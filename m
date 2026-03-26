@@ -1,455 +1,496 @@
-Return-Path: <netdev+bounces-271915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271917-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oLSNGN7oxGkz5AQAu9opvQ
-	(envelope-from <netdev+bounces-271915-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:05:50 +0100
+	id KLFwGsfpxGkz5AQAu9opvQ
+	(envelope-from <netdev+bounces-271917-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:09:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE058330D84
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:05:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04E7C330E68
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:09:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 088663046DA6
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 08:01:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE71930160C7
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 08:04:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC152318BA6;
-	Thu, 26 Mar 2026 08:01:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E055035DA5D;
+	Thu, 26 Mar 2026 08:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="XXpc/ywn"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="iyUCviFq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013036.outbound.protection.outlook.com [52.101.83.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9B6279329;
-	Thu, 26 Mar 2026 08:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774512093; cv=none; b=RCsE63qKfizpMr8CDMj07d58X+fGAgYTpScb4UWzoN+1vmp3yEcPqYl2pCH9l6Qvqj3YHPOoETBxvxdKobKSY9cBOBjiJhu3RGJBdv+z69N1qFyFy1wAJ/+DKmYbSY5TfsMs7bGjDxeXUjlKhMY8SJGBcLgKEAOEi0+zk2RMITw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774512093; c=relaxed/simple;
-	bh=oTK2B96F/5+XXD2QoJ+8PG1kGgWUlZnEwG4iZgzThEQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EtJjsVQUURJFaXC6ba7rEfkFTjh+mQQjYpc+GC83XtoVDrHvBjBD7UE0FtOlbjU0oEVRTe0IAe7jMqaC7MQv/PpnrzS0GXkJgjRJEu9IDOvcq8c+67Lhk2BxevatdkD6lFwxs8wypkeTzICyRVgGLsLVh0/ipZNMIHXs76J/a3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=XXpc/ywn; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62Q7DCW2146722;
-	Thu, 26 Mar 2026 01:01:19 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=UWw6cY5KHp5xiIMMl56oWpZvO
-	rK7PB6CZkHx97xLAGc=; b=XXpc/ywnn6l4BdkItxGGK3c8T7UVYjPYEV/Xg1yvl
-	l9wgRZANazkLWHH+xARhyZBHcgmzR3k/CRIeBOhTRA/+oAvBZMF5ATvibXxmQtIr
-	fymD0gDJ745ZBFks5c7DkmBedqnWaU/umqXswPR1JzWmA4EyTPHF42Oenoh5jBzw
-	VN5KjG6PmjKG6XfxlWvloMm7/gtCJOJuULlo5jN7F9m6uzLk6Z2/X1ZzWEcYCyzD
-	QEYgDct42NYyaUwpwHt66E6yDxz5JiinzmXCzATFcjzrdUTwfX/aHY/LvMe0P1Ym
-	y0jYCFwYnA9uQr20SaLljcKgEc2woTAiNS9CKuXdfUMAQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4d420jmnc9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Mar 2026 01:01:19 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 26 Mar 2026 01:01:17 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Thu, 26 Mar 2026 01:01:17 -0700
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 010253F7073;
-	Thu, 26 Mar 2026 01:01:12 -0700 (PDT)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <bbhushan2@marvell.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Subbaraya
- Sundeep" <sbhatta@marvell.com>
-Subject: [net-next PATCH v3 4/4] octeontx2-pf: cn20k: Use unified Halo context
-Date: Thu, 26 Mar 2026 13:30:48 +0530
-Message-ID: <1774512048-10740-5-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1774512048-10740-1-git-send-email-sbhatta@marvell.com>
-References: <1774512048-10740-1-git-send-email-sbhatta@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D65B234AAF7;
+	Thu, 26 Mar 2026 08:04:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.36
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774512295; cv=fail; b=ndk8PqVSRCCEhOSieNqvnDAfMtbCZdNj+LwZQuLU3iPBBQazT3baHwaLU2NMNfkJhOE6Ou0lsBMYRUyzEaXXkJbCzA7549RILh+NUgfT2rD6FI7P2lD2LmCFJJIhMkB16E3d5S3aoOtmxsgzPMV7KV7GjPt/aE45gc81X3QhcYA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774512295; c=relaxed/simple;
+	bh=F4XpqD51Wf4pWGBzQiM99GW+7aePCBC59Buaz4ZpDvc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=msqN/GxCAGQ/aTtqEvZ0qMO14qzXdyD46deEbEa0Vnx5iOES6sr9Ygr3WOp8uZutXkgZvi9e4pAPYuaTvn0GMMxTdYhxwoEsVguscGuBkLq2NHhRBP+PJk45UZ7j53iaplcdIR3maHxPy5ZW21bjRZs5AfgMoe1vf73Jo9uqyN4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=iyUCviFq; arc=fail smtp.client-ip=52.101.83.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=tEwGtr5YchncayJaMQPC0Lp4aqCG981bo/8wsk29E1FeTB9y5+YYSv0W3CHIW/AejncLBQZ3LeTm3PM//0fVLOmgVbk5mSaEQAVblKjgn0Kg6TtL5GwcPfaJXyfoj6oMbrqvPy9snD9V1Zxq3GCDpiiXEjfETNZWlfDbGm5rI/4b1u+HW97z0gXOqX3qgFNT9/FOF8ixa44pBPmT7Lrmt3xT06dPDsw/rcUuHWUG7DQ1Cf/2IfLe9TonoREVkpXrr9vmoRfbzB0nMHcb4r/BofNFo37HjHDeEd38oPiU0R+dKhf+6mHcuPl5g88wLc8AGCWqcQdpEdty8RF1hAWkTw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tRjT+jRvfqfKANEGJaIAZo2o38IyIaEZvfeg1A7/QFw=;
+ b=xz5ZJcwWYxHaskKNvx3L+tYJLEiyXI+0F7ZJVLSB3U2jHCsfEAjNqicZCzDOZpgvy+mYr5o38nwM8cVTHNO4Rilpz6QG436wYOl5FnvpZaG4ddWOEbOZ4WnJdPmLNigzDleuKTlDABIiOs3R4Lqo0t2NwS92E3AaBwkdLwYx1t/fbCB2DVilzT6gIRGeZ82+KzmD9WeSwWUt3ZGD1VO/l8ljaAQVsKnGUVUlpgeBrj+AlH48eDY9eTK6Z9PVfd7yrz6UR+YVdpwhakx4W9a6PnHo8AdxDW7ehnxezXXAd52UA+yVIQtSqhAs7M7+Yz2Xd05ChMtehx859AOFYJQUgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tRjT+jRvfqfKANEGJaIAZo2o38IyIaEZvfeg1A7/QFw=;
+ b=iyUCviFqDrHn1EoAkK0LME37U+93AQfn18XinVq2CjZpIHXxo//uOK10GqHvrF2McUrpL9oaKUzAJ2qfPt0PpPHgAlES1UeftKiaY+XDjr4ER75sMWRU361IUDLn2PlZOuGHQ2/oYa/VMJ55WvTBN1X7leLFfz1jfPJopSKznx8sfcmJ2Oe6Ooni7dabl2IyWOFfAcyumNdSth1QxoErnIcbwm4ulzre4urg4DoomIGkixY0FPr8bmpv+DCTp+52dWpWOrU3o8bzW0103jCQdf17B6f3TZ1gJFkIP+p3Y2cFORM6nZmGqg5/YbXK17/2ot+w6jOgfLppMdIxpKzlyg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
+ by AS8PR04MB7814.eurprd04.prod.outlook.com (2603:10a6:20b:2a1::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.22; Thu, 26 Mar
+ 2026 08:04:49 +0000
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9723.030; Thu, 26 Mar 2026
+ 08:04:49 +0000
+Date: Thu, 26 Mar 2026 10:04:44 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Manivannan Sadhasivam <mani@kernel.org>
+Cc: linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-can@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	spacemit@lists.linux.dev, UNGLinuxDriver@microchip.com,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Nitin Rawat <quic_nitirawa@quicinc.com>
+Subject: Re: [PATCH v5 phy-next 10/27] scsi: ufs: qcom: keep parallel track
+ of PHY power state
+Message-ID: <20260326080444.gbesciaa5zwvcgoy@skbuf>
+References: <20260319223241.1351137-1-vladimir.oltean@nxp.com>
+ <20260319223241.1351137-11-vladimir.oltean@nxp.com>
+ <ezrcjjwtg5n76w4m65l27szu5mywx66ti3xuprkfcp3x6quvbf@2rew4zrnnbt2>
+ <20260325114309.3k7xkfrffpxp5xq4@skbuf>
+ <vu3cxpynr5mu2fzkrtmjcwijc5jz323wlnbc3r7lp2wxqmhydx@z5xhgf4myw2d>
+ <20260325115731.genmq2yew2p4dvbs@skbuf>
+Content-Type: multipart/mixed; boundary="a4enwsgxq6r6cc7o"
+Content-Disposition: inline
+In-Reply-To: <20260325115731.genmq2yew2p4dvbs@skbuf>
+X-ClientProxiedBy: BE1P281CA0439.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:81::23) To AM9PR04MB8585.eurprd04.prod.outlook.com
+ (2603:10a6:20b:438::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: y02s0JZGQmcMo6kfo-09xXnQjQCgTGeT
-X-Authority-Analysis: v=2.4 cv=ULDQ3Sfy c=1 sm=1 tr=0 ts=69c4e7cf cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=CaZ6pBYYoU2kl75vHkwA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: y02s0JZGQmcMo6kfo-09xXnQjQCgTGeT
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzI2MDA1NyBTYWx0ZWRfXxESSj7j286Z1
- sOtOsjuVEEaSxfNeFzk1f2v76v8Wsl845Lewm+mIAFtOhXhgP1RK6aOdg8V+VhWpPJtabkFXcTD
- 3dyv1HFsz5u+7Ryr9OdGYPGAUj0LZ+O/8tK0l6aMgE4mUSsS3NING9a075SlnJo46ErFUdtB8KT
- HRO6NW/BEPphfgz3OCCNz0TT9DpHOcJDKqlm80J+gv+m4lCQv4v1ymOvVw7UmlptxUH5qMz3nwg
- uf3b8/sR7A1cYdt/MkMX1g65NySGWEULrLebFcUn3FoXZWLi6BVcnbfGTrk4yhRVRjkIYiGYWeS
- AQpS9o98gzkbU0VVffWYtCRF5quFVYCyNpWkaMQa/0lKSvwuQztL+48tCjIvi9mDreeT2mj3+cn
- e8MVYj4J+FDEAON6cWwGq8IHrDoiQK8lsUnOKbJnJZKL8r1Vile25EQVqs5/Lbv+zBJC2nD2QcP
- 6QKXj9z/bBjKMQx+UZA==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-26_02,2026-03-24_01,2025-10-01_01
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|AS8PR04MB7814:EE_
+X-MS-Office365-Filtering-Correlation-Id: f840a32e-0df4-4f58-6577-08de8b0e5990
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|19092799006|376014|6049299003|7416014|366016|10070799003|4053099003|56012099003|22082099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	csCUPcolJzm+0VI37kbpSWVm9QYVUJBx0CDMAVqQpFeDrUKpYUJIdKR9yMB2CaUlZ7WqhSSEqWCmnhoP9ifdnHsS2V5QUl46e8UsbbdFm7QYY8pIUjnAIbzhYzVzcvYwLqwpvc2Y4lHd+w5T/ney5w92NEVsKPTqhNJn1HSWjRA58MJ9JE2J+a4iRRiIJ+ru5AY/J0QnLZv7wEAkkxslisWp3uVH8DMyK1fhr63jNCvmYVUW3tsGzN14f7GDNPm8lMaa24zRoXxLKoMfx0L1iHNa/8O81lziG3phwHeeWA+r2139NlYrqNZjk3EdMEHUN2stWAaija3ZnFHAhhfDti5z3v6g2DZpy1b8noOROIDsUgM5XFRjBH4UkIfZIKsf+9M7eW2gIVhl5JswleBjz8R1N3GAARZfID10WgiAAmRhGDPZ5tg+0HDhuWrOJOEqKxtDPuDoRtzIjGz26o6qVCBfygCauy5lkLtz28uHEEPsZ72Lr5egG6QH6P/R7YKRWN+XApU9tbq1RMU1lgUhfS4BV2PdYfgGlFzjUfwmREs4R/P6nBy2M1LvdPnmJCm6sBkrEBg2HepaXushYxJzA7IHzap4UdQ1rIU867H8sLk3xsABMTzCX0IKCQKWwNfgu3pgiWeuVQMFGQKzDQBGnJrhWox0RLMKaC9HA0Dwx7EkzrzCWOKdLKGInZ6sT6iRilXj/moeHVf4i/djOap1tSTmCzxdFRLkf9zNXJswwm/PKiQL0CHEIfdQXTjzWXsI
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(19092799006)(376014)(6049299003)(7416014)(366016)(10070799003)(4053099003)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?vC+6/uYwZTIckYbcixpzKytcO6Cw4nDldrniCapqlP3sZd4vkfJ8kCoJpWvA?=
+ =?us-ascii?Q?7eliQTgzeuU3UhyG16F7vTHzDNnLFxKespsbzZ8l9ON+6eZsCI8IJzqkhJPG?=
+ =?us-ascii?Q?J18+/AZqtN/xF+EoJ2iXTD4iDelWxvLHyx8GM1hxT0ezdUlSl5OUeCP5/Uqc?=
+ =?us-ascii?Q?sXbZH4ZN45dGe/s/eV3ZYGJn2nQt73uQiJB14aKbBWG63mIZH4b6GKRRMros?=
+ =?us-ascii?Q?K5pAhoa79w3W+lSN/V91Exs3hHJZ5QQs8zP1jZ3zhRqI3rktc/AhzTHDzcBV?=
+ =?us-ascii?Q?uHh3JBnDJbSEA9tR4pi7xBChG/vuuOs7tx4EGAqc2GAmSIDuYeOdV24nNLoy?=
+ =?us-ascii?Q?NxZfwtI6u+C8WOZ5HehJAGqcoxh2vc23ZI+VfhsWHbVhgkXPfYAZKJtjz+za?=
+ =?us-ascii?Q?PPusfoI7ZP+FFjZWo9TVTKJWc5z4diBi9unZnTStbA/8KV9XkScZ/KA4FYgi?=
+ =?us-ascii?Q?wg5/siKcqcJSB4xqlRHaVA67JDHSfZDDyey/CvXaBedKoIN7WDqBeTFtwonT?=
+ =?us-ascii?Q?WnM7DdtfGdlD9XdNEBRTLfq7wOL7Wvwt7SVLVkJlETKzxlU9F9ZzyQotdc81?=
+ =?us-ascii?Q?MnTyW6xhUGODXoRG3d4NCjCHMAwu4qg83GwYRG94SPoXNM1kOFzEBFO3F0TK?=
+ =?us-ascii?Q?bKc849HdebFi609wiUmFO20c6wjE2coPn3+04c2vY+Qag+ONg78PrM0MEzK+?=
+ =?us-ascii?Q?kzXXT6rIhj7d0W0kYQvPBwIAUFfm85+dXr7Jf5HnQnG8kbc+fYwOI9UH0iEC?=
+ =?us-ascii?Q?dAi1dSazmAn8FLxumeZ0BgNZovV2qhT+hdbzu5VOX5I/wpIc5WX9//3Ijl3E?=
+ =?us-ascii?Q?CIAmReS3BmYWsxBoSZO/LhUoGXjaKH3RIT1l3dNcweWr6LNzYXcHA6mV/mwZ?=
+ =?us-ascii?Q?fNSTIAs82FtUgM6z9mEKuZl3TozBawFzR9Ytl4RNMJmfaMFUQ2Rqe1b/iHfe?=
+ =?us-ascii?Q?xj6sdrj6lX74m9V+WF2o9L9d2QcP+E4+AMr1oAF84FkYtvgv0fID6wAnsjUi?=
+ =?us-ascii?Q?5RPOvk/KRDRmsRFl4M69/Y388DHlTBs/Hg+Mz89LwmvYPBwxY4ss5EzgyWyH?=
+ =?us-ascii?Q?9OR0weBe36UdkU20LezVDOVw1Q66ly4ErhS686CyhrJRivf7ndsoUK9wtLOp?=
+ =?us-ascii?Q?sEzA4gem4WUXjG0rFKMjWRWhFVAeYoSDAVst0ZmbafDT3Il3Z7a1NDeKLIpo?=
+ =?us-ascii?Q?jJhzPQGrgl8TowUdMzO0c8afBx+JQ9G38Jc+bCgAKhUlHpnnqTPcA2XGxayJ?=
+ =?us-ascii?Q?ufdLdvvtTGtrGT06Zae9/wrJ1vJJLAoh1Y7BdXQ2bnNS8h8N7l1M3kD6JXGc?=
+ =?us-ascii?Q?s3tJQorVvFa4zKKNBrTyik2nDapb2cD5ijde4QBRGh9r1dljFMx6ZrGbVn5f?=
+ =?us-ascii?Q?XPMDpu6rJMSz55TRGyQ4ZvTeN9PzbOSax6NwyY9Ppw0S0S7rPoJMgeKh5bDR?=
+ =?us-ascii?Q?K5gTTjalyMw31pSr/41zbQXsvOaSkrpDSYXvHDkf5ZBAX5EjptCC7EW57Y/O?=
+ =?us-ascii?Q?11oeAszzSKuNBnRWEHHJ/G16YJYXF8PzGwafsnCobc8hYWP/Sy2jGMkB/8k7?=
+ =?us-ascii?Q?U8Oo/yhaIXiykeyetmrLRWRV3fASPAGZOQQGshiQfG+ykci4FzNA7aI9U+Rn?=
+ =?us-ascii?Q?0UkhfC9n2I2YGYtPG0ZCApRC3Otf0mAjhlNgWUqvShezS/52cizXsRpIl67a?=
+ =?us-ascii?Q?Oe5LrEP5Tj1d+ESwC1sH1D2WY+sc7j6BH7tRFRqp6SNDpU4tD5nETQiK6Hni?=
+ =?us-ascii?Q?MvUMwUPPkENaTv8WTQRAmY4H58GPbTqZbqdMglstCfRxMYpgJUmNyZy9Zdkx?=
+X-MS-Exchange-AntiSpam-MessageData-1: /UHHYE7DwLCbITtqgENAjqpRpb8fCd9brn4=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f840a32e-0df4-4f58-6577-08de8b0e5990
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2026 08:04:49.4753
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uOz1ZusyfzkmEXJ0GnhbBLPbvhvxHCGZsOlerWGNMMrnIipBUcghnCjMG44S4+eE5YuDkPONEXfm5uwZOvZxQw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7814
+X-Spamd-Result: default: False [0.34 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-diff];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271915-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	TAGGED_FROM(0.00)[bounces-271917-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	DKIM_TRACE(0.00)[nxp.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,marvell.com:dkim,marvell.com:email,marvell.com:mid];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: BE058330D84
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
+	HAS_ATTACHMENT(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,nxp.com:email,hansenpartnership.com:email,oracle.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 04E7C330E68
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Use unified Halo context present in CN20K hardware for
-octeontx2 netdevs instead of aura and pool contexts.
+--a4enwsgxq6r6cc7o
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+On Wed, Mar 25, 2026 at 01:57:31PM +0200, Vladimir Oltean wrote:
+> On Wed, Mar 25, 2026 at 05:21:14PM +0530, Manivannan Sadhasivam wrote:
+> > I believe I added the power_count check for phy_exit(). But since that got
+> > moved, the check becomes no longer necessary.
+> 
+> FYI, the power_count keeps track of the balance of phy_power_on() and
+> phy_power_off() calls, whereas it is the init_count keeps track of
+> phy_init() and phy_exit() calls. They are only related to the extent
+> that you must respect the phy_init() -> phy_power_on() -> phy_power_off()
+> -> phy_exit() sequence. But in any case, both should be considered
+> PHY-internal fields. The "Order of API calls" section from
+> Documentation/driver-api/phy/phy.rst mentions the order that I just
+> described above, and consumers should just ensure they follow that.
+
+Ok, so we can close this topic of "checking the power_count not needed"
+by linking to the conversation which spun off here:
+https://lore.kernel.org/lkml/20260325120122.265973-1-manivannan.sadhasivam@oss.qualcomm.com/
+
+Mani, I spent some more time to figure out what's really going on with
+this unexpected phy_power_off() call. Do you think you could
+regression-test the patch attached?
+
+Thanks!
+
+--a4enwsgxq6r6cc7o
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-scsi-ufs-qcom-don-t-call-phy_power_on-before-phy_ini.patch"
+
+From 50dfff3541566eb094e931bd56c80011f29b9817 Mon Sep 17 00:00:00 2001
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+Date: Thu, 26 Mar 2026 10:01:55 +0200
+Subject: [PATCH] scsi: ufs: qcom: don't call phy_power_on() before phy_init()
+
+The Qualcomm UFS host controller driver violates the Generic PHY API
+expectation, documented in section "Order of API calls" from
+Documentation/driver-api/phy/phy.rst, and then tries to hide it.
+
+The expectation is that calls must be made in the phy_init() ->
+phy_power_on() -> phy_power_off() -> phy_exit() sequence.
+
+What we actually have is:
+
+ufshcd_init()
+-> ufshcd_hba_init()
+   -> ufshcd_setup_clocks(hba, true)
+      -> ufshcd_vops_setup_clocks(hba, true, POST_CHANGE)
+         -> ufs_qcom_setup_clocks(hba, true, POST_CHANGE)
+            -> phy_power_on(phy)
+   -> ufshcd_variant_hba_init()
+      -> ufs_qcom_init()
+         -> ufs_qcom_setup_clocks(hba, true, POST_CHANGE)
+            -> phy_power_on(phy)
+-> ufshcd_hba_enable()
+   -> ufshcd_vops_hce_enable_notify()
+      -> ufs_qcom_hce_enable_notify()
+         -> ufs_qcom_power_up_sequence()
+            -> if (phy->power_count) phy_power_off(phy)
+            -> phy_init(phy)
+
+This "works" because the way that the "phy_power_on was called before
+phy_init\n" condition is detected in phy-core.c is if the power_count is
+positive at the phy_init() call time.
+
+By having that "if (phy->power_count) phy_power_off(phy)" logic, the
+ufs-qcom.c technically sidesteps the test, but actually violates the
+Generic PHY API even more (calls phy_power_on() *and* phy_power_off()
+before phy_init()).
+
+The reason why I stumbled upon this was that I was trying to remove
+dereferences of phy->power_count from drivers. This is a PHY-internal
+field, and using it from drivers is highly likely to be incorrect, as
+this case showcases rather well.
+
+As commit 77d2fa54a945 ("scsi: ufs: qcom : Refactor phy_power_on/off
+calls") shows, this driver tries to couple the PHY power state with the
+HBA clocks, for power saving reasons. I won't try to change that, I will
+just move the phy_init() call earlier, to ufs_qcom_init().
+
+After the phy_init() movement, ufs_qcom_power_up_sequence() should no
+longer need to do either phy_init() nor the conditional phy_power_down().
+
+Because the UFS variant operations are not balanced, but the PHY API
+calls need to be, create wrappers for all Generic PHY API calls, and
+keep a "phy_initialized" and a "phy_powered_on" boolean, so that we call
+these only once, and they properly get paired with their phy_exit()/
+phy_power_off() counterparts rather than leave the phy->init_count and
+phy->power_count elevated.
+
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
- .../ethernet/marvell/octeontx2/nic/cn20k.c    | 213 +++++++++---------
- .../ethernet/marvell/octeontx2/nic/cn20k.h    |   3 +
- .../marvell/octeontx2/nic/otx2_common.h       |   3 +
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   6 +
- 4 files changed, 122 insertions(+), 103 deletions(-)
+Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
+Cc: Manivannan Sadhasivam <mani@kernel.org>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Nitin Rawat <quic_nitirawa@quicinc.com>
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-index a5a8f4558717..08033858c59d 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-@@ -242,15 +242,6 @@ int cn20k_register_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs)
- 
- #define RQ_BP_LVL_AURA   (255 - ((85 * 256) / 100)) /* BP when 85% is full */
- 
--static u8 cn20k_aura_bpid_idx(struct otx2_nic *pfvf, int aura_id)
--{
--#ifdef CONFIG_DCB
--	return pfvf->queue_to_pfc_map[aura_id];
--#else
--	return 0;
--#endif
--}
--
- static int cn20k_tc_get_entry_index(struct otx2_flow_config *flow_cfg,
- 				    struct otx2_tc_flow *node)
- {
-@@ -517,84 +508,7 @@ int cn20k_tc_alloc_entry(struct otx2_nic *nic,
- 	return 0;
+v5->v6: rewrite after actually understanding the core issue
+v4->v5: patch is new
+---
+ drivers/ufs/host/ufs-qcom.c | 104 ++++++++++++++++++++++++++----------
+ drivers/ufs/host/ufs-qcom.h |   2 +
+ 2 files changed, 79 insertions(+), 27 deletions(-)
+
+diff --git a/drivers/ufs/host/ufs-qcom.c b/drivers/ufs/host/ufs-qcom.c
+index 375fd24ba458..ed067247d72a 100644
+--- a/drivers/ufs/host/ufs-qcom.c
++++ b/drivers/ufs/host/ufs-qcom.c
+@@ -485,11 +485,70 @@ static u32 ufs_qcom_get_hs_gear(struct ufs_hba *hba)
+ 	return UFS_HS_G3;
  }
  
--static int cn20k_aura_aq_init(struct otx2_nic *pfvf, int aura_id,
--			      int pool_id, int numptrs)
--{
--	struct npa_cn20k_aq_enq_req *aq;
--	struct otx2_pool *pool;
--	u8 bpid_idx;
--	int err;
--
--	pool = &pfvf->qset.pool[pool_id];
--
--	/* Allocate memory for HW to update Aura count.
--	 * Alloc one cache line, so that it fits all FC_STYPE modes.
--	 */
--	if (!pool->fc_addr) {
--		err = qmem_alloc(pfvf->dev, &pool->fc_addr, 1, OTX2_ALIGN);
--		if (err)
--			return err;
--	}
--
--	/* Initialize this aura's context via AF */
--	aq = otx2_mbox_alloc_msg_npa_cn20k_aq_enq(&pfvf->mbox);
--	if (!aq) {
--		/* Shared mbox memory buffer is full, flush it and retry */
--		err = otx2_sync_mbox_msg(&pfvf->mbox);
--		if (err)
--			return err;
--		aq = otx2_mbox_alloc_msg_npa_cn20k_aq_enq(&pfvf->mbox);
--		if (!aq)
--			return -ENOMEM;
--	}
--
--	aq->aura_id = aura_id;
--
--	/* Will be filled by AF with correct pool context address */
--	aq->aura.pool_addr = pool_id;
--	aq->aura.pool_caching = 1;
--	aq->aura.shift = ilog2(numptrs) - 8;
--	aq->aura.count = numptrs;
--	aq->aura.limit = numptrs;
--	aq->aura.avg_level = 255;
--	aq->aura.ena = 1;
--	aq->aura.fc_ena = 1;
--	aq->aura.fc_addr = pool->fc_addr->iova;
--	aq->aura.fc_hyst_bits = 0; /* Store count on all updates */
--
--	/* Enable backpressure for RQ aura */
--	if (aura_id < pfvf->hw.rqpool_cnt && !is_otx2_lbkvf(pfvf->pdev)) {
--		aq->aura.bp_ena = 0;
--		/* If NIX1 LF is attached then specify NIX1_RX.
--		 *
--		 * Below NPA_AURA_S[BP_ENA] is set according to the
--		 * NPA_BPINTF_E enumeration given as:
--		 * 0x0 + a*0x1 where 'a' is 0 for NIX0_RX and 1 for NIX1_RX so
--		 * NIX0_RX is 0x0 + 0*0x1 = 0
--		 * NIX1_RX is 0x0 + 1*0x1 = 1
--		 * But in HRM it is given that
--		 * "NPA_AURA_S[BP_ENA](w1[33:32]) - Enable aura backpressure to
--		 * NIX-RX based on [BP] level. One bit per NIX-RX; index
--		 * enumerated by NPA_BPINTF_E."
--		 */
--		if (pfvf->nix_blkaddr == BLKADDR_NIX1)
--			aq->aura.bp_ena = 1;
--
--		bpid_idx = cn20k_aura_bpid_idx(pfvf, aura_id);
--		aq->aura.bpid = pfvf->bpid[bpid_idx];
--
--		/* Set backpressure level for RQ's Aura */
--		aq->aura.bp = RQ_BP_LVL_AURA;
--	}
--
--	/* Fill AQ info */
--	aq->ctype = NPA_AQ_CTYPE_AURA;
--	aq->op = NPA_AQ_INSTOP_INIT;
--
--	return 0;
--}
--
--static int cn20k_pool_aq_init(struct otx2_nic *pfvf, u16 pool_id,
-+static int cn20k_halo_aq_init(struct otx2_nic *pfvf, u16 pool_id,
- 			      int stack_pages, int numptrs, int buf_size,
- 			      int type)
- {
-@@ -610,36 +524,57 @@ static int cn20k_pool_aq_init(struct otx2_nic *pfvf, u16 pool_id,
- 	if (err)
- 		return err;
- 
-+	/* Allocate memory for HW to update Aura count.
-+	 * Alloc one cache line, so that it fits all FC_STYPE modes.
-+	 */
-+	if (!pool->fc_addr) {
-+		err = qmem_alloc(pfvf->dev, &pool->fc_addr, 1, OTX2_ALIGN);
-+		if (err) {
-+			qmem_free(pfvf->dev, pool->stack);
-+			return err;
-+		}
-+	}
-+
- 	pool->rbsize = buf_size;
- 
--	/* Initialize this pool's context via AF */
-+	/* Initialize this aura's context via AF */
- 	aq = otx2_mbox_alloc_msg_npa_cn20k_aq_enq(&pfvf->mbox);
- 	if (!aq) {
- 		/* Shared mbox memory buffer is full, flush it and retry */
- 		err = otx2_sync_mbox_msg(&pfvf->mbox);
--		if (err) {
--			qmem_free(pfvf->dev, pool->stack);
--			return err;
--		}
-+		if (err)
-+			goto free_mem;
- 		aq = otx2_mbox_alloc_msg_npa_cn20k_aq_enq(&pfvf->mbox);
- 		if (!aq) {
--			qmem_free(pfvf->dev, pool->stack);
--			return -ENOMEM;
-+			err = -ENOMEM;
-+			goto free_mem;
- 		}
- 	}
- 
- 	aq->aura_id = pool_id;
--	aq->pool.stack_base = pool->stack->iova;
--	aq->pool.stack_caching = 1;
--	aq->pool.ena = 1;
--	aq->pool.buf_size = buf_size / 128;
--	aq->pool.stack_max_pages = stack_pages;
--	aq->pool.shift = ilog2(numptrs) - 8;
--	aq->pool.ptr_start = 0;
--	aq->pool.ptr_end = ~0ULL;
-+
-+	aq->halo.stack_base = pool->stack->iova;
-+	aq->halo.stack_caching = 1;
-+	aq->halo.ena = 1;
-+	aq->halo.buf_size = buf_size / 128;
-+	aq->halo.stack_max_pages = stack_pages;
-+	aq->halo.shift = ilog2(numptrs) - 8;
-+	aq->halo.ptr_start = 0;
-+	aq->halo.ptr_end = ~0ULL;
-+
-+	aq->halo.avg_level = 255;
-+	aq->halo.fc_ena = 1;
-+	aq->halo.fc_addr = pool->fc_addr->iova;
-+	aq->halo.fc_hyst_bits = 0; /* Store count on all updates */
-+
-+	if (pfvf->npa_dpc_valid) {
-+		aq->halo.op_dpc_ena = 1;
-+		aq->halo.op_dpc_set = pfvf->npa_dpc;
-+	}
-+	aq->halo.unified_ctx = 1;
- 
- 	/* Fill AQ info */
--	aq->ctype = NPA_AQ_CTYPE_POOL;
-+	aq->ctype = NPA_AQ_CTYPE_HALO;
- 	aq->op = NPA_AQ_INSTOP_INIT;
- 
- 	if (type != AURA_NIX_RQ) {
-@@ -661,6 +596,78 @@ static int cn20k_pool_aq_init(struct otx2_nic *pfvf, u16 pool_id,
- 	}
- 
- 	return 0;
-+
-+free_mem:
-+	qmem_free(pfvf->dev, pool->stack);
-+	qmem_free(pfvf->dev, pool->fc_addr);
-+	return err;
-+}
-+
-+static int cn20k_aura_aq_init(struct otx2_nic *pfvf, int aura_id,
-+			      int pool_id, int numptrs)
++static int ufs_qcom_phy_init(struct ufs_qcom_host *host)
 +{
-+	return 0;
-+}
-+
-+static int cn20k_pool_aq_init(struct otx2_nic *pfvf, u16 pool_id,
-+			      int stack_pages, int numptrs, int buf_size,
-+			      int type)
-+{
-+	return cn20k_halo_aq_init(pfvf, pool_id, stack_pages,
-+				  numptrs, buf_size, type);
-+}
-+
-+int cn20k_npa_alloc_dpc(struct otx2_nic *nic)
-+{
-+	struct npa_cn20k_dpc_alloc_req *req;
-+	struct npa_cn20k_dpc_alloc_rsp *rsp;
++	struct phy *phy = host->generic_phy;
 +	int err;
 +
-+	req = otx2_mbox_alloc_msg_npa_cn20k_dpc_alloc(&nic->mbox);
-+	if (!req)
-+		return -ENOMEM;
++	if (host->phy_initialized)
++		return 0;
 +
-+	/* Count successful ALLOC requests only */
-+	req->dpc_conf = 1ULL << 4;
-+
-+	err = otx2_sync_mbox_msg(&nic->mbox);
++	err = phy_init(phy);
 +	if (err)
 +		return err;
 +
-+	rsp = (struct npa_cn20k_dpc_alloc_rsp *)otx2_mbox_get_rsp(&nic->mbox.mbox,
-+								  0, &req->hdr);
-+	if (IS_ERR(rsp))
-+		return PTR_ERR(rsp);
-+
-+	nic->npa_dpc = rsp->cntr_id;
-+	nic->npa_dpc_valid = true;
++	host->phy_initialized = true;
 +
 +	return 0;
 +}
 +
-+int cn20k_npa_free_dpc(struct otx2_nic *nic)
++static void ufs_qcom_phy_exit(struct ufs_qcom_host *host)
 +{
-+	struct npa_cn20k_dpc_free_req *req;
++	if (host->phy_initialized) {
++		phy_exit(host->generic_phy);
++		host->phy_initialized = false;
++	}
++}
++
++static int ufs_qcom_phy_power_on(struct ufs_qcom_host *host)
++{
 +	int err;
 +
-+	if (!nic->npa_dpc_valid)
++	if (host->phy_powered_on)
 +		return 0;
 +
-+	mutex_lock(&nic->mbox.lock);
++	err = phy_power_on(host->generic_phy);
++	if (err)
++		return err;
 +
-+	req = otx2_mbox_alloc_msg_npa_cn20k_dpc_free(&nic->mbox);
-+	if (!req) {
-+		mutex_unlock(&nic->mbox.lock);
-+		return -ENOMEM;
++	host->phy_powered_on = true;
++
++	return 0;
++}
++
++static int ufs_qcom_phy_set_gear(struct ufs_qcom_host *host,
++				 enum phy_mode mode)
++{
++	return phy_set_mode_ext(host->generic_phy, mode, host->phy_gear);
++}
++
++static int ufs_qcom_phy_calibrate(struct ufs_qcom_host *host)
++{
++	return phy_calibrate(host->generic_phy);
++}
++
++static void ufs_qcom_phy_power_off(struct ufs_qcom_host *host)
++{
++	if (host->phy_powered_on) {
++		phy_power_off(host->generic_phy);
++		host->phy_powered_on = false;
++	}
++}
++
+ static int ufs_qcom_power_up_sequence(struct ufs_hba *hba)
+ {
+ 	struct ufs_qcom_host *host = ufshcd_get_variant(hba);
+ 	struct ufs_host_params *host_params = &host->host_params;
+-	struct phy *phy = host->generic_phy;
+ 	enum phy_mode mode;
+ 	int ret;
+ 
+@@ -508,31 +567,22 @@ static int ufs_qcom_power_up_sequence(struct ufs_hba *hba)
+ 	if (ret)
+ 		return ret;
+ 
+-	if (phy->power_count)
+-		phy_power_off(phy);
+-
+-
+-	/* phy initialization - calibrate the phy */
+-	ret = phy_init(phy);
++	ret = ufs_qcom_phy_set_gear(host, mode);
+ 	if (ret) {
+-		dev_err(hba->dev, "%s: phy init failed, ret = %d\n",
++		dev_err(hba->dev, "%s: phy_set_mode_ext() failed, ret = %d\n",
+ 			__func__, ret);
+-		return ret;
+-	}
+-
+-	ret = phy_set_mode_ext(phy, mode, host->phy_gear);
+-	if (ret)
+ 		goto out_disable_phy;
++	}
+ 
+ 	/* power on phy - start serdes and phy's power and clocks */
+-	ret = phy_power_on(phy);
++	ret = ufs_qcom_phy_power_on(host);
+ 	if (ret) {
+ 		dev_err(hba->dev, "%s: phy power on failed, ret = %d\n",
+ 			__func__, ret);
+ 		goto out_disable_phy;
+ 	}
+ 
+-	ret = phy_calibrate(phy);
++	ret = ufs_qcom_phy_calibrate(host);
+ 	if (ret) {
+ 		dev_err(hba->dev, "Failed to calibrate PHY: %d\n", ret);
+ 		goto out_disable_phy;
+@@ -543,7 +593,7 @@ static int ufs_qcom_power_up_sequence(struct ufs_hba *hba)
+ 	return 0;
+ 
+ out_disable_phy:
+-	phy_exit(phy);
++	ufs_qcom_phy_power_off(host);
+ 
+ 	return ret;
+ }
+@@ -1233,7 +1283,6 @@ static int ufs_qcom_setup_clocks(struct ufs_hba *hba, bool on,
+ 				 enum ufs_notify_change_status status)
+ {
+ 	struct ufs_qcom_host *host = ufshcd_get_variant(hba);
+-	struct phy *phy;
+ 	int err;
+ 
+ 	/*
+@@ -1244,8 +1293,6 @@ static int ufs_qcom_setup_clocks(struct ufs_hba *hba, bool on,
+ 	if (!host)
+ 		return 0;
+ 
+-	phy = host->generic_phy;
+-
+ 	switch (status) {
+ 	case PRE_CHANGE:
+ 		if (on) {
+@@ -1263,16 +1310,12 @@ static int ufs_qcom_setup_clocks(struct ufs_hba *hba, bool on,
+ 				ufs_qcom_dev_ref_clk_ctrl(host, false);
+ 			}
+ 
+-			err = phy_power_off(phy);
+-			if (err) {
+-				dev_err(hba->dev, "phy power off failed, ret=%d\n", err);
+-				return err;
+-			}
++			ufs_qcom_phy_power_off(host);
+ 		}
+ 		break;
+ 	case POST_CHANGE:
+ 		if (on) {
+-			err = phy_power_on(phy);
++			err = ufs_qcom_phy_power_on(host);
+ 			if (err) {
+ 				dev_err(hba->dev, "phy power on failed, ret = %d\n", err);
+ 				return err;
+@@ -1441,6 +1484,13 @@ static int ufs_qcom_init(struct ufs_hba *hba)
+ 	if (err)
+ 		goto out_variant_clear;
+ 
++	err = ufs_qcom_phy_init(host);
++	if (err) {
++		dev_err(hba->dev, "%s: phy_init failed, ret = %d\n",
++			__func__, err);
++		goto out_variant_clear;
 +	}
 +
-+	req->cntr_id = nic->npa_dpc;
-+
-+	err = otx2_sync_mbox_msg(&nic->mbox);
-+
-+	mutex_unlock(&nic->mbox.lock);
-+
-+	return err;
+ 	ufs_qcom_setup_clocks(hba, true, POST_CHANGE);
+ 
+ 	ufs_qcom_get_default_testbus_cfg(host);
+@@ -1466,8 +1516,8 @@ static void ufs_qcom_exit(struct ufs_hba *hba)
+ 	struct ufs_qcom_host *host = ufshcd_get_variant(hba);
+ 
+ 	ufs_qcom_disable_lane_clks(host);
+-	phy_power_off(host->generic_phy);
+-	phy_exit(host->generic_phy);
++	ufs_qcom_phy_power_off(host);
++	ufs_qcom_phy_exit(host);
  }
  
- static int cn20k_sq_aq_init(void *dev, u16 qidx, u8 chan_offset, u16 sqb_aura)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
-index b5e527f6d7eb..16a69d84ea79 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
-@@ -28,4 +28,7 @@ int cn20k_tc_alloc_entry(struct otx2_nic *nic,
- 			 struct otx2_tc_flow *new_node,
- 			 struct npc_install_flow_req *dummy);
- int cn20k_tc_free_mcam_entry(struct otx2_nic *nic, u16 entry);
-+int cn20k_npa_alloc_dpc(struct otx2_nic *nic);
-+int cn20k_npa_free_dpc(struct otx2_nic *nic);
-+
- #endif /* CN20K_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index eecee612b7b2..f997dfc0fedd 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -592,6 +592,9 @@ struct otx2_nic {
- 	struct cn10k_ipsec	ipsec;
- 	/* af_xdp zero-copy */
- 	unsigned long		*af_xdp_zc_qidx;
-+
-+	bool			npa_dpc_valid;
-+	u8			npa_dpc; /* NPA DPC counter id */
- };
+ static int ufs_qcom_fw_managed_init(struct ufs_hba *hba)
+diff --git a/drivers/ufs/host/ufs-qcom.h b/drivers/ufs/host/ufs-qcom.h
+index 1111ab34da01..33b1b1521916 100644
+--- a/drivers/ufs/host/ufs-qcom.h
++++ b/drivers/ufs/host/ufs-qcom.h
+@@ -282,6 +282,8 @@ struct ufs_qcom_host {
+ 	struct clk_bulk_data *clks;
+ 	u32 num_clks;
+ 	bool is_lane_clks_enabled;
++	bool phy_initialized;
++	bool phy_powered_on;
  
- static inline bool is_otx2_lbkvf(struct pci_dev *pdev)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index ee623476e5ff..2941549d46c8 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -1651,6 +1651,9 @@ int otx2_init_hw_resources(struct otx2_nic *pf)
- 	if (!is_otx2_lbkvf(pf->pdev))
- 		otx2_nix_config_bp(pf, true);
- 
-+	if (is_cn20k(pf->pdev))
-+		cn20k_npa_alloc_dpc(pf);
-+
- 	/* Init Auras and pools used by NIX RQ, for free buffer ptrs */
- 	err = otx2_rq_aura_pool_init(pf);
- 	if (err) {
-@@ -1790,6 +1793,9 @@ void otx2_free_hw_resources(struct otx2_nic *pf)
- 
- 	otx2_free_sq_res(pf);
- 
-+	if (is_cn20k(pf->pdev))
-+		cn20k_npa_free_dpc(pf);
-+
- 	/* Free RQ buffer pointers*/
- 	otx2_free_aura_ptr(pf, AURA_NIX_RQ);
- 
+ 	struct icc_path *icc_ddr;
+ 	struct icc_path *icc_cpu;
 -- 
-2.48.1
+2.34.1
 
+
+--a4enwsgxq6r6cc7o--
 
