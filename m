@@ -1,137 +1,178 @@
-Return-Path: <netdev+bounces-272273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272274-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8NG0JBG2xWnEAwUAu9opvQ
-	(envelope-from <netdev+bounces-272273-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:41:21 +0100
+	id sE7XGqW5xWkeBAUAu9opvQ
+	(envelope-from <netdev+bounces-272274-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:56:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DBED33CA5A
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:41:17 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74E7C33CD45
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:56:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7EAB33011A70
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 22:41:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8D579305A484
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 22:45:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D5D31E823;
-	Thu, 26 Mar 2026 22:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40003345CBD;
+	Thu, 26 Mar 2026 22:45:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PsnTFjOZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mccKv7sH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF0D4AEE2;
-	Thu, 26 Mar 2026 22:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A584B344025
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 22:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774564874; cv=none; b=f4QuN1YUM3g8/jr85AclOlk4dP0WfxyH40yo4n8sa4q2RvlxlOdTI937QWAMGQbXxUena+q4N56ASFYQCmDf88yVg3yMe3kjY74hEZze/hXYBPqfyg72T6ZfMGpsK4M6iCdY3ZNfZmBSbML3doB7i9Xe2ynbsBYu7n3b1d/PKJA=
+	t=1774565133; cv=none; b=kcZfpQ6zWeaA9pu973clVcGGmcvIzjHiBJR3T5HhxHT6XAjaj6RfBeuKwVKZOlBlbDgqbT49Z2ppnjS2eNCXInVlfWDujhl1hAeuz/oDxJYJVBeRvppXeFNPoWqXCma/XEW8XulRgNl+bLK/ESAPWvl97iMywne6MbIq11jpptg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774564874; c=relaxed/simple;
-	bh=O9RE3qPQOrONRsorAVN2XwchrtUcoeQXGzvczDsoM0I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O7Ry6CFRQJntveQZQzi2R+H0Nn9uINJZPQEmxy3CXFsdLUQh4nbeDu8xXCeOODvRuOa/2dkz/olOrbl45+wIHupiLjd1/N59UeKZRpxbVHmn/KGfw8Qc+ddCKalckr0m/lVJx5Xvg5yH72SKrRNK/MtOcSiUOEOZTbga4sU0nwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PsnTFjOZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F329C116C6;
-	Thu, 26 Mar 2026 22:41:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774564873;
-	bh=O9RE3qPQOrONRsorAVN2XwchrtUcoeQXGzvczDsoM0I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PsnTFjOZKBZWQ4+ymH6V5CbVtPOKgtB7APar8wQbMHAL324LaZ3YA1lEqUplGxxJM
-	 7gowm/jZDTt4f9FAUW6Sei6Jhgt0w6JS9eeWENbE6MagiwxaAYVHC0tb/Z6vqwqwSw
-	 zjuFISZZNCdmocM8GAFf1hQDyceBOcpfyTHl+zMcCmQNOiHamfaY0Q78xxZpPA5hn4
-	 aiLf0dU4cUcJmDQ7Aa0y2Ho8lDqdhnV16Fk4Xb2dg9gInBLlHG60kzH3DVFNztBTte
-	 zSlHh29e3e8PT/Nc7LWEzjm8oOGVmmTtEeGptW1/E5KVeXER+QTapM/Q/1Z2wScHex
-	 nsy13cDBr1Vcg==
-Date: Thu, 26 Mar 2026 16:41:11 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Zhiping Zhang <zhipingz@meta.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-rdma@vger.kernel.org,
-	linux-pci@vger.kernel.org, netdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, Yochai Cohen <yochai@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Bjorn Helgaas <helgaas@kernel.org>
-Subject: Re: [RFC v2 1/2] vfio: add callback to get tph info for dmabuf
-Message-ID: <acW2BwQKaUbS3eL9@kbusch-mbp>
-References: <20260324234615.3731237-1-zhipingz@meta.com>
- <20260324234615.3731237-2-zhipingz@meta.com>
- <20260325082534.GN814676@unreal>
+	s=arc-20240116; t=1774565133; c=relaxed/simple;
+	bh=d24yFDrcbVdxC849ACOfVcdtjeCjV7I6Vta77nevR88=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=n11oQw7Ja9rG7vNNTbShWV6FoQtlbHERrkAZcdRTpNiAYYAaP5VoN5/+X2a6P43SHnGdM9duxn2NupEwX2ZcobXn3GZjJQ54eHJBNMQPMD+DRSBYwpsNQTnmA1cJ+Xipfe+fEBGfuhJ7UXHFwoyXwFV8dVcN8MuZz0TbQMxvDhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mccKv7sH; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c7422397574so2578754a12.0
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 15:45:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774565131; x=1775169931; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=L9mfLSr3iC4uQpiQYaWzWq/7NPFs0+yjP9nmA8PkcV4=;
+        b=mccKv7sHtWj7jKEQz40DHnEgBv0NP7dj+LELq6J4lyipNQqy15awFl4sGm7iZ7LVOD
+         uxJMXZUFvDGV5JtE95E/YXCg+Y7yBmbTwXdBHARjPoIHVqy9hi32EaH+dqRsOhLHy8PC
+         D87KqFAp6c3WX4VGdWUcvhv75aqiwUmPd+QXSsZwOSt7tSSVkKALzBs5X/x/obdNKK7H
+         UzhBTXuuSqRJLNXRZotMC4+tMWlKI0sem2L6s4VY5SJByLvjJbqiaShZgVbpyvDCK6WD
+         4QD2MyFNLUy6dzyRjzIHGObBYR41ckbceWS9GWHImbWLtFCne6Z0D6TGSLBZhs+3kQj9
+         N0Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774565131; x=1775169931;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=L9mfLSr3iC4uQpiQYaWzWq/7NPFs0+yjP9nmA8PkcV4=;
+        b=pnF6y6ROzev7V1vWP8gX9dJaLUVPmlr7PRCHbw0+RRgUOxk1LIbMW0nkirfcfkoAhl
+         fYt611mafccIoZYPewIzwU/zpjNseTeN4peE9WgInFzAHvxrcAim/I0uyVLe0jaTS+Fy
+         knq02BECtRE931vC+71fURNjn5MJepu3/5NWdFoAk9j9SSA5mvF+GOTl8MVT5OAHfPAt
+         ua238lfv3PC6UP+8zXF1tVVcw37EwgNWqe1sqo87HI78+GCl0uScsfX4aJ1Q//HsTSd3
+         In1X6olVEubxKhoUdi1uRZr2AU4y7HV9tchZdIYtHiP53keLbUi/niFmCA+eTdNwA1gv
+         AN/w==
+X-Gm-Message-State: AOJu0YyZJF6NmMZL1kQ+VcnvrbN/D1oLlBlrSQHZb5Hxf8jtvOTWeXbl
+	PlDK4LT8heMoLp/F+vyBfq0VRZNm8CDhiuxeEuCue6TKAk4IMXFTWLa3NyNqpWcMEmItT+tCfKy
+	0hwxoGk4PN9rTJ46SpFle3Xk6R5ntLMZlZDr8R2KPADoUc2foStOnEDc+6F6yMzDOzkbapJBjo6
+	hhwfetWnjl3fghAayUAVvwdkbsJ/U0tV6cKS+PZLPQbC4ly+J92vvObXzcTy4tS0o=
+X-Received: from pgbcs9.prod.google.com ([2002:a05:6a02:4189:b0:c74:390e:55b3])
+ (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:2a15:b0:398:bcee:4506 with SMTP id adf61e73a8af0-39c87b86836mr250935637.38.1774565130483;
+ Thu, 26 Mar 2026 15:45:30 -0700 (PDT)
+Date: Thu, 26 Mar 2026 22:45:24 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260325082534.GN814676@unreal>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
+Message-ID: <20260326224527.1044097-1-hramamurthy@google.com>
+Subject: [PATCH net-next v2 0/3] gve: add support for PTP gettimex64
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+To: netdev@vger.kernel.org
+Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	richardcochran@gmail.com, willemb@google.com, nktgrg@google.com, 
+	jfraker@google.com, ziweixiao@google.com, maolson@google.com, 
+	thostet@google.com, jordanrhee@google.com, jefrogers@google.com, 
+	alok.a.tiwari@oracle.com, yyd@google.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272273-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kbusch@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-272274-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1DBED33CA5A
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 74E7C33CD45
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 25, 2026 at 10:25:34AM +0200, Leon Romanovsky wrote:
-> On Tue, Mar 24, 2026 at 04:46:02PM -0700, Zhiping Zhang wrote:
-> >  struct vfio_device_feature_dma_buf {
-> >  	__u32	region_index;
-> >  	__u32	open_flags;
-> > -	__u32   flags;
-> > -	__u32   nr_ranges;
-> > +	__u32	flags;
-> > +#define VFIO_DMABUF_FL_TPH		(1U << 0) /* TPH info is present */
-> > +#define VFIO_DMABUF_TPH_PH_SHIFT	1         /* bits 1-2: PH (2-bit) */
-> > +#define VFIO_DMABUF_TPH_PH_MASK	0x6U
-> > +#define VFIO_DMABUF_TPH_ST_SHIFT	16        /* bits 16-31: steering tag */
-> > +#define VFIO_DMABUF_TPH_ST_MASK		0xffff0000U
-> 
-> This extension of flags is basically kills future extension of this
-> struct for anything that includes TPH.
-> 
-> Add new
-> enum vfio_device_feature_dma_buf_flags {
->     VFIO_DMABUF_FL_TPH  = 1 << 0
-> }
-> 
-> > +	__u32	nr_ranges;
-> 
-> add your "__u16 steering_tag" and "__u8 ph" fields here.
+From: Jordan Rhee <jordanrhee@google.com>
 
-You're suggesting that Ziping append the new fields to the end of this
-struct? I don't think we can modify the layout of a uapi.
+This patch series adds support to obtain near-simultaneous NIC and
+system timestamps with gettimex64. This enables daemons like
+chrony and phc2sys to synchronize the system clock to the NIC clock.
 
-If we can't carve the space for this out of the existing unused flags
-field, I think we'd have to introduce a new vfio device feature that
-basically copies VFIO_DEVICE_FEATURE_DMA_BUF with the extra hints
-fields.
- 
-> >  	struct vfio_region_dma_range dma_ranges[] __counted_by(nr_ranges);
-> >  };
+GVE does not have direct register access to the NIC hardware clock, so
+it must issue an AdminQ command to read the NIC clock. Due to relatively
+high latency of AQ commands (~100us), it is necessary for the hypervisor
+to sample the system time sandwich inside the AQ command.
+
+The first two patches pave the way for the PTP implementation by
+quieting excessive logging and refactoring an existing routine for
+thread safety.
+
+When tested inside a GCE C3 VM, this enabled chrony to synchronize the
+NIC clock and system clock with sub-microsecond precision.
+
+chronyc tracking
+Reference ID    : 50484330 (PHC0)
+Stratum         : 1
+Ref time (UTC)  : Sat Feb 14 01:53:42 2026
+System time     : 0.000000001 seconds fast of NTP time
+Last offset     : -0.000000000 seconds
+RMS offset      : 0.000000001 seconds
+Frequency       : 0.686 ppm fast
+Residual freq   : -0.000 ppm
+Skew            : 0.001 ppm
+Root delay      : 0.000000001 seconds
+Root dispersion : 0.000000812 seconds
+Update interval : 0.5 seconds
+Leap status     : Normal
+
+---
+Changelog:
+V2:
+- Fixed compilation warning on ARM by casting to u64
+
+V1: https://lore.kernel.org/netdev/20260323234829.3185051-1-hramamurthy@google.com/
+---
+
+Ankit Garg (1):
+  gve: make nic clock reads thread safe
+
+Jordan Rhee (2):
+  gve: skip error logging for retryable AdminQ commands
+  gve: implement PTP gettimex64
+
+ drivers/net/ethernet/google/gve/gve.h        |   6 +-
+ drivers/net/ethernet/google/gve/gve_adminq.c |  26 ++-
+ drivers/net/ethernet/google/gve/gve_adminq.h |   4 +-
+ drivers/net/ethernet/google/gve/gve_ptp.c    | 209 +++++++++++++++++--
+ 4 files changed, 220 insertions(+), 25 deletions(-)
+
+
+base-commit: 5446b8691eb8278f10deca92048fad84ffd1e4d5
+-- 
+2.53.0.1018.g2bb0e51243-goog
+
 
