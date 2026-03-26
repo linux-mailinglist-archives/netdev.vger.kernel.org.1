@@ -1,71 +1,98 @@
-Return-Path: <netdev+bounces-271808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271806-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2DyaN3CXxGnn1AQAu9opvQ
-	(envelope-from <netdev+bounces-271808-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 03:18:24 +0100
+	id KFlPGySXxGnn1AQAu9opvQ
+	(envelope-from <netdev+bounces-271806-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 03:17:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59D8232E4D0
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 03:18:24 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5313432E49D
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 03:17:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 36AD6302AF24
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 02:17:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0CAE2302368C
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 02:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB7E390221;
-	Thu, 26 Mar 2026 02:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E9F224AF7;
+	Thu, 26 Mar 2026 02:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ET2C75lD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E885C33AD8C
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 02:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FA83081D6
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 02:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774491466; cv=none; b=XyY8PMKGuK02ROxD48tXO0IK9jxBD6zxehmv11so67oIwZQrJCL8IQOOnRoZn8ssC6Owm73Mc2d5BqafQrwcUDpwiV/+e7/l0NNgErmFzkPuxkWMFgWGf14XX8LLRouRnlNXe3MhOzgAqoa7UZWqWSldG2AS50GFrA7N8BvPS0I=
+	t=1774491415; cv=none; b=fj4DcilGeugu6KzQX7wuYFxdspc+CmOWDqJoXF+ZDEEg49ZN2BZR2LOCaiEJL41HBHZdvE+cbT1zJYhiBuFVOMm2WfCtYKbUvQUkviapzYsB/xGX/IqkaOKWfukgJOmm5KE5CFPoQ6tqph4psasWUKOyvpyQutOwJYWr54PCItI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774491466; c=relaxed/simple;
-	bh=QqH7Wdg59WRrg279JM6iirCloQWd8/iwHmLoiowCroc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G4fzOyYEkow7mZkGTsdK2CZSwMO6NKMHlyNQia3kNtmjiUVsBJ1bxxD8JWPVBToLwujeyMSUA1mnlIQ9uFrchg3fNvhdvTjSLBEFXP7Hg6LQ26SFVZAOVUOyjTq1Tt7Q8cBTD9esF1jCeuaSUAplumHLTRhcB0J8tnMDc0JaAyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpsz11t1774491347tbd1ddf50
-X-QQ-Originating-IP: IyiggHlmL/S654Nz76+QAx2Z7PpeV8v3zdkgPQAfQPg=
-Received: from lap-jiawenwu.trustnetic.com ( [36.20.60.44])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 26 Mar 2026 10:15:45 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 513056848894671807
-EX-QQ-RecipientCnt: 18
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1774491415; c=relaxed/simple;
+	bh=XL210it0gtQsEszctI6MjLScbi4X8gcsVy8bQGL8kHE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HBgJfbw+9UtEhaFFo84TKN46pMgSHwKLyo1ODKAIFp+Q2DaSPEQzj9hdEYW1W4IC9tzLnmUSraFfjtaAfCfcFhLPbI8QHTnys+S5X0FDwpCetIpEDxhtasxdZQm+ltJ8zYNqHr+S2zuQrjIyBWv+mvWcjvHoM05oaEJVMaBUhk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ET2C75lD; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-668d4751a3bso593971a12.2
+        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 19:16:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774491411; x=1775096211; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BmgS7jmIsFb12HXFzHaausAdN0MMTikyDLHIG6ToCYY=;
+        b=ET2C75lDl3dF1GWBDNPPHXY6R+M/C7yiiikMHpM6L8envXWQe/S06lOBVxuzZnA+6b
+         FQjhSqIgqpIyX30rocEXzH2Get1UZZ7y6Carv5gxGD2I1rnbR4HIbAlVrjRJX8b9MNCv
+         n3j0layCpgYYJj79JuO5zwwCn33L8W9De3yxnUUAgtN8/CuCCD27/AfVAJldCs5La8Fe
+         3TrW2WRrDLEbaaVF9XBcksDDx4VrDhy62uIHTCvmFMQVSb1B5GL3viBfvgwdEdhnC3J1
+         G5DW9VDwRT+dd/4kZnkCmgSsGY6Gn4+JgyGUFrnJ2ymOxnIMi+kfGTV8aCq90nvUYMSd
+         q0og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774491411; x=1775096211;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BmgS7jmIsFb12HXFzHaausAdN0MMTikyDLHIG6ToCYY=;
+        b=GRxeVF/el87atN0ZAuDfmJwLlCJF8YH/ydjGXL3Kz47kKStR8GUUOd0ALj+qvRf7lb
+         RWWcdpnNMWrsytv2L4gE2cZHjmFo0I6EblsvsrKS6rWkyPH/PiMawumhZJgzeqAnqtrY
+         F/qdbic0uhchlBq9VxuRN8yr5mfXlX4g92Q5Zy81qcuOjSpUKwjqDvyOaRLjuWzcxjY+
+         0c8+w9vJ+47O1//aJgevTsfuEjVp5+kcRcO4jGGIFDGFFwDB8QiD/kBrDLR5uGHcgALi
+         8ex2r/LXsQI2Om9iAXmWuVtt38wA43663UR8f4ojwm6XatKqXEOQITtSmvpfOe8WnmTu
+         q0ig==
+X-Forwarded-Encrypted: i=1; AJvYcCVE6sx7XeSTfTvpM3YXqvCHTojn/yq1qX5hTK4kVhLgPBhivhBmgkFqbosEI84xwKeP1DxKk+4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyc+y5lvIUqF55PtKEYjLLUTzCSjtd+yfuUfCd2Or5NT4QcgcId
+	5heVwFj2Mbl5g3ic8+MQDAj3uiGxgKM100yro69r4h0rcYuPaMLzXNwu
+X-Gm-Gg: ATEYQzxgSaHzmBA8emYn9wACC9mHzaDbTKcrJT/jhBY0Y2AtP3xfnI05CPcYrgrY6QF
+	J1yG4iP9HqaAIo02RPKYPRyCeJIGpp6ejdV1qaUGQjG+Jocb2mGrqtl3mgdUj77g9YL5IwpDwro
+	3xnSrKHk/+QgRttUSHn0Js9kx8TML7f60OeSRiQTQTXMGh0e5t0fhv/c7RuXgChF6K/aEH3HTeE
+	hSbEup/6rppRjEQgUr2AhBvoNR4KLbDfZcZ2rNMpdENEjm0sSs0tVlG+RuC34ZgPuWoFUtoLQ/3
+	sAIz9ADXuP2R3FC824U579rNi9YbBC89Daco/TJruNI5gFL4y0VZ1gJ3lAeV3Wkx6ieWG81oiD6
+	9ppXNJwmP8clOpUvCM8e1scX/XiuYFdq77Ld/L65rg2v4ll/2v2WqnUSehJTqLyvXugb+7JEjVS
+	M5CFDTPcpuVfC9
+X-Received: by 2002:a05:6402:40d1:b0:66a:11c9:f6bd with SMTP id 4fb4d7f45d1cf-66a826e30admr3331546a12.27.1774491410742;
+        Wed, 25 Mar 2026 19:16:50 -0700 (PDT)
+Received: from gmail.com ([2a09:bac5:4e24:270f::3e4:5])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-66ad541489esm447262a12.0.2026.03.25.19.16.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Mar 2026 19:16:49 -0700 (PDT)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Shuah Khan <shuah@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
 	Simon Horman <horms@kernel.org>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Kees Cook <kees@kernel.org>,
-	Joe Damato <joe@dama.to>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Abdun Nihaal <abdun.nihaal@gmail.com>,
-	Breno Leitao <leitao@debian.org>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v6 11/11] net: wangxun: implement pci_error_handlers ops
-Date: Thu, 26 Mar 2026 10:14:06 +0800
-Message-Id: <20260326021406.30444-12-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20260326021406.30444-1-jiawenwu@trustnetic.com>
-References: <20260326021406.30444-1-jiawenwu@trustnetic.com>
+	Felix Maurer <fmaurer@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Antonio Quartulli <antonio@openvpn.net>,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Paul Mackerras <paulus@ozlabs.org>
+Subject: [PATCH net-next v4] selftests: net: add tests for PPP
+Date: Thu, 26 Mar 2026 10:16:24 +0800
+Message-ID: <20260326021642.29170-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,297 +100,275 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: OJ1IEQL1epI3s5vkeKsgH7XDA4c8asPJGnaEGAltgGEmFQt4NN+AHNg0
-	XL6A3VCi6erJXQG42LfZ0lNg9z6Hh8mlCOD1vovnhpU6av1uQs9RkF6bo7v9quPQTo7+jt0
-	S3Q7YgROlUKXKH0EVl2BStjIqgzzM0JDjuZNoO3NbPD8E8aeRLY124axNqYnns4rAgXusLS
-	RRXXrjJ3snQqbQRiJGMYyzLH91cnaVOzXnT71zncNdlZahIDPlPByF/r1q/8qqhQo+4Ed6j
-	Qx3amIZYhVMqFxQNb7lf4p6IFveV+yufGQlFh0ViUlrfS6jJDfSRf79CCcjohV/KNtKgAQX
-	KctAfOyJ2kkN/fRupPg34jl5zV8xFh9j5diHu8gPnNQoFguQLSqgKyf9+BfW00HXRb7aduJ
-	Fk8jS5qTJF9yj9i/nGSFbkhVr7XALxa49Lc7wqcqSyrnhVJMPMuoR5XHE5Kd+pub7ZoLHhW
-	bUc5A02x4ONZ7zBAVePO3RYrbDH/nNUKj9J/kxJ1Inj39dJGrC69RfwGUXCURVKO1EKXcNM
-	dP9Lp8FCr5nl7SiBKxFPqyG4eY43PjbdppUUb1cvFbMfoItIJqyxHMZtp7uQBcWYXxfrflc
-	brRiPhXcEtcS8YdIt9Zy+m1Hu5PJqnl2PA9dSNsz1FfN0Mv4dvbqUzoUvZ1AtGPxoIW6uj/
-	to+qlE9AohJ5qGUN2OKLWdQSMFKRRt1x8i100oM+GoIJhrqk+tz6ufYmYXnBv1eYqVnIf9G
-	le8ImaLeby2SNP5i9gxW1zxWHSfk4taM34p44neAe9yRWBBVTmRb3a65CMihNhej0CtqzAx
-	22sfYecqatRoNxEAgQ5WOs52WAHJsvM/1+a5gEDNqRVynwBMDcj6VBAIcEhunw1vhwYlgaX
-	HRpbdZAjfobl53F2ntdrVtWwOT5UZYv2acjsjj3pT8HIIayDyz5WceEv/qupp7Y5XLaOr8k
-	FLDtg8Vu3hIa9w7frLTZQ99igppgswct81+MiLnl64Xqpg9WabWQ1RgfTgpSutIl/r7lwvq
-	CGaCF9UiIv3sJsKL9NPeXB7X5jj0dwZkjWMXsg7gsd13zbjgUPV+4g6uJRArFBHQmmjcW6G
-	tH0m5bB5ryEXr9dqz7H2jlEKqGNhNHWHw==
-X-QQ-XMRINFO: MSVp+SPm3vtSI1QTLgDHQqIV1w2oNKDqfg==
-X-QQ-RECHKSPAM: 0
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271808-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-271806-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[trustnetic.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,linux.intel.com,intel.com,dama.to,debian.org,trustnetic.com];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[trustnetic.com:email,trustnetic.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 59D8232E4D0
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,enneenne.com:email]
+X-Rspamd-Queue-Id: 5313432E49D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Support AER driver to handle the PCIe errors.
+Add ping and iperf3 tests for ppp_async.c and pppoe.c.
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_err.c   | 102 ++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_err.h   |   2 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   |   5 +-
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |   1 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   5 +-
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   5 +-
- 6 files changed, 117 insertions(+), 3 deletions(-)
+v4: double quote $EXIT_STATUS (SC2086)
+ https://lore.kernel.org/netdev/20260325014411.3596-1-dqfext@gmail.com/
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-index bb77bdce69d2..86b318647a3c 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-@@ -3,11 +3,113 @@
+ MAINTAINERS                                   |  1 +
+ tools/testing/selftests/Makefile              |  1 +
+ tools/testing/selftests/net/ppp/Makefile      | 15 +++++++
+ tools/testing/selftests/net/ppp/config        |  9 ++++
+ tools/testing/selftests/net/ppp/ppp_async.sh  | 43 ++++++++++++++++++
+ tools/testing/selftests/net/ppp/ppp_common.sh | 44 +++++++++++++++++++
+ .../selftests/net/ppp/pppoe-server-options    |  2 +
+ tools/testing/selftests/net/ppp/pppoe.sh      | 40 +++++++++++++++++
+ 8 files changed, 155 insertions(+)
+ create mode 100644 tools/testing/selftests/net/ppp/Makefile
+ create mode 100644 tools/testing/selftests/net/ppp/config
+ create mode 100755 tools/testing/selftests/net/ppp/ppp_async.sh
+ create mode 100644 tools/testing/selftests/net/ppp/ppp_common.sh
+ create mode 100644 tools/testing/selftests/net/ppp/pppoe-server-options
+ create mode 100755 tools/testing/selftests/net/ppp/pppoe.sh
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a09bf30a057d..d553437d5ac1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -21078,6 +21078,7 @@ PPP PROTOCOL DRIVERS AND COMPRESSORS
+ L:	linux-ppp@vger.kernel.org
+ S:	Orphan
+ F:	drivers/net/ppp/ppp_*
++F:	tools/testing/selftests/net/ppp/
  
- #include <linux/netdevice.h>
- #include <linux/pci.h>
-+#include <linux/aer.h>
- 
- #include "wx_type.h"
- #include "wx_lib.h"
- #include "wx_err.h"
- 
-+/**
-+ * wx_io_error_detected - called when PCI error is detected
-+ * @pdev: Pointer to PCI device
-+ * @state: The current pci connection state
-+ *
-+ * Return: pci_ers_result_t.
-+ *
-+ * This function is called after a PCI bus error affecting
-+ * this device has been detected.
-+ */
-+static pci_ers_result_t wx_io_error_detected(struct pci_dev *pdev,
-+					     pci_channel_state_t state)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
+ PPS SUPPORT
+ M:	Rodolfo Giometti <giometti@enneenne.com>
+diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+index 450f13ba4cca..65f84e8a0cf0 100644
+--- a/tools/testing/selftests/Makefile
++++ b/tools/testing/selftests/Makefile
+@@ -78,6 +78,7 @@ TARGETS += net/netfilter
+ TARGETS += net/openvswitch
+ TARGETS += net/ovpn
+ TARGETS += net/packetdrill
++TARGETS += net/ppp
+ TARGETS += net/rds
+ TARGETS += net/tcp_ao
+ TARGETS += nolibc
+diff --git a/tools/testing/selftests/net/ppp/Makefile b/tools/testing/selftests/net/ppp/Makefile
+new file mode 100644
+index 000000000000..b39b0abadde6
+--- /dev/null
++++ b/tools/testing/selftests/net/ppp/Makefile
+@@ -0,0 +1,15 @@
++# SPDX-License-Identifier: GPL-2.0
 +
-+	netdev = wx->netdev;
-+	if (!netif_device_present(netdev))
-+		return PCI_ERS_RESULT_DISCONNECT;
++top_srcdir = ../../../../..
 +
-+	rtnl_lock();
-+	netif_device_detach(netdev);
++TEST_PROGS := \
++	ppp_async.sh \
++	pppoe.sh \
++# end of TEST_PROGS
 +
-+	if (netif_running(netdev))
-+		wx->close_suspend(wx);
++TEST_FILES := \
++	ppp_common.sh \
++	pppoe-server-options \
++# end of TEST_FILES
 +
-+	if (state == pci_channel_io_perm_failure) {
-+		rtnl_unlock();
-+		return PCI_ERS_RESULT_DISCONNECT;
-+	}
++include ../../lib.mk
+diff --git a/tools/testing/selftests/net/ppp/config b/tools/testing/selftests/net/ppp/config
+new file mode 100644
+index 000000000000..b45d25c5b970
+--- /dev/null
++++ b/tools/testing/selftests/net/ppp/config
+@@ -0,0 +1,9 @@
++CONFIG_IPV6=y
++CONFIG_PACKET=y
++CONFIG_PPP=m
++CONFIG_PPP_ASYNC=m
++CONFIG_PPP_BSDCOMP=m
++CONFIG_PPP_DEFLATE=m
++CONFIG_PPPOE=m
++CONFIG_PPPOE_HASH_BITS_4=y
++CONFIG_VETH=y
+diff --git a/tools/testing/selftests/net/ppp/ppp_async.sh b/tools/testing/selftests/net/ppp/ppp_async.sh
+new file mode 100755
+index 000000000000..c47a6f5c02dd
+--- /dev/null
++++ b/tools/testing/selftests/net/ppp/ppp_async.sh
+@@ -0,0 +1,43 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
 +
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
-+	rtnl_unlock();
++source ppp_common.sh
 +
-+	/* Request a slot reset. */
-+	return PCI_ERS_RESULT_NEED_RESET;
++# Temporary files for PTY symlinks
++TTY_DIR=$(mktemp -d /tmp/ppp.XXXXXX)
++TTY_SERVER="$TTY_DIR"/server
++TTY_CLIENT="$TTY_DIR"/client
++
++cleanup() {
++	cleanup_all_ns
++	[ -n "$SOCAT_PID" ] && kill_process "$SOCAT_PID"
++	rm -fr "$TTY_DIR"
 +}
 +
-+/**
-+ * wx_io_slot_reset - called after the pci bus has been reset.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * Return: pci_ers_result_t.
-+ *
-+ * Restart the card from scratch, as if from a cold-boot.
-+ */
-+static pci_ers_result_t wx_io_slot_reset(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	pci_ers_result_t result;
++trap cleanup EXIT
 +
-+	if (pci_enable_device_mem(pdev)) {
-+		wx_err(wx, "Cannot re-enable PCI device after reset.\n");
-+		result = PCI_ERS_RESULT_DISCONNECT;
-+	} else {
-+		/* make all bar access done before reset. */
-+		smp_mb__before_atomic();
-+		clear_bit(WX_STATE_DISABLED, wx->state);
-+		pci_set_master(pdev);
-+		pci_restore_state(pdev);
-+		pci_save_state(pdev);
-+		pci_wake_from_d3(pdev, false);
++require_command socat
++ppp_common_init
++modprobe -q ppp_async
 +
-+		wx->do_reset(wx->netdev, false);
-+		result = PCI_ERS_RESULT_RECOVERED;
-+	}
++# Create the virtual serial device
++socat -d PTY,link="$TTY_SERVER",rawer PTY,link="$TTY_CLIENT",rawer &
++SOCAT_PID=$!
 +
-+	pci_aer_clear_nonfatal_status(pdev);
++# Wait for symlinks to be created
++slowwait 5 [ -L "$TTY_SERVER" ]
 +
-+	return result;
++# Start the PPP Server
++ip netns exec "$NS_SERVER" pppd "$TTY_SERVER" 115200 \
++	"$IP_SERVER":"$IP_CLIENT" \
++	local noauth nodefaultroute debug
++
++# Start the PPP Client
++ip netns exec "$NS_CLIENT" pppd "$TTY_CLIENT" 115200 \
++	local noauth updetach nodefaultroute debug
++
++ppp_test_connectivity
++
++log_test "PPP async"
++
++exit "$EXIT_STATUS"
+diff --git a/tools/testing/selftests/net/ppp/ppp_common.sh b/tools/testing/selftests/net/ppp/ppp_common.sh
+new file mode 100644
+index 000000000000..c72218813f95
+--- /dev/null
++++ b/tools/testing/selftests/net/ppp/ppp_common.sh
+@@ -0,0 +1,44 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# shellcheck disable=SC2153
++
++source ../lib.sh
++
++IP_SERVER="192.168.200.1"
++IP_CLIENT="192.168.200.2"
++
++ppp_common_init() {
++	# Package requirements
++	require_command pppd
++	require_command iperf3
++
++	# Check for root privileges
++	if [ "$(id -u)" -ne 0 ];then
++		echo "SKIP: Need root privileges"
++		exit $ksft_skip
++	fi
++
++	# Namespaces
++	setup_ns NS_SERVER NS_CLIENT
 +}
 +
-+/**
-+ * wx_io_resume - called when traffic can start flowing again.
-+ * @pdev: Pointer to PCI device
-+ *
-+ * This callback is called when the error recovery driver tells us that
-+ * its OK to resume normal operation.
-+ */
-+static void wx_io_resume(struct pci_dev *pdev)
-+{
-+	struct wx *wx = pci_get_drvdata(pdev);
-+	struct net_device *netdev;
-+
-+	netdev = wx->netdev;
-+	rtnl_lock();
-+	if (netif_running(netdev))
-+		netdev->netdev_ops->ndo_open(netdev);
-+
-+	netif_device_attach(netdev);
-+	rtnl_unlock();
++ppp_check_addr() {
++	dev=$1
++	addr=$2
++	ns=$3
++	ip -netns "$ns" -4 addr show dev "$dev" 2>/dev/null | grep -q "$addr"
++	return $?
 +}
 +
-+const struct pci_error_handlers wx_err_handler = {
-+	.error_detected = wx_io_error_detected,
-+	.slot_reset = wx_io_slot_reset,
-+	.resume = wx_io_resume,
-+};
-+EXPORT_SYMBOL(wx_err_handler);
++ppp_test_connectivity() {
++	slowwait 10 ppp_check_addr "ppp0" "$IP_CLIENT" "$NS_CLIENT"
 +
- static void wx_reset_subtask(struct wx *wx)
- {
- 	if (!test_bit(WX_FLAG_NEED_PF_RESET, wx->flags))
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.h b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-index e317e6c8d928..8b1a7863b5b1 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_err.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_err.h
-@@ -7,6 +7,8 @@
- #ifndef _WX_ERR_H_
- #define _WX_ERR_H_
- 
-+extern const struct pci_error_handlers wx_err_handler;
++	ip netns exec "$NS_CLIENT" ping -c 3 "$IP_SERVER"
++	check_err $?
 +
- void wx_handle_errors_subtask(struct wx *wx);
- void wx_tx_timeout(struct net_device *netdev, unsigned int txqueue);
- void wx_handle_tx_hang(struct wx_ring *tx_ring, unsigned int next);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index be7a170a4029..09be700f69bb 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -3406,7 +3406,8 @@ static void wx_dev_shutdown(struct pci_dev *pdev, bool *enable_wake)
- 	*enable_wake = !!wufc;
- 	wx_control_hw(wx, false);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- int wx_suspend(struct pci_dev *pdev, pm_message_t state)
-@@ -3434,6 +3435,8 @@ int wx_resume(struct pci_dev *pdev)
- 		wx_err(wx, "Cannot enable PCI device from suspend\n");
- 		return err;
- 	}
++	ip netns exec "$NS_SERVER" iperf3 -s -1 -D
++	wait_local_port_listen "$NS_SERVER" 5201 tcp
 +
-+	clear_bit(WX_STATE_DISABLED, wx->state);
- 	pci_set_master(pdev);
- 	device_wakeup_disable(&pdev->dev);
- 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 510fab4b3a0f..117cebbb9a67 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1208,6 +1208,7 @@ enum wx_state {
- 	WX_STATE_PTP_RUNNING,
- 	WX_STATE_PTP_TX_IN_PROGRESS,
- 	WX_STATE_SERVICE_SCHED,
-+	WX_STATE_DISABLED,
- 	WX_STATE_NBITS		/* must be last */
- };
- 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index 080310a51ef8..3715db4ec912 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -808,6 +808,7 @@ static int ngbe_probe(struct pci_dev *pdev,
- 		goto err_register;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	return 0;
- 
-@@ -858,7 +859,8 @@ static void ngbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static struct pci_driver ngbe_driver = {
-@@ -870,6 +872,7 @@ static struct pci_driver ngbe_driver = {
- 	.resume   = wx_resume,
- 	.shutdown = wx_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(ngbe_driver);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index e9439e4ebe61..4f0af47260a9 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -885,6 +885,7 @@ static int txgbe_probe(struct pci_dev *pdev,
- 		goto err_remove_phy;
- 
- 	pci_set_drvdata(pdev, wx);
-+	pci_save_state(pdev);
- 
- 	netif_tx_stop_all_queues(netdev);
- 
-@@ -955,7 +956,8 @@ static void txgbe_remove(struct pci_dev *pdev)
- 	kfree(wx->mac_table);
- 	wx_clear_interrupt_scheme(wx);
- 
--	pci_disable_device(pdev);
-+	if (!test_and_set_bit(WX_STATE_DISABLED, wx->state))
-+		pci_disable_device(pdev);
- }
- 
- static struct pci_driver txgbe_driver = {
-@@ -967,6 +969,7 @@ static struct pci_driver txgbe_driver = {
- 	.resume   = wx_resume,
- 	.shutdown = wx_shutdown,
- 	.sriov_configure = wx_pci_sriov_configure,
-+	.err_handler = &wx_err_handler,
- };
- 
- module_pci_driver(txgbe_driver);
++	ip netns exec "$NS_CLIENT" iperf3 -c "$IP_SERVER" -Z -t 2
++	check_err $?
++}
+diff --git a/tools/testing/selftests/net/ppp/pppoe-server-options b/tools/testing/selftests/net/ppp/pppoe-server-options
+new file mode 100644
+index 000000000000..66c8c9d319e9
+--- /dev/null
++++ b/tools/testing/selftests/net/ppp/pppoe-server-options
+@@ -0,0 +1,2 @@
++noauth
++noipdefault
+diff --git a/tools/testing/selftests/net/ppp/pppoe.sh b/tools/testing/selftests/net/ppp/pppoe.sh
+new file mode 100755
+index 000000000000..d5d9b898d537
+--- /dev/null
++++ b/tools/testing/selftests/net/ppp/pppoe.sh
+@@ -0,0 +1,40 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++
++source ppp_common.sh
++
++VETH_SERVER="veth-server"
++VETH_CLIENT="veth-client"
++
++cleanup() {
++	cleanup_all_ns
++}
++
++trap cleanup EXIT
++
++require_command pppoe-server
++ppp_common_init
++modprobe -q pppoe
++
++# Create the veth pair
++ip link add "$VETH_SERVER" type veth peer name "$VETH_CLIENT"
++ip link set "$VETH_SERVER" netns "$NS_SERVER"
++ip link set "$VETH_CLIENT" netns "$NS_CLIENT"
++ip -netns "$NS_SERVER" link set "$VETH_SERVER" up
++ip -netns "$NS_CLIENT" link set "$VETH_CLIENT" up
++
++# Start the PPP Server
++ip netns exec "$NS_SERVER" pppoe-server -I "$VETH_SERVER" \
++	-L "$IP_SERVER" -R "$IP_CLIENT" -N 1 -q "$(command -v pppd)" \
++	-k -O "$(pwd)/pppoe-server-options"
++
++# Start the PPP Client
++ip netns exec "$NS_CLIENT" pppd \
++	local debug updetach noipdefault noauth nodefaultroute \
++	plugin pppoe.so nic-"$VETH_CLIENT"
++
++ppp_test_connectivity
++
++log_test "PPPoE"
++
++exit "$EXIT_STATUS"
 -- 
-2.48.1
+2.43.0
 
 
