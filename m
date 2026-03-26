@@ -1,182 +1,182 @@
-Return-Path: <netdev+bounces-271818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271819-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YBUNI/+mxGmZ1wQAu9opvQ
-	(envelope-from <netdev+bounces-271818-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 04:24:47 +0100
+	id +CqeOUeoxGmZ1wQAu9opvQ
+	(envelope-from <netdev+bounces-271819-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 04:30:15 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 038E032EC39
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 04:24:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A9BB32ED7D
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 04:30:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3ADE1301DC12
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 03:24:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2752D300F534
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 03:25:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18CF839099C;
-	Thu, 26 Mar 2026 03:24:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C4538F651;
+	Thu, 26 Mar 2026 03:25:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="cPkix0lc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="auY2R3sw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F1B1F0E34
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 03:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFD81A9FB7
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 03:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774495484; cv=none; b=ZZZg4r7JzBeU/SM/UW6Y/JK/STZ8VWfOXzDp0HvWRDAvv9mzqEXdvIH8B7G6VzWEo8ryXx2bJDgZ6LRIg662o5y/zsM4F0mhL/BTOR2vECRoXFELCO0wIZLa+GQnUxh8jxkcRaDqFn61X0QVGflEll3ILRjHCy0EPRYsphERauE=
+	t=1774495510; cv=none; b=jY/d7JN/1WLf2Ud9Ch5l6u4brLz8FYPtb/7iosBkW9hH4cl25NS9pfLY1ypW9sa2fgKQyWnYkvmpMK+vigflyqyhneyHVsOBsrrxLUvMV+Oany3QW+13FbPgsXb6R/klb+4lW/KvvDpjTqeXwRZTeYCAUbIkYfvaVvs+L6cHBU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774495484; c=relaxed/simple;
-	bh=K/PQfR8P9MVwkiIO+y1urfpkVRliInekQl8DW1MODec=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bsbeqgpig0j2Jl0NNW9KQ9UVJn+WmcY6Dyk8x3jZLuO56U90nYPQScKkBgbf4354g+7nt3dEvYpOZqB5RYeYJ3IvUR715LoL+0GaY8qLoGKiMcXFNA+0DYCW9DAYxJZKMGNzj9Fg7FTClpBjPXIUnJr4UAaXJ+2mrBgwLFmyfqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=cPkix0lc; arc=none smtp.client-ip=74.125.82.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-2c107ef474fso1307282eec.0
-        for <netdev@vger.kernel.org>; Wed, 25 Mar 2026 20:24:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1774495482; x=1775100282; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=O0EG3jDsn9Dx1dDIZW/WxKOBZ4AbtctaYvNgsvk5XBw=;
-        b=cPkix0lcMfsH1fUcrD84/Ajp/GHkVu78fUxIBzDn09PEVOjAMSmdo7bNnYbbAbvi5c
-         Zcmzb/b1+IVfWXmwyXSw9gxS6Qv9iSnKnToyamRcHb1FRnQr0AbHKGPBvRQWIR2yqalq
-         OaGu5ca65+qBoTBcqQ/e0AaESo9ZdJqKR5ENVUsO5daHlEkxwdM7uXhP9pNNoYGcjEJq
-         zz14cQ5EC91uCDPsGhuSYHU7CsRcPEPR0kQnazRyLC+3HzKQcEzOI4mm3a9h9SevnAXH
-         2+bUV4zi4qt1Kv385Aa9NsYVfvCacydXkuElruezUj+RKea+GzqQf9sjLF5HDDaGk8Mx
-         5ibw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774495482; x=1775100282;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O0EG3jDsn9Dx1dDIZW/WxKOBZ4AbtctaYvNgsvk5XBw=;
-        b=qZ70Z4og+gbKydiw0qDl1QeaLJb84th+YrLQkx8WQhz43D+WumPvgBJaqQOtL2OwPz
-         g24srCmbEZWfxqH0K/vJIiyigXYNvjj+WQHK7WaohKnvbwt49EkiO3gBbz1dD6vtQYq2
-         FaahPHoJRZYSLd/HkOeAs8uKCrmuPq/xrE3ixoIwTX8GvevpSqA9cdaJtwlH5jIZX+fK
-         lozA07uUViShM3a0On76N8AApApWCEYzC/P8rAKGvrHPZhu/wOpHs/IB6pMcraMnW3zH
-         fR9VUlilvOa2TO7THMbQGPYM9WuJThQd7xGsMYJc0culJG2QPB1K6JXBoOVUUGr+XwDt
-         yFpA==
-X-Gm-Message-State: AOJu0YzPFbz02GgUWRvGs+RuLb/170NVjsHCztr1m2rakU8CRGpF8BlR
-	N8RidxKATPy/UVyiUx5h78LDzNxTtx6EJCC/ovkjytuHhcb1srQeJFUm8+HWbSePu3QxamF3Nk4
-	wFeQczQ==
-X-Gm-Gg: ATEYQzwdgK9J3InmIw/Ik+/IwtcJ7vMXz2m8pZy5i6ItaJNmT3JSUB93ZurCjrInvnN
-	+y77ymL/WT2k2f78g7HGvfON8pVR4Vp4n+FyeberyCjJ+fZVwGrG7UDvRvG7JwEbMMgj/phc314
-	wt1dYPW4UsuEgwFvqnxvKvT5vX1Yq7rMo1X887Z4p1Yau3vg5GHnDadIJQRluNRBB31Ff61TKmy
-	EY0NrjH2AHIgfC6KVZ80YPUXQaXhLSP7AraPkvCcsJcNFNIICeajoXMmlVMgQFVLWrr6GJQzmyA
-	lOpb8vNhrOuaOXgroBCd187LxRdXnZhbT859ksAFzu4w7e1s3ug5GSNvA9/qYAFITfltaQv9VEW
-	UkcB6PZPozUdEfWzSUnVaikjjCReNuOsufTgcIj0X4nZwSujvwjZ6KPrprwOygqqFlhttmrLZrj
-	/q3OZpbzDCHEJKRGaO4DMqbe3yH+WME2aQBE7w8FxSsbI5VaabxFPWWA==
-X-Received: by 2002:a05:7301:ea7:b0:2be:a2d8:e9e3 with SMTP id 5a478bee46e88-2c15d468539mr3356070eec.29.1774495481658;
-        Wed, 25 Mar 2026 20:24:41 -0700 (PDT)
-Received: from p1.scai.dhcp.asu.edu (209-147-138-15.nat.asu.edu. [209.147.138.15])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c16ec277edsm2317280eec.3.2026.03.25.20.24.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2026 20:24:41 -0700 (PDT)
-From: Xiang Mei <xmei5@asu.edu>
-To: netdev@vger.kernel.org
-Cc: bridge@lists.linux.dev,
-	razor@blackwall.org,
-	idosch@nvidia.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	bestswngs@gmail.com,
-	Xiang Mei <xmei5@asu.edu>
-Subject: [PATCH net] bridge: mrp: reject zero test interval to avoid OOM panic
-Date: Wed, 25 Mar 2026 20:24:38 -0700
-Message-ID: <20260326032438.3307549-1-xmei5@asu.edu>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1774495510; c=relaxed/simple;
+	bh=PeO3Wn4eC2AsM7MoyTFPPR2RxQrGibPXKvXagwq9jD8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GwiS++LiZgJ1r2XoZZ+44SE4rtp8uEK+88aA0m2rOewxczR0XdXfLlDXNZimXIskq+AbL6cOfiLzJN5qgmI5sify+walOeduaAsEXs8VKyStcUhljDnrgY1Kt9Qiz5wvlbUAchLa1RMm4veWHGLTStLmm/oDRw1r2YqOfnHyhOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=auY2R3sw; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <4c27a461-2714-4c27-8604-dedd506a09aa@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774495506;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wNdfjJHD6SMD9Xw8BJ+zCQWvHXfF4m3AH/8ikcFZoxY=;
+	b=auY2R3swKFmiQYJ62EhZeIZ6lJgq+hhn4f8D4apQgKw3hvmi8awSu9dy5bBPhVf1PseunR
+	Bf14bYgKDDOiMNz9HrgunVljUnXDZ/QWZHVfptyhd8vBoV8P/D+2pfg3Jzfk43UPDVM1Pm
+	JY1JwnQOPI2JXs2PC41PuCSNh9gyV2k=
+Date: Thu, 26 Mar 2026 11:24:39 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH bpf v1 2/2] selftests/bpf: Add protocol check test for
+ bpf_sk_assign_tcp_reqsk()
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20260323105510.51990-1-jiayuan.chen@linux.dev>
+ <20260323105510.51990-3-jiayuan.chen@linux.dev>
+ <9adc3c2e-0d5a-4863-b3ed-194d8f9fd630@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <9adc3c2e-0d5a-4863-b3ed-194d8f9fd630@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271818-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lists.linux.dev,blackwall.org,nvidia.com,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,asu.edu];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-271819-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[shopee.com,kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 038E032EC39
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4A9BB32ED7D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-br_mrp_start_test() and br_mrp_start_in_test() accept the user-supplied
-interval value from netlink without validation. When interval is 0,
-usecs_to_jiffies(0) yields 0, causing the delayed work
-(br_mrp_test_work_expired / br_mrp_in_test_work_expired) to reschedule
-itself with zero delay. This creates a tight loop on system_percpu_wq
-that allocates and transmits MRP test frames at maximum rate, exhausting
-all system memory and causing a kernel panic via OOM deadlock.
 
-The same zero-interval issue applies to br_mrp_start_in_test_parse()
-for interconnect test frames.
+On 3/25/26 5:59 AM, Martin KaFai Lau wrote:
+> On 3/23/26 3:54 AM, Jiayuan Chen wrote:
+>> +void test_tcp_custom_syncookie_protocol_check(void)
+>> +{
+>> +    struct test_tcp_custom_syncookie *skel;
+>> +    struct sockaddr_in tcp_addr, udp_addr;
+>> +    socklen_t addr_len = sizeof(tcp_addr);
+>> +    int tcp_server = -1, udp_client = -1;
+>> +    char buf[32] = "test";
+>> +    int ret;
+>> +
+>> +    if (setup_netns())
+>> +        return;
+>> +
+>> +    skel = test_tcp_custom_syncookie__open_and_load();
+>> +    if (!ASSERT_OK_PTR(skel, "open_and_load"))
+>> +        return;
+>>   +    /* Create a TCP listener so the BPF can find a LISTEN socket */
+>> +    tcp_server = start_server(AF_INET, SOCK_STREAM, "127.0.0.1", 0, 0);
+>> +    if (!ASSERT_NEQ(tcp_server, -1, "start tcp_server"))
+>> +        goto destroy_skel;
+>> +
+>> +    ret = getsockname(tcp_server, (struct sockaddr *)&tcp_addr, 
+>> &addr_len);
+>> +    if (!ASSERT_OK(ret, "getsockname"))
+>> +        goto close_tcp;
+>> +
+>> +    skel->bss->tcp_listener_port = ntohs(tcp_addr.sin_port);
+>> +    skel->bss->udp_test_port = 9999;
+>> +
+>> +    ret = bpf_program__fd(skel->progs.tcp_custom_syncookie_badproto);
+>> +    if (setup_tc(ret))
+>> +        goto close_tcp;
+>> +
+>> +    udp_client = socket(AF_INET, SOCK_DGRAM, 0);
+>> +    if (!ASSERT_NEQ(udp_client, -1, "udp socket"))
+>> +        goto cleanup_tc;
+>> +
+>> +    memset(&udp_addr, 0, sizeof(udp_addr));
+>> +    udp_addr.sin_family = AF_INET;
+>> +    udp_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+>> +    udp_addr.sin_port = htons(9999);
+>> +
+>> +    ret = sendto(udp_client, buf, sizeof(buf), 0,
+>> +             (struct sockaddr *)&udp_addr, sizeof(udp_addr));
+>> +    ASSERT_EQ(ret, sizeof(buf), "sendto udp");
+>> +
+>> +    /* Wait for TC ingress BPF to process the skb. */
+>> +    kern_sync_rcu();
+>
+> hmm... is it guaranteed to work? Regardless, it checks the error 
+> returned from bpf_sk_assign_tcp_reqsk(). Maybe bpf_prog_test_run is 
+> simpler?
+>
+> pw-bot: cr
+>
+>> +
+>>
+I looked into using bpf_prog_test_run, but it won't work here
+because bpf_sk_assign_tcp_reqsk() requires the skb to come from TC ingress
+— it checks skb_at_tc_ingress() internally and returns -EINVAL otherwise.
 
-Use NLA_POLICY_MIN(NLA_U32, 1) in the nla_policy tables for both
-IFLA_BRIDGE_MRP_START_TEST_INTERVAL and
-IFLA_BRIDGE_MRP_START_IN_TEST_INTERVAL, so zero is rejected at the
-netlink attribute parsing layer before the value ever reaches the
-workqueue scheduling code. This is consistent with how other bridge
-subsystems (br_fdb, br_mst) enforce range constraints on netlink
-attributes.
-
-Fixes: 7ab1748e4ce6 ("bridge: mrp: Extend MRP netlink interface for configuring MRP interconnect")
-Reported-by: Weiming Shi <bestswngs@gmail.com>
-Signed-off-by: Xiang Mei <xmei5@asu.edu>
----
- net/bridge/br_mrp_netlink.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/bridge/br_mrp_netlink.c b/net/bridge/br_mrp_netlink.c
-index ce6f63c77cc0..86f0e75d6e34 100644
---- a/net/bridge/br_mrp_netlink.c
-+++ b/net/bridge/br_mrp_netlink.c
-@@ -196,7 +196,7 @@ static const struct nla_policy
- br_mrp_start_test_policy[IFLA_BRIDGE_MRP_START_TEST_MAX + 1] = {
- 	[IFLA_BRIDGE_MRP_START_TEST_UNSPEC]	= { .type = NLA_REJECT },
- 	[IFLA_BRIDGE_MRP_START_TEST_RING_ID]	= { .type = NLA_U32 },
--	[IFLA_BRIDGE_MRP_START_TEST_INTERVAL]	= { .type = NLA_U32 },
-+	[IFLA_BRIDGE_MRP_START_TEST_INTERVAL]	= NLA_POLICY_MIN(NLA_U32, 1),
- 	[IFLA_BRIDGE_MRP_START_TEST_MAX_MISS]	= { .type = NLA_U32 },
- 	[IFLA_BRIDGE_MRP_START_TEST_PERIOD]	= { .type = NLA_U32 },
- 	[IFLA_BRIDGE_MRP_START_TEST_MONITOR]	= { .type = NLA_U32 },
-@@ -316,7 +316,7 @@ static const struct nla_policy
- br_mrp_start_in_test_policy[IFLA_BRIDGE_MRP_START_IN_TEST_MAX + 1] = {
- 	[IFLA_BRIDGE_MRP_START_IN_TEST_UNSPEC]	= { .type = NLA_REJECT },
- 	[IFLA_BRIDGE_MRP_START_IN_TEST_IN_ID]	= { .type = NLA_U32 },
--	[IFLA_BRIDGE_MRP_START_IN_TEST_INTERVAL]	= { .type = NLA_U32 },
-+	[IFLA_BRIDGE_MRP_START_IN_TEST_INTERVAL]	= NLA_POLICY_MIN(NLA_U32, 1),
- 	[IFLA_BRIDGE_MRP_START_IN_TEST_MAX_MISS]	= { .type = NLA_U32 },
- 	[IFLA_BRIDGE_MRP_START_IN_TEST_PERIOD]	= { .type = NLA_U32 },
- };
--- 
-2.43.0
+For the synchronization concern, instead of kern_sync_rcu(), I now create
+a UDP server bound to the target port and recv() the packet after sendto().
+Since the BPF program returns TC_ACT_OK, the packet passes through TC 
+ingress
+and arrives at the UDP socket. The recv() naturally blocks until the BPF 
+program
+has finished processing, so no timing tricks are needed.
 
 
