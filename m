@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-272116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272117-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kIBLEnhVxWkk9gQAu9opvQ
-	(envelope-from <netdev+bounces-272116-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:49:12 +0100
+	id GKRyElpVxWkk9gQAu9opvQ
+	(envelope-from <netdev+bounces-272117-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:48:42 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABB8F337DC1
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:49:11 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A039337DA5
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:48:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E08DD300072C
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:31:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AF6913161454
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:31:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1FC40626D;
-	Thu, 26 Mar 2026 15:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F824070E7;
+	Thu, 26 Mar 2026 15:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PMxUwqvs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZN6iSroL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0F5405ABA;
-	Thu, 26 Mar 2026 15:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE1140629D
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 15:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774539040; cv=none; b=t08+BHlK9p/G0MhONvdm4WI49lWMjZMNH+jfpgKnRCcIsB+awP5GcmTX7xdelMIIifsJ3ZDUZVI6Vw8oL1ekgYAL6EWjgO+Oelo0FX2H3Qn9UNGz2SCFmPWrUXKekLHyogVcda/lKa5JuOzub5u211j34e1rawz3LLx19LK7WUc=
+	t=1774539041; cv=none; b=Cv2f1+gymXURhxCsm9mN6LqHmiTq3ebCICpjSFbUgG7imAGIOHeh6L+SbhjfpWZZeKRNwY+bP7K/R9wbdJHTZmL1TKpaoD5OQzkZTabQGxEN2NDvslIYf8c3FAFW0H6eogJxpMDflMhuTu3BFs9kJ3VDYPsUf6EjwAsH6FOB/0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774539040; c=relaxed/simple;
-	bh=ZQwez07XLSJsXDc9l7YfbnM/Xp0EDdsgP+/RzA+qKew=;
+	s=arc-20240116; t=1774539041; c=relaxed/simple;
+	bh=HreVZYnRckYDyEMjUce/Qy7GLlm6mNkzDlrxXNC8Tfw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TuP2+vNjFGEqrhVndyZoWcPPGzMCC7ho8MO2ujBlStWCd2fs3Rn6xE4zvkz/m/o1zBvtIJCsnwzfPACek/fnHliyNyUPoh0c9tXoTAmV1O//AT+VqvSc9DkPbzJ+2aPWftCDBk/JoF3Tl/HTq7OHJAcgM3ghUzHl6FBQddqPl18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PMxUwqvs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74A16C116C6;
-	Thu, 26 Mar 2026 15:30:39 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=DmQQmJKWL4nLWxCFTXLtkGfIT+TUGe/ftx7JCuRdN3l6uZvwLw9AtA/kIKjidUwzDE8T8ArrI2Bm/CT8AAs/9QpiAn6CQyfCAApbQDjZjuSrBtA324tZa9h5Fmp2qiRISVH9GjzH69m/MVe+6TpLY6RWu0Y+w1+ukH20ha6qWCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZN6iSroL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACE22C19424;
+	Thu, 26 Mar 2026 15:30:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774539039;
-	bh=ZQwez07XLSJsXDc9l7YfbnM/Xp0EDdsgP+/RzA+qKew=;
+	s=k20201202; t=1774539040;
+	bh=HreVZYnRckYDyEMjUce/Qy7GLlm6mNkzDlrxXNC8Tfw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PMxUwqvsjs13g3BlZymlEsUxk8eCNIoOR+5lyVythsSxd3WY7YhyfLGcjqQDjR84y
-	 D1b14EYNN4MbvgcqivTxDn9eLfdnPCAQhGT2pxpyOb+nEm0ww3r4QBXtxKzhlHl5JN
-	 4+1XiJUxn6l1a3k23IYoIOt5kLvfOMoLsxNGw+XXmXadp9cBC7WjSBsWKWnZLYveV7
-	 DuROvl7sVLGH3WmPwgey+DCWOdhe9uCgwnXOCE7TVsdnNVP6vqDsvJ9S61A98/Wue1
-	 MwIng9VIGINNp/c7kAjwFjnxXT+TMjg2Nk1gLQ+OlaEOArHpZG8OtMfe02VC1RQ591
-	 U0W2UYzxzSTbA==
+	b=ZN6iSroLIxv/K51ijFXzY8sbeqGDNhml70ZzQG1bfUD4+qZ1bIo2RWMxVYqsouYPI
+	 cLIsdbo6eYGdXoT0YfQNswQKz4yncfKgz7ggPJanRaz0645eOYJ/9uKEXVvLG8PpL6
+	 k81aUVtEgv1Si2PbFBd2L4CqqW7pJj0Rt/Gzx9bMZdh4HCgAB5jd3xmwL94Sd1utwY
+	 nfDJphX8Uq4leftRMo7Z24zHmQMG/wGpy+6I6fi+nXWjuzC3TDUd2hpipyoFknLWXx
+	 Ji1Zdv6v4yZ9dInQsiuGso0vHxazJlh1B2HVYNmncTW/QPM6tk/q80xgrztzGoaNt5
+	 0OhqtB1Ls1jWA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FF2F39EFA69;
-	Thu, 26 Mar 2026 15:30:27 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CFEC39EFA69;
+	Thu, 26 Mar 2026 15:30:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,88 +55,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 01/12] netfilter: nft_set_pipapo_avx2: don't return
- non-matching entry on expiry
+Subject: Re: [PATCH] netfilter: ctnetlink: use netlink policy range checks
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177453902605.2636466.17922004373589340158.git-patchwork-notify@kernel.org>
-Date: Thu, 26 Mar 2026 15:30:26 +0000
-References: <20260326125153.685915-2-pablo@netfilter.org>
-In-Reply-To: <20260326125153.685915-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
+ <177453902728.2636466.202984065147410322.git-patchwork-notify@kernel.org>
+Date: Thu, 26 Mar 2026 15:30:27 +0000
+References: <20260324171259.318041-1-devnexen@gmail.com>
+In-Reply-To: <20260324171259.318041-1-devnexen@gmail.com>
+To: David Carlier <devnexen@gmail.com>
+Cc: pablo@netfilter.org, fw@strlen.de, phil@nwl.cc, edumazet@google.com,
+ netdev@vger.kernel.org
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-272117-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272116-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,netfilter.org:email,strlen.de:email]
-X-Rspamd-Queue-Id: ABB8F337DC1
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,netfilter.org:email]
+X-Rspamd-Queue-Id: 4A039337DA5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Pablo Neira Ayuso <pablo@netfilter.org>:
 
-On Thu, 26 Mar 2026 13:51:42 +0100 you wrote:
-> From: Florian Westphal <fw@strlen.de>
+On Tue, 24 Mar 2026 17:12:59 +0000 you wrote:
+> Replace manual range and mask validations with netlink policy
+> annotations in ctnetlink code paths, so that the netlink core rejects
+> invalid values early and can generate extack errors.
 > 
-> New test case fails unexpectedly when avx2 matching functions are used.
-> 
-> The test first loads a ranomly generated pipapo set
-> with 'ipv4 . port' key, i.e.  nft -f foo.
+> - CTA_PROTOINFO_TCP_STATE: reject values > TCP_CONNTRACK_SYN_SENT2 at
+>   policy level, removing the manual >= TCP_CONNTRACK_MAX check.
+> - CTA_PROTOINFO_TCP_WSCALE_ORIGINAL/REPLY: reject values > TCP_MAX_WSCALE
+>   (14). The normal TCP option parsing path already clamps to this value,
+>   but the ctnetlink path accepted 0-255, causing undefined behavior when
+>   used as a u32 shift count.
+> - CTA_FILTER_ORIG_FLAGS/REPLY_FLAGS: use NLA_POLICY_MASK with
+>   CTA_FILTER_F_ALL, removing the manual mask checks.
+> - CTA_EXPECT_FLAGS: use NLA_POLICY_MASK with NF_CT_EXPECT_MASK, adding
+>   a new mask define grouping all valid expect flags.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,01/12] netfilter: nft_set_pipapo_avx2: don't return non-matching entry on expiry
-    https://git.kernel.org/netdev/net/c/d3c0037ffe12
-  - [net,02/12] selftests: netfilter: nft_concat_range.sh: add check for flush+reload bug
-    https://git.kernel.org/netdev/net/c/6caefcd9491c
-  - [net,03/12] netfilter: nfnetlink_log: fix uninitialized padding leak in NFULA_PAYLOAD
-    https://git.kernel.org/netdev/net/c/52025ebaa29f
-  - [net,04/12] netfilter: ip6t_rt: reject oversized addrnr in rt_mt6_check()
-    https://git.kernel.org/netdev/net/c/9d3f027327c2
-  - [net,05/12] netfilter: nft_set_rbtree: revisit array resize logic
-    https://git.kernel.org/netdev/net/c/fafdd92b9e30
-  - [net,06/12] netfilter: nf_conntrack_expect: honor expectation helper field
-    https://git.kernel.org/netdev/net/c/9c42bc9db90a
-  - [net,07/12] netfilter: nf_conntrack_expect: use expect->helper
-    https://git.kernel.org/netdev/net/c/f01794106042
-  - [net,08/12] netfilter: ctnetlink: ensure safe access to master conntrack
-    https://git.kernel.org/netdev/net/c/bffcaad9afdf
-  - [net,09/12] netfilter: nf_conntrack_expect: store netns and zone in expectation
-    https://git.kernel.org/netdev/net/c/02a3231b6d82
-  - [net,10/12] netfilter: nf_conntrack_expect: skip expectations in other netns via proc
-    https://git.kernel.org/netdev/net/c/3db5647984de
-  - [net,11/12] netfilter: nf_conntrack_sip: fix use of uninitialized rtp_addr in process_sdp
-    https://git.kernel.org/netdev/net/c/6a2b724460cb
-  - [net,12/12] netfilter: ctnetlink: use netlink policy range checks
+  - netfilter: ctnetlink: use netlink policy range checks
     https://git.kernel.org/netdev/net/c/8f15b5071b45
 
 You are awesome, thank you!
