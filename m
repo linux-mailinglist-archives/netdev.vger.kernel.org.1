@@ -1,165 +1,187 @@
-Return-Path: <netdev+bounces-272231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272232-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OEZZFKeUxWmq/gQAu9opvQ
-	(envelope-from <netdev+bounces-272231-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 21:18:47 +0100
+	id mBh2EGOVxWmq/gQAu9opvQ
+	(envelope-from <netdev+bounces-272232-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 21:21:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53D0633B5CA
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 21:18:46 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 859C133B5E6
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 21:21:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A6347300BE8D
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:18:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4A70E3036085
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:21:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312513A3826;
-	Thu, 26 Mar 2026 20:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22832391E4C;
+	Thu, 26 Mar 2026 20:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7LdI/I9"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="PfpHeDGn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA533976B3
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 20:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3442933CEBB;
+	Thu, 26 Mar 2026 20:21:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774556321; cv=none; b=IXcajF826OSrdJBimKrnYWefXY2vAjl2TtJfbP9Q3IjpIddyiFDK6pIbYXOKE4uZuWaMOCas/ag7nnIwJiJVw5cw4UbuxyTmEnn3aweSATbnkEBqBgsTadItw0k8bLClkiuMEyDe0vt/IgSi14We5r/0E0K8A3SfKnuxFmk/W9g=
+	t=1774556511; cv=none; b=JQvnH9elcWxC3m72j2O4aglkFoNVhl4VpzHKzBf2CxlUvV9k/g+B9cDfCW4KWUjheHPxjFn64IR6leQBzd9GsPVrdHIGB7Ls3Pd5FNRxne1EyNjv50cIeKUqjs70N4ChlQY47V/qWJZiRdH+eBL6VFRZOqAXNo6HVKpJ9QbwTMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774556321; c=relaxed/simple;
-	bh=K5v5TTWH4F+mh+Qb1H4gG6uq2C0QCi+Bgcw9bKObD+A=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SJ/X1A21mXcT/Nhkv/5W6nXt3QB/13oOTnwRGQCKRlfCwOkG7YROXGLsflCFPbAPwV6q6NVmwm0PuK0PhajcADukhLaRa3Y6+strWzgSqOIohGEPklKwQu3z1HgZ1zU1ntDnQKEAiDg3oyKEAsE2uaOSie67rIyBFcdyP2hvqUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X7LdI/I9; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4853c1ca73aso14049075e9.2
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 13:18:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774556318; x=1775161118; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xycnlm/h8VsaAluVGkMfR2izvoHRISt/YiMCwALMUO4=;
-        b=X7LdI/I9ozAE4Yw7QpZTVLe0TVjjbwjkLo4fu+3hGtce21mmaUdC4OIPhErpiiyGuP
-         bz0kNorxBGWvMMmzvyd3s/Xo5cWy5CBjYJoPSXvL29mJPE+/BZaiXMYaQd5DdeXOquqK
-         Iw8wSgfOZZbTQy6KXGyZl7p0UkmMJMRoe1xlLiW70VwJ1GerVbquxPOV35asHCvaL1Cz
-         LDRLoNfNgqhksj1zCBNXQyc7OAhRIF9dTzI3b7/rnzyZSUYli6u+eTRUri3eQ/D//Esd
-         rhykzrYRgLFZzF0mfaYReGEZ/mbl7E1ldobRHiCXUD8inSXqd6dEwCiZu6B+LqOVvKOv
-         SmjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774556318; x=1775161118;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xycnlm/h8VsaAluVGkMfR2izvoHRISt/YiMCwALMUO4=;
-        b=goGiyCIZC5k48H2fKC3ozZJFW266SBno0uDARQxdQbgJGCHofe1LDBCB5MzLyzfWM2
-         yPbEIjkBuk60cu/ZemDjiVmMJwW25xkgBMpVdAhqJV5bJz3KeEpzxHdpGZT4S0kMUSY0
-         1fykSNU9zl8of06K9A2Aq92yB4rMN1K/4H5riJJCUFOaItW55RtfpxkpZEDs5LNCjhLR
-         f7aFz/ElFfqfXqTxY+RQeHb0fmG50MgruDl/FEkV6iNxBPmm6RO87sLtn2GwVCrJVylU
-         dgMHrfGhlWdiDszqtX4itW6NHXJpW0DV3SU6k3fRg3JTifxSv0Qoq/Vsb7STm/dxXkEh
-         F1lg==
-X-Forwarded-Encrypted: i=1; AJvYcCVe1+pqBNYwMtHiQQd2q3JSsGhfgGsYkaemkvrELGUaweduKlLp2KgQLyF04hMdthMiBQlSZVA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTc9fcce4LQXtMrc2hLTXrPnh7it7n0pEI5oHdX4OSQoeF71/I
-	CNzU4bjVc/cn/jzHGj2IH6E6VO14UEdDItEjjH32W5kumLrzoECC8o61
-X-Gm-Gg: ATEYQzxbU2EuOprO7QfmamYh0EyL3BV0hfGrQbfAdgM6dpmeycnTaHYABtIyc9X85+j
-	+pDkgESmZe+VL8eAmWsZpYl9farGPGWiFoP+FMexqmt776Jbx4EjFrczscy+FLlzrouyf9d6+6V
-	vsUKVKChTci6EJSQjQa4EytzAtvJfRPyElIJlN8VwtP6rNyVSutk7bYgaog7E8EYt6DwAEQtuMQ
-	TOCJhtZcrYpmbo2jZwwawZGN2lEv6reOfkAaIBeIeRrQ24g840WM5vPxNFhPKTc/34NsY11j3V/
-	+jSYmKdnlTr9uWHvzhymMnNfdoObxu09/N3u57PU3yXAuYcdEl6mV9sv4cEFV8YE7wpvGQ6ChN6
-	DIp+IA/gKAzDiIy9rP97ZeYVwRxeYZyXQQ8fDV7lr+CK2BE6xUvegB4Jebr14p2zVXxKnqwO+AY
-	QgvYOf4gmEdv/28MsEtrXnSrc4wyEuru5a5k+UTLRREhhWEh5Sghq4WFH3pDZyp8ngOzTsFD0um
-	q/KYpYHpBJ4
-X-Received: by 2002:a05:600c:8708:b0:483:b505:9db7 with SMTP id 5b1f17b1804b1-48727f1b5f1mr442955e9.32.1774556317978;
-        Thu, 26 Mar 2026 13:18:37 -0700 (PDT)
-Received: from snowdrop.snailnet.com (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48725d9acb9sm3330475e9.1.2026.03.26.13.18.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 13:18:37 -0700 (PDT)
-From: david.laight.linux@gmail.com
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Shuah Khan <shuah@kernel.org>,
-	wireguard@lists.zx2c4.com,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: David Laight <david.laight.linux@gmail.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Petr Mladek <pmladek@suse.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: [PATCH next] wireguard: selftests: Remove spurious precision from banner printf
-Date: Thu, 26 Mar 2026 20:18:36 +0000
-Message-Id: <20260326201836.3957-1-david.laight.linux@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1774556511; c=relaxed/simple;
+	bh=sjBIaQIJ3lM8oaURKVY3teKRZko/3BU/LQ5VCIK1n1w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Povc/nRdcJHnkbjt3Fb/OROP07VkUNY72j/361lyp7JU+LG4CFcWMUdCYfqvxpBa1LUVROH9BvTr+GPb6035XOxN+MWBXCakJ4h7kXjBGuKyr6iPHyda4vclGf57dxk45oBhAYzLFpPywlbukbiMSIUNSXF0RBMPwTmgYslBuBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=PfpHeDGn; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id DDAA160262;
+	Thu, 26 Mar 2026 21:21:46 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1774556507;
+	bh=XVG1PdwNY/KMdNBwdSih/WCTXGUheIF/+ZYN0DkQ1Aw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PfpHeDGnDQjZouFiuDFWOTp+Z7MqLYSmhGwJkqh7OrIlVxfe19VpQxFIiKK3UAvrz
+	 qfVnvnpVt1zSd41E9+6+T0RGjPdMatvAohvEwKg2L0PpX0pixN2cTmHL+eR+a/32yx
+	 B8U+5MtHLbBAAJD96czYLgeYVJ1a8okuwDiFGEVSN/bv9iFf7qAaSuxFsEbEm65LLu
+	 tLMwsVc3iuSMzLqt+AcUz6Scm7/zkmEbGJPGoJjWK0ZGGDOAb1780Fr7r0A9IUm98a
+	 tHKo+XKRA/8zpOBfwkifrQR3rFrq8tLEgIdv3y0KiahjsTyTvev+Rdon9tr8C0aW+L
+	 zrbEK60vbejIQ==
+Date: Thu, 26 Mar 2026 21:21:43 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Weiming Shi <bestswngs@gmail.com>
+Cc: Florian Westphal <fw@strlen.de>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Phil Sutter <phil@nwl.cc>, Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>
+Subject: Re: [PATCH nf] netfilter: nf_conntrack_sip: fix use of uninitialized
+ rtp_addr in process_sdp
+Message-ID: <acWVV__8xRMezYrU@chamomile>
+References: <20260323080727.2932866-3-bestswngs@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260323080727.2932866-3-bestswngs@gmail.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,suse.com,rasmusvillemoes.dk,linux.intel.com,goodmis.org,chromium.org,linux-foundation.org];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-272231-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[netfilter.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FROM_NO_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-272232-lists,netdev=lfdr.de];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 53D0633B5CA
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 859C133B5E6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: David Laight <david.laight.linux@gmail.com>
+On Mon, Mar 23, 2026 at 04:07:29PM +0800, Weiming Shi wrote:
+> process_sdp() declares union nf_inet_addr rtp_addr on the stack and
+> passes it to the nf_nat_sip sdp_session hook after walking the SDP
+> media descriptions. However rtp_addr is only initialized inside the
+> media loop when a recognized media type with a non-zero port is found.
+> 
+> If the SDP body contains no m= lines, only inactive media sections
+> (m=audio 0 ...) or only unrecognized media types, rtp_addr is never
+> assigned. Despite that, the function still calls hooks->sdp_session()
+> with &rtp_addr, causing nf_nat_sdp_session() to format the stale stack
+> value as an IP address and rewrite the SDP session owner and connection
+> lines with it.
+> 
+> With CONFIG_INIT_STACK_ALL_ZERO (default on most distributions) this
+> results in the session-level o= and c= addresses being rewritten to
+> 0.0.0.0 for inactive SDP sessions. Without stack auto-init the
+> rewritten address is whatever happened to be on the stack.
+> 
+> Fix this by pre-initializing rtp_addr from the session-level connection
+> address (caddr) when available, and tracking via a have_rtp_addr flag
+> whether any valid address was established. Skip the sdp_session hook
+> entirely when no valid address exists.
+> 
+> Fixes: 4ab9e64e5e3c ("[NETFILTER]: nf_nat_sip: split up SDP mangling")
+> Reported-by: Xiang Mei <xmei5@asu.edu>
+> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> ---
+>  net/netfilter/nf_conntrack_sip.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/netfilter/nf_conntrack_sip.c b/net/netfilter/nf_conntrack_sip.c
+> index 4ab5ef71d96db..17af0ff4ea7ab 100644
+> --- a/net/netfilter/nf_conntrack_sip.c
+> +++ b/net/netfilter/nf_conntrack_sip.c
+> @@ -1040,6 +1040,7 @@ static int process_sdp(struct sk_buff *skb, unsigned int protoff,
+>  	unsigned int port;
+>  	const struct sdp_media_type *t;
+>  	int ret = NF_ACCEPT;
+> +	bool have_rtp_addr = false;
+>  
+>  	hooks = rcu_dereference(nf_nat_sip_hooks);
+>  
+> @@ -1056,8 +1057,11 @@ static int process_sdp(struct sk_buff *skb, unsigned int protoff,
+>  	caddr_len = 0;
+>  	if (ct_sip_parse_sdp_addr(ct, *dptr, sdpoff, *datalen,
+>  				  SDP_HDR_CONNECTION, SDP_HDR_MEDIA,
+> -				  &matchoff, &matchlen, &caddr) > 0)
+> +				  &matchoff, &matchlen, &caddr) > 0) {
+>  		caddr_len = matchlen;
+> +		memcpy(&rtp_addr, &caddr, sizeof(rtp_addr));
+> +		have_rtp_addr = true;
+> +	}
+>  
+>  	mediaoff = sdpoff;
+>  	for (i = 0; i < ARRAY_SIZE(sdp_media_types); ) {
+> @@ -1091,9 +1095,11 @@ static int process_sdp(struct sk_buff *skb, unsigned int protoff,
+>  					  &matchoff, &matchlen, &maddr) > 0) {
+>  			maddr_len = matchlen;
+>  			memcpy(&rtp_addr, &maddr, sizeof(rtp_addr));
+> -		} else if (caddr_len)
+> +			have_rtp_addr = true;
+> +		} else if (caddr_len) {
+>  			memcpy(&rtp_addr, &caddr, sizeof(rtp_addr));
+> -		else {
+> +			have_rtp_addr = true;
 
-Change ("%*.s", len, "") to ("%*s", len, "").
-The former is equivalent to "%*.0s" but is really a typing mistake.
-No actual change to the output.
+After this update, this loop sets over rtp_addr, but this was already
+set by ct_sip_parse_sdp_addr() a bit above.
 
-Signed-off-by: David Laight <david.laight.linux@gmail.com>
----
- tools/testing/selftests/wireguard/qemu/init.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This new chunk results in:
 
-diff --git a/tools/testing/selftests/wireguard/qemu/init.c b/tools/testing/selftests/wireguard/qemu/init.c
-index 3e49924dd77e..c87570494d30 100644
---- a/tools/testing/selftests/wireguard/qemu/init.c
-+++ b/tools/testing/selftests/wireguard/qemu/init.c
-@@ -53,7 +53,7 @@ static void print_banner(void)
- 		panic("uname");
- 
- 	len = strlen("    WireGuard Test Suite on       ") + strlen(utsname.sysname) + strlen(utsname.release) + strlen(utsname.machine);
--	printf("\x1b[45m\x1b[33m\x1b[1m%*.s\x1b[0m\n\x1b[45m\x1b[33m\x1b[1m    WireGuard Test Suite on %s %s %s    \x1b[0m\n\x1b[45m\x1b[33m\x1b[1m%*.s\x1b[0m\n\n", len, "", utsname.sysname, utsname.release, utsname.machine, len, "");
-+	printf("\x1b[45m\x1b[33m\x1b[1m%*s\x1b[0m\n\x1b[45m\x1b[33m\x1b[1m    WireGuard Test Suite on %s %s %s    \x1b[0m\n\x1b[45m\x1b[33m\x1b[1m%*s\x1b[0m\n\n", len, "", utsname.sysname, utsname.release, utsname.machine, len, "");
- }
- 
- static void seed_rng(void)
--- 
-2.39.5
+                } else if (caddr_len) {
+                       memcpy(&rtp_addr, &caddr, sizeof(rtp_addr));
+                       have_rtp_addr = true;
 
+which is not needed? Why does caddr need to be copied over and over
+again to rtp_addr?
+
+> +		} else {
+>  			nf_ct_helper_log(skb, ct, "cannot parse SDP message");
+>  			return NF_DROP;
+>  		}
 
