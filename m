@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-271857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271858-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iIy3Lu3SxGnk4AQAu9opvQ
-	(envelope-from <netdev+bounces-271857-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 07:32:13 +0100
+	id WL+WGu3RxGnB4AQAu9opvQ
+	(envelope-from <netdev+bounces-271858-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 07:27:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 588B332FDD0
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 07:32:13 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 319FF32FC6E
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 07:27:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 36049305ACA8
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 06:27:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7AD7B303AC3E
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 06:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302473B0AE2;
-	Thu, 26 Mar 2026 06:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 468283B0AFE;
+	Thu, 26 Mar 2026 06:27:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="EYxkafqC"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="DZ/tCcKF"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011055.outbound.protection.outlook.com [52.101.70.55])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012030.outbound.protection.outlook.com [52.101.66.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B8138F239;
-	Thu, 26 Mar 2026 06:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3363B27D8;
+	Thu, 26 Mar 2026 06:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.30
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774506446; cv=fail; b=GHefVqJwKS32k1GcttItIoaH28PXDlAU1beYgxRNSIWJGtYwFVb9hcTjN7xlEXz12/2na6pQyNp5pzsJfbJXv3zWCyYdjgGZo1O7OhBidQVQuTKuUiUItODlIdABsk4RSCxkvFqeV9G4xmTy8UXJNWSZEZqFHsDskeLKbUTFYiY=
+	t=1774506453; cv=fail; b=pFBKaZUxRVdq56t6bVre9sar3/YXqyuvoQw+JUO6sxn15ilYkVxuW+JOloomEeUp2HEvDrCWZ1y6smhyemDk1b/afj0yQxAMdM5s62XGgCqBKe/pzyxvDVKXBofony6wtPoxMxcnm+GNoPABx0/l0yXaz/M7YT8kulEXkgSkJWc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774506446; c=relaxed/simple;
-	bh=Jcfv9OB1YKjez630Wrb5qiBKbK4xiwF97ERsu+AuRY8=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=MQQ1iLAn1dggBx9ItZ83lXz6bOJ4fki+Dfb4N64y+qzwIyqEWjF6EFmxWVdjqYcZt+kNNmru2Z2y0XNsJPr8FHpnd6SazkhzBlP6Bi5RqRKMrefduUx2jAYeNA5kd0PbD92WqK7lNlrLzct14Jsl/hwHaogvzJiX5TgikZyzElY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=EYxkafqC; arc=fail smtp.client-ip=52.101.70.55
+	s=arc-20240116; t=1774506453; c=relaxed/simple;
+	bh=7HSB2dE6vpsK0/UwCaQG69LI3UUEHuXUT6qrDbuRL0o=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=kLf/QtfA0H9/EA6ATKxtYZkihkwmEokt7F+PKadq4enb9o58Q/RNoJkfpIVvgN7MPQZUKauWcyku6DfVPNyqLRUbteAZcM1NgbQUa+pfc4fzciT3fbSC6PPQk2BiqJwo4FdTvhCSiWmYc+N1KdrEpH34mdbZGR0wqlBS3C9dY+4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=DZ/tCcKF; arc=fail smtp.client-ip=52.101.66.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=exyGiZWhw19WdOG2ya+sBjGf+ArubCdqFChAC73JjlpatZZzCRVp+j7/DDvGv0e8kBSx5/M4R8d9TVmQPuk4fyZORbdh6yUVgX5+YafMSTfkBxnhyye2g9GTMYEt8EDj/F7zm4O3rkefVrDGR79YNWhgC2JmbXxUJk8ENRaBeEakRhaOELwDOB1i3s0CzUOExxcK5vdYyY0o5UA7VhH4/UsaEMr5s+WgznOcKiU189WWv3YNRN3yCpSUTi3aYZsq0bKiw3hHIv2pfW9Vn5piOYcGxFR/wZl0QO8NfOyR5EU7hxJ2LktCgo5KvwnT8nmWj89V/t7wuohwC73t/lGWtA==
+ b=GBlgWHIHEiC/4dke0gfOxWTjqqzvqHDO1Ww+C8N5Fth+aOJy1fSIJbXK49YrO7/uYr6YYsi1pnCBFV04xq6mobvsVYAcpKfVMt6QmJkrXGbG7N/CX6Uwygwdl0nI5dpAnkaBhrtoPcSjb6pBcGeEJxqvUCL44jix4VPRwDReSuS5iU7zuOEeE2lzMMIMKK/InjRACJBK8zvLBIfavebLlbP1mjHrhkeVX5I1fahRT6UkKZkpPvrluoGUMQHjlyK47NM2rVIXohxSH2dmvu3usEWyU7bpxdub94pTTP2aEIzMofKs8KSXCaLVhlZMmFCoLL0TIJadMRNTr8DQFNmbfw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0/Ig6QHm6f+vAuUX+t5kRLquc9gxss9/tlRHXXrTG5k=;
- b=yyc6HLeSUPtOCTZSDP7BaBnOcu/ytC5R6Ox5EBlaXOeqe5kPjPJJYsiqHqJq+CUwU4E8A9SKd+5/yg+6U585DNC4RVMCEQRpqss7kMJ0fmHB+MXZeWXTv34pmNUzPkGsjvZ/YM4bG+DoMzOvSVs1rGwsC84rxhxhwYsDHT3hBS7IKrzqqmjNMXIj08TpuWensI4EOBmpVOAUQbuAnIct2zoK/c/JqUEPEXE2ePeEwm0j9QpoGmq4U2K452Ajbu//XQYM332AWn7uM9UkRJCv0qu9u6xu1ohXBLle+fHyWo0OBAMBtMyDyX/8h/mnhflwS3V4sKdLdnkgM/T1Hgzr+w==
+ bh=b/XZWFlsxzM+0lZxykfSK1STJKtwotZ7hmQM6Y2ONMU=;
+ b=pL8A2tDd/ZcbWbpDpTOvr2aJa2MvXWhgAtD2b0Zn9nhuOHk6mtCEjSkwP+Y1APJGofy+NEZMlVQKzGQpa8AUqawFwGWk/6OY6I0azJaB5XJLZKUPUl3buMV1f+09VMM8QQVwWS6Kz+7h179Fx58sCFMlCngV894Xr9nX3ypq1JZxtDzySqNZTJVt0rFYTdnz1SpzWcErdn4CrCGyPNjuXhcbHvJ0DcAG/7aAAUV3w1/+Fd3jGb53EdSogC50zdMDdueitji5baKIQaK6R/YeTKoJbkPfAsuJIYl5t8bE4PDa0cc+ToZsKCyD6bScOlL6U5H2e2HANQEtSL7bWbtqQg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0/Ig6QHm6f+vAuUX+t5kRLquc9gxss9/tlRHXXrTG5k=;
- b=EYxkafqChvRnfAmqIdw2jylgU7zsI1vVWCzZn53ZOLMYsCWFub9wJVKOxMLQ56EqJJCeHj0iOaC3InwdfDg0UnRIPjlAm3SjabumGBXhi03vSFyg5PMZBJqFWB8+zhReup3I/sJYmiKiJ0LpE1kS+Gv+xnRgnlJAv7S53scHuG2Uw7GhUHkQjGquZ48qjZzEW6C4Q8FxHjgm9TuW7lFAaB0moOTYcBy7sEt39AvcpC9sdY9B5PfYUUwpEPAxHz7m/6VUiz7qO0Zb/MUx6CKNAVYrYkmk8/02XdAQsYMku+tM7TclKAhGzdxH73NKXVNxm4Bw1ib1KigJYPfn2hhIpg==
+ bh=b/XZWFlsxzM+0lZxykfSK1STJKtwotZ7hmQM6Y2ONMU=;
+ b=DZ/tCcKFImVPq6aPOsg1EbHPwKzZVQI1MGPaKUIEyoZYjN26CeBzJdd2hbYEREME02Qa9qAUTdD48QYRnO9MBzIeNTsPeIMKVF758hT/aUJK7xMukV/DgNPsBAp9AWAj487GRYGAOHVOJDnlNHnyXELpfAhS5Ukhbnw8B7JMjpF8rHdXL6iQ+/OGayNtoQJtyR2Npx1ZgsCdLSiDLAK1e/3FQZqypwgtAckvXqyR5aeVbp662sNmzSSan/3w/jVGa4hvgK712GPImTqxtHpyfrLipWig3zAL0yPLYnXZrPLR2peeUKBMt2Vh/s7iMFg+YT6VG2xyS6YbYG3v95mgSg==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
  by PA2PR04MB10309.eurprd04.prod.outlook.com (2603:10a6:102:41f::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.31; Thu, 26 Mar
- 2026 06:27:21 +0000
+ 2026 06:27:28 +0000
 Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
  ([fe80::b476:c19a:24cd:3694]) by PAXPR04MB8510.eurprd04.prod.outlook.com
  ([fe80::b476:c19a:24cd:3694%3]) with mapi id 15.20.9745.019; Thu, 26 Mar 2026
- 06:27:21 +0000
+ 06:27:28 +0000
 From: Wei Fang <wei.fang@nxp.com>
 To: claudiu.manoil@nxp.com,
 	vladimir.oltean@nxp.com,
@@ -82,10 +83,12 @@ Cc: netdev@vger.kernel.org,
 	linuxppc-dev@lists.ozlabs.org,
 	linux-arm-kernel@lists.infradead.org,
 	imx@lists.linux.dev
-Subject: [PATCH v3 net-next 00/14] Add preliminary NETC switch support for i.MX94
-Date: Thu, 26 Mar 2026 14:29:03 +0800
-Message-Id: <20260326062917.3552334-1-wei.fang@nxp.com>
+Subject: [PATCH v3 net-next 01/14] dt-bindings: net: dsa: update the description of 'dsa,member' property
+Date: Thu, 26 Mar 2026 14:29:04 +0800
+Message-Id: <20260326062917.3552334-2-wei.fang@nxp.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260326062917.3552334-1-wei.fang@nxp.com>
+References: <20260326062917.3552334-1-wei.fang@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: MA5PR01CA0046.INDPRD01.PROD.OUTLOOK.COM
@@ -99,56 +102,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|PA2PR04MB10309:EE_
-X-MS-Office365-Filtering-Correlation-Id: ad4b04c3-2c56-4135-1ba9-08de8b00bbf0
+X-MS-Office365-Filtering-Correlation-Id: 2ff94605-0a7b-4349-a2a6-08de8b00c0ae
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|1800799024|19092799006|366016|52116014|921020|38350700014|18002099003|56012099003;
+	BCL:0;ARA:13230040|7416014|376014|1800799024|19092799006|366016|52116014|921020|38350700014|22082099003|18002099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	n/IbjOXh/hvAVBW488W2FliTqx22f71NwkVYt/9cBjsMFLqE5qeA8IfrXGLj7SPNSOaprvk5LYlmtJcODrir/y7eHDlzltN4VYVt/MK5M3wbcswsZYWuNVzcuTT3koccC7mmRvwMSbTtcTANDRMfFISR0USoU00pv95S50h8wA6xF6lKoMPDc1aiMIO2pRVKc2CjxHEtrkcO03cZAoBbli4VmY2y47g4GrpBRck1e2bGT5wVGyd4iV2gyel68eidt+vQUc+J/zPTbcJLUgKvOr2y14iS40GQanJbvEK9SlBBgtj05Xqc95UUo6yKlwgH752vNTO09puR65owQuiUr/HFv7kO2L3xvED5QbzCu0SsZuoSSEgrzsvlaosnZjhMtxb5AxMIfpbzTKZW83EDDDa5IYoRxCogtUVgTD9ZgXLcmyAAZCZ2mRwGkwulZTvkyzFxwfyu5wmXuoWQvCgyCMSH6lwUblNu+9g+R2hHw7DurEPrdu56zpfkKaNKOOKDW2qQWLdHNBIIJOYDUvJDBxKkxsybGL4ln0an56EUxYAG/YpupyZvMqoIvpC/Oyv4HfAxtFOhMdIDyFe1BTWeXy3I/CD85c5G2jrSqFHh3021NfPoBWGdMshUD5/wVxgzZ8FAeHkYSsmUpLDsAR4Uw9uyktN9IgfwcC2zwGgyaBcyX2Dual94Txnc1xi7Ry8tco0F0VQcgz+BENPYtz7yXvA7bJmYTzoD2JkvufgU7xeAtioih2E0QnSJhyVjVJmvNSAirJllPK6n5r1bWT9e+uFErBmb4REUp9uGmmcld7C4TzgatnmAziQkskh/QCSx
+	lXlUz/qDiaZjDfUAk7tMNCO/GB+8n5cmCKZKrC2J8LpdKFlTbGS0D3d+x0JKuiZvsqcvXLeZxvBVAFsowwNYQzfrjD6tqobsCV1+pYPbcpxYtem4+UyiwJ3nMzSEXZGA65W4Q3KtH6GWxQrO6OUOL9I18Zs3LN+tXBJ+FqlRYIE8xix400pQ/5tyemQoMasO4Smj/dqhk2Tg5fl8sIrjv7WCblBtTcDY96qhRt+zbl/72hQPlCX+/YGHzFh482R75EFxB2BzCNUns+W5cpVExNKFP0RgigxjomIl8EvFG2F77d73INxbe+alekKymkJuhUWmU8J6Zhl+sMG0NxpUOWoTjjCTHMpZs7Xite2vYUXzXWXW3l8zi8aYN41QBEUhpDVfum651GHB8ivVDGySA57zetJURgTHs/P90s/7J2phLp/u5abcIZjpAXYVSdp1Kv+k/35AyAEdBw1bX8nNLl5gg5mFBoqUSqfjBb3CZxPc0dOCqqeicyee48sK/icbH8khXbh56hSgtwLaneQLgFOHR6/lpf6rLYWvsVpG6aKScb7bnZnyaIakly2KNdxA5YJK4UTCP9FcXlNkYkIRaE11q6alGZcLuUFcFYOnavGVttE+Epyv+/qgVHLEoks5NiGsx+I9NQkfQRd2IdwEYElmXyGs5F4cp3YEWhYPmzGoozLUcOSYG8mJv8eVXAVR4KWkD6+gkbj+kfHGBymAVVP2ezAxzPCatVrSyypENe6jd9JHhb7c7ftLlACmOaxvdM5mqhkp6JmQCtgeNvhi5ysSUaz/k9DGDGi9vsiHtvmibKDr6CNTW+mIdbnVfW7P
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(19092799006)(366016)(52116014)(921020)(38350700014)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(19092799006)(366016)(52116014)(921020)(38350700014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?3+4ddGcUU/vzWpyHkzCUi1tuU/92tmICIq+NxtpJqXNHVNJIcuAoDkDHBevq?=
- =?us-ascii?Q?A9kXk8oAw6lbxG+ZlQd33y/yuUulpKkzldsD66wSB+NiAJ0k4rQj3Xz7KV/K?=
- =?us-ascii?Q?/qittqKB97oQg7QG/Vw5AcPBdoBcztZumjeVvIPTBJRAvZpBAbIJJ2Zjykcy?=
- =?us-ascii?Q?YYM4olR0mpdCtBEdwHRZePKDOU+WPG8JAAFxH5ue8xPGGyYHWjZINEuqxmPQ?=
- =?us-ascii?Q?fyFNYHAco3J103agIs7cJjYi7VBEzmW0qhxNN5W8Zy1S8FE35IKL+gWBccd+?=
- =?us-ascii?Q?RTWXMbnaiVLIx154xE5xKwrudlTVpQ7c8H+tRgrdMYmVgEuNGeak+ARMKcds?=
- =?us-ascii?Q?s/EK9BQbJaJyFJ42rMkqEgNx393t3H137/qn7FpdGMk3+6521cI87f3Iqb/3?=
- =?us-ascii?Q?TA4KDhGT7kLezgG5MujPUGvQEuPRaJlO/CJZliBndTLP58UukHH27kD1MqUc?=
- =?us-ascii?Q?XOySH2pQs3I2AL1U3mwHMqtut8qFRu6Iz7pIdA2wd23hQKZzNb+fJ4xpA/Ot?=
- =?us-ascii?Q?q5K9ca11w/eECblxqoEpr2hYe03lxln0fFsCvKcpSVbzWz/BFZXZng3rpwwB?=
- =?us-ascii?Q?XJ0NTh7H3TrPwMpUbJOlboOIyw1Kkyr3nqw6gzhehvn4wvuXDnt6lSeeOM6N?=
- =?us-ascii?Q?mkMvKL5UHfHe+YAApPiZnnbvBF7OZOCegm82YOATH17sBxdW0kGLnqDfdj2A?=
- =?us-ascii?Q?Vpr2ladmiDDXwW8tUIbcRkk03iHisC016r54JILXf/+DmxhbaKkRy9pSNDd/?=
- =?us-ascii?Q?uPWAVomsiRvwucRdyy5xu4NLG+8xkKQF0uW1Z+ZgusM5V+CA/9LaNb1ld88W?=
- =?us-ascii?Q?pGVh/EeKpQ+hkEjAMapJWzwggoUzz8x1OVmT6kxrMHImKj1IT7+MbuQBKzNW?=
- =?us-ascii?Q?STA7Shl39neeKWketMIJq2DgaviqcfK8MYs+a+jZ4LPtTLWFOjecbRyhrfyD?=
- =?us-ascii?Q?6WkrcTxJuVnlpCFqZNCqockE0Gvg011jar4R1cJLRiMU/4XmvHusZBfqybBL?=
- =?us-ascii?Q?UCLW2K7cx2152ta1O00ImpQ64y7KPDXFnjZfQ5lbS+wOLFQKHjPMTeDuwPA5?=
- =?us-ascii?Q?dRRJwVs4xLvsDJ5oxk5FK2C/3eZsgvEJBqMjnkbjBZoMtPv4EBYquyt5uWOF?=
- =?us-ascii?Q?HYm0Om7EZIozaTH7RGRvXNLqXXLh9gCL1i7fg2CTLh/a6NZw39r+tFvx+QDi?=
- =?us-ascii?Q?1p89NGIAVRbMSZwTJcZQU1BzWVHrTqH51wtija1JaqbDK4jzeiI1ZA1oQtuE?=
- =?us-ascii?Q?eMxPGuz143+bnAM0yVi43vHr/CuuZcy9QRGCdt3ngKjTMvzHHRlZZGY0UIZT?=
- =?us-ascii?Q?MBbK2Pmgd5Ru4R3Zte0bkVWXOJJiQmnban8f/LiWB4RzzKlHlJYnLKbh96G0?=
- =?us-ascii?Q?2I80HF9ImE1O0YTbBTxTRbGBmadtt6p/Io+QPz+xuQR7bzxxU3qvRPqG85Jp?=
- =?us-ascii?Q?iRW8ReJvK5s4ImHuBbtgY3ji4fRirfkSy3sIlPGAQGDyl5lOdtZkuKVExS4T?=
- =?us-ascii?Q?x7Vg9PHXLVasSMTee4SS6N9gn0fG42/V9zSBcH803ejTw3afyAzYa9ggpvbB?=
- =?us-ascii?Q?J6ud3mWWb/5k7ntax3qaV8wI5GFUETKuxbig5P39Te2HOKBQwJnxLkjKqapN?=
- =?us-ascii?Q?jaklgLCzQnnStrn7qcBqfbfx398mTCrgTiCpYva3+BgplzoXzAX8Po8OEnvb?=
- =?us-ascii?Q?UBOBVpfUtfK2tAdOlcQNrZ6N3LlE0JOGYKNlwg8wRn9NOa9C?=
+	=?us-ascii?Q?hzpJBJTG56kU5flPX+ZtgkWgTRibXUD7CYdjj8SRJD8b//lK8yVyzAOwB73U?=
+ =?us-ascii?Q?tPEZwnR8IHAjgjTrK+k/v9kMTWy+cKzwgbdFbYRvXsU73E3ShcN6FQLihRN8?=
+ =?us-ascii?Q?FFyz2b8Xc1zi4Mzp2VJ6eLwqZ5scutb6dMUPVSQtkckXl7xbqNx6IZEOAFGo?=
+ =?us-ascii?Q?cjjGVw0fBSA/CIqC4xvCn3px/63W+TARCC1hUrI+5P9HnHNPR0yfu9Nuf9vP?=
+ =?us-ascii?Q?MzULLA+AbY0kZOomzFtVeXPMHegt/jn2Y4cEwCfbga5KzIzGvT8ASyWzElZH?=
+ =?us-ascii?Q?yw3Yu2gXR79B7eQBVM+m88rG6wOPfXPkgESHGW45+VeugQPjtzHD1FLO5wuE?=
+ =?us-ascii?Q?E8KBO6OwGVKxYDBbj2ZlN3MiL2UEvLW/d+lIzgiwYXs/jhkkL9a0d9VxkKtA?=
+ =?us-ascii?Q?T1CL/Ggq2VcArx1uRyz9qeXcdItJLFpRcb4hIG0po/GY3MdLRJEFBdJDgX7z?=
+ =?us-ascii?Q?Nx8ZTEotBx0912h0rc4kqfZ4x0SglK7TpSWvPhSP7OkTu+fXzusKavOZ25vc?=
+ =?us-ascii?Q?z81Qrdl4NrAZvxvt+b+2Pvf8r7o7CEy8vDutUXzcOZR4Rjl7oKgpg1TfMVxk?=
+ =?us-ascii?Q?qMJTUlAOR4MITRKd5bz9U6ov2cfaYKJVAIg4vQMDS5sUnfrOVCPA0latu/Zj?=
+ =?us-ascii?Q?2g3708wPVvEfPkVi6Iy4vpcddhUKNxs40DTzXxPv2REqjVUjgh9xiyQAwuGE?=
+ =?us-ascii?Q?CnXS0PtpIcfCCUSFeuLO7ZpqErMHiO0ehCqciAtnwBYCTxmdchGUChfOqHxj?=
+ =?us-ascii?Q?7GYvXadc0OENbITgSTtRLXWI+s3Xu9UkpCvXiptf+wtV6rja425CFEkbor/L?=
+ =?us-ascii?Q?2mDFeszaSRQKbcxgcOI364CHUu85SYt7PQ0xMPYR3su+1a2oTrnTLXfoxR4t?=
+ =?us-ascii?Q?p+oBY8JkTne2MfdJ4/WBy4626VfNiC8YkpM92l+5czpj3DYqOYzra9AsPqw6?=
+ =?us-ascii?Q?kmmfMzCOcJ7ToqPM1XXJq2kxkMR9nlE9J0WnrHY7X3yn/0jsSAxUaWxZ1jZP?=
+ =?us-ascii?Q?hK+iAMePmV35z7EHB6VrAaVk7g1lJYmFX0owMpJDMurVe6ZFN84s+oDmuRvp?=
+ =?us-ascii?Q?GpJnNjjl2eBR0lKY0VwEOXrndpZB2Yai9OxUDdXrXD0hs/sdwi+j2s2e6GKv?=
+ =?us-ascii?Q?2AMwd3i5Yprd9KkOzh5tTsK+5rv8GeQ3sSxMHoi+hu/QJd1ZgUQU3iBMbUBA?=
+ =?us-ascii?Q?A99vWWtMsth28YVW7i8qxw7tquvCIQB3VVO1Hmnu1DBLus2Oq4AD5oGQERf0?=
+ =?us-ascii?Q?UzZXiPuBYakO+pN0UicANmjGiM9t4XxfMkf5bB5yJDtDKjHL91E6sJIPwUoN?=
+ =?us-ascii?Q?gCFp2xm12mQDTNwng8VqLDBlcnfl/6dXJgpJlHisLAfkMEbTDal/PGERKIDr?=
+ =?us-ascii?Q?bAsnMbyKOKJ3F3q8eysmtDXIcbgJYyxD2OimofELRt9uDoX1s478hsPFuj/j?=
+ =?us-ascii?Q?YtjXsZa3Rd2hHoj1w2sFCFz3xOiNjOL9GQ9T3WQ1dVFLfqjGiP+M0irRuml+?=
+ =?us-ascii?Q?AXhmj0JhrYzzGlpYdxHyIre0pFVhnd66eHt15e/K7yGD3XHOJdPSVr1yKjcX?=
+ =?us-ascii?Q?SN9IujDuSFvRxu3loSln4VJl6qBup2mXoPymEe3P7yUH4qU4Nptta3pCZbiH?=
+ =?us-ascii?Q?Q7MHBbRtGB6+1wABTjq2oZwvqJhkSTPjJbGTH/Ee9WL0399KpTtIv0nMHxWW?=
+ =?us-ascii?Q?l0QG+BdVFrVxB/F0bDuPrpNK0Ai6HCROeXpdCIUc1aSYonm2JMuSCT7s5zC2?=
+ =?us-ascii?Q?w88SGjcoqw=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad4b04c3-2c56-4135-1ba9-08de8b00bbf0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ff94605-0a7b-4349-a2a6-08de8b00c0ae
 X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2026 06:27:21.0294
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2026 06:27:28.5634
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 92Epaf3YVdyUvXVmfllqh2cEgjsRmAvXn1bWHTP/2NRUY5n3OrS490QPpV/1dPvBknbYHP3rZDRKgY8HIPZ4Iw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: QIZL80wALNxnI4U/n/M0IHnseJhedYqSVO3L0zjfLGwNjxPc9OP2IlGzNSg9Hr2QU+w+oVvWGmwnyqnEEVFebA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA2PR04MB10309
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -156,7 +160,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -165,7 +169,7 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271857-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271858-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[23];
 	PRECEDENCE_BULK(0.00)[];
@@ -175,161 +179,54 @@ X-Spamd-Result: default: False [2.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,nxp.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 588B332FDD0
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,nxp.com:email,nxp.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 319FF32FC6E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-i.MX94 NETC (v4.3) integrates 802.1Q Ethernet switch functionality, the
-switch provides advanced QoS with 8 traffic classes and a full range of
-TSN standards capabilities. It has 3 user ports and 1 CPU port, and the
-CPU port is connected to an internal ENETC through the pseduo link, so
-instead of a back-to-back MAC, the lightweight "pseudo MAC" is used at
-both ends of the pseudo link to transfer Ethernet frames. The pseudo
-link provides a zero-copy interface (no serialization delay) and lower
-power (less logic and memory).
+The current description indicates that the 'dsa,member' property cannot
+be set for a switch that is not part of any cluster. Vladimir thinks
+that this is a case where the actual technical limitation was poorly
+transposed into words when this restriction was first documented, in
+commit 8c5ad1d6179d ("net: dsa: Document new binding").
 
-Like most Ethernet switches, the NETC switch also supports a proprietary
-switch tag, is used to carry in-band metadata information about frames.
-This in-band metadata information can include the source port from which
-the frame was received, what was the reason why this frame got forwarded
-to the entity, and for the entity to indicate the precise destination
-port of a frame. The NETC switch tag is added to frames after the source
-MAC address. There are three types of switch tags, and each type has 1
-to 4 subtypes, more details are as follows.
+The true technical limitation is that many DSA tagging protocols are
+topology-unaware, and always call dsa_conduit_find_user() with a
+switch_id of 0. Specifying a custom "dsa,member" property with a
+non-zero switch_id would break them.
 
-Forward switch tag (Type = 0): Represents forwarded frames.
-  - SubType = 0 - Normal frame processing.
+Therefore, for topology-aware switches, it is fine to specify this
+property for them, even if they are not part of any cluster. Our NETC
+switch is a good example which is topology-aware, the switch_id is
+carried in the switch tag, but the switch_id 0 is reserved for VEPA
+switch and cannot be used, so we need to use this property to assign
+a non-zero switch_id for it.
 
-To_Port switch tag (Type = 1): Represents frames that are to be sent to
-a specific switch port.
-  - SubType = 0. No request to perform timestamping.
-  - SubType = 1. Request to perform one-step timestamping.
-  - SubType = 2. Request to perform two-step timestamping.
-  - SubType = 3. Request to perform both one-step timestamping and
-    two-step timestamping.
-
-To_Host switch tag (Type = 2): Represents frames redirected or copied to
-the switch management port.
-  - SubType = 0. Received frames redirected or copied to the switch
-     management port.
-  - SubType = 1. Received frames redirected or copied to the switch
-    management port with captured timestamp at the switch port where
-    the frame was received.
-  - SubType = 2. Transmit timestamp response (two-step timestamping).
-
-Currently, this patch set supports Forward tag, SubType 0 of To_Port tag
-and SubType 0 of To_Host tag. More tags will be supported in the future.
-
-In addition, the switch supports NETC Table Management Protocol (NTMP),
-some switch functionality is controlled using control messages sent to
-the hardware using BD ring interface with 32B descriptors similar to the
-packet Transmit BD ring used on ENETC. This interface is referred to as
-the command BD ring. This is used to configure functionality where the
-underlying resources may be shared between different entities or being
-too large to configure using direct registers.
-
-For this patch set, we have supported the following tables through the
-command BD ring interface.
-
-FDB Table: It contains forwarding and/or filtering information about MAC
-addresses. The FDB table is used for MAC learning lookups and MAC
-forwarding lookups.
-
-VLAN Filter Table: It contains configuration and control information for
-each VLAN configured on the switch.
-
-Buffer Pool Table: It contains buffer pool configuration and operational
-information. Each entry corresponds to a buffer pool. Currently, we use
-this table to implement flow control feature on each port.
-
-Ingress Port Filter Table: It contains a set of filters each capable of
-classifying incoming traffic using a mix of L2, L3, and L4 parsed and
-arbitrary field data. We use this table to implement host flood support
-to the switch port.
-
-The switch also supports other tables, and we will add more advanced
-features through them in the future.
-
+Suggested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Signed-off-by: Wei Fang <wei.fang@nxp.com>
 ---
-v3:
-1. Improve the description of 'dsa,member' property in patch 2.
-2. Remove netc_select_cbdr() and use spin_trylock_bh() instead.
-3. Use pskb_may_pull() in netc_rcv().
-4. Remove phylink_autoneg_inband() from netc_main.c
-5. Remove netc_port_set_hd_flow_control() from netc_main.c.
-6. Impove netc_mac_link_up(), remove unnecessary code from it.
-7. Restore cfge if ntmp_bpt_update_entry() returns an error in
-netc_port_set_tx_pause().
-8. Improve netc_ipv_to_buffer_pool_mapping().
-v2 link: https://lore.kernel.org/imx/20260323060752.1157031-1-wei.fang@nxp.com/
-v2:
-1. Use raw_smp_processor_id() in netc_select_cbdr() instead of
-smp_processor_id().
-2. Remove netc_port_free_mdio_bus() and netc_free_mdio_bus().
-3. Correct the mask value in netc_port_set_mac_mode()
-4. Rename net_port_set_rmii_mii_mac() to netc_port_set_rmii_mii_mac().
-5. Check the return value of ntmp_bpt_update_entry() in
-netc_switch_bpt_default_config().
-6. Add some comments to avoid false positives from AI review.
-v1 link: https://lore.kernel.org/imx/20260316094152.1558671-1-wei.fang@nxp.com/
----
+ Documentation/devicetree/bindings/net/dsa/dsa.yaml | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Wei Fang (14):
-  dt-bindings: net: dsa: update the description of 'dsa,member' property
-  dt-bindings: net: dsa: add NETC switch
-  net: enetc: add pre-boot initialization for i.MX94 switch
-  net: enetc: add basic operations to the FDB table
-  net: enetc: add support for the "Add" operation to VLAN filter table
-  net: enetc: add support for the "Update" operation to buffer pool
-    table
-  net: enetc: add support for "Add" and "Delete" operations to IPFT
-  net: enetc: add multiple command BD rings support
-  net: dsa: add NETC switch tag support
-  net: dsa: netc: introduce NXP NETC switch driver for i.MX94
-  net: dsa: netc: add phylink MAC operations
-  net: dsa: netc: add more basic functions support
-  net: dsa: netc: initialize buffer bool table and implement
-    flow-control
-  net: dsa: netc: add support for the standardized counters
-
- .../devicetree/bindings/net/dsa/dsa.yaml      |    6 +-
- .../bindings/net/dsa/nxp,netc-switch.yaml     |  130 ++
- MAINTAINERS                                   |   11 +
- drivers/net/dsa/Kconfig                       |    3 +
- drivers/net/dsa/Makefile                      |    1 +
- drivers/net/dsa/netc/Kconfig                  |   14 +
- drivers/net/dsa/netc/Makefile                 |    3 +
- drivers/net/dsa/netc/netc_ethtool.c           |  192 ++
- drivers/net/dsa/netc/netc_main.c              | 1558 +++++++++++++++++
- drivers/net/dsa/netc/netc_platform.c          |   89 +
- drivers/net/dsa/netc/netc_switch.h            |  155 ++
- drivers/net/dsa/netc/netc_switch_hw.h         |  335 ++++
- .../ethernet/freescale/enetc/netc_blk_ctrl.c  |  188 +-
- drivers/net/ethernet/freescale/enetc/ntmp.c   |  383 +++-
- .../ethernet/freescale/enetc/ntmp_private.h   |  122 +-
- include/linux/dsa/tag_netc.h                  |   14 +
- include/linux/fsl/netc_global.h               |    6 +
- include/linux/fsl/ntmp.h                      |  235 ++-
- include/net/dsa.h                             |    2 +
- include/uapi/linux/if_ether.h                 |    1 +
- net/dsa/Kconfig                               |   10 +
- net/dsa/Makefile                              |    1 +
- net/dsa/tag_netc.c                            |  185 ++
- 23 files changed, 3614 insertions(+), 30 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.yaml
- create mode 100644 drivers/net/dsa/netc/Kconfig
- create mode 100644 drivers/net/dsa/netc/Makefile
- create mode 100644 drivers/net/dsa/netc/netc_ethtool.c
- create mode 100644 drivers/net/dsa/netc/netc_main.c
- create mode 100644 drivers/net/dsa/netc/netc_platform.c
- create mode 100644 drivers/net/dsa/netc/netc_switch.h
- create mode 100644 drivers/net/dsa/netc/netc_switch_hw.h
- create mode 100644 include/linux/dsa/tag_netc.h
- create mode 100644 net/dsa/tag_netc.c
-
+diff --git a/Documentation/devicetree/bindings/net/dsa/dsa.yaml b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
+index 2abd036578d1..801e1411e5c2 100644
+--- a/Documentation/devicetree/bindings/net/dsa/dsa.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/dsa.yaml
+@@ -28,7 +28,11 @@ properties:
+       A two element list indicates which DSA cluster, and position within the
+       cluster a switch takes. <0 0> is cluster 0, switch 0. <0 1> is cluster 0,
+       switch 1. <1 0> is cluster 1, switch 0. A switch not part of any cluster
+-      (single device hanging off a CPU port) must not specify this property
++      (single device hanging off a CPU port) does not usually need to specify
++      this property, and then it becomes cluster 0, switch 0. For a topology
++      aware switch, its switch index can be specified through this property,
++      even if it is not part of any cluster. Also, topology-unaware switches
++      must always be defined as index 0 of their cluster.
+     $ref: /schemas/types.yaml#/definitions/uint32-array
+ 
+ additionalProperties: true
 -- 
 2.34.1
 
