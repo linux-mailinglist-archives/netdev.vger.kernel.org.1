@@ -1,97 +1,97 @@
-Return-Path: <netdev+bounces-272292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272293-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mOjXAdPIxWmgBgUAu9opvQ
-	(envelope-from <netdev+bounces-272292-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:01:23 +0100
+	id QHcDBHzHxWmgBgUAu9opvQ
+	(envelope-from <netdev+bounces-272293-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 00:55:40 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DBD733D53A
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:01:22 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CF1933D47E
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 00:55:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 56FBD30FC2D4
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:53:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4FB523046FAF
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC273C060B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2965F3C199F;
 	Thu, 26 Mar 2026 23:53:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="JwoWFS87"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="rtYAUz1S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C68033555B
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 23:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4949D3909A6
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 23:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774569196; cv=none; b=Z1Ld8HZ+G4b9QmL073BjK+5nbX04gHJyKbuzDaM5gKVgPPinFgoxB/Lw2L5uBvVI3KDaV441Mmi5HMARPUE0o4Ni7BwDPAXLbtbx/bDe2rebnRXKhhKMO9Egf7+PjwshN86WsxULc63e0EFtVvg222AXQlm+6nEXpTK7sWzrNm8=
+	t=1774569196; cv=none; b=se4jGlEDZWkZ96Y5/xCsRY/B0N6uFQuHsGcCOY+5mp09tvsu5rC2i8xnMRjEmYYP3T6IAL5aT7eBVtjl9Xy4ND/yvNSs9OOCn0mC6ipqmWNdJrQqFQM5bquOeRgGTg2/2UCyXHeE+Kpt7uihxsJyeLYdfVQIRIBToVCNY3JexFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1774569196; c=relaxed/simple;
-	bh=pKyucMpUmEUvEFMBIx42AjbztCbNrx6csAdo92it2Xk=;
+	bh=uWnYZfxpXWzMEdoD4OoQj78mYr7rYihNxdLMDApkweE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VzWznhWa+F5Arb0z4ofPZSEm9buTwEzzduHlp7Q24m7Zld9YnB0g38pumlOnEiFt+xoZ32vCEW4GHoIaBsusAJQ155HTir+ZJH4N8mjSN/zNj7w+jbBghp5r8u+2uma1U+kizUBBlUR7knH/1qlooaTp9SdN/i+A1yl+ardVgcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=JwoWFS87; arc=none smtp.client-ip=209.85.214.169
+	 MIME-Version; b=UN1hcNRlEPhC+5wkZDgLIz3kqaCYFP2akGetGao6L2rChQ9uiaHsc5h95J2q1Eqg5oeD7Nd9y2QAZv3nMEEwysaVPwZ9YhfCmE42wzHwdhSRhd9Lb1+XC3EAmH+686c0gD2aN7v8Zc8NxjMUNU7K3bdJWsTTUWOki2oASbRKdFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=rtYAUz1S; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2ad617d5b80so10044735ad.1
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 16:53:09 -0700 (PDT)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2b0c8362d93so5833425ad.3
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 16:53:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1774569188; x=1775173988; darn=vger.kernel.org;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1774569190; x=1775173990; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JqiCKER8qXjRaUNO4Rk4CZBahew9NIm21W29yweRKzg=;
-        b=JwoWFS87IOpq+uKx9Fqh8duQts3Mx0KQwqFHzfVCKlGLtvto24T2phCv+fOhy0l4C9
-         tur+Er7cHLRarL7sfep5iR3aviRDR5klUP415UNykel10+ggDTfhBENcjuOvot0Nsw2B
-         NmRNdqLHyBS4mEzTWt5IxXy0ZjIDgmib9e84+mv89YVarUWbFuR1Lvc7cQg77lZPemjN
-         1jVkrbnc8WVrZH10WLb5lCbPWr07DQFMAAfYVAnTTWgtLvvE3BzBl+xaLn3+gBqXoe18
-         j2jY9sJfsnaNddaZq6hkHnLrSJ/gd1Ze3o5dALMm5MRAWNwtNUmEtnZLrMUIgKaKfq5y
-         ohXw==
+        bh=lGwTwQhNH9Rzs+EHOpg8GEhPLriykUGXInx1g7lVTBM=;
+        b=rtYAUz1SqOlo8UK0hQgpJEeyQJoG4AReT6crtCujEHQd7PfnfHqepLv3RznAvdysJj
+         oanqLPh4BNyzZWaN73p5d5i64tKgTeQe2V4AlHrrlIcnUhRPmExgW52eXXF6Yz9kwUsn
+         Lc4UBfZ7pIvKHGZTw7djU0K/AHnmhAeIrgcalnTzHZza4kGI7oKF2aJChu9Fp860lIII
+         C4/eE5FsVohrH/snN/xPB8AXhp7YiNnnuuQA358orNp2Unu0ICJPXg8UBuur1XBOZvv3
+         4qTKg6T1ykz6IaI4K7WKRkZbtwqcitEbNg9avgd0wtmyk4+pXNKT5+nlLpBC/eSHtBtL
+         ov+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774569188; x=1775173988;
+        d=1e100.net; s=20251104; t=1774569190; x=1775173990;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=JqiCKER8qXjRaUNO4Rk4CZBahew9NIm21W29yweRKzg=;
-        b=b/EjOqyjcOHrgtOQfn7X4WH5dJwd/yhpbMkFoO1zUiF1Q8u4nZrmavmxdLqrYf+yvT
-         5W2ahmrppFYR0UyfWS9Esd1zxVSLs/A3N2h4Ho2bGVvAy0obZiHg/FN+CVluiTRtv1Ku
-         fX1HVwjZy+DnKI30/t+G9wAmTayzL7XC8xCIg8uUs/PM3r3pHBVYV5+UtP3Fjmj+I9z9
-         4KafCLtvgpgV2DGqq/v6xcVF+w673bmuz4IyZwFfBqb5bJ5zOtYlIYJ4THdCluXmvAcI
-         qLz1hN1upO2NySbtmW7VW1qJqYYY9JynvRaNcwbZ5tDzGv1BjJASmj7r8ecl3ioWkGvV
-         OHJA==
-X-Gm-Message-State: AOJu0Yz5OwHnteljNMcM6GQn+wk/wMEgYEjDSbJO3+YfGpxHHMfA/x50
-	bOLs6X02Kb6zneP2A3w8xAlBcNY2/ZDtIwxGm1PNzneiaOJR2oq94iz3KMj0uTYy3zqVK67SHRV
-	ZfKdzr/0=
-X-Gm-Gg: ATEYQzyAIRe7Sr0G40MDqsOS/p6qOY/3WoA8+KomTr7c5tjaO/l0P8bKcljO/OKZsMC
-	BApWt22QVmyEl1Qz/42YWFRZSe6qNCZ+T+E0T1mfFJSrDeppvmsBnGimCVgWlXBrKKfvSnzBSy3
-	ZW5rvrXa9BMzLtV4O9I/SI4UYFPUNkUkFP2PtzPDI9pD8Y0OwocmKf8y+DzJMsSi1Sa8ihlBl9B
-	zxV/iPc91nMvog9bOOYCNr87iGp4KKnSApv4iWzdjBmnzJJZtvecbR8tUdD27Y1OgKAm4hpD944
-	RXrB16IvD1SqC+7LcteHfxZObGlal2gBjC/NWq/kb6DS4h6EpAgqBBaWiXLHJYKgl50XwzZacHB
-	/f3PAk9uC0xbeqjfgsV/5Fb1pKD7UEXH2OkByyfYaLkYcagER2Fh3drAuh3d5wZZXWGm3QMxuW3
-	R/r8XO5ezKCYI49yQ=
-X-Received: by 2002:a17:902:da91:b0:2b0:5ec1:97c1 with SMTP id d9443c01a7336-2b0cdc238f3mr5392445ad.7.1774569188532;
-        Thu, 26 Mar 2026 16:53:08 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:73::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b0bc7b233fsm43338585ad.32.2026.03.26.16.53.07
+        bh=lGwTwQhNH9Rzs+EHOpg8GEhPLriykUGXInx1g7lVTBM=;
+        b=aXP8P72mJEbIFneqYPxEIk1HhqIGjzd7Yofgra08gVDQ6CLWn467q/43O2WyYS6FjX
+         vJIFog+1FHZJeKzboUlQiWD4rhn8460heMcoY6IjEvakEDFmZ7E51edGi90L4NSz7Ok0
+         tjfEj6ggb57rSVzGldGw7DuAI1vPS8FZatG8yK1nz6EjK3cniCuhkto5KwjFJEUWxzqm
+         tBt3dvUoxZkoPPNwNxkNplzoTngsWsK1mp2tAhjOs05iopP0vtg4AGaZRvCBbiE0xHZ0
+         TYPkY0OboaPmMQ8gq34gYOMPsnBi4xQTA6OVm7chlNECcS+p/nzY6U15CCHF8tMukNDn
+         06fQ==
+X-Gm-Message-State: AOJu0YxrvGMH0IxaesrOB7gzhwUASYAZ6YpQ1dmqgiVvtptezw+ccnc8
+	XMvHcvNII3BU4teodZgGwB1vSvKWhcrBBWT00lnq8ToW/sSR/77ej9ojtCo3k9Qdzc/nAZSxrMJ
+	OhKdGxig=
+X-Gm-Gg: ATEYQzwXM60PUPQf4moJgWuWDmrorB9kQ5OHZ+0QDhYgQJbrAJWSxTOFbCQr0S+qIwM
+	tOKWHi+f6ZwGWnVizm5iJcKaQPgjud02JWZNtEEsQY6tPq5E/C2Nqsq+4w+1fpL9MM11JCbTzey
+	tMSilTjXEwrYIBKpNACixO/mSDQFlGKQeW6I4ZIJAGbtF4oDxmzQsiv+tnjLRaMUFLUTDRQ7ZJM
+	3+DeR6hhUq8AE2H6zplxNFd54gbwE/52sloR/7vnHdKS1GEqSH4TLGgSD5FE9B7YSS9VT/P3c/X
+	NgWQZ8CobVx+Z26zUPNuCfoKXIDDTgdej7GY6sj1Nzdce/KIObQ5ft+Pmuwhu2mb7OVjkeDORc0
+	Kn6VWrR5B9SOnfDGmVqBnJAIw+UPuxUWu+hG/vfTuaIs/A0BuqjfmA9WpCzuOEY+B52i8It6+3A
+	Q3bdvT6ALJBozUChU=
+X-Received: by 2002:a17:902:e809:b0:2a9:e8b:5326 with SMTP id d9443c01a7336-2b0cdc3da4emr4232045ad.23.1774569190139;
+        Thu, 26 Mar 2026 16:53:10 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:5d::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b0bc881fe7sm44411865ad.48.2026.03.26.16.53.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 16:53:08 -0700 (PDT)
+        Thu, 26 Mar 2026 16:53:09 -0700 (PDT)
 From: Joe Damato <joe@dama.to>
 To: netdev@vger.kernel.org,
-	Michael Chan <michael.chan@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
 Cc: andrew+netdev@lunn.ch,
 	horms@kernel.org,
+	michael.chan@broadcom.com,
 	pavan.chebbi@broadcom.com,
 	linux-kernel@vger.kernel.org,
 	leon@kernel.org,
 	Joe Damato <joe@dama.to>
-Subject: [net-next v6 10/12] net: bnxt: Dispatch to SW USO
-Date: Thu, 26 Mar 2026 16:52:29 -0700
-Message-ID: <20260326235238.2940471-11-joe@dama.to>
+Subject: [net-next v6 11/12] net: netdevsim: Add support for SW USO
+Date: Thu, 26 Mar 2026 16:52:30 -0700
+Message-ID: <20260326235238.2940471-12-joe@dama.to>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260326235238.2940471-1-joe@dama.to>
 References: <20260326235238.2940471-1-joe@dama.to>
@@ -108,18 +108,18 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-272292-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272293-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DMARC_NA(0.00)[dama.to];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
@@ -130,18 +130,14 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:email,dama.to:email,dama.to:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,dama-to.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 5DBD733D53A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dama.to:email,dama.to:mid,dama-to.20230601.gappssmtp.com:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,broadcom.com:email]
+X-Rspamd-Queue-Id: 4CF1933D47E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Wire in the SW USO path added in preceding commits when hardware USO is
-not possible.
-
-When a GSO skb with SKB_GSO_UDP_L4 arrives and the NIC lacks HW USO
-capability, redirect to bnxt_sw_udp_gso_xmit() which handles software
-segmentation into individual UDP frames submitted directly to the TX
-ring.
+Add support for UDP Segmentation Offloading in software (SW USO). This
+is helpful for testing when real hardware is not available. A test which
+uses this codepath will be added in a following commit.
 
 Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
@@ -150,25 +146,148 @@ Signed-off-by: Joe Damato <joe@dama.to>
  v5:
    - Added Pavan's Reviewed-by. No functional changes.
 
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ v4:
+   - Added parentheses around the gso_type check for clarity. No functional
+     change.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 946608db92a0..bbbef1f1fa70 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -508,6 +508,11 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		}
- 	}
- #endif
-+	if (skb_is_gso(skb) &&
-+	    (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4) &&
-+	    !(bp->flags & BNXT_FLAG_UDP_GSO_CAP))
-+		return bnxt_sw_udp_gso_xmit(bp, txr, txq, skb);
+ rfcv2:
+   - new in rfcv2
+
+ drivers/net/netdevsim/netdev.c | 100 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 99 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index c71b8d116f18..f228bcf3d190 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -30,6 +30,7 @@
+ #include <net/rtnetlink.h>
+ #include <net/udp_tunnel.h>
+ #include <net/busy_poll.h>
++#include <net/tso.h>
+ 
+ #include "netdevsim.h"
+ 
+@@ -120,6 +121,98 @@ static int nsim_forward_skb(struct net_device *tx_dev,
+ 	return nsim_napi_rx(tx_dev, rx_dev, rq, skb);
+ }
+ 
++static netdev_tx_t nsim_uso_segment_xmit(struct net_device *dev,
++					 struct sk_buff *skb)
++{
++	unsigned int hdr_len, mss, total_payload, num_segs;
++	struct netdevsim *ns = netdev_priv(dev);
++	struct net_device *peer_dev;
++	unsigned int total_len = 0;
++	struct netdevsim *peer_ns;
++	struct nsim_rq *rq;
++	struct tso_t tso;
++	int i, rxq;
 +
- 	free_size = bnxt_tx_avail(bp, txr);
- 	if (unlikely(free_size < skb_shinfo(skb)->nr_frags + 2)) {
- 		/* We must have raced with NAPI cleanup */
++	hdr_len = tso_start(skb, &tso);
++	mss = skb_shinfo(skb)->gso_size;
++	total_payload = skb->len - hdr_len;
++	num_segs = DIV_ROUND_UP(total_payload, mss);
++
++	udp_hdr(skb)->check = 0;
++	if (!tso.ipv6)
++		ip_hdr(skb)->check = 0;
++
++	rcu_read_lock();
++	peer_ns = rcu_dereference(ns->peer);
++	if (!peer_ns)
++		goto out_drop_free;
++
++	peer_dev = peer_ns->netdev;
++	rxq = skb_get_queue_mapping(skb);
++	if (rxq >= peer_dev->num_rx_queues)
++		rxq = rxq % peer_dev->num_rx_queues;
++	rq = peer_ns->rq[rxq];
++
++	for (i = 0; i < num_segs; i++) {
++		unsigned int seg_payload = min_t(unsigned int, mss,
++						 total_payload);
++		bool last = (i == num_segs - 1);
++		unsigned int seg_remaining;
++		struct sk_buff *seg;
++
++		seg = alloc_skb(hdr_len + seg_payload, GFP_ATOMIC);
++		if (!seg)
++			break;
++
++		seg->dev = dev;
++
++		tso_build_hdr(skb, skb_put(seg, hdr_len), &tso,
++			      seg_payload, last);
++
++		if (!tso.ipv6) {
++			unsigned int nh_off = skb_network_offset(skb);
++			struct iphdr *iph;
++
++			iph = (struct iphdr *)(seg->data + nh_off);
++			iph->check = ip_fast_csum(iph, iph->ihl);
++		}
++
++		seg_remaining = seg_payload;
++		while (seg_remaining > 0) {
++			unsigned int chunk = min_t(unsigned int, tso.size,
++						   seg_remaining);
++
++			memcpy(skb_put(seg, chunk), tso.data, chunk);
++			tso_build_data(skb, &tso, chunk);
++			seg_remaining -= chunk;
++		}
++
++		total_payload -= seg_payload;
++
++		seg->ip_summed = CHECKSUM_UNNECESSARY;
++
++		if (nsim_forward_skb(dev, peer_dev, seg, rq, NULL) == NET_RX_DROP)
++			continue;
++
++		total_len += hdr_len + seg_payload;
++	}
++
++	if (!hrtimer_active(&rq->napi_timer))
++		hrtimer_start(&rq->napi_timer, us_to_ktime(5),
++			      HRTIMER_MODE_REL);
++
++	rcu_read_unlock();
++	dev_kfree_skb(skb);
++	dev_dstats_tx_add(dev, total_len);
++	return NETDEV_TX_OK;
++
++out_drop_free:
++	dev_kfree_skb(skb);
++	rcu_read_unlock();
++	dev_dstats_tx_dropped(dev);
++	return NETDEV_TX_OK;
++}
++
+ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
+ 	struct netdevsim *ns = netdev_priv(dev);
+@@ -132,6 +225,10 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	int rxq;
+ 	int dr;
+ 
++	if (skb_is_gso(skb) &&
++	    skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4)
++		return nsim_uso_segment_xmit(dev, skb);
++
+ 	rcu_read_lock();
+ 	if (!nsim_ipsec_tx(ns, skb))
+ 		goto out_drop_any;
+@@ -938,7 +1035,8 @@ static void nsim_setup(struct net_device *dev)
+ 			    NETIF_F_HW_CSUM |
+ 			    NETIF_F_LRO |
+ 			    NETIF_F_TSO |
+-			    NETIF_F_LOOPBACK;
++			    NETIF_F_LOOPBACK |
++			    NETIF_F_GSO_UDP_L4;
+ 	dev->pcpu_stat_type = NETDEV_PCPU_STAT_DSTATS;
+ 	dev->max_mtu = ETH_MAX_MTU;
+ 	dev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_HW_OFFLOAD;
 -- 
 2.52.0
 
