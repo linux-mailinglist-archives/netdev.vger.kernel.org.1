@@ -1,78 +1,62 @@
-Return-Path: <netdev+bounces-271928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271929-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SBevDz7wxGnv5AQAu9opvQ
-	(envelope-from <netdev+bounces-271928-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:37:18 +0100
+	id yJrDKTzvxGnv5AQAu9opvQ
+	(envelope-from <netdev+bounces-271929-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:33:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97FF2331761
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:37:17 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9714033165B
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:32:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D28D33011104
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 08:30:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3085A3001879
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 08:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2203364EAF;
-	Thu, 26 Mar 2026 08:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82188391E5B;
+	Thu, 26 Mar 2026 08:30:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CgI7u7pv";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0PoPML93"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7qT1zK5"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F70040DFB0;
-	Thu, 26 Mar 2026 08:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AED4369229;
+	Thu, 26 Mar 2026 08:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774513824; cv=none; b=WEdEtH3HoQDnjE7e1M3SRrPr0k9dMyYgfF4g5u5neVDJWZxboS7/E5WzLGIhN1osNcg/7F+scAcht5vaSdQOVj/ia0k5SXayT7G8HbL5YPK4cjEGkJ++9yjVFGECt2tWzDwUAFSOm22pFCagIDHJaj3QKtcV3KC+TOeqSXMTylE=
+	t=1774513841; cv=none; b=H/Ly9faqWt/9PY2qNdx6tFhb6IA/l9NQ3IGPeFtYOi0XuWyv0XZgck1InNyf2FZ3xlzpEoARkrFFMsfSVz41zHazGSpJRtORo2kU0/1vxXs+gdORmtBce3uzm7vw+Z53d3jc2ZJVg4jFqqxYuBUJCBxyfpPrhI1RuqDriLfgfNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774513824; c=relaxed/simple;
-	bh=TqOkjz5kCueNamDei3AnmFETLiBpqvS07zVsHNmVrHI=;
+	s=arc-20240116; t=1774513841; c=relaxed/simple;
+	bh=8z7YTqI6mW5Gbbs9U4qAreBJfPpw3dpSNiy+3D8LbPw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OOsV8IG3xPUxGSikDi1PceDptJH3P56I9K4KKs1+5hmtGEg6eK962yDG1IJF27uF+JMLJtUmB0uuqactAPCyd72lr5VuJxTWYMK/2/HJtfLEjko2/sy8IGHx60nUSB49tQVKPMjAktAI/CsDuLykgJlrjFSowTKMkO6d9AWtTTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CgI7u7pv; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0PoPML93; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 26 Mar 2026 09:30:20 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1774513821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TqOkjz5kCueNamDei3AnmFETLiBpqvS07zVsHNmVrHI=;
-	b=CgI7u7pvyWpAhAIaFqT/W9Ery+wogMZEg4tf/uTzyuQuOr/mPNWp94Q23NRcheoTBnC2Fv
-	DriYZg6lKMp5EEe/n2qDk6PHnm8KX0rmf0Pl1UdzBS53xaEshttImS9eFNfGp02AMXWIQl
-	KfBJvHCxR+VxaHVUXwMCa6+pbByROj0WSFMgnz7vhliGZJzDxo27aIr5fQbx3/uWz4k1O/
-	tGUxd/7R8+nvPb9UGVSitfIQRWouIIJmctQZKbYvbjNV0MKydydS3rejm36xj5K+fzErOp
-	ii8RnY9KjiMkNnhPHMeHfptLIcGlirbXY8RoRbMMGWS+cIUwUiL4tyYibAP6Ag==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1774513821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TqOkjz5kCueNamDei3AnmFETLiBpqvS07zVsHNmVrHI=;
-	b=0PoPML93HY+Bm3PCUxhSrvyDqD2qs6QUYlc5dpt6yTIDvyNS8Yc7gVCR+vD7v56AQegZT+
-	iTN9DmPYmvg5LZAw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Felix Maurer <fmaurer@redhat.com>,
-	Antonio Quartulli <antonio@openvpn.net>,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
-	Paul Mackerras <paulus@ozlabs.org>,
-	Guillaume Nault <gnault@redhat.com>
-Subject: Re: [PATCH net-next v4] selftests: net: add tests for PPP
-Message-ID: <20260326083020.2fOQj5br@linutronix.de>
-References: <20260326021642.29170-1-dqfext@gmail.com>
- <20260326081304.xKa7-s_1@linutronix.de>
- <CALW65jYdzn_rZWa2zwYd5J+Gd=kyaGMsVFyX0fMJfKfgULMO6w@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YVcDmVUkFpIcbzW6NGy1iJy36FZBXzImfUG7bTKy8e/Y+hIcZQo723Iu+Hxeqf+l+QOVYA1MmoVWeNTmMwtm+YoihhPWQSGo2AOJSW/nd2hzXAJSekY9zd3gixyQFlS7LZUtNxN8jwFnURjhcNgJnQ6PY+Crnhb5VDq0n3F6yLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7qT1zK5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5447DC116C6;
+	Thu, 26 Mar 2026 08:30:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774513840;
+	bh=8z7YTqI6mW5Gbbs9U4qAreBJfPpw3dpSNiy+3D8LbPw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=U7qT1zK5agOao8hgDPWVyNlfROU4BKh8X37YTBE7eAoNlApPt72yA2vqqdrBr+weg
+	 RuLqX9MQF2v7fi1M25vBDKLR1dVuvkNPXVOARpb0HxxVKuF//2pVu/IT4F2ydbTFV2
+	 WSH2/esQA3y9+EoRsCMSc5Dg9ycWpH2hkEzvQkd3ad8BdEOPYZWF8g6wmKR96EUduk
+	 B6Op9IlJZTuxVVtWGVkRhOB7xe0+JugGLL3tdrpkIwTprfZKV3lurLcL78A0jOJ5mv
+	 7+hLLVN8X44u3EZt3pMmQzFa3icSkVVCtPQ8ep2bBeyEw7qLMphwitiPLvb5xIcARi
+	 DehcRfI4CHG1w==
+Date: Thu, 26 Mar 2026 09:30:38 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Thierry Reding <thierry.reding@gmail.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-tegra@vger.kernel.org
+Subject: Re: [PATCH V3 2/3] dt-bindings: net: Fix Tegra234 MGBE PTP clock
+Message-ID: <20260326-uncovered-manipulative-potoo-ec2445@quoll>
+References: <20260325135811.148480-1-jonathanh@nvidia.com>
+ <20260325135811.148480-3-jonathanh@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,67 +65,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CALW65jYdzn_rZWa2zwYd5J+Gd=kyaGMsVFyX0fMJfKfgULMO6w@mail.gmail.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <20260325135811.148480-3-jonathanh@nvidia.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
-	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-271929-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271928-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linutronix.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linutronix.de:dkim,linutronix.de:email,linutronix.de:mid]
-X-Rspamd-Queue-Id: 97FF2331761
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,qualcomm.com:email,nvidia.com:email]
+X-Rspamd-Queue-Id: 9714033165B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-03-26 16:26:23 [+0800], Qingfang Deng wrote:
-> Hi Sebastian,
-Hi Qingfang,
+On Wed, Mar 25, 2026 at 01:58:10PM +0000, Jon Hunter wrote:
+> The PTP clock for the Tegra234 MGBE device is incorrectly named
+> 'ptp-ref' and should be 'ptp_ref'. This is causing the following
+> warning to be observed on Tegra234 platforms that use this device:
+> 
+>  ERR KERN tegra-mgbe 6800000.ethernet eth0: Invalid PTP clock rate
+>  WARNING KERN tegra-mgbe 6800000.ethernet eth0: PTP init failed
+> 
+> Although this constitutes an ABI breakage in the binding for this
+> device, PTP support has clearly never worked and so fix this now
+> so we can correct the device-tree for this device. Note that the
+> MGBE driver still supports the legacy 'ptp-ref' clock name and so
+> older/existing device-trees will still work, but given that this
+> is not the correct name, there is no point to advertise this in the
+> binding.
+> 
+> Fixes: 189c2e5c7669 ("dt-bindings: net: Add Tegra234 MGBE")
+> Signed-off-by: Jon Hunter <jonathanh@nvidia.com>
+> ---
+>  .../devicetree/bindings/net/nvidia,tegra234-mgbe.yaml         | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-> On Thu, Mar 26, 2026 at 4:13=E2=80=AFPM Sebastian Andrzej Siewior
-> <bigeasy@linutronix.de> wrote:
-> >
-> > On 2026-03-26 10:16:24 [+0800], Qingfang Deng wrote:
-> > > Add ping and iperf3 tests for ppp_async.c and pppoe.c.
-> >
-> > Oh thank you for doing this.
-> > I haven't look in detail but this cover the "invalid loop" cases that
-> > ppp tries to catch?
->=20
-> By "invalid loop", do you mean transmit recursion?
-> https://lore.kernel.org/all/20250715150806.700536-2-bigeasy@linutronix.de/
->=20
-> AFAIK, this can only happen with PPTP or L2TP, which were not included
-> in this patch.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
-Yeah, that one. I was sort of looking into but gave up after a while
-digging through code, since I had no idea how to setup that up=E2=80=A6
+Best regards,
+Krzysztof
 
-> Add Cc: Guillaume Nault
->=20
->=20
-> Regards,
-> Qingfang
-
-Sebastian
 
