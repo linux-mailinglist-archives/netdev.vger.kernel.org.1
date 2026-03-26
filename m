@@ -1,115 +1,337 @@
-Return-Path: <netdev+bounces-272229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272230-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cGJ/CAGVxWmq/gQAu9opvQ
-	(envelope-from <netdev+bounces-272229-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 21:20:17 +0100
+	id YIL/CbGVxWmq/gQAu9opvQ
+	(envelope-from <netdev+bounces-272230-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 21:23:13 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A51B233B5D5
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 21:20:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C12A533B60C
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 21:23:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 697893018BF4
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:14:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 771AD30523C2
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0B839B972;
-	Thu, 26 Mar 2026 20:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F5663A3826;
+	Thu, 26 Mar 2026 20:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hw+lXb42"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="blqaZm56"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED85239EF12
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 20:14:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBDC376BC5
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 20:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774556097; cv=none; b=N+SnxXccADPVT9uhgT4axDuA2YQqX7eHd8OJEwLc7eAJhz/gM7HiI+oMFvq1XSTJ+hGSmWhIthCvX/cU0hoQvRrfJCuZ1SPRMIrV4MdIbEguglUFFuSHN9EWyhs3Msav+AWHflUlenRpeHKZLUxEb43rMD1eL4hC8IBk1Vv9CjM=
+	t=1774556304; cv=none; b=LKdwVn5lflzRvaAk7TYytk0IspUAGTdIAyKCsWgGZyOWQT6L+kpo9BZshX/rXoI63LPriA3DFjZIfi+PQnC6NRB5HfJTZUb5Zodrybx6VCfhjypYyc78w2O/ozfmAJ+JzzVE2RhtLuM9Dt/YQ45B6hTfTdl2lq/7fo7oWkgMdUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774556097; c=relaxed/simple;
-	bh=RZCIwvSiyhoUbbcQednuHM4/M3HqSbXQa4afHK+Q2Qg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V7bk+oebh97JY0lNGCYRljN7eED71TTOXdVZX9mtuw5iJe2jv6tTp/wCysQH1H9iil0w/jg7MeCNaAC13riVDu0MagU0ITH5c9mJTjUojGW5xB8lAdjx5lVFPh2GNsJZjrTBwOKt9Dxdmqh3ZFxSrxrTIbk/PtsTz5VMQhXLvMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hw+lXb42; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79D2CC116C6;
-	Thu, 26 Mar 2026 20:14:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774556096;
-	bh=RZCIwvSiyhoUbbcQednuHM4/M3HqSbXQa4afHK+Q2Qg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Hw+lXb42OB7LmrXiW2uh/yjHNKQJimEp+CdARZJADJdy566d0WlNQRYhca+6NHTFk
-	 sNA8ILuMZBdEBZ6Qy/7sxekkPuo/+Y6S0HANwTQOJtBvt/fQMdj7FPsAC6dFVWbaYP
-	 r1SV7qEAMjft8LQklNqywXMUFqQj6LQhlJuXcUXAnY/60NxaqX96Ti1XAwVi1Wl+W9
-	 3o5viteq+3HYlERJf7RGXmPBXpj8Bh9x6oM+kNqx3cKkB9dV6TSN9dBBfncvbr1ZOY
-	 OaYuTRsI5RnLzHMx9iPtjSq2H4p65I4kok7r4zTrgGBsGqNYGXIqOZPDCOUE5zWJH7
-	 1BeKG0VIcTLNQ==
-Date: Thu, 26 Mar 2026 20:14:52 +0000
-From: Simon Horman <horms@kernel.org>
-To: Yochai Eisenrich <echelonh@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, security@kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] net: ipv6: ndisc: fix ndisc_ra_useropt to initialize
- nduseropt_padX fields to zero to prevent an info-leak
-Message-ID: <20260326201452.GZ111839@horms.kernel.org>
-References: <20260324224925.2437775-1-echelonh@gmail.com>
+	s=arc-20240116; t=1774556304; c=relaxed/simple;
+	bh=JX4vHATIUFWQLbRlq7POOxtY7rKiXSnnAKpkp53Qk4w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=s5tHleSRMEm4SDJ/zxPDamZpGmyG0KME0iTfLqLzAyTDq6YPIraDMlxkqlpMHwFFY9J3hKhZm8ImH366GizMwGTg5imYRMO5Tl7Vd539FVGi9EVVesVUTta51AyETFPuIPs/0V/LJi6et0sqHZtQztWjNoCH+fgivykRptnC0zY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=blqaZm56; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-43b871dd06eso840496f8f.0
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 13:18:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774556300; x=1775161100; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wTEKVcMeJ2+2gv4frZXSVscFWk19gO1Vh54Xj2RwYEY=;
+        b=blqaZm56Pg7xovNIpmBVh3tAUfgT9Wqpu9MfcT0TYYjveYmsdY68H83Hs1z5mg4tQK
+         OJuaro/JcZNe/jj/+68toggUdhKd0g7pC5rQAqWc0z+0vX+fuVOe+RSRFvEiLhH00Ko0
+         HyFexecWi2FRWcC8DgXv1v+Pb3FrecjRVD4cFFhBqjCjgqxWTL2OqoXwA656nHlnfvEK
+         p15Ic2U6J/tfIowzBMxw4hTMwYJMBfine093n1Jqk3Hjmljb7onQJ1ET4ftqCGffQ5wq
+         dgaHVxOFHdd2Z3cL/NNkKZW3tB9+i5AXmNtgmnQ8aL9zSfYrc/YlR8YlY0pN6VsezPT4
+         qifw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774556300; x=1775161100;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wTEKVcMeJ2+2gv4frZXSVscFWk19gO1Vh54Xj2RwYEY=;
+        b=Y9e5+AHJAtmuHyK+cWA8qIRsbU0w9CQ8JNM6Zw2jGekm4m25wOlLjT7hDkp6OlDOAw
+         Rtq2qWN4u0xqOInoHSEFLhWH8/kJzMdQj3QH3B1vhwuxe8x4smWDN+Y2FgwUqsA97wXV
+         MU9090z/kk/phkfwBDUgKBk14z2SR39XGHaQf84eCelOwnklG5zJYoUVSkCdnN4HpU4y
+         Y/ogcY4dMYSJ1ONuD1cP5d0I9yJI5nBr+NoLVvzG5+zTfxTDfqU9ry2Of4MbNYzVPOKN
+         VPnQF7UxHAkMgcxqYHEe/PgUEcQfCZylKNhaZvcpeAZC7+umIaEHJDAXY3LgA9/OLps2
+         p2yg==
+X-Forwarded-Encrypted: i=1; AJvYcCWuuZlF2/zWYByNl0ouTGRglk7q36ysT40vEwSLI5s/zTy1spalwi+rZBVy0+u50iyaIefV4DU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQHBQ3J4AyjASoyafkF8GHG6LF/o0G5kpWyrmaY2wXFB9G5smM
+	yjVVaoNXfZZm5QxmlaeY8IxLDPeXxHCZlwxqhExzIC5WhxJQtr6XpJ+i
+X-Gm-Gg: ATEYQzyd7UagIvdVAb7R0pAqSRLsRAHYm0vDA0+iiUR1HyFOoAdQmyQ/yKW2Zj8mwFM
+	D0ONnHzJLFf9LtAId4rE16TVBS+x8wWMFuRl3FBW8mMbtLkL9koGZlorbvzHoAIY7mvu1+a5sxb
+	v06I3LkwXSeCrIaSxOTj6ecMeEHuINRAzS4al81RlPh5VJoumF1xL6agmymYhtVFXFSf1X++rCT
+	GvZ9nGvtLick88qsHTpw0oqxiip07woMjDcf+C9SwvsBDvZy+s/KVqCjshV+kWEcKP+4wrMLNIi
+	kolDthZmTZL23v8vz9eQKTL85bZlL4kOtUc/OJFE/TzSQP4utVDuqGFL7bGOFFy+3SOWOYFLFV9
+	liCbM/6rU53fyOI2uAkE6QX/3R0+VOGebZc3WDAbCAu4hYLvxshfzOmuTfhgSertMM/hUT9vvHG
+	lOo9A1g+1a4fy0/tNKeJXwY4ebQKia0ygkT2hugFkQWV9EX2JB8pNWvtAyGCm5HD2qGYJpjRhlm
+	IvqEQRgT9gP
+X-Received: by 2002:a05:6000:4287:b0:43b:634d:1a9e with SMTP id ffacd0b85a97d-43b889c505fmr14390229f8f.15.1774556300321;
+        Thu, 26 Mar 2026 13:18:20 -0700 (PDT)
+Received: from snowdrop.snailnet.com (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b9192e3e8sm11693016f8f.5.2026.03.26.13.18.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Mar 2026 13:18:20 -0700 (PDT)
+From: david.laight.linux@gmail.com
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: David Laight <david.laight.linux@gmail.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Petr Mladek <pmladek@suse.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: [PATCH next] netfilter: nf_conntrack_h323: Correct indentation when H323_TRACE defined
+Date: Thu, 26 Mar 2026 20:18:19 +0000
+Message-Id: <20260326201819.3900-1-david.laight.linux@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260324224925.2437775-1-echelonh@gmail.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,suse.com,rasmusvillemoes.dk,linux.intel.com,goodmis.org,chromium.org,linux-foundation.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_FROM(0.00)[bounces-272230-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272229-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NO_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: A51B233B5D5
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C12A533B60C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Mar 25, 2026 at 12:49:25AM +0200, Yochai Eisenrich wrote:
-> When processing Router Advertisements with user options the kernel
-> builds an RTM_NEWNDUSEROPT netlink message. The nduseroptmsg struct
-> has three padding fields that are never zeroed and can leak kernel data
-> 
-> The fix is simple, just zeroes the padding fields.
-> 
-> Fixes: 31910575a9de ("[IPv6]: Export userland ND options through netlink
->     (RDNSS support)")
+From: David Laight <david.laight.linux@gmail.com>
 
-Fixes tags should be all on one line; no line wrapping.
+The trace lines are indented using PRINT("%*.s", xx, " ").
+Userspace will treat this as "%*.0s" and will output no characters
+when 'xx' is zero, the kernel treats it as "%*s" and will output
+a single ' ' - which is probably what is intended.
 
-> Signed-off-by: Yochai Eisenrich <echelonh@gmail.com>
+Change all the formats to "%*s" removing the default precision.
+This gives a single space indent when level is zero.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: David Laight <david.laight.linux@gmail.com>
+---
+ net/netfilter/nf_conntrack_h323_asn1.c | 38 +++++++++++++-------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
 
-...
+diff --git a/net/netfilter/nf_conntrack_h323_asn1.c b/net/netfilter/nf_conntrack_h323_asn1.c
+index 7b1497ed97d2..287402428975 100644
+--- a/net/netfilter/nf_conntrack_h323_asn1.c
++++ b/net/netfilter/nf_conntrack_h323_asn1.c
+@@ -276,7 +276,7 @@ static unsigned int get_uint(struct bitstr *bs, int b)
+ static int decode_nul(struct bitstr *bs, const struct field_t *f,
+                       char *base, int level)
+ {
+-	PRINT("%*.s%s\n", level * TAB_SIZE, " ", f->name);
++	PRINT("%*s%s\n", level * TAB_SIZE, " ", f->name);
+ 
+ 	return H323_ERROR_NONE;
+ }
+@@ -284,7 +284,7 @@ static int decode_nul(struct bitstr *bs, const struct field_t *f,
+ static int decode_bool(struct bitstr *bs, const struct field_t *f,
+                        char *base, int level)
+ {
+-	PRINT("%*.s%s\n", level * TAB_SIZE, " ", f->name);
++	PRINT("%*s%s\n", level * TAB_SIZE, " ", f->name);
+ 
+ 	INC_BIT(bs);
+ 	if (nf_h323_error_boundary(bs, 0, 0))
+@@ -297,7 +297,7 @@ static int decode_oid(struct bitstr *bs, const struct field_t *f,
+ {
+ 	int len;
+ 
+-	PRINT("%*.s%s\n", level * TAB_SIZE, " ", f->name);
++	PRINT("%*s%s\n", level * TAB_SIZE, " ", f->name);
+ 
+ 	BYTE_ALIGN(bs);
+ 	if (nf_h323_error_boundary(bs, 1, 0))
+@@ -316,7 +316,7 @@ static int decode_int(struct bitstr *bs, const struct field_t *f,
+ {
+ 	unsigned int len;
+ 
+-	PRINT("%*.s%s", level * TAB_SIZE, " ", f->name);
++	PRINT("%*s%s", level * TAB_SIZE, " ", f->name);
+ 
+ 	switch (f->sz) {
+ 	case BYTE:		/* Range == 256 */
+@@ -363,7 +363,7 @@ static int decode_int(struct bitstr *bs, const struct field_t *f,
+ static int decode_enum(struct bitstr *bs, const struct field_t *f,
+                        char *base, int level)
+ {
+-	PRINT("%*.s%s\n", level * TAB_SIZE, " ", f->name);
++	PRINT("%*s%s\n", level * TAB_SIZE, " ", f->name);
+ 
+ 	if ((f->attr & EXT) && get_bit(bs)) {
+ 		INC_BITS(bs, 7);
+@@ -381,7 +381,7 @@ static int decode_bitstr(struct bitstr *bs, const struct field_t *f,
+ {
+ 	unsigned int len;
+ 
+-	PRINT("%*.s%s\n", level * TAB_SIZE, " ", f->name);
++	PRINT("%*s%s\n", level * TAB_SIZE, " ", f->name);
+ 
+ 	BYTE_ALIGN(bs);
+ 	switch (f->sz) {
+@@ -417,7 +417,7 @@ static int decode_numstr(struct bitstr *bs, const struct field_t *f,
+ {
+ 	unsigned int len;
+ 
+-	PRINT("%*.s%s\n", level * TAB_SIZE, " ", f->name);
++	PRINT("%*s%s\n", level * TAB_SIZE, " ", f->name);
+ 
+ 	/* 2 <= Range <= 255 */
+ 	if (nf_h323_error_boundary(bs, 0, f->sz))
+@@ -437,7 +437,7 @@ static int decode_octstr(struct bitstr *bs, const struct field_t *f,
+ {
+ 	unsigned int len;
+ 
+-	PRINT("%*.s%s", level * TAB_SIZE, " ", f->name);
++	PRINT("%*s%s", level * TAB_SIZE, " ", f->name);
+ 
+ 	switch (f->sz) {
+ 	case FIXD:		/* Range == 1 */
+@@ -490,7 +490,7 @@ static int decode_bmpstr(struct bitstr *bs, const struct field_t *f,
+ {
+ 	unsigned int len;
+ 
+-	PRINT("%*.s%s\n", level * TAB_SIZE, " ", f->name);
++	PRINT("%*s%s\n", level * TAB_SIZE, " ", f->name);
+ 
+ 	switch (f->sz) {
+ 	case BYTE:		/* Range == 256 */
+@@ -522,7 +522,7 @@ static int decode_seq(struct bitstr *bs, const struct field_t *f,
+ 	const struct field_t *son;
+ 	unsigned char *beg = NULL;
+ 
+-	PRINT("%*.s%s\n", level * TAB_SIZE, " ", f->name);
++	PRINT("%*s%s\n", level * TAB_SIZE, " ", f->name);
+ 
+ 	/* Decode? */
+ 	base = (base && (f->attr & DECODE)) ? base + f->offset : NULL;
+@@ -544,7 +544,7 @@ static int decode_seq(struct bitstr *bs, const struct field_t *f,
+ 	/* Decode the root components */
+ 	for (i = opt = 0, son = f->fields; i < f->lb; i++, son++) {
+ 		if (son->attr & STOP) {
+-			PRINT("%*.s%s\n", (level + 1) * TAB_SIZE, " ",
++			PRINT("%*s%s\n", (level + 1) * TAB_SIZE, " ",
+ 			      son->name);
+ 			return H323_ERROR_STOP;
+ 		}
+@@ -562,7 +562,7 @@ static int decode_seq(struct bitstr *bs, const struct field_t *f,
+ 			if (nf_h323_error_boundary(bs, len, 0))
+ 				return H323_ERROR_BOUND;
+ 			if (!base || !(son->attr & DECODE)) {
+-				PRINT("%*.s%s\n", (level + 1) * TAB_SIZE,
++				PRINT("%*s%s\n", (level + 1) * TAB_SIZE,
+ 				      " ", son->name);
+ 				bs->cur += len;
+ 				continue;
+@@ -615,7 +615,7 @@ static int decode_seq(struct bitstr *bs, const struct field_t *f,
+ 		}
+ 
+ 		if (son->attr & STOP) {
+-			PRINT("%*.s%s\n", (level + 1) * TAB_SIZE, " ",
++			PRINT("%*s%s\n", (level + 1) * TAB_SIZE, " ",
+ 			      son->name);
+ 			return H323_ERROR_STOP;
+ 		}
+@@ -629,7 +629,7 @@ static int decode_seq(struct bitstr *bs, const struct field_t *f,
+ 		if (nf_h323_error_boundary(bs, len, 0))
+ 			return H323_ERROR_BOUND;
+ 		if (!base || !(son->attr & DECODE)) {
+-			PRINT("%*.s%s\n", (level + 1) * TAB_SIZE, " ",
++			PRINT("%*s%s\n", (level + 1) * TAB_SIZE, " ",
+ 			      son->name);
+ 			bs->cur += len;
+ 			continue;
+@@ -655,7 +655,7 @@ static int decode_seqof(struct bitstr *bs, const struct field_t *f,
+ 	const struct field_t *son;
+ 	unsigned char *beg = NULL;
+ 
+-	PRINT("%*.s%s\n", level * TAB_SIZE, " ", f->name);
++	PRINT("%*s%s\n", level * TAB_SIZE, " ", f->name);
+ 
+ 	/* Decode? */
+ 	base = (base && (f->attr & DECODE)) ? base + f->offset : NULL;
+@@ -710,7 +710,7 @@ static int decode_seqof(struct bitstr *bs, const struct field_t *f,
+ 			if (nf_h323_error_boundary(bs, len, 0))
+ 				return H323_ERROR_BOUND;
+ 			if (!base || !(son->attr & DECODE)) {
+-				PRINT("%*.s%s\n", (level + 1) * TAB_SIZE,
++				PRINT("%*s%s\n", (level + 1) * TAB_SIZE,
+ 				      " ", son->name);
+ 				bs->cur += len;
+ 				continue;
+@@ -751,7 +751,7 @@ static int decode_choice(struct bitstr *bs, const struct field_t *f,
+ 	const struct field_t *son;
+ 	unsigned char *beg = NULL;
+ 
+-	PRINT("%*.s%s\n", level * TAB_SIZE, " ", f->name);
++	PRINT("%*s%s\n", level * TAB_SIZE, " ", f->name);
+ 
+ 	/* Decode? */
+ 	base = (base && (f->attr & DECODE)) ? base + f->offset : NULL;
+@@ -792,7 +792,7 @@ static int decode_choice(struct bitstr *bs, const struct field_t *f,
+ 	/* Transfer to son level */
+ 	son = &f->fields[type];
+ 	if (son->attr & STOP) {
+-		PRINT("%*.s%s\n", (level + 1) * TAB_SIZE, " ", son->name);
++		PRINT("%*s%s\n", (level + 1) * TAB_SIZE, " ", son->name);
+ 		return H323_ERROR_STOP;
+ 	}
+ 
+@@ -804,7 +804,7 @@ static int decode_choice(struct bitstr *bs, const struct field_t *f,
+ 		if (nf_h323_error_boundary(bs, len, 0))
+ 			return H323_ERROR_BOUND;
+ 		if (!base || !(son->attr & DECODE)) {
+-			PRINT("%*.s%s\n", (level + 1) * TAB_SIZE, " ",
++			PRINT("%*s%s\n", (level + 1) * TAB_SIZE, " ",
+ 			      son->name);
+ 			bs->cur += len;
+ 			return H323_ERROR_NONE;
+-- 
+2.39.5
+
 
