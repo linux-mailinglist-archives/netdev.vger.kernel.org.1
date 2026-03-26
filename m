@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-272283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272284-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eKWbI0THxWmgBgUAu9opvQ
-	(envelope-from <netdev+bounces-272283-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 00:54:44 +0100
+	id aKVJOn/HxWmgBgUAu9opvQ
+	(envelope-from <netdev+bounces-272284-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 00:55:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9AE733D468
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 00:54:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 492C633D48D
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 00:55:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BF941304DE84
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:52:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0DC33306900E
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 23:53:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7EF13815F4;
-	Thu, 26 Mar 2026 23:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3529395276;
+	Thu, 26 Mar 2026 23:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="aj+ylgOn"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="EaVgK0r4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B20F431AF3B
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 23:52:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E469338D69B
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 23:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774569173; cv=none; b=alXM9pDH6Eo6w9JBaR/btj1tOr8HmEgnCIaI6Hsp7qzGYRFrVFCNDRxZjzZGcQhgjLQOQnWnqdUz3HDKN7DblPSWuypCvST2l8diC/YwwssVQfyherFXtMKUWM5+syeoCJZ23/wOg4/pUpsUOHgWXG/M7v116xWy8P0bYub6pjQ=
+	t=1774569176; cv=none; b=bNd2MGcx75cfZy73aeRoCrrUCijyXtvjiTMl1oahClE8VUWIkYu45uAJqaQ+l9qDn9kkfNOOfufkYL25UvDhInG6KSCwgFmNty3S1QXAEZ8cM1qO+cqFHAjwar+TzbRN6oocbI+dLhqDj3xFutZaNjFTnztYXnWBPMp+fJvGhhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774569173; c=relaxed/simple;
-	bh=89osrXGFcyoMNdsGsSYJRS7HmUWWP8RNcJMZ4Irlins=;
+	s=arc-20240116; t=1774569176; c=relaxed/simple;
+	bh=ORkpzv7iiCxiXOhQaUQdLjmDGsPudQzXaVUYF9lrn6U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BcwNN0a1nR87N7wmxllVfYc3KKkCIfbDMvD8WlYEFKHe4t3aA78DwhGtJhC+zBdjs+3iKisqdhknTJbDNRpcSwjSYOTC6j5mk4fWevohWAuxCwwNPvriKB9OKQA82ZHObHm5zAFm+nMiK63sC9WqD+KBDV0foUWgm7FQmkUdxJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=aj+ylgOn; arc=none smtp.client-ip=209.85.215.178
+	 MIME-Version; b=egcbLVls/J1skVxTv7UY1cSBJvrNn19JYlTgXsynxbN9UMzM1Fh+bubAkOebVU0L4z1lLbuTbTiZmoyfzQu60Qi2GdK3esltyFk5z2QgTCVx0i0SNvQ/yJvoQKucaiOyKghYuzRsjGU81gDOSpdJOT59imWFDyxfAKG2qOowVkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=EaVgK0r4; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-c757a9251faso703890a12.1
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 16:52:52 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2ad9516a653so7225405ad.0
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 16:52:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1774569172; x=1775173972; darn=vger.kernel.org;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1774569174; x=1775173974; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hzwsL2AaeOyolPivj0sSP8+HZDWRlIMJad3TwBTVVkk=;
-        b=aj+ylgOn5510l4Y1yr1L48xVbF+yPSDcoQ04fpFRCjWibUE3Dl6r+5hHV0s3tXUq8P
-         daTXj8gqltaK6AK5N0fWmdswu+r8u1vjc0VwAFNS0ZdFmcaHTb30k3vC/LooVqYTWJCh
-         30WMIve7I00ypX1HNnuIQaoutbA0ZkDiqkSmshjlpSX0f/3L3z0wRxjMSA0GOSs57JLh
-         /tv5ycH5t3eJ2h0ugybsy5YsG27lTBpYgbP4gwoJ2bVrXb45W6+Q57OMujrOGUbpAjsu
-         KeU/HmwSjtBih6m4VPWwVfJDSKOSf1yOJw0VZnHh0UTs5DLXzath5Q5zRScfdYHvX5+m
-         oeNQ==
+        bh=Blw7GY0uzkKurUX6ypQhQlLBgZS5L/EPKYGZQrzDQcs=;
+        b=EaVgK0r4HyvU6sioqne1q3rSS+c2yk8KFt1ibXivQbdpxij4/5e/mxgbixlp7TX0nd
+         zU9Pj5IdHN10tOAlaIvKR9waQAhv3gg94F+xUMRWXo/wdLC2Td9VAsuXOR2uX3Xmn8Eo
+         BLb7sVH9ga0epiHNbzsHvTxpGgPD1HVOSpbsRYC0ERZtzJ6jHqcqq0AyoHqiqNA1dVAx
+         9OMhqDl+6BWYp3HnrEX6yrW2o14vHqmEHZ+wVJGp6cyNBeyO4tCkRQDX3+N5A7G85B2v
+         R7571il9iY0bX72BoMk0LKFvHWOCCE64nAMcfmRWOGw7wt279okBpfWq+tTtSNP4YeLt
+         qkkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774569172; x=1775173972;
+        d=1e100.net; s=20251104; t=1774569174; x=1775173974;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=hzwsL2AaeOyolPivj0sSP8+HZDWRlIMJad3TwBTVVkk=;
-        b=UExESvENpnWdCsQ4DE87LONKbp8EaCZKxyQF9XUXcmmcdgOk9ueSHa9iuXX057J2Fu
-         pADhvweKk1uWScgIO1BQOlknRgj6cLSuKtE/4TZlh0xgyU49d4gIGalwoLHCU6FaSDG6
-         KdiRMysUlBpSAWGt8ks2FCktINWAFSJnQmkLjxeIghBBvDi2+3J6lpXORgqWz9cKoTIy
-         kxYLqeOnn/iA8EOY603PIuFHrtmwJdqlN4uoZ27cEOrlHmLyqE7MI12KBHSx3PEfNpBw
-         Hp9kbas3VJ2WxUSUDumknl2RjXCXH7YsNcs+o0o346jSZjhJXlTP0o4r/+MZKjWHAnq3
-         GD0Q==
-X-Gm-Message-State: AOJu0YwqyM3ylLdpmsJ7HMOXRnfOb9K2ZN4rlfu3maCW+0TWdom7fB4z
-	oJrUEJa1JKh2zartEdRPBKqX8MPdjjUdEUL5dpt+TNitR4tZ/JbgoE/olqtYg3Wx6/u6YSzD1Z2
-	t2UOY
-X-Gm-Gg: ATEYQzw1uESLQkiUPChY914HEH4VEmpPzDb4/ncBML9Q6kLWdzr3KasJzPvcpSj7fQ3
-	iNxrBOZVRvgfrQ+O26OzFbEcK5+6LiKVDDvfWf7rJJPc+AzwA4L8hppuiIGXB1e1pftCfF4UXFG
-	k4stIXYE15bARCUOyVJsIWmcRwI/nK8JvCYJKU+4YbemTcfGwm4aTc8vj7HL8YIFwW5a51uN/if
-	pwm9Lopf34eUct36Xk+bXGUy0zI+NW43/QIr8cGNvHVnHrIKb15w769zXg0D6wAg5s8aMN/ByOn
-	sFJtS26OhYv8Gjiit+JnKAcO7U42qr0o9olrScEvFr8DJh8NpZbs3QnU14dC/0mTdQ0Lt0xX/CY
-	Ik7wZN6GqS8Vfc6Rw8F6uuAHf+gtK1jF/04DUWL6Bwb2yfzWJ160oRNbIsOc48uW9gakzkbtDoa
-	MNaSw=
-X-Received: by 2002:a17:903:19ed:b0:2b0:61c2:8e83 with SMTP id d9443c01a7336-2b0cdc43116mr4855505ad.20.1774569171745;
-        Thu, 26 Mar 2026 16:52:51 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:2::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b0bc87e643sm43677055ad.41.2026.03.26.16.52.51
+        bh=Blw7GY0uzkKurUX6ypQhQlLBgZS5L/EPKYGZQrzDQcs=;
+        b=oKKuGmMa0FKLTrg0y1aRjyKWL3MWKHKSdoJKhLQL4IoeNjgyFS4oC/UnkL7dLold2l
+         1RtwMzg73NiBqHYp5IQKSkhbA0njcYTk1fDZjpGzCIduRyEJKoEGkULT5iEE1DWv7J6D
+         E+Lq2PXD8n+CZgtJe/vqppJ+QrhLYv/Xogic7lBhZbn63W+wh6dgD48OVANyRRVSx7SM
+         X49cdG+c3pCxdrL4wz0dZxMbRdIcCtFjXbjBj/kbxCUKim1mvDehR7xOg2aX4PsREz2v
+         hPKF84qv0fSOD4PKv7wBydtmqQFM04kSvgv1p0B9qHUWBVyMK/MoLc5nspRv9viDanks
+         5oPA==
+X-Gm-Message-State: AOJu0YzvbaL4fbyNngOj5yfE7SumtKPDbWASzDC32JBGsIlPThDbdA6M
+	zfHKo0dtZvmAcDeOjqrwAFo775KsA8Ryf+GGguELKQRrz4JmHZY8kD2IHDM+JrHfNN3kOirruJW
+	7GSXS
+X-Gm-Gg: ATEYQzwq98z2EBoiXz4XOpus5bDroS73Yl7cemMUC4z0ELPJoTy1dBRo87x1g1A4yqe
+	tQ+TpkOhRKSjYT5qFJVabB0X21ZLtvC4EWVV6Abm8Y9nKNGdZ8EV+DUulLdz+rfYhY2Fi7+NWSy
+	obQHi380XPQ+bX3gD1Mpx/8KZ2P6EhEY/Q2noJeD0W6qSjHILlL1uINfQh4i6abKnkBbDRiTj6x
+	0zVXHKJ7BiJi2PlyGa8OOya7MHeoTD6mIU8R6ZyqMZ5JK2u20esQV84YD4jnnb8AD00GRrAXvpH
+	5VVwSSWjdKL6kSGyLtmqJNv2/wc3T1o0Zm1UDRIJAYbOFmzDQr3+rSiuuFyYoghLEPwOGuxNLyf
+	HP5M5wCBIjvM07H75eYVAg0UST3puasFLycRygN5JzHTg2u0KGnZybFj/Lqxow8zOdmhjLuT0Fg
+	LfAoQK
+X-Received: by 2002:a17:902:ea0f:b0:2ae:57e6:616c with SMTP id d9443c01a7336-2b0cdc1eec0mr4725605ad.3.1774569173788;
+        Thu, 26 Mar 2026 16:52:53 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:59::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b0bc76b8acsm43309065ad.4.2026.03.26.16.52.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 16:52:51 -0700 (PDT)
+        Thu, 26 Mar 2026 16:52:53 -0700 (PDT)
 From: Joe Damato <joe@dama.to>
 To: netdev@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
@@ -89,9 +89,9 @@ Cc: andrew+netdev@lunn.ch,
 	linux-kernel@vger.kernel.org,
 	leon@kernel.org,
 	Joe Damato <joe@dama.to>
-Subject: [net-next v6 01/12] net: tso: Introduce tso_dma_map
-Date: Thu, 26 Mar 2026 16:52:20 -0700
-Message-ID: <20260326235238.2940471-2-joe@dama.to>
+Subject: [net-next v6 02/12] net: tso: Add tso_dma_map helpers
+Date: Thu, 26 Mar 2026 16:52:21 -0700
+Message-ID: <20260326235238.2940471-3-joe@dama.to>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260326235238.2940471-1-joe@dama.to>
 References: <20260326235238.2940471-1-joe@dama.to>
@@ -108,18 +108,18 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-272283-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272284-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DMARC_NA(0.00)[dama.to];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
@@ -131,87 +131,388 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,dama.to:email,dama.to:mid,dama-to.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: E9AE733D468
+X-Rspamd-Queue-Id: 492C633D48D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add struct tso_dma_map to tso.h for tracking DMA addresses of mapped
-GSO payload data.
+Adds skb_frag_phys() to skbuff.h, returning the physical address
+of a paged fragment's data, which is used by the tso_dma_map helpers
+introduced in this commit described below:
 
-The struct combines DMA mapping storage with iterator state, allowing
-drivers to walk pre-mapped DMA regions linearly. Includes fields for
-the DMA IOVA path (iova_state, iova_offset, total_len) and a fallback
-per-region path (linear_dma, frags[], frag_idx, offset).
+tso_dma_map_init(): DMA-maps the linear payload region and all frags
+upfront. Prefers the DMA IOVA API for a single contiguous mapping with
+one IOTLB sync; falls back to per-region dma_map_phys() otherwise.
+Returns 0 on success, cleans up partial mappings on failure.
 
-Helpers to initialize and operate on this struct will be added in the
-next commit.
+tso_dma_map_cleanup(): Handles both IOVA and fallback teardown paths.
+
+tso_dma_map_count(): counts how many descriptors the next N bytes of
+payload will need. Returns 1 if IOVA is used since the mapping is
+contiguous.
+
+tso_dma_map_next(): yields the next (dma_addr, chunk_len) pair.
+On the IOVA path, each segment is a single contiguous chunk. On the
+fallback path, indicates when a chunk starts a new DMA mapping so the
+driver can set dma_unmap_len on that descriptor for completion-time
+unmapping.
 
 Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Joe Damato <joe@dama.to>
 ---
+ v4:
+   - Fix the kdoc for the TSO helpers. No functional changes.
+
  v3:
-   - struct tso_dma_map extended to track IOVA state and
-     a fallback per-region path.
+   - Added skb_frag_phys helper include/linux/skbuff.h.
+   - Added tso_dma_map_use_iova() inline helper in tso.h.
+   - Updated the helpers to use the DMA IOVA API and falls back to per-region
+     mapping instead.
 
- include/net/tso.h | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ include/linux/skbuff.h |  11 ++
+ include/net/tso.h      |  21 ++++
+ net/core/tso.c         | 273 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 305 insertions(+)
 
-diff --git a/include/net/tso.h b/include/net/tso.h
-index e7e157ae0526..8f8d9d74e873 100644
---- a/include/net/tso.h
-+++ b/include/net/tso.h
-@@ -3,6 +3,7 @@
- #define _TSO_H
- 
- #include <linux/skbuff.h>
-+#include <linux/dma-mapping.h>
- #include <net/ip.h>
- 
- #define TSO_HEADER_SIZE		256
-@@ -28,4 +29,43 @@ void tso_build_hdr(const struct sk_buff *skb, char *hdr, struct tso_t *tso,
- void tso_build_data(const struct sk_buff *skb, struct tso_t *tso, int size);
- int tso_start(struct sk_buff *skb, struct tso_t *tso);
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 9cc98f850f1d..d8630eb366c5 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -3758,6 +3758,17 @@ static inline void *skb_frag_address_safe(const skb_frag_t *frag)
+ 	return ptr + skb_frag_off(frag);
+ }
  
 +/**
-+ * struct tso_dma_map - DMA mapping state for GSO payload
-+ * @dev: device used for DMA mapping
-+ * @skb: the GSO skb being mapped
-+ * @hdr_len: per-segment header length
-+ * @iova_state: DMA IOVA state (when IOMMU available)
-+ * @iova_offset: global byte offset into IOVA range (IOVA path only)
-+ * @total_len: total payload length
-+ * @frag_idx: current region (-1 = linear, 0..nr_frags-1 = frag)
-+ * @offset: byte offset within current region
-+ * @linear_dma: DMA address of the linear payload
-+ * @linear_len: length of the linear payload
-+ * @nr_frags: number of frags successfully DMA-mapped
-+ * @frags: per-frag DMA address and length
++ * skb_frag_phys - gets the physical address of the data in a paged fragment
++ * @frag: the paged fragment buffer
 + *
-+ * DMA-maps the payload regions of a GSO skb (linear data + frags).
-+ * Prefers the DMA IOVA API for a single contiguous mapping with one
-+ * IOTLB sync; falls back to per-region dma_map_phys() otherwise.
++ * Returns: the physical address of the data within @frag.
 + */
-+struct tso_dma_map {
-+	struct device		*dev;
-+	const struct sk_buff	*skb;
-+	unsigned int		hdr_len;
-+	/* IOVA path */
-+	struct dma_iova_state	iova_state;
-+	size_t			iova_offset;
-+	size_t			total_len;
-+	/* Fallback path if IOVA path fails */
-+	int			frag_idx;
-+	unsigned int		offset;
-+	dma_addr_t		linear_dma;
-+	unsigned int		linear_len;
-+	unsigned int		nr_frags;
-+	struct {
-+		dma_addr_t	dma;
-+		unsigned int	len;
-+	} frags[MAX_SKB_FRAGS];
-+};
++static inline phys_addr_t skb_frag_phys(const skb_frag_t *frag)
++{
++	return page_to_phys(skb_frag_page(frag)) + skb_frag_off(frag);
++}
++
+ /**
+  * skb_frag_page_copy() - sets the page in a fragment from another fragment
+  * @fragto: skb fragment where page is set
+diff --git a/include/net/tso.h b/include/net/tso.h
+index 8f8d9d74e873..f78a470a7277 100644
+--- a/include/net/tso.h
++++ b/include/net/tso.h
+@@ -68,4 +68,25 @@ struct tso_dma_map {
+ 	} frags[MAX_SKB_FRAGS];
+ };
+ 
++int tso_dma_map_init(struct tso_dma_map *map, struct device *dev,
++		     const struct sk_buff *skb, unsigned int hdr_len);
++void tso_dma_map_cleanup(struct tso_dma_map *map);
++unsigned int tso_dma_map_count(struct tso_dma_map *map, unsigned int len);
++bool tso_dma_map_next(struct tso_dma_map *map, dma_addr_t *addr,
++		      unsigned int *chunk_len, unsigned int *mapping_len,
++		      unsigned int seg_remaining);
++
++/**
++ * tso_dma_map_use_iova - check if this map used the DMA IOVA path
++ * @map: the map to check
++ *
++ * Return: true if the IOVA API was used for this mapping. When true,
++ * the driver must call tso_dma_map_cleanup() at completion time instead
++ * of doing per-region DMA unmaps.
++ */
++static inline bool tso_dma_map_use_iova(struct tso_dma_map *map)
++{
++	return dma_use_iova(&map->iova_state);
++}
 +
  #endif	/* _TSO_H */
+diff --git a/net/core/tso.c b/net/core/tso.c
+index 6df997b9076e..8d3cfbd52e84 100644
+--- a/net/core/tso.c
++++ b/net/core/tso.c
+@@ -3,6 +3,7 @@
+ #include <linux/if_vlan.h>
+ #include <net/ip.h>
+ #include <net/tso.h>
++#include <linux/dma-mapping.h>
+ #include <linux/unaligned.h>
+ 
+ void tso_build_hdr(const struct sk_buff *skb, char *hdr, struct tso_t *tso,
+@@ -87,3 +88,275 @@ int tso_start(struct sk_buff *skb, struct tso_t *tso)
+ 	return hdr_len;
+ }
+ EXPORT_SYMBOL(tso_start);
++
++static int tso_dma_iova_try(struct device *dev, struct tso_dma_map *map,
++			    phys_addr_t phys, size_t linear_len, size_t total_len,
++			    size_t *offset)
++{
++	const struct sk_buff *skb;
++	unsigned int nr_frags;
++	int i;
++
++	if (!dma_iova_try_alloc(dev, &map->iova_state, phys, total_len))
++		return 1;
++
++	skb = map->skb;
++	nr_frags = skb_shinfo(skb)->nr_frags;
++
++	if (linear_len) {
++		if (dma_iova_link(dev, &map->iova_state,
++				  phys, *offset, linear_len,
++				  DMA_TO_DEVICE, 0))
++			goto iova_fail;
++		map->linear_len = linear_len;
++		*offset += linear_len;
++	}
++
++	for (i = 0; i < nr_frags; i++) {
++		skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
++		unsigned int frag_len = skb_frag_size(frag);
++
++		if (dma_iova_link(dev, &map->iova_state,
++				  skb_frag_phys(frag), *offset,
++				  frag_len, DMA_TO_DEVICE, 0)) {
++			map->nr_frags = i;
++			goto iova_fail;
++		}
++		map->frags[i].len = frag_len;
++		*offset += frag_len;
++		map->nr_frags = i + 1;
++	}
++
++	if (dma_iova_sync(dev, &map->iova_state, 0, total_len))
++		goto iova_fail;
++
++	return 0;
++
++iova_fail:
++	dma_iova_destroy(dev, &map->iova_state, *offset,
++			 DMA_TO_DEVICE, 0);
++	memset(&map->iova_state, 0, sizeof(map->iova_state));
++
++	/* reset map state */
++	map->frag_idx = -1;
++	map->offset = 0;
++	map->linear_len = 0;
++	map->nr_frags = 0;
++
++	return 1;
++}
++
++/**
++ * tso_dma_map_init - DMA-map GSO payload regions
++ * @map: map struct to initialize
++ * @dev: device for DMA mapping
++ * @skb: the GSO skb
++ * @hdr_len: per-segment header length in bytes
++ *
++ * DMA-maps the linear payload (after headers) and all frags.
++ * Prefers the DMA IOVA API (one contiguous mapping, one IOTLB sync);
++ * falls back to per-region dma_map_phys() when IOVA is not available.
++ * Positions the iterator at byte 0 of the payload.
++ *
++ * Return: 0 on success, -ENOMEM on DMA mapping failure (partial mappings
++ * are cleaned up internally).
++ */
++int tso_dma_map_init(struct tso_dma_map *map, struct device *dev,
++		     const struct sk_buff *skb, unsigned int hdr_len)
++{
++	unsigned int linear_len = skb_headlen(skb) - hdr_len;
++	unsigned int nr_frags = skb_shinfo(skb)->nr_frags;
++	size_t total_len = skb->len - hdr_len;
++	size_t offset = 0;
++	phys_addr_t phys;
++	int i;
++
++	if (!total_len)
++		return 0;
++
++	map->dev = dev;
++	map->skb = skb;
++	map->hdr_len = hdr_len;
++	map->frag_idx = -1;
++	map->offset = 0;
++	map->iova_offset = 0;
++	map->total_len = total_len;
++	map->linear_len = 0;
++	map->nr_frags = 0;
++	memset(&map->iova_state, 0, sizeof(map->iova_state));
++
++	if (linear_len)
++		phys = virt_to_phys(skb->data + hdr_len);
++	else
++		phys = skb_frag_phys(&skb_shinfo(skb)->frags[0]);
++
++	if (tso_dma_iova_try(dev, map, phys, linear_len, total_len, &offset)) {
++		/* IOVA path failed, map state was reset. Fallback to
++		 * per-region dma_map_phys()
++		 */
++		if (linear_len) {
++			map->linear_dma = dma_map_phys(dev, phys, linear_len,
++						       DMA_TO_DEVICE, 0);
++			if (dma_mapping_error(dev, map->linear_dma))
++				return -ENOMEM;
++			map->linear_len = linear_len;
++		}
++
++		for (i = 0; i < nr_frags; i++) {
++			skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
++			unsigned int frag_len = skb_frag_size(frag);
++
++			map->frags[i].len = frag_len;
++			map->frags[i].dma = dma_map_phys(dev, skb_frag_phys(frag),
++							 frag_len, DMA_TO_DEVICE, 0);
++			if (dma_mapping_error(dev, map->frags[i].dma)) {
++				tso_dma_map_cleanup(map);
++				return -ENOMEM;
++			}
++			map->nr_frags = i + 1;
++		}
++	}
++
++	if (linear_len == 0 && nr_frags > 0)
++		map->frag_idx = 0;
++
++	return 0;
++}
++EXPORT_SYMBOL(tso_dma_map_init);
++
++/**
++ * tso_dma_map_cleanup - unmap all DMA regions in a tso_dma_map
++ * @map: the map to clean up
++ *
++ * Handles both IOVA and fallback paths. For IOVA, calls
++ * dma_iova_destroy(). For fallback, unmaps each region individually.
++ */
++void tso_dma_map_cleanup(struct tso_dma_map *map)
++{
++	int i;
++
++	if (dma_use_iova(&map->iova_state)) {
++		dma_iova_destroy(map->dev, &map->iova_state, map->total_len,
++				 DMA_TO_DEVICE, 0);
++		memset(&map->iova_state, 0, sizeof(map->iova_state));
++		map->linear_len = 0;
++		map->nr_frags = 0;
++		return;
++	}
++
++	if (map->linear_len)
++		dma_unmap_phys(map->dev, map->linear_dma, map->linear_len,
++			       DMA_TO_DEVICE, 0);
++
++	for (i = 0; i < map->nr_frags; i++)
++		dma_unmap_phys(map->dev, map->frags[i].dma, map->frags[i].len,
++			       DMA_TO_DEVICE, 0);
++
++	map->linear_len = 0;
++	map->nr_frags = 0;
++}
++EXPORT_SYMBOL(tso_dma_map_cleanup);
++
++/**
++ * tso_dma_map_count - count descriptors for a payload range
++ * @map: the payload map
++ * @len: number of payload bytes in this segment
++ *
++ * Counts how many contiguous DMA region chunks the next @len bytes
++ * will span, without advancing the iterator. On the IOVA path this
++ * is always 1 (contiguous). On the fallback path, uses region sizes
++ * from the current position.
++ *
++ * Return: the number of descriptors needed for @len bytes of payload.
++ */
++unsigned int tso_dma_map_count(struct tso_dma_map *map, unsigned int len)
++{
++	unsigned int offset = map->offset;
++	int idx = map->frag_idx;
++	unsigned int count = 0;
++
++	if (!len)
++		return 0;
++
++	if (dma_use_iova(&map->iova_state))
++		return 1;
++
++	while (len > 0) {
++		unsigned int region_len, chunk;
++
++		if (idx == -1)
++			region_len = map->linear_len;
++		else
++			region_len = map->frags[idx].len;
++
++		chunk = min(len, region_len - offset);
++		len -= chunk;
++		count++;
++		offset = 0;
++		idx++;
++	}
++
++	return count;
++}
++EXPORT_SYMBOL(tso_dma_map_count);
++
++/**
++ * tso_dma_map_next - yield the next DMA address range
++ * @map: the payload map
++ * @addr: output DMA address
++ * @chunk_len: output chunk length
++ * @mapping_len: full DMA mapping length when this chunk starts a new
++ *               mapping region, or 0 when continuing a previous one.
++ *               On the IOVA path this is always 0 (driver must not
++ *               do per-region unmaps; use tso_dma_map_cleanup instead).
++ * @seg_remaining: bytes left in current segment
++ *
++ * Yields the next (dma_addr, chunk_len) pair and advances the iterator.
++ * On the IOVA path, the entire payload is contiguous so each segment
++ * is always a single chunk.
++ *
++ * Return: true if a chunk was yielded, false when @seg_remaining is 0.
++ */
++bool tso_dma_map_next(struct tso_dma_map *map, dma_addr_t *addr,
++		      unsigned int *chunk_len, unsigned int *mapping_len,
++		      unsigned int seg_remaining)
++{
++	unsigned int region_len, chunk;
++
++	if (!seg_remaining)
++		return false;
++
++	/* IOVA path: contiguous DMA range, no region boundaries */
++	if (dma_use_iova(&map->iova_state)) {
++		*addr = map->iova_state.addr + map->iova_offset;
++		*chunk_len = seg_remaining;
++		*mapping_len = 0;
++		map->iova_offset += seg_remaining;
++		return true;
++	}
++
++	/* Fallback path: per-region iteration */
++
++	if (map->frag_idx == -1) {
++		region_len = map->linear_len;
++		chunk = min(seg_remaining, region_len - map->offset);
++		*addr = map->linear_dma + map->offset;
++		*mapping_len = (map->offset == 0) ? region_len : 0;
++	} else {
++		region_len = map->frags[map->frag_idx].len;
++		chunk = min(seg_remaining, region_len - map->offset);
++		*addr = map->frags[map->frag_idx].dma + map->offset;
++		*mapping_len = (map->offset == 0) ? region_len : 0;
++	}
++
++	*chunk_len = chunk;
++	map->offset += chunk;
++
++	if (map->offset >= region_len) {
++		map->frag_idx++;
++		map->offset = 0;
++	}
++
++	return true;
++}
++EXPORT_SYMBOL(tso_dma_map_next);
 -- 
 2.52.0
 
