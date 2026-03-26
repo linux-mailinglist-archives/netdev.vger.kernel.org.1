@@ -1,319 +1,336 @@
-Return-Path: <netdev+bounces-272148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272152-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8A96OpxixWkJ+AQAu9opvQ
-	(envelope-from <netdev+bounces-272148-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:45:16 +0100
+	id IKOgHmpkxWkn+AQAu9opvQ
+	(envelope-from <netdev+bounces-272152-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:52:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B268F338A4F
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:45:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D35B3338BBF
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:52:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4E9B730D1AB1
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:34:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EB0DA30F9E0F
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2FF411620;
-	Thu, 26 Mar 2026 16:33:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6293D40FD8F;
+	Thu, 26 Mar 2026 16:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="Li9nxoSJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pisLqagj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71AEE41160C
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 16:33:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A91F4035CD;
+	Thu, 26 Mar 2026 16:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774542784; cv=none; b=D0Mi6SHEHAuwrdv2JgKMsbua+rEH+v95saZixE4HVjaYo8wn+1CV7x9cx3ULRkG/I84Cg19v3XL9WUHk/6U+/74/l/EafGjfLZZODKNL1lcMShKSH/OElRsasPrslI8AOT80b/BwLE47zrmE+NZc4xG3aMhkivYocfUsPlZ01WQ=
+	t=1774543204; cv=none; b=mJPOPdO8twPDzSqtwwy74+gCJnqE1Up6ToPA6vLThG99qYeQRjctwX+She/+zcil7neKm6ayEBqniWqNH9YhV1sY9TLJ7gyvcwJTemBJULYuAgFRitudfLW7e5j2cdcfvFHqElQPbB2Sd0KD4cZyRHbmjHbRjVRUB36FW1zV1hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774542784; c=relaxed/simple;
-	bh=mXc8HhXjqNJCvEd/LGg/yieYTes/g78CIZi1NYJ6p0I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nerNfc1mFLK2Lo/05tRG5pCfNzFhmNiiOHtJJRYDQeS8IMvQEdcMAgcLWc4q4dbNkb9ww4wM3OsFAqHcv1yJuFZjzm+ExBcpTIneCtG6AKIxEQIpGDhTzORIWXtcSBiHuX/WSqM9PVdjQ2mN4FYreP0szgghYUGgtL16C4PskWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=Li9nxoSJ; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6634197cd98so157543a12.0
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 09:33:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1774542781; x=1775147581; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Uz6X41/9QvtVD+0d1JY1sxw6aOqQLEJwgRVp5WANGc=;
-        b=Li9nxoSJNKiJccyGD9yHbplqiHrTxZtxaczwGIMLi7rr9O6y29ZGBOpdAAXuUW8cfJ
-         OoZIEnmvMMetvXbU5SpuB7ijmk2XNCva4fNQ/+JdEbBJ92940MgAZb6p1UFD2Fq2xTdR
-         tcr9xcTZ/OgJG4bCKvrhEIqTcdmJ4TlCK1paJ3YG/ePD48gW4wqDYNS9tWyHrgABODR4
-         9YvZAq6neO1xXjzoCgqVTe0hdNleOSiE6d6y/Yja3hMFB365xHTdEEZzHkaLBdcKr1O2
-         u77ZpY/Xx2bzmZalj/QzrfQFP4pLy/X3KOK7U8F/z69wVAAF0+He+yWkpQquh1BMaRT+
-         O4pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774542781; x=1775147581;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3Uz6X41/9QvtVD+0d1JY1sxw6aOqQLEJwgRVp5WANGc=;
-        b=sm4ayDehkCJZEJB2hEwcyZt0RkFCv1U2MkbXGT9TAGt2nP0+fKrOdZ+UAny0kLF9Ie
-         L0MQlg73P6zgJRClAMOjyqRsH2Dn6RtjyypiskB9/DsU3bkdpkxtirotNrgxxPRxxebo
-         WLsDZUbotd8BBsDOu1p1uzSNvaoXl5Qojay63g+H1nsJClpfUe8o2Hk1wmuKOtTAgB4G
-         CspGodRD3niYDtnbz35xGuwCsYilN0DYs/FI+RTV2AFgB0Ac/H0vbBPXkyij1R1IapdJ
-         rK9h6p+kY/ekJMzrcZMGrmpFuIwxPq1CH9jm8XWQDWzYAe7V4iOXsdp12FyioSKdZdog
-         4Amw==
-X-Forwarded-Encrypted: i=1; AJvYcCWLV8V/eGfLUrSeJS6eLhaLuZTRrgnZxQ2ZZVI3k7/IDT0AKDJ6tToaERoIsoVJ9bdNtyQ+LpQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqRTksQ2yIt1mhSILwrO/tz/cahLjOzRSWbqfOs152MJdHYQ1G
-	WVgTcw9UwJyXvR6ZhVR62n4shXNP0UZCGU0yQva3jR4A5F5DXrPMNoHOYi85TujZERg=
-X-Gm-Gg: ATEYQzycQ2vx5JNxTzTewbd3NJMPrZxHO1G5WM/sI1u4UOD2BWYjZYmpG0WggF8MuWx
-	GTJlMYAmI9q7VtbHX1Mo2EUhIk4L7Zk9tgY7wsZ0rf9DjNSOTWER+RkANMgIcO7bmke43O7m/ht
-	kpm6qlT5nh5OctDX6kR7xLFKI6MxEcU269at50j8v5OG0O45r+42LqnJjOCY8l6ATdHaYE9wSVj
-	Aw/BJxDXP/4fD3SOGeX8u5QAFvC+THLqpIfccX6AV9jqX0E0JA5xkv0J6757mNcG6R0EoF0bZcs
-	KrSh3plJN5V1G+weD2/UIuxZe8yFYK9/gV82olUoH/3QaYe8uWFwJ7VUbanpo7tsoq3j91tZRU0
-	I1c4xP8S7F2AuasrTsSS0KQNyFemD4+SA32Xe2gbj450S5Y5noNT6lWAugko6/EBsKqCOx4jVZB
-	JfRHRuw6M2neMlpum3bL0R00j1dRnAcajYNQn1RHcCSNlhPqkG4VY+PEHVnNSlg8WHqklTCfy4E
-	XirxIQMGKuknDc=
-X-Received: by 2002:a05:6402:210f:b0:66a:55eb:1cef with SMTP id 4fb4d7f45d1cf-66a826fa22dmr2939717a12.8.1774542780713;
-        Thu, 26 Mar 2026 09:33:00 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-66ad6a5f283sm1242324a12.27.2026.03.26.09.32.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Mar 2026 09:33:00 -0700 (PDT)
-Message-ID: <2bb55d10-38a9-4595-baef-678d59bf4059@6wind.com>
-Date: Thu, 26 Mar 2026 17:32:59 +0100
+	s=arc-20240116; t=1774543204; c=relaxed/simple;
+	bh=v9OxL3z6qKsfDWe7vgJygT5T/5mg3FeLB6gOdPjSyDk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=AzwpW9huwKCjMnbMx3SFlL/M+7ZOzAVIYiZIp77Ap2h3AnY5WOw8Nd21+fB8oNIbiYvZDI3fyUfmtALHBhNFXAhdw/keQyHSTjceuEgewNng0cLINE/XjNKoZGEWYLal2r9dt95wh02nEQdVXfMFx5QpDoASVkvyDcz33meQqXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pisLqagj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BD1BC116C6;
+	Thu, 26 Mar 2026 16:40:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774543203;
+	bh=v9OxL3z6qKsfDWe7vgJygT5T/5mg3FeLB6gOdPjSyDk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=pisLqagj3vB7EHVWtrYeETBb1Gl8iQLkOtglrdUeLgotRTEpoTq6BAXEW845d4eTN
+	 DbK7B6mnUv8MXwuZy+l8Ewm1Bp4/wszn0Itp3iNaoURdrX4Vzb+EMTyANgbZJpqO3+
+	 Y641c7/ZpyRQV9qxCKNZmtH/wN1HWyA7PAFtaH/hUtCqlIJKajhEIgUGJlQoOvZKJ3
+	 rP/VpkLPjhOnP6NMR2/N4iMdpN4DFyZxnqRQnK/c8/XChTyXH8pv6P0BGsONKLOFSU
+	 QhDYiEU+YTg6LoechbtMk8kIA8WLWnwdnAeRqyKMIvrDYLDp35X3k32Bmf3LoSi0Bf
+	 EE4YkDDj60FvA==
+Date: Thu, 26 Mar 2026 11:40:02 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Gerd Bayer <gbayer@linux.ibm.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>,
+	Jay Cornwall <Jay.Cornwall@amd.com>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Alexander Schmidt <alexs@linux.ibm.com>, linux-s390@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	stable@vger.kernel.org, Gerd Bayer <gerd.bayer@de.ibm.com>
+Subject: Re: [PATCH v6 1/2] PCI: AtomicOps: Do not enable without support in
+ root complex
+Message-ID: <20260326164002.GA1325368@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [RFC PATCH net-next 0/3] seg6: SRv6 L2 VPN with End.DT2U and srl2
- device
-To: Andrea Mayer <andrea.mayer@uniroma2.it>, netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Stefano Salsano <stefano.salsano@uniroma2.it>,
- Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
- Ahmed Abdelsalam <ahabdels@cisco.com>,
- Justin Iurman <justin.iurman@6wind.com>, linux-kernel@vger.kernel.org
-References: <20260322000557.12559-1-andrea.mayer@uniroma2.it>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <20260322000557.12559-1-andrea.mayer@uniroma2.it>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4183b471777efa949ce6f7b860c81282e91666ef.camel@linux.ibm.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[6wind.com:+];
-	HAS_ORG_HEADER(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272148-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-272152-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[helgaas@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B268F338A4F
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D35B3338BBF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Le 22/03/2026 à 01:05, Andrea Mayer a écrit :
-> Hi all,
-Hi,
+On Thu, Mar 26, 2026 at 10:51:19AM +0100, Gerd Bayer wrote:
+> On Wed, 2026-03-25 at 15:08 -0500, Bjorn Helgaas wrote:
+> > On Wed, Mar 25, 2026 at 04:16:17PM +0100, Gerd Bayer wrote:
+> > > When inspecting the config space of a Connect-X physical function in an
+> > > s390 system after it was initialized by the mlx5_core device driver, we
+> > > found the function to be enabled to request AtomicOps despite the
+> > > system's root-complex lacking support for completing them:
+> > > 
+> > > 1ed0:00:00.1 Ethernet controller: Mellanox Technologies MT2894 Family [ConnectX-6 Lx]
+> > > 	Subsystem: Mellanox Technologies Device 0002
+> > >   [...]
+> > > 	DevCtl2: Completion Timeout: 50us to 50ms, TimeoutDis-
+> > > 		 AtomicOpsCtl: ReqEn+
+> > > 		 IDOReq- IDOCompl- LTR- EmergencyPowerReductionReq-
+> > > 		 10BitTagReq- OBFF Disabled, EETLPPrefixBlk-
+> > > 
+> > > Turns out the device driver calls pci_enable_atomic_ops_to_root() which
+> > > defaulted to enable AtomicOps requests even if it had no information
+> > > about the root-port that the PCIe device is attached to. Similarly,
+> > > AtomicOps requests are enabled for root complex integrated endpoints
+> > > (RCiEPs) unconditionally.
+> > > 
+> > > Change the logic of pci_enable_atomic_ops_to_root() to fully traverse the
+> > > PCIe tree upwards, check that the bridge devices support delivering
+> > > AtomicOps transactions, and finally check that there is a root port at
+> > > the end that does support completing AtomicOps - or that the support for
+> > > completing AtomicOps at the root complex is announced through some other
+> > > arch specific way.
+> > > 
+> > > Introduce a new pcibios_connects_to_atomicops_capable_rc() function to
+> > > implement the check - and default to always "true". This leaves the
+> > > semantics for today's RCiEPs intact. Pass in the device in question and
+> > > the requested capabilities for future expansions.
+> > > For s390, override pcibios_connects_to_atomicops_capable_rc() to
+> > > always return "false".
+> > > 
+> > > Do not change the enablement of AtomicOps requests if there is no
+> > > positive confirmation that the root complex can complete PCIe AtomicOps.
+> > > 
+> > > Reported-by: Alexander Schmidt <alexs@linux.ibm.com>
+> > > Cc: stable@vger.kernel.org
+> > > Fixes: 430a23689dea ("PCI: Add pci_enable_atomic_ops_to_root()")
+> > > Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+> > > ---
+> > >  arch/s390/pci/pci.c |  5 +++++
+> > >  drivers/pci/pci.c   | 48 +++++++++++++++++++++++++++++++-----------------
+> > >  include/linux/pci.h |  1 +
+> > >  3 files changed, 37 insertions(+), 17 deletions(-)
+> > > 
+> > > diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
+> > > index 2a430722cbe415dd56c92fed2e513e524f46481a..a0bef77082a153a258fbe4abb1070b22e020888e 100644
+> > > --- a/arch/s390/pci/pci.c
+> > > +++ b/arch/s390/pci/pci.c
+> > > @@ -265,6 +265,11 @@ static int zpci_cfg_store(struct zpci_dev *zdev, int offset, u32 val, u8 len)
+> > >  	return rc;
+> > >  }
+> > >  
+> > > +bool pcibios_connects_to_atomicops_capable_rc(struct pci_dev *dev, u32 cap_mask)
+> > > +{
+> > > +	return false;
+> > > +}
+> > > +
+> > >  resource_size_t pcibios_align_resource(void *data, const struct resource *res,
+> > >  				       resource_size_t size,
+> > >  				       resource_size_t align)
+> > > diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> > > index 8479c2e1f74f1044416281aba11bf071ea89488a..006aa589926cb290de43f152100ddaf9961407d1 100644
+> > > --- a/drivers/pci/pci.c
+> > > +++ b/drivers/pci/pci.c
+> > > @@ -3660,6 +3660,19 @@ void pci_acs_init(struct pci_dev *dev)
+> > >  	pci_disable_broken_acs_cap(dev);
+> > >  }
+> > >  
+> > > +static bool pci_is_atomicops_capable_rp(struct pci_dev *dev, u32 cap, u32 cap_mask)
+> > > +{
+> > > +	if (!dev || !(pci_pcie_type(dev) == PCI_EXP_TYPE_ROOT_PORT))
+> > > +		return false;
+> > > +
+> > > +	return (cap & cap_mask) == cap_mask;
+> > > +}
+> > > +
+> > > +bool __weak pcibios_connects_to_atomicops_capable_rc(struct pci_dev *dev, u32 cap_mask)
+> > > +{
+> > > +	return true;
+> > > +}
+> > > +
+> > >  /**
+> > >   * pci_enable_atomic_ops_to_root - enable AtomicOp requests to root port
+> > >   * @dev: the PCI device
+> > > @@ -3676,8 +3689,9 @@ void pci_acs_init(struct pci_dev *dev)
+> > >  int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
+> > >  {
+> > >  	struct pci_bus *bus = dev->bus;
+> > > -	struct pci_dev *bridge;
+> > > -	u32 cap, ctl2;
+> > > +	struct pci_dev *bridge = NULL;
+> > > +	u32 cap = 0;
+> > > +	u32 ctl2;
+> > >  
+> > >  	/*
+> > >  	 * Per PCIe r5.0, sec 9.3.5.10, the AtomicOp Requester Enable bit
+> > > @@ -3714,29 +3728,29 @@ int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
+> > >  		switch (pci_pcie_type(bridge)) {
+> > >  		/* Ensure switch ports support AtomicOp routing */
+> > >  		case PCI_EXP_TYPE_UPSTREAM:
+> > > -		case PCI_EXP_TYPE_DOWNSTREAM:
+> > > -			if (!(cap & PCI_EXP_DEVCAP2_ATOMIC_ROUTE))
+> > > -				return -EINVAL;
+> > > -			break;
+> > > -
+> > > -		/* Ensure root port supports all the sizes we care about */
+> > > -		case PCI_EXP_TYPE_ROOT_PORT:
+> > > -			if ((cap & cap_mask) != cap_mask)
+> > > -				return -EINVAL;
+> > > -			break;
+> > > -		}
+> > > -
+> > > -		/* Ensure upstream ports don't block AtomicOps on egress */
+> > > -		if (pci_pcie_type(bridge) == PCI_EXP_TYPE_UPSTREAM) {
+> > > +			/* Upstream ports must not block AtomicOps on egress */
+> > >  			pcie_capability_read_dword(bridge, PCI_EXP_DEVCTL2,
+> > >  						   &ctl2);
+> > >  			if (ctl2 & PCI_EXP_DEVCTL2_ATOMIC_EGRESS_BLOCK)
+> > >  				return -EINVAL;
+> > > +			fallthrough;
+> > > +		/* All switch ports need to route AtomicOps */
+> > > +		case PCI_EXP_TYPE_DOWNSTREAM:
+> > > +			if (!(cap & PCI_EXP_DEVCAP2_ATOMIC_ROUTE))
+> > > +				return -EINVAL;
+> > > +			break;
+> > >  		}
+> > > -
+> > >  		bus = bus->parent;
+> > >  	}
+> > >  
+> > > +	/*
+> > > +	 * Finally, last bridge must be root port and support requested sizes
+> > > +	 * or firmware asserts support
+> > > +	 */
+> > > +	if (!(pci_is_atomicops_capable_rp(bridge, cap, cap_mask) ||
+> > > +	      pcibios_connects_to_atomicops_capable_rc(dev, cap_mask)))
+> > > +		return -EINVAL;
+> > 
+> > Sashiko says:
+> > 
+> >   Since the generic weak implementation of
+> >   pcibios_connects_to_atomicops_capable_rc() unconditionally returns
+> >   true, the logical OR expression pci_is_atomicops_capable_rp(...) ||
+> >   true will always evaluate to true. This makes the entire if
+> >   condition evaluate to false.
+> > 
+> >   Because of this, it appears -EINVAL is never returned here, and any
+> >   standard endpoint behind a Root Port will successfully be granted
+> >   AtomicOps even if the Root Port lacks the capability in its
+> >   PCI_EXP_DEVCAP2 register.
+> 
+> I've made the generic implementation of
+> pcibios_connects_to_atomicops_capable_rc() default to return "true" to
+> preserve the current code's handling of RCiEPs: Since they are not
+> attached to a root port, their dev->bus->parent is NULL and the entire
+> while-loop is bypassed - before this patch and after. (Sashiko was
+> pointing at that being regressed with v4.)
 
-first, thank you for posting this RFC.
+The v4 patch definitely changed the behavior for RCiEPs: the current
+v7.0-rc1 code always enables AtomicOps for RCiEPs, and the v4 patch
+never enables AtomicOps for RCiEPs.  But I'm not sure this is a
+regression.  It definitely *could* break an RCiEP, but AFAIK we have
+no information about whether the RC supports AtomicOps, so enabling
+them and telling the driver that AtomicOps work might be a lie.
 
-> 
-> this RFC series adds support for the SRv6 End.DT2U behavior and
-> introduces the srl2 Ethernet pseudowire device, together with
-> corresponding selftests.
-> 
-> Motivation
-> ==========
-> 
-> The main goal is to enable L2 service delivery through an internal
-> SRv6 L2 endpoint, in a way similar to how VXLAN provides L2 services
-> through a VXLAN netdevice.
-> 
-> Today, Linux supports SRv6 L2 decapsulation only through an
-> End.DX2-style model, where the exposed Ethernet frame is forwarded
-> to a configured egress interface. The current implementation does
-> not provide a native netdevice representing the SRv6 L2 service
-> endpoint. This is a significant limitation compared to VXLAN, where
-> the tunnel endpoint is represented by a netdevice that can be
-> attached to a bridge and integrated naturally into the local L2
-> data plane.
-> 
-> On the encapsulation side, the existing H.L2.Encaps mode is
-> implemented as a route-based lwtunnel, which only intercepts packets
-> entering the IP routing path. Non-IP protocols such as ARP are
-> never routed and therefore cannot be encapsulated, making it
-> unsuitable for full L2 service delivery.
-> 
-> Design
-> ======
-> 
-> This series addresses that limitation by introducing srl2, a native
-> SRv6 L2 endpoint interface. The intent is to make SRv6 L2 delivery
-> usable in the same deployment model already familiar from VXLAN: an
-> internal interface that represents the L2 service endpoint and can
-> participate naturally in local L2 forwarding.
-The current design, with vxlan, uses two interfaces: one bridge and one vxlan.
-I presume this design was chosen because the vxlan protocol is implemented in
-the vxlan driver.
-I wonder if using the same design for SRv6 is the best choice. Why not use only
-a bridge interface? Instead of pointing to a port, the FDB entries could point
-to a nexthop id. This enables to associate a srv6 encap directly to a MAC
-address. Something like:
+IIUC, the motivation for this series was to avoid enabling AtomicOps
+on s390 where there is no visible Root Port, and you have platform
+knowledg that whatever is upstream from the endpoint in fact does not
+support them.
 
-$ ip nexthop list id 1234
-id 1234 encap seg6 mode encap segs ...
-$ bridge fdb show dev br0
-02:03:04:05:06:07 dev br0 nhid 1234 ...
+I think we should avoid enabling AtomicOps unless we know for certain
+that the completer (Root Port or RC) supports them.  To me that sounds
+like:
 
-What is the gain of having two interfaces?
-In term of scalability, it is interesting to have only one interface.
+  1) Never enable AtomicOps for RCiEPs.
 
-Regards,
-Nicolas
+  2) Only enable AtomicOps for endpoints below a Root Port that
+  supports AtomicOps.
 
+This could be two separate patches, where the second would fix the
+s390 issue reported by Alexander.
+
+If we come across RCiEPs that need AtomicOps and we somehow know that
+the RC supports them, we can add a quirk or something to take
+advantage of it.
+
+We are still hand-waving about peer-to-peer transactions; we don't
+even try to account for that because we don't know what peer might be
+the completer.
+
+> The whole point of pcibios_connects_to_atomicops_capable_rc() is to
+> allow different architectures to implement a discriminator outside of
+> PCIe's structure - potentially depending on CPU model or more.
 > 
-> On top of that, the series adds support for End.DT2U so that Ethernet
-> payloads carried over SRv6 can be decapsulated and delivered into an
-> L2 domain through either a bridge port or an srl2 interface.
+> The only point I wonder about: Should
+> pcibios_connects_to_atomicops_capable_rc() default to return "false"
+> and deliberately change the behavior for today's RCiEP's (if there are
+> any...)?
 > 
-> Relation to RFC 8986
-> ====================
-> 
-> RFC 8986 describes End.DT2U in terms of an abstract L2 table
-> associated with the SID. That abstraction specifies the externally
-> observable forwarding behavior of the node, but it does not mandate a
-> specific internal implementation. What matters is functional
-> equivalence.
-> 
-> This series enforces that property by restricting valid End.DT2U
-> decapsulation targets to endpoints that provide the required L2
-> forwarding semantics by construction.
-> 
-> When the target device is a bridge port, the Linux bridge provides
-> the expected behavior directly: source MAC learning, destination MAC
-> lookup, and unknown-unicast flooding within the corresponding L2
-> domain.
-> 
-> When the target device is an srl2 interface, the same model is
-> realized in a degenerate but valid form, corresponding to a minimal
-> two-port L2 domain in which one endpoint is srl2. In that case,
-> forwarding is trivial: frames are delivered to srl2 only when
-> addressed to its MAC address, or when they are broadcast or multicast.
-> No general FDB is required in this case because there are no
-> additional L2 destinations to learn.
-> 
-> Any other type of decapsulation target is rejected at configuration
-> time, since it would not guarantee the forwarding behavior required by
-> End.DT2U.
-> 
-> The srl2 device is the minimal baseline implementation providing
-> point-to-point L2 encapsulation with a single segment list.
-> Additional features can be added incrementally based on community
-> feedback and use cases.
-> 
-> Usage
-> =====
-> 
->   ip link add srl2-0 type srl2 segs fc00::a,fc00::b
->   ip link set srl2-0 master br0
-> 
->   ip -6 route add fc00::100/128 encap seg6local action End.DT2U \
->       l2dev srl2-0 dev dum0
-> 
->   # encapsulating traffic from veth-hs into srl2-0
->   ip link set veth-hs master br0
-> 
-> Selftest topology
-> =================
-> 
->             cafe::1                                cafe::2
->            10.0.0.1                               10.0.0.2
->           +--------+                             +--------+
->           |  hs-1  |                             |  hs-2  |
->           +---+----+                             +----+---+
->               |                                       |
->         +-----+------+                         +------+-----+
->         |   veth-hs  |                         |  veth-hs   |
->         |      |     |   fcf0:0:1:2::/64       |     |      |
->         |    br0     +-------------------------+   br0      |
->         |      |     |                         |     |      |
->         |   srl2-0   |                         |  srl2-0    |
->         |    rt-1    |                         |   rt-2     |
->         +------------+                         +------------+
-> 
-> The test verifies IPv4/IPv6 host-to-host and host-to-gateway
-> connectivity over the SRv6 L2 VPN, including ARP resolution
-> through the tunnel.
-> 
-> A companion iproute2 series provides userspace support:
-> 
->   [RFC PATCH iproute2-next 0/4] seg6: add SRv6 End.DT2U and srl2 support
-> 
-> 
-> This is an RFC posting to collect feedback on both the overall design
-> and the userspace API before moving forward with a formal submission.
-> 
-> Comments are very welcome, especially on:
-> - the introduction of srl2 as an internal SRv6 L2 endpoint
-> - the choice of constraining End.DT2U targets to bridge ports
->   and srl2 devices
-> - the netlink/uAPI exposure
-> - the selftest coverage and topology
+> > 
+> > > +
+> > >  	pcie_capability_set_word(dev, PCI_EXP_DEVCTL2,
+> > >  				 PCI_EXP_DEVCTL2_ATOMIC_REQ);
+> > >  	return 0;
+> > > diff --git a/include/linux/pci.h b/include/linux/pci.h
+> > > index 1c270f1d512301de4d462fe7e5097c32af5c6f8d..ef90604c39859ea8e61e5392d0bdaa1b0e43874b 100644
+> > > --- a/include/linux/pci.h
+> > > +++ b/include/linux/pci.h
+> > > @@ -692,6 +692,7 @@ void pci_set_host_bridge_release(struct pci_host_bridge *bridge,
+> > >  				 void *release_data);
+> > >  
+> > >  int pcibios_root_bridge_prepare(struct pci_host_bridge *bridge);
+> > > +bool pcibios_connects_to_atomicops_capable_rc(struct pci_dev *dev, u32 cap_mask);
+> > >  
+> > >  #define PCI_REGION_FLAG_MASK	0x0fU	/* These bits of resource flags tell us the PCI region flags */
+> > >  
+> > > 
+> > > -- 
+> > > 2.51.0
+> > > 
 > 
 > Thanks,
-> Andrea and Stefano
-> 
-> 
-> Andrea Mayer (3):
->   seg6: add support for the SRv6 End.DT2U behavior
->   seg6: add SRv6 L2 tunnel device (srl2)
->   selftests: seg6: add SRv6 srl2 + End.DT2U L2 VPN test
-> 
->  include/linux/srl2.h                          |   7 +
->  include/uapi/linux/seg6_local.h               |   3 +
->  include/uapi/linux/srl2.h                     |  20 +
->  net/ipv6/Kconfig                              |  16 +
->  net/ipv6/Makefile                             |   1 +
->  net/ipv6/seg6.c                               |   1 +
->  net/ipv6/seg6_local.c                         | 160 ++++-
->  net/ipv6/srl2.c                               | 269 ++++++++
->  tools/testing/selftests/net/Makefile          |   1 +
->  tools/testing/selftests/net/config            |   1 +
->  .../selftests/net/srv6_srl2_l2vpn_test.sh     | 621 ++++++++++++++++++
->  11 files changed, 1094 insertions(+), 6 deletions(-)
->  create mode 100644 include/linux/srl2.h
->  create mode 100644 include/uapi/linux/srl2.h
->  create mode 100644 net/ipv6/srl2.c
->  create mode 100755 tools/testing/selftests/net/srv6_srl2_l2vpn_test.sh
-> 
-
+> Gerd
 
