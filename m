@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-272143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272144-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sPzBBNVixWkJ+AQAu9opvQ
-	(envelope-from <netdev+bounces-272143-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:46:13 +0100
+	id QGxUHfZkxWkn+AQAu9opvQ
+	(envelope-from <netdev+bounces-272144-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:55:18 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03AE4338A66
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:46:11 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FA37338C74
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:55:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9BC0C31A81FC
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:32:37 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5D6643089605
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F0A4035A5;
-	Thu, 26 Mar 2026 16:32:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E214035B2;
+	Thu, 26 Mar 2026 16:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d1/c57mx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BHyC0L0b"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF2B33F370;
-	Thu, 26 Mar 2026 16:32:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A167402443;
+	Thu, 26 Mar 2026 16:32:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774542747; cv=none; b=MW1VnOnMzKLOGsc5PVH+a2cApKp6uTUyF1UqLCYJdzfdGHZcZSDvjZgMG8v1bqedeje/OWHuWwTk/TIylF3Keoc6tm4L/gy+hkSa3G+msJ3YKMkEiXiXwKVdev5c2O4bZHNsbtNPxo0KGtA5JWKBmW8xG+httInuRts0XrpJM5Q=
+	t=1774542759; cv=none; b=nOtwWF5hp1X2P3wB3/ICV/M49JW6AuM6bzlzTdv/meH/MpkwdZeRnFTXXApYfG7/qBGSuUg/YB0xo82qd4VFtUw5N/FeiuSfNQOO07nOOE9OzyON1eqJ0wOF/JaMKVg6mB/vxaKvMmg8haub9Xjhj79sjRTmJm3tQWdVKbIB6oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774542747; c=relaxed/simple;
-	bh=h6SdAt8V/8U61Dau5TYRbsrbBcUy7opyRgE4IDMhs3o=;
+	s=arc-20240116; t=1774542759; c=relaxed/simple;
+	bh=mGVGmB9xUUY2QySpvbbDhKQd8FqE0QgLo4M6A/it0eo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=r8gV7ECvlOuxFvMoyYqNi2sg3/KQ8KWu0Fj7Ssnc+SFMh6DFDTTB1bLfRJzo681QXYujVWlRbMHl9hsUEy15uJciZT/VbCj3iMUoxs+OBEVCvzNH7nE8+a/zbXDsj67pwyAw4w3KMyssBTdFDgmpzOZV7YKbjhNfBHD98ZYxlxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d1/c57mx; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=haWtTpgaOZ/9Xle05/cryNHIc8KBQXx184r1Rokc7UXmWwlF5yExva8nQYsKoREgHdoLd4iuZYJ62TA7qC/SgdCjoTCTGVGAFceskK/5j78qk0ejzf5qqkgfWzzEAUynaVzoSgLzfkhfuc/mmI0D5KifZo8mVO4H+91ze7PskJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BHyC0L0b; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774542745; x=1806078745;
+  t=1774542757; x=1806078757;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=h6SdAt8V/8U61Dau5TYRbsrbBcUy7opyRgE4IDMhs3o=;
-  b=d1/c57mxfXE6bURXtrNj9UtoNAvmGpPCyDNbzdOz79PiprjmxQyxlygF
-   ffRlqpQnInT7WHr+b4T0yE24Uk8qBXlHxeOGTCSorLw7e3HGAEtm/e4Vo
-   tI71hWlT3HvCZBLw0i8AjjFOQb3+6IWpaxe16O7RNPmWyGjxOCgHCGGO+
-   Xs9Z71ADnSb7rxkka432YJwCpHddo2WneAQccTHND1/lp7b3qi+fS5JIP
-   2WSoopYfaVTHgg69AeONzUsZuYC1LtbYWvxP4Kh43Rxw4dgD2E6Wpk2gY
-   J47CtR4qi0KpeIetrniXLhzYsJHjp+cL3dHEtxFCi2wP/mobeqQnNswup
-   A==;
-X-CSE-ConnectionGUID: k9uRZ6PQReW5MYvwkSH1RQ==
-X-CSE-MsgGUID: leQsqrcfQK+mwYFVLpgM4w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11741"; a="74636560"
+  bh=mGVGmB9xUUY2QySpvbbDhKQd8FqE0QgLo4M6A/it0eo=;
+  b=BHyC0L0brzRuoZDOd2+ICUkst4Lj0oGSkY94nrl5Fow6l11908APtb4t
+   12LwxqGmBFS3E8RRQhKYmRU1xvVy3d9fjfFsxgL+e/V26+6XL5s/vg3eP
+   FJg3VMyebVM/SWiaeryPiXecxffP3m13tK4lRaQQLid3rZfHzchQQgRod
+   DpvZzZgGV9Hup2HQnJ8JTnYlKAoFfdXPKzXzmWjoiRjOglTAQP5MYt6tu
+   Kct0SvsUORk/Z3OSvI8gINRSaoxeAK0nLtsz1FZaD/Xec/buX97KVQtSL
+   7cXszxKMvHHrULj9zOmmxno/PQA36RM+9QnyDc9VGjFbwJ2/1iecMb33U
+   Q==;
+X-CSE-ConnectionGUID: DogPyaHUTvSK62ip/Gs0fw==
+X-CSE-MsgGUID: Loh8GY6sQ8qlgXMweDCROg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11741"; a="74636613"
 X-IronPort-AV: E=Sophos;i="6.23,142,1770624000"; 
-   d="scan'208";a="74636560"
+   d="scan'208";a="74636613"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2026 09:32:24 -0700
-X-CSE-ConnectionGUID: dfd35oV+TCaHZ6HM57vDPw==
-X-CSE-MsgGUID: nmJNRV5ESau2FtC0lmev0A==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2026 09:32:35 -0700
+X-CSE-ConnectionGUID: foKnV65nRIu3ObJ2/MVYhQ==
+X-CSE-MsgGUID: WidJjEn2TjqhHZjQQX+ElA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,142,1770624000"; 
-   d="scan'208";a="225310865"
+   d="scan'208";a="225310908"
 Received: from gklab-003-001.igk.intel.com ([10.91.173.48])
-  by orviesa007.jf.intel.com with ESMTP; 26 Mar 2026 09:32:20 -0700
+  by orviesa007.jf.intel.com with ESMTP; 26 Mar 2026 09:32:30 -0700
 From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 To: netdev@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -84,9 +84,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Grzegorz Nitka <grzegorz.nitka@intel.com>,
 	Jiri Pirko <jiri@nvidia.com>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH v4 net-next 1/8] dpll: add new DPLL type for transmit clock (TXC) usage
-Date: Thu, 26 Mar 2026 17:28:25 +0100
-Message-Id: <20260326162832.3135857-2-grzegorz.nitka@intel.com>
+Subject: [PATCH v4 net-next 2/8] dpll: allow registering FW-identified pin with a different DPLL
+Date: Thu, 26 Mar 2026 17:28:26 +0100
+Message-Id: <20260326162832.3135857-3-grzegorz.nitka@intel.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20260326162832.3135857-1-grzegorz.nitka@intel.com>
 References: <20260326162832.3135857-1-grzegorz.nitka@intel.com>
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -111,7 +111,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,resnulli.us,linux.dev,kernel.org,davemloft.net,google.com,nvidia.com];
 	RCPT_COUNT_TWELVE(0.00)[22];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-272143-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272144-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -123,76 +123,56 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nvidia.com:email]
-X-Rspamd-Queue-Id: 03AE4338A66
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,nvidia.com:email]
+X-Rspamd-Queue-Id: 7FA37338C74
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Extend the DPLL subsystem with a new DPLL type, DPLL_TYPE_TXC,
-representing devices that drive a transmit reference clock. Certain
-PHYs, MACs and SerDes blocks use a dedicated TX reference clock for
-link operation, and this clock domain is distinct from PPS- and
-EEC-driven synchronization sources. Defining a dedicated type allows
-user space and drivers to correctly classify and configure DPLLs
-intended for TX clock generation.
-
-The corresponding netlink specification is updated to expose "txc".
+Relax the (module, clock_id) equality requirement when registering a
+pin identified by firmware (pin->fwnode). Some platforms associate a
+FW-described pin with a DPLL instance that differs from the pin's
+(module, clock_id) tuple. For such pins, permit registration without
+requiring the strict match. Non-FW pins still require equality.
 
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 ---
- Documentation/netlink/specs/dpll.yaml | 3 +++
- drivers/dpll/dpll_nl.c                | 2 +-
- include/uapi/linux/dpll.h             | 2 ++
- 3 files changed, 6 insertions(+), 1 deletion(-)
+ drivers/dpll/dpll_core.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
-index 3dd48a32f783..2a2ee37a1fc0 100644
---- a/Documentation/netlink/specs/dpll.yaml
-+++ b/Documentation/netlink/specs/dpll.yaml
-@@ -138,6 +138,9 @@ definitions:
-       -
-         name: eec
-         doc: dpll drives the Ethernet Equipment Clock
-+      -
-+        name: txc
-+        doc: dpll drives Tx reference clock
-     render-max: true
-   -
-     type: enum
-diff --git a/drivers/dpll/dpll_nl.c b/drivers/dpll/dpll_nl.c
-index a2b22d492114..4182bdbb6dbb 100644
---- a/drivers/dpll/dpll_nl.c
-+++ b/drivers/dpll/dpll_nl.c
-@@ -34,7 +34,7 @@ const struct nla_policy dpll_reference_sync_nl_policy[DPLL_A_PIN_STATE + 1] = {
- static const struct nla_policy dpll_device_id_get_nl_policy[DPLL_A_TYPE + 1] = {
- 	[DPLL_A_MODULE_NAME] = { .type = NLA_NUL_STRING, },
- 	[DPLL_A_CLOCK_ID] = { .type = NLA_U64, },
--	[DPLL_A_TYPE] = NLA_POLICY_RANGE(NLA_U32, 1, 2),
-+	[DPLL_A_TYPE] = NLA_POLICY_RANGE(NLA_U32, 1, 3),
- };
+diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+index 3f54754cdec4..55ad03977d6d 100644
+--- a/drivers/dpll/dpll_core.c
++++ b/drivers/dpll/dpll_core.c
+@@ -880,11 +880,21 @@ dpll_pin_register(struct dpll_device *dpll, struct dpll_pin *pin,
+ 		return -EINVAL;
  
- /* DPLL_CMD_DEVICE_GET - do */
-diff --git a/include/uapi/linux/dpll.h b/include/uapi/linux/dpll.h
-index de0005f28e5c..8f6db5d5bf0c 100644
---- a/include/uapi/linux/dpll.h
-+++ b/include/uapi/linux/dpll.h
-@@ -109,10 +109,12 @@ enum dpll_clock_quality_level {
-  * enum dpll_type - type of dpll, valid values for DPLL_A_TYPE attribute
-  * @DPLL_TYPE_PPS: dpll produces Pulse-Per-Second signal
-  * @DPLL_TYPE_EEC: dpll drives the Ethernet Equipment Clock
-+ * @DPLL_TYPE_TXC: dpll drives Tx reference clock
-  */
- enum dpll_type {
- 	DPLL_TYPE_PPS = 1,
- 	DPLL_TYPE_EEC,
-+	DPLL_TYPE_TXC,
+ 	mutex_lock(&dpll_lock);
+-	if (WARN_ON(!(dpll->module == pin->module &&
+-		      dpll->clock_id == pin->clock_id)))
++
++	/*
++	 * For pins identified via firmware (pin->fwnode), allow registration
++	 * even if the pin's (module, clock_id) differs from the target DPLL.
++	 * For non-fwnode pins, require a strict (module, clock_id) match.
++	 */
++	if (!pin->fwnode &&
++	    WARN_ON_ONCE(dpll->module != pin->module ||
++			 dpll->clock_id != pin->clock_id)) {
+ 		ret = -EINVAL;
+-	else
+-		ret = __dpll_pin_register(dpll, pin, ops, priv, NULL);
++		goto out_unlock;
++	}
++
++	ret = __dpll_pin_register(dpll, pin, ops, priv, NULL);
++out_unlock:
+ 	mutex_unlock(&dpll_lock);
  
- 	/* private: */
- 	__DPLL_TYPE_MAX,
+ 	return ret;
 -- 
 2.39.3
 
