@@ -1,262 +1,789 @@
-Return-Path: <netdev+bounces-272103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272104-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eM4mJOtOxWkU8wQAu9opvQ
-	(envelope-from <netdev+bounces-272103-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:21:15 +0100
+	id EEP/L1lNxWkU8wQAu9opvQ
+	(envelope-from <netdev+bounces-272104-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:14:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 640663377AA
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:21:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C3733375A7
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:14:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6E44B306E5B0
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:04:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE45F30E697C
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2DE186347;
-	Thu, 26 Mar 2026 15:04:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BF1A3FFACC;
+	Thu, 26 Mar 2026 15:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="irUAyFQA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gipltejb"
 X-Original-To: netdev@vger.kernel.org
-Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11020106.outbound.protection.outlook.com [52.101.56.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5E23FF8B9;
-	Thu, 26 Mar 2026 15:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B9E2C0307
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 15:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.172
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774537475; cv=fail; b=E3IYRHTr3YSjeSYOg5j/m24ApM+UH7Y32a7BK0wnRmt4Mpws/jVzDVoqYS8yyWi+Tk6SnV3avplqdVB9hkac4yo4Wmwn6FyMppNAYlr1YSl6SZWvSB1TH6BQUSOT0ccPOLSZ7fJFYFJk9E+x2jdMdbic/+iJg2BHviTNZId1ynM=
+	t=1774537602; cv=pass; b=VHlLxH6AkwOvfkK0A1mQolTkpQwttRFI/nl5CQChOEFUzoc62MSg81tOCO78txcJxXhx9w+fUqntkAYKSk35ibUMDXqu6T+KM6EJdTc7mALvmnlVkgFJb90XJcqUAzT54PcQS+KY3EBL8XEty1hBC/w+OxIUR6PjvaLbSdVyP8w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774537475; c=relaxed/simple;
-	bh=40PF6aYl72TluClOctJHS85BMGBeSkF4YIR+BDu22MA=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=c7yCXkOFZc6dWVDNhKVMFflfGgvVcYwsyfQz5GI4CPWzG678Nr/Je8MF9k3Q72nhqEEu3A/zgwhSGUzX6u/LX4HSNuZWO2Sr/bqJMTAaj8Dj6SLPoIJIYwT3fkPTU0ClewYqrdnwidpBslG9kmodObCgVt3B9o02xZHPyfgQcis=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=irUAyFQA; arc=fail smtp.client-ip=52.101.56.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FBvkbBWDHfmCLotqQSNk0IqlQHg611wQSOcdX1t4mvpKESMAFFClwp7OAqrPaKwCi31yTVrwwmZI+2+I/CCI3Pzzgh10VB82piY219bS2uo06KCv4IV8HwxMqeGIvj83Fl3lHT2/1CcK+yvlWrQT1Z+rjlygWTIWVdPn0/SvO2mhOtNr2leYoB0U9VPRAMwQukefYbJo2s6bLVKaXpK9m1xu9hQk6GaqvUsCfoB6WE546JE7XXUINWff//HuVWv2GshkCJqx0HcrCRLYApFksBf7iMjQz0AZGjoUtOpECFMxbtXwwUuppssNf+lZsjRqYPLHAFEeTIHqtzxJfdCNng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CuQ4erPD+b47Nxw8GS0w/rh2HRjg7IDGNmKirHK6z5o=;
- b=H7vhQpRg1RWtg2OmT3iCGNyOj5fZoxmbGzoVT98PE5SrQtq+Kg9B/XrrvWwnzg0QZ0FIi1NbWIuM1PIY4ua8+U1W2T5rqxeyeTb6WbLb6Dt5Blpg8hS6x20PXbKFHev7FLIGwzITqhHHwWKy67CZI+6OERH6K0aEFFbPYcxR1UeoVKtHKCThFCA7efnbMITnNCuy/iO7TZzI6JqkBY5n0JQukqXtdYsTe7Yivt773o6ZemRk7VHSqNl9fKxDRTg/MjhVPnNNkEGqc9rMpQ/iYZTBGlt4aH6F3nmqei+fj0JKyrcoU6Kob6T1f0SC1lWMgpVBKZXm7eMsDwXLLp7Mnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CuQ4erPD+b47Nxw8GS0w/rh2HRjg7IDGNmKirHK6z5o=;
- b=irUAyFQAw9rmhVHOKp+z14kkdZOj7a+tS5736iQ5swNWSYbnuRxH4+HXZmt0azS/6hv8xex62E8qxyNn5+xMs05iDgS1JdnOoimlml5t2GrZw29jnccxTlaIfw/0wMHBqsI5W73dxG2gaeXowtmvxTgH2iCivBPDBni1q+Yor6U=
-Received: from BY1PR21MB3870.namprd21.prod.outlook.com (2603:10b6:a03:525::7)
- by LV9PR21MB5406.namprd21.prod.outlook.com (2603:10b6:408:2e6::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.8; Thu, 26 Mar
- 2026 15:04:29 +0000
-Received: from BY1PR21MB3870.namprd21.prod.outlook.com
- ([fe80::9faa:4fb0:486b:8267]) by BY1PR21MB3870.namprd21.prod.outlook.com
- ([fe80::9faa:4fb0:486b:8267%4]) with mapi id 15.20.9745.019; Thu, 26 Mar 2026
- 15:04:29 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>, KY Srinivasan
-	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
-	<DECUI@microsoft.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "leon@kernel.org" <leon@kernel.org>,
-	Long Li <longli@microsoft.com>, Konstantin Taranov <kotaranov@microsoft.com>,
-	"horms@kernel.org" <horms@kernel.org>, "shradhagupta@linux.microsoft.com"
-	<shradhagupta@linux.microsoft.com>, "ssengar@linux.microsoft.com"
-	<ssengar@linux.microsoft.com>, "ernis@linux.microsoft.com"
-	<ernis@linux.microsoft.com>, Shiraz Saleem <shirazsaleem@microsoft.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"stephen@networkplumber.org" <stephen@networkplumber.org>,
-	"jacob.e.keller@intel.com" <jacob.e.keller@intel.com>, Dipayaan Roy
-	<dipayanroy@microsoft.com>
-Subject: RE: [PATCH net,v2] net: mana: Fix RX skb truesize accounting
-Thread-Topic: [PATCH net,v2] net: mana: Fix RX skb truesize accounting
-Thread-Index: AQHcu7oS4/BfnrhFE0utJ7wjdSrUdLXA68xg
-Date: Thu, 26 Mar 2026 15:04:28 +0000
-Message-ID:
- <BY1PR21MB38707172B2F76688C6B28252CA56A@BY1PR21MB3870.namprd21.prod.outlook.com>
-References:
- <acLUhLpLum6qrD/N@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-In-Reply-To:
- <acLUhLpLum6qrD/N@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=69808163-55de-4379-9325-9374dfe3c29c;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2026-03-26T15:02:55Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BY1PR21MB3870:EE_|LV9PR21MB5406:EE_
-x-ms-office365-filtering-correlation-id: d39cdc08-b6ca-4b83-80b8-08de8b48fa84
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700021|921020|22082099003|56012099003|18002099003|7053199004;
-x-microsoft-antispam-message-info:
- 16PVDXv2RBl1mYftBNJkXHgKwkHIxmqRJaAcfLF/m5YQyVC10ddsxVu/WAg013A8chFIi2YBWqpXlJX1w8w2aQl5Ej5H1rJXZ5T03X27bs4ys4NzbK5HRcNP9ivNmjlT646OZgQ37/Yj2Xae7tcRmTa7fQ3SrMIaWZdyzlBAONnU/Sgywj6qkSh1RTq4oiI+U9eEiFb+CjCeR/sy3SQ/SfFzev4I6nnYoMVmd9OaEiWjr26P8u1KbFo/c8cG/EFCP40ekLOCFRJuD3DSpOhyY9ovg5008ICFdptsDPFUGMH4Wuv0vHIvIoXS9+jufbujRNWiXzIyvgpRw9gSXv9zxC71/6ATQ3jVIGYUj87paz98Qo3yEy/omT0+bwZb8itl1Se03vIavFUyj0qUtw7aj+HD5asQficYcaEN6q8prxyj2dJ96g2CYChbaiZjH/qApfr0dER28dQPjDnYMpZ0UnFIqpZGkxsofsz1pCyubc4X/fCQEulU3Om2/+LPDU04vVbYcf5G4ERTDq9fYbV0CAUFNFn0NVUwIlv2PQDKjF8tU/SAo+3QNz5tvialD/mQI7Yzg0nPlmW6QdvFXoDWs/u7oNVvinvvio2Zq1F1Y7XdfVaGUEoisWzkWipwsyadO7yF7BUJR4koqrp+kAEDtmrFGOKZVKsx/KNMy3hKQHBh903K8/p/Z+EC5jmJa/kOghP++Uvlao49kHQ8ThYifoG8kJacOFYmCDl0lubTenrmheL/wIJM7SOeH+VVsoFlGZU0HFY1K6/31lQ2LB+NptbX0Tb2ZDX/PQf7FL4LcONxP9THSjw1oTkRV4QuTH0B
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY1PR21MB3870.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700021)(921020)(22082099003)(56012099003)(18002099003)(7053199004);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?NbFeU7LJFHgQYOD2GiuQf/6HdfBTssHdLBGtFSsi/oV8vrROYmWPeWHZpd6t?=
- =?us-ascii?Q?F1XEOpKoVvWVnAIndy1cxbvPkTVPnASAIfyWEIdzlCSziS78JPVHgDigj+gC?=
- =?us-ascii?Q?mv+ru2U8gtTkiWQvio1Rcae6ss92woXdm0DrI+q3owEFOixsOHvdsh+jdSkW?=
- =?us-ascii?Q?lU9IbQltFmW9LtKsy/7jokPWl/d413uyBmPlE+MJpqbNy9R8go9kqy9U+f7+?=
- =?us-ascii?Q?Y5g+1/FL2sDDIWbhakNwfEiBFsL5lz7zpMLW3oUFdUIMx8v3alR0dvB0FZTH?=
- =?us-ascii?Q?E3hDXKSVLLeAaduXqKHUz7FuxwUdPkPRFIayp9pbqA6dbnRFt1cEndwDp19m?=
- =?us-ascii?Q?EQdYIgOrA3Y0gSRjG/Wi7GQEm8uVSy9mJCO+2dfYnUFvsrdSQAIXTuoWn0E8?=
- =?us-ascii?Q?Yb6g4b/bpOeqMmwg6loWQSpaHK4vRuwNJ1JX++5idnqgW/+NPszpvndfR1nv?=
- =?us-ascii?Q?wm4jDuZGRmDWtj9xZVkbiiaqgb4MZjbWRPy8lpy85kvpIFPjQlDKCChj4hUb?=
- =?us-ascii?Q?7cmaQtwx3aap5WzYhbkIAb+SDbjhwUTU58QPijxdYh4BV3U6LxiQsgz41jZV?=
- =?us-ascii?Q?klynxBjJlKLcfwtPd7XRAbE8Zn8Xupy/FtJXiuPtXv2KW7u4qOBwLAlKjkGM?=
- =?us-ascii?Q?LPYqh18WSjkJw1fRB7Xa5Bi3o0ncA+6iYzAVf1e/D/+ItTwx898b1WVY/mjQ?=
- =?us-ascii?Q?u1sfHAumpwZN4JkNcKeKWZsHqgQ4mtCPyh+dBNOFGLjIfDHHHpn9TQm6H2U9?=
- =?us-ascii?Q?/yP5NoSN2wwyBM/7FRSX9pr0w1V+SstcJehzJ2/f2eXfG688eOlG4GL99vR+?=
- =?us-ascii?Q?kAMnxFiYYXZhzvZg1Z1xZcg0bSCQr2Rtv1iCKGmGY6jM+DuQtZxnNW3r3dtC?=
- =?us-ascii?Q?adJcakJCzFGyT9C8wijMdPF6M++VBOQTj7kliNjGTmQUn01KrLk1W6ZCiMbC?=
- =?us-ascii?Q?+w/W9HIFjNyhEgVjATVFtllNtrzPQim4uyUKAFPo1D5Nb8zXN1GsnWZ/1J/n?=
- =?us-ascii?Q?qQOAPKTeckDdQCdzkHA+Jv8+4iUL+p4zSzXBy7o0+khujFg4a49nCVmGzUSf?=
- =?us-ascii?Q?UummehYJ802dm6oza40GaqfoYaXHY/Cgq25G3xZDUQ123rqndrCEKmp1ywvD?=
- =?us-ascii?Q?PfhFGcmUjz+1AWsaKkdmCd9B052za1cUAoInm6xOvYGEJYLJnGugyN1yYT45?=
- =?us-ascii?Q?UeP9tsqPfGL2L+h7bbdcBJf7doGCM4kF9EqGwFVJL1zaTlGokdp6sENmoUzE?=
- =?us-ascii?Q?02BysioV6fqVrZ+jMd/7na0p8rPiULQt0uumP2RUj1bPZY4vX2iHrmN6+4M3?=
- =?us-ascii?Q?DndKIG4F2/2Sng4G0WbknIm7Vx4OFssXl/sRB6cKWfHRuRBaMdkbnWvGcG4v?=
- =?us-ascii?Q?oIJ0cEoBpHX/rO2Lsbw8kJoHXfNWWzIP2IQdiT+mTHvSoV2aIvORSd7OKoIS?=
- =?us-ascii?Q?fwyQ6aS2DHAGNKeKRFRZV8chO5SNeyi2B9MFEkd4MSWkGeBzZGXU7TwSC6+x?=
- =?us-ascii?Q?VUnKWbaYoAaVdcOhpRa/DbJqs/DBGqz6wweCpyhfjiYJOJFz93HGXfaJveCI?=
- =?us-ascii?Q?ubksrPMJUtcLyLerqhW8KantITGmFkkMuqKBo6tRckQp/1Zw/Rzh6RgJJm2p?=
- =?us-ascii?Q?qe4MsuejjB0ceG/BSr9Szc9biEfPAp2UtdD6A9ggRsNMl5P8dGiUAajYFlMF?=
- =?us-ascii?Q?2MS1ENSTCJldvBkjjXH0D4FGXbzWcfB6gwxQ+SlpoGk94FnYNaGCNW+ErPHr?=
- =?us-ascii?Q?/Er3HVJn4A=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1774537602; c=relaxed/simple;
+	bh=nx+HteyFFI7AdLCbzO0p1t9BN73xaw3YXEyCtzkUVzM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h9Yzre9t1h7U4D32j1t+YWWDtwV6zndxe9wUYrCEfd0FKfgE6bkG0Z69422H+1uqB0zFDOXLkhWBQll9I+a/mJsAwGQmtswIzlo1AKgvW3qOZjpy2JMz1PfLVsbLUzkjfBIt4DwXWl6JtaomjrEiS+VEMKezxpPQW0LUoMexxPI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gipltejb; arc=pass smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-82a62714fe6so455182b3a.0
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 08:06:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774537599; cv=none;
+        d=google.com; s=arc-20240605;
+        b=iFsewF8nMtCbEMs8rGYJqjKY7LmeG70TqMuI67KT8DP3XWwt6p7rpf9Wp4/urKj4Dq
+         b+zFmUoZZ4TuCxtke5ToH7XrYoDjAvQT0saLk67E1SWO4QsGFecumyGhElUJpajhX8hY
+         r3cpzp2pklr3kTSYC+c6nbT8c/zjRDw4pZNcZ9ZUoF9dZl5j224QyK73TCh1xVM7lyA9
+         1ZYU7XHH9UnFs7bK4ZVp35fR3+Hq5DZU5dIiGo2k5eWS5E9icxz4f6XkpJlx2fQ3nxTm
+         JHAGvlhydhJDr9hRU4qWC3nrzJGYR4bpwo2yj9lxE+uWuZeqTvA/Y/fvfs4J9gyrKwCf
+         30ZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=FUKqGwYD1hO9AzJAT2EYReBMkJDIVIx9w5Zc+Jzl0to=;
+        fh=9Rdk8HXD3GS6RvUAdNv38kYiVbkJZfpNDtTDAy/OGVI=;
+        b=ig1qepRxr7EebRNLN5L9IcT0FfYd0CYQnyzjOQUsz2e7qRQkmYl8bD1ObUsv4Jcm3u
+         KJ8yL7fxz/N4eV72vSnw8bWNcFXwfchfchb3ey6uMqvcxMU44G5kyBEnTWxh922zFWVH
+         CSnZs8d5asUkKRhQR/XlSBQQL50+unSv08EIt63odsmP1bWTDZerrkSyJhB8/dGVVgX/
+         MlLxqRFC9h6WsflJLbZWwWpk2Z6N1RLQ8B0bEtMENpBY5DtISMS8/AARf8dL/Le3FVos
+         q7lxkBbP6TES8tU4LmnYyE9fDdfk9EDvwHcLqSQ9Vnb4BvqTol5vtjDYLpNNO5vitWXc
+         9AdQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774537599; x=1775142399; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FUKqGwYD1hO9AzJAT2EYReBMkJDIVIx9w5Zc+Jzl0to=;
+        b=Gipltejbu8PcyXLyatr9VpWcZW/SjQnL8a7RnVt7utJAeZcl3/eKPvnW4pkw7yX2Sb
+         7KlscCBYz+KTrG1CW/iWf+nPtw+CclmCogkJzmid6BNJnH5T2H0/mTbG1CSfD5AjQeFP
+         HsAw4OqRTr82h2452k86F8sZw6BDtQDR5HFQEtCHdYwSX3ENl9H8coly4Pa2kmr/+foC
+         JNWldNLbtNlsaoGxLx+DKaIJi/lXH/m4hNRdAVZMyRBsiKgMRjPSHHjMd+TRRp0B9bO+
+         sGKGKwaH4rjjDa9t0N4/vbUDsrJKF0qJqFpdu0LgdImfcyaIv+BQ3h2EHyW2wUKRO12V
+         ruCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774537599; x=1775142399;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=FUKqGwYD1hO9AzJAT2EYReBMkJDIVIx9w5Zc+Jzl0to=;
+        b=WqJOx5qEjFoVNymUuU9ej2b32wHXF1ftGKA5TjQQ8kY0nE8cEQ7yY2D9K7A8n4Dyj6
+         fX7X8BCZ6679hms9RuGGi7re4GfX5b1k/QDVJQ5A3iGXYaJ4pcVjW/U+gjI+dr2UNkbC
+         siBQ0+EJtjBdjZQ4ObIq23USOSm7ruebzzPWMa8DAQ9hx7r2wkybE+gY/tObYdah9ZrS
+         nRjVMyD/jUtwmrgcKxCVi73Dg+DrOyHUUKM2uzkm/vAfjZbzMxu0F8q+2OOjRsYaBLQ6
+         5PvKdA1eyF+0awiPsS6C+s3yG/BVNfkJXJZSztycTrlCB94H4tgyvs0YdrPbx80j2m7c
+         zHEg==
+X-Gm-Message-State: AOJu0YxjMCYQkp7yUdltOF55YygXu9B5EqrHUcKERoFZ2kdiNjnIXftD
+	Zd8GhnR6hVmRtplP3KyH3XRKzbO/wmAgYoM0Ypbjw8KkcNv0wRwZR1h8hMyLrLNOIj3HBDCjVRy
+	xd9T8gncYGjf8qoulSh8wTsp7ArJSvz31RMDAa1w=
+X-Gm-Gg: ATEYQzwx0Ok5+nEL/av7LVgzDMW7liXUr/xV1bcCSzPF79Yupbj7QZywjT+fJmnkjZH
+	tpCA4JVe2gQeOlzKnMJhV817WM3siN1TrYOJBM+m2JzfL8pdoLq3NTUMqL9mxN1eTvwy5NPdc11
+	/u6/eA2mm/EI9tHpSXNYND+5ZdLiDFHGrmiFJUQ90Jr+4lPUI1ImWWNtaLyvc/WGDKrPpRJTesF
+	diubBVamuk68hBscC5B34X/LBVhyjfWJCW9c8whuwa9gcNTC2YdoTWJPnd+m5elngzXY+tQrS/s
+	VMKu+k9g1c64r45ep9R89Bves4shkFkKpihbkdZ2ebirMm1iVJs/LjwGrBBKNJEW2cqQabOwDFn
+	mgs/IlD4w8DYnL8zPL2NkciaRICw7F5vTmQfpIcK9
+X-Received: by 2002:a05:6a00:4c98:b0:81e:1b77:9e61 with SMTP id
+ d2e1a72fcca58-82c869d2a33mr2142434b3a.25.1774537598837; Thu, 26 Mar 2026
+ 08:06:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY1PR21MB3870.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d39cdc08-b6ca-4b83-80b8-08de8b48fa84
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Mar 2026 15:04:28.9885
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: eNfEbVSyfA6NHG54scVvL1iXvGOM/5BUE5OWwCcWPedrvCDOUFfXoBGyOa/4QYd/3x+vXArDe8br/4OqPaNWrQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV9PR21MB5406
-X-Spamd-Result: default: False [1.34 / 15.00];
+References: <cover.1774410440.git.lucien.xin@gmail.com> <91c6fd0a44eb15a98f945171ead8062badb89a60.1774410440.git.lucien.xin@gmail.com>
+In-Reply-To: <91c6fd0a44eb15a98f945171ead8062badb89a60.1774410440.git.lucien.xin@gmail.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 26 Mar 2026 11:06:26 -0400
+X-Gm-Features: AQROBzACuwjYsLpIayq--PQOH3i87OCQN6VqDXDB4GciP-GOMwzf9UMuCvDrrpY
+Message-ID: <CADvbK_eXUfnGGQgGc_k-ecCW3-Co1MpGb7UvMgLonPy3HRhyFA@mail.gmail.com>
+Subject: Re: [PATCH net-next v11 06/15] quic: add stream management
+To: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>, 
+	"Marc E . Fiuczynski" <marc@fiuczynski.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[microsoft.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[microsoft.com:s=selector2];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272103-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[microsoft.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haiyangz@microsoft.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-272104-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[35];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,samba.org,openbsd.org,xiaomi.com,simula.no,vger.kernel.org,gmail.com,manguebit.com,talpey.com,lists.linux.dev,oracle.com,suse.de,johnericson.me,linux.alibaba.com,akamai.com,protonmail.com,queasysnail.net,haxx.se,broadcom.com,fiuczynski.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 640663377AA
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lucienxin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: 1C3733375A7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-
-> -----Original Message-----
-> From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-> Sent: Tuesday, March 24, 2026 2:14 PM
-> To: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
-> <haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
-> <DECUI@microsoft.com>; andrew+netdev@lunn.ch; davem@davemloft.net;
-> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; leon@kernel.org;
-> Long Li <longli@microsoft.com>; Konstantin Taranov
-> <kotaranov@microsoft.com>; horms@kernel.org;
-> shradhagupta@linux.microsoft.com; ssengar@linux.microsoft.com;
-> ernis@linux.microsoft.com; Shiraz Saleem <shirazsaleem@microsoft.com>;
-> linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org; linux-rdma@vger.kernel.org;
-> stephen@networkplumber.org; jacob.e.keller@intel.com; Dipayaan Roy
-> <dipayanroy@microsoft.com>
-> Subject: [PATCH net,v2] net: mana: Fix RX skb truesize accounting
->=20
-> MANA passes rxq->alloc_size to napi_build_skb() for all RX buffers.
-> It is correct for fragment-backed RX buffers, where alloc_size matches
-> the actual backing allocation used for each packet buffer. However, in
-> the non-fragment RX path mana allocates a full page, or a higher-order
-> page, per RX buffer. In that case alloc_size only reflects the usable
-> packet area and not the actual backing memory.
->=20
-> This causes napi_build_skb() to underestimate the skb backing allocation
-> in the single-buffer RX path, so skb->truesize is derived from a value
-> smaller than the real RX buffer allocation.
->=20
-> Fix this by updating alloc_size in the non-fragment RX path to the
-> actual backing allocation size before it is passed to napi_build_skb().
->=20
-> Fixes: 730ff06d3f5c ("net: mana: Use page pool fragments for RX buffers
-> instead of full pages to improve memory efficiency.")
-> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-
+On Tue, Mar 24, 2026 at 11:49=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wr=
+ote:
+>
+> This patch introduces 'struct quic_stream_table' for managing QUIC stream=
+s,
+> each represented by 'struct quic_stream'.
+>
+> It implements mechanisms for acquiring and releasing streams on both the
+> send and receive paths, ensuring efficient lifecycle management during
+> transmission and reception.
+>
+> - quic_stream_get(): Acquire a send-side stream by ID and flags during
+>   TX path, or a receive-side stream by ID during RX path.
+>
+> - quic_stream_put(): Release a send-side stream when sending is done,
+>   or a receive-side stream when receiving is done.
+>
+> It includes logic to detect when stream ID limits are reached and when
+> control frames should be sent to update or request limits from the peer.
+>
+> - quic_stream_id_exceeds(): Check a stream ID would exceed local (recv)
+>   or peer (send) limits.
+>
+> - quic_stream_max_streams_update(): Determines whether a
+>   MAX_STREAMS_UNI/BIDI frame should be sent to the peer.
+>
+> Note stream hash table is per socket, the operations on it are always
+> protected by the sock lock.
+>
+> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> Acked-by: Paolo Abeni <pabeni@redhat.com>
 > ---
-> Changes in v2:
->  - Added maintainers missed in v1.
+> v3:
+>   - Merge send/recv stream helpers into unified functions to reduce code:
+>     * quic_stream_id_send/recv() =E2=86=92 quic_stream_id_valid()
+>     * quic_stream_id_send/recv_closed() =E2=86=92 quic_stream_id_closed()
+>     * quic_stream_id_send/recv_exceeds() =E2=86=92 quic_stream_id_exceeds=
+()
+>     (pointed out by Paolo).
+>   - Clarify in changelog that stream hash table is always protected by so=
+ck
+>     lock (suggested by Paolo).
+>   - quic_stream_init/free(): adjust for new hashtable type; call
+>     quic_stream_delete() in quic_stream_free() to avoid open-coded logic.
+>   - Receiving streams: delete stream only when fully read or reset, inste=
+ad
+>     of when no data was received. Prevents freeing a stream while a FIN
+>     with no data is still queued.
+> v4:
+>   - Replace struct quic_shash_table with struct hlist_head for the
+>     stream hashtable. Since they are protected by the socket lock,
+>     no per-chain lock is needed.
+>   - Initialize stream to NULL in stream creation functions to avoid
+>     warnings from Smatch (reported by Simon).
+>   - Allocate send streams with GFP_KERNEL_ACCOUNT and receive streams
+>     with GFP_ATOMIC | __GFP_ACCOUNT for memory accounting (suggested
+>     by Paolo).
+> v5:
+>   - Introduce struct quic_stream_limits to merge quic_stream_send_create(=
+)
+>     and quic_stream_recv_create(), and to simplify quic_stream_get_param(=
+)
+>     (suggested by Paolo).
+>   - Annotate the sock-lock requirement for quic_stream_send/recv_get()
+>     and quic_stream_send/recv_put() (notied by Paolo).
+>   - Add quic_stream_bidi_put() to deduplicate the common logic between
+>     quic_stream_send_put() and quic_stream_recv_put().
+>   - Remove the unnecessary check when incrementing
+>     streams->send.next_bidi/uni_stream_id in quic_stream_create().
+>   - Remove the unused 'is_serv' parameter from quic_stream_get_param().
+> v7:
+>   - Free the allocated streams on error path in quic_stream_create() (not=
+ed
+>     by Paolo).
+>   - Merge quic_stream_send_get/put() and quic_stream_recv_get/put() helpe=
+rs
+>     to quic_stream_get/put() (suggested by Paolo).
+>   - Add more comments in quic_stream_id_exceeds() and quic_stream_create(=
+).
+> v8:
+>   - Replace bitfields with plain u8 in struct quic_stream_limits and stru=
+ct
+>     quic_stream (suggested by Paolo).
+> v9:
+>   - Fix grammar in the comment for quic_stream::send.window.
+> v10:
+>   - Move quic_stream_init() to after sock_prot_inuse_add() ensure counter=
+s
+>     are incremented before any early return paths in quic_init_sock(),
+>     preventing underflow in quic_destroy_sock() (noted by AI review).
+>   - Initialize the output parameters '*max_uni' and '*max_bidi' to 0 at t=
+he
+>     start of quic_stream_max_streams_update()
+>   - Use 'stream->recv.state > QUIC_STREAM_RECV_STATE_RECVD' instead of '!=
+=3D'
+>     for clearer intent.
+>   - Simplify some state checks in quic_stream_put() by using range
+>     comparisons (> or <) instead of multiple !=3D conditions.
+>   - streams_uni/bidi are u16 type, and their overflow is already prevente=
+d
+>     by QUIC_MAX_STREAMS indirectly. Update comment in quic_stream_create(=
+).
+>   - Replace open-coded kzalloc(sizeof(*stream)) with kzalloc_obj(*stream)
+>     in quic_stream_create().
+> v11:
+>   - Set maximum line length to 80 characters.
+>   - Change is_serv parameter type to bool in quic_stream_id_local().
 > ---
->  drivers/net/ethernet/microsoft/mana/mana_en.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->=20
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index ea71de39f996..884f8e548174 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -766,6 +766,13 @@ static void mana_get_rxbuf_cfg(struct
-> mana_port_context *apc,
->  		}
->=20
->  		*frag_count =3D 1;
+>  net/quic/Makefile |   2 +-
+>  net/quic/socket.c |   5 +
+>  net/quic/socket.h |   8 +
+>  net/quic/stream.c | 444 ++++++++++++++++++++++++++++++++++++++++++++++
+>  net/quic/stream.h | 133 ++++++++++++++
+>  5 files changed, 591 insertions(+), 1 deletion(-)
+>  create mode 100644 net/quic/stream.c
+>  create mode 100644 net/quic/stream.h
+>
+> diff --git a/net/quic/Makefile b/net/quic/Makefile
+> index 13bf4a4e5442..094e9da5d739 100644
+> --- a/net/quic/Makefile
+> +++ b/net/quic/Makefile
+> @@ -5,4 +5,4 @@
+>
+>  obj-$(CONFIG_IP_QUIC) +=3D quic.o
+>
+> -quic-y :=3D common.o family.o protocol.o socket.o
+> +quic-y :=3D common.o family.o protocol.o socket.o stream.o
+> diff --git a/net/quic/socket.c b/net/quic/socket.c
+> index 8dc2cb7628db..0006668551f4 100644
+> --- a/net/quic/socket.c
+> +++ b/net/quic/socket.c
+> @@ -45,11 +45,16 @@ static int quic_init_sock(struct sock *sk)
+>         sk_sockets_allocated_inc(sk);
+>         sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
+>
+> +       if (quic_stream_init(quic_streams(sk)))
+> +               return -ENOMEM;
 > +
-> +		/* In the single-buffer path, napi_build_skb() must see the
-> +		 * actual backing allocation size so skb->truesize reflects
-> +		 * the full page (or higher-order page), not just the usable
-> +		 * packet area.
-> +		 */
-> +		*alloc_size =3D PAGE_SIZE << get_order(*alloc_size);
->  		return;
->  	}
->=20
-> --
-> 2.43.0
->=20
+>         return 0;
+>  }
+>
+>  static void quic_destroy_sock(struct sock *sk)
+>  {
+> +       quic_stream_free(quic_streams(sk));
+> +
+>         quic_data_free(quic_ticket(sk));
+>         quic_data_free(quic_token(sk));
+>         quic_data_free(quic_alpn(sk));
+> diff --git a/net/quic/socket.h b/net/quic/socket.h
+> index 61df0c5867be..e76737b9b74b 100644
+> --- a/net/quic/socket.h
+> +++ b/net/quic/socket.h
+> @@ -13,6 +13,7 @@
+>
+>  #include "common.h"
+>  #include "family.h"
+> +#include "stream.h"
+>
+>  #include "protocol.h"
+>
+> @@ -33,6 +34,8 @@ struct quic_sock {
+>         struct quic_data                ticket;
+>         struct quic_data                token;
+>         struct quic_data                alpn;
+> +
+> +       struct quic_stream_table        streams;
+>  };
+>
+>  struct quic6_sock {
+> @@ -65,6 +68,11 @@ static inline struct quic_data *quic_alpn(const struct=
+ sock *sk)
+>         return &quic_sk(sk)->alpn;
+>  }
+>
+> +static inline struct quic_stream_table *quic_streams(const struct sock *=
+sk)
+> +{
+> +       return &quic_sk(sk)->streams;
+> +}
+> +
+>  static inline bool quic_is_serv(const struct sock *sk)
+>  {
+>         return !!sk->sk_max_ack_backlog;
+> diff --git a/net/quic/stream.c b/net/quic/stream.c
+> new file mode 100644
+> index 000000000000..4d980f9b03ce
+> --- /dev/null
+> +++ b/net/quic/stream.c
+> @@ -0,0 +1,444 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/* QUIC kernel implementation
+> + * (C) Copyright Red Hat Corp. 2023
+> + *
+> + * This file is part of the QUIC kernel implementation
+> + *
+> + * Initialization/cleanup for QUIC protocol support.
+> + *
+> + * Written or modified by:
+> + *    Xin Long <lucien.xin@gmail.com>
+> + */
+> +
+> +#include <linux/quic.h>
+> +
+> +#include "common.h"
+> +#include "stream.h"
+> +
+> +/* Check if a stream ID is valid for sending or receiving. */
+> +static bool quic_stream_id_valid(s64 stream_id, bool is_serv, bool send)
+> +{
+> +       u8 type =3D (stream_id & QUIC_STREAM_TYPE_MASK);
+> +
+> +       if (send) {
+> +               if (is_serv)
+> +                       return type !=3D QUIC_STREAM_TYPE_CLIENT_UNI;
+> +               return type !=3D QUIC_STREAM_TYPE_SERVER_UNI;
+> +       }
+> +       if (is_serv)
+> +               return type !=3D QUIC_STREAM_TYPE_SERVER_UNI;
+> +       return type !=3D QUIC_STREAM_TYPE_CLIENT_UNI;
+> +}
+> +
+> +/* Check if a stream ID was initiated locally. */
+> +static bool quic_stream_id_local(s64 stream_id, bool is_serv)
+> +{
+> +       return is_serv ^ !(stream_id & QUIC_STREAM_TYPE_SERVER_MASK);
+> +}
+> +
+> +/* Check if a stream ID represents a unidirectional stream. */
+> +static bool quic_stream_id_uni(s64 stream_id)
+> +{
+> +       return stream_id & QUIC_STREAM_TYPE_UNI_MASK;
+> +}
+> +
+> +#define QUIC_STREAM_HT_SIZE    64
+> +
+> +static struct hlist_head *quic_stream_head(struct quic_stream_table *str=
+eams,
+> +                                          s64 stream_id)
+> +{
+> +       return &streams->head[stream_id & (QUIC_STREAM_HT_SIZE - 1)];
+> +}
+> +
+> +struct quic_stream *quic_stream_find(struct quic_stream_table *streams,
+> +                                    s64 stream_id)
+> +{
+> +       struct hlist_head *head =3D quic_stream_head(streams, stream_id);
+> +       struct quic_stream *stream;
+> +
+> +       hlist_for_each_entry(stream, head, node) {
+> +               if (stream->id =3D=3D stream_id)
+> +                       break;
+> +       }
+> +       return stream;
+> +}
+> +
+> +static void quic_stream_add(struct quic_stream_table *streams,
+> +                           struct quic_stream *stream)
+> +{
+> +       struct hlist_head *head;
+> +
+> +       head =3D quic_stream_head(streams, stream->id);
+> +       hlist_add_head(&stream->node, head);
+> +}
+> +
+> +static void quic_stream_delete(struct quic_stream *stream)
+> +{
+> +       hlist_del_init(&stream->node);
+> +       kfree(stream);
+> +}
+> +
+> +/* Create and register new streams for sending or receiving. */
+> +static struct quic_stream *quic_stream_create(struct quic_stream_table *=
+streams,
+> +                                             s64 max_stream_id, bool sen=
+d,
+> +                                             bool is_serv)
+> +{
+> +       struct quic_stream_limits *limits =3D &streams->send;
+> +       struct quic_stream *pos, *stream =3D NULL;
+> +       gfp_t gfp =3D GFP_KERNEL_ACCOUNT;
+> +       struct hlist_node *tmp;
+> +       HLIST_HEAD(head);
+> +       s64 stream_id;
+> +       u32 count =3D 0;
+> +
+> +       if (!send) {
+> +               limits =3D &streams->recv;
+> +               gfp =3D GFP_ATOMIC | __GFP_ACCOUNT;
+> +       }
+> +       stream_id =3D limits->next_bidi_stream_id;
+> +       if (quic_stream_id_uni(max_stream_id))
+> +               stream_id =3D limits->next_uni_stream_id;
+> +
+> +       /* rfc9000#section-2.1: A stream ID that is used out of order res=
+ults in
+> +        * all streams of that type with lower-numbered stream IDs also b=
+eing
+> +        * opened.
+> +        */
+> +       while (stream_id <=3D max_stream_id) {
+> +               stream =3D kzalloc_obj(*stream, gfp);
+> +               if (!stream)
+> +                       goto free;
+> +
+> +               stream->id =3D stream_id;
+> +               if (quic_stream_id_uni(stream_id)) {
+> +                       if (send) {
+> +                               stream->send.max_bytes =3D
+> +                                       limits->max_stream_data_uni;
+> +                       } else {
+> +                               stream->recv.max_bytes =3D
+> +                                       limits->max_stream_data_uni;
+> +                               stream->recv.window =3D stream->recv.max_=
+bytes;
+> +                       }
+> +                       hlist_add_head(&stream->node, &head);
+> +                       stream_id +=3D QUIC_STREAM_ID_STEP;
+> +                       continue;
+> +               }
+> +
+> +               if (quic_stream_id_local(stream_id, is_serv)) {
+> +                       stream->send.max_bytes =3D
+> +                               streams->send.max_stream_data_bidi_remote=
+;
+> +                       stream->recv.max_bytes =3D
+> +                               streams->recv.max_stream_data_bidi_local;
+> +               } else {
+> +                       stream->send.max_bytes =3D
+> +                               streams->send.max_stream_data_bidi_local;
+> +                       stream->recv.max_bytes =3D
+> +                               streams->recv.max_stream_data_bidi_remote=
+;
+> +               }
+> +               stream->recv.window =3D stream->recv.max_bytes;
+> +               hlist_add_head(&stream->node, &head);
+> +               stream_id +=3D QUIC_STREAM_ID_STEP;
+> +       }
+> +
+> +       hlist_for_each_entry_safe(pos, tmp, &head, node) {
+> +               hlist_del_init(&pos->node);
+> +               quic_stream_add(streams, pos);
+> +               count++;
+> +       }
+> +
+> +       /* Streams must be opened sequentially. Update the next stream ID=
+ so the
+> +        * correct starting point is known if an out-of-order open is req=
+uested.
+> +        * Note overflow of next_uni/bidi_stream_id is impossible with s6=
+4.
+> +        */
+> +       if (quic_stream_id_uni(stream_id)) {
+> +               limits->next_uni_stream_id =3D stream_id;
+> +               limits->streams_uni +=3D count;
+> +               return stream;
+> +       }
+> +
+> +       limits->next_bidi_stream_id =3D stream_id;
+> +       limits->streams_bidi +=3D count;
+> +       return stream;
+> +
+> +free:
+> +       hlist_for_each_entry_safe(pos, tmp, &head, node) {
+> +               hlist_del_init(&pos->node);
+> +               kfree(pos);
+> +       }
+> +       return NULL;
+> +}
+> +
+> +/* Check if a send or receive stream ID is already closed. */
+> +static bool quic_stream_id_closed(struct quic_stream_table *streams,
+> +                                 s64 stream_id, bool send)
+> +{
+> +       struct quic_stream_limits *limits =3D send ? &streams->send :
+> +                                                  &streams->recv;
+> +
+> +       if (quic_stream_id_uni(stream_id))
+> +               return stream_id < limits->next_uni_stream_id;
+> +       return stream_id < limits->next_bidi_stream_id;
+> +}
+> +
+> +/* Check if a stream ID would exceed local (recv) or peer (send) limits.=
+ */
+> +bool quic_stream_id_exceeds(struct quic_stream_table *streams, s64 strea=
+m_id,
+> +                           bool send)
+> +{
+> +       u64 nstreams;
+> +
+> +       if (!send) {
+> +               /* recv.max_uni_stream_id is updated in
+> +                * quic_stream_max_streams_update() already based on
+> +                * next_uni/bidi_stream_id, max_streams_uni/bidi, and
+> +                * streams_uni/bidi, so only recv.max_uni_stream_id needs=
+ to be
+> +                * checked.
+> +                */
+> +               if (quic_stream_id_uni(stream_id))
+> +                       return stream_id > streams->recv.max_uni_stream_i=
+d;
+> +
+> +               return stream_id > streams->recv.max_bidi_stream_id;
+> +       }
+> +
+> +       if (quic_stream_id_uni(stream_id)) {
+> +               if (stream_id > streams->send.max_uni_stream_id)
+> +                       return true;
+> +               stream_id -=3D streams->send.next_uni_stream_id;
+> +               nstreams =3D quic_stream_id_to_streams(stream_id);
+> +
+> +               return nstreams + streams->send.streams_uni >
+> +                      streams->send.max_streams_uni;
+> +       }
+> +
+> +       if (stream_id > streams->send.max_bidi_stream_id)
+> +               return true;
+> +       stream_id -=3D streams->send.next_bidi_stream_id;
+> +       nstreams =3D quic_stream_id_to_streams(stream_id);
+> +
+> +       return nstreams + streams->send.streams_bidi >
+> +              streams->send.max_streams_bidi;
+> +}
+> +
+> +/* Get or create a send or recv stream by ID. Requires sock lock held. *=
+/
+> +struct quic_stream *quic_stream_get(struct quic_stream_table *streams,
+> +                                   s64 stream_id, u32 flags, bool is_ser=
+v,
+> +                                   bool send)
+> +{
+> +       struct quic_stream *stream;
+> +
+> +       if (!quic_stream_id_valid(stream_id, is_serv, send))
+> +               return ERR_PTR(-EINVAL);
+> +
+> +       stream =3D quic_stream_find(streams, stream_id);
+> +       if (stream) {
+> +               if (send && (flags & MSG_QUIC_STREAM_NEW) &&
+> +                   stream->send.state !=3D QUIC_STREAM_SEND_STATE_READY)
+> +                       return ERR_PTR(-EINVAL);
+> +               return stream;
+> +       }
+> +
+> +       if (!send && quic_stream_id_local(stream_id, is_serv)) {
+> +               if (quic_stream_id_closed(streams, stream_id, !send))
+> +                       return ERR_PTR(-ENOSTR);
+> +               return ERR_PTR(-EINVAL);
+> +       }
+> +
+> +       if (quic_stream_id_closed(streams, stream_id, send))
+> +               return ERR_PTR(-ENOSTR);
+> +
+> +       if (send && !(flags & MSG_QUIC_STREAM_NEW))
+> +               return ERR_PTR(-EINVAL);
+> +
+> +       if (quic_stream_id_exceeds(streams, stream_id, send))
+> +               return ERR_PTR(-EAGAIN);
+> +
+> +       stream =3D quic_stream_create(streams, stream_id, send, is_serv);
+> +       if (!stream)
+> +               return ERR_PTR(-ENOSTR);
+> +
+> +       if (send || quic_stream_id_valid(stream_id, is_serv, !send))
+> +               streams->send.active_stream_id =3D stream_id;
+> +
+> +       return stream;
+> +}
+> +
+> +/* Release or clean up a send or recv stream. This function updates stre=
+am
+> + * counters and state when a send stream has either successfully sent al=
+l data
+> + * or has been reset, or when a recv stream has either consumed all data=
+ or has
+> + * been reset. Requires sock lock held.
+> + */
+> +void quic_stream_put(struct quic_stream_table *streams,
+> +                    struct quic_stream *stream, bool is_serv, bool send)
+> +{
+> +       if (quic_stream_id_uni(stream->id)) {
+> +               if (send) {
+> +                       /* For uni streams, decrement uni count and delet=
+e
+> +                        * immediately.
+> +                        */
+> +                       streams->send.streams_uni--;
+> +                       quic_stream_delete(stream);
+> +                       return;
+> +               }
+> +               /* For uni streams, decrement uni count and mark done. */
+> +               if (!stream->recv.done) {
+> +                       stream->recv.done =3D 1;
+> +                       streams->recv.streams_uni--;
+> +                       streams->recv.uni_pending =3D 1;
+> +               }
+> +               /* Delete stream if fully read or reset. */
+> +               if (stream->recv.state > QUIC_STREAM_RECV_STATE_RECVD)
+> +                       quic_stream_delete(stream);
+> +               return;
+> +       }
+> +
+> +       if (send) {
+> +               /* For bidi streams, only proceed if receive side is in a=
+ final
+> +                * state.
+> +                */
+> +               if (stream->recv.state < QUIC_STREAM_RECV_STATE_RECVD)
+> +                       return;
+> +       } else {
+> +               /* For bidi streams, only proceed if send side is in a fi=
+nal
+> +                * state.
+> +                */
+> +               if (stream->send.state !=3D QUIC_STREAM_SEND_STATE_RECVD =
+&&
+> +                   stream->send.state !=3D QUIC_STREAM_SEND_STATE_RESET_=
+RECVD)
+> +                       return;
+> +       }
+> +
+> +       if (quic_stream_id_local(stream->id, is_serv)) {
+> +               /* Local-initiated stream: mark send done and decrement
+> +                * send.bidi count.
+> +                */
+> +               if (!stream->send.done) {
+> +                       stream->send.done =3D 1;
+> +                       streams->send.streams_bidi--;
+> +               }
+> +       } else {
+> +               /* Remote-initiated stream: mark recv done and decrement =
+recv
+> +                * bidi count.
+> +                */
+> +               if (!stream->recv.done) {
+> +                       stream->recv.done =3D 1;
+> +                       streams->recv.streams_bidi--;
+> +                       streams->recv.bidi_pending =3D 1;
+> +               }
+> +       }
+> +
+> +       /* Delete stream if fully read or reset. */
+> +       if (stream->recv.state > QUIC_STREAM_RECV_STATE_RECVD)
+> +               quic_stream_delete(stream);
+> +}
+> +
+> +/* Updates the maximum allowed incoming stream IDs if any streams were r=
+ecently
+> + * closed.  Recalculates the max_uni and max_bidi stream ID limits based=
+ on the
+> + * number of open streams and whether any were marked for deletion.
+> + *
+> + * Returns true if either max_uni or max_bidi was updated, indicating th=
+at a
+> + * MAX_STREAMS_UNI or MAX_STREAMS_BIDI frame should be sent to the peer.
+> + */
+> +bool quic_stream_max_streams_update(struct quic_stream_table *streams,
+> +                                   s64 *max_uni, s64 *max_bidi)
+> +{
+> +       s64 max, rem;
+> +
+> +       *max_uni =3D 0;
+> +       *max_bidi =3D 0;
+> +       if (streams->recv.uni_pending) {
+> +               rem =3D streams->recv.max_streams_uni - streams->recv.str=
+eams_uni;
+> +               max =3D streams->recv.next_uni_stream_id - QUIC_STREAM_ID=
+_STEP +
+> +                     (rem << QUIC_STREAM_TYPE_BITS);
+> +
+> +               streams->recv.max_uni_stream_id =3D max;
+> +               *max_uni =3D quic_stream_id_to_streams(max);
+> +               streams->recv.uni_pending =3D 0;
+> +       }
+> +       if (streams->recv.bidi_pending) {
+> +               rem =3D streams->recv.max_streams_bidi -
+> +                     streams->recv.streams_bidi;
+> +               max =3D streams->recv.next_bidi_stream_id - QUIC_STREAM_I=
+D_STEP +
+> +                       (rem << QUIC_STREAM_TYPE_BITS);
+> +
+> +               streams->recv.max_bidi_stream_id =3D max;
+> +               *max_bidi =3D quic_stream_id_to_streams(max);
+> +               streams->recv.bidi_pending =3D 0;
+> +       }
+> +
+> +       return *max_uni || *max_bidi;
+> +}
+> +
+> +int quic_stream_init(struct quic_stream_table *streams)
+> +{
+> +       struct hlist_head *head;
+> +       int i;
+> +
+> +       head =3D kmalloc_array(QUIC_STREAM_HT_SIZE, sizeof(*head), GFP_KE=
+RNEL);
+> +       if (!head)
+> +               return -ENOMEM;
+> +       for (i =3D 0; i < QUIC_STREAM_HT_SIZE; i++)
+> +               INIT_HLIST_HEAD(&head[i]);
+> +       streams->head =3D head;
+> +       return 0;
+> +}
+> +
+> +void quic_stream_free(struct quic_stream_table *streams)
+> +{
+> +       struct quic_stream *stream;
+> +       struct hlist_head *head;
+> +       struct hlist_node *tmp;
+> +       int i;
+> +
+> +       if (!streams->head)
+> +               return;
+> +
+> +       for (i =3D 0; i < QUIC_STREAM_HT_SIZE; i++) {
+> +               head =3D &streams->head[i];
+> +               hlist_for_each_entry_safe(stream, tmp, head, node)
+> +                       quic_stream_delete(stream);
+> +       }
+> +       kfree(streams->head);
+The AI report on
 
+  https://netdev-ai.bots.linux.dev/ai-review.html?id=3D1624d906-c0b6-4e12-a=
+63f-5cbfc51b660e#patch-5
+
+is false positive.
+
+As the sk_alloc() calls sk_prot_alloc() with __GFP_ZERO, and the streams->h=
+ead
+is always initialized to NULL.
 
