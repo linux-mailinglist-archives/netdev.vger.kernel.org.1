@@ -1,238 +1,176 @@
-Return-Path: <netdev+bounces-272207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272208-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mL0QEiCCxWlc+wQAu9opvQ
-	(envelope-from <netdev+bounces-272207-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:59:44 +0100
+	id 4CGNFlKCxWlc+wQAu9opvQ
+	(envelope-from <netdev+bounces-272208-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:00:34 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4D9933A9C0
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:59:43 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1994E33A9E6
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:00:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 88F25304E7C7
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:55:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EDC5A30A0ACE
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:57:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7058D3AEF26;
-	Thu, 26 Mar 2026 18:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB0543A3E72;
+	Thu, 26 Mar 2026 18:55:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="ofyhaqKm"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="eaUxL8Bw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013056.outbound.protection.outlook.com [40.93.201.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA13D3A6EE5
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 18:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774551297; cv=none; b=r2him2ClrzZdrVxsbelH+jiceH+YXVudlkNEwc6Nz/2lL/2hhRn4d4yzKkRQn2RdV4VGpkxy4NwVtrtJzPnb9zv3OW7S/M9Cayp+BNsbONmaCw6ecOmDUWZXqV9Ru/kj+3M0+q/Lkklam1dbBDZD84tu1TJxeGnv414s1D/7YN0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774551297; c=relaxed/simple;
-	bh=lxGVZBnf+08GsBICZP8sEEzOYODQn9bhbaVbS0q2K7c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SWpO5fkFYqGvkpKqK2axjOlZW5f4QDQCR3xjjEdQe+CygT/hekRHOXtInLfhEEGKWVYlN/ta1r3mIj+aG5DRNOj7gwE2OBcqIWcQ2SGlvLn3QKbuj3HiMLi+8JQAkD1lJGu6fnrxIZ4ljYXYLCpavplE2wqJ0+qOwF8AnpnYuSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=ofyhaqKm; arc=none smtp.client-ip=74.125.82.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-2bdcf5970cdso833571eec.0
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 11:54:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1774551295; x=1775156095; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=9Rz+Pt38YSBF4T0Yp1WHN3bpE/gP/jXbcLkY+ak3ozA=;
-        b=ofyhaqKmda+n31+of5vxgfvP6fXFIAeMxl3uPpU0YhuCY/oQ3P8yWnRRgrPZkBjoKv
-         8D+D8Q1TxqmiK+wHgNFQejv75gfSm2B2BsM4L1fnmCXdoH+ZZToO/BnhgRvU2roBbx3+
-         V75xgf1TUdf1UYelXPocHcUtgrj53PYUHpFjmlgQAwXL2QYs4/9DDRx/xWyQE0kVd+et
-         xAAjrFzKPSZb64ySXks1dIdqt0FgkvwE9jDbFhWIja6N3/PcNawyoTOyCd80T+a6h5JZ
-         eDzB/ktX4i9Xux77mdBcKZ/5PHjNYPy7fccGazbGf9ozCFw7PZD3+aVi8qJao5RpOQIs
-         HDcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774551295; x=1775156095;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Rz+Pt38YSBF4T0Yp1WHN3bpE/gP/jXbcLkY+ak3ozA=;
-        b=T1hN4T4yTQKIf68tAn4U5BB3weZfbE6wI+auI7ydkOwQhnZm+eDCsV9WjcVJATcw3b
-         pbGzazz1WCWFRtykz/OOByq62Z7c+FjKDvM2dLXhHQ7Ds6AoeZ9VBmcQP7s5lZmjoOMU
-         zA4bRxEh74Acp2USDT1514vnsOEgl+kHXJq4Fbfc527Qd5+8zoZy9YP3CgJWzmYxm/Yv
-         iUEFjE14c0Fx+1XMSJMQJpkugeLvGrtagOLX8J+unEvse/Cb6zN31ZfTjiTm7n0fa3zm
-         xmbThYyloJ6jzohZ3EerxwvzkP0sUJlx44Lq1NU+VtPxnydIul5NF5xVDGCBHvLWwh5D
-         HHMw==
-X-Gm-Message-State: AOJu0Yxf8bfx4x2PAKKeYpxorEjl6C0biw441K0cu09kGeNSq6b1LCql
-	8pbliYC3HQGn3kNXipHN2j78vnx7oJk5fh+Yu3TjDP3ppCcu4cd3ZrxMBm6iPpz4/w==
-X-Gm-Gg: ATEYQzwQQ6RRotPtxjW+nhjLYmhJlN5YtKKlFCpwx8hcJLhVzfe7WwgYhdhhOtLsf4O
-	/nVvwSTjSkI2PpK/0Jw/WTrnkhgbyb67d0UZgQxg7RvoMk0FEWn0Ot12TNCxFssy7TdyudSsQ7M
-	51PEgq9ToVepp5pTheKcgi6sI/AuNDY343+4vP0QfX2HR9YZEnncej3Qtve6ekM0APPK2DlZSFY
-	HL0UXnokuMSKeCeHnC8llyugeWJ+D/PaIfrpUh28Z5wvUQGmzuk88hYz5c9SyFE1UZcHJTLuxKi
-	HHVriwm2RP4tpNW2slu0sj7hDbajAo8ebSJbPo02F/OtcPXzbKMXUO+tyaWfLDYff+FHBgGIDVE
-	PdoU0oIheTk8fCI8qR0EwQBrj8ffJwLo2WKKbZZj/6ljMT+kYJ8Xd6GGnd97W2a5NSrH5U888gH
-	7yhb/nl7fZMQHLRpErv+ZYNO/DRfEjD3AKvYo6qNqd
-X-Received: by 2002:a05:7300:2153:b0:2c1:73d9:2790 with SMTP id 5a478bee46e88-2c1772a36e0mr1432271eec.21.1774551294722;
-        Thu, 26 Mar 2026 11:54:54 -0700 (PDT)
-Received: from p1 (209-147-138-15.nat.asu.edu. [209.147.138.15])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c16ed9f739sm3208457eec.16.2026.03.26.11.54.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 11:54:54 -0700 (PDT)
-Date: Thu, 26 Mar 2026 11:54:52 -0700
-From: Xiang Mei <xmei5@asu.edu>
-To: security@kernel.org
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, jhs@mojatatu.com, 
-	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	horms@kernel.org, bestswngs@gmail.com
-Subject: Re: [PATCH net v2] net/sched: sch_hfsc: fix divide-by-zero in
- rtsc_min()
-Message-ID: <g5kyhh74rriqg4ayz5txfqqtxpuklzu4kbkmcwihqpvyv4xq2s@xcpvtqh7bh5g>
-References: <20260326075851.3967598-1-xmei5@asu.edu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183C6425CF5;
+	Thu, 26 Mar 2026 18:55:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774551323; cv=fail; b=KGouRR3nRQEg4mNpiVdIgia9+nKEBNE7sXQCKpPLjjTHhMvagjUGsyEG2q0fv638sTVr4agrCcGikPAojTvVDloZ2y/1arxLZg5n4j8HlELkJOwHx1y4LPqYBIujqSFZDbcd8zgfpANKf2zgQVCFgLnL/KLki16fOGgERh2kXj0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774551323; c=relaxed/simple;
+	bh=D4Xo9d5ECb2xkXsdWEXBpDwTJVvFXNevXYR1KclmNk4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fMzh63bp/xT1uZEz8tN7RAuDzjeESaYNnJxwBry2YgiEB4R6GeOGA1PZdUNqdIeQ07DmxSTFjbhRYXzerisfBNrJBVy7w/t/cyTb7WhzppPWsQY/FCexcLa4gDqw8lA5G8RAmVDfaYOsXVadPNnm68nz+IwpMA/f8mnCPT67OPQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=eaUxL8Bw; arc=fail smtp.client-ip=40.93.201.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VCD8wH/ThRxkk4QrlaT4HxjQFXDspyiD1XQ9CUjnR+wt8qFftmoukQFBErX+b5g/rq32pR0IShhsRH6qbz4bZ+fWxBz51Sw6mvnXRqKFim4m2PozG3eMcWeKULQOQliIwYYxwl2FoMkVRL8JP1bj7sAq1r8JSS6KCthLqztVvmQgu2zYmRDvbkQZaGY1EDLdyC83Mo5j23BeQ9LO/uVwKQpJTI8DHoRNNqoW3pgODW/nGumE41lQ23XHwVwu9IF/hRZ+xkxkHnvsWKs1heIFF5vbdngIs/2vqmv0hV1WhsZlrK3GuJ+BzM0dpcrfj2VukXpAspVJHX5j800bRUqu+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=70dx2TmCW1kN7PAsE0EPd3QnAagndkpU7G4X0MLAceM=;
+ b=M/HfgSCCYmiL26u54teGoyBi6YjoW8RFFktVYLJQMtWXnOM7crnU9+vSmHbOfraBSvrZ5sznyLTSWowiqFLHbMroZTXyd+B2YGwBZEy2uGR/rLe9ZjvfYREo0HyDMm/QQxJZBpC6at2n5QY2lPSfa7LfoUKg8j818SYet/IPKgYWDHFF4+9wDyAKCqONJ8ThCxOaIKzWu+hz8CgwolVSxZA/nS3e3Xg3N416xLWRJcGl7E4bEclI6A7sfsktjckptWvXlKdyDZ7LzT86D1ZlqUwQsKI8PVgkK7x+V0QhG1W0DEIcKgY929nyO35aeVFCSSkC9OblwRSM56KkSsPApw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=70dx2TmCW1kN7PAsE0EPd3QnAagndkpU7G4X0MLAceM=;
+ b=eaUxL8BwydYqy6vOJb2MgwRG66stTafIxy8EmHsRmEbx6dfR0bjIzPRCn5KOXd4ZwpqPUeT+QqcLU9rpJE56F9JV3+ysvKE2TbwvIm8FaoNJ7eQ7NGgk/RzZDC3lPc7XZOQxU/mhxjg4BV7it3jiedNs6nKCCIw2kBUF3ytaQyM=
+Received: from BN9PR03CA0415.namprd03.prod.outlook.com (2603:10b6:408:111::30)
+ by DM4PR12MB8498.namprd12.prod.outlook.com (2603:10b6:8:183::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.7; Thu, 26 Mar
+ 2026 18:55:17 +0000
+Received: from BN2PEPF000044A0.namprd02.prod.outlook.com
+ (2603:10b6:408:111:cafe::6) by BN9PR03CA0415.outlook.office365.com
+ (2603:10b6:408:111::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.31 via Frontend Transport; Thu,
+ 26 Mar 2026 18:55:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ BN2PEPF000044A0.mail.protection.outlook.com (10.167.243.151) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9745.21 via Frontend Transport; Thu, 26 Mar 2026 18:55:14 +0000
+Received: from Satlexmb09.amd.com (10.181.42.218) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 26 Mar
+ 2026 13:55:14 -0500
+Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb09.amd.com
+ (10.181.42.218) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 26 Mar
+ 2026 11:55:13 -0700
+Received: from xhdsuragupt40.xilinx.com (10.180.168.240) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
+ Transport; Thu, 26 Mar 2026 13:55:10 -0500
+From: Suraj Gupta <suraj.gupta2@amd.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <michal.simek@amd.com>,
+	<sean.anderson@linux.dev>, <radhey.shyam.pandey@amd.com>, <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <harini.katakam@amd.com>
+Subject: [PATCH net V2 0/2] Correct BD length masks and BQL accounting for multi-BD TX packets
+Date: Fri, 27 Mar 2026 00:25:07 +0530
+Message-ID: <20260326185510.3840084-1-suraj.gupta2@amd.com>
+X-Mailer: git-send-email 2.49.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260326075851.3967598-1-xmei5@asu.edu>
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044A0:EE_|DM4PR12MB8498:EE_
+X-MS-Office365-Filtering-Correlation-Id: 20ce70de-413f-40b9-ab6a-08de8b693716
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|7416014|376014|36860700016|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	osh1OPd5W+A0u8Q2IbTwL7p6UxsG6emFiYj6IVMCk+cCEL9/o2DwQ1l73+cPtzIhNM9QKO+cOUl6stWzHUapzfoOuBMOMXn3EgY36XM0x4esUehstHxHqLVumsIoAs0oav59+3Z0fgK46MDQt9cRD5xWQzTZu5ztY7PnyCg7uUSwELAr7oxnSDvqhDh6PC7ouAEutAL3tfwTT30ZV4aCtM2bKY0tin7NRMtGFu1L+ZxLMm3c1iwN/uV7t+2OZ8zdj+BzKutkhz2BfXaCWZZanhS1A0tCvWJ5Jmflzod6aFsC19snv66IyAvZwnAAlVJDX8dQENKqRnyRIgbeaASBONS4HJ0QPRX+YuwVRZ2HcgeBQhTZ1E3RTLv6RdzsDwrRsgcZ5iw+KnGkOksnQOwQEG7CBeSncFrNqWKzBmzOlaJxqXe+3Lc/YMpTESJiQXl1xXunI9NQiR21U0tn6QtFrMXigDzKoatypisoFedsoUqZrnCwYEft/TI9HP9RStm4K4T9mnH5nJbcxi9YtmmNscuz7g8NFs+pdiD3a828u4kV5c2DIT4vkDsib6fxMBUZVoMrujQp016wZIASAyQzuukTtW68kzA4nCj8pLMWzx2O8VUz2O57XVZYPVhqyBf8sfz8kZvE0VvMEn5WT4EDLgWWmgHIh4Y3cWGWHewvekQb94rm9pkdOtw1oBy+mrbk6qUWJvMeHKo1huytMbaWzZRYdIXO4oaJjyJguEjbCG/kGCGrbzFifs1lPBhaYoJVh651T8OACmGiB26JCzkYkw==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(7416014)(376014)(36860700016)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	q2XVazAeif4JOuNZMrOkM0yjnzYj5VJyD8m+YvxhUveHhj9lXaUFnTYYnIMDYIZjRiVvO+/DB3RAYRQnwFfjrp91WBgC4HW37avS89V26Z+DtG7TJt2YSs35dqRuhfaLai3ZwCjhEWTvZq7faTusiREOEgAgU4QyfxKczHGtmrETzJSYIfrGhkuWh1N/MvgP1m7GIJB5IyYegs5qt7YU3OYM6PP0xS2nCUlRKUcWfoINSyykkXqlP1j/qwVAJqDMRrn3WXp2kyd7hcVqhd240CD7KE46Di/gLIP+Z3dQ0ieSXHo7GlavQsqh2aDvAlFQIzdPgoqo+XZRDuP8dxj7sIii1LtIrTMXevcURxjq4yeMnU5HUAS9pMx31AXsPVmt6lvbR5WBzLQIHxPcI5HMOU8ajSIceQCaFxuJt8d5HTQ3fHoKr/b6ujpJUDeROtNc
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2026 18:55:14.4838
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 20ce70de-413f-40b9-ab6a-08de8b693716
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF000044A0.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8498
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272207-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,mojatatu.com,resnulli.us,davemloft.net,google.com,kernel.org,gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-272208-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[suraj.gupta2@amd.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amd.com:dkim,amd.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,asu.edu:dkim,asu.edu:email]
-X-Rspamd-Queue-Id: B4D9933A9C0
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 1994E33A9E6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 12:58:51AM -0700, Xiang Mei wrote:
-> m2sm() converts a u32 slope to a u64 scaled value.  For large inputs
-> (e.g. m1=4000000000), the result can reach 2^32.  rtsc_min() stores
-> the difference of two such u64 values in a u32 variable `dsm` and
-> uses it as a divisor.  When the difference is exactly 2^32 the
-> truncation yields zero, causing a divide-by-zero oops in the
-> concave-curve intersection path:
-> 
->   Oops: divide error: 0000
->   RIP: 0010:rtsc_min (net/sched/sch_hfsc.c:601)
->   Call Trace:
->    init_ed (net/sched/sch_hfsc.c:629)
->    hfsc_enqueue (net/sched/sch_hfsc.c:1569)
->    [...]
-> 
-> Widen `dsm` to u64 and replace do_div() with div64_u64() so the full
-> difference is preserved.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: Weiming Shi <bestswngs@gmail.com>
-> Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> ---
-> v2: resend to netdev ML
-> 
->  net/sched/sch_hfsc.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/sched/sch_hfsc.c b/net/sched/sch_hfsc.c
-> index b5657ffbbf84..83b2ca2e37fc 100644
-> --- a/net/sched/sch_hfsc.c
-> +++ b/net/sched/sch_hfsc.c
-> @@ -555,7 +555,7 @@ static void
->  rtsc_min(struct runtime_sc *rtsc, struct internal_sc *isc, u64 x, u64 y)
->  {
->  	u64 y1, y2, dx, dy;
-> -	u32 dsm;
-> +	u64 dsm;
->  
->  	if (isc->sm1 <= isc->sm2) {
->  		/* service curve is convex */
-> @@ -598,7 +598,7 @@ rtsc_min(struct runtime_sc *rtsc, struct internal_sc *isc, u64 x, u64 y)
->  	 */
->  	dx = (y1 - y) << SM_SHIFT;
->  	dsm = isc->sm1 - isc->sm2;
-> -	do_div(dx, dsm);
-> +	dx = div64_u64(dx, dsm);
->  	/*
->  	 * check if (x, y1) belongs to the 1st segment of rtsc.
->  	 * if so, add the offset.
-> -- 
-> 2.43.0
->
+This patch series fixes two issues in the Xilinx AXI Ethernet driver:
+ 1. Corrects the BD length masks to match the AXIDMA IP spec.
+ 2. Fixes BQL accounting for multi-BD TX packets.
 
-Thanks for your attention for this bug.
-The following information could help you to reproduce the bug:
+---
+Changes in V2:
+Use GENMASK() to define the BD length masks.
+---
+Suraj Gupta (2):
+  net: xilinx: axienet: Correct BD length masks to match AXIDMA IP spec
+  net: xilinx: axienet: Fix BQL accounting for multi-BD TX packets
 
-PoC:
-```sh
-#!/bin/sh
-ip link set lo up
+ drivers/net/ethernet/xilinx/xilinx_axienet.h  |  7 +++++--
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 20 +++++++++----------
+ 2 files changed, 15 insertions(+), 12 deletions(-)
 
-tc qdisc replace dev lo root handle 1: \
-    stab overhead 3000000 mtu 0 tsize 0 \
-    hfsc default 1
-tc class replace dev lo parent 1: classid 1:1 hfsc \
-    rt m1 32gbit d 1ms m2 0bit \
-    ls m1 32gbit d 1ms m2 0bit
+-- 
+2.49.1
 
-# Send UDP to loopback (same method as C PoC)
-python3 -c "
-import socket,time
-s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-s.sendto(b'A'*64,('127.0.0.1',1337))  # activate class
-time.sleep(1)                           # drain → idle
-s.sendto(b'A'*64,('127.0.0.1',1337))  # reactivation → div-by-zero
-"
-```
-
-Intended Crash:
-```log
-[   25.713426] Oops: divide error: 0000 [#1] SMP KASAN NOPTI
-[   25.713720] CPU: 1 UID: 0 PID: 335 Comm: python3 Not tainted 7.0.0-rc4+ #4 PREEMPTLAZY
-[   25.714102] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.17.0-0-gb52ca86e094
-[   25.714825] RIP: 0010:rtsc_min+0x148/0x360
-[   25.715034] Code: 0f 85 ad 01 00 00 48 8b 53 18 4c 01 f2 48 39 d0 0f 83 ea 00 00 00 8b 0c 24 4c c
-[   25.715928] RSP: 0018:ffff888013eef438 EFLAGS: 00010206
-[   25.716198] RAX: 00000f41d6000000 RBX: ffff888010e2c150 RCX: 0000000000000000
-[   25.716555] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff888010e2c168
-[   25.716896] RBP: ffff888010e2c1e0 R08: 0000000000000001 R09: ffff888010e2c008
-[   25.717238] R10: ffff888013488000 R11: ffff888013eefb30 R12: 00000000003d0900
-[   25.717724] R13: 0000000100000000 R14: 00000000002dc72a R15: 0000000017f10a4c
-[   25.718065] FS:  000078cd1f4cf040(0000) GS:ffff8881781cb000(0000) knlGS:0000000000000000
-[   25.718456] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   25.718766] CR2: 000078cd1f5f87d0 CR3: 0000000013fb8002 CR4: 0000000000772ef0
-[   25.719118] PKRU: 55555554
-[   25.719262] Call Trace:
-[   25.719390]  <TASK>
-[   25.719503]  ? ktime_get+0x65/0x150
-[   25.719704]  init_ed+0x70/0x4d0
-[   25.719870]  hfsc_enqueue+0x7bb/0xef0
-[   25.720059]  ? kmalloc_reserve+0x10c/0x2c0
-```
-
-This bug is a DoS bug requiring ns_capable(CAP_NET_ADMIN).
-Please let me know if you have any questions for the patch and poc.
-
-Thanks,
-Xiang
 
