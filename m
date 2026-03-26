@@ -1,217 +1,127 @@
-Return-Path: <netdev+bounces-272032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272033-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gPc7M+wrxWnb7gQAu9opvQ
-	(envelope-from <netdev+bounces-272032-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:51:56 +0100
+	id cGy3L48rxWnb7gQAu9opvQ
+	(envelope-from <netdev+bounces-272033-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:50:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 327EF335801
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:51:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DD5A335788
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:50:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 163E13016CA7
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:48:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E405A3038D6E
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B94E0223DD4;
-	Thu, 26 Mar 2026 12:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73687239086;
+	Thu, 26 Mar 2026 12:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uKUnAe1I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bBX16vSK"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413D22222AA;
-	Thu, 26 Mar 2026 12:47:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C91D2264B0;
+	Thu, 26 Mar 2026 12:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774529280; cv=none; b=FWUC/pt/DMkvbf8UUZVd4GKxvxA1uHooYXIyO7Lf6epXbpEkJuUfjE7SyKnAOP634/NpNM3lY4DBbLk9VC/IJiRhIk+2ruSZNNalnJF33ycO7bhvVzqe4WwsXYinC3JTUnoeIfbSaekEVEdZ7z42CQv7Jq8mmBRvjGlkYDWi+s8=
+	t=1774529421; cv=none; b=B+AAeTdrCbAh3d5tueVHDnklGsao3ZPQFem/w7mJTxzb1Y21G4FvLOZTXABZJ3reWsaKU7gYudViZHLkNJQ/mVaRlgRLIAO2dea4N0kV4cibuBQkJq01uZ4XHI97lblNsaM08oZEYsh46Y1jP4aXjXr4Q40qYPYHUZMNwZljLKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774529280; c=relaxed/simple;
-	bh=WtDmRmh3cezpVSUF61m5UaSrXX0HE0AV8bz/TNmrCwA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hTZzUbDE3hMLIFpYscX1bfwsQ6gDevy6hks8FjqUdcylapzjud7PRL+yG4SG0+p5TiKQ9Ae/m0F1AWf9eJTiujvIQYwAACtX09v56rRrzdpf38/c5rf1/8ys8XtW4B9Ajg5fv9POWxTByOggfkL9tl7Sqn6F8+zf9beaNoEpX6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uKUnAe1I; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PA9iwmtkzKj9Ikfo9/YTRI8DYBCeEBqDSq+sUCDMqak=; b=uKUnAe1I0gtODvDexpiP1eYn+R
-	9Z/SzkqaIY5/pjMge45XSOjwGrvWIIAwgzy/zMNk2vriES1mDVXqbm3fSUpJyy6pqgc30UF6xSJ8u
-	CvyDA+oMLUiSnVP9yIGxIQcThbKuX31hY75UQmOFRPE9bZjmsQaS65k87U7N/sys580c=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w5k7j-00DTiW-NH; Thu, 26 Mar 2026 13:47:43 +0100
-Date: Thu, 26 Mar 2026 13:47:43 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, kevin-kw.huang@airoha.com,
-	macpaul.lin@mediatek.com, matthias.bgg@gmail.com,
-	kernel@collabora.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 4/4] net: phy: Introduce Airoha AN8801/R
- Gigabit Ethernet PHY driver
-Message-ID: <3688a285-7f98-4afa-80ad-697094cd7b97@lunn.ch>
-References: <20260326-add-airoha-an8801-support-v2-0-1a42d6b6050f@collabora.com>
- <20260326-add-airoha-an8801-support-v2-4-1a42d6b6050f@collabora.com>
+	s=arc-20240116; t=1774529421; c=relaxed/simple;
+	bh=nz8zSkm/QwG9xuSPLcqGNPh0yy+Xxb6YSgHtYiiKX/w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hykDIooSKTM1+M5x7BMe2nhUgYwcjzt5+5F7LQV5d/U+onQhe8i0o6VjPzB+ER7nA1IrASoaw14jhr3ZEUqJ502s3MvR3ds/vCX4Y66PiNB/MV3zunv0yT56tuUVRf4H2AhnrAozXYw49xao7xPMsptuMFLRr5HU55imFDLkz3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bBX16vSK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8804C116C6;
+	Thu, 26 Mar 2026 12:50:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774529420;
+	bh=nz8zSkm/QwG9xuSPLcqGNPh0yy+Xxb6YSgHtYiiKX/w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bBX16vSKk2RJ442v4X1RROZTV29ed+azP20KL7akyCDrncKW8ujNBZI3BpEQH0BNp
+	 7XZg5Lwq4VGkfYM+KmzsrAWyy0VJeQcI+hGLdSqNJPdCZMg5ZIx9vDG06fEhrr7ob/
+	 Z8JnEAqSlnOTktXHPzlPbUQQBgfix/IqUsGfqVDcUXAp6aY/7elenM7zdvtevDPkRo
+	 X9brYbViiv9/HL7E/coeTSJxuD10+mSjWdZuAx5zCI1rQ7E/9wR1mcWOR3jpT8QhNH
+	 cjkjTcYrFPChsNKR4yP4GWJNsUyj6CjjfFfgJOypVZv1CyMkFUTNJiL3X0iq/bhrxX
+	 Ie53GJyg6ObQA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA09139EFA65;
+	Thu, 26 Mar 2026 12:50:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260326-add-airoha-an8801-support-v2-4-1a42d6b6050f@collabora.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [GIT PULL] bluetooth 2026-03-25
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177452940754.2540696.16802163481653825797.git-patchwork-notify@kernel.org>
+Date: Thu, 26 Mar 2026 12:50:07 +0000
+References: <20260325194358.618892-1-luiz.dentz@gmail.com>
+In-Reply-To: <20260325194358.618892-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-272033-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272032-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,gmail.com,armlinux.org.uk,airoha.com,mediatek.com,vger.kernel.org,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 327EF335801
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5DD5A335788
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> +static int an8801r_led_blink_set(struct phy_device *phydev, u8 index,
-> +				 unsigned long *delay_on,
-> +				 unsigned long *delay_off)
-> +{
+Hello:
 
-...
+This pull request was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> +	ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, LED_ON_CTRL(index),
-> +			     LED_ON_EN, blink ? LED_ON_EN : 0);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
+On Wed, 25 Mar 2026 15:43:58 -0400 you wrote:
+> The following changes since commit c4ea7d8907cf72b259bf70bd8c2e791e1c4ff70f:
+> 
+>   net: mana: fix use-after-free in add_adev() error path (2026-03-24 21:07:58 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-03-25
+> 
+> [...]
 
-Just
+Here is the summary with links:
+  - [GIT,PULL] bluetooth 2026-03-25
+    https://git.kernel.org/netdev/net/c/aa637b2cf303
 
-
-	return phy_modify_mmd(phydev, MDIO_MMD_VEND2, LED_ON_CTRL(index),
-			     LED_ON_EN, blink ? LED_ON_EN : 0);
-
-> +		if (!led_trigger)
-> +			continue;
-> +
-> +		ret = an8801r_led_hw_control_set(phydev, led_id, led_trigger);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +	return 0;
-> +}
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Please take a look at all your functions. Can the last error check be
-removed and just use return ret, etc.
-
-> +static int an8801r_of_init_leds(struct phy_device *phydev, u8 *led_cfg)
-> +{
-> +	struct device *dev = &phydev->mdio.dev;
-> +	struct device_node *np = dev->of_node;
-> +	struct device_node *leds;
-> +	u32 function_enum_idx;
-> +	int ret;
-> +
-> +	if (!np)
-> +		return 0;
-> +
-> +	/* If devicetree is present, leds configuration is required */
-> +	leds = of_get_child_by_name(np, "leds");
-> +	if (!leds)
-> +		return 0;
-> +
-> +	for_each_available_child_of_node_scoped(leds, led) {
-> +		u32 led_idx;
-> +
-> +		ret = of_property_read_u32(led, "reg", &led_idx);
-> +		if (ret)
-> +			goto out;
-> +
-> +		if (led_idx >= AN8801R_NUM_LEDS) {
-> +			ret = -EINVAL;
-> +			goto out;
-> +		}
-> +
-> +		ret = of_property_read_u32(led, "function-enumerator",
-> +					   &function_enum_idx);
-> +		if (ret)
-> +			function_enum_idx = AN8801R_LED_FN_NONE;
-> +
-
-What is this doing? Is this documented in the binding?
-
-> +		if (function_enum_idx >= AN8801R_LED_FN_MAX) {
-> +			ret = -EINVAL;
-> +			goto out;
-> +		}
-> +
-> +		led_cfg[led_idx] = function_enum_idx;
-> +	}
-> +out:
-> +	of_node_put(leds);
-> +	return ret;
-> +}
-
-> +static int an8801r_read_status(struct phy_device *phydev)
-> +{
-> +	int prev_speed, ret;
-> +	u32 val;
-> +
-> +	prev_speed = phydev->speed;
-> +
-> +	ret = genphy_read_status(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (phydev->link && prev_speed != phydev->speed) {
-> +		val = phydev->speed == SPEED_1000 ?
-> +		      AN8801_BPBUS_LINK_MODE_1000 : 0;
-> +
-> +		return an8801_buckpbus_reg_rmw(phydev,
-> +					       AN8801_BPBUS_REG_LINK_MODE,
-> +					       AN8801_BPBUS_LINK_MODE_1000,
-> +					       val);
-> +	};
-
-This is unusual. What is it doing? Please add a comment.
-
-	Andrew
 
