@@ -1,150 +1,187 @@
-Return-Path: <netdev+bounces-271832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271833-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GIWQO1O6xGnG2wQAu9opvQ
-	(envelope-from <netdev+bounces-271832-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 05:47:16 +0100
+	id SKnLKaTCxGku3QQAu9opvQ
+	(envelope-from <netdev+bounces-271833-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 06:22:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A63B32F23C
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 05:47:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EADC32F57F
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 06:22:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2D9F0301A153
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 04:47:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CA99930500DF
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 05:19:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3541C33065D;
-	Thu, 26 Mar 2026 04:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E97B336881;
+	Thu, 26 Mar 2026 05:18:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gfn5UoLb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nj0lUSOl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DF31F30AD;
-	Thu, 26 Mar 2026 04:47:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49EFE327BFB;
+	Thu, 26 Mar 2026 05:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774500431; cv=none; b=s1k/dHyowTJ/lOpexYB1oVN86oa8wll4W9MmoGiqGlE653oW/JJkS/wpdxOsTrWvP37CyuS8+0e/DwT8LeyarcRKDe+QPekLLUX35F7m19Z7mStDOaRMV3NOylyZAYOBlgz2+GCl8UGs+m1iTp4CIWKsaJJ9KTq8rk/PhAsvqgM=
+	t=1774502339; cv=none; b=hlaLv5/5gmQwajqwrK/Fr68Vexz8J3NRmHCTwzYuXjxiE8Plg97ghxj7gGRMPhad1sW92MJd7Qn0YEPQjsBxtvoUA2Uj2VmzHL/GQKoJ8dq3WZeVyTGVQ10MAzZgWE30qPBCk0zVfVogerfUysURe3s1pvejABhnC7WX0Hlh/Zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774500431; c=relaxed/simple;
-	bh=4kecC/ZYRctGwc1EBoI2M9d2EI/JOraZdYPDLhVU7N4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d3p0AlBtsEldhdtWdQlrZGsTZGF/XRRvxWbWrarPxo1/YhTRhZYZZlI367yuRB+Z3c5o3pXgIK2rZbKH261DlFExyfBGI/wnOzG7dHBpJvzsoN/orGz4vhPgiH86dxnjhjmLTajbZdLn2StXic7F3BAosX9LQGCTWHw4agsZDwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gfn5UoLb; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774500429; x=1806036429;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4kecC/ZYRctGwc1EBoI2M9d2EI/JOraZdYPDLhVU7N4=;
-  b=Gfn5UoLbyToofK5u3ca6EyVoPXuEj5aT1kM0mZmVTT1/P9m4TFd5yBrt
-   4pilbMuf01Gy2K07VaWjtD10I9jaVYhei8MLhSgsPsCZxAQ/pExEGoQlM
-   Ww3zXPDHa16WVV9K6XREeSaXcqtnwjcR7s+uRsOuWvrJKQ74G6YftC50S
-   jUIRIUQrZJSqp70e/RCwNJDAzX38c7Hasq18/1YIpgotO7KR6rwb58i+F
-   vXiGpsFTz7zgPbtWerYCn1bgKda1a40xvmm1okdKVQrRd7Qu4ki/L/2sd
-   wWRzLKuFk0dMRqUAVdR+XJqmcnX4xxC4APVjUInHwZDwcElv3SP5zUndx
-   w==;
-X-CSE-ConnectionGUID: osJ6xDHGSAGHoXBTbo3ELA==
-X-CSE-MsgGUID: 9T7/eciLRtGJbBywAzGibw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11740"; a="79405915"
-X-IronPort-AV: E=Sophos;i="6.23,141,1770624000"; 
-   d="scan'208";a="79405915"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2026 21:47:07 -0700
-X-CSE-ConnectionGUID: pA6lh0FbS1ic8TAYZDDWng==
-X-CSE-MsgGUID: o8y9BNqDTqGu83pX6I8NFg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,141,1770624000"; 
-   d="scan'208";a="221996191"
-Received: from lkp-server01.sh.intel.com (HELO 3905d212be1b) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 25 Mar 2026 21:47:05 -0700
-Received: from kbuild by 3905d212be1b with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w5ccY-000000008Aj-0QEX;
-	Thu, 26 Mar 2026 04:47:02 +0000
-Date: Thu, 26 Mar 2026 12:46:05 +0800
-From: kernel test robot <lkp@intel.com>
-To: Dong Yibo <dong100@mucse.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, danishanwar@ti.com
-Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, dong100@mucse.com
-Subject: Re: [PATCH net-next 4/4] net: rnpgbe: Add link status handling
- support
-Message-ID: <202603261216.IjF1gt9b-lkp@intel.com>
-References: <20260325091204.94015-5-dong100@mucse.com>
+	s=arc-20240116; t=1774502339; c=relaxed/simple;
+	bh=RYIDhb40pciHyjxA9d9rEgw6W+Ol3a6na/ntr3tvrXU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=eIuXS3JOolWPLA/BhdENDTkQY0HX5xdNeu0Xo3tr1dFiWVLCbb/EqjCrxI8+YZgLW/WCgTFe1fSKtnTKm5fjidZFcgj+S8Rd9Sq0NiSOFLnIrDIgKaA2+cCviqDS5lO0fqWUZ+rGlr1T25zj5+fkGN6wHWgqKdCpLUhPuAgnOwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nj0lUSOl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 208A4C19423;
+	Thu, 26 Mar 2026 05:18:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774502339;
+	bh=RYIDhb40pciHyjxA9d9rEgw6W+Ol3a6na/ntr3tvrXU=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=nj0lUSOlTpQtFWdsLV+Fil1MFbnKiJXeGI6sPDuidksnyrhc6WnH8rfmwQSo6ERlc
+	 3REmOyCjwjm8WPndvLcOFFgUK+Iufysc/HtoPxpdglJpmLczzHOcLu1wTItDBhwn63
+	 70F6TRD9e2h/lAHpa8EjLB4EpU2dxHOyIWnVVxakSyjMCj78C08Ie5ja4EFkZckQ1N
+	 bixlbfQyae36m1bfxJhu+qZKtQ2uMHZA+s6qDNhhCClzzx4pCjSXCRkxa3Uo4eyQ+f
+	 DT59HQzc4mdQmO357sCzqseZdfoxguy4K52zl3vwslcX6MNex3YTvTqGFhDWQHYB6g
+	 hPcknZzB6zZVA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F6B4109E536;
+	Thu, 26 Mar 2026 05:18:59 +0000 (UTC)
+From: Satish Kharat via B4 Relay <devnull+satishkh.cisco.com@kernel.org>
+Subject: [PATCH net-next v2 0/6] enic: SR-IOV V2 preparatory infrastructure
+Date: Wed, 25 Mar 2026 22:18:58 -0700
+Message-Id: <20260325-enic-sriov-v2-prep-v2-0-f72cf716ebfa@cisco.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260325091204.94015-5-dong100@mucse.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMLBxGkC/22NwQrCMBBEf6Xs2ZUkrSKe/I/SQ91u7B5MShJCp
+ eTfDcGjx5nHvDkgchCOcO8OCJwlinc1mFMHtM7uxShLzWCUuareDMhOCGMQnzEb3AJvaCxrnp/
+ UL6ShDmtpZW/SERwndLwnmCpZJSYfPu0t68Z/4ss/cdaocLhZNRBrrYgeJJH8mfwbplLKFyWfT
+ 7a+AAAA
+To: Satish Kharat <satishkh@cisco.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1774502338; l=3312;
+ i=satishkh@cisco.com; h=from:subject:message-id;
+ bh=RYIDhb40pciHyjxA9d9rEgw6W+Ol3a6na/ntr3tvrXU=;
+ b=XcxxjsWLxIc6TY47kNkGFQ+RDeEC6m9O99JU5KavoK5gotZWar1R6/w/3lmho8acSpKkDEzY1
+ 2WlC3ShviH5B8uWS6l4T+Pel5ZGgORwzBMk8BWy1NIR2ySuH/IvhIjw
+X-Developer-Key: i=satishkh@cisco.com; a=ed25519;
+ pk=4BxbLoCGvHeIMH/PbpiNVx8/2IcTjFvqcr0AD8K6WLY=
+X-Endpoint-Received: by B4 Relay for satishkh@cisco.com/default with
+ auth_id=639
+X-Original-From: Satish Kharat <satishkh@cisco.com>
+Reply-To: satishkh@cisco.com
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+	MID_RHS_MATCH_TO(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271832-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271833-lists,netdev=lfdr.de,satishkh.cisco.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
+	HAS_REPLYTO(0.00)[satishkh@cisco.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: 6A63B32F23C
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email,cisco.com:email,cisco.com:replyto,cisco.com:mid,davemloft.net:email]
+X-Rspamd-Queue-Id: 0EADC32F57F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Dong,
+This is the first of four series adding SR-IOV V2 support to the enic
+driver for Cisco VIC 14xx/15xx adapters.
 
-kernel test robot noticed the following build warnings:
+The existing V1 SR-IOV implementation has VFs that interact directly
+with the VIC firmware, leaving the PF driver with no visibility or
+control over VF behavior. V2 introduces a PF-mediated model where VFs
+communicate with the PF through a mailbox over a dedicated admin
+channel. This brings enic in line with the standard Linux SR-IOV
+model, enabling full PF management of VFs via ip link (MAC, VLAN,
+link state, spoofchk, trust, and per-VF statistics).
 
-[auto build test WARNING on net-next/main]
+This preparatory series adds detection and resource helper code with
+no functional change to existing driver behavior:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dong-Yibo/net-rnpgbe-Add-interrupt-handling/20260326-025137
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260325091204.94015-5-dong100%40mucse.com
-patch subject: [PATCH net-next 4/4] net: rnpgbe: Add link status handling support
-config: x86_64-randconfig-002-20260326 (https://download.01.org/0day-ci/archive/20260326/202603261216.IjF1gt9b-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260326/202603261216.IjF1gt9b-lkp@intel.com/reproduce)
+  - Extend BAR resource discovery for admin channel resources
+  - Register the V2 VF PCI device ID
+  - Detect VF type (V1/V2/usNIC) from SR-IOV PCI capability
+  - Make enic_dev_enable/disable ref-counted for shared use by data
+    path and admin channel
+  - Add type-aware resource allocation for admin WQ/RQ/CQ/INTR
+  - Detect presence of admin channel resources at probe time
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603261216.IjF1gt9b-lkp@intel.com/
+Tested on VIC 14xx and 15xx series adapters with V2 VFs under KVM
+(sriov_numvfs, VF passthrough, ip link VF configuration, VF traffic).
 
-All warnings (new ones prefixed by >>):
+Based in part on initial work by Christian Benvenuti.
 
->> Warning: drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c:233 function parameter 'is_report' not described in 'mucse_mbx_link_report'
->> Warning: drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c:313 function parameter 'hw' not described in 'mucse_mbx_fw_req_handler'
->> Warning: drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c:233 function parameter 'is_report' not described in 'mucse_mbx_link_report'
->> Warning: drivers/net/ethernet/mucse/rnpgbe/rnpgbe_mbx_fw.c:313 function parameter 'hw' not described in 'mucse_mbx_fw_req_handler'
---
->> Warning: drivers/net/ethernet/mucse/rnpgbe/rnpgbe_lib.c:1888 expecting prototype for mucse_watchdog_subtask(). Prototype was for rnpgbe_watchdog_subtask() instead
+To: Satish Kharat <satishkh@cisco.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
+Changes in v2:
+- Add RES_TYPE_SRIOV_INTR to the has_admin_channel check in patch 6/6
+- CC all netdev maintainers per cc_maintainers CI feedback
+- Link to v1: https://lore.kernel.org/r/20260325-enic-sriov-v2-prep-v1-0-48f04ce110cc@cisco.com
+
+---
+Satish Kharat (6):
+      enic: extend resource discovery for SR-IOV admin channel
+      enic: add V2 SR-IOV VF device ID
+      enic: detect SR-IOV VF type from PCI capability
+      enic: make enic_dev_enable/disable ref-counted
+      enic: add type-aware alloc for WQ, RQ, CQ and INTR resources
+      enic: detect admin channel resources for SR-IOV
+
+ drivers/net/ethernet/cisco/enic/enic.h          | 18 +++++++++++
+ drivers/net/ethernet/cisco/enic/enic_dev.c      | 17 +++++++---
+ drivers/net/ethernet/cisco/enic/enic_main.c     | 42 ++++++++++++++++++++++++-
+ drivers/net/ethernet/cisco/enic/enic_res.c      | 11 +++++--
+ drivers/net/ethernet/cisco/enic/vnic_cq.c       | 14 +++++++--
+ drivers/net/ethernet/cisco/enic/vnic_cq.h       |  3 ++
+ drivers/net/ethernet/cisco/enic/vnic_dev.c      | 10 ++++++
+ drivers/net/ethernet/cisco/enic/vnic_intr.c     | 12 +++++--
+ drivers/net/ethernet/cisco/enic/vnic_intr.h     |  2 ++
+ drivers/net/ethernet/cisco/enic/vnic_resource.h |  4 +++
+ drivers/net/ethernet/cisco/enic/vnic_rq.c       | 14 +++++++--
+ drivers/net/ethernet/cisco/enic/vnic_rq.h       |  3 ++
+ drivers/net/ethernet/cisco/enic/vnic_wq.c       | 14 +++++++--
+ drivers/net/ethernet/cisco/enic/vnic_wq.h       |  3 ++
+ 14 files changed, 148 insertions(+), 19 deletions(-)
+---
+base-commit: b1c803d5c8167026791abfaed96fd3e6a1fcd750
+change-id: 20260324-enic-sriov-v2-prep-2fe1eabc3dc1
+
+Best regards,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Satish Kharat <satishkh@cisco.com>
+
+
 
