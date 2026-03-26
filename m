@@ -1,201 +1,166 @@
-Return-Path: <netdev+bounces-271985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271986-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gElrGykXxWnr6QQAu9opvQ
-	(envelope-from <netdev+bounces-271985-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:23:21 +0100
+	id aCtrFd4YxWnr6QQAu9opvQ
+	(envelope-from <netdev+bounces-271986-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:30:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C007A334658
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:23:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B08CC33486D
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:30:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C04763008206
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:15:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3FCD930DA1C4
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:20:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB5B346E5E;
-	Thu, 26 Mar 2026 11:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570BC38F22D;
+	Thu, 26 Mar 2026 11:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mmpsystems.pl header.i=@mmpsystems.pl header.b="xW/QOBAp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g441ur58"
 X-Original-To: netdev@vger.kernel.org
-Received: from s106b.cyber-folks.pl (s106b.cyber-folks.pl [195.78.66.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9175E34E768;
-	Thu, 26 Mar 2026 11:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.78.66.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CFD33D505
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 11:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774523741; cv=none; b=TzuAGeFEav7rWTf3B/sBf0W1ewQYLPFH1IioPIuaVKxAws90B6URPYB5yRjhwpPd8/99woI57rL9etfj0utHT4xHCAFw66l8c3gC5gdZ0JH7BzSE7ET08VXKn2sZGHyuccu0zW+pbTmF7cvhd85lQp0+abZAzrU0KzGEmNtdtgk=
+	t=1774524000; cv=none; b=rNXuLDMtV8GEsNyZixTRlDucBal6Rjgz2j+rF8LrLnpnq7Hjara9SUT4Mhg+FKEX8iukJSdf9GCQZfBXlImOb3e5hEp5RFd+2EpXVI67qJujXcOjOXjfVUzduveqMIhzZnY9Cu5ESRj1ZZCXpP+Ka8EOt1TLgiOhAwlvX8wEe60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774523741; c=relaxed/simple;
-	bh=mR/kvvFFzm3z7f5VgS/15AS/3++gtgDHcsLPFvzWnHA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=svalUnrYADUjV/OKkUeYY0kgszXKcHuZSccmTsEs7JLAOXK9fNAadTRPAJfxTmceQqwhRoLkoLVviNkm0nXcgCOvQKJDr5H8rmjvj8IG20vSiTu+yLIUwUiGGwsH3uHG2WS+dcpVro1cUB4SseraWrJedvCAD12UxFQxqPwk0Mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mmpsystems.pl; spf=pass smtp.mailfrom=mmpsystems.pl; dkim=pass (2048-bit key) header.d=mmpsystems.pl header.i=@mmpsystems.pl header.b=xW/QOBAp; arc=none smtp.client-ip=195.78.66.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mmpsystems.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mmpsystems.pl
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=mmpsystems.pl; s=x; h=In-Reply-To:Content-Type:MIME-Version:References:
-	Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=DH6OZbGLz6JBjk1mkEJ81mLvO4rTm1UWMB27HtaTvcM=; b=xW/QOBApGKxhjAHWxrKhsO4paW
-	xK89CYlamTAn1AP6eLV9cfTVNJI/ewzZy4wSLYyakacZky5MH/QjCd+aKaHQx3a/Z/96yfR2syCNf
-	P7Cx+SApeqNc8KkuiEUlIqS+R3iXol9E9BdXOjbht4BGl5zgx7C4J+ncxsMCrBjxcgmQxVoIMCy8O
-	bmV29jQB6/srewPeRNWQ2iusgKWNQnulKaLN4O6Qqy6Jipt82HSlULinu1fjin3ig1Bef4/90SKCV
-	Vuy5IGxBRdNgfYPJr7LNDBpXhCL7zIPubChZXshfZ9GXodTgobhevtupjsvNn+LWl+JYpjAcoyUPY
-	P37m3+bQ==;
-Received: from user-5-173-16-20.play-internet.pl ([5.173.16.20] helo=localhost)
-	by s106.cyber-folks.pl with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <michal.piekos@mmpsystems.pl>)
-	id 1w5igY-00000000ajn-1kSH;
-	Thu, 26 Mar 2026 12:15:34 +0100
-Date: Thu, 26 Mar 2026 12:14:44 +0100
-From: Michal Piekos <michal.piekos@mmpsystems.pl>
-To: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] net: stmmac: skip VLAN restore when VLAN hash ops are
- missing
-Message-ID: <lhlghwdoe6o7eecxpgbnv3e5nb7n2snk6jd6fn4wbolbqwjax4@czydhov4pv4s>
-References: <20260321-vlan-restore-error-v2-1-45cf56a5223d@mmpsystems.pl>
- <abb1c779-b306-42f8-b2b1-aa56bfcebe1b@bootlin.com>
- <TY7P301MB198407F8C0280B991334304ED356A@TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM>
+	s=arc-20240116; t=1774524000; c=relaxed/simple;
+	bh=pjR1FeYWT3fCK07KymFSlvdN61443JK+C04q/CejLQU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SIcfa4QXoTQSbUJmGpA/phYEz+a3n/CY3yKcP00JDY1sNLCkLNfmvzjZYEHs927vOWQuFw81xyetIPagMy1RdOGGhg6LryD52VVGx6pcWuq53PaDkhG/0qXcw3+BHNq5QhiQIqdqafoAbN9r96MhrVE9drM5eVZb39dWqo4p+3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g441ur58; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso6535935e9.3
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 04:19:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774523996; x=1775128796; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1cM2Ed0+UHaZsndyPhA9BP7E7XUawbgfNpYu8w9suDg=;
+        b=g441ur5810zFIj8p/ikB4/u9DQBIEXWGcwR0c546n+4wOqdhdX8dHbARNBS3gVkQx+
+         KwU4yJemUQL57Gu/7Wux/arX7/4F8PCOaeeBItmkafzJUnrqaXl01WpxMB09N4aqjmSp
+         B8ORP+zmTcB1EOISOhYCFmHeAEyctm8VxJ3i67nMXkwUkXEylLYEByeBG0MzynapI42W
+         ROyl+IGbDgpSnhaIh9AZD3yRmUSv+4ZXAVTnT/+cVEVtVB4TEDWbfAgV4fUynvh6Ev8X
+         0h2/XjcwnMsqHt2ttXPU0qo+I2DYs51ZZ9QXhWFQg1AfXBb/2jUxPMX+mhRrb9wL7KZJ
+         jcog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774523996; x=1775128796;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1cM2Ed0+UHaZsndyPhA9BP7E7XUawbgfNpYu8w9suDg=;
+        b=PJOQ5wW2/YF/u3FoaKk7SskU3/3yhj5woC/rT3GLwNpj3GEeJJp3oG1R4SHJxO/9eQ
+         9fq/rCjvGMFXLjWU0nKkurZdsgVmAMhSjuA0YgbfRGLgDAFWaNluYD3ipBvBtj0Lory4
+         i+GYutwqHn1yelVHVTxHpHOvIQGWJvqhlqgmytX+lCg0IDx/cgJ8nA27yM8Y50Zo/g9P
+         RWt/TNkMLlceQPEOyZnlK3VDgrFcw3AxpgVUyUOEK95/GZt9xxT0wYZjbN0uBu1e38aF
+         UyLkhLo7Tcz5M0JNFL7XUyikuTL4wZzB4Z1I4rtcYaJoahe/nwtiwE2Ojz+T2CJa0uSc
+         pVaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWvMlawRSO0CQgiBd9ILKJQ+q+zeiCxj/3VEB5P3Nr8GDZx+N12CGD7o/L9iMMOiOQW3clPRy8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5SZxWgriOC2/X27xBpUt4uMeCLpGKonUaO4JHr9EmbX7SWi8i
+	X2k+oHGtW4SWBSLqmCDgfpf5vPE3VgAU0DbAbWENvhsRX3tOYrqn9irK
+X-Gm-Gg: ATEYQzx8eF5KJ2EXY0A+v3CmtNCuxsaqp2OB/WUAV8uO+9fmc4fvQziFDIlhkiN+fD3
+	/C7AivZK0qlOhFT4Mw6Nma1p7uq/VWwv5lyTfM4VKqUCPF4Rp+611jHRawYGEp2XtI3qq0zGgXC
+	HYRAOyw2L0b2GkgH6mV5WFGsLjkABuCypuG06oPdAZu5nNmDcH8WNFDtZXU6icdK+6iAY8bL8Z2
+	DG9ee700AbG1PXnT/2p8HYf+++/U+e+bKhlTwpCeMO2V7OjfD6NpFI9+fcPK24CZo7HoKucEqUZ
+	KEFqNvVNhjnUy6Gqj6LwcdAliPGPlhfDlEDjT1HnrB2S3CQKbQFCE5ObiuRgTrk2whlgZ+6MyYl
+	N1SnnSvGgycW5BkBVYwT7ybd1eI+U4POCWJrIuzWThfZpzs7tLGEmbV24OtirygFMuXb3JW2Y/Z
+	TmpxeIBHQrkRV8AxjitiEeUugF1asPJA1diyQo5Lh3KhHTDuqj
+X-Received: by 2002:a05:600c:8219:b0:485:ae14:8187 with SMTP id 5b1f17b1804b1-48715fc3250mr98179175e9.2.1774523995840;
+        Thu, 26 Mar 2026 04:19:55 -0700 (PDT)
+Received: from localhost.localdomain ([2a00:23c4:a758:8a01:377f:9a3e:6c94:560d])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4872092e105sm13428045e9.29.2026.03.26.04.19.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Mar 2026 04:19:55 -0700 (PDT)
+From: Biju <biju.das.au@gmail.com>
+X-Google-Original-From: Biju <biju.das.jz@bp.renesas.com>
+To: Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: Biju Das <biju.das.jz@bp.renesas.com>,
+	linux-renesas-soc@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Biju Das <biju.das.au@gmail.com>
+Subject: [PATCH v3 0/2] Enable Renesas RZ/G3L GBETH0
+Date: Thu, 26 Mar 2026 11:19:48 +0000
+Message-ID: <20260326111953.31024-1-biju.das.jz@bp.renesas.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <TY7P301MB198407F8C0280B991334304ED356A@TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM>
-X-Authenticated-Id: michal.piekos@mmpsystems.pl
-X-Spamd-Result: default: False [1.64 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[mmpsystems.pl:s=x];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[mmpsystems.pl : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271985-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-271986-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[glider.be,gmail.com,kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[bp.renesas.com,vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[bootlin.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michal.piekos@mmpsystems.pl,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bijudasau@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[mmpsystems.pl:-];
-	NEURAL_HAM(-0.00)[-0.960];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,renesas,dt];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mmpsystems.pl:email]
-X-Rspamd-Queue-Id: C007A334658
+	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:email,bp.renesas.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B08CC33486D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 08:07:33AM +0000, Ovidiu Panait wrote:
-> Hi,
-> 
-> > 
-> > Hi,
-> > 
-> > On 21/03/2026 06:38, Michal Piekos wrote:
-> > > stmmac_vlan_restore() unconditionally calls stmmac_vlan_update() when
-> > > NETIF_F_VLAN_FEATURES is set. On platforms where priv->hw->vlan (or
-> > > ->update_vlan_hash) is not provided, stmmac_update_vlan_hash() returns
-> > > -EINVAL via stmmac_do_void_callback(), resulting in a spurious
-> > > "Failed to restore VLANs" error even when no VLAN filtering is in use.
-> > >
-> > > Check presence of VLAN HW FILTER flags before stmmac_vlan_update().
-> > >
-> > > Tested on Orange Pi Zero 3.
-> > >
-> > > Fixes: bd7ad51253a7 ("net: stmmac: Fix VLAN HW state restore")
-> > > Signed-off-by: Michal Piekos <michal.piekos@mmpsystems.pl>
-> > > ---
-> > > This patch fixes a noisy "Failed to restore VLANs" message on platforms
-> > > where stmmac VLAN hash ops are not implemented.
-> > > stmmac_vlan_restore() calls stmmac_vlan_update() without checking for
-> > > VLAN hash ops presence which results in -EINVAL.
-> > 
-> > I've been seeing the same message on socfpga. My two cents on that is
-> > that this error messages doesn't bring anything to the table anyways.
-> > 
-> > As Russell explains, it's either triggered when the vlan op isn't
-> > implemented (the stmmac callback macro stuff turns that into a -EINVAL),
-> > or when some capabilities arent present. All in all, it's always stuff
-> > that users can't really do anything about, as it's HW limitations, I
-> > think we can simply discard this message.
-> > 
-> > Also, nothing actually checks what stmmac_vlan_restore() returns, so we
-> > might as well return void ?
-> > 
-> 
-> I think this is the best solution until the VLAN capabilities handling is
-> cleaned up.
-> 
-> Michal, please let me know if you will be handling this in v3 or I should
-> send a fix for it.
-> 
+From: Biju Das <biju.das.jz@bp.renesas.com>
 
-I will provide the fix for it latest during the weekend.
+Enable the Gigabit Ethernet Interface (GBETH0) populated on the RZ/G3L
+SMARC EVK. The eth1, pincontrol definitions and hotplug support will be
+added later.
 
-Michal
+This patch series depend upon [1]
 
-> Thanks,
-> Ovidiu
-> 
-> > Maxime
-> > 
-> > > ---
-> > > Changes in v2:
-> > > - Replace check for hash ops with check for HW FILTER flags
-> > > - Link to v1: https://lore.kernel.org/r/20260314-vlan-restore-error-v1-
-> > 1-4fc6c3e2115f@mmpsystems.pl
-> > > ---
-> > >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ++-
-> > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > index 6827c99bde8c..cfc0ce9cec9c 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > @@ -6863,7 +6863,8 @@ static int stmmac_vlan_restore(struct stmmac_priv
-> > *priv)
-> > >  {
-> > >  	int ret;
-> > >
-> > > -	if (!(priv->dev->features & NETIF_F_VLAN_FEATURES))
-> > > +	if (!(priv->dev->features &
-> > > +	      (NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_HW_VLAN_STAG_FILTER)))
-> > >  		return 0;
-> > >
-> > >  	if (priv->hw->num_vlan)
-> > >
-> > > ---
-> > > base-commit: 42bddab0563fe67882b2722620a66dd98c8dbf33
-> > > change-id: 20260314-vlan-restore-error-f8b3a1c7f50a
-> > >
-> > > Best regards,
-> 
+v2->v3:
+ * Rebased to boot series [1].
+ * Dropped ethernet-phy-ieee802.3-c22 from compatible.
+ * Fixed the typo txdv-skew-psec->txen-skew-psec.
+v1->v2:
+ * Separated ethernet dts patches from series [2]
+ * Added rmii_{tx,rx) clocks.
+
+[1] https://lore.kernel.org/all/20260324114329.268249-12-biju.das.jz@bp.renesas.com/
+[2] https://lore.kernel.org/all/20260128125850.425264-1-biju.das.jz@bp.renesas.com/
+
+Biju Das (2):
+  arm64: dts: renesas: r9a08g046: Add GBETH nodes
+  arm64: dts: renesas: rzg3l-smarc-som: Enable eth0 (GBETH0) interface
+
+ arch/arm64/boot/dts/renesas/r9a08g046.dtsi    | 241 ++++++++++++++++++
+ .../boot/dts/renesas/rzg3l-smarc-som.dtsi     |  34 +++
+ 2 files changed, 275 insertions(+)
+
+-- 
+2.43.0
+
 
