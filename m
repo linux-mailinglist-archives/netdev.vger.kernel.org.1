@@ -1,53 +1,64 @@
-Return-Path: <netdev+bounces-272033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272034-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cGy3L48rxWnb7gQAu9opvQ
-	(envelope-from <netdev+bounces-272033-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:50:23 +0100
+	id WEGZHdUsxWnb7gQAu9opvQ
+	(envelope-from <netdev+bounces-272034-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:55:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DD5A335788
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:50:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1C2C33590E
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:55:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E405A3038D6E
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:50:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA8A13008D24
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:52:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73687239086;
-	Thu, 26 Mar 2026 12:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E7923D7E3;
+	Thu, 26 Mar 2026 12:52:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bBX16vSK"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="olmGsxPi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C91D2264B0;
-	Thu, 26 Mar 2026 12:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9854223DE5;
+	Thu, 26 Mar 2026 12:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774529421; cv=none; b=B+AAeTdrCbAh3d5tueVHDnklGsao3ZPQFem/w7mJTxzb1Y21G4FvLOZTXABZJ3reWsaKU7gYudViZHLkNJQ/mVaRlgRLIAO2dea4N0kV4cibuBQkJq01uZ4XHI97lblNsaM08oZEYsh46Y1jP4aXjXr4Q40qYPYHUZMNwZljLKc=
+	t=1774529522; cv=none; b=ephlQo688KYVii37jas1CtBrgNH3MVha4+XkDoWNxZUSt6wvDxGOzyrElZ25woDVKHqkT4L6by07LOzAVDD0WAiNXbIZW/obPaBV/xsMNPlha3Tbfml4UAwwMJwiGAMj6gHhiJHJY6pULWtd+ni7k6mzt6TedZ7kerPQ/fQFgfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774529421; c=relaxed/simple;
-	bh=nz8zSkm/QwG9xuSPLcqGNPh0yy+Xxb6YSgHtYiiKX/w=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hykDIooSKTM1+M5x7BMe2nhUgYwcjzt5+5F7LQV5d/U+onQhe8i0o6VjPzB+ER7nA1IrASoaw14jhr3ZEUqJ502s3MvR3ds/vCX4Y66PiNB/MV3zunv0yT56tuUVRf4H2AhnrAozXYw49xao7xPMsptuMFLRr5HU55imFDLkz3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bBX16vSK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8804C116C6;
-	Thu, 26 Mar 2026 12:50:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774529420;
-	bh=nz8zSkm/QwG9xuSPLcqGNPh0yy+Xxb6YSgHtYiiKX/w=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bBX16vSKk2RJ442v4X1RROZTV29ed+azP20KL7akyCDrncKW8ujNBZI3BpEQH0BNp
-	 7XZg5Lwq4VGkfYM+KmzsrAWyy0VJeQcI+hGLdSqNJPdCZMg5ZIx9vDG06fEhrr7ob/
-	 Z8JnEAqSlnOTktXHPzlPbUQQBgfix/IqUsGfqVDcUXAp6aY/7elenM7zdvtevDPkRo
-	 X9brYbViiv9/HL7E/coeTSJxuD10+mSjWdZuAx5zCI1rQ7E/9wR1mcWOR3jpT8QhNH
-	 cjkjTcYrFPChsNKR4yP4GWJNsUyj6CjjfFfgJOypVZv1CyMkFUTNJiL3X0iq/bhrxX
-	 Ie53GJyg6ObQA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA09139EFA65;
-	Thu, 26 Mar 2026 12:50:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1774529522; c=relaxed/simple;
+	bh=dPC/hvLnNoNXoxkA4KSZj0+7YgMbqD3vYvvIHDhxhSU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q0iBJJNEsTThma6F7DuBk5OYPMBM1haQJRPL3Gw3j05Qn99C1gfVtPnJKc+H0vFouf+O5cI3tNRBOuLp9V7k3gLgz5BTYkiqAm43MxyBIv2crtIihw0N5djFa/z13rjtdeHs8Hv8alWJEEb0mJtayIVGsO4K0F+bL16gNY/vI9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=olmGsxPi; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 9C496600B9;
+	Thu, 26 Mar 2026 13:51:56 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1774529517;
+	bh=E8eNA3bazW6Ue0u1coFCWFhTTGqfs8lOi/pQ1L9C+lM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=olmGsxPisARA/x5wbR4h1G7cPUJIwXru0owU85+eP+dDHXQkpdW8KYPLTeSmyqyA7
+	 Gkn59VkhKNUvXytqpu54UczlvJPRxYn5Dt8Nc5Ff7OmNvXzdiA4acgmW/wkyNG4ydJ
+	 J+Wh+noHD9RhFIuDo2mOjQhBwfCp3SLKZsR0PUK14i4EdurgvO0Q9AbrUSAhJyUQll
+	 scNT6wgU9bL1JlpOiIgC9MyYYuYPgd+mUDH/7HBZ2RvqigvaU2Uvs/2dnWOtZGohgU
+	 /oafkkyNiMMbzl9v64/gZ40hkfUIFclu/cT7OOGT/8G6Weprrl0gHyMBVaz4vcFfh+
+	 js+yJNlz6yJjg==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net,v3 00/12] Netfilter for net
+Date: Thu, 26 Mar 2026 13:51:41 +0100
+Message-ID: <20260326125153.685915-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,73 +66,140 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2026-03-25
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177452940754.2540696.16802163481653825797.git-patchwork-notify@kernel.org>
-Date: Thu, 26 Mar 2026 12:50:07 +0000
-References: <20260325194358.618892-1-luiz.dentz@gmail.com>
-In-Reply-To: <20260325194358.618892-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-272033-lists,netdev=lfdr.de,netdevbpf];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	DMARC_NA(0.00)[netfilter.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272034-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5DD5A335788
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,netfilter.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D1C2C33590E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+This is v3, I kept back an ipset fix and another to tigthen the xtables
+interface to reject invalid combinations with the NFPROTO_ARP family.
+They need a bit more discussion. I fixed the issues reported by AI on
+patch 9 (add #ifdef to access ct zone, update nf_conntrack_broadcast
+and patch 10 (use better Fixes: tag). Thanks!
 
-This pull request was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+-o-
 
-On Wed, 25 Mar 2026 15:43:58 -0400 you wrote:
-> The following changes since commit c4ea7d8907cf72b259bf70bd8c2e791e1c4ff70f:
-> 
->   net: mana: fix use-after-free in add_adev() error path (2026-03-24 21:07:58 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2026-03-25
-> 
-> [...]
+Hi,
 
-Here is the summary with links:
-  - [GIT,PULL] bluetooth 2026-03-25
-    https://git.kernel.org/netdev/net/c/aa637b2cf303
+The following patchset contains Netfilter fixes for *net*.
+ 
+Note that most bugs fixed here stem from 2.6 days, the large PR is not
+due to an increase in regressions.
+ 
+1) Fix incorrect reject of set updates with nf_tables pipapo set
+   avx2 backend.  This comes with a regression test in patch 2.
+   From Florian Westphal.
+ 
+2) nfnetlink_log needs to zero padding to prevent infoleak to userspace,
+   from Weiming Shi.
+  
+3) xtables ip6t_rt module never validated that addrnr length is within the
+   allowed array boundary. Reject bogus values.  From Ren Wei.
+ 
+4) Fix high memory usage in rbtree set backend that was unwanted side-effect
+   of the recently added binary search blob. From Pablo Neira Ayuso.
+ 
+5) Patches 5 to 10, also from Pablo, address long-standing RCU safety bugs
+   in conntracks handling of expectations: We can never safely defer
+   a conntrack extension area without holding a reference. Yet expectation
+   handling does so in multiple places.  Fix this by avoiding the need to
+   look into the master conntrack to begin with and by extending locked
+   sections in a few places.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+11) Fix use of uninitialized rtp_addr in the sip conntrack helper,
+    also from Weiming Shi.
+ 
+12) Add stricter netlink policy checks in ctnetlink, from David Carlier.
+    This avoids undefined behaviour when userspace provides huge wscale
+    value.
 
+Please, pull these changes from:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-03-26
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit c4ea7d8907cf72b259bf70bd8c2e791e1c4ff70f:
+
+  net: mana: fix use-after-free in add_adev() error path (2026-03-24 21:07:58 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-26-03-26
+
+for you to fetch changes up to 8f15b5071b4548b0aafc03b366eb45c9c6566704:
+
+  netfilter: ctnetlink: use netlink policy range checks (2026-03-26 13:28:17 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 26-03-26
+
+----------------------------------------------------------------
+David Carlier (1):
+      netfilter: ctnetlink: use netlink policy range checks
+
+Florian Westphal (2):
+      netfilter: nft_set_pipapo_avx2: don't return non-matching entry on expiry
+      selftests: netfilter: nft_concat_range.sh: add check for flush+reload bug
+
+Pablo Neira Ayuso (6):
+      netfilter: nft_set_rbtree: revisit array resize logic
+      netfilter: nf_conntrack_expect: honor expectation helper field
+      netfilter: nf_conntrack_expect: use expect->helper
+      netfilter: ctnetlink: ensure safe access to master conntrack
+      netfilter: nf_conntrack_expect: store netns and zone in expectation
+      netfilter: nf_conntrack_expect: skip expectations in other netns via proc
+
+Ren Wei (1):
+      netfilter: ip6t_rt: reject oversized addrnr in rt_mt6_check()
+
+Weiming Shi (2):
+      netfilter: nfnetlink_log: fix uninitialized padding leak in NFULA_PAYLOAD
+      netfilter: nf_conntrack_sip: fix use of uninitialized rtp_addr in process_sdp
+
+ include/net/netfilter/nf_conntrack_core.h          |  5 ++
+ include/net/netfilter/nf_conntrack_expect.h        | 20 ++++-
+ include/uapi/linux/netfilter/nf_conntrack_common.h |  4 +
+ net/ipv6/netfilter/ip6t_rt.c                       |  4 +
+ net/netfilter/nf_conntrack_broadcast.c             |  8 +-
+ net/netfilter/nf_conntrack_ecache.c                |  2 +
+ net/netfilter/nf_conntrack_expect.c                | 39 +++++++--
+ net/netfilter/nf_conntrack_h323_main.c             | 12 +--
+ net/netfilter/nf_conntrack_helper.c                | 11 +--
+ net/netfilter/nf_conntrack_netlink.c               | 75 ++++++++++--------
+ net/netfilter/nf_conntrack_proto_tcp.c             | 10 +--
+ net/netfilter/nf_conntrack_sip.c                   | 18 +++--
+ net/netfilter/nfnetlink_log.c                      |  8 +-
+ net/netfilter/nft_set_pipapo_avx2.c                | 20 ++---
+ net/netfilter/nft_set_rbtree.c                     | 92 ++++++++++++++++++----
+ .../selftests/net/netfilter/nft_concat_range.sh    | 70 +++++++++++++++-
+ 16 files changed, 296 insertions(+), 102 deletions(-)
 
