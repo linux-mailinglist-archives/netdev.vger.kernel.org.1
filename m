@@ -1,163 +1,114 @@
-Return-Path: <netdev+bounces-272189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272190-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aEsjLi55xWnw+QQAu9opvQ
-	(envelope-from <netdev+bounces-272189-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:21:34 +0100
+	id mFdKIHx5xWnw+QQAu9opvQ
+	(envelope-from <netdev+bounces-272190-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:22:52 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 207F0339FCA
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:21:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC2F133A00E
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:22:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A66CA3124942
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:12:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 73E953138C78
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E17DA37F8AD;
-	Thu, 26 Mar 2026 18:12:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8FF342526;
+	Thu, 26 Mar 2026 18:13:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mAWrfpvO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IOiU72bp"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66ADA224B05;
-	Thu, 26 Mar 2026 18:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4704730B52A;
+	Thu, 26 Mar 2026 18:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774548735; cv=none; b=Lg9FQGLhrKKZBGru4dbte68JNzAw/QJlsOy7wu78x1hG+Snk8TxRthpvPFUgVX/m8pkeVdKEG6oQkMQuExAMvLTGRdNiq8Nuby85F0YSAYhlyifn0j/WiVAn7A0UqODCQTFcjvYqjnA3I/xfUhF52UbMQU8IPUDIx5dSahh3wTc=
+	t=1774548836; cv=none; b=AyKndWhL1KDE2ys/ZXxKIf1lBt+UJ+DB5N1gIPjHjiV0EEUZYoRj6Vb2DgrardPs3Ipx17vvmAu3mHy5ITobgpVDHoH1jiDL3y15bkQ1llfVN07TXUd21duqfrYSeHKa6cMnbp1QRjQYyEn3c4+wh14BDc8Mi68wm9gzncsLX/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774548735; c=relaxed/simple;
-	bh=sxAmqw1lLIBgSH7InHiLoA7p1BK5TNUSniY9DyPN35E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mJcis83NT9vjMXRuF6h+W8QoyfssXVsse4UCbX5xi3JgoZsu0W/3utVehHaMOOBrs7tFw8Yr3C/Sq8yLuWRFwysYRONfffFf/xH5xs8ORNT2zglvwfRxbGpvv0bWGva1JoyIjj0M988+fI3/Q4uKi+dwlnGHiIfv05ZnGkXZ7zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mAWrfpvO; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Ji45NUWbwmYmtJWis87trG6dXs16U0uRXqDBTnsy5d4=; b=mAWrfpvOlFfajgP5bFr/ohHOiA
-	1QPBL3YZnDhT3I0lLAI2A8ejzh1khwXIIIlePLo6ivYWUVBAGAQy6A2GU1zBq5zM1kgnU1ILI/7aT
-	6+bckNXZKZfbJrK+n5XOCoOxHpWJwkcBYCUd8Py71xIDe2hKglU2ktIDZA62zvZq4GzIFu+Z42HZf
-	4tD/jRwlnJmeiVEMZbzZDyxj2F3YdFmBbLa9BCXi3otIaZb1H+xuGGgTjvazJhCCtIbuLplgyZwGm
-	zOMVqdlpSrwJxH6wuXq+dbMDonDyugML57jeQwYfois/7z+HMwrPJM4W3foKfQI8eEMy3WOE3WilH
-	SXgUClFw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53576)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w5pBg-0000000059C-218X;
-	Thu, 26 Mar 2026 18:12:08 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w5pBe-000000007Fq-2PgA;
-	Thu, 26 Mar 2026 18:12:06 +0000
-Date: Thu, 26 Mar 2026 18:12:06 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 03/15] net: stmmac: qcom-ethqos: eliminate
- configure_func
-Message-ID: <acV29ruRVy_fcwDq@shell.armlinux.org.uk>
-References: <acKNcX5PqtWYf8m3@shell.armlinux.org.uk>
- <E1w51Xs-0000000DwVV-2bnh@rmk-PC.armlinux.org.uk>
- <20260326180453.GU111839@horms.kernel.org>
+	s=arc-20240116; t=1774548836; c=relaxed/simple;
+	bh=zWQctcShB2sKYdh6duA/6NGVzeNPvumaZlYU3M7XPHo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KumF+cg5oWmAO1tWsZmq0gRW8cWayxiYY5A/H8qISZANpsa7+2BJqrmCmed7vUMEgbXTuofge/R9A/IHWvGpDkxWXVoDTFlxLLMM3w0+/Abg+TKdU/X2zU2TmtqHc6jnCpe6G2f3xqP8cn3bsD48pKiNjdRqpiQDDy40eWUpMtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IOiU72bp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77F80C116C6;
+	Thu, 26 Mar 2026 18:13:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774548836;
+	bh=zWQctcShB2sKYdh6duA/6NGVzeNPvumaZlYU3M7XPHo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=IOiU72bpzBtvIWFfxWeRkwTxjoGe7ydIyKpdvlRKlE4wIy4jpmjl57qSoq0c6kM9c
+	 6vniMYcCulA04YzKM9y2PDZ2bw/MCVT61JpAApQx+/mi4KTgRrHnqcMTKq+zLsPG0Q
+	 0zQ7E07EGsefCQX21KOYKosrry14xwZmyHZ9t+jv6HNMyLpCv8ULyWhq6bCZhkHA4R
+	 +ZiSKypYOhRB1eK+sBxeL/rmmEHrbDiEzs7G6CjB1yeo6aAVBscqvaVcMCJ0QqUvav
+	 tMcW7osym0LONC4iOw/lX+B/RFjgXmMNeK6vr7+HiHG5uAg+YW6VOlYzMMLC2bR/N6
+	 VXvo65h4jsnLg==
+From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, magnus.karlsson@intel.com, stfomichev@gmail.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ larysa.zaremba@intel.com, aleksander.lobakin@intel.com, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>
+Subject: Re: [PATCH v4 net 03/11] xsk: fix XDP_UMEM_SG_FLAG issues
+In-Reply-To: <20260326114919.519456-4-maciej.fijalkowski@intel.com>
+References: <20260326114919.519456-1-maciej.fijalkowski@intel.com>
+ <20260326114919.519456-4-maciej.fijalkowski@intel.com>
+Date: Thu, 26 Mar 2026 19:13:52 +0100
+Message-ID: <87fr5mcvbz.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260326180453.GU111839@horms.kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-1.39 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_MIXED_CHARSET(0.77)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272189-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272190-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.975];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bjorn@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:email,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: 207F0339FCA
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[all.your.base.are.belong.to.us:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DC2F133A00E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 06:04:53PM +0000, Simon Horman wrote:
-> On Tue, Mar 24, 2026 at 01:11:44PM +0000, Russell King (Oracle) wrote:
-> > Since ethqos_fix_mac_speed() is called via a function pointer, and only
-> > indirects via the configure_func function pointer, eliminate this
-> > unnecessary indirection.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> ...
-> 
-> > @@ -623,14 +627,6 @@ static void ethqos_configure_sgmii(struct qcom_ethqos *ethqos,
-> >  	ethqos_pcs_set_inband(ethqos, interface == PHY_INTERFACE_MODE_SGMII);
-> >  }
-> >  
-> > -static void ethqos_fix_mac_speed(void *priv, phy_interface_t interface,
-> > -				 int speed, unsigned int mode)
-> > -{
-> > -	struct qcom_ethqos *ethqos = priv;
-> > -
-> > -	ethqos->configure_func(ethqos, interface, speed);
-> > -}
-> > -
-> >  static int qcom_ethqos_serdes_powerup(struct net_device *ndev, void *priv)
-> >  {
-> >  	struct qcom_ethqos *ethqos = priv;
-> 
-> Hi Russell,
-> 
-> FYI, AI generated review reports that the comment in ethqos_clks_config()
-> that references ethqos_fix_mac_speed() should also be updated.
+Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
 
-Also already noted (yesterday).
+> Currently xp_assign_dev_shared() is missing XDP_USE_SG being propagated
+> to flags so set it in order to preserve mtu check that is supposed to be
+> done only when no multi-buffer setup is in picture.
+>
+> Also, this flag has the same value as XDP_UMEM_TX_SW_CSUM so we could
+> get unexpected SG setups for software Tx checksums. Since csum flag is
+> UAPI, modify value of XDP_UMEM_SG_FLAG.
+>
+> Fixes: d609f3d228a8 ("xsk: add multi-buffer support for sockets sharing u=
+mem")
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-I do keep an eye on patchwork for my own patches - I have a firefox tab
-permanently open for my patches in patchwork:
-
-https://patchwork.kernel.org/project/netdevbpf/list/?submitter=165511
-
-Thanks anyway.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org>
 
