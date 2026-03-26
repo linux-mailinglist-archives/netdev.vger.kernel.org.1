@@ -1,80 +1,82 @@
-Return-Path: <netdev+bounces-272250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272251-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OJfuLbmexWlqAAUAu9opvQ
-	(envelope-from <netdev+bounces-272250-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 22:01:45 +0100
+	id SNNZJk2exWlqAAUAu9opvQ
+	(envelope-from <netdev+bounces-272251-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 21:59:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6640D33B9F4
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 22:01:41 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3991E33B9BB
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 21:59:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 65F463015A52
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:59:41 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3696B304A798
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 322D33A257E;
-	Thu, 26 Mar 2026 20:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5833A7855;
+	Thu, 26 Mar 2026 20:59:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KV5Z+9hy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oZZTy2kS"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E403A6EE5
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 20:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841943A7824
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 20:59:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774558778; cv=none; b=cseS2L17m5hMY6RSRE2OETJVJ9AOaW+nPCo+tj2pkfR5ajXVVkkzYX/h0FKul0faQ3T2Rcm9OycU7xXLDSBvsNnArnidRJZYf+XiUbAtZxBH0tO1MEEdkxFqO1tIUkooUZ0+InoRli27jSloUMJNimYEmcmVPwXYw23AP8oMskg=
+	t=1774558780; cv=none; b=ByV546FeYjEri4NzBU+X4Nahiomku8l1LNiPnEnP4iUsBnPga6CDLrLD5pWNxwXV89Pb285lW4gAOhtJuPXHH/n2ERlL4yxs1HTjqQzTvuA9df/RVWPaFoBi2bOMvCJySiVl6khVKMiB5SWGKgKCLZR66bobfPJJzTBykg308gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774558778; c=relaxed/simple;
-	bh=9CI3IyOmtBDo487mBoinvfXlrSwYYvLLukYprVQfHOk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FLL/aV2HDQCFOAm9TdIKsfodR35InsGyE68Qz03Hu9JwRt5wo2zQu0FBcpObFpOSB/ZkwP9HpRJt8INnqg4LiizdfnMcfQGqIZ59D+trZGCxjOYKfgS1qaHL6WD//mP77mqj0QkZg0odUX/pgcrdo7PXWR+k2Rj5N85+rQERlM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KV5Z+9hy; arc=none smtp.client-ip=209.85.167.49
+	s=arc-20240116; t=1774558780; c=relaxed/simple;
+	bh=zjkhmr/61VcX+BSLwE00HTVsyPm/qhWsTHQ4Dov/aow=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=CIjJMra2cKf3ukKOH8T+jC3tV7Ri0YV8CkZbZWVyhkLJh8qn4MZuilfjj80T+/JjvQdQi8kDuPPqhFrquYgbjSCVgHXMEV56ZMGpKkI5+z9qdGelyILxC9BTizZjLgr7iCvLws6+P5PAnzGhymJx8gjfUXBCBe7J9ec1EmwQq6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oZZTy2kS; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5a283c44478so1612866e87.3
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 13:59:36 -0700 (PDT)
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-59dea72099eso1752181e87.0
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 13:59:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774558775; x=1775163575; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sbZS0juuOJoqAPsC+Ibd+2874q2p+fTbJaUXPGnWbZI=;
-        b=KV5Z+9hyvKmMYAqXiLwaHcLLaiwo8seowrC5ZT4JqnfL0AvlsKtnykHQsL+5cbZWwV
-         FUovELAN9siYbaNiGWVL0zMvS9NND6JXPCq558uSnsvn6JX2qsMB++sAo0vlWutLWnKj
-         pr/Fn4AU5912KVelmE09KBPWhAzJk5vapE+AUhN8FxLLqdz9Ip+YvjDpDM3z81edcdNN
-         q4hMH6U9jm6lKofFoibO9LhT5O2Ho7DRVQ18lYZabd81p/vt1UGO3KdWpMeSHXG4JB5/
-         1QzzZ22QVO95dJIciuCtzJlUjbnGHi0lojnFlEfmeIji4ypLim+jjthHysGUDmN2Wlwv
-         tmTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774558775; x=1775163575;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1774558778; x=1775163578; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sbZS0juuOJoqAPsC+Ibd+2874q2p+fTbJaUXPGnWbZI=;
-        b=BoDpMEGEwBw7HXunIJgaobwiMXaMuidpFpN05jYUYBgrrD29spMsDfnDGLQZ8ip+B3
-         p3Gt64jwSyuUzui92uAW9umM3aTrTWmhytO6as754HYSkTxlBGqvQzVgoy5ubZ81ey5Q
-         heTXsLMW/Q5+UPa5oBi/WDdm5syR7ZGNOMx5906KcRdZh7xMKruLT/YnRjV85D/AymMs
-         yc0iw7Oab4Kbzzgcq6QIdKCGXs8492if/XFRxxaTjwYdBc8TB31w1d0PkDvo29+JfouS
-         cI2JtGMNoSKpEv2dmxRyWiJEtxHvYI5uWxOPQj4jnFh0KFcCUNt1ixLfhbC/0y06Dj4G
-         1chg==
-X-Forwarded-Encrypted: i=1; AJvYcCV7TSfApEkMxFpkw7oSfPZfEUVhH/gNPNBPCcJvFI7YRxislQlWIr9VjwqGwwOAK4Kvc5VA2MY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFNIRhdb2C6HPGzqnY8D1IrwWGueXfB6ch4x62VBQUvLq4+EYv
-	J3FC4rl3VrQpFto7X3zjnnvDOfhfD/3Ldgwhs3Ne6fCNJMie0+R3kKyO
-X-Gm-Gg: ATEYQzxKvif5H7t/UfcVrzCICXts9U4z4ac3/Ywg0fCIH3oLkvX6O6ukgnpuAvVydEx
-	I0CpfI6JanyIPYlB9nkvq3eNoqkCU5BGKmhpdnk+G3MTxRcvw7CEhEkIb1Vb3MDhjuhePKX48gb
-	w3UK+9Yxoeud8K1oB/3vJ0Vm7fB9ekVjRswR1oG2PVn92S6DAgrvyz177tcxDDCz2DT0vamyVnY
-	dQHXHkZQKg1SSH3sPO8swD4t1IBko7dDFUz5UlIreT6mKr2vtJ3m1e4v/JGNIPObTBEx0zGIWMq
-	7XxcGNHsjMTRtdnUfPYtfJDxOWiNt0HJgxguw+48NbOt6DuyZtDBcsd9Tytu1g037D68XLh6FIP
-	mif9fpx5PSjupLB8qHbVHoapo9xXoHyGGwrmFpxoP3eaB6ecLCX8UNW73JTljqaWKzZmtXbhSst
-	uu4hc8PJTh2YybOm/ygY3cRelYR9WLv3f/HLC17tKLZcaHrDZHm0oqMsoOEHdIklNKA3hkapmMh
-	HpMgskbLw6dqm4=
-X-Received: by 2002:a05:6512:614:20b0:5a2:777e:3fd0 with SMTP id 2adb3069b0e04-5a2ab91ce28mr1552e87.25.1774558774757;
-        Thu, 26 Mar 2026 13:59:34 -0700 (PDT)
+        bh=AwvGgoJDadEWUFofhWZcAMj58lGXH2SGayO0FVAFsaw=;
+        b=oZZTy2kSqVj2+C9Ajhd6jeqCvxhaT4o0Qs6yzExCox2SZlqxedj7NOtLp/NYWcs0qF
+         mEDASQ5m5dC2v7NQazRLSux4ICncQUmReNmhzlZCxU0EmU7bPb6igglHmS2g7cgaf1Eq
+         y0VEwBPsei/CHTK/VWSGSvTbaQ/+brDHjx/tr90iMOKXaxoB7yvN4zNXvWnWI8eLAtKa
+         zhJGTM+K6EtBHVoGfzpvLEh7CY8VzmyLVki9ANF8UMkm6kkEniztEPMIEG9IEHPxni1O
+         50qB4UwbPxbn3xxP4PrggQDidLxs5I7DMcxPaHbtpvcMYtxljOXW2bD6FGMD0imHCicJ
+         1BZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774558778; x=1775163578;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=AwvGgoJDadEWUFofhWZcAMj58lGXH2SGayO0FVAFsaw=;
+        b=Uu8zUh6HkamT7M6OfE1XXgaYBlpJ8oWZUUM1t95BhVWewb3uD4k4FtIar6cAXaq3Uy
+         6IAwuBOPO1sf78GBWuVK4wR7K/7pvhipk7QuzlnhHFSzoAhd1m8cbDQYSoGglbnNOXUT
+         zmXdP4QSAbuNyREums2Vrg6ilB7nDQsX+1TWTvICLulISbpN2gEEqIJbnriI2k+ZbKpV
+         Y/0ZQ36lVGxXcGnXzQtHbvOjpKbWk+G5gOCvYrL0LHFYBzz1fmfUr8GvyELy2g4+8SnY
+         XT5XyRNVsFG71YdkIuRKqBHEiMUPbRnZ9lF7K9i7bcxVdVFVisZiKkwma7UirKWu6JGd
+         VOLA==
+X-Forwarded-Encrypted: i=1; AJvYcCXTq/zimq6waDwi9IM5uLS4KwRtM+jTTVvsW0NAYYNB50oYeIMcNv9lPBPjI+4k/eAArQ/PyB8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRDbkXKoIDgJp3IO0u6WXQRtiJDHbDjnrVIWqHrFfpyW77xHPy
+	y4Ybzz7+xitMU4M3H9eqmRYJ+k+M3KbQgLnmskEB9js8UeO+XVB/i/OA
+X-Gm-Gg: ATEYQzyhH7AoNYQP98mqMgf4kts1vhprxILw4QR62XaITf0piM+ICnvrK1miZgv0ZjW
+	vo1uKpc8kHvZ0Lq4atRA3G89QjiQjChyqzmqZkQoStwaD0Yn7+0XeRdjeZ6KKgwF/AC3SwqMamf
+	bulLadC8gVHHLMt+OM5EY5qoCgIrfMUvdPAjdM4rvOQADB0jrlwQrO1QyG2YfIpZEh1muGtr4j2
+	fiCZrMnKSSsm0TQggSbqgN6JUKKAlvvOsAQWThSe/kgrPATU7Xpq7qfHqNTgS04i7dyQNGwOAmb
+	+gvulmO3MbWlxWULwkPPUNOHCdvUeWTEIIyBRm3CZclhVsJ8PH6Tf6EH7By13L+3n0N2fxRTj6b
+	PJajjZ8G+O2cA/S/5MxiJ6pfnRE/+W3Bwt4p8ijqpH8dY+2y6fo3uoL1bkxw0RmL4no37xZsqmH
+	E6S8VjgPRKzDNTbDxV10Bc3p2+OTBJKvyGrcVF2UwBtokX6dvcHa1VkeI2SvsxgeAx/gJSvkzmb
+	fGWkMPP387rk8w=
+X-Received: by 2002:a05:6512:230d:b0:5a2:8495:965f with SMTP id 2adb3069b0e04-5a2ab7f1deamr9497e87.15.1774558777462;
+        Thu, 26 Mar 2026 13:59:37 -0700 (PDT)
 Received: from localhost.localdomain (81-237-238-191-no600.tbcn.telia.com. [81.237.238.191])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a2a068f5f1sm842596e87.55.2026.03.26.13.59.32
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a2a068f5f1sm842596e87.55.2026.03.26.13.59.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 13:59:34 -0700 (PDT)
+        Thu, 26 Mar 2026 13:59:36 -0700 (PDT)
 From: Oskar Ray-Frayssinet <rayfraytech@gmail.com>
 To: saeedm@nvidia.com
 Cc: tariqt@nvidia.com,
@@ -89,10 +91,12 @@ Cc: tariqt@nvidia.com,
 	linux-rdma@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Oskar Ray-Frayssinet <rayfraytech@gmail.com>
-Subject: [PATCH net 1/3] net/mlx5e: Add null check for flow namespace in mlx5e_tc_nic_create_miss_table
-Date: Thu, 26 Mar 2026 21:58:22 +0100
-Message-ID: <20260326205824.11749-1-rayfraytech@gmail.com>
+Subject: [PATCH net 2/3] net/mlx5: Add null check for flow namespace in esw_set_slave_root_fdb
+Date: Thu, 26 Mar 2026 21:58:23 +0100
+Message-ID: <20260326205824.11749-2-rayfraytech@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260326205824.11749-1-rayfraytech@gmail.com>
+References: <20260326205824.11749-1-rayfraytech@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,7 +111,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -117,7 +121,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-272250-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272251-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -127,37 +131,44 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6640D33B9F4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3991E33B9BB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 mlx5_get_flow_namespace() can return NULL if the namespace is not
-available. Add a null check to prevent potential null pointer
-dereference when accessing ns->node.
+available. Add null checks to prevent potential null pointer
+dereference when accessing ns->node in both master and slave branches.
 
 Signed-off-by: Oskar Ray-Frayssinet <rayfraytech@gmail.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 4 ++++
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-index 1434b65d4746..503c9cc96a02 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-@@ -5216,6 +5216,10 @@ static int mlx5e_tc_nic_create_miss_table(struct mlx5e_priv *priv)
- 	ft_attr.level = MLX5E_TC_MISS_LEVEL;
- 	ft_attr.prio = 0;
- 	ns = mlx5_get_flow_namespace(priv->mdev, MLX5_FLOW_NAMESPACE_KERNEL);
-+	if (!ns) {
-+		netdev_err(priv->netdev, "failed to get flow namespace\n");
-+		return -EOPNOTSUPP;
-+	}
- 
- 	*ft = mlx5_create_auto_grouped_flow_table(ns, &ft_attr);
- 	if (IS_ERR(*ft)) {
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+index 7a9ee36b8dca..63aff6255c02 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+@@ -2821,6 +2821,8 @@ static int esw_set_slave_root_fdb(struct mlx5_core_dev *master,
+ 	if (master) {
+ 		ns = mlx5_get_flow_namespace(master,
+ 					     MLX5_FLOW_NAMESPACE_FDB);
++		if (!ns)
++			return -EOPNOTSUPP;
+ 		root = find_root(&ns->node);
+ 		mutex_lock(&root->chain_lock);
+ 		MLX5_SET(set_flow_table_root_in, in,
+@@ -2833,6 +2835,8 @@ static int esw_set_slave_root_fdb(struct mlx5_core_dev *master,
+ 	} else {
+ 		ns = mlx5_get_flow_namespace(slave,
+ 					     MLX5_FLOW_NAMESPACE_FDB);
++		if (!ns)
++			return -EOPNOTSUPP;
+ 		root = find_root(&ns->node);
+ 		mutex_lock(&root->chain_lock);
+ 		MLX5_SET(set_flow_table_root_in, in, table_id,
 -- 
 2.43.0
 
