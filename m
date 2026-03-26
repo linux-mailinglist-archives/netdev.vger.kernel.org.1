@@ -1,156 +1,126 @@
-Return-Path: <netdev+bounces-272177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272181-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GL6iLAJxxWkU+QQAu9opvQ
-	(envelope-from <netdev+bounces-272177-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:46:42 +0100
+	id IFzALJtyxWkU+QQAu9opvQ
+	(envelope-from <netdev+bounces-272181-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:53:31 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A96C33966B
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:46:42 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5139F33987C
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:53:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E8F093018D54
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:44:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 18646309EAAB
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162BF35DA44;
-	Thu, 26 Mar 2026 17:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F403A4509;
+	Thu, 26 Mar 2026 17:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pi6DLka2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="C4BS8Uyq"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C8D33D51D;
-	Thu, 26 Mar 2026 17:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF2F41C30B
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 17:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774547062; cv=none; b=bwZ7oz/LSluJVc2GbqPJMVB3R1zzSn+OXFZlYPP2hNz7JkgvTby9Lb6oNMAcwBK0578GjyqfNAzjMx8ZnbF9JdlRxedt19hKs4Jo7TSeMtxa7yIzHJlFGjm8+juXc7reEoj+IND/3TANH+8WLpJrtNbcxk8fWC/t9YV4Mc08d8I=
+	t=1774547202; cv=none; b=kuUOQUDmwxp84OFTxVfUz0I2pxwrhuK7bJzcwSkZNAiH7+E6SB9h2w4SDlRX3DMdV6fOwvu/mv9a21Ju9nVEZCtJTDAQI/I6ujBx6TK7Vda/HUrI5pKeoHWf3GFhcK+AFV75j5JcfK9iB+FHuTk+U371abKuC/J5XOYwGwxLL8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774547062; c=relaxed/simple;
-	bh=/k1OR+GuB2NBGGAdF22Aa+NrR/gPZHefh3IaY2VS4MY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nneXmqglPubuwRTaiaTjygCEqPcBJ2MpAEfrGpjtc/dHJG4j3gLCokhkay/uQ7r1t20/XLtop3nmQuIsvPMHRtzrC4G6eXcrjvi9Tfrp/yUdKgXl59JMi7CCJQls8r7e/sh88ArRrCPYa/c+9fSOlgxICi5fw05fkE9r0PjvaHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pi6DLka2; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=1f6J7MFQ+d3Eprch19nvBJN8SwLx9u4Mt/IcSuHYlLw=; b=pi6DLka26kwbyiEEB6f0eCDWa3
-	6+fgpsgwMuo2hHTi7NjvwYDaE28XI06phkkv6LoAdpoSVu1wGEcuB/B2b7dpbcYLy2qO3OttXzjME
-	q+sWCBOkrWZI5i1fnQy3cpbCjLda4+i3eZ6IiV3X05HIlDpxyUeWguchdj38m/DUEhKv8zxzFow9s
-	sp1alZgomfd1xRGP5gl+s3xYElOko2K4JVrtIVmaeaZCC14vQraGxxQJ7JfhW59B3Embg/9SrBZY1
-	1eqDdmQtKX/3gTk9kqWNxl9W1o9VgVPvZXphGHKZx6FCpLvYvQEMQGxpgkjVyThlTnKUNR+Dd8q69
-	E4vR7l0A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51818)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w5okW-00000000574-3f1q;
-	Thu, 26 Mar 2026 17:44:04 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w5okT-000000007ER-3JGz;
-	Thu, 26 Mar 2026 17:44:01 +0000
-Date: Thu, 26 Mar 2026 17:44:01 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, kevin-kw.huang@airoha.com,
-	macpaul.lin@mediatek.com, matthias.bgg@gmail.com,
-	kernel@collabora.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 4/4] net: phy: Introduce Airoha AN8801/R
- Gigabit Ethernet PHY driver
-Message-ID: <acVwYUKxIkKUEUJZ@shell.armlinux.org.uk>
-References: <20260326-add-airoha-an8801-support-v2-0-1a42d6b6050f@collabora.com>
- <20260326-add-airoha-an8801-support-v2-4-1a42d6b6050f@collabora.com>
- <acVND6DdpM9czIwU@shell.armlinux.org.uk>
- <044110c5-da1e-48c0-93fd-35553e86b271@lunn.ch>
- <acVQQQiciPQBkQOG@shell.armlinux.org.uk>
- <425217fd-f74c-455c-9aa7-5b6682d887fa@lunn.ch>
- <385d2137-0d15-4dc0-8994-9cd48e4150b4@bootlin.com>
+	s=arc-20240116; t=1774547202; c=relaxed/simple;
+	bh=U2Rk1go9BVcJuJ2EEhHc1TGH3yM1ERqWLgCMnpQumYg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jZBVAnE3W54gOvmQAGI/YPmZ176/hXvGNoqQpVvKAxR1z97cMTfyG7S9dK2Oo0T7jKBbrmKHp0zVW7nUp6eVlV2fKufD0yFPdHRoRChPQBurA2gPqZ+XuEDRKCKwVrocCB9piYMm/kM1Y4G5gL8jdPsS6DgPgSJDzrJ8bJTHrAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=C4BS8Uyq; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774547186;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=IDT4pyIhCwz8AX4AEf5QuLYdDUNg/3ZyvF/XHwUhyjw=;
+	b=C4BS8UyqMjKT5a3W1vu9ZrMFRDPXnleIQTHjI58434eGtLPBn347tRxENpBAHqWava/0do
+	K9sPIIVtFatI1ZdpRqCo96SkYmGbpVj3TkupWQrR2sxFjb6K+b+j0iNbZJosnR6ZELHa/6
+	kfD/TcWSeU0XE5/Ads5rbo34s07G3U4=
+From: luka.gejak@linux.dev
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: horms@kernel.org,
+	fmaurer@redhat.com,
+	liuhangbin@gmail.com,
+	linux-kernel@vger.kernel.org,
+	luka.gejak@linux.dev
+Subject: [PATCH net-next v2 0/2] net: hsr: subsystem cleanups and modernization
+Date: Thu, 26 Mar 2026 18:45:58 +0100
+Message-ID: <20260326174600.136232-1-luka.gejak@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <385d2137-0d15-4dc0-8994-9cd48e4150b4@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272177-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,collabora.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,airoha.com,mediatek.com,vger.kernel.org,lists.infradead.org];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,gmail.com,vger.kernel.org,linux.dev];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	TAGGED_FROM(0.00)[bounces-272181-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.963];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5A96C33966B
+	FROM_NO_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luka.gejak@linux.dev,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5139F33987C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 06:25:20PM +0100, Maxime Chevallier wrote:
-> On 26/03/2026 17:56, Andrew Lunn wrote:
-> >> What is the timing requirements for a system going into suspend vs a WoL
-> >> packet being sent? Should a WoL packet abort entry into suspend? If yes,
-> >> then we need to program the MAC before the PHY is suspended, because
-> >> suspend could already be in progress.
-> > 
-> > We would then need to hook into the NETDEV_CHANGEADDR notifier, and
-> > call into the PHY driver to let it reprogram the MAC address.
-> 
-> We would also probably have to re-do that MAC addr programming at phy
-> attach time ? If the PHY isn't attached (e.g. link admin-down on some
-> boards), we can't use that notifier as we don't know what netdev to
-> listen to. Or I'm missing something ?
+From: Luka Gejak <luka.gejak@linux.dev>
 
-Another point to consider in this area:
+Changes in v2:
+ - dropped trivial cleanup-only patches per netdev clean-up policy
+ - added AI attribution for cover-letter/commit-message wording only
+ - dropped fallthrough/BIT conversion patches per review
 
-Should a detached PHY remain with WoL enabled?
+This series contains two focused HSR cleanups with practical benefit.
+It constifies protocol operation tables and replaces a hardcoded 
+function name with __func__ to keep diagnostics correct across 
+refactoring.
+Assisted-by: Copilot:gpt-5.3-codex (cover-letter/commit-message wording 
+only)
 
-If e.g. the network driver is unbound from its device, which certainly
-disconnects the PHY from the network interface, should that PHY still
-be able to wake up the system when there is no way to configure,
-check its status, or handle its interrupts?
+Luka Gejak (2):
+  net: hsr: constify hsr_ops and prp_ops protocol operation structures
+  net: hsr: use __func__ instead of hardcoded function name
+
+ net/hsr/hsr_device.c  | 4 ++--
+ net/hsr/hsr_forward.c | 2 +-
+ net/hsr/hsr_main.h    | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.53.0
+
 
