@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-271956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271957-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CGgfFpEGxWnZ5gQAu9opvQ
-	(envelope-from <netdev+bounces-271956-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:12:33 +0100
+	id 0ORVBJ0GxWnZ5gQAu9opvQ
+	(envelope-from <netdev+bounces-271957-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:12:45 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAE5E3330FE
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:12:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 827E033310E
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 11:12:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3C9903197E36
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:00:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A57B0319B32D
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42C543CF05C;
-	Thu, 26 Mar 2026 09:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BEDD3CF677;
+	Thu, 26 Mar 2026 09:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YLY0P4ju"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qsUprecA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA993CF052
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 09:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D1B3C660D
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 09:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774519057; cv=none; b=aJcDjNkngXgBudcbvjMQJHPa8TD6ONxwv/hj4VSOkKlRRm03NWOesTyTcD1PKt53Vxgff3BBr/2LP+rxiES9be6uKPeeLSezGikNiXkKopCpwuy397gesvoajHPXTcpotj6D6CzSNqB/7uOLLgHy4X6AFnJ6CXAr4GHM7tRiWAY=
+	t=1774519059; cv=none; b=E97rjLztEyf/Vm10GIdPfu5LKBtM/MUkRyNMhWX/8xArC3r/ZJRw/uy6JdQoarvtjX+QGFlBph3bMTzCNpYgrzVjC8GJfNZ2nALXw9XXqU2PgPGYsgXaoQhV7dFyI+zBFngUsmOQqRLk32esvUh+Z/rQzZcLccPqjwZCtMT4aWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774519057; c=relaxed/simple;
-	bh=MR4kj0xpn91eNGWeC5rwKgyiy01MtgWWFZqZWQNGIfk=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=kObyr9e2c9TYR4OYbO7lgVHue1mhyM6Tb6dXxiNd+Vxmb/D0wZ+oKDqlww8nooLw+dw/llHPYO6dHbLDE2jgLCviHhwQ8Pcsdi+FfGLJ+2byfIJkIlnBMTPq5W/G5LeHOdjlRMwqzw5isF6iRVbW6VSilwDAD4gGu/o2EdaBTHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YLY0P4ju; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBC62C116C6;
-	Thu, 26 Mar 2026 09:57:34 +0000 (UTC)
+	s=arc-20240116; t=1774519059; c=relaxed/simple;
+	bh=Qds9B5ILFmS8Vp3JnU8z1SyfzpPtjdN9afy1Htr5iI8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=k7VmcpURcPu5Oj8K/8MlbhEPpOmdDn7kWrdX+yaijaXiFfYvKkwFld+qwfZ4xI3k5ew21yYS5bS0bOT3ZSL5gLXyrUaREAhvbzv/OLvM/R2ZB2oje6qMkuvuO9+BjqreWtbbyFRmsXt5HhzdpNyEOToW8vRQ0k1Z6t0TpJynwys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qsUprecA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21D84C19423;
+	Thu, 26 Mar 2026 09:57:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774519056;
-	bh=MR4kj0xpn91eNGWeC5rwKgyiy01MtgWWFZqZWQNGIfk=;
-	h=From:Subject:Date:To:Cc:From;
-	b=YLY0P4juzrZ/hNTdPESmQIuoWIIlfpXq95jKnLiXfP7aHruZMkowTC9WCLuwnVHkT
-	 Oprb7kw46gkgrpV7Z5BPSmIjPzugRHld6j0JFpfVNOrL+ZweUSZ5ZYYkcP/pq6jrZY
-	 3w/yVaaOiu7dkJmZ8JNu09KeehPv8M/5D6UHFmx0HiIZjWDDywvwmHc+mgQTUcVZZC
-	 YKhIgxsZgoG+W55slBN/e7FwOnpxab6caIfzO6Hjpj9t2fCwL9uBMvPbKbtXi8lqC+
-	 Qp/7o53wtQmLrNUuR9S1X+nNzU0JGZodTCgzFSXzJSjT2OLoGfTYWm4SkflGT9Y9Ln
-	 p0+BfMElWqeFg==
+	s=k20201202; t=1774519059;
+	bh=Qds9B5ILFmS8Vp3JnU8z1SyfzpPtjdN9afy1Htr5iI8=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=qsUprecA4pPJAJo4/LuiJ7rZyt7ml2VX+RmWAIKKi98ppChWRG90f1tLKNSEW57IS
+	 Lp5JwqAIcgg8omPRgb29RzkYaORUTvVgEiiJwVdcNyt/IRz5oaMYiQKojblHfvgtlv
+	 EmhZcmF61Ik4GyvHpMvBYAEtoYxz0NET8Aa5HQFDEC/bYcUM3WAifwTT3LWTcZBo7J
+	 rXU/owqrW7hVfnGKJfRx96mkIaODzIUEc9mUKlNE6hEtZmb0rh4RHZe2iG2pyE4VXV
+	 /sj/cpxOMbglz17XOnwFq4YonHoBNMODAwRX28Hr3nEdpGvsmmIzrv/GtG7QE1EEMn
+	 /fOPNvZ4tgxlA==
 From: Linus Walleij <linusw@kernel.org>
-Subject: [PATCH net v4 0/4] net: dsa: ks8995: Post-move fixes
-Date: Thu, 26 Mar 2026 10:57:31 +0100
-Message-Id: <20260326-ks8995-fixups-v4-0-989abba8f077@kernel.org>
+Date: Thu, 26 Mar 2026 10:57:32 +0100
+Subject: [PATCH net v4 1/4] net: dsa: ks8995: Add shutdown callback
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,11 +55,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3XNyw7CIBAF0F8xrMXwaguu/A/jAsvQkhraQCWap
- v8uYeOjcXnn5txZUITgIKLjbkEBkotu9DmI/Q61vfYdYGdyRoywmlAq8RClUhW27nGfIpbCskq
- 33ArSoGymALkpe2fkYUaXfOxdnMfwLD8SLdWfuUQxwZRoobglnCtzGiB4uB3G0JWpxD65+uUsc
- yWvhnChiaFsw/mbsy3nmevGtjW3QBWtv/i6ri8y9Y6XLgEAAA==
-X-Change-ID: 20260118-ks8995-fixups-84f25ac3f407
+Message-Id: <20260326-ks8995-fixups-v4-1-989abba8f077@kernel.org>
+References: <20260326-ks8995-fixups-v4-0-989abba8f077@kernel.org>
+In-Reply-To: <20260326-ks8995-fixups-v4-0-989abba8f077@kernel.org>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -75,7 +73,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271956-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-271957-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,microchip.com];
@@ -94,72 +92,65 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BAE5E3330FE
+X-Rspamd-Queue-Id: 827E033310E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This fixes some glearing issues in the Micrel KS8995 driver
-pointed out by Vladimir.
+The DSA framework requires that dsa_switch_shutdown() be
+called when the driver is shut down.
 
-This patch series implements some required functionality
-and strips the driver down to just KS8995 deeming the other
-"micrel" variants to be actually handled by the Microchip
-KSZ driver.
+Make sure to also implement the mutual exclusion required
+by checking the platform data pointer to be NULL in
+.remove() and .shutdown().
 
-If the KS8995 should actually *also* be managed by the Microchip
-driver and this driver deleted remains to be seen. It is clearly
-the origin chip for that hardware: it is very close to the
-"KSZ8 family" but there are differences.
-
-It definitely has a different custom tag format for proper DSA
-tagging, but I have implemented that: I now have to figure out
-whether to do that on top of this driver or the KSZ driver before
-continuing.
-
-In the meantime, this patch series makes the situation better.
-
+Fixes: a7fe8b266f65 ("net: dsa: ks8995: Add basic switch set-up")
+Reported-by: Vladimir Oltean <olteanv@gmail.com>
 Signed-off-by: Linus Walleij <linusw@kernel.org>
 ---
-Changes in v4:
-- Drop the final "port isolation" (should be better named "port separation")
-  patch, due to lack of time to revise the patch. Let's keep this one
-  for later.
-- Hope we can merge this first round of fixups so the driver is in some
-  reasonable state.
-- Link to v3: https://lore.kernel.org/r/20260219-ks8995-fixups-v3-0-a7fc63fe1916@kernel.org
+ drivers/net/dsa/ks8995.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Changes in v3:
-- Re-tag the series for net since they are fixes.
-- Implement mutual exclusion between .remove() and .shutdown()
-  as found by the AI reviewer.
-- Fix a typo in the patch dropping the KSZ chips support, 8955->8995,
-  found by the AI reviewer.
-- Add fallback compatibles for the deleted chips to the KSZ
-  SPI driver.
-- Implement port isolation.
-- Link to v2: https://lore.kernel.org/r/20260119-ks8995-fixups-v2-0-98bd034a0d12@kernel.org
+diff --git a/drivers/net/dsa/ks8995.c b/drivers/net/dsa/ks8995.c
+index 77d8b842693c..2522c9057382 100644
+--- a/drivers/net/dsa/ks8995.c
++++ b/drivers/net/dsa/ks8995.c
+@@ -833,11 +833,26 @@ static void ks8995_remove(struct spi_device *spi)
+ {
+ 	struct ks8995_switch *ks = spi_get_drvdata(spi);
+ 
++	if (!ks)
++		return;
++
+ 	dsa_unregister_switch(ks->ds);
+ 	/* assert reset */
+ 	gpiod_set_value_cansleep(ks->reset_gpio, 1);
+ }
+ 
++static void ks8995_shutdown(struct spi_device *spi)
++{
++	struct ks8995_switch *ks = spi_get_drvdata(spi);
++
++	if (!ks)
++		return;
++
++	dsa_switch_shutdown(ks->ds);
++
++	spi_set_drvdata(spi, NULL);
++}
++
+ /* ------------------------------------------------------------------------ */
+ static struct spi_driver ks8995_driver = {
+ 	.driver = {
+@@ -846,6 +861,7 @@ static struct spi_driver ks8995_driver = {
+ 	},
+ 	.probe	  = ks8995_probe,
+ 	.remove	  = ks8995_remove,
++	.shutdown = ks8995_shutdown,
+ 	.id_table = ks8995_id,
+ };
+ 
 
-Changes in v2:
-- Do port_bitmask in another way and fix a bug where BIT(port_bitmask)
-  was used instead of just port_bitmask.
-- Link to v1: https://lore.kernel.org/r/20260118-ks8995-fixups-v1-0-10a493f0339d@kernel.org
-
----
-Linus Walleij (4):
-      net: dsa: ks8995: Add shutdown callback
-      net: dsa: microchip: Add fallback Micrel compatibles
-      net: dsa: ks8955: Delete KSZ8864 and KSZ8795 support
-      net: dsa: ks8995: Add stub bridge join/leave
-
- drivers/net/dsa/ks8995.c            | 198 ++++++++++++------------------------
- drivers/net/dsa/microchip/ksz_spi.c |  15 +++
- 2 files changed, 81 insertions(+), 132 deletions(-)
----
-base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
-change-id: 20260118-ks8995-fixups-84f25ac3f407
-
-Best regards,
 -- 
-Linus Walleij <linusw@kernel.org>
+2.53.0
 
 
