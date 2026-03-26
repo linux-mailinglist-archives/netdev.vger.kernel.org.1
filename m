@@ -1,365 +1,351 @@
-Return-Path: <netdev+bounces-272222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272223-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wOpbIfqPxWlG/QQAu9opvQ
-	(envelope-from <netdev+bounces-272222-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:58:50 +0100
+	id AFjxBgiRxWlG/QQAu9opvQ
+	(envelope-from <netdev+bounces-272223-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 21:03:20 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D967433B303
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:58:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7240933B376
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 21:03:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 884AC303FFDD
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 19:56:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B522A302AC25
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 20:00:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162203932DD;
-	Thu, 26 Mar 2026 19:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C6F03A381B;
+	Thu, 26 Mar 2026 20:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VjL2urrk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VxAsTmHQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2BD37B02D
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 19:56:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC773976BE
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 20:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774554993; cv=none; b=tlk3lfseHKahbH5rKUto4nGLdg6Zk+lNPdRobFVXpLLc5Bx3ADDgQwWCwgTYpbKWM4k9sfkAlvMB+dgeRgG4CIkF5s0ZN4DNHf3kLjKuEuTPlQV30bpqZ6N9eP2A3mI+xL+FVgf4MODwbKQssmfJRhP6fGqHxydRP6Gfpph5Trg=
+	t=1774555206; cv=none; b=KCu/ybBDTKtI3fNPD0qKJNG4zkimaw+Yf5bn9ZZYPll+wvV51Sq5vpYnfv8uagwUmXVSChOf0YNPP1l7xbJ4eppnTzW2fwod5cJA5D1Ola4f753G+dJZlvYKqS9T+ixjaHXzI806uZ0kRvTFc71tXud7njnLFf/i2o6awsITWFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774554993; c=relaxed/simple;
-	bh=8vsqQdfKeyqUWAguK8UnvZTeAhIn5Kn0XZ+L6K3Ue+g=;
+	s=arc-20240116; t=1774555206; c=relaxed/simple;
+	bh=sZCu+zV806RkYMwGhzwSVjIEcYHK2rC1VqIBfMqEoWM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ADlHzDWeiazZEAlLSuxG4IcXQw29u20zOvMvWSfT+ef6HUBx4KFdirZ7HcmptlKfIupn9lDOzZS9xCuNaCrK8wGNqOZDKocWbnEU07V0W2Zo8FVq2sqSB1pI9E453IO1AK7wvagqye20gQK6gS/fMeP8cPZiPk/lJwj/cPAXGfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VjL2urrk; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c7f22eac-3098-4833-b247-3a615f49a5ea@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774554978;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bdtXqquknGuUqL6GqA/v4IZ+ed3yZ+2k+ngeORMK4GU=;
-	b=VjL2urrk/SBki+yQR99mMY549D5LYJaXb020OwkspvZRg1ZvpnrQXoZCeSdlUNyukZGhmm
-	9XFYBIGzfQ+ZVZQYiBWD47PRtuOvFwf2Z3jF7fnU7xyaLFa3c1zNIELZ2DsYmqIvYm4ZiP
-	J6QSLZ1hZsGw9XQoocRWwOk3qQbW24c=
-Date: Thu, 26 Mar 2026 15:56:07 -0400
+	 In-Reply-To:Content-Type; b=jSTU+1jnguPmgdLP1Pa3Gpyk1Ngt5PKjFDcOmYU4Dql4LL0YwsutJfaM24SUSk58vj3DAisEkD3rXN3nw2JabmUm/uNyZcbf35VzczgbzTWgjir5KYRwLcquE6sLIUrQFMh5ww+x0CsqWGgdyTFDRLJXQhFQaL12LVaBn4Dr210=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VxAsTmHQ; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6674cba2c50so3807023a12.0
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 13:00:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774555203; x=1775160003; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DmJ4jvJu+2RaqY+ZPxeE/qs9ff0J/6mOVazKfaw6kqU=;
+        b=VxAsTmHQGTLncq6sOArDnMx+aWMA05cVd0MZ9KsFEDkrBAnaablj3jiVJLaVOS29NZ
+         4gI/ocRd1PWz0bYubAV7fbtwhcnX8MK22B/xIHrD5xxK/THDecAXwiR7+NUJTBp8rsYw
+         XH4RGuQ1XBWyAKvthj2zFEtqEixc3iPSje507SuWouwt/b1192Jt1Vcy0AwJj/ZVzbSM
+         8yMYvpANEqMfT4le14yTrFfaK1RRcVoH0tUVAL54aAgA/3QUVOutQq6+Wbmu354kEEU7
+         wu9G13WDFQc8VB4sevXZ4Zz3jzhFbWTbi9518ZRRNd8PHAq0Fu19QRwYQNeXJPnEKN3c
+         fWjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774555203; x=1775160003;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DmJ4jvJu+2RaqY+ZPxeE/qs9ff0J/6mOVazKfaw6kqU=;
+        b=KWnvXFbxW6udRVnt3L+dRxrKH3hiPMhhBPbppJI0j4I3m712gK3LZTtQUJCHm9zk5V
+         +BAhw7TGm8sxheii042n6KHrlr/MVOgXOXSBWCtuxZ0ClaHP3k5y9qHdV2O0R2oTBvc4
+         z1ZoEE0DXlKTGcE6YC/CStcKzIyT/529/6szVkuKD60sn/wguuB6jvi24ATKO8XBwdEq
+         Q1DNvaFSWNxWa/nDpDo+ZgwA0XD9ThXXnKjVdEd4SzjGMPp2QNDj8WZq6d5argkLW8eU
+         eDOlSbgjP/EqCIQ5J+hRiBhS1QrowFyGloPZu/B6WbRnYMXYuTvY6JUQpQ4Doi2Pes8k
+         b8Rw==
+X-Forwarded-Encrypted: i=1; AJvYcCU1ys/75H0V7TrXABGAmYXrqQvjodJR+FtMKfI/oj3kit0jBzk11USX9zjFVrGeDJnfkBddGG4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfppAOMn2Rvv/WBqJm2kILfYgSwz6ips30539HoJ1g4InJWQGh
+	1v3GxtbYabfTr5lLK7t+cPEqehNIIP2lN2Byt8CUY//nvhCDuidkzYJQ
+X-Gm-Gg: ATEYQzxbKGnPFm5Bdxydn9Ky0IglxAjndiLXKvuVD6bPEgi+EsBCpmLyTD/jU55a/zp
+	SXheKIQFQSvC56SyG7UibK1UyoFm0mQqNOfDD1EkZxwgZ1aNWICDZXtI9ddegNQnwTJcAevh1Mg
+	zVhD6BL2x8gjfGpFN36z53EZ3avlG5q9XxOVrrJyViPYA0mqdL6igPYa+KJnMo9FHy3Uj92duuh
+	0vwYnvkOQ1fYvartBvg3e3n+dyGktfFXz1omoO7bn2lyd35P2UNp9fY9UHdjMf/xnJUsmALdoEk
+	qy1sSP8XVsH/Mbs0hQz4V4DD+1RJG+TwI+QqMRVRTToPHrD9lcKSbV7Q4AqdOFpj/mguLY5zcdO
+	epd96vKis7gqkeHKjej4bz5WwMnjl/lB3ci5m8OqJhP40f38MX/9F4NiiZ1CZuEOTYOgNK3nQZ2
+	oO2qGS/UbbrHa/oCikEaaibnBkkhYduwNR4QxE2lzX6GTrC2MYQSX9VF5WD973S6AJoT1lqPYi1
+	S/ZY1gfSP20ivV5dTHxKseFnRY4Ygyii6mYcGZl3Ivj1JXvuw18aFduKZppcqlhB/UcdubX+3yo
+	B3rE4BljJ7qxj2+48epHiNNYn9izn1bnpQ==
+X-Received: by 2002:a17:907:c0e:b0:b9b:207c:f7e4 with SMTP id a640c23a62f3a-b9b2e75d17bmr214143366b.13.1774555202793;
+        Thu, 26 Mar 2026 13:00:02 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9b2042f7e9sm162059466b.56.2026.03.26.13.00.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Mar 2026 13:00:02 -0700 (PDT)
+Message-ID: <d59bfdca-08cb-4595-8583-eec61e282599@gmail.com>
+Date: Thu, 26 Mar 2026 21:00:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net 2/2] net: xilinx: axienet: Fix BQL accounting for
- multi-BD TX packets
-To: "Gupta, Suraj" <Suraj.Gupta2@amd.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "Simek, Michal" <michal.simek@amd.com>,
- "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
- "horms@kernel.org" <horms@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Katakam, Harini" <harini.katakam@amd.com>
-References: <20260324145353.1899248-1-suraj.gupta2@amd.com>
- <20260324145353.1899248-3-suraj.gupta2@amd.com>
- <cfaf4077-144a-4876-b6b0-8d4388362217@linux.dev>
- <SA1PR12MB6798E4EB242D58AEB86661B9C949A@SA1PR12MB6798.namprd12.prod.outlook.com>
- <9f6a4e9f-9f93-4ced-92de-8fdc6154c694@linux.dev>
- <SA1PR12MB679810BDE0FD91B702A869C2C956A@SA1PR12MB6798.namprd12.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: phy: air_en8811h: add AN8811HB MCU
+ assert/deassert support
+To: "Lucien.Jheng" <lucienzx159@gmail.com>, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bjorn@mork.no
+Cc: frank-w@public-files.de, daniel@makrotopia.org, lucien.jheng@airoha.com
+References: <20260326153518.8387-1-lucienzx159@gmail.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <SA1PR12MB679810BDE0FD91B702A869C2C956A@SA1PR12MB6798.namprd12.prod.outlook.com>
+From: Eric Woudstra <ericwouds@gmail.com>
+In-Reply-To: <20260326153518.8387-1-lucienzx159@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272222-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-272223-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[public-files.de,makrotopia.org,airoha.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sean.anderson@linux.dev,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,linux.dev:dkim,linux.dev:email,linux.dev:mid,lunn.ch:email,bootlin.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D967433B303
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7240933B376
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/26/26 15:51, Gupta, Suraj wrote:
-> [Public]
-> 
->> -----Original Message-----
->> From: Sean Anderson <sean.anderson@linux.dev>
->> Sent: Thursday, March 26, 2026 9:08 PM
->> To: Gupta, Suraj <Suraj.Gupta2@amd.com>; andrew+netdev@lunn.ch;
->> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
->> pabeni@redhat.com; Simek, Michal <michal.simek@amd.com>; Pandey,
->> Radhey Shyam <radhey.shyam.pandey@amd.com>; horms@kernel.org
->> Cc: netdev@vger.kernel.org; linux-arm-kernel@lists.infradead.org; linux-
->> kernel@vger.kernel.org; Katakam, Harini <harini.katakam@amd.com>
->> Subject: Re: [PATCH net 2/2] net: xilinx: axienet: Fix BQL accounting for multi-BD
->> TX packets
->>
->> Caution: This message originated from an External Source. Use proper caution
->> when opening attachments, clicking links, or responding.
->>
->>
->> On 3/25/26 01:30, Gupta, Suraj wrote:
->> > [Public]
->> >
->> >> -----Original Message-----
->> >> From: Sean Anderson <sean.anderson@linux.dev>
->> >> Sent: Tuesday, March 24, 2026 9:39 PM
->> >> To: Gupta, Suraj <Suraj.Gupta2@amd.com>; andrew+netdev@lunn.ch;
->> >> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
->> >> pabeni@redhat.com; Simek, Michal <michal.simek@amd.com>; Pandey,
->> >> Radhey Shyam <radhey.shyam.pandey@amd.com>; horms@kernel.org
->> >> Cc: netdev@vger.kernel.org; linux-arm-kernel@lists.infradead.org;
->> >> linux- kernel@vger.kernel.org; Katakam, Harini
->> >> <harini.katakam@amd.com>
->> >> Subject: Re: [PATCH net 2/2] net: xilinx: axienet: Fix BQL accounting
->> >> for multi-BD TX packets
->> >>
->> >> Caution: This message originated from an External Source. Use proper
->> >> caution when opening attachments, clicking links, or responding.
->> >>
->> >>
->> >> On 3/24/26 10:53, Suraj Gupta wrote:
->> >> > When a TX packet spans multiple buffer descriptors
->> >> > (scatter-gather), the per-BD byte count is accumulated into a local
->> >> > variable that resets on each NAPI poll. If the BDs for a single
->> >> > packet complete across different polls, the earlier bytes are lost and never
->> credited to BQL.
->> >> > This causes BQL to think bytes are permanently in-flight,
->> >> > eventually stalling the TX queue.
->> >> >
->> >> > Fix this by replacing the local accumulator with a persistent
->> >> > counter
->> >> > (tx_compl_bytes) that survives across polls and is reset only after
->> >> > updating BQL and stats.
->> >>
->> >> Do we need this? Can't we just do something like
->> >>
->> >
->> > Nope, the 'size' variable passed to axienet_free_tx_chain() is local
->> > to axienet_tx_poll() and goes out of scope between different polls.
->> > This means it can't track completion bytes across multiple NAPI polls.
->>
->> Yes, but that's fine since we only update completed bytes when we retire at
->> least one packet:
->>
->>         packets = axienet_free_tx_chain(lp, &size, budget);
->>         if (packets) {
->>                 netdev_completed_queue(ndev, packets, size);
->>                 u64_stats_update_begin(&lp->tx_stat_sync);
->>                 u64_stats_add(&lp->tx_packets, packets);
->>                 u64_stats_add(&lp->tx_bytes, size);
->>                 u64_stats_update_end(&lp->tx_stat_sync);
->>
->>                 /* Matches barrier in axienet_start_xmit */
->>                 smp_mb();
->>                 if (((tail - ci) & (lp->rx_bd_num - 1)) >= MAX_SKB_FRAGS + 1)
->>                         netif_wake_queue(ndev);
->>         }
->>
->> and this matches the value we use when enqueuing a packet
->>
->>         tail_p = lp->tx_bd_p + sizeof(*lp->tx_bd_v) * (last_p - lp->tx_bd_v);
->>         smp_store_release(&lp->tx_bd_tail, new_tail_ptr);
->>         netdev_sent_queue(ndev, skb->len);
->>
-> 
-> Let’s say we have a packet with 4 fragments. When xmit() is called, the last buffer descriptor (the 4th one) is marked with the retiral flag[1]. Now, during completion, suppose the first 3 buffer descriptors are processed in one NAPI poll, and the 4th descriptor is handled in a subsequent poll. In this scenario, the size won’t get updated for the first 3 BDs because there’s no packet retiral for them. Then, during the second poll, the size update will only reflect the completion length of the 4th BD.
 
-That's why I suggested using skb->len and not the size from the descriptor.
 
---Sean
+On 3/26/26 4:35 PM, Lucien.Jheng wrote:
+> AN8811HB needs a MCU soft-reset cycle before firmware loading begins.
+> Assert the MCU (hold it in reset) and immediately deassert (release)
+> via a dedicated PBUS register pair (0x5cf9f8 / 0x5cf9fc), accessed
+> through the PHY-addr+8 MDIO bus node rather than the BUCKPBUS indirect
+> path.  This clears the MCU state before the firmware loading sequence
+> starts.
 
-> This means that the bytes corresponding to the first 3 fragments are never credited to BQL, which leads to incorrect accounting and, eventually, to the TX queue stalling as described.
-> Proposed changes to accumulate the completion length across polls until the entire packet is processed directly addresses this gap.
+Perhapse you can register this extra device in the probe() function:
+
+struct mdio_device *mdiodev;
+
+mdiodev = mdio_device_create(phydev->mdio.bus,
+			     phydev->mdio.addr + EN8811H_PBUS_ADDR_OFFS);
+if (IS_ERR(mdiodev))
+	return PTR_ERR(mdiodev);
+
+ret = mdio_device_register(mdiodev);
+if (ret) {
+	mdio_device_free(mdiodev);
+	return ret;
+}
+
+priv->pbusdev = mdiodev;
+
+In the define part add:
+
+#define EN8811H_PBUS_ADDR_OFFS	8
+
+Add to struct en8811h_priv:
+
+struct mdio_device	*pbusdev;
+
+And in the remove function:
+
+mdio_device_remove(priv->pbusdev);
+mdio_device_free(priv->pbusdev);
+
+Then you can use the device:
+
+ret = en8811hb_some_neat_function(priv->pbusdev);
+
 > 
-> [1]: https://elixir.bootlin.com/linux/v7.0-rc5/source/drivers/net/ethernet/xilinx/xilinx_axienet_main.c#L1127
+> Add __air_pbus_reg_write() as a low-level helper for this access, then
+> implement an8811hb_mcu_assert() / _deassert() on top of it.  Wire both
+> into an8811hb_load_firmware() and en8811h_restart_mcu() so every
+> firmware load or MCU restart on AN8811HB correctly sequences the reset
+> control registers.
 > 
+> Fixes: 0a55766b7711 ("net: phy: air_en8811h: add Airoha AN8811HB support")
+> Signed-off-by: Lucien Jheng <lucienzx159@gmail.com>
+> ---
+> Changes in v2:
+> - Rewrite commit message: The previous wording was ambiguous,
+>   as it suggested the MCU remains asserted during the entire
+>   firmware loading process, rather than a quick reset cycle
+>   before it starts.
+>   Clarify that assert and deassert is an immediate soft-reset
+>   cycle to clear MCU state before firmware loading begins.
+> - Add Fixes: 0a55766b7711 ("net: phy: air_en8811h: add Airoha AN8811HB
+>   support").
+> - Change phydev_info() to phydev_dbg() in an8811hb_mcu_assert() and
+>   an8811hb_mcu_deassert() to avoid noise during normal boot.
 > 
-> Regards,
-> Suraj
+>  drivers/net/phy/air_en8811h.c | 105 ++++++++++++++++++++++++++++++++++
+>  1 file changed, 105 insertions(+)
 > 
->> > Regards,
->> > Suraj
->> >
->> >> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> >> b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> >> index 415e9bc252527..1ea8a6592bce1 100644
->> >> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> >> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> >> @@ -768,6 +768,7 @@ static int axienet_free_tx_chain(struct
->> >> axienet_local *lp, u32 *sizep, int budge
->> >>                 if (cur_p->skb) {
->> >>                         struct axienet_cb *cb = (void
->> >> *)cur_p->skb->cb;
->> >>
->> >> +                       *sizep += skb->len;
->> >>                         dma_unmap_sgtable(lp->dev, &cb->sgt, DMA_TO_DEVICE, 0);
->> >>                         sg_free_table_chained(&cb->sgt, XAE_INLINE_SG_CNT);
->> >>                         napi_consume_skb(cur_p->skb, budget); @@
->> >> -783,8 +784,6 @@ static int axienet_free_tx_chain(struct axienet_local *lp,
->> u32 *sizep, int budge
->> >>                 wmb();
->> >>                 cur_p->cntrl = 0;
->> >>                 cur_p->status = 0;
->> >> -
->> >> -               *sizep += status & XAXIDMA_BD_STS_ACTUAL_LEN_MASK;
->> >>         }
->> >>
->> >>         smp_store_release(&lp->tx_bd_ci, (ci + i) & (lp->tx_bd_num -
->> >> 1));
->> >>
->> >> > Fixes: c900e49d58eb ("net: xilinx: axienet: Implement BQL")
->> >> > Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
->> >> > ---
->> >> >  drivers/net/ethernet/xilinx/xilinx_axienet.h  |  3 +++
->> >> > .../net/ethernet/xilinx/xilinx_axienet_main.c | 20
->> >> > +++++++++----------
->> >> >  2 files changed, 13 insertions(+), 10 deletions(-)
->> >> >
->> >> > diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h
->> >> > b/drivers/net/ethernet/xilinx/xilinx_axienet.h
->> >> > index 602389843342..a4444c939451 100644
->> >> > --- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
->> >> > +++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
->> >> > @@ -509,6 +509,8 @@ struct skbuf_dma_descriptor {
->> >> >   *           complete. Only updated at runtime by TX NAPI poll.
->> >> >   * @tx_bd_tail:      Stores the index of the next Tx buffer descriptor in the
->> ring
->> >> >   *              to be populated.
->> >> > + * @tx_compl_bytes: Accumulates TX completion length until a full
->> packet is
->> >> > + *              reported to the stack.
->> >> >   * @tx_packets: TX packet count for statistics
->> >> >   * @tx_bytes:        TX byte count for statistics
->> >> >   * @tx_stat_sync: Synchronization object for TX stats @@ -592,6
->> >> > +594,7 @@ struct axienet_local {
->> >> >       u32 tx_bd_num;
->> >> >       u32 tx_bd_ci;
->> >> >       u32 tx_bd_tail;
->> >> > +     u32 tx_compl_bytes;
->> >> >       u64_stats_t tx_packets;
->> >> >       u64_stats_t tx_bytes;
->> >> >       struct u64_stats_sync tx_stat_sync; diff --git
->> >> > a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> >> > b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> >> > index b06e4c37ff61..95bf61986cb7 100644
->> >> > --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> >> > +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> >> > @@ -692,6 +692,8 @@ static void axienet_dma_stop(struct
->> >> > axienet_local
->> >> *lp)
->> >> >       axienet_lock_mii(lp);
->> >> >       __axienet_device_reset(lp);
->> >> >       axienet_unlock_mii(lp);
->> >> > +
->> >> > +     lp->tx_compl_bytes = 0;
->> >> >  }
->> >> >
->> >> >  /**
->> >> > @@ -770,8 +772,6 @@ static int axienet_device_reset(struct
->> >> > net_device
->> >> *ndev)
->> >> >   * @first_bd:        Index of first descriptor to clean up
->> >> >   * @nr_bds:  Max number of descriptors to clean up
->> >> >   * @force:   Whether to clean descriptors even if not complete
->> >> > - * @sizep:   Pointer to a u32 filled with the total sum of all bytes
->> >> > - *           in all cleaned-up descriptors. Ignored if NULL.
->> >> >   * @budget:  NAPI budget (use 0 when not called from NAPI poll)
->> >> >   *
->> >> >   * Would either be called after a successful transmit operation,
->> >> > or after @@ -780,7 +780,7 @@ static int axienet_device_reset(struct
->> >> > net_device
->> >> *ndev)
->> >> >   * Return: The number of packets handled.
->> >> >   */
->> >> >  static int axienet_free_tx_chain(struct axienet_local *lp, u32 first_bd,
->> >> > -                              int nr_bds, bool force, u32 *sizep, int budget)
->> >> > +                              int nr_bds, bool force, int budget)
->> >> >  {
->> >> >       struct axidma_bd *cur_p;
->> >> >       unsigned int status;
->> >> > @@ -819,8 +819,8 @@ static int axienet_free_tx_chain(struct
->> >> > axienet_local
->> >> *lp, u32 first_bd,
->> >> >               cur_p->cntrl = 0;
->> >> >               cur_p->status = 0;
->> >> >
->> >> > -             if (sizep)
->> >> > -                     *sizep += status & XAXIDMA_BD_STS_ACTUAL_LEN_MASK;
->> >> > +             if (!force)
->> >> > +                     lp->tx_compl_bytes += status &
->> >> > + XAXIDMA_BD_STS_ACTUAL_LEN_MASK;
->> >> >       }
->> >> >
->> >> >       if (!force) {
->> >> > @@ -999,18 +999,18 @@ static int axienet_tx_poll(struct napi_struct
->> >> > *napi, int budget)  {
->> >> >       struct axienet_local *lp = container_of(napi, struct axienet_local,
->> napi_tx);
->> >> >       struct net_device *ndev = lp->ndev;
->> >> > -     u32 size = 0;
->> >> >       int packets;
->> >> >
->> >> >       packets = axienet_free_tx_chain(lp, lp->tx_bd_ci, lp->tx_bd_num, false,
->> >> > -                                     &size, budget);
->> >> > +                                     budget);
->> >> >
->> >> >       if (packets) {
->> >> > -             netdev_completed_queue(ndev, packets, size);
->> >> > +             netdev_completed_queue(ndev, packets,
->> >> > + lp->tx_compl_bytes);
->> >> >               u64_stats_update_begin(&lp->tx_stat_sync);
->> >> >               u64_stats_add(&lp->tx_packets, packets);
->> >> > -             u64_stats_add(&lp->tx_bytes, size);
->> >> > +             u64_stats_add(&lp->tx_bytes, lp->tx_compl_bytes);
->> >> >               u64_stats_update_end(&lp->tx_stat_sync);
->> >> > +             lp->tx_compl_bytes = 0;
->> >> >
->> >> >               /* Matches barrier in axienet_start_xmit */
->> >> >               smp_mb();
->> >> > @@ -1115,7 +1115,7 @@ axienet_start_xmit(struct sk_buff *skb,
->> >> > struct
->> >> net_device *ndev)
->> >> >                               netdev_err(ndev, "TX DMA mapping error\n");
->> >> >                       ndev->stats.tx_dropped++;
->> >> >                       axienet_free_tx_chain(lp, orig_tail_ptr, ii + 1,
->> >> > -                                           true, NULL, 0);
->> >> > +                                           true, 0);
->> >> >                       dev_kfree_skb_any(skb);
->> >> >                       return NETDEV_TX_OK;
->> >> >               }
+> diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
+> index 29ae73e65caa..01fce1b93618 100644
+> --- a/drivers/net/phy/air_en8811h.c
+> +++ b/drivers/net/phy/air_en8811h.c
+> @@ -170,6 +170,16 @@
+>  #define   AN8811HB_CLK_DRV_CKO_LDPWD		BIT(13)
+>  #define   AN8811HB_CLK_DRV_CKO_LPPWD		BIT(14)
+> 
+> +#define AN8811HB_MCU_SW_RST		0x5cf9f8
+> +#define   AN8811HB_MCU_SW_RST_HOLD		BIT(16)
+> +#define   AN8811HB_MCU_SW_RST_RUN		(BIT(16) | BIT(0))
+> +#define AN8811HB_MCU_SW_START		0x5cf9fc
+> +#define   AN8811HB_MCU_SW_START_EN		BIT(16)
+> +
+> +/* MII register constants for PBUS access (PHY addr + 8) */
+> +#define AIR_PBUS_ADDR_HIGH		0x1c
+> +#define AIR_PBUS_DATA_HIGH		0x10
+> +
+>  /* Led definitions */
+>  #define EN8811H_LED_COUNT	3
+> 
+> @@ -254,6 +264,36 @@ static int air_phy_write_page(struct phy_device *phydev, int page)
+>  	return __phy_write(phydev, AIR_EXT_PAGE_ACCESS, page);
+>  }
+> 
+> +static int __air_pbus_reg_write(struct phy_device *phydev,
+> +				u32 pbus_reg, u32 pbus_data)
+> +{
+> +	struct mii_bus *bus = phydev->mdio.bus;
+> +	int pbus_addr = phydev->mdio.addr + 8;
+> +	int ret;
+> +
+> +	ret = __mdiobus_write(bus, pbus_addr, AIR_EXT_PAGE_ACCESS,
+> +			      upper_16_bits(pbus_reg));
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = __mdiobus_write(bus, pbus_addr, AIR_PBUS_ADDR_HIGH,
+> +			      (pbus_reg & GENMASK(15, 6)) >> 6);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = __mdiobus_write(bus, pbus_addr, (pbus_reg & GENMASK(5, 2)) >> 2,
+> +			      lower_16_bits(pbus_data));
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = __mdiobus_write(bus, pbus_addr, AIR_PBUS_DATA_HIGH,
+> +			      upper_16_bits(pbus_data));
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+>  static int __air_buckpbus_reg_write(struct phy_device *phydev,
+>  				    u32 pbus_address, u32 pbus_data)
+>  {
+> @@ -570,10 +610,65 @@ static int an8811hb_load_file(struct phy_device *phydev, const char *name,
+>  	return ret;
+>  }
+> 
+> +static int an8811hb_mcu_assert(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	phy_lock_mdio_bus(phydev);
+> +
+> +	ret = __air_pbus_reg_write(phydev, AN8811HB_MCU_SW_RST,
+> +				   AN8811HB_MCU_SW_RST_HOLD);
+> +	if (ret < 0)
+> +		goto unlock;
+> +
+> +	ret = __air_pbus_reg_write(phydev, AN8811HB_MCU_SW_START, 0);
+> +	if (ret < 0)
+> +		goto unlock;
+> +
+> +	msleep(50);
+> +	phydev_dbg(phydev, "MCU asserted\n");
+> +
+> +unlock:
+> +	phy_unlock_mdio_bus(phydev);
+> +	return ret;
+> +}
+> +
+> +static int an8811hb_mcu_deassert(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	phy_lock_mdio_bus(phydev);
+> +
+> +	ret = __air_pbus_reg_write(phydev, AN8811HB_MCU_SW_START,
+> +				   AN8811HB_MCU_SW_START_EN);
+> +	if (ret < 0)
+> +		goto unlock;
+> +
+> +	ret = __air_pbus_reg_write(phydev, AN8811HB_MCU_SW_RST,
+> +				   AN8811HB_MCU_SW_RST_RUN);
+> +	if (ret < 0)
+> +		goto unlock;
+> +
+> +	msleep(50);
+> +	phydev_dbg(phydev, "MCU deasserted\n");
+> +
+> +unlock:
+> +	phy_unlock_mdio_bus(phydev);
+> +	return ret;
+> +}
+> +
+>  static int an8811hb_load_firmware(struct phy_device *phydev)
+>  {
+>  	int ret;
+> 
+> +	ret = an8811hb_mcu_assert(phydev);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = an8811hb_mcu_deassert(phydev);
+> +	if (ret < 0)
+> +		return ret;
+> +
+>  	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
+>  				     EN8811H_FW_CTRL_1_START);
+>  	if (ret < 0)
+> @@ -662,6 +757,16 @@ static int en8811h_restart_mcu(struct phy_device *phydev)
+>  {
+>  	int ret;
+> 
+> +	if (phy_id_compare_model(phydev->phy_id, AN8811HB_PHY_ID)) {
+> +		ret = an8811hb_mcu_assert(phydev);
+> +		if (ret < 0)
+> +			return ret;
+> +
+> +		ret = an8811hb_mcu_deassert(phydev);
+> +		if (ret < 0)
+> +			return ret;
+> +	}
+> +
+>  	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
+>  				     EN8811H_FW_CTRL_1_START);
+>  	if (ret < 0)
+> --
+> 2.34.1
+> 
 
 
