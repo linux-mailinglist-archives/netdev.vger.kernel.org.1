@@ -1,123 +1,146 @@
-Return-Path: <netdev+bounces-271901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271902-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IDlHFJLixGnz4gQAu9opvQ
-	(envelope-from <netdev+bounces-271901-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 08:38:58 +0100
+	id sFBTKQfkxGnz4gQAu9opvQ
+	(envelope-from <netdev+bounces-271902-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 08:45:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7F19330877
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 08:38:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35E18330974
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 08:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F1E863018F16
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 07:38:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3B084302DA2A
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 07:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B39434BA59;
-	Thu, 26 Mar 2026 07:38:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC67B34B1BE;
+	Thu, 26 Mar 2026 07:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dx1mxg19"
+	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="q6F6BbVW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B0E1A3029
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 07:38:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7702037F741;
+	Thu, 26 Mar 2026 07:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774510735; cv=none; b=KpQ8Vn07b92MPt+VFrfbPDoeQxk597AT6VpZBJodMlOcJmBNtwBsDoeC3Ud0XTQp17z83dHBwludF00M6OY1B/YD0Vd/ev32h80wj1uQPSsheHh9/onJkmS9Orm+1PTkp3isvLyF0FYQbvmrTSuuqEmsA+nVob9v1uu56YanXHw=
+	t=1774510809; cv=none; b=b8stgX7+fgbr5rq1RwWlSmXYAXgbVBXQhmZMNlUdSX+hSN1ntFlipZZUghRGUVz/wlMFj6lb9Ua9znqkjvnCzw0y3C67AJkyR9p2x2Ncqij4c1DIsbNMEPas/IobxoBq+wUh4E01sQwyXZvne40nAPMNYTVqeVMwPbq7nBGIHuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774510735; c=relaxed/simple;
-	bh=R3wbXgK2r8UzgrCyD7t5lRhw2OhPhOtemTvhLLUTItg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aNdRqxEjv153D7nv755J0qnZ1scouIBKqQshrgoz3W7DvbwIsf2yg5Pv+5TsPv/jN8JTyU6CoIqOsW1x7EwIqv69/cO7wE4SSAx8w4rT/Uy/5/iGlyJ1WLAXEqTAsR1jxmFjoPkd1zxTK4otjDwNlBCa2IvqkUnJTbOoRpHhAOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dx1mxg19; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id D4C324E42801;
-	Thu, 26 Mar 2026 07:38:49 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 9A30B5FDEB;
-	Thu, 26 Mar 2026 07:38:49 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1730D1045120B;
-	Thu, 26 Mar 2026 08:38:45 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1774510729; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=jj3IUh9R4W8+zkoV9vgo47YT8g/4LpTWBqx1PXl+Xuo=;
-	b=dx1mxg19tKD42CdR/2YaBJLf7Dr7Fe8A7WsqqtMLBf/vZtK80OAm5Pyjs0aChk3h0Gt1Z7
-	SojNhPAdTawdHI+A61XZO8Sf7qSYBxkK+KtMSJJuFjlhzaU7pIciS+fYgpACK7+0S5gK4e
-	ZHR0SvQMyICsJ/DVLsjG6QD7JFk1RNLfe2wXVaW500om5NxSsKvJY3BDUROV4g6nFyMZji
-	s3tPdWPC4wmX59nJEVTGfXi5AjVssF/xG+WhagOb1GqIwHxbmOI/LmaAmvoNtZcOZB4exq
-	5/FNmmAGBUJlp2oyDhgvelvms6ybZx2Mjv1goCN484gu3+BwlnWLEyNudaD9PA==
-Message-ID: <2f496443-ea0a-425d-9c83-fb9c33a106fa@bootlin.com>
-Date: Thu, 26 Mar 2026 08:38:45 +0100
+	s=arc-20240116; t=1774510809; c=relaxed/simple;
+	bh=ZfiOjVc2IrdgZEJLUmHF/3SEEQexFzH689uOXXnYF+I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rQwW6KQJMvs5tamrbY/dPsy1mO+LCV0mmfV0L6vEOt0TJe62aXeMVocA5+pchXh/FU4lRZU0RPUhQe5s0fe2ZDfF/W4lQaAV1wWuYMTSO0i09WE/Yw+xO4k+LG0qqw0HVEXBcO9VhaEv+gIc1OsjC3dJciwbODJNyrWbqbnRHGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=q6F6BbVW; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 62Q7dYryD1073981, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1774510774; bh=MSr8q9EsJW3GZK9hSTxKNGXrF9wnuG7c2y83VJ4jj34=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=q6F6BbVWijczoJN72R++lhh0dFd3POW0TshTWp6itvOb3rspjhFu6ZUBGp12AJzS/
+	 cMNeUgn731reqQUwCw/Cpc7JQsZ6iLicMpLJ5EyZbzUpZieMYFKeFWqGyVSZbIbyqx
+	 /V2cgY5McdjMtl3f7RcHrLTSS1G5yTaqV6iF1U5M6TXw2l6iSjFP1SqI0VVV88SBKV
+	 H16hayVe8nKj3sM632jyLyfRAB26FuF8b7Tyt/heZOVUKQdo05vRV/42sb8ZK64NZJ
+	 xD/VC6MiwQg+VnCgwbSrjEnsSxgmaMN0K5ciR531Iw5JhhkaGyj8el3wZZkIdT7UoC
+	 fyWdPenoz5Rrg==
+Received: from mail.realtek.com (rtkexhmbs04.realtek.com.tw[10.21.1.54])
+	by rtits2.realtek.com.tw (8.15.2/3.26/5.94) with ESMTPS id 62Q7dYryD1073981
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 26 Mar 2026 15:39:34 +0800
+Received: from RTKEXHMBS05.realtek.com.tw (10.21.1.55) by
+ RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Thu, 26 Mar 2026 15:39:34 +0800
+Received: from RTKEXHMBS04.realtek.com.tw (10.21.1.54) by
+ RTKEXHMBS05.realtek.com.tw (10.21.1.55) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Thu, 26 Mar 2026 15:39:33 +0800
+Received: from fc40.realtek.com.tw (172.22.241.7) by
+ RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server id
+ 15.2.1748.10 via Frontend Transport; Thu, 26 Mar 2026 15:39:33 +0800
+From: Chih Kai Hsu <hsu.chih.kai@realtek.com>
+To: <kuba@kernel.org>, <davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <nic_swsd@realtek.com>,
+        <linux-kernel@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+        <edumazet@google.com>, <bjorn@mork.no>, <pabeni@redhat.com>,
+        Chih Kai Hsu
+	<hsu.chih.kai@realtek.com>
+Subject: [PATCH net-next v4 0/3] r8152: add helper functions for PLA/USB/PHY OCP registers
+Date: Thu, 26 Mar 2026 15:39:22 +0800
+Message-ID: <20260326073925.32976-453-nic_swsd@realtek.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: phylink: use phylink_expects_phy() in
- phylink_fwnode_phy_connect()
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
-References: <E1w4zHg-0000000DmC4-2oyb@rmk-PC.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <E1w4zHg-0000000DmC4-2oyb@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-271901-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[hsu.chih.kai@realtek.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-271902-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[realtek.com:+];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid]
-X-Rspamd-Queue-Id: B7F19330877
+	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realtek.com:dkim,realtek.com:mid];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 35E18330974
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+v4:
+- Add a new patch for original #1. We need to fix a typo first before
+  original #1 patch.
 
+- For patch #2, replace redundant ocp_word_set_bits() with ocp_word_w0w1().
 
-On 24/03/2026 11:46, Russell King (Oracle) wrote:
-> The tests in phylink_expects_phy() and phylink_fwnode_phy_connect() are
-> identical (by intention). Use phylink_expects_phy() to decide whether
-> to ignore a call to phylink_fwnode_phy_connect().
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+v3:
+- For patch #1, fix the issue identified by the AI review.
+  In v2, ocp_byte_set_bits() was used to update the USB_LPM_CTRL register.
+  However, since its function only perform a bitwise OR operaion, it fails
+  to clear the old bits when updating a multi-bit field like LPM_TIMER.
+  Therefore, use ocp_write_byte() to maintain the original direct-write 
+  semantics.
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+- For patch #2, fix the line length exceeding 80 columns
 
-Maxime
+v2:
+For patch #2, remove variable set but not used from r8153_init(),
+r8153b_init() and r8153c_init()
 
+v1:
+Add bitwise operaion functions for PLA/USB/PHY OCP registers 
+to simplify the code.
+
+Chih Kai Hsu (3):
+  r8152: fix incorrect register write to USB_UPHY_XTAL
+  r8152: add helper functions for PLA/USB OCP registers
+  r8152: add helper functions for PHY OCP registers
+
+ drivers/net/usb/r8152.c | 1800 ++++++++++++++-------------------------
+ 1 file changed, 634 insertions(+), 1166 deletions(-)
+
+-- 
+2.34.1
 
 
