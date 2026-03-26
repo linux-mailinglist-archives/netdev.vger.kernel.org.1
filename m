@@ -1,120 +1,191 @@
-Return-Path: <netdev+bounces-272167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272171-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cMnuBM9uxWl1+AQAu9opvQ
-	(envelope-from <netdev+bounces-272167-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:37:19 +0100
+	id yBZABC5vxWl1+AQAu9opvQ
+	(envelope-from <netdev+bounces-272171-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:38:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E13F3393D8
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:37:18 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B0A133945B
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:38:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9EDD53017AB2
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:30:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id B9EE330BE6B7
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:32:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4B641B369;
-	Thu, 26 Mar 2026 17:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21B6425CF4;
+	Thu, 26 Mar 2026 17:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="gC6GIeVi"
+	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="ejBmPAYA";
+	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="jOXsAgpP"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9071041C2FA;
-	Thu, 26 Mar 2026 17:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705BE41C30D;
+	Thu, 26 Mar 2026 17:31:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774546211; cv=none; b=Ok3Xr713/MlOkNxGPaDhXTOiZg7kx6tJHEVknxkVTZjomPVBqtd5loKxSM0D1vhwppurBmyq7Wbggcj0mdD7LulkfI8tyfoyF2YTNop8jwhZkaI7GdPVmiEIwiDlNPHwQsSkpXgqn7EszePFMsUFwh5rC5dstzZJgWP44MBQKow=
+	t=1774546272; cv=none; b=BnrEdWXXKnlptbBoi9324wC8kyRNFTOOJrRsaF2rb9JnIMFsra7CJWnJ9XphOtubhRwJAdSr+Z7gHbFy4PMztF73OJxxPDEIOISIKS2AaTgeyceTFduoEKy88Hi8qC7vAJB0RIdnVikHqeCTRKIo1l9URt87EdgDy7Q4mLaa1h0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774546211; c=relaxed/simple;
-	bh=DAU4SfHW0Z5kEwZHRmCMRMCWV+k23xpMa0Jz8WSqOAo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GzaNcdB1Mk3SKEamuLhshkDOJltMwq5rht69D/1dXem1IV9uwvtjwE8Xg02kBYdFI37919l2Aa/xpT9FC0U53jbzbC9PMpJ7Pjziprm4luSwV7a4ROTB6ShRAC3MagZgbvSWJ7gDlQ0MS7Vq70Zn2B8gAyW2tWrfDx8Kgdc9vaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=gC6GIeVi; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=DAU4SfHW0Z5kEwZHRmCMRMCWV+k23xpMa0Jz8WSqOAo=;
-	t=1774546209; x=1775755809; b=gC6GIeViZW3fLFFg5mAaSYcqYAKvfMGdtHJgdRpWjUcB5et
-	uNXYm74tceWA716adlEAtH/uqzBgGiTKyEO70t8YCZvoSwC4zcQLoV36svU7DGCSqQuJWH4l5ehel
-	N+a0oaHD4G3qj7QmDP02NOgadmOQKsSSvImnfJG4iybHvqlA89LmTcSgErvlcrD5pKfIHrA9Wdyn1
-	j2dlD5mYLH0XnNOtRpX/v1NdJ7fFzrLK9XIy36f+PihgOvC2IeBGgpAyDyopo5PNWQ6irQ5knu06H
-	rmdhcRzKwgGOrbsAtbmoefWnCGzFQsErh05cwmIHQIsYSQXbx6KE40hF+4yTFTQQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1w5oWu-0000000DDEs-0Q9U;
-	Thu, 26 Mar 2026 18:30:00 +0100
-Message-ID: <94dad6848516ffb71967c2832c923f153d14e5d5.camel@sipsolutions.net>
-Subject: Re: [GIT PULL] wireless-2026-03-26
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Date: Thu, 26 Mar 2026 18:29:59 +0100
-In-Reply-To: <936e4100-5e3e-4c3a-8598-6724d904deac@redhat.com>
-References: <20260326093329.77815-3-johannes@sipsolutions.net>
-	 <936e4100-5e3e-4c3a-8598-6724d904deac@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1774546272; c=relaxed/simple;
+	bh=JIOc5GnB72K4q/HRE0zTqYJt05e5jkm8u7Q880pzdBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mTYKcsEg17MJlm5Ug7EtE8GbxqxzhPDqrqlYSOJaX5KDMxzXWEa2TXE/FSEDWF33qgjnaDkqJuxXvp44zsN1IWOPbblHWXmn3HGuGufFIYyrRWhuhzgsddDqg0td2dyNaBdtfDyHS75Z3vUH3ySwDuKvxpS8e7AQcR//X885slA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=ejBmPAYA; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=jOXsAgpP; arc=none smtp.client-ip=160.80.4.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 62QHUbbp011755;
+	Thu, 26 Mar 2026 18:30:43 +0100
+Received: from [10.62.247.239] (93-33-118-253.ip44.fastwebnet.it [93.33.118.253])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id D32A0120596;
+	Thu, 26 Mar 2026 18:30:42 +0100 (CET)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1774546244; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dKQp0iMzqepU2z7oj1+7CMIhVFuegfGwrdKsraVp8KY=;
+	b=ejBmPAYA7FjPQ+gBRxqyAoCBSEleA8Wy/XLoqJEJoJn4j1Jp5czTvGOMQcnS82qOyEVLDI
+	MQ/oOxyZNCeMGoDA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1774546244; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dKQp0iMzqepU2z7oj1+7CMIhVFuegfGwrdKsraVp8KY=;
+	b=jOXsAgpPYTPNb/wjJmNf4jEl1vQmkd3ReeuXPP/hD7LJJ5HzDlNNMe11k9QRvoB34Dzu6k
+	IiQM0PpJVBOwXUjRhrvRho26slfjWrLJ3HJzlb2rL7K03NU38zeW4ymbOK+eveE78ltZ53
+	N7GMTTCZ73KcIhkUuLcQS898xXPDy57oktMvncNSCxEYUsHnkGylX4TXJE5WXFRLPNuAAB
+	Fp4ENIc7VHpEDfYE85j0SmuPmzz2PE7TecSfHDW6AjvRt33afNQ11pd6kIusF3FjHSKVyu
+	zN89z0knQNJepcWufZukAdiKwQNhJMDosvnhjAA3fUrTf9I40e/4prv0pDc2CQ==
+Message-ID: <4d512ba5-a6fd-4d26-876b-5ea7a145d0cd@uniroma2.it>
+Date: Thu, 26 Mar 2026 18:30:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next 0/3] seg6: SRv6 L2 VPN with End.DT2U and srl2
+ device
+Content-Language: it-IT
+To: nicolas.dichtel@6wind.com, Justin Iurman <justin.iurman@6wind.com>,
+        Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+        David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>,
+        Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
+        Ahmed Abdelsalam <ahabdels@cisco.com>, linux-kernel@vger.kernel.org
+References: <20260322000557.12559-1-andrea.mayer@uniroma2.it>
+ <CAOY2Bqx-ZmBm-o-BoUYCxJjGQn31WF8V2u7gbnB52gOSYvG5Rg@mail.gmail.com>
+ <6fef33af-b351-4bf6-a210-ae2283ec9f69@uniroma2.it>
+ <dfc4fb29-7f27-4e9f-b6c9-bd37cbddbf1e@6wind.com>
+From: Stefano Salsano <stefano.salsano@uniroma2.it>
+In-Reply-To: <dfc4fb29-7f27-4e9f-b6c9-bd37cbddbf1e@6wind.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
-	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
+	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272167-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[sipsolutions.net:+];
+	DKIM_TRACE(0.00)[uniroma2.it:+];
+	TAGGED_FROM(0.00)[bounces-272171-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stefano.salsano@uniroma2.it,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,sipsolutions.net:dkim,sipsolutions.net:mid]
-X-Rspamd-Queue-Id: 0E13F3393D8
+	REDIRECTOR_URL(0.00)[urldefense.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,uniroma2.it:dkim,uniroma2.it:mid,uniroma2.it:email,uniroma2.it:url]
+X-Rspamd-Queue-Id: 7B0A133945B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 2026-03-26 at 18:24 +0100, Paolo Abeni wrote:
-> On 3/26/26 10:31 AM, Johannes Berg wrote:
-> > And ... more fixes from drivers came in, notably iwlwifi with
-> > a bunch of things (their maintainer had been on vacation).
-> >=20
-> > I'm going to be on vacation next week, but I'm also not aware
-> > of anything missing from drivers etc. right now, so we'll see.
-> > I doubt this is the _last_ pull request for 7.0, but I think
-> > not much more will come in.
-> >=20
-> > Please pull and let us know if there's any problem.
->=20
-> Blame on me, I left this one out of my bag, and it missed today net PR
-> for Linus.
+Il 26/03/2026 17:30, Nicolas Dichtel ha scritto:
+> 
+> 
+> Le 25/03/2026 à 08:10, Stefano Salsano a écrit :
+>> Il 24/03/2026 17:00, Justin Iurman ha scritto:
+>>> On Sun, Mar 22, 2026 at 12:06 AM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
+>>>>
+>>>> Hi all,
+>>>>
+>>>> this RFC series adds support for the SRv6 End.DT2U behavior and
+>>>> introduces the srl2 Ethernet pseudowire device, together with
+>>>> corresponding selftests.
+>>>
+>>> Hi Andrea,
+>>>
+>>> Thanks for the work you (and Stefano) put into this series! As
+>>> discussed offline, there is interest in such a solution.
+>>
+>> Hi Justin,
+>>
+>> thx for your interest!
+>>
+>>> A general comment: I'm not sure about the name "srl2", as we're
+>>> talking about SRv6 specifically here.
+>>
+>> fair point
+>>
+>>> I would personally love to have
+>>> "l2srv6", although I suspect we may end up with "l2seg6" to remain
+>>> consistent.
+>>
+>> I'd like to keep it as short as possible, our initial idea was seg6l2, very
+>> close to your last suggestion, then we opted for srl2 losing the "6" concept
+>>
+>> now it comes to my mind that l2 is somehow redudant in an interface type name,
+>> as an interface is an l2 concept per se, so my preferred option becomes:
+>>
+>> sr6
+> Note that the interface name is defined to kind + a number when the IFLA_IFNAME
+> attribute is not specified:
+> https://urldefense.com/v3/__https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/net/core/rtnetlink.c?h=v7.0-rc5*n3823__;Iw!!O5Bi4QcV!Bw3h__JfgzAoQlG3DyfQsdX5VEQi5Zx9dXbROUeKuwomkISAWgGMwNxjv059RhKI5xV9MpHHknEXDTb9diS16akPWyJi_dCP7aE$
+> 
+> Here, the default name will be 'sr60' :)
 
-No worries, I just wanted to get it out before I go mostly offline for
-the next week, so it's not stuck on me :)
++1
 
-johannes
+> 'vti6' is already in this case, so it's probably ok. I vote for 'sr6' too ;-)
+> 
+> My two cents,
+> Nicolas
+
+
+-- 
+*******************************************************************
+Prof. Stefano Salsano
+Dipartimento Ingegneria Elettronica
+Universita' di Roma Tor Vergata
+Viale Politecnico, 1 - 00133 Roma - ITALY
+
+http://netgroup.uniroma2.it/Stefano_Salsano/
+
+E-mail  : stefano.salsano@uniroma2.it
+Office  : (Tel.) +39 06 72597770 (Fax.) +39 06 72597435
+*******************************************************************
+
 
