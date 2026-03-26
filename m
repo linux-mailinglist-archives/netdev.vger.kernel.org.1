@@ -1,234 +1,195 @@
-Return-Path: <netdev+bounces-271943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-271944-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yJJHMHP7xGny5QQAu9opvQ
-	(envelope-from <netdev+bounces-271943-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:25:07 +0100
+	id eP7kA9n4xGnM5QQAu9opvQ
+	(envelope-from <netdev+bounces-271944-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:14:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B1F0332430
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:25:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC9C83320D2
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 10:14:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5771318629F
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:11:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5072B305AC93
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 09:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88503BE167;
-	Thu, 26 Mar 2026 09:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2513B9D85;
+	Thu, 26 Mar 2026 09:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QXglUfpy"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="c57OAtvp";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="eKXnx+M6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556653BC691
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 09:10:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13B963BADB5
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 09:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774516255; cv=none; b=SKD/lZzt3J97Bp6Y9f+YqEu1PGKDQPT7+cqZiRT3TlNiBZlAFku17op2k+lV2g9zCIWdHLIommIlv+SKCiAzrFDvkQN9ooJg+jvdJtT6e9UXHsdQu3lAoWriNYNkRnfZ1FKHHDITRvYKYEgPepW3Mv9k4xAoc9RzikvNJhFAE28=
+	t=1774516393; cv=none; b=mxxvPi9F2bYrPYUGzNxargkkqMa1/+Z+Nf9xPjXwPryq+DZj9XbnbmyAyM2rJV0LBpaBSOb6dYuj2oHiASbLCAcCBYvVWctJ51tWCutyOA5u8MF/sjqGziFeMl5lDxQGbltsaF4dQzTeR0UYDYft2JbOH1YA01aYybmljVV1+Kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774516255; c=relaxed/simple;
-	bh=w8YrNU6qSKQOL4v7BNN0lhmGvLNAujqTaPgLpClW6ec=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=u1NOSSgaLJe5jeQ163gqNm3bLPJ7ijMc8Fp33T242tzzsyswHm3Lq42rwja+RYbdU45BL5hVx79g2Zb5pOoIW0bLT1+RiwhVGf3Ht/Mx7xiEJ4Ndm2HB57xLxVYo3TQnhKk6CoqYZpKzm0HunZIZrSwUXPdjVYd8ZGAbpL119uY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QXglUfpy; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-439b94a19fdso649137f8f.0
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 02:10:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774516253; x=1775121053; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dALVgYOMBgS7RxAtSMkBHMyPuZ2ZR74RfMbaRb9k6oE=;
-        b=QXglUfpyI7aTmqmedT1uMw8D7Jrw5J8ynj3Pl+PbZGYTefdBi2mg1aIH+Ut3bUhiKk
-         C/YvWkCUVBTqfceZtxWuyuHwOlhpQotO4S9NqzLFA50xZb4reZge6Ancb6fy3JSCjMyb
-         9j2R3+Gwf2wurGuRmZEvRu4868CUKczgNsAEKWmiOuu7Fp5Jqb+DwCerlJY+5ONokErC
-         t79JF2uJpfjT3Bgsu4mKxkBaaS3rg3IzTDrhrEa5LmgRTrMCck6fKC0X1LvxteMX2+jz
-         OUf9+sKD2B+tdS3r75SxM7VfODw6jc281e0SZLY9GSdU753NhtpUzKHvCRt6vhxJ17Bn
-         TnIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774516253; x=1775121053;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dALVgYOMBgS7RxAtSMkBHMyPuZ2ZR74RfMbaRb9k6oE=;
-        b=FV6q++woFMvSwhg0oExUUbZoitQN5TTns+9rOLXc2OvmOI5IDBXo0ExS/4T/YSy5it
-         sL/eV+nkpvtYkZUkiPMHLkhlG1EKRJdwoHrvGnBq8eYkAFHcN26OFzVERPfsxFt71lPr
-         UPKsp2WTFY7iFgVVtVdsTzEc1lLS2JMnf3rIVBbkl0q+yUIWscIx1T52HgCVvwOI5oBC
-         DP3tpgzUXpS6WKGDtyqZ9JxXZFSiYgJj5Zrw2kSnJfb7PESWv3AvkheJIb4yYhswC0Tm
-         m1mc98N01LQNVRuDDzVvPiu2Yf2k+CbqhRFIdByoeevom4uuD6TCfuJQ69TtV1cXeTJS
-         4OYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWk9pSB5yEPBClWGhPw/OClLWBwYUxMc8SSHPlXGh9mzJJiPyFylpxtF3/skvC3XkwneP8EMoE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHrygZxFZZqyPu4Pd9cck/J6Qv00ivfZKLlBa9UDsgijg2ZIyO
-	KPEkOvp590F13uXpjfd/l59V8mn8B3+zgVxBb+Mfun/C+IJmbh1d3JH5
-X-Gm-Gg: ATEYQzyYlSUqyCeJ/6/sEnTtDqNNorj67Bwxh1ejPAbkH1ZggY6vHFCUkiE5CFFtDQt
-	uOPp6GeFikVOYvCy7ZwL+3yfwfVY57eZJBtKj893ZMa+I2rR0S+VIrirCWnrbHG5uOKN2OzmRUg
-	SS164z96sWQSV0mzGSoYgMn3vuvBFhiBtDiwhl0g2xogPM7MwopbJ9orgXhY5pJrsklXPJJGRre
-	1M/zsV9Z17kLtFDVZR08xcUEnQh4RCnnU1yeS8RJYIlhqLRqMQ4bIqIs2IK4yJAMdJ6qguHTQd7
-	jb7+aMHnTExnTiXBcYIveNXSrGamEOQ+2WIHkCJkFD4s32lJF0hzhRW458wunkoA+qGZTnAzYPh
-	vCCcVd48Xbol3CL67umjxm2MmxR7l9SzzjtkFcWbpQTszK0Bx3D1CZahJcfez1R3CPPhoCT04T9
-	9Ereys1SU1UslEqVHTHZUmPzOxt0HDDu9wR6CZ1R6zDdeXQK8Ajxzn5ozlYBoh9I5hj9iyJCveK
-	C1wLIL6yw==
-X-Received: by 2002:a05:6000:2dc6:b0:43b:6955:54c5 with SMTP id ffacd0b85a97d-43b889a872bmr10137298f8f.17.1774516252624;
-        Thu, 26 Mar 2026 02:10:52 -0700 (PDT)
-Received: from [127.0.1.1] (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b919e7111sm6381199f8f.37.2026.03.26.02.10.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 02:10:52 -0700 (PDT)
-From: Fidelio Lawson <lawson.fidelio@gmail.com>
-X-Google-Original-From: Fidelio Lawson <fidelio.lawson@exotec.com>
-Date: Thu, 26 Mar 2026 10:10:23 +0100
-Subject: [PATCH 3/3] net: dsa: microchip: implement KSZ87xx Module 3
- low-loss cable errata
+	s=arc-20240116; t=1774516393; c=relaxed/simple;
+	bh=inhEeGk09YB26Vrb4nVL0YolzGOxC2QCt+q7ZCYtRdA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pva+Fiic+8mgxotyjoZbhQsBL6dtRlKGTnmby3LtfORPm85HFqUv0o47nygEg2xLZR7ewolNiGC6+EHq0F8W5ZXuUAuWVcz/lRuX9ADrt2BhuDTAN+HDT/rdPiGVGggix8XDLkbe5L8erFAackpSdzvbDO0d/9QjWiFVeWkMlac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=c57OAtvp; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=eKXnx+M6; arc=none smtp.client-ip=202.12.124.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 131507A0170;
+	Thu, 26 Mar 2026 05:13:09 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Thu, 26 Mar 2026 05:13:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1774516389; x=
+	1774602789; bh=rIqHwt0q73wFNTaONxdvLig9/eNeiyDOP4cRUJvTOao=; b=c
+	57OAtvpv0eHgohzeqD0VcgxmVpCNxHe6cRAIzB+O/03U9/eydq3yp6FE9AaZ5YNF
+	XcjHZrTa9r3bWYvos2BvhHqK9iXTaJdLONEqPIGabUMdkogU7JMDGwAA6yAIaUHQ
+	GWAJcSye/hs0GONcHEsWRGdjtFQH81fCJ2agXnGPPXg3k7QvE8Rk4mjgcX2AMnB7
+	LS9oSQ3gqDgqdxwGWPKerKvfCOV0Tb+Urwfj+D57F6MzKzy07EFlG2lzq0E0Xjv+
+	lVgri9Joaa+1zPhtgZ0luFMQzLjvRGgAnlZizZGbxgvqPCpGIk5P56udcZM0ho0G
+	i7fFd2Qq6J05LRxi55gLg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1774516389; x=1774602789; bh=rIqHwt0q73wFNTaONxdvLig9/eNeiyDOP4c
+	RUJvTOao=; b=eKXnx+M6Y/uAAjHM/3cOjxQQV5U6dB7h0vSjiEKDqC901RW+EU7
+	3bKS3WHlYsiXc2ixKTRwbw6ygoCXuOA43pw+4ckl8MBNU8hgp+KNpMUjK7urwawy
+	YKlw4U35P13/4wFQwCwR7D/a0ImPQqrOYzYV5//UHMe5NF+WiXqQr8j5FemzAb+7
+	GCrPldn2ebMpZINH/Gz3Pxpp/Z605c5WmP8VroCytkwsb0/0Kwe913fAu4fxZZHl
+	AzRXA+z9E2Ilvas7aI2Yum7ue4oufFhbBd09JZFQ2kDob1MOX+F5ygo/eUp5aMsw
+	RgZRt7uYn1Q0I6S2+w11gsmF7aK2788ZK9g==
+X-ME-Sender: <xms:pfjEaTJRU1uGeGWf-OCAqBShxtLt5BZWPrBzqIJEKlygwehIx_TbXQ>
+    <xme:pfjEaWN57YEgyEfrT3MbKv4_50n8m_2I7018pDJaDugQr7n0SrT9HllNaGtCg1QO_
+    UYOPv3y5kKJYhvUbATdPo9X1QdZcypjP55toDk7dpSsa77dyfOGc579>
+X-ME-Received: <xmr:pfjEaR5f_AEIcU_TdgJrqVmpaI_DiafdK-xYF42LqnPQUMxpqOwAJzK98VDF>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefvdeileelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeekpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvg
+    htpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvght
+    uggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehimhhvgegsvghlse
+    hgmhgrihhlrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdp
+    rhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtoh
+    epuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigv
+    thesghhoohhglhgvrdgtohhm
+X-ME-Proxy: <xmx:pfjEaY6Rer5SIbF-a4eGL5EmbAIjypUKZo5IT0vU8K8YwmY50rs8UA>
+    <xmx:pfjEafEbHLQ7jSnKZk1kEUE5V2rIfLLrTDUA6VFOcHG7fzVMhEgkMQ>
+    <xmx:pfjEaYVp9pGUQP0tvwyL_R4BqeBKS8_o6H31j_cCNsAXiT6vT-qrIw>
+    <xmx:pfjEaTW8F6iWZSqmnrwXX5yWDT-JDaNHikeKOhMFkX2t2_MXpmNVQQ>
+    <xmx:pfjEaVUC0BuVFXVVYY9MazUW424VBVANIE2MQTREMB9jpKxyjjwpwwV9>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 26 Mar 2026 05:13:08 -0400 (EDT)
+Date: Thu, 26 Mar 2026 10:13:07 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Hyunwoo Kim <imv4bel@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net 1/1] ovpn: fix race between deleting interface and
+ adding new peer
+Message-ID: <acT4o2VwsGk8o3jG@krikkit>
+References: <20260320100351.2283994-1-antonio@openvpn.net>
+ <20260320100351.2283994-2-antonio@openvpn.net>
+ <20260323184304.42c3930f@kernel.org>
+ <20260323184543.764a903e@kernel.org>
+ <acJix6cQZyqb94pA@krikkit>
+ <20260324143006.60e7ca2e@kernel.org>
+ <acMS5PU_CfOMQPtQ@krikkit>
+ <9c891d6c-1064-4f35-8982-3e2dcb3290f5@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260326-ksz87xx_errata_low_loss_connections-v1-3-79a698f43626@exotec.com>
-References: <20260326-ksz87xx_errata_low_loss_connections-v1-0-79a698f43626@exotec.com>
-In-Reply-To: <20260326-ksz87xx_errata_low_loss_connections-v1-0-79a698f43626@exotec.com>
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Woojung Huh <Woojung.Huh@microchip.com>, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Fidelio Lawson <fidelio.lawson@exotec.com>
-X-Mailer: b4 0.15.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1774516248; l=2643;
- i=fidelio.lawson@exotec.com; s=20260326; h=from:subject:message-id;
- bh=w8YrNU6qSKQOL4v7BNN0lhmGvLNAujqTaPgLpClW6ec=;
- b=ReRyXn03/iqq1g302IExSUUnOqcX1cNBWKYHVKQtahzzDyBiFF6BkyKtE22QoN5DyKq3y5usX
- J/0HdTyjUIpD8Z+P6M2UwfkOgntEopq//CFHuJqKMzSorgPtPPGWSn6
-X-Developer-Key: i=fidelio.lawson@exotec.com; a=ed25519;
- pk=866eH9Bmmpjc+ctgkr5T1uXxBefZzob3tEEuiVWZ6BI=
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <9c891d6c-1064-4f35-8982-3e2dcb3290f5@openvpn.net>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-271944-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-271943-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DMARC_NA(0.00)[queasysnail.net];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,redhat.com,lunn.ch,davemloft.net,google.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[exotec.com:email,exotec.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5B1F0332430
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: BC9C83320D2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Implement the "Module 3: Equalizer fix for short cables" erratum from
-Microchip document DS80000687C for KSZ87xx switches.
+2026-03-25, 14:37:36 +0100, Antonio Quartulli wrote:
+> Hi!
+> 
+> On 24/03/2026 23:40, Sabrina Dubroca wrote:
+> > 2026-03-24, 14:30:06 -0700, Jakub Kicinski wrote:
+> > > LGTM. This or change all the write paths to check if the device is still
+> > > alive after taking the lock.
+> > 
+> > I think peer_new is the only relevant path here (other paths use an
+> > existing peer and modify/delete the peer itself or its keys while
+> > holding a reference), and we don't take a lock except to insert the
+> > peer in the ovpn instance (ie netdev)'s hashtable (or peer slot, for
+> > single-peer instances). I guess we could add the reg_state >=
+> > NETREG_UNREGISTERING check to ovpn_peer_add_{p2p,mp} and reject adding
+> > the peer. It seems cleaner than my ovpn_nl_post_doit() diff above.
+> 
+> Yeah, I like the check in ovpn_peer_add_* too.
+> 
+> > 
+> > > > Or we can call ovpn_peers_free on every NETDEV_UNREGISTER notification
+> > > > that netdev_wait_allrefs_any sends us (but then we don't need it in
+> > > > ndo_uninit).
+> > > 
+> > > Hm, wouldn't we need a notification _after_ netdev_wait_allrefs_any() ?
+> > 
+> > netdev_wait_allrefs_any() will never complete if we don't clean up all
+> > the peers, since they hold a ref on the netdev.
+> > 
+> > But calling ovpn_peers_free on netdev_wait_allrefs_any()'s
+> > 
+> >      /* Rebroadcast unregister notification */
+> > 
+> > should clean up peers that got added while we were unregistering.
+> 
+> But with the check in ovpn_peer_add_*, we don't need this extra call to
+> ovpn_peers_free(), right?
 
-The issue affects short or low-loss cable links (e.g. CAT5e/CAT6),
-where the PHY receiver equalizer may amplify high-amplitude signals
-excessively, resulting in internal distortion and link establishment
-failures.
-
-Depending on the selected workaround (1 or 2), the driver writes a
-specific value to the indirect PHY register
-using the 6E/6F/A0 indirect access mechanism.
-
-The errata fix is applied during global switch initialization when
-enabled via device tree.
-
-Signed-off-by: Fidelio Lawson <fidelio.lawson@exotec.com>
----
- drivers/net/dsa/microchip/ksz8.c | 46 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
-
-diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
-index 78b42cf50ce2..b6f3a1ce85fc 100644
---- a/drivers/net/dsa/microchip/ksz8.c
-+++ b/drivers/net/dsa/microchip/ksz8.c
-@@ -1901,6 +1901,41 @@ void ksz8_phylink_mac_link_up(struct phylink_config *config,
- 		ksz8_phy_port_link_up(dev, port, duplex, tx_pause, rx_pause);
- }
- 
-+static int ksz8_handle_module3_errata(struct ksz_device *dev)
-+{
-+	int ret = 0;
-+	const u16 *regs = dev->info->regs;
-+	u16 indir_reg = 0x0000;
-+	u8 indir_val = 0x00;
-+
-+	switch (dev->low_loss_wa_mode) {
-+	case KSZ_LOW_LOSS_WA_1:
-+		indir_reg = 0x3C;
-+		indir_val = 0x15;
-+		break;
-+	case KSZ_LOW_LOSS_WA_2:
-+		indir_reg = 0x4C;
-+		indir_val = 0x40;
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	mutex_lock(&dev->alu_mutex);
-+
-+	ret = ksz_write8(dev, regs[REG_IND_CTRL_0], 0xA0);
-+
-+	if (!ret)
-+		ret = ksz_write8(dev, 0x6F, indir_reg);
-+
-+	if (!ret)
-+		ret = ksz_write8(dev, regs[REG_IND_BYTE], indir_val);
-+
-+	mutex_unlock(&dev->alu_mutex);
-+
-+	return ret;
-+}
-+
- static int ksz8_handle_global_errata(struct dsa_switch *ds)
- {
- 	struct ksz_device *dev = ds->priv;
-@@ -1915,6 +1950,17 @@ static int ksz8_handle_global_errata(struct dsa_switch *ds)
- 	if (dev->info->ksz87xx_eee_link_erratum)
- 		ret = ksz8_ind_write8(dev, TABLE_EEE, REG_IND_EEE_GLOB2_HI, 0);
- 
-+	/* KSZ87xx Errata DS80000687C.
-+	 * Module 3: Equalizer fix for short cables
-+	 * The receiver of the embedded PHYs is tuned by default
-+	 * to support long cable length applications.
-+	 * Because of this, the equalizer in the PHY may amplify
-+	 * high amplitude receiver signals to the point that
-+	 * the signal is distorted internally
-+	 */
-+	if (!ret && dev->low_loss_wa_enable && ksz_is_ksz87xx(dev))
-+		ret = ksz8_handle_module3_errata(dev);
-+
- 	return ret;
- }
- 
+Yes. This was an alternative idea for the same thing.
 
 -- 
-2.53.0
-
+Sabrina
 
