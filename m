@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-272085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272086-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sNogBKVAxWkU8wQAu9opvQ
-	(envelope-from <netdev+bounces-272085-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:20:21 +0100
+	id uCaMHLE/xWkU8wQAu9opvQ
+	(envelope-from <netdev+bounces-272086-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:16:17 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57C41336B27
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:20:20 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72B5A336A7F
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 15:16:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ACF493074561
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:10:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3E295300847A
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A9E3750CA;
-	Thu, 26 Mar 2026 14:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C825375F89;
+	Thu, 26 Mar 2026 14:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EjOz+fQg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SylF9PGH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFF0372B30
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 14:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FB9371875;
+	Thu, 26 Mar 2026 14:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774534220; cv=none; b=anxCHnCunnjCjp2vrxkxUzMaeiuEHaz/msHOo/kERGqgJyQTSE5IDGXPEh/w/k/rCHBpgXX5zA2htcAdSpdx6nWDyGHspGRSMAW1LmwrHAbKHkN6713rfD3h2Ccmm76yhmXbwhPAIrIs0CA9IJpZdc4GcNRC7ebNd0Jb5NhL3eo=
+	t=1774534223; cv=none; b=EE4+95Cgj6DcYqlg4AJ9aQ28yrYAx4bOKYegBcCAIiG1lyre++hyTciVqLNSENLu1pKBUb1kN5f8JS2hSPF3RLcamVWUAf4wPRtZoWAAFk/f6sWLVf5KvvJ8AcxWf/CYGB/77aJ+BhZDOIKr6wIpHAxmZ1SXjwyM9rl98Je+QhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774534220; c=relaxed/simple;
-	bh=VTedjxHjhsQ7TwiqY1zRg3/Pw8EEqi2vQpab9pyqU20=;
+	s=arc-20240116; t=1774534223; c=relaxed/simple;
+	bh=qDXpn8tSOCXVn4ZPGywJkTMJ+kkBMvnV1b47RKYboZE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UXvCkATJTfp2o6dKWa4rD9k6EaO5BymONQ/qU58q/La1Ju6xXoQJoliNP3efQyYaHvrOw23sUr14Ks0F2a1LTrU2aXCocFvXIrxbpxRS0o1TuEMdW+GsS74z4ySmBxr3KcrRs8UIvDYdryDT4cRpxJIuMZwoozMVnq8370CC1g4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EjOz+fQg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 650B8C116C6;
-	Thu, 26 Mar 2026 14:10:18 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=NlH0hrU8G+IkBd6gSK/CCnuZ9M4LgQf3tSiQJasbf7MNu3MGKVjqd2DNHG9nimUGxiKkVL9ny8t42zsksenB7h/rnwYdU11KyeoakRB9277/Sp6Y1th7++McF4tXJUVz/dWUcSakuBKAn2EdpnT6FBbDwSo9Fgz/qlclNckDOs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SylF9PGH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4A1DC116C6;
+	Thu, 26 Mar 2026 14:10:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774534218;
-	bh=VTedjxHjhsQ7TwiqY1zRg3/Pw8EEqi2vQpab9pyqU20=;
+	s=k20201202; t=1774534222;
+	bh=qDXpn8tSOCXVn4ZPGywJkTMJ+kkBMvnV1b47RKYboZE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EjOz+fQgBA7KNeY0TwIEg/dxIwNdN3xfzqOqsneCzWEjTcYg6+NWmB/LVfcE5ZZvw
-	 GbOFJHeJ8D9TTTNIiMwCd+Jz1OfMUfLMc0VFudLvQ4jroMzR/eOokkBzqcuqPMpqEK
-	 XwoDqtzv+RnLRH7XwHPedyMqfgo6Pau3La2mquT6jAhLVISykK77lLvWmahk64j8Qs
-	 paI68Co+0hgk/aXUtBjrRO/8R3B+ybfZqVhVG6z/EnwcGVyHxCmdG03mtBEzL2QC5g
-	 Ia6LN+vCbySvGSvRmN6YCzLzwoN9quigOHSK+IBwWgIC4hbR3TaCuPlB05hlARQu4p
-	 HRwZL9yP+fEkw==
+	b=SylF9PGH2EGpNlsTu2aaFYfkCFg3+gDznpF8mWO7WAGofPtiw69UUuUQQe7d1hszG
+	 lqHMps1JSVsGxMMP5kK7S96qfLVDN5nCF++7xDNhVYHLsJy+izTuFIVwnBpGoEbMh6
+	 pLKk1ODXxMDVNQtbdVxrTBAGw9RnGLQ6/kwNtCmwC0SicQdrvCZL+h8A+e040DijL0
+	 ca+XUB4YponCWCJPTCleMzvQlRmlduu1w+tf0YO48UIRQHparfwfxVlkM7ravLdRl+
+	 4TPRv9u+7sBT6H9DjDHc5N/KhBvT51MIp5ujvtADFmYPoLsv2tyi+JGJQIuae1jIFJ
+	 oXtMuRg47nmgA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD6739EFA69;
-	Thu, 26 Mar 2026 14:10:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE5039EFA69;
+	Thu, 26 Mar 2026 14:10:10 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,69 +55,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: macb: use the current queue number for stats
+Subject: Re: [PATCH net-next v2] net: mana: Set default number of queues to 16
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177453420504.2572343.12776875958480966196.git-patchwork-notify@kernel.org>
-Date: Thu, 26 Mar 2026 14:10:05 +0000
-References: <20260323191634.2185840-1-pvalerio@redhat.com>
-In-Reply-To: <20260323191634.2185840-1-pvalerio@redhat.com>
-To: Paolo Valerio <pvalerio@redhat.com>
-Cc: netdev@vger.kernel.org, nicolas.ferre@microchip.com,
- claudiu.beznea@tuxon.dev, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, nb@tipi-net.de
+ <177453420903.2572343.6705987187482730782.git-patchwork-notify@kernel.org>
+Date: Thu, 26 Mar 2026 14:10:09 +0000
+References: <20260323194925.1766385-1-longli@microsoft.com>
+In-Reply-To: <20260323194925.1766385-1-longli@microsoft.com>
+To: Long Li <longli@microsoft.com>
+Cc: kotaranov@microsoft.com, kuba@kernel.org, davem@davemloft.net,
+ pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch, jgg@ziepe.ca,
+ leon@kernel.org, haiyangz@microsoft.com, kys@microsoft.com,
+ wei.liu@kernel.org, decui@microsoft.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-272086-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272085-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 57C41336B27
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 72B5A336A7F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Mon, 23 Mar 2026 20:16:34 +0100 you wrote:
-> There's a potential mismatch between the memory reserved for statistics
-> and the amount of memory written.
+On Mon, 23 Mar 2026 12:49:25 -0700 you wrote:
+> Set the default number of queues per vPort to MANA_DEF_NUM_QUEUES (16),
+> as 16 queues can achieve optimal throughput for typical workloads. The
+> actual number of queues may be lower if it exceeds the hardware reported
+> limit. Users can increase the number of queues up to max_queues via
+> ethtool if needed.
 > 
-> gem_get_sset_count() correctly computes the number of stats based on the
-> active queues, whereas gem_get_ethtool_stats() indiscriminately copies
-> data using the maximum number of queues, and in the case the number of
-> active queues is less than MACB_MAX_QUEUES, this results in a OOB write
-> as observed in the KASAN splat.
+> Signed-off-by: Long Li <longli@microsoft.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: macb: use the current queue number for stats
-    https://git.kernel.org/netdev/net/c/72d96e4e24bb
+  - [net-next,v2] net: mana: Set default number of queues to 16
+    https://git.kernel.org/netdev/net-next/c/45b2b84ac6fd
 
 You are awesome, thank you!
 -- 
