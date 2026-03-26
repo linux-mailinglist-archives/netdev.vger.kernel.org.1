@@ -1,552 +1,561 @@
-Return-Path: <netdev+bounces-272153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272154-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EC1iLhtnxWkn+AQAu9opvQ
-	(envelope-from <netdev+bounces-272153-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:04:27 +0100
+	id 0G6KNidoxWl1+AQAu9opvQ
+	(envelope-from <netdev+bounces-272154-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:08:55 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7B9D338DD9
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:04:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ECE68338EC6
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:08:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1A3D53008095
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:44:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 435893010809
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 16:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C725E3FD156;
-	Thu, 26 Mar 2026 16:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5D540F8CC;
+	Thu, 26 Mar 2026 16:56:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="E1ExEmsQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kXY46qQT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB51239C63D
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 16:44:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37D441C308;
+	Thu, 26 Mar 2026 16:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774543473; cv=none; b=uGFhRI1QdM2ud5chj3bX9zAfwUp3M6aBSvW6grRW5DWsXEAjybQDUzFRD39S6jg9xo120jR+nTKD2rlypS4JrxFJf93kVmO9S5S6Q97Z0qB/Vg6sAeXLKEr7qlW1NMX4dZUBn6w86yE9NHk8OjfjMmCtzO73DGDsDLKSfsjZclE=
+	t=1774544168; cv=none; b=D67BZCg0Y2eCbD4tgw5qUKRbyGQ4svgqZuqtrGRt9t2uPK6yx10vS8pembrGhUZBc0+rberk2mJv9Flnf+mmcrY2+HOR+Sz2Msd2nk5FW2Nxb6XmkuTN4K5cEdF/hgUJaisBMQxHT+0HESfG7ktPQKMGR74w2KK8ii0EYjegGUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774543473; c=relaxed/simple;
-	bh=/G2bs0BwAXEyEVW9j93XdQ/22tQtf/E5LusP/Tpp5hw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u9XOPwjP+TQ0kAggNnhjzjQ68lJ3xKPtmyxENlZx77I7ki73DyhlRCjt9VqzS1NCAE6xc8oLXn6IKSGTd1FbyJtKEXqGPLaAksytBNLLDoSjiAFnWnC78hJB8BvOxvjxjGX2d1JPwOVoPzmdyzq5U/Cvdn3InojiRq3V3s8fiqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=E1ExEmsQ; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-43b9109374eso41824f8f.0
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 09:44:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1774543470; x=1775148270; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=vGBNnYcyMccpdpNhrK4WEI6MensrK6wWkxqJK4annYs=;
-        b=E1ExEmsQODmQbVdLnNpJhP0tZgNCmRvinCqmml611H2Qub0F3NZ8Nyrpe4/ybGK37P
-         49fzJbKgdwMGHvff/eEVi7IS75V5kijuzh6uUAQVyTc5MaPAc1ePl8aDwrGgjxmiwNpq
-         55J590RYubyOF5uj5zwFN/0p2NODQn2OMY5o5UFzzN8WsyfjD5evkHqT9X9MHdPADCe5
-         xRhnhOz3MGeFEiBrZPAlQwXL/1aARk52SbvAEzg+QPZ+5F6PQ5XLJ14RylyhEH8jq0IK
-         mUqi+AliJujhhZT+qgxulfTKy2pERCMzCGfKdqL0g4WDKkUOlU6wtD9pqzceWMrc+q79
-         XtTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774543470; x=1775148270;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vGBNnYcyMccpdpNhrK4WEI6MensrK6wWkxqJK4annYs=;
-        b=qfL847Y1645SQ/r182iGLV1mVBTcBjQ1BjXWLvlXtR5VnRfWmlKhFS8kn8/6kVrDMt
-         gqQ0piEdkkA/KJX7Ez5Fd905JLZQ98S1fsjhx+nocB73g4QQ1WeXKYfexuAtatqk7TPh
-         Lqpc6LcDV6z4+W4K+ocsv/pyc+V12rTyjiUUbTSKBtyilHD8Vj/SW47B48iCoEkmrkQJ
-         fN+JiuIS01//NVK7wZW7TOxFmFz8SoDYUe8pDs8HTAoo2ItzAZyIjwEAIFBe6HJox+lC
-         imBCbkbq7jkqYjHvE+TV/u2qLVwB+yTw8wXFcr38jpbrDuD56QsxCBDBA+T41ygyeWP0
-         oFmw==
-X-Forwarded-Encrypted: i=1; AJvYcCVjnLVpFXVpGOHItWJ8aVk/1/9xprqes2uNW6pxpHsRMvK+vdjyZnq3P3hpE2vmsvd6uP6NDss=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5YKSY8FMxwvjE0/XAM3RCCQg/zUoxxfVHLuonGqPppTVnIS9q
-	lafmSLUbnFdJLQYd0nkV26z3k50XONq7TugWWuCEGp1Z8RtQriFxi4rOGvo6ZdUOfw8=
-X-Gm-Gg: ATEYQzxDsl0ikqHsk+FQj7iOYUXU3KffzLxVQ+x1Uz3ucRreTYMSmfyqRnTvHlqs8Ku
-	ne2n3hcCzUY0h2NikzqBLnuR1YYpZxe11cd5CEeRC37J3ZBdYn+KN1HPb0TxOE7qzw7MW/94Sgd
-	wc8C9FX0E/QJJTyH9d5D+wwtL4qUjGUOrCY+QWlFisNBDBHRtm1bGhfONzbUAxnHoVVUascOTpA
-	spklfWsVyBV/gWq4eePcK4ZdzEuX5btfxa4tywKacA1mpN5478JNP0XGn8sW71v8U3M/s1wPrnt
-	pHocxxiOxMMildUHYnOsLJAfvVvqNA8AK7GtWTIJhTeD7fJ1R6hl6S64/pg3S+hjBEWoeV1zyH1
-	Ra6GrtrLlg772+rE+KimX9+1ZyqluATBTBKrU74dUmHXaWvPCS/tC9Gi0gQF6ujXMg+EYvNJQWz
-	pyt/hJ0pT5zVlAvgA2UqEP5WW60uPjEKn8ZalfmI0QP4sfxzJ6pFjO7GmWMchkKyz7IBFIUtHWn
-	RHi
-X-Received: by 2002:adf:b648:0:b0:43b:8820:58cf with SMTP id ffacd0b85a97d-43b88a7472bmr5093339f8f.4.1774543470011;
-        Thu, 26 Mar 2026 09:44:30 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b9192e35esm8469873f8f.6.2026.03.26.09.44.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Mar 2026 09:44:29 -0700 (PDT)
-Message-ID: <a4a4ba6d-da13-4bb1-b6b2-1f9a5de190a7@6wind.com>
-Date: Thu, 26 Mar 2026 17:44:29 +0100
+	s=arc-20240116; t=1774544168; c=relaxed/simple;
+	bh=z2L7DgmGvtQl3yVNQHmEZwrdv0W20ff+rYzxy8zxb/c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KqC+7dekpVFYLeC1Z7zIFaNI3/4bRPqf3D8Yp9oLjjTSupa8yrThPnXxteoEBpmRTpQ1lyuiw3m83+Z0HxXyPPQem+XCR/dNCJASLRVmeY/lHS2MUQYIGQhninndz9p+RmYuKOulQUTf+jpdGCmus07z8PvK6kAc1IbaHjkrFg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=kXY46qQT; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=tNUmiKN4fF40nM9pWiE85RUF4sgRs4iO5/OLdhEvvt4=; b=kXY46qQT5qzcTwqCfrKvP11HGq
+	t7K+Nj3BlywQwKVJHBo32nOQW961sBOhNM6FQDhIUViBvKHq2iNyA0rr8m9TTygVEJKRLscoxMdrN
+	7eaXMTw69WouHlGL6LfWeaByyS3LZp7/hcu20kvS8I9S1VBSzNho0lCpzd5ZO93U/40k0INfLkEub
+	FlGjH1w8/zMZDQDGK9O1d17QLcyATzlzoDcmXHrdWVgegDsWEoSeznIXxz3pNCKXKGh2pH/C+NvTL
+	W++2TONR/xO0GHxc8BV6hHNBpIHnuZjZQhN51+sU9938mKQCKmCAUXWxlYhPgCXKwBD53W+PvXvl/
+	vEnpYZbg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35442)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w5nzr-0000000052T-3jxv;
+	Thu, 26 Mar 2026 16:55:51 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w5nzg-000000007C9-0FDQ;
+	Thu, 26 Mar 2026 16:55:40 +0000
+Date: Thu, 26 Mar 2026 16:55:39 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	bcm-kernel-feedback-list@broadcom.com, richardcochran@gmail.com,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com, rohan.g.thomas@altera.com,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org,
+	andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
+	me@ziyao.cc, siyanteng@cqsoftware.com.cn,
+	prabhakar.mahadev-lad.rj@bp.renesas.com,
+	weishangjuan@eswincomputing.com, wens@kernel.org,
+	vladimir.oltean@nxp.com, lizhi2@eswincomputing.com,
+	boon.khai.ng@altera.com, maxime.chevallier@bootlin.com,
+	chenchuangyu@xiaomi.com, yangtiezhu@loongson.cn,
+	ovidiu.panait.rb@renesas.com, chenhuacai@kernel.org,
+	florian.fainelli@broadcom.com, quic_abchauha@quicinc.com
+Subject: Re: [PATCH net-next v8 4/6] Add PCI driver support for BCM8958x
+Message-ID: <acVlC3v0Hyt94XDN@shell.armlinux.org.uk>
+References: <20260320211921.1202058-1-jitendra.vegiraju@broadcom.com>
+ <20260320211921.1202058-5-jitendra.vegiraju@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [RFC PATCH net-next 2/3] seg6: add SRv6 L2 tunnel device (srl2)
-To: Andrea Mayer <andrea.mayer@uniroma2.it>, netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Stefano Salsano <stefano.salsano@uniroma2.it>,
- Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
- Ahmed Abdelsalam <ahabdels@cisco.com>,
- Justin Iurman <justin.iurman@6wind.com>, linux-kernel@vger.kernel.org
-References: <20260322000557.12559-1-andrea.mayer@uniroma2.it>
- <20260322000557.12559-3-andrea.mayer@uniroma2.it>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <20260322000557.12559-3-andrea.mayer@uniroma2.it>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260320211921.1202058-5-jitendra.vegiraju@broadcom.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[6wind.com:+];
-	HAS_ORG_HEADER(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272153-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_REPLYTO(0.00)[nicolas.dichtel@6wind.com];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[nicolas.dichtel@6wind.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-272154-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,foss.st.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,broadcom.com,iogearbox.net,altera.com,st-md-mailman.stormreply.com,lists.infradead.org,lunn.ch,fomichev.me,ziyao.cc,cqsoftware.com.cn,bp.renesas.com,eswincomputing.com,nxp.com,bootlin.com,xiaomi.com,loongson.cn,renesas.com,quicinc.com];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.967];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[6wind.com:dkim,6wind.com:replyto,6wind.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,uniroma2.it:email]
-X-Rspamd-Queue-Id: D7B9D338DD9
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,shell.armlinux.org.uk:mid,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: ECE68338EC6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-
-Le 22/03/2026 à 01:05, Andrea Mayer a écrit :
-> Introduce srl2, an Ethernet pseudowire device over SRv6. It
-> encapsulates L2 frames in IPv6 with a Segment Routing Header for
-> transmission across an SRv6 network.
-> 
-> The encapsulation logic reuses seg6_do_srh_encap() with
-> IPPROTO_ETHERNET. The transmit path uses the standard IPv6 tunnel
-> infrastructure (dst_cache, ip6_route_output, ip6tunnel_xmit).
-> 
-> The device is configured with a segment list for point-to-point
-> L2 encapsulation.
-> 
-> Usage:
-> 
->   ip link add srl2-0 type srl2 segs fc00::a,fc00::b
-> 
-> Co-developed-by: Stefano Salsano <stefano.salsano@uniroma2.it>
-> Signed-off-by: Stefano Salsano <stefano.salsano@uniroma2.it>
-> Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
-> ---
->  include/linux/srl2.h      |   7 +
->  include/uapi/linux/srl2.h |  20 +++
->  net/ipv6/Kconfig          |  16 +++
->  net/ipv6/Makefile         |   1 +
->  net/ipv6/seg6.c           |   1 +
->  net/ipv6/srl2.c           | 269 ++++++++++++++++++++++++++++++++++++++
->  6 files changed, 314 insertions(+)
->  create mode 100644 include/linux/srl2.h
->  create mode 100644 include/uapi/linux/srl2.h
->  create mode 100644 net/ipv6/srl2.c
-> 
-> diff --git a/include/linux/srl2.h b/include/linux/srl2.h
-> new file mode 100644
-> index 000000000000..c1342b979402
-> --- /dev/null
-> +++ b/include/linux/srl2.h
-> @@ -0,0 +1,7 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +#ifndef _LINUX_SRL2_H
-> +#define _LINUX_SRL2_H
-> +
-> +#include <uapi/linux/srl2.h>
-> +
-> +#endif
-Is this really needed?
-
-> diff --git a/include/uapi/linux/srl2.h b/include/uapi/linux/srl2.h
-> new file mode 100644
-> index 000000000000..e7c8f6fc0791
-> --- /dev/null
-> +++ b/include/uapi/linux/srl2.h
-> @@ -0,0 +1,20 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later WITH Linux-syscall-note */
-> +/*
-> + *  SRv6 L2 tunnel device
-> + *
-> + *  Author:
-> + *  Andrea Mayer <andrea.mayer@uniroma2.it>
-> + */
-> +
-> +#ifndef _UAPI_LINUX_SRL2_H
-> +#define _UAPI_LINUX_SRL2_H
-> +
-> +enum {
-> +	IFLA_SRL2_UNSPEC,
-> +	IFLA_SRL2_SRH,	/* binary: struct ipv6_sr_hdr + segments */
-> +	__IFLA_SRL2_MAX,
+On Fri, Mar 20, 2026 at 02:19:19PM -0700, Jitendra Vegiraju wrote:
+> +static const struct property_entry fixed_link_properties[] = {
+> +	PROPERTY_ENTRY_U32("speed", 10000),
+> +	PROPERTY_ENTRY_BOOL("full-duplex"),
+> +	PROPERTY_ENTRY_BOOL("pause"),
+> +	{ }
 > +};
 > +
-> +#define IFLA_SRL2_MAX (__IFLA_SRL2_MAX - 1)
-It should probably be generated automatically from specs, see
-https://docs.kernel.org/userspace-api/netlink/intro-specs.html
-
-> +
-> +#endif
-> diff --git a/net/ipv6/Kconfig b/net/ipv6/Kconfig
-> index b8f9a8c0302e..9c8f7e254435 100644
-> --- a/net/ipv6/Kconfig
-> +++ b/net/ipv6/Kconfig
-> @@ -318,6 +318,22 @@ config IPV6_SEG6_BPF
->  	depends on IPV6_SEG6_LWTUNNEL
->  	depends on IPV6 = y
->  
-> +config IPV6_SRL2
-> +	tristate "IPv6: SRv6 L2 tunnel device"
-> +	depends on IPV6_SEG6_LWTUNNEL
-> +	select DST_CACHE
-> +	help
-> +	  SRv6 virtual Ethernet device that encapsulates L2 frames in
-> +	  IPv6 with a Segment Routing Header (SRH) for transmission
-> +	  over an SRv6 network.
-> +	  Intended for use with a remote seg6local L2 decapsulation
-> +	  behavior, such as End.DT2U or End.DX2.
-> +
-> +	  To compile this as a module, choose M here: the module will
-> +	  be called srl2.
-> +
-> +	  If unsure, say N.
-> +
->  config IPV6_RPL_LWTUNNEL
->  	bool "IPv6: RPL Source Routing Header support"
->  	depends on IPV6
-> diff --git a/net/ipv6/Makefile b/net/ipv6/Makefile
-> index 2c9ce2ccbde1..a7e81d0293ca 100644
-> --- a/net/ipv6/Makefile
-> +++ b/net/ipv6/Makefile
-> @@ -24,6 +24,7 @@ ipv6-$(CONFIG_SYN_COOKIES) += syncookies.o
->  ipv6-$(CONFIG_NETLABEL) += calipso.o
->  ipv6-$(CONFIG_IPV6_SEG6_LWTUNNEL) += seg6_iptunnel.o seg6_local.o
->  ipv6-$(CONFIG_IPV6_SEG6_HMAC) += seg6_hmac.o
-> +obj-$(CONFIG_IPV6_SRL2) += srl2.o
->  ipv6-$(CONFIG_IPV6_RPL_LWTUNNEL) += rpl_iptunnel.o
->  ipv6-$(CONFIG_IPV6_IOAM6_LWTUNNEL) += ioam6_iptunnel.o
->  
-> diff --git a/net/ipv6/seg6.c b/net/ipv6/seg6.c
-> index 1c3ad25700c4..23213ab4fefd 100644
-> --- a/net/ipv6/seg6.c
-> +++ b/net/ipv6/seg6.c
-> @@ -72,6 +72,7 @@ bool seg6_validate_srh(struct ipv6_sr_hdr *srh, int len, bool reduced)
->  
->  	return true;
->  }
-> +EXPORT_SYMBOL_GPL(seg6_validate_srh);
->  
->  struct ipv6_sr_hdr *seg6_get_srh(struct sk_buff *skb, int flags)
->  {
-> diff --git a/net/ipv6/srl2.c b/net/ipv6/srl2.c
-> new file mode 100644
-> index 000000000000..66aa5375d218
-> --- /dev/null
-> +++ b/net/ipv6/srl2.c
-> @@ -0,0 +1,269 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + *  SRv6 L2 tunnel device (srl2)
-> + *
-> + *  A virtual Ethernet device that encapsulates L2 frames in IPv6 with a
-> + *  Segment Routing Header (SRH) for transmission over an SRv6 network.
-> + *  On the remote side, a seg6_local behavior such as End.DT2U or End.DX2
-> + *  decapsulates the inner Ethernet frame for L2 delivery.
-> + *
-> + *  The encapsulation logic reuses seg6_do_srh_encap() from seg6_iptunnel.c
-> + *  with IPPROTO_ETHERNET (143). The transmit path uses the standard IPv6
-> + *  tunnel infrastructure (dst_cache, ip6_route_output, ip6tunnel_xmit).
-> + *
-> + *  Authors:
-> + *	Andrea Mayer <andrea.mayer@uniroma2.it>
-> + *	Stefano Salsano <stefano.salsano@uniroma2.it>
-> + */
-> +
-> +#include <linux/module.h>
-> +#include <linux/netdevice.h>
-> +#include <linux/etherdevice.h>
-> +#include <net/dst_cache.h>
-> +#include <net/ip6_route.h>
-> +#include <net/ip_tunnels.h>
-> +#include <net/ip6_tunnel.h>
-> +#include <net/seg6.h>
-> +#include <linux/seg6.h>
-> +#include <linux/srl2.h>
-> +
-> +/* Conservative initial estimate for SRH size before newlink provides
-> + * the actual value. 256 bytes accommodates up to 15 SIDs.
-> + */
-> +#define SRL2_SRH_HEADROOM_EST	256
-> +
-> +struct srl2_priv {
-> +	struct ipv6_sr_hdr	*srh;
-> +	struct dst_cache	dst_cache;
+> +static const struct software_node parent_swnode = {
+> +	.name = "phy-device",
 > +};
 > +
-> +/*
-> + * srl2_xmit - encapsulate an L2 frame in IPv6+SRH and transmit
-> + *
-> + * When the bridge (or local stack) sends a frame through this device,
-> + * skb->data points to the inner Ethernet header.  We look up a route
-> + * towards the first SID, prepend the outer IPv6+SRH via
-> + * seg6_do_srh_encap(), and transmit via ip6tunnel_xmit().
-> + *
-> + * The route lookup result is cached per-cpu in dst_cache. Since the
-> + * first SID is constant for the lifetime of the device, the cache
-> + * avoids repeated route lookups in the common case.
-> + */
-> +static netdev_tx_t srl2_xmit(struct sk_buff *skb, struct net_device *dev)
+> +static const struct software_node fixed_link_swnode = {
+> +	.name = "fixed-link",           /* MUST be named "fixed-link" */
+> +	.parent = &parent_swnode,
+> +	.properties = fixed_link_properties,
+> +};
+> +
+> +static const struct software_node *brcm_swnodes[] = {
+> +	&parent_swnode,
+> +	&fixed_link_swnode,
+> +	NULL
+> +};
+
+Looking at this structure, I'm not sure it's correct. You seem to have:
+
+pci_device
+- "phy-device" swnode attached here (which describes the PCI device,
+  which isn't any kind of PHY)
+	- "fixed-link" attached as a child
+
+The "fixed-link" is a property for the local network device which
+signifies that there isn't a PHY attached or there's an inaccessible
+PHY that only operates with one set of settings.
+
+Maybe rename "phy-device" to "ethernet"?
+
+> +
+> +struct brcm_priv_data {
+> +	void __iomem *mbox_regs;    /* MBOX  Registers*/
+> +	void __iomem *misc_regs;    /* MISC  Registers*/
+> +	void __iomem *xgmac_regs;   /* XGMAC Registers*/
+> +};
+> +
+> +struct dwxgmac_brcm_pci_info {
+> +	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
+> +};
+> +
+> +static void misc_iowrite(struct brcm_priv_data *brcm_priv,
+> +			 u32 reg, u32 val)
 > +{
-> +	struct srl2_priv *priv = netdev_priv(dev);
-> +	struct net *net = dev_net(dev);
-> +	struct dst_entry *dst;
-> +	struct flowi6 fl6;
-> +	int err;
+> +	iowrite32(val, brcm_priv->misc_regs + reg);
+> +}
 > +
-> +	local_bh_disable();
-> +	dst = dst_cache_get(&priv->dst_cache);
-> +	local_bh_enable();
+> +static void dwxgmac_brcm_common_default_data(struct plat_stmmacenet_data *plat)
+> +{
+> +	int i;
 > +
-> +	if (unlikely(!dst)) {
-> +		memset(&fl6, 0, sizeof(fl6));
-> +		fl6.daddr = priv->srh->segments[priv->srh->first_segment];
+> +	plat->force_sf_dma_mode = true;
+> +	plat->mac_port_sel_speed = SPEED_10000;
+> +	plat->clk_ptp_rate = 125000000;
+> +	plat->clk_ref_rate = 250000000;
+> +	plat->tx_coe = true;
+> +	plat->rx_coe = STMMAC_RX_COE_TYPE1;
+> +	plat->rss_en = 1;
+> +	plat->max_speed = SPEED_10000;
 > +
-> +		dst = ip6_route_output(net, NULL, &fl6);
-> +		if (dst->error) {
-> +			dst_release(dst);
-> +			DEV_STATS_INC(dev, tx_carrier_errors);
-> +			goto drop;
-> +		}
+> +	/* Set default value for multicast hash bins */
+> +	plat->multicast_filter_bins = HASH_TABLE_SIZE;
+
+Already the default setup by stmmac_plat_dat_alloc().
+
 > +
-> +		if (dst_dev(dst) == dev) {
-> +			dst_release(dst);
-> +			DEV_STATS_INC(dev, collisions);
-> +			goto drop;
-> +		}
+> +	/* Set default value for unicast filter entries */
+> +	plat->unicast_filter_entries = 1;
+
+Already the default setup by stmmac_plat_dat_alloc().
+
 > +
-> +		local_bh_disable();
-> +		/* saddr is unused */
-> +		dst_cache_set_ip6(&priv->dst_cache, dst, &fl6.saddr);
-> +		local_bh_enable();
+> +	/* Set the maxmtu to device's default */
+> +	plat->maxmtu = BRCM_MAX_MTU;
+> +
+> +	/* Set default number of RX and TX queues to use */
+> +	plat->tx_queues_to_use = BRCM_TX_Q_COUNT;
+> +	plat->rx_queues_to_use = BRCM_RX_Q_COUNT;
+> +
+> +	plat->tx_sched_algorithm = MTL_TX_ALGORITHM_SP;
+> +	for (i = 0; i < plat->tx_queues_to_use; i++) {
+> +		plat->tx_queues_cfg[i].use_prio = false;
+
+Already false.
+
+> +		plat->tx_queues_cfg[i].prio = 0;
+
+Already zero.
+
+> +		plat->tx_queues_cfg[i].mode_to_use = MTL_QUEUE_AVB;
+
+Since MTL_QUEUE_AVB is zero, this is already the case.
+
 > +	}
-> +
-> +	skb_scrub_packet(skb, false);
-> +
-> +	skb_dst_set(skb, dst);
-> +
-> +	err = seg6_do_srh_encap(skb, priv->srh, IPPROTO_ETHERNET);
-> +	if (unlikely(err)) {
-> +		DEV_STATS_INC(dev, tx_errors);
-> +		kfree_skb(skb);
-> +		return NETDEV_TX_OK;
-> +	}
-> +
-> +	skb->protocol = htons(ETH_P_IPV6);
-> +
-> +	ip6tunnel_xmit(NULL, skb, dev, 0);
-> +
-> +	return NETDEV_TX_OK;
-> +
-> +drop:
-> +	DEV_STATS_INC(dev, tx_dropped);
-> +	kfree_skb(skb);
-> +	return NETDEV_TX_OK;
-> +}
-> +
-> +static int srl2_dev_init(struct net_device *dev)
-> +{
-> +	struct srl2_priv *priv = netdev_priv(dev);
-> +
-> +	return dst_cache_init(&priv->dst_cache, GFP_KERNEL);
-> +}
-> +
-> +static void srl2_dev_uninit(struct net_device *dev)
-> +{
-> +	struct srl2_priv *priv = netdev_priv(dev);
-> +
-> +	dst_cache_destroy(&priv->dst_cache);
-> +}
-> +
-> +static void srl2_dev_free(struct net_device *dev)
-> +{
-> +	struct srl2_priv *priv = netdev_priv(dev);
-> +
-> +	kfree(priv->srh);
-> +}
-> +
-> +static const struct net_device_ops srl2_netdev_ops = {
-> +	.ndo_init		= srl2_dev_init,
-> +	.ndo_uninit		= srl2_dev_uninit,
-> +	.ndo_start_xmit		= srl2_xmit,
-> +	.ndo_set_mac_address	= eth_mac_addr,
-> +	.ndo_validate_addr	= eth_validate_addr,
-> +};
-> +
-> +static void srl2_setup(struct net_device *dev)
-> +{
-> +	ether_setup(dev);
-> +
-> +	dev->netdev_ops = &srl2_netdev_ops;
-> +	dev->needs_free_netdev = true;
-> +	dev->pcpu_stat_type = NETDEV_PCPU_STAT_DSTATS;
-> +	dev->needed_headroom = LL_MAX_HEADER + sizeof(struct ipv6hdr) +
-> +			       SRL2_SRH_HEADROOM_EST;
-> +
-> +	dev->priv_flags &= ~IFF_TX_SKB_SHARING;
-> +	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
-> +	dev->lltx = true;
-> +
-Maybe setting dev->netns_immutable to true ?
 
-Regards,
-Nicolas
+All three points taken together mean that this loop is not required
+as all these members are being explicitly set to values of zero,
+which they already hold.
 
-> +	eth_hw_addr_random(dev);
+> +
+> +	plat->rx_sched_algorithm = MTL_RX_ALGORITHM_SP;
+> +	for (i = 0; i < plat->rx_queues_to_use; i++) {
+> +		plat->rx_queues_cfg[i].use_prio = false;
+
+Already false.
+
+> +		plat->rx_queues_cfg[i].mode_to_use = MTL_QUEUE_AVB;
+
+Since MTL_QUEUE_AVB is zero, this is already the case.
+
+> +		plat->rx_queues_cfg[i].pkt_route = 0x0;
+
+Already zero.
+
+> +		plat->rx_queues_cfg[i].chan = i;
+
+stmmac_plat_dat_alloc() already initialises plat->rx_queues_cfg[].chan.
+
+> +	}
+
+Taking all these points together, it means that this loop also isn't
+required, since you're not changing anything that hasn't already been
+setup.
+
 > +}
 > +
-> +static const struct nla_policy srl2_policy[IFLA_SRL2_MAX + 1] = {
-> +	[IFLA_SRL2_SRH]	= { .type = NLA_BINARY },
-> +};
-> +
-> +static int srl2_validate(struct nlattr *tb[], struct nlattr *data[],
-> +			 struct netlink_ext_ack *extack)
+> +static int dwxgmac_brcm_default_data(struct pci_dev *pdev,
+> +				     struct plat_stmmacenet_data *plat)
 > +{
-> +	if (!data || !data[IFLA_SRL2_SRH]) {
-> +		NL_SET_ERR_MSG(extack, "SRH with segment list is required");
-> +		return -EINVAL;
-> +	}
+> +	/* Set common default data first */
+> +	dwxgmac_brcm_common_default_data(plat);
+> +	plat->core_type = DWMAC_CORE_25GMAC;
+> +	plat->bus_id = 0;
+
+The underlying devm_kzalloc() which allocates "plat" will clear the
+struct to zeros, so this assignment to bus_id shouldn't be necessary.
+
+> +	plat->phy_addr = 0;
+
+You said there's no MDIO bus, so I don't think you need to initialise
+plat->phy_addr. stmmac_plat_dat_alloc() will set this to -1.
+
+> +	plat->phy_interface = PHY_INTERFACE_MODE_XGMII;
 > +
+> +	plat->dma_cfg->pbl = DEFAULT_DMA_PBL;
+> +	plat->dma_cfg->pblx8 = true;
+> +	plat->dma_cfg->aal = false;
+> +	plat->dma_cfg->eame = true;
+> +
+> +	plat->axi->axi_wr_osr_lmt = 31;
+> +	plat->axi->axi_rd_osr_lmt = 31;
+> +	plat->axi->axi_fb = false;
+
+devm_kzalloc() which is used to allocate plat->axi in the probe function
+will zero out this structure, so axi_fb will already be false.
+
+> +	plat->axi->axi_blen_regval = DMA_AXI_BLEN64;
 > +	return 0;
 > +}
 > +
-> +static int srl2_newlink(struct net_device *dev,
-> +			struct rtnl_newlink_params *params,
-> +			struct netlink_ext_ack *extack)
+> +static struct dwxgmac_brcm_pci_info dwxgmac_brcm_pci_info = {
+> +	.setup = dwxgmac_brcm_default_data,
+> +};
+
+It looks to me like this is a copy of stmmac_pci.c / dwmac-intel.c etc.
+Do you know for certain that you're going to need to do different
+setups depending on the PCI device?
+
+What's the reasoning for the split between
+dwxgmac_brcm_common_default_data() and dwxgmac_brcm_default_data() ?
+
+> +
+> +static void brcm_config_misc_regs(struct pci_dev *pdev,
+> +				  struct brcm_priv_data *brcm_priv)
 > +{
-> +	struct srl2_priv *priv = netdev_priv(dev);
-> +	struct nlattr **data = params->data;
-> +	struct ipv6_sr_hdr *srh;
-> +	int srhlen;
-> +	int len;
+> +	pci_write_config_dword(pdev, XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_LOW,
+> +			       XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_LO_VALUE);
+> +	pci_write_config_dword(pdev, XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_HIGH,
+> +			       XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_HI_VALUE);
 > +
-> +	srh = nla_data(data[IFLA_SRL2_SRH]);
-> +	len = nla_len(data[IFLA_SRL2_SRH]);
+> +	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_LO_OFFSET,
+> +		     XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_LO_VALUE);
+> +	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_HI_OFFSET,
+> +		     XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_HI_VALUE);
 > +
-> +	if (len < sizeof(*srh) + sizeof(struct in6_addr)) {
-> +		NL_SET_ERR_MSG(extack, "SRH too short");
-> +		return -EINVAL;
+> +	/* Enable Switch Link */
+> +	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MII_CTRL_OFFSET,
+> +		     XGMAC_PCIE_MISC_MII_CTRL_PAUSE_RX |
+> +		     XGMAC_PCIE_MISC_MII_CTRL_PAUSE_TX |
+> +		     XGMAC_PCIE_MISC_MII_CTRL_LINK_UP);
+> +}
+> +
+> +static int brcm_config_multi_msi(struct pci_dev *pdev,
+> +				 struct plat_stmmacenet_data *plat,
+> +				 struct stmmac_resources *res)
+> +{
+> +	int ret;
+> +	int i;
+> +
+> +	ret = pci_alloc_irq_vectors(pdev, BRCM_XGMAC_MSI_VECTOR_MAX,
+> +				    BRCM_XGMAC_MSI_VECTOR_MAX,
+> +				    PCI_IRQ_MSI | PCI_IRQ_MSIX);
+> +	if (ret < 0) {
+> +		dev_err(&pdev->dev, "%s: multi MSI enablement failed\n",
+> +			__func__);
+> +		return ret;
 > +	}
 > +
-> +	if (!seg6_validate_srh(srh, len, false)) {
-> +		NL_SET_ERR_MSG(extack, "Invalid SRH");
-> +		return -EINVAL;
-> +	}
+> +	/* For RX MSI */
+> +	for (i = 0; i < plat->rx_queues_to_use; i++)
+> +		res->rx_irq[i] =
+> +			pci_irq_vector(pdev,
+> +				       BRCM_XGMAC_MSI_RX_VECTOR_START + i * 2);
 > +
-> +	priv->srh = kmemdup(srh, len, GFP_KERNEL);
-> +	if (!priv->srh)
+> +	/* For TX MSI */
+> +	for (i = 0; i < plat->tx_queues_to_use; i++)
+> +		res->tx_irq[i] =
+> +			pci_irq_vector(pdev,
+> +				       BRCM_XGMAC_MSI_TX_VECTOR_START + i * 2);
+> +
+> +	res->irq = pci_irq_vector(pdev, BRCM_XGMAC_MSI_MAC_VECTOR);
+> +
+> +	plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
+> +	plat->flags |= STMMAC_FLAG_TSO_EN;
+> +	plat->flags |= STMMAC_FLAG_SPH_DISABLE;
+> +	return 0;
+> +}
+> +
+> +static int brcm_pci_resume(struct device *dev, void *bsp_priv)
+> +{
+> +	struct pci_dev *pdev = to_pci_dev(dev);
+> +
+> +	brcm_config_misc_regs(pdev, bsp_priv);
+
+Is it worth declaring struct pdev for one place that it's used?
+
+	brcm_config_misc_regs(to_pci_dev(dev), bsp_priv);
+
+should work just as well.
+
+> +
+> +	return stmmac_pci_plat_resume(dev, bsp_priv);
+> +}
+> +
+> +static int dwxgmac_brcm_pci_probe(struct pci_dev *pdev,
+> +				  const struct pci_device_id *id)
+> +{
+> +	struct dwxgmac_brcm_pci_info *info =
+> +		(struct dwxgmac_brcm_pci_info *)id->driver_data;
+> +	struct plat_stmmacenet_data *plat;
+> +	struct brcm_priv_data *brcm_priv;
+> +	struct stmmac_resources res;
+> +	struct device *dev;
+> +	int rx_offset;
+> +	int tx_offset;
+> +	int vector;
+> +	int ret;
+> +
+> +	dev = &pdev->dev;
+
+As you go to the effort of declaring a struct device pointer, and
+assign it, do you think it would be a good idea to either use it for
+all &pdev->dev instances below, or just get rid of the two instances
+that you actually use "dev" ?
+
+I count six instances of "&pdev->dev" below vs two making use of "dev"
+directly.
+
+> +
+> +	brcm_priv = devm_kzalloc(&pdev->dev, sizeof(*brcm_priv), GFP_KERNEL);
+> +	if (!brcm_priv)
 > +		return -ENOMEM;
 > +
-> +	srhlen = ipv6_optlen(srh);
+> +	plat = stmmac_plat_dat_alloc(dev);
+> +	if (!plat)
+> +		return -ENOMEM;
 > +
-> +	dev->needed_headroom = LL_MAX_HEADER + sizeof(struct ipv6hdr) + srhlen;
+> +	plat->axi = devm_kzalloc(&pdev->dev, sizeof(*plat->axi), GFP_KERNEL);
+> +	if (!plat->axi)
+> +		return -ENOMEM;
 > +
-> +	/* dev->mtu is the inner L3 payload size. Since SRv6 encapsulation
-> +	 * carries the full inner Ethernet frame, subtract both the outer
-> +	 * IPv6+SRH overhead and ETH_HLEN from ETH_DATA_LEN.
+> +	/* This device is directly attached to the switch chip internal to the
+> +	 * SoC using XGMII interface. Since no MDIO is present, register
+> +	 * fixed-link software_node to create phylink.
 > +	 */
-> +	dev->mtu = ETH_DATA_LEN - sizeof(struct ipv6hdr) - srhlen - ETH_HLEN;
-> +	dev->min_mtu = ETH_MIN_MTU;
-> +	dev->max_mtu = IP_MAX_MTU - sizeof(struct ipv6hdr) - srhlen - ETH_HLEN;
+> +	software_node_register_node_group(brcm_swnodes);
+> +	device_set_node(dev, software_node_fwnode(&parent_swnode));
 > +
-> +	dev->priv_destructor = srl2_dev_free;
+> +	/* Disable D3COLD as our device does not support it */
+> +	pci_d3cold_disable(pdev);
 > +
-> +	return register_netdevice(dev);
-> +}
-> +
-> +static void srl2_dellink(struct net_device *dev, struct list_head *head)
-> +{
-> +	unregister_netdevice_queue(dev, head);
-> +}
-> +
-> +static size_t srl2_get_size(const struct net_device *dev)
-> +{
-> +	const struct srl2_priv *priv = netdev_priv(dev);
-> +	int srhlen = ipv6_optlen(priv->srh);
-> +
-> +	return nla_total_size(srhlen);
-> +}
-> +
-> +static int srl2_fill_info(struct sk_buff *skb, const struct net_device *dev)
-> +{
-> +	const struct srl2_priv *priv = netdev_priv(dev);
-> +	int srhlen = ipv6_optlen(priv->srh);
-> +
-> +	if (nla_put(skb, IFLA_SRL2_SRH, srhlen, priv->srh))
-> +		return -EMSGSIZE;
-> +
-> +	return 0;
-> +}
-> +
-> +static struct rtnl_link_ops srl2_link_ops __read_mostly = {
-> +	.kind		= "srl2",
-> +	.maxtype	= IFLA_SRL2_MAX,
-> +	.policy		= srl2_policy,
-> +	.priv_size	= sizeof(struct srl2_priv),
-> +	.setup		= srl2_setup,
-> +	.validate	= srl2_validate,
-> +	.newlink	= srl2_newlink,
-> +	.dellink	= srl2_dellink,
-> +	.get_size	= srl2_get_size,
-> +	.fill_info	= srl2_fill_info,
-> +};
-> +
-> +static int __init srl2_init(void)
-> +{
-> +	return rtnl_link_register(&srl2_link_ops);
-> +}
-> +
-> +static void __exit srl2_exit(void)
-> +{
-> +	rtnl_link_unregister(&srl2_link_ops);
-> +}
-> +
-> +module_init(srl2_init);
-> +module_exit(srl2_exit);
-> +
-> +MODULE_AUTHOR("Andrea Mayer <andrea.mayer@uniroma2.it>");
-> +MODULE_AUTHOR("Stefano Salsano <stefano.salsano@uniroma2.it>");
-> +MODULE_DESCRIPTION("SRv6 L2 tunnel device");
-> +MODULE_LICENSE("GPL");
-> +MODULE_ALIAS_RTNL_LINK("srl2");
+> +	/* Enable PCI device */
+> +	ret = pcim_enable_device(pdev);
+> +	if (ret) {
+> +		dev_err(&pdev->dev, "%s: ERROR: failed to enable device\n",
+> +			__func__);
+> +		return ret;
 
+What about cleaning up the swnodes ?
+
+> +	}
+> +
+> +	pci_set_master(pdev);
+> +
+> +	memset(&res, 0, sizeof(res));
+> +	res.addr = pcim_iomap_region(pdev, 0, pci_name(pdev));
+> +	if (IS_ERR(res.addr))
+> +		return dev_err_probe(&pdev->dev, PTR_ERR(res.addr),
+> +				     "failed to map IO region\n");
+
+Convention is to have a blank line here.
+
+> +	/* MISC Regs */
+> +	brcm_priv->misc_regs = res.addr + BRCM_XGMAC_IOMEM_MISC_REG_OFFSET;
+> +	/* MBOX Regs */
+> +	brcm_priv->mbox_regs = res.addr + BRCM_XGMAC_IOMEM_MBOX_REG_OFFSET;
+> +	/* XGMAC config Regs */
+> +	res.addr += BRCM_XGMAC_IOMEM_CFG_REG_OFFSET;
+> +	brcm_priv->xgmac_regs = res.addr;
+> +
+> +	plat->suspend		= stmmac_pci_plat_suspend;
+> +	plat->resume		= brcm_pci_resume;
+> +	plat->bsp_priv = brcm_priv;
+> +
+> +	ret = info->setup(pdev, plat);
+> +	if (ret)
+> +		return ret;
+
+What about cleaning up the swnodes ?
+
+> +
+> +	pci_write_config_dword(pdev, XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_LOW,
+> +			       XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_LO_VALUE);
+> +	pci_write_config_dword(pdev, XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_HIGH,
+> +			       XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_HI_VALUE);
+> +
+> +	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_LO_OFFSET,
+> +		     XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_LO_VALUE);
+> +	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_HI_OFFSET,
+> +		     XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_HI_VALUE);
+> +
+> +	/* SBD Interrupt */
+> +	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_SBD_ALL_OFFSET,
+> +		     XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_SBD_ALL_VALUE);
+> +	/* EP_DOORBELL Interrupt */
+> +	misc_iowrite(brcm_priv,
+> +		     XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST_DBELL_OFFSET,
+> +		     XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST_DBELL_VALUE);
+> +	/* EP_H0 Interrupt */
+> +	misc_iowrite(brcm_priv,
+> +		     XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST0_OFFSET,
+> +		     XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST0_VALUE);
+> +	/* EP_H1 Interrupt */
+> +	misc_iowrite(brcm_priv,
+> +		     XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST1_OFFSET,
+> +		     XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_EP2HOST1_VALUE);
+> +
+> +	rx_offset = XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_RX0_PF0_OFFSET;
+> +	tx_offset = XGMAC_PCIE_MISC_MSIX_VECTOR_MAP_TX0_PF0_OFFSET;
+> +	vector = BRCM_XGMAC_MSI_RX_VECTOR_START;
+> +	for (int i = 0; i < BRCM_MAX_DMA_CHANNEL_PAIRS; i++) {
+> +		/* RX Interrupt */
+> +		misc_iowrite(brcm_priv, rx_offset, vector++);
+> +		/* TX Interrupt */
+> +		misc_iowrite(brcm_priv, tx_offset, vector++);
+> +		rx_offset += 4;
+> +		tx_offset += 4;
+> +	}
+
+It looks like this device can program the MSI vector numbers. Does
+it make sense to interleave them, or would it be simpler to have
+all the receive vectors and then all the transmit vectors?
+
+This also hard-codes the fact that BRCM_XGMAC_MSI_TX_VECTOR_START
+is one more than BRCM_XGMAC_MSI_RX_VECTOR_START, which isn't nice
+given that you use these macros when claiming the MSI vectors.
+
+> +
+> +	/* Enable Switch Link */
+> +	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MII_CTRL_OFFSET,
+> +		     XGMAC_PCIE_MISC_MII_CTRL_PAUSE_RX |
+> +		     XGMAC_PCIE_MISC_MII_CTRL_PAUSE_TX |
+> +		     XGMAC_PCIE_MISC_MII_CTRL_LINK_UP);
+> +	/* Enable MSI-X */
+> +	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_PCIESS_CTRL_OFFSET,
+> +		     XGMAC_PCIE_MISC_PCIESS_CTRL_EN_MSI_MSIX);
+> +
+> +	ret = brcm_config_multi_msi(pdev, plat, &res);
+> +	if (ret) {
+> +		dev_err(&pdev->dev,
+> +			"%s: ERROR: failed to enable IRQ\n", __func__);
+> +		goto err_disable_msi;
+> +	}
+> +
+> +	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+> +	if (ret)
+> +		goto err_disable_msi;
+> +
+> +	return ret;
+> +
+> +err_disable_msi:
+> +	pci_free_irq_vectors(pdev);
+
+This is still buggy. What about cleaning up the swnodes?
+
+> +
+> +	return ret;
+> +}
+> +
+> +static void dwxgmac_brcm_pci_remove(struct pci_dev *pdev)
+> +{
+> +	stmmac_dvr_remove(&pdev->dev);
+> +	pci_free_irq_vectors(pdev);
+> +	device_set_node(&pdev->dev, NULL);
+> +	software_node_unregister_node_group(brcm_swnodes);
+
+As the remove function does way more cleanup than the probe function,
+this is a sign that the probe function is buggy. This is exactly why
+I suggested using ->init and ->exit in the previous review. I seem
+to have been ignored on that though... and the problem I already
+pointed out remains.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
