@@ -1,151 +1,209 @@
-Return-Path: <netdev+bounces-272050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272048-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mNZ5JrMzxWlS8AQAu9opvQ
-	(envelope-from <netdev+bounces-272050-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:25:07 +0100
+	id 4M8oIms2xWn/8AQAu9opvQ
+	(envelope-from <netdev+bounces-272048-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:36:43 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35160335E9A
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:25:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 111CA33612B
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 14:36:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EFF03309EA90
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:20:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A57F53110FF1
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:20:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60FB33F7898;
-	Thu, 26 Mar 2026 13:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225FB3C060E;
+	Thu, 26 Mar 2026 13:18:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="Qa5yMiLN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dLiVSPFi"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7440C3EF67D;
-	Thu, 26 Mar 2026 13:18:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B074C2D5935
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 13:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774531140; cv=none; b=jZ+msfGWkgP5o6FOw7CqBbv/7eTR2yEkT6dn0rgFfwMNEOu67rvBIbRnLOy07t5OzA884FKlFXbPPQUMS+4EpmortK1w3t1AIOFq3o66Husgj/gVJz+QMoD0VNOcAPXUNOFiItz5slE3Gbi+zqvMXOI5u/QJutRTrBP8eoEdbVI=
+	t=1774531134; cv=none; b=XooxCcxkXMoXUhikZTunu+iFZv6KehqWo57ZEnDkWhypgt3FxfxctPBLtpccPB4aMce6XTI9wrND73PqjhJvWaKjPI48vygrx3MxBoQsXB6b0CNMtRgLJ2bsv0TXLzV8pHirbpSX2C/bJxQpL7m/QWQxi3Ftz5M/q5qMvQTpWmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774531140; c=relaxed/simple;
-	bh=dbSlJJLZr0aDkUKCge5XYxPSmLToKME6MYNLXskWdG4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=HN0/jKtInHPoSn9neQQqT23BeOcIQ4rP38D0kfRyQ8nFhqnYESLGxB1LY45wDY1JBbCL2POwZM93fAsXOkTb2NoMgc/+VN/mKX5XsasXKixa8q4H1HNCIgDhA4cmSa8tVLjE/xfYyK+lTPykZSpOHq3hh5WC5ak9wjRlg6TMVG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=Qa5yMiLN; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 62QDIN1801573874, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1774531103; bh=dbSlJJLZr0aDkUKCge5XYxPSmLToKME6MYNLXskWdG4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=Qa5yMiLNgKN4NGypfhmmU2ZphpmWmn3nwilmPv4bEITdcNGQNTOvjl2ncH7YsS20p
-	 Tqqdw7zq+A1nDqyuZY1fI36Zka6BVzE+whMMS9A+P58hmGhDJ49rpnRFstkFNWC01q
-	 it46x/ff3OaykAQXtYvJ5qw34nHvEQ2Vnmrap9XCaF6NU78SNNvzzD7RSOn+qmJ6+r
-	 m5b4xAr7GIqf4dQ8lSVmgU5vBOU+8KDMHidryttzreuQ3O83IwjAYhVi3PU9m/fWll
-	 qSyvMoxO3uL1M4VYFgAN2yAxD+41iNgvz8tD12k5d+3KWCQWtLq6hPakTXPZu6Rf+K
-	 OM0ZayGg9wUsw==
-Received: from mail.realtek.com (rtkexhmbs04.realtek.com.tw[10.21.1.54])
-	by rtits2.realtek.com.tw (8.15.2/3.26/5.94) with ESMTPS id 62QDIN1801573874
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 26 Mar 2026 21:18:23 +0800
-Received: from RTKEXHMBS03.realtek.com.tw (10.21.1.53) by
- RTKEXHMBS04.realtek.com.tw (10.21.1.54) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Thu, 26 Mar 2026 21:18:23 +0800
-Received: from RTKEXHMBS03.realtek.com.tw ([::1]) by
- RTKEXHMBS03.realtek.com.tw ([fe80::368f:61f6:1754:de7d%9]) with mapi id
- 15.02.1748.010; Thu, 26 Mar 2026 21:18:23 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Chih Kai Hsu <hsu.chih.kai@realtek.com>,
-        "kuba@kernel.org"
-	<kuba@kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        nic_swsd
-	<nic_swsd@realtek.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org"
-	<linux-usb@vger.kernel.org>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "bjorn@mork.no" <bjorn@mork.no>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        Chih Kai Hsu <hsu.chih.kai@realtek.com>
-Subject: RE: [PATCH net-next v4 1/3] r8152: fix incorrect register write to
- USB_UPHY_XTAL
-Thread-Topic: [PATCH net-next v4 1/3] r8152: fix incorrect register write to
- USB_UPHY_XTAL
-Thread-Index: AQHcvPOycbfPy/dSukipZ8LkOW+IpbXAy+uQ
-Date: Thu, 26 Mar 2026 13:18:23 +0000
-Message-ID: <9260dd860db047858a5a505bf2b2430e@realtek.com>
-References: <20260326073925.32976-453-nic_swsd@realtek.com>
- <20260326073925.32976-454-nic_swsd@realtek.com>
-In-Reply-To: <20260326073925.32976-454-nic_swsd@realtek.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1774531134; c=relaxed/simple;
+	bh=uhkPDVDixadPQO+G+Qmnlgq59rRFOKjOaWUGtH4EQ0A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=stIZgyXYndciJw8h0ahlYsfM0ER5u7F13NXf5PdiZRSHDsXFE2MXcexhFdfN+UWuFc7bFVlTc6rMZn2VoQz6eay+eSzFCzm6+1CyZ59rYHanbdvMwR1yxbWy81Z9rbGl8svMaQ+DAVmw7L7vOKMz+PXpRnQjc0jW65A+CqsP5fY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dLiVSPFi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774531131;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+LaissVIx0yr2jBo6wGg+nKyI7tNmER+28MboWyYboE=;
+	b=dLiVSPFiCHCesA71YX4hpQ38yyKJtmr5njSVUMoBxPe5lpxexVMvfi/h60gR1cj/sFaef9
+	3zRmrXiyZXi2KkxczzcRSSlt46WpFB/Kt7neiL/M9irQIfJkLzIEXaA5UNLkQC+KiooOYU
+	aGDb1WTC76aBOBBR4Vy5zbhN+tvjFow=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-382-s5t2WR8JOc6_68FflCiKyQ-1; Thu,
+ 26 Mar 2026 09:18:46 -0400
+X-MC-Unique: s5t2WR8JOc6_68FflCiKyQ-1
+X-Mimecast-MFC-AGG-ID: s5t2WR8JOc6_68FflCiKyQ_1774531125
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 45C9D180047F;
+	Thu, 26 Mar 2026 13:18:44 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.44.33.121])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 517FD1800361;
+	Thu, 26 Mar 2026 13:18:41 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v3 00/11] rxrpc: Miscellaneous fixes
+Date: Thu, 26 Mar 2026 13:18:25 +0000
+Message-ID: <20260326131838.634095-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[realtek.com:+];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-272050-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272048-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dhowells@redhat.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hayeswang@realtek.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mork.no:email]
-X-Rspamd-Queue-Id: 35160335E9A
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url]
+X-Rspamd-Queue-Id: 111CA33612B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Chih Kai Hsu <hsu.chih.kai@realtek.com>
-> Sent: Thursday, March 26, 2026 3:39 PM
-> To: kuba@kernel.org; davem@davemloft.net
-> Cc: netdev@vger.kernel.org; nic_swsd <nic_swsd@realtek.com>;
-> linux-kernel@vger.kernel.org; linux-usb@vger.kernel.org;
-> edumazet@google.com; bjorn@mork.no; pabeni@redhat.com; Chih Kai Hsu
-> <hsu.chih.kai@realtek.com>
-> Subject: [PATCH net-next v4 1/3] r8152: fix incorrect register write to
-> USB_UPHY_XTAL
->=20
-> The old code used ocp_write_byte() to clear the OOBS_POLLING bit
-> (BIT(8)) in the USB_UPHY_XTAL register, but this doesn't correctly clear =
-a bit in
-> the upper byte of the 16-bit register.
->=20
-> Fix this by using ocp_write_word() instead.
->=20
-> Fixes: 195aae321c82 ("r8152: support new chips")
-> Signed-off-by: Chih Kai Hsu <hsu.chih.kai@realtek.com>
+Here are some fixes for rxrpc:
 
-Reviewed-by: Hayes Wang <hayeswang@realtek.com>
+ (1) Fix key quota calculation.
 
-Best Regards,
-Hayes
+ (2) Fix a memory leak.
+
+ (3) Fix rxrpc_new_client_call_for_sendmsg() to substitute NULL for an
+     empty key.
+
+     Might want to remove this substitution entirely or handle it in
+     rxrpc_init_client_call_security() instead.
+
+ (4) Not strictly a fix, but move on_list_rcu() from apparmor to list.h so
+     that (5) can use it as list_empty() is not sufficient.  Also add an
+     on_list() function.
+
+ (5) Fix deletion of call->link to be RCU safe.
+
+ (6) Fix missing bounds checks when parsing RxGK tickets.
+
+ (7) Fix use of wrong skbuff to get challenge serial number.  Also actually
+     substitute the newer response skbuff and release the older one.
+
+ (8) Fix unexpected RACK timer warning to report old mode.
+
+ (9) Fix server keyring refcount leak.
+
+(10) Fix call key refcount leak.
+
+(11) Fix the interaction of jumbograms with Tx window space, setting the
+     request-ack flag when the window space is getting low, typically because
+     each jumbogram take a big bite out of the window and fewer UDP packets
+     get traded.
+
+David
+
+The patches can be found here also:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-fixes
+
+Changes
+=======
+ver #3)
+- Rename the dwc2's on_list() to dwc2_on_list() to free up the name.
+- Added a patch to fix the interaction of jumbograms with window space.
+
+ver #2)
+- AI review[1]:
+  - Added a patch to fix key quota calculation.
+  - Added a patch to fix a memory leak.
+  - Added a patch to use NULL instead of an empty key in rxrpc_sengmsg().
+  - Added a patch to use RCU-safe deletion on call->link.
+  - Modified the response packet selection patch to select the newer
+    response when there's an older response - and to release the older
+    response skbuff.
+- Move on_list_rcu() and add on_list().
+
+Link: https://sashiko.dev/#/patchset/20260319150150.4189381-1-dhowells%40redhat.com [1]
+
+Alok Tiwari (2):
+  rxrpc: Fix use of wrong skb when comparing queued RESP challenge
+    serial
+  rxrpc: Fix rack timer warning to report unexpected mode
+
+Anderson Nascimento (2):
+  rxrpc: Fix keyring reference count leak in rxrpc_setsockopt()
+  rxrpc: Fix key reference count leak from call->key
+
+David Howells (5):
+  rxrpc: Fix key quota calculation for multitoken keys
+  rxrpc: Fix key parsing memleak
+  rxrpc: Fix anonymous key handling
+  list: Move on_list_rcu() to list.h and add on_list() also
+  rxrpc: Fix call removal to use RCU safe deletion
+
+Marc Dionne (1):
+  rxrpc: Fix to request an ack if window is limited
+
+Oleh Konko (1):
+  rxrpc: Fix RxGK token loading to check bounds
+
+ drivers/usb/dwc2/gadget.c          |  6 ++---
+ include/linux/list.h               | 26 ++++++++++++++++++++
+ include/trace/events/rxrpc.h       |  2 ++
+ net/rxrpc/af_rxrpc.c               |  2 +-
+ net/rxrpc/ar-internal.h            |  2 +-
+ net/rxrpc/call_object.c            |  7 +++---
+ net/rxrpc/conn_event.c             |  5 ++--
+ net/rxrpc/input_rack.c             |  2 +-
+ net/rxrpc/key.c                    | 38 +++++++++++++++++-------------
+ net/rxrpc/output.c                 |  2 ++
+ net/rxrpc/proc.c                   |  5 ++--
+ net/rxrpc/sendmsg.c                |  2 +-
+ security/apparmor/include/policy.h |  2 --
+ 13 files changed, 69 insertions(+), 32 deletions(-)
 
 
