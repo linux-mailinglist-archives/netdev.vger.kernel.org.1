@@ -1,139 +1,160 @@
-Return-Path: <netdev+bounces-272014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272016-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uNLrOEEixWmC7AQAu9opvQ
-	(envelope-from <netdev+bounces-272014-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:10:41 +0100
+	id iZMQOOgjxWkU7QQAu9opvQ
+	(envelope-from <netdev+bounces-272016-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:17:44 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 858C2334FBD
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:10:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FDE9335155
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:17:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 754F83024477
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:09:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8BFA83030757
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:16:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6410C3DA7E0;
-	Thu, 26 Mar 2026 12:09:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8BBF372671;
+	Thu, 26 Mar 2026 12:16:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aliasing.net header.i=@aliasing.net header.b="Y9h6/nxy"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="QTMay2dz"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.mr.icloud.com (p-west2-cluster6-host4-snip4-1.eps.apple.com [57.103.70.14])
+Received: from out199-13.us.a.mail.aliyun.com (out199-13.us.a.mail.aliyun.com [47.90.199.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC91334EF05
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 12:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.70.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B33317173
+	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 12:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.199.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774526961; cv=none; b=AUB+ELpIgv9pQ1D00J4r+kub1lOdWG0DbFvRGOq+a5mbvPuCv33iS1fmD2hf2gfB7hpg62BrmUsrNOrIF1zEoHY24TX289pMVwMB+es+Oa/M1uLk/gRuIeci3B7WpSZDG90+NVSZsNgSzihK6bLFv71nyvSngz18iXMYB6V3+VA=
+	t=1774527374; cv=none; b=bTMKN0qw/WfNGemMQcQldOaCG1t4EWBlAPcOu+fQ4AWjJRxxBHwgUuB2z2lgw0af2+lS9I9xcvuxF0cqOVp13Xqf5lhAl3J4c20MxoSNuk87G0rJPM6iF3M8U0oC2TP1rvw6wlEwut/NE70UXn6zEA39hFMQzJFnfUR/NNAOLx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774526961; c=relaxed/simple;
-	bh=+yGrlzp5BwsGqLDcldOQtXxixKAsL5lSNYWLykh/Mq4=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=XjJ+5HfkFX46Ujjw1vxP+Ra5HZcaN18IZyJkV2W8044Vc/hhHVDFogZO9JTJ6PaQCu34A278RKKuVkYVcYXKUz4yWFXy/YtIbcGDyCe4v7qow2artwuXvjaL6s/5bZy88KC50IyiHWG/dXR8UWFiS+o5TM1wXOwm/YZONjGQDEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aliasing.net; spf=pass smtp.mailfrom=aliasing.net; dkim=pass (2048-bit key) header.d=aliasing.net header.i=@aliasing.net header.b=Y9h6/nxy; arc=none smtp.client-ip=57.103.70.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aliasing.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aliasing.net
-Received: from outbound.mr.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-2a-100-percent-3 (Postfix) with ESMTPS id 9C25A1800126;
-	Thu, 26 Mar 2026 12:09:15 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aliasing.net; s=sig1; t=1774526959; x=1777118959; bh=+yGrlzp5BwsGqLDcldOQtXxixKAsL5lSNYWLykh/Mq4=; h=Date:Message-Id:To:Subject:From:Mime-Version:Content-Type:x-icloud-hme; b=Y9h6/nxyK0YtF7+cdvXxFFPAcsCuxaPhUfW9mgltCjkCq89otxAR1mQZv+qGt+C3AJVmsiM/Dj7D+NRSYnXMAUj6NlVb5zHr6k6QecB37L+OuSd0dXT2tu1I0S55kXP9T64qPPRv7/NJvNvc94t16DLCuKy29laglOazXD7J2cMDZREspjQNTsoRrdQpgdURsQqLG4Kj/URnbgEyJ9beflG4dmIqjsJP0DmpJ5bpwyQHok8keZxzj/i+bQQ4tCjILe+lXq5YrWR30ErbnyiznL53n/mYUzaTSmQ9J3T83qfYcBDPI67jp0vYzBIAVTACe3hAiYvZWPkGy+7NvJ13BA==
-mail-alias-created-date: 1769500909675
-Received: from localhost (unknown [17.57.152.38])
-	by p00-icloudmta-asmtp-us-west-2a-100-percent-3 (Postfix) with ESMTPSA id AC5D71800A58;
-	Thu, 26 Mar 2026 12:09:10 +0000 (UTC)
-Date: Thu, 26 Mar 2026 21:09:09 +0900 (JST)
-Message-Id: <20260326.210909.43276613898103820.fujita@bee>
-To: miguel.ojeda.sandonis@gmail.com
-Cc: gary@garyguo.net, fujita.tomonori@gmail.com, acourbot@nvidia.com,
- boqun.feng@gmail.com, tamird@kernel.org, a.hindborg@kernel.org,
- ojeda@kernel.org, boqun@kernel.org, bjorn3_gh@protonmail.com,
- lossin@kernel.org, aliceryhl@google.com, tmgross@umich.edu,
- dakr@kernel.org, airlied@gmail.com, simona@ffwll.ch,
- abdiel.janulgue@gmail.com, daniel.almeida@collabora.com,
- robin.murphy@arm.com, yury.norov@gmail.com, will@kernel.org,
- peterz@infradead.org, mark.rutland@arm.com, mingo@redhat.com,
- longman@redhat.com, ynorov@nvidia.com, rust-for-linux@vger.kernel.org,
- nouveau@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- linux-kernel@vger.kernel.org, driver-core@lists.linux.dev,
+	s=arc-20240116; t=1774527374; c=relaxed/simple;
+	bh=3UWp1m3bckio7CqG1gPbUNey4urC7CK3nvLizOgBktQ=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=DEBo2wK1fx+idE9KwdXAqqzi+hXwbuC7QJHlzLL0mAg6kIVZWox9Exk/LONuKxiTbMk2oTn2q0Ye0ZaVacjy4JmY4GJInpS/CeG0fHM4lmw/nvPnBV4ivzt1BxK7UnTEFFN4qQQDin/Gcm2kDWTbH0y5u5xxrQaDskzeIHTwu6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=QTMay2dz; arc=none smtp.client-ip=47.90.199.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1774527359; h=Message-ID:Subject:Date:From:To;
+	bh=Fr8L/qRD9ZecHm7QP/PNsxlVFPYB2g4rIf3tTqcg1fA=;
+	b=QTMay2dzuWwEErKr3hWs6tuKgs1HqwnCIrS862ho2um5+5Y/M9t1V4Ey2PS6Ry71WEERFQKqFQeAveCdtAndpbFMgWq1DIPpfxBIdMIsVO/sBewk5di5b2wfu/KK+1jROzy7LpoSj2uEILB01kwiLTI5gFb386ABjl544AJ0GEA=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R231e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045133197;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0X.lMQ9P_1774527357;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X.lMQ9P_1774527357 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 26 Mar 2026 20:15:58 +0800
+Message-ID: <1774527071.3010762-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v35 0/8] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
+Date: Thu, 26 Mar 2026 20:11:11 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Wen Gu <guwen@linux.alibaba.com>,
+ Philo Lu <lulie@linux.alibaba.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Dong Yibo <dong100@mucse.com>,
+ "Ethan Nelson-Moore" <enelsonmoore@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vivian Wang <wangruikang@iscas.ac.cn>,
+ Dust Li <dust.li@linux.alibaba.com>,
  netdev@vger.kernel.org
-Subject: Re: [PATCH v3 4/4] rust: make `build_assert` module the home of
- related macros
-From: FUJITA Tomonori <tomo@aliasing.net>
-In-Reply-To: <CANiq72kZH-AX=QQz2V+qCfVzMsUEAPan=o1E=OZOAnivj3L3HQ@mail.gmail.com>
-References: <20260319121653.2975748-1-gary@kernel.org>
-	<20260319121653.2975748-5-gary@kernel.org>
-	<CANiq72kZH-AX=QQz2V+qCfVzMsUEAPan=o1E=OZOAnivj3L3HQ@mail.gmail.com>
+References: <20260323074441.91691-1-xuanzhuo@linux.alibaba.com>
+ <cb8280ad-fd08-4201-9faa-d8b1bc4f0bd7@redhat.com>
+ <1774525085.4029815-1-xuanzhuo@linux.alibaba.com>
+ <cddbd5e9-6df0-40df-9ae1-6a6f296b4061@redhat.com>
+In-Reply-To: <cddbd5e9-6df0-40df-9ae1-6a6f296b4061@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: base64
-X-Proofpoint-GUID: eqMS7S_G52C0wF8NsZjyMQ8O9Pmu7Vu-
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzI2MDA4NSBTYWx0ZWRfX9LUqgBCH9GTY
- a5ATnf9PHeMqlEKLJvYFpH5HsDQL93p0TZMRxyJqBQZcD6/VU5UxZPrOJmTYnxL8KUFgrTneMtg
- be9QwNJRNSpauaqD/ojapwE6uoagfyGOSq761WY+ZzXO8BxNot9ZgoDrIFUFQdzL+xl2aw0L5kW
- dvnhoQc1dUlzSnECg/dFiWujV2iKujHA10BoFLiu3Is1kDUlt0m70qbmUXmRP76iL5+Axj1va+p
- gXd+0HrrhIDavaaS2fJtG68cbR9bIBqnmMEFEuQjxYiVVPS2BrUL+SbgQ48qC8oWkyBXoPTlDy4
- PUBRQqi/JjLE5QfjWA0VMoyOy+V/KYL1z5dPjiatWVQBeK66s6SmVOogtGFGb0=
-X-Authority-Info-Out: v=2.4 cv=TY6bdBQh c=1 sm=1 tr=0 ts=69c521ee
- cx=c_apl:c_pps:t_out a=9OgfyREA4BUYbbCgc0Y0oA==:117
- a=9OgfyREA4BUYbbCgc0Y0oA==:17 a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=pGLkceISAAAA:8 a=VwQbUJbxAAAA:8
- a=7e8LTidUJLtXHkX_rzUA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: eqMS7S_G52C0wF8NsZjyMQ8O9Pmu7Vu-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-26_02,2026-03-24_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- mlxlogscore=395 clxscore=1030 spamscore=0 mlxscore=0 suspectscore=0
- malwarescore=0 lowpriorityscore=0 phishscore=0 adultscore=0 classifier=spam
- authscore=0 adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2603260085
-X-Spamd-Result: default: False [0.44 / 15.00];
+X-Spamd-Result: default: False [-6.16 / 15.00];
+	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[aliasing.net,quarantine];
-	MV_CASE(0.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[aliasing.net:s=sig1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272014-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[garyguo.net,gmail.com,nvidia.com,kernel.org,protonmail.com,google.com,umich.edu,ffwll.ch,collabora.com,arm.com,infradead.org,redhat.com,vger.kernel.org,lists.freedesktop.org,lists.linux.dev];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,linux.alibaba.com,linux.dev,mucse.com,gmail.com,iscas.ac.cn,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272016-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TO_DN_NONE(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tomo@aliasing.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[aliasing.net:+];
+	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.alibaba.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[32];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 858C2334FBD
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.alibaba.com:dkim,linux.alibaba.com:mid]
+X-Rspamd-Queue-Id: 5FDE9335155
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-T24gTW9uLCAyMyBNYXIgMjAyNiAwMDozNjo1MiArMDEwMA0KTWlndWVsIE9qZWRhIDxtaWd1ZWwu
-b2plZGEuc2FuZG9uaXNAZ21haWwuY29tPiB3cm90ZToNCg0KPiBPbiBUaHUsIE1hciAxOSwgMjAy
-NiBhdCAxOjE34oCvUE0gR2FyeSBHdW8gPGdhcnlAa2VybmVsLm9yZz4gd3JvdGU6DQo+Pg0KPj4g
-IHJ1c3Qva2VybmVsL25ldC9waHkvcmVnLnJzICAgICAgICAgICB8ICA4ICsrKysrLS0tDQo+IA0K
-PiBUb21vbm9yaTogYXJlIHlvdSBPSyB3aXRoIHRoZXNlIGNoYW5nZXM/DQoNCkFja2VkLWJ5OiBG
-VUpJVEEgVG9tb25vcmkgPGZ1aml0YS50b21vbm9yaUBnbWFpbC5jb20+DQoNCg==
+On Thu, 26 Mar 2026 13:06:14 +0100, Paolo Abeni <pabeni@redhat.com> wrote:
+> On 3/26/26 12:38 PM, Xuan Zhuo wrote:
+> > On Thu, 26 Mar 2026 12:26:33 +0100, Paolo Abeni <pabeni@redhat.com> wrote:
+> >> On 3/23/26 8:44 AM, Xuan Zhuo wrote:
+> >>> Add a driver framework for EEA that will be available in the future.
+> >>>
+> >>> This driver is currently quite minimal, implementing only fundamental
+> >>> core functionalities. Key features include: I/O queue management via
+> >>> adminq, basic PCI-layer operations, and essential RX/TX data
+> >>> communication capabilities. It also supports the creation,
+> >>> initialization, and management of network devices (netdev). Furthermore,
+> >>> the ring structures for both I/O queues and adminq have been abstracted
+> >>> into a simple, unified, and reusable library implementation,
+> >>> facilitating future extension and maintenance.
+> >>
+> >> Unfortunately sashiko fund more stuff:
+> >>
+> >> https://sashiko.dev/#/patchset/20260323074441.91691-1-xuanzhuo%40linux.alibaba.com
+> >>
+> >> AFAIK checks vs malicious values from the H/W are not due, but stats
+> >> endianness, 32-bits, truesize related concerns looks real.
+> >
+> > I've looked at this, and I think most of it is meaningless. For example, since
+> > we have the following options,
+> >
+> > +	depends on 64BIT
+> >
+> > there's no need to consider some 32-bit related issues. Many other points are
+> > also unnecessary.
+> >
+> > I will go through these comments again. I'll try to fix them.
+> > I might introduce some defensive programming. ^_^ Just to make the
+> > AI happy. However, I can't make all these comments disappear.
+> Please, don't add defensive programming for AI's sake. AI reviews are
+> threaded alike other reviews: if there are valid argument to counter
+> them, should be ignored. Please instead mention on the ML why specific
+> comments are not relevant.
+>
+> Note that defensive checks vs rouge H/W are AFAIK not needed, no need to
+> argument that.
+
+Sashiko doesn't seem to check the discussions on lore, but
+https://netdev-ai.bots.linux.dev/ should perform such checks.
+So I'm not sure how to make Sashiko aware of the detailed context.
+
+I will try to address the issues it currently reports. For the next version, I
+hope to incorporate more manual review of Sashiko's reports.
+
+Thanks.
+
+>
+> /P
+>
 
