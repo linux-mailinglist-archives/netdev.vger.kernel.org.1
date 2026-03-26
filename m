@@ -1,173 +1,119 @@
-Return-Path: <netdev+bounces-272168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272166-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UFB/MHBuxWl1+AQAu9opvQ
-	(envelope-from <netdev+bounces-272168-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:35:44 +0100
+	id cMoxIE5txWl1+AQAu9opvQ
+	(envelope-from <netdev+bounces-272166-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:30:54 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 110DC339369
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:35:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2B7A339285
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:30:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9FBEE306A334
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:30:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 21366302803A
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:29:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 231334219F1;
-	Thu, 26 Mar 2026 17:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4049F41C30B;
+	Thu, 26 Mar 2026 17:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="amKeoRSz";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="wULQHrO8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jIE9gC6C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF4D421EF7;
-	Thu, 26 Mar 2026 17:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DD221C173;
+	Thu, 26 Mar 2026 17:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774546236; cv=none; b=jf+8gy9c7UeMLj3Q8SYS7VO4sW3TuKHk8D2rGraob0LKb0Me/XhK6AlD5HZRFCnGumuxE9CR8A/trDSLYsUkMVm75Ie1CtpD0l4wCNqC5phMt9FucaFLHw16CtiC7lI2rt9iImQeTrd2urW1aMUC3E0ILsbQ3WTwddmJWbTldt8=
+	t=1774546189; cv=none; b=E6aTkgoQIgnBai3YK8HislWGVpJmq51C1u9MkahCJuM8eTuHWgWy8V8yJvS1+5zQ4MQoNVIgIam+zPc4s2qpNxK52BEHVzNDrg2WtYeRJ9t0UDTnGWPJJNr7p7tpcCwhSXlGqB/3xegmGLxWLUfuEteVcqHZydekZfQ8dSiTlkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774546236; c=relaxed/simple;
-	bh=GDIgImmAITT14mH1h9x1AVZllXLG0K+mrW/IwOibwus=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YddUdhg3gticKIncDURK1yMDwwpTUQIaYWR7vactfjHsnK6a9vxY8zGzcb9PBvJW3Thy1TmXv4RiG8x6oHGqRE9hKZGIqxDTu8FtMlg3A10rA+NmJmCrvm3Pf21+2vyggaULTbPhk4qAyl4RHVYQO83JHVbndCFiFh/QURmsUiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=amKeoRSz; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=wULQHrO8; arc=none smtp.client-ip=160.80.4.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 62QHTlq2011685;
-	Thu, 26 Mar 2026 18:29:52 +0100
-Received: from [10.62.247.239] (93-33-118-253.ip44.fastwebnet.it [93.33.118.253])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 1DEC9122940;
-	Thu, 26 Mar 2026 18:29:42 +0100 (CET)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1774546183; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9I5dW3djYPBEN9GH1zFJpeHiokQiFFD8Dnrwz788XaE=;
-	b=amKeoRSzbtxoascx95Vtfoh72dbPlW1kktNlgBrzQc5y5TxxXlYC/VCbOSofWPAwnDPTEP
-	HBE+7e+nVAytABBw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1774546183; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9I5dW3djYPBEN9GH1zFJpeHiokQiFFD8Dnrwz788XaE=;
-	b=wULQHrO85NRYx2qPhcEygGTPL8OSwCZKgGErTOBrjhyooojDJfkMwnp0qXk9j5jnqtCNTP
-	Zw0myrTV26uf3vuwAL//h+BL5uEsvwlg4fdrsksAtIjSCaSjOPNGCZT9FZYZ/1K7wSFr1v
-	t9/B0+UGpmCcQ4RykMgiVRKqdciKPE3JGbOqkAR4gp7OnnOU5E06HDzRkwN6XJx1JpPAwr
-	CWgH8zXt4e4D/haYP9lDPS7ee+rTKDQPxw9C4sPDPqlfTB0Zu3JmpwcRoVXedqtafx7/ys
-	lnQaVvYjZotugkpzcC5hKMvxJx9UofUhjy8MOYH3jm2NBlsuHAZxPS9nqS8eSQ==
-Message-ID: <55aec00e-3031-44dd-a58d-7a6251891027@uniroma2.it>
-Date: Thu, 26 Mar 2026 18:29:41 +0100
+	s=arc-20240116; t=1774546189; c=relaxed/simple;
+	bh=+1oNWwkOQNqPFvhgNYp/LhaQS4lNd0Ijc16A6Wr40VI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XAozFsnGCJFiN+F+5b96TgSUYodvAqcgHee05I6B2n8WqkinkSiwAlDBUUipJI6nrR6x0BZ5Ikfdc00lkQeyYpJogifDB6K4ZIJbHZV07KQjv3CI1JUsJWmBbI9j4L2sq+xEw+Bsx/Rr/fpZEJ3foX8rytETS8HcZUMYIV+sg/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jIE9gC6C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DF9BC116C6;
+	Thu, 26 Mar 2026 17:29:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774546189;
+	bh=+1oNWwkOQNqPFvhgNYp/LhaQS4lNd0Ijc16A6Wr40VI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jIE9gC6CRKFa3gJhsAbOAdhI5cxa7+OV5UzYRCYu4G/pOrB0cGkzcmTvUrL+/FBbN
+	 1tOCKs/tIjNA1xaBTUww4zks7IdYSdQ4uOUwhK9wIbYHvyZKQuCBcwBc545xDP/NR8
+	 PddxWnO21H75JtgNkorAIMByVCU/jRXG2ac5HzJdT0/WkLA6p8WRTV0RXRfHySkH/v
+	 dFFIZMaNXoP4ObiZTCNyf7l3j3mhAwmJ80q3e/Xq0FLY3CPhQIk42fYPdroFGtp3Yu
+	 vH8Ly8nnwDTm0BL4Al8TE8b9x+/wNffcoqEcWwZS4Qf/JUfRSArQcs5ShoLS243RWK
+	 rfPH+4IP8zh5Q==
+Date: Thu, 26 Mar 2026 17:29:43 +0000
+From: Simon Horman <horms@kernel.org>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+	Yao Zi <me@ziyao.cc>
+Subject: Re: [PATCH net-next 1/2] net: stmmac: remove axi_kbbe, axi_mb and
+ axi_rb members
+Message-ID: <20260326172943.GR111839@horms.kernel.org>
+References: <acJh4z3pRKkeaFbR@shell.armlinux.org.uk>
+ <E1w4ydo-0000000Dlpb-34jd@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next 2/3] seg6: add SRv6 L2 tunnel device (srl2)
-Content-Language: it-IT
-To: Justin Iurman <justin.iurman@6wind.com>,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-        David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Simon Horman <horms@kernel.org>,
-        Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
-        Ahmed Abdelsalam <ahabdels@cisco.com>, linux-kernel@vger.kernel.org
-References: <20260322000557.12559-1-andrea.mayer@uniroma2.it>
- <20260322000557.12559-3-andrea.mayer@uniroma2.it>
- <CAOY2Bqxb1C6myf7DBmfLM_3wZSweYQaQSAVSj_wDihf-N9vQJg@mail.gmail.com>
-From: Stefano Salsano <stefano.salsano@uniroma2.it>
-In-Reply-To: <CAOY2Bqxb1C6myf7DBmfLM_3wZSweYQaQSAVSj_wDihf-N9vQJg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1w4ydo-0000000Dlpb-34jd@rmk-PC.armlinux.org.uk>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-272168-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[uniroma2.it:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272166-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stefano.salsano@uniroma2.it,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 110DC339369
+	TAGGED_RCPT(0.00)[netdev,kernel,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: C2B7A339285
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Il 25/03/2026 14:43, Justin Iurman ha scritto:
-> On Sun, Mar 22, 2026 at 12:06 AM Andrea Mayer <andrea.mayer@uniroma2.it> wrote:
->>
->> Introduce srl2, an Ethernet pseudowire device over SRv6. It
->> encapsulates L2 frames in IPv6 with a Segment Routing Header for
->> transmission across an SRv6 network.
->>
->> The encapsulation logic reuses seg6_do_srh_encap() with
->> IPPROTO_ETHERNET. The transmit path uses the standard IPv6 tunnel
->> infrastructure (dst_cache, ip6_route_output, ip6tunnel_xmit).
->>
->> The device is configured with a segment list for point-to-point
->> L2 encapsulation.
->>
->> Usage:
->>
->>    ip link add srl2-0 type srl2 segs fc00::a,fc00::b
+On Tue, Mar 24, 2026 at 10:05:40AM +0000, Russell King (Oracle) wrote:
+> axi_kbbe, axi_mb and axi_rb are all written, but nothing ever reads
+> their values. Remove the code that sets these and the struct members.
 > 
-> Thinking out loud...
-> 
-> We'll likely need SRv6 encap configurations specific to each entry
-> (i.e., MAC address), rather than (or in addition to) per interface.
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-agreed, this is the natural next step towards multipoint
-we've started exploring the design for this, happy to collaborate if 
-you're interested
+Hi Russell,
 
-> We could also add a "mode" (e.g., "normal" mode or reduced mode?).
-
-good point, the infrastructure is already in place, so adding a "mode" 
-parameter to sr6 to support reduced encap should be straightforward
-
-we suggest to address it as an immediate follow-up to this baseline 
-series and we have already some prototype code ready
-
-ciao
-Stefano and Andrea
--- 
-*******************************************************************
-Prof. Stefano Salsano
-Dipartimento Ingegneria Elettronica
-Universita' di Roma Tor Vergata
-Viale Politecnico, 1 - 00133 Roma - ITALY
-
-http://netgroup.uniroma2.it/Stefano_Salsano/
-
-E-mail  : stefano.salsano@uniroma2.it
-Office  : (Tel.) +39 06 72597770 (Fax.) +39 06 72597435
-*******************************************************************
-
+FYI, AI review suggests that these fields should also be removed from
+Documentation/networking/device_drivers/ethernet/stmicro/stmmac.rst
 
