@@ -1,195 +1,217 @@
-Return-Path: <netdev+bounces-272031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272032-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cKAJE+4pxWkU7QQAu9opvQ
-	(envelope-from <netdev+bounces-272031-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:43:26 +0100
+	id gPc7M+wrxWnb7gQAu9opvQ
+	(envelope-from <netdev+bounces-272032-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:51:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D5E335631
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:43:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 327EF335801
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 13:51:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C825D3045BF9
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:41:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 163E13016CA7
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 12:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7111A3F660E;
-	Thu, 26 Mar 2026 12:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B94E0223DD4;
+	Thu, 26 Mar 2026 12:48:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OuJOITzV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uKUnAe1I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347543F1661
-	for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 12:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413D22222AA;
+	Thu, 26 Mar 2026 12:47:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774528899; cv=none; b=MSitN8BChOcalYVQ9WiL1V+5Y2kGhhMQC//9JX2BZVnzY5JiMTkKV+ySiFLEVdxT7FT4X0AvnbRMN0oVKDOz8qHP4CFvR+4f9AUk/JNkZM+VzrkqxTRnFEskL/oxgTp3noJexiJhXgnUGZELAfXvKzcs/xp1KYDMAgMOawd+KOk=
+	t=1774529280; cv=none; b=FWUC/pt/DMkvbf8UUZVd4GKxvxA1uHooYXIyO7Lf6epXbpEkJuUfjE7SyKnAOP634/NpNM3lY4DBbLk9VC/IJiRhIk+2ruSZNNalnJF33ycO7bhvVzqe4WwsXYinC3JTUnoeIfbSaekEVEdZ7z42CQv7Jq8mmBRvjGlkYDWi+s8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774528899; c=relaxed/simple;
-	bh=cJLybKtA7qZVchhZpSmIkgEGEIJ2i8skCN64+TWywC8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s8BdDYI9QCoI5HXRHQdL1WhnGkXeBD1gmcomLOuIkpXdU93h+LyYhR/mEay3OfzkXvFPRr/8EXgYYktUX03FyP8Yjfx5PJp5HcjHAvH1Lt939MNoptNJvMwNdVVUI4oBoI05PC2xv816jlv4jZ0uoRK0GCOrTvAawspt8QReAWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OuJOITzV; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82ae378fff8so643407b3a.2
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 05:41:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774528897; x=1775133697; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GRSZw6tNZSgMZnXBuoH71ptYXvDvECtHFGr/c2qVkiQ=;
-        b=OuJOITzVS4z49PZ3GSdAGYlahVfLmiXk1qoEJhB1ulQPGQpic00UWneT0HggdKnWNz
-         3RwpltU/vboH8/LNFUjRgpnQYm5sDA6wSZLO7wfcqInGG+G3gs+AzgMJuOC8tqTQTzGl
-         6vWWbAeZZiuHk7oauDOxhPsFsw3wH8N9cHye3jM9mbLY0FgV8tObudxjOwglH7bbagZu
-         RbOCONdnvc4TEadj/SkO/vHXozFdoPNtWnZ6Msq72+Ewlv60yqu2u5YTjZs7FpxHZ6Pm
-         fbV5uQVF59vVu/cI40DN6VWDdXBON3LNsjcFZ4K+/EQBOqVGFespRei++EMZz5Z9i97f
-         o29Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774528897; x=1775133697;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=GRSZw6tNZSgMZnXBuoH71ptYXvDvECtHFGr/c2qVkiQ=;
-        b=cnjfHiG5BVWSzoTykAqxJImatBWdDqsJZK5Z1ollKtLNXi+eptKNpFe58hxUdiZeX5
-         GiuyWxozOw7bB1KRc9kAGsoefaNgWA3utNC9y/PpNBGe+lnpECIA/vAnlSWzLmy/ROZv
-         1fXNmpPGyu9zS6GXjLJQ7ekHAn26DIuE5bj7jc4UXc+kvDJ0OBDut//4qwQCK1x1RCgN
-         PdixK3Aj1foPM50vkeveKXWxqf+NuyGVZT6vTtk7YBz4+0pUBiomiE13bAjfJu9d+G5v
-         IXJHyfIQHe1HeaNOXk6eiKTYnFBZrvnmRD//drRYbpEEKuxA0y0Z+B9An8Uq1u1FUIHX
-         TpYg==
-X-Forwarded-Encrypted: i=1; AJvYcCWwV6x5JUM4/8OYQvNy1a1qa4cqFCnDTWsygf0EM3NkmAt/VE2cC04ckMY/x892u/EqfD+QiII=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbcmVaxXuARKFEEjnWUKomEZ5JZ0wt9besA/JVRyZ4/LB5gGQR
-	yHPuTjckBmFlaAYRoPdiKsxKTwXyX+ST6O2Fius/Vuwm6gwqsJpMOWd/
-X-Gm-Gg: ATEYQzx9nLEvENAejlHYE/wnrZeJxPyJHEb6+UC8MaJg0e9R9aANh1RPfGkzaZRQSPR
-	WLOe1pr0iYe4l29akltnX0xbodzrLtWRfPrtDIRB7UleE/DsaDSPq/tbjSSkyecrYGBp6dp8cnm
-	npn/KUDWO5rsqsHTlgtO+drTuKwVPW51AGrbiKOYNNWgX+GybeI2OxNrSjbyMnzwBTXOZ942PaC
-	qOc4Dm2Zez0/I/kND5dn4JjlIl0RE8pLj9VIsbtMl5JjaiUbhsFPX6aawUvkou7nR658hMFjTIs
-	bVZlX6gIQJI1sbLnOul7WFh0/9xuBEiZNaBKSg46nMKAQF2N1/QW1tAwrD0faYY7xfTTUw9kZsz
-	EQpOqiDOgDspZ9AH+p9lKcejeqz53CZlO6Ed3IDSE+av/eX8+/W2dTA6ZYsjj4GKbmJejMcSirE
-	V7xBcCZop8lhEYBJ1dL/tUZ5uAt9Z+QXCUKp4=
-X-Received: by 2002:a05:6a00:430b:b0:824:93df:6d86 with SMTP id d2e1a72fcca58-82c6e0db5f8mr7181255b3a.50.1774528897356;
-        Thu, 26 Mar 2026 05:41:37 -0700 (PDT)
-Received: from localhost.localdomain ([114.243.117.21])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82c7d400f62sm2446514b3a.55.2026.03.26.05.41.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 05:41:36 -0700 (PDT)
-From: Qi Tang <tpluszz77@gmail.com>
-To: steffen.klassert@secunet.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	herbert@gondor.apana.org.au,
-	horms@kernel.org,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net] xfrm: hold skb->dev across async IPv6 transport reinject
-Date: Thu, 26 Mar 2026 20:41:31 +0800
-Message-ID: <20260326124131.193796-1-tpluszz77@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <abz65sB_1I9ImMx6@secunet.com>
-References: <abz65sB_1I9ImMx6@secunet.com>
+	s=arc-20240116; t=1774529280; c=relaxed/simple;
+	bh=WtDmRmh3cezpVSUF61m5UaSrXX0HE0AV8bz/TNmrCwA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hTZzUbDE3hMLIFpYscX1bfwsQ6gDevy6hks8FjqUdcylapzjud7PRL+yG4SG0+p5TiKQ9Ae/m0F1AWf9eJTiujvIQYwAACtX09v56rRrzdpf38/c5rf1/8ys8XtW4B9Ajg5fv9POWxTByOggfkL9tl7Sqn6F8+zf9beaNoEpX6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uKUnAe1I; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=PA9iwmtkzKj9Ikfo9/YTRI8DYBCeEBqDSq+sUCDMqak=; b=uKUnAe1I0gtODvDexpiP1eYn+R
+	9Z/SzkqaIY5/pjMge45XSOjwGrvWIIAwgzy/zMNk2vriES1mDVXqbm3fSUpJyy6pqgc30UF6xSJ8u
+	CvyDA+oMLUiSnVP9yIGxIQcThbKuX31hY75UQmOFRPE9bZjmsQaS65k87U7N/sys580c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w5k7j-00DTiW-NH; Thu, 26 Mar 2026 13:47:43 +0100
+Date: Thu, 26 Mar 2026 13:47:43 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, kevin-kw.huang@airoha.com,
+	macpaul.lin@mediatek.com, matthias.bgg@gmail.com,
+	kernel@collabora.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 4/4] net: phy: Introduce Airoha AN8801/R
+ Gigabit Ethernet PHY driver
+Message-ID: <3688a285-7f98-4afa-80ad-697094cd7b97@lunn.ch>
+References: <20260326-add-airoha-an8801-support-v2-0-1a42d6b6050f@collabora.com>
+ <20260326-add-airoha-an8801-support-v2-4-1a42d6b6050f@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260326-add-airoha-an8801-support-v2-4-1a42d6b6050f@collabora.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272031-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272032-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tpluszz77@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,gmail.com,armlinux.org.uk,airoha.com,mediatek.com,vger.kernel.org,lists.infradead.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E1D5E335631
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 327EF335801
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-I reworked the fix direction to avoid taking another netdev reference.
+> +static int an8801r_led_blink_set(struct phy_device *phydev, u8 index,
+> +				 unsigned long *delay_on,
+> +				 unsigned long *delay_off)
+> +{
 
-The current idea is to reuse the existing dev_hold() in xfrm_input(),
-carry that reference across the async transport reinject path, and drop
-it only once the skb is either consumed earlier or the async reinject
-callback has completed.
+...
 
-Very roughly, the change would look like this:
+> +	ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, LED_ON_CTRL(index),
+> +			     LED_ON_EN, blink ? LED_ON_EN : 0);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
 
-  - in xfrm_input(), do not drop the existing dev reference immediately
-    on async resume
-  - add a dedicated queueing path for skbs that already carry that
-    input-side reference
-  - in transport_finish(), switch from NF_HOOK() to nf_hook() so the
-    ret != 1 path can drop the carried reference when the skb is consumed
-    before okfn runs
-  - in xfrm_trans_reinject(), drop the transferred reference after the
-    callback completes
+Just
 
-Something along these lines:
 
-  diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
-  @@
-        if (encap_type == -1) {
-                async = 1;
-  -             dev_put(skb->dev);
-                seq = XFRM_SKB_CB(skb)->seq.input.low;
-                ...
-        }
+	return phy_modify_mmd(phydev, MDIO_MMD_VEND2, LED_ON_CTRL(index),
+			     LED_ON_EN, blink ? LED_ON_EN : 0);
 
-  @@
-  +int xfrm_trans_queue_in(struct net *net, struct sk_buff *skb, ...)
-  +{
-  +       ...
-  +       XFRM_TRANS_SKB_CB(skb)->dev_ref_held = true;
-  +       ...
-  +}
+> +		if (!led_trigger)
+> +			continue;
+> +
+> +		ret = an8801r_led_hw_control_set(phydev, led_id, led_trigger);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +	return 0;
+> +}
 
-  diff --git a/net/ipv6/xfrm6_input.c b/net/ipv6/xfrm6_input.c
-  @@
-  -     NF_HOOK(..., xfrm6_transport_finish2);
-  +     ret = nf_hook(..., async ? xfrm6_transport_finish2_async :
-  +                            xfrm6_transport_finish2);
-  +     if (ret != 1) {
-  +             if (async)
-  +                     dev_put(dev);
-  +             return 0;
-  +     }
-  +     (async ? xfrm6_transport_finish2_async :
-  +              xfrm6_transport_finish2)(net, NULL, skb);
 
-  diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
-  @@
-        while ((skb = __skb_dequeue(&queue))) {
-  +             bool dev_ref_held = cb->dev_ref_held;
-  +             struct net_device *dev = dev_ref_held ? skb->dev : NULL;
-                cb->finish(cb->net, NULL, skb);
-  +             if (dev_ref_held)
-  +                     dev_put(dev);
-        }
+Please take a look at all your functions. Can the last error check be
+removed and just use return ret, etc.
 
-Does this sound like a reasonable direction for a v2?
+> +static int an8801r_of_init_leds(struct phy_device *phydev, u8 *led_cfg)
+> +{
+> +	struct device *dev = &phydev->mdio.dev;
+> +	struct device_node *np = dev->of_node;
+> +	struct device_node *leds;
+> +	u32 function_enum_idx;
+> +	int ret;
+> +
+> +	if (!np)
+> +		return 0;
+> +
+> +	/* If devicetree is present, leds configuration is required */
+> +	leds = of_get_child_by_name(np, "leds");
+> +	if (!leds)
+> +		return 0;
+> +
+> +	for_each_available_child_of_node_scoped(leds, led) {
+> +		u32 led_idx;
+> +
+> +		ret = of_property_read_u32(led, "reg", &led_idx);
+> +		if (ret)
+> +			goto out;
+> +
+> +		if (led_idx >= AN8801R_NUM_LEDS) {
+> +			ret = -EINVAL;
+> +			goto out;
+> +		}
+> +
+> +		ret = of_property_read_u32(led, "function-enumerator",
+> +					   &function_enum_idx);
+> +		if (ret)
+> +			function_enum_idx = AN8801R_LED_FN_NONE;
+> +
+
+What is this doing? Is this documented in the binding?
+
+> +		if (function_enum_idx >= AN8801R_LED_FN_MAX) {
+> +			ret = -EINVAL;
+> +			goto out;
+> +		}
+> +
+> +		led_cfg[led_idx] = function_enum_idx;
+> +	}
+> +out:
+> +	of_node_put(leds);
+> +	return ret;
+> +}
+
+> +static int an8801r_read_status(struct phy_device *phydev)
+> +{
+> +	int prev_speed, ret;
+> +	u32 val;
+> +
+> +	prev_speed = phydev->speed;
+> +
+> +	ret = genphy_read_status(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (phydev->link && prev_speed != phydev->speed) {
+> +		val = phydev->speed == SPEED_1000 ?
+> +		      AN8801_BPBUS_LINK_MODE_1000 : 0;
+> +
+> +		return an8801_buckpbus_reg_rmw(phydev,
+> +					       AN8801_BPBUS_REG_LINK_MODE,
+> +					       AN8801_BPBUS_LINK_MODE_1000,
+> +					       val);
+> +	};
+
+This is unusual. What is it doing? Please add a comment.
+
+	Andrew
 
