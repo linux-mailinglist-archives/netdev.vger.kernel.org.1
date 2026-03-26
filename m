@@ -1,119 +1,120 @@
-Return-Path: <netdev+bounces-272166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272167-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cMoxIE5txWl1+AQAu9opvQ
-	(envelope-from <netdev+bounces-272166-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:30:54 +0100
+	id cMnuBM9uxWl1+AQAu9opvQ
+	(envelope-from <netdev+bounces-272167-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:37:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2B7A339285
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:30:53 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E13F3393D8
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 18:37:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 21366302803A
-	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:29:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9EDD53017AB2
+	for <lists+netdev@lfdr.de>; Thu, 26 Mar 2026 17:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4049F41C30B;
-	Thu, 26 Mar 2026 17:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4B641B369;
+	Thu, 26 Mar 2026 17:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jIE9gC6C"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="gC6GIeVi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DD221C173;
-	Thu, 26 Mar 2026 17:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9071041C2FA;
+	Thu, 26 Mar 2026 17:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774546189; cv=none; b=E6aTkgoQIgnBai3YK8HislWGVpJmq51C1u9MkahCJuM8eTuHWgWy8V8yJvS1+5zQ4MQoNVIgIam+zPc4s2qpNxK52BEHVzNDrg2WtYeRJ9t0UDTnGWPJJNr7p7tpcCwhSXlGqB/3xegmGLxWLUfuEteVcqHZydekZfQ8dSiTlkA=
+	t=1774546211; cv=none; b=Ok3Xr713/MlOkNxGPaDhXTOiZg7kx6tJHEVknxkVTZjomPVBqtd5loKxSM0D1vhwppurBmyq7Wbggcj0mdD7LulkfI8tyfoyF2YTNop8jwhZkaI7GdPVmiEIwiDlNPHwQsSkpXgqn7EszePFMsUFwh5rC5dstzZJgWP44MBQKow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774546189; c=relaxed/simple;
-	bh=+1oNWwkOQNqPFvhgNYp/LhaQS4lNd0Ijc16A6Wr40VI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XAozFsnGCJFiN+F+5b96TgSUYodvAqcgHee05I6B2n8WqkinkSiwAlDBUUipJI6nrR6x0BZ5Ikfdc00lkQeyYpJogifDB6K4ZIJbHZV07KQjv3CI1JUsJWmBbI9j4L2sq+xEw+Bsx/Rr/fpZEJ3foX8rytETS8HcZUMYIV+sg/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jIE9gC6C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DF9BC116C6;
-	Thu, 26 Mar 2026 17:29:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774546189;
-	bh=+1oNWwkOQNqPFvhgNYp/LhaQS4lNd0Ijc16A6Wr40VI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jIE9gC6CRKFa3gJhsAbOAdhI5cxa7+OV5UzYRCYu4G/pOrB0cGkzcmTvUrL+/FBbN
-	 1tOCKs/tIjNA1xaBTUww4zks7IdYSdQ4uOUwhK9wIbYHvyZKQuCBcwBc545xDP/NR8
-	 PddxWnO21H75JtgNkorAIMByVCU/jRXG2ac5HzJdT0/WkLA6p8WRTV0RXRfHySkH/v
-	 dFFIZMaNXoP4ObiZTCNyf7l3j3mhAwmJ80q3e/Xq0FLY3CPhQIk42fYPdroFGtp3Yu
-	 vH8Ly8nnwDTm0BL4Al8TE8b9x+/wNffcoqEcWwZS4Qf/JUfRSArQcs5ShoLS243RWK
-	 rfPH+4IP8zh5Q==
-Date: Thu, 26 Mar 2026 17:29:43 +0000
-From: Simon Horman <horms@kernel.org>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-	Yao Zi <me@ziyao.cc>
-Subject: Re: [PATCH net-next 1/2] net: stmmac: remove axi_kbbe, axi_mb and
- axi_rb members
-Message-ID: <20260326172943.GR111839@horms.kernel.org>
-References: <acJh4z3pRKkeaFbR@shell.armlinux.org.uk>
- <E1w4ydo-0000000Dlpb-34jd@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1774546211; c=relaxed/simple;
+	bh=DAU4SfHW0Z5kEwZHRmCMRMCWV+k23xpMa0Jz8WSqOAo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GzaNcdB1Mk3SKEamuLhshkDOJltMwq5rht69D/1dXem1IV9uwvtjwE8Xg02kBYdFI37919l2Aa/xpT9FC0U53jbzbC9PMpJ7Pjziprm4luSwV7a4ROTB6ShRAC3MagZgbvSWJ7gDlQ0MS7Vq70Zn2B8gAyW2tWrfDx8Kgdc9vaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=gC6GIeVi; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=DAU4SfHW0Z5kEwZHRmCMRMCWV+k23xpMa0Jz8WSqOAo=;
+	t=1774546209; x=1775755809; b=gC6GIeViZW3fLFFg5mAaSYcqYAKvfMGdtHJgdRpWjUcB5et
+	uNXYm74tceWA716adlEAtH/uqzBgGiTKyEO70t8YCZvoSwC4zcQLoV36svU7DGCSqQuJWH4l5ehel
+	N+a0oaHD4G3qj7QmDP02NOgadmOQKsSSvImnfJG4iybHvqlA89LmTcSgErvlcrD5pKfIHrA9Wdyn1
+	j2dlD5mYLH0XnNOtRpX/v1NdJ7fFzrLK9XIy36f+PihgOvC2IeBGgpAyDyopo5PNWQ6irQ5knu06H
+	rmdhcRzKwgGOrbsAtbmoefWnCGzFQsErh05cwmIHQIsYSQXbx6KE40hF+4yTFTQQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1w5oWu-0000000DDEs-0Q9U;
+	Thu, 26 Mar 2026 18:30:00 +0100
+Message-ID: <94dad6848516ffb71967c2832c923f153d14e5d5.camel@sipsolutions.net>
+Subject: Re: [GIT PULL] wireless-2026-03-26
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Date: Thu, 26 Mar 2026 18:29:59 +0100
+In-Reply-To: <936e4100-5e3e-4c3a-8598-6724d904deac@redhat.com>
+References: <20260326093329.77815-3-johannes@sipsolutions.net>
+	 <936e4100-5e3e-4c3a-8598-6724d904deac@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1w4ydo-0000000Dlpb-34jd@rmk-PC.armlinux.org.uk>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-malware-bazaar: not-scanned
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[sipsolutions.net,none];
+	R_DKIM_ALLOW(-0.20)[sipsolutions.net:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-272167-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[sipsolutions.net:+];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272166-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[johannes@sipsolutions.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: C2B7A339285
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,sipsolutions.net:dkim,sipsolutions.net:mid]
+X-Rspamd-Queue-Id: 0E13F3393D8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 24, 2026 at 10:05:40AM +0000, Russell King (Oracle) wrote:
-> axi_kbbe, axi_mb and axi_rb are all written, but nothing ever reads
-> their values. Remove the code that sets these and the struct members.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+On Thu, 2026-03-26 at 18:24 +0100, Paolo Abeni wrote:
+> On 3/26/26 10:31 AM, Johannes Berg wrote:
+> > And ... more fixes from drivers came in, notably iwlwifi with
+> > a bunch of things (their maintainer had been on vacation).
+> >=20
+> > I'm going to be on vacation next week, but I'm also not aware
+> > of anything missing from drivers etc. right now, so we'll see.
+> > I doubt this is the _last_ pull request for 7.0, but I think
+> > not much more will come in.
+> >=20
+> > Please pull and let us know if there's any problem.
+>=20
+> Blame on me, I left this one out of my bag, and it missed today net PR
+> for Linus.
 
-Hi Russell,
+No worries, I just wanted to get it out before I go mostly offline for
+the next week, so it's not stuck on me :)
 
-FYI, AI review suggests that these fields should also be removed from
-Documentation/networking/device_drivers/ethernet/stmicro/stmmac.rst
+johannes
 
