@@ -1,178 +1,482 @@
-Return-Path: <netdev+bounces-272466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272443-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uEE2NGRFxmmgIAUAu9opvQ
-	(envelope-from <netdev+bounces-272466-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:52:52 +0100
+	id kAssEA9BxmlRIAUAu9opvQ
+	(envelope-from <netdev+bounces-272443-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:34:23 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 510F934153F
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:52:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF44F3410F4
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:34:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 98633301F4B8
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 08:50:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF1A3303E2C6
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 08:31:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D273D9DA6;
-	Fri, 27 Mar 2026 08:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3704A3D6CB1;
+	Fri, 27 Mar 2026 08:31:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=dev.tdt.de header.i=@dev.tdt.de header.b="fq9CBLy5"
+	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="OoYtxFEH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [91.198.224.70])
+Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BBE72FF155;
-	Fri, 27 Mar 2026 08:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.224.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595583D3D02;
+	Fri, 27 Mar 2026 08:31:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774601454; cv=none; b=fWYUg6w6hJl/zGUWTIma6ZHxmP73JM5ct/0mSpNk7vmGp47nJHNtnaa9sS+DArFJwzhUG0i34I38X6v8/cKwUGTpY9mEviyZGlHcoB3WPq8/NaEPWfHN74oAStrGhzZsoQMPjF6vXYTBHoQhhxG2umzC7ovKVGKQW0Q3Uuqk47Y=
+	t=1774600317; cv=none; b=Ne5ZKdDXiAzgtOBCQSAf+IwU7re1Mh6xEzDo7HQv/m+tjMD/942FHm2g6h7AQkTfwyl/YGTOWTokw49RnAi375mZGUu/Bv5OYCUYrIw44O9hv8Zupfl6gQKprH+9MtcW+FTNxRUhZ+mCrLhNclQwb02boCi+rh441p9Qifjs5mk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774601454; c=relaxed/simple;
-	bh=z6z7xz+iqeiIUkPQLjGp8WavFPeWOi1bzCahE5cQY4Q=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:Cc; b=nQCjoF4ubYXcT+g9QGX5M9TbKOgJhpTrOHLYtTpMBvXbuN/qPGB1KT2R23ZsWkMmhWrG8xb4Eu4fgeNhq4qXXLHJgRtEEpteGwKHepYZcsaXJ5EXn7KKl6n+jM2it4bluh/yapO2sUuxnryuMwjtudJ0HDjy0eUTHcYM6pBgFsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; dkim=temperror (0-bit key) header.d=dev.tdt.de header.i=@dev.tdt.de header.b=fq9CBLy5; arc=none smtp.client-ip=91.198.224.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dev.tdt.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
-Received: from [194.37.255.9] (helo=mxout.expurgate.net)
-	by relay.expurgate.net with smtp (Exim 4.92)
-	(envelope-from <prvs=6560504b2e=ms@dev.tdt.de>)
-	id 1w62av-00BrUV-9x; Fri, 27 Mar 2026 09:31:05 +0100
-Received: from [195.243.126.94] (helo=securemail.tdt.de)
-	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ms@dev.tdt.de>)
-	id 1w62au-00G6dA-7N; Fri, 27 Mar 2026 09:31:04 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dev.tdt.de;
-	s=z1-selector1; t=1774600263;
-	bh=C4yTxAHTn4We4DXR/M9YLhr/wzuzBi4JfHbMXvbdvvY=;
-	h=From:Date:Subject:To:Cc:From;
-	b=fq9CBLy52WS8J2xkYaB9/wUthXI39N6exb5gsCJS9GXwinakRxrwxfKGH3+sYU1uu
-	 b4KX3lHQyroTfw2pjhFaaQsBrzkMBfA+b1EKsRlHJjpuSe+Z/Q6Pr4kDtmGo43MHIs
-	 HRhXRBYciiKbX5XCqpiaezGX9O5CMnTs8srFUGf7a6WJDdq9Gg9cl+p+sceLfM3Gie
-	 EwkCsLlJ9a9paZSbFmQKYwrvSrFLosTfi1gDZxn8XEAK0Ppnzztm2YSG0MiGd8sUi7
-	 HUZ5WZpSzfrOisg8bPB6/wXEKHluMZGgRPknfkHRRRUrVOpoqsKGIoQJhhSwLAUC20
-	 POIkIyEzlXk7A==
-Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id ACC7C240040;
-	Fri, 27 Mar 2026 09:31:03 +0100 (CET)
-Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id A37B5240036;
-	Fri, 27 Mar 2026 09:31:03 +0100 (CET)
-Received: from [127.0.1.1] (unknown [10.2.3.19])
-	by mail.dev.tdt.de (Postfix) with ESMTPSA id 772FA21860;
-	Fri, 27 Mar 2026 09:31:03 +0100 (CET)
-From: Martin Schiller <ms@dev.tdt.de>
-Date: Fri, 27 Mar 2026 09:30:58 +0100
-Subject: [PATCH net] net/x25: Fix overflow when accumulating packets
+	s=arc-20240116; t=1774600317; c=relaxed/simple;
+	bh=C5zCJ2dSSr2sUEmtiMBLlNl+9IFiw1PPxBngmjF/gZs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B5m4b8qX8cTGvf7iGUAj9vfV+vUixNvJ9EqT15Yd0fvAq3zkDjZsIHnMtu+/ZQATMWBiR5wEkfxa6Fj/nE1V4jAwULe//ygk3YHXjTw/74K4OORnoO6lYdL2O7ha0R4KAohU1CtuBXIMQX9XJBbgfRg5I6M4C5fvfCub5w0rNkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=OoYtxFEH; arc=none smtp.client-ip=129.217.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
+	s=unimail; t=1774600297;
+	bh=C5zCJ2dSSr2sUEmtiMBLlNl+9IFiw1PPxBngmjF/gZs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=OoYtxFEHguYXITndQdnURTe59OppSq1IZqB+aZK0SCdXwRRqo7f4lAn3saL9h8fFp
+	 kt+2R8RktS6vYjK4of8RlBKvg5B1Dqm2npsCHl9lKO5i1DHcZe1dWtgL6nWCPcigsO
+	 6KfcaS7MgsUaJs+UA6oEgJjnyUhWcRah7uutJaLQ=
+Received: from [IPV6:2a01:599:313:1ec8:db54:5cf5:3244:cdab] (tmo-120-113.customers.d1-online.com [80.187.120.113])
+	(authenticated bits=0)
+	by unimail.uni-dortmund.de (8.18.2/8.18.2) with ESMTPSA id 62R8VWni018737
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 27 Mar 2026 09:31:33 +0100 (CET)
+Message-ID: <b9d84d88-46d5-4fd3-a5b2-d914f54766f6@tu-dortmund.de>
+Date: Fri, 27 Mar 2026 09:31:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20260327-x25_fraglen-v1-1-9fc751d4f754@dev.tdt.de>
-X-B4-Tracking: v=1; b=H4sIAEFAxmkC/x3MQQqAIBBA0avErBN0rIiuEhGiow2EhUYE0t2Tl
- m/xf4FMiSnD1BRIdHPmI1aotgG7mRhIsKsGlDhIjb14sF99MmGnKEZvsZNOkXMaanEm8vz8txk
- iXbC87wfPDl2eYgAAAA==
-X-Change-ID: 20260325-x25_fraglen-8fc240d1edd3
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Yiming Qian <yimingqian591@gmail.com>, linux-x25@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	security@kernel.org, Martin Schiller <ms@dev.tdt.de>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1774600263; l=1558;
- i=ms@dev.tdt.de; s=20260220; h=from:subject:message-id;
- bh=z6z7xz+iqeiIUkPQLjGp8WavFPeWOi1bzCahE5cQY4Q=;
- b=MAENNjzRNYxobCk23Ax+85809q/FlI10zF/+LPF36Deh8nYvaTym8fULiXoOD8xPazVO9fN/y
- 1wEfC9SjR1nCSiSluu9HUUkxAsV6iU0JJyeQcxdXAqYkZ67Nm9YatiT
-X-Developer-Key: i=ms@dev.tdt.de; a=ed25519;
- pk=MAojd7D5IafMnqCYSFC7hY/u/jppX58CLIEhsEsSOYE=
-X-purgate: clean
-X-purgate-ID: 151534::1774600264-E54ACBD2-3D888FAF/0/0
-X-purgate-type: clean
-X-Spamd-Result: default: False [-2.16 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 4/4] tun/tap & vhost-net: avoid ptr_ring
+ tail-drop when a qdisc is present
+To: Jason Wang <jasowang@redhat.com>
+Cc: willemdebruijn.kernel@gmail.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, mst@redhat.com, eperezma@redhat.com,
+        leiyang@redhat.com, stephen@networkplumber.org, jon@nutanix.com,
+        tim.gebauer@tu-dortmund.de, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev
+References: <20260312130639.138988-1-simon.schippers@tu-dortmund.de>
+ <20260312130639.138988-5-simon.schippers@tu-dortmund.de>
+ <CACGkMEtN9XgYPGHQg4TEWEsa_UcMbcnzO=VaTFT=0Tn4BayMDw@mail.gmail.com>
+ <0908392d-6314-4141-b908-6c9a880ba0a4@tu-dortmund.de>
+ <cda710f8-033a-4772-b5ce-a2cfddf42bea@tu-dortmund.de>
+ <CACGkMEuLqxnz=GtdKp3-u0egkGT_eZUgBBwvvtHcgAYpLJv-UA@mail.gmail.com>
+ <3d3274b4-f274-4cf9-9d0f-989d05148604@tu-dortmund.de>
+ <CACGkMEsUag4zNZG+aYipHv_PirbKb_rs7DzSOr-NF8ckhUaJOQ@mail.gmail.com>
+Content-Language: en-US
+From: Simon Schippers <simon.schippers@tu-dortmund.de>
+In-Reply-To: <CACGkMEsUag4zNZG+aYipHv_PirbKb_rs7DzSOr-NF8ckhUaJOQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tdt.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[dev.tdt.de:s=z1-selector1];
+	DMARC_POLICY_ALLOW(-0.50)[tu-dortmund.de,none];
+	R_DKIM_ALLOW(-0.20)[tu-dortmund.de:s=unimail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tdt.de:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,dev.tdt.de:dkim,dev.tdt.de:mid];
-	DKIM_TRACE(0.00)[dev.tdt.de:+];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,kernel.org,dev.tdt.de];
+	TAGGED_FROM(0.00)[bounces-272443-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272466-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,networkplumber.org,nutanix.com,tu-dortmund.de,vger.kernel.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ms@dev.tdt.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[simon.schippers@tu-dortmund.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tu-dortmund.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 510F934153F
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tu-dortmund.de:dkim,tu-dortmund.de:email,tu-dortmund.de:mid]
+X-Rspamd-Queue-Id: BF44F3410F4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a check to ensure that `x25_sock.fraglen` does not overflow.
+On 3/27/26 02:13, Jason Wang wrote:
+> On Thu, Mar 26, 2026 at 11:31 PM Simon Schippers
+> <simon.schippers@tu-dortmund.de> wrote:
+>>
+>> On 3/26/26 03:41, Jason Wang wrote:
+>>> On Wed, Mar 25, 2026 at 10:48 PM Simon Schippers
+>>> <simon.schippers@tu-dortmund.de> wrote:
+>>>>
+>>>> On 3/24/26 11:14, Simon Schippers wrote:
+>>>>> On 3/24/26 02:47, Jason Wang wrote:
+>>>>>> On Thu, Mar 12, 2026 at 9:07 PM Simon Schippers
+>>>>>> <simon.schippers@tu-dortmund.de> wrote:
+>>>>>>>
+>>>>>>> This commit prevents tail-drop when a qdisc is present and the ptr_ring
+>>>>>>> becomes full. Once an entry is successfully produced and the ptr_ring
+>>>>>>> reaches capacity, the netdev queue is stopped instead of dropping
+>>>>>>> subsequent packets.
+>>>>>>>
+>>>>>>> If producing an entry fails anyways due to a race, tun_net_xmit returns
+>>>>>>> NETDEV_TX_BUSY, again avoiding a drop. Such races are expected because
+>>>>>>> LLTX is enabled and the transmit path operates without the usual locking.
+>>>>>>>
+>>>>>>> The existing __tun_wake_queue() function wakes the netdev queue. Races
+>>>>>>> between this wakeup and the queue-stop logic could leave the queue
+>>>>>>> stopped indefinitely. To prevent this, a memory barrier is enforced
+>>>>>>> (as discussed in a similar implementation in [1]), followed by a recheck
+>>>>>>> that wakes the queue if space is already available.
+>>>>>>>
+>>>>>>> If no qdisc is present, the previous tail-drop behavior is preserved.
+>>>>>>
+>>>>>> I wonder if we need a dedicated TUN flag to enable this. With this new
+>>>>>> flag, we can even prevent TUN from using noqueue (not sure if it's
+>>>>>> possible or not).
+>>>>>>
+>>>>>
+>>>>> Except of the slight regressions because of this patchset I do not see
+>>>>> a reason for such a flag.
+>>>>>
+>>>>> I have never seen that the driver prevents noqueue. For example you can
+>>>>> set noqueue to your ethernet interface and under load you soon get
+>>>>>
+>>>>> net_crit_ratelimited("Virtual device %s asks to queue packet!\n",
+>>>>>                                            dev->name);
+>>>>>
+>>>>> followed by a -ENETDOWN. And this is not prevented even though it is
+>>>>> clearly not something a user wants.
+>>>>>
+>>>>>>>
+>>>>>>> Benchmarks:
+>>>>>>> The benchmarks show a slight regression in raw transmission performance,
+>>>>>>> though no packets are lost anymore.
+>>>>>>>
+>>>>>>> The previously introduced threshold to only wake after the queue stopped
+>>>>>>> and half of the ring was consumed showed to be a descent choice:
+>>>>>>> Waking the queue whenever a consume made space in the ring strongly
+>>>>>>> degrades performance for tap, while waking only when the ring is empty
+>>>>>>> is too late and also hurts throughput for tap & tap+vhost-net.
+>>>>>>> Other ratios (3/4, 7/8) showed similar results (not shown here), so
+>>>>>>> 1/2 was chosen for the sake of simplicity for both tun/tap and
+>>>>>>> tun/tap+vhost-net.
+>>>>>>>
+>>>>>>> Test setup:
+>>>>>>> AMD Ryzen 5 5600X at 4.3 GHz, 3200 MHz RAM, isolated QEMU threads;
+>>>>>>> Average over 20 runs @ 100,000,000 packets. SRSO and spectre v2
+>>>>>>> mitigations disabled.
+>>>>>>>
+>>>>>>> Note for tap+vhost-net:
+>>>>>>> XDP drop program active in VM -> ~2.5x faster, slower for tap due to
+>>>>>>> more syscalls (high utilization of entry_SYSRETQ_unsafe_stack in perf)
+>>>>>>>
+>>>>>>> +--------------------------+--------------+----------------+----------+
+>>>>>>> | 1 thread                 | Stock        | Patched with   | diff     |
+>>>>>>> | sending                  |              | fq_codel qdisc |          |
+>>>>>>> +------------+-------------+--------------+----------------+----------+
+>>>>>>> | TAP        | Transmitted | 1.151 Mpps   | 1.139 Mpps     | -1.1%    |
+>>>>>>> |            +-------------+--------------+----------------+----------+
+>>>>>>> |            | Lost/s      | 3.606 Mpps   | 0 pps          |          |
+>>>>>>> +------------+-------------+--------------+----------------+----------+
+>>>>>>> | TAP        | Transmitted | 3.948 Mpps   | 3.738 Mpps     | -5.3%    |
+>>>>>>> |            +-------------+--------------+----------------+----------+
+>>>>>>> | +vhost-net | Lost/s      | 496.5 Kpps   | 0 pps          |          |
+>>>>>>> +------------+-------------+--------------+----------------+----------+
+>>>>>>>
+>>>>>>> +--------------------------+--------------+----------------+----------+
+>>>>>>> | 2 threads                | Stock        | Patched with   | diff     |
+>>>>>>> | sending                  |              | fq_codel qdisc |          |
+>>>>>>> +------------+-------------+--------------+----------------+----------+
+>>>>>>> | TAP        | Transmitted | 1.133 Mpps   | 1.109 Mpps     | -2.1%    |
+>>>>>>> |            +-------------+--------------+----------------+----------+
+>>>>>>> |            | Lost/s      | 8.269 Mpps   | 0 pps          |          |
+>>>>>>> +------------+-------------+--------------+----------------+----------+
+>>>>>>> | TAP        | Transmitted | 3.820 Mpps   | 3.513 Mpps     | -8.0%    |
+>>>>>>> |            +-------------+--------------+----------------+----------+
+>>>>>>> | +vhost-net | Lost/s      | 4.961 Mpps   | 0 pps          |          |
+>>>>>>> +------------+-------------+--------------+----------------+----------+
+>>>>>>>
+>>>>>>> [1] Link: https://lore.kernel.org/all/20250424085358.75d817ae@kernel.org/
+>>>>>>>
+>>>>>>> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>>>>> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+>>>>>>> ---
+>>>>>>>  drivers/net/tun.c | 30 ++++++++++++++++++++++++++++--
+>>>>>>>  1 file changed, 28 insertions(+), 2 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>>>>>> index b86582cc6cb6..9b7daec69acd 100644
+>>>>>>> --- a/drivers/net/tun.c
+>>>>>>> +++ b/drivers/net/tun.c
+>>>>>>> @@ -1011,6 +1011,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>>>>>>         struct netdev_queue *queue;
+>>>>>>>         struct tun_file *tfile;
+>>>>>>>         int len = skb->len;
+>>>>>>> +       bool qdisc_present;
+>>>>>>> +       int ret;
+>>>>>>>
+>>>>>>>         rcu_read_lock();
+>>>>>>>         tfile = rcu_dereference(tun->tfiles[txq]);
+>>>>>>> @@ -1063,13 +1065,37 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>>>>>>>
+>>>>>>>         nf_reset_ct(skb);
+>>>>>>>
+>>>>>>> -       if (ptr_ring_produce(&tfile->tx_ring, skb)) {
+>>>>>>> +       queue = netdev_get_tx_queue(dev, txq);
+>>>>>>> +       qdisc_present = !qdisc_txq_has_no_queue(queue);
+>>>>>>> +
+>>>>>>> +       spin_lock(&tfile->tx_ring.producer_lock);
+>>>>>>> +       ret = __ptr_ring_produce(&tfile->tx_ring, skb);
+>>>>>>> +       if (__ptr_ring_produce_peek(&tfile->tx_ring) && qdisc_present) {
+>>>>>>
+>>>>>> So, it's possible that the administrator is switching between noqueue
+>>>>>> and another qdisc. So ptr_ring_produce() can fail here, do we need to
+>>>>>> check that or not?
+>>>>>>
+>>>>>
+>>>>> Do you mean that? My thoughts:
+>>>>>
+>>>>> Switching from noqueue to some qdisc can cause a
+>>>>>
+>>>>> net_crit_ratelimited("Virtual device %s asks to queue packet!\n",
+>>>>>                                            dev->name);
+>>>>>
+>>>>> followed by a return of -ENETDOWN in __dev_queue_xmit().
+>>>>> This is because tun_net_xmit detects some qdisc with
+>>>>>
+>>>>> qdisc_present = !qdisc_txq_has_no_queue(queue);
+>>>>>
+>>>>> and returns NETDEV_TX_BUSY even though __dev_queue_xmit() did still
+>>>>> detect noqueue.
+>>>>>
+>>>>> I am not sure how to solve this/if this has to be solved.
+>>>>> I do not see a proper way to avoid parallel execution of ndo_start_xmit
+>>>>> and a qdisc change (dev_graft_qdisc only takes qdisc_skb_head lock).
+>>>>>
+>>>>> And from my understanding the veth implementation faces the same issue.
+>>>>
+>>>> How about rechecking if a qdisc is connected?
+>>>> This would avoid -ENETDOWN.
+>>>>
+>>>> diff --git a/net/core/dev.c b/net/core/dev.c
+>>>> index f48dc299e4b2..2731a1a70732 100644
+>>>> --- a/net/core/dev.c
+>>>> +++ b/net/core/dev.c
+>>>> @@ -4845,10 +4845,17 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+>>>>                                 if (is_list)
+>>>>                                         rc = NETDEV_TX_OK;
+>>>>                         }
+>>>> +                       bool qdisc_present = !qdisc_txq_has_no_queue(txq);
+>>>>                         HARD_TX_UNLOCK(dev, txq);
+>>>>                         if (!skb) /* xmit completed */
+>>>>                                 goto out;
+>>>>
+>>>> +                       /* Maybe a qdisc was connected in the meantime */
+>>>> +                       if (qdisc_present) {
+>>>> +                               kfree_skb(skb);
+>>>> +                               goto out;
+>>>> +                       }
+>>>> +
+>>>>                         net_crit_ratelimited("Virtual device %s asks to queue packet!\n",
+>>>>                                              dev->name);
+>>>>                         /* NETDEV_TX_BUSY or queue was stopped */
+>>>>
+>>>
+>>> Probably not, and we likely won't hit this warning because qdisc could
+>>> not be changed during ndo_start_xmit().
+>>
+>> Okay.
+>>
+>>>
+>>> I meant something like this:
+>>>
+>>> 1) set noqueue to tuntap
+>>> 2) produce packets so tuntap is full
+>>> 3) set e.g fq_codel to tuntap
+>>> 4) then we can hit the failure of __ptr_ring_produce()
+>>>
+>>> Rethink of the code, it looks just fine.
+>>
+>> Yes, in this case it just returns NETDEV_TX_BUSY which is fine with a
+>> qdisc attached.
+>>
+>>>
+>>>>
+>>>>>
+>>>>>
+>>>>> Switching from some qdisc to noqueue is no problem I think.
+>>>>>
+>>>>>>> +               netif_tx_stop_queue(queue);
+>>>>>>> +               /* Avoid races with queue wake-ups in __tun_wake_queue by
+>>>>>>> +                * waking if space is available in a re-check.
+>>>>>>> +                * The barrier makes sure that the stop is visible before
+>>>>>>> +                * we re-check.
+>>>>>>> +                */
+>>>>>>> +               smp_mb__after_atomic();
+>>>>>>
+>>>>>> Let's document which barrier is paired with this.
+>>>>>>
+>>>>>
+>>>>> I am basically copying the (old) logic of veth [1] proposed by
+>>>>> Jakub Kicinski. I must admit I am not 100% sure what it pairs with.
+>>>>>
+>>>>> [1] Link: https://lore.kernel.org/all/20250424085358.75d817ae@kernel.org/
+>>>
+>>> So it looks like it implicitly tries to pair with tun_ring_consume():
+>>>
+>>> 1) spinlock(consumer_lock)
+>>> 2) store NULL to ptr_ring // STORE
+>>> 3) spinunlock(consumer_lock) // RELEASE
+>>> 4) spinlock(consumer_lock) // ACQURE
+>>> 5) check empty
+>>> 6) spinunlock(consumer_lock)
+>>> 7) netif_wakeup_queue() // test_and_set() which is an RMW
+>>>
+>>> RELEASE + ACQUIRE implies a full barrier
+>>
+>> Thanks.
+>>
+>>>
+>>> I see several problems
+>>>
+>>> 1) Due to batch consumption, we may get spurious wakeups under heavy
+>>> load (we can try disabling batch consuming to see if it helps).
+>>
+>> I assume that you mean the waking in the recheck of the producer happens
+>> too often and then wakes too often. But this would just take slightly
+>> more producer cpu as the SOFTIRQ runs on the producer cpu and not slow
+>> down the consumer?
+>>
+>> Why would disabling batch consume help here?
+> 
+> We could end up with.
+> 
+> 1) consumer wakes up the producer but the slot is not cleaned
 
-The `fraglen` also needs to be resetted when purging `fragment_queue` in
-`x25_clear_queues()`.
+Ah okay.. I guess MST will not like this:
 
-Reported-by: Yiming Qian <yimingqian591@gmail.com>
-Signed-off-by: Martin Schiller <ms@dev.tdt.de>
----
- net/x25/x25_in.c   | 6 ++++++
- net/x25/x25_subr.c | 1 +
- 2 files changed, 7 insertions(+)
+From now on I assume that by "batch consumption" you mean that
+__ptr_ring_zero_tail() is only called after consuming ring.batch
+elements. And you want to disable it so __ptr_ring_zero_tail() is
+called after each consumption.
+(And I assume that you do not mean ptr_ring_consume_batched() in
+vhost_net_buf_produce() as that does not make sense to me.)
 
-diff --git a/net/x25/x25_in.c b/net/x25/x25_in.c
-index b981a4828d08c2e6676749a06035910eab01e6cd..1603238d6fff73090ef10b5fd11387b3e7f017a2 100644
---- a/net/x25/x25_in.c
-+++ b/net/x25/x25_in.c
-@@ -34,6 +34,12 @@ static int x25_queue_rx_frame(struct sock *sk, struct sk_buff *skb, int more)
- 	struct sk_buff *skbo, *skbn = skb;
- 	struct x25_sock *x25 = x25_sk(sk);
- 
-+	/* make sure we don't overflow */
-+	if (x25->fraglen + skb->len > sizeof(x25->fraglen)) {
-+		kfree_skb(skb);
-+		return 1;
-+	}
-+
- 	if (more) {
- 		x25->fraglen += skb->len;
- 		skb_queue_tail(&x25->fragment_queue, skb);
-diff --git a/net/x25/x25_subr.c b/net/x25/x25_subr.c
-index 0285aaa1e93c17233748d38eef6d8b5c6059b67a..159708d9ad20cb2e6db24ead67daf1e9d6258f64 100644
---- a/net/x25/x25_subr.c
-+++ b/net/x25/x25_subr.c
-@@ -40,6 +40,7 @@ void x25_clear_queues(struct sock *sk)
- 	skb_queue_purge(&x25->interrupt_in_queue);
- 	skb_queue_purge(&x25->interrupt_out_queue);
- 	skb_queue_purge(&x25->fragment_queue);
-+	x25->fraglen = 0;
- }
- 
- 
+I think my current implementation works fine with that:
+The consumer only wakes after consuming >= ring.size/2.
+And this is for TAP and TAP+vhost-net.
+And ring.size/2 is always bigger than a single ring.batch (see
+__ptr_ring_set_size() ), which ensures that __ptr_ring_zero_tail()
+is called and the slot is cleaned before waking.
 
----
-base-commit: 4ae97cae07e15d41e5c0ebabba64c6eefdeb0bbe
-change-id: 20260325-x25_fraglen-8fc240d1edd3
+Waking on ptr_ring_empty() also ensures that __ptr_ring_zero_tail()
+is called and the slot is cleaned before waking.
 
-Best regards,
--- 
-Martin Schiller <ms@dev.tdt.de>
+> 2) producer is woken up but see the ring is full, so it need to drop the packet 
+> 
+> This probably defeat the goal of zero packet loss.
 
+No then NETDEV_TX_BUSY is returned (noticeable as qdisc requeue).
+
+And this happened very rarely for me in my benchmarks.
+Here the average of the 20 runs @ 100.000.000 packets each:
+
+TAP single queue: 23.6 requeues
+TAP 2 queues: 35.5 requeues
+TAP+vhost-net single queue: 1.9 requeues
+TAP+vhost-net 2 queues: 12.1 requeues
+
+> 
+>> Wouldn't it just decrease the consumer speed?
+> 
+> Not sure, we probably need a benchmark.
+> 
+>>
+>> Apart from that I do not see a different method to do this recheck.
+>> The ring producer is only safely able to do a !produce_peek (so a check
+>> for !full).
+>>
+>> The normal waking (after consuming half of the ring) should be fine IMO.
+>>
+>>> 2) So the barriers don't help but would slow down the consuming
+>>> 3) Two spinlocks were used instead of one, this is another reason we
+>>> will see a performance regression
+>>
+>> You are right, I can change it to a single spin_lock. Apart from that
+>> I do not see how the barriers/locking could be reduced further.
+>>
+>>> 4) Tricky code that needs to be understood or at least requires a comment tweak.
+>>>
+>>> Note that due to ~IFF_TX_SKB_SHARING, pktgen can't clone skbs, so we
+>>> may not notice the real degradation.
+>>
+>> So run pktgen with pg_set SHARED?
+> 
+> Probably (as a workaround).
+> 
+
+Okay, for future benchmarks I will add this command to my benchmark
+scripts.
+
+>> I am pretty sure that the vhost
+>> thread was always at 100% CPU so pktgen was not the bottleneck. And when
+>> I had perf enabled I always saw that in my patched version not the
+>> creation of SKB's took most CPU in pktgen but a different unnamed
+>> function (I assume this is a waiting function).
+> 
+> Let's try and see.
+> 
+> Thanks
+> 
+>>
+>>
+>> Thank you!
+>>
+>>>
+>>>>>
+>>>>>>> +               if (!__ptr_ring_produce_peek(&tfile->tx_ring))
+>>>>>>> +                       netif_tx_wake_queue(queue);
+>>>>>>> +       }
+>>>>>>> +       spin_unlock(&tfile->tx_ring.producer_lock);
+>>>>>>> +
+>>>>>>> +       if (ret) {
+>>>>>>> +               /* If a qdisc is attached to our virtual device,
+>>>>>>> +                * returning NETDEV_TX_BUSY is allowed.
+>>>>>>> +                */
+>>>>>>> +               if (qdisc_present) {
+>>>>>>> +                       rcu_read_unlock();
+>>>>>>> +                       return NETDEV_TX_BUSY;
+>>>>>>> +               }
+>>>>>>>                 drop_reason = SKB_DROP_REASON_FULL_RING;
+>>>>>>>                 goto drop;
+>>>>>>>         }
+>>>>>>>
+>>>>>>>         /* dev->lltx requires to do our own update of trans_start */
+>>>>>>> -       queue = netdev_get_tx_queue(dev, txq);
+>>>>>>>         txq_trans_cond_update(queue);
+>>>>>>>
+>>>>>>>         /* Notify and wake up reader process */
+>>>>>>> --
+>>>>>>> 2.43.0
+>>>>>>>
+>>>>>>
+>>>>>> Thanks
+>>>>>>
+>>>>
+>>>
+>>> Thanks
+>>>
+>>
+> 
 
