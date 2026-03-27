@@ -1,215 +1,187 @@
-Return-Path: <netdev+bounces-272327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272328-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uNNrNd3jxWkeCwUAu9opvQ
-	(envelope-from <netdev+bounces-272327-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:56:45 +0100
+	id kEHWBzbkxWkeCwUAu9opvQ
+	(envelope-from <netdev+bounces-272328-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:58:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D4FB33E029
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:56:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8283333E06C
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:58:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CC036302E903
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:53:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8F930301454C
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 124AB2EC0A5;
-	Fri, 27 Mar 2026 01:53:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76ABF3126D0;
+	Fri, 27 Mar 2026 01:53:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QyhOXBcr"
+	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="JVoBqhgB"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from n169-110.mail.139.com (n169-110.mail.139.com [120.232.169.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4986527B347
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 01:53:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A870178F59;
+	Fri, 27 Mar 2026 01:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774576389; cv=none; b=oWRkX5pGAFHVdLkxONJ9hPD4meFSPfM2HcD2UKB7VLFCuuuAs14ko4I+0UA4Ser6a4axiy21TLOc8/QJvIdiSFpzyGwTqVOnqcTaiJ6zwl3TmWrdf0kHLfJW9r55MwQubngaYJLTk3bwU/6+ehMZJcKNG2yLD8xMXpCh8FTnQiE=
+	t=1774576406; cv=none; b=axgPqbXHf7M5MkhuzsJq6NfzCHvZwGmR2WQg3q5FnOyA7HiR/H255XTCiI3jNLxFfYR9m5VC5jLvXRiV7f5/JYuhSkHWwVuTmvI2P8M1hbKQDWp4NfJK6c/4SY1I6rmtCA2trvnr6P2AfQfDpBT3qtEXx1J6b6oem2o9QPLrXNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774576389; c=relaxed/simple;
-	bh=216TK3RDbNFux8Vz68QqIt77sULAYGcQPaXgVmlrCv0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cMibOA5fdNGWAXweQ9eRgUNreecoYUrwIjBs0kokW/dpxExREseP8WRl0dGqAJsf9a+YrNyZEO6GlJBLR23AZJRqcbg7no1cGfjbSFUtmIe+S6xeJC2rQzB97F/X/MKZEx2SvIPbOZQdePZS48iy1UyW/Nf6qbSuDqm843Ib8Qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QyhOXBcr; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5ce664e8-8c65-4000-b73d-06a9423edb32@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774576381;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9PFHr0GiOHoG1p9wMnx0nkJpSabI/bYbM+Srr2peKG8=;
-	b=QyhOXBcrAJUMoShO9XQYWFJiIZpU3in5ABRAK7G6XsHM7uiknVTQ8anWMzQST41KCQE7uk
-	ZtaS2KmmFBIU5RDAvoFli6nZQm6TgDdZXvs5pMX18k6DEb3gDkfefOYsuF+8zm1INXr9ho
-	oQSWY2Zz9coe/MuQIuDWt/ZbPbNjXGQ=
-Date: Fri, 27 Mar 2026 09:52:50 +0800
+	s=arc-20240116; t=1774576406; c=relaxed/simple;
+	bh=/eB1/rf/CU2pvZVuVrWldNffSXGURHHOo9QBNHEohe0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F1PuLWZh1BKrU/N+ImEqpZ+oUwk37D97hcbqPyVb2UYyLszlW8EoNexWZz2LCa5lM/YLSkI6mVhP+yT8ZpM0d0ZXm+Yol0d8/yDXOhsl/RXFGw5ya07sQTcYIuw8/TMVextMXbpwHOF3ET+KKKHNjj/z9HQTT6FeACf8iergzPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=JVoBqhgB; arc=none smtp.client-ip=120.232.169.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=139.com; s=dkim; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=JVoBqhgBWEtkybUwaYzrDk2dTYsUbfYBp95J5ZDNnBZly69MW0GGAF273QckNAfPOdAyijUp04tsB
+	 yJHl/YdQNpTk2DNZ/T58k8PLd/IFp6/cjV3QolSJkM4fJwaAVKoyjjTs3GIbtOpjeYbKdQVJDRD+7U
+	 puc7nsaHdHrrvRWw=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM:                                                                                        
+X-RM-SPAM-FLAG:00000000
+Received:from NTT-kernel-dev (unknown[60.247.85.88])
+	by rmsmtp-lg-appmail-08-12086 (RichMail) with SMTP id 2f3669c5e305cda-01cff;
+	Fri, 27 Mar 2026 09:53:14 +0800 (CST)
+X-RM-TRANSID:2f3669c5e305cda-01cff
+From: Rajani Kantha <681739313@139.com>
+To: gregkh@linuxfoundation.org,
+	stable@vger.kernel.org,
+	rmk+kernel@armlinux.org.uk
+Cc: patches@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	vladimir.oltean@nxp.com,
+	netdev@vger.kernel.org,
+	xu.yang_2@nxp.com
+Subject: [PATCH 6.1.y 3/3] net: phy: fix phy_uses_state_machine()
+Date: Fri, 27 Mar 2026 09:53:16 +0800
+Message-Id: <20260327015316.1713133-1-681739313@139.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf v2 2/2] selftests/bpf: Add protocol check test for
- bpf_sk_assign_tcp_reqsk()
-To: Kuniyuki Iwashima <kuniyu@google.com>,
- Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>,
- Martin KaFai Lau <martin.lau@linux.dev>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Shuah Khan <shuah@kernel.org>, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20260326062657.88446-1-jiayuan.chen@linux.dev>
- <20260326062657.88446-3-jiayuan.chen@linux.dev>
- <CAAVpQUAKAeU8SXpKQwcQS6P6aFJ_BxmevcrK=Hs+_rf_mnaLXA@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <CAAVpQUAKAeU8SXpKQwcQS6P6aFJ_BxmevcrK=Hs+_rf_mnaLXA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [2.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_REJECT(1.00)[139.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272327-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	DMARC_NA(0.00)[139.com];
+	TAGGED_FROM(0.00)[bounces-272328-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,google.com,davemloft.net,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[25];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,nxp.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	FREEMAIL_FROM(0.00)[139.com];
+	FROM_NEQ_ENVFROM(0.00)[681739313@139.com,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: 3D4FB33E029
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[139.com:-];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	NEURAL_HAM(-0.00)[-0.991];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,nxp.com:email,armlinux.org.uk:email,139.com:email,139.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8283333E06C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 
-On 3/27/26 1:33 AM, Kuniyuki Iwashima wrote:
-[...]
->>          for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
->> @@ -145,6 +145,82 @@ void test_tcp_custom_syncookie(void)
->>
->>   destroy_skel:
->>          system("tc qdisc del dev lo clsact");
->> +       test_tcp_custom_syncookie__destroy(skel);
->> +}
->>
->> +/* Test: bpf_sk_assign_tcp_reqsk() should reject non-TCP skb.
->> + *
->> + * Send a UDP packet through TC ingress where a BPF program calls
->> + * bpf_sk_assign_tcp_reqsk() on it. The kfunc should return an error
->> + * because the skb carries UDP, not TCP.
->> + */
->> +void test_tcp_custom_syncookie_protocol_check(void)
->> +{
->> +       int tcp_server = -1, udp_server = -1, udp_client = -1;
->> +       struct test_tcp_custom_syncookie *skel;
->> +       struct sockaddr_in udp_addr;
->> +       char buf[32] = "test";
->> +       int udp_port, ret;
->> +
->> +       if (setup_netns())
->> +               return;
->> +
->> +       skel = test_tcp_custom_syncookie__open_and_load();
->> +       if (!ASSERT_OK_PTR(skel, "open_and_load"))
->> +               return;
->> +
->> +       /* Create a TCP listener so the BPF can find a LISTEN socket */
->> +       tcp_server = start_server(AF_INET, SOCK_STREAM, "127.0.0.1", 0, 0);
-> Can you add IPv6 test as well ?
-> You can reuse test_tcp_custom_syncookie_case[].
->
->
->> +       if (!ASSERT_NEQ(tcp_server, -1, "start tcp_server"))
->> +               goto destroy_skel;
->> +
->> +       /* Create a UDP server to receive the packet as synchronization */
->> +       udp_server = start_server(AF_INET, SOCK_DGRAM, "127.0.0.1", 0, 0);
-> You can specify the port to get_socket_local_port(tcp_server),
->
->
->> +       if (!ASSERT_NEQ(udp_server, -1, "start udp_server"))
->> +               goto close_tcp;
->> +
->> +       skel->bss->tcp_listener_port = ntohs(get_socket_local_port(tcp_server));
->> +       udp_port = ntohs(get_socket_local_port(udp_server));
->> +       skel->bss->udp_test_port = udp_port;
-> then the 3 lines above will be unnecessary,
->
->
->> +
->> +       ret = bpf_program__fd(skel->progs.tcp_custom_syncookie_badproto);
->> +       if (setup_tc(ret))
->> +               goto close_udp_server;
->> +
->> +       udp_client = socket(AF_INET, SOCK_DGRAM, 0);
->> +       if (!ASSERT_NEQ(udp_client, -1, "udp socket"))
->> +               goto cleanup_tc;
->> +
->> +       memset(&udp_addr, 0, sizeof(udp_addr));
->> +       udp_addr.sin_family = AF_INET;
->> +       udp_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
->> +       udp_addr.sin_port = htons(udp_port);
-> and you can reuse get_socket_local_port(tcp_server) here too.
->
->
->> +
->> [...]
->> +       iph = (struct iphdr *)(eth + 1);
->> +       if (iph + 1 > data_end)
->> +               return TC_ACT_OK;
->> +
->> +       if (iph->protocol != IPPROTO_UDP)
->> +               return TC_ACT_OK;
->> +
->> +       udp = (struct udphdr *)(iph + 1);
->> +       if (udp + 1 > data_end)
->> +               return TC_ACT_OK;
->> +
->> +       if (bpf_ntohs(udp->dest) != udp_test_port)
->> +               return TC_ACT_OK;
-> You don't need to worry about other program sending UDP
-> packets in this netns created by unshare().
->
->
->> +
->> +       udp_intercepted = true;
->> +
->> +       tuple.ipv4.saddr = iph->saddr;
->> +       tuple.ipv4.daddr = iph->daddr;
->> +       tuple.ipv4.sport = udp->source;
->> +       tuple.ipv4.dport = bpf_htons(tcp_listener_port);
-> and you can simply reuse dport here too.
->
+[ Upstream commit e0d1c55501d377163eb57feed863777ed1c973ad ]
 
-Thanks for the review. I'll update the code to address all these points.
+The blamed commit changed the conditions which phylib uses to stop
+and start the state machine in the suspend and resume paths, and
+while improving it, has caused two issues.
+
+The original code used this test:
+
+	phydev->attached_dev && phydev->adjust_link
+
+and if true, the paths would handle the PHY state machine. This test
+evaluates true for normal drivers that are using phylib directly
+while the PHY is attached to the network device, but false in all
+other cases, which include the following cases:
+
+- when the PHY has never been attached to a network device.
+- when the PHY has been detached from a network device (as phy_detach()
+   sets phydev->attached_dev to NULL, phy_disconnect() calls
+   phy_detach() and additionally sets phydev->adjust_link NULL.)
+- when phylink is using the driver (as phydev->adjust_link is NULL.)
+
+Only the third case was incorrect, and the blamed commit attempted to
+fix this by changing this test to (simplified for brevity, see
+phy_uses_state_machine()):
+
+	phydev->phy_link_change == phy_link_change ?
+		phydev->attached_dev && phydev->adjust_link : true
+
+However, this also incorrectly evaluates true in the first two cases.
+
+Fix the first case by ensuring that phy_uses_state_machine() returns
+false when phydev->phy_link_change is NULL.
+
+Fix the second case by ensuring that phydev->phy_link_change is set to
+NULL when phy_detach() is called.
+
+Reported-by: Xu Yang <xu.yang_2@nxp.com>
+Link: https://lore.kernel.org/r/20250806082931.3289134-1-xu.yang_2@nxp.com
+Fixes: fc75ea20ffb4 ("net: phy: allow MDIO bus PM ops to start/stop state machine for phylink-controlled PHY")
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Link: https://patch.msgid.link/E1uvMEz-00000003Aoe-3qWe@rmk-PC.armlinux.org.uk
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Rajani Kantha <681739313@139.com>
+---
+ drivers/net/phy/phy_device.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index fd49616c6608..9b0c88c19795 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -270,8 +270,7 @@ static bool phy_uses_state_machine(struct phy_device *phydev)
+ 	if (phydev->phy_link_change == phy_link_change)
+ 		return phydev->attached_dev && phydev->adjust_link;
+ 
+-	/* phydev->phy_link_change is implicitly phylink_phy_change() */
+-	return true;
++	return !!phydev->phy_link_change;
+ }
+ 
+ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
+@@ -1791,6 +1790,8 @@ void phy_detach(struct phy_device *phydev)
+ 		phydev->attached_dev->phydev = NULL;
+ 		phydev->attached_dev = NULL;
+ 	}
++
++	phydev->phy_link_change = NULL;
+ 	phydev->phylink = NULL;
+ 
+ 	if (phydev->mdio.dev.driver)
+-- 
+2.34.1
+
 
 
