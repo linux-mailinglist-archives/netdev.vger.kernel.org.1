@@ -1,166 +1,190 @@
-Return-Path: <netdev+bounces-272551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272552-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eMm/HMV9xmlTLAUAu9opvQ
-	(envelope-from <netdev+bounces-272551-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:53:25 +0100
+	id OG+XDPd/xmm1LAUAu9opvQ
+	(envelope-from <netdev+bounces-272552-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 14:02:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB72334497E
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:53:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBC50344AC2
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 14:02:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EDC04300FEDB
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:49:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE89D302DB72
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772433AF669;
-	Fri, 27 Mar 2026 12:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361333BA226;
+	Fri, 27 Mar 2026 12:55:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zka115Wk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YN8sghLm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54ACB39890F
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 12:49:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94C03B6340
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 12:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774615760; cv=none; b=pNUx8lepQEGZhrA+Vrv8y/VzIFGQVvwXKLY9LVUT2APphtq1FLiAzq9dZsQ+xHXNMXY20cJ/DmbBFgIJ+5p3tB1YmAG7bzCTJjkVgrah4h7ZDiX614lTd/jhBwZF3iQoq2U8tjt2P1yDq228jmiDnSdiSY2uWiap8DHw//us568=
+	t=1774616132; cv=none; b=HJ9VSRUyha7ixudc47ZjGtctdGJMaJFVlyIlG2Gp7xo5ymA7zTJ5lWhQv/wEgChmCTNi92BUJFK+iWbM4OKv1CASKM9OQHorwiLnrY0Jb2RYCSbxCvJKykMJmyK0rJ5DYfeWLIJuOmhFfikEWv8JeLhHMrKjIFFTY7QK7KFn0ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774615760; c=relaxed/simple;
-	bh=b7ElzXcXcist9AsYV8c8hZGYqPwSpchrOE5v/dVGw/M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OfyQep261NfoXZJs3EqEN54Rs2ZezOQrAQmhTp1mLwzVhOQzW4r5MMeOnXJ00SGXU8EyR8tlwZI2AjUqnAsNHoz7wD2maLjrKk6qaqMSFBeNG9NxZD/OnTqIaZN/NPeUV06HI3IiGF6zVuEJq2k6nqznlTQjmNCFcx18ypmDptI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zka115Wk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23982C19423;
-	Fri, 27 Mar 2026 12:49:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774615760;
-	bh=b7ElzXcXcist9AsYV8c8hZGYqPwSpchrOE5v/dVGw/M=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Zka115Wk8Hvqqmq44xi4NOiyHs3Or/Otg7CVznzDi6LC5iUMLKCzhe1eFxi86EXZS
-	 ze8m1Zdlok+9DXOLhVT3foFRC2aXFLf8VJWApomUZ3ucb61ZRjmJhmpiX3GZMJ21LO
-	 aUzO5cM2/4RySWnYX4xrlzAUSzsHWd+hSjEyi3XkXP+4LhXIHx3PEhF92gvEUHZeG0
-	 6EYaeV5n2xHPgsyCP7HDZJZnCnIjj9F7RfyBa1w8WW7ehDl1hMKuzfmtbIyY0haA5G
-	 3rmL78nrlNq+mqyqCccEEMBRdaEV4Gi8zcDvLyjr+4fj92ELeZi7c+wQb3dwkiuYul
-	 bwDiCNao/V9Pg==
-Message-ID: <7f00346d-5dc6-421b-8d61-75c1c3898c30@kernel.org>
-Date: Fri, 27 Mar 2026 13:49:15 +0100
+	s=arc-20240116; t=1774616132; c=relaxed/simple;
+	bh=LWqbvh3FeikukKL/Ot4NgwDYa+s99h0ef6596oxgW00=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u7vE/43aTSVvXk8PoXNLOEoVHFS9tRfVlJ0+/bYaD0MBIqiWxyU+ftv3FE2NQz/dBXUhAOI+NiOLXzKU3Q/cQkXk+quseNlHsl5n2RIwrNTua5ynLk9WUosRywuafwN5KlMUVBuLtPYCoF5bSZtiUh9soJ+jZkz3rzpGwZqBOw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YN8sghLm; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4852c9b4158so16826865e9.0
+        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 05:55:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774616129; x=1775220929; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MP30gO10RQY6yXiMpOxuMeuGTT1rodnXb+jcK+Xa1Wg=;
+        b=YN8sghLmTaOw2FvVeIPViL24BP2LmqV69Iu1JTPmXnGAX2BRw+MMm3U6aRuqsUVZDy
+         n2i2p+t+Q7pg6PcpV3XEYAsOkMsYzN4D4df/2IwdkaTowinFc9Xq2Dv6kX8bvtNdSDed
+         Yq21nD16yE/VGIjU6xFN0FUsMmxmLeN5T5uOk2u+MO5DiOVZ3+U2xWyzV5oAw2jqCkTg
+         Es4cId3ZX8EW6KunGxr5UaNph9u8WIayf6SgG0yB1RC/Ss7+/Sa8yx9hUdXJFYh/bW37
+         FpUyEHedOXP0u3PYRfLsydyeU4igik2La6KlI+QJQ/y+fsaaz87NmEma3EBjw3emtXKT
+         rMHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774616129; x=1775220929;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=MP30gO10RQY6yXiMpOxuMeuGTT1rodnXb+jcK+Xa1Wg=;
+        b=eqEaplmA3EbJByRC9nkWgqeMLfxf3TaoUGL6Mwnwy1eDgNPRdQpcafsWlVvUJElraw
+         19Q3MjnP5oP4c9cxJvx+ZKNxn9f67YsKT6HS15gWeNH4SNHHewQeOOoNHXe5bpYysM5Z
+         bEiVcYm2L3+GQXduaRhFQwO0CbTvBb8+9yyW2B3H0b/8PfQJ1rr8ADL4W84fqyhS38gr
+         BdjitUSwBDClypdcb9MeoSd6oK2wPVYcWDBT+vuin1CmVntRfatvGQ7U4dJvnX8AlsC1
+         3kv9jW6pRNJrWld8764UCuRb0cZtCFR+ebsuRGWEZCwl+N5655CFiGo6nGRgch+B0Bv7
+         q61w==
+X-Forwarded-Encrypted: i=1; AJvYcCWnS9vHNXav4jlZ7gCrq+sk57XOYP0sL+KmG3sHJvj96hcn6pWWlrrT0ZjmbZkAOt9D5H9RDnc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgtB/h8d9tdFtz4PUjFSsG2536i1mTQV1pr5Zb6qjrQzKJSf/p
+	a0rlaYlaK3rb0esPquMgCRJ4xDy6EkbIshDd4B0BAp1bgXQJSIu99pn9
+X-Gm-Gg: ATEYQzxy5a6ulCRHse4bV2XH9glORVPhYg8zOxrUbfTAanPM0mP6+lLbbp1XvUfGUye
+	zDTh+sDr/o1xOb9BVsY2pGLugOxV7haY4Fh//RGgWBVlUzmMyLd+H7sCtvuyuYu0uv7cjGwFPoV
+	a3RwzrnjDyw8NZ+z3dieL9vIfOMOn+d6Wb6YgQv4SjHK2/P2ddR1aFFNWKsR9E9f1d2QsGoRgbU
+	ujf2snj3z9xypOUKiaRcEdfRZNvjjVDOy9QY5dpNUq/Mgeo5LUIHddNDPAVkiYRBT0qQCTZ33H/
+	KbCO/C5wAqO0dtmvdGYHWUqeyJRKWjhl2UWaRFjN2rrqasYLWdWGafj6EnU5Svy7vWT1sRvaVdw
+	6XE5FzvYNGjUyfQNjpzqgFGYNtCBJhd6zjWIzoo9eTXvaIcEpTpmAU7axHbpvcIAA4Jo6VDXcqu
+	x1P7cg+uVV6M7IGKyqMSHTz9B5zEEPkagitCPqkim63+ntK5LkmjPJ1RGeDbc6RIjz
+X-Received: by 2002:a05:600c:c168:b0:485:35a4:939f with SMTP id 5b1f17b1804b1-48727eddeacmr41627195e9.28.1774616128950;
+        Fri, 27 Mar 2026 05:55:28 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48722be608bsm118640275e9.0.2026.03.27.05.55.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Mar 2026 05:55:28 -0700 (PDT)
+Date: Fri, 27 Mar 2026 12:55:27 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Petr Mladek <pmladek@suse.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal
+ <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Masami Hiramatsu <mhiramat@kernel.org>,
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Steven Rostedt <rostedt@goodmis.org>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>, Andrew Morton
+ <akpm@linux-foundation.org>
+Subject: Re: [PATCH next] netfilter: nf_conntrack_h323: Correct indentation
+ when H323_TRACE defined
+Message-ID: <20260327125527.13aaf590@pumpkin>
+In-Reply-To: <acZSPeowuYC7ivgA@pathway.suse.cz>
+References: <20260326201819.3900-1-david.laight.linux@gmail.com>
+	<acZSPeowuYC7ivgA@pathway.suse.cz>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/5] veth: add Byte Queue Limits (BQL) support
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jhs@mojatatu.com,
- jiri@resnulli.us, j.koeppeler@tu-berlin.de, kernel-team@cloudflare.com,
- Chris Arges <chris.arges@gmail.com>,
- Mike Freemon <mike.freemon@cloudflare.com>
-References: <20260324174719.1224337-1-hawk@kernel.org>
- <87h5q1d2j9.fsf@toke.dk>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <87h5q1d2j9.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272551-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,resnulli.us,tu-berlin.de,cloudflare.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-272552-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[davidlaightlinux@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,medium.com:url]
-X-Rspamd-Queue-Id: AB72334497E
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BBC50344AC2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Fri, 27 Mar 2026 10:47:41 +0100
+Petr Mladek <pmladek@suse.com> wrote:
 
-
-On 27/03/2026 10.50, Toke Høiland-Jørgensen wrote:
-> hawk@kernel.org writes:
+> On Thu 2026-03-26 20:18:19, david.laight.linux@gmail.com wrote:
+> > From: David Laight <david.laight.linux@gmail.com>
+> > 
+> > The trace lines are indented using PRINT("%*.s", xx, " ").
+> > Userspace will treat this as "%*.0s" and will output no characters
+> > when 'xx' is zero, the kernel treats it as "%*s" and will output
+> > a single ' ' - which is probably what is intended.
+> > 
+> > Change all the formats to "%*s" removing the default precision.
+> > This gives a single space indent when level is zero.
+> > 
+> > Signed-off-by: David Laight <david.laight.linux@gmail.com>
+> > ---
+> >  net/netfilter/nf_conntrack_h323_asn1.c | 38 +++++++++++++-------------
+> >  1 file changed, 19 insertions(+), 19 deletions(-)
+> > 
+> > diff --git a/net/netfilter/nf_conntrack_h323_asn1.c b/net/netfilter/nf_conntrack_h323_asn1.c
+> > index 7b1497ed97d2..287402428975 100644
+> > --- a/net/netfilter/nf_conntrack_h323_asn1.c
+> > +++ b/net/netfilter/nf_conntrack_h323_asn1.c
+> > @@ -276,7 +276,7 @@ static unsigned int get_uint(struct bitstr *bs, int b)
+> >  static int decode_nul(struct bitstr *bs, const struct field_t *f,
+> >                        char *base, int level)
+> >  {
+> > -	PRINT("%*.s%s\n", level * TAB_SIZE, " ", f->name);
+> > +	PRINT("%*s%s\n", level * TAB_SIZE, " ", f->name);
+> >  
+> >  	return H323_ERROR_NONE;
+> >  }  
 > 
->> From: Jesper Dangaard Brouer <hawk@kernel.org>
->>
->> This series adds BQL (Byte Queue Limits) to the veth driver, reducing
->> latency by dynamically limiting in-flight bytes in the ptr_ring and
->> moving buffering into the qdisc where AQM algorithms can act on it.
->>
->> Problem:
->>    veth's 256-entry ptr_ring acts as a "dark buffer" -- packets queued
->>    there are invisible to the qdisc's AQM.  Under load, the ring fills
->>    completely (DRV_XOFF backpressure), adding up to 256 packets of
->>    unmanaged latency before the qdisc even sees congestion.
->>
->> Solution:
->>    BQL (STACK_XOFF) dynamically limits in-flight bytes, stopping the
->>    queue before the ring fills.  This keeps the ring shallow and pushes
->>    excess packets into the qdisc, where sojourn-based AQM can measure
->>    and drop them.
+> The change is important for making the kernel %*.s handling POSIX
+> compliant. The dot '.' without any following number is handled
+> a zero precision by POSIX. It would print no space "" when
+> also the field width was zero, aka when level == 0.
 > 
-> So one question here: Is *Byte* queue limits really the right thing for
-> veth? As you mention above, the ptr_ring is sized in a number of
-> packets. On a physical NIC, accounting bytes makes sense because there's
-> a fixed line rate, so bytes turn directly into latency.
+> It has no efect if the field width (@level) is always > 0 because
+> vsprintf() would add the required emptry spaces ' ' anyway.
+
+That looks like C&P AI output...
+
 > 
-> But on a veth device, the stack processing is per packet, and most
-> processing takes the same amount of time regardless of the size of the
-> packet (e.g., netfilter rules that operate on the skb only).
+> Reviewed-by: Petr Mladek <pmladek@suse.com>
 > 
-> So my worry would be that when you're accounting in bytes, if there's a
-> mix of big and small packets, you'd end up with the BQL algorithm
-> scaling to a "too large" value, which would allow a lot of small packets
-> to be queued up, adding extra latency (or even overflowing the ring
-> buffer if the ratio is large enough).
+> Best Regards,
+> Petr
 > 
-> Have you run any such experiments? 
-
-Thank for bring this up.
-Yes, we have considered this (and agree).
-
-Jonas is conduction some experiments.
-I will let Jonas answer?
-
- > And have you tried just accounting> the queue in packets, so instead of:
 > 
-> +		netdev_tx_sent_queue(txq, skb->len);
-> 
-> you'd just do:
-> 
-> +		netdev_tx_sent_queue(txq, 1);
-
-I've been playing with using 1000 instead of 1, as that seems to work
-better with the DQL algorithm[1].
-
---Jesper
-
-[1] 
-https://medium.com/@tom_84912/byte-queue-limits-the-unauthorized-biography-61adc5730b83
-
 
 
