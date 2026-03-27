@@ -1,269 +1,215 @@
-Return-Path: <netdev+bounces-272330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272327-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aCS1NhLkxWkeCwUAu9opvQ
-	(envelope-from <netdev+bounces-272330-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:57:38 +0100
+	id uNNrNd3jxWkeCwUAu9opvQ
+	(envelope-from <netdev+bounces-272327-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:56:45 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5479E33E057
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:57:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D4FB33E029
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:56:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B5993309D75F
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:56:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CC036302E903
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6C5313520;
-	Fri, 27 Mar 2026 01:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 124AB2EC0A5;
+	Fri, 27 Mar 2026 01:53:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="tujcAx/B"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QyhOXBcr"
 X-Original-To: netdev@vger.kernel.org
-Received: from n169-114.mail.139.com (n169-114.mail.139.com [120.232.169.114])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9524F2E3AEA;
-	Fri, 27 Mar 2026 01:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.114
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4986527B347
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 01:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774576565; cv=none; b=d1CyawMF6zQAvk7apJBcSdzP7izo14jJkuMN792+f9flVgh+IOrS9PkI/xs4T8KhlH2RljwZEkQpnU/bqduBYLsrEbnGb4a1KPAm+ISwMMEfhRm993G2G+lgoUS1B4EGeIzmSrNMSDoHBSqeu26m2mPfF/0nn52kniEMpflYNzw=
+	t=1774576389; cv=none; b=oWRkX5pGAFHVdLkxONJ9hPD4meFSPfM2HcD2UKB7VLFCuuuAs14ko4I+0UA4Ser6a4axiy21TLOc8/QJvIdiSFpzyGwTqVOnqcTaiJ6zwl3TmWrdf0kHLfJW9r55MwQubngaYJLTk3bwU/6+ehMZJcKNG2yLD8xMXpCh8FTnQiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774576565; c=relaxed/simple;
-	bh=NFJnpicLI5cm346Kgai/jAAAFpfOESyBxq3+wZhrQWQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=A5jNyS8XsL1lsw4MxFzCGheBioxe2hDdawVYe/xjw1gST3329WnicYzkb0usHis2ftvtHr+vY17OBdGZHecJqQqADCl56pzZmd1X/kZavyXAH9MdzzWpSwLignVleqotHmjLw3yBJpD9lGgZWfdRR0DBBM4HdpZrQ3fBty5B7Lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=tujcAx/B; arc=none smtp.client-ip=120.232.169.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=139.com; s=dkim; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=tujcAx/BS3Ii9CWy1ufqr8+jv2uW+4hRFuohfkpdq/oBN/mswbESSPSMfC+FaOYzRWT3EwNXB7EKD
-	 Z/IjiNt25OF1a3eYrTcgqFWk1IR51llpQnUu2ANa8X+ApnGblj25yNe5ZVZlKcI/ujo4jx5he/xF2n
-	 TLDky607OsRero5o=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM:                                                                                        
-X-RM-SPAM-FLAG:00000000
-Received:from NTT-kernel-dev (unknown[60.247.85.88])
-	by rmsmtp-lg-appmail-40-12054 (RichMail) with SMTP id 2f1669c5e2e1df3-00e06;
-	Fri, 27 Mar 2026 09:52:38 +0800 (CST)
-X-RM-TRANSID:2f1669c5e2e1df3-00e06
-From: Rajani Kantha <681739313@139.com>
-To: gregkh@linuxfoundation.org,
-	stable@vger.kernel.org,
-	vladimir.oltean@nxp.com
-Cc: patches@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	matthias.bgg@gmail.com,
-	f.fainelli@gmail.com,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	wei.fang@nxp.com
-Subject: [PATCH 6.1.y 2/3] net: phy: allow MDIO bus PM ops to start/stop state machine for phylink-controlled PHY
-Date: Fri, 27 Mar 2026 09:52:37 +0800
-Message-Id: <20260327015237.1713008-1-681739313@139.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1774576389; c=relaxed/simple;
+	bh=216TK3RDbNFux8Vz68QqIt77sULAYGcQPaXgVmlrCv0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cMibOA5fdNGWAXweQ9eRgUNreecoYUrwIjBs0kokW/dpxExREseP8WRl0dGqAJsf9a+YrNyZEO6GlJBLR23AZJRqcbg7no1cGfjbSFUtmIe+S6xeJC2rQzB97F/X/MKZEx2SvIPbOZQdePZS48iy1UyW/Nf6qbSuDqm843Ib8Qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QyhOXBcr; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <5ce664e8-8c65-4000-b73d-06a9423edb32@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774576381;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9PFHr0GiOHoG1p9wMnx0nkJpSabI/bYbM+Srr2peKG8=;
+	b=QyhOXBcrAJUMoShO9XQYWFJiIZpU3in5ABRAK7G6XsHM7uiknVTQ8anWMzQST41KCQE7uk
+	ZtaS2KmmFBIU5RDAvoFli6nZQm6TgDdZXvs5pMX18k6DEb3gDkfefOYsuF+8zm1INXr9ho
+	oQSWY2Zz9coe/MuQIuDWt/ZbPbNjXGQ=
+Date: Fri, 27 Mar 2026 09:52:50 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [2.54 / 15.00];
+Subject: Re: [PATCH bpf v2 2/2] selftests/bpf: Add protocol check test for
+ bpf_sk_assign_tcp_reqsk()
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+ Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, Jiayuan Chen <jiayuan.chen@shopee.com>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20260326062657.88446-1-jiayuan.chen@linux.dev>
+ <20260326062657.88446-3-jiayuan.chen@linux.dev>
+ <CAAVpQUAKAeU8SXpKQwcQS6P6aFJ_BxmevcrK=Hs+_rf_mnaLXA@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <CAAVpQUAKAeU8SXpKQwcQS6P6aFJ_BxmevcrK=Hs+_rf_mnaLXA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[139.com:s=dkim];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[139.com];
-	TAGGED_FROM(0.00)[bounces-272330-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,lists.infradead.org,nxp.com];
+	TAGGED_FROM(0.00)[bounces-272327-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,shopee.com,linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,google.com,davemloft.net,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[139.com];
-	FROM_NEQ_ENVFROM(0.00)[681739313@139.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[139.com:-];
-	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[139.com:email,139.com:mid,msgid.link:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,nxp.com:email]
-X-Rspamd-Queue-Id: 5479E33E057
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: 3D4FB33E029
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-[ Upstream commit fc75ea20ffb452652f0d4033f38fe88d7cfdae35 ]
+On 3/27/26 1:33 AM, Kuniyuki Iwashima wrote:
+[...]
+>>          for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
+>> @@ -145,6 +145,82 @@ void test_tcp_custom_syncookie(void)
+>>
+>>   destroy_skel:
+>>          system("tc qdisc del dev lo clsact");
+>> +       test_tcp_custom_syncookie__destroy(skel);
+>> +}
+>>
+>> +/* Test: bpf_sk_assign_tcp_reqsk() should reject non-TCP skb.
+>> + *
+>> + * Send a UDP packet through TC ingress where a BPF program calls
+>> + * bpf_sk_assign_tcp_reqsk() on it. The kfunc should return an error
+>> + * because the skb carries UDP, not TCP.
+>> + */
+>> +void test_tcp_custom_syncookie_protocol_check(void)
+>> +{
+>> +       int tcp_server = -1, udp_server = -1, udp_client = -1;
+>> +       struct test_tcp_custom_syncookie *skel;
+>> +       struct sockaddr_in udp_addr;
+>> +       char buf[32] = "test";
+>> +       int udp_port, ret;
+>> +
+>> +       if (setup_netns())
+>> +               return;
+>> +
+>> +       skel = test_tcp_custom_syncookie__open_and_load();
+>> +       if (!ASSERT_OK_PTR(skel, "open_and_load"))
+>> +               return;
+>> +
+>> +       /* Create a TCP listener so the BPF can find a LISTEN socket */
+>> +       tcp_server = start_server(AF_INET, SOCK_STREAM, "127.0.0.1", 0, 0);
+> Can you add IPv6 test as well ?
+> You can reuse test_tcp_custom_syncookie_case[].
+>
+>
+>> +       if (!ASSERT_NEQ(tcp_server, -1, "start tcp_server"))
+>> +               goto destroy_skel;
+>> +
+>> +       /* Create a UDP server to receive the packet as synchronization */
+>> +       udp_server = start_server(AF_INET, SOCK_DGRAM, "127.0.0.1", 0, 0);
+> You can specify the port to get_socket_local_port(tcp_server),
+>
+>
+>> +       if (!ASSERT_NEQ(udp_server, -1, "start udp_server"))
+>> +               goto close_tcp;
+>> +
+>> +       skel->bss->tcp_listener_port = ntohs(get_socket_local_port(tcp_server));
+>> +       udp_port = ntohs(get_socket_local_port(udp_server));
+>> +       skel->bss->udp_test_port = udp_port;
+> then the 3 lines above will be unnecessary,
+>
+>
+>> +
+>> +       ret = bpf_program__fd(skel->progs.tcp_custom_syncookie_badproto);
+>> +       if (setup_tc(ret))
+>> +               goto close_udp_server;
+>> +
+>> +       udp_client = socket(AF_INET, SOCK_DGRAM, 0);
+>> +       if (!ASSERT_NEQ(udp_client, -1, "udp socket"))
+>> +               goto cleanup_tc;
+>> +
+>> +       memset(&udp_addr, 0, sizeof(udp_addr));
+>> +       udp_addr.sin_family = AF_INET;
+>> +       udp_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+>> +       udp_addr.sin_port = htons(udp_port);
+> and you can reuse get_socket_local_port(tcp_server) here too.
+>
+>
+>> +
+>> [...]
+>> +       iph = (struct iphdr *)(eth + 1);
+>> +       if (iph + 1 > data_end)
+>> +               return TC_ACT_OK;
+>> +
+>> +       if (iph->protocol != IPPROTO_UDP)
+>> +               return TC_ACT_OK;
+>> +
+>> +       udp = (struct udphdr *)(iph + 1);
+>> +       if (udp + 1 > data_end)
+>> +               return TC_ACT_OK;
+>> +
+>> +       if (bpf_ntohs(udp->dest) != udp_test_port)
+>> +               return TC_ACT_OK;
+> You don't need to worry about other program sending UDP
+> packets in this netns created by unshare().
+>
+>
+>> +
+>> +       udp_intercepted = true;
+>> +
+>> +       tuple.ipv4.saddr = iph->saddr;
+>> +       tuple.ipv4.daddr = iph->daddr;
+>> +       tuple.ipv4.sport = udp->source;
+>> +       tuple.ipv4.dport = bpf_htons(tcp_listener_port);
+> and you can simply reuse dport here too.
+>
 
-DSA has 2 kinds of drivers:
-
-1. Those who call dsa_switch_suspend() and dsa_switch_resume() from
-   their device PM ops: qca8k-8xxx, bcm_sf2, microchip ksz
-2. Those who don't: all others. The above methods should be optional.
-
-For type 1, dsa_switch_suspend() calls dsa_user_suspend() -> phylink_stop(),
-and dsa_switch_resume() calls dsa_user_resume() -> phylink_start().
-These seem good candidates for setting mac_managed_pm = true because
-that is essentially its definition [1], but that does not seem to be the
-biggest problem for now, and is not what this change focuses on.
-
-Talking strictly about the 2nd category of DSA drivers here (which
-do not have MAC managed PM, meaning that for their attached PHYs,
-mdio_bus_phy_suspend() and mdio_bus_phy_resume() should run in full),
-I have noticed that the following warning from mdio_bus_phy_resume() is
-triggered:
-
-	WARN_ON(phydev->state != PHY_HALTED && phydev->state != PHY_READY &&
-		phydev->state != PHY_UP);
-
-because the PHY state machine is running.
-
-It's running as a result of a previous dsa_user_open() -> ... ->
-phylink_start() -> phy_start() having been initiated by the user.
-
-The previous mdio_bus_phy_suspend() was supposed to have called
-phy_stop_machine(), but it didn't. So this is why the PHY is in state
-PHY_NOLINK by the time mdio_bus_phy_resume() runs.
-
-mdio_bus_phy_suspend() did not call phy_stop_machine() because for
-phylink, the phydev->adjust_link function pointer is NULL. This seems a
-technicality introduced by commit fddd91016d16 ("phylib: fix PAL state
-machine restart on resume"). That commit was written before phylink
-existed, and was intended to avoid crashing with consumer drivers which
-don't use the PHY state machine - phylink always does, when using a PHY.
-But phylink itself has historically not been developed with
-suspend/resume in mind, and apparently not tested too much in that
-scenario, allowing this bug to exist unnoticed for so long. Plus, prior
-to the WARN_ON(), it would have likely been invisible.
-
-This issue is not in fact restricted to type 2 DSA drivers (according to
-the above ad-hoc classification), but can be extrapolated to any MAC
-driver with phylink and MDIO-bus-managed PHY PM ops. DSA is just where
-the issue was reported. Assuming mac_managed_pm is set correctly, a
-quick search indicates the following other drivers might be affected:
-
-$ grep -Zlr PHYLINK_NETDEV drivers/ | xargs -0 grep -L mac_managed_pm
-drivers/net/ethernet/atheros/ag71xx.c
-drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-drivers/net/ethernet/microchip/lan966x/lan966x_main.c
-drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
-drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-drivers/net/ethernet/freescale/ucc_geth.c
-drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
-drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-drivers/net/ethernet/marvell/mvneta.c
-drivers/net/ethernet/marvell/prestera/prestera_main.c
-drivers/net/ethernet/mediatek/mtk_eth_soc.c
-drivers/net/ethernet/altera/altera_tse_main.c
-drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-drivers/net/ethernet/tehuti/tn40_phy.c
-drivers/net/ethernet/mscc/ocelot_net.c
-
-Make the existing conditions dependent on the PHY device having a
-phydev->phy_link_change() implementation equal to the default
-phy_link_change() provided by phylib. Otherwise, we implicitly know that
-the phydev has the phylink-provided phylink_phy_change() callback, and
-when phylink is used, the PHY state machine always needs to be stopped/
-started on the suspend/resume path. The code is structured as such that
-if phydev->phy_link_change() is absent, it is a matter of time until the
-kernel will crash - no need to further complicate the test.
-
-Thus, for the situation where the PM is not managed by the MAC, we will
-make the MDIO bus PM ops treat identically the phylink-controlled PHYs
-with the phylib-controlled PHYs where an adjust_link() callback is
-supplied. In both cases, the MDIO bus PM ops should stop and restart the
-PHY state machine.
-
-[1] https://lore.kernel.org/netdev/Z-1tiW9zjcoFkhwc@shell.armlinux.org.uk/
-
-Fixes: 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume() state")
-Reported-by: Wei Fang <wei.fang@nxp.com>
-Tested-by: Wei Fang <wei.fang@nxp.com>
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Link: https://patch.msgid.link/20250407094042.2155633-1-vladimir.oltean@nxp.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Rajani Kantha <681739313@139.com>
----
- drivers/net/phy/phy_device.c | 31 +++++++++++++++++++++++++++++--
- 1 file changed, 29 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 7d19857a6dc4..fd49616c6608 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -247,6 +247,33 @@ static void phy_link_change(struct phy_device *phydev, bool up)
- 		phydev->mii_ts->link_state(phydev->mii_ts, phydev);
- }
- 
-+/**
-+ * phy_uses_state_machine - test whether consumer driver uses PAL state machine
-+ * @phydev: the target PHY device structure
-+ *
-+ * Ultimately, this aims to indirectly determine whether the PHY is attached
-+ * to a consumer which uses the state machine by calling phy_start() and
-+ * phy_stop().
-+ *
-+ * When the PHY driver consumer uses phylib, it must have previously called
-+ * phy_connect_direct() or one of its derivatives, so that phy_prepare_link()
-+ * has set up a hook for monitoring state changes.
-+ *
-+ * When the PHY driver is used by the MAC driver consumer through phylink (the
-+ * only other provider of a phy_link_change() method), using the PHY state
-+ * machine is not optional.
-+ *
-+ * Return: true if consumer calls phy_start() and phy_stop(), false otherwise.
-+ */
-+static bool phy_uses_state_machine(struct phy_device *phydev)
-+{
-+	if (phydev->phy_link_change == phy_link_change)
-+		return phydev->attached_dev && phydev->adjust_link;
-+
-+	/* phydev->phy_link_change is implicitly phylink_phy_change() */
-+	return true;
-+}
-+
- static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
- {
- 	struct device_driver *drv = phydev->mdio.dev.driver;
-@@ -307,7 +334,7 @@ static __maybe_unused int mdio_bus_phy_suspend(struct device *dev)
- 	 * may call phy routines that try to grab the same lock, and that may
- 	 * lead to a deadlock.
- 	 */
--	if (phydev->attached_dev && phydev->adjust_link)
-+	if (phy_uses_state_machine(phydev))
- 		phy_stop_machine(phydev);
- 
- 	if (!mdio_bus_phy_may_suspend(phydev))
-@@ -361,7 +388,7 @@ static __maybe_unused int mdio_bus_phy_resume(struct device *dev)
- 		}
- 	}
- 
--	if (phydev->attached_dev && phydev->adjust_link)
-+	if (phy_uses_state_machine(phydev))
- 		phy_start_machine(phydev);
- 
- 	return 0;
--- 
-2.34.1
-
+Thanks for the review. I'll update the code to address all these points.
 
 
