@@ -1,98 +1,100 @@
-Return-Path: <netdev+bounces-272381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272382-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +Ca+GP8fxmlbGwUAu9opvQ
-	(envelope-from <netdev+bounces-272381-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 07:13:19 +0100
+	id OKdFJocmxmnQGwUAu9opvQ
+	(envelope-from <netdev+bounces-272382-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 07:41:11 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20DFA33F695
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 07:13:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 196A733FEDF
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 07:41:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A5365306B381
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 06:13:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 066B5315585B
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 06:33:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700DE344D91;
-	Fri, 27 Mar 2026 06:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46CC338B7B3;
+	Fri, 27 Mar 2026 06:33:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="lTCcQx+3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L7bGfVKf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1270534CFDA
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 06:13:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986E93A7F73
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 06:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774591995; cv=none; b=mMjhrjb68b7FzKYYatKUxHzfoOKCAJIDwosK+sX5oMngBgrw3uX8sgFKL28+NMJo6/RWp7UXImTkGSRiCxu6qqXvtdcm1m3cppGI4Q9b0e3ngkrjjLxtuz4NcBPO7zCPDNZ44uVp8CECEmFu2AZWcdxBjqCFTQZYJQyJtkgOKCY=
+	t=1774593185; cv=none; b=ObIfQweB+aZKxYTVvQ9NF+RgK9gJbXMJBb1oYTRTY5Qb6qMW561VmksCr4aladITB6lyITYlJllVbzeGU8H3SkhDo4AFDl2JsBdF/bWnErkmxT6tCSFTDZ1ZMykkoyBI3wWsGbx4lS2IijSmYio22CjnwWK5oee4ZTpfsXxCpaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774591995; c=relaxed/simple;
-	bh=7IAVFQ22luLLoScxk2r4L1McIpblN+ISn1+oY7K9Gt8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pdr18FVAYydp+4G7sxRvI4Lbu12oufLnIYjcKgyAQaYL4TY0u/gY+blx6KVikU3lzlyYyGTno5f4d/WXnYqBErmvxeAYfme0AjUpL7JzPTrDkKdvdSm4gdPwqAAU4riYdiwYMdjJIsKsEdx0MFuyxESmlLzwVFB9cVuHoiSvXYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=lTCcQx+3; arc=none smtp.client-ip=74.125.82.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-2bdd40d3c61so1563048eec.1
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 23:13:13 -0700 (PDT)
+	s=arc-20240116; t=1774593185; c=relaxed/simple;
+	bh=R+Wyx2quThKO6kdxp3NboLSs48m1AeEp3SSFm3vLIIk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=OhFcPC1ItaUQKa6JcjYMtcXCUQ/YGNRjUbXKwA8XDL2AWpZDHVbbh+0bsHtl+WBu93vIUmrLIUVNLtOmPpzn7ixvEQXLLmSGnpUkAKarI/ew7pSDf5Noquc1GpdzZi4RVMpIPk+rKKfuH/YgkNBDYmzi+MwTTk1FQn68GLwe2og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L7bGfVKf; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2aecf52fa69so1985075ad.0
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 23:32:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1774591993; x=1775196793; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1774593173; x=1775197973; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TSxNOOdfdbQoEkwoyaF+9gJkfdj1EolLZPAX5NBWU7Q=;
-        b=lTCcQx+31lGaTr0RKfyAU/H0YVcEhNuDQVtKxSr3q3sCpSurc5/dzT30LWhdBxUP6G
-         EDKmxwf/KLcKw+S1GbyhQkOO2kyTX/3pVJUImHsIFUgKFsWyLkMQrY+Rh/5BfYimXHA+
-         Sl0978FdOPfRZzoCobWzS/qhJuwDGZjT62gCBgS5Dx91PHpTeDlymYKXNd9JZkqnPrE+
-         u5SJiASjaOY262lLv0tWjY3za+eIH8g7EnYxX5RhTGMyRTQ0+xJPEDKiyVQ2FSIkd0CF
-         H0LMfW1BgStHRFvrI+7+BL8Wpm+U57A1Y4O564hx9Uh6QiGKeAMoNIo2txz021qxakO+
-         kNWw==
+        bh=NYhDafFa6ifxo2/1PziNZDy5gbmYZ4I4QcjogoZ5uUc=;
+        b=L7bGfVKf5H6+UJk+J+qFOYg/U0GF6J2FQhf6p07IRZH3sJxY/URQScJ4FV1xVHI4wN
+         Tum9VElXlV56xaVrQPhdJcuIqO5duuQYI7yYfkqIJv3QdI+cCjeVKeQoJTkLj01SYOfx
+         g6JIl8eazA/Nu2tva0QeJmMug/UatZgSth4HPmdihe3GGRFFRjKuoMcz3lsXAUGLXdQF
+         iOjYev1Srf0IbPh6/84P8luMgrDx79syDsCr0x1hvhxiD44iX5RPs7Wf1Qn4BhRazDzZ
+         Gj2N20O3KtMIK+uyDvCTFN0HRKShEA7v+BNz0p3L7j3Ha9RakGMvNKZShepMGk/aP1Mq
+         38EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774591993; x=1775196793;
+        d=1e100.net; s=20251104; t=1774593173; x=1775197973;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=TSxNOOdfdbQoEkwoyaF+9gJkfdj1EolLZPAX5NBWU7Q=;
-        b=iyWTmYtmSdqSCDSY9ANAvB2Kq2qgmnQa+HShBEcOxmppoet1s+4T2I4DNK8wnCjXjj
-         Zq2T7NQFEaA+E7p6j2vX4v2jfMUl+a8XwlmiPnYgzn6pgvEQInYnHXPaRTyfg8o6T02+
-         MKz567Oq8Cd13rNKCNVOnSXPYJ+UAoWmVv9Ejnz+lSrAQSJdjVeTSr60jIO379jz6WtV
-         /AnsuJv8JqrsvxQ+0gzf/6CJptlKNYTfRXlLKminDZD+plse+9CRbJSgdj9WjXoDzGX8
-         Jmba55OJC25+FFTUsiCGA2W0hLwa/IYdN5YC0NGZhtY58sLks4Ta0fWpZJWVvuqD4XnP
-         DmTQ==
-X-Gm-Message-State: AOJu0YyUNqcTE2sF5AKHr8MLRwz82shRUUQfh7DGd7RCf1AsSzQv1KA5
-	IjFzdoE1zTsA0FAcNX9X2o51j7KzTDbstmDQaYFpJaMNa/tvN+Ee2DhP5nNJmh6bn5ZZ6Bm1XPa
-	rNj2S0Q==
-X-Gm-Gg: ATEYQzyvrdrhKra7Png1PjQpdQlLUbdE6cHjqzG/86zmEuP0uNRojDhXTwljDzBCg46
-	51RFK5pxGKz+gFPYNUg18udAqBwhVzcTyFFh4QVf2hWaYtaGa7LNI+h6OHcegQrePImGsOVGun3
-	y5ZqMd9vHRHWsM/xOf9tx+gPqYHQp2TMPYVeW8Ue/yKm12DYZx155mFbppqXU17k0u+Zk8r1D7v
-	krwMMaZO9GPsPLEKduavMiMXvRXhGZpBj75Rhq8DFMBXPR8UHxdakTK6DHeinfvnLsda1MRCxgL
-	K2V96ZnhHcGKY9UGWr242npmJfJA5oS21uQl7Qw+a3s5pgDLIWmp3YXkpRGLm4lmRLC6tDvI5vb
-	KtzYisIjjlpWBkDw1l6P0ypKRHVxglAxJnlBHsASlxgZcMCkgXSM1VtoEIgnXv7sBz1TyH0OoAT
-	AxbMGZjbv/OsWVoQwjCSoTMi/9J8dTDMBCq4BFXBgsdjeg8RLo8Gl1kg==
-X-Received: by 2002:a05:693c:23c5:b0:2c1:7fd3:4504 with SMTP id 5a478bee46e88-2c185d537bcmr720551eec.3.1774591993007;
-        Thu, 26 Mar 2026 23:13:13 -0700 (PDT)
-Received: from p1.scai.dhcp.asu.edu (209-147-138-15.nat.asu.edu. [209.147.138.15])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c16ec26651sm4629441eec.2.2026.03.26.23.13.12
+        bh=NYhDafFa6ifxo2/1PziNZDy5gbmYZ4I4QcjogoZ5uUc=;
+        b=sbvyFyaEnBpnPgF6+cxF4EnF4etsld0/q2zi2cinWGwBJOmSedckQAZvu1CjaIBHz4
+         DsdE6TlyC7DMmBNpG7z+laUtUO91Mab0PQS0tROeizUiJKAwWyMdQjxaPXz50dbRjF4t
+         dYJLKmChUqcqMthKEUAxxu6GW7NO+tXwAhNXJn8lflgyzzo7NfHUa/pcxj1CIYNxJMrS
+         OHI23IW9412sGAgKw7/87hYKnU9zep1wWETdd9JKQgwYuYpkRHhvEu6uHR/MiI30//c0
+         xjoygf5IA7yzm2Z5ITe36jUziBUJGDoHd6nAirC1x6hJOkcFgwM8iUMc5y+FeMp5Z0vz
+         zscg==
+X-Forwarded-Encrypted: i=1; AJvYcCWqbZccNYew/sBSy3ytb91LgmrjN3AW5QVarc0kl7MmUrtDKjxLTHriV89DU8y0Dd/dae/cdRc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmCqt1sGAQsSDPU2rri07jU1LC/IDnkPgcPkXo5eHT2lboQEqs
+	sbL9LZs2AUKEbQWr08luqvN5fs9fJk1MBokQ6xCoT8AJWPh9gimIyM/F
+X-Gm-Gg: ATEYQzxfqHetrswMAihUzCVCgQQ2CBYv0lyQTnI+w8pmy7mbqmwYA40aDClY90s+BDA
+	MOzn0ocBICiPjiuxQYhL8gywRig4UMlWK+bKNGAUBeZRKF84U72BxIjIaGX5IIRLRHEZtn/QfNc
+	ubWVElgUq+9GAIP02f6k5Bta1GTPUb5I7OOJUfihT0IZxlfIenjK605t8ZpC7OoKgzz0Oqa3Lh+
+	MRwwNeG5Y1eM7CQCIWa4wg2lG05Ti4OdaooFGHSUYbPVRgEsz0uCE/ZDjz/WxrZfwQhH57p0NYr
+	I/iymll72Yp8qs+EJXEFAvdSMXHmzbEjLUZUz12I5vxo1a4rg85y9F/vVAurtSvdlKrcu09qONh
+	BZM9nPS6hSyV5rotabFPiWFw3dGLKsp82NWqawKVp1ZgO9vGq8zf4n/rulCq8neV6FVEn02mL9W
+	lFCOnjtFmdYTj+3vgWtB8OO3bcFLWcATFv
+X-Received: by 2002:a05:6a00:2da3:b0:82a:68e4:da90 with SMTP id d2e1a72fcca58-82c95ee3d68mr849669b3a.4.1774593171986;
+        Thu, 26 Mar 2026 23:32:51 -0700 (PDT)
+Received: from localhost.localdomain ([189.1.242.96])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82c7d3bedeesm4498146b3a.42.2026.03.26.23.32.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 23:13:12 -0700 (PDT)
-From: Xiang Mei <xmei5@asu.edu>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	jiri@resnulli.us,
+        Thu, 26 Mar 2026 23:32:51 -0700 (PDT)
+From: sunichi <sunyiqixm@gmail.com>
+To: i.maximets@ovn.org
+Cc: aconole@redhat.com,
 	davem@davemloft.net,
+	dev@openvswitch.org,
+	echaudro@redhat.com,
 	edumazet@google.com,
-	kuba@kernel.org,
 	horms@kernel.org,
-	shuah@kernel.org,
-	bestswngs@gmail.com,
-	Xiang Mei <xmei5@asu.edu>
-Subject: [PATCH net 3/3] selftests/tc-testing: add tests for cls_fw and cls_flow on shared blocks
-Date: Thu, 26 Mar 2026 23:13:00 -0700
-Message-ID: <20260327061300.3066844-3-xmei5@asu.edu>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260327061300.3066844-1-xmei5@asu.edu>
-References: <20260327061300.3066844-1-xmei5@asu.edu>
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	sunyiqixm@gmail.com
+Subject: Re: Re: [PATCH] net/openvswitch: fix trigger-able BUG_ON after ovs_vport_cmd_fill_info
+Date: Fri, 27 Mar 2026 14:32:27 +0800
+Message-Id: <20260327063227.2069909-1-sunyiqixm@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <3813e7fb-e234-42ec-b05c-7bcb609de3ba@ovn.org>
+References: <3813e7fb-e234-42ec-b05c-7bcb609de3ba@ovn.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,101 +105,99 @@ Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272381-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[mojatatu.com,resnulli.us,davemloft.net,google.com,kernel.org,gmail.com,asu.edu];
+	TAGGED_FROM(0.00)[bounces-272382-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,openvswitch.org,google.com,kernel.org,vger.kernel.org,gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_NEQ_ENVFROM(0.00)[sunyiqixm@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[asu.edu:+];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 20DFA33F695
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 196A733FEDF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Regression tests for the shared-block NULL derefs fixed in the previous
-two patches:
-  - fw: attach an empty fw filter to a shared block and send traffic.
-  - flow: create a flow filter on a shared block without a baseclass.
+On 3/24/26 1:01 PM, Ilya Maximets wrote:
+> On 3/23/26 8:14 AM, sunichi wrote:
+> > ovs_vport_set_upcall_portids() does not validate the length of the
+> > user-supplied OVS_VPORT_ATTR_UPCALL_PID netlink attribute. A
+> > sufficiently large portid list can overflow the reply skb allocated
+> > with NLMSG_DEFAULT_SIZE in causing ovs_vport_cmd_fill_info()
+> > to return -EMSGSIZE and triggering the unconditional BUG_ON(),
+> > which panics the kernel on most distributions.
+> > 
+> > Any local user with CAP_NET_ADMIN (or an equivalent unprivileged
+> > namespace capability where applicable) can exploit this to perform a
+> > denial-of-service against the host.
+> > 
+> > Replace BUG_ON with WARN_ON_ONCE to prevent kernel panic.
+> > 
+> > Signed-off-by: sunichi <sunyiqixm@gmail.com>
+> > ---
+> >  net/openvswitch/datapath.c | 17 ++++++++++++-----
+> >  1 file changed, 12 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
+> > index e209099218b4..50c2945081a1 100644
+> > --- a/net/openvswitch/datapath.c
+> > +++ b/net/openvswitch/datapath.c
+> > @@ -2202,7 +2202,8 @@ struct sk_buff *ovs_vport_cmd_build_info(struct vport *vport, struct net *net,
+> >  
+> >  	retval = ovs_vport_cmd_fill_info(vport, skb, net, portid, seq, 0, cmd,
+> >  					 GFP_KERNEL);
+> > -	BUG_ON(retval < 0);
+> > +	if (WARN_ON_ONCE(retval < 0))
+> > +		return ERR_PTR(-EMSGSIZE);
+> 
+> Hi, sunichi.  Thanks for the patch!  Though I don't think this is the right
+> solution.  Instead of just failing the request, we should allocate appropriate
+> amount of memory for it instead.  The fact that the array is sort of unbounded
+> today is also a problem.
+> 
+> So, what I'd suggest is, let's limit the number of upcall pids for a vport with
+> the number of CPUs as it is done for the upcall_pids array on the datapath level.
+> This will give us some reasonable upper value as there is no point for the
+> application to have more handlers than there are CPUs, and the existing userspace
+> never does that, so the limit should be safe.  Next we can create a new function
+> ovs_vport_cmd_msg_size() similar to the existing ovs_dp_cmd_msg_size() that would
+> calculate and allocate the appropriate message size, so the allocation is always
+> correct.
 
-Signed-off-by: Xiang Mei <xmei5@asu.edu>
----
- .../tc-testing/tc-tests/infra/filter.json     | 45 +++++++++++++++++++
- 1 file changed, 45 insertions(+)
+Thanks for the detailed review, Ilya!
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/filter.json b/tools/testing/selftests/tc-testing/tc-tests/infra/filter.json
-index 8d10042b489b..b749087d1691 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/infra/filter.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/infra/filter.json
-@@ -22,5 +22,50 @@
-         "teardown": [
-             "$TC qdisc del dev $DUMMY root handle 1: htb default 1"
-         ]
-+    },
-+    {
-+        "id": "b7e3",
-+        "name": "Empty fw filter on shared block - no NULL deref in fw_classify",
-+        "category": [
-+            "filter",
-+            "fw"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 ingress_block 1 clsact",
-+            "$TC filter add block 1 protocol ip prio 1 fw"
-+        ],
-+        "cmdUnderTest": "$IP addr add 10.10.10.1/24 dev $DEV1 && ping -I$DEV1 -c1 -W1 10.10.10.1 || true",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC qdisc show dev $DEV1",
-+        "matchPattern": "clsact",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 clsact"
-+        ]
-+    },
-+    {
-+        "id": "c8f4",
-+        "name": "Flow filter on shared block without baseclass - no NULL deref in flow_change",
-+        "category": [
-+            "filter",
-+            "flow"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 ingress_block 1 clsact"
-+        ],
-+        "cmdUnderTest": "$TC filter add block 1 protocol ip prio 1 handle 1 flow map key dst",
-+        "expExitCode": "2",
-+        "verifyCmd": "$TC filter show block 1",
-+        "matchPattern": "flow",
-+        "matchCount": "0",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 clsact"
-+        ]
-     }
- ]
--- 
-2.43.0
+Agreed on all points. For v2 patch submit later, would:
+1. Add ovs_vport_cmd_msg_size() to calculate the correct allocation size upfront,
+eliminating the EMSGSIZE path entirely.
+2. Fix the memory leak on the error path.
 
+> P.S.: This patch also needs a Fixes tag and should be targeted for the 'net'
+> tree, i.e. have [PATCH net] as a subject prefix.  Also, IIRC, kernel requires
+> a full name in the sign-off tag.
+> 
+> AI review also points out a memory leak in case we just return without freeing
+> and potentially leaving half- or even fully configured port while returning an
+> error to the userspace.
+> 
+> Best regards, Ilya Maximets.
+> 
+
+Respectfully, sunichi. 
 
