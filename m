@@ -1,206 +1,268 @@
-Return-Path: <netdev+bounces-272339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272340-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WHo/IC/txWlTDQUAu9opvQ
-	(envelope-from <netdev+bounces-272339-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:36:31 +0100
+	id gGdyGZXuxWlTDQUAu9opvQ
+	(envelope-from <netdev+bounces-272340-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:42:29 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28A1233E686
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:36:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F92133E73B
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:42:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B9D143156A7F
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:29:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0C1593081BE9
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:39:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48CE33EAE4;
-	Fri, 27 Mar 2026 02:28:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FEE026F2AD;
+	Fri, 27 Mar 2026 02:39:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="37PtGZEy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mcRmhyy5"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCDA33E348;
-	Fri, 27 Mar 2026 02:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774578534; cv=none; b=vDT58MyuZ7O49jSFmHrvajgg89zf6Ek4rEYB7QCLieqEybingH47L+nd+ETrstZUploFNipEyng9hNEpZw4tIVIqmBpqgkTe1DErmbDCcnzlSh+kR3jAV4gNhTb3ncU4IhLhpwSPKzScXCbFJ6vl/Ev89Pd8/LW9CZzG4SoV9T0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774578534; c=relaxed/simple;
-	bh=VVt5ij+kMWsNHI8Al9a/uXzS8989yRPQYMceuFxRziY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QpXhpu8Fdz5LT8b4B4V8x7YYc0jsditQNAZinV6lUovamRd3Qd6RnynwZo+ZPhQB3+uSy0LUQDJHhrBJERrjz1eOn7czea+rHECfyGyHYM9LKPW/+shLfbjfjjMnPW7HhP/q4jCMs7q5b4mz2xIRHOsCnyHhKgvAKCj3sf3MByg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=37PtGZEy; arc=none smtp.client-ip=113.46.200.222
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=hm6kb93pB6qdHMIw+3ybuuz5LipF2Ie1zf0Gkn+KtHA=;
-	b=37PtGZEyCG5T7IaS+GbY6hUZvQdEM2TldG3C96rbHbwPKSdxDXKGgUpKGFe1b3+3S1GLifteq
-	PLJfTqWYhOlzI9dINtiq1OnNs/1Lc5iFLa9bmPJxja97pAnRqQYtNY2pPYZBYzl2YkDc8cyYXVS
-	Prw6Nrel7PeeAKS7MHtQTJY=
-Received: from mail.maildlp.com (unknown [172.19.163.15])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4fhkv66GTqzLlT5;
-	Fri, 27 Mar 2026 10:22:42 +0800 (CST)
-Received: from kwepemj500018.china.huawei.com (unknown [7.202.194.48])
-	by mail.maildlp.com (Postfix) with ESMTPS id AD3BD40539;
-	Fri, 27 Mar 2026 10:28:48 +0800 (CST)
-Received: from [10.174.178.79] (10.174.178.79) by
- kwepemj500018.china.huawei.com (7.202.194.48) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 27 Mar 2026 10:28:47 +0800
-Message-ID: <d5312a24-68d5-49e3-9787-9a01c8606d9a@huawei.com>
-Date: Fri, 27 Mar 2026 10:28:46 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B704E24503F
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 02:39:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774579181; cv=pass; b=VX+rXUtPlDRtb2oE4qzvGq2WMPzPcIGdM6hldC5gZKZPuCaqmp5HiYP8dVyExqZX8RaRb0d7SJGGtIKVxsEK7yOcEyRJMBdO5wOlb/IHizeMuaxSYQDNfp5m7FqKb/578ro91oaEiBiVVoMwdBEJzDV7ceBf4QDujSwh4JyO4Ow=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774579181; c=relaxed/simple;
+	bh=fFnLdx80Lwgt+BNY1Dx1jqYlDMZ++tOi6mJEx2z902I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n/mB40bRip3L69ygk6WcxNS4nup/6ti+qEK/IFKCWnEj1fUhOm8Yohwf/6b7wrVtAYQjM/MUwOzU83MpHqTs9nmu53WTOfaYDlRVnszGjlA51q8s4X4qLl4bKmgNmE85xFjVlAJ9dyYlC29VV7foZEbYxKazWmMScG8tGfojUiQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mcRmhyy5; arc=pass smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-66b1019bb55so1036411a12.1
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 19:39:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774579178; cv=none;
+        d=google.com; s=arc-20240605;
+        b=cmtaLY0uYQDUT6RXBmWJfpXh72bNXR+sjVKzcgMfXC+fC3YSWLyAi7cbEbMD7yapZC
+         c6y/3NzcX4qJaE1qr2rg5jqy8GhL9gwXJYfp0rRZ4b+iciudF2iVZL3GUh1AZ4Y6Fgkl
+         c8CmvHxGpeKRh9DCWbZN5MNEhoNcuHa0RBURa8RaXuL7F/hDSVs4Z59tBopFQxVvBQlQ
+         QyjbV7w/AgMBpd+5glscfsRj+u1yJ+4wdfgRnLLC40Y369Yt5VhPxMcbJaVcEc3Y/RJD
+         eXeMhaA9X0PuzRKXSGtQH8bnF9w+jtL9RIjXxhQu8FPdTR1Fyq9DjoFUvJkKHOnMzC7N
+         DlVg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=UJ2njBuNaj0VaWfPhX2usnjUYhb68jMwXCP3GoFIvQE=;
+        fh=ZETVI6zHfe2A/6P1ovF9PRe6oZ+9Tg6vq3dq04vqpCs=;
+        b=W4XN1PveU7GU9k4z78vLg3DPS2gMLiaGK8BoTWG6nUamOl4DQ2Q3IqhuLE0bqdmDik
+         Jk9UINynCfcWn6uqkpeuea1hNKFa+PiyKKSVPbOqjrwXyf1SkHMbQV5Q3b5KuRz2fxlk
+         OPHh8bPDb+GzToxe9FlGvBQI3wn+ZJONLCcYwIzuAkEi2WmqcqZiTu3LcJ3I/g4+V5Kj
+         36m5Nzzhz80UacPr6j/cZtF1ybHsBOkcdf8WSlODgJPqAnMGXboygmp2s46CiYFJHfBM
+         WDksaDDHVZi1aG3+XH6PgmlFhj58bEwioER7garhadtCvFi8SB9MhIQYxjzqyFBby6zB
+         bwGw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774579178; x=1775183978; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=UJ2njBuNaj0VaWfPhX2usnjUYhb68jMwXCP3GoFIvQE=;
+        b=mcRmhyy5u5uJ9TUYMqHA5vykFUfV95SCoirQlMSXutXtkrVRQYV3P4eqBHmXvauwFO
+         PxhmPjFHqdKK2RKekWE0EN9gasO4gK2a6fAD6Aq/pfSjTHxrUud+Hk4wjamCccbAfxSu
+         tf2l/2eXGdq1I8KRm6MHzmK7qsiI7Zz6Ww6Ut8Fs/MGh43+rFREbaIqnhwFJ2ZFPwUyy
+         iNMmt6UYPRttIctTxCiw4mBJCq8KqDdNzRV4cl7e9wTQ4oc2HjlBQ15861wQLisnXUHu
+         lbaYe0aGFT/7qgmjNKZhoHagZDI3nKEnLsCiUvhkZBNPA8admw+KxYe8GwTQJ0+eYLor
+         2GbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774579178; x=1775183978;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UJ2njBuNaj0VaWfPhX2usnjUYhb68jMwXCP3GoFIvQE=;
+        b=frjQ+XFDe6szXtBE0K4m77B/n/7EGPh3Ygf5jNyf7SlalRSQXvr4t2sWgS1+InlF5u
+         V58nT1PSS5+o+TWKHCYctQDYjOiLSb9+/8AF5YXhrP1RA2hGpO/jQrLowUt4myD/9mgY
+         KUV7XHcJCvk3KBqx4Y36h14OREtNAt9Aa5GgQ5hq0Kb034XtGK83A489e+11T8f3xQSO
+         SimPxksOmYRwh/WNEzntJEiIZX8iSphHSI+Z3e0oSMYIlghEPfIRY0EeKFYRypENdaAx
+         fIXi1exlCml15tN/socWpHCRybm/SiOPrb4xXSDVNGUwiv2yRMr2RQ5bCciElHTCfHzq
+         McCA==
+X-Forwarded-Encrypted: i=1; AJvYcCXHn4AXEaXd4+snN+7OrRLo5naP7Eo5pZ0UFr2D8ek5KXkNlnW1Qpx5bfkaSR2XwtRQI//jiYw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBSGfLpz3Ohl8Q2x/ncWDq9XZiDuhZWC5Mc/o8vKax6fUZpT/2
+	Jp4cyofN1oNxWuwZ0K3OJoCIus9yCi9Ew2XGn6DsEoR/G/1fOzHFBmqqNrX1P3KVd3TTBPOUV3T
+	/OEoPo5N00SWvTYJQ+thC7IRSZi8brCs=
+X-Gm-Gg: ATEYQzx7pZjf9f/9RiOspD/8a7pnI57JvJqpSKBSaK1D6s1MAwOJrWaxWeIzzNdxQ9q
+	ldof0wz8i26VNyAMenxKil18hdz5GVuVpV8Xoj4IkJcCYjAKzIaD7mRDUVEXAYIvcGlxSP8R2K6
+	KB0nA7s1fqo6VUnVy3VxznbHW1EOamOM3HlPrlH96feK+7F+eyinS+58/G7lX5JDTXIr2YPGqFr
+	Ne2PDJU0wjxwH2L+1eUhJthaIi6CzSgy867evzwZpvOTNoPm4jy6iS5GtcB3BXNArkKxZ5xCQcl
+	beeA
+X-Received: by 2002:a05:6402:4618:b0:665:e9f:9021 with SMTP id
+ 4fb4d7f45d1cf-66b2855f8d5mr335186a12.9.1774579178032; Thu, 26 Mar 2026
+ 19:39:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/3] gve: skip error logging for retryable
- AdminQ commands
-To: Harshitha Ramamurthy <hramamurthy@google.com>
-CC: <joshwash@google.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <willemb@google.com>, <nktgrg@google.com>,
-	<jfraker@google.com>, <ziweixiao@google.com>, <maolson@google.com>,
-	<thostet@google.com>, <jordanrhee@google.com>, <jefrogers@google.com>,
-	<alok.a.tiwari@oracle.com>, <yyd@google.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <yuehaibing@huawei.com>,
-	<zhangchangzhong@huawei.com>, <weiyongjun1@huawei.com>
-References: <20260326224527.1044097-1-hramamurthy@google.com>
- <20260326224527.1044097-2-hramamurthy@google.com>
-From: Li Xiasong <lixiasong1@huawei.com>
-In-Reply-To: <20260326224527.1044097-2-hramamurthy@google.com>
+References: <20260323182823.5813-1-teknoraver@meta.com> <20260323182823.5813-3-teknoraver@meta.com>
+ <IA3PR11MB8986307A14724905DE2FDFF6E548A@IA3PR11MB8986.namprd11.prod.outlook.com>
+In-Reply-To: <IA3PR11MB8986307A14724905DE2FDFF6E548A@IA3PR11MB8986.namprd11.prod.outlook.com>
+From: Matteo Croce <technoboy85@gmail.com>
+Date: Fri, 27 Mar 2026 03:39:01 +0100
+X-Gm-Features: AQROBzBiAPRhsRa45Vggn9i03leNAE9sOWPbFipz0NnppklDg7IYO0SsDmOrUoA
+Message-ID: <CAFnufp16d3BtZ_A6Zp-yV80CUruTo32EPE7pqCXKYnmzpnacxQ@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next v4 2/2] e1000e: add
+ XDP_REDIRECT support
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Mohsin Bashir <mohsin.bashr@gmail.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemj500018.china.huawei.com (7.202.194.48)
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272339-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,vger.kernel.org,huawei.com];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-272340-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,vger.kernel.org,lists.osuosl.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lixiasong1@huawei.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[huawei.com:+];
+	FROM_NEQ_ENVFROM(0.00)[technoboy85@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,huawei.com:dkim,huawei.com:mid]
-X-Rspamd-Queue-Id: 28A1233E686
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0F92133E73B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+Il giorno mar 24 mar 2026 alle ore 09:48 Loktionov, Aleksandr
+<aleksandr.loktionov@intel.com> ha scritto:
+>
+>
+>
+> > -----Original Message-----
+> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > Of Matteo Croce
+> > Sent: Monday, March 23, 2026 7:28 PM
+> > To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
+> > Przemyslaw <przemyslaw.kitszel@intel.com>; Andrew Lunn
+> > <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric
+> > Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
+> > Abeni <pabeni@redhat.com>; Alexei Starovoitov <ast@kernel.org>; Daniel
+> > Borkmann <daniel@iogearbox.net>; Jesper Dangaard Brouer
+> > <hawk@kernel.org>; John Fastabend <john.fastabend@gmail.com>; Mohsin
+> > Bashir <mohsin.bashr@gmail.com>
+> > Cc: netdev@vger.kernel.org; bpf@vger.kernel.org; intel-wired-
+> > lan@lists.osuosl.org; linux-kernel@vger.kernel.org
+> > Subject: [Intel-wired-lan] [PATCH net-next v4 2/2] e1000e: add
+> > XDP_REDIRECT support
+> >
+> > Add the ability to redirect packets to other devices via XDP_REDIRECT
+> > and to receive redirected frames from other devices via ndo_xdp_xmit.
+> >
+> > New functionality:
+> > - XDP_REDIRECT case in e1000_run_xdp() using xdp_do_redirect()
+> > - e1000_xdp_xmit() as the ndo_xdp_xmit callback for receiving
+> >   redirected frames from other devices
+> > - xdp_do_flush() in e1000_finalize_xdp() for REDIR completions
+> > - xdp_features_set/clear_redirect_target() in e1000_xdp_setup()
+> > - NETDEV_XDP_ACT_REDIRECT and NETDEV_XDP_ACT_NDO_XMIT advertised
+> >
+> > Assisted-by: claude-opus-4-6
+> > Signed-off-by: Matteo Croce <teknoraver@meta.com>
+> > ---
+> >  drivers/net/ethernet/intel/e1000e/netdev.c | 85
+> > +++++++++++++++++++++-
+> >  1 file changed, 81 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c
+> > b/drivers/net/ethernet/intel/e1000e/netdev.c
+> > index d77f208f00cc..01661e1a74e5 100644
+> > --- a/drivers/net/ethernet/intel/e1000e/netdev.c
+> > +++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+> > @@ -41,6 +41,7 @@ char e1000e_driver_name[] = "e1000e";
+> >  #define E1000_XDP_PASS               0
+> >  #define E1000_XDP_CONSUMED   BIT(0)
+> >  #define E1000_XDP_TX         BIT(1)
+>
+> ...
+>
+> >
+> > +/**
+> > + * e1000_xdp_xmit - transmit XDP frames from another device
+> > + * @netdev: network interface device structure
+> > + * @n: number of frames to transmit
+> > + * @frames: array of XDP frame pointers
+> > + * @flags: XDP transmit flags
+> > + *
+> > + * This is the ndo_xdp_xmit callback, called when other devices
+> > +redirect
+> > + * frames to this device.
+> > + **/
+> > +static int e1000_xdp_xmit(struct net_device *netdev, int n,
+> > +                       struct xdp_frame **frames, u32 flags) {
+> > +     struct e1000_adapter *adapter = netdev_priv(netdev);
+> > +     struct e1000_ring *tx_ring = adapter->tx_ring;
+> > +     struct netdev_queue *nq = netdev_get_tx_queue(netdev, 0);
+> > +     int cpu = smp_processor_id();
+> > +     int nxmit = 0;
+> > +     int i;
+> > +
+> > +     if (unlikely(test_bit(__E1000_DOWN, &adapter->state)))
+> > +             return -ENETDOWN;
+> > +
+> > +     if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
+> > +             return -EINVAL;
+> > +
+> > +     if (!adapter->xdp_prog)
+> > +             return -ENXIO;
+> > +
+> > +     __netif_tx_lock(nq, cpu);
+> > +     txq_trans_cond_update(nq);
+> > +
+> > +     for (i = 0; i < n; i++) {
+> > +             int err;
+> > +
+> > +             err = e1000_xdp_xmit_ring(adapter, tx_ring, frames[i]);
+> > +             if (err != E1000_XDP_TX)
+> > +                     break;
+> On first failure, we break out of the loop. frames[i] through frames[n-1] are silently abandoned.
+> It should be no memleaks I hope, but silent packets drop is nasty!
+>
 
-On 3/27/2026 6:45 AM, Harshitha Ramamurthy wrote:
-> From: Jordan Rhee <jordanrhee@google.com>
-> 
-> AdminQ commands may return -EAGAIN under certain transient conditions.
-> These commands are intended to be retried by the driver, so logging
-> a formal error to the system log is misleading and creates
-> unnecessary noise.
-> 
-> Modify the logging logic to skip the error message when the result
-> is -EAGAIN.
-> 
-> Reviewed-by: Joshua Washington <joshwash@google.com>
-> Signed-off-by: Jordan Rhee <jordanrhee@google.com>
-> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
-> ---
->  drivers/net/ethernet/google/gve/gve_adminq.c | 26 +++++++++++++++-----
->  1 file changed, 20 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-> index 08587bf40ed4..c7834614c5f0 100644
-> --- a/drivers/net/ethernet/google/gve/gve_adminq.c
-> +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-> @@ -416,11 +416,6 @@ static bool gve_adminq_wait_for_cmd(struct gve_priv *priv, u32 prod_cnt)
->  
->  static int gve_adminq_parse_err(struct gve_priv *priv, u32 status)
->  {
-> -	if (status != GVE_ADMINQ_COMMAND_PASSED &&
-> -	    status != GVE_ADMINQ_COMMAND_UNSET) {
-> -		dev_err(&priv->pdev->dev, "AQ command failed with status %d\n", status);
-> -		priv->adminq_cmd_fail++;
-> -	}
->  	switch (status) {
->  	case GVE_ADMINQ_COMMAND_PASSED:
->  		return 0;
-> @@ -455,6 +450,16 @@ static int gve_adminq_parse_err(struct gve_priv *priv, u32 status)
->  	}
->  }
->  
-> +static bool gve_adminq_is_retryable(enum gve_adminq_opcodes opcode)
-> +{
-> +	switch (opcode) {
-> +	case GVE_ADMINQ_REPORT_NIC_TIMESTAMP:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
->  /* Flushes all AQ commands currently queued and waits for them to complete.
->   * If there are failures, it will return the first error.
->   */
-> @@ -482,9 +487,18 @@ static int gve_adminq_kick_and_wait(struct gve_priv *priv)
->  		cmd = &priv->adminq[i & priv->adminq_mask];
->  		status = be32_to_cpu(READ_ONCE(cmd->status));
->  		err = gve_adminq_parse_err(priv, status);
-> -		if (err)
-> +		if (err) {
-> +			enum gve_adminq_opcodes opcode =
-> +				be32_to_cpu(READ_ONCE(cmd->opcode));
-> +			priv->adminq_cmd_fail++;
-> +			if (!gve_adminq_is_retryable(opcode) || err != -EAGAIN)
+I wanted to be consistent with other similar drivers, this i what igb
+does in igb_main.c:
 
-In gve_adminq_kick_and_wait(), the condition is:
+for (i = 0; i < n; i++) {
+        struct xdp_frame *xdpf = frames[i];
+        int err;
 
-	if (!gve_adminq_is_retryable(opcode) || err != -EAGAIN)
-		dev_err_ratelimited(...);
+        err = igb_xmit_xdp_ring(adapter, tx_ring, xdpf);
+        if (err != IGB_XDP_TX)
+                break;
+        nxmit++;
+}
 
-Based on the commit log, the goal is to skip logging when the result is
--EAGAIN for transient conditions. However, when gve_adminq_is_retryable()
-returns false (e.g., GVE_ADMINQ_COMMAND_ERROR_ABORTED), even if err is
--EAGAIN, the condition evaluates to true and the error would still be logged.
+Regards,
+-- 
+Matteo Croce
 
-Would it be more appropriate to use && instead of || here?
-
-	if (!gve_adminq_is_retryable(opcode) && err != -EAGAIN)
-
-I may be missing something, so please let me know if I've misunderstood.
-
-> +				dev_err_ratelimited(&priv->pdev->dev,
-> +						    "AQ command %d failed with status %d\n",
-> +						    opcode, status);
-> +
->  			// Return the first error if we failed.
->  			return err;
-> +		}
->  	}
->  
->  	return 0;
-
-Best regards,
-Li Xiasong
+perl -e 'for($t=0;;$t++){print chr($t*($t>>8|$t>>13)&255)}' |aplay
 
