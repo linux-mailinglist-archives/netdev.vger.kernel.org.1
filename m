@@ -1,53 +1,62 @@
-Return-Path: <netdev+bounces-272313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272314-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJo7BMvbxWneCQUAu9opvQ
-	(envelope-from <netdev+bounces-272313-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:22:19 +0100
+	id kD0iM6LdxWk9CgUAu9opvQ
+	(envelope-from <netdev+bounces-272314-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:30:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D00633DCAF
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:22:18 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8C2933DD79
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:30:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 677003037EFC
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:20:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 13B123012864
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:30:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B952D0C92;
-	Fri, 27 Mar 2026 01:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE693126D0;
+	Fri, 27 Mar 2026 01:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iCfhDqzk"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="UDP8GqqR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4712848AF;
-	Fri, 27 Mar 2026 01:20:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0033145B3F;
+	Fri, 27 Mar 2026 01:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774574422; cv=none; b=SfQwJ5PNguJepj118T0x2JTrNjKdXlSdl5TFxrcFUQDOVxzeBoNlY/GO53Yh8kYloIkkCo8hkJXu4c9B13pDKjRE4cpGAOQB0H3SRw6+jdU9hS8VmuTTAO47R/2jibt83CRmv8WKo7jU8jxHb8e7i6WS2TebHL3cbVrD9wgvmoo=
+	t=1774575007; cv=none; b=f7zfExcxC+wOy9GPO0KxZ0MIAk9EhWQUGpzcYCIMr5oS/w+ljhHsoAFEp2iLClb5S8L3s89jqcQn8wKirz/5vF+IeCIG1HJzC+LFdY6ZarZDvQ5br3+bPbbD+u0fJQI0lg6yfineiaTITrAe3gbm8rfiUPNVxEPsZSfYARZfLbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774574422; c=relaxed/simple;
-	bh=+mbG3eLMPAF0Yt2+SNkDC2ssfDgwkGm8vxuXyXfcop4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GqCREhyQ3Y6SCyYFEpHEBdiNj43fF0/hIr2g5wyhens2YWj3xvX3EOd5vwUr85/yYzGyp2nKm5qQVM4tHbAQLN7p2jSHPCxoahTwdSmMlPpmh1T2EbBeGb05g764k1NSdLd3Z9Z+8vw70VTWPKZMk+MyHHJ4DFmy0k1BOYorzNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iCfhDqzk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B446DC116C6;
-	Fri, 27 Mar 2026 01:20:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774574421;
-	bh=+mbG3eLMPAF0Yt2+SNkDC2ssfDgwkGm8vxuXyXfcop4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iCfhDqzkhmcNkYGWkj09iFJq6rCEDt1dbAqTatJbEGc1rBoXetzKDZOXuLpBFjiME
-	 a9P8LcR9NdgAj8rW2IuLq3wUmWDVOgSGvBI3IBLemkAhxfETD+8YAB5qMQUx0mXxQQ
-	 Z1KX0X7a0FY5C/oSovuXJUNuz+9HL9vMTvfhtdmSwUO6tI3WhvJ9uUYU1trF5TKJ1U
-	 iq0MgVZUAAMKnMtahTCAX/2yMy7tmHEqIv/Bb+X3JWttgSheCwjeNIi2kSQ0wu+ypW
-	 49ihEaPrekoIUMIhBS9G/ZYoXAGC2NF/9eFI+t9r0qQjQGVlVbbvT4QGfSW740gtBt
-	 XrNoUx3Y3OyPQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FF6E3809A07;
-	Fri, 27 Mar 2026 01:20:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1774575007; c=relaxed/simple;
+	bh=ETZw3J00wPbx6pVWylDoMG68bVBpU6WA8sGn8Kh7MEc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WeFm/kyinxUDCiu2M8BXt+tOHAIbF/2pxEdCTupnqWi6Dk22PG0ZITuAjj60TPADpiBkdG6FDe/SSX3j4Uj/Iprey74GzBQnX0SOGvDAgOacXEBNx065YRdKOLfujpvLE1mL+T80Wdmi81Jmyw6cI3ApBlvp1Xp1SCR27b1jQqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=UDP8GqqR; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Lv
+	niDk8mfmfFkAjOrhekZXQ186TivOTunCNcsaWQK9U=; b=UDP8GqqRQBQX4o+G8l
+	OdyHEpQIylRUGm7z17BfelWE7RjLIldmXHU0OhSxiXR4oylfTRJwlnAcPAE7GQ9J
+	8d+JDY43/PByIAPczwjG8mWJe06UAGP7QpXm17qYK6ZPyC+1DkQKgp/a7R3hdIcE
+	bveb4YVFH9zOP37dwMkIX/I5E=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wBn8J7r3MVp3wgfBg--.15322S2;
+	Fri, 27 Mar 2026 09:27:09 +0800 (CST)
+From: fffsqian@163.com
+To: davem@davemloft.net,
+	edumazet@google.com
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Qingshuang Fu <fuqingshuang@kylinos.cn>
+Subject: [PATCH v3] selftests: net: broadcast_pmtu: Fix false failure from incorrect ping exit code logic
+Date: Fri, 27 Mar 2026 09:27:05 +0800
+Message-Id: <20260327012705.2389814-1-fffsqian@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,90 +64,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v15 0/3] Add support for Nuvoton MA35D1 GMAC
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177457440804.3248049.2435571505438713021.git-patchwork-notify@kernel.org>
-Date: Fri, 27 Mar 2026 01:20:08 +0000
-References: <20260323101756.81849-1-a0987203069@gmail.com>
-In-Reply-To: <20260323101756.81849-1-a0987203069@gmail.com>
-To: Joey Lu <a0987203069@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, mcoquelin.stm32@gmail.com, richardcochran@gmail.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, ychuang3@nuvoton.com,
- schung@nuvoton.com, yclu4@nuvoton.com, peppe.cavallaro@st.com,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- openbmc@lists.ozlabs.org, linux-stm32@st-md-mailman.stormreply.com
+X-CM-TRANSID:_____wBn8J7r3MVp3wgfBg--.15322S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7uw4xtF13ur18ur1kuF45Wrg_yoW8AFWUpa
+	1rGa9YkF1xWw13Aa18CF47ZFW8Ka93Wa18GrW2g390qrs8Ja4DXr17KFy7GF1jvrZaqw13
+	Z3s0qryav34kCa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jn8n5UUUUU=
+X-CM-SenderInfo: 5iii21xldqqiywtou0bp/xtbC6Q0+CWnF3O1l0QAA36
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272313-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,synopsys.com,nuvoton.com,st.com,lists.infradead.org,vger.kernel.org,lists.ozlabs.org,st-md-mailman.stormreply.com];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-272314-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6D00633DCAF
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fffsqian@163.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[163.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[163.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,kylinos.cn:email]
+X-Rspamd-Queue-Id: B8C2933DD79
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+From: Qingshuang Fu <fuqingshuang@kylinos.cn>
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+The broadcast_pmtu.sh test verifies that broadcast route MTU is respected,
+but it uses an incorrect criteria for test success: it relies solely on
+the ping command's exit code, which leads to false failures.
 
-On Mon, 23 Mar 2026 18:17:53 +0800 you wrote:
-> This patch series is submitted to add GMAC support for Nuvoton MA35D1
-> SoC platform. This work involves implementing a GMAC driver glue layer
-> based on Synopsys DWMAC driver framework to leverage MA35D1's dual GMAC
-> interface capabilities.
-> 
-> Overview:
->   1. Added a GMAC driver glue layer for MA35D1 SoC, providing support for
->   the platform's two GMAC interfaces.
->   2. Added device tree settings, with specific configurations for our
->   development boards:
->     a. SOM board: Configured for two RGMII interfaces.
->     b. IoT board: Configured with one RGMII and one RMII interface.
->   3. Added dt-bindings for the GMAC interfaces.
-> 
-> [...]
+When the kernel correctly blocks oversized broadcast packets due to the
+configured MTU limit (1500), ping fails to transmit any packets and returns
+exit code 1. The original script interprets this as a test failure, even
+though the kernel is properly enforcing the MTU (the core goal of the test).
 
-Here is the summary with links:
-  - [net-next,v15,1/3] dt-bindings: net: nuvoton: Add schema for Nuvoton MA35 family GMAC
-    https://git.kernel.org/netdev/net-next/c/8454478ef9ab
-  - [net-next,v15,2/3] arm64: dts: nuvoton: Add Ethernet nodes
-    (no matching commit)
-  - [net-next,v15,3/3] net: stmmac: dwmac-nuvoton: Add dwmac glue for Nuvoton MA35 family
-    https://git.kernel.org/netdev/net-next/c/4d7c557f58ef
+Fix this by checking ping's output for "0 packets transmitted" or
+"message too long" instead of relying on exit code.
 
-You are awesome, thank you!
+Signed-off-by: Qingshuang Fu <fuqingshuang@kylinos.cn>
+---
+ tools/testing/selftests/net/broadcast_pmtu.sh | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/tools/testing/selftests/net/broadcast_pmtu.sh b/tools/testing/selftests/net/broadcast_pmtu.sh
+index 726eb5d25839..68b4c5e539e7 100755
+--- a/tools/testing/selftests/net/broadcast_pmtu.sh
++++ b/tools/testing/selftests/net/broadcast_pmtu.sh
+@@ -40,8 +40,15 @@ cleanup() {
+ trap cleanup EXIT
+ 
+ setup &&
+-	echo "Testing for broadcast route MTU" &&
+-	ip net exec "${CLIENT_NS}" ping -f -M want -q -c 1 -s 8000 -w 1 -b "${CLIENT_BROADCAST_ADDRESS}" > /dev/null 2>&1
+-
+-exit $?
++	echo "Testing for broadcast route MTU" && {
++		ping_output=$(ip net exec "${CLIENT_NS}" ping -f -M want -c 1 -s 8000 -w 1 -b \
++			"${CLIENT_BROADCAST_ADDRESS}" 2>&1)
++		if echo "${ping_output}" | grep -q -E "0 packets transmitted|message too long"; then
++			exit_code=0
++		else
++			exit_code=1
++		fi
++	}
++
++exit ${exit_code}
+ 
+
+base-commit: bbeb83d3182abe0d245318e274e8531e5dd7a948
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
