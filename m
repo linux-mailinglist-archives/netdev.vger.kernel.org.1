@@ -1,224 +1,142 @@
-Return-Path: <netdev+bounces-272505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272506-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eBZQMChnxmnnJgUAu9opvQ
-	(envelope-from <netdev+bounces-272505-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:16:56 +0100
+	id kGHQFWBpxmmkJwUAu9opvQ
+	(envelope-from <netdev+bounces-272506-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:26:24 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2319934336D
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:16:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C679034369C
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:26:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2CB73303E3BB
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 11:08:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4EF35301303D
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 11:21:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A62393E5EE8;
-	Fri, 27 Mar 2026 11:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404D238550B;
+	Fri, 27 Mar 2026 11:21:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="x2LrWzb6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sVko6hsG"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FC9315D46;
-	Fri, 27 Mar 2026 11:07:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BEEC3B0AD7;
+	Fri, 27 Mar 2026 11:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774609676; cv=none; b=I3GZ9bZNbq/cr45kAzke35LzLTtKLHnCKuf+lqy+If3LRKQ5gR4ORulOPxOjzW6YX/i04TELMnM9m68KgoMXcYjKEJ5/EYeVUQ1zzEn2KuJCHS4Z9r0gucWHjTk8h4kHd4p9x3MfVl17jtpAftDBwYWdiFazJ1hmQJeagepmdlQ=
+	t=1774610461; cv=none; b=mwAYR+5AwXmiRFPe0B3uebQo2Hu8QlhI1e/+tGjEfTHHAwJl0Cp5rYbADk94THPT8KTZcKIU8UoTm4wo/PT/TPU9lJVFd9d1EU/c258Y06ifRcEcrTyyP6eIDQQmJJllsO5xzD0o6HpUCXemhQOZ/1UKgjC9VrJJaqfFlOimhCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774609676; c=relaxed/simple;
-	bh=X7+MSwRLL32PrKY1RmX3TkO6F/2E8YzLL2YkG7lfk48=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k9/L3dsjeaHAe/29Lh2JIi517Ebl2tJVPzXoPEGI7E9wujIumQeN1xFD2oSLstbcB1pbWLIIe2XsuK/TknS8DoMO0ga0vU5ZvbjbScy9tyuMTQqNj4iLIphooKwfbmmMUbXsW4ezm279zyQSUygrr6YOQl3dtkqKpKII+R/MVek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=x2LrWzb6; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1774609672; x=1806145672;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=X7+MSwRLL32PrKY1RmX3TkO6F/2E8YzLL2YkG7lfk48=;
-  b=x2LrWzb6dIWahEibaqQhgfi8NovYc8mxcPqG86SiNS8boJrA7xHUVR7V
-   dk3Kum4K8Ps1nC4B9SFhw07pRgMnVKmTWaD40/RxxPlXENBqzaeUHpgwu
-   E8x6EHbfnVO4ucU+sjJCb6tt+83vGnL8PsgwVkFc+jjFQG8671eLa4wHi
-   BHxrmYog77qfIEGXTK9W8bE/vfbnbES8mvJWIzmQmkqoFs3ydU3+YYYep
-   LBhhN0bS6q8DnkZEu0d9Xq4Wy1shOca+1No57em2ZoPEoVky4eG4fZRTm
-   zVRIHKIKixH5UiPMZEs0t8a97bqOm2qLHyfYAXvDhsxbT5T/vtsuAJBwz
-   A==;
-X-CSE-ConnectionGUID: x2neiTdjQO65w24S27r6nA==
-X-CSE-MsgGUID: DN5Z1Fr4R52TqPmX0f8tDQ==
-X-IronPort-AV: E=Sophos;i="6.23,144,1770620400"; 
-   d="scan'208";a="55302100"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Mar 2026 04:07:49 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Fri, 27 Mar 2026 04:07:24 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Fri, 27 Mar 2026 04:07:21 -0700
-Date: Fri, 27 Mar 2026 12:07:20 +0100
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Herve Codina <herve.codina@bootlin.com>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Steen Hegelund
-	<steen.hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
-	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Arnd
- Bergmann <arnd@arndb.de>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<bpf@vger.kernel.org>
-Subject: Re: [PATCH net-next 00/10] net: lan966x: add support for PCIe FDMA
-Message-ID: <20260327110720.une422vpf7pas4tg@DEN-DL-M70577>
-References: <20260320-lan966x-pci-fdma-v1-0-ef54cb9b0c4b@microchip.com>
- <20260323155204.0321db13@bootlin.com>
- <20260323172640.2669232d@bootlin.com>
- <20260323194059.jjphkep4teq5rzbc@DEN-DL-M70577.microsemi.net>
- <20260324090752.0799acb1@bootlin.com>
- <20260326154833.jp6rx5x2rlpmwrg3@DEN-DL-M70577>
- <20260327113337.0368eea3@bootlin.com>
+	s=arc-20240116; t=1774610461; c=relaxed/simple;
+	bh=CexnmDRZ7Cp+fH+8nL6oilVVi6b5Bwd+yn7ecTHIIV8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nZWxZmQkncaOioDaUfGUThJONz1KPtKGF8nM34MMseELaJQmPkgUJsoOLzDmy+mnyXIWI5jl7wZKtuuwWk8NxfS14NpH2PFwWGQbshKVpeQbA+1p17omdM8eWfuE5BNwdSnxb0dVxfUCcNVzXq/YuJYuiBqAWauGBSaPIzeVp7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sVko6hsG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92973C2BC9E;
+	Fri, 27 Mar 2026 11:20:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774610460;
+	bh=CexnmDRZ7Cp+fH+8nL6oilVVi6b5Bwd+yn7ecTHIIV8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sVko6hsGi9f9VFcN7+zZSpRJQC4NcplZGU3SYz8i5aONt/2D4q35oauA15LZP+RVf
+	 6lC5dkyY9NBnZ2+BwxSiq6nvzcxWoNUViZwpNx84PowmKbFGzdfoKEmtnGEk5g/1lX
+	 /RIxVFguMv3divtttcIlHAa7EWH4XgEBWKmin/2mIVm6TwpmJVS4tImNyVWZHIO+b/
+	 LW9s9jVEXD+3CK0KAu3tsyTFuGjxaLT3SCQ433YlkIAsANk91VnJFje26AsJEwkS9F
+	 DFBGMzP7zJHDPq4Aq+Iwu75yE5X2//PzlDYbvwPNsFL16/YVidAlwv6paKNDxlJL1m
+	 743EC93Xb7B8g==
+Date: Fri, 27 Mar 2026 11:20:56 +0000
+From: Simon Horman <horms@kernel.org>
+To: Xiang Mei <xmei5@asu.edu>
+Cc: netdev@vger.kernel.org, bridge@lists.linux.dev, razor@blackwall.org,
+	idosch@nvidia.com, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, bestswngs@gmail.com
+Subject: Re: [PATCH net] bridge: cfm: do not reschedule TX work when interval
+ is zero
+Message-ID: <20260327112056.GC567789@horms.kernel.org>
+References: <20260326031957.3299500-1-xmei5@asu.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260327113337.0368eea3@bootlin.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <20260326031957.3299500-1-xmei5@asu.edu>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,microchip.com,iogearbox.net,gmail.com,fomichev.me,arndb.de,linuxfoundation.org,vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,blackwall.org,nvidia.com,davemloft.net,google.com,redhat.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-272506-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272505-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel.machon@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 2319934336D
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: C679034369C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Hervé,
+On Wed, Mar 25, 2026 at 08:19:57PM -0700, Xiang Mei wrote:
+> ccm_tx_work_expired() uses interval_to_us() to convert the configured
+> exp_interval enum into a microsecond delay, then passes it to
+> queue_delayed_work() to schedule the next iteration. The ccm_tx_dwork
+> callback re-arms the same delayed_work struct at the end of each
+> invocation, forming a repeating timer.
+> 
+> interval_to_us() returns 0 for BR_CFM_CCM_INTERVAL_NONE and any
+> out-of-range enum value. When this 0 is passed to queue_delayed_work()
+> as the delay, the work item fires immediately and re-arms itself with
+> zero delay again, creating an infinite tight loop. Each iteration
+> allocates an skb via ccm_frame_build() and queues it for transmission.
+> The skbs pile up faster than the network stack can free them because the
+> worker never yields the CPU, rapidly exhausting all kernel memory until
+> OOM deadlock panic.
+> 
+> Since CC config and CCM TX are independent netlink commands that can be
+> issued in any order, there is no single configuration entry point where
+> rejecting interval=0 would cover all cases.
+> 
+> Fix this by checking the interval at the start of ccm_tx_work_expired()
+> and stopping transmission immediately if it is zero. Set period to 0 so
+> that br_cfm_cc_ccm_tx() correctly sees transmission as stopped and can
+> restart it later if a valid interval is configured. This also avoids
+> transmitting a CCM frame with an invalid interval value.
 
-> Hi Daniel,
-> 
-> On Thu, 26 Mar 2026 16:48:33 +0100
-> Daniel Machon <daniel.machon@microchip.com> wrote:
-> 
-> ...
-> 
-> >
-> > As I remembered, doing rmmod on the lan966x_switch followed by modprobe
-> > lan966x_switch works fine. This is because neither the switch core, nor the FDMA
-> > engine is reset, so they remain in sync.
-> >
-> > When the lan966x_pci module is removed and reloaded (what you did), the DT
-> > overlay is re-applied, which causes the reset controller
-> > (reset-microchip-sparx5) to re-probe. During probe, it performs a GCB soft reset
-> > that resets the switch core, but protects the CPU domain from the reset. The
-> > FDMA engine is part of the CPU domain, so it is not reset.
-> >
-> > This leaves the switch core in a reset state while the FDMA
-> > retains state from the previous driver instance. When the switch driver
-> > subsequently probes and activates the FDMA channels, the two are out of
-> > sync, and the FDMA immediately reports extraction errors.
-> >
-> > Theres actually an FDMA register called NRESET that resets the FDMA controller
-> > state. Calling this in the FDMA init path causes traffic to work correctly on
-> > lan966x_pci reload, but it does not get rid of the FDMA splats you posted above.
-> > They get queued up between the switch core reset, in the reset controller, and
-> > the FDMA enabling. I tried different approaches to drain or flush queues, but
-> > they wont go away entirely.
-> >
-> > The only thing that seems to work consistently is to *not* do the soft reset in
-> > the reset controller for the PCI path. The soft reset is actually the problem:
-> > it only resets the switch core while protecting the CPU domain (including FDMA),
-> > causing a desync.
-> >
-> > A simple fix could be (in reset-microchip-sparx5.c):
-> >
-> > +static bool mchp_reset_is_pci(struct device *dev)
-> > +{
-> > +     for (dev = dev->parent; dev; dev = dev->parent) {
-> > +             if (dev_is_pci(dev))
-> > +                     return true;
-> > +     }
-> > +     return false;
-> > +}
-> >
-> > -     /* Issue the reset very early, our actual reset callback is a noop. */
-> > -     err = sparx5_switch_reset(ctx);
-> > -     if (err)
-> > -             return err;
-> > +     /* Issue the reset very early, our actual reset callback is a noop.
-> > +      *
-> > +      * On the PCI path, skip the reset. The endpoint is already in
-> > +      * power-on reset state on the first probe. On subsequent probes
-> > +      * (after driver reload), resetting the switch core while the FDMA
-> > +      * retains state (CPU domain is protected from the soft reset)
-> > +      * causes the two to go out of sync, leading to FDMA extraction
-> > +      * errors.
-> > +      */
-> > +     if (!mchp_reset_is_pci(&pdev->dev)) {
-> > +             err = sparx5_switch_reset(ctx);
-> > +             if (err)
-> > +                     return err;
-> > +     }
-> >
-> > Could you test it and see if it helps the problem on your side.
-> >
-> 
-> I have tested it on my ARM and x86 system. It fixes the lan966x_pci module
-> unloading / reloading issue.
-> 
-> However an other regression is present. After a reboot, without power
-> off/on, the board is not working (tested on both my ARM and x86 systems).
-> 
-> According to your explanation, this makes sense.
-> 
-> IMHO, the problem is that we cannot make the assumption that "The endpoint
-> is already in power-on reset state on the first probe". That's not true
-> when you just call the reboot command.
-> 
-> Best regards,
-> Hervé
+Hi,
 
-Again, thanks for testing.
+I think that the principle should be that code that doesn't need
+to be in the datapath shouldn't be in the datapath.
 
-Agreed, that makes sense.
+So, with that in mind, I think it would be better to set a lower bound on
+exp_interval when the mep is:
 
-I will continue experimenting with the FDMA reset and see if I can do an FDMA
-reset on switch driver probe, while not getting any intermediate FDMA errors.
-After spring break, that is :)
+a) Created. It looks like that happens in br_cfm_mep_create
+b) Configured. It looks like that can be done by setting a policy on the
+   minimum value of IFLA_BRIDGE_CFM_CC_CONFIG_EXP_INTERVAL
 
-/Daniel
+> 
+> Fixes: a806ad8ee2aa ("bridge: cfm: Kernel space implementation of CFM. CCM frame TX added.")
+> Reported-by: Weiming Shi <bestswngs@gmail.com>
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
 
-
+...
 
