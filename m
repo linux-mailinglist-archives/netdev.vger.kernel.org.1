@@ -1,511 +1,283 @@
-Return-Path: <netdev+bounces-272618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272619-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJkyLuayxmmiNgUAu9opvQ
-	(envelope-from <netdev+bounces-272618-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 17:40:06 +0100
+	id yJBhCW6yxmmiNgUAu9opvQ
+	(envelope-from <netdev+bounces-272619-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 17:38:06 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35E1E347966
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 17:40:06 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD43F3478CD
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 17:38:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F05B13116E25
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 16:31:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 121C5302D693
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 16:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC6840F8C2;
-	Fri, 27 Mar 2026 16:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3A923EAAB;
+	Fri, 27 Mar 2026 16:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ExhTgTOt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j9lwDqVK"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012006.outbound.protection.outlook.com [40.93.195.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CF7364925;
-	Fri, 27 Mar 2026 16:24:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9731427A
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 16:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.179
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774628672; cv=fail; b=be8zhwlgQ0VDpgxJkVK/5eZC1bGL6cef8AhGqUBxVFu/9Pcq2+6ktdWTGsjzg1tsyWtC45e4fv+L1Pv/6hJmZJZSroPObsDJ/8KMsQNQ9C4uJU8xYECtXV7WrBuxFBGFCd9vMCC77XQZSQ8jqbNhEHb9Znr4N1EOdWYIYjbv1Ok=
+	t=1774629482; cv=pass; b=nffPKvWmGTD+nprmspaAeRjpWo5HH67X1xHuioK9vac65Y+utvQt56xgrFZ0BqXRZAG+RztfoqvCZMBZM26u0hkCP0pk1R9CM6lnOC9twTMwI4yCDmdnuX4uvNwr5L3OeOh1H0NyPzeDGlIBiocxDBQ7/cB6jScOhEMYgJpYmEM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774628672; c=relaxed/simple;
-	bh=2WYU67tBez3mgvaKxhTG1Kec+sv5rcPkPpPng4/a7FQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=PEBI5Gdmh8xR4qRLnMzkVqmQQtu/RO7Uyw7HDfrco/EtebvHMKJkA/6rQdYCuLMBhy7pEtF2wR3KOEiZmFJobswLb/3L+VE0xHYnxava1ioe/cuA5Cr/uxQVHiNd4BBfvW/Eo6Ul0vyk18xr73DRX3RKC1D6pRDJDoxnh/ZswjE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ExhTgTOt; arc=fail smtp.client-ip=40.93.195.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AvmvBwmhctaNdqubcca+WLEVHC5XiObvJBbu5CEhq3txTBzMyjFJPgXXb1JgaTMFHjbXA10ciehmtD3hA//CWPJVE/sMyW+WtAyibu1xpIvGfxl6NrpfYXaRY5zyCOQ6UzAZE5/GeBbSKHb0tSUNf41T0XBa7BkLnmQgiEyUkWrDtP3Ud5maPl4Zf306BTgPhTWbBx52SEM4FYjk9+pq59OMy4iDPBQEH8WD8hPAW/1atRl9r9yPgo+jR1bOx4nNmZ06tNTLF42zNQ9mESt84pifhrM82rz/52qSZIErecYEFhuC5E0Y/2+10a5H0C/yfj8uBVok4z7i6ZbzaZBOUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wgbGnEfC8jeBxr5RQo/B6GlpONGcN27rW852PaiVwaU=;
- b=FK65kZW8Y81AJciHKVchHl4nyZYLx4veqmeYgf77rjhFJfiHo/OWTWc8nUVUcNq/Q8FWPalnAYgJ/4PZtGm2tpvh/XwqbCy5Og40hCmRTJKyPanuRarkf/e3Syp77PTwnooX8eVk5200vQJAJZrxYHZTgawnyJKeBcpCWP4rRMSJgBkdkFN+xFT5bB2uk5hDQitm59V0zmS456V5HJ0TVuFBlH33QMCSzhaC3/21aBkGhhWkD10BpxxfLLnfVLxYaLKutR2xe3MGiZlfjQfuEv6XszhIUBDUcV3axw58XmG6hjUufNHzz7QJNSwMp0cGi4I3QhnOB9pyZppvfERX3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wgbGnEfC8jeBxr5RQo/B6GlpONGcN27rW852PaiVwaU=;
- b=ExhTgTOtzbVWAYP7q/IQHSC1ZcelrJYS4VLaf3evMj3L7AFM60UPkEXHCPO7tzd543KxhlqJX7S+L8RYTgUMq8YAOHsa8lCMfJalvWqHXXNHMC7RzldEdZ63uHfgebIOyiB/E9NH37GHnMG+qPD7aqZkTD9M0iMM5S9XuIVpmfqlzbiK53BezCy3mTcBgSejVS3uk4lJkLw2sO//iZb2qhoxgrEHM/+qxkQAeEVJRZFUSfQEWHqC+3g7Y/pglfKfKHS3L4i1WBp95vxkE99jyz1+SxX+lSX9ZxEmYvHs5jYc6VfjYJHp05iTbEUhrYciy7aVQRMIA0e4m/fJnv4IjA==
-Received: from CY5PR11MB6462.namprd11.prod.outlook.com (2603:10b6:930:32::10)
- by DM4PR11MB6262.namprd11.prod.outlook.com (2603:10b6:8:a7::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.8; Fri, 27 Mar
- 2026 16:24:26 +0000
-Received: from CY5PR11MB6462.namprd11.prod.outlook.com
- ([fe80::10d1:11dd:5088:7559]) by CY5PR11MB6462.namprd11.prod.outlook.com
- ([fe80::10d1:11dd:5088:7559%5]) with mapi id 15.20.9769.004; Fri, 27 Mar 2026
- 16:24:26 +0000
-From: <Prathosh.Satish@microchip.com>
-To: <ivecera@redhat.com>, <netdev@vger.kernel.org>
-CC: <arkadiusz.kubalewski@intel.com>, <jiri@resnulli.us>,
-	<mschmidt@redhat.com>, <poros@redhat.com>, <horms@kernel.org>,
-	<vadim.fedorenko@linux.dev>, <linux-kernel@vger.kernel.org>,
-	<conor+dt@kernel.org>, <krzk+dt@kernel.org>, <robh@kernel.org>,
-	<devicetree@vger.kernel.org>, <pvaanane@redhat.com>
-Subject: RE: [PATCH net-next 5/5] dpll: zl3073x: add ref-sync pair support
-Thread-Topic: [PATCH net-next 5/5] dpll: zl3073x: add ref-sync pair support
-Thread-Index: AQHct8it2yiZboqfgE6YpfihCIpUhLXCnKHA
-Date: Fri, 27 Mar 2026 16:24:26 +0000
-Message-ID:
- <CY5PR11MB6462E28870C343F05E53B34DEC57A@CY5PR11MB6462.namprd11.prod.outlook.com>
-References: <20260319174826.7623-1-ivecera@redhat.com>
- <20260319174826.7623-6-ivecera@redhat.com>
-In-Reply-To: <20260319174826.7623-6-ivecera@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY5PR11MB6462:EE_|DM4PR11MB6262:EE_
-x-ms-office365-filtering-correlation-id: 5371d3e4-6da3-4f6e-9b71-08de8c1d50a5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700021|56012099003|22082099003|18002099003;
-x-microsoft-antispam-message-info:
- a4YTQEVED9gIB2bRkkXDHpRU2BAMvElzJiELQx9oSmL9XH0MCMtjyZMzhvO8x/7THEGS3uovsXbfa8waUdob9YVEfLd9qlhF6ISgjiPW88iIMU43T2o05rIsy0GfTum+YRdSkww7QypKmbi/AABDrYc0f2i9i/PjvAyal8oOqJ/uMYmurP13DMwjMIdQOMYsjQt6D+lmP6B9NX98m0F27AfnQz9J64GpgceteEHRnmlVi0KKF8spWmktcsUCo8beWMR/aXIQCRGkxQgerWMXVuh+5Tzk/nT4n7nIrdJ5PvwGt2iV90TaatzOkAxmlpaRCfsbm9j5Dtmc1oyvyvyRLl5XaM+rM9sxyZ0Z4iH5of6VqPklomo4HZiaYpf3dQ5q59ITe4T0NWYU5hUMpZv3I3qeh0RiwDPTLig8z4OVUUg6tzt2QMkg41zB+ndHnLZnZwsJnmx8ZtTDZvHowB9bJak4jfcGN2MHgX1nk0gdRL2EmJ++3pUgTJEFNsyCqLWaz+q/l9jRHBo9Qed5UGCGG8PXnemVEbjzpE4fRtxr6E/MZww2OJ7r7WPIuULKl9bKu+jYa3NJg38wizx/KIggveqr7CuSLiK8hXz63lJu0n/dgY6uDCE20duosVG2u9fDyvpvQz3vBN0Pbu5MDwB0BnbP/0P60+jOUW3ReIr24/MKpzpokqWSFIYcR3/Mu0wCGbDW/T876Ga4UwvAfkrkY67QsHiji9PV1zml5N86MAs8gx5ePyqVxw1O2gY1fklzw06RhvhaBotOD/0dNfrTrSNCfCK+sge9Ub13OWCNn2Q=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6462.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700021)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?dTIfB3w42G+BYbnggU3ZrRiCZY0ZrnpXaBTwUiL+MKZrJ8qRRlEEOPNsZiOJ?=
- =?us-ascii?Q?uOLbTnhxsu8SKn4bQVMgRGnonth7gh2MDUj7eiFV/Ouxmtk0QazwrlxQNnNr?=
- =?us-ascii?Q?KrSvD/UbY4uacl8TFRYg7sn/FfkdpUtPoJHdnFzU3NmRp7m91OOtkjJj5I24?=
- =?us-ascii?Q?0Lcb0eF39rQACc8uZNn5elQIeudlPGgX8Eap3jAWLd/kAOPhhio/lJp8fzyl?=
- =?us-ascii?Q?MadQkNamPTNUhE7By8tdd115zvloB0cfatBQmrTnyhke76xajbYOdiR62PW7?=
- =?us-ascii?Q?JsBQhezynT8uIjGyz05A6goYl2UjrRfQmaJx3UOd/UzztH6o8gVDjyN8pr8b?=
- =?us-ascii?Q?uaqzG8GNPdwQprGLNTJY+vHjinQ4Ty9+HqCD1sRjiSh9Kmw8hg6qIaLAwZ+7?=
- =?us-ascii?Q?PU+DFFBjRaQGkQYtIXis5gHBBsrhwWNwiG5XpW3H0fstKAEbGPFLKJbGg+qg?=
- =?us-ascii?Q?8cahSaxlwsjTlfxOHMTkpHl08pF7mcn1F6UxtCeqF0OX1L6E7Vot0ZXRh2sQ?=
- =?us-ascii?Q?SN5xP1F/eDR0Wl01JU7k0yvROdvYeYatB+VqGapmnBKpOPGWIL7DpEcSVY+L?=
- =?us-ascii?Q?q1k6NV7WUUvgkKWRIY5YDrUUB42lasQo3ZRAMB+7fiAhTL5cr1xeYAVBzxmU?=
- =?us-ascii?Q?m0032XKMXm/A85VanALcAat70hneh8IcZLQGgrHIoGFOoMn5HvXX1ZiTMsFv?=
- =?us-ascii?Q?TTStlqD5tzwbn94pABrOJISJ3fQUs9MR2wsWuDs/1aPvSMB6FGsA254FpIY0?=
- =?us-ascii?Q?18UBkgJMpvThFOG1OmrqKIPaUsx/Bex1Vk4SxDxKA/muOixbsT+Bea/XykEW?=
- =?us-ascii?Q?ONk1uvhrvfCC5fhIghY0ULG0/O/UYJxEI/r89OGr/caQ1tkkZ/G/ylfkGQbc?=
- =?us-ascii?Q?Pvb0CZfYKGvxlITJk/7vUK3LiUJ91h8S1Roy6FmPG7dvvHOoqQimTAIO5hyr?=
- =?us-ascii?Q?rir9ejpqRHTiiHqwZUux9Pc3u4IA/OFI0YsRq00bd0sOXkoDKAvduhyLjiwJ?=
- =?us-ascii?Q?naELPdG/sPQOBS7OrcwCjwvkw3QaVnpxPDndhnrJ2Ty7DQIg43ZNVWhb8Z8O?=
- =?us-ascii?Q?uZ0x3pKurG3GLZXBs+NjSnw45/SO7+Y4sxlw3Hm9sSkcK2tiYw/JEE+EaFCr?=
- =?us-ascii?Q?ndRZN4p771GNxl3aIEXey36ZVq07OWvJ1f9tM+2LqIrJ0GvWQlVnZQTatRsT?=
- =?us-ascii?Q?2XwaF/g2RhRjE4E7iswVM9lAhN1HwZRsmF+VGDt3K4cltG0nfvGYMn+oiJs3?=
- =?us-ascii?Q?FAF/F4OjtP1sUYOinqkAsTLfnLs+oaI/Od+EcoiJrVoyQHXOPeB+jEBaiyHI?=
- =?us-ascii?Q?tKtDeFoGwBJAOYi8zV8X/PUowH6Z2rJTXYhXuSABk3kYftgTt8DQfP5MXX3p?=
- =?us-ascii?Q?fmAYpm7XRJfFuiAKaOQwIVI39v66Lap0uyObMKI3SnXVoTSrAb6tgq7J4Upn?=
- =?us-ascii?Q?2wPvCK6lG7EZDgru7D6wfmwiFUEb0ULXQKw2oR4qkrGveKSqa0JIFtvHOJdr?=
- =?us-ascii?Q?snmJX1kVofhDtoqaz5dIkQG6Ru9g/mw2YVjN+sR2tv8npJCHCiZQaB5gm9LZ?=
- =?us-ascii?Q?q5VYbvY013GEK2GyaVY0gybbL8BXEe8jkqHdgcmTyNu2O+DKL6vAH+C2ckT3?=
- =?us-ascii?Q?d/fIFRdzHrcuAOf+lj8rZe227qxLuRq+qwg164YUriX9rahdRJT0ROUF0SyK?=
- =?us-ascii?Q?kS3HuwaVZmofQVZxg33Oh1u5aZ0RXc0vnmfRN9TdMRQspiba2gJOrwrXpXfu?=
- =?us-ascii?Q?4ju8qN3mTquzaKQ7yGMjYCmvbDSFTCg=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1774629482; c=relaxed/simple;
+	bh=GokTuLMhIobPSbdQrXwZZwX5RKLJyz3ofmzV1l1ir38=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KgDwQx6tHheh72va2s/rPlpbWnpZB0lqx6qponYZoghKbbufcbzJChE6LQm4av0r4wKcQnyEQ7Q08xIvLgGv/ZBvn9mQaRBgv9bOPjtN9ac0RiSGYgx8M9jl8qSBXh/HT3GR5YUhZrGh+cpNIJnLz73D6yhvkDb4jtR+Ya9o7eY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j9lwDqVK; arc=pass smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-5091ed02c54so530671cf.1
+        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 09:38:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774629480; cv=none;
+        d=google.com; s=arc-20240605;
+        b=CM6hbsu2LmVcY/+ch0lk9TpUagZ7yBgsvFBhAwcghflT7xuMFmyij9kG8x4eG81SWd
+         jEMNUqpkBGXpm/7JyYOzXqZo7asR2OMT2Jb6jT3aC4/w30xH2rpTWlwYNFzkSEJSpwx6
+         INcfmBqMIPWTf0I88XL7+QETf8MSdVfcWZJ7cFRb8KOZyxt1AGmSrZ0JQd2GSJBOu0oX
+         0DS+OthFsw9UewC0PfuIigc4raPffFBFu/cTJ4FU2OsRfcO+KY1F6+aOdOqoj/TNgcaF
+         TGu2saYi5TrGHQPB6czcyXF6Itu1yTTOM58N+C8/YnGEcAELS21g331/fQ4uyI1H4gyB
+         M8aA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ogtTF1xlzyX8b2OV+MkXixyOfngUXZUbZmozqazuWJU=;
+        fh=3Zucjh3cXLxuxNuYJN0oOLoO7wGTNiq9E5Scr9qGMzg=;
+        b=V4wiCPEbpt9xYYC+HAjJUF6qjaGB5zohgGQs8PSnpvnaPsbik/RaRG3JJCL99iphtF
+         YqHt0bRmyxBuGCRvYGbne6JRj2kuOnfg7asACsgMsOt4zLaMII5AOfGIpqFzfP1hUKOz
+         V4nSFnY7oyjxsdQvXyXXj8vmKAisCQd5iLx6LcCivIk00M5j4TeEdzfk1Fa363nw3A9j
+         CEe6h3HZGFxQSWXtm+GDgZG4uhGZm3G6jgEI+KQT8dUfw4GaaHOroHMltEBfIog6WtmL
+         XMgyG+QrlsldfEYZWRwuJ5QNNgr3D0EE6ooVvztot2/jc5z2++tQb2TpE7GVBAv3JkW4
+         gV7A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774629480; x=1775234280; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ogtTF1xlzyX8b2OV+MkXixyOfngUXZUbZmozqazuWJU=;
+        b=j9lwDqVK4veyYYmQ25FFu6c0xBMOGjtMiaetonVZahk/Le15CDd56vloNuSBZ+jijf
+         HvqfiSDvVKA/7warPzsnupCSNAFFMzbUoDozGnaRj8xr5vOPfgYBEFamQa2E9Lah1fNZ
+         Q9ggnRcbrrcEcEF4QuZG66uEr03m66qCR8USgyipeNo0yUncNX60G9d7peFw7bIaiMQF
+         71mU01LB4eDiKjVdT8wnYfsJRAsnWqSCwuT4oS5l0SPzIyzJJKnpPaQDdk8YJCHyWNw5
+         p0excsVRY6YqQTKxBwrsMHpslWGvE2qTrOI1ftfO9+CgUcNkz2GA6LLpcNN7p9NorTTN
+         hcZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774629480; x=1775234280;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ogtTF1xlzyX8b2OV+MkXixyOfngUXZUbZmozqazuWJU=;
+        b=ZQ/8jn2aG/jePOBCGjzd3u6KSmpPo0Mcu7Kxby0hEql4yYfg4vmmRxKt77aJlNLBtb
+         zbgAK8JRmvbTxf+8WpPKAfHscBiSqDpYQ1ZdHJMDm0kEH9zLvbgP1dFqBglc4Tz2fiBI
+         393oe3GPS5prhRxt+W60kelHs44C0AEfHhy9G4IVjzX7f7/4LefkXE9mctmbL5wk+4oE
+         0HUZLXujEfGTfEdizyuZ6N3o6lykKpEfSXDs+ec1AyKfDOxKVDdHzWvfZtV+M4G8idPn
+         RXw0waw/DnRTXRJLFHTyYSThQ/CnQVT2hAvq7+yRAXoclewPewyD1OLfQayaFz/3E3AY
+         YrqQ==
+X-Gm-Message-State: AOJu0YzJ7PCDWNMq+/i7ubGVIXlLvroNRwnmiWqliMX72fTmd0jwMFL+
+	mlAq4ty4C5qkJ4xU+BEaeXIfai1jCnPleZJsmGO5BhibtkLFrvE654v45cb+LVNfjUpZgp5i1mF
+	Fwt4dJ87oPjPtBraLc8QE1+9xnQXPAI0H8wc9tzyFv4x9ubYnhFR1IaC5
+X-Gm-Gg: ATEYQzwjkh5ml8thV/18wslK7CVbwIVv5yyTlLU2vedOpOuIJpjYdiW8ot5o3HRcwpu
+	VzyVCOV7X4JlhhAQRWWKR+n1IElMxm+vi8uAH3rG82KempNgQx5Jz6sdRa0MtoLkEhOjEdgizn0
+	eQx2db6XKwDsPnzcA6ORQ9Mil4sjY4pdYsLS5qJlBDtU6z1RYBHVnXdyKAxSdhVic01gQ+lhR84
+	8xz3Z2U6vW05cL7LLydXhCcBgY8nit1+Tv+JVl5SKW1wW1EvNdmGMQADR97h9qdhwecWCdd3opA
+	HfItaMZDecMijyQBnYgRJKsKUNaNx+W+LLQB13Q7/w==
+X-Received: by 2002:a05:622a:59cb:b0:509:1cf9:ea11 with SMTP id
+ d75a77b69052e-50ba3252239mr5056631cf.7.1774629479028; Fri, 27 Mar 2026
+ 09:37:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6462.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5371d3e4-6da3-4f6e-9b71-08de8c1d50a5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Mar 2026 16:24:26.7939
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ODMMcWVl5LGBoE5iygmPfomn0UDrbol/Ctc5fLS7WLH5ZvV/Ad6n4m8tIQuyRkzE9TRyAhZrL5dLMnb5WCblf3wpVKuuBleyvHWkRRAh5FM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6262
-X-Spamd-Result: default: False [1.34 / 15.00];
+References: <20260325134439.3048615-1-louis.scalbert@6wind.com>
+ <20260325134439.3048615-2-louis.scalbert@6wind.com> <CAJ5u_OcpOGSPYK-EzYeW8LdpJrLd16fGn6zN6cvk+tCjCi+QxA@mail.gmail.com>
+In-Reply-To: <CAJ5u_OcpOGSPYK-EzYeW8LdpJrLd16fGn6zN6cvk+tCjCi+QxA@mail.gmail.com>
+From: =?UTF-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS14KS+4KSwKQ==?= <maheshb@google.com>
+Date: Fri, 27 Mar 2026 09:37:32 -0700
+X-Gm-Features: AQROBzC5RoyR-MA-WNLGukD5D6GDubUPMrtmdWnIACu8StwWeIcp-tNmkeySk-0
+Message-ID: <CAF2d9ji+aoMdA3ydstkPVb-pnCz56woJF6F2reftd4nPOEvBEA@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/3] bonding: 3ad: fix carrier when no valid slaves
+To: Louis Scalbert <louis.scalbert@6wind.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, jv@jvosburgh.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, fbl@redhat.com, 
+	andy@greyhouse.net, shemminger@vyatta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [0.13 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_MIXED_CHARSET(0.79)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272618-lists,netdev=lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[Prathosh.Satish@microchip.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-272619-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[microchip.com:+];
+	DKIM_TRACE(0.00)[google.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TO_DN_NONE(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maheshb@google.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,resnulli.us:email,microchip.com:dkim,microchip.com:email,linux.dev:email,CY5PR11MB6462.namprd11.prod.outlook.com:mid]
-X-Rspamd-Queue-Id: 35E1E347966
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[6wind.com:email,mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BD43F3478CD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Reviewed-by: prathosh.satish@microchip.com
+On Fri, Mar 27, 2026 at 9:22=E2=80=AFAM Louis Scalbert <louis.scalbert@6win=
+d.com> wrote:
+>
+> Hi everyone,
+>
+> Le mer. 25 mars 2026 =C3=A0 14:44, Louis Scalbert
+> <louis.scalbert@6wind.com> a =C3=A9crit :
+> >
+> > When an 802.3ad (LACP) bonding interface has no slaves in the
+> > collecting/distributing state, the bonding master may still report
+> > carrier as up. In this situation, no slave is actually able to transmit
+> > or receive traffic.
+> >
+> I=E2=80=99ve just realized that the issue description is not entirely acc=
+urate.
+>
+> Bonding links that are not in LACP Collecting/Distributing state are
+> excluded from traffic
+> distribution in favor of those that are. However, if no links are in
+> Collecting/Distributing state,
+> the kernel considers all links as valid for distributing traffic.
+>
+> > As a result, upper-layer daemons consider the interface operational
+> > while traffic is effectively blackholed.
+>
+> There are situations where traffic is not blackholed.
+>
+> For example, a Linux machine A is connected to machine B using two
+> aggregated links.
+> On A, LACP is configured, but not on B. As a result, LACP will not
+> reach the Collecting/Distributing
+> state since B does not send LACP frames. However, the bonding
+> interface will still be up on both
+> sides, and traffic can be exchanged.
+>
+> This behavior is, of course, not compliant with the LACP (802.3ad)
+> standard, but applying this fix
+> as-is could introduce regressions in some setups. Under normal
+> conditions, having no Collecting /
+> Distributing links means that no interfaces are operational for
+> handling traffic - that is precisely the
+> purpose of using LACP.
+>
+The legacy behavior is to "maintain connectivity" by selecting a
+functioning aggregator, as long as there are no link events. It's
+crucial to maintain this legacy behavior.
 
------Original Message-----
-From: Ivan Vecera <ivecera@redhat.com>=20
-Sent: Thursday, March 19, 2026 5:48 PM
-To: netdev@vger.kernel.org
-Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>; Jiri Pirko <jiri=
-@resnulli.us>; Michal Schmidt <mschmidt@redhat.com>; Petr Oros <poros@redha=
-t.com>; Prathosh Satish - M66066 <Prathosh.Satish@microchip.com>; Simon Hor=
-man <horms@kernel.org>; Vadim Fedorenko <vadim.fedorenko@linux.dev>; linux-=
-kernel@vger.kernel.org; Conor Dooley <conor+dt@kernel.org>; Krzysztof Kozlo=
-wski <krzk+dt@kernel.org>; Rob Herring <robh@kernel.org>; devicetree@vger.k=
-ernel.org; Pasi Vaananen <pvaanane@redhat.com>
-Subject: [PATCH net-next 5/5] dpll: zl3073x: add ref-sync pair support
+> I will publish a new version with a knob to enforce compliance with
+> the LACP standard. It will be
+> disabled by default for backward compatibility.
+>
+> What do you think of "lacp_strict" or "lacp_enforce" ?
+>
+I don't have any specific preference for the name, but the default
+value must comply with the legacy behavior.
 
-EXTERNAL EMAIL: Do not click links or open attachments unless you know the =
-content is safe
-
-Add support for ref-sync pair registration using the 'ref-sync-sources'
-phandle property from device tree. A ref-sync pair consists of a clock refe=
-rence and a low-frequency sync signal where the DPLL locks to the clock ref=
-erence but phase-aligns to the sync reference.
-
-The implementation:
-- Stores fwnode handle in zl3073x_dpll_pin during pin registration
-- Adds ref_sync_get/set callbacks to read and write the sync control
-  mode and pair registers
-- Validates ref-sync frequency constraints: sync signal must be 8 kHz
-  or less, clock reference must be 1 kHz or more and higher than sync
-- Excludes sync source from automatic reference selection by setting
-  its priority to NONE on connect; on disconnect the priority is left
-  as NONE and the user must explicitly make the pin selectable again
-- Iterates ref-sync-sources phandles to register declared pairings
-  via dpll_pin_ref_sync_pair_add()
-
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/dpll/zl3073x/dpll.c | 207 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 206 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c inde=
-x 276f0a92db0b1..8010e2635f641 100644
---- a/drivers/dpll/zl3073x/dpll.c
-+++ b/drivers/dpll/zl3073x/dpll.c
-@@ -13,6 +13,7 @@
- #include <linux/module.h>
- #include <linux/netlink.h>
- #include <linux/platform_device.h>
-+#include <linux/property.h>
- #include <linux/slab.h>
- #include <linux/sprintf.h>
-
-@@ -30,6 +31,7 @@
-  * @dpll: DPLL the pin is registered to
-  * @dpll_pin: pointer to registered dpll_pin
-  * @tracker: tracking object for the acquired reference
-+ * @fwnode: firmware node handle
-  * @label: package label
-  * @dir: pin direction
-  * @id: pin id
-@@ -45,6 +47,7 @@ struct zl3073x_dpll_pin {
-        struct zl3073x_dpll     *dpll;
-        struct dpll_pin         *dpll_pin;
-        dpll_tracker            tracker;
-+       struct fwnode_handle    *fwnode;
-        char                    label[8];
-        enum dpll_pin_direction dir;
-        u8                      id;
-@@ -184,6 +187,109 @@ zl3073x_dpll_input_pin_esync_set(const struct dpll_pi=
-n *dpll_pin,
-        return zl3073x_ref_state_set(zldev, ref_id, &ref);  }
-
-+static int
-+zl3073x_dpll_input_pin_ref_sync_get(const struct dpll_pin *dpll_pin,
-+                                   void *pin_priv,
-+                                   const struct dpll_pin *ref_sync_pin,
-+                                   void *ref_sync_pin_priv,
-+                                   enum dpll_pin_state *state,
-+                                   struct netlink_ext_ack *extack) {
-+       struct zl3073x_dpll_pin *sync_pin =3D ref_sync_pin_priv;
-+       struct zl3073x_dpll_pin *pin =3D pin_priv;
-+       struct zl3073x_dpll *zldpll =3D pin->dpll;
-+       struct zl3073x_dev *zldev =3D zldpll->dev;
-+       const struct zl3073x_ref *ref;
-+       u8 ref_id, mode, pair;
-+
-+       ref_id =3D zl3073x_input_pin_ref_get(pin->id);
-+       ref =3D zl3073x_ref_state_get(zldev, ref_id);
-+       mode =3D zl3073x_ref_sync_mode_get(ref);
-+       pair =3D zl3073x_ref_sync_pair_get(ref);
-+
-+       if (mode =3D=3D ZL_REF_SYNC_CTRL_MODE_REFSYNC_PAIR &&
-+           pair =3D=3D zl3073x_input_pin_ref_get(sync_pin->id))
-+               *state =3D DPLL_PIN_STATE_CONNECTED;
-+       else
-+               *state =3D DPLL_PIN_STATE_DISCONNECTED;
-+
-+       return 0;
-+}
-+
-+static int
-+zl3073x_dpll_input_pin_ref_sync_set(const struct dpll_pin *dpll_pin,
-+                                   void *pin_priv,
-+                                   const struct dpll_pin *ref_sync_pin,
-+                                   void *ref_sync_pin_priv,
-+                                   const enum dpll_pin_state state,
-+                                   struct netlink_ext_ack *extack) {
-+       struct zl3073x_dpll_pin *sync_pin =3D ref_sync_pin_priv;
-+       struct zl3073x_dpll_pin *pin =3D pin_priv;
-+       struct zl3073x_dpll *zldpll =3D pin->dpll;
-+       struct zl3073x_dev *zldev =3D zldpll->dev;
-+       u8 mode, ref_id, sync_ref_id;
-+       struct zl3073x_chan chan;
-+       struct zl3073x_ref ref;
-+       int rc;
-+
-+       ref_id =3D zl3073x_input_pin_ref_get(pin->id);
-+       sync_ref_id =3D zl3073x_input_pin_ref_get(sync_pin->id);
-+       ref =3D *zl3073x_ref_state_get(zldev, ref_id);
-+
-+       if (state =3D=3D DPLL_PIN_STATE_CONNECTED) {
-+               const struct zl3073x_ref *sync_ref;
-+               u32 ref_freq, sync_freq;
-+
-+               sync_ref =3D zl3073x_ref_state_get(zldev, sync_ref_id);
-+               ref_freq =3D zl3073x_ref_freq_get(&ref);
-+               sync_freq =3D zl3073x_ref_freq_get(sync_ref);
-+
-+               /* Sync signal must be 8 kHz or less and clock reference
-+                * must be 1 kHz or more and higher than the sync signal.
-+                */
-+               if (sync_freq > 8000) {
-+                       NL_SET_ERR_MSG(extack,
-+                                      "sync frequency must be 8 kHz or les=
-s");
-+                       return -EINVAL;
-+               }
-+               if (ref_freq < 1000) {
-+                       NL_SET_ERR_MSG(extack,
-+                                      "clock frequency must be 1 kHz or mo=
-re");
-+                       return -EINVAL;
-+               }
-+               if (ref_freq <=3D sync_freq) {
-+                       NL_SET_ERR_MSG(extack,
-+                                      "clock frequency must be higher than=
- sync frequency");
-+                       return -EINVAL;
-+               }
-+
-+               zl3073x_ref_sync_pair_set(&ref, sync_ref_id);
-+               mode =3D ZL_REF_SYNC_CTRL_MODE_REFSYNC_PAIR;
-+       } else {
-+               mode =3D ZL_REF_SYNC_CTRL_MODE_REFSYNC_PAIR_OFF;
-+       }
-+
-+       zl3073x_ref_sync_mode_set(&ref, mode);
-+
-+       rc =3D zl3073x_ref_state_set(zldev, ref_id, &ref);
-+       if (rc)
-+               return rc;
-+
-+       /* Exclude sync source from automatic reference selection by settin=
-g
-+        * its priority to NONE. On disconnect the priority is left as NONE
-+        * and the user must explicitly make the pin selectable again.
-+        */
-+       if (state =3D=3D DPLL_PIN_STATE_CONNECTED) {
-+               chan =3D *zl3073x_chan_state_get(zldev, zldpll->id);
-+               zl3073x_chan_ref_prio_set(&chan, sync_ref_id,
-+                                         ZL_DPLL_REF_PRIO_NONE);
-+               return zl3073x_chan_state_set(zldev, zldpll->id, &chan);
-+       }
-+
-+       return 0;
-+}
-+
- static int
- zl3073x_dpll_input_pin_ffo_get(const struct dpll_pin *dpll_pin, void *pin_=
-priv,
-                               const struct dpll_device *dpll, void *dpll_p=
-riv, @@ -1100,6 +1206,8 @@ static const struct dpll_pin_ops zl3073x_dpll_in=
-put_pin_ops =3D {
-        .phase_adjust_set =3D zl3073x_dpll_input_pin_phase_adjust_set,
-        .prio_get =3D zl3073x_dpll_input_pin_prio_get,
-        .prio_set =3D zl3073x_dpll_input_pin_prio_set,
-+       .ref_sync_get =3D zl3073x_dpll_input_pin_ref_sync_get,
-+       .ref_sync_set =3D zl3073x_dpll_input_pin_ref_sync_set,
-        .state_on_dpll_get =3D zl3073x_dpll_input_pin_state_on_dpll_get,
-        .state_on_dpll_set =3D zl3073x_dpll_input_pin_state_on_dpll_set,
- };
-@@ -1190,8 +1298,11 @@ zl3073x_dpll_pin_register(struct zl3073x_dpll_pin *p=
-in, u32 index)
-        if (IS_ERR(props))
-                return PTR_ERR(props);
-
--       /* Save package label, esync capability and phase adjust granularit=
-y */
-+       /* Save package label, fwnode, esync capability and phase adjust
-+        * granularity.
-+        */
-        strscpy(pin->label, props->package_label);
-+       pin->fwnode =3D fwnode_handle_get(props->fwnode);
-        pin->esync_control =3D props->esync_control;
-        pin->phase_gran =3D props->dpll_props.phase_gran;
-
-@@ -1236,6 +1347,8 @@ zl3073x_dpll_pin_register(struct zl3073x_dpll_pin *pi=
-n, u32 index)
-        dpll_pin_put(pin->dpll_pin, &pin->tracker);
-        pin->dpll_pin =3D NULL;
- err_pin_get:
-+       fwnode_handle_put(pin->fwnode);
-+       pin->fwnode =3D NULL;
-        zl3073x_pin_props_put(props);
-
-        return rc;
-@@ -1265,6 +1378,9 @@ zl3073x_dpll_pin_unregister(struct zl3073x_dpll_pin *=
-pin)
-
-        dpll_pin_put(pin->dpll_pin, &pin->tracker);
-        pin->dpll_pin =3D NULL;
-+
-+       fwnode_handle_put(pin->fwnode);
-+       pin->fwnode =3D NULL;
- }
-
- /**
-@@ -1735,6 +1851,88 @@ zl3073x_dpll_free(struct zl3073x_dpll *zldpll)
-        kfree(zldpll);
- }
-
-+/**
-+ * zl3073x_dpll_ref_sync_pair_register - register ref_sync pairs for a=20
-+pin
-+ * @pin: pointer to zl3073x_dpll_pin structure
-+ *
-+ * Iterates 'ref-sync-sources' phandles in the pin's firmware node and
-+ * registers each declared pairing.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_dpll_ref_sync_pair_register(struct zl3073x_dpll_pin *pin) {
-+       struct zl3073x_dev *zldev =3D pin->dpll->dev;
-+       struct fwnode_handle *fwnode;
-+       struct dpll_pin *sync_pin;
-+       dpll_tracker tracker;
-+       int n, rc;
-+
-+       for (n =3D 0; ; n++) {
-+               /* Get n'th ref-sync source */
-+               fwnode =3D fwnode_find_reference(pin->fwnode, "ref-sync-sou=
-rces",
-+                                              n);
-+               if (IS_ERR(fwnode)) {
-+                       rc =3D PTR_ERR(fwnode);
-+                       break;
-+               }
-+
-+               /* Find associated dpll pin */
-+               sync_pin =3D fwnode_dpll_pin_find(fwnode, &tracker);
-+               fwnode_handle_put(fwnode);
-+               if (!sync_pin) {
-+                       dev_warn(zldev->dev, "%s: ref-sync source %d not fo=
-und",
-+                                pin->label, n);
-+                       continue;
-+               }
-+
-+               /* Register new ref-sync pair */
-+               rc =3D dpll_pin_ref_sync_pair_add(pin->dpll_pin, sync_pin);
-+               dpll_pin_put(sync_pin, &tracker);
-+
-+               /* -EBUSY means pairing already exists from another DPLL's
-+                * registration.
-+                */
-+               if (rc && rc !=3D -EBUSY) {
-+                       dev_err(zldev->dev,
-+                               "%s: failed to add ref-sync source %d: %pe"=
-,
-+                               pin->label, n, ERR_PTR(rc));
-+                       break;
-+               }
-+       }
-+
-+       return rc !=3D -ENOENT ? rc : 0;
-+}
-+
-+/**
-+ * zl3073x_dpll_ref_sync_pairs_register - register ref_sync pairs for a=20
-+DPLL
-+ * @zldpll: pointer to zl3073x_dpll structure
-+ *
-+ * Iterates all registered input pins of the given DPLL and establishes
-+ * ref_sync pairings declared by 'ref-sync-sources' phandles in the
-+ * device tree.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_dpll_ref_sync_pairs_register(struct zl3073x_dpll *zldpll) {
-+       struct zl3073x_dpll_pin *pin;
-+       int rc;
-+
-+       list_for_each_entry(pin, &zldpll->pins, list) {
-+               if (!zl3073x_dpll_is_input_pin(pin) || !pin->fwnode)
-+                       continue;
-+
-+               rc =3D zl3073x_dpll_ref_sync_pair_register(pin);
-+               if (rc)
-+                       return rc;
-+       }
-+
-+       return 0;
-+}
-+
- /**
-  * zl3073x_dpll_register - register DPLL device and all its pins
-  * @zldpll: pointer to zl3073x_dpll structure @@ -1758,6 +1956,13 @@ zl307=
-3x_dpll_register(struct zl3073x_dpll *zldpll)
-                return rc;
-        }
-
-+       rc =3D zl3073x_dpll_ref_sync_pairs_register(zldpll);
-+       if (rc) {
-+               zl3073x_dpll_pins_unregister(zldpll);
-+               zl3073x_dpll_device_unregister(zldpll);
-+               return rc;
-+       }
-+
-        return 0;
- }
-
---
-2.52.0
-
+> >
+> > Fix this by asserting carrier only when at least 'min_links' slaves are
+> > in the collecting/distributing state (or collecting only if the
+> > coupled_control default behavior is disabled).
+> >
+> > Fixes: 655f8919d549 ("bonding: add min links parameter to 802.3ad")
+> > Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
+> > ---
+> >  drivers/net/bonding/bond_3ad.c | 24 ++++++++++++++++++++++--
+> >  1 file changed, 22 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_=
+3ad.c
+> > index af7f74cfdc08..6d3613755d45 100644
+> > --- a/drivers/net/bonding/bond_3ad.c
+> > +++ b/drivers/net/bonding/bond_3ad.c
+> > @@ -745,6 +745,22 @@ static void __set_agg_ports_ready(struct aggregato=
+r *aggregator, int val)
+> >         }
+> >  }
+> >
+> > +static int __agg_valid_ports(struct aggregator *agg)
+> > +{
+> > +       struct port *port;
+> > +       int valid =3D 0;
+> > +
+> > +       for (port =3D agg->lag_ports; port;
+> > +            port =3D port->next_port_in_aggregator) {
+> > +               if (port->actor_oper_port_state & LACP_STATE_COLLECTING=
+ &&
+> > +                   (!port->slave->bond->params.coupled_control ||
+> > +                    port->actor_oper_port_state & LACP_STATE_DISTRIBUT=
+ING))
+> > +                       valid++;
+> > +       }
+> > +
+> > +       return valid;
+> > +}
+> > +
+> >  static int __agg_active_ports(struct aggregator *agg)
+> >  {
+> >         struct port *port;
+> > @@ -2120,6 +2136,7 @@ static void ad_enable_collecting_distributing(str=
+uct port *port,
+> >                           port->actor_port_number,
+> >                           port->aggregator->aggregator_identifier);
+> >                 __enable_port(port);
+> > +               bond_3ad_set_carrier(port->slave->bond);
+> >                 /* Slave array needs update */
+> >                 *update_slave_arr =3D true;
+> >                 /* Should notify peers if possible */
+> > @@ -2141,6 +2158,7 @@ static void ad_disable_collecting_distributing(st=
+ruct port *port,
+> >                           port->actor_port_number,
+> >                           port->aggregator->aggregator_identifier);
+> >                 __disable_port(port);
+> > +               bond_3ad_set_carrier(port->slave->bond);
+> >                 /* Slave array needs an update */
+> >                 *update_slave_arr =3D true;
+> >         }
+> > @@ -2819,8 +2837,10 @@ int bond_3ad_set_carrier(struct bonding *bond)
+> >         }
+> >         active =3D __get_active_agg(&(SLAVE_AD_INFO(first_slave)->aggre=
+gator));
+> >         if (active) {
+> > -               /* are enough slaves available to consider link up? */
+> > -               if (__agg_active_ports(active) < bond->params.min_links=
+) {
+> > +               /* are enough slaves in collecting (and distributing) s=
+tate to consider
+> > +                * link up?
+> > +                */
+> > +               if (__agg_valid_ports(active) < bond->params.min_links)=
+ {
+> >                         if (netif_carrier_ok(bond->dev)) {
+> >                                 netif_carrier_off(bond->dev);
+> >                                 goto out;
+> > --
+> > 2.39.2
+> >
+>
 
