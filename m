@@ -1,377 +1,121 @@
-Return-Path: <netdev+bounces-272358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272359-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAQCEgD8xWmOEwUAu9opvQ
-	(envelope-from <netdev+bounces-272358-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:39:44 +0100
+	id 4JOXJlz7xWmOEwUAu9opvQ
+	(envelope-from <netdev+bounces-272359-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:37:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 949AA33ED9B
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:39:43 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38ACE33ED6D
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:37:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 483A0301DAC7
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:34:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 08DA9303C5BA
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C6AD36C5AB;
-	Fri, 27 Mar 2026 03:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B575E36C5AB;
+	Fri, 27 Mar 2026 03:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DTyKlNOC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CVHHapz0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76A11DEFE0
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 03:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9180636C0D3
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 03:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774582490; cv=none; b=lBlpL9oqRjx4pEzo21KRT1Fe7v4VkQSDtNKDvQdZVKWaRgEsaZWQbhIrcl/p9A0mpt3SZxpa519XY+GpvTZBylBSQNS1zC1wS8azFKtX/wAHDL0dQhjvDZ0SLLbrC3EFl72//H6CGiJPi2jDmmydosLqBjhJe2VNhG8dhq7nPG8=
+	t=1774582607; cv=none; b=pPBk95HJNVxm1PzMoldgSzMy2XfpXYqdRj7DbPma/v45beRRTLOQqI6vJWrxz6lZpRjsnwwd1Xtx2aGxpakncENuZ9fqyfOSf+akW6GbIYFj4TG/3fUDCCRHCZakM8oL4e3TEumJYtMQAWmEEIY1FJtXWEafwnt7n+SHVLXYgSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774582490; c=relaxed/simple;
-	bh=YyHggGrYKFX25d1ZrTELFxsr5Vu0abAUxsmArjDmCWM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F/nJvDoqTaWPFS0n9KontcJqBSCWWDv9BJIV14SNE2lURigUtsXSGidjTYBdPnyb5+1DBhmOYw0w7Qdx+z7WZW93mgg6c8pa7TSyzKno9BJZjMdEbHQe1GhEYKh29EiWRfMJeqcZXeHcPz+DoKNm5QGCB27OVLwymcmWPkbguDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DTyKlNOC; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-66b1019bb55so1069666a12.1
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 20:34:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774582487; x=1775187287; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=syKPPCVy2UJYMWZ8iCZgs0W23e8LeZHvZ2SrmBGYQzg=;
-        b=DTyKlNOCcddBNzQF6yFdFi6z6pFtw+IuUBS+cv5HrZKecNFXJyY8a4VajRYwZ5Dwvm
-         Zj/ZaVYTqwIurwKxS43cPkugz3+26sZjHNxiCFfx3WAdFnHCxQX2otq8KFKPjKraj6s1
-         LGcNCe+rRvvebtnWAOAtaNoBOhICHSqyoG6DfLPdF0bnSl2fqHLRoBJQ+pbZtqy0x5eF
-         nAbO0mu7uf0TFxXuFl5Ky6Dqvra+CfDShh46lhLiNCw/dLCftbcbrV9CESdn5N5QmXi4
-         rmmaUkD0evGC0XvM9r/NBF8NsXdbxGLh+2ZBiHPzGRWmlfdtWOrJCY5jVrHK+8uKUsQQ
-         brLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774582487; x=1775187287;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=syKPPCVy2UJYMWZ8iCZgs0W23e8LeZHvZ2SrmBGYQzg=;
-        b=FICT3ZV+ICvUfnCC60NvfysMLizhhi2XleuXqQWzze/9wPA4vW91NM3rt03HWTdNK2
-         AkUsyjMEj4GQGBLWrbOcV1JYYz6zmaJi6nK7kkqBsAuKaqubWyWZS3Cfa13oak3YUgKp
-         iraZBj+nKa7O/OulcsUJ3c8XyojlK/bUEqz38pUYGHLqINoLhekVbwugSbPiQcS9RXeU
-         4krY9Z/AmvMR6ilY26eJvUbsfd7N8JMf2FYHWPiezN+z5O0XHmyxooR0pkTFxQ0K3S4V
-         80ZXzejtNf9fs6lVDLxEp6M1Ny5Qnn8fGI2DIEjuAZUbqtqNt/U/JmkQgyHeZb9ZRo/0
-         0QUw==
-X-Forwarded-Encrypted: i=1; AJvYcCUnk4dTs8noyPNlyTji8SMqemv6AArLwvqAzuE49R/CyTR+iI3hJIQaV96Cf1aQLcgnuOLAsQs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEYH1h477Wvbj3yh6Ro9i2G5MK8U4gyepGofw6I1uaTkISFgCG
-	tPDRe0iJ2X3mzoLAzice1x3gjFhkAsDUqsCmfF3t04+vehlTglga5bB3
-X-Gm-Gg: ATEYQzzKxEY5fv4gdHcLcUCAsvYbEQMkVooT8GvaEAyrfpbY2nRjdogg248eEl+Vpj3
-	0btyEYK54YuE76bmmomN6aWhQ0qGpYAXGccPTMb9SsCnjkDtj3fHYRw1tk/0kyrZTBOcN17XxVl
-	WfiQqJo8i8csDx/olH1NXOhDg04SiDOHpErsrFyaG/dGrbBlIw4E+LUgqlO6t+o/OgHEb8c5bfW
-	lF7OVqu6ztI93eu0DPl/SkJXIHOd+aJpQ6Iqm0NC2qUQExSTXEl4S586t6Z7Tw6E4VADuPNNIgk
-	GKcnZ2qd5ehpcYUppvOvauoeCNu8lNAoW66X4iwkUOeeWLxboePs2i8OhTziEfT6it80ioZfeAP
-	30Xwok+nLaPUUASGmGtiBUrHC9ELxcuKiZFuJmJug/NY4iV9k9nHJIGaLCFpldgM+B+mPJeMWZw
-	4yOV4=
-X-Received: by 2002:a05:6402:43c7:b0:660:a2df:ad1 with SMTP id 4fb4d7f45d1cf-66b2855f52fmr468709a12.7.1774582486819;
-        Thu, 26 Mar 2026 20:34:46 -0700 (PDT)
-Received: from gmail.com ([2a09:bac5:4e22:270f::3e4:18])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-66ad5e3adf8sm1636110a12.2.2026.03.26.20.34.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 20:34:45 -0700 (PDT)
-From: Qingfang Deng <dqfext@gmail.com>
-To: Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Felix Maurer <fmaurer@redhat.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Antonio Quartulli <antonio@openvpn.net>,
-	Petr Machata <petrm@nvidia.com>,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Paul Mackerras <paulus@ozlabs.org>
-Subject: [PATCH net-next v6] selftests: net: add tests for PPP
-Date: Fri, 27 Mar 2026 11:34:19 +0800
-Message-ID: <20260327033438.125135-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1774582607; c=relaxed/simple;
+	bh=aAgHj1tvkJKNntEu6NMqOmmnnuGuh8u9b+RVHiZYVCU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=O0BNaPCw40ARPlzga+vecw2BtiV6UN1e+J3Itc073JC1pJdU+OWomy4icmEpaGGmLMFq/dVFnNAWWqevkYqCLv/v0cR9rzRRyPOEHL1zQCig07gIK/TdykACJibXRPNtJ2mZoL9yxceWr0Gm8gqGuWWi+hs3Dlq1iaPT5GIYDRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CVHHapz0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22B82C19423;
+	Fri, 27 Mar 2026 03:36:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774582607;
+	bh=aAgHj1tvkJKNntEu6NMqOmmnnuGuh8u9b+RVHiZYVCU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CVHHapz0UqlgQ05CnZcML6HYfFEgmC/bpmV3fRfPM+/2dwBEYoaQ9ggRuhdNzVa8q
+	 DWglJ1x869sctB7WH2H0FEUrGCTrtGKWUpRQBEj1CpjCZNhogtNheVA2buY1J2Zv4y
+	 zaFbcr/r/3JMJ485NqaXyijsnbgOkGasT3ZPDYhFGt2RY4BkFXey6Ie8AAExgOWOeB
+	 R8alnDCHgEKkw/rGz/HnQebQ9KmyVOjkxaYDUufZaULtrpw20f7yAeJ6jXwZVHJCyy
+	 Aoc5BTKjvU9QpRmCb+YdtPgNvipFEnr4/NpTyTaxJaBZtTd2bMuX2yOT9MgI/BbTMK
+	 UjQ1SQn2KSEaA==
+Date: Thu, 26 Mar 2026 20:36:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Nikolaos Gkarlis <nickgarlis@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH] rtnetlink: add missing netlink_ns_capable() check for
+ peer netns
+Message-ID: <20260326203646.2da52419@kernel.org>
+In-Reply-To: <20260324080730.4051666-1-nickgarlis@gmail.com>
+References: <20260324080730.4051666-1-nickgarlis@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-272358-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272359-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[pppoe.so:url,ppp_common.sh:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pppoe.sh:url,enneenne.com:email]
-X-Rspamd-Queue-Id: 949AA33ED9B
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 38ACE33ED6D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add ping and iperf3 tests for ppp_async.c and pppoe.c.
+On Tue, 24 Mar 2026 09:07:30 +0100 Nikolaos Gkarlis wrote:
+> rtnl_newlink() lacks a CAP_NET_ADMIN capability check on the peer
+> network namespace when creating paired devices (veth, vxcan,
+> netkit). This allows an unprivileged user with a user namespace
+> to create interfaces in arbitrary network namespaces, including
+> init_net.
+> 
+> Add a netlink_ns_capable() check for CAP_NET_ADMIN in the peer
+> namespace before allowing device creation to proceed.
+> 
+> Fixes: 48327566769a ("rtnetlink: fix double call of rtnl_link_get_net_ifla()")
 
-Signed-off-by: Qingfang Deng <dqfext@gmail.com>
----
-v6: fix SC2329 scope
- https://lore.kernel.org/netdev/20260327024202.111655-1-dqfext@gmail.com/
+AI assistant here suggests this is not the valid Fixes tag,
+which seems true on the surface. This commit was fixing
+cleanup, IDK how it could break input validation?
 
- MAINTAINERS                                   |  1 +
- tools/testing/selftests/Makefile              |  1 +
- tools/testing/selftests/net/ppp/Makefile      | 15 +++++++
- tools/testing/selftests/net/ppp/config        |  9 ++++
- tools/testing/selftests/net/ppp/ppp_async.sh  | 44 +++++++++++++++++++
- tools/testing/selftests/net/ppp/ppp_common.sh | 44 +++++++++++++++++++
- .../selftests/net/ppp/pppoe-server-options    |  2 +
- tools/testing/selftests/net/ppp/pppoe.sh      | 41 +++++++++++++++++
- 8 files changed, 157 insertions(+)
- create mode 100644 tools/testing/selftests/net/ppp/Makefile
- create mode 100644 tools/testing/selftests/net/ppp/config
- create mode 100755 tools/testing/selftests/net/ppp/ppp_async.sh
- create mode 100644 tools/testing/selftests/net/ppp/ppp_common.sh
- create mode 100644 tools/testing/selftests/net/ppp/pppoe-server-options
- create mode 100755 tools/testing/selftests/net/ppp/pppoe.sh
+> Reported-by: Nikolaos Gkarlis <nickgarlis@gmail.com>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7a2ffd9d37d5..b922e154b9e7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -21080,6 +21080,7 @@ PPP PROTOCOL DRIVERS AND COMPRESSORS
- L:	linux-ppp@vger.kernel.org
- S:	Orphan
- F:	drivers/net/ppp/ppp_*
-+F:	tools/testing/selftests/net/ppp/
- 
- PPS SUPPORT
- M:	Rodolfo Giometti <giometti@enneenne.com>
-diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-index 450f13ba4cca..65f84e8a0cf0 100644
---- a/tools/testing/selftests/Makefile
-+++ b/tools/testing/selftests/Makefile
-@@ -78,6 +78,7 @@ TARGETS += net/netfilter
- TARGETS += net/openvswitch
- TARGETS += net/ovpn
- TARGETS += net/packetdrill
-+TARGETS += net/ppp
- TARGETS += net/rds
- TARGETS += net/tcp_ao
- TARGETS += nolibc
-diff --git a/tools/testing/selftests/net/ppp/Makefile b/tools/testing/selftests/net/ppp/Makefile
-new file mode 100644
-index 000000000000..b39b0abadde6
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/Makefile
-@@ -0,0 +1,15 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+top_srcdir = ../../../../..
-+
-+TEST_PROGS := \
-+	ppp_async.sh \
-+	pppoe.sh \
-+# end of TEST_PROGS
-+
-+TEST_FILES := \
-+	ppp_common.sh \
-+	pppoe-server-options \
-+# end of TEST_FILES
-+
-+include ../../lib.mk
-diff --git a/tools/testing/selftests/net/ppp/config b/tools/testing/selftests/net/ppp/config
-new file mode 100644
-index 000000000000..b45d25c5b970
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/config
-@@ -0,0 +1,9 @@
-+CONFIG_IPV6=y
-+CONFIG_PACKET=y
-+CONFIG_PPP=m
-+CONFIG_PPP_ASYNC=m
-+CONFIG_PPP_BSDCOMP=m
-+CONFIG_PPP_DEFLATE=m
-+CONFIG_PPPOE=m
-+CONFIG_PPPOE_HASH_BITS_4=y
-+CONFIG_VETH=y
-diff --git a/tools/testing/selftests/net/ppp/ppp_async.sh b/tools/testing/selftests/net/ppp/ppp_async.sh
-new file mode 100755
-index 000000000000..9233dc656678
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/ppp_async.sh
-@@ -0,0 +1,44 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+source ppp_common.sh
-+
-+# Temporary files for PTY symlinks
-+TTY_DIR=$(mktemp -d /tmp/ppp.XXXXXX)
-+TTY_SERVER="$TTY_DIR"/server
-+TTY_CLIENT="$TTY_DIR"/client
-+
-+# shellcheck disable=SC2329
-+cleanup() {
-+	cleanup_all_ns
-+	[ -n "$SOCAT_PID" ] && kill_process "$SOCAT_PID"
-+	rm -fr "$TTY_DIR"
-+}
-+
-+trap cleanup EXIT
-+
-+require_command socat
-+ppp_common_init
-+modprobe -q ppp_async
-+
-+# Create the virtual serial device
-+socat -d PTY,link="$TTY_SERVER",rawer PTY,link="$TTY_CLIENT",rawer &
-+SOCAT_PID=$!
-+
-+# Wait for symlinks to be created
-+slowwait 5 [ -L "$TTY_SERVER" ]
-+
-+# Start the PPP Server
-+ip netns exec "$NS_SERVER" pppd "$TTY_SERVER" 115200 \
-+	"$IP_SERVER":"$IP_CLIENT" \
-+	local noauth nodefaultroute debug
-+
-+# Start the PPP Client
-+ip netns exec "$NS_CLIENT" pppd "$TTY_CLIENT" 115200 \
-+	local noauth updetach nodefaultroute debug
-+
-+ppp_test_connectivity
-+
-+log_test "PPP async"
-+
-+exit "$EXIT_STATUS"
-diff --git a/tools/testing/selftests/net/ppp/ppp_common.sh b/tools/testing/selftests/net/ppp/ppp_common.sh
-new file mode 100644
-index 000000000000..c72218813f95
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/ppp_common.sh
-@@ -0,0 +1,44 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# shellcheck disable=SC2153
-+
-+source ../lib.sh
-+
-+IP_SERVER="192.168.200.1"
-+IP_CLIENT="192.168.200.2"
-+
-+ppp_common_init() {
-+	# Package requirements
-+	require_command pppd
-+	require_command iperf3
-+
-+	# Check for root privileges
-+	if [ "$(id -u)" -ne 0 ];then
-+		echo "SKIP: Need root privileges"
-+		exit $ksft_skip
-+	fi
-+
-+	# Namespaces
-+	setup_ns NS_SERVER NS_CLIENT
-+}
-+
-+ppp_check_addr() {
-+	dev=$1
-+	addr=$2
-+	ns=$3
-+	ip -netns "$ns" -4 addr show dev "$dev" 2>/dev/null | grep -q "$addr"
-+	return $?
-+}
-+
-+ppp_test_connectivity() {
-+	slowwait 10 ppp_check_addr "ppp0" "$IP_CLIENT" "$NS_CLIENT"
-+
-+	ip netns exec "$NS_CLIENT" ping -c 3 "$IP_SERVER"
-+	check_err $?
-+
-+	ip netns exec "$NS_SERVER" iperf3 -s -1 -D
-+	wait_local_port_listen "$NS_SERVER" 5201 tcp
-+
-+	ip netns exec "$NS_CLIENT" iperf3 -c "$IP_SERVER" -Z -t 2
-+	check_err $?
-+}
-diff --git a/tools/testing/selftests/net/ppp/pppoe-server-options b/tools/testing/selftests/net/ppp/pppoe-server-options
-new file mode 100644
-index 000000000000..66c8c9d319e9
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/pppoe-server-options
-@@ -0,0 +1,2 @@
-+noauth
-+noipdefault
-diff --git a/tools/testing/selftests/net/ppp/pppoe.sh b/tools/testing/selftests/net/ppp/pppoe.sh
-new file mode 100755
-index 000000000000..73e4ea957b43
---- /dev/null
-+++ b/tools/testing/selftests/net/ppp/pppoe.sh
-@@ -0,0 +1,41 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+source ppp_common.sh
-+
-+VETH_SERVER="veth-server"
-+VETH_CLIENT="veth-client"
-+
-+# shellcheck disable=SC2329
-+cleanup() {
-+	cleanup_all_ns
-+}
-+
-+trap cleanup EXIT
-+
-+require_command pppoe-server
-+ppp_common_init
-+modprobe -q pppoe
-+
-+# Create the veth pair
-+ip link add "$VETH_SERVER" type veth peer name "$VETH_CLIENT"
-+ip link set "$VETH_SERVER" netns "$NS_SERVER"
-+ip link set "$VETH_CLIENT" netns "$NS_CLIENT"
-+ip -netns "$NS_SERVER" link set "$VETH_SERVER" up
-+ip -netns "$NS_CLIENT" link set "$VETH_CLIENT" up
-+
-+# Start the PPP Server
-+ip netns exec "$NS_SERVER" pppoe-server -I "$VETH_SERVER" \
-+	-L "$IP_SERVER" -R "$IP_CLIENT" -N 1 -q "$(command -v pppd)" \
-+	-k -O "$(pwd)/pppoe-server-options"
-+
-+# Start the PPP Client
-+ip netns exec "$NS_CLIENT" pppd \
-+	local debug updetach noipdefault noauth nodefaultroute \
-+	plugin pppoe.so nic-"$VETH_CLIENT"
-+
-+ppp_test_connectivity
-+
-+log_test "PPPoE"
-+
-+exit "$EXIT_STATUS"
+Reported-by tags are only when the reporter is different than author
+the Google's bounty program rules have been amended to make this
+explicit, please let us know if other programs still mislead people
+
+> Signed-off-by: Nikolaos Gkarlis <nickgarlis@gmail.com>
 -- 
-2.43.0
-
+pw-bot: cr
 
