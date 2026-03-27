@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-272360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272361-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yElGDCv8xWmOEwUAu9opvQ
-	(envelope-from <netdev+bounces-272360-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:40:27 +0100
+	id QFbaKjb8xWmOEwUAu9opvQ
+	(envelope-from <netdev+bounces-272361-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:40:38 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30DBF33EDD8
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:40:26 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4581633EDEF
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:40:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2524E3026BDE
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:40:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1F73D30635A5
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 331D036EA94;
-	Fri, 27 Mar 2026 03:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60145371051;
+	Fri, 27 Mar 2026 03:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bbRTZ+aQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pj+PnC32"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08FF636D9E6;
-	Fri, 27 Mar 2026 03:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CDD236E482;
+	Fri, 27 Mar 2026 03:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774582820; cv=none; b=u1TxsCTakme+jhnqI4v/rn22dk1H62u171qSzHf2yEcGeaT/mqply/hnYZKHtyBqjRwGEFP3D7jsTe6yq/1SOu9Fjy/KzPcHO4FEoXncTc9L1pmRFlEaS73l070sIAz0hk55Grj2vgAaEWdNn62KNezzLnnO1FbBwGONPmE/FPU=
+	t=1774582824; cv=none; b=gFf2iV/VocNYQ4jkngFMjrcHvDSCEvPcddYZICpbakdrsgUZKzKDaJR3O2YowqLr9g58kd0G/mQ6IXo87pfYjHcx2j6A4WN2OOOWfTz98t0qBDuvxkgiPPn7g9Ae9rL2Hfes6vbhwD9/xfRx7QgMtc1nyUag0zKKyrZXvE8n01E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774582820; c=relaxed/simple;
-	bh=gE7KMmVBMRpPER+wtbVUeqXwIsZUFAHyeuliTqSSXqU=;
+	s=arc-20240116; t=1774582824; c=relaxed/simple;
+	bh=hICh2ybyY8oAWcTzR4MUd/iENTmcUq8gUlg9iQ+i16M=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=icISPOjev78DlUS029Yc8/0Xq+DiEvPJhKbT5YKsUvg+WuyCIvO7opT+ikWzHbNRfwBrKvtKpegnEkR87tzA24QTT9gaESghfq5kCkyrgNZMDtGlfgB3vn+jlP6RbskBOrSvnfiz3t7UaOSeHfNmEBMvVM72HVutdcOmp3XTbaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bbRTZ+aQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77E4AC19423;
-	Fri, 27 Mar 2026 03:40:19 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=cCwCcPHeqdf1lyJCUBUMOmpO3UyUlLJAGzXGLJo1Qr6IkAIhyyqcotMx/L4+atSI3R0Qo0DzXW781AxqoIPZ9qVv49d0iYB4pYFUnlcALOsdiQmWE5tIRt0WjmzqhrNf058F7cixAe03Ex3n10sIFcEGVZRkPPUIMmDv9UBlNew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pj+PnC32; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0A7FC19423;
+	Fri, 27 Mar 2026 03:40:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774582819;
-	bh=gE7KMmVBMRpPER+wtbVUeqXwIsZUFAHyeuliTqSSXqU=;
+	s=k20201202; t=1774582823;
+	bh=hICh2ybyY8oAWcTzR4MUd/iENTmcUq8gUlg9iQ+i16M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bbRTZ+aQOtZN5caZtZF2ctJDOIi/zNleAZnludnjI1Ip4OxpbDY5LXsSXBeFzCet4
-	 bTLPccpJo1DmSQ+h+At8Sjd+/8EvLP89X6qGpvKjAGvXn/JBG6qLedotoFD5yoVays
-	 B+fBizCz2UOWpv+ElSWrw9EELpdf8Toloy5MYt68rvWZ/v1EdnHG6xFFaQSpCnDii6
-	 cm6AzG0YN4fCbjIX5zYXi2KbMv488uT0Zl7sMV0q/OKGGCZfVpKUeG8hdJdM6ZPKzb
-	 PtwTnmmgUzfYd/FGWbY/aJLet57VIs/2XONlk8gmuuWlml987ucB9hugxAZ3kJWhdH
-	 WBB+W3seprVaQ==
+	b=pj+PnC32GsQmVFm8YYii6JK0anr2CGyYjo/3rQfYxgNMXayyeZPFn7/5L6YZxW9Bi
+	 K2YbDb5rf17LtwlAndo8bcXCGcMoatdqnbNJhwo19DEE0DkoBBaD4Cei/EnIcrmZoe
+	 oJc8Wzry3EDqkPUpbUU+cRYSMHPTBIM+uibjr2iSGIHRj4s3YsH7WM5MaQ/B6Q4PCv
+	 58W0A+g/fR1rXIugo60XJBSxxCbEZXKnFhKqf0fCmLm4t7+rpbmY16Dof7YSBsnn+C
+	 Hv2cTdLMPGhFBb0pP3nQYOn4NZgMdWnpbEXUzbbFIEsagk0JjU/8Dhs+UNl8vimXE9
+	 3PX5bDkMo1muQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DE73809A0B;
-	Fri, 27 Mar 2026 03:40:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FCF53809A0B;
+	Fri, 27 Mar 2026 03:40:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,34 +55,33 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v1] net: qrtr: replace qrtr_tx_flow radix_tree with
- xarray
- to fix memory leak
+Subject: Re: [PATCH net-next v4] virtio-net: enable NETIF_F_GRO_HW only if
+ GRO-related offloads are supported
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177458280579.3288619.17825648611260843625.git-patchwork-notify@kernel.org>
-Date: Fri, 27 Mar 2026 03:40:05 +0000
-References: <20260324080645.290197-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20260324080645.290197-1-jiayuan.chen@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, jiayuan.chen@shopee.com,
- syzbot+006987d1be3586e13555@syzkaller.appspotmail.com, mani@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, andersson@kernel.org, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <177458280978.3288619.10895546782089194731.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Mar 2026 03:40:09 +0000
+References: <20260323041730.986351-1-zhud@hygon.cn>
+In-Reply-To: <20260323041730.986351-1-zhud@hygon.cn>
+To: Di Zhu <zhud@hygon.cn>
+Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+ eperezma@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, willemb@google.com,
+ netdev@vger.kernel.org, virtualization@lists.linux.dev, lijing@hygon.cn,
+ yingzhiwei@hygon.cn
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272360-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-272361-lists,netdev=lfdr.de,netdevbpf];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -95,32 +94,32 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,006987d1be3586e13555];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,shopee.com:email]
-X-Rspamd-Queue-Id: 30DBF33EDD8
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4581633EDEF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 24 Mar 2026 16:06:44 +0800 you wrote:
-> From: Jiayuan Chen <jiayuan.chen@shopee.com>
+On Mon, 23 Mar 2026 12:17:30 +0800 you wrote:
+> Negotiating VIRTIO_NET_F_CTRL_GUEST_OFFLOADS indicates the device
+> allows control over offload support, but the offloads that can be
+> controlled may have nothing to do with GRO (e.g., if neither GUEST_TSO4
+> nor GUEST_TSO6 is supported).
 > 
-> __radix_tree_create() allocates and links intermediate nodes into the
-> tree one by one. If a subsequent allocation fails, the already-linked
-> nodes remain in the tree with no corresponding leaf entry. These orphaned
-> internal nodes are never reclaimed because radix_tree_for_each_slot()
-> only visits slots containing leaf values.
+> In such a setup, reporting NETIF_F_GRO_HW as available for the device
+> is too optimistic and misleading to the user.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v1] net: qrtr: replace qrtr_tx_flow radix_tree with xarray to fix memory leak
-    https://git.kernel.org/netdev/net/c/2428083101f6
+  - [net-next,v4] virtio-net: enable NETIF_F_GRO_HW only if GRO-related offloads are supported
+    https://git.kernel.org/netdev/net-next/c/f8844dfeeae8
 
 You are awesome, thank you!
 -- 
