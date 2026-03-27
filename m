@@ -1,199 +1,266 @@
-Return-Path: <netdev+bounces-272554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272555-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kMiRLgeBxmnQLAUAu9opvQ
-	(envelope-from <netdev+bounces-272554-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 14:07:19 +0100
+	id 0MagIg2DxmnQLAUAu9opvQ
+	(envelope-from <netdev+bounces-272555-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 14:15:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69D76344C2F
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 14:07:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49F48344F54
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 14:15:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9225631686AB
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:58:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 17B3930C0279
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD5C3BADA9;
-	Fri, 27 Mar 2026 12:58:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21F523E868E;
+	Fri, 27 Mar 2026 13:11:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AIdqEKxm";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pnMWSKA+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FXKYULXo"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81643BA224
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 12:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85E53BD24A;
+	Fri, 27 Mar 2026 13:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774616331; cv=none; b=Hpn47Bdiios7bz5z/ld9G0Hbw7vilZwPcAINuFPcdCyQF1x699iMIDmn6qWbYMZGGjp4kwFZ93coYwp7m7/n/pvhiofser9j3WVKStTMmf4TK9ev3GlyL+lJJJgtj7PLdY8yE2LKa0l5fC+1pUUHBf1b18sK5UPA94csh71lsY0=
+	t=1774617075; cv=none; b=SLOLGxPR1r7iZi5AvZwWMxP6oyqlMYAhZXcV81lXvPgaemAX4bVw/L3Z7HkZxiyDbB7LWsQ1sR48Y1W/Pjtg0jIrjtshWsyfaVxFoQKGFpVnf9Y0dKhsEIuLiwUzOY0KY2+6nD9rLy31kKBNVmJ49/n81E3jvgNDoyemx+B+O3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774616331; c=relaxed/simple;
-	bh=T/MncoWZVwS48wLOvcaP5pmO5KoCebx4I8w5SbYrRow=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r/AmGjN0Wkj/QkjxzqZsXevRkPR/wNllFK5A3Mv/kDfTPGTuxM1gPyaFrpOgDQbHGUIRQtsaQDFBmQC/PWuCzl/Zj3yDGyvhWg69GGKKg793cAv+3AQJzHVhresvklHJ2LRPyRBQgQ3qKUN0neEhAqZBarz7UhtFgzfPUtR1WHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AIdqEKxm; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pnMWSKA+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774616329;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Xhz+6dozSsvrLdg2FUPvcHN2R/yxft2xWhen9c3tayI=;
-	b=AIdqEKxmDPkW3skRUfHjMD1d7YcbSIIk1GK/Bcg2hEun3+s4GSrRCck/QUokTqnBY5P1xZ
-	DFCJc93iVBn6R1/NobP08DlgLRyzMuMT95KMhEVvMfLvt1E68tHmVkCNmlnIMeSF2YxM+t
-	q+SsykJX/f81f4zEdPkdLeGJptL4s5o=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-64-ET3Hs2apOA6QvxeW93cfpQ-1; Fri, 27 Mar 2026 08:58:47 -0400
-X-MC-Unique: ET3Hs2apOA6QvxeW93cfpQ-1
-X-Mimecast-MFC-AGG-ID: ET3Hs2apOA6QvxeW93cfpQ_1774616326
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-439a85832c0so648289f8f.2
-        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 05:58:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774616326; x=1775221126; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Xhz+6dozSsvrLdg2FUPvcHN2R/yxft2xWhen9c3tayI=;
-        b=pnMWSKA+hGjYZ9CoXOfasqoeJE+S767+gz7suvfWUIH0aNICqAJklTfoA2r0sPxt+O
-         7PJwuiX+4eH3ORnI78TaUvzHrzoHlSgn3I7bH0fvr+qzdoH7NM47L3H8iIhP7BG+65mn
-         9CWtFwv+jt1P0rdp0tuIv1TOIi4nKlinUqOV5eZ/SAI0uaCwMswZ+vWOUYp4+/7JwGbM
-         cpKW2cUmjODk0RnKxbyHSEUtfCSSmQNkBxjLVDwvvmxyELOnKkNbyWBPK9VYCdoANI7a
-         e2hK7f5nXfa3V/ppsfkhvJSbMPudcVwuH2Em29IWG7esY/aKkKnabW8FN10M51rfJNyN
-         JEjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774616326; x=1775221126;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xhz+6dozSsvrLdg2FUPvcHN2R/yxft2xWhen9c3tayI=;
-        b=MxeF3ArhYa2SiVmroEXvm8DjzEShL6CW1YVEXUCpgJdpEDlV88mabRu7bZlH6mFlXS
-         uv5LLOvs32dj+9WLmafsdWx00nlUbD/WFNS2kTT/xkDX0xhEup8yaqh2YSlMKZqlywrB
-         sJ7vGeTD+Z8j5mhMQh4ynTw18vep0iqdUBGF0CYhDK5pUiM1DzdjpLX439g6EQG4aZtu
-         fPtrfLrztDXH2nsHnYe1JG5g8D+1isOEeF2HBUjHGAClyIot3wkz1FtFPx61lk+pno28
-         ut+Mj2sjUYbpiTj3aebX4Dj0tKkM3V4CgnsPKFhK3CX6E1mULhoDepZbnVxs7EDupUhw
-         yvZw==
-X-Forwarded-Encrypted: i=1; AJvYcCWOdCXN30iACTv/eIq1KmqG2CqgmHWzVThv8PSp2cja9qIKyLkTue0w+wSM1lTOUEFom/SL6kY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZfiiA6K9q7akyrFsWDhQ1/6+HO7IMfweJstRZiq+ls1CZJG23
-	9qE26r8RmgbwJQf3ZZLVCzifqxMv6vktt+RH5mLyyHxedPCJ92y9lqjm6VPaja1Z0Z4VSjJUGb3
-	e+Yfn5zPFRJ26iYsKuSbxDT2RYqmsoA03z7xZyOgACZHg/v3YVkEqUHBsPQ==
-X-Gm-Gg: ATEYQzzPnHNJHfujHaIWcLbn/37rfZB3NDjxIo546QXscBIurd+I0WJXjhajY38NP1w
-	bhMbatcfaU45pvEyahy039W26zvjqIdCrHHZwvb1vGv8UT5sfxv2pdy8qWqidZ0EMP6HpOLLpqH
-	hVeOVp8J/4vAg1a3fuGGBmv8yrbk9A43rUIyz82wBkpfioMXnJTYWaa6ccYL120SnnSHPS3mjhi
-	Wz4SvxvDQaaFVZRGic/yuWtZs8w9jXvrNpjV6Zd0d8f1ehPXNxGigHtvz9/d36yEuN49NwMykvs
-	NMgs5ZHg7J9fHWnFhSvpPUW4Fd+dBV48Bfz41L59eRgoDpPN5+0CsXh0HsT84GbqvEtlXpD1gM7
-	+DQa2cyhJ7jcbUN0I0ADPSJ1OZGRpE1kYL5S4jFFkfMwlbQIAoNp8LOClHfQHAxyDqmvihefetw
-	==
-X-Received: by 2002:a5d:6107:0:b0:43c:482b:afc1 with SMTP id ffacd0b85a97d-43c482bb099mr289814f8f.36.1774616326276;
-        Fri, 27 Mar 2026 05:58:46 -0700 (PDT)
-X-Received: by 2002:a5d:6107:0:b0:43c:482b:afc1 with SMTP id ffacd0b85a97d-43c482bb099mr289762f8f.36.1774616325794;
-        Fri, 27 Mar 2026 05:58:45 -0700 (PDT)
-Received: from debian (2a01cb05923c9a002e69015071700bd3.ipv6.abo.wanadoo.fr. [2a01:cb05:923c:9a00:2e69:150:7170:bd3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b919dfb54sm14881269f8f.31.2026.03.27.05.58.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Mar 2026 05:58:45 -0700 (PDT)
-Date: Fri, 27 Mar 2026 13:58:42 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Felix Maurer <fmaurer@redhat.com>,
-	Antonio Quartulli <antonio@openvpn.net>,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
-	Paul Mackerras <paulus@ozlabs.org>
-Subject: Re: [PATCH net-next v4] selftests: net: add tests for PPP
-Message-ID: <acZ_AgXhJVyUT_yj@debian>
-References: <20260326021642.29170-1-dqfext@gmail.com>
- <20260326081304.xKa7-s_1@linutronix.de>
- <CALW65jYdzn_rZWa2zwYd5J+Gd=kyaGMsVFyX0fMJfKfgULMO6w@mail.gmail.com>
- <acZp3gRUqVIbw9yb@debian>
- <CALW65jZNi3oA7V7at_Jr5Vr4AdL03JYdA9WeK5G7cNr-XS2Bvg@mail.gmail.com>
+	s=arc-20240116; t=1774617075; c=relaxed/simple;
+	bh=7UWnzrZdSof0bppbpEHEi89CB1BS2wWB8rE7AbLfxsw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cEGUg1AMP4hr1oNNuhoC6mLY8lStnA4iml0D7dY7y5T4U0xbLYCvsYWSDeTqqczHkkH5lWqYlDpZSVfYCLq9UjMOOIotTR8lNrbaX7BuknoNLD+ugtEK7WA7szjIREv7aJre8v5Cu8JVQH501BWGU26BIznUih9ZcKGxDQYGdQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FXKYULXo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FD82C19423;
+	Fri, 27 Mar 2026 13:10:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774617074;
+	bh=7UWnzrZdSof0bppbpEHEi89CB1BS2wWB8rE7AbLfxsw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FXKYULXoWx5SMZACv2tufJTQaJnJdC0sBdYmOPJayEupC3HhmRA7Rl9lsqVKlqBgJ
+	 AAp15nhSlMEHwJM1YygUqFhqmGbW92x3CIft5IUBwQsztvbharJGxKCkgJ++T9aLAB
+	 kXhpwPyPGY5GsnPBpjXHFaLaARgDqTx8XxdD44Q1lWG9AUoKZB4anIcAk6A/vb9xv2
+	 BT8nygATOx0RRGvMBqpO58MQNiPX+P8Vv3hukqh8AQoSlANJVHr7uSWqK5w6in4/3u
+	 XkLtG0qRK8ZDy4pmvRx36dKwHbvbpDc1FpLzi4txfLMLR2KSQCxLjLuhyhCZeKwRUR
+	 Fut+na4Gqyshg==
+From: Sumit Garg <sumit.garg@kernel.org>
+To: linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	freedreno@lists.freedesktop.org,
+	linux-media@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ath12k@lists.infradead.org,
+	linux-remoteproc@vger.kernel.org
+Cc: andersson@kernel.org,
+	konradybcio@kernel.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	robin.clark@oss.qualcomm.com,
+	sean@poorly.run,
+	akhilpo@oss.qualcomm.com,
+	lumag@kernel.org,
+	abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com,
+	marijn.suijten@somainline.org,
+	airlied@gmail.com,
+	simona@ffwll.ch,
+	vikash.garodia@oss.qualcomm.com,
+	dikshita.agarwal@oss.qualcomm.com,
+	bod@kernel.org,
+	mchehab@kernel.org,
+	elder@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jjohnson@kernel.org,
+	mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com,
+	mukesh.ojha@oss.qualcomm.com,
+	pavan.kondeti@oss.qualcomm.com,
+	jorge.ramirez@oss.qualcomm.com,
+	tonyh@qti.qualcomm.com,
+	vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com,
+	jens.wiklander@linaro.org,
+	op-tee@lists.trustedfirmware.org,
+	apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com,
+	harshal.dev@oss.qualcomm.com,
+	linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: [PATCH v3 00/15] firmware: qcom: Add OP-TEE PAS service support
+Date: Fri, 27 Mar 2026 18:40:28 +0530
+Message-ID: <20260327131043.627120-1-sumit.garg@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALW65jZNi3oA7V7at_Jr5Vr4AdL03JYdA9WeK5G7cNr-XS2Bvg@mail.gmail.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272554-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gnault@redhat.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272555-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_GT_50(0.00)[50];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 69D76344C2F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 49F48344F54
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 27, 2026 at 08:39:11PM +0800, Qingfang Deng wrote:
-> On Fri, Mar 27, 2026 at 7:28 PM Guillaume Nault <gnault@redhat.com> wrote:
-> >
-> > On Thu, Mar 26, 2026 at 04:26:23PM +0800, Qingfang Deng wrote:
-> > > Hi Sebastian,
-> > >
-> > > On Thu, Mar 26, 2026 at 4:13 PM Sebastian Andrzej Siewior
-> > > <bigeasy@linutronix.de> wrote:
-> > > >
-> > > > On 2026-03-26 10:16:24 [+0800], Qingfang Deng wrote:
-> > > > > Add ping and iperf3 tests for ppp_async.c and pppoe.c.
-> > > >
-> > > > Oh thank you for doing this.
-> > > > I haven't look in detail but this cover the "invalid loop" cases that
-> > > > ppp tries to catch?
-> > >
-> > > By "invalid loop", do you mean transmit recursion?
-> > > https://lore.kernel.org/all/20250715150806.700536-2-bigeasy@linutronix.de/
-> > >
-> > > AFAIK, this can only happen with PPTP or L2TP, which were not included
-> > > in this patch.
-> >
-> > The problem was originally reproduced using L2TP, indeed. But I guess
-> > that it could also be reproduced with PPPoE by using a UDP tunnel
-> > device like VXLAN (like sending a packet through a PPP interface,
-> > handled by PPPoE, running on top of a VXLAN device, that routes the UDP
-> > encapsulated packet back to the original PPP interface).
-> 
-> Yeah I've thought of that also. It can technically happen, though
-> there's no practical use. For self tests purpose, I may just add the
-> recursion test into PPTP or L2TP tests.
+From: Sumit Garg <sumit.garg@oss.qualcomm.com>
 
-Yes, no problem.
+Qcom platforms has the legacy of using non-standard SCM calls
+splintered over the various kernel drivers. These SCM calls aren't
+compliant with the standard SMC calling conventions which is a
+prerequisite to enable migration to the FF-A specifications from Arm.
 
-> Regards,
-> Qingfang
-> 
+OP-TEE as an alternative trusted OS to Qualcomm TEE (QTEE) can't
+support these non-standard SCM calls. And even for newer architectures
+using S-EL2 with Hafnium support, QTEE won't be able to support SCM
+calls either with FF-A requirements coming in. And with both OP-TEE
+and QTEE drivers well integrated in the TEE subsystem, it makes further
+sense to reuse the TEE bus client drivers infrastructure.
+
+The added benefit of TEE bus infrastructure is that there is support
+for discoverable/enumerable services. With that client drivers don't
+have to manually invoke a special SCM call to know the service status.
+
+So enable the generic Peripheral Authentication Service (PAS) provided
+by the firmware. It acts as the common layer with different TZ
+backends plugged in whether it's an SCM implementation or a proper
+TEE bus based PAS service implementation.
+
+The TEE PAS service ABI is designed to be extensible with additional API
+as PTA_QCOM_PAS_CAPABILITIES. This allows to accommodate any future
+extensions of the PAS service needed while still maintaining backwards
+compatibility.
+
+Currently OP-TEE support is being added to provide the backend PAS
+service implementation which can be found as part of this PR [1].
+This implementation has been tested on Kodiak/RB3Gen2 board with lemans
+EVK board being the next target. In addition to that WIN/IPQ targets
+planning to use OP-TEE will use this service too. Surely the backwards
+compatibility is maintained and tested for SCM backend.
+
+Patch summary:
+- Patch #1: adds Kodiak EL2 overlay since boot stack with TF-A/OP-TEE
+  only allow UEFI and Linux to boot in EL2.
+- Patch #2: adds generic PAS service.
+- Patch #3: migrates SCM backend to generic PAS service.
+- Patch #4: adds TEE/OP-TEE backend for generic PAS service.
+- Patch #5-#13: migrates all client drivers to generic PAS service.
+- Patch #14: drops legacy PAS SCM exported APIs.
+
+The patch-set is based on v7.0-rc5 tag and can be found in git tree here
+[2].
+
+Merge strategy:
+
+It is expected due to APIs dependency, the entire patch-set to go via
+the Qcom tree. All other subsystem maintainers, it will be great if I
+can get acks for the corresponding subsystem patches.
+
+[1] https://github.com/OP-TEE/optee_os/pull/7721
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/sumit.garg/linux.git/log/?h=qcom-pas-v3
+
+---
+Changes in v3:
+- Incorporated some style and misc. comments for patch #2, #3 and #4.
+- Add QCOM_PAS Kconfig dependency for various subsystems.
+- Switch from pseudo TA to proper TA invoke commands.
+
+Changes in v2:
+- Fixed kernel doc warnings.
+- Polish commit message and comments for patch #2.
+- Pass proper PAS ID in set_remote_state API for media firmware drivers.
+- Added Maintainer entry and dropped MODULE_AUTHOR.
+
+Mukesh Ojha (1):
+  arm64: dts: qcom: kodiak: Add EL2 overlay
+
+Sumit Garg (14):
+  firmware: qcom: Add a generic PAS service
+  firmware: qcom_scm: Migrate to generic PAS service
+  firmware: qcom: Add a PAS TEE service
+  remoteproc: qcom_q6v5_pas: Switch over to generic PAS TZ APIs
+  remoteproc: qcom_q6v5_mss: Switch to generic PAS TZ APIs
+  soc: qcom: mdtloader: Switch to generic PAS TZ APIs
+  remoteproc: qcom_wcnss: Switch to generic PAS TZ APIs
+  remoteproc: qcom: Select QCOM_PAS generic service
+  drm/msm: Switch to generic PAS TZ APIs
+  media: qcom: Switch to generic PAS TZ APIs
+  net: ipa: Switch to generic PAS TZ APIs
+  wifi: ath12k: Switch to generic PAS TZ APIs
+  firmware: qcom_scm: Remove SCM PAS wrappers
+  MAINTAINERS: Add maintainer entry for Qualcomm PAS TZ service
+
+ MAINTAINERS                                   |   9 +
+ arch/arm64/boot/dts/qcom/Makefile             |   2 +
+ arch/arm64/boot/dts/qcom/kodiak-el2.dtso      |  35 ++
+ drivers/firmware/qcom/Kconfig                 |  19 +
+ drivers/firmware/qcom/Makefile                |   2 +
+ drivers/firmware/qcom/qcom_pas.c              | 288 +++++++++++
+ drivers/firmware/qcom/qcom_pas.h              |  50 ++
+ drivers/firmware/qcom/qcom_pas_tee.c          | 478 ++++++++++++++++++
+ drivers/firmware/qcom/qcom_scm.c              | 302 ++++-------
+ drivers/gpu/drm/msm/Kconfig                   |   1 +
+ drivers/gpu/drm/msm/adreno/a5xx_gpu.c         |   4 +-
+ drivers/gpu/drm/msm/adreno/adreno_gpu.c       |  11 +-
+ drivers/media/platform/qcom/iris/Kconfig      |  25 +-
+ .../media/platform/qcom/iris/iris_firmware.c  |   9 +-
+ drivers/media/platform/qcom/venus/Kconfig     |   1 +
+ drivers/media/platform/qcom/venus/firmware.c  |  11 +-
+ drivers/net/ipa/Kconfig                       |   2 +-
+ drivers/net/ipa/ipa_main.c                    |  13 +-
+ drivers/net/wireless/ath/ath12k/Kconfig       |   2 +-
+ drivers/net/wireless/ath/ath12k/ahb.c         |   8 +-
+ drivers/remoteproc/Kconfig                    |   1 +
+ drivers/remoteproc/qcom_q6v5_mss.c            |   5 +-
+ drivers/remoteproc/qcom_q6v5_pas.c            |  51 +-
+ drivers/remoteproc/qcom_wcnss.c               |  12 +-
+ drivers/soc/qcom/mdt_loader.c                 |  12 +-
+ include/linux/firmware/qcom/qcom_pas.h        |  43 ++
+ include/linux/firmware/qcom/qcom_scm.h        |  29 --
+ include/linux/soc/qcom/mdt_loader.h           |   6 +-
+ 28 files changed, 1114 insertions(+), 317 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/qcom/kodiak-el2.dtso
+ create mode 100644 drivers/firmware/qcom/qcom_pas.c
+ create mode 100644 drivers/firmware/qcom/qcom_pas.h
+ create mode 100644 drivers/firmware/qcom/qcom_pas_tee.c
+ create mode 100644 include/linux/firmware/qcom/qcom_pas.h
+
+-- 
+2.51.0
 
 
