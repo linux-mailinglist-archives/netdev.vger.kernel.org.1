@@ -1,147 +1,134 @@
-Return-Path: <netdev+bounces-272474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272476-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MN+lJ01Qxmk2IgUAu9opvQ
-	(envelope-from <netdev+bounces-272474-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:39:25 +0100
+	id EAljGsFRxmk2IgUAu9opvQ
+	(envelope-from <netdev+bounces-272476-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:45:37 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61C46341DDA
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:39:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF158341F3E
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:45:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 313DD3095C64
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:37:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3A9FE301052A
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:40:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2727B3D6498;
-	Fri, 27 Mar 2026 09:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 857773DA7F2;
+	Fri, 27 Mar 2026 09:40:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=aliel.fr header.i=@aliel.fr header.b="FgkXKXD9"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fLfbgQ2U"
 X-Original-To: netdev@vger.kernel.org
-Received: from courrier.aliel.fr (pouet.aliel.fr [65.21.61.41])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77D9379EC4;
-	Fri, 27 Mar 2026 09:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.21.61.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0EBC3DBD46
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 09:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774604253; cv=none; b=YhEizAxG4RTcqXYx4+oY9VLsDP9lTJw2DZEXz7Ek7eraNAXfL9qho8QX4E2VGnWRcjZHb9Ilh1BnE4g7mpqfMx7LT+RY9ft7cBEzc409163ScqNkmLMoy70YnK4B6K+hbhb7WaSG9SdmwvNyHkg3Sx2zHhX+xebU45iHFKON8D0=
+	t=1774604406; cv=none; b=qAVJC2EGFx9BcxQ8ubCN+hxlpgR7Ca5GdX+TfiM+/lNpkFFqK1qWClbw3HjVLkfNQ/C1tziO2hxWODnE/5Wl7XRLWi41tdLS7SxgIwLITJ3dtG8Z0OraLQ8XHYC+jE2GIcAP/+5bZnKfVRB+w3RcC3WqeQe1pRix4Ye8gSJP+B8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774604253; c=relaxed/simple;
-	bh=cCrKuuyOz5qG2rFBsp37cnDOUzhVXzOLst/bIvh8j+A=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hyIUSlx4DI6iMEn67ojhYCiWrfpUhapiQlSMi5mhlFbrbfhF9OAGQEZ/puNT5U4TD3a/aTxh7du08IkYq7SEfQvTYTRm6cvbN4zUV8baq6aEmP36VJ8P8hcu0OLGy/xuM6YA4rpZq8URAic+pQdtLm+8GqQEu6qjjlkMOlxXbvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aliel.fr; spf=pass smtp.mailfrom=aliel.fr; dkim=pass (1024-bit key) header.d=aliel.fr header.i=@aliel.fr header.b=FgkXKXD9; arc=none smtp.client-ip=65.21.61.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aliel.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aliel.fr
-From: Ronald Claveau <linux-kernel-dev@aliel.fr>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aliel.fr;
-	s=courrier-s1; t=1774604242;
-	bh=cCrKuuyOz5qG2rFBsp37cnDOUzhVXzOLst/bIvh8j+A=;
-	h=From:Date:Subject:To:Cc;
-	b=FgkXKXD9iXLEZQAnfELBmS7V93ht232DzX+JEbXFdYBrm7ChAVeXfp3e4l57j1nwF
-	 itc5IBJlAL5t32cDWr7w6uKj4Ex9MEMNkSR3ohDEzo08OzlnzPUWyMBIhP+pjWCLTk
-	 /7TdBBtXGuD8ux8M36dd/At3l4EklgM1VU9pg7eQ=
-Date: Fri, 27 Mar 2026 10:36:26 +0100
-Subject: [PATCH net-next v2] dt-bindings: net: wireless: brcm: Add
- compatible for bcm43752
+	s=arc-20240116; t=1774604406; c=relaxed/simple;
+	bh=rmmlf4KKWtRHguk2iBVhE8jcOsAloGPjFm1p9NESs3c=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=BXVScZSGW7Y//JtZ1mOvogUWmIM4xDojJryTZMSttiD7KB75Uo09BoqVl0WNXaGSrJvO9xu6mstz3ug9Mjdq8mE4VRHL8mUK9wpnUd9s+TFPG+Zfz385QybpmTltl4MdZx+tCz/1IIkLjC48CrwYM/tE0FmgnJCYahDbC5zAbA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=fLfbgQ2U; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=WUPmq1A5eaO109OW3qO6eHS11Ep2OeWicoobVOUG9AI=; b=fLfbgQ2UujCA7PbAk0yuuAA5t1
+	4MTeVFDKsrj8Gcggwihm9v+awDhPb78uHdVsxMyKgunZybO9QMzqEQt3M3bQOKgHCYjAEGgbMYNQJ
+	wkHZRW7Ao8lvat74xIMHKZjhNv1WP1nSV6313Af66dsdjdkGcT/f7XbBNF94EwLDrXY2kYfqDxvIO
+	I4SEY4ybTwcm/gp0ouGt59m7uQM9xB9uoHqNrpUASlLIGgk6L5c1NUjFXZcaOmKBrh3FYmOzl3fMh
+	OADA9lfdW/Hatqz1qHSQnc+5d59ssjRWHssVbskYH8+g6K3v/YiSTUg0iAWFMIoNfB3cyLOeUUWR2
+	HC+VcwQQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34894)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w63fX-000000005xG-0JIU;
+	Fri, 27 Mar 2026 09:39:55 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w63fU-000000007wj-3Q70;
+	Fri, 27 Mar 2026 09:39:52 +0000
+Date: Fri, 27 Mar 2026 09:39:52 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 0/2] net: stmmac: fix and clean up TSO/GSO support
+Message-ID: <acZQaDeCoib5S5UA@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260327-add-bcm43752-compatible-v2-1-5b28e6637101@aliel.fr>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/4WNTQqDMBBGryKz7hRN/F/1HsXFRMc6oFGSIBbx7
- g1eoMvH43vfCZ6dsIc2OcHxLl5WG0E9Eugnsh9GGSKDSlWZalUiDQOafsl1VSjs12WjIGZmZFX
- mlI9VU2mCuN4cj3Lc5TdYDmj5CNBFM4kPq/vel3t2+7/1PcMMjTYNFTUZXZsXzcLzc3TQXdf1A
- yPTs3THAAAA
-X-Change-ID: 20260326-add-bcm43752-compatible-e264a4f7973a
-To: Johannes Berg <johannes@sipsolutions.net>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, van Spriel <arend@broadcom.com>
-Cc: linux-wireless@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Conor Dooley <conor.dooley@microchip.com>, 
- Ronald Claveau <linux-kernel-dev@aliel.fr>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openssh-sha256; t=1774604241; l=1596;
- i=linux-kernel-dev@aliel.fr; s=id_ed25519; h=from:subject:message-id;
- bh=cCrKuuyOz5qG2rFBsp37cnDOUzhVXzOLst/bIvh8j+A=;
- b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgMGec55oxeeisqykQiUedekMYyOnR9
- BG9E/7rDWyqdNoAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QIfB4fa5UnaYIw0QLG9SkKH5Df9Rhm2DOTJfIGNKliU28PbcrWWyEMIDqEabsSl4xy16qD9S7fD
- B1ndbnYkdBgI=
-X-Developer-Key: i=linux-kernel-dev@aliel.fr; a=openssh;
- fpr=SHA256:kch4osYZ6A1BrPps5AUs6KnfdE2wm4ocMtyTc8TmZMs
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[aliel.fr:s=courrier-s1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272474-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[aliel.fr];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[aliel.fr:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linux-kernel-dev@aliel.fr,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,microchip.com:email,aliel.fr:dkim,aliel.fr:email,aliel.fr:mid]
-X-Rspamd-Queue-Id: 61C46341DDA
+	TAGGED_FROM(0.00)[bounces-272476-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.965];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,armlinux.org.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AF158341F3E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add bcm43752 compatible with its bcm4329 compatible fallback.
+This series:
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-Signed-off-by: Ronald Claveau <linux-kernel-dev@aliel.fr>
----
-The Khadas VIM4 board based on Amlogic A311D2 aka T7 features an AP6275s Wi-Fi/Bluetooth module with a BCM43752 chipset.
-This patch aims to add this chipset with its fallback to bcm4329 compatible.
+1. moves setting priv->tso from stmmac_fix_features() to
+   stmmac_set_features() as fix_features is not supposed to change
+   driver state.
 
-The original patch series is here:
-https://lore.kernel.org/r/20260326-add-emmc-t7-vim4-v5-0-d3f182b48e9d@aliel.fr
----
-Changes in v2:
-- Add netdev in CC.
-- Link to v1: https://lore.kernel.org/r/20260326-add-bcm43752-compatible-v1-1-b3b9a58ab38b@aliel.fr
----
- Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml | 1 +
- 1 file changed, 1 insertion(+)
+2. simplifies the TSO/GSP test in stmmac_xmit() to simply check if the
+   skbuff is a GSO buffer, and whether the gso_type is one that we
+   should handle.
 
-diff --git a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
-index 3be7576787644..81fd3e37452a6 100644
---- a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
-+++ b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
-@@ -42,6 +42,7 @@ properties:
-               - brcm,bcm4356-fmac
-               - brcm,bcm4359-fmac
-               - brcm,bcm4366-fmac
-+              - brcm,bcm43752-fmac
-               - cypress,cyw4373-fmac
-               - cypress,cyw43012-fmac
-               - infineon,cyw43439-fmac
+A previous version of patch 1 was posted in February:
 
----
-base-commit: 45b2b84ac6fde39c427018d6cdf7d44258938faa
-change-id: 20260326-add-bcm43752-compatible-e264a4f7973a
+https://lore.kernel.org/r/E1vuU3X-0000000Ae9G-1Er8@rmk-PC.armlinux.org.uk/
 
-Best regards,
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h      |  3 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 38 +++++++++++------------
+ 2 files changed, 21 insertions(+), 20 deletions(-)
+
 -- 
-Ronald Claveau <linux-kernel-dev@aliel.fr>
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
