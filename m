@@ -1,118 +1,285 @@
-Return-Path: <netdev+bounces-272604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272606-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KByYFAelxmk4NQUAu9opvQ
-	(envelope-from <netdev+bounces-272604-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 16:40:55 +0100
+	id MHb2Elalxmk4NQUAu9opvQ
+	(envelope-from <netdev+bounces-272606-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 16:42:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0046346E63
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 16:40:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAB4F346EB5
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 16:42:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8FF5305ACA2
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 15:35:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F17723091D3D
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 15:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2DC2DF156;
-	Fri, 27 Mar 2026 15:35:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 801CA3081D6;
+	Fri, 27 Mar 2026 15:35:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b="AM/Nv6Ol";
-	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="o+ovQMcj"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="HYIlDdGH"
 X-Original-To: netdev@vger.kernel.org
-Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010002.outbound.protection.outlook.com [52.101.61.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4638A3770B
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 15:35:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.202.193.197
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774625735; cv=none; b=UrMkIYkcMSW2OHm6qilxyYgIVdqy03cWj6FiS+oYHuAB5ASdoTT0UsBq7nGc2/fWxCXCYcQ5O8emnc1OIlJTuKk5f2UC1JTfSIhFsWCYJWsbkHQQ+NwRjqX5c27dN8Izs1OU4GZzkh2ygp326Rnl0nvZETBdxd1P5nV2lG6ln7o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774625735; c=relaxed/simple;
-	bh=cBecj4/BHUgpx2Akznttb6F22ju7+BUQg+K5+fkSw+I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WO2HFj07/CwutCtHqQzsOIEZR6mGciwqKZnjn6PwV9Wb/77jtSN1hrUWMhs0RL29dRHs3fCI+I4xqgbFqBM+c9Rz8uuQfJSbSTAhhGTYE52K5VLd9IBogzprW0u27mlnVTwuT05BQZMPeTptllc3WgxUyjvuiH6hbHLX6ipPLSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com; spf=pass smtp.mailfrom=tinyisr.com; dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b=AM/Nv6Ol; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=o+ovQMcj; arc=none smtp.client-ip=34.202.193.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tinyisr.com
-DKIM-Signature: a=rsa-sha256; b=AM/Nv6Ol2T95fudLP+syTRCGn+Yaw5HZu2X8qBuTydDK2yHmFpGRo/JhiTmfjppyjcVKb8B9X86YKznSip+ylxjzUjqapirOlQPXSdlfgCQq23CFeP3hYRHIuiomEXx8Hc25defyvS4WGCLJuj4I8gPOwv4ghiGKII4gfT/0YKGkuxLE5EcYxIcbkf0WbbzEQcjtnajqcpoa4QPxx0u4zvayAYtcEpugtv8+9rMQWtcoMD9NESm2ggUl2R8zbVC7rxRIgbCe+mXcyblyM47sd8mPU/Y4PHwnjwDMLA0k/QTXXSlAEKmM8ipf34pOmgJjaEyoBPwUpeLsaQdPSWNlVw==; s=purelymail1; d=tinyisr.com; v=1; bh=cBecj4/BHUgpx2Akznttb6F22ju7+BUQg+K5+fkSw+I=; h=Received:Date:From:To:Subject;
-DKIM-Signature: a=rsa-sha256; b=o+ovQMcjc8yWn1enLEUls6VusOHGrS5ndPoQaEBA9lPdJ9spFmXfm9fGehuKqMjQ0B9E6vnWDFjpmeyEvVVon0Xq5xnUARnL3uheQhxWuYeJLB39Grfk7S2sdRXljPiGIVvO3Vjypab05C3lsKHrx4aUujqdQQSeCvZpvs/ZIIXXfCVWlOhKQBZeccp1etUMOKAYrhx+klJ6472yGRigB6fc6SK8fIdUTSgJ/x0oMO+wEJlNnsUmA+472Ko6AJNx1U4uzodod1P3z6Y+8QGWeTABKf41BblAOamcsUmCIeOxifGjL0xPOwIbfZ9L59api5KEEp8jqo9D5zaG3FgZSw==; s=purelymail1; d=purelymail.com; v=1; bh=cBecj4/BHUgpx2Akznttb6F22ju7+BUQg+K5+fkSw+I=; h=Feedback-ID:Received:Date:From:To:Subject;
-Feedback-ID: 99681:12517:null:purelymail
-X-Pm-Original-To: netdev@vger.kernel.org
-Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 1686820232;
-          (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
-          Fri, 27 Mar 2026 15:35:25 +0000 (UTC)
-Date: Fri, 27 Mar 2026 17:35:15 +0200
-From: Joris Vaisvila <joey@tinyisr.com>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com, 
-	kuba@kernel.org, edumazet@google.com, davem@davemloft.net, olteanv@gmail.com, 
-	Andrew Lunn <andrew@lunn.ch>, devicetree@vger.kernel.org, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: add MT7628 ESW
-Message-ID: <acaijjDU7cgOUWmU@archlinux>
-References: <20260326204413.3317584-1-joey@tinyisr.com>
- <20260326204413.3317584-2-joey@tinyisr.com>
- <acW9G8vrMz89Enss@makrotopia.org>
- <acYZOEksxcc-uHcT@archlinux>
- <acZqvZfYXR_4sMlT@makrotopia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B2D92DF156;
+	Fri, 27 Mar 2026 15:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.2
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774625745; cv=fail; b=qmvrZFwoM9PVn2nc6l9pDZR7+U18c6tX1/UmmGgMVt06Vv6Os4REoEmdiE/f6N8aKOoJVE1Ec19W6x3X3fXKxX1A+8I4l1aaHzJxxfCner0UONTc0NSh31sRN/AdQSS8QzPA9i5SgIYMTG1m9yCJzFTZVRPydwUtUt0kkCoq5Bo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774625745; c=relaxed/simple;
+	bh=mSdM94IOKvG12w0tUcrW1gmy8TKZJ6E5azly5UQ/4lY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=e8knlRCLQRS7qPcjDCpgbR6hEO+Vhx2fFzQcTnMwZKxjHapDNa+zaZ4l5cUM+9iiZQR1ka41YthTxw6ArE+kinMSszNR4oPk5QjR+/KCCCZmXD9RL7tF0JTJ/g8hsoTNfX2Tzi1rMxRHREgYyvq8Sqze7lPjsxUsVebH5JaREbc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=HYIlDdGH; arc=fail smtp.client-ip=52.101.61.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AHwkL+knu79h/pWx6o2XNvvzW7DSJNwGTXKqYW5z76xTflVuFpuOi/0DnhpL70KOdCKaaqtSFE5bMmgaTnwJQ7FcUbD7g1Wzsy+MRLw22TpZ10v/Ly8yTA2/szrB1VQ6Y0mJZzpGX3nWO+JhFhdMo3PnhUTrYLBbNdUU6ogyTbNXeOjpiOzQEIB6NWJv2xXSygDY6M30OhDf933K9kHfOF6RAA4lRkfjZJPtRxKJRL/ChMLyLg9f7A0FVtRJARHAALT2BsvhyugKwJcZoQ2hdTfBjVnr3kTG0qiJfY+RbEQQEVbB/CU7Cq9McfSTtfqwxcs3xOYhIsmQCUPnSxZ1JA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VsLDPRQuWnveMMc+04YzyMN04lQBExwFdn5NFqN53Yk=;
+ b=TJU4cXLdWCGQuybEMlIR/XfVDdYxnbkIRVGTQKWD4XScK87/21eKG7etIypo+E289KnNsqR/M07sNSF01s4eaAPFIouKw/x6jmPCW05wCYtTFE79rz9bCl5Tn8IZ5upkZCc/ceQSeGYEKVAx3BQovW3fBUNayMih1s4kEmI3x5MuXFTtGXTRc4IXpI+SKouK7TQ4xLCPNiVivQQ/H+CtCzZMfae3MMxkZ+Q/hilvww0KMScwrjJrc065u6K7y2U4fhhm4D0Kx4yec59eQ6wgyi/U8jpkJCx9tO/7inByTkEVwhABgd/uMWOmj0ZekYOloLIB0djg1DevQ1xGZnULfA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VsLDPRQuWnveMMc+04YzyMN04lQBExwFdn5NFqN53Yk=;
+ b=HYIlDdGH8VZtzS+ZEVRE3U+9wKaLdndkYGs7o9rl2PfrcQexfCu//6OP4D86UX8gdWQwtK2p5VIwoc0wKAqSC0qZfoaq6GMQZUmEAZTOPPIX6eTiC5I+/E/VWHhwYHf6ltWzEWj4h7nXNpN42cnjlHWVNpsrZhkgUTXO9feEd5dKW5tKZSzp63opms2FCGcbbTH6R5CMVy8zaBXtFfBXoviMFwwpdQfFOGw8RNPdYmHwcOog2Xsj/56J6Nw4/JN0x9bGuvxk5yd9vY7Ye+IuuwO3KdtDWLTJKx8JRWS6UMxsyMUR9aWE7MhzPkJvGT7OwShjAIeYFdVYN5d3LeBtOQ==
+Received: from CY5PR11MB6462.namprd11.prod.outlook.com (2603:10b6:930:32::10)
+ by PH8PR11MB7990.namprd11.prod.outlook.com (2603:10b6:510:259::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.6; Fri, 27 Mar
+ 2026 15:35:40 +0000
+Received: from CY5PR11MB6462.namprd11.prod.outlook.com
+ ([fe80::10d1:11dd:5088:7559]) by CY5PR11MB6462.namprd11.prod.outlook.com
+ ([fe80::10d1:11dd:5088:7559%5]) with mapi id 15.20.9769.004; Fri, 27 Mar 2026
+ 15:35:40 +0000
+From: <Prathosh.Satish@microchip.com>
+To: <ivecera@redhat.com>, <netdev@vger.kernel.org>
+CC: <arkadiusz.kubalewski@intel.com>, <jiri@resnulli.us>,
+	<mschmidt@redhat.com>, <poros@redhat.com>, <horms@kernel.org>,
+	<vadim.fedorenko@linux.dev>, <linux-kernel@vger.kernel.org>,
+	<conor+dt@kernel.org>, <krzk+dt@kernel.org>, <robh@kernel.org>,
+	<devicetree@vger.kernel.org>, <pvaanane@redhat.com>
+Subject: RE: [PATCH net-next 2/5] dpll: zl3073x: use FIELD_MODIFY() for
+ clear-and-set patterns
+Thread-Topic: [PATCH net-next 2/5] dpll: zl3073x: use FIELD_MODIFY() for
+ clear-and-set patterns
+Thread-Index: AQHct8iojHzy4j+M10abM/1ReuO74bXCjx7g
+Date: Fri, 27 Mar 2026 15:35:39 +0000
+Message-ID:
+ <CY5PR11MB646215070FB6F16391909979EC57A@CY5PR11MB6462.namprd11.prod.outlook.com>
+References: <20260319174826.7623-1-ivecera@redhat.com>
+ <20260319174826.7623-3-ivecera@redhat.com>
+In-Reply-To: <20260319174826.7623-3-ivecera@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CY5PR11MB6462:EE_|PH8PR11MB7990:EE_
+x-ms-office365-filtering-correlation-id: 8b963a21-2ef1-47fc-2f56-08de8c168022
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700021|22082099003|56012099003|18002099003;
+x-microsoft-antispam-message-info:
+ TQBamX1/fhSz+Ntd3DtcOfq6IvtisZfxuWrd0xUe7vybcxHRdZ6gF8viWG0w2wMh+XnJkxTvlIbadh4XshEhYueFraGm1oGAvWKmJh4oysQf6F1x3wAV1QMGvRIKC3r5bwlbJCztuPuokAs7OEyVS1dNAtF7mDlsdvj5Qu8CIwemq1GlZJ7u3mid7hjnvi/iBk01bxuaB35aiV1Jz7jYmE4DIbMlm4X2Tx6pxbFB3Z9fdx4FeNvD0OYVrjQcPyUGTDSiVGhtxGSaVL0yY6MalOhPvbiOGhKWlvefL3lBXwefQWqbBQe2+jg5E+DY40hDzaIg5I50xpFB9vMQ0SlrCDGTmbG2d0xlW0kURYshRpmnj7FfeY19/6YQMVfGleCJhZDjUv2Ek/ZmM/L5VaqgsBnZp9yjDMOGxTrk4WY7CaEfm5ND0GH21+3FlME+9w7scywGj0winxovMDmtDPxBBfdPe2XFWEC00Q01DOyrU24WCSukruk+gC2RhlBgQXDUCWOfPN6VHgNG/I0soHFDYX95zgmGUC0OPsgpEuRcjPauPGDCeXWXHX27tgz7htb8/9B3Ql5u51scRSG/WaOtCJTODMFdkHxqHZpRLELs5Hi0IjnstviU0U03N3C3eh0sTFwuCIQ+4xoTSQoaO5iUypVnQ4TEOQTQibYGHKBFIrV+xdldAip7w+AX41KMooJeDomR059fzo1bXDnrX8ux+KGUqt6pBqc6C2VMj8sYgQIvmPACFdyxVAD9R9ypv6PsKrok4k8/hwIcsbxw9M1e4FV1rTYO5qPijyesRIdoA3A=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6462.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700021)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?BGHVnbpTrrh3fbL37RR6AOHkzkAZJVm2XhVqL8kDcwo/Q5pKur05nC1Za5Rw?=
+ =?us-ascii?Q?Tce+lg7zRq0ycgacHCs6A+Vc2bdrhGNRmgceoTXNvTJc6Dj+otBRzOuiSX+y?=
+ =?us-ascii?Q?3c5VzEkduA92D1jYStvtZO877pot8ajUOTJ7Vbydjg5rhKbbtq0/0QnQ/xtC?=
+ =?us-ascii?Q?YCTw+rk8uo4JhihLfBFRJFd0UC4RrA3yOmArbwByKYXOIoQ+anaYyArAtSHc?=
+ =?us-ascii?Q?YgvKjZx3gkg9II5tnDE23AmfN3hN2u8NpCto8nsBXLziP3BD0MVOY/xXsQLu?=
+ =?us-ascii?Q?cZ2+tjPa6YzdAQivnLurcWSC+y3/Te12fo+abPAnF+/OHVVNW14Gti+Z1BgP?=
+ =?us-ascii?Q?j0RFT78loVgISFCMTHbvkjp1nyZWVGQTgPdQ+IO+06NiBoUmkruO1OgWxj/E?=
+ =?us-ascii?Q?MWH0qDvWLZXNIp4ieniAuVQCmylzD21bbuOH+nOvfARpZUwGmtlfss7bkq8P?=
+ =?us-ascii?Q?7tPKI1qRw9j2O1l0BuyIylX4LD5oMxWyo7K12oxOUIJHars2rb3IAtHotcWR?=
+ =?us-ascii?Q?0Zv80vAjVB1+xUVFwy7hS1zWYXRvT2l0QCgXxaAFVK1uAs8BeWhcZgP/6mU1?=
+ =?us-ascii?Q?G1TRPDMxJ51bcuQcV8E1BcVLda3dc1P1qFINo+BsNXejXVcfAkHevyMh7aZS?=
+ =?us-ascii?Q?7Ijqe0U3mpPjrX2/toyiI0zQncf0y7q7Qte2iBUWz2kLn+E90vXAXqylETeY?=
+ =?us-ascii?Q?vLABjVLW7eKG+fsZigsiBviqI/Af9DtgbLFTO/+e9co0E9GXLpilzx/Hc7RU?=
+ =?us-ascii?Q?KdgscA8tWcC7ots/1ECPEOF2YO+Xh+yRTlVvCz+DaCfHfQD1ybVGLGhpf53+?=
+ =?us-ascii?Q?EtUUeAh5+fgRmJWgIGy/l/dsnli0ckyrAR5ZFSUs3gkKdSRGUEyJFn9wf5vJ?=
+ =?us-ascii?Q?zX2ReEdL45TIMrd5DK185/miYtR4q3RLyRPFAKuB11t/+8ChrmXRbDwEXWOl?=
+ =?us-ascii?Q?jq8K9+O7lKYnNcSOxJGW+ht+YKSxgKTxBkU4/f11DpkWXtrYSekfFKBYgX0p?=
+ =?us-ascii?Q?ZsVyrQXHRsZX+VuY2gpUf5m1kJajIs5JmQou1bo1R4H85IFWty1ovyY6tTAo?=
+ =?us-ascii?Q?kvsos2wMX8pU2JR7t/j9RztjaYAIKQ9SBepb/YXERDj1yuNwRzTYmRzNetbx?=
+ =?us-ascii?Q?4qA9wivGDrR2HInDU4Jh9/0Rvzd3aLYV6NvRYKCG26PM/bnO5wyOpk88J0dt?=
+ =?us-ascii?Q?zaBiLjLEY7VHDIegY8OzNjgmvwPGHl3vsVyUeuIA5OVNsfmrTup9BSKSw+mb?=
+ =?us-ascii?Q?AwCCHb6geZE4+Jv63/mnL0C561xe9gvsges2UlrwaKQPYmvvcZokTKMFpnfg?=
+ =?us-ascii?Q?jPJLqBwKOBHimfFhBaEUtnjefTS2BKOnjzOerAmN0jpZ1JRPFPMmYt1YEdAZ?=
+ =?us-ascii?Q?yT7jqTjj4P0gYlQv52dgCffp6Hvcv7CkFJQYhWB2Zs/tT2Ql6GfwY/zZI0an?=
+ =?us-ascii?Q?gJw+dNkqR/3YQObZNsQR88QtlqbaCf+DBABIlH6Dn1EVvvELKXRkyL4y6L57?=
+ =?us-ascii?Q?uxDal4WjpP4hj/fuKidCUUVnH8snG5cPjzblyRMVitk1R93JkFZIT4JvWU9H?=
+ =?us-ascii?Q?sjroJuFLiMrFgZtAjQyKVnNj9JpEcfsjpASTyAa2wSm2+Rz4FxkpmtIFEEzF?=
+ =?us-ascii?Q?k6NRoj0dH2Iq6ZBTeCgvbw+lTnRJ9xH6zYF4WIDkLw8EM1WJeSeWtBZJ3XoH?=
+ =?us-ascii?Q?eVxXdxW9bL8krdBnTqBr/C1zd8jCbhLIaksNUzOYxmO19V0zaHKu+Oa71Hc6?=
+ =?us-ascii?Q?Ou+02rZcxQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acZqvZfYXR_4sMlT@makrotopia.org>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6462.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b963a21-2ef1-47fc-2f56-08de8c168022
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Mar 2026 15:35:39.9186
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pY6DgwFpEmEy2SqOYL7rkmfynP/+/hCVail0xr84m2lAufMJdeMoc7p7/w7TF7zgum+s3MARRM/31xbMyg3P/ZDT8W8Z/yVqTNuIVzn2rwE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7990
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[tinyisr.com,reject];
-	R_DKIM_ALLOW(-0.20)[tinyisr.com:s=purelymail1,purelymail.com:s=purelymail1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272604-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272606-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[Prathosh.Satish@microchip.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,davemloft.net,gmail.com,lunn.ch];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joey@tinyisr.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tinyisr.com:+,purelymail.com:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[microchip.com:+];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tinyisr.com:dkim,purelymail.com:dkim]
-X-Rspamd-Queue-Id: B0046346E63
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NO_DN(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:dkim,microchip.com:email,linux.dev:email,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,CY5PR11MB6462.namprd11.prod.outlook.com:mid,resnulli.us:email]
+X-Rspamd-Queue-Id: AAB4F346EB5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 27, 2026 at 11:32:13AM +0000, Daniel Golle wrote:
-> > [...]
-> > On the hardware I'm testing on, it works fine with the port set to
-> > "internal" or "rgmii". Would it make more sense to set "internal" then? 
-> 
-> "internal" then. It's a single-die SoC, the switch sharing the same
-> memory space, clocking domain, ... with all the rest of the SoC makes
-> it very unlikely that RGMII would be used as an on-die connection
-> type. (unlike eg. MT7621 or MT7623A which are using multiple dies in
-> the same package, and actually RGMII or TRGMII to connect the
-> MDIO-managed switch part to the main SoC, see "MCM" / "multi-chip
-> module" in the mt7530 driver...)
+Reviewed-by: prathosh.satish@microchip.com
 
-Makes sense, will change CPU port to internal in v2. 
+-----Original Message-----
+From: Ivan Vecera <ivecera@redhat.com>=20
+Sent: Thursday, March 19, 2026 5:48 PM
+To: netdev@vger.kernel.org
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>; Jiri Pirko <jiri=
+@resnulli.us>; Michal Schmidt <mschmidt@redhat.com>; Petr Oros <poros@redha=
+t.com>; Prathosh Satish - M66066 <Prathosh.Satish@microchip.com>; Simon Hor=
+man <horms@kernel.org>; Vadim Fedorenko <vadim.fedorenko@linux.dev>; linux-=
+kernel@vger.kernel.org; Conor Dooley <conor+dt@kernel.org>; Krzysztof Kozlo=
+wski <krzk+dt@kernel.org>; Rob Herring <robh@kernel.org>; devicetree@vger.k=
+ernel.org; Pasi Vaananen <pvaanane@redhat.com>
+Subject: [PATCH net-next 2/5] dpll: zl3073x: use FIELD_MODIFY() for clear-a=
+nd-set patterns
 
-Thanks,
-Joris
+EXTERNAL EMAIL: Do not click links or open attachments unless you know the =
+content is safe
+
+Replace open-coded clear-and-set bitfield operations with FIELD_MODIFY().
+
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ drivers/dpll/zl3073x/chan.h  | 17 ++++++-----------  drivers/dpll/zl3073x/=
+core.c  |  3 +--  drivers/dpll/zl3073x/flash.c |  3 +--
+ 3 files changed, 8 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/dpll/zl3073x/chan.h b/drivers/dpll/zl3073x/chan.h inde=
+x e0f02d3432086..481da2133202b 100644
+--- a/drivers/dpll/zl3073x/chan.h
++++ b/drivers/dpll/zl3073x/chan.h
+@@ -66,8 +66,7 @@ static inline u8 zl3073x_chan_ref_get(const struct zl3073=
+x_chan *chan)
+  */
+ static inline void zl3073x_chan_mode_set(struct zl3073x_chan *chan, u8 mod=
+e)  {
+-       chan->mode_refsel &=3D ~ZL_DPLL_MODE_REFSEL_MODE;
+-       chan->mode_refsel |=3D FIELD_PREP(ZL_DPLL_MODE_REFSEL_MODE, mode);
++       FIELD_MODIFY(ZL_DPLL_MODE_REFSEL_MODE, &chan->mode_refsel,=20
++ mode);
+ }
+
+ /**
+@@ -77,8 +76,7 @@ static inline void zl3073x_chan_mode_set(struct zl3073x_c=
+han *chan, u8 mode)
+  */
+ static inline void zl3073x_chan_ref_set(struct zl3073x_chan *chan, u8 ref)=
+  {
+-       chan->mode_refsel &=3D ~ZL_DPLL_MODE_REFSEL_REF;
+-       chan->mode_refsel |=3D FIELD_PREP(ZL_DPLL_MODE_REFSEL_REF, ref);
++       FIELD_MODIFY(ZL_DPLL_MODE_REFSEL_REF, &chan->mode_refsel, ref);
+ }
+
+ /**
+@@ -110,13 +108,10 @@ zl3073x_chan_ref_prio_set(struct zl3073x_chan *chan, =
+u8 ref, u8 prio)  {
+        u8 *val =3D &chan->ref_prio[ref / 2];
+
+-       if (!(ref & 1)) {
+-               *val &=3D ~ZL_DPLL_REF_PRIO_REF_P;
+-               *val |=3D FIELD_PREP(ZL_DPLL_REF_PRIO_REF_P, prio);
+-       } else {
+-               *val &=3D ~ZL_DPLL_REF_PRIO_REF_N;
+-               *val |=3D FIELD_PREP(ZL_DPLL_REF_PRIO_REF_N, prio);
+-       }
++       if (!(ref & 1))
++               FIELD_MODIFY(ZL_DPLL_REF_PRIO_REF_P, val, prio);
++       else
++               FIELD_MODIFY(ZL_DPLL_REF_PRIO_REF_N, val, prio);
+ }
+
+ /**
+diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c inde=
+x 6363002d48d46..7eebfc1ad1019 100644
+--- a/drivers/dpll/zl3073x/core.c
++++ b/drivers/dpll/zl3073x/core.c
+@@ -743,8 +743,7 @@ int zl3073x_dev_phase_avg_factor_set(struct zl3073x_dev=
+ *zldev, u8 factor)
+        value =3D (factor + 1) & 0x0f;
+
+        /* Update phase measurement control register */
+-       dpll_meas_ctrl &=3D ~ZL_DPLL_MEAS_CTRL_AVG_FACTOR;
+-       dpll_meas_ctrl |=3D FIELD_PREP(ZL_DPLL_MEAS_CTRL_AVG_FACTOR, value)=
+;
++       FIELD_MODIFY(ZL_DPLL_MEAS_CTRL_AVG_FACTOR, &dpll_meas_ctrl,=20
++ value);
+        rc =3D zl3073x_write_u8(zldev, ZL_REG_DPLL_MEAS_CTRL, dpll_meas_ctr=
+l);
+        if (rc)
+                return rc;
+diff --git a/drivers/dpll/zl3073x/flash.c b/drivers/dpll/zl3073x/flash.c in=
+dex 83452a77e3e98..f85535c8ad246 100644
+--- a/drivers/dpll/zl3073x/flash.c
++++ b/drivers/dpll/zl3073x/flash.c
+@@ -194,8 +194,7 @@ zl3073x_flash_cmd_wait(struct zl3073x_dev *zldev, u32 o=
+peration,
+        if (rc)
+                return rc;
+
+-       value &=3D ~ZL_WRITE_FLASH_OP;
+-       value |=3D FIELD_PREP(ZL_WRITE_FLASH_OP, operation);
++       FIELD_MODIFY(ZL_WRITE_FLASH_OP, &value, operation);
+
+        rc =3D zl3073x_write_u8(zldev, ZL_REG_WRITE_FLASH, value);
+        if (rc)
+--
+2.52.0
+
 
