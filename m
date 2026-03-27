@@ -1,115 +1,131 @@
-Return-Path: <netdev+bounces-272593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272596-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aPQWKJmYxmnrMQUAu9opvQ
-	(envelope-from <netdev+bounces-272593-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 15:47:53 +0100
+	id eFJNGm+bxmnrMQUAu9opvQ
+	(envelope-from <netdev+bounces-272596-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 15:59:59 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 175B23464D5
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 15:47:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B94803466B3
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 15:59:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D41D53021582
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 14:47:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BCC6E3019935
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 14:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C09228313D;
-	Fri, 27 Mar 2026 14:47:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 812EB3F880C;
+	Fri, 27 Mar 2026 14:55:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZrN6GdQs"
+	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="NVUt3fDw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF383F8819;
-	Fri, 27 Mar 2026 14:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5843F99DF;
+	Fri, 27 Mar 2026 14:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774622845; cv=none; b=KIQsiBR+sCGSIdl25NfgNoikYuQ9zx2NNsCuWaWczmURk31Vge3G1/HG2OdGi6k0r/mwQRpIBMf0Q2hcFzDxhFWAy9S1tioEM7hU/iitIP4OzVCb/9edCyrwbisq1u/UNcs1KoIZZ80su8nscbFb3hQ/O2t02rpgE3nrLrNS5To=
+	t=1774623322; cv=none; b=ftCJIL70y/FOviEgPPWpWCNKFPBrktQ9OuYD82qFIpx8K+ZcwBg8gU6xhoPf8NBj9m29fT8kNjR0zyhy78SsID3+JubQWUYzsrj0wEE+DRI5yIvzMsZ99KdNcCnHWr1wqsGgEE5HGwAObSbEvRsLDy2s8EkSG3Ij0V9IMa1CpHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774622845; c=relaxed/simple;
-	bh=2rXQs32wqvDW7QSkYIr4YtldGSQDImxafhk89H7DS1A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pme1FcFlSt8UUnM8xCDQlgJxTy++egu1L0Jr6OMdoR+8rvwmgWHmpAROtQEslNJp2jORiepnfDbqMpPT7+GSeAaqUu7pIeS/4pjVyXnXS3UlHGypehlV7memYakw5KSMNzco5ysS4T77kmGnf3WbISUSbRxgpRkxKfnUvndppE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZrN6GdQs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE435C19423;
-	Fri, 27 Mar 2026 14:47:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774622845;
-	bh=2rXQs32wqvDW7QSkYIr4YtldGSQDImxafhk89H7DS1A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZrN6GdQs0ktOGev58eAnzNGJtREEZW0v3FXnrZ5tK+XfjF2p9AXjNiEaPH7rWWH7F
-	 tW/M1lhVAWLzELJJZWSnJnfCV/omxVDQ/tNNFSd12C9EmcWKrbnKuyYh5Q2AVJFK0f
-	 jxd2nKAEjgxMTIMpS03XQ46OPHgUtKj9/szQQc/hWBeO8lkRl7HhHNgbboIcds4bYn
-	 jXYMNHp0H4vdN8obwcC6JnRT2AVEH6pF4cX45uLe8drEdHjrMZ5pSb9ZF+Q991QrZn
-	 TCQc3R38C9pADyc58aBYfcoUYiu707w2CzWpNuknm/+mBkvArIlzRYSY3CaIRKS0qY
-	 Bg1jWsEfBhdhw==
-Date: Fri, 27 Mar 2026 07:47:23 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: fffsqian@163.com
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, Qingshuang
- Fu <fuqingshuang@kylinos.cn>
-Subject: Re: [PATCH v3] selftests: net: broadcast_pmtu: Fix false failure
- from incorrect ping exit code logic
-Message-ID: <20260327074723.26e086d8@kernel.org>
-In-Reply-To: <20260327012705.2389814-1-fffsqian@163.com>
-References: <20260327012705.2389814-1-fffsqian@163.com>
+	s=arc-20240116; t=1774623322; c=relaxed/simple;
+	bh=T+KQ37jHwWtYw3vucW7+wu32h2LngUqMA4j4rk4dfyE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Lrh/BQYw0rJG7Ucxuc/wz9y/o0eLL2jPF4cfJW+bzx2AYhnRZML5pz+l06wtUcjrkvvuVgAxECnAN8tprM9QH+BTqlazVR2KyJZ/SgLgu1/cLqBa4SlClJg+d3kE/rI135ZXloe+/J1ojA45TVyjJYR96QjTXdigX2gfbCJvFOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=NVUt3fDw; arc=none smtp.client-ip=178.251.229.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E68BA108582;
+	Fri, 27 Mar 2026 15:55:14 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
+	s=dkim; t=1774623317;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=O3U6KBp5eEItdm326gyDQSusCSAfn1puIfEFX1XPUdk=;
+	b=NVUt3fDwRABcutDS7WJf5ejKhiImODoNwU89rycq8ImOEeRghCk4mHysUjpxLN+JdLxrAD
+	YysQpaCV5wz9GErd08aZm92Sjtx7Hyxe4xkrz2m19gQ8HejFS6dmM/wmRVgfvGoR7qJFYt
+	9TLOjEb2UZmwRRfo7dzMn43E/2jJUrbMMFa6m7VSthcZ5rTn1uRBwPgaX5ARIYUpmCZ01L
+	d7tU4T5XCqnTgL129b541YEVYG9auPJ5sNTZJ/7PeMCKHQPA3fTkrE0/jxYepIHpm93mzm
+	csG7ctMpvOfcfyZSqRo4jk2bPoksajsq13/wzLL28DcUNhtZu0GDQPy8KTTgsQ==
+Message-ID: <80e21085-84b9-4ebd-9a60-1d7acfc1a56b@nabladev.com>
+Date: Fri, 27 Mar 2026 15:55:14 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] net: dsa: microchip: implement KSZ87xx Module 3
+ low-loss cable errata
+To: Bastien Curutchet <bastien.curutchet@bootlin.com>,
+ Vladimir Oltean <olteanv@gmail.com>,
+ Fidelio Lawson <lawson.fidelio@gmail.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Fidelio Lawson <fidelio.lawson@exotec.com>
+References: <20260326-ksz87xx_errata_low_loss_connections-v1-0-79a698f43626@exotec.com>
+ <20260326-ksz87xx_errata_low_loss_connections-v1-0-79a698f43626@exotec.com>
+ <20260326-ksz87xx_errata_low_loss_connections-v1-3-79a698f43626@exotec.com>
+ <20260326-ksz87xx_errata_low_loss_connections-v1-3-79a698f43626@exotec.com>
+ <20260326094211.hdaf4tz7lbjyjznn@skbuf>
+ <2848158c-a807-4d26-be87-248d4107c5b4@bootlin.com>
+Content-Language: en-US
+From: Marek Vasut <marex@nabladev.com>
+In-Reply-To: <2848158c-a807-4d26-be87-248d4107c5b4@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
+	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272593-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272596-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[163.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[bootlin.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.931];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marex@nabladev.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[nabladev.com:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,broadcast_pmtu.sh:url]
-X-Rspamd-Queue-Id: 175B23464D5
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nabladev.com:dkim,nabladev.com:mid]
+X-Rspamd-Queue-Id: B94803466B3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 27 Mar 2026 09:27:05 +0800 fffsqian@163.com wrote:
-> The broadcast_pmtu.sh test verifies that broadcast route MTU is respected,
-> but it uses an incorrect criteria for test success: it relies solely on
-> the ping command's exit code, which leads to false failures.
-> 
-> When the kernel correctly blocks oversized broadcast packets due to the
-> configured MTU limit (1500), ping fails to transmit any packets and returns
-> exit code 1. The original script interprets this as a test failure, even
-> though the kernel is properly enforcing the MTU (the core goal of the test).
-> 
-> Fix this by checking ping's output for "0 packets transmitted" or
-> "message too long" instead of relying on exit code.
+On 3/27/26 3:47 PM, Bastien Curutchet wrote:
 
-Still failing, are you testing this locally before you repost it?
-Does it pass for you?
-Please do not post another version until someone asks for it.
+Hello Bastien,
+
+>> FYI, the driver is in a restructuring process. The ksz88xx_switch_ops
+>> will be split out of the common ksz_switch_ops. This will conflict with
+>> your series, so you should rebase on top of that much larger set.
+>> You can coordinate with Bastien Curutchet to see what is the status:
+>> https://lore.kernel.org/netdev/20260313153849.qkfzv5c2u6fepjku@skbuf
+> 
+> Indeed, I'm currently polishing a first iteration for it. I'll send it 
+> ASAP.
+I would argue that this low-loss cable errata is a bugfix, so maybe that 
+should have a priority over restructuring ?
 
