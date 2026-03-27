@@ -1,215 +1,181 @@
-Return-Path: <netdev+bounces-272445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272446-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8GFiGStDxmlRIAUAu9opvQ
-	(envelope-from <netdev+bounces-272445-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:43:23 +0100
+	id oL5LADpDxmmgIAUAu9opvQ
+	(envelope-from <netdev+bounces-272446-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:43:38 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B60D3412BB
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:43:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 689AB3412D8
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:43:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 65ADC30E2E57
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 08:35:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 957DE301A288
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 08:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8253D170E;
-	Fri, 27 Mar 2026 08:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49CA34BA42;
+	Fri, 27 Mar 2026 08:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pSRVoD3i"
+	dkim=temperror (0-bit key) header.d=dev.tdt.de header.i=@dev.tdt.de header.b="knLLKjgb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D2B3D6CB1
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 08:35:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774600519; cv=pass; b=N5hQHlUqvzMWAk0zMo7ptO0uHtVzuimN7SAWgJiboyXfOaY0JVXwuxPdKQbR3TNiOywpe3x+DXf791hDA3lQF45gMRKW+1qCstpLRhfYQY7ETnLk7XDI2/zh8Vix3Omvq3M1EK3sAeIIrpBOoxpMh+bdHP4XQT0xDzdBeIJis1k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774600519; c=relaxed/simple;
-	bh=qYBJ7lG2jPqlCAQklJIlC/RTAf122HGcyvH4xyxPcD0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jGgBfjO8WJhdfWvBbk56Tr9fwZp0JsLDXE1Q0xox+5DdzuoPkBbEmJZ7It4XjBObUvKHMPTXGMSs9KptwF6jNw97bBNxrGQrMMsF/gCryGOvGfzwIJRpBnPWhjn74m2VSi+p68pTc/sRncP3hs85FHPV5a+QnXrTnXAF0+NgME4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pSRVoD3i; arc=pass smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5a299cba953so2109313e87.2
-        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 01:35:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774600516; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bwP7vvmvUkghIUCcTQmVfWKKYj8t8OdeaXakzfIUr34zrKD84lVwSqoAygkGl8HJEI
-         /zyrk2pOWARuyDwLpK5yvViTvtHS2wdz2wl8BPEQ+uFRA+vzHbz1HBlJn1TkXDhzH3N/
-         bo+A+1tTKvTOZ3nS0lawtvI1dCaoB1tDQA9WJbVV+pi9C9zjhRDSp+WtPNxIVMFxMvh0
-         HVYIM9kWCXNfJuMb7+UBfptFfmXtpkbDjGisZNaB8W/Q42xuNfDYEabvav7sf3BwAQMx
-         iMC/oH9GsIIVEMwGOptv1X9uSQvajh/uchXYHeXUYOsYlD6W2heFt0z3rMhznDclJ6+4
-         zB0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qYBJ7lG2jPqlCAQklJIlC/RTAf122HGcyvH4xyxPcD0=;
-        fh=CktjoNrYNBUUaU+S7nKhHFB2PCywnAAvKowoQ4HD6pg=;
-        b=JsMX2FaGOXbakNeCFttQRfy+0At3Hl2QvIfkUpF+7cyuvhRDi483hd/KZciB1+n5DZ
-         N2QeKI9/gy8blFoGlOR8qs6UQpSooCB2wySaerQ5HD3d7uWUaaCkIpcXBQLYOWH+ssbG
-         an2iYF3z4Mwh4XdenMKBH/YahmYL0rEUCGsxwqQNZ+rXUT9t3P+w6jGt2uGX8nmcaXDj
-         0tV/JPoe73UfwhXIR6kDShR2ZVdVevYdE46dMqZpPLsECiNBWgHVvhM9CtwpZdG/OL2H
-         gwFdQwhLvLbQNMLaE5vODl1/rvohBDc8CSMlZTotAL+rkwbdC8w0jyUUF1NHqPYoOyuI
-         9rSQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774600516; x=1775205316; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qYBJ7lG2jPqlCAQklJIlC/RTAf122HGcyvH4xyxPcD0=;
-        b=pSRVoD3iBtz3+bbNs5Tjgg89pFWgjkXtiTsTaqvSEFdWbzXjF0yOOLjNZi7tkCbEzG
-         VdWRgfyDxuoLjDwbmoWBSzsUC01sCG5esIddP82A0OMf1VjKTRz7b7zcMf/toEMuSMGS
-         DNAZRhmdhpMJx3/Ghc3kPNZarwgoAHJ1ZKXscptmPTP70ygJwE4NIZZRcvyqVNfjVCZy
-         1SY38KuH/roOBWWIzslAkUWMGBg66q4CZXiIyo7EAelgUYRuHBRFiPh5bSeLx00tqjSt
-         IE+GsjJAplCGpn/36zB6QPhvN6YC264N5k3MvgHk6aDLwDxd7vUpZHWnVj4b4UhcUTbw
-         HBzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774600516; x=1775205316;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=qYBJ7lG2jPqlCAQklJIlC/RTAf122HGcyvH4xyxPcD0=;
-        b=eJpE6uSWsEGubo9mfZCqWFYGJaoI7Qedao9ddBboyXQZ1cdXuSBTW+55iAwPbcbDOY
-         UjKqjiYMgcRu/fynCar8ffUvvTH4GTenPmtcjAaY3v7Cejt5NIOYAAigpezVLLWHodx5
-         HiuuHVaW744WsFylrk72EtNrilltlgEaPIPzxNkqhggawZ5QxaHOHEYHsbO2b6X3zno0
-         0AC54Tsal1MH4GD2srCgtC+NcMWRCOBWCr2OkHiaAJMmB12kxjibpwsVxwAi+Yj5ZnJA
-         MsD3I+Emi5RAPg+CNnuX1zo66BZSQ7AqlSlRALPriRk4xiGXqbcdcx2GJ/bQStcFhe9a
-         SMLA==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ9V0sYx95IylRZIdhbtMdyPwq+/GFHsiZMXhofMFZQMTONo7K7FWX6ikWvcWjm/GGwzq/0Ig=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwivARUNS0S9gyqzJtvg62JNMdJz8T7VtaSq19yWupUQwax0kg8
-	PreMk+her59osVzFdf9F8adoAMrDn7v4Qldiv5jgkEvF1HY3m+fEm0AW6BvOr1FwIhSGSizxgFL
-	PIIgNZyJqI12YkeJ3wb3KGUuT1MqvnLWfCZU0uTY=
-X-Gm-Gg: ATEYQzytIFmXKFbD8cgVU9o0GTpRiIs7xHPrssapGkT+jnubj3SHjHUoS9t91jTO0i5
-	7VhqBZ+qyyTinDiXaMRL1VWX+GK+8BApn9Fy/Z1jLM5GyPlnqi6EnaQ5qDCMU1dgPV4SFUkuITV
-	5U1NpvZFdYbJK7CR1DmEOvyCan/iEd5F7vPszeHJysoW3RbFmN0uXKzHKTkWNR3N89FzskoAF/9
-	Fw11e9KsMmhciOgZPU9o4wRYQYelIdJ7POyybiZIsOogNKuaEp7VYdyazeBIavAr5KGJgffM+sj
-	TIeUNWGF
-X-Received: by 2002:a05:6512:10ce:b0:5a2:9cb6:ef4e with SMTP id
- 2adb3069b0e04-5a2ab920dbemr645542e87.21.1774600515244; Fri, 27 Mar 2026
- 01:35:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456D03D0924;
+	Fri, 27 Mar 2026 08:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774600573; cv=none; b=RrAc5l49MHucobpiBtKS0FiYM4JXfImqzqzahPxNN6GzTNHe07nQ9I+Ar6wqTqyQNlW4Rxgp1llQVCqF2tTfrZB1qSNcb7UpvjecJfYnAYETOHBXTMOScQefvNnMZIBZfd94cn9YBo2MZmu6/pCpzDuABUlN28VH5gIedUXGpME=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774600573; c=relaxed/simple;
+	bh=2KWjZ/2iGjbmuz/g4gBSiBOHXeHByW4AdB4snk19mgI=;
+	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
+	 References:Message-ID; b=GSJd2nTS/BLISbev+buJ4ADRhLSG99whsnRrkAbdgtg6v8G+J7soyI3UjN6bQ4o48vT6shD/nJoEKUmxNrHDGrod2av8hp35mxTSAzkQ6xJ0JL2sf3gOXWCXMV/m7v04f3wR2Tbqwk7AMMFthQueaNmRDzH+vQHsD/HSTO9wMpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; dkim=temperror (0-bit key) header.d=dev.tdt.de header.i=@dev.tdt.de header.b=knLLKjgb; arc=none smtp.client-ip=194.37.255.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dev.tdt.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
+Received: from [194.37.255.9] (helo=mxout.expurgate.net)
+	by relay.expurgate.net with smtp (Exim 4.92)
+	(envelope-from <prvs=6560504b2e=ms@dev.tdt.de>)
+	id 1w62fi-00Cro2-Jt; Fri, 27 Mar 2026 09:36:02 +0100
+Received: from [195.243.126.94] (helo=securemail.tdt.de)
+	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ms@dev.tdt.de>)
+	id 1w62fh-00GVvM-Kn; Fri, 27 Mar 2026 09:36:01 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dev.tdt.de;
+	s=z1-selector1; t=1774600561;
+	bh=aGMbQa8+Oe2AlyUT09xJbB5ceL0DEpkVThvDJdWD/Jc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=knLLKjgbB8tX3GN0UXW3EV5oOu7u3Wv67trY/Du+3m5VC8szkkZjcRuXomlLQKs+I
+	 T1OIopXc0r8i2nK62mKD0kZ+SYXy+D0iP3cxl71jtcMpjdRZ1xkw+1ftaY+wllBp/0
+	 A1iPUQI0zuc5KHMAzCtWNA8i7ngiNdGD5ESiBbGvvtY32ggGaCHYiiVWWm0Py/jeNA
+	 FW+zlagF8UHkxnPl666tUfBCACFjFPwKjnoBkV3zUW+fda+ly/QwmBX+v2E8Y5U4x7
+	 PZrzV4eeHTAxJtDQJjXGE7VMHwQoeQsMigiWPcUEO8RGcq6GT84ctqDYI/3AssBCvZ
+	 fPZxTjyyNjsCQ==
+Received: from securemail.tdt.de (localhost [127.0.0.1])
+	by securemail.tdt.de (Postfix) with ESMTP id 10C4E240040;
+	Fri, 27 Mar 2026 09:36:01 +0100 (CET)
+Received: from mail.dev.tdt.de (unknown [10.2.4.42])
+	by securemail.tdt.de (Postfix) with ESMTP id 08FD0240036;
+	Fri, 27 Mar 2026 09:36:01 +0100 (CET)
+Received: from mail.dev.tdt.de (localhost [IPv6:::1])
+	by mail.dev.tdt.de (Postfix) with ESMTP id ADB2023B24;
+	Fri, 27 Mar 2026 09:36:00 +0100 (CET)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260326144249.97213-1-kerneljasonxing@gmail.com> <acYD8JT16b3_htIz@mini-arch>
-In-Reply-To: <acYD8JT16b3_htIz@mini-arch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 27 Mar 2026 16:34:37 +0800
-X-Gm-Features: AQROBzBFpeC9jgdD2TkLOeX99Kk7Kr0iH0GXi8wk5nv1NgDam9EvjEI6SoT6zYk
-Message-ID: <CAL+tcoBHpSo6FHto4qxibdjUEkDPOaYTvVOUHv+OU_wh1PSqkQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: add sysctl to toggle napi_consume_skb()
- alien skb defer
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Fri, 27 Mar 2026 09:36:00 +0100
+From: Martin Schiller <ms@dev.tdt.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Yiming Qian <yimingqian591@gmail.com>, linux-x25@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	security@kernel.org
+Subject: Re: [PATCH net] net/x25: Fix overflow when accumulating packets
+Organization: TDT AG
+In-Reply-To: <20260327-x25_fraglen-v1-1-9fc751d4f754@dev.tdt.de>
+References: <20260327-x25_fraglen-v1-1-9fc751d4f754@dev.tdt.de>
+Message-ID: <b2099069e5dce49a0bc068a8d318f3a2@dev.tdt.de>
+X-Sender: ms@dev.tdt.de
+User-Agent: Roundcube Webmail/1.3.17
+X-purgate-type: clean
+X-purgate-ID: 151534::1774600562-43474BD0-942CBC77/0/0
+X-purgate: clean
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[tdt.de,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[dev.tdt.de:s=z1-selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272445-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,kernel.org];
+	TAGGED_FROM(0.00)[bounces-272446-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[dev.tdt.de:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tdt.de:email,dev.tdt.de:dkim,dev.tdt.de:mid];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ms@dev.tdt.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0B60D3412BB
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 689AB3412D8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 27, 2026 at 12:13=E2=80=AFPM Stanislav Fomichev
-<stfomichev@gmail.com> wrote:
->
-> On 03/26, Jason Xing wrote:
-> > Commit e20dfbad8aab ("net: fix napi_consume_skb() with alien skbs")
-> > defers freeing of alien SKBs (alloc_cpu !=3D current cpu) via
-> > skb_attempt_defer_free() on the TX completion path to reduce cross-NUMA
-> > SLUB spinlock contention to improve multi-queue UDP workloads.
-> >
-> > However, this unconditionally impacts the napi_skb_cache fast recycle
-> > path for single-flow / few-flow workloads (e.g. AF_XDP benchmarks[1]):
-> > when the TX completion NAPI CPU differs from the SKB allocation CPU,
-> > SKBs are deferred instead of being returned to the local napi_skb_cache=
-,
-> > forcing RX allocations back to the slow slab path.
-> >
-> > The existing net.core.skb_defer_max=3D0 could disable this, but it is a
-> > global switch that also disables the defer mechanism in TCP/UDP/MPTCP
-> > recvmsg paths, losing its positive SLUB locality benefits there. AF_XDP
-> > can co-exist with other protocols. That's the reason why I gave up
-> > reusing skb_defer_disable_key. Besides, if the defer path is disabled,
-> > that means TCP/UDP/MPTCP in process path will trigger directly freeing
-> > skb with enabling/disabling bottom half(in kfree_skb_napi_cache())
-> > which could affect others. So my thinking is not to touch this path.
-> >
-> > Add a dedicated sysctl net.core.napi_consume_skb_defer backed by a
-> > static key to selectively control the alien skb defer feature. Let
-> > users decide which is the best fit for their own requirements.
->
-> For a non-zc path adding a userspace knob feels like too much. And there
-> is zero documentation for users to decide which mode to use.
+On 2026-03-27 09:30, Martin Schiller wrote:
+> Add a check to ensure that `x25_sock.fraglen` does not overflow.
+> 
+> The `fraglen` also needs to be resetted when purging `fragment_queue` 
+> in
+> `x25_clear_queues()`.
+> 
+> Reported-by: Yiming Qian <yimingqian591@gmail.com>
+> Signed-off-by: Martin Schiller <ms@dev.tdt.de>
+> ---
+>  net/x25/x25_in.c   | 6 ++++++
+>  net/x25/x25_subr.c | 1 +
+>  2 files changed, 7 insertions(+)
+> 
+> diff --git a/net/x25/x25_in.c b/net/x25/x25_in.c
+> index
+> b981a4828d08c2e6676749a06035910eab01e6cd..1603238d6fff73090ef10b5fd11387b3e7f017a2
+> 100644
+> --- a/net/x25/x25_in.c
+> +++ b/net/x25/x25_in.c
+> @@ -34,6 +34,12 @@ static int x25_queue_rx_frame(struct sock *sk,
+> struct sk_buff *skb, int more)
+>  	struct sk_buff *skbo, *skbn = skb;
+>  	struct x25_sock *x25 = x25_sk(sk);
+> 
+> +	/* make sure we don't overflow */
+> +	if (x25->fraglen + skb->len > sizeof(x25->fraglen)) {
 
-AF_XDP is the only one case that I use to exemplify. Reusing defer max
-is not flexible and good enough as I've mentioned in the commit.
+Please ignore this patch. I'll send a V2 without that
+"sizeof()" nonsense in a moment.
 
-Please note that the knob is applicable for single or few flows
-regardless of what kinds of protocols/tunnels, which brings 6.6%
-improvement back that is not trivial/negligible.
-
-You're right about the doc. Will add the following one, thanks.
-diff --git a/Documentation/admin-guide/sysctl/net.rst
-b/Documentation/admin-guide/sysctl/net.rst
-index 0724a793798f..42e06f93306f 100644
---- a/Documentation/admin-guide/sysctl/net.rst
-+++ b/Documentation/admin-guide/sysctl/net.rst
-@@ -368,6 +368,19 @@ by the cpu which allocated them.
-
- Default: 128
-
-+napi_consume_skb_defer
-+----------------------
-+When set to 1 (default), napi_consume_skb() defers freeing SKBs whose
-+allocation CPU differs from the current CPU via skb_attempt_defer_free().
-+This reduces cross-NUMA SLUB spinlock contention for multi-queue workloads=
-.
-+
-+Setting this to 0 disables the defer path in napi_consume_skb() only,
-+allowing SKBs to be returned to the local napi_skb_cache immediately.
-+This can benefit single-flow or few-flow workloads (e.g. AF_XDP TX)
-+where the defer detour hurts the fast recycle path.
-+
-+Default: 1
-+
- optmem_max
- ----------
-
-Thanks,
-Jason
+> +		kfree_skb(skb);
+> +		return 1;
+> +	}
+> +
+>  	if (more) {
+>  		x25->fraglen += skb->len;
+>  		skb_queue_tail(&x25->fragment_queue, skb);
+> diff --git a/net/x25/x25_subr.c b/net/x25/x25_subr.c
+> index
+> 0285aaa1e93c17233748d38eef6d8b5c6059b67a..159708d9ad20cb2e6db24ead67daf1e9d6258f64
+> 100644
+> --- a/net/x25/x25_subr.c
+> +++ b/net/x25/x25_subr.c
+> @@ -40,6 +40,7 @@ void x25_clear_queues(struct sock *sk)
+>  	skb_queue_purge(&x25->interrupt_in_queue);
+>  	skb_queue_purge(&x25->interrupt_out_queue);
+>  	skb_queue_purge(&x25->fragment_queue);
+> +	x25->fraglen = 0;
+>  }
+> 
+> 
+> 
+> ---
+> base-commit: 4ae97cae07e15d41e5c0ebabba64c6eefdeb0bbe
+> change-id: 20260325-x25_fraglen-8fc240d1edd3
+> 
+> Best regards,
 
