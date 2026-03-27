@@ -1,183 +1,175 @@
-Return-Path: <netdev+bounces-272465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272467-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wKX4KJJExmmgIAUAu9opvQ
-	(envelope-from <netdev+bounces-272465-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:49:22 +0100
+	id 4MyqAkVHxmmgIAUAu9opvQ
+	(envelope-from <netdev+bounces-272467-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:00:53 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AECE43414AF
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:49:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BC43341690
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:00:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BBD1F3008455
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 08:49:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4AD6300F9FD
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 08:55:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 924F13D8127;
-	Fri, 27 Mar 2026 08:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFEF43D9DB3;
+	Fri, 27 Mar 2026 08:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=dev.tdt.de header.i=@dev.tdt.de header.b="rnwaK1a9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IglS6tQ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68092D3EE5;
-	Fri, 27 Mar 2026 08:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774601355; cv=none; b=Dxy/JHboRqo3+OaQrADyOLtJ/AOzGqlanf0nXx06h65bXPuu8NmHpv8wO3yBJl8Vzz0ASe7XTnZwjZEQxEwYLuGql0RKsPDqfJKm0r7ehXrItLMeLKtGeubfIu3lMVDlCirPUKXxHTT5c/6H+Kln/MHl0gbVSo4yeGt8fDxnhsY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774601355; c=relaxed/simple;
-	bh=AszbKk2UbW/3YlByw22wCgCrsW1o6pJgrdRCwlXFd3A=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:Cc; b=hkeGw8conn8izw0nSQYghbZR+/2kvdMqP7O8V0vU5Ofsu4Bat8WlUmv1U2yQeptplud8YrvvAeDHOZ/fi/azDX5XodEI99LLc9ZD7diOOTmtxuA5kjU5bk0SptEg1YQhlRw1iSEQOjNXlwowAWAgNCf0nPoY5n+kuWDlE3ZkuoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; dkim=temperror (0-bit key) header.d=dev.tdt.de header.i=@dev.tdt.de header.b=rnwaK1a9; arc=none smtp.client-ip=194.37.255.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dev.tdt.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
-Received: from [194.37.255.9] (helo=mxout.expurgate.net)
-	by relay.expurgate.net with smtp (Exim 4.92)
-	(envelope-from <prvs=6560504b2e=ms@dev.tdt.de>)
-	id 1w62sN-00GYrU-Hn; Fri, 27 Mar 2026 09:49:07 +0100
-Received: from [195.243.126.94] (helo=securemail.tdt.de)
-	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ms@dev.tdt.de>)
-	id 1w62sM-002zRG-Ol; Fri, 27 Mar 2026 09:49:06 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dev.tdt.de;
-	s=z1-selector1; t=1774601346;
-	bh=myEI14OaJ5vlN9nRaS+DEQwHA9TNMsxy8cNQZpWUwc8=;
-	h=From:Date:Subject:To:Cc:From;
-	b=rnwaK1a94NT1Y4Ih9vi85yyVImKmUnF1ZU+yXg1Nb4SbVBBxMJHefQmZilzlhg1Vl
-	 BJgHjIGegqfmwtzX3aLLbu3zhJ7jk6IfZBN51HU7fZ32rXhAFyrYa54TRiL0ulJA/c
-	 WdadSANtAsBCdzYYrF1d6iGx3soFEYzxVHXnxbT860wims7oM6sG5/bnMyJRFVLEO3
-	 Z8MJn8+manKu6yqalpYEjEmqvXKBy1wKAFH+HGyoAbGAJCgN1skoW3lTIRaTUxp8Y1
-	 65S5naBfwx+uVUAkQ7CEeaiDZO4bUZZw38Fv/49iwy6Fcs8SH4H6IgkN5Ts65RR2d7
-	 4iZXubjxxThMQ==
-Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id 26D1F240040;
-	Fri, 27 Mar 2026 09:49:06 +0100 (CET)
-Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id 19281240036;
-	Fri, 27 Mar 2026 09:49:06 +0100 (CET)
-Received: from [127.0.1.1] (unknown [10.2.3.19])
-	by mail.dev.tdt.de (Postfix) with ESMTPSA id E46E3210AC;
-	Fri, 27 Mar 2026 09:49:05 +0100 (CET)
-From: Martin Schiller <ms@dev.tdt.de>
-Date: Fri, 27 Mar 2026 09:49:02 +0100
-Subject: [PATCH net v2] net/x25: Fix overflow when accumulating packets
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844573BED2D
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 08:55:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774601744; cv=pass; b=sLyFBpyx4qbAS8haL3UYukB0yMhcVR5YGhThizk5s07i3eNQ12UGGll0+rvJznrr33gebP8eNYMsPK7VvbW7bMk/3tiaXtJi6ECZVZl1x6LLSEaz12ynrD+s4r2++LjwexTX9vcSB7yns3b6zWTIXHW2fq3i6ErJj6M7rXTPAdc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774601744; c=relaxed/simple;
+	bh=8UeDx3YcJwKvTruLriZjWHcVAvboJUZ2/LdgvefG7Qg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uuWXP/ywuLB9+EosYBdJRsQkuiBV3KCffqECY8rfmM78hgmDXYhK91qZj+gjqp9wZd++092nozTl0zzOwEERgyFjWoqYWfkGYU0PKS7TFgbjvvombiuiS5cEPSJNWoMAETwrIeXBCc/aAR/vyl1LUxTJIPfKACmz2Rhnf4FsP7I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IglS6tQ1; arc=pass smtp.client-ip=209.85.210.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-7d7e5e8c907so1178186a34.0
+        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 01:55:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774601742; cv=none;
+        d=google.com; s=arc-20240605;
+        b=SiPhWxgVGXnb6RraQzZkbgQm+SjBQ1RfnC1oKxzMnQ3hIVjPfZZ+j1lDpJs1u2+Kv/
+         XjRYbQcX5oSzh/GFktq7IBMCWwV60AHbSwSLZZX0/y0cW4Gn3aV1R3gwvXTimFT6fTQ+
+         S2aIIjSrwIMfVv8C/+0tOMXjtgSabaX5/zv5tYpjJlT5Yqcfobnz6l3eyRockwu5yHxo
+         y/ebOZDqGwQ+5pmrEljceDCfbitiyMASiruFBrhHlxOUtDvYvXVAQ2iKs3EpIZn1YMxF
+         lNIbUdDAwkZhbzExGMseXBGzdIKNhGGGeU+HnTMbH0h7FCDyqQ4L8ucPU7BJnaO3AZU+
+         OF8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=8UeDx3YcJwKvTruLriZjWHcVAvboJUZ2/LdgvefG7Qg=;
+        fh=7ydaQ9ymFSq3Qj7ComF7ttJTQSfmFe8O8iD2CDMmDc4=;
+        b=EkjbeqWqmYZq0nOIpZ8/Wckbouw9dYCKVFfBJ0QK4X93VdS9SduW2OaPTj1p0F87i+
+         /Ln7mLAlr55MBZfuTqrQ+seDVR7VK7a611hm2k+SEfUro5/Voe3ZdORKb9wMFMJ8LY7N
+         B/8xPWdotM8PyTSoJRSti2uqHcljqtRAWlYv5xH1Lzk8xAspLbRBvB4cFUr8DYGKshtr
+         Xn+f7cbzSFEtHQA3qx+nyBwGJs5hG1bT4OPPelazer5ZRWb3vMMJK+6Mn5zZBIxTCRz3
+         LLV/9saLaIBHe9IH95SNJOkK7gljgpPq7X/4DdFrXrTxFbcqhQGcMt8wRuqns6norups
+         htTg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774601742; x=1775206542; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8UeDx3YcJwKvTruLriZjWHcVAvboJUZ2/LdgvefG7Qg=;
+        b=IglS6tQ1kT98PuQVEJ/9vIkSbSQyWVnGpcOnD1sq1NChMAi9+JZ0SbKmyYQD30uPyD
+         RViBypQ7Hp2REZRbdgCmFYzT/UK4A9GP+Fj5+oZAE7HbhuxpmivIAfnXv4Qb/vQHIiYn
+         9lzP3AEA9a/bF29qml63ddnPqB7H+lHiaqMPw0smovdnjGPtdnQbWuK3/BxxaWO6z5xi
+         +SE8caXgBzIhFOzZvSv6QJI2HCT3+H6WAOzcf9ZOUwJQ6n0MbjofBrt+FlH3dMSbUtKo
+         QJfG3vsd+3+9lqEE5zP1yNqpXMCqAw7PzEUgcQrSkpd2Ahmp6/EgsT3jShCZamH1Nj5t
+         Tx5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774601742; x=1775206542;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8UeDx3YcJwKvTruLriZjWHcVAvboJUZ2/LdgvefG7Qg=;
+        b=g9HhnHjB02CSp69sXyX21jHqTfz7fSR0v0mpv7xcb6IciV7iBVxgVyfw9oVrRNT1Jh
+         mgI4wAsGWdA52yprJdYXW2a8Yv0wOVla6pPmhg4g7BFkIt3sp2zq0XapOC7IvUZ+q3NC
+         ZBilOpW+l/lcKZhVxo1afoESpgbaxZYoMjzze8obaNPI086+j4jK73AtUC/JmlWVEI5f
+         YiZ6SqR5ZX+H3zDp5W1vr/TC4u4W6rIsUuxMh2hR5cbO9aKT/VMtNr6gc8hhszeCheCb
+         Jq9W0D6moEUOXjwUQXzvYcFStnV6WGnLQYodzMGE1CeymcvX6GW8eqiw+XqIhX92zqoW
+         in6Q==
+X-Gm-Message-State: AOJu0YxWK+/uv+gH8m377oHrnkY7VjRvy+PoiodfPnS0lVcSkjHcQu/s
+	QmuqVyhDl9J21ypuZ7R3cf/3psBfSkyQDPYMsGkv8dAiU1jC2hoiy35NFCEoSn/9t+Q5yupfe0J
+	ryd8FoaaP/7W72NUAxDl5YpFTzXaUqR9m2U75t9A=
+X-Gm-Gg: ATEYQzx88GA34wGqEMC5N3ButULUIcsnwny2QCXdCNqzqq+3syw95gG1Ve73Xr8X1Q3
+	7HIccJR46k27upNPaEbJmV5QUb9jPT5FXMCeXP2R/iYuFLgruoYH7wvad9tGdohWOiFGqw4s4zc
+	UvyLTJAZ3S5UrjqXrUqGpqzD5/NXZsv8vvikdTryUlYkTjxDC86X+W0euOmeR6khfJyXGGjfc9f
+	2Js59qkICaTn39cRAkgVHR2u0BeoiBzRoo4kTz+3oAyD8WF4g63VtCeVAqxaW7oBkF9A6E8o4C1
+	pmHaMYqr88tRPnbR1lj3EY23cN0yApUu9VvIMXgx3yjgysNSa38pCCrDHQu6iNUzYDus
+X-Received: by 2002:a05:6820:1746:b0:67a:2ff:91b0 with SMTP id
+ 006d021491bc7-67e185f6198mr757083eaf.3.1774601742384; Fri, 27 Mar 2026
+ 01:55:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20260327-x25_fraglen-v2-1-143911c3f62a@dev.tdt.de>
-X-B4-Tracking: v=1; b=H4sIAH1ExmkC/1WNQQrDIBRErxL+ugY12rRd9R4llOD/JkIxRUVSg
- nevSDddvhnmzQGRgqMIt+6AQNlFt/kK8tSBWWe/EHNYGSSXZz5IzXapnzbMy4s8u1gjFUdBiAP
- UxTuQdXuzPcBTgqmGq4tpC5/2kEWrfrLxT5YFE+xqzagFKjtqdUfKfcLUI8FUSvkCLfOgo6wAA
- AA=
-X-Change-ID: 20260325-x25_fraglen-8fc240d1edd3
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Yiming Qian <yimingqian591@gmail.com>, linux-x25@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	security@kernel.org, Martin Schiller <ms@dev.tdt.de>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1774601345; l=1712;
- i=ms@dev.tdt.de; s=20260220; h=from:subject:message-id;
- bh=AszbKk2UbW/3YlByw22wCgCrsW1o6pJgrdRCwlXFd3A=;
- b=qOX6IEPtyPoTNmSlCc6CCNmXY5l+QjdKavO7qtzQ5LjkoyQkHd2sluFSAGu/lbR5MOxC5oyCl
- inno2UZB/BkC40gTNo+Y7d0adtR1qK6TKoRrpBbM0oDTLdMnr+LTUhc
-X-Developer-Key: i=ms@dev.tdt.de; a=ed25519;
- pk=MAojd7D5IafMnqCYSFC7hY/u/jppX58CLIEhsEsSOYE=
-X-purgate-type: clean
-X-purgate: clean
-X-purgate-ID: 151534::1774601347-A6786013-7F5441A1/0/0
+References: <20260324080730.4051666-1-nickgarlis@gmail.com> <20260326203646.2da52419@kernel.org>
+In-Reply-To: <20260326203646.2da52419@kernel.org>
+From: Nikolaos Gkarlis <nickgarlis@gmail.com>
+Date: Fri, 27 Mar 2026 09:55:31 +0100
+X-Gm-Features: AQROBzBE9sNWESWLlPyFHmXvgfF-G49bmzGAUszR-lFSp9bJ-i3w1oYKu6ORBcI
+Message-ID: <CA+jwDRk_pg6jLsg_nZ+DwHKcLk-TjbhS5o8aveOD5ns=yxUYCg@mail.gmail.com>
+Subject: Re: [PATCH] rtnetlink: add missing netlink_ns_capable() check for
+ peer netns
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tdt.de,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[dev.tdt.de:s=z1-selector1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tdt.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,dev.tdt.de:dkim,dev.tdt.de:mid];
-	DKIM_TRACE(0.00)[dev.tdt.de:+];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,kernel.org,dev.tdt.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWO(0.00)[2];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272465-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272467-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ms@dev.tdt.de,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nickgarlis@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: AECE43414AF
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,gist.githubusercontent.com:url]
+X-Rspamd-Queue-Id: 8BC43341690
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a check to ensure that `x25_sock.fraglen` does not overflow.
+Hi Jakub,
 
-The `fraglen` also needs to be resetted when purging `fragment_queue` in
-`x25_clear_queues()`.
+I've created a crude reproduction script using some AI. If that helps,
+you can find it here:
+https://gist.githubusercontent.com/nickgarlis/5a5815d438aa19b409806712f35f2cb1/raw/c7e2dd0902f1f53f5750f7bbd3ba39ff0b21e43e/inject_iface.c
 
-Reported-by: Yiming Qian <yimingqian591@gmail.com>
-Signed-off-by: Martin Schiller <ms@dev.tdt.de>
----
-Changes in v2:
-- Use USHRT_MAX instead of sizeof(fraglen) nonsense
-- Link to v1: https://lore.kernel.org/r/20260327-x25_fraglen-v1-1-9fc751d4f754@dev.tdt.de
----
- net/x25/x25_in.c   | 6 ++++++
- net/x25/x25_subr.c | 1 +
- 2 files changed, 7 insertions(+)
+> AI assistant here suggests this is not the valid Fixes tag,
+> which seems true on the surface. This commit was fixing
+> cleanup, IDK how it could break input validation?
 
-diff --git a/net/x25/x25_in.c b/net/x25/x25_in.c
-index b981a4828d08c2e6676749a06035910eab01e6cd..cb84c683d249d6078f3673835bb2f80eb487f253 100644
---- a/net/x25/x25_in.c
-+++ b/net/x25/x25_in.c
-@@ -34,6 +34,12 @@ static int x25_queue_rx_frame(struct sock *sk, struct sk_buff *skb, int more)
- 	struct sk_buff *skbo, *skbn = skb;
- 	struct x25_sock *x25 = x25_sk(sk);
- 
-+	/* make sure we don't overflow */
-+	if (x25->fraglen + skb->len > USHRT_MAX) {
-+		kfree_skb(skb);
-+		return 1;
-+	}
-+
- 	if (more) {
- 		x25->fraglen += skb->len;
- 		skb_queue_tail(&x25->fragment_queue, skb);
-diff --git a/net/x25/x25_subr.c b/net/x25/x25_subr.c
-index 0285aaa1e93c17233748d38eef6d8b5c6059b67a..159708d9ad20cb2e6db24ead67daf1e9d6258f64 100644
---- a/net/x25/x25_subr.c
-+++ b/net/x25/x25_subr.c
-@@ -40,6 +40,7 @@ void x25_clear_queues(struct sock *sk)
- 	skb_queue_purge(&x25->interrupt_in_queue);
- 	skb_queue_purge(&x25->interrupt_out_queue);
- 	skb_queue_purge(&x25->fragment_queue);
-+	x25->fraglen = 0;
- }
- 
- 
+I went back to check and ran the test against 7a0ea70da56e (the commit
+prior) and it does seem like it was broken then too. I think I must have
+messed up my testing process when I initially submitted the patch.
 
----
-base-commit: 4ae97cae07e15d41e5c0ebabba64c6eefdeb0bbe
-change-id: 20260325-x25_fraglen-8fc240d1edd3
+It also seems like the bug was always there or at least - almost always
+- since Iassume it wasn't a problem before unprivileged namespaces
+were introduced ?
 
-Best regards,
--- 
-Martin Schiller <ms@dev.tdt.de>
+In that case, should the tags point to the introduction of the
+attributes (like shown below) or point to the introduction of
+the namespaces ?
 
+Fixes: 0eb87b02a705 ("veth: Set VETH_INFO_PEER to veth_link_ops.peer_type.")
+Fixes: 6b84e558e95d ("vxcan: Set VXCAN_INFO_PEER to vxcan_link_ops.peer_type.")
+Fixes: fefd5d082172 ("netkit: Set IFLA_NETKIT_PEER_INFO to
+netkit_link_ops.peer_type.")
+
+> Reported-by tags are only when the reporter is different than author
+> the Google's bounty program rules have been amended to make this
+> explicit, please let us know if other programs still mislead people
+
+That was a mistake on my part, not going through the docs properly.
+I'll fix all of the tags in a V2 if you want to accept the patch.
 
