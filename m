@@ -1,53 +1,69 @@
-Return-Path: <netdev+bounces-272326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272329-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sOmuIM/ixWkeCwUAu9opvQ
-	(envelope-from <netdev+bounces-272326-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:52:15 +0100
+	id qL/7GXjjxWkeCwUAu9opvQ
+	(envelope-from <netdev+bounces-272329-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:55:04 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 248A933DF8F
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:52:15 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B99A33DFD8
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:55:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 400A0307341B
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:50:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 92EB33014A2C
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:54:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5867D3126D0;
-	Fri, 27 Mar 2026 01:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B5430DEB8;
+	Fri, 27 Mar 2026 01:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qXZ0u16V"
+	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="3XiAAVNA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 367B0304976
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 01:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from n169-110.mail.139.com (n169-110.mail.139.com [120.232.169.110])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F362226F46F;
+	Fri, 27 Mar 2026 01:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774576229; cv=none; b=FhmLo3NGUVvpEbqyAgLjDRfOsMbvx50ty/uAfGN1dW04NjQOnpxcpz79kQ8KSDzDqTItfoCxgyO3VrluT3kSfIIusz3nM5mfyjebexeFyXw7nJtiCyQ5GAYpNh2b+lAN2P0FOukPfXWL9dLC8U1p6P61S267fA1KsBBitCHZD0A=
+	t=1774576488; cv=none; b=S67Gx7A4LSNQbpBTh9o/WzDjB04XbAzBYZv9ffj4ho6QNy9PwWkCB5VSG+2sH5xqJlfZ2V0ECv1ZGXNGu6FAQzH3StK9bGWm0G60xwWda/vBprVwTk6nYFqm6eqsqN0mOfqP73Gz5NHfvjKycsio+ZG7/Wp3ujhVtgo7zK3Ya3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774576229; c=relaxed/simple;
-	bh=4kiiqE3D+wDv6J6hodZDyGsVtbfDqc3mqLBoh6regB4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JjuR+mkwAMZznuNxWA9lwTwOqqN889Jd2WK4vo9lC08pLkUqi+Ndv85BfBAAoVmjtuOXkENhtAcuJE64x7Cnb6K7+Nd3T83ZgC70y/wy2dvUwBiZpluFXMUDGRYjJeHgMO3cjKQr/n/xeWMrn491j+IEviASKtVtih+RviZONcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qXZ0u16V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6FF3C116C6;
-	Fri, 27 Mar 2026 01:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774576229;
-	bh=4kiiqE3D+wDv6J6hodZDyGsVtbfDqc3mqLBoh6regB4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qXZ0u16V+X586A5Gr1e66ujMPC/q07qOGhtzegAWFBvHizW0o0H1jhy3UwTgtt1YZ
-	 s9nM4cV2MrjGZkuQliJrSqSa1UHWMZeIRVFL1uNhlPDqgAh85nca2bkqyixpw5DEu8
-	 WcVBWMM1WLhqwi8y7jb7njNfFi77DHVCK496t0AGTT94Yjw3iG95wL1f1ms53liw7E
-	 lcgGO/DZIxVGFdHjsH9juhDX/rzQqsoyJ5QbpA0ZvoSJ3V6HRABlYwadCPw+07q/Ou
-	 tsLBoPkaXag8iWnWtQ7nvuUO4eZjeTMjVJg6em661YznP3mzDVHuLrQNa2UXHbOfGl
-	 dzfHGDOzuFwMg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF513809A07;
-	Fri, 27 Mar 2026 01:50:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1774576488; c=relaxed/simple;
+	bh=ZqV+tRZXIY15nG5MUbhJ9kF9CsPGNZz/KgeQrtcorBM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=X1JDEM+VAina4i8QEjVgWjgWsUVQQdhpmky4dtriaLIg6vW00VTq9JyrXjWUy8PG5gZF5MAkea9RZ5MtmlhWjEpLvMtjXZG4nIwoPVnznW58hdCKxKu0HK8U2S8PUzS94KDpMljZb4aZbZd15al5Nw4VdsYIaVLAcItwuc+ooAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=3XiAAVNA; arc=none smtp.client-ip=120.232.169.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=139.com; s=dkim; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=3XiAAVNADMJx0bKCLvOhGJSLsN2KhUSC6/qZT8qw6WVoLhOfCHMvqmzULics/bX4caTmO46HAaI95
+	 LmAusC7XR8Eq2YVdAFGXv+V8J0A/uGkqq3EkXDwW0hlNyWNkKzP54zHy7eeW4AvWruk88+UDBWb+RT
+	 4itDxmadmy/WDbXU=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM:                                                                                        
+X-RM-SPAM-FLAG:00000000
+Received:from NTT-kernel-dev (unknown[60.247.85.88])
+	by rmsmtp-lg-appmail-04-12082 (RichMail) with SMTP id 2f3269c5e29809b-010b3;
+	Fri, 27 Mar 2026 09:51:22 +0800 (CST)
+X-RM-TRANSID:2f3269c5e29809b-010b3
+From: Rajani Kantha <681739313@139.com>
+To: gregkh@linuxfoundation.org,
+	stable@vger.kernel.org,
+	vladimir.oltean@nxp.com
+Cc: patches@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	rmk+kernel@armlinux.org.uk
+Subject: [PATCH 6.1.y 1/3] net: phy: move phy_link_change() prior to mdio_bus_phy_may_suspend()
+Date: Fri, 27 Mar 2026 09:51:20 +0800
+Message-Id: <20260327015120.1712759-1-681739313@139.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,75 +71,109 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: mctp: avoid copy in fragmentation loop for
- near-MTU messages
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177457621503.3256339.5338687081913402435.git-patchwork-notify@kernel.org>
-Date: Fri, 27 Mar 2026 01:50:15 +0000
-References: <20260324-dev-mtu-copy-v1-1-7af6bd7027d3@codeconstruct.com.au>
-In-Reply-To: <20260324-dev-mtu-copy-v1-1-7af6bd7027d3@codeconstruct.com.au>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: matt@codeconstruct.com.au, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- yuanzm2@lenovo.com
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [2.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_REJECT(1.00)[139.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272326-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[139.com];
+	TAGGED_FROM(0.00)[bounces-272329-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[139.com];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 248A933DF8F
+	FROM_NEQ_ENVFROM(0.00)[681739313@139.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[139.com:-];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	NEURAL_HAM(-0.00)[-0.974];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,139.com:email,139.com:mid,msgid.link:url,nxp.com:email]
+X-Rspamd-Queue-Id: 6B99A33DFD8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+[ Upstream commit f40a673d6b4a128fe95dd9b8c3ed02da50a6a862 ]
 
-On Tue, 24 Mar 2026 15:19:56 +0800 you wrote:
-> Currently, we incorrectly send messages that are within 4 bytes (a
-> struct mctp_hdr) smaller than the MTU through mctp_do_fragment_route().
-> This has no effect on the actual fragmentation, as we will still send as
-> one packet, but unnecessarily copies the original skb into a new
-> single-fragment skb.
-> 
-> Instead of having the MTU comparisons in both mctp_local_output() and
-> mctp_do_fragment_route(), feed all local messages through the latter,
-> and add the single-packet optimisation there.
-> 
-> [...]
+In an upcoming change, mdio_bus_phy_may_suspend() will need to
+distinguish a phylib-based PHY client from a phylink PHY client.
+For that, it will need to compare the phydev->phy_link_change() function
+pointer with the eponymous phy_link_change() provided by phylib.
 
-Here is the summary with links:
-  - [net-next] net: mctp: avoid copy in fragmentation loop for near-MTU messages
-    https://git.kernel.org/netdev/net-next/c/e1877cf62311
+To avoid forward function declarations, the default PHY link state
+change method should be moved upwards. There is no functional change
+associated with this patch, it is only to reduce the noise from a real
+bug fix.
 
-You are awesome, thank you!
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Link: https://patch.msgid.link/20250407093900.2155112-1-vladimir.oltean@nxp.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+[ Minor context change fixed ]
+Signed-off-by: Rajani Kantha <681739313@139.com>
+---
+ drivers/net/phy/phy_device.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 11839dca8f56..7d19857a6dc4 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -234,6 +234,19 @@ static struct phy_driver genphy_driver;
+ static LIST_HEAD(phy_fixup_list);
+ static DEFINE_MUTEX(phy_fixup_lock);
+ 
++static void phy_link_change(struct phy_device *phydev, bool up)
++{
++	struct net_device *netdev = phydev->attached_dev;
++
++	if (up)
++		netif_carrier_on(netdev);
++	else
++		netif_carrier_off(netdev);
++	phydev->adjust_link(netdev);
++	if (phydev->mii_ts && phydev->mii_ts->link_state)
++		phydev->mii_ts->link_state(phydev->mii_ts, phydev);
++}
++
+ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
+ {
+ 	struct device_driver *drv = phydev->mdio.dev.driver;
+@@ -1036,19 +1049,6 @@ struct phy_device *phy_find_first(struct mii_bus *bus)
+ }
+ EXPORT_SYMBOL(phy_find_first);
+ 
+-static void phy_link_change(struct phy_device *phydev, bool up)
+-{
+-	struct net_device *netdev = phydev->attached_dev;
+-
+-	if (up)
+-		netif_carrier_on(netdev);
+-	else
+-		netif_carrier_off(netdev);
+-	phydev->adjust_link(netdev);
+-	if (phydev->mii_ts && phydev->mii_ts->link_state)
+-		phydev->mii_ts->link_state(phydev->mii_ts, phydev);
+-}
+-
+ /**
+  * phy_prepare_link - prepares the PHY layer to monitor link status
+  * @phydev: target phy_device struct
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+2.34.1
 
 
 
