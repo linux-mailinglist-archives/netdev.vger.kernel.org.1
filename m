@@ -1,136 +1,189 @@
-Return-Path: <netdev+bounces-272631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272632-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uNqXKg/PxmmuOwUAu9opvQ
-	(envelope-from <netdev+bounces-272631-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 19:40:15 +0100
+	id QJFXGLTPxmndOwUAu9opvQ
+	(envelope-from <netdev+bounces-272632-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 19:43:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E869F349163
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 19:40:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5C833491A2
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 19:42:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1F752303E75D
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 18:39:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A1CFF3047533
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 18:42:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2CFC410D3B;
-	Fri, 27 Mar 2026 18:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCBBA41161B;
+	Fri, 27 Mar 2026 18:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a6So7/fn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JqLTMAvv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68312407119
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 18:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F953FEB1D;
+	Fri, 27 Mar 2026 18:42:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774636784; cv=none; b=X3s4ofBwogm4kpXdQDvLQYzhpqqPxwTkmvV1GVjPbyQmK2yFGHoOnLeGJL2JVdbVmykBLd+ClDUfvNxl2LyDK7TW4hVdQEwyRpuP1HvpFjlw99mc9Y95q63r473vH0ggzn9BpxpO4i69x7ZRaTd/VG5Q61jNY4aXmVvodi/JESQ=
+	t=1774636974; cv=none; b=cRzp1iyhu/WADzJ04ZF61ROC0gN7xqe3RWKkmUgWJGgtePChXEDs3dfswKLgccmQL0mAeWo359uSxj/esR6W/16fIKuXA26WOy6s4Zg90HvYV2L/hn3LRr07LEs4YB+gjC8UZtHFdlVN1e+sVyySu1jxduyFIjJWvkS6DwgIQaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774636784; c=relaxed/simple;
-	bh=22Xz3+eZMS7/J6rdfE1EEuhHi9H26t+XeUeP6Ef2daI=;
+	s=arc-20240116; t=1774636974; c=relaxed/simple;
+	bh=R9AHAajVl54S43rOD25tNtqd/iHB1Qz12wrBG7w2KjE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I3S08NX2FOPIer/w8Wm/vSSnBBXjNdUfTj0xGH4apKHmjuFXfquMwLDF3VLHkEnBq/fHGztDBSjSCeVfQY1ygqqUP3idX6+nzZxfVA71r3XSJkv2Rm/DXc5HFkF1auanQ+jERSeZzXM4YxXJbVET2+h7kuAy1K0kGj/UwCUHJY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a6So7/fn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774636782;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IYQ+qhUAXb2Z9JfIpc10XqqDG6/nzFbrgxdQauX3Mys=;
-	b=a6So7/fn33pBGF7x++NLD4b80u94MkUAzkR/wN+TuDw9h9tQ4SIhZidYUlKUguJyVyG6jq
-	xc6TjaHB1XFpDCr9+tforxfBaPfW0Zfq8+zEIPgZ18zbkwADj6AW8yCIg2b8rUE8NDSiku
-	c4nn8A8pkVD5ZUINM1QuljtAWxBzmak=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-288-z0Gue9LOOhq3GuO7EECm2w-1; Fri,
- 27 Mar 2026 14:39:39 -0400
-X-MC-Unique: z0Gue9LOOhq3GuO7EECm2w-1
-X-Mimecast-MFC-AGG-ID: z0Gue9LOOhq3GuO7EECm2w_1774636777
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7C4FD1956062;
-	Fri, 27 Mar 2026 18:39:37 +0000 (UTC)
-Received: from thinkpad (unknown [10.44.33.208])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C987F1800351;
-	Fri, 27 Mar 2026 18:39:34 +0000 (UTC)
-Date: Fri, 27 Mar 2026 19:39:31 +0100
-From: Felix Maurer <fmaurer@redhat.com>
-To: Luka Gejak <luka.gejak@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org, horms@kernel.org,
-	liuhangbin@gmail.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/4] net: hsr: fix VLAN add unwind on slave
- errors
-Message-ID: <acbO48xPc--SBzOu@thinkpad>
-References: <20260326154715.38405-1-luka.gejak@linux.dev>
- <20260326154715.38405-3-luka.gejak@linux.dev>
- <acZvYp_SYvypHWgk@thinkpad>
- <F40ED495-9115-489C-A010-0011A9229C4A@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LvNEyi7e2PVFgCDNz8V+QLbUnz3NOQ1Vs7PUVa0BkcD5KzJulfu/C1iOeIHFMuZcMIS88MU9z6CgmScGee27GaMpfe1B9rXJUYWai0ZGQYS+YZF0qXY49EPN9ZaWxWmWR/5lxXdBRjVctSq1kW4q1g0bqIHth7JrI9wmi+epF+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JqLTMAvv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CC21C4AF09;
+	Fri, 27 Mar 2026 18:42:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774636974;
+	bh=R9AHAajVl54S43rOD25tNtqd/iHB1Qz12wrBG7w2KjE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JqLTMAvv7+jnfJ63kHoj5u/xRq7KjteyBcy3HIl1cnYvAHjHZ1OWSG0NmwwBvb/fd
+	 dup5UeymFe5k1FgaPMpKPS1CWFV2QefCBH69aiBilkovEgPOC7G+mJHdKietEf93mn
+	 z+D5DefKb0R+UjekRh0OhALTi/xJwUwgIy8DpuYwcGTN9n+tm/uHO9LVguwZYokkoK
+	 tnQuwnG/Tf+S+rzR3bpRe5cvXOYdNDZqK+J4SPMytGZ+3SUK2+mrVQra/5ismGlbII
+	 czayvkG45XiAzqxbhUAC5z+eA4cRh6ytBdF/EcuGtNZxJHtyqSJi2FR5/EBnlhtMp1
+	 Wd10Tu3oCjHYw==
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 5096CF40074;
+	Fri, 27 Mar 2026 14:42:52 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Fri, 27 Mar 2026 14:42:52 -0400
+X-ME-Sender: <xms:rM_Gaf53wU_w_vFmN1XR_9VmQF1e9TTRE1rM87oww0jbqKn3zQiTvA>
+    <xme:rM_GaXPvT0Z2HQrHgUaQNVTRIVrWLOwO-BgCrV5k8GRfnE72m0QIvotqSXTp_orHj
+    2gOytGhfi8Tw5WrIjza2Ip1_8Tik1hvjAcSmd5zwH2MmvzdFnQ12Q>
+X-ME-Received: <xmr:rM_GaVKjAVbZbK7E0hlnUpPhDxno_FwWS3alvOVgDWol-eNebJPQxgRTTLinzpUhbU8XuI9F0parELUQLiuRtIH53yHFxQQe>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeffedutdefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpeeuohhquhhn
+    ucfhvghnghcuoegsohhquhhnsehkvghrnhgvlhdrohhrgheqnecuggftrfgrthhtvghrnh
+    epgfdvtdefieetieefueetudehffevieffkeejvdetleffledvveetgfeufeethfeinecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunh
+    domhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeijedtleekgeejuddqudej
+    jeekheehhedvqdgsohhquhhnpeepkhgvrhhnvghlrdhorhhgsehfihigmhgvrdhnrghmvg
+    dpnhgspghrtghpthhtohepfedvpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehm
+    ihhguhgvlhdrohhjvggurgdrshgrnhguohhnihhssehgmhgrihhlrdgtohhmpdhrtghpth
+    htohepghgrrhihsehgrghrhihguhhordhnvghtpdhrtghpthhtohepfhhujhhithgrrdht
+    ohhmohhnohhrihesghhmrghilhdrtghomhdprhgtphhtthhopegrtghouhhrsghothesnh
+    hvihguihgrrdgtohhmpdhrtghpthhtohepsghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgt
+    ohhmpdhrtghpthhtohepthgrmhhirhgusehkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    grrdhhihhnuggsohhrgheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohhjvggurges
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepsghjohhrnhefpghghhesphhrohhtohhnmh
+    grihhlrdgtohhm
+X-ME-Proxy: <xmx:rM_GadFLMzx4SKFk_EBd2q_cYZurxddg5M3RCp3W13r-KO2-pIw_3w>
+    <xmx:rM_GaQwrMngO9IeycAuAvKlG4TKJtWiPzWRRnEJy5iLXeqAcanIiVQ>
+    <xmx:rM_GaRzM6IaacdY8NVZgpSijNYfeYjtBiBd74AMcjNC3_VfJbdwB2A>
+    <xmx:rM_GaeYlxRTqqcf4hORjoZECWHFuqZSzQ6j1M4n3MsRaTFYdYieCxA>
+    <xmx:rM_GabyudvqMVVB43xhTcrM2BV1ORfwR7f7w1i5eNFfiIaXHwurbBMl7>
+Feedback-ID: i8dbe485b:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 27 Mar 2026 14:42:51 -0400 (EDT)
+Date: Fri, 27 Mar 2026 11:42:50 -0700
+From: Boqun Feng <boqun@kernel.org>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Gary Guo <gary@garyguo.net>,	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	Boqun Feng <boqun.feng@gmail.com>,	Tamir Duberstein <tamird@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,	Danilo Krummrich <dakr@kernel.org>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Abdiel Janulgue <abdiel.janulgue@gmail.com>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Robin Murphy <robin.murphy@arm.com>,	Yury Norov <yury.norov@gmail.com>,
+ Will Deacon <will@kernel.org>,	Peter Zijlstra <peterz@infradead.org>,
+	Mark Rutland <mark.rutland@arm.com>, Ingo Molnar <mingo@redhat.com>,
+	Waiman Long <longman@redhat.com>, Yury Norov <ynorov@nvidia.com>,
+	rust-for-linux@vger.kernel.org, nouveau@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+	driver-core@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 4/4] rust: make `build_assert` module the home of
+ related macros
+Message-ID: <acbPqjBE8mqbiVkv@tardis.local>
+References: <20260319121653.2975748-1-gary@kernel.org>
+ <20260319121653.2975748-5-gary@kernel.org>
+ <CANiq72kZH-AX=QQz2V+qCfVzMsUEAPan=o1E=OZOAnivj3L3HQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <F40ED495-9115-489C-A010-0011A9229C4A@linux.dev>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANiq72kZH-AX=QQz2V+qCfVzMsUEAPan=o1E=OZOAnivj3L3HQ@mail.gmail.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-272631-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272632-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[garyguo.net,gmail.com,nvidia.com,kernel.org,protonmail.com,google.com,umich.edu,ffwll.ch,collabora.com,arm.com,infradead.org,redhat.com,vger.kernel.org,lists.freedesktop.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[31];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tardis.local:mid];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmaurer@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[boqun@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E869F349163
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: B5C833491A2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 27, 2026 at 05:03:18PM +0100, Luka Gejak wrote:
-> On March 27, 2026 12:52:02 PM GMT+01:00, Felix Maurer <fmaurer@redhat.com> wrote:
-[...]
-> >nit: superflous empty line (it's inconsistent with the other case
-> >blocks)
-> Good catch. I'll drop the extra newline in v3.
-> >I think this would look cleaner with the good and the bad paths in
-> >the same switch-case, but that may be a matter of (my) taste. What do
-> > you think?
-> Very well. I will take your preference into consideration and will
-> make mentioned changes in v3. However I am not currently home and will
-> send v3 once I come home in 1-2 days.
+On Mon, Mar 23, 2026 at 12:36:52AM +0100, Miguel Ojeda wrote:
+> On Thu, Mar 19, 2026 at 1:17 PM Gary Guo <gary@kernel.org> wrote:
+> >
+> >  rust/kernel/net/phy/reg.rs           |  8 +++++---
+> 
+> Tomonori: are you OK with these changes?
+> 
+> >  rust/kernel/num/bounded.rs           |  2 +-
+> 
+> Alexandre: are you OK with these changes?
+> 
+> >  rust/kernel/sync/atomic/internal.rs  |  9 ++++++---
+> >  rust/kernel/sync/atomic/predefine.rs |  2 +-
+> >  rust/kernel/sync/locked_by.rs        |  2 +-
+> >  rust/kernel/sync/refcount.rs         |  8 +++++---
+> 
+> Boqun: are you OK with these changes?
+> 
 
-Alright, thank you! No hurry, take your time. Just fyi, I'll be out of
-office next week, but I'll definitely review v3 as soon as I'm back (if
-nobody else did it in the meantime).
+Acked-by: Boqun Feng <boqun@kernel.org>
 
-Thanks,
-   Felix
+Regards,
+Boqun
 
+> >  rust/kernel/xarray.rs                | 10 ++++++++--
+> 
+> Tamir, Andreas: are you OK with these changes?
+> 
+> > -    transmute::{AsBytes, FromBytes},
+> > +    transmute::{AsBytes, FromBytes}, //
+> 
+> Nit: We should take the chance to expand this.
+> 
+> Thanks all!
+> 
+> Cheers,
+> Miguel
 
