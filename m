@@ -1,240 +1,342 @@
-Return-Path: <netdev+bounces-272308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272309-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YAdGDEPYxWnQCAUAu9opvQ
-	(envelope-from <netdev+bounces-272308-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:07:15 +0100
+	id kMb4D+XYxWnQCAUAu9opvQ
+	(envelope-from <netdev+bounces-272309-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:09:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86D9133DB89
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:07:14 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97E1633DBCB
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:09:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 57CF530479CE
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:06:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 891D1304F202
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF5C25B1D2;
-	Fri, 27 Mar 2026 01:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BFD12C3254;
+	Fri, 27 Mar 2026 01:09:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b="hPzIoFJd"
+	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="Kg3nh85P";
+	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="R2nyM+u+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9EE2DB790
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 01:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.179
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774573598; cv=pass; b=GGcsL2sTB73iL7RaON0LwMIYF40jAuxmzkqtObLXHKVKBAybxHJWoaNKEmvKnHCeOoxjT2uggoQtrp8Acu0VrB58rnU6TpR+r+GPrayFD9QQdMHMDzCXGyc0ZcMUHo+tHUttg4psDrbdkITvhJXzcJfyjPiKstDGHIKm84EnzMM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774573598; c=relaxed/simple;
-	bh=+SRCyrUbaMimd/Aa0g9CjXoy6/PQTbHhk3tkhsnd2jg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PIJKsy63TJD6iJtOTDSR0Y7/8lkFw7OPCCF5DS3tBhScq2iGLuLYR9b2ZsOzd1frkIiLNCBnEIOLDnNIJ6HEqgirH6fkhiCLuAbrLQWBAmxLPgcChJdIkkKTOW6DcAatKuTf2PojzYe5gglkYddTCeOZWzFFj3FG3nfVq5HktUI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com; spf=pass smtp.mailfrom=allelesecurity.com; dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b=hPzIoFJd; arc=pass smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=allelesecurity.com
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-56cc6fe8815so711951e0c.1
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 18:06:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774573593; cv=none;
-        d=google.com; s=arc-20240605;
-        b=H7aMnbwMFxaTt72hobgba5eiykm+DgF62lSH3vgqHy7h/JU6SLYLw/rBiqv/vRevtU
-         42gGsEfMwU0AR12+NrcAxwpUvOnNxlnefBA/xOtFBrLsBWx2STrzDnofGhAOpHJAEZCy
-         AqLetEgVjJR62VBmEmcaDB9hsAJPWTF1cLhlgEV856EBGXKueWTuUu8e8AAZ60utXOQQ
-         mWE9rC21ZaaMz7Bb77kuYX8DuP0sprBE1AxoRKPOqv2hxu7IJmhj5zITfx2WOlUh2z9h
-         ob7gj/i0ddv7p8msQPxy95UlUkG2zaFgJZVvdryoBReA/pKdOwYgZyHV5z1afiE1UDz9
-         5Jlg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=a/j0+PViRHHjaQqa7PF5VSm6ctiXwCQqdeR9CJmtwlM=;
-        fh=RA+Qa+ISJfkVmZv3hENIA3DHpb/w9nUFTEfJNneqZis=;
-        b=V42cfTQ1Pzhu8MzNxw/YJt7hoC11i1z6e1UMrbitViKKPc1ROtPt4UGeNjJEpwGZrk
-         HhENvu52HdHsdsHoGXVoTMUpIdtxr+PwteqD5hq9Q7MPiOC2J0sqNli6zJNkdxSfgh5K
-         sL2FcS1FE+o1zaj337j4oJaXpwi9HY+aO+DUKj/hVxnCjQnQWaP0G/JEIhteBDG3oFiJ
-         sf29lqaX134ChBLNAj1Buw9mtpmZT1gpGCYw/85FXb8zfLgHMczLp/RYClwJnMHuaL1I
-         sqQDsgbUU6vkt1YLUBW9iyzsfs5QEIO+LEoEBNdO3oclIUnmU6eF8aoKoMiWSaFuAC6P
-         AGXA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=allelesecurity.com; s=google; t=1774573593; x=1775178393; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a/j0+PViRHHjaQqa7PF5VSm6ctiXwCQqdeR9CJmtwlM=;
-        b=hPzIoFJd7F0teQ2wOWN3nlXaqvf0BkBtwbR0x618eYPL6rr3rZqrPT6dUlcXm1ZRUB
-         rk0wgWBONDiB6QCkbO8s3CHq4+0UD7vbH0vdBlFXxNhoLNnZcJ3ApEV/r+ekyvSZI1ng
-         ldHyRuO843R/JdS/hU6Ndoye0JeLNCyluZrMA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774573593; x=1775178393;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=a/j0+PViRHHjaQqa7PF5VSm6ctiXwCQqdeR9CJmtwlM=;
-        b=D7uMiaPPs9H3tqaX6MbemiNIliuz+m+ZgwTWE8ztzQi/4bRNMStSTbLHUMkvodoojk
-         YjuNb5D+DaCLSY2+jNgRrkwA6DU27rt9A1p1po4GOifR0Fyf3MAkFUv6lkFizm5mcKRX
-         bFbCMbUwmPJeroO4A+hojIC9QO0GyfWElmvjGftCvh7wGnuDTL6JfVE1NTU9cGiXmjsH
-         BznkFQuIcw2xB7R/N4XLO3wT+xhtgJumI+EIhqa2s7gj33Z3LULrp/st/YRYI3JckLWx
-         OvJVubYACOFzC+B6+yvMy0wtuIAwB2+vumszTwAUhF59pcg+Kk53jDw4ag/6MpfAicCE
-         oT7A==
-X-Gm-Message-State: AOJu0Yzj3Xs28WZvyoQdv0MA/D5Iux0fv0p0tezThJfRJcDUdOUSNvDX
-	Rh/9ay34Ghbi/5xZ0FKWnaEdDKRpk3AOFdiMt3CfFwjoxYIhxae4Lpi+lqBRCSXCSUBdapmvkbs
-	Jvd0T4C43Q9VJZwvb0qHw3pASagvDOhqHduu2iO/ifw==
-X-Gm-Gg: ATEYQzyM5S+oClymLdd+3kzdsE57kqltvTK4mQ/pzq1XltQ3NET/vII5LRa7CjQ080O
-	ECjbrQFe5/W88gOAIgjjNBc8x220yIBhLFnceRiheXnDOWOONVthXC310FBTchSHzIB65pnBACC
-	7+ixmVnLwmUsJBlgIAa9cYPzfnJr83avMEoXjygceGhjWuVBbvYgBJf2vnxtMo8qobmYc7leucc
-	F5GxmSA1NdbHRI1QFQyQwld5KTsW4aCAttTFPeSdYuKoLqqp+GnpoHMDDExmbFu0XhX8ZelR83o
-	EPRDlqu5
-X-Received: by 2002:a05:6122:e44b:b0:56b:7a5b:3cee with SMTP id
- 71dfb90a1353d-56d4a5f8f00mr253297e0c.12.1774573593441; Thu, 26 Mar 2026
- 18:06:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B5B3194098;
+	Fri, 27 Mar 2026 01:09:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774573793; cv=none; b=SChHUQvNlnl0JjmT1H47HeYVI4T67c3lXmGa0Xk4+5gtCuancjITKaWSjNSIerSSjQffLRqvkUAS05JjqvTktYKHpEYi+njupQw0A+nu9INEeqBdDXpvV5O+xvBbg+X3WQDmazmd0lO9aAo7zy1D2+StIJtF6Z8tfpMk2irrsbA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774573793; c=relaxed/simple;
+	bh=bjXv93Krq0wj9XmPC7RqWDmiHZOkdLuXlTkptSP0nPQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=afA7+H+bqGu4OtO/UGkA09iM7MFyLJkPZsldfzClS+qWK4BorsMUoqq+54ehBFu8qMiVVfRE21R9IiKa/nqVeg/gnJxyVnGpf0MBa1xYSK16QqsLFyQY9jLfu77noLy/ljh5h0NGaXItR0DcwGbg+8ijLINev1BIMfrbVa0oPRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=Kg3nh85P; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=R2nyM+u+; arc=none smtp.client-ip=160.80.4.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 62R19E1D020471;
+	Fri, 27 Mar 2026 02:09:20 +0100
+Received: from [192.168.0.118] (unknown [101.59.90.84])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id CAF86120596;
+	Fri, 27 Mar 2026 02:09:09 +0100 (CET)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1774573749; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=njr7CAlrLqWjnq8HpAm3JeplWgmrKAC6gpa47rNgBpk=;
+	b=Kg3nh85POhDBMdVzN1QHo7giPOxDzTya74ebzcUjWoDAPR3jklg7e/bPEn+tEgAEWTZ3Lq
+	EIg3lTkna8K0RMBw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1774573749; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=njr7CAlrLqWjnq8HpAm3JeplWgmrKAC6gpa47rNgBpk=;
+	b=R2nyM+u+/X+wLP9XfoKEKlmltDQjTRODWX5CVj4gpke/d+EXbytR1ZZfGkh59q8P2QNfZl
+	QcZpghNrp7B78imPEoIrbj6dIvsRO2kXvBK1UQAFUCZkFTOPUekwizVNP5D9R6jl88eYSz
+	5e17khI0nY6vXFBH9seEqA3AMAljDAYXBu7w8ljhmGaGASZnLpYboHeRFZF7r7PwCFxjnM
+	guKnGSVyB+mSf9CGHjV4ULECMhFKObAfWXqWKZa4k0bz6q/ZTtGakxW8WIa7SZTfIm0aU1
+	n4jMVBsN/7S5F4LyOXD6F65wNBRSXAVkRlxUHQAkyOD8HZpVaDYU64nccf8Dsg==
+Message-ID: <56dca998-220c-4c29-bf3d-2a94292d6d32@uniroma2.it>
+Date: Fri, 27 Mar 2026 02:09:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260326131838.634095-1-dhowells@redhat.com> <20260326131838.634095-10-dhowells@redhat.com>
-In-Reply-To: <20260326131838.634095-10-dhowells@redhat.com>
-From: Anderson Nascimento <anderson@allelesecurity.com>
-Date: Thu, 26 Mar 2026 22:06:22 -0300
-X-Gm-Features: AQROBzBSrApkqh5-RU3p-dW15R25sMpm0H938y9vFHuYqB4GYlfJMl-5uJ5Jc9c
-Message-ID: <CAPhRvkw8eopbCei6XQY3Fi-nDk+FyuXUWs8ToQyHE9J229_v0Q@mail.gmail.com>
-Subject: Re: [PATCH net v3 09/11] rxrpc: Fix keyring reference count leak in rxrpc_setsockopt()
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Jeffrey Altman <jaltman@auristor.com>, 
-	Simon Horman <horms@kernel.org>, stable@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next 0/3] seg6: SRv6 L2 VPN with End.DT2U and srl2
+ device
+Content-Language: it-IT
+To: nicolas.dichtel@6wind.com, Andrea Mayer <andrea.mayer@uniroma2.it>,
+        netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+        David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>,
+        Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
+        Ahmed Abdelsalam <ahabdels@cisco.com>,
+        Justin Iurman <justin.iurman@6wind.com>, linux-kernel@vger.kernel.org
+References: <20260322000557.12559-1-andrea.mayer@uniroma2.it>
+ <2bb55d10-38a9-4595-baef-678d59bf4059@6wind.com>
+From: Stefano Salsano <stefano.salsano@uniroma2.it>
+In-Reply-To: <2bb55d10-38a9-4595-baef-678d59bf4059@6wind.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[allelesecurity.com,reject];
-	R_DKIM_ALLOW(-0.20)[allelesecurity.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272308-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-272309-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[uniroma2.it:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anderson@allelesecurity.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[allelesecurity.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:email,davemloft.net:email,allelesecurity.com:dkim,allelesecurity.com:email,allelesecurity.com:url]
-X-Rspamd-Queue-Id: 86D9133DB89
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stefano.salsano@uniroma2.it,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 97E1633DBCB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 10:19=E2=80=AFAM David Howells <dhowells@redhat.com=
-> wrote:
->
-> From: Anderson Nascimento <anderson@allelesecurity.com>
->
-> In rxrpc_setsockopt(), the code checks 'rx->key' when handling the
-> RXRPC_SECURITY_KEYRING option.  However, this appears to be a logic error=
-.
-> The code should be checking 'rx->securities' to determine if a keyring ha=
-s
-> already been defined for the socket.
->
-> Currently, if a user calls setsockopt(RXRPC_SECURITY_KEYRING) multiple
-> times on the same socket, the check 'if (rx->key)' fails to block
-> subsequent calls because 'rx->key' has not been defined by the function.
-> This results in a reference count leak on the keyring.
->
-> This patch changes the check to 'rx->securities' to correctly identify if
-> the socket security keyring has already been configured, returning -EINVA=
-L
-> on subsequent attempts.
->
-> Before the patch:
->
-> It shows the keyring reference counter elevated.
->
-> $ cat /proc/keys | grep AFSkeys1
-> 27aca8ae I--Q--- 24469721 perm 3f010000  1000  1000 keyring   AFSkeys1: e=
-mpty
-> $
->
-> After the patch:
->
-> The keyring reference counter remains stable and subsequent calls return =
-an
-> error:
->
-> $ ./poc
-> setsockopt: Invalid argument
-> $
->
-> Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by=
- userspace and kernel both")
-> Signed-off-by: Anderson Nascimento <anderson@allelesecurity.com>
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Reviewed-by: Jeffrey Altman <jaltman@auristor.com>
-> cc: Marc Dionne <marc.dionne@auristor.com>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: Simon Horman <horms@kernel.org>
-> cc: linux-afs@lists.infradead.org
-> cc: netdev@vger.kernel.org
-> cc: stable@kernel.org
-> ---
->  net/rxrpc/af_rxrpc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/rxrpc/af_rxrpc.c b/net/rxrpc/af_rxrpc.c
-> index 0f90272ac254..0b7ed99a3025 100644
-> --- a/net/rxrpc/af_rxrpc.c
-> +++ b/net/rxrpc/af_rxrpc.c
-> @@ -665,7 +665,7 @@ static int rxrpc_setsockopt(struct socket *sock, int =
-level, int optname,
->
->                 case RXRPC_SECURITY_KEYRING:
->                         ret =3D -EINVAL;
-> -                       if (rx->key)
-> +                       if (rx->securities)
->                                 goto error;
->                         ret =3D -EISCONN;
->                         if (rx->sk.sk_state !=3D RXRPC_UNBOUND)
->
+Il 26/03/2026 17:32, Nicolas Dichtel ha scritto:
+> Le 22/03/2026 à 01:05, Andrea Mayer a écrit :
+>> Hi all,
+> Hi,
+> 
+> first, thank you for posting this RFC.
+> 
+>>
+>> this RFC series adds support for the SRv6 End.DT2U behavior and
+>> introduces the srl2 Ethernet pseudowire device, together with
+>> corresponding selftests.
+>>
+>> Motivation
+>> ==========
+>>
+>> The main goal is to enable L2 service delivery through an internal
+>> SRv6 L2 endpoint, in a way similar to how VXLAN provides L2 services
+>> through a VXLAN netdevice.
+>>
+>> Today, Linux supports SRv6 L2 decapsulation only through an
+>> End.DX2-style model, where the exposed Ethernet frame is forwarded
+>> to a configured egress interface. The current implementation does
+>> not provide a native netdevice representing the SRv6 L2 service
+>> endpoint. This is a significant limitation compared to VXLAN, where
+>> the tunnel endpoint is represented by a netdevice that can be
+>> attached to a bridge and integrated naturally into the local L2
+>> data plane.
+>>
+>> On the encapsulation side, the existing H.L2.Encaps mode is
+>> implemented as a route-based lwtunnel, which only intercepts packets
+>> entering the IP routing path. Non-IP protocols such as ARP are
+>> never routed and therefore cannot be encapsulated, making it
+>> unsuitable for full L2 service delivery.
+>>
+>> Design
+>> ======
+>>
+>> This series addresses that limitation by introducing srl2, a native
+>> SRv6 L2 endpoint interface. The intent is to make SRv6 L2 delivery
+>> usable in the same deployment model already familiar from VXLAN: an
+>> internal interface that represents the L2 service endpoint and can
+>> participate naturally in local L2 forwarding.
+> The current design, with vxlan, uses two interfaces: one bridge and one vxlan.
+> I presume this design was chosen because the vxlan protocol is implemented in
+> the vxlan driver.
+> I wonder if using the same design for SRv6 is the best choice. Why not use only
+> a bridge interface? Instead of pointing to a port, the FDB entries could point
+> to a nexthop id. This enables to associate a srv6 encap directly to a MAC> address. Something like:
+> 
+> $ ip nexthop list id 1234
+> id 1234 encap seg6 mode encap segs ...
+> $ bridge fdb show dev br0
+> 02:03:04:05:06:07 dev br0 nhid 1234 ...
+> 
+> What is the gain of having two interfaces?
+> In term of scalability, it is interesting to have only one interface.
 
-I am following this patchset along with sashiko's comments. This time,
-it flagged this patch for an API order dependency. The setsockopt
-RXRPC_SECURITY_KEY option checks for rx->securities before proceeding,
-but after this change, the RXRPC_SECURITY_KEYRING option doesn't check
-for rx->key. Consequently, it's possible to set both keys on a socket
-depending on the setsockopt call order.
+among our medium-term design goals we have:
 
-I noticed this and wondered about it before sending the patch, but I
-decided to keep the patch as concise as possible rather than assuming
-too much and potentially breaking code. To make the logic more
-coherent, what if we check if (rx->key || rx->securities) in both
-options and remove the rx->securities check from rxrpc_request_key()?
+1) achieving the feature parity with vxlan
+2) being at least isomorphic with vxlan in terms of exposed CLI mechanisms
 
-Based on my check, rxrpc_request_key() and rxrpc_server_keyring() are
-only called by their setsockopt options. We could also add a comment
-to rxrpc_request_key() and rxrpc_server_keyring() noting that key
-validation should be handled by the caller. Is the -EINVAL error
-appropriate for this case?
+in this way we can port the existing vxlan based solution for cloud 
+infrastructures and container networking to srv6
 
---=20
-Anderson Nascimento
-Allele Security Intelligence
-https://www.allelesecurity.com
+on top of this, we can design srv6 specific machinery for higher efficiency
+
+therefore, the bridge+sr6 solution has to be supported to achieve 
+feature parity/isomorphism with vxlan
+
+on top of this, we also include a solution that does not need the bridge 
+and terminates an L2 tunnel directly into a single sr6 interface 
+characterized by a mac address (this is for the decap side)
+
+for the encap side, we are considering per-mac solutions (see our answer 
+to Justin) in a way which is aligned with vxlan design for the reasons 
+mentioned above
+
+ciao
+Stefano
+
+
+> 
+> Regards,
+> Nicolas
+> 
+>>
+>> On top of that, the series adds support for End.DT2U so that Ethernet
+>> payloads carried over SRv6 can be decapsulated and delivered into an
+>> L2 domain through either a bridge port or an srl2 interface.
+>>
+>> Relation to RFC 8986
+>> ====================
+>>
+>> RFC 8986 describes End.DT2U in terms of an abstract L2 table
+>> associated with the SID. That abstraction specifies the externally
+>> observable forwarding behavior of the node, but it does not mandate a
+>> specific internal implementation. What matters is functional
+>> equivalence.
+>>
+>> This series enforces that property by restricting valid End.DT2U
+>> decapsulation targets to endpoints that provide the required L2
+>> forwarding semantics by construction.
+>>
+>> When the target device is a bridge port, the Linux bridge provides
+>> the expected behavior directly: source MAC learning, destination MAC
+>> lookup, and unknown-unicast flooding within the corresponding L2
+>> domain.
+>>
+>> When the target device is an srl2 interface, the same model is
+>> realized in a degenerate but valid form, corresponding to a minimal
+>> two-port L2 domain in which one endpoint is srl2. In that case,
+>> forwarding is trivial: frames are delivered to srl2 only when
+>> addressed to its MAC address, or when they are broadcast or multicast.
+>> No general FDB is required in this case because there are no
+>> additional L2 destinations to learn.
+>>
+>> Any other type of decapsulation target is rejected at configuration
+>> time, since it would not guarantee the forwarding behavior required by
+>> End.DT2U.
+>>
+>> The srl2 device is the minimal baseline implementation providing
+>> point-to-point L2 encapsulation with a single segment list.
+>> Additional features can be added incrementally based on community
+>> feedback and use cases.
+>>
+>> Usage
+>> =====
+>>
+>>    ip link add srl2-0 type srl2 segs fc00::a,fc00::b
+>>    ip link set srl2-0 master br0
+>>
+>>    ip -6 route add fc00::100/128 encap seg6local action End.DT2U \
+>>        l2dev srl2-0 dev dum0
+>>
+>>    # encapsulating traffic from veth-hs into srl2-0
+>>    ip link set veth-hs master br0
+>>
+>> Selftest topology
+>> =================
+>>
+>>              cafe::1                                cafe::2
+>>             10.0.0.1                               10.0.0.2
+>>            +--------+                             +--------+
+>>            |  hs-1  |                             |  hs-2  |
+>>            +---+----+                             +----+---+
+>>                |                                       |
+>>          +-----+------+                         +------+-----+
+>>          |   veth-hs  |                         |  veth-hs   |
+>>          |      |     |   fcf0:0:1:2::/64       |     |      |
+>>          |    br0     +-------------------------+   br0      |
+>>          |      |     |                         |     |      |
+>>          |   srl2-0   |                         |  srl2-0    |
+>>          |    rt-1    |                         |   rt-2     |
+>>          +------------+                         +------------+
+>>
+>> The test verifies IPv4/IPv6 host-to-host and host-to-gateway
+>> connectivity over the SRv6 L2 VPN, including ARP resolution
+>> through the tunnel.
+>>
+>> A companion iproute2 series provides userspace support:
+>>
+>>    [RFC PATCH iproute2-next 0/4] seg6: add SRv6 End.DT2U and srl2 support
+>>
+>>
+>> This is an RFC posting to collect feedback on both the overall design
+>> and the userspace API before moving forward with a formal submission.
+>>
+>> Comments are very welcome, especially on:
+>> - the introduction of srl2 as an internal SRv6 L2 endpoint
+>> - the choice of constraining End.DT2U targets to bridge ports
+>>    and srl2 devices
+>> - the netlink/uAPI exposure
+>> - the selftest coverage and topology
+>>
+>> Thanks,
+>> Andrea and Stefano
+>>
+>>
+>> Andrea Mayer (3):
+>>    seg6: add support for the SRv6 End.DT2U behavior
+>>    seg6: add SRv6 L2 tunnel device (srl2)
+>>    selftests: seg6: add SRv6 srl2 + End.DT2U L2 VPN test
+>>
+>>   include/linux/srl2.h                          |   7 +
+>>   include/uapi/linux/seg6_local.h               |   3 +
+>>   include/uapi/linux/srl2.h                     |  20 +
+>>   net/ipv6/Kconfig                              |  16 +
+>>   net/ipv6/Makefile                             |   1 +
+>>   net/ipv6/seg6.c                               |   1 +
+>>   net/ipv6/seg6_local.c                         | 160 ++++-
+>>   net/ipv6/srl2.c                               | 269 ++++++++
+>>   tools/testing/selftests/net/Makefile          |   1 +
+>>   tools/testing/selftests/net/config            |   1 +
+>>   .../selftests/net/srv6_srl2_l2vpn_test.sh     | 621 ++++++++++++++++++
+>>   11 files changed, 1094 insertions(+), 6 deletions(-)
+>>   create mode 100644 include/linux/srl2.h
+>>   create mode 100644 include/uapi/linux/srl2.h
+>>   create mode 100644 net/ipv6/srl2.c
+>>   create mode 100755 tools/testing/selftests/net/srv6_srl2_l2vpn_test.sh
+>>
+> 
+
+
+-- 
+*******************************************************************
+Prof. Stefano Salsano
+Dipartimento Ingegneria Elettronica
+Universita' di Roma Tor Vergata
+Viale Politecnico, 1 - 00133 Roma - ITALY
+
+http://netgroup.uniroma2.it/Stefano_Salsano/
+
+E-mail  : stefano.salsano@uniroma2.it
+Office  : (Tel.) +39 06 72597770 (Fax.) +39 06 72597435
+*******************************************************************
+
 
