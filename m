@@ -1,81 +1,83 @@
-Return-Path: <netdev+bounces-272606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272607-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MHb2Elalxmk4NQUAu9opvQ
-	(envelope-from <netdev+bounces-272606-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 16:42:14 +0100
+	id KK4+GGulxmk4NQUAu9opvQ
+	(envelope-from <netdev+bounces-272607-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 16:42:35 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAB4F346EB5
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 16:42:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C1F29346ECB
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 16:42:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F17723091D3D
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 15:35:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4ED4330DC6F0
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 15:36:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 801CA3081D6;
-	Fri, 27 Mar 2026 15:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ED02309EE7;
+	Fri, 27 Mar 2026 15:36:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="HYIlDdGH"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="mqTEpMBV"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010002.outbound.protection.outlook.com [52.101.61.2])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012000.outbound.protection.outlook.com [52.101.48.0])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B2D92DF156;
-	Fri, 27 Mar 2026 15:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E782DF156;
+	Fri, 27 Mar 2026 15:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.0
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774625745; cv=fail; b=qmvrZFwoM9PVn2nc6l9pDZR7+U18c6tX1/UmmGgMVt06Vv6Os4REoEmdiE/f6N8aKOoJVE1Ec19W6x3X3fXKxX1A+8I4l1aaHzJxxfCner0UONTc0NSh31sRN/AdQSS8QzPA9i5SgIYMTG1m9yCJzFTZVRPydwUtUt0kkCoq5Bo=
+	t=1774625764; cv=fail; b=fI6Y0KEqGb50iJz7cUN152tVY8In0EwlRgNpp/6yRQkxjOzT3W0X1CKEBnRdU/LW5jfFTUjGO/YUNEJlugUhrlbsyooROz6cV0ehBEJKXhUVm8mbcV8MI2HDjy2me8/hV0YvnhMmBr3a3tX8yNzXq7owkY+b5hhcHGIzyWud/PA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774625745; c=relaxed/simple;
-	bh=mSdM94IOKvG12w0tUcrW1gmy8TKZJ6E5azly5UQ/4lY=;
+	s=arc-20240116; t=1774625764; c=relaxed/simple;
+	bh=Z1gCEM5HKc3LxqWznIbJTjwBrf//ZIQkce0txOYp6j4=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=e8knlRCLQRS7qPcjDCpgbR6hEO+Vhx2fFzQcTnMwZKxjHapDNa+zaZ4l5cUM+9iiZQR1ka41YthTxw6ArE+kinMSszNR4oPk5QjR+/KCCCZmXD9RL7tF0JTJ/g8hsoTNfX2Tzi1rMxRHREgYyvq8Sqze7lPjsxUsVebH5JaREbc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=HYIlDdGH; arc=fail smtp.client-ip=52.101.61.2
+	 Content-Type:MIME-Version; b=OYGQ5eeKnGi96ILpmVhcTeAlCfV+isyky2BB1MxEEP8Uyzd/oeD/WXnaP+D5jnBihspwVS+I/O8kwIbk3OGVno52drt2Rn6xPbSIbfa/dvtK/RfwxQLWDTF1OC4KZDV6WCHY4GXxwAYYXvwdZDc8s/TTMmP3hoTdc8xzHwlyay0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=mqTEpMBV; arc=fail smtp.client-ip=52.101.48.0
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AHwkL+knu79h/pWx6o2XNvvzW7DSJNwGTXKqYW5z76xTflVuFpuOi/0DnhpL70KOdCKaaqtSFE5bMmgaTnwJQ7FcUbD7g1Wzsy+MRLw22TpZ10v/Ly8yTA2/szrB1VQ6Y0mJZzpGX3nWO+JhFhdMo3PnhUTrYLBbNdUU6ogyTbNXeOjpiOzQEIB6NWJv2xXSygDY6M30OhDf933K9kHfOF6RAA4lRkfjZJPtRxKJRL/ChMLyLg9f7A0FVtRJARHAALT2BsvhyugKwJcZoQ2hdTfBjVnr3kTG0qiJfY+RbEQQEVbB/CU7Cq9McfSTtfqwxcs3xOYhIsmQCUPnSxZ1JA==
+ b=V4YzP34GQ7/AX1MiGUEakD1w/ei/xQdHEefWI2T+LqxQvOkmRNvBt7wyVwVlYGa3hKPULIKjO63POSbZWhCufnnnp9BAH1gy8LXF8VGrTf7Tuvgz3boneGMcpLwkkASiHA1sDOuzA5l/54BUni744LXzVbwLQ4uqUtkuRoNTrKs6hC1u4tS8UD2QsY1wntXSugt8cp3CzoV7uHn+49u59K868li7g2TRtmGKm7I5HkGPj7+YPWtq9SuuFhAC8rSjAmL4LCDxmlh1Yc/jHSRITgpYyCMiul4q3kpu9bmkFFMEh/cw3WzEx+b9GeNC84QC3zUG+YkuQYPgYvvoZB2Kdg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VsLDPRQuWnveMMc+04YzyMN04lQBExwFdn5NFqN53Yk=;
- b=TJU4cXLdWCGQuybEMlIR/XfVDdYxnbkIRVGTQKWD4XScK87/21eKG7etIypo+E289KnNsqR/M07sNSF01s4eaAPFIouKw/x6jmPCW05wCYtTFE79rz9bCl5Tn8IZ5upkZCc/ceQSeGYEKVAx3BQovW3fBUNayMih1s4kEmI3x5MuXFTtGXTRc4IXpI+SKouK7TQ4xLCPNiVivQQ/H+CtCzZMfae3MMxkZ+Q/hilvww0KMScwrjJrc065u6K7y2U4fhhm4D0Kx4yec59eQ6wgyi/U8jpkJCx9tO/7inByTkEVwhABgd/uMWOmj0ZekYOloLIB0djg1DevQ1xGZnULfA==
+ bh=hIskjCEB3om1/KWnV1lYFwRxqJ1nzn6IyUKcDU+yeD0=;
+ b=J/W+XhuSXHL1GbtvH5j/uMi+W04yuZRtwBBGqIUfug22U8owrWXvJJVGVqbsxwirFVij3VyAysSVpTVUEAUGidyf2GA0MPZ6eb5uqWq6ZVHFb7J8UDY2424fsU82ngpvuqV43dDDxPVYf9CoO+nQcsnJrzjBDOiUMKwqVW2QIYQh85VZRe4skbjefHWbsJ8Gn5ANyXvZTIbMxv5BeTo0fJoJElBf1U/Rt/RWpJpn1b95cW5nYujGZ3oaGW1fmnjUh/hn2w0Djh6K3g/D35lH3WDre+ORvYy7Y1R/Zy4GXT5aZdp5J/Es2M5MMRwy32KdiVLaS/2Uq8HE29dxJNgM5w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=microchip.com; dmarc=pass action=none
  header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VsLDPRQuWnveMMc+04YzyMN04lQBExwFdn5NFqN53Yk=;
- b=HYIlDdGH8VZtzS+ZEVRE3U+9wKaLdndkYGs7o9rl2PfrcQexfCu//6OP4D86UX8gdWQwtK2p5VIwoc0wKAqSC0qZfoaq6GMQZUmEAZTOPPIX6eTiC5I+/E/VWHhwYHf6ltWzEWj4h7nXNpN42cnjlHWVNpsrZhkgUTXO9feEd5dKW5tKZSzp63opms2FCGcbbTH6R5CMVy8zaBXtFfBXoviMFwwpdQfFOGw8RNPdYmHwcOog2Xsj/56J6Nw4/JN0x9bGuvxk5yd9vY7Ye+IuuwO3KdtDWLTJKx8JRWS6UMxsyMUR9aWE7MhzPkJvGT7OwShjAIeYFdVYN5d3LeBtOQ==
+ bh=hIskjCEB3om1/KWnV1lYFwRxqJ1nzn6IyUKcDU+yeD0=;
+ b=mqTEpMBVMkN+gy9wttC4aZ6wCGwoZWbZVhdgOmdMy/mDSdo9Z5NZ8OVnWMZqRlk0GjNRmav2lIGfvu4kEFF5XLJaD8/+DSCfX2P1GhOXsk3E9607DQOW2DppvEyEv/TuZf4eJV0DUTrlNMX1FAEbrYp2K/QYTlvY9V6iE3jY5QdGoFIFx1wD/P2kuMX2VRSADByhVXmmZwX09ftrFZwUiX5fLexANS1fn9iF6MQtwX9N1hq6EJyAGBmrA8pqPueuvwS5fCUvHYTyxhEQPliG8ND+/GXRbEpQF/6bFDvsBaIgrLSa8bUCNWwIvofohK7AnvCo3/nBXHBNdEgxVo3QSw==
 Received: from CY5PR11MB6462.namprd11.prod.outlook.com (2603:10b6:930:32::10)
  by PH8PR11MB7990.namprd11.prod.outlook.com (2603:10b6:510:259::6) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.6; Fri, 27 Mar
- 2026 15:35:40 +0000
+ 2026 15:36:00 +0000
 Received: from CY5PR11MB6462.namprd11.prod.outlook.com
  ([fe80::10d1:11dd:5088:7559]) by CY5PR11MB6462.namprd11.prod.outlook.com
  ([fe80::10d1:11dd:5088:7559%5]) with mapi id 15.20.9769.004; Fri, 27 Mar 2026
- 15:35:40 +0000
+ 15:36:00 +0000
 From: <Prathosh.Satish@microchip.com>
-To: <ivecera@redhat.com>, <netdev@vger.kernel.org>
-CC: <arkadiusz.kubalewski@intel.com>, <jiri@resnulli.us>,
-	<mschmidt@redhat.com>, <poros@redhat.com>, <horms@kernel.org>,
-	<vadim.fedorenko@linux.dev>, <linux-kernel@vger.kernel.org>,
-	<conor+dt@kernel.org>, <krzk+dt@kernel.org>, <robh@kernel.org>,
-	<devicetree@vger.kernel.org>, <pvaanane@redhat.com>
-Subject: RE: [PATCH net-next 2/5] dpll: zl3073x: use FIELD_MODIFY() for
- clear-and-set patterns
-Thread-Topic: [PATCH net-next 2/5] dpll: zl3073x: use FIELD_MODIFY() for
- clear-and-set patterns
-Thread-Index: AQHct8iojHzy4j+M10abM/1ReuO74bXCjx7g
-Date: Fri, 27 Mar 2026 15:35:39 +0000
+To: <horms@kernel.org>, <ivecera@redhat.com>
+CC: <devicetree@vger.kernel.org>, <vadim.fedorenko@linux.dev>,
+	<jiri@resnulli.us>, <netdev@vger.kernel.org>, <pvaanane@redhat.com>,
+	<arkadiusz.kubalewski@intel.com>, <robh@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <conor+dt@kernel.org>, <krzk+dt@kernel.org>,
+	<mschmidt@redhat.com>, <poros@redhat.com>
+Subject: RE: [PATCH net-next 1/5] dpll: zl3073x: clean up esync get/set and
+ use zl3073x_out_is_ndiv()
+Thread-Topic: [PATCH net-next 1/5] dpll: zl3073x: clean up esync get/set and
+ use zl3073x_out_is_ndiv()
+Thread-Index: AQHct8ijyZrubbgxEUCEz2iAjS7MRrW3q0WAgAAD9wCAAQO1AIAJ3Ekg
+Date: Fri, 27 Mar 2026 15:35:59 +0000
 Message-ID:
- <CY5PR11MB646215070FB6F16391909979EC57A@CY5PR11MB6462.namprd11.prod.outlook.com>
-References: <20260319174826.7623-1-ivecera@redhat.com>
- <20260319174826.7623-3-ivecera@redhat.com>
-In-Reply-To: <20260319174826.7623-3-ivecera@redhat.com>
+ <CY5PR11MB64627489F70490DF091A9FF3EC57A@CY5PR11MB6462.namprd11.prod.outlook.com>
+References: <20260319174826.7623-2-ivecera@redhat.com>
+ <20260320171725.112558-1-horms@kernel.org>
+ <ffa7b3a5-a381-435e-b170-24341962b6d1@redhat.com>
+ <20260321090108.GP74886@horms.kernel.org>
+In-Reply-To: <20260321090108.GP74886@horms.kernel.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -84,47 +86,47 @@ authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=microchip.com;
 x-ms-publictraffictype: Email
 x-ms-traffictypediagnostic: CY5PR11MB6462:EE_|PH8PR11MB7990:EE_
-x-ms-office365-filtering-correlation-id: 8b963a21-2ef1-47fc-2f56-08de8c168022
+x-ms-office365-filtering-correlation-id: 4bc9fd6c-ef7c-4b1e-4049-08de8c168c0d
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam:
  BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700021|22082099003|56012099003|18002099003;
 x-microsoft-antispam-message-info:
- TQBamX1/fhSz+Ntd3DtcOfq6IvtisZfxuWrd0xUe7vybcxHRdZ6gF8viWG0w2wMh+XnJkxTvlIbadh4XshEhYueFraGm1oGAvWKmJh4oysQf6F1x3wAV1QMGvRIKC3r5bwlbJCztuPuokAs7OEyVS1dNAtF7mDlsdvj5Qu8CIwemq1GlZJ7u3mid7hjnvi/iBk01bxuaB35aiV1Jz7jYmE4DIbMlm4X2Tx6pxbFB3Z9fdx4FeNvD0OYVrjQcPyUGTDSiVGhtxGSaVL0yY6MalOhPvbiOGhKWlvefL3lBXwefQWqbBQe2+jg5E+DY40hDzaIg5I50xpFB9vMQ0SlrCDGTmbG2d0xlW0kURYshRpmnj7FfeY19/6YQMVfGleCJhZDjUv2Ek/ZmM/L5VaqgsBnZp9yjDMOGxTrk4WY7CaEfm5ND0GH21+3FlME+9w7scywGj0winxovMDmtDPxBBfdPe2XFWEC00Q01DOyrU24WCSukruk+gC2RhlBgQXDUCWOfPN6VHgNG/I0soHFDYX95zgmGUC0OPsgpEuRcjPauPGDCeXWXHX27tgz7htb8/9B3Ql5u51scRSG/WaOtCJTODMFdkHxqHZpRLELs5Hi0IjnstviU0U03N3C3eh0sTFwuCIQ+4xoTSQoaO5iUypVnQ4TEOQTQibYGHKBFIrV+xdldAip7w+AX41KMooJeDomR059fzo1bXDnrX8ux+KGUqt6pBqc6C2VMj8sYgQIvmPACFdyxVAD9R9ypv6PsKrok4k8/hwIcsbxw9M1e4FV1rTYO5qPijyesRIdoA3A=
+ /hOh086VWuG6TpT/TjXrR5QM2PdcpBTgktFkvrv9e2qVgwboe2NuZvQWxj+bXnGCnN/Hz5ZAW3A3SFwWVuOW9Y+qF52Bw4D54s5eSp9ioNKNOlBPBTSJeDyHS2+79HCjgXs4hG4gMagaEyP9thQLMjx5L6drhcNaRbGCA376WEfQis14Z3uCKy+HoH/jR8Pvcf1Q0apda1CJmGF+7GYvw+axKFWYmRTeYwyF+oOhI+9Z3wsQ9zW6waVbzxUyCa96bIhDgYGYtilfzJyBr+t6mQW/dqwrxBo1ISSSJvK0er0iVFIIJRN0mGJRRDODgreDLN1IEqmEjoMGqEDmdPP8Sz6cnNlzXqAvftazxS2rpkGrDroF98Qd/RXN9FJWF0AY1BnqNZS3DiocZtdhaz5wdXvZwbnyA6+4rsRrTK/HlOZsU+fvPhUItTRr/Q6nUKRYqTt53dB7EIkkDwshkI+lyMJ3+nh5CmIdMixheYv/OeLmPdqQuCOAwMgjwJW7pmkbdf6Q3lzX+11HVSpXybtRSbXI7dhEtiRfY2D/jd5lfL+JYpbuapT1GgjLSU4XdB54SE1FTh0pg/ke/5+D07I+XROtS6t89Yq+N58wNk2yp8ZaExSg2ZGJSUMBdYiLkOP2TNNFM+/0qRMY6smksXvlZU30KFGHGpoG8mRVmn/02XXaQ54K5J4ei3V///EDMoZu1W9ynX9y+n0+29gdUWJ7WGBg7/nZTy+Uf02o0+yDTX4=
 x-forefront-antispam-report:
  CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6462.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700021)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?BGHVnbpTrrh3fbL37RR6AOHkzkAZJVm2XhVqL8kDcwo/Q5pKur05nC1Za5Rw?=
- =?us-ascii?Q?Tce+lg7zRq0ycgacHCs6A+Vc2bdrhGNRmgceoTXNvTJc6Dj+otBRzOuiSX+y?=
- =?us-ascii?Q?3c5VzEkduA92D1jYStvtZO877pot8ajUOTJ7Vbydjg5rhKbbtq0/0QnQ/xtC?=
- =?us-ascii?Q?YCTw+rk8uo4JhihLfBFRJFd0UC4RrA3yOmArbwByKYXOIoQ+anaYyArAtSHc?=
- =?us-ascii?Q?YgvKjZx3gkg9II5tnDE23AmfN3hN2u8NpCto8nsBXLziP3BD0MVOY/xXsQLu?=
- =?us-ascii?Q?cZ2+tjPa6YzdAQivnLurcWSC+y3/Te12fo+abPAnF+/OHVVNW14Gti+Z1BgP?=
- =?us-ascii?Q?j0RFT78loVgISFCMTHbvkjp1nyZWVGQTgPdQ+IO+06NiBoUmkruO1OgWxj/E?=
- =?us-ascii?Q?MWH0qDvWLZXNIp4ieniAuVQCmylzD21bbuOH+nOvfARpZUwGmtlfss7bkq8P?=
- =?us-ascii?Q?7tPKI1qRw9j2O1l0BuyIylX4LD5oMxWyo7K12oxOUIJHars2rb3IAtHotcWR?=
- =?us-ascii?Q?0Zv80vAjVB1+xUVFwy7hS1zWYXRvT2l0QCgXxaAFVK1uAs8BeWhcZgP/6mU1?=
- =?us-ascii?Q?G1TRPDMxJ51bcuQcV8E1BcVLda3dc1P1qFINo+BsNXejXVcfAkHevyMh7aZS?=
- =?us-ascii?Q?7Ijqe0U3mpPjrX2/toyiI0zQncf0y7q7Qte2iBUWz2kLn+E90vXAXqylETeY?=
- =?us-ascii?Q?vLABjVLW7eKG+fsZigsiBviqI/Af9DtgbLFTO/+e9co0E9GXLpilzx/Hc7RU?=
- =?us-ascii?Q?KdgscA8tWcC7ots/1ECPEOF2YO+Xh+yRTlVvCz+DaCfHfQD1ybVGLGhpf53+?=
- =?us-ascii?Q?EtUUeAh5+fgRmJWgIGy/l/dsnli0ckyrAR5ZFSUs3gkKdSRGUEyJFn9wf5vJ?=
- =?us-ascii?Q?zX2ReEdL45TIMrd5DK185/miYtR4q3RLyRPFAKuB11t/+8ChrmXRbDwEXWOl?=
- =?us-ascii?Q?jq8K9+O7lKYnNcSOxJGW+ht+YKSxgKTxBkU4/f11DpkWXtrYSekfFKBYgX0p?=
- =?us-ascii?Q?ZsVyrQXHRsZX+VuY2gpUf5m1kJajIs5JmQou1bo1R4H85IFWty1ovyY6tTAo?=
- =?us-ascii?Q?kvsos2wMX8pU2JR7t/j9RztjaYAIKQ9SBepb/YXERDj1yuNwRzTYmRzNetbx?=
- =?us-ascii?Q?4qA9wivGDrR2HInDU4Jh9/0Rvzd3aLYV6NvRYKCG26PM/bnO5wyOpk88J0dt?=
- =?us-ascii?Q?zaBiLjLEY7VHDIegY8OzNjgmvwPGHl3vsVyUeuIA5OVNsfmrTup9BSKSw+mb?=
- =?us-ascii?Q?AwCCHb6geZE4+Jv63/mnL0C561xe9gvsges2UlrwaKQPYmvvcZokTKMFpnfg?=
- =?us-ascii?Q?jPJLqBwKOBHimfFhBaEUtnjefTS2BKOnjzOerAmN0jpZ1JRPFPMmYt1YEdAZ?=
- =?us-ascii?Q?yT7jqTjj4P0gYlQv52dgCffp6Hvcv7CkFJQYhWB2Zs/tT2Ql6GfwY/zZI0an?=
- =?us-ascii?Q?gJw+dNkqR/3YQObZNsQR88QtlqbaCf+DBABIlH6Dn1EVvvELKXRkyL4y6L57?=
- =?us-ascii?Q?uxDal4WjpP4hj/fuKidCUUVnH8snG5cPjzblyRMVitk1R93JkFZIT4JvWU9H?=
- =?us-ascii?Q?sjroJuFLiMrFgZtAjQyKVnNj9JpEcfsjpASTyAa2wSm2+Rz4FxkpmtIFEEzF?=
- =?us-ascii?Q?k6NRoj0dH2Iq6ZBTeCgvbw+lTnRJ9xH6zYF4WIDkLw8EM1WJeSeWtBZJ3XoH?=
- =?us-ascii?Q?eVxXdxW9bL8krdBnTqBr/C1zd8jCbhLIaksNUzOYxmO19V0zaHKu+Oa71Hc6?=
- =?us-ascii?Q?Ou+02rZcxQ=3D=3D?=
+ =?us-ascii?Q?YhJ+dx2SUFBmq9YDbA+u8OCqGfR2Bsd5DPA0d08jruM2KfGYVP6v+wzJnJo+?=
+ =?us-ascii?Q?CIcakFzkDOY44YccEYSMd19iVMAhuEoGHF4tGQaFXMW7yMwXb3Sdum3YSnGw?=
+ =?us-ascii?Q?yMe/kbrBcrd+wW5c3J5KseSIaZ05MGBEES5TEU28Puxv81IcvYG3fmdf4Red?=
+ =?us-ascii?Q?onnk1oT1enMoAu4XcOs5oxfk0qG+yHexFucc0a4NeMTUUxv+aiEMrOp5C4jr?=
+ =?us-ascii?Q?yPNwp9LEm7+re6+8J4k54NCf0fklHAEYfsKFvQJ1fthCDQ1NmqQJmnZg4mBU?=
+ =?us-ascii?Q?Ke3zGFzzzMBTf3a/O6u9q1N/qEFRns3zRyELy7/D0NBI2RHYtOHNGCrKD/3R?=
+ =?us-ascii?Q?nEEoP19SQY2V6emFDJ70gt3h7p3twqOtXxcAd6D5/ee9JJUsvHDhR5Uwyw5P?=
+ =?us-ascii?Q?/Qb1x0uK4pCw1NLhjua8hGQDjbKLLHOSRll9rs8DTwxtxcuyWqkDPqHb/pTe?=
+ =?us-ascii?Q?DBdstVk1EaFh6JpGZBEg1yLff4WxFck8WSRquO44MG7pxmOxLGUGYesYKeLb?=
+ =?us-ascii?Q?RN4j+5LJY5NjMwE4AieXzbfOxx04jjO8IhxbIhEWwyVW3XcT7/jubRdg4+Xk?=
+ =?us-ascii?Q?aalRmBzCXUwrp7vE+SNwFWxvdhEm8hLCl8M5cyvBo8ZKLNkyPGk31fnCuZG+?=
+ =?us-ascii?Q?jaEWAFIukN+z4Z/yZuW1z2JljOKbvyxAIPdodcyBPCskwI3Mwr+g0xcHfvEA?=
+ =?us-ascii?Q?t+jNQk0gvVvNqlz0xE5uL0wqBevzwjHbb+Lw0O9MIVuZBg0ZVSocddzTEJrg?=
+ =?us-ascii?Q?39mLehXMhi7smF2WLTwnPkUfgLzrDK+SF1BHK+c4zuUNSAVkgUGc/XOY/tWa?=
+ =?us-ascii?Q?D6QzAAyJ+ye72iLxvoWWXdJ9OAW539CQHQ+KW1lp+WyFs7c9jvfE3zoT51W4?=
+ =?us-ascii?Q?o1pvGkhwqrDeeRht0axjYhaxbLajoFnbjrGEXgt2MKmHiCsEJnU4Iie+o70D?=
+ =?us-ascii?Q?7KJFFX+WwGxKq0dmTb3CwK50kWzbQmRes0b+0mfUPucrrjqlmLDqVdC82SlX?=
+ =?us-ascii?Q?53WKUVsdnKvCAc2TUUcWtykor5Zg0yeRO9I+gsd5p3J5RKCuQB2Jq0bDoyQ/?=
+ =?us-ascii?Q?h9UYypYyEvlQ9aFbwr0qDFMTt458hYCwtN7lMIsrRoei/D6AAtG4eVzvt+un?=
+ =?us-ascii?Q?/CUlW5FPv67qQVBq6AqZBHwFcRr5JMqhWc3YHVzj17Mx++bxCqhmkIhkFy/0?=
+ =?us-ascii?Q?5H3Jl5xFVdxF5foFDojd61ylTpRmflot2eagKlPS3pfDW3zwHDJ7fqDnTp2D?=
+ =?us-ascii?Q?ndPFDiWUCZWoHhqVytht6FQWc5r1qmPPywZyrutMOpCnXA/542m405bUyPtR?=
+ =?us-ascii?Q?FmaoBVB6tgHWvlhcll19Y2QhKOXgPPpp0LSQJqqvYO45rO2wZUk+Vl3eD8Td?=
+ =?us-ascii?Q?Cf5etAY2PuHs8NVhLMjo0bVxaA+MJfLQCa5jvFrHh05BFPiJYV+Gjs6hRqjr?=
+ =?us-ascii?Q?fJ9ewqMdEO+4rSBwmL1jkWByHwX1rjU+GG+uVnCN4TNG/ZLs15s5uFAwiN9d?=
+ =?us-ascii?Q?mWcb8yhaJPvP1sqgdtwP+ovCRK+w31clRJJVyhBytUUkHir5ZqobeHPncW+q?=
+ =?us-ascii?Q?3RvPPG+w47AhdIxhaOMR+F1s5QI7sWUcIlVzBamsgzq7DQ3ZLV3khkopcxQH?=
+ =?us-ascii?Q?9q813ZDZsuxiYwnpIwMp1PBIav+z5+hIUk7idiuDHRvNDKjr2ufp4Q2B2p6E?=
+ =?us-ascii?Q?Icg50pgE5RLSutqnPooxCaVxTthr8V3sVYQ+iD5RuCV7odBYsgZ1G8kQpVUr?=
+ =?us-ascii?Q?ejvFKoco3g=3D=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -136,13 +138,13 @@ MIME-Version: 1.0
 X-OriginatorOrg: microchip.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6462.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8b963a21-2ef1-47fc-2f56-08de8c168022
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Mar 2026 15:35:39.9186
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4bc9fd6c-ef7c-4b1e-4049-08de8c168c0d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Mar 2026 15:35:59.9547
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pY6DgwFpEmEy2SqOYL7rkmfynP/+/hCVail0xr84m2lAufMJdeMoc7p7/w7TF7zgum+s3MARRM/31xbMyg3P/ZDT8W8Z/yVqTNuIVzn2rwE=
+X-MS-Exchange-CrossTenant-userprincipalname: EGhvIfPTSgVuX7ovfppiTUnhjyLOH3VY+4Nlz/CS1PSbUysuxfRenexFO2JsDCG2JQxzfn+wPXcA46zRABftQSt7Qte7yKebGMApxmLghGM=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7990
 X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -153,7 +155,7 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272606-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272607-lists,netdev=lfdr.de];
 	FROM_NEQ_ENVFROM(0.00)[Prathosh.Satish@microchip.com,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -169,117 +171,222 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:dkim,microchip.com:email,linux.dev:email,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,CY5PR11MB6462.namprd11.prod.outlook.com:mid,resnulli.us:email]
-X-Rspamd-Queue-Id: AAB4F346EB5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:dkim,microchip.com:email,linux.dev:email,linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,CY5PR11MB6462.namprd11.prod.outlook.com:mid,intel.com:email,resnulli.us:email]
+X-Rspamd-Queue-Id: C1F29346ECB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Reviewed-by: prathosh.satish@microchip.com
 
 -----Original Message-----
-From: Ivan Vecera <ivecera@redhat.com>=20
-Sent: Thursday, March 19, 2026 5:48 PM
-To: netdev@vger.kernel.org
-Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>; Jiri Pirko <jiri=
-@resnulli.us>; Michal Schmidt <mschmidt@redhat.com>; Petr Oros <poros@redha=
-t.com>; Prathosh Satish - M66066 <Prathosh.Satish@microchip.com>; Simon Hor=
-man <horms@kernel.org>; Vadim Fedorenko <vadim.fedorenko@linux.dev>; linux-=
-kernel@vger.kernel.org; Conor Dooley <conor+dt@kernel.org>; Krzysztof Kozlo=
-wski <krzk+dt@kernel.org>; Rob Herring <robh@kernel.org>; devicetree@vger.k=
-ernel.org; Pasi Vaananen <pvaanane@redhat.com>
-Subject: [PATCH net-next 2/5] dpll: zl3073x: use FIELD_MODIFY() for clear-a=
-nd-set patterns
+From: Simon Horman <horms@kernel.org>=20
+Sent: Saturday, March 21, 2026 9:01 AM
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: devicetree@vger.kernel.org; vadim.fedorenko@linux.dev; jiri@resnulli.us=
+; netdev@vger.kernel.org; pvaanane@redhat.com; arkadiusz.kubalewski@intel.c=
+om; robh@kernel.org; linux-kernel@vger.kernel.org; conor+dt@kernel.org; krz=
+k+dt@kernel.org; Prathosh Satish - M66066 <Prathosh.Satish@microchip.com>; =
+mschmidt@redhat.com; poros@redhat.com
+Subject: Re: [PATCH net-next 1/5] dpll: zl3073x: clean up esync get/set and=
+ use zl3073x_out_is_ndiv()
 
 EXTERNAL EMAIL: Do not click links or open attachments unless you know the =
 content is safe
 
-Replace open-coded clear-and-set bitfield operations with FIELD_MODIFY().
+On Fri, Mar 20, 2026 at 06:31:36PM +0100, Ivan Vecera wrote:
+> Hi Simon,
+>
+> On 3/20/26 6:17 PM, Simon Horman wrote:
+> > This is an AI-generated review of your patch. The human sending this=20
+> > email has considered the AI review valid, or at least plausible.
+> >
+> > For local reproduction steps see=20
+> > https://netdev-ai.bots.linux.dev/ai-local.html
+> > ---
+> > dpll: zl3073x: clean up esync get/set and use zl3073x_out_is_ndiv()
+> >
+> > Return -EOPNOTSUPP early in esync_get callbacks when esync is not=20
+> > supported instead of conditionally populating the range at the end.
+> > This simplifies the control flow by removing the finish label/goto=20
+> > in the output variant and the conditional range assignment in both=20
+> > input and output variants.
+> >
+> > Replace open-coded N-div signal format switch statements with
+> > zl3073x_out_is_ndiv() helper in esync_get, esync_set and=20
+> > frequency_set callbacks.
+> >
+> > > diff --git a/drivers/dpll/zl3073x/dpll.c=20
+> > > b/drivers/dpll/zl3073x/dpll.c index a29f606318f6..79ef62d69a32=20
+> > > 100644
+> > > --- a/drivers/dpll/zl3073x/dpll.c
+> > > +++ b/drivers/dpll/zl3073x/dpll.c
+> > > @@ -131,6 +131,12 @@ zl3073x_dpll_input_pin_esync_get(const struct dp=
+ll_pin *dpll_pin,
+> > >           ref_id =3D zl3073x_input_pin_ref_get(pin->id);
+> > >           ref =3D zl3073x_ref_state_get(zldev, ref_id);
+> > >
+> > > + if (!pin->esync_control || zl3073x_ref_freq_get(ref) =3D=3D 1)
+> > > +         return -EOPNOTSUPP;
+> > > +
+> > > + esync->range =3D esync_freq_ranges; range_num =3D=20
+> > > + esync->ARRAY_SIZE(esync_freq_ranges);
+> > > +
+> > >           switch (FIELD_GET(ZL_REF_SYNC_CTRL_MODE, ref->sync_ctrl)) {
+> > >           case ZL_REF_SYNC_CTRL_MODE_50_50_ESYNC_25_75:
+> > >                   esync->freq =3D ref->esync_n_div =3D=3D=20
+> > > ZL_REF_ESYNC_DIV_1HZ ? 1 : 0; @@ -142,17 +148,6 @@ zl3073x_dpll_input=
+_pin_esync_get(const struct dpll_pin *dpll_pin,
+> > >                   break;
+> > >           }
+> > >
+> > > - /* If the pin supports esync control expose its range but only
+> > > -  * if the current reference frequency is > 1 Hz.
+> > > -  */
+> > > - if (pin->esync_control && zl3073x_ref_freq_get(ref) > 1) {
+> > > -         esync->range =3D esync_freq_ranges;
+> > > -         esync->range_num =3D ARRAY_SIZE(esync_freq_ranges);
+> > > - } else {
+> > > -         esync->range =3D NULL;
+> > > -         esync->range_num =3D 0;
+> > > - }
+> > > -
+> > >           return 0;
+> > >   }
+> >
+> > The refactoring changes the behavior when the reference frequency is 0 =
+Hz.
+> >
+> > The old code checked 'zl3073x_ref_freq_get(ref) > 1' which excluded=20
+> > both
+> > freq=3D=3D0 and freq=3D=3D1 from having the esync range exposed. The ne=
+w=20
+> > code checks
+> > 'zl3073x_ref_freq_get(ref) =3D=3D 1' which only excludes freq=3D=3D1.
+> >
+> > When freq=3D=3D0 (which can happen when freq_base, freq_mult, or=20
+> > freq_ratio_m is 0), the old code would return 0 with=20
+> > esync->range=3DNULL and
+> > esync->range_num=3D0, while the new code returns 0 with=20
+> > esync->range=3Desync_freq_ranges and esync->range_num=3D1.
+> >
+> > The removed comment documented the original intent: "if the current=20
+> > reference frequency is > 1 Hz". Should the new check be 'zl3073x_ref_fr=
+eq_get(ref) <=3D 1'
+> > to preserve the original behavior for 0 Hz frequencies?
+> >
+> > >
+> > > @@ -582,8 +577,8 @@ zl3073x_dpll_output_pin_esync_get(const struct dp=
+ll_pin *dpll_pin,
+> > >           struct zl3073x_dpll_pin *pin =3D pin_priv;
+> > >           const struct zl3073x_synth *synth;
+> > >           const struct zl3073x_out *out;
+> > > + u32 synth_freq, out_freq;
+> > >           u8 clock_type, out_id;
+> > > - u32 synth_freq;
+> > >
+> > >           out_id =3D zl3073x_output_pin_out_get(pin->id);
+> > >           out =3D zl3073x_out_state_get(zldev, out_id); @@ -592,17=20
+> > > +587,19 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *d=
+pll_pin,
+> > >            * for N-division is also used for the esync divider so bot=
+h cannot
+> > >            * be used.
+> > >            */
+> > > - switch (zl3073x_out_signal_format_get(out)) {
+> > > - case ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV:
+> > > - case ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV_INV:
+> > > + if (zl3073x_out_is_ndiv(out))
+> > >                   return -EOPNOTSUPP;
+> > > - default:
+> > > -         break;
+> > > - }
+> > >
+> > >           /* Get attached synth frequency */
+> > >           synth =3D zl3073x_synth_state_get(zldev, zl3073x_out_synth_=
+get(out));
+> > >           synth_freq =3D zl3073x_synth_freq_get(synth);
+> > > + out_freq =3D synth_freq / out->div;
+> > > +
+> > > + if (!pin->esync_control || out_freq =3D=3D 1)
+> > > +         return -EOPNOTSUPP;
+> > > +
+> > > + esync->range =3D esync_freq_ranges; range_num =3D=20
+> > > + esync->ARRAY_SIZE(esync_freq_ranges);
+> > >
+> > >           clock_type =3D FIELD_GET(ZL_OUTPUT_MODE_CLOCK_TYPE, out->mo=
+de);
+> > >           if (clock_type !=3D ZL_OUTPUT_MODE_CLOCK_TYPE_ESYNC) { @@=20
+> > > -610,11 +607,11 @@ zl3073x_dpll_output_pin_esync_get(const struct dpl=
+l_pin *dpll_pin,
+> > >                   esync->freq =3D 0;
+> > >                   esync->pulse =3D 0;
+> > >
+> > > -         goto finish;
+> > > +         return 0;
+> > >           }
+> > >
+> > >           /* Compute esync frequency */
+> > > - esync->freq =3D synth_freq / out->div / out->esync_n_period;
+> > > + esync->freq =3D out_freq / out->esync_n_period;
+> > >
+> > >           /* By comparing the esync_pulse_width to the half of the pu=
+lse width
+> > >            * the esync pulse percentage can be determined.
+> > > @@ -623,18 +620,6 @@ zl3073x_dpll_output_pin_esync_get(const struct d=
+pll_pin *dpll_pin,
+> > >            */
+> > >           esync->pulse =3D (50 * out->esync_n_width) / out->div;
+> > >
+> > > -finish:
+> > > - /* Set supported esync ranges if the pin supports esync control=20
+> > > and
+> > > -  * if the output frequency is > 1 Hz.
+> > > -  */
+> > > - if (pin->esync_control && (synth_freq / out->div) > 1) {
+> > > -         esync->range =3D esync_freq_ranges;
+> > > -         esync->range_num =3D ARRAY_SIZE(esync_freq_ranges);
+> > > - } else {
+> > > -         esync->range =3D NULL;
+> > > -         esync->range_num =3D 0;
+> > > - }
+> > > -
+> > >           return 0;
+> > >   }
+> >
+> > Similar to the input variant, this changes the behavior for 0 Hz=20
+> > output frequencies.
+> >
+> > The old code used '(synth_freq / out->div) > 1' to decide whether to=20
+> > expose the esync range, which excluded both out_freq=3D=3D0 and=20
+> > out_freq=3D=3D1. The new code uses 'out_freq =3D=3D 1' for the early=20
+> > -EOPNOTSUPP return, only excluding out_freq=3D=3D1.
+> >
+> > When out_freq=3D=3D0 (which can happen when synth_freq is 0 or=20
+> > synth_freq <
+> > out->div), the old code returned 0 with esync->range=3DNULL and
+> > esync->range_num=3D0, while the new code returns 0 with=20
+> > esync->range=3Desync_freq_ranges and esync->range_num=3D1.
+> >
+> > The removed comment documented the intent: "if the output frequency=20
+> > is > 1 Hz". Should this also use 'out_freq <=3D 1' to maintain=20
+> > consistency with the original behavior?
+> >
+> > [ ... ]
+> >
+>
+> The frequency for both input and output pins cannot be zero... Cannot=20
+> be set to 0 and device never returns configured frequency to be 0.
+>
+> I can modify the lines to be:
+>
+> if (!pin->esync_control || out_freq <=3D 1)
+>       return -EOPNOTSUPP;
+>
+> but it is needless - but let me know.
 
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/dpll/zl3073x/chan.h  | 17 ++++++-----------  drivers/dpll/zl3073x/=
-core.c  |  3 +--  drivers/dpll/zl3073x/flash.c |  3 +--
- 3 files changed, 8 insertions(+), 15 deletions(-)
+Thanks Ivan,
 
-diff --git a/drivers/dpll/zl3073x/chan.h b/drivers/dpll/zl3073x/chan.h inde=
-x e0f02d3432086..481da2133202b 100644
---- a/drivers/dpll/zl3073x/chan.h
-+++ b/drivers/dpll/zl3073x/chan.h
-@@ -66,8 +66,7 @@ static inline u8 zl3073x_chan_ref_get(const struct zl3073=
-x_chan *chan)
-  */
- static inline void zl3073x_chan_mode_set(struct zl3073x_chan *chan, u8 mod=
-e)  {
--       chan->mode_refsel &=3D ~ZL_DPLL_MODE_REFSEL_MODE;
--       chan->mode_refsel |=3D FIELD_PREP(ZL_DPLL_MODE_REFSEL_MODE, mode);
-+       FIELD_MODIFY(ZL_DPLL_MODE_REFSEL_MODE, &chan->mode_refsel,=20
-+ mode);
- }
-
- /**
-@@ -77,8 +76,7 @@ static inline void zl3073x_chan_mode_set(struct zl3073x_c=
-han *chan, u8 mode)
-  */
- static inline void zl3073x_chan_ref_set(struct zl3073x_chan *chan, u8 ref)=
-  {
--       chan->mode_refsel &=3D ~ZL_DPLL_MODE_REFSEL_REF;
--       chan->mode_refsel |=3D FIELD_PREP(ZL_DPLL_MODE_REFSEL_REF, ref);
-+       FIELD_MODIFY(ZL_DPLL_MODE_REFSEL_REF, &chan->mode_refsel, ref);
- }
-
- /**
-@@ -110,13 +108,10 @@ zl3073x_chan_ref_prio_set(struct zl3073x_chan *chan, =
-u8 ref, u8 prio)  {
-        u8 *val =3D &chan->ref_prio[ref / 2];
-
--       if (!(ref & 1)) {
--               *val &=3D ~ZL_DPLL_REF_PRIO_REF_P;
--               *val |=3D FIELD_PREP(ZL_DPLL_REF_PRIO_REF_P, prio);
--       } else {
--               *val &=3D ~ZL_DPLL_REF_PRIO_REF_N;
--               *val |=3D FIELD_PREP(ZL_DPLL_REF_PRIO_REF_N, prio);
--       }
-+       if (!(ref & 1))
-+               FIELD_MODIFY(ZL_DPLL_REF_PRIO_REF_P, val, prio);
-+       else
-+               FIELD_MODIFY(ZL_DPLL_REF_PRIO_REF_N, val, prio);
- }
-
- /**
-diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c inde=
-x 6363002d48d46..7eebfc1ad1019 100644
---- a/drivers/dpll/zl3073x/core.c
-+++ b/drivers/dpll/zl3073x/core.c
-@@ -743,8 +743,7 @@ int zl3073x_dev_phase_avg_factor_set(struct zl3073x_dev=
- *zldev, u8 factor)
-        value =3D (factor + 1) & 0x0f;
-
-        /* Update phase measurement control register */
--       dpll_meas_ctrl &=3D ~ZL_DPLL_MEAS_CTRL_AVG_FACTOR;
--       dpll_meas_ctrl |=3D FIELD_PREP(ZL_DPLL_MEAS_CTRL_AVG_FACTOR, value)=
-;
-+       FIELD_MODIFY(ZL_DPLL_MEAS_CTRL_AVG_FACTOR, &dpll_meas_ctrl,=20
-+ value);
-        rc =3D zl3073x_write_u8(zldev, ZL_REG_DPLL_MEAS_CTRL, dpll_meas_ctr=
-l);
-        if (rc)
-                return rc;
-diff --git a/drivers/dpll/zl3073x/flash.c b/drivers/dpll/zl3073x/flash.c in=
-dex 83452a77e3e98..f85535c8ad246 100644
---- a/drivers/dpll/zl3073x/flash.c
-+++ b/drivers/dpll/zl3073x/flash.c
-@@ -194,8 +194,7 @@ zl3073x_flash_cmd_wait(struct zl3073x_dev *zldev, u32 o=
-peration,
-        if (rc)
-                return rc;
-
--       value &=3D ~ZL_WRITE_FLASH_OP;
--       value |=3D FIELD_PREP(ZL_WRITE_FLASH_OP, operation);
-+       FIELD_MODIFY(ZL_WRITE_FLASH_OP, &value, operation);
-
-        rc =3D zl3073x_write_u8(zldev, ZL_REG_WRITE_FLASH, value);
-        if (rc)
---
-2.52.0
-
+If it is needless then there is no need to handle it in the code.
+Sorry for not understanding that before forwarding on the AI generated revi=
+ew.
 
