@@ -1,204 +1,257 @@
-Return-Path: <netdev+bounces-272684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272685-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uMkhEVjuxmkIQQUAu9opvQ
-	(envelope-from <netdev+bounces-272684-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:53:44 +0100
+	id kMhtNEzsxmkIQQUAu9opvQ
+	(envelope-from <netdev+bounces-272685-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:45:00 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3934934B57A
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:53:43 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E84C34B3BD
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:45:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D3FE0302BC3E
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 20:42:04 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D25FE304CF53
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 20:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 400A938F932;
-	Fri, 27 Mar 2026 20:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7E13939B4;
+	Fri, 27 Mar 2026 20:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nM/BfZ+Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DZUBGCo3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65D638CFF5
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 20:42:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA03392C34
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 20:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774644122; cv=none; b=b3AHMjJYXXWfz3VHxhRL2vu66bIlVkNnWb1UTO6X6SMH1rpVrUEqXHsM8K1WTX9kvADlJmmeTBTFyPCaq43VM5lPo1Y9n6xME3+PdzLlUto2PkFSna6PwKgIEaDH7egtbLTsbgjSnCiKTcNiyeWunhyoROe9SrPadlJ2KKwBvsw=
+	t=1774644288; cv=none; b=ie8vjju5AzfcIuRrihurqS2HHhBi79f/ISSAq0JrmlYDGkJ8pJMfbcp18/eDvbulw67ZAeaTVpFVlLackAAbCE2TQFF15agl0ka8waw9/pe/8Cb6i5FSHFp9n2PcUk86eYSfUAGNkISKejqILulObbNnSgm8W6XKOhtfHLvzUpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774644122; c=relaxed/simple;
-	bh=OseZgolmzhAr4jFqxBRNN1L/7ggRloDkt++YOQpR2p8=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U9q+p9fff2LcrY/GmJbZrxgxxJlVUmDr317kiM886itzd6yXP2HmPjX7f2Znas+CUWXcCM5vHj9cjDa+Lu5B/LWn/zicfleQKQ/BXx8hyD7Gq0IMu4/bx0w+Iix4bnWHzorcjLUI76b6xIgIs7GxuI+oiTixxMkKT+f6hl5VT/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nM/BfZ+Y; arc=none smtp.client-ip=209.85.128.53
+	s=arc-20240116; t=1774644288; c=relaxed/simple;
+	bh=5BuGymhJ2SueICkDMHULqDUp+FweVGD5zC7CgfMl/TA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q2kMYHYyaDf/Ul2+6eoX5o5aOnaUc8MW4qX/llQuud0Kg0wdt0sYO8bCW4FtL5FKd3Y6faV695YPRJpkHvI4tjGJBWa0PxSFWwAMdY7+9N2NhFu0P9F5Cu+HYKm1K13YpV3ObjaqJJvCB/W61Yc+39WLK1tH8YawvRqjP69Xrxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DZUBGCo3; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso20746135e9.3
-        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 13:42:00 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-82a7ebc729dso1177485b3a.3
+        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 13:44:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774644119; x=1775248919; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sZ/7XD1rJXQYlW2CUYI9bsXyEYg+8UaYCRyEmTmJK34=;
-        b=nM/BfZ+YLMVvk5P3x54GwdFqdhKmNJ1Hx2r4zooAmkk5jyqty65BG5Z/uNElRCb6iY
-         atigMkijN16Bg0MggWKJdpuEJizIgzzsHp8uWkf3jKGObwBow5TmIAnkXXrqS59Y+HyE
-         hUaDJeb7L7MvoygWrNTlThnWgcILNdnwFIxHBmdrUObxwmUefmvY23WjhAsY3hLEmf3V
-         rONqyr8uPLBAQt0hOQm9zA/WPdl8mxXYOXcdgzOLm3g5YAip4rEMTMXdKxwYDbKtdNF+
-         59EkTsbwaWxSa4pz4TXedRnJ3xpRtQwB741vQE2mzx7GXYus9zCyOz5xX/f6uYz16fe6
-         I6QQ==
+        d=gmail.com; s=20251104; t=1774644286; x=1775249086; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=u1RGoVUYCYgEkpIIr1krzGHx69IUyqzZSta5UxOBMJk=;
+        b=DZUBGCo3nwV/ghqalbjXDs25eQlD2iInVIyxC/v43Ie0iWCus57Lm/Mvr0sxtnAaRK
+         1aUWwMt/uYfU7PWlygIQRu+DR9pyoMnrGz2ai7M3i+wJArd0W/vqPZruoltWrgHTn9ci
+         9l7b0XY6mjxjS1ulOT87aEcHTgZdCAiQU2c87vHFjeHG1QoslKkn6u4SOYyeA70tsL2g
+         F7IPh+Gci+9GKSlMvuhiqSIeGzNS2IjZ7abyd39lpEG63Py3chyPR1fCzo1S883TdQnJ
+         z49F3sBzdiZf8QnqPh8Pub81RfLe9Da6x1BuuZqdiL8fe/Dfd2rYMKae7/eKUb9ar7nn
+         jtBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774644119; x=1775248919;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sZ/7XD1rJXQYlW2CUYI9bsXyEYg+8UaYCRyEmTmJK34=;
-        b=ZYgddooMe2FLxOGFYiMn0RP/0X69yfVW1wgArH5sx+PwmtFQ+iVPeHRHWBDTEZQvMB
-         +pierlRj108zo9kecip056YcyAYwe9D4omBssfYLwo0W9DDfHN2QvVG+NywtPGBQg5If
-         vYEscQb9+VZSQNbm2kYE78sfT3hboMndNFf5U28FrdNXZldFJQUkeQ55/7TlyDfcyw/D
-         o9LXtGKU0OeyPAo8cEf5BUjVC+b6rSP7X+sBAAuObxlj7uHwYhsUWRD7v1v5meZrP+iH
-         s2qZ0uWlCD5nkp3GSZz/fo39c7N/EoaOnIdQSoys4Gt4z+X2ltymaEYqSkIWu0HoMzZe
-         I+yg==
-X-Forwarded-Encrypted: i=1; AJvYcCVIdJpIRQyKnpJnF0jwPzxlS9Iyzi6VyyU1D5aljuvgnccp9ArscNIfNzLQ0DbBQV+Ffn/4poE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzVSjIHXwhS+GVQCVBxnSMC+1hULkhi3sjwxl+C8enPgtWd5Vx
-	dfOufOKQSSfxURIK4vO+6OdX4AIS6mqZBRRelzy+izffc+aUBAy0QPIE
-X-Gm-Gg: ATEYQzxWwjj2im4bIAEpevmRvB5GMjpUqp7ubNZmYjKOC/Ax2c7Dgt/Fl4tbqQ0SM5y
-	7cZz60Hf3/oQCQ6FAeCDlW0Cy7MOAZI1GUPxSXo0qtkUTH2Rn6W4/qUQWoMhSjKO8lCNn+DZtrs
-	IDO177nCSQgpIvzj/k0oBby2VWaH5pKgWD2nS0IQwY0lWcf/EzOn+AGmMzkvchCnVXNBA9ljBiO
-	2l0aG2e12WSNaBVgzD/8NicIyF8WMPnEtEqq6TxM1JQozZeg73bVYvWxj3JGNmPH1e5iuJCzXSY
-	c2GkKZKqOPhc51Zb2nlAnDKwyNiLYHH/LUYR7vpDt5QGDNXHLTADeS2kB3rn4AeupnkI0xHh09h
-	pqfW2N2f7LIYmechgpFkpR9sNAK2SdOA5/Q8lBDxf1kPpXiP5xUeGKupzAnqcvNLkt42BzIB0tB
-	KFsK04MmpfMKbr/bLIuck0dzLxFy3jl6ClfcFiltK9PI9oGU16pwekWJ9LGw==
-X-Received: by 2002:a05:600c:1d15:b0:485:2fc5:3a5 with SMTP id 5b1f17b1804b1-48727edf4f5mr64539105e9.26.1774644118896;
-        Fri, 27 Mar 2026 13:41:58 -0700 (PDT)
-Received: from krava (cust-west-par-46-193-1-135.cust.wifirst.net. [46.193.1.135])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4872712b3ebsm20378445e9.19.2026.03.27.13.41.58
+        d=1e100.net; s=20251104; t=1774644286; x=1775249086;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u1RGoVUYCYgEkpIIr1krzGHx69IUyqzZSta5UxOBMJk=;
+        b=kyL8P0xZn6wuVDDuJmn7GDdCdlxjZE3W3h1X5kYnmMJdhKnCM0sw0wMrKHyhkM2Uny
+         pNOW0eig0cBGvMEcaxD9JLdcWREXDXEbUJyf3hQBJPw9LOrVVz20LpR4H0qZU7ZzPpfL
+         izVpCokmRT/X7CuwUPOsicmyRL5VWzDqh49Nmk/UA0VFKR3fZJ/uNMu0z/WjRCThOzP5
+         ilIP9nbbakQ0vhB65eN+1gw5L9QebleVsycZ9KFXcnDxA848KAFaoVd17D2l3Zt6XuLg
+         JmHLdA3PBug06SUqEiC39BZ0L1xN4e1qAjFbr3tMB5ISEkwvKVSF7U/Ksf5Zfc9EO2g/
+         dTow==
+X-Forwarded-Encrypted: i=1; AJvYcCVNZ2S6nFAYRSB+rS1yS6Zl2Oe7AG9OgUNpC5yBxhFTdMCe87EHULiu/uEGTo67mH3TB6Z2LHo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHBfPJ0DGBjDtZt1gGFc2P+EzjvoMG/mNOKObUxiM7u/gvFoFp
+	szONaP128H6RFyskMrw9pTBwBLrFLD5HIobStcRmDKntoMJPH1x1WTjL
+X-Gm-Gg: ATEYQzzv3m3tKQ9C377PU5hss1555kA0+o1v4V5AnKINZjdG9YQXdpfI9kEOclnIkyz
+	CFfS9milP9V0VyrpRGm0QYK1qFnoFjlDWLl8blSEgw1hLccWiD+9159TMRUVhjxazyOG3Dg5aKr
+	Ik3DbHdPMN9tK6mJsPcc1fpg5gm68n8Ihz7YEHZlrDehOmWO7Mh5wDQLh9CGK/TZHN1RzLMsEjp
+	On744OHFKeamEIU8WUrhLC1RHr7B5IZk36gCDT1FQOi8IKR3BP9cGRzkTyXxa3F13wMdI0ioGs1
+	l8DBAm1IB52Jq+xLerBOB9dk1RZVGF+sgkgThlcdshadL/bB53YMkYEFv2d8d+kR/9ZO1+w29nB
+	XHFZW5R0rXGRkLAj1Y+j+eWq1zRMHVSHbxkkJwbeWLOQPvvbh4o2+fctL1jwKa2zjTSWh4NKGBm
+	6ZN4bZGCUu2+l69A5qeZ6g0ldgqZOIDHDjid34Wy4=
+X-Received: by 2002:a05:6a00:138e:b0:82c:213b:123f with SMTP id d2e1a72fcca58-82c95ee5fc2mr3952515b3a.31.1774644286307;
+        Fri, 27 Mar 2026 13:44:46 -0700 (PDT)
+Received: from localhost ([2a03:2880:7ff:71::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82ca85d019dsm110819b3a.29.2026.03.27.13.44.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Mar 2026 13:41:58 -0700 (PDT)
-From: Jiri Olsa <olsajiri@gmail.com>
-X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
-Date: Fri, 27 Mar 2026 21:41:56 +0100
-To: Leon Hwang <leon.hwang@linux.dev>
-Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Shuah Khan <shuah@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
+        Fri, 27 Mar 2026 13:44:45 -0700 (PDT)
+From: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>
+Cc: Alexander Duyck <alexanderduyck@fb.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Toke Hoiland-Jorgensen <toke@redhat.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
-	kernel-patches-bot@fb.com
-Subject: Re: [PATCH bpf-next 2/3] bpf: Disallow freplace on kprobe with
- mismatched kprobe_write_ctx values
-Message-ID: <acbrlN_n4Z684h9e@krava>
-References: <20260324150444.68166-1-leon.hwang@linux.dev>
- <20260324150444.68166-3-leon.hwang@linux.dev>
+	kernel-team@meta.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Mohsin Bashir <mohsin.bashr@gmail.com>,
+	Lee Trager <lee@trager.us>,
+	Mike Marciniszyn <mike.marciniszyn@gmail.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] fbnic: Set Relaxed Ordering PCIe TLP attributes for DMA engines
+Date: Fri, 27 Mar 2026 13:44:45 -0700
+Message-ID: <20260327204445.3074446-1-dimitri.daskalakis1@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260324150444.68166-3-leon.hwang@linux.dev>
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272684-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,google.com,davemloft.net,redhat.com,fb.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-272685-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[fb.com,kernel.org,meta.com,lunn.ch,google.com,redhat.com,intel.com,gmail.com,trager.us,vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olsajiri@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[dimitridaskalakis1@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3934934B57A
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,fb.com:email,meta.com:email]
+X-Rspamd-Queue-Id: 7E84C34B3BD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 24, 2026 at 11:04:43PM +0800, Leon Hwang wrote:
-> uprobe programs are allowed to modify struct pt_regs.
-> 
-> Since the actual program type of uprobe is KPROBE, it can be abused to
-> modify struct pt_regs via kprobe+freplace when the kprobe attaches to
-> kernel functions.
-> 
-> For example,
-> 
-> SEC("?kprobe")
-> int kprobe(struct pt_regs *regs)
-> {
-> 	return 0;
-> }
-> 
-> SEC("?freplace")
-> int freplace_kprobe(struct pt_regs *regs)
-> {
-> 	regs->di = 0;
-> 	return 0;
-> }
-> 
-> freplace_kprobe prog will attach to kprobe prog.
-> kprobe prog will attach to a kernel function.
-> 
-> Without this patch, when the kernel function runs, its first arg will
-> always be set as 0 via the freplace_kprobe prog.
-> 
-> To avoid the abuse of kprobe_write_ctx=true via kprobe+freplace, disallow
-> freplace on kprobe programs with mismatched kprobe_write_ctx values.
-> 
-> Fixes: 7384893d970e ("bpf: Allow uprobe program to change context registers")
-> Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
-> ---
->  kernel/bpf/verifier.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> index 12330466d58b..f8257bae6081 100644
-> --- a/kernel/bpf/verifier.c
-> +++ b/kernel/bpf/verifier.c
-> @@ -6404,6 +6404,14 @@ static int check_ctx_access(struct bpf_verifier_env *env, int insn_idx, int off,
->  		/* remember the offset of last byte accessed in ctx */
->  		if (env->prog->aux->max_ctx_offset < off + size)
->  			env->prog->aux->max_ctx_offset = off + size;
-> +		if (env->prog->type == BPF_PROG_TYPE_EXT) {
-> +			struct bpf_prog *dst_prog = env->prog->aux->dst_prog;
-> +
-> +			if (env->prog->aux->kprobe_write_ctx != dst_prog->aux->kprobe_write_ctx) {
-> +				verbose(env, "Extension program cannot have different kprobe_write_ctx value with target prog\n");
-> +				return -EINVAL;
-> +			}
-> +		}
+From: Alexander Duyck <alexanderduyck@fb.com>
 
-would it be more clear to check this in bpf_check_attach_target,
-instead of depending on actual write to context
+Add ATTR CSR bit field definitions for the DMA engine TLP header
+configuration registers:
+  AW_CFG: RDE_ATTR[17:15], RQM_ATTR[14:12], TQM_ATTR[11:9]
+  AR_CFG: TDE_ATTR[17:15], RQM_ATTR[14:12], TQM_ATTR[11:9]
 
-jirka
+These fields control the PCIe TLP attribute bits for outbound
+transactions from the TQM, RQM, RDE (write path), and TDE (read path)
+DMA engines. An enum is added with standard PCIe TLP attribute values:
+NS (No Snoop), RO (Relaxed Ordering), and IDO (ID-based Ordering).
+
+Read the PCIe Relaxed Ordering capability at probe time and store it in
+fbnic_dev. Configure Relaxed Ordering on the PCIe TLP attributes in
+fbnic_mbx_init_desc_ring when the capability is enabled. For the write
+path (AW_CFG), set RO on RDE and TQM attributes. For the read path
+(AR_CFG), set RO on all three attributes (TDE, RQM, TQM). This allows
+the PCIe fabric to reorder these transactions for improved throughput.
+
+Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+Signed-off-by: Dimitri Daskalakis <daskald@meta.com>
+---
+ drivers/net/ethernet/meta/fbnic/fbnic.h         |  1 +
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h     | 12 ++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_devlink.c |  1 +
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.c      | 15 +++++++++++++--
+ 4 files changed, 27 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+index f7df5302e91a..d0715695c43e 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+@@ -57,6 +57,7 @@ struct fbnic_dev {
+ 	u64 dsn;
+ 	u32 mps;
+ 	u32 readrq;
++	u8 relaxed_ord;
+ 
+ 	/* Local copy of the devices TCAM */
+ 	struct fbnic_act_tcam act_tcam[FBNIC_RPC_TCAM_ACT_NUM_ENTRIES];
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+index 43de522af172..81794bd326e1 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+@@ -975,9 +975,21 @@ enum {
+ #define FBNIC_PUL_OB_TLP_HDR_AW_CFG	0x3103d		/* 0xc40f4 */
+ #define FBNIC_PUL_OB_TLP_HDR_AW_CFG_FLUSH	CSR_BIT(19)
+ #define FBNIC_PUL_OB_TLP_HDR_AW_CFG_BME		CSR_BIT(18)
++#define FBNIC_PUL_OB_TLP_HDR_AW_CFG_RDE_ATTR	CSR_GENMASK(17, 15)
++#define FBNIC_PUL_OB_TLP_HDR_AW_CFG_RQM_ATTR	CSR_GENMASK(14, 12)
++#define FBNIC_PUL_OB_TLP_HDR_AW_CFG_TQM_ATTR	CSR_GENMASK(11, 9)
++enum {
++	FBNIC_TLP_ATTR_NS	= 1,
++	FBNIC_TLP_ATTR_RO	= 2,
++	FBNIC_TLP_ATTR_IDO	= 4,
++};
++
+ #define FBNIC_PUL_OB_TLP_HDR_AR_CFG	0x3103e		/* 0xc40f8 */
+ #define FBNIC_PUL_OB_TLP_HDR_AR_CFG_FLUSH	CSR_BIT(19)
+ #define FBNIC_PUL_OB_TLP_HDR_AR_CFG_BME		CSR_BIT(18)
++#define FBNIC_PUL_OB_TLP_HDR_AR_CFG_TDE_ATTR	CSR_GENMASK(17, 15)
++#define FBNIC_PUL_OB_TLP_HDR_AR_CFG_RQM_ATTR	CSR_GENMASK(14, 12)
++#define FBNIC_PUL_OB_TLP_HDR_AR_CFG_TQM_ATTR	CSR_GENMASK(11, 9)
+ #define FBNIC_PUL_USER_OB_RD_TLP_CNT_31_0 \
+ 					0x3106e		/* 0xc41b8 */
+ #define FBNIC_PUL_USER_OB_RD_DWORD_CNT_31_0 \
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+index f1c992f5fe94..546e1c12d287 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+@@ -647,6 +647,7 @@ struct fbnic_dev *fbnic_devlink_alloc(struct pci_dev *pdev)
+ 	fbd->dsn = pci_get_dsn(pdev);
+ 	fbd->mps = pcie_get_mps(pdev);
+ 	fbd->readrq = pcie_get_readrq(pdev);
++	fbd->relaxed_ord = pcie_relaxed_ordering_enabled(pdev);
+ 
+ 	fbd->mac_addr_boundary = FBNIC_RPC_TCAM_MACDA_DEFAULT_BOUNDARY;
+ 
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+index c2bad51bdde6..0c6812fcf185 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+@@ -448,6 +448,7 @@ static int fbnic_fw_xmit_simple_msg(struct fbnic_dev *fbd, u32 msg_type)
+ 
+ static int fbnic_mbx_init_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
+ {
++	u8 tlp_attr = fbd->relaxed_ord ? FBNIC_TLP_ATTR_RO : 0;
+ 	struct fbnic_fw_mbx *mbx = &fbd->mbx[mbx_idx];
+ 
+ 	mbx->ready = true;
+@@ -456,14 +457,24 @@ static int fbnic_mbx_init_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
+ 	case FBNIC_IPC_MBX_RX_IDX:
+ 		/* Enable DMA writes from the device */
+ 		wr32(fbd, FBNIC_PUL_OB_TLP_HDR_AW_CFG,
+-		     FBNIC_PUL_OB_TLP_HDR_AW_CFG_BME);
++		     FBNIC_PUL_OB_TLP_HDR_AW_CFG_BME |
++		     FIELD_PREP(FBNIC_PUL_OB_TLP_HDR_AW_CFG_RDE_ATTR,
++				tlp_attr) |
++		     FIELD_PREP(FBNIC_PUL_OB_TLP_HDR_AW_CFG_TQM_ATTR,
++				tlp_attr));
+ 
+ 		/* Make sure we have a page for the FW to write to */
+ 		return fbnic_mbx_alloc_rx_msgs(fbd);
+ 	case FBNIC_IPC_MBX_TX_IDX:
+ 		/* Enable DMA reads from the device */
+ 		wr32(fbd, FBNIC_PUL_OB_TLP_HDR_AR_CFG,
+-		     FBNIC_PUL_OB_TLP_HDR_AR_CFG_BME);
++		     FBNIC_PUL_OB_TLP_HDR_AR_CFG_BME |
++		     FIELD_PREP(FBNIC_PUL_OB_TLP_HDR_AR_CFG_TDE_ATTR,
++				tlp_attr) |
++		     FIELD_PREP(FBNIC_PUL_OB_TLP_HDR_AR_CFG_RQM_ATTR,
++				tlp_attr) |
++		     FIELD_PREP(FBNIC_PUL_OB_TLP_HDR_AR_CFG_TQM_ATTR,
++				tlp_attr));
+ 		break;
+ 	}
+ 
+-- 
+2.52.0
+
 
