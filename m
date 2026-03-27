@@ -1,109 +1,144 @@
-Return-Path: <netdev+bounces-272548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272549-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CKAJJg94xmnwKgUAu9opvQ
-	(envelope-from <netdev+bounces-272548-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:29:03 +0100
+	id kOoUNMN6xmnwKgUAu9opvQ
+	(envelope-from <netdev+bounces-272549-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:40:35 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AD6934433F
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:29:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C0D1344568
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7B795300D764
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:29:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4D6B0301DB9B
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFA4396588;
-	Fri, 27 Mar 2026 12:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C02021CC5B;
+	Fri, 27 Mar 2026 12:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PDKtxyOI"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Yu4TmWo1"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A1E391826
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 12:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F1A21B9DA;
+	Fri, 27 Mar 2026 12:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774614539; cv=none; b=J22xZ2E8sK7rCcygqpISTLBLjbeV+a9q4DwsoFztNeN5DvoMA/BAehNmx6Nob8DLK6EaFEOzLio0JG2SFr4lw59CUZZYZP/20F7YNlg3DyecJb+ohYRsLJ1m/q/qwDhI8uj57T4h5z1qGTkUWiUS+ZMptmHXPztCoiDP5ANncLY=
+	t=1774614910; cv=none; b=h8v35rQoRL4L/wNplmrOBC/wS5aKo3DPc2xVb5dvp7QoI/vdXs6cszqT3N36xNKxLgJxPlEvdaKi+pKUqyhgCscBLAzGp8mlK9hHKUfGD+5FYtMvow8O/WnjTwJja+sEhcIz8H/wyQFt6C68/qbqJ3TaNTFyOCfTgexhT1B1rbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774614539; c=relaxed/simple;
-	bh=3j0HyvQljmQ/t1JC2oGpNr03/yiAJOffD/xcXeljd+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Shj2GBb+W/UBp9rgJxJzXhj37RNVe+1O9sPouD2BFTlZx3oTBAnIEbFsROCz3Wjw/4R2XbxHrgtcCYcUmFNzZ38VSzYbt9gX9WzF9H2hLBBKc72ujZz+hkD0n1dyk0p8tRGDmJnWfl8LxTF4KgE8sGW69XnqvKJQLrq/GkvD/Sk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PDKtxyOI; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=rMqhh+p1MSRt692TuvrcDmyWwsgHJy7OUH9oJQP2h+M=; b=PDKtxyOIYHIaBcKCNJr4unw8ae
-	zL5WHKGpUnimNP29O6ge4TaBo5kzjqLqJ6cdyMRi8t6XisrTmL63nOYYoS6Ig4NitHl8no1AznF0S
-	UG6rNr4lp0J44rnGzKVP2yGSh8lFUBBKFnrgk9TVkOnilpQxYC1mluhP5Xt7d6AsLI/8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w66J1-00Deh5-Tp; Fri, 27 Mar 2026 13:28:51 +0100
-Date: Fri, 27 Mar 2026 13:28:51 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Linus Walleij <linusw@kernel.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: qca8k: Use the right GPIO header
-Message-ID: <45f47abf-00f8-4a78-a29d-36b36f65c64d@lunn.ch>
-References: <20260327-net-dsa-qca8k-v1-1-94e613a5c369@kernel.org>
+	s=arc-20240116; t=1774614910; c=relaxed/simple;
+	bh=X3kyuRjg7v+xLbz6US3MZDcLvz17mxsXqmt5e/m8kbM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dPI+Mp3JT8+5fn9ieJ482/NqduiGzUWFHt+J7AZtdyrOr1klP2//3NR+F8tlxGYldwzqK/xIWRUAyZXFEz2cm+r3d86iOGrz/6PTLg2edziqtzD/GOmATGah7oJ2cQslSEce1aQqGOuZZSM+V8FHVxRQYcL7DFAYztGg7lP87nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Yu4TmWo1; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1774614908; x=1806150908;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=X3kyuRjg7v+xLbz6US3MZDcLvz17mxsXqmt5e/m8kbM=;
+  b=Yu4TmWo1oxcMsMTUAk/K9+XptmbxvWAr+VVv8A2As1/b1JPXFSNseJXq
+   rdD3S+Ojj9FHl0fu82CSVvIpMksYxwyrr7bs3IYYbcVnY9tM4XsAyzJyV
+   OTAglF62XUBd/vFfS/YQtquJeEDju3oZHF4Paz7M8+zwvG7qXSNKlIMX5
+   l8v41/nJG1y+iPovCMKgcaJhdCbiujAU259Tn7V48RssqMVOERZFzeC+l
+   qVVL65LJSu26auoXCxzIpK9fdOianQsNKHlhzwjfbubOEsce4cJSNwUNz
+   1pxK/08cYCVnV66xGvaeWLthdQWGybjT9ICLUpJ4QnUFTA4OAidsX8IWG
+   Q==;
+X-CSE-ConnectionGUID: tFGc9Y2OSSqwHrCtZH+5dg==
+X-CSE-MsgGUID: bEduLCXNQ2CHYc669s0JdA==
+X-IronPort-AV: E=Sophos;i="6.23,144,1770620400"; 
+   d="scan'208";a="286683013"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2026 05:35:07 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
+ chn-vm-ex2.mchp-main.com (10.10.87.31) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Fri, 27 Mar 2026 05:34:35 -0700
+Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58 via Frontend Transport; Fri, 27 Mar 2026 05:34:34 -0700
+Date: Fri, 27 Mar 2026 05:34:32 -0700
+From: Charles Perry <charles.perry@microchip.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Charles Perry <charles.perry@microchip.com>, <netdev@vger.kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Rob
+ Herring" <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, "Conor
+ Dooley" <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"Russell King" <linux@armlinux.org.uk>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 0/2] Add support for PIC64-HPSC/HX MDIO
+ controller
+Message-ID: <acZ5WDz5qVxBDj3e@bby-cbu-swbuild03.eng.microchip.com>
+References: <20260323220254.3822444-1-charles.perry@microchip.com>
+ <20260326203309.7154152d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20260327-net-dsa-qca8k-v1-1-94e613a5c369@kernel.org>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <20260326203309.7154152d@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-272548-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[microchip.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,armlinux.org.uk];
+	TAGGED_FROM(0.00)[bounces-272549-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[microchip.com:+];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:email,lunn.ch:mid]
-X-Rspamd-Queue-Id: 3AD6934433F
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bby-cbu-swbuild03.eng.microchip.com:mid]
+X-Rspamd-Queue-Id: 3C0D1344568
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 27, 2026 at 01:23:45PM +0100, Linus Walleij wrote:
-> The driver header for qca8k includes the legacy GPIO header
-> <linux/gpio.h> but does not use any symbols from it and actually
-> wants <linux/gpio/consumer.h> so fix this up.
+On Thu, Mar 26, 2026 at 08:33:09PM -0700, Jakub Kicinski wrote:
+> On Mon, 23 Mar 2026 15:02:52 -0700 Charles Perry wrote:
+> >  .../net/microchip,pic64hpsc-mdio.yaml         |  68 +++++++
+> >  drivers/net/mdio/Kconfig                      |   7 +
+> >  drivers/net/mdio/Makefile                     |   1 +
+> >  drivers/net/mdio/mdio-pic64hpsc.c             | 192 ++++++++++++++++++
 > 
-> Signed-off-by: Linus Walleij <linusw@kernel.org>
+> Speaking under correction from PHY maintainers but I think we need 
+> a MAINTAINERS entry that will cover Microchip MDIO, or at least the
+> files you're adding. Important read:
+> https://docs.kernel.org/next/maintainer/feature-and-driver-maintainers.html
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Sure, I think this should go under "RISC-V MICROCHIP SUPPORT" or maybe a
+new "MICROCHIP PIC64-HPSC/HX DRIVER" entry if the former was meant only for
+Polarfire SoC.
 
-    Andrew
+I'll add something in v3.
+
+Thanks,
+Charles
+
+> -- 
+> pw-bot: cr
 
