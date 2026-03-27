@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-272528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272537-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8L2BNLV0xmlFKgUAu9opvQ
-	(envelope-from <netdev+bounces-272528-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:14:45 +0100
+	id OMXUN2d0xmlFKgUAu9opvQ
+	(envelope-from <netdev+bounces-272537-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:13:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 378073440C4
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:14:45 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99FAF344064
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:13:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 34AA7301FA5E
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:11:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 97D4930A2F9E
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56481395D98;
-	Fri, 27 Mar 2026 12:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F13393DC2;
+	Fri, 27 Mar 2026 12:11:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="VcovLM8T"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="XEZHKBp9"
 X-Original-To: netdev@vger.kernel.org
 Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621B639447B;
-	Fri, 27 Mar 2026 12:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7413932FF;
+	Fri, 27 Mar 2026 12:11:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774613480; cv=none; b=tC8LTRvZ2oSBE79zS+0VHBS6rnahlysTBJmeLB1Cxv19u/BZfnZhVP08D/VTtlxp8hsrMgHbsu3s0MvUsQOYqYp/gVbKgSILdOzmqhhVmVh/t0ZVoYKjFexlstlW57oGiw7LyVft7adliBx+UUQvoJkgwKEUt95N7tUP1PbmK5o=
+	t=1774613485; cv=none; b=PWBvaABpSlPRNNTP2GksNyV2jEXk1Y+1q6bugfaCmEEGisurOjQh4L9ahCqukKyxedeDVLxoEMjAAF1PeZGiU+HKmrqVi6Qt3NIWeHiQP1/0MZBx9pqC0UVekbaAoLMavEY9h17rOlEQK81Ck3g/8Ol3U0u3ukX3koUAgU0wTjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774613480; c=relaxed/simple;
-	bh=uxp79e+lvDPLB4AthBNIkcicVeaLzdj36JFHyWd+Kpo=;
+	s=arc-20240116; t=1774613485; c=relaxed/simple;
+	bh=qkwF2FeT8fgZVlnlYHyG9Osh0cJCad2JQMdvcMm6mTE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QfZUH/jx5q+CpmoazZuCzuGoliot1D25EEzwHgTGQGxhH5wxecaJi+ahhvLRmtoWXO5NmRZ13xbjxtH7PPjul4NlYnFSie7ZmNtdtBAmjJ2JcQk+n+4vHNnehPs8XNHklnv5BUoMpX+oYRGzd34/P89wAu08xKK0D/6pcAVJZVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=VcovLM8T; arc=none smtp.client-ip=213.133.104.62
+	 MIME-Version; b=m6EyOnk8cWPrEjr+hEtYoasczGD/eJz5gz7vNrN5KRQYJwKX6mar5twe8afFgQgbmTjOcbAWFhZL5d43U+P06Jn625OCyw//wGk8s1hN2dWZB3psbi7wRoioK1LQsgXZXPL/dh1Cpl2FPUqYSDnIT8ubapPi/kAY0/lqzc3SEXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=XEZHKBp9; arc=none smtp.client-ip=213.133.104.62
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -39,18 +39,18 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=kPLVrGm0yGmr2kw4VkETFsROpWLn+lwE+bj5HCsw3a8=; b=VcovLM8TuUpH+ZZNf7RgwndUJd
-	nnA8KfbpGQdXFz/tELjNc7lUkmOddNHJ/mx+g0KZ5x0Khtf7szx/04BddjMp0Wew8/0BVIYR11jpz
-	nS3cSLHILa4tSDWzFD3/PDP9qRTNUA0L9wZawXZ669tDQpUBpHYFpqeae6xgxGNXMy5oElJpGFTQI
-	l9r28iVSmls8UdNtPJ/BaCegRNVOmffwPk7uRLu/oddiAgdw9XYaEeQPra+GFFCb4DHVJgSkTDK8Y
-	RJstpRqD3nPvjb3GAgQN9NeELvsXo54/nJnUddFAHMglG5VTiLGdpH3Em1U1vgC4Js5AvV9z0mLcR
-	NyZ6FDYw==;
+	bh=V679cYNi6Ioll11J+uImYbw0BgH3MIt/k2dRN+cToaE=; b=XEZHKBp9dBWTokOwcwdrR+f0nh
+	Myl5eno03cIGaCnpSqif+JNEe4WLmMlJ85OTZSLatee526oAHbkwE0hK4mjUMT/KH5s/tlGAPW63d
+	1GB/pQ7+SaDAnrR0eAjrmDvy0+PNxfiZShf7BZ12YwfaT4UX2RjzQj14oGsqaTI1AXbCqBB3ZEKM9
+	JusBEfIjOldaKswenr9qyhN3GGEPYZuAcMhjKHTRmc0Si+IVDO2vRTWw/di4JyPA7I4zl8amEubC7
+	yj6ueZZP5/BWmR7x/H2YatVOvPwsklvK84IYfjFRAw4AHIlujV9bXpYnans9bym34MOAsfIG8QlGD
+	mGH5krpg==;
 Received: from localhost ([127.0.0.1])
 	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96.2)
 	(envelope-from <daniel@iogearbox.net>)
-	id 1w661g-000AMs-2B;
-	Fri, 27 Mar 2026 13:10:56 +0100
+	id 1w661h-000AN3-2Z;
+	Fri, 27 Mar 2026 13:10:57 +0100
 From: Daniel Borkmann <daniel@iogearbox.net>
 To: netdev@vger.kernel.org
 Cc: bpf@vger.kernel.org,
@@ -69,9 +69,9 @@ Cc: bpf@vger.kernel.org,
 	toke@redhat.com,
 	yangzhenze@bytedance.com,
 	wangdongdong.6@bytedance.com
-Subject: [PATCH net-next v10 04/14] net, ethtool: Disallow leased real rxqs to be resized
-Date: Fri, 27 Mar 2026 13:10:39 +0100
-Message-ID: <20260327121049.334562-5-daniel@iogearbox.net>
+Subject: [PATCH net-next v10 05/14] net: Slightly simplify net_mp_{open,close}_rxq
+Date: Fri, 27 Mar 2026 13:10:40 +0100
+Message-ID: <20260327121049.334562-6-daniel@iogearbox.net>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260327121049.334562-1-daniel@iogearbox.net>
 References: <20260327121049.334562-1-daniel@iogearbox.net>
@@ -90,7 +90,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
 	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -100,7 +100,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272528-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272537-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	PRECEDENCE_BULK(0.00)[];
@@ -110,106 +110,154 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davidwei.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iogearbox.net:dkim,iogearbox.net:email,iogearbox.net:mid]
-X-Rspamd-Queue-Id: 378073440C4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,davidwei.uk:email,iogearbox.net:dkim,iogearbox.net:email,iogearbox.net:mid]
+X-Rspamd-Queue-Id: 99FAF344064
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Similar to AF_XDP, do not allow queues in a physical netdev to be
-resized by ethtool -L when they are leased. Cover channel resize
-paths (both netlink and ioctl) to reject resizing when the queues
-would be affected.
+net_mp_open_rxq is currently not used in the tree as all callers are
+using __net_mp_open_rxq directly, and net_mp_close_rxq is only used
+once while all other locations use __net_mp_close_rxq.
+
+Consolidate into a single API, netif_mp_{open,close}_rxq, using the
+netif_ prefix to indicate that the caller is responsible for locking.
 
 Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 Co-developed-by: David Wei <dw@davidwei.uk>
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- net/ethtool/channels.c | 17 ++++++++++++-----
- net/ethtool/ioctl.c    | 16 +++++++++++-----
- 2 files changed, 23 insertions(+), 10 deletions(-)
+ include/net/page_pool/memory_provider.h |  8 ++------
+ io_uring/zcrx.c                         |  9 ++++++---
+ net/core/devmem.c                       |  6 +++---
+ net/core/netdev_rx_queue.c              | 23 ++---------------------
+ 4 files changed, 13 insertions(+), 33 deletions(-)
 
-diff --git a/net/ethtool/channels.c b/net/ethtool/channels.c
-index 45232cf1c144..63ed5ebf19a8 100644
---- a/net/ethtool/channels.c
-+++ b/net/ethtool/channels.c
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0-only
+diff --git a/include/net/page_pool/memory_provider.h b/include/net/page_pool/memory_provider.h
+index ada4f968960a..255ce4cfd975 100644
+--- a/include/net/page_pool/memory_provider.h
++++ b/include/net/page_pool/memory_provider.h
+@@ -23,14 +23,10 @@ bool net_mp_niov_set_dma_addr(struct net_iov *niov, dma_addr_t addr);
+ void net_mp_niov_set_page_pool(struct page_pool *pool, struct net_iov *niov);
+ void net_mp_niov_clear_page_pool(struct net_iov *niov);
  
--#include <net/xdp_sock_drv.h>
-+#include <net/netdev_queues.h>
+-int net_mp_open_rxq(struct net_device *dev, unsigned ifq_idx,
+-		    struct pp_memory_provider_params *p);
+-int __net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
++int netif_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+ 		      const struct pp_memory_provider_params *p,
+ 		      struct netlink_ext_ack *extack);
+-void net_mp_close_rxq(struct net_device *dev, unsigned ifq_idx,
+-		      struct pp_memory_provider_params *old_p);
+-void __net_mp_close_rxq(struct net_device *dev, unsigned int rxq_idx,
++void netif_mp_close_rxq(struct net_device *dev, unsigned int rxq_idx,
+ 			const struct pp_memory_provider_params *old_p);
  
- #include "common.h"
- #include "netlink.h"
-@@ -169,14 +169,21 @@ ethnl_set_channels(struct ethnl_req_info *req_info, struct genl_info *info)
+ /**
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index 62d693287457..d3ec63c83d0c 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -552,8 +552,11 @@ static void io_close_queue(struct io_zcrx_ifq *ifq)
+ 	}
+ 
+ 	if (netdev) {
+-		if (ifq->if_rxq != -1)
+-			net_mp_close_rxq(netdev, ifq->if_rxq, &p);
++		if (ifq->if_rxq != -1) {
++			netdev_lock(netdev);
++			netif_mp_close_rxq(netdev, ifq->if_rxq, &p);
++			netdev_unlock(netdev);
++		}
+ 		netdev_put(netdev, &netdev_tracker);
+ 	}
+ 	ifq->if_rxq = -1;
+@@ -841,7 +844,7 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+ 		mp_param.rx_page_size = 1U << ifq->niov_shift;
+ 	mp_param.mp_ops = &io_uring_pp_zc_ops;
+ 	mp_param.mp_priv = ifq;
+-	ret = __net_mp_open_rxq(ifq->netdev, reg.if_rxq, &mp_param, NULL);
++	ret = netif_mp_open_rxq(ifq->netdev, reg.if_rxq, &mp_param, NULL);
  	if (ret)
- 		return ret;
+ 		goto netdev_put_unlock;
+ 	netdev_unlock(ifq->netdev);
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index 69d79aee07ef..cde4c89bc146 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -145,7 +145,7 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
  
--	/* Disabling channels, query zero-copy AF_XDP sockets */
-+	/* ensure channels are not busy at the moment */
- 	from_channel = channels.combined_count +
- 		       min(channels.rx_count, channels.tx_count);
--	for (i = from_channel; i < old_total; i++)
--		if (xsk_get_pool_from_qid(dev, i)) {
--			GENL_SET_ERR_MSG(info, "requested channel counts are too low for existing zerocopy AF_XDP sockets");
-+	for (i = from_channel; i < old_total; i++) {
-+		bool losing_rx = i >= channels.combined_count +
-+				      channels.rx_count;
-+
-+		if (netdev_queue_busy(dev, i,
-+				      losing_rx ? NETDEV_QUEUE_TYPE_RX :
-+						  NETDEV_QUEUE_TYPE_TX, NULL)) {
-+			GENL_SET_ERR_MSG(info,
-+					 "requested channel counts are too low due to busy queues (AF_XDP or queue leasing)");
- 			return -EINVAL;
- 		}
-+	}
+ 		rxq_idx = get_netdev_rx_queue_index(rxq);
  
- 	ret = dev->ethtool_ops->set_channels(dev, &channels);
- 	return ret < 0 ? ret : 1;
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 3c713a91ad0d..f7288bc6cae4 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -27,12 +27,12 @@
- #include <linux/net.h>
- #include <linux/pm_runtime.h>
- #include <linux/utsname.h>
-+#include <linux/ethtool_netlink.h>
- #include <net/devlink.h>
- #include <net/ipv6.h>
--#include <net/xdp_sock_drv.h>
- #include <net/flow_offload.h>
- #include <net/netdev_lock.h>
--#include <linux/ethtool_netlink.h>
-+#include <net/netdev_queues.h>
+-		__net_mp_close_rxq(binding->dev, rxq_idx, &mp_params);
++		netif_mp_close_rxq(binding->dev, rxq_idx, &mp_params);
+ 	}
  
- #include "common.h"
+ 	percpu_ref_kill(&binding->ref);
+@@ -163,7 +163,7 @@ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+ 	u32 xa_idx;
+ 	int err;
  
-@@ -2284,13 +2284,19 @@ static noinline_for_stack int ethtool_set_channels(struct net_device *dev,
- 	if (ret)
- 		return ret;
+-	err = __net_mp_open_rxq(dev, rxq_idx, &mp_params, extack);
++	err = netif_mp_open_rxq(dev, rxq_idx, &mp_params, extack);
+ 	if (err)
+ 		return err;
  
--	/* Disabling channels, query zero-copy AF_XDP sockets */
-+	/* Disabling channels, query busy queues (AF_XDP, queue leasing) */
- 	from_channel = channels.combined_count +
- 		min(channels.rx_count, channels.tx_count);
- 	to_channel = curr.combined_count + max(curr.rx_count, curr.tx_count);
--	for (i = from_channel; i < to_channel; i++)
--		if (xsk_get_pool_from_qid(dev, i))
-+	for (i = from_channel; i < to_channel; i++) {
-+		bool losing_rx = i >= channels.combined_count +
-+				      channels.rx_count;
-+
-+		if (netdev_queue_busy(dev, i,
-+				      losing_rx ? NETDEV_QUEUE_TYPE_RX :
-+						  NETDEV_QUEUE_TYPE_TX, NULL))
- 			return -EINVAL;
-+	}
+@@ -176,7 +176,7 @@ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+ 	return 0;
  
- 	ret = dev->ethtool_ops->set_channels(dev, &channels);
- 	if (!ret)
+ err_close_rxq:
+-	__net_mp_close_rxq(dev, rxq_idx, &mp_params);
++	netif_mp_close_rxq(dev, rxq_idx, &mp_params);
+ 	return err;
+ }
+ 
+diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
+index a4d8cad6db74..06ac3bd5507f 100644
+--- a/net/core/netdev_rx_queue.c
++++ b/net/core/netdev_rx_queue.c
+@@ -200,7 +200,7 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
+ }
+ EXPORT_SYMBOL_NS_GPL(netdev_rx_queue_restart, "NETDEV_INTERNAL");
+ 
+-int __net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
++int netif_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+ 		      const struct pp_memory_provider_params *p,
+ 		      struct netlink_ext_ack *extack)
+ {
+@@ -264,18 +264,7 @@ int __net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+ 	return ret;
+ }
+ 
+-int net_mp_open_rxq(struct net_device *dev, unsigned int rxq_idx,
+-		    struct pp_memory_provider_params *p)
+-{
+-	int ret;
+-
+-	netdev_lock(dev);
+-	ret = __net_mp_open_rxq(dev, rxq_idx, p, NULL);
+-	netdev_unlock(dev);
+-	return ret;
+-}
+-
+-void __net_mp_close_rxq(struct net_device *dev, unsigned int ifq_idx,
++void netif_mp_close_rxq(struct net_device *dev, unsigned int ifq_idx,
+ 			const struct pp_memory_provider_params *old_p)
+ {
+ 	struct netdev_queue_config qcfg[2];
+@@ -305,11 +294,3 @@ void __net_mp_close_rxq(struct net_device *dev, unsigned int ifq_idx,
+ 	err = netdev_rx_queue_reconfig(dev, ifq_idx, &qcfg[0], &qcfg[1]);
+ 	WARN_ON(err && err != -ENETDOWN);
+ }
+-
+-void net_mp_close_rxq(struct net_device *dev, unsigned ifq_idx,
+-		      struct pp_memory_provider_params *old_p)
+-{
+-	netdev_lock(dev);
+-	__net_mp_close_rxq(dev, ifq_idx, old_p);
+-	netdev_unlock(dev);
+-}
 -- 
 2.43.0
 
