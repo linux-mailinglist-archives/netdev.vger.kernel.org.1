@@ -1,84 +1,68 @@
-Return-Path: <netdev+bounces-272428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272422-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4F12LRs2xmnzHQUAu9opvQ
-	(envelope-from <netdev+bounces-272428-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 08:47:39 +0100
+	id sGzRLws0xmnzHQUAu9opvQ
+	(envelope-from <netdev+bounces-272422-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 08:38:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16B7B3409BA
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 08:47:39 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 610C534087D
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 08:38:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F0A2430209E3
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 07:47:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CAFA830DD4E1
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 07:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E30153CAE99;
-	Fri, 27 Mar 2026 07:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 490633CA4A2;
+	Fri, 27 Mar 2026 07:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZTTPMS1a"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="yrxc40M2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D52E273803
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 07:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65EA530F927;
+	Fri, 27 Mar 2026 07:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774597639; cv=none; b=Yz1hEYLuU5l80G00sr16CxgiUAqmpsW2bjAEGChy7cX9XvKzSKzpDK6maBsFnuJz4Rwf2XZgB+wBipg0H5x73GrTKXl/28hAKSNYns4eP7Mh+g6Tyq241Rw8SrMFHmcRUW6T5XkC99ejdQ6JUiquvpXkWdHbzniiRwH7d26i+v0=
+	t=1774596742; cv=none; b=fGCodFcjBSinhXygH6ZeSMITolVUV0ubj5OB4/bCPAKAIKCWQYKiL+Do6kX1k2+EuHT/jyb5DWdkrKx2pIRZzaqW/cvltpJZjtQmyI5E5KG6gCWi2VM88QoAAmXZCn6gq+li2wbQyzMEeq6sFQ0cBf7n2qxyCUdQB20T++9rZ2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774597639; c=relaxed/simple;
-	bh=0/WtdtXwB4HbLOBB/i29YghftIrngRbaQdXqbmrmeMk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WQYXJl2IUlslsm6Yrepwrp3JzRneWSLo6PyB72eljOwionOvgNigUkZH7cxWeqTTIf7N5MDmzELdFx3/IHWVC9z59EiIpcK3NxrCLGF7zkRYKBod0LxFn6oOsA4fAkd2eKjZbELha0xXLO9upnX7nRQevUhjHtKog79J1OM1FYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZTTPMS1a; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774597632;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+Ya0OKIOhrl1q5883EggLqKidONP4W3BL2eswWDJDRg=;
-	b=ZTTPMS1a4mPZm2TR7VigCLlo6ymw1OlXsVEhKhDcVrCCfE5KDSNpQ3LFSTn9fCkuSQQ0bG
-	t1+QcZgN+JUugl/3Sa+rJRdqI05VELT4VH0bAMxi7mftQmOjQnlmv6/5YSt1SIxSAl2DLr
-	3N1qPcjo+6w9PufP6dgbSG44Qn4DzoM=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-653-LCiNJ1KkO36QsokeeGwf6A-1; Fri,
- 27 Mar 2026 03:47:11 -0400
-X-MC-Unique: LCiNJ1KkO36QsokeeGwf6A-1
-X-Mimecast-MFC-AGG-ID: LCiNJ1KkO36QsokeeGwf6A_1774597629
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CACD318002CF;
-	Fri, 27 Mar 2026 07:47:08 +0000 (UTC)
-Received: from ShadowPeak.redhat.com (unknown [10.45.224.50])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2F2B11800671;
-	Fri, 27 Mar 2026 07:47:03 +0000 (UTC)
-From: Petr Oros <poros@redhat.com>
-To: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org,
-	Petr Oros <poros@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Ivan Vecera <ivecera@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-net] ice: fix PTP timestamping broken by SyncE code on E825C
-Date: Fri, 27 Mar 2026 08:46:58 +0100
-Message-ID: <20260327074658.2963328-1-poros@redhat.com>
+	s=arc-20240116; t=1774596742; c=relaxed/simple;
+	bh=sPIq4oegDN+UKCJQyVm2Z2Ah5A/OXXT0CKNhqwvY1ec=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=byydRqkIqyWTHgxyPQebRw4QxJVKwdEmQLTD+1q7DC7RcA500fIYoc6U8QqMJD7f3woW4D2tXGQTXEyMo2wgrfTt0KiQAI3Du4RQ7nnbv/mRD1t2FqYphWyLkhPcNND8vEEpsgJ75PqDKi2RHPYs29yfvARYr/XGK+Vl1qUYO5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=yrxc40M2; arc=none smtp.client-ip=113.46.200.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=JlOVJvch5CnHpSnAoS69wCZR9XjUE7/EkqJycR+1o9A=;
+	b=yrxc40M20ytoWJ3FnjbvHeDJVvaRzULkYULAsjamP8Ae3DDI1wDzh/nkIs0Pjev787bpuhmiR
+	LeqOP0DhZk07NkXP/QE/nPh2ICgcd/AiHOGl7u6VZwT7+KiGz1yss/BOLzyFNN9hl8TssktuDMf
+	Alc+K/TpCK+9++VYFbii0aY=
+Received: from mail.maildlp.com (unknown [172.19.163.200])
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4fhsd60zZ0zKm67;
+	Fri, 27 Mar 2026 15:26:02 +0800 (CST)
+Received: from kwepemj500018.china.huawei.com (unknown [7.202.194.48])
+	by mail.maildlp.com (Postfix) with ESMTPS id B04E94055B;
+	Fri, 27 Mar 2026 15:32:10 +0800 (CST)
+Received: from huawei.com (10.50.85.128) by kwepemj500018.china.huawei.com
+ (7.202.194.48) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 27 Mar
+ 2026 15:32:10 +0800
+From: Li Xiasong <lixiasong1@huawei.com>
+To: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
+	<martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <mptcp@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
+	<zhangchangzhong@huawei.com>, <weiyongjun1@huawei.com>
+Subject: [PATCH net v3] mptcp: fix soft lockup in mptcp_recvmsg()
+Date: Fri, 27 Mar 2026 15:55:44 +0800
+Message-ID: <20260327075544.3622851-1-lixiasong1@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,120 +70,155 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemj500018.china.huawei.com (7.202.194.48)
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,gmail.com,lists.osuosl.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-272428-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272422-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lixiasong1@huawei.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 16B7B3409BA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:dkim,huawei.com:email,huawei.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 610C534087D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The E825C SyncE support added in commit ad1df4f2d591 ("ice: dpll:
-Support E825-C SyncE and dynamic pin discovery") introduced a SyncE
-reconfiguration block in ice_ptp_link_change() that prevents
-ice_ptp_port_phy_restart() from being called in several error paths.
-Without the PHY restart, PTP timestamps stop working after any link
-change event.
+syzbot reported a soft lockup in mptcp_recvmsg() [0].
 
-There are three ways the PHY restart gets blocked:
+When receiving data with MSG_PEEK | MSG_WAITALL flags, the skb is not
+removed from the sk_receive_queue. This causes sk_wait_data() to always
+find available data and never perform actual waiting, leading to a soft
+lockup.
 
-1. When DPLL initialization fails (e.g. missing ACPI firmware node
-   properties), ICE_FLAG_DPLL is not set and the function returns early
-   before reaching the PHY restart.
+Fix this by adding a 'last' parameter to track the last peeked skb.
+This allows sk_wait_data() to make informed waiting decisions and prevent
+infinite loops when MSG_PEEK is used.
 
-2. When ice_tspll_bypass_mux_active_e825c() fails to read the CGU
-   register, WARN_ON_ONCE fires and the function returns early.
+[0]:
+watchdog: BUG: soft lockup - CPU#2 stuck for 156s! [server:1963]
+Modules linked in:
+CPU: 2 UID: 0 PID: 1963 Comm: server Not tainted 6.19.0-rc8 #61 PREEMPT(none)
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+RIP: 0010:sk_wait_data+0x15/0x190
+Code: 80 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 41 56 41 55 41 54 49 89 f4 55 48 89 d5 53 48 89 fb <48> 83 ec 30 65 48 8b 05 17 a4 6b 01 48 89 44 24 28 31 c0 65 48 8b
+RSP: 0018:ffffc90000603ca0 EFLAGS: 00000246
+RAX: 0000000000000000 RBX: ffff888102bf0800 RCX: 0000000000000001
+RDX: 0000000000000000 RSI: ffffc90000603d18 RDI: ffff888102bf0800
+RBP: 0000000000000000 R08: 0000000000000002 R09: 0000000000000101
+R10: 0000000000000000 R11: 0000000000000075 R12: ffffc90000603d18
+R13: ffff888102bf0800 R14: ffff888102bf0800 R15: 0000000000000000
+FS:  00007f6e38b8c4c0(0000) GS:ffff8881b877e000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055aa7bff1680 CR3: 0000000105cbe000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ mptcp_recvmsg+0x547/0x8c0 net/mptcp/protocol.c:2329
+ inet_recvmsg+0x11f/0x130 net/ipv4/af_inet.c:891
+ sock_recvmsg+0x94/0xc0 net/socket.c:1100
+ __sys_recvfrom+0xb2/0x130 net/socket.c:2256
+ __x64_sys_recvfrom+0x1f/0x30 net/socket.c:2267
+ do_syscall_64+0x59/0x2d0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e arch/x86/entry/entry_64.S:131
+RIP: 0033:0x7f6e386a4a1d
+Code: 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 8d 05 f1 de 2c 00 41 89 ca 8b 00 85 c0 75 20 45 31 c9 45 31 c0 b8 2d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 6b f3 c3 66 0f 1f 84 00 00 00 00 00 41 56 41
+RSP: 002b:00007ffc3c4bb078 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
+RAX: ffffffffffffffda RBX: 000000000000861e RCX: 00007f6e386a4a1d
+RDX: 00000000000003ff RSI: 00007ffc3c4bb150 RDI: 0000000000000004
+RBP: 00007ffc3c4bb570 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000103 R11: 0000000000000246 R12: 00005605dbc00be0
+R13: 00007ffc3c4bb650 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
 
-3. When ice_tspll_cfg_synce_ethdiv_e825c() fails to configure the
-   clock divider for an active pin, same early return.
-
-SyncE and PTP are independent features. SyncE reconfiguration failures
-must not prevent the PTP PHY restart that is essential for timestamp
-recovery after link changes.
-
-Fix by making the entire SyncE block conditional on ICE_FLAG_DPLL
-without an early return, and replacing the WARN_ON_ONCE + return error
-handling inside the loop with dev_err_once + break. The function always
-proceeds to ice_ptp_port_phy_restart() regardless of SyncE errors.
-
-Fixes: ad1df4f2d591 ("ice: dpll: Support E825-C SyncE and dynamic pin discovery")
-Signed-off-by: Petr Oros <poros@redhat.com>
+Fixes: 8e04ce45a8db ("mptcp: fix MSG_PEEK stream corruption")
+Signed-off-by: Li Xiasong <lixiasong1@huawei.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ptp.c | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 094e96219f4565..60bc47099432a2 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1296,12 +1296,10 @@ void ice_ptp_link_change(struct ice_pf *pf, bool linkup)
- 	if (pf->hw.reset_ongoing)
- 		return;
- 
--	if (hw->mac_type == ICE_MAC_GENERIC_3K_E825) {
-+	if (hw->mac_type == ICE_MAC_GENERIC_3K_E825 &&
-+	    test_bit(ICE_FLAG_DPLL, pf->flags)) {
- 		int pin, err;
- 
--		if (!test_bit(ICE_FLAG_DPLL, pf->flags))
--			return;
--
- 		mutex_lock(&pf->dplls.lock);
- 		for (pin = 0; pin < ICE_SYNCE_CLK_NUM; pin++) {
- 			enum ice_synce_clk clk_pin;
-@@ -1314,15 +1312,19 @@ void ice_ptp_link_change(struct ice_pf *pf, bool linkup)
- 								port_num,
- 								&active,
- 								clk_pin);
--			if (WARN_ON_ONCE(err)) {
--				mutex_unlock(&pf->dplls.lock);
--				return;
-+			if (err) {
-+				dev_err_once(ice_pf_to_dev(pf),
-+					     "Failed to read SyncE bypass mux for pin %d, err %d\n",
-+					     pin, err);
-+				break;
+v2->v3:
+Thanks to Matthieu Baerts for the review.
+- Initialize last to NULL.
+- Only update 'last' when MSG_PEEK is set, avoiding dangling pointer.
+
+v1->v2:
+Thanks to Matthieu Baerts for the suggestion and review.
+- Move 'last' variable definition into the while loop in mptcp_recvmsg() to
+  narrow its scope.
+- In __mptcp_recvmsg_mskq(), assign 'last' right after 'copied' is updated,
+  regardless of MSG_PEEK flag.
+https://lore.kernel.org/netdev/20260324085131.4187473-1-lixiasong1@huawei.com/
+
+v1:
+https://lore.kernel.org/netdev/20260302052651.1466983-1-lixiasong1@huawei.com/
+
+---
+ net/mptcp/protocol.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index cf1852b99963..60f6e6a189b7 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -2006,7 +2006,7 @@ static void mptcp_eat_recv_skb(struct sock *sk, struct sk_buff *skb)
+ static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
+ 				size_t len, int flags, int copied_total,
+ 				struct scm_timestamping_internal *tss,
+-				int *cmsg_flags)
++				int *cmsg_flags, struct sk_buff **last)
+ {
+ 	struct mptcp_sock *msk = mptcp_sk(sk);
+ 	struct sk_buff *skb, *tmp;
+@@ -2058,6 +2058,8 @@ static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
  			}
  
- 			err = ice_tspll_cfg_synce_ethdiv_e825c(hw, clk_pin);
--			if (active && WARN_ON_ONCE(err)) {
--				mutex_unlock(&pf->dplls.lock);
--				return;
-+			if (active && err) {
-+				dev_err_once(ice_pf_to_dev(pf),
-+					     "Failed to configure SyncE ETH divider for pin %d, err %d\n",
-+					     pin, err);
-+				break;
- 			}
+ 			mptcp_eat_recv_skb(sk, skb);
++		} else {
++			*last = skb;
  		}
- 		mutex_unlock(&pf->dplls.lock);
+ 
+ 		if (copied >= len)
+@@ -2288,10 +2290,12 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 		cmsg_flags = MPTCP_CMSG_INQ;
+ 
+ 	while (copied < len) {
++		struct sk_buff *last = NULL;
+ 		int err, bytes_read;
+ 
+ 		bytes_read = __mptcp_recvmsg_mskq(sk, msg, len - copied, flags,
+-						  copied, &tss, &cmsg_flags);
++						  copied, &tss, &cmsg_flags,
++						  &last);
+ 		if (unlikely(bytes_read < 0)) {
+ 			if (!copied)
+ 				copied = bytes_read;
+@@ -2343,7 +2347,7 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 
+ 		pr_debug("block timeout %ld\n", timeo);
+ 		mptcp_cleanup_rbuf(msk, copied);
+-		err = sk_wait_data(sk, &timeo, NULL);
++		err = sk_wait_data(sk, &timeo, last);
+ 		if (err < 0) {
+ 			err = copied ? : err;
+ 			goto out_err;
 -- 
-2.52.0
+2.34.1
 
 
