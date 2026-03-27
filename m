@@ -1,304 +1,225 @@
-Return-Path: <netdev+bounces-272336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272337-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GK64DabnxWlTDQUAu9opvQ
-	(envelope-from <netdev+bounces-272336-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:12:54 +0100
+	id wN/qBgTtxWlTDQUAu9opvQ
+	(envelope-from <netdev+bounces-272337-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:35:48 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6259333E1BE
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:12:49 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B96A733E662
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:35:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5767030152CB
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:12:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 25B2730D0378
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AECF329367;
-	Fri, 27 Mar 2026 02:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF3B30E82D;
+	Fri, 27 Mar 2026 02:25:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="e/rrFI6/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MeZCcFZK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f226.google.com (mail-vk1-f226.google.com [209.85.221.226])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E23F328B62
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 02:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.226
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774577564; cv=pass; b=MCQLHyU+J6s01y8YePlnqMDv/Vqp3n40wwBSpM0cKB7x8pnjpdiivhKWO/3/gVRaDmkRneVJr8if0KA93KsmLqQXAtKRgUVjyjheJzZuslEnM+QGjZIHBBb5W3B7VsLHwbTGULLGQ7nSymz+1M1R1rIpYfb798sOUBAEfw0E8mw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774577564; c=relaxed/simple;
-	bh=P/44B+5NFXEJAE+utB4QxUpTAQWkbkxRb1tTKD8qZUo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R3A4fCm85P6Wr6olWCPoG3m/Y7B29smorWlB06xFy8Xvkwff6vmmZ2Z+NijOtF/hoViJ2ZXjX3xQ4PssVjLbBZ81Y6NTw1e99PZQgN2gPPJdXCbQ5Ok9Djqkyo15Nn1oHjsLs9r+QJorSk622A7bAmvz6+5M8t3UW/WM3kjpaos=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=e/rrFI6/; arc=pass smtp.client-ip=209.85.221.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vk1-f226.google.com with SMTP id 71dfb90a1353d-56b7043c97eso703526e0c.1
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 19:12:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774577561; x=1775182361;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Dz+f97yNsE848EC4aW/uxVKB5lNuTci10YWu7rTR0SY=;
-        b=g6Gm9EHFhNt/6ijzYIvou4u9IrpTSZt6kQtyoOAM/monUBqL7WWk/NQMxMaagro96C
-         jLn0ZoQELelfEl9PXvoyrfiFJcm+KroUXPkcYZXziHptWcilCXQQ1LcQXoXfhSe4U7FY
-         tuRlZ00FWfSsJfO+7kCFLP2onQtCyRfNx1R4cM4g00k+2c+N+Scq+Fp0cApqJBxjFuSS
-         5dah2suf8hyAn7gFZQMs+3hZukqdzuLP6aI8vUfcqfDW5w40qIb8IllYie199HuThYYM
-         OKRD1FiyYwyvrEAUBQEJ8RaQRy1R/gdxgNo4kaJZqn6CJr584bFaRpQLivg57rqBh7/c
-         LWXA==
-X-Forwarded-Encrypted: i=2; AJvYcCW2buDO4m0yLFNo7pTY3F/L6S79hV1EFG1bDwo8wAqX9wx22mVV5yvKRM+vntWBZcVsyalhSJI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBOcacvc7K3maF9IzAYqA3eGWhfLdMAg2fW9F71tVqXkyrPUb6
-	e7hwUzKNNxD5C3f3H7UImR6n0thNkknABGJcFf6ot9Lrtii5nK+cxV8uD4fbQ6UoZbei4LjSUdg
-	t8UheTiKytOyGwzdJJ/0PwSBS/ndG3ORtgYER8ZcU/dQhPtXMxqr+KkctyeWWiE2mRfvGlQpj25
-	9fkb7i0CxnoajKbbBBHeo9WoBkDbrZx5VdQuSrHx47v5C5qQhCPwYILwPOjwr6yVtTuOxj0hoM5
-	QHVw9Q1iBs=
-X-Gm-Gg: ATEYQzzHDXbiu5C3mw/UBxGw65PEHxMT7SJ57dT7W5F6fxAEP6WMCm1dftCH4KI2NtZ
-	de4jQ/N6dBwfmeMAtLhCG0WR2KmnrZwXvzOVw1exKkmQ/Lewk8lhZ9l/McNHcrpeKdbsVU8j4Wu
-	41zODvig0SbzXW+17GWJoXO1gXOCA81k/DW6SVcSHcBnKD2EL2heU3z+sdPyXQeM5aW8UZrUaa0
-	1wX1kNm9hvM0nYjDCazh7uh5M08epjqQkbmuzpN3WOCdeCUuRhWOcQhNQ8Yt8yS5SMMkwi12sOd
-	fNxtQyhvzTrK7yX9Jp0cDuanmfnJhnnrb3Y1NXR+JvePSa9wNqa+LmaJoVWbtYjx4hj0z27f20w
-	jv1h17mjYXxKTmOzLsHg3LLobc/TbaZtrgA0KsSssu9QC0qIwZT8QR5ysSGCRAJPdmSAJMYxRFz
-	cq3PB7xfFv3386MvjEVA3XfjRSi4y6q7WfUceQ2gA/MoacvMPEvoVIAnk1
-X-Received: by 2002:a05:6122:54f:b0:56c:d623:8967 with SMTP id 71dfb90a1353d-56d4a65e5c7mr249232e0c.15.1774577561419;
-        Thu, 26 Mar 2026 19:12:41 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-25.dlp.protect.broadcom.com. [144.49.247.25])
-        by smtp-relay.gmail.com with ESMTPS id 71dfb90a1353d-56d318ffbdbsm861003e0c.0.2026.03.26.19.12.40
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 26 Mar 2026 19:12:41 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-668c932088fso2354147a12.1
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 19:12:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774577560; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Qzq1ZbU+AjYA6E4t0r5XSY8BhWvc0NsJeV4Yv4CKjzWS4h/cxmEUYvl8iS39iKiqZ9
-         IMnhmnyGkUEE6WJMkM/eY1uRs+GrYskRsfUCe8w/rjx+PK4b52rDIlDYlw3XLOQEOAwq
-         l+zP0SjCpz2veqQ0vDo0Sya4KKvJK2gw6NmoypqlsBEkwZtPCoUypFLQ/E1yb4A1G6o3
-         NJUoG5cETQfHRC67upp8DK85avFbFZNccTae32fpSYlkdHmcJm9bWd9ofDPTo6TTXF4w
-         Se7TFVxEI5D9JSqL8aIJBvpcWwW4fKPayDEHUs8nmcB5Vc7BQyG2T6866FikBFj3j+6H
-         Vl5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Dz+f97yNsE848EC4aW/uxVKB5lNuTci10YWu7rTR0SY=;
-        fh=auCuE5Q0Oj/iTB1g+Zqz4J38yEHAPcL/5b8k3yt2L9g=;
-        b=gPcvy804vwWbFVzfxopm6sL9dDLHFqE+q3wxxzUYQZay11AV+MF1B//yB6Oja+hghs
-         IcoI1yGTmuJQiOcuXCC3SpKZgbwADVy8+JaK6HzvhON51/gxc8ac6mXG8Y3zTmOa/cXh
-         6RgUUl66FLngQNV9rKZ1ro46kh6MOzio+ZquOIMwHmPZQBylCDEpN2p3iHQKGKnM0f/b
-         /upBlBFi122se2OUiIlUWQO0oM/KzxbFxIrlvP3O+ycLAD9nJthNckX+zUrJWnSwamcn
-         74ogCU4mNCNVWdkyxVt5vHTsYa66T4sM6uizZVsPr3+7KBG4qM5fLlWvgJjY/GDDryMP
-         ZpCA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67693016E0
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 02:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774578315; cv=none; b=U3DB2ksfTOhP595Jt4xik+nfU68fWLerpXamttpIYFh4zxEWaPPmdt82NpZB7huaLGlZgmZo5p2iubducxehJL/0P/22xFoufS1uPObGPt5/wJBjnnt/8jhDJeMfFhE8h9TYZSk6aejgua/ESKMxN9WkN4YyCj0eAe8CkGvUjts=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774578315; c=relaxed/simple;
+	bh=GA9iJ3FHlrroqC2NNiJuu9RWhIYVniR+DEyF4ubqR/A=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=TEmU03K4v6zaUsfchmfhlSAMcCYYqL4A/yrKwavYJoaCA+Kl9x3NmXb6G3hul8z598Kz5ZUqQf0nnj8iuNY7BoluNTd7Tr52doGvY2BHxP0cukJ2eucL1Y8wnzGKOA3yLFZMEE6i3a1kgxffJX4cw1SRSbyuf+QEXf7hj/VCVlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MeZCcFZK; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-c70fb6aa323so667812a12.3
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 19:25:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1774577560; x=1775182360; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dz+f97yNsE848EC4aW/uxVKB5lNuTci10YWu7rTR0SY=;
-        b=e/rrFI6/fBbSxJAaujTzip1YjrcW9b5vCX0NSOv8fqZForVZUiXDhsAy7By13b2Ow+
-         WIUvEm2lrbMMr/oXmQKDCEb7nCuHFNKg1KP5eX0LWj4zJqttXjbqQN1JKCGzRkfrWnDq
-         wDlM+mQDuZWQjHnm7m1kFX0STu/1iPoZ7GP0w=
-X-Forwarded-Encrypted: i=1; AJvYcCWxMETnTq7dDJFNnxSNAxjBTDrVovIql++9ycus9PlEKbUrxtXxhWnvKwE5/1Kavdx0PwqvepU=@vger.kernel.org
-X-Received: by 2002:a05:6402:52d3:b0:669:cc12:9beb with SMTP id 4fb4d7f45d1cf-66b28b559d1mr264680a12.15.1774577559910;
-        Thu, 26 Mar 2026 19:12:39 -0700 (PDT)
-X-Received: by 2002:a05:6402:52d3:b0:669:cc12:9beb with SMTP id
- 4fb4d7f45d1cf-66b28b559d1mr264676a12.15.1774577559451; Thu, 26 Mar 2026
- 19:12:39 -0700 (PDT)
+        d=gmail.com; s=20251104; t=1774578313; x=1775183113; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RgsriYW27LYcQzITLoiIl7pLc3IW/A/busdV44W1OJw=;
+        b=MeZCcFZKlwi3rNFgQ5ayoTF+0SnE7Ehttu0O1M+2/9F5Tu20xyHa1GE/UhOsEDS5mi
+         lUPW43+a68DUvrg3Vv2j2p5CHU5u355wz1D78QYuMlc4kRi93Fzd2Bafpvq5/rlzTNRP
+         hGlGkFBGX6di/8lG+Kd7JYbySnIAz6ygRhpOnO9xrI5DjjXLsKuX39AYaUK/1xGRbQEW
+         tYEZD8L0CoKL6HGM6EYsQ7a6weLcU4iTpsk0M+zuWH8VLterGLgISHGyN/tg+56NZaCM
+         Bxr5e6IoAIGx6wbWNN48X7AfIQhqmgCtYSD31cZL6t/oFY1qJqFPW9DgNGSJCBrnX6k9
+         LMTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774578313; x=1775183113;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RgsriYW27LYcQzITLoiIl7pLc3IW/A/busdV44W1OJw=;
+        b=YSFxXv0lUM2uW8ErB4pYxdX9h6MsprHXyRWsEeRtzETI2rsgUSZXNoLxErNlZBAG2t
+         Pe+rryttHC9CL1h5uIvMuoxjEbaxsTctdElKNs4capLnImlv6rkIyOWfhRncgEkrXmAx
+         o9ysdeBWe1tkqE0J5ZovyOiYVvCr7MxG5wXjnRS1eHgjz7du9mxTTXbnn9ey2cw9IzRy
+         n562szubQphf5AiBlIzFCWiUTXpolovYcsGg+Bbp0ld754V0rPjATKe5acFN65syYj7v
+         EJYH2BFFyv8dj6WeFGswRFl9hOZtRElR0gqg2rQVi7V1SjPw23x2/RnJKCQSz7WlhR6f
+         uMHw==
+X-Forwarded-Encrypted: i=1; AJvYcCXeZvZiS0ZhgJvuk7SxKOp7GQcuCmEbMh9E2w58jxT3KcS/VkyRs6pf4754Pyn9Us+NoCTJt3Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPwv7TlbL6ULDUKkzX73G36vsIpJrLbBnghq3RH24WijgXYJi+
+	k9LQ+drbrukYM7wu9em4RATwO2C/Y+/GIekRXwMv2dkcfomzZMbVTtYg
+X-Gm-Gg: ATEYQzwzC+58fsvLNbzvxfhp4kX8h+qP9kZK9C/lyC1LbFeXWz9WPBjDcGZ53SzNwue
+	DgCZjwFz7XwDgt5aHEAVAvvi58DQtIBrARvT1JBf18SR0rin9v/bvCI+YeyXgxZosd09f+8Denz
+	ktEyQdDk4xtd2EJ+PFwj5ue83X7dulr1ps99L8JNP7b/+0h2NudaAy/+7NeMdwnm+zeoxbjA9Me
+	IyFweyiiNR3vSGA506Jga45HlMVf1aDo1iwQtkwGHMLWQzG+upM0PvPiTO2OZM0uyRjGTG6htTl
+	nrjvp9TIfbr7t+sM/QQJAF45GygoutpPDpuqwy+u8hYPf7HXSy9Ej76sxEZeolrszYrnE3xXi2C
+	AX6F6IbledwAGe5KhKmURnJrtFRdkXesvhbmTQloCiPD0aRm33z1LSeHIMcwyZpoBXpXt5Yc5l/
+	ZvMMtVeuK0I7F87HhBGV5xbUolqm5XLUR2rEwVfo+OSkPMqhbmHjIZCxVAv0oiVo9YiYGpGSJD8
+	+Z7pNA6NHOlScWnPIio/s9NdILDPebcQGEpOJQ4pp0dkfyPoji1
+X-Received: by 2002:a17:903:37ce:b0:2b0:41bf:ca83 with SMTP id d9443c01a7336-2b0cdcc8106mr9033135ad.23.1774578312983;
+        Thu, 26 Mar 2026 19:25:12 -0700 (PDT)
+Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([240e:34c:576a:8120:d1e2:12aa:7df5:2768])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b0cb9ad55csm9423815ad.53.2026.03.26.19.25.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Mar 2026 19:25:12 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+Date: Fri, 27 Mar 2026 10:24:47 +0800
+Subject: [PATCH net v2] ipv6: fix data race in fib6_metric_set() using
+ cmpxchg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260327010235.42668-1-pengpeng@iscas.ac.cn>
-In-Reply-To: <20260327010235.42668-1-pengpeng@iscas.ac.cn>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Thu, 26 Mar 2026 19:12:27 -0700
-X-Gm-Features: AQROBzBwtR1gWvWCQFlPj3CVge78NXf05L7zAzLdN4As7yLxCr3Y4o9g42PEtSU
-Message-ID: <CACKFLi=W_CV3aNonyU8oOuzr42WpvRw_vjNLACjEVgxKEke3pQ@mail.gmail.com>
-Subject: Re: [PATCH net v5] bnxt_en: validate firmware backing store types
-To: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Cc: pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000001ab511064df809c3"
-X-Spamd-Result: default: False [-2.76 / 15.00];
-	SIGNED_SMIME(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260327-b4-fib6_metric_set-kmemleak-v2-1-366b2c78b5c2@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/42NWwqDMBBFtyLz3SkmWh/96j6KSJKOOmi0JEFax
+ L03ZAX9POfCuQd4ckwe7tkBjnb2vK0R5CUDM6l1JORXZJC5rPJCVqhLHFhXvaXg2PSeAs6W7EJ
+ qxlqpm2jrRjalglh4Oxr4k+pPWClAF+XEPmzumx53kaa/4rtAgaZpByN0IaTJH6NVvFzNZqE7z
+ /MHHYTQ6csAAAA=
+X-Change-ID: 20260326-b4-fib6_metric_set-kmemleak-7aa51978284a
+To: "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Fei Liu <feliu@redhat.com>, 
+ Hangbin Liu <liuhangbin@gmail.com>
+X-Mailer: b4 0.14.3
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272336-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-272337-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	HAS_ATTACHMENT(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[broadcom.com:+];
+	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid,iscas.ac.cn:email]
-X-Rspamd-Queue-Id: 6259333E1BE
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B96A733E662
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---0000000000001ab511064df809c3
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+fib6_metric_set() may be called concurrently from softirq context without
+holding the FIB table lock. A typical path is:
 
-On Thu, Mar 26, 2026 at 6:03=E2=80=AFPM Pengpeng Hou <pengpeng@iscas.ac.cn>=
- wrote:
+  ndisc_router_discovery()
+    spin_unlock_bh(&table->tb6_lock)        <- lock released
+    fib6_metric_set(rt, RTAX_HOPLIMIT, ...) <- lockless call
 
-> @@ -8692,15 +8692,18 @@ static int bnxt_hwrm_func_backing_store_qcaps_v2(=
-struct bnxt *bp)
->                 u8 init_val, init_off, i;
->                 u32 max_entries;
->                 u16 entry_size;
-> +               u16 req_type;
->                 __le32 *p;
-> +               u16 next_type;
->                 u32 flags;
->
-> -               req->type =3D cpu_to_le16(type);
-> +               req_type =3D type;
-> +               req->type =3D cpu_to_le16(req_type);
->                 rc =3D hwrm_req_send(bp, req);
->                 if (rc)
->                         goto ctx_done;
->                 flags =3D le32_to_cpu(resp->flags);
-> -               type =3D le16_to_cpu(resp->next_valid_type);
+When two CPUs process Router Advertisement packets for the same router
+simultaneously, they can both arrive at fib6_metric_set() with the same
+fib6_info pointer whose fib6_metrics still points to dst_default_metrics.
 
-I think a simpler fix is to assign ctxm->type =3D type here if the
-concern is that FW can return a bogus resp->type.
+  if (f6i->fib6_metrics == &dst_default_metrics) {   /* both CPUs: true */
+      struct dst_metrics *p = kzalloc_obj(*p, GFP_ATOMIC);
+      refcount_set(&p->refcnt, 1);
+      f6i->fib6_metrics = p;   /* CPU1 overwrites CPU0's p -> p0 leaked */
+  }
 
-ctxm->type is fixed and is equal to the array index of ctx->ctx_arr so
-it can be set up early.  You can optionally validate resp->type for
-sanity but it will not be used.  After that, type can advance to the
-next valid type.
+The dst_metrics allocated by the losing CPU has refcnt=1 but no pointer
+to it anywhere in memory, producing a kmemleak report:
 
-> +               next_type =3D le16_to_cpu(resp->next_valid_type);
->                 if (!(flags & BNXT_CTX_MEM_TYPE_VALID)) {
->                         bnxt_free_one_ctx_mem(bp, ctxm, true);
->                         continue;
+  unreferenced object 0xff1100025aca1400 (size 96):
+    comm "softirq", pid 0, jiffies 4299271239
+    backtrace:
+      kmalloc_trace+0x28a/0x380
+      fib6_metric_set+0xcd/0x180
+      ndisc_router_discovery+0x12dc/0x24b0
+      icmpv6_rcv+0xc16/0x1360
 
---0000000000001ab511064df809c3
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Fix this by:
+ - Set val for p->metrics before published via cmpxchg() so the metrics
+   value is ready before the pointer becomes visible to other CPUs.
+ - Replace the plain pointer store with cmpxchg() and free the allocation
+   safely when competition failed.
+ - Add READ_ONCE()/WRITE_ONCE() for metrics[] setting in the non-default
+   metrics path to prevent compiler-based data races.
 
-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
-DPVtLUtep/P3evQuAtTQRaKedjamBcUpJ7qUhBuv/Z07LlLIlB/vfNSPWe1V+njTezc8m3VfvNEC
-qEpXasPSfDgfcuUhcPR+7++oUDaTt9iqGFOjwiURxx08pL6ogSuiT41O4Xu7msabnUE6RY0O0xR5
-5UGwbpC1QSmnBq7TAy8oQg/nNw4vowEh3S2lmjdHCOdR270Ygd7jet8WQKa5ia4ZK4QdkS8+5uLt
-rMMRyM3QurndiZZJBipjPvEWJR/+jod8867f3n0CAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
-oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
-Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
-BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
-IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
-FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
-hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUJbO/Fi7RhZHYmATVQf6NlAH2
-qUcwDQYJKoZIhvcNAQELBQADggIBABcLQEF8mPE9o6GHJd52vmHFsKsf8vRmdMEouFxrW+GhXXzg
-2/AqqhXeeFZki82D6/5VAPkeVcgDeGZ43Bv89GHnjh/Vv0iCUGHgClZezpWdKCAXkn698xoh1+Wx
-K/c/SHMqGWfBSVm1ygKAWkmzJLF/rd4vUE0pjvZVBpNSVkjXgc80dTZcs7OvoFnt14UgvjuYe+Ia
-H/ux6819kbi0Tmmj5LwSZW8GXw3zcPmAyEYc0ZDCZk9QckL5yPzMlTAsy0Q+NMVpJ8onLj/mHgTk
-Ev8zt1OUE8MlXZj2+wgVY+az2T8rGmqRU2iOzRlJnc86qVwuwjL9AA9v4R13Yt8zYyA7jL0NiBNP
-WaOSajKBB5Z/4ZVtcvOMILD1+G+CVZX7GUWERT9NRXw/SyIEMU59lFbuvy4zxe3+RbOleCgp3pze
-q8HE2p9rkOJT3MkCNLxe+ij4RytIvPQXACsZeLdfTDUnjeXCDDJ9KugVhuqMelAZc4NissPz8FOn
-2NK++r5/QamlFqYRhsFxSBIvhkh2Q/hD3/zy4j17Yf/FUje5uyg03FblSBOk2WYpRpXEuCpyn5pb
-bYVIzfhQJgwGfO+L8BAeZIFjO1QL3s/zzn+RBlTl4wdDzh8L9eS+QEDhMcSsqb4fFRDbsoVuRjpx
-R5MunSUzk4GcmmM19m7oHhPGeKwIMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
-ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMZh03KTi4m/vsqWZxMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCCfQqSb
-rXw+e9T95458n63pA5WoZ++LSmHGv0PDlHimADAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNjAzMjcwMjEyNDBaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
-MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCY0VVglyZOlJIIyEdsYtA2LW4YNoT5K7ob+aJVw9Jw
-dKuRn6jvbAzcsvPH9BKwYrWOfPa1lZJabeBoIRofJeOLI/54PrsWV3vOHG6VgrebOVkQGF0qHJZb
-uPDlUERJdlBrQo/vbVM3yugjpGe8DO8nhJX2oMNdMzJjSudPzMnjf6T9POFXlppdgQdVPit2zKf3
-sTQ96dv1hXrJp7lljCu+ctDqeLH504HxHJeie+w6e67448ls0o8NqhwU6fFQV2cLRPCb6KQnkDvR
-eO1h8Cw6MyEdnNyCZD+gtN+QIKxa2FQyOYkKf6IObfMcC86TPwdMMJxwV5ULi2Ldkf7oByM+
---0000000000001ab511064df809c3--
+Fixes: d4ead6b34b67 ("net/ipv6: move metrics from dst to rt6_info")
+Reported-by: Fei Liu <feliu@redhat.com>
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+Changes in v2:
+- Set val for p->metrics before published via cmpxchg() (Eric Dumazet)
+- Add READ_ONCE()/WRITE_ONCE() for metrics[] setting (Jiayuan Chen)
+- Link to v1: https://lore.kernel.org/r/20260326-b4-fib6_metric_set-kmemleak-v1-1-c89fc1b312c0@gmail.com
+---
+ net/ipv6/ip6_fib.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+index dd26657b6a4a..2a7cc33fbcef 100644
+--- a/net/ipv6/ip6_fib.c
++++ b/net/ipv6/ip6_fib.c
+@@ -730,17 +730,24 @@ void fib6_metric_set(struct fib6_info *f6i, int metric, u32 val)
+ 	if (!f6i)
+ 		return;
+ 
+-	if (f6i->fib6_metrics == &dst_default_metrics) {
++	if (READ_ONCE(f6i->fib6_metrics) == &dst_default_metrics) {
++		struct dst_metrics *dflt = (struct dst_metrics *)&dst_default_metrics;
+ 		struct dst_metrics *p = kzalloc_obj(*p, GFP_ATOMIC);
+ 
+ 		if (!p)
+ 			return;
+ 
++		p->metrics[metric - 1] = val;
+ 		refcount_set(&p->refcnt, 1);
+-		f6i->fib6_metrics = p;
++		if (cmpxchg(&f6i->fib6_metrics, dflt, p) != dflt)
++			kfree(p);
++		else
++			return;
+ 	}
+ 
+-	f6i->fib6_metrics->metrics[metric - 1] = val;
++	struct dst_metrics *m = READ_ONCE(f6i->fib6_metrics);
++
++	WRITE_ONCE(m->metrics[metric - 1], val);
+ }
+ 
+ /*
+
+---
+base-commit: c4ea7d8907cf72b259bf70bd8c2e791e1c4ff70f
+change-id: 20260326-b4-fib6_metric_set-kmemleak-7aa51978284a
+
+Best regards,
+-- 
+Hangbin Liu <liuhangbin@gmail.com>
+
 
