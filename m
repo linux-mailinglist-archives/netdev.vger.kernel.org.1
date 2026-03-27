@@ -1,59 +1,78 @@
-Return-Path: <netdev+bounces-272299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272300-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EAHOOU3VxWnQCAUAu9opvQ
-	(envelope-from <netdev+bounces-272299-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:54:37 +0100
+	id wDHRD5jWxWnQCAUAu9opvQ
+	(envelope-from <netdev+bounces-272300-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:00:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF50E33DA30
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:54:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9721633DAC8
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:00:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id F154C301CEC2
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 00:54:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C26C03028EFC
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48962874ED;
-	Fri, 27 Mar 2026 00:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2086229AAFA;
+	Fri, 27 Mar 2026 01:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ryVKUbuS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FNroW0u0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18D41D5160;
-	Fri, 27 Mar 2026 00:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC80B1E5B7B;
+	Fri, 27 Mar 2026 01:00:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774572872; cv=none; b=EiDpOEIGr3vG9YUQTyADiJHzwWsHosOESB4Vz2/lKIRVt1oGGxXwByQVfwVhZlCm+QzzAZbRUOhR0CMcEMH+Gz0xBVGSyWhpxtNH4SnGIvVgzzz6/NN2/dRQRLLawZQdPGXa/B144/REK6WFuOhNYlCX/vdeZlxOEQ7eyYWGTMg=
+	t=1774573204; cv=none; b=a4nx7BsyZU7vR9NBCkF3Qb+hg23zZEPsCxpeG0trYy1a1Q14jQ1rHV73AATmdMIdesMQ14WJBJp5O1h+YAc/xIGfZnobbE3m4gn8c83oJOvqxTKp30sPlYs1oO8dccGuX3xV/tiAhjWoAY5+hvmIPtS8W+Lhu2PAY9jBb45hRQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774572872; c=relaxed/simple;
-	bh=+FvjcGCklqo4FF90eAX6+EdtMH3jFAmS5fh8CidR4XE=;
+	s=arc-20240116; t=1774573204; c=relaxed/simple;
+	bh=qxY3/yGGf6j+ovhznsYEiHtyVq8spceSXqsmShyDfZM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UFVv0tYuDHXuXEJ4RS5occQOfJomSdR2qEdjnlCidseQHWOgGjPzV3G1Ug6Q56tiXAaLd21MbI50LAo8Ff4/BgJF2I0oLwv1v4Brhyqlk0mqCBr3+lMsfLbPuGgtBT8pXIA06pubCQIcKfvRSEn1AwZ8oM6PIfhng7m245d1N/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ryVKUbuS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E157EC116C6;
-	Fri, 27 Mar 2026 00:54:31 +0000 (UTC)
+	 MIME-Version:Content-Type; b=SY4pxXyiwZN63jneSnzMQP9Pl7AHos42gUT2n+/CrN8MvF5IV9IbchCZ6KhuMGyzTfn95HInwXUc+8WJ4vvu3EMeIVx6U5g4cXWdMVrzquc3EsDVciU8fNWOaPSXpkQc86gKCyjdWmLvwAamvhnCNVPno5MWsidjzrERZEBpdXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FNroW0u0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BE9FC116C6;
+	Fri, 27 Mar 2026 01:00:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774572872;
-	bh=+FvjcGCklqo4FF90eAX6+EdtMH3jFAmS5fh8CidR4XE=;
+	s=k20201202; t=1774573203;
+	bh=qxY3/yGGf6j+ovhznsYEiHtyVq8spceSXqsmShyDfZM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ryVKUbuSZSdi4NnWR2sV+J8fVQtSCXdsX7N54JSdmtvdND/5Eoqf/sEVK4IziYhxZ
-	 CWDCrd3sTGUoBG8zPWmzjPzsOIKFfv6YiG+mEG9Ce5ddIhZ9n8Q074i38ZItvgpBS/
-	 IUicsm1KJx17eD32BauQLXhvX8VV7h/66SwnRJvTDOQSLHElVND92P7RNyVylvX14q
-	 upxoeqqaRuBJd1fjDHxz/jI4zmCZ+YC0pZitFSTsXNHbrjsJXljndf4Inf6OvNFIZ5
-	 QUxpwSSkZivXJH9Nll1CZOksOJwGKTjhi5waH+IR72PEBb6e5WBEeMc2HGnJf4OyKL
-	 5pAHel6iCFHMg==
-Date: Thu, 26 Mar 2026 17:54:30 -0700
+	b=FNroW0u0U36ViZc4+y7bksZ+3Vn2ECYJKzcMQu2+7+wgbCIIsSRoawWqyJWlucPZ7
+	 veDTO26o7D2SxZUVQnuNVRXQsH+37K7QiGKE68XMAtOISbRknR/gJz4fBKSOZAe7HQ
+	 4pSAfw8E5Sw8ox/f45asPCxLpEeiNr1H1DNmT5u3Knkt/niNOXoFoUrLn2/OvVVwlZ
+	 9aMewJKaEHrcVCtS/Cf5rmiCxdC8HI9K0r2Nb18EsYP88+4fWaaw1bMdOpv359WuHL
+	 lW4vI1EuzPrHZke3KX5/VNAvsuy0awj1MQSGvcAefO895voF4iRRZ+kav4kmluphgZ
+	 hsSU21cW2rWog==
+Date: Thu, 26 Mar 2026 18:00:01 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Chuck Lever <cel@kernel.org>
-Cc: john.fastabend@gmail.com, sd@queasysnail.net, netdev@vger.kernel.org,
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Stefan Metzmacher
+ <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli
+ <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz
+ <dreibh@simula.no>, linux-cifs@vger.kernel.org, Steve French
+ <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara
+ <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
  kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
- Hannes Reinecke <hare@suse.de>, Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH net-next v6 0/6] TLS read_sock performance scalability
-Message-ID: <20260326175430.7ceff326@kernel.org>
-In-Reply-To: <20260326-tls-read-sock-v6-0-fd887b9e7f06@oracle.com>
-References: <20260326-tls-read-sock-v6-0-fd887b9e7f06@oracle.com>
+ Jeff Layton <jlayton@kernel.org>, Steve Dickson <steved@redhat.com>, Hannes
+ Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, David
+ Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, John
+ Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, "D .
+ Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg
+ <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>, "Marc E
+ . Fiuczynski" <marc@fiuczynski.com>
+Subject: Re: [PATCH net-next v11 06/15] quic: add stream management
+Message-ID: <20260326180001.793b62be@kernel.org>
+In-Reply-To: <CADvbK_eyNtAfA=JPR5Y4arFLPpkWMs8io=TO83rHAa-JJkhdAA@mail.gmail.com>
+References: <cover.1774410440.git.lucien.xin@gmail.com>
+	<91c6fd0a44eb15a98f945171ead8062badb89a60.1774410440.git.lucien.xin@gmail.com>
+	<CADvbK_eXUfnGGQgGc_k-ecCW3-Co1MpGb7UvMgLonPy3HRhyFA@mail.gmail.com>
+	<20260326130740.74b4c92f@kernel.org>
+	<CADvbK_eyNtAfA=JPR5Y4arFLPpkWMs8io=TO83rHAa-JJkhdAA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,46 +85,50 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,queasysnail.net,vger.kernel.org,lists.linux.dev,oracle.com,suse.de,wdc.com];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-272299-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272300-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[35];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,davemloft.net,google.com,redhat.com,kernel.org,samba.org,openbsd.org,xiaomi.com,simula.no,gmail.com,manguebit.com,talpey.com,oracle.com,suse.de,johnericson.me,linux.alibaba.com,akamai.com,protonmail.com,queasysnail.net,haxx.se,broadcom.com,fiuczynski.com];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.905];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: EF50E33DA30
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+X-Rspamd-Queue-Id: 9721633DAC8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 26 Mar 2026 09:50:45 -0400 Chuck Lever wrote:
-> I'd like to encourage in-kernel kTLS consumers (i.e., NFS and
-> NVMe/TCP) to coalesce on the use of read_sock. When I suggested
-> this to Hannes, he reported a number of nagging performance
-> scalability issues with read_sock. This series is an attempt to
-> run these issues down and get them fixed before we convert the
-> above sock_recvmsg consumers over to read_sock.
+On Thu, 26 Mar 2026 17:48:51 -0400 Xin Long wrote:
+> > Can you also check the google one?
+> >
+> > https://sashiko.dev/#/patchset/4019cfba3ffd6f91aee24713d2adc778f858b4c4.1774410440.git.lucien.xin@gmail.com  
 > 
-> Batch async decryption and its submit/deliver scaffolding were
-> dropped from this series because async_capable is always false
-> for TLS 1.3, which NFS and NVMe/TCP both require. Async crypto
-> support for TLS 1.3 is a prerequisite for revisiting that work.
+> Will do. There are quite a few reports, and it may take me some time
+> to review them all carefully.
+> 
+> BTW, what's the workflow for the Google AI feedback? should I reply to
+> each item in this thread like we did with Claude one, or is there a
+> different workflow?
 
-Please repost the remaining 5 patches
+It's a bit more chatty and we don't have any integrations there so it's
+a bit hard to deal with :( At this point just look thru the reports and
+address what's legit. We'll probably take your word for everything that
+remains being a false positive.
 
