@@ -1,292 +1,204 @@
-Return-Path: <netdev+bounces-272683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272684-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qF18I3jnxmnrPwUAu9opvQ
-	(envelope-from <netdev+bounces-272683-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:24:24 +0100
+	id uMkhEVjuxmkIQQUAu9opvQ
+	(envelope-from <netdev+bounces-272684-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:53:44 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01EB834AE6E
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:24:23 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3934934B57A
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:53:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CAFEA304F6C0
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 20:24:20 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D3FE0302BC3E
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 20:42:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F9F392C2F;
-	Fri, 27 Mar 2026 20:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 400A938F932;
+	Fri, 27 Mar 2026 20:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VuqQy0dF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nM/BfZ+Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0E437E2F5
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 20:24:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774643051; cv=pass; b=tiiNKJ0SIf4rABOwvnoosWVSAyeNkEwCl0eL9QZHPBkQJSdKNO3mBsEEgh3FeiqxNWX+TwcZVNo9J7/PW91ecPEyMjOdpWtWj9vPxmVRhAE9ZdI5wVtDge9YqgkElezYIw8C8vh8RwYSW+wZbXWnVQLyf678UMS8FxJDXjZudiI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774643051; c=relaxed/simple;
-	bh=fe8HYEgNDSZEJwtPnP9d7rdRK4mOuzWO1Arb10bM66I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yb6NcVfovtm+xS+fstGOiPLxB8KOZ968Ob9iE740ihXvaQjip5d7a+JyNVdfiWbIlji82pjfZJtQuHR6rs6ffpxI6XVSIcXhHrs9Xz9xUBFdQx+/YQYyab1srduhz9Ewnt87i9WOQKjlCaULMA27QxME/W914Nt2JSHDnnwUYK4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VuqQy0dF; arc=pass smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-66b0f489f3aso3006380a12.3
-        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 13:24:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774643047; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Ou1fGNwLEq9bUzh3DO6cXsD223OC0Sfn3OUGpepyF1tY03E1S7sMl61IwTEuI6KpaD
-         vDzAEpVgA2irK8ZTde/0nHTztw9eM2TVfqb9b9TNCgSoOwxy2/RR0VmIJ4XmqAmR9lUY
-         48LSkE/bPyYi8Tse19lF40WI7OgAvmuw4gtEjgTqxqCx6cQKc0hEz4Tgk/gbdyEhVX6T
-         XikCfEsMP7P5oPIFzzUAIm6fhtJG+WggScEpMX3gS3kEvq5u8ocAFTcqSBGxpSN8DTTC
-         +YqfeZ6I6c/4CFo9AWXEdFAG+CiHaoQ+hkwrR6mH1AWvWTYzkwVROQkuHfRWvEee8YHv
-         xbZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=9WeOtA6rLKd2feImk1nWk/a5NsEeM0kN8oqqyEId0bQ=;
-        fh=VZSezCaVQsSBYXN3uu4q+vdnGcbExcXlel+wuWt4Ihs=;
-        b=MfPy841n+HJsZBJ5b97tj/kZ0+B7SDNn5FUj+MRhhzGeLKfGYb7pZgd5JDI+wV11en
-         5vJbtu1y4bC7maWMwLXynV8oaO2b7yfufQs5WvxD2dcBFKNInVVSlSQZ4qoUWD0Fg8Dn
-         2iOWGsBTrbxlOzX+1icejrMbKXyFuQszt5fPbpM2Iz4cxiUr2lrQ0Iz3MkPURQFrMOPk
-         jwtP4sS01PipYBhiv2Dn6T++KfKHB77ZGAcvvBicYG1UjSHVAkkz6ane2np6mDLGIFse
-         J9LTOg2AwjcQM+Qqi3gH1R1F69bj9lGjihHcOaDC8CBfGmtkTZ6Xhd9faZJwobe5WP6X
-         8/dg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65D638CFF5
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 20:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774644122; cv=none; b=b3AHMjJYXXWfz3VHxhRL2vu66bIlVkNnWb1UTO6X6SMH1rpVrUEqXHsM8K1WTX9kvADlJmmeTBTFyPCaq43VM5lPo1Y9n6xME3+PdzLlUto2PkFSna6PwKgIEaDH7egtbLTsbgjSnCiKTcNiyeWunhyoROe9SrPadlJ2KKwBvsw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774644122; c=relaxed/simple;
+	bh=OseZgolmzhAr4jFqxBRNN1L/7ggRloDkt++YOQpR2p8=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U9q+p9fff2LcrY/GmJbZrxgxxJlVUmDr317kiM886itzd6yXP2HmPjX7f2Znas+CUWXcCM5vHj9cjDa+Lu5B/LWn/zicfleQKQ/BXx8hyD7Gq0IMu4/bx0w+Iix4bnWHzorcjLUI76b6xIgIs7GxuI+oiTixxMkKT+f6hl5VT/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nM/BfZ+Y; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso20746135e9.3
+        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 13:42:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1774643047; x=1775247847; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9WeOtA6rLKd2feImk1nWk/a5NsEeM0kN8oqqyEId0bQ=;
-        b=VuqQy0dFFUKCW5LFnvEaxGiKsvA7wZMtgk9MpLPdPYNG0CjRWontr06l/oScJ9SlL1
-         r9wEtzgkdnjKi0jIFmkCWVMcUt1DKXUUnD7yfUC1jgsUScQbM2/1SadvK6JBbSkmQYv4
-         qSJ68sbS0T6VZPCTKM6GaMbq+iX9Q7TUrvklbvVXtraoXJ2iQJiNf1CCxINzF8kNLKwP
-         NOvf4x8hp0t8wrVujWooo56OYrlQ2VJYEsTv/8AoqFdQu5mfMcrvLthjlYiwU3SoH/Us
-         hlNdeZy9StxdLBHAoU7DXMvu0AqipWs5uVJE/jJHuiXn0PFfRmPiYl7JPpxJvKz+0G7z
-         /5RQ==
+        d=gmail.com; s=20251104; t=1774644119; x=1775248919; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sZ/7XD1rJXQYlW2CUYI9bsXyEYg+8UaYCRyEmTmJK34=;
+        b=nM/BfZ+YLMVvk5P3x54GwdFqdhKmNJ1Hx2r4zooAmkk5jyqty65BG5Z/uNElRCb6iY
+         atigMkijN16Bg0MggWKJdpuEJizIgzzsHp8uWkf3jKGObwBow5TmIAnkXXrqS59Y+HyE
+         hUaDJeb7L7MvoygWrNTlThnWgcILNdnwFIxHBmdrUObxwmUefmvY23WjhAsY3hLEmf3V
+         rONqyr8uPLBAQt0hOQm9zA/WPdl8mxXYOXcdgzOLm3g5YAip4rEMTMXdKxwYDbKtdNF+
+         59EkTsbwaWxSa4pz4TXedRnJ3xpRtQwB741vQE2mzx7GXYus9zCyOz5xX/f6uYz16fe6
+         I6QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774643047; x=1775247847;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9WeOtA6rLKd2feImk1nWk/a5NsEeM0kN8oqqyEId0bQ=;
-        b=r2h4FKo3VjY5tpgNLk7Z4c5wj1ift5e3VR8jy7mkvrYKLMLRlHZU4xbgyvKexfBY91
-         upur7qT4REyImI7saPQexQWUUQDlmfvFRe2ITMKTgefK3ZMTOWpE85tBTMYbSF+t3IrA
-         9ZkfmV+Xk+LDMuWjRGNCeUpyKE1gncxSeE9DFOXTtjP0wYOdFAYK/hmTlfltpfE+67/u
-         Cw0xs51fSZ3V/wMj2MDsf1x2ImOhCtIrs1BM00mKJ6gaxUjEZAPG0QiTV1I9VjAvXGab
-         My2Lx87hTHMu15dakFgKeNwPBKBnrjnIChsectbH4SqZHBfuJJrvkHyMXhL8fDcNyKTR
-         qIuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXvcp2ma6SNHNpuFeMidzGYDKODJ1FqTqnyKsvaCtgM6LDxSpgvIxRVQ5SuPjxlHruZwjoxXuY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxcn48JjiKLUu5OCfKpUS4Z0zr0obgFik2VuhHVq9gTgpLtJ6OL
-	DPXnuoLeJGfmVM2CqotgF0iPj1Te6CjSG7C0prEykTs+OB1039lPmagLypVlx55Eo++Hwl5Eew3
-	s88B2Ck9fVNAIqw9ozXkHVwH3UzOuLt4VJhxWxqAI2w==
-X-Gm-Gg: ATEYQzw+kLsHbRljtpPQJ55kMvyOmAKaULLrPIxJua9ITTNBFHJBzI2NBQngeSwcNpZ
-	FOwieQ1cl/wpApsqo23VuUafOpRxLtmbdQHGjgcFF6j8tXjzPLgg18wO/RuHkPo0HTzVNmQjfuE
-	RjHYWkZpF4p7BGx79rTK4bZaTaiqaMhFTjrJlJHT1YignqCdlMO7/coTaVnGMDpcYRsCaXPyOV2
-	5PGBvhht1wtoVVxlz3YExjw4DhfAIAsbfg0rI0krlz/5Qvsn/NnJbBrsnvIwTXjSa6mXjdWRXg+
-	yQHDC8XiNQ9My4xV2PznzFH+74ISyJQyNBbY7BHG
-X-Received: by 2002:a05:6402:46db:b0:66a:199d:138 with SMTP id
- 4fb4d7f45d1cf-66b28c66cbemr2039826a12.20.1774643046839; Fri, 27 Mar 2026
- 13:24:06 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1774644119; x=1775248919;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sZ/7XD1rJXQYlW2CUYI9bsXyEYg+8UaYCRyEmTmJK34=;
+        b=ZYgddooMe2FLxOGFYiMn0RP/0X69yfVW1wgArH5sx+PwmtFQ+iVPeHRHWBDTEZQvMB
+         +pierlRj108zo9kecip056YcyAYwe9D4omBssfYLwo0W9DDfHN2QvVG+NywtPGBQg5If
+         vYEscQb9+VZSQNbm2kYE78sfT3hboMndNFf5U28FrdNXZldFJQUkeQ55/7TlyDfcyw/D
+         o9LXtGKU0OeyPAo8cEf5BUjVC+b6rSP7X+sBAAuObxlj7uHwYhsUWRD7v1v5meZrP+iH
+         s2qZ0uWlCD5nkp3GSZz/fo39c7N/EoaOnIdQSoys4Gt4z+X2ltymaEYqSkIWu0HoMzZe
+         I+yg==
+X-Forwarded-Encrypted: i=1; AJvYcCVIdJpIRQyKnpJnF0jwPzxlS9Iyzi6VyyU1D5aljuvgnccp9ArscNIfNzLQ0DbBQV+Ffn/4poE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzVSjIHXwhS+GVQCVBxnSMC+1hULkhi3sjwxl+C8enPgtWd5Vx
+	dfOufOKQSSfxURIK4vO+6OdX4AIS6mqZBRRelzy+izffc+aUBAy0QPIE
+X-Gm-Gg: ATEYQzxWwjj2im4bIAEpevmRvB5GMjpUqp7ubNZmYjKOC/Ax2c7Dgt/Fl4tbqQ0SM5y
+	7cZz60Hf3/oQCQ6FAeCDlW0Cy7MOAZI1GUPxSXo0qtkUTH2Rn6W4/qUQWoMhSjKO8lCNn+DZtrs
+	IDO177nCSQgpIvzj/k0oBby2VWaH5pKgWD2nS0IQwY0lWcf/EzOn+AGmMzkvchCnVXNBA9ljBiO
+	2l0aG2e12WSNaBVgzD/8NicIyF8WMPnEtEqq6TxM1JQozZeg73bVYvWxj3JGNmPH1e5iuJCzXSY
+	c2GkKZKqOPhc51Zb2nlAnDKwyNiLYHH/LUYR7vpDt5QGDNXHLTADeS2kB3rn4AeupnkI0xHh09h
+	pqfW2N2f7LIYmechgpFkpR9sNAK2SdOA5/Q8lBDxf1kPpXiP5xUeGKupzAnqcvNLkt42BzIB0tB
+	KFsK04MmpfMKbr/bLIuck0dzLxFy3jl6ClfcFiltK9PI9oGU16pwekWJ9LGw==
+X-Received: by 2002:a05:600c:1d15:b0:485:2fc5:3a5 with SMTP id 5b1f17b1804b1-48727edf4f5mr64539105e9.26.1774644118896;
+        Fri, 27 Mar 2026 13:41:58 -0700 (PDT)
+Received: from krava (cust-west-par-46-193-1-135.cust.wifirst.net. [46.193.1.135])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4872712b3ebsm20378445e9.19.2026.03.27.13.41.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Mar 2026 13:41:58 -0700 (PDT)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Fri, 27 Mar 2026 21:41:56 +0100
+To: Leon Hwang <leon.hwang@linux.dev>
+Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Shuah Khan <shuah@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Toke Hoiland-Jorgensen <toke@redhat.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+	kernel-patches-bot@fb.com
+Subject: Re: [PATCH bpf-next 2/3] bpf: Disallow freplace on kprobe with
+ mismatched kprobe_write_ctx values
+Message-ID: <acbrlN_n4Z684h9e@krava>
+References: <20260324150444.68166-1-leon.hwang@linux.dev>
+ <20260324150444.68166-3-leon.hwang@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260327184706.1600329-1-vladimir.oltean@nxp.com> <20260327184706.1600329-10-vladimir.oltean@nxp.com>
-In-Reply-To: <20260327184706.1600329-10-vladimir.oltean@nxp.com>
-From: Peter Griffin <peter.griffin@linaro.org>
-Date: Fri, 27 Mar 2026 20:23:54 +0000
-X-Gm-Features: AQROBzCjrloDfUGTlNvOpQXdM4anVOjHCl2P0WQRB2XbIrpLYVg7AhYSjcExBJI
-Message-ID: <CADrjBPqMwtrae7LB9A8xipg6R0rHGewe69awQ_jJnsf=2c=eTw@mail.gmail.com>
-Subject: Re: [PATCH v6 phy-next 09/28] scsi: ufs: exynos: stop poking into
- struct phy guts
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: linux-phy@lists.infradead.org, Vinod Koul <vkoul@kernel.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, dri-devel@lists.freedesktop.org, 
-	freedreno@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-ide@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, 
-	linux-pci@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, linux-rockchip@lists.infradead.org, 
-	linux-samsung-soc@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org, 
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org, spacemit@lists.linux.dev, 
-	UNGLinuxDriver@microchip.com, Bart Van Assche <bvanassche@acm.org>, 
-	Alim Akhtar <alim.akhtar@samsung.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Chanho Park <chanho61.park@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
-	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260324150444.68166-3-leon.hwang@linux.dev>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272683-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[31];
+	TAGGED_FROM(0.00)[bounces-272684-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,google.com,davemloft.net,redhat.com,fb.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[peter.griffin@linaro.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linaro.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,samsung.com:email,nxp.com:email,acm.org:email,hansenpartnership.com:email,oracle.com:email]
-X-Rspamd-Queue-Id: 01EB834AE6E
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[olsajiri@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3934934B57A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 27 Mar 2026 at 18:48, Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
->
-> The Exynos host controller driver is clearly a PHY consumer (gets the
-> ufs->phy using devm_phy_get()), but pokes into the guts of struct phy
-> to get the generic_phy->power_count.
->
-> The UFS core (specifically ufshcd_link_startup()) may call the variant
-> operation exynos_ufs_pre_link() -> exynos_ufs_phy_init() multiple times
-> if the link startup fails and needs to be retried.
->
-> However ufs-exynos shouldn't be doing what it's doing, i.e. looking at
-> the generic_phy->power_count, because in the general sense of the API, a
-> single Generic PHY may have multiple consumers. If ufs-exynos looks at
-> generic_phy->power_count, there's no guarantee that this ufs-exynos
-> instance is the one who previously bumped that power count. So it may be
-> powering down the PHY on behalf of another consumer.
->
-> The correct way in which this should be handled is ufs-exynos should
-> *remember* whether it has initialized and powered up the PHY before, and
-> power it down during link retries. Not rely on the power_count (which,
-> btw, on the writer side is modified under &phy->mutex, but on the reader
-> side is accessed unlocked). This is a discouraged pattern even if here
-> it doesn't cause functional problems.
->
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-> Acked-by: Alim Akhtar <alim.akhtar@samsung.com>
-> Tested-by: Alim Akhtar <alim.akhtar@samsung.com>
+On Tue, Mar 24, 2026 at 11:04:43PM +0800, Leon Hwang wrote:
+> uprobe programs are allowed to modify struct pt_regs.
+> 
+> Since the actual program type of uprobe is KPROBE, it can be abused to
+> modify struct pt_regs via kprobe+freplace when the kprobe attaches to
+> kernel functions.
+> 
+> For example,
+> 
+> SEC("?kprobe")
+> int kprobe(struct pt_regs *regs)
+> {
+> 	return 0;
+> }
+> 
+> SEC("?freplace")
+> int freplace_kprobe(struct pt_regs *regs)
+> {
+> 	regs->di = 0;
+> 	return 0;
+> }
+> 
+> freplace_kprobe prog will attach to kprobe prog.
+> kprobe prog will attach to a kernel function.
+> 
+> Without this patch, when the kernel function runs, its first arg will
+> always be set as 0 via the freplace_kprobe prog.
+> 
+> To avoid the abuse of kprobe_write_ctx=true via kprobe+freplace, disallow
+> freplace on kprobe programs with mismatched kprobe_write_ctx values.
+> 
+> Fixes: 7384893d970e ("bpf: Allow uprobe program to change context registers")
+> Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
 > ---
-
-Reviewed-by: Peter Griffin <peter.griffin@linaro.org>
-
-> Cc: Alim Akhtar <alim.akhtar@samsung.com>
-> Cc: Peter Griffin <peter.griffin@linaro.org>
-> Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-> Cc: Krzysztof Kozlowski <krzk@kernel.org>
-> Cc: Chanho Park <chanho61.park@samsung.com>
->
-> v5->v6: collect tags from Alim Akhtar
-> v4->v5: collect tag, add "scsi: " prefix to commit title
-> v3->v4: none
-> v2->v3:
-> - add Cc Chanho Park, author of commit 3d73b200f989 ("scsi: ufs:
->   ufs-exynos: Change ufs phy control sequence")
-> v1->v2:
-> - add better ufs->phy_powered_on handling in exynos_ufs_exit(),
->   exynos_ufs_suspend() and exynos_ufs_resume() which ensures we won't
->   enter a phy->power_count underrun condition
-> ---
->  drivers/ufs/host/ufs-exynos.c | 24 ++++++++++++++++++++----
->  drivers/ufs/host/ufs-exynos.h |  1 +
->  2 files changed, 21 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/ufs/host/ufs-exynos.c b/drivers/ufs/host/ufs-exynos.c
-> index 76fee3a79c77..274e53833571 100644
-> --- a/drivers/ufs/host/ufs-exynos.c
-> +++ b/drivers/ufs/host/ufs-exynos.c
-> @@ -963,9 +963,10 @@ static int exynos_ufs_phy_init(struct exynos_ufs *ufs)
->
->         phy_set_bus_width(generic_phy, ufs->avail_ln_rx);
->
-> -       if (generic_phy->power_count) {
-> +       if (ufs->phy_powered_on) {
->                 phy_power_off(generic_phy);
->                 phy_exit(generic_phy);
-> +               ufs->phy_powered_on = false;
->         }
->
->         ret = phy_init(generic_phy);
-> @@ -979,6 +980,8 @@ static int exynos_ufs_phy_init(struct exynos_ufs *ufs)
->         if (ret)
->                 goto out_exit_phy;
->
-> +       ufs->phy_powered_on = true;
+>  kernel/bpf/verifier.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> index 12330466d58b..f8257bae6081 100644
+> --- a/kernel/bpf/verifier.c
+> +++ b/kernel/bpf/verifier.c
+> @@ -6404,6 +6404,14 @@ static int check_ctx_access(struct bpf_verifier_env *env, int insn_idx, int off,
+>  		/* remember the offset of last byte accessed in ctx */
+>  		if (env->prog->aux->max_ctx_offset < off + size)
+>  			env->prog->aux->max_ctx_offset = off + size;
+> +		if (env->prog->type == BPF_PROG_TYPE_EXT) {
+> +			struct bpf_prog *dst_prog = env->prog->aux->dst_prog;
 > +
->         return 0;
->
->  out_exit_phy:
-> @@ -1527,6 +1530,9 @@ static void exynos_ufs_exit(struct ufs_hba *hba)
->  {
->         struct exynos_ufs *ufs = ufshcd_get_variant(hba);
->
-> +       if (!ufs->phy_powered_on)
-> +               return;
-> +
->         phy_power_off(ufs->phy);
->         phy_exit(ufs->phy);
->  }
-> @@ -1728,8 +1734,10 @@ static int exynos_ufs_suspend(struct ufs_hba *hba, enum ufs_pm_op pm_op,
->         if (ufs->drv_data->suspend)
->                 ufs->drv_data->suspend(ufs);
->
-> -       if (!ufshcd_is_link_active(hba))
-> +       if (!ufshcd_is_link_active(hba) && ufs->phy_powered_on) {
->                 phy_power_off(ufs->phy);
-> +               ufs->phy_powered_on = false;
-> +       }
->
->         return 0;
->  }
-> @@ -1737,9 +1745,17 @@ static int exynos_ufs_suspend(struct ufs_hba *hba, enum ufs_pm_op pm_op,
->  static int exynos_ufs_resume(struct ufs_hba *hba, enum ufs_pm_op pm_op)
->  {
->         struct exynos_ufs *ufs = ufshcd_get_variant(hba);
-> +       int err;
->
-> -       if (!ufshcd_is_link_active(hba))
-> -               phy_power_on(ufs->phy);
-> +       if (!ufshcd_is_link_active(hba) && !ufs->phy_powered_on) {
-> +               err = phy_power_on(ufs->phy);
-> +               if (err) {
-> +                       dev_err(hba->dev, "Failed to power on PHY: %pe\n",
-> +                               ERR_PTR(err));
-> +               } else {
-> +                       ufs->phy_powered_on = true;
-> +               }
-> +       }
->
->         exynos_ufs_config_smu(ufs);
->         exynos_ufs_fmp_resume(hba);
-> diff --git a/drivers/ufs/host/ufs-exynos.h b/drivers/ufs/host/ufs-exynos.h
-> index abe7e472759e..683b9150e2ba 100644
-> --- a/drivers/ufs/host/ufs-exynos.h
-> +++ b/drivers/ufs/host/ufs-exynos.h
-> @@ -227,6 +227,7 @@ struct exynos_ufs {
->         int avail_ln_rx;
->         int avail_ln_tx;
->         int rx_sel_idx;
-> +       bool phy_powered_on;
->         struct ufs_pa_layer_attr dev_req_params;
->         struct ufs_phy_time_cfg t_cfg;
->         ktime_t entry_hibern8_t;
-> --
-> 2.43.0
->
+> +			if (env->prog->aux->kprobe_write_ctx != dst_prog->aux->kprobe_write_ctx) {
+> +				verbose(env, "Extension program cannot have different kprobe_write_ctx value with target prog\n");
+> +				return -EINVAL;
+> +			}
+> +		}
+
+would it be more clear to check this in bpf_check_attach_target,
+instead of depending on actual write to context
+
+jirka
 
