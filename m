@@ -1,269 +1,239 @@
-Return-Path: <netdev+bounces-272616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272617-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qKH0G9euxmmiNgUAu9opvQ
-	(envelope-from <netdev+bounces-272616-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 17:22:47 +0100
+	id uMxCAWqwxmmiNgUAu9opvQ
+	(envelope-from <netdev+bounces-272617-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 17:29:30 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B653475D5
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 17:22:46 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EED8934770C
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 17:29:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5ABB8315D9F6
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 16:16:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3025D3054F7D
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 16:18:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F7E4347530;
-	Fri, 27 Mar 2026 16:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C125347525;
+	Fri, 27 Mar 2026 16:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="DFy4uEAn"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BbtTUVri"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6525C344DBE
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 16:16:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774628213; cv=pass; b=q0rGaju4oXAAOmyBn7F6Q7ZDkd1rD/wF+cap0lkYgIf9H+xMuMu4vbGEI5hv0261+Z/Rb+G0XF9T5ap3z3Af5q5+xYmPfgpd+iALRLOgd0qV23NX/GaGr+G3/DGixUJLJCS0acpJr+Zvk96EzNtsXi1Qwnrttd8vO7k6gPWy/oU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774628213; c=relaxed/simple;
-	bh=frz4p06SnBq2LbkdgMPdF69AiDSG1rVy9h0kmRJdqeQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=esZOKioFWHgjNJW7+Q3BnfwqPX8CJ7JBkk2s5dGFjNCxnQSEJk7paHGnbNN90BTbMAuE4RVdx7MaBdkMXtRYNR8mE7iE4DKSoDU1RVR8dg/whtH2qZ7GW/yOQEsqapnYHG5JTCAp3ud8ff4ZYRK67Bx0sueU2k/wwPUONeB9Tsg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=DFy4uEAn; arc=pass smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b9358bc9c50so321729766b.1
-        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 09:16:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774628209; cv=none;
-        d=google.com; s=arc-20240605;
-        b=QSTxPbPGFhCnBbANOWFfUYABOiBMMILpHUmki/Nsh6NSEon092o+VplrytoHtvhG5e
-         dj1Q1wtbTnwBKgZH4hNfKFmBF53MGHO0rcVZUmcbSMOoiyApjNndXDBEFggLbps0GiWU
-         p7fpChBsy9AKDO+EtL4/ZDXoVpHPsuhc5+hXh88YS8Y8KkN1rY4dZKlu6RZid7OdCmZV
-         7+HHUBuDZrz+nwTGmDYH8by0YR1gtBdXKQcWksWZR06ZCPICPPUCy8smr5yL9coc9CL6
-         kLVsaGEuzdMdQ49rQN5+I8Da7qxyyzOOmYzM7dOsk18muEuhwznI0z1TG8//bSHLb7xC
-         /A4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ZWBSGmgMx2VtQsPuBnSVVG+3OGW1QLkqIN3lGz/DvMk=;
-        fh=4odBnGn8JM0FdZN1urASS1qicWjbfyLYdIkOi+5S4tg=;
-        b=WU2DBqLkgSXFaT/tlOkxL3zbrVK/Agy8I85hm2HeJiDNotgyiGRCN9N/PbOnSjChqk
-         x8F4YJVzvokA9nSjwmxcD147Hnuy9+3iIrnqRtozUoj3YDxNSzVKM2KNKV0Xn/Q/VQbZ
-         i5T7EdCFwRp2c4ayB5cmy78BpdaZzU+NkKGnMCkGTf1kdelX0mAIsA/MYMcXd6R/cpri
-         3CLgF8995HYG41sBotYb7q/9YrUAaORq3n5mEyDUz6yOGfMLLWAnzGinlIhtdJxgPd5U
-         eGy+YkaClnsqqVKXDAGh6HYfGmfKnh1OXigl6ELHUGCzxn/dc+9hGsvEgIwAwAnUmg5F
-         SUVQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1774628209; x=1775233009; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZWBSGmgMx2VtQsPuBnSVVG+3OGW1QLkqIN3lGz/DvMk=;
-        b=DFy4uEAnTlnFHKKUHkBYeA9chXDxANDkjgQJjc1mGUnvk4lzd8F63TY3Yov3FJNJ6D
-         x6CiT4w91n4oqLC3gZ9NEafT05O7Eupppi/ePWoO9/Z1rUeb/kpPK9+wTxQ1ikWAJxv+
-         hPCy4lQh9EgGi5f7Go5vGprQT3Vgh4k3SNeEGHZ0QopHK/i/58TtIUd0J0JLGNBLGTu+
-         AWpT9qmDOX6oGtAoexjl4eHY9d5ipt8yPIR+5YI5D6RvZqc4M4bT/RNrT9qSxKsXk0O4
-         excuqyeZMiKdiXmcsvlHGth4oY30vnMdLHMaFMu8ZPrTK9RMXoAcEKpe3Fpkk/ckKZxJ
-         SBSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774628209; x=1775233009;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZWBSGmgMx2VtQsPuBnSVVG+3OGW1QLkqIN3lGz/DvMk=;
-        b=h3EvoupgrXOxMyCPKbldKzcBPfKsMKebmVA+cHZNfzNDS25zLhKAMVWhyA4xfiLhLF
-         +ri96qjAXDQOQMGrU27+Vyli/0Fyn7WLkfz34F3d7gg8PzxCIQ0mr1pagUIDhDVCO36b
-         YN5kFXKnvJnZKzIM+OiXiwY5E4HKVRM6cOehu4YvT8cIvmXWc9dPyCPFQKULYQI9bOws
-         pZa5kQbeiAlO91hW4PK7oyBJVC9y4B+7Yz58rPkOmi3uj5EdrqRObcgvVxne/9H345tt
-         5MiFIy5BNf4Xt+gGTwQbml7pKWT6wzJdNekLUdInv+7BI+z9JVjG7ydB3g0DGRTykOyA
-         bdNA==
-X-Gm-Message-State: AOJu0YybsrA8kWHO6jn77Tz3mXNANOrbJ1QpkSv6sQkUyNms3oFmgKyo
-	Kq9b/K+zplHSgEN/1rjf2tp5LAW2zU4zcv+HfPpFa6ipeu3RWhkbbFzKdGnCaqXtg6CDR3GEdMN
-	aNltmKQrMBE8O9j1qYgAGx8xVPGxGT3D77KqFy5r/VMXdWUIGvn6wImPZHQ==
-X-Gm-Gg: ATEYQzxg/OxpAG49CF+cRF/t6KxZvBZ4c9j+ujb4/s9mC0JP3BiDqqufXmJe30mLSNw
-	wJD8wzbV8nxZ3weKW0J+KiL/gmwDPPN6ne0bnpC9PsmJieIkKz9qhJPxD3UX1u+YTwbPSwRNDD5
-	qDLQ3pDXfHPkErGrk8uYoZZAAr0fI0m+s7uzBjrz9Q/w7QnseUElOJQ7s36HgI9gmB9X3WG8sDp
-	G3h28RpwbWE88lUOiFSTRjH0adRWjERscCnqdsn35GCGnCmqKQ11DvdMN8llE1hETQZeAWceEN2
-	wa8BqA==
-X-Received: by 2002:a17:907:809:b0:b88:6164:6421 with SMTP id
- a640c23a62f3a-b9b50351d51mr240512966b.16.1774628209355; Fri, 27 Mar 2026
- 09:16:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB798BA45
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 16:17:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774628279; cv=none; b=fIZkgfraA18dW5hdif/LDQY8nCTGPAAQudUBOMjciQsyEIv7HpjCykmwPW4uFc9zEMlEDvfrs4zwbY0C4mO0R8x+XVnS1sGitiBO4Z5PlMVeX5CSoxUZ47u+kcINLpCKiDnzCzeG8TQh/KvxZAqETckcWHNnIWQpVBvnOuS1riQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774628279; c=relaxed/simple;
+	bh=Jvj0H0BNMwrqy0vdbAzVJC4giq+CsIV6NXI94MTEosc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EF3eHuwoEAI5+WkaskfUoP5C1ZXnn/C3M8DGkuY28cfaMGkoTGq3hEXKiVBR0zJY4UxAFfE3jTP+9U3Zoz2xTZl79AohN2HWP/qVu+s9gREDYHaA9EhOdLjlk0jW4RhlJ/c01e2mMw1AeLDZLrIGG3LwzGc9QSyCck9EBDQmrwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=BbtTUVri; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=fhSjZHFW8NlZLwfI5rvfaifkSdytoybhbBeCfm6NEvI=; b=BbtTUVriK08BrG+iemILYLe4Nb
+	M8rdaLtX3hrXzPxtEkTYqRta3e63SWT34ts0EPCxYDzGJSUpoqJcYrMo7uzQcbBc/GinRZ+1Tb3dy
+	L+aOH+yyNaDlaIfW7KxT3P85nKBBBTyREOXqHGpuoVRQOoYdl6w+lIhVlwPCEtQOsXk/rEfZNyODl
+	H4Gw2FCJq018PP7Kfgh1HJ56bxc6qY+OYawdoQdprFYFhedJDOMglE9/np8+5G9CK2t8BnHWt20TL
+	FFXz4Np91E+/Q4Lv43xwL/pLphby5NUy7iJQUHI+UU153aKKLS2sO6GKu9ql2YvYIZlDkhCEXMXfR
+	YES1Y/iA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43574)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w69sd-000000006OK-0kIf;
+	Fri, 27 Mar 2026 16:17:51 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w69sa-000000008Ah-3Fii;
+	Fri, 27 Mar 2026 16:17:48 +0000
+Date: Fri, 27 Mar 2026 16:17:48 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexis Lothore <alexis.lothore@bootlin.com>
+Subject: Re: [PATCH net-next] net: phylink: allow PHYs to be attached in
+ 802.3z inband mode
+Message-ID: <acatrPb1DdHuyVoL@shell.armlinux.org.uk>
+References: <E1w66jW-0000000E3qS-23fW@rmk-PC.armlinux.org.uk>
+ <a5d7aedb-9770-492f-b528-0a28a652279b@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260325134439.3048615-1-louis.scalbert@6wind.com> <20260325134439.3048615-2-louis.scalbert@6wind.com>
-In-Reply-To: <20260325134439.3048615-2-louis.scalbert@6wind.com>
-From: Louis Scalbert <louis.scalbert@6wind.com>
-Date: Fri, 27 Mar 2026 17:16:38 +0100
-X-Gm-Features: AQROBzBRs-WiOd15Hl2riQv8IqvG1MboKmjqbWz1RnhuaaPq0QwngJF8IQOBW8E
-Message-ID: <CAJ5u_OcpOGSPYK-EzYeW8LdpJrLd16fGn6zN6cvk+tCjCi+QxA@mail.gmail.com>
-Subject: Re: [PATCH net v2 1/3] bonding: 3ad: fix carrier when no valid slaves
-To: netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch, jv@jvosburgh.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, fbl@redhat.com, andy@greyhouse.net, 
-	shemminger@vyatta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a5d7aedb-9770-492f-b528-0a28a652279b@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [-0.36 / 15.00];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[6wind.com:+];
-	TAGGED_FROM(0.00)[bounces-272616-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-272617-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[louis.scalbert@6wind.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.994];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,6wind.com:dkim,6wind.com:email,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: C6B653475D5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,armlinux.org.uk:email,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: EED8934770C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi everyone,
+On Fri, Mar 27, 2026 at 04:44:23PM +0100, Maxime Chevallier wrote:
+> Hi Russell,
+> 
+> On 27/03/2026 13:56, Russell King (Oracle) wrote:
+> > Now that we have proper decision making for inband mode support which
+> > makes it a "best efforts" feature based on the capabilities of the PHY
+> > and PCS, we can relax whether we expect and permit a PHY to be
+> > attached. This is especially true for the 2500BASE-X case which some
+> > PHYs use without inband on their host side interface for 2.5G speeds,
+> > but use inband for slower speeds switching to SGMII on their host side
+> > interface.
+> > 
+> > We already have such a case for some qcom-ethqos setups, although
+> > qcom-ethqos overrides phylink's inband settings by accessing the PCS
+> > directly at the moment. This should allow qcom-ethqos to transition to
+> > defaulting to inband when 2500BASE-X or SGMII is specified in its DTS.
+> > 
+> > Allow PHYs to be attached when inband mode has been specified, which
+> > will be necessary to allow inband mode to be used on qcom-ethqos.
+> > 
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> >  drivers/net/phy/phylink.c | 8 ++------
+> >  1 file changed, 2 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> > index 087ac63f9193..1c178038e6f1 100644
+> > --- a/drivers/net/phy/phylink.c
+> > +++ b/drivers/net/phy/phylink.c
+> > @@ -1965,9 +1965,7 @@ EXPORT_SYMBOL_GPL(phylink_destroy);
+> >   */
+> >  bool phylink_expects_phy(struct phylink *pl)
+> >  {
+> > -	if (pl->cfg_link_an_mode == MLO_AN_FIXED ||
+> > -	    (pl->cfg_link_an_mode == MLO_AN_INBAND &&
+> > -	     phy_interface_mode_is_8023z(pl->link_interface)))
+> > +	if (pl->cfg_link_an_mode == MLO_AN_FIXED)
+> >  		return false;
+> >  	return true;
+> >  }
+> > @@ -2206,9 +2204,7 @@ static int phylink_attach_phy(struct phylink *pl, struct phy_device *phy,
+> >  {
+> >  	u32 flags = 0;
+> >  
+> > -	if (WARN_ON(pl->cfg_link_an_mode == MLO_AN_FIXED ||
+> > -		    (pl->cfg_link_an_mode == MLO_AN_INBAND &&
+> > -		     phy_interface_mode_is_8023z(interface) && !pl->sfp_bus)))
+> > +	if (WARN_ON(pl->cfg_link_an_mode == MLO_AN_FIXED))
+> >  		return -EINVAL;
+> >  
+> >  	if (pl->phydev)
+> 
+> So I've tested that on my socfpga setup, and I now get this when trying to
+> bring an interface attached to an SFP up :
+> 
+>   socfpga-dwmac ff702000.ethernet eth1: no phy found
+> 
+> This wasn't showing before because our DT has :
+> 
+>   &gmac1 {
+>     status = "okay";
+>     phy-mode = "1000base-x";
+>     managed = "in-band-status";
+>     sfp = <&sfp>;
+>   };
+> 
+> It used to kinda work because the problem was hidden with the use of "1000base-x"
+> as the PHY mode.
+> 
+> Now with this patch, using "sgmii" or "1000base-x" as the phy-mode doesn't
+> do any difference, as expected.
+> 
+> The real issue IMO is rather how stmmac_init_phy() behaves, it's guarded by:
+> 
+>   if (!phylink_expects_phy(priv->phylink))
+>           return 0;
+> 
+> and then tries to find a PHY, failing if there's none. We should probably add
+> an extra check there to say "if we have a PCS, then it's OK not to have a PHY" ?
 
-Le mer. 25 mars 2026 =C3=A0 14:44, Louis Scalbert
-<louis.scalbert@6wind.com> a =C3=A9crit :
->
-> When an 802.3ad (LACP) bonding interface has no slaves in the
-> collecting/distributing state, the bonding master may still report
-> carrier as up. In this situation, no slave is actually able to transmit
-> or receive traffic.
->
-I=E2=80=99ve just realized that the issue description is not entirely accur=
-ate.
+I had a feeling that we'd run into this, because stmmac is somewhat
+"special" (for all the wrong reasons.)
 
-Bonding links that are not in LACP Collecting/Distributing state are
-excluded from traffic
-distribution in favor of those that are. However, if no links are in
-Collecting/Distributing state,
-the kernel considers all links as valid for distributing traffic.
+phylink has, for a long time, had "we must have a PHY" when it operates
+in MLO_AN_PHY mode, "we must not have a PHY" when it operates in
+MLO_AN_FIXED mode, and "we may or may not have a PHY" when operating in
+inband depending on the PHY interface mode.
 
-> As a result, upper-layer daemons consider the interface operational
-> while traffic is effectively blackholed.
+stmmac basically doesn't support the latter - it assumes that if a PHY
+node is not present, then it needs to fall back to the PHY addressed
+by priv->plat->phy_addr, and if that's not specified, then it errors
+out. phylink_expects_phy() was added to try and workaround this.
 
-There are situations where traffic is not blackholed.
+I suspect that if you specify:
 
-For example, a Linux machine A is connected to machine B using two
-aggregated links.
-On A, LACP is configured, but not on B. As a result, LACP will not
-reach the Collecting/Distributing
-state since B does not send LACP frames. However, the bonding
-interface will still be up on both
-sides, and traffic can be exchanged.
+   &gmac1 {
+     status = "okay";
+     phy-mode = "sgmii";
+     managed = "in-band-status";
+     sfp = <&sfp>;
+   };
 
-This behavior is, of course, not compliant with the LACP (802.3ad)
-standard, but applying this fix
-as-is could introduce regressions in some setups. Under normal
-conditions, having no Collecting /
-Distributing links means that no interfaces are operational for
-handling traffic - that is precisely the
-purpose of using LACP.
+without this patch, you'll run into the same problem - while phylink
+would be perfectly happy, stmmac decides "we must have a PHY!" because
+phylink_expects_phy() will return true for this.
 
-I will publish a new version with a knob to enforce compliance with
-the LACP standard. It will be
-disabled by default for backward compatibility.
+As I've recently said, I think we're more or less boxed in between a
+rock and a hard place because of the hacks that qcom-ethqos introduced
+with its PCS support. At the moment, I am failing to see any path where
+the stmmac PCS can be programmed for inband according to phylink's
+wishes and qcom-ethqos can be made to work without its hacks.
 
-What do you think of "lacp_strict" or "lacp_enforce" ?
+This all ultimately comes back to the half-hearted phylink conversion
+of stmmac that was done behind my back without my review. Had the
+conversion been done fully, and kept up with the phylink changes for
+PCS support, then we probably wouldn't be in this situation today.
 
->
-> Fix this by asserting carrier only when at least 'min_links' slaves are
-> in the collecting/distributing state (or collecting only if the
-> coupled_control default behavior is disabled).
->
-> Fixes: 655f8919d549 ("bonding: add min links parameter to 802.3ad")
-> Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
-> ---
->  drivers/net/bonding/bond_3ad.c | 24 ++++++++++++++++++++++--
->  1 file changed, 22 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3a=
-d.c
-> index af7f74cfdc08..6d3613755d45 100644
-> --- a/drivers/net/bonding/bond_3ad.c
-> +++ b/drivers/net/bonding/bond_3ad.c
-> @@ -745,6 +745,22 @@ static void __set_agg_ports_ready(struct aggregator =
-*aggregator, int val)
->         }
->  }
->
-> +static int __agg_valid_ports(struct aggregator *agg)
-> +{
-> +       struct port *port;
-> +       int valid =3D 0;
-> +
-> +       for (port =3D agg->lag_ports; port;
-> +            port =3D port->next_port_in_aggregator) {
-> +               if (port->actor_oper_port_state & LACP_STATE_COLLECTING &=
-&
-> +                   (!port->slave->bond->params.coupled_control ||
-> +                    port->actor_oper_port_state & LACP_STATE_DISTRIBUTIN=
-G))
-> +                       valid++;
-> +       }
-> +
-> +       return valid;
-> +}
-> +
->  static int __agg_active_ports(struct aggregator *agg)
->  {
->         struct port *port;
-> @@ -2120,6 +2136,7 @@ static void ad_enable_collecting_distributing(struc=
-t port *port,
->                           port->actor_port_number,
->                           port->aggregator->aggregator_identifier);
->                 __enable_port(port);
-> +               bond_3ad_set_carrier(port->slave->bond);
->                 /* Slave array needs update */
->                 *update_slave_arr =3D true;
->                 /* Should notify peers if possible */
-> @@ -2141,6 +2158,7 @@ static void ad_disable_collecting_distributing(stru=
-ct port *port,
->                           port->actor_port_number,
->                           port->aggregator->aggregator_identifier);
->                 __disable_port(port);
-> +               bond_3ad_set_carrier(port->slave->bond);
->                 /* Slave array needs an update */
->                 *update_slave_arr =3D true;
->         }
-> @@ -2819,8 +2837,10 @@ int bond_3ad_set_carrier(struct bonding *bond)
->         }
->         active =3D __get_active_agg(&(SLAVE_AD_INFO(first_slave)->aggrega=
-tor));
->         if (active) {
-> -               /* are enough slaves available to consider link up? */
-> -               if (__agg_active_ports(active) < bond->params.min_links) =
-{
-> +               /* are enough slaves in collecting (and distributing) sta=
-te to consider
-> +                * link up?
-> +                */
-> +               if (__agg_valid_ports(active) < bond->params.min_links) {
->                         if (netif_carrier_ok(bond->dev)) {
->                                 netif_carrier_off(bond->dev);
->                                 goto out;
-> --
-> 2.39.2
->
+Unfortunately, the driver is going to keep breaking all the time that
+it abuses phylink, and at the moment I see no way to stop this sodding
+driver abusing phylink.
+
+Can we not just delete this bloody driver and be done with it? :D
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
