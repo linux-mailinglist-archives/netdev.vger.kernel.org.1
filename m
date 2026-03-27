@@ -1,185 +1,166 @@
-Return-Path: <netdev+bounces-272550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yBobEfh7xmnwKgUAu9opvQ
-	(envelope-from <netdev+bounces-272550-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:45:44 +0100
+	id eMm/HMV9xmlTLAUAu9opvQ
+	(envelope-from <netdev+bounces-272551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:53:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 874A8344824
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:45:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB72334497E
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:53:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 640683026C29
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:39:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EDC04300FEDB
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA2C229B18;
-	Fri, 27 Mar 2026 12:39:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772433AF669;
+	Fri, 27 Mar 2026 12:49:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nZfPPg9c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zka115Wk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1333C221DB6
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 12:39:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774615165; cv=pass; b=oprMC3t1/qZ8CMC/2ZNwviHbOg85oVb7PTzv+iVN2sK7Ef5O20MrFF2vf5WT4ZnCvWNH7FeCWnTRUVoR2RHRV4kwN4eFgmKYkicQn0HE36vtR/F8j89io1YA+jy33scRX3A3nKWfJHoFB4BR8X07iImYzykGevrtoJ15K2S0pKs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774615165; c=relaxed/simple;
-	bh=9yUDwreZVAO3aCgvkkcmjPsNpZ0NGYYbXQDmMvro/NE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Cjl8L4YgrOKwmv0o1AU5c1cuHgBPu9QmQ+MAla62cm00SutJX63mtCohLnOKro+wWH0jaWN/KQylrFf+9e1WFNITqc0YCJfjCAq6Cptzj4YvF1qyz72gI6ZepYNFzb2N1DOcnnbflkfel3MA2z1VYrYFx7DEKkVCqwP8LG+M2D8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nZfPPg9c; arc=pass smtp.client-ip=74.125.224.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-6500040f128so275542d50.0
-        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 05:39:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774615163; cv=none;
-        d=google.com; s=arc-20240605;
-        b=QsBsIub+q3JNhv3M2VhIBRb198yfSeoZ7A4kXJfCrodlCHwu/MGgX1Z3wQQ2QUuO+g
-         y4jd1zK2lyKagaPW8S2NMVVp3aKHZcAsLavZpFeFxZWRu1tPmnkZSSl1Mul8XezKe68I
-         4Bl0UQeBFZwjo3ujoksAJg+QOHl4vXrCRVCSxQcthhhMXeVyuNyNJyLJl2NS1S9akd5z
-         NduoZdGwDIv5s73yFlwGOjK3CAJdqoZZ5sDdBCtY8e+nOtEW3ETEmHJuHb9J+AlCA0jc
-         sJhdVVsrkQ6N2UWAz5zwhE4sZa7iOG2BT5pJzIQ1QqPPLYEKodgM8LdH2eNEVkRO0RFS
-         R5nQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=9yUDwreZVAO3aCgvkkcmjPsNpZ0NGYYbXQDmMvro/NE=;
-        fh=dixpFNCZVxfxzOHxM5gyKeUQD2jNN8HaksYrghNk+nQ=;
-        b=V1zE47bSu5xH1z3H2mHmWDyX6QiJjtbGc5x3g2KcqwgZcrYQqvE2aU01kBoBw3ncwP
-         9Ts596aN3nHhM8hyNh6YFBB55UQH7ohWe7hcfLiDz6NZ9KR/60CrsLmrXc7KXww2X+SZ
-         RChSOe3feLPyGkF5i/fQ5o/nD8+rHVmKJMhvPUI6qtZt+gePNFDOIIwPPTSCb+5S2HtM
-         WynsiUV25yz6IE+09cxFfyMZLiilTAHPomc/6cFB2BjdpThOPkjtn593KKqCwuwn32WU
-         gqFnIL1BOfpq8H/238006WsTlk5Z37DAGYWcg48udLms/s+L+t+FuB9hEeLERtQS5HNd
-         IBfA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774615163; x=1775219963; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9yUDwreZVAO3aCgvkkcmjPsNpZ0NGYYbXQDmMvro/NE=;
-        b=nZfPPg9cyym33ia3X5tDthwBqAVI1CRF+E/nPYenZQABTctGnlIDiSg7i1bzKgTOBF
-         axmJNU3QlhD7/IfQ7beAiGjRCIv4p0KLt6Y6egYVRBZvTCN59pLxsUckc/5iavN7WXnO
-         +1l+DoESaOYXaVtSQnF37S2iTFnnVbet23NW1EG282H5sVakuxtQ89aIL4O+96qZNyEz
-         0IBYSbaXUR4IfkCaUu2D/845hwXrDaeRuaXHsnfrk86TSL65hNQEeZF/TAGm0xgUjhGX
-         g6Lc4Tpnfl65om1rQIQlTqaUizpEQl3JsIp3n5kqKguSn35BSmP9H7vxPxM7ZHdNI0Zi
-         Ke8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774615163; x=1775219963;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9yUDwreZVAO3aCgvkkcmjPsNpZ0NGYYbXQDmMvro/NE=;
-        b=d9H+yUwNm21GjmThnWs23a1J0rA78ZeIN/PJLEj1QDBoDEHs5yVgixQhSfXcSxRUdM
-         3DdKg27id9v8IQjoTwTawrZvzBgemMqF2TH8PBhUNm7L/2vBMhpm9TxAU4+RUl5xYfZj
-         6nsY3qFTBCEzehTdk8tCGRJY3+x2GVGGKQi6/P3ggbIR1hTXWOPFi3vHAxAurfsK2BYh
-         q6y8QIagi7f3IDFStVG2C+xB73p9pYuguPSvinIPTya3gG/ydrAUeW7JzQmJ4pSqypAg
-         F/bRLNxAhX1p57MSf5ioo3vGRvttpzogV5JWdNUDv4eH/g4WXG5mVTRjpxHPTi0F/e/0
-         2qCA==
-X-Forwarded-Encrypted: i=1; AJvYcCWECUp7t4wggtSnzHk3lcF8NsxyMAmgnmU3sngbMHAlpev3bR2ZYQzBnut75eUgKmYzSnjox3Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLOOFsnFZ0wRoRkw3/lFfRQALBGTL22So66/t7bPzAR+WtQkOz
-	dHBPQOz2SrUylUkSnlkMF4siMxrm0B+ibhWSaGYiTWBDbTEk87Wqb00y8orVtw6Px3g1uFfPW4T
-	Uy2x6hMyqXoOfbSAWh2LT7WVveoBmtVo=
-X-Gm-Gg: ATEYQzzscclfmDRdKkI6hWKgb4wG/P8UghQ3igSqks204NoB3GFU9w+YEz89LudYAtA
-	ZPORP8JqfKGmk1GhPoE3c/QxCjDlx7N7X2/a69oqbDOenoECLf6kYnYhEv6wbe197qLM0278uBN
-	ze/Z82YoXnPKXGkO57iDNLj/4ltKk6O1YDgbBSHjEvXngLyXTI91wFHLr9aUrImyifmS3sZoRBb
-	jvLzdZoiX1eUpVp2XjfIZbMDYOInrlDmtosGQHWzyejNrfQd+O7C+VSmnAe1hHaniTIeuJHC4eT
-	JAHO4u7B+4hxhEh3z6xYSM0cEHoHVmKrI1v9
-X-Received: by 2002:a05:690c:89:b0:79a:62a2:b3a6 with SMTP id
- 00721157ae682-79bde0b0487mr20276607b3.29.1774615163125; Fri, 27 Mar 2026
- 05:39:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54ACB39890F
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 12:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774615760; cv=none; b=pNUx8lepQEGZhrA+Vrv8y/VzIFGQVvwXKLY9LVUT2APphtq1FLiAzq9dZsQ+xHXNMXY20cJ/DmbBFgIJ+5p3tB1YmAG7bzCTJjkVgrah4h7ZDiX614lTd/jhBwZF3iQoq2U8tjt2P1yDq228jmiDnSdiSY2uWiap8DHw//us568=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774615760; c=relaxed/simple;
+	bh=b7ElzXcXcist9AsYV8c8hZGYqPwSpchrOE5v/dVGw/M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OfyQep261NfoXZJs3EqEN54Rs2ZezOQrAQmhTp1mLwzVhOQzW4r5MMeOnXJ00SGXU8EyR8tlwZI2AjUqnAsNHoz7wD2maLjrKk6qaqMSFBeNG9NxZD/OnTqIaZN/NPeUV06HI3IiGF6zVuEJq2k6nqznlTQjmNCFcx18ypmDptI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zka115Wk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23982C19423;
+	Fri, 27 Mar 2026 12:49:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774615760;
+	bh=b7ElzXcXcist9AsYV8c8hZGYqPwSpchrOE5v/dVGw/M=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Zka115Wk8Hvqqmq44xi4NOiyHs3Or/Otg7CVznzDi6LC5iUMLKCzhe1eFxi86EXZS
+	 ze8m1Zdlok+9DXOLhVT3foFRC2aXFLf8VJWApomUZ3ucb61ZRjmJhmpiX3GZMJ21LO
+	 aUzO5cM2/4RySWnYX4xrlzAUSzsHWd+hSjEyi3XkXP+4LhXIHx3PEhF92gvEUHZeG0
+	 6EYaeV5n2xHPgsyCP7HDZJZnCnIjj9F7RfyBa1w8WW7ehDl1hMKuzfmtbIyY0haA5G
+	 3rmL78nrlNq+mqyqCccEEMBRdaEV4Gi8zcDvLyjr+4fj92ELeZi7c+wQb3dwkiuYul
+	 bwDiCNao/V9Pg==
+Message-ID: <7f00346d-5dc6-421b-8d61-75c1c3898c30@kernel.org>
+Date: Fri, 27 Mar 2026 13:49:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260326021642.29170-1-dqfext@gmail.com> <20260326081304.xKa7-s_1@linutronix.de>
- <CALW65jYdzn_rZWa2zwYd5J+Gd=kyaGMsVFyX0fMJfKfgULMO6w@mail.gmail.com> <acZp3gRUqVIbw9yb@debian>
-In-Reply-To: <acZp3gRUqVIbw9yb@debian>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Fri, 27 Mar 2026 20:39:11 +0800
-X-Gm-Features: AQROBzDc-YGc2NLhX5E2vD7ZT3JvJ1z5OznSsvZlnQxdHln3jtYE9PJclSiuybM
-Message-ID: <CALW65jZNi3oA7V7at_Jr5Vr4AdL03JYdA9WeK5G7cNr-XS2Bvg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4] selftests: net: add tests for PPP
-To: Guillaume Nault <gnault@redhat.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Shuah Khan <shuah@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Felix Maurer <fmaurer@redhat.com>, Antonio Quartulli <antonio@openvpn.net>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-ppp@vger.kernel.org, 
-	netdev@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/5] veth: add Byte Queue Limits (BQL) support
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jhs@mojatatu.com,
+ jiri@resnulli.us, j.koeppeler@tu-berlin.de, kernel-team@cloudflare.com,
+ Chris Arges <chris.arges@gmail.com>,
+ Mike Freemon <mike.freemon@cloudflare.com>
+References: <20260324174719.1224337-1-hawk@kernel.org>
+ <87h5q1d2j9.fsf@toke.dk>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <87h5q1d2j9.fsf@toke.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-272551-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,resnulli.us,tu-berlin.de,cloudflare.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-272550-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linutronix.de:email,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 874A8344824
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hawk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,medium.com:url]
+X-Rspamd-Queue-Id: AB72334497E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 27, 2026 at 7:28=E2=80=AFPM Guillaume Nault <gnault@redhat.com>=
- wrote:
->
-> On Thu, Mar 26, 2026 at 04:26:23PM +0800, Qingfang Deng wrote:
-> > Hi Sebastian,
-> >
-> > On Thu, Mar 26, 2026 at 4:13=E2=80=AFPM Sebastian Andrzej Siewior
-> > <bigeasy@linutronix.de> wrote:
-> > >
-> > > On 2026-03-26 10:16:24 [+0800], Qingfang Deng wrote:
-> > > > Add ping and iperf3 tests for ppp_async.c and pppoe.c.
-> > >
-> > > Oh thank you for doing this.
-> > > I haven't look in detail but this cover the "invalid loop" cases that
-> > > ppp tries to catch?
-> >
-> > By "invalid loop", do you mean transmit recursion?
-> > https://lore.kernel.org/all/20250715150806.700536-2-bigeasy@linutronix.=
-de/
-> >
-> > AFAIK, this can only happen with PPTP or L2TP, which were not included
-> > in this patch.
->
-> The problem was originally reproduced using L2TP, indeed. But I guess
-> that it could also be reproduced with PPPoE by using a UDP tunnel
-> device like VXLAN (like sending a packet through a PPP interface,
-> handled by PPPoE, running on top of a VXLAN device, that routes the UDP
-> encapsulated packet back to the original PPP interface).
 
-Yeah I've thought of that also. It can technically happen, though
-there's no practical use. For self tests purpose, I may just add the
-recursion test into PPTP or L2TP tests.
 
-Regards,
-Qingfang
+On 27/03/2026 10.50, Toke Høiland-Jørgensen wrote:
+> hawk@kernel.org writes:
+> 
+>> From: Jesper Dangaard Brouer <hawk@kernel.org>
+>>
+>> This series adds BQL (Byte Queue Limits) to the veth driver, reducing
+>> latency by dynamically limiting in-flight bytes in the ptr_ring and
+>> moving buffering into the qdisc where AQM algorithms can act on it.
+>>
+>> Problem:
+>>    veth's 256-entry ptr_ring acts as a "dark buffer" -- packets queued
+>>    there are invisible to the qdisc's AQM.  Under load, the ring fills
+>>    completely (DRV_XOFF backpressure), adding up to 256 packets of
+>>    unmanaged latency before the qdisc even sees congestion.
+>>
+>> Solution:
+>>    BQL (STACK_XOFF) dynamically limits in-flight bytes, stopping the
+>>    queue before the ring fills.  This keeps the ring shallow and pushes
+>>    excess packets into the qdisc, where sojourn-based AQM can measure
+>>    and drop them.
+> 
+> So one question here: Is *Byte* queue limits really the right thing for
+> veth? As you mention above, the ptr_ring is sized in a number of
+> packets. On a physical NIC, accounting bytes makes sense because there's
+> a fixed line rate, so bytes turn directly into latency.
+> 
+> But on a veth device, the stack processing is per packet, and most
+> processing takes the same amount of time regardless of the size of the
+> packet (e.g., netfilter rules that operate on the skb only).
+> 
+> So my worry would be that when you're accounting in bytes, if there's a
+> mix of big and small packets, you'd end up with the BQL algorithm
+> scaling to a "too large" value, which would allow a lot of small packets
+> to be queued up, adding extra latency (or even overflowing the ring
+> buffer if the ratio is large enough).
+> 
+> Have you run any such experiments? 
+
+Thank for bring this up.
+Yes, we have considered this (and agree).
+
+Jonas is conduction some experiments.
+I will let Jonas answer?
+
+ > And have you tried just accounting> the queue in packets, so instead of:
+> 
+> +		netdev_tx_sent_queue(txq, skb->len);
+> 
+> you'd just do:
+> 
+> +		netdev_tx_sent_queue(txq, 1);
+
+I've been playing with using 1000 instead of 1, as that seems to work
+better with the DQL algorithm[1].
+
+--Jesper
+
+[1] 
+https://medium.com/@tom_84912/byte-queue-limits-the-unauthorized-biography-61adc5730b83
+
+
 
