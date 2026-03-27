@@ -1,72 +1,53 @@
-Return-Path: <netdev+bounces-272328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kEHWBzbkxWkeCwUAu9opvQ
-	(envelope-from <netdev+bounces-272328-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:58:14 +0100
+	id AJDtE/3kxWkeCwUAu9opvQ
+	(envelope-from <netdev+bounces-272331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:01:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8283333E06C
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:58:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C963733E0BD
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:01:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8F930301454C
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:53:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 588B03037880
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76ABF3126D0;
-	Fri, 27 Mar 2026 01:53:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0C331352B;
+	Fri, 27 Mar 2026 02:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="JVoBqhgB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="km4u8iZL"
 X-Original-To: netdev@vger.kernel.org
-Received: from n169-110.mail.139.com (n169-110.mail.139.com [120.232.169.110])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A870178F59;
-	Fri, 27 Mar 2026 01:53:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5935519DFAB;
+	Fri, 27 Mar 2026 02:00:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774576406; cv=none; b=axgPqbXHf7M5MkhuzsJq6NfzCHvZwGmR2WQg3q5FnOyA7HiR/H255XTCiI3jNLxFfYR9m5VC5jLvXRiV7f5/JYuhSkHWwVuTmvI2P8M1hbKQDWp4NfJK6c/4SY1I6rmtCA2trvnr6P2AfQfDpBT3qtEXx1J6b6oem2o9QPLrXNw=
+	t=1774576823; cv=none; b=A45K981+kjZwADhVmt/qDbNV7Tj6eGxYgNJYhCNpcOMZzCr5U18GUz6su+/O7RISnvsIWkkB1NhzymAnC+I1MlZBubd65imzE5aVJpESTDcDjSIQTyw9x+I+bdgRrbyRwUQOCc71ynPGDuiRXhmXPgHBp0aA7XdAdJ2fsrhEW7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774576406; c=relaxed/simple;
-	bh=/eB1/rf/CU2pvZVuVrWldNffSXGURHHOo9QBNHEohe0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F1PuLWZh1BKrU/N+ImEqpZ+oUwk37D97hcbqPyVb2UYyLszlW8EoNexWZz2LCa5lM/YLSkI6mVhP+yT8ZpM0d0ZXm+Yol0d8/yDXOhsl/RXFGw5ya07sQTcYIuw8/TMVextMXbpwHOF3ET+KKKHNjj/z9HQTT6FeACf8iergzPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=JVoBqhgB; arc=none smtp.client-ip=120.232.169.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=139.com; s=dkim; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=JVoBqhgBWEtkybUwaYzrDk2dTYsUbfYBp95J5ZDNnBZly69MW0GGAF273QckNAfPOdAyijUp04tsB
-	 yJHl/YdQNpTk2DNZ/T58k8PLd/IFp6/cjV3QolSJkM4fJwaAVKoyjjTs3GIbtOpjeYbKdQVJDRD+7U
-	 puc7nsaHdHrrvRWw=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM:                                                                                        
-X-RM-SPAM-FLAG:00000000
-Received:from NTT-kernel-dev (unknown[60.247.85.88])
-	by rmsmtp-lg-appmail-08-12086 (RichMail) with SMTP id 2f3669c5e305cda-01cff;
-	Fri, 27 Mar 2026 09:53:14 +0800 (CST)
-X-RM-TRANSID:2f3669c5e305cda-01cff
-From: Rajani Kantha <681739313@139.com>
-To: gregkh@linuxfoundation.org,
-	stable@vger.kernel.org,
-	rmk+kernel@armlinux.org.uk
-Cc: patches@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	vladimir.oltean@nxp.com,
-	netdev@vger.kernel.org,
-	xu.yang_2@nxp.com
-Subject: [PATCH 6.1.y 3/3] net: phy: fix phy_uses_state_machine()
-Date: Fri, 27 Mar 2026 09:53:16 +0800
-Message-Id: <20260327015316.1713133-1-681739313@139.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1774576823; c=relaxed/simple;
+	bh=TCG5jlX9DJKAtBu1/6DKurvT+cHPOipTgn1Rr2S3Vxw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=YG514Xti0TQcKQzYPugg1amkCX/drtJxdFqWZNS54kAve0VPdD2K1VLlNubS31F3mOyGlTYiTD+ukvMRgS68dBgv9KWiC+sQjIQQD1ffGyENp4sIXO68aRXWihBehOoi+n+8Vzr/aY1Eytv4zMOPwBqi7ra3j/LkksGr2c2j/kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=km4u8iZL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADA1FC116C6;
+	Fri, 27 Mar 2026 02:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774576822;
+	bh=TCG5jlX9DJKAtBu1/6DKurvT+cHPOipTgn1Rr2S3Vxw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=km4u8iZL/2TVux6hMiZQI7TpCWoQCnoUF0HIwPWVwuhICN4cbyxMb3kTGDmphkImP
+	 ZMG7daXAYVTC3f0SraiTMYYSSR1QIh/bKMS/Kut9HJjlWY8EjA6K5srYvGvR+XM8kS
+	 QHzBlyjWpd1XYPXpp0/ZuG6L+I791x+48zmc+dW7E8upY6H6sFEZtivYxN5M6RZbz/
+	 A3yFdED66xru3cmg0LmQjNglVaiMZoz+vgXJOnVCVFUqMY6IYvoN4+BnNIReVSzaBb
+	 M8ryc6kz3zD6+S3jcIvSkzTu1U9Xqd4hs8Jjqgl1jBvhS3kNtMJhUQA/yBHqKhalSk
+	 hxYD0/NkXdg0g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FE7E3809A07;
+	Fri, 27 Mar 2026 02:00:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,114 +55,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [2.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Subject: Re: [PATCH net-next] selftests: net: Remove unnecessary backslashes
+ in
+ fq_band_pktlimit.sh
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177457680880.3259194.10020144008504466264.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Mar 2026 02:00:08 +0000
+References: 
+ <dd0bbd48cdf468da56ec34fd61cecd4d2111d7ba.1774372510.git.yk@y-koj.net>
+In-Reply-To: 
+ <dd0bbd48cdf468da56ec34fd61cecd4d2111d7ba.1774372510.git.yk@y-koj.net>
+To: Yohei Kojima <yk@y-koj.net>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[139.com:s=dkim];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[139.com];
-	TAGGED_FROM(0.00)[bounces-272328-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,nxp.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[139.com];
-	FROM_NEQ_ENVFROM(0.00)[681739313@139.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272331-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[139.com:-];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	NEURAL_HAM(-0.00)[-0.991];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,nxp.com:email,armlinux.org.uk:email,139.com:email,139.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8283333E06C
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[fq_band_pktlimit.sh:url]
+X-Rspamd-Queue-Id: C963733E0BD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Hello:
 
-[ Upstream commit e0d1c55501d377163eb57feed863777ed1c973ad ]
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-The blamed commit changed the conditions which phylib uses to stop
-and start the state machine in the suspend and resume paths, and
-while improving it, has caused two issues.
+On Wed, 25 Mar 2026 02:20:28 +0900 you wrote:
+> Address "grep: warning: stray \ before white space" warning from GNU
+> grep 3.12. This warns the misplaced backslashes before whitespaces
+> (e.g. \\' ' or '\ ') which leads to unspecified behavior [1].
+> 
+> We can just remove the backslashes before whitespaces as POSIX says:
+> 
+>   Enclosing characters in single-quotes ('') shall preserve the literal
+>   value of each character within the single-quotes.
+> 
+> [...]
 
-The original code used this test:
+Here is the summary with links:
+  - [net-next] selftests: net: Remove unnecessary backslashes in fq_band_pktlimit.sh
+    https://git.kernel.org/netdev/net-next/c/5f70b0aa08ad
 
-	phydev->attached_dev && phydev->adjust_link
-
-and if true, the paths would handle the PHY state machine. This test
-evaluates true for normal drivers that are using phylib directly
-while the PHY is attached to the network device, but false in all
-other cases, which include the following cases:
-
-- when the PHY has never been attached to a network device.
-- when the PHY has been detached from a network device (as phy_detach()
-   sets phydev->attached_dev to NULL, phy_disconnect() calls
-   phy_detach() and additionally sets phydev->adjust_link NULL.)
-- when phylink is using the driver (as phydev->adjust_link is NULL.)
-
-Only the third case was incorrect, and the blamed commit attempted to
-fix this by changing this test to (simplified for brevity, see
-phy_uses_state_machine()):
-
-	phydev->phy_link_change == phy_link_change ?
-		phydev->attached_dev && phydev->adjust_link : true
-
-However, this also incorrectly evaluates true in the first two cases.
-
-Fix the first case by ensuring that phy_uses_state_machine() returns
-false when phydev->phy_link_change is NULL.
-
-Fix the second case by ensuring that phydev->phy_link_change is set to
-NULL when phy_detach() is called.
-
-Reported-by: Xu Yang <xu.yang_2@nxp.com>
-Link: https://lore.kernel.org/r/20250806082931.3289134-1-xu.yang_2@nxp.com
-Fixes: fc75ea20ffb4 ("net: phy: allow MDIO bus PM ops to start/stop state machine for phylink-controlled PHY")
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Link: https://patch.msgid.link/E1uvMEz-00000003Aoe-3qWe@rmk-PC.armlinux.org.uk
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Rajani Kantha <681739313@139.com>
----
- drivers/net/phy/phy_device.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index fd49616c6608..9b0c88c19795 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -270,8 +270,7 @@ static bool phy_uses_state_machine(struct phy_device *phydev)
- 	if (phydev->phy_link_change == phy_link_change)
- 		return phydev->attached_dev && phydev->adjust_link;
- 
--	/* phydev->phy_link_change is implicitly phylink_phy_change() */
--	return true;
-+	return !!phydev->phy_link_change;
- }
- 
- static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
-@@ -1791,6 +1790,8 @@ void phy_detach(struct phy_device *phydev)
- 		phydev->attached_dev->phydev = NULL;
- 		phydev->attached_dev = NULL;
- 	}
-+
-+	phydev->phy_link_change = NULL;
- 	phydev->phylink = NULL;
- 
- 	if (phydev->mdio.dev.driver)
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
