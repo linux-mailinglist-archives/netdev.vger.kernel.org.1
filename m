@@ -1,103 +1,103 @@
-Return-Path: <netdev+bounces-272492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272493-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SLggET5dxmm+JAUAu9opvQ
-	(envelope-from <netdev+bounces-272492-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 11:34:38 +0100
+	id EM15Ax9cxmm+JAUAu9opvQ
+	(envelope-from <netdev+bounces-272493-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 11:29:51 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B98CC3429E9
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 11:34:37 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A20903428B0
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 11:29:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B11323048EF0
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:27:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9CB99307C20C
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C603B47EF;
-	Fri, 27 Mar 2026 10:27:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F1E2352C4E;
+	Fri, 27 Mar 2026 10:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fsM6lIcw";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DMpQRaeg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CDzKLN6l";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PDRk9xqe"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B6F3B4EB7
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 10:27:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29D83ACF17
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 10:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774607225; cv=none; b=NdLBE/ftKwQHECMy8acUtri1vnvAp1bQxtXmoT+ZOLl5ISMEHnF+ghgmFwKZQSCobhikMLBxdhbSTWls+r1SjwoLN37QjL6pVO6eeGCJ5lPK84gmRH3PCcI7u/w0VFxPq364OpLueK0MAJhHkgPd5imTXV2Qdhuf+RfOTXDP0H4=
+	t=1774607286; cv=none; b=p3MSkPnOMpo2CklRfn/IxU7xe064jGinhUUb9YsXe+ewmtLfPQsaqeU9BTqcYTDMwQ47cKsVFE9NSWnYZevxvhCSlJ9zlhUZ4x4tndq+4EyY9mq7z+7nm98RT4HO1Fi7UQ+2XvS0/6J5IxKoIyCAawQKHmuQYvRdWX/5L5P7lJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774607225; c=relaxed/simple;
-	bh=xKgCAgq1H7Rlg4EsTIkmGyUWOfSoJfQhQ+3PuUhY2FM=;
+	s=arc-20240116; t=1774607286; c=relaxed/simple;
+	bh=x4SiBt7V6Sk2WFVNfxLTaA7+5TjSVas4/7Un9ol0p7w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DBIGTXHvvYz3SFtpEqe4mCjZ74O/wFdcjwau5gscnCNIDz+80uk2hKPCfgZl+SiApaameD+eZ7iRQOwT+eYLofSox0KshTx8G52wONxA2j6eOMOko4ep50k2acPjnWN24qrW9mezz+Ex1X/KDcwa2vu3GPDbCV/CHDv/YbqGOs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fsM6lIcw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DMpQRaeg; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=ZJnhLCXuBKeIayAdiBY/yTF9HRDEhZ0yk6fuvGThOEJx7kdjdkb6EHwanT7G7iWO5k2Mq9avtm5z5hwNYwZWhCVfHLHX8nObb3dmJsBw80yfi8YNRWjlUG39pNTfibrBjI0nVrU+H4yWb5KMjBx+zdyUexcs1DlSFb4T8l+oyaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CDzKLN6l; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PDRk9xqe; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774607218;
+	s=mimecast20190719; t=1774607281;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KECpU8r6JDwUuQdYjM4h2h2PS7uvjrBi9NeBGYCIlKo=;
-	b=fsM6lIcw/HTYY0vk3Szho1UEBuaEDq9lxg9097VO+bOG+/ERiXQxTTrOVHlea7Kn3cfz0w
-	+yOLGkZWkBs9soDGuHr+Umo5CmRATBX0rXHR57siPBb5jCaaC6Hb42x8eHvOVw0Td3Y4fJ
-	TWm31wdeVw22Htnk1mu98l9HsJuUpXU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Td1UEV2F3jUbtWfOC+hUJMZhhPXqcdPMCvHHDB6wWwo=;
+	b=CDzKLN6lPUWZqGTKb3uY2RbBe0TlZyFt2Yxqi+TwDKZE20VN5+KwJ4nhtbRihkzWfy2gOK
+	PdlmYyeFKW/OV6rt2LF1iq186Aty/CC6QmQ7oEPEAgQ1TVklm1qDuz2M6kiqGS5TrzLNa6
+	iOh3Sl/rnEM8elIMbOKBP6VivkkOgao=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-261-YrATaqT5Pxa-1QIK28csRw-1; Fri, 27 Mar 2026 06:26:57 -0400
-X-MC-Unique: YrATaqT5Pxa-1QIK28csRw-1
-X-Mimecast-MFC-AGG-ID: YrATaqT5Pxa-1QIK28csRw_1774607216
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4837b6f6b93so19684755e9.3
-        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 03:26:56 -0700 (PDT)
+ us-mta-682-G1Yl3x64PwCgdcZJkiUAug-1; Fri, 27 Mar 2026 06:27:59 -0400
+X-MC-Unique: G1Yl3x64PwCgdcZJkiUAug-1
+X-Mimecast-MFC-AGG-ID: G1Yl3x64PwCgdcZJkiUAug_1774607279
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-485397788b3so20782725e9.2
+        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 03:27:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774607216; x=1775212016; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1774607279; x=1775212079; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=KECpU8r6JDwUuQdYjM4h2h2PS7uvjrBi9NeBGYCIlKo=;
-        b=DMpQRaegMzHeZT0qbk0fafd9++ChQOmhqdfYKUGlNC0ZkDByZMNncHEQry7rboGVqw
-         UZ1O5x2EzfBHIEqArYmjbsBUCeoqCpiDJNRHRVRCGe5eYxCbGCTM80jjprVe+2okeQF0
-         /DYDZDsCG9ZX3Mm5uYnkqjZ3afv/U/gQ8JUJW4SCiAroJwZIP8NiJT4dOnqRMBNPWfcQ
-         S5CwpPNMctGM5RXGkVA6l/DfePfdyDgFolYGFuUnkmXtH3sMZ9nQUZzAczUOEL5VI9AL
-         1U00+G0scn/svwdLcpxFnRHEvfdtUDACw4G4tktPeaz2OVjUrcs+SKG3Ys+R1bZTfw4D
-         ewog==
+        bh=Td1UEV2F3jUbtWfOC+hUJMZhhPXqcdPMCvHHDB6wWwo=;
+        b=PDRk9xqeQXfokS8l666uPSVLPaxjE29OsFa9Npka0WgWD2h+JC23lUjV6xn3SLLmIV
+         0jI8FD42p/SXDjLYUbddYOiLglAaxCOxbgpMa9puqgYEXsqNiv+1wRjKKa6ESFzarR4v
+         A5ahi4p1CmJmJwdfxQ5Ub2sKKEzCOl8q2sHh9PXGKdp327irvkEkd1Tg37wDxMy50LmU
+         Fz3D3yI1PRNcZ+fhL3/EIhI4X5/Dx5/R+RRXw9Yq6o96U/IuTU60hLD+FTTik1WyMZXT
+         42yjXOv1axrE4bU5Hijue1faJ+598d2VxAF3H5xqoLnxPsNpRzZpd23nxJe2njpS7sNx
+         pvDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774607216; x=1775212016;
+        d=1e100.net; s=20251104; t=1774607279; x=1775212079;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KECpU8r6JDwUuQdYjM4h2h2PS7uvjrBi9NeBGYCIlKo=;
-        b=PjVfUtBOQy4OD8FrbJfEbdgoGwMLasd1gNzNxKUJVgBZ3Zxr1Od2cXHebqAzJ3QwK8
-         MYdFshN3KWhWYii0tSBOxsMOA7/59ZM2PWFn9KM7vcIb+5E11s1OTSOpCH0JcIG0WtqJ
-         6DzlhrmLfRvyztU5c58kr4d8S5dxEcOFcsyw3r5SeDwtjrSHqfqZ+MIDF88dt02GR51I
-         2wUh5J55nlPqIy7DWIr+Em8pf5SISPdNepFMpHfrncr9N3hD0lNrQNGepv02zfkusfyQ
-         BjN978pjUc0yyjIci6NrIhCPzNsii1MYOABloUzNt5rxSl9yT6XlINAsA/sCz+9NufW8
-         jDvw==
-X-Forwarded-Encrypted: i=1; AJvYcCWa6gZIsVBqLGLSwGn9IhEtoptvED0TtrrUEHUcbvNz3ree+gmALlsFmjaFBtzB09kJUSxPgl8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4c/p+Aa63tXcCadn8t61TVD1lm42OzRmxvxORUUGg0m7qAQJK
-	nI3iHJn3/n4jsbAaskEJ8VtSxgPLIK1TeSMznhlo4M4RaJV5o/UhLDbZR/Stf3dncfhBWQxcRQl
-	KbKbMNE+RJUlZIseFUF3x0mmbjOBf6/7TFIibssN288/Pr1EuybhOxNbNQQ==
-X-Gm-Gg: ATEYQzxftD/sP9/qA6BZTvLoREaJbyjgOlQC1bIzoF7cTuO9PwUPOWtataW5kvBI8O/
-	cD6L7zMRzotUZWUWwyG+NV7dfylmHRU/tkdmTd2tJwKET7n7HJsxlvBxAdCBGuKY/5+GEOHhCgh
-	d/dApiGl2k2yL1N6Fb2RTw6LKcSGoHuTJdkpOzXKqqB3Urks1OBOG1uR8l/O8bhFugRPOt7k0L3
-	fbfVWUkJRu6g+vPhNS44Gzifq+C3+W5l+/lEB3RzoPYfHG6v8EKiGq8iwqf9DZ9flVfxeLiLM+u
-	EPE7fxkBqG/zYsReJZx+y34qofLKZCa7raBX/sAXW21rtppbcRYtb8lnRsJ24PQ3vIbtCUuFqLK
-	TVA+gNK+CoSX4XU8jguC7
-X-Received: by 2002:a05:600c:c493:b0:486:ffa3:594 with SMTP id 5b1f17b1804b1-48727ef0b7dmr30010975e9.23.1774607215760;
-        Fri, 27 Mar 2026 03:26:55 -0700 (PDT)
-X-Received: by 2002:a05:600c:c493:b0:486:ffa3:594 with SMTP id 5b1f17b1804b1-48727ef0b7dmr30010515e9.23.1774607215233;
-        Fri, 27 Mar 2026 03:26:55 -0700 (PDT)
+        bh=Td1UEV2F3jUbtWfOC+hUJMZhhPXqcdPMCvHHDB6wWwo=;
+        b=bbDxvnPnQilQxS9Jd9E/GA5YfCqyEzypGoF4dV6aEMd0MRL3bAVYqL2KgROB/5saKZ
+         wNj9dophajd3yG5mbHsGg3Fi7KAkAR4tSfHC+wuLIeWnMdazCulPuV7k7tdx7hO/giga
+         JnHnZ+LZgSX5sj5LlU5Vwmk8DvRkXDmiBMkgficaKiqfIhl8qKuvhbTOMtWlssdJrNiS
+         vJYJWajgypE/L6pt/RYMm6taEXn6X0/PoRg7NxbxynVELLyNx21fnxk7q6e4sQ61QBl5
+         UNl7h185Oi9bej7qYLEmCBqi4VnKI6VXvUbiRKUrZQ1b6VaxPa9hIMLoJ4eVIKpdH994
+         YWtA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGQo/6cHjv3THi9BQ5PAnd7wilVe+0M/Kkd+mVHfB8Uy1/4Uzwq+cjtK1xFxtwTtMxFSGg2R4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcJhh4BzFGjqBB8EQizha+LbYJU7b9R0qboGmVDvsxt5U7F726
+	x95aic1oq6960vptH1QFXd+ooG+4ZF9lQ+WC1sDL9Duf7wayBUoNyipcSPaCl6A8O0BjIzwNoJp
+	FBYwjEbkP+uAa4SJxtIOnZ0DxB2kiPS+oaBHi8sAVYLrDrt45tyW8lx9y1w==
+X-Gm-Gg: ATEYQzxKRT1uEuiT6sp6dzcRFOoNlAaWeWhVBtUiKmIZAaiAWNpUBhyJ2bnSjbeuB29
+	EblNOkilt15bTdaqrYwprjpdCX0g/gkc60GvFxu9TjIqaySkXE7xSLw+Mr6nCh5Sm8Ymm4lC2YW
+	a6p0Egn5Qcdb+n0z8w3+EjbCj4ORuQ6rLkOvP7Y9B+xvJ3poYoTQdTMKGTVVpNf154VPdI0XB+i
+	+PUr8zO1eYMFl3ZyjZYJmS2VgE+ItqZa4O8NI3zzdX51eALesVUe148F6X/vX/FpL2thDq/It4v
+	xIuDGctG9ktdb3s5wqELc6BooOqJJXiYDpibVjdQuSwQhmal75/0Ir1R7bXht6UwO8LEf4qxhXA
+	uSEUPyNtYJuLzVb3AsBKG
+X-Received: by 2002:a05:600c:19cf:b0:487:1108:48bc with SMTP id 5b1f17b1804b1-48727ec7695mr33006275e9.17.1774607278585;
+        Fri, 27 Mar 2026 03:27:58 -0700 (PDT)
+X-Received: by 2002:a05:600c:19cf:b0:487:1108:48bc with SMTP id 5b1f17b1804b1-48727ec7695mr33005795e9.17.1774607278095;
+        Fri, 27 Mar 2026 03:27:58 -0700 (PDT)
 Received: from [192.168.2.83] ([46.175.183.46])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48722c6b105sm157228075e9.1.2026.03.27.03.26.53
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48722c9f0afsm156453505e9.10.2026.03.27.03.27.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Mar 2026 03:26:54 -0700 (PDT)
-Message-ID: <80c6190a-5ee2-4c67-bd1f-151460a1ccac@redhat.com>
-Date: Fri, 27 Mar 2026 11:26:53 +0100
+        Fri, 27 Mar 2026 03:27:57 -0700 (PDT)
+Message-ID: <5764b509-9d02-4d0d-afbc-8176a7c44ca1@redhat.com>
+Date: Fri, 27 Mar 2026 11:27:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,8 +105,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/5] dpll: zl3073x: add ref sync and output clock
- type helpers
+Subject: Re: [PATCH net-next 4/5] dt-bindings: dpll: add ref-sync-sources
+ property
 To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
 Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
  Jiri Pirko <jiri@resnulli.us>, Michal Schmidt <mschmidt@redhat.com>,
@@ -117,17 +117,17 @@ Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
  <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
  devicetree@vger.kernel.org, Pasi Vaananen <pvaanane@redhat.com>
 References: <20260319174826.7623-1-ivecera@redhat.com>
- <20260319174826.7623-4-ivecera@redhat.com>
+ <20260319174826.7623-5-ivecera@redhat.com>
 Content-Language: en-US
 From: Petr Oros <poros@redhat.com>
-In-Reply-To: <20260319174826.7623-4-ivecera@redhat.com>
+In-Reply-To: <20260319174826.7623-5-ivecera@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -135,7 +135,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272492-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272493-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -144,221 +144,106 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B98CC3429E9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,0.0.0.0:email,0.0.0.1:email]
+X-Rspamd-Queue-Id: A20903428B0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> Add ZL_REF_SYNC_CTRL_MODE_REFSYNC_PAIR and ZL_REF_SYNC_CTRL_PAIR
-> register definitions.
+> Add ref-sync-sources phandle-array property to the dpll-pin schema
+> allowing board designers to declare which input pins can serve as
+> sync sources in a Reference-Sync pair.  A Ref-Sync pair consists of
+> a clock reference and a low-frequency sync signal where the DPLL locks
+> to the clock but phase-aligns to the sync reference.
 >
-> Add inline helpers to get and set the sync control mode and sync pair
-> fields of the reference sync control register:
->
->    zl3073x_ref_sync_mode_get/set() - ZL_REF_SYNC_CTRL_MODE field
->    zl3073x_ref_sync_pair_get/set() - ZL_REF_SYNC_CTRL_PAIR field
->
-> Add inline helpers to get and set the clock type field of the output
-> mode register:
->
->    zl3073x_out_clock_type_get/set() - ZL_OUTPUT_MODE_CLOCK_TYPE field
->
-> Convert existing esync callbacks to use the new helpers.
+> Update both examples in the Microchip ZL3073x binding to demonstrate
+> the new property with a 1 PPS sync source paired to a clock source.
 >
 > Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 > ---
->   drivers/dpll/zl3073x/dpll.c | 24 ++++++++-----------
->   drivers/dpll/zl3073x/out.h  | 22 ++++++++++++++++++
->   drivers/dpll/zl3073x/ref.h  | 46 +++++++++++++++++++++++++++++++++++++
->   drivers/dpll/zl3073x/regs.h |  2 ++
->   4 files changed, 80 insertions(+), 14 deletions(-)
+>   .../devicetree/bindings/dpll/dpll-pin.yaml    | 11 +++++++
+>   .../bindings/dpll/microchip,zl30731.yaml      | 30 ++++++++++++++-----
+>   2 files changed, 34 insertions(+), 7 deletions(-)
 >
-> diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
-> index 79ef62d69a32d..276f0a92db0b1 100644
-> --- a/drivers/dpll/zl3073x/dpll.c
-> +++ b/drivers/dpll/zl3073x/dpll.c
-> @@ -137,7 +137,7 @@ zl3073x_dpll_input_pin_esync_get(const struct dpll_pin *dpll_pin,
->   	esync->range = esync_freq_ranges;
->   	esync->range_num = ARRAY_SIZE(esync_freq_ranges);
+> diff --git a/Documentation/devicetree/bindings/dpll/dpll-pin.yaml b/Documentation/devicetree/bindings/dpll/dpll-pin.yaml
+> index 51db93b77306f..7084f102e274c 100644
+> --- a/Documentation/devicetree/bindings/dpll/dpll-pin.yaml
+> +++ b/Documentation/devicetree/bindings/dpll/dpll-pin.yaml
+> @@ -36,6 +36,17 @@ properties:
+>       description: String exposed as the pin board label
+>       $ref: /schemas/types.yaml#/definitions/string
 >   
-> -	switch (FIELD_GET(ZL_REF_SYNC_CTRL_MODE, ref->sync_ctrl)) {
-> +	switch (zl3073x_ref_sync_mode_get(ref)) {
->   	case ZL_REF_SYNC_CTRL_MODE_50_50_ESYNC_25_75:
->   		esync->freq = ref->esync_n_div == ZL_REF_ESYNC_DIV_1HZ ? 1 : 0;
->   		esync->pulse = 25;
-> @@ -173,8 +173,7 @@ zl3073x_dpll_input_pin_esync_set(const struct dpll_pin *dpll_pin,
->   	else
->   		sync_mode = ZL_REF_SYNC_CTRL_MODE_50_50_ESYNC_25_75;
->   
-> -	ref.sync_ctrl &= ~ZL_REF_SYNC_CTRL_MODE;
-> -	ref.sync_ctrl |= FIELD_PREP(ZL_REF_SYNC_CTRL_MODE, sync_mode);
-> +	zl3073x_ref_sync_mode_set(&ref, sync_mode);
->   
->   	if (freq) {
->   		/* 1 Hz is only supported frequency now */
-> @@ -578,7 +577,7 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
->   	const struct zl3073x_synth *synth;
->   	const struct zl3073x_out *out;
->   	u32 synth_freq, out_freq;
-> -	u8 clock_type, out_id;
-> +	u8 out_id;
->   
->   	out_id = zl3073x_output_pin_out_get(pin->id);
->   	out = zl3073x_out_state_get(zldev, out_id);
-> @@ -601,8 +600,7 @@ zl3073x_dpll_output_pin_esync_get(const struct dpll_pin *dpll_pin,
->   	esync->range = esync_freq_ranges;
->   	esync->range_num = ARRAY_SIZE(esync_freq_ranges);
->   
-> -	clock_type = FIELD_GET(ZL_OUTPUT_MODE_CLOCK_TYPE, out->mode);
-> -	if (clock_type != ZL_OUTPUT_MODE_CLOCK_TYPE_ESYNC) {
-> +	if (zl3073x_out_clock_type_get(out) != ZL_OUTPUT_MODE_CLOCK_TYPE_ESYNC) {
->   		/* No need to read esync data if it is not enabled */
->   		esync->freq = 0;
->   		esync->pulse = 0;
-> @@ -635,8 +633,8 @@ zl3073x_dpll_output_pin_esync_set(const struct dpll_pin *dpll_pin,
->   	struct zl3073x_dpll_pin *pin = pin_priv;
->   	const struct zl3073x_synth *synth;
->   	struct zl3073x_out out;
-> -	u8 clock_type, out_id;
->   	u32 synth_freq;
-> +	u8 out_id;
->   
->   	out_id = zl3073x_output_pin_out_get(pin->id);
->   	out = *zl3073x_out_state_get(zldev, out_id);
-> @@ -648,15 +646,13 @@ zl3073x_dpll_output_pin_esync_set(const struct dpll_pin *dpll_pin,
->   	if (zl3073x_out_is_ndiv(&out))
->   		return -EOPNOTSUPP;
->   
-> -	/* Select clock type */
-> +	/* Update clock type in output mode */
->   	if (freq)
-> -		clock_type = ZL_OUTPUT_MODE_CLOCK_TYPE_ESYNC;
-> +		zl3073x_out_clock_type_set(&out,
-> +					   ZL_OUTPUT_MODE_CLOCK_TYPE_ESYNC);
->   	else
-> -		clock_type = ZL_OUTPUT_MODE_CLOCK_TYPE_NORMAL;
-> -
-> -	/* Update clock type in output mode */
-> -	out.mode &= ~ZL_OUTPUT_MODE_CLOCK_TYPE;
-> -	out.mode |= FIELD_PREP(ZL_OUTPUT_MODE_CLOCK_TYPE, clock_type);
-> +		zl3073x_out_clock_type_set(&out,
-> +					   ZL_OUTPUT_MODE_CLOCK_TYPE_NORMAL);
->   
->   	/* If esync is being disabled just write mailbox and finish */
->   	if (!freq)
-> diff --git a/drivers/dpll/zl3073x/out.h b/drivers/dpll/zl3073x/out.h
-> index edf40432bba5f..660889c57bffa 100644
-> --- a/drivers/dpll/zl3073x/out.h
-> +++ b/drivers/dpll/zl3073x/out.h
-> @@ -42,6 +42,28 @@ const struct zl3073x_out *zl3073x_out_state_get(struct zl3073x_dev *zldev,
->   int zl3073x_out_state_set(struct zl3073x_dev *zldev, u8 index,
->   			  const struct zl3073x_out *out);
->   
-> +/**
-> + * zl3073x_out_clock_type_get - get output clock type
-> + * @out: pointer to out state
-> + *
-> + * Return: clock type of given output (ZL_OUTPUT_MODE_CLOCK_TYPE_*)
-> + */
-> +static inline u8 zl3073x_out_clock_type_get(const struct zl3073x_out *out)
-> +{
-> +	return FIELD_GET(ZL_OUTPUT_MODE_CLOCK_TYPE, out->mode);
-> +}
+> +  ref-sync-sources:
+> +    description: |
+> +      List of phandles to input pins that can serve as the sync source
+> +      in a Reference-Sync pair with this pin acting as the clock source.
+> +      A Ref-Sync pair consists of a clock reference and a low-frequency
+> +      sync signal.  The DPLL locks to the clock reference but
+> +      phase-aligns to the sync reference.
+> +      Only valid for input pins.  Each referenced pin must be a
+> +      different input pin on the same device.
+> +    $ref: /schemas/types.yaml#/definitions/phandle-array
 > +
-> +/**
-> + * zl3073x_out_clock_type_set - set output clock type
-> + * @out: pointer to out state
-> + * @type: clock type (ZL_OUTPUT_MODE_CLOCK_TYPE_*)
-> + */
-> +static inline void
-> +zl3073x_out_clock_type_set(struct zl3073x_out *out, u8 type)
-> +{
-> +	FIELD_MODIFY(ZL_OUTPUT_MODE_CLOCK_TYPE, &out->mode, type);
-> +}
-> +
->   /**
->    * zl3073x_out_signal_format_get - get output signal format
->    * @out: pointer to out state
-> diff --git a/drivers/dpll/zl3073x/ref.h b/drivers/dpll/zl3073x/ref.h
-> index 06d8d4d97ea26..09fab97a71d7e 100644
-> --- a/drivers/dpll/zl3073x/ref.h
-> +++ b/drivers/dpll/zl3073x/ref.h
-> @@ -106,6 +106,52 @@ zl3073x_ref_freq_set(struct zl3073x_ref *ref, u32 freq)
->   	return 0;
->   }
+>     supported-frequencies-hz:
+>       description: List of supported frequencies for this pin, expressed in Hz.
 >   
-> +/**
-> + * zl3073x_ref_sync_mode_get - get sync control mode
-> + * @ref: pointer to ref state
-> + *
-> + * Return: sync control mode (ZL_REF_SYNC_CTRL_MODE_*)
-> + */
-> +static inline u8
-> +zl3073x_ref_sync_mode_get(const struct zl3073x_ref *ref)
-> +{
-> +	return FIELD_GET(ZL_REF_SYNC_CTRL_MODE, ref->sync_ctrl);
-> +}
-> +
-> +/**
-> + * zl3073x_ref_sync_mode_set - set sync control mode
-> + * @ref: pointer to ref state
-> + * @mode: sync control mode (ZL_REF_SYNC_CTRL_MODE_*)
-> + */
-> +static inline void
-> +zl3073x_ref_sync_mode_set(struct zl3073x_ref *ref, u8 mode)
-> +{
-> +	FIELD_MODIFY(ZL_REF_SYNC_CTRL_MODE, &ref->sync_ctrl, mode);
-> +}
-> +
-> +/**
-> + * zl3073x_ref_sync_pair_get - get sync pair reference index
-> + * @ref: pointer to ref state
-> + *
-> + * Return: paired reference index
-> + */
-> +static inline u8
-> +zl3073x_ref_sync_pair_get(const struct zl3073x_ref *ref)
-> +{
-> +	return FIELD_GET(ZL_REF_SYNC_CTRL_PAIR, ref->sync_ctrl);
-> +}
-> +
-> +/**
-> + * zl3073x_ref_sync_pair_set - set sync pair reference index
-> + * @ref: pointer to ref state
-> + * @pair: paired reference index
-> + */
-> +static inline void
-> +zl3073x_ref_sync_pair_set(struct zl3073x_ref *ref, u8 pair)
-> +{
-> +	FIELD_MODIFY(ZL_REF_SYNC_CTRL_PAIR, &ref->sync_ctrl, pair);
-> +}
-> +
->   /**
->    * zl3073x_ref_is_diff - check if the given input reference is differential
->    * @ref: pointer to ref state
-> diff --git a/drivers/dpll/zl3073x/regs.h b/drivers/dpll/zl3073x/regs.h
-> index 5ae50cb761a97..d425dc67250fe 100644
-> --- a/drivers/dpll/zl3073x/regs.h
-> +++ b/drivers/dpll/zl3073x/regs.h
-> @@ -213,7 +213,9 @@
->   #define ZL_REG_REF_SYNC_CTRL			ZL_REG(10, 0x2e, 1)
->   #define ZL_REF_SYNC_CTRL_MODE			GENMASK(2, 0)
->   #define ZL_REF_SYNC_CTRL_MODE_REFSYNC_PAIR_OFF	0
-> +#define ZL_REF_SYNC_CTRL_MODE_REFSYNC_PAIR	1
->   #define ZL_REF_SYNC_CTRL_MODE_50_50_ESYNC_25_75	2
-> +#define ZL_REF_SYNC_CTRL_PAIR			GENMASK(7, 4)
+> diff --git a/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml b/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml
+> index 17747f754b845..fa5a8f8e390cd 100644
+> --- a/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml
+> +++ b/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml
+> @@ -52,11 +52,19 @@ examples:
+>             #address-cells = <1>;
+>             #size-cells = <0>;
 >   
->   #define ZL_REG_REF_ESYNC_DIV			ZL_REG(10, 0x30, 4)
->   #define ZL_REF_ESYNC_DIV_1HZ			0
-
+> -          pin@0 { /* REF0P */
+> +          sync0: pin@0 { /* REF0P - 1 PPS sync source */
+>               reg = <0>;
+>               connection-type = "ext";
+> -            label = "Input 0";
+> -            supported-frequencies-hz = /bits/ 64 <1 1000>;
+> +            label = "SMA1";
+> +            supported-frequencies-hz = /bits/ 64 <1>;
+> +          };
+> +
+> +          pin@1 { /* REF0N - clock source, can pair with sync0 */
+> +            reg = <1>;
+> +            connection-type = "ext";
+> +            label = "SMA2";
+> +            supported-frequencies-hz = /bits/ 64 <10000 10000000>;
+> +            ref-sync-sources = <&sync0>;
+>             };
+>           };
+>   
+> @@ -90,11 +98,19 @@ examples:
+>             #address-cells = <1>;
+>             #size-cells = <0>;
+>   
+> -          pin@0 { /* REF0P */
+> +          sync1: pin@0 { /* REF0P - 1 PPS sync source */
+>               reg = <0>;
+> -            connection-type = "ext";
+> -            label = "Input 0";
+> -            supported-frequencies-hz = /bits/ 64 <1 1000>;
+> +            connection-type = "gnss";
+> +            label = "GNSS_1PPS_IN";
+> +            supported-frequencies-hz = /bits/ 64 <1>;
+> +          };
+> +
+> +          pin@1 { /* REF0N - clock source */
+> +            reg = <1>;
+> +            connection-type = "gnss";
+> +            label = "GNSS_10M_IN";
+> +            supported-frequencies-hz = /bits/ 64 <10000000>;
+> +            ref-sync-sources = <&sync1>;
+>             };
+>           };
+>   
 LGTM.
 
 Reviewed-by: Petr Oros <poros@redhat.com>
-
 
 
