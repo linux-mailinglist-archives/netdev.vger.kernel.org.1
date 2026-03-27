@@ -1,66 +1,69 @@
-Return-Path: <netdev+bounces-272696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272697-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mPWKCrkYx2mXSwUAu9opvQ
-	(envelope-from <netdev+bounces-272696-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 00:54:33 +0100
+	id kOesOkoZx2mXSwUAu9opvQ
+	(envelope-from <netdev+bounces-272697-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 00:56:58 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C404D34C913
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 00:54:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EFAB34C959
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 00:56:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 98C2E30490C1
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 23:52:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2E1833031E8F
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 23:55:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5174E32A3EC;
-	Fri, 27 Mar 2026 23:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A343346E57;
+	Fri, 27 Mar 2026 23:55:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gwLYaP5k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qU9Yuwlc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4DD2877F7;
-	Fri, 27 Mar 2026 23:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FEB234216C;
+	Fri, 27 Mar 2026 23:55:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774655521; cv=none; b=VFIUgPnSalS0ziXyVAmqmhQE/iENoYOSrhY7ZUpVPGnAd91oy0kX9Kjlc9ZYnj7C03C35PNABAmEJoz6uU8vLluaq3canLLJ0yUfkZEefu2YBiD1infddbAskeYRPmxA2p7EKGJETgyYWJRXC02YvGWjddPQWVdszQyuyjECKYU=
+	t=1774655718; cv=none; b=UN99kkfa6stEs4eDHwltOAWvkzzKjr2+eKuSQ8DLdF8MVqoGHp7J7a+dNhDOGbNOZj56I9iFw5bG/WDkvDIQrjFo0LzBUfJ7+CnCHmUlai9wWvQCUP5mTcaGuhu/YX+7pLzhx+ycYvcDOISFcBuUSKAWslV5BiHUwc5H3hFh0xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774655521; c=relaxed/simple;
-	bh=n0HrjJh23j5s50K5kpsr4BouiZnYXdlRUEa9ow7Kb4Y=;
+	s=arc-20240116; t=1774655718; c=relaxed/simple;
+	bh=RnVNM/WM/sXq1Qxj0l9dY0/aSg/+qWWVxkrRCD9kPLs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YvRFB9lQMRs6hf1veIN/jjAgyi6yKW1CzqoDBOD4t6JTmIR+vnpyhiHyusHDUzKGB9+ljEXbmBLGJdERq29Ti107bZ0MQnTqg07g7mpIpoLgbXdgWsSA2jz3x0XFVmR/OX8ExcB18gc6e/U/9Qk06stOztixZ9j7QhYHqrXtPGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gwLYaP5k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBA5DC19423;
-	Fri, 27 Mar 2026 23:51:59 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qKJjmDNz+jGMR6CQdVW4FOYkEoGUzh6fXLUL0JkmY0/lcUaxt+0+ckOu3iPsB3+hmsPEgufN7kAIl7wSwwJ7gPKt3eZGjs207mHepb139J+u3F0zM+VCCC6PwRY88UJj4OjRdnmc+eqLI17ToVz0KTHSwzE2U6W79hX+ATyXxTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qU9Yuwlc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DC64C19423;
+	Fri, 27 Mar 2026 23:55:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774655520;
-	bh=n0HrjJh23j5s50K5kpsr4BouiZnYXdlRUEa9ow7Kb4Y=;
+	s=k20201202; t=1774655718;
+	bh=RnVNM/WM/sXq1Qxj0l9dY0/aSg/+qWWVxkrRCD9kPLs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gwLYaP5ksGsFt8e4rlR7SJ0Rexulhn2UiIUQdWePHurcrDfv1XUoLkV8v1yMtYiPz
-	 w4V9OzW0NWKHns3JnErxN2IWP0SCZYIKfUnkzvugOpIzXHua/OPeeznRCYLF4cvQmC
-	 oYZCRIBRhFsCqN5AW4LpKe6P/EmsAYKb2/Pyt+jlRqa3LnoMdYdJuUiTXmzYelM855
-	 mee2hSEVMth36KZYZeWy8am5Z5WDt6waeD1TR6EpZppbfDhEiZ5PZC9D0mrN34bJJo
-	 YWKrt8xVFejfdb64NxAdCw10r6c9P9qc75tNuVdLscaIPRkaMHzNo2p/jNgpf192KD
-	 C/JiPdPiOZNWw==
-Date: Fri, 27 Mar 2026 16:51:58 -0700
+	b=qU9YuwlcGd76wQVMeMuEYfELfWK+jFLsKwkSYtic4A8rDO3NKlImWzEFsTGZvPzvJ
+	 6MfsmVgLW5lySjPdhsBmHeTY3oIc0jM7m5bHS5V1VrN6fUHgUvvK5mbuidkH3O7HPs
+	 HUCDiqN7QldIZ3zyZBNAPF+h87YETggU4s9QmqFTygL+CPUxf+SjIKbqEMAZb8Fd0a
+	 grHFPSMJxoQQqu/h1wLaNAsjYdubmCMAE29ULc4wtNGVY89UISlmCHbiGTTmAk/av3
+	 IDTnlCpG4T7I8tRAkAe+2GUF6n/hz6/vOQWXIjfqfDHEhS0WtDBAP4nRaESBV1WiIm
+	 UuX2wBSZ6Frqg==
+Date: Fri, 27 Mar 2026 16:55:12 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Charles Perry <charles.perry@microchip.com>
-Cc: <netdev@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>, "Russell King"
- <linux@armlinux.org.uk>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 0/2] Add support for PIC64-HPSC/HX MDIO
- controller
-Message-ID: <20260327165158.505855eb@kernel.org>
-In-Reply-To: <acZ5WDz5qVxBDj3e@bby-cbu-swbuild03.eng.microchip.com>
-References: <20260323220254.3822444-1-charles.perry@microchip.com>
-	<20260326203309.7154152d@kernel.org>
-	<acZ5WDz5qVxBDj3e@bby-cbu-swbuild03.eng.microchip.com>
+To: Long Li <longli@microsoft.com>
+Cc: Konstantin Taranov <kotaranov@microsoft.com>, "David S . Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Jason Gunthorpe
+ <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Haiyang Zhang
+ <haiyangz@microsoft.com>, KY Srinivasan <kys@microsoft.com>, Wei Liu
+ <wei.liu@kernel.org>, Dexuan Cui <DECUI@microsoft.com>, Simon Horman
+ <horms@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [PATCH net-next v2] net: mana: Set default
+ number of queues to 16
+Message-ID: <20260327165512.08f7b6f9@kernel.org>
+In-Reply-To: <SA1PR21MB668314B1AF002E40B379F1C0CE57A@SA1PR21MB6683.namprd21.prod.outlook.com>
+References: <20260323194925.1766385-1-longli@microsoft.com>
+	<20260326201841.3b7e5b78@kernel.org>
+	<SA1PR21MB668314B1AF002E40B379F1C0CE57A@SA1PR21MB6683.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,56 +76,57 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272696-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,armlinux.org.uk];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-272697-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	NEURAL_HAM(-0.00)[-0.996];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: C404D34C913
+X-Rspamd-Queue-Id: 8EFAB34C959
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 27 Mar 2026 05:34:32 -0700 Charles Perry wrote:
-> On Thu, Mar 26, 2026 at 08:33:09PM -0700, Jakub Kicinski wrote:
-> > On Mon, 23 Mar 2026 15:02:52 -0700 Charles Perry wrote:  
-> > >  .../net/microchip,pic64hpsc-mdio.yaml         |  68 +++++++
-> > >  drivers/net/mdio/Kconfig                      |   7 +
-> > >  drivers/net/mdio/Makefile                     |   1 +
-> > >  drivers/net/mdio/mdio-pic64hpsc.c             | 192 ++++++++++++++++++  
-> > 
-> > Speaking under correction from PHY maintainers but I think we need 
-> > a MAINTAINERS entry that will cover Microchip MDIO, or at least the
-> > files you're adding. Important read:
-> > https://docs.kernel.org/next/maintainer/feature-and-driver-maintainers.html  
+On Fri, 27 Mar 2026 04:00:31 +0000 Long Li wrote:
+>   We considered netif_get_num_default_rss_queues() but chose a fixed default based on our performance testing. On Azure VMs, typical
+>   workloads plateau at around 16 queues - adding more queues beyond that doesn't improve throughput but increases memory usage and
+>   interrupt overhead.
 > 
-> Sure, I think this should go under "RISC-V MICROCHIP SUPPORT" or maybe a
-> new "MICROCHIP PIC64-HPSC/HX DRIVER" entry if the former was meant only for
-> Polarfire SoC.
+>   netif_get_num_default_rss_queues() would return 32-64 on large VMs (64-128 vCPUs), which wastes resources without benefit.
 > 
-> I'll add something in v3.
+>   That said, I agree that completely ignoring the core-based heuristic isn't ideal for consistency. One option is to use
+>   netif_get_num_default_rss_queues() but clamp it to a maximum of MANA_DEF_NUM_QUEUES (16), so small VMs still get enough queues and
+>   large VMs don't over-allocate. Something like:
+> 
+>    apc->num_queues = min(netif_get_num_default_rss_queues(), MANA_DEF_NUM_QUEUES);
+>    apc->num_queues = min(apc->num_queues, gc->max_num_queues);
+> 
+>   For reference, it seems mlx4 does something similar - it caps at DEF_RX_RINGS (16) regardless of core count.
 
-Thanks! FWIW I'd prefer the latter - smaller entries make the
-responsibility clear. Under a big arch entry the maintainers are
-usually seeing too many random patches to act. You can add
-_both_ dedicated a entry and add the files to RISC-V MICROCHIP,
-if you prefer, too.
+mlx4 is a bit ancient. And mlx5 does the wrong thing, which is why 
+I'm so sensitive to this issue :(
+
+>   Do you want me to send a v2?
+
+Please send a follow up, let's leave this patch be and make an
+incremental change. 
+
+Thanks!
 
