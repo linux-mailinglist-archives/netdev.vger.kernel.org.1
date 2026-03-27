@@ -1,69 +1,89 @@
-Return-Path: <netdev+bounces-272472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272473-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WCABGPhMxmmgIAUAu9opvQ
-	(envelope-from <netdev+bounces-272472-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:25:12 +0100
+	id mAVYGSRNxmmgIAUAu9opvQ
+	(envelope-from <netdev+bounces-272473-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:25:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFB65341AB9
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:25:11 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE0F5341AE0
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:25:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3825E300516C
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:23:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8D6B5307C6DB
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA493DB658;
-	Fri, 27 Mar 2026 09:23:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB7C3B95F6;
+	Fri, 27 Mar 2026 09:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZkxF6S0B"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lNTY/ZqA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA40A3DA7F6;
-	Fri, 27 Mar 2026 09:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9D53CBE7F;
+	Fri, 27 Mar 2026 09:24:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774603412; cv=none; b=r1u1esGyZbsa/gqIgvVYy3LkCSmLs1UWzXwpcgqgXbwhoFgro828vH32Anh7AzWnKr706BjoxF3xcrEtPOZY1K8IqxPgFEzQ7+Bbeo4IQR4N/An6Jst64TtVk7olkLZg6CTa/fBUhwhz3xVR23mnxDvakT7r442FPHia9mkO1OU=
+	t=1774603500; cv=none; b=NNnaWOeuka6Bvt/pNkp/X1svDGKz1dV9nZ+pJo2ZLeVUN7YL3GR21SpWYC/ve+tdCKTGVbNXjFBR8zApVCtIxxb2WYvddYUsA6D23xMuZVdQ7Mj2DCqxck3ZLFRsEIP7ldDtk78vDXYTuV2Hs10/2bYBGHogs/jwYrEa/uNjtcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774603412; c=relaxed/simple;
-	bh=UUG2DpyL+eUgewSKD3Yd9/PcZ1TPr1oUxFvTW/dSkKQ=;
+	s=arc-20240116; t=1774603500; c=relaxed/simple;
+	bh=qJm6pDnzsN9A+Wle9K581NgqCbPN5k4qbYPIvW7F/aM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yu9dhBeplIs5A4b6H6uvPCDMiRcvn6ZI5Pi6qOktANOSp6v3DhXsirHwZeWE7cTT/fZt1sqqi6W0yAw+3wzfTTYS1kfBtSWrTQJKkQGBQTP8AWYMs/Erh5lB29OJrW+8l7Lb2/nBioreChJ5jEs3v8t1hnwZhHDDReDErxmRQts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZkxF6S0B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1C0EC19423;
-	Fri, 27 Mar 2026 09:23:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774603412;
-	bh=UUG2DpyL+eUgewSKD3Yd9/PcZ1TPr1oUxFvTW/dSkKQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZkxF6S0BiL0pUMCoaFi5uLzUqKys1/B/6mt3ukZHPLBa5qEd7hdlLFCxl+Gl75d4a
-	 Q6SmC/Vi4JBGKgSYfu/rgGMW0d+oawHZ0jiCn1gdZ1F365s5z4nko5D6qYe4S3Iwcd
-	 IQxsqx4hhrYj/h/eYjDeRpi4tWnh01zkzqLoOfbJm3xT0hgNoY/ld1VKopZv9ZdgSz
-	 f0ieMUCtFrO2RgZ7tA2E+VSm16BxnaOdxlHNuyR4YWVKbr9pxd6bHP8fNq0b24No7N
-	 siyHOR6Zpd82Q1sWqO6bVxxMganoTMAAzr0OA75MU3GkWqiZ2lSeUxD5XnXAj4W8W8
-	 sEdoTraxOBzKg==
-Date: Fri, 27 Mar 2026 09:23:27 +0000
-From: Simon Horman <horms@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=rFSxk0aveP4LcOqAMl9cg3QHkbgc3v40AFuTvZE2pxOB8aeLw+ShZjtgZHali2Lj1pNSnT75GwDMa2vS+udGvV+FQFibRj9UySePG3p2wfV2M5SCZT5XufEEvMYHsVY8rHgIdVwWNg+jE+9CWKMIfRTmoHgvPCXvsPD9gea3nyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lNTY/ZqA; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774603498; x=1806139498;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qJm6pDnzsN9A+Wle9K581NgqCbPN5k4qbYPIvW7F/aM=;
+  b=lNTY/ZqAmo/ccEgD+XgxH3Qygr6VqFr73ue8zZB1pz/IA85DLNc40Nil
+   GrDJc2MwwcR5+ZUVYhfPWxxVE5HCD4HM5xtqf0E7g4+G+DiUP4DCRtDJU
+   0XpN3g/MCSaFd8I/0gjDnWnGOgpKrpHiW/xihWFY8CTUsOtjS/H5Q02Rw
+   olYQiMT3kHF3fq0HIu18OKOx55VWGfkmcVqgK8+9J7stwdh1nDsBc2vyr
+   CfDfJTkEN9WEcLDSzV4WH1fTHLBBtShf2FbzSPPjQfn3U+yIgqiWRvcQG
+   rm8yFlWVudXgtb7rGrWszwDT2UHwXqhDN58a0Gp2JgtksPX+46K5lJdqD
+   Q==;
+X-CSE-ConnectionGUID: jBQqzcj0RwCStpP4M8LxiA==
+X-CSE-MsgGUID: Nh3eU0gmRmqfX/YVwafGKw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11741"; a="79577823"
+X-IronPort-AV: E=Sophos;i="6.23,143,1770624000"; 
+   d="scan'208";a="79577823"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2026 02:24:57 -0700
+X-CSE-ConnectionGUID: tzczHYdqTAyV/N9Z5YCVnA==
+X-CSE-MsgGUID: uQP1u3pARJyk5ylijKxydA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,143,1770624000"; 
+   d="scan'208";a="230191724"
+Received: from vpanait-mobl.ger.corp.intel.com (HELO localhost) ([10.245.244.127])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2026 02:24:52 -0700
+Date: Fri, 27 Mar 2026 11:24:50 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 03/15] net: stmmac: qcom-ethqos: eliminate
- configure_func
-Message-ID: <20260327092327.GA111839@horms.kernel.org>
-References: <acKNcX5PqtWYf8m3@shell.armlinux.org.uk>
- <E1w51Xs-0000000DwVV-2bnh@rmk-PC.armlinux.org.uk>
- <20260326180453.GU111839@horms.kernel.org>
- <acV29ruRVy_fcwDq@shell.armlinux.org.uk>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Petr Mladek <pmladek@suse.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH next] netfilter: nf_conntrack_h323: Correct indentation
+ when H323_TRACE defined
+Message-ID: <acZM4qwEtWqANece@ashevche-desk.local>
+References: <20260326201819.3900-1-david.laight.linux@gmail.com>
+ <acWWBxmPd_BNqUHF@chamomile>
+ <20260326221809.0b99df3f@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,80 +92,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <acV29ruRVy_fcwDq@shell.armlinux.org.uk>
+In-Reply-To: <20260326221809.0b99df3f@pumpkin>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272472-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272473-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	HAS_ORG_HEADER(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,armlinux.org.uk:email,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: CFB65341AB9
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim]
+X-Rspamd-Queue-Id: EE0F5341AE0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 06:12:06PM +0000, Russell King (Oracle) wrote:
-> On Thu, Mar 26, 2026 at 06:04:53PM +0000, Simon Horman wrote:
-> > On Tue, Mar 24, 2026 at 01:11:44PM +0000, Russell King (Oracle) wrote:
-> > > Since ethqos_fix_mac_speed() is called via a function pointer, and only
-> > > indirects via the configure_func function pointer, eliminate this
-> > > unnecessary indirection.
+On Thu, Mar 26, 2026 at 10:18:09PM +0000, David Laight wrote:
+> On Thu, 26 Mar 2026 21:24:39 +0100
+> Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> > On Thu, Mar 26, 2026 at 08:18:19PM +0000, david.laight.linux@gmail.com wrote:
 > > > 
-> > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > The trace lines are indented using PRINT("%*.s", xx, " ").
+> > > Userspace will treat this as "%*.0s" and will output no characters
+> > > when 'xx' is zero, the kernel treats it as "%*s" and will output
+> > > a single ' ' - which is probably what is intended.
+> > > 
+> > > Change all the formats to "%*s" removing the default precision.
+> > > This gives a single space indent when level is zero.  
 > > 
-> > ...
-> > 
-> > > @@ -623,14 +627,6 @@ static void ethqos_configure_sgmii(struct qcom_ethqos *ethqos,
-> > >  	ethqos_pcs_set_inband(ethqos, interface == PHY_INTERFACE_MODE_SGMII);
-> > >  }
-> > >  
-> > > -static void ethqos_fix_mac_speed(void *priv, phy_interface_t interface,
-> > > -				 int speed, unsigned int mode)
-> > > -{
-> > > -	struct qcom_ethqos *ethqos = priv;
-> > > -
-> > > -	ethqos->configure_func(ethqos, interface, speed);
-> > > -}
-> > > -
-> > >  static int qcom_ethqos_serdes_powerup(struct net_device *ndev, void *priv)
-> > >  {
-> > >  	struct qcom_ethqos *ethqos = priv;
-> > 
-> > Hi Russell,
-> > 
-> > FYI, AI generated review reports that the comment in ethqos_clks_config()
-> > that references ethqos_fix_mac_speed() should also be updated.
+> > Do you have a setup using this helper? Or you just found this via
+> > visual inspection?
 > 
-> Also already noted (yesterday).
-> 
-> I do keep an eye on patchwork for my own patches - I have a firefox tab
-> permanently open for my patches in patchwork:
-> 
-> https://patchwork.kernel.org/project/netdevbpf/list/?submitter=165511
-> 
-> Thanks anyway.
+> Found with grep looking for places which might be affected by 'fixing'
+> the kernel printf code to be POSIX compliant.
 
-Thanks, and sorry if you told me this before.
-I'll try to remember and not spam you with these things going forward.
+Do we have the respective test case in printf_kunit?
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
