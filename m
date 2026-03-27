@@ -1,178 +1,115 @@
-Return-Path: <netdev+bounces-272516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272517-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QBZtN6xuxmmkJwUAu9opvQ
-	(envelope-from <netdev+bounces-272516-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:49:00 +0100
+	id 8NQvBkxwxmmkJwUAu9opvQ
+	(envelope-from <netdev+bounces-272517-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:55:56 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E788343C29
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:49:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F998343D9F
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 12:55:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 95763306C463
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 11:46:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3F9ED3121914
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 11:48:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1876B382F33;
-	Fri, 27 Mar 2026 11:46:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B0B38657A;
+	Fri, 27 Mar 2026 11:48:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="kH9/ie0F"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tm/l+TU5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0AE318B9C
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 11:46:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAAA13815F7;
+	Fri, 27 Mar 2026 11:48:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774612005; cv=none; b=cMB9sCRQJxgfvMJxrqwN6X5JCWUe+cRX3uYVL4GEdrn6QMhn3mykn6fxDLxbG6jp6EpjHZSAnYx9qS6dJ/ymS0wtFx/1mljqJyEu2b7UPHqwIoZy+TrhtdZ0Ldxx6ErlE3KMsAR1doMPZKTWsOVjd6a1/LAX9rCPZqvkuC9aqDY=
+	t=1774612108; cv=none; b=YgMYtyLvGbaONWzezeQDWPv2P0N+h8kWwdMHZ3JtrYlIHVVlJWpB9tAbtbtX3kP6KfyjRCX5oZRcVCDyN+Gx3Wvmyf0Y/PcIoRkmJ2ofkWRa+PM4KVYtttYvqniJnu6w+QSlqW5GRbMm6bgWCRDM3SbPS5kv1l9NwJ0/RuGajPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774612005; c=relaxed/simple;
-	bh=eKAy6z3eeID/ZV+oMTzobfIHdZrDrSWFIIM6feni8JE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sNpwzK20RMHupCKmX/hS0DCJaSpLmW36mfJACJ6DwfjYOVjGWuiUKnNIpYV+RR8uYAKp/XlqMpCJrjWn1WM3mCcl3/pVaICfA49gon+Lpw1lduWUlJ1vWzDEnDwKL4EjZr+JnDDaEN8aeplWcF/vkq1bhT5Fr7ZjHzz1+qsdvms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=kH9/ie0F; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-486ff201041so18174075e9.1
-        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 04:46:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1774612001; x=1775216801; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Dc8kZiAOVDqJfTCwQ4sp4VFOqE7cbWv8ZLlFBvNl/+g=;
-        b=kH9/ie0Fcs5rxOJrRPQ1ijrAGhzQTDTiaikPoHHzsurC4eNZST/ixzBsg8vXC1ul/2
-         vVVvYxVq+qtWQTxuPDBcw2hrvu+qlS76CLV1VxAlwImNQnqgLaSaTWRMQ3sT91C955YQ
-         spM8C7zcFk58Pf6hpKxaa6ouE8WOnQm7xaxyA1PpST3kZNKO4f7dnHkh0cIZreIZXmqv
-         iCBFHTLPSaMFGHN9znXnkPqUcUZbiMMuVvIlWaNj/5lcsPBKsvrreUUmJbkq5iawLS8M
-         d1LXmkA1IbOel9jN2dZtRggCQz7VwGnFU7u/esDixTB83fcscuauTUfMABpwoBD4KEyl
-         Icvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774612001; x=1775216801;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Dc8kZiAOVDqJfTCwQ4sp4VFOqE7cbWv8ZLlFBvNl/+g=;
-        b=GNqo7IF0fsRUKr7FABCRjTPWASZ5Zg93Oql5Lf436okCCsD2CP7TPUCm801/0AVScj
-         dgXMgGKbxXId07NkIX7FB4/Boj6lqcMiOau3cxvOoWQX9p8F//jz5rMgOyLT2fGzgrhC
-         2F6S2JWR1cgeqtJbS9sXEn4CPKCyVS5TPWRYeyR4hB3vwf+xvoHPPHNLhCjeygbSW+n+
-         gquAh0Fv+X12NMCo9/m99e9S3vXsLygKRDH2bEbWXZ2jb8tzN9KzVap7QkcZXBKYU8Zm
-         c+WvuYkmWNE2rd9G1uY2iHKiyqVccXaDbwHvbGcxyl2m2nskrercaRydeLWlwoUJgmD/
-         IChw==
-X-Gm-Message-State: AOJu0YwZsFPYMl8CprPiV3xNKCxOfYNgzDJU05u2wR6vjibtCttwTVwa
-	51FoWUK0uKu1xRGd9+vW7DAExoCSyDxuRkR1diglScemLGu+3SNMWHOxnmIu+1mkz1TrlsDnWho
-	n8uB3
-X-Gm-Gg: ATEYQzwEGlldor6aYPe4D2H1+kGO7Xeon8CLQREbfCCbS+09AbzyKMUHLmwWPVcE0z/
-	2dnzZWokHGuwkBfEDTlHDa01FGW38EK83G41FTz8GxS24fWyLlG02na9DH/x1BsLbobRyFQb1Sj
-	4RAnCkj0XDS6h4TD+L76V7CxN1qn9HeKa8xIb+oj8Re/ez+dkOPn+FXb7eDxlR91gsCXKwsZoRG
-	R5b40g0cvg9yBZCpgfGsZz17QnaLVnP4taEZGzUNg+88oOn7wE4r0ALUPlV+atGaXO7Et5+asg6
-	TCtmn30/oxKJvWFjVAlp1P9fhurWariqwYsv7we90HXk7D6G5/33YVrNmUN8TOT9BMblw70Z1f3
-	bcaCBsBSDeo5v54irTRzr0b/WJNLe7isyEIR80cQDC+A4rPMV6Kt5VtTF0UtOhD/A6HGxZOs/EA
-	2ONe7+q/vAjTGWzzcZcslz4UnW38zzir/Z6+v++YIxvI7IW2q6C7IoeA==
-X-Received: by 2002:a05:600c:3f0a:b0:485:2f4a:6ae6 with SMTP id 5b1f17b1804b1-48727d5941emr40047055e9.6.1774612000783;
-        Fri, 27 Mar 2026 04:46:40 -0700 (PDT)
-Received: from [192.168.0.161] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48722cb0d83sm83129465e9.13.2026.03.27.04.46.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Mar 2026 04:46:40 -0700 (PDT)
-Message-ID: <f7fea291-bde9-4f95-8a59-1b209407ee27@blackwall.org>
-Date: Fri, 27 Mar 2026 13:46:39 +0200
+	s=arc-20240116; t=1774612108; c=relaxed/simple;
+	bh=Kwtx7sJmgY9H63obq3O12tOE4ThiZXqrxNJqOnkc86c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bc4bAQ1MMuEwtJ5bzgEzQYMNa5qWSy96RKDus2D+Kmb8EvdzT4GTJ/X9iUd6wP6U+RwWpLS9586Er4RMYTj1jZ3p4tgEM4+vdvv1sMKxd1gO4Unq/bXQXPlcAfAuzd1ET5J+dNt0oDJJrTY76ikaYdG+Y3oCSLK8zN2ISP5R3T0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tm/l+TU5; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=DAhJnv5c2JC/LGwNBMq3wIdQ+V/gMdi8PLZ3o0VQ/OA=; b=tm/l+TU5AGFWW1JeSpiASjvKDl
+	QnDu7nLiy8lHwChc+hkUWr97Fp0DuFTzkClvkKwutwvko/Wf9WlLHxEMmRB3sqLqc+9+fjc3BKcm7
+	WrBnSEbnpw2pbOVMqo3GphX3Kzij4riEHmsmo6HC+dTE6ATWNLaGMhvQVTvoU1gnR+f8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w65fl-00DeIa-E1; Fri, 27 Mar 2026 12:48:17 +0100
+Date: Fri, 27 Mar 2026 12:48:17 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Joris Vaisvila <joey@tinyisr.com>
+Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
+	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+	olteanv@gmail.com, devicetree@vger.kernel.org,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Subject: Re: [PATCH net-next 2/4] net: phy: mediatek: add phy driver for
+ MT7628 built-in Fast Ethernet PHYs
+Message-ID: <95814693-ed58-46ca-a680-8b93e4adee72@lunn.ch>
+References: <20260326204413.3317584-1-joey@tinyisr.com>
+ <20260326204413.3317584-3-joey@tinyisr.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] bridge: mrp: reject zero test interval to avoid OOM
- panic
-To: Simon Horman <horms@kernel.org>, Xiang Mei <xmei5@asu.edu>
-Cc: netdev@vger.kernel.org, bridge@lists.linux.dev, idosch@nvidia.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- bestswngs@gmail.com
-References: <20260326032438.3307549-1-xmei5@asu.edu>
- <20260327113412.GD567789@horms.kernel.org>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20260327113412.GD567789@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260326204413.3317584-3-joey@tinyisr.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[blackwall.org:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,nvidia.com,davemloft.net,google.com,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-272516-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[blackwall.org];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-272517-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,google.com,davemloft.net,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,blackwall.org:dkim,blackwall.org:mid,asu.edu:email]
-X-Rspamd-Queue-Id: 3E788343C29
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tinyisr.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:email,lunn.ch:mid]
+X-Rspamd-Queue-Id: 5F998343D9F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 27/03/2026 13:34, Simon Horman wrote:
-> On Wed, Mar 25, 2026 at 08:24:38PM -0700, Xiang Mei wrote:
->> br_mrp_start_test() and br_mrp_start_in_test() accept the user-supplied
->> interval value from netlink without validation. When interval is 0,
->> usecs_to_jiffies(0) yields 0, causing the delayed work
->> (br_mrp_test_work_expired / br_mrp_in_test_work_expired) to reschedule
->> itself with zero delay. This creates a tight loop on system_percpu_wq
->> that allocates and transmits MRP test frames at maximum rate, exhausting
->> all system memory and causing a kernel panic via OOM deadlock.
+On Thu, Mar 26, 2026 at 10:44:11PM +0200, Joris Vaisvila wrote:
+> The Fast Ethernet PHYs present in the MT7628 SoCs require an
+> undocumented bit to be set before they can establish 100mbps links.
 > 
-> I would suspect the primary outcome of this problem is high CPU consumption
-> rather than memory exhaustion. Is there a reason to expect that
-> the transmitted fames can't be consumed as fast as they are created?
+> This commit adds the Kconfig option MEDIATEK_FE_SOC_PHY and the
+> corresponding driver mtk-fe-soc.c.
 > 
+> Signed-off-by: Joris Vaisvila <joey@tinyisr.com>
 
-+1
-More so with CAP_NET_ADMIN you can cause all sorts of OOM and high-cpu usage
-conditions. This is a configuration error and OOM doesn't lead to panic unless
-instructed to. I don't think this is worth changing at all.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
->>
->> The same zero-interval issue applies to br_mrp_start_in_test_parse()
->> for interconnect test frames.
->>
->> Use NLA_POLICY_MIN(NLA_U32, 1) in the nla_policy tables for both
->> IFLA_BRIDGE_MRP_START_TEST_INTERVAL and
->> IFLA_BRIDGE_MRP_START_IN_TEST_INTERVAL, so zero is rejected at the
->> netlink attribute parsing layer before the value ever reaches the
->> workqueue scheduling code. This is consistent with how other bridge
->> subsystems (br_fdb, br_mst) enforce range constraints on netlink
->> attributes.
->>
->> Fixes: 7ab1748e4ce6 ("bridge: mrp: Extend MRP netlink interface for configuring MRP interconnect")
-> 
-> I think you also want
-> 
-> Fixes: 20f6a05ef635 ("bridge: mrp: Rework the MRP netlink interface")
-> 
-> As highlighted by AI review.
-> 
->> Reported-by: Weiming Shi <bestswngs@gmail.com>
->> Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> 
-> ...
-
+    Andrew
 
