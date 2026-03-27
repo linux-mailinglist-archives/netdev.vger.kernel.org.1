@@ -1,225 +1,316 @@
-Return-Path: <netdev+bounces-272337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272338-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wN/qBgTtxWlTDQUAu9opvQ
-	(envelope-from <netdev+bounces-272337-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:35:48 +0100
+	id YJBzGR3wxWkkEgUAu9opvQ
+	(envelope-from <netdev+bounces-272338-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:49:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B96A733E662
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:35:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBC3D33E801
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 25B2730D0378
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:29:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A4FE631FF4AB
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:29:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF3B30E82D;
-	Fri, 27 Mar 2026 02:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C25330676;
+	Fri, 27 Mar 2026 02:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MeZCcFZK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="osoo/iwX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67693016E0
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 02:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774578315; cv=none; b=U3DB2ksfTOhP595Jt4xik+nfU68fWLerpXamttpIYFh4zxEWaPPmdt82NpZB7huaLGlZgmZo5p2iubducxehJL/0P/22xFoufS1uPObGPt5/wJBjnnt/8jhDJeMfFhE8h9TYZSk6aejgua/ESKMxN9WkN4YyCj0eAe8CkGvUjts=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774578315; c=relaxed/simple;
-	bh=GA9iJ3FHlrroqC2NNiJuu9RWhIYVniR+DEyF4ubqR/A=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=TEmU03K4v6zaUsfchmfhlSAMcCYYqL4A/yrKwavYJoaCA+Kl9x3NmXb6G3hul8z598Kz5ZUqQf0nnj8iuNY7BoluNTd7Tr52doGvY2BHxP0cukJ2eucL1Y8wnzGKOA3yLFZMEE6i3a1kgxffJX4cw1SRSbyuf+QEXf7hj/VCVlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MeZCcFZK; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAC93002B3
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 02:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774578519; cv=pass; b=Q6LOhmablnG9Kb7KHStAKvMC871Es6v1qlFbR2yr9DapGhKwFdisqG6UbsEr5BtZ1OuAn0/SdYBE0jcCCR0YgD7KKUahwYe8m4sByDVQM93kv94Yk22dW1bjRD4xVgS3xlrHMk8Tsb4qIBAYcnXpcuGxza51ABJt+c1+xujeS8Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774578519; c=relaxed/simple;
+	bh=HdDqD4u/X6L1QK8GFdtslv9KZE3dAP7uRvJPuX1zDoE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m6wKNVQ6WfOp9gszuSER/s2gTVGr2S//sLSQ5nQ2leh1E1FdhGcVoUOuuq9ZNe5JB5vWInvkge1c80MKFRp/o/M2YEdtw4Yo4N3D/HuKb9OT/x09NiPHIgwKRSQ8MY1DbrRFD7CKP6K7em1UsXBRvY16A2D2YXK6SmqVEo3kkV8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=osoo/iwX; arc=pass smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-c70fb6aa323so667812a12.3
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 19:25:13 -0700 (PDT)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-66132b22182so2234793a12.2
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 19:28:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774578516; cv=none;
+        d=google.com; s=arc-20240605;
+        b=a+FcsBaNGAuZVEQF36+8Drqc5c745oKPsJ0fNeaekj9Nug6atLiGEh+UiLMmJKdNqB
+         /AAidFCbggICPM6Om3fWpMAxSkil4UISwkaYCOwuqoCUvmthlaweVfbVgTJa9kuMcHZF
+         de+oCB6xduMIe1qNwB8b2FTbngv8BgueR2QsIHnzTCitw0UY36F35LxU9hZr7i6AmHnH
+         t/IV/SsEfxwoOU8S553LS/VRq8kjmwezKC/0F95KilKJG1jwco3qIH9Glt+o6O3C3vEm
+         HopzRXT4QS+074O1xy6lrBxK0wzee3GlQKjZX9TICI9hi1OUK9g6siNYqKP24BDfNw3C
+         bbhg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=o/QYHaH5lUz5iP49ZKscBpC9M/ZhuP2QIdCxew6sXwY=;
+        fh=Bib4zHjZ7uh7m9yHiKtwR313N216XW+ymU5hwk8xq/Q=;
+        b=ZKevYKyRjkgLXfxrUWNA33dF1tnl4pSDsPP29EgDIdMMK/Gye16cbP/fnxAr6st1SK
+         tryyI4VYJP9VYEPId4uF8KElIgkyLaqS7I8PuosI1m5ahXqTngp7xoCQUrIGMMbzrpWN
+         FhXhfACbkz5O0gE0h59ZOPA1tx6tbobmJ3L5u87zmUZLzcDIZ3DHzUVZ7QZLV6jpse6z
+         eV6eNekCyVDwZvLijE4xG1NOX2RAyCD2bEQchuk9PKMD6vHYR0dIDqWIAz+pvwo+yEjH
+         yYeBLFq0uY4tegfxegklsrU7fShINwo2gzcAaXzdSlrf5j7E3qlB8OZia6vRIvpszVZY
+         6dLw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774578313; x=1775183113; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RgsriYW27LYcQzITLoiIl7pLc3IW/A/busdV44W1OJw=;
-        b=MeZCcFZKlwi3rNFgQ5ayoTF+0SnE7Ehttu0O1M+2/9F5Tu20xyHa1GE/UhOsEDS5mi
-         lUPW43+a68DUvrg3Vv2j2p5CHU5u355wz1D78QYuMlc4kRi93Fzd2Bafpvq5/rlzTNRP
-         hGlGkFBGX6di/8lG+Kd7JYbySnIAz6ygRhpOnO9xrI5DjjXLsKuX39AYaUK/1xGRbQEW
-         tYEZD8L0CoKL6HGM6EYsQ7a6weLcU4iTpsk0M+zuWH8VLterGLgISHGyN/tg+56NZaCM
-         Bxr5e6IoAIGx6wbWNN48X7AfIQhqmgCtYSD31cZL6t/oFY1qJqFPW9DgNGSJCBrnX6k9
-         LMTw==
+        d=gmail.com; s=20251104; t=1774578516; x=1775183316; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=o/QYHaH5lUz5iP49ZKscBpC9M/ZhuP2QIdCxew6sXwY=;
+        b=osoo/iwXVRYkFj6XpPsvL4mN0Vw11EYfasWQhfJyT9V40j72sF0l5TQ6nZ7EeGNXul
+         /77JDWS3wJ4sbOquxpTOZSFuWHe6SW2Wkjg8ZcPWl7GklvJlycnxU4GCWELCqe5UHkBD
+         6Ux56dQQj4SV+ekc2IVkWEd3RRE59kRJkEf3u17E9ot/W6o4DlBMrUuGQzdEJi6sZfbr
+         F7exnCSSlxcln7eNc+NxF+0wgfV4DVZb1qMKaSuuAuYV2lSbQSTcLuaL5YFn+aS+g4tU
+         MBTfeXySZz+wkRE3r487tC+KB/G73I7vmPnmyqMdS86rsSfAYE6Xy2CjhnGjyo2lF67t
+         NVWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774578313; x=1775183113;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1774578516; x=1775183316;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RgsriYW27LYcQzITLoiIl7pLc3IW/A/busdV44W1OJw=;
-        b=YSFxXv0lUM2uW8ErB4pYxdX9h6MsprHXyRWsEeRtzETI2rsgUSZXNoLxErNlZBAG2t
-         Pe+rryttHC9CL1h5uIvMuoxjEbaxsTctdElKNs4capLnImlv6rkIyOWfhRncgEkrXmAx
-         o9ysdeBWe1tkqE0J5ZovyOiYVvCr7MxG5wXjnRS1eHgjz7du9mxTTXbnn9ey2cw9IzRy
-         n562szubQphf5AiBlIzFCWiUTXpolovYcsGg+Bbp0ld754V0rPjATKe5acFN65syYj7v
-         EJYH2BFFyv8dj6WeFGswRFl9hOZtRElR0gqg2rQVi7V1SjPw23x2/RnJKCQSz7WlhR6f
-         uMHw==
-X-Forwarded-Encrypted: i=1; AJvYcCXeZvZiS0ZhgJvuk7SxKOp7GQcuCmEbMh9E2w58jxT3KcS/VkyRs6pf4754Pyn9Us+NoCTJt3Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPwv7TlbL6ULDUKkzX73G36vsIpJrLbBnghq3RH24WijgXYJi+
-	k9LQ+drbrukYM7wu9em4RATwO2C/Y+/GIekRXwMv2dkcfomzZMbVTtYg
-X-Gm-Gg: ATEYQzwzC+58fsvLNbzvxfhp4kX8h+qP9kZK9C/lyC1LbFeXWz9WPBjDcGZ53SzNwue
-	DgCZjwFz7XwDgt5aHEAVAvvi58DQtIBrARvT1JBf18SR0rin9v/bvCI+YeyXgxZosd09f+8Denz
-	ktEyQdDk4xtd2EJ+PFwj5ue83X7dulr1ps99L8JNP7b/+0h2NudaAy/+7NeMdwnm+zeoxbjA9Me
-	IyFweyiiNR3vSGA506Jga45HlMVf1aDo1iwQtkwGHMLWQzG+upM0PvPiTO2OZM0uyRjGTG6htTl
-	nrjvp9TIfbr7t+sM/QQJAF45GygoutpPDpuqwy+u8hYPf7HXSy9Ej76sxEZeolrszYrnE3xXi2C
-	AX6F6IbledwAGe5KhKmURnJrtFRdkXesvhbmTQloCiPD0aRm33z1LSeHIMcwyZpoBXpXt5Yc5l/
-	ZvMMtVeuK0I7F87HhBGV5xbUolqm5XLUR2rEwVfo+OSkPMqhbmHjIZCxVAv0oiVo9YiYGpGSJD8
-	+Z7pNA6NHOlScWnPIio/s9NdILDPebcQGEpOJQ4pp0dkfyPoji1
-X-Received: by 2002:a17:903:37ce:b0:2b0:41bf:ca83 with SMTP id d9443c01a7336-2b0cdcc8106mr9033135ad.23.1774578312983;
-        Thu, 26 Mar 2026 19:25:12 -0700 (PDT)
-Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([240e:34c:576a:8120:d1e2:12aa:7df5:2768])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b0cb9ad55csm9423815ad.53.2026.03.26.19.25.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 19:25:12 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-Date: Fri, 27 Mar 2026 10:24:47 +0800
-Subject: [PATCH net v2] ipv6: fix data race in fib6_metric_set() using
- cmpxchg
+        bh=o/QYHaH5lUz5iP49ZKscBpC9M/ZhuP2QIdCxew6sXwY=;
+        b=KYsf9cIKqgjioZ44EyqBrzS9hTXHltimqlW28fl5L3I6uNh0SIpXCCpmTFmuePH2RZ
+         vc5h502ZhT1XYX9AVxtJf+E6ll9cwfVGmaETGrqV7fpBiZJX2SlN9VDtyA45QwbQByQX
+         zRA1f6vX18wDoC9Oy16eI+dMm7wx0iSk1Yi0gTZQ/gvb+UYBxnMxsIKr7lL4hfvzO4HM
+         S79FdNGtGp7v7kXOjjzqJA9m8FeaJyUG0e3zVbDzWifYKxBhe8bao7NBeeMID6cEuxgR
+         02jltG1JWUbHwt70m3v4OCQl/HZXRVEzVf8htEC/vRegslm84UeHF4FRruXTBoXMW1Tt
+         qieQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU8ssQSH8V/nqqa8vVEA2vMa8XWMV/XChtjFh7pyWu41d9MIxIDu/FIR+Gbw9D/4ZOO2ctbTk4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqPM+PkYmrEnMiK0EMtGEDRnunKJ07Jlkco1hFeeWmskE3Aesw
+	my64GxBbaFiVCIPj9ISyvKnJfubR3hWcOlPVOyOg2X2umvnSRoCEKyUF0Y+x5moZaOi227yC7Wn
+	BFLJCtazHk4N7cllAQY6qGeS+d7AqaqY=
+X-Gm-Gg: ATEYQzxqn3VQxRoFPmDxa9rx+bVSq/BkB4mUmnLexEUv7G5pDkzTozbBaEzRvSJdZZV
+	eUD3yq7KhLU8FuvgIm11D27jd/qN0bPlVfyylolrBwcj0wgiAZc4Li0V+ezmZnJnKR9xlILJHtx
+	+wxE//aSyhegIpui78a3SgTNoXkfbaZ5J3IbO5fXQFwLtYcxpK08jiiGwOygBLSte1wBERqq2yG
+	0Og/anCV4b099qdH+ByRKqjM3ZRly4/z0yoYdthsM6ut93ootBYx9e25eu7pPVMQImthicWHYz9
+	muvr
+X-Received: by 2002:a05:6402:a0dc:b0:666:d675:e2ed with SMTP id
+ 4fb4d7f45d1cf-66b28b5d0c3mr265917a12.21.1774578516178; Thu, 26 Mar 2026
+ 19:28:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260327-b4-fib6_metric_set-kmemleak-v2-1-366b2c78b5c2@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/42NWwqDMBBFtyLz3SkmWh/96j6KSJKOOmi0JEFax
- L03ZAX9POfCuQd4ckwe7tkBjnb2vK0R5CUDM6l1JORXZJC5rPJCVqhLHFhXvaXg2PSeAs6W7EJ
- qxlqpm2jrRjalglh4Oxr4k+pPWClAF+XEPmzumx53kaa/4rtAgaZpByN0IaTJH6NVvFzNZqE7z
- /MHHYTQ6csAAAA=
-X-Change-ID: 20260326-b4-fib6_metric_set-kmemleak-7aa51978284a
-To: "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Fei Liu <feliu@redhat.com>, 
- Hangbin Liu <liuhangbin@gmail.com>
-X-Mailer: b4 0.14.3
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+References: <20260323182823.5813-1-teknoraver@meta.com> <20260323182823.5813-2-teknoraver@meta.com>
+ <IA3PR11MB8986EC18B4FE10649049AF87E548A@IA3PR11MB8986.namprd11.prod.outlook.com>
+In-Reply-To: <IA3PR11MB8986EC18B4FE10649049AF87E548A@IA3PR11MB8986.namprd11.prod.outlook.com>
+From: Matteo Croce <technoboy85@gmail.com>
+Date: Fri, 27 Mar 2026 03:27:59 +0100
+X-Gm-Features: AQROBzBQpBbZY2yB90kykPH3EOXGMHAzeYAHmse7tk-aqdKtuWnq9c8rAoT9-d0
+Message-ID: <CAFnufp1H4ptUN0mr1Kq4j2hcOE+pN-XfiHnwh_6=68FD2OzomA@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next v4 1/2] e1000e: add basic XDP support
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Mohsin Bashir <mohsin.bashr@gmail.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-272337-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272338-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,vger.kernel.org,lists.osuosl.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[technoboy85@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B96A733E662
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BBC3D33E801
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-fib6_metric_set() may be called concurrently from softirq context without
-holding the FIB table lock. A typical path is:
+Il giorno mar 24 mar 2026 alle ore 09:06 Loktionov, Aleksandr
+<aleksandr.loktionov@intel.com> ha scritto:
+>
+>
+>
+> > -----Original Message-----
+> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > Of Matteo Croce
+> > Sent: Monday, March 23, 2026 7:28 PM
+> > To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
+> > Przemyslaw <przemyslaw.kitszel@intel.com>; Andrew Lunn
+> > <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric
+> > Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
+> > Abeni <pabeni@redhat.com>; Alexei Starovoitov <ast@kernel.org>; Daniel
+> > Borkmann <daniel@iogearbox.net>; Jesper Dangaard Brouer
+> > <hawk@kernel.org>; John Fastabend <john.fastabend@gmail.com>; Mohsin
+> > Bashir <mohsin.bashr@gmail.com>
+> > Cc: netdev@vger.kernel.org; bpf@vger.kernel.org; intel-wired-
+> > lan@lists.osuosl.org; linux-kernel@vger.kernel.org
+> > Subject: [Intel-wired-lan] [PATCH net-next v4 1/2] e1000e: add basic
+> > XDP support
+> >
+> > Add XDP support to the e1000e driver covering the actions defined by
+> > NETDEV_XDP_ACT_BASIC: XDP_DROP, XDP_PASS, XDP_TX and XDP_ABORTED.
+> >
+> > Infrastructure:
+> > - e1000_xdp_setup() / e1000_xdp() for program attach/detach with
+> >   MTU validation and close/open cycle
+> > - ndo_bpf support in net_device_ops
+> > - xdp_rxq_info registration in setup/free_rx_resources
+> >
+> > Receive path:
+> > - e1000_alloc_rx_buffers_xdp() for page-based Rx buffer allocation
+> >   with XDP_PACKET_HEADROOM
+> > - e1000_clean_rx_irq_xdp() as the XDP receive handler
+> > - e1000_run_xdp() to execute the XDP program on received packets
+> > - SKB building via napi_build_skb() for XDP_PASS with metadata,
+> >   checksum offload and RSS hash support
+> >
+> > Transmit path:
+> > - e1000_xdp_xmit_ring() to DMA-map and enqueue an XDP frame
+> > - e1000_xdp_xmit_back() to convert an xdp_buff to a frame and send it
+> > - e1000_finalize_xdp() to flush the TX ring after XDP processing
+> > - TX completion via xdp_return_frame() with buffer type tracking
+> >
+> > Assisted-by: claude-opus-4-6
+> > Signed-off-by: Matteo Croce <teknoraver@meta.com>
+> > ---
+> >  drivers/net/ethernet/intel/Kconfig         |   1 +
+> >  drivers/net/ethernet/intel/e1000e/e1000.h  |  18 +-
+> > drivers/net/ethernet/intel/e1000e/netdev.c | 533 ++++++++++++++++++++-
+> >  3 files changed, 540 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/intel/Kconfig
+> > b/drivers/net/ethernet/intel/Kconfig
+> > index 288fa8ce53af..46e37cb68e70 100644
+> > --- a/drivers/net/ethernet/intel/Kconfig
+> > +++ b/drivers/net/ethernet/intel/Kconfig
+> > @@ -63,6 +63,7 @@ config E1000E
+> >       depends on PCI && (!SPARC32 || BROKEN)
+> >       depends on PTP_1588_CLOCK_OPTIONAL
+> >       select CRC32
+> > +     select PAGE_POOL
+> >       help
+> >         This driver supports the PCI-Express Intel(R) PRO/1000
+> > gigabit
+> >         ethernet family of adapters. For PCI or PCI-X e1000 adapters,
+> > diff --git a/drivers/net/ethernet/intel/e1000e/e1000.h
+> > b/drivers/net/ethernet/intel/e1000e/e1000.h
+> > index 63ebe00376f5..4c1175d4e5cb 100644
+> > --- a/drivers/net/ethernet/intel/e1000e/e1000.h
+> > +++ b/drivers/net/ethernet/intel/e1000e/e1000.h
+> > @@ -19,10 +19,13 @@
+> >  #include <linux/net_tstamp.h>
+> >  #include <linux/ptp_clock_kernel.h>
+> >  #include <linux/ptp_classify.h>
+>
+> ...
+>
+> > +/**
+> > + * e1000_xdp_xmit_ring - transmit an XDP frame on the TX ring
+> > + * @adapter: board private structure
+> > + * @tx_ring: Tx descriptor ring
+> > + * @xdpf: XDP frame to transmit
+> > + *
+> > + * Returns E1000_XDP_TX on success, E1000_XDP_CONSUMED on failure
+> > **/
+> > +static int e1000_xdp_xmit_ring(struct e1000_adapter *adapter,
+> > +                            struct e1000_ring *tx_ring,
+> > +                            struct xdp_frame *xdpf)
+> > +{
+> > +     struct e1000_buffer *buffer_info;
+> > +     struct e1000_tx_desc *tx_desc;
+> > +     dma_addr_t dma;
+> > +     u16 i;
+> > +
+> > +     if (e1000_desc_unused(tx_ring) < 1)
+> > +             return E1000_XDP_CONSUMED;
+> > +
+> > +     i = tx_ring->next_to_use;
+> Unsynchronized read of next_to_use. ndo_start_xmit on another CPU can be
+> reading+writing this same field RIGHT NOW under __netif_tx_lock, which we do NOT hold.
+> Isn't it ?
+>
+> > +     buffer_info = &tx_ring->buffer_info[i];
+> > +
+> > +     dma = dma_map_single(&adapter->pdev->dev, xdpf->data, xdpf-
+> > >len,
+> > +                          DMA_TO_DEVICE);
+> > +     if (dma_mapping_error(&adapter->pdev->dev, dma))
+> > +             return E1000_XDP_CONSUMED;
+> > +
+> > +     buffer_info->xdpf = xdpf;
+> > +     buffer_info->type = E1000_TX_BUF_XDP;
+> > +     buffer_info->dma = dma;
+> > +     buffer_info->length = xdpf->len;
+> > +     buffer_info->time_stamp = jiffies;
+> > +     buffer_info->next_to_watch = i;
+> > +     buffer_info->segs = 1;
+> > +     buffer_info->bytecount = xdpf->len;
+> > +     buffer_info->mapped_as_page = 0;
+> > +
+> > +     tx_desc = E1000_TX_DESC(*tx_ring, i);
+> > +     tx_desc->buffer_addr = cpu_to_le64(dma);
+> Writing DMA descriptor that ndo_start_xmit may also be writing to
+> at the same index - probably causes ring corruption
+>
+> > +     tx_desc->lower.data = cpu_to_le32(adapter->txd_cmd |
+> > +                                        E1000_TXD_CMD_IFCS |
+> > +                                        xdpf->len);
+> > +     tx_desc->upper.data = 0;
+> > +
+> > +     i++;
+> > +     if (i == tx_ring->count)
+> > +             i = 0;
+> > +     tx_ring->next_to_use = i;
+> Unsynchronized store - races with the identical write in e1000_xmit_frame.
+>
+> > +
+> > +     return E1000_XDP_TX;
+> > +}
+> > +
+>
+> ...
+>
+> >       kfree(adapter->tx_ring);
+> >       kfree(adapter->rx_ring);
+> >
+> > --
+> > 2.53.0
+>
 
-  ndisc_router_discovery()
-    spin_unlock_bh(&table->tb6_lock)        <- lock released
-    fib6_metric_set(rt, RTAX_HOPLIMIT, ...) <- lockless call
+You're right. I see two solutions here: taking __netif_tx_lock around
+the XDP TX, or using a separate TX ring dedicated to XDP.
+The latter would be a bigger change for e1000e since it only has one
+TX queue, so I'd go with the lock.
 
-When two CPUs process Router Advertisement packets for the same router
-simultaneously, they can both arrive at fib6_metric_set() with the same
-fib6_info pointer whose fib6_metrics still points to dst_default_metrics.
-
-  if (f6i->fib6_metrics == &dst_default_metrics) {   /* both CPUs: true */
-      struct dst_metrics *p = kzalloc_obj(*p, GFP_ATOMIC);
-      refcount_set(&p->refcnt, 1);
-      f6i->fib6_metrics = p;   /* CPU1 overwrites CPU0's p -> p0 leaked */
-  }
-
-The dst_metrics allocated by the losing CPU has refcnt=1 but no pointer
-to it anywhere in memory, producing a kmemleak report:
-
-  unreferenced object 0xff1100025aca1400 (size 96):
-    comm "softirq", pid 0, jiffies 4299271239
-    backtrace:
-      kmalloc_trace+0x28a/0x380
-      fib6_metric_set+0xcd/0x180
-      ndisc_router_discovery+0x12dc/0x24b0
-      icmpv6_rcv+0xc16/0x1360
-
-Fix this by:
- - Set val for p->metrics before published via cmpxchg() so the metrics
-   value is ready before the pointer becomes visible to other CPUs.
- - Replace the plain pointer store with cmpxchg() and free the allocation
-   safely when competition failed.
- - Add READ_ONCE()/WRITE_ONCE() for metrics[] setting in the non-default
-   metrics path to prevent compiler-based data races.
-
-Fixes: d4ead6b34b67 ("net/ipv6: move metrics from dst to rt6_info")
-Reported-by: Fei Liu <feliu@redhat.com>
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
-Changes in v2:
-- Set val for p->metrics before published via cmpxchg() (Eric Dumazet)
-- Add READ_ONCE()/WRITE_ONCE() for metrics[] setting (Jiayuan Chen)
-- Link to v1: https://lore.kernel.org/r/20260326-b4-fib6_metric_set-kmemleak-v1-1-c89fc1b312c0@gmail.com
----
- net/ipv6/ip6_fib.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
-
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index dd26657b6a4a..2a7cc33fbcef 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -730,17 +730,24 @@ void fib6_metric_set(struct fib6_info *f6i, int metric, u32 val)
- 	if (!f6i)
- 		return;
- 
--	if (f6i->fib6_metrics == &dst_default_metrics) {
-+	if (READ_ONCE(f6i->fib6_metrics) == &dst_default_metrics) {
-+		struct dst_metrics *dflt = (struct dst_metrics *)&dst_default_metrics;
- 		struct dst_metrics *p = kzalloc_obj(*p, GFP_ATOMIC);
- 
- 		if (!p)
- 			return;
- 
-+		p->metrics[metric - 1] = val;
- 		refcount_set(&p->refcnt, 1);
--		f6i->fib6_metrics = p;
-+		if (cmpxchg(&f6i->fib6_metrics, dflt, p) != dflt)
-+			kfree(p);
-+		else
-+			return;
- 	}
- 
--	f6i->fib6_metrics->metrics[metric - 1] = val;
-+	struct dst_metrics *m = READ_ONCE(f6i->fib6_metrics);
-+
-+	WRITE_ONCE(m->metrics[metric - 1], val);
- }
- 
- /*
-
----
-base-commit: c4ea7d8907cf72b259bf70bd8c2e791e1c4ff70f
-change-id: 20260326-b4-fib6_metric_set-kmemleak-7aa51978284a
-
-Best regards,
+Thanks,
 -- 
-Hangbin Liu <liuhangbin@gmail.com>
+Matteo Croce
 
+perl -e 'for($t=0;;$t++){print chr($t*($t>>8|$t>>13)&255)}' |aplay
 
