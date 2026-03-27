@@ -1,140 +1,105 @@
-Return-Path: <netdev+bounces-272296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272297-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iKPDGl7UxWnQCAUAu9opvQ
-	(envelope-from <netdev+bounces-272296-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:50:38 +0100
+	id YJszErTUxWnQCAUAu9opvQ
+	(envelope-from <netdev+bounces-272297-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:52:04 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA43933D9EA
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:50:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0130433DA02
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:52:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 48B063023500
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 00:49:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E47E3302337B
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 00:50:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9465C1DB34C;
-	Fri, 27 Mar 2026 00:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF04281368;
+	Fri, 27 Mar 2026 00:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o62RvCUd"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4FB155326;
-	Fri, 27 Mar 2026 00:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9B8282F11
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 00:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774572571; cv=none; b=fL9oyB0CUGenxb5KgrWwFXst+SyJpMBH0ZNDNlhHZSmTSW+tGm5coIZH9Jm72POy5ENYIssrAWkXLFtPxCUzRofi6k537uwQBDpqoxqUV6lS0/LFFb20FoD8klYmr4qxoCMEwD568+0xeA+eVh9CUhkO4fBhG3qtZBs8mjcOtRI=
+	t=1774572652; cv=none; b=GYMhAMm5aVreyjyC5a8NAcL9m0OdhbVF4d4bRr26ld7NhgmduEj5wl9FTnccjFXTVvdeHsatpCcU0lqTqPHfvqwLNcNaOgIuyFuMBv+hojw6qprYkyCOeW3ftTsOoejUem9OOt2R9d+GKhkWI2mT7C4VyBEZwSOvlbF0s8RHBKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774572571; c=relaxed/simple;
-	bh=MPdtmWiT9iqAmPuCSGKMQD6D36b2PXRFVInDXW9L72o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gXtnCK5Cgr1Hqlwm+DFpK2gu/lWRPuHpiAQbPIEPYy//lgMTBKfV1AN39mOfRANVuLP5RCj5RQa9+eCOH2ilQ7fOkuJhz0GojNhW+9/QA7Mt4OqyNTf6FCvRRTjMNZw5QesoyPJekky/55DaeNfKRFWJ2XvVZ3FetTyeh81LeWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [111.196.245.197])
-	by APP-03 (Coremail) with SMTP id rQCowACnyeAR1MVpb7L4Cw--.40306S2;
-	Fri, 27 Mar 2026 08:49:21 +0800 (CST)
-From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-To: andrew+netdev@lunn.ch
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pengpeng@iscas.ac.cn
-Subject: Re: [PATCH] qed: fcoe: limit command queue array fill to the ramrod array size
-Date: Fri, 27 Mar 2026 08:49:21 +0800
-Message-ID: <20260327004921.61371-1-pengpeng@iscas.ac.cn>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260324105647.92763-1-pengpeng@iscas.ac.cn>
-References: <20260324105647.92763-1-pengpeng@iscas.ac.cn>
+	s=arc-20240116; t=1774572652; c=relaxed/simple;
+	bh=E8z9xsiZJnyDXAvMSIm4/D6VjQNc8xajnju24fxixLw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S8+e3HWDJYUvP2MRmKemmsMrLh4w/sf2iWW4nH+YVcUzTBJiVa7pqWGrj3ELNXicMfarRKlu4yGXPJc8qO2ItOuk/XFMbOX7Hd9zTh7p5PHUt/kyzC7hsHBlrvaGzWsxvJdVobryqPaum7+jKhf2RokA33qCfePDB204qCbju8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o62RvCUd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0C50C116C6;
+	Fri, 27 Mar 2026 00:50:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774572652;
+	bh=E8z9xsiZJnyDXAvMSIm4/D6VjQNc8xajnju24fxixLw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=o62RvCUdaElvZvNdXI4uwGymAu3gdVtSXkaPEE9S1tCXCFLWKKE/GhHzbCuLNIU2K
+	 Y9U9y0bljpe4Q/+bRPeXon/Z3CRZhSyO23GuXplBWmnpMKSXZAr0jZjDLOx6AcuaGD
+	 W6OMOYIvgPctH404rVjPjGTLU0idA1OrO3y30h1BfcXLgqEtYz7hIereu4q+vjgxYW
+	 4PR8oR0bXRj+DsisbuEbCif9obgp1eKBjAWJyYOtsOOTMFQPEeCE+faaoFhnkQA2p1
+	 6MZUsfGbUZ/47RuW/Q3IHFX+x82i55j5kGogtoJ1HoqTg3vTmyYtgL1BAnm3Zo4r6p
+	 4r/ldqyBie3UQ==
+Date: Thu, 26 Mar 2026 17:50:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xiang Mei <xmei5@asu.edu>
+Cc: security@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ jhs@mojatatu.com, jiri@resnulli.us, davem@davemloft.net,
+ edumazet@google.com, horms@kernel.org, bestswngs@gmail.com
+Subject: Re: [PATCH net v2] net/sched: sch_hfsc: fix divide-by-zero in
+ rtsc_min()
+Message-ID: <20260326175051.31828b64@kernel.org>
+In-Reply-To: <CAPpSM+Sz_z2LpJwJrc9g+A+vRb=dRyMaDnBdZPP7TT952bgjpg@mail.gmail.com>
+References: <20260326075851.3967598-1-xmei5@asu.edu>
+	<g5kyhh74rriqg4ayz5txfqqtxpuklzu4kbkmcwihqpvyv4xq2s@xcpvtqh7bh5g>
+	<20260326122137.4aae1d46@kernel.org>
+	<CAPpSM+Sz_z2LpJwJrc9g+A+vRb=dRyMaDnBdZPP7TT952bgjpg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowACnyeAR1MVpb7L4Cw--.40306S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7XFW5GrWkGF1UGryDXF1rXrb_yoWDCrX_GF
-	Z8CwnY93W8ZF4vg39IkrsxXrsrX3yUW34DZa1kAF18KryavrW5uryrW342yr47JayF9rZ5
-	Gry3Ka4UK3W5CjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb4AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVW8Jr
-	0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-	6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v2
-	6r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
-	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
-	c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
-	AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_
-	Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU18sqt
-	UUUUU==
-X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,redhat.com,mojatatu.com,resnulli.us,davemloft.net,google.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-272297-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272296-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CA43933D9EA
+X-Rspamd-Queue-Id: 0130433DA02
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+On Thu, 26 Mar 2026 13:44:37 -0700 Xiang Mei wrote:
+> Thanks for the suggestion. A TDC selftest was added to v3.
 
-No, I do not think the existing feat_num-based check is sufficient here.
-
-That check only verifies that num_cqs does not exceed the FCoE CQ
-resources reported by the hardware:
-
-    fcoe_pf_params->num_cqs <= p_hwfn->hw_info.feat_num[QED_FCOE_CQ]
-
-But the ramrod field being filled afterwards is a fixed-size array:
-
-    cq_cmdq_sb_num_arr[SCSI_MAX_NUM_OF_CMDQS]
-
-and SCSI_MAX_NUM_OF_CMDQS is 64 in the current tree.
-
-The in-tree qedf caller derives num_cqs from the device-reported CQ count
-and the online CPU count:
-
-    dev_info.num_cqs = FEAT_NUM(hwfn, QED_FCOE_CQ)
-    num_queues = min(dev_info.num_cqs, num_online_cpus())
-    fcoe_pf_params->num_cqs = num_queues
-
-So the existing resource check and the ramrod array capacity are not the
-same bound. If the hardware reports more than 64 FCoE CQs, current-tree
-callers can still pass a num_cqs value that satisfies the feat_num check
-but exceeds ARRAY_SIZE(cq_cmdq_sb_num_arr).
-
-I can resend with this clarified in the commit message.
-
-Best regards,
-Pengpeng
-
+Excellent, thanks!
 
