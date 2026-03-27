@@ -1,246 +1,168 @@
-Return-Path: <netdev+bounces-272573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272574-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CBS7KIqGxmlALQUAu9opvQ
-	(envelope-from <netdev+bounces-272573-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 14:30:50 +0100
+	id CJpjLG+IxmldLgUAu9opvQ
+	(envelope-from <netdev+bounces-272574-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 14:38:55 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C077434541D
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 14:30:49 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5355D345662
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 14:38:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B0D363027688
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:29:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D766D30AA686
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 13:31:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E393E9295;
-	Fri, 27 Mar 2026 13:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D30E39B486;
+	Fri, 27 Mar 2026 13:30:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="aadqkOco";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OZkyxgsh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t5ABGA6p"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C0B3EAC8D
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 13:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED41359A87;
+	Fri, 27 Mar 2026 13:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774618185; cv=none; b=BR6Hyh26Qmt873Cl0VR29xc+Ew62Gi1vijMvXh+KVIx/OOhaJCT/+usqXzRIGKNj6t4eJILYp2IUJBdd2no9zhUEiswpJq6xens6/lVvL9Q9UMSQwi9BgveoIPEgI9PGIs6OR+2E2zfOzg+Mweh5o14dOwZTC1xNWLO+z82O5ko=
+	t=1774618242; cv=none; b=F0+popTG8jx3aaLI/vvo5hAGsCqK4PuHAtChHsBQyVG5qQQ0doBHcDH6RI5aphXYHKMXTJD8iVVsLJPJ7x/vfhXFKKbLaTTpT9e1UfR7H9hzqAf6F61Gxtlg3uQnWyq6P8Wh80pk8jhVn7XHBiCaLIOQICPLv3CkjigpnWwM27s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774618185; c=relaxed/simple;
-	bh=NJqVpvJhJBm0VShieAiUFCZ4442kUiTh0IjxnWGK4zk=;
+	s=arc-20240116; t=1774618242; c=relaxed/simple;
+	bh=/fbIKQ2oLGLR49tKqB6Cs4YItShzlhvXJmfOqd4yPjI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RKWw1IHJBDfnn6FzaRIm7QdXiBLk500zHkPCxquKimWTclWQYDbhrBRUBLOkHi6Vf5RjcxJzbL1VFJdxizZ1Q3lvtUbz7lLKgZdEXGhIuQYTRP34j4aePzs0F+WaRhJTbxrgQy1/va56zqQBlfu98ITuGjLYDVag24PPvknWkTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=aadqkOco; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OZkyxgsh; arc=none smtp.client-ip=202.12.124.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id A707B7A0170;
-	Fri, 27 Mar 2026 09:29:40 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-10.internal (MEProxy); Fri, 27 Mar 2026 09:29:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1774618180; x=
-	1774704580; bh=2IXZxqukJb5w4rqqyV4J/rzB7JNGA6tYKyvKZ3+L5ZE=; b=a
-	adqkOcoti1Opoh4vogjp6UqyGX7KUR57yG6lFjoqiT+PpsbDFkXhlRQrnk+yogCZ
-	Noo+12e9DzcKEJ3javxDHNNx3efaJN2Y2f5h/SDBPu0ORJr5CMbxM79/9kgq6NOg
-	U62RtoZmKx1agbOFUsysLdEbekQpslWUqY/3cN8nMR2UOahcAbbjz+mlsn1g5Mx1
-	nJFd/aJhRZtf01jK4F1uDj3h+/21Idq2/DxsuEtAIAm5E1lL8tI2WSbai1CqaspP
-	FjqDwLziHUMLPFDRXmzsgW/xymJJ6rHhE/IsQcYi9MowA2KEOR/fPGE7NyGalZtl
-	BJaD5JCqJWJwAOazJX66A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1774618180; x=1774704580; bh=2IXZxqukJb5w4rqqyV4J/rzB7JNGA6tYKyv
-	KZ3+L5ZE=; b=OZkyxgsh2VKpgj1jlyS8c/w+TRKh36By/bPXZK1kGFxxjs+obi5
-	XJRF7p6Tj9+EzhhxZQ8rLsawPO4Ule88Oasz+a40tGX0yJ6/ny6C/xeO2atOmTsg
-	ZNoLmhwoTQ2uWW/N5jKTTGzJNegO6tkypAWL1KU5BR65q1eQtQWlDQJpXWrREHgF
-	nqGDXB8D38q3Q0vQXggnxK/mn1tlSkdwgutlme3tNgIFlj4ZJuruVlyC+nL72UcY
-	+aRYrSIXFP7TCTUHYO/KdgN594GxdWXuRdsDYCdonRt7l+kSLd4sLI7IByaTaFOl
-	hJz0aWJjtQQNW8ccQ03BfF9jPMbaSb7Upsg==
-X-ME-Sender: <xms:Q4bGaUbDhOpMkSBW5UD7K6jREFIxDmLBPS7m8f2St6X4ZgblMznFAw>
-    <xme:Q4bGabNzsZelcfzJ8w9XkIWYk_YUmhKq1KuRcm2dd6tA-DnDZLAzkgh1x8t8PTH5q
-    vZi0IGxVYdg_z07DsCJ-FiPrfOp_4V1cJ6fXh16r5WVpzP1S8qHqA>
-X-ME-Received: <xmr:Q4bGaaVO1q98NRDqFNKLpOrl8u0xgtBcWPj3xxyln1hQ3kNdO5-4935jUCrf>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeffedtgedtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduvddpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprhhjvghthhifrghnihesphhurhgvshhtoh
-    hrrghgvgdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopehsrggvvggumhesnhhvihguihgrrdgtohhmpdhrtghpthhtoh
-    epthgrrhhiqhhtsehnvhhiughirgdrtghomhdprhgtphhtthhopehmsghlohgthhesnhhv
-    ihguihgrrdgtohhmpdhrtghpthhtohepsghorhhishhpsehnvhhiughirgdrtghomhdprh
-    gtphhtthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphht
-    thhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvh
-    gvmhhlohhfthdrnhgvth
-X-ME-Proxy: <xmx:Q4bGaYL3sTH74Ky0hbo95YO8qyoK_5odIs-lPEQarXFNbZV6C88NWg>
-    <xmx:Q4bGadrEhzsRq_ycVY6_9xp4CwneZuCvdt5D6WpczaKXh5B3WYLlcg>
-    <xmx:Q4bGaXx-oQNa3fia3kpdDqY_u3Xq7585CdYTFoGpedOjvp9vPU2WmA>
-    <xmx:Q4bGaZtQT4_yq9PiqYnTTfCSqrJxohPL7Bx_EjFVKtvgG2R7X-Hwrw>
-    <xmx:RIbGaSOOdZn58B9g-3SDhes_EumEt52XH03JBmI67nZI1tJL1HTVcNdQ>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 27 Mar 2026 09:29:39 -0400 (EDT)
-Date: Fri, 27 Mar 2026 14:29:37 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Rishikesh Jethwani <rjethwani@purestorage.com>
-Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
-	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com,
-	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, leon@kernel.org
-Subject: Re: [PATCH v9 5/6] tls: add hardware offload key update support
-Message-ID: <acaGQYExqMXEx7vZ@krikkit>
-References: <20260320235706.636531-1-rjethwani@purestorage.com>
- <20260320235706.636531-6-rjethwani@purestorage.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EV8G2z6zev9SiJWb4OE1VDuBbzLRL0EcsbeDH59pl6sUKioeGRJc+13t6zhNjKoW6J3hVLh+UR6Xm8HRqkI+G2R4BpJ8EPkF3cYK5dPOk4v2IZ1aZa9RkB3HCZnGlYZy89c0oD5TSBmuhntQY55wqBd1XuYiowkkR8dtqEyDtR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t5ABGA6p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBE5EC2BC9E;
+	Fri, 27 Mar 2026 13:30:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774618241;
+	bh=/fbIKQ2oLGLR49tKqB6Cs4YItShzlhvXJmfOqd4yPjI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=t5ABGA6pcjq7NImlKHC2f8GTRNLsDhRFsXnkw4rOHm7SG+A5Q0+YsJm8hcYqimxVV
+	 Pz1rhAKSH3A70W4/7BHyQAPThVOD4utxWErzblJhIe2tVMeKqbTQOrtdWNKZkmRb+4
+	 3JF8i1DK5NPKw0av819fxGgsZ9LFjGQ8HnoCy+K10dmBFbQsivvqbDWALtaGAM8uHV
+	 8mTJUtDJwbYdkdIziZzg9TQ1TV/wkS4yHzmYk3XE3EJqO+HoCH5El0dLiAruNcbddb
+	 v7sHfffxa7yvmQaIFoHIPMe+1jd3xPl7gnwkioqZ1PSRwsEsKHE5QEaIob7yOkzDhv
+	 3d3u0IxqB8Ysw==
+Date: Fri, 27 Mar 2026 13:30:36 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, donald.hunter@gmail.com,
+	jiri@resnulli.us, chuck.lever@oracle.com, matttbe@kernel.org,
+	cjubran@nvidia.com, shshitrit@nvidia.com, dtatulea@nvidia.com,
+	tariqt@nvidia.com
+Subject: Re: [PATCH v8 net-next 6/6] octeontx2-af: npc: Support for custom
+ KPU profile from filesystem
+Message-ID: <20260327133036.GE567789@horms.kernel.org>
+References: <20260325072159.1126964-1-rkannoth@marvell.com>
+ <20260325072159.1126964-7-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260320235706.636531-6-rjethwani@purestorage.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+In-Reply-To: <20260325072159.1126964-7-rkannoth@marvell.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm2,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-272574-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272573-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,kernel.org,davemloft.net,redhat.com,google.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,marvell.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,resnulli.us,oracle.com,nvidia.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C077434541D
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: 5355D345662
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-03-20, 17:57:05 -0600, Rishikesh Jethwani wrote:
-> Add TLS KeyUpdate (rekey) support for hardware offload connections.
-> 
-> When tls_dev_add() fails during hardware rekey, the connection
-> gracefully degrades to software encryption/decryption while
-> maintaining TLS_HW configuration.
-> 
-> Tested on Mellanox ConnectX-6 Dx (Crypto Enabled) with multiple
-> TLS 1.3 key update cycles.
+On Wed, Mar 25, 2026 at 12:51:59PM +0530, Ratheesh Kannoth wrote:
 
-Now your commit messages have gone from "overly detailed descriptions
-of every minor change" to not describing anything about a pretty
-complex patch. This is also not helpful for reviewers.
+...
 
-Something like an overview of the parts that you're adding (flags,
-extra SW context, saved sequence numbers, etc) and how they come
-together to make the key transition work would probably help us figure
-out what this patch does and if it does it correctly.
+Thanks for the updates, much appreciated.
 
-[short example: during the key transition a temporary SW ctx is used
-because [...]. clean_acked keeps track of ACKs and sets the READY flag
-when [...], then the next sendmsg call will complete the rekey in the
-offload ctx and tear down the temporary SW ctx. etc]
+I have a few more minor questions.
 
-
-
-Only a few comments on the rekey completion for now, I'm still looking
-at the patch.
-
-[...]
-> +static int tls_device_complete_rekey(struct sock *sk, struct tls_context *ctx)
+> +void npc_load_kpu_profile(struct rvu *rvu)
 > +{
-[...]
-> +	rc = netdev->tlsdev_ops->tls_dev_add(netdev, sk, TLS_OFFLOAD_CTX_DIR_TX,
-> +					     &offload_ctx->rekey_crypto_send.info,
-> +					     tcp_sk(sk)->write_seq);
+> +	struct npc_kpu_profile_adapter *profile = &rvu->kpu;
+> +	const char *kpu_profile = rvu->kpu_pfl_name;
 > +
-[...]
-> +	/* following this assignment tls_is_skb_tx_device_offloaded
-> +	 * will return true and the context might be accessed
-> +	 * by the netdev's xmit function.
+> +	profile->from_fs = false;
+> +
+> +	/* If user not specified profile customization */
+> +	if (!strncmp(kpu_profile, def_pfl_name, KPU_NAME_LEN))  {
+> +		npc_prepare_default_kpu(rvu, profile);
+> +		return;
+> +	}
+> +
+> +	/* Order of preceedence for load loading NPC profile (high to low)
+> +	 * Firmware binary in filesystem.
+> +	 * Firmware database method.
+> +	 * Default KPU profile.
 > +	 */
-> +	smp_store_release(&sk->sk_validate_xmit_skb, tls_validate_xmit_skb);
 > +
-> +	tls_sw_release_resources_tx(sk);
+> +	/* No support for filesystem KPU loading for cn20k */
+> +npc_prepare_default_kpu	if (!is_cn20k(rvu->pdev)) {
+> +		if (!npc_load_kpu_profile_from_fs(rvu))
 
-The write_seq we passed to tls_dev_add could be wrong if this ends up
-pushing encrypted data on the socket?
+AI review flags that:
 
-> +	ctx->rekey_sw_ctx = NULL;
-> +	ctx->rekey_cipher_ctx = NULL;
+npc_load_kpu_profile_from_fs() calls npc_apply_custom_kpu(),
+which returns early if the following condition is met.
+
+	if (fw->kpus > profile->kpus)
+
+Does npc_prepare_default_kpu() need to be called before
+npc_load_kpu_profile_from_fs() to initialise profile->kpus,
+which is 0 by default due to profile being allocated using devm_kzalloc()?
+
+> +			return;
+> +	}
 > +
-> +	return 0;
-
-
-[...]
-> @@ -187,6 +404,32 @@ static void tls_tcp_clean_acked(struct sock *sk, u32 acked_seq)
->  	}
+> +	/* First prepare default KPU, then we'll customize top entries. */
+> +	npc_prepare_default_kpu(rvu, profile);
+> +	if (!npc_load_kpu_profile_from_fw(rvu))
+> +		return;
 >  
->  	ctx->unacked_record_sn += deleted_records;
-> +
-> +	/* Track ACKs to determine when HW rekey can complete:
-> +	 * complete_seq captures write_seq when old-key data is ACKed,
-> +	 * REKEY_READY is set once all pending data (including any new) is
-> +	 * ACKed.
-> +	 */
-> +	if (test_bit(TLS_TX_REKEY_PENDING, &tls_ctx->flags) &&
-> +	    !test_bit(TLS_TX_REKEY_FAILED, &tls_ctx->flags)) {
-> +		u32 boundary_seq = READ_ONCE(tls_ctx->rekey_boundary_seq);
-> +		u32 complete_seq = READ_ONCE(tls_ctx->rekey_complete_seq);
-> +
-> +		if (!before(acked_seq, boundary_seq) && complete_seq == 0) {
-> +			complete_seq = tcp_sk(sk)->write_seq;
-> +			WRITE_ONCE(tls_ctx->rekey_complete_seq, complete_seq);
-> +		}
-> +
-> +		if (complete_seq != 0) {
-> +			u32 current_write_seq = tcp_sk(sk)->write_seq;
-> +
-> +			if (before(complete_seq, current_write_seq))
-> +				WRITE_ONCE(tls_ctx->rekey_complete_seq, current_write_seq);
-> +			else if (!before(acked_seq, complete_seq))
-> +				set_bit(TLS_TX_REKEY_READY, &tls_ctx->flags);
-> +		}
+> -revert_to_default:
+>  	npc_prepare_default_kpu(rvu, profile);
 
-This is a really tricky part. AFAIU the rekey will only complete if
-the peer manages to ACK fast enough, so that we don't already have
-more data already in flight? And if not, we stay in SW mode "forever"?
+Is this call to npc_prepare_default_kpu() still needed?
 
-Could we move to REKEY_READY as soon as acked >= boundary, and let
-closing the SW context handle all the data that was sent since the
-rekey was requested? Then we have a situation similar to the initial
-setup, with some data floating in the queues that doesn't need to be
-encrypted (in the initial setup case, because it's pre-encryption;
-here, because it went through SW encrypt), and HW taking over after
-that.
+>  }
+>  
+>  static void npc_parser_profile_init(struct rvu *rvu, int blkaddr)
+>  {
+> +	struct npc_kpu_profile_adapter *profile = &rvu->kpu;
+>  	struct rvu_hwinfo *hw = rvu->hw;
+>  	int num_pkinds, num_kpus, idx;
+>  
 
--- 
-Sabrina
+...
 
