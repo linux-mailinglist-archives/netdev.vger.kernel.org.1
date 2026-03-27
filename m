@@ -1,86 +1,58 @@
-Return-Path: <netdev+bounces-272372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272373-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QEBWEJcKxmlxFgUAu9opvQ
-	(envelope-from <netdev+bounces-272372-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 05:41:59 +0100
+	id eInLAHEQxmnwFwUAu9opvQ
+	(envelope-from <netdev+bounces-272373-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 06:06:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB9D433F26C
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 05:41:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D76833F354
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 06:06:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 27D7D3042D48
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:41:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 31564301F9C8
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 05:06:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7637379998;
-	Fri, 27 Mar 2026 04:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F3E8324B27;
+	Fri, 27 Mar 2026 05:06:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eDxUzo4L"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="3AJZLbex"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C4F35E92E
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 04:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F392D8DCF;
+	Fri, 27 Mar 2026 05:06:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774586499; cv=none; b=HVDJDL89PWCrtQQnqW4eUF4/yMw2zGbPqXMq0mwdGSS261SjQL6T4WK1qwbf0ikPvaGdk/kmTGRP4YLvfxfp9DbBSFjouSh1e5EuuzInZ0h0PN0kSJdG2tS11dOegGnjYoBxl5djwEdi5+9U3cQCgK0/5ffDm0et2PIC0+uP0XU=
+	t=1774588010; cv=none; b=A4mi42+zcCxl4qBYi5+z7dXBVWuA7luEK/JbrODmvN4jgCJ3vAsUoKtRo5hV3Fmm5IbA/4KV0tFGOEsR3WiWRJRIpkGRNx7/L+hlx+uy/PEM2OSfAhMNjw4+UBqnMpOiMl1zv3iNqOsk5pV+JU247d4n13YX0F9oNdSR9K6Zts4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774586499; c=relaxed/simple;
-	bh=Scua9GPZsRXj0stK9B9V9bKR3VeiqeC09MIzJurqBy0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YCZKJN6P0QMlQi2yCOehJnWOoB/V2KGlaH/fX4yIVd2cWO4u1WMQY/YWNMw0hvjvXLsnlEa1yV94clmjcKgV5FHCRvwGrvry7g5poih1GFK5Z6Co2FzvhkZlhI8yl3ir5kTWny9hC+1rr7IBhTpC63A4KYR/2ctslW5Y8lPbLSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eDxUzo4L; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b886fc047d5so265296566b.3
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 21:41:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774586496; x=1775191296; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tML2KJbSCfggZr859jR0LN8Mp7QLraD7QpaCCvMrtro=;
-        b=eDxUzo4Lcwq+YUxVi6jYHVHrLkixGAvMHNyuFdRWrhMxY3LAWg1UgBik6R+Jk+MlOb
-         3AvrYAB7SG2JuhedsoUh9YqrpOroZbDGBGb6cfjEru0/0ybRq8xB/xn1sCJ1kdq4cSH3
-         4MSahRhBaUlYHuV7pujVMfbMwMe9MXSIZfp7W/Rx7OqwAmeDc5RyjBtuaaDX5CF0SjZD
-         HFPod0vlvv06GzioS+t3l+Bs5weAXz66YqFGnrRg+Fk6oppw6LX9LeHlCWEVkho0pLgA
-         3BuFF1SQkL3OfSpXr1DVCiYfaHHg0iSxVNUl7d+EPaOrUJOV5Wa6WD57oQVk+GkPzZ6p
-         mccw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774586496; x=1775191296;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tML2KJbSCfggZr859jR0LN8Mp7QLraD7QpaCCvMrtro=;
-        b=FB/R2UyoBt7iP/+zRpMDg22u3MsoACx3VrNvuk0YWgrUpy94H1KV0H6yGXXO/pxH2/
-         xsWBwTM/gML0O4pAC2XIdJZwjcNcaP4NTPClAc8uzJBFwuXo0BZ4M4Voo2H2wS7ISePL
-         KtzOsT5NdvEVqdxKQBYVVtKi3o31x/5LSO8hg4vDJfTAptxfg3dB6GXYQR6UAHjTIpaF
-         SmBF8l2zkac0vjTZQzrBQF3tYp6tCCbLUjEGCOiN7rs1gfQneSBW/CQhBVIUTE74CtUd
-         GgcH6kbQ6JfXTPmzln+EOmYcKQd6hDevIz1UprRXt4wiSkUHgrnORCtlm80cssaeAK8c
-         NGtg==
-X-Forwarded-Encrypted: i=1; AJvYcCVQbjLSGr2TAJ0SmyTcT/1MsyGHVUXhyLZMPnZCSgr4IgvqMklVANIC0qVPodEXT1bkqgNsiKM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSX4kjAlBpZkMS93gZZQG7FzwTxoh/HVVAK4oK7D0MufpykGgE
-	NWHxFuorUYDvwgiwE9Cnb4BvG0Q+blYvUj60sxsG7Y22JhLeQDJYFuLi
-X-Gm-Gg: ATEYQzxgQQ3IW9oqEcypDck1yPZOMFM/tMhe5fsZzqYrpKZKlWd1cUDNFpMZ/dfCQuw
-	PIvAmxqskso2uolgY36rmDqeiUgec4COUCzGqDUbLUj39O0Tr8GBdAi88Z6eHIG0TNbEdFPI9ll
-	7WfOYj0LzMSVMn0UQbv0TKrc6QSjhrJpRj5k+h4WotF8YvLB775oFxC+zGdzb5UPqSqk1SM4mdp
-	oqmYCD1equMG7Xhp81a6k4ZBzGf0R5vvnr+0FI57k9irDU5BfL163L5CmPoG8iD8Gizyu2TGfJK
-	z8RePU0UcNYoL/hw5yL5tv/UAaR1Adlm/NSORDNgM7rFLvONEPHukd/oh8v1wcNkLQCJXMxlkLE
-	qY/thWllhvsY0I8yGWpVMRMsuHm2RUt3itcCrkUoagW2uCw44C/mlbV8N81lcZSZURK39/HMU3K
-	pJjbclqaOdwlBkvxpqV4TvzbJSrr+W2ONTUegSba5f1pFeVuS4xlQEUlciU6Yc1Y2to6tsCAD4R
-	YGUu6ahbDZiynyYXwGARbi6m1J0xgGl2RqoXI3SlOdVbVdVNuWTsc5FFz5yBeBVm4pHMAYj6yrF
-	CIyQA19QXwNJuREYJetmwfpCZUJYH1Fi3w==
-X-Received: by 2002:a17:907:9411:b0:b87:173f:61b with SMTP id a640c23a62f3a-b9b50175810mr59303366b.9.1774586496016;
-        Thu, 26 Mar 2026 21:41:36 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9b2021866csm200665366b.11.2026.03.26.21.41.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Mar 2026 21:41:35 -0700 (PDT)
-Message-ID: <edeee8e5-0de3-48ea-aeb5-cc705fdcd469@gmail.com>
-Date: Fri, 27 Mar 2026 05:41:33 +0100
+	s=arc-20240116; t=1774588010; c=relaxed/simple;
+	bh=mur6AlO1n0RiVhNvnz/HueTDTfHu2GrGcv9mA55TKow=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Oab2JB2+tQ3B1O8qJR/CXGrAfiwx1+jQZOASWJpC1wNRU9n1hNxIDBji1dL4P2wtbqVbxyoQRyJbVJ+kPntsOyXRIy6+TxGZ4GIzXFFBS2z+eHi5ux3C8jUiScV2mxi8atCQRvmSi/LX+KKbUkqTVpJgc3gyurcjpUE7LsgVEmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=3AJZLbex; arc=none smtp.client-ip=113.46.200.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=VBZMpzSgUOv4cJtrWYNW7JwvJefPtoBU3kRrhiFPMkE=;
+	b=3AJZLbexEiFbdTH6N4OcFuV2LwV2qsCUF9mSDzbhQPVxT7S+5CPrb0Uf6bsliWRDbUI5xA8gT
+	F/YTLGYt15B6z2mfXnqXn0l8gpgMyV1R1sRVR9KekIL8vB39qu7R7S3aW+V8uUXN6FevvKtgwD5
+	QIc93FYIDnIEM6+2XOi3yDg=
+Received: from mail.maildlp.com (unknown [172.19.162.140])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4fhpPr095ZzpStd;
+	Fri, 27 Mar 2026 13:01:04 +0800 (CST)
+Received: from kwepemj500018.china.huawei.com (unknown [7.202.194.48])
+	by mail.maildlp.com (Postfix) with ESMTPS id 08C9A2025F;
+	Fri, 27 Mar 2026 13:06:43 +0800 (CST)
+Received: from [10.174.178.79] (10.174.178.79) by
+ kwepemj500018.china.huawei.com (7.202.194.48) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 27 Mar 2026 13:06:41 +0800
+Message-ID: <e5aa3bb6-34e5-49de-b07a-47c8bac32420@huawei.com>
+Date: Fri, 27 Mar 2026 13:06:41 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,318 +60,171 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: phy: air_en8811h: add AN8811HB MCU
- assert/deassert support
-To: "Lucien.Jheng" <lucienzx159@gmail.com>, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bjorn@mork.no
-Cc: frank-w@public-files.de, daniel@makrotopia.org, lucien.jheng@airoha.com
-References: <20260326153518.8387-1-lucienzx159@gmail.com>
-Content-Language: en-US
-From: Eric Woudstra <ericwouds@gmail.com>
-In-Reply-To: <20260326153518.8387-1-lucienzx159@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Subject: Re: [PATCH net-next v2 1/3] gve: skip error logging for retryable
+ AdminQ commands
+To: Jordan Rhee <jordanrhee@google.com>
+CC: Harshitha Ramamurthy <hramamurthy@google.com>, <joshwash@google.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <richardcochran@gmail.com>,
+	<willemb@google.com>, <nktgrg@google.com>, <jfraker@google.com>,
+	<ziweixiao@google.com>, <maolson@google.com>, <thostet@google.com>,
+	<jefrogers@google.com>, <alok.a.tiwari@oracle.com>, <yyd@google.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<weiyongjun1@huawei.com>
+References: <20260326224527.1044097-1-hramamurthy@google.com>
+ <20260326224527.1044097-2-hramamurthy@google.com>
+ <d5312a24-68d5-49e3-9787-9a01c8606d9a@huawei.com>
+ <CA+mzVtsXm1M4G_qiuEZ4A_ttJk4NL-DP-Ceo=nFPWRNUSn6RBQ@mail.gmail.com>
+From: Li Xiasong <lixiasong1@huawei.com>
+In-Reply-To: <CA+mzVtsXm1M4G_qiuEZ4A_ttJk4NL-DP-Ceo=nFPWRNUSn6RBQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemj500018.china.huawei.com (7.202.194.48)
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272372-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[public-files.de,makrotopia.org,airoha.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272373-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,vger.kernel.org,huawei.com];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[lixiasong1@huawei.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[huawei.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EB9D433F26C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:dkim,huawei.com:email,huawei.com:mid]
+X-Rspamd-Queue-Id: 7D76833F354
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi, Jordan
 
+On 3/27/2026 11:56 AM, Jordan Rhee wrote:
+> Hi Li, thank you very much for the review. The intent is only to skip
+> logging for *retryable* commands that return -EAGAIN. If a
+> non-retryable command fails, we do want to log, even if it returns
+> -EAGAIN.
+> Jordan
+>
 
-On 3/26/26 4:35 PM, Lucien.Jheng wrote:
-> AN8811HB needs a MCU soft-reset cycle before firmware loading begins.
-> Assert the MCU (hold it in reset) and immediately deassert (release)
-> via a dedicated PBUS register pair (0x5cf9f8 / 0x5cf9fc), accessed
-> through the PHY-addr+8 MDIO bus node rather than the BUCKPBUS indirect
-> path.  This clears the MCU state before the firmware loading sequence
-> starts.
+Thanks for the explanation! I totally misread the condition - I confused
+opcode with err because they both start with GVE_ADMINQ_.
+
+The || makes perfect sense now. Sorry for the noise!
+
+Best regards,
+Li Xiasong
+
 > 
-> Add __air_pbus_reg_write() as a low-level helper for this access, then
-> implement an8811hb_mcu_assert() / _deassert() on top of it.  Wire both
-> into an8811hb_load_firmware() and en8811h_restart_mcu() so every
-> firmware load or MCU restart on AN8811HB correctly sequences the reset
-> control registers.
-> 
-> Fixes: 0a55766b7711 ("net: phy: air_en8811h: add Airoha AN8811HB support")
-> Signed-off-by: Lucien Jheng <lucienzx159@gmail.com>
-> ---
-> Changes in v2:
-> - Rewrite commit message: The previous wording was ambiguous,
->   as it suggested the MCU remains asserted during the entire
->   firmware loading process, rather than a quick reset cycle
->   before it starts.
->   Clarify that assert and deassert is an immediate soft-reset
->   cycle to clear MCU state before firmware loading begins.
-> - Add Fixes: 0a55766b7711 ("net: phy: air_en8811h: add Airoha AN8811HB
->   support").
-> - Change phydev_info() to phydev_dbg() in an8811hb_mcu_assert() and
->   an8811hb_mcu_deassert() to avoid noise during normal boot.
-> 
->  drivers/net/phy/air_en8811h.c | 105 ++++++++++++++++++++++++++++++++++
->  1 file changed, 105 insertions(+)
-> 
-> diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
-> index 29ae73e65caa..01fce1b93618 100644
-> --- a/drivers/net/phy/air_en8811h.c
-> +++ b/drivers/net/phy/air_en8811h.c
-> @@ -170,6 +170,16 @@
->  #define   AN8811HB_CLK_DRV_CKO_LDPWD		BIT(13)
->  #define   AN8811HB_CLK_DRV_CKO_LPPWD		BIT(14)
-> 
-> +#define AN8811HB_MCU_SW_RST		0x5cf9f8
-> +#define   AN8811HB_MCU_SW_RST_HOLD		BIT(16)
-> +#define   AN8811HB_MCU_SW_RST_RUN		(BIT(16) | BIT(0))
-> +#define AN8811HB_MCU_SW_START		0x5cf9fc
-> +#define   AN8811HB_MCU_SW_START_EN		BIT(16)
-> +
-> +/* MII register constants for PBUS access (PHY addr + 8) */
-> +#define AIR_PBUS_ADDR_HIGH		0x1c
-> +#define AIR_PBUS_DATA_HIGH		0x10
-> +
->  /* Led definitions */
->  #define EN8811H_LED_COUNT	3
-> 
-> @@ -254,6 +264,36 @@ static int air_phy_write_page(struct phy_device *phydev, int page)
->  	return __phy_write(phydev, AIR_EXT_PAGE_ACCESS, page);
->  }
-> 
-> +static int __air_pbus_reg_write(struct phy_device *phydev,
-> +				u32 pbus_reg, u32 pbus_data)
-> +{
-> +	struct mii_bus *bus = phydev->mdio.bus;
-> +	int pbus_addr = phydev->mdio.addr + 8;
-> +	int ret;
-> +
-> +	ret = __mdiobus_write(bus, pbus_addr, AIR_EXT_PAGE_ACCESS,
-> +			      upper_16_bits(pbus_reg));
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	ret = __mdiobus_write(bus, pbus_addr, AIR_PBUS_ADDR_HIGH,
-> +			      (pbus_reg & GENMASK(15, 6)) >> 6);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	ret = __mdiobus_write(bus, pbus_addr, (pbus_reg & GENMASK(5, 2)) >> 2,
-> +			      lower_16_bits(pbus_data));
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	ret = __mdiobus_write(bus, pbus_addr, AIR_PBUS_DATA_HIGH,
-> +			      upper_16_bits(pbus_data));
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	return 0;
-> +}
-> +
-
-Maybe you can use mutex_lock() and mutex_unlock() here also, like so:
-
-static int __air_pbus_reg_write(struct mdio_device *mdio, u32 pbus_address,
-				u32 pbus_data)
-{
-	int ret;
-
-	ret = __mdiobus_write(mdio->bus, mdio->addr, AIR_EXT_PAGE_ACCESS,
-			      (u16)(pbus_address >> 6));
-	if (ret < 0)
-		return ret;
-
-	ret = __mdiobus_write(mdio->bus, mdio->addr, (pbus_address >> 2) & 0xf,
-			      (u16)pbus_data);
-	if (ret < 0)
-		return ret;
-
-	ret = __mdiobus_write(mdio->bus, mdio->addr, AIR_PBUS_DATA_HIGH,
-			      (u16)(pbus_data >> 16));
-	if (ret < 0)
-		return ret;
-
-	return 0;
-}
-
-static int air_pbus_reg_write(struct mdio_device *mdio, u32 pbus_address,
-			      u32 pbus_data)
-{
-	int ret;
-
-	mutex_lock(&mdio->bus->mdio_lock);
-
-	ret = __air_pbus_reg_write(mdio, pbus_address, pbus_data);
-	if (ret < 0)
-		dev_err(&mdio->dev, "%s 0x%08x failed: %d\n", __func__,
-			pbus_address, ret);
-
-	mutex_unlock(&mdio->bus->mdio_lock);
-
-	return ret;
-}
-
-static int __air_pbus_reg_read(struct mdio_device *mdio, u32 pbus_address,
-			       u32 *pbus_data)
-{
-	int ret, pbus_data_low;
-
-	ret = __mdiobus_write(mdio->bus, mdio->addr, AIR_EXT_PAGE_ACCESS,
-			      (u16)(pbus_address >> 6));
-	if (ret < 0)
-		return ret;
-
-	ret = __mdiobus_read(mdio->bus, mdio->addr, (pbus_address >> 2) & 0xf);
-	if (ret < 0)
-		return ret;
-	pbus_data_low = ret;
-
-	ret = __mdiobus_read(mdio->bus, mdio->addr, AIR_PBUS_DATA_HIGH);
-	if (ret < 0)
-		return ret;
-
-	*pbus_data = (ret << 16) + pbus_data_low;
-
-	return 0;
-}
-
-static int air_pbus_reg_read(struct mdio_device *mdio, u32 pbus_address,
-			     u32 *pbus_data)
-{
-	int ret;
-
-	mutex_lock(&mdio->bus->mdio_lock);
-
-	ret = __air_pbus_reg_read(mdio, pbus_address, pbus_data);
-	if (ret < 0)
-		dev_err(&mdio->dev, "%s 0x%08x failed: %d\n", __func__,
-			pbus_address, ret);
-
-	mutex_unlock(&mdio->bus->mdio_lock);
-
-	return ret;
-}
-
-With:
-
-#define AIR_PBUS_DATA_HIGH		0x10
-
-
->  static int __air_buckpbus_reg_write(struct phy_device *phydev,
->  				    u32 pbus_address, u32 pbus_data)
->  {
-> @@ -570,10 +610,65 @@ static int an8811hb_load_file(struct phy_device *phydev, const char *name,
->  	return ret;
->  }
-> 
-> +static int an8811hb_mcu_assert(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	phy_lock_mdio_bus(phydev);
-> +
-> +	ret = __air_pbus_reg_write(phydev, AN8811HB_MCU_SW_RST,
-> +				   AN8811HB_MCU_SW_RST_HOLD);
-> +	if (ret < 0)
-> +		goto unlock;
-> +
-> +	ret = __air_pbus_reg_write(phydev, AN8811HB_MCU_SW_START, 0);
-> +	if (ret < 0)
-> +		goto unlock;
-> +
-> +	msleep(50);
-> +	phydev_dbg(phydev, "MCU asserted\n");
-> +
-> +unlock:
-> +	phy_unlock_mdio_bus(phydev);
-> +	return ret;
-> +}
-> +
-> +static int an8811hb_mcu_deassert(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	phy_lock_mdio_bus(phydev);
-> +
-> +	ret = __air_pbus_reg_write(phydev, AN8811HB_MCU_SW_START,
-> +				   AN8811HB_MCU_SW_START_EN);
-> +	if (ret < 0)
-> +		goto unlock;
-> +
-> +	ret = __air_pbus_reg_write(phydev, AN8811HB_MCU_SW_RST,
-> +				   AN8811HB_MCU_SW_RST_RUN);
-> +	if (ret < 0)
-> +		goto unlock;
-> +
-> +	msleep(50);
-> +	phydev_dbg(phydev, "MCU deasserted\n");
-> +
-> +unlock:
-> +	phy_unlock_mdio_bus(phydev);
-> +	return ret;
-> +}
-> +
->  static int an8811hb_load_firmware(struct phy_device *phydev)
->  {
->  	int ret;
-> 
-> +	ret = an8811hb_mcu_assert(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	ret = an8811hb_mcu_deassert(phydev);
-> +	if (ret < 0)
-> +		return ret;
-> +
->  	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
->  				     EN8811H_FW_CTRL_1_START);
->  	if (ret < 0)
-> @@ -662,6 +757,16 @@ static int en8811h_restart_mcu(struct phy_device *phydev)
->  {
->  	int ret;
-> 
-> +	if (phy_id_compare_model(phydev->phy_id, AN8811HB_PHY_ID)) {
-> +		ret = an8811hb_mcu_assert(phydev);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		ret = an8811hb_mcu_deassert(phydev);
-> +		if (ret < 0)
-> +			return ret;
-> +	}
-> +
->  	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
->  				     EN8811H_FW_CTRL_1_START);
->  	if (ret < 0)
-> --
-> 2.34.1
-> 
-
+> On Thu, Mar 26, 2026 at 7:28 PM Li Xiasong <lixiasong1@huawei.com> wrote:
+>>
+>> Hi,
+>>
+>> On 3/27/2026 6:45 AM, Harshitha Ramamurthy wrote:
+>>> From: Jordan Rhee <jordanrhee@google.com>
+>>>
+>>> AdminQ commands may return -EAGAIN under certain transient conditions.
+>>> These commands are intended to be retried by the driver, so logging
+>>> a formal error to the system log is misleading and creates
+>>> unnecessary noise.
+>>>
+>>> Modify the logging logic to skip the error message when the result
+>>> is -EAGAIN.
+>>>
+>>> Reviewed-by: Joshua Washington <joshwash@google.com>
+>>> Signed-off-by: Jordan Rhee <jordanrhee@google.com>
+>>> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+>>> ---
+>>>  drivers/net/ethernet/google/gve/gve_adminq.c | 26 +++++++++++++++-----
+>>>  1 file changed, 20 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
+>>> index 08587bf40ed4..c7834614c5f0 100644
+>>> --- a/drivers/net/ethernet/google/gve/gve_adminq.c
+>>> +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
+>>> @@ -416,11 +416,6 @@ static bool gve_adminq_wait_for_cmd(struct gve_priv *priv, u32 prod_cnt)
+>>>
+>>>  static int gve_adminq_parse_err(struct gve_priv *priv, u32 status)
+>>>  {
+>>> -     if (status != GVE_ADMINQ_COMMAND_PASSED &&
+>>> -         status != GVE_ADMINQ_COMMAND_UNSET) {
+>>> -             dev_err(&priv->pdev->dev, "AQ command failed with status %d\n", status);
+>>> -             priv->adminq_cmd_fail++;
+>>> -     }
+>>>       switch (status) {
+>>>       case GVE_ADMINQ_COMMAND_PASSED:
+>>>               return 0;
+>>> @@ -455,6 +450,16 @@ static int gve_adminq_parse_err(struct gve_priv *priv, u32 status)
+>>>       }
+>>>  }
+>>>
+>>> +static bool gve_adminq_is_retryable(enum gve_adminq_opcodes opcode)
+>>> +{
+>>> +     switch (opcode) {
+>>> +     case GVE_ADMINQ_REPORT_NIC_TIMESTAMP:
+>>> +             return true;
+>>> +     default:
+>>> +             return false;
+>>> +     }
+>>> +}
+>>> +
+>>>  /* Flushes all AQ commands currently queued and waits for them to complete.
+>>>   * If there are failures, it will return the first error.
+>>>   */
+>>> @@ -482,9 +487,18 @@ static int gve_adminq_kick_and_wait(struct gve_priv *priv)
+>>>               cmd = &priv->adminq[i & priv->adminq_mask];
+>>>               status = be32_to_cpu(READ_ONCE(cmd->status));
+>>>               err = gve_adminq_parse_err(priv, status);
+>>> -             if (err)
+>>> +             if (err) {
+>>> +                     enum gve_adminq_opcodes opcode =
+>>> +                             be32_to_cpu(READ_ONCE(cmd->opcode));
+>>> +                     priv->adminq_cmd_fail++;
+>>> +                     if (!gve_adminq_is_retryable(opcode) || err != -EAGAIN)
+>>
+>> In gve_adminq_kick_and_wait(), the condition is:
+>>
+>>         if (!gve_adminq_is_retryable(opcode) || err != -EAGAIN)
+>>                 dev_err_ratelimited(...);
+>>
+>> Based on the commit log, the goal is to skip logging when the result is
+>> -EAGAIN for transient conditions. However, when gve_adminq_is_retryable()
+>> returns false (e.g., GVE_ADMINQ_COMMAND_ERROR_ABORTED), even if err is
+>> -EAGAIN, the condition evaluates to true and the error would still be logged.
+>>
+>> Would it be more appropriate to use && instead of || here?
+>>
+>>         if (!gve_adminq_is_retryable(opcode) && err != -EAGAIN)
+>>
+>> I may be missing something, so please let me know if I've misunderstood.
+>>
+>>> +                             dev_err_ratelimited(&priv->pdev->dev,
+>>> +                                                 "AQ command %d failed with status %d\n",
+>>> +                                                 opcode, status);
+>>> +
+>>>                       // Return the first error if we failed.
+>>>                       return err;
+>>> +             }
+>>>       }
+>>>
+>>>       return 0;
+>>
+>> Best regards,
+>> Li Xiasong
 
