@@ -1,203 +1,212 @@
-Return-Path: <netdev+bounces-272382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272383-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OKdFJocmxmnQGwUAu9opvQ
-	(envelope-from <netdev+bounces-272382-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 07:41:11 +0100
+	id SLZUOaknxmnQGwUAu9opvQ
+	(envelope-from <netdev+bounces-272383-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 07:46:01 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 196A733FEDF
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 07:41:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D7DD33FFCC
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 07:46:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 066B5315585B
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 06:33:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CBF1730E4276
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 06:38:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46CC338B7B3;
-	Fri, 27 Mar 2026 06:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8907139FCD1;
+	Fri, 27 Mar 2026 06:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L7bGfVKf"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="K1Kw/B1m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986E93A7F73
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 06:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3AE23BE63E
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 06:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774593185; cv=none; b=ObIfQweB+aZKxYTVvQ9NF+RgK9gJbXMJBb1oYTRTY5Qb6qMW561VmksCr4aladITB6lyITYlJllVbzeGU8H3SkhDo4AFDl2JsBdF/bWnErkmxT6tCSFTDZ1ZMykkoyBI3wWsGbx4lS2IijSmYio22CjnwWK5oee4ZTpfsXxCpaI=
+	t=1774593482; cv=none; b=kVnljgiAYWxo9PHw86Gmn1AlNiJROiIFI5wR9LxCARzJJu2Pn1BT6AzBXRloTnfTQ6nEIrS1gpIBB3Yb9LTKOlEeaDjSOuGUOlMwGUPwTlxXIXuOu8a86hZdOtN1QgRw7f04Pop0BWw24GQ44u9QfwxxMCPgxm27wW047dNhpU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774593185; c=relaxed/simple;
-	bh=R+Wyx2quThKO6kdxp3NboLSs48m1AeEp3SSFm3vLIIk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OhFcPC1ItaUQKa6JcjYMtcXCUQ/YGNRjUbXKwA8XDL2AWpZDHVbbh+0bsHtl+WBu93vIUmrLIUVNLtOmPpzn7ixvEQXLLmSGnpUkAKarI/ew7pSDf5Noquc1GpdzZi4RVMpIPk+rKKfuH/YgkNBDYmzi+MwTTk1FQn68GLwe2og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L7bGfVKf; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2aecf52fa69so1985075ad.0
-        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 23:32:53 -0700 (PDT)
+	s=arc-20240116; t=1774593482; c=relaxed/simple;
+	bh=+4LgBG2lPnteLEva5q5EV8krPKKJf5AzHFIuy/FUdK0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uTf0nsPjz+fxr14GRuHJtpE0KBORlD0FsZ9LR1xeQCW5sP0wi57dgqlP45xDqNfsCFEXfZhjCnVEsOQykT4ND7AS9ldNAD1oCvvtApg005hed08fZBwF6O+QtFRNJ0cBO402555dxjVbBdhjKR0wHNmdMsJE/gGwdu+3/pnOaF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=K1Kw/B1m; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-48704db565eso24678705e9.1
+        for <netdev@vger.kernel.org>; Thu, 26 Mar 2026 23:37:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774593173; x=1775197973; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NYhDafFa6ifxo2/1PziNZDy5gbmYZ4I4QcjogoZ5uUc=;
-        b=L7bGfVKf5H6+UJk+J+qFOYg/U0GF6J2FQhf6p07IRZH3sJxY/URQScJ4FV1xVHI4wN
-         Tum9VElXlV56xaVrQPhdJcuIqO5duuQYI7yYfkqIJv3QdI+cCjeVKeQoJTkLj01SYOfx
-         g6JIl8eazA/Nu2tva0QeJmMug/UatZgSth4HPmdihe3GGRFFRjKuoMcz3lsXAUGLXdQF
-         iOjYev1Srf0IbPh6/84P8luMgrDx79syDsCr0x1hvhxiD44iX5RPs7Wf1Qn4BhRazDzZ
-         Gj2N20O3KtMIK+uyDvCTFN0HRKShEA7v+BNz0p3L7j3Ha9RakGMvNKZShepMGk/aP1Mq
-         38EA==
+        d=blackwall.org; s=google; t=1774593471; x=1775198271; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eglRAgY65J6K+hGvowI7XYpmAYRuD59HMwb8erAafGE=;
+        b=K1Kw/B1mww//S1t+6oVki27SFuiGdVD7Xx46jspQmc25Q2e3GnyHKkx3ewuWBnDrT8
+         jZ4A/gx7ThG5VAfMDl0n3boDTruwj7A7u1qX+f/nQWz5Dy156288nVvvf12JxM2GIJ/D
+         agGmWSMQUKHKHnWCK1Ij385apB+Z0/aw+4aXxNgR733V4l9TLsZLI70x3pL9YpdsQ4ZE
+         u66rcp/7WhI/Un7MC/utmFkyYNfB+Naqp0WRtCFQjTPFjfLp2wXqGAmPdPP8IyWNkzj8
+         t//09oYfb6oFsLZxcOGVUTKkyHrndmKlAONChNPkAJnJvdmMg49fZ3VAicMZpAeh6vjp
+         vPlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774593173; x=1775197973;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NYhDafFa6ifxo2/1PziNZDy5gbmYZ4I4QcjogoZ5uUc=;
-        b=sbvyFyaEnBpnPgF6+cxF4EnF4etsld0/q2zi2cinWGwBJOmSedckQAZvu1CjaIBHz4
-         DsdE6TlyC7DMmBNpG7z+laUtUO91Mab0PQS0tROeizUiJKAwWyMdQjxaPXz50dbRjF4t
-         dYJLKmChUqcqMthKEUAxxu6GW7NO+tXwAhNXJn8lflgyzzo7NfHUa/pcxj1CIYNxJMrS
-         OHI23IW9412sGAgKw7/87hYKnU9zep1wWETdd9JKQgwYuYpkRHhvEu6uHR/MiI30//c0
-         xjoygf5IA7yzm2Z5ITe36jUziBUJGDoHd6nAirC1x6hJOkcFgwM8iUMc5y+FeMp5Z0vz
-         zscg==
-X-Forwarded-Encrypted: i=1; AJvYcCWqbZccNYew/sBSy3ytb91LgmrjN3AW5QVarc0kl7MmUrtDKjxLTHriV89DU8y0Dd/dae/cdRc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmCqt1sGAQsSDPU2rri07jU1LC/IDnkPgcPkXo5eHT2lboQEqs
-	sbL9LZs2AUKEbQWr08luqvN5fs9fJk1MBokQ6xCoT8AJWPh9gimIyM/F
-X-Gm-Gg: ATEYQzxfqHetrswMAihUzCVCgQQ2CBYv0lyQTnI+w8pmy7mbqmwYA40aDClY90s+BDA
-	MOzn0ocBICiPjiuxQYhL8gywRig4UMlWK+bKNGAUBeZRKF84U72BxIjIaGX5IIRLRHEZtn/QfNc
-	ubWVElgUq+9GAIP02f6k5Bta1GTPUb5I7OOJUfihT0IZxlfIenjK605t8ZpC7OoKgzz0Oqa3Lh+
-	MRwwNeG5Y1eM7CQCIWa4wg2lG05Ti4OdaooFGHSUYbPVRgEsz0uCE/ZDjz/WxrZfwQhH57p0NYr
-	I/iymll72Yp8qs+EJXEFAvdSMXHmzbEjLUZUz12I5vxo1a4rg85y9F/vVAurtSvdlKrcu09qONh
-	BZM9nPS6hSyV5rotabFPiWFw3dGLKsp82NWqawKVp1ZgO9vGq8zf4n/rulCq8neV6FVEn02mL9W
-	lFCOnjtFmdYTj+3vgWtB8OO3bcFLWcATFv
-X-Received: by 2002:a05:6a00:2da3:b0:82a:68e4:da90 with SMTP id d2e1a72fcca58-82c95ee3d68mr849669b3a.4.1774593171986;
-        Thu, 26 Mar 2026 23:32:51 -0700 (PDT)
-Received: from localhost.localdomain ([189.1.242.96])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82c7d3bedeesm4498146b3a.42.2026.03.26.23.32.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Mar 2026 23:32:51 -0700 (PDT)
-From: sunichi <sunyiqixm@gmail.com>
-To: i.maximets@ovn.org
-Cc: aconole@redhat.com,
-	davem@davemloft.net,
-	dev@openvswitch.org,
-	echaudro@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	sunyiqixm@gmail.com
-Subject: Re: Re: [PATCH] net/openvswitch: fix trigger-able BUG_ON after ovs_vport_cmd_fill_info
-Date: Fri, 27 Mar 2026 14:32:27 +0800
-Message-Id: <20260327063227.2069909-1-sunyiqixm@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <3813e7fb-e234-42ec-b05c-7bcb609de3ba@ovn.org>
-References: <3813e7fb-e234-42ec-b05c-7bcb609de3ba@ovn.org>
+        d=1e100.net; s=20251104; t=1774593471; x=1775198271;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eglRAgY65J6K+hGvowI7XYpmAYRuD59HMwb8erAafGE=;
+        b=kDJ2PHR4qensJ7aJwkUKdZWulYgvCw3zbqqahvL4bqqUbQ8L5nXJWULAZFl5AumWXU
+         0sftRj4wGNjESUPlrIuZO7Oo2PtK2N0bmYB1v2Bgbn8ZzdjNmzwgww5bi5A5we0a0nL1
+         yBm+/qxbp+0cx1P6goXFACWoMabVnARKRXGSeOLHKFtn/L9p9849+Em4wZh0P0JQmz4e
+         KJCv2u51wS6dvR9GpHGQWFe5FZJZCoJZT/bu3W8lzpI780uX9kvQ2Tpw/vqSzDJwtWem
+         0m7mui+HSZVqoJ6oZqMAKxOXlKEiAkoGXjGOqfaO87cV5N9TYXZR6Qt856HdrtMLhm8e
+         J1Kg==
+X-Forwarded-Encrypted: i=1; AJvYcCWEIVOqrFVvr2OMQMSOdYAEYkXbkK17dbTGzJXSKIL7OX7Cd8dr6n5i82Xy9IRknKpJg1nGZ/E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwANs96hRvDta/vG6hoRcR7ipLgec3dAsAzo2qtESBQbPjJna+m
+	mp3hqZ4F6F0PWFoci2wT8lGd9IM3jEIuQ2uskytydfzJsqOGPiT3mZmritRTlAtOhGo=
+X-Gm-Gg: ATEYQzzaOfo89BdAUYpxhOG7LvXCeWssuqXLdmGrlTtG8p35PhDmkveqs7SEnqFlKER
+	zngNn/G3MCXsY4V4mkcr7lBJmZQM3cW7+MA8frB7T2vjh119ZpGoEJQWdb9LxTOQDg7KuMRk3A6
+	WXqSy4hE1hZcGNN5g4+uQU7X5SK0+PgLRgAHF7VF1z8V4UD4XrLOEkDWDiMm2S5mYpkla6pbVls
+	bXOedE1qMDbVjIUAhq2ife/E0krx9Y9ekJ/OjfG4foHNVnprr1BL1/KpdkGNNcLJ42dtW+9mtV5
+	zRJpn0YBsdbS4AN57D2shK5/azqNyZyCzY7Odwe7gmOn9T5lqFgxu3L2sGeO28fDvZvNzwv/Co6
+	XWoRJJHlUpUo88RKxdFf/uRQEPZFEIZLohRlm20fpV4VE08LqFO+cinwSZb5LEMIxeTIj1MTr5V
+	gQ8z9TSqAKWfT0zy7h7ZQtUTNkRz+GbA+qZwdAfn24VaWPmSsDRkxz6A==
+X-Received: by 2002:a05:600c:8485:b0:487:1fc:14f9 with SMTP id 5b1f17b1804b1-48727d77c8fmr19397525e9.15.1774593470767;
+        Thu, 26 Mar 2026 23:37:50 -0700 (PDT)
+Received: from [192.168.0.161] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48722c9134fsm123324635e9.9.2026.03.26.23.37.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Mar 2026 23:37:50 -0700 (PDT)
+Message-ID: <cc0bf1a8-5bae-4e92-8b92-8b9038632990@blackwall.org>
+Date: Fri, 27 Mar 2026 08:37:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/3] bridge: br_nd_send: linearize skb before parsing
+ ND options
+To: Yang Yang <n05ec@lzu.edu.cn>, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, idosch@nvidia.com
+Cc: andrew+netdev@lunn.ch, horms@kernel.org, florian.fainelli@broadcom.com,
+ roopa@cumulusnetworks.com, dlstevens@us.ibm.com, nb@tipi-net.de,
+ netdev@vger.kernel.org, bridge@lists.linux.dev,
+ linux-kernel@vger.kernel.org, yifanwucs@gmail.com, tomapufckgml@gmail.com,
+ tanyuan98@outlook.com, bird@lzu.edu.cn
+References: <20260326034441.2037420-1-n05ec@lzu.edu.cn>
+ <20260326034441.2037420-2-n05ec@lzu.edu.cn>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20260326034441.2037420-2-n05ec@lzu.edu.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[blackwall.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272382-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,openvswitch.org,google.com,kernel.org,vger.kernel.org,gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_NEQ_ENVFROM(0.00)[sunyiqixm@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272383-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[blackwall.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,kernel.org,broadcom.com,cumulusnetworks.com,us.ibm.com,tipi-net.de,vger.kernel.org,lists.linux.dev,gmail.com,outlook.com,lzu.edu.cn];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[blackwall.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[razor@blackwall.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 196A733FEDF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[blackwall.org:dkim,blackwall.org:email,blackwall.org:mid,lzu.edu.cn:email,outlook.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4D7DD33FFCC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/24/26 1:01 PM, Ilya Maximets wrote:
-> On 3/23/26 8:14 AM, sunichi wrote:
-> > ovs_vport_set_upcall_portids() does not validate the length of the
-> > user-supplied OVS_VPORT_ATTR_UPCALL_PID netlink attribute. A
-> > sufficiently large portid list can overflow the reply skb allocated
-> > with NLMSG_DEFAULT_SIZE in causing ovs_vport_cmd_fill_info()
-> > to return -EMSGSIZE and triggering the unconditional BUG_ON(),
-> > which panics the kernel on most distributions.
-> > 
-> > Any local user with CAP_NET_ADMIN (or an equivalent unprivileged
-> > namespace capability where applicable) can exploit this to perform a
-> > denial-of-service against the host.
-> > 
-> > Replace BUG_ON with WARN_ON_ONCE to prevent kernel panic.
-> > 
-> > Signed-off-by: sunichi <sunyiqixm@gmail.com>
-> > ---
-> >  net/openvswitch/datapath.c | 17 ++++++++++++-----
-> >  1 file changed, 12 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-> > index e209099218b4..50c2945081a1 100644
-> > --- a/net/openvswitch/datapath.c
-> > +++ b/net/openvswitch/datapath.c
-> > @@ -2202,7 +2202,8 @@ struct sk_buff *ovs_vport_cmd_build_info(struct vport *vport, struct net *net,
-> >  
-> >  	retval = ovs_vport_cmd_fill_info(vport, skb, net, portid, seq, 0, cmd,
-> >  					 GFP_KERNEL);
-> > -	BUG_ON(retval < 0);
-> > +	if (WARN_ON_ONCE(retval < 0))
-> > +		return ERR_PTR(-EMSGSIZE);
+On 26/03/2026 05:44, Yang Yang wrote:
+> br_nd_send() parses neighbour discovery options from ns->opt[] and
+> assumes that these options are in the linear part of request.
 > 
-> Hi, sunichi.  Thanks for the patch!  Though I don't think this is the right
-> solution.  Instead of just failing the request, we should allocate appropriate
-> amount of memory for it instead.  The fact that the array is sort of unbounded
-> today is also a problem.
+> Its callers only guarantee that the ICMPv6 header and target address
+> are available, so the option area can still be non-linear. Parsing
+> ns->opt[] in that case can access data past the linear buffer.
 > 
-> So, what I'd suggest is, let's limit the number of upcall pids for a vport with
-> the number of CPUs as it is done for the upcall_pids array on the datapath level.
-> This will give us some reasonable upper value as there is no point for the
-> application to have more handlers than there are CPUs, and the existing userspace
-> never does that, so the limit should be safe.  Next we can create a new function
-> ovs_vport_cmd_msg_size() similar to the existing ovs_dp_cmd_msg_size() that would
-> calculate and allocate the appropriate message size, so the allocation is always
-> correct.
+> Linearize request before option parsing and derive ns from the linear
+> network header.
+> 
+> Fixes: ed842faeb2bd ("bridge: suppress nd pkts on BR_NEIGH_SUPPRESS ports")
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Tested-by: Ao Zhou <n05ec@lzu.edu.cn>
+> Co-developed-by: Yuan Tan <tanyuan98@outlook.com>
+> Signed-off-by: Yuan Tan <tanyuan98@outlook.com>
+> Suggested-by: Xin Liu <bird@lzu.edu.cn>
+> Signed-off-by: Yang Yang <n05ec@lzu.edu.cn>
+> ---
+>   net/bridge/br_arp_nd_proxy.c | 12 +++++++-----
+>   1 file changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/bridge/br_arp_nd_proxy.c b/net/bridge/br_arp_nd_proxy.c
+> index 1e2b51769eec8..af3d1e33f50b8 100644
+> --- a/net/bridge/br_arp_nd_proxy.c
+> +++ b/net/bridge/br_arp_nd_proxy.c
+> @@ -251,12 +251,12 @@ struct nd_msg *br_is_nd_neigh_msg(const struct sk_buff *skb, struct nd_msg *msg)
+>   
+>   static void br_nd_send(struct net_bridge *br, struct net_bridge_port *p,
+>   		       struct sk_buff *request, struct neighbour *n,
+> -		       __be16 vlan_proto, u16 vlan_tci, struct nd_msg *ns)
+> +		       __be16 vlan_proto, u16 vlan_tci)
+>   {
+>   	struct net_device *dev = request->dev;
+>   	struct net_bridge_vlan_group *vg;
+> +	struct nd_msg *na, *ns;
+>   	struct sk_buff *reply;
+> -	struct nd_msg *na;
+>   	struct ipv6hdr *pip6;
+>   	int na_olen = 8; /* opt hdr + ETH_ALEN for target */
+>   	int ns_olen;
+> @@ -264,7 +264,7 @@ static void br_nd_send(struct net_bridge *br, struct net_bridge_port *p,
+>   	u8 *daddr;
+>   	u16 pvid;
+>   
+> -	if (!dev)
+> +	if (!dev || skb_linearize(request))
+>   		return;
+>   
+>   	len = LL_RESERVED_SPACE(dev) + sizeof(struct ipv6hdr) +
+> @@ -281,6 +281,8 @@ static void br_nd_send(struct net_bridge *br, struct net_bridge_port *p,
+>   	skb_set_mac_header(reply, 0);
+>   
+>   	daddr = eth_hdr(request)->h_source;
+> +	ns = (struct nd_msg *)(skb_network_header(request) +
+> +			       sizeof(struct ipv6hdr));
+>   
+>   	/* Do we need option processing ? */
+>   	ns_olen = request->len - (skb_network_offset(request) +
+> @@ -472,9 +474,9 @@ void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
+>   				if (vid != 0)
+>   					br_nd_send(br, p, skb, n,
+>   						   skb->vlan_proto,
+> -						   skb_vlan_tag_get(skb), msg);
+> +						   skb_vlan_tag_get(skb));
+>   				else
+> -					br_nd_send(br, p, skb, n, 0, 0, msg);
+> +					br_nd_send(br, p, skb, n, 0, 0);
+>   				replied = true;
+>   			}
+>   
 
-Thanks for the detailed review, Ilya!
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Agreed on all points. For v2 patch submit later, would:
-1. Add ovs_vport_cmd_msg_size() to calculate the correct allocation size upfront,
-eliminating the EMSGSIZE path entirely.
-2. Fix the memory leak on the error path.
-
-> P.S.: This patch also needs a Fixes tag and should be targeted for the 'net'
-> tree, i.e. have [PATCH net] as a subject prefix.  Also, IIRC, kernel requires
-> a full name in the sign-off tag.
-> 
-> AI review also points out a memory leak in case we just return without freeing
-> and potentially leaving half- or even fully configured port while returning an
-> error to the userspace.
-> 
-> Best regards, Ilya Maximets.
-> 
-
-Respectfully, sunichi. 
 
