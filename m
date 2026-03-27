@@ -1,214 +1,159 @@
-Return-Path: <netdev+bounces-272500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272501-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDZyIOZfxmm+JAUAu9opvQ
-	(envelope-from <netdev+bounces-272500-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 11:45:58 +0100
+	id 2O8COuBexmm+JAUAu9opvQ
+	(envelope-from <netdev+bounces-272501-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 11:41:36 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 479DC342CF5
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 11:45:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E01C342BB1
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 11:41:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E398330ACCD9
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:40:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DABED3033FB8
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9EB73B4EB5;
-	Fri, 27 Mar 2026 10:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93C034E769;
+	Fri, 27 Mar 2026 10:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gkUG3L0s"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bm7BpwL1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6011B3B4E9A
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 10:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774607969; cv=pass; b=dBFy8LjTmDMgdWGmyIvGmprU8zvSOejwq2mO1l2Rj/mbi5TJU6QYEuaziEwwNprNM/p3R3LxGkc4Q5KOZautcQXbEsFuCPwzfrQzN/tv7FEFp6WJP0PZhV6QTc49DewLm9pMgD0WY/kIuWQHHf/9Q7Z6hIXuyC3xGF37YXOqaCQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774607969; c=relaxed/simple;
-	bh=N8fq7UtLOxR4Iv+iBktgqxIt69VvXXVbPrs3reH1t6A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sVJcwptj/lGr+KqLmTQEnLRFi7sn/x6weASF5oyG6292m2QfsLiu3ZEMdoWht7kV0Ik3JSL7ZNovdlwFLW7EfWQGRGSCxa8K7cR+8ao9RL2B/Doo4h+ln9n6yxiOt5zvue9Q9XOy10QRJ6T17JvfAVLluQg1Hgodd7E+7LDted8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gkUG3L0s; arc=pass smtp.client-ip=74.125.224.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-6500040f128so154995d50.0
-        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 03:39:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774607967; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NCCJ+1QIFL0MUBZXs7mqa5V1+N2FQDycRUGHDBNGayK9vSKFlFb81qH0i34bYzzz9I
-         DllMlVpe95YdeYPVe3vf/UalUHIGf0WedXK2nphEgPNMf/4YEFlCczefJGt4hPcBU2D0
-         FnrGPUBHGdbNcC4oSXbQpHubXKtR96nZ1VQBEEdquahwtsfbVU3F0HbpNfGOT49DbxsL
-         zj5sCiAO4xcxSSkqFfIyhs+EG0QTuWgiU2Z5qDYUqrcJMLBReucSGB38R3Rl2n6kqdWM
-         nyvhnt0ZufxJIek8Bm93E5zJNE1Bf1oTTfZ579SP1PO058zFwtZeYK9XgHYvdkTAg2sk
-         j1eQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=J3EDHpPb5AhiaBsdFZsph770IiBUnt3skegE31v5MuI=;
-        fh=Bq6fgS7s0Q38dcc+gqeO2s2+Z3aw17K05ERkcVv2ZS8=;
-        b=KhWHcnLVkSTHcCZT5U2k1lCtMsj+UV4Elbnr5Fib8bH4oaHT0n1uAQH/qAtjjqwD9b
-         X+NPb9MndrUHO7xAYL9fTaNYf/N2d9t3IoADUK0qyHCKkWrEG/q+yvzDkKPVJtaWZ9Ae
-         jl+RPZj49bPbup1gP6wNAhuOYZVgudPiI802EoQtVMe6XzIGlp89VyqCT36+j/nFyi/5
-         iT3q1Vflj4YO8rUdB9pZR8nayWlj+4tvkDlKRPQimqvv8AAtInHN7QVFiPZ9DYEkPmcQ
-         pnXbu/mERAjA/xnLo8KwqJe/fSdOByi63Peijzq3hsakyJvjjSKTPLVdojJsLeQLuq2G
-         Wd0g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774607967; x=1775212767; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=J3EDHpPb5AhiaBsdFZsph770IiBUnt3skegE31v5MuI=;
-        b=gkUG3L0sFpuPUFbsvC0dQduTPgXtbVoQggYZ7mSM6oX8y/AI39c/Z0Wu/Xs7XhbC7X
-         b5i6OoxR+yhzUtRw1q9lSog5o8L/n9YNHHag7Eun7Qm1zNREchFjzhc0M/Y4Wtixkjqt
-         M5M1GkOVZFEBsJyXwASMjqFu3UFXnphWxNuaObVdtgVVoAM29yf6Ru9E3a8fXd1GPiG6
-         pi5lshG7+DoIt52x80cYNMPXOpKRmaIs8QKntotlu13FwjD73mYJ2Q4QFt7Jn/NykIHN
-         Z1fhk/Rg8bVo+6W+EBNSfrrsOEuXFi5rE4Xl2RHjHy2c4VM0A2Nqb8s9eJmBJlpgmQ1M
-         yHSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774607967; x=1775212767;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J3EDHpPb5AhiaBsdFZsph770IiBUnt3skegE31v5MuI=;
-        b=aAGuqDNOlByyECLBzWmGhCQ1ccbq1ifO2X1ac65HPj7NeWJysQSsSpWo/XNIVYxq81
-         IfGmIc+1ggmTbaCJRiiDVuiotqZMKpFxreDT9WopuhWFmtpMfnyj4LGTHn4Kom33jjA7
-         Mk28WcSyiWb5+EdauLry8VzSZJPDhx70l+C0/U8HNYu6IOiHEWk7PsCr8Lf4j4By/ccN
-         nYg//+zDLXOtnJBoToDcUNT7rqlJHbtTqxMAP4pCuikWj/EM4BxcDp/EWIH5gGFUgb5J
-         Jg0yPr14RGEWUg7ysNvoJ/PBplqaqts16jM7rTw9hZbzvGIW52w4oC+IDVmrfqrnQOTz
-         Q7Gw==
-X-Forwarded-Encrypted: i=1; AJvYcCXFeF5mXHZSJUUCpgR6XM7clgD9CECWq5TIZ7dGop1mC4Y212j3dWgKAfojk51uFtqBInaMiw8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhtBw9jJSoeVDskX00MRlo8B2qFbEFAALnX0ttcNhvDfNRwXqm
-	ZrEAhTkLz0GmD1Hv24Llosgb2fs1E+W2gfyKO7H2rG8TK4Q/RLRIO6QHaT4F2MMfEejk4JnOgPS
-	wGMJHUgRmWv7yX4Pv+rS+phs2shA0XjM=
-X-Gm-Gg: ATEYQzyEQAVr7myRR7xI9vehWECG2qbEbtjqZS3gUXjN01NzM0MxCDPa9AtO+Oop8px
-	Wp+Fzp1m6Kr/CoH3QrJtvVLT16gaKOAqjkhr07Bgrj7ltbOoXBlPX/15j7HGeCkpS62l76fgUb9
-	RPQWoDjU0W/7uKSbIOVQIZVWXxoqhZT5c0Wo9QSCl4jC8ylWggUXv/V2N3SJoKzlWOfB0xxTI/g
-	CgfOyejKs8qIddWRBveYzGSCHLlpAUkxApYSYDaf/HBxrgej9+tGumdpBAcQQF58HATqSmGlW6g
-	KnF8WpVjfXRfgSOuOGvXsi0v4883zVuftHosQnn/boIm17kw
-X-Received: by 2002:a05:690c:4c09:b0:79a:b46c:e608 with SMTP id
- 00721157ae682-79bddd5dedcmr18719737b3.10.1774607967433; Fri, 27 Mar 2026
- 03:39:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2533C5DAB;
+	Fri, 27 Mar 2026 10:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774608093; cv=none; b=Dc0GLWUDjlvRWqCZ2QENrJ5MYyLrYZ1ctw2dEHlJSRDc+6xUMnnd5m8Htc6Xh2r7Vjgr5kJHbSiCQ0bpEDTkSxrhjfgKexkaKteu1CJO37U2bQkWWUVKlXYKXZctwqwp2we3q1F9PYK7SNwKydPdjngXzDn5wwhZBCUuu8W4mns=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774608093; c=relaxed/simple;
+	bh=jWe6OEhA34gE7fEyHsXA6R0diYZ11O4QgBijUwIUAVI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=puptnprdzY7Yp07MSyRQQluzlk5BMzn9AkctjYpUh12kQeWmTaYWuQgG+hSU4+/TyrCs3jYe01YYoTVXA6BK5ONVnlaYspMuK/Pt1X0venT/ZedkavVR+HZmgk2T/Nns7mrRdFR0U7ICzkMPJ/OwfHWHsleARjsL7osNzkuM0jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Bm7BpwL1; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774608092; x=1806144092;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jWe6OEhA34gE7fEyHsXA6R0diYZ11O4QgBijUwIUAVI=;
+  b=Bm7BpwL1tUU/sKnQ/sdScO1csjB7tM8DAoyRVa41XERmkQwAA2PvYv9/
+   GSHq3JNJ7H+5J/KjZvDnY7mN5WbS8l3LTLZdbmJGivhjwaSKB+scnmOgd
+   KlwUTjeGRXCfXxRFXD3ai5VLuD1wjV9BTS0oN1xhNxKmoAymRYW0MXCxH
+   czMUVkFVSzljmkDxeTS/+lRmF7Iq3S7UsxSm+OXRWY3JmF4ZSS148NnaB
+   rqMYlMzZhR7EapB+Zpp7dZpE/BjdnMeOsngclxZjB+A6WU7+5hZAAGuoi
+   Z09GOgOJmD5Orx6gw7M5mKv4W+ydrj5lOhfXla9b9TD9HyMjGN/Y/QyuB
+   w==;
+X-CSE-ConnectionGUID: E3UtSoSgTt6S3o5nopMxJw==
+X-CSE-MsgGUID: AJFEhCJmSrC8+lR5vFtaWg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11741"; a="85986959"
+X-IronPort-AV: E=Sophos;i="6.23,144,1770624000"; 
+   d="scan'208";a="85986959"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2026 03:41:31 -0700
+X-CSE-ConnectionGUID: 5kkWXhs2TKi8vmT27S42Lg==
+X-CSE-MsgGUID: UZ64OI1qT/qx1vNhpOuskg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,144,1770624000"; 
+   d="scan'208";a="225202172"
+Received: from lkp-server01.sh.intel.com (HELO 3905d212be1b) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 27 Mar 2026 03:41:25 -0700
+Received: from kbuild by 3905d212be1b with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w64cz-00000000AAp-16RM;
+	Fri, 27 Mar 2026 10:41:21 +0000
+Date: Fri, 27 Mar 2026 18:40:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+	Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>, linux-block@vger.kernel.org,
+	nbd@other.debian.org, netdev@vger.kernel.org,
+	syzbot+7b4f368d3955d2c9950e@syzkaller.appspotmail.com
+Subject: Re: [PATCH 5/5] nbd: Use lock_sock_try() for TCP sendmsg() and
+ shutdown().
+Message-ID: <202603271810.hoQGfrEp-lkp@intel.com>
+References: <20260325063843.1790782-6-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260325125131.53399-1-devnexen@gmail.com> <20260327102924.GF111839@horms.kernel.org>
-In-Reply-To: <20260327102924.GF111839@horms.kernel.org>
-From: David CARLIER <devnexen@gmail.com>
-Date: Fri, 27 Mar 2026 10:39:15 +0000
-X-Gm-Features: AQROBzBJJOv5FvWWrA-8SBYmzTxhOKlhxOqal3cqYu71wFo9yUVcl9nKQidk5fw
-Message-ID: <CA+XhMqzcdZcztwuar_j2Cv=3rogmaE=Xmn3Y1_avxYm6eGnsyQ@mail.gmail.com>
-Subject: Re: [PATCH] net: ti: icssg-prueth: fix missing data copy and wrong
- recycle in ZC RX dispatch
-To: Simon Horman <horms@kernel.org>
-Cc: danishanwar@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	m-malladi@ti.com, jacob.e.keller@intel.com, 
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260325063843.1790782-6-kuniyu@google.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272500-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272501-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 479DC342CF5
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,7b4f368d3955d2c9950e];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,01.org:url]
+X-Rspamd-Queue-Id: 4E01C342BB1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Simon and thanks for the feedback, will keep this in mind. Cheers !
+Hi Kuniyuki,
 
-On Fri, 27 Mar 2026 at 10:29, Simon Horman <horms@kernel.org> wrote:
->
-> + Meghana Malladi
->
-> On Wed, Mar 25, 2026 at 12:51:30PM +0000, David Carlier wrote:
-> > emac_dispatch_skb_zc() allocates a new skb via napi_alloc_skb() but
-> > never copies the packet data from the XDP buffer into it. The skb is
-> > passed up the stack containing uninitialized heap memory instead of
-> > the actual received packet, leaking kernel heap contents to userspace.
-> >
-> > Copy the received packet data from the XDP buffer into the skb using
-> > skb_copy_to_linear_data().
-> >
-> > Additionally, remove the skb_mark_for_recycle() call since the skb is
-> > backed by the NAPI page frag allocator, not page_pool. Marking a
-> > non-page_pool skb for recycle causes the free path to return pages to
-> > a page_pool that does not own them, corrupting page_pool state.
-> >
-> > The non-ZC path (emac_rx_packet) does not have these issues because it
-> > uses napi_build_skb() to wrap the existing page_pool page directly,
-> > requiring no copy, and correctly marks for recycle since the page comes
-> > from page_pool_dev_alloc_pages().
-> >
-> > Fixes: 7a64bb388df3 ("net: ti: icssg-prueth: Add AF_XDP zero copy for RX")
-> > Signed-off-by: David Carlier <devnexen@gmail.com>
-> > ---
-> >  drivers/net/ethernet/ti/icssg/icssg_common.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> Hi David,
->
-> Thanks for the update.
-> My understanding is that this addresses the review of v1.
->
-> Reviewed-by: Simon Horman <horms@kernel.org>
->
-> v1: https://lore.kernel.org/all/20260324211402.342474-1-devnexen@gmail.com/
->
-> Some points to keep in mind for the future:
->
-> * Please include a version number in the subject when posting versions >
->   This helps a lot in tracking things.
->
->   Subject: [PATCH v2] ...
->
-> * Please include the target tree. As a fix for code, which I asusme
->   is present in net, in this case that would be the net tree.
->
->   Subject: [PATCH net v2] ...
->
->   Otherwise it would probably be the net-next tree.
->
-> * Please CC all relevant parties. In this case that would
->   include Meghana as he provided review of v1.
->
-> * Please consider including a changelog, along with links to earlier
->   versions below the scissors ("---")
->
-> * b4 can help with most of these things
->
-> * More information on the Netdev development process can be found at
->   https://docs.kernel.org/process/maintainer-netdev.html
->
-> ...
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on axboe/for-next]
+[also build test ERROR on linus/master v7.0-rc5]
+[cannot apply to next-20260326]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/nbd-Remove-redundant-sock-ops-shutdown-check-in-nbd_get_socket/20260325-175457
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux.git for-next
+patch link:    https://lore.kernel.org/r/20260325063843.1790782-6-kuniyu%40google.com
+patch subject: [PATCH 5/5] nbd: Use lock_sock_try() for TCP sendmsg() and shutdown().
+config: arm64-randconfig-003-20260326 (https://download.01.org/0day-ci/archive/20260327/202603271810.hoQGfrEp-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 13.4.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260327/202603271810.hoQGfrEp-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603271810.hoQGfrEp-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   aarch64-linux-ld: Unexpected GOT/PLT entries detected!
+   aarch64-linux-ld: Unexpected run-time procedure linkages detected!
+   aarch64-linux-ld: drivers/block/nbd.o: in function `nbd_mark_nsock_dead':
+>> nbd.c:(.text+0x1238): undefined reference to `inet_shutdown_locked'
+   aarch64-linux-ld: drivers/block/nbd.o: in function `__sock_xmit':
+>> nbd.c:(.text+0x4fbc): undefined reference to `tcp_sendmsg_locked'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
