@@ -1,156 +1,147 @@
-Return-Path: <netdev+bounces-272473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272474-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mAVYGSRNxmmgIAUAu9opvQ
-	(envelope-from <netdev+bounces-272473-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:25:56 +0100
+	id MN+lJ01Qxmk2IgUAu9opvQ
+	(envelope-from <netdev+bounces-272474-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:39:25 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE0F5341AE0
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:25:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61C46341DDA
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 10:39:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8D6B5307C6DB
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:25:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 313DD3095C64
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 09:37:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB7C3B95F6;
-	Fri, 27 Mar 2026 09:25:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2727B3D6498;
+	Fri, 27 Mar 2026 09:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lNTY/ZqA"
+	dkim=pass (1024-bit key) header.d=aliel.fr header.i=@aliel.fr header.b="FgkXKXD9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from courrier.aliel.fr (pouet.aliel.fr [65.21.61.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9D53CBE7F;
-	Fri, 27 Mar 2026 09:24:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77D9379EC4;
+	Fri, 27 Mar 2026 09:37:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.21.61.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774603500; cv=none; b=NNnaWOeuka6Bvt/pNkp/X1svDGKz1dV9nZ+pJo2ZLeVUN7YL3GR21SpWYC/ve+tdCKTGVbNXjFBR8zApVCtIxxb2WYvddYUsA6D23xMuZVdQ7Mj2DCqxck3ZLFRsEIP7ldDtk78vDXYTuV2Hs10/2bYBGHogs/jwYrEa/uNjtcY=
+	t=1774604253; cv=none; b=YhEizAxG4RTcqXYx4+oY9VLsDP9lTJw2DZEXz7Ek7eraNAXfL9qho8QX4E2VGnWRcjZHb9Ilh1BnE4g7mpqfMx7LT+RY9ft7cBEzc409163ScqNkmLMoy70YnK4B6K+hbhb7WaSG9SdmwvNyHkg3Sx2zHhX+xebU45iHFKON8D0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774603500; c=relaxed/simple;
-	bh=qJm6pDnzsN9A+Wle9K581NgqCbPN5k4qbYPIvW7F/aM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rFSxk0aveP4LcOqAMl9cg3QHkbgc3v40AFuTvZE2pxOB8aeLw+ShZjtgZHali2Lj1pNSnT75GwDMa2vS+udGvV+FQFibRj9UySePG3p2wfV2M5SCZT5XufEEvMYHsVY8rHgIdVwWNg+jE+9CWKMIfRTmoHgvPCXvsPD9gea3nyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lNTY/ZqA; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774603498; x=1806139498;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qJm6pDnzsN9A+Wle9K581NgqCbPN5k4qbYPIvW7F/aM=;
-  b=lNTY/ZqAmo/ccEgD+XgxH3Qygr6VqFr73ue8zZB1pz/IA85DLNc40Nil
-   GrDJc2MwwcR5+ZUVYhfPWxxVE5HCD4HM5xtqf0E7g4+G+DiUP4DCRtDJU
-   0XpN3g/MCSaFd8I/0gjDnWnGOgpKrpHiW/xihWFY8CTUsOtjS/H5Q02Rw
-   olYQiMT3kHF3fq0HIu18OKOx55VWGfkmcVqgK8+9J7stwdh1nDsBc2vyr
-   CfDfJTkEN9WEcLDSzV4WH1fTHLBBtShf2FbzSPPjQfn3U+yIgqiWRvcQG
-   rm8yFlWVudXgtb7rGrWszwDT2UHwXqhDN58a0Gp2JgtksPX+46K5lJdqD
-   Q==;
-X-CSE-ConnectionGUID: jBQqzcj0RwCStpP4M8LxiA==
-X-CSE-MsgGUID: Nh3eU0gmRmqfX/YVwafGKw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11741"; a="79577823"
-X-IronPort-AV: E=Sophos;i="6.23,143,1770624000"; 
-   d="scan'208";a="79577823"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2026 02:24:57 -0700
-X-CSE-ConnectionGUID: tzczHYdqTAyV/N9Z5YCVnA==
-X-CSE-MsgGUID: uQP1u3pARJyk5ylijKxydA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,143,1770624000"; 
-   d="scan'208";a="230191724"
-Received: from vpanait-mobl.ger.corp.intel.com (HELO localhost) ([10.245.244.127])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2026 02:24:52 -0700
-Date: Fri, 27 Mar 2026 11:24:50 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Petr Mladek <pmladek@suse.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH next] netfilter: nf_conntrack_h323: Correct indentation
- when H323_TRACE defined
-Message-ID: <acZM4qwEtWqANece@ashevche-desk.local>
-References: <20260326201819.3900-1-david.laight.linux@gmail.com>
- <acWWBxmPd_BNqUHF@chamomile>
- <20260326221809.0b99df3f@pumpkin>
+	s=arc-20240116; t=1774604253; c=relaxed/simple;
+	bh=cCrKuuyOz5qG2rFBsp37cnDOUzhVXzOLst/bIvh8j+A=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hyIUSlx4DI6iMEn67ojhYCiWrfpUhapiQlSMi5mhlFbrbfhF9OAGQEZ/puNT5U4TD3a/aTxh7du08IkYq7SEfQvTYTRm6cvbN4zUV8baq6aEmP36VJ8P8hcu0OLGy/xuM6YA4rpZq8URAic+pQdtLm+8GqQEu6qjjlkMOlxXbvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aliel.fr; spf=pass smtp.mailfrom=aliel.fr; dkim=pass (1024-bit key) header.d=aliel.fr header.i=@aliel.fr header.b=FgkXKXD9; arc=none smtp.client-ip=65.21.61.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aliel.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aliel.fr
+From: Ronald Claveau <linux-kernel-dev@aliel.fr>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aliel.fr;
+	s=courrier-s1; t=1774604242;
+	bh=cCrKuuyOz5qG2rFBsp37cnDOUzhVXzOLst/bIvh8j+A=;
+	h=From:Date:Subject:To:Cc;
+	b=FgkXKXD9iXLEZQAnfELBmS7V93ht232DzX+JEbXFdYBrm7ChAVeXfp3e4l57j1nwF
+	 itc5IBJlAL5t32cDWr7w6uKj4Ex9MEMNkSR3ohDEzo08OzlnzPUWyMBIhP+pjWCLTk
+	 /7TdBBtXGuD8ux8M36dd/At3l4EklgM1VU9pg7eQ=
+Date: Fri, 27 Mar 2026 10:36:26 +0100
+Subject: [PATCH net-next v2] dt-bindings: net: wireless: brcm: Add
+ compatible for bcm43752
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260326221809.0b99df3f@pumpkin>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260327-add-bcm43752-compatible-v2-1-5b28e6637101@aliel.fr>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/4WNTQqDMBBGryKz7hRN/F/1HsXFRMc6oFGSIBbx7
+ g1eoMvH43vfCZ6dsIc2OcHxLl5WG0E9Eugnsh9GGSKDSlWZalUiDQOafsl1VSjs12WjIGZmZFX
+ mlI9VU2mCuN4cj3Lc5TdYDmj5CNBFM4kPq/vel3t2+7/1PcMMjTYNFTUZXZsXzcLzc3TQXdf1A
+ yPTs3THAAAA
+X-Change-ID: 20260326-add-bcm43752-compatible-e264a4f7973a
+To: Johannes Berg <johannes@sipsolutions.net>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, van Spriel <arend@broadcom.com>
+Cc: linux-wireless@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Conor Dooley <conor.dooley@microchip.com>, 
+ Ronald Claveau <linux-kernel-dev@aliel.fr>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openssh-sha256; t=1774604241; l=1596;
+ i=linux-kernel-dev@aliel.fr; s=id_ed25519; h=from:subject:message-id;
+ bh=cCrKuuyOz5qG2rFBsp37cnDOUzhVXzOLst/bIvh8j+A=;
+ b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgMGec55oxeeisqykQiUedekMYyOnR9
+ BG9E/7rDWyqdNoAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
+ QIfB4fa5UnaYIw0QLG9SkKH5Df9Rhm2DOTJfIGNKliU28PbcrWWyEMIDqEabsSl4xy16qD9S7fD
+ B1ndbnYkdBgI=
+X-Developer-Key: i=linux-kernel-dev@aliel.fr; a=openssh;
+ fpr=SHA256:kch4osYZ6A1BrPps5AUs6KnfdE2wm4ocMtyTc8TmZMs
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[aliel.fr:s=courrier-s1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272473-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272474-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	DMARC_NA(0.00)[aliel.fr];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[aliel.fr:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andriy.shevchenko@linux.intel.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[linux-kernel-dev@aliel.fr,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim]
-X-Rspamd-Queue-Id: EE0F5341AE0
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,microchip.com:email,aliel.fr:dkim,aliel.fr:email,aliel.fr:mid]
+X-Rspamd-Queue-Id: 61C46341DDA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 10:18:09PM +0000, David Laight wrote:
-> On Thu, 26 Mar 2026 21:24:39 +0100
-> Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> > On Thu, Mar 26, 2026 at 08:18:19PM +0000, david.laight.linux@gmail.com wrote:
-> > > 
-> > > The trace lines are indented using PRINT("%*.s", xx, " ").
-> > > Userspace will treat this as "%*.0s" and will output no characters
-> > > when 'xx' is zero, the kernel treats it as "%*s" and will output
-> > > a single ' ' - which is probably what is intended.
-> > > 
-> > > Change all the formats to "%*s" removing the default precision.
-> > > This gives a single space indent when level is zero.  
-> > 
-> > Do you have a setup using this helper? Or you just found this via
-> > visual inspection?
-> 
-> Found with grep looking for places which might be affected by 'fixing'
-> the kernel printf code to be POSIX compliant.
+Add bcm43752 compatible with its bcm4329 compatible fallback.
 
-Do we have the respective test case in printf_kunit?
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Signed-off-by: Ronald Claveau <linux-kernel-dev@aliel.fr>
+---
+The Khadas VIM4 board based on Amlogic A311D2 aka T7 features an AP6275s Wi-Fi/Bluetooth module with a BCM43752 chipset.
+This patch aims to add this chipset with its fallback to bcm4329 compatible.
 
+The original patch series is here:
+https://lore.kernel.org/r/20260326-add-emmc-t7-vim4-v5-0-d3f182b48e9d@aliel.fr
+---
+Changes in v2:
+- Add netdev in CC.
+- Link to v1: https://lore.kernel.org/r/20260326-add-bcm43752-compatible-v1-1-b3b9a58ab38b@aliel.fr
+---
+ Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
+index 3be7576787644..81fd3e37452a6 100644
+--- a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
++++ b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
+@@ -42,6 +42,7 @@ properties:
+               - brcm,bcm4356-fmac
+               - brcm,bcm4359-fmac
+               - brcm,bcm4366-fmac
++              - brcm,bcm43752-fmac
+               - cypress,cyw4373-fmac
+               - cypress,cyw43012-fmac
+               - infineon,cyw43439-fmac
+
+---
+base-commit: 45b2b84ac6fde39c427018d6cdf7d44258938faa
+change-id: 20260326-add-bcm43752-compatible-e264a4f7973a
+
+Best regards,
 -- 
-With Best Regards,
-Andy Shevchenko
-
+Ronald Claveau <linux-kernel-dev@aliel.fr>
 
 
