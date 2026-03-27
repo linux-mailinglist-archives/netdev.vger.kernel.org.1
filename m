@@ -1,121 +1,131 @@
-Return-Path: <netdev+bounces-272359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272360-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4JOXJlz7xWmOEwUAu9opvQ
-	(envelope-from <netdev+bounces-272359-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:37:00 +0100
+	id yElGDCv8xWmOEwUAu9opvQ
+	(envelope-from <netdev+bounces-272360-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:40:27 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38ACE33ED6D
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:37:00 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30DBF33EDD8
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:40:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 08DA9303C5BA
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:36:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2524E3026BDE
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B575E36C5AB;
-	Fri, 27 Mar 2026 03:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 331D036EA94;
+	Fri, 27 Mar 2026 03:40:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CVHHapz0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bbRTZ+aQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9180636C0D3
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 03:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08FF636D9E6;
+	Fri, 27 Mar 2026 03:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774582607; cv=none; b=pPBk95HJNVxm1PzMoldgSzMy2XfpXYqdRj7DbPma/v45beRRTLOQqI6vJWrxz6lZpRjsnwwd1Xtx2aGxpakncENuZ9fqyfOSf+akW6GbIYFj4TG/3fUDCCRHCZakM8oL4e3TEumJYtMQAWmEEIY1FJtXWEafwnt7n+SHVLXYgSs=
+	t=1774582820; cv=none; b=u1TxsCTakme+jhnqI4v/rn22dk1H62u171qSzHf2yEcGeaT/mqply/hnYZKHtyBqjRwGEFP3D7jsTe6yq/1SOu9Fjy/KzPcHO4FEoXncTc9L1pmRFlEaS73l070sIAz0hk55Grj2vgAaEWdNn62KNezzLnnO1FbBwGONPmE/FPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774582607; c=relaxed/simple;
-	bh=aAgHj1tvkJKNntEu6NMqOmmnnuGuh8u9b+RVHiZYVCU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O0BNaPCw40ARPlzga+vecw2BtiV6UN1e+J3Itc073JC1pJdU+OWomy4icmEpaGGmLMFq/dVFnNAWWqevkYqCLv/v0cR9rzRRyPOEHL1zQCig07gIK/TdykACJibXRPNtJ2mZoL9yxceWr0Gm8gqGuWWi+hs3Dlq1iaPT5GIYDRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CVHHapz0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22B82C19423;
-	Fri, 27 Mar 2026 03:36:47 +0000 (UTC)
+	s=arc-20240116; t=1774582820; c=relaxed/simple;
+	bh=gE7KMmVBMRpPER+wtbVUeqXwIsZUFAHyeuliTqSSXqU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=icISPOjev78DlUS029Yc8/0Xq+DiEvPJhKbT5YKsUvg+WuyCIvO7opT+ikWzHbNRfwBrKvtKpegnEkR87tzA24QTT9gaESghfq5kCkyrgNZMDtGlfgB3vn+jlP6RbskBOrSvnfiz3t7UaOSeHfNmEBMvVM72HVutdcOmp3XTbaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bbRTZ+aQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77E4AC19423;
+	Fri, 27 Mar 2026 03:40:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774582607;
-	bh=aAgHj1tvkJKNntEu6NMqOmmnnuGuh8u9b+RVHiZYVCU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CVHHapz0UqlgQ05CnZcML6HYfFEgmC/bpmV3fRfPM+/2dwBEYoaQ9ggRuhdNzVa8q
-	 DWglJ1x869sctB7WH2H0FEUrGCTrtGKWUpRQBEj1CpjCZNhogtNheVA2buY1J2Zv4y
-	 zaFbcr/r/3JMJ485NqaXyijsnbgOkGasT3ZPDYhFGt2RY4BkFXey6Ie8AAExgOWOeB
-	 R8alnDCHgEKkw/rGz/HnQebQ9KmyVOjkxaYDUufZaULtrpw20f7yAeJ6jXwZVHJCyy
-	 Aoc5BTKjvU9QpRmCb+YdtPgNvipFEnr4/NpTyTaxJaBZtTd2bMuX2yOT9MgI/BbTMK
-	 UjQ1SQn2KSEaA==
-Date: Thu, 26 Mar 2026 20:36:46 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Nikolaos Gkarlis <nickgarlis@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] rtnetlink: add missing netlink_ns_capable() check for
- peer netns
-Message-ID: <20260326203646.2da52419@kernel.org>
-In-Reply-To: <20260324080730.4051666-1-nickgarlis@gmail.com>
-References: <20260324080730.4051666-1-nickgarlis@gmail.com>
+	s=k20201202; t=1774582819;
+	bh=gE7KMmVBMRpPER+wtbVUeqXwIsZUFAHyeuliTqSSXqU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bbRTZ+aQOtZN5caZtZF2ctJDOIi/zNleAZnludnjI1Ip4OxpbDY5LXsSXBeFzCet4
+	 bTLPccpJo1DmSQ+h+At8Sjd+/8EvLP89X6qGpvKjAGvXn/JBG6qLedotoFD5yoVays
+	 B+fBizCz2UOWpv+ElSWrw9EELpdf8Toloy5MYt68rvWZ/v1EdnHG6xFFaQSpCnDii6
+	 cm6AzG0YN4fCbjIX5zYXi2KbMv488uT0Zl7sMV0q/OKGGCZfVpKUeG8hdJdM6ZPKzb
+	 PtwTnmmgUzfYd/FGWbY/aJLet57VIs/2XONlk8gmuuWlml987ucB9hugxAZ3kJWhdH
+	 WBB+W3seprVaQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DE73809A0B;
+	Fri, 27 Mar 2026 03:40:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v1] net: qrtr: replace qrtr_tx_flow radix_tree with
+ xarray
+ to fix memory leak
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177458280579.3288619.17825648611260843625.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Mar 2026 03:40:05 +0000
+References: <20260324080645.290197-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20260324080645.290197-1-jiayuan.chen@linux.dev>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, jiayuan.chen@shopee.com,
+ syzbot+006987d1be3586e13555@syzkaller.appspotmail.com, mani@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, andersson@kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-272360-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272359-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 38ACE33ED6D
+	TAGGED_RCPT(0.00)[netdev,006987d1be3586e13555];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,shopee.com:email]
+X-Rspamd-Queue-Id: 30DBF33EDD8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 24 Mar 2026 09:07:30 +0100 Nikolaos Gkarlis wrote:
-> rtnl_newlink() lacks a CAP_NET_ADMIN capability check on the peer
-> network namespace when creating paired devices (veth, vxcan,
-> netkit). This allows an unprivileged user with a user namespace
-> to create interfaces in arbitrary network namespaces, including
-> init_net.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 24 Mar 2026 16:06:44 +0800 you wrote:
+> From: Jiayuan Chen <jiayuan.chen@shopee.com>
 > 
-> Add a netlink_ns_capable() check for CAP_NET_ADMIN in the peer
-> namespace before allowing device creation to proceed.
+> __radix_tree_create() allocates and links intermediate nodes into the
+> tree one by one. If a subsequent allocation fails, the already-linked
+> nodes remain in the tree with no corresponding leaf entry. These orphaned
+> internal nodes are never reclaimed because radix_tree_for_each_slot()
+> only visits slots containing leaf values.
 > 
-> Fixes: 48327566769a ("rtnetlink: fix double call of rtnl_link_get_net_ifla()")
+> [...]
 
-AI assistant here suggests this is not the valid Fixes tag,
-which seems true on the surface. This commit was fixing
-cleanup, IDK how it could break input validation?
+Here is the summary with links:
+  - [net,v1] net: qrtr: replace qrtr_tx_flow radix_tree with xarray to fix memory leak
+    https://git.kernel.org/netdev/net/c/2428083101f6
 
-> Reported-by: Nikolaos Gkarlis <nickgarlis@gmail.com>
-
-Reported-by tags are only when the reporter is different than author
-the Google's bounty program rules have been amended to make this
-explicit, please let us know if other programs still mislead people
-
-> Signed-off-by: Nikolaos Gkarlis <nickgarlis@gmail.com>
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
