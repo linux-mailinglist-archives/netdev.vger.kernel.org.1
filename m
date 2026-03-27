@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-272676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272677-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6DIGFmjoxmloQAUAu9opvQ
-	(envelope-from <netdev+bounces-272676-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:28:24 +0100
+	id 2IkyIHXoxmloQAUAu9opvQ
+	(envelope-from <netdev+bounces-272677-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:28:37 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F1934AF37
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:28:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A44234AF3F
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:28:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 515D93164A2E
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 20:18:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1CBEE30BA7B1
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 20:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31D93C2790;
-	Fri, 27 Mar 2026 20:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C4539E185;
+	Fri, 27 Mar 2026 20:15:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="S11KKDD3"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QyoZZODq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f226.google.com (mail-pg1-f226.google.com [209.85.215.226])
+Received: from mail-pg1-f225.google.com (mail-pg1-f225.google.com [209.85.215.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649F83C0630
-	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 20:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E44396597
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 20:15:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774642520; cv=none; b=WljEdOAU4hx5bFeeO6lW7z+cQBOFBGcZDbWzL9wuQmPUpz972xYtzL02x/oVG398gPiQFFqxNRlpiFczrZ1Ifh+8/Fx/evuxqvRECFGwPjAccV7viucQ2Id0mxIoWS8bRhOg2a4sS7pEUK4tVq5ys5vGKn9wRgDrKZeV8tCNxec=
+	t=1774642526; cv=none; b=lBS8fMMYI91j98Cryw0QPXL197b/bn1FWO29au+BgSEkgUf88sVKutooyZMEwaJi2B9uWTK9eDLGn+GxI/FOjlikUyWwzHHb3pESVoHfRqhwoqYOQc3aHagmknR5kkTYRP8JuqLWy5eySTbz/yPkwvF2J+z81Kfkulb7p/0Hf6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774642520; c=relaxed/simple;
-	bh=TIpcFuh7n2ngbWAaEFXISNUyNN8Exrie9238dF/EPiQ=;
+	s=arc-20240116; t=1774642526; c=relaxed/simple;
+	bh=RzaqFNKdVRTX/6fbKxbgoh8rdmg6EYIZDsbIZdlQBIo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LIYUjaFT19C+72zoZZcoGswUpEYIJJygiOY4fZCr/adAIvsFAbkkQp8Q/gp2RHblCtt/xE7E1bRcS/wnHbYFgQUneiI0k9x6OIxM5L1FVe1lwqPrVMS9qEPPqFBJWpSYOdae9T2GjC7Vf0pkNFT2A3rJnTp5xMo0X4NaPok8+bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=S11KKDD3; arc=none smtp.client-ip=209.85.215.226
+	 MIME-Version; b=HnnkB9g3ZwblJvXxEWx66SFqzt0noK/t4dsAbvnQi8eM659ldtqhiWg4I1NjL7BRZVXKGcyLDx8oe/CS9TC7FYxlcUcjKQKbHhctLF1tSeUdHUFtdGkwfkFlz9cnZEiNN8KzGpU+nrCyryEJza5owwSmyxFNG7JdAG4x/W4hndA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QyoZZODq; arc=none smtp.client-ip=209.85.215.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f226.google.com with SMTP id 41be03b00d2f7-c742b9b7727so844806a12.0
-        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 13:15:19 -0700 (PDT)
+Received: by mail-pg1-f225.google.com with SMTP id 41be03b00d2f7-c70ea5e9e9dso1124547a12.1
+        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 13:15:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774642519; x=1775247319;
+        d=1e100.net; s=20251104; t=1774642524; x=1775247324;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KPl7EmvJaJYETRrR8LpDympp691TF5ooz/XTqqQRZvk=;
-        b=AqjlMGfoS/kOHzHBaiRm5DniroU+4sZ7hiSbd8aHh+TbtSnVBupNrMTKUNmhkfqo1Z
-         YHJBNg4FPsOVzBIMFsLMW/dEUJacWn/MV0+0lsxqlrqXu4ExTs6K00lQYkdNVdD5nPys
-         CCJ8IA4HJR5s06QHDXVKV6tzDFNFeyjb32Hp/ZZPatduF0DJA+ly3dlhuu6FaVhdPApy
-         xxDj2gPhIBZqCLNNW+fRiehfU3GsnWApWS4NJpimOgJq0Rzi/7nciIACklXXwCgDF8+q
-         eWnc320tFq39RteO9i2TbqXR+osNr4L6zJNNJvmKgTY6ajUwxDv9V3COLb6Hfe66x9MF
-         94mQ==
-X-Gm-Message-State: AOJu0Yx2GC85ZwaJ1e9ZLg7ljrXZ8Csrc9vl1DybBdB5xRCG5QMWi59j
-	rtrnH9MDobLk1OMsrjYHChojeYfsbJo2jixVq5ge+37dCOh4jQt67GOv8jyaedClu/eEFNZQLZP
-	WQ4uOjeS5eYG56IUaFp6PGjZTh98xVNyMxlE5JOnnbqEXa1NQqzDdWFRlUah3YFRSps28z9seF6
-	LdWOE6rGUyvmdh06GpoWblEPSBUTDWRy0r7RY7BtSykpfRbYCY9PKfJVKBcnU7UXE25vAFDIQmr
-	DtJe2kjVIuTBKAREYWh
-X-Gm-Gg: ATEYQzwTtnl4MWSWPrTufx8YCoUeZ3eleVZHzKr+fUuJJSieWjAajYFYKQMjFbC7YJ8
-	ui0vrbOdy+nwP0/3evFsy3YQsDoLnKvYUDQ9PUxudUjAK9zk5kDm3ChnodA2yUWVLcy7skv7CKN
-	QXlOR51+6jgnnf7gBTLsNsDdJ1OvRUtKQ2f6bt0Sf7MWP9p143Lu4tut49enZq5QnoE9gL2A0hu
-	qWYfXJCMTgoxMFfQJW0GBBkV6U9JaRCZfiUZaOc/YzXd8ag18AM+sx5/JcjSsKqGKRjq9m8npZi
-	VBMKWNZuYpmpEN+lIOh+sIU7PM11e2iNBYG+Rlo99IW0aP5g+uTvGg/TU8hYSrTq32UGuxrIfQm
-	LLuxmbmoA/ugdwGtpCg4Ld9Tp3cmVxzs8wVx4kJPbZW8nAyrkOtCKhR9pZwVpGb91R/BcY11n0u
-	EE9pxDiWocLATKPe+hQ39jWHv7APLiieqzcyfnjIEUR25ONVI76xVe+Ic/mDVX7yI=
-X-Received: by 2002:a05:6a20:5483:b0:39b:92ea:d182 with SMTP id adf61e73a8af0-39c73557810mr6597875637.10.1774642518747;
-        Fri, 27 Mar 2026 13:15:18 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-25.dlp.protect.broadcom.com. [144.49.247.25])
-        by smtp-relay.gmail.com with ESMTPS id 41be03b00d2f7-c76916e0329sm12672a12.4.2026.03.27.13.15.18
+        bh=AcrU2S3pwS1dF0Y8GuCFOSv27TX89aMT8zCjbmcIpD8=;
+        b=PvpBKiQnH2ksE4GBzMpvaS6MXyZItAliwY6+TJoe0S1wdkv7hS/Tg5mEKtCLjFfyJe
+         ur1qJjvNzqlQv3qdN4ddQvCmuwH5/hBy8Dyyrrdb/OwZE5kfUK31J94qe+lQ7HcmfYEg
+         tQuPXwqFKP8YTlF9jRuSDI1h9HOPR2KNNFxa+obWtGZfOlyKko1zj66yTdMc1tY8UGdG
+         EnlM/hwIsAukVRkmGcWNsTFmPa3DiXYYfSZIeZiHV4/cRAtfxXGIr6KPt12bSZoGnUaz
+         sp8Zw0VG2ypmSZJXvqrNZZUNGKE8ve4RuDAOOQOwzvlFNbCu1bjg4ACr4ZEcdupWEyvI
+         C2vQ==
+X-Gm-Message-State: AOJu0Yy61w2RPwpA3CC/1S7T/2PzVuB9LaMW5jligucDTkh6ncV9z7NN
+	NImL9n79paNRyhJuPH+k3p8FEM4ZlT8Py7Is+Q8w7HfWnEmSDXWwrCOZ+53vdXLjgwY+AjzUAcM
+	HutoHdFviU9zHaZoaiqoBL7Wxl7NWt+IE41Of+qtXF9rFksNE0FmQ0jrPnRJJJ85ODJp5wQMW1E
+	Nv2dT/lL+9vTdycFhBQwa8tnJJvb1Hl9Qo6fT3lAjgdmwAv5kwrWVsQSDtU4sAh8ewgxhoakCrK
+	06jqnkwZLDhol60DCoB
+X-Gm-Gg: ATEYQzx0+6d0oKSC50RdrfMCLuC5KfgJzMwh0q6vvJGMshuX9OzPRJUjtNrQu8GxnkE
+	iVxR7h0DmFZjYQ5avChPXfIvb3zikgLyIHZF6jiEq5P6Ncqd9SM3Y0aNd3u1A78JZZ5Gav3jgiM
+	9iHVH0DA4TH0H22Uhfu5SvB6efwSirVfNAwJLeCqg3w7ta+HzFYoOweeSxYlOn8sTJrQ+rD3SRj
+	AfFnlUMZwKbydBBKARgMtUhw0GU07pP8lsDN2/Lh+yEnb4Y2jmLBLzXvV6AcNFvJLywH2HgbaIQ
+	8Fntp1UiMJMCNq5eNkcHTNim8hsXa9ym9Fu+f6kKD5K1QKuDjU7Zimynsl9Yfres0oLF/JdIGfI
+	aaZ1FGv9ePAQTlGBjFMIgf/oYD6FIHKfV1n9uNw52/FNQbMx3xhGDyTpbBiX98i0S9qejIVMfWS
+	pdR+M9tSZOWlw=
+X-Received: by 2002:a17:902:c946:b0:2ae:c8b4:6d9e with SMTP id d9443c01a7336-2b0cdc1b6dfmr41069655ad.13.1774642523964;
+        Fri, 27 Mar 2026 13:15:23 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com ([144.49.247.127])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2b242729a0esm249135ad.32.2026.03.27.13.15.23
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 27 Mar 2026 13:15:18 -0700 (PDT)
+        Fri, 27 Mar 2026 13:15:23 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-794b240c0d3so71628317b3.0
-        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 13:15:17 -0700 (PDT)
+Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-79a51ba2bf9so53678837b3.3
+        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 13:15:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1774642517; x=1775247317; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1774642523; x=1775247323; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KPl7EmvJaJYETRrR8LpDympp691TF5ooz/XTqqQRZvk=;
-        b=S11KKDD3bg/88sPM12zZbpwDXUzw9maHThDtsBrlhSbtr7/UmLlKDCVT1nF+zFzxDW
-         y7vDBasP4efCuAjWcdggQxAc+CtbVozoOWkI55Aw0juhOvqkGjF/yfxbXuoXzZ9h21jd
-         7hgbngDnedVkOUZ9sj53WjrSrrUkG7i45zQx8=
-X-Received: by 2002:a05:690c:6602:b0:799:1a4d:82c0 with SMTP id 00721157ae682-79bde26a772mr33848167b3.12.1774642517319;
-        Fri, 27 Mar 2026 13:15:17 -0700 (PDT)
-X-Received: by 2002:a05:690c:6602:b0:799:1a4d:82c0 with SMTP id 00721157ae682-79bde26a772mr33847797b3.12.1774642516732;
-        Fri, 27 Mar 2026 13:15:16 -0700 (PDT)
+        bh=AcrU2S3pwS1dF0Y8GuCFOSv27TX89aMT8zCjbmcIpD8=;
+        b=QyoZZODqZ1+se4BI/1+5vRzmq6xX6qO8t+Wvzgdyx7NxptBDRv0sCnfDqgZB3dsDQH
+         XPzdIWdzs4cXLSCuLS2e46KAvLiSs06hJpbBOzG9AQ2V1AGMg0CC07xXMOpxLIPZtZTj
+         /LyozzkdxoJaknVW7lxiAhnrZuPBAajdr8Mos=
+X-Received: by 2002:a05:690c:c50f:b0:798:2629:85d7 with SMTP id 00721157ae682-79bddd7743emr36729097b3.9.1774642522627;
+        Fri, 27 Mar 2026 13:15:22 -0700 (PDT)
+X-Received: by 2002:a05:690c:c50f:b0:798:2629:85d7 with SMTP id 00721157ae682-79bddd7743emr36728627b3.9.1774642521952;
+        Fri, 27 Mar 2026 13:15:21 -0700 (PDT)
 Received: from localhost.localdomain ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-79cb9a8f324sm119057b3.28.2026.03.27.13.15.10
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-79cb9a8f324sm119057b3.28.2026.03.27.13.15.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Mar 2026 13:15:15 -0700 (PDT)
+        Fri, 27 Mar 2026 13:15:21 -0700 (PDT)
 From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -101,12 +101,10 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	vsrama-krishna.nemani@broadcom.com,
 	vikas.gupta@broadcom.com,
-	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
-	Rahul Gupta <rahul-rg.gupta@broadcom.com>,
-	Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
-Subject: [PATCH net-next v10 07/10] bng_en: periodically fetch and accumulate hardware statistics
-Date: Sat, 28 Mar 2026 01:43:40 +0530
-Message-ID: <20260327201343.16146-8-bhargava.marreddy@broadcom.com>
+	Bhargava Marreddy <bhargava.marreddy@broadcom.com>
+Subject: [PATCH net-next v10 08/10] bng_en: implement ndo_get_stats64
+Date: Sat, 28 Mar 2026 01:43:41 +0530
+Message-ID: <20260327201343.16146-9-bhargava.marreddy@broadcom.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260327201343.16146-1-bhargava.marreddy@broadcom.com>
 References: <20260327201343.16146-1-bhargava.marreddy@broadcom.com>
@@ -130,10 +128,10 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272676-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272677-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[broadcom.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
@@ -141,153 +139,182 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[bhargava.marreddy@broadcom.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: B0F1934AF37
+X-Rspamd-Queue-Id: 0A44234AF3F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Use the timer to schedule periodic stats collection via
-the workqueue when the link is up. Fetch fresh counters from
-hardware via DMA and accumulate them into 64-bit software
-shadows, handling wrap-around for counters narrower than
-64 bits.
+Implement the ndo_get_stats64 callback to report aggregate network
+statistics. The driver gathers these by accumulating the per-ring
+counters into the provided rtnl_link_stats64 structure.
 
 Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
-Reviewed-by: Rahul Gupta <rahul-rg.gupta@broadcom.com>
-Reviewed-by: Ajit Kumar Khaparde <ajit.khaparde@broadcom.com>
 ---
- .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 90 +++++++++++++++++++
- .../net/ethernet/broadcom/bnge/bnge_netdev.h  |  1 +
- 2 files changed, 91 insertions(+)
+ .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 103 ++++++++++++++++++
+ .../net/ethernet/broadcom/bnge/bnge_netdev.h  |   3 +
+ 2 files changed, 106 insertions(+)
 
 diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-index 23a07f640847..3b9bcfbe6fdc 100644
+index 3b9bcfbe6fdc..b5cc96d1ee0e 100644
 --- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
 +++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-@@ -313,9 +313,93 @@ static void bnge_timer(struct timer_list *t)
- 		}
+@@ -2872,6 +2872,7 @@ static int bnge_open_core(struct bnge_net *bn)
  	}
  
-+	if (BNGE_LINK_IS_UP(bd) && bn->stats_coal_ticks)
-+		bnge_queue_sp_work(bn, BNGE_PERIODIC_STATS_SP_EVENT);
-+
- 	mod_timer(&bn->timer, jiffies + bn->current_interval);
+ 	set_bit(BNGE_STATE_OPEN, &bd->state);
++	set_bit(BNGE_STATE_STATS_ENABLE, &bn->state);
+ 
+ 	bnge_enable_int(bn);
+ 
+@@ -2910,6 +2911,99 @@ static int bnge_shutdown_nic(struct bnge_net *bn)
+ 	return 0;
  }
  
-+static void bnge_add_one_ctr(u64 hw, u64 *sw, u64 mask)
-+{
-+	u64 sw_tmp, sw_val;
-+
-+	hw &= mask;
-+	sw_val = READ_ONCE(*sw);
-+	sw_tmp = (sw_val & ~mask) | hw;
-+	if (hw < (sw_val & mask))
-+		sw_tmp += mask + 1;
-+	WRITE_ONCE(*sw, sw_tmp);
-+}
-+
-+static void __bnge_accumulate_stats(__le64 *hw_stats, u64 *sw_stats, u64 *masks,
-+				    int count)
-+{
-+	int i;
-+
-+	for (i = 0; i < count; i++) {
-+		u64 hw = le64_to_cpu(READ_ONCE(hw_stats[i]));
-+
-+		if (masks[i] == -1ULL)
-+			WRITE_ONCE(sw_stats[i], hw);
-+		else
-+			bnge_add_one_ctr(hw, &sw_stats[i], masks[i]);
-+	}
-+}
-+
-+static void bnge_accumulate_stats(struct bnge_stats_mem *stats)
-+{
-+	if (!stats->hw_stats)
-+		return;
-+
-+	__bnge_accumulate_stats(stats->hw_stats, stats->sw_stats,
-+				stats->hw_masks, stats->len / 8);
-+}
-+
-+static void bnge_accumulate_all_stats(struct bnge_dev *bd)
++static void bnge_get_ring_stats(struct bnge_dev *bd,
++				struct rtnl_link_stats64 *stats)
 +{
 +	struct bnge_net *bn = netdev_priv(bd->netdev);
-+	struct bnge_stats_mem *ring0_stats = NULL;
 +	int i;
 +
 +	for (i = 0; i < bd->nq_nr_rings; i++) {
 +		struct bnge_napi *bnapi = bn->bnapi[i];
 +		struct bnge_nq_ring_info *nqr;
-+		struct bnge_stats_mem *stats;
++		u64 *sw;
 +
 +		nqr = &bnapi->nq_ring;
-+		stats = &nqr->stats;
++		sw = nqr->stats.sw_stats;
 +
-+		if (!ring0_stats)
-+			ring0_stats = &bn->bnapi[0]->nq_ring.stats;
++		stats->rx_packets += BNGE_GET_RING_STATS64(sw, rx_ucast_pkts);
++		stats->rx_packets += BNGE_GET_RING_STATS64(sw, rx_mcast_pkts);
++		stats->rx_packets += BNGE_GET_RING_STATS64(sw, rx_bcast_pkts);
 +
-+		__bnge_accumulate_stats(stats->hw_stats, stats->sw_stats,
-+					ring0_stats->hw_masks,
-+					ring0_stats->len / 8);
-+	}
++		stats->tx_packets += BNGE_GET_RING_STATS64(sw, tx_ucast_pkts);
++		stats->tx_packets += BNGE_GET_RING_STATS64(sw, tx_mcast_pkts);
++		stats->tx_packets += BNGE_GET_RING_STATS64(sw, tx_bcast_pkts);
 +
-+	if (bn->flags & BNGE_FLAG_PORT_STATS) {
-+		struct bnge_stats_mem *stats = &bn->port_stats;
-+		__le64 *hw_stats = stats->hw_stats;
-+		u64 *sw_stats = stats->sw_stats;
-+		u64 *masks = stats->hw_masks;
-+		u16 cnt;
++		stats->rx_bytes += BNGE_GET_RING_STATS64(sw, rx_ucast_bytes);
++		stats->rx_bytes += BNGE_GET_RING_STATS64(sw, rx_mcast_bytes);
++		stats->rx_bytes += BNGE_GET_RING_STATS64(sw, rx_bcast_bytes);
 +
-+		cnt = sizeof(struct rx_port_stats) / 8;
-+		__bnge_accumulate_stats(hw_stats, sw_stats, masks, cnt);
++		stats->tx_bytes += BNGE_GET_RING_STATS64(sw, tx_ucast_bytes);
++		stats->tx_bytes += BNGE_GET_RING_STATS64(sw, tx_mcast_bytes);
++		stats->tx_bytes += BNGE_GET_RING_STATS64(sw, tx_bcast_bytes);
 +
-+		hw_stats += BNGE_TX_PORT_STATS_BYTE_OFFSET / 8;
-+		sw_stats += BNGE_TX_PORT_STATS_BYTE_OFFSET / 8;
-+		masks += BNGE_TX_PORT_STATS_BYTE_OFFSET / 8;
-+		cnt = sizeof(struct tx_port_stats) / 8;
-+		__bnge_accumulate_stats(hw_stats, sw_stats, masks, cnt);
-+	}
++		stats->rx_missed_errors +=
++			BNGE_GET_RING_STATS64(sw, rx_discard_pkts);
 +
-+	if (bn->flags & BNGE_FLAG_PORT_STATS_EXT) {
-+		bnge_accumulate_stats(&bn->rx_port_stats_ext);
-+		bnge_accumulate_stats(&bn->tx_port_stats_ext);
++		stats->multicast += BNGE_GET_RING_STATS64(sw, rx_mcast_pkts);
++		stats->tx_dropped += BNGE_GET_RING_STATS64(sw, tx_error_pkts);
 +	}
 +}
 +
- static void bnge_sp_task(struct work_struct *work)
- {
- 	struct bnge_net *bn = container_of(work, struct bnge_net, sp_task);
-@@ -328,6 +412,12 @@ static void bnge_sp_task(struct work_struct *work)
- 		return;
- 	}
- 
-+	if (test_and_clear_bit(BNGE_PERIODIC_STATS_SP_EVENT, &bn->sp_event)) {
-+		bnge_hwrm_port_qstats(bd, 0);
-+		bnge_hwrm_port_qstats_ext(bd, 0);
-+		bnge_accumulate_all_stats(bd);
++static void bnge_add_prev_stats(struct bnge_net *bn,
++				struct rtnl_link_stats64 *stats)
++{
++	struct rtnl_link_stats64 *prev_stats = &bn->net_stats_prev;
++
++	stats->rx_packets += prev_stats->rx_packets;
++	stats->tx_packets += prev_stats->tx_packets;
++	stats->rx_bytes += prev_stats->rx_bytes;
++	stats->tx_bytes += prev_stats->tx_bytes;
++	stats->rx_missed_errors += prev_stats->rx_missed_errors;
++	stats->multicast += prev_stats->multicast;
++	stats->tx_dropped += prev_stats->tx_dropped;
++}
++
++static void bnge_get_stats64(struct net_device *dev,
++			     struct rtnl_link_stats64 *stats)
++{
++	struct bnge_net *bn = netdev_priv(dev);
++	struct bnge_dev *bd = bn->bd;
++
++	rcu_read_lock();
++	if (!test_bit(BNGE_STATE_STATS_ENABLE, &bn->state)) {
++		rcu_read_unlock();
++		*stats = bn->net_stats_prev;
++		return;
 +	}
 +
- 	if (test_and_clear_bit(BNGE_UPDATE_PHY_SP_EVENT, &bn->sp_event)) {
- 		int rc;
- 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-index 74b08d492c53..548c5a77e76a 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-@@ -276,6 +276,7 @@ enum bnge_sp_event {
- 	BNGE_LINK_SPEED_CHNG_SP_EVENT,
- 	BNGE_LINK_CFG_CHANGE_SP_EVENT,
- 	BNGE_UPDATE_PHY_SP_EVENT,
-+	BNGE_PERIODIC_STATS_SP_EVENT,
++	bnge_get_ring_stats(bd, stats);
++	bnge_add_prev_stats(bn, stats);
++
++	if (bn->flags & BNGE_FLAG_PORT_STATS) {
++		u64 *tx = bn->port_stats.sw_stats +
++			  BNGE_TX_PORT_STATS_BYTE_OFFSET / 8;
++		u64 *rx = bn->port_stats.sw_stats;
++
++		stats->rx_crc_errors =
++			BNGE_GET_RX_PORT_STATS64(rx, rx_fcs_err_frames);
++		stats->rx_frame_errors =
++			BNGE_GET_RX_PORT_STATS64(rx, rx_align_err_frames);
++		stats->rx_length_errors =
++			BNGE_GET_RX_PORT_STATS64(rx, rx_undrsz_frames) +
++			BNGE_GET_RX_PORT_STATS64(rx, rx_ovrsz_frames) +
++			BNGE_GET_RX_PORT_STATS64(rx, rx_runt_frames);
++		stats->rx_errors =
++			BNGE_GET_RX_PORT_STATS64(rx, rx_false_carrier_frames) +
++			BNGE_GET_RX_PORT_STATS64(rx, rx_jbr_frames);
++		stats->collisions =
++			BNGE_GET_TX_PORT_STATS64(tx, tx_total_collisions);
++		stats->tx_fifo_errors =
++			BNGE_GET_TX_PORT_STATS64(tx, tx_fifo_underruns);
++		stats->tx_errors = BNGE_GET_TX_PORT_STATS64(tx, tx_err);
++	}
++	rcu_read_unlock();
++}
++
+ static void bnge_close_core(struct bnge_net *bn)
+ {
+ 	struct bnge_dev *bd = bn->bd;
+@@ -2921,6 +3015,14 @@ static void bnge_close_core(struct bnge_net *bn)
+ 	timer_delete_sync(&bn->timer);
+ 	bnge_shutdown_nic(bn);
+ 	bnge_disable_napi(bn);
++
++	/* Save ring stats before shutdown */
++	if (bn->bnapi)
++		bnge_get_ring_stats(bd, &bn->net_stats_prev);
++
++	clear_bit(BNGE_STATE_STATS_ENABLE, &bn->state);
++	synchronize_rcu();
++
+ 	bnge_free_all_rings_bufs(bn);
+ 	bnge_free_irq(bn);
+ 	bnge_del_napi(bn);
+@@ -2943,6 +3045,7 @@ static const struct net_device_ops bnge_netdev_ops = {
+ 	.ndo_open		= bnge_open,
+ 	.ndo_stop		= bnge_close,
+ 	.ndo_start_xmit		= bnge_start_xmit,
++	.ndo_get_stats64	= bnge_get_stats64,
+ 	.ndo_features_check	= bnge_features_check,
  };
  
- struct bnge_net {
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
+index 548c5a77e76a..c972567882bf 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
+@@ -262,6 +262,7 @@ struct bnge_stats_mem {
+ 
+ enum bnge_net_state {
+ 	BNGE_STATE_NAPI_DISABLED,
++	BNGE_STATE_STATS_ENABLE,
+ };
+ 
+ #define BNGE_TIMER_INTERVAL	HZ
+@@ -353,6 +354,8 @@ struct bnge_net {
+ 
+ 	u64			flags;
+ 
++	struct rtnl_link_stats64	net_stats_prev;
++
+ 	struct bnge_stats_mem	port_stats;
+ 	struct bnge_stats_mem	rx_port_stats_ext;
+ 	struct bnge_stats_mem	tx_port_stats_ext;
 -- 
 2.47.3
 
