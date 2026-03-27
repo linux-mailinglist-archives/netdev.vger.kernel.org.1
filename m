@@ -1,84 +1,53 @@
-Return-Path: <netdev+bounces-272312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272313-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qKwSL4XaxWneCQUAu9opvQ
-	(envelope-from <netdev+bounces-272312-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:16:53 +0100
+	id WJo7BMvbxWneCQUAu9opvQ
+	(envelope-from <netdev+bounces-272313-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:22:19 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C1BE33DC44
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:16:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D00633DCAF
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 02:22:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 22CF230312D2
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:16:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 677003037EFC
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 01:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D934426ED3F;
-	Fri, 27 Mar 2026 01:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B952D0C92;
+	Fri, 27 Mar 2026 01:20:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="WSfm52FK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iCfhDqzk"
 X-Original-To: netdev@vger.kernel.org
-Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.49])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD511A08AF;
-	Fri, 27 Mar 2026 01:16:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4712848AF;
+	Fri, 27 Mar 2026 01:20:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774574205; cv=none; b=jgsA7IAKBLpgE2tYt1rx5V1LUTvZp0XErEy0Y6+SqSn7QHd3gYc1yDrSxqL8bb77Q++mCXGBMYfCKH8sm05s8UauSYXBiHIkugwvAacfoScrFe5DuuHWNut7IUcK4lkVXWbhFZ7pJSctBgk4DE40kt9g+JFTaZGS/IjCVUnZAfc=
+	t=1774574422; cv=none; b=SfQwJ5PNguJepj118T0x2JTrNjKdXlSdl5TFxrcFUQDOVxzeBoNlY/GO53Yh8kYloIkkCo8hkJXu4c9B13pDKjRE4cpGAOQB0H3SRw6+jdU9hS8VmuTTAO47R/2jibt83CRmv8WKo7jU8jxHb8e7i6WS2TebHL3cbVrD9wgvmoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774574205; c=relaxed/simple;
-	bh=4ION8xlOxziA6xIZ/HXmfnOT9E1HwOafvdlHdxXZrM4=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=CBAgi+ugpntVHeCBdRBo+BGLrSC9hA55ufs+atSWQDTKQjPNEuLVL4yZA+J86lTasY1QDPMAlTBIPs/LT1K3G+r2YDTSywI23+HLDsLrw7ds2ivrv9xwqy8qCWJw+IaTvnetHSn/TVmMvhinnTi11wA9T22LysvjAzk4hYCAz1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=WSfm52FK; arc=none smtp.client-ip=43.163.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1774574193; bh=3E7Cy3Lq5RO4uDWdY28fkZ57PM0uaL3UsRvYBXsxZ/Y=;
-	h=From:To:Cc:Subject:Date;
-	b=WSfm52FKTcRhp68EyfDlOaLLtT9XOe5eo3U7LntTDMxeR4R48//Gkj7/4QN6Q6SzM
-	 OwBe4kIeRMLCZgCcbYQHKJNVsS8BHKovhvuH8MF8qJaiDh0aPjpDDgSAK+6omQGi9h
-	 L9/B+Va3Ffdm79qKjSBWGNpZWqZNYNEFEzEamckY=
-Received: from June.localdomain ([123.121.145.35])
-	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
-	id 41D27EBF; Fri, 27 Mar 2026 09:16:29 +0800
-X-QQ-mid: xmsmtpt1774574189tpmumoq43
-Message-ID: <tencent_5F1EACA5E1063E7E346A4138913F7486A009@qq.com>
-X-QQ-XMAILINFO: M1rD3f8svNzn4NIMJdFeCJf7eTIWagXxfV2gDR6fjAo5PkA2iJNwzCBtFVKMn0
-	 tFQ8NTkYQKBrnTRyl6xsDvO0qM1vBXmfzt/E9YppNBe6VSfq5S/myfSqTtsjTDdwKo/JAqPVWhHR
-	 f0Wlwq+ZPuBQJk6tDtlHA2wrWBjgPnLFL18ajKfpj3CVz2kgnNi9QrnYKsUQraRElRDiSrC+aHET
-	 WIctd9ddXG/Q0+F5BM3/YUFy19dcgeY8rODKU5qvPf4id1KoJvmlmEFY2h9cYFVutJidtlwdkNTb
-	 AmyMct+48HNVWJ0rxdCx0cx/8TOL2iC9BcT69F1GV+MkNWTHgIBkndK6rl2Z/vW8o9MrHWltdr1P
-	 Bi2vniRTTG/DVG5/4AjC9QmDKvfiNOltn/A+CWE1hIqlZVRO2NmzJeWqKNZOzogFXLLXB6EymeBa
-	 5Umot1bXHLK0ae28u3vGyApvT9DTJGbvg85+ixP1BOFwwpq/T5swfejxfqVoH9WFtoQoDtBfZ1nS
-	 Gm/OaQYBc1g/AJtmmYFoOGwc4iv0J/HkCdpd+im6+H89IXrbqATX/XP00BsbFXNx6GxTtDb0/IsS
-	 pjV+Rh2wuuLsX1yWNW658RpwwG56TJw6fTO8P2FtvkEo5hBKwItVuxVS0lqw1kBH9xOd85jA3ekG
-	 JMq18jFPuNN71V6+SEOyKMQpMit/G6B5/mT9AheFTmn4dZpToBCcciB5gt1ezKSpgfraU9LJGZNL
-	 GC+q/saWcSpUhy9O7+WSRkjgY5D0vi3HVEbob3qj8Hsk6FCv40fg5drWawBbnjZ6M9bSsxBsUfd0
-	 m2Gnk5zfKRUjgeCjBzQC96k3vQIOWxWgWt0Pw8xjfnbJQuzuBVUIGpgNR0Ol3s4nlU03RNLz0CAZ
-	 eBaBm9o0e0OwzxHAXO1U2aTrx8febcGhc1nn1ffbBtYKLl3j+ETrJgqS+pL65q0uTucnn56O5sl0
-	 +Idn8lz+edooOGFdqT+gnzxSQjen+9BkyGR834O6TW02MGpB0kHie1PEdBnPpULO2/uK1kS72MyF
-	 WHacISJbItzWia3TNiih/6bzNn2LMfjsr8LFyr772PwphUa9+A
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-From: Wang Jun <1742789905@qq.com>
-To: kuba@kernel.org
-Cc: pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	simon.horman@corigine.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	gszhai@bjtu.edu.cn,
-	25125332@bjtu.edu.cn,
-	25125283@bjtu.edu.cn,
-	23120469@bjtu.edu.cn,
-	Wang Jun <1742789905@qq.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] net: ns83820: check DMA mapping errors in hard_start_xmit
-Date: Fri, 27 Mar 2026 09:16:27 +0800
-X-OQ-MSGID: <20260327011627.40863-1-1742789905@qq.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1774574422; c=relaxed/simple;
+	bh=+mbG3eLMPAF0Yt2+SNkDC2ssfDgwkGm8vxuXyXfcop4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=GqCREhyQ3Y6SCyYFEpHEBdiNj43fF0/hIr2g5wyhens2YWj3xvX3EOd5vwUr85/yYzGyp2nKm5qQVM4tHbAQLN7p2jSHPCxoahTwdSmMlPpmh1T2EbBeGb05g764k1NSdLd3Z9Z+8vw70VTWPKZMk+MyHHJ4DFmy0k1BOYorzNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iCfhDqzk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B446DC116C6;
+	Fri, 27 Mar 2026 01:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774574421;
+	bh=+mbG3eLMPAF0Yt2+SNkDC2ssfDgwkGm8vxuXyXfcop4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=iCfhDqzkhmcNkYGWkj09iFJq6rCEDt1dbAqTatJbEGc1rBoXetzKDZOXuLpBFjiME
+	 a9P8LcR9NdgAj8rW2IuLq3wUmWDVOgSGvBI3IBLemkAhxfETD+8YAB5qMQUx0mXxQQ
+	 Z1KX0X7a0FY5C/oSovuXJUNuz+9HL9vMTvfhtdmSwUO6tI3WhvJ9uUYU1trF5TKJ1U
+	 iq0MgVZUAAMKnMtahTCAX/2yMy7tmHEqIv/Bb+X3JWttgSheCwjeNIi2kSQ0wu+ypW
+	 49ihEaPrekoIUMIhBS9G/ZYoXAGC2NF/9eFI+t9r0qQjQGVlVbbvT4QGfSW740gtBt
+	 XrNoUx3Y3OyPQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FF6E3809A07;
+	Fri, 27 Mar 2026 01:20:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,135 +55,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Subject: Re: [PATCH net-next v15 0/3] Add support for Nuvoton MA35D1 GMAC
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177457440804.3248049.2435571505438713021.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Mar 2026 01:20:08 +0000
+References: <20260323101756.81849-1-a0987203069@gmail.com>
+In-Reply-To: <20260323101756.81849-1-a0987203069@gmail.com>
+To: Joey Lu <a0987203069@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, mcoquelin.stm32@gmail.com, richardcochran@gmail.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, ychuang3@nuvoton.com,
+ schung@nuvoton.com, yclu4@nuvoton.com, peppe.cavallaro@st.com,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ openbmc@lists.ozlabs.org, linux-stm32@st-md-mailman.stormreply.com
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-272313-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,synopsys.com,nuvoton.com,st.com,lists.infradead.org,vger.kernel.org,lists.ozlabs.org,st-md-mailman.stormreply.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272312-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[qq.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[redhat.com,lunn.ch,davemloft.net,google.com,corigine.com,vger.kernel.org,bjtu.edu.cn,qq.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[1742789905@qq.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qq.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,qq.com:dkim,qq.com:email,qq.com:mid]
-X-Rspamd-Queue-Id: 5C1BE33DC44
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NO_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6D00633DCAF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The ns83820 driver currently ignores the return values of dma_map_single()
-and skb_frag_dma_map() in the transmit path. If DMA mapping fails due to
-IOMMU exhaustion or SWIOTLB pressure, the driver may proceed with invalid
-DMA addresses, potentially causing hardware errors, data corruption, or
-system instability.
+Hello:
 
-Additionally, if mapping fails midway through processing fragmented
-packets,previously mapped DMA resources are not released, leading
-to DMA resource leaks.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Fix this by:
-1. Checking dma_mapping_error() after each DMA mapping call.
-2. Implementing an error handling path to unmap successfully
-mapped buffers(both linear and fragments) using
-dma_unmap_single().
-3. Freeing the skb using dev_kfree_skb_any() to safely handle
-both process and softirq contexts, as hard_start_xmit may be
-called with IRQs enabled.
-4. Returning NETDEV_TX_OK to drop the packet gracefully and
-prevent TX queue stagnation.
+On Mon, 23 Mar 2026 18:17:53 +0800 you wrote:
+> This patch series is submitted to add GMAC support for Nuvoton MA35D1
+> SoC platform. This work involves implementing a GMAC driver glue layer
+> based on Synopsys DWMAC driver framework to leverage MA35D1's dual GMAC
+> interface capabilities.
+> 
+> Overview:
+>   1. Added a GMAC driver glue layer for MA35D1 SoC, providing support for
+>   the platform's two GMAC interfaces.
+>   2. Added device tree settings, with specific configurations for our
+>   development boards:
+>     a. SOM board: Configured for two RGMII interfaces.
+>     b. IoT board: Configured with one RGMII and one RMII interface.
+>   3. Added dt-bindings for the GMAC interfaces.
+> 
+> [...]
 
-This ensures compliance with the DMA API guidelines and
-improves driver stability under memory pressure.
+Here is the summary with links:
+  - [net-next,v15,1/3] dt-bindings: net: nuvoton: Add schema for Nuvoton MA35 family GMAC
+    https://git.kernel.org/netdev/net-next/c/8454478ef9ab
+  - [net-next,v15,2/3] arm64: dts: nuvoton: Add Ethernet nodes
+    (no matching commit)
+  - [net-next,v15,3/3] net: stmmac: dwmac-nuvoton: Add dwmac glue for Nuvoton MA35 family
+    https://git.kernel.org/netdev/net-next/c/4d7c557f58ef
 
-Fixes: fd9e4d6fec15 ("natsemi: switch from 'pci_' to 'dma_' API")
-Cc: stable@vger.kernel.org
-Signed-off-by: Wang Jun <1742789905@qq.com>
----
- drivers/net/ethernet/natsemi/ns83820.c | 32 ++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
-
-diff --git a/drivers/net/ethernet/natsemi/ns83820.c b/drivers/net/ethernet/natsemi/ns83820.c
-index cdbf82affa7b..90465e4977c3 100644
---- a/drivers/net/ethernet/natsemi/ns83820.c
-+++ b/drivers/net/ethernet/natsemi/ns83820.c
-@@ -1051,6 +1051,12 @@ static netdev_tx_t ns83820_hard_start_xmit(struct sk_buff *skb,
- 	int stopped = 0;
- 	int do_intr = 0;
- 	volatile __le32 *first_desc;
-+	dma_addr_t frag_dma_addr[MAX_SKB_FRAGS];
-+	unsigned int frag_dma_len[MAX_SKB_FRAGS];
-+	int frag_mapped_count = 0;
-+	dma_addr_t main_buf = 0;
-+	unsigned int main_len = 0;
-+	int i;
- 
- 	dprintk("ns83820_hard_start_xmit\n");
- 
-@@ -1121,6 +1127,13 @@ static netdev_tx_t ns83820_hard_start_xmit(struct sk_buff *skb,
- 	buf = dma_map_single(&dev->pci_dev->dev, skb->data, len,
- 			     DMA_TO_DEVICE);
- 
-+	if (dma_mapping_error(&dev->pci_dev->dev, buf)) {
-+		dev_kfree_skb_any(skb);
-+		return NETDEV_TX_OK;
-+	}
-+	main_buf = buf;
-+	main_len = len;
-+
- 	first_desc = dev->tx_descs + (free_idx * DESC_SIZE);
- 
- 	for (;;) {
-@@ -1144,6 +1157,15 @@ static netdev_tx_t ns83820_hard_start_xmit(struct sk_buff *skb,
- 
- 		buf = skb_frag_dma_map(&dev->pci_dev->dev, frag, 0,
- 				       skb_frag_size(frag), DMA_TO_DEVICE);
-+		if (dma_mapping_error(&dev->pci_dev->dev, buf))
-+			goto dma_map_error;
-+
-+		if (frag_mapped_count < MAX_SKB_FRAGS) {
-+			frag_dma_addr[frag_mapped_count] = buf;
-+			frag_dma_len[frag_mapped_count] = skb_frag_size(frag);
-+			frag_mapped_count++;
-+		}
-+
- 		dprintk("frag: buf=%08Lx  page=%08lx offset=%08lx\n",
- 			(long long)buf, (long) page_to_pfn(frag->page),
- 			frag->page_offset);
-@@ -1166,6 +1188,16 @@ static netdev_tx_t ns83820_hard_start_xmit(struct sk_buff *skb,
- 	if (stopped && (dev->tx_done_idx != tx_done_idx) && start_tx_okay(dev))
- 		netif_start_queue(ndev);
- 
-+	return NETDEV_TX_OK;
-+dma_map_error:
-+	dma_unmap_single(&dev->pci_dev->dev, main_buf, main_len, DMA_TO_DEVICE);
-+	for (i = 0; i < frag_mapped_count; i++) {
-+		dma_unmap_single(&dev->pci_dev->dev, frag_dma_addr[i], frag_dma_len[i],
-+				 DMA_TO_DEVICE);
-+	}
-+
-+	dev_kfree_skb_any(skb);
-+
- 	return NETDEV_TX_OK;
- }
- 
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
