@@ -1,169 +1,248 @@
-Return-Path: <netdev+bounces-272687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272688-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0FwuMYz2xmkGQwUAu9opvQ
-	(envelope-from <netdev+bounces-272687-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 22:28:44 +0100
+	id 4OjrJ4b4xmlwQwUAu9opvQ
+	(envelope-from <netdev+bounces-272688-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 22:37:10 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BDD934BB55
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 22:28:44 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC13E34BC33
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 22:37:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DD70D304A6C4
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:27:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1496830455F3
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 21:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E0A393DD3;
-	Fri, 27 Mar 2026 21:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2459F39D6F9;
+	Fri, 27 Mar 2026 21:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Ms6teX8r"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H98b1hfX"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E2DA392C5A;
-	Fri, 27 Mar 2026 21:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06E139DBC4
+	for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 21:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774646846; cv=none; b=eK3EgWxbXQwHiWMyera1AjW139Sn6m3QNOs2szvG1la0eSqsWBOE2LWqua80dqvRFh9jKCAbVRe7Kg4iqzBqXujuXv+T+YYJC9xFgJGgr997Nt2mY6rsHNB7V2+rVvZ0B8TT2kZb6io7ctf+oMVyDTEuiD182m6altpSV+gVW0c=
+	t=1774647287; cv=none; b=mbduLtH6NQYA+sJtvnLto4Vj1a9Yen3/SIOwwdvcH2S0IAIO3vldMlXKwiEKeO6RfyeyR5tnJVIza7H+jDOHCvSaVMhzIzOc/+EtKJ4y3M8L4o+KeoAUwHbZkkWLwqe1GuAjKPvSfpM6toVy70h3tg90GCTdSOXrLeskX6vF6A0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774646846; c=relaxed/simple;
-	bh=5KA0kZt4s0Pa0hT1hYmZ5xCmj7e+CT/d+UoZc79RQ2E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bRWhfg6KUU3zo5NoUg7B35bcJ9vyYy4ffNGkpKVxyEl8vp5kB78mSBImBXzyPmj2j4Fnm5H7oUKFi0Bb3L6JLmI1M3W9oKfE34XBkk1d2q+nJ1xA20Wc8OQrOhstUSPiYDD7eGGMoqYL3JDR7GjKI4KZpPGvSkUexrTMMzUfHy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Ms6teX8r; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [10.17.149.12] (unknown [131.107.8.12])
-	by linux.microsoft.com (Postfix) with ESMTPSA id A8F6D20B6F01;
-	Fri, 27 Mar 2026 14:27:24 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A8F6D20B6F01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1774646844;
-	bh=rOEiR+xqNwP7mi5DMkwFjv/YmDpf5sOAdwYcP1lPfCU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ms6teX8rQ/QhSM0TRb/L+6L0QiQ1pSwDvM/YDAqecVmDuw3BOFfkuov2LsbZyBpRa
-	 zdY4g72PXsKja/NAwe9pX3kENSZzlghkhg7pUync6wAEli9VU0uR1IdD0HVPCo8DXY
-	 S5PSilxlirLRpo6x/eJ+IuZJpRbHUTOxtjtZjiKk=
-Message-ID: <eb567b6f-2822-4802-97d2-d78fe63a7342@linux.microsoft.com>
-Date: Fri, 27 Mar 2026 14:27:23 -0700
+	s=arc-20240116; t=1774647287; c=relaxed/simple;
+	bh=5nR1ngLxmMq8UEuESNVUn29LOUuMj/vfTLBP5VqIjak=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jYDjr+lnFeARctbrIM6E9M9fRWVjooxPuAHr8r9lgci1Odl9slRbttFw58fVI+yNYTGsnMCqmiYoVCwjaN6XwFDby86CijenRIlHXsSJCRjUIFLUqf3GLJFw4e8MyeLmQqS11fOYPorMNRECPnirbU8NhPqxH3c3JzCCXFJwKsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H98b1hfX; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c6e24ee93a6so2407699a12.0
+        for <netdev@vger.kernel.org>; Fri, 27 Mar 2026 14:34:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774647285; x=1775252085; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bPuS/pWZaNCqWvWNSrB3xY4cOu7IqsnNqUHAgUKc9/s=;
+        b=H98b1hfXjqMhzCOsXjDjlulez6gkzKu759NQktI2iorQFgYUq7GnbsMFj4gCNV45u1
+         /irJW/zS/Oe09T4dA6x9m4vWUwK30ZddaCNn7P+rfiz9ZcUa/AzSqTsJ1zJ1vdxp5xnB
+         GVS/w7AlLbCW7cRmJflIs6yQ7E43HDQfksGfCvLYzReM55sktkhA3rGJ9HjiatnSYFMF
+         qeup2DQSpxgBalJTOzFfQaxa3TN5jxphhdVOhHkLPTqJg2hw2MklkFXaZZF2/K2v+83H
+         ApFiEPIrV36xD18JSaO5fJrHfGO9FvwBAyWoS3XdPOZnuCTsS2cuIH2qm404r0lNhOjL
+         nXMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774647285; x=1775252085;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bPuS/pWZaNCqWvWNSrB3xY4cOu7IqsnNqUHAgUKc9/s=;
+        b=NmqtO0xpNrc7YELvb93Jh9E17YX8hb90+HKsPf/KmZZNFmrtgZIxAZCDvm0tvrmGLW
+         JvkdfqiwMqno+DVbuMZiMxq1fHBwJR/3ncKe9GpizlJT4aUCBi5dP2lUSRoYBSZogb3G
+         mrkw81U61fg096NIZRTRgKph7afYzjydabHL5tc2MHrMDMFrR8j5ZcnpfLBYhqTAn0TA
+         5jZ7vwISPZ96UJ0aD/cVLUzXGX2fluePqB3hE8NHtV+/K5ysvj1/EfqR9BAfRxs9l7Yf
+         jmW4lU1kt+BeYzFXal/ngiEHdqdahGyJ24eEs9xZ954YdtFowMmoofrhX6Sw6oaz1rCK
+         UH9w==
+X-Forwarded-Encrypted: i=1; AJvYcCV0u2ktGA3BYQoFZaDeXfIOfAm9kVTPS6QVVC2b5BkXJLFh6t5oS/l8LOqIc28OtIgLPEDg2Sc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvhaaTYMYW5jrr4qnf/C6/iefzZ0k/n0+XhHAkRkhpmdceGF5S
+	xIsrXkDNqpDo1skjE9ZNv3vETd6Or1xUSo5SyiI+tddrZaGqCQe7Xj9K0k+UwnF90RVpuAKnTDn
+	Tg0VQgw==
+X-Received: from pgao5.prod.google.com ([2002:a63:4105:0:b0:c73:fc44:8bb5])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:3d06:b0:39b:8368:d3b3
+ with SMTP id adf61e73a8af0-39c7321665emr6871365637.0.1774647284492; Fri, 27
+ Mar 2026 14:34:44 -0700 (PDT)
+Date: Fri, 27 Mar 2026 21:34:40 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: mana: fix use-after-free in add_adev() error path
-To: Guangshuo Li <lgs201920130244@gmail.com>,
- "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Saurabh Sengar <ssengar@linux.microsoft.com>,
- Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
- Shradha Gupta <shradhagupta@linux.microsoft.com>,
- Dipayaan Roy <dipayanroy@linux.microsoft.com>,
- Aditya Garg <gargaditya@linux.microsoft.com>,
- Shiraz Saleem <shirazsaleem@microsoft.com>, Leon Romanovsky
- <leon@kernel.org>, linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org
-References: <20260318154041.638747-1-lgs201920130244@gmail.com>
-Content-Language: en-US
-From: Hardik Garg <hargar@linux.microsoft.com>
-In-Reply-To: <20260318154041.638747-1-lgs201920130244@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
+Message-ID: <20260327213441.3781433-1-kuniyu@google.com>
+Subject: [PATCH v1 net-next] tun: Ignore tun in netdev_lock_pos().
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272687-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com,microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272688-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lunn.ch];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hargar@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.microsoft.com:dkim,linux.microsoft.com:mid]
-X-Rspamd-Queue-Id: 2BDD934BB55
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DC13E34BC33
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+dev->type could be any value on tun due to TUNSETLINK.
 
+Let's not warn about it in netdev_lock_pos().
 
-On 3/18/2026 8:40 AM, Guangshuo Li wrote:
-> If auxiliary_device_add() fails, add_adev() calls
-> auxiliary_device_uninit(adev), whose release callback adev_release()
-> frees the containing struct mana_adev.
-> 
-> The current error path then falls through to init_fail and accesses
-> adev->id. Since adev is embedded in struct mana_adev, this may lead
-> to a use-after-free.
-> 
-> Fix it by storing the allocated auxiliary device id in a local
-> variable and using that saved id in the cleanup path after
-> auxiliary_device_uninit().
-> 
-> Fixes: a69839d4327d ("net: mana: Add support for auxiliary device")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
-> ---
->  drivers/net/ethernet/microsoft/mana/mana_en.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index 1ad154f9db1a..70d71594c599 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -3362,6 +3362,7 @@ static int add_adev(struct gdma_dev *gd, const char *name)
->  {
->  	struct auxiliary_device *adev;
->  	struct mana_adev *madev;
-> +	int id;
->  	int ret;
->  
->  	madev = kzalloc(sizeof(*madev), GFP_KERNEL);
-> @@ -3372,7 +3373,8 @@ static int add_adev(struct gdma_dev *gd, const char *name)
->  	ret = mana_adev_idx_alloc();
->  	if (ret < 0)
->  		goto idx_fail;
-> -	adev->id = ret;
-> +	id = ret;
-> +	adev->id = id;
->  
->  	adev->name = name;
->  	adev->dev.parent = gd->gdma_context->dev;
-> @@ -3398,7 +3400,7 @@ static int add_adev(struct gdma_dev *gd, const char *name)
->  	auxiliary_device_uninit(adev);
->  
->  init_fail:
-> -	mana_adev_idx_free(adev->id);
-> +	mana_adev_idx_free(id);
->  
->  idx_fail:
->  	kfree(madev);
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ drivers/net/tun.c      |  2 +-
+ include/linux/if_tun.h | 12 ++++++++++++
+ net/core/dev.c         | 22 +++++++++++++---------
+ 3 files changed, 26 insertions(+), 10 deletions(-)
 
-Reviewed-by: Hardik Garg <hargar@linux.microsoft.com>
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index c492fda6fc15..48194e567656 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -2338,7 +2338,7 @@ static int tun_fill_info(struct sk_buff *skb, const struct net_device *dev)
+ 	return -EMSGSIZE;
+ }
+ 
+-static struct rtnl_link_ops tun_link_ops __read_mostly = {
++struct rtnl_link_ops tun_link_ops __read_mostly = {
+ 	.kind		= DRV_NAME,
+ 	.priv_size	= sizeof(struct tun_struct),
+ 	.setup		= tun_setup,
+diff --git a/include/linux/if_tun.h b/include/linux/if_tun.h
+index 80166eb62f41..89d9b7b0a044 100644
+--- a/include/linux/if_tun.h
++++ b/include/linux/if_tun.h
+@@ -20,6 +20,13 @@ struct tun_msg_ctl {
+ };
+ 
+ #if defined(CONFIG_TUN) || defined(CONFIG_TUN_MODULE)
++extern struct rtnl_link_ops tun_link_ops;
++
++static inline bool netdev_is_tun(const struct net_device *dev)
++{
++	return dev->rtnl_link_ops == &tun_link_ops;
++}
++
+ struct socket *tun_get_socket(struct file *);
+ struct ptr_ring *tun_get_tx_ring(struct file *file);
+ 
+@@ -45,6 +52,11 @@ void tun_ptr_free(void *ptr);
+ struct file;
+ struct socket;
+ 
++static inline bool netdev_is_tun(const struct net_device *dev)
++{
++	return false;
++}
++
+ static inline struct socket *tun_get_socket(struct file *f)
+ {
+ 	return ERR_PTR(-EINVAL);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 200d44883fc1..bd91e0a3dbdf 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -89,6 +89,7 @@
+ #include <linux/errno.h>
+ #include <linux/interrupt.h>
+ #include <linux/if_ether.h>
++#include <linux/if_tun.h>
+ #include <linux/netdevice.h>
+ #include <linux/etherdevice.h>
+ #include <linux/ethtool.h>
+@@ -526,24 +527,27 @@ static const char *const netdev_lock_name[] = {
+ static struct lock_class_key netdev_xmit_lock_key[ARRAY_SIZE(netdev_lock_type)];
+ static struct lock_class_key netdev_addr_lock_key[ARRAY_SIZE(netdev_lock_type)];
+ 
+-static inline unsigned short netdev_lock_pos(unsigned short dev_type)
++static inline unsigned short netdev_lock_pos(const struct net_device *dev)
+ {
++	unsigned short dev_type = dev->type;
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(netdev_lock_type); i++)
+ 		if (netdev_lock_type[i] == dev_type)
+ 			return i;
++
+ 	/* the last key is used by default */
+-	WARN_ONCE(1, "netdev_lock_pos() could not find dev_type=%u\n", dev_type);
++	WARN_ONCE(!netdev_is_tun(dev),
++		  "netdev_lock_pos() could not find dev_type=%u\n", dev_type);
+ 	return ARRAY_SIZE(netdev_lock_type) - 1;
+ }
+ 
+-static inline void netdev_set_xmit_lockdep_class(spinlock_t *lock,
+-						 unsigned short dev_type)
++static inline void netdev_set_xmit_lockdep_class(const struct net_device *dev,
++						 spinlock_t *lock)
+ {
+ 	int i;
+ 
+-	i = netdev_lock_pos(dev_type);
++	i = netdev_lock_pos(dev);
+ 	lockdep_set_class_and_name(lock, &netdev_xmit_lock_key[i],
+ 				   netdev_lock_name[i]);
+ }
+@@ -552,14 +556,14 @@ static inline void netdev_set_addr_lockdep_class(struct net_device *dev)
+ {
+ 	int i;
+ 
+-	i = netdev_lock_pos(dev->type);
++	i = netdev_lock_pos(dev);
+ 	lockdep_set_class_and_name(&dev->addr_list_lock,
+ 				   &netdev_addr_lock_key[i],
+ 				   netdev_lock_name[i]);
+ }
+ #else
+-static inline void netdev_set_xmit_lockdep_class(spinlock_t *lock,
+-						 unsigned short dev_type)
++static inline void netdev_set_xmit_lockdep_class(const struct net_device *dev,
++						 spinlock_t *lock)
+ {
+ }
+ 
+@@ -11210,7 +11214,7 @@ static void netdev_init_one_queue(struct net_device *dev,
+ {
+ 	/* Initialize queue lock */
+ 	spin_lock_init(&queue->_xmit_lock);
+-	netdev_set_xmit_lockdep_class(&queue->_xmit_lock, dev->type);
++	netdev_set_xmit_lockdep_class(dev, &queue->_xmit_lock);
+ 	queue->xmit_lock_owner = -1;
+ 	netdev_queue_numa_node_write(queue, NUMA_NO_NODE);
+ 	queue->dev = dev;
+-- 
+2.53.0.1018.g2bb0e51243-goog
 
-
-Thanks,
-Hardik
 
