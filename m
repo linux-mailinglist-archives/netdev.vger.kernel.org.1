@@ -1,70 +1,53 @@
-Return-Path: <netdev+bounces-272355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272356-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UJi2EMr5xWmOEwUAu9opvQ
-	(envelope-from <netdev+bounces-272355-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:30:18 +0100
+	id +B+7Mfv5xWmOEwUAu9opvQ
+	(envelope-from <netdev+bounces-272356-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:31:07 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9394E33ECE1
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:30:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2265133ECF0
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 04:31:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E87C3011862
-	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:30:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CE0DD3017C35
+	for <lists+netdev@lfdr.de>; Fri, 27 Mar 2026 03:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E6236C0D3;
-	Fri, 27 Mar 2026 03:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D234C36C9F8;
+	Fri, 27 Mar 2026 03:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="qiaK4ixx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JQ3LpiiQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7106D36BCFD;
-	Fri, 27 Mar 2026 03:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2D336C9C0;
+	Fri, 27 Mar 2026 03:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774582214; cv=none; b=M/395tIs5W6RoNzrsstPf76MoqovjGuEf6f4KEAKJLHsdwCfFZX/1rMCB4Z1piD2kubvfBIC7d1na8sTVl3dej3YHGNXIFqaFQ395fkaXp8dHVy2nVlrCP4KXqUmXtpcCP8eBP6hUWykGa0fa1LKS44c65SDQYsN1VkYZaE95lM=
+	t=1774582223; cv=none; b=VGA/5WWeNvm2bLVCMeXjTARNdiX0o8vyE7M1LVLK5hKXIhC0WuPwoqRPGS6WIBYeXoaIQs7FzMiTz70bZce9Laqw2tMbqUAQsvMQyACj5zQrnoFPkgeG/8RzCmPGZNBC3X+XNBubq/RYQrtvgsM3GdKJ/cJs9iuG/E586/1Xvfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774582214; c=relaxed/simple;
-	bh=b81KdN662/X/cQnamq8uyRN4wBy0hvARXsNQJsKiJAk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KID47A8KdjXEPz3tnD8kgg4A3os2wvo4+OqvYw9WsVJxOB9U4bs1VAZljXL/xsZbCIWDZciFCAs8dmh1MAglVqh3gPQIq9lMOGF/9/TF9eFn4VcD6Pg7Q+0Yjt7GzqA/jxXIUoUOAkrpnlXfCS7FFCVh2X4o8iYaSJ8Ng07ETeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=qiaK4ixx; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 62R3TkkV62864817, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1774582186; bh=DFu5p6blwaTSpFrV/yKTr+hM46k87qhBmYMi69YJzP0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=qiaK4ixxVnJqEuhXpx4veOxZWnKCs1NeaPa0mN/aRxMgs+LY0IjfBkn2CvOd14HnC
-	 BAZkYMaLAGVcys5i/ZWhr5OY/5h56leSGPIAhHp0KNIRd8+9WqT8s3MUAHQ/l4YHPK
-	 B4EsjQpnKEvmG9NL7N3Meg6wdMl5mvFMjecysVYgcV75Fvv7fJAS1VtQ+KZpRwgnvR
-	 ypX/m1h6hlbuV0bSuHvE5ufboRRKDJ8jPrINrKKdmbndU+ZIQcWSJpzHJ4hZ8Cr+XV
-	 EFwBAC7widjAXb7Vt+Wu2OgKOsp4Q9GorgFkLl7i0ywrnnsWynGc4NiwTLDhQhz109
-	 FSktu9iWgAipw==
-Received: from mail.realtek.com (rtkexhmbs02.realtek.com.tw[172.21.6.41])
-	by rtits2.realtek.com.tw (8.15.2/3.26/5.94) with ESMTPS id 62R3TkkV62864817
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 27 Mar 2026 11:29:46 +0800
-Received: from RTKEXHMBS03.realtek.com.tw (10.21.1.53) by
- RTKEXHMBS02.realtek.com.tw (172.21.6.41) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Fri, 27 Mar 2026 11:29:45 +0800
-Received: from RTDOMAIN (172.21.43.26) by RTKEXHMBS03.realtek.com.tw
- (10.21.1.53) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
- Transport; Fri, 27 Mar 2026 11:29:45 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
-        <larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>
-Subject: [PATCH net] rtase: Fix flow control configuration
-Date: Fri, 27 Mar 2026 11:29:43 +0800
-Message-ID: <20260327032943.58569-1-justinlai0215@realtek.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1774582223; c=relaxed/simple;
+	bh=aaJRGPqgb61KY23V+ty+AwjuClm0OPw0i+z42m/+LsQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QNwXSgMIXXS4kLiulJgRblr5fOBGybeTLi7Sfbvljc/yWzs0uHEkyh8NwPrH7vea+cLrktyl7Vp39tY0rupSXIaDys71B9NNUYO/Lx6vIqAn4AXjfogsGqtWYlkMVFfZkCaKE4itKeS6UPJKVtNxYPERBfKBw4bc0I6tvNVtUpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JQ3LpiiQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 892B2C116C6;
+	Fri, 27 Mar 2026 03:30:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774582223;
+	bh=aaJRGPqgb61KY23V+ty+AwjuClm0OPw0i+z42m/+LsQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JQ3LpiiQYZLOFELuUUrMmgAGaOAQUuAZQs5eYaN3ltprz0suvk6RJu7ZG1VtgdkS2
+	 YWhkGuohNRcp/hAglrZxTqSPOX4nCj4Itq33vRk84qUd2OHNnhvVv+7TFAROwwPJ1x
+	 N3ODMM9DCmUG7fNO4t88N4+JsOJ+aQUQefFsGnZBT52AfMoHFGGGZytoB8fImfWhr3
+	 rDS3axb5qWCw/59c4SGXrI/oGb4Da1FeU3ds7vS/VDYRnubVmKBN3iRU4ZRmGHEDWL
+	 GOeMTzy7k5OaTxT41z/HOAxEieF/1mOlWEF5TxRHLiA8IBGy+K1irsEyF7+iRv1pJR
+	 HdOq3U6uATGzw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02E8A3809A0B;
+	Fri, 27 Mar 2026 03:30:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,78 +55,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Spamd-Result: default: False [0.84 / 15.00];
+Subject: Re: [PATCH v5 RESEND net 0/3] net: enetc: safely reinitialize TX BD
+ ring
+ when it has unsent frames
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177458220979.3285968.1583263638777426157.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Mar 2026 03:30:09 +0000
+References: <20260324062121.2745033-1-wei.fang@nxp.com>
+In-Reply-To: <20260324062121.2745033-1-wei.fang@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk, Frank.Li@nxp.com,
+ horms@kernel.org, saikrishnag@marvell.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, imx@lists.linux.dev
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[justinlai0215@realtek.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272355-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-272356-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[realtek.com:+];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,realtek.com:dkim,realtek.com:email,realtek.com:mid]
-X-Rspamd-Queue-Id: 9394E33ECE1
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2265133ECF0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Fix hardware setting to allow flow control to be configured via
-ethtool.
+Hello:
 
-Fixes: 85dd839ad1e5 ("rtase: Implement hardware configuration function")
-Signed-off-by: Justin Lai <justinlai0215@realtek.com>
----
- drivers/net/ethernet/realtek/rtase/rtase.h      | 4 ++++
- drivers/net/ethernet/realtek/rtase/rtase_main.c | 3 +++
- 2 files changed, 7 insertions(+)
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase.h b/drivers/net/ethernet/realtek/rtase/rtase.h
-index b9209eb6ea73..9bd6872474c1 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase.h
-+++ b/drivers/net/ethernet/realtek/rtase/rtase.h
-@@ -153,6 +153,10 @@ enum rtase_registers {
- #define RTASE_FORCE_TXFLOW_EN BIT(10)
- #define RTASE_RX_CHKSUM       BIT(5)
- 
-+	RTASE_GPHY_STD_00 = 0x6024,
-+#define RTASE_RXFLOW_EN BIT(7)
-+#define RTASE_TXFLOW_EN BIT(6)
-+
- 	RTASE_Q0_RX_DESC_ADDR0 = 0x00E4,
- 	RTASE_Q0_RX_DESC_ADDR4 = 0x00E8,
- 	RTASE_Q1_RX_DESC_ADDR0 = 0x4000,
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-index ef13109c49cf..bde9bccfb5a9 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-+++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-@@ -974,6 +974,9 @@ static void rtase_hw_config(struct net_device *dev)
- 	rtase_hw_set_features(dev, dev->features);
- 
- 	/* enable flow control */
-+	reg_data16 = rtase_r16(tp, RTASE_GPHY_STD_00);
-+	reg_data16 &= ~(RTASE_TXFLOW_EN | RTASE_RXFLOW_EN);
-+	rtase_w16(tp, RTASE_GPHY_STD_00, reg_data16);
- 	reg_data16 = rtase_r16(tp, RTASE_CPLUS_CMD);
- 	reg_data16 |= (RTASE_FORCE_TXFLOW_EN | RTASE_FORCE_RXFLOW_EN);
- 	rtase_w16(tp, RTASE_CPLUS_CMD, reg_data16);
+On Tue, 24 Mar 2026 14:21:18 +0800 you wrote:
+> Currently the driver does not reset the producer index register (PIR) and
+> consumer index register (CIR) when initializing a TX BD ring. The driver
+> only reads the PIR and CIR and initializes the software indexes. If the
+> TX BD ring is reinitialized when it still contains unsent frames, its PIR
+> and CIR will not be equal after the reinitialization. However, the BDs
+> between CIR and PIR have been freed and become invalid and this can lead
+> to a hardware malfunction, causing the TX BD ring will not work properly.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v5,RESEND,net,1/3] net: enetc: reset PIR and CIR if they are not equal when initializing TX ring
+    https://git.kernel.org/netdev/net/c/0239fd701d33
+  - [v5,RESEND,net,2/3] net: enetc: add graceful stop to safely reinitialize the TX Ring
+    https://git.kernel.org/netdev/net/c/2725d84efe25
+  - [v5,RESEND,net,3/3] net: enetc: do not access non-existent registers on pseudo MAC
+    https://git.kernel.org/netdev/net/c/f2df9567b123
+
+You are awesome, thank you!
 -- 
-2.40.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
