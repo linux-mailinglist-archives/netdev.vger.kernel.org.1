@@ -1,64 +1,62 @@
-Return-Path: <netdev+bounces-272702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272703-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GELQDN4fx2mDTQUAu9opvQ
-	(envelope-from <netdev+bounces-272702-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 01:25:02 +0100
+	id uJJFECYgx2mDTQUAu9opvQ
+	(envelope-from <netdev+bounces-272703-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 01:26:14 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B95E34CAF9
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 01:25:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97BAF34CB10
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 01:26:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 04F8A3013A87
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 00:25:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3213D3014BF1
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 00:26:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FF411A9F9F;
-	Sat, 28 Mar 2026 00:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DCE81A9FB0;
+	Sat, 28 Mar 2026 00:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aEBdSegW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g+PuOpZG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFECD40DFC9;
-	Sat, 28 Mar 2026 00:24:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ACE529CE1;
+	Sat, 28 Mar 2026 00:26:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774657499; cv=none; b=hPk6bDvJMNPQ747tg1PlTpLofws/+c+gUoZyBrWMrZtm7A+K+G8Ma6cBNbUvoO5qd6YGhiVydXfF/G7narDd5qp0Qk5xm5lHemzCSiC+kz4lVFaNRJw+XHhv11SxePEE8NU/RN72R66NTblwqOyCe9s/Ehp3WtIqJHYhjs7GT5k=
+	t=1774657571; cv=none; b=YSlkj9iLhlvooSGb0ENsYgewb1Ueh7PNf7OI4E9EEEGgVsIO5JKhKvv4O/sAg+2mrMsS+R9WY871G7I0qV0hGqfnqGvGXewtGk5+Hih/JcG4zyCxiwHkAMl0/0FXlniYAK5ScKZT5qDWaW3ZNz/5Rxen5CdAlMF8hKpialtINYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774657499; c=relaxed/simple;
-	bh=eTCuq4xez0vRuryl1L76sF2NU8W9lCO8PmiMdzIiDBQ=;
+	s=arc-20240116; t=1774657571; c=relaxed/simple;
+	bh=On3JLPKP5M4KBigXQBxIRUwwWe4X/XKC7AZ+Vp4kLyk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Hhe2ugqdG/3X7rs3RQO3vjMNOc5cU+xohnDyc5+gKHaca2iOXnFftHzjCcDBiob7FALigc7yBXKLTedktU0L9WwibwSe8wWcCzjH5mjLsGlnf5Ocdvcwc9mb9Oxzxsk2fhmwzTE7X7Nu3PO1chGpDbCszxvF8RtPbU5COSzYk98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aEBdSegW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68B26C19423;
-	Sat, 28 Mar 2026 00:24:57 +0000 (UTC)
+	 MIME-Version:Content-Type; b=MAZy2p0ASh1moAlwaViRwKyyfW97TXwqRzV473v/7YtfmYt5hsjs7yNlPw2hCUVf2rj+MBpqsOqGtKWNjW7CsC50U0/Z7B9BIkAe6FuicPwGdyJWc3JNEF/SWQ2oONmdf1n6APocC6XHQ5coQEbycSYpaiTaJ15s4KJYAiJw26Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g+PuOpZG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3857C19423;
+	Sat, 28 Mar 2026 00:26:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774657498;
-	bh=eTCuq4xez0vRuryl1L76sF2NU8W9lCO8PmiMdzIiDBQ=;
+	s=k20201202; t=1774657571;
+	bh=On3JLPKP5M4KBigXQBxIRUwwWe4X/XKC7AZ+Vp4kLyk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aEBdSegWlvIzxkGddNU4cuLR7KNEE8qw7KFyCV+XCSbjlJKtyWcmrXZhjn87Xa1is
-	 3jQsSumSCMyPH4bKcZqCWIMJqRbbs+no3tkcOtwKTCZI7A/qdmr3oTwbjdOLGG06Eo
-	 0HuYkmdaYUymjYR/gJ1koCwTAoUAJ0+dwYRRkQZkGouHqu0/2u8RStlmsbFmtt4JQm
-	 yneA/AKnljzIqoif7IPncCfh+z030qsGGGkZjZJKzotvPIl12VJFheqUwR5BnzTILt
-	 BAHAHI9c8v1nbFPGXUpxkmwCct350914tiiVRYWtbsOwQjVgoS8+0zKHdCbz4WuKv/
-	 GkqoC1VWPsjvg==
-Date: Fri, 27 Mar 2026 17:24:54 -0700
+	b=g+PuOpZGW2JtAseTNOwv/pMlZhrhxREkqtN6RWlKTMzrVVWciJ7J8xbWce8lk/jrq
+	 n3u2RjHmCz3JrLOS17BoT4qv8K/mEXUmwCz42ne+58B7aMpH9v8KjdTeH4MgZv/2Bk
+	 nq8f1p6T6Dpf48cnv5ZsFjp2kPhvdx9ZGhcRdxgZZYierLcKEmQDNu4XS95s6l8aED
+	 MkTUeJtq3xtiMONmvodcMBiuv0xtbm6cVEO54DPCfHYpgdDv9h1Fhg50dWiUFxBz48
+	 jwgLaYY4V6oSRW3NvCHy3mSa4YYzTkbi5fDWKr8nUPsTXOLzjkZz9bzaYEhuThDX5B
+	 0WdpGuFHoXANw==
+Date: Fri, 27 Mar 2026 17:26:07 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Ioana Ciornei <ioana.ciornei@nxp.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, petrm@nvidia.com, willemb@google.com,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v4 00/10] selftests: drivers: bash support for
- remote traffic generators
-Message-ID: <20260327172454.6b9bc8f3@kernel.org>
-In-Reply-To: <5cuoazp2svgjja5h663zc34dafkuqa2grrm7lzpuunvrjogydf@43mryp77gq2q>
-References: <20260326132828.805703-1-ioana.ciornei@nxp.com>
-	<20260326120342.6429fbdc@kernel.org>
-	<5cuoazp2svgjja5h663zc34dafkuqa2grrm7lzpuunvrjogydf@43mryp77gq2q>
+To: "Chuck Lever" <cel@kernel.org>
+Cc: john.fastabend@gmail.com, "Sabrina Dubroca" <sd@queasysnail.net>,
+ netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev, "Chuck Lever"
+ <chuck.lever@oracle.com>, "Hannes Reinecke" <hare@suse.de>, "Alistair
+ Francis" <alistair.francis@wdc.com>
+Subject: Re: [PATCH net-next v6 0/6] TLS read_sock performance scalability
+Message-ID: <20260327172607.1ae2bde9@kernel.org>
+In-Reply-To: <722ffab1-f3d8-4309-afa0-482d64ae3a33@app.fastmail.com>
+References: <20260326-tls-read-sock-v6-0-fd887b9e7f06@oracle.com>
+	<20260326175430.7ceff326@kernel.org>
+	<722ffab1-f3d8-4309-afa0-482d64ae3a33@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,65 +74,51 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272702-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,queasysnail.net,vger.kernel.org,lists.linux.dev,oracle.com,suse.de,wdc.com];
+	TAGGED_FROM(0.00)[bounces-272703-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,local_termination.sh:url]
-X-Rspamd-Queue-Id: 8B95E34CAF9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 97BAF34CB10
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 27 Mar 2026 09:32:22 +0200 Ioana Ciornei wrote:
-> On Thu, Mar 26, 2026 at 12:03:42PM -0700, Jakub Kicinski wrote:
-> > On Thu, 26 Mar 2026 15:28:18 +0200 Ioana Ciornei wrote:  
-> > > This patch set aims to add the necessary support so that bash written
-> > > selftests are also able to easily run with a remote traffic generator
-> > > system, either be it in another netns or one accessible through ssh.
-> > > 
-> > > This patch set is a result of the discussion from v1:
-> > > https://lore.kernel.org/all/20260303084330.340b6459@kernel.org/
-> > > Even though the python infrastructure is already established, some
-> > > things are easier in bash and it would be a shame to leave behind the
-> > > bash tests that we already have.  
-> > 
-> > I think this introduces a bunch of regressions, eg:
-> > 
-> > https://netdev-ctrl.bots.linux.dev/logs/vmksft/forwarding/results/575622/4-local-termination-sh/stdout
-> > 
-> > https://netdev-ctrl.bots.linux.dev/logs/vmksft/netdevsim/results/575802/18-netcons-resume-sh/stdout  
+On Fri, 27 Mar 2026 09:35:09 -0400 Chuck Lever wrote:
+> On Thu, Mar 26, 2026, at 8:54 PM, Jakub Kicinski wrote:
+> > On Thu, 26 Mar 2026 09:50:45 -0400 Chuck Lever wrote:  
+> >> I'd like to encourage in-kernel kTLS consumers (i.e., NFS and
+> >> NVMe/TCP) to coalesce on the use of read_sock. When I suggested
+> >> this to Hannes, he reported a number of nagging performance
+> >> scalability issues with read_sock. This series is an attempt to
+> >> run these issues down and get them fixed before we convert the
+> >> above sock_recvmsg consumers over to read_sock.
+> >> 
+> >> Batch async decryption and its submit/deliver scaffolding were
+> >> dropped from this series because async_capable is always false
+> >> for TLS 1.3, which NFS and NVMe/TCP both require. Async crypto
+> >> support for TLS 1.3 is a prerequisite for revisiting that work.  
+> >
+> > Please repost the remaining 5 patches  
 > 
-> I cannot reproduce this unfortunately. For example, local_termination.sh
-> gives me the following result with the exact patches that I submitted.
-> Any idea on what might be the difference?
+> To make sure I understand your request, do you mean the TLS-related
+> patches that are pre-requisites for Alistair's KeyUpdate series?
 
-Hm, the system that runs this on our end is:
-
-# cat /etc/redhat-release 
-Fedora release 43 (Forty Three)
-
-And it has this added on top of default install:
-
-# cat /etc/systemd/network/99-default.link
-[Match]
-OriginalName=*
-
-[Link]
-NamePolicy=keep kernel database onboard slot path
-AlternativeNamesPolicy=database onboard slot path mac
-MACAddressPolicy=none
+Oh, no, sorry, we merged patch 1 as a Fix and shipped it to Linus.
+I meant to ask for you to fetch net-next, rebase and repost.
+Patch 1 should "disappear" (unless I messed something up)
 
