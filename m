@@ -1,156 +1,235 @@
-Return-Path: <netdev+bounces-272818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272819-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8NwhFthEyGkMjQUAu9opvQ
-	(envelope-from <netdev+bounces-272818-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 22:15:04 +0100
+	id YANqFMxFyGk9jQUAu9opvQ
+	(envelope-from <netdev+bounces-272819-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 22:19:08 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB98E34FF97
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 22:15:03 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D88D034FFB8
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 22:19:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 75DAE301C146
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 21:15:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EE51B3009882
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 21:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29EF6364929;
-	Sat, 28 Mar 2026 21:15:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0583536492F;
+	Sat, 28 Mar 2026 21:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qKqZH9Vt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iYX+ReWe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0068329E46
-	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 21:14:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774732500; cv=none; b=f4NmlChA7fHufXHQB3R0awBzTbgtYh/E0KYTj1lhnrqcVAvjaE9f7Cwp2ALbwp/P4HralGAydq54pXOzCUTQeRg/0JbnNwNMm38sJ+tHhBdSIEswkYva74r+5Ch9SJzqHdeT+H5nCehbz+d7cr/PBGUAp9O7UmYFBC+o3kbZDlQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774732500; c=relaxed/simple;
-	bh=4e5mPa9ipNQFdSB2c2OxyejfNcXOupstsSGcGX/T4Ok=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AXgVG/qmnQaVF12zwk2aMx+cGgnL1UaFD5doRmLXNDyqFWh9qcOGntUhigY+J9LM2fOVVHbXguiMiCPdehweUyMp1jHp3f0iv1I6XtuCYWshpK/TkPuAyR13gOtI2jbMTWuzhrSJzG6mbBcdXLNpyrBAuREjfrnsWxMii+fBDiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qKqZH9Vt; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5a1443780c4so3526745e87.0
-        for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 14:14:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9695E346E64
+	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 21:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774732745; cv=pass; b=KN1FqHJvpoIU4PvGCuePVkI22eClHhnB7zDaWCZsf80S2gxNoci8KAY3+FC+T5Ytc1GgZQck/eEXNMvy9UjHNQJZDpWcFbcbU8SWtJzso3bbpRu+ClEhrz/o2680f1ypZOldGEk3fDzab8SeziotZ2S6hYyrX4FwBGKHh+iQ39c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774732745; c=relaxed/simple;
+	bh=RdlmNbYcSO7Vui1HbCfl3BLGYhnu0FcF4Irn9izRU1E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lYYYEgCY0y+C2mXSTv0WRdfGpQfLX3Q2hIXTA0cD4NYgHZRXlSYY4MMS5URplutDpwInF53qnb5uJAInTLEEcU0MEU8plc3BXX4AJ7q2gBU9VqAIGPxS6e9+SQ1WVEkRmRaw4UyYLtn3Wc5AvHKI/k+1q2LpRXC1CfEqNmhhmBc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iYX+ReWe; arc=pass smtp.client-ip=74.125.82.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-12732e6a123so143214c88.1
+        for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 14:19:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774732743; cv=none;
+        d=google.com; s=arc-20240605;
+        b=l033bj/6TfIoHKp/Y5Wh3EGbH5eY3Hpe2dZGgYt78wEaICTjAIfoH3tGb8n5Lz0REl
+         /hH17HcSZj8PGi6qRnaxB9+qSHFXNICVFgTzWsJHqw7mVQKpz8uQ4sDI5+7WRNlyH0Z9
+         yVmqKTr/TLcvROnlZpG4tfLK10DR3k8LsCKwXMSO5aAGV7ZFoe/5oSjQDL2dcExCT7RE
+         ecIOp6PKCvtC882V2WQ9Wk6Xa4gSIPMFWOCgidF5djqLFf2f5qi+3Sg2+j9M/3qQuS5k
+         lnPVHMCQlpDDN5xe1pzHp94LgEojdvN7zpUj14mJRjDHwvOsdkrwzJd11g0P2fvpMEBD
+         Dsnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=PBiTFJ2Aekxslv0nQzrSV8JBl6uUm9THEIcdA/4Aakk=;
+        fh=sLcLFHH8jvYha3R8WrhKldB31Yp6edTt89E3Sdmhdto=;
+        b=T9R6zwlwhU84K7pYyhzHW5vPeU/ZOQ5/IMs5LcliGULXaBurWRQ3hE6aI2rqMhfdA5
+         3DT27uHujt4vByAcym7WVv1hym8wRK17UoMHOLUiqCTvBvLlddKqKGRUHIUfG9AA6F6C
+         bKjxrtdPHNB6Y8d7QuChRQAZxT6QGus+UN67UhabD9BqH4RUXMYIzlR91kfgHm8pCYyJ
+         p7JPBZRXZp+tFy6iMTWKPLh7KMIIStwj2LZzoWM3EguqsbHBqn5Lk/hcY7t6vc/nzPWo
+         EC3VRdSdJZ8ger6LPjawLCpq2feuzYWOJUBcsHmUspPS51JYcsdxaYtVEnZwNzBI6DlL
+         dU5Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774732497; x=1775337297; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=o6gCLSoGwa+Ad9PRbQ91A93sEC/N4yfYzEMmnT9fLIw=;
-        b=qKqZH9VtD0WtY68GskY+cnetvQ7N8tFIzFZS8yBMCbfZBdT2rxryt/zLpr1WN72f7G
-         wliBYktgIaKN9jE2olunt58NzSljTcUmF7vygT2rlDzaLc2Nl6UUrXt9MnpppRbeHJl+
-         fejnriGyNaaD9JEHjsox3T/kYFKGkCL6W8+ve09/pGholQWrbzdCtWnfqBDX3e4a5+Zp
-         gdqg3KlKrlYtPoeJLGmmpkV1ZS3zQD2OqQcYF9214DI3ComolZyyyQk0pRtffy6Hk372
-         06/GiIH+BtLpULZM02E2WJAhEfvz8J32B5sG7RtSm9XZiCxkOGGt788DSL6XkpVz9PIV
-         t4Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774732497; x=1775337297;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20251104; t=1774732743; x=1775337543; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=o6gCLSoGwa+Ad9PRbQ91A93sEC/N4yfYzEMmnT9fLIw=;
-        b=AARXJM/ibYYuuvyujMJYnhKbFgOt1nvk5GMZTohcECCAL8fjfhOcOhOGsueaQGKTWr
-         WRybufvDjKJqeTmsQVYFcrRXCebNAGDucjSczVwO0vDh2pGzE9CEUJM0R1BwfuyCN54Q
-         G9c3GEc1LsUOHSvi9TkzYvh/x6STsknNOxXz7fpBxqZYSAA4cyZAJYP/qlxHxcOwUkHU
-         xVftE+dBjIUyrhbQkTHAD63RJHh006/+sw+7BOOuOJ7p3RPde472/j4C/tJ2T3K4wooz
-         njnEW8xhMDYUqOL825m0ENdY8vGI87Y4JadL4UXZ2Lud6GrjbgvLSCXx4DI3RcX3nL95
-         9sGg==
-X-Forwarded-Encrypted: i=1; AJvYcCXKuJebdVrfkhWqY016gRcwSanV/vlFyYd0UpqwoZxj1cR5bHm8d0GcC43Ng6QTf9UOAWkcPEg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE9SnJVv7NNBkjBoYwBOwj2bmGCwZ313rUnG9baVEBbFrwlB3M
-	etIGQNScqwVpESjiPo1Gyhq6WbxPnyIMfiRml31WU+1tccTRKX8XNr3Y
-X-Gm-Gg: ATEYQzxPiCjRdQu0UEIkvRTcKMMB5PUHm12JtU5F2Rn9F9+OhpQ4Rn1ZDLIcqLQQRAC
-	myk139Qn64IPLfJ8jjjNPR2Lx+Bs2vW3tMpXw7SddfrMvCn0erhbwYeZErUIhKO+8TbIe8wHrPs
-	RBwD6TobqpUTHlNr6YJ43idnKsf2sAF1RiIMzNRzGXs9/0zHgdrlgN2P1tr4uwvGZ9tMbR2+qn5
-	kh7rDv0hc6yOHPj/j8wiKwKM3q1wymJeoMS4pTuQF0oGKR7IzakH3yDYZrTBFQxT8ZJiz9tuxnP
-	coSPScSmYmWqWXxB2sEqsADVAU+e6M5QDfVMTpTFyptxpyS7msQRQ+kYX3cZUa3rXG64Jyd3L/w
-	9zQ8eMCMxa0lDkry6kZqIeswpTYIqEPvgAmmGJoGYtJXjhH1NNr2qsMgfLku1nwCPLFL18nC8Pm
-	unIkJ6c2IO5pzEYzzN+pR1Jw==
-X-Received: by 2002:a05:6512:3ca5:b0:5a1:3d08:cfab with SMTP id 2adb3069b0e04-5a2a508f103mr4507750e87.23.1774732496574;
-        Sat, 28 Mar 2026 14:14:56 -0700 (PDT)
-Received: from yepc2 ([87.68.133.22])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-38c83911aeasm6350691fa.41.2026.03.28.14.14.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Mar 2026 14:14:55 -0700 (PDT)
-From: Yochai Eisenrich <echelonh@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>
-Cc: Yochai Eisenrich <echelonh@gmail.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	security@kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] net: sched: cls_api: fix tc_chain_fill_node to initialize tcm_info to zero to prevent an info-leak
-Date: Sun, 29 Mar 2026 00:14:36 +0300
-Message-ID: <20260328211436.1010152-1-echelonh@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        bh=PBiTFJ2Aekxslv0nQzrSV8JBl6uUm9THEIcdA/4Aakk=;
+        b=iYX+ReWeXe188ACbUGCpLf1UXz7AFVkIvqyAJuiuMc3DXcCgUsDW/t+3m3oddWvcSa
+         QpO92Zq4iSZyM/jDa+NTlgOKXqbo7W9adtjaIyRQ4kNnj+/Xfp0P9k4RBdD5aY+LrY1C
+         EXbU+lJ383x4D0pCCZhFTJ4Pa3fofttFVlnk9Pwtf3SnEFV8VdQ6WX1c9VV1pmK2+R2C
+         c9geZcmqnsmFcWBNNUx548K9nEhy5TDsMWEsC3XUYMvttdM0gyGFDMXOLRkbqAD0zStj
+         cdGt5JBCmt9gaxTXNK7Vqk0xnTvoA91dgRGzRn9hdXK1B/fO7raQH9x3LHZ5rU20Srri
+         U0AQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774732743; x=1775337543;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PBiTFJ2Aekxslv0nQzrSV8JBl6uUm9THEIcdA/4Aakk=;
+        b=LqTRT5V5SWBd4p7ZezQpQfRPoe8laGuw3FHjF4IviYVL8a+X7PRGmpE13No8FvG75t
+         EWu3XhxprtuqHBd83/WyeIWyPGjYuANzHLI/wKCOO1l1auJsaSzX2xysgi0cTPvgUHti
+         g2VfpPpwRMH5EGZ0he2U/SeVEdkwYWLgrlA2XB/MJ3ZOSedMBkcdCXUNjE4Xw/dCMpkN
+         +04/tHoskF5W0ewcIy3v4JGjZFOItH3Fb0un4QNuP7DhF+e7bU0P/ccSj03M+phVC783
+         CUJSMq4tdj2Lu86fUWTY4oyhubH+DvoZRx9iHgqYaVMLwxTJvUkIXW+SEBps8QxPvSk5
+         +X3w==
+X-Gm-Message-State: AOJu0YzRp+zhjNSkEkQVC1E2iblNUpEc4iYJ/692zkf3fpxwBydvm9xR
+	F+8ZlbivM9E9YyP2Hd+A5HLIgOTBzWB6c+zmxivB3qY9vNZCzxjgXynQfAoPg0p9159sKibGbYl
+	NFs3Fo8/jUVwKTDUAw5GFvIY6T2Br8WRbnxMtIjTbHHZhKjctcSuKSzCC
+X-Gm-Gg: ATEYQzzo15w81FLdZij0Rg/vKf+t9Hmjx5LtSGflxum4BzfcGoA05f6VaRT7iH+F0GV
+	0d0q3vUcNcFkKSviFXDiw4iqLEF6EJus6ZQIXEi86Jw0y6BWPUsiFi+nvoCj+rC+Aj/2BcJdOfk
+	IOg36XpLVZrD4DONLoMUNk2IQaFzr7PU/5Llg5vuPGeo/GRK9ovrJwdhxzJ4AtPCFvaLxvwv26b
+	1c5OJiDNBdAaIk4oJn11PHQ8TJPvBwu+HCraUqEbryvEKuAhSIOC8HRwEIJT9zNNM0NEWWhLAnf
+	8o6/j1WZPI0c6RREJ9ITqlDQ6tX9y0X2ixc3cL68VcIkuMtsHMe6OKnxpL11Snv18FEOZXGR
+X-Received: by 2002:a05:7022:458d:b0:127:9c10:446c with SMTP id
+ a92af1059eb24-12ab28a1e13mr4511274c88.7.1774732742875; Sat, 28 Mar 2026
+ 14:19:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+References: <20260328135215.901879-1-nickgarlis@gmail.com>
+In-Reply-To: <20260328135215.901879-1-nickgarlis@gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Sat, 28 Mar 2026 14:18:51 -0700
+X-Gm-Features: AQROBzBd9ECxhJCHvjjqCxkWZr6ORLlclA1P09xwEdlha2fZzQ55KnJeu6PdD5Q
+Message-ID: <CAAVpQUAQVYkbcshJnpPkwMzQzKuNziHRuone=MKV9xAGWW2Y2Q@mail.gmail.com>
+Subject: Re: [PATCH net v3] rtnetlink: add missing netlink_ns_capable() check
+ for peer netns
+To: Nikolaos Gkarlis <nickgarlis@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[gmail.com,mojatatu.com,resnulli.us,kernel.org,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-272818-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272819-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[google.com:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[echelonh@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DB98E34FF97
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D88D034FFB8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When building netlink messages, tc_chain_fill_node() never initializes
-the tcm_info field of struct tcmsg. Since the allocation is not zeroed,
-kernel heap memory is leaked to userspace through this 4-byte field.
+On Sat, Mar 28, 2026 at 6:52=E2=80=AFAM Nikolaos Gkarlis <nickgarlis@gmail.=
+com> wrote:
+>
+> rtnl_newlink() lacks a CAP_NET_ADMIN capability check on the peer
+> network namespace when creating paired devices (veth, vxcan,
+> netkit). This allows an unprivileged user with a user namespace
+> to create interfaces in arbitrary network namespaces, including
+> init_net.
+>
+> Add a netlink_ns_capable() check for CAP_NET_ADMIN in the peer
+> namespace before allowing device creation to proceed.
+>
+> Fixes: 81adee47dfb6 ("net: Support specifying the network namespace upon =
+device creation.")
+> Signed-off-by: Nikolaos Gkarlis <nickgarlis@gmail.com>
+> ---
+> v3:
+>   - Move netlink_ns_capable() check from rtnl_newlink() into
+>     rtnl_get_peer_net(), after the last rtnl_link_get_net_ifla(tb)
+>     call. The tbp path is already covered by rtnl_link_get_net_capable()
+>     in the caller. (suggested by Kuniyuki)
+>   - Pass skb to rtnl_get_peer_net() for the capability check.
+>   - Add IS_ERR() check on rtnl_link_get_net_ifla(tb) return value.
+> v2:
+>   - Removed "Reported-by" tag
+>   - Fixed "Fixes" tag with the help of Kuniyuki Iwashima (thanks !)
+>
+>  net/core/rtnetlink.c | 20 +++++++++++++++++---
+>  1 file changed, 17 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> index fae8034efbf..4be7fc6e23a 100644
+> --- a/net/core/rtnetlink.c
+> +++ b/net/core/rtnetlink.c
+> @@ -3894,12 +3894,14 @@ static int rtnl_newlink_create(struct sk_buff *sk=
+b, struct ifinfomsg *ifm,
+>         goto out;
+>  }
+>
+> -static struct net *rtnl_get_peer_net(const struct rtnl_link_ops *ops,
+> +static struct net *rtnl_get_peer_net(struct sk_buff *skb,
+> +                                    const struct rtnl_link_ops *ops,
+>                                      struct nlattr *tbp[],
+>                                      struct nlattr *data[],
+>                                      struct netlink_ext_ack *extack)
+>  {
+>         struct nlattr *tb[IFLA_MAX + 1];
+> +       struct net *net;
+>         int err;
+>
+>         if (!data || !data[ops->peer_type])
+> @@ -3915,7 +3917,19 @@ static struct net *rtnl_get_peer_net(const struct =
+rtnl_link_ops *ops,
+>                         return ERR_PTR(err);
+>         }
+>
+> -       return rtnl_link_get_net_ifla(tb);
+> +       net =3D rtnl_link_get_net_ifla(tb);
+> +       if (IS_ERR(net))
 
-The fix simply zeroes tcm_info alongside the other fields that are
-already initialized.
+nit: use IS_ERR_OR_NULL and remove "if (!net) below
 
-Fixes: 32a4f5ecd738 ("net: sched: introduce chain object to uapi")
-Signed-off-by: Yochai Eisenrich <echelonh@gmail.com>
 
----
- net/sched/cls_api.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-index 4829c27446e3..20f7f9ee0b35 100644
---- a/net/sched/cls_api.c
-+++ b/net/sched/cls_api.c
-@@ -2969,6 +2969,7 @@ static int tc_chain_fill_node(const struct tcf_proto_ops *tmplt_ops,
- 	tcm->tcm__pad1 = 0;
- 	tcm->tcm__pad2 = 0;
- 	tcm->tcm_handle = 0;
-+	tcm->tcm_info = 0;
- 	if (block->q) {
- 		tcm->tcm_ifindex = qdisc_dev(block->q)->ifindex;
- 		tcm->tcm_parent = block->q->handle;
---
-2.53.0
+> +               return net;
+> +
+> +       if (!net)
+> +               return NULL;
+> +
+> +       if (!netlink_ns_capable(skb, net->user_ns, CAP_NET_ADMIN)) {
+> +               put_net(net);
+> +               return ERR_PTR(-EPERM);
+> +       }
+> +
+> +       return net;
+>  }
+>
+>  static int __rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+> @@ -4054,7 +4068,7 @@ static int rtnl_newlink(struct sk_buff *skb, struct=
+ nlmsghdr *nlh,
+>                 }
+>
+>                 if (ops->peer_type) {
+> -                       peer_net =3D rtnl_get_peer_net(ops, tb, data, ext=
+ack);
+> +                       peer_net =3D rtnl_get_peer_net(skb, ops, tb, data=
+, extack);
+>                         if (IS_ERR(peer_net)) {
+>                                 ret =3D PTR_ERR(peer_net);
+>                                 goto put_ops;
+> --
+> 2.34.1
+>
 
