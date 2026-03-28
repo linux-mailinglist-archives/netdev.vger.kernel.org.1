@@ -1,432 +1,179 @@
-Return-Path: <netdev+bounces-272751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272752-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +IcdA0yNx2m+YwUAu9opvQ
-	(envelope-from <netdev+bounces-272751-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:11:56 +0100
+	id QKbCEKWOx2k0ZAUAu9opvQ
+	(envelope-from <netdev+bounces-272752-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:17:41 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6758534DC62
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:11:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E58C34DCA5
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:17:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 12B91303A5E3
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 08:07:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CC250302BA7C
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 08:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1866E369211;
-	Sat, 28 Mar 2026 08:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79B426158C;
+	Sat, 28 Mar 2026 08:17:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BE/x7/Wc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mmpsystems.pl header.i=@mmpsystems.pl header.b="t6UKIqEK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from s106b.cyber-folks.pl (s106b.cyber-folks.pl [195.78.66.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B181364023
-	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 08:06:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8F22376FD;
+	Sat, 28 Mar 2026 08:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.78.66.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774685220; cv=none; b=qzcoeyDlMZr+3NST5/Csod9WEaLSPeCmEtVBAQG7cUoIPcAmVZpsNldGs/vaopQ2FhgpxywiBmfD7DBVD7FBoBp4f9rbMh71nMb6oV8QyalNjsXasaimpvaMEVTTSaaGVB/qSX/tMrULkHvagZJTbrHTQT/I43rsPu/5W9nNAfQ=
+	t=1774685856; cv=none; b=Qbj/EGpWmk1//WazTk5IvJI5qaYu41WyPKGsK1nDwTgf1TJCSDfhEqZS5GDuRooo1w4ovtmjtyEmTjNjfCKAjRCP2LGxi+s/vn5xPe2uclsSwkJDoQ0dbW1caOd1c9IXQpKdTjJyp3qTY1F2giNgF6B1MGlgNIFVNYpsZqV2vf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774685220; c=relaxed/simple;
-	bh=K/RNdWGDa81UmWVWas+Pv2X19thLcK/aPXztrVXAnu8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K7IllWpwTbkpEyOnUPl22oTUJF6gSdQqzGIGQLOPojQXCm+kq/LDeHaKlo/pq8PhQzhjTsQwlh5AAXaJ/ojBMTfT37FqkybCzrghpXxPhsByYvg3rwBwGLJUiiH6biscNEa0HSglyOsRilc7uVLB01Y4kUHDm2X5bY2aDupx5YA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BE/x7/Wc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774685217;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z2DPLVqDhXEJBfGDhcq8szGEpKDSX4n5KNDsUD+Cqtw=;
-	b=BE/x7/Wc36e6Is0gVXCaKS0mw8Ws8Vpbjv+65hSoWikZogYgVhfhjSTbBN1UCeqzOAF537
-	AUtafLoMZ/eorDfHbHP6ISJfqmPDD2gAwsi4tt7/nwq6pKEguCSdjfNBJpEvLBAF6OYCeg
-	fuGdTZ+a4XaxGpcLmOZDRws/lS8ph0g=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-595-Pjo3sygoMOiWWMD2idCeAA-1; Sat,
- 28 Mar 2026 04:06:54 -0400
-X-MC-Unique: Pjo3sygoMOiWWMD2idCeAA-1
-X-Mimecast-MFC-AGG-ID: Pjo3sygoMOiWWMD2idCeAA_1774685212
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 313081800345;
-	Sat, 28 Mar 2026 08:06:52 +0000 (UTC)
-Received: from p16v.redhat.com (unknown [10.44.32.48])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6199C1800351;
-	Sat, 28 Mar 2026 08:06:48 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Petr Oros <poros@redhat.com>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	linux-kernel@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	devicetree@vger.kernel.org,
-	Pasi Vaananen <pvaanane@redhat.com>
-Subject: [PATCH net-next v2 5/5] dpll: zl3073x: add ref-sync pair support
-Date: Sat, 28 Mar 2026 09:06:24 +0100
-Message-ID: <20260328080624.593916-6-ivecera@redhat.com>
-In-Reply-To: <20260328080624.593916-1-ivecera@redhat.com>
-References: <20260328080624.593916-1-ivecera@redhat.com>
+	s=arc-20240116; t=1774685856; c=relaxed/simple;
+	bh=ZDHz9uPP8pqI/sNXlxqRQs9YEhFvQM4pMG0G0GmIMJs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nunvRkcdkBC0r/NHQBqHt2CKHBnewW1fTr8+NUfym8trKFHSkt3bnRqiGMoV81/0yq6kT57qVE7P8hKGXWs3NhXEFGFl1gEz910xkjUA/1h4eN+VNgijr97kALLsbXesfrjAzaCAWT/Ml3lO+vMCWD1JmpxT8YgOiUwafBLTdPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mmpsystems.pl; spf=pass smtp.mailfrom=mmpsystems.pl; dkim=pass (2048-bit key) header.d=mmpsystems.pl header.i=@mmpsystems.pl header.b=t6UKIqEK; arc=none smtp.client-ip=195.78.66.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mmpsystems.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mmpsystems.pl
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=mmpsystems.pl; s=x; h=In-Reply-To:Content-Type:MIME-Version:References:
+	Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ejJZ2msrybPfriDsCgcnWyd7Z8ZISOT5WUkjT8Zg0gg=; b=t6UKIqEKEe0xdQ4e6+tsd6DeSR
+	NBT4of6c00PndbkeLeMSBHo8y5rTdNHleSCIjDcpvUdqjLggks7OJEh95Hj6onI1lPuXAPo1p6fO2
+	ftDKcVenb368/7W2sN6mhs6yDFil5eeg39VWit8dkXUBGqRjhohyP+FMmVJtzaB+OfbPAjFeVfuCT
+	mpvhndZjApCMqhnhiX80x3gD9yLW4/cZTCRejqcpl1JBy87uV8tuIfPR6YsgW/zBdMWy63YjMEXY+
+	JnqkuKQIExZlygJ1nYyiwHB4og6EGP3zr6VTsmb13kImgTqe0LafJnsmGyejL8DthLmgiiGft/8Wd
+	Jop/neCQ==;
+Received: from user-5-173-16-20.play-internet.pl ([5.173.16.20] helo=localhost)
+	by s106.cyber-folks.pl with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <michal.piekos@mmpsystems.pl>)
+	id 1w6OrK-00000001FqP-2Oxh;
+	Sat, 28 Mar 2026 09:17:30 +0100
+Date: Sat, 28 Mar 2026 09:17:23 +0100
+From: Michal Piekos <michal.piekos@mmpsystems.pl>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Ovidiu Panait <ovidiu.panait.rb@renesas.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] net: stmmac: skip VLAN restore when VLAN hash ops are
+ missing
+Message-ID: <d3nc2eqhedz6ygstu76cgj2dghkoiod5dnamdwqpvoe3vajndq@ewqtagfgkfzd>
+References: <20260328-vlan-restore-error-v3-1-df47a039c6f6@mmpsystems.pl>
+ <aceIeFWGAZwr1njk@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aceIeFWGAZwr1njk@shell.armlinux.org.uk>
+X-Authenticated-Id: michal.piekos@mmpsystems.pl
+X-Spamd-Result: default: False [1.64 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+	R_DKIM_REJECT(1.00)[mmpsystems.pl:s=x];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[mmpsystems.pl : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-272752-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272751-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[mmpsystems.pl:-];
+	NEURAL_HAM(-0.00)[-0.565];
+	FROM_NEQ_ENVFROM(0.00)[michal.piekos@mmpsystems.pl,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,renesas.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6758534DC62
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mmpsystems.pl:email]
+X-Rspamd-Queue-Id: 9E58C34DCA5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add support for ref-sync pair registration using the 'ref-sync-sources'
-phandle property from device tree. A ref-sync pair consists of a clock
-reference and a low-frequency sync signal where the DPLL locks to the
-clock reference but phase-aligns to the sync reference.
+On Sat, Mar 28, 2026 at 07:51:20AM +0000, Russell King (Oracle) wrote:
+> On Sat, Mar 28, 2026 at 07:51:53AM +0100, Michal Piekos wrote:
+> > stmmac_vlan_restore() unconditionally calls stmmac_vlan_update() when
+> > NETIF_F_VLAN_FEATURES is set. On platforms where priv->hw->vlan (or
+> > ->update_vlan_hash) is not provided, stmmac_update_vlan_hash() returns
+> > -EINVAL via stmmac_do_void_callback(), resulting in a spurious
+> > "Failed to restore VLANs" error even when no VLAN filtering is in use.
+> > 
+> > Remove the unneeded comment.
+> > 
+> > Tested on Orange Pi Zero 3.
+> > 
+> > Fixes: bd7ad51253a7 ("net: stmmac: Fix VLAN HW state restore")
+> > Signed-off-by: Michal Piekos <michal.piekos@mmpsystems.pl>
+> > ---
+> > This patch fixes a noisy "Failed to restore VLANs" message on platforms
+> > where stmmac VLAN hash ops are not implemented.
+> > stmmac_vlan_restore() calls stmmac_vlan_update() without checking for
+> > VLAN hash ops presence which results in -EINVAL. 
+> > ---
+> > Changes in v3:
+> > - Remove the offending comment
+> > - Restore the original check for NETIF_F_VLAN_FEATURES
+> > - Link to v2: https://lore.kernel.org/r/20260321-vlan-restore-error-v2-1-45cf56a5223d@mmpsystems.pl
+> > 
+> > Changes in v2:
+> > - Replace check for hash ops with check for HW FILTER flags
+> > - Link to v1: https://lore.kernel.org/r/20260314-vlan-restore-error-v1-1-4fc6c3e2115f@mmpsystems.pl
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 8 +-------
+> >  1 file changed, 1 insertion(+), 7 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > index 6827c99bde8c..0f3e5ac05faa 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -6861,19 +6861,13 @@ static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vi
+> >  
+> >  static int stmmac_vlan_restore(struct stmmac_priv *priv)
+> >  {
+> > -	int ret;
+> > -
+> >  	if (!(priv->dev->features & NETIF_F_VLAN_FEATURES))
+> >  		return 0;
+> >  
+> >  	if (priv->hw->num_vlan)
+> >  		stmmac_restore_hw_vlan_rx_fltr(priv, priv->dev, priv->hw);
+> >  
+> > -	ret = stmmac_vlan_update(priv, priv->num_double_vlans);
+> > -	if (ret)
+> > -		netdev_err(priv->dev, "Failed to restore VLANs\n");
+> > -
+> > -	return ret;
+> > +	return stmmac_vlan_update(priv, priv->num_double_vlans);
+> >  }
+> 
+> Yes, but as both Andrew and myself have pointed out, no one checks
+> the return value of stmmac_vlan_restore(), so why does it return
+> int?
 
-The implementation:
-- Stores fwnode handle in zl3073x_dpll_pin during pin registration
-- Adds ref_sync_get/set callbacks to read and write the sync control
-  mode and pair registers
-- Validates ref-sync frequency constraints: sync signal must be 8 kHz
-  or less, clock reference must be 1 kHz or more and higher than sync
-- Excludes sync source from automatic reference selection by setting
-  its priority to NONE on connect; on disconnect the priority is left
-  as NONE and the user must explicitly make the pin selectable again
-- Iterates ref-sync-sources phandles to register declared pairings
-  via dpll_pin_ref_sync_pair_add()
+Was too quick with the patch. Will spin another version.
 
-Reviewed-by: Petr Oros <poros@redhat.com>
-Reviewed-by: Prathosh Satish <Prathosh.Satish@microchip.com>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/dpll/zl3073x/dpll.c | 207 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 206 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
-index b5b411425f6b3..79589400f0cc2 100644
---- a/drivers/dpll/zl3073x/dpll.c
-+++ b/drivers/dpll/zl3073x/dpll.c
-@@ -13,6 +13,7 @@
- #include <linux/module.h>
- #include <linux/netlink.h>
- #include <linux/platform_device.h>
-+#include <linux/property.h>
- #include <linux/slab.h>
- #include <linux/sprintf.h>
- 
-@@ -30,6 +31,7 @@
-  * @dpll: DPLL the pin is registered to
-  * @dpll_pin: pointer to registered dpll_pin
-  * @tracker: tracking object for the acquired reference
-+ * @fwnode: firmware node handle
-  * @label: package label
-  * @dir: pin direction
-  * @id: pin id
-@@ -45,6 +47,7 @@ struct zl3073x_dpll_pin {
- 	struct zl3073x_dpll	*dpll;
- 	struct dpll_pin		*dpll_pin;
- 	dpll_tracker		tracker;
-+	struct fwnode_handle	*fwnode;
- 	char			label[8];
- 	enum dpll_pin_direction	dir;
- 	u8			id;
-@@ -184,6 +187,109 @@ zl3073x_dpll_input_pin_esync_set(const struct dpll_pin *dpll_pin,
- 	return zl3073x_ref_state_set(zldev, ref_id, &ref);
- }
- 
-+static int
-+zl3073x_dpll_input_pin_ref_sync_get(const struct dpll_pin *dpll_pin,
-+				    void *pin_priv,
-+				    const struct dpll_pin *ref_sync_pin,
-+				    void *ref_sync_pin_priv,
-+				    enum dpll_pin_state *state,
-+				    struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll_pin *sync_pin = ref_sync_pin_priv;
-+	struct zl3073x_dpll_pin *pin = pin_priv;
-+	struct zl3073x_dpll *zldpll = pin->dpll;
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	const struct zl3073x_ref *ref;
-+	u8 ref_id, mode, pair;
-+
-+	ref_id = zl3073x_input_pin_ref_get(pin->id);
-+	ref = zl3073x_ref_state_get(zldev, ref_id);
-+	mode = zl3073x_ref_sync_mode_get(ref);
-+	pair = zl3073x_ref_sync_pair_get(ref);
-+
-+	if (mode == ZL_REF_SYNC_CTRL_MODE_REFSYNC_PAIR &&
-+	    pair == zl3073x_input_pin_ref_get(sync_pin->id))
-+		*state = DPLL_PIN_STATE_CONNECTED;
-+	else
-+		*state = DPLL_PIN_STATE_DISCONNECTED;
-+
-+	return 0;
-+}
-+
-+static int
-+zl3073x_dpll_input_pin_ref_sync_set(const struct dpll_pin *dpll_pin,
-+				    void *pin_priv,
-+				    const struct dpll_pin *ref_sync_pin,
-+				    void *ref_sync_pin_priv,
-+				    const enum dpll_pin_state state,
-+				    struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll_pin *sync_pin = ref_sync_pin_priv;
-+	struct zl3073x_dpll_pin *pin = pin_priv;
-+	struct zl3073x_dpll *zldpll = pin->dpll;
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	u8 mode, ref_id, sync_ref_id;
-+	struct zl3073x_chan chan;
-+	struct zl3073x_ref ref;
-+	int rc;
-+
-+	ref_id = zl3073x_input_pin_ref_get(pin->id);
-+	sync_ref_id = zl3073x_input_pin_ref_get(sync_pin->id);
-+	ref = *zl3073x_ref_state_get(zldev, ref_id);
-+
-+	if (state == DPLL_PIN_STATE_CONNECTED) {
-+		const struct zl3073x_ref *sync_ref;
-+		u32 ref_freq, sync_freq;
-+
-+		sync_ref = zl3073x_ref_state_get(zldev, sync_ref_id);
-+		ref_freq = zl3073x_ref_freq_get(&ref);
-+		sync_freq = zl3073x_ref_freq_get(sync_ref);
-+
-+		/* Sync signal must be 8 kHz or less and clock reference
-+		 * must be 1 kHz or more and higher than the sync signal.
-+		 */
-+		if (sync_freq > 8000) {
-+			NL_SET_ERR_MSG(extack,
-+				       "sync frequency must be 8 kHz or less");
-+			return -EINVAL;
-+		}
-+		if (ref_freq < 1000) {
-+			NL_SET_ERR_MSG(extack,
-+				       "clock frequency must be 1 kHz or more");
-+			return -EINVAL;
-+		}
-+		if (ref_freq <= sync_freq) {
-+			NL_SET_ERR_MSG(extack,
-+				       "clock frequency must be higher than sync frequency");
-+			return -EINVAL;
-+		}
-+
-+		zl3073x_ref_sync_pair_set(&ref, sync_ref_id);
-+		mode = ZL_REF_SYNC_CTRL_MODE_REFSYNC_PAIR;
-+	} else {
-+		mode = ZL_REF_SYNC_CTRL_MODE_REFSYNC_PAIR_OFF;
-+	}
-+
-+	zl3073x_ref_sync_mode_set(&ref, mode);
-+
-+	rc = zl3073x_ref_state_set(zldev, ref_id, &ref);
-+	if (rc)
-+		return rc;
-+
-+	/* Exclude sync source from automatic reference selection by setting
-+	 * its priority to NONE. On disconnect the priority is left as NONE
-+	 * and the user must explicitly make the pin selectable again.
-+	 */
-+	if (state == DPLL_PIN_STATE_CONNECTED) {
-+		chan = *zl3073x_chan_state_get(zldev, zldpll->id);
-+		zl3073x_chan_ref_prio_set(&chan, sync_ref_id,
-+					  ZL_DPLL_REF_PRIO_NONE);
-+		return zl3073x_chan_state_set(zldev, zldpll->id, &chan);
-+	}
-+
-+	return 0;
-+}
-+
- static int
- zl3073x_dpll_input_pin_ffo_get(const struct dpll_pin *dpll_pin, void *pin_priv,
- 			       const struct dpll_device *dpll, void *dpll_priv,
-@@ -1100,6 +1206,8 @@ static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
- 	.phase_adjust_set = zl3073x_dpll_input_pin_phase_adjust_set,
- 	.prio_get = zl3073x_dpll_input_pin_prio_get,
- 	.prio_set = zl3073x_dpll_input_pin_prio_set,
-+	.ref_sync_get = zl3073x_dpll_input_pin_ref_sync_get,
-+	.ref_sync_set = zl3073x_dpll_input_pin_ref_sync_set,
- 	.state_on_dpll_get = zl3073x_dpll_input_pin_state_on_dpll_get,
- 	.state_on_dpll_set = zl3073x_dpll_input_pin_state_on_dpll_set,
- };
-@@ -1190,8 +1298,11 @@ zl3073x_dpll_pin_register(struct zl3073x_dpll_pin *pin, u32 index)
- 	if (IS_ERR(props))
- 		return PTR_ERR(props);
- 
--	/* Save package label, esync capability and phase adjust granularity */
-+	/* Save package label, fwnode, esync capability and phase adjust
-+	 * granularity.
-+	 */
- 	strscpy(pin->label, props->package_label);
-+	pin->fwnode = fwnode_handle_get(props->fwnode);
- 	pin->esync_control = props->esync_control;
- 	pin->phase_gran = props->dpll_props.phase_gran;
- 
-@@ -1236,6 +1347,8 @@ zl3073x_dpll_pin_register(struct zl3073x_dpll_pin *pin, u32 index)
- 	dpll_pin_put(pin->dpll_pin, &pin->tracker);
- 	pin->dpll_pin = NULL;
- err_pin_get:
-+	fwnode_handle_put(pin->fwnode);
-+	pin->fwnode = NULL;
- 	zl3073x_pin_props_put(props);
- 
- 	return rc;
-@@ -1265,6 +1378,9 @@ zl3073x_dpll_pin_unregister(struct zl3073x_dpll_pin *pin)
- 
- 	dpll_pin_put(pin->dpll_pin, &pin->tracker);
- 	pin->dpll_pin = NULL;
-+
-+	fwnode_handle_put(pin->fwnode);
-+	pin->fwnode = NULL;
- }
- 
- /**
-@@ -1735,6 +1851,88 @@ zl3073x_dpll_free(struct zl3073x_dpll *zldpll)
- 	kfree(zldpll);
- }
- 
-+/**
-+ * zl3073x_dpll_ref_sync_pair_register - register ref_sync pairs for a pin
-+ * @pin: pointer to zl3073x_dpll_pin structure
-+ *
-+ * Iterates 'ref-sync-sources' phandles in the pin's firmware node and
-+ * registers each declared pairing.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_dpll_ref_sync_pair_register(struct zl3073x_dpll_pin *pin)
-+{
-+	struct zl3073x_dev *zldev = pin->dpll->dev;
-+	struct fwnode_handle *fwnode;
-+	struct dpll_pin *sync_pin;
-+	dpll_tracker tracker;
-+	int n, rc;
-+
-+	for (n = 0; ; n++) {
-+		/* Get n'th ref-sync source */
-+		fwnode = fwnode_find_reference(pin->fwnode, "ref-sync-sources",
-+					       n);
-+		if (IS_ERR(fwnode)) {
-+			rc = PTR_ERR(fwnode);
-+			break;
-+		}
-+
-+		/* Find associated dpll pin */
-+		sync_pin = fwnode_dpll_pin_find(fwnode, &tracker);
-+		fwnode_handle_put(fwnode);
-+		if (!sync_pin) {
-+			dev_warn(zldev->dev, "%s: ref-sync source %d not found",
-+				 pin->label, n);
-+			continue;
-+		}
-+
-+		/* Register new ref-sync pair */
-+		rc = dpll_pin_ref_sync_pair_add(pin->dpll_pin, sync_pin);
-+		dpll_pin_put(sync_pin, &tracker);
-+
-+		/* -EBUSY means pairing already exists from another DPLL's
-+		 * registration.
-+		 */
-+		if (rc && rc != -EBUSY) {
-+			dev_err(zldev->dev,
-+				"%s: failed to add ref-sync source %d: %pe",
-+				pin->label, n, ERR_PTR(rc));
-+			break;
-+		}
-+	}
-+
-+	return rc != -ENOENT ? rc : 0;
-+}
-+
-+/**
-+ * zl3073x_dpll_ref_sync_pairs_register - register ref_sync pairs for a DPLL
-+ * @zldpll: pointer to zl3073x_dpll structure
-+ *
-+ * Iterates all registered input pins of the given DPLL and establishes
-+ * ref_sync pairings declared by 'ref-sync-sources' phandles in the
-+ * device tree.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_dpll_ref_sync_pairs_register(struct zl3073x_dpll *zldpll)
-+{
-+	struct zl3073x_dpll_pin *pin;
-+	int rc;
-+
-+	list_for_each_entry(pin, &zldpll->pins, list) {
-+		if (!zl3073x_dpll_is_input_pin(pin) || !pin->fwnode)
-+			continue;
-+
-+		rc = zl3073x_dpll_ref_sync_pair_register(pin);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * zl3073x_dpll_register - register DPLL device and all its pins
-  * @zldpll: pointer to zl3073x_dpll structure
-@@ -1758,6 +1956,13 @@ zl3073x_dpll_register(struct zl3073x_dpll *zldpll)
- 		return rc;
- 	}
- 
-+	rc = zl3073x_dpll_ref_sync_pairs_register(zldpll);
-+	if (rc) {
-+		zl3073x_dpll_pins_unregister(zldpll);
-+		zl3073x_dpll_device_unregister(zldpll);
-+		return rc;
-+	}
-+
- 	return 0;
- }
- 
--- 
-2.52.0
-
+Michal
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
