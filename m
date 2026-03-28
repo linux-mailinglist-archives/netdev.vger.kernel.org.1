@@ -1,203 +1,186 @@
-Return-Path: <netdev+bounces-272755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272756-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wFB8BKaXx2mFZgUAu9opvQ
-	(envelope-from <netdev+bounces-272755-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:56:06 +0100
+	id mBTyM6aex2mSZwUAu9opvQ
+	(envelope-from <netdev+bounces-272756-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 10:25:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CD4534DDF2
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:56:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32C7D34DE81
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 10:25:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AF35D301DB89
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 08:56:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 837233034B24
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:24:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E6A33314DE;
-	Sat, 28 Mar 2026 08:56:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FAC92DBF75;
+	Sat, 28 Mar 2026 09:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mmpsystems.pl header.i=@mmpsystems.pl header.b="cw/PSUbN"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OmM2nbuG"
 X-Original-To: netdev@vger.kernel.org
-Received: from s106b.cyber-folks.pl (s106b.cyber-folks.pl [195.78.66.88])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8095E25487C;
-	Sat, 28 Mar 2026 08:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.78.66.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F82434166B
+	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 09:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774688161; cv=none; b=cNb+QmYdqdqSlrD4Ro/fph4wfYIdVkBABVNGhqkUpeRftP9gD15P/3bOQLoE/uvONdSojX8aZcJMWq1HzA+tYzXViqiziubCakCoSmfLRMgcmPjBWwgfhFarkNBJxgWX08UdvFzyr0ja0Hq2JENdebLhlUZhFi3rDiadqOslNXs=
+	t=1774689880; cv=none; b=ucuSw6cj2l4DyxlgKnmGgG7HMBY2bS1tqMEBKb5FPy0vba0o6QMaOPlLIKCDZ0rSztinZnho1F44MiFHuz8VQPoK05M3AUO+/VUHdiok11+psp4TSMFiEyvCBVGDhR+bv1BEneK2OWK5wbzyL4N0xWwn5pBYGv8NfNzXyC6+tHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774688161; c=relaxed/simple;
-	bh=lmB9RkAsJOKKgD5XsOpXtoTGuYHWZeBiE4dI8gGBpmE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Ii3VkVhfarlJV+6Z80mYpwTrmN9UfMh/RLFWZt+65NrGzDbhMAMBxbdFVP8Qj89hNqmvspNTIOcE1PiLkGxJwlErBx4znzVIiHYq/8ZDeBPf2mxcbPtWJ7I29x/PtMdqJit7eyxPjpl8Qiof//7zKu0jLkPQyrhndT2ZPgVYm9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mmpsystems.pl; spf=pass smtp.mailfrom=mmpsystems.pl; dkim=pass (2048-bit key) header.d=mmpsystems.pl header.i=@mmpsystems.pl header.b=cw/PSUbN; arc=none smtp.client-ip=195.78.66.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mmpsystems.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mmpsystems.pl
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=mmpsystems.pl; s=x; h=Cc:To:Message-Id:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:Subject:Date:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=W9D8vCzCrRJ5LPPbiAlFNwBx1RgUj04xH732MSvsX1E=; b=cw/PSUbNcg/qV3aSySproi+46b
-	W4YCBnfrBl1BwW4KsBBH2MU+F7BBr+tZt9Y2yRpuGWgva3tHHyVfLXwyh5aquGvXq1VwiafVvt6hi
-	aiT66Pq0eHtSdMZz1fm+MgNFToKjNZkrgnQosP+xCFgbp/qOEwxkSeh63mSsUmpUNnXF5sye27KaR
-	CBpKQSo80mC7QpIm15t913/z4BipHh/rzUdNYV0rERciL6UCmefkJQkdrXJAlaGWktL3IpOtOU+fz
-	lWRHOV1woaQ2E9zC5FO++SeCUVB8o68Ott/DIUMu2dC+fyjRs/7QjsIPuH0sVYdRnppWDwqsrVkK/
-	OwMxtMnA==;
-Received: from user-5-173-16-20.play-internet.pl ([5.173.16.20] helo=localhost)
-	by s106.cyber-folks.pl with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <michal.piekos@mmpsystems.pl>)
-	id 1w6PSU-00000002znC-02RV;
-	Sat, 28 Mar 2026 09:55:54 +0100
-From: Michal Piekos <michal.piekos@mmpsystems.pl>
-Date: Sat, 28 Mar 2026 09:55:51 +0100
-Subject: [PATCH v4] net: stmmac: skip VLAN restore when VLAN hash ops are
- missing
+	s=arc-20240116; t=1774689880; c=relaxed/simple;
+	bh=NzyrU5zPm0aE7B5Xv/X9tBXqZrUh/Ux/aTbQVo2C6kI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QjCCN38xbEjo82QmGFtj/ahlrwJigVD41kM8tKL8QzNJOf4Lot9WyHFZCAdo7dr83yZ04+abY/tCVjwCXBZ7rNMWMQowgBmtuBhRP1cFcYcsvml+QwaHjEl3XBOteJlHvCgKq9GkjIRWi3A32CcS5szTMM0aCcM+Jzg0Bh03fJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OmM2nbuG; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774689877;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1cmrkz5W6UykUZpniAtrjuFU7d70RC0nIF5M0anlmZQ=;
+	b=OmM2nbuGpixhtFvCZ4RytYBhDEgmm1oxpd+WnC4RS6xOPA0/+4ZCII/P0axwaARlXJsPDc
+	wRMsiLwoCGDFokdEc5/PPsW7Fbl28kFx0v4e5qzZpqsyFfngQ8J900Fom0QUBa73Y9SU1L
+	Sr5bNojQucHT/eiDGEkkSScAr4dyBdU=
+From: Yufan Chen <yufan.chen@linux.dev>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: yufan.chen@linux.dev,
+	Yufan Chen <ericterminal@gmail.com>
+Subject: [PATCH] net/ftgmac100: fix ring allocation unwind leaks on open failure
+Date: Sat, 28 Mar 2026 17:24:28 +0800
+Message-ID: <20260328092428.75430-1-yufan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260328-vlan-restore-error-v4-1-f88624c530dc@mmpsystems.pl>
-X-B4-Tracking: v=1; b=H4sIAJaXx2kC/33NSwrCMBCA4atI1kaaZ6sr7yEuYjpjA32RlGApv
- btJV0WKy3+Y+WYhAbyDQG6nhXiILrihTyHPJ2Ib07+Bujo14QXXhWCSxtb01EOYBg8UvB88xeo
- lDLMlqsKQdDh6QPfZ0MczdePy9rz9iCxP/3KRUUYlWm0FcMYU3rtuDHOYoAuXsSWZjHzHcHbI8
- Mwoi0obxbmojxixZ6pDRiSmRlmaQlytRv3LrOv6BRYVpxFGAQAA
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Michal Piekos <michal.piekos@mmpsystems.pl>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1774688151; l=3201;
- i=michal.piekos@mmpsystems.pl; s=20260301; h=from:subject:message-id;
- bh=lmB9RkAsJOKKgD5XsOpXtoTGuYHWZeBiE4dI8gGBpmE=;
- b=k0d4LG2qW5S5JB0Fw6C5IlvnEM6iE36A+wAxwIDuP+cwTUSfPySgFjTY8DhZb7fP9denByW3G
- X1IW0pnaROsDzVv+iTBKmYEfIuVIHP+iXVC3oPv1jrAgIM5eUD2bwuS
-X-Developer-Key: i=michal.piekos@mmpsystems.pl; a=ed25519;
- pk=Aixyx03If7ZDamiKKN0lsa+0mtA+WjIuIf2ZQVYNBqg=
-X-Authenticated-Id: michal.piekos@mmpsystems.pl
-X-Spamd-Result: default: False [1.14 / 15.00];
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2882; i=ericterminal@gmail.com; h=from:subject; bh=U/Fkrvdf6DiDU9bwx1OrsOmxztxIWo5PjRRPWmVxAlk=; b=owGbwMvMwCXWM/dCzeS3H+sZT6slMWQen8Pk+CesaLntKVc1/xlfphsybC2+2y50rXHn5ZPv2 DQT1Q986pjIwiDGxWAppshy9/++ublet+Zc5z6cCzOHlQlkiLRIAwMQsDDw5SbmlRrpGOmZahvq GRrpGOgYM3BxCsBUv9rJ8FcwzmSXh/CT5C7GJ9uLdF/Jp+nH7Kgy89qZKlQStz/s+nRGhokS+k2 pJmf4Q+2P3wnXvmBSZ3R/fZ6fw/oFJrJSb1lyeQA=
+X-Developer-Key: i=ericterminal@gmail.com; a=openpgp; fpr=DDFFBE9D6D4ADA9CD70BC36D8C9DD07C93EDF17F
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[mmpsystems.pl:s=x];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[mmpsystems.pl : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272755-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,renesas.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272756-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.770];
-	FROM_NEQ_ENVFROM(0.00)[michal.piekos@mmpsystems.pl,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[mmpsystems.pl:-];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yufan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5CD4534DDF2
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 32C7D34DE81
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-stmmac_vlan_restore() unconditionally calls stmmac_vlan_update() when
-NETIF_F_VLAN_FEATURES is set. On platforms where priv->hw->vlan (or
-->update_vlan_hash) is not provided, stmmac_update_vlan_hash() returns
--EINVAL via stmmac_do_void_callback(), resulting in a spurious
-"Failed to restore VLANs" error even when no VLAN filtering is in use.
+From: Yufan Chen <ericterminal@gmail.com>
 
-Remove not needed comment.
-Remove not used return value from stmmac_vlan_restore().
+ftgmac100_alloc_rings() allocated rx_skbs, tx_skbs, rxdes, txdes, and rx_scratch in stages but returned directly on any intermediate allocation failure. This left previously allocated objects unreleased and could accumulate leaks across repeated ifup retries under memory pressure.
 
-Tested on Orange Pi Zero 3.
+Switch ftgmac100_alloc_rings() to a centralized goto-based unwind path that calls ftgmac100_free_rings() on failure so partially allocated ring resources are always released before returning -ENOMEM.
 
-Fixes: bd7ad51253a7 ("net: stmmac: Fix VLAN HW state restore")
-Signed-off-by: Michal Piekos <michal.piekos@mmpsystems.pl>
+Also clear rx_skbs, tx_skbs, and rx_scratch pointers in ftgmac100_free_rings() after freeing. This prevents stale pointers from being reused during later retry failures and keeps ring teardown idempotent.
+
+Signed-off-by: Yufan Chen <ericterminal@gmail.com>
 ---
-This patch fixes a noisy "Failed to restore VLANs" message on platforms
-where stmmac VLAN hash ops are not implemented.
-stmmac_vlan_restore() calls stmmac_vlan_update() without checking for
-VLAN hash ops presence which results in -EINVAL. 
----
-Changes in v4:
-- Remove not used return value of stmmac_vlan_restore()
-- Link to v3: https://lore.kernel.org/r/20260328-vlan-restore-error-v3-1-df47a039c6f6@mmpsystems.pl
+ drivers/net/ethernet/faraday/ftgmac100.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-Changes in v3:
-- Remove the offending comment
-- Restore the original check for NETIF_F_VLAN_FEATURES
-- Link to v2: https://lore.kernel.org/r/20260321-vlan-restore-error-v2-1-45cf56a5223d@mmpsystems.pl
-
-Changes in v2:
-- Replace check for hash ops with check for HW FILTER flags
-- Link to v1: https://lore.kernel.org/r/20260314-vlan-restore-error-v1-1-4fc6c3e2115f@mmpsystems.pl
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 6827c99bde8c..13d3cac056be 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -156,7 +156,7 @@ static void stmmac_tx_timer_arm(struct stmmac_priv *priv, u32 queue);
- static void stmmac_flush_tx_descriptors(struct stmmac_priv *priv, int queue);
- static void stmmac_set_dma_operation_mode(struct stmmac_priv *priv, u32 txmode,
- 					  u32 rxmode, u32 chan);
--static int stmmac_vlan_restore(struct stmmac_priv *priv);
-+static void stmmac_vlan_restore(struct stmmac_priv *priv);
- 
- #ifdef CONFIG_DEBUG_FS
- static const struct net_device_ops stmmac_netdev_ops;
-@@ -6859,21 +6859,15 @@ static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vi
- 	return ret;
- }
- 
--static int stmmac_vlan_restore(struct stmmac_priv *priv)
-+static void stmmac_vlan_restore(struct stmmac_priv *priv)
+diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
+index 1e91e79c8..147300e60 100644
+--- a/drivers/net/ethernet/faraday/ftgmac100.c
++++ b/drivers/net/ethernet/faraday/ftgmac100.c
+@@ -946,7 +946,9 @@ static void ftgmac100_free_rings(struct ftgmac100 *priv)
  {
--	int ret;
--
- 	if (!(priv->dev->features & NETIF_F_VLAN_FEATURES))
--		return 0;
-+		return;
+ 	/* Free skb arrays */
+ 	kfree(priv->rx_skbs);
++	priv->rx_skbs = NULL;
+ 	kfree(priv->tx_skbs);
++	priv->tx_skbs = NULL;
  
- 	if (priv->hw->num_vlan)
- 		stmmac_restore_hw_vlan_rx_fltr(priv, priv->dev, priv->hw);
- 
--	ret = stmmac_vlan_update(priv, priv->num_double_vlans);
--	if (ret)
--		netdev_err(priv->dev, "Failed to restore VLANs\n");
--
--	return ret;
-+	stmmac_vlan_update(priv, priv->num_double_vlans);
+ 	/* Free descriptors */
+ 	if (priv->rxdes)
+@@ -965,31 +967,34 @@ static void ftgmac100_free_rings(struct ftgmac100 *priv)
+ 	if (priv->rx_scratch)
+ 		dma_free_coherent(priv->dev, RX_BUF_SIZE,
+ 				  priv->rx_scratch, priv->rx_scratch_dma);
++	priv->rx_scratch = NULL;
  }
  
- static int stmmac_bpf(struct net_device *dev, struct netdev_bpf *bpf)
-
----
-base-commit: be762d8b6dd7efacb61937d20f8475db8f207655
-change-id: 20260314-vlan-restore-error-f8b3a1c7f50a
-
-Best regards,
+ static int ftgmac100_alloc_rings(struct ftgmac100 *priv)
+ {
++	int err = -ENOMEM;
++
+ 	/* Allocate skb arrays */
+ 	priv->rx_skbs = kcalloc(MAX_RX_QUEUE_ENTRIES, sizeof(void *),
+ 				GFP_KERNEL);
+ 	if (!priv->rx_skbs)
+-		return -ENOMEM;
++		goto out;
+ 	priv->tx_skbs = kcalloc(MAX_TX_QUEUE_ENTRIES, sizeof(void *),
+ 				GFP_KERNEL);
+ 	if (!priv->tx_skbs)
+-		return -ENOMEM;
++		goto out;
+ 
+ 	/* Allocate descriptors */
+ 	priv->rxdes = dma_alloc_coherent(priv->dev,
+ 					 MAX_RX_QUEUE_ENTRIES * sizeof(struct ftgmac100_rxdes),
+ 					 &priv->rxdes_dma, GFP_KERNEL);
+ 	if (!priv->rxdes)
+-		return -ENOMEM;
++		goto out;
+ 	priv->txdes = dma_alloc_coherent(priv->dev,
+ 					 MAX_TX_QUEUE_ENTRIES * sizeof(struct ftgmac100_txdes),
+ 					 &priv->txdes_dma, GFP_KERNEL);
+ 	if (!priv->txdes)
+-		return -ENOMEM;
++		goto out;
+ 
+ 	/* Allocate scratch packet buffer */
+ 	priv->rx_scratch = dma_alloc_coherent(priv->dev,
+@@ -997,9 +1002,13 @@ static int ftgmac100_alloc_rings(struct ftgmac100 *priv)
+ 					      &priv->rx_scratch_dma,
+ 					      GFP_KERNEL);
+ 	if (!priv->rx_scratch)
+-		return -ENOMEM;
++		goto out;
+ 
+ 	return 0;
++
++out:
++	ftgmac100_free_rings(priv);
++	return err;
+ }
+ 
+ static void ftgmac100_init_rings(struct ftgmac100 *priv)
 -- 
-Michal Piekos <michal.piekos@mmpsystems.pl>
+2.47.3
 
 
