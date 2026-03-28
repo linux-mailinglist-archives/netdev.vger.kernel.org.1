@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-272824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272825-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WC6qMwZKyGlVjgUAu9opvQ
-	(envelope-from <netdev+bounces-272824-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 22:37:10 +0100
+	id oH/lMRRKyGlVjgUAu9opvQ
+	(envelope-from <netdev+bounces-272825-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 22:37:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id D556A350065
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 22:37:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27AA8350089
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 22:37:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 568FC300D76C
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 21:37:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 02B31302C346
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 21:37:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719D1359A75;
-	Sat, 28 Mar 2026 21:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8927343D86;
+	Sat, 28 Mar 2026 21:37:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MWTCshwQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tlTxbXa0"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED69E194AE6
-	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 21:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A12D359A75
+	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 21:37:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774733822; cv=none; b=Eidu+hZhiDVDSb+vaXtNgpan8UhPV4X68O8fI+uGUrfOLmjDpS3/XbchkX7185vREv5gi6Lun3b4LSbP2+9JB8o3s77AHov++LxDipmoQLql6bYAhpruZNvWF+UlZuf5HXvzRZ6JZLpWT2AYZtz2Vw6gcR2LCL8yhoQRF0iff2g=
+	t=1774733827; cv=none; b=boOOYHNC9J30aXXBgldwdNU3iSEaYW4zLGRIn+0phzZIv0qovdR8FNA6NuxKb4oRQKTw8qOjEiCLmF3zsQLLl5ESAFgAULM4/G4OfpmUpeOWDV0S2ilQ9N6c5JeItiWUwxS+MIXqJ27zUE4oE/v0Se/wmthvYxb6ylTOew9uY9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774733822; c=relaxed/simple;
-	bh=zjBCLixLHvRboyUseTLBPn9w9WpYjxLqjB5qFzsA01k=;
+	s=arc-20240116; t=1774733827; c=relaxed/simple;
+	bh=C837YuOHF2/+bkANG/bZeWLT+UZej/PnxWk3LzwvHKs=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=p0yQ08fedJHct30lU/kC0wV57qwg+CQ5kgQajYTDX+RVFLfk7w5tQ7M2h1wonhen+hLljk8V/c4N02OP6g6KrsGWjMf+JWBtL3V53vs/KTzIzHrXkbCDRoVZ2QSZfKSWNc9CTDqEOlbOb9u2rfrBmiWuHCspj01QYRei5oXwJ0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=MWTCshwQ; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=ixPmO/uL5WCTnwQN6tf25hIQxwXWKRSDyeVJyo/R23QTQJqHmc0G/5FBSmEe82NTOiMz5PMHE+a/T4QXlnbk8Sxj2lj+LdQBxEFdFsjAIM/JppYKgkzkv+M4irohzkOVgXWxtdeMeh7UKAxiI1z+oEuwnbxrgIMrCVyYUDIe8qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tlTxbXa0; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -40,22 +40,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=BW1hhmXXWTLU0JxQeAvbat9bJsdPkpNBSt+Ets8c1vc=; b=MWTCshwQGA7nyqyfIrzSr69yBp
-	PGajwaeP3i/NgsVO5jck8ZWH547IBneEu64GYq0VNux0ysnLIbsCxDj90eDn8nildZbHEZx+d/qBA
-	yTHJu0sawC1x1SlytqfWkbfUDo1crg9kYf5pZ3esN/na69lufoIXA3NT568DNcGhPFzPY5CoD7+22
-	usFqn1jdBKNrT9uhAt8V+L42WaUeRb8n3+qgT9UDZADVaciFfUjbvTYYGp80+p+FnwKqTvwl+wOi6
-	ffZpgowJtPz8L7aqB8DncGRXBO6/hZp17BxQnIWTggxOZNTxaJAZOGBQTyGq1pkVAxvv8OHnjZxhr
-	ndIVN20Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33086 helo=rmk-PC.armlinux.org.uk)
+	bh=rmtvPeRClGsN+/hlvuBTyHk3INo2YZVmRU3ck+rUhCs=; b=tlTxbXa0QYHZ1gRYH1n8rWFkla
+	8FOMQMbZPMJKiefnidsY+JnRN4bRYh/8VlBq90q6rjd1kN0PxgwiY4AAgHBJK9Cw42qy/Nggabzmo
+	JqJSzLhTvE7iUA6ijyryeNg+iSpFgfu2xTfVw+rD5rA5BVK+B1i1IVFa87PcPI67YjZUMvxVPw4CK
+	n9Exc8lvm/xJWGnF+glcd7eaJYknBl/Lbo7lxhKPFwyCuf/m//kaUM4FMvt5+3+gd/CxtBEBweB2a
+	V3HCJAoeKgcJbDn3qqIajwlYvT2rWxtqGZQWM6N+F6VDXbl63OhnISKzwUqR1DJKee951eMzWhqf/
+	mftjyjyw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33096 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1w6bKu-000000007S5-3odc;
-	Sat, 28 Mar 2026 21:36:53 +0000
+	id 1w6bL0-000000007SS-1u9s;
+	Sat, 28 Mar 2026 21:36:58 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1w6bKu-0000000ELtr-0U6v;
-	Sat, 28 Mar 2026 21:36:52 +0000
+	id 1w6bKz-0000000ELtx-0rYr;
+	Sat, 28 Mar 2026 21:36:57 +0000
 In-Reply-To: <achJ1dfeT6Q8rBuX@shell.armlinux.org.uk>
 References: <achJ1dfeT6Q8rBuX@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -70,8 +70,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	netdev@vger.kernel.org,
 	Ong Boon Leong <boon.leong.ong@intel.com>,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 03/10] net: stmmac: move TSO VLAN tag insertion to
- core code
+Subject: [PATCH net-next 04/10] net: stmmac: always enable channel TSO when
+ supported
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,14 +81,14 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1w6bKu-0000000ELtr-0U6v@rmk-PC.armlinux.org.uk>
+Message-Id: <E1w6bKz-0000000ELtx-0rYr@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sat, 28 Mar 2026 21:36:52 +0000
+Date: Sat, 28 Mar 2026 21:36:57 +0000
 X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
@@ -96,7 +96,7 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272824-lists,netdev=lfdr.de,kernel];
+	TAGGED_FROM(0.00)[bounces-272825-lists,netdev=lfdr.de,kernel];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
@@ -105,69 +105,43 @@ X-Spamd-Result: default: False [1.14 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	NEURAL_HAM(-0.00)[-0.995];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D556A350065
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,rmk-PC.armlinux.org.uk:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 27AA8350089
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-stmmac_tso_xmit() checks whether the skbuff is trying to offload
-vlan tag insertion to hardware, which from the comment in the code
-appears to be buggy when the TSO feature is used.
+Rather than configuring the channels depending on whether GSO/TSO is
+currently enabled by the user, always enable if the hardware has
+TSO support and the platform wants TSO to be enabled.
 
-Rather than stmmac_tso_xmit() inserting the VLAN tag, handle this
-in stmmac_features_check() which will then use core net code to
-handle this. See net/core/dev.c::validate_xmit_skb()
+This avoids TSO being disabled on a channel over a suspend/resume
+when the user has disabled TSO features, and then the hardware
+misbehaves when TSO is re-enabled.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 21 +++++++------------
- 1 file changed, 8 insertions(+), 13 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index e21ca1c70c6d..ed3e9515cf25 100644
+index ed3e9515cf25..f500fcc17ce5 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4419,19 +4419,6 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
- 	u8 proto_hdr_len, hdr;
- 	dma_addr_t des;
+@@ -3712,7 +3712,7 @@ static int stmmac_hw_setup(struct net_device *dev)
+ 	stmmac_set_rings_length(priv);
  
--	/* Always insert VLAN tag to SKB payload for TSO frames.
--	 *
--	 * Never insert VLAN tag by HW, since segments split by
--	 * TSO engine will be un-tagged by mistake.
--	 */
--	if (skb_vlan_tag_present(skb)) {
--		skb = __vlan_hwaccel_push_inside(skb);
--		if (unlikely(!skb)) {
--			priv->xstats.tx_dropped++;
--			return NETDEV_TX_OK;
--		}
--	}
--
- 	nfrags = skb_shinfo(skb)->nr_frags;
- 	queue = skb_get_queue_mapping(skb);
- 
-@@ -4932,6 +4919,14 @@ static netdev_features_t stmmac_features_check(struct sk_buff *skb,
- 	features = vlan_features_check(skb, features);
- 
- 	if (skb_is_gso(skb)) {
-+		/* Always insert VLAN tag to SKB payload for TSO frames.
-+		 *
-+		 * Never insert VLAN tag by HW, since segments split by
-+		 * TSO engine will be un-tagged by mistake.
-+		 */
-+		features &= ~(NETIF_F_HW_VLAN_STAG_TX |
-+			      NETIF_F_HW_VLAN_CTAG_TX);
-+
- 		/* STM32MP25xx (dwmac v5.3) states "Do not enable time-based
- 		 * scheduling for channels on which the TSO feature is
- 		 * enabled." If we have a skb for a channel which has TBS
+ 	/* Enable TSO */
+-	if (priv->tso) {
++	if (priv->dma_cap.tsoen && priv->plat->flags & STMMAC_FLAG_TSO_EN) {
+ 		for (chan = 0; chan < tx_cnt; chan++) {
+ 			if (!stmmac_channel_tso_permitted(priv, chan))
+ 				continue;
 -- 
 2.47.3
 
