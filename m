@@ -1,214 +1,222 @@
-Return-Path: <netdev+bounces-272808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272809-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +BhIM5EoyGnEhQUAu9opvQ
-	(envelope-from <netdev+bounces-272808-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 20:14:25 +0100
+	id QJTcIawqyGk2hgUAu9opvQ
+	(envelope-from <netdev+bounces-272809-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 20:23:24 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4163B34FBDA
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 20:14:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D718234FC90
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 20:23:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8984F305116B
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 19:13:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BEE7F307C481
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 19:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD17345CA3;
-	Sat, 28 Mar 2026 19:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950B434107A;
+	Sat, 28 Mar 2026 19:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bq635Hk0"
+	dkim=pass (2048-bit key) header.d=bridgetech.tv header.i=@bridgetech.tv header.b="Br21SBn7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11023072.outbound.protection.outlook.com [40.107.162.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37DD346A19
-	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 19:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774725185; cv=none; b=f10gGk+VrB7FLMGEkRI4PR+x0AZejwOXwEx9rsEDAVZe/OxN9lzfUDljRIe0QwMLczp4B2VQOW5ikK6zVrRSGQB6QliFljXBU/kM3Z932j2JS3TOQrs8MBRAD7kx/ga3JAb1h0PquDfpJVKVC00bxrknmIbdlvMD8Vt4ar39a/c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774725185; c=relaxed/simple;
-	bh=qGFTzlpUUEI4pKdSdaSVMTnjSAfvQHYO8xeTqhyGGNE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pranHOw+ExaTlsRQquTaFmvfrBgDv1hLiLqzQ+/YLAVeaYxa1k5xnp7azwZ5hUhqG3h67L5lIxNHM1KkON1CDt/qhns4N50cyhPPCchkWSMyPhWf8gmv6sLoebaTWHrt/6HOgVkQzim8/HWbg1Qo5Gv4gzY9nrmaLOmWarAGNpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bq635Hk0; arc=none smtp.client-ip=74.125.82.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-128b9b7e3edso571797c88.0
-        for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 12:13:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774725183; x=1775329983; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nV0vTDjXno/BRjs9UsVyAooL1Z9SQRTeEW/NqAyKUfY=;
-        b=bq635Hk08G52PmB4wUjBX1P9YGeKaD4Gl3lrxEBOaE5c9Gg9KGzd/w8GhZ8T+ugp2p
-         j0mBWYH+5bnAxRcuKqaXM9h2LD+N1xEh0y+WamdrA3mxlSOibdl880GmCOguQ0g7uVYD
-         k+Oo1eU6QKRA0Ktch/xVyjsCBAMj1PqMdOkET5HWAwAaNgMwCj66xvPrsqLyKu8ZkiML
-         sPQtFDYwMnF/9OsWHQ8gb0eaIiL9rSx1ozqTzxAFYqaxTJWpe686GOG0qBIJ8qSm8Fff
-         I/he+SDCkRGZ0WfaK5w/JdvQik/xmoCMZ/9hG6yACD7bXknPHnF6ykqNEtQC/JWl+6te
-         ScHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774725183; x=1775329983;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nV0vTDjXno/BRjs9UsVyAooL1Z9SQRTeEW/NqAyKUfY=;
-        b=Gt2YIgBQlTqUYRXknjl6vqO20yqlJLG7RvsTSIyNhc8x5Sd6+GLwoYvrT2oaQMJAiV
-         RPHN4MloG70/ixkk+cZhNOEeeY3zKbm1A92qDgJ/Nn2wqfTPY1dhvm58pX9AIGj8Q8ts
-         Qd3pvn83idlCOvH42XF1IkOKiNEdqySGrHZtOaJx5ehzeEIelkzS8o5H2efC52dQbiOY
-         nhidAsuET4MUNmD4r020PB12PBpY4u5YNesv7GM+LAMvyp0fCOx/QcM9EqMTQH2ilZ1B
-         pWbZ1EkPp/aaCKzlVq1hwUocU8kRD8zOVfh4MpoTciRXaAN7BL7O5SgqtiWMt4/8sXYl
-         tQxA==
-X-Forwarded-Encrypted: i=1; AJvYcCVP9i6lRPRQaVKgyyb7PMCDOpgbs2A2iVeNwrkwsAYxCvQ764oOIdwWVR1tU0QfoLTzdWmG9js=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxzx+NKRj2v10IWkve5yiKkkQCWnlb4pje5wUTWaB8dbJ0zpugg
-	cGDeEau1IVPNcwTweP36FFKMt1MJ9lnmAnOpwBaBAUUmkSITZFqLuV6U
-X-Gm-Gg: ATEYQzzI8+pm9i8xNW1KdteqyXeMEaPMy7RCgJ/+OdadXKc6c+irZpFToWiwu71A3/z
-	8ss/VMxPV5GW8ATVO/1LZ2J6cPC9LdFv3EbCdAbDkKt2A2AZRHlfOOFijRVPvptJxLODlbpT5lQ
-	gPcr4ijywZ0J4xrY4Ukn8I7eAkUW12NYA0++FOM0sV+7kU58KdDUubKw4Y3KFagJIV7ubVNmnyj
-	X4TaJX0sDeZWEj0BA7PZFEJ43ahbxaVSGTE7D/roABCEt0Hd8LSAzbF6wq6Ui3tiH4m5xWG2bt9
-	98kjHGJwBe7n68lT+wxxArJEJ/6aIJd2bIwHhgqfI7eQmlDfB2tDpAhUdgNPGNKuf8qrWn1ywK9
-	nYSvlbLOKjxvBUISrEqOaiQWfKpHfdLjmjRSlZ7MfiRQkPUV8xUUg1hjERzUPEz5lAIqVvyjOJz
-	guPHz7/2KBlR1qTKruM4jisWMy/1L7UaXdVm6KtodHs0Gyxbb6r4WeoK67
-X-Received: by 2002:a05:7022:f102:b0:11d:fd26:234e with SMTP id a92af1059eb24-12ab28cdebbmr4140608c88.16.1774725182824;
-        Sat, 28 Mar 2026 12:13:02 -0700 (PDT)
-Received: from localhost (static-23-234-93-211.cust.tzulo.com. [23.234.93.211])
-        by smtp.gmail.com with UTF8SMTPSA id a92af1059eb24-12abbe21787sm2071517c88.11.2026.03.28.12.13.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 28 Mar 2026 12:13:02 -0700 (PDT)
-From: Sam Edwards <cfsworks@gmail.com>
-X-Google-Original-From: Sam Edwards <CFSworks@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7FE13033DF;
+	Sat, 28 Mar 2026 19:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.72
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774725630; cv=fail; b=Q58XCzr1M6DKvg+S0RGHoLlCZ3GH1pdNapzR0/qT7mUUVLhCmYDQGpFrb1f5J1SFbOFiLxa5JaupWNPYGVlF7zIpr+P3dUobf6JJ8NkxOeWc/pyl8RxOVCUUxNnbTV0wBcxNWvzqdOpBBFgsp5Y5U+e0LX/V7e5beBR7m8nunjw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774725630; c=relaxed/simple;
+	bh=uRTBTgQi2EWKFOb+CzSK6i3o+uniSMPiC0ikbORWf8E=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=aO+hm1iYbsSHTqO3oIrTyF/vgBi9bOhCOw795H+gJs/GVA/iFowEru5d0N/uD3i54tfBpCkRMUNNkvym2+RpgKKxckGyoyYd3dvkAkcfnb4BkGc0RjImJAXWHpWeUtEXD3JyVpLvnm0m7VGGI+cyp00AG9nS1GhMkMkDWdTj7P0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bridgetech.tv; spf=pass smtp.mailfrom=bridgetech.tv; dkim=pass (2048-bit key) header.d=bridgetech.tv header.i=@bridgetech.tv header.b=Br21SBn7; arc=fail smtp.client-ip=40.107.162.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bridgetech.tv
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bridgetech.tv
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fttbbmrWy7YDgk4IleyIravTFmfWtrvNNtn8hqzsw5oXDq3Q08ckhNWniC5JlJzf97HY50eYYs8S9rpD3DEWAGVmNtUloCUvV3iGKKBTa6lvD9HKmu9Wn+lvunZ2uf2Xnq+5PFRtrZdSBANyYStGdzRSZDa3+lm30EOlBB9nCvlOPJ1v0LbdySdyhbqYMKU6fBU8xqlMUxmD3bDthj6A1UrukfoxUXarmDe2Ah5Jr5YSP22MaOSvIoNMTvPbHXFQoXFWcNzRHpYaNVZmE49Qtc1ytruRVBt4NN49ewHNhF95okHl+SH22gMzuXKLKzr8a/0FJeKrhm3Ve7evXUfDmA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4dqpQ5mQDH2EE1ot5vbiA2Lpv6pyLgV5ToZGdIycKmE=;
+ b=WL//MkvwJTnnmkgHd46iyjT2GVfKhoMEC193O1AHUsNZzUztgbjLB4S3Ks20zaabowOd5Z1O21foZ7PSWo4KP/iTLe1PQXvc5qrQymJlEnhP8Au/1Xv1jog+qXKADNccixJg1FqwvcNB0idW+2JXphc/YVk795VBGD7F6Vcav/hsIGEwfleAUjzG0lvHN+FFh+G/+IcHw0R+vbb1W65ecO4tlH2tRE1DnNGHAHEMdP4zCpRn7Sph209iWmaC+ukwapBWyDhFULagnZyMf0Fer3xhS8wqVHLFhIY8jfQZmZJeb/176iEtoGR61rDLLouVHZP4YgzL/tbFN1irM6rbNg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bridgetech.tv; dmarc=pass action=none
+ header.from=bridgetech.tv; dkim=pass header.d=bridgetech.tv; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bridgetech.tv;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4dqpQ5mQDH2EE1ot5vbiA2Lpv6pyLgV5ToZGdIycKmE=;
+ b=Br21SBn7fFa7Ce9P5RxerbH+3uCFQI9eQI5MSiek+o0xwVq1A9F2obSiNyDSWa43NwvhSJZFPIxhjfRYWrLO3uZWfI/Ukq3wQofO/z08+CpIVA18ZdyLgKsVcKBDWSndysnbYGIU6KaCuB4NifvSMMlShLBTM7Tljjl/2fnVMG7ZM0/H6CfsL0zk3zAG/7KQLuw7QNUgpHxRyiX+QXm63cgnGlWDYNwbeO9Mv34BBzlDyzboqsctsHlEAubfwbsD+aqg9tMp1p+tbVcKeuwRYPBhp43aky5fhk8DUB1jYyP0d2EmeJ1hjckCEgVbbhn1KGwl0f+E2vI3oZSLgnNqaA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=bridgetech.tv;
+Received: from AS1PR08MB7611.eurprd08.prod.outlook.com (2603:10a6:20b:476::6)
+ by AS8PR08MB6485.eurprd08.prod.outlook.com (2603:10a6:20b:318::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.25; Sat, 28 Mar
+ 2026 19:20:25 +0000
+Received: from AS1PR08MB7611.eurprd08.prod.outlook.com
+ ([fe80::8c65:fe4e:ea79:bbb4]) by AS1PR08MB7611.eurprd08.prod.outlook.com
+ ([fe80::8c65:fe4e:ea79:bbb4%4]) with mapi id 15.20.9745.019; Sat, 28 Mar 2026
+ 19:20:25 +0000
+From: kenneth@bridgetech.tv
+To: Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Baruch Siach <baruch@tkos.co.il>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Yevgeny Kliteynik <kliteyn@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>,
 	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
+	linux-rdma@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Sam Edwards <CFSworks@gmail.com>,
+	Kenneth Klette Jonassen <kenneth@bridgetech.tv>,
 	stable@vger.kernel.org
-Subject: [PATCH v3 2/2] net: stmmac: Prevent indefinite RX stall on buffer exhaustion
-Date: Sat, 28 Mar 2026 12:12:33 -0700
-Message-ID: <20260328191233.519950-3-CFSworks@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260328191233.519950-1-CFSworks@gmail.com>
-References: <20260328191233.519950-1-CFSworks@gmail.com>
+Subject: [PATCH net] net/mlx5: fs, fix invalid pointer dereference in mlx5_fs_add_rule tracepoint
+Date: Sat, 28 Mar 2026 20:20:08 +0100
+Message-ID: <20260328192008.3525475-1-kenneth@bridgetech.tv>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: OS6P279CA0016.NORP279.PROD.OUTLOOK.COM
+ (2603:10a6:e10:33::6) To AS1PR08MB7611.eurprd08.prod.outlook.com
+ (2603:10a6:20b:476::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS1PR08MB7611:EE_|AS8PR08MB6485:EE_
+X-MS-Office365-Filtering-Correlation-Id: 644c9dad-dd0a-4b36-9cbb-08de8cff1055
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|52116014|7416014|10070799003|376014|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	ybhZY5TYCJnVC31BB/5/wZ2Sz/5BRikhsBnAfPlHwTmlOUetlLeQ0cE0Yk0yf8MH4xqsaD67nXHJ9eYia7WcY4Uu7S58jBfET7eZbS5rR9+z9xo3Tp/ado8mSEPSLBlMttO5DmIwHwrx7i/Neyn9c3V24jcddst8MqltG1Jymz6g9cyHCkYxR5zNsqP6iBe63/Rf7nZ5N5GhyRiixXxIolsRDE/A+fIOC6mWzXLe+TnNCqAY1nqRmfGhKz+nmSaHQeAcRsVM7wka+vmhwh2igaYdTxwO/5b/hHFPBuaUHCZCI0yL6F+nqm7aWuBPB+0AH0RuwUyhtCh1E7R2qa2souhrfVC/mBjjoxiidS3fekGhDkecODUlBqTPLFh+1Jrna8Fp2/TsekLmOc2BrXDfxj100tYgB5HIkLUd+H9BJEHDzmBVW+U9U6k1r5S/nmufZ81zxZqA873LwSMxe3yOz71iIV156fDISxD1VaFcdieLn8cRbY3DJKi4BwPIsIx0yk/FKfKAD13EU45sW2rEtSK9CvN0wHpr+CZEeZZwB9pER6zcOBzf23CmjXRuu5SxCqgEn3JDPFIbzO9F3cIHv0AX5bfPcVXXPgYNFYnPxySBCffQ9104t44BlDIw5JhuReZ+0R+2WZLvbcG8zC+sh8d1EOB02dUo6Fy31mkyeXaqYtakTWbj7v7v3EhRMD7m
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS1PR08MB7611.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(52116014)(7416014)(10070799003)(376014)(56012099003)(18002099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?a1r0iFrIPIitG5+866XtYsp+QbtTtr51P+sfldW1pEtU4Nc6bJObQr/bFS23?=
+ =?us-ascii?Q?afYMNh1IagMBXPsBILuEsCUMcr1cRO4mXzOsi4g0Ejd3vk6kBUuyj+Q6TYDc?=
+ =?us-ascii?Q?Lto7e7QVqS0XokHBBF4hS7Pcz6NK/1Dt8vVU9Aelp3pZtPrHNX6PIvJJ7IDW?=
+ =?us-ascii?Q?vU6CNpSiJhr52nL3LiO9zBJpgHGlKz9rS9bCCOHbZX+6XW1x37ELxAffLSxq?=
+ =?us-ascii?Q?lm0jJPFnFwPiL7v7Gxg21cPczHUACv0MTeHeEsnG7E44Vo3T5MHoFxpV0Ngw?=
+ =?us-ascii?Q?fmHp6I03loSgCJf9RQI1pyLcxjhFwEL01otAI/VP3N5uH0vrD+kp2eMd3KdL?=
+ =?us-ascii?Q?xdEkIOvcoppQMnzWWesgHp0AfYOYV94brpfYR1m1IkSHyC1XMIUf81dRe5PV?=
+ =?us-ascii?Q?zAiBS6luXym+J08VFayWoYnmzH2cX6VVwND7l797OwHAxuTMsZsKki9vxoJg?=
+ =?us-ascii?Q?oc568NScqwM7z5qVt5NDQGxNt+s0iq5UHjATn3FVxDoH3TMI3phTWRO1DRWP?=
+ =?us-ascii?Q?4ZvxNnPzMd3Xr9hl3cgDaWBxGo9RkMpt1wv/PPFg0bGv0BNoq3l3wq6a/fq3?=
+ =?us-ascii?Q?j1Z33hFLPcPZaQOgOGbGQF7yQuVF+mTlpdYbHqTproiU0keF3DhAQb9WjM5g?=
+ =?us-ascii?Q?fnluKx/MUecUI4QLmaa+UapYPOl+fyK6MeoU3zAQqkun27t/N5wpNS+iAE+t?=
+ =?us-ascii?Q?9yIuB+0uWyulztFKOKMs38CJwdK8pzK55vo3+KkUFw/AXuWLoRkr0a6Z0bBb?=
+ =?us-ascii?Q?AAmVQxrLh5e3KlZsRMzzkDCC8tLEc2DZ82Qn3SFxxOa/HRwbRENekILJt4/h?=
+ =?us-ascii?Q?ntkfp0Twx49n8tTnwwDo7/t0MCU09JVhUCluQ92WdaElQHipPzaVDXgrIHK3?=
+ =?us-ascii?Q?5WyDk0SwcnDHAxcvqk1yV6iRoKEk1LNnw0D0gUYW14uoaWElud0bsqFfLV1t?=
+ =?us-ascii?Q?BWcMEiHq7Z95/7Cr+/LvqUs+tj7PUg/NOPVi9JHX0hcgUOmZaP4YYaFphYnj?=
+ =?us-ascii?Q?N7C/7Sn3QKANznFCOWTSkG1oQaYI3oZeJMMGXif+8SlkMarXW8Zzv4qEECIX?=
+ =?us-ascii?Q?iNRZKuW0cPMDRyMeILA65NGbWGS+EB7rh+ruGy4qHZ8n9QMPyDZu7R02AjnC?=
+ =?us-ascii?Q?6JjGnrkQxXQh9FT9HJXxRIcuFKR/rUxInCfHMTbSwlrz7mkPXD523eLX5sAc?=
+ =?us-ascii?Q?V1XcGF5Sh+xa22gDB9v6RSNhJs7Lgf1rqPL6utHzqWmid9VvW29HTtN09vuF?=
+ =?us-ascii?Q?92iegC/iV3Ty7/R/2S8RDOr5sHXM5KYXNNaHKeQU7JaByQI05DdJvayKm/1f?=
+ =?us-ascii?Q?VCAEUmEi54C1OcHU6ewijrPrcst5l7US54oMUTdfE6GYStx1R0oNPL2akm7s?=
+ =?us-ascii?Q?0nMl/vM0p+ECGixFOWoWZNTb1SssXQWjJHjGKay8CmqX7/JdmNoQcMJv8Vkw?=
+ =?us-ascii?Q?pnF0oXTzAA6nT7qjgbgI8GtmkGpcK5cuyVv7DztWTBQaN/UavA3pOYTGDX9T?=
+ =?us-ascii?Q?M1jK9emA0jofAZr07pHkR1e0E4uqeOQZPdpNIuafMIpO5rZKUfa44IC8A/aq?=
+ =?us-ascii?Q?3zzErYF5tdrC4aX1tNKtVGtGghfz8CPDbqaKdEi4FyO1amvGeDFSzseCGi52?=
+ =?us-ascii?Q?QmWP+ob1FrId6e0ZEPcalE/w9WlUiae4gFnMnKw/4ja4nAnxGD1vZxvHB8p3?=
+ =?us-ascii?Q?S2o8lr7VMT/ua92nhqzG5zQqlKEnMLEUibMJPZpqGiWBKKxuRqFY4O5IYoCy?=
+ =?us-ascii?Q?XwpjWyxs4PFS7uBGhL/FgSlhCzI+I2JEKxZ5qaxVGVyDXbyLbXKgL+80qdnD?=
+X-MS-Exchange-AntiSpam-MessageData-1: jn+qM6fBcdfvBS3aVCabl9G7XpMAkP4L5aM=
+X-OriginatorOrg: bridgetech.tv
+X-MS-Exchange-CrossTenant-Network-Message-Id: 644c9dad-dd0a-4b36-9cbb-08de8cff1055
+X-MS-Exchange-CrossTenant-AuthSource: AS1PR08MB7611.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Mar 2026 19:20:25.5527
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 511b9776-65d2-4726-b5bc-af4fc772381e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vNzZlZcd7RNn1KAGc5hrQVYjjwy1vhxoSjbUWwPVSnas3J9FYXXY4DNKowe2eMLL+vVBAXuZyhUm0bfczrXsiWJ5L6rxEu6PMo3tCSCZCy8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB6485
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[bridgetech.tv,quarantine];
+	R_DKIM_ALLOW(-0.20)[bridgetech.tv:s=selector1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272808-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-272809-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,renesas.com,nxp.com,tkos.co.il,st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cfsworks@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,kernel];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kenneth@bridgetech.tv,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[bridgetech.tv:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FROM_NO_DN(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4163B34FBDA
+X-Rspamd-Queue-Id: D718234FC90
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The stmmac driver handles interrupts in the usual NAPI way: an interrupt
-arrives, the NAPI instance is scheduled and interrupts are masked, and
-the actual work occurs in the NAPI polling function. Once no further
-work remains, interrupts are unmasked and the NAPI instance is put to
-sleep to await a future interrupt. In the receive case, the MAC only
-sends the interrupt when a DMA operation completes; thus the driver must
-make sure a usable RX DMA descriptor exists before expecting a future
-interrupt.
+From: Kenneth Klette Jonassen <kenneth@bridgetech.tv>
 
-The main receive loop in stmmac_rx() exits under one of 3 conditions:
-1) It encounters a DMA descriptor with OWN=1, indicating that no further
-   pending data exists. The MAC will use this descriptor for the next
-   RX DMA operation, so the driver can expect a future interrupt.
-2) It exhausts the NAPI budget. In this case, the driver doesn't know
-   whether the MAC has any usable DMA descriptors. But when the driver
-   consumes its full budget, that signals NAPI to keep polling, so the
-   question is moot.
-3) It runs out of (non-dirty) descriptors in the RX ring. In this case,
-   the MAC will only have a usable descriptor if stmmac_rx_refill()
-   succeeds (at least partially).
+The mlx5_fs_add_rule tracepoint has used the flow destination type in
+a bitwise test since its introduction. However, that's not a valid way
+to treat it anymore (if it ever was), and after commit d639af621600dc
+("net/mlx5: fs, split software and IFC flow destination definitions"),
+this mismatch caused nearly any destination type to be mistaken as a
+flow counter, and thus stashing 32 bits of the mlx5_flow_destination
+union into the counter_id field of the tracepoint.
 
-Currently, stmmac_rx() lacks any check against scenario #3 and
-stmmac_rx_refill() failing: it will stop NAPI polling and unmask
-interrupts to await an interrupt that will never arrive, stalling the
-receive pipeline indefinitely.
+Later commit 95f68e06b41b9e ("net/mlx5: fs, add counter object to flow
+destination") exacerbates this issue by converting the counter union
+member from an integer to a pointer. Now the tracepoint dereferences
+whichever value is in the union, and in cases where that's not a valid
+pointer, it can lead to a kernel oops.
 
-Fix this by checking stmmac_rx_dirty(): it will return 0 if
-stmmac_rx_refill() fully succeeded and we can safely await an interrupt.
-Any nonzero value means some allocations failed, in which case we risk
-dropping frames if a large traffic burst exhausts the surviving
-non-dirties. Therefore, simply return the full budget (to keep polling)
-until all allocations succeed.
+Fix the check. Reported by GitHub user whi71800.
 
-Fixes: 47dd7a540b8a ("net: add support for STMicroelectronics Ethernet controllers.")
 Cc: stable@vger.kernel.org
-Signed-off-by: Sam Edwards <CFSworks@gmail.com>
+Fixes: 95f68e06b41b9e ("net/mlx5: fs, add counter object to flow destination")
+Closes: https://github.com/knneth/mlnx-ofa_kernel/issues/1
+Signed-off-by: Kenneth Klette Jonassen <kenneth@bridgetech.tv>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/net/ethernet/mellanox/mlx5/core/diag/fs_tracepoint.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index f98b070073c0..81f764352f3d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -5604,6 +5604,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
- 	unsigned int desc_size;
- 	struct sk_buff *skb = NULL;
- 	struct stmmac_xdp_buff ctx;
-+	int budget = limit;
- 	int xdp_status = 0;
- 	int bufsz;
- 
-@@ -5870,6 +5871,10 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
- 	priv->xstats.rx_dropped += rx_dropped;
- 	priv->xstats.rx_errors += rx_errors;
- 
-+	/* If stmmac_rx_refill() failed, keep trying until it doesn't. */
-+	if (unlikely(stmmac_rx_dirty(priv, queue) > 0))
-+		return budget;
-+
- 	return count;
- }
- 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/diag/fs_tracepoint.h b/drivers/net/ethernet/mellanox/mlx5/core/diag/fs_tracepoint.h
+index d6e736c1fb24..b099fe71b781 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/diag/fs_tracepoint.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/diag/fs_tracepoint.h
+@@ -289,7 +289,7 @@ TRACE_EVENT(mlx5_fs_add_rule,
+ 			   memcpy(__entry->destination,
+ 				  &rule->dest_attr,
+ 				  sizeof(__entry->destination));
+-			   if (rule->dest_attr.type &
++			   if (rule->dest_attr.type ==
+ 			       MLX5_FLOW_DESTINATION_TYPE_COUNTER)
+ 				__entry->counter_id =
+ 					mlx5_fc_id(rule->dest_attr.counter);
 -- 
-2.52.0
+2.43.0
 
 
