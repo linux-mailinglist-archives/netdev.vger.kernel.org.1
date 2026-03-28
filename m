@@ -1,199 +1,247 @@
-Return-Path: <netdev+bounces-272815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272816-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id pjzBDps0yGnaiAUAu9opvQ
-	(envelope-from <netdev+bounces-272815-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 21:05:47 +0100
+	id xNH8JUE1yGn/iAUAu9opvQ
+	(envelope-from <netdev+bounces-272816-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 21:08:33 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8192C34FE55
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 21:05:46 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13E0734FE6E
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 21:08:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0F9CA306707A
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 20:03:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 80A22300C5AE
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 20:06:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53FF33CE92;
-	Sat, 28 Mar 2026 20:03:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B39330D2F;
+	Sat, 28 Mar 2026 20:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=3e8.eu header.i=@3e8.eu header.b="F9Bh3rrs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MTYzXAN4";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="fLugGFVT"
 X-Original-To: netdev@vger.kernel.org
-Received: from srv4.3e8.eu (srv4.3e8.eu [193.25.101.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B5233F369;
-	Sat, 28 Mar 2026 20:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.25.101.238
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DCBEEEB3
+	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 20:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774728202; cv=none; b=pCjjW8lsZzP4kID0CbzbGfoRXDiWdjV7BvSR+WPuihvQ5cnwzNk/4WRnzljV94J3lqTjwQi3I15+dTxWpOU/RTxDn35464l/qTNjCZfqh8Ybe/u1VJTuZPet2//YeaNrW7BFpYj2ae8cbSMiZ7VUiG1Ave1A6s1p0NwTYd7sUlA=
+	t=1774728416; cv=none; b=nKvqqyThD5tr01Br/MHd/09K4pHao0fI+9EfLIuojKhWEtrzESz74b/IraXe+9tNMzLBVKrQN9GPaQG3/Zgf+ZtbUKxiieN5FycLxBbjD3Olo042gXIH650oAomuM5fG1gvK732hmRvI8wQ95kX4aZSjKq9Xu95M2D9ceEBvjks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774728202; c=relaxed/simple;
-	bh=LOSMQgslP4TrtJFgfUffaAG45tS6CyTkAR0ssvy7MXQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NLgk5nmjcXheAsZMD9dheKobfiBVqe+OLo+45HGC/yXToRvilMhx0e5bEvBhdlJhVxdBnCtVPQPJxJdUDttD6uCPiLku8VD9KHjvjVDk67iAAjOrICeW8EwDsztpFPU2cpQiSyRBeRSBHjONKMT5iqEj7/QNOV/pXCHBj9zEn+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=3e8.eu; spf=pass smtp.mailfrom=3e8.eu; dkim=pass (2048-bit key) header.d=3e8.eu header.i=@3e8.eu header.b=F9Bh3rrs; arc=none smtp.client-ip=193.25.101.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=3e8.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=3e8.eu
-Received: from [IPV6:2003:ed:4701:bfa0:9bcb:9dce:e3f7:b116] (p200300ed4701bfa09bcb9dcee3f7b116.dip0.t-ipconnect.de [IPv6:2003:ed:4701:bfa0:9bcb:9dce:e3f7:b116])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by srv4.3e8.eu (Postfix) with ESMTPSA id C7BE0402E1;
-	Sat, 28 Mar 2026 21:02:35 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=3e8.eu; s=mail20211217;
-	t=1774728156;
+	s=arc-20240116; t=1774728416; c=relaxed/simple;
+	bh=bGOadoblnU96HDigSkK7llNOmUI4XGEi05y/xucO2Fc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pfTVU4YyEjafhCPewejc4cWFcky+hU/snFhZp1Lanigp5BDEskLiFqxdBq0O9V3t+sfNeWmbgcTMLrR1UaSpRUnp7IOfrwm8tiWgV89dcWp0Y1meCnMzpv2JUw67Nio9ieQIKcUvswA+zezePHk8wm3yn/ASBmMAkgSs0vZ62so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MTYzXAN4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=fLugGFVT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774728413;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HxCBC5AKAsQBm+nqKl27GCFO5qEFiMFsQvR5c0kAdZg=;
-	b=F9Bh3rrsPgMhlS4re3BifLcycdAC/4aiaTH7rXBm+oz8LZvBbA50szAPPQZSomkXnbeZv1
-	Mw3Thl4775pzSZOkDkIsTNpug+9vx5gzlIRBiwShbl6wCJIG26pKjRAAwASqvZkyrHG5fM
-	unhUoWEX879fGvYUjH7PPXhKhzjVAojbOv24lBvr+1zlfOCEfWdjaDk6+pqGnOxcHFI8rJ
-	MU7KiZK5PFFM3XAUWryI9Pb+Z6oj7auAomAuJpBUpFgoN5wzm4TdqyvRvrgXai+aaUuyUY
-	Zh3JrU4X6bCLcumspKgyqNLuJ8OGMpc2qi1gGYt27FAG9AiWAtNQ5gJTTwD7yA==
-Message-ID: <58089a15-61e4-4899-b74f-2f5a495a206c@3e8.eu>
-Date: Sat, 28 Mar 2026 21:02:34 +0100
+	 in-reply-to:in-reply-to:references:references;
+	bh=8LloPA85Nqff5cq7+bKoEOXpAMWpx0zeVTOibPMT674=;
+	b=MTYzXAN40+8RjQuokGZe+V48UI9Riwa2LFcppkXox6TT/2q9UQv7BM58Sg46d1ZN9u7HgR
+	JzfayL7v0V56IR0Vec7NhADF4WS9gnax020P+jvZmd5k4jhFhqPKp1rGuWn3Erx5wIYC/T
+	XAcMqT+pXXwb1f1h/9eRqHms/BpqHyw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-14-RXcrmgxJNUSKLUlOnc8O6g-1; Sat, 28 Mar 2026 16:06:52 -0400
+X-MC-Unique: RXcrmgxJNUSKLUlOnc8O6g-1
+X-Mimecast-MFC-AGG-ID: RXcrmgxJNUSKLUlOnc8O6g_1774728411
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48532df52c5so29669635e9.1
+        for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 13:06:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1774728411; x=1775333211; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8LloPA85Nqff5cq7+bKoEOXpAMWpx0zeVTOibPMT674=;
+        b=fLugGFVTPmqMjrHUcXHLJCcCCTAeO9QV9IxhRdP8mLlHQDNabHuokQuIHWooxBrwwd
+         rICjpoSq4SsdYjTBw95WgVy1R2/dvLaIndVbeKia6zN8M7iV4TLQlPCu0fO6Hyg6MmfF
+         4kLVtyg74OtZaGZINozm1JkSrW6nibsieqfnyYlmlWM52TysHrKPYSLNxERLWvVy9bbB
+         e2Dpu77B/zgomBG2CAUJruS2O46FQPvmIcYsX5i0LLWx/ZCBFF3pBQv0zZ5/kouZMaXm
+         5rJl/DyEu2YBh2vSp7VG/IPGlbJYEuqhOHtNuZtqOpX/Piy9vLjar7hBKrnxaAwnsliI
+         ie5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774728411; x=1775333211;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8LloPA85Nqff5cq7+bKoEOXpAMWpx0zeVTOibPMT674=;
+        b=EC9bE+vBP9gOeeCNPjkL5QamihhsueXRySydBO2DDxhUdcoztBHJJXN61RbVN7F3XG
+         4UAmgmp4Jz0FT29lgAX61xfPyoEc6Dh/t7LQNnDIFKn2MfAKXomUeXJi3pk73dz2QGrw
+         YVQmHe/ovYr/5+re0hKgCrIxM4WiQI3cP6yItbFGBhz3velTxOoiau0+nqPLaNqeEUX7
+         IT1zTaJbA6coXP0EAPsPeT0+tlqoPAMDqdjdxWLwh3WC3u8Su4RHKgYQL6iBN2nMQ9zX
+         JjHBsGSDp0TyGVCeewVRLNEKzBGNlljrDCByzmWH1j2akOokKip12SZ9GOaWvXgHeIka
+         lBSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVfbmTpdAkSsQJhxyvm36GN5Su6QV0tYAbhCnsNygls6W5W3O9pNp6C0B2/AbxKN88c13nYJtI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXq3FK5D2nI4y4OVcBO8q8PKG5PyYaVtpAom2S4KfM/cIZMSza
+	ipi5lb9H83m5uF/qCV6/5nQ+YeHT28ODjMj+DnB1OBvM333WyzgnNUVKrVdLFTXvjlqUJ6uNtyl
+	ndcyASBiC+0qMa+cJccNuPa65Eo966DZ6o+MWPuQjpCxNLVONyX4fapblWg==
+X-Gm-Gg: ATEYQzwnPQ6c+kEBpt/xX5JhNUYtamq3JQFjIHjFUjYPtLFvyXh3NKw7V74KaPHTEZl
+	+QHMItOxp3fWA1cpPFTvYOoZPV3Ng3vVlJn3U4Mk/O4Fp1pSHF+3ZaUY6GR14HZhWlnkB4avf8+
+	9m2at4w32bTn+4RHVkIghuwlbmviFnRa0O3oT+kDAiPwLvpBxVKNmyqcW/SBRZfQuSHGgMh+COM
+	rTGugHR56yQ4cAvz/ca6Fghg8d5khCTJ3QIl3zy9MjcBoejbZqncbLuiKr1Mc6WJ4rCX+sk6f68
+	Tmf58cEHmsdDmhE8SMChxqKgAhibVE0LyBEidkIxkAZOJVm6wETjA3G2UrXl3Mcj2UtLzurRZpa
+	164iJ7TVmx7LcA0JJInA/5hY0sk4Xkre7TkmeEcJDW15apw==
+X-Received: by 2002:a05:600c:828a:b0:487:338:b4df with SMTP id 5b1f17b1804b1-48727d8818cmr110534005e9.15.1774728410544;
+        Sat, 28 Mar 2026 13:06:50 -0700 (PDT)
+X-Received: by 2002:a05:600c:828a:b0:487:338:b4df with SMTP id 5b1f17b1804b1-48727d8818cmr110533625e9.15.1774728409957;
+        Sat, 28 Mar 2026 13:06:49 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48722d23679sm321974575e9.9.2026.03.28.13.06.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Mar 2026 13:06:49 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 0BF395FF9A5; Sat, 28 Mar 2026 21:06:48 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jonas =?utf-8?Q?K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>, Jesper
+ Dangaard Brouer
+ <hawk@kernel.org>, netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jhs@mojatatu.com,
+ jiri@resnulli.us, kernel-team@cloudflare.com, Chris Arges
+ <chris.arges@gmail.com>, Mike Freemon <mike.freemon@cloudflare.com>
+Subject: Re: [PATCH net-next 0/5] veth: add Byte Queue Limits (BQL) support
+In-Reply-To: <7d404bd3-4444-464e-8831-c8304ecf5b40@tu-berlin.de>
+References: <20260324174719.1224337-1-hawk@kernel.org>
+ <87h5q1d2j9.fsf@toke.dk> <7f00346d-5dc6-421b-8d61-75c1c3898c30@kernel.org>
+ <7d404bd3-4444-464e-8831-c8304ecf5b40@tu-berlin.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Sat, 28 Mar 2026 21:06:48 +0100
+Message-ID: <87bjg7d8h3.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: sfp: add quirk for ZOERAX SFP-2.5G-T
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260325164034.1542787-1-jan@3e8.eu>
- <20260327205020.1c020731@kernel.org>
-Content-Language: en-US
-From: Jan Hoffmann <jan@3e8.eu>
-Autocrypt: addr=jan@3e8.eu; keydata=
- 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
- AqNjQxfojjo=
-In-Reply-To: <20260327205020.1c020731@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.07 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[3e8.eu,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[3e8.eu:s=mail20211217];
+	R_MIXED_CHARSET(0.59)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-272816-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,resnulli.us,cloudflare.com,gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tu-berlin.de:email,toke.dk:mid];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-272815-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[3e8.eu:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jan@3e8.eu,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[toke@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[3e8.eu:dkim,3e8.eu:email,3e8.eu:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8192C34FE55
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 13E0734FE6E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-03-28 at 04:50, Jakub Kicinski wrote:
-> On Wed, 25 Mar 2026 17:35:58 +0100 Jan Hoffmann wrote:
->> This is a 2.5G copper module which appears to be based on a Motorcomm
->> YT8821 PHY. There doesn't seem to be a usable way to to access the PHY
->> (I2C address 0x56 provides only read-only C22 access, and Rollball is
->> also not working).
->>
->> The module does not report the correct extended compliance code for
->> 2.5GBase-T, and instead claims to support SONET OC-48 and Fibre Channel:
->>
->>    Identifier          : 0x03 (SFP)
->>    Extended identifier : 0x04 (GBIC/SFP defined by 2-wire interface ID)
->>    Connector           : 0x07 (LC)
->>    Transceiver codes   : 0x00 0x01 0x00 0x00 0x40 0x40 0x04 0x00 0x00
->>    Transceiver type    : FC: Multimode, 50um (M5)
->>    Encoding            : 0x05 (SONET Scrambled)
->>    BR Nominal          : 2500MBd
->>
->> Despite this, the kernel still sets 2500Base-X as interface mode based
->> on the (incorrect) nominal signaling rate.
->>
->> However, it is also necessary to disable auto-negotiation for the module
->> to actually work. Thus, create a SFP quirk to do this.
->>
->> Signed-off-by: Jan Hoffmann <jan@3e8.eu>
->> ---
->> Note: I'm not quite sure "sfp_quirk_disable_autoneg" is enough here, or
->> if it would be appropriate to use the full "sfp_quirk_oem_2_5g" quirk
->> due to the not really correct compliance code / nominal signaling rate.
-> 
-> I'm no SFP expert but just going by the naming I strongly suspect that
-> the module is the same hardware as "SFP-2.5G-T" from "FS", so keeping
-> quirks consistent makes sense?
-Based on commit e27aca3760c0 ("net: sfp: enhance quirk for Fibrestore 
-2.5G copper SFP module"), the FS module uses an RTL8221B PHY, so it is 
-different hardware. And it also supports the Rollball protocol for PHY 
-access, unlike this Zoerax module.
+Jonas K=C3=B6ppeler <j.koeppeler@tu-berlin.de> writes:
 
- From the existing quirks, the only valid alternative I see for the 
-Zoerax module would be "sfp_quirk_oem_2_5g" (which also sets the 
-additional bits for 2500Base-T link mode and explicitly enables 
-2500Base-X interface mode). But as that is not strictly necessary for 
-making this particular module work, I am unsure if using this quirk 
-would be appropriate.
+> On 3/27/26 13:49, Jesper Dangaard Brouer wrote:
+>>
+>>
+>> On 27/03/2026 10.50, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>>> hawk@kernel.org writes:
+>>>
+>>>> From: Jesper Dangaard Brouer <hawk@kernel.org>
+>>>>
+>>>> This series adds BQL (Byte Queue Limits) to the veth driver, reducing
+>>>> latency by dynamically limiting in-flight bytes in the ptr_ring and
+>>>> moving buffering into the qdisc where AQM algorithms can act on it.
+>>>>
+>>>> Problem:
+>>>> =C2=A0=C2=A0 veth's 256-entry ptr_ring acts as a "dark buffer" -- pack=
+ets queued
+>>>> =C2=A0=C2=A0 there are invisible to the qdisc's AQM.=C2=A0 Under load,=
+ the ring fills
+>>>> =C2=A0=C2=A0 completely (DRV_XOFF backpressure), adding up to 256 pack=
+ets of
+>>>> =C2=A0=C2=A0 unmanaged latency before the qdisc even sees congestion.
+>>>>
+>>>> Solution:
+>>>> =C2=A0=C2=A0 BQL (STACK_XOFF) dynamically limits in-flight bytes, stop=
+ping the
+>>>> =C2=A0=C2=A0 queue before the ring fills.=C2=A0 This keeps the ring sh=
+allow and pushes
+>>>> =C2=A0=C2=A0 excess packets into the qdisc, where sojourn-based AQM ca=
+n measure
+>>>> =C2=A0=C2=A0 and drop them.
+>>>
+>>> So one question here: Is *Byte* queue limits really the right thing for
+>>> veth? As you mention above, the ptr_ring is sized in a number of
+>>> packets. On a physical NIC, accounting bytes makes sense because there's
+>>> a fixed line rate, so bytes turn directly into latency.
+>>>
+>>> But on a veth device, the stack processing is per packet, and most
+>>> processing takes the same amount of time regardless of the size of the
+>>> packet (e.g., netfilter rules that operate on the skb only).
+>>>
+>>> So my worry would be that when you're accounting in bytes, if there's a
+>>> mix of big and small packets, you'd end up with the BQL algorithm
+>>> scaling to a "too large" value, which would allow a lot of small packets
+>>> to be queued up, adding extra latency (or even overflowing the ring
+>>> buffer if the ratio is large enough).
+>>>
+>>> Have you run any such experiments?=20
+>>
+>> Thank for bring this up.
+>> Yes, we have considered this (and agree).
+>>
+>> Jonas is conduction some experiments.
+>> I will let Jonas answer?
+> Hi,
+>
+> I used the provided selftest, modified so that the payload size alternates
+> between 1400 bytes and sizeof(struct pkt_hdr) =3D 24 bytes every 5000 pac=
+kets.
+>
+> The receiver was slowed down using 10K iptables rules. I could confirm th=
+at
+> the receive queue filled up to ~66 packets, whereas the BQL limit is arou=
+nd
+> 2884 bytes, corresponding to approximately 2 x 1400-byte packets.
+>
+> I compared two accounting strategies: using skb->len vs. a fixed size of =
+1.
+>
+> Ping results over 5 runs using skb->len accounting:
+>
+>  =C2=A0 rtt min/avg/max/mdev =3D 0.636/2.784/ 9.543/1.735 ms
+>  =C2=A0 rtt min/avg/max/mdev =3D 0.629/2.947/10.587/1.927 ms
+>  =C2=A0 rtt min/avg/max/mdev =3D 0.587/2.966/11.625/1.963 ms
+>  =C2=A0 rtt min/avg/max/mdev =3D 0.589/3.006/10.694/1.979 ms
+>
+> Ping results over 5 runs using fixed size (1) accounting:
+>
+>  =C2=A0 rtt min/avg/max/mdev =3D 0.587/2.446/6.261/1.065 ms
+>  =C2=A0 rtt min/avg/max/mdev =3D 0.641/2.339/6.008/0.950 ms
+>  =C2=A0 rtt min/avg/max/mdev =3D 0.688/2.527/5.506/1.086 ms
+>  =C2=A0 rtt min/avg/max/mdev =3D 0.596/2.411/5.228/1.041 ms
+>
+> The avg and max RTT are consistently lower with the fixed-size accounting.
+> This suggests that the excess buffered packets contribute to some
+> latency.
 
-Thanks,
-Jan
+Right, so this sounds like fixed-size accounting is the way to go, then.
+Cool :)
+
+-Toke
+
 
