@@ -1,205 +1,133 @@
-Return-Path: <netdev+bounces-272783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272770-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QEihJun4x2lMfQUAu9opvQ
-	(envelope-from <netdev+bounces-272783-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 16:51:05 +0100
+	id cDZQGJ3ix2lFeQUAu9opvQ
+	(envelope-from <netdev+bounces-272770-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 15:15:57 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35B3C34F00F
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 16:51:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1FB034EA45
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 15:15:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B25E2300F532
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 15:47:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F1C39301981F
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 14:15:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5007634C81F;
-	Sat, 28 Mar 2026 15:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2FC21B9DA;
+	Sat, 28 Mar 2026 14:15:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T2XeDzUe"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="I71qmciX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347A3237A4F
-	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 15:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA1FE55A;
+	Sat, 28 Mar 2026 14:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774712875; cv=none; b=WYApWI2J29hE1qrWQscA2/fPHUTSYyATfc6bLDex4csCJkGIpKlWVIg4ddH0hS3FdVxYVjt6QWoNaLIz6gUQ2w8+XjTsZKQTU0YriNCmXFjvtQ0Vougs5UDppHLbs4ZTcPoL6MRraHz12rL1q3RulXo2c9OT0hi4AlYdH0KJqCo=
+	t=1774707337; cv=none; b=BVG6k6/93Jpz+6gsyPQvhJ4EykcUylTuljqNeGVaXIGcjd3zrDypqclYYlVrNSWvpiu70WO3TE7IhJEajdi08DKP4WzmT1PcCouL5Tv5wAugKYHo/5fhYfW22Ns/qRUnys5tn2Oxr35a+TaFlzLuoF5NiRtbaqf3QJ3oA0amTEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774712875; c=relaxed/simple;
-	bh=Yev9UV/I8swSwv3LUCQDvu20G+cSD5KmPOhjN/tcxOo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CG8OhZygBvr6Z9Y5KebLN00s43mLNOkatK7qBpnHkf5XDyLh9sxFaPl5n1pzyTqW7AkeL7RScglOjPu/jjrZXbhS2/cpYsZatN7aeJw8Im56bsldLqu5Zrys5ag7F9i2gL1KyOca1+rB3BUNZ61Y3V+m1EkmvyIpiUiAuBeT0nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T2XeDzUe; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b9a0762ed5fso426719966b.1
-        for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 08:47:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774712871; x=1775317671; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3xnJLgLPDdJ1GsL2xUFaC/e6C6O7gdTvGVWbkMiWCSI=;
-        b=T2XeDzUetMb/Oa6zznFkTsRfaAupYKgCyHZGbCQJkWrh/4cf7bnjX3AbtbZFGfohHH
-         f6gcscfTFJNjx6bx72i1tA2NbhiqW6gjuPKjdsWLR4dSxwll1QLDdGEVwiOwyzsiu82D
-         zN+6JHhxQuopp04GimH0kmvA9Q7zhCAXV4BwU+CDIcPXNTckNBru9R1p/FbsGeTuVnUB
-         2yXW58Uo40ROd6ICilctH77kny/LcbsOOMA1V23MInydnnGRM4ARJ0WIiW+ydEkR91kx
-         SH5FNW/f4KOWC9MuVX6WgZP0ziZuCKdmGkpTQ/VVvpDpM3y5VHRsRZZekbZLja4yHbXK
-         B+9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774712871; x=1775317671;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3xnJLgLPDdJ1GsL2xUFaC/e6C6O7gdTvGVWbkMiWCSI=;
-        b=FpRhfFP91H4gcIoo09GiBcgqLTj65UGb4USNREsPGBzAG6VgMfnGfoG1YWbqg0o4EK
-         iasBz/Vvvq0X5fBho3QaozprX1aNVhgB45NuQmlkP6h7DgfWhOPFsoDcq9jztvIoVeQL
-         jFe7v6rCEZj3zvMGHoaG1ySW4Q1WFNUfbfJXuX4WBAMGqZNTa+hRXxR6eOky0KHEcs/x
-         dYBws0cFmFeTxP6Havu+z8fNnYoDiCpkgc4MesEMEwcYloqS6NiDOz9KZogSBitpyUla
-         Dtoz4YafSEg0hX/tiEDtTQ+L3jp074UbCIs6Pu18lqXvRCCXDpNZE+sfFhzRk0fvLdqt
-         cF4Q==
-X-Gm-Message-State: AOJu0YwGe6YanAjcxt8ExPp2YEMt+fCylKewMTykcDFQ35dIh/0LhseP
-	Tw1iTu7j3alpBwcYSQmFFI/WUwuhXBQlnNUpHsnOj1YtNs+dztMV8KzXfmsovL2q
-X-Gm-Gg: ATEYQzy7XtyEbILSSEiaib/ioWyiR+W622QeXN+iURIV8vPKeXlbNQDzvwxCVlD8mnw
-	KH68ZzqzECIV6llBvRsrbtAPLINggaGQJeYiWaI7CeNwkPYUrzB2sQyFkHz0zdvoLu3F+DIs+34
-	809d05Q5oigSwb1vwnAgcLaOvtd42pA91HYFh8c5YjmtnTEr9yEQsdc3PpIvlOsrSDumEylfYAs
-	2r8IllGh8eeClGa3LmnYcvmP/TzKa6svAf3YAhPvGhnrYsKLtZaK1y9Z1QIlzhUdIklcllI6g3O
-	/8cmK7HQS3mFDYG1Fyje7crXoCHrH6EQKGfvOSqZE6uFTMGbrOCznOxMpFQCY1ZHo/+LMShBhS6
-	p6hPKHSMpUDPqDpKVLHRkgGLI6unoJa1JYxXnma3p8ZOtD/ncf58Wq8jnzCCDTfo22620OoPgA3
-	twEIrX4fd0h1i8y8/LX8YipKcyhfwp7WU16fUFFVWRkYs1PcpLBx8Ldv2HWv+q2SkA8EKlkI2re
-	nzPw3t4kAQ=
-X-Received: by 2002:a05:6512:3b2c:b0:5a2:7b8b:8a80 with SMTP id 2adb3069b0e04-5a2abc3eedfmr1920106e87.3.1774705957433;
-        Sat, 28 Mar 2026 06:52:37 -0700 (PDT)
-Received: from pop-os.. ([2a02:2121:86b:dd40:8edb:ab33:1974:67a6])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a2b1456dffsm459537e87.70.2026.03.28.06.52.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Mar 2026 06:52:35 -0700 (PDT)
-From: Nikolaos Gkarlis <nickgarlis@gmail.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	nickgarlis@gmail.com,
-	kuniyu@google.com
-Subject: [PATCH net v3] rtnetlink: add missing netlink_ns_capable() check for peer netns
-Date: Sat, 28 Mar 2026 14:52:15 +0100
-Message-Id: <20260328135215.901879-1-nickgarlis@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1774707337; c=relaxed/simple;
+	bh=Z86EOurNTWz1a+nZzokKJ8hU47RVxzrhQCryff54TlI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EMzxDBARWluvpPj8L3aBBV22Y2oywnD5/QvUec6fDQF9IJZp3QLxhFdkpP+jvPcGBLL7kB8oiwhyu8WssDgoXb5dGLRygEJDOn7j91M6Z8NyNlCm1Om/QfYkyjgqSkoWbrCMuirVqx2I96ncsnVd9g2vKts75JKZxOVcWB8rtzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=I71qmciX; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=kVfi/cvvI4effHQf1xv2lRBGA7PDS15vJ1d3gkI1pI8=; b=I71qmciXdrC9t6OXuCkhFJoPNC
+	Hqh+ZSZsHdoyEGbja8szHWlXt5gNdbri7rfJc2OPLuLjdC76jyP2aKWWnHffwUYVX0ZXnfU1LjVOa
+	8wtbtxO96L9s5tS+seKQjFqwUKHygxjkXGrPr26YTxAkFAtvlRsOtrr/V6u0P6ANiYoU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w6URW-00Dn4l-8f; Sat, 28 Mar 2026 15:15:14 +0100
+Date: Sat, 28 Mar 2026 15:15:14 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Eric Woudstra <ericwouds@gmail.com>,
+	"Lucien.Jheng" <lucienzx159@gmail.com>, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bjorn@mork.no,
+	frank-w@public-files.de, daniel@makrotopia.org,
+	lucien.jheng@airoha.com
+Subject: Re: [PATCH v2] net: phy: air_en8811h: add AN8811HB MCU
+ assert/deassert support
+Message-ID: <e1a3ca7c-99f0-4452-bd5e-ca3662fd8d9a@lunn.ch>
+References: <20260326153518.8387-1-lucienzx159@gmail.com>
+ <edeee8e5-0de3-48ea-aeb5-cc705fdcd469@gmail.com>
+ <6f42d92b-a26d-49a4-bef7-2227c252eea7@gmail.com>
+ <acesgklpv8GlNeVf@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <acesgklpv8GlNeVf@shell.armlinux.org.uk>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272783-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,google.com];
+	TAGGED_FROM(0.00)[bounces-272770-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no,public-files.de,makrotopia.org,airoha.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[nickgarlis@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 35B3C34F00F
+X-Rspamd-Queue-Id: B1FB034EA45
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-rtnl_newlink() lacks a CAP_NET_ADMIN capability check on the peer
-network namespace when creating paired devices (veth, vxcan,
-netkit). This allows an unprivileged user with a user namespace
-to create interfaces in arbitrary network namespaces, including
-init_net.
+On Sat, Mar 28, 2026 at 10:25:06AM +0000, Russell King (Oracle) wrote:
+> On Sat, Mar 28, 2026 at 11:21:59AM +0100, Eric Woudstra wrote:
+> > static int air_pbus_reg_write(struct mdio_device *mdio, u32 pbus_address,
+> > 			      u32 pbus_data)
+> > {
+> > 	int ret;
+> > 
+> > 	mutex_lock(&mdio->bus->mdio_lock);
+> 
+> I wonder why we have phy_lock_mdio_bus() but not mdio_bus_lock()...
+> Should a helper be provided at mdio bus level to complement the PHY
+> level helper if we're going to have MDIO drivers directly manipulating
+> the lock?
 
-Add a netlink_ns_capable() check for CAP_NET_ADMIN in the peer
-namespace before allowing device creation to proceed.
+DSA is pretty much the only class of mdio driver. And they mostly need
+to use:
 
-Fixes: 81adee47dfb6 ("net: Support specifying the network namespace upon device creation.")
-Signed-off-by: Nikolaos Gkarlis <nickgarlis@gmail.com>
----
-v3:
-  - Move netlink_ns_capable() check from rtnl_newlink() into
-    rtnl_get_peer_net(), after the last rtnl_link_get_net_ifla(tb)
-    call. The tbp path is already covered by rtnl_link_get_net_capable()
-    in the caller. (suggested by Kuniyuki)
-  - Pass skb to rtnl_get_peer_net() for the capability check.
-  - Add IS_ERR() check on rtnl_link_get_net_ifla(tb) return value.
-v2:
-  - Removed "Reported-by" tag
-  - Fixed "Fixes" tag with the help of Kuniyuki Iwashima (thanks !)
+mutex_lock_nested(&bus->mdio_lock, MDIO_MUTEX_NESTED);
 
- net/core/rtnetlink.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+Not the plain mutex_lock(). 
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index fae8034efbf..4be7fc6e23a 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3894,12 +3894,14 @@ static int rtnl_newlink_create(struct sk_buff *skb, struct ifinfomsg *ifm,
- 	goto out;
- }
- 
--static struct net *rtnl_get_peer_net(const struct rtnl_link_ops *ops,
-+static struct net *rtnl_get_peer_net(struct sk_buff *skb,
-+				     const struct rtnl_link_ops *ops,
- 				     struct nlattr *tbp[],
- 				     struct nlattr *data[],
- 				     struct netlink_ext_ack *extack)
- {
- 	struct nlattr *tb[IFLA_MAX + 1];
-+	struct net *net;
- 	int err;
- 
- 	if (!data || !data[ops->peer_type])
-@@ -3915,7 +3917,19 @@ static struct net *rtnl_get_peer_net(const struct rtnl_link_ops *ops,
- 			return ERR_PTR(err);
- 	}
- 
--	return rtnl_link_get_net_ifla(tb);
-+	net = rtnl_link_get_net_ifla(tb);
-+	if (IS_ERR(net))
-+		return net;
-+
-+	if (!net)
-+		return NULL;
-+
-+	if (!netlink_ns_capable(skb, net->user_ns, CAP_NET_ADMIN)) {
-+		put_net(net);
-+		return ERR_PTR(-EPERM);
-+	}
-+
-+	return net;
- }
- 
- static int __rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
-@@ -4054,7 +4068,7 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		}
- 
- 		if (ops->peer_type) {
--			peer_net = rtnl_get_peer_net(ops, tb, data, extack);
-+			peer_net = rtnl_get_peer_net(skb, ops, tb, data, extack);
- 			if (IS_ERR(peer_net)) {
- 				ret = PTR_ERR(peer_net);
- 				goto put_ops;
--- 
-2.34.1
+Hence it has not been added up until now.
+
+But yes, such a helper would make sense for a PHY driver having to do
+odd things.
+
+	Andrew
 
 
