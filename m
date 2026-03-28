@@ -1,235 +1,271 @@
-Return-Path: <netdev+bounces-272706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272707-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6OKIMxwkx2lATgUAu9opvQ
-	(envelope-from <netdev+bounces-272706-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 01:43:08 +0100
+	id 6E0WHVY7x2k+UgUAu9opvQ
+	(envelope-from <netdev+bounces-272707-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 03:22:14 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D49334CC65
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 01:43:08 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BE7534D0D3
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 03:22:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BAAF03036AE2
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 00:43:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8F208302064E
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 02:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1B7D205E02;
-	Sat, 28 Mar 2026 00:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3BC6313293;
+	Sat, 28 Mar 2026 02:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LUH2KR/2"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="2JF+WD79"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 039811FC0EF;
-	Sat, 28 Mar 2026 00:43:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03FC4C2FD;
+	Sat, 28 Mar 2026 02:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774658583; cv=none; b=Rkp9C3p80jIBzgPw0iP3rWRV2BPOw+gbk+2aFtsWps8V2+AA55wiVXZLVWpKDtV+Upwzt0/NfsVNiamzi1PARRkjMZBC4DCHb2Bgx5vFXmXngTQ+7vvFt3hp+JCxrhmXRRyIQVTPt05iCXYU6X0iDMTbHKP4wPgN75LMGxxuGbw=
+	t=1774664528; cv=none; b=WKHkmR7Ns6nA4n+y/0iRbgk2x9bEvDNCSXTQPuvpmIzFGmbhE4JstBEhGJUpf/R1c4KG69Q4oxRLwzSsTatM7UKC9KruXaVHSsqXhOuLHh3S3URvnrUM+deEfobY4E0LjszEfUfXN6zuyK4GrUBshe5In051h/brvuS5EiUE9qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774658583; c=relaxed/simple;
-	bh=7NSTQHAfTLzUwxbewhUsEMWtdbDebIbYLUZFZavLeDg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U5KwsUAAK4rbkKYCjyacb1f0EfoFaLsF/+5VOdN4fH284cHcWQhUupCJIE7G8DmhKnobUC3J4Ue878LuamW+inXbGvAfGwAZ18Wo8k2ZssRLDOfLkf2OunBYR5xQmEgTByfYiGvDpXCS/SYZu1mBM52n5SLK7au77/Nv/nEopvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LUH2KR/2; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774658582; x=1806194582;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=7NSTQHAfTLzUwxbewhUsEMWtdbDebIbYLUZFZavLeDg=;
-  b=LUH2KR/2cTnaQ30segD0hwq3e0Bh9q6n67OKtudrVOFN1G7SrxNKZA6w
-   Cx+qCxnxuUaBsmM7E3rN5L5CEDtF2rvlR1URWSvOPTT3F6mrNXP225uvt
-   qU8YDLOItJ8EukusaZPLcWu0qgJ2MsFM/6CT0xq6O/MI02QR02Wz1Jct/
-   CJ14W+TBALaqjRfHac4R2XJDC7yrP1rYq56YZw0r9C5DP+pJ5kl6jFSFh
-   I0gdlPaTHtBabClZ+EibyLVSO9cnCu6U18KS/Dh2qcHewdMxHZx5uYkNP
-   a1Dp2+1HtoC9L2jP7QWcPPUUm4qp36Flgv4QnzYfSZSjN9fxtogotz2+g
-   Q==;
-X-CSE-ConnectionGUID: tvHgASnVSPG9Kv8o5DVH0A==
-X-CSE-MsgGUID: wwlSCmctSFG4Scz8wPdaaw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11742"; a="75935237"
-X-IronPort-AV: E=Sophos;i="6.23,145,1770624000"; 
-   d="scan'208";a="75935237"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2026 17:43:01 -0700
-X-CSE-ConnectionGUID: IWJPWWYgSgyOxbjfYtEolg==
-X-CSE-MsgGUID: plpu0+QbQhqAtYmA408DUg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,145,1770624000"; 
-   d="scan'208";a="263411944"
-Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2026 17:43:02 -0700
-Date: Fri, 27 Mar 2026 17:42:56 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-	Jon Kohler <jon@nutanix.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v8 02/10] x86/bhi: Make clear_bhb_loop() effective on
- newer CPUs
-Message-ID: <20260328004256.mm2ttj5iwvu5kdpa@desk>
-References: <20260324-vmscape-bhb-v8-0-68bb524b3ab9@linux.intel.com>
- <20260324-vmscape-bhb-v8-2-68bb524b3ab9@linux.intel.com>
- <20260324205930.GQacL7Mp7vwGBKX1W7@fat_crate.local>
- <20260324221308.7sh6afdy6r6tsf4w@desk>
- <20260325203759.GCacRHp2t8a7c4Bp6E@fat_crate.local>
- <20260326083934.fk4wyhe6rgiss34z@desk>
- <20260326100120.GAacUD8BVziYzLxZHB@fat_crate.local>
- <20260326104557.24295cbb@pumpkin>
- <20260326202931.wlggnd3nfj6hngpb@desk>
+	s=arc-20240116; t=1774664528; c=relaxed/simple;
+	bh=ilKV3fBIfOdo+efVbzrEw7HNYJHL5ePWB8l7pDMop2g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=D+/qJLw1wwjBZ40P/aI6IJ5sATLeoB/kwxus0PNUSCEpuq5IuPHTT1L3eR/d7oceU+QRAVRZV5Bmfl+rpZcqeJoy48SU15tW552u/mbz6x4kqL1Hxfvgeq6W2vximhdVUUYPvTQ8jT8P0HrV+mBGEOvk+46BCPdmCFfYibRQA+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=2JF+WD79; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=1OkLiW8Ed78xDJTW8wn1LfvAVL5T6iaxi219R/4j/pQ=;
+	b=2JF+WD79kpjFM25pn6LCZ/yf1qTkA1lCV4qAW3Hli7RNh88wNlL/rQrdh3W/cX8hNZxHZ2lkE
+	H8a4NvDibeihCShBjV0YH5znkUSkE+HPMlmAkPBcdlkb6oHMDLEHmW+jExzY7dk/sMbRagOAkdE
+	jipw2J80WKKr6DZU8huwfzA=
+Received: from mail.maildlp.com (unknown [172.19.162.140])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4fjLjW052Kz12LDV;
+	Sat, 28 Mar 2026 10:16:31 +0800 (CST)
+Received: from kwepemk500009.china.huawei.com (unknown [7.202.194.94])
+	by mail.maildlp.com (Postfix) with ESMTPS id C6AF52025F;
+	Sat, 28 Mar 2026 10:21:56 +0800 (CST)
+Received: from [10.67.121.161] (10.67.121.161) by
+ kwepemk500009.china.huawei.com (7.202.194.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 28 Mar 2026 10:21:56 +0800
+Message-ID: <04859df4-6fa4-4b2b-aef1-621f3c053c2e@huawei.com>
+Date: Sat, 28 Mar 2026 10:21:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260326202931.wlggnd3nfj6hngpb@desk>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v2 1/2] vfio: add callback to get tph info for dmabuf
+To: Zhiping Zhang <zhipingz@meta.com>, Jason Gunthorpe <jgg@ziepe.ca>, Leon
+ Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	<linux-rdma@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dri-devel@lists.freedesktop.org>, Keith Busch
+	<kbusch@kernel.org>, Yochai Cohen <yochai@nvidia.com>, Yishai Hadas
+	<yishaih@nvidia.com>
+CC: Bjorn Helgaas <helgaas@kernel.org>
+References: <20260324234615.3731237-1-zhipingz@meta.com>
+ <20260324234615.3731237-2-zhipingz@meta.com>
+Content-Language: en-US
+From: fengchengwen <fengchengwen@huawei.com>
+In-Reply-To: <20260324234615.3731237-2-zhipingz@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemk500009.china.huawei.com (7.202.194.94)
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272706-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[37];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[alien8.de,kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,redhat.com,linux.dev,gmail.com,fomichev.me,lwn.net,vger.kernel.org,intel.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,alien8.de:email]
-X-Rspamd-Queue-Id: 5D49334CC65
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fengchengwen@huawei.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272707-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[huawei.com:+]
+X-Rspamd-Queue-Id: 7BE7534D0D3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Mar 26, 2026 at 01:29:31PM -0700, Pawan Gupta wrote:
-> On Thu, Mar 26, 2026 at 10:45:57AM +0000, David Laight wrote:
-> > On Thu, 26 Mar 2026 11:01:20 +0100
-> > Borislav Petkov <bp@alien8.de> wrote:
-> > 
-> > > On Thu, Mar 26, 2026 at 01:39:34AM -0700, Pawan Gupta wrote:
-> > > > I believe the equivalent for cpu_feature_enabled() in asm is the
-> > > > ALTERNATIVE. Please let me know if I am missing something.  
-> > > 
-> > > Yes, you are.
-> > > 
-> > > The point is that you don't want to stick those alternative calls inside some
-> > > magic bhb_loop function but hand them in from the outside, as function
-> > > arguments.
-> > > 
-> > > Basically what I did.
-> > > 
-> > > Then you were worried about this being C code and it had to be noinstr... So
-> > > that outer function can be rewritten in asm, I think, and still keep it well
-> > > separate.
-> > > 
-> > > I'll try to rewrite it once I get a free minute, and see how it looks.
-> > > 
-> > 
-> > I think someone tried getting C code to write the values to global data
-> > and getting the asm to read them.
-> > That got discounted because it spilt things between two largely unrelated files.
+Hi Zhiping,
+
+On 3/25/2026 7:46 AM, Zhiping Zhang wrote:
+> This patch adds a callback to get the tph info on DMA buffer exporters.
+> The tph info includes both the steering tag and the process hint (ph).
 > 
+> The steering tag and ph are encoded in the flags field of
+> vfio_device_feature_dma_buf instead of adding new fields to the uapi
+> struct, to preserve ABI compatibility.
 > 
-> The implementation with global variables wasn't that bad, let me revive it.
+> Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_dmabuf.c | 26 ++++++++++++++++++++++++--
+>  include/linux/dma-buf.h            | 30 ++++++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h          |  9 +++++++--
+>  3 files changed, 61 insertions(+), 4 deletions(-)
 > 
-> This part which ties sequence to BHI mitigation, which is not ideal,
-> (because VMSCAPE also uses it) it does seems a cleaner option.
+> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
+> index 478beafc6ac3..c45cb3884b85 100644
+> --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
+> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
+> @@ -17,6 +17,8 @@ struct vfio_pci_dma_buf {
+>  	struct phys_vec *phys_vec;
+>  	struct p2pdma_provider *provider;
+>  	u32 nr_ranges;
+> +	u16 steering_tag;
+> +	u8 ph;
+>  	u8 revoked : 1;
+>  };
 > 
-> --- a/arch/x86/kernel/cpu/bugs.c
-> +++ b/arch/x86/kernel/cpu/bugs.c
-> @@ -2095,6 +2095,11 @@ static void __init bhi_select_mitigation(void)
+> @@ -60,6 +62,15 @@ vfio_pci_dma_buf_map(struct dma_buf_attachment *attachment,
+>  				       priv->size, dir);
+>  }
 > 
->  static void __init bhi_update_mitigation(void)
->  {
-> +   if (!cpu_feature_enabled(X86_FEATURE_BHI_CTRL)) {
-> +       bhi_seq_outer_loop = 5;
-> +       bhi_seq_inner_loop = 5;
-> +   }
+> +static int vfio_pci_dma_buf_get_tph(struct dma_buf *dmabuf, u16 *steering_tag,
+> +				    u8 *ph)
+> +{
+> +	struct vfio_pci_dma_buf *priv = dmabuf->priv;
+> +	*steering_tag = priv->steering_tag;
+> +	*ph = priv->ph;
+
+If the dmabuf exporter don't provide st&ph, this ops should return error
+
+> +	return 0;
+> +}
 > +
+>  static void vfio_pci_dma_buf_unmap(struct dma_buf_attachment *attachment,
+>  				   struct sg_table *sgt,
+>  				   enum dma_data_direction dir)
+> @@ -90,6 +101,7 @@ static const struct dma_buf_ops vfio_pci_dmabuf_ops = {
+>  	.unpin = vfio_pci_dma_buf_unpin,
+>  	.attach = vfio_pci_dma_buf_attach,
+>  	.map_dma_buf = vfio_pci_dma_buf_map,
+> +	.get_tph = vfio_pci_dma_buf_get_tph,
+>  	.unmap_dma_buf = vfio_pci_dma_buf_unmap,
+>  	.release = vfio_pci_dma_buf_release,
+>  };
+> @@ -228,7 +240,10 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 flags,
+>  	if (copy_from_user(&get_dma_buf, arg, sizeof(get_dma_buf)))
+>  		return -EFAULT;
 > 
-> I believe this can be moved to somewhere common to all mitigations.
+> -	if (!get_dma_buf.nr_ranges || get_dma_buf.flags)
+> +	if (!get_dma_buf.nr_ranges ||
+> +	    (get_dma_buf.flags & ~(VFIO_DMABUF_FL_TPH |
+> +				   VFIO_DMABUF_TPH_PH_MASK |
+> +				   VFIO_DMABUF_TPH_ST_MASK)))
+>  		return -EINVAL;
 > 
-> > I think the BPF code would need significant refactoring to call a C function.
+>  	/*
+> @@ -285,7 +300,14 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 flags,
+>  		ret = PTR_ERR(priv->dmabuf);
+>  		goto err_dev_put;
+>  	}
+> -
+> +	if (get_dma_buf.flags & VFIO_DMABUF_FL_TPH) {
+> +		priv->steering_tag = (get_dma_buf.flags &
+> +				      VFIO_DMABUF_TPH_ST_MASK) >>
+> +				     VFIO_DMABUF_TPH_ST_SHIFT;
+> +		priv->ph = (get_dma_buf.flags &
+> +			    VFIO_DMABUF_TPH_PH_MASK) >>
+> +			   VFIO_DMABUF_TPH_PH_SHIFT;
+> +	}
+>  	/* dma_buf_put() now frees priv */
+>  	INIT_LIST_HEAD(&priv->dmabufs_elm);
+>  	down_write(&vdev->memory_lock);
+> diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
+> index 133b9e637b55..26705c83ad80 100644
+> --- a/include/linux/dma-buf.h
+> +++ b/include/linux/dma-buf.h
+> @@ -113,6 +113,36 @@ struct dma_buf_ops {
+>  	 */
+>  	void (*unpin)(struct dma_buf_attachment *attach);
 > 
-> Ya, true. Will use globals and keep clear_bhb_loop() in asm.
+> +	/**
+> +	 * @get_tph:
+> +	 *
+> +	 * Get the TPH (TLP Processing Hints) for this DMA buffer.
+> +	 *
+> +	 * This callback allows DMA buffer exporters to provide TPH including
+> +	 * both the steering tag and the process hints (ph), which can be used
+> +	 * to optimize peer-to-peer (P2P) memory access. The TPH info is typically
+> +	 * used in scenarios where:
+> +	 * - A PCIe device (e.g., RDMA NIC) needs to access memory on another
+> +	 *   PCIe device (e.g., GPU),
+> +	 * - The system supports TPH and can use steering tags / ph to optimize
+> +	 *   cache placement and memory access patterns,
+> +	 * - The memory is exported via DMABUF for cross-device sharing.
+> +	 *
+> +	 * @dmabuf: [in] The DMA buffer for which to retrieve TPH
+> +	 * @steering_tag: [out] Pointer to store the 16-bit TPH steering tag value
+> +	 * @ph: [out] Pointer to store the 8-bit TPH processing-hint value
+> +	 *
+> +	 * Returns:
+> +	 * * 0 - Success, steering tag stored in @steering_tag
+> +	 * * -EOPNOTSUPP - TPH steering tags not supported for this buffer
+> +	 * * -EINVAL - Invalid parameters
+> +	 *
+> +	 * This callback is optional. If not implemented, the buffer does not
+> +	 * support TPH.
 
-While testing this approach, I noticed that syscalls were suffering an 8%
-regression on ICX for Native BHI mitigation:
+It seemed already impl...
 
-  $ perf bench syscall basic -l 100000000
+> +	 *
+> +	 */
+> +	int (*get_tph)(struct dma_buf *dmabuf, u16 *steering_tag, u8 *ph);
+> +
+>  	/**
+>  	 * @map_dma_buf:
+>  	 *
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index bb7b89330d35..e2a8962641d2 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -1505,8 +1505,13 @@ struct vfio_region_dma_range {
+>  struct vfio_device_feature_dma_buf {
+>  	__u32	region_index;
+>  	__u32	open_flags;
+> -	__u32   flags;
+> -	__u32   nr_ranges;
+> +	__u32	flags;
+> +#define VFIO_DMABUF_FL_TPH		(1U << 0) /* TPH info is present */
+> +#define VFIO_DMABUF_TPH_PH_SHIFT	1         /* bits 1-2: PH (2-bit) */
+> +#define VFIO_DMABUF_TPH_PH_MASK	0x6U
+> +#define VFIO_DMABUF_TPH_ST_SHIFT	16        /* bits 16-31: steering tag */
+> +#define VFIO_DMABUF_TPH_ST_MASK		0xffff0000U
+> +	__u32	nr_ranges;
+>  	struct vfio_region_dma_range dma_ranges[] __counted_by(nr_ranges);
+>  };
 
-Bisection pointed to the change for using 8-bit registers (al/ah replacing
-eax/ecx) as the main contributor to the regression. (Global variables added
-a bit, but within noise).
+Another question:
+1\ PCIE protocol define 8bit and 16bit ST
+2\ In host-device ST impl, the ACPI will provide 8bit and 16bit ST, the choice of which
+   one to use depends on the minimum supported range of the device and the RP.
+3\ So in this P2P scene, although exporter (e.g. GPU) support 16bit ST, but the consumer
+   (e.g. RDMA NIC) only support 8bit this may lead to mis-match
 
-Further digging revealed a strange behavior, using %ah for the inner loop
-was causing the regression, interchanging %al and %ah in the loops
-(for movb and sub) eliminated the regression.
+> 
+> --
+> 2.52.0
+> 
+> 
+> 
 
-<clear_bhb_loop_nofence>:
-
-	movb	bhb_seq_outer_loop(%rip), %al
-
-	call	1f
-	jmp	5f
-1:	call	2f
-.Lret1:	RET
-2:	movb	bhb_seq_inner_loop(%rip), %ah
-3:	jmp	4f
-	nop
-4:	sub	$1, %ah <---- No regression with %al here
-	jnz	3b
-	sub	$1, %al
-	jnz	1b
-
-My guess is, "sub $1, %al" is faster than "sub $1, %ah". Using %al in the
-inner loop, which is executed more number of times is likely making the
-difference. A perf profile is needed to confirm this.
-
-Never imagined a register selection can make an 8% difference in
-performance! Anyways, will update the patch with this finding.
 
