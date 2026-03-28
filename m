@@ -1,71 +1,77 @@
-Return-Path: <netdev+bounces-272752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272753-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QKbCEKWOx2k0ZAUAu9opvQ
-	(envelope-from <netdev+bounces-272752-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:17:41 +0100
+	id YMfAHFGQx2nFZAUAu9opvQ
+	(envelope-from <netdev+bounces-272753-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:24:49 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E58C34DCA5
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:17:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC13934DCFB
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:24:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CC250302BA7C
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 08:17:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6B1B8302D523
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 08:24:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79B426158C;
-	Sat, 28 Mar 2026 08:17:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7EB8374726;
+	Sat, 28 Mar 2026 08:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mmpsystems.pl header.i=@mmpsystems.pl header.b="t6UKIqEK"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zeXZhzLg"
 X-Original-To: netdev@vger.kernel.org
-Received: from s106b.cyber-folks.pl (s106b.cyber-folks.pl [195.78.66.88])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8F22376FD;
-	Sat, 28 Mar 2026 08:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.78.66.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE722C21DD
+	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 08:24:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774685856; cv=none; b=Qbj/EGpWmk1//WazTk5IvJI5qaYu41WyPKGsK1nDwTgf1TJCSDfhEqZS5GDuRooo1w4ovtmjtyEmTjNjfCKAjRCP2LGxi+s/vn5xPe2uclsSwkJDoQ0dbW1caOd1c9IXQpKdTjJyp3qTY1F2giNgF6B1MGlgNIFVNYpsZqV2vf8=
+	t=1774686286; cv=none; b=RIjTeo8ALGudzGDsclIllpeHgwE+fvhSHnHLGyOfQle3HCVSVe4bg5uTwcv8KspDbIsIcycU8n0GWWs1pgNlenx210nDfYGztLLjaOkKDMJJTz3dgCqDDdbMwRI3zJGs+7Jo+01rrtIzAeDtSuq1EgYkxqu8V1FXvgAUBjAcGN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774685856; c=relaxed/simple;
-	bh=ZDHz9uPP8pqI/sNXlxqRQs9YEhFvQM4pMG0G0GmIMJs=;
+	s=arc-20240116; t=1774686286; c=relaxed/simple;
+	bh=8sXpWwGlFLojnG830vpU87C4ieuymSRA1ExHCOv6aDk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nunvRkcdkBC0r/NHQBqHt2CKHBnewW1fTr8+NUfym8trKFHSkt3bnRqiGMoV81/0yq6kT57qVE7P8hKGXWs3NhXEFGFl1gEz910xkjUA/1h4eN+VNgijr97kALLsbXesfrjAzaCAWT/Ml3lO+vMCWD1JmpxT8YgOiUwafBLTdPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mmpsystems.pl; spf=pass smtp.mailfrom=mmpsystems.pl; dkim=pass (2048-bit key) header.d=mmpsystems.pl header.i=@mmpsystems.pl header.b=t6UKIqEK; arc=none smtp.client-ip=195.78.66.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mmpsystems.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mmpsystems.pl
+	 Content-Type:Content-Disposition:In-Reply-To; b=MhvcC/nU5UAZWgTF0mp0cshNd9Vk4nrldRaDbI6VxIcFIpOq/SNmN86OTIer5pnxlOWuWVdE7oBYMSuuYsKxiXIbErKX8J1/mN39QUXGiqHvXj7X8A8lr6+zbK0faLXINbkFs7ZOmtN6nAKETa/q0ErBchUfoHJlVbc2peSlyMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zeXZhzLg; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=mmpsystems.pl; s=x; h=In-Reply-To:Content-Type:MIME-Version:References:
-	Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ejJZ2msrybPfriDsCgcnWyd7Z8ZISOT5WUkjT8Zg0gg=; b=t6UKIqEKEe0xdQ4e6+tsd6DeSR
-	NBT4of6c00PndbkeLeMSBHo8y5rTdNHleSCIjDcpvUdqjLggks7OJEh95Hj6onI1lPuXAPo1p6fO2
-	ftDKcVenb368/7W2sN6mhs6yDFil5eeg39VWit8dkXUBGqRjhohyP+FMmVJtzaB+OfbPAjFeVfuCT
-	mpvhndZjApCMqhnhiX80x3gD9yLW4/cZTCRejqcpl1JBy87uV8tuIfPR6YsgW/zBdMWy63YjMEXY+
-	JnqkuKQIExZlygJ1nYyiwHB4og6EGP3zr6VTsmb13kImgTqe0LafJnsmGyejL8DthLmgiiGft/8Wd
-	Jop/neCQ==;
-Received: from user-5-173-16-20.play-internet.pl ([5.173.16.20] helo=localhost)
-	by s106.cyber-folks.pl with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=dBGUIi2ACXBs5dBa+ZwVmMxZ7q4HBlEgRbUeEupBh9U=; b=zeXZhzLgUiuIiTK8dL2wHfYuQ4
+	twJPvaZEpu/cCswIQPutnepzFsLq/3cT2sqneczANqSdaUDxO5BFOnB/I3hzp9oNxr4MaknA4Zlfb
+	dtWGiOscalNfC8nNPuMZAjjQ0eyPEFGHd9JEf5R0ots+a6iC6NgO8ItOb2glUMYkMImzwsMfwBrz8
+	ufb/8adgE1SGKZzcG7g0+ePe66kPFxRCipXUr+arTfB5b/x/wl/uoWAbshn5t8m6aTW1O26/kkGc+
+	YzyJMdLESbM1u3d1qt9sDv5eXys6OufyDAxI1xRX7XSqibcdRcPWOFCiOR5Hr0/QJm+9dT8LHqMOt
+	/5lhlXFA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60066)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
-	(envelope-from <michal.piekos@mmpsystems.pl>)
-	id 1w6OrK-00000001FqP-2Oxh;
-	Sat, 28 Mar 2026 09:17:30 +0100
-Date: Sat, 28 Mar 2026 09:17:23 +0100
-From: Michal Piekos <michal.piekos@mmpsystems.pl>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] net: stmmac: skip VLAN restore when VLAN hash ops are
- missing
-Message-ID: <d3nc2eqhedz6ygstu76cgj2dghkoiod5dnamdwqpvoe3vajndq@ewqtagfgkfzd>
-References: <20260328-vlan-restore-error-v3-1-df47a039c6f6@mmpsystems.pl>
- <aceIeFWGAZwr1njk@shell.armlinux.org.uk>
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w6OyF-0000000073T-0W0n;
+	Sat, 28 Mar 2026 08:24:39 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w6OyD-000000000WK-1f02;
+	Sat, 28 Mar 2026 08:24:37 +0000
+Date: Sat, 28 Mar 2026 08:24:37 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 2/2] net: stmmac: simplify GSO/TSO test in
+ stmmac_xmit()
+Message-ID: <aceQRSc5o4D-HHmq@shell.armlinux.org.uk>
+References: <acZQaDeCoib5S5UA@shell.armlinux.org.uk>
+ <E1w63fl-0000000E3Vb-3JkY@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,106 +80,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aceIeFWGAZwr1njk@shell.armlinux.org.uk>
-X-Authenticated-Id: michal.piekos@mmpsystems.pl
-X-Spamd-Result: default: False [1.64 / 15.00];
+In-Reply-To: <E1w63fl-0000000E3Vb-3JkY@rmk-PC.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[mmpsystems.pl:s=x];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[mmpsystems.pl : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272752-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272753-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mmpsystems.pl:-];
-	NEURAL_HAM(-0.00)[-0.565];
-	FROM_NEQ_ENVFROM(0.00)[michal.piekos@mmpsystems.pl,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,renesas.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mmpsystems.pl:email]
-X-Rspamd-Queue-Id: 9E58C34DCA5
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.624];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,armlinux.org.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AC13934DCFB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Mar 28, 2026 at 07:51:20AM +0000, Russell King (Oracle) wrote:
-> On Sat, Mar 28, 2026 at 07:51:53AM +0100, Michal Piekos wrote:
-> > stmmac_vlan_restore() unconditionally calls stmmac_vlan_update() when
-> > NETIF_F_VLAN_FEATURES is set. On platforms where priv->hw->vlan (or
-> > ->update_vlan_hash) is not provided, stmmac_update_vlan_hash() returns
-> > -EINVAL via stmmac_do_void_callback(), resulting in a spurious
-> > "Failed to restore VLANs" error even when no VLAN filtering is in use.
-> > 
-> > Remove the unneeded comment.
-> > 
-> > Tested on Orange Pi Zero 3.
-> > 
-> > Fixes: bd7ad51253a7 ("net: stmmac: Fix VLAN HW state restore")
-> > Signed-off-by: Michal Piekos <michal.piekos@mmpsystems.pl>
-> > ---
-> > This patch fixes a noisy "Failed to restore VLANs" message on platforms
-> > where stmmac VLAN hash ops are not implemented.
-> > stmmac_vlan_restore() calls stmmac_vlan_update() without checking for
-> > VLAN hash ops presence which results in -EINVAL. 
-> > ---
-> > Changes in v3:
-> > - Remove the offending comment
-> > - Restore the original check for NETIF_F_VLAN_FEATURES
-> > - Link to v2: https://lore.kernel.org/r/20260321-vlan-restore-error-v2-1-45cf56a5223d@mmpsystems.pl
-> > 
-> > Changes in v2:
-> > - Replace check for hash ops with check for HW FILTER flags
-> > - Link to v1: https://lore.kernel.org/r/20260314-vlan-restore-error-v1-1-4fc6c3e2115f@mmpsystems.pl
-> > ---
-> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 8 +-------
-> >  1 file changed, 1 insertion(+), 7 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > index 6827c99bde8c..0f3e5ac05faa 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > @@ -6861,19 +6861,13 @@ static int stmmac_vlan_rx_kill_vid(struct net_device *ndev, __be16 proto, u16 vi
-> >  
-> >  static int stmmac_vlan_restore(struct stmmac_priv *priv)
-> >  {
-> > -	int ret;
-> > -
-> >  	if (!(priv->dev->features & NETIF_F_VLAN_FEATURES))
-> >  		return 0;
-> >  
-> >  	if (priv->hw->num_vlan)
-> >  		stmmac_restore_hw_vlan_rx_fltr(priv, priv->dev, priv->hw);
-> >  
-> > -	ret = stmmac_vlan_update(priv, priv->num_double_vlans);
-> > -	if (ret)
-> > -		netdev_err(priv->dev, "Failed to restore VLANs\n");
-> > -
-> > -	return ret;
-> > +	return stmmac_vlan_update(priv, priv->num_double_vlans);
-> >  }
+On Fri, Mar 27, 2026 at 09:40:09AM +0000, Russell King (Oracle) wrote:
+> The test in stmmac_xmit() to see whether we should pass the skbuff to
+> stmmac_tso_xmit() is more complex than it needs to be. This test can
+> be simplified by storing the mask of GSO types that we will pass, and
+> setting it according to the enabled features.
 > 
-> Yes, but as both Andrew and myself have pointed out, no one checks
-> the return value of stmmac_vlan_restore(), so why does it return
-> int?
-
-Was too quick with the patch. Will spin another version.
-
-Michal
+> Note that "tso" is a mis-nomer since commit b776620651a1 ("net:
+> stmmac: Implement UDP Segmentation Offload"). Also note that this
+> commit controls both via the TSO feature. We preserve this behaviour
+> in this commit.
 > 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> Also, this commit unconditionally accessed skb_shinfo(skb)->gso_type
+> for all frames, even when skb_is_gso() was false. This access is
+> eliminated.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+AI review of this patch regurgitates Jakub's point that was discussed.
+
+> @@ -3700,7 +3700,7 @@ static int stmmac_hw_setup(struct net_device *dev)
+>  	stmmac_set_rings_length(priv);
+>  
+>  	/* Enable TSO */
+> -	if (priv->tso) {
+> +	if (priv->gso_enabled_types) {
+>  		for (chan = 0; chan < tx_cnt; chan++) {
+>  			struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[chan];
+>  
+
+...
+
+> @@ -7828,7 +7834,7 @@ static int __stmmac_dvr_probe(struct device *device,
+>  		ndev->hw_features |= NETIF_F_TSO | NETIF_F_TSO6;
+>  		if (priv->plat->core_type == DWMAC_CORE_GMAC4)
+>  			ndev->hw_features |= NETIF_F_GSO_UDP_L4;
+> -		priv->tso = true;
+> +		stmmac_set_gso_types(priv, true);
+
+Clearly, the issue it is regurgitating has been there for a long time
+and isn't a new issue introduced by this patch.
+
+AI needs to stop doing this, because it is encouraging multiple changes
+in a single patch, which is against the normal kernel process.
+
+As already pointed out, there are multiple issues with stmmac TSO
+support, particularly with glue drivers that enable TSO on some
+queues/channels and not others, since netdev core TSO support is
+global across all channels.
+
+So, won't the AI response in this patch - it's just another pre-
+existing issue that needs fixing in a separate patch.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
