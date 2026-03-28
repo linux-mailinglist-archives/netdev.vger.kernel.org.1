@@ -1,289 +1,167 @@
-Return-Path: <netdev+bounces-272803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272804-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ULCUFUckyGkXhQUAu9opvQ
-	(envelope-from <netdev+bounces-272803-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 19:56:07 +0100
+	id IWMlJtIkyGkyhQUAu9opvQ
+	(envelope-from <netdev+bounces-272804-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 19:58:26 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2CD134FB45
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 19:56:06 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A5B634FB4E
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 19:58:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3BCBC3024A58
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 18:56:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 85965301680A
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 18:58:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABF633A70F;
-	Sat, 28 Mar 2026 18:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F3333C194;
+	Sat, 28 Mar 2026 18:58:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wcxrXdOx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q277r79J"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1A03081D6
-	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 18:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9766533DEFE
+	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 18:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774724164; cv=none; b=d8gFvMjyFTsxchg7lZHz7Yxflxx62vhryRXFxWdbHk66XWoOIWL+AyMi0Wb89N66yxe6m9n3V/w9/ZhC+pBD1YPtnTXPIZNP9NPSSrUMsU93RLUMs92cBDobGUWjuLkmE19GXCnKuvhXOwi1ZjReoei17a7T9YCqiEEarnCzRr8=
+	t=1774724300; cv=none; b=ADv5GdC9g6Q+xiQk8rayNJmx6EeHPysPsjv0dVpm/oWbhJ+c+ryWf1YCxBTgC3YtcKyn7Do/610nDMjrtWGp5PVyphYQqXu+bZ7QjUUXT2ZALWsPj/syUx0XpOB2M+9wAJQG/Ff+ZjHWp/aVLXy0FTWR0wISWQYAKaMZCNfWsb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774724164; c=relaxed/simple;
-	bh=MFMcARP+62ax75T9Lx65udf8GIwMXzSxFrP9s3n8eJs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mrgL8GFR7NitUGYXUhMn22f83FeB7LkYJNg9bKXOwMULZlHMUyLohX9wMicpbtSAOFI2CrQ6SMT2k7s2nvKCzDXCkIB/lrUpQ/q2GWhtn63fvNcqqlUhGm7kT2ahZEUw8eDmrJHE95JhVgNcu6zUztyUAzM87GkFNpOBL7J9vRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wcxrXdOx; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=QmNbU8w/wXLROhB5GpLCWw/c0/7pPxZBQCA+U72RmSs=; b=wcxrXdOx2x0CM5UOU1Z5djDfMk
-	rTynwB4SMJh1bQYz6s1K8OGwkSf9Z2R5QW6YYW6dmLFgqicCknErDcotW7UQDLYVmHEPvwc2vIQDv
-	p68AhgdpoKq9QuvHMzCk1WpDWfRmIPnz7Gi8T+qTLkH3xuZ/kf68SKpt5NqX229KmFpwfKpqefphe
-	BDLhqcsXL6KnbjrAa1Pk725z2G0xyDO2w0GdzU/8573wMiMGWuNXWlHu7vUfZYOdOVnly1zMxPZ/c
-	1uWa7TVDqaTJOKd4Gb5ZoVPaxx6yJu41siZjVmq+SDYGPDP5EsuUie6PXw8LthWeffXT+cZKk7emi
-	xL1zmoow==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47004)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w6Yp4-000000007M3-3wn7;
-	Sat, 28 Mar 2026 18:55:51 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w6Yp1-000000000sd-3WOM;
-	Sat, 28 Mar 2026 18:55:47 +0000
-Date: Sat, 28 Mar 2026 18:55:47 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Ong Boon Leong <boon.leong.ong@intel.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 2/2] net: stmmac: simplify GSO/TSO test in
- stmmac_xmit()
-Message-ID: <acgkM2FGS2h-fPVN@shell.armlinux.org.uk>
-References: <acZQaDeCoib5S5UA@shell.armlinux.org.uk>
- <E1w63fl-0000000E3Vb-3JkY@rmk-PC.armlinux.org.uk>
- <aceQRSc5o4D-HHmq@shell.armlinux.org.uk>
- <acegAqUb-Dzy87d8@shell.armlinux.org.uk>
- <acgPJgW9r0l952qu@shell.armlinux.org.uk>
+	s=arc-20240116; t=1774724300; c=relaxed/simple;
+	bh=TY2hsxKzRdg6cVTU5tH32Ru8fM1l3UVUUf+AIaD3Bug=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=l7+WrDVZ4Ih/Je+ktB4BtqYZkpwV3QYouoOTTs+yDwy4S7BZyZERRxjvKyf/3fgrN5yNnDGxecSuTUxUlML9h+WeF7xqdYp9sggAnlmth+jl3NQia478JKovSknoBrdL7zun8BRtd0sFYmhoIU4CLNcSUDYCCbbQvJiJN6s46cY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q277r79J; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2ad617d5b80so21867185ad.1
+        for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 11:58:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774724298; x=1775329098; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PWZCRNA7sq5TKfV/GxwqqTIp6ycx6O3DA7KXt4hfRiQ=;
+        b=Q277r79J2yZ72Kx3XeYpKwiAmpKOu5ZxmDkdQHGCpWeB/U4KM9bFEacDl3NhhJedP9
+         cSv74bT9JjdVkMhYsD4siNtHJIqKbH+OLQ3USw7O6ZzuFOLBfnGH5wcOG2q50FkXUNSv
+         cHu22HlJkUYGk0tkhu9AxKgAaFI24r6G4Y/86QtdwY8taK4rwiNSo9Jb+JTZ91WpY5J+
+         g2CdF0qlzb6hWuYqZ8JvZy3X2fQmLJTy4z5PF66grPDOMx4LFM23I9IfIoNJ0U+8JWvZ
+         ZVnjBmL9pQ/DJlG8UOvN50VyJHjKZ+FUsDMC91XX2wBrLbaJs4qUD03INcODD1lBKeX8
+         /r3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774724298; x=1775329098;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PWZCRNA7sq5TKfV/GxwqqTIp6ycx6O3DA7KXt4hfRiQ=;
+        b=natdhqa5LtGEhoYjx6ZkiLT8bsdb0Uehn9xQ/YYWeDRfyzhLAipqNd/lJj5YogDZJZ
+         lRr6/H7ngS3tbA7A0b5DH6KWdoD8HlJJM/zjlnBHw1RajSous1/iiR5yF5/omtFOY+Hf
+         HQTubETFiZvjHwpo2oOKE+5RC+ROpdHY2MKMDk/WO/fPcfTy2dXn74E3mgNwBhkEaw7S
+         6+nJSebGrf1ToRIF4TNlh+cTy8MtWsaMGb3wfukPJNPyXIO4K+LGCLZ2vqN4Qv74fD3m
+         dWRnXEUmjKAvoifDo6AFwT8ZznOvXEhGvrK8lnPhWTkBembYGYtT5LYH86m8hs4Mp4lO
+         FhUg==
+X-Gm-Message-State: AOJu0Yym3zLMj/gxo/HtxnqBf2F7eCqwWAVX8trStOCwu6ZgQggm5CE0
+	+PISZ7noSXO8O7g6x/lVdZbMZK0PD8vU7+JfEGg5uC5L/y3b+320m676
+X-Gm-Gg: ATEYQzy+YL43+VFZCXwvFOUkR8g+ZIQEOr8uGbUaddDXx4P0FW5DMWitvTf9ZxjDPZ4
+	qTa7/0HxWn0iVEAFLzTGAx95e/IU9GSxaMutmHWtZ3EQKdJ6Ckc9l3NKjDMLf9a4eiWGBrktvuQ
+	qViZkIV0G5RLgCzQCMEANLl86GH9muYaPmzwVBK7YcOiISDX9C9JjTaooY7tK9x3QEhKY31Sai7
+	vWP2guiQ9bEsu5pvxvEm2svSBLh8Wfj3fIRLdsY/pu07geaSiSH0lZ6K3qxjTePPqUjzZrUH24N
+	JzlzP9T+gyQD0eEstffUes5mvCNbUFDX1FdDMAotCK0y4VWL+e+XIYh5jxtHCWR84LG9SoCztAK
+	SOnrbuK1M/JxwIr4OKVFMBwmaN0QvZ5xxoZERS0sAImXPLJfLBCOF4KStDfXdY6t7qZ11vDQWh+
+	wT8PeTKDqvKRmJOH4z5w==
+X-Received: by 2002:a17:902:ef45:b0:2b0:4eeb:f807 with SMTP id d9443c01a7336-2b0cdc3e969mr68503115ad.13.1774724297746;
+        Sat, 28 Mar 2026 11:58:17 -0700 (PDT)
+Received: from kfuzz ([202.120.234.33])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2427b1ef0sm37793225ad.74.2026.03.28.11.58.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Mar 2026 11:58:17 -0700 (PDT)
+From: Kangzheng Gu <xiaoguai0992@gmail.com>
+To: gregkh@linuxfoundation.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	kees@kernel.org,
+	p@1g4.org,
+	xiaoguai0992@gmail.com
+Cc: netdev@vger.kernel.org,
+	stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net-shapers: free rollback entries using kfree_rcu
+Date: Sat, 28 Mar 2026 18:58:04 +0000
+Message-ID: <20260328185804.41325-1-xiaoguai0992@gmail.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <CAKvcANOzRwFk0jm4xBfMGVNJrgGhBT8zvb6r49qc=WdB5zP_fg@mail.gmail.com>
+References: <CAKvcANOzRwFk0jm4xBfMGVNJrgGhBT8zvb6r49qc=WdB5zP_fg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acgPJgW9r0l952qu@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272803-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-272804-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[linuxfoundation.org,davemloft.net,google.com,kernel.org,redhat.com,1g4.org,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_NEQ_ENVFROM(0.00)[xiaoguai0992@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.688];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[davemloft.net:email,intel.com:email,shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A2CD134FB45
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0A5B634FB4E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Mar 28, 2026 at 05:25:58PM +0000, Russell King (Oracle) wrote:
-> On Sat, Mar 28, 2026 at 09:31:46AM +0000, Russell King (Oracle) wrote:
-> > On Sat, Mar 28, 2026 at 08:24:37AM +0000, Russell King (Oracle) wrote:
-> > > On Fri, Mar 27, 2026 at 09:40:09AM +0000, Russell King (Oracle) wrote:
-> > > > The test in stmmac_xmit() to see whether we should pass the skbuff to
-> > > > stmmac_tso_xmit() is more complex than it needs to be. This test can
-> > > > be simplified by storing the mask of GSO types that we will pass, and
-> > > > setting it according to the enabled features.
-> > > > 
-> > > > Note that "tso" is a mis-nomer since commit b776620651a1 ("net:
-> > > > stmmac: Implement UDP Segmentation Offload"). Also note that this
-> > > > commit controls both via the TSO feature. We preserve this behaviour
-> > > > in this commit.
-> > > > 
-> > > > Also, this commit unconditionally accessed skb_shinfo(skb)->gso_type
-> > > > for all frames, even when skb_is_gso() was false. This access is
-> > > > eliminated.
-> > > > 
-> > > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > > 
-> > > AI review of this patch regurgitates Jakub's point that was discussed.
-> > > 
-> > > > @@ -3700,7 +3700,7 @@ static int stmmac_hw_setup(struct net_device *dev)
-> > > >  	stmmac_set_rings_length(priv);
-> > > >  
-> > > >  	/* Enable TSO */
-> > > > -	if (priv->tso) {
-> > > > +	if (priv->gso_enabled_types) {
-> > > >  		for (chan = 0; chan < tx_cnt; chan++) {
-> > > >  			struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[chan];
-> > > >  
-> > > 
-> > > ...
-> > > 
-> > > > @@ -7828,7 +7834,7 @@ static int __stmmac_dvr_probe(struct device *device,
-> > > >  		ndev->hw_features |= NETIF_F_TSO | NETIF_F_TSO6;
-> > > >  		if (priv->plat->core_type == DWMAC_CORE_GMAC4)
-> > > >  			ndev->hw_features |= NETIF_F_GSO_UDP_L4;
-> > > > -		priv->tso = true;
-> > > > +		stmmac_set_gso_types(priv, true);
-> > > 
-> > > Clearly, the issue it is regurgitating has been there for a long time
-> > > and isn't a new issue introduced by this patch.
-> > > 
-> > > AI needs to stop doing this, because it is encouraging multiple changes
-> > > in a single patch, which is against the normal kernel process.
-> > > 
-> > > As already pointed out, there are multiple issues with stmmac TSO
-> > > support, particularly with glue drivers that enable TSO on some
-> > > queues/channels and not others, since netdev core TSO support is
-> > > global across all channels.
-> > > 
-> > > So, won't the AI response in this patch - it's just another pre-
-> > > existing issue that needs fixing in a separate patch.
-> > 
-> > Looking at the TSO vs TBS issue (which precludes the use of TSO on a
-> > channel in stmmac) I can't find an obvious reason for this in the
-> > available documentation. However, unfortunately, iMX8MP doesn't support
-> > TSO, so the TSO bits are elided there, but does support TBS (needing
-> > enhanced descriptors to be enabled). STM32MP151 on the other hand
-> > supports TSO but not TBS, and thus fails to mention anything about
-> > enhanced descriptors or TBS.
-> > 
-> > When stmmac_enable_tbs() enables TBS, it isn't actually enabling a
-> > feature specific bit, but switching the channel to use enhanced
-> > descriptor format. This format extends the basic descriptors by
-> > placing four extra 32-bit words before the basic descriptor.
-> > 
-> > Looking at the enhanced normal descriptor format for TDES3, it
-> > indicates that the format includes bit 18 in the control field, which
-> > is the TSE bit (TCP segmentation enable for this packet.) So, it seems
-> > it's not a limitation of the descriptor format.
-> > 
-> > So, either "TSO and TBS cannot co-exist" is incorrect, or there is a
-> > hardware limitation that isn't documented between these two manuals.
-> > 
-> > One other interesting point is that stmmac_tso_xmit() seems to
-> > handle the case where TSO and TBS are enabled on the channel:
-> > 
-> >                 if (tx_q->tbs & STMMAC_TBS_AVAIL)
-> >                         mss_desc = &tx_q->dma_entx[tx_q->cur_tx].basic;
-> >                 else
-> >                         mss_desc = &tx_q->dma_tx[tx_q->cur_tx];
-> > 
-> >                 stmmac_set_mss(priv, mss_desc, mss);
-> > ...
-> >         if (tx_q->tbs & STMMAC_TBS_AVAIL)
-> >                 desc = &tx_q->dma_entx[first_entry].basic;
-> >         else
-> >                 desc = &tx_q->dma_tx[first_entry];
-> >         first = desc;
-> > 
-> > etc.
-> > 
-> > Avoiding enabling TSO for a TBS channel was added by this commit:
-> > 
-> > commit 5e6038b88a5718910dd74b949946d9d9cee9a041
-> > Author: Ong Boon Leong <boon.leong.ong@intel.com>
-> > Date:   Wed Apr 21 17:11:49 2021 +0800
-> > 
-> >     net: stmmac: fix TSO and TBS feature enabling during driver open
-> > 
-> >     TSO and TBS cannot co-exist and current implementation requires two
-> >     fixes:
-> > 
-> >      1) stmmac_open() does not need to call stmmac_enable_tbs() because
-> >         the MAC is reset in stmmac_init_dma_engine() anyway.
-> >      2) Inside stmmac_hw_setup(), we should call stmmac_enable_tso() for
-> >         TX Q that is _not_ configured for TBS.
-> > 
-> >     Fixes: 579a25a854d4 ("net: stmmac: Initial support for TBS")
-> >     Signed-off-by: Ong Boon Leong <boon.leong.ong@intel.com>
-> >     Signed-off-by: David S. Miller <davem@davemloft.net>
-> > 
-> > which doesn't really explain the background, and leaves all the TBS
-> > cruft in the TSO transmit path (nothing like properly updating the
-> > driver, eh? No wonder stmmac is such a mess!)
-> 
-> The more I look at this, the more I'm convinced this commit is
-> incorrect, even if it is the case that the hardware doesn't support
-> TSO and TBS together.
-> 
-> When TSO is enabled (NETIF_F_TSO set in the netif's features) then
-> the core net layer can submit skbuffs that need to be processed using
-> TSO.
-> 
-> If such a skbuff hits a channel that has TSO disabled (because the
-> above commit caused:
-> 
-> 	stmmac_enable_tso(priv, priv->ioaddr, 1, chan);
-> 
-> not to be called) then the TSE bit in the transmit control register
-> will not be set, thereby disabling TSO on this particular channel.
-> 
-> However, stmmac_xmit() will still call through to stmmac_tso_xmit()
-> which will dutifully populate the transmit ring with descriptors that
-> assume TSE has been set in the transmit control register.
-> 
-> It seems to me _that_ is even more broken than "the hardware doesn't
-> support TSO and TBS together" - I have no idea what the stmmac hardware
-> does if it encounters descriptors with TSE set but TSE is disabled in
-> the transmit control register. My guess would be it would ignore the
-> TSE bit in the descriptor and assume that it's one very large packet
-> to be sent - and either error out because it's longer than the
-> maximum the hardware can support or it will just try to transmit it
-> anyway.
+net_shaper_rollback() removes NET_SHAPER_NOT_VALID entries and frees
+them using kfree(), which can race with net_shaper_nl_get_dumpit() and
+lead to a use-after-free in net_shaper_fill_one().
 
-Okay, I've found a statement in the stm32mp25xx documentation which
-backs up Intel's commit, but that commit is still wrong because it
-only half does the job.
+Use kfree_rcu() instead of kfree() to free rollback entries, since
+net_shaper_nl_get_dumpit() protects shaper access with rcu_read_lock().
 
-However, I think I now have a solution - implementing
-.ndo_features_check() which will mask out the NETIF_F_GSO_MASK
-features if either the header length is greater than 1023 (the
-hardware maximum) or the queue (as returned by
-skb_get_queue_mapping(skb)) is for a queue which has TBS available,
-and thus has TSO disabled.
+Cc: stable@vger.kernel.org
+Fixes: 93954b40f6a4 ("net-shapers: implement NL set and delete operations")
+Signed-off-by: Kangzheng Gu <xiaoguai0992@gmail.com>
+---
+ net/shaper/shaper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm surprised we haven't had reports of brokenness in this area.
-
-I think it's time to re-shuffle these patches (plus I think there's
-a bit more scope to clean up some of the TSO code which would mean
-placing stmmac_set_gso_types() in a different location to keep
-all the TSO-related code together. I'll mark this series as
-superseded once I have its replacement ready.
-
+diff --git a/net/shaper/shaper.c b/net/shaper/shaper.c
+index 94bc9c7382ea..8922f7f64768 100644
+--- a/net/shaper/shaper.c
++++ b/net/shaper/shaper.c
+@@ -434,7 +434,7 @@ static void net_shaper_rollback(struct net_shaper_binding *binding)
+ 	xa_for_each_marked(&hierarchy->shapers, index, cur,
+ 			   NET_SHAPER_NOT_VALID) {
+ 		__xa_erase(&hierarchy->shapers, index);
+-		kfree(cur);
++		kfree_rcu(cur, rcu);
+ 	}
+ 	xa_unlock(&hierarchy->shapers);
+ }
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.50.1
+
 
