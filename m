@@ -1,173 +1,148 @@
-Return-Path: <netdev+bounces-272766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272767-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id FVNHF2i6x2mfbQUAu9opvQ
-	(envelope-from <netdev+bounces-272766-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 12:24:24 +0100
+	id iMTwHEC9x2k9bgUAu9opvQ
+	(envelope-from <netdev+bounces-272767-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 12:36:32 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB8C34E2B7
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 12:24:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 798B234E300
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 12:36:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2A8AC3022042
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 11:24:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C3713013276
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 11:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39132E282B;
-	Sat, 28 Mar 2026 11:24:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ZK8fLAS/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97BC837F731;
+	Sat, 28 Mar 2026 11:36:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC6813DBA0;
-	Sat, 28 Mar 2026 11:24:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CDAE40DFBC;
+	Sat, 28 Mar 2026 11:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774697058; cv=none; b=CXzKkExJ3kfg7KPFcrtNZWQyrdOQIQUYYIodj3vgQjbZ0yrE9B71MFlkkma1uobmRs4QCy8OCT03KNFAQSSH3tuWr1tNEov95axi+Sd2msJTQCND3bdS4eNEQCSIF64dRILwLNJ84xzxciJe5XpkOvUGHC1v274kPr8wVGr669Q=
+	t=1774697789; cv=none; b=Z4oI8Sm8QDTVhmNduXOAAzQqMhvsSPp6MY341TDv/bNpTTiWI6Luu3wzF49zJlW8BGodC1o0kk/YrFtGcGJhrUMx+Yw0KmegQBw/P4xAL/J/L0/b/UNKWIK+uzezKtoPYJdP0rNd/6On4lhbAgj11OtSq8Rd16/aZNjdyMJo6mU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774697058; c=relaxed/simple;
-	bh=/RTUSRBEQO1I15pjsE+WveuZ5SBVnLu3/PT13TFmDF0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jTnIRubZovud82GM1/Bl6uBf9Lq9cI3c3N/IX5iQDssRUZM3ao5EnnI1VkXYpiH+ma4ZbJjG2j8ElSWI782TXZybjYx+xIIRslfkmW1KXqaZHKS834wzsOg+nd18HywIDrvrbQp9vZXZUugIrlkYL2qoSkGfoorQ3CqzBFy9OPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ZK8fLAS/; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
-	Content-Type; bh=4Iy2uWD6EdTkX0LR5V/PYn9bkVMswz2dyqbJDDHTxhQ=;
-	b=ZK8fLAS/D3WCTVy6B8EE9CWRDMCYrNgr4hFxi9X0rq0CKn297Ij1Z/a+BoLyBx
-	H/2Ly8tR9Wh28Q86nzjGOKKwNayf0WblSjffMK2R+6crHMuK+FGw9YYh4DdRQdCe
-	PcrPvUuHM9o+2vCG5sBflajTXH4ZANy+9XvsEG+vjXwUE=
-Received: from [10.54.26.11] (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgBXQ_MIusdpOpRiTA--.6241S2;
-	Sat, 28 Mar 2026 19:22:50 +0800 (CST)
-Message-ID: <7e8c45cb-b5dd-4694-80e9-7c8e5ad9ade7@163.com>
-Date: Sat, 28 Mar 2026 19:22:48 +0800
+	s=arc-20240116; t=1774697789; c=relaxed/simple;
+	bh=rhlDXRXJHepqcIKaaqSr0WQGym7zs9V2OcYTND/ciH4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a3T4jT4oy6YVXNE8+q+/n4yPdjYrpn5q0MLnxiYyS0lv2tER7ekDmejZ/y3u742n3iwOPoWNaqADiHHRJfS9hLfH95T+sLnBRvHDhKN5+ayC9YvqmpnjQ+Nf6CmJsm7OQtk+Om901PCdDqTt3WBqIxmrWbJhEZMxor7Pb0MC8ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [111.196.245.197])
+	by APP-05 (Coremail) with SMTP id zQCowAD3iAwvvcdplh_ACw--.26170S2;
+	Sat, 28 Mar 2026 19:36:15 +0800 (CST)
+From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+To: netdev@vger.kernel.org,
+	krzk@kernel.org
+Cc: bongsu.jeon@samsung.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	pengpeng@iscas.ac.cn
+Subject: [PATCH] NFC: s3fwrn5: bound the UART receive buffer
+Date: Sat, 28 Mar 2026 19:36:15 +0800
+Message-ID: <20260328113615.37260-1-pengpeng@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] ipv6: fix data race in fib6_metric_set() using
- cmpxchg
-To: Hangbin Liu <liuhangbin@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Fei Liu <feliu@redhat.com>
-References: <20260327-b4-fib6_metric_set-kmemleak-v2-1-366b2c78b5c2@gmail.com>
-From: Jiayuan Chen <mrpre@163.com>
-In-Reply-To: <20260327-b4-fib6_metric_set-kmemleak-v2-1-366b2c78b5c2@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgBXQ_MIusdpOpRiTA--.6241S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxAr4UXw1xZrWUJFyxKFyUKFg_yoW5GFWrpF
-	Z3G39rtanrtrW3uw1kC3Z7XFykJw4xAFy3GrWSywnI9Fy5Gw1aqayrK3y2gry5Ar4fX34a
-	9F4qy34DZFyqqaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UxnYwUUUUU=
-X-CM-SenderInfo: xpus2vi6rwjhhfrp/xtbC6wv8pGnHugsUwAAA3z
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-CM-TRANSID:zQCowAD3iAwvvcdplh_ACw--.26170S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tr48Aw4DGF4xJFyrXw4rAFb_yoW8Xw4kpF
+	45Ka4jqr18tr43Jr9rJ3yFgFW3J34SgFW5Cry3K3yrZFWrArZ8GaySkFW2gr45Cr4kJFWf
+	Aa48AF48C3WUKrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r1q
+	6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUU
+	U==
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[163.com,none];
-	R_DKIM_ALLOW(-0.20)[163.com:s=s110527];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,kernel.org,google.com,redhat.com,linux.dev];
-	FREEMAIL_FROM(0.00)[163.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-272766-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[163.com:+];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mrpre@163.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,redhat.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9CB8C34E2B7
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272767-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iscas.ac.cn:email,iscas.ac.cn:mid]
+X-Rspamd-Queue-Id: 798B234E300
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+s3fwrn82_uart_read() appends bytes to phy->recv_skb with skb_put_u8().
+It only resets the skb after a complete NCI frame is assembled.
 
-On 3/27/26 10:24 AM, Hangbin Liu wrote:
-> fib6_metric_set() may be called concurrently from softirq context without
-> holding the FIB table lock. A typical path is:
->
->    ndisc_router_discovery()
->      spin_unlock_bh(&table->tb6_lock)        <- lock released
->      fib6_metric_set(rt, RTAX_HOPLIMIT, ...) <- lockless call
->
-> When two CPUs process Router Advertisement packets for the same router
-> simultaneously, they can both arrive at fib6_metric_set() with the same
-> fib6_info pointer whose fib6_metrics still points to dst_default_metrics.
->
->    if (f6i->fib6_metrics == &dst_default_metrics) {   /* both CPUs: true */
->        struct dst_metrics *p = kzalloc_obj(*p, GFP_ATOMIC);
->        refcount_set(&p->refcnt, 1);
->        f6i->fib6_metrics = p;   /* CPU1 overwrites CPU0's p -> p0 leaked */
->    }
->
-> The dst_metrics allocated by the losing CPU has refcnt=1 but no pointer
-> to it anywhere in memory, producing a kmemleak report:
->
->    unreferenced object 0xff1100025aca1400 (size 96):
->      comm "softirq", pid 0, jiffies 4299271239
->      backtrace:
->        kmalloc_trace+0x28a/0x380
->        fib6_metric_set+0xcd/0x180
->        ndisc_router_discovery+0x12dc/0x24b0
->        icmpv6_rcv+0xc16/0x1360
->
-> Fix this by:
->   - Set val for p->metrics before published via cmpxchg() so the metrics
->     value is ready before the pointer becomes visible to other CPUs.
->   - Replace the plain pointer store with cmpxchg() and free the allocation
->     safely when competition failed.
->   - Add READ_ONCE()/WRITE_ONCE() for metrics[] setting in the non-default
->     metrics path to prevent compiler-based data races.
->
-> Fixes: d4ead6b34b67 ("net/ipv6: move metrics from dst to rt6_info")
-> Reported-by: Fei Liu <feliu@redhat.com>
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+The receive skb is allocated with NCI_SKB_BUFF_LEN bytes, but
+malformed UART traffic can keep the frame incomplete and continue
+growing recv_skb until skb_put_u8() overruns the tailroom.
 
-Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+Drop the accumulated partial frame once the fixed receive buffer is full
+and no complete frame has been seen yet so malformed UART traffic cannot
+grow the skb past NCI_SKB_BUFF_LEN.
 
-https://sashiko.dev/#/patchset/20260327-b4-fib6_metric_set-kmemleak-v2-1-366b2c78b5c2%40gmail.com
+Fixes: 3f52c2cb7e3a ("nfc: s3fwrn5: Support a UART interface")
+Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
+---
+ drivers/nfc/s3fwrn5/uart.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-
-The concern about reader paths (e.g., ip_dst_init_metrics, fib6_pmtu) 
-lacking READ_ONCE()
-annotations is valid — if the compiler reloads from->fib6_metrics after 
-inlining, it could produce
-an inconsistent pointer/flags combination in dst->_metrics, potentially 
-leading to a refcount_dec
-on the read-only dst_default_metrics.
-
-However, this is a pre-existing issue that exists before this patch.
-The plain store f6i->fib6_metrics = p in the original code has the same 
-read-side race.
-This patch focuses on fixing the writer-side data race that causes 
-kmemleak, and it
-does so correctly.
-
-BTW, please consider moving the declaration of m to the top of the 
-function if you have a next version
-
+diff --git a/drivers/nfc/s3fwrn5/uart.c b/drivers/nfc/s3fwrn5/uart.c
+index 9c09c10c2a46..c664fed78c1f 100644
+--- a/drivers/nfc/s3fwrn5/uart.c
++++ b/drivers/nfc/s3fwrn5/uart.c
+@@ -64,8 +64,17 @@ static size_t s3fwrn82_uart_read(struct serdev_device *serdev,
+ 			continue;
+ 
+ 		if ((phy->recv_skb->len - S3FWRN82_NCI_HEADER)
+-				< phy->recv_skb->data[S3FWRN82_NCI_IDX])
++				< phy->recv_skb->data[S3FWRN82_NCI_IDX]) {
++			if (phy->recv_skb->len < NCI_SKB_BUFF_LEN)
++				continue;
++
++			dev_dbg(&serdev->dev, "dropping oversized UART frame\n");
++			kfree_skb(phy->recv_skb);
++			phy->recv_skb = alloc_skb(NCI_SKB_BUFF_LEN, GFP_KERNEL);
++			if (!phy->recv_skb)
++				return 0;
+ 			continue;
++		}
+ 
+ 		s3fwrn5_recv_frame(phy->common.ndev, phy->recv_skb,
+ 				   phy->common.mode);
+-- 
+2.50.1 (Apple Git-155)
 
 
