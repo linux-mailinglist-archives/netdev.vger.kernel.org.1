@@ -1,175 +1,177 @@
-Return-Path: <netdev+bounces-272786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272787-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cI9nKtgCyGnagAUAu9opvQ
-	(envelope-from <netdev+bounces-272786-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 17:33:28 +0100
+	id gDAYLbkDyGnugAUAu9opvQ
+	(envelope-from <netdev+bounces-272787-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 17:37:13 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E222434F2BE
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 17:33:26 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC14E34F303
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 17:37:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A58F0301F794
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 16:33:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C341F3013196
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 16:35:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5482033C18B;
-	Sat, 28 Mar 2026 16:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025703A450E;
+	Sat, 28 Mar 2026 16:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KJJw8ahx"
+	dkim=pass (2048-bit key) header.d=carlini.com header.i=@carlini.com header.b="hKqofFqA";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RmisDd/6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1030726FA5A
-	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 16:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77AB33C18B
+	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 16:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774715603; cv=none; b=S+td6yb9shvpjaEMd9Oq3Ba8+dXqdzPlKjENXAwz+/FS0h9aDmxcLuAekZqFEgZ9nut+GGZUQNDlKPut6Oky4ImaO8ZKB4huh5TBDSIT67cq8t4TwOMloLsPuVYpBTg++zWCUbG7mMDMQ8gYK+7nY4rXK2cO+pmwUpmd6qsLj34=
+	t=1774715722; cv=none; b=HdEM/pW8F0U9C9uGnfWSoFFvxNkwqzinPv7GtD78KJhaRF3cNBrBcN5AiMiXv21WIv+cwpL41F+ZyF8b8vA1gKD3iHzB5QjEJTasQr3mnsY4dE0UnrUSPjrz+poJKLLYzdaNcaFjfeTWTLLRa27SVS/3KiviPZQXHYAauPXPkBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774715603; c=relaxed/simple;
-	bh=Fq6eHI+AA+1FVZs9j/tF5tTRiJpn5tD7qFqbJjL24RM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P8nQHgChtLIdWoccI9zX8gLWqQ20HEh6i9lCMZU6zp6JdA0wvLSTFRVu32vmzdXr74GY5CZ5eW1/whkfkG3GJFwX9c8fHvEGg82bb8MWJ8ETMfmX8tgT7DhJ021XExO/YA5u4SQmvKKv6hsfZTIFrcbXxSI3ttW3t19na9mH72o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KJJw8ahx; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774715597;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=BQAfoUisJ6V0zmjJY8J3so7sKalecxOlLQSbXuTuX9E=;
-	b=KJJw8ahx7Jck7gs/XkaQsS2Mh7QMyEdHPanzyPN8WKT2Q2kdk+gWoRd9PxoisgRrh9WFzd
-	MeeIfFufbjLj7JfDfzXf22GfRokFsIQSiAgargO2grbpvr9vXwgbURvEP29/6kMTonGArV
-	x8TYq/E56UPNMa8Qzm0jwWcKcXpnkH0=
-From: Yufan Chen <yufan.chen@linux.dev>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1774715722; c=relaxed/simple;
+	bh=GJoaATxqiThJHB/A5Vfgd30jzdOLGmOmiL7NJRuKzjU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c72zkdHZSRIgJ0fNMLUESep3Q1UAj3frDMleHnJeNBHgB20gBfi2HBzKHopnW2VxKECXA7SHVPZz4UnkM+oZPLZMErHCc2H2g+fNaZVa4qHaQTCvDEWWmSCmA8oCcc9SHLp7vk55gdRzzN6gt3EwcUXZemMKdIRuFyvUrbMdAl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=carlini.com; spf=pass smtp.mailfrom=carlini.com; dkim=pass (2048-bit key) header.d=carlini.com header.i=@carlini.com header.b=hKqofFqA; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RmisDd/6; arc=none smtp.client-ip=202.12.124.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=carlini.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=carlini.com
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id BA32C7A01A6;
+	Sat, 28 Mar 2026 12:35:19 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-12.internal (MEProxy); Sat, 28 Mar 2026 12:35:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=carlini.com; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1774715719; x=1774802119; bh=90YPRoRWWuassmQHsRnkD
+	goaHXeFk8zo0icT/ORYCy0=; b=hKqofFqAXoNjQdN1ssZ+te63ERKofsKZM4JXl
+	JCPTP/1RZPvC9kdY7vIy7hGH5deYQAPwlpgyVjYuUwW+B46jXntewlg799gOjzLh
+	6w8bl4PauB0kfxuT+5reytMZ++zm94Yod0EWwi2zmFAy6T+vqqZQh3qOHKna7Dd5
+	//d9kjCm4znT/yuRk7Ktlo2ePA+m49PSLGIXEqwgGXjeaRF+XlUVBj/qjwQso1eq
+	AsLAN00Kp4kECl4n6QSORrcAO+aXnBKc0GNAJTNj9D5eozNIL7IGvbcvR8zic6jO
+	aAPo9Wcc9cW7p3/SB1qy3UggldRVNOSWWeHMwV0QHK8e18H6A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1774715719; x=1774802119; bh=90YPRoRWWuassmQHsRnkDgoaHXeFk8zo0ic
+	T/ORYCy0=; b=RmisDd/6NFq7wOVlkZQUAoPKwqW/DqGw5WHIn1ZgFS0R0PVpz2e
+	KfDNhTzfPP8rv3c/UYa9IRYhwO8/POEfCmbFkX6PqfcVHUkwcyQLhjkBuV0N3SAU
+	mlECFo89TvbnV0pfE7dOoGSm3lF5WskvIoANM/LiZjw6/2qfMPvaVYS7K5zWTjpK
+	NvbIAkJVQbj/cG75ndnbp8u9Ln6iW1o4Vw4XFIcjij2Wp23RGp+fKgCpjLcQyeNB
+	BtB9lEFWx0eKoArKNvCqJB+kw+6CxE3szrpPS6bBL+uf8rhjkWZyRZN6C4pd9qE3
+	77x7TNSpRSuHq4JFUVvdK68abn7CrrXtVhA==
+X-ME-Sender: <xms:RgPIaWsMXEjDwe5GDqeqdJUk_iaNECekVf2C_eULmv4_ErlqNB6YtQ>
+    <xme:RgPIaWaKLU4nNY8lT254ktUYcGeYa-CT1I_KQD8KY5IrIbLnIah-rTXmcQz4b4ezC
+    OX8G8GNzh-5b6nNMtVCKWPU9oJhVNiheVLsloJRcSsO3qsbiRE8QP4>
+X-ME-Received: <xmr:RgPIaQwIzEuB1T6A_Rik-Rm67EeweQn0qzCsbZFswLs0LcuakbqmUBoVwnHnv2HkBY_IEybffFG5GAGKj23y7WxkOUnI_fGmamf75FaMvvAnx3pc023z5Ii5IC-kJSZoPo6xnWSA2TBuwKChMrLUhFRfYcJbsg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeffeefieeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepnhhitghhohhlrghs
+    segtrghrlhhinhhirdgtohhmnecuggftrfgrthhtvghrnhepjeelfeeuieduheehheefje
+    ffvdetvdefuedttedvheefteffvdefveelheffgfejnecuvehluhhsthgvrhfuihiivgep
+    tdenucfrrghrrghmpehmrghilhhfrhhomhepnhhitghhohhlrghssegtrghrlhhinhhird
+    gtohhmpdhnsggprhgtphhtthhopeeipdhmohguvgepshhmthhpohhuthdprhgtphhtthho
+    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehsthgvfh
+    hfvghnrdhklhgrshhsvghrthesshgvtghunhgvthdrtghomhdprhgtphhtthhopehhvghr
+    sggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtohepuggrvh
+    gvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehsrhigiihrsegrnhhthhhr
+    ohhpihgtrdgtohhmpdhrtghpthhtohepnhhitghhohhlrghssegtrghrlhhinhhirdgtoh
+    hm
+X-ME-Proxy: <xmx:RgPIaWg5-GZ05TYgZ1d5a7BUOSAnSpUo6BPSc6JdZ4umOxdKEp_F7g>
+    <xmx:RgPIaUm9Z-IfXEfxwrd60h0XTDXprFZRL9cQhNDGCWGQSvr8LEJ-1A>
+    <xmx:RgPIaUicNvaK6xi9jZkWWV3XXqQl62tcwt1Lgg42FpVG29nFlHXWEQ>
+    <xmx:RgPIaQ0Pvq_nlpmT0fsba7xgmUEM1C8oIAyzZYasZ4v28s3Md30TZA>
+    <xmx:RwPIaTgJmQT8nBa9_S5kcPrUgwl_xQtqhlCbO1OGfsdNoQnNLAw-U9T1>
+Feedback-ID: i78b949e2:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 28 Mar 2026 12:35:17 -0400 (EDT)
+From: nicholas@carlini.com
+To: netdev@vger.kernel.org
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: yufan.chen@linux.dev
-Subject: [PATCH net v2] net: ftgmac100: fix ring allocation unwind on open failure
-Date: Sun, 29 Mar 2026 00:32:57 +0800
-Message-ID: <20260328163257.60836-1-yufan.chen@linux.dev>
+	Milad Nasr <srxzr@anthropic.com>,
+	Nicholas Carlini <nicholas@carlini.com>
+Subject: [PATCH] xfrm6: fix slab-out-of-bounds write in xfrm6_input_addr()
+Date: Sat, 28 Mar 2026 16:35:16 +0000
+Message-ID: <20260328163516.2111971-1-nicholas@carlini.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2537; i=ericterminal@gmail.com; h=from:subject; bh=Fq6eHI+AA+1FVZs9j/tF5tTRiJpn5tD7qFqbJjL24RM=; b=owGbwMvMwCXWM/dCzeS3H+sZT6slMWSeYGpJ2uknrZ35KvPcluPf81jsSrq+vO77K+Zz71aLd EXsHB21joksDGJcDJZiiix3/++bm+t1a8517sO5MHNYmUCGSIs0MAABCwNfbmJeqZGOkZ6ptqGe oZGOgY4xAxenAEy1vQnDP7OZv8QfzDm5aM+1fYw8Jr8/d3zJN+1jnLxEcX5nwXJ58ySGfzp7lk2 yt/y+d+e+wzPV7cN+/lzBkGj/VffNcSWN3CSlNcwA
-X-Developer-Key: i=ericterminal@gmail.com; a=openpgp; fpr=DDFFBE9D6D4ADA9CD70BC36D8C9DD07C93EDF17F
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[carlini.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[carlini.com:s=fm3,messagingengine.com:s=fm1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272786-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272787-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[carlini.com:+,messagingengine.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NO_DN(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yufan.chen@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nicholas@carlini.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E222434F2BE
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[carlini.com:dkim,carlini.com:email,carlini.com:mid,anthropic.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: BC14E34F303
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-ftgmac100_alloc_rings() allocates rx_skbs, tx_skbs, rxdes, txdes, and
-rx_scratch in stages. On intermediate failures it returned -ENOMEM
-directly, leaking resources allocated earlier in the function.
+From: Nicholas Carlini <nicholas@carlini.com>
 
-Rework the failure path to use staged local unwind labels and free
-allocated resources in reverse order before returning -ENOMEM. This
-matches common netdev allocation cleanup style.
+The bounds check guarding sp->xvec[sp->len++] uses == where >= is
+required. When sp->len has already reached XFRM_MAX_DEPTH via prior
+ESP processing in xfrm_input(), the check (1 + 6 == 6) is false and
+the write goes out of bounds into the adjacent skbuff_ext_cache slab
+object.
 
-Fixes: d72e01a0430f ("ftgmac100: Use a scratch buffer for failed RX allocations")
-Cc: stable@vger.kernel.org
-Signed-off-by: Yufan Chen <yufan.chen@linux.dev>
+An unprivileged local user can trigger this by entering a
+user+network namespace, configuring six transport-mode ESP SAs plus
+one MIP6 routing SA, and injecting an IPv6 packet with six ESP
+layers followed by multiple Routing Header Type 2 extensions.
+
+The check was correct (>) when the function was introduced, but
+was changed to == during a refactor in 2007.
+
+Fixes: 9473e1f631de ("[XFRM] MIPv6: Fix to input RO state correctly.")
+Reported-by: Milad Nasr <srxzr@anthropic.com>
+Signed-off-by: Nicholas Carlini <nicholas@carlini.com>
 ---
- drivers/net/ethernet/faraday/ftgmac100.c | 28 ++++++++++++++++++++----
- 1 file changed, 24 insertions(+), 4 deletions(-)
+ net/ipv6/xfrm6_input.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index 1e91e79c8..6d2fe5c2f 100644
---- a/drivers/net/ethernet/faraday/ftgmac100.c
-+++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -977,19 +977,19 @@ static int ftgmac100_alloc_rings(struct ftgmac100 *priv)
- 	priv->tx_skbs = kcalloc(MAX_TX_QUEUE_ENTRIES, sizeof(void *),
- 				GFP_KERNEL);
- 	if (!priv->tx_skbs)
--		return -ENOMEM;
-+		goto err_free_rx_skbs;
- 
- 	/* Allocate descriptors */
- 	priv->rxdes = dma_alloc_coherent(priv->dev,
- 					 MAX_RX_QUEUE_ENTRIES * sizeof(struct ftgmac100_rxdes),
- 					 &priv->rxdes_dma, GFP_KERNEL);
- 	if (!priv->rxdes)
--		return -ENOMEM;
-+		goto err_free_tx_skbs;
- 	priv->txdes = dma_alloc_coherent(priv->dev,
- 					 MAX_TX_QUEUE_ENTRIES * sizeof(struct ftgmac100_txdes),
- 					 &priv->txdes_dma, GFP_KERNEL);
- 	if (!priv->txdes)
--		return -ENOMEM;
-+		goto err_free_rxdes;
- 
- 	/* Allocate scratch packet buffer */
- 	priv->rx_scratch = dma_alloc_coherent(priv->dev,
-@@ -997,9 +997,29 @@ static int ftgmac100_alloc_rings(struct ftgmac100 *priv)
- 					      &priv->rx_scratch_dma,
- 					      GFP_KERNEL);
- 	if (!priv->rx_scratch)
--		return -ENOMEM;
-+		goto err_free_txdes;
- 
- 	return 0;
-+
-+err_free_txdes:
-+	dma_free_coherent(priv->dev,
-+			  MAX_TX_QUEUE_ENTRIES *
-+			  sizeof(struct ftgmac100_txdes),
-+			  priv->txdes, priv->txdes_dma);
-+	priv->txdes = NULL;
-+err_free_rxdes:
-+	dma_free_coherent(priv->dev,
-+			  MAX_RX_QUEUE_ENTRIES *
-+			  sizeof(struct ftgmac100_rxdes),
-+			  priv->rxdes, priv->rxdes_dma);
-+	priv->rxdes = NULL;
-+err_free_tx_skbs:
-+	kfree(priv->tx_skbs);
-+	priv->tx_skbs = NULL;
-+err_free_rx_skbs:
-+	kfree(priv->rx_skbs);
-+	priv->rx_skbs = NULL;
-+	return -ENOMEM;
- }
- 
- static void ftgmac100_init_rings(struct ftgmac100 *priv)
--- 
-2.47.3
+diff --git a/net/ipv6/xfrm6_input.c b/net/ipv6/xfrm6_input.c
+index 9005fc156a20..a958c08589d6 100644
+--- a/net/ipv6/xfrm6_input.c
++++ b/net/ipv6/xfrm6_input.c
+@@ -246,7 +246,7 @@ int xfrm6_input_addr(struct sk_buff *skb, xfrm_address_t *daddr,
+         goto drop;
+     }
+
+-    if (1 + sp->len == XFRM_MAX_DEPTH) {
++    if (1 + sp->len >= XFRM_MAX_DEPTH) {
+         XFRM_INC_STATS(net, LINUX_MIB_XFRMINBUFFERERROR);
+         goto drop;
+     }
+--
+2.39.5
 
