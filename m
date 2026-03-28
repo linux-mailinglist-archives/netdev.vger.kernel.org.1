@@ -1,337 +1,267 @@
-Return-Path: <netdev+bounces-272762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272784-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +ChTDv2qx2mAaQUAu9opvQ
-	(envelope-from <netdev+bounces-272762-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 11:18:37 +0100
+	id AFR0FE/5x2lMfQUAu9opvQ
+	(envelope-from <netdev+bounces-272784-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 16:52:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D650834E0BA
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 11:18:36 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA31B34F03D
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 16:52:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B97F2302690D
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 10:18:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5E9B030041CC
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 15:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A4B38655D;
-	Sat, 28 Mar 2026 10:18:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A472B342510;
+	Sat, 28 Mar 2026 15:52:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s8rm2Poj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pTFwf9Vp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908C227B343
-	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 10:18:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9E213AA2D
+	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 15:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774693108; cv=none; b=KJhZQVYmY7Xr3Q0el0Pc1VRLv1iSz4G0AXXtmlZEO2zDSUTK587ReCJ6jtzwM9reNr0+y/vG4BbxgPzcbIZPsCDH+Bz9jLLWBW/6qgv6LDhcSCQLW9YIyrCwt7FcAsBJLdE4MgCE8Bl6kBjnoh5AlmrG0lR74TJrhO0y+FVydDQ=
+	t=1774713164; cv=none; b=BIKOHDH4/jDCCkWwSfWrgV7PPd0okmS9FKtN7AvcuA5sZJpDT7c4JHxIu3wR5hd3hJbf5RwLj0QCI2Q7YL4VMZcaaKecdPZWUeyWDsQ82nX8o7I6Ovw41+woubS0C7xsv+qSAPb1VgBOUFhTb8tP5G5To7i5DqyF64oYmaDMHPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774693108; c=relaxed/simple;
-	bh=z3Q6Ub6eZntdR+yjtMU1sOruGYzB+66LUEFvDVoYVTo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=FpdJ9hc/sORarvPA5s3DRPIyQu9wPEwFoxY66pqbb0UIJEHmwbA/IEEteKDo3tZKlR9uyRGZ0O/sjk4/45z8wGLi9OZ4kgtfytSpuCaIRAtWx0sf4oYHkR2/34tcwsMHcJ2WlLtjOr7AQKxNYlgafZ2azQWGe+3LebnCmOv5klA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s8rm2Poj; arc=none smtp.client-ip=209.85.160.174
+	s=arc-20240116; t=1774713164; c=relaxed/simple;
+	bh=93XagFVPNl3duxbBvxcwUDBo3vyzqKak8SMWenv0TS4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=g4goCk+eI+0acwIEasCuNauBD7WZNXZqSO8jCgjSiDzOX+e/2K0c9rgl2CbH9Wq57EuKrttPJraPRzDETsUqUOVeOY/wASNXDqyNXkpeET4rHu9tuiTCT5f9ZmqECLyww2BdnV5YxrX1MNuL2/pCzzR+hsGVusUvZL8P72deERg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pTFwf9Vp; arc=none smtp.client-ip=209.85.208.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-509217e84a3so24434901cf.3
-        for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 03:18:26 -0700 (PDT)
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-38a43f1f978so26962711fa.3
+        for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 08:52:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774693106; x=1775297906; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9rff8AXpzD8NbsmqMfMlyjp8BORw8w2LjOLxO5njrPs=;
-        b=s8rm2PojZO5amf6SyirZYwRvQej6lcdmy9088SB1KxbwpS0lwEJdvkZ7Vre0qFh2lN
-         j+Y2NWzY2bX2R4aR3HjvMq8Npt4ynbxsiFaAgyzM2TsfQFS/EAjoMp3FdKwYMua8ujJ/
-         8a7rTilr2q9MGl7WeXXGZwRh4gjpgut2t2312rhSRFfMTKhVT3JmQHPZxYVw4A0560X1
-         0M+Bhp9fkTVxBY60zSr+gPAj22xMLhSIk/pwI+I8rylZaBwRhYp8Tx18XuAALO52FzTk
-         97lbS1xGt0A8uc54CRKggA2V3jKaEgV43xuocao7IIBDjbGu9+eQ0O/aB3qwAkA//e0i
-         3QWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774693106; x=1775297906;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
+        d=gmail.com; s=20251104; t=1774713161; x=1775317961; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=9rff8AXpzD8NbsmqMfMlyjp8BORw8w2LjOLxO5njrPs=;
-        b=Dq5M0jocfe3ygiPkDbD6wrvWmXxZcYvEH4U8ApB6FPj2yp21Hgz7wNtQfyvhyO80rI
-         EY3I7ulMcFPUlhhLAuDlHqY5HBhXHtItVufZpvF2A3VQPlxGItpK51CN+cwTXjknbdg6
-         KhWmVeqAEgxMLJqlddstrK21VXQNbLy1O5LBDfy81cZGIdAzlEF+ZMUEYwSLCPCjC0cr
-         RPPi/3+mmBxVhuXC8zFIdh3FoPa78MvwDxK1IFe43zF6STCrpr/qBvSSqUP6aH3hbZ0G
-         IUC4mWpfE106pKT6zVOGaNTJKXI7mC8iDPcShwXxN5zna8y6qyYQELcBDf/9ZJDzZZEq
-         Aj/g==
-X-Forwarded-Encrypted: i=1; AJvYcCWKlwtxXZr5MbQ712DfB+rY28ekfTJ+ljDHtpOm2qMuzPBLN9g7D0Dzu6QS8OCYfKjOeWDMyLA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyt5nB8o9H1DoTB9HZAWRWwmCuCE7OLw3A8WaLVSruG57MvQo3R
-	F3+sQv7yYNqpRPxZE8khGjpEfbYOpGaVCy6FBvfyd5u4ac7h1QtOYV+6
-X-Gm-Gg: ATEYQzxfRwQiQ4Nh7/dhvavtKwgBzg6cUhQ6g4m/WXtGf7UlEEja9N7MmkHlFYggeVG
-	83d2rFfxeP5iYjxztTXc6FjSBBv31RuV2yGSBMiEuq/Y73EaI24aszP57s3TbcJO4BKhQaAvRfy
-	j5fQgssE/y+THvmW5W+lhywqy6p0AHRE0gx2uHVvo/lR/yjG9aj/aiEQe9WB/f86+0vwNP3g776
-	FiJSG4MX0wdtX42CUqXB5oe75eF4oJ5Jq79mNYSoKTdnvN4dv1QSk2DrE+Rv/j7UFoDp+EQN3tC
-	Un4wDRiodqC2aqrgRhIdYi7inyyq21YCZUR6ANGY4g4ny1rLqRbo/H+syycsLwaLqQHWhg0BDcT
-	Eh9yVbZfsbbbxk4tQ2YD8X+5KtBBVy5RwuGJ4xrCZN5beWBKoHYT0WmnnqLQeTt7byMesSq7Ape
-	SYusNGtHL09eYbdrFRfJvUNg3c73heNErQ4U3Zil7MM4w=
-X-Received: by 2002:ac8:5814:0:b0:50b:51f7:c660 with SMTP id d75a77b69052e-50ba398f849mr74156431cf.61.1774693105530;
-        Sat, 28 Mar 2026 03:18:25 -0700 (PDT)
-Received: from localhost.localdomain ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50bb2e17372sm15490681cf.24.2026.03.28.03.18.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Mar 2026 03:18:25 -0700 (PDT)
-From: Kevin Hao <haokexin@gmail.com>
-Date: Sat, 28 Mar 2026 18:17:48 +0800
-Subject: [PATCH net-next 4/4] net: macb: Remove dedicated IRQ handler for
- WoL
+        bh=y7pyXU2qFzEOnU8j2MDB/XlKYkbXJkeDxLklHnoWscA=;
+        b=pTFwf9VpgkkL4V5yKtX9uG2X9s24eusiMb8jCAgtWMPXsvm3Bu1ATv5obC0bO0oOHp
+         MwsgX/gU+2ZzI+puBX2XvkCANrQlzYP7vfn2pf8xjyz406QCN7XN7Hk9ohKfrNbP/u4g
+         6Vax+X5kbWBNGZaHgGykzKINTVEJdDphIqrS2kcmCIoc1ocfJ+lkvK/6LiBX1eIG1gGW
+         QKukpLK1XsYZi90GDtvLFbdPZ1YCi7u6KzoMjxnUSj3t3Tct5xKxKqOOhb20CV+evgYs
+         R/OIyQp0CqVHJrZrh/ZsdrMirI+TDuuNL8WmAUZ3/sdGXgnIOUM47A2voOi1OQlTfles
+         3yQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774713161; x=1775317961;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y7pyXU2qFzEOnU8j2MDB/XlKYkbXJkeDxLklHnoWscA=;
+        b=JFNUUtqDWaQ2BS5trvN/U+kBHylFoN2U7AVtbN5Blnkxj2wyRjBmjdfJFxEqynmScX
+         5Fcc45n3Ty74J9SQFCX3sHymJkSRf8z47ISbD98Tm7tvy9GwPr5BuXZqV0lrA2biTR/4
+         YQykyMKgXBfO4x08IAnjDg7O2y5RoNq2+JemiNVn/GeMYzhfwuHI+phAOP0QxjlwFcno
+         H1GMibQTDxQkYDikAG/++ijM15Zqwyksf1UVJUFfGUeMu3SBGcGJoOB4IkryjdxwrhQU
+         EsNKjusO5p9Cpi+7AHW394LbbZKv2o7E1kIRve+hzcaLNI+We/TFmgP+Jg4WiuxEmy7x
+         yUQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWAh32mxCS8WvxIwK34MdsqkwrTH1O1LdzFI5TEuRuBSHDgq8wBMzyzs4lG1YzUVCXxggEpL/8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyqecf6KI8CSZ+yEnnQMNg2BoM7vnggFQyOyIwRgNZNuewC5BkH
+	D+hzrVt0VqINhNlcDxv//o1P/ZBFwwAZarW17ndZfzFfjQEKMudl3otOT6qfgA==
+X-Gm-Gg: ATEYQzwiukmE9ABJGzVkAmAbvQue24NEHLN0psU2cpZOf52KZ26cI4wOOxDHiRbLkPW
+	ug/690Hq8f0qJcz6NuoGWcv1Ewe2+BTx8kxrb/1QglramTPFRlbpZeIDh56FzoISy0PGP0ljepb
+	+y+jjS/FwxbAXPUwrMTVoLW++3yQtdgKHoO1Stp/rf7pIBlAp7BCKJc4qbVGblPNqyR+wKrRTNu
+	atwFJQ72H7TXs3mGk0HKIj6x0Mh6jPVCnrfjPlDcHKtYKC/hNW3xKABJ8w07aU38Fm2V4GmZnAP
+	HE5JKmdfEbeKNCVXLE/AdEnPQ2AVPCTG+lSqUJCJ4KcGcGmizUqtNU+84Fo8vmOkXEoMZ0RHY5J
+	xzGvCxvGau9LwOG8kCPi5VU2FQ/0mWBDo4HylyExInQEAXfrTQnf44c5Cw98XDTme9HvwmkbMl+
+	VZQcuWSffvz70tkpGdMQ5uAPYNYoqL2ynFhFHScFr8zuvpH5mtJJHuudjagR91BLemizF80qaYx
+	KkyzfVdcSd+udAtNGwQ6+z+gzqgwVsdTpQrHtNuY87duNTo13uWxCyZYDJAafS8yqoc7/BgQdhs
+	jCpQAbJgZqpNYfh7rxY2WEoAkZcQw3hB4w==
+X-Received: by 2002:a17:907:1c1e:b0:b98:5b6b:9138 with SMTP id a640c23a62f3a-b9b50363003mr311019166b.19.1774693320670;
+        Sat, 28 Mar 2026 03:22:00 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9b7b1e3aeesm62735466b.48.2026.03.28.03.21.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 28 Mar 2026 03:22:00 -0700 (PDT)
+Message-ID: <6f42d92b-a26d-49a4-bef7-2227c252eea7@gmail.com>
+Date: Sat, 28 Mar 2026 11:21:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: phy: air_en8811h: add AN8811HB MCU
+ assert/deassert support
+From: Eric Woudstra <ericwouds@gmail.com>
+To: "Lucien.Jheng" <lucienzx159@gmail.com>, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bjorn@mork.no
+Cc: frank-w@public-files.de, daniel@makrotopia.org, lucien.jheng@airoha.com
+References: <20260326153518.8387-1-lucienzx159@gmail.com>
+ <edeee8e5-0de3-48ea-aeb5-cc705fdcd469@gmail.com>
+Content-Language: en-US
+In-Reply-To: <edeee8e5-0de3-48ea-aeb5-cc705fdcd469@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260328-macb-irq-v1-4-7b3e622fb46c@gmail.com>
-References: <20260328-macb-irq-v1-0-7b3e622fb46c@gmail.com>
-In-Reply-To: <20260328-macb-irq-v1-0-7b3e622fb46c@gmail.com>
-To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Kevin Hao <haokexin@gmail.com>, netdev@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272762-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272784-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[public-files.de,makrotopia.org,airoha.com];
 	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[ericwouds@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D650834E0BA
+X-Rspamd-Queue-Id: EA31B34F03D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In the current implementation, the suspend/resume path frees the
-existing IRQ handler and sets up a dedicated WoL IRQ handler, then
-restores the original handler upon resume. This approach is not used
-by any other Ethernet driver and unnecessarily complicates the
-suspend/resume process. After adjusting the IRQ handler in the previous
-patches, we can now handle WoL interrupts without introducing any
-overhead in the TX/RX hot path. Therefore, the dedicated WoL IRQ
-handler is removed.
 
-Signed-off-by: Kevin Hao <haokexin@gmail.com>
----
- drivers/net/ethernet/cadence/macb_main.c | 116 ++++++++-----------------------
- 1 file changed, 29 insertions(+), 87 deletions(-)
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index c53b28b42a46489722461957625e8377be63e427..de166dd9e637f5e436274b99f2c5eef99dcdb351 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -71,7 +71,8 @@ struct sifive_fu540_macb_mgmt {
- 					| MACB_BIT(TXUBR))
- 
- #define MACB_INT_MISC_FLAGS	(MACB_TX_ERR_FLAGS | MACB_BIT(RXUBR) | \
--				 MACB_BIT(ISR_ROVR) | MACB_BIT(HRESP))
-+				 MACB_BIT(ISR_ROVR) | MACB_BIT(HRESP) | \
-+				 GEM_BIT(WOL) | MACB_BIT(WOL))
- 
- /* Max length of transmit frame must be a multiple of 8 bytes */
- #define MACB_TX_LEN_ALIGN	8
-@@ -2027,62 +2028,32 @@ static void macb_hresp_error_task(struct work_struct *work)
- 	netif_tx_start_all_queues(dev);
- }
- 
--static irqreturn_t macb_wol_interrupt(int irq, void *dev_id)
-+static void macb_wol_interrupt(struct macb_queue *queue, u32 status)
- {
--	struct macb_queue *queue = dev_id;
- 	struct macb *bp = queue->bp;
--	u32 status;
- 
--	status = queue_readl(queue, ISR);
--
--	if (unlikely(!status))
--		return IRQ_NONE;
--
--	spin_lock(&bp->lock);
--
--	if (status & MACB_BIT(WOL)) {
--		queue_writel(queue, IDR, MACB_BIT(WOL));
--		macb_writel(bp, WOL, 0);
--		netdev_vdbg(bp->dev, "MACB WoL: queue = %u, isr = 0x%08lx\n",
--			    (unsigned int)(queue - bp->queues),
--			    (unsigned long)status);
--		if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--			queue_writel(queue, ISR, MACB_BIT(WOL));
--		pm_wakeup_event(&bp->pdev->dev, 0);
--	}
--
--	spin_unlock(&bp->lock);
--
--	return IRQ_HANDLED;
-+	queue_writel(queue, IDR, MACB_BIT(WOL));
-+	macb_writel(bp, WOL, 0);
-+	netdev_vdbg(bp->dev, "MACB WoL: queue = %u, isr = 0x%08lx\n",
-+		    (unsigned int)(queue - bp->queues),
-+		    (unsigned long)status);
-+	if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
-+		queue_writel(queue, ISR, MACB_BIT(WOL));
-+	pm_wakeup_event(&bp->pdev->dev, 0);
- }
- 
--static irqreturn_t gem_wol_interrupt(int irq, void *dev_id)
-+static void gem_wol_interrupt(struct macb_queue *queue, u32 status)
- {
--	struct macb_queue *queue = dev_id;
- 	struct macb *bp = queue->bp;
--	u32 status;
- 
--	status = queue_readl(queue, ISR);
--
--	if (unlikely(!status))
--		return IRQ_NONE;
--
--	spin_lock(&bp->lock);
--
--	if (status & GEM_BIT(WOL)) {
--		queue_writel(queue, IDR, GEM_BIT(WOL));
--		gem_writel(bp, WOL, 0);
--		netdev_vdbg(bp->dev, "GEM WoL: queue = %u, isr = 0x%08lx\n",
--			    (unsigned int)(queue - bp->queues),
--			    (unsigned long)status);
--		if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--			queue_writel(queue, ISR, GEM_BIT(WOL));
--		pm_wakeup_event(&bp->pdev->dev, 0);
--	}
--
--	spin_unlock(&bp->lock);
--
--	return IRQ_HANDLED;
-+	queue_writel(queue, IDR, GEM_BIT(WOL));
-+	gem_writel(bp, WOL, 0);
-+	netdev_vdbg(bp->dev, "GEM WoL: queue = %u, isr = 0x%08lx\n",
-+		    (unsigned int)(queue - bp->queues),
-+		    (unsigned long)status);
-+	if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
-+		queue_writel(queue, ISR, GEM_BIT(WOL));
-+	pm_wakeup_event(&bp->pdev->dev, 0);
- }
- 
- static int macb_interrupt_misc(struct macb_queue *queue, u32 status)
-@@ -2147,6 +2118,14 @@ static int macb_interrupt_misc(struct macb_queue *queue, u32 status)
- 			queue_writel(queue, ISR, MACB_BIT(HRESP));
- 	}
- 
-+	if (macb_is_gem(bp)) {
-+		if (status & GEM_BIT(WOL))
-+			gem_wol_interrupt(queue, status);
-+	} else {
-+		if (status & MACB_BIT(WOL))
-+			macb_wol_interrupt(queue, status);
-+	}
-+
- 	return 0;
- }
- 
-@@ -5943,7 +5922,6 @@ static int __maybe_unused macb_suspend(struct device *dev)
- 	unsigned long flags;
- 	u32 tmp, ifa_local;
- 	unsigned int q;
--	int err;
- 
- 	if (!device_may_wakeup(&bp->dev->dev))
- 		phy_exit(bp->phy);
-@@ -6007,39 +5985,15 @@ static int __maybe_unused macb_suspend(struct device *dev)
- 			/* write IP address into register */
- 			tmp |= MACB_BFEXT(IP, ifa_local);
- 		}
--		spin_unlock_irqrestore(&bp->lock, flags);
- 
--		/* Change interrupt handler and
--		 * Enable WoL IRQ on queue 0
--		 */
--		devm_free_irq(dev, bp->queues[0].irq, bp->queues);
- 		if (macb_is_gem(bp)) {
--			err = devm_request_irq(dev, bp->queues[0].irq, gem_wol_interrupt,
--					       IRQF_SHARED, netdev->name, bp->queues);
--			if (err) {
--				dev_err(dev,
--					"Unable to request IRQ %d (error %d)\n",
--					bp->queues[0].irq, err);
--				return err;
--			}
--			spin_lock_irqsave(&bp->lock, flags);
- 			queue_writel(bp->queues, IER, GEM_BIT(WOL));
- 			gem_writel(bp, WOL, tmp);
--			spin_unlock_irqrestore(&bp->lock, flags);
- 		} else {
--			err = devm_request_irq(dev, bp->queues[0].irq, macb_wol_interrupt,
--					       IRQF_SHARED, netdev->name, bp->queues);
--			if (err) {
--				dev_err(dev,
--					"Unable to request IRQ %d (error %d)\n",
--					bp->queues[0].irq, err);
--				return err;
--			}
--			spin_lock_irqsave(&bp->lock, flags);
- 			queue_writel(bp->queues, IER, MACB_BIT(WOL));
- 			macb_writel(bp, WOL, tmp);
--			spin_unlock_irqrestore(&bp->lock, flags);
- 		}
-+		spin_unlock_irqrestore(&bp->lock, flags);
- 
- 		enable_irq_wake(bp->queues[0].irq);
- 	}
-@@ -6081,7 +6035,6 @@ static int __maybe_unused macb_resume(struct device *dev)
- 	struct macb_queue *queue;
- 	unsigned long flags;
- 	unsigned int q;
--	int err;
- 
- 	if (!device_may_wakeup(&bp->dev->dev))
- 		phy_init(bp->phy);
-@@ -6108,17 +6061,6 @@ static int __maybe_unused macb_resume(struct device *dev)
- 			queue_writel(bp->queues, ISR, -1);
- 		spin_unlock_irqrestore(&bp->lock, flags);
- 
--		/* Replace interrupt handler on queue 0 */
--		devm_free_irq(dev, bp->queues[0].irq, bp->queues);
--		err = devm_request_irq(dev, bp->queues[0].irq, macb_interrupt,
--				       IRQF_SHARED, netdev->name, bp->queues);
--		if (err) {
--			dev_err(dev,
--				"Unable to request IRQ %d (error %d)\n",
--				bp->queues[0].irq, err);
--			return err;
--		}
--
- 		disable_irq_wake(bp->queues[0].irq);
- 
- 		/* Now make sure we disable phy before moving
+On 3/27/26 5:41 AM, Eric Woudstra wrote:
+> static int __air_pbus_reg_write(struct mdio_device *mdio, u32 pbus_address,
+> 				u32 pbus_data)
+> {
+> 	int ret;
+> 
+> 	ret = __mdiobus_write(mdio->bus, mdio->addr, AIR_EXT_PAGE_ACCESS,
+> 			      (u16)(pbus_address >> 6));
+> 	if (ret < 0)
+> 		return ret;
+> 
+> 	ret = __mdiobus_write(mdio->bus, mdio->addr, (pbus_address >> 2) & 0xf,
+> 			      (u16)pbus_data);
+> 	if (ret < 0)
+> 		return ret;
+> 
+> 	ret = __mdiobus_write(mdio->bus, mdio->addr, AIR_PBUS_DATA_HIGH,
+> 			      (u16)(pbus_data >> 16));
+> 	if (ret < 0)
+> 		return ret;
+> 
+> 	return 0;
+> }
+> 
+> static int air_pbus_reg_write(struct mdio_device *mdio, u32 pbus_address,
+> 			      u32 pbus_data)
+> {
+> 	int ret;
+> 
+> 	mutex_lock(&mdio->bus->mdio_lock);
+> 
+> 	ret = __air_pbus_reg_write(mdio, pbus_address, pbus_data);
+> 	if (ret < 0)
+> 		dev_err(&mdio->dev, "%s 0x%08x failed: %d\n", __func__,
+> 			pbus_address, ret);
+> 
+> 	mutex_unlock(&mdio->bus->mdio_lock);
+> 
+> 	return ret;
+> }
+> 
+> static int __air_pbus_reg_read(struct mdio_device *mdio, u32 pbus_address,
+> 			       u32 *pbus_data)
+> {
+> 	int ret, pbus_data_low;
+> 
+> 	ret = __mdiobus_write(mdio->bus, mdio->addr, AIR_EXT_PAGE_ACCESS,
+> 			      (u16)(pbus_address >> 6));
+> 	if (ret < 0)
+> 		return ret;
+> 
+> 	ret = __mdiobus_read(mdio->bus, mdio->addr, (pbus_address >> 2) & 0xf);
+> 	if (ret < 0)
+> 		return ret;
+> 	pbus_data_low = ret;
+> 
+> 	ret = __mdiobus_read(mdio->bus, mdio->addr, AIR_PBUS_DATA_HIGH);
+> 	if (ret < 0)
+> 		return ret;
+> 
+> 	*pbus_data = (ret << 16) + pbus_data_low;
+> 
+> 	return 0;
+> }
+> 
+> static int air_pbus_reg_read(struct mdio_device *mdio, u32 pbus_address,
+> 			     u32 *pbus_data)
+> {
+> 	int ret;
+> 
+> 	mutex_lock(&mdio->bus->mdio_lock);
+> 
+> 	ret = __air_pbus_reg_read(mdio, pbus_address, pbus_data);
+> 	if (ret < 0)
+> 		dev_err(&mdio->dev, "%s 0x%08x failed: %d\n", __func__,
+> 			pbus_address, ret);
+> 
+> 	mutex_unlock(&mdio->bus->mdio_lock);
+> 
+> 	return ret;
+> }
+> 
+> With:
+> 
+> #define AIR_PBUS_DATA_HIGH		0x10
 
--- 
-2.53.0
+Small correction using upper_16_bits() and lower_16_bits():
+
+static int __air_pbus_reg_write(struct mdio_device *mdio, u32 pbus_address,
+				u32 pbus_data)
+{
+	int ret;
+
+	ret = __mdiobus_write(mdio->bus, mdio->addr, AIR_EXT_PAGE_ACCESS,
+			      (u16)(pbus_address >> 6));
+	if (ret < 0)
+		return ret;
+
+	ret = __mdiobus_write(mdio->bus, mdio->addr, (pbus_address >> 2) & 0xf,
+			      lower_16_bits(pbus_data));
+	if (ret < 0)
+		return ret;
+
+	ret = __mdiobus_write(mdio->bus, mdio->addr, AIR_PBUS_DATA_HIGH,
+			      upper_16_bits(pbus_data));
+	if (ret < 0)
+		return ret;
+
+	return 0;
+}
+
+static int air_pbus_reg_write(struct mdio_device *mdio, u32 pbus_address,
+			      u32 pbus_data)
+{
+	int ret;
+
+	mutex_lock(&mdio->bus->mdio_lock);
+
+	ret = __air_pbus_reg_write(mdio, pbus_address, pbus_data);
+	if (ret < 0)
+		dev_err(&mdio->dev, "%s 0x%08x failed: %d\n", __func__,
+			pbus_address, ret);
+
+	mutex_unlock(&mdio->bus->mdio_lock);
+
+	return ret;
+}
 
 
