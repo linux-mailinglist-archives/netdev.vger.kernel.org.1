@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-272770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272771-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cDZQGJ3ix2lFeQUAu9opvQ
-	(envelope-from <netdev+bounces-272770-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 15:15:57 +0100
+	id KNNROnjmx2kYegUAu9opvQ
+	(envelope-from <netdev+bounces-272771-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 15:32:24 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1FB034EA45
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 15:15:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 460A334EAD8
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 15:32:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F1C39301981F
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 14:15:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D439E301014D
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 14:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2FC21B9DA;
-	Sat, 28 Mar 2026 14:15:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA60F32FA29;
+	Sat, 28 Mar 2026 14:31:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="I71qmciX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eaKtklGa"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA1FE55A;
-	Sat, 28 Mar 2026 14:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ABD7311956
+	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 14:31:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774707337; cv=none; b=BVG6k6/93Jpz+6gsyPQvhJ4EykcUylTuljqNeGVaXIGcjd3zrDypqclYYlVrNSWvpiu70WO3TE7IhJEajdi08DKP4WzmT1PcCouL5Tv5wAugKYHo/5fhYfW22Ns/qRUnys5tn2Oxr35a+TaFlzLuoF5NiRtbaqf3QJ3oA0amTEw=
+	t=1774708286; cv=none; b=BUCLmD6fqnSgftvdgrLP06WVAF8kOK0mjU7eEGEmZIc0UwX73BbDSAeM/Ar/VNOdSIE7OvJWyn5LorAUnxRHihoq5ZLWg54IV/i9FU1pkhUQ231rzbg/+8/oVVvUadeTmMzpj+gGOE4TRymTtr+8GMFLdvFBjeb7k6Bc0Mel8fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774707337; c=relaxed/simple;
-	bh=Z86EOurNTWz1a+nZzokKJ8hU47RVxzrhQCryff54TlI=;
+	s=arc-20240116; t=1774708286; c=relaxed/simple;
+	bh=i2Ey4/jLZ5NSjIyVJ/PSk/CB7TQv7bWX6PUTNtBOub4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EMzxDBARWluvpPj8L3aBBV22Y2oywnD5/QvUec6fDQF9IJZp3QLxhFdkpP+jvPcGBLL7kB8oiwhyu8WssDgoXb5dGLRygEJDOn7j91M6Z8NyNlCm1Om/QfYkyjgqSkoWbrCMuirVqx2I96ncsnVd9g2vKts75JKZxOVcWB8rtzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=I71qmciX; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=W5Gq0rDe8CuQ/523r3Y8D2dZbHCRUQCiXFrIJX3XPJo9y3h4ooxkCrZPjux6+XsRhM9ec3aeiQxHLO5OJnjuzWGt0NhMpBYoIzaifqIVxXxbpq89SCOXPKiKEuXpKwzwVKltujv1o3GRVatIbjRVLWWmsj+WGO/c3ifd7mrMRbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eaKtklGa; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,29 +39,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kVfi/cvvI4effHQf1xv2lRBGA7PDS15vJ1d3gkI1pI8=; b=I71qmciXdrC9t6OXuCkhFJoPNC
-	Hqh+ZSZsHdoyEGbja8szHWlXt5gNdbri7rfJc2OPLuLjdC76jyP2aKWWnHffwUYVX0ZXnfU1LjVOa
-	8wtbtxO96L9s5tS+seKQjFqwUKHygxjkXGrPr26YTxAkFAtvlRsOtrr/V6u0P6ANiYoU=;
+	bh=NSROk3734XDPppz40eLzs51hYXYidQqyUgpjnsybh28=; b=eaKtklGaOKgM8IhO3ti5fSlYNS
+	ozMJN3VWTKTiQct1BssysV9aXDYXu8kDv4e48QOyhNPrVYOZlF3cVoAR3RgyYylbwiky9lRHu5H+I
+	y0o+K9xMNJeADQ/R6Gx3rwZBGQnLpucxM533+13XDSU1MSbcrwPNbupOjhNtyBARd2es=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1w6URW-00Dn4l-8f; Sat, 28 Mar 2026 15:15:14 +0100
-Date: Sat, 28 Mar 2026 15:15:14 +0100
+	id 1w6Uh4-00Dn7n-BV; Sat, 28 Mar 2026 15:31:18 +0100
+Date: Sat, 28 Mar 2026 15:31:18 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Eric Woudstra <ericwouds@gmail.com>,
-	"Lucien.Jheng" <lucienzx159@gmail.com>, hkallweit1@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bjorn@mork.no,
-	frank-w@public-files.de, daniel@makrotopia.org,
-	lucien.jheng@airoha.com
-Subject: Re: [PATCH v2] net: phy: air_en8811h: add AN8811HB MCU
- assert/deassert support
-Message-ID: <e1a3ca7c-99f0-4452-bd5e-ca3662fd8d9a@lunn.ch>
-References: <20260326153518.8387-1-lucienzx159@gmail.com>
- <edeee8e5-0de3-48ea-aeb5-cc705fdcd469@gmail.com>
- <6f42d92b-a26d-49a4-bef7-2227c252eea7@gmail.com>
- <acesgklpv8GlNeVf@shell.armlinux.org.uk>
+To: Liu Xiang <liu.xiang@zlingsmart.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH v2] net: stmmac: avoid repeated devm_gpiod_get_optional
+ in mdio
+Message-ID: <35b72404-4abf-4e03-91f2-8345cccdbe31@lunn.ch>
+References: <20260328032520.7866-1-liu.xiang@zlingsmart.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,8 +62,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <acesgklpv8GlNeVf@shell.armlinux.org.uk>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+In-Reply-To: <20260328032520.7866-1-liu.xiang@zlingsmart.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
@@ -79,55 +72,62 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272770-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,mork.no,public-files.de,makrotopia.org,airoha.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-272771-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B1FB034EA45
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: 460A334EAD8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Mar 28, 2026 at 10:25:06AM +0000, Russell King (Oracle) wrote:
-> On Sat, Mar 28, 2026 at 11:21:59AM +0100, Eric Woudstra wrote:
-> > static int air_pbus_reg_write(struct mdio_device *mdio, u32 pbus_address,
-> > 			      u32 pbus_data)
-> > {
-> > 	int ret;
-> > 
-> > 	mutex_lock(&mdio->bus->mdio_lock);
-> 
-> I wonder why we have phy_lock_mdio_bus() but not mdio_bus_lock()...
-> Should a helper be provided at mdio bus level to complement the PHY
-> level helper if we're going to have MDIO drivers directly manipulating
-> the lock?
+On Sat, Mar 28, 2026 at 11:25:20AM +0800, Liu Xiang wrote:
+> During system resume, stmmac_resume() calls stmmac_mdio_reset().
+> This results in repeated calls to devm_gpiod_get_optional() for the same
+> GPIO. The second invocation returns an error since the GPIO descriptor has
+> already been obtained.
 
-DSA is pretty much the only class of mdio driver. And they mostly need
-to use:
+How is this different to v1?
 
-mutex_lock_nested(&bus->mdio_lock, MDIO_MUTEX_NESTED);
+> @@ -386,15 +386,15 @@ int stmmac_mdio_reset(struct mii_bus *bus)
+>  
+>  #ifdef CONFIG_OF
+>  	if (priv->device->of_node) {
+> -		struct gpio_desc *reset_gpio;
+>  		u32 delays[3] = { 0, 0, 0 };
+>  
+> -		reset_gpio = devm_gpiod_get_optional(priv->device,
+> -						     "snps,reset",
+> -						     GPIOD_OUT_LOW);
+> -		if (IS_ERR(reset_gpio))
+> -			return PTR_ERR(reset_gpio);
+> -
+> +		if (IS_ERR_OR_NULL(priv->reset_gpio)) {
+> +			priv->reset_gpio = devm_gpiod_get_optional(priv->device,
+> +								   "snps,reset",
+> +								 GPIOD_OUT_LOW);
+> +			if (IS_ERR(priv->reset_gpio))
+> +				return PTR_ERR(priv->reset_gpio);
+> +		}
 
-Not the plain mutex_lock(). 
-
-Hence it has not been added up until now.
-
-But yes, such a helper would make sense for a PHY driver having to do
-odd things.
+In general, a driver should get the resources it needs in probe, since
+probe can only be successful once. So i suggest moving this into
+stmmac_mdio_register() which is the equivalent of probe. To keep the
+behaviour the same, pass GPIOD_ASIS, and then here in _reset set it
+low.
 
 	Andrew
-
 
