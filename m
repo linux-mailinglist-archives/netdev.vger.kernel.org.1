@@ -1,130 +1,129 @@
-Return-Path: <netdev+bounces-272717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272718-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eM7wLAdQx2mOVQUAu9opvQ
-	(envelope-from <netdev+bounces-272717-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 04:50:31 +0100
+	id AFPJF2BSx2nfVQUAu9opvQ
+	(envelope-from <netdev+bounces-272718-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 05:00:32 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31D7534D331
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 04:50:31 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ACC534D359
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 05:00:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D87FE3046F19
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 03:50:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0654A3024EE4
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 04:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B0D30F7EA;
-	Sat, 28 Mar 2026 03:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E2229992A;
+	Sat, 28 Mar 2026 04:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gisSvAXK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rN17ULNI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90BA81F30BB;
-	Sat, 28 Mar 2026 03:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23DD51D514E;
+	Sat, 28 Mar 2026 04:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774669821; cv=none; b=orvV8F971lzb/tQ9EAECH6e84Z/J9fy4NBc6iucysYoNRSUr2eyimRPBdokSE4yi3/zFSmh4Th/K0ayYUJH0/e4MDYyYh1RjMMj7mTUirBTA2X/OSCL8pGuQxLNglwAKZ0CrWV42bSj91dTPvZZNnhIqCIAfgAKE9tMkRMsqi5s=
+	t=1774670424; cv=none; b=ZG+CUslldUmslz6BWG+hRFad/PgOlBdg8fD0aAMy52d7QKATPMeXmugst8pRCkz8wFfM1pdZSn90McQFUPdtMV8yyw3egRLqKaYezC+wnJHLnNojhyLVJUOULDA1itvwalif/Hf6vnx65iQwi+osgnNzDJQAYXujp0Jzv1eRBkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774669821; c=relaxed/simple;
-	bh=5k/JPSKn+kKloIgLHKlmvgrCuTizRELOVOkwmdqMLQY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=omjFhyKVm664yC8kr84ZHgNm5GZBJz+EATFilJMb18AmN1hu+88WLSUH3MEzfklxKb2VPGrtBQZpFKUNY61CTeo3BgtQjN9okACeSUFjxu0FAtd+hkjrZ7UpdhYfd/KmDCtxTTrK/RLRVBVFMw+oVWEz6r4eqDXQZYVyZMG9wtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gisSvAXK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 170C6C2BC9E;
-	Sat, 28 Mar 2026 03:50:21 +0000 (UTC)
+	s=arc-20240116; t=1774670424; c=relaxed/simple;
+	bh=yloG6ynr9Mz4f4H0bKZf9h5qR/VAUUv+IJoP+vxc1i4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qWe84WYMODX9KZO0mM3g/eRYr5UdVyE4QE0L8gHJ8Im1/yKCt+P2zMH5KjHL25hKAnPGRvGKm/fNXPZqnci9O43QrAKFEDyqZUOKYK85B9QWvSGh5kPa9dD7O8a1cP+z/M05dMXcurU1lDuJZFBVFVd8+LpPM35uMlMtLpzvYzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rN17ULNI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA266C4CEF7;
+	Sat, 28 Mar 2026 04:00:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774669821;
-	bh=5k/JPSKn+kKloIgLHKlmvgrCuTizRELOVOkwmdqMLQY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gisSvAXKYCRW1xQ3D5XogSDupfdy09Ul3WQHXqbegci7q7DbKruCQ3WNgEpo69WaB
-	 CJgxJSA3BC/NH7DdQsaOHVDF+mRLQFRnmwpNMr6N8BAGGovTjSmDutL4IKeDcv2l6d
-	 teTTAtWaDDm/irK0aj1HVImEaJEWZBocpbNgx4zNSl/J4VDIwjYp861dj/nGiR/r7c
-	 WwjBII6Nbj+vie2bYXDtaiUx9jfGPa8a/x0uN6qPrbBGoTauS9eU/JVumytkPjW4Fb
-	 Sx9z7I9g+gdjTahUIjbR4bO2ubGyD+NnGdLq+PlcsCfVd12Eeds8tI0TjQIur6XcHI
-	 p7qB7PMk6xmbg==
-Date: Fri, 27 Mar 2026 20:50:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jan Hoffmann <jan@3e8.eu>
-Cc: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: sfp: add quirk for ZOERAX SFP-2.5G-T
-Message-ID: <20260327205020.1c020731@kernel.org>
-In-Reply-To: <20260325164034.1542787-1-jan@3e8.eu>
-References: <20260325164034.1542787-1-jan@3e8.eu>
+	s=k20201202; t=1774670423;
+	bh=yloG6ynr9Mz4f4H0bKZf9h5qR/VAUUv+IJoP+vxc1i4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rN17ULNImDnquUgvHd+8DlYcRJm3XKxQoackE3BiPTObWDogGhGqMCe7ui5dpcUWD
+	 PMolSBQlxFJR5/lsfahjUaGeLnIgKcT4IKW3/MYGYGSfSAka+GFhznCB7IDMnoKSlm
+	 vgIwRQWyX2uDdG7KqLWW/SS1Me+E14ZeE14POrIiaQJ300fjH3QpGyFLJITNw6Mhqw
+	 0NEvpD9A41pO8c4kHQDapnFBrl8nmmPrAM/2VX7iyO0bgxF6yFuZmWgisrajHTfRlb
+	 qVufvxNeqwm4KlRjInhF5AGlv2hQuBF+PjmBpw9HVaOwCuCgmhncSJk/3ExZMTVz8h
+	 Z83OStDjJbcLA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CECA3930181;
+	Sat, 28 Mar 2026 04:00:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net 0/2] net: enetc: add more checks to
+ enetc_set_rxfh()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177467040929.4173055.9412756951653552914.git-patchwork-notify@kernel.org>
+Date: Sat, 28 Mar 2026 04:00:09 +0000
+References: <20260326075233.3628047-1-wei.fang@nxp.com>
+In-Reply-To: <20260326075233.3628047-1-wei.fang@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, alexandru.marginean@nxp.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-272717-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-272718-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,3e8.eu:email]
-X-Rspamd-Queue-Id: 31D7534D331
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 4ACC534D359
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 25 Mar 2026 17:35:58 +0100 Jan Hoffmann wrote:
-> This is a 2.5G copper module which appears to be based on a Motorcomm
-> YT8821 PHY. There doesn't seem to be a usable way to to access the PHY
-> (I2C address 0x56 provides only read-only C22 access, and Rollball is
-> also not working).
-> 
-> The module does not report the correct extended compliance code for
-> 2.5GBase-T, and instead claims to support SONET OC-48 and Fibre Channel:
-> 
->   Identifier          : 0x03 (SFP)
->   Extended identifier : 0x04 (GBIC/SFP defined by 2-wire interface ID)
->   Connector           : 0x07 (LC)
->   Transceiver codes   : 0x00 0x01 0x00 0x00 0x40 0x40 0x04 0x00 0x00
->   Transceiver type    : FC: Multimode, 50um (M5)
->   Encoding            : 0x05 (SONET Scrambled)
->   BR Nominal          : 2500MBd
-> 
-> Despite this, the kernel still sets 2500Base-X as interface mode based
-> on the (incorrect) nominal signaling rate.
-> 
-> However, it is also necessary to disable auto-negotiation for the module
-> to actually work. Thus, create a SFP quirk to do this.
-> 
-> Signed-off-by: Jan Hoffmann <jan@3e8.eu>
-> ---
-> Note: I'm not quite sure "sfp_quirk_disable_autoneg" is enough here, or
-> if it would be appropriate to use the full "sfp_quirk_oem_2_5g" quirk
-> due to the not really correct compliance code / nominal signaling rate.
+Hello:
 
-I'm no SFP expert but just going by the naming I strongly suspect that
-the module is the same hardware as "SFP-2.5G-T" from "FS", so keeping
-quirks consistent makes sense?
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 26 Mar 2026 15:52:31 +0800 you wrote:
+> ENETC only supports Toeplitz algorithm, and VFs do not support setting
+> the RSS key, but enetc_set_rxfh() does not check these constraints and
+> silently accepts unsupported configurations. This may mislead users or
+> tools into believing that the requested RSS settings have been
+> successfully applied. So add checks to reject unsupported hash functions
+> and RSS key updates on VFs, and return "-EOPNOTSUPP" to user space.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net,1/2] net: enetc: check whether the RSS algorithm is Toeplitz
+    https://git.kernel.org/netdev/net/c/d389954a6cae
+  - [v2,net,2/2] net: enetc: do not allow VF to configure the RSS key
+    https://git.kernel.org/netdev/net/c/a142d139168c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
