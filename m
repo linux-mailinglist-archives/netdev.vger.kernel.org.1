@@ -1,215 +1,199 @@
-Return-Path: <netdev+bounces-272814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272815-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sAgvMdMzyGlbiAUAu9opvQ
-	(envelope-from <netdev+bounces-272814-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 21:02:27 +0100
+	id pjzBDps0yGnaiAUAu9opvQ
+	(envelope-from <netdev+bounces-272815-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 21:05:47 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC08A34FE41
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 21:02:26 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8192C34FE55
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 21:05:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DF0D8300A270
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 20:02:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0F9CA306707A
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 20:03:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154B82E8B81;
-	Sat, 28 Mar 2026 20:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53FF33CE92;
+	Sat, 28 Mar 2026 20:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b="QmBmqAFs"
+	dkim=pass (2048-bit key) header.d=3e8.eu header.i=@3e8.eu header.b="F9Bh3rrs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+Received: from srv4.3e8.eu (srv4.3e8.eu [193.25.101.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBADEEB3;
-	Sat, 28 Mar 2026 20:02:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B5233F369;
+	Sat, 28 Mar 2026 20:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.25.101.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774728142; cv=none; b=bSlSpLSzuDsKP56lhAYlzrkaCB61W7Nguew5WIv0EKJsa1JrbTNiDZdezQyIWTUjiw1LZHVnPgUFt6QBON0vqCR4xEsmdZL5JeRVXDqwUcVrAaq0XhFPN8/lkm0fKFnzd7s0MCEoaNhAJQ1Av9hc/ECZZHG+SaBdIuYcK7m/pbo=
+	t=1774728202; cv=none; b=pCjjW8lsZzP4kID0CbzbGfoRXDiWdjV7BvSR+WPuihvQ5cnwzNk/4WRnzljV94J3lqTjwQi3I15+dTxWpOU/RTxDn35464l/qTNjCZfqh8Ybe/u1VJTuZPet2//YeaNrW7BFpYj2ae8cbSMiZ7VUiG1Ave1A6s1p0NwTYd7sUlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774728142; c=relaxed/simple;
-	bh=RGfBobdezF52Pe49YZ4hBRoClOfKkMnnw7d/RzJEGL8=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=cEnjgHstu0dBtwHsTyu+vT9QSDFcFfm5be9Ma8yocTNQ2HjDtidtybBgVdTKXR24/c4kuTJFf+ipaXs9OJLS3HkklTU3umlux77MPD/O6+ye++oCF/ZtH39mVgQoMSI72Xe3OTXmv0zlAAcbPCg+zWuiUymYMHeQnMd6qFvfsZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=markus.stockhausen@gmx.de header.b=QmBmqAFs; arc=none smtp.client-ip=212.227.15.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1774728128; x=1775332928;
-	i=markus.stockhausen@gmx.de;
-	bh=KSrSfjzTxYSKqIzYWDSWe17D5wfwNkeXQ188OFn2hGw=;
-	h=X-UI-Sender-Class:From:To:Cc:References:In-Reply-To:Subject:Date:
-	 Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=QmBmqAFsU7vkkBth4Z9agAqZxpDBXccUHFWcYwzPfTPnEsV4TpbmVeR6FPBkC9Ny
-	 Bet5d47srcswL7AGHw2hOv9Ev9L04lwH4sJnwnSxELXjcC/H9xB2Ur9f/1aRt/xWT
-	 TFjHSlhWTiecL90FKYHiR9xl6fN1LNshTGabgKSgQq8hy/3TbECpKLy41/4I7mu2P
-	 p7MmZbLVS0ZaE4g3T5fuRguGSH0+0QJ/Zw0/thuCn0oGDPXNL9oeDTY9QO3zoF6Fq
-	 U8evw1NAVtXxruxGK05EOqi+oElwqiRRskj+zK1haGXVRRkVSQcezDtlEdTEsHcc9
-	 ElekkTnSk0I+lZKvrw==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from client.hidden.invalid by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MKKUv-1vomWl0Yut-00O9zk; Sat, 28
- Mar 2026 21:02:08 +0100
-From: <markus.stockhausen@gmx.de>
-To: "'Jan Hoffmann'" <jan@3e8.eu>,
-	"'Andrew Lunn'" <andrew@lunn.ch>,
-	"'Heiner Kallweit'" <hkallweit1@gmail.com>,
-	"'Russell King'" <linux@armlinux.org.uk>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	"'Paolo Abeni'" <pabeni@redhat.com>,
-	"'Daniel Golle'" <daniel@makrotopia.org>,
-	"'Damien Dejean'" <dam.dejean@gmail.com>
-Cc: <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20260322193235.990881-1-jan@3e8.eu>
-In-Reply-To: <20260322193235.990881-1-jan@3e8.eu>
-Subject: AW: [PATCH net-next] net: phy: realtek: support MDI swapping for RTL8226-CG
-Date: Sat, 28 Mar 2026 21:02:05 +0100
-Message-ID: <005e01dcbeed$c1dc0220$45940660$@gmx.de>
+	s=arc-20240116; t=1774728202; c=relaxed/simple;
+	bh=LOSMQgslP4TrtJFgfUffaAG45tS6CyTkAR0ssvy7MXQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NLgk5nmjcXheAsZMD9dheKobfiBVqe+OLo+45HGC/yXToRvilMhx0e5bEvBhdlJhVxdBnCtVPQPJxJdUDttD6uCPiLku8VD9KHjvjVDk67iAAjOrICeW8EwDsztpFPU2cpQiSyRBeRSBHjONKMT5iqEj7/QNOV/pXCHBj9zEn+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=3e8.eu; spf=pass smtp.mailfrom=3e8.eu; dkim=pass (2048-bit key) header.d=3e8.eu header.i=@3e8.eu header.b=F9Bh3rrs; arc=none smtp.client-ip=193.25.101.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=3e8.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=3e8.eu
+Received: from [IPV6:2003:ed:4701:bfa0:9bcb:9dce:e3f7:b116] (p200300ed4701bfa09bcb9dcee3f7b116.dip0.t-ipconnect.de [IPv6:2003:ed:4701:bfa0:9bcb:9dce:e3f7:b116])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by srv4.3e8.eu (Postfix) with ESMTPSA id C7BE0402E1;
+	Sat, 28 Mar 2026 21:02:35 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=3e8.eu; s=mail20211217;
+	t=1774728156;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=HxCBC5AKAsQBm+nqKl27GCFO5qEFiMFsQvR5c0kAdZg=;
+	b=F9Bh3rrsPgMhlS4re3BifLcycdAC/4aiaTH7rXBm+oz8LZvBbA50szAPPQZSomkXnbeZv1
+	Mw3Thl4775pzSZOkDkIsTNpug+9vx5gzlIRBiwShbl6wCJIG26pKjRAAwASqvZkyrHG5fM
+	unhUoWEX879fGvYUjH7PPXhKhzjVAojbOv24lBvr+1zlfOCEfWdjaDk6+pqGnOxcHFI8rJ
+	MU7KiZK5PFFM3XAUWryI9Pb+Z6oj7auAomAuJpBUpFgoN5wzm4TdqyvRvrgXai+aaUuyUY
+	Zh3JrU4X6bCLcumspKgyqNLuJ8OGMpc2qi1gGYt27FAG9AiWAtNQ5gJTTwD7yA==
+Message-ID: <58089a15-61e4-4899-b74f-2f5a495a206c@3e8.eu>
+Date: Sat, 28 Mar 2026 21:02:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQFsscWDCsukjy3yqNYdgqms5XBmDLakdahQ
-Content-Language: de
-X-Provags-ID: V03:K1:PfgVThndcEIdD6lHxGDJsPWWlrUPq1Ygf6UaOmvIHrwRzMkISEW
- C7IibMZL3iCmDiW/8U2ltKfnlLI5K1lSG3RdLSelf4GFuytblEXB6TPfkmdwIWeu5n3Wx+/
- QmKNkTv0BVV5FUn8fim8bdyj99fU6bq/ShTls8Wjh4wrMFbn6+7y0dBYy79MbidAs6Q4JV1
- tpTsTACUDT/NeH8mZnwiw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:FGU6JY+mOiA=;AgW9jXrKU/GrCJ45VOvt0C3f18n
- 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
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: sfp: add quirk for ZOERAX SFP-2.5G-T
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260325164034.1542787-1-jan@3e8.eu>
+ <20260327205020.1c020731@kernel.org>
+Content-Language: en-US
+From: Jan Hoffmann <jan@3e8.eu>
+Autocrypt: addr=jan@3e8.eu; keydata=
+ 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
+ AqNjQxfojjo=
+In-Reply-To: <20260327205020.1c020731@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmx.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[gmx.de:s=s31663417];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[3e8.eu,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[3e8.eu:s=mail20211217];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272814-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmx.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[3e8.eu,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,makrotopia.org];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[markus.stockhausen@gmx.de,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-272815-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[3e8.eu:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[gmx.de:+];
+	FROM_NEQ_ENVFROM(0.00)[jan@3e8.eu,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_NO_DN(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,gmx.de:dkim,gmx.de:mid]
-X-Rspamd-Queue-Id: CC08A34FE41
+	DBL_BLOCKED_OPENRESOLVER(0.00)[3e8.eu:dkim,3e8.eu:email,3e8.eu:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8192C34FE55
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> Von: Jan Hoffmann <jan@3e8.eu>=20
-> Betreff: [PATCH net-next] net: phy: realtek: support MDI swapping for
-RTL8226-CG
->
-> Add support for configuring swapping of MDI pairs (ABCD->DCBA) when the
-> property "enet-phy-pair-order" is specified.
-> ...
->	ret =3D phy_modify_mmd(phydev, MDIO_MMD_VEND2, 0xd068, 0x7, 0x1);
+On 2026-03-28 at 04:50, Jakub Kicinski wrote:
+> On Wed, 25 Mar 2026 17:35:58 +0100 Jan Hoffmann wrote:
+>> This is a 2.5G copper module which appears to be based on a Motorcomm
+>> YT8821 PHY. There doesn't seem to be a usable way to to access the PHY
+>> (I2C address 0x56 provides only read-only C22 access, and Rollball is
+>> also not working).
+>>
+>> The module does not report the correct extended compliance code for
+>> 2.5GBase-T, and instead claims to support SONET OC-48 and Fibre Channel:
+>>
+>>    Identifier          : 0x03 (SFP)
+>>    Extended identifier : 0x04 (GBIC/SFP defined by 2-wire interface ID)
+>>    Connector           : 0x07 (LC)
+>>    Transceiver codes   : 0x00 0x01 0x00 0x00 0x40 0x40 0x04 0x00 0x00
+>>    Transceiver type    : FC: Multimode, 50um (M5)
+>>    Encoding            : 0x05 (SONET Scrambled)
+>>    BR Nominal          : 2500MBd
+>>
+>> Despite this, the kernel still sets 2500Base-X as interface mode based
+>> on the (incorrect) nominal signaling rate.
+>>
+>> However, it is also necessary to disable auto-negotiation for the module
+>> to actually work. Thus, create a SFP quirk to do this.
+>>
+>> Signed-off-by: Jan Hoffmann <jan@3e8.eu>
+>> ---
+>> Note: I'm not quite sure "sfp_quirk_disable_autoneg" is enough here, or
+>> if it would be appropriate to use the full "sfp_quirk_oem_2_5g" quirk
+>> due to the not really correct compliance code / nominal signaling rate.
+> 
+> I'm no SFP expert but just going by the naming I strongly suspect that
+> the module is the same hardware as "SFP-2.5G-T" from "FS", so keeping
+> quirks consistent makes sense?
+Based on commit e27aca3760c0 ("net: sfp: enhance quirk for Fibrestore 
+2.5G copper SFP module"), the FS module uses an RTL8221B PHY, so it is 
+different hardware. And it also supports the Rollball protocol for PHY 
+access, unlike this Zoerax module.
 
-No real knowledge here. But from other register combinations around=20
-the Realtek ecosystem this could make sense:
+ From the existing quirks, the only valid alternative I see for the 
+Zoerax module would be "sfp_quirk_oem_2_5g" (which also sets the 
+additional bits for 2500Base-T link mode and explicitly enables 
+2500Base-X interface mode). But as that is not strictly necessary for 
+making this particular module work, I am unsure if using this quirk 
+would be appropriate.
 
-#define RTL822X_MDI_CAL_CTRL    0xd068   /* MDI pair cal index/control */
-#define RTL822X_MDI_CAL_DATA    0xd06a   /* MDI pair cal data */
-
-Markus
-
+Thanks,
+Jan
 
