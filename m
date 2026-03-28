@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-272837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272838-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id P9/kF/heyGmjlAUAu9opvQ
-	(envelope-from <netdev+bounces-272837-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 00:06:32 +0100
+	id QHnBBxJfyGmilAUAu9opvQ
+	(envelope-from <netdev+bounces-272838-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 00:06:58 +0100
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84EDD350325
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 00:06:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92EA7350353
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 00:06:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8493530065F9
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 23:06:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0B485302B206
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 23:06:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC30372695;
-	Sat, 28 Mar 2026 23:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02AB6374161;
+	Sat, 28 Mar 2026 23:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="Tn1048uM"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="Not9lQgg"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE96518DB26;
-	Sat, 28 Mar 2026 23:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD723081D6;
+	Sat, 28 Mar 2026 23:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774739181; cv=none; b=g29ohbZXdCubgoXMUr04WAoTjKeW4xGhVTyM+bJp4n58mV5NV+RO3miuWWXNAmn/TU5mNw70o/xogU9PxTeQqy60STOcCKaZfo2yeYmudausDC3SYuB2athl97hUBIDLy41jZxauAlewnoJV6mJrkgQE1ZjSXmLsjy1rPm51f3w=
+	t=1774739182; cv=none; b=QgiNrfSU5xTxhsoqmRNcXNX/KOcyYEV1mkD+UBREurcl4ltrhkyI6ksHgHaHp895S+KI1nS2qZ3K7G3hjttfyMGOrgejUb6rQpdxodu+nwYaiC1JhXYSUa8lxkOXJYTv0ofif5NwvbCR6b6r0HzHp/8jXuNOwXdhudUZ8GbBSWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774739181; c=relaxed/simple;
-	bh=AtZ3moN5ceTrzdk9n7Rb62LsXZK7LaYDrg+YYNVYmog=;
+	s=arc-20240116; t=1774739182; c=relaxed/simple;
+	bh=bwse5ia5geehUnoC75TmrWfexriTsUU0UCBWFF79h8M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MHASelSEqT0VXj0QaxO7XNXRro/IF0YeoSzN+gUnE6PrT2In/dCX6iZlMj6usOby8OZ77pPCGIuu5ablcwXSfuNoBjET2Yugnfbj/pI0KitqSkOTza2g3x7ft4hJf/k+cqJ2L76uGAWBC5jdaJNVk2S8X4cL+UdlPkfSn5iR5Ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=Tn1048uM; arc=none smtp.client-ip=194.13.80.246
+	 MIME-Version; b=rdKp6ULPP7ZiT8iDSrMzYM4e7jRWYaly6ybpCqymxNt6OJd5QXDEiP4w0ouZ5+44cJCamJ8Cn/AryUjnb/sNLCVNEowVE0ZFUtbpkgskazo/tGEQzkTdGinOEaGsPb0kg8RQ/Zp3XdXnMFLBcTDVHOnAe5TweofidAo+a6vxFv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=Not9lQgg; arc=none smtp.client-ip=194.13.80.246
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3A3CDA5870;
-	Sun, 29 Mar 2026 00:06:17 +0100 (CET)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B23DFA5876;
+	Sun, 29 Mar 2026 00:06:18 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1774739177; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1774739179; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=SLHKU2FK8FdfRAdN14XZV1JwdlFHMY42usYjkOK4Hc4=;
-	b=Tn1048uMt9LCPJjhax0sUnwM6rWgyclNYimOKd4i/qGOVoMpy54ExlMAEnLp52jMxD/Fh+
-	osT2UYClmW8VgKEesO77FIGk70toyEl38OcIZkDwRUW5kGF0cf7RzmJCNObesy+O/4dUVO
-	f8+g4D/llw6I8myonRBe50tALaERlkWqyrJ/VfZzQVuKDX+bbY1jdFkgAYdsXlgmBBruLF
-	8Xzqw4ZZqw6yUALAx+dowHC58nAihSIPMLcbn+r2YZK6fFCnD6YtwlcnXTIRmRFf/xvRSs
-	Lf/6p/xlBKyWcGISzL7+n/OT1GAi69vGeUZ4NlFgkBzDnMoLFQcgZ8SvnNc+FA==
+	bh=kVbq45ndCObyZv//9vbSqZatUansK26OO3dxPwMB+cE=;
+	b=Not9lQggTIKKWGqbzA1TyGuxKS/Fo462e+ujDhB2CLd5+IgNHgXxDhab1fxtoimxs2zfVL
+	gk1O3E/ezHVBlDkQ1mrvAxgMVLfveqmgQ1Lx/JHsaNR5tSVfDMJSciXtGdRK7g8Zp41q0f
+	Yv27FztNClk19xlmFjfISxVIb+QL5PSOd42OZWdZ//jGxFS6Uf7BZpv4RwshKRd6fGNsKv
+	dnTPuOez4Gj0Kcve1PkighpDhhrW41c7avuKK2Gwb/Aa+bDYDRWxkOKSFNk7ZSoFL8DpYN
+	ynvPLzGJUUAX1IwIq4Bhhv7BYk+S8/KIESMOqjcpQWkgz6CnxwVmLw/aqwIljA==
 From: Nicolai Buchwitz <nb@tipi-net.de>
 To: netdev@vger.kernel.org
 Cc: Justin Chen <justin.chen@broadcom.com>,
@@ -65,9 +65,9 @@ Cc: Justin Chen <justin.chen@broadcom.com>,
 	Stanislav Fomichev <sdf@fomichev.me>,
 	linux-kernel@vger.kernel.org,
 	bpf@vger.kernel.org
-Subject: [PATCH net-next v5 2/6] net: bcmgenet: register xdp_rxq_info for each RX ring
-Date: Sun, 29 Mar 2026 00:05:05 +0100
-Message-ID: <20260328230513.415790-3-nb@tipi-net.de>
+Subject: [PATCH net-next v5 3/6] net: bcmgenet: add basic XDP support (PASS/DROP)
+Date: Sun, 29 Mar 2026 00:05:06 +0100
+Message-ID: <20260328230513.415790-4-nb@tipi-net.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260328230513.415790-1-nb@tipi-net.de>
 References: <20260328230513.415790-1-nb@tipi-net.de>
@@ -81,115 +81,287 @@ Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272837-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272838-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[broadcom.com,kernel.org,tipi-net.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,fomichev.me,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	DMARC_DNSFAIL(0.00)[tipi-net.de : query timed out];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[broadcom.com,kernel.org,tipi-net.de,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,fomichev.me,vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 84EDD350325
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 92EA7350353
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Register an xdp_rxq_info per RX ring and associate it with the ring's
-page_pool via MEM_TYPE_PAGE_POOL. This is required infrastructure for
-XDP program execution: the XDP framework needs to know the memory model
-backing each RX queue for correct page lifecycle management.
+Add XDP program attachment via ndo_bpf and execute XDP programs in the
+RX path. XDP_PASS builds an SKB from the xdp_buff (handling
+xdp_adjust_head/tail), XDP_DROP returns the page to page_pool without
+SKB allocation.
 
-No functional change - XDP programs are not yet attached or executed.
+XDP_TX and XDP_REDIRECT are not yet supported and return XDP_ABORTED.
+
+Advertise NETDEV_XDP_ACT_BASIC in xdp_features.
 
 Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
 ---
- drivers/net/ethernet/broadcom/genet/bcmgenet.c | 18 ++++++++++++++++++
- drivers/net/ethernet/broadcom/genet/bcmgenet.h |  2 ++
- 2 files changed, 20 insertions(+)
+ .../net/ethernet/broadcom/genet/bcmgenet.c    | 150 +++++++++++++++---
+ .../net/ethernet/broadcom/genet/bcmgenet.h    |   4 +
+ 2 files changed, 136 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index f32acacadcf0..9f81192d9e31 100644
+index 9f81192d9e31..b45ba2c2857e 100644
 --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
 +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -2780,7 +2780,23 @@ static int bcmgenet_rx_ring_create_pool(struct bcmgenet_priv *priv,
- 		return err;
- 	}
+@@ -35,6 +35,8 @@
+ #include <linux/ip.h>
+ #include <linux/ipv6.h>
+ #include <linux/phy.h>
++#include <linux/bpf_trace.h>
++#include <linux/filter.h>
  
-+	err = xdp_rxq_info_reg(&ring->xdp_rxq, priv->dev, ring->index, 0);
-+	if (err)
-+		goto err_free_pp;
-+
-+	err = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq, MEM_TYPE_PAGE_POOL,
-+					 ring->page_pool);
-+	if (err)
-+		goto err_unreg_rxq;
-+
+ #include <linux/unaligned.h>
+ 
+@@ -2274,6 +2276,54 @@ static int bcmgenet_rx_refill(struct bcmgenet_rx_ring *ring,
  	return 0;
-+
-+err_unreg_rxq:
-+	xdp_rxq_info_unreg(&ring->xdp_rxq);
-+err_free_pp:
-+	page_pool_destroy(ring->page_pool);
-+	ring->page_pool = NULL;
-+	return err;
  }
  
- /* Initialize a RDMA ring */
-@@ -2809,6 +2825,7 @@ static int bcmgenet_init_rx_ring(struct bcmgenet_priv *priv,
- 	if (ret) {
- 		for (i = 0; i < ring->size; i++)
- 			bcmgenet_free_rx_cb(ring->cbs + i, ring->page_pool);
-+		xdp_rxq_info_unreg(&ring->xdp_rxq);
- 		page_pool_destroy(ring->page_pool);
- 		ring->page_pool = NULL;
- 		return ret;
-@@ -3014,6 +3031,7 @@ static void bcmgenet_destroy_rx_page_pools(struct bcmgenet_priv *priv)
- 	for (i = 0; i <= priv->hw_params->rx_queues; ++i) {
- 		ring = &priv->rx_rings[i];
- 		if (ring->page_pool) {
-+			xdp_rxq_info_unreg(&ring->xdp_rxq);
- 			page_pool_destroy(ring->page_pool);
- 			ring->page_pool = NULL;
++static struct sk_buff *bcmgenet_xdp_build_skb(struct bcmgenet_rx_ring *ring,
++					      struct xdp_buff *xdp,
++					      struct page *rx_page)
++{
++	unsigned int metasize;
++	struct sk_buff *skb;
++
++	skb = napi_build_skb(xdp->data_hard_start, PAGE_SIZE);
++	if (unlikely(!skb))
++		return NULL;
++
++	skb_mark_for_recycle(skb);
++
++	metasize = xdp->data - xdp->data_meta;
++	skb_reserve(skb, xdp->data - xdp->data_hard_start);
++	__skb_put(skb, xdp->data_end - xdp->data);
++
++	if (metasize)
++		skb_metadata_set(skb, metasize);
++
++	return skb;
++}
++
++static unsigned int bcmgenet_run_xdp(struct bcmgenet_rx_ring *ring,
++				     struct bpf_prog *prog,
++				     struct xdp_buff *xdp,
++				     struct page *rx_page)
++{
++	unsigned int act;
++
++	act = bpf_prog_run_xdp(prog, xdp);
++
++	switch (act) {
++	case XDP_PASS:
++		return XDP_PASS;
++	case XDP_DROP:
++		page_pool_put_full_page(ring->page_pool, rx_page, true);
++		return XDP_DROP;
++	default:
++		bpf_warn_invalid_xdp_action(ring->priv->dev, prog, act);
++		fallthrough;
++	case XDP_ABORTED:
++		trace_xdp_exception(ring->priv->dev, prog, act);
++		page_pool_put_full_page(ring->page_pool, rx_page, true);
++		return XDP_ABORTED;
++	}
++}
++
+ /* bcmgenet_desc_rx - descriptor based rx process.
+  * this could be called from bottom half, or from NAPI polling method.
+  */
+@@ -2283,6 +2333,7 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
+ 	struct bcmgenet_rx_stats64 *stats = &ring->stats64;
+ 	struct bcmgenet_priv *priv = ring->priv;
+ 	struct net_device *dev = priv->dev;
++	struct bpf_prog *xdp_prog;
+ 	struct enet_cb *cb;
+ 	struct sk_buff *skb;
+ 	u32 dma_length_status;
+@@ -2293,6 +2344,8 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
+ 	unsigned int p_index, mask;
+ 	unsigned int discards;
+ 
++	xdp_prog = READ_ONCE(priv->xdp_prog);
++
+ 	/* Clear status before servicing to reduce spurious interrupts */
+ 	mask = 1 << (UMAC_IRQ1_RX_INTR_SHIFT + ring->index);
+ 	bcmgenet_intrl2_1_writel(priv, mask, INTRL2_CPU_CLEAR);
+@@ -2403,26 +2456,52 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
+ 			goto next;
+ 		} /* error packet */
+ 
+-		/* Build SKB from the page - data starts at hard_start,
+-		 * frame begins after RSB(64) + pad(2) = 66 bytes.
+-		 */
+-		skb = napi_build_skb(hard_start, PAGE_SIZE - GENET_XDP_HEADROOM);
+-		if (unlikely(!skb)) {
+-			BCMGENET_STATS64_INC(stats, dropped);
+-			page_pool_put_full_page(ring->page_pool, rx_page,
+-						true);
+-			goto next;
+-		}
+-
+-		skb_mark_for_recycle(skb);
++		/* XDP: frame data starts after RSB + pad */
++		if (xdp_prog) {
++			struct xdp_buff xdp;
++			unsigned int xdp_act;
++			int pkt_len;
++
++			pkt_len = len - GENET_RSB_PAD;
++			if (priv->crc_fwd_en)
++				pkt_len -= ETH_FCS_LEN;
++
++			xdp_init_buff(&xdp, PAGE_SIZE, &ring->xdp_rxq);
++			xdp_prepare_buff(&xdp, page_address(rx_page),
++					 GENET_RX_HEADROOM, pkt_len, true);
++
++			xdp_act = bcmgenet_run_xdp(ring, xdp_prog, &xdp,
++						   rx_page);
++			if (xdp_act != XDP_PASS)
++				goto next;
++
++			/* XDP_PASS: build SKB from (possibly modified) xdp */
++			skb = bcmgenet_xdp_build_skb(ring, &xdp, rx_page);
++			if (unlikely(!skb)) {
++				BCMGENET_STATS64_INC(stats, dropped);
++				page_pool_put_full_page(ring->page_pool,
++							rx_page, true);
++				goto next;
++			}
++		} else {
++			/* Build SKB from the page - data starts at
++			 * hard_start, frame begins after RSB(64) + pad(2).
++			 */
++			skb = napi_build_skb(hard_start,
++					     PAGE_SIZE - GENET_XDP_HEADROOM);
++			if (unlikely(!skb)) {
++				BCMGENET_STATS64_INC(stats, dropped);
++				page_pool_put_full_page(ring->page_pool,
++							rx_page, true);
++				goto next;
++			}
+ 
+-		/* Reserve the RSB + pad, then set the data length */
+-		skb_reserve(skb, GENET_RSB_PAD);
+-		__skb_put(skb, len - GENET_RSB_PAD);
++			skb_mark_for_recycle(skb);
++			skb_reserve(skb, GENET_RSB_PAD);
++			__skb_put(skb, len - GENET_RSB_PAD);
+ 
+-		if (priv->crc_fwd_en) {
+-			skb_trim(skb, skb->len - ETH_FCS_LEN);
+-			len -= ETH_FCS_LEN;
++			if (priv->crc_fwd_en)
++				skb_trim(skb, skb->len - ETH_FCS_LEN);
  		}
+ 
+ 		/* Set up checksum offload */
+@@ -3745,6 +3824,39 @@ static int bcmgenet_change_carrier(struct net_device *dev, bool new_carrier)
+ 	return 0;
+ }
+ 
++static int bcmgenet_xdp_setup(struct net_device *dev,
++			      struct netdev_bpf *xdp)
++{
++	struct bcmgenet_priv *priv = netdev_priv(dev);
++	struct bpf_prog *old_prog;
++	struct bpf_prog *prog = xdp->prog;
++
++	if (prog && dev->mtu > PAGE_SIZE - GENET_RX_HEADROOM -
++	    SKB_DATA_ALIGN(sizeof(struct skb_shared_info))) {
++		NL_SET_ERR_MSG_MOD(xdp->extack,
++				   "MTU too large for single-page XDP buffer");
++		return -EOPNOTSUPP;
++	}
++
++	old_prog = xchg(&priv->xdp_prog, prog);
++	if (old_prog) {
++		synchronize_net();
++		bpf_prog_put(old_prog);
++	}
++
++	return 0;
++}
++
++static int bcmgenet_xdp(struct net_device *dev, struct netdev_bpf *xdp)
++{
++	switch (xdp->command) {
++	case XDP_SETUP_PROG:
++		return bcmgenet_xdp_setup(dev, xdp);
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
+ static const struct net_device_ops bcmgenet_netdev_ops = {
+ 	.ndo_open		= bcmgenet_open,
+ 	.ndo_stop		= bcmgenet_close,
+@@ -3756,6 +3868,7 @@ static const struct net_device_ops bcmgenet_netdev_ops = {
+ 	.ndo_set_features	= bcmgenet_set_features,
+ 	.ndo_get_stats64	= bcmgenet_get_stats64,
+ 	.ndo_change_carrier	= bcmgenet_change_carrier,
++	.ndo_bpf		= bcmgenet_xdp,
+ };
+ 
+ /* GENET hardware parameters/characteristics */
+@@ -4058,6 +4171,7 @@ static int bcmgenet_probe(struct platform_device *pdev)
+ 			 NETIF_F_RXCSUM;
+ 	dev->hw_features |= dev->features;
+ 	dev->vlan_features |= dev->features;
++	dev->xdp_features = NETDEV_XDP_ACT_BASIC;
+ 
+ 	netdev_sw_irq_coalesce_default_on(dev);
+ 
 diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.h b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
-index 11a0ec563a89..82a6d29f481d 100644
+index 82a6d29f481d..1459473ac1b0 100644
 --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.h
 +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
 @@ -16,6 +16,7 @@
  #include <linux/dim.h>
  #include <linux/ethtool.h>
  #include <net/page_pool/helpers.h>
-+#include <net/xdp.h>
++#include <linux/bpf.h>
+ #include <net/xdp.h>
  
  #include "../unimac.h"
+@@ -671,6 +672,9 @@ struct bcmgenet_priv {
+ 	u8 sopass[SOPASS_MAX];
  
-@@ -579,6 +580,7 @@ struct bcmgenet_rx_ring {
- 	u32		rx_max_coalesced_frames;
- 	u32		rx_coalesce_usecs;
- 	struct page_pool *page_pool;
-+	struct xdp_rxq_info xdp_rxq;
- 	struct bcmgenet_priv *priv;
+ 	struct bcmgenet_mib_counters mib;
++
++	/* XDP */
++	struct bpf_prog *xdp_prog;
  };
  
+ static inline bool bcmgenet_has_40bits(struct bcmgenet_priv *priv)
 -- 
 2.51.0
 
