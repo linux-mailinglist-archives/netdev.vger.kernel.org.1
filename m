@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-272750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272751-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UFp9N/GMx2m+YwUAu9opvQ
-	(envelope-from <netdev+bounces-272750-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:10:25 +0100
+	id +IcdA0yNx2m+YwUAu9opvQ
+	(envelope-from <netdev+bounces-272751-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:11:56 +0100
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A93B34DC4B
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:10:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6758534DC62
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 09:11:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B0F1330A3A7D
-	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 08:06:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 12B91303A5E3
+	for <lists+netdev@lfdr.de>; Sat, 28 Mar 2026 08:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88F6C36308A;
-	Sat, 28 Mar 2026 08:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1866E369211;
+	Sat, 28 Mar 2026 08:07:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QYCplL5n"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BE/x7/Wc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231B735F5E7
-	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 08:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B181364023
+	for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 08:06:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774685216; cv=none; b=V33XUs1Y7YNJBrqR/Q0XcwQTgMfUv//3/x/zb5YU/m37iT4UEr1EkX06TXKUFbsn92xNwWlurK7pLHWpApDn2cfzCVQmC4J5P+0OtElHlhyH+l20uYr8giKZVAAeAj+B8ZzXqBK7K7wA99ObYi7uQIPjjM9Ps0HEK6+A5ppoYFQ=
+	t=1774685220; cv=none; b=qzcoeyDlMZr+3NST5/Csod9WEaLSPeCmEtVBAQG7cUoIPcAmVZpsNldGs/vaopQ2FhgpxywiBmfD7DBVD7FBoBp4f9rbMh71nMb6oV8QyalNjsXasaimpvaMEVTTSaaGVB/qSX/tMrULkHvagZJTbrHTQT/I43rsPu/5W9nNAfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774685216; c=relaxed/simple;
-	bh=SvhyWW3tt3Ud0yWsd7T0BRbVeC5mUdW739kw/8bEoUw=;
+	s=arc-20240116; t=1774685220; c=relaxed/simple;
+	bh=K/RNdWGDa81UmWVWas+Pv2X19thLcK/aPXztrVXAnu8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=vEpkg/zjxjviLl4myrPxIuK3AlppvA02qdFvhmj0KXHEih9liQ/pwCTosQ1UA3fTTRZk0BRWr8HQMHbV+WFBqaM81VVk4IF9XhVOw7yZL91WPlZfMGMbJy5sRlcLSsg/nLUba3CKhmE79SlB0VoL+Qyl/ohDkjJgpUBB/UogoEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QYCplL5n; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=K7IllWpwTbkpEyOnUPl22oTUJF6gSdQqzGIGQLOPojQXCm+kq/LDeHaKlo/pq8PhQzhjTsQwlh5AAXaJ/ojBMTfT37FqkybCzrghpXxPhsByYvg3rwBwGLJUiiH6biscNEa0HSglyOsRilc7uVLB01Y4kUHDm2X5bY2aDupx5YA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BE/x7/Wc; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774685214;
+	s=mimecast20190719; t=1774685217;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UpsyArjLv3rVabAfchF7KfNQHGCZv++NltOe2FfD/wU=;
-	b=QYCplL5nnyJGYxqrs6azkWpdDqQ5wHH15DzHV7G8nrfFxnQRyKwcAuuGD21dnwJow7UCkw
-	C2iHHZBruu4DN0Zz6u3+mXK+iAeZHwbrTgmKK2yPNE2HIUF9+ffZHAq8A9pVvXR+ONTSxG
-	MXeF5vZlVlG3ndxRZxfQcWRqnAxXZr8=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+	bh=Z2DPLVqDhXEJBfGDhcq8szGEpKDSX4n5KNDsUD+Cqtw=;
+	b=BE/x7/Wc36e6Is0gVXCaKS0mw8Ws8Vpbjv+65hSoWikZogYgVhfhjSTbBN1UCeqzOAF537
+	AUtafLoMZ/eorDfHbHP6ISJfqmPDD2gAwsi4tt7/nwq6pKEguCSdjfNBJpEvLBAF6OYCeg
+	fuGdTZ+a4XaxGpcLmOZDRws/lS8ph0g=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-70-bsaVJ61yP5qd2LFOeLvb6Q-1; Sat,
- 28 Mar 2026 04:06:49 -0400
-X-MC-Unique: bsaVJ61yP5qd2LFOeLvb6Q-1
-X-Mimecast-MFC-AGG-ID: bsaVJ61yP5qd2LFOeLvb6Q_1774685208
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-595-Pjo3sygoMOiWWMD2idCeAA-1; Sat,
+ 28 Mar 2026 04:06:54 -0400
+X-MC-Unique: Pjo3sygoMOiWWMD2idCeAA-1
+X-Mimecast-MFC-AGG-ID: Pjo3sygoMOiWWMD2idCeAA_1774685212
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EBE1218005B2;
-	Sat, 28 Mar 2026 08:06:47 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 313081800345;
+	Sat, 28 Mar 2026 08:06:52 +0000 (UTC)
 Received: from p16v.redhat.com (unknown [10.44.32.48])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DE9011800351;
-	Sat, 28 Mar 2026 08:06:43 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6199C1800351;
+	Sat, 28 Mar 2026 08:06:48 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Petr Oros <poros@redhat.com>,
@@ -75,9 +75,9 @@ Cc: Petr Oros <poros@redhat.com>,
 	Rob Herring <robh@kernel.org>,
 	devicetree@vger.kernel.org,
 	Pasi Vaananen <pvaanane@redhat.com>
-Subject: [PATCH net-next v2 4/5] dt-bindings: dpll: add ref-sync-sources property
-Date: Sat, 28 Mar 2026 09:06:23 +0100
-Message-ID: <20260328080624.593916-5-ivecera@redhat.com>
+Subject: [PATCH net-next v2 5/5] dpll: zl3073x: add ref-sync pair support
+Date: Sat, 28 Mar 2026 09:06:24 +0100
+Message-ID: <20260328080624.593916-6-ivecera@redhat.com>
 In-Reply-To: <20260328080624.593916-1-ivecera@redhat.com>
 References: <20260328080624.593916-1-ivecera@redhat.com>
 Precedence: bulk
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272750-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272751-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -115,100 +115,316 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.1:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,0.0.0.0:email,microchip.com:email]
-X-Rspamd-Queue-Id: 8A93B34DC4B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6758534DC62
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add ref-sync-sources phandle-array property to the dpll-pin schema
-allowing board designers to declare which input pins can serve as
-sync sources in a Reference-Sync pair.  A Ref-Sync pair consists of
-a clock reference and a low-frequency sync signal where the DPLL locks
-to the clock but phase-aligns to the sync reference.
+Add support for ref-sync pair registration using the 'ref-sync-sources'
+phandle property from device tree. A ref-sync pair consists of a clock
+reference and a low-frequency sync signal where the DPLL locks to the
+clock reference but phase-aligns to the sync reference.
 
-Update both examples in the Microchip ZL3073x binding to demonstrate
-the new property with a 1 PPS sync source paired to a clock source.
+The implementation:
+- Stores fwnode handle in zl3073x_dpll_pin during pin registration
+- Adds ref_sync_get/set callbacks to read and write the sync control
+  mode and pair registers
+- Validates ref-sync frequency constraints: sync signal must be 8 kHz
+  or less, clock reference must be 1 kHz or more and higher than sync
+- Excludes sync source from automatic reference selection by setting
+  its priority to NONE on connect; on disconnect the priority is left
+  as NONE and the user must explicitly make the pin selectable again
+- Iterates ref-sync-sources phandles to register declared pairings
+  via dpll_pin_ref_sync_pair_add()
 
 Reviewed-by: Petr Oros <poros@redhat.com>
 Reviewed-by: Prathosh Satish <Prathosh.Satish@microchip.com>
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
- .../devicetree/bindings/dpll/dpll-pin.yaml    | 11 +++++++
- .../bindings/dpll/microchip,zl30731.yaml      | 30 ++++++++++++++-----
- 2 files changed, 34 insertions(+), 7 deletions(-)
+ drivers/dpll/zl3073x/dpll.c | 207 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 206 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/dpll/dpll-pin.yaml b/Documentation/devicetree/bindings/dpll/dpll-pin.yaml
-index 51db93b77306f..7084f102e274c 100644
---- a/Documentation/devicetree/bindings/dpll/dpll-pin.yaml
-+++ b/Documentation/devicetree/bindings/dpll/dpll-pin.yaml
-@@ -36,6 +36,17 @@ properties:
-     description: String exposed as the pin board label
-     $ref: /schemas/types.yaml#/definitions/string
+diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
+index b5b411425f6b3..79589400f0cc2 100644
+--- a/drivers/dpll/zl3073x/dpll.c
++++ b/drivers/dpll/zl3073x/dpll.c
+@@ -13,6 +13,7 @@
+ #include <linux/module.h>
+ #include <linux/netlink.h>
+ #include <linux/platform_device.h>
++#include <linux/property.h>
+ #include <linux/slab.h>
+ #include <linux/sprintf.h>
  
-+  ref-sync-sources:
-+    description: |
-+      List of phandles to input pins that can serve as the sync source
-+      in a Reference-Sync pair with this pin acting as the clock source.
-+      A Ref-Sync pair consists of a clock reference and a low-frequency
-+      sync signal.  The DPLL locks to the clock reference but
-+      phase-aligns to the sync reference.
-+      Only valid for input pins.  Each referenced pin must be a
-+      different input pin on the same device.
-+    $ref: /schemas/types.yaml#/definitions/phandle-array
+@@ -30,6 +31,7 @@
+  * @dpll: DPLL the pin is registered to
+  * @dpll_pin: pointer to registered dpll_pin
+  * @tracker: tracking object for the acquired reference
++ * @fwnode: firmware node handle
+  * @label: package label
+  * @dir: pin direction
+  * @id: pin id
+@@ -45,6 +47,7 @@ struct zl3073x_dpll_pin {
+ 	struct zl3073x_dpll	*dpll;
+ 	struct dpll_pin		*dpll_pin;
+ 	dpll_tracker		tracker;
++	struct fwnode_handle	*fwnode;
+ 	char			label[8];
+ 	enum dpll_pin_direction	dir;
+ 	u8			id;
+@@ -184,6 +187,109 @@ zl3073x_dpll_input_pin_esync_set(const struct dpll_pin *dpll_pin,
+ 	return zl3073x_ref_state_set(zldev, ref_id, &ref);
+ }
+ 
++static int
++zl3073x_dpll_input_pin_ref_sync_get(const struct dpll_pin *dpll_pin,
++				    void *pin_priv,
++				    const struct dpll_pin *ref_sync_pin,
++				    void *ref_sync_pin_priv,
++				    enum dpll_pin_state *state,
++				    struct netlink_ext_ack *extack)
++{
++	struct zl3073x_dpll_pin *sync_pin = ref_sync_pin_priv;
++	struct zl3073x_dpll_pin *pin = pin_priv;
++	struct zl3073x_dpll *zldpll = pin->dpll;
++	struct zl3073x_dev *zldev = zldpll->dev;
++	const struct zl3073x_ref *ref;
++	u8 ref_id, mode, pair;
 +
-   supported-frequencies-hz:
-     description: List of supported frequencies for this pin, expressed in Hz.
- 
-diff --git a/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml b/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml
-index 17747f754b845..fa5a8f8e390cd 100644
---- a/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml
-+++ b/Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml
-@@ -52,11 +52,19 @@ examples:
-           #address-cells = <1>;
-           #size-cells = <0>;
- 
--          pin@0 { /* REF0P */
-+          sync0: pin@0 { /* REF0P - 1 PPS sync source */
-             reg = <0>;
-             connection-type = "ext";
--            label = "Input 0";
--            supported-frequencies-hz = /bits/ 64 <1 1000>;
-+            label = "SMA1";
-+            supported-frequencies-hz = /bits/ 64 <1>;
-+          };
++	ref_id = zl3073x_input_pin_ref_get(pin->id);
++	ref = zl3073x_ref_state_get(zldev, ref_id);
++	mode = zl3073x_ref_sync_mode_get(ref);
++	pair = zl3073x_ref_sync_pair_get(ref);
 +
-+          pin@1 { /* REF0N - clock source, can pair with sync0 */
-+            reg = <1>;
-+            connection-type = "ext";
-+            label = "SMA2";
-+            supported-frequencies-hz = /bits/ 64 <10000 10000000>;
-+            ref-sync-sources = <&sync0>;
-           };
-         };
- 
-@@ -90,11 +98,19 @@ examples:
-           #address-cells = <1>;
-           #size-cells = <0>;
- 
--          pin@0 { /* REF0P */
-+          sync1: pin@0 { /* REF0P - 1 PPS sync source */
-             reg = <0>;
--            connection-type = "ext";
--            label = "Input 0";
--            supported-frequencies-hz = /bits/ 64 <1 1000>;
-+            connection-type = "gnss";
-+            label = "GNSS_1PPS_IN";
-+            supported-frequencies-hz = /bits/ 64 <1>;
-+          };
++	if (mode == ZL_REF_SYNC_CTRL_MODE_REFSYNC_PAIR &&
++	    pair == zl3073x_input_pin_ref_get(sync_pin->id))
++		*state = DPLL_PIN_STATE_CONNECTED;
++	else
++		*state = DPLL_PIN_STATE_DISCONNECTED;
 +
-+          pin@1 { /* REF0N - clock source */
-+            reg = <1>;
-+            connection-type = "gnss";
-+            label = "GNSS_10M_IN";
-+            supported-frequencies-hz = /bits/ 64 <10000000>;
-+            ref-sync-sources = <&sync1>;
-           };
-         };
++	return 0;
++}
++
++static int
++zl3073x_dpll_input_pin_ref_sync_set(const struct dpll_pin *dpll_pin,
++				    void *pin_priv,
++				    const struct dpll_pin *ref_sync_pin,
++				    void *ref_sync_pin_priv,
++				    const enum dpll_pin_state state,
++				    struct netlink_ext_ack *extack)
++{
++	struct zl3073x_dpll_pin *sync_pin = ref_sync_pin_priv;
++	struct zl3073x_dpll_pin *pin = pin_priv;
++	struct zl3073x_dpll *zldpll = pin->dpll;
++	struct zl3073x_dev *zldev = zldpll->dev;
++	u8 mode, ref_id, sync_ref_id;
++	struct zl3073x_chan chan;
++	struct zl3073x_ref ref;
++	int rc;
++
++	ref_id = zl3073x_input_pin_ref_get(pin->id);
++	sync_ref_id = zl3073x_input_pin_ref_get(sync_pin->id);
++	ref = *zl3073x_ref_state_get(zldev, ref_id);
++
++	if (state == DPLL_PIN_STATE_CONNECTED) {
++		const struct zl3073x_ref *sync_ref;
++		u32 ref_freq, sync_freq;
++
++		sync_ref = zl3073x_ref_state_get(zldev, sync_ref_id);
++		ref_freq = zl3073x_ref_freq_get(&ref);
++		sync_freq = zl3073x_ref_freq_get(sync_ref);
++
++		/* Sync signal must be 8 kHz or less and clock reference
++		 * must be 1 kHz or more and higher than the sync signal.
++		 */
++		if (sync_freq > 8000) {
++			NL_SET_ERR_MSG(extack,
++				       "sync frequency must be 8 kHz or less");
++			return -EINVAL;
++		}
++		if (ref_freq < 1000) {
++			NL_SET_ERR_MSG(extack,
++				       "clock frequency must be 1 kHz or more");
++			return -EINVAL;
++		}
++		if (ref_freq <= sync_freq) {
++			NL_SET_ERR_MSG(extack,
++				       "clock frequency must be higher than sync frequency");
++			return -EINVAL;
++		}
++
++		zl3073x_ref_sync_pair_set(&ref, sync_ref_id);
++		mode = ZL_REF_SYNC_CTRL_MODE_REFSYNC_PAIR;
++	} else {
++		mode = ZL_REF_SYNC_CTRL_MODE_REFSYNC_PAIR_OFF;
++	}
++
++	zl3073x_ref_sync_mode_set(&ref, mode);
++
++	rc = zl3073x_ref_state_set(zldev, ref_id, &ref);
++	if (rc)
++		return rc;
++
++	/* Exclude sync source from automatic reference selection by setting
++	 * its priority to NONE. On disconnect the priority is left as NONE
++	 * and the user must explicitly make the pin selectable again.
++	 */
++	if (state == DPLL_PIN_STATE_CONNECTED) {
++		chan = *zl3073x_chan_state_get(zldev, zldpll->id);
++		zl3073x_chan_ref_prio_set(&chan, sync_ref_id,
++					  ZL_DPLL_REF_PRIO_NONE);
++		return zl3073x_chan_state_set(zldev, zldpll->id, &chan);
++	}
++
++	return 0;
++}
++
+ static int
+ zl3073x_dpll_input_pin_ffo_get(const struct dpll_pin *dpll_pin, void *pin_priv,
+ 			       const struct dpll_device *dpll, void *dpll_priv,
+@@ -1100,6 +1206,8 @@ static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
+ 	.phase_adjust_set = zl3073x_dpll_input_pin_phase_adjust_set,
+ 	.prio_get = zl3073x_dpll_input_pin_prio_get,
+ 	.prio_set = zl3073x_dpll_input_pin_prio_set,
++	.ref_sync_get = zl3073x_dpll_input_pin_ref_sync_get,
++	.ref_sync_set = zl3073x_dpll_input_pin_ref_sync_set,
+ 	.state_on_dpll_get = zl3073x_dpll_input_pin_state_on_dpll_get,
+ 	.state_on_dpll_set = zl3073x_dpll_input_pin_state_on_dpll_set,
+ };
+@@ -1190,8 +1298,11 @@ zl3073x_dpll_pin_register(struct zl3073x_dpll_pin *pin, u32 index)
+ 	if (IS_ERR(props))
+ 		return PTR_ERR(props);
+ 
+-	/* Save package label, esync capability and phase adjust granularity */
++	/* Save package label, fwnode, esync capability and phase adjust
++	 * granularity.
++	 */
+ 	strscpy(pin->label, props->package_label);
++	pin->fwnode = fwnode_handle_get(props->fwnode);
+ 	pin->esync_control = props->esync_control;
+ 	pin->phase_gran = props->dpll_props.phase_gran;
+ 
+@@ -1236,6 +1347,8 @@ zl3073x_dpll_pin_register(struct zl3073x_dpll_pin *pin, u32 index)
+ 	dpll_pin_put(pin->dpll_pin, &pin->tracker);
+ 	pin->dpll_pin = NULL;
+ err_pin_get:
++	fwnode_handle_put(pin->fwnode);
++	pin->fwnode = NULL;
+ 	zl3073x_pin_props_put(props);
+ 
+ 	return rc;
+@@ -1265,6 +1378,9 @@ zl3073x_dpll_pin_unregister(struct zl3073x_dpll_pin *pin)
+ 
+ 	dpll_pin_put(pin->dpll_pin, &pin->tracker);
+ 	pin->dpll_pin = NULL;
++
++	fwnode_handle_put(pin->fwnode);
++	pin->fwnode = NULL;
+ }
+ 
+ /**
+@@ -1735,6 +1851,88 @@ zl3073x_dpll_free(struct zl3073x_dpll *zldpll)
+ 	kfree(zldpll);
+ }
+ 
++/**
++ * zl3073x_dpll_ref_sync_pair_register - register ref_sync pairs for a pin
++ * @pin: pointer to zl3073x_dpll_pin structure
++ *
++ * Iterates 'ref-sync-sources' phandles in the pin's firmware node and
++ * registers each declared pairing.
++ *
++ * Return: 0 on success, <0 on error
++ */
++static int
++zl3073x_dpll_ref_sync_pair_register(struct zl3073x_dpll_pin *pin)
++{
++	struct zl3073x_dev *zldev = pin->dpll->dev;
++	struct fwnode_handle *fwnode;
++	struct dpll_pin *sync_pin;
++	dpll_tracker tracker;
++	int n, rc;
++
++	for (n = 0; ; n++) {
++		/* Get n'th ref-sync source */
++		fwnode = fwnode_find_reference(pin->fwnode, "ref-sync-sources",
++					       n);
++		if (IS_ERR(fwnode)) {
++			rc = PTR_ERR(fwnode);
++			break;
++		}
++
++		/* Find associated dpll pin */
++		sync_pin = fwnode_dpll_pin_find(fwnode, &tracker);
++		fwnode_handle_put(fwnode);
++		if (!sync_pin) {
++			dev_warn(zldev->dev, "%s: ref-sync source %d not found",
++				 pin->label, n);
++			continue;
++		}
++
++		/* Register new ref-sync pair */
++		rc = dpll_pin_ref_sync_pair_add(pin->dpll_pin, sync_pin);
++		dpll_pin_put(sync_pin, &tracker);
++
++		/* -EBUSY means pairing already exists from another DPLL's
++		 * registration.
++		 */
++		if (rc && rc != -EBUSY) {
++			dev_err(zldev->dev,
++				"%s: failed to add ref-sync source %d: %pe",
++				pin->label, n, ERR_PTR(rc));
++			break;
++		}
++	}
++
++	return rc != -ENOENT ? rc : 0;
++}
++
++/**
++ * zl3073x_dpll_ref_sync_pairs_register - register ref_sync pairs for a DPLL
++ * @zldpll: pointer to zl3073x_dpll structure
++ *
++ * Iterates all registered input pins of the given DPLL and establishes
++ * ref_sync pairings declared by 'ref-sync-sources' phandles in the
++ * device tree.
++ *
++ * Return: 0 on success, <0 on error
++ */
++static int
++zl3073x_dpll_ref_sync_pairs_register(struct zl3073x_dpll *zldpll)
++{
++	struct zl3073x_dpll_pin *pin;
++	int rc;
++
++	list_for_each_entry(pin, &zldpll->pins, list) {
++		if (!zl3073x_dpll_is_input_pin(pin) || !pin->fwnode)
++			continue;
++
++		rc = zl3073x_dpll_ref_sync_pair_register(pin);
++		if (rc)
++			return rc;
++	}
++
++	return 0;
++}
++
+ /**
+  * zl3073x_dpll_register - register DPLL device and all its pins
+  * @zldpll: pointer to zl3073x_dpll structure
+@@ -1758,6 +1956,13 @@ zl3073x_dpll_register(struct zl3073x_dpll *zldpll)
+ 		return rc;
+ 	}
+ 
++	rc = zl3073x_dpll_ref_sync_pairs_register(zldpll);
++	if (rc) {
++		zl3073x_dpll_pins_unregister(zldpll);
++		zl3073x_dpll_device_unregister(zldpll);
++		return rc;
++	}
++
+ 	return 0;
+ }
  
 -- 
 2.52.0
