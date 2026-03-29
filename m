@@ -1,213 +1,128 @@
-Return-Path: <netdev+bounces-273014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273015-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IFbJASiOyWm1zAUAu9opvQ
-	(envelope-from <netdev+bounces-273014-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:40:08 +0200
+	id 6C0QETqOyWm1zAUAu9opvQ
+	(envelope-from <netdev+bounces-273015-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:40:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 639AF354075
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:40:07 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52394354087
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:40:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D48FE30086E7
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 20:37:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 665983001F99
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 20:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BFC3815F9;
-	Sun, 29 Mar 2026 20:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794BD2C15BB;
+	Sun, 29 Mar 2026 20:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B0/S4hRI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rp8JmTXf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03B12475CB;
-	Sun, 29 Mar 2026 20:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5625C1A9F9F
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 20:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774816676; cv=none; b=QqfL3xeORSGdI8DKo2XX5FMzOdRD3p3+/3rHKKGXa/w6H29DW+iYnYRyAkMENtMWs++ab3sChfVbzmB9BI9Mh+4UxnOLaQ8j0zCmhs+YrNAyHPZdQAbpKJcLec6iBv8GsqfEl7lxgdfJDb3rDQ371bw/hoRV9ZJANdWWfOL/HmY=
+	t=1774816821; cv=none; b=P3aG64D9dFKKFYBdNAm7GO+LQiJow9mPxANhy2jp543BtobaAssJnzdjxlU1e7XFly4bOIY2KGOqih1pLmmrIXFNdw4mqLSgOAqYgRnZ6XiQETHoobPAOqnN4gLogmnkVyt3bC2DMTCXxw/psCpNO5Ow701nJ6cY/gaNMD/H3Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774816676; c=relaxed/simple;
-	bh=aigITbTVLfuJBr/qVXIS60k4FHN1WCz0am2GEPJu+Fc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LdUj75fQ0a/9KwaP2p/f/Md0IclZVNPWkR0IpCrnWzHG3LHcSJC7wEujF1ndwo7Dlii3tER8ihRtotNOxJlezFc29bU2KQmAnkjebRDt/uWwH7zU6xMNK6dome0dK9agsqVs5EOclCkaZgXhhErvjq8s3N9fZ2J48Qxs0P9eiqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B0/S4hRI; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774816674; x=1806352674;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=aigITbTVLfuJBr/qVXIS60k4FHN1WCz0am2GEPJu+Fc=;
-  b=B0/S4hRIQKcRgxDSjIEb6PqyRQc5oyhoF1EmzWhKN2E+NNt1bzyv0F0y
-   UVl6/iLApk6qJwk1r6c8VnT9jsGEEk8h/A4a8lfGqPYQWTBMsamtkO0FA
-   4GUXgEImo20WgKjh/G0v6U2h6vUD3DmB2txKpvaITHowPXnWPPK2YB5Eu
-   +piTM6zwXp2H3Y4LaQMANdQTdKv5BqUCtdUAHtk2oBGtDg0BL8QDd+40z
-   91tKveSjP/QVlc+8uYJ3MGviTdh07AXFPXFydXzQXckpKWonVpjgBE7df
-   cNGuyhrZ0SZBhXdb5On29wu18pQiEOJ50lMrVZUWkhQUxSto/24s/SXR/
-   w==;
-X-CSE-ConnectionGUID: bymfKwgRQlygIsbizChE4A==
-X-CSE-MsgGUID: oFEIMaOySc2zSsJdWj3R7g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11743"; a="101270367"
-X-IronPort-AV: E=Sophos;i="6.23,148,1770624000"; 
-   d="scan'208";a="101270367"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2026 13:37:54 -0700
-X-CSE-ConnectionGUID: oaAaCG26SzS+JV5fgg6dBw==
-X-CSE-MsgGUID: IHGeZN2OQoyAjWTle4KBOw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,148,1770624000"; 
-   d="scan'208";a="225865642"
-Received: from lkp-server01.sh.intel.com (HELO 283bf2e1b94a) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 29 Mar 2026 13:37:51 -0700
-Received: from kbuild by 283bf2e1b94a with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w6wtI-0000000009N-1iRH;
-	Sun, 29 Mar 2026 20:37:48 +0000
-Date: Mon, 30 Mar 2026 04:36:50 +0800
-From: kernel test robot <lkp@intel.com>
-To: Michael Dege <michael.dege@renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Michael Dege <michael.dege@renesas.com>
-Subject: Re: [PATCH net-next v2 13/13] net: renesas: rswitch: add vlan aware
- switching
-Message-ID: <202603300436.ryIgiB0z-lkp@intel.com>
-References: <20260327-rswitch_add_vlans-v2-13-d7f4358ca57a@renesas.com>
+	s=arc-20240116; t=1774816821; c=relaxed/simple;
+	bh=GBVNDpvpTMYRwuBR5jHuCGd39lgzUCI90GiEX4xBk+s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=HMYNr9wc5xJvq8njBTriKOzqQUenIpomEy7ZtFNikdlekHJtq9LelXUFBFY16UIzk6kF9eevisoaQUUWvH4S01a1W7yAHMO2oIcHVonXn8/dtQ/p/E9OCXpPqgMv2xGf4OIWcLXpG3U9XuSerLAj0Ybfb0RgtJ7SROcZLgXBHeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rp8JmTXf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28AA5C116C6;
+	Sun, 29 Mar 2026 20:40:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774816821;
+	bh=GBVNDpvpTMYRwuBR5jHuCGd39lgzUCI90GiEX4xBk+s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Rp8JmTXfm+dxNCpQ+M7WhZdunpj53g5HPxuXTl/ELmKUSzPuEkv2YYZBLsR7vTi1h
+	 9lmfMAeYWUTny5YVKCOCYUkw3oBwJRuOSjuVib5LXwN8ILkefVy8E3+NMnNHsAQnNz
+	 NkDO8q+UD11tFeqBgdS/fN1CC6SXnCdCBW2keCpIsi2w6CIL2p/VS08liSyN9Vj16l
+	 x34hNmbhfGAuyhV2ntSpQDfE9Vgyh4RUDhJbdCgXgk2zg4D83QNgIdb+V1KdnL+pJH
+	 Oabxk/VCvHbhBi6lg0E/A9OAdq3Tli8INTNf1cf06TD88QK1gQ1VO8cIqMPKN8rW5x
+	 1tNM8D3Elxu/g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02D373930012;
+	Sun, 29 Mar 2026 20:40:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260327-rswitch_add_vlans-v2-13-d7f4358ca57a@renesas.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: dsa: qca8k: Use the right GPIO header
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177481680579.460129.6710614801382324337.git-patchwork-notify@kernel.org>
+Date: Sun, 29 Mar 2026 20:40:05 +0000
+References: <20260327-net-dsa-qca8k-v1-1-94e613a5c369@kernel.org>
+In-Reply-To: <20260327-net-dsa-qca8k-v1-1-94e613a5c369@kernel.org>
+To: Linus Walleij <linusw@kernel.org>
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273014-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-273015-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,01.org:url]
-X-Rspamd-Queue-Id: 639AF354075
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 52394354087
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Michael,
+Hello:
 
-kernel test robot noticed the following build errors:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-[auto build test ERROR on 1f318b96cc84d7c2ab792fcc0bfd42a7ca890681]
+On Fri, 27 Mar 2026 13:23:45 +0100 you wrote:
+> The driver header for qca8k includes the legacy GPIO header
+> <linux/gpio.h> but does not use any symbols from it and actually
+> wants <linux/gpio/consumer.h> so fix this up.
+> 
+> Signed-off-by: Linus Walleij <linusw@kernel.org>
+> ---
+>  drivers/net/dsa/qca/qca8k.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Michael-Dege/net-renesas-rswitch-improve-port-change-mode-functions/20260329-154812
-base:   1f318b96cc84d7c2ab792fcc0bfd42a7ca890681
-patch link:    https://lore.kernel.org/r/20260327-rswitch_add_vlans-v2-13-d7f4358ca57a%40renesas.com
-patch subject: [PATCH net-next v2 13/13] net: renesas: rswitch: add vlan aware switching
-config: arm64-defconfig (https://download.01.org/0day-ci/archive/20260330/202603300436.ryIgiB0z-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260330/202603300436.ryIgiB0z-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [net-next] net: dsa: qca8k: Use the right GPIO header
+    https://git.kernel.org/netdev/net-next/c/d4383c7c7863
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603300436.ryIgiB0z-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   aarch64-linux-ld: Unexpected GOT/PLT entries detected!
-   aarch64-linux-ld: Unexpected run-time procedure linkages detected!
-   aarch64-linux-ld: drivers/net/ethernet/renesas/rswitch_l2.o: in function `rswitch_port_obj_do_add_gwca':
->> drivers/net/ethernet/renesas/rswitch_l2.c:443:(.text+0x11e0): undefined reference to `br_vlan_enabled'
-   aarch64-linux-ld: drivers/net/ethernet/renesas/rswitch_l2.o: in function `rswitch_port_obj_do_add':
-   drivers/net/ethernet/renesas/rswitch_l2.c:412:(.text+0x135c): undefined reference to `br_vlan_enabled'
->> aarch64-linux-ld: drivers/net/ethernet/renesas/rswitch_l2.c:423:(.text+0x13bc): undefined reference to `br_vlan_enabled'
-
-
-vim +443 drivers/net/ethernet/renesas/rswitch_l2.c
-
-   402	
-   403	static int rswitch_port_obj_do_add(struct net_device *ndev,
-   404					   struct switchdev_obj_port_vlan *p_vlan)
-   405	{
-   406		struct rswitch_device *rdev = netdev_priv(ndev);
-   407		struct rswitch_private *priv = rdev->priv;
-   408		struct rswitch_etha *etha = rdev->etha;
-   409		int err;
-   410	
-   411		/* Set Rswitch VLAN mode */
-   412		iowrite32(br_vlan_enabled(rdev->brdev) ? FIELD_PREP(FWGC_SVM, C_TAG) : 0,
-   413			  priv->addr + FWGC);
-   414	
-   415		err = rswitch_write_vlan_table(priv, p_vlan->vid, etha->index);
-   416		if (err < 0)
-   417			return err;
-   418	
-   419		/* If the default vlan for this port has been set, don't overwrite it. */
-   420		if (ioread32(etha->addr + EAVCC))
-   421			return NOTIFY_DONE;
-   422	
- > 423		if (br_vlan_enabled(rdev->brdev))
-   424			rswitch_modify(priv->addr, FWPC0(etha->index), 0, FWPC0_VLANSA | FWPC0_VLANRU);
-   425	
-   426		rswitch_modify(priv->addr, FWPC2(AGENT_INDEX_GWCA),
-   427			       FIELD_PREP(FWPC2_LTWFW, BIT(etha->index)),
-   428			       0);
-   429	
-   430		return rswitch_port_set_vlan_tag(etha, p_vlan, false);
-   431	}
-   432	
-   433	static int rswitch_port_obj_do_add_gwca(struct net_device *ndev,
-   434						struct rswitch_private *priv,
-   435						struct switchdev_obj_port_vlan *p_vlan)
-   436	{
-   437		int err;
-   438	
-   439		if (!(p_vlan->flags & BRIDGE_VLAN_INFO_BRENTRY))
-   440			return NOTIFY_DONE;
-   441	
-   442		/* Set Rswitch VLAN mode */
- > 443		iowrite32(br_vlan_enabled(ndev) ? FIELD_PREP(FWGC_SVM, C_TAG) : 0, priv->addr + FWGC);
-   444	
-   445		err = rswitch_write_vlan_table(priv, p_vlan->vid, AGENT_INDEX_GWCA);
-   446		if (err < 0)
-   447			return err;
-   448	
-   449		/* If the default vlan for this port has been set, don't overwrite it. */
-   450		if (ioread32(priv->addr + GWVCC))
-   451			return NOTIFY_DONE;
-   452	
-   453		return rswitch_gwca_set_vlan_tag(priv, p_vlan, false);
-   454	}
-   455	
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
