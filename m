@@ -1,178 +1,172 @@
-Return-Path: <netdev+bounces-272873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272874-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wDqjDNb/yGn1tAUAu9opvQ
-	(envelope-from <netdev+bounces-272873-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 12:32:54 +0200
+	id 2Jf6IcQIyWl2tgUAu9opvQ
+	(envelope-from <netdev+bounces-272874-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:11:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98398351964
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 12:32:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB1E0351BF2
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:10:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 853B9300D9E7
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 10:32:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 53EF130179FC
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF5EC30C63B;
-	Sun, 29 Mar 2026 10:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C99C3451B3;
+	Sun, 29 Mar 2026 11:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QNBGtbCZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WU859tyo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD4DE302163
-	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 10:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF0A3446CE
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 11:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774780371; cv=none; b=aPeLrD0RWxVPYHFdU/3H9X6NET4MANoUz+MeIJpBPhsFfR2dZPrnghsSLNojaHgLG+3DIozY8HM8ruyxYynorV1VqjHeXkcI1StoEp0MTOhyfXsoOO7s7uGVeBhhFm9/Iv9Cg/LGk+k7OorKaBzNEzyKNF3xAcHN7loxIsRWwvI=
+	t=1774782648; cv=none; b=dfq6m40mVfRMSJU/gv/nFKCapbJZZPDBrdRoJyKK3FZorFJcWXpbEdqQac08UNVgkYmTTNWwD52Lc6GGE8f4p3zpjt9Wg+CpzIq57cg4FRVc7tAmXuzzeF8iSSbdgJz2lIvqzH6e9ljQSTIJGWxYLyilJNFbeOi+MjWfR3PDjqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774780371; c=relaxed/simple;
-	bh=H5kTsfBqoaymzwtE0f4kGO+QKpbjF0HlaDUOV/uNet4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=curUiewA9qe4TXof99QGfFrRjlDRC56BXv7PlJKFEpjQLCIwaPxN+idkgo6mojiAcBgtFs8bE+aiDfLKATGMU53uxtmYGctSn+KL5vYYrDUZ2+ydAAg6M+pLQGAO1/TrUdR2WWA9yAEi/aPLkcQk5ZpIeoBKGH+un4IxggJcSLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QNBGtbCZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAA82C116C6;
-	Sun, 29 Mar 2026 10:32:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774780371;
-	bh=H5kTsfBqoaymzwtE0f4kGO+QKpbjF0HlaDUOV/uNet4=;
-	h=From:Date:Subject:To:Cc:From;
-	b=QNBGtbCZnr0gu12JO1gWqdp4bWA8J7HoSjvT1LVvQbCnbMFE3C9T4UYIEw4wukuwQ
-	 jZimwY98STVOauxRL20o9HbKie2RcSdFoMidfjwtReYd4C7qQttMw0eylELXZTbMvB
-	 NuVW8Kn+vlA+AwEw0DpgIx+XBcbq+PZAdotca542CkUOmWBNLmGWZEYcvu0B+U3Iut
-	 QoMROxGrjptruN+VkxtTPLYCO5d7XjfnJjDVx1iRaC6z9xrsAAvbkAZ+RmRPzG22Ee
-	 5PcOCrxRFIztWmUQNWarcbBUDnKal4PyE7VsfkzIsUOFiAk+z8CdW+ln0pYNUH0IYf
-	 crygs3pG88P1w==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Sun, 29 Mar 2026 12:32:27 +0200
-Subject: [PATCH net-next v2] net: airoha: Delay offloading until all
- net_devices are fully registered
+	s=arc-20240116; t=1774782648; c=relaxed/simple;
+	bh=g2CTlm/4BOAAf+kUViN/ibgUNHCsThNxTS+MoqudMlU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uMceXsxI/GVull90mplnI2YDkHXfympubinDybLW7DgRAF06ELQFEiQkoqNMR7Le7OYL3tnGAEVB18wGbf8iRDWfIQ0WkoPoxXHjApS7h2Xy0TDYAI+zvjin5D/8/p2UMxM4NKgPbtjYkrn+fLGh7IdjOB2mk+Zjaoes8rsSU28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WU859tyo; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774782647; x=1806318647;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=g2CTlm/4BOAAf+kUViN/ibgUNHCsThNxTS+MoqudMlU=;
+  b=WU859tyoF0kVP6ITUWJnNnvXOXhraTY3BWWIknCTT2fdtVfz0Ua1LR/u
+   yxKLis5/gtiHeRC9BLxI0kQgnVx1WwkDNp8jt440fFbLAZcCfEXzR/Vxc
+   8l8RNBmTu1rLmSurzqxIzI2gStDoL1avVIX4c48zNZf9xkrCmrs0/uYjZ
+   cF3w62sQw/RrWcth5ksL3SO41KSgDCq3o7syU9v91DTfiISschHGx+COA
+   N30YSm2R+PbAqUjIha6l63+QSmi+ODIYD5DvT3WSXV3AGnb2SKURLtoEB
+   zbpQqU9P0n0Z9KezbTgk3iQfCCJOWcWFNoTx/rmKt7sTBlDIAzSsX3mlW
+   w==;
+X-CSE-ConnectionGUID: IiAjivkjQc6Ay8UlpgZ+xQ==
+X-CSE-MsgGUID: aJ0quetYRGe/MheCASxPgQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11742"; a="75504059"
+X-IronPort-AV: E=Sophos;i="6.23,148,1770624000"; 
+   d="scan'208";a="75504059"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2026 04:10:46 -0700
+X-CSE-ConnectionGUID: zckU4j3RQ/qXJvBeSKaRtw==
+X-CSE-MsgGUID: NMbtkP5lS6+/CVMAN6483g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,148,1770624000"; 
+   d="scan'208";a="230570832"
+Received: from lkp-server01.sh.intel.com (HELO 3905d212be1b) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 29 Mar 2026 04:10:44 -0700
+Received: from kbuild by 3905d212be1b with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w6o2T-00000000CJ3-1Gh7;
+	Sun, 29 Mar 2026 11:10:41 +0000
+Date: Sun, 29 Mar 2026 19:10:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>
+Subject: Re: [PATCH v1 net-next] tun: Ignore tun in netdev_lock_pos().
+Message-ID: <202603291907.vWkbcfS4-lkp@intel.com>
+References: <20260327213441.3781433-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260329-airoha-regiser-race-fix-v2-1-f4ebb139277b@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/3WNwQqDMBBEf0X23C1Jqqn01P8oHlLd6NKSyEbEI
- vn3Bum1x5nhvdkhkTAluFU7CK2cOIYSzKmCfnJhJOShZDDKWHUxGh1LnBwKjVxQFNcTet7QU9v
- U3urhahUUehYq9WF+QKAFA20LdGWZOC1RPsflqo/9Z6//2leNGq3S9eCbpm3t8/4iCfQ+Rxmhy
- zl/AW1cTiHJAAAA
-X-Change-ID: 20260321-airoha-regiser-race-fix-fe854f61d760
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260327213441.3781433-1-kuniyu@google.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272874-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[google.com,davemloft.net,kernel.org,redhat.com,gmail.com,lunn.ch];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272873-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 98398351964
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
+X-Rspamd-Queue-Id: DB1E0351BF2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Netfilter flowtable can theoretically try to offload flower rules as soon
-as a net_device is registered while all the other ones are not
-registered or initialized, triggering a possible NULL pointer dereferencing
-of qdma pointer in airoha_ppe_set_cpu_port routine. Moreover, if
-register_netdev() fails for a particular net_device, there is a small
-race if Netfilter tries to offload flowtable rules before all the
-net_devices are properly unregistered in airoha_probe() error patch,
-triggering a NULL pointer dereferencing in airoha_ppe_set_cpu_port
-routine. In order to avoid any possible race, delay offloading until
-all net_devices are registered in the networking subsystem.
+Hi Kuniyuki,
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
-Changes in v2:
-- Do not grab flow_offload_mutex in airoha_register_gdm_devices() since
-  it can trigger a deadlock. Add DEV_STATE_REGISTERED flag instead to
-  mark when all net_devices are fully registered.
-- Link to v1: https://lore.kernel.org/r/20260324-airoha-regiser-race-fix-v1-1-6014df55886b@kernel.org
----
- drivers/net/ethernet/airoha/airoha_eth.c | 2 ++
- drivers/net/ethernet/airoha/airoha_eth.h | 1 +
- drivers/net/ethernet/airoha/airoha_ppe.c | 7 +++++++
- 3 files changed, 10 insertions(+)
+kernel test robot noticed the following build errors:
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 82e53c60f561f6314fbf201ba8bc8711e40edc68..743ef0db30980ce74059dfb63553030ef3bf735f 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2957,6 +2957,8 @@ static int airoha_register_gdm_devices(struct airoha_eth *eth)
- 			return err;
- 	}
- 
-+	set_bit(DEV_STATE_REGISTERED, &eth->state);
-+
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index 7df4dbcd8861856c54c2a38bc89c69180ac2f6dc..af29fc74165b8fffb59f45b4725dbd963f1b876d 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -88,6 +88,7 @@ enum {
- 
- enum {
- 	DEV_STATE_INITIALIZED,
-+	DEV_STATE_REGISTERED,
- };
- 
- enum {
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index 58b14aea7c2f33ebce11c51d892eefff692378ca..c057bb2d105d92947bb8c421d89ee94fc0c10f2f 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -1389,6 +1389,13 @@ int airoha_ppe_setup_tc_block_cb(struct airoha_ppe_dev *dev, void *type_data)
- 	struct airoha_eth *eth = ppe->eth;
- 	int err = 0;
- 
-+	/* Netfilter flowtable can try to offload flower rules while not all
-+	 * the net_devices are registered or initialized. Delay offloading
-+	 * until all net_devices are registered in the system.
-+	 */
-+	if (!test_bit(DEV_STATE_REGISTERED, &eth->state))
-+		return -EBUSY;
-+
- 	mutex_lock(&flow_offload_mutex);
- 
- 	if (!eth->npu)
+[auto build test ERROR on net-next/main]
 
----
-base-commit: ced629dc8e5c51ff2b5d847adeeb1035cd655d58
-change-id: 20260321-airoha-regiser-race-fix-fe854f61d760
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/tun-Ignore-tun-in-netdev_lock_pos/20260328-220059
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260327213441.3781433-1-kuniyu%40google.com
+patch subject: [PATCH v1 net-next] tun: Ignore tun in netdev_lock_pos().
+config: x86_64-rhel-9.4-kselftests (https://download.01.org/0day-ci/archive/20260329/202603291907.vWkbcfS4-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260329/202603291907.vWkbcfS4-lkp@intel.com/reproduce)
 
-Best regards,
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603291907.vWkbcfS4-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   ld: vmlinux.o: in function `netdev_lock_pos':
+>> net/core/dev.c:540:(.text+0x24fe910): undefined reference to `tun_link_ops'
+>> ld: net/core/dev.c:540:(.text+0x254084c): undefined reference to `tun_link_ops'
+
+
+vim +540 net/core/dev.c
+
+   529	
+   530	static inline unsigned short netdev_lock_pos(const struct net_device *dev)
+   531	{
+   532		unsigned short dev_type = dev->type;
+   533		int i;
+   534	
+   535		for (i = 0; i < ARRAY_SIZE(netdev_lock_type); i++)
+   536			if (netdev_lock_type[i] == dev_type)
+   537				return i;
+   538	
+   539		/* the last key is used by default */
+ > 540		WARN_ONCE(!netdev_is_tun(dev),
+   541			  "netdev_lock_pos() could not find dev_type=%u\n", dev_type);
+   542		return ARRAY_SIZE(netdev_lock_type) - 1;
+   543	}
+   544	
+
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
