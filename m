@@ -1,169 +1,218 @@
-Return-Path: <netdev+bounces-272869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272870-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Pt2HTT3yGmFswUAu9opvQ
-	(envelope-from <netdev+bounces-272869-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:56:04 +0200
+	id 3L6bHO/6yGkrtAUAu9opvQ
+	(envelope-from <netdev+bounces-272870-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 12:11:59 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AA923517C2
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:56:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 52DB5351863
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 12:11:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6ABE8300A26C
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 09:55:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 393543005307
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 10:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB383043DE;
-	Sun, 29 Mar 2026 09:55:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB78C2D1914;
+	Sun, 29 Mar 2026 10:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nebelreich.de header.i=eitschman@nebelreich.de header.b="lWKNhs4H"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 673D82F3C34;
-	Sun, 29 Mar 2026 09:55:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E22A7285CBA
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 10:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774778124; cv=none; b=pWT24fyDiRlI28UzRW0gwmjgvQfA0Scgc0MLiNVXy97utjLZWPp1h1Pokz2YGK60pB7Hnud85q1nVzBx5igSdJem80B02/jZuG95Z3IPpR2cRHYG9guWt1poIEl7dIR9M6yFl+SJL8XKT2lc/0mktEcOK1oSb2acx0veSp7eGY4=
+	t=1774779111; cv=none; b=IScwu3DJnniJZ48opUYmqdcq7juvOiX3UFSYOKv7WIi4uMuICKOzhLySoBp6uQQMBO53ONjO4/S0SWVVbz0xRXpc5RqI79mmO+IQvrz0uCyj/ZBPNRiBq0M4v1VuDHqtbZyztaGDs0wQVqXm7S16d0APZFGa9u36DA2J0ZgxTeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774778124; c=relaxed/simple;
-	bh=XrsR9qx45NC4IWVRp22mz2up1Qtx5aeK6S8BgAQv43Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oNEbLkzUUNCvMvi/1Z8E448wscBe0dbbkLbHh5AySgJ+vowDwuGJDNSS2EsqIjh4dHMX5debaPmSTNhOuONS2wRxkvFyLxiGmXJIWHkN+6CPCHg9h9CTTJkxoIsdhjVkYRyikqN36+/1MkXCjbvWK98UUBE7FMSPkiwVs/tfNLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=13.75.44.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app3 (Coremail) with SMTP id ywmowADHAJjt9shpLzIsAA--.35468S3;
-	Sun, 29 Mar 2026 17:54:54 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: security@kernel.org
-Cc: dhowells@redhat.com,
-	marc.dionne@auristor.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	yuantan098@gmail.com,
-	bird@lzu.edu.cn,
-	enjou1224z@gmail.com,
-	xuyuqiabc@gmail.com,
-	n05ec@lzu.edu.cn,
-	linux-afs@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1] rxrpc: reject undecryptable rxkad response tickets
-Date: Sun, 29 Mar 2026 17:54:52 +0800
-Message-ID: <32271ec25eae3d23aae2450ab864f37e9d475e24.1774627789.git.xuyuqiabc@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1774627789.git.xuyuqiabc@gmail.com>
-References: <cover.1774627789.git.xuyuqiabc@gmail.com>
+	s=arc-20240116; t=1774779111; c=relaxed/simple;
+	bh=/Q3x77xvg3ZB3+VFb3GxTH89ZpVyA+23z9zU9pt+hzc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TODARXoHxGFF+lzYvoHPD3DXkrXNCeHgxDDHuzRa3UJ2LSZSUW1OQOanr4XSpZHafTJ9dV8knRE96y9qjjhCMIu5lvSECreOh2+uoztZxgAXYWa3Mvg/VKTjrM07imbj0dwXQmGV5Zs7spT1kQr76S0WQc7DpyeodqDYHfsNiAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nebelreich.de; spf=pass smtp.mailfrom=nebelreich.de; dkim=pass (2048-bit key) header.d=nebelreich.de header.i=eitschman@nebelreich.de header.b=lWKNhs4H; arc=none smtp.client-ip=212.227.126.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nebelreich.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebelreich.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nebelreich.de;
+	s=s1-ionos; t=1774779108; x=1775383908; i=eitschman@nebelreich.de;
+	bh=jt2uIeRPuBlDYj3MvR7QxlrUUASUFPPj19tl4ayc20Q=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=lWKNhs4Hx65B6bWHRvRQYau0ZJN3hAA8Fl8of33fZgsByMVBGmsQM0iOlKxaZa//
+	 RaJFWLIG2WgaiUI+VhGEbvv28zckuaMtkjtCwkwqltkypHxjsM8HFynWbH+QEgJX1
+	 /2f3s8g9pqAB6CXOyNbIHNfAk2eFt+ojgGrOFCeZNQRt74tgOdbEooMc2hdHjdiUl
+	 jvd9NI2Ht8+kVJiCQzKsrwArAfRahrT7ziqI5wNl7mxD6eqyOcpX2z0op8+fKbRfg
+	 dNfPrDB8rPHNw9JHtx0k46/5C/4jqXwyXWwHATQnJFkaMGfsJx+Hrv8FmuRMR7QiZ
+	 sGY49t/iJvtMnU4QNQ==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue012
+ [212.227.15.167]) with ESMTPSA (Nemesis) id 1MlsWZ-1vh2ou2SY7-00kpub; Sun, 29
+ Mar 2026 12:11:48 +0200
+From: "Andreas Haarmann-Thiemann" <eitschman@nebelreich.de>
+To: <linusw@kernel.org>
+Cc: <ulli.kroll@googlemail.com>,
+	<netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>
+Subject: [BUG] net: ethernet: cortina: gemini: skb leak in gmac_rx() causes kernel lockup under sustained RX load
+Date: Sun, 29 Mar 2026 12:11:11 +0200
+Message-ID: <000001dcbf64$725ec300$571c4900$@nebelreich.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ywmowADHAJjt9shpLzIsAA--.35468S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7CF4xZrW7CrWxGr1xCw1kuFg_yoW8Zryrpr
-	ZIkrZ3J3s5Jw17Ca1rAr9agFyUtFWUGF13G3ykGr40van7Xr48ZanIqF4jqr1DJFWFkFW5
-	AF4j9F1rt3ZxuFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_GFv_Wrylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
-	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRMXdjDUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQMBCWnH+XsGOgAAsa
-X-Spamd-Result: default: False [-0.96 / 15.00];
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: Ady/ZEVLqiX7zl0vRlmrxMWD5MwYIg==
+Content-Language: de
+X-Provags-ID: V03:K1:B9FfPFYeT5xhJ5DXzXuBy/iUUe772T1XyNmMt/CLvGBuv47Udr7
+ QjGwq5SWhrzJJZbie/Ti135I5bse+kaekARFnGX8qbcMXnSyIZdYQ7zLn2BPHaT8/VMrGe0
+ oXNkrrd8J0nJI6KAocMkcpdV4rcgKeghT8ekK/Zj25cer2zYaIv5NvqBVrjYaiKkt+Cipej
+ aPQ2c+INT9JNdXQjjQUAw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:TQONWpgu8ys=;UorpyPnCJUFiuYLCBpsWVTO2JwC
+ CJ5XxXEF8jF7D5TAH17SdTdZKwND61nFYLeVTVXg4cb3/12Lk9vytP/wW7tid4NiRapWd2e7s
+ 4EM+y/vytYdRfHO6sNWdX5jcn2jqGEAUTAyFgsqIiwC/2hmgSrM0ALSO/p0o4dijiBCoI0MR6
+ QzNlbw5ROkGuYV4kjemceq4cjSeG0mwi95BGlCnHMVeN2SEHMYcGnGrG3xjmNGXCuZKtjC5sj
+ NkvF9/yEO2kZJYFKRkjKdb5ob4XFyOfrb/bToa6w7D78/b3A01pizLlY+XhfP7uc6TLin7VrI
+ JdWQZ8OVNLP/yCuyMHso6oldtmKAaN/c1/4KdAo2mgASafGAyiwdWoFnnEIKh/dysE6DaZmyH
+ on3FgAxrlEIvV1H1k22ftZvTqVhM3tC0Hi0I4K4aw+JtWc1nu8+ZJLfbDOJMYwFq3osKdFx/3
+ bJbvH0U/F7B0cw1BNhgUGLU7MEr8J4cgXoyvGV0b40H/c1yWpts8oJUq/wRxwELgnooqli1kb
+ HxSZi3volQI2SGZw50fkF5ejmZtgTdEorld79Jsuo1MBdPYksyTmkR129XZm5DUiodBV5mx9r
+ 9czi8LlVDMMsZAFMUQNNLbXht7n+ilN+0zQlpXeZnMgqEI3lmmxAXNSwxJlX7OIvZYOB0tWfb
+ oaDiHm0qKSUUnjv5C6rPKnmPX1r9gFfN/5YO0qVrfpC7e2TI551eIPlL+sUghizq67JWNq96a
+ fsBxcKftkaobE3CSnMiDYzHRAah7GnaqjdGPlTs3abnEngvdS3/LI57vyfEt0Ic5wowHJ6h8R
+ eAApW9M37+lA6ipUo2cpZljcqPsk1vlxqriLd5Vuk/XtgErF4yIHnq8O6cxSy4PwieC/oP9Wz
+ br7/1wJwqaPju6O0nfrvJad84MqLhq+2aJZGlBkeGOI+BIyH4q5ABCA97igFuprai4p8MCUQd
+ HNXwashxgIEWIMdb57s400VpMqiQii2Ow2JTQtrmz41XLcMUcRywJbWsHfZfL7T12qbed2syH
+ xzIbZXvSJntVUNcgCpaD4tMA0K0MpfNXKv1t3s0xabFYN3T+N66iHtWZD5S1nEQncvC9vkKdF
+ VR4PT0o8gaGkJhZEME2pK+631Zirq1wX0HpbWDPVZ8VCE1a4hQlCbEM5S8/4KK1gB9KmJ0CoS
+ 23ZvGamGUMgrkSD8hSuMXK7xQ6IeUc1nMt+6rNOeljr8Vhb+2DIOBEoBeWWj6ISnEzZrEO+q1
+ GKtNJoSjjjPKi8eBSjkEvpNjqSlY9QhVNStft67osBbwt8i8yzpGrDOyJaJGc0SXwUh+aslq+
+ Y6fQ3DTnzo1e1YtQX1/H9PJKDn8s6IUr3uA+iSiDoDDZk8Ub1fL1+ljGCKZISYDM6iRulSrNJ
+ 5eOxfsCtOEmzLiTPNT27190nupzgKu9Rq208+CwyBO1HPNIAuNIHRKTAJz1V9CiP8VIChrUWl
+ wYyn5SYE0p5AVXpHzCeNkasV45XZV2TRwe5jsNt15x1jZOGjkslPhU3CiX2AEX0uWEldsrAl8
+ ExJJ+qcNPhDqmjAu+faa1RsJLArryeDBspqZQcI43uRfXHH6CRtLtOwsOVVygJfw6L2YJrgV9
+ wcs/Y/uRWThVzWneypTruJaFhbOPW7wy3P7N9J+pIXSXqnmF7Ye36Ese0neexW66wyoZoHIjw
+ FwGhK1t7kX3gbdyfAnDjZdasp6zvKWRks5v+SZzrM7IbuoRcm3pghH7XWX4uRcIAaeScpSDXI
+ nkeVpRFsAxMo2gygbYwvnI/d7d9Mcf/iRbJaQsUEEixAiR3eGjV8Slj1+F69AR7IVWK3EeZaX
+ t74Yq8lKbGi7Q5t+ca1Ou1iXocNdp7wpc5SBm88agXNCB+ZSCiQQu7tnWHe1Npv7KF+5QTSnV
+ 0uCAVAM3FmiziTI7g==
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[nebelreich.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_DKIM_ALLOW(-0.20)[nebelreich.de:s=s1-ionos];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272869-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,auristor.com,davemloft.net,google.com,kernel.org,gmail.com,lzu.edu.cn,lists.infradead.org,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FREEMAIL_CC(0.00)[googlemail.com,vger.kernel.org,lists.infradead.org];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272870-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[nebelreich.de:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	TO_DN_NONE(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[eitschman@nebelreich.de,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[4];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8AA923517C2
+X-Rspamd-Queue-Id: 52DB5351863
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Yuqi Xu <xuyuqiabc@gmail.com>
+Hello,
 
-rxkad_decrypt_ticket() decrypts the RXKAD response ticket and then
-parses the buffer as plaintext without checking whether
-crypto_skcipher_decrypt() succeeded.
+I am writing to report an SKB memory leak in the Cortina Gemini Ethernet
+driver (drivers/net/ethernet/cortina/gemini.c) that causes the device to
+lock up under sustained receive load.
 
-A malformed RESPONSE can therefore use a non-block-aligned ticket
-length, make the decrypt operation fail, and still drive the ticket
-parser with attacker-controlled bytes.
+Hardware affected: Raidsonic IB-NAS4220-B (Storlink/Cortina Gemini SL3516,
+ARM FA526), running OpenWrt 6.12.67.
 
-Check the decrypt result and abort the connection with RXKADBADTICKET
-when ticket decryption fails.
+--- Observed Behaviour ---
 
-Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by userspace and kernel both")
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Suggested-by: Xin Liu <bird@lzu.edu.cn>
-Tested-by: Ren Wei <enjou1224z@gmail.com>
-Signed-off-by: Yuqi Xu <xuyuqiabc@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- net/rxrpc/rxkad.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Under sustained RX load (e.g. large file transfers over the network), the
+device freezes completely and requires a hard power cycle. No kernel panic
+or oops is produced; the system simply stops responding.
 
-diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
-index e923d6829008..0f79d694cb08 100644
---- a/net/rxrpc/rxkad.c
-+++ b/net/rxrpc/rxkad.c
-@@ -958,6 +958,7 @@ static int rxkad_decrypt_ticket(struct rxrpc_connection *conn,
- 	struct in_addr addr;
- 	unsigned int life;
- 	time64_t issue, now;
-+	int ret;
- 	bool little_endian;
- 	u8 *p, *q, *name, *end;
- 
-@@ -977,8 +978,11 @@ static int rxkad_decrypt_ticket(struct rxrpc_connection *conn,
- 	sg_init_one(&sg[0], ticket, ticket_len);
- 	skcipher_request_set_callback(req, 0, NULL, NULL);
- 	skcipher_request_set_crypt(req, sg, sg, ticket_len, iv.x);
--	crypto_skcipher_decrypt(req);
-+	ret = crypto_skcipher_decrypt(req);
- 	skcipher_request_free(req);
-+	if (ret < 0)
-+		return rxrpc_abort_conn(conn, skb, RXKADBADTICKET, -EPROTO,
-+					rxkad_abort_resp_tkt_short);
- 
- 	p = ticket;
- 	end = p + ticket_len;
--- 
-2.52.0
+--- Root Cause Analysis ---
+
+In gmac_rx() (drivers/net/ethernet/cortina/gemini.c), when
+gmac_get_queue_page() returns NULL for the second page of a multi-page
+fragment, the driver logs an error and continues - but does not free the
+in-progress skb that was already being assembled via napi_build_skb() /
+napi_get_frags():
+
+    gpage = gmac_get_queue_page(geth, port, mapping + PAGE_SIZE);
+    if (!gpage) {
+        dev_err(geth->dev, "could not find mapping\n");
+        /* BUG: skb leaked here */
+        port->stats.rx_dropped++;
+        continue;
+    }
+
+This path is distinct from the similar block in gmac_cleanup_rxq(), which
+correctly only logs "could not find page" without an skb in flight.
+
+Each occurrence of this error path leaks one skb. Under sustained traffic
+the leak exhausts kernel memory, causing the observed lockup.
+
+Note: this analysis is based on code review only. The fix below has not
+yet been verified on hardware due to the driver being compiled into the
+kernel (CONFIG_GEMINI_ETHERNET=y) on the affected device, which prevents
+loading a patched module at runtime.
+
+--- Proposed Fix ---
+
+Free the in-progress skb via napi_free_frags() before continuing, matching
+the pattern already used elsewhere in the driver:
+
+diff --git a/drivers/net/ethernet/cortina/gemini.c
+b/drivers/net/ethernet/cortina/gemini.c
+--- a/drivers/net/ethernet/cortina/gemini.c
++++ b/drivers/net/ethernet/cortina/gemini.c
+@@ -1491,6 +1491,10 @@ static int gmac_rx(struct napi_struct *napi, int
+budget)
+ 		gpage = gmac_get_queue_page(geth, port, mapping +
+PAGE_SIZE);
+ 		if (!gpage) {
+ 			dev_err(geth->dev, "could not find mapping\n");
++			if (skb) {
++				napi_free_frags(&port->napi);
++				skb = NULL;
++			}
+ 			port->stats.rx_dropped++;
+ 			continue;
+ 		}
+
+--- Additional Notes ---
+
+A similar "could not find page" error path exists in gmac_cleanup_rxq().
+That path does not have an skb in flight at that point and does not require
+the same fix.
+
+I would be happy to submit this as a formal patch if the analysis looks
+correct to you.
+
+Thank you for your time.
+
+Best regards,
+Andreas Haarmann-Thiemann
+eitschman@nebelreich.de
 
 
