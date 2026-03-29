@@ -1,192 +1,224 @@
-Return-Path: <netdev+bounces-272881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272882-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kDFzEfoLyWkHtwUAu9opvQ
-	(envelope-from <netdev+bounces-272881-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:24:42 +0200
+	id 5eGNBNENyWlatwUAu9opvQ
+	(envelope-from <netdev+bounces-272882-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:32:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D11B1351CA3
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:24:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A585351CFC
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:32:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1E204300559F
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:24:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3396230125E3
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3422F346E58;
-	Sun, 29 Mar 2026 11:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF5531353C;
+	Sun, 29 Mar 2026 11:32:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="V4nvhR2R"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jTS6pVyR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EEDC2C15AC
-	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 11:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDC118A6A7;
+	Sun, 29 Mar 2026 11:32:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774783479; cv=none; b=OkK2bNz0IO6BghUfMeqaakhpqb/1jfraHqe3q/tDgQ8hWIawvOBP0XMskEwhgY8kVfjmrL7PMxrqiUIVUOQaFzbiqDUr6tLlJgL+DvmW20iCDbQG0Xi1ujxjVcax1I/2fUjKesDxzmNIF4ImU7Y2+wpRtAag72HjYv/VrHE1m2s=
+	t=1774783949; cv=none; b=aljNuf3obYHPmuY8THAWwq+08A8WrHs0HRpd563gERBXqtz6AekTDel2spkjbt5FmsUsRh4do1erBZ1r/1ycxxCzON5N3ut0ZO4k6Q/HX27hN9b1yqPlp/6KIPyHYjbp2MDgBr4rfpAP3fcYYINyKgLQH6h9REvMk2D8tDN2poM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774783479; c=relaxed/simple;
-	bh=MLi0Z6pFA5N+tSKxLYzNxj0vUcsbG7LsGqtWENUdFw8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pe2+K7AqO6PnZW8OwVnezisWa2jRSaQqcjFL81H7S/Jvvf23UNVDTZ6Et1ie1RaMrHlqI72W56puLwRR0bdHaqp8DcJlAMoAF91fJ8Gov0vBKhqayflwWYhCdKXEJ297o8bya3wRfFsMzNAA1NCAjG97tg7mDNc7WhYwcHjt8+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=V4nvhR2R; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-482f454be5bso42451815e9.0
-        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 04:24:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1774783476; x=1775388276; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PThdoORy2iuaX5Hlbv5/ayxBCCRV0jzN1bLjarnMAh0=;
-        b=V4nvhR2RWMviLvQOJYzMK+cHUxVzMJ2pKf2pKJKUiHHCJ17RkRKdwJtbhp5fITNBpB
-         QmGmu+8uzcnWELaWS9WAg1qwQ6owQTjtjYb9g+z0Kf8T63odyEHTIXdRw44GP3NNGD9E
-         PSfKdCfi/NxpHv+77MYPJqC5yif+BAXded3u8dxAUTtdZIPIcNaFz04WoexxnalYrxgC
-         sIvOImhaPAMBmjqdd/+PZImlm3SmrfIzShB13snDjmBh8YaEdNj437qUVSriOgeJWAuH
-         rynqyuLXRNnM4SzI8by9mxUZ+MKe4hQFnNT0g5DdYLlgaAVCFnUnvjPzVG0bvbV8jHtu
-         Oi8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774783476; x=1775388276;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PThdoORy2iuaX5Hlbv5/ayxBCCRV0jzN1bLjarnMAh0=;
-        b=G2DsjcfC6bQU+VKXs2CdAVi4iZJ3nF9EZkisAZEUQU0SA/Ff3SOawipvQIDgZt1nbm
-         K18yAUcEIzoB8P8Jz1zISWVOZQE9cryybVenh2WWIsnOJigVYdVJHt7079XgmnJfnYq3
-         OQlRTePU6XiIm85Q9VxmKIcdPg6i84LmuCiHe3/A/vP6jGO8zbxuTKsCQFuoY+Mhylfd
-         yS7rNBS7z1Hl2GRA7MEP62mhdCjg046PKz+TUx2+msHbMnWnDZTQk6WJlx/fCYVJPDWY
-         gq21Yl4Cj4Ni4Rw31xsgaaJMPMPtSlS0vstXoR6f9r+fqotpGRAXZwNc1SjismMkeAOL
-         BSKQ==
-X-Gm-Message-State: AOJu0Yw80P66Q+xUXUCVQUIBilKDYArFmcD9207MGACljKUQneMFsJpn
-	w4pWS3MsVkVdsFhn37GtqGcTs+9kPrPbV1Dcqw66Ly3k/JzUhEN6rs5Is2fgseS60rc=
-X-Gm-Gg: ATEYQzxQf7nHXFg+ewHjNCcKp9FfN0nKw5a2DYniE+DAC5FYu9UheDjIK//3DkmDiVb
-	SQNIRt/BrdYJPoLwIOd5JIyMhA8TfjCyjNcH1ijVTQC4pGkzMawXlDGevVw5T1P+08D02GyBlWw
-	CVrIHsXXEHixOhRijXIfHTGpmFFl0ZXQ1IbT5Z9/MEBjDv/KwNDX7GYPFrC8PFMpU7GxYtTVaYJ
-	vcDlw1AzaTOfjqYTcT1mqZ7Y933+hrSKYNxyHUqMtuAvUYGJ2wjENcbYKzZ+HUVtLNns3cJozBq
-	owi3pL1twUk+vDbeX9Po9tA3QHtXph0A9xNnVvIv9EOHS9SAV8p7jIynKTPxy/YrNx1CEf1SxUL
-	E6F+M23S7TjElVALoedSOqQdac6ZpXpA4eDQe8FVdg3ccuv49+Zoc6Fgv1pVEB5gL1NI4A+tiWy
-	7vViIyFzy/YvA7fIf7eO7I5qyTb9jrJMjGFNNsKp5AXWepRbS70aI8Qw==
-X-Received: by 2002:a05:600d:8402:b0:485:3428:774c with SMTP id 5b1f17b1804b1-487290b36b5mr91083805e9.4.1774783475709;
-        Sun, 29 Mar 2026 04:24:35 -0700 (PDT)
-Received: from FV6GYCPJ69 ([2001:1ae9:6084:ab00:4c27:3a72:8516:e661])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4873bbcac33sm3844315e9.15.2026.03.29.04.24.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Mar 2026 04:24:35 -0700 (PDT)
-Date: Sun, 29 Mar 2026 13:24:33 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	intel-wired-lan@lists.osuosl.org, poros@redhat.com, richardcochran@gmail.com, 
-	andrew+netdev@lunn.ch, przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com, 
-	Prathosh.Satish@microchip.com, ivecera@redhat.com, arkadiusz.kubalewski@intel.com, 
-	vadim.fedorenko@linux.dev, donald.hunter@gmail.com, horms@kernel.org, pabeni@redhat.com, 
-	kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH v4 net-next 3/8] dpll: extend pin notifier and netlink
- events with notification source ID
-Message-ID: <y5rjyaqyvmnyfaj7o2fari2t6i2klegklpnwi7xw7ld6rmajqb@uovrzb76cjs5>
-References: <20260326162832.3135857-1-grzegorz.nitka@intel.com>
- <20260326162832.3135857-4-grzegorz.nitka@intel.com>
+	s=arc-20240116; t=1774783949; c=relaxed/simple;
+	bh=CS1AKKELuvewejgn0DBIhyp5SikMKYpZXqpF4+4HZVw=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=j/qUCMpTO5Cs37QzXtbgonvPFU3PkUfaeo4OEtCSNZ2wT2c1r+u8kMhQlmUJSWlvhWHfi+u8Bsdq/A888AxBSBade2KMIwWPcv4Ip3WTbHCTPPoz8EscSNL1aOhhCO6k1y1+1CgDDkyhYi5U4u8q30RMP/ElkJm+z84b6S4HKrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jTS6pVyR; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=AxNR5KaJmzWZIX1WbAJp7aQ4tgAbVPKdjMDYmpdFN5s=; b=jTS6pVyRRG8MYv9PxPUvYR15P+
+	nJ8AAwxhgPe+Q7578NPbWitGHavbLyZ+IhcpJJlV2ii/pXIM0q2dkEPjC/U4CIizyFqoZWJNdCmHi
+	4KYPrJXpKNTqxqvJLtGtiYO9Sdzr5mBS9xqwoDnUnxQ6otEmQgUwrX1kapqSUUWiqifGjApQWINl9
+	3QwhMAK87JMd27uudgHNEvo4VLIGvNuqfqJmZZJpNh92cmO5pueVl5tl5WdLkGYziZFjTiSio9Fh6
+	2cO7HVMTfV/j3uGlnzmxhwYIGGOygf1jpDZz2W7ymHjPv8oDCT0kkdhlBi5XOJ/JuBkQ6OglXIebA
+	VmBM760Q==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51262 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1w6oNR-000000007sn-2tJK;
+	Sun, 29 Mar 2026 12:32:21 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1w6oNQ-0000000ER1E-43NU;
+	Sun, 29 Mar 2026 12:32:20 +0100
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: "Guilherme G. Piccoli" <gpiccoli@igalia.com>,
+	Kees Cook <kees@kernel.org>,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Tony Luck <tony.luck@intel.com>
+Subject: [PATCH RFC net-next] usb: gadget: u_ether: fix eth_get_drvinfo() oops
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260326162832.3135857-4-grzegorz.nitka@intel.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1w6oNQ-0000000ER1E-43NU@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Sun, 29 Mar 2026 12:32:20 +0100
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272881-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[resnulli.us];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,linux.dev,kernel.org,davemloft.net,google.com];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,resnulli-us.20230601.gappssmtp.com:dkim,intel.com:email]
-X-Rspamd-Queue-Id: D11B1351CA3
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272882-lists,netdev=lfdr.de,kernel];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.989];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[get_maintainers.pl:url]
+X-Rspamd-Queue-Id: 4A585351CFC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Thu, Mar 26, 2026 at 05:28:27PM +0100, grzegorz.nitka@intel.com wrote:
->Extend the DPLL pin notification API to include a source identifier
->indicating where the notification originates. This allows notifier
->consumers and netlink listeners to distinguish between notifications
->coming from an associated DPLL instance, a parent pin, or the pin
->itself.
->
->A new field, src_id, is added to struct dpll_pin_notifier_info and is
->passed through all pin-related notification paths. Callers of
->dpll_pin_notify() are updated to provide a meaningful source identifier
->based on their context:
->  - pin registration/unregistration uses the DPLL's clock_id,
->  - pin-on-pin operations use the parent pin's clock_id,
->  - pin changes use the pin's own clock_id.
->
->As introduced in the commit ("dpll: allow registering FW-identified pin
->with a different DPLL"), it is possible to share the same physical pin
->via firmware description (fwnode) with DPLL objects from different
->kernel modules. This means that a given pin can be registered multiple
->times.
->
->Driver such as ICE (E825 devices) rely on this mechanism when listening
->for the event where a shared-fwnode pin appears, while avoiding reacting
->to events triggered by their own registration logic.
->
->This change only extends the notification metadata and does not alter
->existing semantics for drivers that do not use the new field.
->
->Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
->Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
->---
-> drivers/dpll/dpll_core.c    | 14 ++++++++------
-> drivers/dpll/dpll_core.h    |  2 +-
-> drivers/dpll/dpll_netlink.c | 10 +++++-----
-> drivers/dpll/dpll_netlink.h |  4 ++--
-> include/linux/dpll.h        |  1 +
-> 5 files changed, 17 insertions(+), 14 deletions(-)
->
->diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
->index 55ad03977d6d..c7fcae76c3f5 100644
->--- a/drivers/dpll/dpll_core.c
->+++ b/drivers/dpll/dpll_core.c
->@@ -71,7 +71,8 @@ void dpll_device_notify(struct dpll_device *dpll, unsigned long action)
-> 	call_dpll_notifiers(action, &info);
-> }
-> 
->-void dpll_pin_notify(struct dpll_pin *pin, unsigned long action)
->+void dpll_pin_notify(struct dpll_pin *pin, u64 ntfy_src,
+The following oops was observed on the nVidia Jetson Xavier NX1
+platform with 7.0.0-rc5, which is caused by dev->gadget becoming NULL
+while the u_ether device is still visible to userspace. Adding some
+debug reveals that we see this sequence:
 
-I don't see the reason for "ntfy_" prefix here. Also. It's src_clock_id.
+net usb1: gadget detached
+tegra-xudc 3550000.usb: ep 0 disabled
+net usb1: no gadget for drvinfo
+usb1 (unregistering): left allmulticast mode
+usb1 (unregistering): left promiscuous mode
+l4tbr0: port 2(usb1) entered disabled state
 
-Could you perhaps consistently name this "src_clock_id" here and in the
-info struct as well?
+Put a sticky plaster over this (it's racy!) I suspect
+gether_detach_gadget() needs to at least take the RTNL as well to
+prevent ethtool ops running concurrently with the gadget being
+detached.
 
-Thanks!
+Unable to handle kernel NULL pointer dereference at virtual address 000000000000
+00d0
+Mem abort info:
+  ESR = 0x0000000096000004
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x04: level 0 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+user pgtable: 4k pages, 48-bit VAs, pgdp=00000001086b1000
+[00000000000000d0] pgd=0000000000000000, p4d=0000000000000000
+Internal error: Oops: 0000000096000004 [#1]  SMP
+Modules linked in: snd_soc_tegra210_mvc snd_soc_tegra186_asrc snd_soc_tegra210_m
+ixer snd_soc_tegra210_admaif snd_soc_tegra_pcm snd_soc_tegra210_ope snd_soc_tegr
+a186_dspk snd_soc_tegra210_i2s snd_soc_simple_card_utils snd_soc_tegra210_dmic s
+nd_soc_tegra210_amx snd_soc_tegra210_adx snd_soc_tegra210_sfc rtw88_8822ce rtw88
+_8822c rtw88_pci rtw88_core mac80211 libarc4 sha256 cfg80211 snd_soc_tegra210_ah
+ub snd_soc_core snd_pcm_dmaengine snd_pcm snd_timer tegra210_adma zram tegra_drm
+ zsmalloc usb_f_ncm syscopyarea usb_f_mass_storage drm_client_lib sysfillrect sy
+simgblt ramoops fb_sys_fops reed_solomon nls_iso8859_1 drm_display_helper nls_cp437 vfat drm_kms_helper fb fat cec drm_dp_aux_bus tegra_aconnect usb_f_acm u_serial usb_f_rndis u_ether max77620_wdt realtek tegra_xudc phy_package snd phy_tegra194_p2u dwmac_dwc_qos_eth soundcore stmmac_platform pwm_tegra rtc_efi tegra186_gpc_dma virt_dma tegra_bpmp_thermal host1x pcie_tegra194 libcomposite udc_core drm drm_panel_orientation_quirks backlight efivarfs ip_tables
+ x_tables
+CPU: 1 UID: 0 PID: 4181 Comm: systemd-udevd Not tainted 7.0.0-rc5-net-next+ #640 PREEMPT
+Hardware name: NVIDIA NVIDIA Jetson Xavier NX Developer Kit/Jetson, BIOS 6.0-37391689 08/28/2024
+pstate: 80400009 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : eth_get_drvinfo+0x4c/0x80 [u_ether]
+lr : eth_get_drvinfo+0x40/0x80 [u_ether]
+sp : ffff80008484bb60
+x29: ffff80008484bb60 x28: ffff000083de18c0 x27: 0000000000000000
+x26: 0000000000000000 x25: ffff0000947da0a8 x24: 0000000000004000
+x23: ffff0000a38a5600 x22: 0000000000000000 x21: ffff80007a3a5558
+x20: ffff0000947da000 x19: ffff0000a38a5608 x18: 0000000000000000
+x17: 0000000000000000 x16: 0000000000000000 x15: 0000ffffe09af760
+x14: 0000000000000000 x13: 0000000000000020 x12: 0101010101010101
+x11: 7f7f7f7f7f7f7f7f x10: 00007ffff0071c50 x9 : 0000000000000020
+x8 : 0101010101010101 x7 : ffff0000a38a5634 x6 : fefefefefefefeff
+x5 : ffff0000a38a562c x4 : 0000000000383030 x3 : 0000000000383030
+x2 : 0000000000000020 x1 : 0000000000000000 x0 : ffff0000a38a564c
+Call trace:
+ eth_get_drvinfo+0x4c/0x80 [u_ether] (P)
+ ethtool_get_drvinfo+0x54/0x1e0
+ __dev_ethtool+0x698/0x2000
+ dev_ethtool+0x90/0x1a0
+ dev_ioctl+0x37c/0x594
+ sock_ioctl+0x390/0x5bc
+ __arm64_sys_ioctl+0x408/0xeb4
+ invoke_syscall.constprop.0+0x50/0xe0
+ do_el0_svc+0x40/0xc0
+ el0_svc+0x48/0x2a0
+ el0t_64_sync_handler+0xa0/0xe4
+ el0t_64_sync+0x19c/0x1a0
+Code: 95a68811 f9468a81 d2800402 91011260 (f9406821)
+---[ end trace 0000000000000000 ]---
 
-[..]
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+
+1. get_maintainers.pl is picking up on the PSTORE folk because of the
+mention of "ramoops" in the commit message... even though this has
+nothing to do with them.
+
+2. I think there's more bugs here as mentioned in the commit message,
+since setting dev->gadget to NULL without taking any locking while
+the u_ether device is still published to userspace looks mightily
+dangerous. Seems to be another kernel driver that fails to obey the
+basics discussed in OLS some twenty years ago concerning the order
+of setup/publish/unpublish/teardown... and we still don't seem to
+be able to get it right. :(
+
+3. Patch generated against the net-next tree, because that's what I'm
+working with being focussed on stmmac at the moment - but I would like
+my test platform not to oops and reboot itself when I instead want it
+to power off.
+
+ drivers/usb/gadget/function/u_ether.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/usb/gadget/function/u_ether.c b/drivers/usb/gadget/function/u_ether.c
+index 1a9e7c495e2e..d1ae91889537 100644
+--- a/drivers/usb/gadget/function/u_ether.c
++++ b/drivers/usb/gadget/function/u_ether.c
+@@ -113,6 +113,10 @@ static void eth_get_drvinfo(struct net_device *net, struct ethtool_drvinfo *p)
+ 
+ 	strscpy(p->driver, "g_ether", sizeof(p->driver));
+ 	strscpy(p->version, UETH__VERSION, sizeof(p->version));
++
++	if (!dev->gadget)
++		return;
++
+ 	strscpy(p->fw_version, dev->gadget->name, sizeof(p->fw_version));
+ 	strscpy(p->bus_info, dev_name(&dev->gadget->dev), sizeof(p->bus_info));
+ }
+-- 
+2.47.3
+
 
