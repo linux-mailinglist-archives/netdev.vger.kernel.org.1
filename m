@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-272998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272999-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YBE9KW2EyWndygUAu9opvQ
-	(envelope-from <netdev+bounces-272998-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:58:37 +0200
+	id AM9hMxGEyWnfygUAu9opvQ
+	(envelope-from <netdev+bounces-272999-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:57:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 073CB353E0D
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:58:36 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDDA7353DCA
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:57:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7B3793011F12
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 19:56:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 042DA3001A4F
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 19:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFC09389444;
-	Sun, 29 Mar 2026 19:56:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C49338838F;
+	Sun, 29 Mar 2026 19:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q1v//S5n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FsL2LNAq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B991F3876BF;
-	Sun, 29 Mar 2026 19:56:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DFF40DFA9;
+	Sun, 29 Mar 2026 19:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774814191; cv=none; b=jP1YprSUyiswAQ2YVz6XlqE6ioxsu5nji8YHyZIFZ18NLZ5H83RjCAMpUe6XpEyUnh3KRcDXlSIfqkjHv0535BLHgxp9Z+t7y/m2Z4bhEqX68QcuYqIV8EzDMMe5h+/PuTN5ys1D7inuIT3JCIGtYNQdvdy6yZnCayLkDmNF3Jo=
+	t=1774814193; cv=none; b=pezQCQeIrLRA+kDDZyg00SF+OQ0oOqXF4y2A7OLkiXbg5Wl5SB7zr3/9Io00jO7dqpeZNZRl2/HC2mVyajtOHV2H9REJdVaAM8dRaGAhTC21zq/PYa+vLYr7ONYJqOqPTmqlZl/6sQUTqNQXNu7FsGKlEe13NYHLElLExM8jdgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774814191; c=relaxed/simple;
-	bh=4p/WaX8te25qMy8WeUumTA75QWOrLvm5o+2T5WSdwl4=;
+	s=arc-20240116; t=1774814193; c=relaxed/simple;
+	bh=i2T1CFcPDnOMaQowK7m4si7gej8YKdhMTnXPDpYZjwM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bb+U7Vd3WWYxplpaUfbGeX1rxuGJOAKTW/UhuCQXQ86brMotrmL2HRCPK5+0SkdURZa17i62xSlWlQgWnhY6H9HiN8/FDMiHsvMKDv6IXCuzbAZzxMZnwTGa88h+IqlQ1hH8kAba6ADehwPE6XGZHUkqTrr3MG9WdCClq1Xb7Mg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q1v//S5n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B425C116C6;
-	Sun, 29 Mar 2026 19:56:30 +0000 (UTC)
+	 MIME-Version; b=Lqu/TprxMRHKs+l92dv2ghRjDX3s2lSfZdl9o5u0TR9h+Wp9y3fOgfEhxJiJ3haQ5OE/s3QTq2KWUZv/HvCONe71H/hMGcauuq+k8zez9Jd/cKqMDSiWFuhDxVNfwOWu0BrkIc7hXbJo+M0+HCnmmAWb9pw/ym+ggUGQRKvK/T8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FsL2LNAq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87A0DC116C6;
+	Sun, 29 Mar 2026 19:56:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774814191;
-	bh=4p/WaX8te25qMy8WeUumTA75QWOrLvm5o+2T5WSdwl4=;
+	s=k20201202; t=1774814193;
+	bh=i2T1CFcPDnOMaQowK7m4si7gej8YKdhMTnXPDpYZjwM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Q1v//S5nTtdxx3FI6NZKwwlJuLArFAn7Ip3Q46PpPWHGLB9hIt9fa+cpm6QxjayFq
-	 rZQfNZ2hhC9DE8bp5S7MdPOK3VGBsCpu9GiHRV6E8aaMQw/qwSMurqiO//OBD+3M2W
-	 thtFJZWuM5X/9MPm14vCQIno+iTLTs2FbVcL39ZY9LiApgNq45KCQNSbtdWsuLTJtU
-	 b2I/l9sMOl4KnytahtwJ87bCNu/jOg/L8EH4bx7YQK49CLe6QW7Qzafdfu04hwxJfp
-	 dir1MVXqzkY97FUPmB4F8HlbY3rOdtIsl2eT5Ts5PzMH7/az17Dr4kxi5KhnlOJe3d
-	 gVJ5MGxtd0XPw==
+	b=FsL2LNAqh9JNlqljhwq8AywvLyNX/6NMVXqX6UU9E1hkSjnVkdkNqR8AppfQo8g0n
+	 XrqWY2wduVyYQcj/zT5CQW0XvULuQdtaM1w94O0V8+ojWZ+BdsQnnuDi76J4tI/8B7
+	 2hrOxi2/H8WGvhsr3Vnelpq8CDRFm4n3dktcxmSUw0pcXScMEvJNb/Ba+tYwIpes9S
+	 xb5waxR0oEmtv7RQ3QvePPQHN55MVw6FGCkP4AGZ81dailW3kwrsfyjlZodIMrf0CS
+	 E6g8k3DE+0Ag2Tob4eavAY2bYwyaUfM2GIk59IrOm83l6UUQoyJ/uRadEHv90RhAxk
+	 B4z4N3RZb7Hww==
 From: Jakub Kicinski <kuba@kernel.org>
 To: jensemil.schulzostergaard@microchip.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -64,12 +64,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v2 4/9] net: dsa: lan9645x: add basic dsa driver for LAN9645X
-Date: Sun, 29 Mar 2026 12:56:29 -0700
-Message-ID: <20260329195629.2789129-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2 5/9] net: dsa: lan9645x: add bridge support
+Date: Sun, 29 Mar 2026 12:56:31 -0700
+Message-ID: <20260329195631.2789158-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260324-dsa_lan9645x_switch_driver_base-v2-4-f7504e3b0681@microchip.com>
-References: <20260324-dsa_lan9645x_switch_driver_base-v2-4-f7504e3b0681@microchip.com>
+In-Reply-To: <20260324-dsa_lan9645x_switch_driver_base-v2-5-f7504e3b0681@microchip.com>
+References: <20260324-dsa_lan9645x_switch_driver_base-v2-5-f7504e3b0681@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,14 +84,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-272998-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272999-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -104,211 +104,230 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 073CB353E0D
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DDDA7353DCA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-Subject: net: dsa: lan9645x: add basic dsa driver for LAN9645X
+net: dsa: lan9645x: add bridge support
 
-This commit adds a basic DSA driver for the Microchip LAN9645X switch. It
-includes initialization, port module setup for NPI, CPU, and front ports,
-and phylink integration for MAC side configuration.
+This commit adds support for hardware offloading of the bridge in the
+lan9645x DSA driver. It enables a single bridge device to be used with
+the switch.
 
-diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_npi.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_npi.c
---- a/drivers/net/dsa/microchip/lan9645x/lan9645x_npi.c
-+++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_npi.c
+> diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
+> index a0908cbf89c7..599e589c4ec3 100644
+> --- a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
+> +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
 [ ... ]
-> +static void disable_conduit_ipv6(struct lan9645x *lan9645x,
-> +				 struct net_device *conduit)
+> @@ -145,6 +155,8 @@ static int lan9645x_setup(struct dsa_switch *ds)
+>  		return err;
+>  	}
+>  
+> +	mutex_init(&lan9645x->fwd_domain_lock);
+> +
+>  	/* Link Aggregation Mode: NETDEV_LAG_HASH_L2 */
+>  	lan_wr(ANA_AGGR_CFG_AC_SMAC_ENA |
+>  	       ANA_AGGR_CFG_AC_DMAC_ENA,
+[ ... ]
+> @@ -240,6 +252,11 @@ static int lan9645x_setup(struct dsa_switch *ds)
+>  
+>  	lan9645x_port_set_tail_drop_wm(lan9645x);
+>  
+> +	lan9645x->owq = alloc_ordered_workqueue("%s-owq", 0,
+> +						dev_name(lan9645x->dev));
+> +	if (!lan9645x->owq)
+> +		return -ENOMEM;
+> +
+
+Is it possible that the hardware remains initialized if the call to
+alloc_ordered_workqueue fails? Because the setup callback returns an error,
+the DSA core will skip the teardown callback. This would bypass
+lan9645x_npi_port_deinit, potentially leaving the conduit netdev in a
+corrupted state with hardware tagging enabled.
+
+Also in lan9645x_setup, the initialization loop for PGID_ENTRIES iterates
+through index 88:
+
+for (int i = 0; i < PGID_ENTRIES; ++i)
+        lan_wr(ANA_PGID_CFG_OBEY_VLAN_SET(1),
+               lan9645x, ANA_PGID_CFG(i));
+
+Could this leave the CPU port's source configuration in an undefined state?
+The CPU port is port 9, which has its source analysis register at PGID_SRC
+(80) + 9 = 89, but the loop terminates before reaching it.
+
+> @@ -258,6 +275,271 @@ static void lan9645x_port_phylink_get_caps(struct dsa_switch *ds, int port,
+>  	lan9645x_phylink_get_caps(ds->priv, port, config);
+>  }
+>  
+> +static int lan9645x_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
 > +{
-> +	struct inet6_dev *dev_v6;
+> +	u32 age_secs = max(1, msecs / MSEC_PER_SEC / 2);
+> +	struct lan9645x *lan9645x = ds->priv;
 > +
-> +	if (!conduit)
-> +		return;
-> +
-> +	/* IPv6 on the conduit will generate frames bypassing our tag driver, so
-> +	 * they lack an IFH. This will be garbage in garbage out and we want to
-> +	 * avoid this.
+> +	/* Entry is must suffer two aging scans before it is removed, so it is
+> +	 * aged after 2*AGE_PERIOD, and the unit is in seconds.
+> +	 * An age period of 0 disables automatic aging.
 > +	 */
-> +	rtnl_lock();
-> +	dev_v6 = __in6_dev_get(conduit);
-> +	if (dev_v6) {
-> +		WRITE_ONCE(dev_v6->cnf.disable_ipv6, 1);
-> +		dev_warn(lan9645x->dev, "Disabled IPv6 on conduit device: %s\n",
-> +			 netdev_name(conduit));
-> +	}
-> +	rtnl_lock();
+> +	lan_rmw(ANA_AUTOAGE_AGE_PERIOD_SET(age_secs),
+> +		ANA_AUTOAGE_AGE_PERIOD,
+> +		lan9645x, ANA_AUTOAGE);
+> +	return 0;
 > +}
 
-Does directly modifying dev_v6->cnf.disable_ipv6 bypass the proper sysctl
-teardown path (addrconf_disable_ipv6) and leave the IPv6 stack in an
-inconsistent state on the conduit device by failing to clean up routes,
-addresses, and MLD memberships?
-
-Is it a layering violation for a switch driver to alter the networking
-configuration of an external upper device, especially since this change
-isn't reverted during driver unbind?
+Does this function properly disable automatic aging when requested? When the
+Linux bridge passes msecs = 0 to disable aging, the max macro evaluates to 1.
+Since writing 1 configures an aggressive 2-second aging period, it appears
+this might not fulfill the user's intent.
 
 [ ... ]
-> +void lan9645x_npi_port_init(struct lan9645x *lan9645x,
-> +			    struct dsa_port *cpu_port)
+> +static void __lan9645x_port_set_host_flood(struct lan9645x *lan9645x, int port,
+> +					   bool uc, bool mc)
 > +{
-> +	int port = cpu_port->index;
-> +	struct lan9645x_port *p;
+> +	bool mc_ena, uc_ena;
 > +
-> +	p = lan9645x_to_port(lan9645x, port);
-> +	lan9645x->npi = port;
+> +	lockdep_assert_held(&lan9645x->fwd_domain_lock);
+> +
+> +	/* We want promiscuous and all_multi to affect standalone ports, for
+> +	 * debug and test purposes.
+> +	 *
+> +	 * However, the linux bridge is incredibly eager to put bridged ports in
+> +	 * promiscuous mode.
+> +
+> +	 * This is unfortunate since lan9645x flood masks are global and not per
+> +	 * ingress port. When some port triggers unknown uc/mc to the CPU, the
+> +	 * traffic from any port is forwarded to the CPU.
+> +	 *
+> +	 * If the host CPU is weak, this can cause tremendous stress. Therefore,
+> +	 * we compromise by ignoring this host flood request for bridged ports.
+> +	 */
+> +	if (lan9645x_port_is_bridged(lan9645x_to_port(lan9645x, port)))
+> +		return;
 
-In a cascaded multi-switch DSA topology, cpu_port->index may belong to a
-different switch and be greater than 8. If lan9645x_to_port returns NULL,
-will this cause a panic when dereferencing p->chip_port below?
+Will ignoring the host flood request for bridged ports break IPv6 Neighbor
+Discovery? IPv6 ND relies on multicast, and the PGID_MC and PGID_MCIPV6 masks
+do not include the CPU port by default. By ignoring the bridge's request to
+enable multicast flooding, the CPU port may fail to receive ICMPv6 ND packets.
 
 [ ... ]
-> +	/* Configure IFH prefix mode for NPI port. */
-> +	lan_rmw(SYS_PORT_MODE_INCL_XTR_HDR_SET(LAN9645X_TAG_PREFIX_LONG) |
-> +		SYS_PORT_MODE_INCL_INJ_HDR_SET(LAN9645X_TAG_PREFIX_NONE),
-> +		SYS_PORT_MODE_INCL_XTR_HDR |
-> +		SYS_PORT_MODE_INCL_INJ_HDR,
-> +		lan9645x,
-> +		SYS_PORT_MODE(p->chip_port));
-
-Setting LAN9645X_TAG_PREFIX_NONE means the hardware interprets the first
-bytes of any frame received from the host as an IFH command structure.
-
-Does this allow a local user to transmit crafted frames (for example, via
-raw sockets or standard protocols) whose MAC address bytes map to malicious
-IFH commands, thereby bypassing VLAN isolation or flooding the switch?
-
-Should the hardware be configured to require a strict prefix, such as
-LAN9645X_TAG_PREFIX_LONG, for injected frames to prevent this?
-
-diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
---- a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-+++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-[ ... ]
-> +static int lan9645x_setup(struct dsa_switch *ds)
+> +/* Called in atomic context */
+> +static void lan9645x_port_set_host_flood(struct dsa_switch *ds, int port,
+> +					 bool uc, bool mc)
 > +{
 > +	struct lan9645x *lan9645x = ds->priv;
-> +	struct device *dev = lan9645x->dev;
-> +	u32 all_phys_ports;
-> +	int err;
+> +	struct lan9645x_host_flood_work *w;
 > +
-> +	lan9645x->num_phys_ports = ds->num_ports;
-> +	all_phys_ports = GENMASK(lan9645x->num_phys_ports - 1, 0);
-> +
-> +	err = lan9645x_reset_switch(lan9645x);
-> +	if (err)
-> +		return err;
-> +
-> +	lan9645x->ports = devm_kcalloc(lan9645x->dev, lan9645x->num_phys_ports,
-> +				       sizeof(struct lan9645x_port *),
-> +				       GFP_KERNEL);
+> +	w = kzalloc_obj(*w, GFP_ATOMIC);
 
-Since the DSA .setup callback can be invoked multiple times during the
-platform device's lifetime (for example, when the DSA master interface is
-unbound and bound again), does using devm_kcalloc here cause a memory leak?
-Should these allocations be moved to .probe or managed with kcalloc and
-freed in .teardown?
+Is kzalloc_obj an available kernel function? Using it might cause a build
+error, as the standard API would be kzalloc(sizeof(*w), GFP_ATOMIC).
+
+> +	if (!w)
+> +		return;
+
+Are there consequences to returning silently when the allocation fails?
+If this allocation fails under memory pressure, the network stack will still
+assume the configuration was successfully applied, leaving the hardware state
+out of sync.
 
 [ ... ]
-> +	/* Set all the entries to obey VLAN. */
-> +	for (int i = 0; i < PGID_ENTRIES; ++i)
-> +		lan_wr(ANA_PGID_CFG_OBEY_VLAN_SET(1),
-> +		       lan9645x, ANA_PGID_CFG(i));
-
-PGID_ENTRIES is defined as 89, so this loop initializes indices 0 through
-88. Since the CPU port is index 9, its source PGID is PGID_SRC + CPU_PORT
-(80 + 9 = 89).
-
-Is index 89 left uninitialized, breaking the OBEY_VLAN rule and allowing
-CPU-injected frames to leak across VLAN boundaries?
-
-[ ... ]
-> +	/* Multicast to all front ports */
-> +	lan_wr(all_phys_ports, lan9645x, ANA_PGID(PGID_MC));
-> +
-> +	/* IP multicast to all front ports */
-> +	lan_wr(all_phys_ports, lan9645x, ANA_PGID(PGID_MCIPV4));
-> +	lan_wr(all_phys_ports, lan9645x, ANA_PGID(PGID_MCIPV6));
-> +
-> +	/* Unicast to all front ports */
-> +	lan_wr(all_phys_ports, lan9645x, ANA_PGID(PGID_UC));
-> +
-> +	/* Broadcast to all ports */
-> +	lan_wr(BIT(CPU_PORT) | all_phys_ports, lan9645x, ANA_PGID(PGID_BC));
-
-PGID_BC includes BIT(CPU_PORT) and all_phys_ports (which includes the NPI
-port). Will this forward broadcast frames to both the CPU extraction queue
-and the NPI port's normal egress queue, causing duplicate frames for the host?
-
-Conversely, the multicast masks and PGID_UC exclude BIT(CPU_PORT). Does
-this cause them to bypass the CPU extraction queue entirely, thereby
-lacking the LONG extraction prefix and breaking the host's DSA tagger parsing?
-
-diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_phylink.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_phylink.c
---- a/drivers/net/dsa/microchip/lan9645x/lan9645x_phylink.c
-+++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_phylink.c
-[ ... ]
-> +static int lan9645x_phylink_mac_prepare(struct phylink_config *config,
-> +					unsigned int mode,
-> +					phy_interface_t iface)
+> +static int lan9645x_port_bridge_join(struct dsa_switch *ds, int port,
+> +				     struct dsa_bridge bridge,
+> +				     bool *tx_fwd_offload,
+> +				     struct netlink_ext_ack *extack)
 > +{
-> +	struct lan9645x_port *p = lan9645x_phylink_config_to_port(config);
-> +	struct lan9645x *lan9645x = p->lan9645x;
-> +	int port = p->chip_port;
-> +	u32 mask;
-> +
-> +	if (port == 5 || port == 6 || port > 8)
-> +		return -EINVAL;
-> +
-> +	mask = HSIO_HW_CFG_GMII_ENA_SET(BIT(port));
-> +	lan_rmw(mask, mask, lan9645x, HSIO_HW_CFG);
-> +
-> +	if (port == 4 && phy_interface_mode_is_rgmii(iface))
-> +		lan_rmw(HSIO_HW_CFG_RGMII_0_CFG_SET(1),
-> +			HSIO_HW_CFG_RGMII_0_CFG,
-> +			lan9645x, HSIO_HW_CFG);
-
-The lan9645x_phylink_get_caps function advertises RGMII support for ports
-4, 7, and 8. Does restricting the hardware multiplexer configuration here to
-port 4 break connectivity for ports 7 and 8 when used in RGMII mode?
-
-diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
---- a/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
-+++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_port.c
 [ ... ]
-> +int lan9645x_port_set_maxlen(struct lan9645x *lan9645x, int port, size_t sdu)
-> +{
-> +	struct lan9645x_port *p = lan9645x_to_port(lan9645x, port);
-> +	int maxlen = sdu + ETH_HLEN + ETH_FCS_LEN;
+> +	/* The bridge puts ports in IFF_ALLMULTI before calling
+> +	 * port_bridge_join, so clean up before the port is marked as bridged.
+> +	 */
+> +	__lan9645x_port_set_host_flood(lan9645x, port, false, false);
+> +	lan9645x->bridge_mask |= BIT(p->chip_port);
+> +
+> +	mutex_unlock(&lan9645x->fwd_domain_lock);
+> +
+> +	/* Later: stp_state_set updates forwarding */
+> +
+> +	return 0;
+> +}
 
-Does this maximum frame length calculation drop standard 1500-byte MTU
-frames that are 802.1Q VLAN tagged (1522 bytes total), since it does not
-account for VLAN_HLEN?
+Could clearing the host flood masks here lead to lost hardware state when the
+port leaves the bridge? If a user previously enabled IFF_PROMISC or
+IFF_ALLMULTI on the standalone port, the software netdev flags remain set.
+When lan9645x_port_bridge_leave is called, it does not restore the hardware's
+promiscuous or multicast state to match the unchanged software flags.
 
-[ ... ]
-> +int lan9645x_port_setup(struct dsa_switch *ds, int port)
+> +static void lan9645x_port_bridge_stp_state_set(struct dsa_switch *ds, int port,
+> +					       u8 state)
 > +{
-> +	struct dsa_port *dp = dsa_to_port(ds, port);
+> +	struct lan9645x *lan9645x;
+> +	struct lan9645x_port *p;
+> +	bool learn_ena;
+> +
+> +	lan9645x = ds->priv;
+> +	p = lan9645x_to_port(lan9645x, port);
+> +
+> +	mutex_lock(&lan9645x->fwd_domain_lock);
+> +
+> +	p->stp_state = state;
+> +
+> +	if (state == BR_STATE_FORWARDING)
+> +		lan9645x->bridge_fwd_mask |= BIT(p->chip_port);
+> +	else
+> +		lan9645x->bridge_fwd_mask &= ~BIT(p->chip_port);
+> +
+> +	learn_ena = (state == BR_STATE_LEARNING ||
+> +		     state == BR_STATE_FORWARDING) && p->learn_ena;
+> +
+> +	lan_rmw(ANA_PORT_CFG_LEARN_ENA_SET(learn_ena),
+> +		ANA_PORT_CFG_LEARN_ENA, lan9645x,
+> +		ANA_PORT_CFG(p->chip_port));
+> +
+> +	lan9645x_update_fwd_mask(lan9645x);
+> +	mutex_unlock(&lan9645x->fwd_domain_lock);
+> +}
+
+Are ingress data frames correctly dropped for ports in non-forwarding STP
+states? When the port is removed from bridge_fwd_mask,
+lan9645x_update_fwd_mask calculates the source PGID mask as
+bridge_mask & bridge_fwd_mask & ~BIT(dp->index).
+
+This evaluates to the set of all other forwarding ports in the bridge. Since
+ingress forwarding is not explicitly disabled on the port (for example, by
+setting ANA_PORT_CFG_PORTID_VAL to NONE), data frames received on a blocking
+or learning port can enter the analyzer and be forwarded.
+
+> +static void lan9645x_port_bridge_leave(struct dsa_switch *ds, int port,
+> +				       struct dsa_bridge bridge)
+> +{
 > +	struct lan9645x *lan9645x = ds->priv;
 > +	struct lan9645x_port *p;
 > +
 > +	p = lan9645x_to_port(lan9645x, port);
 > +
-> +	if (dp->dn) {
-> +		p->rx_internal_delay =
-> +			of_property_present(dp->dn, "rx-internal-delay-ps");
-> +		p->tx_internal_delay =
-> +			of_property_present(dp->dn, "tx-internal-delay-ps");
-> +	}
+> +	mutex_lock(&lan9645x->fwd_domain_lock);
+> +
+> +	lan9645x->bridge_mask &= ~BIT(p->chip_port);
+> +
+> +	/* Last port leaving clears bridge dev */
+> +	if (!lan9645x->bridge_mask)
+> +		lan9645x->bridge = NULL;
+> +
+> +	lan9645x_update_fwd_mask(lan9645x);
+> +
+> +	mutex_unlock(&lan9645x->fwd_domain_lock);
+> +}
 
-These are standard integer properties specifying delays in picoseconds. If
-a user explicitly disables the delay via devicetree using a value of 0,
-will of_property_present evaluate to true and enable the hardware delay
-anyway? Should of_property_read_u32 be used instead to check the value?
+Should p->learn_ena be reset when a port leaves the bridge?
+
+During port_bridge_flags, p->learn_ena is set to true. When leaving the
+bridge, this flag remains true. The DSA core will transition the leaving
+port to BR_STATE_FORWARDING, which calls lan9645x_port_bridge_stp_state_set
+and leaves hardware learning enabled. This can pollute the shared FDB with
+MAC addresses from standalone ports, leading to silent packet drops if
+bridged ports attempt to forward traffic to them.
 
