@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-272878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272879-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SItZKBUMyWkHtwUAu9opvQ
-	(envelope-from <netdev+bounces-272878-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:25:09 +0200
+	id gLsnOEgMyWkHtwUAu9opvQ
+	(envelope-from <netdev+bounces-272879-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:26:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06541351CB2
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:25:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3725E351CC8
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:26:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 65E42303E496
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:23:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8DF8E304C7E1
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 022D935F17A;
-	Sun, 29 Mar 2026 11:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E7C435C1AA;
+	Sun, 29 Mar 2026 11:23:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AL42Lqzh"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e1KEBXTa"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD3E35C1AA
-	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 11:23:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38FC35B632
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 11:23:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774783420; cv=none; b=jNIPvdlIB+e9bFXYTQdqDyc0oS5dqOIs5rlgqUTqF2Ev3ZB06t/FEsIYvw2meoNVjuDG1v1Sn+/Elptq9OU5TBVHLjy61KGteOGZwlIjZJJzb+6iLhrbtHU8d/2koddzXYvyR/VwtXj25yw3EULDNIXh//gFL38pwFzxhVNmLMc=
+	t=1774783422; cv=none; b=G90xmXbr/V/U/GTlWtHBZI7l7MnjBz2tK44HmCy3QRtE2XMAB7hjdWnrmhuh5cLsYhb/n+38IBveRGiLZCCn+0P1MfVNjyHRoJgcjzDJ4/cRXBE1YyEC+i4WACy2MbyC7lUkIRSQdyqGt4f8iX44bQHBfAqxMpac3ddaa2t/BiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774783420; c=relaxed/simple;
-	bh=PIuYIprfouppkQZ7QeNiFpoaRkQAOKuyzHEJqlLVsCQ=;
+	s=arc-20240116; t=1774783422; c=relaxed/simple;
+	bh=FKvTpO1SluKtjSMrTLWTBN3s/9HEwJe1ge0E6tvCeNg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uoRODl25n5au9GfAIZgIlz41vuMGloFP88fJ1QKmDIZx05suUKQjJeJWW65tgwGmqzf4TkNCdRUit6QCuJ9/kgu7wkvmBExHdq5mdb8gH+Qz7it7EESrsSwmlEhjnl5CpBbZAPy/qhJK4wmJQMHhS6OBZaN9Nx7/D5L3dJKJ5go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AL42Lqzh; arc=none smtp.client-ip=91.218.175.185
+	 MIME-Version; b=gcM+hf95wuR77cmq7IhsG5sXylTk/6/6jaAVFGS121hOAMDoun7+sZl1u3pX2gQ+GYqh1WCQnGkjqOMupBHG29NuKGAr6k0MuyrZM8nmedxV8HtkUzT4NCjw/Dyus8FOpogZF7judnAImpiKUl8ePb62eiQD8QRzITKROoRxpqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e1KEBXTa; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774783418;
+	t=1774783419;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KSHMJQQ8DMWFQEe3KshqgTve/RGG6/L+xVBKnqvidjI=;
-	b=AL42LqzhKfMk6JkvEzGhY87/anTYEb48GDnPCxaRJD9M5BDLd82C/UbqYnsQ58sFhZR7dJ
-	36v1JdeG5D1rwWHyhHPQISWjjI1x7XfowABoZGMsF95GVMLIkbXXfpPen6hMvQoGZVBvS5
-	7fGQAaHdcZVmkgarNXAv7xRoT+iIR9U=
+	bh=Cz51yi/FiPlzZs1MA69fyINR+7e40BLTFJSWXlWlNIo=;
+	b=e1KEBXTajsVUm7rZ9TVIPSVJ72GiNPMrClmEJOv2GWWt4Km/nKIae5418LliSuJrOGCHa1
+	ibnuKCuAMwU5gaj9XJ9Q35Yyv2ZXdsLDG1ZGtYi8VS/UHyA+tzmcF+ip0BVGjfIc22iuaw
+	SG/6GRsg7l/JSWzK4HBL2OywfTw3siw=
 From: luka.gejak@linux.dev
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -56,9 +56,9 @@ Cc: horms@kernel.org,
 	liuhangbin@gmail.com,
 	linux-kernel@vger.kernel.org,
 	luka.gejak@linux.dev
-Subject: [PATCH net-next v3 2/4] net: hsr: fix VLAN add unwind on slave errors
-Date: Sun, 29 Mar 2026 13:23:11 +0200
-Message-ID: <20260329112313.17164-3-luka.gejak@linux.dev>
+Subject: [PATCH net-next v3 3/4] net: hsr: require valid EOT supervision TLV
+Date: Sun, 29 Mar 2026 13:23:12 +0200
+Message-ID: <20260329112313.17164-4-luka.gejak@linux.dev>
 In-Reply-To: <20260329112313.17164-1-luka.gejak@linux.dev>
 References: <20260329112313.17164-1-luka.gejak@linux.dev>
 Precedence: bulk
@@ -82,7 +82,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FREEMAIL_CC(0.00)[kernel.org,redhat.com,gmail.com,vger.kernel.org,linux.dev];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
-	TAGGED_FROM(0.00)[bounces-272878-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272879-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -97,89 +97,38 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
-X-Rspamd-Queue-Id: 06541351CB2
+X-Rspamd-Queue-Id: 3725E351CC8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Luka Gejak <luka.gejak@linux.dev>
 
-When vlan_vid_add() fails for a secondary slave, the error path calls
-vlan_vid_del() on the failing port instead of the peer slave that had
-already succeeded. This results in asymmetric VLAN state across the HSR
-pair.
+Supervision frames are only valid if terminated with a zero-length EOT
+TLV. The current check fails to reject non-EOT entries as the terminal
+TLV, potentially allowing malformed supervision traffic.
 
-Fix this by switching to a centralized unwind path that removes the VID
-from any slave device that was already programmed.
+Fix this by strictly requiring the terminal TLV to be HSR_TLV_EOT
+with a length of zero.
 
+Reviewed-by: Felix Maurer <fmaurer@redhat.com>
 Signed-off-by: Luka Gejak <luka.gejak@linux.dev>
 ---
- net/hsr/hsr_device.c | 32 +++++++++++++++++---------------
- 1 file changed, 17 insertions(+), 15 deletions(-)
+ net/hsr/hsr_forward.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index 5c3eca2235ce..8ee30fc32612 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -532,8 +532,8 @@ static void hsr_change_rx_flags(struct net_device *dev, int change)
- static int hsr_ndo_vlan_rx_add_vid(struct net_device *dev,
- 				   __be16 proto, u16 vid)
- {
--	bool is_slave_a_added = false;
--	bool is_slave_b_added = false;
-+	struct net_device *slave_a_dev = NULL;
-+	struct net_device *slave_b_dev = NULL;
- 	struct hsr_port *port;
- 	struct hsr_priv *hsr;
- 	int ret = 0;
-@@ -549,33 +549,35 @@ static int hsr_ndo_vlan_rx_add_vid(struct net_device *dev,
- 		switch (port->type) {
- 		case HSR_PT_SLAVE_A:
- 			if (ret) {
--				/* clean up Slave-B */
- 				netdev_err(dev, "add vid failed for Slave-A\n");
--				if (is_slave_b_added)
--					vlan_vid_del(port->dev, proto, vid);
--				return ret;
-+				goto unwind;
- 			}
--
--			is_slave_a_added = true;
-+			slave_a_dev = port->dev;
- 			break;
--
- 		case HSR_PT_SLAVE_B:
- 			if (ret) {
--				/* clean up Slave-A */
- 				netdev_err(dev, "add vid failed for Slave-B\n");
--				if (is_slave_a_added)
--					vlan_vid_del(port->dev, proto, vid);
--				return ret;
-+				goto unwind;
- 			}
--
--			is_slave_b_added = true;
-+			slave_b_dev = port->dev;
- 			break;
- 		default:
-+			if (ret)
-+				goto unwind;
- 			break;
- 		}
+diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+index aefc9b6936ba..d26c7d0e8109 100644
+--- a/net/hsr/hsr_forward.c
++++ b/net/hsr/hsr_forward.c
+@@ -110,7 +110,7 @@ static bool is_supervision_frame(struct hsr_priv *hsr, struct sk_buff *skb)
  	}
  
- 	return 0;
-+
-+unwind:
-+	if (slave_a_dev)
-+		vlan_vid_del(slave_a_dev, proto, vid);
-+
-+	if (slave_b_dev)
-+		vlan_vid_del(slave_b_dev, proto, vid);
-+
-+	return ret;
- }
+ 	/* end of tlvs must follow at the end */
+-	if (hsr_sup_tlv->HSR_TLV_type == HSR_TLV_EOT &&
++	if (hsr_sup_tlv->HSR_TLV_type != HSR_TLV_EOT ||
+ 	    hsr_sup_tlv->HSR_TLV_length != 0)
+ 		return false;
  
- static int hsr_ndo_vlan_rx_kill_vid(struct net_device *dev,
 -- 
 2.53.0
 
