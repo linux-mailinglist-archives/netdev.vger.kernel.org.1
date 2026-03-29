@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-272991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272992-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oFQDCCuCyWmBygUAu9opvQ
-	(envelope-from <netdev+bounces-272991-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:48:59 +0200
+	id UD8xOj+CyWmBygUAu9opvQ
+	(envelope-from <netdev+bounces-272992-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:49:19 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96C70353D53
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:48:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DA1E353D5A
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:49:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AFAFB302BEAD
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 19:47:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C3A7D300DF63
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 19:47:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D145274FEB;
-	Sun, 29 Mar 2026 19:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9B3292B54;
+	Sun, 29 Mar 2026 19:47:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uk30xVZc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XIpP+rfU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6081C8634
-	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 19:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F5F1C8634
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 19:47:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774813671; cv=none; b=NixQ9A1wJFFGH7xzGY1i/2Cdc0bjnsgJBlTurcO5U8J2DajqUP8k2UGuGHl0LiImLpHI0fnLhs5NB90Tcw7yWRcanklkLIpoqs1D2/aKY9MjgJVQGWjgOrs8abCsp2Z9IWBbFrHgd7ujE/lgD/jKi9XKS2sTMUkBZN9ZZQGGtlw=
+	t=1774813673; cv=none; b=B3YGURu+fPk/MxJX/jkiXjzTiR2fLy06t/DwmY6o4Q0GDjinHjsvIcjhv2CG/KKLBchRkJX0oJKIZBfKWXkprdV1dXHfDHn/EJGSmg/mdSHX2d8ty54wfVArx0ldhAB48cmQwnhtHdNvK4F4ix/E18gEk7Lr2d2oiTWUjFA1NQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774813671; c=relaxed/simple;
-	bh=+1PBXvBhna3YctzmS8U7N4WTuV6LO6zkkBGkQEuHwic=;
+	s=arc-20240116; t=1774813673; c=relaxed/simple;
+	bh=Pb4w/eaCQxIBwkeAzx0AsYwcBf04mixK9df36YJfOWs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mXfF7ua6i6TADXVPEcub3kQcIaXvNZLwpP5KN5M4vByAGA9hY7xXmbBddkh6XJEv+6fsV3kJ2nw0YserWkn2wZljAJxVEj3N/qIJQ0hRvCztpdooP+ZhlDvRv5nSM7nq1kFWdInunYc4MnElg50pxlAbh/rxm21DilfdcvJIKEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uk30xVZc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C4F8C116C6;
-	Sun, 29 Mar 2026 19:47:50 +0000 (UTC)
+	 MIME-Version; b=A+62JKakNEyOuBwrGxyuBy5YwHtVluq18oyvB0r1fjZqY4YzR33rcxC2t2PpdIt6iGDdQXMuYkdjRELMs+e/B7PoOZQwXkaOgMy2BGykyZ14zRmRwIjvfsjtypxlSS1lxSwD55pUebZemSU9zVRZz6oJPnsLdjw3A6mLiXoWmjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XIpP+rfU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68465C116C6;
+	Sun, 29 Mar 2026 19:47:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774813671;
-	bh=+1PBXvBhna3YctzmS8U7N4WTuV6LO6zkkBGkQEuHwic=;
+	s=k20201202; t=1774813672;
+	bh=Pb4w/eaCQxIBwkeAzx0AsYwcBf04mixK9df36YJfOWs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uk30xVZczpo5SGexAKe6DEnQyaQukwUR91QtvqmZBALKx3JVpGAq+cy5kEiTZ5B83
-	 beWrUMHYvD+ixD9Ou1UqzX7RLCQvDAKzTZwr+PPkqUv9VrfrE+eWJXgLRqhj8EsM35
-	 B/BuCx5RtRVIotQu7M14jN0vNskQJGCSHcHAkSjn6b0JY2hDAjxniOggdVc88zIvWa
-	 Y4IIP2u6GN/wpY707K18lJwZPyn9FM7h0HdEl9sVW4GQwoYxjievx23GqmK9PwfUg0
-	 d+USNcnGABaXg0HFKcvyrfcAu+6MIaSHJd6dd+gLOlxIuadnw7pyhwHk7SmWMOLJrt
-	 l++qc3uxshI1Q==
+	b=XIpP+rfUew0QDsCi/REfJDwxNiKcxTNNDV7i7B2zVVLwGaVrqIY53Umo4kOXfK8vh
+	 7KO90kWS9JG6i4j2nYsvbqI0PCiT8dlbsWFB7tMoG153wRIqXsslVXCE2VZa6zjE4a
+	 2boXwB2xHwzg7JMdQjqRZpmoOBGCM5GtGzRjk3e8w5xDrUJzLlckLCK8r4CnV5ob/Q
+	 Bc7cN0QOurxONvWYVAcFk1pC9UQqLH/m7w+T2VLFWpdYDBivjR8v7CExkz+j7PiKpo
+	 A94/CR78SA89a2vRdJ8sPjii3enkeQtyAbyJ1ZuOQBQ5SaFst/5hJMl1iHpf6Fbp+r
+	 iisKup/aVRZKQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: pvalerio@redhat.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -57,12 +57,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	lorenzo@kernel.org,
 	theo.lebrun@bootlin.com,
 	nb@tipi-net.de
-Subject: Re: [PATCH net-next v6 6/7] net: macb: add XDP support for gem
-Date: Sun, 29 Mar 2026 12:47:49 -0700
-Message-ID: <20260329194749.2781535-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v6 7/7] net: macb: introduce ndo_xdp_xmit support
+Date: Sun, 29 Mar 2026 12:47:51 -0700
+Message-ID: <20260329194751.2781563-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260323221047.2749577-7-pvalerio@redhat.com>
-References: <20260323221047.2749577-7-pvalerio@redhat.com>
+In-Reply-To: <20260323221047.2749577-8-pvalerio@redhat.com>
+References: <20260323221047.2749577-8-pvalerio@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,7 +82,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-272991-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272992-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -98,104 +98,83 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 96C70353D53
+X-Rspamd-Queue-Id: 6DA1E353D5A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: macb: add XDP support for gem
+net: macb: introduce ndo_xdp_xmit support
 
-This commit introduces basic XDP support for macb/gem with the XDP_TX,
-XDP_PASS, XDP_DROP, and XDP_REDIRECT verdict support.
+This commit introduces ndo_xdp_xmit support for the macb driver to
+enable XDP redirection. It adds the gem_xdp_xmit function and updates
+macb_xdp_submit_frame to handle DMA mapping for redirected frames.
 
 > diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index 4c5dd70f003b..537d02264851 100644
+> index 537d02264851..38b15d1e7127 100644
 > --- a/drivers/net/ethernet/cadence/macb_main.c
 > +++ b/drivers/net/ethernet/cadence/macb_main.c
+
 [ ... ]
-> @@ -1197,6 +1198,18 @@ static int macb_halt_tx(struct macb *bp)
->  					bp, TSR);
->  }
->  
-> +static void macb_tx_release_buff(void *buff, enum macb_tx_buff_type type, int budget)
+
+> @@ -1708,8 +1723,8 @@ static int macb_xdp_submit_frame(struct macb *bp, struct xdp_frame *xdpf,
+>  	desc = macb_tx_desc(queue, queue->tx_head);
+>  	tx_buff = macb_tx_buff(queue, queue->tx_head);
+>  	tx_buff->ptr = xdpf;
+> -	tx_buff->type = MACB_TYPE_XDP_TX;
+> -	tx_buff->mapping = 0;
+> +	tx_buff->type = buff_type;
+> +	tx_buff->mapping = dma_map ? mapping : 0;
+>  	tx_buff->size = xdpf->len;
+
+Is a bounds check needed on the frame length here?
+
+Since ndo_xdp_xmit can receive frames redirected from other devices,
+the frame length could potentially be up to ~64KB on architectures with
+64KB pages.
+
+macb_xdp_submit_frame() casts this length to a 32-bit integer and
+bitwise-ORs it into the descriptor's control word, which has a 14-bit
+length field (maximum 16383 bytes). Frame lengths exceeding this limit
+could silently overflow into adjacent control bits like TX_LAST,
+corrupting the descriptor ring.
+
+[ ... ]
+
+> +static int gem_xdp_xmit(struct net_device *dev, int num_frame,
+> +			struct xdp_frame **frames, u32 flags)
 > +{
-> +	if (type == MACB_TYPE_SKB) {
-> +		napi_consume_skb(buff, budget);
-> +	} else {
-> +		if (!budget)
-> +			xdp_return_frame(buff);
-> +		else
-> +			xdp_return_frame_rx_napi(buff);
+> +	struct macb *bp = netdev_priv(dev);
+> +	u32 xmitted = 0;
+> +	int i;
+> +
+> +	if (!macb_is_gem(bp))
+> +		return -EOPNOTSUPP;
+> +
+> +	if (unlikely(!netif_carrier_ok(dev)))
+> +		return -ENETDOWN;
+> +
+> +	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
+> +		return -EINVAL;
+> +
+> +	for (i = 0; i < num_frame; i++) {
+> +		if (macb_xdp_submit_frame(bp, frames[i], dev, true, 0))
+> +			break;
+
+Should this loop batch the doorbell rings based on the XDP_XMIT_FLUSH flag?
+
+Currently, the code calls macb_xdp_submit_frame() for each frame, which
+independently acquires the global bp->lock and performs an MMIO write to the
+NCR register to ring the hardware doorbell per packet.
+
+Doing this per packet ignores the batching semantics of the bulk transmission
+API and could cause severe lock contention and MMIO overhead.
+
+> +
+> +		xmitted++;
 > +	}
+> +
+> +	return xmitted;
 > +}
-
-Does this code cause memory corruption in the page pool lockless cache?
-This function is called from macb_tx_complete(), which executes in the
-context of the TX NAPI poll routine (queue->napi_tx).
-
-However, the page pool was created and bound to the RX NAPI context
-(queue->napi_rx). Since xdp_return_frame_rx_napi() bypasses safety checks
-and places the page directly into the pool's lockless cache, and these are
-independent NAPI instances that can be scheduled concurrently on different
-CPUs, shouldn't this use xdp_return_frame() to safely handle cross-CPU
-synchronization?
-
-[ ... ]
-> +static int macb_xdp_submit_frame(struct macb *bp, struct xdp_frame *xdpf,
-> +				 struct net_device *dev, dma_addr_t addr)
-> +{
-[ ... ]
-> +	tx_buff->ptr = xdpf;
-> +	tx_buff->type = MACB_TYPE_XDP_TX;
-> +	tx_buff->mapping = 0;
-> +	tx_buff->size = xdpf->len;
-> +	tx_buff->mapped_as_page = false;
-> +
-> +	ctrl = (u32)tx_buff->size;
-> +	ctrl |= MACB_BIT(TX_LAST);
-
-Could this write overwrite control bits in the descriptor if the XDP frame
-length exceeds the hardware's maximum limit?
-
-The hardware uses a 14-bit field for the frame length, with higher bits
-reserved for control flags like TX_LAST and TX_WRAP. On architectures with
-a PAGE_SIZE larger than 16KB (e.g., ARM64 ZynqMP with 64KB pages), an XDP
-program can use bpf_xdp_adjust_tail() to legitimately increase the frame
-length beyond this boundary.
-
-Does this need a bounds check against the hardware's maximum supported
-transmit size to prevent corrupted DMA operations?
-
-[ ... ]
-> @@ -1683,6 +1878,18 @@ static int gem_rx(struct macb_queue *queue, struct napi_struct *napi,
->  				queue->stats.rx_dropped++;
->  			}
->  
-> +			headroom = bp->rx_headroom;
-> +
-> +			if (last_frame) {
-> +				ret = gem_xdp_run(queue, buff_head, &data_len,
-> +						  &headroom, addr - gem_rx_pad(bp));
-> +				if (ret == XDP_REDIRECT)
-> +					xdp_flush = true;
-> +
-> +				if (ret != XDP_PASS)
-> +					goto next_frame;
-> +			}
-> +
->  			queue->skb = napi_build_skb(buff_head, gem_total_rx_buffer_size(bp));
-
-Will this sequence allow multi-descriptor RX packets to silently bypass the
-XDP program?
-
-If a received packet spans multiple hardware descriptors (first_frame is true
-but last_frame is false), the code skips gem_xdp_run() completely. It then
-proceeds to allocate an sk_buff using napi_build_skb(), append subsequent
-fragments on following loop iterations, and pass the assembled packet to the
-network stack.
-
-Shouldn't the driver explicitly drop packets that span multiple descriptors
-when an XDP program is attached?
 
