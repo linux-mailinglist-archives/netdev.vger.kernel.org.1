@@ -1,149 +1,140 @@
-Return-Path: <netdev+bounces-272979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272981-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WAanBDl6yWlIyQUAu9opvQ
-	(envelope-from <netdev+bounces-272979-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:15:05 +0200
+	id kEt9AVl7yWmIyQUAu9opvQ
+	(envelope-from <netdev+bounces-272981-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:19:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A3DB353BEE
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:15:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E87C4353C29
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:19:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E552A300293D
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 19:15:00 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D5F9B300293B
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 19:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 006B3311958;
-	Sun, 29 Mar 2026 19:14:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1F32D0292;
+	Sun, 29 Mar 2026 19:19:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L71CGYcE"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="Yzqi9vRd";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="XKxdYa0f"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout-y-209.mailbox.org (mout-y-209.mailbox.org [91.198.250.237])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D141D28D830;
-	Sun, 29 Mar 2026 19:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2B42C11FE;
+	Sun, 29 Mar 2026 19:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.237
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774811697; cv=none; b=iEMzWAxDjfByy7JU7zy4VTfZww+liu8Vjjy0wHeUCnaMyqILTCQQFr5klVB9P3aD4jaQTdziQIFJUZSWmU5bQeK+KXszgsHvsVIVrP6I0EUyN5KerFfjjwyXjEYNs3N3gNGCdebTxj/21pH6CnAOAMu8Vt/VwrW/U82gewb8sGU=
+	t=1774811987; cv=none; b=emEwK9z/QAJno3MicI8jrWdLcR/gvpMbAQF8sKV08aK14FhJFCwAoqE9ZyMkb9sv4X2iG/EOQIuYb2HKLe5+jml+vH/paMRzxtZIF2Jw8KnqfEFEbHkU/U8bTZS0+9gnwMM4oQ4N2kcYS/IsGOtukj/WFxSDdQ5Vn/EjNlFkyYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774811697; c=relaxed/simple;
-	bh=2t4y18byjP1MjQQ2XhoChveQhWdoC7SnSWd/GP1c26g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FVHYEzCEHf/eKGr5iUnXWcHWu8pHOrXPHhCARo7HKWDo2JvvNyYrHUC+VVTTCx2iqFqblfLgspzJQU1t+UtDDU43HOpOcg6xb9iRBogh8O5aFg1C0oZzntTmpmv8cceduZULf/sZSpuv3OIL7QuIT8mrdauzH2281Vb0TQ6Y0Ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L71CGYcE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3851C116C6;
-	Sun, 29 Mar 2026 19:14:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774811697;
-	bh=2t4y18byjP1MjQQ2XhoChveQhWdoC7SnSWd/GP1c26g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L71CGYcE68iwQWH4swEnEnQd5j4J1W+HudNK3TShVFeCpkhI95IU4g4JXoykRuJrq
-	 k5Lip9ePtirW1wyHq/ZlHphH9D3zjq3SkRTWSKi4C+uIhO6SfqpcXVeYHCp1aNUfvo
-	 /B+FEGp00aaRdk80zHhk74rzEZH+rpRdusZvw6maC3gyZL7HXZpwNyiK94+LhLnKip
-	 dIUabtN4QvKW3DPfjhIBzqkWkDS+DEK59P6bs1a0SIM2PXnAogWQ7SZOzond6lQCaE
-	 02lqUAhSz0HiRhlUXj8XHI0Az2eqbWszHG9+TzIJgbP9Kmfz6qelpSkiGQI4YHqE/z
-	 4K3ecNoUfEvew==
-Date: Sun, 29 Mar 2026 12:14:55 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org,
- linux-kernel@vger.kernel.org, Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, John Johansen
- <john.johansen@canonical.com>, Minas Harutyunyan <hminas@synopsys.com>,
- Simon Horman <horms@kernel.org>, apparmor@lists.ubuntu.com,
- linux-usb@vger.kernel.org, stable@kernel.org
-Subject: Re: [PATCH net v3 04/11] list: Move on_list_rcu() to list.h and add
- on_list() also
-Message-ID: <20260329121455.72f87d3b@kernel.org>
-In-Reply-To: <20260326131838.634095-5-dhowells@redhat.com>
-References: <20260326131838.634095-1-dhowells@redhat.com>
-	<20260326131838.634095-5-dhowells@redhat.com>
+	s=arc-20240116; t=1774811987; c=relaxed/simple;
+	bh=zFBeQYVNC8x00m5+sFnrPZHbxYdH+e/c8dDnAvyzjjI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bvOaLSUc+JbMm8fnQSqJvDc/rVQRM5U4X745YEAiG+GXn90opBcf842AKo0XeygjeewZ83fGKQzG0RYyKNu36vxVqIzfwx6eDigq8vShaHp00HQMBoC7hix9nOChFepCmaatK11qxm805vqeqKdFrs3CWoCe43YkH8Yg9mexLiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=Yzqi9vRd; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=XKxdYa0f; arc=none smtp.client-ip=91.198.250.237
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-y-209.mailbox.org (Postfix) with ESMTPS id 4fkPMf5JcXzB13n;
+	Sun, 29 Mar 2026 21:19:42 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1774811982;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zFBeQYVNC8x00m5+sFnrPZHbxYdH+e/c8dDnAvyzjjI=;
+	b=Yzqi9vRdr3SzSz/PJxm9wPPE7JRSgQ/ZYEkbz/LeBREPvgbdEC7UFd9NxbEugUsljn4fYL
+	pOj6qkIAospxyMfvRo6kQNjdIUd4ftfSDEFVn+VUgCHqCtHS81zRAljYkf48SCC5PYgsmS
+	/ocNsBuAaZDzezDe7PppuXMBZJ252Hri5QoR8xz0SNVP9VmylqFEWC4bVFFHPob1ygkmJ9
+	bkX/SgvP5E7Q5DXRzlBlPAA2iEgulVwZ5oy6fZ95d2pZwfYmFuvCz/gavIzO7P/j6b1vby
+	O18mkLocKA3cGulov6qgxyl78VJlMVLmuG5y1OQbHoE8hXv75138BdZAGF+nEg==
+From: Mashiro Chen <mashiro.chen@mailbox.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1774811981;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zFBeQYVNC8x00m5+sFnrPZHbxYdH+e/c8dDnAvyzjjI=;
+	b=XKxdYa0fOj9oVb2kHeHX50gd/ZweDUg0Yk2mZz3rDFqWbpC828eQRWM+tMvtHNJQgdnw2+
+	vV+HFhd5dzOumP1fIuRY/oVwb9Wnk62njaNYzf0IzsFhpvvennzcF/6NyDJ6Y+pKAH9ZIL
+	9BnJzy/ENYm7xAhpH0OLYRqk89qTaspYi4ML8dvIUJRAzzMT2sWL/p4XB9xb/RnT1HYm+Z
+	8g99vA2YkY53PTgUi39lnXtlpfVk5PlxojbK8JhxEoWYFbU4VaIv1rRC48dlb63aAPKfCo
+	Ptlat7eWIGDa12/0ZciZESoKzIfAfGld7SN7V+PVTCbgKQEXk++6sovSSaf9tg==
+To: kuba@kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	linux-hams@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mashiro.chen@mailbox.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH 0/5] hamradio: mkiss: modernize and clean up mkiss driver
+Date: Mon, 30 Mar 2026 03:19:23 +0800
+Message-ID: <20260329191923.821284-1-mashiro.chen@mailbox.org>
+In-Reply-To: <20260329103508.4905cc09@kernel.org>
+References: <20260329103508.4905cc09@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-MBO-RS-META: 18kjeg8guodyyrajkz9fgufneradckas
+X-MBO-RS-ID: cf6a7534abaa90038c8
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272979-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-272981-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[mailbox.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mashiro.chen@mailbox.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0A3DB353BEE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E87C4353C29
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 26 Mar 2026 13:18:29 +0000 David Howells wrote:
-> Unfortunately, list_empty() is not usable with an entry that has been
-> removed from a list with list_del_rcu() as ->next must be left pointing at
-> the following entry so as not to break traversal under RCU.
+Hi Jakub,
 
-This seems to break build for jffs.
-Someone already marked this as rejected in PW.
-Whoever it was PLEASE STOP.
+Thank you for the quick review and for pointing out the Netdev policy
+regarding clean-up patches. I apologize for the noise; I was not fully
+aware of the specific guidelines for the Netdev subsystem in this regard.
 
-Quoting documentation:
+I will respect these guidelines and focus my further contributions on
+functional improvements or bug fixes.
 
-  Updating patch status
-  ~~~~~~~~~~~~~~~~~~~~~
-  
-  Contributors and reviewers do not have the permissions to update patch
-  state directly in patchwork. Patchwork doesn't expose much information
-  about the history of the state of patches, therefore having multiple
-  people update the state leads to confusion.
-  
-  Instead of delegating patchwork permissions netdev uses a simple mail
-  bot which looks for special commands/lines within the emails sent to
-  the mailing list. For example to mark a series as Changes Requested
-  one needs to send the following line anywhere in the email thread::
-  
-    pw-bot: changes-requested
-  
-  As a result the bot will set the entire series to Changes Requested.
-  This may be useful when author discovers a bug in their own series
-  and wants to prevent it from getting applied.
-  
-  The use of the bot is entirely optional, if in doubt ignore its
-  existence completely. Maintainers will classify and update the state
-  of the patches themselves. No email should ever be sent to the list
-  with the main purpose of communicating with the bot, the bot commands
-  should be seen as metadata. 
-  The use of the bot is restricted to authors of the patches (the
-  ``From:`` header on patch submission and command must match!),
-  maintainers of the modified code according to the MAINTAINERS file
-  (again, ``From:`` must match the MAINTAINERS entry) and a handful of
-  senior reviewers. 
-  Bot records its activity here:
-  
-    https://netdev.bots.linux.dev/pw-bot.html
-  
-See:
-  https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#updating-patch-status
+Regarding the current series, I understand them do not meet the Netdev
+Standard for clean-up patches and I will drop these submissions.
+
+Thank you again for your time and guidance.
+
+Best Regards,
+Mashiro Chen
 
