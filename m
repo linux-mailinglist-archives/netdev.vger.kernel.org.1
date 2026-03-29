@@ -1,224 +1,260 @@
-Return-Path: <netdev+bounces-272882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272883-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 5eGNBNENyWlatwUAu9opvQ
-	(envelope-from <netdev+bounces-272882-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:32:33 +0200
+	id 6EogEXkRyWnktwUAu9opvQ
+	(envelope-from <netdev+bounces-272883-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:48:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A585351CFC
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:32:32 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C651F351D5B
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:48:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3396230125E3
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:32:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 055FF3004DEF
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:48:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF5531353C;
-	Sun, 29 Mar 2026 11:32:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D711A175A7F;
+	Sun, 29 Mar 2026 11:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jTS6pVyR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F1RRsP3U";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bjiS84Gj"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDC118A6A7;
-	Sun, 29 Mar 2026 11:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61D21F9D9
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 11:48:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774783949; cv=none; b=aljNuf3obYHPmuY8THAWwq+08A8WrHs0HRpd563gERBXqtz6AekTDel2spkjbt5FmsUsRh4do1erBZ1r/1ycxxCzON5N3ut0ZO4k6Q/HX27hN9b1yqPlp/6KIPyHYjbp2MDgBr4rfpAP3fcYYINyKgLQH6h9REvMk2D8tDN2poM=
+	t=1774784884; cv=none; b=fJs1rxM2fMNf3zaLEOranwTmw212niZGxO3LLzd7g67E+4OiBpcYucGUvTZGxgnD1TH/YrHLDGhBMbaEt/oQZrCIWhURMypXpLIHX1kXOd787cEh4YXmLt6C5/FRMqFPxDqFZqtn8ZoFfGf6R78KPeMjBuDpUmGpyOrolwfujSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774783949; c=relaxed/simple;
-	bh=CS1AKKELuvewejgn0DBIhyp5SikMKYpZXqpF4+4HZVw=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=j/qUCMpTO5Cs37QzXtbgonvPFU3PkUfaeo4OEtCSNZ2wT2c1r+u8kMhQlmUJSWlvhWHfi+u8Bsdq/A888AxBSBade2KMIwWPcv4Ip3WTbHCTPPoz8EscSNL1aOhhCO6k1y1+1CgDDkyhYi5U4u8q30RMP/ElkJm+z84b6S4HKrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jTS6pVyR; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AxNR5KaJmzWZIX1WbAJp7aQ4tgAbVPKdjMDYmpdFN5s=; b=jTS6pVyRRG8MYv9PxPUvYR15P+
-	nJ8AAwxhgPe+Q7578NPbWitGHavbLyZ+IhcpJJlV2ii/pXIM0q2dkEPjC/U4CIizyFqoZWJNdCmHi
-	4KYPrJXpKNTqxqvJLtGtiYO9Sdzr5mBS9xqwoDnUnxQ6otEmQgUwrX1kapqSUUWiqifGjApQWINl9
-	3QwhMAK87JMd27uudgHNEvo4VLIGvNuqfqJmZZJpNh92cmO5pueVl5tl5WdLkGYziZFjTiSio9Fh6
-	2cO7HVMTfV/j3uGlnzmxhwYIGGOygf1jpDZz2W7ymHjPv8oDCT0kkdhlBi5XOJ/JuBkQ6OglXIebA
-	VmBM760Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:51262 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1w6oNR-000000007sn-2tJK;
-	Sun, 29 Mar 2026 12:32:21 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1w6oNQ-0000000ER1E-43NU;
-	Sun, 29 Mar 2026 12:32:20 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: "Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Kees Cook <kees@kernel.org>,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Tony Luck <tony.luck@intel.com>
-Subject: [PATCH RFC net-next] usb: gadget: u_ether: fix eth_get_drvinfo() oops
+	s=arc-20240116; t=1774784884; c=relaxed/simple;
+	bh=VmiU+lGWwhD04qd6rphG/xwilSYXtQMv9P8qHhzig6w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uqABp+hK0rS7mMNIFBH2qIafDLV+CtinrIvrb3lD6rdIEzCeeFLrNAK7S4+JjXog2qk6L2fr+xTC8/eGvyEbzp4pORO35xbJI+QJyRRjCwrdsoIVjKoadNlQrPREXLV+Wf/n4Y1Ruhl7dzV6O8e5fxPgw0U+Wpcncu0XaZmPQrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F1RRsP3U; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bjiS84Gj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774784882;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w4wyr6M+eJrZIrzyYJ1+8bLKHcISE+JsFI7+Bovqkkc=;
+	b=F1RRsP3UmJRGBpQwH/CvC2ktWP8DpvesSP7xXLH8lPQpTJEWbgWyvm1EZ4xa4F5GmjFV0p
+	eG/3hkq8XabWUaUeBfjZj/0bKmEK+m2P12uRv+J1+H+9erPvP00F1YMfnGt5tj3Z9EK9tp
+	cleT5+qNHGqKv9gMIKcal8SGpKpNTng=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-58-s8haxHLjMbegueF2qxdytg-1; Sun, 29 Mar 2026 07:48:00 -0400
+X-MC-Unique: s8haxHLjMbegueF2qxdytg-1
+X-Mimecast-MFC-AGG-ID: s8haxHLjMbegueF2qxdytg_1774784879
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-486fc42c83aso26235975e9.0
+        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 04:48:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1774784878; x=1775389678; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w4wyr6M+eJrZIrzyYJ1+8bLKHcISE+JsFI7+Bovqkkc=;
+        b=bjiS84GjGtRZ+IZrZ5gAn20vN8SSKN0/CSeFzsWCruJyYRw06O3GIzYSNIUWluccsQ
+         S0ZBlh2RFcShT3c2I9v17dc13lJmxU6XmK/aaUQ1on5nr8vW7bGFrCYjlWH0MNuuu9bH
+         qQUcZY9dKBvfAt+cSEbx+52Iyt8eGnIRpQ4fIBUfCSS79h+vh/ZHv8yfnkbmTAc6Wobv
+         +hStXgbD1YmjU437Z8o0kQV8xCmuW0Y+vii6gYxHc/B99I60SeiYFZBVTZCQ/T4hdCZ6
+         ql7RDgxOsojZLHNHcbxFCouVfCVwokUCwaZH1Jq9e/C6YaRa72KODZmVaS5nl3MTcZXX
+         fhrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774784878; x=1775389678;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w4wyr6M+eJrZIrzyYJ1+8bLKHcISE+JsFI7+Bovqkkc=;
+        b=ejjtYS5CfJUUNirpT6gqMGyNpbIDzrUAefmNwVKOar6zoP4PHXzpV6ObxfYbSxcdEq
+         GQ3jg2GB6rJ2zp22g16bZylNKKIDDYetZJXAFWmw+4vsq6s0MXut+Pb/v7kNOlSuSvG6
+         Y+nk76WUHcZXUOrIs6DxKmQ3a8b8pUX1zZMrC4dAQMC8bsd3+2a6xKbRJxlnHMGq7xhe
+         vdfp5SuGAWNNHQn7IjUwANK1wSZ8bK7Ig/pVsthnjjDPAg2FS/b+nA+ZgonQlFvDh2Ff
+         G2qu2W+8/vgba49wiEUVchN4/8YcIAHXsfZZoNfpg1f/tb8mFYmWBV7akXBV1UTirWok
+         mnIg==
+X-Forwarded-Encrypted: i=1; AJvYcCXw+yyHveWf3INKy/G2A2/fuMCxoDDC3vYNdNuzOyqMrGMcOIi+gyuB2yP0VgcXqFir7mhd/ek=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyewzdAlzUVie/mPrbZ2ESCw582oh5Wr4PcanzhsGYWhhZYFY/
+	AGdcSE4kRoSzQOY+4lh4vLUJeSjRa5MjMy12Fp0PiHGgcNPHMlkbL4Xs4jxWU8RGiKBW+U4bnLY
+	G2M50J/wQoiqz5L0KPHzir9YUjrQWKF93IGO6FiFKyvYL7wuzF64nHGiWNL9dO4sczg==
+X-Gm-Gg: ATEYQzyAs5Lz+gQTI3GFq9nKPG2Gow0zUxM1R/Xn4ZI9Td04fnPvVqNAzpIaSc+iewL
+	3a7NaVmJ/4zL7ABBwEz76dYdpsM+Zow4CRJMGBR/OcbC34X9HzfdeVnkjQcllPVefNPoltmQ3Bx
+	Qhj55136nQVqvzc89E2AWZf5arWdTCHD0gPVOhyOdgKPyOkDm1hTwa+ATMmaI3Wc5+5fjPeWkj2
+	Y84QTVAJIiTeEOqLJNWPhf9rOPjcteSIVmeLz3JU5pSBvsmjAfOALfmzORDtn/USZbO+sSK4wBH
+	gsSOgYD9okYgzhzmCKwmkRon8Lly1tvmru2jUCw1ZfoWSuRW3vVIrgPuFDwkhAYz6wr9tLyS56W
+	xxbrALCUn4brlq6/av1gQ
+X-Received: by 2002:a05:600c:8485:b0:487:36c:f5ab with SMTP id 5b1f17b1804b1-48727d73464mr164565785e9.10.1774784878159;
+        Sun, 29 Mar 2026 04:47:58 -0700 (PDT)
+X-Received: by 2002:a05:600c:8485:b0:487:36c:f5ab with SMTP id 5b1f17b1804b1-48727d73464mr164565445e9.10.1774784877645;
+        Sun, 29 Mar 2026 04:47:57 -0700 (PDT)
+Received: from [192.168.2.83] ([46.175.183.46])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43cf247102dsm14038435f8f.27.2026.03.29.04.47.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 29 Mar 2026 04:47:56 -0700 (PDT)
+Message-ID: <eb41d806-27e3-4b3b-9c83-95e0305d940b@redhat.com>
+Date: Sun, 29 Mar 2026 13:47:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1w6oNQ-0000000ER1E-43NU@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sun, 29 Mar 2026 12:32:20 +0100
-X-Spamd-Result: default: False [-0.36 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next v2] dpll: Send object per event in JSON
+ monitor mode
+To: Vitaly Grinberg <vgrinber@redhat.com>, netdev@vger.kernel.org
+Cc: stephen@networkplumber.org
+References: <20260329-dpll-mon-j-v2-1-c8170a80e6d8@redhat.com>
+Content-Language: en-US
+From: Petr Oros <poros@redhat.com>
+In-Reply-To: <20260329-dpll-mon-j-v2-1-c8170a80e6d8@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272882-lists,netdev=lfdr.de,kernel];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.989];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272883-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[get_maintainers.pl:url]
-X-Rspamd-Queue-Id: 4A585351CFC
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: C651F351D5B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The following oops was observed on the nVidia Jetson Xavier NX1
-platform with 7.0.0-rc5, which is caused by dev->gadget becoming NULL
-while the u_ether device is still visible to userspace. Adding some
-debug reveals that we see this sequence:
+> Previously, monitor mode wrapped all events in a single JSON array
+> inside a top-level object, which made piping the output to external
+> tools (such as `jq`) impossible.
+> Send a separate JSON object for each event in monitor mode,
+> making the output suitable for line-by-line consumers. Skip the
+> global JSON wrapper for monitor mode.
+>
+> Signed-off-by: Vitaly Grinberg <vgrinber@redhat.com>
+> ---
+> v2:
+>    - Fixed indentation
+> ---
+>   dpll/dpll.c | 25 +++++++++++++++++--------
+>   1 file changed, 17 insertions(+), 8 deletions(-)
+>
+> diff --git a/dpll/dpll.c b/dpll/dpll.c
+> index 9893ca8c..49576d23 100644
+> --- a/dpll/dpll.c
+> +++ b/dpll/dpll.c
+> @@ -571,8 +571,15 @@ int main(int argc, char **argv)
+>   	argc -= optind;
+>   	argv += optind;
+>   
+> -	new_json_obj_plain(json);
+> -	open_json_object(NULL);
+> +	/* Monitor emits one JSON object per event for streaming;
+> +	 * other commands use a single JSON wrapper object.
+> +	 */
+> +	bool is_monitor = argc > 0 && strcmp(argv[0], "monitor") == 0;
+> +
+> +	if (!is_monitor) {
+> +		new_json_obj_plain(json);
+> +		open_json_object(NULL);
+> +	}
+>   
+>   	/* Skip netlink init for help commands */
+>   	bool need_nl = true;
+> @@ -602,8 +609,10 @@ dpll_fini:
+>   	if (need_nl)
+>   		dpll_fini(dpll);
+>   json_cleanup:
+> -	close_json_object();
+> -	delete_json_obj_plain();
+> +	if (!is_monitor) {
+> +		close_json_object();
+> +		delete_json_obj_plain();
+> +	}
+>   dpll_free:
+>   	dpll_free(dpll);
+>   	return ret;
+> @@ -2173,6 +2182,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
+>   
+>   		mnl_attr_parse(nlh, sizeof(struct genlmsghdr), attr_cb, tb);
+>   
+> +		new_json_obj_plain(json);
+>   		open_json_object(NULL);
+>   		print_string(PRINT_JSON, "name", NULL, json_name);
+>   		open_json_object("msg");
+> @@ -2182,6 +2192,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
+>   
+>   		close_json_object();
+>   		close_json_object();
+> +		delete_json_obj_plain();
+>   		break;
+>   	}
+>   	case DPLL_CMD_PIN_CREATE_NTF:
+> @@ -2200,6 +2211,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
+>   			json_name = "pin-delete-ntf";
+>   		}
+>   
+> +		new_json_obj_plain(json);
+>   		open_json_object(NULL);
+>   		print_string(PRINT_JSON, "name", NULL, json_name);
+>   		open_json_object("msg");
+> @@ -2209,6 +2221,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
+>   
+>   		close_json_object();
+>   		close_json_object();
+> +		delete_json_obj_plain();
+>   		break;
+>   	}
+>   	default:
+> @@ -2273,8 +2286,6 @@ static int cmd_monitor(struct dpll *dpll)
+>   		goto err_signalfd;
+>   	}
+>   
+> -	open_json_array(PRINT_JSON, "monitor");
+> -
+>   	pfds[0].fd = signal_fd;
+>   	pfds[0].events = POLLIN;
+>   	pfds[1].fd = netlink_fd;
+> @@ -2307,8 +2318,6 @@ static int cmd_monitor(struct dpll *dpll)
+>   		}
+>   	}
+>   
+> -	close_json_array(PRINT_JSON, NULL);
+> -
+>   err_signalfd:
+>   	if (signal_fd >= 0)
+>   		close(signal_fd);
+>
+> ---
+> base-commit: 36252727bfc653905bb39bec115a32869452beb1
+> change-id: 20260328-dpll-mon-j-d88eb48c1f09
+>
+> Best regards,
+> --
+> Vitaly Grinberg <vgrinber@redhat.com>
+>
+>
+Good idea, Thanks
 
-net usb1: gadget detached
-tegra-xudc 3550000.usb: ep 0 disabled
-net usb1: no gadget for drvinfo
-usb1 (unregistering): left allmulticast mode
-usb1 (unregistering): left promiscuous mode
-l4tbr0: port 2(usb1) entered disabled state
+Reviewed-by: Petr Oros <poros@redhat.com>
 
-Put a sticky plaster over this (it's racy!) I suspect
-gether_detach_gadget() needs to at least take the RTNL as well to
-prevent ethtool ops running concurrently with the gadget being
-detached.
-
-Unable to handle kernel NULL pointer dereference at virtual address 000000000000
-00d0
-Mem abort info:
-  ESR = 0x0000000096000004
-  EC = 0x25: DABT (current EL), IL = 32 bits
-  SET = 0, FnV = 0
-  EA = 0, S1PTW = 0
-  FSC = 0x04: level 0 translation fault
-Data abort info:
-  ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
-  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
-  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-user pgtable: 4k pages, 48-bit VAs, pgdp=00000001086b1000
-[00000000000000d0] pgd=0000000000000000, p4d=0000000000000000
-Internal error: Oops: 0000000096000004 [#1]  SMP
-Modules linked in: snd_soc_tegra210_mvc snd_soc_tegra186_asrc snd_soc_tegra210_m
-ixer snd_soc_tegra210_admaif snd_soc_tegra_pcm snd_soc_tegra210_ope snd_soc_tegr
-a186_dspk snd_soc_tegra210_i2s snd_soc_simple_card_utils snd_soc_tegra210_dmic s
-nd_soc_tegra210_amx snd_soc_tegra210_adx snd_soc_tegra210_sfc rtw88_8822ce rtw88
-_8822c rtw88_pci rtw88_core mac80211 libarc4 sha256 cfg80211 snd_soc_tegra210_ah
-ub snd_soc_core snd_pcm_dmaengine snd_pcm snd_timer tegra210_adma zram tegra_drm
- zsmalloc usb_f_ncm syscopyarea usb_f_mass_storage drm_client_lib sysfillrect sy
-simgblt ramoops fb_sys_fops reed_solomon nls_iso8859_1 drm_display_helper nls_cp437 vfat drm_kms_helper fb fat cec drm_dp_aux_bus tegra_aconnect usb_f_acm u_serial usb_f_rndis u_ether max77620_wdt realtek tegra_xudc phy_package snd phy_tegra194_p2u dwmac_dwc_qos_eth soundcore stmmac_platform pwm_tegra rtc_efi tegra186_gpc_dma virt_dma tegra_bpmp_thermal host1x pcie_tegra194 libcomposite udc_core drm drm_panel_orientation_quirks backlight efivarfs ip_tables
- x_tables
-CPU: 1 UID: 0 PID: 4181 Comm: systemd-udevd Not tainted 7.0.0-rc5-net-next+ #640 PREEMPT
-Hardware name: NVIDIA NVIDIA Jetson Xavier NX Developer Kit/Jetson, BIOS 6.0-37391689 08/28/2024
-pstate: 80400009 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : eth_get_drvinfo+0x4c/0x80 [u_ether]
-lr : eth_get_drvinfo+0x40/0x80 [u_ether]
-sp : ffff80008484bb60
-x29: ffff80008484bb60 x28: ffff000083de18c0 x27: 0000000000000000
-x26: 0000000000000000 x25: ffff0000947da0a8 x24: 0000000000004000
-x23: ffff0000a38a5600 x22: 0000000000000000 x21: ffff80007a3a5558
-x20: ffff0000947da000 x19: ffff0000a38a5608 x18: 0000000000000000
-x17: 0000000000000000 x16: 0000000000000000 x15: 0000ffffe09af760
-x14: 0000000000000000 x13: 0000000000000020 x12: 0101010101010101
-x11: 7f7f7f7f7f7f7f7f x10: 00007ffff0071c50 x9 : 0000000000000020
-x8 : 0101010101010101 x7 : ffff0000a38a5634 x6 : fefefefefefefeff
-x5 : ffff0000a38a562c x4 : 0000000000383030 x3 : 0000000000383030
-x2 : 0000000000000020 x1 : 0000000000000000 x0 : ffff0000a38a564c
-Call trace:
- eth_get_drvinfo+0x4c/0x80 [u_ether] (P)
- ethtool_get_drvinfo+0x54/0x1e0
- __dev_ethtool+0x698/0x2000
- dev_ethtool+0x90/0x1a0
- dev_ioctl+0x37c/0x594
- sock_ioctl+0x390/0x5bc
- __arm64_sys_ioctl+0x408/0xeb4
- invoke_syscall.constprop.0+0x50/0xe0
- do_el0_svc+0x40/0xc0
- el0_svc+0x48/0x2a0
- el0t_64_sync_handler+0xa0/0xe4
- el0t_64_sync+0x19c/0x1a0
-Code: 95a68811 f9468a81 d2800402 91011260 (f9406821)
----[ end trace 0000000000000000 ]---
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
-
-1. get_maintainers.pl is picking up on the PSTORE folk because of the
-mention of "ramoops" in the commit message... even though this has
-nothing to do with them.
-
-2. I think there's more bugs here as mentioned in the commit message,
-since setting dev->gadget to NULL without taking any locking while
-the u_ether device is still published to userspace looks mightily
-dangerous. Seems to be another kernel driver that fails to obey the
-basics discussed in OLS some twenty years ago concerning the order
-of setup/publish/unpublish/teardown... and we still don't seem to
-be able to get it right. :(
-
-3. Patch generated against the net-next tree, because that's what I'm
-working with being focussed on stmmac at the moment - but I would like
-my test platform not to oops and reboot itself when I instead want it
-to power off.
-
- drivers/usb/gadget/function/u_ether.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/usb/gadget/function/u_ether.c b/drivers/usb/gadget/function/u_ether.c
-index 1a9e7c495e2e..d1ae91889537 100644
---- a/drivers/usb/gadget/function/u_ether.c
-+++ b/drivers/usb/gadget/function/u_ether.c
-@@ -113,6 +113,10 @@ static void eth_get_drvinfo(struct net_device *net, struct ethtool_drvinfo *p)
- 
- 	strscpy(p->driver, "g_ether", sizeof(p->driver));
- 	strscpy(p->version, UETH__VERSION, sizeof(p->version));
-+
-+	if (!dev->gadget)
-+		return;
-+
- 	strscpy(p->fw_version, dev->gadget->name, sizeof(p->fw_version));
- 	strscpy(p->bus_info, dev_name(&dev->gadget->dev), sizeof(p->bus_info));
- }
--- 
-2.47.3
 
 
