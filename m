@@ -1,253 +1,314 @@
-Return-Path: <netdev+bounces-272863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272864-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eD5oHRHayGl/rgUAu9opvQ
-	(envelope-from <netdev+bounces-272863-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 09:51:45 +0200
+	id CEToNDPbyGnjrgUAu9opvQ
+	(envelope-from <netdev+bounces-272864-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 09:56:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C941C35127C
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 09:51:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 820D8351298
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 09:56:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 628AB300FC61
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 07:51:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DB198301F9CE
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 07:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A3F286D60;
-	Sun, 29 Mar 2026 07:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60AE02D77FF;
+	Sun, 29 Mar 2026 07:56:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJ9WVMZe";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PuwKnMET"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIBbgLHq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8A027456
-	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 07:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC0E2D5C74
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 07:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774770702; cv=none; b=YZutWkNRaOC0T9znFFH4n0HbtguCOvW7WGgwcnwJ4TNKJ+OilyPnPQ1Na7YcsZtg1VtbRBvj60sHJOKSZOXajEjgdQiCORijqOqDYoTrfOBcKe2wzK8Zc1E5bMugbWyXaD1QqH37UdLDJo5KTDFBtxrYxOCwkFx8xQ4pQMkJlss=
+	t=1774770987; cv=none; b=HZMnn6+PNMthZR/8gltsZ+/aMqK4tOy96FfsUtuskQthTz1//YiDu54zXXi84mHenawcLp9DTsgILPy3FSJo/9e76NQgnGt1O/Drzw6n+bWsij/MYUGWVgv4ATOyrSbm0sP/4OSBr9R0yJBfbbrBTWiQregCXCArosymQBv+uA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774770702; c=relaxed/simple;
-	bh=0QqKeyJ0/F2jDnYJmXdz+VmqvKKDvNIttKKwHdq93AI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=W3gdxKZqgoL7/gHANUR9atIAi+fi/AzGxNoZkRX7OBJX/wNS4XtTixJU5yFLHsXtZ44O2jHmXFzB0Y2tFMBfpILIXWWGrJ4A9WhsAAzpM/xXfAWt+FSuTa9DdELdRpu11Q3vbY/axIcmnITryFTbRaDGJlSDtFRYxfpCmSYP/og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iJ9WVMZe; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PuwKnMET; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774770699;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=2g+8qZgdxqpIYeBdmB4OnaosPugCO2R3QxSlnsf14BA=;
-	b=iJ9WVMZeGGZop5lA/5p4faYPR48U6ZdvrXrqBSQzXdwO55omecbfph5thU77k8fM8ky2zO
-	kRTeppOBWGG/F4PupvZiA9Me7iUqCnO9fqWlKUBZxmA0Uqj7bAeINSrvK3dJw5DsyzY8BS
-	EryGVhCVNKFRjYaGF8Qqui/7nOCJ/HA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-255-a63SrkQCNJCeSIBh0JaI8w-1; Sun, 29 Mar 2026 03:51:37 -0400
-X-MC-Unique: a63SrkQCNJCeSIBh0JaI8w-1
-X-Mimecast-MFC-AGG-ID: a63SrkQCNJCeSIBh0JaI8w_1774770696
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-439ca4b3d0bso2044562f8f.3
-        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 00:51:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774770696; x=1775375496; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2g+8qZgdxqpIYeBdmB4OnaosPugCO2R3QxSlnsf14BA=;
-        b=PuwKnMETCMRHi3mCx1FziBWdS4DswBinyqtxoJnF0OhqniSJ/oQrE52n/8BLfaZ5C0
-         Ibefz9kVbdm8mjY/DjGpKGaRwebPArZlE34K/PyujUa+05iYzABTwA9rjrhQIBzc/c77
-         WgKgyMEBvvwq1glRBq50wljtAo3fOBqJFLvCQEnLRHKDn/XC+3A4gE/q/d7iOeloFowX
-         AJ4b+3JZqgjU1MyJqr5F166p5GwCYif6jnfIS1R9oS3A242zFvS/ELgf2uiMoC2hezdN
-         VyoEP+dz7GIC23OoHSyQrZLLDUrY00ibuBE3eKEp4GXaRmsndS4R39aw7R4s8xx/syB9
-         iw6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774770696; x=1775375496;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2g+8qZgdxqpIYeBdmB4OnaosPugCO2R3QxSlnsf14BA=;
-        b=P3zf3dMYk7cicwqnHjqO2w4AgaPZpl1oE2u7f9E//MpPA45gZg9QTu03FybCe1dT9w
-         Ri/jFMD20Sbqa4/wXABfw9HOMo24Si0f6RHM1MH4BAx3VBJF3NI+M/je2pjd0KxVO31C
-         tAxUPZV0uGZRvdocqn2GP4cWG7qA4UhH23UjutyUM3CU9vxnRkyZWLjrlhciva/lwWEf
-         RAMgWu3RL2uMIG7MfiGFd0MTGcvJjDGB50TmLhyIOlBTjZq1gGAcSOOq5MdTmt5/Hu8o
-         Eta0Jk9yvWZ2LTZFOLTufBjeUd33RXEkVcBt2D6QZrCb/y5wHtjpqFxH6iNb2M4tixo8
-         /LmA==
-X-Gm-Message-State: AOJu0YyRT1EmYKix4EH8/b/Y3IM7/TORDMX7/bIqZsDygJR2SvPNPYRm
-	GTIRafcxkhzHnSuCCY3+wKnW4pbrbr+oV9nsGUBTYEIZX5qfK4BZM/GqEuuQUx5xHf+PnuQ37u1
-	05HZg+2RdMwhVuBliVLzJ4UjheoF8ulskbVK0A7iM6LKs8JJH1P822jzeAgsgYgTw1w==
-X-Gm-Gg: ATEYQzzNUMQMcN6B+u1D6XwT39wwnCsbcRH9HrqlOGWp4cV16HQNX369WhQSP0uFDQr
-	yVTJzTn9Bx8O/ySFwvDevlpKbybysVV3B2o0l1yzLGJHj1HJ3976jtLZB9AGY+8tN4Yrjy9xd6d
-	XqJmU70W2IQlIS7FgZQJs8tzpbe+QHpUAn71q9zq1T5h5VTM5euHx4MptPdwV1yTONTcGuXcYD2
-	eOc9v98LO54//5mxaSmGune9k9KHPdmAVbnaNcAgghg0bT4/1jc27oQ4pvHxFoRQprW46RO1ZgV
-	S8vczQLWPIGe3DEJZRi+sW/PTb3/3Sad62o3QHjU2sxclSOmAKooHEooOvgUAEY8NsuLdsHHv31
-	ysCe46VzgJbmGxBa9SoZ1QYAx0UTnywgjiKPkbBbCIvS/l4FgW+y077OVxd/q5AFIVYNxN3E=
-X-Received: by 2002:a05:6000:4013:b0:43b:60f7:2283 with SMTP id ffacd0b85a97d-43b9e9f6ae1mr13051246f8f.22.1774770695775;
-        Sun, 29 Mar 2026 00:51:35 -0700 (PDT)
-X-Received: by 2002:a05:6000:4013:b0:43b:60f7:2283 with SMTP id ffacd0b85a97d-43b9e9f6ae1mr13051221f8f.22.1774770695291;
-        Sun, 29 Mar 2026 00:51:35 -0700 (PDT)
-Received: from [127.0.0.1] (IGLD-80-230-124-201.inter.net.il. [80.230.124.201])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43cf21e2487sm10369771f8f.5.2026.03.29.00.51.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Mar 2026 00:51:34 -0700 (PDT)
-From: Vitaly Grinberg <vgrinber@redhat.com>
-Date: Sun, 29 Mar 2026 10:51:01 +0300
-Subject: [PATCH iproute2-next v2] dpll: Send object per event in JSON
- monitor mode
+	s=arc-20240116; t=1774770987; c=relaxed/simple;
+	bh=NXkO1BKIOyiirGfmId7kEdTa6tS6egLCtvOXPPxBnMY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gkpOyVPiExg59gi+/tQPoDz8lBP9n1/0IO/U3kzGVIjW8KvBBlsziIvF3SnV0vtUU0vcC/wBjyp340lnRPtUi5j4/BlXeDFCVqd/rOUYzI3rIjGaBdv3TUvyXyLKPfcoxSowcY8msAVP+dc26gCvVdHYy7Zs2banWBdndqNm8Y0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vIBbgLHq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F6C6C2BCB1
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 07:56:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774770987;
+	bh=NXkO1BKIOyiirGfmId7kEdTa6tS6egLCtvOXPPxBnMY=;
+	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
+	b=vIBbgLHqv/uLYBd86xyIlxiSESiRFAnHHxQoim/AV+l5rkykTFlAw9WvTvgl5UazA
+	 ArrBvCaXkanE11+OOsQNgXzc5TmsQhl7mspqtfr0jngvjJCMFhRpUruYRQFpZHVPGL
+	 UIdo6wlx6JahI89KvE71TZ8PNwG0+rBxe/IItnc65yCGaKlETzL33q13PoKvkAfLeH
+	 K8sTqogdgtskrP0cbLdQUZ6zgnYG2Zz0P0ycGzDni7+e0CFftPBjfql4oByZMKKj5p
+	 uT/0OAQQTYPXb9QIsWeHTN38VN9h9EF0QHMiAGJ6MRY71sm9wD49QHHmISrWSkTFgq
+	 RIkBQpGdMhPIQ==
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-38bd3c6c502so28877481fa.1
+        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 00:56:26 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVLLL5iS9pASH3a3MhEhi1FAnh1X6saj64QjQDjBnJenQpEc2xHAaYFja+bD/Uv0j7hRuCFpNA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPhZk3PvKeXs+RtLV7H7VB0TKFnmgeHrzrALdpUlG6VP0DNfdE
+	MmUqbdD2RW9CjalbV+5CtrQMurk7lpu4F+OlEjqCHPRywexFiP0C/dLNheceXojAr7NwvRwPAYI
+	J4vpFC7NHvBzXX7+TnYs2tJkrmC2DArk=
+X-Received: by 2002:a2e:bea8:0:b0:38b:d89b:e285 with SMTP id
+ 38308e7fff4ca-38c731b8b78mr24317401fa.4.1774770985099; Sun, 29 Mar 2026
+ 00:56:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260329-dpll-mon-j-v2-1-c8170a80e6d8@redhat.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/22OzQ6CMBCEX8Xs2TVQEKsn38Nw6M9iS6AlbSEYw
- rsLePU4M5lvZoFIwVKEx2mBQJON1rtNsPMJlBHuTWj1poFlrMoKxlEPXYe9d9ii5pxkyVXeZHf
- YCkOgxs4H7AV2CH5MxNDRnKD+xXGULam0A/eCFJFQBuGU2a1eWLfbxsbkw+f4NLGD9m9+YpijL
- Bg1N15WJK/PQNqIdFG+h3pd1y8iH0rT3QAAAA==
-X-Change-ID: 20260328-dpll-mon-j-d88eb48c1f09
-To: netdev@vger.kernel.org
-Cc: stephen@networkplumber.org, Vitaly Grinberg <vgrinber@redhat.com>
-X-Mailer: b4 0.15.1
-X-Spamd-Result: default: False [-2.16 / 15.00];
+References: <20260310-a733-clk-v1-0-36b4e9b24457@pigmoral.tech> <20260310-a733-clk-v1-2-36b4e9b24457@pigmoral.tech>
+In-Reply-To: <20260310-a733-clk-v1-2-36b4e9b24457@pigmoral.tech>
+Reply-To: wens@kernel.org
+From: Chen-Yu Tsai <wens@kernel.org>
+Date: Sun, 29 Mar 2026 15:56:12 +0800
+X-Gmail-Original-Message-ID: <CAGb2v65ycixbX7YS_rC6pyh-zMP6QvHqc6qdXjH4e0xpaqX=CQ@mail.gmail.com>
+X-Gm-Features: AQROBzBv23a5U8YFwC6JrpXv9HxCxK3WuA_W9E6K5Up_sT7yzO6F5aKFcWx7Jy8
+Message-ID: <CAGb2v65ycixbX7YS_rC6pyh-zMP6QvHqc6qdXjH4e0xpaqX=CQ@mail.gmail.com>
+Subject: Re: [PATCH RFC 2/8] clk: sunxi-ng: sdm: Add dual patterns support
+To: Junhui Liu <junhui.liu@pigmoral.tech>
+Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alex@ghiti.fr>, Richard Cochran <richardcochran@gmail.com>, linux-clk@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272863-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-272864-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FREEMAIL_CC(0.00)[baylibre.com,kernel.org,gmail.com,sholland.org,pengutronix.de,dabbelt.com,eecs.berkeley.edu,ghiti.fr,vger.kernel.org,lists.infradead.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vgrinber@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wens@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C941C35127C
+	TAGGED_RCPT(0.00)[netdev,dt];
+	HAS_REPLYTO(0.00)[wens@kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pigmoral.tech:email,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 820D8351298
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Previously, monitor mode wrapped all events in a single JSON array
-inside a top-level object, which made piping the output to external
-tools (such as `jq`) impossible.
-Send a separate JSON object for each event in monitor mode,
-making the output suitable for line-by-line consumers. Skip the
-global JSON wrapper for monitor mode.
+On Tue, Mar 10, 2026 at 4:42=E2=80=AFPM Junhui Liu <junhui.liu@pigmoral.tec=
+h> wrote:
+>
+> On newer Allwinner platforms like the A733, the Sigma-Delta Modulation
+> (SDM) control logic is more complex. The SDM enable bit, which was
+> previously located in the PLL register, is now moved to a second
+> pattern register (PATTERN1).
+>
+> To support this, rename the existing "tuning" members to "pattern0" to
+> align with the datasheet, and introduce the _SUNXI_CCU_SDM_DUAL_PAT
+> macro to provide pattern1 register support. Related operations are also
+> updated.
+>
+> Signed-off-by: Junhui Liu <junhui.liu@pigmoral.tech>
+> ---
+>  drivers/clk/sunxi-ng/ccu_sdm.c | 51 +++++++++++++++++++++++++++++-------=
+------
+>  drivers/clk/sunxi-ng/ccu_sdm.h | 32 +++++++++++++++++---------
+>  2 files changed, 57 insertions(+), 26 deletions(-)
+>
+> diff --git a/drivers/clk/sunxi-ng/ccu_sdm.c b/drivers/clk/sunxi-ng/ccu_sd=
+m.c
+> index c564e5f9e610..204e25feaa36 100644
+> --- a/drivers/clk/sunxi-ng/ccu_sdm.c
+> +++ b/drivers/clk/sunxi-ng/ccu_sdm.c
+> @@ -18,7 +18,10 @@ bool ccu_sdm_helper_is_enabled(struct ccu_common *comm=
+on,
+>         if (sdm->enable && !(readl(common->base + common->reg) & sdm->ena=
+ble))
+>                 return false;
+>
+> -       return !!(readl(common->base + sdm->tuning_reg) & sdm->tuning_ena=
+ble);
+> +       if (sdm->pat1_enable && !(readl(common->base + sdm->pat1_reg) & s=
+dm->pat1_enable))
+> +               return false;
+> +
+> +       return !!(readl(common->base + sdm->pat0_reg) & sdm->pat0_enable)=
+;
+>  }
+>  EXPORT_SYMBOL_NS_GPL(ccu_sdm_helper_is_enabled, "SUNXI_CCU");
+>
+> @@ -37,18 +40,27 @@ void ccu_sdm_helper_enable(struct ccu_common *common,
+>         for (i =3D 0; i < sdm->table_size; i++)
+>                 if (sdm->table[i].rate =3D=3D rate)
+>                         writel(sdm->table[i].pattern,
+> -                              common->base + sdm->tuning_reg);
+> +                              common->base + sdm->pat0_reg);
+>
+>         /* Make sure SDM is enabled */
+>         spin_lock_irqsave(common->lock, flags);
+> -       reg =3D readl(common->base + sdm->tuning_reg);
+> -       writel(reg | sdm->tuning_enable, common->base + sdm->tuning_reg);
+> +       reg =3D readl(common->base + sdm->pat0_reg);
+> +       writel(reg | sdm->pat0_enable, common->base + sdm->pat0_reg);
+>         spin_unlock_irqrestore(common->lock, flags);
+>
+> -       spin_lock_irqsave(common->lock, flags);
+> -       reg =3D readl(common->base + common->reg);
+> -       writel(reg | sdm->enable, common->base + common->reg);
+> -       spin_unlock_irqrestore(common->lock, flags);
+> +       if (sdm->enable) {
+> +               spin_lock_irqsave(common->lock, flags);
+> +               reg =3D readl(common->base + common->reg);
+> +               writel(reg | sdm->enable, common->base + common->reg);
+> +               spin_unlock_irqrestore(common->lock, flags);
+> +       }
+> +
+> +       if (sdm->pat1_enable) {
+> +               spin_lock_irqsave(common->lock, flags);
+> +               reg =3D readl(common->base + sdm->pat1_reg);
+> +               writel(reg | sdm->pat1_enable, common->base + sdm->pat1_r=
+eg);
+> +               spin_unlock_irqrestore(common->lock, flags);
+> +       }
+>  }
+>  EXPORT_SYMBOL_NS_GPL(ccu_sdm_helper_enable, "SUNXI_CCU");
+>
+> @@ -61,14 +73,23 @@ void ccu_sdm_helper_disable(struct ccu_common *common=
+,
+>         if (!(common->features & CCU_FEATURE_SIGMA_DELTA_MOD))
+>                 return;
+>
+> -       spin_lock_irqsave(common->lock, flags);
+> -       reg =3D readl(common->base + common->reg);
+> -       writel(reg & ~sdm->enable, common->base + common->reg);
+> -       spin_unlock_irqrestore(common->lock, flags);
+> +       if (sdm->enable) {
+> +               spin_lock_irqsave(common->lock, flags);
+> +               reg =3D readl(common->base + common->reg);
+> +               writel(reg & ~sdm->enable, common->base + common->reg);
+> +               spin_unlock_irqrestore(common->lock, flags);
+> +       }
+> +
+> +       if (sdm->pat1_enable) {
+> +               spin_lock_irqsave(common->lock, flags);
+> +               reg =3D readl(common->base + sdm->pat1_reg);
+> +               writel(reg & ~sdm->pat1_enable, common->base + sdm->pat1_=
+reg);
+> +               spin_unlock_irqrestore(common->lock, flags);
+> +       }
+>
+>         spin_lock_irqsave(common->lock, flags);
+> -       reg =3D readl(common->base + sdm->tuning_reg);
+> -       writel(reg & ~sdm->tuning_enable, common->base + sdm->tuning_reg)=
+;
+> +       reg =3D readl(common->base + sdm->pat0_reg);
+> +       writel(reg & ~sdm->pat0_enable, common->base + sdm->pat0_reg);
+>         spin_unlock_irqrestore(common->lock, flags);
+>  }
+>  EXPORT_SYMBOL_NS_GPL(ccu_sdm_helper_disable, "SUNXI_CCU");
+> @@ -123,7 +144,7 @@ unsigned long ccu_sdm_helper_read_rate(struct ccu_com=
+mon *common,
+>         pr_debug("%s: clock is sigma-delta modulated\n",
+>                  clk_hw_get_name(&common->hw));
+>
+> -       reg =3D readl(common->base + sdm->tuning_reg);
+> +       reg =3D readl(common->base + sdm->pat0_reg);
+>
+>         pr_debug("%s: pattern reg is 0x%x",
+>                  clk_hw_get_name(&common->hw), reg);
+> diff --git a/drivers/clk/sunxi-ng/ccu_sdm.h b/drivers/clk/sunxi-ng/ccu_sd=
+m.h
+> index c1a7159b89c3..c289be28e1b4 100644
+> --- a/drivers/clk/sunxi-ng/ccu_sdm.h
+> +++ b/drivers/clk/sunxi-ng/ccu_sdm.h
+> @@ -33,21 +33,31 @@ struct ccu_sdm_internal {
+>         u32             table_size;
+>         /* early SoCs don't have the SDM enable bit in the PLL register *=
+/
+>         u32             enable;
+> -       /* second enable bit in tuning register */
+> -       u32             tuning_enable;
+> -       u16             tuning_reg;
+> +       /* second enable bit in pattern0 register */
+> +       u32             pat0_enable;
+> +       u16             pat0_reg;
+> +       /* on some platforms, the sdm enable bit in pattern1 register */
+> +       u32             pat1_enable;
+> +       u16             pat1_reg;
+>  };
+>
+> -#define _SUNXI_CCU_SDM(_table, _enable,                        \
+> -                      _reg, _reg_enable)               \
+> -       {                                               \
+> -               .table          =3D _table,               \
+> -               .table_size     =3D ARRAY_SIZE(_table),   \
+> -               .enable         =3D _enable,              \
+> -               .tuning_enable  =3D _reg_enable,          \
+> -               .tuning_reg     =3D _reg,                 \
+> +#define __SUNXI_CCU_SDM(_table, _enable, _pat0, _pat0_enable, _pat1, _pa=
+t1_enable)     \
+> +       {                                                               \
+> +               .table                  =3D _table,                      =
+ \
+> +               .table_size             =3D ARRAY_SIZE(_table),          =
+ \
+> +               .enable                 =3D _enable,                     =
+ \
+> +               .pat0_enable            =3D _pat0_enable,                =
+ \
+> +               .pat0_reg               =3D _pat0,                       =
+ \
+> +               .pat1_enable            =3D _pat1_enable,                =
+ \
+> +               .pat1_reg               =3D _pat1,                       =
+ \
+>         }
+>
+> +#define _SUNXI_CCU_SDM(_table, _enable, _pat0, _pat0_enable)   \
+> +       __SUNXI_CCU_SDM(_table, _enable, _pat0, _pat0_enable, 0, 0)
+> +
+> +#define _SUNXI_CCU_SDM_DUAL_PAT(_table, _pat0, _pat0_enable, _pat1, _pat=
+1_enable)      \
+> +       __SUNXI_CCU_SDM(_table, 0, _pat0, _pat0_enable, _pat1, _pat1_enab=
+le)
+> +
 
-Signed-off-by: Vitaly Grinberg <vgrinber@redhat.com>
----
-v2:
-  - Fixed indentation
----
- dpll/dpll.c | 25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+Don't introduce an intermediate macro that looks _almost_ the same as the
+macro the driver is actually supposed to use.
 
-diff --git a/dpll/dpll.c b/dpll/dpll.c
-index 9893ca8c..49576d23 100644
---- a/dpll/dpll.c
-+++ b/dpll/dpll.c
-@@ -571,8 +571,15 @@ int main(int argc, char **argv)
- 	argc -= optind;
- 	argv += optind;
- 
--	new_json_obj_plain(json);
--	open_json_object(NULL);
-+	/* Monitor emits one JSON object per event for streaming;
-+	 * other commands use a single JSON wrapper object.
-+	 */
-+	bool is_monitor = argc > 0 && strcmp(argv[0], "monitor") == 0;
-+
-+	if (!is_monitor) {
-+		new_json_obj_plain(json);
-+		open_json_object(NULL);
-+	}
- 
- 	/* Skip netlink init for help commands */
- 	bool need_nl = true;
-@@ -602,8 +609,10 @@ dpll_fini:
- 	if (need_nl)
- 		dpll_fini(dpll);
- json_cleanup:
--	close_json_object();
--	delete_json_obj_plain();
-+	if (!is_monitor) {
-+		close_json_object();
-+		delete_json_obj_plain();
-+	}
- dpll_free:
- 	dpll_free(dpll);
- 	return ret;
-@@ -2173,6 +2182,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
- 
- 		mnl_attr_parse(nlh, sizeof(struct genlmsghdr), attr_cb, tb);
- 
-+		new_json_obj_plain(json);
- 		open_json_object(NULL);
- 		print_string(PRINT_JSON, "name", NULL, json_name);
- 		open_json_object("msg");
-@@ -2182,6 +2192,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
- 
- 		close_json_object();
- 		close_json_object();
-+		delete_json_obj_plain();
- 		break;
- 	}
- 	case DPLL_CMD_PIN_CREATE_NTF:
-@@ -2200,6 +2211,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
- 			json_name = "pin-delete-ntf";
- 		}
- 
-+		new_json_obj_plain(json);
- 		open_json_object(NULL);
- 		print_string(PRINT_JSON, "name", NULL, json_name);
- 		open_json_object("msg");
-@@ -2209,6 +2221,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
- 
- 		close_json_object();
- 		close_json_object();
-+		delete_json_obj_plain();
- 		break;
- 	}
- 	default:
-@@ -2273,8 +2286,6 @@ static int cmd_monitor(struct dpll *dpll)
- 		goto err_signalfd;
- 	}
- 
--	open_json_array(PRINT_JSON, "monitor");
--
- 	pfds[0].fd = signal_fd;
- 	pfds[0].events = POLLIN;
- 	pfds[1].fd = netlink_fd;
-@@ -2307,8 +2318,6 @@ static int cmd_monitor(struct dpll *dpll)
- 		}
- 	}
- 
--	close_json_array(PRINT_JSON, NULL);
--
- err_signalfd:
- 	if (signal_fd >= 0)
- 		close(signal_fd);
+Just declare _SUNXI_CCU_SDM_DUAL_PAT() to expand to the full entry, and
+_SUNXI_CCU_SDM() to _SUNXI_CCU_SDM_DUAL_PAT() with the last two parameters
+as zero. That takes less lines.
 
----
-base-commit: 36252727bfc653905bb39bec115a32869452beb1
-change-id: 20260328-dpll-mon-j-d88eb48c1f09
 
-Best regards,
---  
-Vitaly Grinberg <vgrinber@redhat.com>
+ChenYu
 
+>  bool ccu_sdm_helper_is_enabled(struct ccu_common *common,
+>                                struct ccu_sdm_internal *sdm);
+>  void ccu_sdm_helper_enable(struct ccu_common *common,
+>
+> --
+> 2.52.0
+>
+>
 
