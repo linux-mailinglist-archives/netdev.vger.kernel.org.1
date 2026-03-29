@@ -1,154 +1,197 @@
-Return-Path: <netdev+bounces-272927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272928-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uCy1FQBByWm1wgUAu9opvQ
-	(envelope-from <netdev+bounces-272927-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 17:10:56 +0200
+	id 0BEWA/1FyWkAxAUAu9opvQ
+	(envelope-from <netdev+bounces-272928-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 17:32:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC00E352873
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 17:10:55 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1FF635299D
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 17:32:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 14BCA30022CF
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 15:10:55 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C5849300407E
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 15:32:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5299A37CD27;
-	Sun, 29 Mar 2026 15:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF2229D287;
+	Sun, 29 Mar 2026 15:32:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QNGxhWFX"
+	dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b="kVKPlvN8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szelinsky.de (szelinsky.de [85.214.127.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176D837C114
-	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 15:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3AE52AD00;
+	Sun, 29 Mar 2026 15:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.127.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774797054; cv=none; b=FgJlDZ7O3wPkOuewpWs5OcFXSQ+vba9275dx4uWY1/ZkJfdj3AtOQ+OVL6NYs35lG+0SxrF0w+E2Ns7H1rcac2hubk5z0fGqsHP5Bu2+Ua38zo+Hzo8/xFF0HtLCLla4VgWcVIjViZDL301zE72wgmLyMJdmWsekF/LC0RpkafI=
+	t=1774798326; cv=none; b=pgGsAe6GLe5bRjbxRM94ZBi3a0+m5HM3u+CPcIlyqXZTd92Hs3JbKwIeGJPyDsi30VSkIxfSKROo2G3Il18jgv6aLc2CG+F4FlNmhfNXHJWje01i44NP8AUxWy4NDM5Pf+PGA3kXhM5F8MiHPmqb964livqP4tIzbRgZYoRyO4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774797054; c=relaxed/simple;
-	bh=LLr5cmf3SYYozYXM1xWVhMV/tB13W4sXrryaCkfDtAI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NuLH5fooMa+22M/rHTHnyupZX3d9LknlfhwBQUx9Mies/ymmXGfeA5A36lQd0rpoU4DUgw6Mkp11W1xs7limXYTWhgA1r9ucXQQtgXod/HU2SjMrj6GpjSQNQDFfkyiqdbjHPsF11HbE3qUnQnU8N3QHHs9K4hPmV8baVRxUMQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QNGxhWFX; arc=none smtp.client-ip=74.125.224.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-65015facf32so715193d50.1
-        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 08:10:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774797052; x=1775401852; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LLr5cmf3SYYozYXM1xWVhMV/tB13W4sXrryaCkfDtAI=;
-        b=QNGxhWFXskETE6GLekQJYDfjGzsz6l5JxFNH1lf/RPQLeCcr7b/MKxwbDhl7cLqm36
-         d28NVsjRWWY80+uh5FMFbAjIvwklcO+WTOkyI3A2eKjv98AH/jWpVoZH6d2v65ozNOIq
-         ajYnnHfdglnl3GUW0sLiRJK+fBwnQocfwC3HajhXdJFuGSzPKbXgla7LkGiahr+qmIwK
-         DsYw89F/nzt2POCfKCdlGZtcSqOxtpbDwIii/klccS8sDsU6ve2H6LNSRjnJhlEogfQS
-         /FJjdVi9Y32e+k6TPS44cJfy9wYDvurYNuGcyD72EonW6YvelN6zV8rUviTE4orRDjUp
-         XWGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774797052; x=1775401852;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LLr5cmf3SYYozYXM1xWVhMV/tB13W4sXrryaCkfDtAI=;
-        b=W/DPLxi1T5csNakdd2pJbP7LAz3kcgsPBth7Q/crdAzZ8fwGt50xBD7ScgsFeng3M1
-         SY91z9vKS7DsSHeDSJNqford1RkT4xtPJkVj/lGV/qNrTV+cuoR0XRfmTMBsYpVKPObh
-         pSI8mM+dN4D/i9Kz0S52/fa7MQilBbqvdKcXROvjCFiszME8kEu4UD0Wi/H9+sMkyZYk
-         Sa0hxSZcp76EzRmwBy370PHuiPwa9GIqXxfArGwTNGMraU7euwMcT1JKab3UxqbRE6FP
-         qcycGSTHxvVpil+9TY/ayIdIaBg2tTrybNxNYRROXLtFHCilUS8TtHLsZY13cS95c04V
-         QsZg==
-X-Forwarded-Encrypted: i=1; AJvYcCVXjanX9XBLJH+TA7K9Pk19GIFh0Pyp2YN7A9CMrKFUfxxov7cVhkM39ac6PJrfsoQexfBXk18=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVHOE+G2zW+0EZRgHJ/6AGJz1RFxoVAKnw8cpLxhCadEFCJ52G
-	1jMmfsFqLEWjlRT6jFc3oRWU/yEgdPc2ShlTw06vktUMg7qWbrs9WBi0
-X-Gm-Gg: ATEYQzwnGn6ZWrRuBlKfEPwvo7Uu24ely/HtClQXJyZg/fLoFop8LNoOmjxCGYKSwlg
-	20/5wBYzEt3Gpt+1WmBC3/sH61t8IUM9A4FMXclAvq/hUK0jjTwvXWw5rs+na75fo5YxOLdMLTd
-	H1SWcW+sZ5SWuum1Sur93OnKae/wvqWOJ1CJj1eBAspDT/ivfaerQduEr5KR7aEMw8c4R+3as9a
-	iNHpyW4JUhpYZVOckPfSf8ExfwKzeLCnjPvApyQk7IKOqAYvG1d731MCaQPKDUFOTnymzL1sVES
-	oX3GZGtMphrI92dyJhfNqSoHcved1g+3//bKIIGxz+BIj+PxoEd0oAa83ZJQR9YqFEk3Bni6WqC
-	Xb0obXzI4tk8Mps/ixp6aE4fRKVAhxRJkZwEectoPiJhST6dmBJ0HRzbENuFiO8sIJqIZuz6Oeg
-	YnSDMUsxHClV+ljOGMegj6buQIJk8TQ5um0V+CS5jU/wiVOWUWeA/phktChZ6TMQspoZTBYyovl
-	q2QK3k2wPsBj3qrWn2bKOVMJMPLlcrRuLKOQj6welC2
-X-Received: by 2002:a05:690e:14cf:b0:64e:e90c:5684 with SMTP id 956f58d0204a3-64ff742c558mr9453537d50.64.1774797052021;
-        Sun, 29 Mar 2026 08:10:52 -0700 (PDT)
-Received: from [192.168.5.93] (76-224-22-216.lightspeed.sntcca.sbcglobal.net. [76.224.22.216])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65009262fa2sm2601166d50.8.2026.03.29.08.10.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 29 Mar 2026 08:10:51 -0700 (PDT)
-Message-ID: <fc702208-daee-49dd-9b67-9cb123b50fd8@gmail.com>
-Date: Sun, 29 Mar 2026 08:10:49 -0700
+	s=arc-20240116; t=1774798326; c=relaxed/simple;
+	bh=PYE5OK7z7Jdd7yR96lM9fSnbK9gChfg3ShSKL5aGE6A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m4MQ0tQ1cgKI57Dp0qJ1r6gilTTWjkuTBzmJ+bhX9ZFM/+hlMTJ9NHd9Y+hSFUjyg1len+MgsHHi444oqGH3Za7x08TECIZzUu5BhmgxZbEK39p3RRaYNY6bRIVt+x5Dpcby4DzhG/Vv86GFinUE0AByT1/oZ1He7iZon0AYdWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=kVKPlvN8; arc=none smtp.client-ip=85.214.127.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szelinsky.de
+Received: from localhost (localhost [127.0.0.1])
+	by szelinsky.de (Postfix) with ESMTP id 4D56FE83AA3;
+	Sun, 29 Mar 2026 17:31:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
+	s=mail; t=1774798316;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=cISj67w4spQ8WTae0MkZOWZQZ+Y8dFzeDvusrBQfhFs=;
+	b=kVKPlvN8z82NJLTxn9/GUGYf0Q1aRQTxll5j/WHSrCTABRpuvuySR6MT4n3jJYWnvF0r2A
+	Au8CM4ei7BNMRoFhAF3VzhtaCMNMUhljPb6oVCgxAE/c/pqE8kg2fsGbEsQ4Cy3baZTUZ3
+	haRPGKfHv1SozA+WfL/x/cVd/p8JWuSzjZFe2TAm55kF5D8c42K5l3iXsQXDDCZXH6NRrL
+	tZfyvRqJ/5xOPvNCz9dMPWdmRJTppKJ9epjAfGN+RDuw3AF64Bu/hR82yNQog0AL7Fxbsi
+	8ob+6orzxlus5nekb/oXkGxFb/upcIKW5I39GWMfyhsGnAHHAiJFHEi0onVK3g==
+X-Virus-Scanned: Debian amavisd-new at szelinsky.de
+Received: from szelinsky.de ([127.0.0.1])
+	by localhost (szelinsky.de [127.0.0.1]) (amavisd-new, port 10025)
+	with ESMTP id v9mje7p7lZZu; Sun, 29 Mar 2026 17:31:56 +0200 (CEST)
+Received: from p14sgen5.fritz.box (dslb-002-205-089-102.002.205.pools.vodafone-ip.de [2.205.89.102])
+	by szelinsky.de (Postfix) with ESMTPSA;
+	Sun, 29 Mar 2026 17:31:55 +0200 (CEST)
+From: Carlo Szelinsky <github@szelinsky.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-leds@vger.kernel.org,
+	Carlo Szelinsky <github@szelinsky.de>
+Subject: [PATCH net-next v3 0/3] net: pse-pd: add poll path and LED trigger support
+Date: Sun, 29 Mar 2026 17:31:21 +0200
+Message-ID: <20260329153124.2823980-1-github@szelinsky.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/2] Fix page fragment handling when PAGE_SIZE > 4K
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
- Alexander Duyck <alexanderduyck@fb.com>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>,
- Mike Marciniszyn <mike.marciniszyn@gmail.com>, Lee Trager <lee@trager.us>,
- Jacob Keller <jacob.e.keller@intel.com>,
- Mohsin Bashir <mohsin.bashr@gmail.com>, Mina Almasry
- <almasrymina@google.com>, netdev@vger.kernel.org, kernel-team@meta.com
-References: <20260324195123.3486219-1-dimitri.daskalakis1@gmail.com>
- <20260327202958.53d26d46@kernel.org>
-Content-Language: en-US
-From: Dimitri Daskalakis <dimitri.daskalakis1@gmail.com>
-In-Reply-To: <20260327202958.53d26d46@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
+	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-272927-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272928-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,fb.com,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,trager.us,intel.com,vger.kernel.org,meta.com];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dimitridaskalakis1@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[szelinsky.de:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DC00E352873
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[szelinsky.de:dkim,szelinsky.de:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F1FF635299D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/27/26 8:29 PM, Jakub Kicinski wrote:
+Big thanks to Kory, Oleksij and Krzysztof for all the helpful feedback
+on v2 — really appreciate the time you put into reviewing this.
+I learned a lot!
 
-> On Tue, 24 Mar 2026 12:51:21 -0700 Dimitri Daskalakis wrote:
->> FBNIC operates on fixed size descriptors (4K). When the OS supports pages
->> larger than 4K, we fragment the page across multiple descriptors.
->>
->> While performance testing, I found several issues with our page fragment
->> handling, resulting in low throughput and potential RX stalls.
-> Google AI reviewer points out that we will also be toast if someone
-> configures the ring size to just 16 descriptors. Can you check what
-> is the min size that doesn't wedge w/ 64kB pages and let's just set
-> the min to that instead of the current 16?
-Yeah, this looks legit. Bumping the min to 32 should work, but I'll
-test/verify before submitting the fix.
+This series adds poll-based event detection and LED trigger support
+to the PSE core subsystem.
+
+Patches 1-2 introduce the poll path independently of LED support,
+so it can be tested in isolation on boards with and without IRQ
+configured.
+
+Patch 3 adds LED triggers that hook into the shared event handling
+path introduced by patch 2.
+
+Note: pse_handle_events() and the existing pse_isr() pass notifs_mask
+as a single unsigned long, which limits the bitmask to BITS_PER_LONG
+PI lines. This is a pre-existing constraint in the IRQ path and is
+sufficient for all current PSE controllers (max 48 ports vs 64-bit
+unsigned long), but may need to be converted to DECLARE_BITMAP() if
+future hardware exceeds this limit.
+
+Changes since v2:
+- Based on net-next/main, added net-next subject prefix
+- Added --base tree information
+- Added CC for devicetree list and DT maintainers
+- Collected Reviewed-by from Kory Maincent on patch 1/3
+- Fixed build error when CONFIG_LEDS_TRIGGERS is disabled:
+  moved LED registration before list_add(), removing the
+  pcdev->pi_led_trigs = NULL assignment on conditionally
+  compiled struct member (reported by kernel test robot)
+- Fixed use-after-free on device unbind: poll work is now
+  cancelled via devm_add_action_or_reset() to ensure correct
+  devres teardown ordering (poll_work cancelled before
+  poll_notifs is freed)
+- Used system_freezable_wq for poll worker to prevent hardware
+  access during system suspend
+- Added PoDL power status and admin state checks to LED triggers
+  so they work for both C33 and PoDL controller types
+- Used dev_name(dev) for LED trigger names to ensure uniqueness
+  across multiple PSE controllers (of_node->name can be generic)
+- Added initial LED state query at registration so already-active
+  ports are reflected immediately
+- Added pse_led_update() calls in regulator enable/disable paths
+  so ethtool admin state changes are reflected in LEDs
+- Moved LED trigger registration before list_add() to prevent
+  race where IRQ/poll could invoke pse_led_update() on partially
+  initialized triggers
+
+Changes since v1:
+- Split single patch into 3 separate patches
+- Extracted pse_handle_events() and devm_pse_poll_helper() as a
+  standalone poll path (patches 1-2), testable without LED code
+- Added DT binding for poll-interval-ms as a separate patch
+- Renamed led-poll-interval-ms to poll-interval-ms for generic use
+- Fire LED triggers from the notification path rather than a
+  separate poll loop
+
+Tested on Realtek RTL9303 with HS104 PoE chip, poll path only
+(without IRQ configured). Verified PD connect/disconnect notifications
+and LED trigger state changes.
+
+Link: https://lore.kernel.org/all/20260323201225.1836561-1-github@szelinsky.de/
+Link: https://lore.kernel.org/all/20260314235916.2391678-1-github@szelinsky.de/
+
+Carlo Szelinsky (3):
+  dt-bindings: net: pse-pd: add poll-interval-ms property
+  net: pse-pd: add devm_pse_poll_helper()
+  net: pse-pd: add LED trigger support via notification path
+
+ .../bindings/net/pse-pd/pse-controller.yaml   |   8 +
+ drivers/net/pse-pd/pse_core.c                 | 298 ++++++++++++++++--
+ include/linux/pse-pd/pse.h                    |  34 ++
+ 3 files changed, 309 insertions(+), 31 deletions(-)
+
+
+base-commit: ced629dc8e5c51ff2b5d847adeeb1035cd655d58
+-- 
+2.43.0
+
 
