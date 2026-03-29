@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-272990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272991-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cJGXGxqCyWmBygUAu9opvQ
-	(envelope-from <netdev+bounces-272990-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:48:42 +0200
+	id oFQDCCuCyWmBygUAu9opvQ
+	(envelope-from <netdev+bounces-272991-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:48:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E16CB353D4C
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:48:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96C70353D53
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:48:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3AF9C300C5B0
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 19:47:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AFAFB302BEAD
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 19:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C782727F3;
-	Sun, 29 Mar 2026 19:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D145274FEB;
+	Sun, 29 Mar 2026 19:47:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RvylsfQe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uk30xVZc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CC1292B54
-	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 19:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6081C8634
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 19:47:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774813669; cv=none; b=qnFPbx5J4/4RswMPxfXusmcm1o2LyP7AokqlMP3uxoci0zYUFDlvPGQ3sDKzz5qXv8c2mqSChfMrB60Vmtd9Gw/1o17dPBBmM/5PTFqxx9R82ERNXz5cjkhsAkiYHdP44Ow/DuOgNgVAUB5AgkY8Vvfw6/FS7ZB+ef5xYVBt31U=
+	t=1774813671; cv=none; b=NixQ9A1wJFFGH7xzGY1i/2Cdc0bjnsgJBlTurcO5U8J2DajqUP8k2UGuGHl0LiImLpHI0fnLhs5NB90Tcw7yWRcanklkLIpoqs1D2/aKY9MjgJVQGWjgOrs8abCsp2Z9IWBbFrHgd7ujE/lgD/jKi9XKS2sTMUkBZN9ZZQGGtlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774813669; c=relaxed/simple;
-	bh=6MYKNqloEAUlvnH2BRlAnouVR6iLhRhs0jjpPB8vM7M=;
+	s=arc-20240116; t=1774813671; c=relaxed/simple;
+	bh=+1PBXvBhna3YctzmS8U7N4WTuV6LO6zkkBGkQEuHwic=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mZDSc+Za3OL7iKS466GgkrPBbWyn2RBF6upmAnkQSpFUsm+AS7yrO7Ywxj7OB55T23/Y6QBX4/OmX4KPk669TmJ2BwYsHDtHZMdEshRXgy24Gd826lA0o/mRp1iX51tC4GYYn2MF29Pt8In66VJcfAhk/NK5U3gTM5Tuad8eXgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RvylsfQe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07AC5C116C6;
-	Sun, 29 Mar 2026 19:47:48 +0000 (UTC)
+	 MIME-Version; b=mXfF7ua6i6TADXVPEcub3kQcIaXvNZLwpP5KN5M4vByAGA9hY7xXmbBddkh6XJEv+6fsV3kJ2nw0YserWkn2wZljAJxVEj3N/qIJQ0hRvCztpdooP+ZhlDvRv5nSM7nq1kFWdInunYc4MnElg50pxlAbh/rxm21DilfdcvJIKEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uk30xVZc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C4F8C116C6;
+	Sun, 29 Mar 2026 19:47:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774813669;
-	bh=6MYKNqloEAUlvnH2BRlAnouVR6iLhRhs0jjpPB8vM7M=;
+	s=k20201202; t=1774813671;
+	bh=+1PBXvBhna3YctzmS8U7N4WTuV6LO6zkkBGkQEuHwic=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RvylsfQeENRmLfYlH0QngMLVTmsM+kwqKZmhhkL/gl05tkETlnYFEBOUSrI0mi5RP
-	 4TUiVOwNPUI+86BtjmyTxS0i+0J+muAj36sFAtMYGj1T9TADKYvaPWSGOKHoGmHJYT
-	 B07xffma9WiTuper7B/WQkKWpg7qW7+0GQKKcXExDPuoN7tCyKLYzYq72fCXC5bhlm
-	 rl1QcilZKEK3+sMVCAAp7i7g/cyPmPROnv+T2xxvfU1dXyX1/uOWOrghI14BW5my1A
-	 gTUXiEn4VJRwkARC9Cu7yZWU5yX5a/g//Cx0vF1MC/aEAa61lK+3qGbaTb2nAjmM3c
-	 Byn1hIYkTu8WQ==
+	b=uk30xVZczpo5SGexAKe6DEnQyaQukwUR91QtvqmZBALKx3JVpGAq+cy5kEiTZ5B83
+	 beWrUMHYvD+ixD9Ou1UqzX7RLCQvDAKzTZwr+PPkqUv9VrfrE+eWJXgLRqhj8EsM35
+	 B/BuCx5RtRVIotQu7M14jN0vNskQJGCSHcHAkSjn6b0JY2hDAjxniOggdVc88zIvWa
+	 Y4IIP2u6GN/wpY707K18lJwZPyn9FM7h0HdEl9sVW4GQwoYxjievx23GqmK9PwfUg0
+	 d+USNcnGABaXg0HFKcvyrfcAu+6MIaSHJd6dd+gLOlxIuadnw7pyhwHk7SmWMOLJrt
+	 l++qc3uxshI1Q==
 From: Jakub Kicinski <kuba@kernel.org>
 To: pvalerio@redhat.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -57,12 +57,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	lorenzo@kernel.org,
 	theo.lebrun@bootlin.com,
 	nb@tipi-net.de
-Subject: Re: [PATCH net-next v6 5/7] net: macb: generalize tx buffer handling
-Date: Sun, 29 Mar 2026 12:47:48 -0700
-Message-ID: <20260329194748.2781504-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v6 6/7] net: macb: add XDP support for gem
+Date: Sun, 29 Mar 2026 12:47:49 -0700
+Message-ID: <20260329194749.2781535-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260323221047.2749577-6-pvalerio@redhat.com>
-References: <20260323221047.2749577-6-pvalerio@redhat.com>
+In-Reply-To: <20260323221047.2749577-7-pvalerio@redhat.com>
+References: <20260323221047.2749577-7-pvalerio@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,12 +77,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-272990-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272991-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -96,125 +96,106 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E16CB353D4C
+X-Rspamd-Queue-Id: 96C70353D53
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: macb: generalize tx buffer handling
+net: macb: add XDP support for gem
 
-This commit renames the skb member in struct macb_tx_buff to ptr and
-introduces an enum macb_tx_buff_type. This prepares the driver for XDP xmit
-support by allowing the buffer to handle both sk_buff and xdp frames.
+This commit introduces basic XDP support for macb/gem with the XDP_TX,
+XDP_PASS, XDP_DROP, and XDP_REDIRECT verdict support.
 
 > diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index a71d36b18170..4c5dd70f003b 100644
+> index 4c5dd70f003b..537d02264851 100644
 > --- a/drivers/net/ethernet/cadence/macb_main.c
 > +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -1197,7 +1197,8 @@ static int macb_halt_tx(struct macb *bp)
+[ ... ]
+> @@ -1197,6 +1198,18 @@ static int macb_halt_tx(struct macb *bp)
 >  					bp, TSR);
 >  }
 >  
-> -static void macb_tx_unmap(struct macb *bp, struct macb_tx_buff *tx_buff, int budget)
-> +static void macb_tx_unmap(struct macb *bp, struct macb_tx_buff *tx_buff,
-> +			  int budget)
->  {
+> +static void macb_tx_release_buff(void *buff, enum macb_tx_buff_type type, int budget)
+> +{
+> +	if (type == MACB_TYPE_SKB) {
+> +		napi_consume_skb(buff, budget);
+> +	} else {
+> +		if (!budget)
+> +			xdp_return_frame(buff);
+> +		else
+> +			xdp_return_frame_rx_napi(buff);
+> +	}
+> +}
+
+Does this code cause memory corruption in the page pool lockless cache?
+This function is called from macb_tx_complete(), which executes in the
+context of the TX NAPI poll routine (queue->napi_tx).
+
+However, the page pool was created and bound to the RX NAPI context
+(queue->napi_rx). Since xdp_return_frame_rx_napi() bypasses safety checks
+and places the page directly into the pool's lockless cache, and these are
+independent NAPI instances that can be scheduled concurrently on different
+CPUs, shouldn't this use xdp_return_frame() to safely handle cross-CPU
+synchronization?
 
 [ ... ]
+> +static int macb_xdp_submit_frame(struct macb *bp, struct xdp_frame *xdpf,
+> +				 struct net_device *dev, dma_addr_t addr)
+> +{
+[ ... ]
+> +	tx_buff->ptr = xdpf;
+> +	tx_buff->type = MACB_TYPE_XDP_TX;
+> +	tx_buff->mapping = 0;
+> +	tx_buff->size = xdpf->len;
+> +	tx_buff->mapped_as_page = false;
+> +
+> +	ctrl = (u32)tx_buff->size;
+> +	ctrl |= MACB_BIT(TX_LAST);
 
-> -	if (tx_buff->skb) {
-> -		napi_consume_skb(tx_buff->skb, budget);
-> -		tx_buff->skb = NULL;
-> +	if (tx_buff->ptr) {
-> +		napi_consume_skb(tx_buff->ptr, budget);
-> +		tx_buff->ptr = NULL;
->  	}
->  }
+Could this write overwrite control bits in the descriptor if the XDP frame
+length exceeds the hardware's maximum limit?
 
-Does the teardown path iterate over the uncompleted descriptors to call
-macb_tx_unmap()?
+The hardware uses a 14-bit field for the frame length, with higher bits
+reserved for control flags like TX_LAST and TX_WRAP. On architectures with
+a PAGE_SIZE larger than 16KB (e.g., ARM64 ZynqMP with 64KB pages), an XDP
+program can use bpf_xdp_adjust_tail() to legitimately increase the frame
+length beyond this boundary.
 
-When the interface is closed, the hardware is reset and macb_free_consistent()
-frees the tx_buff array directly via kfree(queue->tx_buff).
-
-If the teardown path does not iterate from tx_tail to tx_head, will any
-packets (and future xdp frames) that are currently in the transmit ring when
-the interface is brought down be permanently leaked, along with their
-associated DMA mappings?
+Does this need a bounds check against the hardware's maximum supported
+transmit size to prevent corrupted DMA operations?
 
 [ ... ]
-
-> @@ -1298,7 +1299,7 @@ static void macb_tx_error_task(struct work_struct *work)
->  		desc = macb_tx_desc(queue, tail);
->  		ctrl = desc->ctrl;
->  		tx_buff = macb_tx_buff(queue, tail);
-> -		skb = tx_buff->skb;
-> +		skb = tx_buff->ptr;
-
-Is the tx_error_task workqueue canceled before freeing tx_buff during device
-teardown?
-
-The macb_tx_error_task background task accesses the queue->tx_buff array and
-the hardware tx_ring. During device teardown, macb_free_consistent() frees
-queue->tx_buff using kfree().
-
-If cancel_work_sync(&queue->tx_error_task) is not called in the teardown
-path, could a transmit error schedule this workqueue just before the device
-is brought down, causing the task to execute after the structures have been
-destroyed and resulting in a use-after-free?
-
-[ ... ]
-
-> @@ -2365,7 +2368,8 @@ static unsigned int macb_tx_map(struct macb *bp,
->  			goto dma_error;
+> @@ -1683,6 +1878,18 @@ static int gem_rx(struct macb_queue *queue, struct napi_struct *napi,
+>  				queue->stats.rx_dropped++;
+>  			}
 >  
->  		/* Save info to properly release resources */
-> -		tx_buff->skb = NULL;
-> +		tx_buff->ptr = NULL;
-> +		tx_buff->type = MACB_TYPE_SKB;
+> +			headroom = bp->rx_headroom;
+> +
+> +			if (last_frame) {
+> +				ret = gem_xdp_run(queue, buff_head, &data_len,
+> +						  &headroom, addr - gem_rx_pad(bp));
+> +				if (ret == XDP_REDIRECT)
+> +					xdp_flush = true;
+> +
+> +				if (ret != XDP_PASS)
+> +					goto next_frame;
+> +			}
+> +
+>  			queue->skb = napi_build_skb(buff_head, gem_total_rx_buffer_size(bp));
 
-What happens if this function receives an empty skb and fails to find any
-fragments?
+Will this sequence allow multi-descriptor RX packets to silently bypass the
+XDP program?
 
-Looking at the rest of macb_tx_map(), if the packet has no data length, it
-appears the function logs an error and returns 0:
+If a received packet spans multiple hardware descriptors (first_frame is true
+but last_frame is false), the code skips gem_xdp_run() completely. It then
+proceeds to allocate an sk_buff using napi_build_skb(), append subsequent
+fragments on following loop iterations, and pass the assembled packet to the
+network stack.
 
-	/* Should never happen */
-	if (unlikely(!tx_buff)) {
-		netdev_err(bp->dev, "BUG! empty skb!\n");
-		return 0;
-	}
-
-Since the caller treats 0 as success, it would skip the error path that frees
-the skb. As no descriptor was actually queued and tx_head wasn't updated, will
-the packet never be unmapped or freed by the completion path, causing a
-permanent memory leak? Should this return a non-zero error code instead?
-
-[ ... ]
-
-> @@ -5283,8 +5289,9 @@ static netdev_tx_t at91ether_start_xmit(struct sk_buff *skb,
->  		netif_stop_queue(dev);
->  
->  		/* Store packet information (to free when Tx completed) */
-> -		lp->rm9200_txq[desc].skb = skb;
-> +		lp->rm9200_txq[desc].ptr = skb;
->  		lp->rm9200_txq[desc].size = skb->len;
-> +		lp->rm9200_txq[desc].type = MACB_TYPE_SKB;
->  		lp->rm9200_txq[desc].mapping = dma_map_single(&lp->pdev->dev, skb->data,
-
-Can a DMA mapping error here cause a permanent queue hang?
-
-If dma_mapping_error() fails just below this, the driver calls
-dev_kfree_skb_any(skb) and returns NETDEV_TX_OK but leaves the queue stopped
-via netif_stop_queue(dev).
-
-Because no transmission is started, the hardware will never generate a
-completion interrupt, leaving the queue permanently hung.
-
-Additionally, ptr is left pointing to the freed memory, creating a dangling
-pointer. Does this need to be cleared when the error occurs?
+Shouldn't the driver explicitly drop packets that span multiple descriptors
+when an XDP program is attached?
 
