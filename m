@@ -1,398 +1,194 @@
-Return-Path: <netdev+bounces-272931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272932-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id atkcIBBGyWkZxAUAu9opvQ
-	(envelope-from <netdev+bounces-272931-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 17:32:32 +0200
+	id K8HkAiBNyWmGxQUAu9opvQ
+	(envelope-from <netdev+bounces-272932-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:02:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E6EC3529CD
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 17:32:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B92A352BD5
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:02:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 15306300F1BB
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 15:32:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0DC78300A775
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 16:02:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEF6436EAB3;
-	Sun, 29 Mar 2026 15:32:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9A723EAB8;
+	Sun, 29 Mar 2026 16:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b="L9G088x7"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="XMTrtt7h"
 X-Original-To: netdev@vger.kernel.org
-Received: from szelinsky.de (szelinsky.de [85.214.127.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C794936F41F;
-	Sun, 29 Mar 2026 15:32:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.127.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7D128F5;
+	Sun, 29 Mar 2026 16:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774798347; cv=none; b=ZcPsJwneGRu0yeuVnjEHwXD9/NQfGe3zCu2Ryk/eiH5Tbzn+VPWqzll1UQbebe/QYfXeU/6/EOqX5ma3GGx8rQyYuAe7JC6bo4yRxDaZ0mt2q9iBabjSWaOdTgYdmuiTiySIzu3WWtIP22AdlRLAgHFlBBe9xi5wXRrdQUr8IGE=
+	t=1774800157; cv=none; b=MRlQWoXQeIm1OJtaq4GamlJ+oWH0dR/1RelQ00ANl0w/RVZyI0lBZKXyFb1MfuEcpdtA0duOzU6akf15Z1Fin6mjuIvWF3Vvndf04iZbkQCm8tFSNl2xT93ecU2Y1OGR6iovEi3ypT5EnoWoZo1T0ftZCkA5x3f2fImBEBoZVsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774798347; c=relaxed/simple;
-	bh=JSYt1l/FH9k/ENetfDE+rGRX4DYHFvxYMroFChgZOMs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rfzxFOpQWLbBaZl7rXMcXK3Ha8S5BQG9kK/t7SbVCq5OE7nJviNNh977brOMf7tHaSD8+XfRXymBZlHuvHkdGmUBiU0yX7yN52YN+OXs0hAXdUCO13xGDxvCyFIFLXN6x+ydkUQAQ2Gyjm1t2YcDf2wCRKKGCqey9/UGZ23o8k4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=L9G088x7; arc=none smtp.client-ip=85.214.127.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szelinsky.de
-Received: from localhost (localhost [127.0.0.1])
-	by szelinsky.de (Postfix) with ESMTP id DFC5EE83AA3;
-	Sun, 29 Mar 2026 17:32:12 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
-	s=mail; t=1774798332;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fL/bFTPsPg0+fNImxHcoDytPXvPqcGj9fLOqv6wijrc=;
-	b=L9G088x74bR9b8acx9hgiFoAGrxq6+1b5uHdt5/jLGMLVNC5ljaM36IhIS6888oNEUT5DV
-	O6pJZqtFAJXOJtDQTY1GGPYpq2DYwSPSLEIPaIpCsDKiyfUE+itBzncBgGsBKeD/hi0rjC
-	ct5GHPE9GgxZaAYa6gC/ZdXo2IYQbwivqn2UajtoJMuLPH05SYjowjbtyyP3+yExE+uIFm
-	F16DlwHR520sKjw7Kp5DcD0JzSwVyeKGZYQ6phkg4NFDbte3n/H3fOxnc5OkgBTQmTxOQT
-	2UViQMXVfNW5Myeqoui37qmG1wLNhJmo+AA37lyFmtnQRDuva9h68zGU4foTJg==
-X-Virus-Scanned: Debian amavisd-new at szelinsky.de
-Received: from szelinsky.de ([127.0.0.1])
-	by localhost (szelinsky.de [127.0.0.1]) (amavisd-new, port 10025)
-	with ESMTP id d2ftxUfkT0GS; Sun, 29 Mar 2026 17:32:12 +0200 (CEST)
-Received: from p14sgen5.fritz.box (dslb-002-205-089-102.002.205.pools.vodafone-ip.de [2.205.89.102])
-	by szelinsky.de (Postfix) with ESMTPSA;
-	Sun, 29 Mar 2026 17:32:12 +0200 (CEST)
-From: Carlo Szelinsky <github@szelinsky.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-leds@vger.kernel.org,
-	Carlo Szelinsky <github@szelinsky.de>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH net-next v3 3/3] net: pse-pd: add LED trigger support via notification path
-Date: Sun, 29 Mar 2026 17:31:24 +0200
-Message-ID: <20260329153124.2823980-4-github@szelinsky.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260329153124.2823980-1-github@szelinsky.de>
-References: <20260329153124.2823980-1-github@szelinsky.de>
+	s=arc-20240116; t=1774800157; c=relaxed/simple;
+	bh=9rH5GAq4AqXtdoG0CE1gaMfZpzllUXPTe55W8AddnOw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MonfRoKEnzZHudYteHHJQCK4T4gq1xls3W4qgZse8f5y0gskk7zO1jmGEVlWebDhfAUQF7wTHleAHrgfHX5UObwOD32M9Bx0wFcquC8WfuRFC7nRUS+X6l4q33DK1Nb4pjPtBIrZ4DgVr2SBxIoJ3fslE9wHgrT6rJ5fKbNKvOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=XMTrtt7h; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Received: from localhost (unknown [79.139.247.223])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 25EE6406C750;
+	Sun, 29 Mar 2026 16:02:31 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 25EE6406C750
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1774800151;
+	bh=wsYFc3Tx9EISvC1vyUkGB5FPr7lo2/T7m98WS8sicfw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XMTrtt7hMEZ8CzZI90QoUDs3OLWEoOmS6/3M6V6qtyg+rEx8B6Kp/tTa4X4VVdJJc
+	 sqbovAZxM8nFZuihgPu41DKntdu4zJv81wz/cTuk7Kc7I9th7kje1oZAT7ypCbmQqz
+	 Im/2VlOgs69XGfX8y9obf6+6O7vLibYppE45UOW4=
+Date: Sun, 29 Mar 2026 19:02:31 +0300
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Agalakov Daniil <ade@amicon.ru>, lvc-project@linuxtesting.org, Roman Razov <rrv@amicon.ru>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, linux-kernel@vger.kernel.org, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Daniil Iskhakov <dish@amicon.ru>, 
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net 2/3] e1000: fix endianness conversion of
+ uninitialized words
+Message-ID: <20260329181905-cf917b74fe3e24dd60228601-pchelkin@ispras>
+References: <20260318120512.687149-1-ade@amicon.ru>
+ <20260318120512.687149-3-ade@amicon.ru>
+ <5128e54e-4164-4cb1-8ae1-e58d6a40c005@intel.com>
+ <20260325180127-711d8e8fbff840853081f11e-pchelkin@ispras>
+ <3a0f74f0-7031-43e3-8268-473badd9f1fe@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <3a0f74f0-7031-43e3-8268-473badd9f1fe@intel.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
+	DMARC_POLICY_ALLOW(-0.50)[ispras.ru,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[ispras.ru:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272931-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272932-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[szelinsky.de:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.988];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pchelkin@ispras.ru,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ispras.ru:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,szelinsky.de:dkim,szelinsky.de:email,szelinsky.de:mid]
-X-Rspamd-Queue-Id: 2E6EC3529CD
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5B92A352BD5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add per-PI "delivering" and "enabled" LED triggers to the PSE core
-subsystem. LED state is updated from the shared pse_handle_events()
-function whenever the IRQ or poll path detects a state change, as well
-as from the regulator enable/disable paths so that host-initiated
-admin state changes via ethtool are immediately reflected.
+On Wed, 25. Mar 16:01, Jacob Keller wrote:
+> On 3/25/2026 8:19 AM, Fedor Pchelkin wrote:
+> > Hi,
+> > 
+> > On Tue, 24. Mar 16:26, Tony Nguyen wrote:
+> >> On 3/18/2026 5:05 AM, Agalakov Daniil wrote:
+> >>> [Why]
+> >>> In e1000_set_eeprom(), the eeprom_buff is allocated to hold a range of
+> >>> words. However, only the boundary words (the first and the last) are
+> >>> populated from the EEPROM if the write request is not word-aligned.
+> >>> The words in the middle of the buffer remain uninitialized because they
+> >>> are intended to be completely overwritten by the new data via memcpy().
+> >>>
+> >>> The previous implementation had a loop that performed le16_to_cpus()
+> >>> on the entire buffer. This resulted in endianness conversion being
+> >>> performed on uninitialized memory for all interior words.
+> >>>
+> >>> Fix this by converting the endianness only for the boundary words
+> >>> immediately after they are successfully read from the EEPROM.
+> >>>
+> >>> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> >>>
+> >>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> >>
+> >> While this is definitely better, I'm not sure there's a bug here since it's
+> >> being immediately overwritten. Seems like this patch would be better going
+> >> to *-next as an improvement.
+> > 
+> > It's worth stating in the commit message that the uninitialized memory is
+> > touched with le16_to_cpus() in the loop only on BE systems.  Little-endian
+> > ones are not affected - le16_to_cpus() is a no-op there.
+> > 
+> > Anyway, for the BE case, touching and manipulating uninit memory bytes is
+> > still in general considered a bug, even if this memory is overwritten a
+> > few lines after that.  I guess if KMSAN supported big-endian architectures,
+> > it would hit this, and that wouldn't be a false-positive.
+> > 
+> > I'm not aware of the details on how you treat the bugs in these drivers
+> > for BE-systems: maybe they aren't prioritized and then would occasionnaly
+> > go as -next material.  But, again, this situation looks like a real bug
+> > worth fixing on BE-systems.
+> > 
+> 
+> Typically the bar for a fixes and a net change is that it requires some
+> user visible behavioral impact. That's where the hesitance on our end
+> comes from: how does this cause a user-visible bug?
+> 
+> If there are truly user-visible impact on BE system for touching and
+> manipulating the uninitialized memory, then it makes sense to go to net
+> for me. I guess "KASAN/UBSAN complains you touched uninitialized memory"
+> would be such a bug.
 
-Both C33 and PoDL power status and admin state are checked so that LED
-triggers work for both controller types.
+My first thought was that reading and writing uninitialized memory is just
+undefined behavior in C.  It's hard to say what some compiler might invent
+here.
 
-Trigger names use dev_name(dev) (e.g. "pse-1-003c:port0:delivering")
-to ensure uniqueness when multiple PSE controllers are present on the
-same system.
+The current situation is not trivial though because there is a chunk of
+uninit memory allocated with kmalloc() to which we have a valid pointer,
+and we are swapping the order of uninitialized bytes inside this chunk,
+i.e. reading/writing uninitialized memory.  Basically it should just go
+down to swapping garbage values without any suspicious compiler
+optimizations - I don't think the compiler is aware that kmalloc() returns
+uninit memory.
 
-Initial LED state is queried at registration time so already-active
-ports are reflected immediately without waiting for a hardware event.
 
-LED trigger registration is performed before adding the controller to
-the global list, avoiding a race where an IRQ or poll event could
-invoke pse_led_update() on a partially initialized trigger.
+KMSAN actually supports one big-endian arch - that's s390 (the only arch
+except x86 that KMSAN supports).  I've tried quickly to trigger the splat
+out of curiosity, but booting the KMSAN-enabled kernel with s390 QEMU TCG
+looks like taking forever so unfortunately no specific results here.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202603251254.o5PqMBRU-lkp@intel.com/
-Closes: https://lore.kernel.org/oe-kbuild-all/202603251250.cuMCk5Yv-lkp@intel.com/
-Signed-off-by: Carlo Szelinsky <github@szelinsky.de>
----
- drivers/net/pse-pd/pse_core.c | 134 +++++++++++++++++++++++++++++++++-
- include/linux/pse-pd/pse.h    |  22 ++++++
- 2 files changed, 154 insertions(+), 2 deletions(-)
+KASAN/UBSAN don't catch error patterns of this type.
 
-diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-index 23783bf2edf4..dd0895ca07ad 100644
---- a/drivers/net/pse-pd/pse_core.c
-+++ b/drivers/net/pse-pd/pse_core.c
-@@ -12,9 +12,10 @@
- #include <linux/phy.h>
- #include <linux/pse-pd/pse.h>
- #include <linux/regulator/driver.h>
-+#include <linux/leds.h>
-+#include <linux/workqueue.h>
- #include <linux/regulator/machine.h>
- #include <linux/rtnetlink.h>
--#include <linux/workqueue.h>
- #include <net/net_trackers.h>
- 
- #define PSE_PW_D_LIMIT INT_MAX
-@@ -670,6 +671,111 @@ static int _pse_pi_delivery_power_sw_pw_ctrl(struct pse_controller_dev *pcdev,
- 	return 0;
- }
- 
-+#if IS_ENABLED(CONFIG_LEDS_TRIGGERS)
-+/**
-+ * pse_led_update - Update LED triggers for a PI based on current state
-+ * @pcdev: PSE controller device
-+ * @id: PI index
-+ *
-+ * Queries the current power status and admin state of the PI and
-+ * fires LED trigger events on state changes. Called from the
-+ * notification path and the regulator enable/disable paths.
-+ *
-+ * Must be called with pcdev->lock held.
-+ */
-+static void pse_led_update(struct pse_controller_dev *pcdev, int id)
-+{
-+	struct pse_pi_led_triggers *trigs;
-+	struct pse_pw_status pw_status = {};
-+	struct pse_admin_state admin_state = {};
-+	bool delivering, enabled;
-+
-+	if (!pcdev->pi_led_trigs)
-+		return;
-+
-+	trigs = &pcdev->pi_led_trigs[id];
-+	if (!trigs->delivering.name)
-+		return;
-+
-+	if (pcdev->ops->pi_get_pw_status(pcdev, id, &pw_status))
-+		return;
-+	if (pcdev->ops->pi_get_admin_state(pcdev, id, &admin_state))
-+		return;
-+
-+	delivering = pw_status.c33_pw_status ==
-+		ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING ||
-+		pw_status.podl_pw_status ==
-+		ETHTOOL_PODL_PSE_PW_D_STATUS_DELIVERING;
-+	enabled = admin_state.c33_admin_state ==
-+		ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED ||
-+		admin_state.podl_admin_state ==
-+		ETHTOOL_PODL_PSE_ADMIN_STATE_ENABLED;
-+
-+	if (trigs->last_delivering != delivering) {
-+		trigs->last_delivering = delivering;
-+		led_trigger_event(&trigs->delivering,
-+				  delivering ? LED_FULL : LED_OFF);
-+	}
-+
-+	if (trigs->last_enabled != enabled) {
-+		trigs->last_enabled = enabled;
-+		led_trigger_event(&trigs->enabled,
-+				  enabled ? LED_FULL : LED_OFF);
-+	}
-+}
-+
-+static int pse_led_triggers_register(struct pse_controller_dev *pcdev)
-+{
-+	struct device *dev = pcdev->dev;
-+	const char *dev_id;
-+	int i, ret;
-+
-+	dev_id = dev_name(dev);
-+
-+	pcdev->pi_led_trigs = devm_kcalloc(dev, pcdev->nr_lines,
-+					   sizeof(*pcdev->pi_led_trigs),
-+					   GFP_KERNEL);
-+	if (!pcdev->pi_led_trigs)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < pcdev->nr_lines; i++) {
-+		struct pse_pi_led_triggers *trigs = &pcdev->pi_led_trigs[i];
-+
-+		/* Skip PIs not described in device tree */
-+		if (!pcdev->no_of_pse_pi && !pcdev->pi[i].np)
-+			continue;
-+
-+		trigs->delivering.name = devm_kasprintf(dev, GFP_KERNEL,
-+							"pse-%s:port%d:delivering",
-+							dev_id, i);
-+		if (!trigs->delivering.name)
-+			return -ENOMEM;
-+
-+		ret = devm_led_trigger_register(dev, &trigs->delivering);
-+		if (ret)
-+			return ret;
-+
-+		trigs->enabled.name = devm_kasprintf(dev, GFP_KERNEL,
-+						     "pse-%s:port%d:enabled",
-+						     dev_id, i);
-+		if (!trigs->enabled.name)
-+			return -ENOMEM;
-+
-+		ret = devm_led_trigger_register(dev, &trigs->enabled);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+#else
-+static inline void pse_led_update(struct pse_controller_dev *pcdev, int id) {}
-+static int pse_led_triggers_register(struct pse_controller_dev *pcdev)
-+{
-+	return 0;
-+}
-+#endif /* CONFIG_LEDS_TRIGGERS */
-+
- static int pse_pi_enable(struct regulator_dev *rdev)
- {
- 	struct pse_controller_dev *pcdev = rdev_get_drvdata(rdev);
-@@ -695,6 +801,7 @@ static int pse_pi_enable(struct regulator_dev *rdev)
- 			pcdev->pi[id].admin_state_enabled = 1;
- 			ret = 0;
- 		}
-+		pse_led_update(pcdev, id);
- 		mutex_unlock(&pcdev->lock);
- 		return ret;
- 	}
-@@ -702,6 +809,7 @@ static int pse_pi_enable(struct regulator_dev *rdev)
- 	ret = ops->pi_enable(pcdev, id);
- 	if (!ret)
- 		pcdev->pi[id].admin_state_enabled = 1;
-+	pse_led_update(pcdev, id);
- 	mutex_unlock(&pcdev->lock);
- 
- 	return ret;
-@@ -719,6 +827,7 @@ static int pse_pi_disable(struct regulator_dev *rdev)
- 	ret = _pse_pi_disable(pcdev, id);
- 	if (!ret)
- 		pi->admin_state_enabled = 0;
-+	pse_led_update(pcdev, id);
- 
- 	mutex_unlock(&pcdev->lock);
- 	return 0;
-@@ -1108,6 +1217,20 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
- 	if (ret)
- 		return ret;
- 
-+	ret = pse_led_triggers_register(pcdev);
-+	if (ret) {
-+		dev_warn(pcdev->dev, "Failed to register LED triggers: %d\n",
-+			 ret);
-+	}
-+
-+	/* Query initial LED state for all PIs so already-active ports
-+	 * are reflected immediately without waiting for a hardware event.
-+	 */
-+	for (i = 0; i < pcdev->nr_lines; i++) {
-+		if (pcdev->no_of_pse_pi || pcdev->pi[i].np)
-+			pse_led_update(pcdev, i);
-+	}
-+
- 	mutex_lock(&pse_list_mutex);
- 	list_add(&pcdev->list, &pse_controller_list);
- 	mutex_unlock(&pse_list_mutex);
-@@ -1265,7 +1388,14 @@ static void pse_handle_events(struct pse_controller_dev *pcdev,
- 		struct pse_ntf ntf = {};
- 		int ret;
- 
--		/* Do nothing PI not described */
-+		/* Update LEDs for described PIs regardless of consumer state.
-+		 * LED triggers are registered at controller init, before any
-+		 * PHY claims a PSE control, so rdev may still be NULL here.
-+		 */
-+		if (pcdev->no_of_pse_pi || pcdev->pi[i].np)
-+			pse_led_update(pcdev, i);
-+
-+		/* Skip regulator/netlink path for PIs without consumers */
- 		if (!pcdev->pi[i].rdev)
- 			continue;
- 
-diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-index 44d5d10e239d..0058636a6299 100644
---- a/include/linux/pse-pd/pse.h
-+++ b/include/linux/pse-pd/pse.h
-@@ -10,6 +10,7 @@
- #include <linux/kfifo.h>
- #include <uapi/linux/ethtool.h>
- #include <uapi/linux/ethtool_netlink_generated.h>
-+#include <linux/leds.h>
- #include <linux/regulator/driver.h>
- 
- /* Maximum current in uA according to IEEE 802.3-2022 Table 145-1 */
-@@ -266,6 +267,23 @@ struct pse_pi {
- 	int pw_allocated_mW;
- };
- 
-+#if IS_ENABLED(CONFIG_LEDS_TRIGGERS)
-+/**
-+ * struct pse_pi_led_triggers - LED trigger state for a PSE PI
-+ *
-+ * @delivering: LED trigger for power delivering state
-+ * @enabled: LED trigger for admin enabled state
-+ * @last_delivering: cached delivering state for change detection
-+ * @last_enabled: cached enabled state for change detection
-+ */
-+struct pse_pi_led_triggers {
-+	struct led_trigger delivering;
-+	struct led_trigger enabled;
-+	bool last_delivering;
-+	bool last_enabled;
-+};
-+#endif
-+
- /**
-  * struct pse_ntf - PSE notification element
-  *
-@@ -303,6 +321,7 @@ struct pse_ntf {
-  * @ntf_work: workqueue for PSE notification management
-  * @ntf_fifo: PSE notifications FIFO
-  * @ntf_fifo_lock: protect @ntf_fifo writer
-+ * @pi_led_trigs: per-PI LED trigger state array
-  */
- struct pse_controller_dev {
- 	const struct pse_controller_ops *ops;
-@@ -327,6 +346,9 @@ struct pse_controller_dev {
- 	struct work_struct ntf_work;
- 	DECLARE_KFIFO_PTR(ntf_fifo, struct pse_ntf);
- 	spinlock_t ntf_fifo_lock; /* Protect @ntf_fifo writer */
-+#if IS_ENABLED(CONFIG_LEDS_TRIGGERS)
-+	struct pse_pi_led_triggers *pi_led_trigs;
-+#endif
- };
- 
- /**
--- 
-2.43.0
+> 
+> Alternatively: is there a risk of some side channel method to capture
+> that uninitialized data and leak kernel memory? I don't recall enough to
+> know whether that would be an issue here...
+> 
+> I don't personally have an objection to going through net (besides
+> fixing the commit hash for the Fixes: tag on the patch that was wrong)
+> since its an obvious fix.
 
+Thanks for the feedback.  I see Daniil has already sent some newer
+versions targeting -next.  The problem in question is rather obscure about
+severity of its consequences but spending some time on investigating this
+now I'm more inclined to think there should be no opportunity for UB here
+and it's okay to process the patch like Tony suggested..
 
