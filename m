@@ -1,93 +1,92 @@
-Return-Path: <netdev+bounces-272944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272945-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +NhGLjNZyWkuxgUAu9opvQ
-	(envelope-from <netdev+bounces-272944-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:54:11 +0200
+	id OLE9LmtZyWkuxgUAu9opvQ
+	(envelope-from <netdev+bounces-272945-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:55:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B5F73532E8
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:54:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1276D3532F0
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:55:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 410A130086D5
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 16:53:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5A9073006B1B
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 16:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B52637F75A;
-	Sun, 29 Mar 2026 16:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6A43815C8;
+	Sun, 29 Mar 2026 16:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fE4gN2Rj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HUeAtjOS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623C830DEB0
-	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 16:53:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABDA2BD0B
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 16:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774803196; cv=none; b=inbRWNpvB6pdqWOFMBbTaj/1K/jwSQH/ix/xh6DY9Bm5D4YN5HmHD1UrI1OVyLANzK+P9/ztQWj4iqymN81M/s9VKC8r2BLC/6iagY/poX0O/NoVoIyDe+tKsgDQLbTzJHdxYl2uyFd3f/WG4uJua8xiyqIyOQh7FjDQY61PZ8s=
+	t=1774803237; cv=none; b=JbvxuaYdzBoDk20/za99xyih9kplMd2D6PuI27ADfo/d8SDqylbmDYa1IjwKNnwmWjtqCNJOM1NWjhVuL04h5cA9QBQ518jFHkcnwUXASjzdWz1cxk3xD4Fp6uCrfOKPW0tHYO5zbbISh4iC4JJ3ESmqE/kaGdYw/1gAeYzNPzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774803196; c=relaxed/simple;
-	bh=2POrlhuH9arAjA/6Ity1Mx6C1zU6oUhfYHGwB9Hu21s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n7eko2pvN0y7dr7lenvZY6Wy3rSRPwPQ1hPTc8A6xlSGQkONALeFEnITvP0rxSUACPyM/TENNusdQ/dn1wtSiUW9FRIk6xHq2jTGN7fyCOzssimlqSfFS6u8kqCX+BN0AlFwkZ+H/7R3NbBpkAGHOC73pI1qQqsDOOZG7uCLdw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fE4gN2Rj; arc=none smtp.client-ip=209.85.216.46
+	s=arc-20240116; t=1774803237; c=relaxed/simple;
+	bh=+BTKBD59YWu2xkn2TAEqe31LoHLRQO1O0pRXWEi5f18=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B8WzW8VSJ/FNpapus3hOWyc+5DOFGYjdgrLf/70qxCvUNMRkmmEbNbBVncV9z9GHhbUGN5gEHSCuVd/xV6LjHbBZwuE8VBf+xX7WBuXufgQpF34zb9riFGUEnU9vZEIkrmxQzU9XAfW2XcK6lN2DmqUQBG2SGGz0bgUALKBeBxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HUeAtjOS; arc=none smtp.client-ip=209.85.216.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-35da9692ec3so94639a91.1
-        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 09:53:15 -0700 (PDT)
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-35d971fb6f1so840922a91.0
+        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 09:53:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774803195; x=1775407995; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1774803236; x=1775408036; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=puu7Te+HEqA2/yPexvy6rub1Qzj4/NrG66ME/AJqUXs=;
-        b=fE4gN2Rj31ZsaOTek/KLTxKVOb9HZ1F3bkPdgAqFGvr5Za5H8F9QJAZ72rZng79c92
-         zA+PEkueXiuvIynTG3Yza5In85j5/NCw3QnBNsO96wkoY4NNKCQI43uJC8OxlUm/BjuY
-         PIpZti8J09FRvt1MpRcg/Ql02vmeIPK9f2pdWyvcNBLGsQBLGEbQBKjqzvwX/CH/vuV8
-         QlMtpiarLewYNGwbDyIJ5CzgJHdBEuOqLc81KtlSoT7mWgxjMjLltfFWFfavNh2XrmZg
-         eZfCTWt2bsS43ktddN9j+mo/daYNbDTysChe1u9WrW9vblP3iwPwbSvlFZMYaO/sXKfu
-         l/tQ==
+        bh=3gqeZSuHutjivB5N11MVmiWyWDlLluyBO9c1a+A4Zxk=;
+        b=HUeAtjOSozl0wrZQEDpGfuz2s4sD+qjHPMbgSQpKmS3LttHI3uBY1r2ZrDrysKP4Ny
+         7432+Q3P1fnbFohh5HVHRlu16cQvwpWKT4VZ8TpW5oIeqYMbCyTIbinfjhjuXFsGoaJQ
+         wbjB4+FjtZMqO044Cv3gKtsfB8PFro6bQ26yZYDogLCd+5rJx25HSKdGbRCkuh9rZNyu
+         oMHsfFTX3qzFbE7P/axIovk2mBELfssQ/JljyxVQCcL8e8livT+6oBpLRPxPlaHPbgRZ
+         7s0rVG1yo41mTa/U9jmH5lVt3I0qlxzX/43A4+LSbVgqL36FZm8pgeoqtcCIJdrPvsrR
+         bJ/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774803195; x=1775407995;
+        d=1e100.net; s=20251104; t=1774803236; x=1775408036;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=puu7Te+HEqA2/yPexvy6rub1Qzj4/NrG66ME/AJqUXs=;
-        b=JkGSKM8h1GL/ch1IZzUbPATaEuiWCFf0P6jQxwlATurAjA7YxGFDXCuOSYt/Hr2pyv
-         m8TGorrYiEOkcS22mJmgNnWHjE34cMLwHlsvnNnshkx48401CxqLBplx+ax+wZsotXdW
-         SS3W+haNL1u3Ysyd29c3WOOKZoFNShapMFfnKotW8I9TRTbcxiVbRNC8hPHTwHXl9qji
-         BmlXqfokDfNjN1LvQyA2sUlPq69Z3GSG9NL9IlUW+5/18Y3X2ExKD8KXpibCIxhZzAxY
-         HIiQYlsMBW31Wb7Wjno094wDjvzOqxJxF8T7md/ue8P2MqGnJT+kCW1k6lDRMlX2qi5Z
-         nkHw==
-X-Forwarded-Encrypted: i=1; AJvYcCXXbAu1K94SeEX7RuGRIg1PYm1CX6Ik36jf8PKE/kgzM3c8noVjzMEZeXIffeebVEwIbBKlO74=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSv2t3FNPvpqP7J5OZiCgTrpzKeCv0DRfDZvB2vpDO5g3UeaJ+
-	h0g1Ar70tlzNsUOknAabXsAm2viRFfgkCSy/IeHy2ugC8KRrpVlXKmLU
-X-Gm-Gg: ATEYQzzI3OeS/Wdas9QAVcF43Hf+SlPbxW3x3Zp5FSi+icHTsZ/NiLuJZXafIkcqMpx
-	CE4Ir+KjSkq6M5h9McRi6I1aNDXjvnr+VQ6RxY4IogmzYvvtT1iszbO+Dy4ZX8bCV5vCkZy6e4q
-	TLxwCUqtGIaoLu6T+7rALSYCP34lFeUDObTDaVYf56dBvVpUvdHuZJ4wT+g21HCyZeAfQmKPxyZ
-	9qe8VZPJwuT/kcaVCZbgQJW00jUvT9mDnHEyH5I8nzzu98+e4vFUC3Ra0Af9zYCKtwvBG5ND4dN
-	swvH40poPVwQBYF0on0SrKBpUVgh5f2hbl6ZfIz+RkuDpM2BoShqY1jJ9DGtd1y/Bejt187Pl/Y
-	MlLf7vt2LDHQ8ushaP1WrcFqcdjeDlgB6vOkFZmctDFFvgfthVOYBIgbGnoMlUUw5Kuwcm9y90N
-	iLSlCL7v95NjqpQGppWh2ieMfWmmGveZ8khbA=
-X-Received: by 2002:a17:90b:57cc:b0:35b:e51b:19c0 with SMTP id 98e67ed59e1d1-35c300c22c2mr9727354a91.31.1774803194639;
-        Sun, 29 Mar 2026 09:53:14 -0700 (PDT)
+        bh=3gqeZSuHutjivB5N11MVmiWyWDlLluyBO9c1a+A4Zxk=;
+        b=GafscJflNCvxHnoEfz/LFxCKNaOd4nAAfgu/d3F9svLI66O5450v5LTrpYbrtNSODA
+         TWOQiUx5B1zdDNw12hGlV1D0fAOOifO31m6m8pKCg7jW+4UopNTVRBo8c8Zaz2B9EtLz
+         4cY4+84vmONBjEWSMWZrEKuybyRv5TPNeogbSU/MG8yYau6/Iy0JuFOTzvnZacYoPxkw
+         1hbFi6uza6LiQkT+7rm87RKhnVZOe0i2mB/YeQuj9nEY38ZlzBWWG3pFTHhF6H3dtp0q
+         kC7ZK8417Kp07aPnbEt4Bx49toDCH3rx3bRwo02G5YL86KRfEc8RP8XOR1VYZQbzNFlA
+         /gjA==
+X-Forwarded-Encrypted: i=1; AJvYcCVzqDnOlPDFP6MI012ius+LnU3Y12Gr/aEPNwAprzpmkUAQhxZsKiofP24+4MFO4UvI7duzWu0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhZn6GZ3ALEH4qQnhsNHltAnqcx/RFuFDbHU3bMXl9QE9QbpSR
+	gB+flWBAKczLSOeXYcR90nm78b1ZhcUKDeQQoH2ylU+DbTJC0dGjCZSa
+X-Gm-Gg: ATEYQzz11RdfCzoB6RZ/148uTgFagbv4hlLw6sgT0tDNREyv1vYfJi4fjcjaiHXTN1Y
+	okx9GGuqgBrc92eiO0sDwWEw/Dw3EAvgpGiNsLEIeO/DEXiBiLCNDRyeY7BqylxA8zb8uSod2Wk
+	cgcwzpCPTpwFpFvGxWLbQLt4RMpyOdlsPcoQPCqz+ZCtgeNfH2KnkwjpLL2naj3x4vQV21x2ljj
+	9vp6Wb79wSThFLLf2ef56SZcCIg2JJ0SPhFdWevuLU86wIa2Z0GDgHOIGPLSc7XXp+vzSuu6F18
+	IG+arjdbc1DmSpSeD5D3wI2mCOw6KMWjpc4L+pW4YTw6xlBxPblNsPBrGIAfHpLmNUeLka5SCtb
+	SbQBbOSM9Rwyh32z4adsuGla5zb69iHxWntqFhTxjFpw0Si3preLdWg0kc0yJXzbXxJQIrttKWx
+	QJNVhlQZltKdOyOivWzUvP//AzkdCIVzHFhWAx34uNz0p4TQ==
+X-Received: by 2002:a05:6a21:7a45:b0:39c:8c0a:d09b with SMTP id adf61e73a8af0-39c8c0ad0fbmr9737476637.49.1774803236054;
+        Sun, 29 Mar 2026 09:53:56 -0700 (PDT)
 Received: from localhost.localdomain ([47.236.127.140])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35da9ef1b70sm310631a91.16.2026.03.29.09.53.10
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76917bb809sm4224736a12.28.2026.03.29.09.53.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Mar 2026 09:53:13 -0700 (PDT)
+        Sun, 29 Mar 2026 09:53:55 -0700 (PDT)
 From: Qi Tang <tpluszz77@gmail.com>
 To: Jamal Hadi Salim <jhs@mojatatu.com>,
 	Jiri Pirko <jiri@resnulli.us>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org,
 	Qi Tang <tpluszz77@gmail.com>
-Subject: [PATCH] net/sched: skip reverse bind walk after failed class delete
-Date: Mon, 30 Mar 2026 00:53:06 +0800
-Message-ID: <20260329165306.241079-1-tpluszz77@gmail.com>
+Subject: [PATCH] net/sched: cls_flow: reject baseclass resolution on shared blocks
+Date: Mon, 30 Mar 2026 00:53:49 +0800
+Message-ID: <20260329165349.241123-1-tpluszz77@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -96,83 +95,93 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272944-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tpluszz77@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-272945-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[tpluszz77@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0B5F73532E8
+X-Rspamd-Queue-Id: 1276D3532F0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-__tc_ctl_tclass() unconditionally calls tc_bind_tclass() after
-RTM_DELTCLASS even when tclass_del_notify() fails.  On
-ingress/clsact qdiscs with shared blocks, the delete always fails
-with -EOPNOTSUPP, but the subsequent bind walk still runs.
-tc_bind_tclass() reaches tcf_node_bind() which calls tcf_block_q()
-on the shared block and dereferences the NULL qdisc pointer.
+flow_change() calls tcf_block_q() and immediately dereferences the
+returned qdisc pointer to resolve a zero-major baseclass handle.
+On shared blocks, tcf_block_q() returns NULL because no qdisc owns
+the block, causing a NULL pointer dereference.
 
-Only perform the reverse bind walk when the class delete succeeds.
+Check for NULL before dereferencing and return -EOPNOTSUPP, since
+shared blocks have no qdisc handle to derive the major number from.
 
-Triggered by issuing RTM_DELTCLASS on an ingress/clsact pseudo-class
-that carries a shared block with a classifier using bind_class:
+Triggered by creating a cls_flow filter on a shared block without
+a non-zero-major TCA_FLOW_BASECLASS:
 
-  $ tc qdisc add dev veth0 egress_block 22 clsact
-  $ tc filter add block 22 pref 1 protocol ip handle 0x1 \
-      fw classid ffff:fff3 action drop
-  $ tc class del dev veth0 classid ffff:fff3
-  RTNETLINK answers: Operation not supported
-  Kernel panic - not syncing: Attempted to kill init!
-  exitcode=0x00000700
+  Kernel panic - not syncing: kernel: panic_on_warn set ...
+  Call Trace:
+   <TASK>
+   check_panic_on_warn+0x5d/0x80
+   __warn+0xe7/0x300
+   flow_change+0x1422/0x1900
+   report_bug+0x9a/0x1e0
+   handle_bug+0x14c/0x360
+   exc_invalid_op+0x13/0x40
+   asm_exc_invalid_op+0x16/0x20
+  RIP: 0010:flow_change+0x1422/0x1900
+   tc_new_tfilter+0x92b/0x2060
+   rtnetlink_rcv_msg+0x758/0xab0
+   netlink_rcv_skb+0x120/0x350
+   netlink_unicast+0x755/0xaa0
+   netlink_sendmsg+0x787/0xc30
+   ____sys_sendmsg+0x8b6/0xb00
+   ___sys_sendmsg+0xed/0x170
+   __sys_sendmsg+0x107/0x1a0
+   do_syscall_64+0xe0/0x1290
+   entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-The NULL dereference occurs in tcf_node_bind() when sch_tree_lock()
-is called with the NULL return from tcf_block_q() on a shared block.
-
-Fixes: 07d79fc7d94e ("net_sched: add reverse binding for tc class")
+Fixes: 1abf272022cf ("net: sched: tcindex, fw, flow: use tcf_block_q helper to get struct Qdisc")
 Signed-off-by: Qi Tang <tpluszz77@gmail.com>
 ---
- net/sched/sch_api.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/sched/cls_flow.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index cc43e3f7574f..50d311ff1f2d 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -2251,7 +2251,8 @@ static int __tc_ctl_tclass(struct sk_buff *skb, struct nlmsghdr *n,
- 		case RTM_DELTCLASS:
- 			err = tclass_del_notify(net, cops, skb, n, q, cl, extack);
- 			/* Unbind the class with flilters with 0 */
--			tc_bind_tclass(q, portid, clid, 0);
-+			if (!err)
-+				tc_bind_tclass(q, portid, clid, 0);
- 			goto out;
- 		case RTM_GETTCLASS:
- 			err = tclass_get_notify(net, skb, n, q, cl, extack);
+diff --git a/net/sched/cls_flow.c b/net/sched/cls_flow.c
+index 339c664beff6..ad8b4c375d1c 100644
+--- a/net/sched/cls_flow.c
++++ b/net/sched/cls_flow.c
+@@ -505,6 +505,10 @@ static int flow_change(struct net *net, struct sk_buff *in_skb,
+ 		if (TC_H_MAJ(baseclass) == 0) {
+ 			struct Qdisc *q = tcf_block_q(tp->chain->block);
+ 
++			if (!q) {
++				err = -EOPNOTSUPP;
++				goto err2;
++			}
+ 			baseclass = TC_H_MAKE(q->handle, baseclass);
+ 		}
+ 		if (TC_H_MIN(baseclass) == 0)
 -- 
 2.43.0
 
