@@ -1,85 +1,94 @@
-Return-Path: <netdev+bounces-272874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272875-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2Jf6IcQIyWl2tgUAu9opvQ
-	(envelope-from <netdev+bounces-272874-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:11:00 +0200
+	id ICN1Bk4KyWm5tgUAu9opvQ
+	(envelope-from <netdev+bounces-272875-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:17:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB1E0351BF2
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:10:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68294351C44
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:17:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 53EF130179FC
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:10:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 35D5A300D708
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:17:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C99C3451B3;
-	Sun, 29 Mar 2026 11:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9573F35AC3E;
+	Sun, 29 Mar 2026 11:17:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WU859tyo"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="v7z0bpqL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF0A3446CE
-	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 11:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D7435AC0D
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 11:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774782648; cv=none; b=dfq6m40mVfRMSJU/gv/nFKCapbJZZPDBrdRoJyKK3FZorFJcWXpbEdqQac08UNVgkYmTTNWwD52Lc6GGE8f4p3zpjt9Wg+CpzIq57cg4FRVc7tAmXuzzeF8iSSbdgJz2lIvqzH6e9ljQSTIJGWxYLyilJNFbeOi+MjWfR3PDjqY=
+	t=1774783051; cv=none; b=utrbu6wHYDddrItqRBUaVdNJKP9D49SjsS2FPcqASbe+9p87hj9pzUB1xoG+UeNW5eEvYdaVIg6M6AXosLZYWFYnfAHB/15u87R9P2I58WyoegfsTQuYDNyddYTPwC0NVUHJpnyMTCZXcBA+v1RuXgSfMlhTCVSZLvFqdyDMDFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774782648; c=relaxed/simple;
-	bh=g2CTlm/4BOAAf+kUViN/ibgUNHCsThNxTS+MoqudMlU=;
+	s=arc-20240116; t=1774783051; c=relaxed/simple;
+	bh=QHOIkggUiANlpWTfqj7rQD3MmCJYFw+IMyrljO9+Gnw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uMceXsxI/GVull90mplnI2YDkHXfympubinDybLW7DgRAF06ELQFEiQkoqNMR7Le7OYL3tnGAEVB18wGbf8iRDWfIQ0WkoPoxXHjApS7h2Xy0TDYAI+zvjin5D/8/p2UMxM4NKgPbtjYkrn+fLGh7IdjOB2mk+Zjaoes8rsSU28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WU859tyo; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774782647; x=1806318647;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=g2CTlm/4BOAAf+kUViN/ibgUNHCsThNxTS+MoqudMlU=;
-  b=WU859tyoF0kVP6ITUWJnNnvXOXhraTY3BWWIknCTT2fdtVfz0Ua1LR/u
-   yxKLis5/gtiHeRC9BLxI0kQgnVx1WwkDNp8jt440fFbLAZcCfEXzR/Vxc
-   8l8RNBmTu1rLmSurzqxIzI2gStDoL1avVIX4c48zNZf9xkrCmrs0/uYjZ
-   cF3w62sQw/RrWcth5ksL3SO41KSgDCq3o7syU9v91DTfiISschHGx+COA
-   N30YSm2R+PbAqUjIha6l63+QSmi+ODIYD5DvT3WSXV3AGnb2SKURLtoEB
-   zbpQqU9P0n0Z9KezbTgk3iQfCCJOWcWFNoTx/rmKt7sTBlDIAzSsX3mlW
-   w==;
-X-CSE-ConnectionGUID: IiAjivkjQc6Ay8UlpgZ+xQ==
-X-CSE-MsgGUID: aJ0quetYRGe/MheCASxPgQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11742"; a="75504059"
-X-IronPort-AV: E=Sophos;i="6.23,148,1770624000"; 
-   d="scan'208";a="75504059"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2026 04:10:46 -0700
-X-CSE-ConnectionGUID: zckU4j3RQ/qXJvBeSKaRtw==
-X-CSE-MsgGUID: NMbtkP5lS6+/CVMAN6483g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,148,1770624000"; 
-   d="scan'208";a="230570832"
-Received: from lkp-server01.sh.intel.com (HELO 3905d212be1b) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 29 Mar 2026 04:10:44 -0700
-Received: from kbuild by 3905d212be1b with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w6o2T-00000000CJ3-1Gh7;
-	Sun, 29 Mar 2026 11:10:41 +0000
-Date: Sun, 29 Mar 2026 19:10:19 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Subject: Re: [PATCH v1 net-next] tun: Ignore tun in netdev_lock_pos().
-Message-ID: <202603291907.vWkbcfS4-lkp@intel.com>
-References: <20260327213441.3781433-1-kuniyu@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mhrye5Z5MUU7f39RMO0OAGuW/Ku72XH1tlceTpjkmM+f+ARh6TjrANFm/ClNDrBU9WUQVk5TsS7WWDFLiFgWWqKayYAyq2heypCRn314fFQCmnbFiFp+XltySEa4SOu17HWah3E5CVOw1a9dTiA8DMW3zASF1qDKuC5cOqMK0M4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=v7z0bpqL; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-48334ee0aeaso29831555e9.1
+        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 04:17:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1774783045; x=1775387845; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZZZEbvtH/bKZ6jbXxyKNF2VJCYpTcm4/gV6VLpLYICA=;
+        b=v7z0bpqLGgrvndYwhfu1T68MJN1fZh2h1mDA2x5WJDpHLwlEOSgp+crxvT0s8MLPdr
+         RWHhy0MiTskG71QWA4Kgda+dal/IEmUl8IeRtdSuBiGys/t7qzvjy3SzaLj14/IU8a3u
+         8kwSIYt9u2htte7ct8CuYpuvp1nx2nxj0R88s2kqvpWh+kVT3G/EUsokseVAOeFWE+1D
+         wzAHvcv1Bt4fAObCpR1B0tZNJvPtoqQdVqrNs8yV9l0nHl27bJjaRgSkmKfdApWhj+3n
+         Monrq/cyVpPbfeuC4BdIcwwGXs9T70v3zv/WnNRmDWM/s4izZcT9WjhXJd3VTEeQpM5a
+         UIrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774783045; x=1775387845;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZZZEbvtH/bKZ6jbXxyKNF2VJCYpTcm4/gV6VLpLYICA=;
+        b=nOdYWBVkXgleHR9552z3mHb2gipgZmnJsDyZ3C799ynQJ+LIgJTSAOcIYNNcsfJSyV
+         43xJ8/oaStwBLqaKxEW9o2Npgduy417VuFc2ztB7dKyt6LmcoKXArJ23BEx1oNqn5A4k
+         l+26J2iDPPBwS556MW6sMxWCXOiA7+mrUWjEr3jFLPvMjhzTCWgiChrdAXHVfdKasm+k
+         IGk05G2iG65IQZedJ37YV5pBt2h83OsZF9/BbaSyeMrHo0wDpTQkvNeEFgf9s/azqZUI
+         fQTt8I7UvEV76MeGdKlQAqDA0dXPCVBxYV/p9fyOX29mlmso6qgd1TH1IWElNxV8Q/Yv
+         EGWw==
+X-Gm-Message-State: AOJu0YyiqDdB16BK8MxqsmzsjNqC3kq/B96Ld4rn1gm4Rt8KDspK06Py
+	exZlz6DYamisazZQ2vvhnzDCfYzxeXrPYyq2Q5O3ogLgc8uSJcjVXcQ6lehtmJRyOn/7U2WQDB8
+	G+yb39cM=
+X-Gm-Gg: ATEYQzyy7d+uOdFmwa6B7B5nSH4+2nDQJx/ZoeRabVgLgc83DmZHZ6sSgNc4CkqH0WH
+	ZyN7AYXqJA+YdVNSlBD81lx8Et0yW2d65NPqe/2rck040ImiE+gFvD4/nQTqsoz726ObnQL98Dy
+	brmhfnPAHcw4LR98wWYfvmXNHeCFvjriJI4ypPTrRKTzSlXxjnawW2ndp70rP3edkY1wmlxHEmh
+	Pl6DvUoqBzUv9Xs5xo37R5Am7mzy1mfJM6yYAFC1crZyvvjrb3Lj/n3eKM6mkidO7D0Z4VvpO4O
+	VeK1lrvddl7ptW+33Wkbf+lkbPDey6k5I3L+DjhtsbsNJB0zpnWSN38s4/d6i7yfV+BOk/D7Ivb
+	HCsh6zBfpPezj0qJTDRXVWc/4eRwmVAvFGUo1QM6msRNE3lb6LG1lcuZeEg32RXh9zvyqWZ0AMC
+	ZlTH1/JshE+hY2OxEIPrfS+TRY5GN3K5qABvMR5mmjz+I=
+X-Received: by 2002:a05:600c:41d1:b0:485:364e:934e with SMTP id 5b1f17b1804b1-48727eda4a4mr87253735e9.21.1774783044663;
+        Sun, 29 Mar 2026 04:17:24 -0700 (PDT)
+Received: from FV6GYCPJ69 ([2001:1ae9:6084:ab00:4c27:3a72:8516:e661])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43cf21eba4dsm11810601f8f.11.2026.03.29.04.17.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Mar 2026 04:17:24 -0700 (PDT)
+Date: Sun, 29 Mar 2026 13:17:21 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org, 
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>, edumazet@google.com, horms@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, Michal Schmidt <mschmidt@redhat.com>
+Subject: Re: [PATCH net-next 2/2] devlink: unregister shared devlink
+ resources on destroy
+Message-ID: <wpjltue5gnv4e42a7cpewbgqeza7sl226qbgbbqjl7b2cjgtfc@kjqjqluv3vcb>
+References: <20260325063143.261806-1-przemyslaw.kitszel@intel.com>
+ <20260325063143.261806-3-przemyslaw.kitszel@intel.com>
+ <aa7hsleso6z6zaubb6phx4lexqnthgdvkns5cpg75gk6w3pi3o@7skrmgryitsj>
+ <b78d4c11-e20b-4a84-b8da-2638df46c46c@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,85 +97,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260327213441.3781433-1-kuniyu@google.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <b78d4c11-e20b-4a84-b8da-2638df46c46c@intel.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272874-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[google.com,davemloft.net,kernel.org,redhat.com,gmail.com,lunn.ch];
+	DKIM_TRACE(0.00)[resnulli-us.20230601.gappssmtp.com:+];
+	TAGGED_FROM(0.00)[bounces-272875-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[resnulli.us];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: DB1E0351BF2
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,resnulli-us.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 68294351C44
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Kuniyuki,
+Thu, Mar 26, 2026 at 06:44:49AM +0100, przemyslaw.kitszel@intel.com wrote:
+>On 3/26/26 06:20, Jiri Pirko wrote:
+>> Wed, Mar 25, 2026 at 07:26:53AM +0100, przemyslaw.kitszel@intel.com wrote:
+>> > Since shared devlink acts as a normal devlink instance, capable of all
+>> > usual devlink operations, it must unregister its resources.
+>> > 
+>> > I plan to make use of devlink resources on a shared instance for ice
+>> > driver by separate series, coming soon.
+>> > 
+>> > Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>> > ---
+>> > net/devlink/sh_dev.c | 1 +
+>> > 1 file changed, 1 insertion(+)
+>> > 
+>> > diff --git a/net/devlink/sh_dev.c b/net/devlink/sh_dev.c
+>> > index b85e5cb1edbe..5de138bf3630 100644
+>> > --- a/net/devlink/sh_dev.c
+>> > +++ b/net/devlink/sh_dev.c
+>> > @@ -71,6 +71,7 @@ static void devlink_shd_destroy(struct devlink_shd *shd)
+>> > 
+>> > 	list_del(&shd->list);
+>> > 	devl_lock(devlink);
+>> > +	devl_resources_unregister(devlink);
+>> 
+>> Hmm. It is driver's responsibility to call this on appropriate place,
+>> symmetric to resource register. Why to have this in code for sh?
+>> 
+>> The idea I had was to have callbacks to driver to do things like this
+>> and more eventually. Would it work for you?
+>
+>for driver stuff that could be useful (say, someone wants to have
+>an additional data structure to iterate and free), OTOH, each
+>entity that is sharing should "unplug" from shared devlink, so
+>those structures should be emptied anyway
+>for my stuff in ice I managed to do without destructor
+>
+>coming back to devlink stuff - all things (resources, health)
+>would need same cleaning in all drives, so putting that in
+>devlink_shd_destroy() will simply take the burden off devs
+>(at the expense of less symmetric code for normal/shared
+>devlinks)
 
-kernel test robot noticed the following build errors:
+I think that devs can handle the burden for the sake of symmetricity.
 
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/tun-Ignore-tun-in-netdev_lock_pos/20260328-220059
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260327213441.3781433-1-kuniyu%40google.com
-patch subject: [PATCH v1 net-next] tun: Ignore tun in netdev_lock_pos().
-config: x86_64-rhel-9.4-kselftests (https://download.01.org/0day-ci/archive/20260329/202603291907.vWkbcfS4-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260329/202603291907.vWkbcfS4-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603291907.vWkbcfS4-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   ld: vmlinux.o: in function `netdev_lock_pos':
->> net/core/dev.c:540:(.text+0x24fe910): undefined reference to `tun_link_ops'
->> ld: net/core/dev.c:540:(.text+0x254084c): undefined reference to `tun_link_ops'
-
-
-vim +540 net/core/dev.c
-
-   529	
-   530	static inline unsigned short netdev_lock_pos(const struct net_device *dev)
-   531	{
-   532		unsigned short dev_type = dev->type;
-   533		int i;
-   534	
-   535		for (i = 0; i < ARRAY_SIZE(netdev_lock_type); i++)
-   536			if (netdev_lock_type[i] == dev_type)
-   537				return i;
-   538	
-   539		/* the last key is used by default */
- > 540		WARN_ONCE(!netdev_is_tun(dev),
-   541			  "netdev_lock_pos() could not find dev_type=%u\n", dev_type);
-   542		return ARRAY_SIZE(netdev_lock_type) - 1;
-   543	}
-   544	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>
+>in short: I'm ok with any of
+>a. callback for all cleanup
+>b. callback for driver-specific cleanup
+>c. no callback and no driver-specific cleanup (until someone needs
+>   that very much)
+>
+>thanks!
+>
+>> 
+>> 
+>> > 	devl_unregister(devlink);
+>> > 	devl_unlock(devlink);
+>> > 	kfree(shd->id);
+>> > -- 
+>> > 2.51.1
+>> > 
+>
 
