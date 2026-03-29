@@ -1,163 +1,169 @@
-Return-Path: <netdev+bounces-272868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272869-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WI1pFarzyGngsgUAu9opvQ
-	(envelope-from <netdev+bounces-272868-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:40:58 +0200
+	id 6Pt2HTT3yGmFswUAu9opvQ
+	(envelope-from <netdev+bounces-272869-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:56:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4FB93516B3
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:40:57 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AA923517C2
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:56:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 59C2C300FECB
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 09:40:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6ABE8300A26C
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 09:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB97D2D5A01;
-	Sun, 29 Mar 2026 09:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Jc2Py1MS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB383043DE;
+	Sun, 29 Mar 2026 09:55:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E373009C8
-	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 09:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 673D82F3C34;
+	Sun, 29 Mar 2026 09:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774777255; cv=none; b=s5wqI7fEa+7sSQIWfeS0LMuQIDEjR37npgTDf9ioClbEkJDuBDJV6Qb09Zd+4yEVM5Yr5HxcQiFB8H1ceCeWqElrG16CMGBa9/TMULpIg1qHTM1hqGozXDC6RtXESfwuPTTV6k01jxAyCM16f79Yu7uu6x5I1k2ZZCONzZ7VNl0=
+	t=1774778124; cv=none; b=pWT24fyDiRlI28UzRW0gwmjgvQfA0Scgc0MLiNVXy97utjLZWPp1h1Pokz2YGK60pB7Hnud85q1nVzBx5igSdJem80B02/jZuG95Z3IPpR2cRHYG9guWt1poIEl7dIR9M6yFl+SJL8XKT2lc/0mktEcOK1oSb2acx0veSp7eGY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774777255; c=relaxed/simple;
-	bh=X7sbKucCbl/JqdxspMjRfR/zWWx+5M7lhl/MNi5tH3I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TkW+H7wtpq0Mgrpy1UIYD87PT1BJRmwMpCFjErikweZDYIg46mMRfAka7WGff3zkl/BNcqvfsOYFu9sjHFEoN2XNKySEEGR6e4LSUm56NzWFpsu9208xTc6A4G9LsuOxhRrPjOirZu/15JYlA25QURq0p2OkKi51E9Rn1uT28ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Jc2Py1MS; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=VedDf6KjO7+dUX4YVKgtrHVL8jRFgWiX8TrdhyAcPls=; b=Jc2Py1MS/550Vpu9IWtlooDX44
-	a0y5FYBt2WATmyZfNO92STW5xUTWe20esS0KQaitLEMVxE5zzvgpVCe+rGXRGf0nKgcKhnzpfVP/8
-	HB0uIISrxjcnHVgMQgzk35Xa5LhZ7AVOgkHHiXLWa6PR3MI3d8M60nBpUUUnsM1nLJVlSxTcunyaC
-	UvIW3GzBYgDtz87l1RA6s7K/U0JZjT/3yGHKm8hfd8cfCFOEyeZgAMmq8O+zKeDpSXU87fZR3V4IF
-	33/hmTlexM7N21VguQNH6cZXzpB+RcuGNjg8QNUS86npk/fjLmlUkbf0Nd77xQKRd1QkY0BOI2BdZ
-	//cPxMQg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49578)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w6mdT-000000007qA-0Mle;
-	Sun, 29 Mar 2026 10:40:47 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w6mdP-000000001cj-2hQZ;
-	Sun, 29 Mar 2026 10:40:43 +0100
-Date: Sun, 29 Mar 2026 10:40:43 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	Ong Boon Leong <boon.leong.ong@intel.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 01/10] net: stmmac: fix TSO support when some
- channels have TBS available
-Message-ID: <acjzmxY9xmBInSwm@shell.armlinux.org.uk>
-References: <achJ1dfeT6Q8rBuX@shell.armlinux.org.uk>
- <E1w6bKj-0000000ELtf-3md9@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1774778124; c=relaxed/simple;
+	bh=XrsR9qx45NC4IWVRp22mz2up1Qtx5aeK6S8BgAQv43Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=oNEbLkzUUNCvMvi/1Z8E448wscBe0dbbkLbHh5AySgJ+vowDwuGJDNSS2EsqIjh4dHMX5debaPmSTNhOuONS2wRxkvFyLxiGmXJIWHkN+6CPCHg9h9CTTJkxoIsdhjVkYRyikqN36+/1MkXCjbvWK98UUBE7FMSPkiwVs/tfNLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=13.75.44.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app3 (Coremail) with SMTP id ywmowADHAJjt9shpLzIsAA--.35468S3;
+	Sun, 29 Mar 2026 17:54:54 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: security@kernel.org
+Cc: dhowells@redhat.com,
+	marc.dionne@auristor.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	enjou1224z@gmail.com,
+	xuyuqiabc@gmail.com,
+	n05ec@lzu.edu.cn,
+	linux-afs@lists.infradead.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/1] rxrpc: reject undecryptable rxkad response tickets
+Date: Sun, 29 Mar 2026 17:54:52 +0800
+Message-ID: <32271ec25eae3d23aae2450ab864f37e9d475e24.1774627789.git.xuyuqiabc@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1774627789.git.xuyuqiabc@gmail.com>
+References: <cover.1774627789.git.xuyuqiabc@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1w6bKj-0000000ELtf-3md9@rmk-PC.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ywmowADHAJjt9shpLzIsAA--.35468S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7CF4xZrW7CrWxGr1xCw1kuFg_yoW8Zryrpr
+	ZIkrZ3J3s5Jw17Ca1rAr9agFyUtFWUGF13G3ykGr40van7Xr48ZanIqF4jqr1DJFWFkFW5
+	AF4j9F1rt3ZxuFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
+	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
+	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
+	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_GFv_Wrylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
+	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRMXdjDUUUU
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQMBCWnH+XsGOgAAsa
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272868-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.688];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272869-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,auristor.com,davemloft.net,google.com,kernel.org,gmail.com,lzu.edu.cn,lists.infradead.org,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: A4FB93516B3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8AA923517C2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Mar 28, 2026 at 09:36:41PM +0000, Russell King (Oracle) wrote:
-> According to the STM32MP25xx manual, which is dwmac v5.3, TBS (time
-> based scheduling) is not permitted for channels which have hardware
-> TSO enabled. Intel's commit 5e6038b88a57 ("net: stmmac: fix TSO and
-> TBS feature enabling during driver open") concurs with this, but it
-> is incomplete.
-> 
-> This commit avoids enabling TSO support on the channels which have
-> TBS available, which, as far as the hardware is concerned, means we
-> do not set the TSE bit in the DMA channel's transmit control register.
-> 
-> However, the net device's features apply to all queues(channels), which
-> means these channels may still be handed TSO skbs to transmit, and the
-> driver will pass them to stmmac_tso_xmit(). This will generate the
-> descriptors for TSO, even though the channel has the TSE bit clear.
-> 
-> Fix this by checking whether the queue(channel) has TBS available,
-> and if it does, fall back to software GSO support.
+From: Yuqi Xu <xuyuqiabc@gmail.com>
 
-This is sufficient for the immediate issue of fixing the patch below,
-but I think there's another issue that also needs fixing here.
+rxkad_decrypt_ticket() decrypts the RXKAD response ticket and then
+parses the buffer as plaintext without checking whether
+crypto_skcipher_decrypt() succeeded.
 
-TSO requires the hardware to support checksum offload, and there is
-a comment in the driver:
+A malformed RESPONSE can therefore use a non-block-aligned ticket
+length, make the decrypt operation fail, and still drive the ticket
+parser with attacker-controlled bytes.
 
-        /* DWMAC IPs can be synthesized to support tx coe only for a few tx
-         * queues. In that case, checksum offloading for those queues that don't
-         * support tx coe needs to fallback to software checksum calculation.
-         *
-         * Packets that won't trigger the COE e.g. most DSA-tagged packets will
-         * also have to be checksummed in software.
-         */
+Check the decrypt result and abort the connection with RXKADBADTICKET
+when ticket decryption fails.
 
-So, it seems at the very least we need to add a check (in a subsequent
-patch) for priv->plat->tx_queues_cfg[queue].coe_unsupported to
-stmmac_channel_tso_permitted().
+Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by userspace and kernel both")
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Ren Wei <enjou1224z@gmail.com>
+Signed-off-by: Yuqi Xu <xuyuqiabc@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+---
+ net/rxrpc/rxkad.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-I'm also wondering about the stmmac_has_ip_ethertype() thing, which
-checks whether the skb can be checksummed by the hardware, and how that
-interacts with TSO, and whether that's yet another hole that needs
-plugging.
-
+diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
+index e923d6829008..0f79d694cb08 100644
+--- a/net/rxrpc/rxkad.c
++++ b/net/rxrpc/rxkad.c
+@@ -958,6 +958,7 @@ static int rxkad_decrypt_ticket(struct rxrpc_connection *conn,
+ 	struct in_addr addr;
+ 	unsigned int life;
+ 	time64_t issue, now;
++	int ret;
+ 	bool little_endian;
+ 	u8 *p, *q, *name, *end;
+ 
+@@ -977,8 +978,11 @@ static int rxkad_decrypt_ticket(struct rxrpc_connection *conn,
+ 	sg_init_one(&sg[0], ticket, ticket_len);
+ 	skcipher_request_set_callback(req, 0, NULL, NULL);
+ 	skcipher_request_set_crypt(req, sg, sg, ticket_len, iv.x);
+-	crypto_skcipher_decrypt(req);
++	ret = crypto_skcipher_decrypt(req);
+ 	skcipher_request_free(req);
++	if (ret < 0)
++		return rxrpc_abort_conn(conn, skb, RXKADBADTICKET, -EPROTO,
++					rxkad_abort_resp_tkt_short);
+ 
+ 	p = ticket;
+ 	end = p + ticket_len;
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.52.0
+
 
