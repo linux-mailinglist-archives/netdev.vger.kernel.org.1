@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-273000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273001-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UFPVLB6EyWndygUAu9opvQ
-	(envelope-from <netdev+bounces-273000-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:57:18 +0200
+	id +GtoGvKEyWndygUAu9opvQ
+	(envelope-from <netdev+bounces-273001-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:00:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71EF8353DD9
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:57:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7B55353E36
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:00:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F1A9D30162A3
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 19:56:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 46F8430579C1
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 19:56:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EAF389E08;
-	Sun, 29 Mar 2026 19:56:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0388387596;
+	Sun, 29 Mar 2026 19:56:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjsh19Gx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h14tJnyb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF72A38910E;
-	Sun, 29 Mar 2026 19:56:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B2A387353;
+	Sun, 29 Mar 2026 19:56:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774814195; cv=none; b=gZVSdmKzjXwYppgcj7O0/WYnU/Vt3orYAmaop4N/2xvaUbQyFQprDMDMtltlLtmD/bb3DWcT7Gr2rfDVO7Vqwd6wZ4RcA3GXYJQaAcLnLrl3vZB4+4DvIwRDR+kgK0Tss8ZeNpJkm5bl1moGOdWq/HebAz/ANTInJruI6OKcd90=
+	t=1774814199; cv=none; b=mRsFHqIHFITwCIRcH+g3sQKRXadS7WaicYXzL2AlL6lGlTZfFOmKf27hhahFAm7z+sAD5HPamtYK9fRaO7mdrIs8upU0p1fxNogkqyJFl3FdAo3q4ogIZ7+/24Px4vNTV+B7UNNJ+3JC9MESGuqiQD4GCu7jidT2xhM+YBgIbXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774814195; c=relaxed/simple;
-	bh=MK+ePEwES/dgegXojx7V/J1MPYRFj5607DJ7n5NwjTU=;
+	s=arc-20240116; t=1774814199; c=relaxed/simple;
+	bh=i4/P7pFEfR2+rqJMHJC+jawntlN2Aq6fboGP5XMGlB0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mPmar9asKlnpLVnt5Wh6gmsk21CWPtmc9mXsH3bUTjUFOuFm0gFHPs2zbkWKzAee/MuVb9FTXLajYa1hgqFpusWver0Ae9pZRJqgTSmvxbibptOCLHl5KobpeyoaOkT7nsnCmib62Od73E33ji7qQz47HqYJJZ+k5gJNu18JSag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jjsh19Gx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E591C116C6;
-	Sun, 29 Mar 2026 19:56:34 +0000 (UTC)
+	 MIME-Version; b=BK0Vrr+/iXxy3RTvmBj/upD2c0S5MSYzP/crgP6M4YuaJzmfQElOGYBK+FqU2zYblI69/z1/tkC33P2vetFOa1QelCYLpgsvJMCvwpogB65ypAi8clPeBnlny7G4MEcPRIdsgON+Y0dYxf4A+t2P/PI3gL/NuiQzexRoNiTGC/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h14tJnyb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E996C116C6;
+	Sun, 29 Mar 2026 19:56:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774814195;
-	bh=MK+ePEwES/dgegXojx7V/J1MPYRFj5607DJ7n5NwjTU=;
+	s=k20201202; t=1774814197;
+	bh=i4/P7pFEfR2+rqJMHJC+jawntlN2Aq6fboGP5XMGlB0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jjsh19Gx5HWF3UcVJNBXgAJb9/JnB3g2mXjzVlyFPnUqsKZ9A8QyqyPgLIFdrzORV
-	 Kx0PGJGUhS3QjO16PQIpEZuOyuNNgiTeIa74QQoMnQFtYSth8W5OKKmKhoOAfDvIFy
-	 IeqnfGnAiAMkySEPxgtbG7kKJIXiyjprt3EtlaiCL0TfNi7++w0vPICCw6M3bFdPS5
-	 KTcM8wiYKoluqZkD8YmQOHxn75tXHIYc07gOADZdv4DsRb0Nlmgc/Hi6bx/bIqDYsH
-	 QAy1RKyyHCOrhDNChIKb6OgywWgUWAFAjCqiggKDGijEquPrppDR6/bngRZ75SFwiv
-	 tVC8SK4ZLnZ5g==
+	b=h14tJnybuUa0fwOiiKcgUn2eKZojJTXWkkntQOAcvDEfJ/RZLQWZ0fl8K6c09nKUV
+	 lZqNq2MdLmhjCBdoMMzlk8yu5U6PBH0f3iJKBUR46pxNYj5c6PGoc0B8IFlU8YaJP6
+	 a5SQBlv36FpgrAwNo5kXq/MreYK3juuFSTsnBzJ9fpSXuOOwbkYwUh45ysbyDgw/N5
+	 R797uZD9IK1TUBXppEd+KuLZTEcUDLCpqwvSPy2vnJzw3fy+FACFUsLCc9V7qORisd
+	 HSpFT4Gb1Pr3lTjHfoZ8mnNo952FgpQSDa8Wk32ka9LwlYNBSLkRSl2yZLbYwTcogA
+	 w0KCSZK/WepaQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: jensemil.schulzostergaard@microchip.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -64,12 +64,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v2 6/9] net: dsa: lan9645x: add vlan support
-Date: Sun, 29 Mar 2026 12:56:33 -0700
-Message-ID: <20260329195633.2789187-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2 7/9] net: dsa: lan9645x: add mac table integration
+Date: Sun, 29 Mar 2026 12:56:35 -0700
+Message-ID: <20260329195635.2789227-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260324-dsa_lan9645x_switch_driver_base-v2-6-f7504e3b0681@microchip.com>
-References: <20260324-dsa_lan9645x_switch_driver_base-v2-6-f7504e3b0681@microchip.com>
+In-Reply-To: <20260324-dsa_lan9645x_switch_driver_base-v2-7-f7504e3b0681@microchip.com>
+References: <20260324-dsa_lan9645x_switch_driver_base-v2-7-f7504e3b0681@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,14 +84,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-273000-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273001-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -104,180 +104,211 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 71EF8353DD9
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B7B55353E36
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: dsa: lan9645x: add vlan support
+net: dsa: lan9645x: add mac table integration
 
-Add support for vlanaware bridge. We reserve vid 4095 for standalone
-mode, to implement fdb-isolation. A vlan-unaware bridge uses vid 0.
+Add MAC table support, and dsa fdb callback integration. The mactable is
+keyed on (vid,mac) and each bucket has 4 slots. A mac table entry typically
+points to a PGID index, the first 9 of which represent a front port.
 
+> diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_mac.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_mac.c
+> index 000000000000..6335714dca21
+> --- /dev/null
+> +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_mac.c
+[ ... ]
+> +int lan9645x_mact_entry_add(struct lan9645x *lan9645x, int pgid,
+> +			    const unsigned char *mac, u16 vid)
+> +{
+> +	struct lan9645x_mact_entry *entry;
+> +	int err;
+> +
+> +	mutex_lock(&lan9645x->mact_lock);
+> +
+> +	/* Users can not move (vid,mac) to a different port, without removing
+> +	 * the original entry first. But we overwrite entry in HW, and update
+> +	 * software pgid for good measure.
+> +	 */
+> +	entry = lan9645x_mact_entry_find(lan9645x, mac, vid);
+> +	if (entry) {
+> +		entry->common.pgid = pgid;
+> +		goto mac_learn;
+> +	}
+> +
+> +	entry = lan9645x_mact_entry_alloc(lan9645x, mac, vid, pgid,
+> +					  ENTRYTYPE_LOCKED);
+> +	if (!entry) {
+> +		mutex_unlock(&lan9645x->mact_lock);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	list_add_tail(&entry->list, &lan9645x->mac_entries);
+> +
+> +mac_learn:
+> +	err = __lan9645x_mact_learn(lan9645x, pgid, mac, vid, ENTRYTYPE_LOCKED);
+> +	if (err)
+> +		lan9645x_mact_entry_dealloc(lan9645x, entry);
+
+If a pre-existing entry is updated but the hardware learning command fails,
+will this inadvertently delete the valid software entry and cause the hardware
+and software tracking to become desynchronized?
+
+> +
+> +	mutex_unlock(&lan9645x->mact_lock);
+> +	return err;
+> +}
+> +
+> +int lan9645x_mact_entry_del(struct lan9645x *lan9645x, int pgid,
+> +			    const unsigned char *mac, u16 vid)
+> +{
+> +	struct lan9645x_mact_entry *entry;
+> +	int err;
+> +
+> +	mutex_lock(&lan9645x->mact_lock);
+> +
+> +	entry = lan9645x_mact_entry_find(lan9645x, mac, vid);
+> +	if (!entry) {
+> +		mutex_unlock(&lan9645x->mact_lock);
+> +		return -ENOENT;
+> +	}
+> +
+> +	WARN_ON(entry->common.pgid != pgid);
+> +	lan9645x_mact_entry_dealloc(lan9645x, entry);
+> +	err = __lan9645x_mact_forget(lan9645x, mac, vid, ENTRYTYPE_LOCKED);
+
+Does this permanently remove the software entry even if the hardware
+command to forget the entry fails?
+
+> +
+> +	mutex_unlock(&lan9645x->mact_lock);
+> +	return err;
+> +}
+[ ... ]
+> +void lan9645x_mac_deinit(struct lan9645x *lan9645x)
+> +{
+> +	mutex_destroy(&lan9645x->mact_lock);
+> +}
+
+Are the static MAC entries in the mac_entries list leaked here during driver
+teardown, or are they freed elsewhere?
+
+> +
+> +int lan9645x_mact_dsa_dump(struct lan9645x *lan9645x, int port,
+> +			   dsa_fdb_dump_cb_t *cb, void *data)
+> +{
+> +	struct lan9645x_mact_entry entry = {};
+> +	u32 mach, macl, maca;
+> +	int err = 0;
+> +	u32 autoage;
+[ ... ]
+> +	while (1) {
+> +		/* NOTE: we rely on mach, macl and type being set correctly in
+> +		 * the registers from previous round, vis a vis the GET_NEXT
+> +		 * semantics, so locking entire loop is important.
+> +		 */
+> +		lan_wr(ANA_MACACCESS_MAC_TABLE_CMD_SET(CMD_GET_NEXT) |
+> +		       ANA_MACACCESS_ENTRYTYPE_SET(entry.common.type),
+> +		       lan9645x, ANA_MACACCESS);
+> +
+> +		if (lan9645x_mac_wait_for_completion(lan9645x, &maca))
+> +			break;
+
+If the hardware completion times out, the loop breaks out and returns the
+local err variable which is initialized to 0. Will this suppress the hardware
+timeout error code and incorrectly report a successful dump?
+
+> +
+> +		if (ANA_MACACCESS_VALID_GET(maca) == 0)
+> +			break;
+> +
+> +		mach = lan_rd(lan9645x, ANA_MACHDATA);
+> +		macl = lan_rd(lan9645x, ANA_MACLDATA);
+> +
+> +		lan9645x_mact_parse(mach, macl, maca, &entry.common);
+> +
+> +		if (ANA_MACACCESS_DEST_IDX_GET(maca) == port &&
+> +		    entry.common.type == ENTRYTYPE_NORMAL) {
+
+Since static FDB entries are programmed with ENTRYTYPE_LOCKED, will this
+condition exclude them from the FDB dump, preventing them from showing up
+during bridge FDB queries?
+
+> +			if (entry.common.key.vid > VLAN_MAX)
+> +				entry.common.key.vid = 0;
+> +
+> +			err = cb(entry.common.key.mac, entry.common.key.vid,
+> +				 false, data);
+> +			if (err)
+> +				break;
+> +		}
+> +	}
+> +
+> +	/* Remove aging filters and restore aging */
+> +	lan_wr(0, lan9645x, ANA_ANAGEFIL);
+> +	lan_rmw(ANA_AUTOAGE_AGE_PERIOD_SET(ANA_AUTOAGE_AGE_PERIOD_GET(autoage)),
+> +		ANA_AUTOAGE_AGE_PERIOD,
+> +		lan9645x, ANA_AUTOAGE);
+
+Does restoring the ANA_AUTOAGE register using the autoage value saved at the
+start of the function race with other operations setting the aging time?
+
+If the aging time is updated concurrently without taking mact_lock, its newly
+configured aging period might be overwritten here.
+
+> +
+> +	mutex_unlock(&lan9645x->mact_lock);
+> +
+> +	return err;
+> +}
 > diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-> index 599e589c4ec3..046c95a72242 100644
+> index 046c95a72242..32c0301030a4 100644
 > --- a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
 > +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
 [ ... ]
-> @@ -535,11 +536,54 @@ static void lan9645x_port_bridge_leave(struct dsa_switch *ds, int port,
-[ ... ]
-> +static int lan9645x_port_vlan_filtering(struct dsa_switch *ds, int port,
-> +					bool enabled,
-> +					struct netlink_ext_ack *extack)
+> +static int lan9645x_fdb_del(struct dsa_switch *ds, int port,
+> +			    const unsigned char *addr, u16 vid,
+> +			    struct dsa_db db)
 > +{
+> +	struct net_device *br = lan9645x_db2bridge(db);
+> +	struct dsa_port *dp = dsa_to_port(ds, port);
 > +	struct lan9645x *lan9645x = ds->priv;
-> +	struct lan9645x_port *p;
+> +	int err;
 > +
-> +	p = lan9645x_to_port(lan9645x, port);
-> +	p->vlan_aware = enabled;
-> +	lan9645x_vlan_port_apply(p);
-
-In other places, the driver avoids calling egress functions on the npi
-port because it conflicts with cpu port header extraction. Since this
-unconditionally applies the vlan configuration to both ingress and egress,
-could this overwrite the npi port's configuration when the state is
-synchronized?
-
+> +	if (IS_ERR(br))
+> +		return PTR_ERR(br);
 > +
-> +	return 0;
-> +}
-> +
-> +static int lan9645x_port_vlan_add(struct dsa_switch *ds, int port,
-[ ... ]
-> diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_vlan.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_vlan.c
-> new file mode 100644
-> index 000000000000..0459932a626c
-> --- /dev/null
-> +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_vlan.c
-[ ... ]
-> +static void lan9645x_vlan_hw_wr(struct lan9645x *lan9645x, u16 vid)
-> +{
-> +	struct lan9645x_vlan *v = &lan9645x->vlans[vid];
-> +	bool cpu_dis = !(v->portmask & BIT(CPU_PORT));
-> +	u32 val;
-> +
-> +	val = ANA_VLANTIDX_VLAN_PGID_CPU_DIS_SET(cpu_dis) |
-> +	      ANA_VLANTIDX_V_INDEX_SET(vid) |
-> +	      ANA_VLANTIDX_VLAN_SEC_FWD_ENA_SET(v->s_fwd_ena) |
-> +	      ANA_VLANTIDX_VLAN_FLOOD_DIS_SET(v->fld_dis) |
-> +	      ANA_VLANTIDX_VLAN_PRIV_VLAN_SET(v->prv_vlan) |
-> +	      ANA_VLANTIDX_VLAN_LEARN_DISABLED_SET(v->lrn_dis) |
-> +	      ANA_VLANTIDX_VLAN_MIRROR_SET(v->mir) |
-> +	      ANA_VLANTIDX_VLAN_SRC_CHK_SET(v->src_chk);
-> +
-> +	lan_wr(val, lan9645x, ANA_VLANTIDX);
-> +	lan_wr(v->portmask, lan9645x, ANA_VLAN_PORT_MASK);
-> +	lan_wr(VLANACCESS_CMD_WRITE, lan9645x, ANA_VLANACCESS);
-
-Are these registers written with raw values rather than using their respective
-set macros? This circumvents the register abstraction and might risk failures
-if the hardware layout changes.
-
-> +
-> +	if (lan9645x_vlan_wait_for_completion(lan9645x))
-> +		dev_err(lan9645x->dev, "Vlan set mask failed\n");
-> +}
-[ ... ]
-> +static void
-> +lan9645x_vlan_port_apply_egress(struct lan9645x_port *p,
-> +				struct lan9645x_vlan_port_info *info)
-> +{
-[ ... ]
-> +	lan_rmw(REW_TAG_CFG_TAG_TPID_CFG_SET(3) |
-> +		REW_TAG_CFG_TAG_CFG_SET(tag_cfg),
-> +		REW_TAG_CFG_TAG_TPID_CFG |
-> +		REW_TAG_CFG_TAG_CFG,
-> +		lan9645x, REW_TAG_CFG(p->chip_port));
-> +
-> +	lan_rmw(REW_PORT_VLAN_CFG_PORT_TPID_SET(ETH_P_8021AD) |
-> +		REW_PORT_VLAN_CFG_PORT_VID_SET(port_vid),
-> +		REW_PORT_VLAN_CFG_PORT_TPID |
-> +		REW_PORT_VLAN_CFG_PORT_VID,
-> +		lan9645x, REW_PORT_VLAN_CFG(p->chip_port));
-> +}
-
-Setting the port tpid to 0x88a8 causes untagged ingress frames to egress trunk
-ports with 802.1ad tags. Could this break interoperability with standard
-networks that expect 0x8100 tags?
-
-> +static void lan9645x_vlan_port_apply_ingress(struct lan9645x_port *p)
-> +{
-[ ... ]
-> +	/* Drop frames with multicast source address */
-> +	val = ANA_DROP_CFG_DROP_MC_SMAC_ENA_SET(1);
-> +	if (p->vlan_aware && !pvid)
-> +		/* If port is vlan-aware and tagged, drop untagged and priority
-> +		 * tagged frames.
-> +		 */
-> +		val |= ANA_DROP_CFG_DROP_UNTAGGED_ENA_SET(1) |
-> +		       ANA_DROP_CFG_DROP_PRIO_S_TAGGED_ENA_SET(1) |
-> +		       ANA_DROP_CFG_DROP_PRIO_C_TAGGED_ENA_SET(1);
-> +
-> +	lan_wr(val, lan9645x, ANA_DROP_CFG(p->chip_port));
-> +}
-
-Does this overwrite the entire 32-bit register and silently clear other
-initialized bitfields? Would it be safer to use a read-modify-write here
-instead?
-
-[ ... ]
-> +static int lan9645x_vlan_cpu_add(struct lan9645x_port *p, u16 vid, bool pvid,
-> +				 bool untagged)
-> +{
-> +	struct lan9645x_vlan *v;
-> +
-> +	v = lan9645x_vlan_port_modify(p, vid, pvid, untagged);
-
-Is it intentional that this bypasses the bounds check on the vlan id?
-
-> +	v->portmask |= BIT(CPU_PORT) | BIT(p->chip_port);
-> +	lan9645x_vlan_hw_wr(p->lan9645x, vid);
-> +	lan9645x_vlan_port_apply_ingress(p);
-> +
-> +	return 0;
-> +}
-> +
-> +int lan9645x_vlan_port_add_vlan(struct lan9645x_port *p, u16 vid, bool pvid,
-> +				bool untagged, struct netlink_ext_ack *extack)
-> +{
-[ ... ]
-> +void lan9645x_vlan_port_del_vlan(struct lan9645x_port *p, u16 vid)
-> +{
-> +	struct lan9645x *lan9645x = p->lan9645x;
-> +	struct lan9645x_vlan *v;
+> +	if (dsa_port_is_cpu(dp) && !br &&
+> +	    dsa_fdb_present_in_other_db(ds, port, addr, vid, db))
+> +		return 0;
 > +
 > +	if (!vid)
-> +		return;
+> +		vid = lan9645x_vlan_unaware_pvid(!!br);
 > +
-> +	v = lan9645x_vlan_port_modify(p, vid, false, false);
-
-There is a check for the maximum vlan id when adding a vlan, but no bounds
-check when deleting one. Could userspace use this to delete the reserved
-vid 4095 and break standalone forwarding?
-
-> +	v->portmask &= ~BIT(p->chip_port);
+> +	if (dsa_port_is_cpu(dp))
+> +		return lan9645x_mact_forget(lan9645x, addr, vid,
+> +					    ENTRYTYPE_LOCKED);
 > +
-> +	if (p->chip_port == lan9645x->npi)
-> +		v->portmask &= ~BIT(CPU_PORT);
+> +	err = lan9645x_mact_entry_del(lan9645x, port, addr, vid);
+> +	if (err == -ENOENT) {
+> +		dev_dbg(lan9645x->dev,
+> +			"fdb not found port=%d addr=%pM vid=%u\n", port, addr,
+> +			vid);
+> +		return 0;
+> +	}
 > +
-> +	lan9645x_vlan_hw_wr(lan9645x, vid);
-[ ... ]
-> +void lan9645x_vlan_init(struct lan9645x *lan9645x)
-> +{
-[ ... ]
-> +	for (vid = 1; vid < VLAN_N_VID; vid++)
-> +		lan9645x_vlan_hw_wr(lan9645x, vid);
+> +	return err;
+> +}
 
-If the indirect table access times out, the write function prints an error
-but does not return a status code. Will this cause the initialization loop
-to stall for the full timeout duration 4095 consecutive times if the
-hardware is unresponsive?
-
-> +
-> +	/* Set all the ports + cpu to be part of HOST_PVID and UNAWARE_PVID */
-> +	lan9645x->vlans[HOST_PVID].portmask = all_ports;
+Since lan9645x_mact_entry_del returns -ENOENT when a MAC address is not found
+in the software tracking list, and the software list only contains statically
+added entries, won't this intercept attempts to manually delete dynamically
+learned MAC addresses and return success without actually removing them from
+the hardware table?
 
