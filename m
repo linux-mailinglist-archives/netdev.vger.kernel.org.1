@@ -1,192 +1,213 @@
-Return-Path: <netdev+bounces-273013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273014-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MJ9KMfWNyWm1zAUAu9opvQ
-	(envelope-from <netdev+bounces-273013-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:39:17 +0200
+	id IFbJASiOyWm1zAUAu9opvQ
+	(envelope-from <netdev+bounces-273014-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:40:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A32C354050
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:39:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 639AF354075
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:40:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D1BD4304D71D
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 20:35:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D48FE30086E7
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 20:37:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8943D35F197;
-	Sun, 29 Mar 2026 20:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BFC3815F9;
+	Sun, 29 Mar 2026 20:37:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uW21tUvs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B0/S4hRI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D121EF36E;
-	Sun, 29 Mar 2026 20:35:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03B12475CB;
+	Sun, 29 Mar 2026 20:37:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774816517; cv=none; b=ikdJbGgX+ArCOEkK7LZOGMPXDEOcZYAdhTESuCQowpIRY3WCWABSCoy4R7iLgXlJQC4hEhsiZww3UezUzBGlq91c+MNtx9jb5QBF6QmcFXNHXUrgaoajDuqSIz7a5r7Lz5OJGCsiAvdAlpPVg2baBUvcfRL98NZ1+k8fmSt4Qcs=
+	t=1774816676; cv=none; b=QqfL3xeORSGdI8DKo2XX5FMzOdRD3p3+/3rHKKGXa/w6H29DW+iYnYRyAkMENtMWs++ab3sChfVbzmB9BI9Mh+4UxnOLaQ8j0zCmhs+YrNAyHPZdQAbpKJcLec6iBv8GsqfEl7lxgdfJDb3rDQ371bw/hoRV9ZJANdWWfOL/HmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774816517; c=relaxed/simple;
-	bh=VGwNR6sz5MSPMcw8TPumnldbdd9XU/HxE2Wx7OPTeGQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UkDHjk94JJGP0k6PRocHmeBGEjV+TOhvcS18ZnqppCp1rhn0jEPhCjRAcQo74WGwnEpn6Gas4Ei5H0dCFnxPU84Ljq+ItM94BxoGO4X91UXk0oCTm2x3Ww1UYziVMnnRLTudG0tCjVWjEY+mfgIExMTeB15mWkYlrHuqs9xq+c8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uW21tUvs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69548C116C6;
-	Sun, 29 Mar 2026 20:35:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774816517;
-	bh=VGwNR6sz5MSPMcw8TPumnldbdd9XU/HxE2Wx7OPTeGQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uW21tUvsVfUret2vm/UP9IFsLkZcX9iLr6rhvkIWtpMd9UfY2JTWcHb1cTxKtjpW9
-	 vNVauw8wA9wc1iYZRG94M3cdGo+ZSGNMLYT2i0w+QM3RVBeWE9xzJxI+8nJ9rfLRW+
-	 G7b7b0hDU6+tfGOvQuMBVLmFaHwdMmZyj5ev1QFYqQo+Wg2U94l+LB1mwyir6dlNI9
-	 3aYRO2UtPvr9uYh6Zqdkoxy2f6+fgISPanP16oDCqbqqsywwKxmBx6d3S/hdwOHp6x
-	 PBSnwkxQfiRadm7qAPDdGQBUiuLUSH+CaziM5rHPOeEAqmmXv/L+rnlMVWI0FRxxOC
-	 fPdfAz8oJgRCg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: lixiasong1@huawei.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	alibuda@linux.alibaba.com,
-	dust.li@linux.alibaba.com,
-	sidraya@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	mjambigi@linux.ibm.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yuehaibing@huawei.com,
-	zhangchangzhong@huawei.com,
-	weiyongjun1@huawei.com
-Subject: Re: [PATCH net 2/2] net/smc: fix potential UAF in smc_pnet_add_ib for smcd device
-Date: Sun, 29 Mar 2026 13:35:06 -0700
-Message-ID: <20260329203506.2816841-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260325110352.3833570-3-lixiasong1@huawei.com>
-References: <20260325110352.3833570-3-lixiasong1@huawei.com>
+	s=arc-20240116; t=1774816676; c=relaxed/simple;
+	bh=aigITbTVLfuJBr/qVXIS60k4FHN1WCz0am2GEPJu+Fc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LdUj75fQ0a/9KwaP2p/f/Md0IclZVNPWkR0IpCrnWzHG3LHcSJC7wEujF1ndwo7Dlii3tER8ihRtotNOxJlezFc29bU2KQmAnkjebRDt/uWwH7zU6xMNK6dome0dK9agsqVs5EOclCkaZgXhhErvjq8s3N9fZ2J48Qxs0P9eiqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B0/S4hRI; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774816674; x=1806352674;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=aigITbTVLfuJBr/qVXIS60k4FHN1WCz0am2GEPJu+Fc=;
+  b=B0/S4hRIQKcRgxDSjIEb6PqyRQc5oyhoF1EmzWhKN2E+NNt1bzyv0F0y
+   UVl6/iLApk6qJwk1r6c8VnT9jsGEEk8h/A4a8lfGqPYQWTBMsamtkO0FA
+   4GUXgEImo20WgKjh/G0v6U2h6vUD3DmB2txKpvaITHowPXnWPPK2YB5Eu
+   +piTM6zwXp2H3Y4LaQMANdQTdKv5BqUCtdUAHtk2oBGtDg0BL8QDd+40z
+   91tKveSjP/QVlc+8uYJ3MGviTdh07AXFPXFydXzQXckpKWonVpjgBE7df
+   cNGuyhrZ0SZBhXdb5On29wu18pQiEOJ50lMrVZUWkhQUxSto/24s/SXR/
+   w==;
+X-CSE-ConnectionGUID: bymfKwgRQlygIsbizChE4A==
+X-CSE-MsgGUID: oFEIMaOySc2zSsJdWj3R7g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11743"; a="101270367"
+X-IronPort-AV: E=Sophos;i="6.23,148,1770624000"; 
+   d="scan'208";a="101270367"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2026 13:37:54 -0700
+X-CSE-ConnectionGUID: oaAaCG26SzS+JV5fgg6dBw==
+X-CSE-MsgGUID: IHGeZN2OQoyAjWTle4KBOw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,148,1770624000"; 
+   d="scan'208";a="225865642"
+Received: from lkp-server01.sh.intel.com (HELO 283bf2e1b94a) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 29 Mar 2026 13:37:51 -0700
+Received: from kbuild by 283bf2e1b94a with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w6wtI-0000000009N-1iRH;
+	Sun, 29 Mar 2026 20:37:48 +0000
+Date: Mon, 30 Mar 2026 04:36:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: Michael Dege <michael.dege@renesas.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Michael Dege <michael.dege@renesas.com>
+Subject: Re: [PATCH net-next v2 13/13] net: renesas: rswitch: add vlan aware
+ switching
+Message-ID: <202603300436.ryIgiB0z-lkp@intel.com>
+References: <20260327-rswitch_add_vlans-v2-13-d7f4358ca57a@renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260327-rswitch_add_vlans-v2-13-d7f4358ca57a@renesas.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273013-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273014-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[20];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4A32C354050
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,01.org:url]
+X-Rspamd-Queue-Id: 639AF354075
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net/smc: fix potential UAF in smc_pnet_add_ib for smcd device
+Hi Michael,
 
-This commit fixes a potential use-after-free when accessing an smcd device
-in smc_pnet_add_ib(). It resolves the issue by combining the lookup and
-apply operations into a single function that holds the smcd_dev_list.mutex
-for the duration of both operations.
+kernel test robot noticed the following build errors:
 
-> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
-> index 91c0b1c473b2..a1603740167b 100644
-> --- a/net/smc/smc_pnet.c
-> +++ b/net/smc/smc_pnet.c
+[auto build test ERROR on 1f318b96cc84d7c2ab792fcc0bfd42a7ca890681]
 
-[ ... ]
+url:    https://github.com/intel-lab-lkp/linux/commits/Michael-Dege/net-renesas-rswitch-improve-port-change-mode-functions/20260329-154812
+base:   1f318b96cc84d7c2ab792fcc0bfd42a7ca890681
+patch link:    https://lore.kernel.org/r/20260327-rswitch_add_vlans-v2-13-d7f4358ca57a%40renesas.com
+patch subject: [PATCH net-next v2 13/13] net: renesas: rswitch: add vlan aware switching
+config: arm64-defconfig (https://download.01.org/0day-ci/archive/20260330/202603300436.ryIgiB0z-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260330/202603300436.ryIgiB0z-lkp@intel.com/reproduce)
 
-> @@ -351,23 +357,39 @@ static bool smc_pnet_find_ib_apply(char *ib_name, u8 ib_port, char *pnet_name)
->  }
->  
->  /* Find an smcd device by a given name. The device might not exist. */
-> -static struct smcd_dev *smc_pnet_find_smcd(char *smcd_name)
-> +static struct smcd_dev *__smc_pnet_find_smcd(char *smcd_name)
->  {
->  	struct smcd_dev *smcd_dev;
->  
-> -	mutex_lock(&smcd_dev_list.mutex);
->  	list_for_each_entry(smcd_dev, &smcd_dev_list.list, list) {
->  		if (!strncmp(dev_name(&smcd_dev->dibs->dev), smcd_name,
->  			     IB_DEVICE_NAME_MAX - 1) ||
->  		    (smcd_dev->dibs->dev.parent &&
->  		     !strncmp(dev_name(smcd_dev->dibs->dev.parent), smcd_name,
->  			      IB_DEVICE_NAME_MAX - 1)))
-> -			goto out;
-> +			return smcd_dev;
-> +	}
-> +	return NULL;
-> +}
-> +
-> +/* Find an smcd device by name and apply pnetid under lock. */
-> +static bool smc_pnet_find_smcd_apply(char *smcd_name, char *pnet_name)
-> +{
-> +	struct smcd_dev *smcd_dev;
-> +	bool rc = true;
-> +
-> +	mutex_lock(&smcd_dev_list.mutex);
-> +	smcd_dev = __smc_pnet_find_smcd(smcd_name);
-> +	if (smcd_dev) {
-> +		if (!__smc_pnet_apply_smcd(smcd_dev, pnet_name))
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603300436.ryIgiB0z-lkp@intel.com/
 
-While this prevents the use-after-free in smc_pnet_add_ib() by expanding the
-mutex coverage, does the same vulnerability pattern still exist in the
-connection handshake paths?
+All errors (new ones prefixed by >>):
 
-Neither struct smcd_dev nor struct smc_ib_device appear to use reference
-counting. During a connection handshake, functions like
-smc_pnet_find_ism_resource() and _smc_pnet_find_roce_by_pnetid() find a
-device under the mutex, store the raw pointer (e.g., into ini->ism_dev[0]),
-and immediately release the mutex.
+   aarch64-linux-ld: Unexpected GOT/PLT entries detected!
+   aarch64-linux-ld: Unexpected run-time procedure linkages detected!
+   aarch64-linux-ld: drivers/net/ethernet/renesas/rswitch_l2.o: in function `rswitch_port_obj_do_add_gwca':
+>> drivers/net/ethernet/renesas/rswitch_l2.c:443:(.text+0x11e0): undefined reference to `br_vlan_enabled'
+   aarch64-linux-ld: drivers/net/ethernet/renesas/rswitch_l2.o: in function `rswitch_port_obj_do_add':
+   drivers/net/ethernet/renesas/rswitch_l2.c:412:(.text+0x135c): undefined reference to `br_vlan_enabled'
+>> aarch64-linux-ld: drivers/net/ethernet/renesas/rswitch_l2.c:423:(.text+0x13bc): undefined reference to `br_vlan_enabled'
 
-If a concurrent hot-unplug event triggers smcd_unregister_dev() or
-smc_ib_remove_dev() while the handshake process is accessing the device
-without holding a lock or reference, could it lead to another use-after-free?
 
-Would a more complete fix require introducing reference counting for both
-device structures to ensure they remain valid while pointed to by the
-handshake structures?
+vim +443 drivers/net/ethernet/renesas/rswitch_l2.c
 
-> +			rc = false;
-> +		else
-> +			pr_warn_ratelimited("smc: smcd device %s applied user defined pnetid %.16s\n",
-> +					    dev_name(&smcd_dev->dibs->dev),
-> +					    smcd_dev->pnetid);
->  	}
-> -	smcd_dev = NULL;
-> -out:
->  	mutex_unlock(&smcd_dev_list.mutex);
-> -	return smcd_dev;
-> +	return rc;
->  }
+   402	
+   403	static int rswitch_port_obj_do_add(struct net_device *ndev,
+   404					   struct switchdev_obj_port_vlan *p_vlan)
+   405	{
+   406		struct rswitch_device *rdev = netdev_priv(ndev);
+   407		struct rswitch_private *priv = rdev->priv;
+   408		struct rswitch_etha *etha = rdev->etha;
+   409		int err;
+   410	
+   411		/* Set Rswitch VLAN mode */
+   412		iowrite32(br_vlan_enabled(rdev->brdev) ? FIELD_PREP(FWGC_SVM, C_TAG) : 0,
+   413			  priv->addr + FWGC);
+   414	
+   415		err = rswitch_write_vlan_table(priv, p_vlan->vid, etha->index);
+   416		if (err < 0)
+   417			return err;
+   418	
+   419		/* If the default vlan for this port has been set, don't overwrite it. */
+   420		if (ioread32(etha->addr + EAVCC))
+   421			return NOTIFY_DONE;
+   422	
+ > 423		if (br_vlan_enabled(rdev->brdev))
+   424			rswitch_modify(priv->addr, FWPC0(etha->index), 0, FWPC0_VLANSA | FWPC0_VLANRU);
+   425	
+   426		rswitch_modify(priv->addr, FWPC2(AGENT_INDEX_GWCA),
+   427			       FIELD_PREP(FWPC2_LTWFW, BIT(etha->index)),
+   428			       0);
+   429	
+   430		return rswitch_port_set_vlan_tag(etha, p_vlan, false);
+   431	}
+   432	
+   433	static int rswitch_port_obj_do_add_gwca(struct net_device *ndev,
+   434						struct rswitch_private *priv,
+   435						struct switchdev_obj_port_vlan *p_vlan)
+   436	{
+   437		int err;
+   438	
+   439		if (!(p_vlan->flags & BRIDGE_VLAN_INFO_BRENTRY))
+   440			return NOTIFY_DONE;
+   441	
+   442		/* Set Rswitch VLAN mode */
+ > 443		iowrite32(br_vlan_enabled(ndev) ? FIELD_PREP(FWGC_SVM, C_TAG) : 0, priv->addr + FWGC);
+   444	
+   445		err = rswitch_write_vlan_table(priv, p_vlan->vid, AGENT_INDEX_GWCA);
+   446		if (err < 0)
+   447			return err;
+   448	
+   449		/* If the default vlan for this port has been set, don't overwrite it. */
+   450		if (ioread32(priv->addr + GWVCC))
+   451			return NOTIFY_DONE;
+   452	
+   453		return rswitch_gwca_set_vlan_tag(priv, p_vlan, false);
+   454	}
+   455	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
