@@ -1,167 +1,186 @@
-Return-Path: <netdev+bounces-273004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273006-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OBIlLD+FyWndygUAu9opvQ
-	(envelope-from <netdev+bounces-273004-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:02:07 +0200
+	id aHw1O/yHyWmxywUAu9opvQ
+	(envelope-from <netdev+bounces-273006-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:13:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2995E353E5F
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:02:06 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD164353F09
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:13:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3ED2C30073DA
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 20:02:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B9D633001FB2
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 20:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F34B82D6E44;
-	Sun, 29 Mar 2026 20:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82B1138229B;
+	Sun, 29 Mar 2026 20:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="JekhqfT7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lEepYSvl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CFC257845
-	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 20:02:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605A636C5BD;
+	Sun, 29 Mar 2026 20:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774814521; cv=none; b=lZiItS4Ed2f1hFREyIDzyj9Z/jBnTv0Z6Dquw29niie6GmusATjLS5Nf0aJHjGtoB9D+mnVGwNpxxqcU1fVwaHtD9+E/Zzce1HtBuit7p6qrLYPcOdujsJLCvV6+U6pjdnMPkhsY+tR8XvUFamNbCTV9rix9Smg1YYUPzu7ehaQ=
+	t=1774815222; cv=none; b=QV3V7CzdexrUh67n+PeSLqshtRLaZc6X+ogdaap6gTxdbQDOBATB00RBZc8XwkQt93wz2L8RTETQrFjg3T9Ucgfd0dFJ5W0hWJNuiDZthIqZFL+2u/CoOWPC6k1DldAX+OI68+hEBq3kI4VzOKJZIMKLB1/0JOxBbxC7qmsc/ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774814521; c=relaxed/simple;
-	bh=6KesuHunNm5vzupfH6dWeNmGrojSoSm6OoZ7E509dxI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bxD1j9TyNkJ9gmdDb7mxbauAXGvtU6hgHy9o0SCLNedgPmShE+VoGc64jmeN5u9ty3erMZKhv2Q0U6T/SXpF/STizjIUHR2AUrp9PXPNGCVHe75rGO7nQ/ThCInaiyoUwGjIreX70ZjLWx5x6rRkLezXIsxh1c4NTaAoFSf91kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=JekhqfT7; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b8d7f22d405so584344266b.0
-        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 13:02:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1774814519; x=1775419319; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=W2LBsWL0RCR7A1/NBeRjO1DmOoAWjMff84GLac5q8D4=;
-        b=JekhqfT7S/8S3fOXygO+G3tv8ClmY6WZ+pFZWo0tdyj79q1llTout79e8bAAs3XR7u
-         IP+xpWflJfhHHuQcJjyKb9BribdvSyh2GGym47VzrFgnFWVWzeC1lRCQHEGpakTrGMni
-         Mb41H650xJ9KzGdOLMp83IfqpESMGZEFjULwY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774814519; x=1775419319;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W2LBsWL0RCR7A1/NBeRjO1DmOoAWjMff84GLac5q8D4=;
-        b=aXyw0CuvHTpuSQ/7DR4icfWcFRR0JYXIMwZ85A00urA9fx/G79c0JzUcbl+HWNVW6i
-         6wD8jQeNJls/qqBokLk9xF2bs8Fg8QsBbI6Ito3i0gR4l9bA99WVkXEInh2zlCBbdd77
-         0GTXn7NqFq4UetwtN+86gRa9EXemwLrIANIocX6wE6NIK0Cqg/XMI/l+iF7WZr1sv/tu
-         SpZOMiz0i0khucjs740GbUoihWt5lwB6muVr/avih56YsVCrFbHgK1n8bxBEwFoMsesY
-         xCJ0f/R8l0Et3HRWX1eEsnmU/8vwztyXM4jkBj9zWUSyquDIZsmFKdKQVlbcAdM6PsbF
-         /60w==
-X-Forwarded-Encrypted: i=1; AJvYcCWHMWQAOSHPMZ46OqZGGItHn8909CtZo2KZeZWCJs06WmdfwoEloNXF1sMjFdSnRNgGqg1GtVM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5k+YpMJJMj0mmyvA2OyK2KGrsRdUip0BLHM58BzOUsPjjtyBl
-	drd6l5XKHEh4id+x1nUetxsbQ2W9QMCtwLg6439bdGRj9WYT43U6OK7V+CtGJAMGbz1ANXnns2Q
-	KHaCTH+A=
-X-Gm-Gg: ATEYQzz+SRfRaotT4FLc43EISP/7uVEOEQ8luDrOm9V7uZ8uoi7U+7A3Mc54NhrCRKO
-	a+i/1szRVklr2aEWT5bRuVtRE5Z6CledxlfH70YHskWiumxjUU+nFqe+oPbh5pX2QNl61ZuJPgR
-	irOCbIErbeeZciGjckXnVOny44+yeaLuvm0B75S6Iduxd6P+vm7B2NUdE5/oLvngQqFPLh9Ral8
-	G4uM16UKeAEXUKiRaBz5BdlIMMdufIj878nsBDwHH5vj++iDaDXkyGHi311vF+W39BivfhUSZl1
-	r/cyZKqrJupvE4xXn5wlaFNWqRDUZSWsPvj7bpQzuXVD0llH1Cc4bpQqbAClYbZwT1oilZeCzU8
-	oQMLBt8C/jo+vjVJsmIKYVRS3tgFABbAaf5+Jh0eHjBIjnDPFqpoB6LPoC9Klpf03HC+T5naduh
-	7O6aA5qBfjnSKL8DNOZ7hgXe4NuQTlETJvpwSdYB9+biW5mt6c2Yp8qFLmtzdjMbvr8/VaXKZQ
-X-Received: by 2002:a17:906:ee84:b0:b98:32c1:249b with SMTP id a640c23a62f3a-b9b502bd39amr600540666b.8.1774814518778;
-        Sun, 29 Mar 2026 13:01:58 -0700 (PDT)
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com. [209.85.208.44])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9b7ae520c2sm196952066b.21.2026.03.29.13.01.57
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 29 Mar 2026 13:01:57 -0700 (PDT)
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-66abe08cdf5so5845726a12.0
-        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 13:01:57 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVD3AvwJGPRRW5FfzufK223t2VsnaE/sVemeNJUKJ7vZPMmLppn7Dv+ZJtNAEPCQGMW7C5UsQA=@vger.kernel.org
-X-Received: by 2002:a05:6402:370f:b0:665:638d:75c1 with SMTP id
- 4fb4d7f45d1cf-66b2836522dmr5313873a12.3.1774814517026; Sun, 29 Mar 2026
- 13:01:57 -0700 (PDT)
+	s=arc-20240116; t=1774815222; c=relaxed/simple;
+	bh=SFlOA1qgDGUighbjNOa+k/5ps29jmKNN2EnfDE8Ndy8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BoEMsdIZiMutQ88AKs/lGOrmg0R0hwzzuWVBddxw6ljsYgRNE1YhSHkrAPkGT0wVN+fLrqRN78M5ztbFYpwr5mLYX58wo7wPAB12D0USK01nRcKiq7trXDhjlYZZcmubvXeBvDzNqeBf7X86rM4FYkEbsp3gEHGCxi4KkU4SnKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lEepYSvl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A03F5C116C6;
+	Sun, 29 Mar 2026 20:13:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774815222;
+	bh=SFlOA1qgDGUighbjNOa+k/5ps29jmKNN2EnfDE8Ndy8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=lEepYSvlb6n7LmTJwrXGMovjIPxKw1m2CM1C2EPY6o2JJ9l61gC+EWFw7/JkIZhOL
+	 wiBQTkY641iLzxdLAH2yvFopyO0CGw/bpMaUNgQvrSvQZC1w+l5vI56ZJyx4SZiAtq
+	 as30v28GTL8CbEYp1TbKydCM4A3jEaTWMfoCKgxCOCUvDNBRbgpZJEYYKpnJdXzqYV
+	 jbPjuybeSeIxWghBhrVoeZyNVnSTtvlhbfog8QCKK/1Gb4fB6EAz0A323S1fjC6d4z
+	 SlBUmm8tXclqATKlq8juh8NXhQNckE+Xvh2YAUi4DN4Zm3x63cOKg5lGGT9bcsV+eQ
+	 9vBqqjjxg3anw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: devnull+satishkh.cisco.com@kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	satishkh@cisco.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 4/6] enic: make enic_dev_enable/disable ref-counted
+Date: Sun, 29 Mar 2026 13:13:37 -0700
+Message-ID: <20260329201337.2798745-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260325-enic-sriov-v2-prep-v2-4-f72cf716ebfa@cisco.com>
+References: <20260325-enic-sriov-v2-prep-v2-4-f72cf716ebfa@cisco.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260326131838.634095-1-dhowells@redhat.com> <20260326131838.634095-5-dhowells@redhat.com>
- <20260329121208.6092419d@kernel.org>
-In-Reply-To: <20260329121208.6092419d@kernel.org>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sun, 29 Mar 2026 13:01:40 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiJ6gEELLviexdmSHnyjVoG7MFo8Qwhd1zxs_tCnL-=gQ@mail.gmail.com>
-X-Gm-Features: AQROBzCLNnOtMDq7_zEYzn905-QyT8tE9Dg3ZE8enKPKMkcfb1CkLbH9Xycl1-E
-Message-ID: <CAHk-=wiJ6gEELLviexdmSHnyjVoG7MFo8Qwhd1zxs_tCnL-=gQ@mail.gmail.com>
-Subject: Re: [PATCH net v3 04/11] list: Move on_list_rcu() to list.h and add
- on_list() also
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org, 
-	Marc Dionne <marc.dionne@auristor.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	John Johansen <john.johansen@canonical.com>, Minas Harutyunyan <hminas@synopsys.com>, 
-	Simon Horman <horms@kernel.org>, apparmor@lists.ubuntu.com, linux-usb@vger.kernel.org, 
-	stable@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273004-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[linux-foundation.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux-foundation.org:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273006-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[torvalds@linux-foundation.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev,satishkh.cisco.com];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux-foundation.org:dkim]
-X-Rspamd-Queue-Id: 2995E353E5F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DD164353F09
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, 29 Mar 2026 at 12:12, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> Could someone with sufficient weight to their name ack this?
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+enic: make enic_dev_enable/disable ref-counted
 
-I don't particularly like it. I think the name is too generic, and
-it's all wrong anyway. Whether something is on a list or not ends up
-being much too specific to the use-case, and I do *not* see a huge
-advantage to a helper function that just wraps "list_empty()" with
-another name that is actually *less* descriptive.
+Both the data path (ndo_open/ndo_stop) and the upcoming admin channel
+need to enable and disable the vNIC device independently. Without
+reference counting, closing the admin channel while the netdev is up
+would inadvertently disable the entire device.
 
-So no. NAK.
+[ ... ]
+> diff --git a/drivers/net/ethernet/cisco/enic/enic_dev.c b/drivers/net/ethernet/cisco/enic/enic_dev.c
+> index 2cbae7c6cc3d6..659787f73cf18 100644
+> --- a/drivers/net/ethernet/cisco/enic/enic_dev.c
+> +++ b/drivers/net/ethernet/cisco/enic/enic_dev.c
+> @@ -131,10 +131,13 @@ int enic_dev_set_ig_vlan_rewrite_mode(struct enic *enic)
+>  
+>  int enic_dev_enable(struct enic *enic)
+>  {
+> -	int err;
+> +	int err = 0;
+>  
+>  	spin_lock_bh(&enic->devcmd_lock);
+> -	err = vnic_dev_enable_wait(enic->vdev);
+> +	if (enic->enable_count == 0)
+> +		err = vnic_dev_enable_wait(enic->vdev);
+> +	if (!err)
+> +		enic->enable_count++;
+>  	spin_unlock_bh(&enic->devcmd_lock);
+>  
+>  	return err;
+> @@ -142,10 +145,16 @@ int enic_dev_enable(struct enic *enic)
+>  
+>  int enic_dev_disable(struct enic *enic)
+>  {
+> -	int err;
+> +	int err = 0;
+>  
+>  	spin_lock_bh(&enic->devcmd_lock);
+> -	err = vnic_dev_disable(enic->vdev);
+> +	if (enic->enable_count == 0) {
+> +		spin_unlock_bh(&enic->devcmd_lock);
+> +		return 0;
+> +	}
+> +	enic->enable_count--;
+> +	if (enic->enable_count == 0)
+> +		err = vnic_dev_disable(enic->vdev);
+>  	spin_unlock_bh(&enic->devcmd_lock);
+>  
+>  	return err;
 
-As you mention, the RCU version at least does something else, but
-honestly, it looks pretty damn questionable too. And no, it does not
-work for non-RCU lists in any kind of generic sense, since iut's
-perfectly valid to remove list entries without poisoning them.,
+If vnic_dev_enable_wait() fails, enable_count remains 0. However, the data
+path caller enic_open() ignores the return value of enic_dev_enable() and
+unconditionally returns 0:
 
-For example, some places that want a simple "am I on a list" will use
-__list_del_clearprev(), which does *not* poison the prev pointer, but
-just clears it instead. And then the "am I on a list" is just checking
-prev for NULL or not.
+drivers/net/ethernet/cisco/enic/enic_main.c:enic_open() {
+    ...
+	enic_dev_enable(enic);
 
-In other words: all of this is wrong. Whether you are on a list or not
-is simply not a generic operation. It depends on the user.
+	for (i = 0; i < enic->intr_count; i++)
+		vnic_intr_unmask(&enic->intr[i]);
+    ...
+	return 0;
+}
 
-The name is also *MUCH* too generic anyway.
+Can this cause the device reference count to become unbalanced?
 
-               Linus
+If enic_dev_enable() fails during enic_open(), the interface is marked
+logically up but enable_count remains 0. If enic_stop() is called later,
+enic_dev_disable() will return early since the count is 0, skipping the
+hardware disable command.
+
+Additionally, if the new admin channel calls enic_dev_enable() while
+the device is in this state, it will increment the count from 0 to 1.
+When the admin channel later calls enic_dev_disable(), the count will
+drop back to 0 and issue vnic_dev_disable(), incorrectly disabling the
+hardware while the netdev data path is still up.
+
+Should enic_open() check the return value of enic_dev_enable() and
+handle failures appropriately, or should the enable_count be incremented
+regardless of the hardware command success to keep the logical states
+aligned?
+-- 
+pw-bot: cr
 
