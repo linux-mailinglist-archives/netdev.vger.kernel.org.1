@@ -1,523 +1,464 @@
-Return-Path: <netdev+bounces-272847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272848-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MOSiFrOVyGm3ngUAu9opvQ
-	(envelope-from <netdev+bounces-272847-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 05:00:03 +0200
+	id cULcH9CbyGnAnwUAu9opvQ
+	(envelope-from <netdev+bounces-272848-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 05:26:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFF6435080D
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 05:00:02 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FD73350927
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 05:26:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 224FA3025F62
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 02:59:18 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 089A13002D1B
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 03:26:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF19F271A9A;
-	Sun, 29 Mar 2026 02:59:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3331E9B1A;
+	Sun, 29 Mar 2026 03:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ri6zEgks"
+	dkim=pass (2048-bit key) header.d=vanvalzah-com.20230601.gappssmtp.com header.i=@vanvalzah-com.20230601.gappssmtp.com header.b="RMQVY/Fp"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010014.outbound.protection.outlook.com [52.101.85.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7587926B973;
-	Sun, 29 Mar 2026 02:59:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774753153; cv=fail; b=tvUPE5jDLA2trP0zivnme7s4vRCnnfFazgUEG3L4OJ3E7bQDyFchjiOyDFiupl3u8ha+RJrHf6QxkKNgDCLHXSGz0+noVk9pJEq+mJcdDh6HJLhUDCRuF+rsav69LBtjIRUbZIM02kLzG39VwUnvVwxlI8dmgqR3dGIw5JVaNAI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774753153; c=relaxed/simple;
-	bh=5jCkHkfSjmkcxCScj0qC0OeI0UhHSFU2V935Ptpi2hE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iiecU/ofS6EuGx6zzqeiGU11BUEJ8yBhAi3Auwd8cd7NAZltdN3uuvw+eri1wKJGVHQeb5+Nfo4RrLvWYYNcROf4M3bpltQ7yKRIFfL6HF9dndnWkiKOUj8JQKNz4kYVFy7Q3FF+ieKL5oX0piApVO0DSbNiNxWsqy9xgpVcbgI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ri6zEgks; arc=fail smtp.client-ip=52.101.85.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=E06khBxXDzcYpSIGEUaiqWhZX+edq+EGzexaal1SL0je5m7nSjHwoIMRZMemfht8rwDBezO0+f36PJRCttVOJm+RnymcNsI4bud/+Urye/ogl6p60T5OoU/AvGkBIkhEiY2s3QYKzhHnediX6RzgbadxzCwsnYEFT0MgnBdQ190UCUhcHSM66O3hvf0kIuvh3QmHd85cqRFh2nTIn5NJRfBY0vcRkJ8lKD5KuWEJ3AnlSTYHxgKSw/4bzv3ICV2BGDAd1/WWBjA2xqdMr6RUEksdbzxPNIGJiS+naqeZ6bSDYhh+IChjoCebXZcY1KXsFb3StpdP0hpo+j+E/LVs4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pWhkJlaLx+gijcnZVU3Eudd72WmH6c0h+KLOfObRjtE=;
- b=KM9AlOO/BCuGWeiPm81w7NqnsXRUgDDGzuXRsnTXt7fLC/PdbyKZbVnTZ7Q/JmE8Seltm7ibB2euUAO14BZstLz0bVDG9zeqyOvqDJFtn96vTkY/Ka1xFKjVoTUMd3PPO00OJPC12BSULP9o9CbAZTlllLH2AUGUjyK3FG1elYZGxZR+h/dyORlBT7UaQHptUxZMFsRw/t4OiVaXifUutGsFb9vN5Q/7E3AMGVwqReQ/woAKD/ww3GgzMpLh8OhHbshDlxEAGQXIQcByk/AYVGHotTctFWYB68wAkISS8JOUZ6tGzA8+J9tHgVzPQbd0axElKnwYHaqalKQpL1tx6Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pWhkJlaLx+gijcnZVU3Eudd72WmH6c0h+KLOfObRjtE=;
- b=ri6zEgksC0k9Oeiu7ANbg7aKLjKhM6Y8NjauL2oneYS6H0OkUfQdvGkd/QMwvge0l3eqkKxOULlVWwcnWX6L/UIJqeZh6xxcYeKS7FddnemG0VFFJNiuSQ5G/2fPEBE9fSKq/hlFAlqKWzUa5HZm+iaQCHMFDvyD7VDgAoAw83X8KOrgJWifSVgctQ3kjJvDJS8PKSHN2Icwy2+DyOfg4tpghQs2WMOzXSFJu0qjdjzZM5lsiTi15JxCF69a7Qdw+Fa0INTyaBLyjMkVS1PJF/zxIbc288y723JQFOk4MQXbvBVhySBDBxmTOmBPhDDmkGl/h6mpZgsAjqlDx5zRnw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB8202.namprd12.prod.outlook.com (2603:10b6:8:e1::13) by
- DS2PR12MB9752.namprd12.prod.outlook.com (2603:10b6:8:270::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9769.14; Sun, 29 Mar 2026 02:59:05 +0000
-Received: from DS7PR12MB8202.namprd12.prod.outlook.com
- ([fe80::38fd:4146:aea:639e]) by DS7PR12MB8202.namprd12.prod.outlook.com
- ([fe80::38fd:4146:aea:639e%6]) with mapi id 15.20.9769.014; Sun, 29 Mar 2026
- 02:59:05 +0000
-From: Andy Roulin <aroulin@nvidia.com>
-To: netdev@vger.kernel.org
-Cc: bridge@lists.linux.dev,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>,
-	Petr Machata <petrm@nvidia.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonas Gorski <jonas.gorski@gmail.com>,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Andy Roulin <aroulin@nvidia.com>
-Subject: [PATCH net-next v2 3/3] selftests: net: add bridge STP mode selection test
-Date: Sat, 28 Mar 2026 19:58:58 -0700
-Message-ID: <20260329025858.330620-4-aroulin@nvidia.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260329025858.330620-1-aroulin@nvidia.com>
-References: <20260329025858.330620-1-aroulin@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BY3PR04CA0027.namprd04.prod.outlook.com
- (2603:10b6:a03:217::32) To DS7PR12MB8202.namprd12.prod.outlook.com
- (2603:10b6:8:e1::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565091F1537
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 03:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774754761; cv=none; b=bNvgE7/LV4iZGi1P6XbbRV5I5QEsOhyrpW7cYbNFX46FWHu+iRWevrQcD8JyBOklLOPJ4fwLpsPJgTgS4/vDSFbebFPqTjsIouffgbsw5O4R2yZGmprsK1jiYPG4CbJw7kkWNjmsGUSpImFMUbJlnlYg4Pr9EngtD5Xa/Mhit7A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774754761; c=relaxed/simple;
+	bh=Tmj7sT6JMcM9Fj3FQ4uXM6kwuO78E+sGsqm3ZsWhdVg=;
+	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:Cc:To; b=cYqSWsZOLERA6WMPNkovd6cIGbLxa8pvOTy4L5/lzad4TpDsSeiv4vrI9lHoIilV/Y1uhNZ73NyRHw0j8joFswGEswV17ErL0l4Y0H92qd3D5rVzWU07usA97vftLPdAYtMwbj3Sqs+zLb5RFV5JCmZq4z2jlNePTxglKsQeHFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vanvalzah.com; spf=none smtp.mailfrom=vanvalzah.com; dkim=pass (2048-bit key) header.d=vanvalzah-com.20230601.gappssmtp.com header.i=@vanvalzah-com.20230601.gappssmtp.com header.b=RMQVY/Fp; arc=none smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vanvalzah.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=vanvalzah.com
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-467d9ca391cso1338316b6e.3
+        for <netdev@vger.kernel.org>; Sat, 28 Mar 2026 20:25:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vanvalzah-com.20230601.gappssmtp.com; s=20230601; t=1774754755; x=1775359555; darn=vger.kernel.org;
+        h=to:cc:date:message-id:subject:mime-version:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Q3zHZR2nqCQ4BfQwwL3YtsGWqRQDle8jBml0c4WJz+U=;
+        b=RMQVY/FpftYKIB9OKNjhAwsE5qpHgyHMiOOkmY1Hd/+i0nPNpcdzf4dzRQ0juuki8h
+         lhr89/yr9QhZ0m2zbVkIsoBgcFda2hno5xJ5KvFodtskh8Ge8ROSFgkV6l5ee6nmzW+x
+         cZ15Aelghbyh66I49u23YJfM/TYJlfRkRXmi+0tdwfTXzmPbsaRR8pZu3bH558FaBA79
+         WjqKOKIri6RNhHsoFVI0dFUdhQFJawItgRA2t+w69jwwZwqTUERtOE0CAwVma7k/iQFN
+         1Fl+KdrhZuK0lvC7ipmQsiEARFwUF+WoQlxmOCT/PvRdrIO6rPEWbGxfAWmQwA/o5y1A
+         OJOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774754755; x=1775359555;
+        h=to:cc:date:message-id:subject:mime-version:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q3zHZR2nqCQ4BfQwwL3YtsGWqRQDle8jBml0c4WJz+U=;
+        b=eGfzJYLWbu0w1Qft97UkTy9Iyj8OqoTPq36SzopDHnCOdnYhS3r1SQAofO8qoZAG3H
+         BGyKSmJi3Qizu1g6KHDOWfudkTdRCPSE4cr96PExqq68Lsj0OB2d+GW2cGpDPBARaGGf
+         HJoXHzTmbbu4QD+okjvji7eoJ9+uZhXXyU/tIOKUI0V+UjxBpVo4e89BcUJNEzW5Vcfi
+         cAtDgp7xOx3wPGqyPqeax3YF2sUJBCMeu87TrH6i2OazPDjxrDe/C2nk/cxU95lJX5mA
+         xxNImh6iKl7CRsh3di5SIGfESg5ejuxZOA9sc10Mbe5R5pWDQ0KkIeYZd+dcdMLDbsof
+         zSeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWuNxjL0EkclRTnuy79dGjXyma3zMDbbAxJu3ezEX2Vypqrt6/3srGrirKokZ9oK0kGca5V5dk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+wk/yfjRO1zm8rH9SiFBiYKiwQLARkoEa72Dps15tARyZPgv9
+	KML2VjJRr3hCdpx2/4u9zUZdS8wRkhItfy2+AGgBVfAqThrgoBrJ94aNlt4NiXMN6+8=
+X-Gm-Gg: ATEYQzxMRzDmG4z8wrRGLAi2WxmQ60x2rH9hP119d2hI9nwh+CbW/FggGk0XjdCTGDZ
+	TEeWpB6Mzf0E1B25D4bsU2Bc8W4A8rAX96T5Q7Fx2x5kQO0jCZAG9v01YU7uglH2GaZnIwwLDtY
+	pVee4HtWKhZUcrTpbg0pZPN5BYn9RBpynV2ZkzfS/iCYjvKjrQQ0lx6ye3/IpLNX5W0x6fJhqjD
+	u7r9J25ERW2175gV+Chd+52ccG/jFnQAZHr6SqRk3mWIf1oB5RfnZfjKkOfF+kMzvq4ksNKR84g
+	IRznA9GBMAbHfzLL0Ix35b6DzuPECN0Qwv7RdzcAdr2Lram6PiJOp8DV2djKcuouIkbR5rfXVy6
+	6BxApqepUaJ7WEpEzYRkD5ZhF3K9luANNlog632l4VnVWlJups9Z9Kr6seXdOvSChVeyhvOr2+I
+	rTfbrSSTrOAb+Dg6Tw6XJ8LMPmmoKNAtmeyye8Ae88zPXeEghGpJlyfxVHFOKXjQVQiYOrHf7/o
+	w==
+X-Received: by 2002:a05:6808:1928:b0:467:5571:7f3c with SMTP id 5614622812f47-46a8a38f139mr3576274b6e.6.1774754754796;
+        Sat, 28 Mar 2026 20:25:54 -0700 (PDT)
+Received: from smtpclient.apple (c-76-16-6-204.hsd1.il.comcast.net. [76.16.6.204])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-46aa0efdb75sm2191961b6e.13.2026.03.28.20.25.52
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 28 Mar 2026 20:25:53 -0700 (PDT)
+From: Bob Van Valzah <bob@vanvalzah.com>
+Content-Type: multipart/mixed;
+	boundary="Apple-Mail=_DAE5922D-DCB8-444B-BD9A-99F8AE183AD2"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB8202:EE_|DS2PR12MB9752:EE_
-X-MS-Office365-Filtering-Correlation-Id: 855946a0-f7af-478a-f13f-08de8d3f2370
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|18002099003|18092099006|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	kbTTAGlN4+15OAqe7wWwZGIQAA/+7rn7PfaDbY8xFyABbGOp9XKd1sO0mDrp8f1i03ANqMbZX3VphtZMk+9KOAisXaJhsiJmTPNHQ9b31Sw9lJr0F+mFU0O9dXQeM/f7sowOYAc1lfD0dzFMSB8MKzbXz2BNSvhkLnFYLbINlNd3k4EIV7fBf8MpSD9NM2220uvnwpKG8KPxkVukMHLRfaA0uh++42Xbrid07YdJtLRzbFELspM138KycafrhisYK874PGgzKGQpZRS2krPClR7UsD3QRFnupDuDCn6HC4V/bUprduedZlujTuo6oLA2XndMdN5zTADWOakWa6gYAVcLyy0bq2iX9GDlN6umfyWtcdtU8m6rRDL698JEthOgR5blZUJQ7ifbmrfuSw/uEvYwZfPEI3czIzySpm5nMp+Gmo458CXX/E5/Hn0dJD93Cx0kT832yI5ji4nISYDafFt57qhraTNLvBCNYfmeddqxiw80ZZJaJv54Fh0Jx9x22OpwDntx1PqPRVrKuWKjnXPrrtlouLEwTB0Rm2GQalCbc5sUVAH1ADBIhjz9zAlrq8uMYHZAYBaqZfRnjoLbarG0AqJkqPJAxP8BEKX8S/K7E+I36CsYFM3TwCaa0IO0Hok+EYFk4Qz9VJ5kCV3GIx7fn5Zl4GIFCaz2q8pYMD5MNllRg3ozDeEuEcVl40HmIJs6liJsf+B0dPcI02sGGqOR04RWJHnymhaMx3SgUDI=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB8202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(18002099003)(18092099006)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?BIpkVkz53UuJ/OZCkGYiO/AbtQfR1B4YDc18F5R3x5PTkgHKSQQna5bDcfhl?=
- =?us-ascii?Q?dtRney3XR7CADP46D2et3x2/PllJ++Ju56UooP1yhafWgKjt1lxoUDQ8yjRt?=
- =?us-ascii?Q?VYSmlinI1OgXKwdnNedQSD2KzWSf7NBtkXRAri2alEJjaMXCNE+IYO2TPpcb?=
- =?us-ascii?Q?KYJsHKNfGVpHM5z9DZ2E1k2BoXCzK//Jb3vzLZIXFNjftXee4vRUUa+alSr4?=
- =?us-ascii?Q?Z0it79QCPOcutoNMR2hbCr1oKIkP8CwO/2DBuROMBiJrX25Ny8YMQD1FNhuZ?=
- =?us-ascii?Q?YM2xBE+GEVF3h4Zs1IyRK40jbjq6ict5sgIkq83ys5+/m1t93s1Zi1LmmspX?=
- =?us-ascii?Q?8Tqwfs1D0NGuc2Zj/ECSAYbjo39Jb0mGQZo3OcxdOl3AX6fhNqQdz/6gG9BN?=
- =?us-ascii?Q?xy0/cLkbcg9ksQ+heuHyMrYGHo6qryZ584csiKJJPHkFgYy2Zuc9jBC82a4P?=
- =?us-ascii?Q?Qad0YVb9L7DkOnLprqv/9AD84TqsmpDE55Vev53av1agZvelaqFPSJ/p7+xU?=
- =?us-ascii?Q?8AhH4yE/3v0g8b+Wn4sq/iBbnAeItOvS0TMO+bMHnYezMKSd387FaEvUJ3kT?=
- =?us-ascii?Q?q19QcRgqg6RTc7puI1ElRl+Tsb2mEn4DB05tDwzVGabIZFzKBW95F9SDgK2b?=
- =?us-ascii?Q?GkWpemlrPcLu2SqyK6drGJ0lxlS29q8bdOHpAwIBaaxaitm7sZlQ/pppiUEH?=
- =?us-ascii?Q?zn9oJrNtKDkGdPKz9ghGg8CB7qLOhGsGpC2sHRwaJzImRWYKcLyVcoZq+NaX?=
- =?us-ascii?Q?GQxbBb9h9o7g4iOZFwtvsWK673Vx7eJ7IuYXvOr5jynTriimWcCBSBsiTE3R?=
- =?us-ascii?Q?bR2+4oKs4wBUf7iMi8mXgekc/3XeLGjJyFWWYJ0yUODb5sPADev2VGI/dRQl?=
- =?us-ascii?Q?6Q+K11IBuPtITJw99zN908DrhlHWNXKKQUPmYtx0v6T4mmpW0uCjKg4yKWUv?=
- =?us-ascii?Q?i0IduUBR31smH6ZL8Q2Xt9YkT2O2CBfWASslivSi/+OPtvdUpd2bPbX+gPZY?=
- =?us-ascii?Q?XemV8XwxF6B4qGjEh3yOgY5e2hvN9zFa6bNrKJb0VS14CFJvlmmDkWXJGVqq?=
- =?us-ascii?Q?0GTLtuWrjd42c5cevZ9fnfR8V1ThVSgXQbHNNBje2FaFRAQzEPT6ng700iGb?=
- =?us-ascii?Q?XFIFPi6MJ4E5wx+xkGSuubIIKF0N77Hb8WIPx5f1n8Ho1J0LhHzm4yxkSKGg?=
- =?us-ascii?Q?W1fWXqwduvMNbgo4pVZAU2txX3txIYmRthfcvo1qxLBAkahGtginwj8jbNL0?=
- =?us-ascii?Q?WDkuUYPgrLJ/ib+tXKK3MBt6tLq13JE9he1kYL3rokki4bp8PWdtIvSeXyKr?=
- =?us-ascii?Q?oXydp0LAbqsMrv9JdmpZXyZe7ChN/YJ8Bto3ncnozmg8yWnh8Nxu6O0qUXSk?=
- =?us-ascii?Q?jAq6M0lIYs9IyEpBIE6OUF6RJjdSjNmMP843nk3Emr/5u0LSw7d/4lDJcE5m?=
- =?us-ascii?Q?/sBhlru3XVBrYMbcQeFgkclxuyfR6Lx0ebkvMg0MuuDAULV4xRz8n6xtQYQa?=
- =?us-ascii?Q?+F0BZO1YKhoXD9D3wkWbs4Y85zm16DGSQSLLmjDU0eScEiaa9D7JG+rie0WO?=
- =?us-ascii?Q?YaGjpD+IWwmDlqzeor3jIaBxyPl2fj/NzFvrBxssCmq0Zd3zcy22l882/FPK?=
- =?us-ascii?Q?TXM91aAeNvQZfPWV0JDe2PV5P+Oyy2XmQTe6DBot9HhPR6yilZbHk76GxlIh?=
- =?us-ascii?Q?Z0Xgfa73dHWCJKtBn9f5RvikobaXBX1N3a2qWT+zBhLafabZbRYje5V5KTIC?=
- =?us-ascii?Q?eFvd2ni2jg=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 855946a0-f7af-478a-f13f-08de8d3f2370
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB8202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2026 02:59:05.1648
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: A0RSsq9/AN1p8avZ5axJn06BOX50vBbPGwP6tUPPy/NfP2nNldWnXxZrrjo4e9Ghh1CdKKkWn873bcg4POaMQA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS2PR12MB9752
-X-Spamd-Result: default: False [2.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.400.21\))
+Subject: [PATCH] igc: fix Tx timestamp timeout caused by unlocked TIMINCA
+ write in adj fine
+Message-Id: <D1C3B3DF-960F-40C7-BBD7-994359F0C8AD@vanvalzah.com>
+Date: Sat, 28 Mar 2026 22:25:41 -0500
+Cc: anthony.l.nguyen@intel.com,
+ netdev@vger.kernel.org,
+ julianstj@fb.com,
+ jeff@jeffgeerling.com
+To: intel-wired-lan@lists.osuosl.org
+X-Mailer: Apple Mail (2.3864.400.21)
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_DKIM_ALLOW(-0.20)[vanvalzah-com.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-python-script];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272847-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lists.linux.dev,blackwall.org,nvidia.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,lwn.net,gmail.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
+	DKIM_TRACE(0.00)[vanvalzah-com.20230601.gappssmtp.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aroulin@nvidia.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	HAS_ATTACHMENT(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272848-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DMARC_NA(0.00)[vanvalzah.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bob@vanvalzah.com,netdev@vger.kernel.org];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_NONE(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: DFF6435080D
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	APPLE_MAILER_COMMON(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5]
+X-Rspamd-Queue-Id: 3FD73350927
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a selftest for the IFLA_BR_STP_MODE bridge attribute that verifies:
 
-1. stp_mode defaults to auto on new bridges
-2. stp_mode can be toggled between user, kernel, and auto
-3. Changing stp_mode while STP is active is rejected with -EBUSY
-4. Re-setting the same stp_mode while STP is active succeeds
-5. stp_mode user in a network namespace yields userspace STP (stp_state=2)
-6. stp_mode kernel forces kernel STP (stp_state=1)
-7. stp_mode auto in a netns preserves traditional fallback to kernel STP
-8. stp_mode and stp_state can be set atomically in a single message
-9. stp_mode persists across STP disable/enable cycles
+--Apple-Mail=_DAE5922D-DCB8-444B-BD9A-99F8AE183AD2
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-Test 5 is the key use case: it demonstrates that userspace STP can now
-be enabled in non-init network namespaces by setting stp_mode to user
-before enabling STP.
+Hi,
 
-Test 8 verifies the atomic usage pattern where both attributes are set
-in a single netlink message, which is supported because br_changelink()
-processes IFLA_BR_STP_MODE before IFLA_BR_STP_STATE.
+We found a race in igc_ptp_adjfine_i225() that causes "Tx timestamp
+timeout" errors and eventually wedges EXTTS when a PTP grandmaster
+(ptp4l with hardware timestamping) runs concurrently with PHC
+frequency discipline (any GPSDO calling clock_adjtime ADJ_FREQUENCY).
 
-The test gracefully skips if the installed iproute2 does not support
-the stp_mode attribute.
+Root cause: igc_ptp_adjfine_i225() writes IGC_TIMINCA without holding
+any lock.  Every other PTP clock operation in igc_ptp.c (adjtime,
+gettime, settime) holds tmreg_lock, but adjfine does not.  When the
+increment rate changes while the hardware is capturing a TX timestamp,
+the captured value is corrupt.  The driver retries for
+IGC_PTP_TX_TIMEOUT (15s), then logs the timeout and frees the skb.
+Repeated occurrences eventually prevent EXTTS from delivering events.
 
-Assisted-by: Claude:claude-opus-4-6
-Signed-off-by: Andy Roulin <aroulin@nvidia.com>
+The attached reproducer (triggers in ~17 seconds on i226):
+
+  One thread calling clock_adjtime(ADJ_FREQUENCY) at ~200k/s on the
+  PHC, another sending UDP packets with SO_TIMESTAMPING requesting
+  hardware TX timestamps at ~100k/s.  A Python reproducer is at:
+  =
+https://github.com/bobvan/PePPAR-Fix/blob/main/tools/igc_tx_timeout_repro.=
+py
+
+  At realistic rates (1 Hz adjfine from a GPSDO + ptp4l at 128 Hz
+  sync), the race triggers in ~30 minutes.
+
+The attached patch holds ptp_tx_lock around the TIMINCA write and
+skips the write if any TX timestamps are pending (tx_tstamp[i].skb
+!=3D NULL), returning -EBUSY.  This doesn't fully close the hardware
+race (a new TX capture can start between the check and the write),
+but at realistic rates the residual probability gives ~25 year MTBF
+vs ~30 minutes without the patch.
+
+A complete fix would likely require either disabling TX timestamping
+around TIMINCA writes (via TSYNCTXCTL), or making the timeout recovery
+path more robust so a single corrupt timestamp doesn't wedge the
+subsystem.  We'd welcome guidance from the igc maintainers on the
+preferred approach.
+
+Tested on:
+  - Intel i226 (TimeHAT v5 board on Raspberry Pi 5)
+  - Kernel 6.12.62+rpt-rpi-2712 (Raspberry Pi OS)
+  - Intel out-of-tree igc driver 5.4.0-7642.46
+  - Stock upstream igc_ptp.c (same code, same bug)
+
+	Bob
+
 ---
 
-Notes:
-    v2:
-      * Fix shellcheck CI: add SC2329 suppression.
-      * Add idempotent stp_mode test.
+ drivers/net/ethernet/intel/igc/igc_ptp.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
- tools/testing/selftests/net/Makefile          |   1 +
- .../testing/selftests/net/bridge_stp_mode.sh  | 281 ++++++++++++++++++
- 2 files changed, 282 insertions(+)
- create mode 100755 tools/testing/selftests/net/bridge_stp_mode.sh
+diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c =
+b/drivers/net/ethernet/intel/igc/igc_ptp.c
+index XXXXXXX..XXXXXXX 100644
+--- a/drivers/net/ethernet/intel/igc/igc_ptp.c
++++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
+@@ -47,8 +47,10 @@ static int igc_ptp_adjfine_i225(struct ptp_clock_info =
+*ptp, long scaled_ppm)
+ {
+        struct igc_adapter *igc =3D container_of(ptp, struct =
+igc_adapter,
+                                               ptp_caps);
+        struct igc_hw *hw =3D &igc->hw;
++       unsigned long flags;
+        int neg_adj =3D 0;
+        u64 rate;
+        u32 inca;
++       int i;
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 6bced3ed798b0..053c7b83c76dd 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -15,6 +15,7 @@ TEST_PROGS := \
- 	big_tcp.sh \
- 	bind_bhash.sh \
- 	bpf_offload.py \
-+	bridge_stp_mode.sh \
- 	bridge_vlan_dump.sh \
- 	broadcast_ether_dst.sh \
- 	broadcast_pmtu.sh \
-diff --git a/tools/testing/selftests/net/bridge_stp_mode.sh b/tools/testing/selftests/net/bridge_stp_mode.sh
-new file mode 100755
-index 0000000000000..5737a10f002f0
---- /dev/null
-+++ b/tools/testing/selftests/net/bridge_stp_mode.sh
-@@ -0,0 +1,281 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# shellcheck disable=SC2034,SC2154,SC2317,SC2329
-+#
-+# Test for bridge STP mode selection (IFLA_BR_STP_MODE).
-+#
-+# Verifies that:
-+# - stp_mode defaults to auto on new bridges
-+# - stp_mode can be toggled between user, kernel, and auto
-+# - stp_mode change is rejected while STP is active (-EBUSY)
-+# - stp_mode user in a netns yields userspace STP (stp_state=2)
-+# - stp_mode kernel forces kernel STP (stp_state=1)
-+# - stp_mode auto preserves traditional fallback to kernel STP
-+# - stp_mode and stp_state can be set atomically in one message
-+# - stp_mode persists across STP disable/enable cycles
-+
-+source lib.sh
-+
-+require_command jq
-+
-+ALL_TESTS="
-+	test_default_auto
-+	test_set_modes
-+	test_reject_change_while_stp_active
-+	test_idempotent_mode_while_stp_active
-+	test_user_mode_in_netns
-+	test_kernel_mode
-+	test_auto_mode
-+	test_atomic_mode_and_state
-+	test_mode_persistence
-+"
-+
-+bridge_info_get()
-+{
-+	ip -n "$NS1" -d -j link show "$1" | \
-+		jq -r ".[0].linkinfo.info_data.$2"
-+}
-+
-+check_stp_mode()
-+{
-+	local br=$1; shift
-+	local expected=$1; shift
-+	local msg=$1; shift
-+	local val
-+
-+	val=$(bridge_info_get "$br" stp_mode)
-+	[ "$val" = "$expected" ]
-+	check_err $? "$msg: expected $expected, got $val"
-+}
-+
-+check_stp_state()
-+{
-+	local br=$1; shift
-+	local expected=$1; shift
-+	local msg=$1; shift
-+	local val
-+
-+	val=$(bridge_info_get "$br" stp_state)
-+	[ "$val" = "$expected" ]
-+	check_err $? "$msg: expected $expected, got $val"
-+}
-+
-+# Create a bridge in NS1, bring it up, and defer its deletion.
-+bridge_create()
-+{
-+	ip -n "$NS1" link add "$1" type bridge
-+	ip -n "$NS1" link set "$1" up
-+	defer ip -n "$NS1" link del "$1"
-+}
-+
-+setup_prepare()
-+{
-+	setup_ns NS1
-+}
-+
-+cleanup()
-+{
-+	defer_scopes_cleanup
-+	cleanup_all_ns
-+}
-+
-+# Check that stp_mode defaults to auto when creating a bridge.
-+test_default_auto()
-+{
-+	RET=0
-+
-+	ip -n "$NS1" link add br-test type bridge
-+	defer ip -n "$NS1" link del br-test
-+
-+	check_stp_mode br-test auto "stp_mode default"
-+
-+	log_test "stp_mode defaults to auto"
-+}
-+
-+# Test setting stp_mode to user, kernel, and back to auto.
-+test_set_modes()
-+{
-+	RET=0
-+
-+	ip -n "$NS1" link add br-test type bridge
-+	defer ip -n "$NS1" link del br-test
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode user
-+	check_err $? "Failed to set stp_mode to user"
-+	check_stp_mode br-test user "after set user"
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode kernel
-+	check_err $? "Failed to set stp_mode to kernel"
-+	check_stp_mode br-test kernel "after set kernel"
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode auto
-+	check_err $? "Failed to set stp_mode to auto"
-+	check_stp_mode br-test auto "after set auto"
-+
-+	log_test "stp_mode set user/kernel/auto"
-+}
-+
-+# Verify that stp_mode cannot be changed while STP is active.
-+test_reject_change_while_stp_active()
-+{
-+	RET=0
-+
-+	bridge_create br-test
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode kernel
-+	check_err $? "Failed to set stp_mode to kernel"
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 1
-+	check_err $? "Failed to enable STP"
-+
-+	# Changing stp_mode while STP is active should fail.
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode auto 2>/dev/null
-+	check_fail $? "Changing stp_mode should fail while STP is active"
-+
-+	check_stp_mode br-test kernel "mode unchanged after rejected change"
-+
-+	# Disable STP, then change should succeed.
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 0
-+	check_err $? "Failed to disable STP"
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode auto
-+	check_err $? "Changing stp_mode should succeed after STP is disabled"
-+
-+	log_test "reject stp_mode change while STP is active"
-+}
-+
-+# Verify that re-setting the same stp_mode while STP is active succeeds.
-+test_idempotent_mode_while_stp_active()
-+{
-+	RET=0
-+
-+	bridge_create br-test
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode user stp_state 1
-+	check_err $? "Failed to enable STP with user mode"
-+
-+	# Re-setting the same mode while STP is active should succeed.
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode user
-+	check_err $? "Idempotent stp_mode set should succeed while STP is active"
-+
-+	check_stp_state br-test 2 "stp_state after idempotent set"
-+
-+	log_test "idempotent stp_mode set while STP is active"
-+}
-+
-+# Test that stp_mode user in a non-init netns yields userspace STP
-+# (stp_state == 2). This is the key use case: userspace STP without
-+# needing /sbin/bridge-stp or being in init_net.
-+test_user_mode_in_netns()
-+{
-+	RET=0
-+
-+	bridge_create br-test
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode user
-+	check_err $? "Failed to set stp_mode to user"
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 1
-+	check_err $? "Failed to enable STP"
-+
-+	check_stp_state br-test 2 "stp_state with user mode"
-+
-+	log_test "stp_mode user in netns yields userspace STP"
-+}
-+
-+# Test that stp_mode kernel forces kernel STP (stp_state == 1)
-+# regardless of whether /sbin/bridge-stp exists.
-+test_kernel_mode()
-+{
-+	RET=0
-+
-+	bridge_create br-test
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode kernel
-+	check_err $? "Failed to set stp_mode to kernel"
-+
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 1
-+	check_err $? "Failed to enable STP"
-+
-+	check_stp_state br-test 1 "stp_state with kernel mode"
-+
-+	log_test "stp_mode kernel forces kernel STP"
-+}
-+
-+# Test that stp_mode auto preserves traditional behavior: in a netns
-+# (non-init_net), bridge-stp is not called and STP falls back to
-+# kernel mode (stp_state == 1).
-+test_auto_mode()
-+{
-+	RET=0
-+
-+	bridge_create br-test
-+
-+	# Auto mode is the default; enable STP in a netns.
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 1
-+	check_err $? "Failed to enable STP"
-+
-+	# In a netns with auto mode, bridge-stp is skipped (init_net only),
-+	# so STP should fall back to kernel mode (stp_state == 1).
-+	check_stp_state br-test 1 "stp_state with auto mode in netns"
-+
-+	log_test "stp_mode auto preserves traditional behavior"
-+}
-+
-+# Test that stp_mode and stp_state can be set in a single netlink
-+# message. This is the intended atomic usage pattern.
-+test_atomic_mode_and_state()
-+{
-+	RET=0
-+
-+	bridge_create br-test
-+
-+	# Set both stp_mode and stp_state in one command.
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode user stp_state 1
-+	check_err $? "Failed to set stp_mode user and stp_state 1 atomically"
-+
-+	check_stp_state br-test 2 "stp_state after atomic set"
-+
-+	log_test "atomic stp_mode user + stp_state 1 in single message"
-+}
-+
-+# Test that stp_mode persists across STP disable/enable cycles.
-+test_mode_persistence()
-+{
-+	RET=0
-+
-+	bridge_create br-test
-+
-+	# Set user mode and enable STP.
-+	ip -n "$NS1" link set dev br-test type bridge stp_mode user
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 1
-+	check_err $? "Failed to enable STP with user mode"
-+
-+	# Disable STP.
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 0
-+	check_err $? "Failed to disable STP"
-+
-+	# Verify mode is still user.
-+	check_stp_mode br-test user "stp_mode after STP disable"
-+
-+	# Re-enable STP -- should use user mode again.
-+	ip -n "$NS1" link set dev br-test type bridge stp_state 1
-+	check_err $? "Failed to re-enable STP"
-+
-+	check_stp_state br-test 2 "stp_state after re-enable"
-+
-+	log_test "stp_mode persists across STP disable/enable cycles"
-+}
-+
-+# Check iproute2 support before setting up resources.
-+if ! ip link add type bridge help 2>&1 | grep -q "stp_mode"; then
-+	echo "SKIP: iproute2 too old, missing stp_mode support"
-+	exit "$ksft_skip"
-+fi
-+
-+trap cleanup EXIT
-+
-+setup_prepare
-+tests_run
-+
-+exit "$EXIT_STATUS"
--- 
-2.43.0
+        if (scaled_ppm < 0) {
+                neg_adj =3D 1;
+@@ -63,7 +65,21 @@ static int igc_ptp_adjfine_i225(struct ptp_clock_info =
+*ptp, long scaled_ppm)
+        if (neg_adj)
+                inca |=3D ISGN;
 
+-       wr32(IGC_TIMINCA, inca);
++       /* Changing the clock increment rate while a TX timestamp is =
+being
++        * captured by the hardware can corrupt the timestamp, causing =
+the
++        * driver to report "Tx timestamp timeout" and eventually =
+wedging
++        * the EXTTS subsystem.  Serialize with pending TX timestamps:
++        * skip the rate change if any are in flight.
++        */
++       spin_lock_irqsave(&igc->ptp_tx_lock, flags);
++       for (i =3D 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
++               if (igc->tx_tstamp[i].skb) {
++                       spin_unlock_irqrestore(&igc->ptp_tx_lock, =
+flags);
++                       return -EBUSY;
++               }
++       }
++       wr32(IGC_TIMINCA, inca);
++       spin_unlock_irqrestore(&igc->ptp_tx_lock, flags);
+
+        return 0;
+ }
+--
+2.39.2
+
+--Apple-Mail=_DAE5922D-DCB8-444B-BD9A-99F8AE183AD2
+Content-Disposition: attachment;
+	filename=igc_tx_timeout_repro.py
+Content-Type: text/x-python-script;
+	x-unix-mode=0644;
+	name="igc_tx_timeout_repro.py"
+Content-Transfer-Encoding: quoted-printable
+
+#!/usr/bin/env python3
+"""Reproducer for igc driver Tx timestamp timeout bug.
+
+The igc driver (Intel i225/i226) has a race between clock_adjtime
+(ADJ_FREQUENCY) and hardware TX timestamping.  When adjfine() is
+called while a TX timestamp is pending, the timestamp register can
+wedge, producing "Tx timestamp timeout" errors in dmesg and eventually
+breaking EXTTS (PPS capture).
+
+This reproducer runs two threads:
+  1. Hammers clock_adjtime(ADJ_FREQUENCY) on the PHC
+  2. Sends UDP packets with SO_TIMESTAMPING (hardware TX timestamps)
+
+On a vulnerable igc driver, "Tx timestamp timeout" appears in dmesg
+within seconds.
+
+Usage:
+    sudo python3 tools/igc_tx_timeout_repro.py eth1 /dev/ptp0
+    # Watch with: dmesg -w | grep "Tx timestamp"
+
+Requires root for SO_TIMESTAMPING and clock_adjtime on PHC.
+"""
+
+import ctypes
+import ctypes.util
+import os
+import socket
+import struct
+import sys
+import threading
+import time
+
+
+def get_phc_clockid(fd):
+    return (~fd << 3) | 3
+
+
+def adjfine_loop(phc_fd, stop_event, stats):
+    """Hammer adjfine() on the PHC."""
+    librt =3D ctypes.CDLL(ctypes.util.find_library("rt"), =
+use_errno=3DTrue)
+
+    class Timeval(ctypes.Structure):
+        _fields_ =3D [("tv_sec", ctypes.c_long), ("tv_usec", =
+ctypes.c_long)]
+
+    class Timex(ctypes.Structure):
+        _fields_ =3D [
+            ("modes", ctypes.c_uint),
+            ("offset", ctypes.c_long),
+            ("freq", ctypes.c_long),
+            ("maxerror", ctypes.c_long),
+            ("esterror", ctypes.c_long),
+            ("status", ctypes.c_int),
+            ("constant", ctypes.c_long),
+            ("precision", ctypes.c_long),
+            ("tolerance", ctypes.c_long),
+            ("time", Timeval),
+            ("tick", ctypes.c_long),
+            ("ppsfreq", ctypes.c_long),
+            ("jitter", ctypes.c_long),
+            ("shift", ctypes.c_int),
+            ("stabil", ctypes.c_long),
+            ("jitcnt", ctypes.c_long),
+            ("calcnt", ctypes.c_long),
+            ("errcnt", ctypes.c_long),
+            ("stbcnt", ctypes.c_long),
+            ("tai", ctypes.c_int),
+        ]
+
+    ADJ_FREQUENCY =3D 0x0002
+    clockid =3D get_phc_clockid(phc_fd)
+    n =3D 0
+    toggle =3D False
+
+    while not stop_event.is_set():
+        tx =3D Timex()
+        tx.modes =3D ADJ_FREQUENCY
+        # Alternate between two tiny frequency offsets
+        tx.freq =3D 100 if toggle else -100  # ~0.0015 ppb
+        toggle =3D not toggle
+        ret =3D librt.clock_adjtime(ctypes.c_int32(clockid), =
+ctypes.byref(tx))
+        if ret < 0:
+            print(f"adjfine error: {ctypes.get_errno()}")
+            break
+        n +=3D 1
+
+    stats["adjfine_count"] =3D n
+
+
+def tx_timestamp_loop(iface, stop_event, stats):
+    """Send UDP packets requesting hardware TX timestamps."""
+    # SOL_SOCKET options for timestamping
+    SO_TIMESTAMPING =3D 37
+    SOF_TIMESTAMPING_TX_HARDWARE =3D (1 << 0)
+    SOF_TIMESTAMPING_RAW_HARDWARE =3D (1 << 6)
+    SOF_TIMESTAMPING_OPT_TSONLY =3D (1 << 11)
+
+    flags =3D (SOF_TIMESTAMPING_TX_HARDWARE |
+             SOF_TIMESTAMPING_RAW_HARDWARE |
+             SOF_TIMESTAMPING_OPT_TSONLY)
+
+    sock =3D socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, SO_TIMESTAMPING, flags)
+    # Bind to the specific interface
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE,
+                    iface.encode() + b'\0')
+    sock.settimeout(0.01)
+
+    # Send to a harmless destination (localhost or broadcast)
+    dest =3D ("224.0.0.1", 9999)  # multicast, won't route
+    payload =3D b"igc_repro" + b"\x00" * 32
+    n =3D 0
+    errors =3D 0
+
+    while not stop_event.is_set():
+        try:
+            sock.sendto(payload, dest)
+            n +=3D 1
+        except OSError:
+            errors +=3D 1
+        # Don't sleep =E2=80=94 maximize collision probability
+        # But yield to avoid starving the adjfine thread
+        if n % 100 =3D=3D 0:
+            time.sleep(0.0001)
+
+    sock.close()
+    stats["tx_count"] =3D n
+    stats["tx_errors"] =3D errors
+
+
+def check_dmesg_for_timeout():
+    """Check if Tx timestamp timeout appeared in dmesg."""
+    try:
+        import subprocess
+        result =3D subprocess.run(
+            ["dmesg", "--since", "60 seconds ago"],
+            capture_output=3DTrue, text=3DTrue, timeout=3D2
+        )
+        return "Tx timestamp timeout" in result.stdout
+    except Exception:
+        return False
+
+
+def main():
+    if len(sys.argv) < 3:
+        print(f"Usage: sudo {sys.argv[0]} <interface> <ptp_device>")
+        print(f"Example: sudo {sys.argv[0]} eth1 /dev/ptp0")
+        sys.exit(1)
+
+    iface =3D sys.argv[1]
+    ptp_dev =3D sys.argv[2]
+    duration =3D float(sys.argv[3]) if len(sys.argv) > 3 else 30.0
+
+    if os.geteuid() !=3D 0:
+        print("ERROR: must run as root (sudo)")
+        sys.exit(1)
+
+    phc_fd =3D os.open(ptp_dev, os.O_RDWR)
+    print(f"Opened {ptp_dev} (fd=3D{phc_fd})")
+    print(f"Interface: {iface}")
+    print(f"Duration: {duration}s")
+    print(f"Watch for: dmesg -w | grep 'Tx timestamp timeout'")
+    print()
+
+    stop =3D threading.Event()
+    stats =3D {}
+
+    t_adj =3D threading.Thread(target=3Dadjfine_loop, args=3D(phc_fd, =
+stop, stats))
+    t_tx =3D threading.Thread(target=3Dtx_timestamp_loop, args=3D(iface, =
+stop, stats))
+
+    t_adj.start()
+    t_tx.start()
+
+    start =3D time.monotonic()
+    triggered =3D False
+    while time.monotonic() - start < duration:
+        time.sleep(1)
+        elapsed =3D time.monotonic() - start
+        if check_dmesg_for_timeout():
+            print(f"\n*** Tx timestamp timeout detected after =
+{elapsed:.1f}s ***")
+            triggered =3D True
+            break
+        print(f"  {elapsed:.0f}s: running...", end=3D"\r")
+
+    stop.set()
+    t_adj.join(timeout=3D2)
+    t_tx.join(timeout=3D2)
+    os.close(phc_fd)
+
+    adj_n =3D stats.get("adjfine_count", 0)
+    tx_n =3D stats.get("tx_count", 0)
+    tx_err =3D stats.get("tx_errors", 0)
+    elapsed =3D time.monotonic() - start
+
+    print(f"\nResults ({elapsed:.1f}s):")
+    print(f"  adjfine calls: {adj_n} ({adj_n/elapsed:.0f}/s)")
+    print(f"  TX packets:    {tx_n} ({tx_n/elapsed:.0f}/s), {tx_err} =
+errors")
+
+    if triggered:
+        print(f"\n  BUG TRIGGERED: igc Tx timestamp timeout")
+        print(f"  The igc driver's PTP timestamp register wedged due =
+to")
+        print(f"  concurrent adjfine() and hardware TX timestamping.")
+        sys.exit(1)
+    else:
+        print(f"\n  No timeout detected in {duration}s")
+        sys.exit(0)
+
+
+if __name__ =3D=3D "__main__":
+    main()
+
+--Apple-Mail=_DAE5922D-DCB8-444B-BD9A-99F8AE183AD2--
 
