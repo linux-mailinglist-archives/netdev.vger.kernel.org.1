@@ -1,129 +1,139 @@
-Return-Path: <netdev+bounces-273022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273023-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +OkMEWOcyWmqzwUAu9opvQ
-	(envelope-from <netdev+bounces-273022-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 23:40:51 +0200
+	id smTyHNOhyWlD0QUAu9opvQ
+	(envelope-from <netdev+bounces-273023-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 00:04:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF81B354316
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 23:40:50 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6C9A3543E3
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 00:04:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 53F163009F1E
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:40:44 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F2AF43001828
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA952382281;
-	Sun, 29 Mar 2026 21:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072782DC767;
+	Sun, 29 Mar 2026 22:03:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JFIW3eit"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZAfRSMz0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A580137AA79;
-	Sun, 29 Mar 2026 21:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85842D978C
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 22:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774820442; cv=none; b=b89W4NeN6ZFqjRNRgvuDBBf/AK4b6jWHHB5Fkd37KyGuGyfPMguNKtTEqLPbUMNl5ts5HErsJYVFrxQFm6rKLb3cta76k4gEAKudkxtwxk2sWpmWkkAlO27TexP6ablZ4iwZE/Bp3wQZAJPVoBO2gSqbghqLbQbgUOzIb2LjKhM=
+	t=1774821838; cv=none; b=YWiE7zC3VEN7F0OYxqj2NBuMyPMa1+JdiWM0diWQbs0PD0GHzPpAUeru2GOQ7yuiv33seQYMAw3nRiIu0Wn9TIuR5wSirE9C5jNp/l8xya8oVOWUVx3OCqeYw+6NfNOCzYaCHnSnW8E2zg9ybdBXsweCKSSfw9qItmfXd84+kr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774820442; c=relaxed/simple;
-	bh=hmCRlyG0bAv29oQ0zT8IF5KWMcwWQa7Oj6fZIK+K8FE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nRLnp6dGt+f/xZ/A7TV2mD2mhq70kD/mrEbBfj9dNbK9SPxFo2m8rcx+LdUqTiuJsYodztABo0MchD/RVcCAUtn02orx57BjSVjaUzhejqkKy4ou5SISjGr7oe6vk4oHytmOlKGowZz9oH4EMqlQy94VjIK/1lnSJlFSj4X3nsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JFIW3eit; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78258C116C6;
-	Sun, 29 Mar 2026 21:40:42 +0000 (UTC)
+	s=arc-20240116; t=1774821838; c=relaxed/simple;
+	bh=6yn7EwahshMP7t8gqyl8uwicrBe/9zbJ4Uog9xwOHv0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=BtAW7GAEgrGh4RYXqo3chtWnbJi0IKI6Ymd2s7V6c9j8sfhTjw/PQ28AtN3fO6DCiUL099V7yPbR+W/DWypVemTKZsIJP9Pe7EOcUPq1IkWXIA2VgnWgE2htu1bLb9nFR3btIBxQ2ldi+655MJ5JwCIKdyWlTUMAJ+O7GF7R/9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZAfRSMz0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39119C116C6;
+	Sun, 29 Mar 2026 22:03:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774820442;
-	bh=hmCRlyG0bAv29oQ0zT8IF5KWMcwWQa7Oj6fZIK+K8FE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JFIW3eit3Al+gKwsouuexsxYcJA0ZA6RMQNRr7/OTssRgQuKYYxgZoPVZGneCU5me
-	 d09YBaY87ZjxQ6vCQ10cz4IQOiGNAV8TxePuoC+qm5ywMeBUCDFwkazhll9X/CpG1U
-	 u9dCzawuQDAAPZF97IjsZ2ZqALBoRAAC67GGqfW5fQVQvqTGTfSKNicV0Y8VkCA3Eu
-	 ClLSw1oa2zRoyUVrGUF2fq8dDstwX1W3wJ6wBpHpZNb2FCdUo6LBHaqQGuHR5RBaBa
-	 EgYt7qeZzCBbrJ/NxEu/clQTwEQq6YarVNgsURA+4FuIFz/0OXW/eO08Ddko/gwK63
-	 /0j4mS62xwgXw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FE083930012;
-	Sun, 29 Mar 2026 21:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1774821838;
+	bh=6yn7EwahshMP7t8gqyl8uwicrBe/9zbJ4Uog9xwOHv0=;
+	h=From:Date:Subject:To:Cc:From;
+	b=ZAfRSMz0wkc+I1P/TrrvJfqM2Aq9vVJMq62NhtG6qrQkyvL4HCmwEhUVoKFd4lI5h
+	 4GpnaiCeG0k8vEEUsxIwlbGcG5hyylgYGnt25APxWcuNFL+eqn+sOTIrXsqXaoZQPQ
+	 ftrR0nITFRxSUx6C3YjIinCn2R0klplk16HU37jieJnotbKuOh3VeDyKUEO3S6tU14
+	 CNtN4q7iKFjYiPNd6Iy/qjkBtnc85evSC6Xjhxud7m8wRlQsz5x16bVfi6bQoYe+jd
+	 6Nbb8I/SnUEaw9ZXXb6NJQnZFWyqgUdWlPsWTkds/2aw+FYhjxU6suBjY5DVqgJBEX
+	 qgp0PteYCkiMQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Mon, 30 Mar 2026 00:03:49 +0200
+Subject: [PATCH net-next] net: airoha: Fix typo in airoha_set_gdm2_loopback
+ routine name
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/2] net: hsr: subsystem cleanups and
- modernization
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177482042679.472023.17711197467583379324.git-patchwork-notify@kernel.org>
-Date: Sun, 29 Mar 2026 21:40:26 +0000
-References: <20260326174600.136232-1-luka.gejak@linux.dev>
-In-Reply-To: <20260326174600.136232-1-luka.gejak@linux.dev>
-To: Luka Gejak <luka.gejak@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, horms@kernel.org,
- fmaurer@redhat.com, liuhangbin@gmail.com, linux-kernel@vger.kernel.org
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260330-airoha_set_gdm2_loopback-fix-typo-v1-1-a1320ff6b6cc@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2NQQrDIBAAvxL23AU1NdB+pRSxZpMsbV1RKSkhf
+ 4/kOAzMbFAoMxW4dxtk+nFhiQ30pYOw+DgT8tgYjDKD6s0NPWdZvCtU3Tx+jfuIpJcPb5x4xfp
+ PgoGs7rWy18kO0DopU3Pn4wGRKkZaKzz3/QCPiBUufQAAAA==
+X-Change-ID: 20260329-airoha_set_gdm2_loopback-fix-typo-ce5131054f56
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273022-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-273023-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email]
-X-Rspamd-Queue-Id: AF81B354316
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D6C9A3543E3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+Rename airhoha_set_gdm2_loopback() in airoha_set_gdm2_loopback()
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/airoha/airoha_eth.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Thu, 26 Mar 2026 18:45:58 +0100 you wrote:
-> From: Luka Gejak <luka.gejak@linux.dev>
-> 
-> Changes in v2:
->  - dropped trivial cleanup-only patches per netdev clean-up policy
->  - added AI attribution for cover-letter/commit-message wording only
->  - dropped fallthrough/BIT conversion patches per review
-> 
-> [...]
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index 82e53c60f561f6314fbf201ba8bc8711e40edc68..2beba017e791d20f142e754edafcd402d8cc496f 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -1709,7 +1709,7 @@ static int airoha_dev_set_macaddr(struct net_device *dev, void *p)
+ 	return 0;
+ }
+ 
+-static int airhoha_set_gdm2_loopback(struct airoha_gdm_port *port)
++static int airoha_set_gdm2_loopback(struct airoha_gdm_port *port)
+ {
+ 	struct airoha_eth *eth = port->qdma->eth;
+ 	u32 val, pse_port, chan, nbq;
+@@ -1785,7 +1785,7 @@ static int airoha_dev_init(struct net_device *dev)
+ 		if (!eth->ports[1]) {
+ 			int err;
+ 
+-			err = airhoha_set_gdm2_loopback(port);
++			err = airoha_set_gdm2_loopback(port);
+ 			if (err)
+ 				return err;
+ 		}
 
-Here is the summary with links:
-  - [net-next,v2,1/2] net: hsr: constify hsr_ops and prp_ops protocol operation structures
-    https://git.kernel.org/netdev/net-next/c/3e09b370f830
-  - [net-next,v2,2/2] net: hsr: use __func__ instead of hardcoded function name
-    https://git.kernel.org/netdev/net-next/c/137ac69c15fd
+---
+base-commit: cf0d9080c6f795bc6be08babbffa29b62c06e9b0
+change-id: 20260329-airoha_set_gdm2_loopback-fix-typo-ce5131054f56
 
-You are awesome, thank you!
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Lorenzo Bianconi <lorenzo@kernel.org>
 
 
