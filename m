@@ -1,61 +1,65 @@
-Return-Path: <netdev+bounces-273024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273025-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id C6VvMaijyWnj0QUAu9opvQ
-	(envelope-from <netdev+bounces-273024-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 00:11:52 +0200
+	id mNxVF9OjyWnj0QUAu9opvQ
+	(envelope-from <netdev+bounces-273025-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 00:12:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11513354412
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 00:11:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E5C3B354420
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 00:12:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 576B9300BC93
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:11:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 55630300D476
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:12:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B7836BCC3;
-	Sun, 29 Mar 2026 22:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74B42EC0B4;
+	Sun, 29 Mar 2026 22:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KPvbeLS5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h5IAqs9a"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804AB30F547;
-	Sun, 29 Mar 2026 22:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A409B249EB;
+	Sun, 29 Mar 2026 22:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774822309; cv=none; b=opD+b+q82rp0Lx2aH9Q+pYsA9n2rMp+WZIIyg42xKqzOwJn3pjNF4s/tq5nnY3BxBsW7kuEM9oK3VsjrUfajmhP4z1Ycmx2tuHKhIiZihYlKURqi6pQWh6z0Z1nAoqnVWvxXnZei94KN60IaoCQgLuDdec6erWsEE1y4konyB6Q=
+	t=1774822352; cv=none; b=Rpn/id/9dG4ryRas9U+FDHckiiz26zbW2GmoCg18JR0m4zVy88q/pS/8Bu6t0Sq5Qwaefy9cXmd7V36pgknAKF+GRnI0L+JbKHp0uNmLnqMikLoKuDNr6UlrswbozIC7DqzRvRgCRNm31pmQ+z9ky2hbbTQfbjENecPE/kXIwg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774822309; c=relaxed/simple;
-	bh=JRvJneMHtrsi4yXBNe6LRlO/CoN/jkmSP5H4YoABJz0=;
+	s=arc-20240116; t=1774822352; c=relaxed/simple;
+	bh=7gR/RhLuywXK4z4Yd7rCJo6vYLWYlNMRRVny8ORRdmE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=POshLGGhTZka/U4Yz5rvNGFB1ZF4y86dgTH1lcm/mH194Uk7OU4R2ysGKK9cyX/QuR/p4tOcu8EbgCD1/G7K3UnYjR0Qdd2zYUsg/RPd3bTPDRXU5Yg3fImennpAT5omzjC8UivBmKFvJerPd5QD4S3tyTLrwyi8FmRB66N257g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KPvbeLS5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 946D9C116C6;
-	Sun, 29 Mar 2026 22:11:48 +0000 (UTC)
+	 MIME-Version:Content-Type; b=sEZlh23Ct0XACvl0VXRK8261AHXyvFkS9dB/TRC9aK3MFCNyArpoq9FLxSBDD7kqtwoxgtBNh914MNsUDJBDILlbWQM6Jaf5K9NLyOAS5vveoh2FAVl16cE3LHDBBC4lFfdRDnu05ubOJwVRJcE06xtKEXvn9rc1/6IwCG7A5qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h5IAqs9a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88472C116C6;
+	Sun, 29 Mar 2026 22:12:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774822309;
-	bh=JRvJneMHtrsi4yXBNe6LRlO/CoN/jkmSP5H4YoABJz0=;
+	s=k20201202; t=1774822352;
+	bh=7gR/RhLuywXK4z4Yd7rCJo6vYLWYlNMRRVny8ORRdmE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KPvbeLS5SMngDD87LJ4R2e44su0XT5Q9/K1513B1FfdyJeI1wQMVTK1eB2gzGILmm
-	 9ypJqhM0kt43isErXMYwNqzz4NxtPzdyiy+W47oVwtU7O73blO23trxxK+DlJZBBDM
-	 dbd646gC4Qhl+TmZHMSxi9B4l+f2VNqR/8rDKzTanPR0C5lwdo5K1wpYq7mjnC05H+
-	 imnKzwQtChYatuWCAuZOZFlm4KpXTU49HiaUCOxDAVk03vNYIc2DXyKoZJLS9q/4Ao
-	 uiklx6WLp9E2+Rlm/yu0S8g4+7ioksnWBVsvK83D03K1S7O6EuTfxkppi2SYlmyhO0
-	 tUoc2mWdrlLxQ==
-Date: Sun, 29 Mar 2026 15:11:47 -0700
+	b=h5IAqs9aCMRjB/2oTjfgQE8t6j2fyW3/y1ZVHXTY7wP7YvgmgSwDKhka2H7txuDg3
+	 wdsUP2tFb55Vts1gih6NRtIQsbi2462x9+pKUx0OUSpMLYLRjM8yhu9hPSpq5rKEU0
+	 KP03EQSTMvivYq7c+q7NCZZa7LQVh3efCvwXC82WIFxZzgqAF3cmFwlyCAKlVyc+vO
+	 q1MqVx2yBwtko2leztRX0NY4sAbEowbq5C0o9KeR3YmdO/qPwFOEG8qpD6LW3k5Fxp
+	 GFC+W6q+iEmn3xmVSIYXQbi2fgZo4o9dYrXXMFC50z7IcooaqfOLF8nNWEwVIooc41
+	 hz8/onyrdBuTA==
+Date: Sun, 29 Mar 2026 15:12:30 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Joe Damato <joe@dama.to>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- andrew+netdev@lunn.ch, horms@kernel.org, michael.chan@broadcom.com,
- pavan.chebbi@broadcom.com, linux-kernel@vger.kernel.org, leon@kernel.org
-Subject: Re: [net-next v6 01/12] net: tso: Introduce tso_dma_map
-Message-ID: <20260329151147.6d2fc8e0@kernel.org>
-In-Reply-To: <20260326235238.2940471-2-joe@dama.to>
+Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, andrew+netdev@lunn.ch,
+ horms@kernel.org, pavan.chebbi@broadcom.com, linux-kernel@vger.kernel.org,
+ leon@kernel.org, bpf@vger.kernel.org
+Subject: Re: [net-next v6 07/12] net: bnxt: Add boilerplate GSO code
+Message-ID: <20260329151230.7acacbb9@kernel.org>
+In-Reply-To: <20260326235238.2940471-8-joe@dama.to>
 References: <20260326235238.2940471-1-joe@dama.to>
-	<20260326235238.2940471-2-joe@dama.to>
+	<20260326235238.2940471-8-joe@dama.to>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,45 +73,41 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273024-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-273025-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,broadcom.com,davemloft.net,google.com,redhat.com,gmail.com,kernel.org,iogearbox.net,lunn.ch];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 11513354412
+X-Rspamd-Queue-Id: E5C3B354420
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 26 Mar 2026 16:52:20 -0700 Joe Damato wrote:
-> Add struct tso_dma_map to tso.h for tracking DMA addresses of mapped
-> GSO payload data.
-> 
-> The struct combines DMA mapping storage with iterator state, allowing
-> drivers to walk pre-mapped DMA regions linearly. Includes fields for
-> the DMA IOVA path (iova_state, iova_offset, total_len) and a fallback
-> per-region path (linear_dma, frags[], frag_idx, offset).
-> 
-> Helpers to initialize and operate on this struct will be added in the
-> next commit.
+On Thu, 26 Mar 2026 16:52:26 -0700 Joe Damato wrote:
+> @@ -891,6 +891,7 @@ struct bnxt_sw_tx_bd {
+>  	u8			is_ts_pkt;
+>  	u8			is_push;
+>  	u8			action;
+> +	u8			is_sw_gso;
+>  	unsigned short		nr_frags;
 
-Let's squash this with patch 2? Quite useful to see the struct when
-reviewing the code..
+nit: maybe group the is_* together, IOW move new fields before @action?
 
