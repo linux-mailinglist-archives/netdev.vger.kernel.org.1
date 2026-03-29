@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-273017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273018-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oCpVOpqXyWnWzgUAu9opvQ
-	(envelope-from <netdev+bounces-273017-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 23:20:26 +0200
+	id EKdxNoyXyWnWzgUAu9opvQ
+	(envelope-from <netdev+bounces-273018-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 23:20:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A196354213
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 23:20:26 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD2E4354205
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 23:20:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19C9F30038ED
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:20:03 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1FAC03002F76
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834E02E22BD;
-	Sun, 29 Mar 2026 21:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF412E7F38;
+	Sun, 29 Mar 2026 21:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PmGN4SZv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RwMbK1ow"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED532E040E;
-	Sun, 29 Mar 2026 21:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879A32E0413;
+	Sun, 29 Mar 2026 21:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774819202; cv=none; b=tP3+BT9io2cyanlQ6g3ztV8jQ1XVW3ABk4B0tot8njxM/QDxkLUkEt9BkoLx81OSSx5Qd07/GsBHxRMooFhslc5NCtngJdv311mPDlkO1ezXP2YwP230L4S2VNpbjA8dwmBj/lrt0IIAtgJSUkroXo4dGGZ0pRj+ugt9UJKSsno=
+	t=1774819204; cv=none; b=MfuGl6MvfpTpOhuE2Cf6UD2BJmGKopZtnwbwvq44hLyk67f9TFLUBgTbBy//ASDHhbb1sHXzrGOZNtpTfIKdAPOih5gaM+yGujH93xXoydY5ffMqU6s7UuQFzIXAXhCbPmfH47WLKwlfp7y5pL5Bjx3aIvSgPF7UkgutlrIdoUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774819202; c=relaxed/simple;
-	bh=S1uFCIxkrPT2YoMOkN2aLPV/xIL2DGaeopxboUzveXE=;
+	s=arc-20240116; t=1774819204; c=relaxed/simple;
+	bh=kAo9tLjGKCihc6z2YnjSXgOzlhPl2lvECWwCBnkE4SI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LbvXC3SCnE3Ha9+ENhkm0swh+1sChtFv2PL+GTbJ/KGhhtcKHe54Oeseix0nuMekvw24F02+h9pPEIgpMYawa8D9r6mrxYeObTZVtPaz5N754oWzBdqaaPwS4SfKSAwq7Xzf22Z5fs6vFO62/SY7JT+WW/lpK5QX5CXMcSi/i2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PmGN4SZv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1A0BC116C6;
-	Sun, 29 Mar 2026 21:20:00 +0000 (UTC)
+	 MIME-Version; b=ODSC3igUB6jFmmph3L8GaYKe3/XBZvulS0K9QehlDrigyFEyRFsOoRXMqBj0TUgIaUVlwZ2YuezM0/Uc3d1c3DNFBD3LaTbt1QbGnii+Q1mET7tMHLoFBgkQ3qJD9or22dmy5l6E8sYOnAFI5wruUCyb8SWyikoVA3vcbPt6Cvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RwMbK1ow; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70679C116C6;
+	Sun, 29 Mar 2026 21:20:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774819201;
-	bh=S1uFCIxkrPT2YoMOkN2aLPV/xIL2DGaeopxboUzveXE=;
+	s=k20201202; t=1774819204;
+	bh=kAo9tLjGKCihc6z2YnjSXgOzlhPl2lvECWwCBnkE4SI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PmGN4SZvL7nYDxPTq+OkwVWaFWiLNzSkTSR9GEl+o85wiUh1HZq2BPSzgj0C9R9QD
-	 Y4a62lBlMA+q5UZz38mIA/u8J9UUIu5zmqXBwISml77RCWJZbsTrbSuMRysUB9sB/W
-	 NrtQH5pnbgTUiRIESbMdr2qlSl8uW/m8b0bl39oI4TPqOsSQlo3dRxM0bnhsC7c/dU
-	 mGcNqOgucnkQxtMfioTxGwellsNRojvb9bk6j/VfrcdvDgNxXp9OwvKnmBlp1NyLii
-	 B7tgh7xshPv64vS3NQJX80ehfSf3DsQnJJYjS+ThTl3IWxueP6EdbKdPcjo14k6437
-	 PlIZQWkRhpUoQ==
+	b=RwMbK1ow8cAGT5E9dm/BWee23Je6zD8Gr9ad/W1ASz2BjlNlG+Bztv09F6jpYpcvp
+	 dCXt7ybrcE29TksIeJ4qlawV2TTljeMFSNQ43by96ZFHRCQxpXcM+omce1wMo3UJlZ
+	 R1qYtU9dVEEMS99avXpLoTaomFppYRYOOEh0vWU0gD/v/aBRHMo58AG8pwQuJJPPjE
+	 bNFkbu3Lj3LRYwujF9GWrHgeICDm6sOxBJWWBuXIjpEpJsMMuiqC7UGBz5yByOBpM1
+	 nunSKd75+j4xOqBYdANR0kZKERWuLOegSOSRUjD4s56eDaJu3fc1IQDD50+h6GuWt1
+	 N3svh7bhj5t/g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: hramamurthy@google.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -66,12 +66,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	yyd@google.com,
 	linux-kernel@vger.kernel.org,
 	namangulati@google.com
-Subject: Re: [PATCH net-next v2 2/3] gve: make nic clock reads thread safe
-Date: Sun, 29 Mar 2026 14:19:58 -0700
-Message-ID: <20260329211958.2875749-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2 3/3] gve: implement PTP gettimex64
+Date: Sun, 29 Mar 2026 14:20:02 -0700
+Message-ID: <20260329212002.2875815-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260326224527.1044097-3-hramamurthy@google.com>
-References: <20260326224527.1044097-3-hramamurthy@google.com>
+In-Reply-To: <20260326224527.1044097-4-hramamurthy@google.com>
+References: <20260326224527.1044097-4-hramamurthy@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,14 +86,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,google.com,lunn.ch,davemloft.net,redhat.com,gmail.com,oracle.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[21];
-	TAGGED_FROM(0.00)[bounces-273017-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273018-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -106,82 +106,149 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6A196354213
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DD2E4354205
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-gve: make nic clock reads thread safe
+Subject: gve: implement PTP gettimex64
 
-This commit adds a mutex to protect the shared DMA buffer used for receiving
-NIC timestamp reports. The lock is needed to synchronize the periodic worker
-and the upcoming gettimex64 ioctl.
+This commit implements the PTP gettimex64 function to enable chrony and
+phc2sys to synchronize the system clock to the NIC clock. It reads the
+NIC timestamp along with pre and post system cycle counters to minimize
+the uncertainty window.
 
 > diff --git a/drivers/net/ethernet/google/gve/gve_ptp.c b/drivers/net/ethernet/google/gve/gve_ptp.c
-> index 06b1cf4a5efc..140b8fbce4f4 100644
+> index 140b8fbce4f4..bea794541f30 100644
 > --- a/drivers/net/ethernet/google/gve/gve_ptp.c
 > +++ b/drivers/net/ethernet/google/gve/gve_ptp.c
+> @@ -10,28 +10,203 @@
 
 [ ... ]
 
-> @@ -109,6 +114,7 @@ static void gve_ptp_release(struct gve_priv *priv)
->  
->  int gve_init_clock(struct gve_priv *priv)
+> +static int gve_adminq_read_timestamp(struct gve_priv *priv,
+> +				     cycles_t *pre_cycles,
+> +				     cycles_t *post_cycles)
+> +{
+> +	unsigned long delay_us = 1000;
+> +	int retry_count = 0;
+> +	int err;
+> +
+> +	lockdep_assert_held(&priv->nic_ts_read_lock);
+> +
+> +	do {
+> +		*pre_cycles = get_cycles();
+> +		err = gve_adminq_report_nic_ts(priv, priv->nic_ts_report_bus);
+> +
+> +		/* Ensure cycle counter is sampled after AdminQ cmd returns */
+> +		rmb();
+> +		*post_cycles = get_cycles();
+
+Are execution barriers needed around get_cycles() here? rmb() orders
+memory accesses, but the CPU might still speculatively execute the cycle
+counter reads out of order with respect to the AdminQ commands.
+
+Could this speculative reordering cause the strict bounds validation in
+gve_ptp_gettimex64() to fail spuriously?
+
+[ ... ]
+
+>  static int gve_ptp_gettimex64(struct ptp_clock_info *info,
+>  			      struct timespec64 *ts,
+>  			      struct ptp_system_timestamp *sts)
 >  {
-> +	u64 nic_raw;
->  	int err;
->  
->  	err = gve_ptp_init(priv);
+> -	return -EOPNOTSUPP;
+> +	struct gve_ptp *ptp = container_of(info, struct gve_ptp, info);
+> +	struct gve_sysclock_sample sysclock = {0};
+> +	struct gve_priv *priv = ptp->priv;
+> +	struct system_time_snapshot snap;
+> +	u64 nic_ts;
+> +	int err;
+> +
+> +	/* Take system clock snapshot before sampling cycle counters */
+> +	if (sts)
+> +		ktime_get_snapshot(&snap);
+> +
+> +	err = gve_clock_nic_ts_read(priv, &nic_ts, &sysclock);
+
+Could the system time snapshot become stale here? 
+
+If priv->nic_ts_read_lock is contended, or if gve_adminq_read_timestamp()
+retries and sleeps, the snapshot might be taken significantly before the
+actual hardware read.
+
+Would it be more accurate to take the snapshot immediately before reading the
+hardware, inside the mutex?
+
+> +	if (err)
+> +		return err;
+> +
+> +	if (sts) {
+> +		/* Reject samples with out of order system clock values */
+> +		if (!(sysclock.host_pre_cycles <= sysclock.nic_pre_cycles &&
+> +		      sysclock.nic_pre_cycles  <= sysclock.nic_post_cycles &&
+> +		      sysclock.nic_post_cycles <= sysclock.host_post_cycles)) {
+> +			dev_err_ratelimited(&priv->pdev->dev,
+> +					    "AdminQ system clock cycle counts out of order. Expecting %llu <= %llu <= %llu <= %llu\n",
+> +					    (u64)sysclock.host_pre_cycles,
+> +					    sysclock.nic_pre_cycles,
+> +					    sysclock.nic_post_cycles,
+> +					    (u64)sysclock.host_post_cycles);
+> +			return -EBADMSG;
+
+How does this behave on architectures where get_cycles() is not implemented
+and returns 0, or with older firmware that leaves nic_pre_cycles and
+nic_post_cycles as 0?
+
+It looks like the bounds check would unconditionally fail and return -EBADMSG.
+Since userspace tools like chrony usually expect -EOPNOTSUPP for unsupported
+extended ioctls to fall back to basic PTP ioctls, will returning -EBADMSG
+cause a hard failure for clock synchronization?
 
 [ ... ]
 
-> @@ -125,17 +131,20 @@ int gve_init_clock(struct gve_priv *priv)
->  		err = -ENOMEM;
+> @@ -132,7 +307,7 @@ int gve_init_clock(struct gve_priv *priv)
 >  		goto release_ptp;
 >  	}
-> -	err = gve_clock_nic_ts_read(priv);
-> +	mutex_init(&priv->nic_ts_read_lock);
-> +	err = gve_clock_nic_ts_read(priv, &nic_raw);
-
-Could this lead to a race condition with userspace?
-
-If gve_ptp_init() registers the PTP clock via ptp_clock_register(), the
-device is exposed to userspace immediately. If a userspace process opens the
-device and calls the gettimex64 ioctl before the mutex and DMA buffer are
-initialized here, it could cause a NULL pointer dereference or operate on an
-uninitialized mutex.
-
+>  	mutex_init(&priv->nic_ts_read_lock);
+> -	err = gve_clock_nic_ts_read(priv, &nic_raw);
+> +	err = gve_clock_nic_ts_read(priv, &nic_raw, NULL);
 >  	if (err) {
 >  		dev_err(&priv->pdev->dev, "failed to read NIC clock %d\n", err);
 >  		goto release_nic_ts_report;
->  	}
-> +	WRITE_ONCE(priv->last_sync_nic_counter, nic_raw);
->  	ptp_schedule_worker(priv->ptp->clock,
->  			    msecs_to_jiffies(GVE_NIC_TS_SYNC_INTERVAL_MS));
->  
->  	return 0;
->  
->  release_nic_ts_report:
-> +	mutex_destroy(&priv->nic_ts_read_lock);
->  	dma_free_coherent(&priv->pdev->dev,
->  			  sizeof(struct gve_nic_ts_report),
->  			  priv->nic_ts_report, priv->nic_ts_report_bus);
 
-Is it safe to destroy the mutex and free the DMA buffer before calling
-gve_ptp_release() here?
+Is there a race condition exposing the PTP device to userspace before its
+resources are fully initialized?
 
-If the PTP clock is already registered and exposed to userspace by
-gve_ptp_init(), this error path frees resources while the clock is still
-active. A concurrent userspace ioctl could access the destroyed mutex or
-freed buffer before gve_ptp_release() unregisters the clock.
+Looking at gve_init_clock(), gve_ptp_init() is called before allocating
+nic_ts_report and initializing nic_ts_read_lock:
 
-Should all resource allocation and initialization strictly precede
-ptp_clock_register(), and the error path unregister the clock before tearing
-down the resources?
--- 
-pw-bot: cr
+    err = gve_ptp_init(priv);
+    if (err)
+        return err;
+
+    priv->nic_ts_report = dma_alloc_coherent(...);
+    ...
+    mutex_init(&priv->nic_ts_read_lock);
+
+If a concurrent userspace process immediately invokes the
+PTP_SYS_OFFSET_EXTENDED ioctl after gve_ptp_init() registers the /dev/ptpX
+device, could it call gve_ptp_gettimex64() and attempt to lock the
+uninitialized mutex or dereference the NULL nic_ts_report pointer?
+
+Additionally, in the error path for gve_init_clock():
+
+    release_nic_ts_report:
+        mutex_destroy(&priv->nic_ts_read_lock);
+        dma_free_coherent(...);
+        priv->nic_ts_report = NULL;
+    release_ptp:
+        gve_ptp_release(priv);
+
+Could destroying the mutex and freeing the memory before gve_ptp_release()
+create a use-after-free window if an ioctl is currently running?
 
