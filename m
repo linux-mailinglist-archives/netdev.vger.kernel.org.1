@@ -1,268 +1,204 @@
-Return-Path: <netdev+bounces-273003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273005-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GGCsJlCFyWndygUAu9opvQ
-	(envelope-from <netdev+bounces-273003-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:02:24 +0200
+	id i9REMmOGyWl0ywUAu9opvQ
+	(envelope-from <netdev+bounces-273005-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:06:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3978B353E83
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:02:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22FD4353ED3
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 22:06:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E3C17306F7AD
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 19:56:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ACD0F300876D
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 20:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9904A38551B;
-	Sun, 29 Mar 2026 19:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BB021257E;
+	Sun, 29 Mar 2026 20:06:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="erzw5uW1"
+	dkim=pass (2048-bit key) header.d=nebelreich.de header.i=eitschman@nebelreich.de header.b="BoIkUrIo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75537386C0F;
-	Sun, 29 Mar 2026 19:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A36701F5858
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 20:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774814203; cv=none; b=uTRwtnyMeTAGwBZP/6uf2VmyBmeJP4hyglgS0dFM0XjwrSOa+bKAgiBIkz+hZfyjnqkOlc468/y+jzT8QKfY119R6pQN0G0TESUe89sFGrd/jdP2hb10MKvdcSMRui8tR0xf5m9z1Dl9OMOZm2c+fkwhwdeoqaxl6NBx3Z3NFE8=
+	t=1774814817; cv=none; b=LMM6XHMo1wjWkYXoSfcv9iixhcNy7wShyikPIVpYBAHa8rhCk2rTWXauEGTdGvl6bRLH6XnbKl7kmXCNfarctV6uGkuc0nzYWXh/uAOsxTcmZPBZqyj3O3j1MCAtnka64+4YZ9DhKDbD7ZAOTO8hHqv9HD1VmVBbTwFo2YgpcE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774814203; c=relaxed/simple;
-	bh=rzmuSdC783UdanWK5KRP7rxT8rboYecl70TfW8YAGFs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R5bS7t4Drm+/8qRLGqK7rODsJ1Iv/uDU2X7cyXBQ4fmwrw94YepppuI5m1ETsO0D3+oRQwAFzeiUI0H21SRKaMJuHq6Y3eWXDg5HyxNq2k/j9CqbByD780VR4mFDF6wIrR/fH7OkkZDmbPFrlvE2v3l9Ed6TbuD9swD1Tlj6r7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=erzw5uW1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57CDAC2BCB1;
-	Sun, 29 Mar 2026 19:56:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774814201;
-	bh=rzmuSdC783UdanWK5KRP7rxT8rboYecl70TfW8YAGFs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=erzw5uW1zwami3pWq3vSKGV4s2VbQ2uOun4lwWhU2tPuihfwEXm7I3+ZvAIkdP7s2
-	 MdM1wePQfVw5wfZHLu0uq5ZQcy1kP03FFg8BVkDl6wlBkdWj7gKsLB+UCG4+TKXaqc
-	 FhuMULU1bWjM6Inc/pGDDnrdfo1A6zBPfO5gbfnkzxURWGsBslmvCSFB+UG9vs4zkF
-	 II0ULuuMbK+jgM/iun8uX5c2OqNjR0V21ueUsXKJ7WzEZ6WaegNLsk7yO1r1o3eSCE
-	 8MCvmOA0hoIbVfjR4BJkrG7xrF3r1E0qzm5yjL+7kHyuNbd72JcmX9UQ2GNWQwqBf0
-	 ItPWiQV7NILaQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: jensemil.schulzostergaard@microchip.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	UNGLinuxDriver@microchip.com,
-	andrew@lunn.ch,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	woojung.huh@microchip.com,
-	linux@armlinux.org.uk,
-	Steen.Hegelund@microchip.com,
-	daniel.machon@microchip.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v2 9/9] net: dsa: lan9645x: add port statistics
-Date: Sun, 29 Mar 2026 12:56:39 -0700
-Message-ID: <20260329195639.2789284-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260324-dsa_lan9645x_switch_driver_base-v2-9-f7504e3b0681@microchip.com>
-References: <20260324-dsa_lan9645x_switch_driver_base-v2-9-f7504e3b0681@microchip.com>
+	s=arc-20240116; t=1774814817; c=relaxed/simple;
+	bh=rOFVWryWour3tdlBTW7iOgqO5UprJfSktFu2+9e3HQk=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KTLjAocIfoQsz3fbDDkQRE2Ay2TAFPzzHVCnEQrgakwsuNbTlUK6wSYBG91kUHvUhRxn97mEm5CRsgwsPS5h4lC47PwWsJhLsjZ2Fu7SnkDdgfVfdYgPI9LZzoXJARIsLc+UVWJvNDi3n6z1uIqgWLXJU2yVpPWaq9EIsnfmMaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nebelreich.de; spf=pass smtp.mailfrom=nebelreich.de; dkim=pass (2048-bit key) header.d=nebelreich.de header.i=eitschman@nebelreich.de header.b=BoIkUrIo; arc=none smtp.client-ip=212.227.17.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nebelreich.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebelreich.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nebelreich.de;
+	s=s1-ionos; t=1774814807; x=1775419607; i=eitschman@nebelreich.de;
+	bh=G9wEL7YhtGTlkZIbfzXrBHx4q/WG4oQ21I3JWs74ZMg=;
+	h=X-UI-Sender-Class:From:To:Cc:References:In-Reply-To:Subject:Date:
+	 Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=BoIkUrIojGZGLtTY3jO6p1CJQmhSBYg2Ba83FgUKpcYNqCW0lrSf1ri9ZjPxPOc9
+	 7Mk2ewEqOlCfUWVK8wBM0dNTWcrcUit8C+sPIbS3KpQ/r3Xbvl7+H+ls2hmTg5NnW
+	 m6sacga51+T7rjZpbnvRjfdwXsWMVg7kyFlNhNSBQu6EhTg0zRYUfxUiyKIEJPqNQ
+	 dN21THILPtuTs6DLchPozXKvl9JjL+tHtMSgTvmseIvK0weEyuM7c+DO7fxpKwyQr
+	 Fkk1mdHADgTfEATW5ydAYmmsGL2/neKNVhbN7UieycQkpW9isXuSoe4qOblZRlpPV
+	 oyYxSgg2B9UbPUA87Q==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from client.hidden.invalid by mrelayeu.kundenserver.de (mreue106
+ [212.227.15.183]) with ESMTPSA (Nemesis) id 1MV5G4-1vztKd0zA6-00XNt9; Sun, 29
+ Mar 2026 22:01:09 +0200
+From: "Andreas Haarmann-Thiemann" <eitschman@nebelreich.de>
+To: "'Linus Walleij'" <linusw@kernel.org>
+Cc: <ulli.kroll@googlemail.com>,
+	<netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>
+References: <006201dcbf63$84593aa0$8d0bafe0$@nebelreich.de> <CAD++jLmVPCL6p3jcdg1y_w=Zij6oVdWTvSmQFjWLn4yRJL4g=w@mail.gmail.com>
+In-Reply-To: <CAD++jLmVPCL6p3jcdg1y_w=Zij6oVdWTvSmQFjWLn4yRJL4g=w@mail.gmail.com>
+Subject: AW: [BUG] net: ethernet: cortina: gemini: skb leak in gmac_rx() causes kernel lockup under sustained RX load
+Date: Sun, 29 Mar 2026 22:01:08 +0200
+Message-ID: <000c01dcbfb6$c8fa6b40$5aef41c0$@nebelreich.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQLUme4N3xNJ0EwL8UVC5C2k8HMTYAH+30GOs8ZCkwA=
+Content-Language: de
+X-Provags-ID: V03:K1:9ezzx3KcIaT9BtlchuUc8xv0bbAlDqMAb5FzatEXOkeq3X3bYAX
+ MmdUe8KpGFfCjTvxnZbMRkWY7sjTt5Sgg3F2wsOO8S7hg1t8B09CoMcVMD/ieytViedKwkm
+ yPUs03mnxrAgqqPPeCOZOB0R5BH5ozWbw/mYTgKtWcUG/Iv5cAFV57eDH7pZ1KdexBh4nOt
+ HdzIpLJetkl5m4WliUTPA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:jpco1jQQQxU=;rizAXQ0hYQcFcbQUwejip2SFiwW
+ NvqL+AtXyc8nvlmFT0fHsXcm8fKYpciGFrTZJDUigrkGRKMmcqrRBQX3sF6RDDBRIhDeLhGGr
+ fGVsyT5tVdZbI9DPCk8WEopYbKe4U+NVFflDJGKd7Iy/3H47KNmmR4XxGBS1+XYMhSQhdTP4V
+ QdAgMX7L06AvBOJ1a8rD3aXrqsQu3o1L0j0gjhdrTtGUa6TgnMEaWr2J+02Pi7r8yDvKd52NF
+ 0GttkJlmxCtfZ7ofmO5mHGTRzqDgvZNILeitADjiamS6MHasbSZD8THCxqRqmwgo24bcy+kDo
+ q/Bpjt6R4XCCHK2+FiCNFwzEh7NtjWpT4EJR0lcaDgNvtP5mj2HKx6B7/qD0vz1VFMIZTVmtg
+ ZyZW8a21IvvpK2USQSQuEpJE47Fj3wuBXpqMAVUf2Axe3PJL3ihzt8vsQYEvIS3mKI36Qk3MP
+ tCb2QAH0bPxy95IGInyFgL9VHK4d60sWxzn0gqPLJezNgdIZlN7NxK4CUhw6nC/66OfoefI4v
+ XaeO6y6qNd7xtaRvIArwGrBb2L83X9EApdHEdRqVJQRvL85EH37fZBMFHQ8IYXf0ZZV/wl1mM
+ +lb0Q8cRnsTgxEA6ebmkEBlgkqeeLpNW4u5NNcXqQ5wSYXaHaUMpk7W/VNatNqc2rHENMyXc7
+ 0RqjqPi1bd8MbJnu2cn8V+O5+f6quvnMl7o8O3xhYdsqq8NKXKcrUks3vb+zSoZ+60UZCfFdx
+ J0NO/+/o7JNShHV0PodwEjIEoy5tpuUSeGYuZFidqC/4I1dvwjFkwHjERfADJg3ai3X7WxKER
+ gnRDUhu4GetKnTdLgs0RIon+CXpcUOCEUGdgfjzf4OPPoPFjJuGVK8Vh6dbyfxfBdZU+6PGkM
+ kyvOtrvF5o1uwylexQVAhT9YrlP2QOZpPKGwsxr2RiitTJuBRqxPKu+vAPi7QIPfe+LTZQDJ+
+ 8OQY2kNWNlaFZAhWZHRdAvqoTojYA9y9vMaxfxQzujGhFSACbjQbHRjegDDXS6AA4xw+gaB4G
+ 4drtP883LWDqOM9j6cfztEf1a173H/lbAOdbHraHEldMiApIS48pwZLOwLA1/qTIFjBu3c/sj
+ Hvmmg+oubDCTC04GuyLwcsw07mEU22Wa79O15jKjsyEzup1O3NbUceKQU4ZAQvSD9FNhyriZK
+ hnmwXgJHXiif9xioPAXwvJWpZiMq5cpEq23xeNGvtVMespZ5RZCNWVo1mPdoVQUcpZmqXoeBN
+ RhPhdi6IDjT92AznRS58S/o+02yMqF/d0TEElALI1vvw/H9SuM72mDG3zd1Pr5ma9XFkqNb+b
+ z8+FBxsLxMzBLz2yb4Pwkg23KyUu0sBTKgkjhwc37SlGxjoHZoHg+fimrmuIeP0gk7rVvPOw6
+ yRTZWZEh7ZRC7DZiWNV8QAWcdiY33i7aXr+z6cz6XOlFlh+HXc72MYTb3lp7i34C/GU2tt4TZ
+ vmVJjoJFG49X5ubVHx+SFzj6EzcYTJaUVt8aF9JF/xrLmufG5S0Mtp8HlqMOJLHyYpromZkgJ
+ 7R35SAU78riSW0dBqjBRAaj3n19S1oIZVf+PDmoe0O2SO7n0tTcOcSH8elowX58LYN/VfDJ+t
+ r2k1APQMR4TzlCApsDveq1b4AbTzkGjWTkFvpzhCZH7dckF701ZF/swdlxEJEVf8l96gHW2ko
+ 6BnR3KNZdIDtABIxdGW9jnFSkhElYygweVE0TxyVGL1e6Sp7MF/VFSkrpy13Jljybu4BqHNLG
+ ALfwgn+ICN4+J2+eyiXPnK0vbwoD02B442fnuwHfiVizfoYs3VN9jQR/o3Z7X7Zenjuwp+cdG
+ UA8g7/lhvUU7qwR0qRs2UIlfeQ==
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[nebelreich.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[nebelreich.de:s=s1-ionos];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,armlinux.org.uk,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_FROM(0.00)[bounces-273003-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273005-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[googlemail.com,vger.kernel.org,lists.infradead.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_THREE(0.00)[4];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[eitschman@nebelreich.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[nebelreich.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3978B353E83
+X-Rspamd-Queue-Id: 22FD4353ED3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net: dsa: lan9645x: add port statistics
-    
-Add statistics support for the port counters. Chip registers are 32 bit,
-so this unit is responsible maintaining a 64bit software cache, and
-updating it frequently to handle overflows in hardware.
+Hello Linus,
 
-> diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-> index 24a60f40f6b8..9a46c08dad59 100644
-> --- a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-> +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-[ ... ]
-> @@ -262,6 +264,12 @@ static int lan9645x_setup(struct dsa_switch *ds)
->  	if (!lan9645x->owq)
->  		return -ENOMEM;
->  
-> +	err = lan9645x_stats_init(lan9645x);
-> +	if (err) {
-> +		dev_err(dev, "Failed to init stats.\n");
-> +		goto owq_destroy;
-> +	}
-> +
-[ ... ]
-> diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_stats.c b/drivers/net/dsa/microchip/lan9645x/lan9645x_stats.c
-> index 000000000000..3e82a859f173
-> --- /dev/null
-> +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_stats.c
-[ ... ]
-> +static const struct lan9645x_ethtool_stat lan9645x_port_ethtool_stats[] = {
-> +	{ "rx_uc",              SCNT_RX_UC },
-> +	{ "rx_cat_drop",        SCNT_RX_CAT_DROP },
-[ ... ]
-> +	{ "tx_uc",              SCNT_TX_UC },
-> +	{ "tx_drop",            SCNT_TX_DROP },
-[ ... ]
-> +};
+thank you for the confirmation!
 
-Is it necessary to duplicate standard networking statistics in the driver
-private ethtool output?
+Here is my Signed-off-by:
 
-The networking subsystem guidelines state that stats possessing a standard UAPI
-representation, such as tx_dropped and rx_packets in struct rtnl_link_stats64,
-should not be duplicated in the ethtool -S output.
+Signed-off-by: Andreas Haarmann-Thiemann <eitschman@nebelreich.de>
 
-Could these redundant strings be removed since the driver natively supports
-them via lan9645x_stats_get_stats64?
+Please feel free to create the patch from the inline code.
 
-[ ... ]
-> +static const struct lan9645x_view_stats lan9645x_view_stat_cfgs[] = {
-> +	[LAN9645X_STAT_PORTS] = {
-> +		.name = "ports",
-> +		.type = LAN9645X_STAT_PORTS,
-> +		.layout = lan9645x_port_stats_layout,
-> +		.num_cnts = ARRAY_SIZE(lan9645x_port_stats_layout),
-> +		.num_indexes = NUM_PHYS_PORTS,
-> +	},
-> +};
-[ ... ]
-> +static u64 *lan9645x_stats_view_idx_update(struct lan9645x *lan9645x,
-> +					   enum lan9645x_view_stat_type vtype,
-> +					   int idx)
-> +{
-> +	struct lan9645x_stats *s = lan9645x->stats;
-> +
-> +	mutex_lock(&s->hw_lock);
-> +	__lan9645x_stats_view_idx_update(lan9645x, vtype, idx);
-> +	mutex_unlock(&s->hw_lock);
-> +
-> +	return STAT_COUNTERS(lan9645x, vtype, idx);
-> +}
+Best regards,
+Andreas Haarmann-Thiemann
 
-Does this code overflow the allocated buffer when called for the CPU port?
+-----Urspr=C3=BCngliche Nachricht-----
+Von: Linus Walleij <linusw@kernel.org>=20
+Gesendet: Sonntag, 29. M=C3=A4rz 2026 20:54
+An: Andreas Haarmann-Thiemann <eitschman@nebelreich.de>
+Cc: ulli.kroll@googlemail.com; netdev@vger.kernel.org; =
+linux-arm-kernel@lists.infradead.org
+Betreff: Re: [BUG] net: ethernet: cortina: gemini: skb leak in gmac_rx() =
+causes kernel lockup under sustained RX load
 
-The stats buffer cnts is allocated using num_indexes, which is NUM_PHYS_PORTS
-(9). This covers ports 0 to 8. However, the CPU port is defined as index 9
-(CPU_PORT = 9).
+Hi Andreas,
 
-When the DSA core invokes stat callbacks like get_ethtool_stats or get_stats64
-for the CPU port, the idx argument is 9. While the helper
-__lan9645x_stats_view_idx_update skips the hardware read for out-of-bounds
-indices, lan9645x_stats_view_idx_update ignores that failure and returns the
-result of STAT_COUNTERS(lan9645x, vtype, idx).
+thanks for digging into this, I have wondered why this happens for a =
+long time but I'm not the best net developer myself.
 
-This computes a pointer past the end of the cnts array, which the callers then
-blindly dereference, potentially leaking kernel memory or causing a crash. Can
-bounds checking be added to the callers, or should the buffer be sized to
-include the CPU port?
+On Sun, Mar 29, 2026 at 12:05=E2=80=AFPM Andreas Haarmann-Thiemann =
+<eitschman@nebelreich.de> wrote:
 
-[ ... ]
-> +void lan9645x_stats_get_ethtool_stats(struct lan9645x *lan9645x, int port,
-> +				      u64 *data)
-> +{
-> +	struct lan9645x_stats *stats = lan9645x->stats;
-> +	u64 *c;
-> +	int i;
-> +
-> +	c = lan9645x_stats_view_idx_update(lan9645x, LAN9645X_STAT_PORTS, port);
-> +
-> +	spin_lock(&stats->sw_lock);
-> +	for (i = 0; i < ARRAY_SIZE(lan9645x_port_ethtool_stats); i++)
-> +		*data++ = c[lan9645x_port_ethtool_stats[i].idx];
-> +	spin_unlock(&stats->sw_lock);
-> +}
-[ ... ]
-> +/* Called in atomic context */
-> +void lan9645x_stats_get_stats64(struct lan9645x *lan9645x, int port,
-> +				struct rtnl_link_stats64 *stats)
-> +{
-> +	struct lan9645x_stats *s = lan9645x->stats;
-> +	u64 *c;
-> +
-> +	c = STAT_COUNTERS(lan9645x, LAN9645X_STAT_PORTS, port);
-> +
-> +	spin_lock(&s->sw_lock);
+> diff --git a/drivers/net/ethernet/cortina/gemini.c=20
+> b/drivers/net/ethernet/cortina/gemini.c
+> --- a/drivers/net/ethernet/cortina/gemini.c
+> +++ b/drivers/net/ethernet/cortina/gemini.c
+>
+> @@ -1491,6 +1491,10 @@ static int gmac_rx(struct napi_struct *napi, =
+int budget)
+>                               gpage =3D gmac_get_queue_page(geth, =
+port, mapping + PAGE_SIZE);
+>                               if (!gpage) {
+>                                               dev_err(geth->dev,=20
+> "could not find mapping\n");
+> +                                             if (skb) {
+> +                                                            =
+napi_free_frags(&port->napi);
+> +                                                            skb =3D =
+NULL;
+> +                                             }
+>                                               =
+port->stats.rx_dropped++;
+>                                               continue;
+>                               }
 
-Can this code deadlock when a softirq interrupts a process holding the lock?
+This looks right to me, can you send a proper patch, or provide your =
+Signed-off-by in this thread so I can create a patch from this inline =
+code?
 
-The sw_lock spinlock protects the 64-bit software stats counters. In
-lan9645x_stats_get_stats64, which acts as the ndo_get_stats64 callback, this
-lock is acquired using a plain spin_lock. The code comment notes this function
-is called in atomic context (such as from NET_RX_SOFTIRQ via dev_get_stats).
+The kernel process requires a "certificate of origin" i.e. =
+Signed-off-by, described a bit down in this document:
+https://docs.kernel.org/process/submitting-patches.html
 
-Concurrently, process context paths like lan9645x_stats_get_ethtool_stats and
-lan9645x_check_stats_work also acquire sw_lock using plain spin_lock. Because
-plain spin_lock does not disable softirqs, if a softirq preempts the execution
-on a CPU while process context holds sw_lock, the softirq will spin
-indefinitely waiting for the lock.
+Yours,
+Linus Walleij
 
-Should the process-context acquisitions use spin_lock_bh instead?
-
-[ ... ]
-> +int lan9645x_stats_init(struct lan9645x *lan9645x)
-> +{
-> +	const struct lan9645x_view_stats *vs;
-> +	struct lan9645x_stats *stats;
-> +	int err, i;
-> +
-> +	lan9645x->stats = devm_kzalloc(lan9645x->dev, sizeof(*stats),
-> +				       GFP_KERNEL);
-
-Will this memory be leaked when the DSA switch unbinds and rebinds?
-
-The lan9645x_stats_init function allocates lan9645x->stats, vstat->cnts, and
-vstat->buf using devm_kzalloc and devm_kcalloc. This function is called from
-lan9645x_setup, which is the DSA .setup callback.
-
-The DSA tree lifecycle is independent of the platform device lifecycle. If the
-master netdevice is unbound and bound again, the DSA switch's .teardown and
-.setup callbacks will be invoked multiple times. Because .teardown cannot free
-devres-managed memory, the memory tied to the platform device will be leaked
-on every setup cycle until the switch's platform device itself is destroyed.
-
-Could this use standard kzalloc allocations paired with kfree in teardown?
 
