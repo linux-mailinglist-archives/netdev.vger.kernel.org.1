@@ -1,81 +1,107 @@
-Return-Path: <netdev+bounces-272936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272937-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WPNYFZ5PyWm/xQUAu9opvQ
-	(envelope-from <netdev+bounces-272936-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:13:18 +0200
+	id QJrQDttQyWnrxQUAu9opvQ
+	(envelope-from <netdev+bounces-272937-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:18:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2159352D20
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:13:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9421A352D66
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:18:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0347F303931E
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 16:11:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7AB87301547A
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 16:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC12538228B;
-	Sun, 29 Mar 2026 16:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40C637DE9C;
+	Sun, 29 Mar 2026 16:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b="TPcrDiR3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gt1CAXSE"
 X-Original-To: netdev@vger.kernel.org
-Received: from szelinsky.de (szelinsky.de [85.214.127.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7D337FF44;
-	Sun, 29 Mar 2026 16:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.127.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6674D18EB0
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 16:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774800646; cv=none; b=Sidg0PCOH17COOxJR4obCLfdaPHNe9ypV4HDdPEFVJJRoHAb5zyZQaktdyNTt4Tk214anS0+1lZGKYqivN9CqHBw1XvQzLcR70UJn+RtqmNsqOIlay754MLm5NhTLBcccb3jRvRQaxlkXrn+Ss9u+EMtBDNcADhsaxuYmFnjj9s=
+	t=1774801092; cv=none; b=umvYyo6x2CD+wnmKmANKMmIGUrLOD7avjtrL/Hbgf5NpE+1bq3js6wHRita6EIESClfvuls14zkg0tTNDDY11Z6qhGBIV+PJpHquDWsO6fuxpfAY2uV2kckBWb+ei1sZiROLZ95wndQnA88YnApg1Il4MUXA5o6w1/GNxGmIZbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774800646; c=relaxed/simple;
-	bh=P6/A+JOlCoDetx/0/ysYfOC310WI84Hdv3H9eqMMQxk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nr4ISUJiDpRvDhURq1hzkTLJ4Tdt/rOhg/EHMPjlFz6Rr41WzuCPjFjxvnmoQXp2VsWDVmLce34QQ/sJr/p8Scbsbc4ZA3Sw8LPco+Y8YO1I+BpX1foBJmNeO/RGL4b95wSHtJJF8CpbO9iUD5bNCo4X+KRAtCiUqpH763mGty4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=TPcrDiR3; arc=none smtp.client-ip=85.214.127.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szelinsky.de
-Received: from localhost (localhost [127.0.0.1])
-	by szelinsky.de (Postfix) with ESMTP id 98596E86F82;
-	Sun, 29 Mar 2026 18:10:43 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
-	s=mail; t=1774800643;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VhlormB9e1plGDlmX2H/AurXlOK0vzu1Zr6fCmM0GGQ=;
-	b=TPcrDiR3Tw8Agak2JW62h84sxYQ65/Q2PILpCIZeB4NAu2/Hhby9o6PjG/03zbj7y84SLs
-	OJCNAuA5iwtO39jsBdFlCB6/jg0m8hnxPbzrqDQ2TeD/fUcv+o0HcD62XJnTUUtmpi5B9p
-	bEPsAR8Se6dUVrRvL+qyBTypslM2HrCAQX6Tv8ogw/BGb/vvhWMkMeoNQokzk3j3DhO6ek
-	xRShXJ3vMheEe3sCX6FBBxT9D/NwpU7oPgLI0p6UnPiHo2uUfQAS9RT51HKcJjBdimGFFQ
-	7h2ocyhKtczAsBVF3gij/9LBYkKQeCn31lhZWEJJv+AZ/uxw95vihyun9zgj9A==
-X-Virus-Scanned: Debian amavisd-new at szelinsky.de
-Received: from szelinsky.de ([127.0.0.1])
-	by localhost (szelinsky.de [127.0.0.1]) (amavisd-new, port 10025)
-	with ESMTP id k4jk6b3rSXDt; Sun, 29 Mar 2026 18:10:43 +0200 (CEST)
-Received: from p14sgen5.fritz.box (dslb-002-205-089-102.002.205.pools.vodafone-ip.de [2.205.89.102])
-	by szelinsky.de (Postfix) with ESMTPSA;
-	Sun, 29 Mar 2026 18:10:43 +0200 (CEST)
-From: Carlo Szelinsky <github@szelinsky.de>
-To: Kory Maincent <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
+	s=arc-20240116; t=1774801092; c=relaxed/simple;
+	bh=vA7FGZ4QgImw8H7FwAwRGPAFqoafQa4yOe2ds6Od3rU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TmQjjGxPWJ6H7V1/PXRndh1E9+4sf4TdRpPIK0YP2HB5N0Nrufnwq9csxawJJ+x2yRHjlpx1Z06JhJ47sRJwScfJyaOYGUS07rE9bSCY1iI6+dViz3D2eMXY+fzQMMXhXiD8NzdBP4fUNMU77IiJF0xZJIZxO3QjOvERkfxo+gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gt1CAXSE; arc=none smtp.client-ip=74.125.224.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-64edf260b49so6367725d50.0
+        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 09:18:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774801089; x=1775405889; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=a83TUsskxy1VkF8Vg9eln+jbw7jfWEDWtbMcqUkZ9fM=;
+        b=gt1CAXSEcqSMUTCq4NvcKCfGmVvMF3qN1b9CQoHH28GLay64l9eB6scxUgJIjsMCFU
+         kBLwWUQF1ebkikqZ1+XW8T/prpRtQx5bqth0JE7X8ZFqF9gMuOnRJnQlH3weUw8vyayM
+         ntvBru3B6TP7TxC5p9AxCNP8g+/xFuDVOa9DBc3EFR5NSE0mWaQSUUwJogPnC3peNgsQ
+         y8eo3zFUtc+54yEquulqa9MYjxhS188WvPaEhmL5kZ+/tFPJ2dKEeus0rtUGxH20ETAw
+         A38ny0uIQURiZzQzvqnrwzg9zd4ZpQ1aSA42X6YHbsnAxaJ9J1mKclU79JqBz91kjhoF
+         Q98A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774801089; x=1775405889;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a83TUsskxy1VkF8Vg9eln+jbw7jfWEDWtbMcqUkZ9fM=;
+        b=WlVZPfrrLravDEB+vQtaNE61e64A8UqwwKyWRorsl1xUTmEEHIuwdJRMDrVpIOsJPq
+         VOU214wArpg0QXG7RvhXymQs/bitK+tBhL6rYkdGWMxpCSgwAU/J45p1h3lCJDmDpC9m
+         kbtMepsmYc0pHPhx2BfZ61u3mUbpSRPKby+qfrTeU0IVMANd7gJrD8PVmP3AXmhOp0tD
+         uiYl5AYzWwfEHl9rG6NotGLo0eZIKUlJxKQCtTUFl13k9bj9JXdcAoOEqZfjsvlw2MTe
+         vipba2TmAuUd8HewJsJ8aZej++frYhWVA67fodgo6sxcbI/S/Gw4Gvp4SYeY8LQDy8mY
+         qOrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVX8xRLMY4ClTxeQ+WLLFFvkjh/R5BVXgKHeJg+R0Y1fHhIemkMcdI3IXSz3jNmOhtAX8c1HUI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4T0F2GfIAFbIoNI+EJAbqEBJ9JkijRFNB5bLnmBZF2ImOZcL5
+	Gqh7Orc737AcAAPiZ/6Wpxc1ihKjd7qaxAe90s4bYn6QZt/RPBUeCznW
+X-Gm-Gg: ATEYQzyHSVW3sw4iYzLcD8jvBNGphpTnSx6AJYhszWkoA/NbF0JpIHHxpu+HMkw2Lj+
+	ZysBC7Jp3P62mj0jlaVNyPy9xONQ5CZY0//DNBpnIJOU5ekfcjqa4y63WhQimiaifJv52h8KHN0
+	LJXm5wBq1h4zCljxPmk5oxc4vdbcxwly+y1aL/mf5NyaZTC+x2ISuORWUFb2aF67Fa3/eKQ2G0o
+	yAF4F65fEYDOovxKR63DE2Y8RDylcvzhX8eePHybCK8PyReML/pcEXiTHmAUXcKppvCx65ieq8W
+	6EBkNSeLYO+gswMy3+THbRKMxIMxXZ0eYe+yzaplEarWx47ZK+lcWD/v4S01MIZqHSpdxhRtxDX
+	58UwYBJ2gmsRsqyYQFekk5wH3avsp35nCTdlvkHdY/ZcPmtVy24iVUxrDFJ1HnSCCJWX9JBtfi1
+	mAWnaxAEXyLfRPgD/qMCCOzCWNoGmz1qj74s+jfsicLBf2CGzZHf4FyRRgugY0fxEjE4sopPldH
+	lo/+/q6uMMIAIEjME46kU8dwM5Il6u0tUWxs8MNkoBUM5Om0No6Xh3Sr3ckJxpT6EQ=
+X-Received: by 2002:a05:690e:4092:b0:64e:e833:337a with SMTP id 956f58d0204a3-64fee1b61a5mr10432402d50.2.1774801089372;
+        Sun, 29 Mar 2026 09:18:09 -0700 (PDT)
+Received: from localhost.localdomain (108-214-96-168.lightspeed.sntcca.sbcglobal.net. [108.214.96.168])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6500936f692sm2638216d50.19.2026.03.29.09.18.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Mar 2026 09:18:09 -0700 (PDT)
+From: Sun Jian <sun.jian.kdev@gmail.com>
+To: ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org
+Cc: martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Carlo Szelinsky <github@szelinsky.de>
-Subject: [PATCH 3/3] net: pse-pd: add lazy PSE control resolution for modular drivers
-Date: Sun, 29 Mar 2026 18:10:14 +0200
-Message-ID: <20260329161014.2908509-4-github@szelinsky.de>
+	Sun Jian <sun.jian.kdev@gmail.com>,
+	syzbot+619b9ef527f510a57cfc@syzkaller.appspotmail.com
+Subject: [PATCH v2] selftests/bpf: Reject malformed IPv4/IPv6 skb test input
+Date: Mon, 30 Mar 2026 00:17:51 +0800
+Message-ID: <20260329161751.1914272-1-sun.jian.kdev@gmail.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260329161014.2908509-1-github@szelinsky.de>
-References: <20260329161014.2908509-1-github@szelinsky.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,153 +109,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,szelinsky.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-272936-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FREEMAIL_CC(0.00)[linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org,syzkaller.appspotmail.com];
 	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272937-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[szelinsky.de:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,szelinsky.de:dkim,szelinsky.de:email,szelinsky.de:mid]
-X-Rspamd-Queue-Id: E2159352D20
+	TAGGED_RCPT(0.00)[netdev,619b9ef527f510a57cfc];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email,syzkaller.appspot.com:url]
+X-Rspamd-Queue-Id: 9421A352D66
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When a PSE controller driver is built as a module and was not probed
-during PHY registration, the PHY ends up with psec=NULL. Add
-pse_control_try_resolve() to lazily resolve the PSE control on first
-ethtool access.
+bpf_prog_test_run_skb() derives skb->protocol from the Ethernet header
+through eth_type_trans(), but it does not verify that the provided
+linear input is long enough to contain the corresponding L3 base header.
 
-Call pse_control_try_resolve() in both the GET and SET ethtool PSE
-handlers, before checking phydev->psec. The function is serialized by
-RTNL (enforced via ASSERT_RTNL), preventing concurrent callers from
-double-allocating a PSE control.
+This can result in an inconsistent skb being passed to test_run helpers
+such as bpf_skb_adjust_room(), where inferred protocol offsets can lead
+to operating on uninitialized memory, triggering KMSAN errors.
 
-If resolution fails (e.g. the module still has not loaded), a debug
-message is emitted via phydev_dbg() and the handler falls through to
-the existing "No PSE is attached" error path.
+To reject such malformed test input, we check that the linear head is
+sufficiently large to contain the corresponding L3 base header (IPv4
+or IPv6) before running the program.
 
-Signed-off-by: Carlo Szelinsky <github@szelinsky.de>
+Reported-by: syzbot+619b9ef527f510a57cfc@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=619b9ef527f510a57cfc
+Signed-off-by: Sun Jian <sun.jian.kdev@gmail.com>
 ---
- drivers/net/pse-pd/pse_core.c | 36 +++++++++++++++++++++++++++++++++++
- include/linux/pse-pd/pse.h    |  5 +++++
- net/ethtool/pse-pd.c          |  4 ++++
- 3 files changed, 45 insertions(+)
+v2:
+ - Ensured that the linear head is large enough to accommodate the corresponding L3 base header (IPv4 or IPv6), before running the program.
 
-diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-index 566b07c336bf..390df23a991c 100644
---- a/drivers/net/pse-pd/pse_core.c
-+++ b/drivers/net/pse-pd/pse_core.c
-@@ -1569,6 +1569,42 @@ struct pse_control *of_pse_control_get(struct device_node *node,
- }
- EXPORT_SYMBOL_GPL(of_pse_control_get);
+Link: <https://lore.kernel.org/bpf/129d235b04aca276c0a57c7c3646ce48644458cdc85d9b92b25f405e2d58a9ae@mail.kernel.org/>
+
+ net/bpf/test_run.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index 178c4738e63b..4790bee535b9 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -1118,6 +1118,25 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
+ 	skb->protocol = eth_type_trans(skb, dev);
+ 	skb_reset_network_header(skb);
  
-+/**
-+ * pse_control_try_resolve - attempt to resolve a deferred PSE control
-+ * @phydev: the PHY device whose PSE control may need resolution
-+ *
-+ * When a PSE controller driver is built as a module, it may not have
-+ * probed when PHYs were registered on the MDIO bus. This function
-+ * retries PSE control acquisition and should be called before
-+ * accessing phydev->psec in ethtool handlers.
-+ *
-+ * Context: Caller must hold RTNL.
-+ */
-+void pse_control_try_resolve(struct phy_device *phydev)
-+{
-+	struct device_node *np;
-+	struct pse_control *psec;
-+
-+	ASSERT_RTNL();
-+
-+	if (phydev->psec)
-+		return;
-+
-+	np = phydev->mdio.dev.of_node;
-+	if (!np || !of_property_present(np, "pses"))
-+		return;
-+
-+	psec = of_pse_control_get(np, phydev);
-+	if (IS_ERR(psec)) {
-+		phydev_dbg(phydev, "failed to resolve PSE control: %pe\n",
-+			   psec);
-+		return;
++	switch (skb->protocol) {
++	case htons(ETH_P_IP):
++		if (skb_headlen(skb) < sizeof(struct iphdr)) {
++			ret = -EINVAL;
++			goto out;
++		}
++		break;
++#if IS_ENABLED(CONFIG_IPV6)
++	case htons(ETH_P_IPV6):
++		if (skb_headlen(skb) < sizeof(struct ipv6hdr)) {
++			ret = -EINVAL;
++			goto out;
++		}
++		break;
++#endif
++	default:
++		break;
 +	}
 +
-+	phydev->psec = psec;
-+}
-+EXPORT_SYMBOL_GPL(pse_control_try_resolve);
-+
- /**
-  * pse_get_sw_admin_state - Convert the software admin state to c33 or podl
-  *			    admin state value used in the standard
-diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-index b86cce740551..d2f9b7c1acdf 100644
---- a/include/linux/pse-pd/pse.h
-+++ b/include/linux/pse-pd/pse.h
-@@ -350,6 +350,7 @@ int devm_pse_irq_helper(struct pse_controller_dev *pcdev, int irq,
- struct pse_control *of_pse_control_get(struct device_node *node,
- 				       struct phy_device *phydev);
- void pse_control_put(struct pse_control *psec);
-+void pse_control_try_resolve(struct phy_device *phydev);
- 
- int pse_ethtool_get_status(struct pse_control *psec,
- 			   struct netlink_ext_ack *extack,
-@@ -379,6 +380,10 @@ static inline void pse_control_put(struct pse_control *psec)
- {
- }
- 
-+static inline void pse_control_try_resolve(struct phy_device *phydev)
-+{
-+}
-+
- static inline int pse_ethtool_get_status(struct pse_control *psec,
- 					 struct netlink_ext_ack *extack,
- 					 struct ethtool_pse_control_status *status)
-diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
-index 2eb9bdc2dcb9..adffc230acd6 100644
---- a/net/ethtool/pse-pd.c
-+++ b/net/ethtool/pse-pd.c
-@@ -42,6 +42,8 @@ static int pse_get_pse_attributes(struct phy_device *phydev,
- 		return -EOPNOTSUPP;
- 	}
- 
-+	pse_control_try_resolve(phydev);
-+
- 	if (!phydev->psec) {
- 		NL_SET_ERR_MSG(extack, "No PSE is attached");
- 		return -EOPNOTSUPP;
-@@ -249,6 +251,8 @@ ethnl_set_pse_validate(struct phy_device *phydev, struct genl_info *info)
- 		return -EOPNOTSUPP;
- 	}
- 
-+	pse_control_try_resolve(phydev);
-+
- 	if (!phydev->psec) {
- 		NL_SET_ERR_MSG(info->extack, "No PSE is attached");
- 		return -EOPNOTSUPP;
+ 	switch (skb->protocol) {
+ 	case htons(ETH_P_IP):
+ 		sk->sk_family = AF_INET;
+
+base-commit: cbfffcca2bf0622b601b7eaf477aa29035169184
 -- 
 2.43.0
 
