@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-272934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272935-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cBwALUhPyWm/xQUAu9opvQ
-	(envelope-from <netdev+bounces-272934-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:11:52 +0200
+	id EMKxNWdPyWm/xQUAu9opvQ
+	(envelope-from <netdev+bounces-272935-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:12:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35A44352CEA
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:11:52 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F773352D0A
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:12:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0B62C301CC71
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 16:10:50 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 12BFF3028C03
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 16:10:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5637C3803E5;
-	Sun, 29 Mar 2026 16:10:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E723815E7;
+	Sun, 29 Mar 2026 16:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b="eYJ6ou5Y"
+	dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b="W7oLiZk2"
 X-Original-To: netdev@vger.kernel.org
 Received: from szelinsky.de (szelinsky.de [85.214.127.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE72D3803DD;
-	Sun, 29 Mar 2026 16:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FA73803F1;
+	Sun, 29 Mar 2026 16:10:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.127.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774800643; cv=none; b=dJ5ri08+w0v60Sab2KYz73z1y4TXHHFU3k8yQj3ZNJ21D5fkSz9TKUN4cC+rmBw+JIrZI9rnlENWXpQizUi6o/V3pH3jd1fuIQUCWGQLg3uLlfNcyj0nXTBnxqdA17Qt2m2sq7RwIjKGh4Oq2+m7mFjKkdo8KhqIZYauk3jDsW4=
+	t=1774800645; cv=none; b=s79g3KjPKOCqAyqvct3QbERImoavmPuDNmihVnM9cCHYkjwAE5oJapALQMFL4OlRA/hhgLSq3GuXK+qhXI7Bjk0XO8HImfuMSxre3kcucRQAwhyv8l6APDairpJFRsJ7Jlp0m5VQTCUBQmTM9ekUAU43gtdxXbLaJLuINKA3uI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774800643; c=relaxed/simple;
-	bh=q/bWozPvpjS3129sQ1aT6MCNM/+CB287UXZCclsrAiQ=;
+	s=arc-20240116; t=1774800645; c=relaxed/simple;
+	bh=FjPBmb7sbxh3je9T4zb4X3mtCrGESVIQyoIpNQcSEk0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bvlRROCGS8MVr6Ay1pBtpANVhw1f9UMaU7A2Q5aMrqi130wxiC1u7eq5D+oN7MF9n1T0w11YVuTvk4EHaL7JBQpyV8xPM1SRsY+6uYxcAGieUMK7oa5K6DeH1ckg3A4ujbCEOBIPDT2GpWb86bdCL51tPAqKODOq2yqtzW8f0TE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=eYJ6ou5Y; arc=none smtp.client-ip=85.214.127.56
+	 MIME-Version; b=f//1uP10LFPoKycC5PcbBd3O9L3ay0tg0APW1XaW7WJURMDUSTOcls6pJ7E0O77moiU26LiirR12uDFULf8yTekpzl1VfJ0euewWUbjr+IVfTcOhgD2KjUECXRlvOxgdAvI3iMbGj0RmK8nusmOncKFME+mKERxmRNuWp+Xy+B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=W7oLiZk2; arc=none smtp.client-ip=85.214.127.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szelinsky.de
 Received: from localhost (localhost [127.0.0.1])
-	by szelinsky.de (Postfix) with ESMTP id 2038EE86F82;
-	Sun, 29 Mar 2026 18:10:40 +0200 (CEST)
+	by szelinsky.de (Postfix) with ESMTP id EE378E83A8D;
+	Sun, 29 Mar 2026 18:10:41 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
-	s=mail; t=1774800640;
+	s=mail; t=1774800641;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OX2jiAI6SxjZvU8BVrCpRDDPGBmGKx9O4aTJ81TZaPs=;
-	b=eYJ6ou5YxFaF7NJrr+D0dQg0jcWxxDsXle6FvgOsdoI+2Z2PjgPZMvPi3vTOwRyn7flogJ
-	7We6W8t4knYJ6WpGKbbV6Zw5lzpbHbkehk2rpWse27Iu4K+tLIvcOhr5onkONfjSmvJV4O
-	eqNxnD3P+sXPIWhZ6R2/pnxSS84vzV/rbVgB9D2uIb+ax8JZO3YT2f47jLG8+m82NDxA/x
-	NEEFishcyQ206By6qzxPLJriUi5PXl56dZ3PVNrwCmxhhKFWmjmQecHATnjbXAO3Bv5oBx
-	gYiEPmw0dfiaPiFCHRDC6UyFux0sGyPXZow/3BcQN6cC2YFD3/xAwA8Mhh3MpQ==
+	bh=50/WO8MSecnkND79syf2COkGlyNU/ras3AKDpgbmDKA=;
+	b=W7oLiZk2zdZ8QbaTC5VlyUwVwwBTs9YPnXYhxYJ/XAs+HqiZon9FCPQtRqo03i7FwCWVF2
+	xSKZbPTyEuL86e9WGpv3PNIp6fAknL/KQiFrNAxoZRdwwD3bFTGe5PPG08o5anTygjUc3L
+	BQz6OC1cq4pVdOpg3fegcbb2TmL+bXugz2+Jzm/lWN0tPDXSmRNmZ5/xbb8DImUKgho+HW
+	ko+A+5jkiYoOw0e2LtqASUiwLik+QYxOMISaBjnIKPB3pFfIM2jOfjE2PWjwBzwfKFcq9D
+	rQ1C1HRTK/wfvVFKJofi/r+Ng4bQZC7WlDfeCetKF40nWFHFrnThLFeSftQbEw==
 X-Virus-Scanned: Debian amavisd-new at szelinsky.de
 Received: from szelinsky.de ([127.0.0.1])
 	by localhost (szelinsky.de [127.0.0.1]) (amavisd-new, port 10025)
-	with ESMTP id DJpmlPOCNOeE; Sun, 29 Mar 2026 18:10:40 +0200 (CEST)
+	with ESMTP id P1DlYMwhnskw; Sun, 29 Mar 2026 18:10:41 +0200 (CEST)
 Received: from p14sgen5.fritz.box (dslb-002-205-089-102.002.205.pools.vodafone-ip.de [2.205.89.102])
 	by szelinsky.de (Postfix) with ESMTPSA;
-	Sun, 29 Mar 2026 18:10:39 +0200 (CEST)
+	Sun, 29 Mar 2026 18:10:41 +0200 (CEST)
 From: Carlo Szelinsky <github@szelinsky.de>
 To: Kory Maincent <kory.maincent@bootlin.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
@@ -70,9 +70,9 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Carlo Szelinsky <github@szelinsky.de>
-Subject: [PATCH 1/3] net: mdio: treat PSE EPROBE_DEFER as non-fatal during PHY registration
-Date: Sun, 29 Mar 2026 18:10:12 +0200
-Message-ID: <20260329161014.2908509-2-github@szelinsky.de>
+Subject: [PATCH 2/3] net: pse-pd: prevent regulator cleanup from disabling unclaimed PSE PIs
+Date: Sun, 29 Mar 2026 18:10:13 +0200
+Message-ID: <20260329161014.2908509-3-github@szelinsky.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260329161014.2908509-1-github@szelinsky.de>
 References: <20260329161014.2908509-1-github@szelinsky.de>
@@ -90,7 +90,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
 	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -100,7 +100,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-272934-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-272935-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -110,47 +110,80 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[szelinsky.de:dkim,szelinsky.de:email,szelinsky.de:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 35A44352CEA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,szelinsky.de:dkim,szelinsky.de:email,szelinsky.de:mid]
+X-Rspamd-Queue-Id: 5F773352D0A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When a PSE controller driver is built as a module, it may not be probed
-yet when PHYs are registered on the MDIO bus. This causes
-fwnode_find_pse_control() -> of_pse_control_get() to return
--EPROBE_DEFER, which currently propagates up and destroys the PHY
-device.
+When a PSE controller driver is loaded as a module, its PI regulators
+are registered before any consumer (PHY) acquires the corresponding PSE
+control via of_pse_control_get(). The regulator framework's
+regulator_late_cleanup then calls pse_pi_is_enabled(), which queries
+hardware and sees the PI is enabled. Since no consumer holds it
+(use_count == 0), regulator_late_cleanup disables it, killing PoE.
 
-Treat -EPROBE_DEFER as non-fatal, allowing the PHY to register
-successfully with psec=NULL. The PSE control can be resolved lazily
-when first needed.
+Add an admin_state_synced flag to struct pse_pi that is set when a
+consumer first acquires the PSE control and syncs admin_state_enabled
+from hardware. In pse_pi_is_enabled(), report unsynchronized PIs as
+disabled so regulator_late_cleanup skips them.
+
+This preserves the existing dual-path behavior: software-tracked state
+for software-controlled power domains, and hardware queries for
+hardware-controlled domains. The admin_state_synced flag is only false
+before the first consumer acquisition, which is the exact window where
+regulator_late_cleanup could incorrectly disable the PI.
 
 Signed-off-by: Carlo Szelinsky <github@szelinsky.de>
 ---
- drivers/net/mdio/fwnode_mdio.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/net/pse-pd/pse_core.c | 13 +++++++++++++
+ include/linux/pse-pd/pse.h    |  1 +
+ 2 files changed, 14 insertions(+)
 
-diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
-index ba7091518265..2a03b3fc41e6 100644
---- a/drivers/net/mdio/fwnode_mdio.c
-+++ b/drivers/net/mdio/fwnode_mdio.c
-@@ -161,8 +161,12 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
+diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
+index 3beaaaeec9e1..566b07c336bf 100644
+--- a/drivers/net/pse-pd/pse_core.c
++++ b/drivers/net/pse-pd/pse_core.c
+@@ -421,6 +421,18 @@ static int pse_pi_is_enabled(struct regulator_dev *rdev)
  
- 	psec = fwnode_find_pse_control(child, phy);
- 	if (IS_ERR(psec)) {
--		rc = PTR_ERR(psec);
--		goto unregister_phy;
-+		if (PTR_ERR(psec) == -EPROBE_DEFER) {
-+			psec = NULL;
-+		} else {
-+			rc = PTR_ERR(psec);
-+			goto unregister_phy;
-+		}
- 	}
+ 	id = rdev_get_id(rdev);
+ 	mutex_lock(&pcdev->lock);
++
++	/*
++	 * Report the PI as disabled until a consumer has acquired it
++	 * and synced admin_state_enabled from hardware. This prevents
++	 * regulator_late_cleanup from disabling unclaimed PSE PIs
++	 * when the PSE controller driver loads as a module.
++	 */
++	if (!pcdev->pi[id].admin_state_synced) {
++		ret = 0;
++		goto out;
++	}
++
+ 	if (pse_pw_d_is_sw_pw_control(pcdev, pcdev->pi[id].pw_d)) {
+ 		ret = pcdev->pi[id].admin_state_enabled;
+ 		goto out;
+@@ -1431,6 +1443,7 @@ pse_control_get_internal(struct pse_controller_dev *pcdev, unsigned int index,
+ 		goto free_psec;
  
- 	phy->psec = psec;
+ 	pcdev->pi[index].admin_state_enabled = ret;
++	pcdev->pi[index].admin_state_synced = true;
+ 	psec->ps = devm_regulator_get_exclusive(pcdev->dev,
+ 						rdev_get_name(pcdev->pi[index].rdev));
+ 	if (IS_ERR(psec->ps)) {
+diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
+index 4e5696cfade7..b86cce740551 100644
+--- a/include/linux/pse-pd/pse.h
++++ b/include/linux/pse-pd/pse.h
+@@ -260,6 +260,7 @@ struct pse_pi {
+ 	struct device_node *np;
+ 	struct regulator_dev *rdev;
+ 	bool admin_state_enabled;
++	bool admin_state_synced;
+ 	struct pse_power_domain *pw_d;
+ 	int prio;
+ 	bool isr_pd_detected;
 -- 
 2.43.0
 
