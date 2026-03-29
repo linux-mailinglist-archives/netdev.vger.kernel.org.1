@@ -1,107 +1,91 @@
-Return-Path: <netdev+bounces-272937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272938-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QJrQDttQyWnrxQUAu9opvQ
-	(envelope-from <netdev+bounces-272937-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:18:35 +0200
+	id oA1TDmdSyWnrxQUAu9opvQ
+	(envelope-from <netdev+bounces-272938-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:25:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9421A352D66
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:18:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A4B2352E19
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 18:25:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7AB87301547A
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 16:18:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 491103037E4E
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 16:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40C637DE9C;
-	Sun, 29 Mar 2026 16:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D8F37C922;
+	Sun, 29 Mar 2026 16:22:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gt1CAXSE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MxYsCGFO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6674D18EB0
-	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 16:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501FD3750A9
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 16:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774801092; cv=none; b=umvYyo6x2CD+wnmKmANKMmIGUrLOD7avjtrL/Hbgf5NpE+1bq3js6wHRita6EIESClfvuls14zkg0tTNDDY11Z6qhGBIV+PJpHquDWsO6fuxpfAY2uV2kckBWb+ei1sZiROLZ95wndQnA88YnApg1Il4MUXA5o6w1/GNxGmIZbU=
+	t=1774801346; cv=none; b=cl5Xoz/4fZPsWYxgMbEK8Tiwx05FKeVuCAWdfXYuFsTjU87axXVX9TMttkZx9vv55TigYlBukW6Bh10l9Bj0Q/P7KPAciyh6MehErnMN0c05JXXaUg1WwbaAAVyZza9jD8/hOelJWTC1VpqXg5hi9IUIl8eYZPk7LlbCrPKx7Zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774801092; c=relaxed/simple;
-	bh=vA7FGZ4QgImw8H7FwAwRGPAFqoafQa4yOe2ds6Od3rU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TmQjjGxPWJ6H7V1/PXRndh1E9+4sf4TdRpPIK0YP2HB5N0Nrufnwq9csxawJJ+x2yRHjlpx1Z06JhJ47sRJwScfJyaOYGUS07rE9bSCY1iI6+dViz3D2eMXY+fzQMMXhXiD8NzdBP4fUNMU77IiJF0xZJIZxO3QjOvERkfxo+gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gt1CAXSE; arc=none smtp.client-ip=74.125.224.41
+	s=arc-20240116; t=1774801346; c=relaxed/simple;
+	bh=y5/H+TqDE4OujzUA/5gacU9H3XM10J/mK0k1UKIflqU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=avb+MQhkK6ufKRWKNcJXEi358InMd4mS32GE9SmxSH2fKUxTMiLvvQ7ZzdqesALS/t6/A3jh2FF5NN0HwO0eUlbbacPjCCaKFeuGvlS6LnfCj+usPFe0RJ/PnrqyFulkjlgY9pXrn1nzpbJ8UmkLxw5lORFB58np7nibpB0UHVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MxYsCGFO; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-64edf260b49so6367725d50.0
-        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 09:18:10 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4853a485721so5375215e9.3
+        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 09:22:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774801089; x=1775405889; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1774801344; x=1775406144; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=a83TUsskxy1VkF8Vg9eln+jbw7jfWEDWtbMcqUkZ9fM=;
-        b=gt1CAXSEcqSMUTCq4NvcKCfGmVvMF3qN1b9CQoHH28GLay64l9eB6scxUgJIjsMCFU
-         kBLwWUQF1ebkikqZ1+XW8T/prpRtQx5bqth0JE7X8ZFqF9gMuOnRJnQlH3weUw8vyayM
-         ntvBru3B6TP7TxC5p9AxCNP8g+/xFuDVOa9DBc3EFR5NSE0mWaQSUUwJogPnC3peNgsQ
-         y8eo3zFUtc+54yEquulqa9MYjxhS188WvPaEhmL5kZ+/tFPJ2dKEeus0rtUGxH20ETAw
-         A38ny0uIQURiZzQzvqnrwzg9zd4ZpQ1aSA42X6YHbsnAxaJ9J1mKclU79JqBz91kjhoF
-         Q98A==
+        bh=39nWh5Sbwqb3QyZ67qx+99ZIlQgRVmnOj8xt3uyYktk=;
+        b=MxYsCGFOtAdujG99DC3NLSrN+NUhC1hI8/fROaAwLyGUJHnZXM6b9fK0BBl6JGd4aa
+         oPZV8Ywjjiw/QETPlnzUlLpFCLvGh1KHH3dcrhsGxxf7Ex+Ti7RyAKA0patUiJx+VFKe
+         04cJI7wTl4DOXen+MwjwHSzZk4i34QbtyOriAPDLZxKlVE6YB0gqaCFQU07wc/b5rR2p
+         TOn1a+P7I9rkseRoyblwcICO3DdfG4ft3gBA87IGxMRAh2ql2siZx6P8cPAxz0DwUl+/
+         DbVl/mFl3Get7haSR+OGl8IKF+pLlrnTTaWH12uemZKxSozO+8eKreEaja919Eu7kr+f
+         gMZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774801089; x=1775405889;
+        d=1e100.net; s=20251104; t=1774801344; x=1775406144;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=a83TUsskxy1VkF8Vg9eln+jbw7jfWEDWtbMcqUkZ9fM=;
-        b=WlVZPfrrLravDEB+vQtaNE61e64A8UqwwKyWRorsl1xUTmEEHIuwdJRMDrVpIOsJPq
-         VOU214wArpg0QXG7RvhXymQs/bitK+tBhL6rYkdGWMxpCSgwAU/J45p1h3lCJDmDpC9m
-         kbtMepsmYc0pHPhx2BfZ61u3mUbpSRPKby+qfrTeU0IVMANd7gJrD8PVmP3AXmhOp0tD
-         uiYl5AYzWwfEHl9rG6NotGLo0eZIKUlJxKQCtTUFl13k9bj9JXdcAoOEqZfjsvlw2MTe
-         vipba2TmAuUd8HewJsJ8aZej++frYhWVA67fodgo6sxcbI/S/Gw4Gvp4SYeY8LQDy8mY
-         qOrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVX8xRLMY4ClTxeQ+WLLFFvkjh/R5BVXgKHeJg+R0Y1fHhIemkMcdI3IXSz3jNmOhtAX8c1HUI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4T0F2GfIAFbIoNI+EJAbqEBJ9JkijRFNB5bLnmBZF2ImOZcL5
-	Gqh7Orc737AcAAPiZ/6Wpxc1ihKjd7qaxAe90s4bYn6QZt/RPBUeCznW
-X-Gm-Gg: ATEYQzyHSVW3sw4iYzLcD8jvBNGphpTnSx6AJYhszWkoA/NbF0JpIHHxpu+HMkw2Lj+
-	ZysBC7Jp3P62mj0jlaVNyPy9xONQ5CZY0//DNBpnIJOU5ekfcjqa4y63WhQimiaifJv52h8KHN0
-	LJXm5wBq1h4zCljxPmk5oxc4vdbcxwly+y1aL/mf5NyaZTC+x2ISuORWUFb2aF67Fa3/eKQ2G0o
-	yAF4F65fEYDOovxKR63DE2Y8RDylcvzhX8eePHybCK8PyReML/pcEXiTHmAUXcKppvCx65ieq8W
-	6EBkNSeLYO+gswMy3+THbRKMxIMxXZ0eYe+yzaplEarWx47ZK+lcWD/v4S01MIZqHSpdxhRtxDX
-	58UwYBJ2gmsRsqyYQFekk5wH3avsp35nCTdlvkHdY/ZcPmtVy24iVUxrDFJ1HnSCCJWX9JBtfi1
-	mAWnaxAEXyLfRPgD/qMCCOzCWNoGmz1qj74s+jfsicLBf2CGzZHf4FyRRgugY0fxEjE4sopPldH
-	lo/+/q6uMMIAIEjME46kU8dwM5Il6u0tUWxs8MNkoBUM5Om0No6Xh3Sr3ckJxpT6EQ=
-X-Received: by 2002:a05:690e:4092:b0:64e:e833:337a with SMTP id 956f58d0204a3-64fee1b61a5mr10432402d50.2.1774801089372;
-        Sun, 29 Mar 2026 09:18:09 -0700 (PDT)
-Received: from localhost.localdomain (108-214-96-168.lightspeed.sntcca.sbcglobal.net. [108.214.96.168])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6500936f692sm2638216d50.19.2026.03.29.09.18.00
+        bh=39nWh5Sbwqb3QyZ67qx+99ZIlQgRVmnOj8xt3uyYktk=;
+        b=rvh/mtr7oSB8OY4vvjjkLAJ509mR5F/sn3lL0/v3ZGCU9j1Gwqe4X3fxuKDBGvcizJ
+         vhrHC9NaEYsnWHVUmYh18qodQ4c9p0KRUFnPPuuWKqpK2537ulfdKwWEcaJ/0GTcvcYb
+         eKbIQaTwtueaCxXq8pUHr7dQF7eBVOVjf0tgkrF5kTttGjVsUGbTAGTcYIoU7pf0CaSo
+         DjseXapLbohhqxmNzjOB+fLXNeKtBOY/C8tiNytIfulbYzxzczFMXEPMmPr17RVbGf8z
+         +H3UfxD0+TjYcSeO7tB3wlEDX7CEvKQWb8wiY40afm1XwASb5qEzVSbTu/h2IYvPgxPg
+         7nYA==
+X-Gm-Message-State: AOJu0YzoB3FhveBYMgxz4cYH7uaHXGV5l7eIaCpZbm212Umiz0LCsQ5j
+	lCJMHQ3gfsMLNzI4GFKZnAQ2rtxu9ZivVGIJ2rRVjy1DInW8caqp0U10
+X-Gm-Gg: ATEYQzzQrKDGXIIOx7+m7OLj7drO1NSSIb81Eph3va4MTVnkkVkOlIov3FtuKcgiUVZ
+	aycJP1SfmiCtSGouY3mtcMliSJzwz7fjbb2pcZbanb+iani8o4OjZ/Liw8qN4JmzQLGzEyddTOR
+	XelGamC0o8nURdNYeGYkXIef1/f+z2b5LdJ/Le9cRv1H7kBMlOzM99TskC98XUUF7WWHLyjhGoS
+	VB28ayUj+n0Q8emzRcuQrVw5M3KHzFgFH5qjm//zTOFhhyCjhp6PNNlP8thojqdOjmwgfUtThLA
+	1mlSO1cy/iWdFddkIi5DT7Fp3AyOZ9YYJqBMIapVKxBAxhcQ1LezayuWlowq9oLw7SaavUj69U0
+	mG2jvs8PHexkzNypjKlOtK4sWTakvSksqrzydZNJorrPEQG4gVlIAsp2DBt2OMdFe+dreVH7v8r
+	S4maMwMe/USyB8Q7pl+39GZwLAMNEQxBuYmWTfYB2182uEudGeeTl71NFraxL6asCT/oeTGEht6
+	K9iGEs1j155FKMpvjRIoX4pc9Co
+X-Received: by 2002:a05:600c:b99:b0:485:39a1:bcb3 with SMTP id 5b1f17b1804b1-48727f5f8d8mr76636175e9.6.1774801343387;
+        Sun, 29 Mar 2026 09:22:23 -0700 (PDT)
+Received: from localhost ([2a01:cb1d:4ec:6700:174f:90cc:2ec3:a84b])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43cf24707f2sm12760803f8f.26.2026.03.29.09.22.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Mar 2026 09:18:09 -0700 (PDT)
-From: Sun Jian <sun.jian.kdev@gmail.com>
-To: ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org
-Cc: martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sun Jian <sun.jian.kdev@gmail.com>,
-	syzbot+619b9ef527f510a57cfc@syzkaller.appspotmail.com
-Subject: [PATCH v2] selftests/bpf: Reject malformed IPv4/IPv6 skb test input
-Date: Mon, 30 Mar 2026 00:17:51 +0800
-Message-ID: <20260329161751.1914272-1-sun.jian.kdev@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Sun, 29 Mar 2026 09:22:22 -0700 (PDT)
+From: Aaron Esau <aaron1esau@gmail.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	arkadiusz.kubalewski@intel.com,
+	stable@vger.kernel.org,
+	Aaron Esau <aaron1esau@gmail.com>
+Subject: [PATCH net] i40e: fix memcmp of pointer in i40e_hw_set_dcb_config()
+Date: Sun, 29 Mar 2026 18:21:51 +0200
+Message-ID: <20260329162151.2043655-1-aaron1esau@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,9 +93,9 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
@@ -119,87 +103,68 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	FREEMAIL_CC(0.00)[linux.dev,gmail.com,kernel.org,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org,syzkaller.appspotmail.com];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272937-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272938-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[aaron1esau@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,619b9ef527f510a57cfc];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: 9421A352D66
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6A4B2352E19
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-bpf_prog_test_run_skb() derives skb->protocol from the Ethernet header
-through eth_type_trans(), but it does not verify that the provided
-linear input is long enough to contain the corresponding L3 base header.
+In i40e_hw_set_dcb_config(), both new_cfg and old_cfg are pointers to
+struct i40e_dcbx_config, so sizeof(new_cfg) evaluates to the size of a
+pointer (8 bytes on 64-bit) rather than the size of the struct. Likewise,
+&new_cfg and &old_cfg are the addresses of the pointer variables on the
+stack, not the addresses of the actual config structs.
 
-This can result in an inconsistent skb being passed to test_run helpers
-such as bpf_skb_adjust_room(), where inferred protocol offsets can lead
-to operating on uninitialized memory, triggering KMSAN errors.
+As a result, the memcmp never compares the actual configuration data,
+meaning the "no change needed" early return never fires. Every call to
+this function performs a full DCB reconfiguration (quiescing all VSIs,
+reprogramming via "Set LLDP MIB" AQC, and reconfiguring VEB/VSIs) even
+when the configuration has not changed.
 
-To reject such malformed test input, we check that the linear head is
-sufficiently large to contain the corresponding L3 base header (IPv4
-or IPv6) before running the program.
+Fix this by comparing the structs themselves rather than the pointers.
 
-Reported-by: syzbot+619b9ef527f510a57cfc@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=619b9ef527f510a57cfc
-Signed-off-by: Sun Jian <sun.jian.kdev@gmail.com>
+Fixes: 4b208eaa8078 ("i40e: Add init and default config of software based DCB")
+Cc: stable@vger.kernel.org
+Signed-off-by: Aaron Esau <aaron1esau@gmail.com>
 ---
-v2:
- - Ensured that the linear head is large enough to accommodate the corresponding L3 base header (IPv4 or IPv6), before running the program.
 
-Link: <https://lore.kernel.org/bpf/129d235b04aca276c0a57c7c3646ce48644458cdc85d9b92b25f405e2d58a9ae@mail.kernel.org/>
+Found using Coccinelle/spatch with a semantic patch that matches
+sizeof(ptr) and &ptr used together where ptr is a pointer type.
 
- net/bpf/test_run.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index 178c4738e63b..4790bee535b9 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -1118,6 +1118,25 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog, const union bpf_attr *kattr,
- 	skb->protocol = eth_type_trans(skb, dev);
- 	skb_reset_network_header(skb);
- 
-+	switch (skb->protocol) {
-+	case htons(ETH_P_IP):
-+		if (skb_headlen(skb) < sizeof(struct iphdr)) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+		break;
-+#if IS_ENABLED(CONFIG_IPV6)
-+	case htons(ETH_P_IPV6):
-+		if (skb_headlen(skb) < sizeof(struct ipv6hdr)) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+		break;
-+#endif
-+	default:
-+		break;
-+	}
-+
- 	switch (skb->protocol) {
- 	case htons(ETH_P_IP):
- 		sk->sk_family = AF_INET;
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index XXXXXXX..XXXXXXX 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -6904,7 +6904,7 @@ static int i40e_hw_set_dcb_config(struct i40e_pf *pf,
+ 	int ret;
 
-base-commit: cbfffcca2bf0622b601b7eaf477aa29035169184
--- 
-2.43.0
-
+ 	/* Check if need reconfiguration */
+-	if (!memcmp(&new_cfg, &old_cfg, sizeof(new_cfg))) {
++	if (!memcmp(new_cfg, old_cfg, sizeof(*new_cfg))) {
+ 		dev_dbg(&pf->pdev->dev, "No Change in DCB Config required.\n");
+ 		return 0;
+ 	}
+--
+2.49.0
 
