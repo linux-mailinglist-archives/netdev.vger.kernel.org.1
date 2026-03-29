@@ -1,65 +1,68 @@
-Return-Path: <netdev+bounces-272985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272986-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CAyZIEJ/yWnbyQUAu9opvQ
-	(envelope-from <netdev+bounces-272985-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:36:34 +0200
+	id mZOcM+GByWmBygUAu9opvQ
+	(envelope-from <netdev+bounces-272986-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:47:45 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06E90353D05
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:36:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24645353D2E
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 21:47:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 32910300A10D
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 19:35:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6FFFF300A625
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 19:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB5A37D107;
-	Sun, 29 Mar 2026 19:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C01B1244692;
+	Sun, 29 Mar 2026 19:47:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rWeIaT3t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WTVT1+9i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58885EEBB;
-	Sun, 29 Mar 2026 19:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4451C8634
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 19:47:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774812905; cv=none; b=d0m5LpSkLF9wDDUCeV/vOVDBpZBeNZkDU6m+8FX53l6aRyPnerVEZRH19TCl4haldsIGWbTfKDwHLIsRXJiSIbhxPNxwHDFo++JgxK81X7X8Yhc9HkpmAyesIWr4wjqxtCVhhkVz/l4t68MyXj32mIs3TVBEp4y/GZireLmoQx4=
+	t=1774813662; cv=none; b=Q1KR2m/lzJneTsKuhvqPXRDCUas5IO/IeSo/0xnxd8EtkhPqc+MQPfnV+eK93kuLrmPurymQkxINDGKXGH5AWPmjfDSyn05RC/6Vvnc29gfBXVFTuMWFQku27Ih5eiYYG7kLnHcMjiGamghf1AoKx9U1xkyx3jci3lTybNq2ITc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774812905; c=relaxed/simple;
-	bh=XQkUIWVsukd2jBCyqb0nVppdak+jFRU6N91Zevt00dA=;
+	s=arc-20240116; t=1774813662; c=relaxed/simple;
+	bh=VdsmcZtSyn1wbk6ZOA7ply1vgF/F82CyH5qHYy+OqyY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kYFNYssdCw6rxIWtwBxjXNnorXejGiJG6Ms+bNTI1zJAGkGd0VtxyWX/8XKxUH3C7k9C42utPLl/KFlQM8HdZpXu8wnJtkZgDEfrMn6RLQkYO2tn+2hzlT2JvqtHFyCOJBn6tFWJkRgSndb1bvtYhy2RDXrwI3SjZ+Y+u5KFFx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rWeIaT3t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F358C116C6;
-	Sun, 29 Mar 2026 19:35:04 +0000 (UTC)
+	 MIME-Version; b=pKlQBAX4S9GHCWIxncIqwvOHWqW5ZB2RjdUDNT1GAFYRte+EcIGaZmMq6a80Qshess5Ui2+bpsZ61BjB0RZNEL884r/xXhFCxOUbMMYcrTA9aiCM280y0P11pLRUKZ+BcbrvzJwGPNd2ooW1BHyJt31zFXstO4rGYB6Vpi0pe5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WTVT1+9i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98014C116C6;
+	Sun, 29 Mar 2026 19:47:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774812904;
-	bh=XQkUIWVsukd2jBCyqb0nVppdak+jFRU6N91Zevt00dA=;
+	s=k20201202; t=1774813662;
+	bh=VdsmcZtSyn1wbk6ZOA7ply1vgF/F82CyH5qHYy+OqyY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rWeIaT3tNCZpU0n47rci5u2TtOotxCkpIbDjKRy5XyufiPQZ3bTIx8F1T7ne59T69
-	 Y0SmnxUXdiwZZVUhYogZU1Br0ENXB4Lv7jCYQ7QQxYxcC3pGgxXlYUP74b0AD933fo
-	 hWOOVKzR77KbE5pamjB/jN+YEO0z0eEEXjucmvh9NZpd2uPBriv1dk6+Yvc1vntkBh
-	 Yu7qRr51Hd7+7xl92AdsWkvSbg8UkRZVfA94mJ9o6Mn66g9awrwzMdStReeJZqTzts
-	 ZzP3Y87FDokjrq0qu2BqDy8zPfoYwLrWsGEMrw1dr09OSABVFIq9/o6WhxZ3NhxFvy
-	 PihgOQ1JpwcIA==
+	b=WTVT1+9io29TCDtJ79uxcKoMbz9Vsf6tTAEp7dqBzS7o90K+SfmjMx1wMraV7ktCW
+	 0s0NzGNTjV7I/jR3gaXC4Al3ZDlWu/kpuJuWiSRgm2Q/zd8s3HyCOXQ5Ro9ADtlYQF
+	 rYITigzfzvXpVkhUDGgKWIh+qrWyLeECzzZtGqBjdsKjXMB/18wl5tnei5f6znwD/q
+	 yCyKIvdXrMPa192zN2MeBM7unkP775gmytXRsMWRqemdVzWsa9u2Ax+etXCXgQxps2
+	 omEZpIxcoStoEfeUUnYynJVrxdQGqTtVS0D80NXMivmb7sVpHqLfpkIFvDJUL5zUYG
+	 ZN4yljVzE7okA==
 From: Jakub Kicinski <kuba@kernel.org>
-To: mail@birger-koblitz.de
+To: pvalerio@redhat.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	nicolas.ferre@microchip.com,
+	claudiu.beznea@tuxon.dev,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 2/2] r8152: Add support for the RTL8157 hardware
-Date: Sun, 29 Mar 2026 12:34:58 -0700
-Message-ID: <20260329193457.2764549-2-kuba@kernel.org>
+	lorenzo@kernel.org,
+	theo.lebrun@bootlin.com,
+	nb@tipi-net.de
+Subject: Re: [PATCH net-next v6 1/7] net: macb: move Rx buffers alloc from link up to open
+Date: Sun, 29 Mar 2026 12:47:35 -0700
+Message-ID: <20260329194735.2781096-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260324-rtl8157_next-v4-2-034312b12de5@birger-koblitz.de>
-References: <20260324-rtl8157_next-v4-2-034312b12de5@birger-koblitz.de>
+In-Reply-To: <20260323221047.2749577-2-pvalerio@redhat.com>
+References: <20260323221047.2749577-2-pvalerio@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,186 +72,109 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-272986-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272985-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 06E90353D05
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 24645353D2E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-r8152: Add support for the RTL8157 hardware
+net: macb: move Rx buffers alloc from link up to open
 
-This commit adds support for the RTL8157 chip, including its new 16-byte
-descriptor format, SRAM/ADV interfaces, and PHY setup. It reuses existing
-initialization functions where possible while branching for chip-specific
-logic.
-
-> diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-> index bab8e10e5f99..010126e6dae4 100644
-> --- a/drivers/net/usb/r8152.c
-> +++ b/drivers/net/usb/r8152.c
-> @@ -1629,6 +1862,28 @@ static u16 sram_read(struct r8152 *tp, u16 addr)
->  	return ocp_reg_read(tp, OCP_SRAM_DATA);
->  }
->  
-> +static void sram_write_w0w1(struct r8152 *tp, u16 addr, u16 clear, u16 set)
-> +{
-> +	u16 data = sram_read(tp, addr);
-> +
-> +	data = (data & ~clear) | set;
-> +	ocp_reg_write(tp, OCP_SRAM_DATA, data);
-> +}
-
-Does this sequence write the modified data back to the wrong address?
-
-Indirect SRAM access ports typically auto-increment their internal address
-pointer upon read. Since sram_read() reads OCP_SRAM_DATA, the address
-pointer likely advances, causing the subsequent ocp_reg_write() to corrupt
-the adjacent register instead of the intended one. Should this use
-sram_write(tp, addr, data) to reset the address before writing?
-
-> +static u16 sram2_read(struct r8152 *tp, u16 addr)
-> +{
-> +	ocp_reg_write(tp, OCP_SRAM2_ADDR, addr);
-> +	return ocp_reg_read(tp, OCP_SRAM2_DATA);
-> +}
-> +
-> +static void sram2_write_w0w1(struct r8152 *tp, u16 addr, u16 clear, u16 set)
-> +{
-> +	u16 data = sram2_read(tp, addr);
-> +
-> +	data = (data & ~clear) | set;
-> +	ocp_reg_write(tp, OCP_SRAM2_DATA, data);
-> +}
-
-Is the same auto-increment issue present here with OCP_SRAM2_DATA?
+This commit moves the Rx buffer allocation in the macb driver from link up
+to open. It allows the initialization to fail early and loudly if the
+Rx rings cannot be refilled, rather than initializing the device in a
+broken state.
 
 [ ... ]
 
-> @@ -4080,6 +4473,14 @@ static void rtl8156_runtime_enable(struct r8152 *tp, bool enable)
->  	}
->  }
->  
-> +static void rtl8157_runtime_enable(struct r8152 *tp, bool enable)
-> +{
-> +	r8153_queue_wake(tp, enable);
-> +	r8153b_u1u2en(tp, false);
-> +	r8157_u2p3en(tp, false);
-> +	rtl_runtime_suspend_enable(tp, enable);
-> +}
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index 1cb49252abf5..38302cba05ad 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -1504,6 +1505,7 @@ static void gem_rx_refill(struct macb_queue *queue)
+>  			if (unlikely(!skb)) {
+>  				netdev_err(bp->dev,
+>  					   "Unable to allocate sk_buff\n");
+> +				err = -ENOMEM;
+>  				break;
+>  			}
 
-Does this function break power management upon the first suspend and resume
-cycle? Unlike rtl8156_runtime_enable() which checks the enable parameter,
-this implementation unconditionally calls r8153b_u1u2en(tp, false) and
-r8157_u2p3en(tp, false) even when resuming.
+If dma_map_single() fails shortly after this block, the code frees the
+allocated skb and breaks out of the loop:
 
-[ ... ]
+	paddr = dma_map_single(&bp->pdev->dev, skb->data,
+			       bp->rx_buffer_size,
+			       DMA_FROM_DEVICE);
+	if (dma_mapping_error(&bp->pdev->dev, paddr)) {
+		dev_kfree_skb(skb);
+		break;
+	}
 
-> @@ -6693,7 +7052,7 @@ static void rtl8156_up(struct r8152 *tp)
->  	r8153_aldps_en(tp, true);
->  	r8153_u2p3en(tp, true);
->  
-> -	if (tp->udev->speed >= USB_SPEED_SUPER)
-> +	if (tp->version != RTL_VER_16 && tp->udev->speed >= USB_SPEED_SUPER)
->  		r8153b_u1u2en(tp, true);
->  }
-
-Because r8153_u2p3en(tp, true) is called unconditionally just before the
-modified lines, will RTL8157 incorrectly write to the legacy USB_U2P3_CTRL
-register instead of using its specific r8157_u2p3en() function?
+Does this cause the function to return 0 (success) despite the DMA mapping
+failure, bypassing the new fail-early design?
 
 [ ... ]
 
-> @@ -6706,13 +7065,13 @@ static void rtl8156_down(struct r8152 *tp)
->  		return;
->  	}
->  
-> -	ocp_data = ocp_read_word(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3);
-> -	ocp_data |= PLA_MCU_SPDWN_EN;
-> -	ocp_write_word(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3, ocp_data);
-> +	ocp_word_set_bits(tp, MCU_TYPE_PLA, PLA_MAC_PWR_CTRL3, PLA_MCU_SPDWN_EN);
->  
->  	r8153b_u1u2en(tp, false);
-> -	r8153_u2p3en(tp, false);
-> -	r8153b_power_cut_en(tp, false);
-> +	if (tp->version != RTL_VER_16) {
-> +		r8153_u2p3en(tp, false);
-> +		r8153b_power_cut_en(tp, false);
+> @@ -6108,12 +6127,20 @@ static int __maybe_unused macb_resume(struct device *dev)
+>  	for (q = 0, queue = bp->queues; q < bp->num_queues;
+>  	     ++q, ++queue) {
+>  		if (!(bp->caps & MACB_CAPS_MACB_IS_EMAC)) {
+> -			if (macb_is_gem(bp))
+> -				gem_init_rx_ring(queue);
+> -			else
+> +			if (macb_is_gem(bp)) {
+> +				err = gem_init_rx_ring(queue);
+> +				if (err) {
+> +					dev_err(dev, "Unable to init RX ring: %d\n", err);
+> +					return err;
+> +				}
+> +			} else {
+>  				macb_init_rx_ring(queue);
+> +			}
+>  		}
 > +	}
->  	r8153_aldps_en(tp, false);
-
-While the legacy registers are correctly avoided for RTL_VER_16 here, are we
-missing calls to r8157_u2p3en(tp, false) and r8157_power_cut_en(tp, false)?
-If omitted, these power states might remain permanently enabled when the
-interface goes down.
-
-[ ... ]
-
-> @@ -8362,10 +8825,21 @@ static void r8156b_init(struct r8152 *tp)
 >  
->  	set_bit(GREEN_ETHERNET, &tp->flags);
->  
-> -	/* rx aggregation */
-> -	ocp_data = ocp_read_word(tp, MCU_TYPE_USB, USB_USB_CTRL);
-> -	ocp_data &= ~(RX_AGG_DISABLE | RX_ZERO_EN);
-> -	ocp_write_word(tp, MCU_TYPE_USB, USB_USB_CTRL, ocp_data);
-> +	/* rx aggregation / 16 bytes Rx descriptor */
-> +	if (tp->version == RTL_VER_16)
-> +		ocp_word_clr_bits(tp, MCU_TYPE_USB, USB_USB_CTRL, RX_AGG_DISABLE | RX_DESC_16B);
+> +	for (q = 0, queue = bp->queues; q < bp->num_queues;
+> +	     ++q, ++queue) {
+>  		napi_enable(&queue->napi_rx);
+>  		napi_enable(&queue->napi_tx);
+>  	}
 
-Is it intended to clear the RX_DESC_16B bit for RTL_VER_16? The driver uses
-sizeof(struct rx_desc_v2) which is a 16-byte descriptor for RTL8157.
-Clearing this bit might configure the hardware to send 8-byte descriptors
-instead, leading to packet parsing corruption in rx_bottom().
+If gem_init_rx_ring() fails and we return err early here, the subsequent
+loop that calls napi_enable() is skipped.
 
-[ ... ]
+Since NAPI was disabled during suspend, the NAPI context remains in a
+disabled state. If the interface is later administratively brought down,
+.ndo_stop (macb_close) will unconditionally call napi_disable().
 
-> @@ -9647,6 +10158,29 @@ static int rtl_ops_init(struct r8152 *tp)
->  		tp->rx_buf_sz		= 32 * 1024;
->  		tp->eee_en		= true;
->  		tp->eee_adv		= MDIO_EEE_1000T | MDIO_EEE_100TX;
-> +		r8152_desc_init(tp);
-> +		break;
-> +
-> +	case RTL_VER_16:
-> +		tp->eee_en		= true;
-> +		tp->eee_adv		= MDIO_EEE_1000T | MDIO_EEE_100TX;
-> +		tp->eee_adv2		= MDIO_EEE_2_5GT | MDIO_EEE_5GT;
-> +		ops->init		= r8156_init;
-> +		ops->enable		= rtl8156_enable;
-> +		ops->disable		= rtl8153_disable;
-> +		ops->up			= rtl8156_up;
-> +		ops->down		= rtl8156_down;
-> +		ops->unload		= rtl8153_unload;
-
-Will using rtl8153_unload for RTL_VER_16 result in incorrect power cut
-teardown? rtl8153_unload calls the legacy r8153_power_cut_en(tp, false).
-RTL8157 seems to require r8157_power_cut_en(tp, false) to properly clear
-USB_MISC_2 bit 1 and PCUT_STATUS on module unload.
+Can calling napi_disable() on an already disabled NAPI context cause an
+infinite loop and a hard kernel deadlock in this scenario?
+-- 
+pw-bot: cr
 
