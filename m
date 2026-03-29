@@ -1,260 +1,191 @@
-Return-Path: <netdev+bounces-272883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-272884-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6EogEXkRyWnktwUAu9opvQ
-	(envelope-from <netdev+bounces-272883-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:48:09 +0200
+	id kJyBJOYXyWkFugUAu9opvQ
+	(envelope-from <netdev+bounces-272884-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 14:15:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C651F351D5B
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 13:48:08 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0974351E58
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 14:15:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 055FF3004DEF
-	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 11:48:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id ABE9B301301B
+	for <lists+netdev@lfdr.de>; Sun, 29 Mar 2026 12:15:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D711A175A7F;
-	Sun, 29 Mar 2026 11:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F023603E7;
+	Sun, 29 Mar 2026 12:15:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F1RRsP3U";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bjiS84Gj"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="tf9bDJRY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61D21F9D9
-	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 11:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774784884; cv=none; b=fJs1rxM2fMNf3zaLEOranwTmw212niZGxO3LLzd7g67E+4OiBpcYucGUvTZGxgnD1TH/YrHLDGhBMbaEt/oQZrCIWhURMypXpLIHX1kXOd787cEh4YXmLt6C5/FRMqFPxDqFZqtn8ZoFfGf6R78KPeMjBuDpUmGpyOrolwfujSs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774784884; c=relaxed/simple;
-	bh=VmiU+lGWwhD04qd6rphG/xwilSYXtQMv9P8qHhzig6w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uqABp+hK0rS7mMNIFBH2qIafDLV+CtinrIvrb3lD6rdIEzCeeFLrNAK7S4+JjXog2qk6L2fr+xTC8/eGvyEbzp4pORO35xbJI+QJyRRjCwrdsoIVjKoadNlQrPREXLV+Wf/n4Y1Ruhl7dzV6O8e5fxPgw0U+Wpcncu0XaZmPQrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F1RRsP3U; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bjiS84Gj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774784882;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w4wyr6M+eJrZIrzyYJ1+8bLKHcISE+JsFI7+Bovqkkc=;
-	b=F1RRsP3UmJRGBpQwH/CvC2ktWP8DpvesSP7xXLH8lPQpTJEWbgWyvm1EZ4xa4F5GmjFV0p
-	eG/3hkq8XabWUaUeBfjZj/0bKmEK+m2P12uRv+J1+H+9erPvP00F1YMfnGt5tj3Z9EK9tp
-	cleT5+qNHGqKv9gMIKcal8SGpKpNTng=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-58-s8haxHLjMbegueF2qxdytg-1; Sun, 29 Mar 2026 07:48:00 -0400
-X-MC-Unique: s8haxHLjMbegueF2qxdytg-1
-X-Mimecast-MFC-AGG-ID: s8haxHLjMbegueF2qxdytg_1774784879
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-486fc42c83aso26235975e9.0
-        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 04:48:00 -0700 (PDT)
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795C83446AB
+	for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 12:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774786530; cv=pass; b=BQZ27Igaw5xTmZP0Sb78l2vw/p/bp9PfjhskxCtS8H1oDpnVt6oWslKMvyZ99I6mZ0ndWPBmzVY48wFDmkG3BqM29Mf5gsT4ZjJVcjhvpFrYduIpFKiH0MddTHt/omb3FUXCl1+sHJPS7Oh4rM0lSKiVeiHqydyw74lDkv+nKbc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774786530; c=relaxed/simple;
+	bh=aGUSXWhm+JoDXr6K679Ou4D8GdN9hAVsT9C3QTs8kNI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Pu4/Xc3uyrC2c4cLqZ6tfms5jqEnCzKuCzVsW3LRRiUeWJ0tPldaAVWqOSGc7E6xJNoeNw6b2F8YaJYipnVoz+wdkLXBxt7Mu1W6Sy/2kh2yw67vHtmwZ/O3viFK9mjRx8wdAWMuf7CkSjA2KKEcAyftIv1WRsyKIEE6wNJbO3Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=tf9bDJRY; arc=pass smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-82bae83318bso1655018b3a.2
+        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 05:15:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774786528; cv=none;
+        d=google.com; s=arc-20240605;
+        b=J9T5pUOvveI/IjIytLblUokiQ0mZJPorehEhehE4QBKbOotj46xsInysLouk5bUgfe
+         ho1RX/WjGNKnykK0EHFm4MsHQSpc3jybI3gGm6+Jx4OhMTMT/9UzlSfVcAYiscKipg0T
+         UYkApY34p1n7Wc1ugH5srxWhjgiwv4rMLgWgeF+nx79THNXv16hAE1niMLsooNBzth4o
+         dnr6Nw4O/EWID86IedsLCigevFpUfTkH6h/Jk55Ckg6QIpqBBQQyTickNhDhafg7+lp8
+         Oa4SWYLhLbJsJD+78zkPq/NrRtzLCqYq1becCGqH8CV+fxtfGhBzS9gI5hp3vB0NdR/B
+         ZZXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=A1bkIX8hkRMa3/SMIoe10mwAwuMyepgF8Mu7WOEyDrs=;
+        fh=nYVvRJn7C0FHwv+zL8foIgb8fRUFEmEj4NkKRgmpwPk=;
+        b=cFPCWM15b9InkyXqasTy1u2s1F6u5ZQtWLJHCA0/RltRTfN3vFeX+jsoQ140Vr8eud
+         MWFdGMPWcdHNY4sifTeXVSDlY/Qo0yjQC3Cdbfg0ehGv04ZvOn3EgqCezRwZ3biRCY9a
+         GeEcc18EdqETB27wrFLdj8ENzdMIz32a3qwLJBnfcgS8myFMECfPi0g6+GHyuoM1UACe
+         uO4e1z7iKT41elGa6Qo5w9UVZypQgN3SFNoBVTIfyON/teemV+8VnRenpZ7ljm6/HEIi
+         6ALsm0xvD/2qqc4Tmwct3TkImGxIiGRoptaTIxpvNViQZzqIPgtzfPZdvo8czTgPIBj/
+         UYtA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774784878; x=1775389678; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=w4wyr6M+eJrZIrzyYJ1+8bLKHcISE+JsFI7+Bovqkkc=;
-        b=bjiS84GjGtRZ+IZrZ5gAn20vN8SSKN0/CSeFzsWCruJyYRw06O3GIzYSNIUWluccsQ
-         S0ZBlh2RFcShT3c2I9v17dc13lJmxU6XmK/aaUQ1on5nr8vW7bGFrCYjlWH0MNuuu9bH
-         qQUcZY9dKBvfAt+cSEbx+52Iyt8eGnIRpQ4fIBUfCSS79h+vh/ZHv8yfnkbmTAc6Wobv
-         +hStXgbD1YmjU437Z8o0kQV8xCmuW0Y+vii6gYxHc/B99I60SeiYFZBVTZCQ/T4hdCZ6
-         ql7RDgxOsojZLHNHcbxFCouVfCVwokUCwaZH1Jq9e/C6YaRa72KODZmVaS5nl3MTcZXX
-         fhrA==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1774786528; x=1775391328; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A1bkIX8hkRMa3/SMIoe10mwAwuMyepgF8Mu7WOEyDrs=;
+        b=tf9bDJRYl0anmhOjA97tX+MmWbmJHVKMmrporCYuiMSjwYwFVPclAycOAb0/8y561g
+         UoCaeNL28jGVvA/i+I5643vQ1NVgbjneYbOApnIbxMrbv74JlRZ4t6ceO9D3k51Btl0b
+         li+lTyvslYnwecuNSSk8oBhwKTc6LubQnEt5P0KfBnA5jHtPaK5AX2gTTvGYt9v34yQw
+         VaplfV276wvTve8NnT2XQe+BqFb+SMEmLUBL3jiU0pIhvSfOQxvxKhAF9CAU6Um1z+4p
+         +G0k+pgT3ih+3vaciqJT1G3BUwBVPEq1SMuvHSVTs9zhT7Mofq4DZ7wLFrcm0F+BVfEd
+         eXyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774784878; x=1775389678;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w4wyr6M+eJrZIrzyYJ1+8bLKHcISE+JsFI7+Bovqkkc=;
-        b=ejjtYS5CfJUUNirpT6gqMGyNpbIDzrUAefmNwVKOar6zoP4PHXzpV6ObxfYbSxcdEq
-         GQ3jg2GB6rJ2zp22g16bZylNKKIDDYetZJXAFWmw+4vsq6s0MXut+Pb/v7kNOlSuSvG6
-         Y+nk76WUHcZXUOrIs6DxKmQ3a8b8pUX1zZMrC4dAQMC8bsd3+2a6xKbRJxlnHMGq7xhe
-         vdfp5SuGAWNNHQn7IjUwANK1wSZ8bK7Ig/pVsthnjjDPAg2FS/b+nA+ZgonQlFvDh2Ff
-         G2qu2W+8/vgba49wiEUVchN4/8YcIAHXsfZZoNfpg1f/tb8mFYmWBV7akXBV1UTirWok
-         mnIg==
-X-Forwarded-Encrypted: i=1; AJvYcCXw+yyHveWf3INKy/G2A2/fuMCxoDDC3vYNdNuzOyqMrGMcOIi+gyuB2yP0VgcXqFir7mhd/ek=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyewzdAlzUVie/mPrbZ2ESCw582oh5Wr4PcanzhsGYWhhZYFY/
-	AGdcSE4kRoSzQOY+4lh4vLUJeSjRa5MjMy12Fp0PiHGgcNPHMlkbL4Xs4jxWU8RGiKBW+U4bnLY
-	G2M50J/wQoiqz5L0KPHzir9YUjrQWKF93IGO6FiFKyvYL7wuzF64nHGiWNL9dO4sczg==
-X-Gm-Gg: ATEYQzyAs5Lz+gQTI3GFq9nKPG2Gow0zUxM1R/Xn4ZI9Td04fnPvVqNAzpIaSc+iewL
-	3a7NaVmJ/4zL7ABBwEz76dYdpsM+Zow4CRJMGBR/OcbC34X9HzfdeVnkjQcllPVefNPoltmQ3Bx
-	Qhj55136nQVqvzc89E2AWZf5arWdTCHD0gPVOhyOdgKPyOkDm1hTwa+ATMmaI3Wc5+5fjPeWkj2
-	Y84QTVAJIiTeEOqLJNWPhf9rOPjcteSIVmeLz3JU5pSBvsmjAfOALfmzORDtn/USZbO+sSK4wBH
-	gsSOgYD9okYgzhzmCKwmkRon8Lly1tvmru2jUCw1ZfoWSuRW3vVIrgPuFDwkhAYz6wr9tLyS56W
-	xxbrALCUn4brlq6/av1gQ
-X-Received: by 2002:a05:600c:8485:b0:487:36c:f5ab with SMTP id 5b1f17b1804b1-48727d73464mr164565785e9.10.1774784878159;
-        Sun, 29 Mar 2026 04:47:58 -0700 (PDT)
-X-Received: by 2002:a05:600c:8485:b0:487:36c:f5ab with SMTP id 5b1f17b1804b1-48727d73464mr164565445e9.10.1774784877645;
-        Sun, 29 Mar 2026 04:47:57 -0700 (PDT)
-Received: from [192.168.2.83] ([46.175.183.46])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43cf247102dsm14038435f8f.27.2026.03.29.04.47.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 29 Mar 2026 04:47:56 -0700 (PDT)
-Message-ID: <eb41d806-27e3-4b3b-9c83-95e0305d940b@redhat.com>
-Date: Sun, 29 Mar 2026 13:47:54 +0200
+        d=1e100.net; s=20251104; t=1774786528; x=1775391328;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=A1bkIX8hkRMa3/SMIoe10mwAwuMyepgF8Mu7WOEyDrs=;
+        b=nyefQOdI1PZGcF65V5QR7/pGsaVh8oi4HPHSJ0Y55tzOyw1FTa+BB4zokCi9ImB/2E
+         44QAmuHgLvH8WpZpPBDhtBpYaB/hRmO2Z8Om459iwykYLcxhc2JVPDNA2e0GHLWFnPkH
+         jXVngWEn0ygrQKkZk8Fpo7aADsjBiMQB9IhNYzKoaXQTok2ohCjo7q1jKLAQu8na0MDe
+         FlCyQo0dNsN/E3OF9aNtuDDuI+wVLy0BB5if8fKoaXZPWtGpAfm7Z/Feu/Ni1g5sl+7v
+         AI7tOUQpqXD2dCu4AXStiAUc1SEISMtPlYteqaXsY33QEfRcWReR0ldvYUostjOVcLvo
+         tZUQ==
+X-Gm-Message-State: AOJu0YzyYXF9BpMi9ZPe2gQZkiNwx5rZE5IEFfhLRiTs3lF//Rphy8OV
+	WmbaExof6VVRiVya+sf6zaAsK0wR3TDdf+Jyojv+5IJv7KpqUgcOnv2cDOR79m8LyTTyezt3aSi
+	Gf8eMXg5y0tY8+S0vF9Sgv+3jSZypyECG74/cIITr+AHXzkNd261vkw==
+X-Gm-Gg: ATEYQzyvB1ypESkE0ehD5kVm89WuQk2SqP5k7WHxOPeu7l2DmMSf4kuUFsw1B4wY7DP
+	vvAYZvFqgqBiaQfPhnHuC8I+jY8TVQ5nQHdPHhrV2jhL+y7uqfcqPwXOD291vzVxiaZTHKI8OvU
+	suonmjiythjAvLOw7RJaEzv8DITyKoplPduA5uGTPGZAu9kvhiYSQdCnWaxMEIH33xQew2iQNAY
+	pe+3DqExHZg7RTL7kbuTmTfqihiPRIoRdJzqlpXGOtnyz2sERJXe2qQSdN7ChjlsL9L13DtXLov
+	WV9t/PQ0bQAtEDycph0=
+X-Received: by 2002:a05:6a00:a113:b0:7e8:4471:ae55 with SMTP id
+ d2e1a72fcca58-82c96025e7amr7739376b3a.33.1774786528595; Sun, 29 Mar 2026
+ 05:15:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next v2] dpll: Send object per event in JSON
- monitor mode
-To: Vitaly Grinberg <vgrinber@redhat.com>, netdev@vger.kernel.org
-Cc: stephen@networkplumber.org
-References: <20260329-dpll-mon-j-v2-1-c8170a80e6d8@redhat.com>
-Content-Language: en-US
-From: Petr Oros <poros@redhat.com>
-In-Reply-To: <20260329-dpll-mon-j-v2-1-c8170a80e6d8@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+References: <20260327061300.3066844-1-xmei5@asu.edu> <CAM0EoMkspiNjXpdwnG2HaPK3n+BJkjTRbA8k4TsV4fcVk7g_Zg@mail.gmail.com>
+In-Reply-To: <CAM0EoMkspiNjXpdwnG2HaPK3n+BJkjTRbA8k4TsV4fcVk7g_Zg@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Sun, 29 Mar 2026 08:15:17 -0400
+X-Gm-Features: AQROBzCZdaTy7dGEaWscHfEJG9hoD6B4SzbDG_dCsc6onIiJoUb1LKRQwZz8sLk
+Message-ID: <CAM0EoMmVey4ayJBZgogMO4S3Z-_n5oDfasdZyiVryEqCNqu6bw@mail.gmail.com>
+Subject: Re: [PATCH net 1/3] net/sched: cls_fw: fix NULL pointer dereference
+ on shared blocks
+To: Xiang Mei <xmei5@asu.edu>
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, horms@kernel.org, shuah@kernel.org, 
+	bestswngs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-272883-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-272884-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[mojatatu.com];
+	FREEMAIL_CC(0.00)[vger.kernel.org,resnulli.us,davemloft.net,google.com,kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[poros@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: C651F351D5B
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,asu.edu:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mojatatu.com:email]
+X-Rspamd-Queue-Id: D0974351E58
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> Previously, monitor mode wrapped all events in a single JSON array
-> inside a top-level object, which made piping the output to external
-> tools (such as `jq`) impossible.
-> Send a separate JSON object for each event in monitor mode,
-> making the output suitable for line-by-line consumers. Skip the
-> global JSON wrapper for monitor mode.
+On Fri, Mar 27, 2026 at 10:11=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
+> wrote:
 >
-> Signed-off-by: Vitaly Grinberg <vgrinber@redhat.com>
-> ---
-> v2:
->    - Fixed indentation
-> ---
->   dpll/dpll.c | 25 +++++++++++++++++--------
->   1 file changed, 17 insertions(+), 8 deletions(-)
+> On Fri, Mar 27, 2026 at 2:13=E2=80=AFAM Xiang Mei <xmei5@asu.edu> wrote:
+> >
+> > The old-method path in fw_classify() calls tcf_block_q() and
+> > dereferences q->handle. Shared blocks leave block->q NULL, causing a
+> > NULL deref when an empty cls_fw filter is attached to a shared block
+> > and a packet with a nonzero major skb mark is classified.
+> >
+> > Check tcf_block_shared() before accessing block->q and return -1 (no
+> > match) for shared blocks, consistent with cls_u32's tc_u_common_ptr().
+> >
+> > The fixed null-ptr-deref calling stack:
+> >  KASAN: null-ptr-deref in range [0x0000000000000038-0x000000000000003f]
+> >  RIP: 0010:fw_classify (net/sched/cls_fw.c:81)
+> >  Call Trace:
+> >   tcf_classify (./include/net/tc_wrapper.h:197 net/sched/cls_api.c:1764=
+ net/sched/cls_api.c:1860)
+> >   tc_run (net/core/dev.c:4401)
+> >   __dev_queue_xmit (net/core/dev.c:4535 net/core/dev.c:4790)
+> >
+> > Fixes: 1abf272022cf ("net: sched: tcindex, fw, flow: use tcf_block_q he=
+lper to get struct Qdisc")
+> > Reported-by: Weiming Shi <bestswngs@gmail.com>
+> > Signed-off-by: Xiang Mei <xmei5@asu.edu>
 >
-> diff --git a/dpll/dpll.c b/dpll/dpll.c
-> index 9893ca8c..49576d23 100644
-> --- a/dpll/dpll.c
-> +++ b/dpll/dpll.c
-> @@ -571,8 +571,15 @@ int main(int argc, char **argv)
->   	argc -= optind;
->   	argv += optind;
->   
-> -	new_json_obj_plain(json);
-> -	open_json_object(NULL);
-> +	/* Monitor emits one JSON object per event for streaming;
-> +	 * other commands use a single JSON wrapper object.
-> +	 */
-> +	bool is_monitor = argc > 0 && strcmp(argv[0], "monitor") == 0;
-> +
-> +	if (!is_monitor) {
-> +		new_json_obj_plain(json);
-> +		open_json_object(NULL);
-> +	}
->   
->   	/* Skip netlink init for help commands */
->   	bool need_nl = true;
-> @@ -602,8 +609,10 @@ dpll_fini:
->   	if (need_nl)
->   		dpll_fini(dpll);
->   json_cleanup:
-> -	close_json_object();
-> -	delete_json_obj_plain();
-> +	if (!is_monitor) {
-> +		close_json_object();
-> +		delete_json_obj_plain();
-> +	}
->   dpll_free:
->   	dpll_free(dpll);
->   	return ret;
-> @@ -2173,6 +2182,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
->   
->   		mnl_attr_parse(nlh, sizeof(struct genlmsghdr), attr_cb, tb);
->   
-> +		new_json_obj_plain(json);
->   		open_json_object(NULL);
->   		print_string(PRINT_JSON, "name", NULL, json_name);
->   		open_json_object("msg");
-> @@ -2182,6 +2192,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
->   
->   		close_json_object();
->   		close_json_object();
-> +		delete_json_obj_plain();
->   		break;
->   	}
->   	case DPLL_CMD_PIN_CREATE_NTF:
-> @@ -2200,6 +2211,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
->   			json_name = "pin-delete-ntf";
->   		}
->   
-> +		new_json_obj_plain(json);
->   		open_json_object(NULL);
->   		print_string(PRINT_JSON, "name", NULL, json_name);
->   		open_json_object("msg");
-> @@ -2209,6 +2221,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
->   
->   		close_json_object();
->   		close_json_object();
-> +		delete_json_obj_plain();
->   		break;
->   	}
->   	default:
-> @@ -2273,8 +2286,6 @@ static int cmd_monitor(struct dpll *dpll)
->   		goto err_signalfd;
->   	}
->   
-> -	open_json_array(PRINT_JSON, "monitor");
-> -
->   	pfds[0].fd = signal_fd;
->   	pfds[0].events = POLLIN;
->   	pfds[1].fd = netlink_fd;
-> @@ -2307,8 +2318,6 @@ static int cmd_monitor(struct dpll *dpll)
->   		}
->   	}
->   
-> -	close_json_array(PRINT_JSON, NULL);
-> -
->   err_signalfd:
->   	if (signal_fd >= 0)
->   		close(signal_fd);
+> Thanks for also providing the tdc tests. Looks like a bizarre bug=E2=80=
+=94and
+> in my mind the question is does fw or flow even factor into tc blocks?
+> Please give me time to review if the approach makes sense - perhaps
+> this weekend.
 >
-> ---
-> base-commit: 36252727bfc653905bb39bec115a32869452beb1
-> change-id: 20260328-dpll-mon-j-d88eb48c1f09
->
-> Best regards,
-> --
-> Vitaly Grinberg <vgrinber@redhat.com>
->
->
-Good idea, Thanks
+Since the fix is exactly as what u32 does - why not move
+tc_u_common_ptr() to a header file (pkt_cls.h)? then reuse it in u32,
+fw, and flow.
 
-Reviewed-by: Petr Oros <poros@redhat.com>
+I am still questioning the value of using blocks with these two
+classifiers and unfortunately the commit message of  1abf272022cf was
+not helpful.
+The testcases look good. Please add a letter head, perhaps quote the
+comment in tc_u_common_ptr() since it gives a good description of this
+whole dance.
 
-
+cheers,
+jamal
 
