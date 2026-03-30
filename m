@@ -1,77 +1,68 @@
-Return-Path: <netdev+bounces-273158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273159-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eJhOCpJuymnG8gUAu9opvQ
-	(envelope-from <netdev+bounces-273158-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:37:38 +0200
+	id gMnlEe5uymnG8gUAu9opvQ
+	(envelope-from <netdev+bounces-273159-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:39:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F85535B20C
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:37:37 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E7CA35B258
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:39:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1A02B3050236
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:32:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BEEA6301A3A4
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F5F3C9EFD;
-	Mon, 30 Mar 2026 12:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C33737EFFF;
+	Mon, 30 Mar 2026 12:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wzSqs23y"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1SkUQbL6"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFD83D0914
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 12:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DA11C3BFC;
+	Mon, 30 Mar 2026 12:35:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774873973; cv=none; b=emzLNSRcisdl25xVfKui5D/UopTHxVwzmoSRsW+JIdFO4615QyBJc3tBdLdJxr/HAsbvh/DWA2sZr2EXsiNrTYau9Vmm7WNIDQa7ITZPFAvTAPKzYyjFmWAemuAtU0RfGUEbpyH8iYZzdf0e0FdvHUM/Xv7MtmwrkHaD+nlDHq4=
+	t=1774874161; cv=none; b=aCZfQcuksmxG/txkKAOktjnxDZ6WzUGnTNDS7u/QtW/Pbr9VITU5wNc+C8QR3k/aEN+wg6a8AjcwHM4c/y+XZLtBTMuovYkeUtG/fcl/rdaM1qCje5Hh9PemobtZHl6Elzed2kOtrPRRNF9zvR6njWgPAOHt/QiJSGnuW3ZYKas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774873973; c=relaxed/simple;
-	bh=qTef9Y3NMxe+o3njNmJimFXzqpRgcjc0hEZwDqJWqPs=;
+	s=arc-20240116; t=1774874161; c=relaxed/simple;
+	bh=JgLz3/9DYWLbmsDqByx5eAD23pD+Ig2Gi9+AabgwnYw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NjKukYeqD3vGrzYQV8+zpwc686tFX6k4aqFsjRGu8pmaxph1qp3gbGKHSkd2CiTJMBosvi5rL7djM2onpTbvvfso+VQoPA+3B9of+cnKdSp+hiVbd0uV/DoygWvCpolLA2XIclhHn5+FEfAYyFzhyGRjSBn8MntUc9IKMgal6y4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wzSqs23y; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=x3Kcwxaz4yBp1v+INCmF72EmNBovcjM9LS/BwH6HzfE=; b=wzSqs23ymZRFsB6G+vgPNhRb/l
-	aTZ4mEOi+hgwcDuV00wQA6Mj74CCCn5K2OnuZaQY8TehecTJ0K54H7JrJ7Zsp5m7yq/s6v/l28vgF
-	JfN2vC95DRI7jGTmwuMm+bomSsbuWBozn5U8DY2ge0P0+dV4NXsUWuevOzk3J2ELO6xPE0HZ8cXo1
-	I6ixrCvEtYgeNR9tgah0UgtsMW8SdrVbmC3YLrC8EKiFFObUwjPJ49S4v2rSKeAuayQe3Wksb6H9S
-	5ScpsvwzzHwYwIFNYk6ra/chfPE8BAVlcDDz+M2vB2M5B4OKrodAkmll0g4k6tD5SOWbk3sIrzRC4
-	wEFiVPkg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51310)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w7BnS-000000000TQ-2byx;
-	Mon, 30 Mar 2026 13:32:46 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w7BnR-000000002fZ-0lGQ;
-	Mon, 30 Mar 2026 13:32:45 +0100
-Date: Mon, 30 Mar 2026 13:32:45 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=uCjrjihOPMlKRMYlgnF6lrhz+PHuXjeg1XozbN9pVGr0aoK22/55hkbtaZKH6anyQFAqtVmbPvjU5QBXP1wNc7sLLjkvGCU8etJkIUt3ZBMvqdTT1H44oVNCvuZ39o5ktX7AtVAl2xLOZzg0SzYjF/KS0T5Y48JTJFEMK06CmPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1SkUQbL6; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=wYBKS7dt5j38ighh50PUCkRqON2g0NPUuA+55y0x1ts=; b=1SkUQbL6OFfy1tSZ9NRgzdUTff
+	nx10vqYDxRH/htdOaPiVosjSKdhM+qxPyDPb/ZeO7l4XS0kH0sLr7vfDRKQspBuuHzII56mZcUeVW
+	pPYw7YPK1B530+BU4J4hpwSn8/TEQjcj6IM/G7WUTz09DeLGTvMLc3ou/fsCMWQZ6JEE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w7BqF-00E1x8-5E; Mon, 30 Mar 2026 14:35:39 +0200
+Date: Mon, 30 Mar 2026 14:35:39 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexis Lothore <alexis.lothore@bootlin.com>
-Subject: Re: [PATCH net-next] net: phylink: allow PHYs to be attached in
- 802.3z inband mode
-Message-ID: <acptbbfTt_FJgms6@shell.armlinux.org.uk>
-References: <E1w66jW-0000000E3qS-23fW@rmk-PC.armlinux.org.uk>
- <a5d7aedb-9770-492f-b528-0a28a652279b@bootlin.com>
- <acatrPb1DdHuyVoL@shell.armlinux.org.uk>
- <30a2cad9-fa2c-4abe-ad51-983d70564c7c@lunn.ch>
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH RFC net-next] net: stmmac: qcom-ethqos: set clk_csr
+Message-ID: <0d650de4-eb45-481b-8c39-1bf455b948c9@lunn.ch>
+References: <E1w6AZm-0000000E54W-1F6E@rmk-PC.armlinux.org.uk>
+ <9d0a529a-d065-4f46-a93b-23195a4f9727@oss.qualcomm.com>
+ <acpqgpCsbo3lJs3l@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,83 +71,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <30a2cad9-fa2c-4abe-ad51-983d70564c7c@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+In-Reply-To: <acpqgpCsbo3lJs3l@shell.armlinux.org.uk>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273158-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273159-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.992];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: 6F85535B20C
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9E7CA35B258
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 30, 2026 at 02:26:58PM +0200, Andrew Lunn wrote:
-> > As I've recently said, I think we're more or less boxed in between a
-> > rock and a hard place because of the hacks that qcom-ethqos introduced
-> > with its PCS support. At the moment, I am failing to see any path where
-> > the stmmac PCS can be programmed for inband according to phylink's
-> > wishes and qcom-ethqos can be made to work without its hacks.
+On Mon, Mar 30, 2026 at 01:20:18PM +0100, Russell King (Oracle) wrote:
+> On Mon, Mar 30, 2026 at 01:18:56PM +0200, Konrad Dybcio wrote:
+> > On 3/27/26 6:02 PM, Russell King (Oracle) wrote:
+> > > The clocks for qcom-ethqos return a rate of zero as firmware manages
+> > > their rate. According to hardware documentation, the clock which is
+> > > fed to the slave AHB interface can crange between 50 and 100MHz.
 > > 
-> > This all ultimately comes back to the half-hearted phylink conversion
-> > of stmmac that was done behind my back without my review. Had the
-> > conversion been done fully, and kept up with the phylink changes for
-> > PCS support, then we probably wouldn't be in this situation today.
-> > 
-> > Unfortunately, the driver is going to keep breaking all the time that
-> > it abuses phylink, and at the moment I see no way to stop this sodding
-> > driver abusing phylink.
+> > FWIW this __may__ possibly differ between platforms, but I'm not sure
+> > to what degree. Will there be visible impact if we e.g. have a 200 or
+> > 300 MHz clock somewhere?
 > 
-> "The needs of the many outweigh the needs of the few"
+> When you add other platforms, you're going to have to deal with their
+> differences.
 > 
-> The MAC driver is used by a lot of different SoCs. If qcom-ethqos
-> caused this problem, should we consider breaking backwards
-> compatibility for it, if that opens up a path for getting clean
-> phylink integration for all the other variants?
+> IEEE 802.3 states that the maximum clock rate for the MDIO bus is
+> 2.5MHz. You need to ensure that is the case.
+> 
+> Current qcom-ethqos code doesn't set clk_csr, and returns zero for
+> clk_get_rate() on the stmmac clocks because they are managed entirely
+> in firmware.
 
-Consider something like mvneta (which supports 2.5G speeds) connected
-to a 2.5G PHY that uses 2500BASE-X for 2.5G speeds, and SGMII for
-slower speeds with inband.
+Could a fixed clock be used in DT to represent clk_csr? Different
+platforms then set it to different frequencies, to represent whatever
+the firmware is doing.
 
-How should this be described in DT?
-
-	phy-mode = "2500base-x";
-	managed = "in-band-status";
-
-will fail today, as these tests will refuse to attach a PHY in that
-setup, and without a PHY attached, we will never know if it switches
-to SGMII mode.
-
-This patch makes phylink more flexible and permissive.
-
-However, as has been found, this patch causes problems for stmmac,
-so it needs a different approach, because stmmac interprets an
-optional PHY as "we must have a PHY if we don't we fail" at the
-moment.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+    Andrew
 
