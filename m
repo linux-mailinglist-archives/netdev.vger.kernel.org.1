@@ -1,80 +1,84 @@
-Return-Path: <netdev+bounces-273331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273332-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KBkdM+zyymkkBQYAu9opvQ
-	(envelope-from <netdev+bounces-273331-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:02:20 +0200
+	id B/dzO/jyymlaBwYAu9opvQ
+	(envelope-from <netdev+bounces-273332-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:02:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DF73361B7F
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:02:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 54162361B86
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:02:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E84D5303C009
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 21:57:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 96EDB303FFEE
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 21:57:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38953A7F69;
-	Mon, 30 Mar 2026 21:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529F13A8729;
+	Mon, 30 Mar 2026 21:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IUfXroDu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IWab94tu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8AF3A7848
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 21:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 392D63A7F4A
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 21:57:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774907833; cv=none; b=SyfLGCJShIcObUNh2ICpD4ue/kL/NSM52mebaKULLkgFlG6zfQT22cu+HNzLgcLlMP/Bl6pzTuiIg7568j8fkS5nffTg4DwTtbbtLspV47Ez4K/kmw0fjNff4c1VjZQZTGd3Qs/Je1YxSnRUQ2TtRhfE/yBAeyiNTeYO3TQQclg=
+	t=1774907834; cv=none; b=J3rPmAyzZj6byM9LgIywM8d7OChSe97ALDrGAANHPkfgyoESqFSQXwcbMcSWFZh4J8HQ8BzOYrGtzksxnm7/mj1D+TRZfb1oYqsQgj0iGyiO2uVGsf3C/7XO/qfWOeJtclsnofmb4RO+Ewvp9t7WSoEW4BQOqkOEaMiZfNSK0t8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774907833; c=relaxed/simple;
-	bh=TUABFKh2Cj1ynxKxcSeh4gP82eO8t3Tm55gdX0npR7I=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Bcc2ZhD+wNsgFSQjFLUKN4/Oa4ni++Rj5m5Mloq31LRUFAZ72SfSnzRyyVsYjjPvqCPQxH9dIomJ2YC+N6gBrucMBLnK4bpHr0GP/cCCz8bKRhBJ5R9ZEYFY1C3Gjs1uTjF5nt1yUs2jPUkNM3gco9nfdhk27pr4iNKDDmw9UXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IUfXroDu; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1774907834; c=relaxed/simple;
+	bh=pz86PmEpfzQN9js8IsuHqblvmjM03Ljb/l6bvN9B5Ms=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=jayst7dxWohwk+dO4ZBNyputOeY/ow1+9LqQl5E91zV8KlMrgVeGKT5C0g7KCtoUKonaCPgRYUjHo0ZW9HmbjZFERb3myeZJCMtMxUkC2CqFL5xhZsLRXQcV46A/n6qJEg4lLqDaOAGiERfhZrZYPvzwObNDrz5Ac38Y9zZuN+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IWab94tu; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-82cdaf0f934so121678b3a.0
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 14:57:10 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c76b15a3ccfso41076a12.3
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 14:57:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774907829; x=1775512629; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8ezkx37vFhwxIuITDyGC8lYQPdysOgwQvvO9b96vUlI=;
-        b=IUfXroDuGiPXn9rzqF9N3rBOWdaiehmgv7d9j9QVaCy9T6Ssy+Zdi4r6QrljL3cSWb
-         ltl/tzxnDSxln/vioyoo9uIfUwhtiPK1G24lpVOpRHVFRVq9ehnteLZSRrnmlIDj6qYP
-         WE5JDgqV92tv5E6BqY+aSZYsoB23qILgmuwieWsvCFlixFnK3yk3qsOoGOOSN5hrMEW2
-         FXx8we029RFPRd1Z3jVDYsNH1JicxMfCxuSrOLJHmzorYNEVz3QR0B/8qkpggsv+9X7j
-         eqUStduC9Al+OufKQM8WLBguEf3vPI2MxTjj3+UlKzyG476pkM3chD4OiP+8TAsvBRrl
-         3Mfg==
+        d=google.com; s=20251104; t=1774907831; x=1775512631; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DR2NV2QHTTPddHUWacFog7WO7giZkfHr/2vqRIpwBGM=;
+        b=IWab94tuiYPgSu5VWUAq8rtCYBUgGNScAaTJO7B5bAHld/Oc5VVHPx99DPFtBfl5tn
+         uWPtguVjaxZZtPRLBHhiUiaPmCwfF7ecUuIcbau7Jw/I0ZYCy9jyDw993GwryOqDoxaR
+         3+dUCgB31izbB1jXHimalHiGiKqiDms/foCVBXZE8fLEnSspd8s9tvRv8mVqkE16Xezj
+         pPe8bXjD8ifT71CCJ2ye5KwpYA3jTe+rKRXvPa5jgIomCcUi8PS14P9Rn1AtQAxM7mvO
+         gCEHM8ejmKsx4r+MAQKlHONhpnLqRI11uAp/iikBvjBQ1YFKZGUF/syjfW3btZFYU9Tj
+         SoVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774907829; x=1775512629;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8ezkx37vFhwxIuITDyGC8lYQPdysOgwQvvO9b96vUlI=;
-        b=fvNBHixyiGEEToyZYAFMA+cq5BSSHJz3zHqxZ/zUfYsR71VsgFf/3Xr9aaugsHcDp2
-         8ss/7++qLZeNDo2FCru2OHBU91I6eYY7Y0kvx7pVBWyBFiuCdqXRC6ZDgfnmsSVtw6tL
-         LothuEozJ5hr/0mEmqyp/HQbNo1O2pXWCluXQG11KcbijYtRVvv0OQ56ZSroLXdM5ZbT
-         +uJCuy8tRnGGe9G0Sk9bXIsdgl/LQFmd6xhoZUPiuRZR571Yuu/lfdQy5WxM8G1vzUKx
-         NHVp9V4GLn45PSd9fYRfq1TPMyuY50Gxy7/D96w0V5gKc8xEUplS+nBoE3ikxJ0LTx/D
-         wzYQ==
-X-Gm-Message-State: AOJu0Yx4LmSibGBk583QYWeHyNmmf5qb8wu7ocnL4vIWuteBfnIaeSpI
-	kxB4qFXHLAXRw51Bg4ezlH/nuLYbERmgxj2Ndl/KbOcU3EvALWW1q6b76MbGxp4+RzCiDCBxvo4
-	Egklk3sgEh4ejToJ0Qm5uWYkr49HIofqw7axekcdtlWl4VgjaLmiXPeJUt9rGkiB2SUqWcqfO16
-	4mai5q2s1YK3bXgfi4fnRn+8M6vs6Td5o=
-X-Received: from pfbif10.prod.google.com ([2002:a05:6a00:8b0a:b0:827:45df:8f74])
- (user=jrife job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3698:b0:81e:e09d:2687
- with SMTP id d2e1a72fcca58-82c95af13f9mr13335495b3a.1.1774907829135; Mon, 30
- Mar 2026 14:57:09 -0700 (PDT)
-Date: Mon, 30 Mar 2026 21:57:00 +0000
+        d=1e100.net; s=20251104; t=1774907831; x=1775512631;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DR2NV2QHTTPddHUWacFog7WO7giZkfHr/2vqRIpwBGM=;
+        b=IAMl5pVMsdWMriTuzaGAc5IOXHkDpaY1CSpe7h8u/X2JrySn90hgPCH1IZvzQ6Qf3G
+         A7CKwTQcREypBJ+6x2MOI/4QLWF/MQzFD41ECgTFa9Ilvs/3wHoItMXUXQSUSjX1rrpl
+         gmxW9R0a4msuY0kR5DBTNDE7SxjqPDJgaYdb5sPBV+KHhJAG9YVIU8Og8pq71qEDeZ9x
+         5WH3Kb76XU8WFXn5lqwyF6oJawhP2DPkbrR60Obvm56LRdOSNM2x0MVfRwx99hcBtn/b
+         GZVqrpYgj+0gGAr5Zabxw4fFL1EucpCyVyWBHJybGczAcBif9hjR2xSfGDDQY/aB0uvl
+         Hz0w==
+X-Gm-Message-State: AOJu0Yyc2rV1Iwq0O3uXJszHrHmYC12okxkmh5Rta0hEO1wcC9KIIv1w
+	ZEOxmY4AhxbQ7IZ+kA/oP9OkTUYJA+TdBLLpG3v7Of0HTscvghTXrtz+1WEyKDroGsYe/o269nY
+	CyqKSwz+DOwc5qlz96C1SW4jc3SvvuAzxVEl7cfpE57KzWnsYT+Lft64o4eHe9B1shrMEaQlOgN
+	wNfb9Yve9w7dj1jtrdB0+ykrPamszt3m0=
+X-Received: from pgg12.prod.google.com ([2002:a05:6a02:4d8c:b0:c73:bade:9641])
+ (user=jrife job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9187:b0:398:4c9f:d970
+ with SMTP id adf61e73a8af0-39c877a9973mr13050112637.14.1774907830685; Mon, 30
+ Mar 2026 14:57:10 -0700 (PDT)
+Date: Mon, 30 Mar 2026 21:57:01 +0000
+In-Reply-To: <20260330215707.2374657-1-jrife@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260330215707.2374657-1-jrife@google.com>
 X-Mailer: git-send-email 2.53.0.1118.gaef5881109-goog
-Message-ID: <20260330215707.2374657-1-jrife@google.com>
-Subject: [PATCH net-next v3 0/4] udp: Preserve UDP socket addresses on abort
+Message-ID: <20260330215707.2374657-2-jrife@google.com>
+Subject: [PATCH net-next v3 1/4] udp: Only compare daddr/dport when sk_state
+ == TCP_ESTABLISHED
 From: Jordan Rife <jrife@google.com>
 To: netdev@vger.kernel.org
 Cc: Jordan Rife <jrife@google.com>, bpf@vger.kernel.org, 
@@ -95,7 +99,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273331-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273332-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -112,87 +116,146 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3DF73361B7F
+X-Rspamd-Queue-Id: 54162361B86
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-BPF cgroup/sock_release hooks can be useful for performing cleanup,
-map maintenance, or other bookkeeping when sockets are released. Cilium
-uses cgroup/sock_release hooks to do just that, cleaning up maps keyed
-by socket destination addresses. This works fine for TCP and connected
-UDP sockets when they're closed gracefully, but Yusuke reported in [1]
-that behavior is inconsistent following a socket abort.
+Adjust lookups and scoring to keep their results equivalent to before
+even if inet_daddr+inet_dport are left intact after disconnecting a
+socket (sk_state == TCP_CLOSE). sk_state == TCP_ESTABLISHED implies that
+*daddr is non-zero, so remove redundant checks for that at the same
+time. Note that __udp6_lib_demux_lookup already checks if sk_state ==
+TCP_ESTABLISHED, so no change was needed there [1].
 
-From the perspective of a BPF sock_release hook, the state of sockets
-following a socket abort (udp_abort, tcp_abort) is inconsistent and
-surprising. After a sequence like the following,
+I could find no discernible difference in performance in
+udp4_lib_lookup2 before and after the change in compute_score.
 
-1. connect(127.0.0.1:10001) or connect(::1:10001)
-2. abort (diag_destroy() -> tcp_abort() or udp_abort())
-3. close() -> sock_release hook runs
+(AMD Ryzen 9 9900X)
 
-, the state of the sock_release program context differs depending on the
-protocol and IP version.
+kprobe:udp4_lib_lookup2 {
+        @start[cpu] = nsecs;
+}
+kretprobe:udp4_lib_lookup2 {
+        @lookup[cpu] = hist(nsecs - @start[cpu], 2);
+}
 
-   +--------------------------------------------------------------+
-   |        Configuration        |           ctx fields           |
-   +------+----------+-----------+-----------+---------+----------+
-   | Case | Protocol | IP Family | dst_ip4   | dst_ip6 | dst_port |
-   +------+----------+-----------+-----------+---------+----------+
-   | 1    | TCP      | IPv4      | 127.0.0.1 | -       | 10001    |
-   | 2    | TCP      | IPv6      | -         | ::1     | 10001    |
-   | 3    | UDP      | IPv4      | 0         | -       | 0        |
-   | 4    | UDP      | IPv6      | -         | ::1     | 0        |
-   +------+----------+-----------+-----------+---------+----------+
+BEFORE
+======
+@lookup[11]:
+[80, 96)         1387077 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+[96, 112)         364973 |@@@@@@@@@@@@@                                       |
+[112, 128)         34261 |@                                                   |
+[128, 160)          7246 |                                                    |
+[160, 192)           215 |                                                    |
+[192, 224)           126 |                                                    |
 
-For TCP, the state of dst_ip4/dst_ip6/dst_port are preserved. In the
-case of UDP, both dst_ip4 and dst_port are cleared for IPv4 while
-dst_ip6 remains intact for IPv6. This can be confusing for users of BPF
-like Cilium where a sock_release hook makes use of these fields and
-expects them to match a socket's state prior to abort. This series aims
-to make the behavior consistent across the board to eliminate this
-pitfall by preserving the state of dst_ip4 and dst_port after an abort.
+AFTER
+=====
+@lookup[11]:
+[80, 96)         1408594 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+[96, 112)         340568 |@@@@@@@@@@@@                                        |
+[112, 128)         30753 |@                                                   |
+[128, 160)          8019 |                                                    |
+[160, 192)           231 |                                                    |
+[192, 224)           157 |                                                    |
 
-[1]: https://github.com/cilium/cilium/issues/42649
+[1]: https://lore.kernel.org/netdev/20170623222537.130493-1-tracywwnj@gmail.com/
 
-v2: https://lore.kernel.org/netdev/20260303170106.129698-1-jrife@google.com/
+Signed-off-by: Jordan Rife <jrife@google.com>
+---
+ net/ipv4/udp.c | 20 +++++++++++---------
+ net/ipv6/udp.c | 18 +++++++++---------
+ 2 files changed, 20 insertions(+), 18 deletions(-)
 
-CHANGES
-=======
-v2 -> v3:
-* Expand selftests to add coverage for scenarios where a socket is bound
-  and connected.
-* Simply unhashing a socket in udp_abort() as in v2 immediately releases
-  any ports the socket is bound to. Instead, the socket should hold onto
-  its port until it is closed just as before (Kuniyuki). v3 employs a
-  new strategy where inet_daddr and inet_dport are left intact in
-  __udp_disconnect during udp_abort and bound sockets remain in the
-  primary and portaddr hashes just as before. At the same time, the
-  logic in hash lookups is adjusted so that inet_daddr/inet_dport are
-  ignored unless the socket is currently connected (sk_state ==
-  TCP_ESTABLISHED).
-    Kuniyuki mentioned that performance may be a concern with changes to
-    logic in the fast path. I've tried to address these concerns by
-    testing the performance of udp4_lib_lookup2 before and after making
-    the changes.
-v1 -> v2:
-* Set connect_fd back to -1 after calling destroy() in the selftest
-  (Jakub).
-
-Jordan Rife (4):
-  udp: Only compare daddr/dport when sk_state == TCP_ESTABLISHED
-  udp: Remove disconnected sockets from the 4-tuple hash
-  udp: Preserve destination address info after abort
-  selftests/bpf: Ensure dst addr/port are preserved after socket abort
-
- net/ipv4/udp.c                                |  47 +++--
- net/ipv6/udp.c                                |  18 +-
- .../bpf/prog_tests/sock_destroy_release.c     | 180 ++++++++++++++++++
- .../bpf/progs/sock_destroy_release.c          |  56 ++++++
- 4 files changed, 278 insertions(+), 23 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sock_destroy_release.c
- create mode 100644 tools/testing/selftests/bpf/progs/sock_destroy_release.c
-
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index b60fad393e18..d91c587c3657 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -385,16 +385,16 @@ static int compute_score(struct sock *sk, const struct net *net,
+ 	score = (sk->sk_family == PF_INET) ? 2 : 1;
+ 
+ 	inet = inet_sk(sk);
+-	if (inet->inet_daddr) {
++	if (sk->sk_state == TCP_ESTABLISHED) {
+ 		if (inet->inet_daddr != saddr)
+ 			return -1;
+ 		score += 4;
+-	}
+ 
+-	if (inet->inet_dport) {
+-		if (inet->inet_dport != sport)
+-			return -1;
+-		score += 4;
++		if (inet->inet_dport) {
++			if (inet->inet_dport != sport)
++				return -1;
++			score += 4;
++		}
+ 	}
+ 
+ 	dev_match = udp_sk_bound_dev_eq(net, sk->sk_bound_dev_if,
+@@ -796,8 +796,9 @@ static inline bool __udp_is_mcast_sock(struct net *net, const struct sock *sk,
+ 
+ 	if (!net_eq(sock_net(sk), net) ||
+ 	    udp_sk(sk)->udp_port_hash != hnum ||
+-	    (inet->inet_daddr && inet->inet_daddr != rmt_addr) ||
+-	    (inet->inet_dport != rmt_port && inet->inet_dport) ||
++	    (sk->sk_state == TCP_ESTABLISHED &&
++	     (inet->inet_daddr != rmt_addr ||
++	     (inet->inet_dport != rmt_port && inet->inet_dport))) ||
+ 	    (inet->inet_rcv_saddr && inet->inet_rcv_saddr != loc_addr) ||
+ 	    ipv6_only_sock(sk) ||
+ 	    !udp_sk_bound_dev_eq(net, sk->sk_bound_dev_if, dif, sdif))
+@@ -2854,7 +2855,8 @@ static struct sock *__udp4_lib_demux_lookup(struct net *net,
+ 	ports = INET_COMBINED_PORTS(rmt_port, hnum);
+ 
+ 	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
+-		if (inet_match(net, sk, acookie, ports, dif, sdif))
++		if (sk->sk_state == TCP_ESTABLISHED &&
++		    inet_match(net, sk, acookie, ports, dif, sdif))
+ 			return sk;
+ 		/* Only check first socket in chain */
+ 		break;
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 010b909275dd..b93a9a3e7678 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -147,16 +147,16 @@ static int compute_score(struct sock *sk, const struct net *net,
+ 	score = 0;
+ 	inet = inet_sk(sk);
+ 
+-	if (inet->inet_dport) {
++	if (sk->sk_state == TCP_ESTABLISHED) {
+ 		if (inet->inet_dport != sport)
+ 			return -1;
+ 		score++;
+-	}
+ 
+-	if (!ipv6_addr_any(&sk->sk_v6_daddr)) {
+-		if (!ipv6_addr_equal(&sk->sk_v6_daddr, saddr))
+-			return -1;
+-		score++;
++		if (!ipv6_addr_any(&sk->sk_v6_daddr)) {
++			if (!ipv6_addr_equal(&sk->sk_v6_daddr, saddr))
++				return -1;
++			score++;
++		}
+ 	}
+ 
+ 	bound_dev_if = READ_ONCE(sk->sk_bound_dev_if);
+@@ -949,9 +949,9 @@ static bool __udp_v6_is_mcast_sock(struct net *net, const struct sock *sk,
+ 
+ 	if (udp_sk(sk)->udp_port_hash != hnum ||
+ 	    sk->sk_family != PF_INET6 ||
+-	    (inet->inet_dport && inet->inet_dport != rmt_port) ||
+-	    (!ipv6_addr_any(&sk->sk_v6_daddr) &&
+-		    !ipv6_addr_equal(&sk->sk_v6_daddr, rmt_addr)) ||
++	    (sk->sk_state == TCP_ESTABLISHED &&
++	     ((inet->inet_dport && inet->inet_dport != rmt_port) ||
++	     !ipv6_addr_equal(&sk->sk_v6_daddr, rmt_addr))) ||
+ 	    !udp_sk_bound_dev_eq(net, READ_ONCE(sk->sk_bound_dev_if), dif, sdif) ||
+ 	    (!ipv6_addr_any(&sk->sk_v6_rcv_saddr) &&
+ 		    !ipv6_addr_equal(&sk->sk_v6_rcv_saddr, loc_addr)))
 -- 
 2.53.0.1118.gaef5881109-goog
 
