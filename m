@@ -1,157 +1,170 @@
-Return-Path: <netdev+bounces-273198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273195-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EONnNtl/ymnX9QUAu9opvQ
-	(envelope-from <netdev+bounces-273198-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:51:21 +0200
+	id cJwnHIJ/ymnX9QUAu9opvQ
+	(envelope-from <netdev+bounces-273195-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:49:54 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 345C235C586
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:51:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC76235C4FF
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:49:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E94243052632
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:43:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AF7483037EC9
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272BF3D47A3;
-	Mon, 30 Mar 2026 13:43:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401C43D0930;
+	Mon, 30 Mar 2026 13:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="CZGIYuLS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P8f4jU1z"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D3A3BFE5A;
-	Mon, 30 Mar 2026 13:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2123238150
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 13:42:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774878187; cv=none; b=aBau5dF1Qxww7+CuLQ+8obgTyNORnSweDAfY8BslmjEEWseJ/q1YD7vbwi4xd7EFsaBl+QdMmk2htC+g3NH9Zucteditr0MKd6cZ1L/DDaUhPmWu/XSfvS/4DixJGq0G0Qqx5EkdKyGYL9/4BLI6iJmZIsdTaAYDcpCH1+aILJc=
+	t=1774878151; cv=none; b=mYdVAjGgnr0XKE0wmllN3O4moHuw+MvJp+DnbgtR9L4ZXc9R28jF9MZh3SNvdr2UZMQUC94gvMW1s64rYd+wZo+7dDTyHXl+5AqmmA9eDe8MhyvfO0mEg3mPdqa0Seucw3CKDhkzrgNrXD8QTSH18NEohU5QG5kvP5H0s3aelqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774878187; c=relaxed/simple;
-	bh=nHe8/8Bn9Z2nJjXigStXbXvDUI4dnqVGlmqimDu7dn4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iBo48ZEHXu/Vr4joSLZmiwOJzultNKx6QuXK5+ZN33fRxW8AtINyGVFSEJTIbQ7SAX6J0fMM7P72udPrigFRvJ+bP8csWoAytUxVsemeSDt8cZTuolZjGQyfJv5xfEQwCSwdZuW/TMQLSMOHehZwujWXXMKv2Hz+F5YxP7lPur4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=CZGIYuLS; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1774878185; x=1806414185;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=nHe8/8Bn9Z2nJjXigStXbXvDUI4dnqVGlmqimDu7dn4=;
-  b=CZGIYuLSGiObJCUhstyTBo9zy+Lkw1mtdvtR5oqVr3yPBkrbHwkskrGy
-   xrhQSBEGzO5E3WRjdzG6RpayRNI7dTkrqbkHFsnxd3HO0Zcg7rMIFTH9Y
-   6+f8LTC6FBzwAclbJkty1jyHYfpNbY9/ohhHlOpu4I1CT1tCe9KVZbU0u
-   0oqd1jeGylKuw4Qkfgc0qXYiiBdAFp3jH+RU3TKC5AaOZPPwyPw5mYAVS
-   gEKxQV1x0g48thIbIIHuxsii8RWggO78NItXLz3KbyUQ87zirvVk+Yo+g
-   82LQgtPOkJNe4jqLfbkXEvE/LhyFWW7exD+ehr6V9oRwqy/lWflPqGMkO
-   A==;
-X-CSE-ConnectionGUID: 2vXt89tESFa2aJsbwP30Hw==
-X-CSE-MsgGUID: dgTLrdTORdO5iYnBy3Lu7g==
-X-IronPort-AV: E=Sophos;i="6.23,150,1770620400"; 
-   d="scan'208";a="54658517"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 06:43:04 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.87.151) by
- chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Mon, 30 Mar 2026 06:42:44 -0700
-Received: from che-ll-i17164.microchip.com (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Mon, 30 Mar 2026 06:42:40 -0700
-From: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-To: <parthiban.veerasooran@microchip.com>, <piergiorgio.beruto@gmail.com>,
-	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <steve.glendinning@shawell.net>,
-	<UNGLinuxDriver@microchip.com>
-CC: <netdev@vger.kernel.org>, <linux-usb@vger.kernel.org>
-Subject: [PATCH net-next 3/3] net: usb: smsc95xx: suspend PHY during USB suspend
-Date: Mon, 30 Mar 2026 19:12:22 +0530
-Message-ID: <20260330134222.67597-4-parthiban.veerasooran@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260330134222.67597-1-parthiban.veerasooran@microchip.com>
-References: <20260330134222.67597-1-parthiban.veerasooran@microchip.com>
+	s=arc-20240116; t=1774878151; c=relaxed/simple;
+	bh=OxeMDfIOeJPo0liFSF+iS4Bsty37kddULdD/aIXYKGE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=DGD20JVL+kvCtwogqkAI2WnrxJPCK7mxyrqxGK5q6OHCU7kBtgXSGhZTLHZyM/sKt6RjmzQ1QmnEXZaRLBhz0djhwKdVgS+viDUkT5bcfzPBpaq3mGl3GV5btkj4w3XHgCaRMsImdlvfRte7kN7cpGIFh2IpP2oC4iHThK1ioBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P8f4jU1z; arc=none smtp.client-ip=74.125.224.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-65003f40a22so4295542d50.2
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 06:42:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774878149; x=1775482949; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dReUoPRdYJoj/PVvzy5/qVwqlhgJ0D0SdiCFOdc0j84=;
+        b=P8f4jU1zWYaPeg2MbgI/MgQcMM4Di0TOPJMh+/7IXFzaq1Ve+FGzdTgr31JvePwvgX
+         j4L14uLya5lWF/Bu+aQzl/q5WzLnPg5WXC1xuG6SphyaD0HH6HtXRgGWXeeE4x/SNN0S
+         5OeSSorGYaonjJloIR3LOT6t89WXqT0y6W4eex8Eo86VKYJTg/ZnGSDUcNpDTGNj6v8a
+         RmbOVWQccJisKLHxwG181MKNxehwD0akU6h6a+SnBeKOKmwhwjkcRjKLnLCapcokL/Rj
+         4iqdNqqhoOCPz/bmy0/Bx0k/kC5sHmKXud5kKyNjjxhq9mh83zxmaTw0dYKpos8SNGhY
+         XQ4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774878149; x=1775482949;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dReUoPRdYJoj/PVvzy5/qVwqlhgJ0D0SdiCFOdc0j84=;
+        b=BJrm9gbnpGu3YZDw/rzO1n2dp9JH7AsHtaiqTJ/l/Bk657pC1FTioiuKaLTIA5a/aP
+         KZS6aYXOQRcFV7kH9PTQYIPtW2DkLlNiK1Sh5T2nmBWy5XN66xR0IN74YgIwkQZG5MOl
+         3qC/asR5KncPN7acPCmEGjYQo/huGk/AZ4brmI/+dasfT3Z6PX49CHclEJ+Xx/2q9i2q
+         8t3XD3LypETXs7iKcncX4VMsTkjF4Y3hsZpKZ4dU6p77ijA/iz/VIcouy22qj+GjS991
+         kw9vKQOkDn7PHeKdUt5KtWMvUskv2jR2TrxHkjLrO+yrO3kAUjuPInNxZJfYIsA0G+ES
+         DdgQ==
+X-Gm-Message-State: AOJu0YwjVxa+2Wz0lHmgY2CmxW+zIqPj0oEevAOegC+jPTxh5m6FvpN8
+	jb05hsCsBBVanRzO9FnXbeQ8A8gD6J0dBtH/Z219ENjR+IA8pgBeskCp
+X-Gm-Gg: ATEYQzx4GQgVoykxtUDrn+TfVZrKktjYw0y/9kX//l02JbmW7hJfDmHeTvwd9CCDZAo
+	VSMqBrBlQtbiodbGqvEkKpWkbpOtawQTnV+kRvSkWiZ08E4s91JF9NEHDQanmLgKMnD4/qLzD+e
+	72DZiKsn0h/VhtrT6+N62R9DB86EnI5iPgeEYVIeiNae5I+BFo7F7/AIvGp597Sc3j2XH1op8LS
+	4XCqcUzgcPyCVS+AS8cEq9L4QuAL+PmujM7ZaCWJ57HZ4mRph5DQc63LDBM6jUPm278KlM+LHeL
+	dyb0eHDT6cSAon0yolFTEkhL+o55L9ge/BQnsElkvvEAQEwsd7GN434+OSAt3qXy2STGqawCDP6
+	mqSwN7ok+/gCZTAPNJ8NkPgCmrnxybj2ZIQ5+CzmwfOgvKeM64FR60H5tZD8exBJZukztQ/ZcKV
+	HsQpjx8yCCMN+FIQP3RULdy9RN9iHG8Jos2H9zd7I1ANXRE1jJR/IrC/Mt8iLsnlzKB1j7jao2a
+	6sm
+X-Received: by 2002:a53:d005:0:b0:650:1bc2:7e13 with SMTP id 956f58d0204a3-6501bc286e4mr3068003d50.7.1774878147225;
+        Mon, 30 Mar 2026 06:42:27 -0700 (PDT)
+Received: from gmail.com (180.134.85.34.bc.googleusercontent.com. [34.85.134.180])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65009200901sm4033085d50.1.2026.03.30.06.42.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 06:42:26 -0700 (PDT)
+Date: Mon, 30 Mar 2026 09:42:26 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ maze@google.com, 
+ willemdebruijn.kernel@gmail.com, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ martin.lau@linux.dev, 
+ eddyz87@gmail.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ jolsa@kernel.org
+Message-ID: <willemdebruijn.kernel.15a62f8f2870@gmail.com>
+In-Reply-To: <20260329180428.2657785-1-kuba@kernel.org>
+References: <20260329180428.2657785-1-kuba@kernel.org>
+Subject: Re: [PATCH bpf-next v2 1/2] net: clear the dst when performing encap
+ / decap
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Spamd-Result: default: False [0.84 / 15.00];
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-273198-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[microchip.com,gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,shawell.net];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[parthiban.veerasooran@microchip.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-273195-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,iogearbox.net,linux.dev,fomichev.me];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:dkim,microchip.com:email,microchip.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 345C235C586
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EC76235C4FF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The smsc95xx driver registers a PHY device but does not currently
-propagate suspend events to it when the USB interface is suspended.
+Jakub Kicinski wrote:
+> Commit ba9db6f907ac ("net: clear the dst when changing skb protocol")
+> added dst clearing when a BPF program changes the skb protocol
+> (e.g. IPv4 to IPv6). Since that was a fix we only cleared the dst when
+> the L3 protocol actually changes to keep it minimal. As suggested during
+> the discussion (see Link) encap or decap operation which wraps or unwraps
+> a same-protocol header may also render the existing dst incorrect - even
+> if that doesn't result in a crash, just the wrong route for the now-outermost
+> IP dst.
+> 
+> Make dropping dst unconditional for bpf_skb_change_proto() and all
+> L3 encap / decap ops.
+> 
+> Link: https://lore.kernel.org/CANP3RGfRaYwve_xgxH6Tp2zenzKn2-DjZ9tg023WVzfdJF3p_w@mail.gmail.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Call phy_suspend() from the driver's suspend callback so the attached
-PHY can properly enter low-power state during system or runtime
-suspend. This aligns smsc95xx suspend handling with other network
-drivers that manage an external or integrated PHY.
-
-Without this, the PHY may remain active and fail to execute its own
-suspend procedure, leading to unnecessary power consumption or
-incorrect resume behavior.
-
-This change is also required for the EVB-LAN8670-USB Rev.D0 device to
-support OATC10-compliant sleep and wake functionality.
-
-Signed-off-by: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
----
- drivers/net/usb/smsc95xx.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
-index 42e4048b574b..3a6e03b7410a 100644
---- a/drivers/net/usb/smsc95xx.c
-+++ b/drivers/net/usb/smsc95xx.c
-@@ -1550,6 +1550,12 @@ static int smsc95xx_suspend(struct usb_interface *intf, pm_message_t message)
- 
- 	pdata->pm_task = current;
- 
-+	if (pdata->phydev) {
-+		ret = phy_suspend(pdata->phydev);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	ret = usbnet_suspend(intf, message);
- 	if (ret < 0) {
- 		netdev_warn(dev->net, "usbnet_suspend error\n");
--- 
-2.34.1
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
