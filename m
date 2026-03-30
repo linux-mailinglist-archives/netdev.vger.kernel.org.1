@@ -1,173 +1,125 @@
-Return-Path: <netdev+bounces-273155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273156-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WIYlJERsymnG8gUAu9opvQ
-	(envelope-from <netdev+bounces-273155-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:27:48 +0200
+	id MAeJCCpuymnG8gUAu9opvQ
+	(envelope-from <netdev+bounces-273156-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:35:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D68835B06C
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:27:48 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87A0C35B1B8
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:35:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E8278300F795
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:23:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 327063054118
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:27:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70B573C552F;
-	Mon, 30 Mar 2026 12:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21FE3CBE6E;
+	Mon, 30 Mar 2026 12:27:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="xzEvR8ZH"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="auSz9rJ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7343B4E8B;
-	Mon, 30 Mar 2026 12:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2239F3CAE7C
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 12:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774873395; cv=none; b=mlnbOOP/T8cxVqJMt17wapq7uaFdyMNxBiY8HSmTl/v0pzzwBps/X4p+H8H1KZ+x4M5wGtsjptRxgYgb+IhaQZj2+kg/FikA4c/PoeviTCOx7xfH7c1k+5efzoe9xzRAFnBCi0o07UHxtaGF5inlIpsZrUR4Yncj7R4zskE7z5c=
+	t=1774873636; cv=none; b=JazmOORk57xDfj8QcyBsa7UY6ERPNTUaKkJxaEgxI6GQOwgRAT+VAks78tA9VenxB6Cl0zRBrW+dGs5eOqlDIS8qlLy3t5Ll9th1Hs1FI5kjLNB2Lr2OHa2HOHuvU/hu8LNAwgtw+6UTtLELjUNdSt5xE9xg13KGdfULGFmyl8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774873395; c=relaxed/simple;
-	bh=FsvuZh6AdTR/1QOkqYfLXEn+LEcBDFMJTS700Rj4mxc=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=QkwLGP7lSaMeqBXkIWW2vnxuKuO5VZhz7oZEq5bjjMMWC0H/Etj43mtD64QKnQoDJBq8Y/w6p1e2r5N8xUia1r9C+ypILNPRdoMrXzv7G2j70b86p81GEcPmRXXdqPMlr3VMyeaqgjwyW96lpwgz1jOx3w7TMok2M1Hl4rqQTH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=xzEvR8ZH; arc=none smtp.client-ip=162.240.164.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=wqOHbYxZOhKblA4rwLkEKOT4hJPxT7ENuF/pYv/tQxg=; b=xzEvR8ZHDo4I62B4dPIGN+0R3O
-	5QkEzWyY2CAiRv+A+QGcAI+eWBtBpZvb/1yI9cuCbe7qO5sOLlF616Fuu7YZ5fY+a1Ob2ivJ/EKDW
-	4dr0PONKQPEqiBx6KkNngxOSWbtmEJ2g0dF4F2tZrpPl5reUgff2+pmCrjD4SwRv+i+lw5ZxYiurR
-	cdTYStoFU/YtAMF8l5wJfgwLde4TQHEGdC4e1I5fdG5sQ0c2MOu5xcbHwaCF6Ye8V55Op4aIivYR4
-	0gKrvMTWbamrfZxaViQFbCOuYD+/KkTmBkqaBb4dw0H1n+umP/mCOm0+FVKsCu+bMacfQebnYRxcV
-	tuBypLMQ==;
-Received: from [115.246.246.98] (port=33079 helo=zimbra.couthit.local)
-	by server.couthit.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1w7Be4-00000005tTc-05MZ;
-	Mon, 30 Mar 2026 08:23:04 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 2AB1E1B22FE5;
-	Mon, 30 Mar 2026 17:52:58 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
- by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10032)
- with ESMTP id ZZfqEwv8_Cm0; Mon, 30 Mar 2026 17:52:57 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 9538D1B23224;
-	Mon, 30 Mar 2026 17:52:57 +0530 (IST)
-X-Virus-Scanned: amavis at couthit.local
-Received: from zimbra.couthit.local ([127.0.0.1])
- by localhost (zimbra.couthit.local [127.0.0.1]) (amavis, port 10026)
- with ESMTP id U0buoev9nmnn; Mon, 30 Mar 2026 17:52:57 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 6D0871B22FE5;
-	Mon, 30 Mar 2026 17:52:57 +0530 (IST)
-Date: Mon, 30 Mar 2026 17:52:57 +0530 (IST)
-From: Parvathi Pudi <parvathi@couthit.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Parvathi Pudi <parvathi@couthit.com>, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Kevin Hilman <khilman@baylibre.com>, nm <nm@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, afd <afd@ti.com>, 
-	rogerq <rogerq@kernel.org>, tony <tony@atomide.com>, 
-	robh <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
-	conor+dt <conor+dt@kernel.org>, 
-	richardcochran <richardcochran@gmail.com>, 
-	aaro koskinen <aaro.koskinen@iki.fi>, andreas <andreas@kemnade.info>, 
-	linux-omap <linux-omap@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	netdev <netdev@vger.kernel.org>, danishanwar <danishanwar@ti.com>, 
-	pratheesh <pratheesh@ti.com>, j-rameshbabu <j-rameshbabu@ti.com>, 
-	praneeth <praneeth@ti.com>, srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	m-malladi <m-malladi@ti.com>, krishna <krishna@couthit.com>, 
-	mohan <mohan@couthit.com>, pmohan <pmohan@couthit.com>, 
-	basharath <basharath@couthit.com>, 
-	Murali Karicheri <m-karicheri2@ti.com>
-Message-ID: <2119014162.782613.1774873377419.JavaMail.zimbra@couthit.local>
-In-Reply-To: <6c523569-928b-4df5-89f3-9a460d5f6020@lunn.ch>
-References: <20260307122641.738450-1-parvathi@couthit.com> <20260307122641.738450-4-parvathi@couthit.com> <7ho6ks1r4s.fsf@baylibre.com> <91797572.667989.1773662409130.JavaMail.zimbra@couthit.local> <ee2ec279-ee5d-4d6d-b6ff-35187e3f03e6@kernel.org> <1868242922.724201.1774332140293.JavaMail.zimbra@couthit.local> <6c523569-928b-4df5-89f3-9a460d5f6020@lunn.ch>
-Subject: Re: [PATCH v5 3/3] arm: dts: ti: Add device tree support for
- PRU-ICSS on AM335x
+	s=arc-20240116; t=1774873636; c=relaxed/simple;
+	bh=llJznkRYrMjQ2g8AZalOG8AxrTe4w2O9WpmyW53WKxI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fuQn3Nk2NKMyOg3dzmyh937FrDjyHg4AeGt0S5HULr29cPImGLvvXWsnihEFJl3DXQ2s4OX3IccHtl/c8NqoludffcObyBh6x/+Ab+LONr9GILfW3wiu+k31Ymppe8/g7RVbThOSZ1NHndcoKBQpIQHCFpiMXzqf1LZCl2gABTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=auSz9rJ9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ZloaSKpGUzTDvSvNkKJvXGWiuMQ2BtRRtHd9Y3h/ZYI=; b=auSz9rJ9sMa6GLQVUFg4Jl2EFo
+	XnX55W0roCH4ZPx4MiCqFoelj0sTGWLg7tclkDdEDi7MPrVQMQJbjPiCqkbRuB1dN9uz0YycvrWDT
+	k3GhkpSF4hNO07gAd6xteTN6W2kUYtWCURsh8sEx2gy0UQJnqIPhuQLENLGc10OVvj/w=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w7Bhq-00E1sM-Od; Mon, 30 Mar 2026 14:26:58 +0200
+Date: Mon, 30 Mar 2026 14:26:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexis Lothore <alexis.lothore@bootlin.com>
+Subject: Re: [PATCH net-next] net: phylink: allow PHYs to be attached in
+ 802.3z inband mode
+Message-ID: <30a2cad9-fa2c-4abe-ad51-983d70564c7c@lunn.ch>
+References: <E1w66jW-0000000E3qS-23fW@rmk-PC.armlinux.org.uk>
+ <a5d7aedb-9770-492f-b528-0a28a652279b@bootlin.com>
+ <acatrPb1DdHuyVoL@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 9.0.0_ZEXTRAS_20240927 (ZimbraWebClient - GC138 (Linux)/9.0.0_ZEXTRAS_20240927)
-Thread-Topic: Add device tree support for PRU-ICSS on AM335x
-Thread-Index: Yeg9Le+d6/LdmTazsRbjkV66zNcCzA==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.couthit.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[couthit.com:s=default];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <acatrPb1DdHuyVoL@shell.armlinux.org.uk>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[couthit.com : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[couthit.com,kernel.org,baylibre.com,ti.com,atomide.com,gmail.com,iki.fi,kemnade.info,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-273156-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,couthit.local:mid];
-	HAS_X_GMSV(0.00)[smtp@couthit.com];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MIME_TRACE(0.00)[0:+];
-	HAS_X_AS(0.00)[smtp@couthit.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273155-lists,netdev=lfdr.de];
-	HAS_X_SOURCE(0.00)[];
-	DKIM_TRACE(0.00)[couthit.com:-];
-	FROM_NEQ_ENVFROM(0.00)[parvathi@couthit.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[31];
-	NEURAL_HAM(-0.00)[-0.548];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	HAS_X_ANTIABUSE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: 0D68835B06C
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 87A0C35B1B8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
-
->> We have verified that dtbs_check does report this issue, and we will update
->> our test setup to retain full dtbs_check output to avoid missing such warnings
->> in the future.
+> As I've recently said, I think we're more or less boxed in between a
+> rock and a hard place because of the hacks that qcom-ethqos introduced
+> with its PCS support. At the moment, I am failing to see any path where
+> the stmmac PCS can be programmed for inband according to phylink's
+> wishes and qcom-ethqos can be made to work without its hacks.
 > 
-> I would expect the exit value is set to something other than 0 when it
-> finds an error. Why not just fail the test based on that?
+> This all ultimately comes back to the half-hearted phylink conversion
+> of stmmac that was done behind my back without my review. Had the
+> conversion been done fully, and kept up with the phylink changes for
+> PCS support, then we probably wouldn't be in this situation today.
 > 
+> Unfortunately, the driver is going to keep breaking all the time that
+> it abuses phylink, and at the moment I see no way to stop this sodding
+> driver abusing phylink.
 
-Earlier, we were using the command "grep -v '^\s\s*'" to capture the logs.
-We noticed that this command skips capturing output lines that starts with an
-indent. To prevent this, we have temporarily modified the grep command to capture
-the full output. The downside is that this results in a bigger log file. 
+"The needs of the many outweigh the needs of the few"
 
-We will review and try to come up with a better way to handle this issue.
+The MAC driver is used by a lot of different SoCs. If qcom-ethqos
+caused this problem, should we consider breaking backwards
+compatibility for it, if that opens up a path for getting clean
+phylink integration for all the other variants?
 
-Thanks and Regards,
-Parvathi
+	Andrew
 
