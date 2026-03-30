@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-273101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273102-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +Kz1GfA8ymnG6wUAu9opvQ
-	(envelope-from <netdev+bounces-273101-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:05:52 +0200
+	id uLESKaI7ymnD6gUAu9opvQ
+	(envelope-from <netdev+bounces-273102-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:00:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5C08357C31
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:05:50 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06A6357A4E
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:00:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3B4AB307EBE5
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 08:50:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3CBDC304002B
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 08:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B39813ACF12;
-	Mon, 30 Mar 2026 08:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F52E3ACA6B;
+	Mon, 30 Mar 2026 08:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UV4rLANJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mt5BNCFx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215CD3ACF16
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 08:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAE9382383
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 08:52:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774860623; cv=none; b=gpD24uIzkpgdFAPxEHoLM8jL7l2mvGrS/zRNJIopbZnJrk6sHGG+FWuVIGnzxAS1rSVuXMntO8j1vmlpfi8t+fcTxeaDXYpCuWowjGUyHL+HH/sHkwdV9nf4GIstkRfmDry8vBWvQdtUEMS28mmH1GKjUakUXUHxvmkcilJT92U=
+	t=1774860769; cv=none; b=Rr/aAVjnj84cvvmUAH8teEsuIe4qLNW4LHkjUZrIEkblzuhSPrPlPwrukXX/ONusUzGiLPsKR96iEqM1a9MdkI4a6loR6GKvCkhPnzMmsV2E9iOtUMTU/QnWX8uZ+wc5KpqDBCGu95FRDqGqZ1OQdFLQxIbz1mcuV7fj796MBls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774860623; c=relaxed/simple;
-	bh=2KoPNxmKsdxT6zmm+q+ltTKBWlpbtb6RIHYy4EaLfYU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G0Vobfj2dJvc4rs2gak2M0ZLSlYfO9lxj/PFtuVV0gzGrLkR46bwvyoeQOY29LT+FUo0e6BBIWprV9HF/4+3WPKBSmz7spKnzN7qBaUZnamtvr8yZDADKnFjhenGFLQAzdHdhNgJ4JtX1+dIyKcWVlxaLO7JOO0WgsBKUlqDwJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UV4rLANJ; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1774860769; c=relaxed/simple;
+	bh=AA2BdMUW7VfEiqAUAzVMsm0H/MPU3SGAH/WOlBUEhSw=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=DmZ7i5o3/Sd9tsC1gWLF5Yu+EfpcRM0rsiMMAifjiCCC0nOwslejKOAFElT2S9JJyahe3MUfXhS4ibiJi/5iU/9d8ftTTZbIKj3m/zEBpOFULOcSSGs+/miYIADn5EyQ3ZPpXJX9FOdOQ5HvE9WYnowmF4rpNEMnBz+9nLbWwPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mt5BNCFx; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774860621;
+	s=mimecast20190719; t=1774860766;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SCaX9vVMAeysC0r5VvECqBNsRE2DjxzmEaovdyRV5VM=;
-	b=UV4rLANJdm6A7KWpCCmUeaWl0sVGYQR46qJjQkvfnB+RCOZqHDqBG0cTQi1Y1hhOmq11sC
-	IlVqrrMdT7pVzGuSqou/qX0+eOT8qK5kDbLIsbcbRsKUigZb5lSsBeBQS0CfCpGaTmpKSU
-	RLem1oZ2HRBcWFlyYC6DvxJBglYK1lc=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	bh=or/KOdTHYhj19Ns3SWZkcQKqCJUJy40IjMw5ydB3GXk=;
+	b=Mt5BNCFxGFvA5kjrq1dKKJwqb3zGhCYyxcQBd+bJMnC2BSYZERCjbWZZyE68mhT5NPwpjl
+	ME/Z/ozkidtgZPau5Ow4FPLPld0T33r7C23LdDVdKUlrbwHiwR05nAg1KP67DTyuSjAwJ7
+	qX/YyvuY32+KonwkKEA+6oR4VA1AlQk=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-687-_WBNSPxmOLqeOsmKJIe0MQ-1; Mon,
- 30 Mar 2026 04:50:17 -0400
-X-MC-Unique: _WBNSPxmOLqeOsmKJIe0MQ-1
-X-Mimecast-MFC-AGG-ID: _WBNSPxmOLqeOsmKJIe0MQ_1774860616
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-548-PbSe9W_gOB-x8qrN-X81PA-1; Mon,
+ 30 Mar 2026 04:52:45 -0400
+X-MC-Unique: PbSe9W_gOB-x8qrN-X81PA-1
+X-Mimecast-MFC-AGG-ID: PbSe9W_gOB-x8qrN-X81PA_1774860763
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6359918002C7;
-	Mon, 30 Mar 2026 08:50:16 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 873F51800610;
+	Mon, 30 Mar 2026 08:52:42 +0000 (UTC)
 Received: from [10.44.33.70] (unknown [10.44.33.70])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6758130001A1;
-	Mon, 30 Mar 2026 08:50:15 +0000 (UTC)
-Message-ID: <e0488c57-5745-4398-b646-9f791e14c20a@redhat.com>
-Date: Mon, 30 Mar 2026 10:50:14 +0200
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1E5FC1800107;
+	Mon, 30 Mar 2026 08:52:37 +0000 (UTC)
+Message-ID: <a341fd52-3682-473f-8116-a8323bf846ee@redhat.com>
+Date: Mon, 30 Mar 2026 10:52:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,159 +69,103 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next v2] dpll: Send object per event in JSON
- monitor mode
-To: Vitaly Grinberg <vgrinber@redhat.com>, netdev@vger.kernel.org
-Cc: stephen@networkplumber.org
-References: <20260329-dpll-mon-j-v2-1-c8170a80e6d8@redhat.com>
-Content-Language: en-US
+Subject: Re: [PATCH net-next 2/3] dpll: add actual frequency monitoring
+ callback ops
 From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <20260329-dpll-mon-j-v2-1-c8170a80e6d8@redhat.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>, Petr Oros
+ <poros@redhat.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260325193914.124898-1-ivecera@redhat.com>
+ <20260325193914.124898-3-ivecera@redhat.com>
+ <d0a6d302-c5af-4ad1-87e2-fa017bdd96a8@linux.dev>
+ <e4372a58-13ba-4581-af4e-28d0c880c7bc@redhat.com>
+Content-Language: en-US
+In-Reply-To: <e4372a58-13ba-4581-af4e-28d0c880c7bc@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273102-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[intel.com,resnulli.us,lwn.net,linuxfoundation.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,microchip.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273101-lists,netdev=lfdr.de];
-	RCPT_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C5C08357C31
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F06A6357A4E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/29/26 9:51 AM, Vitaly Grinberg wrote:
-> Previously, monitor mode wrapped all events in a single JSON array
-> inside a top-level object, which made piping the output to external
-> tools (such as `jq`) impossible.
-> Send a separate JSON object for each event in monitor mode,
-> making the output suitable for line-by-line consumers. Skip the
-> global JSON wrapper for monitor mode.
+On 3/26/26 6:48 PM, Ivan Vecera wrote:
+> On 3/26/26 12:21 PM, Vadim Fedorenko wrote:
+>> On 25/03/2026 19:39, Ivan Vecera wrote:
+>>
+>>> +static int dpll_msg_add_actual_freq(struct sk_buff *msg, struct 
+>>> dpll_pin *pin,
+>>> +                    struct dpll_pin_ref *ref,
+>>> +                    struct netlink_ext_ack *extack)
+>>> +{
+>>> +    const struct dpll_device_ops *dev_ops = dpll_device_ops(ref->dpll);
+>>> +    const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
+>>> +    struct dpll_device *dpll = ref->dpll;
+>>> +    enum dpll_feature_state state;
+>>> +    u64 actual_freq;
+>>> +    int ret;
+>>> +
+>>> +    if (!ops->actual_freq_get)
+>>> +        return 0;
+>>> +    if (dev_ops->freq_monitor_get) {
+>>> +        ret = dev_ops->freq_monitor_get(dpll, dpll_priv(dpll),
+>>> +                        &state, extack);
+>>> +        if (ret)
+>>> +            return ret;
+>>> +        if (state == DPLL_FEATURE_STATE_DISABLE)
+>>> +            return 0;
+>>
+>> I think we have to signal back to user that frequency monitoring is
+>> disabled via extack.
 > 
-> Signed-off-by: Vitaly Grinberg <vgrinber@redhat.com>
-> ---
-> v2:
->    - Fixed indentation
-> ---
->   dpll/dpll.c | 25 +++++++++++++++++--------
->   1 file changed, 17 insertions(+), 8 deletions(-)
+> Hi Vadim,
 > 
-> diff --git a/dpll/dpll.c b/dpll/dpll.c
-> index 9893ca8c..49576d23 100644
-> --- a/dpll/dpll.c
-> +++ b/dpll/dpll.c
-> @@ -571,8 +571,15 @@ int main(int argc, char **argv)
->   	argc -= optind;
->   	argv += optind;
->   
-> -	new_json_obj_plain(json);
-> -	open_json_object(NULL);
-> +	/* Monitor emits one JSON object per event for streaming;
-> +	 * other commands use a single JSON wrapper object.
-> +	 */
-> +	bool is_monitor = argc > 0 && strcmp(argv[0], "monitor") == 0;
-> +
-> +	if (!is_monitor) {
-> +		new_json_obj_plain(json);
-> +		open_json_object(NULL);
-> +	}
->   
->   	/* Skip netlink init for help commands */
->   	bool need_nl = true;
-> @@ -602,8 +609,10 @@ dpll_fini:
->   	if (need_nl)
->   		dpll_fini(dpll);
->   json_cleanup:
-> -	close_json_object();
-> -	delete_json_obj_plain();
-> +	if (!is_monitor) {
-> +		close_json_object();
-> +		delete_json_obj_plain();
-> +	}
->   dpll_free:
->   	dpll_free(dpll);
->   	return ret;
-> @@ -2173,6 +2182,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
->   
->   		mnl_attr_parse(nlh, sizeof(struct genlmsghdr), attr_cb, tb);
->   
-> +		new_json_obj_plain(json);
->   		open_json_object(NULL);
->   		print_string(PRINT_JSON, "name", NULL, json_name);
->   		open_json_object("msg");
-> @@ -2182,6 +2192,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
->   
->   		close_json_object();
->   		close_json_object();
-> +		delete_json_obj_plain();
->   		break;
->   	}
->   	case DPLL_CMD_PIN_CREATE_NTF:
-> @@ -2200,6 +2211,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
->   			json_name = "pin-delete-ntf";
->   		}
->   
-> +		new_json_obj_plain(json);
->   		open_json_object(NULL);
->   		print_string(PRINT_JSON, "name", NULL, json_name);
->   		open_json_object("msg");
-> @@ -2209,6 +2221,7 @@ static int cmd_monitor_cb(const struct nlmsghdr *nlh, void *data)
->   
->   		close_json_object();
->   		close_json_object();
-> +		delete_json_obj_plain();
->   		break;
->   	}
->   	default:
-> @@ -2273,8 +2286,6 @@ static int cmd_monitor(struct dpll *dpll)
->   		goto err_signalfd;
->   	}
->   
-> -	open_json_array(PRINT_JSON, "monitor");
-> -
->   	pfds[0].fd = signal_fd;
->   	pfds[0].events = POLLIN;
->   	pfds[1].fd = netlink_fd;
-> @@ -2307,8 +2318,6 @@ static int cmd_monitor(struct dpll *dpll)
->   		}
->   	}
->   
-> -	close_json_array(PRINT_JSON, NULL);
-> -
->   err_signalfd:
->   	if (signal_fd >= 0)
->   		close(signal_fd);
+> This would break pin-get operation... Do or dump pin-get operation would
+> fail with this extack message.
 > 
-> ---
-> base-commit: 36252727bfc653905bb39bec115a32869452beb1
-> change-id: 20260328-dpll-mon-j-d88eb48c1f09
+> Here we can check if the freq-monitoring is enabled and conditionally
+> call actual_freq_get() or measured_freq_get()
 > 
-> Best regards,
-> --
-> Vitaly Grinberg <vgrinber@redhat.com>
+> -or-
 > 
+> Call this callback unconditionally and check for return code and if a
+> driver returns e.g. -ENODATA then skip nla_put_64bit() but return
+> success.
 > 
-Thanks Vitaly... next time please do not forget to CC me and Petr.
+> WDYT?
 
-Reviewed-by: Ivan Vecera <ivecera@redhat.com>
+Vadim?
 
 
