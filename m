@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-273294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273295-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iHO6CBbEymmL/wUAu9opvQ
-	(envelope-from <netdev+bounces-273294-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 20:42:30 +0200
+	id WHVgLBLEymmL/wUAu9opvQ
+	(envelope-from <netdev+bounces-273295-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 20:42:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7437135FDA2
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 20:42:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15EBE35FD9B
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 20:42:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1D424302DE54
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 18:40:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4D579302AC1E
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 18:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9103C7DE8;
-	Mon, 30 Mar 2026 18:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B953DE442;
+	Mon, 30 Mar 2026 18:40:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b="Os4lFeOD";
-	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="GCmwu2EV"
+	dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b="fwh/BcTa";
+	dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b="pdNc89NZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from sendmail.purelymail.com (sendmail.purelymail.com [34.202.193.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C614B391E4C
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 18:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC48B381B16
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 18:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.202.193.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774896042; cv=none; b=fCTnyJSVdk/rZCESar6wxmEcKEnguksKf0qE5jQonWx9zHzn/kyx0VDYSVSxFLRBq1EsFz/uogsWZM5ga95o1L2LS139GF2WTpcKnzmbmaxYjrIi+z6RZHXgY0IHLp42aDOsQArKMN1NfpaoS+HSlN6JSctEitG6evpOIxsOGTA=
+	t=1774896046; cv=none; b=TwN1Yb/3N8pKG5Oq37A0/S+X/CZephQSBvOBi/eKvSvH/6Cl9LoDt+3B0M/UjvVLkuvd6AUIkZNlOba4lqDtrXIBFajNbGKt/owvcxTOkO8tTxdKCrTopJqwMoaoXxGKXxbRsrfpO/Fl8X70sIIQ3T8HyFweA53gAYHIyyM8oW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774896042; c=relaxed/simple;
-	bh=zsaS1yU7o94c2mKXcX+WazML68v+SgIQzUW11lwQfVk=;
+	s=arc-20240116; t=1774896046; c=relaxed/simple;
+	bh=KrJFr+nqo44Fve8cQ5I8GuzhYpqXcIbdueb8l/MHNA4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m6bvtpSpPwQsWQNkYbbWvNBA5mxtnC5XLdJFc6rq8ELZzVGdsR+LlokqyQKhX+exBjg23rC9g6nTAei7q+aslkwgBEqKD3A7prffdfNHRmtNT1as1tS6u1cEUbVcpt4knjCkb8NAC/7nlFfpxhwYHl5+b41adw7B+NW38uma1vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com; spf=pass smtp.mailfrom=tinyisr.com; dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b=Os4lFeOD; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=GCmwu2EV; arc=none smtp.client-ip=34.202.193.197
+	 MIME-Version:Content-Type; b=qGCgNJpoYAoerE7ibMmGGJn4qOUpHuvpQBlGoKiW8mR3DZ3XCCvyhAYB1NPb5hIvNFpd4OLI0t7WC+u4kNdmq3MSz6D/B74HCqAkge45gkOaa9KcmoUeFigN9/EYHOiK35vraoCVE+ZjdzgXmGX5hw/QCi+5+bC+DsPEeAOhxIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com; spf=pass smtp.mailfrom=tinyisr.com; dkim=pass (2048-bit key) header.d=tinyisr.com header.i=@tinyisr.com header.b=fwh/BcTa; dkim=pass (2048-bit key) header.d=purelymail.com header.i=@purelymail.com header.b=pdNc89NZ; arc=none smtp.client-ip=34.202.193.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tinyisr.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tinyisr.com
 Authentication-Results: purelymail.com; auth=pass
-DKIM-Signature: a=rsa-sha256; b=Os4lFeODkwrbYACuYvk4GJh1mDnTq96YeuItV0PZNtL7Sr4rYhlWoONgAyt7CE2jpRBc0BzbbiXqaQhXJIhY2tRuTe5gMq7GBS3aRWnueShY0tKHmNvPGhfrNBPuK/CMZk7IswuRrMXK/qftnbO6TTcsfvkME/p22bXROa9I4fwuGK9R7UFR7uo4sfUAWKhbTLjPYyvu+JFdvOozkTxSBjJOUO+q4ep5ZjnChWWYqgzhK3RzAF4vZ0pPu+ieWaSlccJrk0AnHi9q7w1+nwsFb5WZT0pjiNowuUM34IRdqB7tg+NNhsY5BHtJDCz9V4Dpk57d9U+3gw16LBiqHCopXw==; s=purelymail1; d=tinyisr.com; v=1; bh=zsaS1yU7o94c2mKXcX+WazML68v+SgIQzUW11lwQfVk=; h=Received:From:To:Subject:Date;
-DKIM-Signature: a=rsa-sha256; b=GCmwu2EVYxgXDvUX26Xvcqw2xO4oU99IWH1FLTy5XQNKFrge4tf+dqdTPb6gzSR8HA8GlXUEr0O/f5bCXppaa7b9QjMU9N7t0L62KSfVkv9CIbVbgzOPiGrgPo3TFBJTCjUdl3Q5lrnHID8E/Ot4lL2PS9vMqTNchgkQR8alTgTiXZiBmFK5scvZsYd1no5BGlPFPJim9h/S9Ih8Pw6P2961mOC2i/Dupt3+BFZTRG53Ff/lgr7ga2MP+LSb0kmuLyDndXaULhqoCfFJiZOnYN5iyc6MW+hQcXC2RNWUsIs6HHrbYhSB85CJGc5aYLdgEAWNspbuIqmbd1L3SoLWpQ==; s=purelymail1; d=purelymail.com; v=1; bh=zsaS1yU7o94c2mKXcX+WazML68v+SgIQzUW11lwQfVk=; h=Feedback-ID:Received:From:To:Subject:Date;
+DKIM-Signature: a=rsa-sha256; b=fwh/BcTa63FopFIKj52RR2LryvA30lxtZDQrkSGVZamZIv6R0t1/GngjOe8huvELPpzlgIdX2t+ecsJ7jAPdLR10GmIlcnkIvIRvWzGaKYeDnDC4AodccwwpcWAdJX0tjPXfUpr9Zm9ynD80kQU7IXNR00ZN6Nj/c7J3ERCVHmJ2c0Mwh5gPnEuRdtXvpnyYmFxcbbmaFGL7O4PrbPcaBP03LE2t5cxuJ4iQ5C2Scc8VLF3V+OGqE0lNpsNyj1fXQ9iQ22h75q64YbZSEc6v7cdK1VjElHu5EJgI3nSJsPu4mUR/V/tbdXwn2UkTVR/K9tSTQduIzwpQYl7SlbGUFA==; s=purelymail1; d=tinyisr.com; v=1; bh=KrJFr+nqo44Fve8cQ5I8GuzhYpqXcIbdueb8l/MHNA4=; h=Received:From:To:Subject:Date;
+DKIM-Signature: a=rsa-sha256; b=pdNc89NZpIXJKq07O+fqae71upp/G1XtzhS7PQ0A0o6Bdkd32OwakQnzsap26zGlxXy9Jl9J8q6D/lVql+eUFPTVWiU7lgeN+CjQOLL9yuCAvEvgMmJCwLWgmuZ7Djbjjgzt0pZOdMcXzn9RadsPXzjSlZkvEtwBZxsHeAD6GPoxIR+TgH64xvkrOb6Y2pNlq9rIGIClaPQy4oGKevYRW0ib92lgORuas85tHAGBr7I3ODuwirMJRg8QDhjGF637yGh4/DKHWkmCOo4EaucWOCBeKOLrgQsXdrE88UdzbldudsnLz3jufYm3y2s4yOexIZBTkbWeX7yhFLx3vETlhw==; s=purelymail1; d=purelymail.com; v=1; bh=KrJFr+nqo44Fve8cQ5I8GuzhYpqXcIbdueb8l/MHNA4=; h=Feedback-ID:Received:From:To:Subject:Date;
 Feedback-ID: 99681:12517:null:purelymail
 X-Pm-Original-To: netdev@vger.kernel.org
 Received: by smtp.purelymail.com (Purelymail SMTP) with ESMTPSA id 1431054842;
           (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
-          Mon, 30 Mar 2026 18:40:38 +0000 (UTC)
+          Mon, 30 Mar 2026 18:40:41 +0000 (UTC)
 From: Joris Vaisvila <joey@tinyisr.com>
 To: netdev@vger.kernel.org
 Cc: horms@kernel.org,
@@ -57,9 +57,9 @@ Cc: horms@kernel.org,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
 	Joris Vaisvila <joey@tinyisr.com>
-Subject: [PATCH net-next v2 2/4] net: phy: mediatek: add phy driver for MT7628 built-in Fast Ethernet PHYs
-Date: Mon, 30 Mar 2026 21:40:15 +0300
-Message-ID: <20260330184017.766200-3-joey@tinyisr.com>
+Subject: [PATCH net-next v2 3/4] net: dsa: initial MT7628 tagging driver
+Date: Mon, 30 Mar 2026 21:40:16 +0300
+Message-ID: <20260330184017.766200-4-joey@tinyisr.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260330184017.766200-1-joey@tinyisr.com>
 References: <20260330184017.766200-1-joey@tinyisr.com>
@@ -78,12 +78,12 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[tinyisr.com,reject];
 	R_DKIM_ALLOW(-0.20)[tinyisr.com:s=purelymail1,purelymail.com:s=purelymail1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273294-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273295-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
@@ -98,120 +98,183 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tinyisr.com:dkim,tinyisr.com:email,tinyisr.com:mid,purelymail.com:dkim]
-X-Rspamd-Queue-Id: 7437135FDA2
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tinyisr.com:dkim,tinyisr.com:email,tinyisr.com:mid,purelymail.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 15EBE35FD9B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The Fast Ethernet PHYs present in the MT7628 SoCs require an
-undocumented bit to be set before they can establish 100mbps links.
+Add support for the MT7628 embedded switch's tag.
 
-This commit adds the Kconfig option MEDIATEK_FE_SOC_PHY and the
-corresponding driver mtk-fe-soc.c.
+The MT7628 tag is merged with the VLAN TPID field when a VLAN is
+appended by the switch hardware. It is not installed if the VLAN tag is
+already there on ingress. Due to this hardware quirk the tag cannot be
+trusted for port 0 if we don't know that the VLAN was added by the
+hardware. As a workaround for this the switch is configured to always
+append the port PVID tag even if the incoming packet is already tagged.
+The tagging driver can then trust that the tag is always accurate and
+the whole VLAN tag can be removed on ingress as it's only metadata for
+the tagger.
+
+On egress the MT7628 tag allows precise TX, but the correct VLAN tag
+from tag_8021q is still appended or the switch will not forward the
+packet.
 
 Signed-off-by: Joris Vaisvila <joey@tinyisr.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/phy/mediatek/Kconfig      | 10 +++++-
- drivers/net/phy/mediatek/Makefile     |  1 +
- drivers/net/phy/mediatek/mtk-fe-soc.c | 50 +++++++++++++++++++++++++++
- 3 files changed, 60 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/phy/mediatek/mtk-fe-soc.c
+ include/net/dsa.h    |  2 +
+ net/dsa/Kconfig      |  6 +++
+ net/dsa/Makefile     |  1 +
+ net/dsa/tag_mt7628.c | 89 ++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 98 insertions(+)
+ create mode 100644 net/dsa/tag_mt7628.c
 
-diff --git a/drivers/net/phy/mediatek/Kconfig b/drivers/net/phy/mediatek/Kc=
-onfig
-index bb7dc876271e..b6a51f38c358 100644
---- a/drivers/net/phy/mediatek/Kconfig
-+++ b/drivers/net/phy/mediatek/Kconfig
-@@ -21,8 +21,16 @@ config MEDIATEK_GE_PHY
- =09  common operations with MediaTek SoC built-in Gigabit
- =09  Ethernet PHYs.
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 6c17446f3dcc..e93f9356b5c3 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -58,6 +58,7 @@ struct tc_action;
+ #define DSA_TAG_PROTO_YT921X_VALUE=09=0930
+ #define DSA_TAG_PROTO_MXL_GSW1XX_VALUE=09=0931
+ #define DSA_TAG_PROTO_MXL862_VALUE=09=0932
++#define DSA_TAG_PROTO_MT7628_VALUE=09=0933
 =20
-+config MEDIATEK_FE_SOC_PHY
-+=09tristate "MediaTek SoC Fast Ethernet PHYs"
+ enum dsa_tag_protocol {
+ =09DSA_TAG_PROTO_NONE=09=09=3D DSA_TAG_PROTO_NONE_VALUE,
+@@ -93,6 +94,7 @@ enum dsa_tag_protocol {
+ =09DSA_TAG_PROTO_YT921X=09=09=3D DSA_TAG_PROTO_YT921X_VALUE,
+ =09DSA_TAG_PROTO_MXL_GSW1XX=09=3D DSA_TAG_PROTO_MXL_GSW1XX_VALUE,
+ =09DSA_TAG_PROTO_MXL862=09=09=3D DSA_TAG_PROTO_MXL862_VALUE,
++=09DSA_TAG_PROTO_MT7628=09=09=3D DSA_TAG_PROTO_MT7628_VALUE,
+ };
+=20
+ struct dsa_switch;
+diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
+index 5ed8c704636d..946f44f0b843 100644
+--- a/net/dsa/Kconfig
++++ b/net/dsa/Kconfig
+@@ -98,6 +98,12 @@ config NET_DSA_TAG_EDSA
+ =09  Say Y or M if you want to enable support for tagging frames for the
+ =09  Marvell switches which use EtherType DSA headers.
+=20
++config NET_DSA_TAG_MT7628
++=09tristate "Tag driver for the MT7628 embedded switch"
 +=09help
-+=09  Support for MediaTek MT7628 built-in Fast Ethernet PHYs.
-+=09  This driver only sets an initialization bit required for the PHY
-+=09  to establish 100 Mbps links. All other PHY operations are handled
-+=09  by the kernel's generic PHY code.
++=09  Say Y or M if you want to enable support for tagging frames for the
++=09  switch embedded in the MT7628 SoC.
 +
- config MEDIATEK_GE_SOC_PHY
--=09tristate "MediaTek SoC Ethernet PHYs"
-+=09tristate "MediaTek SoC Gigabit Ethernet PHYs"
- =09depends on ARM64 || COMPILE_TEST
- =09depends on ARCH_AIROHA || (ARCH_MEDIATEK && NVMEM_MTK_EFUSE) || \
- =09=09   COMPILE_TEST
-diff --git a/drivers/net/phy/mediatek/Makefile b/drivers/net/phy/mediatek/M=
-akefile
-index ac57ecc799fc..6f9cacf7f906 100644
---- a/drivers/net/phy/mediatek/Makefile
-+++ b/drivers/net/phy/mediatek/Makefile
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- obj-$(CONFIG_MEDIATEK_2P5GE_PHY)=09+=3D mtk-2p5ge.o
-+obj-$(CONFIG_MEDIATEK_FE_SOC_PHY)=09+=3D mtk-fe-soc.o
- obj-$(CONFIG_MEDIATEK_GE_PHY)=09=09+=3D mtk-ge.o
- obj-$(CONFIG_MEDIATEK_GE_SOC_PHY)=09+=3D mtk-ge-soc.o
- obj-$(CONFIG_MTK_NET_PHYLIB)=09=09+=3D mtk-phy-lib.o
-diff --git a/drivers/net/phy/mediatek/mtk-fe-soc.c b/drivers/net/phy/mediat=
-ek/mtk-fe-soc.c
+ config NET_DSA_TAG_MTK
+ =09tristate "Tag driver for Mediatek switches"
+ =09help
+diff --git a/net/dsa/Makefile b/net/dsa/Makefile
+index bf7247759a64..a84f33f0963d 100644
+--- a/net/dsa/Makefile
++++ b/net/dsa/Makefile
+@@ -27,6 +27,7 @@ obj-$(CONFIG_NET_DSA_TAG_GSWIP) +=3D tag_gswip.o
+ obj-$(CONFIG_NET_DSA_TAG_HELLCREEK) +=3D tag_hellcreek.o
+ obj-$(CONFIG_NET_DSA_TAG_KSZ) +=3D tag_ksz.o
+ obj-$(CONFIG_NET_DSA_TAG_LAN9303) +=3D tag_lan9303.o
++obj-$(CONFIG_NET_DSA_TAG_MT7628) +=3D tag_mt7628.o
+ obj-$(CONFIG_NET_DSA_TAG_MTK) +=3D tag_mtk.o
+ obj-$(CONFIG_NET_DSA_TAG_MXL_862XX) +=3D tag_mxl862xx.o
+ obj-$(CONFIG_NET_DSA_TAG_MXL_GSW1XX) +=3D tag_mxl-gsw1xx.o
+diff --git a/net/dsa/tag_mt7628.c b/net/dsa/tag_mt7628.c
 new file mode 100644
-index 000000000000..317944411fbe
+index 000000000000..f0e346595f30
 --- /dev/null
-+++ b/drivers/net/phy/mediatek/mtk-fe-soc.c
-@@ -0,0 +1,50 @@
-+// SPDX-License-Identifier: GPL-2.0-only
++++ b/net/dsa/tag_mt7628.c
+@@ -0,0 +1,89 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Driver for MT7628 Embedded Switch internal Fast Ethernet PHYs
++ * Copyright (c) 2026, Joris Vaisvila <joey@tinyisr.com>
++ * MT7628 switch tag support
 + */
-+#include <linux/module.h>
-+#include <linux/phy.h>
 +
-+#define MTK_FPHY_ID_MT7628=090x03a29410
-+#define MTK_EXT_PAGE_ACCESS=090x1f
++#include <linux/etherdevice.h>
++#include <linux/dsa/8021q.h>
++#include <net/dsa.h>
 +
-+static int mt7628_phy_read_page(struct phy_device *phydev)
++#include "tag.h"
++
++/*
++ * The MT7628 tag is encoded in the VLAN TPID field.
++ * On TX the lower 6 bits encode the destination port bitmask.
++ * On RX the lower 3 bits encode the source port number.
++ *
++ * The switch hardware will not modify the TPID of an incoming packet if i=
+t is
++ * already VLAN tagged. To work around this the switch is configured to al=
+ways
++ * append a tag_8021q standalone VLAN tag for each port. That means we can
++ * safely strip the outer VLAN tag after parsing it.
++ *
++ * A VLAN tag is constructed on egress to target the standalone VLAN and
++ * destination port.
++ */
++
++#define MT7628_TAG_NAME "mt7628"
++
++#define MT7628_TAG_TX_PORT GENMASK(5, 0)
++#define MT7628_TAG_RX_PORT GENMASK(2, 0)
++#define MT7628_TAG_LEN 4
++
++static struct sk_buff *mt7628_tag_xmit(struct sk_buff *skb,
++=09=09=09=09       struct net_device *dev)
 +{
-+=09return __phy_read(phydev, MTK_EXT_PAGE_ACCESS);
++=09struct dsa_port *dp;
++=09u16 xmit_vlan;
++=09__be16 *tag;
++
++=09dp =3D dsa_user_to_port(dev);
++=09xmit_vlan =3D dsa_tag_8021q_standalone_vid(dp);
++
++=09skb_push(skb, MT7628_TAG_LEN);
++=09dsa_alloc_etype_header(skb, MT7628_TAG_LEN);
++
++=09tag =3D dsa_etype_header_pos_tx(skb);
++
++=09tag[0] =3D htons(ETH_P_8021Q |
++=09=09       FIELD_PREP(MT7628_TAG_TX_PORT,
++=09=09=09=09  dsa_xmit_port_mask(skb, dev)));
++=09tag[1] =3D htons(xmit_vlan);
++
++=09return skb;
 +}
 +
-+static int mt7628_phy_write_page(struct phy_device *phydev, int page)
++static struct sk_buff *mt7628_tag_rcv(struct sk_buff *skb,
++=09=09=09=09      struct net_device *dev)
 +{
-+=09return __phy_write(phydev, MTK_EXT_PAGE_ACCESS, page);
++=09__be16 *phdr;
++
++=09if (unlikely(!pskb_may_pull(skb, MT7628_TAG_LEN)))
++=09=09return NULL;
++
++=09phdr =3D dsa_etype_header_pos_rx(skb);
++=09skb->dev =3D
++=09    dsa_conduit_find_user(dev, 0,
++=09=09=09=09  FIELD_GET(MT7628_TAG_RX_PORT, ntohs(*phdr)));
++=09if (!skb->dev)
++=09=09return NULL;
++
++=09skb_pull_rcsum(skb, MT7628_TAG_LEN);
++=09dsa_strip_etype_header(skb, MT7628_TAG_LEN);
++=09dsa_default_offload_fwd_mark(skb);
++=09return skb;
 +}
 +
-+static int mt7628_phy_config_init(struct phy_device *phydev)
-+{
-+=09/*
-+=09 * This undocumented bit is required for the PHYs to be able to
-+=09 * establish 100mbps links.
-+=09 */
-+=09return phy_write_paged(phydev, 0x8000, 30, BIT(13));
-+}
-+
-+static struct phy_driver mtk_soc_fe_phy_driver[] =3D {
-+=09{
-+=09=09PHY_ID_MATCH_EXACT(MTK_FPHY_ID_MT7628),
-+=09=09.name =3D "MediaTek MT7628 PHY",
-+=09=09.config_init =3D mt7628_phy_config_init,
-+=09=09.read_page =3D mt7628_phy_read_page,
-+=09=09.write_page =3D mt7628_phy_write_page,
-+=09},
++static const struct dsa_device_ops mt7628_tag_ops =3D {
++=09.name =3D MT7628_TAG_NAME,
++=09.proto =3D DSA_TAG_PROTO_MT7628,
++=09.xmit =3D mt7628_tag_xmit,
++=09.rcv =3D mt7628_tag_rcv,
++=09.needed_headroom =3D MT7628_TAG_LEN,
 +};
 +
-+module_phy_driver(mtk_soc_fe_phy_driver);
-+static const struct mdio_device_id __maybe_unused mtk_soc_fe_phy_tbl[] =3D=
- {
-+=09{ PHY_ID_MATCH_EXACT(MTK_FPHY_ID_MT7628) },
-+=09{ }
-+};
++module_dsa_tag_driver(mt7628_tag_ops);
 +
-+MODULE_DESCRIPTION("MediaTek SoC Fast Ethernet PHY driver");
-+MODULE_AUTHOR("Joris Vaisvila <joey@tinyisr.com>");
++MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_MT7628, MT7628_TAG_NAME);
++MODULE_DESCRIPTION("DSA tag driver for MT7628 switch");
 +MODULE_LICENSE("GPL");
-+
-+MODULE_DEVICE_TABLE(mdio, mtk_soc_fe_phy_tbl);
 --=20
 2.53.0
 
