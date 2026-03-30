@@ -1,196 +1,225 @@
-Return-Path: <netdev+bounces-273285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273286-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kBDbC+C1ymmE/QUAu9opvQ
-	(envelope-from <netdev+bounces-273285-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 19:41:52 +0200
+	id sGyKJqS4ymkk/gUAu9opvQ
+	(envelope-from <netdev+bounces-273286-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 19:53:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A78E335F668
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 19:41:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F25B135F86F
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 19:53:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9DDE1300F5E8
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 17:39:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D01E6300D310
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 17:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A5F3D6CC0;
-	Mon, 30 Mar 2026 17:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D9736A014;
+	Mon, 30 Mar 2026 17:52:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ePA2Sgiv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HT/utHUc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B97E3DC4AC
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 17:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90EC52F39CE
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 17:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774892387; cv=none; b=hD7DAZU9TDVUjCQ7rslG0Dlr709QkNN5/N6CHmizQsko3/T2dzC02YRTsp2UUrP04kaSJISLb0z98QY9vwZPEIFn7o6pAKJpuKhjNfg8lPdCM5w/QOnKp2/LGE66gGDl478ZDw3sI5KBLTGNd4c+Z7uQThflKBdXt5yH3tipVKE=
+	t=1774893146; cv=none; b=Q7EI+IFySo0p57Ls+Tx5I1S7G6F3aICihlORGjgERPhlC8BP/DyY/kodrzXdnTOHj0iscdZrDacQcv8dGRpPtsEIlkF/FJmNpmZrY/Ml+BfNPsqqSon1amKC7Z4AQOm08Jn+XGYpe/U12dJe3HNqDN0yokqDJpEUmPuamRe4uRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774892387; c=relaxed/simple;
-	bh=eYiGKx4UJtJf4Q1Avkayv013k8Pwb2Zd8ZfL+Yv9bCo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PXBrtr1VYtMFQUwBfyii92C+Q909ju71bQSrRM/opHZggDuzVPbDm+0JKgr/EzloyUZ9wKI/Npx3KC9CEA44yV9IzgcepoQabBEketY/eowCS+AuqfSjTFWgGAUwQH2ozFM0Z+yAZpLLnfObRPh60KZBbfvyl9ixltk8It+9YDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ePA2Sgiv; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-48374014a77so57976125e9.3
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 10:39:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1774892384; x=1775497184; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q3tTxvSmqNW1V5FDg72/l9DpdB33WKVqHdXYeZvn1mY=;
-        b=ePA2SgivNL+KhnjorlnoALd7eDjnnrysPSBFkO1IlTPrwvhdTUXSoC5gBnMh9jwrZq
-         iQmtYjZi8BJgsTntn4KjRPfcVHTJmQLUnGO8Z5N3xX8JMLYVsmys0Qw9n6vgRnTmfJRo
-         jhxYlmGcaYyXiTrq6ojY+duquZpU8rdrISNtKLvTqb8nVmnkMiAYohXUT5IXauxg/Ffb
-         dPQrsM7hpTQYyJoS1kKqGvSbzQJBJlTltATHaEiVmzoFl3pBMTKUdvw7df5S3Y/6WdvO
-         lMwJu+aG/dMaEPHrvHXpH2RZvgblJyd3ngAjAFROgxteHaCw8Hl3seh+d050mOnpa4C5
-         MQZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774892384; x=1775497184;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q3tTxvSmqNW1V5FDg72/l9DpdB33WKVqHdXYeZvn1mY=;
-        b=g3FxjpsyWvyFM9vd9GQaxWnjv3xbcaCmKpaL8EUQXVKnOuc0aQrZ3ZqJFcxEvHdqhI
-         dfp96T1IGlaseZmHv91P6CPCBfgVhARPXzmTZQjH3Sa5oO7khzUhrSSA/dE64/RSj8Cy
-         sFxSIZPYFIZeAWZIu+W64mPvCCt1DKpVV1oH4Em/0c6AQ+2MqRRu2MEdCwdY8T6c3Hmy
-         Q9oc1DDKhldSGrkpjJrwVdGLApnpCEdaDqnjT/0bi0t4MIQPAUYgFgQ+wUzBibDThH1B
-         0DI+68xY4rinSq/CG37y+FpmosiOHFI8fOYOhYazT+j3oMinmqVh4mMIXZO3inIposws
-         1Wiw==
-X-Gm-Message-State: AOJu0YwO1epJyp/CP81lodKA8ARGl1rDFHr6ERIuy3VdWLXPbH811mYu
-	OQv/wcCWVYnLq08TW0JQbc4S4G6orW2SIiAvdsWR8tuB3gNmsxUnA0RrOVetBbdPGyg=
-X-Gm-Gg: ATEYQzy7rF+S9AAnqdZaicj5nUObOs1JrCNG94yJNwJrzpfwfsaROw6jCqBJSUPmfnk
-	LWz9XMl90jcHtgfC8GrszH/vozpoU9DpMOfngzP0PQFyGwV7ZhHRVTjv2qCA9HMeuPbPB+9mhJy
-	QTYY/P6JbXF23LgQpLunjGWZ6IZJ9V59aHIiAtOc7C8HKX+sRi4Fik+wBLCw4syh6T/9t1MWJjD
-	mmrHAVl/396GiSWjGCPogPBTYkb3NUjVVgqxnZ88WJHtfeqhTXjKJQwx2C1yzQqe6clE4XTS09/
-	Ht6ibIqetDSdM4zfVs2ctbZjz1JTWrFA+EJjisl8R+6rpS7chCZki/zykQrGYXvuFSIbgrVPe8E
-	mCyHd5PRInOjIZL3J0b+4rChY9z2XA7mV4X6Kleh6dXUVl+yl9tPLlh6Vdxehz8Wk4by3hfigGR
-	KuWpyRTQX9n+s12QwvnQMfc/Fujg8DoV7SHHvR4SpnwwHH+I4j+kh0tgndvz3vajAJnA==
-X-Received: by 2002:a05:600c:8b6d:b0:485:35ba:1d81 with SMTP id 5b1f17b1804b1-48727eb7fb7mr230986485e9.21.1774892383791;
-        Mon, 30 Mar 2026 10:39:43 -0700 (PDT)
-Received: from ?IPV6:2001:a61:1373:4b01:cc61:7bc9:bea5:a415? ([2001:a61:1373:4b01:cc61:7bc9:bea5:a415])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48730688694sm183170845e9.11.2026.03.30.10.39.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Mar 2026 10:39:43 -0700 (PDT)
-Message-ID: <1c660862-de30-428d-a772-8bee9b990a59@suse.com>
-Date: Mon, 30 Mar 2026 19:39:42 +0200
+	s=arc-20240116; t=1774893146; c=relaxed/simple;
+	bh=om2f9Ho3FVaDIPkVBm2gmD78z2AueWy3dtjI7TD71iw=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=r0KVoTbCol4pYYKv8JNCy+M6uhzSlK8UHNJhP5UZ90NVIeRe3thtSRpnJ6BaxPi9T23LshKZxBSCk73l6HueBUCZFH377eExtVdxUqj/Y2YRxvm7EzzYYfdYLwg8p1Fovqlu0iJYvkViFzXZ24nzLN9DgIt3I/G3uN1of0Y4j+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HT/utHUc; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] net: usb: smsc95xx: suspend PHY during USB
- suspend
-To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
- piergiorgio.beruto@gmail.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, steve.glendinning@shawell.net,
- UNGLinuxDriver@microchip.com
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org
-References: <20260330134222.67597-1-parthiban.veerasooran@microchip.com>
- <20260330134222.67597-4-parthiban.veerasooran@microchip.com>
-Content-Language: en-US
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <20260330134222.67597-4-parthiban.veerasooran@microchip.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774893142;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8/ZohPn0tEwclWEs73U7FxbLocJmGnnoEpSpxL5nBww=;
+	b=HT/utHUc8lgdICl+7AKP2eUGWqGS87jeJCjNhlM/axXVP2uTR1zAEx7oxBP2d7gF9Ptfg5
+	br7hixyyJVb0342CKYZWVHZXIS5gxQFeCl6mlfA2LaO6JAsv8xnFOD6/VmXRCnWIngNnRD
+	ZEz3Dt9vAyTkqK/rpdquDTmF+EevXqY=
+Date: Mon, 30 Mar 2026 17:52:17 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Frank Wunderlich" <frank.wunderlich@linux.dev>
+Message-ID: <d9639ac711ff8f1186a684fa120ba77247669051@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH v4 net-next 5/5] net: pcs: pcs-mtk-lynxi: deprecate
+ "mediatek,pnswap"
+To: "Vladimir Oltean" <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org, "Daniel
+ Golle" <daniel@makrotopia.org>, "Horatiu Vultur"
+ <horatiu.vultur@microchip.com>, "=?utf-8?B?QmriiJriiI9ybiBNb3Jr?="
+ <bjorn@mork.no>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "Heiner Kallweit"
+ <hkallweit1@gmail.com>, "Russell King" <linux@armlinux.org.uk>, "David S.
+ Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski"
+ <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Matthias
+ Brugger" <matthias.bgg@gmail.com>, "AngeloGioacchino Del Regno"
+ <angelogioacchino.delregno@collabora.com>, "Eric Woudstra"
+ <ericwouds@gmail.com>, "Alexander Couzens" <lynxis@fe80.eu>, "Chester A.
+ Unal" <chester.a.unal@arinc9.com>, "DENG Qingfang" <dqfext@gmail.com>,
+ "Sean Wang" <sean.wang@mediatek.com>, "Felix Fietkau" <nbd@nbd.name>
+In-Reply-To: <20260326215404.krh6v3mmnqdlndli@skbuf>
+References: <20260119091220.1493761-1-vladimir.oltean@nxp.com>
+ <20260119091220.1493761-6-vladimir.oltean@nxp.com>
+ <e0ad52862d34cf4e0169c9850a7f164f127d0093@linux.dev>
+ <20260326215404.krh6v3mmnqdlndli@skbuf>
+X-Migadu-Flow: FLOW_OUT
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273285-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[microchip.com,gmail.com,lunn.ch,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,shawell.net];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-273286-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,makrotopia.org,microchip.com,mork.no,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,fe80.eu,arinc9.com,mediatek.com,nbd.name];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[oneukum@suse.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[frank.wunderlich@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:email,suse.com:dkim,suse.com:mid]
-X-Rspamd-Queue-Id: A78E335F668
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid,bpi-r3:email]
+X-Rspamd-Queue-Id: F25B135F86F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Vladimir
 
+Thanks for the patch and sorry for my delay...i was away this weekend so =
+i was not able to test.
 
-On 30.03.26 15:42, Parthiban Veerasooran wrote:
-> The smsc95xx driver registers a PHY device but does not currently
-> propagate suspend events to it when the USB interface is suspended.
-> 
-> Call phy_suspend() from the driver's suspend callback so the attached
-> PHY can properly enter low-power state during system or runtime
-> suspend. This aligns smsc95xx suspend handling with other network
-> drivers that manage an external or integrated PHY.
-> 
-> Without this, the PHY may remain active and fail to execute its own
-> suspend procedure, leading to unnecessary power consumption or
-> incorrect resume behavior.
-> 
-> This change is also required for the EVB-LAN8670-USB Rev.D0 device to
-> support OATC10-compliant sleep and wake functionality.
-> 
-> Signed-off-by: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-> ---
->   drivers/net/usb/smsc95xx.c | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
-> index 42e4048b574b..3a6e03b7410a 100644
-> --- a/drivers/net/usb/smsc95xx.c
-> +++ b/drivers/net/usb/smsc95xx.c
-> @@ -1550,6 +1550,12 @@ static int smsc95xx_suspend(struct usb_interface *intf, pm_message_t message)
->   
->   	pdata->pm_task = current;
->   
-> +	if (pdata->phydev) {
-> +		ret = phy_suspend(pdata->phydev);
-> +		if (ret)
-> +			return ret;
-> +	}
+traffic works again (but there is only read now) and this is the result o=
+f your debug prints:
 
-At this point you have suspended the phy.
-Hence the device can no longer transmit
+root@bpi-r3:~# dmesg | grep SGMSYS_QPHY_WRAP_CTRL
+[    2.706963] SGMSYS_QPHY_WRAP_CTRL =3D 0x501, intending to write 0x500
+[    9.134081] SGMSYS_QPHY_WRAP_CTRL =3D 0x500, intending to write 0x500
 
+R3/mt7986 has 2 MAC, and switch is on the first, so value will change, no=
+t sure why this is different.
+
+i have not found SGMSYS_QPHY_WRAP_CTRL or something related with polarity=
+ in ethernet/mac-=20
+(drivers/net/ethernet/mediatek/mtk_eth_soc.c)=20or switch-driver (drivers=
+/net/dsa/mt7530{,-mdio}.c)
+in case they manipulate this register too (of course they should not). Al=
+so looked into the pcs-handling
+in both drivers, but see nothing related to polarity. And looked for poss=
+ible duplicate register const
+definition (other name for 0xec).
+
+regards Frank
+
+Am 26. M=C3=A4rz 2026 um 22:54 schrieb "Vladimir Oltean" <vladimir.oltean=
+@nxp.com>:
+>=20
+>=20Hi Frank,
+>=20
+>=20On Tue, Mar 24, 2026 at 06:36:44AM +0000, Frank Wunderlich wrote:
+>=20
+>=20>=20
+>=20> Hi,
+> >=20=20
+>=20>  looks like this patch breaks BPI-R3 serdes between mt7986 SoC and =
+mt7531 switch in 7.0 (6.19 is ok).
+> >  in ethtool i see only tx on mac but no rx. if i revert this patch i =
+can ping through dsa-ports again.
+> >=20=20
+>=20>  i did not completely understanding the code with the default-pol a=
+s it is now splitted between rx and tx.
+> >=20=20
+>=20>  mt7986 and this board does not have mediatek,pnswap set, so the fi=
+nal regmap_update_bits writes val=3D0,
+> >  before there was only write to this register on invert mode...but i =
+guess this should not break. Maybe some
+> >  kind of timing issue between mac and switch?
+> >=20=20
+>=20>  maybe reverting this patch skips changes made here:
+> >  bde1ae2d52ab 2026-01-19 net: pcs: pcs-mtk-lynxi: pass SGMIISYS OF no=
+de to PCS
+> >=20=20
+>=20>  I resend as last try was sending as html (option "always send as t=
+ext" in webmailer seems to be ignored
+> >  somehow, had to choose "unformatted" in this response too).
+> >=20=20
+>=20>  regards Frank
+> >=20
+>=20Sorry for the delay.
+>=20
+>=20If writing val=3D0 breaks the link, I'm curious
+> (a) whether it still breaks if we don't write anything at all
+> (b) what was the register value originally
+>=20
+>=20Could you please test the patch below and let me know what it prints,
+> and whether traffic passes with it applied?
+>=20
+>=20-- >8 --
+> diff --git a/drivers/net/pcs/pcs-mtk-lynxi.c b/drivers/net/pcs/pcs-mtk-=
+lynxi.c
+> index c12f8087af9b..5c5f45b93b82 100644
+> --- a/drivers/net/pcs/pcs-mtk-lynxi.c
+> +++ b/drivers/net/pcs/pcs-mtk-lynxi.c
+> @@ -126,7 +126,7 @@ static int mtk_pcs_config_polarity(struct mtk_pcs_l=
+ynxi *mpcs,
+>  {
+>  struct fwnode_handle *fwnode =3D mpcs->fwnode, *pcs_fwnode;
+>  unsigned int pol, default_pol =3D PHY_POL_NORMAL;
+> - unsigned int val =3D 0;
+> + unsigned int val =3D 0, tmp;
+>  int ret;
+>=20=20
+>=20 if (fwnode_property_read_bool(fwnode, "mediatek,pnswap"))
+> @@ -153,8 +153,14 @@ static int mtk_pcs_config_polarity(struct mtk_pcs_=
+lynxi *mpcs,
+>  if (pol =3D=3D PHY_POL_INVERT)
+>  val |=3D SGMII_PN_SWAP_TX;
+>=20=20
+>=20- return regmap_update_bits(mpcs->regmap, SGMSYS_QPHY_WRAP_CTRL,
+> - SGMII_PN_SWAP_RX | SGMII_PN_SWAP_TX, val);
+> + ret =3D regmap_read(mpcs->regmap, SGMSYS_QPHY_WRAP_CTRL, &tmp);
+> + if (ret)
+> + return ret;
 > +
->   	ret = usbnet_suspend(intf, message);
+> + pr_err("SGMSYS_QPHY_WRAP_CTRL =3D 0x%x, intending to write 0x%lx\n",
+> + tmp, (tmp & ~(SGMII_PN_SWAP_RX | SGMII_PN_SWAP_TX)) | val);
+> +
+> + return 0;
+>  }
+>=20=20
+>=20 static int mtk_pcs_lynxi_config(struct phylink_pcs *pcs, unsigned in=
+t neg_mode,
+> -- >8 --
+>=20
 
-This wants to
-
-1. drain the queue if you do runtime PM
-2. can return -EBUSY
-
->   	if (ret < 0) {
->   		netdev_warn(dev->net, "usbnet_suspend error\n");
-
-And here it will return in the error case. With the phy
-already suspended.
-
-And, as a question of principle: Why do you suspend the phy
-in suspend(), but take no action in resume()?
-
-	Regards
-		Oliver
-
-
+regards=20Frank
 
