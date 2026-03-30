@@ -1,163 +1,228 @@
-Return-Path: <netdev+bounces-273064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273066-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AAPwDEgIymk64gUAu9opvQ
-	(envelope-from <netdev+bounces-273064-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 07:21:12 +0200
+	id QCRgHV8LymmL4gUAu9opvQ
+	(envelope-from <netdev+bounces-273066-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 07:34:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F5A4355739
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 07:21:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB223355981
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 07:34:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F1B29300C990
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 05:20:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EB4BF303D2D6
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 05:32:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B340837AA8F;
-	Mon, 30 Mar 2026 05:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FACB381AE5;
+	Mon, 30 Mar 2026 05:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rm42e46/"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="j2OSyIBA"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63761E633C
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 05:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5B237E31E;
+	Mon, 30 Mar 2026 05:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774848057; cv=none; b=pWOWWi42hLp/OUc2pGDgr0xjwv3B1dWroGC3mdLwnPK8OSc6eU0jgaOwEhLkXzOHroJZzul5G3msouI9k31KsvmgtaYGSJXsjouNsDmi9C7HV06NlGU/bAewNbgrCb14X8DYik+b9+bfUmHM/73y6wzi6YZUbtCWFOzSaL9iGIo=
+	t=1774848724; cv=none; b=ce+gqd7m4UHTJmEX19APbclhQUdYgEUK9a2Ptu+nkY7eCB+zi+4pBqIY1uFH5U1CRKnuvPBDkjdCPDOKmfqbzja+8rxS7g+m2BZo9VAK1R2G1q8RhSveSEY5hhRHEQUii+CxFDEyFV7v+Tn3ehwWDmkmnYz1NjU+1JKiho/6ZGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774848057; c=relaxed/simple;
-	bh=0d0naRcIv9z63yxPLsdCSjk0pr783O3WgjjGnMocXio=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PBP3Mm7Aj4DgeUh6PxYrPUnhQQPSBU0xZN/iZ43g0dQufrRP5ZpgxL3VlGwBFVXV/94482pk7Nfx0ajwVXEsFJ/9ca5+hrATBvFwf7rzTdAbzXb8HzJ24/TiwW5Q1DJkMyXceF23CDMPS+MhzH/G43NwyyhNZ831B5CIHcwTkio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rm42e46/; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f83308b6-305f-401d-8a81-ca18e1968b56@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774848053;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9fd68eY2O2CwKaCg9R2Y4ntn7WouQrswGFUmgrDBAqE=;
-	b=rm42e46/2efGwnTyy/Nk+aswrm4cugwEBxJF6HCKwNl0e0BvUV9EJq7hIsC2Pr6k1w3QM1
-	ntPjaA78xPcGapwBvb4Hez5TRgyQ3LklKOQltrR5754BM77QV6Tq+MquKKYb5n2wtGnK6x
-	JZUk16rHpsKNIyUYI0FG1pYo2wsHxoY=
-Date: Mon, 30 Mar 2026 13:20:16 +0800
+	s=arc-20240116; t=1774848724; c=relaxed/simple;
+	bh=AaK4KvRkyuGNIx0jc7ZYNo5IO0Z7vOXrAQtywxEzheM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=e+4Eq9fJpPY6JxHzFl/WoCGo4s2fgLDdGuob74T4p0A6O4qTmUUdad2QhHeQFTHbTCbe988Hq4nntq9vRodcgN31/4tfZ6eaZJkkrZ0eXY1h3fTEb1+Cm5hBfmRg1ltmEt2wNY9VboC47nKLm7VIxA7qbc+CJVzEcGu/DGYa1VI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=j2OSyIBA; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62TNXE4C260885;
+	Sun, 29 Mar 2026 22:31:41 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=e9gRS3Lu47lHcZeO6D3XS3W
+	6YQngVOiTajVudI9WIbU=; b=j2OSyIBAjjYGIrQJZ3bt5/n+aujCA3Z1IhKWFe7
+	oncqlB4MBs5W8zNoJv0VcWP+fVyp8pdscbXfhw1sWYALw2BZ7SNbb5HJsKPpV/SG
+	EXLgldASdH8ofmBLmawSGnBqOxdi+eNECPgJvn7W87nQkD1LpRSfnPTi0w1BMLoO
+	45Ly2zZfIPodP73WcC4HJMgsiiVNqIONlKcK65ipeXpWNgnJTRHLvjom3dGd3PVe
+	PBHXu6IHabKaNWlqqOzx+VcQbesA1LyNYZOYlH0ooUJv/6OMLGMMYrZeRw6nf6bN
+	epeNBZSBPJZM5X6czTIAUhyvS9mjatRJd8MnxnZLpdZZAPA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4d6cbjtxky-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 29 Mar 2026 22:31:41 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Sun, 29 Mar 2026 22:31:40 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Sun, 29 Mar 2026 22:31:40 -0700
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 0F66D3F706F;
+	Sun, 29 Mar 2026 22:31:33 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <donald.hunter@gmail.com>, <horms@kernel.org>, <jiri@resnulli.us>,
+        <chuck.lever@oracle.com>, <matttbe@kernel.org>, <cjubran@nvidia.com>,
+        <saeedm@nvidia.com>, <leon@kernel.org>, <tariqt@nvidia.com>,
+        <mbloch@nvidia.com>, <dtatulea@nvidia.com>,
+        Ratheesh Kannoth
+	<rkannoth@marvell.com>
+Subject: [PATCH v9 net-next 0/6] octeontx2-af: npc: Enhancements.
+Date: Mon, 30 Mar 2026 11:00:59 +0530
+Message-ID: <20260330053105.2722453-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next 1/3] bpf: Disallow freplace on XDP with
- mismatched xdp_has_frags values
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: bpf@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Shuah Khan <shuah@kernel.org>, "David S . Miller" <davem@davemloft.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Toke Hoiland-Jorgensen <toke@redhat.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
- kernel-patches-bot@fb.com
-References: <20260324150444.68166-1-leon.hwang@linux.dev>
- <20260324150444.68166-2-leon.hwang@linux.dev>
- <20260326124205.1a3bb825@kernel.org>
- <785e0b04-91e4-457f-8d6c-e0a911c0fd88@linux.dev>
- <20260327171220.6d10d710@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Leon Hwang <leon.hwang@linux.dev>
-In-Reply-To: <20260327171220.6d10d710@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzMwMDA0MCBTYWx0ZWRfX0X47boP64uNk
+ EqIwJJRgqARjRUY0wjOycRJxuLh/gsCpvwhBSGE3MT54z5uBGsf4/Khy5/UrCEyVFOiyfdreNXH
+ Nuc/v0PhR3Nhc1zOS3yiplf0U6dqXygc/T1NmvQVpdFqMToOnmtH3xWtWMCPjX536XkVkAEuq1m
+ 0c4G0isZTJHXwNjL+Bs2HtIFHKuQjnECnLQEMJQVsM5cMgOsEsMbKjbzhBViYVgauXakPUfUU4b
+ pZtNMui0aqFHtTSkTh6S4OPeP1OhaqPVMhF1lLFTPbJla8/1PY7P9ZziBMZVkgUOKUekFaxcEr3
+ Wmy3JPJiquVId+YJsGNWpa7UGQqqa61SnoGOf1nBNX+1GQvS5LrGHS/mxUxcr/nME1m7KcXPMUf
+ Jzlr0J0Tzrc6uwPt0yKoA2HBrHSPHqLt7kn90HAmHtRYV0/H/BZzwIH6atnVFdduWXSVCyRxlhE
+ rqMlTtStTXFvd2dpDHg==
+X-Proofpoint-GUID: rIvAaNnvVZR6Wje_WhtXR3EuSNKs5K2b
+X-Authority-Analysis: v=2.4 cv=Pf3yRyhd c=1 sm=1 tr=0 ts=69ca0abd cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=EAYMVhzMl8SCOHhVQcBL:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=F3GfQixlnA_JdfTOFKwA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: rIvAaNnvVZR6Wje_WhtXR3EuSNKs5K2b
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-29_05,2026-03-28_01,2025-10-01_01
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,google.com,davemloft.net,redhat.com,fb.com];
-	TAGGED_FROM(0.00)[bounces-273064-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_CC(0.00)[marvell.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,resnulli.us,oracle.com,nvidia.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	TAGGED_FROM(0.00)[bounces-273066-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon.hwang@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 5F5A4355739
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: CB223355981
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 28/3/26 08:12, Jakub Kicinski wrote:
-> On Fri, 27 Mar 2026 14:42:19 +0800 Leon Hwang wrote:
->>> It may be worth adding a selftest to
->>> tools/testing/selftests/drivers/net/xdp.py
->>> which sets MTU to 9k, tries to attach a non-frag-capable prog
->>> if that fails attaches a frag-capable prog and then checks if
->>> replacing the capable prog with non-capable fails.
->>> Drivers may be buggy in this regard.  
->>
->> Do you mean adding these two tests to xdp.py?
->>
->> 1. Verify the failure of attaching non-frag-capable prog to mtu=9k
->>    driver.
->> 2. Verify the failure of updating frag-capable prog with non-frag-
->>    capable prog via libbpf.c::bpf_link__update_program().
-> 
-> Not directly via libbpf just ip -f link, it uses libbpf internally
-> but testing with  ip link is simpler. Also - there are already XDP
-> progs which return XDP_PASS in frag-capable and non-capable mode,
-> so just use those.
-> 
+This series extends Marvell octeontx2-af support for CN20K NPC (MCAM
+debuggability, allocation policy, default-rule lifetime, and optional
+KPU profiles from firmware files) and adds a devlink mechanism for
+multi-value parameters, with a small mlx5 follow-up to keep stack usage
+within -Wframe-larger-than limits once union devlink_param_value grows.
 
-Yep, I see these XDP progs in xdp_dummy.bpf.c.
+Patch 1 improves CN20K MCAM visibility in debugfs: mcam_layout marks
+enabled entries, dstats reports per-entry hit deltas, and mismatch lists
+enabled entries without a PF mapping. MCAM enable state is tracked in a
+bitmap updated from the CN20K enable path.
 
-I think the option of ip cmd to update XDP prog is -force.
+Patch 2 heap-allocates the temporary devlink param value array in
+mlx5e_pcie_cong_get_thresh_config() so a larger union devlink_param_value
+does not overflow the stack (patch 3).
 
-# ip l set dev eth0 mtu 9000
-# ip l set dev eth0 xdpdrv obj xdp_dummy.bpf.o sec xdp.frags
-# ip l
-6: eth0: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 9000 xdp qdisc mq
-master bond0 state UP mode DEFAULT group default qlen 1000
-    link/ether 3a:39:5f:35:17:6c brd ff:ff:ff:ff:ff:ff permaddr
-e0:9d:73:c6:7a:d6
-    prog/xdp id 72 name xdp_dummy_prog_ tag 614b434cd8324ecc jited
-# ip -force l set dev eth0 xdpdrv obj xdp_dummy.bpf.o sec xdp.frags
-# ip l
-6: eth0: <BROADCAST,MULTICAST,SLAVE,UP,LOWER_UP> mtu 9000 xdp qdisc mq
-master bond0 state UP mode DEFAULT group default qlen 1000
-    link/ether 3a:39:5f:35:17:6c brd ff:ff:ff:ff:ff:ff permaddr
-e0:9d:73:c6:7a:d6
-    prog/xdp id 76 name xdp_dummy_prog_ tag 614b434cd8324ecc jited
-# ip l set dev eth0 mtu 1500 xdpdrv off
+Patch 3 (Saeed) introduces DEVLINK_PARAM_TYPE_U64_ARRAY and nested
+DEVLINK_ATTR_PARAM_VALUE_DATA attributes so drivers and user space can
+exchange bounded u64 arrays; devlink_nl_param_fill() moves large locals
+to the heap as well.
 
-I'd like to post an RFC to net-next later.
+Patch 4 adds a runtime devlink parameter npc_srch_order (U64 array) to
+reorder CN20K subbank search during MCAM allocation.
 
-Thanks,
-Leon
+Patch 5 ties default MCAM entries (broadcast, multicast, promisc, ucast)
+to NIX LF alloc/free on CN20K, adds NIX_LF_DONT_FREE_DFT_IDXS for kernel
+PF suspend-style teardown, and adjusts free-all and default-entry paths
+so default rules are not freed as ordinary user rules.
 
+Patch 6 allows loading a custom KPU profile from /lib/firmware/kpu via
+module parameter kpu_profile on non-CN20K paths, with cam2/ptype support
+and shared helpers for firmware-sourced vs filesystem-sourced profiles;
+CN20K continues to use its existing custom KPU apply path.
+
+The mlx5 change is placed immediately before the devlink union growth
+so the series applies cleanly and stays warning-free when built
+incrementally.
+
+Ratheesh Kannoth (5):
+  octeontx2-af: npc: cn20k: debugfs enhancements
+  net/mlx5e: heap-allocate devlink param values
+  octeontx2-af: npc: cn20k: add subbank search order control
+  octeontx2-af: npc: cn20k: dynamically allocate and free default MCAM
+    entries
+  octeontx2-af: npc: Support for custom KPU profile from filesystem
+
+Saeed Mahameed (1):
+  devlink: Implement devlink param multi attribute nested data values
+
+ Documentation/netlink/specs/devlink.yaml      |   4 +
+ .../marvell/octeontx2/af/cn20k/debugfs.c      | 126 ++++-
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 255 +++++++--
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.h |  10 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   1 +
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |  17 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   6 +-
+ .../marvell/octeontx2/af/rvu_devlink.c        |  92 +++-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  16 +-
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 521 ++++++++++++++----
+ .../ethernet/marvell/octeontx2/af/rvu_npc.h   |  17 +
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   1 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   6 +-
+ .../mellanox/mlx5/core/en/pcie_cong_event.c   |  11 +-
+ include/net/devlink.h                         |   8 +
+ include/uapi/linux/devlink.h                  |   1 +
+ net/devlink/netlink_gen.c                     |   2 +
+ net/devlink/param.c                           |  91 ++-
+ 18 files changed, 979 insertions(+), 206 deletions(-)
+
+--
+
+v8 -> v9: Addressed Simon comments
+	https://lore.kernel.org/netdev/20260325072159.1126964-1-rkannoth@marvell.com/
+
+v7 -> v8: Addressed Simon comments
+	https://lore.kernel.org/netdev/20260323035110.3908741-1-rkannoth@marvell.com/T/#t
+
+v6 -> v7: Addressed Simon comments
+	https://lore.kernel.org/netdev/20260320165432.98832-1-horms@kernel.org/
+
+v5 -> v6: Addressed Jakub,Jiri comments
+	https://lore.kernel.org/netdev/20260317045623.250187-1-rkannoth@marvell.com/
+
+v4 -> v5: Addressed Jakub comments
+	https://lore.kernel.org/netdev/20260312022754.2029595-6-rkannoth@marvell.com/
+
+v3 -> v4: Addressed Simon comments
+	https://lore.kernel.org/netdev/abDeXLpMMxp7G1v3@rkannoth-OptiPlex-7090/#t
+
+v2 -> v3: Addressed Simon comments.
+	https://lore.kernel.org/netdev/20260304043032.3661647-1-rkannoth@marvell.com/
+v1 -> v2: Addressed Jakub comments.
+	https://lore.kernel.org/netdev/20260302085803.2449828-1-rkannoth@marvell.com/#t
+
+2.43.0
 
