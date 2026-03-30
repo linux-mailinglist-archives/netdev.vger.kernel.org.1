@@ -1,160 +1,166 @@
-Return-Path: <netdev+bounces-273114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273116-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YL7cIiVRymmb7QUAu9opvQ
-	(envelope-from <netdev+bounces-273114-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:32:05 +0200
+	id WBWsIkFRymmb7QUAu9opvQ
+	(envelope-from <netdev+bounces-273116-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:32:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72461359583
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:32:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2842359591
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:32:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 79E06300D76E
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 10:26:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 48AAB3043FBA
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 10:27:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CEE23BAD8B;
-	Mon, 30 Mar 2026 10:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E44E3BADB5;
+	Mon, 30 Mar 2026 10:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T3Lk3LeT"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SzMLjlBB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F763B637E;
-	Mon, 30 Mar 2026 10:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D002E3BADBC
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 10:27:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774866385; cv=none; b=jsdDo7wSR2R0aptFfi2SoUP6s7fOhC+qQbjsdE7eabZEHq7i+jkRnmm8seujN0ID2qYdTnvlxifBd0evNlgn2Z0F1nmgSlRPM5v/1v7aVY5yuF2Q2yKcjiKua1ixWfOiFEa4MfDXnL0JtFItjg/xkST4h6/9ZUMCnNgINzP1NRc=
+	t=1774866468; cv=none; b=lb/YTPIoHQIpHY+uo+o4avtEXtfc5naSZyoWssyVD3v38nrBmSIJhu5BFuKKPi1KxUdVn0rtcpAYx2ukP9JWmqylCfvkhbvJCP57rLVdK3D7alqsGxCX8+897RqVsYF6pUQyxTxBowRU79TatN+KOMTKfh8643t3KC3k91+nPmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774866385; c=relaxed/simple;
-	bh=T9uIlKF64yOcg9bZtE+cTBedhjk9S9RgTUSXgAnuvIw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TPmpX1Ah1ZwQqfSvCUH2R82AdsMkb798GbHbkjpkZ6RGIfYvuOfFwjUqUfDGdSQbl5937u2BBzvw/5an9/We9s+JpR3VLBtS1j8Ff+fvO3zpTFwfq7BAd68isNDfKULd4NMuhzCCrJWzePdZ5cYXuKpGATASeZsmpsIFDOzasE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T3Lk3LeT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21D52C4CEF7;
-	Mon, 30 Mar 2026 10:26:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774866385;
-	bh=T9uIlKF64yOcg9bZtE+cTBedhjk9S9RgTUSXgAnuvIw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=T3Lk3LeTfciLzYIG75jBzdIlDdDiBmouF5ORvWGPOHx12VEIo6la8O327J2sZk3/e
-	 fXDSOERPW4rywuTPQeYzcfPtPw1avW980TYA13Dl2aMHwTfS+l/eolVC3gcYMWn2Vt
-	 KhIp7fKVr1MK42KrpJJiCmc6IgayIZhmyiM71ySP67dneW4Qea3SfCP6+tdNWbGu47
-	 GqPHK+ichN9sfmqgQjLDfXu4vmfPt2lktGVJ1estQdrQ0uXz4tY57sga7toFsLTqrD
-	 mcUjGBZsq2/Q7m+T/Hjuc3iDEuWkAqhnqWg0W2dVxLUC/3sEnA+SXH8yQ3URnAeuEW
-	 sD1cTcOQLCcCA==
-Received: from johan by xi.lan with local (Exim 4.98.2)
-	(envelope-from <johan@kernel.org>)
-	id 1w79p8-000000070qq-42E7;
-	Mon, 30 Mar 2026 12:26:22 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Johan Hovold <johan@kernel.org>
-Subject: [PATCH 2/2] net: ipeth: refactor endpoint lookup
-Date: Mon, 30 Mar 2026 12:26:11 +0200
-Message-ID: <20260330102611.1671546-3-johan@kernel.org>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260330102611.1671546-1-johan@kernel.org>
-References: <20260330102611.1671546-1-johan@kernel.org>
+	s=arc-20240116; t=1774866468; c=relaxed/simple;
+	bh=+Qteq5dPyhbY15tJRt3TuJmErEIzgLhr1XV4UIcwuoo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ON6IueV7rAbGxZJVmmpd/H3AVkw7bbI4PY0SjXkh4I+4eW3F0pAQgzDVj1YG0RTFArfEzY3sWvTg910h04hs3omGYthV6Do4blGhsvZxE9xYnth5mWoIOvdusUVKyKdY79sC1Dnx0ITo7tGDDY09O4E44lku9fallrR072qzI8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SzMLjlBB; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <447c9ec1-2f3e-4da6-bcd0-febce271ae6f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774866454;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nUQgRzqepPeMNaAgLk7AwaLDULRzH/pnHtqpTNEISBs=;
+	b=SzMLjlBB+PjsuuLHyVZ/zuy1uGb/2ASld9OBG6zvgqhznPEtkHaByJk3pawZdIk3/Ej/Ip
+	C1dHEx9DpU/ABODUw2aCem3p9GWv7TcdMAqMQdV61HGo+twJ+n7/tAMLGRcox+RHE/XC/w
+	lffWMqSFZ/6zwYfFh7J7DLYaoRBeaDI=
+Date: Mon, 30 Mar 2026 11:27:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next 2/3] dpll: add actual frequency monitoring
+ callback ops
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>, Petr Oros
+ <poros@redhat.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260325193914.124898-1-ivecera@redhat.com>
+ <20260325193914.124898-3-ivecera@redhat.com>
+ <d0a6d302-c5af-4ad1-87e2-fa017bdd96a8@linux.dev>
+ <e4372a58-13ba-4581-af4e-28d0c880c7bc@redhat.com>
+ <a341fd52-3682-473f-8116-a8323bf846ee@redhat.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <a341fd52-3682-473f-8116-a8323bf846ee@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[johan@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273114-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273116-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,resnulli.us,lwn.net,linuxfoundation.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,microchip.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 72461359583
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E2842359591
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Use the common USB helper for looking up bulk and interrupt endpoints
-instead of open coding.
+On 30/03/2026 09:52, Ivan Vecera wrote:
+> On 3/26/26 6:48 PM, Ivan Vecera wrote:
+>> On 3/26/26 12:21 PM, Vadim Fedorenko wrote:
+>>> On 25/03/2026 19:39, Ivan Vecera wrote:
+>>>
+>>>> +static int dpll_msg_add_actual_freq(struct sk_buff *msg, struct 
+>>>> dpll_pin *pin,
+>>>> +                    struct dpll_pin_ref *ref,
+>>>> +                    struct netlink_ext_ack *extack)
+>>>> +{
+>>>> +    const struct dpll_device_ops *dev_ops = dpll_device_ops(ref- 
+>>>> >dpll);
+>>>> +    const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
+>>>> +    struct dpll_device *dpll = ref->dpll;
+>>>> +    enum dpll_feature_state state;
+>>>> +    u64 actual_freq;
+>>>> +    int ret;
+>>>> +
+>>>> +    if (!ops->actual_freq_get)
+>>>> +        return 0;
+>>>> +    if (dev_ops->freq_monitor_get) {
+>>>> +        ret = dev_ops->freq_monitor_get(dpll, dpll_priv(dpll),
+>>>> +                        &state, extack);
+>>>> +        if (ret)
+>>>> +            return ret;
+>>>> +        if (state == DPLL_FEATURE_STATE_DISABLE)
+>>>> +            return 0;
+>>>
+>>> I think we have to signal back to user that frequency monitoring is
+>>> disabled via extack.
+>>
+>> Hi Vadim,
+>>
+>> This would break pin-get operation... Do or dump pin-get operation would
+>> fail with this extack message.
+>>
+>> Here we can check if the freq-monitoring is enabled and conditionally
+>> call actual_freq_get() or measured_freq_get()
 
-Signed-off-by: Johan Hovold <johan@kernel.org>
----
- drivers/net/usb/ipheth.c | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
+Let's make it this way, we don't want to waste even small amount of
+resources for useless call.
 
-diff --git a/drivers/net/usb/ipheth.c b/drivers/net/usb/ipheth.c
-index a19789b57190..bb1364f85bd1 100644
---- a/drivers/net/usb/ipheth.c
-+++ b/drivers/net/usb/ipheth.c
-@@ -573,11 +573,10 @@ static int ipheth_probe(struct usb_interface *intf,
- 			const struct usb_device_id *id)
- {
- 	struct usb_device *udev = interface_to_usbdev(intf);
-+	struct usb_endpoint_descriptor *ep_in, *ep_out;
- 	struct usb_host_interface *hintf;
--	struct usb_endpoint_descriptor *endp;
- 	struct ipheth_device *dev;
- 	struct net_device *netdev;
--	int i;
- 	int retval;
- 
- 	netdev = alloc_etherdev(sizeof(struct ipheth_device));
-@@ -603,19 +602,16 @@ static int ipheth_probe(struct usb_interface *intf,
- 		goto err_endpoints;
- 	}
- 
--	for (i = 0; i < hintf->desc.bNumEndpoints; i++) {
--		endp = &hintf->endpoint[i].desc;
--		if (usb_endpoint_is_bulk_in(endp))
--			dev->bulk_in = endp->bEndpointAddress;
--		else if (usb_endpoint_is_bulk_out(endp))
--			dev->bulk_out = endp->bEndpointAddress;
--	}
--	if (!(dev->bulk_in && dev->bulk_out)) {
--		retval = -ENODEV;
-+	retval = usb_find_common_endpoints_reverse(hintf, &ep_in, &ep_out,
-+						   NULL, NULL);
-+	if (retval) {
- 		dev_err(&intf->dev, "Unable to find endpoints\n");
- 		goto err_endpoints;
- 	}
- 
-+	dev->bulk_in = ep_in->bEndpointAddress;
-+	dev->bulk_out = ep_out->bEndpointAddress;
-+
- 	dev->ctrl_buf = kmalloc(IPHETH_CTRL_BUF_SIZE, GFP_KERNEL);
- 	if (dev->ctrl_buf == NULL) {
- 		retval = -ENOMEM;
--- 
-2.52.0
+>>
+>> -or-
+>>
+>> Call this callback unconditionally and check for return code and if a
+>> driver returns e.g. -ENODATA then skip nla_put_64bit() but return
+>> success.
+>>
+>> WDYT?
+> 
+> Vadim?
+
+Sorry, was AFK this Friday/weekend
+
 
 
