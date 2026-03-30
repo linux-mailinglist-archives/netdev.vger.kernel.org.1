@@ -1,64 +1,102 @@
-Return-Path: <netdev+bounces-273086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273087-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QEl7FHsrymmQ5wUAu9opvQ
-	(envelope-from <netdev+bounces-273086-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 09:51:23 +0200
+	id aMwGEHouymkA6AUAu9opvQ
+	(envelope-from <netdev+bounces-273087-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 10:04:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89E71356A90
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 09:51:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ABC7356D70
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 10:04:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B68A93039812
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 07:48:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 185E03021E4A
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 07:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2092339E18F;
-	Mon, 30 Mar 2026 07:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26923A8FF6;
+	Mon, 30 Mar 2026 07:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="EiunZEx0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qq9R3UCy";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jfh/HxAJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2646172623;
-	Mon, 30 Mar 2026 07:48:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0963A8757
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 07:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774856924; cv=none; b=QbhMhm+N999P3ugvNvOXuCYc/MQVTwIQr3I+2EpAWBb0OBrasmmfziODd5zxMEudszrCJ4EIG6WkPjXuzVSVYZnnqPMoMtjo4mjRtJHuf/Dj/J7ClI7MEVQzKmrR8phj17UvpH5c9yVbRNjfP/9oE2szbJxCKbXcHZOotQOB9mU=
+	t=1774857393; cv=none; b=DiT7WyLj2Uu9ldgWXfBnl2/LYScjtMsP+ZaCX94EqIT1qxpINGMa+0fJPjYsj/A5VVFv6lEo73DliqRIbxlYLRauVrD8Ib53KVO9mORbSGkasKqsaIhnARI4eUjqryEm4hUYj5u51q4hsi970ENuN6tLQsYlKckzMHWQTIlU3q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774856924; c=relaxed/simple;
-	bh=aDhUMEJ9z7sa3Ar3gcl5539YFInQhpyKyYNNjaTyXHA=;
+	s=arc-20240116; t=1774857393; c=relaxed/simple;
+	bh=aU+2NNvo4O7/xXKAgg9ewUdbqnZsagjlNGGoyKaRs14=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HFRWFEXThGN4V5siJxT1E5g0Ul2jn/gjb8t/HST44Z0E0LyN0iL28V+y071Nicjd9dZUPWLjfO7PjicJdWXF29lItldq/2+Mzjd/vEzSG1JtTxg61I9MStaR31IFSjYtnXB4InmAgfGtj/bvg8NVClLq1NueNM5qGFaYa71hdek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=EiunZEx0; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=a5+hZawfd/GIwIr79hxwmDfEBJDfCzXxaknum3x1+jQ=; b=EiunZEx0Ix0cec2hQJYx282aq+
-	Qjd7WQ+exfgg/aSpMcUFOmT+mLThnYg1VHot82GJQfhG4SWf3EyZE8AcGJpy6EdKDdEBrRIN7hih2
-	zKb/RowuWjAtcXsz20lElQq8eJBIRrasO8KtMJP02utP0wOzUUGfUyDfyaGGIV9eta0L7nLxboOLL
-	zG6mB3Xiv8i9zk0twluYEMbYJ4084UJJW2hCthkk59P4F+drBCWrxVl7Feqkc9wzfJ3SEIxa6+wpN
-	YDxaLiyqYDrkWaWN0cQla8NKHfpwYengXRl5ggSpSfdP0x/q2GL2HKWG3HgjIJ4iyzoUwJLzpQj5r
-	4LE9VHow==;
-Received: from sslproxy04.your-server.de ([78.46.152.42])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1w77MB-000Jlv-2q;
-	Mon, 30 Mar 2026 09:48:19 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy04.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1w77MA-000JC6-0v;
-	Mon, 30 Mar 2026 09:48:18 +0200
-Message-ID: <168347a2-993b-4267-902b-9fe17a58f483@iogearbox.net>
-Date: Mon, 30 Mar 2026 09:48:17 +0200
+	 In-Reply-To:Content-Type; b=dbgXnA1rlG+qS4JSo9jJAA3Qb6hfUidIQp6asfghRbJ9HhXJdIPx984vpirT37vbt9gt0pveSiN52xQ31PmxER1qSMFoQWO661OfbEU16mbz/olGqEoHmFH+SBrXbvxA/U5vM0qnKmvlzzChPEVpYEIYWzR35t6CfyYw4jY17L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qq9R3UCy; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jfh/HxAJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774857391;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+kIlzFsIxp6fqIHyjYLxiN/9v3HI4JuGZ1vO55yaAPU=;
+	b=Qq9R3UCyhuyXJbItj5FcHYRMSLI32Q1z1FI0Nz9Y6eWkWw+xP9EfyA5JSjMnWieN2FRH9p
+	ZjC1Tlv+5d+mP4NpuOBNx2cRvkZ4Qe7p/wqfJ57UkCcIWtGVuGerOT39Cdz7TVWFuPvE5l
+	9BhhANOkrOiyUQxR282vwR/AaJwLcR8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-394-lViY2wzgMyy1sh7mA_Whgg-1; Mon, 30 Mar 2026 03:56:30 -0400
+X-MC-Unique: lViY2wzgMyy1sh7mA_Whgg-1
+X-Mimecast-MFC-AGG-ID: lViY2wzgMyy1sh7mA_Whgg_1774857389
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48553fdd03dso23351335e9.0
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 00:56:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1774857389; x=1775462189; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+kIlzFsIxp6fqIHyjYLxiN/9v3HI4JuGZ1vO55yaAPU=;
+        b=Jfh/HxAJ/0t3sDpG8AsaJ4l+PWFXaoxbj3ba4JJzvvrBQuQltPnqLVuCx2VENK9Lqc
+         34GKbMog4d+AZDpncD7x8Eq87O/27oBN30TXigZD70UyEviV80ZW61ZRa3kFWvlgqz2n
+         A3Ly9jbF/aKggUfdfXYDax8396xJb83LX14OEbDvdPtxneZTg69/FrcR3acrQb1KWqzq
+         23LakXfOWjPO+N29xBO4baTREbyyt4V8iV0UX13YaFwB4rqG9GgM6A9SEtrb6WdOqdL5
+         QqXLsZtJ4lo8ywlp+O0vLuqhgevC6Zeb4bhpFnIQLLBRA9rXC8HJRfm0PlOgBtSjCTZx
+         Y7Rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774857389; x=1775462189;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+kIlzFsIxp6fqIHyjYLxiN/9v3HI4JuGZ1vO55yaAPU=;
+        b=U7gulRHI+IYSnOOhbjQjmlTnwHpAk43DGPbytBxpsaSIWzw3ig+wTETJH4mXnQ4bGF
+         H9/IJ2CUms76PfdODcoF3BdT6VWU63XEf74E/8er1GfFfY5CQVkvfARbzwuQoAwIwlTl
+         zhqLu0IbV8eGezQ9pUZtSsP/DqHmMx7+ggpLjO2Nb4bEsEDsPFbGTK+zDMgDUAFaxz+D
+         W+Vr0avoabALbbK+u1Fkm+xVbbvMAs1MI9RFwunlVrYWYHZvvYG0fts6yW82kDyjI1NI
+         g4CwvULzpzTxVWNR83/+jFGx3xSu+8I/hwHUR0ls0kf+mzZPMzLC5ZOLAoIOwxlMdRMd
+         5ztg==
+X-Gm-Message-State: AOJu0YxD3sP6ibXwteezwqNSs3UagCHWWBeQ8u6DQzN3QsJIyRnCF9DH
+	94DspuIKz9lU80Sz9MArCvIrwaMftmGGvVpP4apoMs6VoeYo9V0eV7fcgGTi9KbLaHQLioq3ulr
+	5L2uBpNPXqDUwfnLNworV3gbFYmfCqYVryyPv6WROFUrapDmTJFXYbSGjMg==
+X-Gm-Gg: ATEYQzxWZxif9PJ68A+nxWsqSJdHZCsYAWsokVPB47TuSryVlb6NcBiXuZ1I6ZdfkGJ
+	bqLIjgJG78tG9HdLT+PTFxabJOCg/vemGj9Yk42c1iFndWcErx+DG7TZYqpwTDlnv1Ft/pgu0D6
+	0XVyi9Tcq7vV8fhiKs7uNIDxufrdDMZlBj/OY7b204w1eQK8fjjK8PHugisIrpYa0lTtzWjOQaI
+	JBuvotdcAPs9n1enafwQGYfExJZbycolgMaXHiiCNbAAOg7AAdBlXhstmiFvPRZqS6DNsbmogkl
+	Yjn94+U9+S4Isxn7AdFTpjnhcaGLgE8QEsqs+BVXEjqxUCxFra+sOUC55A+63blc+8PyLn/l+id
+	094nrQxigV5bYrC/FcFmY9riFmn69jG7D/+XmJdGT+ooKh3Xt8zHv+X16
+X-Received: by 2002:a05:600c:3b8f:b0:485:3b00:f93b with SMTP id 5b1f17b1804b1-48727f17f7bmr210372655e9.31.1774857388974;
+        Mon, 30 Mar 2026 00:56:28 -0700 (PDT)
+X-Received: by 2002:a05:600c:3b8f:b0:485:3b00:f93b with SMTP id 5b1f17b1804b1-48727f17f7bmr210372305e9.31.1774857388490;
+        Mon, 30 Mar 2026 00:56:28 -0700 (PDT)
+Received: from [192.168.88.32] ([216.128.11.222])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4873069961esm166932665e9.12.2026.03.30.00.56.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Mar 2026 00:56:28 -0700 (PDT)
+Message-ID: <f73c3cf9-18e9-4109-b173-d6000cb0cf88@redhat.com>
+Date: Mon, 30 Mar 2026 09:56:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,112 +104,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v2 1/2] net: clear the dst when performing encap
- / decap
-To: Jakub Kicinski <kuba@kernel.org>, bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, maze@google.com,
- willemdebruijn.kernel@gmail.com, ast@kernel.org, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org
-References: <20260329180428.2657785-1-kuba@kernel.org>
+Subject: Re: [PATCH] net/ipv6: repeat route lookup with saddr set for ECMP
+To: Maximilian Moehl <maximilian@moehl.eu>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260329091201.63646-1-maximilian@moehl.eu>
 Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <20260329180428.2657785-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260329091201.63646-1-maximilian@moehl.eu>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27956/Mon Mar 30 08:24:32 2026)
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-273086-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,linux.dev,fomichev.me];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	NEURAL_HAM(-0.00)[-0.938];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273087-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 89E71356A90
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,moehl.eu:email,moehl.eu:url]
+X-Rspamd-Queue-Id: 8ABC7356D70
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/29/26 8:04 PM, Jakub Kicinski wrote:
-> Commit ba9db6f907ac ("net: clear the dst when changing skb protocol")
-> added dst clearing when a BPF program changes the skb protocol
-> (e.g. IPv4 to IPv6). Since that was a fix we only cleared the dst when
-> the L3 protocol actually changes to keep it minimal. As suggested during
-> the discussion (see Link) encap or decap operation which wraps or unwraps
-> a same-protocol header may also render the existing dst incorrect - even
-> if that doesn't result in a crash, just the wrong route for the now-outermost
-> IP dst.
+On 3/29/26 11:12 AM, Maximilian Moehl wrote:
+> When the routing decision involves ECMP, the initial hash is calculated
+> with saddr being :: and the decision which interface to select from an
+> ECMP group is based on that hash. If the route lookup has to be
+> repeated, e.g. because a route was updated, the hash is calculated with
+> saddr set to the previously selected address. This can cause the
+> selected interface to change, breaking ongoing connections.
 > 
-> Make dropping dst unconditional for bpf_skb_change_proto() and all
-> L3 encap / decap ops.
+> To ensure the initial interface selection is based on an actual saddr
+> the route lookup is repeated after the source address selection if a
+> hash was calculated.
 > 
-> Link: https://lore.kernel.org/CANP3RGfRaYwve_xgxH6Tp2zenzKn2-DjZ9tg023WVzfdJF3p_w@mail.gmail.com
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+> Signed-off-by: Maximilian Moehl <maximilian@moehl.eu>
+> Link: https://lore.kernel.org/all/aOYLRyIlc7XU7-7n@shredder/
+> ---
+> I've created a write-up of what I've done, including the steps taken
+> to test the patch: https://moehl.eu/blog/linux-ipv6-ecmp-instability.html
+> 
+>  net/ipv6/ip6_output.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+> index 8e2a6b28cea7..465fce51d017 100644
+> --- a/net/ipv6/ip6_output.c
+> +++ b/net/ipv6/ip6_output.c
+> @@ -1148,6 +1148,18 @@ static int ip6_dst_lookup_tail(struct net *net, const struct sock *sk,
+>  			*dst = NULL;
+>  		}
+>  
+> +		/* If ECMP was involved the initial hash was calculted
+> +		 * with saddr=:: which can result in instability
+> +		 * when it is later re-calculated with the selected
+> +		 * saddr. Lookup the route again with the chosen
+> +		 * saddr to get a stable result.
+> +		 */
+> +		if (fl6->mp_hash) {
+> +			fl6->mp_hash = 0;
+> +			dst_release(*dst);
+> +			*dst = NULL;
+> +		}
+> +
+>  		if (fl6->flowi6_oif)
+>  			flags |= RT6_LOOKUP_F_IFACE;
+>  	}
+
+This apparently breaks ipv6 fib tests (fib_tests.sh):
+
+# IPv6 multipath load balance test
+#      TEST: IPv6 multipath loadbalance                          [FAIL]
+
+see
+https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+on how to reproduce the tests.
+
+Also this would deserve additional testcases.
+
+Without diving much inside the code I have the feeling this change is
+plugged into the wrong place: multipath selection logic should be
+encapsulated by fib6_select_path().
+
+/P
+
 
