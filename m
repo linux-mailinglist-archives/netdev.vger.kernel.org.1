@@ -1,174 +1,155 @@
-Return-Path: <netdev+bounces-273152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273153-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AA1GL/1qymnG8gUAu9opvQ
-	(envelope-from <netdev+bounces-273152-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:22:21 +0200
+	id sLV1JJpqymnG8gUAu9opvQ
+	(envelope-from <netdev+bounces-273153-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:20:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0053A35AF4A
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:22:20 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B77935AF06
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6CD053054701
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:17:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D439D300E28F
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874FA3CBE6B;
-	Mon, 30 Mar 2026 12:17:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A1B3CAE60;
+	Mon, 30 Mar 2026 12:20:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="CuZOFdyI";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ovGUldBi"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wPM54DK0"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8283CA486
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 12:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940F33C9ED5;
+	Mon, 30 Mar 2026 12:20:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774873036; cv=none; b=oyPp8eVOVxwImTjn62fM/E0zJUxSRAxoDP0K5CqGp41T+X6gEZD1oeSLZBx/p9/oMCHVw7mYzFBb2ruDtT/e2eN3tfFm/pd2fmvVONKKKcXUflEW9ATLDGzfQWMichcmL+M+YKmMh8H3Zrw6FtYWFbIdbbuN7O4saPRwNj+Rf7k=
+	t=1774873237; cv=none; b=j9yHXk+Z6r4YPAuQolKM1AQ5tojDrbOaGNa1oFsTMezspO+RIsTrN5wIbeOUCZPmnaBBqBPvI1AXEhASoON9iTyMPQF859yu8SZCwQxWqel9QlfgLUPDQdfk10eDWRtkqMzdZvEz80B54l9z4q3llyrySmLnQOvWixZlpjJ4mrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774873036; c=relaxed/simple;
-	bh=oeIljEcpEVllYLXaDWQ51cTnXqMSV8r236BtfoZZqKk=;
+	s=arc-20240116; t=1774873237; c=relaxed/simple;
+	bh=n39tc+fj8bYN5UpqLdes32ezJr0VjG8m0tZdwcG2c7s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qXw6TjBTZKvWlQBXvRgCSXDfS2gG7710gA0/sEa15g4s3xj0/0X2SJuphHgTFy/CRin0Ro4cohslAcLOSsfbPZKJzsFRqjZQd3p+QCuLqGxDdWruWnrv39JY79cbu3sBWQ36aMbNl8iePPRivw1DvnX2aBUTLQMaUPyU+M+qiNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=CuZOFdyI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ovGUldBi; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 853EB7A034D;
-	Mon, 30 Mar 2026 08:17:10 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Mon, 30 Mar 2026 08:17:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1774873030; x=
-	1774959430; bh=X8dWxIjsyoY0CUR/3yMkGz/2NEc2cULzzVR/QRpLG2c=; b=C
-	uZOFdyIL4szx31UwBaGLJEwCqP9ECYJke2KDeUq37gSMMquahQOir7ntw/UTiewH
-	RtR983FH9G5A1LEj6KWuu58mnmsta91gd+D6NO+1xOODdrVpAH5vvFNIzq+yQn68
-	0m6HnasajZ21I2v4jhhzemXAXUnf0tTLRKO/8ubA/178wsXfYgjM99Hznid+qwjW
-	R8GhSYxiT9usr/2K18wxoyYJ6YEMzKYycsG3iSctQJITebznZyOawe7hfgWb2ENz
-	oLIVZOsf6U4g2M7uRgIysmoADmC8avaykzYpO+eCpaJGi/ezl/jAINBUj8PLkrgk
-	cOcBgSuyFRXTzQeenXfkQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1774873030; x=1774959430; bh=X8dWxIjsyoY0CUR/3yMkGz/2NEc2cULzzVR
-	/QRpLG2c=; b=ovGUldBiXogK6/+bsa0YFrgV6kRRfyaxR1GIHfSPHBf2UUGipQV
-	incQpE8yDU2HxOhVWcKdpoTi7q5UkdVu08kMzYfjR3SYRQGgjDb9LqpxpQgRApAd
-	Fdabk1CoHZPz+qHWQkQHx6T5BnCQjYOvrycQuTxCRs7TMVeRz5u2Oy8PICWRO38V
-	PRj/KCThYDq2eT+vJSssy3eEf0W9eeqIZA3aXrzfiCLSTiTTJAHIHiszykRVHU0h
-	LB6Vf7+gfyMHt7RcaZonjTDGmnLHMB7+strZx2S9Hr9iAtW8WxgR+y6b+lHqCcPU
-	bWkBdYjrzQIo9OfnQ269EhDgCJ/Aq7nD6kw==
-X-ME-Sender: <xms:xWnKacWF1bdXba25FYVQTgTiEHnLUXDgdavjh2GiYWBhBpUmbrBVOw>
-    <xme:xWnKaakQnrgiMAxxGxlD3gTtqsb1aO_4JnmphAleo37F_eVfU5XzyIXsRAo_xOgTe
-    TVpD3LEctVtYAj7YceKTH9AcR284Ju1QppE3P0bURm2s9_2aRGU2vE>
-X-ME-Received: <xmr:xWnKaXB8T7CCsgUaQew8wO7edWEp6GifoaV-r4rFnLJYZymEbgPT_cY3iANw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeffeekleeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeekpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegtvghlsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthho
-    pehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrh
-    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhgvrhhnvghlqdhtlhhsqdhhrghnughs
-    hhgrkhgvsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheptghhuhgtkhdrlh
-    gvvhgvrhesohhrrggtlhgvrdgtohhmpdhrtghpthhtohephhgrrhgvsehsuhhsvgdruggv
-    pdhrtghpthhtoheprghlihhsthgrihhrrdhfrhgrnhgtihhsseifuggtrdgtohhm
-X-ME-Proxy: <xmx:xWnKaZiZnDOpMCtZZpysxQ_IXLI4R8MHPayUIRGyqgjISaGuQIDIKQ>
-    <xmx:xWnKaUxGj5aZVXv3Oe7F1vjiFSzTb6PF87Neb_P3qwn6pH7fVu3TxA>
-    <xmx:xWnKaa0W7bx2gW6rIRdVD7iUqu-FiP0UA6YF9nx14SLZm5ShuurCBQ>
-    <xmx:xWnKaZ_q6-eKBLZ_xur2w-3B56U9Nyv91o71vRPWGRurqysE81KhnQ>
-    <xmx:xmnKaWH-hb5kfIH60YfHVpCMY-VFQGGRDaA-DHpUbaTv8uL-hfiD17Ln>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 30 Mar 2026 08:17:09 -0400 (EDT)
-Date: Mon, 30 Mar 2026 14:17:07 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Chuck Lever <cel@kernel.org>
-Cc: john.fastabend@gmail.com, kuba@kernel.org, netdev@vger.kernel.org,
-	kernel-tls-handshake@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH net-next v7 2/5] tls: Fix dangling skb pointer in
- tls_sw_read_sock()
-Message-ID: <acppwzU7-TgWbd5f@krikkit>
-References: <20260328-tls-read-sock-v7-0-15678415dfc1@oracle.com>
- <20260328-tls-read-sock-v7-2-15678415dfc1@oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ronA1qJdMQsA1aFJWzdCLZQkjtYsn+RBOwtgDazhlOBNSMC1YFyKpHmlHWy1ElPp5otLG44YmenzKbi69Li5tFvP6ckghcvHKq4fvTXCqBA34VtpztJ2HnRdDYJDrk5uyIJK6ql+IHtkS8hMHbOdX3jVC1zXCG9+NXG8jsehu5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wPM54DK0; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=veBAT8N9PXJSRI8kHRpQ29JL9EyN/jr+PWryhqRzBmk=; b=wPM54DK01Q8N254E8px4APBfKH
+	UIeqvvYFYUsrpjSXOvsemWOhETVj9D7LVVWZ4Ce1H8ZKqgyUwC9DDugUIAfjC3yXNUOAng3YrAIju
+	1MfcTshv5NYdJ2Qu8XwgPmFt5LMmZYlNtNtJ+l4Sjr9x6U1HQILzrZnP8PIeetsO5hGUjb7vSnD7x
+	oOsSxFtJacRtDdOXXqmpNp93fFKC71HVZV791Zda3UFp9nhYBegRjRWvAjv14/cbVa9AFdgQvmydL
+	XKOgRJKGfski3b9FnylZKtYwC71nejuyTMqwTOHCn9QTTz+wfif1lNo1cUhveN1ublyANzSwl6bfy
+	2o2ypw7g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38442)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w7BbS-000000000ST-11Bh;
+	Mon, 30 Mar 2026 13:20:22 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w7BbO-000000002fP-0eU8;
+	Mon, 30 Mar 2026 13:20:18 +0100
+Date: Mon, 30 Mar 2026 13:20:18 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Cc: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH RFC net-next] net: stmmac: qcom-ethqos: set clk_csr
+Message-ID: <acpqgpCsbo3lJs3l@shell.armlinux.org.uk>
+References: <E1w6AZm-0000000E54W-1F6E@rmk-PC.armlinux.org.uk>
+ <9d0a529a-d065-4f46-a93b-23195a4f9727@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260328-tls-read-sock-v7-2-15678415dfc1@oracle.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+In-Reply-To: <9d0a529a-d065-4f46-a93b-23195a4f9727@oss.qualcomm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273152-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273153-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,lists.linux.dev,oracle.com,suse.de,wdc.com];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.756];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,oracle.com:email,queasysnail.net:dkim,queasysnail.net:email]
-X-Rspamd-Queue-Id: 0053A35AF4A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: 7B77935AF06
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-03-28, 11:17:09 -0400, Chuck Lever wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
+On Mon, Mar 30, 2026 at 01:18:56PM +0200, Konrad Dybcio wrote:
+> On 3/27/26 6:02 PM, Russell King (Oracle) wrote:
+> > The clocks for qcom-ethqos return a rate of zero as firmware manages
+> > their rate. According to hardware documentation, the clock which is
+> > fed to the slave AHB interface can crange between 50 and 100MHz.
 > 
-> Per ISO/IEC 9899:2011 section 6.2.4p2, a pointer value becomes
-> indeterminate when the object it points to reaches the end of its
-> lifetime; Annex J.2 classifies the use of such a value as undefined
-> behavior. In tls_sw_read_sock(), consume_skb(skb) in the
-> fully-consumed path frees the skb, but the "do { } while (skb)"
-> loop condition then evaluates that freed pointer. Although the
-> value is never dereferenced -- the loop either continues and
-> overwrites skb, or exits -- any future change that adds a
-> dereference between consume_skb() and the loop condition would
-> produce a silent use-after-free.
-> 
-> Fixes: 662fbcec32f4 ("net/tls: implement ->read_sock()")
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-> ---
->  net/tls/tls_sw.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+> FWIW this __may__ possibly differ between platforms, but I'm not sure
+> to what degree. Will there be visible impact if we e.g. have a 200 or
+> 300 MHz clock somewhere?
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+When you add other platforms, you're going to have to deal with their
+differences.
+
+IEEE 802.3 states that the maximum clock rate for the MDIO bus is
+2.5MHz. You need to ensure that is the case.
+
+Current qcom-ethqos code doesn't set clk_csr, and returns zero for
+clk_get_rate() on the stmmac clocks because they are managed entirely
+in firmware.
+
+This leads to the GMII_Address register field CR "CSR Clock Range"
+being programmed with a value of 15, which, according to some
+documentation, states that the clock divisor is CSR clock / 18.
+
+With the /18 divisor (assuming your dwmac uses that divisor):
+
+CSR clock	MDIO MDC clock rate
+50MHz		2.78MHz (exceeds IEEE 802.3 maximum)
+100MHz		5.56MHz (exceeds IEEE 802.3 maximum)
+200MHz		11.1MHz (exceeds IEEE 802.3 maximum)
+300MHz		16.7MHz (exceeds IEEE 802.3 maximum)
+
+Do you think this is acceptable, or do you think this should be
+fixed before anything else happens with the driver?
 
 -- 
-Sabrina
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
