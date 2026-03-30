@@ -1,197 +1,149 @@
-Return-Path: <netdev+bounces-273105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273106-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kE2SEtk9ymnD6gUAu9opvQ
-	(envelope-from <netdev+bounces-273105-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:09:45 +0200
+	id EKfiOL5Bymky7AUAu9opvQ
+	(envelope-from <netdev+bounces-273106-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:26:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4619357DD6
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:09:44 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D18E0358263
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:26:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F168B30809B0
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 09:02:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 282B830041D6
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 09:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58E63B2FFB;
-	Mon, 30 Mar 2026 09:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 498803B2FD5;
+	Mon, 30 Mar 2026 09:26:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hHXjhEmZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IVsvXuD3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92251399011;
-	Mon, 30 Mar 2026 09:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F06382F01
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 09:26:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774861361; cv=none; b=KjEwpHnEQEUljA0xkVFrFjXMvVpXojITGMy/491L/ewr9/1Ox/jweadif42+Xr//zYtPoME+Vfdp/JiShPlmyXj9qdUwKLfiNU5hkf5mP7V1F4EQm5ZBKP+jIL5wkNbtt2qlg9Dx3QwJxIHX7eWStMyeVW8gUt6BjQfT9lv7c6U=
+	t=1774862780; cv=none; b=q2bkX1we+9RgzV+A/pzJrvRlNThp6rqeEH0KKhqjSTHRS3TS1+p1mYx0YccdhQ/INg1i+x+qmH9liERlpNrNWTtwr1mj0MxOhXV0tJsf4Tjehzt07W35WXSyNPk9TmvLkNrD/VVhhjV6kDqcIcXwoCl7VzlxnYzyHAdSVGldubY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774861361; c=relaxed/simple;
-	bh=qRDiLQ7/Xx7OWinJo708eydLzcr8WmKcb0zRtIsdSO8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AEgMZLE3t4o6o7Lbrrtbqmm2NSqnNEJrY2ZqVbyep4suWuxRiUuUeIdBicE+S6QgIymEBWC0ZaZolNbbOoF1KN2gUpRxzzhV9jy9ushGqp4A3CzSJEYTJ3bhDpebxiiVzFycD552qzQFfKLzCJTSX42OHJAYDrLCVbU4teC/67M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hHXjhEmZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F7CBC2BCF5;
-	Mon, 30 Mar 2026 09:02:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774861361;
-	bh=qRDiLQ7/Xx7OWinJo708eydLzcr8WmKcb0zRtIsdSO8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=hHXjhEmZZxDEryQivP7+OwcpVMgA5oBn8cpG9Bk9N/iLWFqC8zyStSkdTZlsQ2vCn
-	 IxAj6WpNay1JuUaYnqoFTx0Y1YmO7Ua83XblC+OekvpKYGNJ1OAWLXJMeOeZu4+Tic
-	 4xZcS4VgIttR4bxu6P0NboTqUUSc1QDXis720VsDg/XMJWm+ha69coHzaxhvmpuJjl
-	 BzVJgMZtVvq2EcsJyokY9ejZ5CHZniuEqaZEeYII/D9v5ERHFw8GrSSB23jc+7fQx4
-	 t/qFv0qPFG2Yu+V0ybZoYwTQxZLVy4JkDZolzC2cepGKGLa4Z9GPaJJU58fMc4hUti
-	 LOGv6tSOyhEaQ==
-From: Conor Dooley <conor@kernel.org>
-To: netdev@vger.kernel.org
-Cc: conor@kernel.org,
-	Conor Dooley <conor.dooley@microchip.com>,
-	kernel test robot <lkp@intel.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org
-Subject: [PATCH net-next v1] net: macb: fix use of at91_default_usrio without CONFIG_OF
-Date: Mon, 30 Mar 2026 10:02:00 +0100
-Message-ID: <20260330-overture-cactus-c8eb7b9cbecc@spud>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1774862780; c=relaxed/simple;
+	bh=DR19R+3fwQ3BqBBpwMykWcYWQRMojXvEWPI//+c8MMw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qXuTD09CpHegcaOfQRE3o5ZWSYJM8UyXB9U5fJlCS0M4Ws+kJugGwoUuumm8MN1bk+g8khBX9PGT0d71xyRFA+3/SWfoqum6hw1DWZD8XUb0oZzuPTIwBrbKP1m6CkPzI1C7olRn35QHzZp/vmcmqBBjy9MQotYQKCfheNg+WcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IVsvXuD3; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d1a739d2-c4ea-4fae-aeaf-f49e75dac0f3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774862766;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CKBqVj13lx/MPnFDQq/AzvUbYUq2ml+LYlzgDV8zhU4=;
+	b=IVsvXuD3BI5AT7lOaqhItODLuwxuhhJH9UAcBtnfs8fPS/sdINqCXBrdatpb5LtrRTmLV9
+	jTKCHiS6x4IAGsJaXleZp+AExrvia2yYMkbkI4mSfYG0Y2BhQJ+ri3xBxdoub3SYjrWo8M
+	uBQt0RRWznpezirxHId+EQTO2D6pckc=
+Date: Mon, 30 Mar 2026 17:25:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3605; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=A1BubFgGNTU8Lrl5NTMqEeZD7ZkkVzsO+2Mw4LraCwo=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJmnbLheGWkVLNMQ2R+3+ewm89UXxPTfW7DuWbrdcmX3F 57IqzrLOkpZGMS4GGTFFFkSb/e1SK3/47LDuectzBxWJpAhDFycAjCRU7sZ/udrS7FEZQZeS9Hv PHfuk+fWm+ez5/xsuLnms3Ze3O4NTD8Z/sf1HliytJTxU16fzcXye71ax980ddhvuTbzSmrY3LX 22jwA
-X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.34 / 15.00];
+Subject: Re: [PATCH bpf v4 1/2] bpf: tcp: Reject non-TCP skb in
+ bpf_sk_assign_tcp_reqsk()
+To: bot+bpf-ci@kernel.org, bpf@vger.kernel.org, clm@meta.com,
+ Kuniyuki Iwashima <kuniyu@google.com>
+Cc: kuniyu@google.com, martin.lau@linux.dev, daniel@iogearbox.net,
+ john.fastabend@gmail.com, sdf@fomichev.me, ast@kernel.org,
+ andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, haoluo@google.com,
+ jolsa@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, martin.lau@kernel.org, clm@meta.com,
+ ihor.solodrai@linux.dev
+References: <20260330080746.319680-2-jiayuan.chen@linux.dev>
+ <6ee24770a2b014219d86839b2243e1b7bad4dc4f520457269d5e8ca2b21c2cb8@mail.kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <6ee24770a2b014219d86839b2243e1b7bad4dc4f520457269d5e8ca2b21c2cb8@mail.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273105-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-273106-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[google.com,linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,davemloft.net,redhat.com,vger.kernel.org,meta.com];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B4619357DD6
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D18E0358263
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Conor Dooley <conor.dooley@microchip.com>
 
-If CONFIG_OF is not enabled, at91_default_usrio is used undeclared in
-gem_default_config. Rather than move the struct around, take the
-opportunity to rename gem_default_config, as the only compatible it is
-ever used for is "cdns,macb" - not "cdns,gem" at all! With that done,
-remove the use of default_gem_config as a fallback in probe, as every
-device has a specific set of match data.
+On 3/30/26 5:00 PM, bot+bpf-ci@kernel.org wrote:
+>> #if IS_BUILTIN(CONFIG_IPV6)
+>>   	case htons(ETH_P_IPV6):
+>> +		if (ipv6_hdr(skb)->nexthdr != IPPROTO_TCP)
+>> +			return -EINVAL;
+>> +
+>>   		ops = &tcp6_request_sock_ops;
+> For IPv6, ipv6_hdr(skb)->nexthdr gives the type of the header
+> immediately following the base IPv6 header. If extension headers
+> are present (hop-by-hop options, routing, etc.), nexthdr would be
+> the extension header type rather than IPPROTO_TCP, even when the
+> packet is a valid TCP segment.
+>
+> Would it be worth using ipv6_find_hdr() here, similar to
+> bpf_update_srh_state() in the same file, to walk past any extension
+> headers? The IPv4 check above is fine since ip_hdr(skb)->protocol
+> always identifies the transport protocol directly.
+>
+> In practice this is very unlikely to matter since TCP SYN packets
+> with IPv6 extension headers are essentially non-existent, but the
+> check as written would reject them.
+>
+>
+> ---
+> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+> See:https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+>
+> CI run summary:https://github.com/kernel-patches/bpf/actions/runs/23735111188
 
-It pains me a little to leave at91_default_usrio in match data used by
-"cdns,macb", but this is probably required to avoid regressing anyone.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202603280028.wQjUrIvv-lkp@intel.com/
-Reported-by: Jiawen Wu <jiawenwu@trustnetic.com>
-Closes: https://lore.kernel.org/all/06a701dcc014$86def5b0$949ce110$@trustnetic.com/
-Fixes: a17871778ee28 ("net: macb: rename macb_default_usrio to at91_default_usrio as not all platforms have mii mode control in usrio")
-Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
----
-lkp also reported this over the weekend, but against the dev copy in my
-tree. I had thought that CONFIG_OF was standard off on x86, but I guess
-it isn't, given lkp didn't catch it until randconfigs.
+Thanks for the analysis.
 
-CC: Andrew Lunn <andrew+netdev@lunn.ch>
-CC: David S. Miller <davem@davemloft.net>
-CC: Eric Dumazet <edumazet@google.com>
-CC: Jakub Kicinski <kuba@kernel.org>
-CC: Paolo Abeni <pabeni@redhat.com>
-CC: Nicolas Ferre <nicolas.ferre@microchip.com>
-CC: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-CC: netdev@vger.kernel.org
-CC: devicetree@vger.kernel.org
-CC: linux-kernel@vger.kernel.org
-CC: linux-riscv@lists.infradead.org
----
- drivers/net/ethernet/cadence/macb_main.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+There are many places in the kernel that check nexthdr directly without
+walking extension headers.
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 12e2b2f4aaf88..4f70e4fcf4606 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -5716,9 +5716,18 @@ static const struct macb_config pic64hpsc_config = {
- 	.jumbo_max_len = 16383,
- };
- 
-+static const struct macb_config macb_macb_config = {
-+	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE |
-+		MACB_CAPS_JUMBO |
-+		MACB_CAPS_GEM_HAS_PTP,
-+	.dma_burst_length = 16,
-+	.usrio = &at91_default_usrio,
-+	.jumbo_max_len = 10240,
-+};
-+
- static const struct of_device_id macb_dt_ids[] = {
- 	{ .compatible = "cdns,at91sam9260-macb", .data = &at91sam9260_config },
--	{ .compatible = "cdns,macb" },
-+	{ .compatible = "cdns,macb", .data = &macb_macb_config},
- 	{ .compatible = "cdns,np4-macb", .data = &np4_config },
- 	{ .compatible = "cdns,pc302-gem", .data = &pc302gem_config },
- 	{ .compatible = "cdns,gem", .data = &pc302gem_config },
-@@ -5747,15 +5756,6 @@ static const struct of_device_id macb_dt_ids[] = {
- MODULE_DEVICE_TABLE(of, macb_dt_ids);
- #endif /* CONFIG_OF */
- 
--static const struct macb_config default_gem_config = {
--	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE |
--		MACB_CAPS_JUMBO |
--		MACB_CAPS_GEM_HAS_PTP,
--	.dma_burst_length = 16,
--	.usrio = &at91_default_usrio,
--	.jumbo_max_len = 10240,
--};
--
- static int macb_probe(struct platform_device *pdev)
- {
- 	struct clk *pclk, *hclk = NULL, *tx_clk = NULL, *rx_clk = NULL;
-@@ -5778,7 +5778,7 @@ static int macb_probe(struct platform_device *pdev)
- 
- 	macb_config = of_device_get_match_data(&pdev->dev);
- 	if (!macb_config)
--		macb_config = &default_gem_config;
-+		return -EINVAL;
- 
- 	err = macb_clk_init(pdev, &pclk, &hclk, &tx_clk, &rx_clk, &tsu_clk,
- 			    macb_config);
--- 
-2.53.0
+I'd prefer to keep it simple for now and leave ipv6_find_hdr() as a
+potential future improvement if needed.
+
+But happy to change if reviewersthink otherwise.
 
 
