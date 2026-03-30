@@ -1,234 +1,205 @@
-Return-Path: <netdev+bounces-273383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273378-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GBELCCsKy2kNDQYAu9opvQ
-	(envelope-from <netdev+bounces-273383-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:41:31 +0200
+	id UOyiEdYDy2kQDAYAu9opvQ
+	(envelope-from <netdev+bounces-273378-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:14:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65951362619
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:41:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 938D336249C
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:14:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BDC5B302C305
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:41:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B36D230022A7
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:10:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7233BAD84;
-	Mon, 30 Mar 2026 23:41:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54063A75BB;
+	Mon, 30 Mar 2026 23:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="MbuYaueX"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="pN/DWH7B";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="TwTxOO0o";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="pN/DWH7B";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="TwTxOO0o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD1936AB54;
-	Mon, 30 Mar 2026 23:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0CA3939BC
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 23:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774914087; cv=none; b=kqAo6gsJzdji2QIMT9Ws9oElmDI4RVPU9DaduE1Ws9w50+7c14ehE6MdmhaSiPqeFAQCDZ2Uutr70cTAH2fHpWv1cOwv/2QLJP0aMu8HvtVmFRRHTzfkSVH/0TM0DIwWMdsSmivJZROx4zWvViXNLf/VCeYQj29CYJdIT9HLS6Q=
+	t=1774912202; cv=none; b=gKXCSq2/zvBMeI4g/kFB8k5e0JU8irt8q4BNR1cTE0SRIGzHqd6k7QiqSZvJrN1SNoky/Tz6vmFmo9/tIxVJG3cQQjqdA9eSfXTHvfRrQPNxi2wSPlSKRDmFv6IIKtLmKwanr1Bh4oCw5UwFCBhnrKFfQNWHezfuySss9XLaM5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774914087; c=relaxed/simple;
-	bh=Wsb68vwebu5k5GbIZ4m7HzQHX0mtcKHGVK4H/spGrgw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JVnx6tlXPQvo2dfbgAG6ijzehOigNmcSt8KT0qksXaVH+jx9RcfhUcj38cOYqbcT9A3WdqAyl54ioP0wXa9nc4lDTZAsNU/baJ/ecHJkzICkW+uwD0Bk2BllpmsbaIdNBh0W3SpdRtpOSp/6AdYPLbRiwMH9azTwBtn0wwXq8nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=MbuYaueX; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1w7LeK-002rCb-89; Tue, 31 Mar 2026 01:04:00 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=SqFNvY1V+aOz8GRhxciZ/yNPa759gjISZHD7MtM/Fmg=; b=MbuYaueXdMQp3bLFmRL8FrrdFK
-	YG+4GryjUIHI3irD+p5oUWptBWhztRePe4mUiF0Tlx7WPDuWnEH3BSOBI2Hcvs8mUonnf5OJkC0e1
-	l4JStv8HZsIewiWqcI/kaFH7P9VDrh0tVvNiiXi8hw9ySV+yFlnf+JRTM3g7UEIdjgJ1LZaRYKHwq
-	4KlLft08Jvx8tiFmg7SSNIx7I77UCKTUX47sWwP0yAhGJgTNzT5PORenOwtVzi2aUIIWmiIjZB7/J
-	WWhQISfgt2cZvnDOqoptGzEWzHzaTqZtTEQO+nATgc/APm3MGVhcTJrtVxLUqzjTvTmyOKo05ZMvd
-	mHc9I1Bg==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1w7Le8-0006EB-KT; Tue, 31 Mar 2026 01:03:48 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1w7Ldp-007xmP-N0; Tue, 31 Mar 2026 01:03:29 +0200
-Message-ID: <27fa6e91-02a5-46cd-8c95-b75fd2c5fa08@rbox.co>
-Date: Tue, 31 Mar 2026 01:03:23 +0200
+	s=arc-20240116; t=1774912202; c=relaxed/simple;
+	bh=je0nK5GYgw4YWy/87+u34k0PPJBhDhJUBSziNOQACTc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gwi+9LeAst6HOrsPJz4WOqhzM9KmRvRq7pgO+UNAEgXbORqB6VDxDDmWIDCj+7qcBkFFq6C4UVbQiza/B2juFTWenh8d5IsUhI1nSA3ktXm9H90wjvKTbMFTAa6JkqAQ0/BK7skh9sUGoF8bkepPHIkbPn+g7bFPkyBjeQeeqZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=pN/DWH7B; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=TwTxOO0o; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=pN/DWH7B; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=TwTxOO0o; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 272C54D267;
+	Mon, 30 Mar 2026 23:09:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1774912197;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=je0nK5GYgw4YWy/87+u34k0PPJBhDhJUBSziNOQACTc=;
+	b=pN/DWH7B+3f/367yUERIqospKSvUnkVHx07ywRM5WYA1kQL4mwaA2vqQehQ49Dm+pT0b8U
+	S2hFT7QaN3R7M0DylIxD6yK7YWvzqQJTUusVfSmDSxQ/R4Ez1uMEgkTltF2h0DHalR+TQS
+	ONB4Sc/GRjTW1NfGH1R7RI6mGuw3Y3w=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1774912197;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=je0nK5GYgw4YWy/87+u34k0PPJBhDhJUBSziNOQACTc=;
+	b=TwTxOO0obSlo/RCv5hZfn22IM7haTn0EyQJ22X0M6Emak33dMD+/vcHoReV4o/I+PkRifc
+	OivNIGbajwB687Bg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b="pN/DWH7B";
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=TwTxOO0o
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1774912197;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=je0nK5GYgw4YWy/87+u34k0PPJBhDhJUBSziNOQACTc=;
+	b=pN/DWH7B+3f/367yUERIqospKSvUnkVHx07ywRM5WYA1kQL4mwaA2vqQehQ49Dm+pT0b8U
+	S2hFT7QaN3R7M0DylIxD6yK7YWvzqQJTUusVfSmDSxQ/R4Ez1uMEgkTltF2h0DHalR+TQS
+	ONB4Sc/GRjTW1NfGH1R7RI6mGuw3Y3w=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1774912197;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=je0nK5GYgw4YWy/87+u34k0PPJBhDhJUBSziNOQACTc=;
+	b=TwTxOO0obSlo/RCv5hZfn22IM7haTn0EyQJ22X0M6Emak33dMD+/vcHoReV4o/I+PkRifc
+	OivNIGbajwB687Bg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C10A54A0A2;
+	Mon, 30 Mar 2026 23:09:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id cMOQLMQCy2nJZgAAD6G6ig
+	(envelope-from <pvorel@suse.cz>); Mon, 30 Mar 2026 23:09:56 +0000
+Date: Tue, 31 Mar 2026 01:09:51 +0200
+From: Petr Vorel <pvorel@suse.cz>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	Valentin Lefebvre <valentin.lefebvre@suse.com>,
+	Yu Watanabe <watanabe.yu@gmail.com>,
+	Andrei Borzenkov <arvidjaar@gmail.com>,
+	Luca Boccassi <luca.boccassi@gmail.com>,
+	Luca Boccassi <bluca@debian.org>, ltp@lists.linux.it
+Subject: Re: [RFC] loading vmw_vsock_virtio_transport by systemd breaks
+ vsock_loopback autoloading
+Message-ID: <20260330230951.GB108555@pevik>
+Reply-To: Petr Vorel <pvorel@suse.cz>
+References: <20260320110224.GA140154@pevik>
+ <acqLo6-IQVBzY3UW@sgarzare-redhat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf v3 5/5] bpf, sockmap: Adapt for af_unix-specific lock
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Jiayuan Chen <mrpre@163.com>, John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Yonghong Song <yhs@fb.com>,
- Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Cong Wang <cong.wang@bytedance.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20260306-unix-proto-update-null-ptr-deref-v3-0-2f0c7410c523@rbox.co>
- <20260306-unix-proto-update-null-ptr-deref-v3-5-2f0c7410c523@rbox.co>
- <2192e9ef-894f-4826-b296-4f90e973a31b@163.com>
- <b9a956dd-ebb2-47ca-8b49-ccbba6ff9b26@rbox.co>
- <b21fac4e-891b-481c-9734-e95290e49097@linux.dev>
- <fa818820-c0c9-48dc-8ebc-661cb3349935@rbox.co>
- <dd043c69-4d03-46fe-8325-8f97101435cf@linux.dev>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <dd043c69-4d03-46fe-8325-8f97101435cf@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <acqLo6-IQVBzY3UW@sgarzare-redhat>
+X-Spam-Flag: NO
+X-Spam-Score: -2.21
+X-Spam-Level: 
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[rbox.co,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[rbox.co:s=selector1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[163.com,gmail.com,cloudflare.com,google.com,redhat.com,davemloft.net,kernel.org,fb.com,iogearbox.net,linux.dev,fomichev.me,bytedance.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-273383-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273378-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[rbox.co:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[codesearch.debian.net:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.cz:dkim,suse.cz:replyto];
+	DMARC_NA(0.00)[suse.cz];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,suse.com,gmail.com,debian.org,lists.linux.it];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mhal@rbox.co,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[pvorel@suse.cz,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	HAS_REPLYTO(0.00)[pvorel@suse.cz];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rbox.co:dkim,rbox.co:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 65951362619
+	REPLYTO_EQ_FROM(0.00)[]
+X-Rspamd-Queue-Id: 938D336249C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/26/26 07:26, Martin KaFai Lau wrote:
-> On 3/15/26 4:58 PM, Michal Luczaj wrote:
->>> Beside, from looking at the may_update_sockmap(), I don't know if it is
->>> even doable (or useful) to bpf_map_update_elem(unix_sk) in
->>> tc/flow_dissector/xdp. One possible path is the SOCK_FILTER when looking
->>> at unix_dgram_sendmsg() => sk_filter(). It was not the original use case
->>> when the bpf_map_update_elem(sockmap) support was added iirc.
->>
->> What about a situation when unix_sk is stored in a sockmap, then tc prog
->> looks it up and invokes bpf_map_update_elem(unix_sk)? I'm not sure it's
->> useful, but seems doable.
-> 
-> [ Sorry for the late reply ]
-> 
-> It is a bummer that the bpf_map_update_elem(unix_sk) path is possible 
-> from tc :(
-> 
-> Then unix_state_lock() in its current form cannot be safely acquired in 
-> sock_map_update_elem(). It is currently a spin_lock() instead of 
-> spin_lock_bh().
+[ Cc LTP ML ]
 
-Is there a specific deadlock you have in your mind?
+> On Fri, Mar 20, 2026 at 12:02:24PM +0100, Petr Vorel wrote:
+> > Hi all,
 
->>> The only path left is bpf_iter, which I believe was the primary use case
->>> when adding bpf_map_update_elem(sockmap) support [1]. It would be nice
->>> to avoid bh_lock_sock() when calling from all bpf_iter (tcp/udp/unix)
->>> where lock_sock() has already been done. It is more for
->>> reading-correctness though. This just came to my mind.
->>> has_current_bpf_ctx() can be used to check this. sockopt_lock_sock() has
->>> been using it to conditionally take lock_sock() or not.
->>
->> [ One clarification: bh_lock_sock() is a sock_map_update_elem() thing,
->> which can only be called by a bpf prog. IOW, has_current_bpf_ctx() is
->> always `true` in sock_map_update_elem(), right? ]
-> 
-> For all the bpf prog types allowed by may_update_sockmap() to do 
-> bpf_map_update_elem(sockmap), only BPF_TRACE_ITER should have 
-> has_current_bpf_ctx() == true. The tc prog (and others allowed in 
-> may_update_sockmap()) will have has_current_bpf_ctx() == false when 
-> calling sock_map_update_elem().
+> > there is a systemd bug [1] which causes vsock_loopback not to be autoloaded due
+> > previous loading vmw_vsock_virtio_transport in an early phase of boot.
+> > vmw_vsock_virtio_transport requires vmw_vsock_virtio_transport_common and vsock,
+> > vsock_loopback requires vsock.
 
-OK, so let's take test_sockmap_update.c:copy_sock_map(). It is a tc prog
-and it calls bpf_map_update_elem() -> sock_map_update_elem(), right? But
-running `test_progs -t "sockmap_basic/sockmap update"` shows (pr_warn() in
-sock_map_update_elem()) that has_current_bpf_ctx() == true. That's expected
-and has_current_bpf_ctx() would be false if sock_map_update_elem() was ran
-via a hook?
+> > Reproducer: [2].
+> > Proposed fix in systemd: [3]
 
-> The tc case of bpf_map_update_elem(unix_sk) is unfortunate and requires 
-> going back to the drawing board. I think checking unix_peer(sk) for NULL 
-> without acquiring unix_state_lock() is needed for the 
-> sock_map_update_elem() path, since changing unix_state_lock() for this 
-> unknown use case seems overkill.
-> 
-> Whether sock_map_update_elem_"sys"() needs unix_state_lock() is up for 
-> debate.
+> > While I think the bug should be fixed in systemd with proposed fix [3] we'd like
+> > to know opinion of the kernel vsock developers in case there is a way to improve
+> > vsock modules autoloading.
 
-All right, I'll re-spin the series reverting back to v1.
+> The original idea of vsock_loopback was to be used just for
+> testing/debugging, so maybe even the autoloading when no other transport was
+> loaded wasn't a great idea, but at the time we thought it might be useful
+> for testing.
 
-> For bpf_iter_unix_seq_show(), one thought is to add unix_state_lock() 
-> there before running the bpf iter prog. iiuc, it is what Kuniyuki has in 
-> mind also to allow bpf iter prog having a stable view of unix_sock. This 
-> could be a followup.
-> [fwiw, it was why I first thought of has_current_bpf_ctx() to avoid 
-> sock_map_update_elem() taking unix_state_lock() again if 
-> bpf_iter_unix_seq_show() acquires unix_state_lock() earlier. I later 
-> concluded (but proved to be incorrect) that tc cannot call 
-> bpf_map_update_elem(unix_sk).]
-> 
->>
->> Let me know if I'm correctly rephrasing your idea: assume all bpf-context
->> callers hold the socket locked or keep it "stable" (meaning: "sk won't
->> surprise sockmap update by some breaking state change coming from another
->> thread"). As you said, most bpf iters already take the sock_lock(), and I
-> 
-> Right, all bpf iter (udp, tcp, unix) has acquired the lock_sock() before 
-> running the bpf iter prog. afaik, the only exception is netlink bpf iter 
-> but it cannot be added to sock_map afaik.
+Stefano, thanks for info.
 
-And sock_{map,hash}_seq_show() (being a part of bpf iter machinery) needs
-to take lock_sock() just as well? Would that require a special-casing
-(unix_state_lock()) for af_unix?
+> In general, therefore, if you want to use the loopback, it's always best to
+> load vsock_loopback.
 
->> have a patch that fixes sock_{map,hash}_seq_show(). Then we could try
->> dropping that bh_lock_sock().
->>
->>> [ I would still keep patch 3 though. ]
->>
->> Right.
->>
->>> [1]: https://lore.kernel.org/bpf/20200821102948.21918-1-lmb@cloudflare.com/
->>>
->>>>
->>>> In a parallel thread I've asked Kuniyuki if it might be better to
->>>> completely drop patch 2/5, which would change how we interact with
->>>> sock_map_close(). Lets see how it goes.
->>>>
->>>
->>> If patch 2 is dropped, lock_sock() is always needed for unix_sk?
->>
->> For sock_map_update_elem_sys() I wanted to lock_sock()+unix_state_lock()
->> following Kuniyuki's suggestion to keep locking pattern/order (that repeats
->> when unix bpf iter prog invokes bpf_map_update_elem() ->
->> sock_map_update_elem()). For sock_map_update_elem() not, we can't sleep there.
-> 
+> What use case is being affected by the fact that vsock_loopback isn't loaded
+> automatically?
+
+It's actually testing. Only LTP test cve-2025-21756.c [1] used it.
+
+Reported [2], fixed in systemd [3].
+Of course we could call 'modprobe vsock_loopback' in the test, but now not
+needed as as fixed in systemd.
+
+I wonder who else uses the module. Searching in Debian's codesearch I see mostly
+testing code (+ now systemd :)).
+
+Kind regards,
+Petr
+
+[1] https://github.com/linux-test-project/ltp/blob/master/testcases/cve/cve-2025-21756.c
+[2] https://github.com/systemd/systemd/issues/41100
+[3] https://github.com/systemd/systemd/commit/7c1075fb8ff2d3b87fa463d542e2e00ac086cbd3
+[4] https://codesearch.debian.net/search?q=vsock_loopback&perpkg=1&page=1
+
+> Thanks,
+> Stefano
 
 
