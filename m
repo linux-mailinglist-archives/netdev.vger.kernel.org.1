@@ -1,162 +1,148 @@
-Return-Path: <netdev+bounces-273074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273075-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6M1zA1cSymn54wUAu9opvQ
-	(envelope-from <netdev+bounces-273074-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 08:04:07 +0200
+	id AMpOHrsYyml85AUAu9opvQ
+	(envelope-from <netdev+bounces-273075-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 08:31:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65C0A355D13
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 08:04:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB82F355F28
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 08:31:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 26A1230063AE
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 06:00:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 77B45301CC57
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 06:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D87D392C3C;
-	Mon, 30 Mar 2026 06:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F316A394487;
+	Mon, 30 Mar 2026 06:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OjhY0RdT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sAap5ILN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B13391826
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 06:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C714B3939BD;
+	Mon, 30 Mar 2026 06:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774850433; cv=none; b=QoMAZr6lQsqIocoaVyTr96Yc+4Fd++9aaqwJOhlUwPFwP2HwHHZh6dm0nf6ZP240+WmXoA2VwFMkcJpP92n3Etw2VMpwlXpBRrXsFMrGkSrSjzTJXy9JPELGdVwN3ZQWq3dL0WPBDCNqlFxUbQNIUFR7uMPmV98wYlxW5qbCKjQ=
+	t=1774852200; cv=none; b=ZE8+zWOH/xFU4y0/V7Av4QvE3iF1mXtb2BRrU6M3nnuahze+9aoxdV/qYsh2QdxieB1f45IMcMLlFhpRiNJ+SP/OCjwyH2ORc5Tj3uGCH3q8+Jb/N2hOmgdmuyc7/aTWSVl36rnqXlksnuedHEXcnlcriLHhYR1P003ngQJ9wwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774850433; c=relaxed/simple;
-	bh=MtA7daWwhSx1HAEKj0tFdWyfwEFe4uO0E13RPKrKK7Y=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Z/E83/Q4shNR0i593eDSjK9OstOcIwmwiC9+J5qx7I5jcSxHpAKKVgqqx2cFSESvC5USvf7ODuSESc9cCYXL5aGLRmt5DoD8STCGv+iFm2fOsDYsnMu72pLwXZOOlD/gkSuj2SHuPRydwnTpYPy2z0OB9BA8YqJUSi+v2BqF7ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OjhY0RdT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F36EBC4CEF7;
-	Mon, 30 Mar 2026 06:00:30 +0000 (UTC)
+	s=arc-20240116; t=1774852200; c=relaxed/simple;
+	bh=035aYXpJRW2cnLWGbph4ptLu8VVBvXeKIlejv+8hpVw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rKUB/HvM8idLE+VChDpRclsygw3OWSUrmo1TIejpatG0W/ADcsIyvc6h+ZF/sAIhlToychHSLMzLTFp6iCKD+Ks0Q7RYYQiV/FFpMzAmgeSFdNxeiZjCfimqeyjuJ3bhywmWeYDpF3vIXajMQhUNbuDd/ZV7ie5vlrtYCNUAZKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sAap5ILN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0708CC4CEF7;
+	Mon, 30 Mar 2026 06:29:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774850432;
-	bh=MtA7daWwhSx1HAEKj0tFdWyfwEFe4uO0E13RPKrKK7Y=;
-	h=From:Date:Subject:To:Cc:From;
-	b=OjhY0RdTwTvuePNbdDFzhk1G/jRqkif/pIizSXYqQ7ElK4XQk5FXWwY2IAIvht6tX
-	 24vhCXP6Rhi2Scz9hDwK7H1Ct16X0JGMUWGnHP5KgY2fPyJEUHpajvxJYGFcvJ0gz8
-	 l9CXYNU7yfMfTs20SaTidM81dArhPx4PpFJcoB+aC2/zYxCh1pUoDF/KVAzRQYfG5+
-	 q1/Tzb/SnXMe+gny0ki3sbR+B1lSJSQPTkll4bJF0Yc1BsLsXMqrje+rKJLeH/CZNF
-	 3lf85msSpnKF6/YT45VISMknysxjRFtKbrJFFXUy23ijVJ6L7YEmDgUeI3DizwjLA6
-	 lEBl7W5vFt1+g==
-From: Linus Walleij <linusw@kernel.org>
-Date: Mon, 30 Mar 2026 08:00:29 +0200
-Subject: [PATCH net] net: ethernet: cortina: Fix SKB leak
+	s=k20201202; t=1774852200;
+	bh=035aYXpJRW2cnLWGbph4ptLu8VVBvXeKIlejv+8hpVw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sAap5ILNduf99Z2ehiqgpjwUfo5MqIvhYLE72v04gGyFNT1vPdmm2znMIBN/1WPxv
+	 KFsmu4d/uEKwe4XwHGphBp0Vw7GsXJYYR6ENvjTAL0kG+11TPgBF7lAskT6NKaKXv3
+	 SqpRuekj2IYI74IFT03P/UKrpKruyJc/fJrbTlvXFEZhcfnBYmP2r3QBNjMbvr6xs6
+	 X0Rgga6H6yaX5JaJ96l+QcsN4bSAW7HOePJIybS6egOCDftuDv/k3vMpPAGFTMgv5p
+	 zdmnBwa7Ysw4rlo8bnuuyuRkb457dCwRAwGl8aiZEoem/hIHfd217rZEav/6X6pLnq
+	 CcrmVuNPPxuXw==
+Date: Mon, 30 Mar 2026 11:59:41 +0530
+From: Sumit Garg <sumit.garg@kernel.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Mukesh Ojha <mukesh.ojha@oss.qualcomm.com>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+	linux-media@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
+	linux-remoteproc@vger.kernel.org, andersson@kernel.org,
+	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
+	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
+	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
+	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
+	trilokkumar.soni@oss.qualcomm.com, pavan.kondeti@oss.qualcomm.com,
+	jorge.ramirez@oss.qualcomm.com, tonyh@qti.qualcomm.com,
+	vignesh.viswanathan@oss.qualcomm.com,
+	srinivas.kandagatla@oss.qualcomm.com,
+	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>
+Subject: Re: [PATCH v2 02/15] firmware: qcom: Add a generic PAS service
+Message-ID: <acoYVdr4wBEqwFoM@sumit-xelite>
+References: <20260312062756.694390-1-sumit.garg@kernel.org>
+ <20260312062756.694390-3-sumit.garg@kernel.org>
+ <20260313072450.sx7vqtvh62nflhff@hu-mojha-hyd.qualcomm.com>
+ <acE3MR4SVCPUzcgR@sumit-xelite>
+ <2da6cbcc-677d-4ba8-9762-ecb47b157f21@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260330-gemini-ethernet-fix-v1-1-18783a45d13a@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MQQqAMAwEvyI5G6itivgV8VDqqjlYpRURxL8bP
- M4yOw9lJEGmvngo4ZIse1SoyoLC6uMClkmZrLGtcc7wgk2iMM4VKeLkWW5uTR1sFxo3+Yr0eST
- o/FcHUonG9/0AqHSZoGoAAAA=
-X-Change-ID: 20260330-gemini-ethernet-fix-604c28c53da1
-To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- =?utf-8?q?Micha=C5=82_Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>
-Cc: netdev@vger.kernel.org, 
- Andreas Haarmann-Thiemann <eitschman@nebelreich.de>, 
- Linus Walleij <linusw@kernel.org>
-X-Mailer: b4 0.14.3
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2da6cbcc-677d-4ba8-9762-ecb47b157f21@kernel.org>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[googlemail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,rere.qmqm.pl];
-	TAGGED_FROM(0.00)[bounces-273074-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273075-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[oss.qualcomm.com,vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 65C0A355D13
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EB82F355F28
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Andreas Haarmann-Thiemann <eitschman@nebelreich.de>
+On Fri, Mar 27, 2026 at 02:39:24PM +0100, Krzysztof Kozlowski wrote:
+> On 23/03/2026 13:50, Sumit Garg wrote:
+> >>> +
+> >>> +#include <linux/device/devres.h>
+> >>> +#include <linux/firmware/qcom/qcom_pas.h>
+> >>> +#include <linux/kernel.h>
+> >>> +#include <linux/module.h>
+> >>> +
+> >>> +#include "qcom_pas.h"
+> >>> +
+> >>> +struct qcom_pas_ops *ops_ptr;
+> >>
+> >> Should this be static ?
+> > 
+> > It was static earlier in v1. I dropped it based on earlier v1 discussion
+> > with Krzysztof. Let me conclude that discussion on the other thread
+> > again.
+> 
+> The discussion was whether this should be singleton in the first place,
+> not making it a global singleton.
+> 
+> Of course it cannot be anything else than static - nothing should poke here.
 
-Under sustained RX load (e.g. large file transfers over the network), the
-device freezes completely and requires a hard power cycle. No kernel panic
-or oops is produced; the system simply stops responding.
+Sure, I have put the static back for v3.
 
-In gmac_rx() (drivers/net/ethernet/cortina/gemini.c), when
-gmac_get_queue_page() returns NULL for the second page of a multi-page
-fragment, the driver logs an error and continues — but does not free the
-in-progress skb that was already being assembled via napi_build_skb() /
-napi_get_frags():
-
-    gpage = gmac_get_queue_page(geth, port, mapping + PAGE_SIZE);
-    if (!gpage) {
-        dev_err(geth->dev, "could not find mapping\n");
-        /* BUG: skb leaked here */
-        port->stats.rx_dropped++;
-       continue;
-    }
-
-This path is distinct from the similar block in gmac_cleanup_rxq(), which
-correctly only logs "could not find page" without an skb in flight.
-
-Each occurrence of this error path leaks one skb. Under sustained traffic
-the leak exhausts kernel memory, causing the observed lockup.
-
-Free the in-progress skb via napi_free_frags() before continuing, matching
-the pattern already used elsewhere in the driver.
-
-Fixes: 4d5ae32f5e1e ("net: ethernet: Add a driver for Gemini gigabit ethernet")
-Signed-off-by: Andreas Haarmann-Thiemann <eitschman@nebelreich.de>
-Signed-off-by: Linus Walleij <linusw@kernel.org>
----
- drivers/net/ethernet/cortina/gemini.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
-index 4824232f4890..723d90d5fdf3 100644
---- a/drivers/net/ethernet/cortina/gemini.c
-+++ b/drivers/net/ethernet/cortina/gemini.c
-@@ -1491,6 +1491,10 @@ static unsigned int gmac_rx(struct net_device *netdev, unsigned int budget)
- 		gpage = gmac_get_queue_page(geth, port, mapping + PAGE_SIZE);
- 		if (!gpage) {
- 			dev_err(geth->dev, "could not find mapping\n");
-+			if (skb) {
-+				napi_free_frags(&port->napi);
-+				skb = NULL;
-+			}
- 			continue;
- 		}
- 		page = gpage->page;
-
----
-base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
-change-id: 20260330-gemini-ethernet-fix-604c28c53da1
-
-Best regards,
--- 
-Linus Walleij <linusw@kernel.org>
-
+-Sumit
 
