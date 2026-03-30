@@ -1,258 +1,291 @@
-Return-Path: <netdev+bounces-273214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273216-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ON7xLgqLymn09gUAu9opvQ
-	(envelope-from <netdev+bounces-273214-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 16:39:06 +0200
+	id GBXOGKmLymn09gUAu9opvQ
+	(envelope-from <netdev+bounces-273216-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 16:41:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B7E435D02F
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 16:39:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B77F035D0D0
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 16:41:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D03503017FA3
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:28:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 876633093E0F
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BBE43A63FD;
-	Mon, 30 Mar 2026 14:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B67B2EC562;
+	Mon, 30 Mar 2026 14:33:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="rNcoS1WG"
+	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LeyyIUo0"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010037.outbound.protection.outlook.com [52.101.61.37])
+Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22EEB3A1A42;
-	Mon, 30 Mar 2026 14:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774880825; cv=fail; b=ICP5BMU6mf/MzZbjQKO1nZe0jxYc6lpPg2Ws5bTdS3Bqmm8YjDt+lT84UTMPVwuZonfGSkK3yTLbFtPUn2I0Sv4PAn6tZdrDlNXLFjQ2gFA9a79l5bMAWrk8sZHRh9olpWIYbgarzG9QOqZ4iVDgAgevHLbFjESXGoYy+N5NH7c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774880825; c=relaxed/simple;
-	bh=9BUkAh4wgEGRTcktG6F1OgKfKnBCby9BhFhnGMmzyuw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=R2OhMzcOB9cW6HnFH46jRJ89KAnB35AIi4O9rPx3U57nMYMPHSI5Ccl1WxC2/alh/DrsvpFzQOoOhXIvPtnyfDCUciZbz/vDJ2lpJCoMZm0Jbz3l97BWfuCS8VZHL3qOMyxta/1CmTC/Hi8NjZXI/+mq9zXBBgEOf44FE7x0SAI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=rNcoS1WG; arc=fail smtp.client-ip=52.101.61.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kp9zZtJMhEfHKSvceWd7JSD+dBTs/bAkQ7BbkDYQqCUIOaRchPALHEfsZH3a/lmP0BOS5+wzbw7LNXUNDjhy9lND3t1q2NDPAY2lQykgIXSLBLDiG5wZ71IsEvwpAmwtk1EwGdxqEjp7L194Aj0dd/Rva00VXXeKdPR3b2vCp1Z7Votgi+Kr8QBoBwcmqst9OV6xzWN2nRqt+uQiSWh3cCokWF/QU9XkT23/53ZaTUhMor0gzd1yzvdYZkhQuevE+Rg/OYrwX10vg5a7jDvRdlzmo5FxtutWAVRJJy3YQZ9odfDwVKL6FiuxHH1bUPRLnQNrcKXrv1tC0ha4aAlGDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ha2GMFALJvEN8eFo2ggyS18xUQl5bp/V4/whRaXqgzk=;
- b=o1ORqzPbl6d0zen0KXfRSNSODbu1KxXHwBSkkSChhKWWuH19kRMzKmILM7vPAvC60Kx3fFA88n6hbQdaGGsr6BOs4edrxIPOeMWhsRZBIkC/nbxlS3T8oyk6Z/MjOEWweizSDjRZYRTU1wQV2qyzrdMgHS8cvjpXnptidrkzobbnFjzgDlCu1DiUNntJwfRJ8x+32dwK+BqFizAZRUynbME7FsXOUU/lRcaFz3OzX+p1i2lDWPokKYs6ONaKdulhEilc0NQt77y6Vi7Tkwa603My5KLY65f5ZyNiz0OZY/G1j1nI3dMEr3w1Ki6BrxvubIMKaMEeIrHqLjwHNkPnQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ha2GMFALJvEN8eFo2ggyS18xUQl5bp/V4/whRaXqgzk=;
- b=rNcoS1WGMxWbTfCgU9s9HMtDEldJfjQSSzt/X5zj7pCKbsywSXeWhPJXwyL/yCXcL5zb5FoM/5c+NxdhiwMYLLPLNqfPRQL4u5nDbJiGxsXb8TAB3zNvulqKJXh0hHxv1b97ntOOwFkL6l4que2vyNgHmLGo099VicJnwzmN0Gc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by SN7PR12MB6714.namprd12.prod.outlook.com (2603:10b6:806:272::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.15; Mon, 30 Mar
- 2026 14:26:58 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::9e55:f616:6a93:7a3d]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::9e55:f616:6a93:7a3d%6]) with mapi id 15.20.9769.014; Mon, 30 Mar 2026
- 14:26:58 +0000
-Message-ID: <8737035f-07e9-4c14-93a9-bb542197d7f7@amd.com>
-Date: Mon, 30 Mar 2026 15:26:41 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v24 10/11] cxl: Avoid dax creation for accelerators
-Content-Language: en-US
-To: Alison Schofield <alison.schofield@intel.com>,
- alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dave.jiang@intel.com,
- dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Davidlohr Bueso <daves@stgolabs.net>,
- Ben Cheatham <benjamin.cheatham@amd.com>
-References: <20260323113117.2352709-1-alejandro.lucero-palau@amd.com>
- <20260323113117.2352709-11-alejandro.lucero-palau@amd.com>
- <acNPnzDryNIQlTFS@aschofie-mobl2.lan>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <acNPnzDryNIQlTFS@aschofie-mobl2.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: JN3P275CA0128.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:d0::10)
- To DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E7D2E7623;
+	Mon, 30 Mar 2026 14:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774881188; cv=none; b=Hgx0GW7MQoSXimZsnUKxt9llb7OWyz1h8lwFT7BF+E2mackAIxx0lulYbXKiZEDyXpejWU8uG/i00QFkNIAitEWRFQ0XTvpvc02WXs5G539kwa0e3xBiD302yMKYLVkVovLI9dciEmA7MUgDuxDO9wgaqkJ7O12i1PuT6ks3Ugs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774881188; c=relaxed/simple;
+	bh=qXyMA/3yrrPgyhk87wJOL1csRZbxo4+mbkZUAZM/io8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AzGcjNd9aU+sE3SX1HZAS8XFI58lYqwFIE+xUHve1zPx6esBTlt9iWvRWqEGxZXb7/JgHgpMV4gjjBs63OUlrBYO+CR10cPPXfveeU45Gqn/lVLhbUnWmh9hqe7m9uENcNoW9jm0+PMhpS8ClYl6DZxYsZheh8P2j/MKlU6jtHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=LeyyIUo0; arc=none smtp.client-ip=130.117.225.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=virtuozzo.com; s=relay; h=Content-Type:MIME-Version:Message-ID:Date:Subject
+	:From; bh=ykovE9Ss5bS4WvX5GU5qRjuShXMBEAaY8t91/xSP7TU=; b=LeyyIUo0IQMuI2+1YjG
+	y8j6KFNBWSAd9qTpze3MRd5gEQuaoTDGuA7NY1niouI39T3zhw+x1uqt9XDr3CxL8u9HBkPln18Po
+	fE11EIitaV+FppRj8Mc1awBVVUcG6UcOy9bbY+zoTNjOnQuYzfKv4WtuWv7WtlnJSfnt9KMwXUlEB
+	Oh6QhttlE7kG2W0F8A+9B4nAh+BbKN2RZPaFj2OKQmwwF3ZjOVOTO1aRw57XMl+kIEVVb1DCLOruF
+	QqPG+4fP2jQp1boS12vrB9N/CVWCKcpvnmfxLATBP2966lh1Xd0FPRSIRqM/hhIVsdQsqJ8Kpw+rw
+	mwO9PWIA4U1JEug==;
+Received: from ch-demo-asa.virtuozzo.com ([130.117.225.8] helo=f0.vzint.dev)
+	by relay.virtuozzo.com with esmtp (Exim 4.96)
+	(envelope-from <khorenko@virtuozzo.com>)
+	id 1w7Dde-009NzU-1F;
+	Mon, 30 Mar 2026 16:32:48 +0200
+From: Konstantin Khorenko <khorenko@virtuozzo.com>
+To: Peter Oberparleiter <oberpar@linux.ibm.com>,
+	Mikhail Zaslonko <zaslonko@linux.ibm.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Vasileios Almpanis <vasileios.almpanis@virtuozzo.com>,
+	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Konstantin Khorenko <khorenko@virtuozzo.com>
+Subject: [PATCH 0/1] lib/zlib: fix GCOV-induced crashes from concurrent inflate_fast()
+Date: Mon, 30 Mar 2026 16:32:54 +0200
+Message-ID: <20260330143256.306326-1-khorenko@virtuozzo.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|SN7PR12MB6714:EE_
-X-MS-Office365-Filtering-Correlation-Id: 71a982f8-756f-4653-8679-08de8e686698
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|22082099003|18002099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	rKnMrSc5/egiF5nzl/Ce33g4HNlt9fHeUIvpahPoIZFm+CuJe1ExTnsqIJDV1yMdPfwyYYIzvRnLPzirZvakbUEm/dJKLYw22A+kfsRdijkiwZ2eujzzxfCe9/SYy31m4BPymjUTIHjsLYAwRN0TZ7x6ZwY5xC9L8XSXVgdTrVamyf/MRlqdD2139E1O1kjYoeg+mcrWCmzpDEviG0F1i5m4j0px6pz1jZOs/Ks7Z04S3nwyoMwKjycP3FhZ2095mPbzmHSz8UtjqMzZ8HPUWiljSJ57Xq54OXybu6GOK1SC3tm34ITXEkjxKBp+oAH3pKZsKC6OBCdae0otp6McCfvNhxWxfhPbSZfhj45Rh+1bC1bHvTNoBKZQLTDLf+x8XOaBZBm/qkFNSgJsGB8PbRlBRIKPstNP7r9uvTvv/tWQiL5bLxJqmVZg2nTgjKyrPaQYNTP7QjPFFWFtVPWVmeu5FLjixJM1YKOii9lZ733VahwJ9B89bik/W9hl8NyKRAhBVPTySzKrYE50ZzHLdD6Mn/16V6SPrvJ6KLUTcYa6IUSaJnFHvZOZTWhkOiDoBFlymybdc8C5ddxifWaIBLzUVWoLYmuGuafwAAfggSlU78povRuvrUJ2MVnaaZ0iGS5ZHNKYK7/rrsAppStjS1IX3mEuiWH5KjBeVWRVDBdqxs9eC9D4SjejldFrJNgZkdKnQQnJbRCxoyQii2iev7iHZOAc138jY9BuN3f7Wek=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?R0MxNTJHLy91eWRTblIrOWRRa3B1Yytac1NkcUd4WUNBanExQ3hHRk1IVG9G?=
- =?utf-8?B?NVZ3akU5UVZMUmZBY040QWk4UEZTY2ZaZTJOZ25KKzVuNGVRNzFBTlVZVXNK?=
- =?utf-8?B?aFZPMVp6VjkzaDZ0TXp4MVFUUDhIYnFqVzNOZGtmTkg3WEVkb0J0dEpDeG5H?=
- =?utf-8?B?bVBueldLa2dMNXBsODZXb0JBdXN4RDVQUTRzTys2TUZUSHVSU3A2OVYwaVNl?=
- =?utf-8?B?TTlLbDl2OWkvVjZRYjI1UmtpRUNMQ091Wi8wTWtXbzZLU0RXdkZPb1NobVFQ?=
- =?utf-8?B?TlNLZDFDTkdENjd5TVJWb2FJaWM0WmNpWkVvY0NqY1U0OGhIdDhiMzNIRkY0?=
- =?utf-8?B?VHBEN05DMDlqQWVnK1RhSkNocXNSQnZuZXlLNFRPMzBiQm1WUks1cFJEbmRW?=
- =?utf-8?B?YjlzcWliaFFGQ3ZpVEJxTytKSUc3Y1lPb1JPUjdLZDdPQzNjcDNQbDhkMllQ?=
- =?utf-8?B?M0pBTGpGRlRKaGRFSDhzWVFSUlZGdFZXR0padmU2VHdZcjgwdGNCWUNMRjUr?=
- =?utf-8?B?T3FPQ2NXMjJFVkp4NmEyR1J4aGREa0haYmlMNFllOWRKWHc0cnplWDBVSkQy?=
- =?utf-8?B?RWl2SENzMXFweGNOSy9qSFVzMDlXTjI2TjkybU1MWTl5TWc5L2NIbkkwclBv?=
- =?utf-8?B?bEEvcVRXQlRwdFp0bGkrUlRSUVIra2xtc1dpUG4wT01FdC9HNWJ0V1V2OG5m?=
- =?utf-8?B?dk91RVVzMDFXbmZGQUlzb3BIQlhYZ1dEV0trK3p3MU9Mb0Q0U0c0dVlVVHJp?=
- =?utf-8?B?SnYxZ042VGtlazR4Z1Exd1J6VnhML1VMMEdHVHFPSFZpWEZSOTZBQkMrcGM5?=
- =?utf-8?B?Q2JLd1l4TVhVUDNTVVVwL1NGOUdGR0VmVTJmQmdTMDBSa2UyMGdqSmFNbVhM?=
- =?utf-8?B?bGpBMG44bVJZeHp4SnYybzN3bmhwOGozOUVFMWZZallRdGpVUjZjY3dFNGI5?=
- =?utf-8?B?Yy9RNEpNNWNJUjlBb1BxUGVESUx3bGxPNUw5aHVYN2h6bkZsMFowRWdPZmY1?=
- =?utf-8?B?STAzY2tlV2ZCc2RFdjB5dDRoa3BibDNOd1FIZXlFdzgrY245a0lGbGxZRUNV?=
- =?utf-8?B?bnVYNDJiL05ZZy8zMEpRQlVobHRNSVIzMzZtbWJ6UTdaYVBrb0xHelFmK1NM?=
- =?utf-8?B?RHhKMGNaTkdqNjN2bzgreUNXeDY2T2hhL0VLOEhQWlN2WDdwOWd0MXg5VFRY?=
- =?utf-8?B?cm9nSG9NTjVNTThlWXcyWHJJQ1A1ZndqTUtZVFI4VjB4ang2NkF0Mm0rY1Mx?=
- =?utf-8?B?aHAxREVhdXgvWlQ1THV3MkM2MzRZZ1JGbU05RUc4WlJ5Z2NOS3VBRlRmL2p5?=
- =?utf-8?B?Q1Z6SmJNcXlPc0NCM0FKVTZPTlJDZGVwcVZpcHlUYmpSZ2pTaVI0RWNpcm9U?=
- =?utf-8?B?MWE0cVQxQWhqd1FEMTFWWWtaa1hDMjhmZkJ0RktZRXJROWpQblJmVUZBTFh5?=
- =?utf-8?B?blFWbk1Mdmw4bTFtMHE4dld6YThiTDE2M0U0dnQzbUZoa2FlU2pVY2J2bVFs?=
- =?utf-8?B?M09IR3llMWJ4VCtxeDEyOFZheU03WTFvU2FzdjFpakYvbEFnZGtzMVMxaXM4?=
- =?utf-8?B?Zzg2UjM0c2E3SmttcU9BWGdQNGpUMzdaK0VBNlVMcm53R1UwOHRQUjlBL09q?=
- =?utf-8?B?cjBqWnR0RDhzdUJ1VWRRb3VYYXZjN3hzVm1iQ2JEUkJBV2tpYU9id0lxSCt1?=
- =?utf-8?B?M0l6c1hwTnA3Q3kvYk5vcVFSS2ZDS1RPS0c4VjU5Um13enN2cU51YWRod1pl?=
- =?utf-8?B?b1l5ek1vdkZVTlRQMHViZXVrb2FwTHVhay9tVmFPYktXc2dZOThweWtHUE5x?=
- =?utf-8?B?WHJzb3llTmNYRytjQ1hvTFhIRTRVM0pRRjEyN0h0dVZ5YkdlQUNGbytldC9m?=
- =?utf-8?B?cU0wZUdjUFMydVNEMitIcmNSWnQ1TnJ5Vll3Wmg0aDdlWWxXd3VxSzhOWnhR?=
- =?utf-8?B?VXl6SHRtaG9ocllGV2JlUU5rWFZrM2NJdmhmUVczb1h4SVZjV0g1M0NPbnFj?=
- =?utf-8?B?eDRvOTZJNml4ZFVoQVVUOGd1YkdKaXNaMUQ1SExsMndtcVF6RlhTcjRBQ3di?=
- =?utf-8?B?TWpXWThBRWlhbEN2ODJKa1NXZFlIOEZMTnJCWExZcjU2eE15bE1WM0RXbmxq?=
- =?utf-8?B?bjlRR0s2ejVlKzlxWGdVOC8yZU9XVzhwcTBWSnorTE5UZTNCYXdHY2dkVVNu?=
- =?utf-8?B?c2dsZ0JYODlwRnZzcTU0NmpGRUVCeEY1ZkN0LzlNT3RpTEJJVGlDQ3czb1dH?=
- =?utf-8?B?N0pSZnBTUFpDVzVnazUvbGJ0cExHSXR6NFlvblF4bTNJNnVXOFpDRlpKcFZ5?=
- =?utf-8?B?QW5MSitoaUFyR1RwZUQwMWZTOWZsUk5ZNFI4UnZiLytwdWNYUEZVQT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 71a982f8-756f-4653-8679-08de8e686698
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2026 14:26:58.6391
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vUnbn3YD7fGbqpqWtk8WQM1W7RNrvRpDvFRcUqhNrR37YvVSd4TaaOZC9XHXwb8QnS4iVh6nElYnTzGSi9RSNA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6714
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=relay];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273214-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-273216-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alucerop@amd.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[khorenko@virtuozzo.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[virtuozzo.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,amd.com:dkim,amd.com:email,amd.com:mid,huawei.com:email]
-X-Rspamd-Queue-Id: 4B7E435D02F
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,virtuozzo.com:dkim,virtuozzo.com:mid]
+X-Rspamd-Queue-Id: B77F035D0D0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+## Summary
 
-On 3/25/26 02:59, Alison Schofield wrote:
-> On Mon, Mar 23, 2026 at 11:31:16AM +0000, alejandro.lucero-palau@amd.com wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> By definition a type2 cxl device will use the host managed memory for
->> specific functionality, therefore it should not be available to other
->> uses.
-> Hi Alejandro,
->
-> I'm wondering if we're skipping too much, or perhaps just needs
-> a clarifying comment?
->
-> Commit message says 'Avoid dax creation...', that's specific.
->
-> Commit log says 'should not be available to other uses', that's less specific
+GCC can merge global GCOV branch counters with loop induction variables,
+causing out-of-bounds memory writes when the same function executes
+concurrently on multiple CPUs. We observed kernel crashes in zlib's
+inflate_fast() during IPComp (IP Payload Compression) decompression when
+the kernel is built with CONFIG_GCOV_KERNEL=y.
 
+This patch adds -fprofile-update=atomic to the zlib Makefiles to prevent
+the problematic optimization.
 
-Hi Allison,
+## Problem Discovery
 
+The issue was discovered while running the LTP networking stress test on
+a 6.12-based kernel with GCOV enabled:
 
-Would you prefer something like "should not be available to other uses 
-like DAX".?
+  Test:     LTP net_stress.ipsec_udp -> udp4_ipsec06
+  Command:  udp_ipsec.sh -p comp -m transport -s 100:1000:65000:R65000
+  Kernel:   6.12.0-55.52.1.el10 based (x86_64) with CONFIG_GCOV_KERNEL=y
 
+The crash occurred in inflate_fast() during concurrent IPComp packet
+decompression:
 
-> follow me ...
->
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
->> Reviewed-by: Davidlohr Bueso <daves@stgolabs.net>
->> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
->> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
->> ---
->>   drivers/cxl/core/region.c | 7 +++++++
->>   1 file changed, 7 insertions(+)
->>
->> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
->> index 8bb53a095290..2f9bdb4f1f4f 100644
->> --- a/drivers/cxl/core/region.c
->> +++ b/drivers/cxl/core/region.c
->> @@ -4263,6 +4263,13 @@ static int cxl_region_probe(struct device *dev)
->>   	if (rc)
->>   		return rc;
->>   
->> +	/*
->> +	 * HDM-D[B] (device-memory) regions have accelerator specific usage.
->> +	 * Skip device-dax registration.
->> +	 */
->> +	if (cxlr->type == CXL_DECODER_DEVMEM)
->> +		return 0;
->> +
-> And above says 'Skip device-dax' specific again, and is indeed skipped.
->
-> This escape is not surgically placed at the point where dax is added.
-> We are skipping a few other things before dax registration actually
-> happens. Why skip memory notifiers, shutdown_notifiers, poison setup?
+  BUG: unable to handle page fault for address: ffffd0a3c0902ffa
+  RIP: inflate_fast+1431
+  Call Trace:
+   zlib_inflate
+   __deflate_decompress
+   crypto_comp_decompress
+   ipcomp_decompress [xfrm_ipcomp]
+   ipcomp_input [xfrm_ipcomp]
+   xfrm_input
 
+Analysis showed a write 3.4 MB past the end of a 65 KB decompression
+buffer, hitting unmapped vmalloc guard pages.
 
-posion setup crashes with a type2 and I'm not sure if the memory 
-notifiers make sense for Type2.
+## Verification on Upstream Kernel
 
+We verified the bug is present in upstream Linux v7.0-rc5 (commit
+46b513250491) with both:
 
-If it is really needed, I would prefer to support it as a follow up.
+- GCC 14.2.1 20250110 (Red Hat 14.2.1-7)
+- GCC 16.0.1 20260327 (experimental, built from source)
 
+We compiled lib/zlib_inflate/inffast.c with the kernel's standard GCOV
+flags (including the existing -fno-tree-loop-im workaround from commit
+2b40e1ea76d4) and inspected the assembly output. Both compilers exhibit
+the problematic optimization.
 
-Thank you
+## Root Cause: GCOV Counter IV-Merging
 
+When CONFIG_GCOV_KERNEL=y, GCC instruments every basic block with counter
+updates. In zlib's inner copy loops, GCC can optimize by merging these
+global GCOV counters with the loop induction variables that compute store
+addresses.
 
->
->>   	/*
->>   	 * From this point on any path that changes the region's state away from
->>   	 * CXL_CONFIG_COMMIT is also responsible for releasing the driver.
->> -- 
->> 2.34.1
->>
->>
+For example, in the pattern-fill loop in inflate_fast() (conceptually
+`do { *sout++ = pat16; } while (--loops);`), GCC may generate code that:
+
+1. Loads the current GCOV counter value from global memory
+2. Uses that value to compute the base address, start index, and end bound
+3. On each iteration, uses the counter as both:
+   - The value to write back to the global counter
+   - The index for the data store
+
+This optimization is valid for single-threaded code but breaks when the
+same function executes concurrently on multiple CPUs, because the GCOV
+counter is a single global variable shared by all CPUs.
+
+### Assembly Examples
+
+**GCC 14.2.1 (Red Hat)** — pattern-fill loop without -fprofile-update=atomic:
+
+    movq    __gcov0.inflate_fast+248(%rip), %r9
+    leaq    1(%r9), %rax                        # rax = counter + 1
+    leaq    (%r9,%rdi), %rsi                    # rsi = counter + loops (end)
+    negq    %r9
+    leaq    (%r15,%r9,2), %r9                   # r9 = base - counter*2
+  .L42:
+    movq    %rax, __gcov0.inflate_fast+248(%rip)
+    movw    %cx, (%r9,%rax,2)                   # WRITE using merged counter
+    addq    $1, %rax
+    cmpq    %rax, %rsi
+    jne     .L42
+
+Here, %rax serves dual purpose: GCOV counter and memory index.  If another
+CPU updates __gcov0.inflate_fast+248 between the initial load and the loop
+iteration, the write address becomes invalid.
+
+**GCC 16.0.1 (experimental)** — same pattern, different register allocation:
+
+    movq    __gcov0.inflate_fast+248(%rip), %r14
+    leaq    1(%r14), %rdx
+    leaq    (%r14,%r8), %rdi                    # end bound from counter
+    negq    %r14
+    leaq    (%rbx,%r14,2), %rbx                 # base address from counter
+  .L42:
+    movq    %rdx, __gcov0.inflate_fast+248(%rip)
+    movw    %si, (%rbx,%rdx,2)                  # WRITE using merged counter
+    addq    $1, %rdx
+    cmpq    %rdx, %rdi
+    jne     .L42
+
+Both compilers merge the counter with the loop IV; both are vulnerable.
+
+**With -fprofile-update=atomic** (GCC 14.2.1):
+
+    movq    %rdi, %r9                           # pure pointer
+  .L42:
+    lock addq   $1, __gcov0.inflate_fast+248(%rip)
+    addq    $2, %r9
+    movw    %ax, -2(%r9)                        # WRITE using pure pointer
+    subq    $1, %rdx
+    jne     .L42
+
+The GCOV counter update is isolated as a standalone atomic instruction.
+The write address is computed purely from local registers, making
+concurrent execution safe.
+
+## Why Existing Workarounds Don't Help
+
+The kernel already passes -fno-tree-loop-im when building with GCOV
+(commit 2b40e1ea76d4, "gcov: disable tree-loop-im to reduce stack usage").
+That flag prevents GCC from hoisting loop-invariant memory operations out
+of loops, which was causing excessive stack usage.
+
+However, -fno-tree-loop-im does NOT prevent the IVopts (induction variable
+optimization) pass from merging GCOV counters with loop induction
+variables.  These are separate optimization passes, and the IV-merging
+happens even with -fno-tree-loop-im present.
+
+## The Fix: -fprofile-update=atomic
+
+Adding -fprofile-update=atomic tells GCC that profile counters may be
+accessed concurrently. This causes GCC to:
+
+1. Use atomic instructions (lock addq) for counter updates
+2. Treat counter variables as opaque — they cannot be merged with loop IVs
+
+This completely eliminates the problematic optimization while preserving
+GCOV functionality.
+
+The flag is added only to lib/zlib_inflate/, lib/zlib_deflate/, and
+lib/zlib_dfltcc/ Makefiles to minimize performance overhead. Zlib is
+particularly vulnerable because:
+
+- inflate_fast() has tight inner loops that GCC heavily optimizes
+- IPComp and other subsystems call zlib from multiple CPUs concurrently
+- The per-CPU isolation (scratch buffers, crypto transforms) protects
+  data structures but cannot protect global GCOV counters
+
+Applying -fprofile-update=atomic globally would make all GCOV counter
+updates use atomic instructions, adding overhead throughout the kernel.
+By scoping it to zlib, we fix the known crash site with minimal impact.
+
+## GCC Bug Report Status
+
+A bug report for the upstream GCC project is being filed.
+
+i'm not sure if GCC team will accept this as a bug as the compiler
+optimization looks technically valid under the C standard (data races on
+non-atomic variables are undefined behavior), but it creates a practical
+problem for kernel code that routinely executes the same function on
+multiple CPUs.
+
+And anyway we need to fix/workaround the issue until/if the compiler is fixed.
+
+## Testing
+
+Verified the fix by:
+
+1. Compiling lib/zlib_inflate/inffast.c with and without
+   -fprofile-update=atomic using the kernel's exact build flags
+2. Inspecting assembly output to confirm the atomic flag prevents
+   counter-IV merging
+3. Testing on upstream v7.0-rc5 with GCC 14.2.1 and GCC 16.0.1
+
+---
+
+Konstantin Khorenko (1):
+  lib/zlib: use atomic GCOV counters to prevent crash in inflate_fast
+
+ lib/zlib_deflate/Makefile | 6 ++++++
+ lib/zlib_dfltcc/Makefile  | 6 ++++++
+ lib/zlib_inflate/Makefile | 7 +++++++
+ 3 files changed, 19 insertions(+)
+
+-- 
+2.43.0
 
