@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-273056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273055-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SCipE1HkyWlC3QUAu9opvQ
-	(envelope-from <netdev+bounces-273056-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 04:47:45 +0200
+	id CPTRLE7kyWlC3QUAu9opvQ
+	(envelope-from <netdev+bounces-273055-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 04:47:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF527354DEC
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 04:47:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17D1E354DE5
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 04:47:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6C8E4303FDEE
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4BB17303F7E1
 	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 02:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2A8396B70;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78641396B68;
 	Mon, 30 Mar 2026 02:45:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rd+Oknxh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kT+U+oJA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3AFA3939AE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD293939AF;
 	Mon, 30 Mar 2026 02:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774838718; cv=none; b=g0HsyCmUYTdSaA/yj5OL2tKSf8tRujlnWYF6OqzZpCHhKQi9/LiWuChc/JUMZSuqqYxUlIXVmeliKrvgciX91dCanflJDb8cbTMG9UMdSDGC28SYhgSeameZDBEYCOxI9SzTHFtH28NF7/QE8rWBnc3LeMNNIhDaBeAApOYP/O8=
+	t=1774838718; cv=none; b=c11kqI5PZyiJJ+nJs0oATJZ1HSypRU6vqZowhBZgn8YAXb7rnlLuxp6eqlUYE3mThpQY6Gj1baRquLJfWEzAxblgdyvE6TUPemnsk3Lk3rhZCTuaqFZmeSJssaIcrK6+W7VlxeC98q145XioZj3fsxqEKksF8rL5LGZagiTbq5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1774838718; c=relaxed/simple;
-	bh=WXpYpK3yhKn2sm0AMqrjWN6OL03+heVozAsWmGdd/6M=;
+	bh=YhIMr4yYwBZ5EllsEmbIO/ym48ayC5JDhQ8YCwvYqy4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=iaF5RXs11fvcsyJXZpc35xcEsDxcO4pne6TS1QAY7beWjVoVbxyC9E8bq9RByuG2XBf76SPn2BUf9rsit0x28kv1g80cU9ccoTnpbplXs7txl4uK7ty4K3vxp6Qe6d6GCyuYDC6KcvuEo5PwOpCtpqtc75hgcCnPvhM9cxLZjkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rd+Oknxh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C5170C2BCB5;
+	 In-Reply-To:To:Cc; b=Btvt+6GaAHi+ilDoYKvtNN1k0GP3ozozvJ6UdrMjMniVylRg4FAVFdUq/cuZZo5L1F7XJ7eomtacaLxJbAPhJoMBRqIWqZkxbEQ4wm9WZhQ3AEjzDZSq6Exa3yphcY4I5gm4+wQduLRG4HlNSJ3ZD3Xez4BWTG33xyWKsDOKPY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kT+U+oJA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D23E5C2BCB2;
 	Mon, 30 Mar 2026 02:45:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1774838717;
-	bh=WXpYpK3yhKn2sm0AMqrjWN6OL03+heVozAsWmGdd/6M=;
+	bh=YhIMr4yYwBZ5EllsEmbIO/ym48ayC5JDhQ8YCwvYqy4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=rd+OknxhIAKjWsUTjjsJym4N1MYvV2aWjvyw5LLjRWSFUrBnatF3i/luPIaM2+kDh
-	 2xp1YU9ZcIJZBFpd33odebeknIF4RnoXKtG/z8uyXsHiqOZtef9mu8xQPiwNPviUmD
-	 kdt2e4lMaI7FvTLQEnXkHzRTevFhurfMbQNQRdJIaE+iFlT0GqBmMqyLWPYMdmCOB7
-	 qac0JeUQiOycKj9Z7UycKknHwJKylD4FZJl5uIA/ysAv9jEQ5hT+YJM4mpKB5xyzQ3
-	 WXjUUd43SEu8pyOiNp6zHlWY9yGcwvR5C68ESjRiFZaDaTE8iwpO4d92WRI2Qk8xS3
-	 MH3+cNnTicQCw==
+	b=kT+U+oJAZyIxRAtDgVTRzxcEg4FTCHTNh4TziPcxfubv8KFYBMVKv0xsKbcGKWFaN
+	 mzZyif+OagQBy5a5LkoGK2jRTSPOFHqdet+vUEXUSHs17WGfmrFYZssWQOd7yeBV4D
+	 Dqyxi/uG7KBLFg5CaYFq4HVPTIi+YKbaE7xLRzmlrfDlN3jxr6rJGNweMNfbFKpGgj
+	 fRr14m6/xeht05GKoUbpruWzlBjM31CHspwUhM2OacWJJMujRvf9Whk8aVor8zKiFa
+	 /boW/ccDkLli8t3d8b6werWrq34CPyiJfFrLPzY2WuKCmOl7g0eMVg7PjzfjeaS9Cu
+	 rATSDVD8RC6Kg==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD3AAFF4935;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBB18FF4934;
 	Mon, 30 Mar 2026 02:45:17 +0000 (UTC)
 From: Satish Kharat via B4 Relay <devnull+satishkh.cisco.com@kernel.org>
-Date: Sun, 29 Mar 2026 19:45:21 -0700
-Subject: [PATCH net-next v3 5/6] enic: add type-aware alloc for WQ, RQ, CQ
- and INTR resources
+Date: Sun, 29 Mar 2026 19:45:22 -0700
+Subject: [PATCH net-next v3 6/6] enic: detect admin channel resources for
+ SR-IOV
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260329-enic-sriov-v2-prep-v3-5-19a477549ef6@cisco.com>
+Message-Id: <20260329-enic-sriov-v2-prep-v3-6-19a477549ef6@cisco.com>
 References: <20260329-enic-sriov-v2-prep-v3-0-19a477549ef6@cisco.com>
 In-Reply-To: <20260329-enic-sriov-v2-prep-v3-0-19a477549ef6@cisco.com>
 To: Satish Kharat <satishkh@cisco.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -67,11 +67,11 @@ To: Satish Kharat <satishkh@cisco.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1774838716; l=10146;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1774838716; l=2466;
  i=satishkh@cisco.com; h=from:subject:message-id;
- bh=sStTy9Bg8r3IiBcBVUP3bIWBVt484dhT5KCgXRyPs1c=;
- b=hqDjqLx5Ao1tD97X7cUkKa1NE8ee5G4In9HhY+0vNut3lahiILGp5PQhx3KAYb1L1EtWLJHHf
- FjTYnBIhN6zCL8kX3TepE58vhVDx0poQBvTBfMbZZUyu1bwWDpyn9o4
+ bh=1nJliUotDMusF5w/UMmuyqwJOqlCYgr21D/fx9rjM1w=;
+ b=FP3N6n9JNqA14RAcxqQshUiFQzZBox6Hs9ztDbhE85d+PFcCHb2lUFqDb+YhKX9YHpF/yaE8j
+ GOKEOtvVDYaCEZQAGa6PQk5dxH8bmwgEKsBktNdKFJMu0DkDpYCipUg
 X-Developer-Key: i=satishkh@cisco.com; a=ed25519;
  pk=4BxbLoCGvHeIMH/PbpiNVx8/2IcTjFvqcr0AD8K6WLY=
 X-Endpoint-Received: by B4 Relay for satishkh@cisco.com/default with
@@ -93,7 +93,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273056-lists,netdev=lfdr.de,satishkh.cisco.com];
+	TAGGED_FROM(0.00)[bounces-273055-lists,netdev=lfdr.de,satishkh.cisco.com];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_HAS_DN(0.00)[];
 	HAS_REPLYTO(0.00)[satishkh@cisco.com];
@@ -105,236 +105,73 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,cisco.com:email,cisco.com:replyto,cisco.com:mid]
-X-Rspamd-Queue-Id: BF527354DEC
+	DBL_BLOCKED_OPENRESOLVER(0.00)[cisco.com:email,cisco.com:replyto,cisco.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 17D1E354DE5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Satish Kharat <satishkh@cisco.com>
 
-The existing vnic_wq_alloc(), vnic_rq_alloc(), vnic_cq_alloc() and
-vnic_intr_alloc() hardcode data-path resource types (RES_TYPE_WQ,
-RES_TYPE_RQ, RES_TYPE_CQ, RES_TYPE_INTR_CTRL). The upcoming admin
-channel uses different BAR resource types (RES_TYPE_ADMIN_WQ/RQ/CQ,
-RES_TYPE_SRIOV_INTR) for its queues.
+Check for the presence of admin channel BAR resources
+(RES_TYPE_ADMIN_WQ, ADMIN_RQ, ADMIN_CQ, SRIOV_INTR) during resource
+discovery. Set has_admin_channel when all four are available.
 
-Add _with_type() variants that accept an explicit resource type
-parameter. Refactor the original functions as thin wrappers that
-pass the default data-path type. No functional change.
+Use ARRAY_SIZE(enic->admin_cq) for the admin CQ count check since the
+driver allocates two admin CQs (one for WQ completions, one for RQ
+completions) and both must be backed by hardware resources.
+
+Add admin WQ, RQ, CQ and INTR fields to struct enic for use by the
+upcoming admin channel open/close paths.
 
 Signed-off-by: Satish Kharat <satishkh@cisco.com>
 ---
- drivers/net/ethernet/cisco/enic/vnic_cq.c   | 14 +++++++++++---
- drivers/net/ethernet/cisco/enic/vnic_cq.h   |  3 +++
- drivers/net/ethernet/cisco/enic/vnic_intr.c | 12 +++++++++---
- drivers/net/ethernet/cisco/enic/vnic_intr.h |  2 ++
- drivers/net/ethernet/cisco/enic/vnic_rq.c   | 14 +++++++++++---
- drivers/net/ethernet/cisco/enic/vnic_rq.h   |  3 +++
- drivers/net/ethernet/cisco/enic/vnic_wq.c   | 14 +++++++++++---
- drivers/net/ethernet/cisco/enic/vnic_wq.h   |  3 +++
- 8 files changed, 53 insertions(+), 12 deletions(-)
+ drivers/net/ethernet/cisco/enic/enic.h     |  7 +++++++
+ drivers/net/ethernet/cisco/enic/enic_res.c | 12 ++++++++++--
+ 2 files changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/cisco/enic/vnic_cq.c b/drivers/net/ethernet/cisco/enic/vnic_cq.c
-index 27c885e91552..5a0dbb816223 100644
---- a/drivers/net/ethernet/cisco/enic/vnic_cq.c
-+++ b/drivers/net/ethernet/cisco/enic/vnic_cq.c
-@@ -20,13 +20,14 @@ void vnic_cq_free(struct vnic_cq *cq)
- 	cq->ctrl = NULL;
- }
- 
--int vnic_cq_alloc(struct vnic_dev *vdev, struct vnic_cq *cq, unsigned int index,
--	unsigned int desc_count, unsigned int desc_size)
-+int vnic_cq_alloc_with_type(struct vnic_dev *vdev, struct vnic_cq *cq,
-+			    unsigned int index, unsigned int desc_count,
-+			    unsigned int desc_size, unsigned int res_type)
- {
- 	cq->index = index;
- 	cq->vdev = vdev;
- 
--	cq->ctrl = vnic_dev_get_res(vdev, RES_TYPE_CQ, index);
-+	cq->ctrl = vnic_dev_get_res(vdev, res_type, index);
- 	if (!cq->ctrl) {
- 		vdev_err(vdev, "Failed to hook CQ[%d] resource\n", index);
- 		return -EINVAL;
-@@ -35,6 +36,13 @@ int vnic_cq_alloc(struct vnic_dev *vdev, struct vnic_cq *cq, unsigned int index,
- 	return vnic_dev_alloc_desc_ring(vdev, &cq->ring, desc_count, desc_size);
- }
- 
-+int vnic_cq_alloc(struct vnic_dev *vdev, struct vnic_cq *cq, unsigned int index,
-+		  unsigned int desc_count, unsigned int desc_size)
-+{
-+	return vnic_cq_alloc_with_type(vdev, cq, index, desc_count, desc_size,
-+				       RES_TYPE_CQ);
-+}
+diff --git a/drivers/net/ethernet/cisco/enic/enic.h b/drivers/net/ethernet/cisco/enic/enic.h
+index 67fd780b1fa1..08472420f3a1 100644
+--- a/drivers/net/ethernet/cisco/enic/enic.h
++++ b/drivers/net/ethernet/cisco/enic/enic.h
+@@ -289,6 +289,13 @@ struct enic {
+ 	u8 rss_key[ENIC_RSS_LEN];
+ 	struct vnic_gen_stats gen_stats;
+ 	enum ext_cq ext_cq;
 +
- void vnic_cq_init(struct vnic_cq *cq, unsigned int flow_control_enable,
- 	unsigned int color_enable, unsigned int cq_head, unsigned int cq_tail,
- 	unsigned int cq_tail_color, unsigned int interrupt_enable,
-diff --git a/drivers/net/ethernet/cisco/enic/vnic_cq.h b/drivers/net/ethernet/cisco/enic/vnic_cq.h
-index 0e37f5d5e527..d46d4d2ef6bb 100644
---- a/drivers/net/ethernet/cisco/enic/vnic_cq.h
-+++ b/drivers/net/ethernet/cisco/enic/vnic_cq.h
-@@ -73,6 +73,9 @@ static inline void vnic_cq_inc_to_clean(struct vnic_cq *cq)
- void vnic_cq_free(struct vnic_cq *cq);
- int vnic_cq_alloc(struct vnic_dev *vdev, struct vnic_cq *cq, unsigned int index,
- 	unsigned int desc_count, unsigned int desc_size);
-+int vnic_cq_alloc_with_type(struct vnic_dev *vdev, struct vnic_cq *cq,
-+			    unsigned int index, unsigned int desc_count,
-+			    unsigned int desc_size, unsigned int res_type);
- void vnic_cq_init(struct vnic_cq *cq, unsigned int flow_control_enable,
- 	unsigned int color_enable, unsigned int cq_head, unsigned int cq_tail,
- 	unsigned int cq_tail_color, unsigned int interrupt_enable,
-diff --git a/drivers/net/ethernet/cisco/enic/vnic_intr.c b/drivers/net/ethernet/cisco/enic/vnic_intr.c
-index 25319f072a04..010ad8c2108d 100644
---- a/drivers/net/ethernet/cisco/enic/vnic_intr.c
-+++ b/drivers/net/ethernet/cisco/enic/vnic_intr.c
-@@ -19,13 +19,13 @@ void vnic_intr_free(struct vnic_intr *intr)
- 	intr->ctrl = NULL;
- }
++	/* Admin channel resources for SR-IOV MBOX */
++	bool has_admin_channel;
++	struct vnic_wq admin_wq;
++	struct vnic_rq admin_rq;
++	struct vnic_cq admin_cq[2];
++	struct vnic_intr admin_intr;
+ };
  
--int vnic_intr_alloc(struct vnic_dev *vdev, struct vnic_intr *intr,
--	unsigned int index)
-+int vnic_intr_alloc_with_type(struct vnic_dev *vdev, struct vnic_intr *intr,
-+			      unsigned int index, unsigned int res_type)
- {
- 	intr->index = index;
- 	intr->vdev = vdev;
+ static inline struct net_device *vnic_get_netdev(struct vnic_dev *vdev)
+diff --git a/drivers/net/ethernet/cisco/enic/enic_res.c b/drivers/net/ethernet/cisco/enic/enic_res.c
+index bbd3143ed73e..2b7545d6a67f 100644
+--- a/drivers/net/ethernet/cisco/enic/enic_res.c
++++ b/drivers/net/ethernet/cisco/enic/enic_res.c
+@@ -205,10 +205,18 @@ void enic_get_res_counts(struct enic *enic)
+ 	enic->cq_count = enic->cq_avail;
+ 	enic->intr_count = enic->intr_avail;
  
--	intr->ctrl = vnic_dev_get_res(vdev, RES_TYPE_INTR_CTRL, index);
-+	intr->ctrl = vnic_dev_get_res(vdev, res_type, index);
- 	if (!intr->ctrl) {
- 		vdev_err(vdev, "Failed to hook INTR[%d].ctrl resource\n",
- 			 index);
-@@ -35,6 +35,12 @@ int vnic_intr_alloc(struct vnic_dev *vdev, struct vnic_intr *intr,
- 	return 0;
- }
- 
-+int vnic_intr_alloc(struct vnic_dev *vdev, struct vnic_intr *intr,
-+		    unsigned int index)
-+{
-+	return vnic_intr_alloc_with_type(vdev, intr, index, RES_TYPE_INTR_CTRL);
-+}
++	enic->has_admin_channel =
++		vnic_dev_get_res_count(enic->vdev, RES_TYPE_ADMIN_WQ) >= 1 &&
++		vnic_dev_get_res_count(enic->vdev, RES_TYPE_ADMIN_RQ) >= 1 &&
++		vnic_dev_get_res_count(enic->vdev, RES_TYPE_ADMIN_CQ) >=
++			ARRAY_SIZE(enic->admin_cq) &&
++		vnic_dev_get_res_count(enic->vdev, RES_TYPE_SRIOV_INTR) >= 1;
 +
- void vnic_intr_init(struct vnic_intr *intr, u32 coalescing_timer,
- 	unsigned int coalescing_type, unsigned int mask_on_assertion)
- {
-diff --git a/drivers/net/ethernet/cisco/enic/vnic_intr.h b/drivers/net/ethernet/cisco/enic/vnic_intr.h
-index 33a72aa10b26..2bc2dbffdb80 100644
---- a/drivers/net/ethernet/cisco/enic/vnic_intr.h
-+++ b/drivers/net/ethernet/cisco/enic/vnic_intr.h
-@@ -89,6 +89,8 @@ static inline u32 vnic_intr_legacy_pba(u32 __iomem *legacy_pba)
- void vnic_intr_free(struct vnic_intr *intr);
- int vnic_intr_alloc(struct vnic_dev *vdev, struct vnic_intr *intr,
- 	unsigned int index);
-+int vnic_intr_alloc_with_type(struct vnic_dev *vdev, struct vnic_intr *intr,
-+			      unsigned int index, unsigned int res_type);
- void vnic_intr_init(struct vnic_intr *intr, u32 coalescing_timer,
- 	unsigned int coalescing_type, unsigned int mask_on_assertion);
- void vnic_intr_coalescing_timer_set(struct vnic_intr *intr,
-diff --git a/drivers/net/ethernet/cisco/enic/vnic_rq.c b/drivers/net/ethernet/cisco/enic/vnic_rq.c
-index 5ae80551f17c..a662d9fd1199 100644
---- a/drivers/net/ethernet/cisco/enic/vnic_rq.c
-+++ b/drivers/net/ethernet/cisco/enic/vnic_rq.c
-@@ -69,15 +69,16 @@ void vnic_rq_free(struct vnic_rq *rq)
- 	rq->ctrl = NULL;
+ 	dev_info(enic_get_dev(enic),
+-		"vNIC resources avail: wq %d rq %d cq %d intr %d\n",
++		"vNIC resources avail: wq %d rq %d cq %d intr %d admin %s\n",
+ 		enic->wq_avail, enic->rq_avail,
+-		enic->cq_avail, enic->intr_avail);
++		enic->cq_avail, enic->intr_avail,
++		enic->has_admin_channel ? "yes" : "no");
  }
  
--int vnic_rq_alloc(struct vnic_dev *vdev, struct vnic_rq *rq, unsigned int index,
--	unsigned int desc_count, unsigned int desc_size)
-+int vnic_rq_alloc_with_type(struct vnic_dev *vdev, struct vnic_rq *rq,
-+			    unsigned int index, unsigned int desc_count,
-+			    unsigned int desc_size, unsigned int res_type)
- {
- 	int err;
- 
- 	rq->index = index;
- 	rq->vdev = vdev;
- 
--	rq->ctrl = vnic_dev_get_res(vdev, RES_TYPE_RQ, index);
-+	rq->ctrl = vnic_dev_get_res(vdev, res_type, index);
- 	if (!rq->ctrl) {
- 		vdev_err(vdev, "Failed to hook RQ[%d] resource\n", index);
- 		return -EINVAL;
-@@ -98,6 +99,13 @@ int vnic_rq_alloc(struct vnic_dev *vdev, struct vnic_rq *rq, unsigned int index,
- 	return 0;
- }
- 
-+int vnic_rq_alloc(struct vnic_dev *vdev, struct vnic_rq *rq, unsigned int index,
-+		  unsigned int desc_count, unsigned int desc_size)
-+{
-+	return vnic_rq_alloc_with_type(vdev, rq, index, desc_count, desc_size,
-+				       RES_TYPE_RQ);
-+}
-+
- static void vnic_rq_init_start(struct vnic_rq *rq, unsigned int cq_index,
- 	unsigned int fetch_index, unsigned int posted_index,
- 	unsigned int error_interrupt_enable,
-diff --git a/drivers/net/ethernet/cisco/enic/vnic_rq.h b/drivers/net/ethernet/cisco/enic/vnic_rq.h
-index a1cdd729caec..9fc2090eac44 100644
---- a/drivers/net/ethernet/cisco/enic/vnic_rq.h
-+++ b/drivers/net/ethernet/cisco/enic/vnic_rq.h
-@@ -196,6 +196,9 @@ static inline int vnic_rq_fill(struct vnic_rq *rq,
- void vnic_rq_free(struct vnic_rq *rq);
- int vnic_rq_alloc(struct vnic_dev *vdev, struct vnic_rq *rq, unsigned int index,
- 	unsigned int desc_count, unsigned int desc_size);
-+int vnic_rq_alloc_with_type(struct vnic_dev *vdev, struct vnic_rq *rq,
-+			    unsigned int index, unsigned int desc_count,
-+			    unsigned int desc_size, unsigned int res_type);
- void vnic_rq_init(struct vnic_rq *rq, unsigned int cq_index,
- 	unsigned int error_interrupt_enable,
- 	unsigned int error_interrupt_offset);
-diff --git a/drivers/net/ethernet/cisco/enic/vnic_wq.c b/drivers/net/ethernet/cisco/enic/vnic_wq.c
-index 29c7900349b2..5a20bdc62141 100644
---- a/drivers/net/ethernet/cisco/enic/vnic_wq.c
-+++ b/drivers/net/ethernet/cisco/enic/vnic_wq.c
-@@ -72,15 +72,16 @@ void vnic_wq_free(struct vnic_wq *wq)
- 	wq->ctrl = NULL;
- }
- 
--int vnic_wq_alloc(struct vnic_dev *vdev, struct vnic_wq *wq, unsigned int index,
--	unsigned int desc_count, unsigned int desc_size)
-+int vnic_wq_alloc_with_type(struct vnic_dev *vdev, struct vnic_wq *wq,
-+			    unsigned int index, unsigned int desc_count,
-+			    unsigned int desc_size, unsigned int res_type)
- {
- 	int err;
- 
- 	wq->index = index;
- 	wq->vdev = vdev;
- 
--	wq->ctrl = vnic_dev_get_res(vdev, RES_TYPE_WQ, index);
-+	wq->ctrl = vnic_dev_get_res(vdev, res_type, index);
- 	if (!wq->ctrl) {
- 		vdev_err(vdev, "Failed to hook WQ[%d] resource\n", index);
- 		return -EINVAL;
-@@ -101,6 +102,13 @@ int vnic_wq_alloc(struct vnic_dev *vdev, struct vnic_wq *wq, unsigned int index,
- 	return 0;
- }
- 
-+int vnic_wq_alloc(struct vnic_dev *vdev, struct vnic_wq *wq, unsigned int index,
-+		  unsigned int desc_count, unsigned int desc_size)
-+{
-+	return vnic_wq_alloc_with_type(vdev, wq, index, desc_count, desc_size,
-+				       RES_TYPE_WQ);
-+}
-+
- int enic_wq_devcmd2_alloc(struct vnic_dev *vdev, struct vnic_wq *wq,
- 			  unsigned int desc_count, unsigned int desc_size)
- {
-diff --git a/drivers/net/ethernet/cisco/enic/vnic_wq.h b/drivers/net/ethernet/cisco/enic/vnic_wq.h
-index 3bb4758100ba..1d448b7a9ba2 100644
---- a/drivers/net/ethernet/cisco/enic/vnic_wq.h
-+++ b/drivers/net/ethernet/cisco/enic/vnic_wq.h
-@@ -165,6 +165,9 @@ static inline void vnic_wq_service(struct vnic_wq *wq,
- void vnic_wq_free(struct vnic_wq *wq);
- int vnic_wq_alloc(struct vnic_dev *vdev, struct vnic_wq *wq, unsigned int index,
- 	unsigned int desc_count, unsigned int desc_size);
-+int vnic_wq_alloc_with_type(struct vnic_dev *vdev, struct vnic_wq *wq,
-+			    unsigned int index, unsigned int desc_count,
-+			    unsigned int desc_size, unsigned int res_type);
- void vnic_wq_init(struct vnic_wq *wq, unsigned int cq_index,
- 	unsigned int error_interrupt_enable,
- 	unsigned int error_interrupt_offset);
+ void enic_init_vnic_resources(struct enic *enic)
 
 -- 
 2.43.0
