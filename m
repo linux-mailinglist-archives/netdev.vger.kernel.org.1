@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-273164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273165-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uCjMNB1yymnG8gUAu9opvQ
-	(envelope-from <netdev+bounces-273164-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:52:45 +0200
+	id wP8xHTRzymlQ9AUAu9opvQ
+	(envelope-from <netdev+bounces-273165-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:57:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AC9635B532
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:52:45 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31A3E35B633
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:57:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6A658302C75C
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:47:15 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6C8BF301DD34
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 169CD3D093C;
-	Mon, 30 Mar 2026 12:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D613D1703;
+	Mon, 30 Mar 2026 12:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sQvo0YJ2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4u8bxRXT"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945AF30E84F;
-	Mon, 30 Mar 2026 12:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4837630E84F;
+	Mon, 30 Mar 2026 12:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774874833; cv=none; b=qsXZuzsTNsPNllk5wwbumu6QEDdAVxNY0UOv4vWMN9+cK90Agl/KHkS04EvcqlSwRxu//DBOTnbSZvsKlly2D/1xeJqPEubxQVbp/zokyk/GJEJ018wsGzfeGGDEFvfnVvFmu2MyqWqE9d41HbJICs8yuJ4yUt7p7ca0ctSsvm4=
+	t=1774874890; cv=none; b=q4Ihz0mdk2EH6bJTRlrdHDQhiZdJD+ORAgm1XrTXCJKUkXzFdFf7CW0pJp1UGhsjrch0UwHGTqC7IwbYVcFdvkhxq2LwAXBK+Wj/mSaQ6QBrHU1SmS/AxpAZp5KYTqbFxdKvR0FUbh+39zu1UmtQBSdrDOqPgmuxOMB+B2uw2qI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774874833; c=relaxed/simple;
-	bh=WMuniRwk7KpMUL+kyEbqy+DZXfpJIvxnyIoPffxwcC0=;
+	s=arc-20240116; t=1774874890; c=relaxed/simple;
+	bh=Ussa43LWPtA6yUb/RL9ctofSX1Bow0SUPYYU5fJRt9k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YLObRtjjyeiNuP9pqNazTYx84+mu8G7y/ObUhBY4GLE1Ql5K3Lzo0kg6u0aaojKxkmWmhCtHcRrq2e7y5d7OqVCSYopF4OOdLBItcbgDB/Y4GkOBgKqfnNTl0hMgdgrLxARIOP1QFBPOt77vRiV6Prv53Bhl0/5KE/lcjHLcUe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sQvo0YJ2; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ihsyt1G++RauNM5a9K5WC3r41utcnTe1OoiQwg0Qm6N9y3liQd0dWtbeg9cV42MFJmLggX/B/l2HQSJY7Xsiv5x38n7/wLyg5PW79AaY6NOqhudcYih4PG7VchlvOofp3Amx4juygWiF8g96vEQpJO7jZwigHorsCe5PMSnMNf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4u8bxRXT; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -39,13 +39,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GL5CWlLyR6lWA0gUv9SvGsvHrjp4P6AcIV65PcsG49k=; b=sQvo0YJ2RLF72T1ViiyRRfxS6k
-	/YbS4PlhQ2t20w/hf7wHnc1L7aWItSyPSi7+vdZag5IKBuzcL0pTEpABm9DU0fz6HehGQ1SraDxXv
-	TRufpe6GbjYrVSDYjLLrswMmYC57ht6f3iktmooNljKVCUVpVdhXMBqITa2CXX9rC2gI=;
+	bh=SQnnYyQCAMoEC4ylO9r2ZhM0h4XUUS6e+qeqslEd9oI=; b=4u8bxRXTVofUZNO3GnH46dTRFh
+	qABu43NQTw6SA6vZbt0RI3XRPew1nnG7gyKQhBVJVQsVvGTFO1BUVWa70F4gHlz/NamAiUfYEUBMI
+	RmPQIB7RaCbLT76S1pz4lyKS8jk5zZngwhYJcbPxAj0X9BlDfzYVeEg2lPlUSB5H+lBE=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1w7C1I-00E23J-AW; Mon, 30 Mar 2026 14:47:04 +0200
-Date: Mon, 30 Mar 2026 14:47:04 +0200
+	id 1w7C2E-00E242-Kn; Mon, 30 Mar 2026 14:48:02 +0200
+Date: Mon, 30 Mar 2026 14:48:02 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: "Maciej W. Rozycki" <macro@orcam.me.uk>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -53,9 +53,10 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] FDDI: defza: Rate-limit memory allocation errors
-Message-ID: <4cfa0b04-1cf8-4ebd-89f6-e5d50399a9cb@lunn.ch>
-References: <alpine.DEB.2.21.2603291252380.60268@angie.orcam.me.uk>
+Subject: Re: [PATCH net-next 1/2] declance: Rate-limit DMA errors
+Message-ID: <5df83811-91ed-47e3-a6d2-3d96eaef0b0d@lunn.ch>
+References: <alpine.DEB.2.21.2603291259140.60268@angie.orcam.me.uk>
+ <alpine.DEB.2.21.2603291303190.60268@angie.orcam.me.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,24 +65,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.21.2603291252380.60268@angie.orcam.me.uk>
+In-Reply-To: <alpine.DEB.2.21.2603291303190.60268@angie.orcam.me.uk>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273164-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273165-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
@@ -91,14 +92,14 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[orcam.me.uk:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:email,lunn.ch:mid]
-X-Rspamd-Queue-Id: 4AC9635B532
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:email,lunn.ch:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,orcam.me.uk:email]
+X-Rspamd-Queue-Id: 31A3E35B633
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Mar 29, 2026 at 01:32:34PM +0100, Maciej W. Rozycki wrote:
-> Prevent the system from becoming unstable or unusable due to a flood of 
-> memory allocation error messages under memory pressure.
+On Sun, Mar 29, 2026 at 01:32:51PM +0100, Maciej W. Rozycki wrote:
+> Prevent the system from becoming unusable due to a flood of DMA error
+> messages.
 > 
 > Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
 
