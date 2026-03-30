@@ -1,117 +1,159 @@
-Return-Path: <netdev+bounces-273342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273344-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MBI3BCf4ymmlBwYAu9opvQ
-	(envelope-from <netdev+bounces-273342-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:24:39 +0200
+	id 2KUPLN34ymmlBwYAu9opvQ
+	(envelope-from <netdev+bounces-273344-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:27:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5759361E50
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:24:38 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 401F0361EC9
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:27:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 61A523027100
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 22:23:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 767953048ECC
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 22:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E063E3D93;
-	Mon, 30 Mar 2026 22:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DC413E51D4;
+	Mon, 30 Mar 2026 22:26:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X0rYMfry"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AWJMdggJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F8B3DDDB1;
-	Mon, 30 Mar 2026 22:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774909402; cv=none; b=e+5oWSvHIo/LgktVmgT4y7GPTXg1jQUSY3RRMaSdG1GSXfzmZ7Uyy+Rbcq7b2S81pwJuVqQxkH7oH9BYP3yhhSFtpqNT2yf7Wzo90HFanPqienxF835FmcoSo5bpShl0vrVspDn+zMsWU5IcCazQ+XydEzj2coD9pOOBEfkPSG0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774909402; c=relaxed/simple;
-	bh=R/RTYULXwMk5jUyXPTlsjfkiAucxmpo5A8GIlmR+4pI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L9KpfDNy8+zTgr1/k/4XYi/iDabxRdad8LGqd8W2+xW6D6gO+HeLMxiAC94a0Kx57gpzG+FMe8e9Xp8BBX1/LMvIFjwx7fj84EsAZtU6dK/LRhTRPrDi+CLRrC8p3oMF6sLqRQf+T7nnpu/7CWzm2giYXApEmbXmrEYCDQZtPmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X0rYMfry; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7EB4C4CEF7;
-	Mon, 30 Mar 2026 22:23:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774909401;
-	bh=R/RTYULXwMk5jUyXPTlsjfkiAucxmpo5A8GIlmR+4pI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X0rYMfryywhutY6O4h5DcOtft954Mqqbo5clo1gTAQiKIfqI2gr263Ib68H1c878N
-	 aGehaKv/M3SGBbBhpXye4W0sHfhmB8v4XkbiBdXXcBxxL2fnDNcTKLhhjZ05/W3O2Z
-	 a3RZ/iE5LeQEwlH6m7zKLtHtmXxotgZFzO7x/YhOPVdbqMXzpxDP0xYmnKPAxu7Cl5
-	 RA+Zlj9AJ4u6oV0vwBYzfr3tunqPhVC+ja03upecAu/kYlEKe5BF2AtxoEMpIBbnMY
-	 O7FWd9HlrjlCgG++1J0ODjkGg/q15snobTvSXA8Ra5P1rsxU+5CZcs3xXyydDLxOGb
-	 mcrPri0YQjK/w==
-Date: Mon, 30 Mar 2026 15:23:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- kotaranov@microsoft.com, horms@kernel.org,
- shradhagupta@linux.microsoft.com, shirazsaleem@microsoft.com,
- dipayanroy@linux.microsoft.com, yury.norov@gmail.com, kees@kernel.org,
- ssengar@linux.microsoft.com, gargaditya@linux.microsoft.com,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next v4] net: mana: Expose hardware diagnostic info
- via debugfs
-Message-ID: <20260330152318.144c1b30@kernel.org>
-In-Reply-To: <acrKgG0USsGABqYT@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260319070926.1459515-1-ernis@linux.microsoft.com>
-	<20260323174444.2717da3d@kernel.org>
-	<acK56AlPfVW8cDPe@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-	<acrKgG0USsGABqYT@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CD13E3C5D
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 22:26:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774909613; cv=pass; b=hXOOfWUc6dL8FgW0Y72WB967C3DnoQSk1YrI7Syf7ObhpJSKGEMDQP9Ye+FUjjbmmLp0K9ci+Ojuxy8/+V9JPK5wkAf43HoiPG9QYz3hgVIzmHCIRP8qc8T7QWM809oWeHz1dn3oFtsRvamuhmC6glE6OrHNH4NBqwotNkSZHy4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774909613; c=relaxed/simple;
+	bh=vakATihP4mCxAvV7TkAw/QAr6YVcvDOHJ7aoqLhL6Vw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hfmmTcM7sPL0lGFbTawew/tVEStfRfxyd6KrJduI9gx2qVgeiqnS1h/Sw11ok/XNhBJehVfj8dCCcAYcg0VVVq07pXfxUH6vzeoG96EgQXq8TnnIaVYnMWabBZsGabkv4/UQBq+QhrnrKOxrKTieh9gY4IPRrR6ki31Mv11yjnA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AWJMdggJ; arc=pass smtp.client-ip=209.85.210.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7d7cc688861so886287a34.3
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 15:26:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774909599; cv=none;
+        d=google.com; s=arc-20240605;
+        b=TMAdBECm1NVd0OUyNa4SbkPtJrQ59VNvwP4P4dD25w8cYwGclTdVan9S6s5gHjLJUk
+         8GrGWft4L4iloMpkNhgzBVgjze97+wBTZhS6vqsmWNVKymGcZEdTqQS+9kZ8WOF5Mla1
+         M5lMoyzo/ZXWeOSYu3M+WyUedRwgRlh+r+WDsetmAfrYgEJuCmeaN8c0Ic64Yg1BCAG7
+         8RlpA7+fo3kxL28hZuFWwTBf0vXxlZuDv66n3OC1eD8s9syNb3B7RkzdvHLR/KoEu/Jj
+         jS2Zhj0h1ZMZJEKJhwOz7/QZfTQStcgSCVDeI3KtXI9tLPe4fnY1wPaaWn3NqsoaycNN
+         qXAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vakATihP4mCxAvV7TkAw/QAr6YVcvDOHJ7aoqLhL6Vw=;
+        fh=w/N4PPzM0Fj4TOdKVXUZsyHDB8uPhY9caRFOO3DELto=;
+        b=Ts9Nz/deXRr98ZvIgul5kv4M8GVSaI2q78fQIFc46fhD6wH82VDtp92FmPNb+yDzfS
+         DimWhV30U/5JLOs2FXopBMFUwkBikTq4FBM3bDmUt+uAGAp0OPSNoyCch6dlYJNtszDW
+         dEJWrQyVT4i1dyhJ4rjQopvNBpRGNVmahLt/+kE82aB0+ezJWol7TflJMAstigUCRuCs
+         tRJFdEW8jMTWvws5No1VbUSHCXCmzGhO10/s0zW5/+a6Ecxt0qL738liAr+lUG6ARLU5
+         rdSjOgJMzavdKU9IcAEUAo8kfeLbdzhkpYpRo8gqdYoZPk+0mhTLh3GG/sbEl2oWGFtT
+         VlAw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774909599; x=1775514399; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vakATihP4mCxAvV7TkAw/QAr6YVcvDOHJ7aoqLhL6Vw=;
+        b=AWJMdggJN5ewAMwa9ve0iG4Hp3aGyPjYdfb8YAZW1D9QsJvfieRToG96a7TZ6P3JT1
+         /Ie+6joer9sFVOscENsi95h7GRnv+LbIbfVCsw7bzBvFjoJg+L35HRENlWBJB2JiInOG
+         zx5SPuIOd2gAsFpxGnI2vyk/SZU6LWBBhTslIiySjPFBOsV3ax7zWPo2hPDbzlrhY1Vg
+         gDSVJMpmgaqYC1zqxp2PtSPzWUKiUarxVp6BI8YM7bpg8ZeBcFMDfeqHacfiC6qr+754
+         HllPBEtYgjrzBapJyE3OokMEqKWBlWFteCsH/iywWaix5Guo9b6tZ9OxnXtzKV7zvFCu
+         bedA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774909599; x=1775514399;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vakATihP4mCxAvV7TkAw/QAr6YVcvDOHJ7aoqLhL6Vw=;
+        b=OQIAf7ZI1Gd6VtHpXRKgaTx+58QFtgsQ7Uyg6uqT5IhkiAv3ikpy1+0oOn7WqBpGs9
+         J4ArqtkJNTdcjmCHz3d8laZ6uIW4Ydh2Z1n/ccxZzwlkfRzJXNa3GtKqCoEFh0xcaxdQ
+         2X8cPGWF/RZ1XoiOtIMST0Z2OzAg4R0cRArd731ZPPeLILToaYaTDU1UexQIQbzg1f9N
+         M27pZ/CrqLGROlSwzQOtz303D0IpbBpwZtB8CPj6iLdKSSJ9ihwsLj2Hdcuq3AGzVZdQ
+         GNmIZRT30qmjd/ut94XIKhfnMqIDjNHC4S+FT0vYMwmojQ/9Y6YYmuVyDHvK/YCiszn2
+         I1Pg==
+X-Gm-Message-State: AOJu0YxtEt3OkSgYL+4QWZh2Z5Qh5FR497WbB0P9SzgjUfG3pf9P8gnL
+	aZsioNRruhhyO+PKAGGist4TwyNN6f14HMCEFhPC1ltPU5MswpBQmJjbLFhHlz+F00/tUfLTzV8
+	3bhAo8RaqPs4mCMeIL5cBQQEJH3XUoF8=
+X-Gm-Gg: ATEYQzxM9HliMRNNwCcB3I/XFwLQSz1Wcd0h42WPeA2h9PT2PRQBODAbpsN15Lm+qkK
+	BjvDNPoUm/y16Vi0BNFBYeQ5D39DH4BcwtJ+JGNddbqtrlQcK2cJwZ6D8yOLM8B0kZmHWXse0SU
+	nUotH+md67vRkBwkQ0LTWETELUeqMFpj7TmNHKXHjsRJO7zRVZy/ZkFTIxlcLam3MnVPQQPk3ae
+	Ivp05B+XslYjAv696Zj8Cd4S9utPaHiW8aDXVg6pO1KxHcOqbX+lSrVlKGVTpiKjWD/DxAlWKza
+	sMA/Cw==
+X-Received: by 2002:a05:6808:220d:b0:467:2509:c1bd with SMTP id
+ 5614622812f47-46a8a4115d3mr4973742b6e.2.1774909599478; Mon, 30 Mar 2026
+ 15:26:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20260329041922.3850747-1-weibunny.kernel@gmail.com> <20260329111240.67e6f097@kernel.org>
+In-Reply-To: <20260329111240.67e6f097@kernel.org>
+From: Wei Wang <weibunny.kernel@gmail.com>
+Date: Mon, 30 Mar 2026 15:26:28 -0700
+X-Gm-Features: AQROBzABcwKSUc3fUywvI4YWennUfe-LetT0i-CJD34xxvOeE07K25FgJMMG0C0
+Message-ID: <CAGqc4nVw8h+xz3ABTdQpUO+xmEAh=UujKwv+28Za-2yNgzCQ0w@mail.gmail.com>
+Subject: Re: [PATCH v8 net-next 0/5] psp: Add support for dev-assoc/disassoc
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Daniel Zahka <daniel.zahka@gmail.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Wei <dw@davidwei.uk>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Wei Wang <weibunny@fb.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273342-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273344-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,kernel.org,fb.com];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[weibunnykernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A5759361E50
+	RCPT_COUNT_SEVEN(0.00)[10];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 401F0361EC9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 30 Mar 2026 12:09:52 -0700 Erni Sri Satya Vennela wrote:
-> Just a quick follow=E2=80=91up on this. Since these issues were pre=E2=80=
-=91existing and
-> not introduced by this patch, would you prefer that I send them as a
-> separate fix patch, or fold the fixes into the current patch?
+On Sun, Mar 29, 2026 at 11:12=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Sat, 28 Mar 2026 21:19:16 -0700 Wei Wang wrote:
+> > The main purpose of this feature is to associate virtual devices like
+> > veth or netkit with a real PSP device, so we could provide PSP
+> > functionality to the application running with virtual devices.
+>
+> Does not apply to net-next.
 
-Anything that's pre-existing should be a separate patch, before any new
-code. If the bug exists only in net-next - earlier in the same series,
-if the bug exists in net - posted separately for the net tree.
+Sorry, rebased and will resend
 
