@@ -1,208 +1,214 @@
-Return-Path: <netdev+bounces-273337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273338-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EDSIJFr0ymmlBwYAu9opvQ
-	(envelope-from <netdev+bounces-273337-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:08:26 +0200
+	id sDryHYj0ymmlBwYAu9opvQ
+	(envelope-from <netdev+bounces-273338-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:09:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1214361BF5
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:08:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFEA0361C04
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:09:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4176D300D941
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 22:01:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4E26D302335F
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 22:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026893A63F8;
-	Mon, 30 Mar 2026 22:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFF723A75B9;
+	Mon, 30 Mar 2026 22:02:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Bb2nCFnj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T3qAk3db"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f100.google.com (mail-pj1-f100.google.com [209.85.216.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B299A1A9F9F
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 22:01:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32CC4393DC0;
+	Mon, 30 Mar 2026 22:02:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774908101; cv=none; b=TNBDRHDdiEfTKN8AwdmeDTo172bH8BoDY6W/3R4Rufkp5o0ZJVfyHVN/Mk0VrRMK42Fa5PlBNrHpBW8fSntJthYk2MV9F1UU4dD6tkFDXHNg7iYH3TbzokypclW9R0qe8lnDbbPljYa487C10jm3MPHMx8gveiHX+BAVrKF+wfw=
+	t=1774908175; cv=none; b=JZkzx7E2f0Kp8Cz4srWrVNM2FSQCh3F7LdtFV9OLQRE6k4w/GLJOhn1UOMoS8pRRUoc7sNN2j3oXH4KBHekqAbdCwpm0gWwL7pxubX3pZLThF9dzS0KHuX3BebnPbPMILOZYZcCHG8qX8jUEpt/+WNTmkNiLTc1xLFZ4Q3ojfdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774908101; c=relaxed/simple;
-	bh=SEcggzMQPlBT4VfcXD93RHhGaIq3bozFKGxfmOBi4E8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F8AdC4IcVrU/7bOVcm4Apv2ojzyUpB5zaHk68s7Pi1c3CUSsN0giGA8rHF06hrXWEWYL1D7tXfH1Al3otd6Z6113pUmM2TSIiDt51gsyTEqFjUnz6pNh/Y2koCu11/FSlQQCIiL+89bjfY/idI13lJAJK8L4FCphil09n+lAd9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Bb2nCFnj; arc=none smtp.client-ip=209.85.216.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f100.google.com with SMTP id 98e67ed59e1d1-35d9f68d011so1308203a91.2
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 15:01:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774908100; x=1775512900;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:dkim-signature:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CtdGhRlX3HJBZMrHLz+B9bjBl7r5J98b1F9YuBfP76o=;
-        b=bA+HI20RDK7HkO7cU2Og2oDFH2p/LQSiGcAPeOuzIMOHi/OG3QQTSAstsSKMP6msU3
-         8u2EUOrjLiBME4lUY3bXxx11oWxVwrs9SLBUGG3V/vgpIJDUgYXkg6QkjiFz08nvzJdf
-         GloNzXPNaBr6R9O0NoHLOW112wJrEGkuRhVafsgAHOlj+7MoA8mlmOw2nBeokyz7Dl69
-         c3kW1fQ9hi3FhFPyEDPOL6+HtOSH0+EuyZ4Nk8ZuhDUmFfiWTKbrSCs9xsgxNx4yU5/h
-         HWdY8SpUwhNfe/z/kayC0hC2AZmIXjXudoIDwTC41oINE5P62hnsJ4VEvtEIy0J6fJvd
-         vluw==
-X-Forwarded-Encrypted: i=1; AJvYcCV6zL44EziW4umSa6NvJZp2fkLg/eIXbhAt3s2uzeavTGIUHcuiIsswplqRl6gEFvmdHlDg0v0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWkqiHFgIWXJpfIdqPoAvQPSK7hvclovYMf5wVBjV24xUj15q3
-	xYf9dmzUMPjXaMh6eb7JPnIk6lUPzaHKqBy3jSk0IdscFekWPd0YH8pLxdYx1UTs/nkn9mGtHXZ
-	5s+1cclar+2/pL1jq8gocZIvbV95DYjBSK+4qYvAeYo+juJXxr5d4l/qvFBEb5FCszA9nILUd3K
-	pfzr9lfSBH6ag8jemeQnWJJMr/w5PtOkBwD+rNyMd3GfXn8DnrRcVvdh0lI5UwFSXTbPOB+S3bJ
-	GjEV5cvVMvmu8hv
-X-Gm-Gg: ATEYQzxDS92aYyy4/GYLGGNcV8IL+FXCYWtvO4Lh0U8KeXPG+mKCIK+EiEjFkwsiPkv
-	FrftTckdaRmcBYwAtBpIIJZgdsb7/1bRwKujabi9BoAVqVmYfWv9oCRLt1qg2+OlsHJHZ/tVofR
-	tw0DiEesKWeZwXjnU17GWrNi7Z5GknS9JuVnAtiXdcJubjd10ehu3OkAKRZbqYPVWO0qMh+4tZY
-	DRU5koLRu8wTc1rznybjttuMGLos9MhrpQBhY1ggEzf7xV9Mak4sSs406N3pbvs8f7U/Fwo1o+d
-	/KiQsDwAZNCErTDQONDEpPsmfvo+0hm7SpikkGYP9aLFXmycZjUueHcKtFY6haEn5WR9eLaFA8N
-	WrTvBulsGjc2eeNzwyZFteeseDpKuahMgadru/Pc/3aHikZrDscWIUXn07D5936d1G7sBbnflG5
-	jRexs7bves0zf/3miwn+pxynf6PDQqJsPXU2+DaYflQoPC96jnEJ+y6nPP3EngxQ==
-X-Received: by 2002:a17:90b:2ccb:b0:354:bfb7:db1a with SMTP id 98e67ed59e1d1-35c30145afdmr12493123a91.31.1774908099818;
-        Mon, 30 Mar 2026 15:01:39 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-25.dlp.protect.broadcom.com. [144.49.247.25])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-35d9504f309sm1021213a91.6.2026.03.30.15.01.39
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 30 Mar 2026 15:01:39 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-2c0f6593ef5so6205513eec.1
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 15:01:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1774908098; x=1775512898; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=CtdGhRlX3HJBZMrHLz+B9bjBl7r5J98b1F9YuBfP76o=;
-        b=Bb2nCFnjt03EJnlf2Q4WUWsduLMViRaR6pCrVuiJqK1QpPsSZ1Bq5be04Zp7LROIBD
-         odBD3/WTx0uW7M8iZvjlllUl2drNPJSzje0+7aa7fGAIApWcjyc9lsnLI3SSmeflVBCj
-         Bz11/B6NNzMVvMnQIoVGISiMR2hOioYMTtxGU=
-X-Forwarded-Encrypted: i=1; AJvYcCWqon/myk44apmg4jVUuIf2sxKCWkVTOLyVDGLgsEfRz5yuQ4Aj9thg8Rwd6UkxtbsxRZmBJMs=@vger.kernel.org
-X-Received: by 2002:a05:7301:1685:b0:2c1:2706:b41c with SMTP id 5a478bee46e88-2c185d5371emr8115409eec.6.1774908098140;
-        Mon, 30 Mar 2026 15:01:38 -0700 (PDT)
-X-Received: by 2002:a05:7301:1685:b0:2c1:2706:b41c with SMTP id 5a478bee46e88-2c185d5371emr8115378eec.6.1774908097535;
-        Mon, 30 Mar 2026 15:01:37 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c3c41c1513sm8659766eec.8.2026.03.30.15.01.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Mar 2026 15:01:37 -0700 (PDT)
-Message-ID: <0332755b-ed58-46e9-8ffb-9a09d688f3c0@broadcom.com>
-Date: Mon, 30 Mar 2026 15:01:35 -0700
+	s=arc-20240116; t=1774908175; c=relaxed/simple;
+	bh=0a/qTJ6Z6SLzYReYiecSbgx8In0wkAtWXm6TRVfoSvY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fezGdsDI69JneeZMsK8YZm9z9nKonQ2ZcXEBvQTDzbK2/lu9cHJHMNwJlS9/qSd1O1XBE2hyE5CHMNgGnQJ8YP3/67QaeGuz3JDHMg0Y8x8+NNIEIjcJNKmj9m9XQh2OeUK5mgVrG0KNj58MIQF1I1RYRQaAJ13nhVTKEjcBsr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T3qAk3db; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774908174; x=1806444174;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0a/qTJ6Z6SLzYReYiecSbgx8In0wkAtWXm6TRVfoSvY=;
+  b=T3qAk3dbYN4z5fuR6iBhwXzLg89ylG2cJGCaXhTgi0YLpLnTv7gpEbF0
+   nlzVJT27m/QIokrc9spT2MJ7+TSUbaw/fUKgfnInNapvx8vh2fGc4sxId
+   wPgf+lKMPpqAS4TSg3f/pfs7N+RCSGl3603XI9gOGBufkrueMz42991cL
+   /LrfgVQoMAEbC0aIHMDma18hb7P6ZG4Ov0/GjHtEsSt+Y7rFRDP/Uqk3M
+   75+Xo8smwZFGPgkyo8XWxH1wutYaM/OY/1zKqqF60ASutD0geZC7tNMCf
+   PZGB6Sj0HZbAj4aGQA7lX6323IzTFuBKHpb+n8LlzN/HqO2U0zIdCvNp2
+   w==;
+X-CSE-ConnectionGUID: E25wVTJTT2W1uecRbdNsYQ==
+X-CSE-MsgGUID: uCucRZF1RJyHdRpSLawXXQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11744"; a="86530364"
+X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
+   d="scan'208";a="86530364"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 15:02:53 -0700
+X-CSE-ConnectionGUID: 4F9eCnT+T2S7Jx4SnsHesA==
+X-CSE-MsgGUID: Jp+P6fSSR+KZjuQgYb8ZkA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
+   d="scan'208";a="230980195"
+Received: from lkp-server01.sh.intel.com (HELO 283bf2e1b94a) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 30 Mar 2026 15:02:49 -0700
+Received: from kbuild by 283bf2e1b94a with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w7Kh4-000000001ll-1KrN;
+	Mon, 30 Mar 2026 22:02:46 +0000
+Date: Tue, 31 Mar 2026 06:01:49 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ma Ke <make24@iscas.ac.cn>, yoshihiro.shimoda.uh@renesas.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	niklas.soderlund+renesas@ragnatech.se, michael.dege@renesas.com,
+	nikita.yoush@cogentembedded.com, yury.norov@gmail.com,
+	geert+renesas@glider.be
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Ma Ke <make24@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net: renesas: rswitch: Fix memory leak in
+ rswitch_phy_device_init()
+Message-ID: <202603310514.S572gcNU-lkp@intel.com>
+References: <20260330073541.2871414-1-make24@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: phy: bcm84881: add BCM84891/BCM84892
- support
-To: Daniel Wagner <wagner.daniel.t@gmail.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, bcm-kernel-feedback-list@broadcom.com,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20260324152503.1522071-2-wagner.daniel.t@gmail.com>
- <20260324190601.1616343-1-wagner.daniel.t@gmail.com>
-Content-Language: en-US, fr-FR
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20260324190601.1616343-1-wagner.daniel.t@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260330073541.2871414-1-make24@iscas.ac.cn>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,broadcom.com,kernel.org,google.com,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273337-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[florian.fainelli@broadcom.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-273338-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[iscas.ac.cn,renesas.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,ragnatech.se,cogentembedded.com,gmail.com,glider.be];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: E1214361BF5
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,renesas];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,git-scm.com:url]
+X-Rspamd-Queue-Id: CFEA0361C04
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/24/26 12:06, Daniel Wagner wrote:
-> The BCM84891 and BCM84892 are 10GBASE-T PHYs in the same family as the
-> BCM84881, sharing the register map and most callbacks. They add USXGMII
-> as a host interface mode.
-> 
-> bcm8489x_config_init() is separate from bcm84881_config_init(): it
-> allows only USXGMII (the only host mode available on the tested
-> hardware) and clears MDIO_CTRL1_LPOWER, which is set at boot on the
-> tested platform. Does not recur on ifdown/ifup, cable events, or
-> link-partner advertisement changes, so config_init is sufficient.
-> 
-> For USXGMII, read_status() skips the 0x4011 host-mode register: it
-> returns the same value regardless of negotiated copper speed (USXGMII
-> symbol replication). Speed comes from phy_resolve_aneg_linkmode() via
-> standard C45 AN resolution.
-> 
-> Tested on TRENDnet TEG-S750 (RTL9303 + 1x BCM84891 + 4x BCM84892)
-> running OpenWrt, where the MDIO controller driver is currently
-> OpenWrt-specific. Link verified at 100M, 1G, 2.5G, 10G.
-> 
-> Signed-off-by: Daniel Wagner <wagner.daniel.t@gmail.com>
+Hi Ma,
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net-next/main]
+[also build test WARNING on net/main linus/master v7.0-rc6 next-20260327]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Ma-Ke/net-renesas-rswitch-Fix-memory-leak-in-rswitch_phy_device_init/20260330-214200
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20260330073541.2871414-1-make24%40iscas.ac.cn
+patch subject: [PATCH] net: renesas: rswitch: Fix memory leak in rswitch_phy_device_init()
+config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20260331/202603310514.S572gcNU-lkp@intel.com/config)
+compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260331/202603310514.S572gcNU-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603310514.S572gcNU-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/renesas/rswitch_main.c:1480:2: warning: variable 'phydev' is uninitialized when used here [-Wuninitialized]
+    1480 |         phydev->mac_managed_pm = true;
+         |         ^~~~~~
+   drivers/net/ethernet/renesas/rswitch_main.c:1462:27: note: initialize the variable 'phydev' to silence this warning
+    1462 |         struct phy_device *phydev, *tmp_phydev;
+         |                                  ^
+         |                                   = NULL
+   1 warning generated.
+
+
+vim +/phydev +1480 drivers/net/ethernet/renesas/rswitch_main.c
+
+3590918b5d07aa drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2022-10-31  1459  
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1460  static int rswitch_phy_device_init(struct rswitch_device *rdev)
+3590918b5d07aa drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2022-10-31  1461  {
+142f4caaa41b9c drivers/net/ethernet/renesas/rswitch_main.c Ma Ke             2026-03-30  1462  	struct phy_device *phydev, *tmp_phydev;
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1463  	struct device_node *phy;
+0df024d0f1d3e5 drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1464  	int err = -ENOENT;
+3590918b5d07aa drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2022-10-31  1465  
+b46f1e5793298c drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1466  	if (!rdev->np_port)
+3590918b5d07aa drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2022-10-31  1467  		return -ENODEV;
+3590918b5d07aa drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2022-10-31  1468  
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1469  	phy = of_parse_phandle(rdev->np_port, "phy-handle", 0);
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1470  	if (!phy)
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1471  		return -ENODEV;
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1472  
+0df024d0f1d3e5 drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1473  	/* Set phydev->host_interfaces before calling of_phy_connect() to
+0df024d0f1d3e5 drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1474  	 * configure the PHY with the information of host_interfaces.
+0df024d0f1d3e5 drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1475  	 */
+142f4caaa41b9c drivers/net/ethernet/renesas/rswitch_main.c Ma Ke             2026-03-30  1476  	tmp_phydev = of_phy_find_device(phy);
+142f4caaa41b9c drivers/net/ethernet/renesas/rswitch_main.c Ma Ke             2026-03-30  1477  	if (!tmp_phydev)
+0df024d0f1d3e5 drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1478  		goto out;
+142f4caaa41b9c drivers/net/ethernet/renesas/rswitch_main.c Ma Ke             2026-03-30  1479  	__set_bit(rdev->etha->phy_interface, tmp_phydev->host_interfaces);
+35b78409e1c7ff drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-10-17 @1480  	phydev->mac_managed_pm = true;
+0df024d0f1d3e5 drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1481  
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1482  	phydev = of_phy_connect(rdev->ndev, phy, rswitch_adjust_link, 0,
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1483  				rdev->etha->phy_interface);
+142f4caaa41b9c drivers/net/ethernet/renesas/rswitch_main.c Ma Ke             2026-03-30  1484  
+142f4caaa41b9c drivers/net/ethernet/renesas/rswitch_main.c Ma Ke             2026-03-30  1485  	/* Release the temporary reference obtained by of_phy_find_device() */
+142f4caaa41b9c drivers/net/ethernet/renesas/rswitch_main.c Ma Ke             2026-03-30  1486  	phy_device_free(tmp_phydev);
+142f4caaa41b9c drivers/net/ethernet/renesas/rswitch_main.c Ma Ke             2026-03-30  1487  
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1488  	if (!phydev)
+0df024d0f1d3e5 drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1489  		goto out;
+3590918b5d07aa drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2022-10-31  1490  
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1491  	phy_set_max_speed(phydev, SPEED_2500);
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1492  	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1493  	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1494  	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1495  	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1496  	rswitch_phy_remove_link_mode(rdev, phydev);
+3590918b5d07aa drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2022-10-31  1497  
+c16a5033f77b9e drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1498  	phy_attached_info(phydev);
+3590918b5d07aa drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2022-10-31  1499  
+0df024d0f1d3e5 drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1500  	err = 0;
+0df024d0f1d3e5 drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1501  out:
+0df024d0f1d3e5 drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1502  	of_node_put(phy);
+0df024d0f1d3e5 drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1503  
+0df024d0f1d3e5 drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2023-02-01  1504  	return err;
+3590918b5d07aa drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2022-10-31  1505  }
+3590918b5d07aa drivers/net/ethernet/renesas/rswitch.c      Yoshihiro Shimoda 2022-10-31  1506  
+
 -- 
-Florian
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
