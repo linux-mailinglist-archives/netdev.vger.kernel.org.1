@@ -1,137 +1,117 @@
-Return-Path: <netdev+bounces-273341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273342-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gOstDAz5ymmlBwYAu9opvQ
-	(envelope-from <netdev+bounces-273341-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:28:28 +0200
+	id MBI3BCf4ymmlBwYAu9opvQ
+	(envelope-from <netdev+bounces-273342-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:24:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D60F361EE1
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:28:27 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5759361E50
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:24:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 015443080123
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 22:20:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 61A523027100
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 22:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01143DFC62;
-	Mon, 30 Mar 2026 22:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E063E3D93;
+	Mon, 30 Mar 2026 22:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i86b9JsD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X0rYMfry"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071373E1CE2;
-	Mon, 30 Mar 2026 22:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F8B3DDDB1;
+	Mon, 30 Mar 2026 22:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774909223; cv=none; b=lv5UTa0ZQSPe4oVNVqJ7ShcjWGZ4TPaImgITm6336PA7+4lvIDRb7NAemwGYY7OwIEbzuCyEzxixc5hbltamWMnO5eaR0MjtBJWeWFmbcFbemLWs0fs9tdbIyaovT0OJHnqVCmbE8DkaL1JyuHrDg79ekZS0WFjhdNxLxMjL7es=
+	t=1774909402; cv=none; b=e+5oWSvHIo/LgktVmgT4y7GPTXg1jQUSY3RRMaSdG1GSXfzmZ7Uyy+Rbcq7b2S81pwJuVqQxkH7oH9BYP3yhhSFtpqNT2yf7Wzo90HFanPqienxF835FmcoSo5bpShl0vrVspDn+zMsWU5IcCazQ+XydEzj2coD9pOOBEfkPSG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774909223; c=relaxed/simple;
-	bh=pMi/WvQhiD88WMv6+51QIS/yzn0J2cBfkD/DASpvQAQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HKR1TyPcMdKbKpESrJzGcLm/aeaT9jaLzPdpar47f3Wsg2iARcwMFsrhgdmSjO0UgI03u2/XHLhaAsP3F7e5uL5YeJ2V88BxU3j50eWGL3s51QH9YKjGTn01eg8mQ6NNOobV1uGXktC4C1U7uq+NzvH1Fj9DhZJP2OFCQitQTvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i86b9JsD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FDBBC4CEF7;
-	Mon, 30 Mar 2026 22:20:22 +0000 (UTC)
+	s=arc-20240116; t=1774909402; c=relaxed/simple;
+	bh=R/RTYULXwMk5jUyXPTlsjfkiAucxmpo5A8GIlmR+4pI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L9KpfDNy8+zTgr1/k/4XYi/iDabxRdad8LGqd8W2+xW6D6gO+HeLMxiAC94a0Kx57gpzG+FMe8e9Xp8BBX1/LMvIFjwx7fj84EsAZtU6dK/LRhTRPrDi+CLRrC8p3oMF6sLqRQf+T7nnpu/7CWzm2giYXApEmbXmrEYCDQZtPmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X0rYMfry; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7EB4C4CEF7;
+	Mon, 30 Mar 2026 22:23:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774909222;
-	bh=pMi/WvQhiD88WMv6+51QIS/yzn0J2cBfkD/DASpvQAQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=i86b9JsDkBrIGmQvJsuT5n7kKuQLS97KR4IopKqt1p79/+lQhCZot69g0B2BVDS+z
-	 qszGoT7OsmAsma4Hpta8HOVNpqXAAEZ5WmVZpc8ZlnVDp2LeTqM36en+gOTh2ovmLX
-	 f0zjPUQNBtONjmBg3gPW98SXYENMoHXPVNmXdOEG7hCYFevu0RtmwjLnDXi6TsBjX4
-	 jazs+K4kL98zid3iU/P3h2VPXs5m3/oNC7LkRwPQ6rlhr8afrQzV7n9E3cAruw4kL8
-	 GJTrICYWf9ZwOt13m2IphgO8KsnFHwMeJq0KpY+cw5H5TMfQ0u0la4unqbHrDeD6bj
-	 rLPs8ZciPE+sQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FCF0392FF83;
-	Mon, 30 Mar 2026 22:20:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1774909401;
+	bh=R/RTYULXwMk5jUyXPTlsjfkiAucxmpo5A8GIlmR+4pI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=X0rYMfryywhutY6O4h5DcOtft954Mqqbo5clo1gTAQiKIfqI2gr263Ib68H1c878N
+	 aGehaKv/M3SGBbBhpXye4W0sHfhmB8v4XkbiBdXXcBxxL2fnDNcTKLhhjZ05/W3O2Z
+	 a3RZ/iE5LeQEwlH6m7zKLtHtmXxotgZFzO7x/YhOPVdbqMXzpxDP0xYmnKPAxu7Cl5
+	 RA+Zlj9AJ4u6oV0vwBYzfr3tunqPhVC+ja03upecAu/kYlEKe5BF2AtxoEMpIBbnMY
+	 O7FWd9HlrjlCgG++1J0ODjkGg/q15snobTvSXA8Ra5P1rsxU+5CZcs3xXyydDLxOGb
+	 mcrPri0YQjK/w==
+Date: Mon, 30 Mar 2026 15:23:18 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, shirazsaleem@microsoft.com,
+ dipayanroy@linux.microsoft.com, yury.norov@gmail.com, kees@kernel.org,
+ ssengar@linux.microsoft.com, gargaditya@linux.microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next v4] net: mana: Expose hardware diagnostic info
+ via debugfs
+Message-ID: <20260330152318.144c1b30@kernel.org>
+In-Reply-To: <acrKgG0USsGABqYT@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260319070926.1459515-1-ernis@linux.microsoft.com>
+	<20260323174444.2717da3d@kernel.org>
+	<acK56AlPfVW8cDPe@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	<acrKgG0USsGABqYT@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v2 1/2] net: clear the dst when performing encap
- /
- decap
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177490920605.1961104.13650171609512464999.git-patchwork-notify@kernel.org>
-Date: Mon, 30 Mar 2026 22:20:06 +0000
-References: <20260329180428.2657785-1-kuba@kernel.org>
-In-Reply-To: <20260329180428.2657785-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
- horms@kernel.org, maze@google.com, willemdebruijn.kernel@gmail.com,
- ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273341-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,kernel.org,gmail.com,iogearbox.net,linux.dev,fomichev.me];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273342-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[22];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8D60F361EE1
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A5759361E50
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+On Mon, 30 Mar 2026 12:09:52 -0700 Erni Sri Satya Vennela wrote:
+> Just a quick follow=E2=80=91up on this. Since these issues were pre=E2=80=
+=91existing and
+> not introduced by this patch, would you prefer that I send them as a
+> separate fix patch, or fold the fixes into the current patch?
 
-This series was applied to bpf/bpf-next.git (net)
-by Martin KaFai Lau <martin.lau@kernel.org>:
-
-On Sun, 29 Mar 2026 11:04:27 -0700 you wrote:
-> Commit ba9db6f907ac ("net: clear the dst when changing skb protocol")
-> added dst clearing when a BPF program changes the skb protocol
-> (e.g. IPv4 to IPv6). Since that was a fix we only cleared the dst when
-> the L3 protocol actually changes to keep it minimal. As suggested during
-> the discussion (see Link) encap or decap operation which wraps or unwraps
-> a same-protocol header may also render the existing dst incorrect - even
-> if that doesn't result in a crash, just the wrong route for the now-outermost
-> IP dst.
-> 
-> [...]
-
-Here is the summary with links:
-  - [bpf-next,v2,1/2] net: clear the dst when performing encap / decap
-    https://git.kernel.org/bpf/bpf-next/c/648c1bc05997
-  - [bpf-next,v2,2/2] selftests/bpf: test that dst is cleared on same-protocol encap
-    https://git.kernel.org/bpf/bpf-next/c/660735c4182c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Anything that's pre-existing should be a separate patch, before any new
+code. If the bug exists only in net-next - earlier in the same series,
+if the bug exists in net - posted separately for the net tree.
 
