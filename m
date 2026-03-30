@@ -1,128 +1,129 @@
-Return-Path: <netdev+bounces-273166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273167-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WAE/Er91ymmB9AUAu9opvQ
-	(envelope-from <netdev+bounces-273166-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:08:15 +0200
+	id 0Jh4I010ymmu9AUAu9opvQ
+	(envelope-from <netdev+bounces-273167-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:02:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDA0C35BA1A
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:08:14 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6E6A35B8EB
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:02:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2359C3045AA4
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:00:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 76396300D931
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7106C3D3314;
-	Mon, 30 Mar 2026 13:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CB43CFF4C;
+	Mon, 30 Mar 2026 13:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Di3bwdXn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gYzAgezo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF6B3CD8BB;
-	Mon, 30 Mar 2026 13:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6731FF1C7;
+	Mon, 30 Mar 2026 13:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774875614; cv=none; b=LN6V++wiXEGQyM2TSL3eO9dsBaFuGJzhx+go8Byh+HiZOd+QalrVsFnUUQfTh75NMa9295SFykzD/1svoRikM8dJ7jWOKJJsnYxzcSwxXTtn1AX2qa6VPbyj8+QLolimX+zavxrBTeB/jNGBLF38Qu1HZMyFsWH9YuymVZ7i10g=
+	t=1774875679; cv=none; b=dDsMi+8vFm04/OfR70zW3gsmtQdIyDbLmonmu57N1tvi9q9htc1t4o1sVAdvS4DGAm21JCylSeIIiHC+IdPweFpMi8cOvBHQJfi3E5MMSyPbXID0WZGOmxe0LCuWeu493VmAvH+bu3mUaWveGf5Ofkb6iSbMMYkJHRMtSVpxeFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774875614; c=relaxed/simple;
-	bh=TtCvUVWKXPVAaTKLJLcMPLOfFxnwBsE36MNglsemq0A=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=u9o7645as/jt1IlVKl148bMN17JtNonA+CgdH7K3EsthvNnnujdDPunks8Oh66uWNFip0l85D8ZmTMgMOQdf+y9KIjGGR3VOc++n6NCTfy05HBK5aL2iiKkV6bT7ZZC9LtvvOFu7Q1TdOpG9rEG3fVCXf+MKuryU3h9dIMjkKKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Di3bwdXn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78B51C2BCB0;
-	Mon, 30 Mar 2026 13:00:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774875613;
-	bh=TtCvUVWKXPVAaTKLJLcMPLOfFxnwBsE36MNglsemq0A=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=Di3bwdXn6V7ktE0AT0tyMDlwtOImbxe7ORVPDO45dSA1lQrHFE3peV4PtqdvhhtgL
-	 DteL2GE+1pt+sBeWxAHM+YLi0Fh0BI23tOaNWLPKHi/Q+I08XEP75A7k7+Mt+ypLLK
-	 WpDZnR/bU4/BUSHBA+AUKlzUwNRTz1b1OICYMD+In7wV8UOpkHS0Qy1+f1KDiOSVmG
-	 qSpazTBF9qmeh2c6shCq/w/cpEeabJRY6g5v1afUIjIFxlnevEzg6YVOPy/kM/4qRx
-	 Ofv8mkUhMwsYVoG9e0Yzz6gPjnl+uP4Z/RLzrpesXhgE5Fhp7XYwX+agn1VtWEiz+w
-	 Z95qAqQONKlfw==
-From: Leon Romanovsky <leon@kernel.org>
-To: Konstantin Taranov <kotaranov@microsoft.com>, 
- Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, Jason Gunthorpe <jgg@ziepe.ca>, 
- Haiyang Zhang <haiyangz@microsoft.com>, 
- "K . Y . Srinivasan" <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
- Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
- linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org, 
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-In-Reply-To: <20260325194100.1929056-1-longli@microsoft.com>
-References: <20260325194100.1929056-1-longli@microsoft.com>
-Subject: Re: [PATCH rdma v3] RDMA/mana_ib: Disable RX steering on RSS QP
- destroy
-Message-Id: <177487561085.3814940.18401263006419819555.b4-ty@kernel.org>
-Date: Mon, 30 Mar 2026 09:00:10 -0400
+	s=arc-20240116; t=1774875679; c=relaxed/simple;
+	bh=nP9f1EqIPdqAMjlrltvj90GqZmirg/40G3V7UFz4aiE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nc7rfYevqKV7NQxQIXQ0BzcfWyLQzwAei818kSTQRLQe97XT+un/wT/N6nTeGzVB/EV/l7zRbBptj+q9qYs2wkX3XuP6EYTjZBgFDIDnfGMP936Z+TcicwZzQxzKyxkIbTiaR+Q3Aa9dvLYU1ATcu83qVUKj8gmNPVZUWW2lEqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gYzAgezo; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=SM5++uahSjWdn9lZl3+feCFnrHEokV98lFnyAP0vFD0=; b=gYzAgezouYEkgP4jpnvkVpjXjm
+	8XGi9C4EHFi8z6P2L1cm1g0BQtuY4ce4iSU6IbRdhROXshGXo4R6IHaIDVhDotFiSvO+ekJbZwPcc
+	G7f1ylCE+xjaFAzrOJgfHhO1HYS72PadscKYmaPGoP8TlcP41590zq7O6nmRRz7E/HHQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w7CEq-00E29h-2L; Mon, 30 Mar 2026 15:01:04 +0200
+Date: Mon, 30 Mar 2026 15:01:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: netdev@vger.kernel.org, Phil Elwell <phil@raspberrypi.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] net: phy: microchip: add downshift tunable support
+ for LAN88xx
+Message-ID: <ea58ad33-ac25-4907-8fa5-167479070b97@lunn.ch>
+References: <20260329224202.500229-1-nb@tipi-net.de>
+ <20260329224202.500229-2-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-18f8f
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260329224202.500229-2-nb@tipi-net.de>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273166-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,raspberrypi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-273167-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CDA0C35BA1A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: E6E6A35B8EB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+> +	switch (val & LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_MASK) {
+> +	case LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_2:
+> +		*data = 2;
+> +		break;
+> +	case LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_3:
+> +		*data = 3;
+> +		break;
+> +	case LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_4:
+> +		*data = 4;
+> +		break;
+> +	case LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_5:
+> +		*data = 5;
+> +		break;
+> +	}
 
-On Wed, 25 Mar 2026 12:40:57 -0700, Long Li wrote:
-> When an RSS QP is destroyed (e.g. DPDK exit), mana_ib_destroy_qp_rss()
-> destroys the RX WQ objects but does not disable vPort RX steering in
-> firmware. This leaves stale steering configuration that still points to
-> the destroyed RX objects.
-> 
-> If traffic continues to arrive (e.g. peer VM is still transmitting) and
-> the VF interface is subsequently brought up (mana_open), the firmware
-> may deliver completions using stale CQ IDs from the old RX objects.
-> These CQ IDs can be reused by the ethernet driver for new TX CQs,
-> causing RX completions to land on TX CQs:
-> 
-> [...]
+> +#define  LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_2	(0 << 2)
+> +#define  LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_3	(1 << 2)
+> +#define  LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_4	(2 << 2)
+> +#define  LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_5	(3 << 2)
 
-Applied, thanks!
+It looks like you can replace the switch statement with a FIELD_GET() + 2.
 
-[1/1] RDMA/mana_ib: Disable RX steering on RSS QP destroy
-      https://git.kernel.org/rdma/rdma/c/187c8bd5e571f5
+    Andrew
 
-Best regards,
--- 
-Leon Romanovsky <leon@kernel.org>
-
+---
+pw-bot: cr
 
