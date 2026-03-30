@@ -1,205 +1,200 @@
-Return-Path: <netdev+bounces-273049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273053-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mHWTE6HgyWn83AUAu9opvQ
-	(envelope-from <netdev+bounces-273049-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 04:32:01 +0200
+	id gAHPNsDjyWlC3QUAu9opvQ
+	(envelope-from <netdev+bounces-273053-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 04:45:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D626D354D0B
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 04:32:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 645CB354D73
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 04:45:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6DB2C300B06F
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 02:29:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 518DD3006F3D
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 02:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E7F34405B;
-	Mon, 30 Mar 2026 02:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E10663939AC;
+	Mon, 30 Mar 2026 02:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E6BSmCaE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O3WMlg+Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 394DB37F75A
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 02:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B981336C9D0;
+	Mon, 30 Mar 2026 02:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774837776; cv=none; b=mYZsZ3kwz2eOwtE1tYbpADLPTxhZI1IsmGAYcwqy2iQlaUkIQZaC948u8+HcHbNJyCE93aeY5F1xKRVaAIbGh7qmvIOvdAbM991DXTjEcykkoHJHvtciD0i0tImbYnyTwP3OE1BinLUBtaDGY4WS5eLWIBt9S8uexPKPHu0dAMs=
+	t=1774838717; cv=none; b=SAUnpH5V5Imy5QnEiuNmMZtQwcWiQKxKd4lqD2Tb/ivSpORZPREbV8YJAG2vtY7KjqgBB0obirp+mFwxSKvhthaYJqtmycmicDC2RcnPBdDfVSJKx2xEOGr1Ht19flKiY8ptW7Wp3klb0QAsPOf0inJGOK92w8WuYltRbVYV/b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774837776; c=relaxed/simple;
-	bh=q+XVYlFLxCAzomJfQtNjsLarOjG6MU1Go2EMdXhpJq0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=IgLdVeA3z/dKRn/ArNZ2AMJ9hSiSx9ETx/fFIM3nIH5XVX2c7NvD7oO3t2nYbQO83IErbpzmuZKJ0sk7QqDsD4R3b2izSCHEYLx5CCjNCWmPrLfbq739eciwI1vSYFvPAkZqs1v80L8fM8R+cTcYREuOqtwdrGcozqhmdTZ6anY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E6BSmCaE; arc=none smtp.client-ip=74.125.224.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-64eaf8aa893so4566494d50.3
-        for <netdev@vger.kernel.org>; Sun, 29 Mar 2026 19:29:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774837774; x=1775442574; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q+XVYlFLxCAzomJfQtNjsLarOjG6MU1Go2EMdXhpJq0=;
-        b=E6BSmCaE6Ly6XM2TQ7PfZ2KjhVdIFYFQmCIOR2GwyQDV0xiUo1gljhEEeTnYNHgt1I
-         nA4Xg+OvwtFDVv7JROq4vKYzjDwI66gBOrMTtE7f24m/2ZARDZDiSxVHC0kfrO8s0zFF
-         OewjpJFtprGIShnB5thiASBs1T0XmzJ2hiJtxqtfsW79pqvBJ2FcHXuVKH8EaUT3POL1
-         NkmCefCp1qkN9qdhH9mpygkPp1e/ZDoTgFghSOHOqbXTeJYkmZo/xeXKzuLNq+4iySnx
-         XsUrdegthsPzb6nfcoMhvbCy9NyCrovLHRuVexhlQzqd+GnTAk9T8eNNqNIM+4R5FyBs
-         KigQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774837774; x=1775442574;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=q+XVYlFLxCAzomJfQtNjsLarOjG6MU1Go2EMdXhpJq0=;
-        b=bPOynoe4B3PELnDfuOACpJ2vts0uRVlPkYIFi/arsCa1zNFV8cmxHCPUa94xqBzlNI
-         qzRKsnCUhA+HMLZd9cOUBULJdIZcxJfzoqsH2CbsaHlsgtTh8SVv6iZxqATiU8MQIQ7o
-         QkFO4/xZW507b9J8RXVEr4qGpCp0sHSxNoLLJaQJatdxkfgLvJLw23A9bLMDGiQC2Y0u
-         RHdqajTPGuegxcR3zKNQUGmz36GL/C+gbuF+JQswfvWz1xUL2foCJZNfezL3rDp3eMGp
-         RCVi075IT9+exB+vIlzb8gnHZvZRv8Tf+B0IFdIg21k2T0FYChxMzJcR+r5/Owfkri0Z
-         cu6w==
-X-Forwarded-Encrypted: i=1; AJvYcCU4xoWzBfrelGYuo4PMDp4WoFlzJlYFylxYSnj32NQkJXZVqlSPoeVHyv+TvU6ifoaGE9R0mMQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2CITwWBRWENiHIh++fFwNLu6tsm00n5EPDEjU7qoCFEy89zbi
-	xX0fxbMu2lobjBLHXs+MVbW9QI9FdOEp4eFNo5/qOSVMcCZeCg7U9kOl
-X-Gm-Gg: ATEYQzw/XBty+QJoYBNv/721hNhkPlfEjA8a+P4HEVu9huBjRV1VY/WA5WHX+EQX50v
-	/iM9iLfvl5lXMCgnGzR4oe8j7BgwSrr6zKuKd+FxX86XXMCAS/p/SIyW6auC7nc5aYEIMI4I4DW
-	YUVAoSCZ8EUZlE9DtakYB6P75qSnTko9v9dFILyVFim45L3PP0TflKaX032PtD3HLsuRBhTG99N
-	IAnL0sADNWTaPn1WlpyMfkBINHBeeQMPd1QMUKK08UGSodokY1OSzEVlT2K98JUD3yr/si6h99R
-	7g2XHxIPTt/HBNFMbn0JUHzKKWkfetVEkTuKlup7armP39U8XHA2qhJkrpyMgv0yPmW9Wx5ugJU
-	epMW5AEvG6lFNz8SpOUWdME4O1mSTjJ+6dOv7c21nRdKrYm5XL0DKjTEZU+xcZqO91Hp/kNwT6X
-	WYOyx+sBZlrsId+wyg/TZZtKxWJKOKezUseFGAwOgkAajAAaJz2PzU2eT/xZvjT5Ir7VoqdCjPJ
-	54F
-X-Received: by 2002:a53:d005:0:b0:650:1bc2:7e18 with SMTP id 956f58d0204a3-6501bc286femr1961791d50.1.1774837774124;
-        Sun, 29 Mar 2026 19:29:34 -0700 (PDT)
-Received: from gmail.com (180.134.85.34.bc.googleusercontent.com. [34.85.134.180])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6500934c235sm3278408d50.17.2026.03.29.19.29.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Mar 2026 19:29:32 -0700 (PDT)
-Date: Sun, 29 Mar 2026 22:29:32 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Jason Wang <jasowang@redhat.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- Simon Horman <horms@kernel.org>, 
- Kuniyuki Iwashima <kuni1840@gmail.com>, 
- netdev@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.1968171df848f@gmail.com>
-In-Reply-To: <CANn89iL_znbKR2oqOs9kQTgAnNKv487ymr8Xx8ouHFsyAK=o6Q@mail.gmail.com>
-References: <20260327213441.3781433-1-kuniyu@google.com>
- <CANn89iLshTzN95t+GV0Tk97n_BCDzjAGDNTb=vSyF1rQNqwe_A@mail.gmail.com>
- <CAAVpQUB=LtWXq_bzET2DOkyw_y5qRsuUf_fNCRE+TtiVHFktZw@mail.gmail.com>
- <willemdebruijn.kernel.64bceda776b2@gmail.com>
- <CANn89iL_znbKR2oqOs9kQTgAnNKv487ymr8Xx8ouHFsyAK=o6Q@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next] tun: Ignore tun in netdev_lock_pos().
+	s=arc-20240116; t=1774838717; c=relaxed/simple;
+	bh=EUgvJUu5JMz2u17CJzY6/EHPhU84LC0U5uuI3sWTPmM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=PKOjz3H7Q+3oAlQ+Z6g/fZvlIdYcjImnLTcBwgDbSsgVrKCVkkyyI4Ga/ET9EuSOqrKoF8UNBgnjxwG02WG+aqGDZ6voTkEWSb8NXxdHX6YjSJywe1amQ946OEYwbVAGCfhRn2jMlD9zayuMvqZnv9AU2BqxQ16H7jYeBTygOPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O3WMlg+Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5C531C116C6;
+	Mon, 30 Mar 2026 02:45:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774838717;
+	bh=EUgvJUu5JMz2u17CJzY6/EHPhU84LC0U5uuI3sWTPmM=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=O3WMlg+ZzuyfD0ewR7Pqq9X9kHXS2bIymelWpJMscggEmQgngacGXY8fu61ED2Cqf
+	 WtrCQG8YPayn7/yjjcLuIhDounfKrAXXCbDIBDgkyvpNUvSLNghOfNQl+1CUOHMeoc
+	 zTYGOckK+8wimIwEvAJJCWU6V9vaw0JHPcigOR6JW6yEZ+/JlsWzHwx8iEPgISupuj
+	 7NDM96epm/IykRViFHIOfFcSy/lI8OQjVCSt07kbDMRsjo/JwE2jaztBSLFtTu9/m2
+	 lqIIN5HFeIcxk6D4q/bKx/GXhRS9NzhE58hPnVTCRtbu9ZnfETtHdHkejfS+h0TPN6
+	 r0HyC4Ki7agAQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F75FF492F;
+	Mon, 30 Mar 2026 02:45:17 +0000 (UTC)
+From: Satish Kharat via B4 Relay <devnull+satishkh.cisco.com@kernel.org>
+Subject: [PATCH net-next v3 0/6] (no cover subject)
+Date: Sun, 29 Mar 2026 19:45:16 -0700
+Message-Id: <20260329-enic-sriov-v2-prep-v3-0-19a477549ef6@cisco.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.16 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALzjyWkC/4XNMQ7CMAwF0KtUmTFK3NIiJu6BGFrXoR5IqqSKi
+ qrenShiYEBi/P76z5uKHISjulSbCpwkinc51IdK0dS7B4OMOSvU2OoaG2AnBDGIT5AQ5sAzoGX
+ D/UD1SEblYT5aWQt6U44XcLwu6p6bSeLiw6t8S6b0H/j0C04GNDRnqxtiYzTRlSSSP5J/Fi7hf
+ wIzYTsk25mWB9t/E/u+vwH2XjxZAQEAAA==
+To: Satish Kharat <satishkh@cisco.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1774838716; l=3907;
+ i=satishkh@cisco.com; h=from:subject:message-id;
+ bh=EUgvJUu5JMz2u17CJzY6/EHPhU84LC0U5uuI3sWTPmM=;
+ b=sX65B2f1sAugzBzovoPK6r9Bbgd9twhOYQbfvlU9Pha6DtWf+CtsXeYceJtxzQ87pjPLtGRK2
+ OnU5DaH8OjQBoxxDVYbwB4mxi/bEWCSXAtxZ42TTIyNwTolGUawBDZB
+X-Developer-Key: i=satishkh@cisco.com; a=ed25519;
+ pk=4BxbLoCGvHeIMH/PbpiNVx8/2IcTjFvqcr0AD8K6WLY=
+X-Endpoint-Received: by B4 Relay for satishkh@cisco.com/default with
+ auth_id=639
+X-Original-From: Satish Kharat <satishkh@cisco.com>
+Reply-To: satishkh@cisco.com
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_RHS_MATCH_TO(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273049-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,lunn.ch,gmail.com,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[google.com,gmail.com];
+	TO_DN_SOME(0.00)[];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-273053-lists,netdev=lfdr.de,satishkh.cisco.com];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_HAS_DN(0.00)[];
+	HAS_REPLYTO(0.00)[satishkh@cisco.com];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D626D354D0B
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,davemloft.net:email]
+X-Rspamd-Queue-Id: 645CB354D73
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Eric Dumazet wrote:
-> On Fri, Mar 27, 2026 at 4:16=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Kuniyuki Iwashima wrote:
-> > > On Fri, Mar 27, 2026 at 2:48=E2=80=AFPM Eric Dumazet <edumazet@goog=
-le.com> wrote:
-> > > >
-> > > > On Fri, Mar 27, 2026 at 2:34=E2=80=AFPM Kuniyuki Iwashima <kuniyu=
-@google.com> wrote:
-> > > > >
-> > > > > dev->type could be any value on tun due to TUNSETLINK.
-> > > > >
-> > > > > Let's not warn about it in netdev_lock_pos().
-> > > > >
-> > > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> > > >
-> > > > Hmmm... should we instead have a list of supported types ?
-> > > >
-> > > > And reject user space requests for unsupported ones ?
-> > >
-> > > I chose a safer way but maybe we could reuse tun_get_addr_len()
-> > > and define the default case there as unsupported ?
-> > >
-> > > I guess it's okay even if it breaks userspace because we can
-> > > just add a single line to restore the support.
-> >
-> > We shouldn't risk breaking userspace, over such a sanity check.
-> =
+Changes in v3:
+- Thanks to the reviewers for the feedback on v2, all comments have
+  been addressed in this revision.
+- Patch 4/6: check enic_dev_enable() return value in enic_open() and
+  add proper error unwind path so the enable reference count stays
+  consistent if the firmware command fails.
+- Patch 6/6: use ARRAY_SIZE(enic->admin_cq) for the admin CQ resource
+  count check, since the driver allocates two admin CQs and both must
+  be backed by hardware.
+- Link to v2: https://lore.kernel.org/r/20260325-enic-sriov-v2-prep-v2-0-f72cf716ebfa@cisco.com
 
-> The thing is : this check makes sure that each type has a different
-> lockdep class.
-> =
+enic: SR-IOV V2 preparatory infrastructure
 
-> >
-> > Presumably any truly newly added type will have a non-zero addr_len.
-> > While tun sets this to zero for weird inputs. Maybe just filter on
-> > that in the WARN_ONCE?
-> =
+This is the first of four series adding SR-IOV V2 support to the enic
+driver for Cisco VIC 14xx/15xx adapters.
 
-> Then we might hit some lockdep issues...
+The existing V1 SR-IOV implementation has VFs that interact directly
+with the VIC firmware, leaving the PF driver with no visibility or
+control over VF behavior. V2 introduces a PF-mediated model where VFs
+communicate with the PF through a mailbox over a dedicated admin
+channel. This brings enic in line with the standard Linux SR-IOV
+model, enabling full PF management of VFs via ip link (MAC, VLAN,
+link state, spoofchk, trust, and per-VF statistics).
 
-Warnings due to stacked devices wouldn't apply to tun.
+This preparatory series adds detection and resource helper code with
+no functional change to existing driver behavior:
 
-Can this be used to set up (false positive) lock inversion deadline
-reports?
- =
+  - Extend BAR resource discovery for admin channel resources
+  - Register the V2 VF PCI device ID
+  - Detect VF type (V1/V2/usNIC) from SR-IOV PCI capability
+  - Make enic_dev_enable/disable ref-counted for shared use by data
+    path and admin channel
+  - Add type-aware resource allocation for admin WQ/RQ/CQ/INTR
+  - Detect presence of admin channel resources at probe time
 
-> Perhaps use lockdep_register_key() on each tun device...
+Tested on VIC 14xx and 15xx series adapters with V2 VFs under KVM
+(sriov_numvfs, VF passthrough, ip link VF configuration, VF traffic).
 
-In tun_set_iff replace the xmit_lockdep_class previously set by
-netdev_init_one_queue?
+Based in part on initial work by Christian Benvenuti.
+
+To: Satish Kharat <satishkh@cisco.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+Changes in v2:
+- Add RES_TYPE_SRIOV_INTR to the has_admin_channel check in patch 6/6
+- CC all netdev maintainers per cc_maintainers CI feedback
+- Link to v1: https://lore.kernel.org/r/20260325-enic-sriov-v2-prep-v1-0-48f04ce110cc@cisco.com
+
+---
+Satish Kharat (6):
+      enic: extend resource discovery for SR-IOV admin channel
+      enic: add V2 SR-IOV VF device ID
+      enic: detect SR-IOV VF type from PCI capability
+      enic: make enic_dev_enable/disable ref-counted
+      enic: add type-aware alloc for WQ, RQ, CQ and INTR resources
+      enic: detect admin channel resources for SR-IOV
+
+ drivers/net/ethernet/cisco/enic/enic.h          | 18 ++++++++
+ drivers/net/ethernet/cisco/enic/enic_dev.c      | 17 +++++--
+ drivers/net/ethernet/cisco/enic/enic_main.c     | 59 ++++++++++++++++++++++++-
+ drivers/net/ethernet/cisco/enic/enic_res.c      | 12 ++++-
+ drivers/net/ethernet/cisco/enic/vnic_cq.c       | 14 ++++--
+ drivers/net/ethernet/cisco/enic/vnic_cq.h       |  3 ++
+ drivers/net/ethernet/cisco/enic/vnic_dev.c      | 10 +++++
+ drivers/net/ethernet/cisco/enic/vnic_intr.c     | 12 +++--
+ drivers/net/ethernet/cisco/enic/vnic_intr.h     |  2 +
+ drivers/net/ethernet/cisco/enic/vnic_resource.h |  4 ++
+ drivers/net/ethernet/cisco/enic/vnic_rq.c       | 14 ++++--
+ drivers/net/ethernet/cisco/enic/vnic_rq.h       |  3 ++
+ drivers/net/ethernet/cisco/enic/vnic_wq.c       | 14 ++++--
+ drivers/net/ethernet/cisco/enic/vnic_wq.h       |  3 ++
+ 14 files changed, 165 insertions(+), 20 deletions(-)
+---
+base-commit: b1c803d5c8167026791abfaed96fd3e6a1fcd750
+change-id: 20260324-enic-sriov-v2-prep-2fe1eabc3dc1
+
+Best regards,
+-- 
+Satish Kharat <satishkh@cisco.com>
 
 
-If keeping the approach from v1, perhaps a tun device can already be
-identified in core code without having to export tun_link_ops.
-From the init in tun_set_iff, dev->sysfs_groups[0] will have an attr
-"tun_flags". There might be something more elegant. Just the first I
-spotted.
 
