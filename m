@@ -1,213 +1,169 @@
-Return-Path: <netdev+bounces-273175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273176-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eFHMMtF0ymmB9AUAu9opvQ
-	(envelope-from <netdev+bounces-273175-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:04:17 +0200
+	id sAnkOS13ymnk9AUAu9opvQ
+	(envelope-from <netdev+bounces-273176-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:14:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 691B835B991
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:04:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52EE135BBD9
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:14:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C350B300CA3E
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:04:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 34B853036060
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E520A3D332A;
-	Mon, 30 Mar 2026 13:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F323D3335;
+	Mon, 30 Mar 2026 13:07:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AVt5pSJB"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Y7BTAk1f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663543B6350
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 13:04:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774875853; cv=pass; b=dgwIRqgX25hxwvHFaPJbRFLI3k7QT4gXDmU4pnezfrjn8ukL5XFHRblQeD7MicCm1On4aoOyofVUaHkSyoyS6d3LPImF/zuBZ7DWs1XxRrH0Kq/GYmhKIMRcYgNiiLX6rMMRNEfGooM36KhsHtOU24uDrL+c8bLWvDU7i+pqTQE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774875853; c=relaxed/simple;
-	bh=0Cwdb/46OgW5VjkNSZbAZFMjeairSLyPIs4ZEcz5EQw=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hVxcmsPHXGC39aWp8bKKUMWTgiQtR4O5pXCSwSB7RJ8Daoss+4RE+8ssX/xjfiAZa3/ne0LpQwVjHiAN1Qs0Av275CAFkTgnTznubIjIm4Cs+/JtqkgOeGBurSPudCfAoImiD3Jzbo6/JrXwigawEDT2yKU6qQVuHRxQ2ivW4wI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AVt5pSJB; arc=pass smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-66bd3d05e03so1358568a12.2
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 06:04:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774875851; cv=none;
-        d=google.com; s=arc-20240605;
-        b=bzSn6S4MujSQ/vpn2rIq17JvykXo4xXDFWP2E5+SaDIM05iN2mKAlGBWlkka5IaWC5
-         wTNSE/aF2Fsayv5ZhFtXlHupRYcyBx7ffXrBWfXqCcAZn6kp0Dt1Ihtls8p0ZSqFMExj
-         88hEdBdDdFTu6fJy1M/bi7RrIjipQsW3XUNcSgKimSt+XR9U2JtrUbdKdjbwB5VcaeKK
-         tuuyL5vc/xcLCemirkHXym+1qnk73Rh4iKGyhdwF13qpNOuPuAPRR+VcqLCt/LSbD6aq
-         GfXzp6w4zvuhDN3O/2c9QKGBOAPLX8/mPXZDpoGoflkq19sGIrCC7NssUnl+z/3a5E+J
-         H/+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=V0WKfufc+UkKVXOEWdhXWE4oAi0whRIif5wlHsWbgx4=;
-        fh=1NxLiEhMoqV9lOhJV8BVyymHwxXCacL1MyR/M+KaDMA=;
-        b=JBEVcE0E2NDOXOmbeWDJ5jBuhcRhCUad+9WXGiG6Mf5ThywglS9MvoZ8H9fPlZca12
-         WOJIHN++YmylnoXHzYzv+Hu3atkSvTz/qBgp9jIIQY88fGzsF4m+SajAyuX8GiKgMQ5R
-         4SYM5z6clJJESN9P2Ia9vRZikRYy1QW9B/bquVIcOrMH2Sn+849wxmopPOCs28erCG7L
-         05q5prW1cWewrDKQmdB70i18KuBxIXgK23nxTTyT6n97IpggPJhWYiwyXdlJOJ1hZqGa
-         MvETYqdKVUCdgRZARnkZMYpmg1HZVPPQTx1YgTM+AkMndtT2N4x8vxgTnRHofJqoJbHq
-         0ynQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774875851; x=1775480651; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=V0WKfufc+UkKVXOEWdhXWE4oAi0whRIif5wlHsWbgx4=;
-        b=AVt5pSJBnuAY4A6BNO4rMOeV/GtmXiEMAy/MSDyq6tKpW2pcl82zOpD/iTxjVo2pdz
-         EPCREXVaV+qkKcfIp6d6hiD6pONGf6tuoxYGy3iNjZPMXA7TA2DM3UTb9r+zgIOyXgOI
-         w8Q68dHe+/6PJ0uXx0GJvrkbXvSqX+NF56ix/9f4Q4Zo6v7trXUBqi31pkwNnfEr6GMy
-         jyntZBRa2kDZGbsNVnWUeVLVxoxybER9nT96//z0g7Cc2qZLvCeogJ3RBnHdQDCFQXeh
-         ldLr4k8F96h81ixhistQhjrvciJsNvtYsVM2MvizerhXySnyuuDIiLDjfIXreKkvqoOS
-         bO4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774875851; x=1775480651;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V0WKfufc+UkKVXOEWdhXWE4oAi0whRIif5wlHsWbgx4=;
-        b=ktf6SJuOFqx/mbSLsRXQT4IX8JQoqzwy+cDlFSW8CePYIvgMksQg6fcrcMTXVFK27/
-         opDCXYg+fpksW8sxRCegG65fxCB2FglmjqCIJnbK8wFPZBetf8pVtN/N6OgNPo2ELs+F
-         1jOZyxSpAxR/ChzJOt1do/jicBC+ef5/PHhkcSBbw5nDvsiS2phmqWN1HLITR4I2JD90
-         lE94OME0IOZ1FTEVfpJLuJ+HrlYbs+oiW1JOTiLSPZCgDQ70MGeoV4/AASNvE/Js5K/S
-         YU4ivywlTFNC887v+ka2V285plpBCV7cCbDcUx8Hgy3lZc0EMVn29grkg9/coAsktook
-         7XRw==
-X-Gm-Message-State: AOJu0YzwaVghQvMA0wCSQh2btYWlkKeWFKBZYm4wEh+HidKI1QWj4CvK
-	mJJJyAfDt9ulv7qRqoB0M5b++BqTGRWexOorR4AyM5b8qg2pIOd3HBaNQxZbhwc28X+dcnWBpx1
-	nufWxlA3kB4rO3HwRU5j/vYT5gvsRlK9nWa+r
-X-Gm-Gg: ATEYQzxWBt7osFypmspC51NlFsXMmUILuS8Rns8OK4IYTwvj+aqqQ/FWrkwRjYvqyEw
-	sYAF2yaH+3ZZ3xTtSoadOmVEKW2Mp9W+TjlYvVbQg7yfFYkyxNJnb0yFld6Q0dFKUByhZn3A1lw
-	8xF9cyHatbNtJc7OoSHVQYjPHGncJWn3bHhUVW1BBgZGhz+kIFMBebQF5m6F1h4zYOnbzTyydO8
-	rXrOILF42IuALc1xT1QVeRMGLu/3d2W1S9hiFoTmJkWl8HC22WBulQ2TEJUp7w5MN5YXob7ZsGP
-	qIPARHO3xxGG+F4Ngk5UUsjDwbVltnVo4Vk0tawsj8mfQyFislHcH4FdG9yEIzuobia5xwLQSA=
-	=
-X-Received: by 2002:a05:6402:530c:b0:66a:16ed:46cb with SMTP id
- 4fb4d7f45d1cf-66b290775bdmr6447498a12.26.1774875850266; Mon, 30 Mar 2026
- 06:04:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C1C3CA481
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 13:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774876055; cv=none; b=PO8irghWsd9TbmRilqop8wBGON7793i0L5EcR/XsQeZOW5HRJhZoGTG0PORO7g54sPAEO6/F83s563kChmKxrs6eS+mRWK89gIG0LgeO747QOfYPpIZHLQ3C3h2cEcBXCT+ixD5FbqvSVAi1zbR+Ry2yP3v2w4/RQGKpNtnb2CA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774876055; c=relaxed/simple;
+	bh=C8NNL7hwaTk7W11gVRZRwpeVV5rtR8at0YoB5aRdk3s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M35V50aS6KLw/+RoMQLIcKqsmt25tl5cge4IL951tPS1pInLVZGmJIl3lc77rBxnEz1eIwaeFoesJuZ4mone8YgN5nKzy06YmPmeJs01ax78Qqh947k7k7nIuQRZfsBUPfQgiCX3plDNgiqp+PvJRNmI+YpOw2QmikAEezPUTRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Y7BTAk1f; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id D05204E42869;
+	Mon, 30 Mar 2026 13:07:29 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 9CC785FFA8;
+	Mon, 30 Mar 2026 13:07:29 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A46CB10450083;
+	Mon, 30 Mar 2026 15:07:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1774876049; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=kxvWlb22Njz2egFEf3cDrys6xgKK//DxYUkt6sa1KI4=;
+	b=Y7BTAk1fzkpu2QGNVyq1Qe1qk+fNedxyKVoun+GAZkv9jy8TC41cR5t7Gk1hp65n41i6b5
+	DHCiNw5f91uhU0tPoejTqfyw9+bFg8lE5Q0tvWGesrMwCZKim3ja6Z/8rCYXlHB9qDmYKs
+	18qZ3GYLQYDbyoiZyXEbYH0nh98WrEXiED59vrMUuWcEye/9mpRNMwdLm9BLIpfFF3OlKb
+	Q5aJbod/01ojURy9JaudHfw+RCdcISTuMB5Pw1PoMASvXVJuTG2IHG3AYV89I3WW6sp5v3
+	QezCAQXmgp4cJ2T9VQmq5zu7BW79lJaTjYOmIkWhAMouCsg+X4BDnzzhClYHbA==
+Message-ID: <20b8349c-932d-4138-a155-5359cc3a10b2@bootlin.com>
+Date: Mon, 30 Mar 2026 15:07:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Kai Zen <kai.aizen.dev@gmail.com>
-Date: Mon, 30 Mar 2026 16:03:43 +0300
-X-Gm-Features: AQROBzAd3o8frkHTSwmLZErgd2pRzfZsX2CL5hHa_Z9yzJCi4yGbZ9r1XQr0XWY
-Message-ID: <CALynFi5d0DuGW50xq7xQnsDPdEuN5jBGTqh8bcsUwxk6L-FAdA@mail.gmail.com>
-Subject: [PATCH net v2] tipc: fix UAF race in tipc_mon_peer_up/down/remove_peer
- vs bearer teardown
-To: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org, jmaloy@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: phylink: allow PHYs to be attached in
+ 802.3z inband mode
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Alexis Lothore <alexis.lothore@bootlin.com>
+References: <E1w66jW-0000000E3qS-23fW@rmk-PC.armlinux.org.uk>
+ <a5d7aedb-9770-492f-b528-0a28a652279b@bootlin.com>
+ <acatrPb1DdHuyVoL@shell.armlinux.org.uk>
+ <30a2cad9-fa2c-4abe-ad51-983d70564c7c@lunn.ch>
+ <acptbbfTt_FJgms6@shell.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <acptbbfTt_FJgms6@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273175-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[bootlin.com:+];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273176-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kaiaizendev@gmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
-	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 691B835B991
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 52EE135BBD9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-CVE-2025-40280 fixed tipc_mon_reinit_self() accessing monitors[] from a
-workqueue without RTNL.  That patch closed the workqueue path by adding
-rtnl_lock() around the call.
 
-However, three additional functions in the same subsystem access
-tipc_net->monitors[] from softirq context with no RCU protection at all:
 
-  tipc_mon_peer_up()    - called from tipc_node_write_unlock()
-  tipc_mon_peer_down()  - called from tipc_node_write_unlock()
-  tipc_mon_remove_peer() - called from tipc_node_link_down()
+On 30/03/2026 14:32, Russell King (Oracle) wrote:
+> On Mon, Mar 30, 2026 at 02:26:58PM +0200, Andrew Lunn wrote:
+>>> As I've recently said, I think we're more or less boxed in between a
+>>> rock and a hard place because of the hacks that qcom-ethqos introduced
+>>> with its PCS support. At the moment, I am failing to see any path where
+>>> the stmmac PCS can be programmed for inband according to phylink's
+>>> wishes and qcom-ethqos can be made to work without its hacks.
+>>>
+>>> This all ultimately comes back to the half-hearted phylink conversion
+>>> of stmmac that was done behind my back without my review. Had the
+>>> conversion been done fully, and kept up with the phylink changes for
+>>> PCS support, then we probably wouldn't be in this situation today.
+>>>
+>>> Unfortunately, the driver is going to keep breaking all the time that
+>>> it abuses phylink, and at the moment I see no way to stop this sodding
+>>> driver abusing phylink.
+>>
+>> "The needs of the many outweigh the needs of the few"
+>>
+>> The MAC driver is used by a lot of different SoCs. If qcom-ethqos
+>> caused this problem, should we consider breaking backwards
+>> compatibility for it, if that opens up a path for getting clean
+>> phylink integration for all the other variants?
+> 
+> Consider something like mvneta (which supports 2.5G speeds) connected
+> to a 2.5G PHY that uses 2500BASE-X for 2.5G speeds, and SGMII for
+> slower speeds with inband.
+> 
+> How should this be described in DT?
+> 
+> 	phy-mode = "2500base-x";
+> 	managed = "in-band-status";
+> 
+> will fail today, as these tests will refuse to attach a PHY in that
+> setup, and without a PHY attached, we will never know if it switches
+> to SGMII mode.
+> 
+> This patch makes phylink more flexible and permissive.
 
-These three are invoked from the packet receive path (tipc_rcv ->
-tipc_node_write_unlock / tipc_node_link_down) and hold only the per-node
-rwlock, not RTNL.
+You're patch is clearly correct IMO
 
-Concurrently, bearer_disable() -- which always holds RTNL per its own
-inline documentation -- calls tipc_mon_delete(), which:
+> However, as has been found, this patch causes problems for stmmac,
+> so it needs a different approach, because stmmac interprets an
+> optional PHY as "we must have a PHY if we don't we fail" at the
+> moment.
 
-  1. acquires mon->lock
-  2. sets tn->monitors[bearer_id] = NULL
-  3. frees all peer entries
-  4. releases mon->lock
-  5. calls kfree(mon)  <-- no synchronize_rcu()
+What would be the consequences of changing stmmac's stmmac_init_phy so
+that it doesn't error-out when no PHY is found AND we have a PCS AND
+we're using any of the SGMII/1000BaseX/SFP-compatible modes ?
 
-The race is structural: there is no shared lock between the data-path
-reader (which reads monitors[id] then acquires mon->lock) and the
-teardown path (which acquires mon->lock, NULLs the slot, then frees).
-A softirq thread can read a non-NULL mon pointer, get preempted, and
-resume after kfree(mon) has run on another CPU, then call
-write_lock_bh(&mon->lock) on freed memory:
+I don't think it would break current setups that work, but I may be
+wrong here, especially as I don't have a good understanding on the
+problem caused by qcom-ethqos here :(
 
-  CPU 0 (softirq / tipc_rcv)          CPU 1 (RTNL / bearer_disable)
-  tipc_mon_peer_up()
-    mon = tipc_monitor(net, id)
-    [mon is non-NULL]
-                                       tipc_mon_delete()
-                                         write_lock_bh(&mon->lock)
-                                         tn->monitors[id] = NULL
-                                         ...
-                                         write_unlock_bh(&mon->lock)
-                                         kfree(mon)
-    write_lock_bh(&mon->lock)  <-- UAF
-
-The fix mirrors the existing bearer_list[] pattern in the same module:
-convert monitors[] to __rcu, use rcu_assign_pointer() on creation,
-RCU_INIT_POINTER() + synchronize_rcu() on deletion (before the kfree),
-and the appropriate rcu_dereference_bh() vs rtnl_dereference() variant
-at each read site depending on execution context.
-
-synchronize_rcu() in tipc_mon_delete() is placed after the
-write_unlock_bh() and before timer_shutdown_sync() + kfree() to ensure
-all softirq-context readers that already observed the old pointer have
-completed before the memory is freed.
-
-Fixes: 35c55c9877f8 ("tipc: add neighbor monitoring framework")
-Cc: stable@vger.kernel.org
-Signed-off-by: Kai Aizen <kai.aizen.dev@gmail.com>
----
-v2: Resubmit targeting mainline via netdev per stable-kernel-rules (Option 1).
-    No code changes from v1.
-
- net/tipc/core.h    |  2 +-
- net/tipc/monitor.c | 51 +++++++++++++++++++++++++++++++++--------------
- 2 files changed, 37 insertions(+), 16 deletions(-)
-
-diff --git a/net/tipc/core.h b/net/tipc/core.h
---- a/net/tipc/core.h
-+++ b/net/tipc/core.h
-@@ -109,7 +109,7 @@
-  u32 num_links;
-  /* Neighbor monitoring list */
-- struct tipc_monitor *monitors[MAX_BEARERS];
-+ struct tipc_monitor __rcu *monito[MAX_BEARERS];
- rs
-+
+Maxime
 
