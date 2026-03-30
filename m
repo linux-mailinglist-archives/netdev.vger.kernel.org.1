@@ -1,127 +1,114 @@
-Return-Path: <netdev+bounces-273387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273388-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KJPCIsUMy2msDQYAu9opvQ
-	(envelope-from <netdev+bounces-273387-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:52:37 +0200
+	id cP0CHBkNy2msDQYAu9opvQ
+	(envelope-from <netdev+bounces-273388-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:54:01 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E702136272D
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:52:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF953362755
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:54:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 577853014554
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:52:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AA7FE3018BDD
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B79A3BE65E;
-	Mon, 30 Mar 2026 23:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED8D3BBA19;
+	Mon, 30 Mar 2026 23:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mI8OGNO6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZG8IGrcR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384403BE64F;
-	Mon, 30 Mar 2026 23:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCE2378817;
+	Mon, 30 Mar 2026 23:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774914719; cv=none; b=lh58NzYCmjPMnTz4mxNpgx72xylyI8egQy2Q7a1u3JAXVjR7jgADazha8Dw/r5OHiqwksF+Xt/LsqH+/ewn34ACShvIwZ/ME/IRPShdo+e4nWWfnI5jS0IDeEwGLCCqCBfTY1PHl94aH6EpfE6v06hLMV1wTtivtbhCP/tGiP4Q=
+	t=1774914838; cv=none; b=ITcp69B6eHrVp/DPzWvOtBNqbbL5SOxomQuPq3m+DNzs2i2KUfdD5whVTNKEykQdz0zm/YYiJugrcFIyip5t2NNcg552zkr78EbhSQNcBKG86b1ndldjFKItSn2jDfrUzBjMHh/Ado/8wQRr0feJTbaGKzF0W14HCMbp0NCMBhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774914719; c=relaxed/simple;
-	bh=dZPEfRMQC45032C6pl+fokgRYZwtsw/YLgIsU0w6lCY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DM8Oa+8GomIUK18Bx5KIJDDrg+I2SmIj02Jqc+ThGQYy/53zAqZjfZqTCBGJsn3sP+3seiUmFsTPvp6XD+rDuPoC+Ay+NO48xg+O9Ip9203exo6tD1ehjlVaka0hs0SV14ZRE9qNuNe3/ksjjG2Ij5CarpIECiix0chToJQG10k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mI8OGNO6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4BA6C4CEF7;
-	Mon, 30 Mar 2026 23:51:58 +0000 (UTC)
+	s=arc-20240116; t=1774914838; c=relaxed/simple;
+	bh=umL7+fBsNn2C9eT3rPF5u4PnqF6KuGdcmbfkKPPHtqY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p6xx1ZIGorwXdv/BujyIPoEFXw64TajiJspo00DIAnPmhd+1lFJ8abM9YOVeZGR0bkyahuJDvUwDwBzSHroUGtpDZ2R2GMG2niicuHGczZCUjzx+xyY4t/M7Lxqj1p6mVdEPh9OWpNFcj/gSnVMI5q2Q+t1yhy0Xw02Y+Ps1J7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZG8IGrcR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C35CEC4CEF7;
+	Mon, 30 Mar 2026 23:53:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774914718;
-	bh=dZPEfRMQC45032C6pl+fokgRYZwtsw/YLgIsU0w6lCY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mI8OGNO6UMKH8IcOgDz11ZWsG/AlRVMGFzJ7aMCYGiuzg8ufEYXh8VR73EbubvJFD
-	 Zy+2+gRJocb0vybTfEawFx0Ca8aeyH8ilGMqI9BFqqbFoCBJHp4xRWLhOFnSZwLmzu
-	 Ox5JKyyvWm9LJ3ruFTODipQ6XetFUfrcoxREAFlXTCFriEhUANLre3C60LKj9Hhh3+
-	 1CBErO3A5XsQD1Z1nB9e6CgiI7SCB89DZzzSqSen4oiwoOuXMfFiPezP9lsBQh0BOy
-	 3mkuniALko6rQlipJ8j6NUH+NKChEkfnVpkERKEBz27fT16ipzU7DxUi5m7ZZqYJcV
-	 TYtxuOB3vIPUg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02E2A392FF85;
-	Mon, 30 Mar 2026 23:51:44 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1774914838;
+	bh=umL7+fBsNn2C9eT3rPF5u4PnqF6KuGdcmbfkKPPHtqY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZG8IGrcRJX3lzT7AKO1mBMyr+ah8h7Y/MPR07yensSX/BatK2WbTdPwJCXfgDNbSY
+	 EcF1GKNFRH2YqzvAlfsCzCUXaReDT6x2td9gW8dG2lbz9XGQjo9LnVR4WnYx1L3qCa
+	 gto2Xd5RHSLasMU7ChXBEmhEQc2+s2GI/hxszGxQ7RAkS882wbtLcezuuk4I6+fHba
+	 XMJRxN7UoA9VCF0WDG48/kyKVnn8QbsSBJeNDj23QjtbFhHUm+cLRgTQDeIuVjSXX5
+	 IG/Q2fqgO2iidngHYzvpGMy2XmKnWcTags1XpWh5JXsMVxtE80dea2H325khswsjZo
+	 TMg40VmFV4K7g==
+Date: Mon, 30 Mar 2026 16:53:57 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <joe@dama.to>
+Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch, horms@kernel.org,
+ pavan.chebbi@broadcom.com, linux-kernel@vger.kernel.org, leon@kernel.org
+Subject: Re: [net-next v6 08/12] net: bnxt: Implement software USO
+Message-ID: <20260330165357.31a30b68@kernel.org>
+In-Reply-To: <acqqjfzDK04j2APz@devvm20253.cco0.facebook.com>
+References: <20260326235238.2940471-1-joe@dama.to>
+	<20260326235238.2940471-9-joe@dama.to>
+	<20260329152016.27646fab@kernel.org>
+	<acqqjfzDK04j2APz@devvm20253.cco0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: sfp: add quirk for ZOERAX SFP-2.5G-T
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177491470279.1985303.13835397075068661976.git-patchwork-notify@kernel.org>
-Date: Mon, 30 Mar 2026 23:51:42 +0000
-References: <20260329191304.720160-1-jan@3e8.eu>
-In-Reply-To: <20260329191304.720160-1-jan@3e8.eu>
-To: Jan Hoffmann <jan@3e8.eu>
-Cc: linux@armlinux.org.uk, andrew@lunn.ch, hkallweit1@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-273388-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273387-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E702136272D
+X-Rspamd-Queue-Id: EF953362755
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sun, 29 Mar 2026 21:11:11 +0200 you wrote:
-> This is a 2.5G copper module which appears to be based on a Motorcomm
-> YT8821 PHY. There doesn't seem to be a usable way to to access the PHY
-> (I2C address 0x56 provides only read-only C22 access, and Rollball is
-> also not working).
+On Mon, 30 Mar 2026 09:53:33 -0700 Joe Damato wrote:
+> > > +				   bp->tx_wake_thresh);  
+> > 
+> > Is tx_wake_thresh larger than the max USO even for smallest ring size?  
 > 
-> The module does not report the correct extended compliance code for
-> 2.5GBase-T, and instead claims to support SONET OC-48 and Fibre Channel:
+> Yes, it is.
 > 
-> [...]
+> Maybe its worth adding a comment in the code somewhere to make
+> this more clear? Not sure where would be an appropriate place, but maybe
+> bnxt_init_tx_rings?
 
-Here is the summary with links:
-  - [net-next,v2] net: sfp: add quirk for ZOERAX SFP-2.5G-T
-    https://git.kernel.org/netdev/net-next/c/911e2c050963
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Hm, as long as BNXT_MIN_TX_DESC_CNT is updated I don't think we need
+any bespoke comments 
 
