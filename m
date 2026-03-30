@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-273362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273363-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YLYAOSMBy2k2CgYAu9opvQ
-	(envelope-from <netdev+bounces-273362-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:02:59 +0200
+	id MNbwOigBy2k2CgYAu9opvQ
+	(envelope-from <netdev+bounces-273363-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:03:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 600F836233B
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:02:59 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94BB536234B
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:03:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E9D6A301B17C
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:02:57 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CECAD301CC9E
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:03:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BDCA37C90A;
-	Mon, 30 Mar 2026 23:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8C73A75BB;
+	Mon, 30 Mar 2026 23:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fFJIPaQ/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MN3ipinF"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B0E2F87B
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 23:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953DF30E0D5;
+	Mon, 30 Mar 2026 23:02:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774911775; cv=none; b=Xmjp6j/3uarwEHt04LXHlJwGDbidK92ZMKOZc9ywlxVYexupjTLp4yIYi1FFPxGcWzwNUjuhpj2bfqKcIoXhker62nuoZsWaz8s0OTYlU6PMGzuP/vXQAW8pOHIcTtiMdf7y8lZe3MXmKhZoQ1hfkKj18rDTHzHY0gFpx+WQaCg=
+	t=1774911776; cv=none; b=serFsYzkJp4H2L8VlfCcErdURvuv0ihL0vOWEFg/E7WYg2unUShoXHEQKBNtUl+TvGowmIqerOsVXln9zZ8QttNrdlpliMAo/bICPSImM1/9FGsbCKS7z0yQqQCHwBb6YF1ZqLV0YAHFlEOMRVrIGSO/IyQRjtt4ZNhAyEQkMIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774911775; c=relaxed/simple;
-	bh=Z6Bsqpx5jBqtaFOF7nudK6XFEbhWCEZvVeHQW0mheQA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SXXH7D/L/rQ8wrbvAITBeNvlJmm980eCMiM/pfNvG+Fe3ZfmV3S5TT5wWAn94BefBZw9Km/GfM3gjdIww7gsuae87RvAMKeN5q3++OIai3sS89tLH2vBMB6pwMhpgBy3vg9FjSDkRVSAAMDKANE6KUXGvkV3TaWpiX8QNqF4AxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fFJIPaQ/; arc=none smtp.client-ip=198.175.65.10
+	s=arc-20240116; t=1774911776; c=relaxed/simple;
+	bh=5CWyWKFk5jTQoN5toNXnqvNG/6yKBVyWb01H9h4pABY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mfQZ0c+LshVMhUCm6V0kBVAIybCaOZLftVwLd+y3wTrKwLDcLUE1t7dYOkzK9XQWD+TcILGT4GCjP4aHkIChZVwYOhEK2MBQEcN5dUAhONGewgMmnjaLu5YsTxIvi/GebSsXJ41KFJKBHgXvsUHLf5CA/441ciEZBDyX221j+RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MN3ipinF; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774911773; x=1806447773;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Z6Bsqpx5jBqtaFOF7nudK6XFEbhWCEZvVeHQW0mheQA=;
-  b=fFJIPaQ/AhZd5fUte5ZtyoRXhSWL64pbzrCFcOdq6vQY+p21TLy427fA
-   h3mkfJwMJiadBfN4s+JlQpo9vbDvMLviJvUtophQ3rgkCAPJM7jHtJqcS
-   k6srnvRmqVL3jFhX884g/FpUnoD9oQavIncbCEqDeYbYZwqAr8A8TfM+e
-   LsZ0MEugsboyDuEhcd5l7DuzC+iqfM9odAtNnr8IRUwhu1+32t64GMZAE
-   MUHNqze7MD3heNByoD/g3LsjiucSd8rh2COMNI6b+BeilVilOU8sTHHJB
-   7ggejZNZNvNYSyndlPmD05Z2G5Uh1kROHi7a2w2LV7q5yk9KyvVyQ2gtO
-   g==;
-X-CSE-ConnectionGUID: BMdeXXuvTMW+cieXkmVtSw==
-X-CSE-MsgGUID: YlNL5NCkRFKGEBAyLjKzlQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11744"; a="93297534"
+  t=1774911775; x=1806447775;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=5CWyWKFk5jTQoN5toNXnqvNG/6yKBVyWb01H9h4pABY=;
+  b=MN3ipinFCr3oamFPxqtkv1pEyyppmXtVQAJGiDtviBldYhQSRdi135ox
+   Kqdo1PSJk4GiOmw0fv1j7P+SA+veIWZ8wDP5L9b16k0Lcniae0DEiclT1
+   9WV3IrFqfMEcV5Q7jdnwVF0CELs3sHyzsSBddTS6UgcqGqComBwvkih9y
+   voRLndMDOTmJn7YenUR/YY+xVRR+ThjjNofmCluUMXoMaJ7hfAjjpS2o2
+   s9ntsZ/Itr8uMJsH8id3cITLHIALaLb8vEmi2w+QRC+0dcY6mtBCt0aJ2
+   zudX5cxTxbMQntr97Pb1ZdJPTDsc0rWwMUCH8e65nK9zW7JIorV63dLVO
+   Q==;
+X-CSE-ConnectionGUID: dWvXIMRGTDObkChX78oEfA==
+X-CSE-MsgGUID: cDSNCRs7QwWGDt6e3kQgDw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11744"; a="93297540"
 X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
-   d="scan'208";a="93297534"
+   d="scan'208";a="93297540"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
   by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 16:02:52 -0700
-X-CSE-ConnectionGUID: P8boB7d9Tzi9xKzNk5SMgA==
-X-CSE-MsgGUID: kzZRhbABRPG8Q7PWlS6AxA==
+X-CSE-ConnectionGUID: T0eqtQNIS7+6uQCqQZ6Yrg==
+X-CSE-MsgGUID: /23C1A/BR5e9O/4t3vTCGA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
-   d="scan'208";a="256687699"
+   d="scan'208";a="256687703"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa002.jf.intel.com with ESMTP; 30 Mar 2026 16:02:52 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -67,11 +68,28 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: [PATCH net-next 00/15][pull request] Intel Wired LAN Driver Updates 2026-03-30 (igc, igb, ice)
-Date: Mon, 30 Mar 2026 16:02:29 -0700
-Message-ID: <20260330230248.646900-1-anthony.l.nguyen@intel.com>
+Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
+	anthony.l.nguyen@intel.com,
+	andriy.shevchenko@intel.com,
+	ilpo.jarvinen@linux.intel.com,
+	dima.ruinskiy@intel.com,
+	mbloch@nvidia.com,
+	leon@kernel.org,
+	linux-pci@vger.kernel.org,
+	saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	lukas@wunner.de,
+	bhelgaas@google.com,
+	richardcochran@gmail.com,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Avigail Dahan <avigailx.dahan@intel.com>
+Subject: [PATCH net-next 01/15] igc: Call netif_queue_set_napi() with rtnl locked
+Date: Mon, 30 Mar 2026 16:02:30 -0700
+Message-ID: <20260330230248.646900-2-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20260330230248.646900-1-anthony.l.nguyen@intel.com>
+References: <20260330230248.646900-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,119 +99,98 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[linux.intel.com,intel.com,nvidia.com,kernel.org,vger.kernel.org,wunner.de,google.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-273363-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273362-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 600F836233B
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 94BB536234B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-For igc:
-Mika Westerberg makes improvements to power management flows with a
-focus on PTM.
+From: Mika Westerberg <mika.westerberg@linux.intel.com>
 
-Kohei Enju adds ethtool support for get/set hash key.
+When runtime resuming igc we get:
 
-Maximilian Pezzullo fixes some typos.
+  [  516.161666] RTNL: assertion failed at ./include/net/netdev_lock.h (72)
 
-For igb:
-Takashi Kozu adds ethtool support for get/set hash key.
+Happens because commit 310ae9eb2617 ("net: designate queue -> napi
+linking as "ops protected"") added check for this. For this reason drop
+the special case for runtime PM from __igc_resume(). This makes it take
+rtnl lock unconditionally.
 
-Kohei Enju adds setting of skb hash type based on values from Rx
-descriptor.
+Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+ drivers/net/ethernet/intel/igc/igc_main.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-Maximilian Pezzullo fixes some typos here as well.
-
-For ice:
-Arkadiusz adds support for unmanaged DPLL for ice E830 devices; device
-settings are fixed but can be queried by DPLL.
-
-Jake adds clarification for needed action on devlink reload command.
-
-Przemyslaw Korba expands the size of a char array to silence a
-format-truncation warning.
-
-The following are changes since commit cf0d9080c6f795bc6be08babbffa29b62c06e9b0:
-  Merge branch 'net-hsr-subsystem-cleanups-and-modernization'
-and are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 1GbE
-
-Arkadiusz Kubalewski (1):
-  ice: add support for unmanaged DPLL on E830 NIC
-
-Jacob Keller (1):
-  ice: mention fw_activate action along with devlink reload
-
-Kohei Enju (4):
-  igc: prepare for RSS key get/set support
-  igc: expose RSS key via ethtool get_rxfh
-  igc: allow configuring RSS key via ethtool set_rxfh
-  igb: set skb hash type from RSS_TYPE
-
-Maximilian Pezzullo (2):
-  igb: fix typos in comments
-  igc: fix typos in comments
-
-Mika Westerberg (3):
-  igc: Call netif_queue_set_napi() with rtnl locked
-  igc: Let the PCI core deal with the PM resume flow
-  igc: Don't reset the hardware on suspend path
-
-Przemyslaw Korba (1):
-  ice: dpll: Fix compilation warning
-
-Takashi Kozu (3):
-  igb: prepare for RSS key get/set support
-  igb: expose RSS key via ethtool get_rxfh
-  igb: allow configuring RSS key via ethtool set_rxfh
-
- .../device_drivers/ethernet/intel/ice.rst     |  83 +++++
- .../net/ethernet/intel/ice/devlink/health.c   |   4 +
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  12 +
- drivers/net/ethernet/intel/ice/ice_common.c   | 136 ++++++++
- drivers/net/ethernet/intel/ice/ice_common.h   |   8 +
- drivers/net/ethernet/intel/ice/ice_dpll.c     | 304 ++++++++++++++++--
- drivers/net/ethernet/intel/ice/ice_dpll.h     |  10 +
- .../net/ethernet/intel/ice/ice_fw_update.c    |   2 +-
- drivers/net/ethernet/intel/ice/ice_main.c     |  11 +-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  46 +++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   1 +
- drivers/net/ethernet/intel/igb/e1000_82575.h  |  21 ++
- .../net/ethernet/intel/igb/e1000_defines.h    |   2 +-
- drivers/net/ethernet/intel/igb/e1000_mac.c    |   2 +-
- drivers/net/ethernet/intel/igb/e1000_mbx.h    |   2 +-
- drivers/net/ethernet/intel/igb/e1000_nvm.c    |   2 +-
- drivers/net/ethernet/intel/igb/igb.h          |   3 +
- drivers/net/ethernet/intel/igb/igb_ethtool.c  |  85 +++--
- drivers/net/ethernet/intel/igb/igb_main.c     |  25 +-
- drivers/net/ethernet/intel/igc/igc.h          |   5 +-
- drivers/net/ethernet/intel/igc/igc_diag.c     |   2 +-
- drivers/net/ethernet/intel/igc/igc_ethtool.c  |  73 +++--
- drivers/net/ethernet/intel/igc/igc_main.c     |  43 ++-
- 23 files changed, 774 insertions(+), 108 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 72bc5128d8b8..98024b46789f 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -7536,7 +7536,7 @@ static void igc_deliver_wake_packet(struct net_device *netdev)
+ 	netif_rx(skb);
+ }
+ 
+-static int __igc_resume(struct device *dev, bool rpm)
++static int __igc_resume(struct device *dev)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct net_device *netdev = pci_get_drvdata(pdev);
+@@ -7581,11 +7581,9 @@ static int __igc_resume(struct device *dev, bool rpm)
+ 	wr32(IGC_WUS, ~0);
+ 
+ 	if (netif_running(netdev)) {
+-		if (!rpm)
+-			rtnl_lock();
++		rtnl_lock();
+ 		err = __igc_open(netdev, true);
+-		if (!rpm)
+-			rtnl_unlock();
++		rtnl_unlock();
+ 		if (!err)
+ 			netif_device_attach(netdev);
+ 	}
+@@ -7595,12 +7593,12 @@ static int __igc_resume(struct device *dev, bool rpm)
+ 
+ static int igc_resume(struct device *dev)
+ {
+-	return __igc_resume(dev, false);
++	return __igc_resume(dev);
+ }
+ 
+ static int igc_runtime_resume(struct device *dev)
+ {
+-	return __igc_resume(dev, true);
++	return __igc_resume(dev);
+ }
+ 
+ static int igc_suspend(struct device *dev)
 -- 
 2.47.1
 
