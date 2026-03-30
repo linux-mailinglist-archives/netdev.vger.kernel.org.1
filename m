@@ -1,140 +1,140 @@
-Return-Path: <netdev+bounces-273162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273163-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFrQIlhyymnG8gUAu9opvQ
-	(envelope-from <netdev+bounces-273162-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:53:44 +0200
+	id QGmNHvJxymnG8gUAu9opvQ
+	(envelope-from <netdev+bounces-273163-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:52:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7878D35B549
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:53:43 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E07B735B50C
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:52:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id BA6453002906
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:41:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A1149305BBB4
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56B8F3D090E;
-	Mon, 30 Mar 2026 12:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2863D16F9;
+	Mon, 30 Mar 2026 12:46:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W/zcASzA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UQb9qx6x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C9A3BAD8D
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 12:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D8430E84F;
+	Mon, 30 Mar 2026 12:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774874413; cv=none; b=OR3E67SjntWI7eZSvMj9bHewc4eCKoc8F2p93SyMTYztPz69Fp6bepyQzfga8S1Y14xe13yTkvz5Vpk2Czt/vDKNch29VcYSWh0L0Sldi3pQKszUa57f/U5BiaBBZcFUdOIOrO65VLCxa/qkAdH3AyIbwmAjc9i6QkqFGeE4vaI=
+	t=1774874793; cv=none; b=nkbMx6zfqY3BqNu7QgoYxSgzRaSzg3K98OLfjLe2D7dCzFsmXP/2EYit6sy+iM1sUJMDluzXpsCsi/tmxOshHoG7zJz6VEdbOYbCqAHjliEncii/y86ryAi1HSkx0zbQ7HWX5HpEXeniTcF34l6NpzVXn9k0KXILBtY+o1gxppE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774874413; c=relaxed/simple;
-	bh=PrWi3SJ7YN1tbSH7uE4jbhMQPWF3M7zVjTqKv40unvY=;
+	s=arc-20240116; t=1774874793; c=relaxed/simple;
+	bh=+JI1lyVpwmCdQmV9IzVwmr2ini/KIrHwAFCVRT27qCY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mUbgd4f8RMy7lvCr3MBCWqo67pxzm/MI5+WMiwN7Nu51WDl/o50AXjsqLsEv9B1rYcrfHEZbrc3HVjFOEpNTbVK7o3ZmQPupydmcYePJCdroPe4UKJG6AsG0zUiW++hyx2NqkldQ20vtSY2FbYkBQMUkNexgxsZkBBPK0dIk6V8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W/zcASzA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 835E7C4CEF7;
-	Mon, 30 Mar 2026 12:40:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774874412;
-	bh=PrWi3SJ7YN1tbSH7uE4jbhMQPWF3M7zVjTqKv40unvY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W/zcASzAjVSLyIFxxtAJMGnE7SqL71RS+OMg2r/6p3kd/ygNYMqliLvG0Zdq9MHfI
-	 Z0UiDpr0QLOMaMPuPyX4Y8VUHJb0O8ks+JLTBSbZbrFYXTSRJReDu9syiHMaX+iOuR
-	 iHCmJnsm4gl7CS0Z8vGwcnR1BCGAjtJ4HOK3Ftrvn2lwVIKaNCpUyF9RbN3H9Y+GYr
-	 pmPMaMmc4deIPD6FsvidwqsYCsfidg41dx6CMRV0P6vPV0EVPqs3n6/KI+Wl9T3Cci
-	 j+cnVStV8mQC59TGefVFvqCkN5LlinSZKEyh4W5uJczcLNb+jtBhaGtp9LBmmxN6iu
-	 PshoMnoCk3EOA==
-Date: Mon, 30 Mar 2026 13:40:08 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Ben Copeland <ben.copeland@linaro.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, jiri@nvidia.com, netdev@vger.kernel.org,
-	kuba@kernel.org
-Subject: Re: [PATCH net-next v4 13/15] net/mlx5: Add a shared devlink
- instance for PFs on same chip
-Message-ID: <4cc597da-4742-4437-93b3-686124396517@sirena.org.uk>
-References: <20260312100407.551173-14-jiri@resnulli.us>
- <20260324151014.860376-1-ben.copeland@linaro.org>
- <vms2w2ctvoojfqm25hkqapeq7gvn4bsybnrj5rxwsuvfbwutw7@4i5pbtckvlqn>
- <CAL0q8a6OXJ8qQYYYDCfAdujrsJ-QPt75kB=YQ3rwdZq5L=eO5Q@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=L5EYa4msTpfHbCDDx9FBdcxaP1O9zYvfCPwpPRE3RnDUjL+XO95k+uR45Jh/9A76enknBLjpFXlSJOnOFiVfVroOPUniBCHll5TndnvbgpX6uwY42Y8JWiK0nqHotnoMJqcHDLpA8zFQEl2iwp2dUjGoPDEblizaL98DQl0DYoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UQb9qx6x; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=X22xCMJmu+cCZa6SjDViytKlQGgWoaHzcMM/4kRa0lY=; b=UQb9qx6x0SumTYNtBWwA3KVjak
+	SJbzjiC7revnqpS7MiEnD7lPS11/w0KZnO9LKnxQrXtU7xGOlXHuMk5qmjxMMyk7SoVr9JOP+yQ3S
+	ipZziRwBNBl0+CCrMtZepHXdUfRQ3VRCtbECSYt6wE/j5ZPEfOjy0i6JrsDEYNS3aR8s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w7C0e-00E22J-42; Mon, 30 Mar 2026 14:46:24 +0200
+Date: Mon, 30 Mar 2026 14:46:24 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] FDDI: defxx: Rate-limit memory allocation errors
+Message-ID: <6f38637b-87bb-48ad-a6f9-8eec5f33ec93@lunn.ch>
+References: <alpine.DEB.2.21.2603291236590.60268@angie.orcam.me.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="prCE34Ycx7PQdWPo"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAL0q8a6OXJ8qQYYYDCfAdujrsJ-QPt75kB=YQ3rwdZq5L=eO5Q@mail.gmail.com>
-X-Cookie: You will pass away very quickly.
-X-Spamd-Result: default: False [-4.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+In-Reply-To: <alpine.DEB.2.21.2603291236590.60268@angie.orcam.me.uk>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273162-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273163-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,resnulli.us:email,sirena.org.uk:mid,linaro.org:email]
-X-Rspamd-Queue-Id: 7878D35B549
+	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:email,lunn.ch:mid,orcam.me.uk:email]
+X-Rspamd-Queue-Id: E07B735B50C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Sun, Mar 29, 2026 at 01:32:25PM +0100, Maciej W. Rozycki wrote:
+> Prevent the system from becoming unstable or unusable due to a flood of 
+> memory allocation error messages under memory pressure, e.g.:
+> 
+> [...]
+> fddi0: Could not allocate receive buffer.  Dropping packet.
+> fddi0: Could not allocate receive buffer.  Dropping packet.
+> fddi0: Could not allocate receive buffer.  Dropping packet.
+> fddi0: Could not allocate receive buffer.  Dropping packet.
+> rcu: INFO: rcu_sched self-detected stall on CPU
+> rcu: 	0-...!: (332 ticks this GP) idle=255c/1/0x40000000 softirq=16420123/16420123 fqs=0
+> rcu: 	(t=2103 jiffies g=35680089 q=4 ncpus=1)
+> rcu: rcu_sched kthread timer wakeup didn't happen for 2102 jiffies! g35680089 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x402
+> rcu: 	Possible timer handling issue on cpu=0 timer-softirq=12779658
+> rcu: rcu_sched kthread starved for 2103 jiffies! g35680089 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x402 ->cpu=0
+> rcu: 	Unless rcu_sched kthread gets sufficient CPU time, OOM is now expected behavior.
+> rcu: RCU grace-period kthread stack dump:
+> task:rcu_sched       state:I stack:0     pid:14    tgid:14    ppid:2      flags:0x00004000
+> Call Trace:
+>  __schedule+0x258/0x580
+>  schedule+0x19/0xa0
+>  schedule_timeout+0x4a/0xb0
+>  ? hrtimers_cpu_dying+0x1b0/0x1b0
+>  rcu_gp_fqs_loop+0xb1/0x450
+>  rcu_gp_kthread+0x9d/0x130
+>  kthread+0xb2/0xe0
+>  ? rcu_gp_init+0x4a0/0x4a0
+>  ? kthread_park+0x90/0x90
+>  ret_from_fork+0x2d/0x50
+>  ? kthread_park+0x90/0x90
+>  ret_from_fork_asm+0x12/0x20
+>  entry_INT80_32+0x10d/0x10d
+> CPU: 0 UID: 500 PID: 21895 Comm: 31370.exe Not tainted 6.13.0-dirty #2
+> 
+> (here running the libstdc++-v3 testsuite).
+> 
+> Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
 
---prCE34Ycx7PQdWPo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-On Tue, Mar 24, 2026 at 03:37:20PM +0000, Ben Copeland wrote:
-> On Tue, 24 Mar 2026 at 15:21, Jiri Pirko <jiri@resnulli.us> wrote:
-> > Tue, Mar 24, 2026 at 04:10:14PM +0100, ben.copeland@linaro.org wrote:
-
-> > >@@ -33,7 +33,7 @@ int mlx5_shd_init(struct mlx5_core_dev *dev)
-> > >               start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size,
-> > >                                                    PCI_VPD_RO_KEYWORD_SERIALNO, &kw_len);
-> > >               if (start < 0)
-> > >-                      return -ENOENT;
-> > >+                      return 0;
-
-> > Okay. That is probably the best fall-back. Do you want to send the fix,
-> > or should I?
-
-> I will leave it with you.
-
-Any news on this, the problem still seems to be showing up?
-
---prCE34Ycx7PQdWPo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnKbygACgkQJNaLcl1U
-h9D5Pgf/d9qhzIJz/bvjeITD/ORTxQ86IIYLRMrbl+wIBy+jfQDA68KnAzrEY7MZ
-anUr0qDwP+b/3wRn2kqqf92Mq511iRNRYTfIxUNyCcUP3pz90fyBiXhNfmd69fpJ
-R/aJgCkdALvYW8DR8G+49n/gOiJGX0o3jUZCJOpYAFJyui6FSKnRpj/nb0gZmHib
-6471yjNp69TeysQXkKmoQmwFxnZgPQ6+xFzLvSGWUTKWqaFtEaej/Fb8qdKnnIJk
-04KAG0Aedgoni4lfSqhFv6PPGMmN8fM/BKL+y+M3ZvRg6bbYtYAW9vgFov8fiqxH
-noJ+784fe5FphHechu+7T+iTJWC0wQ==
-=IDT4
------END PGP SIGNATURE-----
-
---prCE34Ycx7PQdWPo--
+    Andrew
 
