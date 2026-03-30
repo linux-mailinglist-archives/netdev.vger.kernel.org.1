@@ -1,109 +1,128 @@
-Return-Path: <netdev+bounces-273165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273166-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wP8xHTRzymlQ9AUAu9opvQ
-	(envelope-from <netdev+bounces-273165-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:57:24 +0200
+	id WAE/Er91ymmB9AUAu9opvQ
+	(envelope-from <netdev+bounces-273166-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:08:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31A3E35B633
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:57:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDA0C35BA1A
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:08:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6C8BF301DD34
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:48:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2359C3045AA4
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:00:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D613D1703;
-	Mon, 30 Mar 2026 12:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7106C3D3314;
+	Mon, 30 Mar 2026 13:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4u8bxRXT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Di3bwdXn"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4837630E84F;
-	Mon, 30 Mar 2026 12:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF6B3CD8BB;
+	Mon, 30 Mar 2026 13:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774874890; cv=none; b=q4Ihz0mdk2EH6bJTRlrdHDQhiZdJD+ORAgm1XrTXCJKUkXzFdFf7CW0pJp1UGhsjrch0UwHGTqC7IwbYVcFdvkhxq2LwAXBK+Wj/mSaQ6QBrHU1SmS/AxpAZp5KYTqbFxdKvR0FUbh+39zu1UmtQBSdrDOqPgmuxOMB+B2uw2qI=
+	t=1774875614; cv=none; b=LN6V++wiXEGQyM2TSL3eO9dsBaFuGJzhx+go8Byh+HiZOd+QalrVsFnUUQfTh75NMa9295SFykzD/1svoRikM8dJ7jWOKJJsnYxzcSwxXTtn1AX2qa6VPbyj8+QLolimX+zavxrBTeB/jNGBLF38Qu1HZMyFsWH9YuymVZ7i10g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774874890; c=relaxed/simple;
-	bh=Ussa43LWPtA6yUb/RL9ctofSX1Bow0SUPYYU5fJRt9k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ihsyt1G++RauNM5a9K5WC3r41utcnTe1OoiQwg0Qm6N9y3liQd0dWtbeg9cV42MFJmLggX/B/l2HQSJY7Xsiv5x38n7/wLyg5PW79AaY6NOqhudcYih4PG7VchlvOofp3Amx4juygWiF8g96vEQpJO7jZwigHorsCe5PMSnMNf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4u8bxRXT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SQnnYyQCAMoEC4ylO9r2ZhM0h4XUUS6e+qeqslEd9oI=; b=4u8bxRXTVofUZNO3GnH46dTRFh
-	qABu43NQTw6SA6vZbt0RI3XRPew1nnG7gyKQhBVJVQsVvGTFO1BUVWa70F4gHlz/NamAiUfYEUBMI
-	RmPQIB7RaCbLT76S1pz4lyKS8jk5zZngwhYJcbPxAj0X9BlDfzYVeEg2lPlUSB5H+lBE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w7C2E-00E242-Kn; Mon, 30 Mar 2026 14:48:02 +0200
-Date: Mon, 30 Mar 2026 14:48:02 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Maciej W. Rozycki" <macro@orcam.me.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] declance: Rate-limit DMA errors
-Message-ID: <5df83811-91ed-47e3-a6d2-3d96eaef0b0d@lunn.ch>
-References: <alpine.DEB.2.21.2603291259140.60268@angie.orcam.me.uk>
- <alpine.DEB.2.21.2603291303190.60268@angie.orcam.me.uk>
+	s=arc-20240116; t=1774875614; c=relaxed/simple;
+	bh=TtCvUVWKXPVAaTKLJLcMPLOfFxnwBsE36MNglsemq0A=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=u9o7645as/jt1IlVKl148bMN17JtNonA+CgdH7K3EsthvNnnujdDPunks8Oh66uWNFip0l85D8ZmTMgMOQdf+y9KIjGGR3VOc++n6NCTfy05HBK5aL2iiKkV6bT7ZZC9LtvvOFu7Q1TdOpG9rEG3fVCXf+MKuryU3h9dIMjkKKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Di3bwdXn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78B51C2BCB0;
+	Mon, 30 Mar 2026 13:00:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774875613;
+	bh=TtCvUVWKXPVAaTKLJLcMPLOfFxnwBsE36MNglsemq0A=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=Di3bwdXn6V7ktE0AT0tyMDlwtOImbxe7ORVPDO45dSA1lQrHFE3peV4PtqdvhhtgL
+	 DteL2GE+1pt+sBeWxAHM+YLi0Fh0BI23tOaNWLPKHi/Q+I08XEP75A7k7+Mt+ypLLK
+	 WpDZnR/bU4/BUSHBA+AUKlzUwNRTz1b1OICYMD+In7wV8UOpkHS0Qy1+f1KDiOSVmG
+	 qSpazTBF9qmeh2c6shCq/w/cpEeabJRY6g5v1afUIjIFxlnevEzg6YVOPy/kM/4qRx
+	 Ofv8mkUhMwsYVoG9e0Yzz6gPjnl+uP4Z/RLzrpesXhgE5Fhp7XYwX+agn1VtWEiz+w
+	 Z95qAqQONKlfw==
+From: Leon Romanovsky <leon@kernel.org>
+To: Konstantin Taranov <kotaranov@microsoft.com>, 
+ Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, Jason Gunthorpe <jgg@ziepe.ca>, 
+ Haiyang Zhang <haiyangz@microsoft.com>, 
+ "K . Y . Srinivasan" <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+ Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+ linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+In-Reply-To: <20260325194100.1929056-1-longli@microsoft.com>
+References: <20260325194100.1929056-1-longli@microsoft.com>
+Subject: Re: [PATCH rdma v3] RDMA/mana_ib: Disable RX steering on RSS QP
+ destroy
+Message-Id: <177487561085.3814940.18401263006419819555.b4-ty@kernel.org>
+Date: Mon, 30 Mar 2026 09:00:10 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.21.2603291303190.60268@angie.orcam.me.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15-dev-18f8f
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273165-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273166-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:email,lunn.ch:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,orcam.me.uk:email]
-X-Rspamd-Queue-Id: 31A3E35B633
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CDA0C35BA1A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Mar 29, 2026 at 01:32:51PM +0100, Maciej W. Rozycki wrote:
-> Prevent the system from becoming unusable due to a flood of DMA error
-> messages.
+
+On Wed, 25 Mar 2026 12:40:57 -0700, Long Li wrote:
+> When an RSS QP is destroyed (e.g. DPDK exit), mana_ib_destroy_qp_rss()
+> destroys the RX WQ objects but does not disable vPort RX steering in
+> firmware. This leaves stale steering configuration that still points to
+> the destroyed RX objects.
 > 
-> Signed-off-by: Maciej W. Rozycki <macro@orcam.me.uk>
+> If traffic continues to arrive (e.g. peer VM is still transmitting) and
+> the VF interface is subsequently brought up (mana_open), the firmware
+> may deliver completions using stale CQ IDs from the old RX objects.
+> These CQ IDs can be reused by the ethernet driver for new TX CQs,
+> causing RX completions to land on TX CQs:
+> 
+> [...]
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Applied, thanks!
 
-    Andrew
+[1/1] RDMA/mana_ib: Disable RX steering on RSS QP destroy
+      https://git.kernel.org/rdma/rdma/c/187c8bd5e571f5
+
+Best regards,
+-- 
+Leon Romanovsky <leon@kernel.org>
+
 
