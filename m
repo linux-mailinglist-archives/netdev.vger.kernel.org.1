@@ -1,185 +1,164 @@
-Return-Path: <netdev+bounces-273258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273262-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ILCCNNyfymmg+QUAu9opvQ
-	(envelope-from <netdev+bounces-273258-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 18:07:56 +0200
+	id +PxkKGylymmx+gUAu9opvQ
+	(envelope-from <netdev+bounces-273262-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 18:31:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29E4135E664
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 18:07:55 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC09235ED40
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 18:31:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2953D301DAF9
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 16:01:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 82AE93019DBA
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 16:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF0D344DB1;
-	Mon, 30 Mar 2026 16:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7E5377034;
+	Mon, 30 Mar 2026 16:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="BD80Oi6S"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="N1zrrHC5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-bc0e.mail.infomaniak.ch (smtp-bc0e.mail.infomaniak.ch [45.157.188.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0897920297C
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 16:01:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774886488; cv=pass; b=uDpW/aZkR8eHWH83jy7DyTdqckzWIJ+p4N2ffx2IdLIdKV8fKpj6PgzjAKR8LTNg45zE5EjqwNC/5G/WYdEjrrOPf14s0va0m6M7EjFAnMxfqpKii4NEUB8Ha7J1CI12La7DrHPnbJ8QxGo7L4v4d31fIPRVpn4DlJL7CWsVKvg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774886488; c=relaxed/simple;
-	bh=SA1vNAl0SIiwT1XVeWiojHnZ7WyhntStWscaAacrolc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SDcr6DwSiq2B14wg/LDfW7A1oEjES1xupBLWYc/CHqxK99ifB6E3NM8k/jOvCgrTup3zIxUYPynUAe1PH6N/dic54kipzvuzeqjiAo++TePqM8PLJUVcSEpNBF/osX0hkmdHkvpU0+BQvwc7W3dcWo5Sd1eVVtsbazwPgZayD2c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=BD80Oi6S; arc=pass smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-82cd6614a90so17249b3a.3
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 09:01:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774886486; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DNhk2NTFanmBYxMBKjBFKx2nAt8GU/lElx1Z9cqKjj7NdLaJpdvvYQVo8w7K6LlviT
-         jTZdwORuTJH0zDu9gIgcH9piDbn8IU84gf8cHM2IQzB6WyZ0b0eE7s7pYUmWIt5vcXqJ
-         fsWhJO54ehplMo44wHlW1/QPUF5W1kXd0VPWlZ0TunTzO0t5t38OiWEqD4IKFTlByEYv
-         XIh6FngscqJZsTmskIu1d2cGD6CBua/pgojLggY4+gP5vhaNTK29e2VqKj8b7QtZf5qa
-         h+JRKV8Z27ihdQlIDlsaWu0nk/M2IoNb32ptl2TGuqGw4mbeZ1CDOeTTa/3b4AzAfCet
-         WNEg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=SA1vNAl0SIiwT1XVeWiojHnZ7WyhntStWscaAacrolc=;
-        fh=8SZ6pNiQwfFfclIXXCszV+P7tSOc1M1Kw6zsabfqBkg=;
-        b=QB8csTzuUn3VU77CDrU74kQXaY1nwl7VRtfdNSRRupGeHsXIf1oNAwSQvL6lync+zj
-         tiJWPTVoE8cepZarTwrVVzfW0M/vd278OpQ4ILR6KFaM8BrtSqMsqMw/9P6UhAuOe+nF
-         +f7DF/+IwvJp5suOtNoY7JshwajqSujltvyFjjAOrfdTYdb8GqYQ4Mp6NmEgtsgT99dI
-         uZ2ECFduHuoaCYd+lMTms/OPHvAEKgPwZmSRW1UDayYmLKLoWm9NgG2o1qdmcndNDifR
-         bGdX+dSqaPvoGtQ3nM46JPv2nsvgS54+2h/hNM7LuKgJglrENHzPM/C+v9JVz5/2Ufal
-         3nnQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1774886486; x=1775491286; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SA1vNAl0SIiwT1XVeWiojHnZ7WyhntStWscaAacrolc=;
-        b=BD80Oi6SP5173LeDOnYYa1qbXT/P6UXLdu9ixzlIPNQ7QqS6QCXw2ZZ7INhhU3PTZe
-         MhCiJ8YZYOOhnyVeCXK2jY7cYAHZOea5LHTX2BBWbU2VY//gECtzLc8GuwuNpoux9sLR
-         z1AyUN9ry965VA5q5u/Keh0GdzvlnPhhist2O3DwUtHZ5bRMmXV9pDirvwtP2bmKPaGZ
-         WqMtdWw81bBqeSH0SoRUYBRszgCHFy+iKtFnOokpc0AVK03wUepIAO7wj2ElZi73nowv
-         CRGhh5vyH18ffiPSlk7ZRUT2iwkVDXTQ8553NprMlODhdBLi0Z+6Jn1C/WinnaWU1fcK
-         0uTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774886486; x=1775491286;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=SA1vNAl0SIiwT1XVeWiojHnZ7WyhntStWscaAacrolc=;
-        b=E4AIQ+l+H5aj8AUzJj81F301dIwfsR23V6a+2hhz9Mqkvr7weUOZVw7+2xjPYJm57t
-         5j6QFyMA2qKqRiBiFy6Lzj2ijCQliP8VYAfivkcngrQZmL27JHOkq44hrevNYv4rwqV3
-         iB0cnXZk7PJrJq8rksTdt5hw3GOkzrdYTXxPO4lAPtpGwezlLI5fW4raFeloSzxL/ZL9
-         p52SMSYmeuRFDnrE3Xz2AwY2Y8n6iG+gmC9vE33Ksx/B+U1T0Hlb+9tjCF0zt2e+6ZU8
-         MeBHLFrQpZkegf48OjBkSgoWgnxtqrstn6js+VbZHJ85XCvlzXfvEhlUByKHlvQAtoU9
-         xUaw==
-X-Forwarded-Encrypted: i=1; AJvYcCXGny30Vlh74UhgeLVoOJuPPG5ftzJTgy2XO/qB1KAHXUrNMheNMNvZk+iegXlGk52wEUoD5RU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywj4E44eZIQF8MhiMTJrkof6AdGrUsdQqHh9e/s7mw/9PLtsDHY
-	t7jYofLUaIEjjor907zX6Z5fjoQnB/L8rnXR6B8jGS7ErNa7zDZelxkY36xVFUAC139vOs2RJ6X
-	daxNTIXAPSSUyOvWmRCEVG0ositKpzeDR5NvKxh6NwXzft6SgADg=
-X-Gm-Gg: ATEYQzwra1plcbkuX1IJzzPAmN25IZ7IXPBCqrxbtQsN6yr8M5SALS31FHmiMPqxe2D
-	50HrthlbbWgf7AxJE9jF1fBEh7Ul+KDjhKDaF+s8krIawI5D4ATNwwOsaLai3H7UC17krRs03en
-	RTtwfktUJiSCOvBeh4sPWxFecjso7f+8RLQN+XfGOhfWoqDdroqzVVgpPQ+RMFIq4cDkvKpAe0/
-	wEDxoHQuuQHc/6+T49EJhYGbYqKZpTqyPqGCoX3IroBBjj0tdio+1MNiuzdRsryqWOFIX+fvoYb
-	jfB/C9UMMPHfjZjzYlc=
-X-Received: by 2002:a05:6a00:6c8d:b0:82a:6d7b:cd3e with SMTP id
- d2e1a72fcca58-82c95e43ea3mr12467518b3a.19.1774886486266; Mon, 30 Mar 2026
- 09:01:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20512F25F0
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 16:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774887582; cv=none; b=iCDehPoAl3NvsG9msBB+z1XhSpjhv/Z1SGAMXfWs7q5s97yw7wvuGtPziWNZt1ZVsJcbgDHEAAozLH51BJX4o/c/80wxLJsUXKggQFtwLRpNK3xFtYp54c6znhYe4LUPUk06bc2S+MVuDeA50udkoBipKk1lNntkmmHVovRSECo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774887582; c=relaxed/simple;
+	bh=FTuPN9pkuRk/knUlmKwpvTYIByq38R8qrglue9xcxxw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jZNYH3TIYnIxl1Mp/KBCQDodCFWbeNNNJPRsvvmJu65QAu4IdH3brnn1pV6ReguN8fCOWTxGIOjaTsLCeWtexyJjRgH9OXT6hTz6d+TE0JAwbNHUsqGcN+i6bye7Ev8C9ixAdJmgIlUQ0tVl3KI6ezMgrbu48TQzSVQjM93F3x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=N1zrrHC5; arc=none smtp.client-ip=45.157.188.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4fkwxG6x6Fzgc5;
+	Mon, 30 Mar 2026 18:02:10 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1774886530;
+	bh=QH+ghypWdt87NimbK9S9Ph50XXZxDv7xSO3Sn1QWNq0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=N1zrrHC5/XlFGcLq2WXkDxiJWkywxl5OC7LjS3jxwhKkKNJfWNIZaZo48glpkXnAj
+	 eUX/PgGy83Euh+3N6M3IfEQa0QKaLBSlQaxWdbISCcvyWU7xo97xYoQp/rSHfX5DA6
+	 d5Q96ooHGB8ZXGWcm2m04q2cZIvwLDu8P7ZWEo94=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4fkwxF0FL0zhFP;
+	Mon, 30 Mar 2026 18:02:08 +0200 (CEST)
+Date: Mon, 30 Mar 2026 18:02:05 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Paul Moore <paul@paul-moore.com>, 
+	John Johansen <john.johansen@canonical.com>, Georgia Garcia <georgia.garcia@canonical.com>
+Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>, 
+	James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, 
+	Tingmao Wang <m@maowtm.org>, Justin Suess <utilityemal77@gmail.com>, 
+	linux-security-module@vger.kernel.org, Samasth Norway Ananda <samasth.norway.ananda@oracle.com>, 
+	Matthieu Buffet <matthieu@buffet.re>, Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, 
+	konstantin.meskhidze@huawei.com, Demi Marie Obenour <demiobenour@gmail.com>, 
+	Alyssa Ross <hi@alyssa.is>, Jann Horn <jannh@google.com>, 
+	Tahera Fahimi <fahimitahera@gmail.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v8 01/12] lsm: Add LSM hook security_unix_find
+Message-ID: <20260330.ie1eth0ex9Pa@digikod.net>
+References: <20260327164838.38231-1-gnoack3000@gmail.com>
+ <20260327164838.38231-2-gnoack3000@gmail.com>
+ <CAHC9VhRktViRp_U3ZAvo2e7vbjUd6RZb-y8+YPXhtLpt7hsXYg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260326181701.308275-1-stephen@networkplumber.org>
- <20260326181701.308275-8-stephen@networkplumber.org> <cf7128a8-80f2-4d4c-8c68-2c9f386cedb2@redhat.com>
-In-Reply-To: <cf7128a8-80f2-4d4c-8c68-2c9f386cedb2@redhat.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 30 Mar 2026 12:01:14 -0400
-X-Gm-Features: AQROBzCnwG59BIciIlocIyIEGszWFfU0bDPY6qm0X28Xi0JW_3MFhh45-jLdDfc
-Message-ID: <CAM0EoMn126L20y4Pw2=6TNOE=Yy0mRPA4TfOC_fGyxJNQTbX+g@mail.gmail.com>
-Subject: Re: [PATCH v3 7/7] selftests/tc-testing: Add netem test case
- exercising loops
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org, 
-	Victor Nogueira <victor@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, Shuah Khan <shuah@kernel.org>, 
-	William Liu <will@willsroot.io>, Jakub Kicinski <kuba@kernel.org>, 
-	Savino Dicanosa <savy@syst3mfailure.io>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHC9VhRktViRp_U3ZAvo2e7vbjUd6RZb-y8+YPXhtLpt7hsXYg@mail.gmail.com>
+X-Infomaniak-Routing: alpha
+X-Spamd-Result: default: False [-0.89 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MIXED_CHARSET(0.77)[subject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[digikod.net:s=20191114];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	TAGGED_FROM(0.00)[bounces-273258-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-273262-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,namei.org,hallyn.com,maowtm.org,vger.kernel.org,oracle.com,buffet.re,huawei-partners.com,huawei.com,alyssa.is,google.com,linutronix.de,kernel.org,zeniv.linux.org.uk];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[digikod.net];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[digikod.net:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[mic@digikod.net,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,mojatatu-com.20230601.gappssmtp.com:dkim,mojatatu.com:email]
-X-Rspamd-Queue-Id: 29E4135E664
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,paul-moore.com:email,digikod.net:dkim,digikod.net:email,digikod.net:mid,maowtm.org:email]
+X-Rspamd-Queue-Id: AC09235ED40
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 30, 2026 at 4:06=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> Hi,
->
-> On 3/26/26 7:01 PM, Stephen Hemminger wrote:
-> > From: Victor Nogueira <victor@mojatatu.com>
+On Fri, Mar 27, 2026 at 01:55:58PM -0400, Paul Moore wrote:
+> On Fri, Mar 27, 2026 at 12:49 PM Günther Noack <gnoack3000@gmail.com> wrote:
 > >
-> > Add a netem nested duplicate test case to validate that it won't
-> > cause an infinite loop
+> > From: Justin Suess <utilityemal77@gmail.com>
 > >
-> > Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> > Acked-by: Stephen Hemminger <stephen@networkplumber.org>
-> > Signed-off-by: Victor Nogueira <victor@mojatatu.com>
->
-> Apparently the new test does not pass on NIPA:
->
-> # not ok 364 8c17 - Test netem's recursive duplicate
-> # Value doesn't match: bytes: 294 !=3D 196
-> # Matching against output: {'kind': 'netem', 'handle': '1:', 'root':
-> True, 'refcnt': 2, 'options': {'limit': 1, 'duplicate': {'duplicate': 1,
-> 'correlation': 0}, 'seed': 6495514880116664183, 'ecn': False, 'gap': 0},
-> 'bytes': 196, 'packets': 2, 'drops': 1, 'overlimits': 0, 'requeues': 0,
-> 'backlog': 0, 'qlen': 0}
->
-> It's not clear to me if the causes is this series or the follow-up. I'm
-> tentatively dropping the latter from PW; let's see how/if TDC is impacted=
-.
+> > Add an LSM hook security_unix_find.
+> >
+> > This hook is called to check the path of a named UNIX socket before a
+> > connection is initiated. The peer socket may be inspected as well.
+> >
+> > Why existing hooks are unsuitable:
+> >
+> > Existing socket hooks, security_unix_stream_connect(),
+> > security_unix_may_send(), and security_socket_connect() don't provide
+> > TOCTOU-free / namespace independent access to the paths of sockets.
+> >
+> > (1) We cannot resolve the path from the struct sockaddr in existing hooks.
+> > This requires another path lookup. A change in the path between the
+> > two lookups will cause a TOCTOU bug.
+> >
+> > (2) We cannot use the struct path from the listening socket, because it
+> > may be bound to a path in a different namespace than the caller,
+> > resulting in a path that cannot be referenced at policy creation time.
+> >
+> > Consumers of the hook wishing to reference @other are responsible
+> > for acquiring the unix_state_lock and checking for the SOCK_DEAD flag
+> > therein, ensuring the socket hasn't died since lookup.
+> >
+> > Cc: Günther Noack <gnoack3000@gmail.com>
+> > Cc: Tingmao Wang <m@maowtm.org>
+> > Cc: Mickaël Salaün <mic@digikod.net>
+> > Cc: Paul Moore <paul@paul-moore.com>
+> > Signed-off-by: Justin Suess <utilityemal77@gmail.com>
+> > Signed-off-by: Günther Noack <gnoack3000@gmail.com>
+> > ---
+> >  include/linux/lsm_hook_defs.h |  5 +++++
+> >  include/linux/security.h      | 11 +++++++++++
+> >  net/unix/af_unix.c            | 10 +++++++---
+> >  security/security.c           | 20 ++++++++++++++++++++
+> >  4 files changed, 43 insertions(+), 3 deletions(-)
+> 
+> This patch doesn't look like it changed significantly in this
+> revision, is there a reason you dropped the tags from Georgia and I?
 
-We should hold on to Stephen's two patches until the skb bits one goes
-in and settles.
-Stephen's patches change the queue expectation which explains the
-accounting mismatch. Stephen run the tdc tests and fix any changes in
-the accounting...
+You'r right, the patch didn't change at all. I added Georgia's tag in my
+-next branch for the previous version, I guess Günther forgot to add it
+for this version, but I updated my branch with the same tag, so it's
+still there.  Thank you both BTW!
 
-cheers,
-jamal
+I just included a one-line fix because of the m68k warning, we'll see if
+it works as expected, and we should be good to go.  It would be nice to
+have John's feedback though.
 
