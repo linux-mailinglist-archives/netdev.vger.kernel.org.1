@@ -1,115 +1,361 @@
-Return-Path: <netdev+bounces-273209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273210-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YBk1OMKGymn09gUAu9opvQ
-	(envelope-from <netdev+bounces-273209-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 16:20:50 +0200
+	id qAHANt+Iymn09gUAu9opvQ
+	(envelope-from <netdev+bounces-273210-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 16:29:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43FE535CB8D
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 16:20:50 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAB1E35CDB9
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 16:29:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9CBD73088102
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:11:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2489A304BA9E
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:17:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A57293D3CE2;
-	Mon, 30 Mar 2026 14:11:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79873D903B;
+	Mon, 30 Mar 2026 14:17:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XAnwjqGM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U2Nkx212";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="FO9qyTiK"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3B53BD654;
-	Mon, 30 Mar 2026 14:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774879905; cv=none; b=VjXsqY8R401N3Bmwin2TRxaKl4+H0lxmtWlcBDUnH9qEmqV5OEYGZ19Hf9VryLKi/0yq3CjVcOYtMi660qeY8K0rgfUMnaHD2p9fy1AWLk4awIBX2UaKkVtMQFb5OjwnDk18N4ZNfVhHfQvwmnFI4V+w0tEMqGJFEEpJYo8v/QQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774879905; c=relaxed/simple;
-	bh=/qNKfL04owZX2gziD5etRAnBI41FRDVk+5J2uKICMRs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ezDToSNTnTqfZUhNa6YkTx2BpNHvi6gogRfCWwc0tIySEWHIVSNlB3XC4UDM789RhjcNF4xwc4REz/IZUCRVjEI+PSZkTr6/Ai3B0oOuVlAwy8YssZ1BQtw4PgMabULRllV0TafDM53funNlefMoCZmCRvHrX4I2KCEgfzXRmuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XAnwjqGM; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=rnYdruBnHlsjyOSlM6GbHyKdjYmgAe0JBFYfEHt7Q/U=; b=XAnwjqGMUoh9zwkeA9cijsfPRI
-	NBSbT9AeMSaBJA6xKqJkl2dfAbm6EWuNDOWakTWoNMq5926VIJJuMeeMnB8eKSRDdbt+hkfcL2lMa
-	1bN6HJRSPTaq2lBZ9TWp4TvYdnmrMqzNEsFw5+WL0QzLA5gvvK2zGFPPcvMKY6hDdfC0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w7DKv-00E2hz-02; Mon, 30 Mar 2026 16:11:25 +0200
-Date: Mon, 30 Mar 2026 16:11:24 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Carlo Szelinsky <github@szelinsky.de>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/3] net: mdio: treat PSE EPROBE_DEFER as
- non-fatal during PHY registration
-Message-ID: <61561526-1e8c-4d0c-a0ff-56da25ee6531@lunn.ch>
-References: <20260329161014.2908509-1-github@szelinsky.de>
- <20260330132952.2950531-1-github@szelinsky.de>
- <20260330132952.2950531-4-github@szelinsky.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272283D8911
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 14:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.133.124
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774880252; cv=pass; b=DpA4LlW3Nck4Y1ukQLwnRe7POxUICxbAx9dfF8q1rV+lHCx+AMQmJzOGUvg/r9tukL/WWSKiIUBUFVDAW7Mr/aEgwRq0itkbP6JRZxL6qYN/lsraAFfg5ShbLAgjqfZFwLiInlRu5R7RIBDRByvoXkfRHRlHtCE5gnPHsSSGhw4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774880252; c=relaxed/simple;
+	bh=QgCXxbwIFTPJMoFfe4ZiNa8GU+aWKCMK6V94ynZLKTw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oYzAF8o2hm4FpbpAxZ+gD7vHJaqw+eVoCR33srRCdZZrCRZYYf4VrbptBSX2wXKJRRGxyI/Bdmqnmt0pt/D+p34bcEngXAK+5L414llayY3DWY08FLChIpnXyOX+UgG95NWFL/PeFLPW79HikH6Bnd8BexFt97mKRDLrUiac5dY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U2Nkx212; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FO9qyTiK; arc=pass smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774880250;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nrLZv/brdC+ptmNYj2GqlLiIuUPLDJQFIDrzPiQMRYQ=;
+	b=U2Nkx212WZvevQ4b+R0ee6yvMiHYgEmy7bOgNTafLk2x4KmpVn6ECp8jr8LealERtYkWsI
+	9PGrr1288G5CuZfNftfe2VFO0RucTNC0kEkq3EvQOnZilYPRsU+mcOauYv/jeg9E93Lf71
+	reIiN9W+ct1/Kn8NpSbWPiQeu8CF0Pk=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-98-TxHa7xCCPAiMusT0Yx6W0A-1; Mon, 30 Mar 2026 10:17:28 -0400
+X-MC-Unique: TxHa7xCCPAiMusT0Yx6W0A-1
+X-Mimecast-MFC-AGG-ID: TxHa7xCCPAiMusT0Yx6W0A_1774880247
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b97ed96ef12so435011066b.3
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 07:17:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774880247; cv=none;
+        d=google.com; s=arc-20240605;
+        b=CKqmrpl2gAygEXXGHKiuW+boWfvMGFl3m1k+ghdGJ1tYvDFtWuGUJ4dZxctno0AG4X
+         wB8ZFP7+v2aaHn9P4gNOo2y34kxpblGfhgjipzeIGRe+V0WyeY1FoZ7nMoNXipcxI6P3
+         2A2amHCsep1tE8pwMOU22ahSYxmHtzNaFa3X5NMOS+mkI4ftP8dJiQiG+ogcd/DXOgk0
+         F5KBNBEzDWWUuYLr3sVvJlbKe2L2uThneXpa+3m+fFnf+ru+hnwn7domGSHyHlrotSFK
+         vrj0hMTZDgI8Jt3vuKob2fnX9QTX1S/xtmdn07tf8OyqEg+Z2x9HEVaVlro4cF8P4bl4
+         F3Aw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=nrLZv/brdC+ptmNYj2GqlLiIuUPLDJQFIDrzPiQMRYQ=;
+        fh=ZUCllxp7QogFw7iyPTLYfzC+oK0OHyEhGVMWdhXIDfc=;
+        b=SrH0tR5eeZzqMn1SkrXmVHCUKKcgXlcugyLcvUve/E/nt5ZRXGX7/2snJq0YQQLWTz
+         /qbjEiin0D0Dzqd8nXKuOLPOc6ykHYmHxkOzicvEW5xUb19Wxjqvm/hxKWXaCBXZZ7BP
+         YbGxZoSneAAezRha2DafK1oCyL2cZw+uQLrixPtv9m9m4kO/rIBdRmWwq9av7bXAGBDZ
+         ohdCUXwuaqVhNQp7eiGQpudW/mFQ+Cr+1dNPeBpnCggYF05m67ZHN2BWpAj67IU7VT3t
+         HDAXN37JdmLJEa3mAwhx2qY69mQo7ubW2UCSibhJu6+MIlXQdfOo+3YHnSAC5tD28FuT
+         PNzQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1774880247; x=1775485047; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nrLZv/brdC+ptmNYj2GqlLiIuUPLDJQFIDrzPiQMRYQ=;
+        b=FO9qyTiKHPmk4QolU6nJloxg3csFFqJDSsoOOv41PiE+41Fv6Oeu6DWBfVKeuFPP2T
+         nEJevx65588J6DH5raNdKnXA0/MwGm6yDKrXRASJ6sh0+5sGbXeAdemqS9Xo5Ck4mipx
+         MSukqzNBc7h2SuPw8rfRled7CKETRjvqGC0kO17Gtm00aarMMTodQah7oaLV7T9jqgiL
+         JeLNMJBDPb5XKLdeugSlZrZ2zj4RFTqRleChpBVCiPzEA8Esh/tCPC/xezTG78w/rL3K
+         3Awwb5yzVhxSahnfnNYbHQhYjEzKPXt+724bYuDk3L14l4e7WfJrfG3Ok3xye1iYOrBk
+         j0lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774880247; x=1775485047;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=nrLZv/brdC+ptmNYj2GqlLiIuUPLDJQFIDrzPiQMRYQ=;
+        b=GVUUD9zIcsnmZkGVgLGcW25YlVPLpNUgRxUtbscgivBoy9YKnYe/s0U0F4ZznsxLpT
+         VbmoJY+pFDcZ1D8POmMHfzAClAFMdfQuTYlEI3nnxhO6RtsJKHmo8rUGwQ3gJcCC1Lzi
+         tMQJWFVR/OtHkiY7am9+nxsonBULyqTB9devHtkwFi+oM5zfnLI9GLO0JegoLRxr9PPI
+         q23vnXDjFApO3IJ3eiJvOcZqU9mhwr6rIV8oP5EpES61axSmsc/85jyUH89PMBhu7yE8
+         r3r17MOY1VLZzxrIu0Unf9pmrAiDkpoFVKT4kAxCXcEvF0UYW2rjAa0iHyAjKwUyhDuL
+         VOsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW+MtmlD8I8rseXNA8lzltgYb4JNZ3d0kxqbNNgfzSKvBgbZUiI0oJNK0F2uujOYRNSY2KQ20M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx885K2dk+1JiGCiV5heycMOjHknPTB0CPAwbI0xqbkUlPKfDAW
+	1P+32ws5CuEgfIs2Bo/LW03QPmW/Rqo0iqbMwb1xj83An7Gc2hcGLMutk5ieWJ2IrXOjqWjT48D
+	+awr/s4iDo8alFxR5BsEJB/qbY5tlzD/Lh2fA5e5kfKn/Sj2cnm7RsReCg96SWgV88uunVIrfUP
+	bqMASuiK4mE8T2QmPzKlVaBsC7VF9o0xV1
+X-Gm-Gg: ATEYQzyZKeHvBE98gzd8amV9/H4Ag3Dr+Zv4pM6G5tQKVOkL59fZGsrpr85zV7zNE1F
+	v80eY9Ehkn8cBdoxTW7+/CKUJRr3KThrQOQtNlJRPIal4HwIk3GokHANYwaVNc+xiq6jityyx92
+	wxTWND81Uc2Pxn4ztGDSkxfjz7ZD/C4DeNiVpBSbjr5TWjLyAECG+QujkXNCEkqFixzM6jfYexW
+	PQk8p8=
+X-Received: by 2002:a17:907:7b94:b0:b98:7f7:50f8 with SMTP id a640c23a62f3a-b9b507c4640mr775489866b.29.1774880247034;
+        Mon, 30 Mar 2026 07:17:27 -0700 (PDT)
+X-Received: by 2002:a17:907:7b94:b0:b98:7f7:50f8 with SMTP id
+ a640c23a62f3a-b9b507c4640mr775485366b.29.1774880246451; Mon, 30 Mar 2026
+ 07:17:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260330132952.2950531-4-github@szelinsky.de>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+References: <20260330113509.23990-1-yiche@redhat.com>
+In-Reply-To: <20260330113509.23990-1-yiche@redhat.com>
+From: Long Xin <lxin@redhat.com>
+Date: Mon, 30 Mar 2026 10:16:49 -0400
+X-Gm-Features: AQROBzBNOmpnx9PRLFRvLfL9PIycTYjajukeXqbEiKbsZ1DFIXNmMNDZelaH83g
+Message-ID: <CAMApiK-USxtQNb17zq+8YO8eX3cDWEZZiQNt+Uvji6ryKuhikA@mail.gmail.com>
+Subject: Re: [PATCH] selftests: netfilter: conntrack_sctp_collision.sh:
+ Introduce SCTP INIT collision test
+To: Yi Chen <yiche@redhat.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, coreteam@netfilter.org, netfilter-devel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-273210-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273209-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[bootlin.com,pengutronix.de,lunn.ch,gmail.com,armlinux.org.uk,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
-X-Rspamd-Queue-Id: 43FE535CB8D
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lxin@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DAB1E35CDB9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> Treat -EPROBE_DEFER as non-fatal, allowing the PHY to register
-> successfully with psec=NULL. The PSE control can be resolved lazily
-> when first needed.
+On Mon, Mar 30, 2026 at 7:35=E2=80=AFAM Yi Chen <yiche@redhat.com> wrote:
+>
+> The existing test covered a scenario where a delayed INIT_ACK chunk
+> updates the vtag in conntrack after the association has already been
+> established.
+>
+> A similar issue can occur with a delayed SCTP INIT chunk.
+>
+> Add a new simultaneous-open test case where the client's INIT is
+> delayed, allowing conntrack to establish the association based on
+> the server-initiated handshake.
+>
+> When the stale INIT arrives later, it may overwirte the vtag in
+> conntrack, causing subsequent SCTP DATA chunks to be considered
+> as invalid and then dropped by nft rules matching on ct state invalid.
+>
+> This test verifies such stale INIT chunks do not corrupt conntrack
+> state.
+>
+> Signed-off-by: Yi Chen <yiche@redhat.com>
+Thanks for the patch, plase see comment below.
 
-Is there a reason not to do lazily resolution all the time?
+> ---
+>  .../net/netfilter/conntrack_sctp_collision.sh | 84 ++++++++++++++-----
+>  1 file changed, 65 insertions(+), 19 deletions(-)
+>
+> diff --git a/tools/testing/selftests/net/netfilter/conntrack_sctp_collisi=
+on.sh b/tools/testing/selftests/net/netfilter/conntrack_sctp_collision.sh
+> index d860f7d9744b..7f8f1b6b746a 100755
+> --- a/tools/testing/selftests/net/netfilter/conntrack_sctp_collision.sh
+> +++ b/tools/testing/selftests/net/netfilter/conntrack_sctp_collision.sh
+> @@ -23,8 +23,19 @@ SERVER_PORT=3D1234
+>  CLIENT_GW=3D"198.51.200.2"
+>  SERVER_GW=3D"198.51.100.2"
+>
+> +assert_pass()
+> +{
+> +       local ret=3D$?
+> +       if [ $ret !=3D 0 ]; then
+> +               echo "FAIL: ${@}"
+> +               exit $ksft_fail
+You should not print FAIL and exit $ksft_fail if ret is $ksft_skip
+(The test case was skipped).
 
-   Andrew
+> +       else
+> +               echo "PASS: ${@}"
+> +       fi
+> +}
+> +
+>  # setup the topo
+> -setup() {
+> +topo_setup() {
+>         setup_ns CLIENT_NS SERVER_NS ROUTER_NS
+>         ip -n "$SERVER_NS" link add link0 type veth peer name link1 netns=
+ "$ROUTER_NS"
+>         ip -n "$CLIENT_NS" link add link3 type veth peer name link2 netns=
+ "$ROUTER_NS"
+> @@ -42,21 +53,51 @@ setup() {
+>         ip -n "$CLIENT_NS" link set link3 up
+>         ip -n "$CLIENT_NS" addr add $CLIENT_IP/24 dev link3
+>         ip -n "$CLIENT_NS" route add $SERVER_IP dev link3 via $CLIENT_GW
+> +}
+>
+> -       # simulate the delay on OVS upcall by setting up a delay for INIT=
+_ACK with
+> -       # tc on $SERVER_NS side
+> -       tc -n "$SERVER_NS" qdisc add dev link0 root handle 1: htb r2q 64
+> -       tc -n "$SERVER_NS" class add dev link0 parent 1: classid 1:1 htb =
+rate 100mbit
+> -       tc -n "$SERVER_NS" filter add dev link0 parent 1: protocol ip u32=
+ match ip protocol 132 \
+> -               0xff match u8 2 0xff at 32 flowid 1:1
+> -       if ! tc -n "$SERVER_NS" qdisc add dev link0 parent 1:1 handle 10:=
+ netem delay 1200ms; then
+> -               echo "SKIP: Cannot add netem qdisc"
+> -               exit $ksft_skip
+> -       fi
+> +conf_delay()
+> +{
+> +       # simulate the delay on OVS upcall by setting up a delay for INIT=
+_ACK/INIT with
+> +       case $1 in
+> +       "INIT") chunk_type=3D1
+> +               # tc on $CLIENT_NS side
+> +               tc -n "$CLIENT_NS" qdisc add dev link3 root handle 1: htb=
+ r2q 64
+> +               tc -n "$CLIENT_NS" class add dev link3 parent 1: classid =
+1:1 htb rate 100mbit
+> +               tc -n "$CLIENT_NS" filter add dev link3 parent 1: protoco=
+l ip \
+> +                       u32 match ip protocol 132 0xff match u8 $chunk_ty=
+pe 0xff at 32 flowid 1:1
+> +               if ! tc -n "$CLIENT_NS" qdisc add dev link3 parent 1:1 ha=
+ndle 10: \
+> +                       netem delay 1200ms; then
+> +                       echo "SKIP: Cannot add netem qdisc"
+> +                       exit $ksft_skip
+> +               fi
+> +               ;;
+> +       "INIT_ACK") chunk_type=3D2
+> +               # tc on $SERVER_NS side
+> +               tc -n "$SERVER_NS" qdisc add dev link0 root handle 1: htb=
+ r2q 64
+> +               tc -n "$SERVER_NS" class add dev link0 parent 1: classid =
+1:1 htb rate 100mbit
+> +               tc -n "$SERVER_NS" filter add dev link0 parent 1: protoco=
+l ip \
+> +                       u32 match ip protocol 132 0xff match u8 $chunk_ty=
+pe 0xff at 32 flowid 1:1
+> +               if ! tc -n "$SERVER_NS" qdisc add dev link0 parent 1:1 ha=
+ndle 10: \
+> +                       netem delay 1200ms; then
+> +                       echo "SKIP: Cannot add netem qdisc"
+> +                       exit $ksft_skip
+> +               fi
+> +               ;;
+> +       esac
+The code of case "INIT" and "INIT_ACK" are pretty simliar, please try
+to move the tc command out of the case statement with $ns and $link.
+
+>
+>         # simulate the ctstate check on OVS nf_conntrack
+> -       ip net exec "$ROUTER_NS" iptables -A FORWARD -m state --state INV=
+ALID,UNTRACKED -j DROP
+> -       ip net exec "$ROUTER_NS" iptables -A INPUT -p sctp -j DROP
+> +       ip net exec "$ROUTER_NS" nft -f - <<-EOF
+> +       table ip t {
+> +               chain forward {
+> +                       type filter hook forward priority filter; policy =
+accept;
+> +                       meta l4proto { icmp, icmpv6 } accept
+> +                       ct state new counter accept
+> +                       ct state established,related counter accept
+> +                       ct state invalid log flags all counter drop
+> +                       counter
+> +               }
+> +       }
+> +       EOF
+I think you need to check if 'nft' is available
+Either in here by:
+
+if [ $? -ne 0 ]; then
+        echo -n "SKIP: Could not load ruleset: "
+        nft --version
+        exit $ksft_skip
+fi
+
+Or at the beginning by:
+
+checktool "nft --version" "run test without nft tool"
+
+>
+>         # use a smaller number for assoc's max_retrans to reproduce the i=
+ssue
+>         modprobe -q sctp
+> @@ -64,8 +105,6 @@ setup() {
+>  }
+>
+>  cleanup() {
+> -       ip net exec "$CLIENT_NS" pkill sctp_collision >/dev/null 2>&1
+> -       ip net exec "$SERVER_NS" pkill sctp_collision >/dev/null 2>&1
+>         cleanup_all_ns
+>  }
+>
+> @@ -81,7 +120,14 @@ do_test() {
+>
+>  # run the test case
+>  trap cleanup EXIT
+> -setup && \
+> -echo "Test for SCTP Collision in nf_conntrack:" && \
+> -do_test && echo "PASS!"
+> -exit $?
+> +
+> +echo "Test for SCTP INIT_ACK Collision in nf_conntrack:"
+> +topo_setup && conf_delay INIT_ACK
+How will the error returned from conf_delay() be handled?
+
+> +do_test
+> +assert_pass "The delayed INIT_ACK chunk did not disrupt sctp ct tracking=
+."
+> +
+> +echo "Test for SCTP INIT Collision in nf_conntrack:"
+> +
+> +topo_setup && conf_delay INIT
+> +do_test
+> +assert_pass "The delayed INIT chunk did not disrupt sctp ct tracking."
+> --
+> 2.53.0
+>
+The current kernel will fail with this test case, please hold the patch
+until the fix is submitted. It is still in testing, as you already know.
+
+thanks.
+
 
