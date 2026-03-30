@@ -1,242 +1,243 @@
-Return-Path: <netdev+bounces-273328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273329-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YEenAYXsymkkBQYAu9opvQ
-	(envelope-from <netdev+bounces-273328-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:35:01 +0200
+	id sIEUBWftymkkBQYAu9opvQ
+	(envelope-from <netdev+bounces-273329-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:38:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7943D361812
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:35:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FB51361848
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:38:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A8C033054703
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 21:33:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 874E63022965
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 21:34:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCAA33A63FD;
-	Mon, 30 Mar 2026 21:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F983A1E73;
+	Mon, 30 Mar 2026 21:34:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgLxC+dU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YOHJ/bms"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5971A3A451A
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 21:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FFEF39C003;
+	Mon, 30 Mar 2026 21:34:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774906389; cv=none; b=pc0TXbW19vhmjK924OvA6pAUE5X/Pd7GsrsuaBlTXpKGHD/WZ/5FwdBbYCBNvYrNDxASxo9hLeSheVik4O5mUUb8E527llWUuw4eSy3h0ILhpLN4h/5d0BzbtCjjHID1yx8eVx+nzbgQm9mhyLtxgwEDmfOqvGts+3IYFt13kT4=
+	t=1774906498; cv=none; b=dBvucjKa0KvjYg8G1XbhbyKpY0Nnk+YMi0K1aMSsR1ccZ754pA9ZB4WlxnqvR2aDSWl7VZyTa9ZRQOEE/fIaMzIWqefSvP/RN4zJdnFLJgjWPM3x/BtYUKqLNEftRvPY79w/I6ZlV0rS8mE2DF36TSOf9JflY0PSHyrsQ1lNClo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774906389; c=relaxed/simple;
-	bh=kMcZjPsOMrDkhR41RdpNe609HpL2qZ9sTZwgMq52YiY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=erO2aB4iwGla5VEWtr5SUtg7lza1baEGyvOC/lXv61ug0eU2mkeZ/8x+t1rGMR/JM0LTWYlX7YGxMThwT8HTfcju9x1RtWdMuoh7LoedyR7zKiavx6c8Tk6aV8sC3jYDb1+aIYXTYJvBg5/DosgoEp2+c6q8s/Z5Nwbqj0bFHco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XgLxC+dU; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-43cfa33a983so1131522f8f.1
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 14:33:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774906387; x=1775511187; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=xBdx6H/Z1jGCptYLlq0P8qy8OL6OaKAaFg5bJOcmtsg=;
-        b=XgLxC+dUH1Wn0OEePd1wpRNA3mGoY1KeKezxVoXDNt7RB5VtopftB4VParxrcBgv9r
-         TxyRA088fRdk4K6yqxn73MoSDMBT5bztb/Jco8fR9lwVdFC4Ngf73VwoifzRenmuFERt
-         nj9mpHTTSdQ4Mls/OCpQ3xm9vX0XYCziMem6R81ERTta6JHhFVGr1EIkVaplaR7rrLxS
-         6fYcUShlLknFisUjSCTYUYTv4CkPrKdVhnCJ1pOUI3D/DY4D3iRaugmRl0tbYUl44j4q
-         IID5v5cZW7U+ZTLq99X0hJgzFKDRulr+hRjq8BH9CZCoTYKzaLa8HdW7/QCci+pse2oX
-         pgwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774906387; x=1775511187;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xBdx6H/Z1jGCptYLlq0P8qy8OL6OaKAaFg5bJOcmtsg=;
-        b=IlO3GpB7qS96xPFmzdJmrqShA2/aUjVXFZz91g0bbTSD94mwTFeU+kOu5P4/7xgaRa
-         V+MgMydaMjFsdOLdUYZn+EHezoIu6I3RtvrUw8WF3tXxH9S/DiokoVta+h/Z9NvCLXNx
-         gypVBhU3EOj3kNqKVM8pmzr9Rr+R01fPBzLaHgI+3EMhvmyvjii+1EEAdzNnI4UqMBQs
-         h4x4SX8i2JOXqt2hIqatu0dphs5gT+FVOWLxt0aMFZz1FSUOTmsG3USW/jJMWET9L2LH
-         iDtIFdtiV8rUdmkTODdeSPyUo+Mmg6L4GO072qQ7e7b8hgQqCNp7+4BIXN6RQQdzMlVJ
-         CWEA==
-X-Gm-Message-State: AOJu0YyukCaHi5HctumJzQ0Mcca5EXcLxfL7Pw+MMpHIPIpahSnLu8EH
-	6PLajhU2jLAYIirEOmcKV+enLmczswfN1fP66vvfGP/Nfcyq1zIAYJyJ
-X-Gm-Gg: ATEYQzxjf574hSFyHH2k5QKziZ6iGXAF4AAViRElRohk+N9/VH90w29+bN/zN71K/3r
-	zccJAIhwnkcgxDzWNYNxRcoM6OXApttS98NORa26d/gg6xRvWc9Xf/uzyhJsjXFV0yZmqpb6ACp
-	yYb0Np5eN7cW93R42AYgZnYWipGIjtoINYruTSl9HkET2SgXNnLXsvDyPBRR4SfZWO3x2vO3koH
-	YCZar8+OLF4uaJldWp1K00MM1vOvJ02O4tiYUiiSqsALxY1FOH9wSZN6owZTxpt71a1Iq25dCcm
-	XTXcEYOwKMyDSJamckl7bXo/m7mKhgCq6gElopKrCUN3ddJWoxMIH68VkesnNpCzQXwQKe4UjnS
-	4qJHwNLpOGHVXz9R+NyLbj1qvqZRPe6pCrW5wtFlMQg0Xw0iAELH67kujorjJb8yIFNV5XA4pBc
-	ivaP7oKO/6kN22wNl+o7BLx7svhwOSgd25ghCycB+lYvvcr5H82OsXLXwrmbPLvsqRVg==
-X-Received: by 2002:a05:6000:40cd:b0:43b:8f29:b08f with SMTP id ffacd0b85a97d-43b9ea46662mr22538065f8f.30.1774906386448;
-        Mon, 30 Mar 2026 14:33:06 -0700 (PDT)
-Received: from nixos-office (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43cf21e9e18sm20855869f8f.9.2026.03.30.14.33.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 14:33:05 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-From: Julian Braha <julianbraha@gmail.com>
-To: andrew+netdev@lunn.ch,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Julian Braha <julianbraha@gmail.com>
-Subject: [PATCH] ppp: dead code cleanup in Kconfig
-Date: Mon, 30 Mar 2026 22:32:58 +0100
-Message-ID: <20260330213258.13982-1-julianbraha@gmail.com>
-X-Mailer: git-send-email 2.51.2
+	s=arc-20240116; t=1774906498; c=relaxed/simple;
+	bh=v6ogNXQHJTDTX4v1/AvGYA8+sEBVNoiI9Ngz1bKXkNo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UNb2UMPVVIQ9KlaG5IavzNjTGBT0Qam6bSTMV8ZhMbcgC1XrrUK/IK0VzJPlpw5PtK+uSmPcTYfobDPg9XjeZTV29VLY/ksIChwtRYeQtsa41cOM0mZ8hCaYztfY0oqBDbYnjeGCDFSO+ZQICPLyFVYH9a9eSuWzU1ajhrBW03E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YOHJ/bms; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774906496; x=1806442496;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=v6ogNXQHJTDTX4v1/AvGYA8+sEBVNoiI9Ngz1bKXkNo=;
+  b=YOHJ/bmsIrY1vWN+Nw/lBKlZq/rCMH4B1BSz2hiGmR8IwUrVJIKgbsI8
+   WynM6paYoHDEh+bJQ3N7MrdaoFMgfjlrdyWW/gZdhXWvvAEBMRQvigxiR
+   1jezxyN41hBBNyF+Yo7NAXW1IMFdzpd0UoUp18cnfnnPYnqHM3oaiRq1q
+   XxZHNkm+F+QbnH/vskx619dyrewk3DYHMTlpVko2ZqMxxUqj5jwxajW/q
+   JmRH6+zDnerw0sXgMBp7tyktveqkrNdIWjr61ZJBrSMYGkPfp3GyCqHFh
+   kFaToQuTVvgA7P1w39dm8MDIlO8vwVIUari6O6MmLWiq48hiz3BtknkV6
+   g==;
+X-CSE-ConnectionGUID: i35L3VadRPG0SRwrM83M8g==
+X-CSE-MsgGUID: cCIdC7LxQgioBAdL+tLaCQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11744"; a="75927261"
+X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
+   d="scan'208";a="75927261"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 14:34:53 -0700
+X-CSE-ConnectionGUID: hSMDTCmdQAS6Fr+I7pGzuw==
+X-CSE-MsgGUID: EuWSIXlYQOyv8nI2jfNKsA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
+   d="scan'208";a="230642865"
+Received: from lkp-server01.sh.intel.com (HELO 283bf2e1b94a) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 30 Mar 2026 14:34:48 -0700
+Received: from kbuild by 283bf2e1b94a with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w7KFw-000000001kD-2pDh;
+	Mon, 30 Mar 2026 21:34:44 +0000
+Date: Tue, 31 Mar 2026 05:34:34 +0800
+From: kernel test robot <lkp@intel.com>
+To: Qi Tang <tpluszz77@gmail.com>, Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>
+Cc: oe-kbuild-all@lists.linux.dev, Phil Sutter <phil@nwl.cc>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, Qi Tang <tpluszz77@gmail.com>
+Subject: Re: [PATCH] netfilter: ctnetlink: zero expect NAT fields when
+ CTA_EXPECT_NAT absent
+Message-ID: <202603310541.XVM8V7WG-lkp@intel.com>
+References: <20260329165217.241038-1-tpluszz77@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260329165217.241038-1-tpluszz77@gmail.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273328-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[julianbraha@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[lists.linux.dev,nwl.cc,vger.kernel.org,netfilter.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-273329-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com,netfilter.org,strlen.de];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7943D361812
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
+X-Rspamd-Queue-Id: 6FB51361848
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-There is already an 'if PPP' condition wrapping several config options
-e.g. PPP_MPPE and PPPOE, making the 'depends on PPP' statement for each of
-these a duplicate dependency (dead code).
+Hi Qi,
 
-I propose leaving the outer 'if PPP...endif' and removing the individual
-'depends on PPP' statement from each option.
+kernel test robot noticed the following build errors:
 
-This dead code was found by kconfirm, a static analysis tool for Kconfig.
+[auto build test ERROR on netfilter-nf/main]
+[also build test ERROR on linus/master nf-next/master horms-ipvs/master v7.0-rc6 next-20260327]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Signed-off-by: Julian Braha <julianbraha@gmail.com>
----
- drivers/net/ppp/Kconfig | 14 +++-----------
- 1 file changed, 3 insertions(+), 11 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Qi-Tang/netfilter-ctnetlink-zero-expect-NAT-fields-when-CTA_EXPECT_NAT-absent/20260330-195347
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git main
+patch link:    https://lore.kernel.org/r/20260329165217.241038-1-tpluszz77%40gmail.com
+patch subject: [PATCH] netfilter: ctnetlink: zero expect NAT fields when CTA_EXPECT_NAT absent
+config: sh-randconfig-001-20260331 (https://download.01.org/0day-ci/archive/20260331/202603310541.XVM8V7WG-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260331/202603310541.XVM8V7WG-lkp@intel.com/reproduce)
 
-diff --git a/drivers/net/ppp/Kconfig b/drivers/net/ppp/Kconfig
-index a1806b4b84be..f57fba84fe55 100644
---- a/drivers/net/ppp/Kconfig
-+++ b/drivers/net/ppp/Kconfig
-@@ -37,7 +37,6 @@ if PPP
- 
- config PPP_BSDCOMP
- 	tristate "PPP BSD-Compress compression"
--	depends on PPP
- 	help
- 	  Support for the BSD-Compress compression method for PPP, which uses
- 	  the LZW compression method to compress each PPP packet before it is
-@@ -56,7 +55,6 @@ config PPP_BSDCOMP
- 
- config PPP_DEFLATE
- 	tristate "PPP Deflate compression"
--	depends on PPP
- 	select ZLIB_INFLATE
- 	select ZLIB_DEFLATE
- 	help
-@@ -71,7 +69,6 @@ config PPP_DEFLATE
- 
- config PPP_FILTER
- 	bool "PPP filtering"
--	depends on PPP
- 	help
- 	  Say Y here if you want to be able to filter the packets passing over
- 	  PPP interfaces.  This allows you to control which packets count as
-@@ -84,7 +81,6 @@ config PPP_FILTER
- 
- config PPP_MPPE
- 	tristate "PPP MPPE compression (encryption)"
--	depends on PPP
- 	select CRYPTO_LIB_ARC4
- 	select CRYPTO_LIB_SHA1
- 	help
-@@ -96,7 +92,6 @@ config PPP_MPPE
- 
- config PPP_MULTILINK
- 	bool "PPP multilink support"
--	depends on PPP
- 	help
- 	  PPP multilink is a protocol (defined in RFC 1990) which allows you
- 	  to combine several (logical or physical) lines into one logical PPP
-@@ -109,7 +104,7 @@ config PPP_MULTILINK
- 
- config PPPOATM
- 	tristate "PPP over ATM"
--	depends on ATM && PPP
-+	depends on ATM
- 	help
- 	  Support PPP (Point to Point Protocol) encapsulated in ATM frames.
- 	  This implementation does not yet comply with section 8 of RFC2364,
-@@ -118,7 +113,6 @@ config PPPOATM
- 
- config PPPOE
- 	tristate "PPP over Ethernet"
--	depends on PPP
- 	help
- 	  Support for PPP over Ethernet.
- 
-@@ -164,7 +158,7 @@ config PPPOE_HASH_BITS
- 
- config PPTP
- 	tristate "PPP over IPv4 (PPTP)"
--	depends on PPP && NET_IPGRE_DEMUX
-+	depends on NET_IPGRE_DEMUX
- 	help
- 	  Support for PPP over IPv4.(Point-to-Point Tunneling Protocol)
- 
-@@ -175,7 +169,7 @@ config PPTP
- 
- config PPPOL2TP
- 	tristate "PPP over L2TP"
--	depends on L2TP && PPP
-+	depends on L2TP
- 	help
- 	  Support for PPP-over-L2TP socket family. L2TP is a protocol
- 	  used by ISPs and enterprises to tunnel PPP traffic over UDP
-@@ -184,7 +178,6 @@ if TTY
- 
- config PPP_ASYNC
- 	tristate "PPP support for async serial ports"
--	depends on PPP
- 	select CRC_CCITT
- 	help
- 	  Say Y (or M) here if you want to be able to use PPP over standard
-@@ -198,7 +191,6 @@ config PPP_ASYNC
- 
- config PPP_SYNC_TTY
- 	tristate "PPP support for sync tty ports"
--	depends on PPP
- 	help
- 	  Say Y (or M) here if you want to be able to use PPP over synchronous
- 	  (HDLC) tty devices, such as the SyncLink adapter. These devices
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603310541.XVM8V7WG-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   net/netfilter/nf_conntrack_netlink.c: In function 'ctnetlink_alloc_expect':
+>> net/netfilter/nf_conntrack_netlink.c:3592:28: error: 'struct nf_conntrack_expect' has no member named 'saved_addr'
+    3592 |                 memset(&exp->saved_addr, 0, sizeof(exp->saved_addr));
+         |                            ^~
+   net/netfilter/nf_conntrack_netlink.c:3592:55: error: 'struct nf_conntrack_expect' has no member named 'saved_addr'
+    3592 |                 memset(&exp->saved_addr, 0, sizeof(exp->saved_addr));
+         |                                                       ^~
+>> net/netfilter/nf_conntrack_netlink.c:3593:28: error: 'struct nf_conntrack_expect' has no member named 'saved_proto'
+    3593 |                 memset(&exp->saved_proto, 0, sizeof(exp->saved_proto));
+         |                            ^~
+   net/netfilter/nf_conntrack_netlink.c:3593:56: error: 'struct nf_conntrack_expect' has no member named 'saved_proto'
+    3593 |                 memset(&exp->saved_proto, 0, sizeof(exp->saved_proto));
+         |                                                        ^~
+>> net/netfilter/nf_conntrack_netlink.c:3594:20: error: 'struct nf_conntrack_expect' has no member named 'dir'
+    3594 |                 exp->dir = 0;
+         |                    ^~
+
+
+vim +3592 net/netfilter/nf_conntrack_netlink.c
+
+  3528	
+  3529	static struct nf_conntrack_expect *
+  3530	ctnetlink_alloc_expect(const struct nlattr * const cda[], struct nf_conn *ct,
+  3531			       struct nf_conntrack_helper *helper,
+  3532			       struct nf_conntrack_tuple *tuple,
+  3533			       struct nf_conntrack_tuple *mask)
+  3534	{
+  3535		struct net *net = read_pnet(&ct->ct_net);
+  3536		struct nf_conntrack_expect *exp;
+  3537		struct nf_conn_help *help;
+  3538		u32 class = 0;
+  3539		int err;
+  3540	
+  3541		help = nfct_help(ct);
+  3542		if (!help)
+  3543			return ERR_PTR(-EOPNOTSUPP);
+  3544	
+  3545		if (cda[CTA_EXPECT_CLASS] && helper) {
+  3546			class = ntohl(nla_get_be32(cda[CTA_EXPECT_CLASS]));
+  3547			if (class > helper->expect_class_max)
+  3548				return ERR_PTR(-EINVAL);
+  3549		}
+  3550		exp = nf_ct_expect_alloc(ct);
+  3551		if (!exp)
+  3552			return ERR_PTR(-ENOMEM);
+  3553	
+  3554		if (cda[CTA_EXPECT_FLAGS]) {
+  3555			exp->flags = ntohl(nla_get_be32(cda[CTA_EXPECT_FLAGS]));
+  3556			exp->flags &= ~NF_CT_EXPECT_USERSPACE;
+  3557		} else {
+  3558			exp->flags = 0;
+  3559		}
+  3560		if (cda[CTA_EXPECT_FN]) {
+  3561			const char *name = nla_data(cda[CTA_EXPECT_FN]);
+  3562			struct nf_ct_helper_expectfn *expfn;
+  3563	
+  3564			expfn = nf_ct_helper_expectfn_find_by_name(name);
+  3565			if (expfn == NULL) {
+  3566				err = -EINVAL;
+  3567				goto err_out;
+  3568			}
+  3569			exp->expectfn = expfn->expectfn;
+  3570		} else
+  3571			exp->expectfn = NULL;
+  3572	
+  3573		exp->class = class;
+  3574		exp->master = ct;
+  3575		write_pnet(&exp->net, net);
+  3576	#ifdef CONFIG_NF_CONNTRACK_ZONES
+  3577		exp->zone = ct->zone;
+  3578	#endif
+  3579		if (!helper)
+  3580			helper = rcu_dereference(help->helper);
+  3581		rcu_assign_pointer(exp->helper, helper);
+  3582		exp->tuple = *tuple;
+  3583		exp->mask.src.u3 = mask->src.u3;
+  3584		exp->mask.src.u.all = mask->src.u.all;
+  3585	
+  3586		if (cda[CTA_EXPECT_NAT]) {
+  3587			err = ctnetlink_parse_expect_nat(cda[CTA_EXPECT_NAT],
+  3588							 exp, nf_ct_l3num(ct));
+  3589			if (err < 0)
+  3590				goto err_out;
+  3591		} else {
+> 3592			memset(&exp->saved_addr, 0, sizeof(exp->saved_addr));
+> 3593			memset(&exp->saved_proto, 0, sizeof(exp->saved_proto));
+> 3594			exp->dir = 0;
+  3595		}
+  3596		return exp;
+  3597	err_out:
+  3598		nf_ct_expect_put(exp);
+  3599		return ERR_PTR(err);
+  3600	}
+  3601	
+
 -- 
-2.51.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
