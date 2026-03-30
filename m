@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-273113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273114-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qKIVExtSymnq7gUAu9opvQ
-	(envelope-from <netdev+bounces-273113-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:36:11 +0200
+	id YL7cIiVRymmb7QUAu9opvQ
+	(envelope-from <netdev+bounces-273114-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:32:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0221235970D
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:36:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72461359583
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:32:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3BE78305F49E
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 10:26:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 79E06300D76E
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 10:26:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 899BB3BA24F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CEE23BAD8B;
 	Mon, 30 Mar 2026 10:26:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8TJeq/F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T3Lk3LeT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64EC03876D5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F763B637E;
 	Mon, 30 Mar 2026 10:26:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774866385; cv=none; b=ZND387F7hgMiAX7l+vD2OJCdr64Fb4WQCeiCEKAW7xarg3tplCF/B2DaRFvy18b3ly5OrpjyFwrsr/DuOBS6EVsxskU7eZO9ISa+tDtsvj8cJbtPZL8R2urHqNad1cJovgVCQk2CwNGaLqX79FYzJ7CAP/mBDQNh5+Xd457Pozc=
+	t=1774866385; cv=none; b=jsdDo7wSR2R0aptFfi2SoUP6s7fOhC+qQbjsdE7eabZEHq7i+jkRnmm8seujN0ID2qYdTnvlxifBd0evNlgn2Z0F1nmgSlRPM5v/1v7aVY5yuF2Q2yKcjiKua1ixWfOiFEa4MfDXnL0JtFItjg/xkST4h6/9ZUMCnNgINzP1NRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1774866385; c=relaxed/simple;
-	bh=rgFKg/d+FUAaOw5JbZeHPHlGozeIL8CU5+819cW2K9Y=;
+	bh=T9uIlKF64yOcg9bZtE+cTBedhjk9S9RgTUSXgAnuvIw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=euNh4CNZnMyFwMipv78OHloXzPf5Laui80qbHbknABGA6fCf8RinIbtvsMngrKA4wncrgSt+WzWZ2ZiD/gZsoTIAVTmz0tkehf9pgMODyl/H2ueoa/cZSo9ZlfiQ4UvZwhxSgjihwOIaCj/oMo/MHHHTr6ON3A/NZE7BcRBD0ww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A8TJeq/F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2782AC2BCB2;
+	 MIME-Version; b=TPmpX1Ah1ZwQqfSvCUH2R82AdsMkb798GbHbkjpkZ6RGIfYvuOfFwjUqUfDGdSQbl5937u2BBzvw/5an9/We9s+JpR3VLBtS1j8Ff+fvO3zpTFwfq7BAd68isNDfKULd4NMuhzCCrJWzePdZ5cYXuKpGATASeZsmpsIFDOzasE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T3Lk3LeT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21D52C4CEF7;
 	Mon, 30 Mar 2026 10:26:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1774866385;
-	bh=rgFKg/d+FUAaOw5JbZeHPHlGozeIL8CU5+819cW2K9Y=;
+	bh=T9uIlKF64yOcg9bZtE+cTBedhjk9S9RgTUSXgAnuvIw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=A8TJeq/FipNLvABEzeHajmIWnQiJEyS8rETi6plHyLvVpkyF92kSIZutj0v8/9lXL
-	 Al+FtJXW9KEKWjA2MgDT1g/+FZ+j5imyWXw54+r1/Q0+MNePfdd1C6tmORb4sT1XMk
-	 OSpLn9hUtBN20FyxaWQZsLfJf4Upq5UUsN2d50MmDgHtEHxwHGayoLChSxdneND6MN
-	 xef0waIGxnOr4u7xYP7KBXBKIpN7rNGn11L1tLxltDr96l9fuguuEm4m1AXH4trzZU
-	 o+/vAmVwhMpIirlAAzx54Ig/KR/jxPAFTTlkvKYPpvC27p8dptCWWlRKc7TH5r9B9F
-	 wiSGTtloT2cUQ==
+	b=T3Lk3LeTfciLzYIG75jBzdIlDdDiBmouF5ORvWGPOHx12VEIo6la8O327J2sZk3/e
+	 fXDSOERPW4rywuTPQeYzcfPtPw1avW980TYA13Dl2aMHwTfS+l/eolVC3gcYMWn2Vt
+	 KhIp7fKVr1MK42KrpJJiCmc6IgayIZhmyiM71ySP67dneW4Qea3SfCP6+tdNWbGu47
+	 GqPHK+ichN9sfmqgQjLDfXu4vmfPt2lktGVJ1estQdrQ0uXz4tY57sga7toFsLTqrD
+	 mcUjGBZsq2/Q7m+T/Hjuc3iDEuWkAqhnqWg0W2dVxLUC/3sEnA+SXH8yQ3URnAeuEW
+	 sD1cTcOQLCcCA==
 Received: from johan by xi.lan with local (Exim 4.98.2)
 	(envelope-from <johan@kernel.org>)
-	id 1w79p8-000000070qo-3yyK;
+	id 1w79p8-000000070qq-42E7;
 	Mon, 30 Mar 2026 12:26:22 +0200
 From: Johan Hovold <johan@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -58,9 +58,9 @@ Cc: linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Johan Hovold <johan@kernel.org>
-Subject: [PATCH 1/2] net: hso: refactor endpoint lookup
-Date: Mon, 30 Mar 2026 12:26:10 +0200
-Message-ID: <20260330102611.1671546-2-johan@kernel.org>
+Subject: [PATCH 2/2] net: ipeth: refactor endpoint lookup
+Date: Mon, 30 Mar 2026 12:26:11 +0200
+Message-ID: <20260330102611.1671546-3-johan@kernel.org>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260330102611.1671546-1-johan@kernel.org>
 References: <20260330102611.1671546-1-johan@kernel.org>
@@ -78,14 +78,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_NEQ_ENVFROM(0.00)[johan@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273113-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273114-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -97,146 +97,63 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0221235970D
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 72461359583
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Use the common USB helpers for looking up bulk and interrupt endpoints
-instead of a custom implementation.
+Use the common USB helper for looking up bulk and interrupt endpoints
+instead of open coding.
 
 Signed-off-by: Johan Hovold <johan@kernel.org>
 ---
- drivers/net/usb/hso.c | 65 +++++++++++--------------------------------
- 1 file changed, 17 insertions(+), 48 deletions(-)
+ drivers/net/usb/ipheth.c | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/usb/hso.c b/drivers/net/usb/hso.c
-index 1825f7cf5dc0..c1aec67688ae 100644
---- a/drivers/net/usb/hso.c
-+++ b/drivers/net/usb/hso.c
-@@ -298,8 +298,6 @@ static int hso_mux_submit_intr_urb(struct hso_shared_int *mux_int,
- 				   struct usb_device *usb, gfp_t gfp);
- static void handle_usb_error(int status, const char *function,
- 			     struct hso_device *hso_dev);
--static struct usb_endpoint_descriptor *hso_get_ep(struct usb_interface *intf,
--						  int type, int dir);
- static int hso_get_mux_ports(struct usb_interface *intf, unsigned char *ports);
- static void hso_free_interface(struct usb_interface *intf);
- static int hso_start_serial_device(struct hso_device *hso_dev, gfp_t flags);
-@@ -2497,16 +2495,11 @@ static struct hso_device *hso_create_net_device(struct usb_interface *interface,
- 	hso_net->net = net;
- 	hso_net->parent = hso_dev;
- 
--	hso_net->in_endp = hso_get_ep(interface, USB_ENDPOINT_XFER_BULK,
--				      USB_DIR_IN);
--	if (!hso_net->in_endp) {
--		dev_err(&interface->dev, "Can't find BULK IN endpoint\n");
--		goto err_net;
--	}
--	hso_net->out_endp = hso_get_ep(interface, USB_ENDPOINT_XFER_BULK,
--				       USB_DIR_OUT);
--	if (!hso_net->out_endp) {
--		dev_err(&interface->dev, "Can't find BULK OUT endpoint\n");
-+	result = usb_find_common_endpoints(interface->cur_altsetting,
-+					   &hso_net->in_endp, &hso_net->out_endp,
-+					   NULL, NULL);
-+	if (result) {
-+		dev_err(&interface->dev, "Can't find BULK endpoints\n");
- 		goto err_net;
- 	}
- 	SET_NETDEV_DEV(net, &interface->dev);
-@@ -2608,10 +2601,12 @@ static void hso_free_serial_device(struct hso_device *hso_dev)
- static struct hso_device *hso_create_bulk_serial_device(
- 			struct usb_interface *interface, int port)
+diff --git a/drivers/net/usb/ipheth.c b/drivers/net/usb/ipheth.c
+index a19789b57190..bb1364f85bd1 100644
+--- a/drivers/net/usb/ipheth.c
++++ b/drivers/net/usb/ipheth.c
+@@ -573,11 +573,10 @@ static int ipheth_probe(struct usb_interface *intf,
+ 			const struct usb_device_id *id)
  {
-+	struct usb_host_interface *iface_desc = interface->cur_altsetting;
- 	struct hso_device *hso_dev;
- 	struct hso_serial *serial;
- 	int num_urbs;
- 	struct hso_tiocmget *tiocmget;
-+	int ret;
- 
- 	hso_dev = hso_create_device(interface, port);
- 	if (!hso_dev)
-@@ -2634,10 +2629,8 @@ static struct hso_device *hso_create_bulk_serial_device(
- 		if (!serial->tiocmget->serial_state_notification)
- 			goto exit;
- 		tiocmget = serial->tiocmget;
--		tiocmget->endp = hso_get_ep(interface,
--					    USB_ENDPOINT_XFER_INT,
--					    USB_DIR_IN);
--		if (!tiocmget->endp) {
-+		ret = usb_find_int_in_endpoint(iface_desc, &tiocmget->endp);
-+		if (ret) {
- 			dev_err(&interface->dev, "Failed to find INT IN ep\n");
- 			goto exit;
- 		}
-@@ -2656,17 +2649,10 @@ static struct hso_device *hso_create_bulk_serial_device(
- 				     BULK_URB_TX_SIZE))
- 		goto exit;
- 
--	serial->in_endp = hso_get_ep(interface, USB_ENDPOINT_XFER_BULK,
--				     USB_DIR_IN);
--	if (!serial->in_endp) {
--		dev_err(&interface->dev, "Failed to find BULK IN ep\n");
--		goto exit2;
--	}
--
--	if (!
--	    (serial->out_endp =
--	     hso_get_ep(interface, USB_ENDPOINT_XFER_BULK, USB_DIR_OUT))) {
--		dev_err(&interface->dev, "Failed to find BULK OUT ep\n");
-+	ret = usb_find_common_endpoints(iface_desc, &serial->in_endp,
-+					&serial->out_endp, NULL, NULL);
-+	if (ret) {
-+		dev_err(&interface->dev, "Failed to find BULK eps\n");
- 		goto exit2;
- 	}
- 
-@@ -2754,13 +2740,14 @@ static
- struct hso_shared_int *hso_create_shared_int(struct usb_interface *interface)
- {
- 	struct hso_shared_int *mux = kzalloc_obj(*mux);
-+	int ret;
- 
- 	if (!mux)
- 		return NULL;
- 
--	mux->intr_endp = hso_get_ep(interface, USB_ENDPOINT_XFER_INT,
--				    USB_DIR_IN);
--	if (!mux->intr_endp) {
-+	ret = usb_find_int_in_endpoint(interface->cur_altsetting,
-+				       &mux->intr_endp);
-+	if (ret) {
- 		dev_err(&interface->dev, "Can't find INT IN endpoint\n");
- 		goto exit;
- 	}
-@@ -3134,24 +3121,6 @@ static void hso_free_interface(struct usb_interface *interface)
- 
- /* Helper functions */
- 
--/* Get the endpoint ! */
--static struct usb_endpoint_descriptor *hso_get_ep(struct usb_interface *intf,
--						  int type, int dir)
--{
--	int i;
--	struct usb_host_interface *iface = intf->cur_altsetting;
+ 	struct usb_device *udev = interface_to_usbdev(intf);
++	struct usb_endpoint_descriptor *ep_in, *ep_out;
+ 	struct usb_host_interface *hintf;
 -	struct usb_endpoint_descriptor *endp;
--
--	for (i = 0; i < iface->desc.bNumEndpoints; i++) {
--		endp = &iface->endpoint[i].desc;
--		if (((endp->bEndpointAddress & USB_ENDPOINT_DIR_MASK) == dir) &&
--		    (usb_endpoint_type(endp) == type))
--			return endp;
+ 	struct ipheth_device *dev;
+ 	struct net_device *netdev;
+-	int i;
+ 	int retval;
+ 
+ 	netdev = alloc_etherdev(sizeof(struct ipheth_device));
+@@ -603,19 +602,16 @@ static int ipheth_probe(struct usb_interface *intf,
+ 		goto err_endpoints;
+ 	}
+ 
+-	for (i = 0; i < hintf->desc.bNumEndpoints; i++) {
+-		endp = &hintf->endpoint[i].desc;
+-		if (usb_endpoint_is_bulk_in(endp))
+-			dev->bulk_in = endp->bEndpointAddress;
+-		else if (usb_endpoint_is_bulk_out(endp))
+-			dev->bulk_out = endp->bEndpointAddress;
 -	}
--
--	return NULL;
--}
--
- /* Get the byte that describes which ports are enabled */
- static int hso_get_mux_ports(struct usb_interface *intf, unsigned char *ports)
- {
+-	if (!(dev->bulk_in && dev->bulk_out)) {
+-		retval = -ENODEV;
++	retval = usb_find_common_endpoints_reverse(hintf, &ep_in, &ep_out,
++						   NULL, NULL);
++	if (retval) {
+ 		dev_err(&intf->dev, "Unable to find endpoints\n");
+ 		goto err_endpoints;
+ 	}
+ 
++	dev->bulk_in = ep_in->bEndpointAddress;
++	dev->bulk_out = ep_out->bEndpointAddress;
++
+ 	dev->ctrl_buf = kmalloc(IPHETH_CTRL_BUF_SIZE, GFP_KERNEL);
+ 	if (dev->ctrl_buf == NULL) {
+ 		retval = -ENOMEM;
 -- 
 2.52.0
 
