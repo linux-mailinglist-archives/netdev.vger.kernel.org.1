@@ -1,1014 +1,293 @@
-Return-Path: <netdev+bounces-273110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273111-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDwqF5VRymmb7QUAu9opvQ
-	(envelope-from <netdev+bounces-273110-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:33:57 +0200
+	id IZY8C3RRymnQ7gUAu9opvQ
+	(envelope-from <netdev+bounces-273111-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:33:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DAAB359636
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:33:56 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5AC13595D8
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:33:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 86706309899A
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 10:17:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 21237309D9F2
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 10:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34C1C3C13F0;
-	Mon, 30 Mar 2026 10:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C528A3BED1B;
+	Mon, 30 Mar 2026 10:16:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=t.fuechsel@gmx.de header.b="G4YuTSrt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fm1Y9tLd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05103BFE2A;
-	Mon, 30 Mar 2026 10:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774865610; cv=none; b=aIE2N+hK6X7cn64fYnU2XMhjbgTHeLoL7C7PI0ykfQpAObEqE9kBylGmzPkJHdBu7PWCcFdhBMUPnxfUeACDT31G7bS8ahbZPn7PT5ptVMzY4kILlUI+z7wvrSy0HeP6uVfDR0WtQXzFMS0i++bdg74pJv6Mf55NuwvQk8D/RPk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774865610; c=relaxed/simple;
-	bh=/t3TlnvWb+wOK9eNtLSFV6jIlKuBzdJ/hym2paDzzPs=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=KeVfsUh2x8BNmJK1KCt4rnjnZn0eJiRWqV/Mc9kXBpziDdD+Cs451WOtX8ZovhcG5vGppMfKpj/fwRu3jxFMFi9bJNGwkh42lxCF1k1L+kafl1hKCONjARCXXDfUzWqzDHsDIMHNfXe5OxJnhzAMWWzOAyULtCPpjXG5gpAhuvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=t.fuechsel@gmx.de header.b=G4YuTSrt; arc=none smtp.client-ip=212.227.17.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1774865585; x=1775470385; i=t.fuechsel@gmx.de;
-	bh=d8IIV/uJaCV9Kb5NcV93DdGLRnl6G0mYDZQFWXtMUuo=;
-	h=X-UI-Sender-Class:Date:From:To:Subject:Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=G4YuTSrtiuNcmdI6zIRIJnEbnFbriRN/edGKCcTjHH52B2gpeJIW8ouBTGNg3fUk
-	 A1cs2u5jV2bWPOeK3XqxCyoKnXIFWU2PQ9aYUkCei1Y73D/oZzmtelwblAbX0y4xy
-	 KEMAAs5QmylZxe38UxB7mIBaGHjtHe7959Dt60/lIhLX4Ti3zp/2UOEuWJcDm9kJ+
-	 ij4RIwlcJor7UB479GrE8rJtaMeYWlecB4grf3oMH76P7qZQYzzRVR0GqoLXkU+yT
-	 9WIwbgC7Sn5IgzlUPw9Lt1i/Iuu9deiIIMgTFrr/ezcAVLoYkfvjy8eJNBb2Kjw4o
-	 zJptoHqmyXTgo/6O9A==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from client.hidden.invalid by mail.gmx.net (mrgmx105
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MiaYJ-1vdKly0sRr-00qKCJ; Mon, 30
- Mar 2026 12:13:05 +0200
-Date: Mon, 30 Mar 2026 12:13:02 +0200
-From: Tim Fuechsel <t.fuechsel@gmx.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Lukas Prause <lukas.prause@ikt.uni-hannover.de>,
-	Tim Fuechsel <t.fuechsel@gmx.de>
-Subject: [RFC net-next] tcp: Add TCP ROCCET congestion control module.
-Message-ID: <acpMrvW9gp_RsmB8@volt-roccet-vm>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 510113B9DAD;
+	Mon, 30 Mar 2026 10:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774865803; cv=fail; b=VzvGARjf1rirLmW4NFeN1Q49nf9L8wBt/nyYvfDlaavrLUKDKVFSXAcu11QkiVy/AE9mP8q7zGPJfN9Na5tvdzGlqeEU9XwMlpT6oI/kIYxaEPv2Oo8WzEJXJUn3afIA3DTyxPHvPfy2uLFFStOwYh6qvVyvFr2zyZ8rAHfR5eQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774865803; c=relaxed/simple;
+	bh=+cZ2/bZQBmXo6hlusMmTrARjcc71lB3FXm3Cot/bWWU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gusDrLSUHQxBK0/Ug3yKSkKKMsP44S9U/DWdwyOH+XU7TDttELQ3yYUTmGgCjdcicRJW5Nd2zFBafLZC3AJyxi9W3FngksO1l9PjCmZrNUoGDW/VNejnWKprnfsAQs6KMR/HDs2Wa3A1GFwNzpqI/OZETR6zwdSi+IBaSaotaYo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fm1Y9tLd; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774865802; x=1806401802;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=+cZ2/bZQBmXo6hlusMmTrARjcc71lB3FXm3Cot/bWWU=;
+  b=fm1Y9tLdFwkbJwv3jxhi7kwltun5sRQDVGyYWLU0IzdetQRvl6C4usL9
+   v6hL7+EEIZQ5996/szN6+tTT0ho+8K4HRhb8btLJeoCehr0Nb/0rMYEyw
+   AXpX4QhTYooI3a9CFyzQkT/nzwuYxVjIl+dWdbDpfvsSoyafAPYbgpUMc
+   Qp4Y5aaDrezIhXA9qj8ldrUH58hhSjU64StLqlIk6r8XiEnYe62kA2O9v
+   U69TOp9tWiPRYlfJloF1980NJprDvGU71C0zWpYV6R9Sdn62HtX3BppWl
+   NuIx8XG+0v1n2neXMFlT/qd0XXUVGpy4AiaHUPbGmD0eK2+UFD0rpv81+
+   Q==;
+X-CSE-ConnectionGUID: i9Ea4Wp6QvS7U0ovymQt0A==
+X-CSE-MsgGUID: 0R5Eo+GISgmCjXG8wXIVVA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11743"; a="78449758"
+X-IronPort-AV: E=Sophos;i="6.23,149,1770624000"; 
+   d="scan'208";a="78449758"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 03:16:42 -0700
+X-CSE-ConnectionGUID: RIc/Oo2oR5Sgib954Imkpg==
+X-CSE-MsgGUID: e3hrqOT/SS2XI3OKZrkEhA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,149,1770624000"; 
+   d="scan'208";a="227628788"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 03:16:41 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 30 Mar 2026 03:16:41 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 30 Mar 2026 03:16:41 -0700
+Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.67) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 30 Mar 2026 03:16:40 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iScLt8bHNStWAb2r3kFEk4F63r+jqwTqIMrXOZbOhqH7l/WdtQYKW2q8wCbGMdUf5ijWSf4+OMbY2a+pZC082fVvQzeOB4zExm5Z61UjjREfUmsZ5CGeOuw63LLF6Y5Y746T6m2cq+xjPx2/zLuKvVsYDbz6hcvN3QnR8WKwEfx+VXjcND1gJH34GVB2cwl7QcvBCkguPJ7ochSbUrvkBILrJU2QVwzTLnZlW5YsNuZrIZjeEu2JHfD9+bVJsW1+vMjnK8Qqmm90g6ueBhtbejWhfRBMUwS8VFaSc4YgFiGobPZ8r725pDmDFAWulaSuYZ1hdf4ujXgs6uIdg366nQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+cZ2/bZQBmXo6hlusMmTrARjcc71lB3FXm3Cot/bWWU=;
+ b=MjgsIXUPZNS9yWDorQ5He9XLFCp64TywMJQO5Je4EncMfRaYQgfWqOpZGzumMnzchhh8N44vTNrZJkyB1FQ1y4I25OBzcrdWoI5AbNEO4/2yH3Bxc4JdJX4DREdPN0v9FloLlXjURhc9wxkADCg0cojnCaxB1mLm404TvrKrqQONmSu+//WK6nkpD6BrD1YYMYc+MQubaVAcjcqajD6tWvE16g/k4/09QWpjAcfdko+zYwoYpvCftHRLlikQeWwFJ+9W7S3LUMPX19UUNT/JOv5fRErs/CPia72G0BcbRJbLviL+CK6Gm2zWwrbvkDmPSCmE2fzUT4BXMoFl64OBew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB9301.namprd11.prod.outlook.com (2603:10b6:208:573::20)
+ by CH3PR11MB7915.namprd11.prod.outlook.com (2603:10b6:610:12f::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.11; Mon, 30 Mar
+ 2026 10:16:33 +0000
+Received: from IA3PR11MB9301.namprd11.prod.outlook.com
+ ([fe80::714b:7d3e:aa0:104c]) by IA3PR11MB9301.namprd11.prod.outlook.com
+ ([fe80::714b:7d3e:aa0:104c%5]) with mapi id 15.20.9745.019; Mon, 30 Mar 2026
+ 10:16:33 +0000
+From: "Holda, Patryk" <patryk.holda@intel.com>
+To: "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, Alex Dvoretsky
+	<advoretsky@gmail.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Loktionov, Aleksandr"
+	<aleksandr.loktionov@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "kurt@linutronix.de" <kurt@linutronix.de>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH net v3] igb: remove napi_synchronize()
+ in igb_down()
+Thread-Topic: [Intel-wired-lan] [PATCH net v3] igb: remove napi_synchronize()
+ in igb_down()
+Thread-Index: AQHcsieZ2k95IXxzOUynBa0+I8yfPrWsM3mAgBrEkwA=
+Date: Mon, 30 Mar 2026 10:16:33 +0000
+Message-ID: <IA3PR11MB930147B64F6421FD7D01AB418A52A@IA3PR11MB9301.namprd11.prod.outlook.com>
+References: <DS4PPF7551E65520F55DBD20987BCAE3C6FE544A@DS4PPF7551E6552.namprd11.prod.outlook.com>
+ <20260312135257.71610-1-advoretsky@gmail.com> <abPY+aT0SWuixsmN@boxer>
+In-Reply-To: <abPY+aT0SWuixsmN@boxer>
+Accept-Language: en-US, pl-PL
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB9301:EE_|CH3PR11MB7915:EE_
+x-ms-office365-filtering-correlation-id: b2bb41f5-0d75-4a2f-b10d-08de8e456b14
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700021|18002099003|22082099003|56012099003;
+x-microsoft-antispam-message-info: Zj8702viS85r8m910Wtc9hS5Jb6KyvI+/1BxkiXSGnr/N2E5q/giICGO07SngjQffM5Mxx02hxyvH0QzTHOZ3mnl+AS79Ptm+zRvaEHwjFYZXWU40UvHHm6o8Yx8y23OO87obBYhuUhIi5djjzf59BGGteKaZ7NB2Wx5laFj+lZ1aSc9lK94V616KJuxOeFF61sr54jdr4XP282azbR5XcMO2JTmLPm5rt4Qg7LBJTrVI+MrTbg95z7D0uqyfvNgY6xc33Dh7yuE4kQ01z6+8dkA95+J0b0jzKfFa+zpw9pAY43FcYe0ucLPvsrvEtF9jg+3c5fD6mwEYjclDsVMD48LvgJ16ZBEuWn2V5RifpYoWaVig8svATK1e7erapA87tOxto/2CFXC0+pcbT+EyQJHkj9GvA//3vm22HiYU0XKUmIKm7rZjBG2bz5OYpuZuwLAWekLkYgiXgZme6HFiGoJAIP3EolSzD9Q2HVmBeA06AgF5WtgeOQHTqOWu+Ctbvo2q//KaWD/o7oMhMfSqBC8CVhmNOwLV05NvXlsL4dQUqxyCkYRxbtXXxeR42bUe8po0xv3i3JkeIwy7EJy60sR7zH2eyxZ+kFeTay6qx6yXPWrmjymHfksrsqDRzKR2fNxz8D7oRkdeMWU1JNnrln6WdU2Ad1lUyK0/cCEBOD8XjaWgtF8/O6UjpuF0k38uejzE0VW27Y+qmJQRfvTM2hLDEjxrbi9oHMQz8HMdvDm9maLoNw2fm29iDwfVGroq2ETLCQk5Tet3txHrclWN8+avfjBY30tOoC7AisdWTc=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB9301.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bHI0R29lS1E0OVRaeFRqQUxDdlppRlM0TGV1c2F5WUtNWHRUMlEreTFSRnla?=
+ =?utf-8?B?NTF5SUxrM3EzcCsyOXhuZnZ6OFVLQ1FvSVBONHZaSEtPQmVPMmJtTFB1TFBN?=
+ =?utf-8?B?T2tzWWVFcXBQNHRuaWFpRHhmT1N3Y3dIU05OL0hhc2xqTXRoOEUwcnp3NHlF?=
+ =?utf-8?B?SzhaTm1IMFV1RTBrbkN6bnpaSCtHVlBLNm5WQmtEQUhBUnY2T2ZsTVdPdmtR?=
+ =?utf-8?B?RDdyUElpUEpjcDBIN3hNQ0NnME9CblR4Y3ZpVmVBSWNyUVlzekhVZ0NyY1lO?=
+ =?utf-8?B?ZkUyWFVySW1lZTQyZzFiV2gvQzZPVlI1dlZxbE9ZaEdCQ0tMLy8waTJGSnJs?=
+ =?utf-8?B?bUlOM2pCOHJLSS83djdKZ2k3QWNWR3QzSWdRTnJMT3pXRittVDBpR3dEdWNE?=
+ =?utf-8?B?VFdiVGlyQWJqSG5sb3RzYThkWEttRUQ2ZW91eW45OTZQT1JNS0cyaHVxWWJV?=
+ =?utf-8?B?UGdiMnQrTHJDNTJVUTZLblJRMEFxNW9sTkZLcFMwaUlzK2JTcGhybWJBamlM?=
+ =?utf-8?B?YnVjL1dnY3RsdktPM2NFYkE0MURBTHU0MXhFNDg1cVFBcjVlUldUYW9ia0dD?=
+ =?utf-8?B?YmhMcnJmOU85WS9Ic0k3cHEwUWlWWGNxdVlqUXFSbklzOUpTOXI3azBMREg5?=
+ =?utf-8?B?MXRjOGRUZFdETlNJNzJlVDRYQi94cFk5ckRKMkUzM1pSMDh4UmpKdE94akU3?=
+ =?utf-8?B?L2hiZ3ZQWjAzQjhVMnVMWXdzVlE3VW5WdloyMlVZQU5NNTMvN3h2UFNNUktx?=
+ =?utf-8?B?cC9TTjN5WTI3Q3BzS2s1RFNKcVZqTHA0YVU0WE1yNWhxTVhlVlF0WEJDTmJM?=
+ =?utf-8?B?VnArWDhnK1J6VitObEpXSlUrcTJEY2V4VkpRa2RESFV2Z1lYL1JCVVc5VUpV?=
+ =?utf-8?B?SkU4b2FlMjJhOU9pbEEwOEhRQ3JaSWVnd3BqbDlkSGNNb0tiR2tydTdqMC9I?=
+ =?utf-8?B?cVFzTmFLVml4TTQxOHUyTU51VC9WRGZ5QlBRN29HZ2sxVGxIRG05Rm9oRUhL?=
+ =?utf-8?B?a3loN3c4OWpjMmJiYStRSWN5M3lhZExDeE9sM1ZVZERCcTBkVm5sYmREY2Zy?=
+ =?utf-8?B?NXRkYjNwQ3VYOE9LaHdsNTE2akxFKzc3SGpFc3BSOWVYWXVIOEFQVGZJWjJH?=
+ =?utf-8?B?WFl4cFpWK1ZyYWR3RVlockhTZ2ZCMWFWSHRSb1ZJNElBUHpmczh3V2VWVWFR?=
+ =?utf-8?B?RnR4aEgrZktVVlZFT2UwU2VjZnkvOERNUTBGb1MwRCt3S2g3MHlnRjVwOGZm?=
+ =?utf-8?B?MFZhQ2FnYXMvdVg0cmRIaTdhSmFiU2hITXJNaGplb3k4ek83aElXYU1NSTVL?=
+ =?utf-8?B?cm5Gams0V0xvbzZrS0JXNWQ1eVJUWkNSSTl2bUpQenNYQU9FL0V3amovUjdt?=
+ =?utf-8?B?MkpJUjNDbjZWL0RTdWNhYm9xSXl3TURPb05FYVlLRTZNU0tNQi96cVdXK0hX?=
+ =?utf-8?B?MktMSSthZVFpaWhvblNZS1hXSzBSOE9NeHZpTDk2bWdXNHR0ZlFtT3hCcStp?=
+ =?utf-8?B?bGNkWjVoVGlOaWp4Y0VQclNqd3hwSWdpRzEvUW9XMi9teGxHcHJBdDZSYWFq?=
+ =?utf-8?B?K1dlUElrRERvdVIvemplSFlMRjJRZWVFNUNkeTM1eW9saGxKQ012SHNGQW1X?=
+ =?utf-8?B?RjlwYjg2ZEZtT00rbG8zWDlQaTUwUDZMTXJpbTZxVFc2SmYxY01lcGNTM2F0?=
+ =?utf-8?B?N28zY2QwdXNuRjFBdHU3MHlpQ01VYUUvNmt4c1VISG9BWnZ5VzkvYXdzZy9v?=
+ =?utf-8?B?WHdtbEwvdGowSkVTZmZEYkswSUIwNkdSVzVNNGQzdENsNC9OZnBobHpxSzF4?=
+ =?utf-8?B?QWdhU3JKUy9kTnVuSXh4QTJZS1FjY280UTRyRXV0OXVEQXE0SjZET1BmRERW?=
+ =?utf-8?B?VkluMlloQlFXbXBGaGJNRjU4TGJOcSs3WTUxczNicElVT0xpRmRYRjM5bWZr?=
+ =?utf-8?B?ZXQ0QkdkY2F6NGlzaHhMMU1nMWpleVJFSDlod0NNSG9oQXcwdDBWclhIT0pW?=
+ =?utf-8?B?Q0FiYzVZMklwZElzcHd0d0dZdkZBNms3Z0dyY2VmUUw0QklnZExPSkJoNzI0?=
+ =?utf-8?B?WjhvMEpqK09NWmJJYXF4Vno1SHg2VnRrdE5HS1VQd3lDTzdLNVV1M05CUStB?=
+ =?utf-8?B?bFJqanNEcFpQcmlwZktmeCt6NkIzMUF2bUIrYjhla09SbjgrKzZQSkhTRXZT?=
+ =?utf-8?B?eUVMamJWMDVZWEkwdEFzYWVPQmFOTVZ4NEh4OVRhSjB2ckNUQmZoVmpnVmFx?=
+ =?utf-8?B?a3VxemxPRmpaa2JPSWVQREtnZXRzM0RBSnJPenlETmRNVnZHcll4cVlkMzhx?=
+ =?utf-8?B?akp1cEd0eUJUckR2TFJqeFJlY3RmcW5hVnpyM3JrVzFqSDdtVTFEZz09?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:jc4Ue6PwV/gACrQmqCe6zlQFIUokHoUF0n09SOOIui6C66vxA8g
- jJ1RSYmlecy4QLq4kmPRlwaJWcdr1cTHzbvu/aqMw/ITTNiPZljYUpfN7rm6J1dFzQ0BKeM
- CUhI9zqUy46e2piARE+guX/mYwb+4M0AGBd75T4xxZZeoCfRbKGcgaNbIAji3nbHQuwSTM5
- Tw8MT6fTmwdFV6bIAjVMA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:C6u2ydr9Lfc=;/0smSDGmRw1yRrDgNp4fvU067uF
- k7+SO6sMRV4hfCV6y9kOycPq+dDcEaW2bw283zsslnVdLQEAaHACitu4PIJULxcwdjxW0bSuA
- dYD1ySG1jvhR/YWkTmqdXzA4Pc54FZ3mvpBZATg9RC4HXvdqwL6BwdB44td7s96fUunNpXzcP
- /WvwtL7ls23ZdPhK0rcAZenTSwz7tfCU6Gv6d/kShp8NAjA/hB38dpJAzuDno9x0p7v3l+vR8
- KuKJTg4fap33QoK0Ocr+HY9XvL++4BSakNiZOhly3B7moemJyr2Pphu4wj6YC/Aujdq9NBqRM
- G5odJKkHgUkPipPzt6xFYjtq+0nPmLDA8AuJ8710UM1qHrjqkt9N+7Oj7BtJBc7R+RFBSlMMo
- +BDEBoBelfhq1sZ1GrTFLDf92cB0HOLSEI5msM0O/RbpDdYUPOTATdcLdeaEZf0j77zr7Aesv
- SguUmCed1e7fVYpTGu/dOO5bQOGk0x2UPQ0pHHcO/sjzg237Q1+fD2jCVs+0FdDjhUlCbjLe9
- fvpg/ykdJTqec9a3usVVsPMEu6cmWSAejrqUNKTihfhJbwsAsxvSsInmjqA1zobfMXyoJmjLs
- l6D6KVTGD0sbStcJNF0BVFgGXFFNvPAM3gBHacoDtENNydVWY4sVT3jzUGBASmOFAagqBzR0u
- 0TGXsRSAEbM5mVEWqgUt+nRWnCJtO5ZjRhYCfw2V4dNEn/wS/yCFY0zBKdsAyfF4bS+Zgcj0N
- X9ARqY20KEI5yHCJbWxqA6UaEqIWo9OitCk294BTBwaYccDQWX1StF6FORiJl2C63LoUzCIo4
- DRsiuznRTfZuRoW9b7Wfqlf5Ds1NxAj8FEb8EVSIXTNVW50vhlIp9jgHMUQhHK8BRJ5EyED6j
- RgdLJWuGB/5HV4lstb4ayvo2PILyXSM6D4rOmBUhaSv5xSYP8gKG+Kmx1U32w1V3Ggaeb6oiq
- 0JqQstHRTFM9+Fq1G3bh6XSx590qXLqUaQ6WrVd3BhCq90L5SRXI7iHewTFQs8aLnbv/x7FdF
- 3kYuS9aQ5rs49KCoRtoM2OkeeT92ONJ5ZLbNHKE+KqQydpBWU6l0TnhnTfsD+uMYHNLg7wKAB
- Vnka2RCbKuU0G3d+RbQb93Ax8WPYkQvy5iTvjBOJ0WpNDv97Jq0MRjlfhHj2iX2m3aHjDzH7u
- JLowFJL3AwSARm/rLaJ/8FrtxgYwY37mR6MqBQYO7aeMqZB3jCyGgsGECTtTlHbY5RBAdZgSA
- +8xHzrAV9Fj6tuZ5oYpCLhwwkCQx0XQ6oJOkE+ZTf31Wo1e+VDj6iHGjPITvu4jMObwMtAn0d
- qmw4Zd9k9s8TtmZ0W8Cpvck7qcimX7Hc2bgvEx3ya7rfY7yP/Q5ws/f8DIizk++fCOyK/9+gZ
- xic4cFz2TmYei7I5b0OKgLpPZJjwD+i2Emyjld8vlI+yzeo5oKmwNXuXrlmpyZH20NgTTYFQH
- ZDZ/TJd9Ul7zdtUdNpd78XIj8P7QWgvjuV46dqaM1gDCLS3OMHqRs2pmYO7WdsJnB08xM+wlr
- nugeBGEAQAINBOMvaYPsbwy3Z/dwcU2wA6wOJgVQGYT8z6psnFy69K+paQA4ZTawU1OaIlvs1
- 42ueQH0UKOZV0IwO4Ho2trnYVWunk3Ddo4WT6g5SAhHGDMSGAOF/8GySITnZJoph1D2V0Wtwd
- vPwajvcg4tEH1ovhgTVqAEFuZjMb7bwpv6a2eH77SXF+3Xfwg5cKzzB24D4+wXZ/EyQ0ZSQkr
- gitOhpKPlSP0Ko0TpbyE16rsjaZ9XTKb6RS50maeuhG151r8w8dEQFUYApU0DGM9VCmu6b/RR
- 5weOKf4s904ZN2uDgwg5MW6atCgMPwdB8OwT+AYgf0vpobKQDN8fuY2Ej8WVhl22X+vM7GT02
- Sb96mR9STTdPSAGsLdGM0xfllMNICyG3p0UhKgFa8etOd6s4UIKhRZ76NS2BYQuWiX0LRbg98
- 8MBplKeca+0QLWHQ4nj88Y/fzqz/YoZ9ka411LYEhwTH/nnZENKTD8uxAxHNlCRxlVOC1UuhL
- ef9YQAklE8J6WvP1JKUM7tOVVpsd2xjymhdU1bh3mdrA43e68sT+t+wLfX9vyI5gr0FITGzVC
- cQS1WcAOnJyqzow8+Mbb4lNf8kpDY9Ql9fGswYOhheZbndd1dYXiQyzXKg51lClgguuMZ5UJ5
- ihl3f3LTJrGs/xEohHc6is1yfSVjeWpaBEwVmoC9geLQ57FA5txzCunohlHlhdvyEQ8w/tY9M
- s7s3E48LdJTZIi+MgU4X413Sb4n4HmCJo388brzdL3K3JWYeshw+RxIPN+1XVpEuAjnjbmKG5
- JbHw9w2JJLwoGA5uGerK30SWKcPfD6pCC9XlYrmsDO3fRB/SygGDNaeVuUnqXq1Ib3rN5A0hG
- 8y/uK8ktd507ouJ9DCF02NGKc5nQvq+kPg1Dekchp11j3ZYFDZSgtuJ55urKSCBh/0yYpf95O
- q8avt2SXISRQAwmcgrN3qWjgmmLLxlEzRI7KqMj8bDOmSR5gpgMVlYo2INtFjsbWdRMs7Ufxb
- VMaYGMzYl8RBu3DE79jaR/9MzUcDpfDld2kxHa0WfVVFc4uGmtlrF5ppNczI7eK/62dAl/u3T
- JoorHEs24I+nWv09sFb+OEmYooc3Ie4kThhT4Q5bQU1WcUvQhRc0GVOAWz5JB4x181WdUsS9t
- fQsuePlSsK842B3k96MwKSGLVM5EFEviJ0LgapMz5j82Z/WdEbSmfp6id/B1FTRHBcTcyTUIK
- XIylfNRoLAKrE7R+svA7YOXjfJo1VvH3vGb6fCvdrQaOfM007nP9oMwgZn+jPKcA4Wg8xEE4M
- upDlWXfBFmXB9fTGy1eCGz1aR9/XmjqrYh4fYAcOd0sTckv6GIV6XQsFEBcphyjccIKE5A2aS
- syJtGhx+OH3yvd6AB5MEz3aCwZCe29kWcEqq+1c7KmVcEGQyKVvlObw6HdIHmvWSNu+ZOEvkD
- S9of5bs+iATsy2j2Lv88jtMzaOLlKPOpnQDLRVxBK5LvAt+CfsLfQ3tdELr+PGl6STT62psW8
- tbyRe6UqWaFIm6K9RBNdBdNd3+EprH4qicEqsqSKbGaSgbF4Uyi47CKocZdN1Lahl5ykc61Vb
- gJF/44uYda+mFyfD1IJAFKedr5pe7IJOjUxToq4//irULYibGMl4UEf5q5+W7uieWxK05dZuE
- MLHNtS1mrIf6/s4pcpcv+YiFOVjRHOOmgMQAVoXPfTz+EPHYwZU91/1ERAZLA5CtsWLaWQBpW
- lECe9rE+HC0Z5K+1Qk7AlYMayglWBcRk1dZhNePFif/7RhvzaOoXxMIYycyu0aGReNGZW1RVd
- gr9hdvOcec10JafIddtsXIklHf9jhfT4FB8KhT+ZRWaDgd/PByct74z7+eOA7VwDumTdQCylC
- /VPMLisTwWPNuiLfaccjOyPGlCT/7KtxPeNS9VD+qNtb3yUUsb9NRXGZRvCkIP8cLZDv2VsKp
- H4FAPVk1EFqMxJ5AV2S8YkQDXanOYwAGtzRFV19j346/QcToOv8fVpIcM3iC8boRVAWAh+Oih
- rF9GFpZ4r4ctPgyo6s32hUXC2PN8lFCgwGf59Uc0y4bJbaSPrVprFlb2Mqd4qS/KPApXUWl3u
- h/c9DPdzD+KK4hRVhXJsLJiat9l3uiTufBUuW7UlngxSbhNvDarGzcQqWi39RnYyLEu3rCzNo
- 4KrM9JmQwQo6EKe0/c3G29OUCPXNajrI0cEIxBMDL4CMhyDc3EMY0UCjdiRxRyqhNGiV62c4u
- n8e/lKHDU75iccOHsS2jH23YKxxPGmJR7ER3sNWmSmYH6Xu9mqGFLe55a9Ng6Iab7G76VlWLV
- mvmKwL+z2do+vo6BnJdAqCrbr8XhJfJFvWma1VirHJIxIXhpiXYVm4Q0l8mRKghseBY+CQAWj
- KKlH1ofhCE2kSQLQ11E8lSfEZAm7UOAro6kc+dhVSk+6VDauKOjz+agCFbH2UocLauB5yKjgV
- cHTqdXw6REUl2+Hfg71GbF5JIX5r9+aG/Y5vpaHklkU18ETgXww/NPl410T8PPcx9zPOYzcYs
- 6abLyTnY/g/zPJkR2nXwOFFu0yilEl28IteM4KCJiI2YQj9lxlItNZRuEbo2QD3xpwv+fsXT2
- S42qTuLhBn3dZOT89+Xqze4QcaT06orDH4gfr/Fe0gP/4QetLm2ndixnhqcI4OzEnI0a9zjND
- NWLHlwdHKJ2U7oCM9A6qEmotKYq9PeUMwFbvJs5cV/x//1X0A/NZqw3oiy3MXlOCA+12M/glb
- 5qfeRM2U/SKkoyu8jEewPO2PkpZePV3fHcR5cjALhHk/GhcLUx1yvnquw99KbKlI2OM4qCWkh
- ptm9B8SXuzUQYibUVAMf6yDqLdnowBGcNgninm+EKUl89HJeoluH9CxIiWopAP2xkFte8y8ex
- VcxHWmzQL5l2j1z+FljG/gm8bwQeSJXQtvi4PoqZJHUhlrHMOXYIZx01ZMf8XFsv00zMops/m
- uXrZTA+wbyFTjxs9tS5eMB9nxWOVcGUR/UoiRDyz+TwT6Raitq7KtdnYdYqGE30YvY6RMMFUJ
- h7zGRfRtI/aV+8HBOMn5qjfhhT9Ten6h+orffFoFocTwXB8gfj1CH/1EVmC65/iauTL6Fc/OB
- iQo8y2xSmBKUsmpJ5B1ymNNltrJqcJOK9+XH5hnmfGKcvDaBM1bxtQ2ZEkugnIoc+X2e9gFOa
- AWvK9bnZ3Ig4m7LpXtVLlx2ksEIZLyPFUl5t4p7xGGVXWdg2GnyXVuZccs603OeJNWJAG/V4u
- cAz9q4o8qf4Iva0N14RVRDFJ0gYdjLqDhZCLZ5CdX+vB2zrKEs11Mrn6IRhhFDVO5oREzwmNx
- 3hGg5nzYVZb2+VuCNtyhtGUfZ/nZ9Lb3eNpsGALGJW8rT/FKZkF4CbJuXWWc+983nrgzlaaah
- 3ExjeI9U8h8gW7Ldltu94LrH2GNzOgzyYsiIf8BFqTWleWJNxlMnufMLox1ZBwNhgPMnPTa4J
- X6tKAq4rGKyXTbVVtrOF+Ip2JsqjdQUp1rO0Lmxg3c/hV+yKdyb/ITmqzY4p74K8d554LqKfX
- yBRa9XU6ogfZRXbZWkAA1hi3XzmKscNzxT2lPD2ojyUHXJ13fg3U543xLX6JAVdqrdH7gr/CY
- PlImaB5dbnV7nqGTodqsaQwn+m+xsDDtzAn2ALPqRJGCYmvuD9nbvo3kPnMSxLkm5Z5UgGlek
- chISBUIyARTSdXQIg69LXftapueduR2ED7GimneAsjbvwZA9zH09npywOhzYrPvVkU2GE/vm5
- gxHwwtqqj+r/GIq/ZjkNkYbFYnCrWhQ40H5oI6ZRX4eBl94z1BmSV6z5WCdzwAwUMD5ku8Z6V
- oLE3nL/wGLFauaAqo455MoxeGJqX9NStS4wHanX6jKD+F49LJe3X2JFQwuXITEeEQE7B0QSL4
- nm
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmx.de,quarantine];
-	R_DKIM_ALLOW(-0.20)[gmx.de:s=s31663417];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-Exchange-RoutingPolicyChecked: T3EkOHJxDQchA2lKdF2l5wTqIrgJaLibtBXCMsK1DAJ4Vdd5lFFqubIIUNAGcn6aixLB0qshGjn8wjLxqL7MNYsTxUV9wAwlDg3/Ho+4uc2o06x1C4ttMBYvHJb+wOcmN76U5CzwUMI+0wjr9OBnEB3Qr5mkWk4kC4P9d2Mk4pAesa4u2VtoezUAPZ6McvLDuQ/PqlUA+3SAW4ByE7U/1o3nJYfurQJqey8suVmjeJ59UvBLmqJjdx4wfyQU2jopcNsD16G7/KwVdhUyKGp87GN4tMHkE3cf4+pVyaJUQ4BluKlYbOa3MRDqjyckYHE0F4NeOlyN0AICxvs5stGk6Q==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB9301.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b2bb41f5-0d75-4a2f-b10d-08de8e456b14
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Mar 2026 10:16:33.3508
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Bwk2n7PFMvjLCP/SFMWtyimNzXZZXG0hsEpB6b6a5npXcC4qWVCRuACS/GAC6+2a48J9o+Dyf9Y8ttkNL9ZD+Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7915
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [-0.06 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmx.de];
-	FREEMAIL_TO(0.00)[davemloft.net,kernel.org,google.com,redhat.com,vger.kernel.org,ikt.uni-hannover.de,gmx.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-273111-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[intel.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-273110-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,IA3PR11MB9301.namprd11.prod.outlook.com:mid,linutronix.de:email];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[t.fuechsel@gmx.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmx.de:+];
+	FROM_NEQ_ENVFROM(0.00)[patryk.holda@intel.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[arxiv.org:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,gmx.de:dkim,gmx.de:email,swin.edu.au:url,ncsu.edu:url,doi.org:url]
-X-Rspamd-Queue-Id: 5DAAB359636
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: E5AC13595D8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-TCP ROCCET is an extension of TCP CUBIC that improves its overall
-performance. By its mode of function, CUBIC causes bufferbloat while
-it tries to detect the available throughput of a network path. This is
-particularly a problem with large buffers in mobile networks. A more
-detailed description and analysis of this problem caused by TCP CUBIC
-can be found in [1]. TCP ROCCET addresses this problem by adding two
-additional metrics to detect congestion (queueing and bufferbloat)
-on a network path. TCP ROCCET achieves better performance than CUBIC
-and BBRv3, by maintaining similar throughput while reducing the latency.
-In addition, TCP ROCCET does not have fairness issues when sharing a
-link with TCP CUBIC and BBRv3. A paper that evaluates the performance
-and function of TCP ROCCET has already been peer-reviewed and will be
-presented at the WONS 2026 conference. A draft of this paper can be
-found here [2].
-
-[1] https://doi.org/10.1109/VTC2023-Fall60731.2023.10333357
-[2] https://arxiv.org/abs/2510.25281
-
-Signed-off-by: Lukas Prause <lukas.prause@ikt.uni-hannover.de>
-Signed-off-by: Tim Fuechsel <t.fuechsel@gmx.de>
-=2D--
- net/ipv4/Kconfig      |  11 +
- net/ipv4/Makefile     |   1 +
- net/ipv4/tcp_roccet.c | 671 ++++++++++++++++++++++++++++++++++++++++++
- net/ipv4/tcp_roccet.h |  56 ++++
- 4 files changed, 739 insertions(+)
- create mode 100644 net/ipv4/tcp_roccet.c
- create mode 100644 net/ipv4/tcp_roccet.h
-
-diff --git a/net/ipv4/Kconfig b/net/ipv4/Kconfig
-index 21e5164e30db..33625111c7f0 100644
-=2D-- a/net/ipv4/Kconfig
-+++ b/net/ipv4/Kconfig
-@@ -663,6 +663,17 @@ config TCP_CONG_CDG
- 	    delay gradients." In Networking 2011. Preprint:
- 	    http://caia.swin.edu.au/cv/dahayes/content/networking2011-cdg-prepri=
-nt.pdf
-=20
-+config TCP_CONG_ROCCET
-+	tristate "ROCCET TCP"
-+	default n
-+	help
-+      TCP ROCCET is a sender-side only modification of the TCP CUBIC
-+      protocol stack that optimizes the performance of TCP congestion
-+      control. Especially for networks with large buffers (wireless,
-+      cellular networks), TCP ROCCET has improved performance by maintain=
-ing
-+      similar throughput as CUBIC while reducing the latency.
-+       For more information, see: https://arxiv.org/abs/2510.25281
-+
- config TCP_CONG_BBR
- 	tristate "BBR TCP"
- 	default n
-diff --git a/net/ipv4/Makefile b/net/ipv4/Makefile
-index 7f9f98813986..82ed7989dcb3 100644
-=2D-- a/net/ipv4/Makefile
-+++ b/net/ipv4/Makefile
-@@ -45,6 +45,7 @@ obj-$(CONFIG_INET_TCP_DIAG) +=3D tcp_diag.o
- obj-$(CONFIG_INET_UDP_DIAG) +=3D udp_diag.o
- obj-$(CONFIG_INET_RAW_DIAG) +=3D raw_diag.o
- obj-$(CONFIG_TCP_CONG_BBR) +=3D tcp_bbr.o
-+obj-$(CONFIG_TCP_CONG_ROCCET) +=3D tcp_roccet.o
- obj-$(CONFIG_TCP_CONG_BIC) +=3D tcp_bic.o
- obj-$(CONFIG_TCP_CONG_CDG) +=3D tcp_cdg.o
- obj-$(CONFIG_TCP_CONG_CUBIC) +=3D tcp_cubic.o
-diff --git a/net/ipv4/tcp_roccet.c b/net/ipv4/tcp_roccet.c
-new file mode 100644
-index 000000000000..892faf907edb
-=2D-- /dev/null
-+++ b/net/ipv4/tcp_roccet.c
-@@ -0,0 +1,671 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * TCP ROCCET: An RTT-Oriented CUBIC Congestion Control
-+ * Extension for 5G and Beyond Networks
-+ *
-+ * TCP ROCCET is a new TCP congestion control
-+ * algorithm suited for current cellular 5G NR beyond networks.
-+ * It extends the kernel default congestion control CUBIC
-+ * and improves its performance, and additionally solves an
-+ * unwanted side effects of CUBIC=E2=80=99s implementation.
-+ * ROCCET uses its own Slow Start, called LAUNCH, where loss
-+ * is not considered as a congestion event.
-+ * The congestion avoidance phase, called ORBITER, uses
-+ * CUBIC's window growth function and adds, based on RTT
-+ * and ACK rate, congestion events.
-+ *
-+ * A peer-reviewed paper on TCP ROCCET will be presented at the WONS 2026=
- conference.
-+ * A draft of the paper is available here:
-+ *		https://arxiv.org/abs/2510.25281
-+ *
-+ *
-+ * Further information about CUBIC:
-+ * TCP CUBIC: Binary Increase Congestion control for TCP v2.3
-+ * Home page:
-+ *	http://netsrv.csc.ncsu.edu/twiki/bin/view/Main/BIC
-+ * This is from the implementation of CUBIC TCP in
-+ * Sangtae Ha, Injong Rhee and Lisong Xu,
-+ *  "CUBIC: A New TCP-Friendly High-Speed TCP Variant"
-+ *  in ACM SIGOPS Operating System Review, July 2008.
-+ * Available from:
-+ *  http://netsrv.csc.ncsu.edu/export/cubic_a_new_tcp_2008.pdf
-+ *
-+ * CUBIC integrates a new slow start algorithm, called HyStart.
-+ * The details of HyStart are presented in
-+ *  Sangtae Ha and Injong Rhee,
-+ *  "Taming the Elephants: New TCP Slow Start", NCSU TechReport 2008.
-+ * Available from:
-+ *  http://netsrv.csc.ncsu.edu/export/hystart_techreport_2008.pdf
-+ *
-+ * All testing results are available from:
-+ * http://netsrv.csc.ncsu.edu/wiki/index.php/TCP_Testing
-+ *
-+ * Unless CUBIC is enabled and congestion window is large
-+ * this behaves the same as the original Reno.
-+ */
-+
-+#include "tcp_roccet.h"
-+#include "linux/printk.h"
-+#include <linux/btf.h>
-+#include <linux/btf_ids.h>
-+#include <linux/math64.h>
-+#include <linux/mm.h>
-+#include <linux/module.h>
-+#include <net/tcp.h>
-+
-+/* Scale factor beta calculation (max_cwnd =3D snd_cwnd * beta) */
-+#define BICTCP_BETA_SCALE 1024
-+
-+#define BICTCP_HZ 10 /* BIC HZ 2^10 =3D 1024 */
-+
-+/* Alpha value for the sRrTT  multiplied by 100.
-+ * Here 20 represents a value of 0.2
-+ */
-+#define ROCCET_ALPHA_TIMES_100 20
-+
-+/* The amount of seconds ROCCET stores a minRTT.
-+ * Enable "calculate_min_rtt" first.
-+ */
-+#define ROCCET_RTT_LOOKBACK_S 10
-+
-+/* Parameters that are specific to the ROCCET-Algorithm */
-+static int sr_rtt_upper_bound __read_mostly =3D 100;
-+static int ack_rate_diff_ss __read_mostly =3D 10;
-+static int ack_rate_diff_ca __read_mostly =3D 200;
-+static bool calculate_min_rtt __read_mostly;
-+static bool ignore_loss __read_mostly;
-+static int roccet_min_rtt_interpolation_factor __read_mostly =3D 70;
-+
-+module_param(sr_rtt_upper_bound, int, 0644);
-+MODULE_PARM_DESC(sr_rtt_upper_bound, "ROCCET's upper bound for srRTT.");
-+module_param(ack_rate_diff_ss, int, 0644);
-+MODULE_PARM_DESC(ack_rate_diff_ss,
-+		 "ROCCET's threshold to exit slow start if ACK-rate defer by given amou=
-nt of segments.");
-+module_param(ack_rate_diff_ca, int, 0644);
-+MODULE_PARM_DESC(ack_rate_diff_ca,
-+		 "ROCCET's threshold for ack-rate and cum_cwnd, in percantage of the cu=
-rrent cwnd.");
-+module_param(calculate_min_rtt, bool, 0644);
-+MODULE_PARM_DESC(calculate_min_rtt,
-+		 "Calculate min RTT if no lower RTT occurs after 10 sec.");
-+module_param(ignore_loss, bool, 0644);
-+MODULE_PARM_DESC(ignore_loss, "Ignore loss as a congestion event.");
-+module_param(roccet_min_rtt_interpolation_factor, int, 0644);
-+MODULE_PARM_DESC(roccet_min_rtt_interpolation_factor,
-+		 "ROCCET factor for interpolating the current RTT with the last minRTT =
-(minRTT =3D (factor * currRTT + (100-factor) * minRTT) / 100)");
-+
-+static int fast_convergence __read_mostly =3D 1;
-+static int beta __read_mostly =3D 717; /* =3D 717/1024 (BICTCP_BETA_SCALE=
-) */
-+static int initial_ssthresh __read_mostly;
-+static int bic_scale __read_mostly =3D 41;
-+static int tcp_friendliness __read_mostly =3D 1;
-+
-+static u32 cube_rtt_scale __read_mostly;
-+static u32 beta_scale __read_mostly;
-+static u64 cube_factor __read_mostly;
-+
-+/* Note parameters that are used for precomputing scale factors are read-=
-only */
-+module_param(fast_convergence, int, 0644);
-+MODULE_PARM_DESC(fast_convergence, "turn on/off fast convergence");
-+module_param(beta, int, 0644);
-+MODULE_PARM_DESC(beta, "beta for multiplicative increase");
-+module_param(initial_ssthresh, int, 0644);
-+MODULE_PARM_DESC(initial_ssthresh, "initial value of slow start threshold=
-");
-+module_param(bic_scale, int, 0444);
-+MODULE_PARM_DESC(bic_scale,
-+		 "scale (scaled by 1024) value for bic function (bic_scale/1024)");
-+module_param(tcp_friendliness, int, 0644);
-+MODULE_PARM_DESC(tcp_friendliness, "turn on/off tcp friendliness");
-+
-+static inline void roccettcp_reset(struct roccettcp *ca)
-+{
-+	memset(ca, 0, offsetof(struct roccettcp, curr_rtt));
-+	ca->bw_limit.sum_cwnd =3D 1;
-+	ca->bw_limit.sum_acked =3D 1;
-+	ca->bw_limit.next_check =3D 0;
-+	ca->curr_min_rtt_timed.rtt =3D ~0U;
-+	ca->curr_min_rtt_timed.time =3D ~0U;
-+	ca->last_rtt =3D 0;
-+	ca->ece_received =3D false;
-+}
-+
-+static inline void update_min_rtt(struct sock *sk)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+	u32 now =3D jiffies_to_usecs(tcp_jiffies32);
-+
-+	if (now - ca->curr_min_rtt_timed.time >
-+		    ROCCET_RTT_LOOKBACK_S * USEC_PER_SEC &&
-+	    calculate_min_rtt) {
-+		u32 new_min_rtt =3D max(ca->curr_rtt, 1);
-+		u32 old_min_rtt =3D ca->curr_min_rtt_timed.rtt;
-+
-+		u32 interpolated_min_rtt =3D
-+			(new_min_rtt * roccet_min_rtt_interpolation_factor +
-+			 old_min_rtt *
-+				 (100 - roccet_min_rtt_interpolation_factor)) /
-+			100;
-+
-+		ca->curr_min_rtt_timed.rtt =3D interpolated_min_rtt;
-+		ca->curr_min_rtt_timed.time =3D now;
-+	}
-+
-+	/* Check if new lower min RTT was found. If so, set it directly */
-+	if (ca->curr_rtt < ca->curr_min_rtt_timed.rtt) {
-+		ca->curr_min_rtt_timed.rtt =3D max(ca->curr_rtt, 1);
-+		ca->curr_min_rtt_timed.time =3D now;
-+	}
-+}
-+
-+/* Return difference between last and current ack rate.
-+ */
-+static inline int get_ack_rate_diff(struct roccettcp *ca)
-+{
-+	return ca->ack_rate.last_rate - ca->ack_rate.curr_rate;
-+}
-+
-+/* Update ack rate sampled by 100ms.
-+ */
-+static inline void update_ack_rate(struct sock *sk)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+	u32 now =3D jiffies_to_usecs(tcp_jiffies32);
-+	u32 interval =3D USEC_PER_MSEC * 100;
-+
-+	if ((u32)(now - ca->ack_rate.last_rate_time) >=3D interval) {
-+		ca->ack_rate.last_rate_time =3D now;
-+		ca->ack_rate.last_rate =3D ca->ack_rate.curr_rate;
-+		ca->ack_rate.curr_rate =3D ca->ack_rate.cnt;
-+		ca->ack_rate.cnt =3D 0;
-+	} else {
-+		ca->ack_rate.cnt +=3D 1;
-+	}
-+}
-+
-+/* Compute srRTT.
-+ */
-+static inline void update_srrtt(struct sock *sk)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	if (ca->curr_min_rtt_timed.rtt =3D=3D 0)
-+		return;
-+
-+	/* Calculate the new rRTT (Scaled by 100).
-+	 * 100 * ((sRTT - sRTT_min) / sRTT_min)
-+	 */
-+	u32 rrtt =3D (100 * (ca->curr_rtt - ca->curr_min_rtt_timed.rtt)) /
-+		   ca->curr_min_rtt_timed.rtt;
-+
-+	// (1 - alpha) * srRTT + alpha * rRTT
-+	ca->curr_srrtt =3D ((100 - ROCCET_ALPHA_TIMES_100) * ca->curr_srrtt +
-+			  ROCCET_ALPHA_TIMES_100 * rrtt) / 100;
-+}
-+
-+__bpf_kfunc static void roccettcp_init(struct sock *sk)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	roccettcp_reset(ca);
-+
-+	if (initial_ssthresh)
-+		tcp_sk(sk)->snd_ssthresh =3D initial_ssthresh;
-+
-+	/* Initial roccet parameters */
-+	ca->roccet_last_event_time_us =3D 0;
-+	ca->curr_min_rtt =3D ~0U;
-+	ca->ack_rate.last_rate =3D 0;
-+	ca->ack_rate.last_rate_time =3D 0;
-+	ca->ack_rate.curr_rate =3D 0;
-+	ca->ack_rate.cnt =3D 0;
-+}
-+
-+__bpf_kfunc static void roccettcp_cwnd_event(struct sock *sk,
-+					     enum tcp_ca_event event)
-+{
-+	if (event =3D=3D CA_EVENT_TX_START) {
-+		struct roccettcp *ca =3D inet_csk_ca(sk);
-+		u32 now =3D tcp_jiffies32;
-+		s32 delta;
-+
-+		delta =3D now - tcp_sk(sk)->lsndtime;
-+
-+		/* We were application limited (idle) for a while.
-+		 * Shift epoch_start to keep cwnd growth to cubic curve.
-+		 */
-+		if (ca->epoch_start && delta > 0) {
-+			ca->epoch_start +=3D delta;
-+			if (after(ca->epoch_start, now))
-+				ca->epoch_start =3D now;
-+		}
-+		return;
-+	}
-+}
-+
-+/* calculate the cubic root of x using a table lookup followed by one
-+ * Newton-Raphson iteration.
-+ * Avg err ~=3D 0.195%
-+ */
-+static u32 cubic_root(u64 a)
-+{
-+	u32 x, b, shift;
-+	/* cbrt(x) MSB values for x MSB values in [0..63].
-+	 * Precomputed then refined by hand - Willy Tarreau
-+	 *
-+	 * For x in [0..63],
-+	 *   v =3D cbrt(x << 18) - 1
-+	 *   cbrt(x) =3D (v[x] + 10) >> 6
-+	 */
-+	static const u8 v[] =3D {
-+		/* 0x00 */ 0,	54,  54,  54,  118, 118, 118, 118,
-+		/* 0x08 */ 123, 129, 134, 138, 143, 147, 151, 156,
-+		/* 0x10 */ 157, 161, 164, 168, 170, 173, 176, 179,
-+		/* 0x18 */ 181, 185, 187, 190, 192, 194, 197, 199,
-+		/* 0x20 */ 200, 202, 204, 206, 209, 211, 213, 215,
-+		/* 0x28 */ 217, 219, 221, 222, 224, 225, 227, 229,
-+		/* 0x30 */ 231, 232, 234, 236, 237, 239, 240, 242,
-+		/* 0x38 */ 244, 245, 246, 248, 250, 251, 252, 254,
-+	};
-+
-+	b =3D fls64(a);
-+	if (b < 7) {
-+		/* a in [0..63] */
-+		return ((u32)v[(u32)a] + 35) >> 6;
-+	}
-+
-+	b =3D ((b * 84) >> 8) - 1;
-+	shift =3D (a >> (b * 3));
-+
-+	x =3D ((u32)(((u32)v[shift] + 10) << b)) >> 6;
-+
-+	/* Newton-Raphson iteration
-+	 *                         2
-+	 * x    =3D ( 2 * x  +  a / x  ) / 3
-+	 *  k+1          k         k
-+	 */
-+	x =3D (2 * x + (u32)div64_u64(a, (u64)x * (u64)(x - 1)));
-+	x =3D ((x * 341) >> 10);
-+	return x;
-+}
-+
-+/* Compute congestion window to use.
-+ */
-+static inline void bictcp_update(struct roccettcp *ca, u32 cwnd, u32 acke=
-d)
-+{
-+	u32 delta, bic_target, max_cnt;
-+	u64 offs, t;
-+
-+	ca->ack_cnt +=3D acked; /* count the number of ACKed packets */
-+
-+	if (ca->last_cwnd =3D=3D cwnd &&
-+	    (s32)(tcp_jiffies32 - ca->last_time) <=3D HZ / 32)
-+		return;
-+
-+	/* The CUBIC function can update ca->cnt at most once per jiffy.
-+	 * On all cwnd reduction events, ca->epoch_start is set to 0,
-+	 * which will force a recalculation of ca->cnt.
-+	 */
-+	if (ca->epoch_start && tcp_jiffies32 =3D=3D ca->last_time)
-+		goto tcp_friendliness;
-+
-+	ca->last_cwnd =3D cwnd;
-+	ca->last_time =3D tcp_jiffies32;
-+
-+	if (ca->epoch_start =3D=3D 0) {
-+		ca->epoch_start =3D tcp_jiffies32; /* record beginning */
-+		ca->ack_cnt =3D acked; /* start counting */
-+		ca->tcp_cwnd =3D cwnd; /* syn with cubic */
-+
-+		if (ca->last_max_cwnd <=3D cwnd) {
-+			ca->bic_K =3D 0;
-+			ca->bic_origin_point =3D cwnd;
-+		} else {
-+			/* Compute new K based on
-+			 * (wmax-cwnd) * (srtt>>3 / HZ) / c * 2^(3*bictcp_HZ)
-+			 */
-+			ca->bic_K =3D cubic_root(cube_factor *
-+					       (ca->last_max_cwnd - cwnd));
-+			ca->bic_origin_point =3D ca->last_max_cwnd;
-+		}
-+	}
-+
-+	/* cubic function - calc */
-+	/* calculate c * time^3 / rtt,
-+	 *  while considering overflow in calculation of time^3
-+	 * (so time^3 is done by using 64 bit)
-+	 * and without the support of division of 64bit numbers
-+	 * (so all divisions are done by using 32 bit)
-+	 *  also NOTE the unit of those variables
-+	 *	  time  =3D (t - K) / 2^bictcp_HZ
-+	 *	  c =3D bic_scale >> 10
-+	 * rtt  =3D (srtt >> 3) / HZ
-+	 * !!! The following code does not have overflow problems,
-+	 * if the cwnd < 1 million packets !!!
-+	 */
-+
-+	t =3D (s32)(tcp_jiffies32 - ca->epoch_start);
-+	t +=3D usecs_to_jiffies(ca->delay_min);
-+
-+	/* change the unit from HZ to bictcp_HZ */
-+	t <<=3D BICTCP_HZ;
-+	do_div(t, HZ);
-+
-+	if (t < ca->bic_K) /* t - K */
-+		offs =3D ca->bic_K - t;
-+	else
-+		offs =3D t - ca->bic_K;
-+
-+	/* c/rtt * (t-K)^3 */
-+	delta =3D (cube_rtt_scale * offs * offs * offs) >> (10 + 3 * BICTCP_HZ);
-+	if (t < ca->bic_K) /* below origin*/
-+		bic_target =3D ca->bic_origin_point - delta;
-+	else /* above origin*/
-+		bic_target =3D ca->bic_origin_point + delta;
-+
-+	/* cubic function - calc bictcp_cnt*/
-+	if (bic_target > cwnd)
-+		ca->cnt =3D cwnd / (bic_target - cwnd);
-+	else
-+		ca->cnt =3D 100 * cwnd; /* very small increment*/
-+
-+	/* The initial growth of cubic function may be too conservative
-+	 * when the available bandwidth is still unknown.
-+	 */
-+	if (ca->last_max_cwnd =3D=3D 0 && ca->cnt > 20)
-+		ca->cnt =3D 20; /* increase cwnd 5% per RTT */
-+
-+tcp_friendliness:
-+	/* TCP Friendly */
-+	if (tcp_friendliness) {
-+		u32 scale =3D beta_scale;
-+
-+		delta =3D (cwnd * scale) >> 3;
-+		while (ca->ack_cnt > delta) { /* update tcp cwnd */
-+			ca->ack_cnt -=3D delta;
-+			ca->tcp_cwnd++;
-+		}
-+
-+		if (ca->tcp_cwnd > cwnd) { /* if bic is slower than tcp */
-+			delta =3D ca->tcp_cwnd - cwnd;
-+			max_cnt =3D cwnd / delta;
-+			if (ca->cnt > max_cnt)
-+				ca->cnt =3D max_cnt;
-+		}
-+	}
-+
-+	/* The maximum rate of cwnd increase CUBIC allows is 1 packet per
-+	 * 2 packets ACKed, meaning cwnd grows at 1.5x per RTT.
-+	 */
-+	ca->cnt =3D max(ca->cnt, 2U);
-+}
-+
-+__bpf_kfunc static void roccettcp_cong_avoid(struct sock *sk, u32 ack,
-+					     u32 acked)
-+{
-+	struct tcp_sock *tp =3D tcp_sk(sk);
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	u32 now =3D jiffies_to_usecs(tcp_jiffies32);
-+	u32 bw_limit_detect =3D 0;
-+	u32 roccet_xj;
-+	u32 jitter;
-+
-+	if (ca->last_rtt > ca->curr_rtt)
-+		jitter =3D ca->last_rtt - ca->curr_rtt;
-+	else
-+		jitter =3D ca->curr_rtt - ca->last_rtt;
-+
-+	/* Update roccet parameters */
-+	update_ack_rate(sk);
-+	update_min_rtt(sk);
-+	update_srrtt(sk);
-+
-+	/* ROCCET drain.
-+	 * Do not increase the cwnd for 100ms after a roccet congestion event
-+	 */
-+	if (now - ca->roccet_last_event_time_us <=3D 100 * USEC_PER_MSEC)
-+		return;
-+
-+	/* LAUNCH: Detect an exit point for tcp slow start
-+	 * in networks with large buffers of multiple BDP
-+	 * Like in cellular networks (5G, ...).
-+	 * Or exit LAUNCH if cwnd is too large for application layer
-+	 * data rate.
-+	 */
-+
-+	if ((tcp_in_slow_start(tp) && ca->curr_srrtt > sr_rtt_upper_bound &&
-+	     get_ack_rate_diff(ca) >=3D ack_rate_diff_ss) ||
-+	    (!tcp_is_cwnd_limited(sk) && tcp_in_slow_start(tp))) {
-+		ca->epoch_start =3D 0;
-+
-+		/* Handle initial slow start. Here we observe the most problems */
-+		if (tp->snd_ssthresh =3D=3D TCP_INFINITE_SSTHRESH) {
-+			tcp_sk(sk)->snd_ssthresh =3D tcp_snd_cwnd(tp) / 2;
-+			tcp_snd_cwnd_set(tp, tcp_snd_cwnd(tp) / 2);
-+		} else {
-+			tcp_sk(sk)->snd_ssthresh =3D
-+				tcp_snd_cwnd(tp) - (tcp_snd_cwnd(tp) / 3);
-+			tcp_snd_cwnd_set(tp, tcp_snd_cwnd(tp) -
-+						     (tcp_snd_cwnd(tp) / 3));
-+		}
-+		ca->roccet_last_event_time_us =3D now;
-+		return;
-+	}
-+
-+	if (tcp_in_slow_start(tp)) {
-+		acked =3D tcp_slow_start(tp, acked);
-+		if (!acked)
-+			return;
-+	}
-+
-+	if (ca->bw_limit.next_check =3D=3D 0)
-+		ca->bw_limit.next_check =3D now + 5 * ca->curr_rtt;
-+
-+	ca->bw_limit.sum_cwnd +=3D tcp_snd_cwnd(tp);
-+	ca->bw_limit.sum_acked +=3D acked;
-+
-+	if (ca->bw_limit.next_check < now) {
-+		/* We send more data as we got acked in the last 5 RTTs */
-+		if ((ca->bw_limit.sum_cwnd * 100) / ca->bw_limit.sum_acked >=3D
-+		    ack_rate_diff_ca)
-+			bw_limit_detect =3D 1;
-+
-+		/* reset struct and set next end of period */
-+		ca->bw_limit.sum_cwnd =3D 1;
-+
-+		/* set to 1 to avoid division by zero */
-+		ca->bw_limit.sum_acked =3D 1;
-+		ca->bw_limit.next_check =3D now + 5 * ca->curr_rtt;
-+	}
-+
-+	/* Respects the jitter of the connection and add it on top of the upper =
-bound
-+	 * for the srRTT
-+	 */
-+	roccet_xj =3D ((jitter * 100) / ca->curr_min_rtt_timed.rtt) +
-+		    sr_rtt_upper_bound;
-+	if (roccet_xj < sr_rtt_upper_bound)
-+		roccet_xj =3D sr_rtt_upper_bound;
-+
-+	if (ca->curr_srrtt > roccet_xj && (bw_limit_detect || ca->ece_received))=
- {
-+		if (ca->ece_received)
-+			ca->ece_received =3D false;
-+		ca->epoch_start =3D 0;
-+		ca->roccet_last_event_time_us =3D now;
-+		ca->cnt =3D 100 * tcp_snd_cwnd(tp);
-+
-+		/* Set Wmax if cwnd is larger than the old Wmax */
-+		if (tcp_snd_cwnd(tp) > ca->last_max_cwnd)
-+			ca->last_max_cwnd =3D tcp_snd_cwnd(tp);
-+
-+		tcp_snd_cwnd_set(tp, min(tp->snd_cwnd_clamp,
-+					 max((tcp_snd_cwnd(tp) * beta) / BICTCP_BETA_SCALE, 2U)));
-+		tp->snd_ssthresh =3D tcp_snd_cwnd(tp);
-+		return;
-+	}
-+
-+	/* Terminates this function if cwnd is not fully utilized.
-+	 * In mobile networks like 5G, this termination causes the cwnd to be fr=
-ozen at
-+	 * an excessively high value. This is because slow start or HyStart mass=
-ively
-+	 * exceed the available bandwidth and leave the cwnd at an excessively h=
-igh
-+	 * value. The cwnd cannot therefore be fully utilized because it is limi=
-ted by
-+	 * the connection capacity.
-+	 */
-+	if (!tcp_is_cwnd_limited(sk))
-+		return;
-+
-+	bictcp_update(ca, tcp_snd_cwnd(tp), acked);
-+	tcp_cong_avoid_ai(tp, max(1, ca->cnt), acked);
-+}
-+
-+__bpf_kfunc static u32 roccettcp_recalc_ssthresh(struct sock *sk)
-+{
-+	const struct tcp_sock *tp =3D tcp_sk(sk);
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	if (ignore_loss)
-+		return tcp_snd_cwnd(tp);
-+
-+	/* Don't exit slow start if loss occurs. */
-+	if (tcp_in_slow_start(tp))
-+		return tcp_snd_cwnd(tp);
-+
-+	ca->epoch_start =3D 0; /* end of epoch */
-+
-+	/* Wmax and fast convergence */
-+	if (tcp_snd_cwnd(tp) < ca->last_max_cwnd && fast_convergence)
-+		ca->last_max_cwnd =3D
-+			(tcp_snd_cwnd(tp) * (BICTCP_BETA_SCALE + beta)) /
-+			(2 * BICTCP_BETA_SCALE);
-+	else
-+		ca->last_max_cwnd =3D tcp_snd_cwnd(tp);
-+
-+	return max((tcp_snd_cwnd(tp) * beta) / BICTCP_BETA_SCALE, 2U);
-+}
-+
-+__bpf_kfunc static void roccettcp_state(struct sock *sk, u8 new_state)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	if (new_state =3D=3D TCP_CA_Loss)
-+		roccettcp_reset(ca);
-+}
-+
-+__bpf_kfunc static void roccettcp_acked(struct sock *sk,
-+					const struct ack_sample *sample)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	/* Some calls are for duplicates without timestamps */
-+	if (sample->rtt_us < 0)
-+		return;
-+
-+	/* Discard delay samples right after fast recovery */
-+	if (ca->epoch_start && (s32)(tcp_jiffies32 - ca->epoch_start) < HZ)
-+		return;
-+
-+	u32 delay =3D sample->rtt_us;
-+
-+	if (delay =3D=3D 0)
-+		delay =3D 1;
-+
-+	/* first time call or link delay decreases */
-+	if (ca->delay_min =3D=3D 0 || ca->delay_min > delay)
-+		ca->delay_min =3D delay;
-+
-+	/* Get valid sample for roccet */
-+	if (sample->rtt_us > 0) {
-+		ca->last_rtt =3D ca->curr_rtt;
-+		ca->curr_rtt =3D sample->rtt_us;
-+	}
-+}
-+
-+__bpf_kfunc static void roccet_in_ack_event(struct sock *sk, u32 flags)
-+{
-+	struct roccettcp *ca =3D inet_csk_ca(sk);
-+
-+	/* Handle ECE bit.
-+	 * Processing of ECE events is done in roccettcp_cong_avoid()
-+	 */
-+	if (flags & CA_ACK_ECE)
-+		ca->ece_received =3D true;
-+}
-+
-+static struct tcp_congestion_ops roccet_tcp __read_mostly =3D {
-+	.init =3D roccettcp_init,
-+	.ssthresh =3D roccettcp_recalc_ssthresh,
-+	.cong_avoid =3D roccettcp_cong_avoid,
-+	.set_state =3D roccettcp_state,
-+	.undo_cwnd =3D tcp_reno_undo_cwnd,
-+	.cwnd_event =3D roccettcp_cwnd_event,
-+	.pkts_acked =3D roccettcp_acked,
-+	.in_ack_event   =3D roccet_in_ack_event,
-+	.owner =3D THIS_MODULE,
-+	.name =3D "roccet",
-+};
-+
-+BTF_KFUNCS_START(tcp_roccet_check_kfunc_ids)
-+BTF_ID_FLAGS(func, roccettcp_init)
-+BTF_ID_FLAGS(func, roccettcp_recalc_ssthresh)
-+BTF_ID_FLAGS(func, roccettcp_cong_avoid)
-+BTF_ID_FLAGS(func, roccettcp_state)
-+BTF_ID_FLAGS(func, roccettcp_cwnd_event)
-+BTF_ID_FLAGS(func, roccettcp_acked)
-+BTF_KFUNCS_END(tcp_roccet_check_kfunc_ids)
-+
-+static const struct btf_kfunc_id_set tcp_roccet_kfunc_set =3D {
-+	.owner =3D THIS_MODULE,
-+	.set =3D &tcp_roccet_check_kfunc_ids,
-+};
-+
-+static int __init roccettcp_register(void)
-+{
-+	int ret;
-+
-+	BUILD_BUG_ON(sizeof(struct roccettcp) > ICSK_CA_PRIV_SIZE);
-+
-+	/* Precompute a bunch of the scaling factors that are used per-packet
-+	 * based on SRTT of 100ms
-+	 */
-+
-+	beta_scale =3D
-+		8 * (BICTCP_BETA_SCALE + beta) / 3 / (BICTCP_BETA_SCALE - beta);
-+
-+	cube_rtt_scale =3D (bic_scale * 10); /* 1024*c/rtt */
-+
-+	/* calculate the "K" for (wmax-cwnd) =3D c/rtt * K^3
-+	 *  so K =3D cubic_root( (wmax-cwnd)*rtt/c )
-+	 * the unit of K is bictcp_HZ=3D2^10, not HZ
-+	 *
-+	 *  c =3D bic_scale >> 10
-+	 *  rtt =3D 100ms
-+	 *
-+	 * the following code has been designed and tested for
-+	 * cwnd < 1 million packets
-+	 * RTT < 100 seconds
-+	 * HZ < 1,000,00  (corresponding to 10 nano-second)
-+	 */
-+
-+	/* 1/c * 2^2*bictcp_HZ * srtt */
-+	cube_factor =3D 1ull << (10 + 3 * BICTCP_HZ); /* 2^40 */
-+
-+	/* divide by bic_scale and by constant Srtt (100ms) */
-+	do_div(cube_factor, bic_scale * 10);
-+
-+	ret =3D register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS,
-+					&tcp_roccet_kfunc_set);
-+	if (ret < 0)
-+		return ret;
-+	return tcp_register_congestion_control(&roccet_tcp);
-+}
-+
-+static void __exit roccettcp_unregister(void)
-+{
-+	tcp_unregister_congestion_control(&roccet_tcp);
-+}
-+
-+module_init(roccettcp_register);
-+module_exit(roccettcp_unregister);
-+
-+MODULE_AUTHOR("Lukas Prause, Tim F=C3=BCchsel");
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("ROCCET TCP");
-+MODULE_VERSION("1.0");
-diff --git a/net/ipv4/tcp_roccet.h b/net/ipv4/tcp_roccet.h
-new file mode 100644
-index 000000000000..a7201866d5ac
-=2D-- /dev/null
-+++ b/net/ipv4/tcp_roccet.h
-@@ -0,0 +1,56 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * TCP ROCCET congestion control interface
-+ */
-+#ifndef __TCP_ROCCET_H
-+#define __TCP_ROCCET_H 1
-+
-+#include <linux/math64.h>
-+
-+struct ack_rate {
-+	u16 last_rate;	/* Last ACK-rate */
-+	u32 last_rate_time;	/* Timestamp of the last ACK-rate */
-+	u16 curr_rate;	/* Current ACK-rate */
-+	u16 cnt;	/* Used for counting acks */
-+};
-+
-+struct bandwidth_limit_detect {
-+	u32 sum_cwnd;	/* sum of cwnd during time interval */
-+	u32 sum_acked;	/* sum of received acks during time interval */
-+	u32 next_check;	/* end/upper bound of time interval */
-+};
-+
-+struct timed_rtt {
-+	u32 time;	/* Time of recording */
-+	u32 rtt;	/* Measured RTT */
-+};
-+
-+/* Based on the BICTCP struct with additions specific for the ROCCET-Algo=
-rithm */
-+struct roccettcp {
-+	u32 cnt;		/* increase cwnd by 1 after ACKs */
-+	u32 last_max_cwnd;	/* last maximum snd_cwnd */
-+	u32 last_cwnd;		/* the last snd_cwnd */
-+	u32 last_time;		/* time when updated last_cwnd */
-+	u32 bic_origin_point;	/* origin point of bic function */
-+	u32 bic_K;		/* time to origin point from the
-+				 * beginning of the current epoch
-+				 */
-+	u32 delay_min;		/* min delay (usec) */
-+	u32 epoch_start;	/* beginning of an epoch */
-+	u32 ack_cnt;		/* number of acks */
-+	u32 tcp_cwnd;		/* estimated tcp cwnd */
-+	u32 curr_rtt;		/* the minimum rtt of current round */
-+
-+	u32 roccet_last_event_time_us;	/* The last time ROCCET was triggered */
-+	bool ece_received;	/* Set to true if an ECE bit was received */
-+	u32 curr_min_rtt;		/* The current observed minRTT */
-+	struct timed_rtt curr_min_rtt_timed;	/* The current observed minRTT with
-+						 * the timestamp when it was observed
-+						 */
-+	u32 curr_srrtt;			/* The srRTT calculated based on the latest ACK */
-+	struct ack_rate ack_rate;	/* The last and the current ACK rate */
-+	struct bandwidth_limit_detect bw_limit;
-+	u32 last_rtt;			/* Used for jitter calculation */
-+};
-+
-+#endif /* __TCP_ROCCET_H */
-=2D-=20
-2.43.0
-
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEludGVsLXdpcmVkLWxhbiA8
+aW50ZWwtd2lyZWQtbGFuLWJvdW5jZXNAb3N1b3NsLm9yZz4gT24gQmVoYWxmIE9mDQo+IE1hY2ll
+aiBGaWphbGtvd3NraQ0KPiBTZW50OiBGcmlkYXksIE1hcmNoIDEzLCAyMDI2IDEwOjI5IEFNDQo+
+IFRvOiBBbGV4IER2b3JldHNreSA8YWR2b3JldHNreUBnbWFpbC5jb20+DQo+IENjOiBpbnRlbC13
+aXJlZC1sYW5AbGlzdHMub3N1b3NsLm9yZzsgbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgTG9rdGlv
+bm92LA0KPiBBbGVrc2FuZHIgPGFsZWtzYW5kci5sb2t0aW9ub3ZAaW50ZWwuY29tPjsgTmd1eWVu
+LCBBbnRob255IEwNCj4gPGFudGhvbnkubC5uZ3V5ZW5AaW50ZWwuY29tPjsgS2l0c3plbCwgUHJ6
+ZW15c2xhdw0KPiA8cHJ6ZW15c2xhdy5raXRzemVsQGludGVsLmNvbT47IGt1cnRAbGludXRyb25p
+eC5kZTsgc3RhYmxlQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogW0ludGVsLXdpcmVk
+LWxhbl0gW1BBVENIIG5ldCB2M10gaWdiOiByZW1vdmUgbmFwaV9zeW5jaHJvbml6ZSgpDQo+IGlu
+IGlnYl9kb3duKCkNCj4gDQo+IE9uIFRodSwgTWFyIDEyLCAyMDI2IGF0IDAyOjUyOjU1UE0gKzAx
+MDAsIEFsZXggRHZvcmV0c2t5IHdyb3RlOg0KPiA+IFdoZW4gYW4gQUZfWERQIHplcm8tY29weSBh
+cHBsaWNhdGlvbiB0ZXJtaW5hdGVzIGFicnVwdGx5IChlLmcuLCBraWxsDQo+ID4gLTkpLCB0aGUg
+WFNLIGJ1ZmZlciBwb29sIGlzIGRlc3Ryb3llZCBidXQgTkFQSSBwb2xsaW5nIGNvbnRpbnVlcy4N
+Cj4gPiBpZ2JfY2xlYW5fcnhfaXJxX3pjKCkgcmVwZWF0ZWRseSByZXR1cm5zIHRoZSBmdWxsIGJ1
+ZGdldCwgcHJldmVudGluZw0KPiA+IG5hcGlfY29tcGxldGVfZG9uZSgpIGZyb20gY2xlYXJpbmcg
+TkFQSV9TVEFURV9TQ0hFRC4NCj4gPg0KPiA+IGlnYl9kb3duKCkgY2FsbHMgbmFwaV9zeW5jaHJv
+bml6ZSgpIGJlZm9yZSBuYXBpX2Rpc2FibGUoKSBmb3IgZWFjaA0KPiA+IHF1ZXVlIHZlY3Rvci4g
+bmFwaV9zeW5jaHJvbml6ZSgpIHNwaW5zIHdhaXRpbmcgZm9yIE5BUElfU1RBVEVfU0NIRUQgdG8N
+Cj4gPiBjbGVhciwgd2hpY2ggbmV2ZXIgaGFwcGVucy4gaWdiX2Rvd24oKSBibG9ja3MgaW5kZWZp
+bml0ZWx5LCB0aGUgVFgNCj4gPiB3YXRjaGRvZyBmaXJlcywgYW5kIHRoZSBUWCBxdWV1ZSByZW1h
+aW5zIHBlcm1hbmVudGx5IHN0YWxsZWQuDQo+ID4NCj4gPiBuYXBpX2Rpc2FibGUoKSBhbHJlYWR5
+IGhhbmRsZXMgdGhpcyBjb3JyZWN0bHk6IGl0IHNldHMgTkFQSV9TVEFURV9ESVNBQkxFLg0KPiA+
+IEFmdGVyIGEgZnVsbC1idWRnZXQgcG9sbCwgX19uYXBpX3BvbGwoKSBjaGVja3MgbmFwaV9kaXNh
+YmxlX3BlbmRpbmcoKS4NCj4gPiBJZiBzZXQsIGl0IGZvcmNlcyBjb21wbGV0aW9uIGFuZCBjbGVh
+cnMgTkFQSV9TVEFURV9TQ0hFRCwgYnJlYWtpbmcgdGhlDQo+ID4gbG9vcCB0aGF0IG5hcGlfc3lu
+Y2hyb25pemUoKSBjYW5ub3QuDQo+ID4NCj4gPiBuYXBpX3N5bmNocm9uaXplKCkgd2FzIGFkZGVk
+IGluIGNvbW1pdCA0MWYxNDlhMjg1ZGEgKCJpZ2I6IEZpeA0KPiA+IHBvc3NpYmxlIHBhbmljIGNh
+dXNlZCBieSBSeCB0cmFmZmljIGFycml2YWwgd2hpbGUgaW50ZXJmYWNlIGlzIGRvd24iKS4NCj4g
+PiBuYXBpX2Rpc2FibGUoKSBwcm92aWRlcyBzdHJvbmdlciBndWFyYW50ZWVzOiBpdCBwcmV2ZW50
+cyBmdXJ0aGVyDQo+ID4gc2NoZWR1bGluZyBhbmQgd2FpdHMgZm9yIGFueSBhY3RpdmUgcG9sbCB0
+byBleGl0Lg0KPiA+IE90aGVyIEludGVsIGRyaXZlcnMgKGl4Z2JlLCBpY2UsIGk0MGUpIHVzZSBu
+YXBpX2Rpc2FibGUoKSB3aXRob3V0IGENCj4gPiBwcmVjZWRpbmcgbmFwaV9zeW5jaHJvbml6ZSgp
+IGluIHRoZWlyIGRvd24gcGF0aHMuDQo+ID4NCj4gPiBSZW1vdmUgcmVkdW5kYW50IG5hcGlfc3lu
+Y2hyb25pemUoKSBjYWxsIGFuZCByZW9yZGVyIG5hcGlfZGlzYWJsZSgpDQo+ID4gYmVmb3JlIGln
+Yl9zZXRfcXVldWVfbmFwaSgpIHNvIHRoZSBxdWV1ZS10by1OQVBJIG1hcHBpbmcgaXMgb25seQ0K
+PiA+IGNsZWFyZWQgYWZ0ZXIgcG9sbGluZyBoYXMgZnVsbHkgc3RvcHBlZC4NCj4gPg0KPiA+IEZp
+eGVzOiAyYzYxOTYwMTNmODQgKCJpZ2I6IEFkZCBBRl9YRFAgemVyby1jb3B5IFJ4IHN1cHBvcnQi
+KQ0KPiA+IENjOiBzdGFibGVAdmdlci5rZXJuZWwub3JnDQo+ID4gUmV2aWV3ZWQtYnk6IEFsZWtz
+YW5kciBMb2t0aW9ub3YgPGFsZWtzYW5kci5sb2t0aW9ub3ZAaW50ZWwuY29tPg0KPiA+IFNpZ25l
+ZC1vZmYtYnk6IEFsZXggRHZvcmV0c2t5IDxhZHZvcmV0c2t5QGdtYWlsLmNvbT4NCj4gDQo+IFN1
+Z2dlc3RlZC1ieTogTWFjaWVqIEZpamFsa293c2tpIDxtYWNpZWouZmlqYWxrb3dza2lAaW50ZWwu
+Y29tPg0KPiBSZXZpZXdlZC1ieTogTWFjaWVqIEZpamFsa293c2tpIDxtYWNpZWouZmlqYWxrb3dz
+a2lAaW50ZWwuY29tPg0KPiANCj4gPiAtLS0NCj4gPiBBZ3JlZWQsIHRoYXQgbG9va3MgY2xlYW5l
+ciDigJQgbm8gcmVhc29uIHRvIHRvdWNoIHRoZSBOQVBJIHBsdW1iaW5nDQo+ID4gd2hpbGUgdGhl
+IHBvbGwgY291bGQgc3RpbGwgYmUgcnVubmluZy4NCj4gPg0KPiA+IHYzOg0KPiA+ICAgLSBSZW9y
+ZGVyIG5hcGlfZGlzYWJsZSgpIGJlZm9yZSBpZ2Jfc2V0X3F1ZXVlX25hcGkoKSBwZXIgQWxla3Nh
+bmRyDQo+ID4gICAgIExva3Rpb25vdidzIHN1Z2dlc3Rpb24uDQo+ID4NCj4gPiB2MjoNCj4gPiAg
+IC0gUmVwbGFjZWQgMy1wYXRjaCBzZXJpZXMgd2l0aCBzaW5nbGUgbmFwaV9zeW5jaHJvbml6ZSgp
+IHJlbW92YWwsDQo+ID4gICAgIHBlciBNYWNpZWogRmlqYWxrb3dza2kncyBzdWdnZXN0aW9uLiBu
+YXBpX2Rpc2FibGUoKSBoYW5kbGVzIHRoZQ0KPiA+ICAgICBzdHVjayBOQVBJIHBvbGwgdmlhIE5B
+UElfU1RBVEVfRElTQUJMRSwgbWFraW5nIHRoZSBfX0lHQl9ET1dODQo+ID4gICAgIGNoZWNrcyBp
+biBpZ2JfY2xlYW5fcnhfaXJxX3pjKCkgYW5kIGlnYl90eF90aW1lb3V0KCksIGFuZCB0aGUNCj4g
+PiAgICAgdHJhbnNpdGlvbiBndWFyZHMgaW4gaWdiX3hkcF9zZXR1cCgpLCBhbGwgdW5uZWNlc3Nh
+cnkuDQo+ID4gICAtIFRlc3RlZCBvbiBJbnRlbCBJMjEwIChpZ2IpIHdpdGggQUZfWERQIHplcm8t
+Y29weTogZnVsbCBFMkUNCj4gPiAgICAgdHJhZmZpYyBzdWl0ZSwgZ3JhY2VmdWwgc2h1dGRvd24s
+IGFuZCA1eCBraWxsLTkgc3RyZXNzIGN5Y2xlcy4NCj4gPiAgICAgWmVybyB0eF90aW1lb3V0IGV2
+ZW50cy4NCj4gPg0KPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9pZ2IvaWdiX21haW4u
+YyB8IDMgKy0tDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMiBkZWxldGlv
+bnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9p
+Z2IvaWdiX21haW4uYw0KPiA+IGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvaWdiL2lnYl9t
+YWluLmMNCj4gPiBpbmRleCA3YzQxZTMyMjU2ZmEuLjA3OTM4NDJjYjkzNyAxMDA2NDQNCj4gPiAt
+LS0gYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9pZ2IvaWdiX21haW4uYw0KPiA+ICsrKyBi
+L2RyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2lnYi9pZ2JfbWFpbi5jDQo+ID4gQEAgLTIyMDMs
+OSArMjIwMyw4IEBAIHZvaWQgaWdiX2Rvd24oc3RydWN0IGlnYl9hZGFwdGVyICphZGFwdGVyKQ0K
+PiA+DQo+ID4gIAlmb3IgKGkgPSAwOyBpIDwgYWRhcHRlci0+bnVtX3FfdmVjdG9yczsgaSsrKSB7
+DQo+ID4gIAkJaWYgKGFkYXB0ZXItPnFfdmVjdG9yW2ldKSB7DQo+ID4gLQkJCW5hcGlfc3luY2hy
+b25pemUoJmFkYXB0ZXItPnFfdmVjdG9yW2ldLT5uYXBpKTsNCj4gPiAtCQkJaWdiX3NldF9xdWV1
+ZV9uYXBpKGFkYXB0ZXIsIGksIE5VTEwpOw0KPiA+ICAJCQluYXBpX2Rpc2FibGUoJmFkYXB0ZXIt
+PnFfdmVjdG9yW2ldLT5uYXBpKTsNCj4gPiArCQkJaWdiX3NldF9xdWV1ZV9uYXBpKGFkYXB0ZXIs
+IGksIE5VTEwpOw0KPiA+ICAJCX0NCj4gPiAgCX0NCj4gPg0KPiA+IC0tDQo+ID4gMi41MS4wDQo+
+ID4NCg0KVGVzdGVkLWJ5OiBQYXRyeWsgSG9sZGEgPHBhdHJ5ay5ob2xkYUBpbnRlbC5jb20+wqAN
+Cg0K
 
