@@ -1,95 +1,77 @@
-Return-Path: <netdev+bounces-273361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273362-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UChoLs8By2k2CgYAu9opvQ
-	(envelope-from <netdev+bounces-273361-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:05:51 +0200
+	id YLYAOSMBy2k2CgYAu9opvQ
+	(envelope-from <netdev+bounces-273362-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:02:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CCED3623FA
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:05:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 600F836233B
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:02:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CD7393077412
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 22:55:15 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E9D6A301B17C
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:02:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B443ECBD9;
-	Mon, 30 Mar 2026 22:54:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BDCA37C90A;
+	Mon, 30 Mar 2026 23:02:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IuWmvmW0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fFJIPaQ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05E4284B29
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 22:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B0E2F87B
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 23:02:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774911288; cv=none; b=E1AAnoJ8OkV+5nYzrBeFe+29Q8KAzJJucAJ5xvrgAuQj6cMYxvvpXSFV9+TOed+EhWClWy7/zPQBgqrsmojsEPY3dyZJbtRKRGCJW2fTs3kORIqdnXBZ3SD5159IqAbK/GLj01eze6L3wQYyjmP9JUn4gO+lwfFjOdGrVRgX2HI=
+	t=1774911775; cv=none; b=Xmjp6j/3uarwEHt04LXHlJwGDbidK92ZMKOZc9ywlxVYexupjTLp4yIYi1FFPxGcWzwNUjuhpj2bfqKcIoXhker62nuoZsWaz8s0OTYlU6PMGzuP/vXQAW8pOHIcTtiMdf7y8lZe3MXmKhZoQ1hfkKj18rDTHzHY0gFpx+WQaCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774911288; c=relaxed/simple;
-	bh=Ujv4VWibSVw2HAdRUF5dpkKnp3v6rUy47IDc6MZc+ME=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DsWw4eM6rEbxydWV3tAlu9QMcFSsO/hAbenLuiKjrTCxzZdqfcKaZFu1XJpv5w4t6RizSd1QCbuplxRNfqIGJSP4ZBlD83nF1BlmtGYECH6BQer+ZjjscMLeDfIx2GSX8qMi+0IDxUX+sqNyZ7qQFToRTZjtSQEbgsgiV6CbPag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IuWmvmW0; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-43b949bf4easo2893515f8f.0
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 15:54:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774911277; x=1775516077; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=eRbr4JDUO9O8YW98OsDnqXVG2lTsNgXdEBiAPgW16ZM=;
-        b=IuWmvmW0ufWu3MuVGIIlZTDtn/rgkQpkJZYNDwY9IIguets+nL27hPnreq2BrqFVga
-         38OZXn4Y8wGTKPAdyMn4hKOZeuiHEF4fjcPbTA65RnGQYyl8OLb71SYpsiD8c5YQJ/Hn
-         pqf/HWPD5fbEE5+1xZpJYCcTrEOrTVGUHmtwUesU7+JJ7vtYnURZP1keU/bHvTCnnnJq
-         cRaXUahatAZVB8mHwYfFDHZ1Xq56kWiJBSVwkvMl6gzGMYZVKhPExiYToAgRNovlAUML
-         13XzISGZJi2ZxWSByBtfLW9GjAwYpMNFPHXEsqX3UAZFVcK0Ir5/FsoYjE9bKPxj6gZj
-         bCSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774911277; x=1775516077;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eRbr4JDUO9O8YW98OsDnqXVG2lTsNgXdEBiAPgW16ZM=;
-        b=D3A2p+m5rxt0J3exni3L//pQvBNEGIfzOlQwVwIpHHwlyymi1F+yZfzwBvrDgpxiHY
-         jI4ow7CadDCcsEdupbJQYEaEu/OlgDqQAoQQ0TXJd8A5uix9RGLGYIz+Ok5GrhuSV7xK
-         2zyhkKGNdXpZtkZ+WGpUZz7cAdYSugJ86rbcQWZmTtG9/kzo7HqB+9APbRjUa1rXBJ/a
-         GxlzSU3Gjxf/O2OUtOMGq+/JH1K96ENgxLFA+lA55Wx2nL8yt4iYQNj0yyIZ8aMhIKI5
-         3uRtQiat5CxLZuCyhIv8TEG3WXiybttlQbEMvfwZ4eXakbgOX2ndcPcgX6xDPQZWSxoD
-         UqDQ==
-X-Gm-Message-State: AOJu0YwistjeN972MQtno8ZbX1JAWZTExSFKK10RAIynWJIbXNxA6KFr
-	/lwC/vlRpPEBwJKfvj44d8JEhKxq7RSLf5ayuq7X8/8bFeTL6OTt4fRCumRc/n51
-X-Gm-Gg: ATEYQzxZ2YnDeoNOYP1Ja5iXJPQwwkcCFqdWBnpzxbPEh6F3tcRgXOE+Vf/ykPLJ6f2
-	PXyaOhM5IKAHLEFB9j7E49wM64wyG2vLchg6jxmlO0he2LJHyr9VGxz0BFiyWO+AyrGvNO7m9BR
-	bv3Hh4lHPcytmbS8g9tbt2bZk0LJbBqUmKVkop3JQJplQRa7vCw/SCoN/lPb3KMGTRlceEF/5P0
-	5rdHfo4NVCv//QX+qDdjTLZJKqgXKgTiK6WmM1K7prsnqSaSflCSyhAgmzrIBjSJJzJDMXR3GBI
-	wHQFvsVqFcIFaP2OpdnkUWKu0y9rkid6dorURoj0YJjmyPqHHdLA/KTtl9zpA83AQZMTd515OPC
-	9Mb9upO7rbKoqRxKck7U4xWzQqQ98Cfyctz/a5JrTya5MxOyW8J0rjrf3mFWn9rPTYCEpEbO2nh
-	kbY+PlPRWhJMgGrp/TBpgFIO2pzF/blmQ2Rh5tFNpYSKlN6ugcecVPW0KyzrSrQ1VyIwVIzOoUu
-	a2OCIQl5GUGV257Y64K/UFRARU=
-X-Received: by 2002:a05:6000:2902:b0:43c:f650:cc97 with SMTP id ffacd0b85a97d-43d081979e8mr2236737f8f.9.1774911276892;
-        Mon, 30 Mar 2026 15:54:36 -0700 (PDT)
-Received: from 6850u.ox.dtw.sh (cpc69060-oxfd26-2-0-cust335.4-3.cable.virginm.net. [82.6.49.80])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43cf2580168sm22707682f8f.36.2026.03.30.15.54.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 15:54:36 -0700 (PDT)
-From: Daniel Wagner <wagner.daniel.t@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	bcm-kernel-feedback-list@broadcom.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nicolai Buchwitz <nb@tipi-net.de>,
-	Daniel Wagner <wagner.daniel.t@gmail.com>
-Subject: [PATCH net-next v3] net: phy: bcm84881: add BCM84891/BCM84892 support
-Date: Mon, 30 Mar 2026 23:53:10 +0100
-Message-ID: <20260330225310.2801264-1-wagner.daniel.t@gmail.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1774911775; c=relaxed/simple;
+	bh=Z6Bsqpx5jBqtaFOF7nudK6XFEbhWCEZvVeHQW0mheQA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SXXH7D/L/rQ8wrbvAITBeNvlJmm980eCMiM/pfNvG+Fe3ZfmV3S5TT5wWAn94BefBZw9Km/GfM3gjdIww7gsuae87RvAMKeN5q3++OIai3sS89tLH2vBMB6pwMhpgBy3vg9FjSDkRVSAAMDKANE6KUXGvkV3TaWpiX8QNqF4AxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fFJIPaQ/; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774911773; x=1806447773;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Z6Bsqpx5jBqtaFOF7nudK6XFEbhWCEZvVeHQW0mheQA=;
+  b=fFJIPaQ/AhZd5fUte5ZtyoRXhSWL64pbzrCFcOdq6vQY+p21TLy427fA
+   h3mkfJwMJiadBfN4s+JlQpo9vbDvMLviJvUtophQ3rgkCAPJM7jHtJqcS
+   k6srnvRmqVL3jFhX884g/FpUnoD9oQavIncbCEqDeYbYZwqAr8A8TfM+e
+   LsZ0MEugsboyDuEhcd5l7DuzC+iqfM9odAtNnr8IRUwhu1+32t64GMZAE
+   MUHNqze7MD3heNByoD/g3LsjiucSd8rh2COMNI6b+BeilVilOU8sTHHJB
+   7ggejZNZNvNYSyndlPmD05Z2G5Uh1kROHi7a2w2LV7q5yk9KyvVyQ2gtO
+   g==;
+X-CSE-ConnectionGUID: BMdeXXuvTMW+cieXkmVtSw==
+X-CSE-MsgGUID: YlNL5NCkRFKGEBAyLjKzlQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11744"; a="93297534"
+X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
+   d="scan'208";a="93297534"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 16:02:52 -0700
+X-CSE-ConnectionGUID: P8boB7d9Tzi9xKzNk5SMgA==
+X-CSE-MsgGUID: kzZRhbABRPG8Q7PWlS6AxA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
+   d="scan'208";a="256687699"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa002.jf.intel.com with ESMTP; 30 Mar 2026 16:02:52 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 00/15][pull request] Intel Wired LAN Driver Updates 2026-03-30 (igc, igb, ice)
+Date: Mon, 30 Mar 2026 16:02:29 -0700
+Message-ID: <20260330230248.646900-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,169 +79,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273361-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273362-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[broadcom.com,lunn.ch,gmail.com,armlinux.org.uk,kernel.org,google.com,redhat.com,tipi-net.de];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wagnerdanielt@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tipi-net.de:email]
-X-Rspamd-Queue-Id: 3CCED3623FA
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 600F836233B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The BCM84891 and BCM84892 are 10GBASE-T PHYs in the same family as the
-BCM84881, sharing the register map and most callbacks. They add USXGMII
-as a host interface mode.
+For igc:
+Mika Westerberg makes improvements to power management flows with a
+focus on PTM.
 
-bcm8489x_config_init() is separate from bcm84881_config_init(): it
-allows only USXGMII (the only host mode available on the tested
-hardware) and clears MDIO_CTRL1_LPOWER, which is set at boot on the
-tested platform. Does not recur on ifdown/ifup, cable events, or
-link-partner advertisement changes, so config_init is sufficient.
+Kohei Enju adds ethtool support for get/set hash key.
 
-For USXGMII, read_status() skips the 0x4011 host-mode register: it
-returns the same value regardless of negotiated copper speed (USXGMII
-symbol replication). Speed comes from phy_resolve_aneg_linkmode() via
-standard C45 AN resolution.
+Maximilian Pezzullo fixes some typos.
 
-Tested on TRENDnet TEG-S750 (RTL9303 + 1x BCM84891 + 4x BCM84892)
-running OpenWrt, where the MDIO controller driver is currently
-OpenWrt-specific. Link verified at 100M, 1G, 2.5G, 10G.
+For igb:
+Takashi Kozu adds ethtool support for get/set hash key.
 
-Signed-off-by: Daniel Wagner <wagner.daniel.t@gmail.com>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
----
-v3: No code changes. Resend per Jakub's request (v2 was posted while
-    the v1 discussion was still ongoing). Collected Reviewed-by tags.
+Kohei Enju adds setting of skb hash type based on values from Rx
+descriptor.
 
-v2: https://lore.kernel.org/netdev/20260324190601.1616343-1-wagner.daniel.t@gmail.com/
-- Separate bcm8489x_config_init() that allows only USXGMII. v1 also
-  allowed USXGMII for BCM84881 (which doesn't support it), and put
-  SGMII/2500BASEX/10GBASER in the 8489x possible_interfaces which I
-  can't substantiate on this hardware. (Russell)
-- LPOWER clear moved from config_aneg to config_init. Characterized on
-  hardware: boot-time only, does not recur on ifdown/ifup, cable
-  events, or link-partner advertisement changes. (Russell)
-- Dropped LED support; will figure out the PHY LED framework approach
-  for bicolor speed-mapped LEDs as a follow-up. (Russell, Andrew)
-- PHY_ID_MATCH_MODEL(). (Russell, Andrew)
-- is_bcm8489x() helper removed; the interface mode now suffices as a
-  discriminator in read_status since only the 8489x config_init allows
-  USXGMII.
+Maximilian Pezzullo fixes some typos here as well.
 
-v1: https://lore.kernel.org/netdev/20260324152503.1522071-2-wagner.daniel.t@gmail.com/
+For ice:
+Arkadiusz adds support for unmanaged DPLL for ice E830 devices; device
+settings are fixed but can be queried by DPLL.
 
- drivers/net/phy/bcm84881.c | 48 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 47 insertions(+), 1 deletion(-)
+Jake adds clarification for needed action on devlink reload command.
 
-diff --git a/drivers/net/phy/bcm84881.c b/drivers/net/phy/bcm84881.c
-index d7f7cc44c5..f114212dd3 100644
---- a/drivers/net/phy/bcm84881.c
-+++ b/drivers/net/phy/bcm84881.c
-@@ -54,6 +54,21 @@ static int bcm84881_config_init(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int bcm8489x_config_init(struct phy_device *phydev)
-+{
-+	__set_bit(PHY_INTERFACE_MODE_USXGMII, phydev->possible_interfaces);
-+
-+	if (phydev->interface != PHY_INTERFACE_MODE_USXGMII)
-+		return -ENODEV;
-+
-+	/* MDIO_CTRL1_LPOWER is set at boot on the tested platform. Does not
-+	 * recur on ifdown/ifup, cable events, or link-partner advertisement
-+	 * changes; clear it once.
-+	 */
-+	return phy_clear_bits_mmd(phydev, MDIO_MMD_PMAPMD, MDIO_CTRL1,
-+				  MDIO_CTRL1_LPOWER);
-+}
-+
- static int bcm84881_probe(struct phy_device *phydev)
- {
- 	/* This driver requires PMAPMD and AN blocks */
-@@ -201,6 +216,15 @@ static int bcm84881_read_status(struct phy_device *phydev)
- 		return 0;
- 	}
- 
-+	/* BCM84891/92 on USXGMII: the host interface mode doesn't change
-+	 * with copper speed (USXGMII symbol replication; the MAC receives
-+	 * the negotiated copper speed, not 10G, so no rate adaptation).
-+	 * Skip 0x4011; phy_resolve_aneg_linkmode() above already set the
-+	 * speed. Only bcm8489x_config_init() allows USXGMII.
-+	 */
-+	if (phydev->interface == PHY_INTERFACE_MODE_USXGMII)
-+		return genphy_c45_read_mdix(phydev);
-+
- 	/* Set the host link mode - we set the phy interface mode and
- 	 * the speed according to this register so that downshift works.
- 	 * We leave the duplex setting as per the resolution from the
-@@ -256,6 +280,26 @@ static struct phy_driver bcm84881_drivers[] = {
- 		.config_aneg	= bcm84881_config_aneg,
- 		.aneg_done	= bcm84881_aneg_done,
- 		.read_status	= bcm84881_read_status,
-+	}, {
-+		PHY_ID_MATCH_MODEL(0x35905080),
-+		.name		= "Broadcom BCM84891",
-+		.inband_caps	= bcm84881_inband_caps,
-+		.config_init	= bcm8489x_config_init,
-+		.probe		= bcm84881_probe,
-+		.get_features	= bcm84881_get_features,
-+		.config_aneg	= bcm84881_config_aneg,
-+		.aneg_done	= bcm84881_aneg_done,
-+		.read_status	= bcm84881_read_status,
-+	}, {
-+		PHY_ID_MATCH_MODEL(0x359050a0),
-+		.name		= "Broadcom BCM84892",
-+		.inband_caps	= bcm84881_inband_caps,
-+		.config_init	= bcm8489x_config_init,
-+		.probe		= bcm84881_probe,
-+		.get_features	= bcm84881_get_features,
-+		.config_aneg	= bcm84881_config_aneg,
-+		.aneg_done	= bcm84881_aneg_done,
-+		.read_status	= bcm84881_read_status,
- 	},
- };
- 
-@@ -264,9 +308,11 @@ module_phy_driver(bcm84881_drivers);
- /* FIXME: module auto-loading for Clause 45 PHYs seems non-functional */
- static const struct mdio_device_id __maybe_unused bcm84881_tbl[] = {
- 	{ 0xae025150, 0xfffffff0 },
-+	{ PHY_ID_MATCH_MODEL(0x35905080) },
-+	{ PHY_ID_MATCH_MODEL(0x359050a0) },
- 	{ },
- };
- MODULE_AUTHOR("Russell King");
--MODULE_DESCRIPTION("Broadcom BCM84881 PHY driver");
-+MODULE_DESCRIPTION("Broadcom BCM84881/BCM84891/BCM84892 PHY driver");
- MODULE_DEVICE_TABLE(mdio, bcm84881_tbl);
- MODULE_LICENSE("GPL");
+Przemyslaw Korba expands the size of a char array to silence a
+format-truncation warning.
+
+The following are changes since commit cf0d9080c6f795bc6be08babbffa29b62c06e9b0:
+  Merge branch 'net-hsr-subsystem-cleanups-and-modernization'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 1GbE
+
+Arkadiusz Kubalewski (1):
+  ice: add support for unmanaged DPLL on E830 NIC
+
+Jacob Keller (1):
+  ice: mention fw_activate action along with devlink reload
+
+Kohei Enju (4):
+  igc: prepare for RSS key get/set support
+  igc: expose RSS key via ethtool get_rxfh
+  igc: allow configuring RSS key via ethtool set_rxfh
+  igb: set skb hash type from RSS_TYPE
+
+Maximilian Pezzullo (2):
+  igb: fix typos in comments
+  igc: fix typos in comments
+
+Mika Westerberg (3):
+  igc: Call netif_queue_set_napi() with rtnl locked
+  igc: Let the PCI core deal with the PM resume flow
+  igc: Don't reset the hardware on suspend path
+
+Przemyslaw Korba (1):
+  ice: dpll: Fix compilation warning
+
+Takashi Kozu (3):
+  igb: prepare for RSS key get/set support
+  igb: expose RSS key via ethtool get_rxfh
+  igb: allow configuring RSS key via ethtool set_rxfh
+
+ .../device_drivers/ethernet/intel/ice.rst     |  83 +++++
+ .../net/ethernet/intel/ice/devlink/health.c   |   4 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  12 +
+ drivers/net/ethernet/intel/ice/ice_common.c   | 136 ++++++++
+ drivers/net/ethernet/intel/ice/ice_common.h   |   8 +
+ drivers/net/ethernet/intel/ice/ice_dpll.c     | 304 ++++++++++++++++--
+ drivers/net/ethernet/intel/ice/ice_dpll.h     |  10 +
+ .../net/ethernet/intel/ice/ice_fw_update.c    |   2 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  11 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  46 +++
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   1 +
+ drivers/net/ethernet/intel/igb/e1000_82575.h  |  21 ++
+ .../net/ethernet/intel/igb/e1000_defines.h    |   2 +-
+ drivers/net/ethernet/intel/igb/e1000_mac.c    |   2 +-
+ drivers/net/ethernet/intel/igb/e1000_mbx.h    |   2 +-
+ drivers/net/ethernet/intel/igb/e1000_nvm.c    |   2 +-
+ drivers/net/ethernet/intel/igb/igb.h          |   3 +
+ drivers/net/ethernet/intel/igb/igb_ethtool.c  |  85 +++--
+ drivers/net/ethernet/intel/igb/igb_main.c     |  25 +-
+ drivers/net/ethernet/intel/igc/igc.h          |   5 +-
+ drivers/net/ethernet/intel/igc/igc_diag.c     |   2 +-
+ drivers/net/ethernet/intel/igc/igc_ethtool.c  |  73 +++--
+ drivers/net/ethernet/intel/igc/igc_main.c     |  43 ++-
+ 23 files changed, 774 insertions(+), 108 deletions(-)
+
 -- 
-2.47.3
+2.47.1
 
 
