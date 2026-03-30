@@ -1,141 +1,197 @@
-Return-Path: <netdev+bounces-273104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273105-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aEoONTw8ymnD6gUAu9opvQ
-	(envelope-from <netdev+bounces-273104-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:02:52 +0200
+	id kE2SEtk9ymnD6gUAu9opvQ
+	(envelope-from <netdev+bounces-273105-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:09:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC07F357AF4
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:02:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4619357DD6
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:09:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 311FC3020A79
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 09:01:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F168B30809B0
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 09:02:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158FD3AEF3E;
-	Mon, 30 Mar 2026 09:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58E63B2FFB;
+	Mon, 30 Mar 2026 09:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VHMUigPl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hHXjhEmZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E601737F749;
-	Mon, 30 Mar 2026 09:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92251399011;
+	Mon, 30 Mar 2026 09:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774861241; cv=none; b=nkzJajWy+Uxe5CZbXKv0LXMML86Z7xzTyu4zYD2mTkGPbIrvl6ML1JRRPlZWhrw+d8cmi2p94xN+JUySzYu2nqAGmK1YFnG40M3E6xKs69IyqhYFSi+U9MD/VWYzQwv39+2MqhOEON4yYwPgi+ns+cqhxiNf69i2d+ym843zLOc=
+	t=1774861361; cv=none; b=KjEwpHnEQEUljA0xkVFrFjXMvVpXojITGMy/491L/ewr9/1Ox/jweadif42+Xr//zYtPoME+Vfdp/JiShPlmyXj9qdUwKLfiNU5hkf5mP7V1F4EQm5ZBKP+jIL5wkNbtt2qlg9Dx3QwJxIHX7eWStMyeVW8gUt6BjQfT9lv7c6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774861241; c=relaxed/simple;
-	bh=vuKopLxiQ6DJEOs3R1LaTxwbfB5g3ZLWVX3uJgUva1E=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=QYg1S3Cx1Udr0pVjsBosAvjxGHa1VRFroq8ELY2UUYky0bYeXekRHOKCx8ZvxaNEJlKfVIuvGkZKiMMc7PJpArYFi3UYLGkIVmo1/NjLlVW+HUG6ijGnItNEsQecrn6q1FB50n6dKsNNk++GRjOTKscO/vtBZy65ZQJQmyOko6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VHMUigPl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2207CC2BC9E;
-	Mon, 30 Mar 2026 09:00:40 +0000 (UTC)
+	s=arc-20240116; t=1774861361; c=relaxed/simple;
+	bh=qRDiLQ7/Xx7OWinJo708eydLzcr8WmKcb0zRtIsdSO8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AEgMZLE3t4o6o7Lbrrtbqmm2NSqnNEJrY2ZqVbyep4suWuxRiUuUeIdBicE+S6QgIymEBWC0ZaZolNbbOoF1KN2gUpRxzzhV9jy9ushGqp4A3CzSJEYTJ3bhDpebxiiVzFycD552qzQFfKLzCJTSX42OHJAYDrLCVbU4teC/67M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hHXjhEmZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F7CBC2BCF5;
+	Mon, 30 Mar 2026 09:02:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774861240;
-	bh=vuKopLxiQ6DJEOs3R1LaTxwbfB5g3ZLWVX3uJgUva1E=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=VHMUigPlUFNhup3Q8tTS1MS7lj7/20UFqlyXIfptK98y5aziKtJyz/uHsaQEsNCGu
-	 IUkhSpQUvwuHqMfpPIp0MCDF+0BhpVCX9TTIvZQzqJJJjlvivKlGujy2nzDBVTA4PH
-	 YgJS9/uWKYdhk4b22jC2z1v+U4DQHSy7wP0zc6LBgHCWnzMNMPgyr5ckfTwOxozg0Z
-	 AssDLPyaNqK5Vqe6NCPcn+HWIVs60cNK/gy9VTF3uWEkl3PzOysR5iaI79XgpTnM1r
-	 mmFeqKXAEErXq9BE16lc1h2Hf1UhKIlLFVVYDFQOpLP2bqh9TWQ4XySdyQBobZ2JBt
-	 9GYyECWECxYVg==
-Content-Type: multipart/mixed; boundary="===============6759854404622828131=="
+	s=k20201202; t=1774861361;
+	bh=qRDiLQ7/Xx7OWinJo708eydLzcr8WmKcb0zRtIsdSO8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hHXjhEmZZxDEryQivP7+OwcpVMgA5oBn8cpG9Bk9N/iLWFqC8zyStSkdTZlsQ2vCn
+	 IxAj6WpNay1JuUaYnqoFTx0Y1YmO7Ua83XblC+OekvpKYGNJ1OAWLXJMeOeZu4+Tic
+	 4xZcS4VgIttR4bxu6P0NboTqUUSc1QDXis720VsDg/XMJWm+ha69coHzaxhvmpuJjl
+	 BzVJgMZtVvq2EcsJyokY9ejZ5CHZniuEqaZEeYII/D9v5ERHFw8GrSSB23jc+7fQx4
+	 t/qFv0qPFG2Yu+V0ybZoYwTQxZLVy4JkDZolzC2cepGKGLa4Z9GPaJJU58fMc4hUti
+	 LOGv6tSOyhEaQ==
+From: Conor Dooley <conor@kernel.org>
+To: netdev@vger.kernel.org
+Cc: conor@kernel.org,
+	Conor Dooley <conor.dooley@microchip.com>,
+	kernel test robot <lkp@intel.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: [PATCH net-next v1] net: macb: fix use of at91_default_usrio without CONFIG_OF
+Date: Mon, 30 Mar 2026 10:02:00 +0100
+Message-ID: <20260330-overture-cactus-c8eb7b9cbecc@spud>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <6ee24770a2b014219d86839b2243e1b7bad4dc4f520457269d5e8ca2b21c2cb8@mail.kernel.org>
-In-Reply-To: <20260330080746.319680-2-jiayuan.chen@linux.dev>
-References: <20260330080746.319680-2-jiayuan.chen@linux.dev>
-Subject: Re: [PATCH bpf v4 1/2] bpf: tcp: Reject non-TCP skb in bpf_sk_assign_tcp_reqsk()
-From: bot+bpf-ci@kernel.org
-To: jiayuan.chen@linux.dev,bpf@vger.kernel.org
-Cc: jiayuan.chen@linux.dev,kuniyu@google.com,martin.lau@linux.dev,daniel@iogearbox.net,john.fastabend@gmail.com,sdf@fomichev.me,ast@kernel.org,andrii@kernel.org,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,kpsingh@kernel.org,haoluo@google.com,jolsa@kernel.org,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,horms@kernel.org,shuah@kernel.org,netdev@vger.kernel.org,linux-kernel@vger.kernel.org,linux-kselftest@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Mon, 30 Mar 2026 09:00:40 +0000 (UTC)
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3605; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=A1BubFgGNTU8Lrl5NTMqEeZD7ZkkVzsO+2Mw4LraCwo=; b=owGbwMvMwCVWscWwfUFT0iXG02pJDJmnbLheGWkVLNMQ2R+3+ewm89UXxPTfW7DuWbrdcmX3F 57IqzrLOkpZGMS4GGTFFFkSb/e1SK3/47LDuectzBxWJpAhDFycAjCRU7sZ/udrS7FEZQZeS9Hv PHfuk+fWm+ez5/xsuLnms3Ze3O4NTD8Z/sf1HliytJTxU16fzcXye71ax980ddhvuTbzSmrY3LX 22jwA
+X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	CTYPE_MIXED_BOGUS(1.00)[];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,google.com,iogearbox.net,gmail.com,fomichev.me,kernel.org,davemloft.net,redhat.com,vger.kernel.org,meta.com];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-273105-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-273104-lists,netdev=lfdr.de,bpf-ci];
-	MIME_TRACE(0.00)[0:+,1:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[33];
-	TO_DN_NONE(0.00)[];
-	MAILSPIKE_FAIL(0.00)[172.232.135.74:query timed out];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[conor@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AC07F357AF4
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B4619357DD6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---===============6759854404622828131==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Conor Dooley <conor.dooley@microchip.com>
 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 78b548158fb0..fb975bcce804 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -12248,11 +12248,17 @@ __bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct __sk_buff *s, struct sock *sk,
->
->  	switch (skb->protocol) {
+If CONFIG_OF is not enabled, at91_default_usrio is used undeclared in
+gem_default_config. Rather than move the struct around, take the
+opportunity to rename gem_default_config, as the only compatible it is
+ever used for is "cdns,macb" - not "cdns,gem" at all! With that done,
+remove the use of default_gem_config as a fallback in probe, as every
+device has a specific set of match data.
 
-[ ... ]
+It pains me a little to leave at91_default_usrio in match data used by
+"cdns,macb", but this is probably required to avoid regressing anyone.
 
-> #if IS_BUILTIN(CONFIG_IPV6)
->  	case htons(ETH_P_IPV6):
-> +		if (ipv6_hdr(skb)->nexthdr != IPPROTO_TCP)
-> +			return -EINVAL;
-> +
->  		ops = &tcp6_request_sock_ops;
-
-For IPv6, ipv6_hdr(skb)->nexthdr gives the type of the header
-immediately following the base IPv6 header. If extension headers
-are present (hop-by-hop options, routing, etc.), nexthdr would be
-the extension header type rather than IPPROTO_TCP, even when the
-packet is a valid TCP segment.
-
-Would it be worth using ipv6_find_hdr() here, similar to
-bpf_update_srh_state() in the same file, to walk past any extension
-headers? The IPv4 check above is fine since ip_hdr(skb)->protocol
-always identifies the transport protocol directly.
-
-In practice this is very unlikely to matter since TCP SYN packets
-with IPv6 extension headers are essentially non-existent, but the
-check as written would reject them.
-
-
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202603280028.wQjUrIvv-lkp@intel.com/
+Reported-by: Jiawen Wu <jiawenwu@trustnetic.com>
+Closes: https://lore.kernel.org/all/06a701dcc014$86def5b0$949ce110$@trustnetic.com/
+Fixes: a17871778ee28 ("net: macb: rename macb_default_usrio to at91_default_usrio as not all platforms have mii mode control in usrio")
+Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+lkp also reported this over the weekend, but against the dev copy in my
+tree. I had thought that CONFIG_OF was standard off on x86, but I guess
+it isn't, given lkp didn't catch it until randconfigs.
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/23735111188
---===============6759854404622828131==--
+CC: Andrew Lunn <andrew+netdev@lunn.ch>
+CC: David S. Miller <davem@davemloft.net>
+CC: Eric Dumazet <edumazet@google.com>
+CC: Jakub Kicinski <kuba@kernel.org>
+CC: Paolo Abeni <pabeni@redhat.com>
+CC: Nicolas Ferre <nicolas.ferre@microchip.com>
+CC: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+CC: netdev@vger.kernel.org
+CC: devicetree@vger.kernel.org
+CC: linux-kernel@vger.kernel.org
+CC: linux-riscv@lists.infradead.org
+---
+ drivers/net/ethernet/cadence/macb_main.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 12e2b2f4aaf88..4f70e4fcf4606 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -5716,9 +5716,18 @@ static const struct macb_config pic64hpsc_config = {
+ 	.jumbo_max_len = 16383,
+ };
+ 
++static const struct macb_config macb_macb_config = {
++	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE |
++		MACB_CAPS_JUMBO |
++		MACB_CAPS_GEM_HAS_PTP,
++	.dma_burst_length = 16,
++	.usrio = &at91_default_usrio,
++	.jumbo_max_len = 10240,
++};
++
+ static const struct of_device_id macb_dt_ids[] = {
+ 	{ .compatible = "cdns,at91sam9260-macb", .data = &at91sam9260_config },
+-	{ .compatible = "cdns,macb" },
++	{ .compatible = "cdns,macb", .data = &macb_macb_config},
+ 	{ .compatible = "cdns,np4-macb", .data = &np4_config },
+ 	{ .compatible = "cdns,pc302-gem", .data = &pc302gem_config },
+ 	{ .compatible = "cdns,gem", .data = &pc302gem_config },
+@@ -5747,15 +5756,6 @@ static const struct of_device_id macb_dt_ids[] = {
+ MODULE_DEVICE_TABLE(of, macb_dt_ids);
+ #endif /* CONFIG_OF */
+ 
+-static const struct macb_config default_gem_config = {
+-	.caps = MACB_CAPS_GIGABIT_MODE_AVAILABLE |
+-		MACB_CAPS_JUMBO |
+-		MACB_CAPS_GEM_HAS_PTP,
+-	.dma_burst_length = 16,
+-	.usrio = &at91_default_usrio,
+-	.jumbo_max_len = 10240,
+-};
+-
+ static int macb_probe(struct platform_device *pdev)
+ {
+ 	struct clk *pclk, *hclk = NULL, *tx_clk = NULL, *rx_clk = NULL;
+@@ -5778,7 +5778,7 @@ static int macb_probe(struct platform_device *pdev)
+ 
+ 	macb_config = of_device_get_match_data(&pdev->dev);
+ 	if (!macb_config)
+-		macb_config = &default_gem_config;
++		return -EINVAL;
+ 
+ 	err = macb_clk_init(pdev, &pclk, &hclk, &tx_clk, &rx_clk, &tsu_clk,
+ 			    macb_config);
+-- 
+2.53.0
+
 
