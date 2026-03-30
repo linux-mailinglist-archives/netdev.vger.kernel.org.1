@@ -1,188 +1,218 @@
-Return-Path: <netdev+bounces-273303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273304-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sNhsKMrKyml3AAYAu9opvQ
-	(envelope-from <netdev+bounces-273303-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 21:11:06 +0200
+	id cIWMMiTMyml3AAYAu9opvQ
+	(envelope-from <netdev+bounces-273304-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 21:16:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D244360334
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 21:11:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FDBB3603C5
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 21:16:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6B289300FEC8
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 19:10:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4E5AE302DB73
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 19:16:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B853DFC7B;
-	Mon, 30 Mar 2026 19:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F09E138656C;
+	Mon, 30 Mar 2026 19:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="j0O5tOIp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="atSTXYWV"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56983E1208;
-	Mon, 30 Mar 2026 19:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6147396D1A
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 19:16:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774897801; cv=none; b=YdVTokjUWku1duo4DYZX0hwdEwo5gIoGJ7ruphQfZNsDjqheW2zm9smOGf72bs+C5UBjLh1rz7Z4hbErP+9F8hy3SninVS+YkXNkD0Ofw08sekNVXxoM4emi2w4p1kO1Xk2NwAzvMu359IMzn01YPsf1VxIUqpK1BgI1QdCOYFY=
+	t=1774898188; cv=none; b=f2X7Se6g+GXj03kw51LL3hU3ECzl7ka4Mtham8pgrS9tRNOS9Q1+amcmTRRk9TR71QXI1F70b7PKmhpYbmTgoHm4hL7pnJxRxD+pF3jkt8qc/W28sZjCa8JFqaNa15PJAtDWC78mayYr8TgUPO6Uipk5CGaFB1Toc5dBf0dtEmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774897801; c=relaxed/simple;
-	bh=hKj2Khk6z1UFkIxi2T+PsGhljz7e/eXHqFn5tDAhTIw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R7BJnStJx8zpu+qlnT+oZtVb0GKpc+XHUNiHMmw2FziplvAyXdpvSd+9kgiNr+VWBWrgecL0ob04FpGMR5gdTL068Cd5ODZowQzNVBckhSB/QwtPa6SIcXFwN+es7fj7BMpdYNqdyqsm+hVakIUNEIW/5rcxbFpTcjdRT5jHlew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=j0O5tOIp; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id 5FE2520B712B; Mon, 30 Mar 2026 12:09:52 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5FE2520B712B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1774897792;
-	bh=khibm8huBnKGzHTyYdNQdU0oYmwKpBKE2lEPAxjzUjI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j0O5tOIpFbzivjvyrT57Ritv8lG5SzRj7BdQqwXrjDN5mnWf85nyQrWHePkm55UhB
-	 OVhsDMS77sxf2HjV08GiTtROsMMsu3FnzapBO4+q+tgJ3dSf6q0KjwUEcx+oSu8qau
-	 pKnfZvy99d8hOMIOTUlrjqGQ2f174bDQeTlUoZ1g=
-Date: Mon, 30 Mar 2026 12:09:52 -0700
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, longli@microsoft.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, shirazsaleem@microsoft.com,
-	dipayanroy@linux.microsoft.com, yury.norov@gmail.com,
-	kees@kernel.org, ssengar@linux.microsoft.com,
-	gargaditya@linux.microsoft.com, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next v4] net: mana: Expose hardware diagnostic info
- via debugfs
-Message-ID: <acrKgG0USsGABqYT@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20260319070926.1459515-1-ernis@linux.microsoft.com>
- <20260323174444.2717da3d@kernel.org>
- <acK56AlPfVW8cDPe@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1774898188; c=relaxed/simple;
+	bh=BOuU4kLSFj0T3OadxVFJ/Pv96MAovOPfw0gN6reRqiY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=IL5vj5g8UXA5Ran73LPcn+6hI/FfnCmptdgfsMsOerdRA8F8vHoZUepwaoDiYxo1im4zF0x5G09WQ6rwWwBCrn1clw/zWeuZWn1sIluglBGt6/z5sdPXKlzrSdDD8ObjWFN24FLqkKby1FRifssXc4q6QDwjaF/Rthxj2wjyA3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=atSTXYWV; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-358d80f60ccso2995373a91.3
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 12:16:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774898187; x=1775502987; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PaNyh4ecr42g5LIJwYY728KlnH3gHzvSwNNrUVP18Jg=;
+        b=atSTXYWVQQk2dZMZ1AVoT8BJOP8W2yAyhd4j3dEgUndvJzt/dyPSuMAAsL/UfEv5Ux
+         mY82bzhdG5HDr59qUv4xsZ/ISrVMM4iCWTfmEW+eMb1MbFlSQMzJi6DGoF+Fez18EYW4
+         38F/qNYdpMQ8C9vMHe9x6t2lTWN5T4AymgJ6olrhX/ZjJl/q+5vKoGpvu1fy0EcC/V5X
+         QQo9q2jM+fkj7M6uhRq8DEe9IFl3PFKiyF7AOeK6SXJTcEOh0dtzHePU5ZrVM3kfL7oW
+         Yk0JHWUfVyHmRuCyDtAg3t+4WYyz32DU4ss/ZqXD0S20DRng2hwoQsYtdERbzP+QQFYB
+         kLRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774898187; x=1775502987;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PaNyh4ecr42g5LIJwYY728KlnH3gHzvSwNNrUVP18Jg=;
+        b=Lrhcwl2GJ3S0Ox6itx34Y32Os5MCI2AOsQX3kGfLQUxSnIJiZbMP26/SgldUqqdSer
+         vHEWEJgGXs4pgJ5PNe2R/Agyvxs1pIYP/jwdVVqePeyhbApFa+fsU2HCYkMHXjNcSsqm
+         bHF10sr2EhRivfGZ/opaVfKBRAyyVRe17QEezhjjSQGmtbS6+nA4w1e4L6yuhgctiOAL
+         s9wy4ssmKMkexw4F5Z8knrOEg9zTO9Uo4kvQvW3MCFlSniPqkvGAVn/v1VqbBSSoE8TY
+         e2Nq8r7GNhIGQQxnlAdAXDYFumcontVXroetwtWdbRUaK6Zm7Lxl/iHMwMwAcMXS/Eqx
+         KyLg==
+X-Forwarded-Encrypted: i=1; AJvYcCWaMQG7KigC4m4AXaZQcj8MU1YnV31XF+Eme6asvYtPJzv0Xwb7mo5CTz62C2KzDK+o2nfhuY8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzcb8nNGh5Bqi8plumbTL0W07tEcxcmbb2OMDQO8OtDjqCdCb80
+	IWT841PFmJowCLl22AN8igCO1FBkgWIQxElyIppDSpzTgNt4DPijR4Hx
+X-Gm-Gg: ATEYQzyBuRU/reuenVomXDY5pSfPn9a/INodusm0kaeVEPenxOgB4oyBtp+i6YZzch7
+	YWYwog3Ov2pv5tmiQ/06UgOtt78zpIC88meHydMWpiBFetrVnWt9GBpf7Fm4nqpYo61pH7lfQrd
+	60QYQhWeFoOWVKRfgG02fbPutco8L85kQKZ0gTyEbSiObepIbjI/gpLUIArFrMMziMnIEQds7cw
+	9jd1LTVxpVBn10tK+3qbI0BqC2+l28pW0zudkGEZ/tGR2Ay+JTJOBcEkZcOCS6bcNkn5vzsM3Tj
+	G7J18sIRGiZefEhiFgW/UsMtHmPMc2v5zK/A3R6Nx+o3YQd8GaxaQ9BwDkgaShiNhEf96dBPdmI
+	CjEI1tE79QxZB5h5FY23CwBDTKPLe2CWMISv6i5cWhMA7E5sOqb38tt8yG5TzH7KL35+d5rSm/v
+	tZj1ZnLohYhGX9twojP3HeTlRI6i3x0k/OUjYHhZ4c
+X-Received: by 2002:a17:90a:e70d:b0:35b:90e7:c453 with SMTP id 98e67ed59e1d1-35c2ffaf73emr12904875a91.6.1774898186798;
+        Mon, 30 Mar 2026 12:16:26 -0700 (PDT)
+Received: from DESKTOP-82PPU4A.localdomain ([202.8.116.192])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35d950d9b12sm9627178a91.17.2026.03.30.12.16.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 12:16:26 -0700 (PDT)
+From: Ujjal Roy <royujjal@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	David Ahern <dsahern@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Andy Roulin <aroulin@nvidia.com>,
+	Yong Wang <yongwang@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>
+Cc: Ujjal Roy <ujjal@alumnux.com>,
+	bridge@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v2 0/5] net: bridge: mcast: add multicast exponential field encoding
+Date: Mon, 30 Mar 2026 19:16:06 +0000
+Message-ID: <20260330191611.16929-1-royujjal@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <f23ed1b3-6321-4e6d-9cda-ec5d34304f3b@blackwall.org>
+References: <f23ed1b3-6321-4e6d-9cda-ec5d34304f3b@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <acK56AlPfVW8cDPe@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273303-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-273304-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	FREEMAIL_CC(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	FROM_NEQ_ENVFROM(0.00)[royujjal@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8D244360334
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 5FDBB3603C5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 24, 2026 at 09:20:56AM -0700, Erni Sri Satya Vennela wrote:
-> On Mon, Mar 23, 2026 at 05:44:44PM -0700, Jakub Kicinski wrote:
-> > On Thu, 19 Mar 2026 00:09:13 -0700 Erni Sri Satya Vennela wrote:
-> > > Add debugfs entries to expose hardware configuration and diagnostic
-> > > information that aids in debugging driver initialization and runtime
-> > > operations without adding noise to dmesg.
-> > > 
-> > > The debugfs directory creation and removal for each PCI device is
-> > > integrated into mana_gd_setup() and mana_gd_cleanup_device()
-> > > respectively, so that all callers (probe, remove, suspend, resume,
-> > > shutdown) share a single code path.
-> > > 
-> > > Device-level entries (under /sys/kernel/debug/mana/<slot>/):
-> > >   - num_msix_usable, max_num_queues: Max resources from hardware
-> > >   - gdma_protocol_ver, pf_cap_flags1: VF version negotiation results
-> > >   - num_vports, bm_hostmode: Device configuration
-> > > 
-> > > Per-vPort entries (under /sys/kernel/debug/mana/<slot>/vportN/):
-> > >   - port_handle: Hardware vPort handle
-> > >   - max_sq, max_rq: Max queues from vPort config
-> > >   - indir_table_sz: Indirection table size
-> > >   - steer_rx, steer_rss, steer_update_tab, steer_cqe_coalescing:
-> > >     Last applied steering configuration parameters
-> > 
-> > AI says:
-> > 
-> > > @@ -1918,15 +1930,23 @@ static int mana_gd_setup(struct pci_dev *pdev)
-> > >  	struct gdma_context *gc = pci_get_drvdata(pdev);
-> > >  	int err;
-> > >  
-> > > +	if (gc->is_pf)
-> > > +		gc->mana_pci_debugfs = debugfs_create_dir("0", mana_debugfs_root);
-> > > +	else
-> > > +		gc->mana_pci_debugfs = debugfs_create_dir(pci_slot_name(pdev->slot),
-> > > +							  mana_debugfs_root);
-> > 
-> > If pdev->slot is NULL (which can happen for VFs in environments like generic
-> > VFIO passthrough or nested KVM), will pci_slot_name(pdev->slot) cause a
-> > NULL pointer dereference?
-> > 
-> > Also, could this naming scheme cause name collisions? If multiple PFs are
-> > present, they would all try to use "0". Similarly, VFs across different
-> > PCI domains or buses might share the same physical slot identifier, leading
-> > to -EEXIST errors. Would it be safer to use the unique PCI BDF via
-> > pci_name(pdev) instead?
-> Yes. that is a better way to handle it. I will use pci_name. We can
-> remove if-else and use only one for both the cases.
-> > 
-> > > @@ -3141,6 +3149,24 @@ static int mana_init_port(struct net_device *ndev)
-> > >  	eth_hw_addr_set(ndev, apc->mac_addr);
-> > >  	sprintf(vport, "vport%d", port_idx);
-> > >  	apc->mana_port_debugfs = debugfs_create_dir(vport, gc->mana_pci_debugfs);
-> > > +
-> > > +	debugfs_create_u64("port_handle", 0400, apc->mana_port_debugfs,
-> > > +			   &apc->port_handle);
-> > 
-> > When operations like changing the MTU or setting an XDP program trigger a
-> > detach/attach cycle, mana_detach() invokes mana_cleanup_port_context(),
-> > which recursively removes the apc->mana_port_debugfs directory.
-> > During re-attachment, mana_attach() calls mana_init_port(), which
-> > recreates the directory and the new files added in this patch. However, the
-> > pre-existing current_speed file (created in mana_probe_port()) is not
-> > recreated here.
-> > 
-> > Does this cause the current_speed file to be permanently lost after a
-> > detach/attach cycle? Should the creation of current_speed be moved to
-> > mana_init_port() so it survives the cycle?
-> Yes that is correct.
-> 
-> Since these issues are pre-existing and not introduced from my patch.
-> I'll plan to send them as different patch with fixes tag.
-> > -- 
-> > pw-bot: cr
+Description:
+This series addresses a mismatch in how multicast query
+intervals and response codes are handled across IPv4 (IGMPv3)
+and IPv6 (MLDv2). While decoding logic currently exists,
+the corresponding encoding logic is missing during query
+packet generation. This leads to incorrect intervals being
+transmitted when values exceed their linear thresholds.
+
+The patches introduce a unified floating-point encoding
+approach based on RFC3376 and RFC3810, ensuring that large
+intervals are correctly represented in QQIC and MRC fields
+using the exponent-mantissa format.
+
+Key Changes:
+* ipv4: igmp: get rid of IGMPV3_{QQIC,MRC} and simplify calculation
+  Removes legacy macros in favor of a cleaner, unified
+  calculation for retrieving intervals from encoded fields,
+  improving code maintainability.
+
+* ipv6: mld: rename mldv2_mrc() and add mldv2_qqi()
+  Standardizes MLDv2 terminology by renaming mldv2_mrc()
+  to mldv2_mrd() (Maximum Response Delay) and introducing
+  a new API mldv2_qqi for QQI calculation, improving code
+  readability.
+
+* ipv4: igmp: encode multicast exponential fields
+  Introduces the logic to dynamically calculate the exponent
+  and mantissa using bit-scan (fls). This ensures QQIC and
+  MRC fields (8-bit) are properly encoded when transmitting
+  query packets with intervals that exceed their respective
+  linear threshold value of 128 (for QQI/MRT).
+
+* ipv6: mld: encode multicast exponential fields
+  Applies similar encoding logic for MLDv2. This ensures
+  QQIC (8-bit) and MRC (16-bit) fields are properly encoded
+  when transmitting query packets with intervals that exceed
+  their respective linear thresholds (128 for QQI; 32768
+  for MRD).
+
+Impact:
+These changes ensure that multicast queriers and listeners
+stay synchronized on timing intervals, preventing protocol
+timeouts or premature group membership expiration caused
+by incorrectly formatted packet headers.
+
+v2:
+- Retargeted the series to net-next as suggested
+- Fixed a compilation warning in the MLD rename change
+- Kept reverse xmas tree order in IGMP exponential encoding change
+- Added bridge selftests to validate IGMPv3 Query MRC and QQIC handling
+
+Ujjal Roy (5):
+  ipv4: igmp: get rid of IGMPV3_{QQIC,MRC} and simplify calculation
+  ipv6: mld: rename mldv2_mrc() and add mldv2_qqi()
+  ipv4: igmp: encode multicast exponential fields
+  ipv6: mld: encode multicast exponential fields
+  selftests: net: bridge: add tests for igmpv3 MRC and QQIC validation
+
+ include/linux/igmp.h                          | 158 +++++++++++++++-
+ include/net/mld.h                             | 179 +++++++++++++++++-
+ net/bridge/br_multicast.c                     |  22 +--
+ net/ipv4/igmp.c                               |   6 +-
+ net/ipv6/mcast.c                              |  19 +-
+ .../selftests/net/forwarding/.gitignore       |   2 +
+ .../testing/selftests/net/forwarding/Makefile |  10 +
+ .../selftests/net/forwarding/bridge_igmp.sh   | 109 +++++++++++
+ .../selftests/net/forwarding/mc_decode.c      |  38 ++++
+ .../selftests/net/forwarding/mc_encode.c      |  40 ++++
+ 10 files changed, 535 insertions(+), 48 deletions(-)
+ create mode 100644 tools/testing/selftests/net/forwarding/mc_decode.c
+ create mode 100644 tools/testing/selftests/net/forwarding/mc_encode.c
 
 
-Hi Jakub,
+base-commit: cf0d9080c6f795bc6be08babbffa29b62c06e9b0
+-- 
+2.43.0
 
-Just a quick follow‑up on this. Since these issues were pre‑existing and
-not introduced by this patch, would you prefer that I send them as a
-separate fix patch, or fold the fixes into the current patch?
-
-Thanks,
-Vennela
 
