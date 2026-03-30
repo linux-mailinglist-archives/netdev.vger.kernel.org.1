@@ -1,169 +1,232 @@
-Return-Path: <netdev+bounces-273176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273179-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sAnkOS13ymnk9AUAu9opvQ
-	(envelope-from <netdev+bounces-273176-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:14:21 +0200
+	id +KAzEDx3ymnk9AUAu9opvQ
+	(envelope-from <netdev+bounces-273179-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:14:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52EE135BBD9
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:14:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E500D35BBEF
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:14:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 34B853036060
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:07:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 68C6E306ABF7
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F323D3335;
-	Mon, 30 Mar 2026 13:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119103D413B;
+	Mon, 30 Mar 2026 13:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Y7BTAk1f"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="A8dcuJU8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C1C3CA481
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 13:07:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496193D34AE;
+	Mon, 30 Mar 2026 13:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774876055; cv=none; b=PO8irghWsd9TbmRilqop8wBGON7793i0L5EcR/XsQeZOW5HRJhZoGTG0PORO7g54sPAEO6/F83s563kChmKxrs6eS+mRWK89gIG0LgeO747QOfYPpIZHLQ3C3h2cEcBXCT+ixD5FbqvSVAi1zbR+Ry2yP3v2w4/RQGKpNtnb2CA=
+	t=1774876214; cv=none; b=t93md4A+BBAglG28a/JjRM2/Wdjenm1AKOGQnuyb+kj8q+ZezHQ8aJDRL6BHdeTqEF8a7LLwD6uTEOTvajj9fHfVoiZ8LBr9fTHhu2g2BeXTy13IiH4fVn6luKOgIEnWW//1DHB7/UrHhnu0oF3s4QwmAQvJ8tkooKsDRZdZQpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774876055; c=relaxed/simple;
-	bh=C8NNL7hwaTk7W11gVRZRwpeVV5rtR8at0YoB5aRdk3s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M35V50aS6KLw/+RoMQLIcKqsmt25tl5cge4IL951tPS1pInLVZGmJIl3lc77rBxnEz1eIwaeFoesJuZ4mone8YgN5nKzy06YmPmeJs01ax78Qqh947k7k7nIuQRZfsBUPfQgiCX3plDNgiqp+PvJRNmI+YpOw2QmikAEezPUTRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Y7BTAk1f; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id D05204E42869;
-	Mon, 30 Mar 2026 13:07:29 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 9CC785FFA8;
-	Mon, 30 Mar 2026 13:07:29 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A46CB10450083;
-	Mon, 30 Mar 2026 15:07:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1774876049; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=kxvWlb22Njz2egFEf3cDrys6xgKK//DxYUkt6sa1KI4=;
-	b=Y7BTAk1fzkpu2QGNVyq1Qe1qk+fNedxyKVoun+GAZkv9jy8TC41cR5t7Gk1hp65n41i6b5
-	DHCiNw5f91uhU0tPoejTqfyw9+bFg8lE5Q0tvWGesrMwCZKim3ja6Z/8rCYXlHB9qDmYKs
-	18qZ3GYLQYDbyoiZyXEbYH0nh98WrEXiED59vrMUuWcEye/9mpRNMwdLm9BLIpfFF3OlKb
-	Q5aJbod/01ojURy9JaudHfw+RCdcISTuMB5Pw1PoMASvXVJuTG2IHG3AYV89I3WW6sp5v3
-	QezCAQXmgp4cJ2T9VQmq5zu7BW79lJaTjYOmIkWhAMouCsg+X4BDnzzhClYHbA==
-Message-ID: <20b8349c-932d-4138-a155-5359cc3a10b2@bootlin.com>
-Date: Mon, 30 Mar 2026 15:07:24 +0200
+	s=arc-20240116; t=1774876214; c=relaxed/simple;
+	bh=0WpXNmINXeVMHKFY8pV8yHTpHakSBdQoEYW2a2Gu4t0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CYFA1GyIWIgpLNJuPSsxm9LyvftQIN+dtga4cV7fmEJSInBWd6iNVbNDJmUhyqXEsWND9AnoOHlulzy618pl8CHmnDzsSd/gJJaj4GUCglNBCXUNhHfrG9Ovj11aQy5GxgxuScxCVbYRQelntYHEE5Xo6BvPLqW12RNqAn1kLOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=A8dcuJU8; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62UCsHAo3587823;
+	Mon, 30 Mar 2026 13:10:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=3I35eUYlAKW8mFUQ9C7xezobrVjM
+	L+hOrP3NDrhy/V0=; b=A8dcuJU8+ltGZb7otEjoZwO3xhvhsT1+NnaC/bdUtqkx
+	I8F4rp8ESWPSsTdNibL9AHGfeHPyUdA9SgQI5ddNL8flxOz/FPb8h75AZfjhYsQf
+	7ElGOsV0w7fYEUEM6g9Yz0OtT/2bw7qEVl1Zx3XSgiglBMft64rrzQMDfeaaCpwU
+	iyzUz2KL5EMRgZ0BEgUy8HqMa9BtYRAxM3wLELELVh6ioWyCPCn0F3skW9bUFVbr
+	nnJg3aQxR0yjIHZtACjlzQpq2dzuaH9v5JR1fM+k2XGdKiB/yTPA0AljjrM3iE9k
+	kUwFXdIadVmOUKGVRlBhZmIyzMfiF/behaXJWZPRGQ==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4d66mrxhsh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Mar 2026 13:10:06 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 62UBA3kL030947;
+	Mon, 30 Mar 2026 13:10:06 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4d6uhjmsxc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Mar 2026 13:10:05 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 62UDA2PV42664204
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 30 Mar 2026 13:10:02 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6257B2004B;
+	Mon, 30 Mar 2026 13:10:02 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2119220043;
+	Mon, 30 Mar 2026 13:10:02 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 30 Mar 2026 13:10:02 +0000 (GMT)
+From: Gerd Bayer <gbayer@linux.ibm.com>
+Subject: [PATCH v7 0/3] PCI: AtomicOps: Fix pci_enable_atomic_ops_to_root()
+Date: Mon, 30 Mar 2026 15:09:43 +0200
+Message-Id: <20260330-fix_pciatops-v7-0-f601818417e8@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: phylink: allow PHYs to be attached in
- 802.3z inband mode
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
- Alexis Lothore <alexis.lothore@bootlin.com>
-References: <E1w66jW-0000000E3qS-23fW@rmk-PC.armlinux.org.uk>
- <a5d7aedb-9770-492f-b528-0a28a652279b@bootlin.com>
- <acatrPb1DdHuyVoL@shell.armlinux.org.uk>
- <30a2cad9-fa2c-4abe-ad51-983d70564c7c@lunn.ch>
- <acptbbfTt_FJgms6@shell.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <acptbbfTt_FJgms6@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-B4-Tracking: v=1; b=H4sIABd2ymkC/23P3WrDMAwF4Fcpvl6KZdV23Ku9xyjDP8pqWJMQt
+ 6aj5N3nlI1lJpdH4nxID5ZoipTYcfdgE+WY4tCXoF92zJ9t/0FNDCUzwYUE4Krp4v199NFehzE
+ 1mlrFW/LecWSlMk5U9k/u7VTyOabrMH099QzL9AcC/h/K0PCGgpetldopQa+fsb/d99Fd9n64s
+ AXL4g8QUF2SRQECByTjNAnaBPAXUBzrVzIWwJgAwnnbOTBbwGEFAFbAYQHQec2tQoNyC5ArQNS
+ ALEBng9UC0ZJttwC1BmQFqAIAdx2YoFUIUAPzPH8DARsnr/EBAAA=
+X-Change-ID: 20251106-fix_pciatops-7e8608eccb03
+To: Bjorn Helgaas <bhelgaas@google.com>, Jay Cornwall <Jay.Cornwall@amd.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Leon Romanovsky <leon@kernel.org>,
+        Alexander Schmidt <alexs@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Gerd Bayer <gbayer@linux.ibm.com>, stable@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Authority-Analysis: v=2.4 cv=J6enLQnS c=1 sm=1 tr=0 ts=69ca762f cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=7zwmxoYQV6rCx-UIAC4A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzMwMDEwMCBTYWx0ZWRfXxJEenwXwTeIx
+ IOX1S2sBdyQms61MrmkjxMjuHsK+3wzYuTn5896QffYl1NT+ZuBc6/f21x7bA/Zbdn0igVRZ/vh
+ DZi3V5UTaZI7BhmsMBoLCPK5CaqM1c33mdDgUcL+XYowE5zKH25zba9ljJBi3VcIXeBJsKXndFU
+ zDNyF8t+CJ9p5IRF96ebwB1/3cqiOban3pFXSzy/MZsnP8+f0/4b6vs2G7oWg0h6lpL3RaFgJQ6
+ e6Eht8vzv8YdQDe6GrWRl/OurBvQSfy5fiGWWpxiSCPja5VvKdgbPyBBU+Sn44VWh82CSI/9fxV
+ 2iaj9fg5nBICM66VUheWvldeLqijVm99WjAaVL3sLzl2TsXTpg6t3m8aAxxpHI9IafofJSWp+Pa
+ x9s21qZ2yu7WmPTixq/ZDyRaYwj5PWt9284Mu5ubvPiMX6qTk8tzRIu3VQgQsxY0yob10MKnda8
+ g5YJHxCPedQG9WksPyQ==
+X-Proofpoint-GUID: 2jPg5nYGLv5jPOt00D2_nVxs-3Vtxl6M
+X-Proofpoint-ORIG-GUID: hFI6YSonbms8A70CRRFvdbqptKdyt-B7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-29_05,2026-03-28_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 clxscore=1015 adultscore=0 priorityscore=1501 bulkscore=0
+ phishscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603300100
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273176-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	RCVD_COUNT_SEVEN(0.00)[11];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 52EE135BBD9
+	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gbayer@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273179-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[ibm.com:+]
+X-Rspamd-Queue-Id: E500D35BBEF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Bjorn et al.
 
+On s390, AtomicOp Requests are enabled on a PCI function that supports
+them, despite the helper being ignorant about the root port's capability
+to supporting their completion.
 
-On 30/03/2026 14:32, Russell King (Oracle) wrote:
-> On Mon, Mar 30, 2026 at 02:26:58PM +0200, Andrew Lunn wrote:
->>> As I've recently said, I think we're more or less boxed in between a
->>> rock and a hard place because of the hacks that qcom-ethqos introduced
->>> with its PCS support. At the moment, I am failing to see any path where
->>> the stmmac PCS can be programmed for inband according to phylink's
->>> wishes and qcom-ethqos can be made to work without its hacks.
->>>
->>> This all ultimately comes back to the half-hearted phylink conversion
->>> of stmmac that was done behind my back without my review. Had the
->>> conversion been done fully, and kept up with the phylink changes for
->>> PCS support, then we probably wouldn't be in this situation today.
->>>
->>> Unfortunately, the driver is going to keep breaking all the time that
->>> it abuses phylink, and at the moment I see no way to stop this sodding
->>> driver abusing phylink.
->>
->> "The needs of the many outweigh the needs of the few"
->>
->> The MAC driver is used by a lot of different SoCs. If qcom-ethqos
->> caused this problem, should we consider breaking backwards
->> compatibility for it, if that opens up a path for getting clean
->> phylink integration for all the other variants?
-> 
-> Consider something like mvneta (which supports 2.5G speeds) connected
-> to a 2.5G PHY that uses 2500BASE-X for 2.5G speeds, and SGMII for
-> slower speeds with inband.
-> 
-> How should this be described in DT?
-> 
-> 	phy-mode = "2500base-x";
-> 	managed = "in-band-status";
-> 
-> will fail today, as these tests will refuse to attach a PHY in that
-> setup, and without a PHY attached, we will never know if it switches
-> to SGMII mode.
-> 
-> This patch makes phylink more flexible and permissive.
+Patch 1: Do not enable AtomicOps Requests on RCiEPs
+Patch 2: Fix the logic in pci_enable_atomic_ops_to_root()
+Patch 3: Update references to PCIe spec in that function.
 
-You're patch is clearly correct IMO
+I did test that the issue is fixed with these patches. Also, I verified
+that on a Mellanox/Nvidia ConnectX-6 adapter plugged straight into the
+root port of a x86 system still gets AtomicOp Requests enabled.
 
-> However, as has been found, this patch causes problems for stmmac,
-> so it needs a different approach, because stmmac interprets an
-> optional PHY as "we must have a PHY if we don't we fail" at the
-> moment.
+Due to a lack of the required hardware, I did not test this with any PCIe
+switches between root port and endpoint. So test exposure in other
+environments is highly appreciated.
 
-What would be the consequences of changing stmmac's stmmac_init_phy so
-that it doesn't error-out when no PHY is found AND we have a PCS AND
-we're using any of the SGMII/1000BaseX/SFP-compatible modes ?
+Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+---
+Changes in v7:
+- Prepend series with a patch to explicitly exclude RCiEPs from
+  enablement of AtomicOps Requests
+- Limit the core patch 2 to enforce a full check of the entire
+  PCIe hierarchy for support of AtomicOps capabilities.
+- Rebase to v7.0-rc6
+- Link to v6: https://lore.kernel.org/r/20260325-fix_pciatops-v6-0-10bf19d76dd1@linux.ibm.com
 
-I don't think it would break current setups that work, but I may be
-wrong here, especially as I don't have a good understanding on the
-problem caused by qcom-ethqos here :(
+Changes in v6:
+- Incorporate Ilpo's editorial comments.
+- Correct logic in pci_is_atomicops_capable_rp() (annotated by Sashiko)
+- Link to v5: https://lore.kernel.org/r/20260323-fix_pciatops-v5-0-fada7233aea8@linux.ibm.com
 
-Maxime
+Changes in v5:
+- Introduce new pcibios_connects_to_atomicops_capable_rc() so arch's can
+  declare AtomicOps support outside of PCIe config space. Defaults to
+  "true" - except s390.
+- rebase to 7.0-rc5
+- Link to v4: https://lore.kernel.org/r/20260313-fix_pciatops-v4-0-93bc70a63935@linux.ibm.com
+
+Changes in v4:
+- drop patch 1 - it will become the base of a new series
+- previous patch 2, now 1: reword commit message
+- add a new patch to update references to PCI spec within
+  pci_enable_atomic_ops_to_root()
+- rebase to latest master
+- Link to v3: https://lore.kernel.org/r/20260306-fix_pciatops-v3-0-99d12bcafb19@linux.ibm.com
+
+Changes in v3:
+- rebase to 7.0-rc2
+- gentle ping
+- add netdev and rdma lists for awareness
+- Link to v2: https://lore.kernel.org/r/20251216-fix_pciatops-v2-0-d013e9b7e2ee@linux.ibm.com
+
+Changes in v2:
+- rebase to 6.19-rc1
+- otherwise unchanged to v1
+- Link to v1: https://lore.kernel.org/r/20251110-fix_pciatops-v1-0-edc58a57b62e@linux.ibm.com
+
+---
+Gerd Bayer (3):
+      PCI: AtomicOps: Do not enable requests by RCiEPs
+      PCI: AtomicOps: Do not enable without support in root port
+      PCI: AtomicOps: Update references to PCIe spec
+
+ drivers/pci/pci.c | 48 ++++++++++++++++++++++++++----------------------
+ 1 file changed, 26 insertions(+), 22 deletions(-)
+---
+base-commit: 7aaa8047eafd0bd628065b15757d9b48c5f9c07d
+change-id: 20251106-fix_pciatops-7e8608eccb03
+
+Best regards,
+-- 
+Gerd Bayer <gbayer@linux.ibm.com>
+
 
