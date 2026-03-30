@@ -1,150 +1,165 @@
-Return-Path: <netdev+bounces-273357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273359-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GOJ/HL39ymk2CgYAu9opvQ
-	(envelope-from <netdev+bounces-273357-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:48:29 +0200
+	id YEFCEj/+ymk2CgYAu9opvQ
+	(envelope-from <netdev+bounces-273359-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:50:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF8FD3621B4
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:48:28 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D597C3621F8
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B984030225F9
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 22:47:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C78CE3021411
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 22:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA383E9284;
-	Mon, 30 Mar 2026 22:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8093E3EC2F8;
+	Mon, 30 Mar 2026 22:47:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="3G8FamUu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NQIRMClQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96843B6BE7;
-	Mon, 30 Mar 2026 22:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118CC3E9F61;
+	Mon, 30 Mar 2026 22:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774910834; cv=none; b=AZmWuEoR7evfLXfz0cI/HZrtUTWf7z1YrvPufRFlHxbNCIiqghQ6ZTjEkgxOMWlXMRHQT1iy7znHLWTn8ZEI+hDaWC8kodK4ux04QPygW+GhfcxZPuSSEYmSwmLPbNHHDdaRwRrE6pnQYvyYy4RvpyT/hfYpb9suS3psoFcTYtE=
+	t=1774910878; cv=none; b=Edu3xUYGo7JUBK4nbSq4PmAOhp3tVibSk7aS7KTchJZ+ZmBGHMw1c4HK2ZNd0GWPRApnPW6k/cZyb66oB8DVTpBxFWV9Utmj14MqHKvo8YUOX85u2gruEOwLReKe8DAM9Il/eFHo2TeKp5qaYZT9CnwAObo+oMra7dJJwj14a8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774910834; c=relaxed/simple;
-	bh=9OQ5A6dxr02B5ohtk009vHuj8hPYVMN/qRsxoF5jI1I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k+LdSNfSNvgfRJf9aHxMkVbuu2EhhaN2aoAOsQNJfAL6Ueo6Ptgv4mSHYhhw7Ydt/xNnINNRGBNdWhqYctEB+K3iWy4NTR/xaZkVAe0XNGPzY+5gFduvjZ2gwhbXCPOmmtQAnj+4F4QMP3TZMhjodyw87S+Ed9upk6UqbqFrIqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=3G8FamUu; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 083BEA5881;
-	Tue, 31 Mar 2026 00:47:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1774910828; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=mE/fYI2gz39/bXx6Kl23gFy1SRMoiaQnerxd9LpncLg=;
-	b=3G8FamUu1tdme3DzwsYI1L3dxx1M5yVZ3d5D6efUEt96d705FwhVM/tK6/5fexyfFhDOOd
-	JyxkWO7kVoaCxeo5maAVkyd+Gxb5iMnm6LdH3U2KCPUQ0eTxS/d7TZHAnXJCiZsX/5Vy1Y
-	51gA0NAnEoS2aPjpqPr/p7c7Q/+4Q81WQGX+HgVlWwuDFx06aWai6V50ajkwNUNhzVwxG2
-	RwvKSds7F8zvmlaER6EUzOBy5bzD03QG0BbwAUB/UH5mFjghhcohTXgz5wHD279J9kCmuz
-	kaHvCvkuNHVdbFPubMxatAb80Fo4T+pHe8/aLxK1RJCF4jklbdPkHUMH0h9qDQ==
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: netdev@vger.kernel.org
-Cc: Phil Elwell <phil@raspberrypi.com>,
-	Nicolai Buchwitz <nb@tipi-net.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] net: phy: microchip: enable downshift by default on LAN88xx
-Date: Tue, 31 Mar 2026 00:46:27 +0200
-Message-ID: <20260330224630.579937-3-nb@tipi-net.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260330224630.579937-1-nb@tipi-net.de>
-References: <20260330224630.579937-1-nb@tipi-net.de>
+	s=arc-20240116; t=1774910878; c=relaxed/simple;
+	bh=YG3N5d72t+VrDNXGRo6sxZ+fWBF6oEI+R5nVyaDJbmM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EJkRhxSC8fn33O7w/7uX3yAHECXHAAQ5KSVKYN7Ye9M8ZoAD6UdHdVEW1nMr/2Nj/JzRQBZsEqZ7G1gSp1bfgQ9FDPqrdZ/AlN1rPINxgRLbArgeApKflWZeWPAIZv6HickdqBovWvK2uUV9GPlHlovGOHOj5X7fQVp9durE+lQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NQIRMClQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 595ABC2BCB0;
+	Mon, 30 Mar 2026 22:47:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774910877;
+	bh=YG3N5d72t+VrDNXGRo6sxZ+fWBF6oEI+R5nVyaDJbmM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NQIRMClQY3utKmTwxhPmuwP1y9wZXpKAGWTdrR+7QXFM68BaTSVtmKjev6yXwPoSM
+	 W0yv9vO+070XjgPeZ7UCZd10F/GVc5cxxcQjmJX+jR9jiwqx/Ar1ZEDIyA30hKNwJm
+	 xqgJfif7Bqkq2Nk4T3Tlr1G6GfrVzZsgt5yajvhR2RGe4GxpAO6pyzyE6NcYERvTWV
+	 LGpQHIuPeLXXxkdeCDNb7jFu6PRMSEKyHAhJRbf815cZa4vICrd1dCu+VWE86zB0U2
+	 GSRQXjTESa5E9Z+SV97b2dJ8y4/JW4/cTeWL7ApCd90AXK3m9Ojl2CZi2N5s2j17Fo
+	 lwAhG3AQLLHZg==
+Date: Mon, 30 Mar 2026 15:47:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+ longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ stephen@networkplumber.org, jacob.e.keller@intel.com, leitao@debian.org,
+ kees@kernel.org, dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next,v4] net: mana: Force full-page RX buffers via
+ ethtool private flag
+Message-ID: <20260330154755.6a8c73a6@kernel.org>
+In-Reply-To: <acrkwuIFyBXhwICF@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <acrkwuIFyBXhwICF@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-273357-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[tipi-net.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[raspberrypi.com,tipi-net.de,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_FROM(0.00)[bounces-273359-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid,lunn.ch:email]
-X-Rspamd-Queue-Id: DF8FD3621B4
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D597C3621F8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Enable auto-downshift from 1000BASE-T to 100BASE-TX after 2 failed
-auto-negotiation attempts by default. This ensures that links with
-faulty or missing cable pairs (C and D) fall back to 100Mbps without
-requiring userspace configuration.
+On Mon, 30 Mar 2026 14:01:54 -0700 Dipayaan Roy wrote:
+> On some ARM64 platforms with 4K PAGE_SIZE, page_pool fragment
+> allocation in the RX refill path can cause 15-20% throughput
+> regression under high connection counts (>16 TCP streams).
 
-Users can override or disable downshift at runtime:
+Did you investigate what makes such a difference exactly?
+As I said I suspect there are some improvements we could
+make in the page pool fragmentation logic that could yield
+similar wins without bothering the user.
 
-  ethtool --set-phy-tunable eth0 downshift off
+> Add an ethtool private flag "full-page-rx" that allows the user to
+> force one RX buffer per page, bypassing the page_pool fragment path.
+> This restores line-rate(180+ Gbps) performance on affected platforms.
+> 
+> Usage:
+>   ethtool --set-priv-flags eth0 full-page-rx on
+> 
+> There is no behavioral change by default. The flag must be explicitly
+> enabled by the user or udev rule.
+> 
+> The existing single-buffer-per-page logic for XDP and jumbo frames is
+> consolidated into a new helper mana_use_single_rxbuf_per_page().
 
-Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/phy/microchip.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ethtool -g rx-buf-len could also fit the bill but I guess this is more
+of a hack / workaround than legit config so no strong preference.
 
-diff --git a/drivers/net/phy/microchip.c b/drivers/net/phy/microchip.c
-index bc293d2dd130..802b8a6e54e6 100644
---- a/drivers/net/phy/microchip.c
-+++ b/drivers/net/phy/microchip.c
-@@ -346,7 +346,7 @@ static void lan88xx_set_mdix(struct phy_device *phydev)
- 
- static int lan88xx_config_init(struct phy_device *phydev)
- {
--	int val;
-+	int val, err;
- 
- 	/*Zerodetect delay enable */
- 	val = phy_read_mmd(phydev, MDIO_MMD_PCS,
-@@ -359,6 +359,11 @@ static int lan88xx_config_init(struct phy_device *phydev)
- 	/* Config DSP registers */
- 	lan88xx_config_TR_regs(phydev);
- 
-+	/* Enable downshift after 2 failed attempts by default */
-+	err = lan88xx_set_downshift(phydev, 2);
-+	if (err < 0)
-+		return err;
-+
- 	return 0;
- }
- 
+> -static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
+> +static void mana_get_strings_stats(struct mana_port_context *apc, u8 **data)
+>  {
+> -	struct mana_port_context *apc = netdev_priv(ndev);
+>  	unsigned int num_queues = apc->num_queues;
+>  	int i, j;
+>  
+> -	if (stringset != ETH_SS_STATS)
+> -		return;
+>  	for (i = 0; i < ARRAY_SIZE(mana_eth_stats); i++)
+> -		ethtool_puts(&data, mana_eth_stats[i].name);
+> +		ethtool_puts(data, mana_eth_stats[i].name);
+>  
+>  	for (i = 0; i < ARRAY_SIZE(mana_hc_stats); i++)
+> -		ethtool_puts(&data, mana_hc_stats[i].name);
+> +		ethtool_puts(data, mana_hc_stats[i].name);
+>  
+>  	for (i = 0; i < ARRAY_SIZE(mana_phy_stats); i++)
+> -		ethtool_puts(&data, mana_phy_stats[i].name);
+> +		ethtool_puts(data, mana_phy_stats[i].name);
+>  
+>  	for (i = 0; i < num_queues; i++) {
+> -		ethtool_sprintf(&data, "rx_%d_packets", i);
+> -		ethtool_sprintf(&data, "rx_%d_bytes", i);
+> -		ethtool_sprintf(&data, "rx_%d_xdp_drop", i);
+> -		ethtool_sprintf(&data, "rx_%d_xdp_tx", i);
+> -		ethtool_sprintf(&data, "rx_%d_xdp_redirect", i);
+> -		ethtool_sprintf(&data, "rx_%d_pkt_len0_err", i);
+> +		ethtool_sprintf(data, "rx_%d_packets", i);
+
+Please factor out the noisy, no-op prep work into a separate patch for
+ease of review
 -- 
-2.51.0
-
+pw-bot: cr
 
