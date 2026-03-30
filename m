@@ -1,233 +1,235 @@
-Return-Path: <netdev+bounces-273149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273139-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WPKuHwxqymnG8gUAu9opvQ
-	(envelope-from <netdev+bounces-273149-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:18:20 +0200
+	id +N3AHWphymn27gUAu9opvQ
+	(envelope-from <netdev+bounces-273139-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:41:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F23C435AEA5
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:18:19 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 441C335A68F
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:41:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 876E830073E4
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:12:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 18ECE300C37B
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A1F3CA49E;
-	Mon, 30 Mar 2026 12:12:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B338A3C6A31;
+	Mon, 30 Mar 2026 11:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="K5haupm7"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="XarzyNs+"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012033.outbound.protection.outlook.com [40.107.209.33])
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700C226158B;
-	Mon, 30 Mar 2026 12:12:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.33
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774872724; cv=fail; b=JEOa9OKkRrTa9YrGbe/MNR7sRgmFvqc57hlgiiwKHerEhvwim/Ff2sHszMag86vrTSCv29gGdjQ5WAGfbj/kJLnz63z17zTmy6MX6TYuKdx++8ZMkJwiTqnB531tNvfejMacs1+HvAtCIbHx81lwKYrw8nboPi7qnpkTo4vFvZI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774872724; c=relaxed/simple;
-	bh=Tj5XRuEXRP3Ptle2HfUzKCvGnKIgODEAxqzwi3fl/tQ=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=nbAeF1RnXbJG0ijtyWRZxMZmSWx0Tw8h3RApQmpuCrPMufh5AijjNPvn+/YhZCPr0HsJQNKoXaEulbhVFyqwkTHyHa3tu/0bMV2SxWjDs47b7YMq0GuoCZWJIbMTLzf7ur14CHBFecHueF6yR1fdrAmqLF91jco8yx1oKcGMqhs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=K5haupm7; arc=fail smtp.client-ip=40.107.209.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jVeBft6CQelcksWm81ChhbaJloRl7Lb6nXJcFuCyo9A+Tmra6xdStZ11NHyiiRoePHfo1/DxsoD/4Ax45EJEl0oomVJk0HLI5OJMRdI4ufXUQ+qANE3FB/P6TUIRulpqtmeuK1Qu3om5/VkKrNPARQpSKW57+QTlDxpTmX1a9E4OOZGN0vd3HsabOjd7iS//4nwOSlwnipwGJtBFdiIe48SYwvbCvBcpfVgwWTcw6XgN0AW3Nr+pEUJVVG0sLIwVykkooghVY3k12RyIuXM2lKj1xLDwFossss/DuPq4lF/fEL/GjFBM4nwmkB4OLfnVSwMNr3KHa/KhWQcbUzbDqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N+Y6sQwXwlhS8xhnLt4GK8QARazoSTbQ1gBM8PYsIZQ=;
- b=bSiD+X9282pnctbc0tAbTuN5jUUiRl7N9+5kKIxmPU8h9T7bUgdzKfDG3FkkghH2OtJ+6EZy4ZC/ETkVZ2SeSqUQZUnd4kDOmQVGHsG3888yEhapFgRtYT9sELXBe//MSm1qbtcSsXoZoYou/i0ZLXhCnRXYMv3qJDg93nJUvg3IgUS7Ygzd6bQBMByw78s6tZbVoWjYADbu9by3mBz/Vkf02z/3Aij/RVC6S2xeDbwU1/UL9avKkXopbojJaFq2wOayHZskY30Bzn0DqtylXsszRJ/JY9i4J4wa3CaPPcjkitHok692HIwXt4fMlCJKcimqAgWHZmEs4Od0KVbIng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N+Y6sQwXwlhS8xhnLt4GK8QARazoSTbQ1gBM8PYsIZQ=;
- b=K5haupm7gZlqtt10gFATeBZ4NPGcONo+IXk0hso97ymFaYN/wa/U5UQ03Pwzn1Kc1s4XPvIP99AWuNyAvpXwJ8EmXiWHIOpGCw9Q3EKY41/eI4gectNIJIMqvCl1KtR37LMFSwcyq8dEb7hkOdnZkKWmcWKhmjVp2vUn3vxkzN0b3B2yMR38Ln1A+2hILnx+8kpLDpRN7shhBKNiH2E5w/DOFkLY8Te8DlcgUWZ3a7ahcpO5fb01beWiTv/IE1kFbr451gPlKBOCUzoCVylWnUI2DZzql5214nzjPylPIdH+7bR50fo67GnA3av6MX4q3AeDUbCpnTXsz5zcJ9QtuA==
-Received: from BY3PR10CA0004.namprd10.prod.outlook.com (2603:10b6:a03:255::9)
- by CY5PR12MB6549.namprd12.prod.outlook.com (2603:10b6:930:43::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.15; Mon, 30 Mar
- 2026 12:11:57 +0000
-Received: from CO1PEPF00012E7E.namprd03.prod.outlook.com
- (2603:10b6:a03:255:cafe::8) by BY3PR10CA0004.outlook.office365.com
- (2603:10b6:a03:255::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9745.28 via Frontend Transport; Mon,
- 30 Mar 2026 12:11:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1PEPF00012E7E.mail.protection.outlook.com (10.167.249.53) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9745.21 via Frontend Transport; Mon, 30 Mar 2026 12:11:56 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 30 Mar
- 2026 05:11:41 -0700
-Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 30 Mar
- 2026 05:11:35 -0700
-References: <20260326132828.805703-1-ioana.ciornei@nxp.com>
- <20260326132828.805703-11-ioana.ciornei@nxp.com>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Ioana Ciornei <ioana.ciornei@nxp.com>
-CC: <netdev@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, <linux-kernel@vger.kernel.org>, <petrm@nvidia.com>,
-	<willemb@google.com>, <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 10/10] selftests: drivers: hw: add test for
- the ethtool standard counters
-Date: Mon, 30 Mar 2026 14:03:35 +0200
-In-Reply-To: <20260326132828.805703-11-ioana.ciornei@nxp.com>
-Message-ID: <87bjg54ivh.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704C63C6A30;
+	Mon, 30 Mar 2026 11:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774870833; cv=none; b=RUFg4XSZKn1NhzYtSZuKegfvJAStztgCG/sFtmna42hzIOje67b0fNUXy/G8RHb3Gt4uY5C3UZhBRYQGsVNM2fFOw9Igmu9Y+IdkPs6xjHqEjs7vFv3yKWCtDhOxnOj10ZiHvzMBFhbVE/chKLGejceJFfokRxFDc94Zj2CGooI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774870833; c=relaxed/simple;
+	bh=h3B146AXDaMG8OjaKqu6sgqpCUkBTNvoDdB7NLG6G8U=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mkhYEHp2kx+jv+lZmv7oBsMkRCsXMrLAsx6ZepFVZfqLVvedjR55vH1sH9KgvJls1JHKWxfenMm/FjzkUAe+BYj7ZrwlReh10x1NU3ENcPf0Nu5Z/NPiYKETPeWtOjCjudiX+Kh5oSRgsxPH55nZCOVqPhZW7lYeBOCAbbHeMxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=XarzyNs+; arc=none smtp.client-ip=113.46.200.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=yKZmHt33n8RZwizYvWZr4IymRKCPNMxFJhuhxnffLpg=;
+	b=XarzyNs+KkS7jMvu7guwX1kJUWxVXv5DkvP1d/5fWJdlqzMITX+/X/tjDVEFyiWRBtCbNyV3S
+	DeEZw6R9t4OJ856xlUxZnAmCcAjA6xInaHf69Q+oJvkuZIgau+BdFj66T9Vy6dVCMGUTyy1Rz3N
+	IiFbzUgKqqTHaN8pTEAZwyU=
+Received: from mail.maildlp.com (unknown [172.19.163.214])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4fkq0D2hnfz1K99G;
+	Mon, 30 Mar 2026 19:34:20 +0800 (CST)
+Received: from kwepemj500018.china.huawei.com (unknown [7.202.194.48])
+	by mail.maildlp.com (Postfix) with ESMTPS id BA3A140561;
+	Mon, 30 Mar 2026 19:40:26 +0800 (CST)
+Received: from huawei.com (10.50.85.128) by kwepemj500018.china.huawei.com
+ (7.202.194.48) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 30 Mar
+ 2026 19:40:26 +0800
+From: Li Xiasong <lixiasong1@huawei.com>
+To: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
+	<martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <mptcp@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
+	<zhangchangzhong@huawei.com>, <weiyongjun1@huawei.com>
+Subject: [PATCH net v4] mptcp: fix soft lockup in mptcp_recvmsg()
+Date: Mon, 30 Mar 2026 20:03:35 +0800
+Message-ID: <20260330120335.659027-1-lixiasong1@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF00012E7E:EE_|CY5PR12MB6549:EE_
-X-MS-Office365-Filtering-Correlation-Id: 89368ff2-f862-42bf-1354-08de8e5589b6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700016|1800799024|376014|7416014|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	trUewd3m6K1At0VV4U2THDU0xgpqy3xd7+9oVXt7Ms7Mvx1PscN7S9yZ3CCvIVqsNEzacIBQx4w1GhmtJNcOaunZgy+Ps+mfAJFtVsvfb4SU7Pi8fbku1AM67IDbX1xKqkefXJ4B+vACMXpXBDuRoXulw+0dshG/AGLtkcyPx0HjqEpVdP8QHt/Sw97Zyt1M0yC8Iu3wCzhcrgDWcr4YfytxsmXMDSLDkeYYxtYpxpJtt9yQUC83l8Y4z/GNQP5T5csyTmSig8SU8s1cckpEMjWiluan/bKt1T/Z34NqL4iKBwwRDYQQ2YbRwz1LPxLvX86f4shHo9IZcFiaazYm/yHLjfUlrI4zveW/FKv40cGn+vnlEb62k3q2JCRrxD5StECbEGsJPWmBkfKdfyrCAJXH5hS3eRHMw7oxtzRPL1zRJdsJChQPeA/jt28a276YLxP5liPNaTrbXS4ULbyq8AcyLCuWTMyqsmc+FGLN9En5j4vkKfNAP3K9HJsyX6OE/vyfY4JbdNElo2rix32kfbOIJjDycEL3EyhKCQ2Z3CGtnb2lmZwoMHL1O34yseZpHf8IykFBJti8V9vL9kML0uUjrzxIXNlpY9F6wzZh32yqnTOZWEUDk1CqI0mBb+XOWLPwCwrtOYN4Y17kDe8AOt9mk+vA/WhORrRBBTHsPRdBDR/Cg7C0A7C0Da0iP7+60RRMfMHYvHhq8WbG2YSb9DvZ39SryjvpPTvafuLFS1dQJWA0zqDN7QopqcA+xNK3ZtPVRqiYcCh89cXe+tU+1Q==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(1800799024)(376014)(7416014)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	fMLRqMVC5qPYb2u14dxUKqJeYcgkW8QsBLHjoVwwwihrG5s/VlVhX5kJgO8HP5iXzw6XeMU/PzTrkp/rA/+qEeEM8sUsCC4IGudMIRHyP8ZJ0uhmz4T9LCTg0mNf7vm/D4srwLgHdAkcCT02euLseJvINBx9B7HuF2EBpcPotoSCMVM6A4L7dxOHu2I0k4/6HIZBOJI+i2B9KJGkuFkIPzkXyZcwxDe7KJMOG5tJd2vAINYeyMOpaNcVUB5VS4wUKLttu0+drj2uSAaWvmx2HHyA2UR4O9XYL1R2fTv1AO32Daf3J3PO2xKCHn99eZx09ckVvmogJAKJyg20Lv7C8tBMFnniq5uFfK873ITUdqR4lN/Rb6CFvpRrVQOSRT9DtQ/4ft+T0mHIyfB4mVfsUlYYTM4r1nulvcH7kMl1txXhyn6shh6SLpUdVNdxvaJR
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2026 12:11:56.5996
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 89368ff2-f862-42bf-1354-08de8e5589b6
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF00012E7E.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6549
-X-Spamd-Result: default: False [1.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemj500018.china.huawei.com (7.202.194.48)
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273149-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-273139-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[huawei.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petrm@nvidia.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[lixiasong1@huawei.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,nvidia.com:email,nvidia.com:mid,nxp.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ethtool_std_stats.sh:url];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: F23C435AEA5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,huawei.com:dkim,huawei.com:email,huawei.com:mid]
+X-Rspamd-Queue-Id: 441C335A68F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+syzbot reported a soft lockup in mptcp_recvmsg() [0].
 
-Ioana Ciornei <ioana.ciornei@nxp.com> writes:
+When receiving data with MSG_PEEK | MSG_WAITALL flags, the skb is not
+removed from the sk_receive_queue. This causes sk_wait_data() to always
+find available data and never perform actual waiting, leading to a soft
+lockup.
 
-> Add a new selftest - ethtool_std_stats.sh - which validates the
-> eth-ctrl, eth-mac and pause standard statistics exported by an
-> interface. Collision related eth-mac counters as well as the error ones
-> will be checked against zero since that is the most likely correct
-> scenario.
->
-> The central part of this patch is the traffic_test() function which
-> gathers the 'before' counter values, sends a batch of traffic and then
-> interrogates again the same counters in order to determine if the delta
-> is on target. The function receives an array through which the caller
-> can request what counters to be interrogated and, for each of them, what
-> is their target delta value.
->
-> The output from this selftest looks as follows on a LX2160ARDB board:
->
->  $ ./run_kselftest.sh -t drivers/net/hw:ethtool_std_stats.sh
->  TAP version 13
->  1..1
->  # timeout set to 0
->  # selftests: drivers/net/hw: ethtool_std_stats.sh
->  # TAP version 13
->  # 1..26
->  # ok 1 ethtool_std_stats.eth-ctrl-MACControlFramesTransmitted
->  # ok 2 ethtool_std_stats.eth-ctrl-MACControlFramesReceived
->  # ok 3 ethtool_std_stats.eth-mac-FrameCheckSequenceErrors
->  # ok 4 ethtool_std_stats.eth-mac-AlignmentErrors
->  # ok 5 ethtool_std_stats.eth-mac-FramesLostDueToIntMACXmitError
->  # ok 6 ethtool_std_stats.eth-mac-CarrierSenseErrors # SKIP
->  # ok 7 ethtool_std_stats.eth-mac-FramesLostDueToIntMACRcvError
->  # ok 8 ethtool_std_stats.eth-mac-InRangeLengthErrors # SKIP
->  # ok 9 ethtool_std_stats.eth-mac-OutOfRangeLengthField # SKIP
->  # ok 10 ethtool_std_stats.eth-mac-FrameTooLongErrors # SKIP
->  # ok 11 ethtool_std_stats.eth-mac-FramesAbortedDueToXSColls # SKIP
->  # ok 12 ethtool_std_stats.eth-mac-SingleCollisionFrames # SKIP
->  # ok 13 ethtool_std_stats.eth-mac-MultipleCollisionFrames # SKIP
->  # ok 14 ethtool_std_stats.eth-mac-FramesWithDeferredXmissions # SKIP
->  # ok 15 ethtool_std_stats.eth-mac-LateCollisions # SKIP
->  # ok 16 ethtool_std_stats.eth-mac-FramesWithExcessiveDeferral # SKIP
->  # ok 17 ethtool_std_stats.eth-mac-BroadcastFramesXmittedOK
->  # ok 18 ethtool_std_stats.eth-mac-OctetsTransmittedOK
->  # ok 19 ethtool_std_stats.eth-mac-BroadcastFramesReceivedOK
->  # ok 20 ethtool_std_stats.eth-mac-OctetsReceivedOK
->  # ok 21 ethtool_std_stats.eth-mac-FramesTransmittedOK
->  # ok 22 ethtool_std_stats.eth-mac-MulticastFramesXmittedOK
->  # ok 23 ethtool_std_stats.eth-mac-FramesReceivedOK
->  # ok 24 ethtool_std_stats.eth-mac-MulticastFramesReceivedOK
->  # ok 25 ethtool_std_stats.pause-tx_pause_frames
->  # ok 26 ethtool_std_stats.pause-rx_pause_frames
->  # # 10 skipped test(s) detected.  Consider enabling relevant config options to improve coverage.
->  # # Totals: pass:16 fail:0 xfail:0 xpass:0 skip:10 error:0
->  ok 1 selftests: drivers/net/hw: ethtool_std_stats.sh
->
-> Please note that not all MACs are counting the software injected pause
-> frames as real Tx pause. For example, on a LS1028ARDB the selftest
-> output will reflect the fact that neither the ENETC MAC, nor the Felix
-> switch MAC are able to detect Tx pause frames injected by software.
->
->  $ ./run_kselftest.sh -t drivers/net/hw:ethtool_std_stats.sh
->  (...)
->  # # software sent pause frames not detected
->  # ok 25 ethtool_std_stats.pause-tx_pause_frames # XFAIL
->  # ok 26 ethtool_std_stats.pause-rx_pause_frames
->
-> Signed-off-by: Ioana Ciornei <ioana.ciornei@nxp.com>
+Fix this by adding a 'last' parameter to track the last peeked skb.
+This allows sk_wait_data() to make informed waiting decisions and prevent
+infinite loops when MSG_PEEK is used.
 
-I didn't go into details much, but the code looks broadly correct.
+[0]:
+watchdog: BUG: soft lockup - CPU#2 stuck for 156s! [server:1963]
+Modules linked in:
+CPU: 2 UID: 0 PID: 1963 Comm: server Not tainted 6.19.0-rc8 #61 PREEMPT(none)
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+RIP: 0010:sk_wait_data+0x15/0x190
+Code: 80 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 41 56 41 55 41 54 49 89 f4 55 48 89 d5 53 48 89 fb <48> 83 ec 30 65 48 8b 05 17 a4 6b 01 48 89 44 24 28 31 c0 65 48 8b
+RSP: 0018:ffffc90000603ca0 EFLAGS: 00000246
+RAX: 0000000000000000 RBX: ffff888102bf0800 RCX: 0000000000000001
+RDX: 0000000000000000 RSI: ffffc90000603d18 RDI: ffff888102bf0800
+RBP: 0000000000000000 R08: 0000000000000002 R09: 0000000000000101
+R10: 0000000000000000 R11: 0000000000000075 R12: ffffc90000603d18
+R13: ffff888102bf0800 R14: ffff888102bf0800 R15: 0000000000000000
+FS:  00007f6e38b8c4c0(0000) GS:ffff8881b877e000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055aa7bff1680 CR3: 0000000105cbe000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ mptcp_recvmsg+0x547/0x8c0 net/mptcp/protocol.c:2329
+ inet_recvmsg+0x11f/0x130 net/ipv4/af_inet.c:891
+ sock_recvmsg+0x94/0xc0 net/socket.c:1100
+ __sys_recvfrom+0xb2/0x130 net/socket.c:2256
+ __x64_sys_recvfrom+0x1f/0x30 net/socket.c:2267
+ do_syscall_64+0x59/0x2d0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e arch/x86/entry/entry_64.S:131
+RIP: 0033:0x7f6e386a4a1d
+Code: 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 8d 05 f1 de 2c 00 41 89 ca 8b 00 85 c0 75 20 45 31 c9 45 31 c0 b8 2d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 6b f3 c3 66 0f 1f 84 00 00 00 00 00 41 56 41
+RSP: 002b:00007ffc3c4bb078 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
+RAX: ffffffffffffffda RBX: 000000000000861e RCX: 00007f6e386a4a1d
+RDX: 00000000000003ff RSI: 00007ffc3c4bb150 RDI: 0000000000000004
+RBP: 00007ffc3c4bb570 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000103 R11: 0000000000000246 R12: 00005605dbc00be0
+R13: 00007ffc3c4bb650 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
 
-Acked-by: Petr Machata <petrm@nvidia.com>
+Fixes: 8e04ce45a8db ("mptcp: fix MSG_PEEK stream corruption")
+Signed-off-by: Li Xiasong <lixiasong1@huawei.com>
+---
+
+v3->v4:
+Thanks to Matthieu Baerts and sashiko for the review.
+- __mptcp_recvmsg_mskq: update 'last' when skipping already peeked skbs.
+- Link to v3: https://lore.kernel.org/netdev/20260327075544.3622851-1-lixiasong1@huawei.com
+
+v2->v3:
+Thanks to Matthieu Baerts for the review.
+- Initialize last to NULL.
+- Only update 'last' when MSG_PEEK is set, avoiding dangling pointer.
+- Link to v2: https://lore.kernel.org/netdev/20260324085131.4187473-1-lixiasong1@huawei.com
+
+v1->v2:
+Thanks to Matthieu Baerts for the suggestion and review.
+- Move 'last' variable definition into the while loop in mptcp_recvmsg() to
+  narrow its scope.
+- In __mptcp_recvmsg_mskq(), assign 'last' right after 'copied' is updated,
+  regardless of MSG_PEEK flag.
+- Link to v1: https://lore.kernel.org/netdev/20260302052651.1466983-1-lixiasong1@huawei.com
+
+---
+ net/mptcp/protocol.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index cf1852b99963..65c3bb8016f4 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -2006,7 +2006,7 @@ static void mptcp_eat_recv_skb(struct sock *sk, struct sk_buff *skb)
+ static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
+ 				size_t len, int flags, int copied_total,
+ 				struct scm_timestamping_internal *tss,
+-				int *cmsg_flags)
++				int *cmsg_flags, struct sk_buff **last)
+ {
+ 	struct mptcp_sock *msk = mptcp_sk(sk);
+ 	struct sk_buff *skb, *tmp;
+@@ -2023,6 +2023,7 @@ static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
+ 			/* skip already peeked skbs */
+ 			if (total_data_len + data_len <= copied_total) {
+ 				total_data_len += data_len;
++				*last = skb;
+ 				continue;
+ 			}
+ 
+@@ -2058,6 +2059,8 @@ static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
+ 			}
+ 
+ 			mptcp_eat_recv_skb(sk, skb);
++		} else {
++			*last = skb;
+ 		}
+ 
+ 		if (copied >= len)
+@@ -2288,10 +2291,12 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 		cmsg_flags = MPTCP_CMSG_INQ;
+ 
+ 	while (copied < len) {
++		struct sk_buff *last = NULL;
+ 		int err, bytes_read;
+ 
+ 		bytes_read = __mptcp_recvmsg_mskq(sk, msg, len - copied, flags,
+-						  copied, &tss, &cmsg_flags);
++						  copied, &tss, &cmsg_flags,
++						  &last);
+ 		if (unlikely(bytes_read < 0)) {
+ 			if (!copied)
+ 				copied = bytes_read;
+@@ -2343,7 +2348,7 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 
+ 		pr_debug("block timeout %ld\n", timeo);
+ 		mptcp_cleanup_rbuf(msk, copied);
+-		err = sk_wait_data(sk, &timeo, NULL);
++		err = sk_wait_data(sk, &timeo, last);
+ 		if (err < 0) {
+ 			err = copied ? : err;
+ 			goto out_err;
+-- 
+2.34.1
+
 
