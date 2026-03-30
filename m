@@ -1,142 +1,166 @@
-Return-Path: <netdev+bounces-273240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273241-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cCi+DfWQyml++AUAu9opvQ
-	(envelope-from <netdev+bounces-273240-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 17:04:21 +0200
+	id IGnZJBKVymkR+QUAu9opvQ
+	(envelope-from <netdev+bounces-273241-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 17:21:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FAA935D698
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 17:04:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 015BA35DB43
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 17:21:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6ACF5304B822
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:57:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4257D305B950
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 15:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D13332E143;
-	Mon, 30 Mar 2026 14:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B21333727;
+	Mon, 30 Mar 2026 15:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="Ge/1ALbS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G6ZgIO1L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE41A3290C2;
-	Mon, 30 Mar 2026 14:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F92C32ED21;
+	Mon, 30 Mar 2026 15:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774882644; cv=none; b=UB1a+ApQSdqMDZXV4lMJfi2oeFjqPiMBk5RQb7FJq51XR1ri1/Ewtpzx99Bo7KrcailKXZ7ODXEobvWLg/mgLsQr2zSKnf6TIBl0cf4TG3JrTTpVoER+EQbQ2ZWKdoajUxAIUnVaXEqy0f1q4WQHEbdwNg95a4mE1cihOb1dHD4=
+	t=1774882970; cv=none; b=QQxsP6yRJfmaYymthC/Fizfs1T65gqoZSPug2eo0dvKhjaTPYoxbsQ6gU9pUyS1cv+omzr/cpuTHbnGpoDjtkUX3nChA4pNB3PsA90x+BvPne1FA6lGqrCpAJ5o+LqYcihaxW3v7jrO2C01wZGkY5GlI82RyyVcBr7+I31kwmDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774882644; c=relaxed/simple;
-	bh=Ln1/n/ClxXU/JaYjINzFmRR8rjkriRavhZdPSGJqgH4=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=PpOpirh+GFd7oEWcJvZQxg8UfCWodXp12wyI/2lv893JlIy0UpC/gAhvQK7q9R6Zn7tfMty1/++WlJG5/IWt0ku1/4x83LYEryvJBndA7LW9XRLH1WnpuHU8NAttJMtwVei5/ihXeMp+DQa+XyEzuNBN0BPHX7+CGH3QmJvW63c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=Ge/1ALbS; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id AE167A5842;
-	Mon, 30 Mar 2026 16:57:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1774882628; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=Feu4vvS9PJP6yuJ+D33WUtWoaluTZV0mEqkqacnZuRg=;
-	b=Ge/1ALbS/US6h7H7OrRnAD0zRdTSYTunQSyao56fLQ2oIBKVkWKZOt7lYDeZ8cDi3QXAj6
-	huQCLk4EIFjLKfeQnS4Il/o4+rs5jsIMs1YchLoNd1vkqDg3rlnL/jPBZGCQdBKwuZCYUY
-	ZiWiZ4Q2Xo4BAkv5rf0KP+vxrdIk9aB+FuVhNnTOcD8EQAWXkQi1r07jRWY8dXHfoCjiww
-	Fav6rlIDcqnPjqzJ9BhwK0mzisqkAsP08GnWwd6q3HS5AjWxNItVsOmfUuun1j96AtvgBL
-	03DlQQDetfzyvyUocYCVyHL/QOQwYvxSOTR8ARPDJEPFQuX4HY5ckq+RaZK2rA==
+	s=arc-20240116; t=1774882970; c=relaxed/simple;
+	bh=0UOIFMhQKOklg3R3612sioG87Ps9KaLdTK71ubPMDZA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=saicw2NICDg9F0VFqM0HeLPpdQ6/EmAHl4AszDuEu2ZdwNHLaPQGr5h5H80u4nqFXsZBnkurgbTZ18hTSqwBzn+cXiWFyYVt9ZpyDDP3TQVt3Am9K4ZyCaCDxX4CTOL7eIllq+1uhvg0HJJs8SYI47Q6ZyvoW+hrBEN8+8r8n/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G6ZgIO1L; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14BFCC4CEF7;
+	Mon, 30 Mar 2026 15:02:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774882970;
+	bh=0UOIFMhQKOklg3R3612sioG87Ps9KaLdTK71ubPMDZA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=G6ZgIO1LADkfURvzlTSBk9OGr4W/m++tm9dAqczimORu63+S/sNABjMPLoBo9ggds
+	 I2h2oXVoy9QEYgDT6HQFIVb+EXTUN0gOMoXSwchQunm6JmreqmNzRm5+vsp9rCEUZD
+	 Up8pc7mTAWKhCIKlwmpLLVSiIZcn4qRk1KDPFBATBhE4z0fcLQ8wyUW3U2nOne4bsG
+	 qelb91X7Q3e7FfR8bQo0A/fhJXsZBw++wx+6XUG7xsAYrGpE2YfHwkpbj/mcOcdnzn
+	 wPudwBweCsxOBGuOjdsYzjyChCUxHdmQuCbZ82YPiBgd+Monz6I2UhQVFQ5zo5ejLp
+	 w8jqeTKoGW6Tg==
+Date: Mon, 30 Mar 2026 16:02:45 +0100
+From: Mark Brown <broonie@kernel.org>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Networking <netdev@vger.kernel.org>
+Cc: Fernando Fernandez Mancera <fmancera@suse.de>,
+	Leon Romanovsky <leon@kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>,
+	Zhu Yanjun <yanjun.zhu@linux.dev>
+Subject: linux-next: manual merge of the net-next tree with the rdma tree
+Message-ID: <acqQlcV326LWAtyp@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 30 Mar 2026 16:57:05 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Phil Elwell <phil@raspberrypi.com>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] net: phy: microchip: add downshift tunable support
- for LAN88xx
-In-Reply-To: <ea58ad33-ac25-4907-8fa5-167479070b97@lunn.ch>
-References: <20260329224202.500229-1-nb@tipi-net.de>
- <20260329224202.500229-2-nb@tipi-net.de>
- <ea58ad33-ac25-4907-8fa5-167479070b97@lunn.ch>
-Message-ID: <8e80433fe878322b8c31fc30fe89e85a@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="FrMZQnoAwEPKyjGO"
+Content-Disposition: inline
+X-Spamd-Result: default: False [-4.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	URIBL_MULTI_FAIL(0.00)[sto.lore.kernel.org:server fail,tipi-net.de:server fail];
-	TAGGED_FROM(0.00)[bounces-273240-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_CC(0.00)[vger.kernel.org,raspberrypi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273241-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_ALL(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2FAA935D698
+	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sirena.org.uk:mid]
+X-Rspamd-Queue-Id: 015BA35DB43
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 30.3.2026 15:01, Andrew Lunn wrote:
->> +	switch (val & LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_MASK) {
->> +	case LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_2:
->> +		*data = 2;
->> +		break;
->> +	case LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_3:
->> +		*data = 3;
->> +		break;
->> +	case LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_4:
->> +		*data = 4;
->> +		break;
->> +	case LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_5:
->> +		*data = 5;
->> +		break;
->> +	}
-> 
->> +#define  LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_2	(0 << 2)
->> +#define  LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_3	(1 << 2)
->> +#define  LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_4	(2 << 2)
->> +#define  LAN78XX_PHY_CTRL3_DOWNSHIFT_CTRL_5	(3 << 2)
-> 
-> It looks like you can replace the switch statement with a FIELD_GET() + 
-> 2.
-> 
 
-Thanks for the review, Andrew! I will incorporate both changes and send 
-a v2.
+--FrMZQnoAwEPKyjGO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Nicolai
+Hi all,
 
->     Andrew
-> 
-> ---
-> pw-bot: cr
+Today's linux-next merge of the net-next tree got a conflict in:
+
+  drivers/infiniband/sw/rxe/rxe_net.c
+
+between commit:
+
+  d0ee939f7703f ("RDMA/rxe: Support RDMA link creation and destruction per =
+net namespace")
+
+=66rom the net-next tree and commit:
+
+  29ae61b2fe7ee ("drivers: net: drop ipv6_stub usage and use direct functio=
+n calls")
+
+=66rom the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+diff --cc drivers/infiniband/sw/rxe/rxe_net.c
+index 211bd3000acc8,cbc646a300035..0000000000000
+--- a/drivers/infiniband/sw/rxe/rxe_net.c
++++ b/drivers/infiniband/sw/rxe/rxe_net.c
+@@@ -141,9 -138,9 +141,9 @@@ static struct dst_entry *rxe_find_route
+  	memcpy(&fl6.daddr, daddr, sizeof(*daddr));
+  	fl6.flowi6_proto =3D IPPROTO_UDP;
+ =20
+- 	ndst =3D ipv6_stub->ipv6_dst_lookup_flow(net,
+- 					       rxe_ns_pernet_sk6(net), &fl6,
+- 					       NULL);
+ -	ndst =3D ip6_dst_lookup_flow(sock_net(recv_sockets.sk6->sk),
+ -				   recv_sockets.sk6->sk, &fl6,
+++	ndst =3D ip6_dst_lookup_flow(net, rxe_ns_pernet_sk6(net),
+++				   &fl6,
++ 				   NULL);
+  	if (IS_ERR(ndst)) {
+  		rxe_dbg_qp(qp, "no route to %pI6\n", daddr);
+  		return NULL;
+
+--FrMZQnoAwEPKyjGO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnKkJQACgkQJNaLcl1U
+h9DQcgf+MXCNcc0mickFgqMmi3/3U81RQa83wuNY5dQK2gPGJX1lcL2YBhypsM/I
+py70wScnTRSv5X82JE1OEX3+Ur8YqtwDXH9FALNL01s1cb5ABAJn+YshZGSyajj5
++zoby7uZu+FMGalmhAdMbhUzlWdtPMtGRB1Oyqs/aPno/OaRf6+z3Fx2tV2I4pIa
+4Zt+l7yHXV63Eupr/vQgaSNzFiJ93w1MfRCdOxzoY2/KJHW+o0uw6l+DwcKUirMJ
+77CO5oP4zcbc2plr2o7GlS/4WSZyJUuJtB9wYZQGUwm1Twng1TF1fEjfzfF6AJK6
+KYw9BZIzYIDieGvmMC+8j4ViLgrxHQ==
+=MH3J
+-----END PGP SIGNATURE-----
+
+--FrMZQnoAwEPKyjGO--
 
