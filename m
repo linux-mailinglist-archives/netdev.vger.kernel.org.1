@@ -1,211 +1,177 @@
-Return-Path: <netdev+bounces-273237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273238-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aKGCAEuTymnF+AUAu9opvQ
-	(envelope-from <netdev+bounces-273237-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 17:14:19 +0200
+	id WOemMoGPymlC+AUAu9opvQ
+	(envelope-from <netdev+bounces-273238-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 16:58:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5958A35D985
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 17:14:18 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F05135D4C7
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 16:58:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A138631C9AA1
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:49:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B3C5D306EED5
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD63F3290D0;
-	Mon, 30 Mar 2026 14:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F0A3264E9;
+	Mon, 30 Mar 2026 14:49:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RgiRnALT"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="aKgXXmpd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9913E325705;
-	Mon, 30 Mar 2026 14:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF997324B31
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 14:49:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774882156; cv=none; b=TaVSEcF/i5FXHUFRTvUekriCcLwIXKZjEhoFhb8qmbiGlI8UKaWz1XvxTABvIian5Ic4JJBlNBrcVYsyuLK2VzLzULxSoO2cUpiwekR9vxRaXCrpIac6mzg0Hig9LEcgE/83jdg5hnlKBLd0Rknj3rrqndazp6FEN+IhvGCrpgY=
+	t=1774882169; cv=none; b=hXaLCfOf0HdzGMCT/rQlhfyOmlBy1GkExpbs+b/WjLZmqTFAUaEqjCp4YZ+OVpQ1uSzkAfJpG9hXNXdoY5NVCOkn7QDOED82Ruk7rplyqmXYC4v8QswohPsVSgSez5keDq2C97G8wEMcw2pCDbeZrye0RoUhYgKj6Pg7xVLNMAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774882156; c=relaxed/simple;
-	bh=3cONE+LFIH/FbcqX/y0erjfAaQNcJqC0RRgU27mScQ8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Ni9xG++T7Fm9Wzk9wUXQEoto5cVwGJJndLZfWfV0tIvVm6diXNnmb5JYJUH6RmO9OPIl5uqvauw9dJOTJDaHWWVWSn72gWTmR+/WXzUi02mnbyXDlILHqiJyK/kftGM6QqntybnedRoYNuLJ3NqEcA8Mq5Dltm/keO6zRyKKqiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RgiRnALT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEB2FC4CEF7;
-	Mon, 30 Mar 2026 14:49:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774882156;
-	bh=3cONE+LFIH/FbcqX/y0erjfAaQNcJqC0RRgU27mScQ8=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=RgiRnALTx9mr4pHLizIfD10hLznOmoI56YTpqzpieXAoLQFyb0xWILrRYjTwsM+wQ
-	 IbNF5TzjWMOybaLNjiUKtYHlKHQmKffX7rhH7sudtfl947+nqJlXmjtjEJ+UuT0MJ4
-	 FTctKKBMnl+3z/0FW2zgyhue0i17phr/kwrag6Bc6C5b6hoqsl+ZDeDY6OwJTi1WLF
-	 52KPYd0GzTfjHQaTNIoF9YCsK0NAyiBCEKSLBC2Fp7hSJEjvl5sVvkXyABfU8u4VDw
-	 sEGKtFQWou4UE36KvtELP06Rjg+GpYnGyubQIGWfbKpn/K3zSx3AbSxzCpFCYQLj6v
-	 MC9rtdCKdhO4A==
-Message-ID: <aacc794e20096cf9b3bfca9ce4d2f43698742a1d.camel@kernel.org>
-Subject: Re: [PATCH v2 10/13] nfsd: add netlink upcall for the svc_export
- cache
-From: Jeff Layton <jlayton@kernel.org>
-To: Chuck Lever <cel@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, 
- NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, Dai
- Ngo <Dai.Ngo@oracle.com>,  Tom Talpey <tom@talpey.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub Kicinski	
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman	
- <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>
-Cc: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Date: Mon, 30 Mar 2026 10:49:12 -0400
-In-Reply-To: <30ff0483-ec38-40b3-811b-6cd66febe1b1@app.fastmail.com>
-References: <20260325-exportd-netlink-v2-0-067df016ea95@kernel.org>
-	 <20260325-exportd-netlink-v2-10-067df016ea95@kernel.org>
-	 <30ff0483-ec38-40b3-811b-6cd66febe1b1@app.fastmail.com>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+	s=arc-20240116; t=1774882169; c=relaxed/simple;
+	bh=z0T1XJu8Unvxzqpx9fqCDccZQn33T8hhs6JtyW6uAhs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=l4iQ6au7fcIbY+gX0hMxJtn08z2xMaVT7pVIi91PxF0oKO/PrrJzJk00rxr6WSENXts2TDsGh3rVao7uVhzdKAJOAliskIjnDkmK0TKtLRvMqZTimdsp+Z3OYiNGLpDr0pRMl+TW5NQ73LccH59LRv8SrcIIoxujciOUZBhrbsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=aKgXXmpd; arc=none smtp.client-ip=74.125.82.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-128e4d0cc48so5437304c88.1
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 07:49:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1774882167; x=1775486967; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9kX6VYdvkK3WSV5D/nj33iayP7yFolCU3O0urfzHGZg=;
+        b=aKgXXmpdhbWr9rnQWOdbysT9lgxRTLqT/XkczBntyeKBHuiB2q14J7EEXoc+2cJoWv
+         ettb3670BSjvENcvhBHK1XMDOmh2PyMuNIXdSPuEOBDQQFWStf8/+jbcB86gE57d/Ltw
+         FaMblQVQAnxNOyga83xEIOEOgFL2O7v6i7HtEwDMYm0w+pZGEqT+zx/rNLlI3aZAS995
+         +OzFyVlRynRw+pbn3OAgGRz9ny3Xd6LZwQztcFVOQlJuqP7Om07TTuxJjMCeYUabU+G4
+         NALckN4RR1l90x0kU4gEngbk991dU8B597Sz2KuZbn5M4yd5/BhCX2MgYLe/a/5F+RVV
+         mQZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774882167; x=1775486967;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9kX6VYdvkK3WSV5D/nj33iayP7yFolCU3O0urfzHGZg=;
+        b=MkqP15YG5u7LIJMVXQ1FZolgqv8wzbP9BpllYruezJ79/nvL0+0YLuis/FbXlZxF6h
+         EtK8ArfSos27aU6jI85DP4M89A3N160t1YQGcmv/9REaRr20HI3CcAPXE1QArJbcbgTb
+         7xATNyDjDeDkg0rz7Q6QENZtooi9HD0apQ5v0c02v10Kl2HXeIoL4lhdzWfI46siXvBq
+         j6VFzJY4nn5jVG3+eGaB1kav1yj6561+E5ikHj8bbvAOvYH7EwOrTnWHjrfHQ3r2/dpl
+         vAJvm5M0SjrE1KS2Xw3JH3Dy5iWUIUrQV+fVw+LzwdEvyhsR7hL4FQDDixpL/kYJUqGU
+         KFXw==
+X-Gm-Message-State: AOJu0Yz00VWwuBO0uFAZ6T4a4sZAVmLkBqF4RTxq8YIkVm4tAGgAZ7zS
+	MAQE4foEN30EFldhIu/TlcxsnCAeBXmcNMOzZB8gJxnXv9kmT3jblSZ976ju5VBVjKY=
+X-Gm-Gg: ATEYQzxtCow6GQw5VNFiXlnnHsQ2XS45um0yLYq9kL2BIutr9E3E10T9N3FXCvtk3B+
+	WqNXpJ2Q/vKkTLMISXwTFO/fEShoA418F2BW2ZszPbGjVxcug+hhjvxaRvzM+KEkSgg5saM6QKr
+	lPxKxxollIoVV0Og13ujMmZep1Sh0UXS5GJ3GfVBmoEkTv5HmTXUfCjYMWN27H0L17qXO8J+ns8
+	JV5JnEoB1z/oTvg9DOjupt65Vs6/1MVEFLzkuMWZMQsUlDXXRkKAfNIN4Vhc/9D8n2/CQNI7xGJ
+	yBM0uCaN9a0avgkt8hKMLo1OPqR9PbhGEMn7/9RmrGpCukFU7k4c/qhKXiVft57S0zdc0cuBu9C
+	E53Gkz2Nw7Qm3b7BsPUopmO9Zb9aLe8HTWZnUIHL/w8IjniwUvE53ZtfLfBO7dv9brqcbnkKPaQ
+	r+4OeZ93wH6DJiP9gGIluDlprvSBlp8cj/XN8=
+X-Received: by 2002:a05:7022:698a:b0:128:cc63:82f0 with SMTP id a92af1059eb24-12ab28cb76cmr6908852c88.25.1774882166723;
+        Mon, 30 Mar 2026 07:49:26 -0700 (PDT)
+Received: from phoenix.local ([104.202.29.139])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12ab97efb42sm11502593c88.7.2026.03.30.07.49.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 07:49:26 -0700 (PDT)
+Date: Mon, 30 Mar 2026 07:49:23 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 0/6] net/sched: netem: cleanups and
+ improvements
+Message-ID: <20260330074923.6f4795f4@phoenix.local>
+In-Reply-To: <4400db54-aaf0-4cc4-98b5-bdee35e29cce@redhat.com>
+References: <20260328182704.456993-1-stephen@networkplumber.org>
+	<4400db54-aaf0-4cc4-98b5-bdee35e29cce@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-1.56 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273237-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[kernel.org,oracle.com,brown.name,redhat.com,talpey.com,davemloft.net,google.com,gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-273238-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWO(0.00)[2];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jlayton@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5958A35D985
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,networkplumber-org.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 6F05135D4C7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 2026-03-30 at 10:22 -0400, Chuck Lever wrote:
-> >=20
-> > +  -
-> > +    name: svc-export-req
-> > +    attributes:
-> > +      -
-> > +        name: seqno
-> > +        type: u64
-> > +      -
-> > +        name: client
-> > +        type: string
-> > +      -
-> > +        name: path
-> > +        type: string
->=20
-> Is the svc-export-req attribute set used for anything?
->=20
->=20
+On Mon, 30 Mar 2026 10:16:21 +0200
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-No, good catch.
+> On 3/28/26 7:26 PM, Stephen Hemminger wrote:
+> > Cleanup and improvement patches for netem, done as follow-on
+> > to the bug fix series found during AI-assisted review.
+> > 
+> > - replace pr_info() with netlink extack error reporting
+> > - validate slot min/max delay range on configuration
+> > - fix slot delay calculation overflow for large ranges
+> > - remove unused loss model struct fields
+> > - remove stale VERSION string
+> > - add per-impairment extended statistics (delayed, dropped,
+> >   corrupted, duplicated, reordered, ecn_marked)
+> > 
+> > The xstats patch requires a corresponding iproute2 change
+> > to display the new counters in tc -s qdisc show. This will go
+> > as separate patch after this.
+> > 
+> > Stephen Hemminger (6):
+> >   net/sched: netem: replace pr_info with netlink extack error messages
+> >   net/sched: netem: check for invalid slot range
+> >   net/sched: netem: fix slot delay calculation overflow
+> >   net/sched: netem: remove unused loss model fields
+> >   net/sched: netem: remove useless VERSION
+> >   net/sched: netem: add per-impairment extended statistics
+> > 
+> >  include/uapi/linux/pkt_sched.h |   9 +++
+> >  net/sched/sch_netem.c          | 120 ++++++++++++++++++++++-----------
+> >  2 files changed, 89 insertions(+), 40 deletions(-)  
+> 
+> I wild guess this is causing TDC failures:
+> 
+> # not ok 364 8c17 - Test netem's recursive duplicate
+> # Value doesn't match: bytes: 294 != 196
+> # Matching against output: {'kind': 'netem', 'handle': '1:', 'root':
+> True, 'refcnt': 2, 'options': {'limit': 1, 'duplicate': {'duplicate': 1,
+> 'correlation': 0}, 'seed': 6495514880116664183, 'ecn': False, 'gap': 0},
+> 'bytes': 196, 'packets': 2, 'drops': 1, 'overlimits': 0, 'requeues': 0,
+> 'backlog': 0, 'qlen': 0}
+> 
+> Possibly patch 6/6 needs to update the expected netem output accordingly?!?
+> 
+> Also there are a is a checkpatch issue on patch 2/6 (empty line between
+> fixes tag and SoB). Tentatively set this revision to 'changes requested'.
+> 
+> /P
+> 
 
-That's a holdover from an earlier version that had a separate attribute
-set for the up and downcalls. It's not needed in the latest version.
-
-It should be fine to remove it and regenerate the headers. The result
-builds fine without it. I've pushed a fixed patch to the 'exportd-nl'
-branch in my tree. You can fix it up or I can resend if you prefer.
-
-Thanks,
---=20
-Jeff Layton <jlayton@kernel.org>
+The other patches from Jamal should go in that fix the duplicate loop
+stuff.
 
