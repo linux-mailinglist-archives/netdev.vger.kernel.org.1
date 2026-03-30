@@ -1,262 +1,262 @@
-Return-Path: <netdev+bounces-273138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273140-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EPWzFAVgymn27gUAu9opvQ
-	(envelope-from <netdev+bounces-273138-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:35:33 +0200
+	id wNcPCNpiymn27gUAu9opvQ
+	(envelope-from <netdev+bounces-273140-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:47:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B79DA35A59B
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:35:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BECE35A826
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:47:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ECB4D3006471
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:35:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 063BC3021985
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:44:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025313BED32;
-	Mon, 30 Mar 2026 11:35:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3473E3C9420;
+	Mon, 30 Mar 2026 11:44:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HhqU71P0"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YYmjw9F/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90EFC3BD65B
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 11:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD1C3C8708;
+	Mon, 30 Mar 2026 11:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774870530; cv=none; b=UhO2LH6gm/HkaNUYJaMvKkuWWwbAMB6b+A33aS9z+bhQfkEQfwvqV6hfQ9pJ6zSSzsDzMb/ReCblRsSX5qrCoEgnBtYAXCygPxO9FAP68/oJn0FnAHDk+tyPU3SxJ4VXFrAr/jfGKO2JZWF+JVEnno/CGX13uDNT0VjuQmtCW5o=
+	t=1774871091; cv=none; b=GKWWXVHG5OrWaZwDnpk3yC0h5deRQShucOyNbz2Q77p5zsBpjo6EDF2F9KXP0bV5ipN7OCFTvRCWwkQFv6EBvhzAz9CJ/D/K6UC42dYKa/DPS8C/bhL10X5OuSrRzEsRlCnUClO261TWzAyLz36pu8Io+VJvyo4FsM0n5Mue5BE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774870530; c=relaxed/simple;
-	bh=s0GYGHG3bHHnLSUpuw3XwU4YANaEchmaJvsIJazD/8g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QKAFV5XibIHIS8Z5FAzPNKchplP3lZFb/yqQhpS06iojFLeMPnPeZrniOSzfUfVJMnRf9fqGfCWZPh924bPk4gFYWV5efivmNsRhp//ICxjClQqw69ihjY8eoj9AQ4KxzcV7Tp9ceo4sAbo6YeDsXlBX5DM91+MD0AGe+PriaFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HhqU71P0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774870528;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=FiZviYo8L2f9R9HpzuBCyEjwLeRZJHeIjS+87uHF2Oc=;
-	b=HhqU71P03dSYseWStW1VMndlYNKtpnoxL58xrGfvw/8Bs+1rIqcxNS3Ur6XvGc9L1NJaa3
-	2ox/it8XKMdBjdtcoQyVNZCDKj7bt0vhr4Saod7P2xHwdtHdm/EQkr7Wy2Es/idLP6mUwN
-	Ceg8h1kqil88fusH8GEiCDbvXmJMWlw=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-128-oMNhOeO0MPygyrTPLK-6HQ-1; Mon,
- 30 Mar 2026 07:35:23 -0400
-X-MC-Unique: oMNhOeO0MPygyrTPLK-6HQ-1
-X-Mimecast-MFC-AGG-ID: oMNhOeO0MPygyrTPLK-6HQ_1774870521
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5EDEC19560B1;
-	Mon, 30 Mar 2026 11:35:20 +0000 (UTC)
-Received: from yiche-laptop.redhat.com (unknown [10.72.112.165])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 627951955D84;
-	Mon, 30 Mar 2026 11:35:12 +0000 (UTC)
-From: Yi Chen <yiche@redhat.com>
-To: Chen Yi <yiche@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	Long Xin <lxin@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: coreteam@netfilter.org,
-	netfilter-devel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] selftests: netfilter: conntrack_sctp_collision.sh: Introduce SCTP INIT collision test
-Date: Mon, 30 Mar 2026 19:35:09 +0800
-Message-ID: <20260330113509.23990-1-yiche@redhat.com>
+	s=arc-20240116; t=1774871091; c=relaxed/simple;
+	bh=+vNFMjBw+BlWXkXKp5/4ZPOOzvowJH1kwHTM8x5kX+g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KMZ8Hdz1n094v/kwCSXESOAKJkrCFr22REzA+YQ6R0z49z0GCTOMsFDwMXHVhsJhJiKPYlrMXWwALIb+tQucaWjvXuiSfV8tVCXnWglsPFb8dPw0jhkmOWlJojdKKTXzWRcxbUg4QvluPD8o2ITKYGkQGP2H28reuOhxFnFFyCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YYmjw9F/; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62TFkTaS3661208;
+	Mon, 30 Mar 2026 11:44:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=wCNCpVtkWBSkchpYjTadWOMtt6ARsf5cI42FipovX
+	pQ=; b=YYmjw9F/vGbgXci4qOucFSAZbrSp2UiOiMKh4As7EjqIGlByhQyCsvIfu
+	4E/9GdEAJ9RaHyjMy+UKFxivtDheS4ZyD0u30diZt1cLXXdCAftOZFrmw/ISGYpx
+	EsUuN4QKQfnhKA/BkL9WtY1+jrXMYzckJnyLDc6tnHwOdu03VkFp/PLc1DPFoo3F
+	bnjwVeJ/hJOwsjOvNTO0MnlEWAx0aMUWIcRZ9E+gKaWZeIEmimQVnmrOKlz0Zh+g
+	edbzijNoERBWXKhy4jEmJVFgvz0oPb3a9gYe5WUDCLSWu/rao4eHTaR2uOKKmbDd
+	euEoiyueWeRuNqc6PQaCqPN3ps3dA==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4d64dgeepy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Mar 2026 11:44:41 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 62U9UFoO005977;
+	Mon, 30 Mar 2026 11:44:40 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4d6spxvryx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Mar 2026 11:44:40 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 62UBia4I17105218
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 30 Mar 2026 11:44:37 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CF35920043;
+	Mon, 30 Mar 2026 11:44:36 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8E16920040;
+	Mon, 30 Mar 2026 11:44:36 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Mon, 30 Mar 2026 11:44:36 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
+	id 6CA64E083A; Mon, 30 Mar 2026 13:44:36 +0200 (CEST)
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Aswin Karuvally <aswin@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>,
+        Nagamani PV <nagamani@linux.ibm.com>
+Subject: [PATCH net-next] net/iucv: Add missing kernel-doc return value descriptions
+Date: Mon, 30 Mar 2026 13:44:36 +0200
+Message-ID: <20260330114436.2010108-1-wintera@linux.ibm.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzMwMDA4OSBTYWx0ZWRfX9/yYC1bEQD1t
+ QzCCLfRIay3Uy47HFNRdwcXjyU1eNl+IkizLV9f7Dd0ccDEDSfPmJlwW6SuGFLib68H2bv0pYF3
+ V4xmEFtY23zSEOA3I3RFgzYSATdRAA0XwFetuWso6YARzTT/Kz3G52uRinjdIYELg6ydlDZqIQU
+ tIxTcOQ9PR2dGydsXWS2qtLh6M8PA2dr8qM+lR9f7CMiW9w2W+o8SELpcmvRJgu8g+2OHEwWtsN
+ D0W+pRI2CUxRpfpU7+hpgpOL92JhAQAo3YPg/+cqRaU3aYeNOYd3IZDIKZYfBet+hF3NUeyLOwf
+ hbfaVvi/9JeBXTnoFm0PwfMCeiYvxS4tiXVcg9gCElP5zvoa3RK3pAzgZGN17MvlNpiGLks/omv
+ hc8w73eQ4EHnL6+WIQkxcaDEosOl0CKl+WU+8SabRzIyI2dF1g7vuy1VgnwXcTNSBgDAA6/R6wG
+ dqRMzbUTBKClscfDnHg==
+X-Authority-Analysis: v=2.4 cv=QKZlhwLL c=1 sm=1 tr=0 ts=69ca6229 cx=c_pps
+ a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
+ a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
+ a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8 a=hiOhG4pdgJk7uAqAlJ4A:9
+X-Proofpoint-GUID: zAH9kKw55int6JhHooHDSWnU2COFV92V
+X-Proofpoint-ORIG-GUID: I-z35pEHXLzFInofZempiY0Wn7N1vbMz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-29_05,2026-03-28_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 phishscore=0 adultscore=0 impostorscore=0 clxscore=1015
+ spamscore=0 bulkscore=0 priorityscore=1501 suspectscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603300089
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
+	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273138-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[yiche@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273140-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wintera@linux.ibm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ibm.com:+];
+	RCVD_COUNT_TWELVE(0.00)[12];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B79DA35A59B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8BECE35A826
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The existing test covered a scenario where a delayed INIT_ACK chunk
-updates the vtag in conntrack after the association has already been
-established.
+From: Nagamani PV <nagamani@linux.ibm.com>
 
-A similar issue can occur with a delayed SCTP INIT chunk.
+Add missing return value descriptions for several functions in
+net/iucv/af_iucv.c and net/iucv/iucv.c to address kernel-doc warnings.
 
-Add a new simultaneous-open test case where the client's INIT is
-delayed, allowing conntrack to establish the association based on
-the server-initiated handshake.
+Warnings detected with:
+scripts/kernel-doc -none -Wall net/iucv/*
+Warning: net/iucv/af_iucv.c:131 No description found for return value of =
+'iucv_msg_length'
+Warning: net/iucv/af_iucv.c:150 No description found for return value of =
+'iucv_sock_in_state'
+...
 
-When the stale INIT arrives later, it may overwirte the vtag in
-conntrack, causing subsequent SCTP DATA chunks to be considered
-as invalid and then dropped by nft rules matching on ct state invalid.
+No functional change.
 
-This test verifies such stale INIT chunks do not corrupt conntrack
-state.
-
-Signed-off-by: Yi Chen <yiche@redhat.com>
+Reviewed-by: Aswin Karuvally <aswin@linux.ibm.com>
+Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+Signed-off-by: Nagamani PV <nagamani@linux.ibm.com>
+Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
 ---
- .../net/netfilter/conntrack_sctp_collision.sh | 84 ++++++++++++++-----
- 1 file changed, 65 insertions(+), 19 deletions(-)
+ net/iucv/af_iucv.c | 12 +++++++-----
+ net/iucv/iucv.c    |  6 ++++++
+ 2 files changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/net/netfilter/conntrack_sctp_collision.sh b/tools/testing/selftests/net/netfilter/conntrack_sctp_collision.sh
-index d860f7d9744b..7f8f1b6b746a 100755
---- a/tools/testing/selftests/net/netfilter/conntrack_sctp_collision.sh
-+++ b/tools/testing/selftests/net/netfilter/conntrack_sctp_collision.sh
-@@ -23,8 +23,19 @@ SERVER_PORT=1234
- CLIENT_GW="198.51.200.2"
- SERVER_GW="198.51.100.2"
- 
-+assert_pass()
-+{
-+	local ret=$?
-+	if [ $ret != 0 ]; then
-+		echo "FAIL: ${@}"
-+		exit $ksft_fail
-+	else
-+		echo "PASS: ${@}"
-+	fi
-+}
-+
- # setup the topo
--setup() {
-+topo_setup() {
- 	setup_ns CLIENT_NS SERVER_NS ROUTER_NS
- 	ip -n "$SERVER_NS" link add link0 type veth peer name link1 netns "$ROUTER_NS"
- 	ip -n "$CLIENT_NS" link add link3 type veth peer name link2 netns "$ROUTER_NS"
-@@ -42,21 +53,51 @@ setup() {
- 	ip -n "$CLIENT_NS" link set link3 up
- 	ip -n "$CLIENT_NS" addr add $CLIENT_IP/24 dev link3
- 	ip -n "$CLIENT_NS" route add $SERVER_IP dev link3 via $CLIENT_GW
-+}
- 
--	# simulate the delay on OVS upcall by setting up a delay for INIT_ACK with
--	# tc on $SERVER_NS side
--	tc -n "$SERVER_NS" qdisc add dev link0 root handle 1: htb r2q 64
--	tc -n "$SERVER_NS" class add dev link0 parent 1: classid 1:1 htb rate 100mbit
--	tc -n "$SERVER_NS" filter add dev link0 parent 1: protocol ip u32 match ip protocol 132 \
--		0xff match u8 2 0xff at 32 flowid 1:1
--	if ! tc -n "$SERVER_NS" qdisc add dev link0 parent 1:1 handle 10: netem delay 1200ms; then
--		echo "SKIP: Cannot add netem qdisc"
--		exit $ksft_skip
--	fi
-+conf_delay()
-+{
-+	# simulate the delay on OVS upcall by setting up a delay for INIT_ACK/INIT with
-+	case $1 in
-+	"INIT") chunk_type=1
-+		# tc on $CLIENT_NS side
-+		tc -n "$CLIENT_NS" qdisc add dev link3 root handle 1: htb r2q 64
-+		tc -n "$CLIENT_NS" class add dev link3 parent 1: classid 1:1 htb rate 100mbit
-+		tc -n "$CLIENT_NS" filter add dev link3 parent 1: protocol ip \
-+			u32 match ip protocol 132 0xff match u8 $chunk_type 0xff at 32 flowid 1:1
-+		if ! tc -n "$CLIENT_NS" qdisc add dev link3 parent 1:1 handle 10: \
-+			netem delay 1200ms; then
-+			echo "SKIP: Cannot add netem qdisc"
-+			exit $ksft_skip
-+		fi
-+		;;
-+	"INIT_ACK") chunk_type=2
-+		# tc on $SERVER_NS side
-+		tc -n "$SERVER_NS" qdisc add dev link0 root handle 1: htb r2q 64
-+		tc -n "$SERVER_NS" class add dev link0 parent 1: classid 1:1 htb rate 100mbit
-+		tc -n "$SERVER_NS" filter add dev link0 parent 1: protocol ip \
-+			u32 match ip protocol 132 0xff match u8 $chunk_type 0xff at 32 flowid 1:1
-+		if ! tc -n "$SERVER_NS" qdisc add dev link0 parent 1:1 handle 10: \
-+			netem delay 1200ms; then
-+			echo "SKIP: Cannot add netem qdisc"
-+			exit $ksft_skip
-+		fi
-+		;;
-+	esac
- 
- 	# simulate the ctstate check on OVS nf_conntrack
--	ip net exec "$ROUTER_NS" iptables -A FORWARD -m state --state INVALID,UNTRACKED -j DROP
--	ip net exec "$ROUTER_NS" iptables -A INPUT -p sctp -j DROP
-+	ip net exec "$ROUTER_NS" nft -f - <<-EOF
-+	table ip t {
-+	        chain forward {
-+	                type filter hook forward priority filter; policy accept;
-+	                meta l4proto { icmp, icmpv6 } accept
-+	                ct state new counter accept
-+	                ct state established,related counter accept
-+	                ct state invalid log flags all counter drop
-+	                counter
-+	        }
-+	}
-+	EOF
- 
- 	# use a smaller number for assoc's max_retrans to reproduce the issue
- 	modprobe -q sctp
-@@ -64,8 +105,6 @@ setup() {
- }
- 
- cleanup() {
--	ip net exec "$CLIENT_NS" pkill sctp_collision >/dev/null 2>&1
--	ip net exec "$SERVER_NS" pkill sctp_collision >/dev/null 2>&1
- 	cleanup_all_ns
- }
- 
-@@ -81,7 +120,14 @@ do_test() {
- 
- # run the test case
- trap cleanup EXIT
--setup && \
--echo "Test for SCTP Collision in nf_conntrack:" && \
--do_test && echo "PASS!"
--exit $?
-+
-+echo "Test for SCTP INIT_ACK Collision in nf_conntrack:"
-+topo_setup && conf_delay INIT_ACK
-+do_test
-+assert_pass "The delayed INIT_ACK chunk did not disrupt sctp ct tracking."
-+
-+echo "Test for SCTP INIT Collision in nf_conntrack:"
-+
-+topo_setup && conf_delay INIT
-+do_test
-+assert_pass "The delayed INIT chunk did not disrupt sctp ct tracking."
--- 
-2.53.0
+diff --git a/net/iucv/af_iucv.c b/net/iucv/af_iucv.c
+index 6554d2cffc19..72dfccd4e3d5 100644
+--- a/net/iucv/af_iucv.c
++++ b/net/iucv/af_iucv.c
+@@ -127,6 +127,8 @@ static inline void low_nmcpy(unsigned char *dst, char=
+ *src)
+  * if the socket data len is > 7, the function returns 8.
+  *
+  * Use this function to allocate socket buffers to store iucv message da=
+ta.
++ *
++ * Returns: Length of the IUCV message.
+  */
+ static inline size_t iucv_msg_length(struct iucv_message *msg)
+ {
+@@ -145,7 +147,7 @@ static inline size_t iucv_msg_length(struct iucv_mess=
+age *msg)
+  * @state:	first iucv sk state
+  * @state2:	second iucv sk state
+  *
+- * Returns true if the socket in either in the first or second state.
++ * Returns: true if the socket is either in the first or second state.
+  */
+ static int iucv_sock_in_state(struct sock *sk, int state, int state2)
+ {
+@@ -156,9 +158,9 @@ static int iucv_sock_in_state(struct sock *sk, int st=
+ate, int state2)
+  * iucv_below_msglim() - function to check if messages can be sent
+  * @sk:		sock structure
+  *
+- * Returns true if the send queue length is lower than the message limit=
+.
+- * Always returns true if the socket is not connected (no iucv path for
+- * checking the message limit).
++ * Returns: true, if either the socket is not connected (no iucv path fo=
+r
++ * checking the message limit) or if the send queue length is lower
++ * than the message limit.
+  */
+ static inline int iucv_below_msglim(struct sock *sk)
+ {
+@@ -883,7 +885,7 @@ static int iucv_sock_getname(struct socket *sock, str=
+uct sockaddr *addr,
+  * list and the socket data len at index 7 (last byte).
+  * See also iucv_msg_length().
+  *
+- * Returns the error code from the iucv_message_send() call.
++ * Returns: the return code from the iucv_message_send() call.
+  */
+ static int iucv_send_iprm(struct iucv_path *path, struct iucv_message *m=
+sg,
+ 			  struct sk_buff *skb)
+diff --git a/net/iucv/iucv.c b/net/iucv/iucv.c
+index 6641c49b09ac..e03bc4a74f67 100644
+--- a/net/iucv/iucv.c
++++ b/net/iucv/iucv.c
+@@ -687,6 +687,8 @@ static int iucv_cpu_down_prep(unsigned int cpu)
+  *
+  * @pathid: path identification number.
+  * @userdata: 16-bytes of user data.
++ *
++ * Returns: 0 on success, the result of the CP b2f0 IUCV call.
+  */
+ static int iucv_sever_pathid(u16 pathid, u8 *userdata)
+ {
+@@ -1092,6 +1094,8 @@ EXPORT_SYMBOL(iucv_message_purge);
+  *
+  * Internal function used by iucv_message_receive and __iucv_message_rec=
+eive
+  * to receive RMDATA data stored in struct iucv_message.
++ *
++ * Returns: 0
+  */
+ static int iucv_message_receive_iprmdata(struct iucv_path *path,
+ 					 struct iucv_message *msg,
+@@ -1852,6 +1856,8 @@ static enum cpuhp_state iucv_online;
+=20
+ /**
+  * iucv_init - Allocates and initializes various data structures.
++ *
++ * Returns: 0 on success, return code on failure.
+  */
+ static int __init iucv_init(void)
+ {
+--=20
+2.51.0
 
 
