@@ -1,227 +1,346 @@
-Return-Path: <netdev+bounces-273098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273099-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kE3UByk0ymk66QUAu9opvQ
-	(envelope-from <netdev+bounces-273098-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 10:28:25 +0200
+	id YNeDA7o1ymnn6QUAu9opvQ
+	(envelope-from <netdev+bounces-273099-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 10:35:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7928B35721A
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 10:28:24 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60E5C3573CA
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 10:35:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B39A3300BC94
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 08:19:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DD589305748A
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 08:28:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603EF3A5458;
-	Mon, 30 Mar 2026 08:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891873AC0D4;
+	Mon, 30 Mar 2026 08:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="L1RmPXDm"
+	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="Faml5W2T"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011028.outbound.protection.outlook.com [40.107.130.28])
+Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F141637FF4B;
-	Mon, 30 Mar 2026 08:19:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.28
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774858796; cv=fail; b=ZVArfyd52TOxgnhND8jzuPF5xXKAUVw2bBlJTm+tWtQ3DuOELXr9b3QUF+jMW9CS/MLMFifV2LmxnCZpk1JuJWVi7Fb6xgVqPK2ilbTEqTB8pHvhE7NhMHDuqxheKfMeOfCC6wknZjWqh4e4xcWQsyLRoNtE40MpmE1A8n6rB5Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774858796; c=relaxed/simple;
-	bh=BV5xTqwsrDlP4rhIIbXZ395J296/lMlT/AMpW8q/yl4=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=EPqpNFtmgGqWDaiIoOXwF0AZYxhx0aHypKFA+DP1EYrXVypEuUuB17RhMmzp1yyoS/cAhSPZZyZ2M3vcu5oM7ia+Lj3MEfJ/B9BDBGExPf1XKfqtRcn4OE9Cfdmb7XV7gX5BQjKCJGBzcGY6GMcFiRdFp64wfdrNUt6/l/vUE8g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=L1RmPXDm; arc=fail smtp.client-ip=40.107.130.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rozGA1bvq1ny1WivPCFsx8sXpaGO6wNMegrGbJWWIsdRjE6areyVzJwBuA8qtr7ebfnYhnBuOfXg3k4n/vYkx9OjtEbiQ/KqIJ5xqM9UvGcL/uO8m+SquFNIDOmkKVL5pB7p6weGGfXUhAONO3qS5oCwFTn2KH6EhuG0+gbx5gfiIr1tq+fQQpQq3xKuOZGDX/8+ANreO1AF20gHWEJ7bEKPsQVXGVsngxltsJ/ZCRv/EF1J4zxcVwpYjFTaTnhK2+XDM7zslhLJYDwQxAg7OE7f64SlRest8NRIJ4AykzD3pD+xLOvtNM2wZKFFgzip0OEJdL/A0yttp1mTFQihpQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dyWkxMU5zf2TVgwx9DXIHgz2HeG2tegQePYDZOKRrEo=;
- b=m2boFrZpm0/2Np+mOowg/zt8TEetU1iw37f/Ow5o1zbrtNImiVvDkfKBsLpOuwwgRcKnRQv53VNPjKokUS6jKJVCLGMLVnutdedCsFe9HS9s9RvduNR5an0vMuUCLse20eYeo/xMK/8NvwD8KSTu9Wwdp1rNgBG1sYXrxyvDlFxbvXDwL/oIfJdGIAL4La5PPJz20Eina0z2t9VucyHny82P8WpUm37d5/PBlRGlmltyqZK5OCfbR2rOxsnt6YNVmeJWWZUt8xU5I7tu7mOnkajk0hoMjbSELo+b5scSwSR7GxOUmRU7U9X3ocWhXwgtVBcu5PfNd0tIwXn77EO3Fw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dyWkxMU5zf2TVgwx9DXIHgz2HeG2tegQePYDZOKRrEo=;
- b=L1RmPXDmBw/pkczfZJUcFadLH+i+iBFk35HLnjyUWkAM8vVGPdl5NNWPraxVtcYhQPVpI3OSr9UI07ZgNQqQUt2ArCfm3XpeQr9fR5xwwLOJFgqSdEkUXI/3i99Oqe0f8cb7sO2LLNXFDRu/V1Yip+QRTwNVWAOID7NjQlnBGNsXCt1+DOiKRF/dA5F5AEbjOnDd5iwzRfaP+AmHkiisQdOOLIpSeKPSzf2JQ6BGvakuoXIB+h/JnYlV2+8WHMxkpuSvi2F99f2+Lqnlnsh7lrEJTxHxzkrOCSIjaDXthpCxwSJQohnwwkDw4yljb+CSEMLnTQYg6mdgYubOudvn/A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
- by PAXPR04MB8880.eurprd04.prod.outlook.com (2603:10a6:102:20f::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.28; Mon, 30 Mar
- 2026 08:19:51 +0000
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9745.027; Mon, 30 Mar 2026
- 08:19:51 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	netdev@vger.kernel.org,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Wei Fang <wei.fang@nxp.com>,
-	Rahul Sharma <black.hawk@163.com>,
-	linux-kernel@vger.kernel.org,
-	Nathan Chancellor <nathan@kernel.org>
-Subject: [PATCH 6.1] net: enetc: fix PF !of_device_is_available() teardown path
-Date: Mon, 30 Mar 2026 11:19:44 +0300
-Message-ID: <20260330081944.527545-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.43.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BE1P281CA0253.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:8b::12) To AM9PR04MB8585.eurprd04.prod.outlook.com
- (2603:10a6:20b:438::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F94382F10
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 08:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774859303; cv=none; b=VbS5ayG1S8tvXixupEh/eJfuWBrQi2kdqUkZdP+4wiDdn12Mx2AGEFkndQ5ghhCYmebuo7U+mNJD5UtBtFhnN0KL/YwMVwfjmY5Lm3+fmA0ZFAzrF2dad6RndtGpURfqFDbtr/kfreTkU31oIzUBhKgklHAt1t9ANF32LZ3Vwpc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774859303; c=relaxed/simple;
+	bh=bFsWfcJw1jBkpNNHPP2oTiXGqbmq3tIhTEBAYwGTUp4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q5WD80aeA/qT92XZ/DYoIfisEWnJQ2zQBk6grcegUwAmhyyzp5D377GALRu4ZF5I6petM1acggJwJwjyzNOvtPTnTyFFVLIKoZV9wCNb8p3lOpRQGIDNSnB43mptyVUSYBZV8/W9t4bM8Iv0HIzg8ic+ZM6Nztp3+Ypd/piZfXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=Faml5W2T; arc=none smtp.client-ip=178.251.229.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4408610B9D7;
+	Mon, 30 Mar 2026 10:28:15 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
+	s=dkim; t=1774859299;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=ftC+ehjxMSogwNmU6UVKxCk/uQgmyhgeYcFEUdWFBnA=;
+	b=Faml5W2TmKaUScQ8a7ThjEJXqh4H/g6ooPbIBZrRGaJUBan46PKJY/SLBVKGrtc4puGc5Y
+	k5K/MyBqpMlL5rgYKSv4AfJTsBuvpSrMBYLya8/p271eSRCWBnzr3oL5Svi4VA9lqUqbnE
+	5BE0OLlyFToJPUvgnVUNI30TjnGX1OCw9Jqb7OofJutg/e0GCqGHGFRg7tDUjs3N0zjOpD
+	eVspK76BPQn8ZXgoDwbcizNvIFTIq998xj3FGyP3EKTP+HqTN8o8Dra3mvSH4uXSc85sNS
+	mkY4ZqiauGnu6pIL9twY1WT67PHDS0GKjQxx3UzKH+4+D1xRGS8q3c5C2p0Cvw==
+Date: Mon, 30 Mar 2026 10:28:12 +0200
+From: =?UTF-8?B?xYF1a2Fzeg==?= Majewski <lukma@nabladev.com>
+To: "Luka Gejak" <luka.gejak@linux.dev>
+Cc: "Fernando Fernandez Mancera" <fmancera@suse.de>, "Fernando Fernandez
+ Mancera" <ffmancera@riseup.net>, <netdev@vger.kernel.org>,
+ <edumazet@google.com>, <pabeni@redhat.com>, <shannon.nelson@amd.com>,
+ <horms@kernel.org>, <kuba@kernel.org>
+Subject: Re: [PATCH v3 net-next] net: hsr: sync hw addr of slave2 according
+ to slave1 hw addr on PRP
+Message-ID: <20260330102812.214f27f4@wsk>
+In-Reply-To: <DHFG26KI6L23.1YCOVQ5SSYMO5@linux.dev>
+References: <20250409101911.3120-1-ffmancera@riseup.net>
+	<DHFCZEM93FTT.1RWFBIE32K7OT@linux.dev>
+	<856eb43a-d4d0-4e1e-895f-75fca4eec51d@suse.de>
+	<d3935fd1-b990-405b-8428-219730d68a89@suse.de>
+	<DHFG26KI6L23.1YCOVQ5SSYMO5@linux.dev>
+Organization: Nabla
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|PAXPR04MB8880:EE_
-X-MS-Office365-Filtering-Correlation-Id: 41a59aff-573e-413e-e1ac-08de8e351d9f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|376014|10070799003|1800799024|19092799006|56012099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	RJZ1d5Yf2XFY+TdbKmPkS7VdFUIcJRrCa0kOfnvP454PPX919pSyo6AjKhpFugibYxJJoO6FtUsjQplAWphJJ5qielaFZrj2vnb9/dOL4IYpqnR0r1kXPmIsHzIzEWfAidzWnn4Kxk5JtcwmLDt4geT+M0D80FX8BjdErcs2XdFr4cw94RhZ2j0A50xvZbSEkWjlg0qB/zWXJ0Q5pBTDwfGndi+mL/sOmlcyvENjy77gcaV6pdo/kgez30eFQjHhNme5mCJTM8pJrBoqGZrJN8eR6yNCsn/sB/kpurh0bKbu/oJ7ik6JoFF55AMnxqbrR0e2lyYYGvLPyw0fNPwumEoL2S1QBJ5OP4qTCss8tLKbs7fH320ynlZchim7dzNNDbXbRa/eWWZH5ZmCREAhHPG5pJm65oYton1thlM7UKReIEo30vYSnfuC9tLJ6k3JOkA4XYz/blNJ6q7OmpwicmacppH120yKfnFEnA4X02WeEiBxc/uf2FMGQGFWnNcEkIK44CQ14LjTT5Ozo7J+3G8g7BmxjJy47alQvK304PIBmOlFn0JWH2rQ+kRyRaux0eRJdgiNOShmAaRvs8uhwaJ9xBvyeiX1xc+hrvJ/BJlkt4t5gppcvX3ETQaLnRUbsXGQ6iO/FcrKRJpaVsImJ2qnGeAbsSse+0MgWsq/wKnpTHcGlySwwGjTVIVBP7qPuMEfOpMbWxa+B7n/DuDxYFrmNsDbm30o8q3RbFPJJOLedACVgC8e2yzjVeSbScu6
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(10070799003)(1800799024)(19092799006)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?4DGxcjSiT+iXRvpERcUGV7mgQIxL38wECN3VCQ0/P1a2qh4Wu26SFlC6ALnP?=
- =?us-ascii?Q?wzbLgWZ+tkgOV9ZOg5tidCMliDCrFHT5IUtvqvmzxLBmKT8EVNksv7J1ma3l?=
- =?us-ascii?Q?eLlcEbJgZAZaeKr7Jkc/QvOilUWSaiByWsQ/ocnBFGDJ7hXYAFknxmCDR2Aj?=
- =?us-ascii?Q?eeP+irfF6cn5//UiA5+MkgF+YUcLd/WTYKfSiCgdwbWDJWk5V2+M4Gkl9pVM?=
- =?us-ascii?Q?hgIefWD463XhLPMk0tTC9+TcOIttElxsjqwjEcKErisJV5rbzPx6X+kxNg41?=
- =?us-ascii?Q?GsJ9IzYHQwPiwdfp9xtZcni7yV+boVwYUcvFVqrCEpaGSwfX0BPkEEloFjhz?=
- =?us-ascii?Q?bo7cfPAMtbV5FB8fcT9hmXwabb+hgGVDMSvLAqn6B9y0yVdDV60yEfq04tOl?=
- =?us-ascii?Q?hAVTl9lGt4Y4zy0spa8t78v3lZcW2phKd4q4d0irWf27EAJJ0DlvJJqWyFnS?=
- =?us-ascii?Q?b/3HRTvoeqz+OXY7oAkrTcc3/8/61VCiUZEu3NGeBLQwjRmXYREB2WFIDl6z?=
- =?us-ascii?Q?o5RxBpX3MBfuDjOBat7loNSy/YJv2Ygty5Q5R3gSNcnqj3lneCwRRdU5XU9K?=
- =?us-ascii?Q?rSy77NdYy8uTvYEQmInngZi8UgoLU1MWDgvX+fByOciLrGXnfrN2J7EHnGms?=
- =?us-ascii?Q?CQxA9XoatyIvDPxpjTk5CdSY1PO9jjznasHGccUlYJgPBQzyE2FNitCbgUom?=
- =?us-ascii?Q?ouuJWle5psh/zMy/fQIM5sTX9ZWGLtPFykEHJ+kENi3telPOMlnULLCgNw+7?=
- =?us-ascii?Q?RCAZcukhzkwGKh1zNlrkM+n1TNawfuLYMB9f10cN2/9uQ9xiwYoejq/scJu0?=
- =?us-ascii?Q?aGrWpN7iGP7Wit3F3471eiUv1nCsUFLZUy3tCR62K+QIyd5a3hlWMOngAUzC?=
- =?us-ascii?Q?8DAs2aKVT/MywT+MbxSDsnqQgyRtTvxyGyMoMyfZJZlA2rUdjSWaxGYr2vRK?=
- =?us-ascii?Q?gltVg8/1J7xayus1YSsO5e2096Aa7vdPDnLCIxFXRfJ+OmbTWTelfSDdYE+z?=
- =?us-ascii?Q?wZ7XMjwoFRt8ofaglq3ZOMdC4qmIv0VFDSyISB+f+ThJlyzcJrSZ7sx8mzLB?=
- =?us-ascii?Q?V9r/UKz1CDnoiZqMAo6lGBNiXJ0aT6KcFRsA7hG3qmC5BWL+4V8n3KYnqHer?=
- =?us-ascii?Q?vG7w8flREBnVtTxLyd+cZ5yj0eJleu0vsj1O6upEfXFhzW443M9soLatYmFl?=
- =?us-ascii?Q?6yL883hlmvXi9lIxRFETvV03Sie5xcaTFqd4PdIxFYwcSHqtoPTTdw1sMu7v?=
- =?us-ascii?Q?qDvIZVfTcLhzZasYKmj5nqt0w9AUFbIgd2jXmATOMIw6Edxw9ubcpncy9SxP?=
- =?us-ascii?Q?zoCigp28PgasXcOZFtVl2wIsZDNIAWICy1IixkIhlQqj02iG+lN9aoNyWc1/?=
- =?us-ascii?Q?un6yaPJ1v0QSPY6eqYUTZ0LfnojYPcJ1KoTfskjhlXYY1VhKvwHWTzXmJLn7?=
- =?us-ascii?Q?CuOBO6nfcfLTbD9wl36jDju+wVJQo+WysbKog5UZi0s2erzaW3ELoOE8upVl?=
- =?us-ascii?Q?Nk/xEq1NxjmlZUy1r4eksa5NAvLF4wDTUaKoJmI6EUfEjXTJ2gVsFoqXAFQD?=
- =?us-ascii?Q?eyeRrmIqK0L17UNbtmfVg0pBkICtS30Cc+o6U6c0hbjoyWcBlxVBaRFU9vCq?=
- =?us-ascii?Q?SPFbjbbd9l30sPhkDjBqyVQkvtZeFef+Rrqnok9//+A5PpX+QUuQvMJgIGK0?=
- =?us-ascii?Q?FZfxzxdgW/xXFwkDy3cfN1TdEciccr8wLj1NlyqUzz+zI4vwOXlbJlYi6PWn?=
- =?us-ascii?Q?ZIkuxe9l8WbQanpuWznbvjFL1HD7qgO2X6wK/RrgNDwjkf6NxxmbFuOTdHpB?=
-X-MS-Exchange-AntiSpam-MessageData-1: HFnpWrIxsp8NS4Mwi8pwxjfkeOWb1st3aLQ=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 41a59aff-573e-413e-e1ac-08de8e351d9f
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2026 08:19:51.7771
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SwQEczQNC/lbXLXnWtlnhiPtcEc9dIf+8+1OvlHzWL7svbP3mUoPq5jJEW5n1Na7/18ga86u/jd3Pcx4VV3QoQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8880
-X-Spamd-Result: default: False [1.34 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[nabladev.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[nabladev.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FREEMAIL_CC(0.00)[linuxfoundation.org,lists.linux.dev,vger.kernel.org,nxp.com,davemloft.net,google.com,kernel.org,redhat.com,163.com];
-	TAGGED_FROM(0.00)[bounces-273098-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	SUBJECT_HAS_EXCLAIM(0.00)[];
-	DKIM_TRACE(0.00)[nxp.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273099-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,nxp.com:email,nxp.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7928B35721A
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lukma@nabladev.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[nabladev.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,riseup.net:email,nabladev.com:dkim,nabladev.com:email,nabladev.com:url,denx.de:url]
+X-Rspamd-Queue-Id: 60E5C3573CA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Upstream commit e15c5506dd39 ("net: enetc: allocate vf_state during PF
-probes") was backported incorrectly to kernels where enetc_pf_probe()
-still has to manually check whether the OF node of the PCI device is
-enabled.
+Hi Luka,
 
-In kernels which contain commit bfce089ddd0e ("net: enetc: remove
-of_device_is_available() handling") and its dependent change, commit
-6fffbc7ae137 ("PCI: Honor firmware's device disabled status"), the
-"err_device_disabled" label has disappeared. Yet, linux-6.1.y and
-earlier still contains it.
+> On Sun Mar 29, 2026 at 7:22 PM CEST, Fernando Fernandez Mancera wrote:
+> > On 3/29/26 6:58 PM, Fernando Fernandez Mancera wrote: =20
+> >> On 3/29/26 5:07 PM, Luka Gejak wrote: =20
+> >>> On Wed Apr 9, 2025 at 12:19 PM CEST, Fernando Fernandez Mancera
+> >>> wrote: =20
+> >>>> In order to work properly PRP requires slave1 and slave2 to
+> >>>> share the same MAC address. To ease the configuration process on
+> >>>> userspace tools, sync the slave2 MAC address with slave1. In
+> >>>> addition, when deleting the port from the list, restore the
+> >>>> original MAC address.
+> >>>>
+> >>>> Signed-off-by: Fernando Fernandez Mancera <ffmancera@riseup.net>
+> >>>> ---
+> >>>> v3: restore the original MAC address on slave removal.
+> >>>> ---
+> >>>> =C2=A0 net/hsr/hsr_device.c | 5 +++++
+> >>>> =C2=A0 net/hsr/hsr_main.c=C2=A0=C2=A0 | 9 +++++++++
+> >>>> =C2=A0 net/hsr/hsr_main.h=C2=A0=C2=A0 | 1 +
+> >>>> =C2=A0 net/hsr/hsr_slave.c=C2=A0 | 2 ++
+> >>>> =C2=A0 4 files changed, 17 insertions(+)
+> >>>>
+> >>>> diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+> >>>> index 439cfb7ad5d1..e8922e8d9398 100644
+> >>>> --- a/net/hsr/hsr_device.c
+> >>>> +++ b/net/hsr/hsr_device.c
+> >>>> @@ -761,6 +761,11 @@ int hsr_dev_finalize(struct net_device
+> >>>> *hsr_dev, struct net_device *slave[2],
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (res)
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto err_unre=
+gister;
+> >>>> +=C2=A0=C2=A0=C2=A0 if (protocol_version =3D=3D PRP_V1) {
+> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 eth_hw_addr_set(slave[1]=
+, slave[0]->dev_addr);
+> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 call_netdevice_notifiers=
+(NETDEV_CHANGEADDR, slave[1]);
+> >>>> +=C2=A0=C2=A0=C2=A0 }
+> >>>> +
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (interlink) {
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 res =3D hsr_a=
+dd_port(hsr, interlink, HSR_PT_INTERLINK,
+> >>>> extack); if (res)
+> >>>> diff --git a/net/hsr/hsr_main.c b/net/hsr/hsr_main.c
+> >>>> index d7ae32473c41..192893c3f2ec 100644
+> >>>> --- a/net/hsr/hsr_main.c
+> >>>> +++ b/net/hsr/hsr_main.c
+> >>>> @@ -78,6 +78,15 @@ static int hsr_netdev_notify(struct
+> >>>> notifier_block *nb, unsigned long event,
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 eth_hw_addr_set(master->dev, dev->dev_addr);
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 call_netdevice_notifiers(NETDEV_CHANGEADDR,
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 master->dev);
+> >>>> +
+> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+if (hsr->prot_version =3D=3D PRP_V1) {
+> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 port =3D hsr_port_get_hsr(hsr, HSR_PT_SLAVE_B);
+> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 if (port) {
+> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 eth_hw_addr_set(port->dev,=
+ dev->dev_addr);
+> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 call_netdevice_notifiers(N=
+ETDEV_CHANGEADDR,
+> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 port->dev);
+> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Make sure =
+we recognize frames from ourselves in=20
+> >>>> hsr_rcv() */
+> >>>> diff --git a/net/hsr/hsr_main.h b/net/hsr/hsr_main.h
+> >>>> index 1bc47b17a296..135ec5fce019 100644
+> >>>> --- a/net/hsr/hsr_main.h
+> >>>> +++ b/net/hsr/hsr_main.h
+> >>>> @@ -155,6 +155,7 @@ struct hsr_port {
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct hsr_priv=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 *hsr;
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 enum hsr_port_type=C2=A0=C2=A0=C2=A0 =
+type;
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct rcu_head=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 rcu;
+> >>>> +=C2=A0=C2=A0=C2=A0 unsigned char=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 original_macaddress[ETH_ALEN];
+> >>>> =C2=A0 };
+> >>>> =C2=A0 struct hsr_frame_info;
+> >>>> diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
+> >>>> index 2a802a5de2ac..b87b6a6fe070 100644
+> >>>> --- a/net/hsr/hsr_slave.c
+> >>>> +++ b/net/hsr/hsr_slave.c
+> >>>> @@ -196,6 +196,7 @@ int hsr_add_port(struct hsr_priv *hsr,
+> >>>> struct net_device *dev,
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 port->hsr =3D hsr;
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 port->dev =3D dev;
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 port->type =3D type;
+> >>>> +=C2=A0=C2=A0=C2=A0 ether_addr_copy(port->original_macaddress, dev->=
+dev_addr);
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (type !=3D HSR_PT_MASTER) {
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 res =3D hsr_p=
+ortdev_setup(hsr, dev, port, extack);
+> >>>> @@ -232,6 +233,7 @@ void hsr_del_port(struct hsr_port *port)
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!port->hs=
+r->fwd_offloaded)
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 dev_set_promiscuity(port->dev, -1);
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 netdev_upper_=
+dev_unlink(port->dev, master->dev);
+> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 eth_hw_addr_set(port->de=
+v, port->original_macaddress);
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kfree_rcu(port, rcu); =20
+> >>>
+> >>> Hi Fernando,
+> >>>
+> >>> Thanks for the patch. The logic to sync the slave2 MAC address
+> >>> with slave1 for PRP is sound, but there are a few implementation
+> >>> issues here that will cause hardware filtering problems and style
+> >>> violations.
+> >>>
+> >>> 1. Hardware MAC Filtering
+> >>> In your current implementation:
+> >>>
+> >>> =C2=A0=C2=A0 if (protocol_version =3D=3D PRP_V1) {
+> >>>
+> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 eth_hw_addr_set(slave[1], slave[=
+0]->dev_addr);
+> >>>
+> >>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 call_netdevice_notifiers(NETDEV_=
+CHANGEADDR, slave[1]);
+> >>>
+> >>> =C2=A0=C2=A0 }
+> >>>
+> >>> eth_hw_addr_set() is appropriate for virtual devices (like the
+> >>> hsr_dev itself), but slave[1] is a physical net_device. By using
+> >>> this helper, you are bypassing
+> >>> dev->netdev_ops->ndo_set_mac_address. This means the physical
+> >>> NIC's hardware MAC filter will not be programmed, and it will
+> >>> silently drop unicast traffic destined for the new PRP MAC
+> >>> address unless the interface happens to be in promiscuous mode.
+> >>> You should use dev_set_mac_address() here instead. Note that
+> >>> unlike eth_hw_addr_set(), dev_set_mac_address() can fail and
+> >>> returns an error code, so you will need to check its return value
+> >>> and handle the error path accordingly.
+> >>>
+> >>> 2. Teardown Notifiers
+> >>> In hsr_del_port():
+> >>>
+> >>> =C2=A0=C2=A0 netdev_upper_dev_unlink(port->dev, master->dev);
+> >>> =C2=A0=C2=A0 eth_hw_addr_set(port->dev, port->original_macaddress);
+> >>>
+> >>> You have the same issue with eth_hw_addr_set() here. Additionally,
+> >>> unlike the setup paths, this version omits
+> >>> call_netdevice_notifiers (NETDEV_CHANGEADDR, port->dev).
+> >>> Switching to dev_set_mac_address() for the restoration will
+> >>> handle both the hardware programming and the notifier chain
+> >>> automatically.=20
+> >>=20
+> >> These points makes sense. I guess I didn't notice the that=20
+> >> eth_hw_addr_set() due to my interface being set to promiscuous
+> >> mode at hsr_slave.c.
+> >>=20
+> >> Let me research a bit more about the impact here and will get back
+> >> to you either with a new patch or an reply here.
+> >>  =20
+> >
+> > Does this actually makes sense? I am not an expert on how hardware
+> > is handling offloading here. But if I am not wrong, as the
+> > interface is set on promiscuous or offload enabled. For promiscuous
+> > this does not matter and for the offloaded scenario shouldn't the
+> > decision be handled by hardware and not depend on
+> > ndo_set_mac_address()?
+> >
+> > Let me know if I am missing something here.
+> >
+> >
+> > Anyway, the missing notification makes sense and should be fixed
+> > for SLAVE_B.
+> >
+> > Thanks,
+> > Fernando. =20
+>=20
+> Hi Fernando,
+> You raise a fair point, and I should have looked more carefully at
+> the existing code paths.
+>=20
+> You are correct that in the non-offloaded case, hsr_slave.c already=20
+> sets promiscuous mode via dev_set_promiscuity(dev, 1), so the
+> hardware MAC filter is bypassed and eth_hw_addr_set() is sufficient
+> for frame reception.
+>=20
+> For the offloaded case, the comment in hsr_portdev_setup() notes that=20
+> "L2 frame forward happens at the offloaded hardware" =E2=80=94 so the
+> hardware is configured through its own HSR/PRP offload mechanisms,
+> not through ndo_set_mac_address().
+>=20
+> So the practical impact of my original concern is limited to edge
+> cases where promiscuous mode might be disabled or fail. The more
+> important issue, which you've already acknowledged, is the missing
+> notifier in hsr_del_port(). That should definitely be fixed for
+> correctness.
+>=20
+> One additional consideration: even though promiscuous mode handles
+> the receive path, dev->dev_addr is still used as the source MAC for=20
+> outgoing frames. Using dev_set_mac_address() would ensure the
+> software state (dev->dev_addr) and any driver-level state remain
+> consistent. But I agree this is less critical than I initially
+> suggested. Thanks for pushing back on this =E2=80=94 it's a good
+> clarification.
+>=20
 
-The trouble is that upstream commit e15c5506dd39 ("net: enetc: allocate
-vf_state during PF probes"), backported as 35668e29e979 in linux-6.1.y,
-introduces new code for the err_setup_mac_addresses and err_alloc_netdev
-labels which calls kfree(pf->vf_state). This code must not execute for
-the err_device_disabled label, because at that stage, the pf structure
-has not yet been allocated, and is an uninitialized pointer.
+Thanks for your patches - as denx.de is not operational anymore (now I
+do work for nabladev.com) I've just stumbled upon your patches.
 
-By moving the err_device_disabled label to undo just the previous
-operation, i.e. a successful enetc_psi_create() call with
-enetc_psi_destroy(), the dereference of uninitialized pf->vf_state is
-avoided.
+I'm very happy that PRP now also gains support :-)
 
-Fixes: 35668e29e979 ("net: enetc: allocate vf_state during PF probes")
-Reported-by: Nathan Chancellor <nathan@kernel.org>
-Closes: https://lore.kernel.org/linux-patches/20260330073356.GA1017537@ax162/
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- drivers/net/ethernet/freescale/enetc/enetc_pf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Best regards,
+> Luka
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.c b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-index 99422c0b4a26..8cb4c759b165 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-@@ -1393,10 +1393,10 @@ static int enetc_pf_probe(struct pci_dev *pdev,
- 	si->ndev = NULL;
- 	free_netdev(ndev);
- err_alloc_netdev:
--err_device_disabled:
- err_setup_mac_addresses:
- 	kfree(pf->vf_state);
- err_alloc_vf_state:
-+err_device_disabled:
- 	enetc_psi_destroy(pdev);
- err_psi_create:
- 	return err;
--- 
-2.43.0
 
+--=20
+Best regards,
+
+Lukasz Majewski
+
+--
+Nabla Software Engineering GmbH
+HRB 40522 Augsburg
+Phone: +49 821 45592596
+E-Mail: office@nabladev.com
+Managing Director : Stefano Babic
 
