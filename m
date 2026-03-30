@@ -1,68 +1,104 @@
-Return-Path: <netdev+bounces-273139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273148-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +N3AHWphymn27gUAu9opvQ
-	(envelope-from <netdev+bounces-273139-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:41:30 +0200
+	id wM76KhZqymnG8gUAu9opvQ
+	(envelope-from <netdev+bounces-273148-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:18:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 441C335A68F
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:41:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BBF035AEB3
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:18:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 18ECE300C37B
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:40:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5F06330179F8
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 12:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B338A3C6A31;
-	Mon, 30 Mar 2026 11:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC07277C9D;
+	Mon, 30 Mar 2026 12:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="XarzyNs+"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ATRnpqS5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="y84QewfJ";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ATRnpqS5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="y84QewfJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704C63C6A30;
-	Mon, 30 Mar 2026 11:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E163C9EFE
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 12:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774870833; cv=none; b=RUFg4XSZKn1NhzYtSZuKegfvJAStztgCG/sFtmna42hzIOje67b0fNUXy/G8RHb3Gt4uY5C3UZhBRYQGsVNM2fFOw9Igmu9Y+IdkPs6xjHqEjs7vFv3yKWCtDhOxnOj10ZiHvzMBFhbVE/chKLGejceJFfokRxFDc94Zj2CGooI=
+	t=1774872660; cv=none; b=fxUHplOXC2ctrSC3yNJrdov7G8yk+X6QflRryAK4/FTZO9rlrnrnLHqyP5NddfCpvIt7UXHUBZ4EJIRAS8xrSi4KLF7kwgXooeR3kNWQ4iwD5n1z4tAKbvne6L0S/Dhx1o1u+3YyaSXhbaybkXDmbRRQdL7n5/nSX96P/C9H4DI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774870833; c=relaxed/simple;
-	bh=h3B146AXDaMG8OjaKqu6sgqpCUkBTNvoDdB7NLG6G8U=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mkhYEHp2kx+jv+lZmv7oBsMkRCsXMrLAsx6ZepFVZfqLVvedjR55vH1sH9KgvJls1JHKWxfenMm/FjzkUAe+BYj7ZrwlReh10x1NU3ENcPf0Nu5Z/NPiYKETPeWtOjCjudiX+Kh5oSRgsxPH55nZCOVqPhZW7lYeBOCAbbHeMxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=XarzyNs+; arc=none smtp.client-ip=113.46.200.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=yKZmHt33n8RZwizYvWZr4IymRKCPNMxFJhuhxnffLpg=;
-	b=XarzyNs+KkS7jMvu7guwX1kJUWxVXv5DkvP1d/5fWJdlqzMITX+/X/tjDVEFyiWRBtCbNyV3S
-	DeEZw6R9t4OJ856xlUxZnAmCcAjA6xInaHf69Q+oJvkuZIgau+BdFj66T9Vy6dVCMGUTyy1Rz3N
-	IiFbzUgKqqTHaN8pTEAZwyU=
-Received: from mail.maildlp.com (unknown [172.19.163.214])
-	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4fkq0D2hnfz1K99G;
-	Mon, 30 Mar 2026 19:34:20 +0800 (CST)
-Received: from kwepemj500018.china.huawei.com (unknown [7.202.194.48])
-	by mail.maildlp.com (Postfix) with ESMTPS id BA3A140561;
-	Mon, 30 Mar 2026 19:40:26 +0800 (CST)
-Received: from huawei.com (10.50.85.128) by kwepemj500018.china.huawei.com
- (7.202.194.48) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 30 Mar
- 2026 19:40:26 +0800
-From: Li Xiasong <lixiasong1@huawei.com>
-To: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
-	<martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <mptcp@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
-	<zhangchangzhong@huawei.com>, <weiyongjun1@huawei.com>
-Subject: [PATCH net v4] mptcp: fix soft lockup in mptcp_recvmsg()
-Date: Mon, 30 Mar 2026 20:03:35 +0800
-Message-ID: <20260330120335.659027-1-lixiasong1@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1774872660; c=relaxed/simple;
+	bh=+LMQoTvu244a85Ncb5u2POFz1DjpQtqMwBU9f7MsV38=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q6oiBTkgbaDt8Ofk/8kyjBu/RtW7m4O2mwfVrn+t8l/QUczBGwD3ExXH+bvae3y68h5x6gkRW4MY934Xj/+BNVSqUKE3+imRBGEIJ0USKkeIWwq0tD72nWMX6IN52NJ68HchFIVRqS+aAl9VjsEAILw0K+g2uNOrmlRlcDKxjT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ATRnpqS5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=y84QewfJ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ATRnpqS5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=y84QewfJ; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4C96A5BD4C;
+	Mon, 30 Mar 2026 12:10:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1774872657; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=0Aiho5oPMkWNSDw5vCE+2Y0Zrx63tX6ET7WiXGit7WQ=;
+	b=ATRnpqS5y5bHge/fqewsFrAy0cf4AxqRJTYmorm3eu9NEclVMRhI8Oeu72wXfyICvmc8Q7
+	Q2bw2kGXiZBKO/WoUms/T3tSS0NQVu9ix848fpGXTK243342DWfHxSE1TlNaYQfFEoGCJA
+	eZDYdQS8hyOmOS1jYFJ3DfMBbYy2e+I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1774872657;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=0Aiho5oPMkWNSDw5vCE+2Y0Zrx63tX6ET7WiXGit7WQ=;
+	b=y84QewfJ9bXt4vs5Ny/yi7xpmaGvsuNPUHNsKWf/l5s451i66Po59uGwvjk3oATYXN/b/N
+	IO9Vtiqq6wQWNkCQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=ATRnpqS5;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=y84QewfJ
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1774872657; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=0Aiho5oPMkWNSDw5vCE+2Y0Zrx63tX6ET7WiXGit7WQ=;
+	b=ATRnpqS5y5bHge/fqewsFrAy0cf4AxqRJTYmorm3eu9NEclVMRhI8Oeu72wXfyICvmc8Q7
+	Q2bw2kGXiZBKO/WoUms/T3tSS0NQVu9ix848fpGXTK243342DWfHxSE1TlNaYQfFEoGCJA
+	eZDYdQS8hyOmOS1jYFJ3DfMBbYy2e+I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1774872657;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=0Aiho5oPMkWNSDw5vCE+2Y0Zrx63tX6ET7WiXGit7WQ=;
+	b=y84QewfJ9bXt4vs5Ny/yi7xpmaGvsuNPUHNsKWf/l5s451i66Po59uGwvjk3oATYXN/b/N
+	IO9Vtiqq6wQWNkCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 94F2E4A0A2;
+	Mon, 30 Mar 2026 12:10:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id DR80IVBoymkKSwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Mon, 30 Mar 2026 12:10:56 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: sdf@fomichev.me,
+	petrm@nvidia.com,
+	idosch@nvidia.com,
+	razor@blackwall.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Subject: [PATCH net-next] net: vxlan: check ipv6_mod_enabled() on neigh_reduce()
+Date: Mon, 30 Mar 2026 14:10:33 +0200
+Message-ID: <20260330121033.4479-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,166 +106,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemj500018.china.huawei.com (7.202.194.48)
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spam-Flag: NO
+X-Spam-Score: -1.51
+X-Spam-Level: 
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273139-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[huawei.com:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lixiasong1@huawei.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273148-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[suse.de:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,huawei.com:dkim,huawei.com:email,huawei.com:mid]
-X-Rspamd-Queue-Id: 441C335A68F
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3BBF035AEB3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot reported a soft lockup in mptcp_recvmsg() [0].
+IPv6 must be enabled or otherwise neigh_reduce() might cause a kernel
+panic. This was prevented by a check on in6_dev. Use ipv6_mod_enabled()
+instead as it is cleaner and also consistent with the code at
+route_shortcircuit().
 
-When receiving data with MSG_PEEK | MSG_WAITALL flags, the skb is not
-removed from the sk_receive_queue. This causes sk_wait_data() to always
-find available data and never perform actual waiting, leading to a soft
-lockup.
-
-Fix this by adding a 'last' parameter to track the last peeked skb.
-This allows sk_wait_data() to make informed waiting decisions and prevent
-infinite loops when MSG_PEEK is used.
-
-[0]:
-watchdog: BUG: soft lockup - CPU#2 stuck for 156s! [server:1963]
-Modules linked in:
-CPU: 2 UID: 0 PID: 1963 Comm: server Not tainted 6.19.0-rc8 #61 PREEMPT(none)
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-RIP: 0010:sk_wait_data+0x15/0x190
-Code: 80 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 41 56 41 55 41 54 49 89 f4 55 48 89 d5 53 48 89 fb <48> 83 ec 30 65 48 8b 05 17 a4 6b 01 48 89 44 24 28 31 c0 65 48 8b
-RSP: 0018:ffffc90000603ca0 EFLAGS: 00000246
-RAX: 0000000000000000 RBX: ffff888102bf0800 RCX: 0000000000000001
-RDX: 0000000000000000 RSI: ffffc90000603d18 RDI: ffff888102bf0800
-RBP: 0000000000000000 R08: 0000000000000002 R09: 0000000000000101
-R10: 0000000000000000 R11: 0000000000000075 R12: ffffc90000603d18
-R13: ffff888102bf0800 R14: ffff888102bf0800 R15: 0000000000000000
-FS:  00007f6e38b8c4c0(0000) GS:ffff8881b877e000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055aa7bff1680 CR3: 0000000105cbe000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- mptcp_recvmsg+0x547/0x8c0 net/mptcp/protocol.c:2329
- inet_recvmsg+0x11f/0x130 net/ipv4/af_inet.c:891
- sock_recvmsg+0x94/0xc0 net/socket.c:1100
- __sys_recvfrom+0xb2/0x130 net/socket.c:2256
- __x64_sys_recvfrom+0x1f/0x30 net/socket.c:2267
- do_syscall_64+0x59/0x2d0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x76/0x7e arch/x86/entry/entry_64.S:131
-RIP: 0033:0x7f6e386a4a1d
-Code: 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 8d 05 f1 de 2c 00 41 89 ca 8b 00 85 c0 75 20 45 31 c9 45 31 c0 b8 2d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 6b f3 c3 66 0f 1f 84 00 00 00 00 00 41 56 41
-RSP: 002b:00007ffc3c4bb078 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
-RAX: ffffffffffffffda RBX: 000000000000861e RCX: 00007f6e386a4a1d
-RDX: 00000000000003ff RSI: 00007ffc3c4bb150 RDI: 0000000000000004
-RBP: 00007ffc3c4bb570 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000103 R11: 0000000000000246 R12: 00005605dbc00be0
-R13: 00007ffc3c4bb650 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-
-Fixes: 8e04ce45a8db ("mptcp: fix MSG_PEEK stream corruption")
-Signed-off-by: Li Xiasong <lixiasong1@huawei.com>
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 ---
+ drivers/net/vxlan/vxlan_core.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-v3->v4:
-Thanks to Matthieu Baerts and sashiko for the review.
-- __mptcp_recvmsg_mskq: update 'last' when skipping already peeked skbs.
-- Link to v3: https://lore.kernel.org/netdev/20260327075544.3622851-1-lixiasong1@huawei.com
-
-v2->v3:
-Thanks to Matthieu Baerts for the review.
-- Initialize last to NULL.
-- Only update 'last' when MSG_PEEK is set, avoiding dangling pointer.
-- Link to v2: https://lore.kernel.org/netdev/20260324085131.4187473-1-lixiasong1@huawei.com
-
-v1->v2:
-Thanks to Matthieu Baerts for the suggestion and review.
-- Move 'last' variable definition into the while loop in mptcp_recvmsg() to
-  narrow its scope.
-- In __mptcp_recvmsg_mskq(), assign 'last' right after 'copied' is updated,
-  regardless of MSG_PEEK flag.
-- Link to v1: https://lore.kernel.org/netdev/20260302052651.1466983-1-lixiasong1@huawei.com
-
----
- net/mptcp/protocol.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index cf1852b99963..65c3bb8016f4 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -2006,7 +2006,7 @@ static void mptcp_eat_recv_skb(struct sock *sk, struct sk_buff *skb)
- static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
- 				size_t len, int flags, int copied_total,
- 				struct scm_timestamping_internal *tss,
--				int *cmsg_flags)
-+				int *cmsg_flags, struct sk_buff **last)
- {
- 	struct mptcp_sock *msk = mptcp_sk(sk);
- 	struct sk_buff *skb, *tmp;
-@@ -2023,6 +2023,7 @@ static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
- 			/* skip already peeked skbs */
- 			if (total_data_len + data_len <= copied_total) {
- 				total_data_len += data_len;
-+				*last = skb;
- 				continue;
- 			}
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index b5fbd03418b6..b3b692c4b628 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -2027,13 +2027,11 @@ static int neigh_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
+ 	struct vxlan_dev *vxlan = netdev_priv(dev);
+ 	const struct in6_addr *daddr;
+ 	const struct ipv6hdr *iphdr;
+-	struct inet6_dev *in6_dev;
+ 	struct neighbour *n;
+ 	struct nd_msg *msg;
  
-@@ -2058,6 +2059,8 @@ static int __mptcp_recvmsg_mskq(struct sock *sk, struct msghdr *msg,
- 			}
+ 	rcu_read_lock();
+-	in6_dev = __in6_dev_get(dev);
+-	if (!in6_dev)
++	if (unlikely(!ipv6_mod_enabled()))
+ 		goto out;
  
- 			mptcp_eat_recv_skb(sk, skb);
-+		} else {
-+			*last = skb;
- 		}
- 
- 		if (copied >= len)
-@@ -2288,10 +2291,12 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 		cmsg_flags = MPTCP_CMSG_INQ;
- 
- 	while (copied < len) {
-+		struct sk_buff *last = NULL;
- 		int err, bytes_read;
- 
- 		bytes_read = __mptcp_recvmsg_mskq(sk, msg, len - copied, flags,
--						  copied, &tss, &cmsg_flags);
-+						  copied, &tss, &cmsg_flags,
-+						  &last);
- 		if (unlikely(bytes_read < 0)) {
- 			if (!copied)
- 				copied = bytes_read;
-@@ -2343,7 +2348,7 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 
- 		pr_debug("block timeout %ld\n", timeo);
- 		mptcp_cleanup_rbuf(msk, copied);
--		err = sk_wait_data(sk, &timeo, NULL);
-+		err = sk_wait_data(sk, &timeo, last);
- 		if (err < 0) {
- 			err = copied ? : err;
- 			goto out_err;
+ 	iphdr = ipv6_hdr(skb);
 -- 
-2.34.1
+2.53.0
 
 
