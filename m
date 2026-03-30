@@ -1,139 +1,259 @@
-Return-Path: <netdev+bounces-273083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273084-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mMWoMNQhymmu5QUAu9opvQ
-	(envelope-from <netdev+bounces-273083-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 09:10:12 +0200
+	id yK8/NFsiymmu5QUAu9opvQ
+	(envelope-from <netdev+bounces-273084-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 09:12:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D52F356438
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 09:10:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26D2A3564AE
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 09:12:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4F862300AED3
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 07:10:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1E1323005ADD
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 07:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93EB361DA2;
-	Mon, 30 Mar 2026 07:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EKLh3tgZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2ADC39527A;
+	Mon, 30 Mar 2026 07:12:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83760149C6F;
-	Mon, 30 Mar 2026 07:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F337B24E4B4;
+	Mon, 30 Mar 2026 07:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774854603; cv=none; b=pj9XExxbBZbYD1zlPD8CglQOWZYRDDjS7ApEiKmECO008l0fI2Lf0xOiCTpoQIWl29RDEwflfecl6ymPeSmFFx0pN3RMlqcgrHHqNGukOj5fQXJgTaw1GktIGo4DEMn2R+onL76XeSWZHE12fTOgxAzxUMq+d/b8xW0DG5jfnFc=
+	t=1774854743; cv=none; b=ofT5o6PWiGy5S1okjvqA2wdX2PqdCM4BsDqjvvZhKuUhrhqOjil4gbjTpGZl8gwHO8Coj+kHFXES6gCdOj9iGRGCUcOYsR7/6mmG1RsE4GUieKtxIXx9cVW93JlZWG/DQ9Y+dWd31EpdcFvxeOPEMouqWtSFRuTfx7fWSSSIo5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774854603; c=relaxed/simple;
-	bh=o5/s63W+wtwaYRANyWsRhZBBKWGpXBUj75tReIRNYdI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A/46nNuAZDLmyNXH+iBAt1W8XECdR5MlSttL02GCj56EHg4apDKZkIx964+a+5uru1DGt0zaBn4SJPUnLGBM9cC1EwwYWpaDXOOZDHfS/OKgLhTKsRXYqc74Pa2MdPW3Lhk2ZOfuv5z0Dh7DIJDZ4FS6wZfk1DQccaMnPAkx+tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EKLh3tgZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F80BC4CEF7;
-	Mon, 30 Mar 2026 07:10:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774854603;
-	bh=o5/s63W+wtwaYRANyWsRhZBBKWGpXBUj75tReIRNYdI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EKLh3tgZ4TQGjF7lvG3Ct1JQh4axeWvYtTumjNaSRBwkP4GixS8EipmD0itVJS14h
-	 E5HfsJsZo9PL773ub9a1IQcuWaDuZiyj9S8hJgbdATdx/jcSKjCxvG/dpaTCJL5zM3
-	 YcdqweCEmf4tg3AZp3iRraLOmszLEM2jjCORZkpWD1cFdb+R+gqz5yTIgSfHvAm7P7
-	 6FbaQmuxDIWjlsNQLPRe5nG7K8Z4YNGVV1rpF6nnBODQKDq3XrzKxIP1Uz0iU/qbtE
-	 uzt+zFR2MpiC6JOf/+43RU8GC3EbkI8PJjhG9wEiJW+rtXMvkDBxKmEdOVDLae7cxN
-	 VLxoR7aYUuEcg==
-Date: Mon, 30 Mar 2026 09:10:00 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Carlo Szelinsky <github@szelinsky.de>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, 
-	Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/3] dt-bindings: net: pse-pd: add
- poll-interval-ms property
-Message-ID: <20260330-spiritual-placid-jackal-cd4269@quoll>
-References: <20260329153124.2823980-1-github@szelinsky.de>
- <20260329153124.2823980-2-github@szelinsky.de>
+	s=arc-20240116; t=1774854743; c=relaxed/simple;
+	bh=rZRZNnj+SWl+nEX6p5ljgjH/OFu8jr4+GWCEBdSVUQA=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ojDwo3KQwMM0UhejCy8W3loG1O+66h4yB/Z0SudUkFo+99eGKjT4fcydtuW1ggZJq8lpFRyCWMJFHpMo4+WB7kIIsXUQ2VE/aMJfV1+Y60bSH+xzFWxfBsS34Ur6Yi5BicnuU3H/NEt6ig4lnz/Snrcy8TOHXU3f54OVYRpABcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas1t1774854731t870t42468
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [115.227.224.139])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 968294333165646595
+To: <patchwork-bot+netdevbpf@kernel.org>,
+	"'Conor Dooley'" <conor@kernel.org>,
+	"'Conor Dooley'" <conor@kernel.org>
+Cc: <netdev@vger.kernel.org>,
+	<conor.dooley@microchip.com>,
+	<Valentina.FernandezAlanis@microchip.com>,
+	<andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<robh@kernel.org>,
+	<krzk+dt@kernel.org>,
+	<conor+dt@kernel.org>,
+	<daire.mcnamara@microchip.com>,
+	<pjw@kernel.org>,
+	<palmer@dabbelt.com>,
+	<aou@eecs.berkeley.edu>,
+	<alex@ghiti.fr>,
+	<nicolas.ferre@microchip.com>,
+	<claudiu.beznea@tuxon.dev>,
+	<richardcochran@gmail.com>,
+	<samuel.holland@sifive.com>,
+	<devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	<linux-riscv@lists.infradead.org>,
+	<dave.stevenson@raspberrypi.com>,
+	<sean.anderson@linux.dev>,
+	<vineeth.karumanchi@amd.com>,
+	<abin.joseph@amd.com>,
+	<theo.lebrun@bootlin.com>,
+	<Ryan.Wanner@microchip.com>,
+	<haokexin@gmail.com>,
+	<netdev@vger.kernel.org>,
+	<conor.dooley@microchip.com>,
+	<Valentina.FernandezAlanis@microchip.com>,
+	<andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<robh@kernel.org>,
+	<krzk+dt@kernel.org>,
+	<conor+dt@kernel.org>,
+	<daire.mcnamara@microchip.com>,
+	<pjw@kernel.org>,
+	<palmer@dabbelt.com>,
+	<aou@eecs.berkeley.edu>,
+	<alex@ghiti.fr>,
+	<nicolas.ferre@microchip.com>,
+	<claudiu.beznea@tuxon.dev>,
+	<richardcochran@gmail.com>,
+	<samuel.holland@sifive.com>,
+	<devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	<linux-riscv@lists.infradead.org>,
+	<dave.stevenson@raspberrypi.com>,
+	<sean.anderson@linux.dev>,
+	<vineeth.karumanchi@amd.com>,
+	<abin.joseph@amd.com>,
+	<theo.lebrun@bootlin.com>,
+	<Ryan.Wanner@microchip.com>,
+	<haokexin@gmail.com>
+References: <20260325-unsterile-flail-4c7729750dc4@spud>  <177482042554.472023.12757157452690281696.git-patchwork-notify@kernel.org>
+In-Reply-To:  <177482042554.472023.12757157452690281696.git-patchwork-notify@kernel.org>
+Subject: RE: [PATCH net-next v5 00/14] macb usrio/tsu patches
+Date: Mon, 30 Mar 2026 15:12:10 +0800
+Message-ID: <06a701dcc014$86def5b0$949ce110$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260329153124.2823980-2-github@szelinsky.de>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQF0vN16QhDCAi1TInuOp+Z4l0ZKlwGT8tMStooKEUA=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: N+qOsY06OnyolDfmxY+LUvXZaPJpBkQLIMQzbmmBgfZQzUP5iogZHril
+	PkWbnnrfyzGj2kYIXb/+4TTfAK4AXX2kLGIXmGykAIQwKF8Ag02Yc3Vqv9cF+8tytlmsG/u
+	fDOyg7hRWGbnft+WpkSxLqEfwMqYeyo3St2MED84LIKk2Mgn5ySc/VKDva58FfpPU/xUrNy
+	Asoz1f8NBbbbKqAu/BLHmn8nTEZ2eMzaNYRSb65t3UPVbIj7XwGxt9gaM99AlKOf4JofAff
+	oM+eyUs5LXVn+YxP+BSIOn0M2QHs+6j0x6+LoQst3LHQWvrnk1a5YCM+QzhGVtp3hw3i3VO
+	R9MF28Scm+jdj1tIENMZQAxzv1yzZ1CC11ZcjADsBUE5crSX9WqJkZ4tuzVeXuf9evNMMlM
+	qPK1KmWdrMhXu87+c7YcVHJTdcHWS8kBNM5b8r/5reKcxZLbheT5UtlAKc5woyl61FXUXGg
+	R3Hr5NayvU45vtiUWOqaxeNdGHDi/Q7YMd297qGgoZERJx6DBJ2rHUahsWha6bQvfvzycph
+	+3x70TOuvI5kduF/TlnTf4AYQKkLWisTT6HuJfmg/D6FHdIXyPnIqZW5RUBcQ0d69UqXedc
+	KcQSLc4RpkYI8XLhP13RnPDLwuvm2qGIMLSP6a9YQ7AtUwxHIZ0QRZI6xb5FDztprZaWVW5
+	B0ehrLtByrEA8NZ0kQk2XHAEOeKTkqzLEaFOhTF3DQBFUVjcYJMUMhXO5u1cRZ0gHWOb///
+	1HalMZV2SefshSekKJvGpXpX7AcqodZTexrpEeYDcLOHJv6PmUEedbrmeQsSY02cFyKOaoA
+	jycQ3AghFgMhtrH5wQuKKlW/OnLNVGzQl1Vjx1frhpLl4O3mwzcvXWbjYMNKZDqsryvRZt3
+	QlgQ95eAQ2g0InOoZyNxTO9HLmKLibS68ju17aHuPhyKXBFHLWpl1Bok+3UUagPkzGCCyzs
+	Mg0Jp+PleY5KSDoELnOfAlwa4a7PwDsLwOQPh81r2Xjqo8j9ta6tJVzQHRWu4JyUiVz26ni
+	aMlZmqyFYupf1O671Rknty409UE3Wj3zbY6BFCDg==
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
+X-QQ-RECHKSPAM: 0
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	FROM_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273083-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,tuxon.dev,gmail.com,sifive.com,lists.infradead.org,raspberrypi.com,linux.dev,amd.com,bootlin.com];
+	TAGGED_FROM(0.00)[bounces-273084-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[trustnetic.com];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_GT_50(0.00)[63];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:email]
-X-Rspamd-Queue-Id: 3D52F356438
+	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,netdevbpf,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,w-ms-7e16:email,trustnetic.com:mid]
+X-Rspamd-Queue-Id: 26D2A3564AE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Mar 29, 2026 at 05:31:22PM +0200, Carlo Szelinsky wrote:
-> Add the optional poll-interval-ms property for PSE controllers that
-> use poll-based event detection instead of interrupts. Defaults to
-> 500ms if not specified.
+> Hello:
+>=20
+> This series was applied to netdev/net-next.git (main)
+> by Jakub Kicinski <kuba@kernel.org>:
+>=20
+> On Wed, 25 Mar 2026 16:28:04 +0000 you wrote:
+> > From: Conor Dooley <conor.dooley@microchip.com>
+> >
+> > Hey folks,
+> >
+> > At the very least, it'd be good of the soc vendor folks could check
+> > their platforms and see if their usrio stuff actually lines up with =
+what
+> > the driver currently calls "macb_default_usrio". Ours didn't and it =
+was
+> > a nasty surprise.
+> >
+> > [...]
+>=20
+> Here is the summary with links:
+>   - [net-next,v5,01/14] Revert "net: macb: Clean up the .usrio =
+settings in macb_config instances"
+>     https://git.kernel.org/netdev/net-next/c/8ccf062c6770
+>   - [net-next,v5,02/14] net: macb: rename macb_default_usrio to =
+at91_default_usrio as not all platforms have mii mode control in
+> usrio
+>     https://git.kernel.org/netdev/net-next/c/a17871778ee2
+>   - [net-next,v5,03/14] net: macb: split USRIO_HAS_CLKEN capability in =
+two
+>     https://git.kernel.org/netdev/net-next/c/039f185a0060
+>   - [net-next,v5,04/14] dt-bindings: net: cdns,macb: replace =
+cdns,refclk-ext with cdns,refclk-source
+>     https://git.kernel.org/netdev/net-next/c/dfa36d7e860c
+>   - [net-next,v5,05/14] net: macb: rework usrio refclk selection code
+>     https://git.kernel.org/netdev/net-next/c/6c5b565d7d41
+>   - [net-next,v5,06/14] net: macb: np4 doesn't need a usrio pointer
+>     https://git.kernel.org/netdev/net-next/c/826cbe636e10
+>   - [net-next,v5,07/14] net: macb: add mpfs specific usrio =
+configuration
+>     https://git.kernel.org/netdev/net-next/c/c711311d6ba3
+>   - [net-next,v5,08/14] net: macb: warn on pclk use as a tsu_clk =
+fallback
+>     https://git.kernel.org/netdev/net-next/c/3fe13d858f83
+>   - [net-next,v5,09/14] net: macb: clean up tsu clk rate acquisition
+>     https://git.kernel.org/netdev/net-next/c/b698a1e397ab
+>   - [net-next,v5,10/14] dt-bindings: net: macb: add property =
+indicating timer adjust mode
+>     https://git.kernel.org/netdev/net-next/c/09a6164a4f1d
+>   - [net-next,v5,11/14] net: macb: timer adjust mode is not supported
+>     https://git.kernel.org/netdev/net-next/c/41adda8764fd
+>   - [net-next,v5,12/14] net: macb: runtime detect =
+MACB_CAPS_USRIO_DISABLED
+>     https://git.kernel.org/netdev/net-next/c/47c86c463612
+>   - [net-next,v5,13/14] net: macb: set MACB_CAPS_USRIO_DISABLED if no =
+usrio config is provided
+>     https://git.kernel.org/netdev/net-next/c/32fc6a9f6e75
+>   - [net-next,v5,14/14] net: macb: drop usrio pointer on EyeQ5 config
+>     https://git.kernel.org/netdev/net-next/c/cd1082a96f9a
+>=20
+> You are awesome, thank you!
+> --
+> Deet-doot-dot, I am a bot.
+> https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Why?
+Hi,
 
-> 
-> Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-> Signed-off-by: Carlo Szelinsky <github@szelinsky.de>
-> ---
->  .../devicetree/bindings/net/pse-pd/pse-controller.yaml    | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml b/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml
-> index cd09560e0aea..329d020f054c 100644
-> --- a/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml
-> +++ b/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml
-> @@ -27,6 +27,14 @@ properties:
->        subnode. This property is deprecated, please use pse-pis instead.
->      enum: [0, 1]
->  
-> +  poll-interval-ms:
+There are compilation errors after merging this patch set.
+I believe the error occurred where the CONFIG_OF is not set.
 
-We allow poll interval for input devices, because how sensitive buttons
-are or what capacitor is there charging/discharging is really a
-hardware property of the board.
-
-Why that would be true for PSE controller? Controller is specific, so
-any internal aspects of polling are already implied by compatible.
-
-You have entire commit msg to explain WHY you are doing this, not
-explain WHAT you did. We see what you did in the diff.
-
-Best regards,
-Krzysztof
+root@w-MS-7E16:~/net-next# make C=3D1 W=3D1
+  CALL    scripts/checksyscalls.sh
+  DESCEND objtool
+  INSTALL libsubcmd_headers
+  CC [M]  drivers/net/ethernet/cadence/macb_main.o
+drivers/net/ethernet/cadence/macb_main.c:5755:19: error: =
+=E2=80=98at91_default_usrio=E2=80=99 undeclared here (not in a function)
+ 5755 |         .usrio =3D &at91_default_usrio,
+      |                   ^~~~~~~~~~~~~~~~~~
+make[6]: *** [scripts/Makefile.build:289: =
+drivers/net/ethernet/cadence/macb_main.o] Error 1
+make[5]: *** [scripts/Makefile.build:548: drivers/net/ethernet/cadence] =
+Error 2
+make[4]: *** [scripts/Makefile.build:548: drivers/net/ethernet] Error 2
+make[3]: *** [scripts/Makefile.build:548: drivers/net] Error 2
+make[2]: *** [scripts/Makefile.build:548: drivers] Error 2
+make[1]: *** [/root/net-next/Makefile:2105: .] Error 2
+make: *** [Makefile:248: __sub-make] Error 2
 
 
