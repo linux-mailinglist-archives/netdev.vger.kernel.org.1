@@ -1,151 +1,167 @@
-Return-Path: <netdev+bounces-273297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273299-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oN5RDPDEymmL/wUAu9opvQ
-	(envelope-from <netdev+bounces-273297-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 20:46:08 +0200
+	id YMPqI2bGymmL/wUAu9opvQ
+	(envelope-from <netdev+bounces-273299-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 20:52:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9814F35FE92
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 20:46:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB80C35FF98
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 20:52:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 980EC301134D
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 18:46:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 88702303F055
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 18:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765663DF015;
-	Mon, 30 Mar 2026 18:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A16B3DFC69;
+	Mon, 30 Mar 2026 18:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="qu5zmt+2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dXamNKUK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED153A1A27;
-	Mon, 30 Mar 2026 18:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795733346A0
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 18:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774896365; cv=none; b=tR6zXxLhpTn42q4HyNxYHh/4nTtXfQ+FpjnXixjpd7wgXLNVwwCGu3agGK5sf0izaqaLZlrpMSTbboj5nV/40J3LJ42+cd/G0g8nvWhu+9u9a3n1XxQIndo+B5i1yv55Clwjc0ot+CQcTMXEkuTvZ2t8NUqzbUzmuX/oyJDEALY=
+	t=1774896626; cv=none; b=fiJk9jZnlf90Som/SJ+hpsBJgUjTT46LaOQa9ggl/ULZKrnvYUuTf6PQZBaNlQzCM46aeqj+jpv/TeS1578p2LhrPO4uJprbBGDcZVDUtDkOuRFkKGixKoScJPOxVarASvWr8CpMBoPiuyDsvclyo/+sVhkym0GD+VH/CRuSUZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774896365; c=relaxed/simple;
-	bh=QsSoqKo+RvBgVtDs65gRGQEN5/0YAAlpWhg+wJjdDg4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RzICoUsVEPu1fgEvjimHoI6uaZ6YEJomkewaTTojnx7EqiAsRAFpWvpkTtLpyhbqwvJpET8Ft3jycY7A/511DHvekDvANu6DNxmSPMNFOvpTWHSb0K2DTCIXgXKiqH7jRK4XlklTljrngvSLc7/OxICBAIo6Nopga8e47k06res=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=qu5zmt+2; arc=none smtp.client-ip=83.149.199.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
-Received: from debian (unknown [79.139.249.222])
-	by mail.ispras.ru (Postfix) with ESMTPSA id 0F935413A4D5;
-	Mon, 30 Mar 2026 18:45:53 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 0F935413A4D5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-	s=default; t=1774896353;
-	bh=+B6v1TakfJioZJMNia76L2HfBJ0P/AY42vMLbLG1nhE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qu5zmt+2waCfevZU5dKqtQzT5zgKS/zq3guS8vs7IArhtbaS41C2btQfS1mjKBuvv
-	 iUJhlUfuG96mKBrtsQlw7KQZ/AaM0uR2gA1epi3vLODJp81OAZ9J1P8qFt3gfPttBP
-	 lvTIs2aoLY/8qcD8iTxW1HrpRGfn6DTdc7ITZKvk=
-From: Fedor Pchelkin <pchelkin@ispras.ru>
-To: Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	=?UTF-8?q?Th=C3=A9o=20Lebrun?= <theo.lebrun@bootlin.com>
-Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Tong Zhang <ztong0001@gmail.com>,
-	Bartosz Folta <bfolta@cadence.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH net 2/2] net: macb: properly unregister fixed rate clocks
-Date: Mon, 30 Mar 2026 21:45:41 +0300
-Message-ID: <20260330184542.626619-2-pchelkin@ispras.ru>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260330184542.626619-1-pchelkin@ispras.ru>
-References: <20260330184542.626619-1-pchelkin@ispras.ru>
+	s=arc-20240116; t=1774896626; c=relaxed/simple;
+	bh=QsrmC22upVvQWb1ttkE2gs6nFEWpOFmpRk7fl+hFzkY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iw08xsCpM6n56tq2AvswwcaLa6JcXiBQMdPNM33UhqiAZ/quVisVKbWdC2CH6NK0PMSSyp5esmVR/xcJPHr8VdoUTyM4sGDmTg1QAWiA9EnJkRP76hcfrez21Yi2xABdiHiDM1whjAcvU2Itb9mFqtwhOmuQFmfguyhc34XBmRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dXamNKUK; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8a57e85b-8917-48b8-9412-b10a38fa230b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774896612;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZbI/xWQ/rrC6wAb85E1XodfYiivSfrUvb5aJFFUK0R4=;
+	b=dXamNKUKlXf3V7TOgKCvckNA8R4hlEefGV1lkULsTRrQwPcO2HWM0lPy99bob7KpucHVR2
+	/8gwDkVk+iRKYIITKU+oy1ANThY8TLqSVDzZVX4hMvZS5Rr2cSLcS00JMdKNC/JI5oV52B
+	Z4J7fYAAc5CJeelap4+eCNbFtAmW+oU=
+Date: Mon, 30 Mar 2026 14:49:59 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Subject: Re: [PATCH net V2 2/2] net: xilinx: axienet: Fix BQL accounting for
+ multi-BD TX packets
+To: Suraj Gupta <suraj.gupta2@amd.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Michal Simek <michal.simek@amd.com>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Ariane Keller <ariane.keller@tik.ee.ethz.ch>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20260327073238.134948-1-suraj.gupta2@amd.com>
+ <20260327073238.134948-3-suraj.gupta2@amd.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20260327073238.134948-3-suraj.gupta2@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[ispras.ru,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[ispras.ru:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[ispras.ru,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,cadence.com,vger.kernel.org,linuxtesting.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-273297-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273299-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pchelkin@ispras.ru,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ispras.ru:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sean.anderson@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,ispras.ru:dkim,ispras.ru:email,ispras.ru:mid,linuxtesting.org:url]
-X-Rspamd-Queue-Id: 9814F35FE92
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:email]
+X-Rspamd-Queue-Id: DB80C35FF98
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The additional resources allocated with clk_register_fixed_rate() need
-to be released with clk_unregister_fixed_rate(), otherwise they are lost.
+On 3/27/26 03:32, Suraj Gupta wrote:
+> When a TX packet spans multiple buffer descriptors (scatter-gather),
+> axienet_free_tx_chain sums the per-BD actual length from descriptor
+> status into a caller-provided accumulator. That sum is reset on each
+> NAPI poll. If the BDs for a single packet complete across different
+> polls, the earlier bytes are lost and never credited to BQL. This
+> causes BQL to think bytes are permanently in-flight, eventually
+> stalling the TX queue.
+> 
+> The SKB pointer is stored only on the last BD of a packet. When that
+> BD completes, use skb->len for the byte count instead of summing
+> per-BD status lengths. This matches netdev_sent_queue(), which debits
+> skb->len, and naturally survives across polls because no partial
+> packet contributes to the accumulator.
+> 
+> Fixes: c900e49d58eb ("net: xilinx: axienet: Implement BQL")
+> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+> ---
+>  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> index b06e4c37ff61..263c4b67fd5a 100644
+> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> @@ -770,8 +770,8 @@ static int axienet_device_reset(struct net_device *ndev)
+>   * @first_bd:	Index of first descriptor to clean up
+>   * @nr_bds:	Max number of descriptors to clean up
+>   * @force:	Whether to clean descriptors even if not complete
+> - * @sizep:	Pointer to a u32 filled with the total sum of all bytes
+> - *		in all cleaned-up descriptors. Ignored if NULL.
+> + * @sizep:	Pointer to a u32 accumulating the total byte count of
+> + *		completed packets (using skb->len). Ignored if NULL.
+>   * @budget:	NAPI budget (use 0 when not called from NAPI poll)
+>   *
+>   * Would either be called after a successful transmit operation, or after
+> @@ -805,6 +805,8 @@ static int axienet_free_tx_chain(struct axienet_local *lp, u32 first_bd,
+>  				 DMA_TO_DEVICE);
+>  
+>  		if (cur_p->skb && (status & XAXIDMA_BD_STS_COMPLETE_MASK)) {
+> +			if (sizep)
+> +				*sizep += cur_p->skb->len;
+>  			napi_consume_skb(cur_p->skb, budget);
+>  			packets++;
+>  		}
+> @@ -818,9 +820,6 @@ static int axienet_free_tx_chain(struct axienet_local *lp, u32 first_bd,
+>  		wmb();
+>  		cur_p->cntrl = 0;
+>  		cur_p->status = 0;
+> -
+> -		if (sizep)
+> -			*sizep += status & XAXIDMA_BD_STS_ACTUAL_LEN_MASK;
+>  	}
+>  
+>  	if (!force) {
 
-Found by Linux Verification Center (linuxtesting.org).
+Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
 
-Fixes: 83a77e9ec415 ("net: macb: Added PCI wrapper for Platform Driver.")
-Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
----
- drivers/net/ethernet/cadence/macb_pci.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/cadence/macb_pci.c b/drivers/net/ethernet/cadence/macb_pci.c
-index 0ce5b736ea43..b79dec17e6b0 100644
---- a/drivers/net/ethernet/cadence/macb_pci.c
-+++ b/drivers/net/ethernet/cadence/macb_pci.c
-@@ -96,10 +96,10 @@ static int macb_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	return 0;
- 
- err_plat_dev_register:
--	clk_unregister(plat_data.hclk);
-+	clk_unregister_fixed_rate(plat_data.hclk);
- 
- err_hclk_register:
--	clk_unregister(plat_data.pclk);
-+	clk_unregister_fixed_rate(plat_data.pclk);
- 
- err_pclk_register:
- 	return err;
-@@ -113,8 +113,8 @@ static void macb_remove(struct pci_dev *pdev)
- 	struct clk *hclk = plat_data->hclk;
- 
- 	platform_device_unregister(plat_dev);
--	clk_unregister(pclk);
--	clk_unregister(hclk);
-+	clk_unregister_fixed_rate(pclk);
-+	clk_unregister_fixed_rate(hclk);
- }
- 
- static const struct pci_device_id dev_id_table[] = {
--- 
-2.53.0
-
+Although FWIW this may result in slightly-different statistics. Not sure
+if we care since this will only affect packets that could not be sent
+for whatever reason (collisions, loss of carrier, etc.)
 
