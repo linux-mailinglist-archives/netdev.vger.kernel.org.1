@@ -1,251 +1,140 @@
-Return-Path: <netdev+bounces-273145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273144-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +H55KGJmymll8gUAu9opvQ
-	(envelope-from <netdev+bounces-273145-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:02:42 +0200
+	id +CCmMVplymll8gUAu9opvQ
+	(envelope-from <netdev+bounces-273144-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:58:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3448335ABE7
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 14:02:42 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C495F35AB2D
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 13:58:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 850143022966
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:55:40 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 68D0B3009E36
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 11:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDCF83C9ECC;
-	Mon, 30 Mar 2026 11:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEEFD3C7DE8;
+	Mon, 30 Mar 2026 11:53:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZbDAIP11"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="Z9fNRKUQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012004.outbound.protection.outlook.com [52.101.48.4])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FB513C943A;
-	Mon, 30 Mar 2026 11:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.4
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774871739; cv=fail; b=eqGKC8/FlZMvaL7gGjJu+jyKN/RQ80pcmEWwOM5zd09QKF7UnwjFVJ5/QWqQ/wPNp7y1HMfmVRcFK5afGAOr7gGJ0tcTUsWxk9MVWbmRAwVR3x2ATY3eh7bupoKwaMrQTaHLgFaRc1QPl2pxC+AAV/Zqdw6hpIpz9uCstakFHZU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774871739; c=relaxed/simple;
-	bh=OMhcETbCen3PG+TzWoFndJQ+AQBuJhIRHmK5cma8FO0=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=GOojD8kd6B0WcGcLdq18RiGuf7+RLkuFk7qnioWQPCUrEy6k0xg7lHR3rfLhqj0icQ+4NLIMboR2hNDzuYsME7HLFyLy3wdyr8cCSCb3Dv0bIuvUE/asYNShARuliZ57zXlqaWxeuYZQJA4SSisWGw/uhxOxFUXAsFm3MmMfYts=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZbDAIP11; arc=fail smtp.client-ip=52.101.48.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jCYXL98jiDE+dRxKLYDFVQYiKhE4D1nWqhJDxeK+aPyQkQi4uarmlX9cuRfrSWDa+dVHKRIf6Gae9tPC5bJKGT0JfyC8xkpwtIiuTAbpp1XMFYLqK7ZUNqnUicAAmTs5PHJVKXmkxUiRuQskq99ofthdtDAUYH5Kpv4WGQ4zGhHS9nLSaLXtRcRvToVotbuHyev0cLPkXf5InsoKW1jklYeQVtj8jaubcTHo78oKDrDjKhz5Kw8/YjMc9gaz4aZ/aezm0GdX7WY1uU+P9/8vLaSQPqVV3YPQtTjnaQQ9tyINND4pw6DeXDP/WrV5U1D4AqxRv88cLphZYyi5xtI8EQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2x2F10Dsf181OIWZDQHiydsRVgzGuitS8vb5d5uW74c=;
- b=E8vzhWvEqQxxZXIf3m1VmBNvTVwJXgMTrYAregcYYa9FuNDMQAbvtwF86qxqAebB85HLe802raa3+71cOeqC3vwbg3GkLgT2QAZZhGiad/gWZ+HPJySxwYgzGhWN12ZlWyKQ51bETuzxODva0BGnsS4FjMig5AKKeu+g9oCoeYTBST3OjNlbJU+udSQOhIVl9MM+WWDyuSdnRb2mwf2CE2QGCNOEsCRXfynoKefWURysLU0VS/pA4URiyDjQGlOkVzO6QBus1pelpFiCDN/OX28O9hs2n4IZ65ts+yUO/Ca/xFIrZxTjl604BnGoZ0SY09wWaSIB3J6keRmzD5moCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2x2F10Dsf181OIWZDQHiydsRVgzGuitS8vb5d5uW74c=;
- b=ZbDAIP11fofP7ZGB3dpiksZDUlNKpdPFyVuWUvQWGTcG6jlZZb4gCu/Zl13hWzdKi+LhRBVjDQBALVo5IVmFUjFlSekHckgUvpmduo+WgPsqyBPtJn6VsuOYGhGM/XxWJJK9liDd2d0Ww/oFDJxBEFslaJS7q1qJkn88GFe50WOoeHaJ5ql7i+A+CQtGb+NEFSb37Oxlhj28STJXAYN0N6PTeJZZXoyLvqp6QGPedLrQpXzI2t5uVfS5qIeWZVb8NxKTOWKgOFYDnlvwmaCmMQSrlG83HKVB8MBtASc9TuEmqbyeAzBwfjTbNYvF4PkDpgSsaNZUq6ACalGHTU8ESg==
-Received: from PH7P221CA0009.NAMP221.PROD.OUTLOOK.COM (2603:10b6:510:32a::28)
- by DM4PR12MB6277.namprd12.prod.outlook.com (2603:10b6:8:a5::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.15; Mon, 30 Mar
- 2026 11:55:33 +0000
-Received: from CY4PEPF0000E9D0.namprd03.prod.outlook.com
- (2603:10b6:510:32a:cafe::a7) by PH7P221CA0009.outlook.office365.com
- (2603:10b6:510:32a::28) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9745.28 via Frontend Transport; Mon,
- 30 Mar 2026 11:55:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000E9D0.mail.protection.outlook.com (10.167.241.135) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9745.21 via Frontend Transport; Mon, 30 Mar 2026 11:55:32 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 30 Mar
- 2026 04:55:17 -0700
-Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 30 Mar
- 2026 04:55:11 -0700
-References: <20260326132828.805703-1-ioana.ciornei@nxp.com>
- <20260326120342.6429fbdc@kernel.org>
- <5cuoazp2svgjja5h663zc34dafkuqa2grrm7lzpuunvrjogydf@43mryp77gq2q>
- <20260327172454.6b9bc8f3@kernel.org> <87a4vp61m4.fsf@nvidia.com>
- <usxkovboo5jt6vu2jvbwpnsltvewjil27xizt3jjhggu5o4td3@2cgex6op4mzc>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Ioana Ciornei <ioana.ciornei@nxp.com>
-CC: Petr Machata <petrm@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
-  Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Paolo
- Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <willemb@google.com>,
-	<linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 00/10] selftests: drivers: bash support for
- remote traffic generators
-Date: Mon, 30 Mar 2026 13:52:06 +0200
-In-Reply-To: <usxkovboo5jt6vu2jvbwpnsltvewjil27xizt3jjhggu5o4td3@2cgex6op4mzc>
-Message-ID: <87o6k54jms.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D77615C14F;
+	Mon, 30 Mar 2026 11:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774871618; cv=none; b=ujU6ziRHHeca02gJIWyAbeuZS82/tZ3ZbtkJtSxfZsgm1uag3cfNakEFlFLK1AUKj+3Rh6rDqd2HcReESqHLIEoYDGysGf+9Bzu8llQKC9QsVaJPsg0/1WKgqLuBEetaL/rZsEQeUk0OyvvBYEdZado2ycaIxkdiG3/lm7PrCAU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774871618; c=relaxed/simple;
+	bh=1JZ0jTW6/Psdq1Q4n/yeT/bumjixZkINNq5+rerMfjI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xboy5rTd54mnLfWnNwl9vzWNBlO5h+QuNwWLJ5d9JszkT27m9/CNMMjO/ffFLCKq5c5lsOKTQ0AyNHBfQxWz1+H6V6lGdmjBSgtieWlkxi+g4c3oHRiQUNqHfDNvQb67AgN0hrUf2c9jMuYl+4dcq8GjGreSRQZtln4p9nRi2uA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=Z9fNRKUQ; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 1A8D460265;
+	Mon, 30 Mar 2026 13:53:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1774871615;
+	bh=wB9KtHcNwq7byYDCOtHwOwXkHzp7JwSRlR1G+CzBe0Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Z9fNRKUQ7WdtPbIJaqAa6lAqjpI4qDBNz5AYGd7RFT0zLJHU2KISqyJnGKOzCnKFo
+	 KfbeVgAZqvv8vL+MOYJxki6AWupLx8idJMN9flAsf9VU+m5lI+Ks5XgiE9kxfTMbJJ
+	 PwQasGhdCsnyWPAW0TAxkVn+vbbWdJDZ9C6vnm/tCy1eOiI1D7eEQorTYXd0L1NH6y
+	 SsPvmNkc/Fny/5JMvyRKoCtKOEgN3NvPl/xmmeNGn7S7ff7KbN4/d+Ay0JIJumucna
+	 +rCITNFjKfeQR/wenaUHN5YjMHPYvtAzjuRqTIxO35nE0tqg5LY4+tuPUngbW1S10E
+	 +vONJc7QhJzLA==
+Date: Mon, 30 Mar 2026 13:53:32 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Qi Tang <tpluszz77@gmail.com>
+Cc: Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] netfilter: ctnetlink: validate expect class against
+ master helper
+Message-ID: <acpkPEJRvzeY863Y@chamomile>
+References: <20260329165131.240989-1-tpluszz77@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D0:EE_|DM4PR12MB6277:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9c9d10f6-7d3b-4d27-cffe-08de8e533f28
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|36860700016|1800799024|82310400026|22082099003|56012099003|18002099003|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	rtRc3N+OAm/wLp1/+6Y7USX0gJ7exeKY2l9Xtt4nn0+1T6FIjCRFH3k3+2WApUvO1tlkx0nehy9/RHmDEhquEw8lrgWt2nGl9pn6F20aqqndPa53yKtkHMjJtbWYoIXYNMqrSkPbJFyGhzxSLi6K1RtvhYWUHfC38ql4bhdagEnvDRfS+zeRYDT4G/6Vt+XhHzEuhJlzegfD54q5OpBoK6hG/5OYR6V81iGxM0rM9ESer2W9v9TtbXUadaYKbQkeJ4u+bIWm6wxbvGhKAmvUeIW9LejEcONtpBoWgFSKpVu932SR6DXAy6Hk15GsOYjXbVwJ/yVNgqseiu+BNC8U2nfpdtTj2lI5j3guzv9/Pbq19DXwmm/wRsHwUW+F3Wpr8FMGkeqEEfHybWSAQ5Eogmlw6oOd1ZiYYRpRwcEFnn+PvkstAQ3mcUW+1neAGHw432krxFJ/Grg2YKo5bwFungd6gIHL7brmkIKVg3TZe47mlxn5SarJUUYNydmcH+KcCoasGp93YbgpbJGJTXKU2TgamErQr39g/kBjlwbfIbWLv+hp07QUKNTGCmSV5rQBS0JltIZ0gpRBTydRpcmUcvO4WrCpaoLCHpihyGBs0CBRpBeDoLQj4/AHC9am3aXIDPBn4m2S/aNOqfegv4gS2iYn5gO1hveOHxQK5GE0pT3FRnt/4P5vs/BP/jYzVOWRX01RipA5nmr8WWDmZhI9dQU/xWhCwe1O3S75OlQ8m7IhF6QOzKQeAIbnf7Nz7Y1/KvwEoeD1dsEl/FUnyyGpiA==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700016)(1800799024)(82310400026)(22082099003)(56012099003)(18002099003)(13003099007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	+E+h4qLLVzmwn//D2XuP3V0y5XHkUUGFCKiJU+78h6rIlSK4VhSe9UBnnGrz9JD7XXDHM/grVs0bq7dB+pqLBW3FA9OPH4re539n3jwzSxZc7tFo6B0lRdqUW+p2s7LBdMkspsNWjfM5gZJc0ocEzRcmWvXDyBKKhlPdBQNCad4kYrHhhFcLazj/0XJRWgKv6JH41s7hWWvCl1YzF4ef+YbJUwlKA00hqvV4vk+k4HDOOxOFRLZvhC//CwHpMXhiEMIsP8Qe7aKl7U03WY/4bHoY6q8VFqof+IpZzdCkrj/cp430xFLxb7Ogg+XrMywjm/xOBYhDxJmbRc+31epDXSHTW3mlUtrxUvac7pnVIVDewq+XULK+iENtwJ88AMByESysla3B8vdjF/QTk7I09WDlSm44fTU35KZeTApYZG5md39IvrIVHpwSauwkH+Ja
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2026 11:55:32.5148
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c9d10f6-7d3b-4d27-cffe-08de8e533f28
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000E9D0.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6277
-X-Spamd-Result: default: False [1.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260329165131.240989-1-tpluszz77@gmail.com>
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273145-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[petrm@nvidia.com,netdev@vger.kernel.org];
+	DMARC_NA(0.00)[netfilter.org];
+	RCVD_COUNT_THREE(0.00)[4];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[localhost:email,nvidia.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nxp.com:email,netcons_resume.sh:url,Nvidia.com:dkim];
-	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-273144-lists,netdev=lfdr.de];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 3448335ABE7
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:dkim,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,ozlabs.org:url]
+X-Rspamd-Queue-Id: C495F35AB2D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi,
 
-Ioana Ciornei <ioana.ciornei@nxp.com> writes:
+On Mon, Mar 30, 2026 at 12:51:31AM +0800, Qi Tang wrote:
+> ctnetlink_alloc_expect() validates CTA_EXPECT_CLASS against the
+> helper specified by CTA_EXPECT_HELP_NAME.  However,
+> __nf_ct_expect_check() and nf_ct_expect_insert() later index the
+> expect_policy array using the master conntrack's actual helper.
+> 
+> When the supplied helper has a larger expect_class_max than the
+> master's helper, the class passes validation but produces an
+> out-of-bounds read on the master helper's heap-allocated policy
+> array during expectation insertion.
+> 
+> Validate the class against the master conntrack's own helper
+> instead, since that is the helper whose policy array will actually
+> be indexed.
+> 
+>   BUG: KASAN: slab-out-of-bounds in nf_ct_expect_related_report+0x2479/0x27c0
+>   Read of size 4 at addr ffff8880043fe408 by task poc/102
+>   Call Trace:
+>    nf_ct_expect_related_report+0x2479/0x27c0
+>    ctnetlink_create_expect+0x22b/0x3b0
+>    ctnetlink_new_expect+0x4bd/0x5c0
+>    nfnetlink_rcv_msg+0x67a/0x950
+>    netlink_rcv_skb+0x120/0x350
 
-> On Mon, Mar 30, 2026 at 12:38:54PM +0200, Petr Machata wrote:
->> 
->> Jakub Kicinski <kuba@kernel.org> writes:
->> 
->> > On Fri, 27 Mar 2026 09:32:22 +0200 Ioana Ciornei wrote:
->> >> On Thu, Mar 26, 2026 at 12:03:42PM -0700, Jakub Kicinski wrote:
->> >> > On Thu, 26 Mar 2026 15:28:18 +0200 Ioana Ciornei wrote:  
->> >> > > This patch set aims to add the necessary support so that bash written
->> >> > > selftests are also able to easily run with a remote traffic generator
->> >> > > system, either be it in another netns or one accessible through ssh.
->> >> > > 
->> >> > > This patch set is a result of the discussion from v1:
->> >> > > https://lore.kernel.org/all/20260303084330.340b6459@kernel.org/
->> >> > > Even though the python infrastructure is already established, some
->> >> > > things are easier in bash and it would be a shame to leave behind the
->> >> > > bash tests that we already have.  
->> >> > 
->> >> > I think this introduces a bunch of regressions, eg:
->> >> > 
->> >> > https://netdev-ctrl.bots.linux.dev/logs/vmksft/forwarding/results/575622/4-local-termination-sh/stdout
->> >> > 
->> >> > https://netdev-ctrl.bots.linux.dev/logs/vmksft/netdevsim/results/575802/18-netcons-resume-sh/stdout  
->> >> 
->> >> I cannot reproduce this unfortunately. For example, local_termination.sh
->> >> gives me the following result with the exact patches that I submitted.
->> >> Any idea on what might be the difference?
->> >
->> > Hm, the system that runs this on our end is:
->> >
->> > # cat /etc/redhat-release 
->> > Fedora release 43 (Forty Three)
->> >
->> > And it has this added on top of default install:
->> >
->> > # cat /etc/systemd/network/99-default.link
->> > [Match]
->> > OriginalName=*
->> >
->> > [Link]
->> > NamePolicy=keep kernel database onboard slot path
->> > AlternativeNamesPolicy=database onboard slot path mac
->> > MACAddressPolicy=none
->> 
->> The observed issues are consistent with TARGETS being defined, but not
->> an array:
->> 
->> $ declare -A T
->> $ T=([a.100]=b)
->> $ U=foo
->> $ if declare -p T &>/dev/null; then echo "${T[a.100]}"; else echo fail; fi
->> b
->> $ if declare -p U &>/dev/null; then echo "${U[a.100]}"; else echo fail; fi
->> bash: a.100: syntax error: invalid arithmetic operator (error token is ".100")
->
-> Totally agree, that's what it looks like.
->
-> On the other hand, I don't see any other use of the TARGETS variable in
-> tools/testing/selftests. The only way I can trigger that kind of error
-> is by setting and exporting TARGETS before running the test.
->
->  root@localhost:~/ksft-net-drv# export TARGETS=test
->  root@localhost:~/ksft-net-drv# ./run_kselftest.sh -t drivers/net/netconsole:netcons_resume.sh
->  [ 1895.134633] kselftest: Running tests in drivers/net/netconsole
->  TAP version 13
->  1..1
->  # timeout set to 45
->  # selftests: drivers/net/netconsole: netcons_resume.sh
->  # Running with bind mode: ifname
->  # /root/ksft-net-drv/drivers/net/lib/sh/../../../../net/lib.sh: line 707: eni497np1: unbound variable
->  not ok 1 selftests: drivers/net/netconsole: netcons_resume.sh # exit=1
->
-> So this means that TARGETS is used by the netdev testing
-> infrastructure, I presume.
+Better to ignore the helper name proposed by userspace when creating
+the expectation.
 
-I think Jakub has the export for make to pick up, and then tests inherit
-it.
+The master conntrack must already has a helper, and such helper must
+be the same that is specified here.
 
-> Anyhow, I can change the variable name to avoid this. Something like
-> NETIF_TARGETS?
+I could instead validate that exp->helper == nfct_help(master)->help->helper
+but it is not worth, this fix simplifies this interface.
 
-I sent some thoughts about how to fix the issue in my review of 02/10,
-so let's move the discussion there.
+CTA_EXPECT_HELP_NAME still is used for dumping the name.
+
+See:
+
+https://patchwork.ozlabs.org/project/netfilter-devel/patch/20260330115236.882409-1-pablo@netfilter.org/
 
