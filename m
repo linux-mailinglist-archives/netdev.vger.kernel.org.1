@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-273332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273333-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id B/dzO/jyymlaBwYAu9opvQ
-	(envelope-from <netdev+bounces-273332-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:02:32 +0200
+	id yPatOM3xymkkBQYAu9opvQ
+	(envelope-from <netdev+bounces-273333-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:57:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54162361B86
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:02:32 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2DC6361A8D
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:57:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 96EDB303FFEE
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 21:57:22 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 924BB300E1A6
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 21:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529F13A8729;
-	Mon, 30 Mar 2026 21:57:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D76D93A75AE;
+	Mon, 30 Mar 2026 21:57:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IWab94tu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aXT5AaNP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 392D63A7F4A
-	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 21:57:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99C13A7F6F
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 21:57:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774907834; cv=none; b=J3rPmAyzZj6byM9LgIywM8d7OChSe97ALDrGAANHPkfgyoESqFSQXwcbMcSWFZh4J8HQ8BzOYrGtzksxnm7/mj1D+TRZfb1oYqsQgj0iGyiO2uVGsf3C/7XO/qfWOeJtclsnofmb4RO+Ewvp9t7WSoEW4BQOqkOEaMiZfNSK0t8=
+	t=1774907836; cv=none; b=D8sNgWFd/dmWwWC+1Mi3DAFn315/sFRcUf1qwmuB3/YuA+KOz6/izlCg8yxKA666g4RSQJYAuyAzvWgB2DNsfoj/Ctc10VPFSK3z//KDUBydAPyByUOv6ZtYv6WV/k4GnE/53FsxUY3cmhFFuYEU4JRWlrd/+srhg2Vxyydcgn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774907834; c=relaxed/simple;
-	bh=pz86PmEpfzQN9js8IsuHqblvmjM03Ljb/l6bvN9B5Ms=;
+	s=arc-20240116; t=1774907836; c=relaxed/simple;
+	bh=cj3zNWgdYDcRxz1oligwgpnRSh482psQj978G9+dUyY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jayst7dxWohwk+dO4ZBNyputOeY/ow1+9LqQl5E91zV8KlMrgVeGKT5C0g7KCtoUKonaCPgRYUjHo0ZW9HmbjZFERb3myeZJCMtMxUkC2CqFL5xhZsLRXQcV46A/n6qJEg4lLqDaOAGiERfhZrZYPvzwObNDrz5Ac38Y9zZuN+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IWab94tu; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=e14KWIEbIx9NMcYkwiWttnToZxslsroypeyrVsqiuxTp8h5CWP0lIpEhsZmHCC1nkCF3YbGH9160+wX55DxS0gE8bput8ikFGI0Cke5KPgxaw688rUTFNT7LK58OneAaRBQn8ok9t+0ZAmPVkVyExsYK/d5s2uozcu9SyPTN33k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aXT5AaNP; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c76b15a3ccfso41076a12.3
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 14:57:11 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b2523e0299so48816755ad.3
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 14:57:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774907831; x=1775512631; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1774907833; x=1775512633; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DR2NV2QHTTPddHUWacFog7WO7giZkfHr/2vqRIpwBGM=;
-        b=IWab94tuiYPgSu5VWUAq8rtCYBUgGNScAaTJO7B5bAHld/Oc5VVHPx99DPFtBfl5tn
-         uWPtguVjaxZZtPRLBHhiUiaPmCwfF7ecUuIcbau7Jw/I0ZYCy9jyDw993GwryOqDoxaR
-         3+dUCgB31izbB1jXHimalHiGiKqiDms/foCVBXZE8fLEnSspd8s9tvRv8mVqkE16Xezj
-         pPe8bXjD8ifT71CCJ2ye5KwpYA3jTe+rKRXvPa5jgIomCcUi8PS14P9Rn1AtQAxM7mvO
-         gCEHM8ejmKsx4r+MAQKlHONhpnLqRI11uAp/iikBvjBQ1YFKZGUF/syjfW3btZFYU9Tj
-         SoVw==
+        bh=Gl/sKXd+rVvwtX4lspRuwpIWSFPNegapjZdLWrBkKwk=;
+        b=aXT5AaNP7PWnwgOWanQq5fX25aALBAXrc7l/nTTIyvat4BxYxREaDt0IHtR9SH4hS4
+         HnJStd7g6h6o5nHjMG4bVF77MzRvAlTkaE0d0X94oinzmdhp5OW8tWBxb9wwDnLUymgt
+         KTxJmAOVsEjmNUJ6BFN5bRx9gXMq/Jl+Qe6c/R/dM6sbGWzPTIg0voyOOv6gjD5XzmFQ
+         sEE+gddS7v4cxXzczl6zDeaIejdviFljFz4EXhm6Fn6NuvQaj9ayinc0PBHbWJeXY70E
+         s3nZrkSO+MhkKm/Cb5t+khZ+SaYLIRNh4DWMWTK8d0Pp7EvMBxiEe1urapwdx+pH4Dz0
+         EpVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774907831; x=1775512631;
+        d=1e100.net; s=20251104; t=1774907833; x=1775512633;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DR2NV2QHTTPddHUWacFog7WO7giZkfHr/2vqRIpwBGM=;
-        b=IAMl5pVMsdWMriTuzaGAc5IOXHkDpaY1CSpe7h8u/X2JrySn90hgPCH1IZvzQ6Qf3G
-         A7CKwTQcREypBJ+6x2MOI/4QLWF/MQzFD41ECgTFa9Ilvs/3wHoItMXUXQSUSjX1rrpl
-         gmxW9R0a4msuY0kR5DBTNDE7SxjqPDJgaYdb5sPBV+KHhJAG9YVIU8Og8pq71qEDeZ9x
-         5WH3Kb76XU8WFXn5lqwyF6oJawhP2DPkbrR60Obvm56LRdOSNM2x0MVfRwx99hcBtn/b
-         GZVqrpYgj+0gGAr5Zabxw4fFL1EucpCyVyWBHJybGczAcBif9hjR2xSfGDDQY/aB0uvl
-         Hz0w==
-X-Gm-Message-State: AOJu0Yyc2rV1Iwq0O3uXJszHrHmYC12okxkmh5Rta0hEO1wcC9KIIv1w
-	ZEOxmY4AhxbQ7IZ+kA/oP9OkTUYJA+TdBLLpG3v7Of0HTscvghTXrtz+1WEyKDroGsYe/o269nY
-	CyqKSwz+DOwc5qlz96C1SW4jc3SvvuAzxVEl7cfpE57KzWnsYT+Lft64o4eHe9B1shrMEaQlOgN
-	wNfb9Yve9w7dj1jtrdB0+ykrPamszt3m0=
-X-Received: from pgg12.prod.google.com ([2002:a05:6a02:4d8c:b0:c73:bade:9641])
- (user=jrife job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9187:b0:398:4c9f:d970
- with SMTP id adf61e73a8af0-39c877a9973mr13050112637.14.1774907830685; Mon, 30
- Mar 2026 14:57:10 -0700 (PDT)
-Date: Mon, 30 Mar 2026 21:57:01 +0000
+        bh=Gl/sKXd+rVvwtX4lspRuwpIWSFPNegapjZdLWrBkKwk=;
+        b=b6dgcqip1A56Upc4uFOAnjik61ivnN+y7y8D3b967Zai4KBiHuhkN0vKUiwy0GwIAk
+         Jq80DOeSDaI5CcvRhoKxYMKjXsBmhbqYzb124yOxjXs5wMZgsUNPSdpdjjuKTDAn7f0r
+         RNTMC+Jh4SZ40H8VU5ajw/VjHEOaMgCdiVtajjxxJjvvf9eVxoov/kZXDXy/gTFcf2sK
+         /hFqieZ8kh0d1ScgBM2Cvyh7gGdbaW2dKT/G4NO3Jlq1oogvys4YiFOxt5wGszxfdvdQ
+         EEPWyUVLqS/oKsMQxvgsRL9uUk5ilGoljIIA3oZVl7/QTLlMwCpE85Uwr3RcjB/jdavf
+         U8Xw==
+X-Gm-Message-State: AOJu0YxvEWUfCs8KnYuzsZAjxHcFMNOqRkSd+mFNeVewR8mKmTVaNFDb
+	YKSUcqCSdy53Q1RW9PwObsVynsVAXWP6kSbHUXGBUAwkKzL1wWTXllLtXdazTgAUAlEh6xsgGrv
+	sSg6qxWbEsmyZWmRffuM81ibrvVDibaVTKa6g3dRNvS09+gU6/ymEvTMzV/FMyiICtShUwzukNg
+	wj05hrjs9NDs+y3JzLchvXuTtSyub0mk0=
+X-Received: from plbbi11.prod.google.com ([2002:a17:902:bf0b:b0:2b0:663c:53a9])
+ (user=jrife job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:46c7:b0:2b2:5503:1b8d
+ with SMTP id d9443c01a7336-2b255032776mr45644885ad.6.1774907832572; Mon, 30
+ Mar 2026 14:57:12 -0700 (PDT)
+Date: Mon, 30 Mar 2026 21:57:02 +0000
 In-Reply-To: <20260330215707.2374657-1-jrife@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260330215707.2374657-1-jrife@google.com>
 X-Mailer: git-send-email 2.53.0.1118.gaef5881109-goog
-Message-ID: <20260330215707.2374657-2-jrife@google.com>
-Subject: [PATCH net-next v3 1/4] udp: Only compare daddr/dport when sk_state
- == TCP_ESTABLISHED
+Message-ID: <20260330215707.2374657-3-jrife@google.com>
+Subject: [PATCH net-next v3 2/4] udp: Remove disconnected sockets from the
+ 4-tuple hash
 From: Jordan Rife <jrife@google.com>
 To: netdev@vger.kernel.org
 Cc: Jordan Rife <jrife@google.com>, bpf@vger.kernel.org, 
@@ -94,12 +94,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273332-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273333-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -112,150 +112,63 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[jrife@google.com,netdev@vger.kernel.org];
 	FREEMAIL_CC(0.00)[google.com,vger.kernel.org,gmail.com,iogearbox.net,linux.dev,fomichev.me,kernel.org,isovalent.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 54162361B86
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E2DC6361A8D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Adjust lookups and scoring to keep their results equivalent to before
-even if inet_daddr+inet_dport are left intact after disconnecting a
-socket (sk_state == TCP_CLOSE). sk_state == TCP_ESTABLISHED implies that
-*daddr is non-zero, so remove redundant checks for that at the same
-time. Note that __udp6_lib_demux_lookup already checks if sk_state ==
-TCP_ESTABLISHED, so no change was needed there [1].
-
-I could find no discernible difference in performance in
-udp4_lib_lookup2 before and after the change in compute_score.
-
-(AMD Ryzen 9 9900X)
-
-kprobe:udp4_lib_lookup2 {
-        @start[cpu] = nsecs;
-}
-kretprobe:udp4_lib_lookup2 {
-        @lookup[cpu] = hist(nsecs - @start[cpu], 2);
-}
-
-BEFORE
-======
-@lookup[11]:
-[80, 96)         1387077 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[96, 112)         364973 |@@@@@@@@@@@@@                                       |
-[112, 128)         34261 |@                                                   |
-[128, 160)          7246 |                                                    |
-[160, 192)           215 |                                                    |
-[192, 224)           126 |                                                    |
-
-AFTER
-=====
-@lookup[11]:
-[80, 96)         1408594 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[96, 112)         340568 |@@@@@@@@@@@@                                        |
-[112, 128)         30753 |@                                                   |
-[128, 160)          8019 |                                                    |
-[160, 192)           231 |                                                    |
-[192, 224)           157 |                                                    |
-
-[1]: https://lore.kernel.org/netdev/20170623222537.130493-1-tracywwnj@gmail.com/
+Currently, previously connected sockets stay in the 4-tuple hash after
+__udp_disconnect if the socket was bound to a specific port or port:addr
+pair. This is benign if inet_daddr/inet_dport are cleared as well, since
+lookups matching the old 4-tuple will not find this socket in the hash.
+To maintain the same behavior as before if inet_daddr/inet_dport are not
+cleared in __udp_disconnect, always remove a socket from the hash on
+disconnect or abort to prevent a lookup for the original 4-tuple from
+finding the socket.
 
 Signed-off-by: Jordan Rife <jrife@google.com>
 ---
- net/ipv4/udp.c | 20 +++++++++++---------
- net/ipv6/udp.c | 18 +++++++++---------
- 2 files changed, 20 insertions(+), 18 deletions(-)
+ net/ipv4/udp.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
 diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index b60fad393e18..d91c587c3657 100644
+index d91c587c3657..6e5ba2ce9314 100644
 --- a/net/ipv4/udp.c
 +++ b/net/ipv4/udp.c
-@@ -385,16 +385,16 @@ static int compute_score(struct sock *sk, const struct net *net,
- 	score = (sk->sk_family == PF_INET) ? 2 : 1;
+@@ -2235,10 +2235,20 @@ int __udp_disconnect(struct sock *sk, int flags)
+ }
+ EXPORT_SYMBOL(__udp_disconnect);
  
- 	inet = inet_sk(sk);
--	if (inet->inet_daddr) {
-+	if (sk->sk_state == TCP_ESTABLISHED) {
- 		if (inet->inet_daddr != saddr)
- 			return -1;
- 		score += 4;
--	}
++static int udp_disconnect_unhash4(struct sock *sk, int flags)
++{
++	struct udp_table *udptable = udp_get_table_prot(sk);
++
++	udp_unhash4(udptable, sk);
++	__udp_disconnect(sk, flags);
++
++	return 0;
++}
++
+ int udp_disconnect(struct sock *sk, int flags)
+ {
+ 	lock_sock(sk);
+-	__udp_disconnect(sk, flags);
++	udp_disconnect_unhash4(sk, flags);
+ 	release_sock(sk);
+ 	return 0;
+ }
+@@ -3254,7 +3264,7 @@ int udp_abort(struct sock *sk, int err)
  
--	if (inet->inet_dport) {
--		if (inet->inet_dport != sport)
--			return -1;
--		score += 4;
-+		if (inet->inet_dport) {
-+			if (inet->inet_dport != sport)
-+				return -1;
-+			score += 4;
-+		}
- 	}
+ 	sk->sk_err = err;
+ 	sk_error_report(sk);
+-	__udp_disconnect(sk, 0);
++	udp_disconnect_unhash4(sk, 0);
  
- 	dev_match = udp_sk_bound_dev_eq(net, sk->sk_bound_dev_if,
-@@ -796,8 +796,9 @@ static inline bool __udp_is_mcast_sock(struct net *net, const struct sock *sk,
- 
- 	if (!net_eq(sock_net(sk), net) ||
- 	    udp_sk(sk)->udp_port_hash != hnum ||
--	    (inet->inet_daddr && inet->inet_daddr != rmt_addr) ||
--	    (inet->inet_dport != rmt_port && inet->inet_dport) ||
-+	    (sk->sk_state == TCP_ESTABLISHED &&
-+	     (inet->inet_daddr != rmt_addr ||
-+	     (inet->inet_dport != rmt_port && inet->inet_dport))) ||
- 	    (inet->inet_rcv_saddr && inet->inet_rcv_saddr != loc_addr) ||
- 	    ipv6_only_sock(sk) ||
- 	    !udp_sk_bound_dev_eq(net, sk->sk_bound_dev_if, dif, sdif))
-@@ -2854,7 +2855,8 @@ static struct sock *__udp4_lib_demux_lookup(struct net *net,
- 	ports = INET_COMBINED_PORTS(rmt_port, hnum);
- 
- 	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
--		if (inet_match(net, sk, acookie, ports, dif, sdif))
-+		if (sk->sk_state == TCP_ESTABLISHED &&
-+		    inet_match(net, sk, acookie, ports, dif, sdif))
- 			return sk;
- 		/* Only check first socket in chain */
- 		break;
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 010b909275dd..b93a9a3e7678 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -147,16 +147,16 @@ static int compute_score(struct sock *sk, const struct net *net,
- 	score = 0;
- 	inet = inet_sk(sk);
- 
--	if (inet->inet_dport) {
-+	if (sk->sk_state == TCP_ESTABLISHED) {
- 		if (inet->inet_dport != sport)
- 			return -1;
- 		score++;
--	}
- 
--	if (!ipv6_addr_any(&sk->sk_v6_daddr)) {
--		if (!ipv6_addr_equal(&sk->sk_v6_daddr, saddr))
--			return -1;
--		score++;
-+		if (!ipv6_addr_any(&sk->sk_v6_daddr)) {
-+			if (!ipv6_addr_equal(&sk->sk_v6_daddr, saddr))
-+				return -1;
-+			score++;
-+		}
- 	}
- 
- 	bound_dev_if = READ_ONCE(sk->sk_bound_dev_if);
-@@ -949,9 +949,9 @@ static bool __udp_v6_is_mcast_sock(struct net *net, const struct sock *sk,
- 
- 	if (udp_sk(sk)->udp_port_hash != hnum ||
- 	    sk->sk_family != PF_INET6 ||
--	    (inet->inet_dport && inet->inet_dport != rmt_port) ||
--	    (!ipv6_addr_any(&sk->sk_v6_daddr) &&
--		    !ipv6_addr_equal(&sk->sk_v6_daddr, rmt_addr)) ||
-+	    (sk->sk_state == TCP_ESTABLISHED &&
-+	     ((inet->inet_dport && inet->inet_dport != rmt_port) ||
-+	     !ipv6_addr_equal(&sk->sk_v6_daddr, rmt_addr))) ||
- 	    !udp_sk_bound_dev_eq(net, READ_ONCE(sk->sk_bound_dev_if), dif, sdif) ||
- 	    (!ipv6_addr_any(&sk->sk_v6_rcv_saddr) &&
- 		    !ipv6_addr_equal(&sk->sk_v6_rcv_saddr, loc_addr)))
+ out:
+ 	if (!has_current_bpf_ctx())
 -- 
 2.53.0.1118.gaef5881109-goog
 
