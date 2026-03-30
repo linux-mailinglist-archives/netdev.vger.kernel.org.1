@@ -1,177 +1,199 @@
-Return-Path: <netdev+bounces-273330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273331-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gGlgFanuymkkBQYAu9opvQ
-	(envelope-from <netdev+bounces-273330-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:44:09 +0200
+	id KBkdM+zyymkkBQYAu9opvQ
+	(envelope-from <netdev+bounces-273331-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:02:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F300A3618EE
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 23:44:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DF73361B7F
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:02:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C9C0C301918A
-	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 21:42:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E84D5303C009
+	for <lists+netdev@lfdr.de>; Mon, 30 Mar 2026 21:57:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90E3A3A4F48;
-	Mon, 30 Mar 2026 21:42:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A38953A7F69;
+	Mon, 30 Mar 2026 21:57:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n4IC9t/9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IUfXroDu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668513A4532;
-	Mon, 30 Mar 2026 21:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8AF3A7848
+	for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 21:57:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774906975; cv=none; b=jL4fxhLa6rw6AoC4mtqN9SUnfrk9hsnV6e5KwtRIYCXcQ56E9S0aQS2yd4Zix8IlXa/6QMesyAaH5yZYRbQZjnUnRDLNnZdKRZbQ3wOIKfA8YkaUO8AQz+rPHNd2irXsshRbncomx/EmHe89rW0UtqR9Y5eSUaB12vaaePBwrG0=
+	t=1774907833; cv=none; b=SyfLGCJShIcObUNh2ICpD4ue/kL/NSM52mebaKULLkgFlG6zfQT22cu+HNzLgcLlMP/Bl6pzTuiIg7568j8fkS5nffTg4DwTtbbtLspV47Ez4K/kmw0fjNff4c1VjZQZTGd3Qs/Je1YxSnRUQ2TtRhfE/yBAeyiNTeYO3TQQclg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774906975; c=relaxed/simple;
-	bh=WDmKX5hyCYCsZw9yvr0oU4+GmiqTh75fiyz8/DAsRWA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=CBiPcCPOcfLAzs23fdj388cufd3RMZoIl30C3BMYbhw7X+eWm4DsviUSZfW3Q1hb5gvkJTfoZLk5ubaSDhejdSEB1p+oN89fiNmSd5+PFXJ236dl6YS4/tdvvW0puLFOMlnc3QWA2wOpc35JjUiZNxtgcgZyS3sQ9YPloyskrCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n4IC9t/9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F285C4CEF7;
-	Mon, 30 Mar 2026 21:42:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774906975;
-	bh=WDmKX5hyCYCsZw9yvr0oU4+GmiqTh75fiyz8/DAsRWA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=n4IC9t/9kMlDfn3o72V3jZPI6iJYHmJHV+A1YEz4cLBcZrXHDboxAGObjtIy9KecY
-	 xcqaUGg/W40l3Zqlidf83ecSn0Mg/+nmI9mIa7G1JHexHwfEfn1HbSY1Y/r9U5JPUK
-	 tH7e6O9QOa4xznvpZVisd8QxwheStdjdng4i4piQ2+Ym+gkcY8fYLkB4G4SgBIP/L2
-	 0Hp9oS+L8oH9RZi02qe37K5dPaRrMnHmC1GFXKnUfU89SrgLqhwOXDBcBhWdJoEpHZ
-	 n9tNyv6c4Y0WSpqc+7ESC+cWocrV0MFGJm+3fIQ/jd7XAzMzvs73MjYWjU0Ine+9g3
-	 pwp+v9byuUMxQ==
-Date: Mon, 30 Mar 2026 16:42:53 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Gerd Bayer <gbayer@linux.ibm.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Selvin Xavier <selvin.xavier@broadcom.com>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	Michal Kalderon <mkalderon@marvell.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>,
-	Jay Cornwall <Jay.Cornwall@amd.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Alexander Schmidt <alexs@linux.ibm.com>, linux-s390@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH v7 1/3] PCI: AtomicOps: Do not enable requests by RCiEPs
-Message-ID: <20260330214253.GA92498@bhelgaas>
+	s=arc-20240116; t=1774907833; c=relaxed/simple;
+	bh=TUABFKh2Cj1ynxKxcSeh4gP82eO8t3Tm55gdX0npR7I=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Bcc2ZhD+wNsgFSQjFLUKN4/Oa4ni++Rj5m5Mloq31LRUFAZ72SfSnzRyyVsYjjPvqCPQxH9dIomJ2YC+N6gBrucMBLnK4bpHr0GP/cCCz8bKRhBJ5R9ZEYFY1C3Gjs1uTjF5nt1yUs2jPUkNM3gco9nfdhk27pr4iNKDDmw9UXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IUfXroDu; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-82cdaf0f934so121678b3a.0
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 14:57:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774907829; x=1775512629; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8ezkx37vFhwxIuITDyGC8lYQPdysOgwQvvO9b96vUlI=;
+        b=IUfXroDuGiPXn9rzqF9N3rBOWdaiehmgv7d9j9QVaCy9T6Ssy+Zdi4r6QrljL3cSWb
+         ltl/tzxnDSxln/vioyoo9uIfUwhtiPK1G24lpVOpRHVFRVq9ehnteLZSRrnmlIDj6qYP
+         WE5JDgqV92tv5E6BqY+aSZYsoB23qILgmuwieWsvCFlixFnK3yk3qsOoGOOSN5hrMEW2
+         FXx8we029RFPRd1Z3jVDYsNH1JicxMfCxuSrOLJHmzorYNEVz3QR0B/8qkpggsv+9X7j
+         eqUStduC9Al+OufKQM8WLBguEf3vPI2MxTjj3+UlKzyG476pkM3chD4OiP+8TAsvBRrl
+         3Mfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774907829; x=1775512629;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8ezkx37vFhwxIuITDyGC8lYQPdysOgwQvvO9b96vUlI=;
+        b=fvNBHixyiGEEToyZYAFMA+cq5BSSHJz3zHqxZ/zUfYsR71VsgFf/3Xr9aaugsHcDp2
+         8ss/7++qLZeNDo2FCru2OHBU91I6eYY7Y0kvx7pVBWyBFiuCdqXRC6ZDgfnmsSVtw6tL
+         LothuEozJ5hr/0mEmqyp/HQbNo1O2pXWCluXQG11KcbijYtRVvv0OQ56ZSroLXdM5ZbT
+         +uJCuy8tRnGGe9G0Sk9bXIsdgl/LQFmd6xhoZUPiuRZR571Yuu/lfdQy5WxM8G1vzUKx
+         NHVp9V4GLn45PSd9fYRfq1TPMyuY50Gxy7/D96w0V5gKc8xEUplS+nBoE3ikxJ0LTx/D
+         wzYQ==
+X-Gm-Message-State: AOJu0Yx4LmSibGBk583QYWeHyNmmf5qb8wu7ocnL4vIWuteBfnIaeSpI
+	kxB4qFXHLAXRw51Bg4ezlH/nuLYbERmgxj2Ndl/KbOcU3EvALWW1q6b76MbGxp4+RzCiDCBxvo4
+	Egklk3sgEh4ejToJ0Qm5uWYkr49HIofqw7axekcdtlWl4VgjaLmiXPeJUt9rGkiB2SUqWcqfO16
+	4mai5q2s1YK3bXgfi4fnRn+8M6vs6Td5o=
+X-Received: from pfbif10.prod.google.com ([2002:a05:6a00:8b0a:b0:827:45df:8f74])
+ (user=jrife job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3698:b0:81e:e09d:2687
+ with SMTP id d2e1a72fcca58-82c95af13f9mr13335495b3a.1.1774907829135; Mon, 30
+ Mar 2026 14:57:09 -0700 (PDT)
+Date: Mon, 30 Mar 2026 21:57:00 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260330-fix_pciatops-v7-1-f601818417e8@linux.ibm.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.1118.gaef5881109-goog
+Message-ID: <20260330215707.2374657-1-jrife@google.com>
+Subject: [PATCH net-next v3 0/4] udp: Preserve UDP socket addresses on abort
+From: Jordan Rife <jrife@google.com>
+To: netdev@vger.kernel.org
+Cc: Jordan Rife <jrife@google.com>, bpf@vger.kernel.org, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>, 
+	Yusuke Suzuki <yusuke.suzuki@isovalent.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-273331-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273330-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[28];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[helgaas@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_TRACE(0.00)[google.com:+];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jrife@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[google.com,vger.kernel.org,gmail.com,iogearbox.net,linux.dev,fomichev.me,kernel.org,isovalent.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F300A3618EE
+X-Rspamd-Queue-Id: 3DF73361B7F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-[+to amdgpu, bnxe_re, mlx5 IB, qedr, mlx5 maintainers]
+BPF cgroup/sock_release hooks can be useful for performing cleanup,
+map maintenance, or other bookkeeping when sockets are released. Cilium
+uses cgroup/sock_release hooks to do just that, cleaning up maps keyed
+by socket destination addresses. This works fine for TCP and connected
+UDP sockets when they're closed gracefully, but Yusuke reported in [1]
+that behavior is inconsistent following a socket abort.
 
-On Mon, Mar 30, 2026 at 03:09:44PM +0200, Gerd Bayer wrote:
-> Since root complex integrated end points (RCiEPs) attach to a bus that
-> has no bridge device describing the root port, the capability to
-> complete AtomicOps requests cannot be determined with PCIe methods.
-> 
-> Change default of pci_enable_atomic_ops_to_root() to not enable
-> AtomicOps requests on RCiEPs.
+From the perspective of a BPF sock_release hook, the state of sockets
+following a socket abort (udp_abort, tcp_abort) is inconsistent and
+surprising. After a sequence like the following,
 
-I know I suggested this because there's nothing explicit that tells us
-whether the RC supports atomic ops from RCiEPs [1].  But I'm concerned
-that GPUs, infiniband HCAs, and NICs that use atomic ops may be
-implemented as RCiEPs and would be broken by this.
+1. connect(127.0.0.1:10001) or connect(::1:10001)
+2. abort (diag_destroy() -> tcp_abort() or udp_abort())
+3. close() -> sock_release hook runs
 
-These drivers use pci_enable_atomic_ops_to_root():
+, the state of the sock_release program context differs depending on the
+protocol and IP version.
 
-  amdgpu
-  bnxt_re (infiniband)
-  mlx5 (infinband)
-  qedr (infiniband)
-  mlx5 (ethernet)
+   +--------------------------------------------------------------+
+   |        Configuration        |           ctx fields           |
+   +------+----------+-----------+-----------+---------+----------+
+   | Case | Protocol | IP Family | dst_ip4   | dst_ip6 | dst_port |
+   +------+----------+-----------+-----------+---------+----------+
+   | 1    | TCP      | IPv4      | 127.0.0.1 | -       | 10001    |
+   | 2    | TCP      | IPv6      | -         | ::1     | 10001    |
+   | 3    | UDP      | IPv4      | 0         | -       | 0        |
+   | 4    | UDP      | IPv6      | -         | ::1     | 0        |
+   +------+----------+-----------+-----------+---------+----------+
 
-Maybe we should assume that because RCiEPs are directly integrated
-into the RC, the RCiEP would only allow AtomicOp Requester Enable to
-be set if the RC supports atomic ops?
+For TCP, the state of dst_ip4/dst_ip6/dst_port are preserved. In the
+case of UDP, both dst_ip4 and dst_port are cleared for IPv4 while
+dst_ip6 remains intact for IPv6. This can be confusing for users of BPF
+like Cilium where a sock_release hook makes use of these fields and
+expects them to match a socket's state prior to abort. This series aims
+to make the behavior consistent across the board to eliminate this
+pitfall by preserving the state of dst_ip4 and dst_port after an abort.
 
-I don't like making assumptions like that, but it'd be worse to break
-these devices.
+[1]: https://github.com/cilium/cilium/issues/42649
 
-[1] https://lore.kernel.org/all/20260326164002.GA1325368@bhelgaas
+v2: https://lore.kernel.org/netdev/20260303170106.129698-1-jrife@google.com/
 
-> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-> ---
->  drivers/pci/pci.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> index 8479c2e1f74f1044416281aba11bf071ea89488a..135e5b591df405e87e7f520a618d7e2ccba55ce1 100644
-> --- a/drivers/pci/pci.c
-> +++ b/drivers/pci/pci.c
-> @@ -3692,15 +3692,14 @@ int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
->  
->  	/*
->  	 * Per PCIe r4.0, sec 6.15, endpoints and root ports may be
-> -	 * AtomicOp requesters.  For now, we only support endpoints as
-> -	 * requesters and root ports as completers.  No endpoints as
-> +	 * AtomicOp requesters.  For now, we only support (legacy) endpoints
-> +	 * as requesters and root ports as completers.  No endpoints as
->  	 * completers, and no peer-to-peer.
->  	 */
->  
->  	switch (pci_pcie_type(dev)) {
->  	case PCI_EXP_TYPE_ENDPOINT:
->  	case PCI_EXP_TYPE_LEG_END:
-> -	case PCI_EXP_TYPE_RC_END:
->  		break;
->  	default:
->  		return -EINVAL;
-> 
-> -- 
-> 2.51.0
-> 
+CHANGES
+=======
+v2 -> v3:
+* Expand selftests to add coverage for scenarios where a socket is bound
+  and connected.
+* Simply unhashing a socket in udp_abort() as in v2 immediately releases
+  any ports the socket is bound to. Instead, the socket should hold onto
+  its port until it is closed just as before (Kuniyuki). v3 employs a
+  new strategy where inet_daddr and inet_dport are left intact in
+  __udp_disconnect during udp_abort and bound sockets remain in the
+  primary and portaddr hashes just as before. At the same time, the
+  logic in hash lookups is adjusted so that inet_daddr/inet_dport are
+  ignored unless the socket is currently connected (sk_state ==
+  TCP_ESTABLISHED).
+    Kuniyuki mentioned that performance may be a concern with changes to
+    logic in the fast path. I've tried to address these concerns by
+    testing the performance of udp4_lib_lookup2 before and after making
+    the changes.
+v1 -> v2:
+* Set connect_fd back to -1 after calling destroy() in the selftest
+  (Jakub).
+
+Jordan Rife (4):
+  udp: Only compare daddr/dport when sk_state == TCP_ESTABLISHED
+  udp: Remove disconnected sockets from the 4-tuple hash
+  udp: Preserve destination address info after abort
+  selftests/bpf: Ensure dst addr/port are preserved after socket abort
+
+ net/ipv4/udp.c                                |  47 +++--
+ net/ipv6/udp.c                                |  18 +-
+ .../bpf/prog_tests/sock_destroy_release.c     | 180 ++++++++++++++++++
+ .../bpf/progs/sock_destroy_release.c          |  56 ++++++
+ 4 files changed, 278 insertions(+), 23 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sock_destroy_release.c
+ create mode 100644 tools/testing/selftests/bpf/progs/sock_destroy_release.c
+
+-- 
+2.53.0.1118.gaef5881109-goog
+
 
