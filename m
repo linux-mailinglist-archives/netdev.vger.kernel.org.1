@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-273626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273627-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2BJ+KHTGy2mnLgYAu9opvQ
-	(envelope-from <netdev+bounces-273626-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:04:52 +0200
+	id UMleBfLGy2mnLgYAu9opvQ
+	(envelope-from <netdev+bounces-273627-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:06:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08BAA369E9F
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:04:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7771E369EFA
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:06:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 820CD302DB4E
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:00:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0086D30A946B
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:00:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67ED53E3C7F;
-	Tue, 31 Mar 2026 13:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F073E3C40;
+	Tue, 31 Mar 2026 13:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D1GvVZwr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZZeccucj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427153E3C56;
-	Tue, 31 Mar 2026 13:00:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2BF3E3C7E;
+	Tue, 31 Mar 2026 13:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774962010; cv=none; b=LwmYFPa2sGIEXL/P1Mn+H145iQOM9NxKP6D2kI5ZQ2rSA7FB4Bvc0wz5S+860UigggeohwJ/gd9XtVJf+cF3RZVn8RjpPKE7vVLsdSdTch6X44wBdHx2WuYXevTBy8sS1RebLFV/47OCOH91A4FKmEYtdd+xIp4aNyPvgAj/kOo=
+	t=1774962033; cv=none; b=sKfvGIQJNCEX0MHx83GxfFf1qNGnA+RqjV0KuoMRsQExraYKanT9+yRhH+w2M1QHXzAyoYJntcflygbSGthlCmDHvlK0acMzMuEXRFKUatg1NvT3Z9D1uq5uicAzarzHcxehpG3m+cPlTwY8BZRfyUvga56fSWh1nJiFVip1vAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774962010; c=relaxed/simple;
-	bh=Aid6A4kU1rFuiXFfYoqlUcE12Y1zwl4OGNPuijYgxwQ=;
+	s=arc-20240116; t=1774962033; c=relaxed/simple;
+	bh=Prx95567J6vzfyKVo56x6e9/hbD35R8iDrHSkAFtEUo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kXwv8iogwHKgw71VKhGcEcC56jx9bnBZQjdMU+DR1dYPaezl+2XQAh6z+sRmEnDq+OI2sqiS+vVmSttUX/1uHeTljEqgp0B5NsGlmyAl3NJ5PU0Gm/CPiC/y1+Crfc+pJGmXmTJNKr8ptCz72to1kaTgGHK7GRxdeamGARQwsVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D1GvVZwr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5715FC19423;
-	Tue, 31 Mar 2026 13:00:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774962009;
-	bh=Aid6A4kU1rFuiXFfYoqlUcE12Y1zwl4OGNPuijYgxwQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D1GvVZwrBJF+RmNmadu1Zd61sTNOaNDCVjyCiMVFWQWQUMH+6Zzw1Hz9oznH2f3ks
-	 ljnsOTeYS0CRUSQrFS62kxo3o64EI2TpzBCxN9YSxtR1BxnimRdrdbRJ8y+vT/5pXU
-	 6ieoDwrOo6tkLAJP7hqhT7bXIx4yxGfg/E4FdIipIi1mejoJD0XpfZrs6bQnMwQFfB
-	 uiHpGijKiTtJ/HdI8OxLMiqKha8jj/0Mbfxjx5oCFIwRfLoyLosrSvvdg42a1BQ87h
-	 ASGO07Q6376XU49mwx6thSd118eOZPEc3avvWEdnznnVHDetxJ5BpVRMlfQAqSb+Dz
-	 9S//mLmMysm2g==
-Date: Tue, 31 Mar 2026 07:00:07 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Zhiping Zhang <zhipingz@meta.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-rdma@vger.kernel.org,
-	linux-pci@vger.kernel.org, netdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, Yochai Cohen <yochai@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Bjorn Helgaas <helgaas@kernel.org>
-Subject: Re: [RFC v2 1/2] vfio: add callback to get tph info for dmabuf
-Message-ID: <acvFV8c5QVxnt3Em@kbusch-mbp>
-References: <20260324234615.3731237-1-zhipingz@meta.com>
- <20260324234615.3731237-2-zhipingz@meta.com>
- <20260325082534.GN814676@unreal>
- <acW2BwQKaUbS3eL9@kbusch-mbp>
- <20260331083758.GA814676@unreal>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hhNMjcT6lCZ+BIvW4wy6g0aJLGiUhNdgNTat0N8rGvhpfRY+87cD/mt8kRJZUXhBkokI/XDpKA9/nL1CFVQWpOgC26+1b6booUCOPufPv/BDCktm/F61k1ZzN2CJaFx642YPIdrIJazpkWBZ+DitlLpF/zqLn9SceaY/xL1kWHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZZeccucj; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=x17+fCZEiea6rkhwqYIBLlsTRs919T9DlcGeN53lTHA=; b=ZZeccucjd5ldAJfs08c+KQjUyp
+	WutXtC30t1z5C1EwkOVmg+ALb0JYTmsdf6eDlXQsuMn5gtt573mPJt0Hz9uWEjfFxZFGnHi4IEk56
+	DyacgvFKDJagFIwYB2NXSzoUj2ssxJJLauWtnlVXKrgu1bdeOX+7YlU07Z7PEBk3hOOg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w7Yhd-00ECKF-96; Tue, 31 Mar 2026 15:00:17 +0200
+Date: Tue, 31 Mar 2026 15:00:17 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Abdun Nihaal <abdun.nihaal@gmail.com>, stable@vger.kernel.org
+Subject: Re: [PATCH net] net: txgbe: fix RTNL assertion warning when remove
+ module
+Message-ID: <cc91b8ab-bbc3-46c9-91bd-05c7456eaaf2@lunn.ch>
+References: <D56A7C3379B4DA62+20260331071107.5414-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,69 +69,109 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260331083758.GA814676@unreal>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+In-Reply-To: <D56A7C3379B4DA62+20260331071107.5414-1-jiawenwu@trustnetic.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273626-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273627-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,intel.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kbusch@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 08BAA369E9F
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,trustnetic.com:email]
+X-Rspamd-Queue-Id: 7771E369EFA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 31, 2026 at 11:37:58AM +0300, Leon Romanovsky wrote:
-> On Thu, Mar 26, 2026 at 04:41:11PM -0600, Keith Busch wrote:
-> > 
-> > You're suggesting that Ziping append the new fields to the end of this
-> > struct? I don't think we can modify the layout of a uapi.
+On Tue, Mar 31, 2026 at 03:11:07PM +0800, Jiawen Wu wrote:
+> For the copper NIC with external PHY, the driver called
+> phylink_connect_phy() during probe and phylink_disconnect_phy() during
+> remove. It caused an RTNL assertion warning in phylink_disconnect_phy()
+> upon module remove.
 > 
-> He needs to add before flex array. This struct is submitted by the user
-> and kernel can easily calculate the position of that array.
+> To fix this, move the phylink connect/disconnect PHY to ndo_open/close.
+> 
+>  ------------[ cut here ]------------
+>  RTNL: assertion failed at drivers/net/phy/phylink.c (2351)
+>  WARNING: drivers/net/phy/phylink.c:2351 at
+> phylink_disconnect_phy+0xd8/0xf0 [phylink], CPU#0: rmmod/4464
+>  Modules linked in: ...
+>  CPU: 0 UID: 0 PID: 4464 Comm: rmmod Kdump: loaded Not tainted 7.0.0-rc4+
+>  Hardware name: Micro-Star International Co., Ltd. MS-7E16/X670E GAMING
+> PLUS WIFI (MS-7E16), BIOS 1.90 12/31/2024
+>  RIP: 0010:phylink_disconnect_phy+0xe4/0xf0 [phylink]
+>  Code: 5b 41 5c 41 5d 41 5e 41 5f 5d 31 c0 31 d2 31 f6 31 ff e9 3a 38 8f e7
+> 48 8d 3d 48 87 e2 ff ba 2f 09 00 00 48 c7 c6 c1 22 24 c0 <67> 48 0f b9 3a
+> e9 34 ff ff ff 66 90 90 90 90 90 90 90 90 90 90 90
+>  RSP: 0018:ffffce7288363ac0 EFLAGS: 00010246
+>  RAX: 0000000000000000 RBX: ffff89654b2a1a00 RCX: 0000000000000000
+>  RDX: 000000000000092f RSI: ffffffffc02422c1 RDI: ffffffffc0239020
+>  RBP: ffffce7288363ae8 R08: 0000000000000000 R09: 0000000000000000
+>  R10: 0000000000000000 R11: 0000000000000000 R12: ffff8964c4022000
+>  R13: ffff89654fce3028 R14: ffff89654ebb4000 R15: ffffffffc0226348
+>  FS:  0000795e80d93780(0000) GS:ffff896c52857000(0000)
+> knlGS:0000000000000000
+>  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>  CR2: 00005b528b592000 CR3: 0000000170d0f000 CR4: 0000000000f50ef0
+>  PKRU: 55555554
+>  Call Trace:
+>   <TASK>
+>   txgbe_remove_phy+0xbb/0xd0 [txgbe]
+>   txgbe_remove+0x4c/0xb0 [txgbe]
+>   pci_device_remove+0x41/0xb0
+>   device_remove+0x43/0x80
+>   device_release_driver_internal+0x206/0x270
+>   driver_detach+0x4a/0xa0
+>   bus_remove_driver+0x83/0x120
+>   driver_unregister+0x2f/0x60
+>   pci_unregister_driver+0x40/0x90
+>   txgbe_driver_exit+0x10/0x850 [txgbe]
+>   __do_sys_delete_module.isra.0+0x1c3/0x2f0
+>   __x64_sys_delete_module+0x12/0x20
+>   x64_sys_call+0x20c3/0x2390
+>   do_syscall_64+0x11c/0x1500
+>   ? srso_alias_return_thunk+0x5/0xfbef5
+>   ? do_syscall_64+0x15a/0x1500
+>   ? srso_alias_return_thunk+0x5/0xfbef5
+>   ? do_fault+0x312/0x580
+>   ? srso_alias_return_thunk+0x5/0xfbef5
+>   ? __handle_mm_fault+0x9d5/0x1040
+>   ? srso_alias_return_thunk+0x5/0xfbef5
+>   ? count_memcg_events+0x101/0x1d0
+>   ? srso_alias_return_thunk+0x5/0xfbef5
+>   ? handle_mm_fault+0x1e8/0x2f0
+>   ? srso_alias_return_thunk+0x5/0xfbef5
+>   ? do_user_addr_fault+0x2f8/0x820
+>   ? srso_alias_return_thunk+0x5/0xfbef5
+>   ? irqentry_exit+0xb2/0x600
+>   ? srso_alias_return_thunk+0x5/0xfbef5
+>   ? exc_page_fault+0x92/0x1c0
+>   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> 
+> Fixes: 02b2a6f91b90 ("net: txgbe: support copper NIC with external PHY")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 
-No, you can't just do that. Existing applications would break when they
-compile against the updated kernel header. They don't know about this
-new "tph" supplied flag, but they'll all accidently use the new
-dma_ranges offset. 
- 
-> Something like this:
-> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> index b1d658b8f7b51..d78d915992232 100644
-> --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
-> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
-> @@ -237,7 +237,11 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 flags,
->         if (get_dma_buf.region_index >= VFIO_PCI_ROM_REGION_INDEX)
->                 return -ENODEV;
-> 
-> -       dma_ranges = memdup_array_user(&arg->dma_ranges, get_dma_buf.nr_ranges,
-> +       if (!tph_supplied)
-> +               dma_ranges = memdup_array_user(old_dma_ranges_pos, get_dma_buf.nr_ranges,
-> +                                      sizeof(*dma_ranges));
-> +       else
-> +               dma_ranges = memdup_array_user(&arg->dma_ranges, get_dma_buf.nr_ranges,
->                                        sizeof(*dma_ranges));
->         if (IS_ERR(dma_ranges))
->                 return PTR_ERR(dma_ranges);
-> ~
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
