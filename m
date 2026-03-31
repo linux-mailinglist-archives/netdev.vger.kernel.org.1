@@ -1,449 +1,242 @@
-Return-Path: <netdev+bounces-273571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273572-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ANouFU2my2nJJwYAu9opvQ
-	(envelope-from <netdev+bounces-273571-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:47:41 +0200
+	id GM20M1Ooy2kpKAYAu9opvQ
+	(envelope-from <netdev+bounces-273572-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:56:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 997503684B4
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:47:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 311F036866E
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:56:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 02BB9300682A
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:47:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F1770300B107
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:48:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCCFD3A381F;
-	Tue, 31 Mar 2026 10:47:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 284BA3A9623;
+	Tue, 31 Mar 2026 10:48:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="ttS2Amqb"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BnVQ9Kl3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010038.outbound.protection.outlook.com [52.101.61.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDF03A7F54
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 10:47:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774954058; cv=none; b=W7LDYmWL8q/e9PdXFsQD9110h3LpN/IbeuVAB2EoLivqkZHTCxg5oDecIWiFbxzXS0FHtLGrQiZaX4cK6YB7qW7DK8BnfX73YxmhDhEXspLK2fo5pTXjQBXPex9GD47Y5vJHjv4kWh7n4lodq/poSMtfEhfaeXUS09fs5McGwn0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774954058; c=relaxed/simple;
-	bh=1vJSss2PDOGDK52J40R1QkD7sw5n8a9B6COXOSmyMTo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J9rAe4Rhg2+hJ8hM3KHXV6/fjJ0dD+KgPJl+gXCFUqb/VOyb3atuA+RdWAbf6pS90RcLwtC+6rDv5n3KDmvVX1ixO8PZlPaKZXo144mCVOe3Y7Dp7VBGMxg6fsJ/S0NpRgDT3fsgEkeQbpD6bu+j9OpRkRySzRIn4msIsUVd++w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ttS2Amqb; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 4D2C120826;
-	Tue, 31 Mar 2026 12:47:33 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V7QyV5wDqGf7; Tue, 31 Mar 2026 12:47:31 +0200 (CEST)
-Received: from EXCH-02.secunet.de (rl2.secunet.de [10.32.0.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 689A4207E4;
-	Tue, 31 Mar 2026 12:47:31 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 689A4207E4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1774954051;
-	bh=uAp9ZZH4rWpk8C8oSLexPs5aba2NMUapjcBriyJiAZ4=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=ttS2AmqbklQuvNB9dm1vqhor3HF2/0F0PoZF1DzZyY+OMe8OsuI6CiHU0wdLl09zC
-	 HN61yFQCl2SA/P2cX4t72Wjmc22KU7E8xlr4kchLO8wsAHY916QjH7WqtS0y1C2jfA
-	 vMzEr0/+gfae5tVYi4yPFx+Jb687iJeHWNwUwyxQIl2FPikhqQd//EkF+jpsnZtVEb
-	 3hHF27oZ9lWCIQJKD5kDXcCkAzugcF93/P0tdVo4DfYAkxxFscNuiU1i4cbEvCbKUr
-	 M0mPctAX4pRP5m+fbN4loib3RgH8aALphgGV1gOqVmk9lbrQp1wnH3EvmiRJZawDUA
-	 52qrlsCQNlnmA==
-Received: from moon.secunet.de (172.18.149.1) by EXCH-02.secunet.de
- (10.32.0.172) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Tue, 31 Mar
- 2026 12:47:30 +0200
-Date: Tue, 31 Mar 2026 12:47:27 +0200
-From: Antony Antony <antony.antony@secunet.com>
-To: Aakash Kumar Shankarappa <saakashkumar@marvell.com>
-CC: "antony.antony@secunet.com" <antony.antony@secunet.com>, Yan Yan
-	<evitayan@google.com>, Nathan Harold <nharold@google.com>, Tobias Brunner
-	<tobias@strongswan.org>, Steffen Klassert <steffen.klassert@secunet.com>,
-	"paul@nohats.ca" <paul@nohats.ca>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, "David S
- . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>, "akamluddin@marvell.com"
-	<akamluddin@marvell.com>, "greg@kroah.com" <greg@kroah.com>
-Subject: Re: [EXTERNAL] Re: [REGRESSION] Discussion on "xfrm: Duplicate SPI
- Handling"
-Message-ID: <acumPxrIVJYlQUsg@moon.secunet.de>
-Reply-To: <antony.antony@secunet.com>
-References: <CADHa2dChQ=4UVY5X5Ad=jryGRCBPQ37Z_Sw60-6h6h_EcUFG9g@mail.gmail.com>
- <aYC0OvkVPkOnVU-i@moon.secunet.de>
- <CADHa2dBN+_9H-_L19Rg3vfvzC1N5FzG+rzW9Pff8pyM3KL9Ocw@mail.gmail.com>
- <fcc761de-f677-4fc9-969b-47c2b56f54be@strongswan.org>
- <CADHa2dBzJBF6po_qDcn97C15U05EZOzuY-opGW1uc3WAYTPx_g@mail.gmail.com>
- <7b4667b9-c4f2-4c56-a0ea-6e9bdc8b5241@strongswan.org>
- <CADhJOfbv8A+2X7xwtoEpLUV1D1vesMjj=nSYc--iOHF6R+VKLw@mail.gmail.com>
- <CADHa2dBA=MpBz3_j2kbLr-wb2nsmnYBhyhWb6pjWekEzurBr9w@mail.gmail.com>
- <acqqpAHmKnduKxRp@moon.secunet.de>
- <BL1PPF236BDCF3E1BDA74118AE2A6ECFAFFDA52A@BL1PPF236BDCF3E.namprd18.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C88287259;
+	Tue, 31 Mar 2026 10:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.38
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774954096; cv=fail; b=T5He0IEAp6QM8F9Q4IgCQ/KqKF7tpqZbuaqVjeiWuAm0E1YwRihE8US5KpVfiyFPQDTZpDukYXbKugocjvdFoxx+pBIInEYZ6T5NgbMmwEJTSBcbMYVlM/7IXXX9e+DvK/ZtOAfDel2REQ7q1GJI/6qKEJoKWmT7X0M/ioBEr8Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774954096; c=relaxed/simple;
+	bh=v1+QLvUw8Gmsz02DYbFCo3gd8IRwKlReEsxgkY8o2wI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=okifXhxVtdCcJz1kVIdvqlpihRI7PlShQ9ajSLzK39slhu2lNA8HvkaUb7eyiBIio+Uyo1jsEfM0hVUrecUui1Y2Sx6bSYcSpNrihO7oWa9tROwVqu4IcgRTTIkuPZlNHDSG0IfZ2WelP2P7qyP8UbkJhtTiEmrvoRZ4/CThwmU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=BnVQ9Kl3; arc=fail smtp.client-ip=52.101.61.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UShBbnmPO0A1asBruAzhxj6qlGsbi6PLzAGEvd8JBBwFKYOzatpmgO9wErf3lMmjIU1sYblgUE9am/0DDxNra5aKqCR0av3LDUvWRDeJVC6hCFwV9XuQaz4SZF/60mP7nFOyduvXJv+8qi+zU/RLNDtf59TYNw8E2R/Hu616w9BRMg9bW803QcToYdXjuUCpVEPp2WOMbrx4kSnAa/CYa9s14LFoGsPYbXoAQtqwvbHK+dtTgTUcOIRPv3Io0mKTwR8zuNPwAK2TLuGQZbkX2psrENmBFq6fnjs1BqI0UiaEDDXEeybDnDEMM5TBx+FJk8Nj/oihtJRanY91NhdGbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=p+WKKnF9ZMyK8yya3iQNB1dP36UmKlQ5DzQqoCYHv2E=;
+ b=UhsojjMAWKPaUuoGefVWdSU/k6nZ2hc2m46JRCqLsxcpzgWQjZWbi/SXQtiFxBUYuFrfh3BA0RbwH46XXlkSPM9nS0gqfR2ss8Sv5cDULD7va7jJr8oXYBF+5WV4fZulX8Gg2FPz1iN68KWMNOfe5MsRaItVgrMS19CFFTYw29iUJOdIeYqJ7nbF5tvqeGa6rZztHCmoISCi365J4QiFzEROkHmsOgYn1FQsSeNaFkQtPWGP2LzqTc4kyTilNdrCFxl4/UMShdglvIl0YL8duAsUsVtFv/p3kIUsqdC4EVYiRjewBDabGNaM9K+bVBbbtDmT0uBu23tn36nn/oMf1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p+WKKnF9ZMyK8yya3iQNB1dP36UmKlQ5DzQqoCYHv2E=;
+ b=BnVQ9Kl3iA45VX/opEAAsH9fyNZASh848HtcT9PEwujt5o49pw1B95PKyrS/itx4Z0FIRwMjIA0up+wQmUfb27j8wKnxqwAiWsQ6oFrBDMXr0L17xhZKafgUEGoM1SfTUtfWtu6jORG1UJja/iWWrgWK/8q+Pl+CX3+Q9kz9SgHJ3NC+q36yLiFdItvSv0fBfqOCeElWOB8VtmMJNuveP9EZ95YguZUorO+pLpRyp6THRqUWiddDnVqJ28bdwId4AbaCxBU/QABrk5zu9nZxsxauohNIs39P4g0q/YeyjVH+RJKiHUC7xmvTQphFPCjC4eCaqKFQx5/xdAw6CKn5Rw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS2PR12MB9750.namprd12.prod.outlook.com (2603:10b6:8:2b0::12)
+ by CH2PR12MB4245.namprd12.prod.outlook.com (2603:10b6:610:af::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.15; Tue, 31 Mar
+ 2026 10:48:10 +0000
+Received: from DS2PR12MB9750.namprd12.prod.outlook.com
+ ([fe80::56a8:d6bf:e24c:b391]) by DS2PR12MB9750.namprd12.prod.outlook.com
+ ([fe80::56a8:d6bf:e24c:b391%6]) with mapi id 15.20.9769.014; Tue, 31 Mar 2026
+ 10:48:10 +0000
+Message-ID: <75e60c8f-ddb8-474c-961b-bc1d8faa48a3@nvidia.com>
+Date: Tue, 31 Mar 2026 11:48:04 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3 1/3] net: stmmac: Fix PTP ref clock for Tegra234
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Thierry Reding <thierry.reding@gmail.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-tegra@vger.kernel.org
+References: <20260325135811.148480-1-jonathanh@nvidia.com>
+ <20260325135811.148480-2-jonathanh@nvidia.com>
+ <20260326-gigantic-tentacled-hornet-cbdb8d@quoll>
+ <01f56e6f-5459-4a96-9042-8a003a340fab@nvidia.com>
+ <5b3eaba5-eba2-43f9-8ef5-d305ca50ddf0@kernel.org>
+From: Jon Hunter <jonathanh@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <5b3eaba5-eba2-43f9-8ef5-d305ca50ddf0@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PA7P264CA0212.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:102:374::9) To DS2PR12MB9750.namprd12.prod.outlook.com
+ (2603:10b6:8:2b0::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="NLT6EcRTn7SWUUEE"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <BL1PPF236BDCF3E1BDA74118AE2A6ECFAFFDA52A@BL1PPF236BDCF3E.namprd18.prod.outlook.com>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: EXCH-04.secunet.de (10.32.0.184) To EXCH-02.secunet.de
- (10.32.0.172)
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PR12MB9750:EE_|CH2PR12MB4245:EE_
+X-MS-Office365-Filtering-Correlation-Id: 519b3028-1961-465d-d973-08de8f12fffd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	z/P4vrzBv53TX7xWswIEOdhUWBBffSOjjF50h7W4mSPDqevM/vkzV0k3BToP1XI7xZ16JOjei/628dt+pk37mfaZW/E3clmvEIWDWNQVTPE4xdeQNSIAKxekLUtIzX2BcqQyrcSMT1FBuJ9OGWOwOnQRslvsoAZtrmhnLwGytpROk/oGpsHKH1EDizNBifusrbRppaezIrl6PglD7/I117wz8F1Ujehr2dRdVqo9J9gUvbe9O5t6DuPlfdnAniRw7LOJl/MZylFr4TjFUKlGlaIYzUeXCd7HRPZ5ynrSBS7g4uhsTP3KoW4/2ykNuZPt40yVoVf78rNsBnkTtozVd9BpNeA//U1AKEDBnyQVFO6FuvXvtyLm8WGiRL2xdjLms+JcuSSK2gU5dOhCI5Yp3+dOmDzgGpaMSK7h4Ihr3T6v2r8FQa2ofrmeK7i3vYrfSx+MFO92pxtBnoBQxApHXkRoEJsrtYS49ySUglYbF2bvJ8Ffbva0PcdlTYo0PRxlDvyI4uyx5vOquBd7lssnwmFVmTiSsTpLbRVL5hO58m85m35LP1YuH6R7z1854JOnb6v15u+ilQEtFtmx79WmA85nOjypVR1+AtDZekyoaQNrL+MJncLQ7Sp1/umlZRnpEOMYO4sScRE1kd9FwX+ztMSnEc04aq3V1GAf7xjBtZnnfkVdFXVKZM7MqNQox8CD9ocHOINuCYrCkaWIMkXk+8lrTDMO9g8vG4fRcQX7Sgo=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS2PR12MB9750.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cXhuWWd2RDUvU2hqWHBBTWd1YkxRVWVhOUR3alQvV3l6bkJzT3gramNlWkxN?=
+ =?utf-8?B?MnEvT3IwOHJralBsZTNPNWdGSmJvUnBKbG1JNVZGaHFBTDlld0x1Z1VEVWxL?=
+ =?utf-8?B?ZWhsSWg0RVcxbExJM1NlL201ZEpDeWhSMVBVVmlDK2JIbHAwb2xWOWEzZnNu?=
+ =?utf-8?B?UWNPUkhBQXJLci94NVNOK0ZIQ1AweWNBY0lEY1BYUUxyY3JLd3lZalozRjBh?=
+ =?utf-8?B?UGM4UWp1TzhRN1hQamcrbHRmMmRpNDNnNTU1SkVnR24yL1VpS1NpOStVV1dr?=
+ =?utf-8?B?NkhSSHdEZE5jT3pVNkh3S08vZkJ2ZVpHRGFuOGNVb0xhaDdzbWJDcUl3Tzgz?=
+ =?utf-8?B?YzArcXdDK2xHUzBlNmFTekVKZGROY3lhWmFFLzdPTUp3aTdrbmRSSkd6R0M4?=
+ =?utf-8?B?S3Vsc2trOXJickpnQnJZSnV1NDBhYTQwb0gzc08zaEdEWm9uck1EU09rZ1NZ?=
+ =?utf-8?B?QUg1Z0xpRGJ6bWVvejVoWXFMY2FMQ1NSM0NNL25vT1dUSW5LdXVqdU4xZSta?=
+ =?utf-8?B?RnRNZ3hLekRkYkZScjluQ3BBQ3FPZWhGdlcza29MRUEvaS82ODdsamhTbXJr?=
+ =?utf-8?B?RTBJT0FaYWVJTmw4a3pQa2pPWmFLdTZORnlYaHRhTERLVjNJVGtxcjNpckd5?=
+ =?utf-8?B?UWZIWTBDWFVDNW54SmFNZWE2NzBRRkN3UTNMMDMybmJhcU53YTlERnBJanFZ?=
+ =?utf-8?B?T0tZaEVUVmRPN3NDZExscU9RaVNweDZRY1F6NXMyMGdGd1YzNisydERWcUFU?=
+ =?utf-8?B?RHJrODRpU1dXRXVZZDZsTUYvbnNmWkMybmk3VUtIUW9ML2RScmtWWUV1Yjhn?=
+ =?utf-8?B?dzdKaXMyaHpvTFpwNElQOVpFL2h6TGUwcEVhMGNiblBkN2JuakF3d3pnL0wx?=
+ =?utf-8?B?YXcxSDR6RHgyckdsK0lIZkZpZVRyVHNuSVRGNWNYQzM0Lzh2RkVjeXRwRzZx?=
+ =?utf-8?B?MWFHOGZzZzd3ZUUxL1BlakduWjhIUkQvd3c0cHhwaWFnV2xaR2lLMXlOV3RU?=
+ =?utf-8?B?Nlo4ZzVuSEc2UEQxSVN2a2ZZSU9jeFJqSGZrY3FKaVFJaWJaMzNobnUrL2ps?=
+ =?utf-8?B?c3J2UVptQy82Q0pDTEQ1N3hqUWlOL1d3amoxVnVmVXEya0p6ZEhTMmU0VjU3?=
+ =?utf-8?B?am56OEFER2Q5cVNVZ2VHcFVuSjY1dEkzU2JCbkFWYlErbUtwT3ZuRHhOVEdG?=
+ =?utf-8?B?ejBlaHRsdzc3QkZ1OXN2Rmh5bWxLWnp5UXVBVVExTWFmRTFpOGtJM1llWmZC?=
+ =?utf-8?B?MlM0aFZ3bHdKWVl4L3Y5MkhLU1pBVFJ0SzZ1cVNhbUF5TFRwUTRzUWNlNHhV?=
+ =?utf-8?B?ZFI3d2J1V1hUZk8wYlY5TExpK2E5TWtMTmlhaFNQVTFuM1RNSy9FTjJocFQ4?=
+ =?utf-8?B?d1FxcUFLS3I1ZUxSZGk2UC9tbyt2RGRyMW9hU2NLOEI4dlJSS3ZCQlJJQ1pO?=
+ =?utf-8?B?K2RpU0hDQVNZQ1pBOUMyWnRWaDhoTkU1ejhzZXBGSEVqSUFPb1luTjNXQmxL?=
+ =?utf-8?B?YU12UTlVWnJOaStmY3F6QVB4MC8yNTJjTTY2Y0lHWm9rZ1NmMlg2OXd4c01R?=
+ =?utf-8?B?T0R1R05pV05MK2xHcDkxNUtvZzFDWFdLYWV1TVB4NDZFZnNYZFBwYnpZSDFi?=
+ =?utf-8?B?ZEVpWkxFd1B5U2kzNU5VRWRmUnJaOVJmdkdKTDNRYVhFNDFpdDIxSmlLaS9B?=
+ =?utf-8?B?V2ZjNXBLaDRQemc0cHRid25YZDc4NGt2R1Y1REVWMHphRkZ6WmhSdVI3cXlq?=
+ =?utf-8?B?akdQaHg0bnh6NHU3RlhCM2JxeHVCSHZIbUdiaDhsZFVyakRsVjNaRjhGNGlu?=
+ =?utf-8?B?czVodXZta1BmektiZkRET01uV1lrbUdvbXB5SmNwQnUrcU43aFZVT25vVDJV?=
+ =?utf-8?B?R01XU2UxWWFwczdNYjhPbWNoN0tCZ1FqSGpFeEFxY2dJUUN5aW1MQWZJbzZO?=
+ =?utf-8?B?U2ZEKzduMC91TlRzVTY4WjdhMFFPSVUxZ0hydXZwVi8yd0FVN05nWlpHQ0Zz?=
+ =?utf-8?B?NlIzMTE1MWpCZ3lpbllwL2Q5QitQaHRRZSsrUVNva1lydjlYOWQrOGdyemRv?=
+ =?utf-8?B?WHRrUEFQL1NkQ0NIeW00TVVHSWZZRWdlUGorOU9QSy94dWtjaUNIZ0FJZVBu?=
+ =?utf-8?B?TGRLNlR5T0dkL2trWGtvSlFqa0kzNTkrdURUWUZGYzdyWkdaMURVNmZKd1RS?=
+ =?utf-8?B?K1VwTFdHbGljVFRET3RTUGFoQVBteVNyTjRYUWJGQWh5ZVVEd21WTlNUVElI?=
+ =?utf-8?B?eTR1blViSzNENjM1K0dPNE1HTUVRRCtUM2ZmeUduQmk3eEh1V1NodHZUSEZR?=
+ =?utf-8?B?WE1vcGdodVJjdmFlNE4rK2taa2R0RGh1cEhWZ09va2twRndEUmVtUT09?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 519b3028-1961-465d-d973-08de8f12fffd
+X-MS-Exchange-CrossTenant-AuthSource: DS2PR12MB9750.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Mar 2026 10:48:10.1154
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jHr+vk8JfZZ0GlWGYrn03UQEgwRNIKWRJWP7fKErJKGYpbye23UiqHMdoeW77HPIkD8l1/Rj3+jSuBAjv6l4kg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4245
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain,text/x-diff];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	TAGGED_FROM(0.00)[bounces-273571-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+,1:+,2:+];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[antony.antony@secunet.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	HAS_ATTACHMENT(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	HAS_REPLYTO(0.00)[antony.antony@secunet.com];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	REDIRECTOR_URL(0.00)[proofpoint.com,aka.ms];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 997503684B4
+	TAGGED_FROM(0.00)[bounces-273572-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jonathanh@nvidia.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:mid,Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 311F036866E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---NLT6EcRTn7SWUUEE
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 
-Hi,
-I have tweaked the patch a bit more, uniqueness is only when
-x->dir == XFRM_SA_DIR_IN. See the attached patch.
-
-I have added tags Fixes: 
-and 
-Reported-by: Yan Yan <evitayan@google.com>  
-Yan, are you ok with this?
-
-So fart I don't have any tests for this, so more tags welcome:)
-
-regards,
--antony
-
-PS: recent libreswan is setting direction. Thta should not be problem.
-
-On Mon, Mar 30, 2026 at 20:34:07 +0000, Aakash Kumar Shankarappa wrote:
->    Hi Antony,
+On 31/03/2026 11:18, Krzysztof Kozlowski wrote:
+> On 31/03/2026 12:14, Jon Hunter wrote:
+>>
+>> On 26/03/2026 08:32, Krzysztof Kozlowski wrote:
+>>
+>> ...
+>>
+>>>> @@ -257,9 +258,23 @@ static int tegra_mgbe_probe(struct platform_device *pdev)
+>>>>    	if (!mgbe->clks)
+>>>>    		return -ENOMEM;
+>>>>    
+>>>> -	for (i = 0; i <  ARRAY_SIZE(mgbe_clks); i++)
+>>>> +	/*
+>>>> +	 * Older device-trees use 'ptp-ref' rather than 'ptp_ref'.
+>>>> +	 * Fall back to the legacy name when 'ptp_ref' is absent.
+>>>> +	 */
+>>>> +	use_legacy_ptp = of_property_match_string(pdev->dev.of_node,
+>>>> +						  "clock-names", "ptp_ref") < 0;
+>>>> +
+>>>> +	for (i = 0; i < ARRAY_SIZE(mgbe_clks); i++) {
+>>>>    		mgbe->clks[i].id = mgbe_clks[i];
+>>>>    
+>>>> +		if (use_legacy_ptp && !strcmp(mgbe_clks[i], "ptp_ref")) {
+>>>
+>>> Why index 0 is not valid? And why -EINVAL would be considered as legacy
+>>> clock present?
+>>
+>> Index 0 is valid. However, yes I guess that treating an -EINVAL from
+>> of_property_match_string() is not correct. I will switch the logic to be ...
+>>
+>>    use_legacy_ptp = of_property_match_string(pdev->dev.of_node,
+>>                                      "clock-names", "ptp-ref") >= 0;
 > 
->    Thanks for the patch. Yes the x->dir based gating approach looks good
->    to me and it works for Marvell.
+> No, apologies, I think my comment was not correct and your reply made me
+> rethink. I missed final "< 0" in of_property_match_string().
 > 
->    Also this seems like the right direction. It preserves backward
->    compatibility for existing users, while still allowing strict RFC 4301
->    complaint SPI uniqueness as an opt-in feature. Anybody who wants the
->    stricter behaviour can upgrade to Strongswan 6.0.0+ and leverage
->    XFRM_SA_DIR_IN.
+> So the code is good, you do not store index in 'use_legacy_ptp', but the
+> error return value.
 > 
->    Thanks, Aakash
+> Can you however make it more obvious code, so something like:
 > 
->    From: Antony Antony <antony.antony@secunet.com>
->    Date: Monday, 30 March 2026 at 10:24 PM
->    To: Yan Yan <evitayan@google.com>
->    Cc: Nathan Harold <nharold@google.com>, Tobias Brunner
->    <tobias@strongswan.org>, antony.antony@secunet.com
->    <antony.antony@secunet.com>, Steffen Klassert
->    <steffen.klassert@secunet.com>, paul@nohats.ca <paul@nohats.ca>,
->    netdev@vger.kernel.org <netdev@vger.kernel.org>, Herbert Xu
->    <herbert@gondor.apana.org.au>, David S . Miller <davem@davemloft.net>,
->    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
->    pabeni@redhat.com <pabeni@redhat.com>, horms@kernel.org
->    <horms@kernel.org>, Aakash Kumar Shankarappa
->    <saakashkumar@marvell.com>, akamluddin@marvell.com
->    <akamluddin@marvell.com>, greg@kroah.com <greg@kroah.com>
->    Subject: [EXTERNAL] Re: [REGRESSION] Discussion on "xfrm: Duplicate SPI
->    Handling"
->    Prioritize security for external emails:
->    Confirm sender and content safety before clicking links or opening
->    attachments
->    [1]Report Suspicious
-> 
-> 
->    Hi, I looked into this. I feel a simple solution is use x->dir as
->    Nathan proposed. When dir is not set we get pre commit 94f39804d891
->    ("xfrm: Duplicate SPI Handling") behaviour. When XFRM_SA_DIR is set
->    alloc_spi() returns per direction unique spi. Another benfit is, this
->    would also keep PF_KEY use case as it was before that comit. Here is
->    simple RFC patch attached. How does this look? strongswan 6.0.0, from
->    Dec 2024, sets x->dir. Aakash would this work for for marvell? regads,
->    -antony On Fri, Mar 27, 2026 at 17:05:13 -0700, Yan Yan wrote: > Hi
->    all, > I wanted to send a friendly ping to see if we are aligning on
->    making > the strict global SPI uniqueness requirement optional, perhaps
->    via a > toggle or by leveraging the XFRM_SA_DIR attribute as previously
->    > discussed. > Are there any other questions or concerns regarding this
->    approach, or > anything else we should clarify to ensure backward
->    compatibility while > meeting the needs of modern standards? > Best, >
->    Yan > > On Tue, Feb 24, 2026 at 3:53 PM Nathan Harold
->    <[1]nharold@google.com> > wrote: > > > That should still be allowed
->    when using the intended APIs (i.e. > ALLOCSPI > > for the inbound and
->    NEWSA for the outbound SA). ALLOCSPI might > enforce > > a unique SPI
->    without considering the address, as that's intended > for > > local,
->    inbound SAs, where the kernel has full control (looking at > the > >
->    the patch, it's certainly not ideal, as it goes through all > installed
->    > > SAs to find a duplicate and it prevents an inbound SPI that >
->    matches an > > existing outbound SPI - I guess that could be resolved
->    by using > separate > > tables for in- and outbound SAs). But that must
->    not prevent > installing > > outbound SAs with the same SPI to another
->    peer using NEWSA, which > still > > uses a hash that includes the
->    destination address (that must > always be > > the case because peers
->    are free to allocate whatever SPI they > want). > Agreed that there are
->    some unfortunate limitations with the current > patch. Keying off the
->    inclusion of XFRM_SA_DIR would resolve the > issue > you noted
->    (conflating inbound and outbound SPIs) and function as an > opt-in for
->    this enforcement. Whatever the mechanism though, the new > behavior
->    should be opt-in rather than opt-out in order to maintain > backwards
->    compatibility. > > In my opinion, you are using the API incorrectly...
->    I also > > don't think there are any benefits in that "consistent
->    larval > lifecycle" > > (if you found any, please let us know). > The
->    Android architecture is multi-tenant and allows userspace apps > to >
->    establish SAs. At the time we designed it, this felt like the >
->    cleanest > way to facilitate leak-free resource management because the
->    chain of > associations between kernel resources could be symmetrical
->    (and > managing them was already quite complicated). Mea culpa
->    (Nathan). > But, > correctly or not, it has/had worked for many years.
->    > > By the way, are you using the min/max option for inbound SAs as >
->    well, > > with an SPI generated in userland? That would seem like a >
->    violation of > > the intention of the API as well (i.e. letting the
->    kernel control > the > > local SPIs). > We provide following two
->    Android APIs for app developers: >
->    [2][2]https://urldefense.proofpoint.com/v2/url?u=https-3A__developer.an
->    droid.com_reference_android_net_IpSecManager-23&d=DwIDaQ&c=nKjWec2b6R0m
->    OyPaz7xtfQ&r=r6Wzn5LnVsk7Tgc5x4l_c04I_Hr_8TYqFn-YFi_gjqI&m=JsnNMKKypJWI
->    SL5BbGkfA2yD1_H51rd5M6YO4NG3WpRdteRwP5OdfTJFNEK0Xiec&s=9txNFXC-wFiRFV_Q
->    JlIQLW2AWSbERIOWcGHJfuQP2ZA&e= >
->    allocateSecurityParameterIndex(java.net.InetAddress) >
->    [3][3]https://urldefense.proofpoint.com/v2/url?u=https-3A__developer.an
->    droid.com_reference_android_net_IpSecManager-23&d=DwIDaQ&c=nKjWec2b6R0m
->    OyPaz7xtfQ&r=r6Wzn5LnVsk7Tgc5x4l_c04I_Hr_8TYqFn-YFi_gjqI&m=JsnNMKKypJWI
->    SL5BbGkfA2yD1_H51rd5M6YO4NG3WpRdteRwP5OdfTJFNEK0Xiec&s=9txNFXC-wFiRFV_Q
->    JlIQLW2AWSbERIOWcGHJfuQP2ZA&e= >
->    allocateSecurityParameterIndex(java.net.InetAddress,%20int) > Indeed,
->    allocateSecurityParameterIndex is direction-agnostic; both > overloads
->    are implemented internally by including the min and max > values in
->    ALLOCSPI. For the variant where app developers provide a > specific SPI
->    (which is also useful in testing), Android simply sets > both the min
->    and max parameters to that exact value. Our > understanding > of
->    #xfrm_alloc_spi is that min/max are required for ALLOCSPI, and >
->    otherwise ENOENT will be returned. > Note that we also use the DADDR as
->    a mandatory part of the tuple > because of the issue mentioned above:
->    SPIs are only unique in > conjunction with a DADDR, regardless of
->    direction, and accordingly, > that’s how Android is expecting the
->    uniqueness requirement be > enforced. In this way, 5 duplicate SPIs can
->    be used on 5 unique IP > addresses on the same machine; therefore, a
->    strict "SPI only" > interpretation for ALLOCSPI (or SPI handling in
->    general) is curious. > We feel that ALLOCSPI should really enforce the
->    same uniqueness > requirements as the SAD. > Best, > Nathan and Yan >
->    -Nathan > On Wed, Feb 18, 2026 at 12:42 AM Tobias Brunner >
->    <[4]tobias@strongswan.org> wrote: > > > > Hi Yan, > > > > > For every
->    inbound SA, we allocate SPIs before negotiation. For > > > outbound
->    SAs, we allocate SPIs once requested by the peer. We > only > > >
->    require the (SPI, destination address) combo to be unique. Thus, > we >
->    > > may have an inbound and outbound SA sharing an SPI with > different
->    > > > destinations, or multiple outbound SAs to different peers >
->    sharing an > > > SPI. > > > > That should still be allowed when using
->    the intended APIs (i.e. > ALLOCSPI > > for the inbound and NEWSA for
->    the outbound SA). ALLOCSPI might > enforce > > a unique SPI without
->    considering the address, as that's intended > for > > local, inbound
->    SAs, where the kernel has full control (looking at > the > > the patch,
->    it's certainly not ideal, as it goes through all > installed > > SAs to
->    find a duplicate and it prevents an inbound SPI that > matches an > >
->    existing outbound SPI - I guess that could be resolved by using >
->    separate > > tables for in- and outbound SAs). But that must not
->    prevent > installing > > outbound SAs with the same SPI to another peer
->    using NEWSA, which > still > > uses a hash that includes the
->    destination address (that must > always be > > the case because peers
->    are free to allocate whatever SPI they > want). > > > > >> If so, why
->    would you use ALLOCSPI and not just install the > outbound SA? Is it to
->    avoid differences for in- and outbound SAs > (ALLOCSPI+UPDSA vs.
->    NEWSA)?" > > > > > > Exactly—it is primarily for code symmetry. By
->    using ALLOCSPI + > UPDSA > > > for both directions, we maintain a
->    consistent larval lifecycle > and > > > make it easier to maintain. > >
->    > > In my opinion, you are using the API incorrectly. ALLOCSPI is >
->    intended > > to allocate a free local SPI for an inbound SA. That is,
->    reserve > it > > before and while the details of the SA are negotiated
->    with the > peer > > using IKE. This step isn't necessary for outbound
->    SAs and forcing > such > > an allocation, after all the details are
->    known, to the responder's > SPI > > (which I assume you do via min/max
->    option) doesn't feel right. I > also > > don't think there are any
->    benefits in that "consistent larval > lifecycle" > > (if you found any,
->    please let us know). And the difference > between > > UPDSA and NEWSA
->    is the nlmsg_type (there are some attributes that > are > > different
->    for in- and outbound SAs, especially if you set the > direction > > in
->    newer kernels, but that's the case regardless of the message > type). >
->    > > > By the way, are you using the min/max option for inbound SAs as >
->    well, > > with an SPI generated in userland? That would seem like a >
->    violation of > > the intention of the API as well (i.e. letting the
->    kernel control > the > > local SPIs). > > > > As the XFRM API basically
->    mirrors PF_KEYv2 here, you can find more > about > > the two ways to
->    install SAs in RFC 2367 (SADB_GETSPI/UPDATE vs. > SADB_ADD). > > > >
->    Regards, > > Tobias > > > > -- > > -- > Best, > Yan > > References > >
->    1. mailto:nharold@google.com > 2.
->    [4]https://urldefense.proofpoint.com/v2/url?u=https-3A__developer.andro
->    id.com_reference_android_net_IpSecManager-23allocateSecurityParameterIn
->    dex-28java.net.InetAddress-29&d=DwIDaQ&c=nKjWec2b6R0mOyPaz7xtfQ&r=r6Wzn
->    5LnVsk7Tgc5x4l_c04I_Hr_8TYqFn-YFi_gjqI&m=JsnNMKKypJWISL5BbGkfA2yD1_H51r
->    d5M6YO4NG3WpRdteRwP5OdfTJFNEK0Xiec&s=UtpwkuoswT-6aK0he6dSS-0dvZfIcRjbfj
->    _Eu4A-c6E&e= > 3.
->    [5]https://urldefense.proofpoint.com/v2/url?u=https-3A__developer.andro
->    id.com_reference_android_net_IpSecManager-23allocateSecurityParameterIn
->    dex-28java.net.InetAddress&d=DwIDaQ&c=nKjWec2b6R0mOyPaz7xtfQ&r=r6Wzn5Ln
->    Vsk7Tgc5x4l_c04I_Hr_8TYqFn-YFi_gjqI&m=JsnNMKKypJWISL5BbGkfA2yD1_H51rd5M
->    6YO4NG3WpRdteRwP5OdfTJFNEK0Xiec&s=fVmYoLIpyuMX3AtAkU7ejR1dno_8QtnhCKLMD
->    4BmURc&e=, int) > 4. mailto:tobias@strongswan.org
-> 
-> References
-> 
->    Visible links:
->    1. https://us-phishalarm-ewt.proofpoint.com/EWT/v1/CRVmXkqW!tG3Tv5d8inv1_6DXc1X1B4ctthRq2qCkR8nIF_n_SOJiXQ-SqG_LUk--J5LZEwV9jGdXABQriDruLYnPEg$
->    2. https://urldefense.proofpoint.com/v2/url?u=https-3A__developer.android.com_reference_android_net_IpSecManager-23&d=DwIDaQ&c=nKjWec2b6R0mOyPaz7xtfQ&r=r6Wzn5LnVsk7Tgc5x4l_c04I_Hr_8TYqFn-YFi_gjqI&m=JsnNMKKypJWISL5BbGkfA2yD1_H51rd5M6YO4NG3WpRdteRwP5OdfTJFNEK0Xiec&s=9txNFXC-wFiRFV_QJlIQLW2AWSbERIOWcGHJfuQP2ZA&e=
->    3. https://urldefense.proofpoint.com/v2/url?u=https-3A__developer.android.com_reference_android_net_IpSecManager-23&d=DwIDaQ&c=nKjWec2b6R0mOyPaz7xtfQ&r=r6Wzn5LnVsk7Tgc5x4l_c04I_Hr_8TYqFn-YFi_gjqI&m=JsnNMKKypJWISL5BbGkfA2yD1_H51rd5M6YO4NG3WpRdteRwP5OdfTJFNEK0Xiec&s=9txNFXC-wFiRFV_QJlIQLW2AWSbERIOWcGHJfuQP2ZA&e=
->    4. https://urldefense.proofpoint.com/v2/url?u=https-3A__developer.android.com_reference_android_net_IpSecManager-23allocateSecurityParameterIndex-28java.net.InetAddress-29&d=DwIDaQ&c=nKjWec2b6R0mOyPaz7xtfQ&r=r6Wzn5LnVsk7Tgc5x4l_c04I_Hr_8TYqFn-YFi_gjqI&m=JsnNMKKypJWISL5BbGkfA2yD1_H51rd5M6YO4NG3WpRdteRwP5OdfTJFNEK0Xiec&s=UtpwkuoswT-6aK0he6dSS-0dvZfIcRjbfj_Eu4A-c6E&e=
->    5. https://urldefense.proofpoint.com/v2/url?u=https-3A__developer.android.com_reference_android_net_IpSecManager-23allocateSecurityParameterIndex-28java.net.InetAddress&d=DwIDaQ&c=nKjWec2b6R0mOyPaz7xtfQ&r=r6Wzn5LnVsk7Tgc5x4l_c04I_Hr_8TYqFn-YFi_gjqI&m=JsnNMKKypJWISL5BbGkfA2yD1_H51rd5M6YO4NG3WpRdteRwP5OdfTJFNEK0Xiec&s=fVmYoLIpyuMX3AtAkU7ejR1dno_8QtnhCKLMD4BmURc&e=
-> 
->    Hidden links:
->    7. https://aka.ms/GetOutlookForMac
+> if (of_property_match_string...))
+> 	use_legacy_ptp = true;;
 
---NLT6EcRTn7SWUUEE
-Content-Type: text/x-diff; charset="us-ascii"
-Content-Disposition: attachment;
-	filename="0001-xfrm-enforce-SPI-uniqueness-for-inbound-SAs-only.patch"
+Yes I can do that. Before I was avoiding the need to pre-initialise the 
+variable, but I am happy either way to get this fixed!
 
-From 47de0cbe52f1a872edfbeb9c2ad5f08c564fad43 Mon Sep 17 00:00:00 2001
-From: Antony Antony <antony.antony@secunet.com>
-Date: Wed, 25 Mar 2026 06:02:07 +0100
-Subject: [PATCH] xfrm: enforce SPI uniqueness for inbound SAs only
+Jon
 
-Per RFC 4301 section 4.4.2.1, the SPI is selected by the receiving
-end, which is interpreted as making SPI uniqueness an inbound-only
-requirement.
-
-Commit 94f39804d891 ("xfrm: Duplicate SPI Handling") introduced
-xfrm_state_lookup_spi_proto() to fix duplicate SPI allocation for
-inbound SAs with different destination addresses.  However, it enforces
-global uniqueness by (spi, proto) across all states regardless of
-direction, which causes SPI allocation to fail for outbound SAs when
-the same (spi, proto) is already in use by an inbound SA.
-
-When x->dir == XFRM_DIR_IN, enforce SPI uniqueness via
-xfrm_state_lookup_spi_proto() scoped to inbound SAs.  SAs created via
-PF_KEY, without direction, or with XFRM_DIR_OUT restore the
-pre-94f39804d891 RFC 2401 lookup by (daddr, spi, proto).
-
-Reported-by: Yan Yan <evitayan@google.com>
-Fixes: 94f39804d891 ("xfrm: Duplicate SPI Handling")
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
----
- net/xfrm/xfrm_state.c | 14 ++++++++++++--
- net/xfrm/xfrm_user.c  |  6 +++---
- 2 files changed, 15 insertions(+), 5 deletions(-)
-
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 98b362d51836..66cff3e8dd65 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -1698,7 +1698,9 @@ struct xfrm_state *xfrm_state_lookup_byspi(struct net *net, __be32 spi,
- }
- EXPORT_SYMBOL(xfrm_state_lookup_byspi);
- 
--static struct xfrm_state *xfrm_state_lookup_spi_proto(struct net *net, __be32 spi, u8 proto)
-+static struct xfrm_state *xfrm_state_lookup_spi_proto(struct net *net,
-+						      __be32 spi, u8 proto,
-+						      u8 dir)
- {
- 	struct xfrm_state *x;
- 	unsigned int i;
-@@ -1707,6 +1709,8 @@ static struct xfrm_state *xfrm_state_lookup_spi_proto(struct net *net, __be32 sp
- 	for (i = 0; i <= net->xfrm.state_hmask; i++) {
- 		hlist_for_each_entry_rcu(x, &net->xfrm.state_byspi[i], byspi) {
- 			if (x->id.spi == spi && x->id.proto == proto) {
-+				if (x->dir != dir)
-+					continue;
- 				if (!xfrm_state_hold_rcu(x))
- 					continue;
- 				rcu_read_unlock();
-@@ -2577,6 +2581,7 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
- 	struct xfrm_state *x0;
- 	int err = -ENOENT;
- 	u32 range = high - low + 1;
-+	u32 mark = x->mark.v & x->mark.m;
- 	__be32 newspi = 0;
- 
- 	spin_lock_bh(&x->lock);
-@@ -2598,7 +2603,12 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
- 		newspi = htonl(spi);
- 
- 		spin_lock_bh(&net->xfrm.xfrm_state_lock);
--		x0 = xfrm_state_lookup_spi_proto(net, newspi, x->id.proto);
-+		if (x->dir == XFRM_SA_DIR_IN)
-+			x0 = xfrm_state_lookup_spi_proto(net, newspi,
-+							 x->id.proto, x->dir);
-+		else
-+			x0 = xfrm_state_lookup(net, mark, &x->id.daddr, newspi,
-+					       x->id.proto, x->props.family);
- 		if (!x0) {
- 			x->id.spi = newspi;
- 			h = xfrm_spi_hash(net, &x->id.daddr, newspi, x->id.proto, x->props.family);
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 403b5ecac2c5..98b90c747aad 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -1873,13 +1873,13 @@ static int xfrm_alloc_userspi(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		goto out_noput;
- 	}
- 
-+	if (attrs[XFRMA_SA_DIR])
-+		x->dir = nla_get_u8(attrs[XFRMA_SA_DIR]);
-+
- 	err = xfrm_alloc_spi(x, p->min, p->max, extack);
- 	if (err)
- 		goto out;
- 
--	if (attrs[XFRMA_SA_DIR])
--		x->dir = nla_get_u8(attrs[XFRMA_SA_DIR]);
--
- 	resp_skb = xfrm_state_netlink(skb, x, nlh->nlmsg_seq);
- 	if (IS_ERR(resp_skb)) {
- 		err = PTR_ERR(resp_skb);
 -- 
-2.39.5
+nvpublic
 
-
---NLT6EcRTn7SWUUEE--
 
