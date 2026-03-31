@@ -1,166 +1,165 @@
-Return-Path: <netdev+bounces-273526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273527-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eCWTGiuIy2kuIwYAu9opvQ
-	(envelope-from <netdev+bounces-273526-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:39:07 +0200
+	id 6EL+CM+Iy2kuIwYAu9opvQ
+	(envelope-from <netdev+bounces-273527-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:41:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31A2136646E
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:39:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A933366530
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:41:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6324E302BDEE
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 08:34:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 69A7E30071C9
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 08:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1DA33E0237;
-	Tue, 31 Mar 2026 08:34:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F033CB2E0;
+	Tue, 31 Mar 2026 08:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eYOeSSSF"
 X-Original-To: netdev@vger.kernel.org
-Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 864C5397E9D
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 08:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DD43BE649;
+	Tue, 31 Mar 2026 08:38:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774946054; cv=none; b=hjFmxmQ7SoHdPhhtKU35ivXumgkZnfv3v7B/HvGZVU4FGVl5CVa+BgTaLtCbLRj2p8yIIx3fwlguo4iyio3vVhXdPkRW23NyPuujer0z3AN09UQJyN0HG1EimvYUVeMnzCfZQKTMIX+Lf+VZiak3+gw2QoE4vvT9dbrRgkZewG8=
+	t=1774946282; cv=none; b=bHVOjvKVxzi7H9xJyfWuE4vOAlZtqV6ir+sJzPuri5sc3YpnUgTjtiUaZ58pZl53eTOJpm8S6qk8wUK2nT9w1TIgVu0aj2I9S4xy3sxdkMB3fJUs2xDIrdw0OnYiuQcfQXfYfCbDTsUNivNbzvs7cE16adAq7No2n45UCIAYLsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774946054; c=relaxed/simple;
-	bh=c1HjZZ3fxfkFdJ4UAJtgOb6uDaY7GCRsdAjXUrFCgOY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NJndI3T67GZgmFTcssbPFV6AlmfCPXIDN4qfaGomxl6oy9bQ7C/O8gb8ShKYx1RHIznlw3l3XxsCqcVEx9IpsF3YkW2sLXzMbUKy100/TpGWbsxiI285blziCqpNXSGt6YCqOCxpA/YjVA6/2xEIHYCOTXN5T5C8CbERYitqB0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=129.150.39.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowACnHf7vhstp0cuXAA--.28506S3;
-	Tue, 31 Mar 2026 16:33:52 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: security@kernel.org,
-	netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	afaerber@suse.de,
-	mani@kernel.org,
-	yoshfuji@linux-ipv6.org,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	yuantan098@gmail.com,
-	bird@lzu.edu.cn,
-	enjou1224z@gmail.com,
-	zcliangcn@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH 1/1] net: ipv6: flowlabel: defer exclusive option free until RCU teardown
-Date: Tue, 31 Mar 2026 16:33:50 +0800
-Message-ID: <07351f0ec47bcee289576f39f9354f4a64add6e4.1774855883.git.zcliangcn@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1774855883.git.zcliangcn@gmail.com>
-References: <cover.1774855883.git.zcliangcn@gmail.com>
+	s=arc-20240116; t=1774946282; c=relaxed/simple;
+	bh=lkgsi7G8x5At2O5V1snIySUQ9gANaxTJ3/quUuCINCg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eLQSo5WdBGnlKPkKEOJLjF1rsTtlNFSUIdIB0arzu1jm6GcIiJ4f5tCVLtAYHq1WOjdR8zeb4aGF6PQO2C2h1JFkLlRVm4k0cSJ+V2ZFAcKbFkz87VlS4cZIQTG2xNoYxII/ZHNx5AdMZptakMDoudo8j1SmuXCzzbA6QBNdHQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eYOeSSSF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08CB8C19423;
+	Tue, 31 Mar 2026 08:38:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774946282;
+	bh=lkgsi7G8x5At2O5V1snIySUQ9gANaxTJ3/quUuCINCg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eYOeSSSFW0WXX4mmb2MsptPkJdbl34XCp/M4zjYe56EoUT29R9MHtfTXKQPdaNTCC
+	 km+65bU1EFEOKw5dFVpsTcaiMT//g3eVQ5wQFTIo/I7oJ/THNQwpC5I8OveBHsLJSv
+	 3TLow+1Vv81z+6ZpRvaJ+yJWkL2V+tUPyY4nPDYssx0+yV1YmWFpME3575WC2Pv8mV
+	 GFTL9SNY7QSYH4J+O7uv1C5fcawUeC5d6HW7UF+4i8Box0HYi2vuZ4MBWER521nK0Q
+	 SenJKH1W+1P9Rtm0e28iNy23S+AdcNCUTs9CjfxLv0EdzgY1EGenaxFTOtyUWS9Nz4
+	 6i/D/wPac9ByA==
+Date: Tue, 31 Mar 2026 11:37:58 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Zhiping Zhang <zhipingz@meta.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-rdma@vger.kernel.org,
+	linux-pci@vger.kernel.org, netdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, Yochai Cohen <yochai@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Bjorn Helgaas <helgaas@kernel.org>
+Subject: Re: [RFC v2 1/2] vfio: add callback to get tph info for dmabuf
+Message-ID: <20260331083758.GA814676@unreal>
+References: <20260324234615.3731237-1-zhipingz@meta.com>
+ <20260324234615.3731237-2-zhipingz@meta.com>
+ <20260325082534.GN814676@unreal>
+ <acW2BwQKaUbS3eL9@kbusch-mbp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowACnHf7vhstp0cuXAA--.28506S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tFW7Gw4UXry7CF4xWr4xXrb_yoW8ZF43pr
-	WxGrnrAFyDCry7tFn7Ar1xZr4rKayDGan7WFnrCa9F9w17Xrn3Jw1kK3yIqFs5tFs2k3yY
-	yF1qvryDZa13urDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
-	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
-	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
-	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
-	n4kS14v26r4a6rW5MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
-	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRpOJnUUUUU=
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQQDCWnKnHsSjQAAsU
-X-Spamd-Result: default: False [-0.96 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <acW2BwQKaUbS3eL9@kbusch-mbp>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.986];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	R_DKIM_NA(0.00)[];
-	DMARC_DNSFAIL(0.00)[lzu.edu.cn : query timed out];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-273527-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	TO_DN_NONE(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,suse.de,linux-ipv6.org,gmail.com,lzu.edu.cn];
-	TAGGED_FROM(0.00)[bounces-273526-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: 31A2136646E
+	FROM_NEQ_ENVFROM(0.00)[leon@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 7A933366530
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Zhengchuan Liang <zcliangcn@gmail.com>
+On Thu, Mar 26, 2026 at 04:41:11PM -0600, Keith Busch wrote:
+> On Wed, Mar 25, 2026 at 10:25:34AM +0200, Leon Romanovsky wrote:
+> > On Tue, Mar 24, 2026 at 04:46:02PM -0700, Zhiping Zhang wrote:
+> > >  struct vfio_device_feature_dma_buf {
+> > >  	__u32	region_index;
+> > >  	__u32	open_flags;
+> > > -	__u32   flags;
+> > > -	__u32   nr_ranges;
+> > > +	__u32	flags;
+> > > +#define VFIO_DMABUF_FL_TPH		(1U << 0) /* TPH info is present */
+> > > +#define VFIO_DMABUF_TPH_PH_SHIFT	1         /* bits 1-2: PH (2-bit) */
+> > > +#define VFIO_DMABUF_TPH_PH_MASK	0x6U
+> > > +#define VFIO_DMABUF_TPH_ST_SHIFT	16        /* bits 16-31: steering tag */
+> > > +#define VFIO_DMABUF_TPH_ST_MASK		0xffff0000U
+> > 
+> > This extension of flags is basically kills future extension of this
+> > struct for anything that includes TPH.
+> > 
+> > Add new
+> > enum vfio_device_feature_dma_buf_flags {
+> >     VFIO_DMABUF_FL_TPH  = 1 << 0
+> > }
+> > 
+> > > +	__u32	nr_ranges;
+> > 
+> > add your "__u16 steering_tag" and "__u8 ph" fields here.
+> 
+> You're suggesting that Ziping append the new fields to the end of this
+> struct? I don't think we can modify the layout of a uapi.
 
-`ip6fl_seq_show()` walks the global flowlabel hash under the seq-file
-RCU read-side lock and prints `fl->opt->opt_nflen` when an option block
-is present.
+He needs to add before flex array. This struct is submitted by the user
+and kernel can easily calculate the position of that array.
 
-Exclusive flowlabels currently free `fl->opt` as soon as `fl->users`
-drops to zero in `fl_release()`. However, the surrounding
-`struct ip6_flowlabel` remains visible in the global hash table until
-later garbage collection removes it and `fl_free_rcu()` finally tears it
-down.
+Something like this:
+diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
+index b1d658b8f7b51..d78d915992232 100644
+--- a/drivers/vfio/pci/vfio_pci_dmabuf.c
++++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
+@@ -237,7 +237,11 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 flags,
+        if (get_dma_buf.region_index >= VFIO_PCI_ROM_REGION_INDEX)
+                return -ENODEV;
 
-A concurrent `/proc/net/ip6_flowlabel` reader can therefore race that
-early `kfree()` and dereference freed option state, triggering a crash
-in `ip6fl_seq_show()`.
+-       dma_ranges = memdup_array_user(&arg->dma_ranges, get_dma_buf.nr_ranges,
++       if (!tph_supplied)
++               dma_ranges = memdup_array_user(old_dma_ranges_pos, get_dma_buf.nr_ranges,
++                                      sizeof(*dma_ranges));
++       else
++               dma_ranges = memdup_array_user(&arg->dma_ranges, get_dma_buf.nr_ranges,
+                                       sizeof(*dma_ranges));
+        if (IS_ERR(dma_ranges))
+                return PTR_ERR(dma_ranges);
+~
 
-Fix this by keeping `fl->opt` alive until `fl_free_rcu()`. That matches
-the lifetime already required for the enclosing flowlabel while readers
-can still reach it under RCU.
 
-Fixes: d3aedd5ebd4b ("ipv6 flowlabel: Convert hash list to RCU.")
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Suggested-by: Xin Liu <bird@lzu.edu.cn>
-Tested-by: Ren Wei <enjou1224z@gmail.com>
-Signed-off-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- net/ipv6/ip6_flowlabel.c | 5 -----
- 1 file changed, 5 deletions(-)
+Thanks
 
-diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
-index 7c12bf75beedf..c92f98c6f6ecc 100644
---- a/net/ipv6/ip6_flowlabel.c
-+++ b/net/ipv6/ip6_flowlabel.c
-@@ -133,11 +133,6 @@ static void fl_release(struct ip6_flowlabel *fl)
- 		if (time_after(ttd, fl->expires))
- 			fl->expires = ttd;
- 		ttd = fl->expires;
--		if (fl->opt && fl->share == IPV6_FL_S_EXCL) {
--			struct ipv6_txoptions *opt = fl->opt;
--			fl->opt = NULL;
--			kfree(opt);
--		}
- 		if (!timer_pending(&ip6_fl_gc_timer) ||
- 		    time_after(ip6_fl_gc_timer.expires, ttd))
- 			mod_timer(&ip6_fl_gc_timer, ttd);
--- 
-2.43.0
-
+> 
+> If we can't carve the space for this out of the existing unused flags
+> field, I think we'd have to introduce a new vfio device feature that
+> basically copies VFIO_DEVICE_FEATURE_DMA_BUF with the extra hints
+> fields.
+>  
+> > >  	struct vfio_region_dma_range dma_ranges[] __counted_by(nr_ranges);
+> > >  };
 
