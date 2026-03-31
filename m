@@ -1,171 +1,242 @@
-Return-Path: <netdev+bounces-273786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273787-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2NIeCaVVzGn/SQYAu9opvQ
-	(envelope-from <netdev+bounces-273786-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 01:15:49 +0200
+	id YJY8ImpWzGn/SQYAu9opvQ
+	(envelope-from <netdev+bounces-273787-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 01:19:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9178D372A60
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 01:15:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D83E1372A9E
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 01:19:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 857E7301300A
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 23:15:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 134D33015CBA
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 23:18:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB99D45BD5F;
-	Tue, 31 Mar 2026 23:15:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDCA466B6D;
+	Tue, 31 Mar 2026 23:18:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="EhFY386O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sM9WTPwR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f97.google.com (mail-oo1-f97.google.com [209.85.161.97])
+Received: from mail-dl1-f53.google.com (mail-dl1-f53.google.com [74.125.82.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5B02D877B
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 23:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.97
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774998946; cv=none; b=r5M5q8vfeeXvZ0vNJB2ofTBUUXItUme9BvjopmVd3dOfPZJK87wRAPp60zqe5iKtl9pCJsM77GSZ7fzEcC5XnFvMCzQml5jBPXlzAaA6y1dYssOT2ieU+ZsSKNKpfAnumFY2JW1FQ3kUQeZfP2B5IU4qiD8RHCdvAAitWwC6wvY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774998946; c=relaxed/simple;
-	bh=UdFSg+9OLBF7JW5ztBTvWY89CYBaqRXqvANYuljPNus=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nIaErEntLzI9YoHSWmsPWdKaWGQyah71Y9wlHrHhhh/mWaikKhDrqjiLk47z30cOgZE52zjj0UUMV7G0uCJqSmRrZ/sd6DwcxC6u0/KooHzQCtmjgAF8v6JgfP3t2tuMs6GvG2/yQxMvo63TF4dAIWoIR6jTfsDD1W+gmXWjOys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=EhFY386O; arc=none smtp.client-ip=209.85.161.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oo1-f97.google.com with SMTP id 006d021491bc7-67bb3fe55a5so2077863eaf.2
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 16:15:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774998944; x=1775603744;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8ecKbIFdB4IMJhfX2+O9VjSoDFPb0JSVEZEHdrHRvIo=;
-        b=AdMz7bP81NlSuLaAGoSb2IJKunZ4HWpyiTyO0lgroKVk6DKc7iyjCDVRAFVPLD7LGV
-         35kNqPwsh8ntKyDw/pLXvaqOJgG/2ZfpfQk1YGPpc6BPigVfXmgIF9YAe1BlmlF5Kujl
-         zsObUeQbk6BrRzbT7HTTlvM1wBMnwsO0HpV0rh5WCivm3Wt/v/cnI2vxBeorwKdGU5l/
-         gc1ggPUOoQEsngLxH4zrkJ+nZ0pZ75F6vIH0ek0EjpaccJgw3O+2uh0bRQYj13aHVxAI
-         +n8ER/P6JN2pkR2v4y4DgUXcIWaHtm3lweQWWr+FYG2eraqDMKjkW6GaiWd7CgO1ORkl
-         ivUw==
-X-Gm-Message-State: AOJu0YzQwIg7/0oecu6hUrtg34+mXFmvgnlON9FqnVNzckiz+cVhYz91
-	6wNGDXuO1jF+p/m2106yVMrMe+3MgdXqB+Q14StPOrS7a3vCbVTCFtYRDFjGpuKjbO/DgXLwYMO
-	zgtJ45bU0p428pyzB/e8xELACOORX5wQicjrWOQz0UID6TxBU9zacaws6m8mHwXZE4QBGw6/YS5
-	CWM2nnsJnCkHtFIJ4Z8wzkAtuvpsjPVTuhBJ/QqJJQs1+njHDuUVML3swTujewHdL+OLsa/xPxS
-	7NhQr0xuw==
-X-Gm-Gg: ATEYQzx98KXlt8tRQxObJi5NhpylIeGG3BcNjSfkKzkZfvP+q1Y+2liUh7Qj3WWEipM
-	OXakHhIwk6aITlrlwX9QCKlXXCGdQGbOspCKaU+6JymiYX0CMvq3NRsJsxyq6SX1wJ+flaGNRRa
-	UuHTHha34Q36CC5RiE+ww+xZmWyQRZy38KZOWW2YyPj1QKEEUvJcIMAm4QysUSgxmwv+c9e1+bg
-	QkB46Sepfuyxd4iSHM89Vbn6A+uKY0x6nO5PNc4QAwRylcVz5c8ysNKb+wopH4bV4GplNlt5km4
-	XEMLTXZDgXOpvgskICsrossTB3PvmAydQX3AA0Z1cUwG1An9TV1rN6PAD16G0W1qzue/L+RMKZa
-	CM5GxuXSEpZIeyaERTPVUMm6addjA+MsWUZ+BmdjPHNTXLRgo3lcESoLjqcOAhApayrrbgPmcdF
-	4z/IAeXwW/I7SihtgM0nFWsPMppOKiBIbRzdE9m0wanOrq5qN4v1MEtFE=
-X-Received: by 2002:a05:6820:4df9:b0:67e:1a5d:a88a with SMTP id 006d021491bc7-67fabca212amr686143eaf.42.1774998944273;
-        Tue, 31 Mar 2026 16:15:44 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-15.dlp.protect.broadcom.com. [144.49.247.15])
-        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-41d04e0787dsm1917631fac.13.2026.03.31.16.15.44
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 31 Mar 2026 16:15:44 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-89cd8b56114so86943886d6.2
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 16:15:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893693A962E
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 23:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774999129; cv=pass; b=Tj25TrXRciNHIakY2JyfHmLMvYH166ksJC1KtMQlzF1tc31ahlVshay2XKZrrytvd53Nyfwuf902Ogv0uMprvyznOpDF0zLiysx543RcVKbSXC3sWHeicFiU2OrK+iFu5YXp4uL6Pq0wPv+c2NM7T3wi3lvBoezrVotXevtPImY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774999129; c=relaxed/simple;
+	bh=Ep3aRbiHaV/UYMBBrDbliRfaZKtkwhs5HbkU3sXRBUc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kNdyS6O800//+q3uTgWsnCKkxT+Y9nCjwuK7g3xjQ6A5kq5dypyvjgFjXjpUQvrzrO4fqZLv0MkhsfmggNhNxpBGyCT5ap9hpxtif8x8yJFllbT2L/MAnLl8ZM6LHNaH2BDT5ru8u7lgh+7cDTut+V4gOamcNeiqLPt05kgzTAs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sM9WTPwR; arc=pass smtp.client-ip=74.125.82.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f53.google.com with SMTP id a92af1059eb24-1273349c56bso7941913c88.0
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 16:18:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774999128; cv=none;
+        d=google.com; s=arc-20240605;
+        b=WclZKVxcWUKGhV6IWhckExz2nplK45UhkB05L0gFZvebrIcRsmm4kxnRkmjHeoPvU3
+         Wj9L/AS9mAIjf/LUQJIouhcgV2yWGfm6ZB6iqPECSlVsAVtrMWY1X6bkOVo9+x0cpa4T
+         PmJcoVsxinUb4WhBPuOT4TpGjJ8g5C1mzt6GLp1Sx9RsZUh59YIW6gtsgNht0dIX1uZ7
+         KXtLe1q/GbWt9fmhBx/stkL93sFni5Hl1gW8zUvJlUWThiFSAmJ6A+iH00EahL3OjfzR
+         ZYMicRQGPwQ9GwGOsRAnUPedMX6lztv5dnDaW7Oxo0gJQG70lzkVa3vMoeN4HvVI3noV
+         /MkA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Ep3aRbiHaV/UYMBBrDbliRfaZKtkwhs5HbkU3sXRBUc=;
+        fh=uM8gmbkNUZ68wlKpcsXivjVirCiVhufyXXHOC/W0p5Q=;
+        b=hqf1CB0tU0dnX7TkupUeQHqp3t9zDsArL8yjjTFCz4kNWwE/YCicLfOT/mXOHdwYgL
+         L3AlTzutwQFF2Ezd3n4K1F1FeFfjl4tC5hqnPKYQNvqurqI94wR7MpEP1vfQ+VsU396E
+         sHbYPCA4wHpBBHI6oVqBUJiHGU5NayF8gAAHk7aCGFPeecKLWe/WYzmOSH3qnl/ZebKG
+         tAOs0hiXhGMxA/lxoTt+97mNTdGSs5KrIibGEGLPvYqcogGhNrjDR88db5qLAq5LNxCD
+         xZNnxfg9aV4VD9GhukH1pehE0Oj+H/62MvVfxfaZGup01NQvxMWEseDs8xobUI5lDGkl
+         tO0g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1774998943; x=1775603743; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8ecKbIFdB4IMJhfX2+O9VjSoDFPb0JSVEZEHdrHRvIo=;
-        b=EhFY386O72J5p8yUcV3hnTlXzBHu3fR6QDLedpLPvv0BcKVIlKtinEiXg+P6EglYBt
-         4c29S6j69wL++RUxZnhngKRrRfPO6Q0OqThGeFcbuhQY6o7e4U/Zp7PpEZELVuMyysmV
-         Z2p7nI58aFqF1N1WtG7bfaBeS1A56EXCaJhp0=
-X-Received: by 2002:a05:6214:478a:b0:89c:449c:5378 with SMTP id 6a1803df08f44-8a43a272853mr23042716d6.34.1774998942989;
-        Tue, 31 Mar 2026 16:15:42 -0700 (PDT)
-X-Received: by 2002:a05:6214:478a:b0:89c:449c:5378 with SMTP id 6a1803df08f44-8a43a272853mr23042406d6.34.1774998942599;
-        Tue, 31 Mar 2026 16:15:42 -0700 (PDT)
-Received: from [10.14.5.163] ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8a33a2bd024sm26393716d6.18.2026.03.31.16.15.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Mar 2026 16:15:41 -0700 (PDT)
-Message-ID: <3550c9fb-2774-42ad-876c-cd6649fe0bc8@broadcom.com>
-Date: Tue, 31 Mar 2026 16:15:39 -0700
+        d=google.com; s=20251104; t=1774999128; x=1775603928; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ep3aRbiHaV/UYMBBrDbliRfaZKtkwhs5HbkU3sXRBUc=;
+        b=sM9WTPwR8ZW59p85JIBE/PXoq8GU2RQvqR9xuKr2+K/a+r9tqFu9l50/WINrVwQpms
+         7z1+esNp99YQzU7O5xr2p9XwGv6cWrjfM17zR1Hk+uCmJlCftdqm/qDCXU+MMElxxLAi
+         BJ2XrR7s/2MjcFCInuxZ2hWdtpmH8KaggSL/b+/QL91rWBb2bSBNmGqEm6gtvomfDd4w
+         7fWPWBJjSHtHoNDvAwocY0UMw/sNH1Xf7kUxa/ymYRV1mNqgPtt1Fni9akWwE7Pre3Qp
+         HjhO37lsUiRCazywKbVFyZU8GavRyUEJ2BLCGya/syjtEJcChX2Kuw9DjGItPhzpcGh3
+         QfCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774999128; x=1775603928;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Ep3aRbiHaV/UYMBBrDbliRfaZKtkwhs5HbkU3sXRBUc=;
+        b=TSm1mXA1nXYaYgEptDJyVL/nKCe3/1lPw34+Md/lKAlq6TYUkcxjJ8Unq2tMl89KRF
+         tXh2t60S1Eef3cAHyPS4S+6gBVHr0oh5VjGf1dhtmPPux84JxzVVctQo0SUkEsbQ46+G
+         gc4K2127jPcHVer+npHUzIb+Yo5/4YFIDoJwUUjErbte8zubEq9P6KjQvFjpPv3IYu6h
+         wSyOHZV9ga3+p1BzIGDfJpxUxOLyNcT0GwNCQJMZD+FH5Q3+ikdxJi2bLAsxtUPZOjuY
+         IYCEgNC85k6aH+VOQ0lOsGf1hH3nQdfGd7PjjFg6xMzXtdwrOdtkWzmO/Og5I/RJNOsE
+         BPaw==
+X-Forwarded-Encrypted: i=1; AJvYcCXlGA6G+MUs91IT04bXwwxtFVAmhaviLWaimBGjv5HeWyAPvCS76UeTdx2W+hhrEf6T4mb/tw0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZadX+TLb4x8SpJSwdO1JhCPDQb6BL7l+yYHJarGLAfVmsCQ1O
+	M4CVt77jj8HeQ6YeYSZlvxAE8sB/mvmiSDcYyFD0u+o4l+hyszJToizqa1ORnAvEYlU3Pfdx+E1
+	QcOIumwzpK+LuGJnhvPKwRQSQLHyu3/PxkEOOiajY
+X-Gm-Gg: ATEYQzxd3J9t4YQlzwehCKXFtJesgst5IPuQxOv/xuwLHMJJOXc2dQWgkzL1yDnvO5c
+	dlrmsEMbs8LXKFkd37RvLw26mrzS8/5bSYaigvKH0bQptLLN/7ClgQ11l4IMPApiDCITS2fM+AB
+	Smu1bqecdS7PHPf2Xptcvnvx5+OHimIBQjceutcWXYKkcdKVSWyRykHrDM6KzGJZUtmDFPoi1ld
+	f8k+VruULp8eoTcRBfbVs7Ibrgdfcq7jEzjK6Yl68aneW7w2o/yQO9zVN95Plvzll0THIYGhomB
+	Nq85zIqm18A0kJokY3NGrePTZbp5N69UCJvohlxjjphfx/iT37Sq0XVn6L3NDSBFc+03Aw==
+X-Received: by 2002:a05:7022:b8c:b0:12a:6fb7:8801 with SMTP id
+ a92af1059eb24-12be643827bmr836648c88.14.1774999126972; Tue, 31 Mar 2026
+ 16:18:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] net: bcmgenet: fix racing timeout handler
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch,
- bcm-kernel-feedback-list@broadcom.com, florian.fainelli@broadcom.com,
- opendmb@gmail.com, nb@tipi-net.de
-References: <20260326184529.1393438-1-justin.chen@brodcom.com>
- <20260326184529.1393438-3-justin.chen@brodcom.com>
- <20260327211331.78476a99@kernel.org>
-Content-Language: en-US
-From: Justin Chen <justin.chen@broadcom.com>
-In-Reply-To: <20260327211331.78476a99@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+References: <20260306-unix-proto-update-null-ptr-deref-v3-0-2f0c7410c523@rbox.co>
+ <20260306-unix-proto-update-null-ptr-deref-v3-5-2f0c7410c523@rbox.co>
+ <2192e9ef-894f-4826-b296-4f90e973a31b@163.com> <b9a956dd-ebb2-47ca-8b49-ccbba6ff9b26@rbox.co>
+ <b21fac4e-891b-481c-9734-e95290e49097@linux.dev> <fa818820-c0c9-48dc-8ebc-661cb3349935@rbox.co>
+ <dd043c69-4d03-46fe-8325-8f97101435cf@linux.dev> <27fa6e91-02a5-46cd-8c95-b75fd2c5fa08@rbox.co>
+ <CAAVpQUAtF29CPDAdEUchYOP=oy8D2-B3GH3fWs2pwTmnYoTu=w@mail.gmail.com> <48bad987-a130-4fb0-b4de-e39deac80ab9@rbox.co>
+In-Reply-To: <48bad987-a130-4fb0-b4de-e39deac80ab9@rbox.co>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 31 Mar 2026 16:18:36 -0700
+X-Gm-Features: AQROBzBDc0n1-_f0-_wUbzS_nTN6WPvIo3JBShn86M-8Oos7kh40q0Zqbff_Ie0
+Message-ID: <CAAVpQUAHijOMext28Gi10dSLuMzGYh+jK61Ujn+fZ-wvcODR2A@mail.gmail.com>
+Subject: Re: [PATCH bpf v3 5/5] bpf, sockmap: Adapt for af_unix-specific lock
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, Jiayuan Chen <mrpre@163.com>, 
+	John Fastabend <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Yonghong Song <yhs@fb.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, Cong Wang <cong.wang@bytedance.com>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,google.com,davemloft.net,lunn.ch,broadcom.com,gmail.com,tipi-net.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	TAGGED_FROM(0.00)[bounces-273786-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273787-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[28];
+	FREEMAIL_CC(0.00)[linux.dev,163.com,gmail.com,cloudflare.com,google.com,redhat.com,davemloft.net,kernel.org,fb.com,iogearbox.net,fomichev.me,bytedance.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 9178D372A60
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rbox.co:email]
+X-Rspamd-Queue-Id: D83E1372A9E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Tue, Mar 31, 2026 at 3:44=E2=80=AFPM Michal Luczaj <mhal@rbox.co> wrote:
+>
+> On 3/31/26 01:27, Kuniyuki Iwashima wrote:
+> > On Mon, Mar 30, 2026 at 4:04=E2=80=AFPM Michal Luczaj <mhal@rbox.co> wr=
+ote:
+> >> On 3/26/26 07:26, Martin KaFai Lau wrote:
+> >>> On 3/15/26 4:58 PM, Michal Luczaj wrote:
+> >>>>> Beside, from looking at the may_update_sockmap(), I don't know if i=
+t is
+> >>>>> even doable (or useful) to bpf_map_update_elem(unix_sk) in
+> >>>>> tc/flow_dissector/xdp. One possible path is the SOCK_FILTER when lo=
+oking
+> >>>>> at unix_dgram_sendmsg() =3D> sk_filter(). It was not the original u=
+se case
+> >>>>> when the bpf_map_update_elem(sockmap) support was added iirc.
+> >>>>
+> >>>> What about a situation when unix_sk is stored in a sockmap, then tc =
+prog
+> >>>> looks it up and invokes bpf_map_update_elem(unix_sk)? I'm not sure i=
+t's
+> >>>> useful, but seems doable.
+> >>>
+> >>> [ Sorry for the late reply ]
+> >>>
+> >>> It is a bummer that the bpf_map_update_elem(unix_sk) path is possible
+> >>> from tc :(
+> >>>
+> >>> Then unix_state_lock() in its current form cannot be safely acquired =
+in
+> >>> sock_map_update_elem(). It is currently a spin_lock() instead of
+> >>> spin_lock_bh().
+> >>
+> >> Is there a specific deadlock you have in your mind?
+> >
+> > lockdep would complain if we used the same lock from
+> > different contexts.
+> >
+> > e.g.)
+> > Process context holding unix_state_lock() with the normal spin_lock()
+> > -> BH interrupt
+> > -> tc prog trying to hold the same lock with spin_lock(). (_bh())
+> > -> deadlock
+>
+> OK, I get it, thanks.
+>
+> So here's one more idea: the null-ptr-deref issue is connect() racing
+> against sock_map_update_elem_*SYS*() coming from user-space, not the
+> can-be-called-from-BH sock_map_update_elem() variant. So can't we assume
+> that for any sock_map_update_elem(unix_sk) invoked by a tc prog, unix_sk
+> will always be "stable", i.e. in a state that cannot lead to that
+> null-ptr-deref?
+>
+> IOW, if for a tc prog the only way to get hold of unix_sk is look it up i=
+n
+> a sockmap, then (by the fact that unix_sk _is_ in the sockmap) unix_sk wi=
+ll
+> be already safe to use by sock_map_update_elem() without taking the af_un=
+ix
+> state lock.
+>
+> Long story short: take the unix state lock in sock_map_update_elem_sys(),
+> don't bother in sock_map_update_elem()?
+
+but it will prevents bpf iter from taking unix_state_lock().
+
+I don't see a good reason to introduce a new locking rule by unnecessarily
+wrapping the entire sockmap update with unix_state_lock() even though
+the root bug can be avoided by a simple null check in a leaf function.
 
 
-On 3/27/26 9:13 PM, Jakub Kicinski wrote:
-> On Thu, 26 Mar 2026 11:45:29 -0700 justin.chen@broadcom.com wrote:
->> The bcmgenet_timeout handler tries to take down all tx queues when
->> a single queue times out. This is over zealous and causes many race
->> conditions with queues that are still chugging along. Instead lets
->> only restart the timed out queue.
-> 
-> FWIW AI seems to suggest we should also stop NAPI and the DMA in this
-> case, just to make sure that the queue in question doesn't suddenly
-> wake up either. Which seems fair but probably as a follow up and only
-> if not too hard in itself..
-
-Yea this crossed my mind. I was thinking we might need to grab the ring 
-lock here in case we race on the napi tx relcaim. But in my testing, I 
-wasn't able to reproduce the lock up with these changes as is. But might 
-be worth throwing a lock in there anyways. I don't think we need to halt 
-the DMA, since we clean up everything, worst outcome is a packet gets 
-sent out when we tag it as being dropped.
-
-Thanks,
-Justin
+>
+> >> ...
+> >> And sock_{map,hash}_seq_show() (being a part of bpf iter machinery) ne=
+eds
+> >> to take lock_sock() just as well? Would that require a special-casing
+> >> (unix_state_lock()) for af_unix?
+> >
+> > Right, lock_sock() + unix_state_lock() + SOCK_DEAD check
+> > should be best.
+>
+> OK, got it.
+>
 
