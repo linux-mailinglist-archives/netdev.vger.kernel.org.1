@@ -1,288 +1,194 @@
-Return-Path: <netdev+bounces-273492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273494-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QJhALUF2y2k3HwYAu9opvQ
-	(envelope-from <netdev+bounces-273492-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 09:22:41 +0200
+	id sIzBFQp2y2k3HwYAu9opvQ
+	(envelope-from <netdev+bounces-273494-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 09:21:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 157023650DF
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 09:22:40 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCF55365080
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 09:21:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0374D3046EAA
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 07:12:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7DBE0303D8A6
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 07:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E93BA34;
-	Tue, 31 Mar 2026 07:12:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="LpO7alF6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C28396B68;
+	Tue, 31 Mar 2026 07:20:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from n169-114.mail.139.com (n169-114.mail.139.com [120.232.169.114])
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10BC19049B;
-	Tue, 31 Mar 2026 07:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.114
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B4EF394793
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 07:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774941166; cv=none; b=X9k0jQGaWi8OA9+jxTQfwJlUvSLTrsUQWOqOcvrrsACDIuars7JXFc/cSI4dENw8oFa7X4cO1Sm+3fAI8mbfGA+C8q/OxZ9NRU/UJ+dsXJfhI6hV/9I5HfiGMcjGvnDeIgQBG8MgDnqsyu3WKawYZq95x9WSYiDDLeDExLpnmlI=
+	t=1774941610; cv=none; b=uMphhQhgIM2kkMU86/TWHtRW8ChtBkmbBl+Q7hpJs4Kf3PSoPA42KoMpYBmkb9xFDpMFa/8+fa6rGAUF3ee6J33g8FDe+KO+grspxcOapniwHgO7dVgwOCnzMuxqb1XxJCCC5yY25FFgt+2BSPhUkftZWIduDxDwTRRFxYBgZKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774941166; c=relaxed/simple;
-	bh=2D4WdNTfPcZiRKss3zeGyGmEM9m4XEU75L4+0XLw77w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IoroK8rhQYYKXJ1Fzm3uldw2ymGti3Qkn2owORnZ4ck70NVN7cD6KfKfUaSOldBHmvvLeYxCeESWceu0vjg475sN2zghGVbzJjM3ftEuV8sVks4SH7NcBvgYfdur9kDGwkIQODA/444q9f/6w3l2MZ2bLgFs1L85Uj4HMgDxalY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=LpO7alF6; arc=none smtp.client-ip=120.232.169.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=139.com; s=dkim; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=LpO7alF6D8hRGID1vONgJQxepW+F9VKh5ugbB6XsY38KsN/k+p6gkE8BmSbDcEhVZ793uXcEP0c4r
-	 MyNGanb/ndEAe3G38if4nzFLH5fl6fqmE9MEw6VCZiQkg+bSNwI1OdD3iQlvYyE4qPamUakS48cP0x
-	 8oDkDWbat3+ZccNc=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM:                                                                                        
-X-RM-SPAM-FLAG:00000000
-Received:from Ubuntu24 (unknown[2409:8A00:DD3:9760:EC02:B35:F13F:3469])
-	by rmsmtp-lg-appmail-45-12076 (RichMail) with SMTP id 2f2c69cb73d6a26-00a34;
-	Tue, 31 Mar 2026 15:12:31 +0800 (CST)
-X-RM-TRANSID:2f2c69cb73d6a26-00a34
-From: XiaoHua Wang <561399680@139.com>
-To: gregkh@linuxfoundation.org,
-	stable@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Yin Fengwei <fengwei_yin@linux.alibaba.com>,
-	Dong Chenchen <dongchenchen2@huawei.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	XiaoHua Wang <561399680@139.com>
-Subject: [PATCH 6.12.y] net: add proper RCU protection to /proc/net/ptype
-Date: Tue, 31 Mar 2026 15:12:24 +0800
-Message-ID: <20260331071224.14601-1-561399680@139.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1774941610; c=relaxed/simple;
+	bh=elCprgIfyZmynNxyFih948fHQDY6a/gAsEUW4KZbOJk=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=a85nPlSakCVI9fhTd1WXRdbs8VLZfMmdvRPadiACGcBtt2DrgWErp/xMchmRnWUutb/4Tg/YV/iJXRKmB3bT0JwP60C7T5smGzz+VCOEhR32fStlWt17hMVM0gdAAUyCeG79Vzx1xWMKwbFesg20a1Oi/w8fPUK87ekycyIWjKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.34.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas9t1774941546t748t35093
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [115.227.224.139])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 5401902762098304351
+To: "'Jakub Kicinski'" <kuba@kernel.org>
+Cc: <netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>,
+	<andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<pabeni@redhat.com>,
+	<richardcochran@gmail.com>,
+	<linux@armlinux.org.uk>,
+	<horms@kernel.org>,
+	<michal.swiatkowski@linux.intel.com>,
+	<jacob.e.keller@intel.com>,
+	<kees@kernel.org>,
+	<joe@dama.to>,
+	<larysa.zaremba@intel.com>,
+	<abdun.nihaal@gmail.com>,
+	<leitao@debian.org>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>,
+	<andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<pabeni@redhat.com>,
+	<richardcochran@gmail.com>,
+	<linux@armlinux.org.uk>,
+	<horms@kernel.org>,
+	<michal.swiatkowski@linux.intel.com>,
+	<jacob.e.keller@intel.com>,
+	<kees@kernel.org>,
+	<joe@dama.to>,
+	<larysa.zaremba@intel.com>,
+	<abdun.nihaal@gmail.com>,
+	<leitao@debian.org>
+References: <20260326021406.30444-5-jiawenwu@trustnetic.com> <20260331005527.3459556-1-kuba@kernel.org>
+In-Reply-To: <20260331005527.3459556-1-kuba@kernel.org>
+Subject: RE: [PATCH net-next v6 04/11] net: ngbe: implement libwx reset ops
+Date: Tue, 31 Mar 2026 15:19:05 +0800
+Message-ID: <073601dcc0de$a87b2e30$f9718a90$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.04 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain;
+	charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQGnYjFgiICnEG1OS+zPz18hM02VsQLH5aBfthy4xNA=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: MKP3LwvGEIjI/a51TJEFxsbxjgtZZqq2Ffjo4uins8uvgvefpVoW9NlH
+	KyaRp8G0j7N/EAvJl0TtLiaOFPO0wei4g0+vP4Zc+lZp0vnDaW6C8wxZnx3ZD9LuMN36OAD
+	qctz2UrV07ikUhv2PzboRVvE+k6JUkW+E8AE31LaDN0h+0CZGRZCowltMTVslIs2jKEy9aD
+	VU5d/CIr8L1nwBkG9n/NFvWiBwSIy4obVDDKyvBCQJNHYBJqYZxppRJq0leqLoQyuJVo5g1
+	wP+8GWqr0ZA9XsNJBS1XINhY+o1PeooU1PrIOjw1VGp6bdDC42h+bu4P3ildulnfa24gIc3
+	z6EdAoaoN6pi90O8dSOYhTiv5tQg7vQV9mVHK+ZrJUP3Jx7QGnMLwnJe3gqgqALKvQ1dl7g
+	CZHwU7vDKvgn9rrpEzzkliZlbEKsXOswKiquWvOyQ3ED+HlPUDxragcJhNOgLUGM/McWQhq
+	o8nPIYFiHqPLrhxXmCUOngJAxmXu74E5VnJVkPnATZH9OyHSSZYB3htnsFttw6+PLfMHZ8N
+	//Cgrzm1wQjSirLAiP/EYW9cyDWRtgV3/tUbCMfn308kunhc+U/Zc2tnR4yDZcp2/WLLEim
+	NGzOmGzB3eM36Bw5leioTnhE2SON8c6Q9U1u9x0A6s1tduK4ZbX/t7nzN6oh+fXittJRqEz
+	iUdbuorIYl9clLMq9KfC0x0yMzEG3Qbrrhgh+eXq6PCoTSIgYW4VYiHzHIQ5P9LUbYtfGOB
+	8aXsDSTWckivCerps1EmWpobwM4jgE98zPwlDYwc3HiYnWKJk6kYCyND0c0le5/TTZaL4zm
+	WOYRAU3tqs3bG0TLIPTy2dtTWKUMnKf4fFQ2eLCUO3rRxKJPRnwm00iYC/LTDZf04YcaSRH
+	CCKC/U70Yt1dyqluBCJG3B/LJ5/G5DQUvuOrgGk6OENQY8qX2sc8q7wtnCIA9qJ5q7NhxLA
+	cCQj94br0HNEdEoaINZ3wJqHGXv4ZvrrxhneK/SSdmeISrZluas+TmdMAiCRddYsJCdDCA+
+	Kt/ZKPo0Z0xusQI5iBX1DbNbEJmHuitS5O03T+Gp5NEYkCHi8HYRhgABxH1JknN2U1UlsBV
+	tkw3BIHbuwYIZX7Cl9zYBtdEs7i/tkE6Ij1OFx5ncwIfsur1WwSyVrQAWNlpak534iE1zOu
+	rNVD
+X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
+X-QQ-RECHKSPAM: 0
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	FROM_EXCESS_BASE64(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[139.com:s=dkim];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273492-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,linux.alibaba.com,huawei.com,kernel.org,139.com];
+	TAGGED_FROM(0.00)[bounces-273494-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[139.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[139.com];
-	FROM_NEQ_ENVFROM(0.00)[561399680@139.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[trustnetic.com];
+	RCPT_COUNT_TWELVE(0.00)[33];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,armlinux.org.uk,kernel.org,linux.intel.com,intel.com,dama.to,debian.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[139.com:-];
-	NEURAL_HAM(-0.00)[-0.995];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.833];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[list.next:url,ptype_all.next:url,alibaba.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,139.com:email,139.com:mid]
-X-Rspamd-Queue-Id: 157023650DF
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[trustnetic.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BCF55365080
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Eric Dumazet <edumazet@google.com>
+> > +static void ngbe_reinit_locked(struct wx *wx)
+> > +{
+> > +	int err = 0;
+> > +
+> > +	netif_trans_update(wx->netdev);
+> > +
+> > +	err = wx_set_state_reset(wx);
+> > +	if (err) {
+> > +		wx_err(wx, "wait device reset timeout\n");
+> > +		return;
+> > +	}
+> > +
+> > +	ngbe_down(wx);
+> > +	ngbe_up(wx);
+> > +
+> > +	clear_bit(WX_STATE_RESETTING, wx->state);
+> > +}
+> 
+> Is it possible to use a standard kernel mutex here instead of a bit flag for
+> synchronization?
+> 
+> Looking at the underlying implementation of wx_set_state_reset(), it relies
+> on an open-coded polling loop:
+> 
+> static inline int wx_set_state_reset(struct wx *wx)
+> {
+>         u8 timeout = 50;
+> 
+>         while (test_and_set_bit(WX_STATE_RESETTING, wx->state)) {
+>                 timeout--;
+>                 if (!timeout)
+>                         return -EBUSY;
+> 
+>                 usleep_range(1000, 2000);
+>         }
+> 
+>         return 0;
+> }
+> 
+> Using a bit flag and a sleep-polling loop to guard a teardown and bringup
+> section acts as an ad-hoc lock. This approach bypasses standard kernel
+> synchronization guarantees and prevents lockdep from analyzing the lock
+> ordering.
+> 
+> Since this context is allowed to sleep, could this section be protected by
+> a standard mutex instead?
 
-[ Upstream commit f613e8b4afea0cd17c7168e8b00e25bc8d33175d ]
-
-Yin Fengwei reported an RCU stall in ptype_seq_show() and provided
-a patch.
-
-Real issue is that ptype_seq_next() and ptype_seq_show() violate
-RCU rules.
-
-ptype_seq_show() runs under rcu_read_lock(), and reads pt->dev
-to get device name without any barrier.
-
-At the same time, concurrent writers can remove a packet_type structure
-(which is correctly freed after an RCU grace period) and clear pt->dev
-without an RCU grace period.
-
-Define ptype_iter_state to carry a dev pointer along seq_net_private:
-
-struct ptype_iter_state {
-	struct seq_net_private	p;
-	struct net_device	*dev; // added in this patch
-};
-
-We need to record the device pointer in ptype_get_idx() and
-ptype_seq_next() so that ptype_seq_show() is safe against
-concurrent pt->dev changes.
-
-We also need to add full RCU protection in ptype_seq_next().
-(Missing READ_ONCE() when reading list.next values)
-
-Many thanks to Dong Chenchen for providing a repro.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Fixes: 1d10f8a1f40b ("net-procfs: show net devices bound packet types")
-Fixes: c353e8983e0d ("net: introduce per netns packet chains")
-Reported-by: Yin Fengwei <fengwei_yin@linux.alibaba.com>
-Reported-by: Dong Chenchen <dongchenchen2@huawei.com>
-Closes: https://lore.kernel.org/netdev/CANn89iKRRKPnWjJmb-_3a=sq+9h6DvTQM4DBZHT5ZRGPMzQaiA@mail.gmail.com/T/#m7b80b9fc9b9267f90e0b7aad557595f686f9c50d
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Tested-by: Yin Fengwei <fengwei_yin@linux.alibaba.com>
-Link: https://patch.msgid.link/20260202205217.2881198-1-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-[ Some adjustments have been made. ]
-Signed-off-by: XiaoHua Wang <561399680@139.com>
----
- net/core/net-procfs.c | 49 +++++++++++++++++++++++++++++--------------
- 1 file changed, 33 insertions(+), 16 deletions(-)
-
-diff --git a/net/core/net-procfs.c b/net/core/net-procfs.c
-index fa6d3969734a..e29d43fe11fa 100644
---- a/net/core/net-procfs.c
-+++ b/net/core/net-procfs.c
-@@ -168,8 +168,14 @@ static const struct seq_operations softnet_seq_ops = {
- 	.show  = softnet_seq_show,
- };
- 
-+struct ptype_iter_state {
-+	struct seq_net_private	p;
-+	struct net_device	*dev;
-+};
-+
- static void *ptype_get_idx(struct seq_file *seq, loff_t pos)
- {
-+	struct ptype_iter_state *iter = seq->private;
- 	struct list_head *ptype_list = NULL;
- 	struct packet_type *pt = NULL;
- 	struct net_device *dev;
-@@ -179,12 +185,16 @@ static void *ptype_get_idx(struct seq_file *seq, loff_t pos)
- 	for_each_netdev_rcu(seq_file_net(seq), dev) {
- 		ptype_list = &dev->ptype_all;
- 		list_for_each_entry_rcu(pt, ptype_list, list) {
--			if (i == pos)
-+			if (i == pos) {
-+				iter->dev = dev;
- 				return pt;
-+			}
- 			++i;
- 		}
- 	}
- 
-+	iter->dev = NULL;
-+
- 	list_for_each_entry_rcu(pt, &net_hotdata.ptype_all, list) {
- 		if (i == pos)
- 			return pt;
-@@ -210,6 +220,7 @@ static void *ptype_seq_start(struct seq_file *seq, loff_t *pos)
- 
- static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- {
-+	struct ptype_iter_state *iter = seq->private;
- 	struct net_device *dev;
- 	struct packet_type *pt;
- 	struct list_head *nxt;
-@@ -220,20 +231,21 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 		return ptype_get_idx(seq, 0);
- 
- 	pt = v;
--	nxt = pt->list.next;
--	if (pt->dev) {
--		if (nxt != &pt->dev->ptype_all)
-+	nxt = READ_ONCE(pt->list.next);
-+	dev = iter->dev;
-+	if (dev) {
-+		if (nxt != &dev->ptype_all)
- 			goto found;
- 
--		dev = pt->dev;
- 		for_each_netdev_continue_rcu(seq_file_net(seq), dev) {
--			if (!list_empty(&dev->ptype_all)) {
--				nxt = dev->ptype_all.next;
-+			nxt = READ_ONCE(dev->ptype_all.next);
-+			if (nxt != &dev->ptype_all) {
-+				iter->dev = dev;
- 				goto found;
- 			}
- 		}
--
--		nxt = net_hotdata.ptype_all.next;
-+		iter->dev = NULL;
-+		nxt = READ_ONCE(net_hotdata.ptype_all.next);
- 		goto ptype_all;
- 	}
- 
-@@ -242,14 +254,14 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 		if (nxt != &net_hotdata.ptype_all)
- 			goto found;
- 		hash = 0;
--		nxt = ptype_base[0].next;
-+		nxt = READ_ONCE(ptype_base[0].next);
- 	} else
- 		hash = ntohs(pt->type) & PTYPE_HASH_MASK;
- 
- 	while (nxt == &ptype_base[hash]) {
- 		if (++hash >= PTYPE_HASH_SIZE)
- 			return NULL;
--		nxt = ptype_base[hash].next;
-+		nxt = READ_ONCE(ptype_base[hash].next);
- 	}
- found:
- 	return list_entry(nxt, struct packet_type, list);
-@@ -263,19 +275,24 @@ static void ptype_seq_stop(struct seq_file *seq, void *v)
- 
- static int ptype_seq_show(struct seq_file *seq, void *v)
- {
-+	struct ptype_iter_state *iter = seq->private;
- 	struct packet_type *pt = v;
-+	struct net_device *dev;
- 
--	if (v == SEQ_START_TOKEN)
-+	if (v == SEQ_START_TOKEN) {
- 		seq_puts(seq, "Type Device      Function\n");
--	else if ((!pt->af_packet_net || net_eq(pt->af_packet_net, seq_file_net(seq))) &&
--		 (!pt->dev || net_eq(dev_net(pt->dev), seq_file_net(seq)))) {
-+		return 0;
-+	}
-+	dev = iter->dev;
-+	if ((!pt->af_packet_net || net_eq(pt->af_packet_net, seq_file_net(seq))) &&
-+		 (!dev || net_eq(dev_net(dev), seq_file_net(seq)))) {
- 		if (pt->type == htons(ETH_P_ALL))
- 			seq_puts(seq, "ALL ");
- 		else
- 			seq_printf(seq, "%04x", ntohs(pt->type));
- 
- 		seq_printf(seq, " %-8s %ps\n",
--			   pt->dev ? pt->dev->name : "", pt->func);
-+			   dev ? dev->name : "", pt->func);
- 	}
- 
- 	return 0;
-@@ -299,7 +316,7 @@ static int __net_init dev_proc_net_init(struct net *net)
- 			 &softnet_seq_ops))
- 		goto out_dev;
- 	if (!proc_create_net("ptype", 0444, net->proc_net, &ptype_seq_ops,
--			sizeof(struct seq_net_private)))
-+			sizeof(struct ptype_iter_state)))
- 		goto out_softnet;
- 
- 	if (wext_proc_init(net))
--- 
-2.43.0
+I think using a state flag here would be better. Because other code paths
+(like watchdog) need to check if a reset is in process without taking a lock.
 
 
 
