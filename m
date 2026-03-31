@@ -1,190 +1,159 @@
-Return-Path: <netdev+bounces-273446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273447-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ULrrIqIsy2n8EQYAu9opvQ
-	(envelope-from <netdev+bounces-273446-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 04:08:34 +0200
+	id mJUiHjo9y2kFFAYAu9opvQ
+	(envelope-from <netdev+bounces-273447-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 05:19:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 695D536348E
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 04:08:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E350C363A7D
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 05:19:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D4D2F301BDC6
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:08:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5F74830465ED
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A12136895D;
-	Tue, 31 Mar 2026 02:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E46266581;
+	Tue, 31 Mar 2026 03:19:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7eLPna2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QUtmu283"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E961036826D;
-	Tue, 31 Mar 2026 02:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DFA1E9919
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 03:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774922904; cv=none; b=cBogbtRWyqTMpYGIcbUNhhv4AnS4ZVYHgRG6Utr2t9+rZJaltBc93k1k8HIPomzzjLNeDIuGHlP/3VU89FDYwoQVUPh5eRtgce23XOC2AkXiXuY76fbugRfqGYYjMjAG5DwM2hNnVmh1UKUkRRyC26f+0YxhX7fnhAnVj2S7JYk=
+	t=1774927143; cv=none; b=Qszk5ulDe+zZ4sazBRhMkl6KZaEgWZHH12GLJFFaiOJiUyR94kiY8NBPQVs07aZ7K3wAcgYLEg8aZwME7FI2qftf2MOL69XoKZmSLNJcWbWSt+1npTi8TuwfehyhXAfnud8D7lqzaUNorcEEHB5AfWcHYyFTzeIunljTKxUOZmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774922904; c=relaxed/simple;
-	bh=Ti2rwlshDR79ZI/BGbAVD6CjcN6oVYO5Ai7SaqZamXk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mNLaDul7WptmxNAVeY5NPcA3A6KdDiSlMQRoCJh6P4f/5Yy+rDrHEktMdL+Hr4f1/J5Ce0cYyq5R8RsOkgvyyhFMRsB5Is0QLDaoJLcz0DGNmGV6RRxbwsR+tnIONvUSU+HQ7UOz6dEZPHapYpe66kNGp6c8A6Sg6Yi7j4Sbr50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7eLPna2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84B8FC19423;
-	Tue, 31 Mar 2026 02:08:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774922903;
-	bh=Ti2rwlshDR79ZI/BGbAVD6CjcN6oVYO5Ai7SaqZamXk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=U7eLPna2zLPQvleiKAUeNeTyNuhbmXZy6joPxF+meNPF0vuJq0MP7KczjS5CMpASR
-	 XjUxBemZlQu8OMqjojw8eVLh2Z+fWu++qcCB2q2fsM2PmUhbsznMl9/bUOgsv4AuLZ
-	 9yS0IjOuMWJyrRNr+I5rDK1RWlwH24ISao6FdTlK2ol+I5FW20vb5kLL3Zv3+dDtZ+
-	 IyKPUzKevuDXOj+cGRrv8+PsmMVb0P86T08oXiP5/dtOiwor8ewxi17EQRCG5bF91l
-	 VA4Wd1CekwLXgI868pwSzAGrXVNu3/cf+EW6gv5EZ73fQxT4aV/wONbDKHT1rVBIb9
-	 PEUVRy4ipgjkA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: tariqt@nvidia.com
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	donald.hunter@gmail.com,
-	horms@kernel.org,
-	jiri@resnulli.us,
-	corbet@lwn.net,
-	skhan@linuxfoundation.org,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	mbloch@nvidia.com,
-	shuah@kernel.org,
-	chuck.lever@oracle.com,
-	matttbe@kernel.org,
-	cjubran@nvidia.com,
-	cratiu@nvidia.com,
-	dtatulea@nvidia.com,
-	jacob.e.keller@intel.com,
-	shshitrit@nvidia.com,
-	daniel.zahka@gmail.com,
-	parav@nvidia.com,
-	ajayachandra@nvidia.com,
-	kees@kernel.org,
-	shayd@nvidia.com,
-	danielj@nvidia.com,
-	moshe@nvidia.com,
-	willemb@google.com,
-	dw@davidwei.uk,
-	petrm@nvidia.com,
-	sdf@fomichev.me,
-	daniel@iogearbox.net,
-	joe@dama.to,
-	razor@blackwall.org,
-	vadim.fedorenko@linux.dev,
-	mst@redhat.com,
-	antonio@openvpn.net,
-	allison.henderson@oracle.com,
-	minhquangbui99@gmail.com,
-	noren@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	gal@nvidia.com,
-	jiri@nvidia.com
-Subject: Re: [PATCH net-next V9 12/14] net/mlx5: qos: Support cross-device tx scheduling
-Date: Mon, 30 Mar 2026 19:08:20 -0700
-Message-ID: <20260331020820.3525138-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260326065949.44058-13-tariqt@nvidia.com>
-References: <20260326065949.44058-13-tariqt@nvidia.com>
+	s=arc-20240116; t=1774927143; c=relaxed/simple;
+	bh=Z7lW49Bjo8TiedKHPp1+w/stGzyGL2KI5EW5Cqvh/LM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gvA+pNKuEJuOp5Ql4/RwvNo/Ls7Qq2Hujv493vHYiJhFjRoZVQHlCQhWX4K0h7yuVruw0kP8b1z5kLYwe7urPVlZeG3CObt0rl9YLYEVc5wWR+xOOiMdOoDrzwsiuTsGecvMjp1BiIWWagJPpKKqV8Ix3tHMxWXPxiPbnrgThK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QUtmu283; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <79805496-9996-40b6-8cbf-0beaf7dd5473@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774927129;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F51B4RKJm1crpeWlG2F4ZvuF8sUulbOmrWGId7sfBqo=;
+	b=QUtmu283nK3yW4rIZldw9qbVYQ2MPdfxU7l1FlPCoxhAji0KPxiOtbh68BwutO2DPtRNmU
+	4KsJMcz6Lszbfr8i+rWBpsGZn5x51L9Tj+zJ51w9c+eEVzLJTyX9Lcnj/bIVB8KPXA/F7O
+	AXynNVz/094JlHs6fv9uyR52AlHFgME=
+Date: Mon, 30 Mar 2026 20:18:36 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH bpf v4 1/2] bpf: tcp: Reject non-TCP skb in
+ bpf_sk_assign_tcp_reqsk()
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+ Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: bot+bpf-ci@kernel.org, bpf@vger.kernel.org, clm@meta.com,
+ daniel@iogearbox.net, john.fastabend@gmail.com, sdf@fomichev.me,
+ ast@kernel.org, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, haoluo@google.com,
+ jolsa@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, martin.lau@kernel.org,
+ ihor.solodrai@linux.dev
+References: <20260330080746.319680-2-jiayuan.chen@linux.dev>
+ <6ee24770a2b014219d86839b2243e1b7bad4dc4f520457269d5e8ca2b21c2cb8@mail.kernel.org>
+ <d1a739d2-c4ea-4fae-aeaf-f49e75dac0f3@linux.dev>
+ <CAAVpQUD1n7L6LkP32H_Ct71RLNpJ2RQWFc8w08+c8h=U_tDjpQ@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAAVpQUD1n7L6LkP32H_Ct71RLNpJ2RQWFc8w08+c8h=U_tDjpQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,redhat.com,lunn.ch,davemloft.net,gmail.com,resnulli.us,lwn.net,linuxfoundation.org,nvidia.com,oracle.com,intel.com,davidwei.uk,fomichev.me,iogearbox.net,dama.to,blackwall.org,linux.dev,openvpn.net,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[49];
-	TAGGED_FROM(0.00)[bounces-273446-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273447-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,meta.com,iogearbox.net,gmail.com,fomichev.me,linux.dev,google.com,davemloft.net,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 695D536348E
+	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
+X-Rspamd-Queue-Id: E350C363A7D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
----
-net/mlx5: qos: Support cross-device tx scheduling
+On 3/30/26 6:35 PM, Kuniyuki Iwashima wrote:
+> On Mon, Mar 30, 2026 at 2:26 AM Jiayuan Chen <jiayuan.chen@linux.dev> wrote:
+>>
+>>
+>> On 3/30/26 5:00 PM, bot+bpf-ci@kernel.org wrote:
+>>>> #if IS_BUILTIN(CONFIG_IPV6)
+>>>>       case htons(ETH_P_IPV6):
+>>>> +            if (ipv6_hdr(skb)->nexthdr != IPPROTO_TCP)
+>>>> +                    return -EINVAL;
+>>>> +
+>>>>               ops = &tcp6_request_sock_ops;
+>>> For IPv6, ipv6_hdr(skb)->nexthdr gives the type of the header
+>>> immediately following the base IPv6 header. If extension headers
+>>> are present (hop-by-hop options, routing, etc.), nexthdr would be
+>>> the extension header type rather than IPPROTO_TCP, even when the
+>>> packet is a valid TCP segment.
+>>>
+>>> Would it be worth using ipv6_find_hdr() here, similar to
+>>> bpf_update_srh_state() in the same file, to walk past any extension
+>>> headers? The IPv4 check above is fine since ip_hdr(skb)->protocol
+>>> always identifies the transport protocol directly.
+>>>
+>>> In practice this is very unlikely to matter since TCP SYN packets
+>>> with IPv6 extension headers are essentially non-existent, but the
+>>> check as written would reject them.
+>>>
+>>>
+>>> ---
+>>> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+>>> See:https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+>>>
+>>> CI run summary:https://github.com/kernel-patches/bpf/actions/runs/23735111188
+>>
+>>
+>> Thanks for the analysis.
+>>
+>> There are many places in the kernel that check nexthdr directly without
+>> walking extension headers.
+>>
+>> I'd prefer to keep it simple for now and leave ipv6_find_hdr() as a
+>> potential future improvement if needed.
+> 
+> +1.
+> 
+> Given this feature is to create a reqsk to process on this running
+> host, it does not make sense to support such ext options.
 
-This commit relaxes the restriction that rate groups can only contain vports
-from the same E-Switch. It enables cross-device TX scheduling if the hardware
-supports it, LAG is enabled, and the E-Switches share a devlink device.
-
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-
-[ ... ]
-
-> @@ -1738,18 +1761,44 @@ int mlx5_esw_devlink_rate_node_del(struct devlink_rate *rate_node, void *priv,
->  	return 0;
->  }
->  
-> +static int
-> +mlx5_esw_validate_cross_esw_scheduling(struct mlx5_eswitch *esw,
-> +				       struct mlx5_esw_sched_node *parent,
-> +				       struct netlink_ext_ack *extack)
-> +{
-
-[ ... ]
-
-> +	if (!mlx5_lag_is_active(esw->dev)) {
-> +		NL_SET_ERR_MSG_MOD(extack,
-> +				   "Cross E-Switch scheduling requires LAG to be activated");
-> +		return -EOPNOTSUPP;
-> +	}
-
-What happens to the cross-device rate scheduling if LAG is deactivated
-after the configuration is applied?
-
-When LAG is deactivated, the LAG state is torn down in hardware, but there
-does not appear to be a corresponding cleanup or update triggered for the
-cross-eswitch QoS scheduling elements.
-
-Could this result in a regression where the hardware TSAR tree and devlink
-rate configuration remain pointing to a now-invalid VHCA association,
-bypassing the state validation and causing traffic drops or firmware errors?
-
-> +
-> +	return 0;
-> +}
+While at header reading, does it need a pskb_may_pull() before reading?
 
