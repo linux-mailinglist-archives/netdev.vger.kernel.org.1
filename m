@@ -1,141 +1,119 @@
-Return-Path: <netdev+bounces-273596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273597-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MMxkIXyzy2kpKAYAu9opvQ
-	(envelope-from <netdev+bounces-273596-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:43:56 +0200
+	id CCYTBYi1y2kpKAYAu9opvQ
+	(envelope-from <netdev+bounces-273597-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:52:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8862F368FD4
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:43:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D345369215
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:52:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3430130197DC
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 11:41:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E066B310351A
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 11:43:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10A93D9036;
-	Tue, 31 Mar 2026 11:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A513D9027;
+	Tue, 31 Mar 2026 11:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="w2pRbwxW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="slwpgFU+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516303BF69C;
-	Tue, 31 Mar 2026 11:41:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51413DC4D0
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 11:43:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774957269; cv=none; b=tkOoHFg4C/aHzfAdNLcEpv2rHzz0iPpiXiU2goBZGuIy+lDfWYcFdtPeQoQ/K0x+XloM9yMgQrnn/2oRvU+GpKCt9batlacPfTz3/Iboc+CvHt7SJCOAKlyxOKgJl2ZfQBJgRcbwKl6PQrSlhfUjZQUT+fgT1ozCGfH/1i3eVAg=
+	t=1774957408; cv=none; b=iPJkkwNOe8PnZEz/D8CqaNWGZGrOEX0UxY/Sd3mQAyi3C947LKC02HDykbJzJjLf5YCv329RSqos2bcoNyysfDn1EyjRlBbWcxXAsV2vczykRu0zNaHtfH8ozgPZVTgD4c3ya+2Nnr26ffUBMfnQM/m47xCoepUvy6RfA6VSOfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774957269; c=relaxed/simple;
-	bh=HC8/liEMF5F55EJ3tray695sFKJE0rqAnsbk+pm2Wi0=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=MZ9bDMDZI/KXB4exosI9ChSVDNTqnpX+elT/qMEEg7HH4TwYGvR72nGsTM07E65oylEmwzymsSWm8T/DcUUK35zrCAf7az3z09xBLCXPSqoSo9/T8wv8bIk4SUJxo/eO2lOMw97iC5fALKOFQaLPG16N8g312o6i/9p+V34kO0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=w2pRbwxW; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 54F98A5870;
-	Tue, 31 Mar 2026 13:40:57 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1774957260; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=Ptxu8P756vAqCj6Qj3gdQkHY8hSmYtFP5vFJaFlvzlc=;
-	b=w2pRbwxWOgcsE3vYUeTHRIfB/M1eChwp0NGmSaT/nayDHMuwFJk8nE47PXwOdhXoqiBkvD
-	3gVmUMEpYG6+lcX0Hr/EC7H6XSTeoObZsiTy4b5jqLEbzl0+hx8nLc8AlZwwmf5mrx51I5
-	+b98LtDIcKPf0m3CJVrPqPWSTvanDVJOW9SiY/FyUI8FjeAHSGSUdLRPgTJUm0oVw2O0o8
-	OP/IAqf0nTpJEdxuaPDrEbohMX5qqWaAviAre0PrUPHYjYIuKMA5+umelS1sBfDIUxh0hN
-	N1od6ZXgaC4XG7NaT8VIY7UQ9IIhYKsCN5hCkuXYMQs07GP0kRsduSht/hKjXw==
+	s=arc-20240116; t=1774957408; c=relaxed/simple;
+	bh=m0oflwx2nKopdBxXxkr40imGikbQrsJCm7oE/3thHw4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cnI2XscDOoW4EL4sQdGCfl9VVrwCJgWvLoLX3iQOXDjfGBR8LI0CdoYCRezkheWDpwCaNBhYXMRtE7tN4gr5cLNM09jnunKW0uTl7nVxUTs+cCOoxj3S86MZIjmtNzlIDBUau5TUiK3+HR/luURmmlGApvksoaagxD6J1CFxhtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=slwpgFU+; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e20b0713-18b6-40e2-88d4-9a4cc8322048@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774957394;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HsuuuruV3Ufjc3J3b63yx0b4a/ckqDaGKovYiLIwnIw=;
+	b=slwpgFU+lKvS9pO5fuuvMGX8cgPVYvVUtY3iDJuO4/K/nnMPk0isgbizPiCVz/2FPKen23
+	qxHmwiLVmsA2x1wqJgiUuJ15J5bUf51iDEg27GHsj3zBBDa5zsQTVIPERCUIMHGov4KgSm
+	toXP+GAE1YRR9vWQ3ZesDrpV88aPr78=
+Date: Tue, 31 Mar 2026 12:43:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 31 Mar 2026 13:40:57 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, Phil Elwell <phil@raspberrypi.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] net: phy: microchip: add downshift tunable support
- for LAN88xx
-In-Reply-To: <acuwKGBn6UKfRCjU@shell.armlinux.org.uk>
-References: <20260330224630.579937-1-nb@tipi-net.de>
- <20260330224630.579937-2-nb@tipi-net.de>
- <acuwKGBn6UKfRCjU@shell.armlinux.org.uk>
-Message-ID: <f3c1a8af592115ca9a77b3249fa167bf@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+Subject: Re: [PATCH net-next v2 1/3] dpll: add frequency monitoring to netlink
+ spec
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>, Petr Oros
+ <poros@redhat.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260330105505.715099-1-ivecera@redhat.com>
+ <20260330105505.715099-2-ivecera@redhat.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20260330105505.715099-2-ivecera@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273596-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,raspberrypi.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-273597-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.987];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[intel.com,resnulli.us,lwn.net,linuxfoundation.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,microchip.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid,armlinux.org.uk:email]
-X-Rspamd-Queue-Id: 8862F368FD4
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
+X-Rspamd-Queue-Id: 7D345369215
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 31.3.2026 13:29, Russell King (Oracle) wrote:
-> On Tue, Mar 31, 2026 at 12:46:26AM +0200, Nicolai Buchwitz wrote:
->> Implement the standard ETHTOOL_PHY_DOWNSHIFT tunable for the LAN88xx
->> PHY. This allows runtime configuration of the auto-downshift feature
->> via ethtool:
->> 
->>   ethtool --set-phy-tunable eth0 downshift on count 3
->> 
->> The LAN88xx PHY supports downshifting from 1000BASE-T to 100BASE-TX
->> after 2-5 failed auto-negotiation attempts. Valid count values are
->> 2, 3, 4 and 5.
->> 
->> This is based on an earlier downstream implementation by Phil Elwell.
->> 
->> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+On 30/03/2026 11:55, Ivan Vecera wrote:
+> Add DPLL_A_FREQUENCY_MONITOR device attribute to allow control over
+> the frequency monitor feature. The attribute uses the existing
+> dpll_feature_state enum (enable/disable) and is present in both
+> device-get reply and device-set request.
 > 
-> I didn't see a cover message. Please always include a cover message 
-> with
-> patch series.
+> Add DPLL_A_PIN_MEASURED_FREQUENCY pin attribute to expose the measured
+> input frequency in Hz. The attribute is present in the pin-get reply.
+> 
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
-Apparently the cover message [1] was sent with slightly different 
-recipients (although it was a single git send-email with 
---cc-cmd='scripts/get_maintainer.pl --norolestats').
-
-> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Thanks, I will add it to the patch.
-
-Nicolai
-
-> Thanks!
-
-[1] 
-https://lore.kernel.org/netdev/20260330224630.579937-1-nb@tipi-net.de/
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
