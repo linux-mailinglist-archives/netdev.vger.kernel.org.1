@@ -1,154 +1,281 @@
-Return-Path: <netdev+bounces-273663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273664-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AHdZGyDey2lHMAYAu9opvQ
-	(envelope-from <netdev+bounces-273663-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:45:52 +0200
+	id iAvFENbey2m0MAYAu9opvQ
+	(envelope-from <netdev+bounces-273664-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:48:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EF0B36B25B
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:45:51 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB68936B2D8
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:48:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CD8803022D7F
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 14:43:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 25C573026D2C
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 14:48:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5E83FE653;
-	Tue, 31 Mar 2026 14:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3D73F9F31;
+	Tue, 31 Mar 2026 14:48:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="duek+YuQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z7Uzq93x";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aKzRnGHj"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E9A3FE64D;
-	Tue, 31 Mar 2026 14:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73AC3A6EE7
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 14:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774968229; cv=none; b=povYrCkgRQ+fLDwTtd3nftiCExetWAuVHl6EGC1EF52SHNDoZLZbjSygSofIC1NNHTfx6jfVvTCE+uz2+E07RMelfIgqvBzehG68KTFpDjPzOk48656YXlJHx8vi833EB1kxbx9lK9L+YNCALr+avKlArULyPUW4jA6a2/JlvwY=
+	t=1774968530; cv=none; b=c4kN8AHhaQkqe0HILGF2fOxQhkYBDTaXv1cSy7ngEKPpvTZ2Jn0IctP1G8oQOzawMVicSLvOQEOvSlBbiFIUORNxHQVEtFDzfoDzFpfyRX9r/ZvZIblE92jqUb6ln4uy4ES0JPBPzHTMTVFY8kRsyiOWHsv45pO9r435bs9aOBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774968229; c=relaxed/simple;
-	bh=DUa0rgcwZDaJ0rdJ2kWsjlF8kpB93W1ipibIvJllQaI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oIQS/UGBK2hqyyaiNBIYpcQXm0XMx4I+qxfCv+hpqINMOkDriKEj8iiAM8VxNnsmAaPvjPtpJD3oiDTBXr5UjjI391ZakgncNtQpCqkRSPRj/QEBrz4MSNG7dHEyQoG9lEvMSrzfE/2exgaH+7/hMtGVB7W+8NJG4iWsgWhpaj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=duek+YuQ; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1774968227; x=1806504227;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=DUa0rgcwZDaJ0rdJ2kWsjlF8kpB93W1ipibIvJllQaI=;
-  b=duek+YuQ2JE1A55LX8wuLCGAApzAfDRqj4gxyOXBfZnQ4PaYrnjr84ug
-   4zGzretUKmYVpvIJ78pSEdB7nyMzot8V0FO//V+X/caVvWEzvwMHfOmml
-   Wy60dhRpc3q5cOBFRKXEQwcSvcRK8yV5avgEM4PWKlaJpPLYtzjxzE5Xf
-   pRbbONA/M7IA82dtRpniH5pz1dXEI82GXY5RgNHSRsL6+jyfaKGKTrDln
-   1gtpaKnJ7nASI31RrP41tdIchGj3umLTQOOheUdzbHyan5UwV5WXDxcc9
-   5pVfDhCIcCjT73s/y3ob48h5O51/vR1aMMrqfjp+5Rh3Xlc1j0CJdBksk
-   w==;
-X-CSE-ConnectionGUID: eQMbEJKqSnqWvWuGlyZwgg==
-X-CSE-MsgGUID: 26StdDJSSKmOJ95EK+Pu2w==
-X-IronPort-AV: E=Sophos;i="6.23,152,1770620400"; 
-   d="scan'208";a="55894668"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2026 07:43:40 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
- chn-vm-ex3.mchp-main.com (10.10.87.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Tue, 31 Mar 2026 07:43:30 -0700
-Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58 via Frontend Transport; Tue, 31 Mar 2026 07:43:29 -0700
-Date: Tue, 31 Mar 2026 07:43:28 -0700
-From: Charles Perry <charles.perry@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "Russell King (Oracle)" <linux@armlinux.org.uk>, Charles Perry
-	<charles.perry@microchip.com>, <netdev@vger.kernel.org>, Maxime Chevallier
-	<maxime.chevallier@bootlin.com>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 2/2] net: mdio: add a driver for
- PIC64-HPSC/HX MDIO controller
-Message-ID: <acvdkBF4ZjZaCHwd@bby-cbu-swbuild03.eng.microchip.com>
-References: <20260331123858.1912449-1-charles.perry@microchip.com>
- <20260331123858.1912449-3-charles.perry@microchip.com>
- <acvEpk1grDFAahzd@shell.armlinux.org.uk>
- <acvPKuuikqvfXauy@bby-cbu-swbuild03.eng.microchip.com>
- <acvUqDgepCIScs8M@shell.armlinux.org.uk>
- <88d652b9-ed4f-4bf4-b0ab-8703c15ce58b@lunn.ch>
+	s=arc-20240116; t=1774968530; c=relaxed/simple;
+	bh=BJIMrk2MYSv2FDeHUUdOkp6wdcv9uNwI5U0yUBOXYVE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J3+n0OvjC1JekMcqy4QLvRt6M4yDXnSFsSFhtLgYdIoqnSkS75ZUom7SfJ3a5CE1CG1aVYFG1Sj4RXFgZORkhD+1ynZZJFgKW4DCYFvmm08QbxBM96wUIAVVMLpByWipfihkCii1kOJW7OJE5McD2Iih+P8ximgwRD0PsMuUsZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z7Uzq93x; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aKzRnGHj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774968527;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uO8xgLmSYcxawrJhbHfOO1eOZxDKPmONKgmhbq8TlcY=;
+	b=Z7Uzq93xaOLP4t3zVg6YC0v2cSASl402ubS+8Q1cAu++mwb3+x98qLP6t364RBajV8sU+0
+	YAJZdoJGDb2ID1/61tBXT3UTsAENkcLbqFfs+X6+09ayqbsaOPdovcu5cP1kVkzH61ZliX
+	kZakx8ARDXbNHAzhMAANFHqd/EYW2AA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-696-XKpl62pfOTex_Wh1_SP_AQ-1; Tue, 31 Mar 2026 10:48:46 -0400
+X-MC-Unique: XKpl62pfOTex_Wh1_SP_AQ-1
+X-Mimecast-MFC-AGG-ID: XKpl62pfOTex_Wh1_SP_AQ_1774968525
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-487219e0800so40108855e9.2
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 07:48:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1774968525; x=1775573325; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uO8xgLmSYcxawrJhbHfOO1eOZxDKPmONKgmhbq8TlcY=;
+        b=aKzRnGHj308wMRZPrWd6JJ4TzdRnAFqYuSJK6kD86oVGq7JhzLls1TFbgEQNVeW9Fc
+         cfmliZVH/fZDZAjCJriyVaHUoEhNHTOS38mIFnZbXVUFshAal1Me9G6DDKE+Zuuq8y6S
+         PKxq5qVasyiR7b5fKIHs3W2YOXiUgglxLUD8NJuV1nDnTyRuJM4Sl6JCBbmBpVaJEw2N
+         5sSIw15cXCnjJYnOW/kl3H6ayQSoajx0pfr75mDKa3Oidkx430QZPlmL8F9/cjrj3Ftj
+         f7yWgTdpOV5CP6gvUMKyiR2NQgwB9cpGH4/U7ySLmo6MkX3U6JEq0+/b4+N4/9xOXsWG
+         LGfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774968525; x=1775573325;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uO8xgLmSYcxawrJhbHfOO1eOZxDKPmONKgmhbq8TlcY=;
+        b=TlwEr4Cqx5SKu3/v7gNGzZTBpi+9Dv3MNXz7MaZiBKHsuU7+W2JTjR4mUnc/QJiP/x
+         pag8PSTJTQN1bzCqAekhLZ/h3WIIRGuRVqdzFklCQVXnuh1tOlWWmouTKOpWRcrnt/J6
+         pDd8kVPD+fpp5V6O5C66PQMp1ec1Nbuhn1sCzvsGqs0wbxuZd3toeTHKfVxKKGJoz1a4
+         R1WmKIIyLpRQhLREiAHlC//pShtc4CmrCHJh/SoHEAWrZpEgoWAX/5xZyX8MhoqfRW4g
+         NvPZPucdEGcd3mGmfsO1L5sp5asa/x5usGsFjh3+VFJXXtO6a1jD7h6+b6iq/86WixZD
+         uOXw==
+X-Forwarded-Encrypted: i=1; AJvYcCVPIwOWgD7kwa1G88fytZoLJh3UGPTI6zfzhhi6dot7n1+Bo4HMlFeMulIoMwwo6I+H87AkO34=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzItj5Xd+Qgo7TKYI49eT3IADhqA3sbtYsgs2Pn3n8UBS7F0ePg
+	ARFPv3YFypnpPJuS3BTrhBvM/Ci+qUUEcnrNS3H+NG8iCzjuKOsjI17em+FpIsBc9Am9OelDkjK
+	iR9W2nWXskIM2JbJ7FIHFlmjY4XzY40fPdX2+ZPxNVMN2vNe6Io9Or8TR4w==
+X-Gm-Gg: ATEYQzyEZ1UnTUANBX4F3ZjDZZCEE1a+QyLI3+mfArPb5lNO4ucjJ4Xa2qBuklAm1mK
+	P/U0h9DfJ4f5X96fj55FMUfKDkwoz8fDJI8mVTNuWRWHl3VSAOkVJEeqDaqGcbzwUzY64JPlYPQ
+	pP0zHnrlxA6vTfxz9qNC7NVZOeca8/svTamrvkEwkxmlzN8KSP6XSLMkPMdnHdTAdgYF8euubWO
+	eb21hxvMKX0skZda8LtPNs/7xYAfTQ4Z27uV6YDf36yHIXLzY2NIco0FnTYWIfagU3ifB6PWTTO
+	TQTsmNL9n+i7hUiF8V4vSn+deMVKDwmwxA8zxLOs1bad/Sg0qcsQPNgePC8fCeXMw/2SNYjA1IK
+	J9uxpH+HrqUQBhx2F
+X-Received: by 2002:a05:600c:a016:b0:483:64b4:79da with SMTP id 5b1f17b1804b1-48727ef153cmr267996655e9.26.1774968525157;
+        Tue, 31 Mar 2026 07:48:45 -0700 (PDT)
+X-Received: by 2002:a05:600c:a016:b0:483:64b4:79da with SMTP id 5b1f17b1804b1-48727ef153cmr267995995e9.26.1774968524618;
+        Tue, 31 Mar 2026 07:48:44 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1525:da00:3ac2:1a22:72ff:4256])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887c8797ecsm38127025e9.8.2026.03.31.07.48.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Mar 2026 07:48:44 -0700 (PDT)
+Date: Tue, 31 Mar 2026 10:48:41 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Srujana Challa <schalla@marvell.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	"eperezma@redhat.com" <eperezma@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	Nithin Kumar Dabilpuram <ndabilpuram@marvell.com>,
+	Shiva Shankar Kommula <kshankar@marvell.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [PATCH net,v5] virtio_net: clamp rss_max_key_size
+ to NETDEV_RSS_KEY_LEN
+Message-ID: <20260331104737-mutt-send-email-mst@kernel.org>
+References: <20260326142344.1171317-1-schalla@marvell.com>
+ <ba027306-e5e0-4d4d-8357-f6080441167d@redhat.com>
+ <CH3PR18MB6379D39BA068565667CF2B06A053A@CH3PR18MB6379.namprd18.prod.outlook.com>
+ <68ca0a8c-27f9-45f1-94cc-7e3c7936181f@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <88d652b9-ed4f-4bf4-b0ab-8703c15ce58b@lunn.ch>
+In-Reply-To: <68ca0a8c-27f9-45f1-94cc-7e3c7936181f@redhat.com>
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,microchip.com,vger.kernel.org,bootlin.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273663-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273664-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mst@redhat.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,microchip.com:dkim,bby-cbu-swbuild03.eng.microchip.com:mid]
-X-Rspamd-Queue-Id: 6EF0B36B25B
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,marvell.com:email]
+X-Rspamd-Queue-Id: DB68936B2D8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 31, 2026 at 04:20:55PM +0200, Andrew Lunn wrote:
-> On Tue, Mar 31, 2026 at 03:05:28PM +0100, Russell King (Oracle) wrote:
-> > On Tue, Mar 31, 2026 at 06:42:02AM -0700, Charles Perry wrote:
-> > > I don't know if there's any value in waiting for write completion here as
-> > > write completion doesn't mean that the effects of the write are available
-> > > right now. I also didn't run into any issues in my testing. Let me know if
-> > > you know of a use case where this wouldn't work.
-> > > 
-> > > I can add a wait for transaction completion if that's expected by phylib.
-> > 
-> > Consider a PHY using a shared interrupt line, and the interrupt being
-> > disabled in at the PHY before being torn down... wouldn't we want the
-> > write to the register which enables interrupts to complete before we
-> > unregister the interrupt handler for the particular PHY?
-> > 
-> > I do notice that other MDIO drivers don't wait. Some PHY drivers don't
-> > access the PHY after the write to disable interrupts either. So, maybe
-> > phy_free_interrupt() should read-back from the PHY before calling
-> > free_irq() to guarantee that the write has completed?
-> > 
-> > Andrew?
+On Tue, Mar 31, 2026 at 04:39:02PM +0200, Paolo Abeni wrote:
+> On 3/31/26 3:29 PM, Srujana Challa wrote:
+> >> On 3/26/26 3:23 PM, Srujana Challa wrote:
+> >>> rss_max_key_size in the virtio spec is the maximum key size supported
+> >>> by the device, not a mandatory size the driver must use. Also the
+> >>> value 40 is a spec minimum, not a spec maximum.
+> >>>
+> >>> The current code rejects RSS and can fail probe when the device
+> >>> reports a larger rss_max_key_size than the driver buffer limit.
+> >>> Instead, clamp the effective key length to min(device
+> >>> rss_max_key_size, NETDEV_RSS_KEY_LEN) and keep RSS enabled.
+> >>>
+> >>> This keeps probe working on devices that advertise larger maximum key
+> >>> sizes while respecting the netdev RSS key buffer size limit.
+> >>>
+> >>> Fixes: 3f7d9c1964fc ("virtio_net: Add hash_key_length check")
+> >>> Cc: stable@vger.kernel.org
+> >>> Signed-off-by: Srujana Challa <schalla@marvell.com>
+> >>> ---
+> >>> v3:
+> >>> - Moved RSS key validation checks to virtnet_validate.
+> >>> - Add fixes: tag and CC -stable
+> >>> v4:
+> >>> - Use NETDEV_RSS_KEY_LEN instead of type_max for the maximum rss key
+> >> size.
+> >>> v5:
+> >>> - Interpret rss_max_key_size as a maximum and clamp it to
+> >> NETDEV_RSS_KEY_LEN.
+> >>> - Do not disable RSS/HASH_REPORT when device rss_max_key_size exceeds
+> >> NETDEV_RSS_KEY_LEN.
+> >>> - Drop the separate patch that replaced the runtime check with
+> >> BUILD_BUG_ON.
+> >>>
+> >>>  drivers/net/virtio_net.c | 20 +++++++++-----------
+> >>>  1 file changed, 9 insertions(+), 11 deletions(-)
+> >>>
+> >>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c index
+> >>> 022f60728721..b241c8dbb4e1 100644
+> >>> --- a/drivers/net/virtio_net.c
+> >>> +++ b/drivers/net/virtio_net.c
+> >>> @@ -373,8 +373,6 @@ struct receive_queue {
+> >>>  	struct xdp_buff **xsk_buffs;
+> >>>  };
+> >>>
+> >>> -#define VIRTIO_NET_RSS_MAX_KEY_SIZE     40
+> >>> -
+> >>>  /* Control VQ buffers: protected by the rtnl lock */  struct
+> >>> control_buf {
+> >>>  	struct virtio_net_ctrl_hdr hdr;
+> >>> @@ -478,7 +476,7 @@ struct virtnet_info {
+> >>>
+> >>>  	/* Must be last as it ends in a flexible-array member. */
+> >>>  	TRAILING_OVERLAP(struct virtio_net_rss_config_trailer, rss_trailer,
+> >> hash_key_data,
+> >>> -		u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];
+> >>> +		u8 rss_hash_key_data[NETDEV_RSS_KEY_LEN];
+> >>>  	);
+> >>>  };
+> >>>  static_assert(offsetof(struct virtnet_info,
+> >>> rss_trailer.hash_key_data) == @@ -6717,6 +6715,7 @@ static int
+> >> virtnet_probe(struct virtio_device *vdev)
+> >>>  	struct virtnet_info *vi;
+> >>>  	u16 max_queue_pairs;
+> >>>  	int mtu = 0;
+> >>> +	u16 key_sz;
+> >>>
+> >>>  	/* Find if host supports multiqueue/rss virtio_net device */
+> >>>  	max_queue_pairs = 1;
+> >>> @@ -6851,14 +6850,13 @@ static int virtnet_probe(struct virtio_device
+> >> *vdev)
+> >>>  	}
+> >>>
+> >>>  	if (vi->has_rss || vi->has_rss_hash_report) {
+> >>> -		vi->rss_key_size =
+> >>> -			virtio_cread8(vdev, offsetof(struct virtio_net_config,
+> >> rss_max_key_size));
+> >>> -		if (vi->rss_key_size > VIRTIO_NET_RSS_MAX_KEY_SIZE) {
+> >>> -			dev_err(&vdev->dev, "rss_max_key_size=%u exceeds
+> >> the limit %u.\n",
+> >>> -				vi->rss_key_size,
+> >> VIRTIO_NET_RSS_MAX_KEY_SIZE);
+> >>> -			err = -EINVAL;
+> >>> -			goto free;
+> >>> -		}
+> >>> +		key_sz = virtio_cread8(vdev, offsetof(struct virtio_net_config,
+> >>> +rss_max_key_size));
+> >>> +
+> >>> +		vi->rss_key_size = min_t(u16, key_sz, NETDEV_RSS_KEY_LEN);
+> >>> +		if (key_sz > vi->rss_key_size)
+> >>> +			dev_warn(&vdev->dev,
+> >>> +				 "rss_max_key_size=%u exceeds driver limit
+> >> %u, clamping\n",
+> >>> +				 key_sz, vi->rss_key_size);
+> >>
+> >> NETDEV_RSS_KEY_LEN is 256 and virtio_cread8() returns a u8. The check is
+> >> not needed, and the warning will never be printed. I think that the
+> >> BUILD_BUG_ON() you used in v4 would be better than the above chunk.
+> >>
+> > Thank you for the feedback. In net-next, NETDEV_RSS_KEY_LEN is 256. This fix is
+> > also intended for stable kernels, where NETDEV_RSS_KEY_LEN is 52, and
+> > I added the message to make clamping visible in that case.
+> > I will remove the check and send the next version.  
 > 
-> The general pattern is to not wait on write.
+> I'm sorry, I haven't looked at the historical context when I wrote my
+> previous reply.
+> 
+> IMHO the additional check does not make sense in the current net tree.
+> On the flip side stable trees will need it. I suggest:
+> 
+> - dropping the check for the 'net' patch
+> - also dropping CC: stable tag
+> - explicitly sending to stable the fix variant including the size check.
+> 
+> @Michael: WDYT?
+> 
+> /P
 
-Ok, then it's status quo for this.
+I was the one who suggested it, the extra check is harmless, I'm
+inclined to always have it.  Less work than maintaining two patches.
 
-I'll send a v4 later this week for the other return issue.
-
-Thanks,
-Charles
+-- 
+MST
 
 
