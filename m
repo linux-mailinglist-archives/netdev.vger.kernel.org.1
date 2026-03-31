@@ -1,135 +1,170 @@
-Return-Path: <netdev+bounces-273480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273485-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WKTaBT5oy2kIHgYAu9opvQ
-	(envelope-from <netdev+bounces-273480-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 08:22:54 +0200
+	id +FLTNtVvy2k3HwYAu9opvQ
+	(envelope-from <netdev+bounces-273485-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 08:55:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA01836472B
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 08:22:53 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B3F1364A87
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 08:55:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D6190301E3E7
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 06:21:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4884E3023E0C
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 06:54:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3BE23845A2;
-	Tue, 31 Mar 2026 06:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KyaehuUK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121FE3AEF33;
+	Tue, 31 Mar 2026 06:54:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ida.uls.co.za (ida.uls.co.za [154.73.32.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A455136AB6B
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 06:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0881524A067;
+	Tue, 31 Mar 2026 06:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=154.73.32.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774938079; cv=none; b=TFhOTlHOWdp/6brpfnm5IQsRW12jJ2dvQvCnTlN/WefsmO1rcs8ChPXqZ+KgW5PR1dL+VSTCoRcKy1FVTo4HP1omzj698PG2XVYhtA50Jl+dkOiqIUzkPdUgAp/TOcSGMOMs7udMMJFvCBETWTS9AyDd0QSohQkOHHpM9JFtRu8=
+	t=1774940063; cv=none; b=F/qK/z5kKvnjta97NIcBz2g/7rp5QOOJU9L8t3OASEXxkX5ed795O0N9irxtFSZeb2kezzkqar2t/I6ah3vDsjg61thu3GzA8NqeGA3TSXoGaCg6vIJ3g6CYoeHTm/kt4R88ZOzfcZcm71fAKa6ldUykJRF/fAj6rqyz8tylBYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774938079; c=relaxed/simple;
-	bh=d+BgWTs2LBjFSXlYSbG7Dx22AT17F/RZ9tqj1xZgmWQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H1JAO8dfecY26S4qOpywvm6YbSwx2I/9YrodcNSbriiG0WJdAR/VbOCb/oP7V93fQi02h2nlxmpXvwvmaMFiZQ6t+h/PyO5MybGZSFu1FLerr+3RcgFgjBpV7O84dx9u8eWldERfKavWdyJkWTLKCjRfatk3UJL8fqQYxJpDrvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KyaehuUK; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-c70fb6aa323so1936568a12.3
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 23:21:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774938078; x=1775542878; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d+BgWTs2LBjFSXlYSbG7Dx22AT17F/RZ9tqj1xZgmWQ=;
-        b=KyaehuUKMiPsSs0lLGiczKiYeYQxLMkfuk3ie1vMOn8n/BVVswn4HPBUXVX1HkgXvt
-         k5UA1vBkPqskDXcVhOYWP1PMVRPJGx96RX1kTkqlEnqP5s0uFm3aEM+YrPvwszKYCqYa
-         yGHhW+SO6FgIzzug9RFo5DTLk5srMVJgHNgVpEOjud/AvGRZV5dCzigf95PofIS/vjqk
-         UBVhmJMEG7cauXWlmyw95PEI1l7+EnKfsJIOTpmIIEnQEVdzif81LQM7U3rSL0Qwn/A3
-         gLLBZJpkkx14N7Q2DrBbx8olSzn79YYCzMR1YOhtEmtAt46BICc5LCnMhxW6pEFDaU1v
-         xYlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774938078; x=1775542878;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=d+BgWTs2LBjFSXlYSbG7Dx22AT17F/RZ9tqj1xZgmWQ=;
-        b=pCby83+tZ1ssnCiOsJXWeFdf3Sq21puDzxH+zKhuArgEq5TAFszsn41AW2PMDy0/s6
-         ao3vZFgWXaoO7iQAIZDJvaalWXGG1QbEozsYPQAhsW0mxyRU900P9x4L9gRxJRUKPMd3
-         QYUfA2YcNB35LD4j9Pqa0cc1NTBQzPmQ+9K+LLeUz2GDhOVUUVFGf9E78HGrm2vRfTQb
-         9uf2fHbUCobyfHgRHjy7YXwgCaugihbQkhce+GoVFhloyep69Yu07ed1ymoiZrhlYIRW
-         Jy3CEmLzEPncD+c8GKTPy23hUugtBKn44dR9Wk3mKPxwFRUWiJXqEiepM/JJuqQL1r9m
-         6npA==
-X-Forwarded-Encrypted: i=1; AJvYcCVboQvW9yeZjsL9/zSGccYfGrGu+Aqn/dMnoW1ao8pWhwXiW0MqpQdwvdo0jLLcFlct5GRvKh8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUfTZeuxBfSOrGMkVnsTrkdwXPlu8UjTBEFwqiYJ/ZL96QeVc/
-	GzKf+lolX6JBUK/fWYzVe1vap8tyI+I19/sdlm3WY4SGOLuAXeoau76k
-X-Gm-Gg: ATEYQzzGGKjilc7PmuEPebpMQ4G3J+JcxVv5g0URMnImHhVQCSFOl1QcUu0fxtzFasx
-	aVBUl96bCybmvON5WppGEDnvIuVrzy7UUGpH+G6EXg1RGWKGgBfi2LslWOUMNIfVXmhGqbEjvvX
-	ONAXWhSMscQnXJemwwOQ1Z7Apk3Sj01UXEba2FbgKz1JNCHEKtwhNBFkTzj9N2iH3zTTQkv4rDB
-	nItC/L4u/M/Gmin8tNImBeVhA8a5rOy1UGQGSHF/jwcilOCbGknT4aExgcXujlfwdwExYip+Dbe
-	zdSEfOutMusZc7smcxviUnJBv69/rt+fSdU4V97OpDTBpSn5A6I+vCReH1TOaTOoi+a+sab/uwn
-	5JeQ5PlQh0RzahME5XgTlU3t74v45YaWv2m3tL49i4hF/PkKVGDwp+Jmu/aKVpsOAzGm0Ra3QP4
-	K3wcnQvZ9mPN0xwusMwufQvcjpTp/CXxSQ6J8=
-X-Received: by 2002:a05:6a00:288e:b0:82a:64c7:8c6d with SMTP id d2e1a72fcca58-82c95e5bd1amr13385091b3a.25.1774938078015;
-        Mon, 30 Mar 2026 23:21:18 -0700 (PDT)
-Received: from localhost.localdomain ([47.236.127.140])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82ca85d3a71sm10696398b3a.30.2026.03.30.23.21.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 23:21:17 -0700 (PDT)
-From: Qi Tang <tpluszz77@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>
-Cc: netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Qi Tang <tpluszz77@gmail.com>
-Subject: Re: [PATCH v2] netfilter: ctnetlink: zero expect NAT fields when CTA_EXPECT_NAT absent
-Date: Tue, 31 Mar 2026 14:21:09 +0800
-Message-ID: <20260331062110.87551-1-tpluszz77@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260331061434.84238-1-tpluszz77@gmail.com>
-References: <20260331061434.84238-1-tpluszz77@gmail.com>
+	s=arc-20240116; t=1774940063; c=relaxed/simple;
+	bh=O/0qHlCx7400cSiRBCThKdrPCIzm2gw2WUdC8zjc5Hk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C/QL2ZfzdqlDXgpBn2xy2uQIvsa+X8Op9xpdaDzkXkfyEbRo70G7XWYMoHboesZKEOzewS2qhSTIo/QGYHyQ/kEksPUirBvRd405xuCAag+285zWK3FRjq39k8gf2DyknVcoF2+Nwify2QRZsmweAUI//ojgYGd+72EmyYrpB0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uls.co.za; spf=pass smtp.mailfrom=uls.co.za; arc=none smtp.client-ip=154.73.32.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uls.co.za
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uls.co.za
+Received: from [165.16.201.5] (helo=[192.168.1.162])
+	by ida.uls.co.za with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.98.2)
+	(envelope-from <jaco@uls.co.za>)
+	id 1w7SWB-000000000du-0quy;
+	Tue, 31 Mar 2026 08:24:03 +0200
+Message-ID: <0aa6aa20-0e2a-48e9-8273-53b2fecd287b@uls.co.za>
+Date: Tue, 31 Mar 2026 08:21:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] pppoe: update Kconfig URLs
+To: Qingfang Deng <dqfext@gmail.com>, linux-ppp@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Paul Mackerras <paulus@ozlabs.org>, Dianne Skoll <dianne@skoll.ca>,
+ James Carlson <carlsonj@workingcode.com>
+References: <20260331033303.5664-1-dqfext@gmail.com>
+Content-Language: en-GB
+From: Jaco Kroon <jaco@uls.co.za>
+Autocrypt: addr=jaco@uls.co.za; keydata=
+ xsBNBFXtplYBCADM6RTLCOSPiclevkn/gdf8h9l+kKA6N+WGIIFuUtoc9Gaf8QhXWW/fvUq2
+ a3eo4ULVFT1jJ56Vfm4MssGA97NZtlOe3cg8QJMZZhsoN5wetG9SrJvT9Rlltwo5nFmXY3ZY
+ gXsdwkpDr9Y5TqBizx7DGxMd/mrOfXeql57FWFeOc2GuJBnHPZQMJsQ66l2obPn36hWEtHYN
+ gcUSPH3OOusSEGZg/oX/8WSDQ/b8xz1JKTEgcnu/JR0FxzjY19zSHmbnyVU+/gF3oeJFcEUk
+ HvZu776LRVdcZ0lb1bHQB2K9rTZBVeZLitgAefPVH2uERVSO8EZO1I5M7afV0Kd/Vyn9ABEB
+ AAHNG0phY28gS3Jvb24gPGphY29AdWxzLmNvLnphPsLAdwQTAQgAIQUCVe2mVgIbAwULCQgH
+ AgYVCAkKCwIEFgIDAQIeAQIXgAAKCRAILcSxr/fungCPB/sHrfufpRbrVTtHUjpbY4bTQLQE
+ bVrh4/yMiKprALRYy0nsMivl16Q/3rNWXJuQ0gR/faC3yNlDgtEoXx8noXOhva9GGHPGTaPT
+ hhpcp/1E4C9Ghcaxw3MRapVnSKnSYL+zOOpkGwye2+fbqwCkCYCM7Vu6ws3+pMzJNFK/UOgW
+ Tj8O5eBa3DiU4U26/jUHEIg74U+ypYPcj5qXG0xNXmmoDpZweW41Cfo6FMmgjQBTEGzo9e5R
+ kjc7MH3+IyJvP4bzE5Paq0q0b5zZ8DUJFtT7pVb3FQTz1v3CutLlF1elFZzd9sZrg+mLA5PM
+ o8PG9FLw9ZtTE314vgMWJ+TTYX0kzsBNBFXtplYBCADedX9HSSJozh4YIBT+PuLWCTJRLTLu
+ jXU7HobdK1EljPAi1ahCUXJR+NHvpJLSq/N5rtL12ejJJ4EMMp2UUK0IHz4kx26FeAJuOQMe
+ GEzoEkiiR15ufkApBCRssIj5B8OA/351Y9PFore5KJzQf1psrCnMSZoJ89KLfU7C5S+ooX9e
+ re2aWgu5jqKgKDLa07/UVHyxDTtQKRZSFibFCHbMELYKDr3tUdUfCDqVjipCzHmLZ+xMisfn
+ yX9aTVI3FUIs8UiqM5xlxqfuCnDrKBJjQs3uvmd6cyhPRmnsjase48RoO84Ckjbp/HVu0+1+
+ 6vgiPjbe4xk7Ehkw1mfSxb79ABEBAAHCwF8EGAEIAAkFAlXtplYCGwwACgkQCC3Esa/37p7u
+ XwgAjpFzUj+GMmo8ZeYwHH6YfNZQV+hfesr7tqlZn5DhQXJgT2NF6qh5Vn8TcFPR4JZiVIkF
+ o0je7c8FJe34Aqex/H9R8LxvhENX/YOtq5+PqZj59y9G9+0FFZ1CyguTDC845zuJnnR5A0lw
+ FARZaL8T7e6UGphtiT0NdR7EXnJ/alvtsnsNudtvFnKtigYvtw2wthW6CLvwrFjsuiXPjVUX
+ 825zQUnBHnrED6vG67UG4z5cQ4uY/LcSNsqBsoj6/wsT0pnqdibhCWmgFimOsSRgaF7qsVtg
+ TWyQDTjH643+qYbJJdH91LASRLrenRCgpCXgzNWAMX6PJlqLrNX1Ye4CQw==
+Organization: Ultimate Linux Solutions (Pty) Ltd
+In-Reply-To: <20260331033303.5664-1-dqfext@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spam-report: Relay access (ida.uls.co.za).
+X-Spamd-Result: default: False [0.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[uls.co.za : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273480-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273485-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tpluszz77@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[jaco@uls.co.za,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.147];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AA01836472B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[uls.co.za:mid,roaringpenguin.com:url,skoll.ca:url,samba.org:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5B3F1364A87
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Please ignore this mis-threaded v2. The correct standalone v2 has
-been sent separately.
+Hi,
 
-Qi Tang
+On 2026/03/31 05:33, Qingfang Deng wrote:
+> Both links are no longer valid. Update them to the correct URLs.
+>
+> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+> ---
+>   drivers/net/ppp/Kconfig | 9 ++++-----
+>   1 file changed, 4 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/net/ppp/Kconfig b/drivers/net/ppp/Kconfig
+> index a1806b4b84be..c751959c53a1 100644
+> --- a/drivers/net/ppp/Kconfig
+> +++ b/drivers/net/ppp/Kconfig
+> @@ -122,11 +122,10 @@ config PPPOE
+>   	help
+>   	  Support for PPP over Ethernet.
+>   
+> -	  This driver requires the latest version of pppd from the CVS
+> -	  repository at cvs.samba.org.  Alternatively, see the
+> -	  RoaringPenguin package (<http://www.roaringpenguin.com/pppoe>)
+> -	  which contains instruction on how to use this driver (under
+> -	  the heading "Kernel mode PPPoE").
+> +	  This driver requires the latest version of pppd at
+> +	  <https://ppp.samba.org>.
+> +	  Alternatively, see the out-of-tree RP-PPPoE plugin at
+> +	  <https://dianne.skoll.ca/projects/rp-pppoe/>.
+
+ppp now exclusively has the plugin code (originally from roaring penguin 
+I believe).  Latest version is no longer relevant, that plugin has been 
+available since at least a few versions back already (at least a decade, 
+probably closer to two).
+
+That same code has recently been dropped from rp-pppoe, which now 
+primarily focusses on pppoe-server, and relies on the plugin now part of 
+ppp package itself. rp-pppoe is only required if you're running a 
+pppoe-server, and I don't think rp-pppoe at this stage will function 
+without ppp.
+
+Most people will never need rp-pppoe.
+
+Kind regards,
+Jaco
+
+
+>   
+>   choice
+>   	prompt "Number of PPPoE hash bits"
 
