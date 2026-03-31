@@ -1,141 +1,324 @@
-Return-Path: <netdev+bounces-273593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273578-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yND3Csixy2kpKAYAu9opvQ
-	(envelope-from <netdev+bounces-273593-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:36:40 +0200
+	id 8JGUOSWxy2kpKAYAu9opvQ
+	(envelope-from <netdev+bounces-273578-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:33:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26A93368E38
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:36:38 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B431368D5F
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:33:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6BB4D302A707
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 11:30:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 237DB305543D
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 11:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5EFE3E1D0B;
-	Tue, 31 Mar 2026 11:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0AC3D5659;
+	Tue, 31 Mar 2026 11:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GHqn8hBF"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="EMyjoGzI"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011001.outbound.protection.outlook.com [52.101.70.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E74CA3E1CF0;
-	Tue, 31 Mar 2026 11:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774956617; cv=none; b=k7j3JOalA4EB3bhL0ORXAZOQbyJW2ZtZc6C7bm5kokLpxItY8kkhvgrYgpEURLof6NkGvI2po/ep0p7Ncl39M+0ZS1UWeGnOWhxUDgaHrpQie+UmdNbwOrUrBN467NrL+gUX89Y2EJy/dUy8BHUKM/xHVpz001MIfHmSSslzAOg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774956617; c=relaxed/simple;
-	bh=30aOrOjH0VtHHJR1WNIenKxVIhqi9GN620JYohuupZ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W66SxlX0JM3vsoLzVU3pYmWCtgZoN48zCkx8oFOWJo/5DVWWx6Jq4wKEawek+NwcBA01YYWrY5UaS2xkLbpAkhwYOdQXc9VJlKvQjAVIjPDScIAx2lJ2eK8+5aTAD+R5D18WeibpmzFab5QLlHyrsa8ApQ1jOhi8UJOFNgwy0Q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GHqn8hBF; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Bz0tlaTdQmy6jb7z+6f/ZifhIJcsPpSr9rXnYYmL8kk=; b=GHqn8hBFIQQ+mc6ITteH3IPH3P
-	tq1E/n7jn/glVaYm5FwrMQuescyEF9QFmWF9eWFq1grVq3/pPgLRqB6qLXRSnFzm/ZB2//I9+SL38
-	Zo0ZgsW4AbvQEkQWKEn6ZUkho5ONGr6bijw7fQEeKabeF/5IpID1M+OVXS4buFRi0g5Z95D0Zsry0
-	jjrHsr+jx2HNW6yNi3707sbkXXZijXmYSxAlTEnljbRCdCHgcqHrXkcKGjdroM8zIph7S6eum9nSe
-	9RQITJHDCNP7MrEHB7Rf/H4r7VAse3c3MQrWawkX/AYONNyjae45u7wCUarQbyZAZefvfD1C74JuM
-	K4L5yb1Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40030)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w7XI8-000000001l9-1n8V;
-	Tue, 31 Mar 2026 12:29:52 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w7XI0-000000003g8-2ZmL;
-	Tue, 31 Mar 2026 12:29:44 +0100
-Date: Tue, 31 Mar 2026 12:29:44 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Nicolai Buchwitz <nb@tipi-net.de>
-Cc: netdev@vger.kernel.org, Phil Elwell <phil@raspberrypi.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] net: phy: microchip: add downshift tunable
- support for LAN88xx
-Message-ID: <acuwKGBn6UKfRCjU@shell.armlinux.org.uk>
-References: <20260330224630.579937-1-nb@tipi-net.de>
- <20260330224630.579937-2-nb@tipi-net.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC963D34AD;
+	Tue, 31 Mar 2026 11:28:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.1
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774956511; cv=fail; b=NplFAwNDX+LWY+zjxzGyJGHx350gXFpGTWS/tnQCFMGz6X7ZBWB1ug/E1ThUYDBsn9ndA5ekxYyVtcLdHzPVgaD01nzjRjafIMvzVrkPDcpszGqo1SECzOi9tJ6speIeGYGWHLXYx+QKymk0wp5ehGatK09Cw7ixHXhPl7LI5UA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774956511; c=relaxed/simple;
+	bh=8KairnEpvD517/yMlZVVy7ppXOvydGY7+dubFP74Ozg=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=fpNvkgFzs8Boa8f93cGB1qkdBJuoGYglczaKBEdXFeqKGLtb0tfdHyuCQgNW4tJske57q+LKLTCXOtNyjsoVc/U1EitZVu8zwbYAoWPkvGSr8+q31FYgfhY1q/r7s4/lH4W5M7jcGJwOEQcmxgjl5Nw1EUgsh4/Z4lPOHbwCjAk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=EMyjoGzI; arc=fail smtp.client-ip=52.101.70.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gy85vFN5Pd1/fnfLPhU6Prl0/23MwkzfoSsGuYO5y9nRleJ3jQJjvEEJS8hl4t1s5VAv8otyqhnn+EWaf1gFgtXjaJMMDeW+YRfHGF2Qh3dVxLxzqxdGqWhulcBRENL1SwfVIoonVmQbEPKYen+n0VXTwvRrx52FX+5TEc2SIq6hJIKgBdwc5yTevxzuAdrRp/jLewJyXhuRtNrDFkYoihRFd+g8rM7VOaPwlda08BrDAsYa9x9twZiHTKDWmQoGau9mrDpfEod9aUE/rhOYoOWo74Wu+VC1KHfz09jC14/S5weeR1LYuSCIG/8lOLMZaj5AHa0VSgf3fpzqztwI8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5jcnRm0BumwIlGcbyzvJHquB8nYFg38oeUdyH/Havak=;
+ b=F945RdErYlTf+IB9zphhYdPRelBGxgRqrUvBQlY2xDgQ5nET61lkpo9mIOHd7t99O2NiA0yYjvB6p+nmMUMzyspG7FYiFVlrtj8qQOwWgeCcDc5XoFU4TaDr6vPK+Ojj8DGwKf8/xt8CvE43+6TSurI3/XLbxTMJGKx73ZS5T9iqUYyyNuG/dfQ7Qsk+VPrH7456XPqN9L7FOoLeP6O28KvTYL/p/Vr/pa76uqHCn09RhOr6i22xGdZr62Qy5saeqQJw70C0ru4YD01QPpl4m0W8imMHD9fD9Ol45GwuLtgxuifdrVJTCeiV1o2cSaDiSUdE68NFbwS1tqoLubhIlA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5jcnRm0BumwIlGcbyzvJHquB8nYFg38oeUdyH/Havak=;
+ b=EMyjoGzIJRN1Z8YOsj6UROvx1hbXJVU1LqO5LainWCtwS9i97soUta9ts8XkIN9pm2YBqsdrxnGibn8F9UF/BSAN3nRQMYfhV11s/JRywhvPYxS+Wjq6VEFMW2FdxiOfD+v233sQJAAawY86bKWM/HCj1ft/7lTxplD4OfHjAE+KjyVOpMFYTkdgeh3lRU8RD89IjYOAtMLS6LjQiZzGNNc5XA95fyz+VGneqI/3i7U6wgKP3BsxauwnOXLD4QpAR+Bp8rzhipPXgG9UKf4z4wEUM6Sz1X3ydrpRnc9gMtEp96Mq4/hANVH1ZCwZN6ZvG4SMu4KI2CWJPYBhsiJoDg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7284.eurprd04.prod.outlook.com (2603:10a6:20b:1dc::8)
+ by PA1PR04MB11406.eurprd04.prod.outlook.com (2603:10a6:102:4f1::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.15; Tue, 31 Mar
+ 2026 11:28:26 +0000
+Received: from AM8PR04MB7284.eurprd04.prod.outlook.com
+ ([fe80::9cd6:51bd:82b:98dc]) by AM8PR04MB7284.eurprd04.prod.outlook.com
+ ([fe80::9cd6:51bd:82b:98dc%5]) with mapi id 15.20.9745.027; Tue, 31 Mar 2026
+ 11:28:26 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	f.fainelli@gmail.com,
+	frank.li@nxp.com,
+	chleroy@kernel.org,
+	horms@kernel.org,
+	linux@armlinux.org.uk,
+	andrew@lunn.ch
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org,
+	imx@lists.linux.dev
+Subject: [PATCH v4 net-next 00/14] Add preliminary NETC switch support for i.MX94
+Date: Tue, 31 Mar 2026 19:30:11 +0800
+Message-Id: <20260331113025.1566878-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MA5P287CA0151.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a01:1d7::14) To AM8PR04MB7284.eurprd04.prod.outlook.com
+ (2603:10a6:20b:1dc::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260330224630.579937-2-nb@tipi-net.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7284:EE_|PA1PR04MB11406:EE_
+X-MS-Office365-Filtering-Correlation-Id: 925ddcf2-fdba-4c41-1618-08de8f18a02c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|376014|52116014|366016|7416014|1800799024|18002099003|56012099003|38350700014|921020;
+X-Microsoft-Antispam-Message-Info:
+	niXsti/1qNTpWUFwB1kLOsHqjBjBDL7jyJrTuoOORhLwuaYxJucnsT8gZrnjwJxT7nHfs4BjbvJOtvN8yUHayL5e7myIMQW2bf5nGZTLcDPnzmL1SgHu6QcsZ3Ca38fJlG+zJPmq8ER4cM+b0zaEYqMb2QqqaS7O6KiGF+8+XXnHVilS8kYQfB8CUH7x42mFyn7wEhoSf6SkR7z0z2QHqN6xMGQXhpWrnRBKxfkgvOecAdqxyu8EPBJd0wbJGxPXwj8Yyra5efVYGwH7tYZHl95EGFTXKxMHn9R9kwQH1iSI+hwRWNpt/vlJe+c0nCDNs8+LjVZhqmQAy1fU5C95sURS1M1i8mJ7QQPh1ldfr1NaHQsTgBak25rkJ6Wv6CcV/AhYmEKpZicwFnjP3EXZskbvxCJa9WQgsHFYniHmTt1/TrQAiPOe+W7//EdjV1up8ZlACqGGBMzrpWJtdeLL8RQW09UpW+S9sVLkGixEcczSd6AbV8uwk4l/SSOWOb65ofwsGPgR/FsiRdxbq7WfQApBeMCupDbVxp83fz8ZRN0+j894U5bGVlleeUhABCmLLmq60tvVkHI2OcOexkjURh+9PozJnoDRK+eHvaBh44wvGbNuiGyegjehgladRZOUy6S/SfU0V6/vQU7myBKWTLTYCzcMODlr38txaMiZJjYBsha6CLvSaJBihmppg+WllidizAhvyfC0m92gYfO1m5/xcBVKxC2/5bIenoEerS4QbweA6IR70VEMhQnvufmxzEBM5dBUQ8GwPfMajP04+Mc+iVuWghgfOFKlAAtag7hfBhbdtxFgF3Zt9aM4Dcka
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7284.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(376014)(52116014)(366016)(7416014)(1800799024)(18002099003)(56012099003)(38350700014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?p4J13O73iyu+rnAsDdG2pUt2OUvTlpat724afifA6Bcdsg4Sch6az4RWIb/e?=
+ =?us-ascii?Q?cbm8U9hNf7ZTi2c0nrNOnWu0uQ+2eXOW1IJQq8dxr9lrcOJhkaFlnlDRsEBY?=
+ =?us-ascii?Q?pBskFJXB9Qm7kLPtfle0cU/WkotPYKHXwbKSdv04j4onSFP2J4PoLjtWW8i5?=
+ =?us-ascii?Q?UjmLw0TT4iveERTRvUg8a5dSrhLb5sIjaQA1EWWiOIRie8naT4E52KCWi6ZZ?=
+ =?us-ascii?Q?00X15qFNzpz67vpEn/F1oA92dEoIeE612JM4+TrxKuP357F0itfpl5DxS3fH?=
+ =?us-ascii?Q?AbZxjSpckYKJrVaDVoFWmyJRAqBLjp2THkLiZ3Eklq8cj7FfSKSCPLsk9ZSP?=
+ =?us-ascii?Q?oZogVdt2k8gW+eS0DRX4ARQDypZumGGomjH0lvYNCLtBiPjimSjO8M23mEFT?=
+ =?us-ascii?Q?JEMHHVLOwQ4CBZxaW78svK+1ii4pcTqcRTx0DM/J62Yf24OH9Oay/gv8f3q/?=
+ =?us-ascii?Q?UnWz28ehWOcN6PaKpfU4lRI8in6BE9RrJiplJZGd+Bwzi4G3blK5aeECLv+u?=
+ =?us-ascii?Q?N2lCwLxh7Ij+q9d/KghSFmWQmCjdjyDj9/L/yl5uF4BqoTy/4zeD8ZMnWi42?=
+ =?us-ascii?Q?0/l8IjyZL4PiD9NjkDaqo6mJjWMNvoVWDmtuKzDWZytF7tsMf1efo2RICqLh?=
+ =?us-ascii?Q?FhV18tRA9OazCC/4SNv5Vxl7ln0FWTgyAP2suw14SLpVXdUmrxyP9N2KAV7G?=
+ =?us-ascii?Q?yk9b1Uvn7RKdF8GgvyUz3Nb+xeN2sp1R7sWWOOTbngmq0HczGvDEt8KfoyrZ?=
+ =?us-ascii?Q?qRV4RDMXHYHMtI0ckBE3k9vr7NXFQ0nM/kc0A2zo/XB9nru1aITd6FbG5EvX?=
+ =?us-ascii?Q?9C/4rVd0sDOJhWHBbIMgaBNr8sHQOKFo4g9DXc6goJZt4GJI0YL5QuSiHUCG?=
+ =?us-ascii?Q?beNnnf1Ll1WI0kR5KHPcuurI8AFdNBKxY2eXTNnmPEGLB31jdHXApbJB2S2G?=
+ =?us-ascii?Q?+pi2vrF32xxfsUeUhrX2L9L0fcHJOQu/ajEPH9pHE4IJdqdHpqT+ffxJZ5Gy?=
+ =?us-ascii?Q?JBkVZm/6SSjtsL4lUOXxTTd8hbv654lG5mR02dKD1irlKjNj3kLbhjUQpRCb?=
+ =?us-ascii?Q?UauI2wxtxbluUw668H+4tHV/b8mjfhdo5jBzogXxa1ibf7OQs4KH0UzBm7qW?=
+ =?us-ascii?Q?hn4oM2BoOZpZYDblXpqjwgZ0qbDyd63lf8pIOH3CbulUmFVF+kQYadmfbdKo?=
+ =?us-ascii?Q?djGCFeWIx7dl5O1FnF2e7XUZpqEAOKhRxq+1kh3IvXewQPH4poXF7ZFvXaV8?=
+ =?us-ascii?Q?I/HaQtU5v51hTUFU6bo2asptTx2KiEu5qbVEXRcJsn1KEi2Pu438oD7gSWg1?=
+ =?us-ascii?Q?PKcoPTgAA+bXESvipFw4rdc6HjGj0FtRmT5ceC8uQt+ksOANLUaxpLztgHLd?=
+ =?us-ascii?Q?DOmLSAjvyhsqcdTKFUre6VXhja3Tx6c1blTlW1YZp7EHQ37JDClsEJLJQ6Hq?=
+ =?us-ascii?Q?2/a7sLEiRnX3s4Ll/PkNOkPGVovl7fjfNDz0bl7QP3O2Q+0DazoMUo0BoCEE?=
+ =?us-ascii?Q?zJius2OzwCuhcKCZKguDr5LymSAqo/Cy6bgY5eQruvyLCUdelvAUieohuD06?=
+ =?us-ascii?Q?i85qAtKqWutOk7nsgd6Q1UYIodPnw9QCad6KQBmNLgsEZ8ktHnQQruR3YgVK?=
+ =?us-ascii?Q?dG+fVhEktrfb1sljOPsbUo7FhGxZvsh1xcdNpmf8myFhLzGS/XRUCvLDlM10?=
+ =?us-ascii?Q?Cp2Fc+OQi7827jJADV+GwTFjsdLiu8gPhG6rIClTBj46MlwC?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 925ddcf2-fdba-4c41-1618-08de8f18a02c
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7284.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Mar 2026 11:28:26.3847
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: thVRyfkjGR2jq2gYWNCh/YbsyRihhQeS6GPx54B+eDkIlaZwcnYh6w+9ZIneW1c40t/9Ij8CvNL+mse0TclwPQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB11406
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,raspberrypi.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273593-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_SPAM(0.00)[0.537];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273578-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,tipi-net.de:email,armlinux.org.uk:email,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 26A93368E38
+	FROM_NEQ_ENVFROM(0.00)[wei.fang@nxp.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:dkim,nxp.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4B431368D5F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 31, 2026 at 12:46:26AM +0200, Nicolai Buchwitz wrote:
-> Implement the standard ETHTOOL_PHY_DOWNSHIFT tunable for the LAN88xx
-> PHY. This allows runtime configuration of the auto-downshift feature
-> via ethtool:
-> 
->   ethtool --set-phy-tunable eth0 downshift on count 3
-> 
-> The LAN88xx PHY supports downshifting from 1000BASE-T to 100BASE-TX
-> after 2-5 failed auto-negotiation attempts. Valid count values are
-> 2, 3, 4 and 5.
-> 
-> This is based on an earlier downstream implementation by Phil Elwell.
-> 
-> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+i.MX94 NETC (v4.3) integrates 802.1Q Ethernet switch functionality, the
+switch provides advanced QoS with 8 traffic classes and a full range of
+TSN standards capabilities. It has 3 user ports and 1 CPU port, and the
+CPU port is connected to an internal ENETC through the pseduo link, so
+instead of a back-to-back MAC, the lightweight "pseudo MAC" is used at
+both ends of the pseudo link to transfer Ethernet frames. The pseudo
+link provides a zero-copy interface (no serialization delay) and lower
+power (less logic and memory).
 
-I didn't see a cover message. Please always include a cover message with
-patch series.
+Like most Ethernet switches, the NETC switch also supports a proprietary
+switch tag, is used to carry in-band metadata information about frames.
+This in-band metadata information can include the source port from which
+the frame was received, what was the reason why this frame got forwarded
+to the entity, and for the entity to indicate the precise destination
+port of a frame. The NETC switch tag is added to frames after the source
+MAC address. There are three types of switch tags, and each type has 1
+to 4 subtypes, more details are as follows.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Forward switch tag (Type = 0): Represents forwarded frames.
+  - SubType = 0 - Normal frame processing.
 
-Thanks!
+To_Port switch tag (Type = 1): Represents frames that are to be sent to
+a specific switch port.
+  - SubType = 0. No request to perform timestamping.
+  - SubType = 1. Request to perform one-step timestamping.
+  - SubType = 2. Request to perform two-step timestamping.
+  - SubType = 3. Request to perform both one-step timestamping and
+    two-step timestamping.
+
+To_Host switch tag (Type = 2): Represents frames redirected or copied to
+the switch management port.
+  - SubType = 0. Received frames redirected or copied to the switch
+     management port.
+  - SubType = 1. Received frames redirected or copied to the switch
+    management port with captured timestamp at the switch port where
+    the frame was received.
+  - SubType = 2. Transmit timestamp response (two-step timestamping).
+
+Currently, this patch set supports Forward tag, SubType 0 of To_Port tag
+and SubType 0 of To_Host tag. More tags will be supported in the future.
+
+In addition, the switch supports NETC Table Management Protocol (NTMP),
+some switch functionality is controlled using control messages sent to
+the hardware using BD ring interface with 32B descriptors similar to the
+packet Transmit BD ring used on ENETC. This interface is referred to as
+the command BD ring. This is used to configure functionality where the
+underlying resources may be shared between different entities or being
+too large to configure using direct registers.
+
+For this patch set, we have supported the following tables through the
+command BD ring interface.
+
+FDB Table: It contains forwarding and/or filtering information about MAC
+addresses. The FDB table is used for MAC learning lookups and MAC
+forwarding lookups.
+
+VLAN Filter Table: It contains configuration and control information for
+each VLAN configured on the switch.
+
+Buffer Pool Table: It contains buffer pool configuration and operational
+information. Each entry corresponds to a buffer pool. Currently, we use
+this table to implement flow control feature on each port.
+
+Ingress Port Filter Table: It contains a set of filters each capable of
+classifying incoming traffic using a mix of L2, L3, and L4 parsed and
+arbitrary field data. We use this table to implement host flood support
+to the switch port.
+
+The switch also supports other tables, and we will add more advanced
+features through them in the future.
+
+---
+v4:
+1. Fix some nits in patch 2.
+2. Revert netc_ipv_to_buffer_pool_mapping() to v2, the new added code in
+v3 is actually a dead code and was only added to address false positives
+reported by AI review. Therefore, v4 optimizes the comments in
+netc_switch_bpt_default_config() to avoid the false positives.
+v3 link: https://lore.kernel.org/imx/20260326062917.3552334-1-wei.fang@nxp.com/
+v2 link: https://lore.kernel.org/imx/20260323060752.1157031-1-wei.fang@nxp.com/
+v1 link: https://lore.kernel.org/imx/20260316094152.1558671-1-wei.fang@nxp.com/
+---
+
+Wei Fang (14):
+  dt-bindings: net: dsa: update the description of 'dsa,member' property
+  dt-bindings: net: dsa: add NETC switch
+  net: enetc: add pre-boot initialization for i.MX94 switch
+  net: enetc: add basic operations to the FDB table
+  net: enetc: add support for the "Add" operation to VLAN filter table
+  net: enetc: add support for the "Update" operation to buffer pool
+    table
+  net: enetc: add support for "Add" and "Delete" operations to IPFT
+  net: enetc: add multiple command BD rings support
+  net: dsa: add NETC switch tag support
+  net: dsa: netc: introduce NXP NETC switch driver for i.MX94
+  net: dsa: netc: add phylink MAC operations
+  net: dsa: netc: add more basic functions support
+  net: dsa: netc: initialize buffer bool table and implement
+    flow-control
+  net: dsa: netc: add support for the standardized counters
+
+ .../devicetree/bindings/net/dsa/dsa.yaml      |    6 +-
+ .../bindings/net/dsa/nxp,netc-switch.yaml     |  130 ++
+ MAINTAINERS                                   |   11 +
+ drivers/net/dsa/Kconfig                       |    3 +
+ drivers/net/dsa/Makefile                      |    1 +
+ drivers/net/dsa/netc/Kconfig                  |   14 +
+ drivers/net/dsa/netc/Makefile                 |    3 +
+ drivers/net/dsa/netc/netc_ethtool.c           |  192 +++
+ drivers/net/dsa/netc/netc_main.c              | 1528 +++++++++++++++++
+ drivers/net/dsa/netc/netc_platform.c          |   90 +
+ drivers/net/dsa/netc/netc_switch.h            |  155 ++
+ drivers/net/dsa/netc/netc_switch_hw.h         |  335 ++++
+ .../ethernet/freescale/enetc/netc_blk_ctrl.c  |  188 +-
+ drivers/net/ethernet/freescale/enetc/ntmp.c   |  383 ++++-
+ .../ethernet/freescale/enetc/ntmp_private.h   |  122 +-
+ include/linux/dsa/tag_netc.h                  |   14 +
+ include/linux/fsl/netc_global.h               |    6 +
+ include/linux/fsl/ntmp.h                      |  235 ++-
+ include/net/dsa.h                             |    2 +
+ include/uapi/linux/if_ether.h                 |    1 +
+ net/dsa/Kconfig                               |   10 +
+ net/dsa/Makefile                              |    1 +
+ net/dsa/tag_netc.c                            |  185 ++
+ 23 files changed, 3585 insertions(+), 30 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/nxp,netc-switch.yaml
+ create mode 100644 drivers/net/dsa/netc/Kconfig
+ create mode 100644 drivers/net/dsa/netc/Makefile
+ create mode 100644 drivers/net/dsa/netc/netc_ethtool.c
+ create mode 100644 drivers/net/dsa/netc/netc_main.c
+ create mode 100644 drivers/net/dsa/netc/netc_platform.c
+ create mode 100644 drivers/net/dsa/netc/netc_switch.h
+ create mode 100644 drivers/net/dsa/netc/netc_switch_hw.h
+ create mode 100644 include/linux/dsa/tag_netc.h
+ create mode 100644 net/dsa/tag_netc.c
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.34.1
+
 
