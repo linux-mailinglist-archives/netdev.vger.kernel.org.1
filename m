@@ -1,53 +1,63 @@
-Return-Path: <netdev+bounces-273530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273531-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uG2OMhCMy2kuIwYAu9opvQ
-	(envelope-from <netdev+bounces-273530-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:55:44 +0200
+	id qANuEwCOy2kuIwYAu9opvQ
+	(envelope-from <netdev+bounces-273531-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 11:04:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0CC9366862
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:55:43 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F1A2366A6D
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 11:03:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A29BA3078B89
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 08:50:30 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 304393064766
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 08:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB7E3EAC9F;
-	Tue, 31 Mar 2026 08:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OXkfi1Cb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DAD73EBF13;
+	Tue, 31 Mar 2026 08:51:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0928F3E9F74;
-	Tue, 31 Mar 2026 08:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [4.193.249.245])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6303E9F61
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 08:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=4.193.249.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774947026; cv=none; b=ZIS5mi456NrVqchnCpip+OATQ5UxrbaFpkqa7BFB6vK3oNsSgQpDzOEEiTjKrutL1HNCS3Ga4Mf6dRR9wVTq9qFQtJusj9pw+RZhp1ZFtVLakKpKprYNJr/0OCiZc5edLZr7ibbyYm/JYhL4Bus1ky5Ue7W8QXk05fCX6wA8xwc=
+	t=1774947107; cv=none; b=Wu1lFh32b9bB6ph+dOJ4JOK9HkTk2WoAlj1mXYsvmkSly30p8YkpWBcrnmJ258p9/8S2nN0+77QzZyA7eT18JSXFT/UCsZvnokFcYCMt0FOjVTo81uahjKvIg/wb3bzPdAnHASgJTiOQNbY5Bo4EcpV6xcb2c0rA8SH8DfSv+oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774947026; c=relaxed/simple;
-	bh=3xn5q88t5joBFJuzN+n2d6yLVcFLpIFnUvfH2KGmb3U=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nY5h6KqW0lPRfkOLAsyuXPHj/O41PGVC7af+AwjpPKsybct7ryHvaGdEJSNDAJoHbu4cMTb2nvKbj7CnNp9heQiMefo9J01k4EBq8W76goYH6WGed1O4CV3N3nBHoJ82dFpKXwe3cxKGg5ynCIXH9KdjpYB/THuif5juY9YnodQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OXkfi1Cb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9212AC19423;
-	Tue, 31 Mar 2026 08:50:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774947025;
-	bh=3xn5q88t5joBFJuzN+n2d6yLVcFLpIFnUvfH2KGmb3U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OXkfi1Cbm9Sz05smuAuV9FfbF/nLoU33mswLkdWXpUG4ngnbhd8lrnd1dxJUY9gW/
-	 oaEXcGvm83UichL4u8UwSvK+FIeEDXg6ijPlvI41GJehqp070OH9G6tlnHvm+ecOvf
-	 /lsNdz2tNfx8cH02it/ClglS9U1RhAeZg4x/+WHTVl/q2XdAperJkJsK+/eAi28e07
-	 aa3aLOsoiKEKqZOGkGayTA90JTLC6DI6xYiVeN8mmo8NQEHpaupvEBnjMPaRhkW4RW
-	 8FvJ2Jo8PP8XwwugumRa2mNLsxmjq7esKygV9D0KW8h4xWNLObUU7tTyK2lX0TOd5R
-	 JwvJw5zMAcImA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CFA2392FF48;
-	Tue, 31 Mar 2026 08:50:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1774947107; c=relaxed/simple;
+	bh=ysb/EWeZtEPjMxr7XPdTcFKfGbnGIsktgpdw9OBWuY8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mEBROgkBbdz2stxpk3F2lkNidFbv2w9XmJRcE2T6JhVbW7xAzB1aXn36ZTriIW6ZfO4kE5/AjUmMelgAWb3sAcDBUG2Y8Wp25wzfKhJowKRArQCxYvOyuq0uUaE0B0IG537R49fQz/gDSpaihLvWZWKNVg0bLb9E4YZKPLQirVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=4.193.249.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from a800-server-1.tail7779b.ts.net (unknown [172.30.111.252])
+	by app1 (Coremail) with SMTP id ygmowADnXwD_istpm9mXAA--.32062S2;
+	Tue, 31 Mar 2026 16:51:11 +0800 (CST)
+From: Yang Yang <n05ec@lzu.edu.cn>
+To: jhs@mojatatu.com
+Cc: xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	tanyuan98@outlook.com,
+	z1652074432@gmail.com,
+	kanolyc@gmail.com,
+	n05ec@lzu.edu.cn,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	sbrivio@redhat.com,
+	vladbu@mellanox.com,
+	netdev@vger.kernel.org,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	bird@lzu.edu.cn
+Subject: [PATCH RESEND nf 1/1] net/sched: cls_flower: avoid stale mask references after delete
+Date: Tue, 31 Mar 2026 08:51:11 +0000
+Message-ID: <0fdcae6ac3e07afbbd43958f6b42e2ed6281e3d2.1773559972.git.z1652074432@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <cover.1773559972.git.z1652074432@gmail.com>
+References: <cover.1773559972.git.z1652074432@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,85 +65,148 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/3] r8152: add helper functions for
- PLA/USB/PHY
- OCP registers
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177494700929.2182623.77507775114681012.git-patchwork-notify@kernel.org>
-Date: Tue, 31 Mar 2026 08:50:09 +0000
-References: <20260326073925.32976-453-nic_swsd@realtek.com>
-In-Reply-To: <20260326073925.32976-453-nic_swsd@realtek.com>
-To: Chih Kai Hsu <hsu.chih.kai@realtek.com>
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- nic_swsd@realtek.com, linux-kernel@vger.kernel.org,
- linux-usb@vger.kernel.org, edumazet@google.com, bjorn@mork.no,
- pabeni@redhat.com
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-CM-TRANSID:ygmowADnXwD_istpm9mXAA--.32062S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxAw4ktryfKF13Ww17Kry3urg_yoWrJr18pF
+	Z5G34UJrWDXF15W3ZIya1j93s0kas7AFyF9F1rW395tr97ta9akFWkA3yj9F15GrWDWryS
+	va1qyr1rZ3WkCrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
+	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
+	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
+	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
+	n4kS14v26r4a6rW5MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
+	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRpOJnUUUUU=
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQMDCWnKnHsTNwAAso
+X-Spamd-Result: default: False [0.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273530-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273531-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,outlook.com,lzu.edu.cn,redhat.com,mellanox.com,vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.976];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D0CC9366862
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lzu.edu.cn:email,outlook.com:email]
+X-Rspamd-Queue-Id: 4F1A2366A6D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+From: Yuhang Zheng <z1652074432@gmail.com>
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+cls_flower keeps filter and mask state separately. After a filter is
+removed or replaced, some paths can still need the mask data associated
+with that filter.
 
-On Thu, 26 Mar 2026 15:39:22 +0800 you wrote:
-> v4:
-> - Add a new patch for original #1. We need to fix a typo first before
->   original #1 patch.
-> 
-> - For patch #2, replace redundant ocp_word_set_bits() with ocp_word_w0w1().
-> 
-> v3:
-> - For patch #1, fix the issue identified by the AI review.
->   In v2, ocp_byte_set_bits() was used to update the USB_LPM_CTRL register.
->   However, since its function only perform a bitwise OR operaion, it fails
->   to clear the old bits when updating a multi-bit field like LPM_TIMER.
->   Therefore, use ocp_write_byte() to maintain the original direct-write
->   semantics.
-> 
-> [...]
+Cache the mask key and dissector in struct cls_fl_filter when the mask
+is assigned, and use the cached copies in dump and offload paths. This
+avoids depending on the external mask object's lifetime after delete or
+replace.
 
-Here is the summary with links:
-  - [net-next,v4,1/3] r8152: fix incorrect register write to USB_UPHY_XTAL
-    https://git.kernel.org/netdev/net-next/c/48afd5124fd6
-  - [net-next,v4,2/3] r8152: add helper functions for PLA/USB OCP registers
-    https://git.kernel.org/netdev/net-next/c/d16133f177fe
-  - [net-next,v4,3/3] r8152: add helper functions for PHY OCP registers
-    https://git.kernel.org/netdev/net-next/c/7db154aa58e1
+Fixes: 061775583e35 ("net: sched: flower: introduce reference counting for filters")
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Signed-off-by: Yuan Tan <tanyuan98@outlook.com>
+Signed-off-by: Xin Liu <bird@lzu.edu.cn>
+Signed-off-by: Yucheng Lu <kanolyc@gmail.com>
+Signed-off-by: Yuhang Zheng <z1652074432@gmail.com>
+---
 
-You are awesome, thank you!
+This email was not CCed to the public mailing list previously, so I am
+resending it with the mailing list included. Sorry for the inconvenience.
+
+ net/sched/cls_flower.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+index 099ff6a3e1f5..c1f10b4ec748 100644
+--- a/net/sched/cls_flower.c
++++ b/net/sched/cls_flower.c
+@@ -124,8 +124,10 @@ struct cls_fl_head {
+ 
+ struct cls_fl_filter {
+ 	struct fl_flow_mask *mask;
++	struct flow_dissector mask_dissector;
+ 	struct rhash_head ht_node;
+ 	struct fl_flow_key mkey;
++	struct fl_flow_key mask_key;
+ 	struct tcf_exts exts;
+ 	struct tcf_result res;
+ 	struct fl_flow_key key;
+@@ -445,6 +447,12 @@ static void fl_destroy_filter_work(struct work_struct *work)
+ 	__fl_destroy_filter(f);
+ }
+ 
++static void fl_filter_copy_mask(struct cls_fl_filter *f)
++{
++	f->mask_key = f->mask->key;
++	f->mask_dissector = f->mask->dissector;
++}
++
+ static void fl_hw_destroy_filter(struct tcf_proto *tp, struct cls_fl_filter *f,
+ 				 bool rtnl_held, struct netlink_ext_ack *extack)
+ {
+@@ -476,8 +484,8 @@ static int fl_hw_replace_filter(struct tcf_proto *tp,
+ 	tc_cls_common_offload_init(&cls_flower.common, tp, f->flags, extack);
+ 	cls_flower.command = FLOW_CLS_REPLACE;
+ 	cls_flower.cookie = (unsigned long) f;
+-	cls_flower.rule->match.dissector = &f->mask->dissector;
+-	cls_flower.rule->match.mask = &f->mask->key;
++	cls_flower.rule->match.dissector = &f->mask_dissector;
++	cls_flower.rule->match.mask = &f->mask_key;
+ 	cls_flower.rule->match.key = &f->mkey;
+ 	cls_flower.classid = f->res.classid;
+ 
+@@ -2489,6 +2497,7 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
+ 	err = fl_check_assign_mask(head, fnew, fold, mask);
+ 	if (err)
+ 		goto unbind_filter;
++	fl_filter_copy_mask(fnew);
+ 
+ 	err = fl_ht_insert_unique(fnew, fold, &in_ht);
+ 	if (err)
+@@ -2705,8 +2714,8 @@ static int fl_reoffload(struct tcf_proto *tp, bool add, flow_setup_cb_t *cb,
+ 		cls_flower.command = add ?
+ 			FLOW_CLS_REPLACE : FLOW_CLS_DESTROY;
+ 		cls_flower.cookie = (unsigned long)f;
+-		cls_flower.rule->match.dissector = &f->mask->dissector;
+-		cls_flower.rule->match.mask = &f->mask->key;
++		cls_flower.rule->match.dissector = &f->mask_dissector;
++		cls_flower.rule->match.mask = &f->mask_key;
+ 		cls_flower.rule->match.key = &f->mkey;
+ 
+ 		err = tc_setup_offload_action(&cls_flower.rule->action, &f->exts,
+@@ -3709,7 +3718,7 @@ static int fl_dump(struct net *net, struct tcf_proto *tp, void *fh,
+ 		goto nla_put_failure_locked;
+ 
+ 	key = &f->key;
+-	mask = &f->mask->key;
++	mask = &f->mask_key;
+ 	skip_hw = tc_skip_hw(f->flags);
+ 
+ 	if (fl_dump_key(skb, net, key, mask))
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
