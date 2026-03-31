@@ -1,142 +1,234 @@
-Return-Path: <netdev+bounces-273659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273661-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aFINLlrby2lHMAYAu9opvQ
-	(envelope-from <netdev+bounces-273659-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:34:02 +0200
+	id AG+0EwHdy2lHMAYAu9opvQ
+	(envelope-from <netdev+bounces-273661-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:41:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C08636B068
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:34:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B881836B188
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:41:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5A04630C2A4E
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 14:25:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 713C6301FFB6
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 14:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7893FADE1;
-	Tue, 31 Mar 2026 14:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD6BA3FADEE;
+	Tue, 31 Mar 2026 14:39:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=skoll.ca header.i=@skoll.ca header.b="F+kOVDit"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XwUhkOdZ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="WnMibm53";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XwUhkOdZ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="WnMibm53"
 X-Original-To: netdev@vger.kernel.org
-Received: from dianne.skoll.ca (dianne.skoll.ca [144.217.161.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A003F8E03;
-	Tue, 31 Mar 2026 14:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.217.161.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546F2329E4B
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 14:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774967141; cv=none; b=mBJMDKuiKVxUZzFJHLA86gqbzvObAOcvD7qcUSm+EP+a1/18sTDg5ZXI+IkNpIaFl5KRNl3aZdLadvNFx0Ax5nHJr0V/qkOxBFSUDsaMjcCDB3PpXkHzsYAQt8QNMq5BZufp+BJ2Yg03VqqJmC2FZgz+IIS2nQepjZWY2uW3txg=
+	t=1774967964; cv=none; b=mURrmABcpnhSMOAMXIUv+gDy0wtungLwe6XtCZ7rdA3+jfKt3yv7Jf8tspsRwuVFP0R18Zk3MGuBWT8bySCHspfXCBDjGJMlC/4cA2jZ6DQWA6t39zIT/GsxKV1/O+BXe24XFAfU0VQIrqP/+GUpB0gDOaBacrXNOy7P8gwr+h8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774967141; c=relaxed/simple;
-	bh=U5uM51uyVywz0Ku3+6t2AG2QfNtCodrg01eurmUPSo8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=crEOHVIxQoqRHs1razT+O9QYaVpw6i7c8U7TOR/pm9jO+t0gvJ4W6tPpGdaK7VYrW+VwCwqF+owitr0r3rco9S5M766OlZ/P8UdiJEVS+dDDxeb/8hz8Goxn7GDKjJr26oFNEThtECuI2PxiihgKvcfV8Vciu7NJ+FXy2aBxlqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=skoll.ca; spf=pass smtp.mailfrom=skoll.ca; dkim=pass (2048-bit key) header.d=skoll.ca header.i=@skoll.ca header.b=F+kOVDit; arc=none smtp.client-ip=144.217.161.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=skoll.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=skoll.ca
-Received: from pi4.skoll.ca ([192.168.84.18])
-	by dianne.skoll.ca (8.18.1/8.18.1/Debian-6) with ESMTPS id 62VEP91q825675
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Tue, 31 Mar 2026 10:25:10 -0400
-Received: from gato.skoll.ca (gato.skoll.ca [192.168.83.21])
-	by pi4.skoll.ca (Postfix) with ESMTPS id 4flVks1M0SzdZY88;
-	Tue, 31 Mar 2026 10:25:09 -0400 (EDT)
-Date: Tue, 31 Mar 2026 10:25:08 -0400
-From: Dianne Skoll <dianne@skoll.ca>
-To: Jaco Kroon <jaco@uls.co.za>
-Cc: Qingfang Deng <dqfext@gmail.com>, linux-ppp@vger.kernel.org,
-        Andrew Lunn
- <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Eric Biggers <ebiggers@kernel.org>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paul Mackerras
- <paulus@ozlabs.org>,
-        James Carlson <carlsonj@workingcode.com>
-Subject: Re: [PATCH net-next] pppoe: update Kconfig URLs
-Message-ID: <20260331102508.2eb6dce8@gato.skoll.ca>
-In-Reply-To: <1bba860e-a204-4a5b-9b8f-4d55a559d01e@uls.co.za>
-References: <20260331033303.5664-1-dqfext@gmail.com>
-	<0aa6aa20-0e2a-48e9-8273-53b2fecd287b@uls.co.za>
-	<20260331091655.30212333@gato.skoll.ca>
-	<1bba860e-a204-4a5b-9b8f-4d55a559d01e@uls.co.za>
+	s=arc-20240116; t=1774967964; c=relaxed/simple;
+	bh=nYSH9MkaaTNcNc94mQTrQGunfMJBSEPzU9S8G+sNEGc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LPugMO51csUkoVGxH3RoGjN9Mdj7gGFJ6N0CVbYT3hUMFof7dOC0QLyxoMzcjDiZVNBltnOwTRwEfIGC/uPJSnYspjLHLcIqQMw2j+Le4fRQ6rBcl/qZ+T+crp8w3A7/VYr2Ilg/gNavOEl57FuyklejzNbqn07SGksEG745LZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XwUhkOdZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=WnMibm53; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XwUhkOdZ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=WnMibm53; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 6CA294D262;
+	Tue, 31 Mar 2026 14:39:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1774967961; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n9UuZmrX8aFUW4CFjuaRiSTZT5Jbr0Ud9L0ld34/jR8=;
+	b=XwUhkOdZLNgwFgd9gquHU5ixmY9hAYkN+Jl2tTXJwRy0DApMeRcwVC+XVMZX+oPxAYBBhi
+	p0aC0n4LuV+6KwS56P+KxUgtjsLdyfTty6IOyqwYWJSGOtHmQBOewHfyPgd3cuAlbGJLbZ
+	4fWXr8aneAcyObuKX+5nA34AzKmkLjc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1774967961;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n9UuZmrX8aFUW4CFjuaRiSTZT5Jbr0Ud9L0ld34/jR8=;
+	b=WnMibm53ZU1zFmAK60YPwJ1w/i1HAyksDhV8jM8laTbIcCdNUjZrT9KR6kORNFJKqhVPSV
+	/YD6hNDChqD7/VBQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=XwUhkOdZ;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=WnMibm53
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1774967961; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n9UuZmrX8aFUW4CFjuaRiSTZT5Jbr0Ud9L0ld34/jR8=;
+	b=XwUhkOdZLNgwFgd9gquHU5ixmY9hAYkN+Jl2tTXJwRy0DApMeRcwVC+XVMZX+oPxAYBBhi
+	p0aC0n4LuV+6KwS56P+KxUgtjsLdyfTty6IOyqwYWJSGOtHmQBOewHfyPgd3cuAlbGJLbZ
+	4fWXr8aneAcyObuKX+5nA34AzKmkLjc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1774967961;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n9UuZmrX8aFUW4CFjuaRiSTZT5Jbr0Ud9L0ld34/jR8=;
+	b=WnMibm53ZU1zFmAK60YPwJ1w/i1HAyksDhV8jM8laTbIcCdNUjZrT9KR6kORNFJKqhVPSV
+	/YD6hNDChqD7/VBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E163E4A0A2;
+	Tue, 31 Mar 2026 14:39:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id ddX+M5jcy2lJJQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 31 Mar 2026 14:39:20 +0000
+Message-ID: <23b3a8b0-b294-4179-9336-49a65e70c6a8@suse.de>
+Date: Tue, 31 Mar 2026 16:38:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=skoll.ca; h=date
-	:from:to:cc:subject:message-id:in-reply-to:references
-	:mime-version:content-type:content-transfer-encoding; s=canit2;
-	 bh=00IX2/FPj4y7ZScMI81Y5QFxmS44uuUj/r6XE4KfdQ4=; b=F+kOVDitfAgI
-	UcjOIi/bfiaYiuxz2Pr2IDV6kAlR7NPGZ7BC4gdWET+ns0TjwnsG5biq7yUpDO/Y
-	ujepG4vjaTgu9Xk+p/vGB+0jaYTyQ+BqlWj0kBfG/EKHrgJQb4meo0pVIJniwat8
-	+0inZ2IBXsQ2E48MK+72sN6n9GTP0hvB25R9HALEriJ7TYjpmdX3NX6dVACCFANu
-	Hz/hB8dOHNxiur0IpYleywnRKr66HQVkPy23o9xI2tOHqiosx/XqH0RhUhysMDYS
-	rw2wccVzlULFakF7quUk1qwSFheQ633zg1iFv2kXEz6U6LqYOIlW5dKXL8cMfjjK
-	GFMJiugYGA==
-X-Scanned-By: CanIt (www . roaringpenguin . com)
-X-Scanned-By: mailmunge 3.20 on 192.168.83.18
-X-Spam-Score: undef - relay 192.168.84.18 marked with skip_spam_scan
-X-CanIt-Geo: No geolocation information available for 192.168.84.18
-X-CanItPRO-Stream: outbound (inherits from default)
-X-Canit-Stats-ID: Bayes signature not available
-X-CanIt-Archive-Cluster: tWKWaF/NcZkqjWIj0BEJTBHJhwY
-X-CanIt-Archived-As: base/20260331 / 01gVqp93O
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ipv4: nexthop: allocate skb dynamically in
+ rtm_get_nexthop()
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
+ kuba@kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ Yiming Qian <yimingqian591@gmail.com>
+References: <20260331115943.10404-1-fmancera@suse.de>
+ <CANn89iLJUi+cA4fFr7XQESkT+5ckY6+MGg7QEM-G123RzuD5RQ@mail.gmail.com>
+ <9aaf6dc6-3c21-4cec-9f16-5d76cb40dc80@suse.de>
+ <CANn89iJ12g+AEr-9o1xbFEcSoTMYYYB4yXQW7pNRH0tei=KZug@mail.gmail.com>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <CANn89iJ12g+AEr-9o1xbFEcSoTMYYYB4yXQW7pNRH0tei=KZug@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[skoll.ca,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[skoll.ca:s=canit2];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,ozlabs.org,workingcode.com];
-	TAGGED_FROM(0.00)[bounces-273659-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,redhat.com,davemloft.net,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273661-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[skoll.ca:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dianne@skoll.ca,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,skoll.ca:dkim,gato.skoll.ca:mid]
-X-Rspamd-Queue-Id: 2C08636B068
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B881836B188
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi, all,
 
-> My bad, my apologies. It was the userspace code you dropped then, which 
-> does NOT require the kernel options?
 
-I was considering doing that, but I kept the userspace code.  The reason is
-that on some platforms, such as uclinux on a processor without an MMU,
-the dlopen() system call is not implemented, so there's no way to use
-a plugin with pppd.  One user asked me to keep the userspace code, so I
-did.
+On 3/31/26 3:38 PM, Eric Dumazet wrote:
+> On Tue, Mar 31, 2026 at 5:50 AM Fernando Fernandez Mancera
+> <fmancera@suse.de> wrote:
+>>
+>> On 3/31/26 2:13 PM, Eric Dumazet wrote:
+>>> On Tue, Mar 31, 2026 at 5:00 AM Fernando Fernandez Mancera
+>>> <fmancera@suse.de> wrote:
+>>>>
+>>>> When querying a nexthop object via RTM_GETNEXTHOP, the kernel currently
+>>>> allocates a fixed-size skb using NLMSG_GOODSIZE. While sufficient for
+>>>> single nexthops and small Equal-Cost Multi-Path groups, this fixed
+>>>> allocation fails for large nexthop groups like 512+ nexthops.
+>>>>
+>>>> This results in the following warning splat:
+>>>>
+>>>>    WARNING: net/ipv4/nexthop.c:3395 at rtm_get_nexthop+0x176/0x1c0, CPU#19: rep/9282
+>>>>    [...]
+>>>>    RIP: 0010:rtm_get_nexthop+0x176/0x1c0
+>>>>    [...]
+>>>>    Call Trace:
+>>>>     <TASK>
+>>>>     rtnetlink_rcv_msg+0x168/0x670
+>>>>     netlink_rcv_skb+0x5c/0x110
+>>>>     netlink_unicast+0x203/0x2e0
+>>>>     netlink_sendmsg+0x222/0x460
+>>>>     ____sys_sendmsg+0x35a/0x380
+>>>>     ___sys_sendmsg+0x99/0xe0
+>>>>     __sys_sendmsg+0x8a/0xf0
+>>>>     do_syscall_64+0x12f/0x1590
+>>>>     entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>>>>     </TASK>
+>>>
+>>> I find these stack traces without symbols not very useful.
+>>
+>> Hi Eric,
+>>
+>> sure, here is the decoded trace:
+>>
+>>    WARNING: net/ipv4/nexthop.c:3395 at rtm_get_nexthop+0x176/0x1c0,
+>> CPU#20: rep/4608
+>>    RIP: 0010:rtm_get_nexthop (net/ipv4/nexthop.c:3395 (discriminator 2))
+>>    Call Trace:
+>>     <TASK>
+>>     rtnetlink_rcv_msg (net/core/rtnetlink.c:6989)
+>>     netlink_rcv_skb (net/netlink/af_netlink.c:2550)
+>>     netlink_unicast (net/netlink/af_netlink.c:1319
+>> net/netlink/af_netlink.c:1344)
+>>     netlink_sendmsg (net/netlink/af_netlink.c:1894)
+>>     ____sys_sendmsg (net/socket.c:721 (discriminator 16) net/socket.c:736
+>> (discriminator 16) net/socket.c:2585 (discriminator 16))
+>>     ___sys_sendmsg (net/socket.c:2641)
+>>     __sys_sendmsg (net/socket.c:2671 (discriminator 1))
+>>     do_syscall_64 (arch/x86/entry/syscall_64.c:63 (discriminator 1)
+>> arch/x86/entry/syscall_64.c:94 (discriminator 1))
+>>     entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+>>     </TASK>
+>>
+>>>
+>>> Any reason you have not used scripts/decode_stacktrace.sh ?
+>>>
+>>
+>> Not really, in the past I checked other commits with `git log --grep
+>> "Call Trace"` and found out that most of the traces did not have symbols
+>> so I decided to attach the raw trace.
+>>
+>> I do not really have a personal preference here. If trace with symbols
+>> is preferred I will do it like that in the future. I could also send a
+>> V2 of this patch if needed.
+> 
+> Please send a V2 (after the ~24 hours delay) as we prefer this
+> whenever possible.
+> 
 
-But you are correct in that 99.99% of Linux users will not need to download
-rp-pppoe if all they want to do is connect to the Internet using a PPPoE
-client.
+Yes, in addition nh_nlmsg_size() isn't accounting the bytes for stats 
+dump so this needs a v2 anyway.
 
-Regards,
+Thanks,
+Fernando.
 
-Dianne.
 
