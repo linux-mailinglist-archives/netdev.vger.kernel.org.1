@@ -1,467 +1,248 @@
-Return-Path: <netdev+bounces-273491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273493-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0IsMJIR0y2ksIAYAu9opvQ
-	(envelope-from <netdev+bounces-273491-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 09:15:16 +0200
+	id eES5Oa50y2ksIAYAu9opvQ
+	(envelope-from <netdev+bounces-273493-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 09:15:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BD18364EA5
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 09:15:16 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B97F364EDC
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 09:15:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5F5BE3087D3F
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 07:09:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5CFED302511F
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 07:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CBA93C0636;
-	Tue, 31 Mar 2026 07:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cz6Qec/R"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C19D3BC678;
+	Tue, 31 Mar 2026 07:13:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 043BF3C1981;
-	Tue, 31 Mar 2026 07:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF723B774B
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 07:13:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774940956; cv=none; b=RddPcQmQlEIosbXv6wP1aFnnNjAQdre9uvXBGC30CqaDtRNtB5Erc1pT43BpcfchkSjzrDFOwiXA5hEq1l66GoGY/meNvDjXDA5FUE3fqGtaGAG0U2+O21JM9KxMhd4Q4cKEqEjYa6ngwhf0+hKjCFyAze9xny2Va4dc24owfEU=
+	t=1774941223; cv=none; b=mtS8EFy1jQ/5lboIc+ZOrSsgxQFO/6Wy+aqmFyk3UX6mVZg/l1IeXa7ujpm1COUw+oZ3XIg8qkJ6jPe3dzROGsosWrZ4La18+UkzmnU2v7hVf2Ry+94WvwuGJgjdWXU5ahm8Uts+7OchXl1qxVhDHZV8IGgucuxZdRph3ZKJ6jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774940956; c=relaxed/simple;
-	bh=fpHT2P3LGixWxFkeaybXJbFYWLO17ZC9nlATSJh7eG0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FdNpXHy7rKKZ5/pQn5Xfu/Jf9I5mOPg1b1oet1J9tmLdXKQa/jYPg0ZFpjPellkDRaLqxyVQEfj6MWl4qw6DrTnVDx+I7+6lpZf8U4+nK7SK/ID3g4dUSOEszb1c7LLSOGbnWJBqvP8IV+8WUDklRJboklBr3R9w2B5vl+f93fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=cz6Qec/R; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62UGNtEI3941090;
-	Tue, 31 Mar 2026 00:09:06 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=soKgQ9molfrj5+mpv0EZnMflw
-	al9dGJsr6xbcodrVYI=; b=cz6Qec/R8YuiXSA33BkX/u+Ej7BwLCYNh7ALizMp9
-	hVzeQaQokdbiC9nZrhlO4k3blUh/BivnJVg98a25A0DFOcg3n/EdTvHAQJFStGN5
-	n04vj9uiMdQe6LCM2z7mAJtQBHgRyMCiFZIAC2xQHMWswuVfiEpZRLib25NiPMvZ
-	L+Ix42AXEYvaoqNy0EL0zFsoF2EZGbaw5SLrVCJB5B0ueZqMTIW6dOJtaiLSYIgo
-	HAWe1s4ydgnIdJ77K1Sta4vNz+VZ5LYAoqKOOb6dSO+bxV/6Q6EwTvcR2V7gtEkW
-	0ynfexOUMImchUv9Tft6SfGfpTIMpp13vUmbzOj8ElSIA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4d738746v0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 31 Mar 2026 00:09:06 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 31 Mar 2026 00:09:05 -0700
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 31 Mar 2026 00:09:04 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 31 Mar 2026 00:09:04 -0700
-Received: from hyd1358.marvell.com (unknown [10.29.37.11])
-	by maili.marvell.com (Postfix) with ESMTP id 725E73F704B;
-	Tue, 31 Mar 2026 00:09:00 -0700 (PDT)
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <bbhushan2@marvell.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Subbaraya
- Sundeep" <sbhatta@marvell.com>
-Subject: [net-next PATCH v4 4/4] octeontx2-pf: cn20k: Use unified Halo context
-Date: Tue, 31 Mar 2026 12:38:39 +0530
-Message-ID: <1774940919-1599-5-git-send-email-sbhatta@marvell.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1774940919-1599-1-git-send-email-sbhatta@marvell.com>
-References: <1774940919-1599-1-git-send-email-sbhatta@marvell.com>
+	s=arc-20240116; t=1774941223; c=relaxed/simple;
+	bh=0f3xzzz8ag9SNW7fb5jqQqPgwNvN6ZIv9z48me9iRiw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M22vj6/AJKfHYsyV4PAGJPzm6q4QOlHd5wCKR0YzEmYe8mVNGOkvuak5wOVDsPScug+sApCNgDIM70Fy3unJRf1Ytm1pPCpjQnEpJNuhp0+4cmoOfNmrgohSFdr5J2mAWmQnc/YAd/B4h+4lxCAxwTYNspHNm7qdL+W0VBQXKOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.16.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: esmtpsz17t1774941099t14806ba7
+X-QQ-Originating-IP: +nL0vZovCMrBp6hTi9EZPmMc8xhqeBn1iAA2s+VSSKg=
+Received: from w-MS-7E16.trustnetic.com ( [115.227.224.139])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 31 Mar 2026 15:11:16 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 14711434964415801438
+EX-QQ-RecipientCnt: 13
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Abdun Nihaal <abdun.nihaal@gmail.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net] net: txgbe: fix RTNL assertion warning when remove module
+Date: Tue, 31 Mar 2026 15:11:07 +0800
+Message-ID: <D56A7C3379B4DA62+20260331071107.5414-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzMxMDA2NiBTYWx0ZWRfX4zb6/JSRUbZ8
- zmyLpt7dnKJNttyczC4s2C6ovsyksTnRcoaWP1nmyWwkATeAxqphjNbyWeplA8pdph4sJzOkz3s
- Cnc+RZO8CZixsGpVizeXUZzvCAbLC1GNCXsuNbhkTpEkfKASsUenhWgXovJC2ES5OAsivrMhXns
- vdvmEP0I4cZbgol4H5DNYo2XBudnONTEaDfBbH7fE36vvPl5mUbmYXeoXOCfr/8GZdegp/wO5G0
- oXG6XQeFWQsW+iDlXJubiP+23+SQBQuh0ilySe9QmVlLlL6nUtNe50jTLnM9n6U6D19xddkwyZC
- 266mjU4a5glrYsok9AXz1KZ2C1Bwvi2TSHbTh85PuPIma/oaAEpy5KyNkTxoIPY7yYXoYGz9bMk
- XB+SimOmRyZk6vm5sHaHi6l/51qnYERIY9wwsiIFeYLM7WWv8Y/icuJbBGuHazpDkeqoHUv/oLo
- GiTW63OpvONpZx/Wejg==
-X-Proofpoint-GUID: UqqSUPGseXFL49U70aHb_X9sizq_GKQA
-X-Authority-Analysis: v=2.4 cv=DMCCIiNb c=1 sm=1 tr=0 ts=69cb7312 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
- a=TtqV-g6YmW1Jfm2GSLaY:22 a=M5GUcnROAAAA:8 a=CaZ6pBYYoU2kl75vHkwA:9
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: UqqSUPGseXFL49U70aHb_X9sizq_GKQA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-31_02,2026-03-28_01,2025-10-01_01
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: MDqtQ4jGWXAGih0efTJlJ3tbYXfXkmB99E+IATvnlj5VBgRux/V9j32i
+	vBAdqClZucKkrhTxplOZvtS6BqvgvKKXP6vY0bPwhdtdlO5EWFky10ih95xVLReK6NlXvPL
+	ZQ4bNiz0FA5A3YPj0eEwTMBcBDsSqFXfQbkh4Pt8cT6cV/jcsIMyxQ3w9OyYrR5edVX06wy
+	HtZI9GC/17TcYek+OlP4UfvqXkbBF9VLdsakJwhxhyd423a7zOXUa6Jx3qBRHCf+DPRDrsH
+	YWZ87W/EQTXsAoQ4ezfUaRiE/I6Fub9mH0C0lE3NDW2Uy9Nf7RY6pK+++qEvYGwEr5Go1BR
+	5Gv4g8yOEJuglypw+6vxZVN2mBzVWtJoc4u+QFXeimu2wb59Tz59co29j3Z1hMCXn7HXWXe
+	2HCax2aodgFKK5pursIM8y5XoWfqBmryevTKLm3o5wRqvohOyFcOiKDAwjbdVu79Sy7QCxD
+	g4+Hy3M37Ax1RO9azc6h7gLB90MCmGvg7t3+I//fsp+snf8Mbgcr/v0nD22ZOn963Wbg3Cx
+	qelm4I/bQTzsBLPlJUlJMp4D2BAOp4RkTdFL1PM/KtTt9vOUjcVV7p5G8wi87W3y7HWDXl8
+	kCM5etqlOpb3f/lqv9QmjX9SBWY2bM+1zrLFk2NOT9XcIOLovkTPsCLCUwqvxCm26aX2VOM
+	5QOmfk/qWMVlKIR3nMPaWtfir4r+s29hhF+mZiCaAZF6l1b+PAH8Z7rTxhEXQEmpqsc85qm
+	c/eiTNm2GQDx7kHelbgU9Z0YT/d6f1pXXCiXFHz8wi7c1mbNVzQ9NM0oGsq4PTz1QVohRig
+	1DpLFO3Jju9ofJa4mvkBQJqTnlgB+HXTuiVFslxY8rEnDu3W+bTeIpRdhNGdFN3IyGLCK/G
+	bZ0AFmoOM7M2bd5yXsi2zbxoszzBHrKQ64N82hdhu6AoSN9h6kzL+cbhIpGMjlwP5H8nczi
+	YqI1fuX1NZHrwFr8QQsec2d65i3hVVg9f9xEJuKjy8OIOwWdmyEtDKtBR3I0lG7/ThYZvEp
+	XYbJUmCjoWgR/lkShBBB0DfQOZcPVOjJoW5VclirmyJzLXHdr6AKAKDX6nLP4=
+X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
+X-QQ-RECHKSPAM: 0
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_NEQ_ENVFROM(0.00)[sbhatta@marvell.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273491-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-273493-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:dkim,marvell.com:email,marvell.com:mid];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[trustnetic.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,intel.com,gmail.com,trustnetic.com,vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: 0BD18364EA5
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.974];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8B97F364EDC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Use unified Halo context present in CN20K hardware for
-octeontx2 netdevs instead of aura and pool contexts.
+For the copper NIC with external PHY, the driver called
+phylink_connect_phy() during probe and phylink_disconnect_phy() during
+remove. It caused an RTNL assertion warning in phylink_disconnect_phy()
+upon module remove.
 
-Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+To fix this, move the phylink connect/disconnect PHY to ndo_open/close.
+
+ ------------[ cut here ]------------
+ RTNL: assertion failed at drivers/net/phy/phylink.c (2351)
+ WARNING: drivers/net/phy/phylink.c:2351 at
+phylink_disconnect_phy+0xd8/0xf0 [phylink], CPU#0: rmmod/4464
+ Modules linked in: ...
+ CPU: 0 UID: 0 PID: 4464 Comm: rmmod Kdump: loaded Not tainted 7.0.0-rc4+
+ Hardware name: Micro-Star International Co., Ltd. MS-7E16/X670E GAMING
+PLUS WIFI (MS-7E16), BIOS 1.90 12/31/2024
+ RIP: 0010:phylink_disconnect_phy+0xe4/0xf0 [phylink]
+ Code: 5b 41 5c 41 5d 41 5e 41 5f 5d 31 c0 31 d2 31 f6 31 ff e9 3a 38 8f e7
+48 8d 3d 48 87 e2 ff ba 2f 09 00 00 48 c7 c6 c1 22 24 c0 <67> 48 0f b9 3a
+e9 34 ff ff ff 66 90 90 90 90 90 90 90 90 90 90 90
+ RSP: 0018:ffffce7288363ac0 EFLAGS: 00010246
+ RAX: 0000000000000000 RBX: ffff89654b2a1a00 RCX: 0000000000000000
+ RDX: 000000000000092f RSI: ffffffffc02422c1 RDI: ffffffffc0239020
+ RBP: ffffce7288363ae8 R08: 0000000000000000 R09: 0000000000000000
+ R10: 0000000000000000 R11: 0000000000000000 R12: ffff8964c4022000
+ R13: ffff89654fce3028 R14: ffff89654ebb4000 R15: ffffffffc0226348
+ FS:  0000795e80d93780(0000) GS:ffff896c52857000(0000)
+knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: 00005b528b592000 CR3: 0000000170d0f000 CR4: 0000000000f50ef0
+ PKRU: 55555554
+ Call Trace:
+  <TASK>
+  txgbe_remove_phy+0xbb/0xd0 [txgbe]
+  txgbe_remove+0x4c/0xb0 [txgbe]
+  pci_device_remove+0x41/0xb0
+  device_remove+0x43/0x80
+  device_release_driver_internal+0x206/0x270
+  driver_detach+0x4a/0xa0
+  bus_remove_driver+0x83/0x120
+  driver_unregister+0x2f/0x60
+  pci_unregister_driver+0x40/0x90
+  txgbe_driver_exit+0x10/0x850 [txgbe]
+  __do_sys_delete_module.isra.0+0x1c3/0x2f0
+  __x64_sys_delete_module+0x12/0x20
+  x64_sys_call+0x20c3/0x2390
+  do_syscall_64+0x11c/0x1500
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? do_syscall_64+0x15a/0x1500
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? do_fault+0x312/0x580
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? __handle_mm_fault+0x9d5/0x1040
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? count_memcg_events+0x101/0x1d0
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? handle_mm_fault+0x1e8/0x2f0
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? do_user_addr_fault+0x2f8/0x820
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? irqentry_exit+0xb2/0x600
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? exc_page_fault+0x92/0x1c0
+  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+Fixes: 02b2a6f91b90 ("net: txgbe: support copper NIC with external PHY")
+Cc: stable@vger.kernel.org
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- .../ethernet/marvell/octeontx2/nic/cn20k.c    | 213 +++++++++---------
- .../ethernet/marvell/octeontx2/nic/cn20k.h    |   3 +
- .../marvell/octeontx2/nic/otx2_common.h       |   3 +
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   8 +
- 4 files changed, 124 insertions(+), 103 deletions(-)
+ drivers/net/ethernet/wangxun/txgbe/txgbe_main.c |  8 ++++++++
+ drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c  | 11 -----------
+ 2 files changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-index a5a8f4558717..08033858c59d 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.c
-@@ -242,15 +242,6 @@ int cn20k_register_pfvf_mbox_intr(struct otx2_nic *pf, int numvfs)
- 
- #define RQ_BP_LVL_AURA   (255 - ((85 * 256) / 100)) /* BP when 85% is full */
- 
--static u8 cn20k_aura_bpid_idx(struct otx2_nic *pfvf, int aura_id)
--{
--#ifdef CONFIG_DCB
--	return pfvf->queue_to_pfc_map[aura_id];
--#else
--	return 0;
--#endif
--}
--
- static int cn20k_tc_get_entry_index(struct otx2_flow_config *flow_cfg,
- 				    struct otx2_tc_flow *node)
- {
-@@ -517,84 +508,7 @@ int cn20k_tc_alloc_entry(struct otx2_nic *nic,
- 	return 0;
- }
- 
--static int cn20k_aura_aq_init(struct otx2_nic *pfvf, int aura_id,
--			      int pool_id, int numptrs)
--{
--	struct npa_cn20k_aq_enq_req *aq;
--	struct otx2_pool *pool;
--	u8 bpid_idx;
--	int err;
--
--	pool = &pfvf->qset.pool[pool_id];
--
--	/* Allocate memory for HW to update Aura count.
--	 * Alloc one cache line, so that it fits all FC_STYPE modes.
--	 */
--	if (!pool->fc_addr) {
--		err = qmem_alloc(pfvf->dev, &pool->fc_addr, 1, OTX2_ALIGN);
--		if (err)
--			return err;
--	}
--
--	/* Initialize this aura's context via AF */
--	aq = otx2_mbox_alloc_msg_npa_cn20k_aq_enq(&pfvf->mbox);
--	if (!aq) {
--		/* Shared mbox memory buffer is full, flush it and retry */
--		err = otx2_sync_mbox_msg(&pfvf->mbox);
--		if (err)
--			return err;
--		aq = otx2_mbox_alloc_msg_npa_cn20k_aq_enq(&pfvf->mbox);
--		if (!aq)
--			return -ENOMEM;
--	}
--
--	aq->aura_id = aura_id;
--
--	/* Will be filled by AF with correct pool context address */
--	aq->aura.pool_addr = pool_id;
--	aq->aura.pool_caching = 1;
--	aq->aura.shift = ilog2(numptrs) - 8;
--	aq->aura.count = numptrs;
--	aq->aura.limit = numptrs;
--	aq->aura.avg_level = 255;
--	aq->aura.ena = 1;
--	aq->aura.fc_ena = 1;
--	aq->aura.fc_addr = pool->fc_addr->iova;
--	aq->aura.fc_hyst_bits = 0; /* Store count on all updates */
--
--	/* Enable backpressure for RQ aura */
--	if (aura_id < pfvf->hw.rqpool_cnt && !is_otx2_lbkvf(pfvf->pdev)) {
--		aq->aura.bp_ena = 0;
--		/* If NIX1 LF is attached then specify NIX1_RX.
--		 *
--		 * Below NPA_AURA_S[BP_ENA] is set according to the
--		 * NPA_BPINTF_E enumeration given as:
--		 * 0x0 + a*0x1 where 'a' is 0 for NIX0_RX and 1 for NIX1_RX so
--		 * NIX0_RX is 0x0 + 0*0x1 = 0
--		 * NIX1_RX is 0x0 + 1*0x1 = 1
--		 * But in HRM it is given that
--		 * "NPA_AURA_S[BP_ENA](w1[33:32]) - Enable aura backpressure to
--		 * NIX-RX based on [BP] level. One bit per NIX-RX; index
--		 * enumerated by NPA_BPINTF_E."
--		 */
--		if (pfvf->nix_blkaddr == BLKADDR_NIX1)
--			aq->aura.bp_ena = 1;
--
--		bpid_idx = cn20k_aura_bpid_idx(pfvf, aura_id);
--		aq->aura.bpid = pfvf->bpid[bpid_idx];
--
--		/* Set backpressure level for RQ's Aura */
--		aq->aura.bp = RQ_BP_LVL_AURA;
--	}
--
--	/* Fill AQ info */
--	aq->ctype = NPA_AQ_CTYPE_AURA;
--	aq->op = NPA_AQ_INSTOP_INIT;
--
--	return 0;
--}
--
--static int cn20k_pool_aq_init(struct otx2_nic *pfvf, u16 pool_id,
-+static int cn20k_halo_aq_init(struct otx2_nic *pfvf, u16 pool_id,
- 			      int stack_pages, int numptrs, int buf_size,
- 			      int type)
- {
-@@ -610,36 +524,57 @@ static int cn20k_pool_aq_init(struct otx2_nic *pfvf, u16 pool_id,
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+index 0de051450a82..b4f95b3188dd 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+@@ -474,6 +474,12 @@ static int txgbe_open(struct net_device *netdev)
  	if (err)
- 		return err;
+ 		goto err_free_irq;
  
-+	/* Allocate memory for HW to update Aura count.
-+	 * Alloc one cache line, so that it fits all FC_STYPE modes.
-+	 */
-+	if (!pool->fc_addr) {
-+		err = qmem_alloc(pfvf->dev, &pool->fc_addr, 1, OTX2_ALIGN);
-+		if (err) {
-+			qmem_free(pfvf->dev, pool->stack);
-+			return err;
-+		}
-+	}
-+
- 	pool->rbsize = buf_size;
- 
--	/* Initialize this pool's context via AF */
-+	/* Initialize this aura's context via AF */
- 	aq = otx2_mbox_alloc_msg_npa_cn20k_aq_enq(&pfvf->mbox);
- 	if (!aq) {
- 		/* Shared mbox memory buffer is full, flush it and retry */
- 		err = otx2_sync_mbox_msg(&pfvf->mbox);
--		if (err) {
--			qmem_free(pfvf->dev, pool->stack);
--			return err;
--		}
++	if (wx->phydev) {
++		err = phylink_connect_phy(wx->phylink, wx->phydev);
 +		if (err)
-+			goto free_mem;
- 		aq = otx2_mbox_alloc_msg_npa_cn20k_aq_enq(&pfvf->mbox);
- 		if (!aq) {
--			qmem_free(pfvf->dev, pool->stack);
--			return -ENOMEM;
-+			err = -ENOMEM;
-+			goto free_mem;
- 		}
- 	}
- 
- 	aq->aura_id = pool_id;
--	aq->pool.stack_base = pool->stack->iova;
--	aq->pool.stack_caching = 1;
--	aq->pool.ena = 1;
--	aq->pool.buf_size = buf_size / 128;
--	aq->pool.stack_max_pages = stack_pages;
--	aq->pool.shift = ilog2(numptrs) - 8;
--	aq->pool.ptr_start = 0;
--	aq->pool.ptr_end = ~0ULL;
-+
-+	aq->halo.stack_base = pool->stack->iova;
-+	aq->halo.stack_caching = 1;
-+	aq->halo.ena = 1;
-+	aq->halo.buf_size = buf_size / 128;
-+	aq->halo.stack_max_pages = stack_pages;
-+	aq->halo.shift = ilog2(numptrs) - 8;
-+	aq->halo.ptr_start = 0;
-+	aq->halo.ptr_end = ~0ULL;
-+
-+	aq->halo.avg_level = 255;
-+	aq->halo.fc_ena = 1;
-+	aq->halo.fc_addr = pool->fc_addr->iova;
-+	aq->halo.fc_hyst_bits = 0; /* Store count on all updates */
-+
-+	if (pfvf->npa_dpc_valid) {
-+		aq->halo.op_dpc_ena = 1;
-+		aq->halo.op_dpc_set = pfvf->npa_dpc;
++			goto err_free_irq;
 +	}
-+	aq->halo.unified_ctx = 1;
++
+ 	wx_ptp_init(wx);
  
- 	/* Fill AQ info */
--	aq->ctype = NPA_AQ_CTYPE_POOL;
-+	aq->ctype = NPA_AQ_CTYPE_HALO;
- 	aq->op = NPA_AQ_INSTOP_INIT;
+ 	txgbe_up_complete(wx);
+@@ -527,6 +533,8 @@ static int txgbe_close(struct net_device *netdev)
+ 	wx_free_irq(wx);
+ 	txgbe_free_misc_irq(wx->priv);
+ 	wx_free_resources(wx);
++	if (wx->phydev)
++		phylink_disconnect_phy(wx->phylink);
+ 	txgbe_fdir_filter_exit(wx);
+ 	wx_control_hw(wx, false);
  
- 	if (type != AURA_NIX_RQ) {
-@@ -661,6 +596,78 @@ static int cn20k_pool_aq_init(struct otx2_nic *pfvf, u16 pool_id,
- 	}
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+index 8ea7aa07ae4e..7268a0c101f3 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+@@ -294,16 +294,6 @@ static int txgbe_phylink_init(struct txgbe *txgbe)
+ 	if (IS_ERR(phylink))
+ 		return PTR_ERR(phylink);
+ 
+-	if (wx->phydev) {
+-		int ret;
+-
+-		ret = phylink_connect_phy(phylink, wx->phydev);
+-		if (ret) {
+-			phylink_destroy(phylink);
+-			return ret;
+-		}
+-	}
+-
+ 	wx->phylink = phylink;
  
  	return 0;
-+
-+free_mem:
-+	qmem_free(pfvf->dev, pool->stack);
-+	qmem_free(pfvf->dev, pool->fc_addr);
-+	return err;
-+}
-+
-+static int cn20k_aura_aq_init(struct otx2_nic *pfvf, int aura_id,
-+			      int pool_id, int numptrs)
-+{
-+	return 0;
-+}
-+
-+static int cn20k_pool_aq_init(struct otx2_nic *pfvf, u16 pool_id,
-+			      int stack_pages, int numptrs, int buf_size,
-+			      int type)
-+{
-+	return cn20k_halo_aq_init(pfvf, pool_id, stack_pages,
-+				  numptrs, buf_size, type);
-+}
-+
-+int cn20k_npa_alloc_dpc(struct otx2_nic *nic)
-+{
-+	struct npa_cn20k_dpc_alloc_req *req;
-+	struct npa_cn20k_dpc_alloc_rsp *rsp;
-+	int err;
-+
-+	req = otx2_mbox_alloc_msg_npa_cn20k_dpc_alloc(&nic->mbox);
-+	if (!req)
-+		return -ENOMEM;
-+
-+	/* Count successful ALLOC requests only */
-+	req->dpc_conf = 1ULL << 4;
-+
-+	err = otx2_sync_mbox_msg(&nic->mbox);
-+	if (err)
-+		return err;
-+
-+	rsp = (struct npa_cn20k_dpc_alloc_rsp *)otx2_mbox_get_rsp(&nic->mbox.mbox,
-+								  0, &req->hdr);
-+	if (IS_ERR(rsp))
-+		return PTR_ERR(rsp);
-+
-+	nic->npa_dpc = rsp->cntr_id;
-+	nic->npa_dpc_valid = true;
-+
-+	return 0;
-+}
-+
-+int cn20k_npa_free_dpc(struct otx2_nic *nic)
-+{
-+	struct npa_cn20k_dpc_free_req *req;
-+	int err;
-+
-+	if (!nic->npa_dpc_valid)
-+		return 0;
-+
-+	mutex_lock(&nic->mbox.lock);
-+
-+	req = otx2_mbox_alloc_msg_npa_cn20k_dpc_free(&nic->mbox);
-+	if (!req) {
-+		mutex_unlock(&nic->mbox.lock);
-+		return -ENOMEM;
-+	}
-+
-+	req->cntr_id = nic->npa_dpc;
-+
-+	err = otx2_sync_mbox_msg(&nic->mbox);
-+
-+	mutex_unlock(&nic->mbox.lock);
-+
-+	return err;
- }
- 
- static int cn20k_sq_aq_init(void *dev, u16 qidx, u8 chan_offset, u16 sqb_aura)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
-index b5e527f6d7eb..16a69d84ea79 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn20k.h
-@@ -28,4 +28,7 @@ int cn20k_tc_alloc_entry(struct otx2_nic *nic,
- 			 struct otx2_tc_flow *new_node,
- 			 struct npc_install_flow_req *dummy);
- int cn20k_tc_free_mcam_entry(struct otx2_nic *nic, u16 entry);
-+int cn20k_npa_alloc_dpc(struct otx2_nic *nic);
-+int cn20k_npa_free_dpc(struct otx2_nic *nic);
-+
- #endif /* CN20K_H */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index eecee612b7b2..f997dfc0fedd 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -592,6 +592,9 @@ struct otx2_nic {
- 	struct cn10k_ipsec	ipsec;
- 	/* af_xdp zero-copy */
- 	unsigned long		*af_xdp_zc_qidx;
-+
-+	bool			npa_dpc_valid;
-+	u8			npa_dpc; /* NPA DPC counter id */
- };
- 
- static inline bool is_otx2_lbkvf(struct pci_dev *pdev)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index ee623476e5ff..2b5fe67d297c 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -1651,6 +1651,9 @@ int otx2_init_hw_resources(struct otx2_nic *pf)
- 	if (!is_otx2_lbkvf(pf->pdev))
- 		otx2_nix_config_bp(pf, true);
- 
-+	if (is_cn20k(pf->pdev))
-+		cn20k_npa_alloc_dpc(pf);
-+
- 	/* Init Auras and pools used by NIX RQ, for free buffer ptrs */
- 	err = otx2_rq_aura_pool_init(pf);
- 	if (err) {
-@@ -1726,6 +1729,8 @@ int otx2_init_hw_resources(struct otx2_nic *pf)
- 	otx2_ctx_disable(mbox, NPA_AQ_CTYPE_AURA, true);
- 	otx2_aura_pool_free(pf);
- err_free_nix_lf:
-+	if (pf->npa_dpc_valid)
-+		cn20k_npa_free_dpc(pf);
- 	mutex_lock(&mbox->lock);
- 	free_req = otx2_mbox_alloc_msg_nix_lf_free(mbox);
- 	if (free_req) {
-@@ -1790,6 +1795,9 @@ void otx2_free_hw_resources(struct otx2_nic *pf)
- 
- 	otx2_free_sq_res(pf);
- 
-+	if (is_cn20k(pf->pdev))
-+		cn20k_npa_free_dpc(pf);
-+
- 	/* Free RQ buffer pointers*/
- 	otx2_free_aura_ptr(pf, AURA_NIX_RQ);
- 
+@@ -657,7 +647,6 @@ void txgbe_remove_phy(struct txgbe *txgbe)
+ 		return;
+ 	case wx_mac_sp:
+ 		if (txgbe->wx->media_type == wx_media_copper) {
+-			phylink_disconnect_phy(txgbe->wx->phylink);
+ 			phylink_destroy(txgbe->wx->phylink);
+ 			return;
+ 		}
 -- 
 2.48.1
 
