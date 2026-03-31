@@ -1,173 +1,206 @@
-Return-Path: <netdev+bounces-273719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273720-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KHP9IAwMzGnGNgYAu9opvQ
-	(envelope-from <netdev+bounces-273719-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 20:01:48 +0200
+	id WATDMKMJzGn+NQYAu9opvQ
+	(envelope-from <netdev+bounces-273720-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 19:51:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CBA536FA0B
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 20:01:47 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FA4E36F67C
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 19:51:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E5DC5307E13F
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:43:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 73AF4300461F
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:47:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A8C43DA2B;
-	Tue, 31 Mar 2026 17:42:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A8D43DA2D;
+	Tue, 31 Mar 2026 17:47:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HUdn4dA2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cUH41bpr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9B943DA27;
-	Tue, 31 Mar 2026 17:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0190C3AA1AF
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 17:47:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774978976; cv=none; b=nNGu8rcA2YHsQGTZNfz+lyYcimUd0nwX87CcE5Ew53yl9kD4KUg5MvYmE/PvZllyu65MPp9q/rV5tKxEl16dY2iinOmYy1YIlCdNxVeXjfzPD0pgo7Z1W7sDGRt7MKKHDrQ46/7qraZHuySSEBJ7dijOQ7ip0uqFFn47cO+FaMI=
+	t=1774979248; cv=none; b=nbVlIPmQoN1XPa2tBKuJlYfDjR/byBU0fTXrpS7avplWy8H76EV3RMx1pbxLF4ysLpVpNOXBCG0O0HO+dMrMxIsktiNjRYTs07hr9u16lb3+BHxdfJm5/0gcPOgPDCmhwzWZGgnJu9ig2HLELbUcoiwcbQSA94QQlFcLwtRXCkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774978976; c=relaxed/simple;
-	bh=mZdGS/f/SYcwOsCwtcdESkfbxrPbR4QFcGm1edkc4tU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TfPxALIjJDIf61ohvxURUHYSO+l7cVlrftKYdnGEqNCEzgocWoEK+gvaTHDkQUG5Q7ZaEozYWwHpv0zRKLnFvlI1TW5Z36T7UAD/f3shMLzRjqT32SkVDa4qn0KPizy+B7BBB3MjuFJc0xtx+mcGVg0D6OGlEtJtVOE0ERBc0DA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HUdn4dA2; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774978972; x=1806514972;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=mZdGS/f/SYcwOsCwtcdESkfbxrPbR4QFcGm1edkc4tU=;
-  b=HUdn4dA2sGl+Cyaf1IaGExkMgCUSb2UIMTxMEJk9SFo4BD5PvQphwb/7
-   Rx4KJuXppSnrTJ9lCB+kA/PFevyGzNAtkCYv72fyoIP4osTRGvnfF6Sa6
-   m4uF6+TY3JvCBgW91DsvBVKLell2x4eGN2Y4lILXLtB2WgjoWi642fmJt
-   tXKsuXfHRL3kkb0nwhzOJhq+cFHM5tq1dwhbAw9LFtHJK6ynGArY69hst
-   C9sevywvzMVYJE7zGmyvreDfHqqpej+PCsJuBib0MDJU2jPbm1RQ0vupq
-   YXtgf3gSPomBxCio9aNYMikKnuPOJVb7LM3cmje6qM7GgQjEu0GgrIDrj
-   A==;
-X-CSE-ConnectionGUID: /4C31g3kTUGipVZoV6Vb8g==
-X-CSE-MsgGUID: aE1f1oClTCW0d9gnzSHKyg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11745"; a="75036939"
-X-IronPort-AV: E=Sophos;i="6.23,152,1770624000"; 
-   d="scan'208";a="75036939"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2026 10:42:50 -0700
-X-CSE-ConnectionGUID: 7D66jnOeQLi8AwqnmGuPNw==
-X-CSE-MsgGUID: kodmoxfISR25nyrOLuD2fQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,152,1770624000"; 
-   d="scan'208";a="249645584"
-Received: from igk-lkp-server01.igk.intel.com (HELO 9958d990ccf2) ([10.211.93.152])
-  by fmviesa001.fm.intel.com with ESMTP; 31 Mar 2026 10:42:48 -0700
-Received: from kbuild by 9958d990ccf2 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w7d6z-000000008Sr-3DXx;
-	Tue, 31 Mar 2026 17:42:45 +0000
-Date: Tue, 31 Mar 2026 19:42:42 +0200
-From: kernel test robot <lkp@intel.com>
-To: Jordan Rife <jrife@google.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Jordan Rife <jrife@google.com>,
-	bpf@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Yusuke Suzuki <yusuke.suzuki@isovalent.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Subject: Re: [PATCH net-next v3 2/4] udp: Remove disconnected sockets from
- the 4-tuple hash
-Message-ID: <202603311954.k4BkWpJN-lkp@intel.com>
-References: <20260330215707.2374657-3-jrife@google.com>
+	s=arc-20240116; t=1774979248; c=relaxed/simple;
+	bh=36v49/fbV4VRJB/+NrcVTAmFSFn0FhRq1Tz1wEyUG4k=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SEe1EdwajAXe3SmqAitUAmIuKz7TnEKxs6MIe9FTxRpRmbvwL5hlXBn1ZxF8dreUvM2+UboDtqXx/YTGbhLKrdiBVgijQXeLXtgv9ybkGQFCR12+/61am8OvgYPIhmzyoBsqB2dz2cIyryje2HHdokv4nFW9Lz6vpaqfUrMjgNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cUH41bpr; arc=none smtp.client-ip=209.85.160.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-5090e08dcfcso52597001cf.0
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 10:47:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774979246; x=1775584046; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=pS9Lmi7r6BF7CSKJWWcfP9WovjVQImzGq2W57fNtUXc=;
+        b=cUH41bprMh9+j9VXGCgVvVDnsovSvXu57jqcsn77/TAM3GKkoo+t6KPfzIwtpeSNpV
+         hwA3eI/HYxRDMTNQWCfH4RCmbrKeboj0Luj+L3Yh1mY7TD0F2k+P5EqQ1MjNnkYdKooR
+         2LeCRwjzH3SUBbc6t4JtGmuoJbZjBwrHK2ZA64o/sJponFHnWlJb6D8XavSFREGIRMEo
+         onhsbi6oKV0y03dRcOYOoo1ZYiZ8LzqfXYvPAHkugE9o5fl7bCNGF8Zft7mfGPowPqjo
+         ozQ5sVOkAUfkSXsGOKP3irUrafCPS+WwuC7Ci0vlST3B/m6lq7Upqt52b8Bd4PpTyhw4
+         x9CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774979246; x=1775584046;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pS9Lmi7r6BF7CSKJWWcfP9WovjVQImzGq2W57fNtUXc=;
+        b=c8OWZpcPnHXqtofK1aNmmY2gTPG/i3rk9AM++IB8eajU6yFi103ualMy0V72j4K0U/
+         sdXt501NvRIGAZRT+NU7ACvaAd/uc5OGpPNIVBcgVynt2Bt2pksNzrV+U6r/8AjYv6UR
+         C0b2IP3d9wDYQxhZVqtcnO/OJhottYJGC7uEIWbW3PCjJzVGj4Yyd6W9vUBilv/8Pc8b
+         ozJo1ojR8azp2zC4IUuW6VUsCr/a+tbZna4IJFPELNnfJ2i3y3QG08GEklhQuYM6A+Ca
+         nDMtvWpzQlc7NH93kapuZXRqJjTTEr9haq0jZnwSnKusJmQGCGdYX5Np+p8+Bwt3sWIV
+         eKbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV2EeOm2ZMtPvm4BacVj97uAmjgFWoarIs9jGG5a4vXw1oIPwkoqzzLFAsP1wbksWu8s/wI6Ko=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyju2bxIXk7EBUlo9bZlZccGV0sM8Mz08+hVMPH+G90lIcE/fnq
+	D6blXR0NCDtVqc0AjaWeblGKKZ6NBNdL50gqaWCeIkKjVqvTNF2CICOHV/8rm4Kfx/hdKr9blqp
+	Ae5qW0rqn/yIaMw==
+X-Received: from qtbhx9.prod.google.com ([2002:a05:622a:6689:b0:503:34fa:ca78])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ac8:5715:0:b0:50d:2a76:43c5 with SMTP id d75a77b69052e-50d3bc2d98fmr7231731cf.2.1774979245543;
+ Tue, 31 Mar 2026 10:47:25 -0700 (PDT)
+Date: Tue, 31 Mar 2026 17:47:22 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260330215707.2374657-3-jrife@google.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.1118.gaef5881109-goog
+Message-ID: <20260331174722.4128061-1-edumazet@google.com>
+Subject: [PATCH v2 net-next] ipv6: move ip6_dst_hoplimit() to net/ipv6/ip6_output.c
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	Fernando Fernandez Mancera <fmancera@suse.de>, Kuniyuki Iwashima <kuniyu@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[lists.linux.dev,google.com,vger.kernel.org,gmail.com,iogearbox.net,linux.dev,fomichev.me,kernel.org,isovalent.com];
-	TAGGED_FROM(0.00)[bounces-273719-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,gmail.com,google.com,suse.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273720-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,01.org:url]
-X-Rspamd-Queue-Id: 7CBA536FA0B
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3FA4E36F67C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jordan,
+Move ip6_dst_hoplimit() to net/ipv6/ip6_output.c so that compiler
+can (auto)inline it from ip6_xmit().
 
-kernel test robot noticed the following build errors:
+$ scripts/bloat-o-meter -t vmlinux.0 vmlinux.1
+add/remove: 0/0 grow/shrink: 0/1 up/down: 0/-11 (-11)
+Function                                     old     new   delta
+ip6_xmit                                    1684    1673     -11
+Total: Before=29655407, After=29655396, chg -0.00%
 
-[auto build test ERROR on net-next/main]
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Fernando Fernandez Mancera <fmancera@suse.de>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+v2: Resend after IPv6 is no longer a module.
+    Added Fernando and Kuniyuki 'Reviewed-by'
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jordan-Rife/udp-Only-compare-daddr-dport-when-sk_state-TCP_ESTABLISHED/20260331-082300
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260330215707.2374657-3-jrife%40google.com
-patch subject: [PATCH net-next v3 2/4] udp: Remove disconnected sockets from the 4-tuple hash
-config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20260331/202603311954.k4BkWpJN-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260331/202603311954.k4BkWpJN-lkp@intel.com/reproduce)
+ net/ipv6/ip6_output.c  | 21 +++++++++++++++++++++
+ net/ipv6/output_core.c | 23 -----------------------
+ 2 files changed, 21 insertions(+), 23 deletions(-)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202603311954.k4BkWpJN-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   net/ipv4/udp.c: In function 'udp_disconnect_unhash4':
->> net/ipv4/udp.c:2182:38: error: implicit declaration of function 'udp_get_table_prot'; did you mean 'vm_get_page_prot'? [-Wimplicit-function-declaration]
-    2182 |         struct udp_table *udptable = udp_get_table_prot(sk);
-         |                                      ^~~~~~~~~~~~~~~~~~
-         |                                      vm_get_page_prot
->> net/ipv4/udp.c:2182:38: error: initialization of 'struct udp_table *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-
-
-vim +2182 net/ipv4/udp.c
-
-  2179	
-  2180	static int udp_disconnect_unhash4(struct sock *sk, int flags)
-  2181	{
-> 2182		struct udp_table *udptable = udp_get_table_prot(sk);
-  2183	
-  2184		udp_unhash4(udptable, sk);
-  2185		__udp_disconnect(sk, flags);
-  2186	
-  2187		return 0;
-  2188	}
-  2189	
-
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index 63abc4fddaee8e9cf2ad2ef0873c963eaea63247..7e92909ab5be3f86b10bf9527e97f3bfe794e9e9 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -259,6 +259,27 @@ bool ip6_autoflowlabel(struct net *net, const struct sock *sk)
+ 	return inet6_test_bit(AUTOFLOWLABEL, sk);
+ }
+ 
++int ip6_dst_hoplimit(struct dst_entry *dst)
++{
++	int hoplimit = dst_metric_raw(dst, RTAX_HOPLIMIT);
++
++	rcu_read_lock();
++	if (hoplimit == 0) {
++		struct net_device *dev = dst_dev_rcu(dst);
++		struct inet6_dev *idev;
++
++		idev = __in6_dev_get(dev);
++		if (idev)
++			hoplimit = READ_ONCE(idev->cnf.hop_limit);
++		else
++			hoplimit = READ_ONCE(dev_net(dev)->ipv6.devconf_all->hop_limit);
++	}
++	rcu_read_unlock();
++
++	return hoplimit;
++}
++EXPORT_SYMBOL(ip6_dst_hoplimit);
++
+ /*
+  * xmit an sk_buff (used by TCP and SCTP)
+  * Note : socket lock is not held for SYNACK packets, but might be modified
+diff --git a/net/ipv6/output_core.c b/net/ipv6/output_core.c
+index cba1684a3f30ff98517d873ddb8e97f32adc9791..64b1eeb79b572b8b412c60f832c4a7984ac8276f 100644
+--- a/net/ipv6/output_core.c
++++ b/net/ipv6/output_core.c
+@@ -100,29 +100,6 @@ int ip6_find_1stfragopt(struct sk_buff *skb, u8 **nexthdr)
+ }
+ EXPORT_SYMBOL(ip6_find_1stfragopt);
+ 
+-#if IS_ENABLED(CONFIG_IPV6)
+-int ip6_dst_hoplimit(struct dst_entry *dst)
+-{
+-	int hoplimit = dst_metric_raw(dst, RTAX_HOPLIMIT);
+-
+-	rcu_read_lock();
+-	if (hoplimit == 0) {
+-		struct net_device *dev = dst_dev_rcu(dst);
+-		struct inet6_dev *idev;
+-
+-		idev = __in6_dev_get(dev);
+-		if (idev)
+-			hoplimit = READ_ONCE(idev->cnf.hop_limit);
+-		else
+-			hoplimit = READ_ONCE(dev_net(dev)->ipv6.devconf_all->hop_limit);
+-	}
+-	rcu_read_unlock();
+-
+-	return hoplimit;
+-}
+-EXPORT_SYMBOL(ip6_dst_hoplimit);
+-#endif
+-
+ int __ip6_local_out(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+ 	ipv6_set_payload_len(ipv6_hdr(skb), skb->len - sizeof(struct ipv6hdr));
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.53.0.1118.gaef5881109-goog
+
 
