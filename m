@@ -1,266 +1,214 @@
-Return-Path: <netdev+bounces-273391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273393-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kPL1MS0Py2msDQYAu9opvQ
-	(envelope-from <netdev+bounces-273391-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:02:53 +0200
+	id ACu5GxwQy2lCDgYAu9opvQ
+	(envelope-from <netdev+bounces-273393-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:06:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3833E362877
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:02:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C929A3628D5
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:06:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 789F4302BA5E
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:02:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 219E530378BC
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:05:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488D0175A7C;
-	Tue, 31 Mar 2026 00:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 665D311CBA;
+	Tue, 31 Mar 2026 00:05:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="A3Fu1OtC"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="LoZU6trn"
 X-Original-To: netdev@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012006.outbound.protection.outlook.com [52.101.48.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9724428FC;
-	Tue, 31 Mar 2026 00:02:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.6
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774915325; cv=fail; b=nTH5nVpawHfQiUMNgLm44uoQRSr/BJAJArdW+L4iAhdf20qifsW/l6Onr0e/2iixF3pI0nnrI/wvm9066t/yyvTmUstLlznSnUxtnGGFaRQrlRJaxURvtXn8isVFiNRBoBIR8PA6DAd//R29jv3FwnAuKvHRMXBNBYZHmXWkF7g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774915325; c=relaxed/simple;
-	bh=ds8jGvX2OO1nWVWyBZt4sNeE2i0m1WcmkJ8fqiUOb6w=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XNXFaXz9916UYNfh5xKG6ccZ2MP6coMXh5d+K+PdqXvNgsq4fyeydu1WGpPogC7Ma3dTqdzItkLhcuHeVVvZ83N/XohvjNuUA//fljeiphd7IVAvI/qnGUVHgn7XQJTHOsfbzJIttr3xv5PW+tDRCNjO137Zmm5tiPhWsA80V0Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=A3Fu1OtC; arc=fail smtp.client-ip=52.101.48.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QPZHF1tKEsHk1HBsUG+588P0SImL2POWav2U2OnM/3CSd7srlzckUeM61d7OvB24lxbBurX14rZWzChmXztAivXSIZoPcB5MY3LJH0MQ6OPTQuzUHvNga0eH0V2nCeqPhCZpfmTBDQLhSrMVqEaNESDYnLQPcbXZUQ4h085VJj+GpES4rUgJeH3nf2tSsBCdp9Ub28MQ1wqqK7i2qkg3NhX69+E3L3HD10HHSWA+nCXVsvRHt5JIgUorrrwncQ681GAbehOPU7Mj6DjeMsxZr7wy0jnPwXNt48nFZuMv8f/XZPjp8Oe8XvjK35EbjuymCykQ+k49q2BTO2LLboNrQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X7jefVcNO14YFQzapvvzUxWNSlvLLcgEYuCpOmcrv18=;
- b=jRNy+pIRcME9RgrkW/YaUZXFgjYPSxMOooR4O+halKRynVctuLEKftd6vu17zkKnd4JXGWZNvWwBFW1il6vLH75fua4s70cInfwA0gef19kqxbQZ1PEvuxuv7cv3U43748w5r1X46CYEyl6EtsKJDnjI8fNttgvJ7Lb5SE/UJ9gNSYDS/Mj25vIiUz/Yj78nM/jfjE+Kjz5qGxyo/wcq8floaSjCBprWv2Iqq08A90Bf05LOpdsIWj9NF+SKbkt/YImcrYRavU0qp+M/R9Q082MuBwZOXBJIukvMcUbaZlM51ME4qitEASeZYsz/9cpcuVVKBW3Qwi5gBdR/gvIWlg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X7jefVcNO14YFQzapvvzUxWNSlvLLcgEYuCpOmcrv18=;
- b=A3Fu1OtCpGZiyH9rsCKdqon3AaHqwWV5rCQ0nRmjfVCakzSifAVNqzYrp/7E2D4guv8gDCmPwASr/4g/dEecTJFFx1YzRo90pzYz+u/AvJpQoTBKMLChD6oF5+uzebFeX1ErL1Ms/3rT7jA9vZY7Su9mMXXtn5cgo7mVHMj9fKI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BN9PR12MB5115.namprd12.prod.outlook.com (2603:10b6:408:118::14)
- by PH0PR12MB8032.namprd12.prod.outlook.com (2603:10b6:510:26f::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.15; Tue, 31 Mar
- 2026 00:01:59 +0000
-Received: from BN9PR12MB5115.namprd12.prod.outlook.com
- ([fe80::230d:c588:d858:9977]) by BN9PR12MB5115.namprd12.prod.outlook.com
- ([fe80::230d:c588:d858:9977%6]) with mapi id 15.20.9769.014; Tue, 31 Mar 2026
- 00:01:59 +0000
-Message-ID: <2ab40ebb-6ce6-490f-a22b-6b2ee873c085@amd.com>
-Date: Mon, 30 Mar 2026 20:01:57 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 1/3] PCI: AtomicOps: Do not enable requests by RCiEPs
-To: Bjorn Helgaas <helgaas@kernel.org>, Gerd Bayer <gbayer@linux.ibm.com>,
- Alex Deucher <alexander.deucher@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Selvin Xavier <selvin.xavier@broadcom.com>,
- Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- Michal Kalderon <mkalderon@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>, Jay Cornwall <Jay.Cornwall@amd.com>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Niklas Schnelle <schnelle@linux.ibm.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Alexander Schmidt
- <alexs@linux.ibm.com>, linux-s390@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <20260330214253.GA92498@bhelgaas>
-Content-Language: en-US
-From: "Kuehling, Felix" <felix.kuehling@amd.com>
-In-Reply-To: <20260330214253.GA92498@bhelgaas>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: YT1PR01CA0060.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:2e::29) To BN9PR12MB5115.namprd12.prod.outlook.com
- (2603:10b6:408:118::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8DBEACD
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 00:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774915505; cv=none; b=hu7R4K+DcKBEIVp+ZXMbJCbrWDqpCLmcLraIKVo6rjGGs3ogmfgMWhO6MIFSWGr9LWw9v8qnxftcb3po3n4X6jX/JXkt2KG30MzWbzFFLiGf1lJItUoztP5VcEgcY74FQfC1sKinLTHBy1b+SuABXxvjy/Qquf/Udug0B692dqo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774915505; c=relaxed/simple;
+	bh=qfzmflUp49CvW+6S238rJkRsxzoduCgnAbdn408rKxw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Sr9ro9q+gA5a2sG+LO5Q/KP87bnfmiM8YrvWazhse3NVuZJ5gwf+YWFua2d1LEEQiOpI0YbyDZW+Scib4Wob4avHIvimomHN4uGDETuxWZcc0jWG6DSewwqnZJP9wcyvdHLnjxhYbWcnumrR4ZAMciNGGNxgh8sL/JXlSgrL78g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=LoZU6trn; arc=none smtp.client-ip=209.85.161.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-67c250805ccso1931779eaf.1
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 17:05:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1774915502; x=1775520302; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=18yatGeQ7YApJ2t5FxEsmf5yyYL6ML89guDbbsjZR2M=;
+        b=LoZU6trnUEf1odxH96Kh/eZI3jDpXLFOmQdNhCsVj4S+iTgG/t61fDjZLSzRDOxI+6
+         d0aMDvnED9gb0Cry256h5D+1NMh3RF7V3ZUQuiiQZ7+2l477DnfJt1FzrQ8SBk7N8j3X
+         BMdol0dgfnFBp+GQSgprNrrE45bChXgab9HByonvj7PPuPr6LmEZ/quRZWfLQPOxnxLy
+         x7Ask028H1JSvXCOXpe6KC2viDm6fnFlzu0GqhZtqkgBXFceJp3wt2iQ42/D15rXolP5
+         p9Fdu4czfejlZzPKERO3/Z/kIesrq2xiFOnjY9F8TmpcZsxMYnYI9qaswjYTTGIJDM3G
+         VlGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774915502; x=1775520302;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=18yatGeQ7YApJ2t5FxEsmf5yyYL6ML89guDbbsjZR2M=;
+        b=hAqSZpBti9vVfo+vxI7Lxl5NKV3KnDYCv6uLQ54/4bmm2WaTj6Bljw/NV6dNBLl1JJ
+         ZSd8ZG9a7FhzvfA1k6nIBeKc+bRk70GecybspNO2Z1oFjYYnVZsQA80B/EUDqeMjsiOG
+         w4O+7mU0Z5e25Q8yQafHPn31xV1QINhEPhiu5HoN3q8yvj5gaQUx19lh1P0RqTJ2NGkE
+         sNaDNFgrC+rDFFTZe0VzBvxG57XfAp/viBb3fg9EtRzKJmq0NMJzCzHyUrB2QRXjX4Q+
+         EA3YwttIJwxSXu8endegIpRNRZlFmohLBbRuwTz00ILIex1+NiSwtmrU6tDcdMALmdWO
+         hgrw==
+X-Gm-Message-State: AOJu0YwEWWoT6PCYRgCfo+UDwIXGaWVt3Wzk6GbpTnQh5kH/ps60izv6
+	Am95lHk1EuU7Cs1uvSEZCPn18WLxsaCkelO18JpfpMjzA3LDh9ozCID6YVW2E3aczXEErnMvgLt
+	l2FpEgmv6UTdrOz91eX1EzUQfCjcd08vLgGDnTfHpKBaCuYxmBFgD/QTRXPgwKQV0NRqf3i34sc
+	MNgWAkWFqUz1VfSHyyN3nCQ5NuVOqi2fM/sedBQS8t9dYT+OU=
+X-Gm-Gg: ATEYQzzv36GBlO3ykppHYIWzBHV81x4ZNrHR63UHhFIWk52WAxMzKQPuucOeKCf20FG
+	udgk9HQ9J+SO5oI6UfDtlsnN3ZMkVxBZyCXzXqyHHPhFX4mcDrDa3RFEpRMuaWxsinue6Ihs/ni
+	yJubjC5IC1a84wVVRSHxhqJ8zL8FRgUmujLx43NUK3uRljd4vFcOGC8S1I+Pu3d8vLjm/7vPtei
+	66Rg7mO56bHwueRkQ9tYmPfAX36eqtB/4EJO10gnFbIKIOgOv5Ww9LIvqb4KTOprsiCw6VUXkyq
+	TAC7F4qUB0K3FEmlqXA/lJ20ioEzSRhtEAPpa0ezD1AZ5Vb6CmwGCV4NHCDJpwrnZ1It7Hl1n5R
+	syaedu8lHAlRLDdewEuX29MQPZ3/MG4zGX2C7LGDiQhnDJ+eY9UFEp8RVZ+odmkQfCak3NdtVmG
+	V0gVueCoUw3mFB/2BDTrY94jnfavrDgsrwVrNshixS2nlHESVsnyzFjQk9qEdLvxjH8pRqW4y4D
+	To=
+X-Received: by 2002:a05:6820:1609:b0:67e:2acc:5c9 with SMTP id 006d021491bc7-67e2acc083emr4446414eaf.44.1774915502296;
+        Mon, 30 Mar 2026 17:05:02 -0700 (PDT)
+Received: from dev-rjethwani.tier4-kif-devvm.svc.slc-eng-prd2 ([208.88.159.128])
+        by smtp.googlemail.com with ESMTPSA id 006d021491bc7-67e231cb2e2sm5627807eaf.12.2026.03.30.17.05.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 17:05:01 -0700 (PDT)
+From: Rishikesh Jethwani <rjethwani@purestorage.com>
+To: netdev@vger.kernel.org
+Cc: saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	mbloch@nvidia.com,
+	borisp@nvidia.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	sd@queasysnail.net,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	leon@kernel.org,
+	Rishikesh Jethwani <rjethwani@purestorage.com>
+Subject: [PATCH net-next v10 0/6] tls: Add TLS 1.3 hardware offload support
+Date: Mon, 30 Mar 2026 18:04:38 -0600
+Message-Id: <20260331000444.4103528-1-rjethwani@purestorage.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN9PR12MB5115:EE_|PH0PR12MB8032:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9d2bb523-c2d7-404e-02e3-08de8eb8baf0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|921020|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	1AxeTpa3t+7+gwF4n7YHqtfPSNJvjE5uZbn4ygx2W0aWxTcG0nZz6hSlXIbpc/iv3kZc0DwygaUZoksxyDhpzi/oGrpuok5GScYjmPgMG8ldImhVJYGnsR0SlMuZNhHFDh4ek/0nv5pRhghO2uBldI4OAg9fdXOKTpKzgpxlKaIlmIomcvAwFFxv72sf1BXKpe3b1+9jimyKe9Qyz7uy3oB/pqftzsB94L7i9CWplsV16WHdv+KwynpKQQWW/QF2Ufo2n6Xn1Ji/fezPZn62c/vxRRrvlWLlbR23feNp1VWDLB/c8L1JfM01TdOW5UxWS5IN+sG0fJgGkRPUIzlpj/7voavBQCWCN4+ORYNI/YknCNaqggzX6sz5mYcQ6zuOtwrbiaq6VvbFaSSZqJkzktb4r44CAKhAFNQU1ynkvoUDboi0GOY7SEeGIgnLUpUZI93yjKE2l4zTby8zjx4PA/jCyENtMfTN2PXk0x5dLBh8++2oLBDbpgzSnPpJPOFdK3Pb1NenLcwBIaH6C8S99QvRmfZOk0rMRLwp/HW68r1vOQPhAT5bS3OGmhaAHDQ4BayV7QzUfrjXTXAdLKPizTPeGlwCtatSFFEGlA7/mq+pJkQGmdjKu/eL9yB4sRbVP2PGvuXt0Nig8e5R3swD/L8L8/5FZxFCyJ+W6iHQfhv4dkZ3aukg+/44gTVZwudmnjo4/9S39/R8e9LSEdex714vzAadEtYgI4HKa3ATeHu9B02YIm48ooCxDAodozD1
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR12MB5115.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(921020)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UFdtbloyeVhrRjRWekdqVjhBV05XODhpVy8yVExVbXIzRWhxdERHZU9VVTN4?=
- =?utf-8?B?VGg0Ym1BRjhwT2doVGVnRWUzVTJ2VjI4LzdhaWhiSFhPaWhuVzltTXBITWFz?=
- =?utf-8?B?dzhRQlFvQWJCSjQwT2xVM1hrTHNEQ0EwMnYwNWV4UWxxajNMSVNzZVV2T3dD?=
- =?utf-8?B?UStlbC9LNWdFMk5QY3h6eUVBQk96TmhiTkhyRjhmdTZuN3UrTEtQZG0yQzJF?=
- =?utf-8?B?R3E3REF0RElYejFIV01maWlDOXNDMCtLN3NrUkNEQkhiNG1KMHBoZXdDMm1I?=
- =?utf-8?B?QTdmdUZOQ0dGRlJRVG5GM3RlUU5UYTJpZVREcTdJTm9Cay9heHJFWm4zVmtF?=
- =?utf-8?B?SmdocmRJbmtFK2FFMkxKZ2pMN0wyQkFmbC9uaEJDb1JEeWF1Tkt0WFBZdW5E?=
- =?utf-8?B?T0hHZWNjL3NiaE5zYXpYNzdqKzFDTEtLTkpEbkk2UVFoOWwzQzlGdm1ZU2lB?=
- =?utf-8?B?SUJTeDNJQ1pTVnRqZkt4MkR5R1pUNVBuUkdKTUpFVlltYUpmcnl2cmRFSlhG?=
- =?utf-8?B?WW9TSjhGdENUc3N3KzE0S1hGYm1Fd2dmTjRpSXg2UlN0RzEyaHdEQ1lLM2F2?=
- =?utf-8?B?TUJuQTMxNFlyQ29weE1lN3N2eEFhdmRadzc0N0FaUzVoZ0ptNVlOdkQxNnFV?=
- =?utf-8?B?bWE2UzBMMi90KzZSc3JZcklXb3ZGeTRPVVZ0ZE1TMEsreC9tOUJmRU1OMG51?=
- =?utf-8?B?SitFeTdYd0lJTHZSemRrMEtGWDR5S1M5aE50VmFYemtJM1dhbkRseHVXMWlp?=
- =?utf-8?B?bE5QT1NrQUtqb1QyeHFXWUtLTTBDaXFRUmdwNEpMZDJrYjNTN001OGVMQ2NM?=
- =?utf-8?B?am04S1JFOTJxQ2pZWDExamFwSUlwT0I0U0JUOVljMjZRamwxT0IrNktOZFNY?=
- =?utf-8?B?elUxOU5YUjVZMmhMd0FsWkhGWERLRVQrYUQrYUQ5Lytnc0xKcHpmV3Jpb2t1?=
- =?utf-8?B?Rm4zZ09xdE1ESUZhR3ZReUg1ajNTbnk3MENnWjZUenEreGZkblVZVm9yVmdD?=
- =?utf-8?B?azUyVGNHU00xVXBBZTA1M2hvc3JmMkV6Y3BSR2prTUpQRUFyQ2lzZElCSHpt?=
- =?utf-8?B?T2doMWdKMk5QNHJ0d1ZLdmFwaFRBaUV3ZkQ0bUtiY0xDSit5STROWjhKS2JS?=
- =?utf-8?B?TjdlNmsycm8zTHQ0MGdHb3pEbTdXTDA2V2tiQjNKVkZvVUxYUk4rMnpoeDJN?=
- =?utf-8?B?WHU3ZXhUVlpwZjVadm81ZFhIcUl2M1dIcFFaZkN3UEZtRlcrVDFZcUxuOTNq?=
- =?utf-8?B?dGxxa3lJbHJHMjRBYjVEV2FHekk0OWZFMmVlMGlpdGNrS0U5aFZvdUcwM0I1?=
- =?utf-8?B?Q21OazNrcWk5MG5qNkt1ZmUxNHJnTzJ3VnIrbFM1L3R1S3lGbWpvM3MzTkFO?=
- =?utf-8?B?VUoreXVXZGN2WG9PWkdmc2xrSzkwQkxFd0NTT1pqbVZNNXJaZ1hsNC9iMlZ3?=
- =?utf-8?B?WlVoaDBUR2JidHNZWFlHTzAyc21YYVA0bjR4UTJHUUkzVUxIK25aRER3bWUr?=
- =?utf-8?B?SEFnYUNibXNjU040Wno4RzNGL2hnWWdnc0FTOGRqcnorV2o1MjYyczVwZVBj?=
- =?utf-8?B?Ly9VOUFGVVorMERjd0x1ZVdHZHpZZFNoUmxaRXVhRHhrWW9scjZ6M3NYdEw0?=
- =?utf-8?B?cFVtbW5kZlRkZzc4LzdxeDN1R1dtb250ZTJOLzBKRDFnV1gzT1FRdHpRZ1hW?=
- =?utf-8?B?WDQyUFNpT3lFK0JCNU9FNFd6OGRleDRTaWVwMWtMcWRNc2lsUFRqYU1wRHZE?=
- =?utf-8?B?aGFFZkhpWWpST29md3BraEc1UFluck9Xdk1HVVBaZWNvRWdWaEFrL3lEaGFm?=
- =?utf-8?B?L29zWUNyMk54NTdZVlJSR3g0L1VBcDNRS1RNZEZJMkVTVGt6cFdmOFdNbGxv?=
- =?utf-8?B?L2RiTHZuNURBd0U4NVQxT0UyaVFGMmlLT01kSkQ0eUdIZlhtK2xWWGpidHdm?=
- =?utf-8?B?OG9BMFROZDBsMHNLQ0FZcDJGL0F5OVh2dXdjVzFobFBhZ2VZc2FrRFVHVUx3?=
- =?utf-8?B?YXQreHVMRmhsZ0JremwxWnNQdEMyWC9IaVQ2c3drbDFrUTc0cEtseTh5cUt3?=
- =?utf-8?B?aFdZNzUraFA4NmxLRVIxa1ZLbDlhUUdoUkhocFpab3pqRnUwTjllWkg0dVV5?=
- =?utf-8?B?OVVxZHZTbTRrbFhpaWk4TlEzcTJEalZMVitOY3RNeFdLcDlqdnpEaFM0NFh5?=
- =?utf-8?B?ZUd3TUxpWi9HUGJZQTFJTExVUURLbjdyVjg1UCtiaWptVzR4Rm45cUxWdkhy?=
- =?utf-8?B?djUrR1AzaTNndUhHRWFUdzFKR210TGJwSnVlUzNyckxoNnVVdkQxQTJCcUVk?=
- =?utf-8?B?VC94UUl0OER0RkF3azBNemVzemM2bDdJVDljVTBxODN1RlZtSTJ3dz09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d2bb523-c2d7-404e-02e3-08de8eb8baf0
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR12MB5115.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Mar 2026 00:01:59.7117
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KJym0xETwCogM9zK0EWdZ9j80Rq4f41/SCwOim5VaL8zVN1sgShhbUSy1/fh+ZnRrUgE9JNZV1/YGZNDZyUtUA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8032
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[purestorage.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273391-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,redhat.com,google.com,purestorage.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-273393-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[felix.kuehling@amd.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[purestorage.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amd.com:dkim,amd.com:mid]
-X-Rspamd-Queue-Id: 3833E362877
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,purestorage.com:dkim,purestorage.com:mid]
+X-Rspamd-Queue-Id: C929A3628D5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi all,
 
-On 2026-03-30 17:42, Bjorn Helgaas wrote:
-> [+to amdgpu, bnxe_re, mlx5 IB, qedr, mlx5 maintainers]
->
-> On Mon, Mar 30, 2026 at 03:09:44PM +0200, Gerd Bayer wrote:
->> Since root complex integrated end points (RCiEPs) attach to a bus that
->> has no bridge device describing the root port, the capability to
->> complete AtomicOps requests cannot be determined with PCIe methods.
->>
->> Change default of pci_enable_atomic_ops_to_root() to not enable
->> AtomicOps requests on RCiEPs.
-> I know I suggested this because there's nothing explicit that tells us
-> whether the RC supports atomic ops from RCiEPs [1].  But I'm concerned
-> that GPUs, infiniband HCAs, and NICs that use atomic ops may be
-> implemented as RCiEPs and would be broken by this.
+This series adds TLS 1.3 hardware offload support including KeyUpdate
+(rekey) and a selftest for validation.
 
-FWIW, on AMD APUs our driver doesn't call pci_enable_atomic_ops_to_root. 
-It just assumes that the GPU can do atomic accesses because it doesn't 
-actually go through PCIe: 
-https://elixir.bootlin.com/linux/v6.19.10/source/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c#L4785
+Patch 1: Reject TLS 1.3 offload in chcr_ktls and nfp drivers
+  These drivers only support TLS 1.2; add explicit version check.
 
-Regards,
-   Felix
+Patch 2: mlx5e TLS 1.3 hardware offload
+  Add TLS 1.3 TX/RX offload on ConnectX-6 Dx and newer.
+  Handle 12-byte IV format and TLS_1_3 context type.
 
+Patch 3: Core TLS 1.3 hardware offload support
+  Extend tls_device.c for TLS 1.3 record format (content type
+  appended before tag). Handle TLS 1.3 IV construction in fallback.
 
->
-> These drivers use pci_enable_atomic_ops_to_root():
->
->    amdgpu
->    bnxt_re (infiniband)
->    mlx5 (infinband)
->    qedr (infiniband)
->    mlx5 (ethernet)
->
-> Maybe we should assume that because RCiEPs are directly integrated
-> into the RC, the RCiEP would only allow AtomicOp Requester Enable to
-> be set if the RC supports atomic ops?
->
-> I don't like making assumptions like that, but it'd be worse to break
-> these devices.
->
-> [1] https://lore.kernel.org/all/20260326164002.GA1325368@bhelgaas
->
->> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
->> ---
->>   drivers/pci/pci.c | 5 ++---
->>   1 file changed, 2 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
->> index 8479c2e1f74f1044416281aba11bf071ea89488a..135e5b591df405e87e7f520a618d7e2ccba55ce1 100644
->> --- a/drivers/pci/pci.c
->> +++ b/drivers/pci/pci.c
->> @@ -3692,15 +3692,14 @@ int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
->>   
->>   	/*
->>   	 * Per PCIe r4.0, sec 6.15, endpoints and root ports may be
->> -	 * AtomicOp requesters.  For now, we only support endpoints as
->> -	 * requesters and root ports as completers.  No endpoints as
->> +	 * AtomicOp requesters.  For now, we only support (legacy) endpoints
->> +	 * as requesters and root ports as completers.  No endpoints as
->>   	 * completers, and no peer-to-peer.
->>   	 */
->>   
->>   	switch (pci_pcie_type(dev)) {
->>   	case PCI_EXP_TYPE_ENDPOINT:
->>   	case PCI_EXP_TYPE_LEG_END:
->> -	case PCI_EXP_TYPE_RC_END:
->>   		break;
->>   	default:
->>   		return -EINVAL;
->>
->> -- 
->> 2.51.0
->>
+Patch 4: Split tls_set_sw_offload into init/finalize
+  Allows HW RX path to init SW context, attempt HW setup, then
+  finalize. Required for proper rekey error handling.
+
+Patch 5: Hardware offload key update (rekey) support
+  Delete old HW context and add new one with updated key.
+  Track ACKs to ensure old-key data is flushed before HW switch.
+
+Patch 6: Selftest for hardware offload
+  Python wrapper + C binary using NetDrvEpEnv framework.
+  Tests TLS 1.2/1.3, AES-GCM-128/256, rekey, various buffer sizes.
+
+Tested on Mellanox ConnectX-6 Dx (Crypto Enabled) with TLS 1.3 AES-GCM-128/256
+and multiple rekey cycles.
+
+Changes in v10:
+- Drop rekey_complete_seq; simplify clean_acked to set REKEY_READY
+  once acked_seq >= boundary_seq.
+- Flush pending SW records (tls_encrypt_async_wait + tls_tx_records)
+  at start of complete_rekey; return -EAGAIN if send buffer full.
+- Add start_marker_record + tcp_write_collapse_fence() in
+  complete_rekey so the NIC passes through SW-encrypted data
+  (including retransmits) before the HW boundary.
+- Fix flag clearing order: PENDING before READY with
+  smp_mb__after_atomic() to prevent clean_acked race.
+- Use crypto_free_aead() instead of tls_sw_release_resources_tx().
+- mlx5: fix reverse Christmas tree variable ordering.
+
+Rishikesh
+
+Rishikesh Jethwani (6):
+  net: tls: reject TLS 1.3 offload in chcr_ktls and nfp drivers
+  net/mlx5e: add TLS 1.3 hardware offload support
+  tls: add TLS 1.3 hardware offload support
+  tls: split tls_set_sw_offload into init and finalize stages
+  tls: add hardware offload key update support
+  selftests: net: add TLS hardware offload test
+
+ .../chelsio/inline_crypto/ch_ktls/chcr_ktls.c |   3 +
+ .../mellanox/mlx5/core/en_accel/ktls.h        |   8 +-
+ .../mellanox/mlx5/core/en_accel/ktls_txrx.c   |  14 +-
+ .../net/ethernet/netronome/nfp/crypto/tls.c   |   3 +
+ include/net/tls.h                             |  76 +-
+ include/uapi/linux/snmp.h                     |   2 +
+ net/tls/tls.h                                 |  19 +-
+ net/tls/tls_device.c                          | 565 +++++++++--
+ net/tls/tls_device_fallback.c                 |  82 +-
+ net/tls/tls_main.c                            |  33 +-
+ net/tls/tls_proc.c                            |   2 +
+ net/tls/tls_sw.c                              | 107 ++-
+ .../selftests/drivers/net/hw/.gitignore       |   1 +
+ .../testing/selftests/drivers/net/hw/Makefile |   2 +
+ .../selftests/drivers/net/hw/tls_hw_offload.c | 902 ++++++++++++++++++
+ .../drivers/net/hw/tls_hw_offload.py          | 281 ++++++
+ 16 files changed, 1921 insertions(+), 179 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/tls_hw_offload.c
+ create mode 100755 tools/testing/selftests/drivers/net/hw/tls_hw_offload.py
+
+-- 
+2.25.1
+
 
