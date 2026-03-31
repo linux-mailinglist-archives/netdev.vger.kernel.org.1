@@ -1,155 +1,214 @@
-Return-Path: <netdev+bounces-273665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273666-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mOHmF+Hgy2n0MAYAu9opvQ
-	(envelope-from <netdev+bounces-273665-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:57:37 +0200
+	id cFKIABbjy2n0MAYAu9opvQ
+	(envelope-from <netdev+bounces-273666-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:07:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00E7B36B428
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:57:36 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7591D36B68E
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:07:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 682EE302A873
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 14:57:36 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0C8B330143FB
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:02:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFBA13FE666;
-	Tue, 31 Mar 2026 14:57:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90DB3E7176;
+	Tue, 31 Mar 2026 15:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="nFexOjuO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZH8WIcKr"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F1135B63B;
-	Tue, 31 Mar 2026 14:57:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BCB3E51FA;
+	Tue, 31 Mar 2026 15:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774969053; cv=none; b=h7rtIKyhKgUIlF5qFbwuRfBR5uUBkNHREcHHBsiKdfPpNBv073hhOWi1n9txkVxbk57Txxw+UyivcV42fQ43VVQwzir5V87QUD8NuPzwHu0fD/ktnj94fDMlu6v+cjg0XMdgMg6hgSxGbaPUV6L3CG5/MKi5WU8pCOBsx403AUI=
+	t=1774969340; cv=none; b=p9gEH3dge2/aOl6Jv7nb3x/5NROVGENQY/fMnXhLpFSIbF5wcUszXtuvO+A9FjWb78jmsMiXvLEYmjGIUZPhJKdAFb/CXc6sfBTu5irK+HibCK8CzIwGFW+OLd9lwAvUAMHcWHWNxxEkihJLXnW3n/8RbLKZvphCWtDAFAR34hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774969053; c=relaxed/simple;
-	bh=zIySdAinjeS2Dxmykke2pYIKupT7GydAWT77fFib0go=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XMDR0E229KaukeA2JT8hVB+xgcEPmZ4w9whyPeueQZXpyEsxkqpwxf1yDoZ6mqt8IfEyFlvI11ZpIWxN2FuJmouHQO/ZPqUPfI1c5ZoLSR78+qVEsnaHx74WIrhhTCDjvoSfQMHelBLVS80EwpXXmdwgfTORmdCu6ybtSF8vGGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=nFexOjuO; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OlC+AbUuT/K+NGvf11dGDQJ07qdXjlhXrgN+pdY1jv8=; b=nFexOjuOC9sWoupGZwEeesh2FQ
-	tKkjt4JUMmaQYYJgAiJGUonj1SkgAVvA55JMWIujszCn7MmMNRZGSiq/MH843dPiAA8rLMeHU5UfA
-	LI7Vh7yTyDFouYgffn6ouM7RaDT5vwOcCDxu7bQwMbjqu/rcpM82f3XyPgkI2kuO5I//O6P89njYT
-	WorpX28WCGunAa/NCAVr54mwtRoUIwiDfQHCU21CsNk/RvH6oQBTojNMzqXCzKw7ByfcH0J5WXiUy
-	yEmUqtca0bQrsG2hRoK86gdrUPLh+4IV+tEPZ1+klhhrPCq2u3c/E5NuZ/+PS+hjmn6RdmbdWp+G1
-	00h3GqRQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40984)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w7aX3-000000001yf-0MNy;
-	Tue, 31 Mar 2026 15:57:29 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w7aX1-000000003oh-0m6l;
-	Tue, 31 Mar 2026 15:57:27 +0100
-Date: Tue, 31 Mar 2026 15:57:27 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Charles Perry <charles.perry@microchip.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/2] net: mdio: add a driver for
- PIC64-HPSC/HX MDIO controller
-Message-ID: <acvg11voyHoRgQsX@shell.armlinux.org.uk>
-References: <20260331123858.1912449-1-charles.perry@microchip.com>
- <20260331123858.1912449-3-charles.perry@microchip.com>
- <acvEpk1grDFAahzd@shell.armlinux.org.uk>
- <acvPKuuikqvfXauy@bby-cbu-swbuild03.eng.microchip.com>
- <acvUqDgepCIScs8M@shell.armlinux.org.uk>
- <88d652b9-ed4f-4bf4-b0ab-8703c15ce58b@lunn.ch>
- <acvdkBF4ZjZaCHwd@bby-cbu-swbuild03.eng.microchip.com>
+	s=arc-20240116; t=1774969340; c=relaxed/simple;
+	bh=A/QYaJnLTcg85kNTS2YUuxrvo0qQ+GxqhLCyT14dS3I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=N9Dd2zzhAV04Q920Z0HD5YAPLsbl0UgpaDTMzs2wVTQWDSBw35XEdsIhOa5XtGuvd07jbB20SBegLUZBwPdI+c2h8DHKnn8p1x6G+gdFSH/MyZrDlhqSiVY/yW0auDiU7jqgwCZfC8k1QxFVmiZklJnNv6n6ZJjjpqyZuQ52JNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZH8WIcKr; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774969340; x=1806505340;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=A/QYaJnLTcg85kNTS2YUuxrvo0qQ+GxqhLCyT14dS3I=;
+  b=ZH8WIcKrdSA8LiC4aKqAfFlfCWymp094eDDhISKzsvKiP/3i03Tn2Rq+
+   sQ+PxGX70ivqP5+zmr6CSm0M5LWcgocdLIDHV2UoX28hVnweFYwtS+jXl
+   N4ZDQbsYGxQEkOU3OFC5GDQo4A/dZ+JTN2PhhEHZQRct2x3/P76ntYOQA
+   yvW98tGSCJ9xqf9MUBtbHvSdDP6H/De0ZRfHJkyg5fbNMjDNnLtC7lnFi
+   /qcPkNqR5eziO6qscvOje7iAiuVXJ8BcRDVvABYGc/igB0YZVxLDsvQH0
+   AvH+hmEGPqWRfhK+ESXLYYXnEgXLbs9AaDVGus/JpA8RIhNU0lQRw+wEO
+   Q==;
+X-CSE-ConnectionGUID: bF8p23SQQbuRBkx6tyviow==
+X-CSE-MsgGUID: lWGd6ftHSFOtJ6Ac0q+O6w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11745"; a="76046079"
+X-IronPort-AV: E=Sophos;i="6.23,152,1770624000"; 
+   d="scan'208";a="76046079"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2026 08:02:19 -0700
+X-CSE-ConnectionGUID: 9qiSr/k8R7KjISZE8F8YdA==
+X-CSE-MsgGUID: VLC7m+sKRlqFU/Ot6U9yXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,152,1770624000"; 
+   d="scan'208";a="219735479"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by fmviesa009.fm.intel.com with ESMTP; 31 Mar 2026 08:02:16 -0700
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	magnus.karlsson@intel.com,
+	stfomichev@gmail.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	larysa.zaremba@intel.com,
+	aleksander.lobakin@intel.com,
+	bjorn@kernel.org,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: [PATCH v5 net 00/11] xsk: tailroom reservation and MTU validation
+Date: Tue, 31 Mar 2026 17:02:02 +0200
+Message-Id: <20260331150213.550797-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acvdkBF4ZjZaCHwd@bby-cbu-swbuild03.eng.microchip.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.16 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,vger.kernel.org,bootlin.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273665-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_SPAM(0.00)[0.433];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-273666-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-0.989];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,armlinux.org.uk:url,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 00E7B36B428
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:mid,intel.com:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7591D36B68E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 31, 2026 at 07:43:28AM -0700, Charles Perry wrote:
-> On Tue, Mar 31, 2026 at 04:20:55PM +0200, Andrew Lunn wrote:
-> > On Tue, Mar 31, 2026 at 03:05:28PM +0100, Russell King (Oracle) wrote:
-> > > On Tue, Mar 31, 2026 at 06:42:02AM -0700, Charles Perry wrote:
-> > > > I don't know if there's any value in waiting for write completion here as
-> > > > write completion doesn't mean that the effects of the write are available
-> > > > right now. I also didn't run into any issues in my testing. Let me know if
-> > > > you know of a use case where this wouldn't work.
-> > > > 
-> > > > I can add a wait for transaction completion if that's expected by phylib.
-> > > 
-> > > Consider a PHY using a shared interrupt line, and the interrupt being
-> > > disabled in at the PHY before being torn down... wouldn't we want the
-> > > write to the register which enables interrupts to complete before we
-> > > unregister the interrupt handler for the particular PHY?
-> > > 
-> > > I do notice that other MDIO drivers don't wait. Some PHY drivers don't
-> > > access the PHY after the write to disable interrupts either. So, maybe
-> > > phy_free_interrupt() should read-back from the PHY before calling
-> > > free_irq() to guarantee that the write has completed?
-> > > 
-> > > Andrew?
-> > 
-> > The general pattern is to not wait on write.
-> 
-> Ok, then it's status quo for this.
+v4->v5:
+- add further review tags from Bjorn
+- fix ./test_progs -t xsk
+ * do so by making the procfs reading common so test_xsk.c can use it
+- get back to idea of relying on pool->umem->zc in
+  xsk_pool_get_tailroom(); that is because we now call its caller
+  (xsk_pool_get_rx_frame_size()) before getting down to driver via
+  ndo_bpf - we do it to rule out invalid setups in terms of MTU vs xsk
+  frame size/number of exposed segments by driver
+- bring back explicit rejection of mbuf && segs == 1 combo
 
-Except someone needs to add that read-back - don't look at me, I
-generate too many patches for netdev, so have no capacity for yet
-more patches.
+v3->v4:
+- allow exact 128 bytes of space when user defined headroom is deducted
+  from total frame size
+- provide a routine for reading procfs entries within xskxceiver
+  * use it to fetch cache line size and calculate skb_shared_info size
+    on our own
+- clean up gve and igc xsk pool enablement routines
+- include mtu vs frame size * max zc segments validation in
+  xp_assign_dev()
+
+v2->v3:
+- add tags from Bjorn/Stan
+- provide at least 128 bytes instead ETH_ZLEN when validating frame
+  headroom
+  * this way we can get rid of i40e/ice changes
+  * make sure xsk_pool_get_rx_frame_size() returns value 128b-aligned
+  * and remove pre-check from idpf
+- separate XDP_UMEM_SG_FLAG fixes from MTU validation in xsk_bind()
+- make drop_idx a local variable in xsk's xdp drop prog
+- adjust rx_dropped to new 128b related values
+- move ugly placed define (Bjorn)
+- remove READ_ONCE when fetching netdev->mtu (Bjorn)
+
+v1->v2:
+- remove xsk_pool_get_tailroom() definition for !CONFIG_XDP_SOCKETS
+  (Stan)
+- do not rely on pool->umem->zc when configuring tailroom (Stan, Bjorn)
+- simplify dbuff setting in ZC drivers (Bjorn)
+- use defines for {head,tail}room in tests (Bjorn)
+- return EINVAL instead of EOPNOTSUPP when mtu setting is wrong (Bjorn)
+- include vlan headers and fcs length when validating mtu (Olek)
+- tighten umem headroom validation when registering umem (Sashiko AI)
+- set XDP_USE_SG in xp_assign_dev_shared() (Sashiko AI)
+- adjust rx dropped xskxceiver test
+
+Hi,
+
+here we fix a long-standing issue regarding multi-buffer scenario in ZC
+mode - we have not been providing space at the end of the buffer where
+multi-buffer XDP works on skb_shared_info. This has been brought to our
+attention via [0].
+
+Unaligned mode does not get any specific treatment, it is user's
+responsibility to properly handle XSK addresses in queues.
+
+With adjustments included here in this set against xskxceiver I have
+been able to pass the full test suite on ice.
+
+Thanks,
+Maciej
+
+[0]: https://community.intel.com/t5/Ethernet-Products/X710-XDP-Packet-Corruption-Issue-DRV-MODE-Zero-Copy-Multi-Buffer/m-p/1724208
+
+
+Maciej Fijalkowski (11):
+  xsk: tighten UMEM headroom validation to account for tailroom and min
+    frame
+  xsk: respect tailroom for ZC setups
+  xsk: fix XDP_UMEM_SG_FLAG issues
+  xsk: validate MTU against usable frame size on bind
+  selftests: bpf: introduce a common routine for reading procfs
+  selftests: bpf: fix pkt grow tests
+  selftests: bpf: have a separate variable for drop test
+  selftests: bpf: adjust rx_dropped xskxceiver's test to respect
+    tailroom
+  idpf: remove xsk frame size check against alignment
+  igc: remove home-grown xsk's frame size validation
+  gve: remove home-grown xsk's frame size validation
+
+ drivers/net/ethernet/google/gve/gve_main.c    |  5 --
+ drivers/net/ethernet/intel/idpf/xsk.c         | 10 ----
+ drivers/net/ethernet/intel/igc/igc_xdp.c      | 11 ----
+ include/net/xdp_sock.h                        |  2 +-
+ include/net/xdp_sock_drv.h                    | 17 +++++-
+ net/xdp/xdp_umem.c                            |  3 +-
+ net/xdp/xsk_buff_pool.c                       | 25 ++++++++-
+ .../selftests/bpf/prog_tests/test_xsk.c       | 55 +++++++++----------
+ .../selftests/bpf/prog_tests/test_xsk.h       | 23 ++++++++
+ tools/testing/selftests/bpf/prog_tests/xsk.c  | 19 +++++++
+ .../selftests/bpf/progs/xsk_xdp_progs.c       |  4 +-
+ tools/testing/selftests/bpf/xskxceiver.c      | 23 ++++++++
+ 12 files changed, 135 insertions(+), 62 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
