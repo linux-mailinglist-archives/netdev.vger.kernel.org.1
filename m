@@ -1,148 +1,216 @@
-Return-Path: <netdev+bounces-273599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273601-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AEGLKYu3y2kpKAYAu9opvQ
-	(envelope-from <netdev+bounces-273599-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 14:01:15 +0200
+	id MNPiMli3y2mCKgYAu9opvQ
+	(envelope-from <netdev+bounces-273601-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 14:00:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 359543693C3
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 14:01:14 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BBEA369385
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 14:00:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B8BF9301912A
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 11:59:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EA38D30321EC
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:00:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38333D8909;
-	Tue, 31 Mar 2026 11:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649143E022B;
+	Tue, 31 Mar 2026 12:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="tdO9rq5W"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="UO7nW114";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8fD/YgN1";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JCIDS4sI";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="FicygYR2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2933A7836;
-	Tue, 31 Mar 2026 11:58:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F423DC4D0
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 12:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774958342; cv=none; b=EyD8E+9ihw1exzi8yLPtubHh+0wwurd8MDsUMoGiGAFjyHcTEBU4DhSygZuUU80uqOpnPvV6xqbcsJs9QKN8heuAiJMHJJd3V+UVAqChpLe0jXj/gWeCptMCJzkjPx1NicUbdor/7UYnADRPKBQPv2g9nxCm1iordUny4dxg6CY=
+	t=1774958404; cv=none; b=RDtnwY/En7IYvNWMktZQMu+4atgakjwCQmW+jCNqUpbr3RRrz0NS8e8CZxJyugIfEdXK+5rdp1P6S9HkWxJKc5QnspwrTraNfIuUDbfhjkNxABH/EYA5bg5koUVYiYC6TZEufmYTv1B+Y+eTagQQNsjFHbvbBaKt8pYYY3+nQNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774958342; c=relaxed/simple;
-	bh=gTTSaOWE824UPhobKypiOi8eXMlQrv2CjgD8/p8SKX4=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=J+FYIKTDyrkRKmQzJSscW1WlcGoviO9xRXs9MplNjGKMEAml+KdwaAHROfNtzxZYo957WJwOgrJjaYIsS6YG8s0EUcFmoCWX06dfNrROEG9qXHznovZFnVyU2azsz1Lb376LoUalN/cPvQewl7ywFQBtGfOQE2gvLo/IKMK5Zwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=tdO9rq5W; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BD81EA56FC;
-	Tue, 31 Mar 2026 13:58:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1774958336; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=QCfXsdJi5wGllcj48KyH40YLNO5PN/6+4FBGIDXGp4s=;
-	b=tdO9rq5Wj2of9pNYe6SrnSI2WKsNFq+cv0wwEd+KNsF804YHZl9LbuTbDnqnuK9ovqxEGs
-	eGNIAGUEshYwDhp3wYI/prSAS437Rwv7wBuA7Y5Y4phEpq7dmTybHcR8EivYXr/kkm9AIG
-	MLaouuNvRSkiT8p7w3/BL2iPernVD4Vtaq0GYvQIy++H0qjnpIvGlCMqg3YXI7aLc3wFVr
-	wmzPsXHX2ZEXLdW1Db1Mw9RcrocMJlBiBbniRhr8osilt0UiHivSh+PrPHR6LdQ0mnWX1Y
-	/eVlQNF4YbG5Eqww9TyMWh5lEU9JXKWz9Dfx9ZF3+VbPBWnGvertJ6TWaJddrg==
+	s=arc-20240116; t=1774958404; c=relaxed/simple;
+	bh=TeW+WR4PTVnP9Pp/5/unSciFX21YayQUZJgukeIfeOQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Rakb22dDL5t0uQZgT2hPeVtbKpupGlpRicfrP8H7d7rMOl7BrZzkUV9CQm9u3Nm2z0PaZPc1Ad1VlhTc33Ds+G1RRCEeu0AROmEYDfWdY/q+JGXbbwKkl3qfJlH9lwRErAYRJVmXsyJNg4hr6MxVVDy2fH9U78eBJY9G4qswcAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=UO7nW114; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8fD/YgN1; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JCIDS4sI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=FicygYR2; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id DB35C5BD0A;
+	Tue, 31 Mar 2026 11:59:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1774958401; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ONP7w9VX6YgrpD+mtY5h+h3i5fpOqeRMgJNMWgV/TWU=;
+	b=UO7nW1140Z8oJY7ZNQePo6rSit/Q/vN7QW6Vhc+kdl0I3s0ucaGlN2Ml1isIHrPW+OZOl5
+	7kYt1MhjuOue8Lb1sfow9JK4WKJ/igIimXCfd/hk/NQyJK1Iv0M4qVmglurtS05/ZkbB4l
+	DisFWEMWj5xt3ZFZTchbWlBHiHQoUpk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1774958401;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ONP7w9VX6YgrpD+mtY5h+h3i5fpOqeRMgJNMWgV/TWU=;
+	b=8fD/YgN1caz3XcKpqxStsHKuDP61R5wuRR15pcddABEWuFvlZ0o+Bh8WfAIXnC+FbMuNwR
+	CT8IESg8clM5uRCQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=JCIDS4sI;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=FicygYR2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1774958399; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ONP7w9VX6YgrpD+mtY5h+h3i5fpOqeRMgJNMWgV/TWU=;
+	b=JCIDS4sImH9x8SbXDZ8O605YxACYGelVYc8A6BnG6N1RQ1kiGnfsEucVDw9EKSmU6fRwAD
+	VIZYH3JIWa5TXddACqP3g6ANZT1tBUxwyjLkF231XXmaQCmsdoAsBoB70ADdpxlp7gJHyG
+	VpOetpZ7EXimClYWQ3s/KF6eyHeJLvE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1774958399;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=ONP7w9VX6YgrpD+mtY5h+h3i5fpOqeRMgJNMWgV/TWU=;
+	b=FicygYR24PIBJQzsZXrJkSv6xEprxXZgFYIVmXtPHGkdORQL4hUbduHd7jciMg8vfVfSBV
+	O+XXldCOOHe1NDCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 506494A0A2;
+	Tue, 31 Mar 2026 11:59:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id MmmtED+3y2nNeQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 31 Mar 2026 11:59:59 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: horms@kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	Fernando Fernandez Mancera <fmancera@suse.de>,
+	Yiming Qian <yimingqian591@gmail.com>
+Subject: [PATCH net] ipv4: nexthop: allocate skb dynamically in rtm_get_nexthop()
+Date: Tue, 31 Mar 2026 13:59:43 +0200
+Message-ID: <20260331115943.10404-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 31 Mar 2026 13:58:55 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, Phil Elwell <phil@raspberrypi.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] net: phy: microchip: enable downshift by default
- on LAN88xx
-In-Reply-To: <acuwvoydmJusuj9x@shell.armlinux.org.uk>
-References: <20260330224630.579937-1-nb@tipi-net.de>
- <20260330224630.579937-3-nb@tipi-net.de>
- <acuwvoydmJusuj9x@shell.armlinux.org.uk>
-Message-ID: <a7e4a17ed0ae027ee6ebfd5f79f7c85c@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273599-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,raspberrypi.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-273601-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,redhat.com,google.com,davemloft.net,suse.de,gmail.com];
+	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-0.996];
+	DKIM_TRACE(0.00)[suse.de:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid]
-X-Rspamd-Queue-Id: 359543693C3
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,suse.de:dkim,suse.de:email,suse.de:mid]
+X-Rspamd-Queue-Id: 2BBEA369385
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 31.3.2026 13:32, Russell King (Oracle) wrote:
-> On Tue, Mar 31, 2026 at 12:46:27AM +0200, Nicolai Buchwitz wrote:
->> Enable auto-downshift from 1000BASE-T to 100BASE-TX after 2 failed
->> auto-negotiation attempts by default. This ensures that links with
->> faulty or missing cable pairs (C and D) fall back to 100Mbps without
->> requiring userspace configuration.
->> 
->> Users can override or disable downshift at runtime:
->> 
->>   ethtool --set-phy-tunable eth0 downshift off
->> 
->> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
->> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> 
-> I'm slightly concerned by this commit. ->config_init() is called when
-> the netdev attaches the PHY, and also during the resume path - and it's
-> the second one which I believe is a problem here.
-> 
-> If the user has configured the downshift, it is reasonable for the user
-> to expect the setting to be preserved over a suspend/resume. However,
-> by placing this code in ->config_init(), you will overwrite the user's
-> setting when the system resumes.
+When querying a nexthop object via RTM_GETNEXTHOP, the kernel currently
+allocates a fixed-size skb using NLMSG_GOODSIZE. While sufficient for
+single nexthops and small Equal-Cost Multi-Path groups, this fixed
+allocation fails for large nexthop groups like 512+ nexthops.
 
-You have a valid point. Looking at other drivers, Marvell has the
-same issue: m88e1112_config_init() unconditionally sets downshift to 3
-on every config_init call.
+This results in the following warning splat:
 
-I see two options:
+ WARNING: net/ipv4/nexthop.c:3395 at rtm_get_nexthop+0x176/0x1c0, CPU#19: rep/9282
+ [...]
+ RIP: 0010:rtm_get_nexthop+0x176/0x1c0
+ [...]
+ Call Trace:
+  <TASK>
+  rtnetlink_rcv_msg+0x168/0x670
+  netlink_rcv_skb+0x5c/0x110
+  netlink_unicast+0x203/0x2e0
+  netlink_sendmsg+0x222/0x460
+  ____sys_sendmsg+0x35a/0x380
+  ___sys_sendmsg+0x99/0xe0
+  __sys_sendmsg+0x8a/0xf0
+  do_syscall_64+0x12f/0x1590
+  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+  </TASK>
 
-1. Save the user's setting in the driver's priv struct and restore it
-in config_init instead of blindly applying the default.
+Fix this by allocating the size dynamically using nh_nlmsg_size(), this
+is consistent with nexthop_notify() behavior. In addition, replace
+alloc_skb() with nlmsg_new().
 
-2. Handle it generically in the PHY core, saving/restoring tunable
-state across suspend/resume for all drivers.
+This cannot be reproduced via iproute2 as the group size is currently
+limited and the command fails as follows:
 
-I'd lean towards (1) to keep this series simple. (2) could be a
-follow-up that fixes Marvell and others too. What do you think?
+addattr_l ERROR: message exceeded bound of 1048
 
-Thanks
+Fixes: 430a049190de ("nexthop: Add support for nexthop groups")
+Reported-by: Yiming Qian <yimingqian591@gmail.com>
+Closes: https://lore.kernel.org/netdev/CAL_bE8Li2h4KO+AQFXW4S6Yb_u5X4oSKnkywW+LPFjuErhqELA@mail.gmail.com/
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+---
+Note: as this cannot be reproduced by iproute2 and a custom C script
+is needed to trigger it, I do not think a selftest covering this corner
+case is worth here.
+---
+ net/ipv4/nexthop.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Nicolai
+diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+index c942f1282236..b502c3ad41bf 100644
+--- a/net/ipv4/nexthop.c
++++ b/net/ipv4/nexthop.c
+@@ -3377,15 +3377,15 @@ static int rtm_get_nexthop(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 	if (err)
+ 		return err;
+ 
+-	err = -ENOBUFS;
+-	skb = alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
+-	if (!skb)
+-		goto out;
+-
+ 	err = -ENOENT;
+ 	nh = nexthop_find_by_id(net, id);
+ 	if (!nh)
+-		goto errout_free;
++		goto out;
++
++	err = -ENOBUFS;
++	skb = nlmsg_new(nh_nlmsg_size(nh), GFP_KERNEL);
++	if (!skb)
++		goto out;
+ 
+ 	err = nh_fill_node(skb, nh, RTM_NEWNEXTHOP, NETLINK_CB(in_skb).portid,
+ 			   nlh->nlmsg_seq, 0, op_flags);
+-- 
+2.53.0
+
 
