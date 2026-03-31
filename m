@@ -1,191 +1,217 @@
-Return-Path: <netdev+bounces-273565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273566-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gGbnCRily2mhJwYAu9opvQ
-	(envelope-from <netdev+bounces-273565-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:42:32 +0200
+	id oDzcI1Cly2mhJwYAu9opvQ
+	(envelope-from <netdev+bounces-273566-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:43:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A19D6368329
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:42:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07DA7368364
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:43:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 23D27300BB89
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:35:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 382B53066BF2
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9F543A7838;
-	Tue, 31 Mar 2026 10:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E3D3A381F;
+	Tue, 31 Mar 2026 10:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="ZgAnieGl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SJD8YkNE";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ieRaqIX/"
 X-Original-To: netdev@vger.kernel.org
-Received: from www537.your-server.de (www537.your-server.de [188.40.3.216])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D995437F00F;
-	Tue, 31 Mar 2026 10:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.3.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417DA3A75AC
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 10:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774953345; cv=none; b=OWR7/gL0KpDmma1gKlYkKKgAXcDcZWb0bEhTXfySAgxgRbUl8egF/DrrDv+hS72XWxORbXxe/hsRTkBuirQHdrHdLNMxpsS1pVV0s3DNjzTJDp6XfY3AlZs6cfjR4YzHinX7BzAWlGkvTjt7hId2MH3+DijDEZO0F9BSjLDgoQo=
+	t=1774953390; cv=none; b=Kk7/VcvFVM+pkDZVSiaGoRd8WCpioyAaqetlCV4iojYjnRvbCH1aEPgnhm0jDNcpJ6PzBLvMWFV086tgQhgU1e4XgjuB7jCAdjYMEk9yM/b265chZt7DBexzIhnp/r8Suh3v7+ug0YouBZDcIt1Dda6jdjMgyd6IdkrXtN9b89s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774953345; c=relaxed/simple;
-	bh=WRDi4ZoZCQrKyhbXtpmsIvhL4UK0NUKPu6XCjC501uI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nHWRSkYKc0qcecrM8eLxIOnywjjOlg2UkNPIz2y391FLZk50W9rND4n65xl7dUBpG6d4lhBF6d//a8viNVAU9ggteNXXER0UuZycEGDxj1WPJJKjwomSKjHKfUlJQCw1X86CZz6t+VzkPQdoLQFuP1nyMC+6WUdKcslkA9k6mrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=ZgAnieGl; arc=none smtp.client-ip=188.40.3.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=ew.tq-group.com; s=default2602; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=P+IgeM0E/Q07Sn3hriePPAxBXX3SXluGXODr4AiAiTw=; b=ZgAnieGle6zDl3EZKJg0za741y
-	zLirxy2bugV/zO27BFhx+ku4dR6GFfFWtuYzQjuImkfCYLhPK9uMkKfoQEdvi29mCImnUcwR7RtIg
-	d7SsfWichOIrd13aI4eXlX4npgSaqznv0AJ80EmsJCikOi05MrDOXJr8dh4ImuXnmpun9fXwcHDuU
-	36cqMsfJacfr+oTkytel6paurOlzmPkKklJWqoHRektriOdfEDxeC5SXGzy1r6iQxvRM6Dj12rPS0
-	8WFzww8a7xSQnM0YilT0Oc2yQpaXRa8rL68N0NdvnfGA7YGPO+1wtVTZ5a9TeMnM4G7TzKHEHPmyX
-	BCdbp99A==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www537.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <nora.schiffer@ew.tq-group.com>)
-	id 1w7WRe-000A6b-2s;
-	Tue, 31 Mar 2026 12:35:38 +0200
-Received: from localhost ([127.0.0.1])
-	by sslproxy02.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <nora.schiffer@ew.tq-group.com>)
-	id 1w7WRd-0004TE-2w;
-	Tue, 31 Mar 2026 12:35:38 +0200
-Message-ID: <b93cbe578c3a4dec6b3b07780e57d50702a37d3d.camel@ew.tq-group.com>
-Subject: Re: [PATCH v2 5/7] phy: ti: gmii-sel: add support for J722S SoC
- family
-From: Nora Schiffer <nora.schiffer@ew.tq-group.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,  Nishanth Menon
- <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo
- <kristo@kernel.org>, Siddharth Vadapalli <s-vadapalli@ti.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>, Neil Armstrong
- <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
- linux-phy@lists.infradead.org,  linux-arm-kernel@lists.infradead.org,
- linux@ew.tq-group.com
-Date: Tue, 31 Mar 2026 12:35:37 +0200
-In-Reply-To: <20260330223741.pmrx25cslrlpbcea@skbuf>
-References: <cover.1774354734.git.nora.schiffer@ew.tq-group.com>
-	 <5d00697f133cd33a1df62ac7ebf73e507e49ed2f.1774354734.git.nora.schiffer@ew.tq-group.com>
-	 <20260330223741.pmrx25cslrlpbcea@skbuf>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3-0ubuntu1.1 
+	s=arc-20240116; t=1774953390; c=relaxed/simple;
+	bh=Xr0KXUuwWyloJuKvsuv9vPbJibUbCJ1c3H4AyRVjmpQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UZYhibaCEoQ9vqry8tmi9kONgAVU3LqUcDAQ+Nf2YCYHag27YqbdAsk+EhNHuASF1PCn+Yu+MqP17POtzD3ndangtkD0r22A/ts+ZYkBeiPjZvY6ku/iVbJ2PCs1bdkqR2GYLXXx8IxuGJ8hb9Q7ebitSsFpggtxsb7vDqVHEwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SJD8YkNE; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ieRaqIX/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774953388;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mmDBnBQF5qqKpPAwNyURFB8rLMz1U2kEtshU27z56VM=;
+	b=SJD8YkNE3kVtfwt8wVzNVXuSqrJnZ0fNQ48T0b0l34EwJFEKH4AAryqNqBhTafvod9a6nE
+	lvNC+e0F0G/nwBKD2suOoSdak+NWpAGqFI9ezAMlfLgpXBS808EviK9cL1noGmaCIufnhf
+	1hAPd6+Q3raHxOFq4y6h+P9YPUvv14o=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-250-l2cGYuFDN86UZ_476JWe0A-1; Tue, 31 Mar 2026 06:36:26 -0400
+X-MC-Unique: l2cGYuFDN86UZ_476JWe0A-1
+X-Mimecast-MFC-AGG-ID: l2cGYuFDN86UZ_476JWe0A_1774953386
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48535f4d5e1so60597675e9.0
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 03:36:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1774953385; x=1775558185; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mmDBnBQF5qqKpPAwNyURFB8rLMz1U2kEtshU27z56VM=;
+        b=ieRaqIX/BkGtO5L2k8P9t4FU9JUVnlXjlI/DmEr2tUtP0MbSuCxwL09mpzbcRN1sc5
+         2CjppFa1Cbdzlk3/Ox1ZvQO08LTQ2YoCGlDq4NQGepZw8Wq85ICOc0UiH6O1FRBQaUJd
+         m3LPksbxr+Iykx+jBptK2yzPv8APHAvGMn59OXkJN3BYmMbYaAkZQAJCZ/9lnhhhFtFr
+         c/ZJIOPtP9XuRXes54K0FmbX5xf+hJOGrd2RVenCylhdz0ZwKG71pjRMakdhlXo05nEq
+         n1UNwJB0v4eEby7Dvdnstul74QOlvjU5V00ZUzkbpW2VnvnFgsqOU58BeRjNFpOzhj0C
+         TrqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774953385; x=1775558185;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mmDBnBQF5qqKpPAwNyURFB8rLMz1U2kEtshU27z56VM=;
+        b=FeKpO9C94+ogKvuPjWMwr9aKgH8FDfzZvGy1imfjvuu7ADpzWSREW/Nc4LuW2NThaZ
+         tCVy3dlNuY8U7ym5iwhcE6SZcj9X5+Dxb/KMM85DL4uKz3M4xQi5mFkZM5aJowjW4VaJ
+         9FgIEFrdl7MYsbLlHGwN5Nj6utiVcvvj9dtMSNZEB3fcUf42FcgR+3xg1/FHEjOuEf5L
+         +vmGWQITAuk9ye1vv4Dh3AcY8sVseYopSs86kR8Y+s7Jh0YqgdWrotFYyXCqYcBMqd4k
+         ZutApLk8APOaHw31nixaEfjP1Bp0NW9KVDCRAcQl0wDPNojRhhtXHVYKJVNzWlEr4Xh6
+         u18Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWIEM/rf0mEjS2vPj5OLfpN67oCgjIsKAlxHrvi2hwmvsWM0l0TBKFdCdqKY+LdGMunqbrtf9o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXTchl0l8kgSaP9cuF6BW33SsKDirpXnXMNzTtFIcsZxDU1S0g
+	5voYCN4ABc4UNgb66F0fGACjEf/dvH/K2otkA8acQyM1uC3b16UHFdG/QMmRAmCayiUE1/XxPnV
+	t83tlG9k2E2NJrfWc3kS/Dv7VmuNI21A2ZYd7J5Nkcxyz3vaX9bQOlFmayQ==
+X-Gm-Gg: ATEYQzyWMPu/xbIwgn4UC8kSBzGvYufr2VS98YtPEZZYg3aawCXP0oDsXvEhzW3rejp
+	YEFLwc5d/DnFXc9WJx48OfcgpOE0tUZI1XZuSq2u9LHB98g5Iljnc4WvcyGSdeCqhk7lRfRS8Em
+	CuQgB0TTtGofiLHBZhGrFNyY9banmYzChSTUrFCcLNQZFxL1jgdv47uIST4JMUpMoLGByCbweCR
+	FReh3oEzL6eLLOOOQ+VkzbBu9sa/e1yHAgXlg7V53mmZW3tvWyIZDQqHWNrZVzRjKEL+byqU0Bh
+	4aopY2A6k5r9Dz008FHHyaQycpQ9yjwbYyO1wk0u4wkmFXhAHeg1N8Ojk20e/2Lh0l5nioa7CU7
+	A2Lhshgt8Dw64n27VSP73OYzsWPiaRYO6OVqZzRtvseAcW6MmMjd6o4h5
+X-Received: by 2002:a05:600c:c490:b0:479:1b0f:dfff with SMTP id 5b1f17b1804b1-48727e908e7mr268869035e9.10.1774953385543;
+        Tue, 31 Mar 2026 03:36:25 -0700 (PDT)
+X-Received: by 2002:a05:600c:c490:b0:479:1b0f:dfff with SMTP id 5b1f17b1804b1-48727e908e7mr268868395e9.10.1774953385003;
+        Tue, 31 Mar 2026 03:36:25 -0700 (PDT)
+Received: from [192.168.88.32] ([212.105.155.58])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887e967badsm32084815e9.14.2026.03.31.03.36.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Mar 2026 03:36:24 -0700 (PDT)
+Message-ID: <b3997b77-d76b-4297-bc67-a2c57c7da601@redhat.com>
+Date: Tue, 31 Mar 2026 12:36:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Virus-Scanned: Clear (ClamAV 1.4.3/27957/Tue Mar 31 08:24:30 2026)
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2 net-next v2] ipv4: handle devconf post-set actions on
+ netlink updates
+To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
+Cc: horms@kernel.org, kuba@kernel.org, edumazet@google.com,
+ dsahern@kernel.org, davem@davemloft.net
+References: <20260327120202.4761-1-fmancera@suse.de>
+ <20260327120202.4761-2-fmancera@suse.de>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260327120202.4761-2-fmancera@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ew.tq-group.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[ew.tq-group.com:s=default2602];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273565-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nora.schiffer@ew.tq-group.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[ew.tq-group.com:+];
-	NEURAL_HAM(-0.00)[-0.820];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273566-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A19D6368329
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:email]
+X-Rspamd-Queue-Id: 07DA7368364
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 2026-03-31 at 01:37 +0300, Vladimir Oltean wrote:
-> Hi Nora,
->=20
-> On Tue, Mar 24, 2026 at 01:29:41PM +0100, Nora Schiffer wrote:
-> > The J722S gmii-sel is mostly identical to the AM64's, but additionally
-> > supports SGMII.
-> >=20
-> > Signed-off-by: Nora Schiffer <nora.schiffer@ew.tq-group.com>
-> > ---
-> >  drivers/phy/ti/phy-gmii-sel.c | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> >=20
-> > diff --git a/drivers/phy/ti/phy-gmii-sel.c b/drivers/phy/ti/phy-gmii-se=
-l.c
-> > index 6213c2b6005a5..4e242b1892334 100644
-> > --- a/drivers/phy/ti/phy-gmii-sel.c
-> > +++ b/drivers/phy/ti/phy-gmii-sel.c
-> > @@ -251,6 +251,13 @@ struct phy_gmii_sel_soc_data phy_gmii_sel_soc_am65=
-4 =3D {
-> >  	.regfields =3D phy_gmii_sel_fields_am654,
-> >  };
-> > =20
-> > +static const
-> > +struct phy_gmii_sel_soc_data phy_gmii_sel_soc_j722s =3D {
-> > +	.use_of_data =3D true,
-> > +	.regfields =3D phy_gmii_sel_fields_am654,
-> > +	.extra_modes =3D BIT(PHY_INTERFACE_MODE_SGMII),
->=20
-> I'm not familiar with the hardware, but "mostly identical to AM64, but
-> additionally supports SGMII" does not explain why j722s does not inherit
-> the features that am654 has (PHY_GMII_SEL_RGMII_ID_MODE and
-> BIT(PHY_GMII_SEL_FIXED_TX_DELAY).
->=20
-> The phy-gmii-sel from j722s does support RGMII, right? Because in lack
-> of the PHY_GMII_SEL_RGMII_ID_MODE feature, phy_gmii_sel_mode() will just
-> silently skip the regmap_field_write(regfield, rgmii_id) call, and
-> return successfully despite an incomplete configuration.
->=20
-> We have the phy_validate() call and phy_ops::validate() through which
-> the PHY can report to the Ethernet controller which phy_interface_t it
-> supports and which it doesn't. If the j722s doesn't support RGMII, maybe
-> it should implement this method.
+On 3/27/26 1:02 PM, Fernando Fernandez Mancera wrote:
+> When IPv4 device configuration parameters are updated via netlink, the
+> kernel currently only updates the value. This bypasses several
+> post-modification actions that occur when these same parameters are
+> updated via sysctl, such as flushing the routing cache or emitting
+> RTM_NEWNETCONF notifications.
+> 
+> This patch addresses the inconsistency by calling the
+> devinet_conf_post_set() helper inside inet_set_link_af(). If a flush is
+> required, we defer it until the netlink attribute parsing loop
+> completes.
 
-Thanks for noticing this, PHY_GMII_SEL_RGMII_ID_MODE and
-PHY_GMII_SEL_FIXED_TX_DELAY are missing indeed - will fix in v3. I made the
-mistake to rebase from an older kernel version where these flags didn't exi=
-st
-yet and neglected to double check when the rebase went through without
-conflicts. I assume I didn't notice any issues because our bootloader left =
-the
-controller in the correct state.
+IMHO the above deserve some additional self-test triggering the relevant
+code.
 
-Best,
-Nora
+> This ensures consistent behavior and side-effects for devconf changes,
+> regardless of whether they are initiated via sysctl or netlink.
+> 
+> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+> ---
+> v2: handled forwarding notification and disabling LRO
+> ---
+>  net/ipv4/devinet.c | 29 +++++++++++++++++++++++++++--
+>  1 file changed, 27 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+> index 8300516fb38f..a35b72662e43 100644
+> --- a/net/ipv4/devinet.c
+> +++ b/net/ipv4/devinet.c
+> @@ -2161,6 +2161,20 @@ static bool devinet_conf_post_set(struct net *net, struct ipv4_devconf *cnf,
+>  					    NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
+>  					    ifindex, cnf);
+>  		break;
+> +	case IPV4_DEVCONF_FORWARDING:
+> +		if (new == 1) {
 
+AI reviews says:
 
->=20
-> > +};
-> > +
+Does this check miss cases where forwarding is enabled with a value other
+than 1?
+The sysctl path allows enabling IP forwarding with any non-zero value. If
+a user sets IPV4_DEVCONF_FORWARDING to 2 via netlink, forwarding will be
+enabled but this check is bypassed, leaving Large Receive Offload (LRO)
+enabled. Could this cause LRO-coalesced packets to be forwarded without
+proper software segmentation?
 
---=20
-TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
-any
-Amtsgericht M=C3=BCnchen, HRB 105018
-Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
-neider
-https://www.tq-group.com/
+> +			/* it is safe to use container_of() because forwarding case
+> +			 * is only used by the netlink path
+> +			 */
+> +			struct in_device *idev = container_of(cnf, struct in_device, cnf);
+> +
+> +			netif_disable_lro(idev->dev);
+
+AI review says:
+
+Is it safe to call netif_disable_lro() here without holding the device
+operations lock?
+While inet_set_link_af() runs under rtnl_lock(), netif_disable_lro()
+modifies device features and calls netdev_update_features(), which
+asserts that the device operations lock is held. Calling this without
+the lock might trigger an assertion or expose the device to data races
+with concurrent feature updates or BPF/XDP attachments.
+Should this use dev_disable_lro() instead, which acquires the required
+lock before disabling LRO?
+
+/P
+
 
