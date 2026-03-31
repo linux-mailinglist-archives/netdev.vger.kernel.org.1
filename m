@@ -1,206 +1,203 @@
-Return-Path: <netdev+bounces-273403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273404-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MCl1O1kTy2nsDgYAu9opvQ
-	(envelope-from <netdev+bounces-273403-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:20:41 +0200
+	id aF1pDfAUy2k1DwYAu9opvQ
+	(envelope-from <netdev+bounces-273404-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:27:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DF853629DF
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:20:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3C6F362A54
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:27:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 752B6300BC75
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:20:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F1A973046E99
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFC1199FAC;
-	Tue, 31 Mar 2026 00:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D0B242D84;
+	Tue, 31 Mar 2026 00:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qmpOb70Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YjvFfMIq"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A149119E992
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 00:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774916436; cv=none; b=C8K9lRoTFDJ7qAho2a88gDZnHjDLgr1TnRahl4dZt9SQBpqUNlVRAahGQrqfJMVgJI1LQxYoiZmrm13/rANahFK6IeNRh4kUuZ1WzVTdoa9/hSb/klWDoyHM7U3X9pOS4ozxPixUQxfDPfUTMTRegQa7vPTFyi2tiljyOgikZ7g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774916436; c=relaxed/simple;
-	bh=L2uLLXPaR8dsFwaj0M/VqP16tI9GfgjDnm6HAXw1oyc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dKPD9AE7aIAQ1iPbxeDUfgjx/CIs1GIqBJ8UiMUNJG6Fs7Rz8NcGdqDaaF6rcaMFDuwlvWvn+LVh03IsMKTDnFnQm3CRqZ29iZQtGG5rz9lS4vr7ESS1Z5t2rrSqbAmvlcv1/+Nrp4qOgcZtvRJ71KIrDxshpMzhZpPqtbtk4JE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qmpOb70Q; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ae86a1e5-769c-44d8-ad7e-ad724800e9e4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774916430;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0Bz8w74PmbsgI9Uedv6J256JzSoyommswdXAjHRd59I=;
-	b=qmpOb70QRGs7gvusJS+sGUC9jM/NNXyorjbHR4eLo6P+ev+i7drne7q9OdIjKTbCWHdYWB
-	YKV6QjQTWzdt7cT7aAd3cyY5nImw0s8v6crA1Sq2Tf+e2F99ZGRcNCDHYwkhKZY04AwRln
-	P6kgiKIr6hdNNFPtOUR7Qv50SM/llyY=
-Date: Mon, 30 Mar 2026 17:20:21 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0815C1D86DC
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 00:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774916658; cv=pass; b=EIpYybBjMvHzAptYg2thZri3skrNNibNY1dJgLvfy8Id9CeZCmMIoabyB3GlEhJxDxw3pSsHTbmWDC7iAqenUXTFeFtsRxMzlXHq9UvsngwOFu8HBjKs5aaJ/fruLuJudz3Bos2Ppw9950I7nN0Dq3boso5BjDSqMuzobd09xWA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774916658; c=relaxed/simple;
+	bh=UEdDM+1yMLjSbL0Qt8pLlHl/Kp06G4E8R1a/LT8SqOw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U4TvqSK5kAkPVvbYxfJL15D84zw9TjBEymAPt+aKykmMvLeFK1mvh85IiVeLiYEkyamH7wO+4wVBmHU5MlHiNoZEz5xbtLHkFKb1AC9DNGLEIOn78Gvpec379n9JgqgClzQLcGmxOYkDs8EHWH8tBYDRD7h221CSbNcUeSR9t04=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YjvFfMIq; arc=pass smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-66b941ebe79so3781156a12.1
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 17:24:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774916655; cv=none;
+        d=google.com; s=arc-20240605;
+        b=L7XFCAluNK5l9y0NPxRCYytmIb8X/UB0R4ZzsPyG+gj7zWK6QadV71DB1jZ8/UAc4o
+         R3Bs2nYcNDeb2a30MnaDmw1Iyz9QdvzyVs/rOgx5oFtiKYVPdX1cZ3vctzizA9VgM+S1
+         +IAKzS4ruZ002Ys+7vgqkblq+SR70yigks5Ntz09vOLY77kz1gGAEg7XJSk09CF/1fNV
+         TCmP7Uiv6IMJKLePk7mmmqs/TC43GR7VUEs2j0u/4XiFxLmvt/b4LbFMxnlNV+ka0xMe
+         SFlQWgNuXzBvP0ZcjbBVYqXQezqinOtTl3MFM66yRRT4S38JjI9wIvyhfB2fZ0CWA+zx
+         Qj1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=x2NSZvLJb21z7sndYI+VJiSvYYr+VIQqISxq8jT0a18=;
+        fh=28Pa4g5P5vEAjBgowuDIdKo74MISrqQ5H5N4tubyjYM=;
+        b=O4eRAOLb2Loy2V7j0SuG99pjc10gBVFlcQ5J+XG9sdBqSiUT0mZFdFEBTaQgjrHIYl
+         wSx0hzA3M6fKYuz0Ciip27XhjfAYl49QYxg7NmUDuAypTFEjfjy+dIUMn/PIQJQioMb6
+         ktvPn734AzzQHsah39qEGuPHfe4KOrSaJc6PxDCJlUVZU+qHyZAAS/5O028WNFA88hXQ
+         yEaqaqQm7zX2gvwuQIpqRf3mC/luqLeBTlHgyN8pZaY9p7zWM793uQ/1Ha3CCII/ImJQ
+         nCqj3EFMqe8CB31o3RKeDdqGqes5HhLmYX/JpWav+VW1YUg1MO57M3hIe1S0sPPiyDg+
+         +Utg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774916655; x=1775521455; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=x2NSZvLJb21z7sndYI+VJiSvYYr+VIQqISxq8jT0a18=;
+        b=YjvFfMIqhI2DKlu3h9P19Qmy/ezz1HNWRHKpyf7wCp2VWxr6l0OmIon6pOYdXDXeGL
+         EhLE/IHXMFeq4j3RxdRr64yOJc1xuQD7DJx9+19/7PAP2x1JgpoBTI5CTA9btYaymnve
+         EJNeXF7fb2UZ9C+WJZQo95fkFNpEem3Ybdk/0+VgSlOYJaQ12uqsxVOghdYcL1IVq/lx
+         6U/p9CfKs264btaTpNyZY+0oNITlfgTY8Z7z6pKquUkEVG4aMO/wFvjR7p7sOxvsXNgi
+         68h2kkG9Olgrswu7GxG68rMruqACNMmtljP5xoyWSZdcxu+LaXBm3I31M1y1yVu5vNsj
+         zsng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774916655; x=1775521455;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x2NSZvLJb21z7sndYI+VJiSvYYr+VIQqISxq8jT0a18=;
+        b=Y4Dim++JMtvwc2SxvYt3LfvGu4/wlzy1aQ2cD97hsYzd9yhAmyhQVBug8FJafygOoN
+         TXG41PWKUZpNtShtmMNcmUw74igXW0Tc6rSWBSyiNVhE2QgGlf/lwyZtc4T3GAXIHLBV
+         GfRhNiTLHivGnkkaoD6C6SqTOeDr8CdjFYbdZ0fiaHCoLJdQis1Uj5DB5ORCzSnKBG5m
+         fzVJezPDp5PFsCRYs5V54ooWWyVnFCPPgdNI6f9fOblyexEufiDMkCtESP4o7v7jnLqD
+         nm9exDuIS/fyI6J5HRA0eOYaRA55R77RWXWLDAeqQeusXCOsbJx5fvlzQeNJpP2xHgkq
+         KywA==
+X-Forwarded-Encrypted: i=1; AJvYcCURDxtEXIMm7gtTiTmek8FWNC+i9YMEavGHa1y2B98ioyB32Mgk1N1+f8QrkhkZ8cCBaX6LSwk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP7BNZvNu8I7bKh1oONR5cJLbRNKqW5PmL4O+4KoIEq4uACW9d
+	aYaqaGK4U8mjE6rViowb2LMWwmvUuuphuOz1Mupc8Z4opr5Bcunp/WirKkZQh3yP43ZWXMk2X/J
+	oHvzV9L2QKOjR76GVOHhNU24Ywqxwk0U=
+X-Gm-Gg: ATEYQzzsf2+4EbDvETGL7Y2FfiV/l3m2X0gd0vseGoy4nAqSDr2riH/4ECA2j3pKmxJ
+	09RZvb+WEV5YJx25SEd0ow2ViCtDH8smsPS1BGieRWzhYHB7MJ1NRHEZSJWQLztJBNBspPp5BGs
+	3Z/ughahwnUxceVaUie28ZOi0gXcC0pQ3i4jsZGpKCMu+CpCVjqy1UqHpTaigib9LmbPfpiage/
+	FdSuU+df7rkAn/tdqIl+k72uuuicAEp1zG+h36JZc+f5uT7ohUvNGXLEA6+XF9/qltM4WTwiVda
+	ztCW
+X-Received: by 2002:a05:6402:6c3:b0:66b:3cb7:f638 with SMTP id
+ 4fb4d7f45d1cf-66b3cb7fbf3mr5656481a12.10.1774916655304; Mon, 30 Mar 2026
+ 17:24:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf v3 5/5] bpf, sockmap: Adapt for af_unix-specific lock
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Jiayuan Chen <mrpre@163.com>, John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Yonghong Song <yhs@fb.com>,
- Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Cong Wang <cong.wang@bytedance.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20260306-unix-proto-update-null-ptr-deref-v3-0-2f0c7410c523@rbox.co>
- <20260306-unix-proto-update-null-ptr-deref-v3-5-2f0c7410c523@rbox.co>
- <2192e9ef-894f-4826-b296-4f90e973a31b@163.com>
- <b9a956dd-ebb2-47ca-8b49-ccbba6ff9b26@rbox.co>
- <b21fac4e-891b-481c-9734-e95290e49097@linux.dev>
- <fa818820-c0c9-48dc-8ebc-661cb3349935@rbox.co>
- <dd043c69-4d03-46fe-8325-8f97101435cf@linux.dev>
- <27fa6e91-02a5-46cd-8c95-b75fd2c5fa08@rbox.co>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <27fa6e91-02a5-46cd-8c95-b75fd2c5fa08@rbox.co>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260323182823.5813-1-teknoraver@meta.com> <20260323182823.5813-2-teknoraver@meta.com>
+ <acp5jaFFI57ilC3y@boxer>
+In-Reply-To: <acp5jaFFI57ilC3y@boxer>
+From: Matteo Croce <technoboy85@gmail.com>
+Date: Tue, 31 Mar 2026 02:23:38 +0200
+X-Gm-Features: AQROBzCByBvhb9AnuqDoT1x2BkYJrGyhggrmURO-zajvyC8YBUAFOoejzi-xIwA
+Message-ID: <CAFnufp0w1qsLAANh5g2KuHYHTQ_-jAB21u2nhOja=4TBMB2gdg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 1/2] e1000e: add basic XDP support
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Mohsin Bashir <mohsin.bashr@gmail.com>, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273403-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[163.com,gmail.com,cloudflare.com,google.com,redhat.com,davemloft.net,kernel.org,fb.com,iogearbox.net,linux.dev,fomichev.me,bytedance.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-273404-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,vger.kernel.org,lists.osuosl.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[technoboy85@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: 8DF853629DF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A3C6F362A54
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/30/26 4:03 PM, Michal Luczaj wrote:
-> On 3/26/26 07:26, Martin KaFai Lau wrote:
->> On 3/15/26 4:58 PM, Michal Luczaj wrote:
->>>> Beside, from looking at the may_update_sockmap(), I don't know if it is
->>>> even doable (or useful) to bpf_map_update_elem(unix_sk) in
->>>> tc/flow_dissector/xdp. One possible path is the SOCK_FILTER when looking
->>>> at unix_dgram_sendmsg() => sk_filter(). It was not the original use case
->>>> when the bpf_map_update_elem(sockmap) support was added iirc.
->>>
->>> What about a situation when unix_sk is stored in a sockmap, then tc prog
->>> looks it up and invokes bpf_map_update_elem(unix_sk)? I'm not sure it's
->>> useful, but seems doable.
->>
->> [ Sorry for the late reply ]
->>
->> It is a bummer that the bpf_map_update_elem(unix_sk) path is possible
->> from tc :(
->>
->> Then unix_state_lock() in its current form cannot be safely acquired in
->> sock_map_update_elem(). It is currently a spin_lock() instead of
->> spin_lock_bh().
-> 
-> Is there a specific deadlock you have in your mind?
+Il giorno lun 30 mar 2026 alle ore 15:24 Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> ha scritto:
+>
+> On Mon, Mar 23, 2026 at 07:28:22PM +0100, Matteo Croce wrote:
+> > Add XDP support to the e1000e driver covering the actions defined by
+> > NETDEV_XDP_ACT_BASIC: XDP_DROP, XDP_PASS, XDP_TX and XDP_ABORTED.
+> >
+> > Infrastructure:
+> > - e1000_xdp_setup() / e1000_xdp() for program attach/detach with
+> >   MTU validation and close/open cycle
+> > - ndo_bpf support in net_device_ops
+> > - xdp_rxq_info registration in setup/free_rx_resources
+> >
+> > Receive path:
+> > - e1000_alloc_rx_buffers_xdp() for page-based Rx buffer allocation
+> >   with XDP_PACKET_HEADROOM
+> > - e1000_clean_rx_irq_xdp() as the XDP receive handler
+>
+> Hi Matteo,
+>
+> Since you started to look onto this driver, I think we should have a
+> single routine for cleaning buffers on rx. So I would ask for getting rid
+> of adapter->clean_rx (or at least convince reviewers it is not possible
+> for some reason) and then implement XDP support with approach as XDP being
+> a first class citizen.
+>
 
-e.g. unix_stream_connect() is taking unix_state_lock(). Can a tc's 
-ingress bpf prog call unix_state_lock()?
+We already have e1000_clean_rx_irq, e1000_clean_jumbo_rx_irq and
+e1000_clean_rx_irq_ps.
+Do you mean unifying them all or just merging e1000_clean_rx_irq and
+e1000_clean_rx_irq_xdp?
 
-> 
->>>> The only path left is bpf_iter, which I believe was the primary use case
->>>> when adding bpf_map_update_elem(sockmap) support [1]. It would be nice
->>>> to avoid bh_lock_sock() when calling from all bpf_iter (tcp/udp/unix)
->>>> where lock_sock() has already been done. It is more for
->>>> reading-correctness though. This just came to my mind.
->>>> has_current_bpf_ctx() can be used to check this. sockopt_lock_sock() has
->>>> been using it to conditionally take lock_sock() or not.
->>>
->>> [ One clarification: bh_lock_sock() is a sock_map_update_elem() thing,
->>> which can only be called by a bpf prog. IOW, has_current_bpf_ctx() is
->>> always `true` in sock_map_update_elem(), right? ]
->>
->> For all the bpf prog types allowed by may_update_sockmap() to do
->> bpf_map_update_elem(sockmap), only BPF_TRACE_ITER should have
->> has_current_bpf_ctx() == true. The tc prog (and others allowed in
->> may_update_sockmap()) will have has_current_bpf_ctx() == false when
->> calling sock_map_update_elem().
-> 
-> OK, so let's take test_sockmap_update.c:copy_sock_map(). It is a tc prog
-> and it calls bpf_map_update_elem() -> sock_map_update_elem(), right? But
-> running `test_progs -t "sockmap_basic/sockmap update"` shows (pr_warn() in
-> sock_map_update_elem()) that has_current_bpf_ctx() == true. That's expected
+> Furthermore I believe all new implementations of XDP require to include
+> multi-buffer support.
+>
 
-I think it is because of the bpf_prog_test_run_skb() code path used by 
-the test_sockmap_update() test. This would need to be addressed if 
-has_current_bpf_ctx() was used in sock_map_update_elem().
+Note taken
 
-> and has_current_bpf_ctx() would be false if sock_map_update_elem() was ran
-> via a hook?
+> Last but not least, this lives in intel directory so I assume
+> primitives/helpers from libie/libeth should be used for this work.
+>
 
-It should be false when the bpf prog is run by tc instead of 
-bpf_prog_test_run_skb().
+Only for the new XDP code or also for the existing one?
+If covering also the existing code that will go into a separate
+prerequisite patch.
 
->>> Let me know if I'm correctly rephrasing your idea: assume all bpf-context
->>> callers hold the socket locked or keep it "stable" (meaning: "sk won't
->>> surprise sockmap update by some breaking state change coming from another
->>> thread"). As you said, most bpf iters already take the sock_lock(), and I
->>
->> Right, all bpf iter (udp, tcp, unix) has acquired the lock_sock() before
->> running the bpf iter prog. afaik, the only exception is netlink bpf iter
->> but it cannot be added to sock_map afaik.
-> 
-> And sock_{map,hash}_seq_show() (being a part of bpf iter machinery) needs
-> to take lock_sock() just as well? Would that require a special-casing
-> (unix_state_lock()) for af_unix?
+Regards,
+-- 
+Matteo Croce
 
-I would think so for lock_sock() considering the current bh_lock_sock 
-without !sock_owned_by_user() usage is incorrect in 
-sock_map_update_elem(). [ this probably should be a separate issue for 
-another patch ]
-
-Some more side-tracking... from looking at the code, the bpf_iter of 
-sock_{map,hash} can do bpf_map_lookup_elem(&sock_map, ...). This 
-bpr_iter program probably will be failed to load because the 
-bpf_sk_release() is not available.
-
-I still don't have good idea what to do with the tc's prog calling 
-sock_map_update_elem().
-
+perl -e 'for($t=0;;$t++){print chr($t*($t>>8|$t>>13)&255)}' |aplay
 
