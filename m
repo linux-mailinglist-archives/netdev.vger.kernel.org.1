@@ -1,136 +1,179 @@
-Return-Path: <netdev+bounces-273519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273521-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aKB/BDyCy2lmIgYAu9opvQ
-	(envelope-from <netdev+bounces-273519-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:13:48 +0200
+	id 4C6BKQGDy2l4IgYAu9opvQ
+	(envelope-from <netdev+bounces-273521-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:17:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C05F365E6D
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:13:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23CD5365F80
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:17:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4D56530A3DE5
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 08:07:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2CA7B301A7DB
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 08:09:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40B83D9DD3;
-	Tue, 31 Mar 2026 08:07:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82FE33BA241;
+	Tue, 31 Mar 2026 08:09:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ida.uls.co.za (ida.uls.co.za [154.73.32.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB59C3DA5C3
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 08:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7621E2D3ED1;
+	Tue, 31 Mar 2026 08:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=154.73.32.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774944446; cv=none; b=MoLfE95dGq8mLHzmYUIvdZtC7fXkDW7ZpMpm+ycK++fYfmVCGtCv5H8mmuflt7oqs5bYZ+vXAHXEg95UzSyoXrm1zTE08CZVXhTYiDltT9w0e6uC4PEp+PIK5qFCQIHET5KhXHhDR9YZkQB2qG+7gD0NV3Gj7Euz4c9ejJpwjYM=
+	t=1774944549; cv=none; b=M/Gcwle+cQA4Wx0qjYKavl8DaJ+Xf2F92lpal8NujlsF2ldlDbC5CWgRwAjRVWe2XponiFOXNK1cbjYyGbmaUOaqsI+pZvAtjLbCwBqpVCIMLisUua5dAcjMC2KtUNOQQ0cnbFCrWi/XpmI9A9u6b6RZ9QpqMNnfg61D+Hkt554=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774944446; c=relaxed/simple;
-	bh=OyOSFNZAcOtYFeS5LtZzdqXIl4nRzbBo9fS0PL7/QXk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=aLYjhO9u5R6iNegTvpxdQw1YWh2/IVaYhdmqy+lttycvwTHHktTcSvmn1+oWociNeawMEglk/TG5pCY1JSBKsaEVjHZeHFXf0IEG0u1zkMqK7xba+tY/J4y1hl1qmRF/G6Gd0+qekcdTs4SxKq56N/AXM0v7v6udh+SV9TG6t+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-67deac23e02so10260882eaf.2
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 01:07:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774944441; x=1775549241;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zGOBMXTLJYi8EMajLqsobqRUIHxHoS8nmfP1bIVDhEw=;
-        b=aW/x9c8IsLj52e8RexLwsqeKlE3210ZchxOuRQO0e4ey3XmH1kB9TJyDSR7Wxcpmvo
-         x+pOfJR667MGWXk4BnB8Tv6nIeN2cH19r//3E0fgAQGlawaNZxS1zOpCVoRcjVAst6lJ
-         DhLofC7ZnPRQ6LICLE1gopoVitNiGbywaMZ+QSTK2E5s22i9DQMKJyFJB6eemBWYMoSD
-         CryHyP+AlE4fEPC2N66Od4eT0caET6S/LwL3M9KiOt2vTbd7O24wS3OkMWJi//h+je3Y
-         d30NTpZB9VoFaVAwJhgrDUiWA87kK+VdWPNV12CHQiKmqAjKD3xcd1TYpS7yyOkpjpzf
-         1BHg==
-X-Forwarded-Encrypted: i=1; AJvYcCU0UpIAjEerJi8xvl0EC+x6oVoMUH9BUeZgtHJsjk6NtzNQrZqCoSc+gj9cEBs56B0mMJi4O50=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9zfFno3iphtZtKcYai9KtoSoI5+wUtQBf5BFPl9ibnzFPpAy4
-	zg3dvo4pvHRLQbY3jpakGzXzB1mh4j0FwtaqQyqYZoFsDMiv5JGiUdKqKLp2jkw/WeI26qrL1Pe
-	1zaNBLMTBQOrbQVJpOZkg4U9OkN2fNXQqZV+OkBqKcG3VOCITe+aO2doJYeU=
+	s=arc-20240116; t=1774944549; c=relaxed/simple;
+	bh=voN4zkkG1QRyEOmKlMzsZ7FxBc/G7IYZvBjrhtdfMgc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XQhvyEOgCh2U86NNIdQLhMspO9cgoeA1MhW6RXWUUtR2aXVE1l7aua6t6yktbhOdifeg87w+KZpxo4gRgkMr1RAqj4uBTo4j+auW/TqZFOofrt5qIEmMIyD9u6MhLV0Tls1cFKw2Z6mXdLAmuQVRk6Pq9uOdGZjdQCqpSdrI0AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uls.co.za; spf=pass smtp.mailfrom=uls.co.za; arc=none smtp.client-ip=154.73.32.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uls.co.za
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uls.co.za
+Received: from [165.16.203.0] (helo=[192.168.42.23])
+	by ida.uls.co.za with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.98.2)
+	(envelope-from <jaco@uls.co.za>)
+	id 1w7U9Z-000000006XJ-01J2;
+	Tue, 31 Mar 2026 10:08:49 +0200
+Message-ID: <f37fca7f-710c-4f7a-a7c5-9d8cc129bf21@uls.co.za>
+Date: Tue, 31 Mar 2026 10:08:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:99b:b0:67e:3f0d:4229 with SMTP id
- 006d021491bc7-67e3f0d4596mr1108766eaf.14.1774944441434; Tue, 31 Mar 2026
- 01:07:21 -0700 (PDT)
-Date: Tue, 31 Mar 2026 01:07:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69cb80b9.a70a0220.97f31.0281.GAE@google.com>
-Subject: [syzbot] Monthly netfilter report (Mar 2026)
-From: syzbot <syzbot+listb1e1f17cbdba99a9f9fe@syzkaller.appspotmail.com>
-To: fw@strlen.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-1.36 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] pppoe: update Kconfig URLs
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: linux-ppp@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+ Dianne Skoll <dianne@skoll.ca>, James Carlson <carlsonj@workingcode.com>
+References: <20260331033303.5664-1-dqfext@gmail.com>
+ <0aa6aa20-0e2a-48e9-8273-53b2fecd287b@uls.co.za>
+ <20260331075438.290119-1-dqfext@gmail.com>
+Content-Language: en-GB
+From: Jaco Kroon <jaco@uls.co.za>
+Autocrypt: addr=jaco@uls.co.za; keydata=
+ xsBNBFXtplYBCADM6RTLCOSPiclevkn/gdf8h9l+kKA6N+WGIIFuUtoc9Gaf8QhXWW/fvUq2
+ a3eo4ULVFT1jJ56Vfm4MssGA97NZtlOe3cg8QJMZZhsoN5wetG9SrJvT9Rlltwo5nFmXY3ZY
+ gXsdwkpDr9Y5TqBizx7DGxMd/mrOfXeql57FWFeOc2GuJBnHPZQMJsQ66l2obPn36hWEtHYN
+ gcUSPH3OOusSEGZg/oX/8WSDQ/b8xz1JKTEgcnu/JR0FxzjY19zSHmbnyVU+/gF3oeJFcEUk
+ HvZu776LRVdcZ0lb1bHQB2K9rTZBVeZLitgAefPVH2uERVSO8EZO1I5M7afV0Kd/Vyn9ABEB
+ AAHNG0phY28gS3Jvb24gPGphY29AdWxzLmNvLnphPsLAdwQTAQgAIQUCVe2mVgIbAwULCQgH
+ AgYVCAkKCwIEFgIDAQIeAQIXgAAKCRAILcSxr/fungCPB/sHrfufpRbrVTtHUjpbY4bTQLQE
+ bVrh4/yMiKprALRYy0nsMivl16Q/3rNWXJuQ0gR/faC3yNlDgtEoXx8noXOhva9GGHPGTaPT
+ hhpcp/1E4C9Ghcaxw3MRapVnSKnSYL+zOOpkGwye2+fbqwCkCYCM7Vu6ws3+pMzJNFK/UOgW
+ Tj8O5eBa3DiU4U26/jUHEIg74U+ypYPcj5qXG0xNXmmoDpZweW41Cfo6FMmgjQBTEGzo9e5R
+ kjc7MH3+IyJvP4bzE5Paq0q0b5zZ8DUJFtT7pVb3FQTz1v3CutLlF1elFZzd9sZrg+mLA5PM
+ o8PG9FLw9ZtTE314vgMWJ+TTYX0kzsBNBFXtplYBCADedX9HSSJozh4YIBT+PuLWCTJRLTLu
+ jXU7HobdK1EljPAi1ahCUXJR+NHvpJLSq/N5rtL12ejJJ4EMMp2UUK0IHz4kx26FeAJuOQMe
+ GEzoEkiiR15ufkApBCRssIj5B8OA/351Y9PFore5KJzQf1psrCnMSZoJ89KLfU7C5S+ooX9e
+ re2aWgu5jqKgKDLa07/UVHyxDTtQKRZSFibFCHbMELYKDr3tUdUfCDqVjipCzHmLZ+xMisfn
+ yX9aTVI3FUIs8UiqM5xlxqfuCnDrKBJjQs3uvmd6cyhPRmnsjase48RoO84Ckjbp/HVu0+1+
+ 6vgiPjbe4xk7Ehkw1mfSxb79ABEBAAHCwF8EGAEIAAkFAlXtplYCGwwACgkQCC3Esa/37p7u
+ XwgAjpFzUj+GMmo8ZeYwHH6YfNZQV+hfesr7tqlZn5DhQXJgT2NF6qh5Vn8TcFPR4JZiVIkF
+ o0je7c8FJe34Aqex/H9R8LxvhENX/YOtq5+PqZj59y9G9+0FFZ1CyguTDC845zuJnnR5A0lw
+ FARZaL8T7e6UGphtiT0NdR7EXnJ/alvtsnsNudtvFnKtigYvtw2wthW6CLvwrFjsuiXPjVUX
+ 825zQUnBHnrED6vG67UG4z5cQ4uY/LcSNsqBsoj6/wsT0pnqdibhCWmgFimOsSRgaF7qsVtg
+ TWyQDTjH643+qYbJJdH91LASRLrenRCgpCXgzNWAMX6PJlqLrNX1Ye4CQw==
+Organization: Ultimate Linux Solutions (Pty) Ltd
+In-Reply-To: <20260331075438.290119-1-dqfext@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-report: Relay access (ida.uls.co.za).
+X-Spamd-Result: default: False [0.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[uls.co.za : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273519-lists,netdev=lfdr.de,listb1e1f17cbdba99a9f9fe];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273521-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com];
+	HAS_ORG_HEADER(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[];
-	REDIRECTOR_URL(0.00)[goo.gl];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	RCPT_COUNT_FIVE(0.00)[6];
-	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jaco@uls.co.za,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.277];
+	MID_RHS_MATCH_FROM(0.00)[];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[googlegroups.com:email,goo.gl:url,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: 5C05F365E6D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,skoll.ca:url,roaringpenguin.com:url,samba.org:url,uls.co.za:email,uls.co.za:mid]
+X-Rspamd-Queue-Id: 23CD5365F80
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello netfilter maintainers/developers,
+Hi,
 
-This is a 31-day syzbot report for the netfilter subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/netfilter
+On 2026/03/31 09:54, Qingfang Deng wrote:
+> Hi,
+>
+> On Tue, 31 Mar 2026 08:21:40 +0200, Jaco Kroon wrote:
+>> On 2026/03/31 05:33, Qingfang Deng wrote:
+>>> --- a/drivers/net/ppp/Kconfig
+>>> +++ b/drivers/net/ppp/Kconfig
+>>> @@ -122,11 +122,10 @@ config PPPOE
+>>>    	help
+>>>    	  Support for PPP over Ethernet.
+>>>    
+>>> -	  This driver requires the latest version of pppd from the CVS
+>>> -	  repository at cvs.samba.org.  Alternatively, see the
+>>> -	  RoaringPenguin package (<http://www.roaringpenguin.com/pppoe>)
+>>> -	  which contains instruction on how to use this driver (under
+>>> -	  the heading "Kernel mode PPPoE").
+>>> +	  This driver requires the latest version of pppd at
+>>> +	  <https://ppp.samba.org>.
+>>> +	  Alternatively, see the out-of-tree RP-PPPoE plugin at
+>>> +	  <https://dianne.skoll.ca/projects/rp-pppoe/>.
+>> ppp now exclusively has the plugin code (originally from roaring penguin
+>> I believe).  Latest version is no longer relevant, that plugin has been
+>> available since at least a few versions back already (at least a decade,
+>> probably closer to two).
+>>
+>> That same code has recently been dropped from rp-pppoe, which now
+>> primarily focusses on pppoe-server, and relies on the plugin now part of
+>> ppp package itself. rp-pppoe is only required if you're running a
+>> pppoe-server, and I don't think rp-pppoe at this stage will function
+>> without ppp.
+>>
+>> Most people will never need rp-pppoe.
+> Thanks for the information.
+>
+> I just checked pppd's changelog: version 2.4.2 or later has the PPPoE
+> plugin.
+>
+> I can update the help message accordingly:
+>
+> 	  To work in client mode, pppd version 2.4.2 or later is
+> 	  required. To work in server mode, the pppoe-server command
+> 	  from the RP-PPPoE package is also required, available at
+> 	  <https://dianne.skoll.ca/projects/rp-pppoe/>.
 
-During the period, 2 new issues were detected and 2 were fixed.
-In total, 13 issues are still open and 196 have already been fixed.
+I like this.  You have however dropped the ppp.samba.org link, just 
+re-add that I reckon.
 
-Some of the still happening issues:
+Signed-off-by: Jaco Kroon <jaco@uls.co.za>
 
-Ref Crashes Repro Title
-<1> 4918    Yes   INFO: rcu detected stall in worker_thread (9)
-                  https://syzkaller.appspot.com/bug?extid=225bfad78b079744fd5e
-<2> 692     Yes   INFO: rcu detected stall in addrconf_rs_timer (6)
-                  https://syzkaller.appspot.com/bug?extid=fecf8bd19c1f78edb255
-<3> 325     Yes   INFO: rcu detected stall in gc_worker (3)
-                  https://syzkaller.appspot.com/bug?extid=eec403943a2a2455adaa
-<4> 68      No    INFO: task hung in nfnetlink_rcv_msg (5)
-                  https://syzkaller.appspot.com/bug?extid=c4b20b80ee6a7a2f5012
-<5> 11      Yes   KMSAN: uninit-value in ip6table_mangle_hook (3)
-                  https://syzkaller.appspot.com/bug?extid=6023ea32e206eef7920a
-<6> 6       Yes   WARNING in nf_ct_bridge_post
-                  https://syzkaller.appspot.com/bug?extid=a8ba738fe2db6b4bb27f
+For what my sign-off is worth in this case :).
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Kind regards,
+Jaco
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
