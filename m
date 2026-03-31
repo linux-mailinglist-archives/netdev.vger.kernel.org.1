@@ -1,88 +1,65 @@
-Return-Path: <netdev+bounces-273714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273715-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QJ3RLbYKzGnGNgYAu9opvQ
-	(envelope-from <netdev+bounces-273714-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 19:56:06 +0200
+	id YHPhBAYHzGn+NQYAu9opvQ
+	(envelope-from <netdev+bounces-273715-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 19:40:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D60136F809
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 19:56:05 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A316836F1B9
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 19:40:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4C9983056150
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:33:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id F21CD305BFFD
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:34:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF28401A05;
-	Tue, 31 Mar 2026 17:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8D93D47D7;
+	Tue, 31 Mar 2026 17:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S5oaBaBC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JJNXQzHM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC91B3E024E;
-	Tue, 31 Mar 2026 17:33:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3493A7F54;
+	Tue, 31 Mar 2026 17:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774978412; cv=none; b=inDkRmexHrzKzLLNqLBwAjyBnNd8Lu6UkMKZ96xptnHOOMdH0WfTYRgSyM7kfn9TvDK4W98J2PbSkpwMhFO5BmFk9Gr1Xo/FekWUZ5vS3Sk4zp0eg4lCQk0Osf9VTYsExHy/9e+TpRGDiiA4y9Z10jLVZDZX/0MOij8GdC/kSsg=
+	t=1774978462; cv=none; b=ipqGDqR6V/HbyZ1O3Z9xvhWgrghDrm57+hofXKUXA+W7w7cB9h9Bn4ZyzwdzvucgvhwIzgHzjlkTNyVoe66TQcMvrwVMkqN800QEamxQugO1F9pTfRV3A4+qJWG7wDOEz1CwelgVXJq02beZVEeBsXGGFLR6N+F3p+SdOM9dnFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774978412; c=relaxed/simple;
-	bh=6yuP0HLOVGo5gujSvyYIlb0a329339oNKp1hUorFe+k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zlx52aL8guPK8dmgREXKjfFU944SV4QorAF8CKDSIc+lQPqtwabFQGznQ8zORkIcEgV3xJEZFpKr0g7ctOS/lm/0DWGDUrAtrrtky6QocZFm/yjz0PiCg42bGzseExIbrcKiMWA2maiQc6ZM0nyhz4tGqA+/OeWPfxflB5o74H0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S5oaBaBC; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774978411; x=1806514411;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6yuP0HLOVGo5gujSvyYIlb0a329339oNKp1hUorFe+k=;
-  b=S5oaBaBCFw8kAbu7/75wuveKU345oYzL+UiShjioTO1YMBaY0519Dr7U
-   iaCdJdRjodzKYqLAvSVe/RlozjUiI6BjnSq6xyIiYsQPc2XsQsjhcFAgK
-   3Woill/hxo6ymgpK6upjWw6x+Hcsv1fMvNroaOiQSHw2cBM9j5unOyB0M
-   4j3rDX8T886VP0MSaMagLKpL3QUr9swpkVtoijHuIsEu5Ug5Yt/ueej2m
-   +xxbEbBerCZGeT0Txbj78E+1S5GzR8C81c01A6QSpcK2cnkh2nWUlJlS2
-   S3pis0exh39gPQgzCci+OVp9qZD21UpIrt9289SgWJsbZwgEBRzDrn8sz
-   Q==;
-X-CSE-ConnectionGUID: MWWUhUofRbqtUicLzvwklA==
-X-CSE-MsgGUID: NMJAlDnxTrm0JYH6ZwsrBQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11745"; a="75035936"
-X-IronPort-AV: E=Sophos;i="6.23,152,1770624000"; 
-   d="scan'208";a="75035936"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2026 10:33:30 -0700
-X-CSE-ConnectionGUID: S6A6JxILTJ+fszX8afT7Vg==
-X-CSE-MsgGUID: uXebTl5ESbGFHy0OO877Vg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,152,1770624000"; 
-   d="scan'208";a="225431662"
-Received: from lkp-server01.sh.intel.com (HELO 283bf2e1b94a) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 31 Mar 2026 10:33:27 -0700
-Received: from kbuild by 283bf2e1b94a with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1w7cxv-000000003wT-3ows;
-	Tue, 31 Mar 2026 17:33:23 +0000
-Date: Wed, 1 Apr 2026 01:33:14 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jordan Rife <jrife@google.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Jordan Rife <jrife@google.com>,
-	bpf@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Yusuke Suzuki <yusuke.suzuki@isovalent.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Subject: Re: [PATCH net-next v3 2/4] udp: Remove disconnected sockets from
- the 4-tuple hash
-Message-ID: <202604010147.jxlA7slL-lkp@intel.com>
-References: <20260330215707.2374657-3-jrife@google.com>
+	s=arc-20240116; t=1774978462; c=relaxed/simple;
+	bh=O2ovCaGzulr+alJNfIBomcRjjrSaCQ5KJ336Qrdjy88=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=DqgTDBwr+daOqUEWNwlN30FUfGmvv+QlzIuWzMr4vSzoCk4WcLW3McJggnMaqHjlqLXDncZhYXHf5JPfaRViod5X250J1c54EbIHTV80yXn2hhZKjZGjNWNLqKnlW7W2HVLo/7TU/Myl3NTKX5AD2/nOM6BOXQuncF1p8wNWr6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JJNXQzHM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70A7FC19423;
+	Tue, 31 Mar 2026 17:34:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774978461;
+	bh=O2ovCaGzulr+alJNfIBomcRjjrSaCQ5KJ336Qrdjy88=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=JJNXQzHM4/3ueMwYJPc+WIYhqdbz1jA81WIj6sie+vX4+x6Eu9D+QuKHAnF2IgCUh
+	 CNG+fUs4pKJ/5+OWN5HbDCE6R1d9bUHUouGbLM33Ht+FPIuFxMg6Lo/UKhzheCGDVu
+	 eAP06qq9zeQ0xdO+vSNzbL0IltKRoLo53c/5zIm2ptjnfNaxsRh/B3AjYYAyWKrnva
+	 PpkgMBmUYVVd6Z0AQqOqrDNJEshtrR9ro9yzQ2a0i3SFJAKlHV9lPUzamFUeypnScg
+	 k35H9CMGFikAHaBF3hi4NZZjJNJPTRX35vT2qt35iSWv556+gb2B7NpyvN/0vyFl/u
+	 y6Z0SWzw/huJw==
+Date: Tue, 31 Mar 2026 12:34:20 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	andriy.shevchenko@intel.com, ilpo.jarvinen@linux.intel.com,
+	dima.ruinskiy@intel.com, mbloch@nvidia.com, leon@kernel.org,
+	linux-pci@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
+	lukas@wunner.de, bhelgaas@google.com, richardcochran@gmail.com,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Avigail Dahan <avigailx.dahan@intel.com>
+Subject: Re: [PATCH net-next 02/15] igc: Let the PCI core deal with the PM
+ resume flow
+Message-ID: <20260331173420.GA143778@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,83 +68,100 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260330215707.2374657-3-jrife@google.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+In-Reply-To: <20260330230248.646900-3-anthony.l.nguyen@intel.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FREEMAIL_CC(0.00)[lists.linux.dev,google.com,vger.kernel.org,gmail.com,iogearbox.net,linux.dev,fomichev.me,kernel.org,isovalent.com];
-	TAGGED_FROM(0.00)[bounces-273714-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-273715-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,lunn.ch,vger.kernel.org,linux.intel.com,intel.com,nvidia.com,wunner.de,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[helgaas@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: 0D60136F809
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email]
+X-Rspamd-Queue-Id: A316836F1B9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jordan,
+On Mon, Mar 30, 2026 at 04:02:31PM -0700, Tony Nguyen wrote:
+> From: Mika Westerberg <mika.westerberg@linux.intel.com>
+> 
+> Currently igc driver calls pci_set_power_state() and pci_restore_state()
+> and the like to bring the device back from low power states. However,
+> PCI core handles all this on behalf of the driver. Furthermore with PTM
+> enabled the PCI core re-enables it on resume but the driver calls
+> pci_restore_state() which ends up disabling it again.
+> 
+> For this reason let the PCI core handle the common PM resume flow.
+> 
+> Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+> Reviewed-by: Andy Shevchenko <andriy.shevchenko@intel.com>
+> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 
-kernel test robot noticed the following build errors:
+I love it, thanks a lot for doing this!
 
-[auto build test ERROR on net-next/main]
+> ---
+>  drivers/net/ethernet/intel/igc/igc_main.c | 6 ------
+>  1 file changed, 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+> index 98024b46789f..0e785af0a3a3 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> @@ -7544,9 +7544,6 @@ static int __igc_resume(struct device *dev)
+>  	struct igc_hw *hw = &adapter->hw;
+>  	u32 err, val;
+>  
+> -	pci_set_power_state(pdev, PCI_D0);
+> -	pci_restore_state(pdev);
+> -
+>  	if (!pci_device_is_present(pdev))
+>  		return -ENODEV;
+>  	err = pci_enable_device_mem(pdev);
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jordan-Rife/udp-Only-compare-daddr-dport-when-sk_state-TCP_ESTABLISHED/20260331-082300
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20260330215707.2374657-3-jrife%40google.com
-patch subject: [PATCH net-next v3 2/4] udp: Remove disconnected sockets from the 4-tuple hash
-config: openrisc-defconfig (https://download.01.org/0day-ci/archive/20260401/202604010147.jxlA7slL-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 15.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260401/202604010147.jxlA7slL-lkp@intel.com/reproduce)
+__igc_shutdown() calls pci_disable_device() in the suspend paths,
+which disables bus mastering.  There are only a relative handful of
+drivers that do this, mostly for NICs, so I'm not sure if it's really
+necessary or if it's been cargo-culted.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202604010147.jxlA7slL-lkp@intel.com/
+Here in the resume path we call pci_enable_device_mem(),
+pci_set_master(), and conditionally call pci_disable_link_state().  I
+suspect all those are unnecessary because pci_pm_resume() should have
+called pci_restore_state() before we get here.
 
-All errors (new ones prefixed by >>):
-
-   net/ipv4/udp.c: In function 'udp_disconnect_unhash4':
->> net/ipv4/udp.c:2182:38: error: implicit declaration of function 'udp_get_table_prot'; did you mean 'vm_get_page_prot'? [-Wimplicit-function-declaration]
-    2182 |         struct udp_table *udptable = udp_get_table_prot(sk);
-         |                                      ^~~~~~~~~~~~~~~~~~
-         |                                      vm_get_page_prot
->> net/ipv4/udp.c:2182:38: error: initialization of 'struct udp_table *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-
-
-vim +2182 net/ipv4/udp.c
-
-  2179	
-  2180	static int udp_disconnect_unhash4(struct sock *sk, int flags)
-  2181	{
-> 2182		struct udp_table *udptable = udp_get_table_prot(sk);
-  2183	
-  2184		udp_unhash4(udptable, sk);
-  2185		__udp_disconnect(sk, flags);
-  2186	
-  2187		return 0;
-  2188	}
-  2189	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> @@ -7556,9 +7553,6 @@ static int __igc_resume(struct device *dev)
+>  	}
+>  	pci_set_master(pdev);
+>  
+> -	pci_enable_wake(pdev, PCI_D3hot, 0);
+> -	pci_enable_wake(pdev, PCI_D3cold, 0);
+> -
+>  	if (igc_is_device_id_i226(hw))
+>  		pci_disable_link_state(pdev, PCIE_LINK_STATE_L1_2);
+>  
+> -- 
+> 2.47.1
+> 
 
