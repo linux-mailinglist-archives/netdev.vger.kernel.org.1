@@ -1,203 +1,183 @@
-Return-Path: <netdev+bounces-273433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273434-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8BwKNKQly2lnEQYAu9opvQ
-	(envelope-from <netdev+bounces-273433-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:38:44 +0200
+	id iED0H4soy2nLEQYAu9opvQ
+	(envelope-from <netdev+bounces-273434-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:51:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 323D03631CE
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:38:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDD1A36326E
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:51:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E9782305A8B0
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:36:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D3213024102
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:48:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063A23630AD;
-	Tue, 31 Mar 2026 01:36:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532952D3A69;
+	Tue, 31 Mar 2026 01:48:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bZdffUEh"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="Xz53Arwz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-57-137.mail.qq.com (out162-62-57-137.mail.qq.com [162.62.57.137])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B77EE306498
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 01:36:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774920968; cv=pass; b=Xcn7/Fs6X+dTJl6X5kFn+0frFrgzQqhWaLUK+3+l6VTIPhyTeIySI2hFvhSpsvj0Ok7Ih33eWxZxrFhcSZ+gCnElTwk5uCVbA3iQjWmYgfJIS1BLj0pLfQ2TRF1ISf3s6Jv8Z2dEJfM06fNNwBIGmPR447B19R+ASQowhwB8grU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774920968; c=relaxed/simple;
-	bh=Fd6QAcJI16f3MqUm0f9PMci/8jTCJThqTHKrceWrBx0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e6Fx+ji6sEFY7+oy6Y+LySOMZ8D76ID3udc+CBukCYrLgBnS+0EC8+KpKGC4PgaPTk+W/Bhnt/FZzVpCtWGzuneK2HwP/lOmYXpKvi3V8dIIQBTKfCbK8C6LpNlH7yWxoB7ZBevqU3100lL5FvJFGzY6lj7yQZr+mgrA9J6zseo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bZdffUEh; arc=pass smtp.client-ip=74.125.82.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-1271257ae53so5131713c88.1
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 18:36:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774920967; cv=none;
-        d=google.com; s=arc-20240605;
-        b=DRK1GIEkol9y3QQjRlSn9bH6eujGJIVIHuvx+0lPoaOdKZzKlJ0R9bGGHKIrp4SefR
-         QJYAicDps0RXVySzTr3CmqrWwLv6o3wOEoXj/blW914CHc/baV2y0gor1eWYOWrk1Ujh
-         miyw+Je/KmtjQ7l1cT0JRohEFDqXU56g0FhHKjDXFcrAMR3pI09ofglOala7jqq7BKf3
-         dng8WZ+xy/PHQDgOyzTWg8Fvsr5UqWNaPJgDOo6oNcY6u6H6Bytu3jYiIK9IFmW3/6F5
-         CaC/7W8xNmg7dAE9m1JBe3T2NNE2caktU7HE7rWqtoLWIWoWV+WSbGJxGtaXZkHHjz+h
-         n6Zw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=65uWDB0Qv6BzU+J5GLRhSZeSW/d9SMCtWTbJ9K48rfo=;
-        fh=ITILdp01/U0eTJDYfXXAYRhlmDnuPLyc1GdZzAHzwOc=;
-        b=ZNudvYXfQ5lm+YQ2dWOM9yFebu0kbzMWGcAbK/ZRniBtjrw832YRtyRXCGLZf4V0jk
-         nNUAd5Zd4IOEhhtTYj7HVO9hSEMn5QR0gMcKTHkv+vMG8HudAKs2MaCszc3K1HzPj8RO
-         s5LuICNxuFNA7DnFL1QE103vN+Nn6zXt6HAR8rgPMOUXghHOwQP/KEHf4AAXkRkkRja8
-         YC2w7XURWOKZgtuoeCgCfHw5kbhqEf3GcRDbth/np9pNLBF5MZgd3PzWtd20EhH5JKOX
-         cBW0sYjc8cmNIIg/C8/uN6XjXxuuqnskRvVpyfRTbCHqgtrqzSg4b+ugLSh7tjV3/Tfw
-         wOzg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774920967; x=1775525767; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=65uWDB0Qv6BzU+J5GLRhSZeSW/d9SMCtWTbJ9K48rfo=;
-        b=bZdffUEhwZTj6I+/0BWDtD7Mp6Ve92s6jNMnchowHJCU8Hq1Uq+75AKYcxyQd8/Cja
-         HT8G1lYvQ4qq0y7HM5IpNIHiZv2e8/g7NyNXzRYdkB1kC6E3HK3g4CaopapLtfSSzj8f
-         dcbhPJsiU6Ejng5l3p+eJxB2sV9tF10WiCcl24T0QWhyySyleAosf1qE3ij3mcGV6VFu
-         dt6fD1d1zSCoumt4EkeAG6sIiUhml3HoLPcFxwgWjMwdgQI5VrGJZTLq1R8av85TrrC1
-         91sCydZ1uxr+cf4idGzF5z/qntMNHzO581DKRJpjKAPEoGrBtiny94wLyHf0Xd2F1/RU
-         PSSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774920967; x=1775525767;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=65uWDB0Qv6BzU+J5GLRhSZeSW/d9SMCtWTbJ9K48rfo=;
-        b=g5iuTioekPM8Vu/luxU8Zl+RItw3WPcGEulj0kN8A3CdQ+RbzaFL+2WxILI+d0Qk4Q
-         Yt/Hg34Mkdu4KKEOYENNTFCF0Fm035Fb5UCwXqTrFZXd2i7h5bkUXwNecdZhPMWIXR2i
-         RbpRj3qivsdhx/BNhc+wOOxN5UMbqkasmRhGi3QIRRqQETUMraeZ9w6nXo4WlbD6A0Gq
-         LWZnbdij4cHf/CmJ8f2Vr+PQn0uACTrupuJtBKYsvqjTjKD51Lxi6hLWuuVGfgnuDbtU
-         dyp8bkptM31WdXKfqevGSAX8Y7B/Urk/VBrT4YyOnkw0khuR2PBsNzCaAd9mcM5g4z7r
-         s3dA==
-X-Forwarded-Encrypted: i=1; AJvYcCXToCByW8RI+L/gaP85jVpbwwa2K9aN8fk0KKysNVovWuEAP/GRWrTamr2AbTbVcg7Rcxlyr+Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAZmtxQTn3GmyKbCHZfFUJysLL0Www6iqSeSeszK+OexCUlY0j
-	knro+QJIPG900sY9nMxNa29sIsXRivEA89X/Ds7QlJ+9Y8yauk5h8nudE9zQEmdILw6WNohGSs3
-	OIb0hPeAVRYgzopwAxJovyFUPrUFieJ7da7MOL2Dg
-X-Gm-Gg: ATEYQzyJ4az3YcxGFnj4wZmJsA5NtLMX1gFxdI9kjkCxvf7++HLLA3um2xBhD3ns1b4
-	LV3HlBkW0f/WvLuNXz+cqNKYgrQM8BUYQDupWW2n2j+RDulrTFi4BN+y1z2nLFdCB7Dopn90aFK
-	g0keylP5C5g4Xmiv9wxZxg33Ym9GQnDxo2W0F5t3zdFf7ghe9u9W/FmLXf2T9yT1ChJNQlD7ONr
-	vzQGuK3KsfiZ9M23b8GMLBJWc767p8j39pMyzXv2/xfFdSn5Z+mbrpkZJDOFPpb+DyNiC6NKdD7
-	MqqVe56g628b+Sg9i4fpN2/9xwfp8dbqpZc6e7HCxwku0VqyUU9YBMIzk8bCBosv6OPDVgMK
-X-Received: by 2002:a05:7022:220a:b0:12a:6c4b:9cf0 with SMTP id
- a92af1059eb24-12ab284bbddmr7115803c88.3.1774920966145; Mon, 30 Mar 2026
- 18:36:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8FCA19D074;
+	Tue, 31 Mar 2026 01:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.137
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774921732; cv=none; b=oG3B+4qU7OVp88qyHCjaRXIfAm84qqr8ZqKN4HxUvR4Vw7BXsdW69IbL74zBLDlaAqIFo3M21iBH56GuuxDTPrAjstzAh7QKBfC5ONUuFXj4t+R+bmS3plhCDqg559SsHloindc3VYDa2Qj0K6XBKgKotzZ3fPP4lu5N0+z10/Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774921732; c=relaxed/simple;
+	bh=2Xe92bJA1IKCHmoyEgcN4DwhMlKFgwtLQv82yed622k=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=uZ5Dew3B+Tbum1/4Ueld/CVAAml4nCLDSm0qA109tWXJdygVZFErSiRBFA2Q0ophqibgw4v/9naJrib12UF9fUrhE5rlznAoZcwuF8CysltMWiaMgEm+u5keEZoR73K1+DF9fep/qInN3cYAL2X0+ln11MS9pjJKaQkfbJMgGJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=Xz53Arwz; arc=none smtp.client-ip=162.62.57.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1774921724; bh=KV1Z2bEMTctuQcZnl3dN2Va7/a85G/GZ/F/sFu+gDxM=;
+	h=From:To:Cc:Subject:Date;
+	b=Xz53ArwzKvYs8+r8urBYYJDWw31lauZlkqHPA2VV/4uHcTIwRR9CMvHrTKITc4acr
+	 Q2EPBPt7kaGx74WlAVqxSO2y/834mQpgoiQm7V6cDCJWgXUWCcsbCKjFgFmYjHS/JS
+	 WpnkSR2jpJ/qZbYmqbpjjSZAb9YC4kBwYfav/R+s=
+Received: from June.localdomain ([123.121.145.35])
+	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
+	id C2884AC8; Tue, 31 Mar 2026 09:48:40 +0800
+X-QQ-mid: xmsmtpt1774921720tspj4u9oa
+Message-ID: <tencent_FAB2A00E105488F503DCC787B8060F881E06@qq.com>
+X-QQ-XMAILINFO: OOyEews/EdUgJBTHzR+AvEpZ8QcrjB2Cid5WlwR2+xD2mMwIGk8pHXWe95ZKP0
+	 ByummtbON/EBe8MQCrAZ49A/eicKRT3Ou1EhLGXLbsStOnHzW3U3dYNA9mcsmVq0xhmlzLk17uLk
+	 pkZmpi/qgZlVpyQOKp3w9F7yDbphSnIJxi0sgcE1G3MGf+uS/Td3csMa6ft6vfukMGg1CDtvOwbo
+	 pt3kR/+l+NUuseqGVDA+Npz9C/yvfIkt18PEFGrCNpnUu9Tj11zmTpzxzkoCoLdexx/LFDkfTDUz
+	 mt70jR39+R9V7pmnEB4aW1gmEJGv3S1fzFYzF2/OmqVAXhw2VUFNpEhplhrXvR2gFhRVxnzJWONk
+	 Xh51jWeA7HcsGaJ8VD5Ujb0U4F6Qt9wDUdRT3paExzTZRIb3c/5Z+ELlgluvh0/2wq0Yd4sHYUc6
+	 aTJRpJ6S90ZTPFX6pj4E0lSoboj0OAg6IMvooMbZpo/DGTjWeeBegcn0FoyCC5XYuwYl+aKL5kon
+	 uvMh1vYL5TPpi5UjHVe1n+3cngRhI++2B/uTz/tk+cKLVHZ7t6QNPcr9GuO/rM1budwWBE7G8qiu
+	 S2Yd2oPoJ4xRVJd752qhpiJ3M3IMKGXhudZ4MYkckD6l/NG1cSOliBYOn4XVJJgYNQ+G/i6sN3Ef
+	 aDSiFR3/svr2+Q+2I9oZCEDspdWX9SRCgTYpri7mwJyOTTqJs0Da3FT8OkqUsI5u53VtSjzKD8Af
+	 zjR2P+hCo/gBirAQ5rXtRIzJzK1PP31K8O0gnaEqWfw7JRCkyxaqyLPrE8wvhH2JFhc2d2/gQpl8
+	 a051xufIqNa5hizpwLS09xhVnsLBk8HFZOn4CCinPoHgQdsyheOsEmWXWQwn6cJ3rexRh7NWjINS
+	 Diax0ELss/Y6OTjfX/CnjAnh/Kp1oC7aLxRhnxo37J0dk5NB8ei5AJWLtua5xIvg/9fIyxWmj2tI
+	 udhf2d044q1GKRQDoe7nUTccgO+Qm26ADnsnr/ls7KbAJF+Tlv3zgDVBj7/GU8H10Q7ltk6cBeoR
+	 +iom6uC7IdhqjqM4X1VxFTAY7h1zWlu8HcyA9Yhd2QK5KuY0IW2OJrGorA7RClOP7U7Jpcsg==
+X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
+From: Wang Jun <1742789905@qq.com>
+To: Jes Sorensen <jes@trained-monkey.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-acenic@sunsite.dk,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	gszhai@bjtu.edu.cn,
+	25125332@bjtu.edu.cn,
+	25125283@bjtu.edu.cn,
+	23120469@bjtu.edu.cn,
+	Wang Jun <1742789905@qq.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: alteon: Add missing DMA mapping error checks in ace_start_xmit
+Date: Tue, 31 Mar 2026 09:48:41 +0800
+X-OQ-MSGID: <20260331014841.74420-1-1742789905@qq.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260330080746.319680-2-jiayuan.chen@linux.dev>
- <6ee24770a2b014219d86839b2243e1b7bad4dc4f520457269d5e8ca2b21c2cb8@mail.kernel.org>
- <d1a739d2-c4ea-4fae-aeaf-f49e75dac0f3@linux.dev>
-In-Reply-To: <d1a739d2-c4ea-4fae-aeaf-f49e75dac0f3@linux.dev>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 30 Mar 2026 18:35:55 -0700
-X-Gm-Features: AQROBzAoWaoGMz8lgwUE4cc5pzeu3Q6dad4Ef9SHjpneA1fRPQ9yGPYn9pz2kSE
-Message-ID: <CAAVpQUD1n7L6LkP32H_Ct71RLNpJ2RQWFc8w08+c8h=U_tDjpQ@mail.gmail.com>
-Subject: Re: [PATCH bpf v4 1/2] bpf: tcp: Reject non-TCP skb in bpf_sk_assign_tcp_reqsk()
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bot+bpf-ci@kernel.org, bpf@vger.kernel.org, clm@meta.com, 
-	martin.lau@linux.dev, daniel@iogearbox.net, john.fastabend@gmail.com, 
-	sdf@fomichev.me, ast@kernel.org, andrii@kernel.org, eddyz87@gmail.com, 
-	song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org, 
-	haoluo@google.com, jolsa@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, martin.lau@kernel.org, 
-	ihor.solodrai@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273433-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273434-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,meta.com,linux.dev,iogearbox.net,gmail.com,fomichev.me,google.com,davemloft.net,redhat.com];
+	FREEMAIL_FROM(0.00)[qq.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[sunsite.dk,vger.kernel.org,bjtu.edu.cn,qq.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email]
-X-Rspamd-Queue-Id: 323D03631CE
+	FROM_NEQ_ENVFROM(0.00)[1742789905@qq.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[qq.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[qq.com:dkim,qq.com:email,qq.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CDD1A36326E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 30, 2026 at 2:26=E2=80=AFAM Jiayuan Chen <jiayuan.chen@linux.de=
-v> wrote:
->
->
-> On 3/30/26 5:00 PM, bot+bpf-ci@kernel.org wrote:
-> >> #if IS_BUILTIN(CONFIG_IPV6)
-> >>      case htons(ETH_P_IPV6):
-> >> +            if (ipv6_hdr(skb)->nexthdr !=3D IPPROTO_TCP)
-> >> +                    return -EINVAL;
-> >> +
-> >>              ops =3D &tcp6_request_sock_ops;
-> > For IPv6, ipv6_hdr(skb)->nexthdr gives the type of the header
-> > immediately following the base IPv6 header. If extension headers
-> > are present (hop-by-hop options, routing, etc.), nexthdr would be
-> > the extension header type rather than IPPROTO_TCP, even when the
-> > packet is a valid TCP segment.
-> >
-> > Would it be worth using ipv6_find_hdr() here, similar to
-> > bpf_update_srh_state() in the same file, to walk past any extension
-> > headers? The IPv4 check above is fine since ip_hdr(skb)->protocol
-> > always identifies the transport protocol directly.
-> >
-> > In practice this is very unlikely to matter since TCP SYN packets
-> > with IPv6 extension headers are essentially non-existent, but the
-> > check as written would reject them.
-> >
-> >
-> > ---
-> > AI reviewed your patch. Please fix the bug or email reply why it's not =
-a bug.
-> > See:https://github.com/kernel-patches/vmtest/blob/master/ci/claude/READ=
-ME.md
-> >
-> > CI run summary:https://github.com/kernel-patches/bpf/actions/runs/23735=
-111188
->
->
-> Thanks for the analysis.
->
-> There are many places in the kernel that check nexthdr directly without
-> walking extension headers.
->
-> I'd prefer to keep it simple for now and leave ipv6_find_hdr() as a
-> potential future improvement if needed.
+The ace_start_xmit function does not check the return value of
+dma_map_page (via ace_map_tx_skb) and skb_frag_dma_map when building
+transmit descriptors. If mapping fails, an invalid DMA address is
+written to the descriptor, which may cause hardware to access
+illegal memory, leading to system instability or crashes.
 
-+1.
+Add proper dma_mapping_error() checks for all mapping calls. When
+mapping fails, free the skb, increment the dropped packet counter,
+and return NETDEV_TX_OK.
 
-Given this feature is to create a reqsk to process on this running
-host, it does not make sense to support such ext options.
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Signed-off-by: Wang Jun <1742789905@qq.com>
+---
+ drivers/net/ethernet/alteon/acenic.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/drivers/net/ethernet/alteon/acenic.c b/drivers/net/ethernet/alteon/acenic.c
+index 455ee8930824..acabede53663 100644
+--- a/drivers/net/ethernet/alteon/acenic.c
++++ b/drivers/net/ethernet/alteon/acenic.c
+@@ -2417,6 +2417,11 @@ static netdev_tx_t ace_start_xmit(struct sk_buff *skb,
+ 		u32 vlan_tag = 0;
+ 
+ 		mapping = ace_map_tx_skb(ap, skb, skb, idx);
++		if (dma_mapping_error(&ap->pdev->dev, mapping)) {
++			dev_kfree_skb(skb);
++			dev->stats.tx_dropped++;
++			return NETDEV_TX_OK;
++		}
+ 		flagsize = (skb->len << 16) | (BD_FLG_END);
+ 		if (skb->ip_summed == CHECKSUM_PARTIAL)
+ 			flagsize |= BD_FLG_TCP_UDP_SUM;
+@@ -2438,6 +2443,11 @@ static netdev_tx_t ace_start_xmit(struct sk_buff *skb,
+ 		int i;
+ 
+ 		mapping = ace_map_tx_skb(ap, skb, NULL, idx);
++		if (dma_mapping_error(&ap->pdev->dev, mapping)) {
++			dev_kfree_skb(skb);
++			dev->stats.tx_dropped++;
++			return NETDEV_TX_OK;
++		}
+ 		flagsize = (skb_headlen(skb) << 16);
+ 		if (skb->ip_summed == CHECKSUM_PARTIAL)
+ 			flagsize |= BD_FLG_TCP_UDP_SUM;
+@@ -2460,6 +2470,11 @@ static netdev_tx_t ace_start_xmit(struct sk_buff *skb,
+ 			mapping = skb_frag_dma_map(&ap->pdev->dev, frag, 0,
+ 						   skb_frag_size(frag),
+ 						   DMA_TO_DEVICE);
++			if (dma_mapping_error(&ap->pdev->dev, mapping)) {
++				dev_kfree_skb(skb);
++				dev->stats.tx_dropped++;
++				return NETDEV_TX_OK;
++			}
+ 
+ 			flagsize = skb_frag_size(frag) << 16;
+ 			if (skb->ip_summed == CHECKSUM_PARTIAL)
+-- 
+2.43.0
+
 
