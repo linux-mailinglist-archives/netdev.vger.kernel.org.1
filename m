@@ -1,253 +1,261 @@
-Return-Path: <netdev+bounces-273693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273694-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YNKME/P3y2kXNAYAu9opvQ
-	(envelope-from <netdev+bounces-273693-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 18:36:03 +0200
+	id mFPhAG/2y2nlMwYAu9opvQ
+	(envelope-from <netdev+bounces-273694-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 18:29:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43EC336CD17
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 18:36:02 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EBE936CA25
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 18:29:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2D6103002D36
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:22:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2097530470FB
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:23:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3F23DB62F;
-	Tue, 31 Mar 2026 16:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE24430E0DC;
+	Tue, 31 Mar 2026 16:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cw3oJN6I"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hv/rzxlp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F382D329E4B;
-	Tue, 31 Mar 2026 16:22:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774974171; cv=fail; b=EgB4W1xtbj37mR/8QE509YXJkn+etPLN7+gwEeXA6CAuOkVVEv9v6Dky7yVI3z9KSNfFFVksuSYACf4EZ/RrhmmY+YmfMZhcCU6i+DDV2UWcFLjJ1ZRxJJ6tQ7qmev3RJcUMHCcygO/PN5fJBhTW1v9xlETYVdpYD2NFGxngLFI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774974171; c=relaxed/simple;
-	bh=JVVYNj73Ml00hHZnn5m0H0X33YNBG1KOWpYI8rr02Y8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=eG6r7Nv23sJFtMjYyPfJ4hFkyw8yESkANlYPf2IubOduiAeKMB9rNj5vDWCmz+a/A8uKKlyknLAUiIqglLU7ttmdp/jmP4y/LV1l9DCYmAUHljr8l9kEiFRIA5UHBuIffdJYEofhGUMePt6YGgoOcecuuAUXG70l66Jw/v6mrlM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Cw3oJN6I; arc=fail smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753FD3D75D9;
+	Tue, 31 Mar 2026 16:23:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774974235; cv=none; b=ppFUYeHlI1IU2ha29Q7NVGnL++O5nucZvp7iatubtdFA25V3G+rTE5s3j/V0godvzDPPfTmwPuDPLZj7oNoKvwEo+sfz2N8O276mntsnkU4oYZJfYx6OnCoB04gBqK2Xsrdu8hghe+hLYNa49+TD5PECv+Vc/3TLAoBmcEarcxU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774974235; c=relaxed/simple;
+	bh=Owy27NZIONsUdNTzktg4/3o+Iq30FcPIRoBuYypQxIE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dOmXgEk0y9ewbe/3jh/8DsfDqLycxrgi0zRLhwxRMkN3/YX7x8D54X55vGYYWKqEe57CvgsRNh90s0lvMdP9f8IVzuD9ioig7jwK1Y4+01WaI7LiDpyajGh2czWkuV7u643sWeIh/sPL6pPmgSuTSMVvZArSs3xUpzvLHcn1UIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hv/rzxlp; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774974170; x=1806510170;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=JVVYNj73Ml00hHZnn5m0H0X33YNBG1KOWpYI8rr02Y8=;
-  b=Cw3oJN6Im8szkRlOW5XeWidlTRv4gdtE7HNOl6KsRf2Bmqbu6ixXPpu/
-   NQoBH8GazudKVRja3uGsgormI0Gp1mAtrcHwWBH16RlclEXmbFHKXvchH
-   eR+h6OpZ6BI7L8KlaY4L7ihADJ2UiSqQFpYVqET/yEom9nQSP49XzmNca
-   SUX5oYURub9VKBC9TWURorXM3V9rV4AWeseK8Kh85gjuYPDjvqGbdztuU
-   cazOAr0C9lm2QXKWPAPpuKpK8XpxopGywim3OrDydxcXA4SH2xPZaCRBX
-   ciJjL7VhoZHqi2OyBOMWpK7ENbFY0ZeFmqpGZ02MCVJBvzV+/eej2vVQI
-   A==;
-X-CSE-ConnectionGUID: 9Dqcwv5uTC+ng5qTXo7I3w==
-X-CSE-MsgGUID: ahv5l2CARrqSJFA5H4nf3g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11745"; a="86608391"
+  t=1774974234; x=1806510234;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Owy27NZIONsUdNTzktg4/3o+Iq30FcPIRoBuYypQxIE=;
+  b=hv/rzxlpta3zLX3NoDA10qIuuOQNPUuAVfkj91UXVkya11PIU7f71jyE
+   Nntu9meFawdKVRQao/z4FehEGAunmREKnv59aWfGuJspVSK+MlvJ6Wikc
+   fTmAdN8w24qzgB3mxg+ldkM5Z29BFCk183e94xC8eeIA/mARMlFH1eUt6
+   UKIiu1QM6V/rIL+tascZyMKBg2gWjOdkDwRgq3rF2BszPb/UE96uC/8Pb
+   OuiJchUrb9PzvTLcE8YWrICVOEDODw59zkiVuVLqcjlqpb+LyiF4ZNpW0
+   X/1lMkXSqPSAhtxaFOlow7KTmmNtg2DO5pT2Z1BhewgBBUM7ZSZ5LSTic
+   g==;
+X-CSE-ConnectionGUID: pIZP2Qq8R6KktlaTckjLPA==
+X-CSE-MsgGUID: NvwQuBrXQlCDYi27I+QAOA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11745"; a="87386939"
 X-IronPort-AV: E=Sophos;i="6.23,152,1770624000"; 
-   d="scan'208";a="86608391"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2026 09:22:49 -0700
-X-CSE-ConnectionGUID: g1VpRBIpRvSq/MS6bL2iwQ==
-X-CSE-MsgGUID: +WWDYvCwT820HS7AS+X3jw==
+   d="scan'208";a="87386939"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2026 09:23:54 -0700
+X-CSE-ConnectionGUID: cF1F+tt8QQ2ChLIXH7/5Aw==
+X-CSE-MsgGUID: 1YpHvgX7QJugjkhEZ86q+Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,152,1770624000"; 
-   d="scan'208";a="249624550"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2026 09:22:48 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 31 Mar 2026 09:22:47 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Tue, 31 Mar 2026 09:22:47 -0700
-Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.12) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Tue, 31 Mar 2026 09:22:45 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CNB/koRYDxMMJlOdaTs9jEY3vnFvtL5Q3gw+wTqoMQ6uKEy2fTmlrzSxo9YJYoyt676mDLdtO1KRcCauTrCJC9HRocLy63GoF+oRAe0GXUv0TmyBmKbhUVlMlCLexlVc3Z9MSHILXgcUn7RFCNpFhNA8EN6upUSzW5NTDUp3JUNS8RX3itD3Jf/Wdz+wCJJIZY6LqMPAShEg6UyP2hJpt3TGgQmg3yr4AC5NNiE87y+FemX2e8O+pKKw7c+BFG1vglBDAKMnBDrIZ73p8oeUf4MDIxxYwC7ScGAzgg2GISAw1EMbr0cw33MgXbX1XBslrlDCYeT1vr9WUAlGzkkZWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JVVYNj73Ml00hHZnn5m0H0X33YNBG1KOWpYI8rr02Y8=;
- b=LLuTLjaJ0v1jtRGmdj5MtnBUm0+PtAU5bOJQ7fuJtQXjQNqDJnPtnDrHBreiPqxg0/3Ta3xouRcvlvD4b4Jk7jBAEu2H4P8JSoXs7Ljh7z7KLZNLOTniRv7Gjm0o4oLeVSpFmLAHDZkAFN/k3nNynNnpL0OKqH8rQZEV1HtPUb8NZXfvLmzI844BN/MyUpQq5HT5LOlf5Hh0eUydWYMU7tNf8SHJ7IOpT2FBht32uKZtuWbPhwNiQzPHpfGek02vrsnPamUWkf7LLc6XR5/rK6GwEAd/W2g5mAbOE74oLEqrvsSjXYOsGIsHKcvlGcOc61nY7P2ZWbg4HdYNDuS/hA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ1PR11MB6297.namprd11.prod.outlook.com (2603:10b6:a03:458::8)
- by CH3PR11MB8383.namprd11.prod.outlook.com (2603:10b6:610:171::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.15; Tue, 31 Mar
- 2026 16:22:37 +0000
-Received: from SJ1PR11MB6297.namprd11.prod.outlook.com
- ([fe80::6f05:5b37:2440:556e]) by SJ1PR11MB6297.namprd11.prod.outlook.com
- ([fe80::6f05:5b37:2440:556e%5]) with mapi id 15.20.9769.014; Tue, 31 Mar 2026
- 16:22:37 +0000
-From: "Salin, Samuel" <samuel.salin@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>
-CC: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: RE: [Intel-wired-lan] [PATCH] idpf: Replace use of system_unbound_wq
- with system_dfl_wq
-Thread-Topic: [Intel-wired-lan] [PATCH] idpf: Replace use of system_unbound_wq
- with system_dfl_wq
-Thread-Index: AQHcsv7J4NzZwpMRNkmTVSSFBKZDsbWsoWaAgAGS2QCAAzH9gIAALXCAgBdbQ6A=
-Date: Tue, 31 Mar 2026 16:22:37 +0000
-Message-ID: <SJ1PR11MB6297246F8ECC4868C05054339B53A@SJ1PR11MB6297.namprd11.prod.outlook.com>
-References: <20260313150917.271086-1-marco.crivellari@suse.com>
- <0ca7f92b-ec4e-469c-ad2b-648d278bcfe9@intel.com>
- <20260314091048.235a6d0b@kernel.org>
- <878cd07a-b7fb-491a-9cec-8ddbab2bb13b@intel.com>
- <20260316124107.0dd3cc2b@kernel.org>
-In-Reply-To: <20260316124107.0dd3cc2b@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ1PR11MB6297:EE_|CH3PR11MB8383:EE_
-x-ms-office365-filtering-correlation-id: 32be1fd9-8230-4208-c028-08de8f41b8f4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700021|56012099003|22082099003|18002099003;
-x-microsoft-antispam-message-info: bK/mT60iU6W1yfuE74suleVCw42XX9vMbAeYnC+dYP1MQK6dafzl9oHNR8LG8LbcQHRB1U7HzBT4eIXhJaumRYaKAQRsZknjqCfKBB2hGBhnnxzqttCi6YcR5E2MDkjWW0tgg4WLeqcMFXd0XRpNI1K4X9M0AniFqAlaFdrvvyIe5A97JVLZHkyMy+OG5L96qYSW+tRC3sQ5eZCv5bynzK5If6wFsJqZSohfPlV1QSy5ZqwodyT68IQzwsJskXRBxicttT5f8ynE7sBMli3B6xfc0gru4jncc4sWbiFUXsoq3iTEWN5fwNUkiYfZ/wjGFu/XY3v7FUkFSDuofY1zlLgiOakZjj6zGSFSnnjLbRZ1yjCy0mspy26n3hOAtWGXPixu3/3sil1ykOOa+fJ1kit6FYMztAZ+6QNWA35bx55n/g1edkRWYg+ckGEW0sZBdzxikQ2sme9155newMlzxC1ArkDCL0ajheLkRcxEE5vT26x+ZHs1N8v7UxGK+PgD4iJ2vWTURChEponZ4UL7+dXNgoVsLXbq1F9Fl6HX3K6wWrBrstU6HNxgjzAUO5KQqy1Eg98ePgnebhcdXZMG2wtQTb5vYiD1fQYcyR2E6AqnpYDWYq+1x7yqsxgLHDxetuN0yLJ9vWU8zWAEMv+oq/7ZkX9xBeeF9oBNOfrupA4OjkNzIbevBR1AGiewPnqpyRPLr9tJWJa8UESXtR9VdSQEiJCgAZXQ/jtfmZaD8b8Px52IZH+yaIQCHTshokOkkcXazM6QRCwhI4kgkwD00sbhQkotmRzoP8hf8poJwgA=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6297.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?hC0Sue80cHgOV7KAyziSbDmVn5pcEIyKgrdN1ZY7r2dG5LuX/9ZrV9rxklBd?=
- =?us-ascii?Q?ifbx9XqbPncL8eRpcNwn1mfwca+8bD1hiloa7Gki6ffHgX2YWMXAWiI7GAq8?=
- =?us-ascii?Q?whxo2yE9EIVvvcRquhz/dfyL9SWlt4t9fxHweWfAVXYPnLcrWbRqYtAwPhIG?=
- =?us-ascii?Q?hG1qU5+7lViJ1g6ZYoO2XvpzNJOD64hasctt6y3yk33pVLZq1t8WEuGIWTbS?=
- =?us-ascii?Q?z4fpNda97drNHngymNpuL5IAV2kfQOqMz3sFFrX7E6rYCo/LX1zQ8ssYTdcn?=
- =?us-ascii?Q?Pt6Cs/Uc00YIaxX2u9aZM6CJ98IGdv920v6Bn3euI+7P2fJgyIhCJAq6GhU8?=
- =?us-ascii?Q?dnbIvQAFcEJzvlcxNBJPzvwHjM/Sz7vt8bbSCOhHqC0uvmw07ySlDzg8y7XK?=
- =?us-ascii?Q?FQjlEuVVTl24xiGbbFOlbXG51biIfDqENqQg9WfrLWo5M3WYJ0MLjXx/Gbrc?=
- =?us-ascii?Q?8/rAaPxSgxzwaK6rr9Qji1UFbpPK7TPDxVQ51fZ6A9exOIm9JylEttspSt5X?=
- =?us-ascii?Q?iMpPq3dxfo/uDDaQJwS2ThtN9BcUSGnbEeEvAqzpNr3vQH7Yp4p35DVPUAnh?=
- =?us-ascii?Q?sI82VLYg15rDrxqzHUu7hisrCNFBq+1zYAJNZdQdauWmkz1XLuiKL4u3F5Yj?=
- =?us-ascii?Q?ffubyPdsxXzyfnc7XOWXSY0Qlfm5sxP0QfMEUI/guv1qKjR7KWVY84dA6q6Y?=
- =?us-ascii?Q?visHKlJJ0y0ht6aFcBemFGXGrspEtIlf5OlobSvXB4rk5xpnyuw+n9cfYKHX?=
- =?us-ascii?Q?wxqr83cBR4LR+qZU52iCPjl8Z3PJ2y8iFN1bofaWI0EapmOfox/1v+9rPGT7?=
- =?us-ascii?Q?f7WY79K/13fweMztZ81l4TGUJevsPpbgEkRFR1dFQmab9ZNYARYVMlZVCCX7?=
- =?us-ascii?Q?5u3ZZ5IXGva8GBCoh6KMkaW0yq0r+Dq9TnI3w96G2y/nbyRPrfWxbcgBMzk+?=
- =?us-ascii?Q?lpvxQNBw7qBDHN//uzdvDM0i3OzsTEL+65iDMglwjSiWwgtTyDu5ac3VnMQA?=
- =?us-ascii?Q?6DIpZzJMsFT8SXI84zDXO3qEMDCTRur5+efjk6xiNgCUcKiZG74Or+HmjNKS?=
- =?us-ascii?Q?sdLWpyg6vXvzsRWcY3T2eJjRdEGNkZ07LJeYighZDfNykqz/2xC4+LinWrqN?=
- =?us-ascii?Q?XclpX3q2/1+HZP2z7gtgKEdrJ64G7SUF9hXy9plqLHSO7XRfRb+bE7brUfMG?=
- =?us-ascii?Q?EdnScVrw7aCywKrlensmqZCynM7yupJ8F8Bxq1tJAPu/GvDViKdFPp7rUxFy?=
- =?us-ascii?Q?93LWK6BnmbPx9ux/uQ4H+rVOAjdqThnT4Gbm5Z9p4vMi2TRvlw0Zm69arOQ4?=
- =?us-ascii?Q?sa+GLUh2ObOx2vV2ysKh/aNkdFYjYooU+NNxe7WrYzEPtpPjlBaz3LPZXS3w?=
- =?us-ascii?Q?8IalY7nmeYwrtQ6604wpfUJI3XeNz1bjdsLKQpouKFNuBcM8IwVF+aoiAujq?=
- =?us-ascii?Q?uHFBTRszMm2N+NOafx7NfGTa2m2fQNgGjogzNblX1naM6gmrqONaTpYII5KI?=
- =?us-ascii?Q?WGr5dPBQ/+Twqzcn2BVLnTeMTS3vws6z2fK4k/ZMi+QxsFl9L0BZ7YMSS/3P?=
- =?us-ascii?Q?MkcqD+siA/KWViVM/QThZQGsJiDV2572iXAbIyMu/nN3VzkH2Ss3/kc/BXd/?=
- =?us-ascii?Q?Tj/gEhXlgVGH2OLvnySWAm2HglYpgSwWMYWqYKDlrkqunrUq5gFQkTL2WqgL?=
- =?us-ascii?Q?aDOaLaOkCMjT4HEboHaF8YpI2ny1BQSRZXZj+Bxcp6XaZpRjwJShZPkHs4lf?=
- =?us-ascii?Q?gVtIB5/p2Q=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="230860100"
+Received: from lkp-server01.sh.intel.com (HELO 283bf2e1b94a) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 31 Mar 2026 09:23:50 -0700
+Received: from kbuild by 283bf2e1b94a with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w7bsZ-000000002t3-2ihm;
+	Tue, 31 Mar 2026 16:23:47 +0000
+Date: Wed, 1 Apr 2026 00:23:21 +0800
+From: kernel test robot <lkp@intel.com>
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+	netdev@vger.kernel.org, dave.jiang@intel.com,
+	dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: oe-kbuild-all@lists.linux.dev, Alejandro Lucero <alucerop@amd.com>,
+	Edward Cree <ecree.xilinx@gmail.com>
+Subject: Re: [PATCH v25 09/11] sfc: obtain decoder and region if committed by
+ firmware
+Message-ID: <202604010036.h2OVjfQU-lkp@intel.com>
+References: <20260330143827.1278677-10-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: ie6o8p8dqKsvCozyWiHyOTXElQkM6YPd2wKMXzqb5NoY7bPo0CAr/gSDbqOZ0AgX6Nm0HofU1Hb/UZNJ9xGdfR8VOIg1ZerwDhz4Jm+PaCntR389A3UXcMmVoZQ1Ix8QNYBRu9qKRvNPnyhFBBzHUi9P2uMcZmB5KKMmVCByp67C9rEe5oo8sOngx2AVsyy4jkDIs0e6qFEsmZ0HqgLuaSYQW3QJ3kr9WPzEhsBHup5WK7BJIthnvZ19aLWCSTfa7njfe2Z7tWP9IDJHIfnHvGvd9BA2xSFITT23TdgZi20rvHn4hLCaLJZO0KnN1Fh4enI+nCK8OdnHJ5UY2Ebb9g==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6297.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 32be1fd9-8230-4208-c028-08de8f41b8f4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Mar 2026 16:22:37.1330
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MMBTkyrq/AaVKUWDwIgmXQAoeMas0V8A2KDxuhyX1W6h2J5V8uOT+dTP6L8nOsFuD1ws1A9lMcun1jbUDlr+qg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8383
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.34 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260330143827.1278677-10-alejandro.lucero-palau@amd.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273693-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[osuosl.org:email,intel.com:dkim,intel.com:email,davemloft.net:email,SJ1PR11MB6297.namprd11.prod.outlook.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[lists.linux.dev,amd.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-273694-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[samuel.salin@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: 43EC336CD17
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[01.org:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
+X-Rspamd-Queue-Id: 8EBE936CA25
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on 64584273dfb8a1e5fc7d78094ba22a93c204b44e]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/alejandro-lucero-palau-amd-com/sfc-add-cxl-support/20260331-055820
+base:   64584273dfb8a1e5fc7d78094ba22a93c204b44e
+patch link:    https://lore.kernel.org/r/20260330143827.1278677-10-alejandro.lucero-palau%40amd.com
+patch subject: [PATCH v25 09/11] sfc: obtain decoder and region if committed by firmware
+config: sparc-randconfig-002-20260331 (https://download.01.org/0day-ci/archive/20260401/202604010036.h2OVjfQU-lkp@intel.com/config)
+compiler: sparc-linux-gcc (GCC) 15.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260401/202604010036.h2OVjfQU-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202604010036.h2OVjfQU-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   sparc-linux-ld: drivers/net/ethernet/sfc/efx_cxl.o: in function `efx_cxl_init':
+>> drivers/net/ethernet/sfc/efx_cxl.c:89:(.text+0x198): undefined reference to `cxl_get_region_range'
+   sparc-linux-ld: drivers/net/ethernet/sfc/efx_cxl.o: in function `efx_cxl_exit':
+>> drivers/net/ethernet/sfc/efx_cxl.c:120:(.text+0x234): undefined reference to `cxl_unregister_region'
 
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Jakub Kicinski
-> Sent: Monday, March 16, 2026 12:41 PM
-> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>
-> Cc: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; intel-wired-
-> lan@lists.osuosl.org; linux-kernel@vger.kernel.org; netdev@vger.kernel.or=
-g;
-> Andrew Lunn <andrew+netdev@lunn.ch>; David S . Miller
-> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Paolo
-> Abeni <pabeni@redhat.com>
-> Subject: Re: [Intel-wired-lan] [PATCH] idpf: Replace use of
-> system_unbound_wq with system_dfl_wq
->=20
-> On Mon, 16 Mar 2026 09:58:29 -0700 Tony Nguyen wrote:
-> > On 3/14/2026 9:10 AM, Jakub Kicinski wrote:
-> > > On Fri, 13 Mar 2026 17:08:57 +0100 Przemek Kitszel wrote:
-> > >> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > >
-> > > Process question - even tho you are also a maintainer I only read
-> > > Tony's tags as "please apply directly". LMK if that's right, I'll
-> > > try to remember / make a note..
-> >
-> > I talked to Przemek about this a little this morning. Since the
-> > Reviewed-by tag is used more prevalently in our process, perhaps an
-> > Acked-by could mean take this directly and the Reviewed-by keeps the
-> > same process of going through IWL. Other thought would be to
-> > explicitly ask/state for it to get taken directly. Open to other ideas
-> > as well if there's something else you'd prefer.
->=20
-> Sounds complicated :S Let me continue ignoring Przemek's tags for the
-> purpose of direct application. I guess it's more about who sends the PRs =
-than
-> who is a maintainer. If you send PRs I naturally never see your review ta=
-gs, as
-> the patches will eventually come out with your SoB.
+vim +89 drivers/net/ethernet/sfc/efx_cxl.c
 
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
+    16	
+    17	int efx_cxl_init(struct efx_probe_data *probe_data)
+    18	{
+    19		struct efx_nic *efx = &probe_data->efx;
+    20		struct pci_dev *pci_dev = efx->pci_dev;
+    21		struct efx_cxl *cxl;
+    22		struct range range;
+    23		u16 dvsec;
+    24		int rc;
+    25	
+    26		probe_data->cxl_pio_initialised = false;
+    27	
+    28		/* Is the device configured with and using CXL? */
+    29		if (!pcie_is_cxl(pci_dev))
+    30			return 0;
+    31	
+    32		dvsec = pci_find_dvsec_capability(pci_dev, PCI_VENDOR_ID_CXL,
+    33						  PCI_DVSEC_CXL_DEVICE);
+    34		if (!dvsec) {
+    35			pci_info(pci_dev, "CXL_DVSEC_PCIE_DEVICE capability not found\n");
+    36			return 0;
+    37		}
+    38	
+    39		pci_dbg(pci_dev, "CXL_DVSEC_PCIE_DEVICE capability found\n");
+    40	
+    41		/* Create a cxl_dev_state embedded in the cxl struct using cxl core api
+    42		 * specifying no mbox available.
+    43		 */
+    44		cxl = devm_cxl_dev_state_create(&pci_dev->dev, CXL_DEVTYPE_DEVMEM,
+    45						pci_dev->dev.id, dvsec, struct efx_cxl,
+    46						cxlds, false);
+    47	
+    48		if (!cxl)
+    49			return -ENOMEM;
+    50	
+    51		rc = cxl_pci_setup_regs(pci_dev, CXL_REGLOC_RBI_COMPONENT,
+    52					&cxl->cxlds.reg_map);
+    53		if (rc) {
+    54			pci_err(pci_dev, "No component registers\n");
+    55			return rc;
+    56		}
+    57	
+    58		if (!cxl->cxlds.reg_map.component_map.hdm_decoder.valid) {
+    59			pci_err(pci_dev, "Expected HDM component register not found\n");
+    60			return -ENODEV;
+    61		}
+    62	
+    63		if (!cxl->cxlds.reg_map.component_map.ras.valid) {
+    64			pci_err(pci_dev, "Expected RAS component register not found\n");
+    65			return -ENODEV;
+    66		}
+    67	
+    68		/* Set media ready explicitly as there are neither mailbox for checking
+    69		 * this state nor the CXL register involved, both not mandatory for
+    70		 * type2.
+    71		 */
+    72		cxl->cxlds.media_ready = true;
+    73	
+    74		if (cxl_set_capacity(&cxl->cxlds, EFX_CTPIO_BUFFER_SIZE)) {
+    75			pci_err(pci_dev, "dpa capacity setup failed\n");
+    76			return -ENODEV;
+    77		}
+    78	
+    79		cxl->cxlmd = devm_cxl_add_memdev(&cxl->cxlds, NULL);
+    80		if (IS_ERR(cxl->cxlmd)) {
+    81			pci_err(pci_dev, "CXL accel memdev creation failed");
+    82			return PTR_ERR(cxl->cxlmd);
+    83		}
+    84	
+    85		cxl->efx_region = cxl_get_region_from_committed_decoder(cxl->cxlmd);
+    86		if (!cxl->efx_region)
+    87			return -ENODEV;
+    88	
+  > 89		rc = cxl_get_region_range(cxl->efx_region, &range);
+    90		if (rc) {
+    91			pci_err(pci_dev,
+    92				"CXL getting regions params from a committed decoder failed");
+    93			return rc;
+    94		}
+    95	
+    96		cxl->ctpio_cxl = ioremap(range.start, range_len(&range));
+    97		if (!cxl->ctpio_cxl) {
+    98			pci_err(pci_dev, "CXL ioremap region (%pra) failed", &range);
+    99			return -ENOMEM;
+   100		}
+   101	
+   102	
+   103		probe_data->cxl = cxl;
+   104	
+   105		return 0;
+   106	}
+   107	
+   108	void efx_cxl_exit(struct efx_probe_data *probe_data)
+   109	{
+   110		if (!probe_data->cxl)
+   111			return;
+   112	
+   113		iounmap(probe_data->cxl->ctpio_cxl);
+   114	
+   115		/* If the sfc cxl initialization was successful, it implies the
+   116		 * endpoint decoder had an auto discover region which is the one
+   117		 * we used and we need to remove now. Otherwise the region will
+   118		 * be around until the root port is removed.
+   119		 */
+ > 120		cxl_unregister_region(probe_data->cxl->efx_region);
+   121	}
+   122	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
