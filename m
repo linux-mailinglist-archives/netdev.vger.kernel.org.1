@@ -1,212 +1,167 @@
-Return-Path: <netdev+bounces-273531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273532-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qANuEwCOy2kuIwYAu9opvQ
-	(envelope-from <netdev+bounces-273531-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 11:04:00 +0200
+	id oAHkC32Ny2kuIwYAu9opvQ
+	(envelope-from <netdev+bounces-273532-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 11:01:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F1A2366A6D
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 11:03:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 145A73669D4
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 11:01:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 304393064766
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 08:52:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CD8333081A8A
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 08:52:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DAD73EBF13;
-	Tue, 31 Mar 2026 08:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A53663E5ED1;
+	Tue, 31 Mar 2026 08:52:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fM27D9v2"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [4.193.249.245])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6303E9F61
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 08:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=4.193.249.245
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774947107; cv=none; b=Wu1lFh32b9bB6ph+dOJ4JOK9HkTk2WoAlj1mXYsvmkSly30p8YkpWBcrnmJ258p9/8S2nN0+77QzZyA7eT18JSXFT/UCsZvnokFcYCMt0FOjVTo81uahjKvIg/wb3bzPdAnHASgJTiOQNbY5Bo4EcpV6xcb2c0rA8SH8DfSv+oo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774947107; c=relaxed/simple;
-	bh=ysb/EWeZtEPjMxr7XPdTcFKfGbnGIsktgpdw9OBWuY8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mEBROgkBbdz2stxpk3F2lkNidFbv2w9XmJRcE2T6JhVbW7xAzB1aXn36ZTriIW6ZfO4kE5/AjUmMelgAWb3sAcDBUG2Y8Wp25wzfKhJowKRArQCxYvOyuq0uUaE0B0IG537R49fQz/gDSpaihLvWZWKNVg0bLb9E4YZKPLQirVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=4.193.249.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from a800-server-1.tail7779b.ts.net (unknown [172.30.111.252])
-	by app1 (Coremail) with SMTP id ygmowADnXwD_istpm9mXAA--.32062S2;
-	Tue, 31 Mar 2026 16:51:11 +0800 (CST)
-From: Yang Yang <n05ec@lzu.edu.cn>
-To: jhs@mojatatu.com
-Cc: xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	tanyuan98@outlook.com,
-	z1652074432@gmail.com,
-	kanolyc@gmail.com,
-	n05ec@lzu.edu.cn,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	sbrivio@redhat.com,
-	vladbu@mellanox.com,
-	netdev@vger.kernel.org,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	bird@lzu.edu.cn
-Subject: [PATCH RESEND nf 1/1] net/sched: cls_flower: avoid stale mask references after delete
-Date: Tue, 31 Mar 2026 08:51:11 +0000
-Message-ID: <0fdcae6ac3e07afbbd43958f6b42e2ed6281e3d2.1773559972.git.z1652074432@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1773559972.git.z1652074432@gmail.com>
-References: <cover.1773559972.git.z1652074432@gmail.com>
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E4B3E95BF
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 08:52:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774947171; cv=pass; b=MMszYgDt1veX5mHYnB5Z0+VIqnBTLFfr0bfFsbFvUjYz4aYGo6Mx5agzxe2AWsuKzqEv+pR763bgHSTC4ZPh/gC0V/LCybLp7lt+HiRRNohSpfpomTJtZwr1usjs9SxsVyZERJs+tgqUSvGzkQiCm0T1mIgH+ezrLyhNFyLCxuM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774947171; c=relaxed/simple;
+	bh=HMzb593tFht3aK58XBG4Aj5ZSTTbPJrSBZv8E4FAh9Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Nye8lWJ+lLfmZPdHdLgleUOcW92BALeTcMPU4xynQh0kR3Pch1FPxUHjrNBSZ2AnsvXVwrEx2rVjBfgylpdUh4GCG0QfEVKNxoMrxIn6t9GHQba8mZZEXlmn3+zwghu9w4bkXIOSfjuRmQZW3RWR/q8Dh6IBDCnD/rfqTEhAQTg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fM27D9v2; arc=pass smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8cfdac74050so718445885a.3
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 01:52:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774947169; cv=none;
+        d=google.com; s=arc-20240605;
+        b=B8yhfwZqCsGH58zYRobdLpaf+5BGT5XkXJYTBWL5k+eTPyC/pYRe0KNBGUXRz55qgn
+         zAp3doyhMWOao9L2IdrgzroiqBnWXHW7OQa3fHEew1M7eoA27m+Kvp1JYsenPiXYf823
+         qvfULEbI2umZ7ZKoJR3XS9DeMP/SgmAjzLfLNRvQlNI+ydYLXCzDvLllOOMHbYiTtU65
+         3PWd3rpLV0Ws5TNm08tDU2bCZ183xRyKHQ5Qt28sI4q1Vt8mdDo6PnwKbNqSnzSJFyvW
+         tOQeuOjfzZ8SSrL9l0fiZ6UdsI6ilDsqiFIsWtsWtoFYG11BnppoxfKHv6nHIESmW2Yj
+         ziKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=HMzb593tFht3aK58XBG4Aj5ZSTTbPJrSBZv8E4FAh9Y=;
+        fh=D+xndRA63Prc1AiEm6mlnxaTda1moqWDgeC1Y/bfZwg=;
+        b=GtPbHpd3RmLwyYI4sDyeaOI9ihd2CfWEda1L52AmKIEJ/AKitU/MlpJstbviaiLKmQ
+         h3qMTK9eOTQbJCGoWJx0jwNdYM18FAsDNgZwEcj7zbj4G3QcQbDSCaY4k0b41DPOIguw
+         HQy54xWpoqFqSnJA6RopSCXAU7yEUc2CNCQOxf0jzRNzkzAoIRuTGHo2JYGZu4KNk0cb
+         LNnDgo76mjjyeI+5mZoKnE242aVa8Zun+xHyWQ+6lXWHTarA01psXYakhoDRfouwPYXD
+         qJ9fM4cxngO7fiwsvadJLGVYNHatvOlYKvz6cKoMM2OFV87lg9aigUFUKO4+GJuEKzCc
+         JxaA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774947169; x=1775551969; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HMzb593tFht3aK58XBG4Aj5ZSTTbPJrSBZv8E4FAh9Y=;
+        b=fM27D9v2SlSeyKy+ZJBrOJLqaQ6jUv45UVgDGX5liaPLO0DHtr3bZ4JGHABM4mYHw7
+         Th5oFWMH2Y6z0jqUn8ZZmTi44f//gWcZYrcoAzR2REYvbbPZ7wvjMZ0jIDwuFroKvs5m
+         HqtSUh719kG+KqEcy6kcza7mpR0/n0LMkCsuhhBkUvSMWhUnxgRokwX2Rs//cCAgW8ZF
+         ZFos1GU5rPzN364JJc3hmzbpmoEcgpGYeJuYqVSA6AgLCy5M9QaS/0XMz8HYmo7MxY+V
+         mRtdtqNM2aX0xDA+Xd6E4qpmFL7xuy5/MFIVHeEcpRDwEi19q8A/HVNs+i6h3SVj3c54
+         ZNJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774947169; x=1775551969;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HMzb593tFht3aK58XBG4Aj5ZSTTbPJrSBZv8E4FAh9Y=;
+        b=UZS+R97TXfjA1nrY0u9CIFR8QTIQu/B9QlSX3di+5e755UTi1IXII4Afb5PxCjW9ZB
+         e+GIjUToOcUi8xxci/vVZUqwI2QRZN8zCtic1MBsz5ExBqvGfXlpUAm5aCArIDj0oGEM
+         PfTUmSEe9oPUjxvqqSUuI2YG7qnkBhsy2ZGkQJwHM12z6gw2FQ/Rl3tDXViipbgzGA25
+         9Tep4V1Pgd2h/DaBHUsUwmD6JdzyS0fJMBjmwRvInWVUSR8extwVcBGG9F1f+/iIRDuy
+         Dm9JQwVAIkcT3bx+IT2v7P8bBkDpbfo09JzyPVcfZyBgu9Q1af4VmWVnc4XCkS1q+AQZ
+         m9qg==
+X-Forwarded-Encrypted: i=1; AJvYcCUeoX/1OToud2ARBhWqF9yJEI+7flMFPxj8+iK/U8p8VWx+F5oC48JSh29C/xz8fE/AP56hdg0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzk9SNjM5nwRnunKYl3ApIRwPxyfDmTNcTUpsHtwVf8AI4bQSqS
+	7GQQ83hXfoNB86B6fURyUVi0mOGLmInY0E7uN+sVFyGiCIB5ynvT6zOPs8yeX9N/ewAbUzXpNkv
+	c3+YPn/QsM+5uA3ME4CxisTOGO3NIB+MEAF5YYh07
+X-Gm-Gg: ATEYQzzrJivnptcw4ORkfFJuFp3RVGbtzOcS1ZNGhCucC4o9KVgvinMlvAZa870SBkL
+	NLQeQHKIchfyq8dyBGP4o7imUYiTzyyCRHm3soLQ1mmrvKiRRBlUETG4Re9JPZkMfPG1WSbqNuG
+	FVMTXPr5EpnaOUUWpoyBybIajTtuTxvnv4TJ9ZBkH61lsuzKfMI9kgv0rgtCDIvnHcBBEAR4+Jb
+	McdqMOrsiqQ1qsD5ba75SEE0qEugAkNP9fa8yE3aSlh9fcrEvREP4RFItkymmMTyXDE1UOiuk+s
+	gKU8M5X15Wd5tF26
+X-Received: by 2002:ac8:5906:0:b0:50b:41ff:e9d2 with SMTP id
+ d75a77b69052e-50ba384f772mr213911251cf.21.1774947168552; Tue, 31 Mar 2026
+ 01:52:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowADnXwD_istpm9mXAA--.32062S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxAw4ktryfKF13Ww17Kry3urg_yoWrJr18pF
-	Z5G34UJrWDXF15W3ZIya1j93s0kas7AFyF9F1rW395tr97ta9akFWkA3yj9F15GrWDWryS
-	va1qyr1rZ3WkCrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
-	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
-	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
-	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
-	n4kS14v26r4a6rW5MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
-	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRpOJnUUUUU=
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQMDCWnKnHsTNwAAso
-X-Spamd-Result: default: False [0.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+References: <cover.1774855883.git.zcliangcn@gmail.com> <07351f0ec47bcee289576f39f9354f4a64add6e4.1774855883.git.zcliangcn@gmail.com>
+In-Reply-To: <07351f0ec47bcee289576f39f9354f4a64add6e4.1774855883.git.zcliangcn@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 31 Mar 2026 01:52:37 -0700
+X-Gm-Features: AQROBzAUJW0CX5_lJi9MVCZ56vOTpJzFKOOWqcQOD8HBR7t1T83p5FIK2-NVoCo
+Message-ID: <CANn89iJ+pDwKy0kKKG8PrSWMXEStgsMP9YGLxwvjcmMJP1PwrA@mail.gmail.com>
+Subject: Re: [PATCH 1/1] net: ipv6: flowlabel: defer exclusive option free
+ until RCU teardown
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: security@kernel.org, netdev@vger.kernel.org, davem@davemloft.net, 
+	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	afaerber@suse.de, mani@kernel.org, yoshfuji@linux-ipv6.org, 
+	yifanwucs@gmail.com, tomapufckgml@gmail.com, yuantan098@gmail.com, 
+	bird@lzu.edu.cn, enjou1224z@gmail.com, zcliangcn@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273531-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[lzu.edu.cn:query timed out];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,outlook.com,lzu.edu.cn,redhat.com,mellanox.com,vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.976];
-	TO_DN_NONE(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	ASN_FAIL(0.00)[1.2.3.5.c.f.2.1.0.0.0.0.0.0.0.0.c.6.3.0.1.0.0.e.4.0.c.3.0.0.6.2.asn6.rspamd.com:query timed out];
+	TAGGED_FROM(0.00)[bounces-273532-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,davemloft.net,redhat.com,suse.de,linux-ipv6.org,gmail.com,lzu.edu.cn];
+	NEURAL_HAM(-0.00)[-1.000];
+	MISSING_XM_UA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lzu.edu.cn:email,outlook.com:email]
-X-Rspamd-Queue-Id: 4F1A2366A6D
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,lzu.edu.cn:email]
+X-Rspamd-Queue-Id: 145A73669D4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Yuhang Zheng <z1652074432@gmail.com>
+On Tue, Mar 31, 2026 at 1:34=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrote:
+>
+> From: Zhengchuan Liang <zcliangcn@gmail.com>
+>
+> `ip6fl_seq_show()` walks the global flowlabel hash under the seq-file
+> RCU read-side lock and prints `fl->opt->opt_nflen` when an option block
+> is present.
 
-cls_flower keeps filter and mask state separately. After a filter is
-removed or replaced, some paths can still need the mask data associated
-with that filter.
+Some points :
 
-Cache the mask key and dissector in struct cls_fl_filter when the mask
-is assigned, and use the cached copies in dump and offload paths. This
-avoids depending on the external mask object's lifetime after delete or
-replace.
+Please do not CC security@ if you submit a public patch, there is
+absolutely no reason for it.
 
-Fixes: 061775583e35 ("net: sched: flower: introduce reference counting for filters")
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Signed-off-by: Yuan Tan <tanyuan98@outlook.com>
-Signed-off-by: Xin Liu <bird@lzu.edu.cn>
-Signed-off-by: Yucheng Lu <kanolyc@gmail.com>
-Signed-off-by: Yuhang Zheng <z1652074432@gmail.com>
----
+Please do not resend the same version within 24 hours; this creates noise.
+Your patch wasn't lost; we have many patch reviews and similar bugs to addr=
+ess.
 
-This email was not CCed to the public mailing list previously, so I am
-resending it with the mailing list included. Sorry for the inconvenience.
-
- net/sched/cls_flower.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
-
-diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-index 099ff6a3e1f5..c1f10b4ec748 100644
---- a/net/sched/cls_flower.c
-+++ b/net/sched/cls_flower.c
-@@ -124,8 +124,10 @@ struct cls_fl_head {
- 
- struct cls_fl_filter {
- 	struct fl_flow_mask *mask;
-+	struct flow_dissector mask_dissector;
- 	struct rhash_head ht_node;
- 	struct fl_flow_key mkey;
-+	struct fl_flow_key mask_key;
- 	struct tcf_exts exts;
- 	struct tcf_result res;
- 	struct fl_flow_key key;
-@@ -445,6 +447,12 @@ static void fl_destroy_filter_work(struct work_struct *work)
- 	__fl_destroy_filter(f);
- }
- 
-+static void fl_filter_copy_mask(struct cls_fl_filter *f)
-+{
-+	f->mask_key = f->mask->key;
-+	f->mask_dissector = f->mask->dissector;
-+}
-+
- static void fl_hw_destroy_filter(struct tcf_proto *tp, struct cls_fl_filter *f,
- 				 bool rtnl_held, struct netlink_ext_ack *extack)
- {
-@@ -476,8 +484,8 @@ static int fl_hw_replace_filter(struct tcf_proto *tp,
- 	tc_cls_common_offload_init(&cls_flower.common, tp, f->flags, extack);
- 	cls_flower.command = FLOW_CLS_REPLACE;
- 	cls_flower.cookie = (unsigned long) f;
--	cls_flower.rule->match.dissector = &f->mask->dissector;
--	cls_flower.rule->match.mask = &f->mask->key;
-+	cls_flower.rule->match.dissector = &f->mask_dissector;
-+	cls_flower.rule->match.mask = &f->mask_key;
- 	cls_flower.rule->match.key = &f->mkey;
- 	cls_flower.classid = f->res.classid;
- 
-@@ -2489,6 +2497,7 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
- 	err = fl_check_assign_mask(head, fnew, fold, mask);
- 	if (err)
- 		goto unbind_filter;
-+	fl_filter_copy_mask(fnew);
- 
- 	err = fl_ht_insert_unique(fnew, fold, &in_ht);
- 	if (err)
-@@ -2705,8 +2714,8 @@ static int fl_reoffload(struct tcf_proto *tp, bool add, flow_setup_cb_t *cb,
- 		cls_flower.command = add ?
- 			FLOW_CLS_REPLACE : FLOW_CLS_DESTROY;
- 		cls_flower.cookie = (unsigned long)f;
--		cls_flower.rule->match.dissector = &f->mask->dissector;
--		cls_flower.rule->match.mask = &f->mask->key;
-+		cls_flower.rule->match.dissector = &f->mask_dissector;
-+		cls_flower.rule->match.mask = &f->mask_key;
- 		cls_flower.rule->match.key = &f->mkey;
- 
- 		err = tc_setup_offload_action(&cls_flower.rule->action, &f->exts,
-@@ -3709,7 +3718,7 @@ static int fl_dump(struct net *net, struct tcf_proto *tp, void *fh,
- 		goto nla_put_failure_locked;
- 
- 	key = &f->key;
--	mask = &f->mask->key;
-+	mask = &f->mask_key;
- 	skip_hw = tc_skip_hw(f->flags);
- 
- 	if (fl_dump_key(skb, net, key, mask))
--- 
-2.43.0
-
+Thank you.
 
