@@ -1,278 +1,221 @@
-Return-Path: <netdev+bounces-273728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273729-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oBbEL/IUzGmGOAYAu9opvQ
-	(envelope-from <netdev+bounces-273728-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 20:39:46 +0200
+	id 7/+RCoAWzGkeOQYAu9opvQ
+	(envelope-from <netdev+bounces-273729-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 20:46:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5811D37017F
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 20:39:46 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0758370285
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 20:46:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 82FF9302873E
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 18:39:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1DF3C304BDBE
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 18:45:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9276638F62B;
-	Tue, 31 Mar 2026 18:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D892738F95E;
+	Tue, 31 Mar 2026 18:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ICvjXZQ3"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="loDEkO9i";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="WR5hvfoN"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010049.outbound.protection.outlook.com [52.101.85.49])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB1838F620;
-	Tue, 31 Mar 2026 18:39:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774982381; cv=fail; b=M8m02BOtB57kyRN1svAHaLA7ltOc/drpBotij7DgS3J03G5ySr19WaqFWe7uF6Gg1+On07BwONvAy/03CwJwl/QwqX6r66bKkqOPoejGlJKG8QbiLPUSi6HP15g7iv7lZihIrhPVkyyJ0UOpKjorovEwEKlEkudOgEiPep7P8sI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774982381; c=relaxed/simple;
-	bh=2ptPcsWDJfDEZR8whTCmjGXRgymTISS2HgzzrCJw9FQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=I9Nmct9joAQhd/k2l0U0V+6AZCiK0CcTdQJgzrZPvUkVeM2oyomvFynOzBOrrC0YFfOR49gIsL9vAOaEbzyUBzdzCc73FN27mDfvsTbH4xBqrWMw6srImThXKvE6TTiGgcgbB6N5u6FsP5ko0QfeMa2tqfHQg4csADBdfLhGRfE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ICvjXZQ3; arc=fail smtp.client-ip=52.101.85.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZXKIm/8gB20bU2EMZWEDbVb7UbIrVaOfbrqKxvwYMbp099/tXTLyaUV53Y2uGPxEJu8sBH6j0j7ahubyh76g9OPEc81cSobvzmIQoBOLKTAaefRcuqEQYtUNf+RZwKVzOdkdii6FhqlkuM8zEvdz/8/XQ/8tnNFrCJuSIKpKhZybKBYVmWTsUxXoynDmTuprsbnDpfUz4kwOsyyNtT8r1eMOPPxBHTMlH1JCV5V4a0+8BbOznBFdURy+oDcpDKgPYvEG/e+1v5yjAmcctjzlEfkyaeoyHMa6FjcuCxuAufUlGrNwvN8EylKSocF/g0remTV+MBdBvrT/JvoknKPzyA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OvY8c3BjBBBwFMbzroXgRxcIatrHgjp7cCUrSfW5J7k=;
- b=RvX3mrR5UlO4jIG2y6e9iBe+SIvSD6q6L+EuFW9kJrzrWELwxbIfp/AvfTcKhNvXSVxEQXAzq2nxHHIEpQJ1DbXh3GKeoezxY8OIZGr2bzl6GumZwR+yXdGg51bUdLksTi9w3IT6PRssa2rFkZIP/8euy6cEoUpf4iil7Pxi8sHqxrjuuYiBBvdBG5z4sQtp3Lvi/LgIsjFKnLYCydRzSwf0/7OTfiNS49A1hqOvTbD3eVbVul7mM+O6w86aYJbOM3avJg1Yuc42jsS+vaQ6gEsCdeGY9hkSeSdc51PAF/Gj43UxCyg90bC9q7gD55niHjVmpcdVGLoyrsmFqnxY8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OvY8c3BjBBBwFMbzroXgRxcIatrHgjp7cCUrSfW5J7k=;
- b=ICvjXZQ3AqbSWARiFMSMjFiiczIjhW4oZQhgkZn8+j38gtiYJ+sLLfa0nkYdyBlsevhVzLeq2llF3tzCn19wr6L6+ET8ks30mgiZ/73pwvSDXwS/YI9Rw9NWokn/sqUz0t3A7PAMdIm27vF8sOjuH5Gkm0n/VkDVwlJfSluwQPU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BN9PR12MB5115.namprd12.prod.outlook.com (2603:10b6:408:118::14)
- by DS4PR12MB9563.namprd12.prod.outlook.com (2603:10b6:8:282::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.16; Tue, 31 Mar
- 2026 18:39:33 +0000
-Received: from BN9PR12MB5115.namprd12.prod.outlook.com
- ([fe80::230d:c588:d858:9977]) by BN9PR12MB5115.namprd12.prod.outlook.com
- ([fe80::230d:c588:d858:9977%6]) with mapi id 15.20.9769.014; Tue, 31 Mar 2026
- 18:39:33 +0000
-Message-ID: <688a8e59-3188-4c9e-a8ed-d53b7d965e10@amd.com>
-Date: Tue, 31 Mar 2026 14:39:26 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 1/3] PCI: AtomicOps: Do not enable requests by RCiEPs
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Gerd Bayer <gbayer@linux.ibm.com>,
- Alex Deucher <alexander.deucher@amd.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Selvin Xavier <selvin.xavier@broadcom.com>,
- Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- Michal Kalderon <mkalderon@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Bjorn Helgaas <bhelgaas@google.com>, Jay Cornwall <Jay.Cornwall@amd.com>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Niklas Schnelle <schnelle@linux.ibm.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Alexander Schmidt
- <alexs@linux.ibm.com>, linux-s390@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <20260331180952.GA148118@bhelgaas>
-Content-Language: en-US
-From: "Kuehling, Felix" <felix.kuehling@amd.com>
-In-Reply-To: <20260331180952.GA148118@bhelgaas>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SJ0PR03CA0344.namprd03.prod.outlook.com
- (2603:10b6:a03:39c::19) To BN9PR12MB5115.namprd12.prod.outlook.com
- (2603:10b6:408:118::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE84331A78
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 18:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774982701; cv=none; b=SkMqKfHctLJJdqBum7RiX/Tg7x2rCmKUc8f0e28nahfftruQxRhrOzz4BYe8F2Eb2RjqvLtV96F7RZE6J+dy9vg4vbHeWM1snTel0yZXWd8S3udf48KWRFoSPhUZxY+bkuTUOv2frcOHShynvhpNmQfHmN4mCcwGwn2QU4K9Pn8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774982701; c=relaxed/simple;
+	bh=auldL/PZcJtISAB4iXpRTm7KDneLIlTOQCtFwhlPCbA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CkY2W6kOHmYKH78vFTHyWaviARUFgJdXuj93WuKGfhIquJu1nvVF4iY92qi6fjfYeO9EUPJ5G/HNL6KEnUlXH6HFLXi2QcwAxbrVA+vAm1UnRUsdQHnYsLdsJd6eDzk5FISK4l1eINNIIUWHNATdguhoJ5XQUen17QWJ9wIWhBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=loDEkO9i; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=WR5hvfoN; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62VGdmuf1056555
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 18:44:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=V73Qkgo5+m2ZEBv2WumRcr
+	lVesbrRNCRgCoAU9LhXvY=; b=loDEkO9iRmM4AzBjZ2Lgb+Ff4wQlczpU0CjYCr
+	jkVofG9HqjGHxtHeDPdHEB1lUY6UdwG2iCFGW3aPu8+Sy7I9f6ncVUUgTUzxl83l
+	SIdIIfxX2qiUVn/ppHHnwxrZN1NmUNBwvRfq8FktXzR2WwWpiIcsRfNSz+rmS/N0
+	c40DpGzARJoAenOvFLJy5nEcu7BTNtRvbtug4o1RC8R6WDTLrQBajPUKgUoZUslO
+	Vr+OaUaUAsdsehFVSTUSYFyXZe6WotMVAD0e0t3r5vmvw/i0YlrdgPkbHLqY5mUp
+	a04QDIX7U6/DLr8K2vUA/S5Lb+fM6UKB4U28xT8+iAn718FA==
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d80hevuv8-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 18:44:59 +0000 (GMT)
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2aae3e185a3so19397345ad.1
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 11:44:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1774982698; x=1775587498; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=V73Qkgo5+m2ZEBv2WumRcrlVesbrRNCRgCoAU9LhXvY=;
+        b=WR5hvfoN4APsERMOcRx4a2Hvj9FgjtXqAFphOUfjwi3Sy5WvfOSv4f4KtDxGVkH4MM
+         DroCmGfSADIdtupdsyGepI98WGp4qmZcDJABqMj7zkTX3UG7nS6anRW7xla+mkC1BtgO
+         B04wVg4psJd1PeMSnwPrdEgJ/FQXUIxCCZfH7G+IenBJeXfXdiicKsD0gJf5+GYZdkjo
+         KHc+FVsDBoj4m4yGmccmvhwafdX/m9aUxjlEZkh/PvNcEOZ3kOeMUpcEHQ6WN6H/te6c
+         /Izt1UlpjJ1wVHzuwX7a18Scw1AKJ4Zgr0M9jxewJqXDj9YyNFKLfQ5R9B3d9NbttAAT
+         2vPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774982698; x=1775587498;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V73Qkgo5+m2ZEBv2WumRcrlVesbrRNCRgCoAU9LhXvY=;
+        b=OGz0ndTMRbxzRkyPqMVVguvNs8CUMUPQTTmIyBJgQpq6PaBFABCUhM7d0k9/MMCz5c
+         iGRdW6U/n8Y9g5BY2pFYHz7AOzGv+oZ4mzuU5sMvYat4GFFWhYDPiVHuLIUDnyZ/hgfX
+         IrF5gNGCpwqlyEjRpDzOqeCvluaOprj1Xc9Ik8pojW2HPwOm/27rU/wYZHbcD/Cm81H6
+         uG9zYYi1zS22JNlmb3KAJ+yM20vhZZgqjc4dAlAn0/M157fqS0jG0EYZ78rbDwfH7itE
+         7IXn7ryTNMB9RbsbC0XOg9d3hGMiy+rcMGpbGSfJUDCb4M8z7RNRHHIVvsEC4eU9UTcA
+         YxZg==
+X-Forwarded-Encrypted: i=1; AJvYcCUBb/gVvIYtAiRaU12TBV8Uc2mwcGwAu4zDZJrmAhICOeq1BmF31zTVmyy60oayI4LsmLkoksM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxk1MyVx9fDlEFxq9csaYIszXoV98z53JvFqTYA7Ep7ZKeF5Pcn
+	1/2JyWW+7bl7gmhZmbtNJzzgKwn31nwKgnmU7yw97P3eeykSlQmNpuDCi43r5Aw3ubITEkpXioo
+	R1j0fEBEFP0abEcCD0jYFvFCfrV3H/VQX1rLE/PiM8cN/AeJPBHyGb9Sj4Jk=
+X-Gm-Gg: ATEYQzw77DeCuftmHbVoXVkmteNj+Vd9cPSxE3AKOiGsnxfWxgLoWxZOU52hQM8EYiV
+	sPzXzA4kq6tGMVyGQ4skq4SgSI7y10TqjMT4So9CT9cqjt64mM69Md0paalXuzcnvHLv4AUCEIo
+	tyK4O0TZ7ojz1Acdtqp6Jh7qsKNpggDz9TQfgY7oEL2X97Ifz7zbyDPsxfJD+e/2PK5lQkW8Wav
+	E5PFcKbGnpy1MB3l1VYl7N3n4pB4f/evcG9vsICwfzgjYVymPvpPAHmnLiQvP58NllYayAu6WL/
+	+DQ4cw524LVPjAagYRB6KIM0XURNOisMtskCgOruX368aCqrKJrePpazZfy3qOir0O4PvKwy19B
+	omRbEcGTJ7fHS+LRmpe7cbT1zsbRe3jbxmekd8MAx4mhOj9AmWr/9
+X-Received: by 2002:a17:902:db0c:b0:2b2:46dd:c3b6 with SMTP id d9443c01a7336-2b26998e8b9mr2206005ad.0.1774982698360;
+        Tue, 31 Mar 2026 11:44:58 -0700 (PDT)
+X-Received: by 2002:a17:902:db0c:b0:2b2:46dd:c3b6 with SMTP id d9443c01a7336-2b26998e8b9mr2205815ad.0.1774982697932;
+        Tue, 31 Mar 2026 11:44:57 -0700 (PDT)
+Received: from hu-uchheda-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2427af930sm153284635ad.70.2026.03.31.11.44.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Mar 2026 11:44:57 -0700 (PDT)
+From: Umang Chheda <umang.chheda@oss.qualcomm.com>
+Subject: [PATCH v2 0/2] arm64: dts: qcom: Introduce support for
+ Monaco-ac-sku Evaluation Kit
+Date: Wed, 01 Apr 2026 00:14:41 +0530
+Message-Id: <20260401-monaco-evk-ac-sku-v2-0-27b5f702cfba@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN9PR12MB5115:EE_|DS4PR12MB9563:EE_
-X-MS-Office365-Filtering-Correlation-Id: e0690a61-f1c4-4e8e-94be-08de8f54da23
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	MpaWyuh7Elo/WME7YJMXMjZmrksf0aHthIr6zK2kGdzGxKGA2jtNP81KvFdmGCr0/cvmMZGtQcgefOl/ERAFjWgpNZ4Rn3wfDZloMVw2DG1yCmvk7DXXFZv52+gwNvpL7Mh6Nz37dceYaDZHwSi+9o1cIZ/Z5rQhPEy9rFYkE9jfmehepCrFUnjDWEB09CyWUFWFGMVHcV6ZNK1YvV38AupLwQM6VEY7nGoigppz5TqcyZp524dx99i6OjGW6EpXMTAReaB26sbh0oB/qA3Jcwh9Z+NLt+Qm1zy7GFP3imS8oDlElwlKJ1vJcdVZJyV63HqdkFjGqWMjUflFmC5yEhUkU18pclNnih36chSoT8ARPfMod0KMXTsfbvAbbS56/JHsUKrcECtai/xTh4F2qEW3GyTTUiMOB7KypuH/OeHk39kM6DtZzk3wS4jQwB35d19tvcwJ0gnRDumZs9JvbOeV6SQfS8rueIgip14xPiIfXJ4KjODD0BXo0u0Hv7F/MZs4FwxzpGd35JfKfWXE4n9jYZi08xn9LWilrz5lE0UCYGlAlF1/5cqtYrF1lwlPVhW/+216c6zgaqlR+fDqjHKUWso1W0rNheV/g35eO02N0DIbZIxdtB0cJL+WALhpZcbBS54JKLK/V6GVnMSDoyCvgHdTZthfikrkpT5b1FhOLtPjqWtflGN6/+krq96U
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR12MB5115.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?U3dHd3pwcmErVkpOQ2FqUHp3M2pZZkczSHNXeVdISWZGLytPOGZqa2QxYWFL?=
- =?utf-8?B?WGxiM056RnErOVgzQlp4U2cvbC9DbmpCREd4bUpHMG1pUTBLTjdqdm85L3hh?=
- =?utf-8?B?MGVIOUkrUEtHOGJsMlNERnpReEsvckVWanRqN09tcFM0UXZROVlTK0ZFaFE5?=
- =?utf-8?B?ZGVSZHJvR3N5NmViYkUzSGFNbFA5dFlpNjYwUFZtY0UyRmVtYWpyNnRtNTJy?=
- =?utf-8?B?YXQ5MFNHbFgwYXI4aDZCQTJNM3JGZWpsR3BIK2ZKcllvU2krZGZTazdWUHdE?=
- =?utf-8?B?Y0xVWHc3U1oySjBKUmxlMnFCNC8zY3lDcXVOdzVmN3VYSFZzWHcyeUZKTE5M?=
- =?utf-8?B?eFBSNDhjV0tCZGtFWkxDS0F1UTZFVS9Wa2xWNEVBdUNyTDA5RitQd3dOOG5T?=
- =?utf-8?B?bWRhcjRPRUhUSU9HYWJhck1zbUM2L29ULzI0cSt0Mk54ZS9hb0E3UUZLaTdU?=
- =?utf-8?B?c3ZtanNxVVpZRWs3SEJQeDk3cXd3Vk92ZnZTSmZ2NCtqMU1HS2lDWW02TVJl?=
- =?utf-8?B?NEd4Uktib3lDeDhwbHJYbHZhWEFNQXpySlhySTAyU05TTkN2WVhzRGdGYlA0?=
- =?utf-8?B?RmNwZjl3OTMwOGQzQUdNOTRIRHhVYUZzRmhVRDdzMk4rOW9XUUVUdG80dzl4?=
- =?utf-8?B?WjVDQTZCa2R2MC9neG1xbWNEbkJCNTdVcTZXWnluUzhpZDI5ajlxTTlnejQx?=
- =?utf-8?B?dTR1ZHBWczFCRU5BbVpCWDh0VjdiZWJjRVpiN3J2MzZoU0R2VWxuQ3E1UEhv?=
- =?utf-8?B?cE5EY0FXaktUeUZyYjBPZ2taOVQzc3JyNC93czltM015bjF0UVhjZlBHSFQy?=
- =?utf-8?B?eEsvblNPTmc5bkdXL0lZVjJXby9ocVI2a3FUU0pzelFPemd6UXU5Z1hWbWxw?=
- =?utf-8?B?NmZoVHAvUXovR3VJbnE0dktvRGthZWNVUDFXeUZCWUJvVXI0amV4aitXb1VT?=
- =?utf-8?B?dXZoTTZKMGw0NFhpM1hxSmZqR3A0U3loV0oxV0ovZGRUNkRjNnVwRTg2VkNK?=
- =?utf-8?B?eEdEcHlSc2YvdGtTZ1k4MkFSaHRuK2tqRFMxRThjUndjWXpld3d2dkw1UjYr?=
- =?utf-8?B?ZmJ1bHhMTnN0b0ZQRWx0Rzd1RGpFYzFHemk0amFtUnREV3ZJQU9NcDgreUo2?=
- =?utf-8?B?MEtSUHFBTldoOGVqRVU5a2U3d1llc1RRTEhpdEdCdkszbUJya1VmRDdXejV5?=
- =?utf-8?B?UHk0aEowejNnUE10VUdiUUs4NzJrVGZVdXVKSi9JdjQ5OUVWSFkyVkFSUC9L?=
- =?utf-8?B?bk9BdTVIYkZVTmduSDcrb3VKMjRxUHFMOXRjSXlpYWFBekNMUTRuNVpXcU5o?=
- =?utf-8?B?aTNqU2dJZVpyWnRhT05Dd0ZWYlY3elBQeWJSbXVSOVpndTlyblZic1N0VGVX?=
- =?utf-8?B?anA2RzhxWWphN1p1dTByUS85R2M1b21IZTJUMTZicldkZmQ2SEplcjg3Z0RI?=
- =?utf-8?B?WnFxRVI5NEVVR21uOXQrZmpqTFpnYlpZa09wSHIxTnNCaXoydzNxeCtMMVhL?=
- =?utf-8?B?eXVQTWtrUWtGOUlHNWtSNkZSejVFSTdJbWphUVJJZWhiT2xhZW96aTdjelBa?=
- =?utf-8?B?aCtOaU4zRnFQc2FIL3dMcGJ2akVNRnNGVHFkcms1b0MzZXFuYzh1RGw1T3Bn?=
- =?utf-8?B?Y1VoTFhUSEFXemNOWVl6VkNNeUt6eW9pLzdkMTdkRmhQcHRMYmVrV1dKZ1Bk?=
- =?utf-8?B?Mk5GaHkwZ3FKVVJuM21nR0JYOHJ4cXUrclBEaVZTOVprYmNMTk45ZDd3Vmc0?=
- =?utf-8?B?dXhHYVFBNXBhTC8vWUoxdXA1bjc1dmFJaDg1REtnQ3pQUktqdmlhYkhnZjI3?=
- =?utf-8?B?RDdLSDFuVmIxZDZaWlloNiszZFMxSWtDelAyQ1dObWhaeDVOUXhGdmNmejNq?=
- =?utf-8?B?RjNBcEt0Sld1YzJVeVdVaVViTXZzTHlUaVZVWWpsbmp4VTFBbUJLc0ljcm1k?=
- =?utf-8?B?RmhneGdkVWhEbjJFbXJOdDEwcHhoT29CdDlZckJWR0hPb0Y0Z05KVkFsWUVP?=
- =?utf-8?B?dGdZOGRLWHZPM0ZZWHEwSTFTbUZvMExrMjdxYVNQR0hpSVRDd0NwZFJVSWI4?=
- =?utf-8?B?dmlHRHN0ZHpxOXdvc1ZEblJ4VlNMRDY0WndIc3IzNjNLcjFFdUo5NUUzUkNa?=
- =?utf-8?B?c1Bkb2x1MjNYY2xUb2Z4d2R5Tk1jT1hoSkd4Mjhxc2dYZE5CaEEyZE00ZTlh?=
- =?utf-8?B?ajN4Ykh1ZVRHbno5dTZKazdVbVBFQjdvaTJNV21LTzZWOWZnQ0EzVUlRbGZD?=
- =?utf-8?B?OEQwWTJDak84elNUbW9GVnZ3YmUrTVlaSXEwVld5UW1rSGRzejQ2MHI5R3Ex?=
- =?utf-8?B?b3RTK3pkYURZLzE1RlA2OXlXN2JLSVcrUkg4UEJ4aGJ2VlpwdXFNUT09?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e0690a61-f1c4-4e8e-94be-08de8f54da23
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR12MB5115.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Mar 2026 18:39:33.5012
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qkxazRCkdsUYZFavcXR8SxFuCURQ5Jsmsm5aKgaPySBbK1gHkTtQMLDOBsxC02Jh+RbAg66aiYpMmGKjEQ7oBw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PR12MB9563
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABkWzGkC/32NQQ6CMBREr0K69hNa0iKuvIdhUctHKtJqPzQaw
+ t0tuHczyUtm3iyMMFgkdsoWFjBast4lEIeMmV67G4JtEzNRCFWU4gijd9p4wDiANkDDDKpVqqu
+ VLEtpWNo9A3b2vTsvzY9pvt7RTJtoa/SWJh8++2nkW++fP3IooKpbnm60lBU/e6L8NeuH8eOYp
+ 2DNuq5feD08sMsAAAA=
+X-Change-ID: 20260328-monaco-evk-ac-sku-6d66f965335c
+To: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Umang Chheda <umang.chheda@oss.qualcomm.com>, netdev@vger.kernel.org,
+        Faruque Ansari <faruque.ansari@oss.qualcomm.com>
+X-Mailer: b4 0.15.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1774982693; l=1361;
+ i=umang.chheda@oss.qualcomm.com; s=20260328; h=from:subject:message-id;
+ bh=auldL/PZcJtISAB4iXpRTm7KDneLIlTOQCtFwhlPCbA=;
+ b=rogm1kseHgtplfJ+xCyPjtSwQWfv3XCXx/qFoXKXvzLxW1LG7L8JkjkCwt6hQMPK5gshrHepp
+ lNTciq4qgw7DX0YNv5v+NydHVRhpWTWEghMcAJ63m3exhGgvMPrkVQy
+X-Developer-Key: i=umang.chheda@oss.qualcomm.com; a=ed25519;
+ pk=3+tjZ+PFFYphz0Vvu4B14pBQSzqcG0jZAQspTaDRQYA=
+X-Authority-Analysis: v=2.4 cv=Gb0aXAXL c=1 sm=1 tr=0 ts=69cc162b cx=c_pps
+ a=JL+w9abYAAE89/QcEU+0QA==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
+ a=bC-a23v3AAAA:8 a=EUspDBNiAAAA:8 a=4V7GHvCDef1FtlI4rEYA:9 a=QEXdDO2ut3YA:10
+ a=324X-CrmTo6CU4MGRt3R:22 a=FO4_E8m0qiDe52t0p3_H:22
+X-Proofpoint-GUID: 5V8Pj6czLs2Kmfrui7O2-qck_4zJu5kM
+X-Proofpoint-ORIG-GUID: 5V8Pj6czLs2Kmfrui7O2-qck_4zJu5kM
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzMxMDE3OSBTYWx0ZWRfXyi59c1ugDzIq
+ Qn3lF2CYHhFmwnDVx/guiGEKv98Ey8Vq/tTrUlZqFC44S1wBDUXkFahRJU+hkPMObjwjoyKyANy
+ X9hHFif0W5l6BpeuTf4ukJ41epw+d4PAbSdmWca5NckkANN4rM1jq1Rixf4/8qYkcwBx1sIlr6w
+ H0DohwD2vJqabKFEY4SYtXBzyQ2wPI1yPzqB5hwcBm3X8UPyyP5KiUUIcwbB/IMUg3V61Kbxspl
+ y240LnO+df0us3rFyolMYO8PXhiaGsoKlLjHNF+9WfNRu0vb+fUyWrUN6WkCZQqw77qw/S7NNBd
+ Qh5Q6RUapgzTUzpqx+nLVCP/7ES3ztvowVR0FWLvYm+kazuVsLKDYrFjmk2N/yC/dnDgj6iUHiG
+ iMLKJ1mqkJMbq9I9MvYs8PHm0uZJBR/abObh/nwCOrIiPypxfdElropDlnAzgWh1fSskgPnvg7c
+ iX/ZU7y4wqQmqweneFQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-31_04,2026-03-31_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 impostorscore=0 adultscore=0 spamscore=0 bulkscore=0
+ malwarescore=0 clxscore=1011 suspectscore=0 priorityscore=1501 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603310179
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273728-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273729-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[kernel.org,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[28];
-	DKIM_TRACE(0.00)[amd.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[msgid.link:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oss.qualcomm.com:dkim,oss.qualcomm.com:mid,qualcomm.com:dkim,qualcomm.com:email];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[felix.kuehling@amd.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[umang.chheda@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.970];
+	TAGGED_RCPT(0.00)[netdev,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5811D37017F
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: B0758370285
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Add support for Qualcomm's Monaco-ac-sku Evaluation Kit (EVK) without
+safety monitoring feature of Safety Island(SAIL) subsystem.
+This board is based on Qualcomm's QCS8300-AC variant SoC.
 
-On 2026-03-31 14:09, Bjorn Helgaas wrote:
-> On Mon, Mar 30, 2026 at 08:01:57PM -0400, Kuehling, Felix wrote:
->> On 2026-03-30 17:42, Bjorn Helgaas wrote:
->>> [+to amdgpu, bnxe_re, mlx5 IB, qedr, mlx5 maintainers]
->>>
->>> On Mon, Mar 30, 2026 at 03:09:44PM +0200, Gerd Bayer wrote:
->>>> Since root complex integrated end points (RCiEPs) attach to a bus that
->>>> has no bridge device describing the root port, the capability to
->>>> complete AtomicOps requests cannot be determined with PCIe methods.
->>>>
->>>> Change default of pci_enable_atomic_ops_to_root() to not enable
->>>> AtomicOps requests on RCiEPs.
->>> I know I suggested this because there's nothing explicit that tells us
->>> whether the RC supports atomic ops from RCiEPs [1].  But I'm concerned
->>> that GPUs, infiniband HCAs, and NICs that use atomic ops may be
->>> implemented as RCiEPs and would be broken by this.
->> FWIW, on AMD APUs our driver doesn't call pci_enable_atomic_ops_to_root. It
->> just assumes that the GPU can do atomic accesses because it doesn't actually
->> go through PCIe: https://elixir.bootlin.com/linux/v6.19.10/source/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c#L4785
-> What does this mean for the other branch that *does* use
-> pci_enable_atomic_ops_to_root()?  Can any of those devices be RCiEPs?
+Monaco-ac-sku EVK board is a single board computer (SBC) that supports various
+industrial applications, including factory automation, industrial
+robots, drones, edge AI boxes, machine vision, autonomous mobile
+robots (AMRs), and industrial gateways.
 
-Most AMD GPUs are not integrated endpoints. APUs are integrated. There 
-are A+A GPUs where the GPUs are separate from the CPU but part of the 
-same coherent data fabric as the CPU (adev->gmc.xbmi.connected_to_cpu == 
-true). Those may also be considered RCiEPs. (I'm not sure about that, is 
-there an easy way to check with lspci?) We may need to include that in 
-the same branch as APUs.
+Signed-off-by: Umang Chheda <umang.chheda@oss.qualcomm.com>
+---
+Changes in v2:
+- Drop keyword "sku" from the compatible string of board bindings 
+  - Krzysztof.
+- Wrap commit text of dt-bindings change based on upstream guidelines
+  - Krzysztof.
+- Link to v1: https://patch.msgid.link/20260328-monaco-evk-ac-sku-v1-0-79d166fa5571@oss.qualcomm.com
 
-You can see that we did that for a new generation of A+A GPU here: 
-https://gitlab.freedesktop.org/agd5f/linux/-/blob/amd-staging-drm-next/drivers/gpu/drm/amd/amdgpu/amdgpu_device.c?ref_type=heads#L3920. 
-We'd need to confirm that the same works for MI200 A+A GPUs as well.
+---
+Umang Chheda (2):
+      dt-bindings: arm: qcom: Add monaco-evk-ac support
+      arm64: dts: qcom: monaco: Add monaco-ac EVK board
 
-Regards,
-   Felix
+ Documentation/devicetree/bindings/arm/qcom.yaml |   1 +
+ arch/arm64/boot/dts/qcom/Makefile               |   1 +
+ arch/arm64/boot/dts/qcom/monaco-evk-ac-sku.dts  | 730 ++++++++++++++++++++++++
+ 3 files changed, 732 insertions(+)
+---
+base-commit: 3b058d1aeeeff27a7289529c4944291613b364e9
+change-id: 20260328-monaco-evk-ac-sku-6d66f965335c
 
+Best regards,
+--  
+Umang Chheda <umang.chheda@oss.qualcomm.com>
 
->
->>> These drivers use pci_enable_atomic_ops_to_root():
->>>
->>>     amdgpu
->>>     bnxt_re (infiniband)
->>>     mlx5 (infinband)
->>>     qedr (infiniband)
->>>     mlx5 (ethernet)
->>>
->>> Maybe we should assume that because RCiEPs are directly integrated
->>> into the RC, the RCiEP would only allow AtomicOp Requester Enable to
->>> be set if the RC supports atomic ops?
->>>
->>> I don't like making assumptions like that, but it'd be worse to break
->>> these devices.
->>>
->>> [1] https://lore.kernel.org/all/20260326164002.GA1325368@bhelgaas
->>>
->>>> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
->>>> ---
->>>>    drivers/pci/pci.c | 5 ++---
->>>>    1 file changed, 2 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
->>>> index 8479c2e1f74f1044416281aba11bf071ea89488a..135e5b591df405e87e7f520a618d7e2ccba55ce1 100644
->>>> --- a/drivers/pci/pci.c
->>>> +++ b/drivers/pci/pci.c
->>>> @@ -3692,15 +3692,14 @@ int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
->>>>    	/*
->>>>    	 * Per PCIe r4.0, sec 6.15, endpoints and root ports may be
->>>> -	 * AtomicOp requesters.  For now, we only support endpoints as
->>>> -	 * requesters and root ports as completers.  No endpoints as
->>>> +	 * AtomicOp requesters.  For now, we only support (legacy) endpoints
->>>> +	 * as requesters and root ports as completers.  No endpoints as
->>>>    	 * completers, and no peer-to-peer.
->>>>    	 */
->>>>    	switch (pci_pcie_type(dev)) {
->>>>    	case PCI_EXP_TYPE_ENDPOINT:
->>>>    	case PCI_EXP_TYPE_LEG_END:
->>>> -	case PCI_EXP_TYPE_RC_END:
->>>>    		break;
->>>>    	default:
->>>>    		return -EINVAL;
->>>>
->>>> -- 
->>>> 2.51.0
->>>>
 
