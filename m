@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-273676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273677-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 25xiBvTjy2mHMQYAu9opvQ
-	(envelope-from <netdev+bounces-273676-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:10:44 +0200
+	id WICGFK3iy2n0MAYAu9opvQ
+	(envelope-from <netdev+bounces-273677-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:05:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81C4D36B7A1
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:10:43 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DACD636B5D6
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:05:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E923D31670AD
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:03:02 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 97AE0305CA4E
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F24402455;
-	Tue, 31 Mar 2026 15:02:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5950402BB4;
+	Tue, 31 Mar 2026 15:02:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C2rk2BQC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ifdNMVYl"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4249401A30;
-	Tue, 31 Mar 2026 15:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4263C40244F;
+	Tue, 31 Mar 2026 15:02:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774969372; cv=none; b=U0QYaQmbuMXWjoRCmrOFa8eJSPeCOmqTDJ234xbT57BNN9GmRDmTUOR+d2YPikWbShxznZGgOrgeW2fB9YuG8aZcUOcE2MvJ047weiHGa+JP4bfA1KgRB3RYQ+BKhiGELHEQp9DyXejncUTUZej2xHaCxBv5q/q9U7iEhhsCLGo=
+	t=1774969373; cv=none; b=N4XtNC7V87HE4ACFl4GjrP23uXLp6zkxZ+GPXqqpqrg/shjw0cI+Os9apzjecJmejplrd5IQCTlUvynPlYiErFEJ6tOAxWWt3cat/HZBEFD8dJLrqlueTWq1ujzi55KwhJ00KQZE/sc9GV25BeHMOzBfewUcwpNNzpN7D0aiArw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774969372; c=relaxed/simple;
-	bh=qV+KGO787iVQA6q+LeGiudsVWzWKdh1iKu/pKa7i5zE=;
+	s=arc-20240116; t=1774969373; c=relaxed/simple;
+	bh=WqEK/4h9ymztvrfhwLyCOfK1llcjY3+wVbom01OjhWA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jgb75qfizOpZ0l+ggep7rCP4kgW8iDCcUJyW8ICCsrtduchSUJamTCgnBn5tm4dZAY+C6SbSeyrJGGq6jBk3ZdnCU+xfI5pO9tW3hOyIyXsIquC+u8vhYsIlWijulEcSfcV0tUU0rMaWaYjJdDN+tAUIcVq/y6uk9NJqZxBYzEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C2rk2BQC; arc=none smtp.client-ip=192.198.163.14
+	 MIME-Version:Content-Type; b=ekgZNy2yQPnWvuR0Wmho6tf/Ip7n0EbWbRLG12w4cN1VbGhcQPqBhHYV7CmnM2LXw5BMIuer3SPPBrMdu4mCIihoOseaexkwgOdItU6HuL1RJzWlVxAaLwGRoPTj8go3m7aI6OTSfdTKnBklzJ0rdncCRYOKFx9kI4KRGwRKaj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ifdNMVYl; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774969371; x=1806505371;
+  t=1774969372; x=1806505372;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qV+KGO787iVQA6q+LeGiudsVWzWKdh1iKu/pKa7i5zE=;
-  b=C2rk2BQCEN9gTBR1g09Sz8w578Hu0DKiY4dldIfDV05aJHN1cOX9qzic
-   Uip+I3ydnowM7e8OSOi0DH/14VeIdQTq7VKRuDng9F9VeZ15FZ9vJQG/S
-   krGhMDBLkQmmnrUfsiAP4LEo/aiKxTAjKd/IXU2u8gcXQtsu8/4DX3uMC
-   R2EJ1V3Fi46flDA3bpZIsOGb+Wcnc02ujL/Q+NQVjLcXosJJZ6uKye3bl
-   ICGtpvyiJYv7quuE5ehDeGJVyYt8gx4MNcuii/A74Fz/SCikUzV8LDrkg
-   OAm99W2LSOKRB5u7rmov4j6tqZzrH5nhfz64lynpYSL9hJXI3zrASacZw
+  bh=WqEK/4h9ymztvrfhwLyCOfK1llcjY3+wVbom01OjhWA=;
+  b=ifdNMVYlBmPChxjfBNzW0AdeTOQCgZ5DoEmGY1UfXOMQU9Nw0fnB8MWl
+   2O1hLrotFal/DpmtGsPPOj9q1f3FgRZh//SgoD3EyiHvcI16If22z9VXR
+   zrdSeJJHE7DWozHL5vUqV8eck7UY9r+hKPkjPsCPofSctbsD0lxX3zHi8
+   zt1YKxxL1rRChqDpGSRSw6GIA7oNYmYq5JuloiQPq072idEW5WhTu7ALt
+   hGY/VfKPR1x8PyhviEefhWmaxgvDuXjz5+gFul17S5HCE+537wtn9i1nM
+   hgyf/mau9uQJfF5QgXYS262z3ikt7hCYZWtpCBcwiiZnifhXA1Ew3lPJL
    A==;
-X-CSE-ConnectionGUID: AuM7gH6uR9C/FdfPy8qX1w==
-X-CSE-MsgGUID: Xrnep1aaT/mm4NTUW3CXJw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11745"; a="76046218"
+X-CSE-ConnectionGUID: 7tpYFmRUQJeaOmuRgJeFUQ==
+X-CSE-MsgGUID: nJF/krruSUCnCZpUpONG+g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11745"; a="76046231"
 X-IronPort-AV: E=Sophos;i="6.23,152,1770624000"; 
-   d="scan'208";a="76046218"
+   d="scan'208";a="76046231"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2026 08:02:48 -0700
-X-CSE-ConnectionGUID: LpLd4fErQja/d/K6zFlFoA==
-X-CSE-MsgGUID: IuAasp0QRNS7xAuZcnUpew==
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2026 08:02:50 -0700
+X-CSE-ConnectionGUID: 6YEBjkpgTju/NU7X8OgMlA==
+X-CSE-MsgGUID: AFDM/9i+TZGmB1fFNSof8A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,152,1770624000"; 
-   d="scan'208";a="219735653"
+   d="scan'208";a="219735663"
 Received: from boxer.igk.intel.com ([10.102.20.173])
-  by fmviesa009.fm.intel.com with ESMTP; 31 Mar 2026 08:02:45 -0700
+  by fmviesa009.fm.intel.com with ESMTP; 31 Mar 2026 08:02:47 -0700
 From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 To: netdev@vger.kernel.org
 Cc: bpf@vger.kernel.org,
@@ -72,10 +72,11 @@ Cc: bpf@vger.kernel.org,
 	larysa.zaremba@intel.com,
 	aleksander.lobakin@intel.com,
 	bjorn@kernel.org,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH v5 net 10/11] igc: remove home-grown xsk's frame size validation
-Date: Tue, 31 Mar 2026 17:02:12 +0200
-Message-Id: <20260331150213.550797-11-maciej.fijalkowski@intel.com>
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Joshua Washington <joshwash@google.com>
+Subject: [PATCH v5 net 11/11] gve: remove home-grown xsk's frame size validation
+Date: Tue, 31 Mar 2026 17:02:13 +0200
+Message-Id: <20260331150213.550797-12-maciej.fijalkowski@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20260331150213.550797-1-maciej.fijalkowski@intel.com>
 References: <20260331150213.550797-1-maciej.fijalkowski@intel.com>
@@ -91,69 +92,58 @@ X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273676-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273677-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,kernel.org,redhat.com,google.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[maciej.fijalkowski@intel.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[intel.com:+];
 	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: 81C4D36B7A1
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DACD636B5D6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Since this check is now present in core in xp_assign_dev(), remove
-redundant statement from igc_xdp_enable_pool().
+redundant statement from gve_xsk_pool_enable().
 
+Reviewed-by: Joshua Washington <joshwash@google.com>
 Reviewed-by: Björn Töpel <bjorn@kernel.org>
 Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 ---
- drivers/net/ethernet/intel/igc/igc_xdp.c | 11 -----------
- 1 file changed, 11 deletions(-)
+ drivers/net/ethernet/google/gve/gve_main.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_xdp.c b/drivers/net/ethernet/intel/igc/igc_xdp.c
-index 9eb47b4beb06..4126173a0226 100644
---- a/drivers/net/ethernet/intel/igc/igc_xdp.c
-+++ b/drivers/net/ethernet/intel/igc/igc_xdp.c
-@@ -61,23 +61,12 @@ static int igc_xdp_enable_pool(struct igc_adapter *adapter,
- 	struct igc_ring *rx_ring, *tx_ring;
- 	struct napi_struct *napi;
- 	bool needs_reset;
--	u32 frame_size;
- 	int err;
- 
- 	if (queue_id >= adapter->num_rx_queues ||
- 	    queue_id >= adapter->num_tx_queues)
+diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+index 9eb4b3614c4f..b63e0a0459fb 100644
+--- a/drivers/net/ethernet/google/gve/gve_main.c
++++ b/drivers/net/ethernet/google/gve/gve_main.c
+@@ -1596,11 +1596,6 @@ static int gve_xsk_pool_enable(struct net_device *dev,
+ 		dev_err(&priv->pdev->dev, "xsk pool invalid qid %d", qid);
  		return -EINVAL;
- 
--	frame_size = xsk_pool_get_rx_frame_size(pool);
--	if (frame_size < ETH_FRAME_LEN + VLAN_HLEN * 2) {
--		/* When XDP is enabled, the driver doesn't support frames that
--		 * span over multiple buffers. To avoid that, we check if xsk
--		 * frame size is big enough to fit the max ethernet frame size
--		 * + vlan double tagging.
--		 */
--		return -EOPNOTSUPP;
+ 	}
+-	if (xsk_pool_get_rx_frame_size(pool) <
+-	     priv->dev->max_mtu + sizeof(struct ethhdr)) {
+-		dev_err(&priv->pdev->dev, "xsk pool frame_len too small");
+-		return -EINVAL;
 -	}
--
- 	err = xsk_pool_dma_map(pool, dev, IGC_RX_DMA_ATTR);
- 	if (err) {
- 		netdev_err(ndev, "Failed to map xsk pool\n");
+ 
+ 	err = xsk_pool_dma_map(pool, &priv->pdev->dev,
+ 			       DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING);
 -- 
 2.43.0
 
