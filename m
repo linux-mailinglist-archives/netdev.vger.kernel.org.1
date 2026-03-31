@@ -1,219 +1,348 @@
-Return-Path: <netdev+bounces-273743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273744-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +NGxC9w2zGn7RQYAu9opvQ
-	(envelope-from <netdev+bounces-273743-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 23:04:28 +0200
+	id uH8nGYc3zGn7RQYAu9opvQ
+	(envelope-from <netdev+bounces-273744-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 23:07:19 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83F63371539
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 23:04:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C672A3715EE
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 23:07:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 36B603040760
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 20:58:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 48E513009529
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 20:59:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F70A3DEAE5;
-	Tue, 31 Mar 2026 20:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04303DFC9E;
+	Tue, 31 Mar 2026 20:59:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="nfMp43Ov";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="XcKyJHaZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gSFqTEVs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73D23DE426
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 20:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774990736; cv=none; b=ppwfa1QBHXhrlKoSD7lceVRSym0oWkdZE3OanNK0/2HD3VDPHWlB5GiopR0rwIZiyg9216LgfLBt0hAcaJnI0ryxMsy7B4Nn0pp+E7bQxqZOKkNxsFzm7/fZonuIvKVAsxsmRw2PTNIl2axa4OmP7Bjzgp+FIYlS2tzybGdC6BQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774990736; c=relaxed/simple;
-	bh=4pw//0aMVpVC79RUN/bCK1yLIUNfqEnOpV6nZbaH04E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TTV9ydZtOTOLTkaaIkrFe4UervwSdm2lksStYUw+23xuk2aVT3FjRYeHgg6HwCJTn1J+VQf/SpZUuXLzGAiF+nKo4BQadpGKmeSxhCnYIjRlUmn8s1xRKFE3+YGIeqzpCzBr/KKoferF0KIPn5HTyRKqdIlpU9m6vP7vIRiZm1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=nfMp43Ov; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=XcKyJHaZ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62VIGsRO3081367
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 20:58:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=HddPcSAbUNS8veYlTx2o5Se9
-	1feKqDMffrj4xcj/ilE=; b=nfMp43OvPKg9eH1vcdrAPIcAYlhRnyjwneuIP46G
-	95nmc/u5yohrbiDrFUCHs6ZXEnG5EYXm/spSAwdxyXOkNvaHJ99r/HtY+iZHzEn/
-	3fKvEOb+JWTFsKJpS92+tez1J2hGKS2ej7F00zGeKqCtTHM+7bnyz20x4k/2EgyJ
-	EIrLrDC1ONnIwrzo1Q7H/ljKWZjcN0DIDydUF3RvLlpn/fi240m/I+QVmzv0Tgvz
-	mjndNVO19zI2XiJVyfemN9TiyOeibZfO6gxfohI0Dn2eRQb61gfZ6hVcBmULUZ/S
-	SqLtMmQMPufxo/jv5e5PRFf1Wjl/+1Oy5FYxWBOrXavc8w==
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d8kdkrny2-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 20:58:54 +0000 (GMT)
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-82a855dc82aso4532002b3a.2
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 13:58:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1774990733; x=1775595533; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HddPcSAbUNS8veYlTx2o5Se91feKqDMffrj4xcj/ilE=;
-        b=XcKyJHaZMkfrwD8wDAL2YoBzRKl2XW9fLwAwI4gt15BxRyIlVjpv8DrRYSEONrz4de
-         hF1iAxngYm3BeuYwBeYd0cpq2cnlRPQbaOc5z4NbR24N64l6Oc+FMr9T4MX+RcYpgrgP
-         XtZdzZpdqrIifSJQLIrVXw3SE7WSwCRcJ89yWWtHeSws1y3RyWclUgt8v8xMBjrRpDa+
-         2fvr1H8mOts9fxtwK8YeIUOfcyyk3GRqW+Whpz1JR71OgvM8UB2XG8tk+SSfwZqYeoYE
-         sFm/zmHP6fjKcbyEWcEce7jXojH4BE2z+B1QjCRWbUw5/F7YXJ/KHzCXPec7BWpSiJB/
-         8wmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774990733; x=1775595533;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HddPcSAbUNS8veYlTx2o5Se91feKqDMffrj4xcj/ilE=;
-        b=VWCEikQCQ1r0Y5wA56quW875jr0jTBCfW/6A/j6FmGWnUijFiVKzkF30fHNwjBq+5Z
-         kwNh1yOjV1mJhe9VV08FzqRmYpHKai1XCgTOp6bPfdAhBdsfghP4/s9cJR0jx9RNXObt
-         0SNT/ByxI/aQyuU4BMRRTwvwOqtvzorpCmMG3NJYpLQC515v2DzKoyJaXzrEejvdEXmY
-         kZv8fwg1Zm/Nj7QxndD7LGwGv9ilAm8SZdtamo/7QdGvOWaqhuCWlISUniohMaPxHCyH
-         nR8U2H7WdhzbKP29ZPnp+PjWt+94FgRc931kTs2FD7/H7+mqm4zYKzpkKTKK7UygbZGI
-         0bDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJnBoWaAhnUNm8PQBM6RJJYcoViUJAJhos/DCeTsoK/D/z1jq70dzWwrB4ygwbCv0Ne2WpGGo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxurq7YYftGOI7a8uDxvBf8GQpV3vj4qDDndqI8r3j/QFFom3ve
-	uYADhFvQnS6lDkEK6sbSG+1E83+iv2erdBXO/51zKfiSxRcCS0n8E5hbrZc14OOt1IS5ZWZTPZH
-	h7g/4VfRO36vTXw6Wxhq0NRqTbXBEaIGhnoE0uaUlyizCjK4kRjdEVQ3LuQ0=
-X-Gm-Gg: ATEYQzyVEwl3lgcTcTFhYlwiDWgJY0Xi4kMVJ9R5vifb0B6wFFzDM9jkGe1hoNFpOGE
-	qMZW6l73dGqySd0luJYPHTGAqHCydCvmnLrxiROwVssbRRxgC23n3rqHULA4ms2iP3sdd8zALGU
-	V2iU4Gj1jMg6woqudGzDB+ufDVqpbS1N17JqYJiZZRGL5dQlMkHGfFKvBOryRL49LOBcYrRDim8
-	5dLsYKeCX4MdSQNP8Tu74igqEX3EuZiTrMRnjT0nWz/8RrePR3sP0B2ZofEbGPj1QikXAPP+sEr
-	KJHC7OMml1qlQZzX4X4y+kFWmgzda6bk4dkiA9WLgEM/XQfbjH/QM+CwhRlymLgwtHZY+H69Y8z
-	WHxbrLhJQlnmwN+k9TxIRihiY7G1goAfL2Rg=
-X-Received: by 2002:a05:6a00:84d:b0:82a:60ad:874 with SMTP id d2e1a72fcca58-82ce8957d6dmr1039519b3a.19.1774990733360;
-        Tue, 31 Mar 2026 13:58:53 -0700 (PDT)
-X-Received: by 2002:a05:6a00:84d:b0:82a:60ad:874 with SMTP id d2e1a72fcca58-82ce8957d6dmr1039494b3a.19.1774990732800;
-        Tue, 31 Mar 2026 13:58:52 -0700 (PDT)
-Received: from oss.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82caf97abfesm10359545b3a.1.2026.03.31.13.58.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 13:58:52 -0700 (PDT)
-Date: Wed, 1 Apr 2026 02:28:45 +0530
-From: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-        Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH RFC net-next] net: stmmac: qcom-ethqos: set clk_csr
-Message-ID: <acw1habUsiSqlrky@oss.qualcomm.com>
-References: <E1w6AZm-0000000E54W-1F6E@rmk-PC.armlinux.org.uk>
- <9d0a529a-d065-4f46-a93b-23195a4f9727@oss.qualcomm.com>
- <acpqgpCsbo3lJs3l@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1FA3DE426
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 20:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774990790; cv=fail; b=rEjW5Ze8RtQjVOtX16dBOM7hH+o1Gw0Y7o4z5Ozjfp9zdaA41NHk+/Ph6Poc5zAV+lDq0jjtlZbLeIak/3TK13a7Vz+1gvBP3P3H3rWh5I+++wl9vZ9H+ma2WabxnDcc0XXnWWY4z3eIV1GmUHNBouQg6XWbK6I5ocfMlkLwbfA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774990790; c=relaxed/simple;
+	bh=iRO0+qAMoKN49lK37sJE0ncgG67+Oy+5TpwT0RWCPaA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ilA0IvP0/6v2+eV75lzA+SrWG06eaT9vsPg0hKIvbcf4RPs9i0yog/ESdEEeDFM+ffNSViKN4g1ggITC0w3u9n39JmwMaQorssrR1Bfa6Ibwv0YwpT4qYstGTROwIJ6Yj5e1aqexNMdiEld0Fqj7/xQSIEpfGIw4aaOUF+hb0uI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gSFqTEVs; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774990789; x=1806526789;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=iRO0+qAMoKN49lK37sJE0ncgG67+Oy+5TpwT0RWCPaA=;
+  b=gSFqTEVs5AqzQv4aH+5JTCiT1COHWlMMuJvb8X6xg1+r2XaMTPCXmctW
+   cNhWsYbM8tDvP5zrEHPo2om1N/+9hq9x1zlIrxXcsuIc8L58fBbu7GvxJ
+   sJr5KC+l13si3T/LzonuwiCEEeq/is83o2X3ZZpUre99WX/gYS6q4jbUH
+   dGpgsnM2fzNZhUmSm7syI9y4T1Rn0BL21RF8xESs7q6I3VnFVTUifNCvy
+   spct+9E5tP71+QJVIa+pjIes1235tEWtgueUraN5T3gR+NY/uNJX42hOa
+   fZxGA8mFaYTRdEe3wOKnt1c7EcF7DvZ6GYpe/aJCBBfLXGh4mr/0G22Wm
+   w==;
+X-CSE-ConnectionGUID: FY78i0MKR9aba+zn0rqrlA==
+X-CSE-MsgGUID: C6mrpgpTQzO8OxVcRZU7+w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11745"; a="86320529"
+X-IronPort-AV: E=Sophos;i="6.23,152,1770624000"; 
+   d="scan'208";a="86320529"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2026 13:59:49 -0700
+X-CSE-ConnectionGUID: 4ycotK+ESXapKBoDARsMmA==
+X-CSE-MsgGUID: wr8iNMG3Q7exJLSNV1M/8w==
+X-ExtLoop1: 1
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2026 13:59:48 -0700
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 31 Mar 2026 13:59:48 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Tue, 31 Mar 2026 13:59:48 -0700
+Received: from CH4PR04CU002.outbound.protection.outlook.com (40.107.201.71) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Tue, 31 Mar 2026 13:59:45 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=O2TXd1x+t+F5FWI72jEDswPvi+/r3ObIXH6Dd7iMPu+chZVaQn/Sf5o8usQrimLSlA0tqjoera9kXjV7UzydAc8lnA9J441fGUuW3XWh93LuEEGjlEplQL70dyTzIiuWnLzRjeHRLSVnGBAh+pFjuPLk6heZsHWwE0oaEBK6AqwYUYfhwShrEFepx+jPrttGWxkTDvIy1Z1nQdMrE4qSf7s168OgfARXgcauXCt4+8bivvXilNgKFb4X/+pDc7owcWCaYJBFSWrhpPiok5trvrJer6CgS+DobaffaeuqWlyPqoU0/U/RmKWXHGJF7E8bTKS/r3HfWk2sc+cdssNu+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EJkytKdj3xO2CoFB9s7uX007H//WA36iG8SaZUw68OM=;
+ b=L4ZOe1cfm0/H7u2Nj9vUNo4NTrj+cKwSQ5gIhsk5m0+2FxOAfxUWudx3HN4HI+SQ3kKz3KgvyIV3fUZcg9UyHxQm8Hone3zLocU05HTm90t1smpaXAQV6IRYkGVPN7XFyRX5oJWy4L7WXZmjaMAEp9GnhhMYWaTa8ZvgNKKKTEbPF4hNbz/eVrzUvOw0uj/k4Owp3+bRbUc34AOsBpqlMOxLwN5ORRhazWkOT4BQxOp/9Yz1QtVUF4vsm21Ak511zSDw5HfYbkpSaqknjS96pFs9UZtams6dKfZh/sfCELeTf9OK2sglKjgRMAL1sJ7Pwe2hbuCwRKidj8RMLT6AIQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8230.namprd11.prod.outlook.com (2603:10b6:8:158::21)
+ by CH2PR11MB8779.namprd11.prod.outlook.com (2603:10b6:610:285::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.15; Tue, 31 Mar
+ 2026 20:59:39 +0000
+Received: from DS0PR11MB8230.namprd11.prod.outlook.com
+ ([fe80::2592:f5a9:a751:be40]) by DS0PR11MB8230.namprd11.prod.outlook.com
+ ([fe80::2592:f5a9:a751:be40%4]) with mapi id 15.20.9769.015; Tue, 31 Mar 2026
+ 20:59:39 +0000
+Message-ID: <be397b6a-eb45-4709-b1ae-2eb831441945@intel.com>
+Date: Tue, 31 Mar 2026 13:59:37 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v3] ice: add 200G_AUI8 PHY type definitions and
+ wire them up
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>, Paul Greenwalt <paul.greenwalt@intel.com>,
+	"Simon Horman" <horms@kernel.org>, Paul Menzel <pmenzel@molgen.mpg.de>
+References: <20260324153542.674859-1-aleksandr.loktionov@intel.com>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <20260324153542.674859-1-aleksandr.loktionov@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0367.namprd04.prod.outlook.com
+ (2603:10b6:303:81::12) To DS0PR11MB8230.namprd11.prod.outlook.com
+ (2603:10b6:8:158::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acpqgpCsbo3lJs3l@shell.armlinux.org.uk>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzMxMDIwMiBTYWx0ZWRfX1oaDmLTIyJch
- UggMVTkyirr696Fm/63ShB6J91l+s0WVfFf0/y77ikeYMavWWFBSqHAqjhTk6b7QxJey0RngJcV
- bVPAu5MTo32FYJzbBSnrc++gE3TNL+sZdKj1eGhvbsMq4YDgwv+ByPIFzXWf4hcQ7a99l74X8nU
- HqX6EyTbNVVZbWRJY1nqT8oY5Q+QBjsSL/PLd5+h9qiwHNZvHJ2aUwdPTkhMfdZT2mH0KKYRx0h
- kI70Y0srMNvyhl6YxwSc/N2aaZA0IL2kisPHrVUmdwLGa0ItCe0PEFSaTcCFibTtp9bi4VsUoFt
- LHBDRQSzoxyoI+a7jeQ+lrPKll1yv4uI7o/J1mkO43eCEYKTq2A+wfr+3DGLxcTfNnElyudRqfz
- 4YApDONsW/j3RQS47M0h3dy7T/YFBuzDtsumbQ1bB5AI+d3AlmWAcPlF5JfJv6rhiW1wW++StpG
- mNiWOxjpi+Jg+KoaZ6A==
-X-Proofpoint-GUID: 1Fez1elSMsv_Ucp7nJELSeUNMd_berT_
-X-Authority-Analysis: v=2.4 cv=YsQChoYX c=1 sm=1 tr=0 ts=69cc358e cx=c_pps
- a=WW5sKcV1LcKqjgzy2JUPuA==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=kj9zAlcOel0A:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22
- a=EUspDBNiAAAA:8 a=9WimFISaW_B1XMulNl8A:9 a=CjuIK1q_8ugA:10
- a=OpyuDcXvxspvyRM73sMx:22
-X-Proofpoint-ORIG-GUID: 1Fez1elSMsv_Ucp7nJELSeUNMd_berT_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-31_05,2026-03-31_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 spamscore=0 bulkscore=0 clxscore=1015 impostorscore=0
- phishscore=0 lowpriorityscore=0 adultscore=0 priorityscore=1501
- malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
- definitions=main-2603310202
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8230:EE_|CH2PR11MB8779:EE_
+X-MS-Office365-Filtering-Correlation-Id: af7578e3-cde7-4f88-2475-08de8f686c73
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|22082099003|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info: TNI+YOhiyJ32lApvQL8r30E5jf36FhFp1RwGJ/b7fGgF34E1mw4CQcmpil+pulRe629EiClcPWPgtmQ1i3vs196bUpqC8VkzsXHqB2jKKW2JjwKNKiDcNtfKhLnTACzp1XEuJ4YcPdc2Nd/1GrBW6EGEfaWhyPY9HIrd5NZnJbFfUf06xisSjfCJfr+Db5D4USmLWU9kAq71KEo+95CPuRnR5EltSInPieeA7nR+UP6ya+hR9oi5CqzmWFtuJzztHrnTVGAJPMlh6PCXT41cZu6PM1YAfvpNJ1wHljSwlEOajdLoNeo4Y/cm0O07Ya8NOCIM2b12jCQCvxMhH9wz3CwyqqIIEbxpu9Mc+VfUYfwF/4pyyaXz95zAGooT5whgjdQGadRuVW+5e2IGIBztIJLv+947ayAMXISokYd/DDhff3wT1VREt6vT7B7BsVUBY/Y7Ex4RQEURlrgM2TrRHtS4uG5nSLKPDP9EmCRjNCDNmlTq8lNH8Crkd24TnpXygcPSSbkKK0zZ3Gj9YoVG/MLI7Vwf7mblmHNCbZ+pY6TPPIg3dpFSQ5EoCnCJ7Gf6LunpQ7hEVsGn1Mujdx3JUwsSmF7mr7MKP2M1CyXFK9Ot63+EIvmKZmAYwF3LcHpDOOy2Vskhi2SlRP+MX5kaX+c0P5o+2iwBNWkKoLepESWW1OdJoH8dxsh9ocdZ2hucMMyTvnK1B9kEcq/XqS28pi0dIKqn1w0CuNmxrMPwZi4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8230.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K1FnRFAvVzludyszRGQxenAwMzFUVzkwWUtvVzNIaC9Wak5EY0krUUxqUGhy?=
+ =?utf-8?B?c2Vrb0hhejkvZXJwcXYyWUJDSS9yRHlkZDUwQ2pya0lRTWFibldTTHpUQWZn?=
+ =?utf-8?B?eC8yY0hPd2VGK0t0WGd4dmxnWG84Z2NhRVg1NDFmOXNsV3ZMaGxpcEpoUU9r?=
+ =?utf-8?B?aWpoZUVXdmREc1lBUFFLVG1NSkRBQmlsZHhHbXk2clVFWWt6MEVJaTdCdXhs?=
+ =?utf-8?B?SFJ1cHQ3eXRTWXBqakE5YU9FWlhuOGc3bTl4cmpzQVZadG1SbUR1cUx1ZEVO?=
+ =?utf-8?B?dHhXeEpZSUQzOWQvL3dSMk1LMmxEUHlKbGdabHk3a054U1VOcGU4ZmxiV0s5?=
+ =?utf-8?B?VWtHVllQSGhqalM2YVFSbDdTNXl6enRvc3RtSFhMZE5sRkJ0dHBGbDVNRjVk?=
+ =?utf-8?B?c09WNjFvaDBmQSs4NU1qRm9IUXdCRlE5RWYzSHZ5MGVwYlBkVzNjM0JERjF4?=
+ =?utf-8?B?ZWhHbW1lTExRSW5aZlFTclRhMDI0MmFubXR4dExucWVmNFhXb2NHdFBaN05G?=
+ =?utf-8?B?dFV0bXkvUXUyRlNGTE1LTVhDbnRMYjF1bFBwMDVXYlFFb0dFWDBHOFB0Y0Vn?=
+ =?utf-8?B?djZadm1xU3pMMVhPZHp6ZHp6VDJtbXg1ZzJRdWdESHZocDVmVXFTZy8xRjRI?=
+ =?utf-8?B?b0tNc3pZN3paRXM5OUc3aklxd0NCY0VITXhMa2pkQ1NsNjRsUzAzY3o3R3hy?=
+ =?utf-8?B?aXBwbTFaNWZVRlNZVVJpYjNRTHAwWXYyK1duc3o5OUNCcXhDSkI2Q1lROFZz?=
+ =?utf-8?B?ekZkOE14U0FsY0VOT3VSRjlCUGRHYk9kZElGei9kK0daY1hEVjd2M3NPOThD?=
+ =?utf-8?B?cjgvQ1F0R0RCK2xIYWE2RlM1OHhnTkUrT0xvR3NHZktxVVZ0eVZFcEpLOFpl?=
+ =?utf-8?B?NkFCMWhTVE1GdlpRaUZMK005OFc2OFl3OFZ6dXFXM2RWTTh4SWhMem4rTnRJ?=
+ =?utf-8?B?U3lyNVh4THR6UmNoM0g0Yk9MazlwdXd4dXNwV2JtVmxqcEE4QlJRY1haeXoz?=
+ =?utf-8?B?L0pzVXVLU2VSeUtIdHArOWY3bG0rdmZPaUpTNUQ1bHFBWWczTjNWb3NXaEQv?=
+ =?utf-8?B?TFo4WklIbUJFWldRY2VRQXhtQUJCK3NhTU04SzFwQ0pxN2x0Q05LT1hqdDlS?=
+ =?utf-8?B?Zks4akI2L3JuZXk3bVg1Tis2dWlUMWVaemxXK2xqSHBTUXlRLzZQK0dDc2tU?=
+ =?utf-8?B?Z1NOUUJrZTZrc3VaTkh6K3Robm95bHEzK1BsdHBUZkVwYVcvTkt1cytQcHFj?=
+ =?utf-8?B?ZHUxbktWaEpyUHN5M3BWcStLbEU0TXhqeWd0dkVYS29uRUN1ajdBR3ZBdFh0?=
+ =?utf-8?B?cGU2S1I0RXJySmxLN2FObE9lcWhKZWlhb0dlamVNelQ4VG95Y2xHNXNCNU82?=
+ =?utf-8?B?dnJiYkpWSnhJM0dVaTJBV3hXeEx0cTA4M0RzbElMcnFFc3pvankxcm1XVzBT?=
+ =?utf-8?B?b0hXY01XMmRVdnI2WCtpdG5GRUFtRW1XdXlRUFQrVnhENHZIbVA5ZWxSS211?=
+ =?utf-8?B?d2FlSjlENTVqWTFsWlpEOWdBdkFhV3EzYm9VVWZDcitnV2d6c2ZpRlN6UFBj?=
+ =?utf-8?B?WlIzdDc3bStkRWw2YkpIL00wMTVMR1VUWnlUWTVLdjBlTGFPUG1OOTZqYmIv?=
+ =?utf-8?B?ODFIT1kxWVRmS2QxSTMwSTMwYnpYeEowWThSNUtSS2JzWjdQYk1MUFRTL3p1?=
+ =?utf-8?B?d2lFOWw5WXJrOGVtbVRnN3pqbkkzcGtmV1p1VVdIK1h1WVhIWVdRQUdGZjlZ?=
+ =?utf-8?B?eE9LcXRDb0xrYW9LRnh1UEZLL3Z3K21NTkRrYksrSExFbUJXU2toS0tNa3FF?=
+ =?utf-8?B?MUlvWDNTSUFhc29ZWVFVdWkrMFhpQ1lURWl2M1BnbVJrQTZLenBYRFFpanZJ?=
+ =?utf-8?B?SCsrL0xvNkxyQVYyMHlHRzJTMUJXbEptMkdTY0xtMVdCbnFCN09ta0xQbTZm?=
+ =?utf-8?B?ZC80ZUVNaVJHZGlqR3lLU3lVVWZaempzZ3EyVHlkWDFSdmRyMHJ1MFRiNjA3?=
+ =?utf-8?B?bUNmU0tZUWVmV0hmaXF5UHJPYW1KWng5MEVLL3piQmlLSjRDQmZuZW1TTFZx?=
+ =?utf-8?B?SldmbVVUZ1VETVdsVXpiTktMUTZ6T3lGWEQxRllwM2FCZ3JFOFQ3UHhCTTNk?=
+ =?utf-8?B?b3g4Si9rLzl6b2J1d0NacXhYWGFEQjFGYTduRDN5UVdBcnE3YUhvMmNTMi92?=
+ =?utf-8?B?cmNGU0tBcEZIV0Q4c1pUNEY5TUF6QzU1RWpIRXJTNFF2S09sUTZHbWZMOG43?=
+ =?utf-8?B?ak11elQ3RHhIeDZMRjVKYnJPcVZidTNteGd0V3ZFR2VmVW9wOWhseXJrT1N6?=
+ =?utf-8?B?dUd1NElmRUJnNVRlWmJBT2NjaE4rMkdZWi8zK0gyQnNHOFlCUU5pVHJhNDlw?=
+ =?utf-8?Q?QfGBswyEwQbEv61k=3D?=
+X-Exchange-RoutingPolicyChecked: rrEyLBknGtsVOLjCnMcXS1jAIaWk7RROWUvOEjZRCTMjMlFM0Tgllz7mgkYP5nuu+WYDlIOiq74Umf7ctQeO/QksWwv8fEk/DeGm9UgZMLRh79EeCt3LzYqu2R5uAyvHx1kaH3f5cBGFiWM5Y/9GfW8wxfHJYyffaFwat8/ji71Ar08ZIsYfELNuBjiL/DliuJiJs8UYEJ8zM1N+xp2JG0GFr+lOa+SnIc7qwg0lKvT/D4nLXiGTrtWyVuF4ioMp+Aro09cclYp4+AehBRNPT+V2L7an/mGq0ol6ygBWVZOSrP5/Lnb9NtmjDd1ILOItlj2vt2O5gzeNXe7CpjxoNg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: af7578e3-cde7-4f88-2475-08de8f686c73
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8230.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Mar 2026 20:59:39.3976
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gCZJ55JWv3j5Pd2OZCelLUu4VkywGQo24BAWMr3TQ1qN7DrRYY6IZTPGQCDVsUDoBxi3noZwQtI0RvA5EQw0HUbgREDQqvcE5Mw7yFwbzU0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR11MB8779
+X-OriginatorOrg: intel.com
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273743-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:dkim,qualcomm.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oss.qualcomm.com:dkim,oss.qualcomm.com:mid];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	TAGGED_FROM(0.00)[bounces-273744-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mpg.de:email];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mohd.anwar@oss.qualcomm.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 83F63371539
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: C672A3715EE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 30, 2026 at 01:20:18PM +0100, Russell King (Oracle) wrote:
-> On Mon, Mar 30, 2026 at 01:18:56PM +0200, Konrad Dybcio wrote:
-> > On 3/27/26 6:02 PM, Russell King (Oracle) wrote:
-> > > The clocks for qcom-ethqos return a rate of zero as firmware manages
-> > > their rate. According to hardware documentation, the clock which is
-> > > fed to the slave AHB interface can crange between 50 and 100MHz.
-> > 
-> > FWIW this __may__ possibly differ between platforms, but I'm not sure
-> > to what degree. Will there be visible impact if we e.g. have a 200 or
-> > 300 MHz clock somewhere?
+
+
+On 3/24/2026 8:35 AM, Aleksandr Loktionov wrote:
+> ice_link_mode_str_high[] lacks entries for phy_type_high bits 5-14
+> (all 200G PHY types on E825C); ice_dump_phy_type() prints nothing for
+> them when ICE_DBG_LINK is set (e.g. 'ethtool -s ethX msglvl 0x10').
+> The loop also iterates all 64 bits against a 5-entry array - undefined
+> behaviour for any matched bit beyond the end.  Add strings for bits
+> 5-14 and guard the loop with ARRAY_SIZE(), falling back to "unknown"
+> for unrecognised bits.
 > 
+> ICE_PHY_TYPE_HIGH_200G_AUI8_AOC_ACC (bit 13) and 200G_AUI8 (bit 14)
+> were absent from ice_adminq_cmd.h; ICE_PHY_TYPE_HIGH_MAX_INDEX capped
+> at 12 caused ice_update_phy_type() to skip them entirely, leaving both
+> invisible to 200G speed requests.  Add the definitions and bump
+> MAX_INDEX to 14.
 
-While I had made an identical change while retesting the PCS series,
-I was holding off on posting this patch for the same concern - what
-if some boards fall outside the 50 - 100 MHz range.
+I don't believe support for these two types got implemented so I don't 
+think there is need to add them.
 
-After some digging, the AHB clock appears to operate within:
- - 50 to 100 MHz for lemans/monaco derivative boards (2500BASE-X
-   interface)
- - 30 to 75 MHz for boards with an RGMII interface.
+> 
+> Wire the two new types throughout the driver:
+> - ice_get_media_type(): handle all ten 200G phy_type_high values so
+>    E825C ports no longer return ICE_MEDIA_UNKNOWN.  AOC_ACC interfaces
+>    map to FIBER; bare AUI4/AUI8 to DA with cage, else BACKPLANE
+>    (matching existing AUI2/CAUI2 logic); CR4_PAM4 to DA; SR4/FR4/LR4/
+>    DR4 to FIBER; KR4_PAM4 to BACKPLANE.
+> - ice_get_link_speed_based_on_phy_type(): return ICE_AQ_LINK_SPEED_200GB
+>    for both new types so ice_update_phy_type() enables them correctly.
+> - phy_type_high_lkup[13,14]: AUI8 is 8-lane 25G-per-lane; no
+>    200000baseSR8/CR8 ethtool modes exist yet, so approximate with
+>    SR4_Full/CR4_Full - matching AUI4 at indices 11-12.  FIXME once
+>    those link modes land upstream.
+> - ICE_PHY_TYPE_HIGH_MASK_200G: add bits 13-14 for the minimum-speed
+>    floor in ice_mask_min_supported_speeds().
+> 
+> Suggested-by: Paul Greenwalt <paul.greenwalt@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: Paul Menzel <pmenzel@molgen.mpg.de>
+> ---
+> v3 -> v4: add ARRAY_SIZE() OOB guard in ice_dump_phy_type(); cover all
+>            ten 200G phy_type_high values in ice_get_media_type(); add FIXME
+>            to lkup[13..14] for missing SR8/CR8 modes; rename subject
+>            fix subject; fix debug enable example (ethtool, not modprobe);
+>            add AUI8 speed mapping, lkup[13-14], MASK_200G bits 13-14,
+>            and AUI8->SR4/CR4 approximation comment
+> v1 -> v2: add ICE_PHY_TYPE_HIGH_MAX_INDEX update
+> ---
+>   .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  4 ++-
+>   drivers/net/ethernet/intel/ice/ice_common.c   | 31 ++++++++++++++++++-
+>   drivers/net/ethernet/intel/ice/ice_ethtool.c  |  4 ++-
+>   drivers/net/ethernet/intel/ice/ice_ethtool.h  |  8 +++++
+>   4 files changed, 44 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> index 859e9c6..efe985c 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+> @@ -1044,7 +1044,9 @@ struct ice_aqc_get_phy_caps {
+>   #define ICE_PHY_TYPE_HIGH_200G_KR4_PAM4		BIT_ULL(10)
+>   #define ICE_PHY_TYPE_HIGH_200G_AUI4_AOC_ACC	BIT_ULL(11)
+>   #define ICE_PHY_TYPE_HIGH_200G_AUI4		BIT_ULL(12)
+> -#define ICE_PHY_TYPE_HIGH_MAX_INDEX		12
+> +#define ICE_PHY_TYPE_HIGH_200G_AUI8_AOC_ACC	BIT_ULL(13)
+> +#define ICE_PHY_TYPE_HIGH_200G_AUI8		BIT_ULL(14)
+> +#define ICE_PHY_TYPE_HIGH_MAX_INDEX		14
+>   
+>   struct ice_aqc_get_phy_caps_data {
+>   	__le64 phy_type_low; /* Use values from ICE_PHY_TYPE_LOW_* */
+> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+> index ce11fea..2f3a268 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_common.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
+> @@ -84,6 +84,16 @@ static const char * const ice_link_mode_str_high[] = {
+>   	[2] = "100G_CAUI2",
+>   	[3] = "100G_AUI2_AOC_ACC",
+>   	[4] = "100G_AUI2",
+> +	[5] = "200G_CR4_PAM4",
+> +	[6] = "200G_SR4",
+> +	[7] = "200G_FR4",
+> +	[8] = "200G_LR4",
+> +	[9] = "200G_DR4",
+> +	[10] = "200G_KR4_PAM4",
+> +	[11] = "200G_AUI4_AOC_ACC",
+> +	[12] = "200G_AUI4",
+> +	[13] = "200G_AUI8_AOC_ACC",
+> +	[14] = "200G_AUI8",
+>   };
+>   
+>   /**
+> @@ -107,9 +117,14 @@ ice_dump_phy_type(struct ice_hw *hw, u64 low, u64 high, const char *prefix)
+>   	ice_debug(hw, ICE_DBG_PHY, "%s: phy_type_high: 0x%016llx\n", prefix, high);
+>   
+>   	for (u32 i = 0; i < BITS_PER_TYPE(typeof(high)); i++) {
+> -		if (high & BIT_ULL(i))
+> +		if (!(high & BIT_ULL(i)))
+> +			continue;
+> +		if (i < ARRAY_SIZE(ice_link_mode_str_high))
+>   			ice_debug(hw, ICE_DBG_PHY, "%s:   bit(%d): %s\n",
+>   				  prefix, i, ice_link_mode_str_high[i]);
+> +		else
+> +			ice_debug(hw, ICE_DBG_PHY, "%s:   bit(%d): unknown\n",
+> +				  prefix, i);
+>   	}
+>   }
+>   
+> @@ -605,13 +620,25 @@ static enum ice_media_type ice_get_media_type(struct ice_port_info *pi)
+>   		switch (hw_link_info->phy_type_high) {
+>   		case ICE_PHY_TYPE_HIGH_100G_AUI2:
+>   		case ICE_PHY_TYPE_HIGH_100G_CAUI2:
+> +		case ICE_PHY_TYPE_HIGH_200G_AUI4:
+> +		case ICE_PHY_TYPE_HIGH_200G_AUI8:
+>   			if (ice_is_media_cage_present(pi))
+>   				return ICE_MEDIA_DA;
+>   			fallthrough;
+>   		case ICE_PHY_TYPE_HIGH_100GBASE_KR2_PAM4:
+> +		case ICE_PHY_TYPE_HIGH_200G_KR4_PAM4:
+>   			return ICE_MEDIA_BACKPLANE;
+>   		case ICE_PHY_TYPE_HIGH_100G_CAUI2_AOC_ACC:
+>   		case ICE_PHY_TYPE_HIGH_100G_AUI2_AOC_ACC:
+> +		case ICE_PHY_TYPE_HIGH_200G_AUI4_AOC_ACC:
+> +		case ICE_PHY_TYPE_HIGH_200G_AUI8_AOC_ACC:
+> +			return ICE_MEDIA_FIBER;
+> +		case ICE_PHY_TYPE_HIGH_200G_CR4_PAM4:
+> +			return ICE_MEDIA_DA;
 
-This is not exhaustive, but it covers all boards I have access to
-which actually boot with the upstream kernel.
+Any reason we don't put this with the other DAs above...
 
-Therefore, I think using the /42 divisor should be fine as it will
-ensure that MDC never goes beyond 2.5 MHz.
+> +		case ICE_PHY_TYPE_HIGH_200G_SR4:
+> +		case ICE_PHY_TYPE_HIGH_200G_FR4:
+> +		case ICE_PHY_TYPE_HIGH_200G_LR4:
+> +		case ICE_PHY_TYPE_HIGH_200G_DR4:
+>   			return ICE_MEDIA_FIBER;
 
-If a future platform exceeds this range, we could switch to something
-like: plat_dat->clk_csr = data->clk_csr, with each EMAC version
-selecting the appropriate divisor.
+and these with the other FIBERs?
 
-Due to some urgent work tasks, I am still finishing PCS series
-testing. I will provide a t-b once done.
-
-In the meanwhile, please feel free to add:
-
-Reviewed-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-
-	Ayaan
-
+Thanks,
+Tony
 
