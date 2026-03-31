@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-273758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273759-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8OZ+Iqg4zGn7RQYAu9opvQ
-	(envelope-from <netdev+bounces-273758-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 23:12:08 +0200
+	id QDgUN646zGlyRgYAu9opvQ
+	(envelope-from <netdev+bounces-273759-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 23:20:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 025973716EE
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 23:12:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4159937190B
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 23:20:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C22433095C03
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 21:11:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 698CD305A6C0
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 21:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF673FB042;
-	Tue, 31 Mar 2026 21:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6AF40711B;
+	Tue, 31 Mar 2026 21:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="htBThJpk"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="Sto3VEtO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7AE3A5437
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 21:11:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F0C3FFAD0
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 21:14:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774991496; cv=none; b=eph0mDpvUwCnoQjFYv+I7XfOE6mY2tJ8Ek7L8Jb/3svJS6ESB9h5VMu+KbQ2jCdisC/5GdY1ClUM3Tr6T74oTwFtOn6b3oanHC1rUm91YQig/KonEpzthp1Ho1HmqVxdKmevtOIGE6LtQ/961Jk48jllvkZUDWgTtqBWp9//Bi0=
+	t=1774991654; cv=none; b=iSW89n0xSvHtJjkXcpRcMXx2E5NtCQMLLW8giHeQoBcpP0MbJTOmlHZ6NwU+y5Qxl1yWNz4sEp6xHex/s3g7ky2ffW7vSSXxh6wDOX7Q8a+0IqapGdiGK/Nugsyu9Wf8dWzkh9sLMl3UAlUPB2raEgWbTf87L2Wpd8MKNGWGJWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774991496; c=relaxed/simple;
-	bh=FWRC3fOXOYfrSoAOEpVCTCqjxvELujNq8j/OczlXMas=;
+	s=arc-20240116; t=1774991654; c=relaxed/simple;
+	bh=RodyypEEjn5xc2xKGLUHgsXuF5/nuAgh5MDTpI7TEK4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ld1BR8WRVNxNjlENgfuZXeoFN/budOibloEcWxauR0ZXBnxwvwuP9aF2yjT1Hz4/hv5kiG3xLCTE46XvGbc56lvzAk7eCIy9Bo6JGRXIZNcBE/KP+lCedJhpxO2eGj7In/XlAUqEJ3Gw+zgenEEdtCDRInxHpW8k4I3TE9IsvPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=htBThJpk; arc=none smtp.client-ip=209.85.210.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=IFW1arOlpYN1PxqEKEoCakQs3sp6Q+uu6x6IMwsBXqEbI1HyF6vFDNabz4B9dslVk3DErZrSy3+kMWLk6sHzh7WctHBBuMREZTkT+tEhdmoteSNSwKuF8B8DczGOQKwvy2AW0nEGvvCSoOkgNNt39Oi+NVsuTvb72rr7frS2Wgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=Sto3VEtO; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-827270d50d4so5398510b3a.3
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 14:11:34 -0700 (PDT)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82a655cfab5so5714519b3a.1
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 14:14:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1774991494; x=1775596294; darn=vger.kernel.org;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1774991651; x=1775596451; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aRLI2nmGdFJjDdlaJeIJBPkgXFafuXmLsFAn4yY0FP0=;
-        b=htBThJpkMhWXfbpNxX60+Z1D9MokrG9caZA4OwLF6mLVKfF/Of9Z8Wtoo6eYdbdX3o
-         uU6TLWFV/I310JTWXq/qHEgeDhko62Qyoej1cQt8KDJfwTq0OQCpWd6A6jwuPE1GBdfh
-         9CN8xgJHNMKppn0a4HOI2XJsnZcnkFnUjeHNTYpebMddWjrMes+l3vDU5gAT9Fj1Sqb3
-         dA4tzlUAF2qd8b/7olXhZtpnkv+OHD7YCXSbEfXSjzg2+OEY7KpZIrgI3ra3AOomY5Vn
-         yPE935/yFWMNGBXo6+nuwrV6dRkRZ8wsRY3DAuZNP5BFWy2GID2pNHvG3CZYDxQ50VMN
-         iFZg==
+        bh=mPsDMKl966SWuogi2uoY2AaXGVDeLc7Y72W3efu4G/s=;
+        b=Sto3VEtOLPeN+FSQWKuPf0/8+DX6zN4/VMq3ogS5DTYnWFhUlIZKj04G9C/1TwDX0A
+         IWVJHzMrvGOZuF3u7uZfDlKAI0Q2SKUXCYjSOiZ2nfTnHzZenhPUbt/D52sDwcbxP5oD
+         xgdrORSxMf99k73BbWf6Fl6Ofz3ZiHlm739eMcck8ictMk77w4vEFZIYayIkY8+a4k9I
+         z7Qu2yinWO6qAWPt5wEfeyjPIZzsokBhVO0PHoe3k7Vj/Yqq6tQNTgiK3aCV0ctRw+vA
+         wjOUL0nf9UFrdGnQYazB9tPmu38rDM30wtL6eNHI62JixqM71h+pE7qmvibXBGkkrOzT
+         M3hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774991494; x=1775596294;
+        d=1e100.net; s=20251104; t=1774991651; x=1775596451;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aRLI2nmGdFJjDdlaJeIJBPkgXFafuXmLsFAn4yY0FP0=;
-        b=gH54mxtfAqH6AxJZBaTuE16w1oonIt8L0MiyJcogHTEakiUJKfrTDzicDQyEBRBewK
-         7HCjO6b/ty1sR9vxnYErQQLoHaoUkWlVFjHmOeAMnc8VuhhZRNpLzWUgnKNiFVyiS1gr
-         XxRqElXyOwVcud95RBC51FFDF+aLQdaECfifwHpb10wsocx1J3+m8aHAZ8Blb3MYL3uT
-         51WRehkAwASdZFOM6DUZUmewdi62KTb/wypekLoHZ5/yrtP/rlCzlSHgNUe8P2EJL+Io
-         l+apK5BnOPztsUPDSoNkDxYW0tW2BJZsxzLRZRfz3MMu1Q4O1kTL8WMc2UZSa5iRUyFL
-         QD2A==
-X-Gm-Message-State: AOJu0YySwCuJtSTERBwi9564+hU4qBwU2pw2kUFIupbsTAOwjfPc0TfM
-	TaJ7DeJACh9+AAmsSP2chT109dTMYT/J3GNvWclyZwZOu0Kwp6KTPDouqRG6W1uzO/E=
-X-Gm-Gg: ATEYQzx36TJKXmly3YXyWGeqfd6SgasvPiRF4ERERKwovonLFVq5yhHFAVF11aSHOgR
-	I7uD9QO/X4oePZEZC2RYR46+xMxx0QsMKKUDN1LubLpFuQEo5qoN70/KgOFd8N562YHvqWuB0m3
-	1FRXmilKs7f8T5ew40c8qpvDvVmMwc8qUElSVTtEqJstJsC4/d+euJifk0yEY08JQdKhokvgNAA
-	MxR8iDmhX7z6nY27m+L5bNadYXbs/0KjUOL0XoF8zP+fKva/1xqpCUeiICJmhauXVOhKYoXbeVr
-	WvYrf07VVH5J+9If3avZXv9xj6kyDGfUNGg9//Idast4yqSwB8DuitXk0Nn/LCnr54YRRmBsj5C
-	MOJazRZQGYpd+Ab4paap7DDahg6rsxPp2Y4tJiXnOSFoQ9Rjin4J2baU6spwwKuIdOu598sXtSH
-	6dmpz6
-X-Received: by 2002:a05:6a00:1951:b0:827:343a:a1ef with SMTP id d2e1a72fcca58-82ce8aead3cmr1033738b3a.52.1774991494490;
-        Tue, 31 Mar 2026 14:11:34 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:44::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82ca85ef1bfsm11111542b3a.44.2026.03.31.14.11.33
+        bh=mPsDMKl966SWuogi2uoY2AaXGVDeLc7Y72W3efu4G/s=;
+        b=QbwViuen5YB0t1Ymr8AdLp0uBSEQp0qfGGn0Cs/HGHszU2fw+MbOPGDYj4Ydiy25Sf
+         aNMVMoew+bkayQjUcNV83SIrRzw+BJCDTZHHWtYQfkM+vQDtuMF0Ckqb7b7iGqWzjVsJ
+         fEgGRhnJ84fXTHOYiZg+Skcqs2GdtaBj8WvIf4OFV5zDmQ8T+tJQlhonPGKy+RDb+j+M
+         3AZwo+W8DWblpx6OX2pAKtp04CeUn+BLugOgQMFZnoiZtBDJPntlv29Ifab8kZviqvto
+         m8QHkMaKZHP9ef5vYYezt0EHutfkSMQ84HqEJtWAqzbDHMNcseR8dGspW0wj+mOwc/AU
+         weQw==
+X-Gm-Message-State: AOJu0Yy9bbFkdaGIreQHg/jTXcW9BG6f3fEgvLfyxFT8O7gyXmRf6F4U
+	NFoUagWbgKRbm9niICEwGALBP68aJDwXQYblmhE+QoPovcBR+s7ogIF7XtlvIXBkPIQ=
+X-Gm-Gg: ATEYQzzfwp8belxTJJq0xFRLYNjU0sCW2NS9Uius598ZqoK0Cb1esTjF1zUMSx+Wniq
+	tYIXBUCWouGzW3X+Tp0EWO4YThHJlFNHXLlhNhxRfZRbyURp/H4u2lnkvz4OZTGYn0O9roEcojV
+	vMA31Dg6zoKn1tmQogx4j+t7OWpml4GxnTT2HIqxJdFOREwzM7abbUPPQRPUoKSkXkXkf+u+wzO
+	f/NzUnKXqBVvSuRgXLveMGjceiZLI85rprMhKE+BgarPQtX9fV/ntX/Lm3gCNbiAcra7KEnaBxF
+	bnym+CO16Qg9ch1dFX07FqFtAgzEHJw67oHZAJE4E24E4pa8BR3Shczki8eloxgOxm7IrCgAXio
+	NJ41PIsW75mlHdIPrgjgmKZS0qESwScwZ5uNEOenfq2NVNT3RPMB8i2cs5DZGFkHF8VU1ylcWr2
+	Q/6spt7PZmDeo=
+X-Received: by 2002:a05:6a00:4195:b0:827:3d52:5d1a with SMTP id d2e1a72fcca58-82ce86d78a1mr1034418b3a.0.1774991651111;
+        Tue, 31 Mar 2026 14:14:11 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82ca849849fsm13712725b3a.26.2026.03.31.14.14.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 14:11:34 -0700 (PDT)
-Date: Tue, 31 Mar 2026 14:11:33 -0700
+        Tue, 31 Mar 2026 14:14:10 -0700 (PDT)
+Date: Tue, 31 Mar 2026 14:14:09 -0700
 From: Joe Damato <joe@dama.to>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>,
@@ -83,8 +83,9 @@ Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>,
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
 	andrew+netdev@lunn.ch, horms@kernel.org, pavan.chebbi@broadcom.com,
 	linux-kernel@vger.kernel.org, leon@kernel.org
-Subject: Re: [net-next v6 08/12] net: bnxt: Implement software USO
-Message-ID: <acw4hWuS4xt/bCwJ@devvm20253.cco0.facebook.com>
+Subject: Re: [net-next v6 09/12] net: bnxt: Add SW GSO completion and
+ teardown support
+Message-ID: <acw5IWuRiLV0yHVe@devvm20253.cco0.facebook.com>
 Mail-Followup-To: Joe Damato <joe@dama.to>,
 	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
 	Michael Chan <michael.chan@broadcom.com>,
@@ -93,10 +94,8 @@ Mail-Followup-To: Joe Damato <joe@dama.to>,
 	andrew+netdev@lunn.ch, horms@kernel.org, pavan.chebbi@broadcom.com,
 	linux-kernel@vger.kernel.org, leon@kernel.org
 References: <20260326235238.2940471-1-joe@dama.to>
- <20260326235238.2940471-9-joe@dama.to>
- <20260329152016.27646fab@kernel.org>
- <acqqjfzDK04j2APz@devvm20253.cco0.facebook.com>
- <20260330165357.31a30b68@kernel.org>
+ <20260326235238.2940471-10-joe@dama.to>
+ <20260330165748.2edb501a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,61 +104,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260330165357.31a30b68@kernel.org>
+In-Reply-To: <20260330165748.2edb501a@kernel.org>
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	URIBL_MULTI_FAIL(0.00)[devvm20253.cco0.facebook.com:server fail,dama-to.20230601.gappssmtp.com:server fail,tor.lore.kernel.org:server fail];
-	TAGGED_FROM(0.00)[bounces-273758-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273759-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	DMARC_NA(0.00)[dama.to];
-	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[devvm20253.cco0.facebook.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 025973716EE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,dama-to.20230601.gappssmtp.com:dkim,devvm20253.cco0.facebook.com:mid]
+X-Rspamd-Queue-Id: 4159937190B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 30, 2026 at 04:53:57PM -0700, Jakub Kicinski wrote:
-> On Mon, 30 Mar 2026 09:53:33 -0700 Joe Damato wrote:
-> > > > +				   bp->tx_wake_thresh);  
-> > > 
-> > > Is tx_wake_thresh larger than the max USO even for smallest ring size?  
-> > 
-> > Yes, it is.
-> > 
-> > Maybe its worth adding a comment in the code somewhere to make
-> > this more clear? Not sure where would be an appropriate place, but maybe
-> > bnxt_init_tx_rings?
+On Mon, Mar 30, 2026 at 04:57:48PM -0700, Jakub Kicinski wrote:
+> On Thu, 26 Mar 2026 16:52:28 -0700 Joe Damato wrote:
+> > @@ -4645,6 +4687,10 @@ static int bnxt_init_tx_rings(struct bnxt *bp)
+> >  
+> >  	bp->tx_wake_thresh = max_t(int, bp->tx_ring_size / 2,
+> >  				   BNXT_MIN_TX_DESC_CNT);
+> > +	if (!(bp->flags & BNXT_FLAG_UDP_GSO_CAP) &&
+> > +	    (bp->dev->features & NETIF_F_GSO_UDP_L4))
+> > +		bp->tx_wake_thresh = max_t(int, bp->tx_wake_thresh,
+> > +					   BNXT_SW_USO_MAX_DESCS);
+> >  
+> >  	for (i = 0; i < bp->tx_nr_rings; i++) {
+> >  		struct bnxt_tx_ring_info *txr = &bp->tx_ring[i];
+> > @@ -13832,6 +13878,11 @@ static netdev_features_t bnxt_fix_features(struct net_device *dev,
+> >  	if ((features & NETIF_F_NTUPLE) && !bnxt_rfs_capable(bp, false))
+> >  		features &= ~NETIF_F_NTUPLE;
+> >  
+> > +	if ((features & NETIF_F_GSO_UDP_L4) &&
+> > +	    !(bp->flags & BNXT_FLAG_UDP_GSO_CAP) &&
+> > +	    bp->tx_ring_size < 2 * BNXT_SW_USO_MAX_DESCS)
+> > +		features &= ~NETIF_F_GSO_UDP_L4;
+> > +
+> >  	if ((bp->flags & BNXT_FLAG_NO_AGG_RINGS) || bp->xdp_prog)
+> >  		features &= ~(NETIF_F_LRO | NETIF_F_GRO_HW);
+> >  
+> > @@ -13877,6 +13928,15 @@ static int bnxt_set_features(struct net_device *dev, netdev_features_t features)
+> >  	int rc = 0;
+> >  	bool re_init = false;
+> >  
+> > +	if (!(bp->flags & BNXT_FLAG_UDP_GSO_CAP)) {
+> > +		if (features & NETIF_F_GSO_UDP_L4)
+> > +			bp->tx_wake_thresh = max_t(int, bp->tx_wake_thresh,
+> > +						   BNXT_SW_USO_MAX_DESCS);
+> > +		else
+> > +			bp->tx_wake_thresh = max_t(int, bp->tx_ring_size / 2,
+> > +						   BNXT_MIN_TX_DESC_CNT);
 > 
-> Hm, as long as BNXT_MIN_TX_DESC_CNT is updated I don't think we need
-> any bespoke comments 
+> Adding extra handling for min ring size all over the place looks a bit
+> messy. Can you factor something out of this logic?
 
-I am hesitant to update BNXT_MIN_TX_DESC_CNT because it affects all hardware,
-including devices that do USO in hardware.
+Could add something like:
 
-It may not matter in practice since I would be bumping it from 19 to 210, but
-we could just leave it as is and let fix_features and init_tx_rings deal with
-ring size (as they do now).
+  static int bnxt_min_tx_desc_cnt(struct bnxt *bp)
+  {
+      if (!(bp->flags & BNXT_FLAG_UDP_GSO_CAP) &&
+          (bp->dev->features & NETIF_F_GSO_UDP_L4))
+          return BNXT_SW_USO_MAX_DESCS;
+      return BNXT_MIN_TX_DESC_CNT;
+  }
 
-IDK. Feels "safer" (but maybe less clear) to leave it as is. WDYT?
+and then when setting the tx_wake_thresh, it becomes:
+
+  bp->tx_wake_thresh = max_t(int, bp->tx_ring_size / 2,
+                             bnxt_min_tx_desc_cnt(bp));
+
+and fix_features can use the same helper.
+
+Question then is just do we still want to bump BNXT_MIN_TX_DESC_CNT (as per
+your previous comment)?
 
