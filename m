@@ -1,70 +1,68 @@
-Return-Path: <netdev+bounces-273680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273681-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CH0qHqvsy2mlMgYAu9opvQ
-	(envelope-from <netdev+bounces-273680-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:47:55 +0200
+	id yKYuA+bsy2mlMgYAu9opvQ
+	(envelope-from <netdev+bounces-273681-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:48:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3BA336C09A
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:47:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4FBB36C10B
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:48:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BD70431A0582
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:39:07 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C339A30B064E
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9E141C2FD;
-	Tue, 31 Mar 2026 15:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A3C421F12;
+	Tue, 31 Mar 2026 15:38:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="iowfm5iF"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="tP5/ZHNT";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="kEhfbqic"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta38.uswest2.a.cloudfilter.net (omta38.uswest2.a.cloudfilter.net [35.89.44.37])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97AFB411639
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 15:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7A6421F0F;
+	Tue, 31 Mar 2026 15:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774971386; cv=none; b=XrLTyMbKkx1P+NjdS6N7U8H1+mwh54Ei/Hr0f4RtyW5/jMHUm+dbusCqWH8NP7q19w7MIZhBu+jK12SFvXALgk4BXwmCWHiO1vthcV647h1rRZR0jCPqbQOeWcSNbR8vtd33IwMNtKYAlNzmE5WqMl5aDkLrdfyG/Pb3XTB0xys=
+	t=1774971501; cv=none; b=g06zve0QryAvs9A+J0VqK6O0MzRpvhiuiMyMl1qESXYRYzU7XoSShE2yW/ll3os1zzKAjfRfBleTwzWZ7t55iiGSN5isgBcAWzP7BAT2zyoQ1q4YkkArgSafCObdEXa9ZjT49Ad2btep719V28mVBvC3nBC5HaQRVe6aFl3hPwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774971386; c=relaxed/simple;
-	bh=g1etV1cSaF1CLKLwroH2Otgkb2vKs+5Py45hjgAK/o8=;
+	s=arc-20240116; t=1774971501; c=relaxed/simple;
+	bh=+atFSHa3fBSLRwnffHL60TLEuwq7BlNCBg5rhe0thHw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jfBIQa6tDXV72a9JXov7YjOMZ2FEACRtftv2EA6uu7QhUseIZeEV64WEvJkOyCSsOBHQDTHeWFD2kHkUXU9UPljscps8O10VMcfTe1G6mavanbgBVWYuFc0PXC6e9wha8jvZlfCinDpffvMHlRBNX3sdF7zTWa2lo0ogFJC/Izc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=iowfm5iF; arc=none smtp.client-ip=35.89.44.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-6001b.ext.cloudfilter.net ([10.0.30.143])
-	by cmsmtp with ESMTPS
-	id 7YImwymMFjw8Y7b8jw6WDh; Tue, 31 Mar 2026 15:36:25 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id 7b8hwCfm3YA8x7b8hwIPbq; Tue, 31 Mar 2026 15:36:23 +0000
-X-Authority-Analysis: v=2.4 cv=VJfdn8PX c=1 sm=1 tr=0 ts=69cbe9f9
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=k5Y5iPg+dmTXVWgYE/XtfQ==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=7T7KSl7uo7wA:10 a=VwQbUJbxAAAA:8
- a=_Wotqz80AAAA:8 a=pGLkceISAAAA:8 a=cTJmZftdM5iI3n9nPlYA:9 a=QEXdDO2ut3YA:10
- a=buJP51TR1BpY-zbLSsyS:22 a=2aFnImwKRvkU0tJ3nQRT:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gPSiibnnkaj7DpyikZYTE/USxJvNbpGxOj64z/kQRZk=; b=iowfm5iFnDEeJ1Hpg3V8sI41Jc
-	ZHrY11TWLlbsmX1yWaZ1D3OG42uvidLzJ825vTHKDil6WOmGmdVoVK9gswamXg/I6uW+a5fjtjnv/
-	WhirNst8ZDoSenFXVfn6EQ0ONZEnG1pr+A79EPa0wt8QkXKS5gIGYF5juC4pbyQ0NPp9XR9u80u9K
-	5sf90N/08DwvypFEphRvRIw4++M2KkOxHooWHLCJyF0d9IX4cTo46Qrcq+liUU+lW7+fUdzju0ZJL
-	LwPSQIGS2ZjFTvN1cc7GSEC3PpiU+BstMBiBWDZi1p2zADlXUrgaBMT1vtk5Y8vyTSpO0dqzQLfWM
-	o6m/Sz7A==;
-Received: from [177.238.16.13] (port=60182 helo=[192.168.0.104])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.99.1)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1w7b8g-00000002Jss-1lMG;
-	Tue, 31 Mar 2026 10:36:23 -0500
-Message-ID: <ddb5961b-02f9-4956-b618-31aab836fce7@embeddedor.com>
-Date: Tue, 31 Mar 2026 09:35:14 -0600
+	 In-Reply-To:Content-Type; b=LvZN92wi4o8MVcWWZllZYEathUb/d/Otyg3KXNv4TMCcELhI0xFYn6AwgNh7q/Hulw98KOEARmRp17IPApiqhg5TxpmfO7QNL/Rf3O4I0iBbg4LKt5y18ahKJ1CzlsZ3vagnL23B1qJQWAoy4cNv9eQvIRJDv+wwoAms2S4RYgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=tP5/ZHNT; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=kEhfbqic; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1774971492;
+	bh=+atFSHa3fBSLRwnffHL60TLEuwq7BlNCBg5rhe0thHw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tP5/ZHNTXN7nYdYpaCHAzNsuV6cca3LKvt1lSd6HR922oKpq6yxXE1mISGDMLXXQ1
+	 i8sET7fenl0jpjM93f8235Wtw9+RLsTXpQieTN0NydSqtQyXbWVnTJwGDF96CEl13P
+	 F0+qrMDfcnLUwXIEKMKEf6AScKegFAcgsXMOd57Tj5sa7VgBzrvhmN1p7WIKH0IkKk
+	 1Ry2+gsfEQqwd6kdf+HbBdtCbPb3kM8C9fAbEEWPYt/I4dlPxA4FN53K0BqpJNPTEP
+	 o5xsTZ/zZwllqVwz5aHY9y2DNSL7gUn1smLSsshIgTBTHBoKnd9Z+9t9V5iLGXwgDL
+	 T22oBhfMehRtA==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id 343AB406EA; Tue, 31 Mar 2026 15:38:12 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1774971491;
+	bh=+atFSHa3fBSLRwnffHL60TLEuwq7BlNCBg5rhe0thHw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kEhfbqicaXuBWu1SIm/N+xu5LdpE3KiykRaaQ+YOiCx3Ckockc2ESeCohhbhhJQnZ
+	 0kI1pRJsKXbjqBW5U9SJl5nN9MWjVmDFU+1mNMz+Sg46OLR/o5DO3BpbGCI7bw/GFp
+	 GpRWDe1UEmnhZdsJVYRz59hY8GD+anxV6hSjhyFWRiYGuea3DTJb2WEGghA3i6gWbD
+	 qEpWjtRCHgjCDSQDcWu2yDe9eB358w5gp3762FOpcO1INd8ASn/Ih41X+HvZEB87Ub
+	 GKKY5P1TMXsf29EKXDJzTcOHG2Ks/mPsSTIanrDoinbMcUL6Yk8xl3pkvJbhb7kbRH
+	 Ue+CLhxzYJ+7g==
+Received: from [IPV6:2003:c6:9f04:eb00::1c8] (p200300c69f04eb0000000000000001c8.dip0.t-ipconnect.de [IPv6:2003:c6:9f04:eb00::1c8])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 24F4D406E4;
+	Tue, 31 Mar 2026 15:38:11 +0000 (UTC)
+Message-ID: <50dc7e8c-6c6d-47d1-866e-677638b4deaf@birger-koblitz.de>
+Date: Tue, 31 Mar 2026 17:38:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,167 +70,202 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3] atm: nicstar: simplify allocation
-To: Rosen Penev <rosenp@gmail.com>, linux-atm-general@lists.sourceforge.net
-Cc: Chas Williams <3chas3@gmail.com>, Kees Cook <kees@kernel.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- "open list:ATM" <netdev@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>,
- open "list:KERNEL" HARDENING "(not" covered by other
- "areas):Keyword:b__counted_by(_le|_be)?b" <linux-hardening@vger.kernel.org>
-References: <20260327192407.365369-1-rosenp@gmail.com>
+Subject: Re: [PATCH net-next v4 1/2] r8152: Add support for 5Gbit Link Speeds
+ and EEE
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260324-rtl8157_next-v4-1-034312b12de5@birger-koblitz.de>
+ <20260329193449.2764517-1-kuba@kernel.org>
+From: Birger Koblitz <mail@birger-koblitz.de>
 Content-Language: en-US
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20260327192407.365369-1-rosenp@gmail.com>
+In-Reply-To: <20260329193449.2764517-1-kuba@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 177.238.16.13
-X-Source-L: No
-X-Exim-ID: 1w7b8g-00000002Jss-1lMG
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.0.104]) [177.238.16.13]:60182
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 43
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfCxGFXRcdAiGyb6XxFpZGyj9UB1E2PakUoqyav8wZ4E9bIGe2iJxZOevJdg4Y0A5mstEOV74YneK7zQQfVW4h4mAMgG8V/8KjAx0dE5bVWOkjaqucsP+
- eeSy7yEMT6VjZLp7nb9eiJdAhxlZAXe1Jr8jCIG1BM8FIuV5GN9HRCJROL8sok7ho812GqCDJXs4KMV7QAn00cN3GQxIAZDYiQo=
-X-Spamd-Result: default: False [-0.46 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[embeddedor.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273680-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[birger-koblitz.de:+];
+	TAGGED_FROM(0.00)[bounces-273681-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org];
+	DMARC_NA(0.00)[birger-koblitz.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[embeddedor.com];
 	MIME_TRACE(0.00)[0:+];
-	HAS_X_SOURCE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,lists.sourceforge.net];
-	DKIM_TRACE(0.00)[embeddedor.com:-];
-	NEURAL_SPAM(0.00)[0.556];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FROM_NEQ_ENVFROM(0.00)[gustavo@embeddedor.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	HAS_X_ANTIABUSE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.997];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[embeddedor.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F3BA336C09A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lkml.org:url]
+X-Rspamd-Queue-Id: E4FBB36C10B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Jakub,
 
-
-On 3/27/26 13:24, Rosen Penev wrote:
-> Use a flexible array member with kzalloc_flex to combine allocations
-> into one.
-> 
-> Add __counted_by for extra runtime analysis. 
-
-Move counting variable
-> assignment to right after allocation as required by __counted_by.
-
-This is misinformation and should be phrased differently[1]
-
--Gustavo
-
-[1] https://lore.kernel.org/linux-hardening/37378f49-437f-438b-ad6c-d60480feb306@embeddedor.com/
-
-> 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+thanks a lot for reviewing the patch!
+On 3/29/26 21:34, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
 > ---
->   v3: reduce to 80 columns
->   v2: use kzalloc_flex
->   drivers/atm/nicstar.c | 18 ++++++------------
->   drivers/atm/nicstar.h |  5 +++--
->   2 files changed, 9 insertions(+), 14 deletions(-)
+> r8152: Add support for 5Gbit Link Speeds and EEE
 > 
-> diff --git a/drivers/atm/nicstar.c b/drivers/atm/nicstar.c
-> index 24e51343df15..c0bed85daf96 100644
-> --- a/drivers/atm/nicstar.c
-> +++ b/drivers/atm/nicstar.c
-> @@ -867,23 +867,18 @@ static scq_info *get_scq(ns_dev *card, int size, u32 scd)
->   	if (size != VBR_SCQSIZE && size != CBR_SCQSIZE)
->   		return NULL;
+> This commit adds support for 5GBit link speeds and EEE to the RTL8157
+> driver. It updates the speed and duplex settings, ethtool integration,
+> and EEE advertisement parameters to handle the new 5G capabilities.
 > 
-> -	scq = kmalloc_obj(*scq);
-> +	scq = kzalloc_flex(*scq, skb, size / NS_SCQE_SIZE);
->   	if (!scq)
->   		return NULL;
-> -        scq->org = dma_alloc_coherent(&card->pcidev->dev,
-> -				      2 * size,  &scq->dma, GFP_KERNEL);
-> +
-> +	scq->num_entries = size / NS_SCQE_SIZE;
-> +
-> +	scq->org = dma_alloc_coherent(&card->pcidev->dev, 2 * size, &scq->dma,
-> +				      GFP_KERNEL);
->   	if (!scq->org) {
->   		kfree(scq);
->   		return NULL;
->   	}
-> -	scq->skb = kzalloc_objs(*scq->skb, size / NS_SCQE_SIZE);
-> -	if (!scq->skb) {
-> -		dma_free_coherent(&card->pcidev->dev,
-> -				  2 * size, scq->org, scq->dma);
-> -		kfree(scq);
-> -		return NULL;
-> -	}
-> -	scq->num_entries = size / NS_SCQE_SIZE;
->   	scq->base = PTR_ALIGN(scq->org, size);
->   	scq->next = scq->base;
->   	scq->last = scq->base + (scq->num_entries - 1);
-> @@ -928,7 +923,6 @@ static void free_scq(ns_dev *card, scq_info *scq, struct atm_vcc *vcc)
->   				}
->   			}
->   	}
-> -	kfree(scq->skb);
->   	dma_free_coherent(&card->pcidev->dev,
->   			  2 * (scq->num_entries == VBR_SCQ_NUM_ENTRIES ?
->   			       VBR_SCQSIZE : CBR_SCQSIZE),
-> diff --git a/drivers/atm/nicstar.h b/drivers/atm/nicstar.h
-> index 1b7f1dfc1735..76635d46016e 100644
-> --- a/drivers/atm/nicstar.h
-> +++ b/drivers/atm/nicstar.h
-> @@ -667,14 +667,15 @@ typedef struct scq_info {
->   	ns_scqe *next;
->   	volatile ns_scqe *tail;	/* Not related to the nicstar register */
->   	unsigned num_entries;
-> -	struct sk_buff **skb;	/* Pointer to an array of pointers
-> -				   to the sk_buffs used for tx */
->   	u32 scd;		/* SRAM address of the corresponding
->   				   SCD */
->   	int tbd_count;		/* Only meaningful on variable rate */
->   	wait_queue_head_t scqfull_waitq;
->   	volatile char full;	/* SCQ full indicator */
->   	spinlock_t lock;	/* SCQ spinlock */
-> +	struct sk_buff *skb[] __counted_by(num_entries);
-> +	/* Pointer to an array of pointers
-> +	   to the sk_buffs used for tx */
->   } scq_info;
+>> diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+>> index 3b6d4252d34c..bab8e10e5f99 100644
+>> --- a/drivers/net/usb/r8152.c
+>> +++ b/drivers/net/usb/r8152.c
+>> @@ -604,6 +604,7 @@ enum spd_duplex {
+>>   	FORCE_100M_FULL,
+>>   	FORCE_1000M_FULL,
+>>   	NWAY_2500M_FULL,
+>> +	NWAY_5000M_FULL,
+>>   };
 > 
->   typedef struct rsq_info {
-> --
-> 2.53.0
+> Are there missing switch cases for NWAY_5000M_FULL in the hardware UPS
+> flag configurations, such as r8156_ups_flags?
+This question has now been raised the third time, see here:
+https://lkml.org/lkml/2026/3/24/1902 and here https://lkml.org/lkml/2026/3/19/1765
+However, while I share the concern, I cannot provide a better answer than
+the first time or second time.
+
+> Is it intentional that the MAC idle speed down feature (IDLE_SPDWN_EN) is
+> disabled for _2500bps but remains enabled for _5000bps?
+Yes, this is intentional. IDLE_SPDWN_EN is indeed only disabled for _2500bps
+in the out-of-tree driver (and not for 5GBit or 10GBit).
+
 > 
+>> @@ -6343,15 +6356,20 @@ static int rtl8152_set_speed(struct r8152 *tp, u8 autoneg, u32 speed, u8 duplex,
+>>   				r8152_mdio_write(tp, MII_CTRL1000, new1);
+>>   		}
+>>   
+>> -		if (tp->support_2500full) {
+>> +		if (tp->support_2500full || tp->support_5000full) {
+>>   			orig = ocp_reg_read(tp, OCP_10GBT_CTRL);
+>> -			new1 = orig & ~MDIO_AN_10GBT_CTRL_ADV2_5G;
+>> +			new1 = orig & ~(MDIO_AN_10GBT_CTRL_ADV2_5G | MDIO_AN_10GBT_CTRL_ADV5G);
+>>   
+>>   			if (advertising & RTL_ADVERTISED_2500_FULL) {
+>>   				new1 |= MDIO_AN_10GBT_CTRL_ADV2_5G;
+>>   				tp->ups_info.speed_duplex = NWAY_2500M_FULL;
+>>   			}
+>>   
+>> +			if (advertising & RTL_ADVERTISED_5000_FULL) {
+>> +				new1 |= MDIO_AN_10GBT_CTRL_ADV5G;
+>> +				tp->ups_info.speed_duplex = NWAY_5000M_FULL;
+>> +			}
+>> +
 > 
+> Could this unintentionally advertise 5GbE on a 2.5GbE-only adapter if
+> userspace requests it?
+> 
+> The earlier check in this function:
+> 
+> 		if (!(advertising & support))
+> 			return -EINVAL;
+> 
+> only ensures that at least one supported speed is requested, but it does
+> not strip unsupported speeds from the advertising mask. Since this block
+> is now entered when support_2500full is true, checking the advertising mask
+> for RTL_ADVERTISED_5000_FULL without verifying tp->support_5000full could
+> erroneously write the 5G bit to the PHY and misconfigure the hardware
+> state.
+
+I will change this to:
+
+         advertising &= support;
+         if (!advertising)
+                 return -EINVAL;
+
+in v5, to be on the safe side.
+
+> [ ... ]
+> 
+>> @@ -8793,6 +8814,19 @@ int rtl8152_get_link_ksettings(struct net_device *netdev,
+>>   			cmd->base.speed = SPEED_2500;
+>>   	}
+>>   
+>> +	if (tp->support_5000full) {
+>> +		linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
+>> +				 cmd->link_modes.advertising,
+>> +				 ocp_reg_read(tp, OCP_10GBT_CTRL) & MDIO_AN_10GBT_CTRL_ADV5G);
+>> +
+>> +		linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
+>> +				 cmd->link_modes.lp_advertising,
+>> +				 ocp_reg_read(tp, OCP_10GBT_STAT) & MDIO_AN_10GBT_STAT_LP5G);
+>> +
+>> +		if (is_speed_5000(rtl8152_get_speed(tp)))
+>> +			cmd->base.speed = SPEED_5000;
+>> +	}
+> 
+> Since 5G adapters like the RTL8157 will have both support_2500full and
+> support_5000full set, will this result in duplicate blocking USB control
+> transfers?
+You are right. Also in view of future 10GBit support, I will change this to:
+         if (tp->support_2500full || tp->support_5000full) {
+                 u16 ocp_10bt_ctrl = ocp_reg_read(tp, OCP_10GBT_CTR)L;
+                 u16 ocp_10bt_stat = ocp_reg_read(tp, OCP_10GBT_STAT);
+
+                 if (tp->support_2500full) {
+                         ...
+                 }
+                 if (tp->support_5000full) {
+                         ...
+                 }
+         }
+
+> In r8153_get_eee, the reading of OCP_EEE_ADV2 and OCP_EEE_LPABLE2 is
+> performed inside the if (tp->support_2500full) block that precedes this new
+> code.
+> 
+> Since those registers contain the EEE capability bits for both 2.5G
+> and 5G speeds, what happens if a device has support_5000full enabled but
+> support_2500full disabled? It looks like the registers would never be read,
+> and the 5Gbps EEE capabilities would fail to populate correctly.
+The driver supports RTL815x-chips, and all RTL815x-chips, which support 5GBit also
+support 2.5gbit (the RTL8157 and the RTL8159). My understanding is, that the
+802.3bz standard even requires this fallback. However, to be on the safe side and
+to also support possible future chips, I will change this to:
+	if (tp->support_2500full || tp->support_5000full) {
+		val = ocp_reg_read(tp, OCP_EEE_ADV2);
+		mii_eee_cap2_mod_linkmode_adv_t(eee->advertised, val);
+
+		val = ocp_reg_read(tp, OCP_EEE_LPABLE2);
+		mii_eee_cap2_mod_linkmode_adv_t(eee->lp_advertised, val);
+	}
+
+	if (tp->support_2500full) {
+		linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, eee->supported);
+
+		if (speed & _2500bps)
+			linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, common);
+	}
+
+	if (tp->support_5000full) {
+		linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT, eee->supported);
+
+		if (speed & _5000bps)
+			linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT, common);
+	}
+
+
+Cheers,
+   Birger
 
 
