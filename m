@@ -1,217 +1,159 @@
-Return-Path: <netdev+bounces-273566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273567-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oDzcI1Cly2mhJwYAu9opvQ
-	(envelope-from <netdev+bounces-273566-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:43:28 +0200
+	id gOmYFoGmy2nJJwYAu9opvQ
+	(envelope-from <netdev+bounces-273567-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:48:33 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07DA7368364
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:43:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A806A3684D5
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:48:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 382B53066BF2
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:36:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5BC5F3042896
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 10:43:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E3D3A381F;
-	Tue, 31 Mar 2026 10:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2246B3A7F69;
+	Tue, 31 Mar 2026 10:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SJD8YkNE";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ieRaqIX/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qzg2rNkp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417DA3A75AC
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 10:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D5C3A4F2F
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 10:43:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774953390; cv=none; b=Kk7/VcvFVM+pkDZVSiaGoRd8WCpioyAaqetlCV4iojYjnRvbCH1aEPgnhm0jDNcpJ6PzBLvMWFV086tgQhgU1e4XgjuB7jCAdjYMEk9yM/b265chZt7DBexzIhnp/r8Suh3v7+ug0YouBZDcIt1Dda6jdjMgyd6IdkrXtN9b89s=
+	t=1774953791; cv=none; b=mIXmrppHvhGYWNlYpWmPhH6mesdAp85P3OqJBcG24bgX8rnlS5TOujPO8kwDPnu7OY137joHA6nM3nFnzjvXHu0sVzB0mee3lT7SGG6EEBEC+OB/CrUsGCHiNvK1g5dIkO1AWyLzHTeekVLL/25P376CygzuIbI4Y+It/6WEG3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774953390; c=relaxed/simple;
-	bh=Xr0KXUuwWyloJuKvsuv9vPbJibUbCJ1c3H4AyRVjmpQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UZYhibaCEoQ9vqry8tmi9kONgAVU3LqUcDAQ+Nf2YCYHag27YqbdAsk+EhNHuASF1PCn+Yu+MqP17POtzD3ndangtkD0r22A/ts+ZYkBeiPjZvY6ku/iVbJ2PCs1bdkqR2GYLXXx8IxuGJ8hb9Q7ebitSsFpggtxsb7vDqVHEwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SJD8YkNE; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ieRaqIX/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774953388;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mmDBnBQF5qqKpPAwNyURFB8rLMz1U2kEtshU27z56VM=;
-	b=SJD8YkNE3kVtfwt8wVzNVXuSqrJnZ0fNQ48T0b0l34EwJFEKH4AAryqNqBhTafvod9a6nE
-	lvNC+e0F0G/nwBKD2suOoSdak+NWpAGqFI9ezAMlfLgpXBS808EviK9cL1noGmaCIufnhf
-	1hAPd6+Q3raHxOFq4y6h+P9YPUvv14o=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-250-l2cGYuFDN86UZ_476JWe0A-1; Tue, 31 Mar 2026 06:36:26 -0400
-X-MC-Unique: l2cGYuFDN86UZ_476JWe0A-1
-X-Mimecast-MFC-AGG-ID: l2cGYuFDN86UZ_476JWe0A_1774953386
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-48535f4d5e1so60597675e9.0
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 03:36:26 -0700 (PDT)
+	s=arc-20240116; t=1774953791; c=relaxed/simple;
+	bh=8u72MSr0OxkiiZaBrCGji5L4mvea8Kp5QoTeUfhvxWA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y5yvU/2AKkScWqtF7gpXVN0I4kPf0YaPJO6NLGWyVIfjCSAED+aj4i9fi8RitvxS3GqQyWlHBDPvVEPpAs2vspuImdv3SVkHfZzIKe9vhpqjSL1gBmgUTdErwQN1O2fon5xtwVJi1uYNVv/x9spcayLovtZgi55fd7JGTbki2AY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qzg2rNkp; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-35da1af3e10so2248537a91.3
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 03:43:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774953385; x=1775558185; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mmDBnBQF5qqKpPAwNyURFB8rLMz1U2kEtshU27z56VM=;
-        b=ieRaqIX/BkGtO5L2k8P9t4FU9JUVnlXjlI/DmEr2tUtP0MbSuCxwL09mpzbcRN1sc5
-         2CjppFa1Cbdzlk3/Ox1ZvQO08LTQ2YoCGlDq4NQGepZw8Wq85ICOc0UiH6O1FRBQaUJd
-         m3LPksbxr+Iykx+jBptK2yzPv8APHAvGMn59OXkJN3BYmMbYaAkZQAJCZ/9lnhhhFtFr
-         c/ZJIOPtP9XuRXes54K0FmbX5xf+hJOGrd2RVenCylhdz0ZwKG71pjRMakdhlXo05nEq
-         n1UNwJB0v4eEby7Dvdnstul74QOlvjU5V00ZUzkbpW2VnvnFgsqOU58BeRjNFpOzhj0C
-         TrqQ==
+        d=gmail.com; s=20251104; t=1774953789; x=1775558589; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hkDa9izHEIAJX9uc+HQPy+UKJAsfOUb53e+2UosqcTo=;
+        b=Qzg2rNkpdKbgTfnQPwbcT/fiSPWaWRLT88lNJwC5UA/FacfpGoPatLwZyJT7M8ruCG
+         Sm/iTdDM7wlUPlVVyLUNH+wCCQR8Ed4WeWrzKpK1BzJ8B5nu02FxORhjVDWfP5LsRBhh
+         76MnX+7uyIk1e1IBgrfHEfSCHFzL9T41++4VdQxOwR7/IoQXzR4lfB7n4w6RK/d0pfEO
+         4Z3yyVhrT6LeEfn0pjy534mcAypOrFPIQ+5F7TGTAUZaDVIZ7UMrL3OO1kdlgkEGZl4j
+         /SxfsI824gpAXqfY1S3gyuXG2x/UzkzKSI+AOi7P7Rj/PwU9WdB/f3wHQcurGwA5ot+s
+         p6yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774953385; x=1775558185;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mmDBnBQF5qqKpPAwNyURFB8rLMz1U2kEtshU27z56VM=;
-        b=FeKpO9C94+ogKvuPjWMwr9aKgH8FDfzZvGy1imfjvuu7ADpzWSREW/Nc4LuW2NThaZ
-         tCVy3dlNuY8U7ym5iwhcE6SZcj9X5+Dxb/KMM85DL4uKz3M4xQi5mFkZM5aJowjW4VaJ
-         9FgIEFrdl7MYsbLlHGwN5Nj6utiVcvvj9dtMSNZEB3fcUf42FcgR+3xg1/FHEjOuEf5L
-         +vmGWQITAuk9ye1vv4Dh3AcY8sVseYopSs86kR8Y+s7Jh0YqgdWrotFYyXCqYcBMqd4k
-         ZutApLk8APOaHw31nixaEfjP1Bp0NW9KVDCRAcQl0wDPNojRhhtXHVYKJVNzWlEr4Xh6
-         u18Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWIEM/rf0mEjS2vPj5OLfpN67oCgjIsKAlxHrvi2hwmvsWM0l0TBKFdCdqKY+LdGMunqbrtf9o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXTchl0l8kgSaP9cuF6BW33SsKDirpXnXMNzTtFIcsZxDU1S0g
-	5voYCN4ABc4UNgb66F0fGACjEf/dvH/K2otkA8acQyM1uC3b16UHFdG/QMmRAmCayiUE1/XxPnV
-	t83tlG9k2E2NJrfWc3kS/Dv7VmuNI21A2ZYd7J5Nkcxyz3vaX9bQOlFmayQ==
-X-Gm-Gg: ATEYQzyWMPu/xbIwgn4UC8kSBzGvYufr2VS98YtPEZZYg3aawCXP0oDsXvEhzW3rejp
-	YEFLwc5d/DnFXc9WJx48OfcgpOE0tUZI1XZuSq2u9LHB98g5Iljnc4WvcyGSdeCqhk7lRfRS8Em
-	CuQgB0TTtGofiLHBZhGrFNyY9banmYzChSTUrFCcLNQZFxL1jgdv47uIST4JMUpMoLGByCbweCR
-	FReh3oEzL6eLLOOOQ+VkzbBu9sa/e1yHAgXlg7V53mmZW3tvWyIZDQqHWNrZVzRjKEL+byqU0Bh
-	4aopY2A6k5r9Dz008FHHyaQycpQ9yjwbYyO1wk0u4wkmFXhAHeg1N8Ojk20e/2Lh0l5nioa7CU7
-	A2Lhshgt8Dw64n27VSP73OYzsWPiaRYO6OVqZzRtvseAcW6MmMjd6o4h5
-X-Received: by 2002:a05:600c:c490:b0:479:1b0f:dfff with SMTP id 5b1f17b1804b1-48727e908e7mr268869035e9.10.1774953385543;
-        Tue, 31 Mar 2026 03:36:25 -0700 (PDT)
-X-Received: by 2002:a05:600c:c490:b0:479:1b0f:dfff with SMTP id 5b1f17b1804b1-48727e908e7mr268868395e9.10.1774953385003;
-        Tue, 31 Mar 2026 03:36:25 -0700 (PDT)
-Received: from [192.168.88.32] ([212.105.155.58])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887e967badsm32084815e9.14.2026.03.31.03.36.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Mar 2026 03:36:24 -0700 (PDT)
-Message-ID: <b3997b77-d76b-4297-bc67-a2c57c7da601@redhat.com>
-Date: Tue, 31 Mar 2026 12:36:23 +0200
+        d=1e100.net; s=20251104; t=1774953789; x=1775558589;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hkDa9izHEIAJX9uc+HQPy+UKJAsfOUb53e+2UosqcTo=;
+        b=Iem6bF8rl8MN6GbyjB3Avqa7GEq6X6cu9kSG1WHPfBGkbuI6McSB2pw+4XjYvhGybv
+         Nhf7COOBSUFxgUzKgO9xKJc8VWUkfKOLRfur53q583Lla3rfX3rpzOqdQ6cHQkyTcGGT
+         AYqh/2XORlSsH+xOGnv+fWcX5NqClBTzNGrPIuAYB1tvG9sTw00ZeGdZGcNJiSAGYLzm
+         H9XPsFWBwyz5QmTOTrMKh4Ysw2gASuROONOLjm3HMEuDgHZDDckmJbcq8kI5IxCerF8I
+         GXRFMLSECab14ODaZvq4qRTE58bfaehtb2QaCTrUUGBlU8Yf/hire+78FMxOksCQ703Y
+         tZow==
+X-Forwarded-Encrypted: i=1; AJvYcCXwLiH0kMf6ucbyuPzMucip1sNDCDZj2ItEXm4/P9LmI/doGDUE9xctvgCyqaBRrjH4eOUdp5E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzY7Y5YLmhbdVfpg9e1Rtmgjf3jRjF3fv2oqvfMgkirLGabRuKC
+	BBIwthhO7+XmVlE2VpKNrSRNLqKOo1lCkkYzDqqxxMrE77Hcfqj0PJOb
+X-Gm-Gg: ATEYQzzU3RUwl2ifgjiCjiXInQjZIp7JPsPPQLFChP4kTcN5JFYfjXpOjHFNjdHjp+P
+	RqA1nYBLg6q3rQhVWrFY4HRHMNDfYNzTL7SPZDbNyce187sGdE8Ams9kqNBHfyglMsUxz7vDm05
+	2/aZ3maXfajYHCL0ygS9CL/XJckovpPgvC14rREJiWbaq65U+R2kgAmg98ddiMcdOwI6m1fQOMX
+	QpgwGGASMUD0l6t/C3YANeQvAeraWQZz63yuQ7zrNl9Wjcs5oA1VI8O2i2H4hXWgTO+djeSWs8J
+	Ak0Erk3SNX3uG/GBZgQcsOGc683kEPuFagfklF67HxO8/puTZ6dIV+mTPAk2eqPx8NFJyqkUB9B
+	gKRJj7sgkCUvDfnI3qGW55BGNvXDTZSVz1hEGdSuWsDRVETXHxMDXsc6MUlH1a0asdsMmgKUdxW
+	S92gTOzIonJVOABZRxcrApvo8G4HQTecFjXCL/SlB2C0EKy70ep8uWuVekOGvn+nzQhE2xkUsN9
+	+9N6YRRGGCnYUqGlJRKtHDKF4oBmHf1fqq61av4BrdyMoCGqtPL4MXd8w==
+X-Received: by 2002:a17:902:d4cd:b0:2b2:53f5:4627 with SMTP id d9443c01a7336-2b253f548afmr65878125ad.4.1774953789256;
+        Tue, 31 Mar 2026 03:43:09 -0700 (PDT)
+Received: from ip-10-1-46-91.ap-northeast-1.compute.internal (ec2-176-32-72-196.ap-northeast-1.compute.amazonaws.com. [176.32.72.196])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2427658e4sm134280415ad.48.2026.03.31.03.43.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Mar 2026 03:43:08 -0700 (PDT)
+From: Daiki Harada <daiky0325@gmail.com>
+To: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Daiki Harada <daiky0325@gmail.com>
+Subject: [PATCH iwl-next v1 0/2] igb/igc: use napi_schedule_irqoff() instead of napi_schedule()
+Date: Tue, 31 Mar 2026 10:39:18 +0000
+Message-ID: <20260331103924.36422-1-daiky0325@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2 net-next v2] ipv4: handle devconf post-set actions on
- netlink updates
-To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
-Cc: horms@kernel.org, kuba@kernel.org, edumazet@google.com,
- dsahern@kernel.org, davem@davemloft.net
-References: <20260327120202.4761-1-fmancera@suse.de>
- <20260327120202.4761-2-fmancera@suse.de>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260327120202.4761-2-fmancera@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273566-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273567-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daiky0325@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:email]
-X-Rspamd-Queue-Id: 07DA7368364
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A806A3684D5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/27/26 1:02 PM, Fernando Fernandez Mancera wrote:
-> When IPv4 device configuration parameters are updated via netlink, the
-> kernel currently only updates the value. This bypasses several
-> post-modification actions that occur when these same parameters are
-> updated via sysctl, such as flushing the routing cache or emitting
-> RTM_NEWNETCONF notifications.
-> 
-> This patch addresses the inconsistency by calling the
-> devinet_conf_post_set() helper inside inet_set_link_af(). If a flush is
-> required, we defer it until the netlink attribute parsing loop
-> completes.
+This patch set is meant to replace the calls to napi_schedule with
+napi_schedule_irqoff as this should help to reduce the interrupt overhead
+slightly by removing the unneeded call to local_irq_save and
+local_irq_restore.
 
-IMHO the above deserve some additional self-test triggering the relevant
-code.
+In the interrupt path, callers of napi_schedule() are invoked with local
+IRQ disabled, so napi_schedule_irqoff() can be used instead.
 
-> This ensures consistent behavior and side-effects for devconf changes,
-> regardless of whether they are initiated via sysctl or netlink.
-> 
-> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
-> ---
-> v2: handled forwarding notification and disabling LRO
-> ---
->  net/ipv4/devinet.c | 29 +++++++++++++++++++++++++++--
->  1 file changed, 27 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-> index 8300516fb38f..a35b72662e43 100644
-> --- a/net/ipv4/devinet.c
-> +++ b/net/ipv4/devinet.c
-> @@ -2161,6 +2161,20 @@ static bool devinet_conf_post_set(struct net *net, struct ipv4_devconf *cnf,
->  					    NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
->  					    ifindex, cnf);
->  		break;
-> +	case IPV4_DEVCONF_FORWARDING:
-> +		if (new == 1) {
+This series applies the same optimization that was done for other drivers
+in [1] to the igb/igc driver.
 
-AI reviews says:
+Link: https://lore.kernel.org/intel-wired-lan/20150929215117.3388.48642.stgit@ahduyck-vm-fedora22/ [1]
 
-Does this check miss cases where forwarding is enabled with a value other
-than 1?
-The sysctl path allows enabling IP forwarding with any non-zero value. If
-a user sets IPV4_DEVCONF_FORWARDING to 2 via netlink, forwarding will be
-enabled but this check is bypassed, leaving Large Receive Offload (LRO)
-enabled. Could this cause LRO-coalesced packets to be forwarded without
-proper software segmentation?
+Daiki Harada (2):
+  igb: use napi_schedule_irqoff() instead of napi_schedule()
+  igc: use napi_schedule_irqoff() instead of napi_schedule()
 
-> +			/* it is safe to use container_of() because forwarding case
-> +			 * is only used by the netlink path
-> +			 */
-> +			struct in_device *idev = container_of(cnf, struct in_device, cnf);
-> +
-> +			netif_disable_lro(idev->dev);
+ drivers/net/ethernet/intel/igb/igb_main.c | 6 +++---
+ drivers/net/ethernet/intel/igc/igc_main.c | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-AI review says:
-
-Is it safe to call netif_disable_lro() here without holding the device
-operations lock?
-While inet_set_link_af() runs under rtnl_lock(), netif_disable_lro()
-modifies device features and calls netdev_update_features(), which
-asserts that the device operations lock is held. Calling this without
-the lock might trigger an assertion or expose the device to data races
-with concurrent feature updates or BPF/XDP attachments.
-Should this use dev_disable_lro() instead, which acquires the required
-lock before disabling LRO?
-
-/P
+-- 
+2.53.0
 
 
