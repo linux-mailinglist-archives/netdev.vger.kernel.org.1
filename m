@@ -1,159 +1,206 @@
-Return-Path: <netdev+bounces-273682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273684-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 3aP1IvXsy2m5MgYAu9opvQ
-	(envelope-from <netdev+bounces-273682-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:49:09 +0200
+	id cAY/MWHzy2lwMwYAu9opvQ
+	(envelope-from <netdev+bounces-273684-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 18:16:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E6E536C12B
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:49:08 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 852AF36C773
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 18:16:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A07EF30BEC9E
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:40:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3211D301BA7F
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:56:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB462423A66;
-	Tue, 31 Mar 2026 15:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57051411603;
+	Tue, 31 Mar 2026 15:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="prKcdYCr"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="u6pI0k4P";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="wk8WO/vV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72FC423A62;
-	Tue, 31 Mar 2026 15:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7A63FFAAA;
+	Tue, 31 Mar 2026 15:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774971503; cv=none; b=JLXgMz9Ifw0xZFmVPzXft1OCx9IMy9A/Vt9ycu+Q9gW5Rkxd5APvTz7BEXJbd0VhwNNc2VGflAPyiV8BzDNdN70jFj/URZBEF2DiVPeR8mP89QqrE0GJ0GS50Yb2aAq/G52sMEB1ruRqMZ2wCn3MSMD4LTAEt/b7zxvMnBEOGyw=
+	t=1774972566; cv=none; b=JKuTiAARr9NT2L/zGelpdfoihfX/Kn52NzpZi3AZ2Q8lhxRQ3DI8SrHOMLM/ZyUTvR3YQBlO94KNY1WRQLgdzD+uKbEydJbLMfOU6NyQJDzpSizM3IadAXKD2LcYfBQHLFCnIJxGQoJPBZ+QvaTZIxW529pULk3QJeaxxJs9ky0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774971503; c=relaxed/simple;
-	bh=Yb4OkI2lEqPgmQxRKGJSkL8RVqJUE5jHBisHEcfMpvg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ABCk9aztLjGKMrpcmuk9+ALlhEE8Henosy1TNN2AY6pR8QvZON7DKGiwYDhLc+6PTGhUtNE3YojL972p1VqkVdJYEzkj0oRvc/OQfRtN5r00mCoDnOf2jQgz8fAfcryutJygqkK28aYu1vOYGeFoihWayILxhNI7GQdGUj2GjpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=prKcdYCr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03C17C19423;
-	Tue, 31 Mar 2026 15:38:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774971503;
-	bh=Yb4OkI2lEqPgmQxRKGJSkL8RVqJUE5jHBisHEcfMpvg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=prKcdYCr9iUyZdZ03hpH+SWUzKf/iZt3M/8nLRReechb2/xcnKO/U8zPaj1FD4PRW
-	 rcI/U+g8I9Fg+Uy9J0cWT42CaAJ4yHyByOfNNl9BnVlF4GVpw92otBZpe9Yul4xOra
-	 r6WXTB//qE6Mq6BduC9WyguCnBztFLP7cRpOZ25mlLWzTOV/pQGBzsZ1rfwpv8Vq+0
-	 0R8QMNP/cePyrMsgXBFfUJCIbRRaybE/ej0GpMR8doFNDLUiCXIjgNoMGFn0cgD9sh
-	 4Z3OEV8NpzB4A4fcY0jePFPXbSyADic8kRMnpIyvQB/3mMBO6378UUsd0kC9EcDF0G
-	 HvO6+kk2oZXFQ==
-Date: Tue, 31 Mar 2026 17:38:18 +0200
-From: Nathan Chancellor <nathan@kernel.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: stable@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev, netdev@vger.kernel.org,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Wei Fang <wei.fang@nxp.com>, Rahul Sharma <black.hawk@163.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6.1] net: enetc: fix PF !of_device_is_available()
- teardown path
-Message-ID: <20260331153818.GA1992169@ax162>
-References: <20260330081944.527545-1-vladimir.oltean@nxp.com>
+	s=arc-20240116; t=1774972566; c=relaxed/simple;
+	bh=Uld0ty6cXAQe0/m8iEoQG8+Flc7B+IO0P/ntT2Zstpk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CQcQ+x+1oEYvR3jEPz2RTJxDepGRMLUKcl4typ78QwsP3Ghp8TjA3z4kQ8byf1hGvwY8IhcwL16osKGSO1GEE+/09h2CkX1nzuYjCUsXc8nbwK0qqL7scqpbrPNxPgZZIgbg5vK+xs2fnNYJsZA1EaWO2wzF8GP30wjDYPWDNgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=u6pI0k4P; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=wk8WO/vV; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1774972563;
+	bh=Uld0ty6cXAQe0/m8iEoQG8+Flc7B+IO0P/ntT2Zstpk=;
+	h=From:Subject:Date:To:Cc:From;
+	b=u6pI0k4PeRwCOQ81FweCFRNZng7jY60z+oaT/d+aBr1VtB5I6yJd7lb7IZFC6IYxe
+	 0SUbxEswlgWV7B24VYr/kNoNA96a7l3mJ2WZRliBjn/Gjbf6rjlnEuKr/hTnpRMk3t
+	 WQ5C3/UPqc/tQHpfyvUJEZPsx0IEC07mJorreT0tfNsHdX4Fm5amc1zbUYlnZyvd8x
+	 q9wZLjli6DvVCl++8AWvAT4CFRdOHFNGQvTxb3IbmkZuwEehH+Sv72FrTHGkr7ynWU
+	 1uDcRPObhuEXzN8dpxYvy0kvlXbB8sJmKQp2c8+8vwp6GChfg+HYm75HD728bQBMvY
+	 pDwPw89wMc/Pw==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id 35E56406F0; Tue, 31 Mar 2026 15:56:03 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1774972562;
+	bh=Uld0ty6cXAQe0/m8iEoQG8+Flc7B+IO0P/ntT2Zstpk=;
+	h=From:Subject:Date:To:Cc:From;
+	b=wk8WO/vVjMLXIpM/4FsBITbIs6Efv97wwb6jJPHt3aIkQr5C5TEiKPv2p5XVppkkz
+	 JzVbHoljshZkTHYjGm661ImwoQ4jv5jfgQD2+J5uRToxjz86kvLGsQgR+1a7lpdWNJ
+	 UE76kSIciGctM1pEP9eFHmWhLD1zJz6mOk/9Gvm7qIqfII9/3qLMknnEMkwU8STbLK
+	 KYf0jfaL9VTRyaJ1JqkjadxlDhXtfx1PR3Ca8ZO1FQP9xTERoiRDVcDOGmnJguxl0l
+	 JGwYSZb+ry9IYHlkONB4dzKoWJE/pkg/o0vvnZ161G9WP84ZhxwQPxcnZHHaJAqoTb
+	 Ku5zL3YipCM6g==
+Received: from DebianDesktop.lan (p200300c69f04eb0000000000000001c8.dip0.t-ipconnect.de [IPv6:2003:c6:9f04:eb00::1c8])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 23963406E4;
+	Tue, 31 Mar 2026 15:56:02 +0000 (UTC)
+From: Birger Koblitz <mail@birger-koblitz.de>
+Subject: [PATCH net-next v5 0/2] r8152: Add support for the RTL8157 5Gbit
+ USB Ethernet chip
+Date: Tue, 31 Mar 2026 17:55:52 +0200
+Message-Id: <20260331-rtl8157_next-v5-0-deb3095f8380@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260330081944.527545-1-vladimir.oltean@nxp.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIjuy2kC/3XPwQrCMAwG4FeRnq00bWerJ99DRFKbalE26cpQx
+ 97dbqcx9PjzJ19Iz1pKkVq2X/UsURfb2NQlVOsVu9ywvhKPvmQmhdwKBZqn/LBQmXNNr8yRwG6
+ tIqcDsrLyTBTia+KOrKbMxyl2Ks0ttrlJ7+lOB1P/m+yAC75zaIzT0mLwBxfTlRK/N+4R82fja
+ QI7OUfMApEFAUEIAbW1Hv4haoZIsUDUiCAFuqAJHs0/RM+R5Tu6IEJpBdKB9FT9QoZh+AJiFRR
+ tiQEAAA==
+X-Change-ID: 20260314-rtl8157_next-ae18683eb4fa
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Birger Koblitz <mail@birger-koblitz.de>
+X-Mailer: b4 0.14.2
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[birger-koblitz.de:s=default];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273682-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[birger-koblitz.de:+];
+	TAGGED_FROM(0.00)[bounces-273684-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	SUBJECT_HAS_EXCLAIM(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[birger-koblitz.de];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,linuxfoundation.org,lists.linux.dev,nxp.com,davemloft.net,google.com,kernel.org,redhat.com,163.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.994];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nathan@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nxp.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0E6E536C12B
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mail@birger-koblitz.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.999];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,birger-koblitz.de:dkim,birger-koblitz.de:email,birger-koblitz.de:mid]
+X-Rspamd-Queue-Id: 852AF36C773
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 30, 2026 at 11:19:44AM +0300, Vladimir Oltean wrote:
-> Upstream commit e15c5506dd39 ("net: enetc: allocate vf_state during PF
-> probes") was backported incorrectly to kernels where enetc_pf_probe()
-> still has to manually check whether the OF node of the PCI device is
-> enabled.
-> 
-> In kernels which contain commit bfce089ddd0e ("net: enetc: remove
-> of_device_is_available() handling") and its dependent change, commit
-> 6fffbc7ae137 ("PCI: Honor firmware's device disabled status"), the
-> "err_device_disabled" label has disappeared. Yet, linux-6.1.y and
-> earlier still contains it.
-> 
-> The trouble is that upstream commit e15c5506dd39 ("net: enetc: allocate
-> vf_state during PF probes"), backported as 35668e29e979 in linux-6.1.y,
-> introduces new code for the err_setup_mac_addresses and err_alloc_netdev
-> labels which calls kfree(pf->vf_state). This code must not execute for
-> the err_device_disabled label, because at that stage, the pf structure
-> has not yet been allocated, and is an uninitialized pointer.
-> 
-> By moving the err_device_disabled label to undo just the previous
-> operation, i.e. a successful enetc_psi_create() call with
-> enetc_psi_destroy(), the dereference of uninitialized pf->vf_state is
-> avoided.
-> 
-> Fixes: 35668e29e979 ("net: enetc: allocate vf_state during PF probes")
-> Reported-by: Nathan Chancellor <nathan@kernel.org>
-> Closes: https://lore.kernel.org/linux-patches/20260330073356.GA1017537@ax162/
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Add support for the RTL8157, which is a 5GBit USB-Ethernet adapter
+chip in the RTL815x family of chips.
 
-Reviewed-by: Nathan Chancellor <nathan@kernel.org>
-Tested-by: Nathan Chancellor <nathan@kernel.org> # build
+The RTL8157 uses a different frame descriptor format, and different
+SRAM/ADV access methods, plus offers 5GBit/s Ethernet, so support for these
+features is added in addition to chip initialization and configuration.
 
-> ---
->  drivers/net/ethernet/freescale/enetc/enetc_pf.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.c b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-> index 99422c0b4a26..8cb4c759b165 100644
-> --- a/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-> +++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-> @@ -1393,10 +1393,10 @@ static int enetc_pf_probe(struct pci_dev *pdev,
->  	si->ndev = NULL;
->  	free_netdev(ndev);
->  err_alloc_netdev:
-> -err_device_disabled:
->  err_setup_mac_addresses:
->  	kfree(pf->vf_state);
->  err_alloc_vf_state:
-> +err_device_disabled:
->  	enetc_psi_destroy(pdev);
->  err_psi_create:
->  	return err;
-> -- 
-> 2.43.0
-> 
+The module was tested with an OEM RTL8157 USB adapter:
+[25758.328238] usb 4-1: new SuperSpeed Plus Gen 2x1 USB device number 2 using xhci_hcd
+[25758.345565] usb 4-1: New USB device found, idVendor=0bda, idProduct=8157, bcdDevice=30.00
+[25758.345585] usb 4-1: New USB device strings: Mfr=1, Product=2, SerialNumber=7
+[25758.345593] usb 4-1: Product: USB 10/100/1G/2.5G/5G LAN
+[25758.345599] usb 4-1: Manufacturer: Realtek
+[25758.345605] usb 4-1: SerialNumber: 000300E04C68xxxx
+[25758.534241] r8152-cfgselector 4-1: reset SuperSpeed Plus Gen 2x1 USB device number 2 using xhci_hcd
+[25758.603511] r8152 4-1:1.0: skip request firmware
+[25758.653351] r8152 4-1:1.0 eth0: v1.12.13
+[25758.689271] r8152 4-1:1.0 enx00e04c68xxxx: renamed from eth0
+[25763.271682] r8152 4-1:1.0 enx00e04c68xxxx: carrier on
+
+The RTL8157 adapter was tested against an AQC107 PCIe-card supporting
+10GBit/s and an RTL8126 5Gbit PCIe-card supporting 5GBit/s for
+performance, link speed and EEE negotiation. Using USB3.2 Gen 1 with
+the RTL8157 USB adapter and running iperf3 against the AQC107 PCIe
+card resulted in 3.47 Gbits/sec, whereas using USB3.2 Gen2 resulted
+in 4.70 Gbits/sec, speeds against the RTL8126-card were the same.
+
+As the code integrates the RTL8157-specific code with existing RTL8156 code
+in order to improve code maintainability (instead of adding RTL8157-specific
+functions duplicaing most of the RTL8156 code), regression tests were done
+with an Edimax EU-4307 V1.0 USB-Ethernet adapter with RTL8156.
+
+The code is based on the out-of-tree r8152 driver published by Realtek under
+the GPL.
+
+This patch is on top of linux-next as the code re-uses the 2.5 Gbit EEE
+recently added in r8152.c.
+
+Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
+---
+Changes in v5:
+- Filter advertising in rtl8152_set_speed() to prevent incorrect speeds
+- Prevent double USB transfers in rtl8152_get_link_ksettings()
+- Make sure OCP_EEE_ADV2 and OCP_EEE_LPABLE2 are read if a device
+  supports 5GBit but not 2.5Gbit
+- Fix rtl8157_runtime_enable() to follow the behavior of
+  rtl8156_runtime_enable()
+- Prevent call to r8153_u2p3en in rtl8156_up() for RTL8157
+- Fix rtl8157_unload() to disable interrupt mitigation
+- Link to v4: https://lore.kernel.org/r/20260324-rtl8157_next-v4-0-034312b12de5@birger-koblitz.de
+
+Changes in v4:
+- Fix return type of ocp_adv_read()
+- In r8152_tx_csum() use tx_desc
+- Use TCPHO_MAX_2 for RTL8157 in rtl8152_features_check()
+- Include RTL_VER_12 in RTL8156B chip versions in rtl8156_init()
+- Remove inline keyword from rx_agg_align and tx_agg_align
+- Link to v3: https://lore.kernel.org/r/20260320-rtl8157_next-v3-0-1aefeca7fda7@birger-koblitz.de
+
+Changes in v3:
+- Apply reverse Christmas tree order for declarations
+- Use poll_timeout_us for register polling
+- In rtl8156_enable(), fix version comparison: tp->version >= RTL_VER_16
+- Correct error handling of r8153_phy_status in r8157_hw_phy_cfg()
+- Fix use of ocp_word_clr_bits for PLA_MCU_SPDWN_EN register
+- Link to v2: https://lore.kernel.org/r/20260317-rtl8157_next-v2-0-10ea1fa488d1@birger-koblitz.de
+
+Changes in v2:
+- Fixed missing initialization of ret value in wait_cmd_ready()
+- Combine all parts with RTL8157-specific code to avoid undefined functions
+- Link to v1: https://lore.kernel.org/r/20260314-rtl8157_next-v1-0-9ba77b428afd@birger-koblitz.de
+
+---
+Birger Koblitz (2):
+      r8152: Add support for 5Gbit Link Speeds and EEE
+      r8152: Add support for the RTL8157 hardware
+
+ drivers/net/usb/r8152.c | 1169 +++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 882 insertions(+), 287 deletions(-)
+---
+base-commit: 5c9e55fecf9365890c64f14761a80f9413a3b1d1
+change-id: 20260314-rtl8157_next-ae18683eb4fa
+
+Best regards,
+-- 
+Birger Koblitz <mail@birger-koblitz.de>
+
 
