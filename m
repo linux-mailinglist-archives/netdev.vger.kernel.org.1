@@ -1,177 +1,259 @@
-Return-Path: <netdev+bounces-273453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273450-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IPfUE71Fy2nSFAYAu9opvQ
-	(envelope-from <netdev+bounces-273453-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 05:55:41 +0200
+	id 6PT2NWZDy2l+FAYAu9opvQ
+	(envelope-from <netdev+bounces-273450-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 05:45:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 900F2363C57
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 05:55:40 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 662B6363BBF
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 05:45:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 06D163036EEC
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:54:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BFD27301CCA9
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851BD292B54;
-	Tue, 31 Mar 2026 03:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8EF2741B5;
+	Tue, 31 Mar 2026 03:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="G/PW045v"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nmu3eFhj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B9E1A3154;
-	Tue, 31 Mar 2026 03:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774929274; cv=none; b=s4Imwjohc/d3qCVtuA4YL8VgqPg4rhs7/v7vSeVlmP5eAU+tUZ6JjKnO5nttSrt9pubOlvyLyASMWccW2x21CDdmhuwVpyYDbqNquaRk1Ny9Bk6mH1hv2ocQfBG/ltzMi6QVp3QdZtqmIJU1d65Tn9CGuycxamPBCQ0uiZZLeqg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774929274; c=relaxed/simple;
-	bh=ATZV6iycX6yHF6Pq4Es1cRfIe5pU2PFBMmBvdNhgBdc=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uPrnCbouX2dnKL6Fx8INFJMFwypuT7jciBUxK8Zymi0DEW56lkr/8QhgPONN7deWh5lGLcwFvZu3EOraMpe6ukJS9sUmZCyWRH6F+YNMG9wkPWVymD1wl+8HU85JSmDCDzJQF/pnyjEopgvEYGN969Hr0jXdBisLoZ2uhnEDh2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=G/PW045v; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62UGNWDo3053916;
-	Mon, 30 Mar 2026 20:43:13 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=2AdKfCKm/uHWeLRWf9vQNwB7K
-	mqObbWnQF+GtyT5gmA=; b=G/PW045vhMBacMs3iMIHo7DpP7JTzxBetvKp8Y5pS
-	yEuIobpg9q2ipxbeZ5K0BCX587VIWrm6Cc8SLwGLJtUIMsHyPXk/N7ESYAt3/Ks0
-	ZwNVZSoD48SVpeSbnvikybTo5cpAnAY+atkDO5qRV5qCxS1wE5E0Pe8mIJg0JjDB
-	37uu/RccwZScKuwv8vrqoJjoCLV9J7zvpbGcdsINn+4H/+MMywf+2GMgKp4aH9hk
-	D0AZF5TAkjGsrTpuvVHW5gHnqnUPoWw82kgx6nvF0taVajvGUf7rAJvA2eUeScfC
-	mOS6GoVI6i8MEbC0K6KVg4l4rYqppbGTZR266IdMdWxsA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4d6yr73xrv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Mar 2026 20:43:13 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF2A41EF09B
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 03:45:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774928740; cv=fail; b=eB2H+dAahR6Z4+og/dImRFhm5eI33/Wa17W2BfSCn6OeVO/Ls9BzcbCZsIAMdZh/Yn874pBsWhU/JdsjIwmtNxvO39ZEkgI6s6MNfp0dVkjspwGAKvkZ956saMMi4tmoE+AmFY4QGCXuJu6Q0ZJJDOmaG/enint3j+7e6jam9vA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774928740; c=relaxed/simple;
+	bh=xu8aMrxPJxSDrSADjskCnK/oSYINxgLOpDhXYpKFSoE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Z5lLypRW5amv1CTXKxczwmVxqXdiBtbzgc3Fcd3wLj4jir/0ryiUSSMlmS8dBWg2379TmV///EMUzkebQKh7y5MerTm3jXcEiRuE/sG49YoHQhzqMJuHAla5oqK9WmdKTTzzD4lRd2f2P1MzeFpl49Tto4rhaJCa37s65m7g5p4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nmu3eFhj; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774928739; x=1806464739;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=xu8aMrxPJxSDrSADjskCnK/oSYINxgLOpDhXYpKFSoE=;
+  b=nmu3eFhjZjU2zMTXflFP9c6DhT5FywWufLw/WN41xzuIv4jr0TQWgVxJ
+   lWfN/wKcDzwLa36ehM3MqTkLJhwMUop7tRS4TV2L2smGz0848oLlnh4PG
+   DjT+u5JTAXmmBMfddCMLUmimdMox2twuJBbgPI1OYEGNVOxzkefxKyoWY
+   +YwaWP75YEZCGe2nGucs6ZhhAgj1fbmUbLUbonThPGMgi2VYrZKi3WEXJ
+   PFdy9Z+lOG9c1VpSOsMuJV2SHqj0XpE47AMeu0mKtIHetucgNV8Nme6H7
+   vhLSbnend3K9EfrsNIt4KJ73FA89LkVMs+squnpn/+CbvrHqIz06VdP1n
+   A==;
+X-CSE-ConnectionGUID: 0IUqSzqVQMiSGvflCSlU9w==
+X-CSE-MsgGUID: +zmoRG5BT5a8Jf6OP+VL7A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11744"; a="75105171"
+X-IronPort-AV: E=Sophos;i="6.23,151,1770624000"; 
+   d="scan'208";a="75105171"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 20:45:38 -0700
+X-CSE-ConnectionGUID: ROJNtNu2T5WqD5mfTiSkNA==
+X-CSE-MsgGUID: hJyVXR+SQDq10gkfPW4QpA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,151,1770624000"; 
+   d="scan'208";a="222937161"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 20:45:38 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 30 Mar 2026 20:43:12 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 30 Mar 2026 20:43:12 -0700
-Received: from rkannoth-OptiPlex-7090 (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 454C03F705A;
-	Mon, 30 Mar 2026 20:43:07 -0700 (PDT)
-Date: Tue, 31 Mar 2026 09:13:06 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Simon Horman <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <donald.hunter@gmail.com>,
-        <jiri@resnulli.us>, <chuck.lever@oracle.com>, <matttbe@kernel.org>,
-        <cjubran@nvidia.com>, <shshitrit@nvidia.com>, <dtatulea@nvidia.com>,
-        <tariqt@nvidia.com>
-Subject: Re: [PATCH v8 net-next 6/6] octeontx2-af: npc: Support for custom
- KPU profile from filesystem
-Message-ID: <actCysjPKrnzExJx@rkannoth-OptiPlex-7090>
-References: <20260325072159.1126964-1-rkannoth@marvell.com>
- <20260325072159.1126964-7-rkannoth@marvell.com>
- <20260327133036.GE567789@horms.kernel.org>
+ 15.2.2562.37; Mon, 30 Mar 2026 20:45:37 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37 via Frontend Transport; Mon, 30 Mar 2026 20:45:37 -0700
+Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.69) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.37; Mon, 30 Mar 2026 20:45:37 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=m8OMSl4EKLcY9Bzzeum9p8RGakbOo1n85dC6tQrgKYvGSL3FNmsYIvt+jxWkaXODlOfih+XHAPN93cvgZWv7qBAuqBq4cCx23jo9PlPYMeL9GnS1EyVlYI9tf2ndAk8Nd8lChPLq/0x/Ra9GU6H4dCkaA6BpwSFK9xKw0wj84pL+GTsv11Cm9wVWJ370u36G0+hJZcXanAk3V59OSaCLPNCSewpViVXQR9U+8B8ii7sU1tle1iWrzXTK/tKEdkEnomcX37LtCUl+rcOLrOwa7atJKgDwsMhUCu6GOym7OiZii63hRbyzbAfPfQ2jOJMiINNJkm5gOr+U6Fe38an/Qw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=o24LVSWvV9jE0dI/dxLP4NGFOPsDfEF8c+vhR6HzVCk=;
+ b=BLiadqjg2U2KV5d3H7p+St0+aFMer8MGi5sd+QK3ZPrZkDnrTEvIYApHk3I9PstWLafnmOfPHu1JrS/TwhegwRhhVHniIlPPQRmSS6RS8C5xwwMJrK76aviECgEkRhVnGprBF9oVhXgD4mE5S0zkYj0GT10hGeex/LyMttGLYK0sqr1n9PA+uEKyQLMNIavr3QGAM9dQvxr6QELEJpM5cU5MVMnv/DfbKeG1zMeH0dOPCgnNMNMR379Lw9xCN0vN2eiMXUtJ6GjkoQ0jV6k7I4GfzW3thAsTm07b17DFnk0EaEJ3SMK5kPK+E9bex4tDCWlllnG2jcF+CKFnJI+oDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by SJ0PR11MB5214.namprd11.prod.outlook.com (2603:10b6:a03:2df::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.15; Tue, 31 Mar
+ 2026 03:45:30 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::7ac8:884c:5d56:9919%4]) with mapi id 15.20.9769.014; Tue, 31 Mar 2026
+ 03:45:29 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Loktionov, Aleksandr"
+	<aleksandr.loktionov@intel.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Jagielski, Jedrzej"
+	<jedrzej.jagielski@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net v1] ixgbe: stop re-reading flash
+ on every get_drvinfo for e610
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v1] ixgbe: stop re-reading
+ flash on every get_drvinfo for e610
+Thread-Index: AQHcq7LkpggdNSZdwEqmKXHI76f5jrXIIp/A
+Date: Tue, 31 Mar 2026 03:45:29 +0000
+Message-ID: <IA1PR11MB6241FAFAFC47D35324AE553C8B53A@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20260304084232.2937498-1-aleksandr.loktionov@intel.com>
+In-Reply-To: <20260304084232.2937498-1-aleksandr.loktionov@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|SJ0PR11MB5214:EE_
+x-ms-office365-filtering-correlation-id: 98674b5f-d550-4402-7b7f-08de8ed7f433
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700021|22082099003|18002099003|56012099003;
+x-microsoft-antispam-message-info: ze089hy2qZR3GNIV8/EfYnNzpMdPNLlNJrYAjvIVGdTnEERX9iO9oVrRA957theSIRRDor2VgpbpwVZjd3UPpSKDAWYjlTNCXTnrCoYvnhvZzvcQvfM8r/tL9+FvXiDhe8TGW6J34e6TdzMXQYm2G4USiFsLoQ8EdeaL8Oteut5/yvZDfgbh147OQUOUw8L7FGEwy+qJ+dQ8h2OaBl6CyrjwKMtrM3gq4oBkmZE6taMT/YOLtsX1+ngtzJ5aIfzTgNWHEQI7mSbIK0saodoS9SChoWC6Rr9jE7k4EDoWYhcgHwNOjZzPMwEWfFvVRf0hXMWZ2ztQ+4JUwzAe70HFxqUDIynatMdJlQwv+cqYV2XUpl0ddyJofwe8ncvLv106FTacvYm/eF54cBqLSjc/PCwNWzgjEka0AdIQdQnaW6AFlDgjV8Hvcr0fLpsgo+voaZSB1948bc3WDBrxm7pelbjquIjevlBrAw/8o5zwKE1sv1NiLR4w4yG9JhLWu3Npfop/r0nMCMbClPGvkVY4nGFiMCCRRiLhX984JMhup1euSkHAV7UA6i7qpcx/sXsoRwYf/KZ0/EZKDF4kLdUqHfNfTKBfHXLw+IHJ7hPlem/k2UBQ1SPySee0Kld/ShBsP8ogqgCNHHNKYCbwvfFVpAHNNH78zuFGe8EsPqghovEXnGj2Izpp2963GNZvbDp8wOEPNJ+wx0VCGqcdD17w5DAdrlsKNtwJV/+IHsnmpSHB2+GvU83Ywi6b6yDoGrYjypuomOKnI+eMp7Po9LhlzEYcT5xO9XsdiYmT5XXD2QU=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700021)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?6vG7pAY45Keyt/ciE9GjZHJH9CMf3JD/mk0eCJmJDY5v8yyg85lp9afPjChW?=
+ =?us-ascii?Q?YzoRTNHMZWMRc96IMgskuL+SwLKtCVlqgMjL1CugKMeQaikU5n45ZmEzXwti?=
+ =?us-ascii?Q?uXShOeMD4u+lP9fB4Ec1uVcaQUJGr2uHrOh/6poLCznxN8wWkZgjc8xVhR2X?=
+ =?us-ascii?Q?+IJLBFfTvBdNiLrNCq6+o2L5+vcYSRrVrXWLueOchhVXwqcVXQwEZxtLx5WV?=
+ =?us-ascii?Q?11yACVbLRPbTbo3RqP50Hku7xtTjabUA/d4venuopGMhpH09fBT/sjrmdirE?=
+ =?us-ascii?Q?iBLTbmFuSYTizmUFHN2hQfOOT6JHUHi7kNo5LLKKnry7HRium0vE1UvxfiSJ?=
+ =?us-ascii?Q?HF8u+ccJAcM3E8LTkeA2zN/qQs7YgIQ8LJkjwK9RJmcdSroeK+NIIDVdK3qO?=
+ =?us-ascii?Q?wYmq6Nw4bm7DdUz5yr51ZpGLzM3XhtSzre74GuUGIESJnDmOIif6uArp7n9W?=
+ =?us-ascii?Q?N2zTlCPK4f6L7CmanUOIV824itX5I096pyuqe6LJGP/moKbLMGcEdMHtFXX7?=
+ =?us-ascii?Q?uTdyXY8xxwZNDsXSY8v83g57DicOKVyzecsDwhyK6YGKZSBWjj7JfMSI3IaD?=
+ =?us-ascii?Q?laX6nWQVXScxkfOGoVH0k821Ft6PSBlM2VE3iLGiFC22m2t6JsDHYqEhhXLQ?=
+ =?us-ascii?Q?X0sJ4auRZA6DA4CPe9iS35kvFdB+yKPsmsb+vHMoOdQ4kWC4MJk90Gg2vzhx?=
+ =?us-ascii?Q?EeKE3fqzw/SlL2E6P0WFfDCd5nYCtq4kxc/RG/WSlIfN6wh+GzPyV/SNZc5e?=
+ =?us-ascii?Q?JLIm20TwneUpNGMAmE8H849OJw3sate34fUTIeFr8L+izMfwPJrVoL7z5pmw?=
+ =?us-ascii?Q?RaNiwwXpMS9DCZ3eNzVfVXw4F7MABkt1q1XmfKohtkP1goxoFuRgiGJ1LpA7?=
+ =?us-ascii?Q?SmtId2CheHU58MRtLbo038AbbBaUdDiQUb8IG6GOwkJj1Nq6N8pWIiAm6H96?=
+ =?us-ascii?Q?ytT7lcL044GCYxQ+M/99y85MZ3V1wfZbI/BDViaT2wTj58ZPe+27Q9/Pne7i?=
+ =?us-ascii?Q?H1yhM7vtnRK98OC+aOgWXeHCts7mqr7ZHRQaunG05665o/SwDvt6sPOjuSmE?=
+ =?us-ascii?Q?j0KOQ+5YvXwjJ0QywoDdaD51URLFBEPp1YuWziM7bqEEv9BArFnt26C0z/P9?=
+ =?us-ascii?Q?iUO1JDs+NEUtMPL2DE7hQq8CZVxAiUVBGBnatRpmRwJNlDijNlfv/3y5w4Fs?=
+ =?us-ascii?Q?D75RQnpDEhtLkOCFnTHp/WZ9VBaJes05a2s1ctrpiKjYF59zp0ApWT/WeywZ?=
+ =?us-ascii?Q?idKBSLqi1F6EFVmA4ofJni0rc4fJei+XSHasPZB48jDlsePHfYUV+80NEKl3?=
+ =?us-ascii?Q?6H2MMiswl4pWe0ANKkBf3GBj9GCsW3FTrcRwpHUpSBrOimYA2zOCE2396N9m?=
+ =?us-ascii?Q?EHV0cRaF057Qwjx0kEPPBdaaxpYk5R4/hPk8clYOT4KK6lLIK7Pubd/E+7Bl?=
+ =?us-ascii?Q?oofkKDfwYI/0hjdFTbIuTM2tGSHDI6J//2mzUGxwJPc+EANF5Xgl8TiDP+vH?=
+ =?us-ascii?Q?JpyOo2LqGypreWZql57/3xxVx5CtOtPk8ClBM1of1NBo0kqT0/o7nZPH2N3i?=
+ =?us-ascii?Q?Fp3gHzYa03jx0JhfzJJYfMWOUvZMjmMyAQmoOGFo9Yid7HBrY69edirLoLGa?=
+ =?us-ascii?Q?PeDcxEXTlrle8XTExmYAanaeAgpNGUkVc46kFGo3ztFo0HZPQXlJIcxOCVzZ?=
+ =?us-ascii?Q?Cii3/V+uB4JdgEKw7nBFx35ZIuujv6vYXTkXdXl6Rz5WVZfr?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260327133036.GE567789@horms.kernel.org>
-X-Proofpoint-GUID: SnWgw0JvzTdgsB2ff63YnKQoHaGpZadF
-X-Proofpoint-ORIG-GUID: SnWgw0JvzTdgsB2ff63YnKQoHaGpZadF
-X-Authority-Analysis: v=2.4 cv=a949NESF c=1 sm=1 tr=0 ts=69cb42d1 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=Yq5XynenixoA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=l0iWHRpgs5sLHlkKQ1IR:22 a=qit2iCtTFQkLgVSMPQTB:22 a=9R54UkLUAAAA:8
- a=VwQbUJbxAAAA:8 a=JAhMjkpjCbTQvw1v-iEA:9 a=CjuIK1q_8ugA:10
- a=YTcpBFlVQWkNscrzJ_Dz:22 a=lhd_8Stf4_Oa5sg58ivl:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzMxMDAzMiBTYWx0ZWRfX00mx2mbcYNZb
- JuC2i4tyirho9LvXi/rtpIzbNlbe0Ygh0VdpqzeQxw3zICdrlv3E0zWxld9RDZTpEuD6wmKgvPK
- MXYsB6Fs+IZdzyMPaRNxRt9F+RxVLe6Hu3p2q0Ewq7j4Yg5W1s7IOMmlPRllMAsTHxrsQkJtPov
- v4/vckIQoBnWNPi3X8aRlC6AWADxk/hEM0BIa8+2sSqOPYKoxvBX9vDK3sroqxoJ2xmn6Lxt5Wz
- JiQd9AiQKusgnpW9WugPeEYipkBfXVphFsg+Q+5gnSQHgHJv+9oIlfGGRPzHH2Dq9BhQkyYnAhT
- oI64X+/M+/ey79Hk2YIhWN6NxhhplOxevKT6sBjjlXa4EfQ6uRXxuDue9akzqIQ7H2/S/+7GVDE
- 6kMQHjpeYEIGJDBHOv9IOTu3bXwt+AtiNLDQjDrPYW7Hl3uX7hgf6ygDpXc71dq7N8Jhgc7cN/W
- Tt2rZRfywg2nBx9aWug==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-31_01,2026-03-28_01,2025-10-01_01
+X-Exchange-RoutingPolicyChecked: KCBosnXxdd1K/4opNIrB7O5RgZma19+qRifZPnxkQaT66hljinttRws/e1hU5RGTGyoSx7JeDRgg4eiXTNXn3yCNZvWSgKXaxpaj7Mx1hfSmn9zd5MK8r25dj25hz9qTQCGf/ci3s1TSY0cdSRb3E6zseNoxxCaApA/Z/oxIu510WWW4mozGRaX4P0FF2y0qV5SOyyfT5sFKfyPr4eY6961EvOCEgdVA4gKQc/ysAWZg6rWbCPthTHqx3F8DvqHUjSq3iC1YO+4K1xxlLJQgy9YKRTlLOLUuR2TtBdHRRy+LGGYq1RmK5LyqpHmN58xy9tLclNbVqb9XV74uHdCRfg==
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 98674b5f-d550-4402-7b7f-08de8ed7f433
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Mar 2026 03:45:29.9126
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2d4uGq6ZO1SKgRjFDm1sm4B61fWHCVxcf8rRbMlDmzuyqdEWg17SXzuU0/EhcjiESVvQGM/Nz6Ih8r/t3PicjQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5214
+X-OriginatorOrg: intel.com
 X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273453-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,marvell.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,resnulli.us,oracle.com,nvidia.com];
+	TAGGED_FROM(0.00)[bounces-273450-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[osuosl.org:email,IA1PR11MB6241.namprd11.prod.outlook.com:mid];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[sx.rinitha@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[marvell.com:+];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 900F2363C57
+	RCVD_COUNT_SEVEN(0.00)[10]
+X-Rspamd-Queue-Id: 662B6363BBF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-03-27 at 19:00:36, Simon Horman (horms@kernel.org) wrote:
-> AI review flags that:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of A=
+leksandr Loktionov
+> Sent: 04 March 2026 14:13
+> To: intel-wired-lan@lists.osuosl.org; Nguyen, Anthony L <anthony.l.nguyen=
+@intel.com>; Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
+> Cc: netdev@vger.kernel.org; Jagielski, Jedrzej <jedrzej.jagielski@intel.c=
+om>
+> Subject: [Intel-wired-lan] [PATCH iwl-net v1] ixgbe: stop re-reading flas=
+h on every get_drvinfo for e610
 >
-> npc_load_kpu_profile_from_fs() calls npc_apply_custom_kpu(),
-> which returns early if the following condition is met.
+> ixgbe_get_drvinfo() calls ixgbe_refresh_fw_version() on every ethtool que=
+ry for e610 adapters.  That ends up in ixgbe_discover_flash_size(), which b=
+isects the full 16 MB NVM space issuing one ACI command per step (~20 ms ea=
+ch, ~24 steps total =3D ~500 ms).
 >
-> 	if (fw->kpus > profile->kpus)
+> Profiling on an idle E610-XAT2 system with telegraf scraping ethtool stat=
+s every 10 seconds:
 >
-> Does npc_prepare_default_kpu() need to be called before
-> npc_load_kpu_profile_from_fs() to initialise profile->kpus,
-> which is 0 by default due to profile being allocated using devm_kzalloc()?
-simon,
+>  kretprobe:ixgbe_get_drvinfo took 527603 us
+>  kretprobe:ixgbe_get_drvinfo took 523978 us
+>  kretprobe:ixgbe_get_drvinfo took 552975 us
+>  kretprobe:ice_get_drvinfo   took       3 us
+>  kretprobe:igb_get_drvinfo   took       2 us
+>  kretprobe:i40e_get_drvinfo  took       5 us
+>
+> The half-second stall happens under the RTNL lock, causing visible latenc=
+y on ip-link and friends.
+>
+> The FW version can only change after an EMPR reset.  All flash data is al=
+ready populated at probe time and the cached adapter->eeprom_id is what get=
+_drvinfo should be returning.  The only place that needs to trigger a re-re=
+ad is ixgbe_devlink_reload_empr_finish(), right after the EMPR completes an=
+d new firmware is running.  Additionally, refresh the FW version in ixgbe_r=
+einit_locked() so that any PF that undergoes a reinit after an EMPR (e.g. t=
+riggered by another PF's devlink reload) also picks up the new version in a=
+dapter->eeprom_id.
+>
+> ixgbe_devlink_info_get() keeps its refresh call for explicit "devlink dev=
+ info" queries, which is fine given those are user-initiated.
+>
+> Fixes: c9e563cae19e ("ixgbe: add support for devlink reload")
+> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+> drivers/net/ethernet/intel/ixgbe/devlink/devlink.c |  2 +-
+> drivers/net/ethernet/intel/ixgbe/ixgbe.h           |  2 +-
+> drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c   | 13 +++++++------
+> drivers/net/ethernet/intel/ixgbe/ixgbe_main.c      | 10 ++++++++++
+> 4 files changed, 19 insertions(+), 8 deletions(-)
+>
 
-Thank you very much for your time.
-
-The v9 AI review has raised the following concern again:
-https://netdev-ai.bots.linux.dev/ai-review.html?id=f29b81fe-bb3f-4902-85de-8271effbb41c
-
-"In the filesystem loading path, does profile->kpus need to be initialized
-before calling npc_load_kpu_profile_from_fs()?
-
-Simon Horman raised this concern in v8 review on lore:
-https://lore.kernel.org/netdev/20260327133036.GE567789@horms.kernel.org/"
-
-would like to clarify that npc_prepare_default_kpu(rvu, profile) is invoked
-very early in the flow, and therefore applies to all execution paths
-(default, filesystem loading, and firmware loading). Additionally,
-if the filesystem loading fails, npc_prepare_default_kpu() is invoked again to
-ensure that all values are reset to their defaults before attempting to load from firmware.
-
-Could you please advise on the best way to address the AI review comment?
-Specifically, would you recommend:
-
-1. Adding a clarifying comment in the code, or
-2. Invoking npc_prepare_default_kpu() again just before npc_load_kpu_profile_from_fs()
-
-to make this behavior clearer?
-
-Thank you once again !
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
