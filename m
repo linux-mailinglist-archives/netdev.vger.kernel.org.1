@@ -1,162 +1,138 @@
-Return-Path: <netdev+bounces-273712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273713-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aET+IsUDzGljNQYAu9opvQ
-	(envelope-from <netdev+bounces-273712-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 19:26:29 +0200
+	id GNFPIccHzGn+NQYAu9opvQ
+	(envelope-from <netdev+bounces-273713-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 19:43:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D57C36EB4C
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 19:26:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 282F836F353
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 19:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 38944308785E
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:18:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A5FDA30022E1
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 17:33:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6CC3624D4;
-	Tue, 31 Mar 2026 17:17:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C586A3E51DF;
+	Tue, 31 Mar 2026 17:33:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mR3Vd908"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f80.google.com (mail-ot1-f80.google.com [209.85.210.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB91346FA6
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 17:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C99D33263A;
+	Tue, 31 Mar 2026 17:33:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774977450; cv=none; b=UmM6GK2aTPU9YNHCCks+Q6v9+teKKlCV+4+fNqMg42we7yOjx5r8dYuncd3uL5AAJOFvSylzIizrFjfXOA6WNatNKE9NQvBCci9OX7Witi4lzB3R2wwBF4huVAA8jdXuxxdQGheSD7WyU9gShlugCis2sVNZV8jOtKl0vAGHjDg=
+	t=1774978390; cv=none; b=YM8uMo5hDoi1uTuDd7LZXU5Z8doYKIZt9Yj+Egbnli8LUVOfyBUyeWJSkk/mzB8v7yMH/cPXnCENpOU+as1bvuEOFO/5PEhAoK6rDBqvCnq0hHPGPuyJBpT8iq2rnIY8a4zTIDnz0LC+OHZvJzvt92Zc9uPzgHMyYCuhogOK8u4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774977450; c=relaxed/simple;
-	bh=Ij4NctXkH98k4D6pU+jIv/fxlb6S2F9PSm7irxHMGPo=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=U1C3jLeSmTtx3xlry8GdTobTg0wGXhQWx8nfX7uPUzhu/ccsVtQmyNlWKTAiHOEHqfHOd7wxJMJxKMopnABEW7dHZhkr0QnKC0FzelD+CuKLy+W2dQREbgSrhP6vDKlDruKmB44/za3X/y4n0ncJTFw0xl/XrX/lH/HK3vRMuOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f80.google.com with SMTP id 46e09a7af769-7d7eb8cf3d6so21908733a34.0
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 10:17:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774977448; x=1775582248;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hteMWmC5zuwxY1wca9+Xqy4IWjKYX39OfCnF/7yj5mU=;
-        b=c0tXvAmtPVs3b4HBOJ+E8ecKFoloWNSVHaq1TXeary6rtZa+C63pyaXrIAh2B6sSb1
-         pYTbKFCKdy1XN1fffYFculW3F/99H4ka+L3QXUHLHIJ9Q2CadOzSMzWz9qJcnDrZJrCb
-         9587IsZuKSqJoK5K+9wmU4Q7UzhAufPmsbRWhko8y2QfmOMC3c7EbUcAaSxtzYATrzze
-         BYnXvi/zwQIAtIlO228rRBeFcwYi7MCyTlVKXyt9EdCZahfE/ze1YY2QDJxXf/d6B2Na
-         IZ2dmBV+mXHpXp2gQtAFIAbk2kMSGc1KEyKnke5J6CSJ4mC2FG2tm66ghDa9/AA/aHE3
-         lTPA==
-X-Forwarded-Encrypted: i=1; AJvYcCVeXVdhbQpKr2f9Jth2CZM8M4IRe7zt5kYvb1URpv1jSWM06H3tyuGuV0Ct7hRko6CeL0a0nsA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYAmwhOghyVk3MDJBgZodA5GSz9Ye/pPPxMtpbvtIeAuIOwJVN
-	UIxMI6h8ik37PDm6nBvM36ofI0d0PkGHjgiIJUtgyT0WKQoBARN0UaNiWuQsSahKaWU1lfI36Vf
-	jAg6myojCtqA2dkVWySmm3kwELyYNiWPDI0gGjW+i6n6r9T+7d3+jsQAanKY=
+	s=arc-20240116; t=1774978390; c=relaxed/simple;
+	bh=apaErXGmlrjKT2LcAebdIMqMLwGunZpI7uIaWKPB7v4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kLC2202D2m7h3H7VYYPhHbFiichBZQBylN48NVh9mzc92nqqYsS+Bptocx1YYw/dx8G24AVgd2h78QLB7Bn1qEj98exs4bxoCfpMr86PMe9v8aRkn7q/oKM/QrnvVLemcyW+lQXseZTLPdMhW6Qn+iaebwTait/h8TO2MtKPtHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mR3Vd908; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 625D7C19423;
+	Tue, 31 Mar 2026 17:33:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774978389;
+	bh=apaErXGmlrjKT2LcAebdIMqMLwGunZpI7uIaWKPB7v4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mR3Vd908u2RrX/wrmor+IWDTb7BZmEKL+bdofNyGYBbQ+EHSHrVtr0hPczt0N4v+C
+	 IqHnpMz5WL2DVKFC1TUrDgdjewIhMQieaGbNtYzF/K19RZNyXDMpHo1f5fPMoEjlNz
+	 6dNy1tfG6HCcQasPrNSJeu99p3BaY483JTd1jvGcU/NoctjkfZ0F5/8+wM/cruqCrP
+	 iGuq2LgvJlY+JQkFjulxl/uycHJAVbeQJ73yKDURMsRkJrAydbNvVnGpN5QsqaLGgy
+	 PcxWl26vzTmRIsZ/zVLXRaYhj16tzS8UCiXo1w+2MkABG4CbEP8dMQ3Vko0wp+tV2K
+	 TfJu+esujSgig==
+Date: Tue, 31 Mar 2026 10:33:08 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Marc Harvey <marcharvey@google.com>
+Cc: jiri@resnulli.us, andrew+netdev@lunn.ch, willemb@google.com,
+ maheshb@google.com, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 0/7] Decouple receive and transmit enablement
+ in team driver
+Message-ID: <20260331103308.421aac59@kernel.org>
+In-Reply-To: <20260331053353.2504254-1-marcharvey@google.com>
+References: <20260331053353.2504254-1-marcharvey@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2d03:b0:67b:c122:d2c8 with SMTP id
- 006d021491bc7-67fabc982c6mr14767eaf.39.1774977447940; Tue, 31 Mar 2026
- 10:17:27 -0700 (PDT)
-Date: Tue, 31 Mar 2026 10:17:27 -0700
-In-Reply-To: <000000000000bd671b06222de427@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69cc01a7.050a0220.183828.002d.GAE@google.com>
-Subject: Re: [syzbot] [net] INFO: task hung in tun_chr_close (5)
-From: syzbot <syzbot+b0ae8f1abf7d891e0426@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, andrew@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, jason@zx2c4.com, jasowang@redhat.com, jhs@mojatatu.com, 
-	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	mail@country-targeted-traffic.com, netdev@vger.kernel.org, 
-	newsletter@monkeydigitaldeals.com, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, vinicius.gomes@intel.com, 
-	willemdebruijn.kernel@gmail.com, wireguard@lists.zx2c4.com, 
-	xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=6754c86e8d9e4c91];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273712-lists,netdev=lfdr.de,b0ae8f1abf7d891e0426];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-273713-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,davemloft.net,google.com,zx2c4.com,redhat.com,mojatatu.com,resnulli.us,kernel.org,vger.kernel.org,country-targeted-traffic.com,monkeydigitaldeals.com,googlegroups.com,intel.com,gmail.com,lists.zx2c4.com];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.932];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,syzkaller.appspot.com:url,intel.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,storage.googleapis.com:url]
-X-Rspamd-Queue-Id: 4D57C36EB4C
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,teamd_activebackup.sh:url]
+X-Rspamd-Queue-Id: 282F836F353
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-syzbot has found a reproducer for the following issue on:
+On Tue, 31 Mar 2026 05:33:46 +0000 Marc Harvey wrote:
+> Allow independent control over receive and transmit enablement states
+> for aggregated ports in the team driver.
+> 
+> The motivation is that IEE 802.3ad LACP "independent control" can't
+> be implemented for the team driver currently. This was added to the
+> bonding driver in commit 240fd405528b ("bonding: Add independent
+> control state machine").
+> 
+> This series also has a few patches that add tests to show that the old
+> coupled enablement still works and that the new decoupled enalbment
+> works as intended (4, 5, and 7).
+> 
+> There are three patches with small fixes as well, with the goal of
+> making the final decouplement patch clearer (1, 2, and 3).
 
-HEAD commit:    47ab2c12c87a Merge branch 'correct-bd-length-masks-and-bql..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=153aed02580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6754c86e8d9e4c91
-dashboard link: https://syzkaller.appspot.com/bug?extid=b0ae8f1abf7d891e0426
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1286e8d2580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=106df5da580000
+The tests don't pass for us, any dependencies we should be aware of?
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/289234295ce6/disk-47ab2c12.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b3f30eb7dc01/vmlinux-47ab2c12.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/62a0f5642c08/bzImage-47ab2c12.xz
-
-The issue was bisected to:
-
-commit 5a781ccbd19e4664babcbe4b4ead7aa2b9283d22
-Author: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Date:   Sat Sep 29 00:59:43 2018 +0000
-
-    tc: Add support for configuring the taprio scheduler
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11535418580000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=13535418580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=15535418580000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b0ae8f1abf7d891e0426@syzkaller.appspotmail.com
-Fixes: 5a781ccbd19e ("tc: Add support for configuring the taprio scheduler")
-
-INFO: task syz-executor:5978 blocked for more than 143 seconds.
-      Not tainted syzkaller #0
-      Blocked by coredump.
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:22400 pid:5978  tgid:5978  ppid:1      task_flags:0x40054c flags:0x00080003
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5298 [inline]
- __schedule+0x15dd/0x52d0 kernel/sched/core.c:6911
- __schedule_loop kernel/sched/core.c:6993 [inline]
- schedule+0x164/0x360 kernel/sched/core.c:7008
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:7065
- __mutex_lock_common kernel/locking/mutex.c:692 [inline]
- __mutex_lock+0x7fe/0x1300 kernel/locking/mutex.c:776
- tun_detach drivers/net/tun.c:634 [inline]
- tun_chr_close+0x3e/0x1c0 drivers/net/tun.c:3436
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+# selftests: drivers/net/team: teamd_activebackup.sh
+# Setting up two-link aggregation for runner activebackup
+# Conf files are /tmp/tmp.zYDeygAAcf and /tmp/tmp.y5dfmFapAj
+# This program is not intended to be run as root.
+# This program is not intended to be run as root.
+# Created team devices
+# PING fd00::2 (fd00::2) 56 data bytes
+# 64 bytes from fd00::2: icmp_seq=1 ttl=64 time=233 ms
+# 
+# --- fd00::2 ping statistics ---
+# 1 packets transmitted, 1 received, 0% packet loss, time 0ms
+# rtt min/avg/max/mdev = 233.163/233.163/233.163/0.000 ms/bin/bash: line 1: pv: command not found
+# Packet count for test_team2 was 0
+# Packet count for eth0 was 0
+# Packet count for eth1 was 0
+# Packet count for eth0 was 0
+# Packet count for eth1 was 0
+# TEST: teamd active backup runner test                               [FAIL]
+# Traffic did not reach team interface in NS2.
+# ./team_lib.sh: line 87: kill: (597) - No such process
+# Tearing down two-link aggregation
+# Failed to kill daemon: Timer expired
+-- 
+pw-bot: defer
 
