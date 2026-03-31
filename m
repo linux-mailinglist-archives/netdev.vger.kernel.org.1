@@ -1,84 +1,83 @@
-Return-Path: <netdev+bounces-273776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273777-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EN/zAxhSzGmvSQYAu9opvQ
-	(envelope-from <netdev+bounces-273776-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 01:00:40 +0200
+	id 4OjmE+dSzGmvSQYAu9opvQ
+	(envelope-from <netdev+bounces-273777-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 01:04:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD5463728CB
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 01:00:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A195737296B
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 01:04:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0B999303756F
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 23:00:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E734730B88CD
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 23:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF3D466B73;
-	Tue, 31 Mar 2026 23:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F124611CE;
+	Tue, 31 Mar 2026 23:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WU0sbQ5B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S/UTOowP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31467346766
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 23:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB882FD7D3
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 23:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774998031; cv=none; b=cDPx18UfChuoGV8Wq72KzIGIeddUsdap0gwpalFQyW+Yih//gDnQNTLkA7F70akjj3OPjd/YgcJ5Xup9pXVQLPqFafdyB9DhHImE9vfQnwA38cIgjgTS3B1n+OVbUQds5smvf/jJ9nDPuOiNnVYDARTMEVRfLcTGJkleaUIitrg=
+	t=1774998035; cv=none; b=mmB6qpbkfpSlpCWHN6nBVLRsts6P6iTZT4YCe14SlyedaRIw6rYYkING8anApBQOgVzbyFpn2O7tyojLmE1aAD9eVIrLiq/yU46vZZ9qMClHA/STcHDlP6M6LtfoDjolERcJhMM6bD/haBjbxSrLBN0/8EQ4c3rThJxx6BTcqv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774998031; c=relaxed/simple;
-	bh=WPNJNWrBYnAojkkcHRpxEx5f5nMRyycsOuMu5ztrywo=;
+	s=arc-20240116; t=1774998035; c=relaxed/simple;
+	bh=ebB3tFe7st0ChlV9KEmkVCHkBQRl1ZMa/WdScimdd9g=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ImJZhjjSYVHYx09uR409R95ij+ZNcXjhwJqmXV0U1BO2qrjsUhYNs4E7GMtLjfEYeUNsxadAoGchOwhaJBAz1HMozkWbtDWy9RPkJ+cfIus8cMN3VJI4fFfScws4SJ2VH2mKxWrXSHT+32dQ20drQxQmLKOdbYQr5i3wFLtn2xM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WU0sbQ5B; arc=none smtp.client-ip=209.85.221.182
+	 In-Reply-To:To:Cc; b=O3p/bNXgA7Q5xrAtVB4ooZ1aynpHkH2y5hzNa46iBwFcxZ+X95FQHFHKL7YZGMdONjln0OXr9uWBgMtxxf9/d4yZeBhThGZdSyCqBa6SYYXg6dt2yOul/z7DG2Iu9L9mWBxyp/0/XkNWG+bI3i1TI1Yh+VpIK/RSONswK8NVtKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S/UTOowP; arc=none smtp.client-ip=209.85.221.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-5673804da95so2252005e0c.0
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 16:00:29 -0700 (PDT)
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-56b7fce3ae6so347637e0c.1
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 16:00:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774998028; x=1775602828; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1774998033; x=1775602833; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KZrJJG+BUOXCgvao7M4HPDJpbagyCTvtNjqLqKAeBdA=;
-        b=WU0sbQ5Bzv3PCz2QpNUfUn44OnIRh7xR72ijqk3z3kD6JA+/uqWlZ2upkJM8GAZt4A
-         s5ma9egrWfVfKw4qx9G13dL1eN65vay6IFfBzfpIlQQ7ZqtbongB4CuwHsCPGoEQMWCi
-         /bTq52+XjmohwTk68+jJgth61hkS9HNUwDYrBtigWblodK9KbYu9PAu5aCAXrwKoXR11
-         HhHsyLryoj1SuxpyArCR2u5BQY4Fzf3B5sUhbTPvrJfBVXYkjCgtmtJuW0iE42aBoQXc
-         GkTsbx8gdzOrgxvnGdC5yIP2c/TAofmB4EMLddkw0qnWC96hKlbjheLpxHEJ/kjH1OxH
-         dQoQ==
+        bh=Ya7/v/C2ic5WGsD3LIjfz1NrbBwmNrzBq94qY22p7kA=;
+        b=S/UTOowPngScjHxsuMUEcHpY/ce8RmIUfVRw3cDeaqvtLQ/tX4xyZ8J8AJVX7U5GJs
+         mJ2sjb6nTe2BanqMOanOyewVitFdXUGvK4a3azlWuBOhgSfjAigvkczxTKNS+bafpaDR
+         xO/lhZLsEHlomJ47l6m9/Z5oiCiYADGMt/RdeofbMcSVMvwN+a/g3l6uP1foZ44XLch3
+         znzecaGkW08tHm4odtLNTo3V2uK0HC7H09tcdogRqxc2pjdtSEOVkBfwbPBRWumAbCQ+
+         3/I+LFbEEQRwN8eIhcSK1+D9anaiKDDBp9KBok4FqVa8yeQy8MWAIIGH3fl9ysnXiX4b
+         dBXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774998028; x=1775602828;
+        d=1e100.net; s=20251104; t=1774998033; x=1775602833;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=KZrJJG+BUOXCgvao7M4HPDJpbagyCTvtNjqLqKAeBdA=;
-        b=repSHEtZDk0zWiP5mJUoBHwKA6k5cgoE8HnpFPlaDsTs3HlVoBgL9ttcr1nkA7QdSN
-         QdZGX8/M1c8I5abFstoQr8pSRl7H03CAlItA7owc2sa/qNBlvIICV+xhSEh5VrswmWRY
-         m/8xgL7wjzFEX3T7d6MI9hOhX41wuUb9O4JFcV6FjKSdA3yzW9lSCN817wZVTVM9bcKv
-         9Ot4GiMERu1squ3Gw575nGjbPO/uQjxxZweFeBULjqNC6fL07OpqA+ojVs+AYVcNTVWq
-         ronnC7g+CZO9zlwPmBCKDqi9WVQh/537JAa01yJl9Vh2qoy/uT7s2P49pLuAcj4/6JA6
-         CLrQ==
-X-Gm-Message-State: AOJu0Yw8cLEXJe+vBSNtQP0Fc5TSTPxuNePiuFQgx3/Rr/2hPeaYpGd7
-	HZkQ52Y8ozWt9ATaYoMSMGG0gznaItZkwztHkPZu5dN+8ksR3y09gPH2
-X-Gm-Gg: ATEYQzx5tVoep/awarIuRhmJf4IIc8yM0Fky5kD5sZdTok2mgDSZoGqkQFm+/vKiOiX
-	rMiASzrxg8p82DuYfZ9BRoFRvg8sOTJdJ8XIyHAoruZyuQYN6/oiXthHVr3pY0jrmzLVaNlA8XV
-	pksV8yCLLd+hY5k19IOxt16in+QvF25wMH8nJJUbprL+pSJc6KsxyzlF1eAvuCCI4738xa5vuFg
-	gWWQLcyfNaodHnKUX11S7iUyP0jGvU5Nxmb7nVw2ZDUWJIKcFeK6DE1H/h/4QUi+0pxNIw6HnvY
-	ZgNP+tp4tZ2wlGf4N/tB/SS2UDIePWcRkA9DgJhtUn2g4jwzkJVntIvEVinLO2wyn3CWDtynA1w
-	WxAR8rVjDszMXtTXoC5KwOtNgTdOJKeX33J2aJTZO0sAf2Xhuaoa9LqldE09kB1Zwz6EQNjQPpt
-	ZfJ05MH8acBblvzUKJ3c/bylLQTUYGR8lvp4MbIA==
-X-Received: by 2002:a05:6122:3288:b0:56a:e46f:2cfa with SMTP id 71dfb90a1353d-56d8a916d32mr621207e0c.12.1774998028157;
-        Tue, 31 Mar 2026 16:00:28 -0700 (PDT)
+        bh=Ya7/v/C2ic5WGsD3LIjfz1NrbBwmNrzBq94qY22p7kA=;
+        b=Ywk47U+serFwMwXQFSMqYBXhDTpKTPj8sljZ5yuKCsTj7yD8H1YMSeP9bVNyjTKQNh
+         J/ZQbKAlxaJnPiMSPA2uMzW/iJzj33lvkS3p2GiPnw7WR0J9l+TciKJUTE3wzSY+pnxW
+         b5W3lzQztD2zIE2lUnCWE0PgBwBf5pzToOYLoW9UbuKEb2ju/4hL7OuSzaQSVT6QvsSd
+         n2YJU5qS80AC09AAhW5LHJz2Fv1Lrjiu05tTa+BRUDUrvXhl2nuYehSTo/vBichPH6RN
+         yMR4EPhQnMxSMRoibPyYc8I2shYMfFMlq//TiA6RXAJAloEAvwgtzUMPzFwaS7s0mWnL
+         vtNA==
+X-Gm-Message-State: AOJu0YyVMvO1NHIiMesA4P+s/DPcjIBxtTTI71+4wpCrchPE2w3xmO4I
+	n0EE+Y4kT/L/JfRt+HzEnJzgX8uFLiqo2SmPRv58/McJIbQlM6DeEQwa
+X-Gm-Gg: ATEYQzxImwIrVWAmat8Ti/jLc7kcDzsOLQwYOH+2/2sq9Dm2gmT1A0GwhlNEkHcBt/S
+	Eh6jTdlSP2V63jfOTdwoSFWo2Wa6D+B3wY++5gnQywIQ2GF+loeiRDdkYspnN+kamMuWACmXLF+
+	lAty8PNTeUEoGMtXrzkto7wz80Geko7cUUFn7KNRHAx4l5t0iW6+Tpl+2wn24/6xM1tkyYsofHY
+	YCe2ZVZNHWmTEHqEhGiGsZWXvFfNtJ7XmpAo1iqv5eWuxE2T0jnqKLQ2DSvFMfdIHHh2WqK7VEx
+	XIu4WQoiw8SUY+GHFtRZa7XUgc2xHLtMNsOaU5JgAZShdEHkXihs1TE2s6n5bmXukbMKnbJifdF
+	xeBpV45uKEe/JIAQIPxuDaKHipzEveFlHlMzyjt5v/MRV1sQ140eG0ZN+khELlkuIB/ck6XkgpU
+	HIzhkQE8n9HtF6UDK/7SGIABIyqOYs71E9pNYmgw==
+X-Received: by 2002:a05:6122:2224:b0:566:ec03:4683 with SMTP id 71dfb90a1353d-56d8ae13b72mr522364e0c.2.1774998033459;
+        Tue, 31 Mar 2026 16:00:33 -0700 (PDT)
 Received: from tresc054937.tre-sc.gov.br ([187.65.210.13])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56d58a7ba96sm13948214e0c.17.2026.03.31.16.00.23
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56d58a7ba96sm13948214e0c.17.2026.03.31.16.00.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 16:00:27 -0700 (PDT)
+        Tue, 31 Mar 2026 16:00:32 -0700 (PDT)
 From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Tue, 31 Mar 2026 20:00:03 -0300
-Subject: [net-next PATCH 03/10] net: dsa: realtek: rtl8365mb: prepare for
- multiple source files
+Date: Tue, 31 Mar 2026 20:00:04 -0300
+Subject: [net-next PATCH 04/10] bitfield.h: add FIELD_WIDTH()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,8 +85,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260331-realtek_forward-v1-3-44fb63033b7e@gmail.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260331-realtek_forward-v1-4-44fb63033b7e@gmail.com>
 References: <20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com>
 In-Reply-To: <20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
@@ -105,12 +104,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273776-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273777-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -128,42 +127,52 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,bang-olufsen.dk:email]
-X-Rspamd-Queue-Id: BD5463728CB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A195737296B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Alvin Šipraga <alsi@bang-olufsen.dk>
+Some hardware stores logical fields split across multiple registers,
+requiring partial values to be reassembled using shifts and masks.
 
-Rename rtl8365mb.c to rtl8365mb_main.c in preparation for subsequent
-commits which add additional source files to the driver.
+Add FIELD_WIDTH(), a helper that returns the number of contiguous bits
+covered by a bitfield mask. This allows callers to determine how much a
+partial value needs to be shifted when reconstructing a field.
 
-The trailing backslash in the Makefile is deliberate. It allows for new
-files to be added without clobbering git history.
+This complements FIELD_MAX() and FIELD_FIT(), and avoids reimplementing
+bit counting logic in drivers.
 
-Co-developed-by: Alvin Šipraga <alsi@bang-olufsen.dk>
-Signed-off-by: Alvin Šipraga <alsi@bang-olufsen.dk>
 Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 ---
- drivers/net/dsa/realtek/Makefile                          | 1 +
- drivers/net/dsa/realtek/{rtl8365mb.c => rtl8365mb_main.c} | 0
- 2 files changed, 1 insertion(+)
+ include/linux/bitfield.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/drivers/net/dsa/realtek/Makefile b/drivers/net/dsa/realtek/Makefile
-index 17367bcba496..3f986e04912f 100644
---- a/drivers/net/dsa/realtek/Makefile
-+++ b/drivers/net/dsa/realtek/Makefile
-@@ -16,3 +16,4 @@ ifdef CONFIG_NET_DSA_REALTEK_RTL8366RB_LEDS
- rtl8366-objs 				+= rtl8366rb-leds.o
- endif
- obj-$(CONFIG_NET_DSA_REALTEK_RTL8365MB) += rtl8365mb.o
-+rtl8365mb-objs := rtl8365mb_main.o \
-diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb_main.c
-similarity index 100%
-rename from drivers/net/dsa/realtek/rtl8365mb.c
-rename to drivers/net/dsa/realtek/rtl8365mb_main.c
+diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
+index 54aeeef1f0ec..8d6c1c309c3b 100644
+--- a/include/linux/bitfield.h
++++ b/include/linux/bitfield.h
+@@ -111,6 +111,19 @@
+ 		(typeof(_mask))((_mask) >> __bf_shf(_mask));		\
+ 	})
+ 
++/**
++ * FIELD_WIDTH() - return the width of a bitfield
++ * @_mask: shifted mask defining the field's length and position
++ *
++ * Returns the number of contiguous bits covered by @_mask.
++ * This corresponds to the bit width of FIELD_MAX(@_mask).
++ */
++#define FIELD_WIDTH(_mask)						\
++	({								\
++		__BF_FIELD_CHECK(_mask, 0ULL, 0ULL, "FIELD_WIDTH: ");	\
++		__bf_shf(~FIELD_MAX(_mask));				\
++	})
++
+ /**
+  * FIELD_FIT() - check if value fits in the field
+  * @_mask: shifted mask defining the field's length and position
 
 -- 
 2.53.0
