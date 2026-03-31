@@ -1,177 +1,218 @@
-Return-Path: <netdev+bounces-273627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273628-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UMleBfLGy2mnLgYAu9opvQ
-	(envelope-from <netdev+bounces-273627-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:06:58 +0200
+	id gHRECNDHy2mnLgYAu9opvQ
+	(envelope-from <netdev+bounces-273628-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:10:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7771E369EFA
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:06:57 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1864E369FAC
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:10:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0086D30A946B
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:00:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B7B23302A96B
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F073E3C40;
-	Tue, 31 Mar 2026 13:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5553DBD76;
+	Tue, 31 Mar 2026 13:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZZeccucj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qtQVer5K"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2BF3E3C7E;
-	Tue, 31 Mar 2026 13:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEA819992C
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 13:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774962033; cv=none; b=sKfvGIQJNCEX0MHx83GxfFf1qNGnA+RqjV0KuoMRsQExraYKanT9+yRhH+w2M1QHXzAyoYJntcflygbSGthlCmDHvlK0acMzMuEXRFKUatg1NvT3Z9D1uq5uicAzarzHcxehpG3m+cPlTwY8BZRfyUvga56fSWh1nJiFVip1vAM=
+	t=1774962217; cv=none; b=HmoYpMJUjp2MOA/eUpVpd8aCynHEXbvaVW79twfdISM/y9tIt3WDghw5vzpYymMIyH+TYFYANTLeQcVCfOdxqai5zRPD0CpG8+FL2EC9CU4u0t8RPyQ2y29yd74FHs4lFn4N/G4Urt/Db/1MRijYhA1+szn6ihaOmIwZ0NFOWKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774962033; c=relaxed/simple;
-	bh=Prx95567J6vzfyKVo56x6e9/hbD35R8iDrHSkAFtEUo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hhNMjcT6lCZ+BIvW4wy6g0aJLGiUhNdgNTat0N8rGvhpfRY+87cD/mt8kRJZUXhBkokI/XDpKA9/nL1CFVQWpOgC26+1b6booUCOPufPv/BDCktm/F61k1ZzN2CJaFx642YPIdrIJazpkWBZ+DitlLpF/zqLn9SceaY/xL1kWHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZZeccucj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=x17+fCZEiea6rkhwqYIBLlsTRs919T9DlcGeN53lTHA=; b=ZZeccucjd5ldAJfs08c+KQjUyp
-	WutXtC30t1z5C1EwkOVmg+ALb0JYTmsdf6eDlXQsuMn5gtt573mPJt0Hz9uWEjfFxZFGnHi4IEk56
-	DyacgvFKDJagFIwYB2NXSzoUj2ssxJJLauWtnlVXKrgu1bdeOX+7YlU07Z7PEBk3hOOg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w7Yhd-00ECKF-96; Tue, 31 Mar 2026 15:00:17 +0200
-Date: Tue, 31 Mar 2026 15:00:17 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Abdun Nihaal <abdun.nihaal@gmail.com>, stable@vger.kernel.org
-Subject: Re: [PATCH net] net: txgbe: fix RTNL assertion warning when remove
- module
-Message-ID: <cc91b8ab-bbc3-46c9-91bd-05c7456eaaf2@lunn.ch>
-References: <D56A7C3379B4DA62+20260331071107.5414-1-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1774962217; c=relaxed/simple;
+	bh=HLL+anMQEr2xZrKHsjbOOFs32foSdLCqdsMgxZQgwS4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mpnwm8X6RMf2s21lJO8FX+A1qblAcLcJRPByfrVHIuhH1u/vdpbRUCVTIOkk7q4S0AG4bmuxixKl5NZ4MfFjPNDCYszMIs2bNZgxmwj+TtXMITaPjgwjAM0XDUKcY7QpwXNQLd7BfoutvUflsRotpbFgCAXZUETvtySR5V58Pf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qtQVer5K; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-89cc68655f8so59221536d6.0
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 06:03:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774962215; x=1775567015; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D0LFedWL/RtJaVjEz95rA1/31zCEvOBr1xfaMxHaAk8=;
+        b=qtQVer5KYDBH12geSTTJsnsDXZL+MBJ9VIFZfqus0VV2To+J9TvdzCRcOLyusY1YSd
+         E4rYDkGAopSXiXoHLv+gPc1EVnH2bdGEjqILWBqGN7Fe/VZ2/GACP+gPSPBqF29y0r2D
+         vCTxTROvBuXVFC+B2DEdmBFuuLpg5RYi/LpFudRyGucuiPBEUmGN53k8L0JB1ZK75Gog
+         Qw2veOewRCVI8wjtbtVUh4g+Q1d1SyiwgE6ZKdO7hM3Y35HVJyMxEEH6OH1eOeeOw9ep
+         D86YdTTtue2KuuJ+3fgOj3ZkVcPsyAlK6sm1PGRlxdy5K+xkg/W572UFscM0IwlDHj5g
+         U7YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774962215; x=1775567015;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D0LFedWL/RtJaVjEz95rA1/31zCEvOBr1xfaMxHaAk8=;
+        b=YRLX/K9pz8duBD67c/adgYRrtcUYhdelJ+fQVj5PPWQIVZEtCg0oTpyBdLOV2yJwyM
+         lwRWdvGYWHoQ+ShLVkWkpVVJ5Oum8jpBlfoRUyivcPF2hMeBNmuYZ10+HJLv3fZKMg4Q
+         OywO+Ab9V7jBVf9pGPOkNO5shBWRFic97LnuNzzPx/MMbgN9mV8gWnKizvOYg893neEM
+         nohkjSJ6OA3R1ocCOPP4BWiGJGZxUhoNgoAOR0xlD6gHzJd+2wAYDX7t2W1fgGYeVvi0
+         dD3m0W6NAn1EVQdpyzwSw2isCRFPkbXrLFa40zTJmADguBU0Zb8dU/TKzfYwHskgA6bo
+         NDLA==
+X-Forwarded-Encrypted: i=1; AJvYcCUCSkSLaQBiRxyrY1/3FJ8K5cetFU89m2lSDkGY7gnV0GJHKjyUNQxCmGtjlDjPlNu+TG4pELo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfQZYiRnBh1Cgpmx1V18Qo8WdgQt/Gaj8VC9daGZL0/MlyKA8k
+	kLk4PK7MDD5Y1JbheJPtCYhNwME0h0uc0u9bNFLcjnBcR7q/LVq8+vOj
+X-Gm-Gg: ATEYQzxXhRWyiPeDqhvLUp65aoj23wIm7OiIOZxpGRie/DfWMLcTS1PZl0LMX73sDUW
+	3LZ9kePLjI/evaDJ2oI5dpunwV7ZFvt+la9WlHNCKMP2hAqhxAwOX1JPagnbIK+Xrk/3miocP+5
+	gTvp4q2Rdyg9BvIenYWaoLNAbYAxCWDwr/AXZvz6LuW9jU5VUgSNkrGNYrTyuJ/Erf+8k2wB9Qc
+	vKguMlCGCxhVQZeCnlEgsOwvaFbUmnuM/CGasn+f33p+uzTTACCHK63dXMW5x6aMb0wboAOyKKk
+	pagXeQwG+7mOyqNLbtKU13XZH02JqUQ8a7G3XaDqejVMX82bEAfBdrCq23NHjhsB15oH7EEs9oo
+	NQ6m2+KK135CIlJbuObQ2IrteueO552J+fz9PI1wW5+8dVixO5Jxl5sebDxywL4WaYjrHtO0iEf
+	WxAioQIhqrUQCWVArXjCtEGC7OEz/4EjAgC84wrw6c3/7l4kmN8n6DTz5nNUL+4OHpG7NKKyvaI
+	IdRESf18RUyF7c=
+X-Received: by 2002:a05:6214:4710:b0:8a0:9376:99c5 with SMTP id 6a1803df08f44-8a2cbe52700mr49406126d6.30.1774962215106;
+        Tue, 31 Mar 2026 06:03:35 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1145:4:c599:9014:d27e:9c09? ([2620:10d:c091:500::1:4033])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89ecf28016dsm90501156d6.25.2026.03.31.06.03.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Mar 2026 06:03:34 -0700 (PDT)
+Message-ID: <a9c76822-cca7-4108-9395-4af6a4ff1eca@gmail.com>
+Date: Tue, 31 Mar 2026 09:03:33 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <D56A7C3379B4DA62+20260331071107.5414-1-jiawenwu@trustnetic.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 net-next 2/5] psp: add new netlink cmd for dev-assoc
+ and dev-disassoc
+To: Wei Wang <weibunny.kernel@gmail.com>, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ David Wei <dw@davidwei.uk>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Simon Horman <horms@kernel.org>
+Cc: Wei Wang <weibunny@fb.com>
+References: <20260330223143.2394706-1-weibunny.kernel@gmail.com>
+ <20260330223143.2394706-3-weibunny.kernel@gmail.com>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <20260330223143.2394706-3-weibunny.kernel@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-273628-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273627-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org,kernel.org,davidwei.uk,lunn.ch,davemloft.net,google.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,intel.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
+	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,trustnetic.com:email]
-X-Rspamd-Queue-Id: 7771E369EFA
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1864E369FAC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 31, 2026 at 03:11:07PM +0800, Jiawen Wu wrote:
-> For the copper NIC with external PHY, the driver called
-> phylink_connect_phy() during probe and phylink_disconnect_phy() during
-> remove. It caused an RTNL assertion warning in phylink_disconnect_phy()
-> upon module remove.
-> 
-> To fix this, move the phylink connect/disconnect PHY to ndo_open/close.
-> 
->  ------------[ cut here ]------------
->  RTNL: assertion failed at drivers/net/phy/phylink.c (2351)
->  WARNING: drivers/net/phy/phylink.c:2351 at
-> phylink_disconnect_phy+0xd8/0xf0 [phylink], CPU#0: rmmod/4464
->  Modules linked in: ...
->  CPU: 0 UID: 0 PID: 4464 Comm: rmmod Kdump: loaded Not tainted 7.0.0-rc4+
->  Hardware name: Micro-Star International Co., Ltd. MS-7E16/X670E GAMING
-> PLUS WIFI (MS-7E16), BIOS 1.90 12/31/2024
->  RIP: 0010:phylink_disconnect_phy+0xe4/0xf0 [phylink]
->  Code: 5b 41 5c 41 5d 41 5e 41 5f 5d 31 c0 31 d2 31 f6 31 ff e9 3a 38 8f e7
-> 48 8d 3d 48 87 e2 ff ba 2f 09 00 00 48 c7 c6 c1 22 24 c0 <67> 48 0f b9 3a
-> e9 34 ff ff ff 66 90 90 90 90 90 90 90 90 90 90 90
->  RSP: 0018:ffffce7288363ac0 EFLAGS: 00010246
->  RAX: 0000000000000000 RBX: ffff89654b2a1a00 RCX: 0000000000000000
->  RDX: 000000000000092f RSI: ffffffffc02422c1 RDI: ffffffffc0239020
->  RBP: ffffce7288363ae8 R08: 0000000000000000 R09: 0000000000000000
->  R10: 0000000000000000 R11: 0000000000000000 R12: ffff8964c4022000
->  R13: ffff89654fce3028 R14: ffff89654ebb4000 R15: ffffffffc0226348
->  FS:  0000795e80d93780(0000) GS:ffff896c52857000(0000)
-> knlGS:0000000000000000
->  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->  CR2: 00005b528b592000 CR3: 0000000170d0f000 CR4: 0000000000f50ef0
->  PKRU: 55555554
->  Call Trace:
->   <TASK>
->   txgbe_remove_phy+0xbb/0xd0 [txgbe]
->   txgbe_remove+0x4c/0xb0 [txgbe]
->   pci_device_remove+0x41/0xb0
->   device_remove+0x43/0x80
->   device_release_driver_internal+0x206/0x270
->   driver_detach+0x4a/0xa0
->   bus_remove_driver+0x83/0x120
->   driver_unregister+0x2f/0x60
->   pci_unregister_driver+0x40/0x90
->   txgbe_driver_exit+0x10/0x850 [txgbe]
->   __do_sys_delete_module.isra.0+0x1c3/0x2f0
->   __x64_sys_delete_module+0x12/0x20
->   x64_sys_call+0x20c3/0x2390
->   do_syscall_64+0x11c/0x1500
->   ? srso_alias_return_thunk+0x5/0xfbef5
->   ? do_syscall_64+0x15a/0x1500
->   ? srso_alias_return_thunk+0x5/0xfbef5
->   ? do_fault+0x312/0x580
->   ? srso_alias_return_thunk+0x5/0xfbef5
->   ? __handle_mm_fault+0x9d5/0x1040
->   ? srso_alias_return_thunk+0x5/0xfbef5
->   ? count_memcg_events+0x101/0x1d0
->   ? srso_alias_return_thunk+0x5/0xfbef5
->   ? handle_mm_fault+0x1e8/0x2f0
->   ? srso_alias_return_thunk+0x5/0xfbef5
->   ? do_user_addr_fault+0x2f8/0x820
->   ? srso_alias_return_thunk+0x5/0xfbef5
->   ? irqentry_exit+0xb2/0x600
->   ? srso_alias_return_thunk+0x5/0xfbef5
->   ? exc_page_fault+0x92/0x1c0
->   entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> 
-> Fixes: 02b2a6f91b90 ("net: txgbe: support copper NIC with external PHY")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+On 3/30/26 6:31 PM, Wei Wang wrote:
+> +    -
+> +      name: dev-assoc
+> +      doc: Associate a network device with a PSP device.
+> +      attribute-set: dev
+> +      do:
+> +        request:
+> +          attributes:
+> +            - id
+> +            - ifindex
+> +            - nsid
+> +        reply:
+> +          attributes: []
+> +        pre: psp-device-get-locked
+> +        post: psp-device-unlock
+> +    -
+> +      name: dev-disassoc
+> +      doc: Disassociate a network device from a PSP device.
+> +      attribute-set: dev
+> +      do:
+> +        request:
+> +          attributes:
+> +            - id
+> +            - ifindex
+> +            - nsid
+> +        reply:
+> +          attributes: []
+> +        pre: psp-device-get-locked
+> +        post: psp-device-unlock
+>   
 
-    Andrew
+Not sure where we ended up on the netns isolation model, but I'll just 
+note that these ops are not "admin" so they can be done from any netns. 
+I don't think that's an issue per se, but I wonder if someone with a 
+different use case will come along down the road and want to go for the 
+more restrictive deployment option.
+
+>   
+> +	list_for_each_entry_safe(entry, entry_tmp, &psd->assoc_dev_list,
+> +				 dev_list) {
+> +		list_del(&entry->dev_list);
+> +		rcu_assign_pointer(entry->assoc_dev->psp_dev, NULL);
+> +		netdev_put(entry->assoc_dev, &entry->dev_tracker);
+> +		kfree(entry);
+> +	}
+> +
+>   	rcu_assign_pointer(psd->main_netdev->psp_dev, NULL);
+>   
+>   	psd->ops = NULL;
+> @@ -361,5 +381,4 @@ static int __init psp_init(void)
+>   
+>   	return genl_register_family(&psp_nl_family);
+>   }
+> -
+>   subsys_initcall(psp_init);
+
+nit: spurious line deletion
+
+> +int psp_nl_dev_assoc_doit(struct sk_buff *skb, struct genl_info *info)
+> +{
+> +	struct psp_dev *psd = info->user_ptr[0];
+> +	struct psp_assoc_dev *psp_assoc_dev;
+> +	struct net_device *assoc_dev;
+> +	u32 assoc_ifindex;
+> +	struct sk_buff *rsp;
+
+nit: reverse xmas issue
+
+> +
+> +int psp_nl_dev_disassoc_doit(struct sk_buff *skb, struct genl_info *info)
+> +{
+> +	struct psp_assoc_dev *entry, *found = NULL;
+> +	struct psp_dev *psd = info->user_ptr[0];
+> +	u32 assoc_ifindex;
+> +	struct sk_buff *rsp;
+
+nit: reverse xmas issue
+
 
