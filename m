@@ -1,172 +1,149 @@
-Return-Path: <netdev+bounces-273473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273474-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eE2vMN1fy2lZHAYAu9opvQ
-	(envelope-from <netdev+bounces-273473-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 07:47:09 +0200
+	id oFsWFgFiy2nCHAYAu9opvQ
+	(envelope-from <netdev+bounces-273474-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 07:56:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42EC9364398
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 07:47:09 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED63536442D
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 07:56:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3B89E303E394
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 05:47:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 39FF9300DCC7
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 05:56:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5C836D517;
-	Tue, 31 Mar 2026 05:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13C5371041;
+	Tue, 31 Mar 2026 05:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="D1277GhP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UltW0E5K"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4583F283FD4;
-	Tue, 31 Mar 2026 05:47:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82235611E
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 05:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774936027; cv=none; b=JmMwCRcJk2iZzT3zSKXLWdOUfRvv8VG/2odbaWq5BlQz4Xlyinm37cC5uqwO+G8r6c4ulSPbABOt0FZkOXkBNogYFUDOP3GwHMUX/nNaf6OSdHiiAIycgSpFCNmUM89vpmch8wnLtHYUTVwwkyv1M8jqrmMZp0ATWyLTGpVEp5o=
+	t=1774936573; cv=none; b=A60dNmLKei61VIuMdBZFKa/bwyhSaTufbtr0aniI7+3etYnzzFwgoUyvXJHoX1zMdFI6uIcBUufnhtz286cZXcmYgp0S5iJQixL7D/wNC4sBEjftsIqLDeJPoQNJ5VT+xCESiB2lR0hIAQ29sv+FdyEy48Fweg7Or1ykoFlw52Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774936027; c=relaxed/simple;
-	bh=Ee6opNaryfGHiIa8jXCXhjOuSR5f97VK7ftydvAf6ek=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=p0XMQa7xfuTQIH6gIFMuTuUhm6v9UTH4COUG6se33WN4rSP2cG2MmNb/7K124fP7uTeBos+XsdRoj58NmCoKXDgQQi45uEqDAHsc3938mhDz3w+HfWVBxfSjU99mUF8GaRlK0YmY7CODZ8gfHEewJFct40KvaZTot0sQp13mX40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=D1277GhP; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 62V5kaeH72628760, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
-	t=1774935996; bh=pEDw9somGOJu6/8v9wZ9i20CKMIqTMMH2Tox4uOSKVg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=D1277GhP3bGnta5vEOxZqRzNRtRhV7BdPBZ4tNmxYX1DjrQRYGSQkG/Mcrloc5sse
-	 VZuzWybIH70FLgIyknxyhxROAMDBZ2wlPGuJ22WsqxABSyGNgv8HREIS6uuEprQuL0
-	 mh6ewYc2ivj7L8ZNDis0vCBfxCwFV5XkJnnf02IAQ/xC9SlBn1xWasOYeOOWUyfwar
-	 Fv6lNK2tqNNtnf+PqxdhY/TssOman4qG/vK0YqCX92QS5pe6SVOpJ1dDmmTWebvfqz
-	 7rSMej6m2GKp10pdF9Sv/fEb1kO4X/VNBnx/Lx0/d57OQGvcAgUBpHDzLeNwWmtY/Z
-	 qd2zv9QU/to7g==
-Received: from mail.realtek.com (rtkexhmbs03.realtek.com.tw[10.21.1.53])
-	by rtits2.realtek.com.tw (8.15.2/3.26/5.94) with ESMTPS id 62V5kaeH72628760
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 31 Mar 2026 13:46:36 +0800
-Received: from RTKEXHMBS05.realtek.com.tw (10.21.1.55) by
- RTKEXHMBS03.realtek.com.tw (10.21.1.53) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Tue, 31 Mar 2026 13:46:33 +0800
-Received: from RTKEXHMBS06.realtek.com.tw (10.21.1.56) by
- RTKEXHMBS05.realtek.com.tw (10.21.1.55) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Tue, 31 Mar 2026 13:46:32 +0800
-Received: from RTKEXHMBS06.realtek.com.tw ([::1]) by
- RTKEXHMBS06.realtek.com.tw ([fe80::46e9:fab9:b2cf:c99b%10]) with mapi id
- 15.02.1748.010; Tue, 31 Mar 2026 13:46:32 +0800
-From: Chih Kai Hsu <hsu.chih.kai@realtek.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        nic_swsd <nic_swsd@realtek.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "bjorn@mork.no" <bjorn@mork.no>,
-        "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: RE: [PATCH net-next v4 3/3] r8152: add helper functions for PHY OCP
- registers
-Thread-Topic: [PATCH net-next v4 3/3] r8152: add helper functions for PHY OCP
- registers
-Thread-Index: AQHcvPOyAxvCbLugj0GPCTeX7npeYLXHZLAAgACjrzA=
-Date: Tue, 31 Mar 2026 05:45:58 +0000
-Message-ID: <0fb2fd8f26334b578c299ee71958202c@realtek.com>
-References: <20260326073925.32976-456-nic_swsd@realtek.com>
- <20260331020156.3518006-2-kuba@kernel.org>
-In-Reply-To: <20260331020156.3518006-2-kuba@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1774936573; c=relaxed/simple;
+	bh=pV72EqT5bcVKWItDa+vXTFHlll9HnMWHUwlsRmZ5PWY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SHf8nYmk77dFTQmT5h/WA0hPVukur04Du5xUw9SYjVX+/RFQT7nhfQ1tplkWopo2bpZREHezt8RCsuO/Nuq+svN8jgxRzWvivMyMorQqyjb6OgxJkzvcFwfgLETLqhfyfLXIFy9l7ueae/X3YKpWiqgGGyq9uVQ71RVbUlR4Kmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UltW0E5K; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-66c24b42efbso1436694a12.2
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 22:56:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774936571; x=1775541371; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xgRGMIbUJ3AhTjO+w1QNBWgEKsQRuVAdG0Urvbs71LI=;
+        b=UltW0E5KdexKAUmJBC6roWmSHoruS9qLPRdX+iyq/G8v/g3+j32BBPK/yIRnV6dobF
+         0KpipBzbtoJ+/cu2vsvBeQrCJLaoDm8QONdyaORlFg2IlOOglLDOorIBy1inUNh5s/wH
+         aX5z0Z7G757px4LSJXhvjbHbxwWKK8SSBTWSn6qCD2Ha220NGYZQGZ8WL+0C+gldy2uR
+         jOMjA6odnFPiTKEzOmqCdZrHY2Vmi2tRi8Dck05SGBDWtQCaRDZexJOae7IF2MZqyigp
+         Dz9ohDu+B4EHBeOpC3iAdRSy3udGgulQ8/7vvQKyQCNkqS63y9o/Vi3zbJ3IxhsydHd0
+         CxpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774936571; x=1775541371;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=xgRGMIbUJ3AhTjO+w1QNBWgEKsQRuVAdG0Urvbs71LI=;
+        b=VUXwJ6Ib0UINR91mqnC3bBCrpYw4QS3a/U1A/WJqafd+xDtsJRCW+AM7MLPtP8Zw8s
+         ffDmKb/dvwbfjwRgD8jICOjFqVPsjHzku5v7C8jU4F3LOvmdyS6Nc5QXI/wY10Gw9dIJ
+         1tgcgR9wGRKU5wwtdtA9HwkN5ED80pMwdoPka0K3VidRBHJgB41Sz2yOu3n8ee8hyxTx
+         OMwTDy9Z0d3a8UxOv97X2LPLaqrOCTm6dbI27NX+dxwQirMxbwbMAX5dD4oKSUjnIlnl
+         vLV3UMXoN7YKqEx8+LQ/vWnHQJwPJKblg7FhV/mB/jlD6r+oPzR1zj4F4HL1+35LQH4I
+         KOcg==
+X-Forwarded-Encrypted: i=1; AJvYcCUdHKAkklsrPe/9kFemXYcgVix2D6Ek5tTXhJgrLTo6nb5HOWuM668cDrMo4qY1QbifJ7A5ntA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuqY7r1OUsbSt7Rjy80IVv8ZzA30+SJHQadpaDwOR6CecbS+y3
+	6uSOAmkaLMU2aFULKjDu/ck3vn6dZ3Z5k1mXsCoPxdsVdz5yk1VhnQdm
+X-Gm-Gg: ATEYQzx2nUQWKtOoWpWGto0D647mE6l7es3+4cl7Yh5lOt8YTj6uYCT+ETTp7/drKRi
+	sMLTTKbupxYMcDFK98jroEfra0M6DgK5Yj4Lb4hnvnoULq1cgc7to+ijFXt9ONjYr7kqE3V2gwP
+	CtMMzUUxdulnDif+YlJxa+yTKVv0JggGGfDeCHUx303MXaUOhnu114j3J64Lgubwm8c8tTo/VVx
+	RokzjJkK64v2dGAPBQ/F44mCKb628j5UZIeqQD4gcWjBj4vbUAhyXGALPXs764uGzZ/sqjbaj7c
+	V+/YmPb4xQ3Amh2WQRSXmMj/h9TtfcZ/SoNCIW1V6Ym1FMIPLO+ECFEXkqTYQPVYo52w8f4sLQr
+	0vWZMWe/TUHSBmwYthQPBYIxejYU6InN4MszZQDDyY8r+8DbSWAWZRXzugu66s3TQajwimM8SDF
+	qH2xM=
+X-Received: by 2002:a17:907:9816:b0:b9b:1cad:fea4 with SMTP id a640c23a62f3a-b9b503520b9mr979230166b.18.1774936570576;
+        Mon, 30 Mar 2026 22:56:10 -0700 (PDT)
+Received: from gmail.com ([2a09:bac5:4e22:2719::3e5:12])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9b7ae50e8asm358016066b.14.2026.03.30.22.56.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 22:56:10 -0700 (PDT)
+From: Qingfang Deng <dqfext@gmail.com>
+To: Julian Braha <julianbraha@gmail.com>
+Cc: andrew+netdev@lunn.ch,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	ebiggers@kernel.org,
+	edumazet@google.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ppp: dead code cleanup in Kconfig
+Date: Tue, 31 Mar 2026 13:55:58 +0800
+Message-ID: <20260331055602.35880-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260330213258.13982-1-julianbraha@gmail.com>
+References: <20260330213258.13982-1-julianbraha@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[realtek.com:+];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-273473-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273474-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[hsu.chih.kai@realtek.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 42EC9364398
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: ED63536442D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 31/03/26 10:02 am, Jakub Kicinski wrote:
->=20
-> > diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c index
-> > 32a4e8d423115..8747c55e0a484 100644
-> > --- a/drivers/net/usb/r8152.c
-> > +++ b/drivers/net/usb/r8152.c
-> [ ... ]
-> > +static void sram_write_w0w1(struct r8152 *tp, u16 addr, u16 clear,
-> > +u16 set) {
-> > +     u16 data;
-> > +
-> > +     data =3D sram_read(tp, addr);
-> > +     data =3D (data & ~clear) | set;
-> > +     ocp_reg_write(tp, OCP_SRAM_DATA, data);
->=20
-> AI flags:
->=20
->   Does writing directly to OCP_SRAM_DATA here actually write to the
-> intended
->   address?
-Yes, this actually writes to the intended address.
+On Mon, 30 Mar 2026 22:32:58 +0100, Julian Braha wrote:
+> There is already an 'if PPP' condition wrapping several config options
+> e.g. PPP_MPPE and PPPOE, making the 'depends on PPP' statement for each of
+> these a duplicate dependency (dead code).
+> 
+> I propose leaving the outer 'if PPP...endif' and removing the individual
+> 'depends on PPP' statement from each option.
+> 
+> This dead code was found by kconfirm, a static analysis tool for Kconfig.
+> 
+> Signed-off-by: Julian Braha <julianbraha@gmail.com>
 
->=20
->   Because hardware indirect SRAM access ports typically auto-increment th=
-eir
->   internal address pointer upon access, the sram_read() call will advance=
- the
->   pointer. By writing directly to OCP_SRAM_DATA instead of using
->   sram_write(tp, addr, data) to re-establish the address, the updated val=
-ue
->   would be written to the next address (addr + 1) rather than the origina=
-l addr.
->=20
->   Could this corrupt the PHY configuration memory across the initializati=
-on
-> paths
->   that now use sram_clr_bits() and sram_set_bits()?
->=20
-> Can you confirm if this is legit? Not sure whether this device / register
-> auto-increments or where AI got it from.
-The address pointer, OCP_SRAM_ADDR, is not auto-incremented after sram_read=
-(tp, addr).
-However, the address pointer is incremented automatically after ocp_reg_wri=
-te(tp, OCP_SRAM_DATA, data).
-
-Best Regards,
-Chih-Kai
+Reviewed-by: Qingfang Deng <dqfext@gmail.com>
 
