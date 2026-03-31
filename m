@@ -1,321 +1,156 @@
-Return-Path: <netdev+bounces-273431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273432-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mLl8Drkhy2mdEAYAu9opvQ
-	(envelope-from <netdev+bounces-273431-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:22:01 +0200
+	id ufjKCxYly2lnEQYAu9opvQ
+	(envelope-from <netdev+bounces-273432-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:36:22 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94D6D36308D
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:22:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7547C3631A8
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:36:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A62ED3019913
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:21:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 65988301158F
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:34:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 823723090D9;
-	Tue, 31 Mar 2026 01:21:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9142C22B8BD;
+	Tue, 31 Mar 2026 01:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qYX41Z4M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WhWFJowV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BD92233A
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 01:21:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774920114; cv=pass; b=oS+g6jANqALf7EsHbhaABHgeD5MnE9GSMBSZEyHqLfq1yoBl1MyLJs46PITNZAxDFGV+MuV95ncT/6dCrJDaaP1mzHiFUgcJtzJt8VaBhqwnLIzF8wAKRXlkmpbtGaWRIv762DHURLHSXkbMLAFh+D2Lf84sOLeplP4K++bPszw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774920114; c=relaxed/simple;
-	bh=fvTz1IRpJxhKnPo++V+kL9b5IKkpiz5dUGWbBQKfCKs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j7CBufWfRyh+MNidtMtjyOXGLCXZ54JiuhLgpsjTBAAQvCACv1GLct6cJMrJ/fmhyevvE8upgOux0UsGSpR6nscUCQBdlPM2LRUFSKxFMWOV5TT80MDFyPHzcymul3noj3gBA0zgFm/N4Dqviy7uFKGJH6fw7IaVzG0JsQdwLdU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qYX41Z4M; arc=pass smtp.client-ip=74.125.82.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-12a74039dc6so4045366c88.0
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 18:21:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774920111; cv=none;
-        d=google.com; s=arc-20240605;
-        b=hs3B8emcVhf74TS+KDBM7UYC/cENpfjU2RaNd7sO43uDuArS4sf/oTf8cRJeZBf5FT
-         XMKE4uNcIDp8Vf4a+4WnTbb79V9b0xCfTVtEX0fsaEfoKhKctIp/V2hgOjo1HW8Bdewc
-         coh3wrrqIo5ERbyB2ZKXShVbzeh6Epobtkv5qoERRvVFZy8s72HZy2DJvX2jeWPwSWX3
-         gtsQ9qGaDv/IVIncBpIrxwMwoqaxwGTX1/Fes17r+FdV6qnx+T8qWQ7LkTGhAnNZkpCE
-         2LccrgfMmjOQb0bg05gi1l6ELqQ3qMEJGxD16cJ4pxi4EKc/P1aQrlzn96qKDOcjy4uL
-         42ew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=asBUfDtRMKucrOKQSzjBlvbQiLLd54e8FYUI/VhTDuw=;
-        fh=CdBF6TsN9iJOMOC9U5OWtFspRjA4tjCk21g3YOVPYxM=;
-        b=QReJj1n5lfJ0VwSZISW7DxZZ95pvQjDgjosz8aCj0X8yAVzYEYY/QCNx91lMs6sp4+
-         vcBGNdgJleeAaYLhUAzqmuIG1hJKv7U2aMVNDnuI4MryHJyoW0VkYmCQnxFiXSYpw7pY
-         GO5s4wHXjQXcvbf5SZbSUg05s7+vKg/UkJfg5S5HU4HTXZ+ekOJ9bIyox6Qy2aU4rvGR
-         5EeK4p3pI00GAdL+EWj56nK5YBdTf8iAw78MFuO2GVdz3CvPhHbsDZqJGLupNepIcb7V
-         1nu4LqSS3cIA32n6RGjVLe1YklE6wG+lLfco6CACm1qPrfKvtXBpMVa3jqAsjbL1Yli0
-         rp5w==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFC31D416C
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 01:34:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774920871; cv=none; b=pHZLqdwlcFQgoZrH/Lklxow4/QfDTG4lyBuLD3cXSrcjadxLMpAPFewwReW46HWfKgkhnmwZlDwIadc9j0xlzOzyW4Xoct68JnARZBi78dRDyjAAJJS6OQJBSZGK/ee6aguDvYfo2dHA8dM6nxgtHQSpYgSRZSzXIwLgIQFEjvg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774920871; c=relaxed/simple;
+	bh=FYk+decOiXv+8xnv+BvgZE/TlqYk9oygaqDmoq1JjiI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rql0zhRWOHNI1qvWmi4lAoPkB287+gwN/02+scm7/CLB6sq7+hFCDHM9fqq4FBBFbze2utLxXZ/cg3o6cApwfHrq4t4KQUckR5ooh4AELH4GOhhWZxxkqYMaqJIlSkmYlBZGLS7vcPiN7O4UoYegUygbtpF74bZ/Y8qWDRboPSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WhWFJowV; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-35d9827661bso1235963a91.3
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 18:34:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774920111; x=1775524911; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=asBUfDtRMKucrOKQSzjBlvbQiLLd54e8FYUI/VhTDuw=;
-        b=qYX41Z4Mo42xNMxlacd/QMopWmBw2APmtSbMo86UKr+17KCS50DAH57KCPkzRj/hu6
-         vjltyH/8A6Mx9etEFr/jS4C53PjM4gu8op3BYB8fMv5b86Npzg629XRdXEvcaBm4E/vH
-         PqlndsB8FgDaLZCssx3g3WVSkbDscAxDX85hzK2qPJ1KckNx532zDhryjKEJ97D39U+u
-         3WSyYh/pEgv3sPpc+HcsnOspEFJilUePV4LqgnAImvQvJfFXR9ucs92mGk/INa0WIV8x
-         OnN3pe1F2aknW2Ey4LN92RMY81u5l6Y8PS5Xdht1Tz62EsXfYZhIi33qKhe5ZGmW4dSN
-         DcaA==
+        d=gmail.com; s=20251104; t=1774920870; x=1775525670; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=zj8A8/B1hK2sNcQ2UY18qL8YDsFqA2hJyd+WwZkuce8=;
+        b=WhWFJowVge2Ie+YGnEJLRJS7ZRWwDbp5qHh8r8Mfk9zWdZ0842V2v09iCvdLylCuLn
+         kv4vQDMSPimxKAnSAfc2saMJtnOjw1XXFc7+XuFHU5zkmS860SBTzKd6+U28UXL/eU9g
+         o+6wh2hwRQvsJhize4Db27qKJKQTi1OCRpQdxPCg9V1sgW6AvrIIGafwkz0Ksd3VWhek
+         /VEA7ElfsWrRUp1DXr+x6lDyRbveWcxjK/vLOnImRz3odJMW8KrLyLpZYhAC0ldbKVgj
+         D7SVUM7VzUTmepQ5ZJmyRnIVkZJlfgvP1HVvqY0NZb39Ym76/gV3yAAy5oEpAbeMNtgX
+         Fv0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774920111; x=1775524911;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=asBUfDtRMKucrOKQSzjBlvbQiLLd54e8FYUI/VhTDuw=;
-        b=PSQCznWasc8hLGtZsajRrG1psT+nar++w2wIP7CVdBuKg6xs846NmdtM7QGy8ZbrnD
-         MT2InJZPkmlXFRemFmcYVd41ufoonnGXDIyLX6P5+qq86ckkp9x86E6S2ChIRSEiK3Fq
-         auypSoK4px+fkDfljdicZkgwrEOC75wg9EDBproo3tKQlywkjtucMxgNBpo69Hzq8Q6M
-         uvVsNbzYLEKmtikRT0OORpzpbHK3YYnlb0s2khX5DT82NT6xi6gRjqRHVoG9tmtoE6oi
-         Clj8g+iIaUsabpKiWQamXmDqguhKoLaIAnBtqXkXxg9P1ApkPTvft0RhwHL0kVs7W8NJ
-         egng==
-X-Gm-Message-State: AOJu0Yz6ESHBmAM+2tobGIm9WXbD1jMRe82o3n2dV5o5ivtg9InfWLSu
-	NrQisuc9KVR22CedMPouCdlfVCz+U62ZGc+zi2kC86bkszMv+bIqGRXnqKS1aRiL8KIAXHdajAk
-	XboBdIskrUyTdBmvEOxC4gfmYlFTzfjQ6UAp4sbWw
-X-Gm-Gg: ATEYQzxdEgoeB6J+CPsmptwr8RJu54Ua0qmlC0od2bk11mk3YPj5w43CIPP8cVwm7qv
-	BgRtt2ZPr9i7Vti1dh+QvgwzyoAYA3tzNsFXUc+zw//d+x97jbhs5Y9aGv5YUZRhEcNTGs85Zvp
-	GdKMBgCWXFHEwyulh4D+I49V4n20R0ny/tSez7HTfjGKCdX7M0eFG9tyRWjwWc/hPBgvvoXnHB7
-	LWPOIRbY4yVZnpb9J+g+DyaRP3bDWs/59gMMkMlYk6BCGRXUPLYcR4AL1ha5KTwe1Atxmyj0071
-	WGZJ38PReLW8+ZwMWKK3pBiULD6iTarNSq+F5TORbguWyc+wy1wAPCZ2pAr+i4v02V4tv4dy
-X-Received: by 2002:a05:7022:2209:b0:128:ea68:27f6 with SMTP id
- a92af1059eb24-12ab28fda86mr8134739c88.36.1774920110404; Mon, 30 Mar 2026
- 18:21:50 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1774920870; x=1775525670;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zj8A8/B1hK2sNcQ2UY18qL8YDsFqA2hJyd+WwZkuce8=;
+        b=L4YhxqXWp4nj/jSeymUoulikwc6lR2KD27gecZZhJsK1u7smwLQXUk6qnSeXLQxA5M
+         UAOrJsFBYamo4yv6RJzDQmjeYt4krw/+amIXiYCEQoIuqENgWxOSUQ9DyI+YS8xbBA7C
+         4hKAgc80ZFrqmO40qjbDEQ+c/GyF7iv/hvzogfV6Wlcvi9B5i5LWbWvtUpxp3k6enI3E
+         tp5VrSGfomdYWo5LMA5X6djlhVKN+i/A5h8ruzv2PSNwR9xp+gZTkxykjNlA3Mo+3raw
+         InmtsfgdE1Xxmn5jN+p9tp2hoi6Widgvlqlsr/ocLOoBV4lpr4JKS972fLvyi42FBOUs
+         UqQw==
+X-Forwarded-Encrypted: i=1; AJvYcCWJe4uudmw4eIzD/XeWDR5KHJ7J2pzhG3B+y9YwR/2rt/ZrxHBE8bXUpZsINDukxicCLhnibwk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yybhryq3SFjdxqNU+rQNnLg37GProLN+TB0yl5Eg2H5rj5K0aQH
+	H+IqEEwIBiP8ze4xuawhfMyPv84oVfg0voNdet9CZ3Jkms8YA6m7iTf+
+X-Gm-Gg: ATEYQzwOWrCPBlxvRTTqwOCHQHWC87InE/K1aJedLFfCjWujjNXOG8o2YFoz6DIxFi+
+	zAMY8USURtY5eY6kxmXjKu80G30vcCg6MI/Lb1G42hYJHLrfWMFQfd6wLE0plDJ9MpftrrTvbCC
+	X/C5iKGkxl7SOe9naTnidxUCQCM6qiLmlFkUYYorlyoy+5PnrODpV96VC+dT8VB8Q8kFfV89e9m
+	lueq5U5Z3owlX11abk8V1CI3LZ4ODSSvm+i9N0QaVf+n/ofNi1QDC2FZJtuU71Vc/ezBCHyvv+4
+	NSX7O+DbUXMabNhHBAuDn2OJse0KSc/8jyCE86tSKRWrwJUM8KaYKvkedZ7h/fcOjShmY2DKfGe
+	fh5k+9srGAWwkKxjjnjYnP0qEj7zlwDkaH2kY2aU7QqzVl8if0JuXpWD5I1eMyLzkgmwqx9FnzM
+	5OSzHy0WuB7+xCIsbqqvel61xtCbo=
+X-Received: by 2002:a17:902:ef0c:b0:2b2:5637:1487 with SMTP id d9443c01a7336-2b2563716c8mr49870375ad.34.1774920869737;
+        Mon, 30 Mar 2026 18:34:29 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b24277fb3asm99887165ad.57.2026.03.30.18.34.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 18:34:29 -0700 (PDT)
+Date: Tue, 31 Mar 2026 01:34:21 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jiayuan Chen <mrpre@163.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Fei Liu <feliu@redhat.com>
+Subject: Re: [PATCH net v2] ipv6: fix data race in fib6_metric_set() using
+ cmpxchg
+Message-ID: <acsknTbxa3REYrlS@fedora>
+References: <20260327-b4-fib6_metric_set-kmemleak-v2-1-366b2c78b5c2@gmail.com>
+ <7e8c45cb-b5dd-4694-80e9-7c8e5ad9ade7@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260330215707.2374657-1-jrife@google.com> <20260330215707.2374657-2-jrife@google.com>
-In-Reply-To: <20260330215707.2374657-2-jrife@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 30 Mar 2026 18:21:39 -0700
-X-Gm-Features: AQROBzCDjrWJyJmfSCXtFAx4PFUj1XlE0JIrlHyoRlyN8IxuQEL9bzRmPAc5E0k
-Message-ID: <CAAVpQUDk1ywgsuCtreVCV4yVJRm_mcjsnC-+LuUwLRLHWavtZA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/4] udp: Only compare daddr/dport when
- sk_state == TCP_ESTABLISHED
-To: Jordan Rife <jrife@google.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>, 
-	Yusuke Suzuki <yusuke.suzuki@isovalent.com>, Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7e8c45cb-b5dd-4694-80e9-7c8e5ad9ade7@163.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,google.com,iogearbox.net,linux.dev,fomichev.me,kernel.org,isovalent.com];
-	TAGGED_FROM(0.00)[bounces-273431-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-273432-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[163.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,linux.dev,gmail.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 94D6D36308D
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+X-Rspamd-Queue-Id: 7547C3631A8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 30, 2026 at 2:57=E2=80=AFPM Jordan Rife <jrife@google.com> wrot=
-e:
->
-> Adjust lookups and scoring to keep their results equivalent to before
-> even if inet_daddr+inet_dport are left intact after disconnecting a
-> socket (sk_state =3D=3D TCP_CLOSE). sk_state =3D=3D TCP_ESTABLISHED impli=
-es that
-> *daddr is non-zero, so remove redundant checks for that at the same
-> time. Note that __udp6_lib_demux_lookup already checks if sk_state =3D=3D
-> TCP_ESTABLISHED, so no change was needed there [1].
->
-> I could find no discernible difference in performance in
-> udp4_lib_lookup2 before and after the change in compute_score.
+On Sat, Mar 28, 2026 at 07:22:48PM +0800, Jiayuan Chen wrote:
+> https://sashiko.dev/#/patchset/20260327-b4-fib6_metric_set-kmemleak-v2-1-366b2c78b5c2%40gmail.com
+> 
+> 
+> The concern about reader paths (e.g., ip_dst_init_metrics, fib6_pmtu)
+> lacking READ_ONCE()
+> annotations is valid — if the compiler reloads from->fib6_metrics after
+> inlining, it could produce
+> an inconsistent pointer/flags combination in dst->_metrics, potentially
+> leading to a refcount_dec
+> on the read-only dst_default_metrics.
 
-What workload did you test the series with ?
+Thanks, I will fix the reader path separately in case I missed anything and
+slow down this one's process.
 
-I think we want to see results under DDoS.
-
-
->
-> (AMD Ryzen 9 9900X)
->
-> kprobe:udp4_lib_lookup2 {
->         @start[cpu] =3D nsecs;
-> }
-> kretprobe:udp4_lib_lookup2 {
->         @lookup[cpu] =3D hist(nsecs - @start[cpu], 2);
-> }
->
-> BEFORE
-> =3D=3D=3D=3D=3D=3D
-> @lookup[11]:
-> [80, 96)         1387077 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@|
-> [96, 112)         364973 |@@@@@@@@@@@@@                                  =
-     |
-> [112, 128)         34261 |@                                              =
-     |
-> [128, 160)          7246 |                                               =
-     |
-> [160, 192)           215 |                                               =
-     |
-> [192, 224)           126 |                                               =
-     |
->
-> AFTER
-> =3D=3D=3D=3D=3D
-> @lookup[11]:
-> [80, 96)         1408594 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=
-@@@@@|
-> [96, 112)         340568 |@@@@@@@@@@@@                                   =
-     |
-> [112, 128)         30753 |@                                              =
-     |
-> [128, 160)          8019 |                                               =
-     |
-> [160, 192)           231 |                                               =
-     |
-> [192, 224)           157 |                                               =
-     |
->
-> [1]: https://lore.kernel.org/netdev/20170623222537.130493-1-tracywwnj@gma=
-il.com/
->
-> Signed-off-by: Jordan Rife <jrife@google.com>
-> ---
->  net/ipv4/udp.c | 20 +++++++++++---------
->  net/ipv6/udp.c | 18 +++++++++---------
->  2 files changed, 20 insertions(+), 18 deletions(-)
->
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index b60fad393e18..d91c587c3657 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -385,16 +385,16 @@ static int compute_score(struct sock *sk, const str=
-uct net *net,
->         score =3D (sk->sk_family =3D=3D PF_INET) ? 2 : 1;
->
->         inet =3D inet_sk(sk);
-> -       if (inet->inet_daddr) {
-> +       if (sk->sk_state =3D=3D TCP_ESTABLISHED) {
->                 if (inet->inet_daddr !=3D saddr)
->                         return -1;
->                 score +=3D 4;
-> -       }
->
-> -       if (inet->inet_dport) {
-> -               if (inet->inet_dport !=3D sport)
-> -                       return -1;
-> -               score +=3D 4;
-> +               if (inet->inet_dport) {
-> +                       if (inet->inet_dport !=3D sport)
-> +                               return -1;
-> +                       score +=3D 4;
-> +               }
->         }
->
->         dev_match =3D udp_sk_bound_dev_eq(net, sk->sk_bound_dev_if,
-> @@ -796,8 +796,9 @@ static inline bool __udp_is_mcast_sock(struct net *ne=
-t, const struct sock *sk,
->
->         if (!net_eq(sock_net(sk), net) ||
->             udp_sk(sk)->udp_port_hash !=3D hnum ||
-> -           (inet->inet_daddr && inet->inet_daddr !=3D rmt_addr) ||
-> -           (inet->inet_dport !=3D rmt_port && inet->inet_dport) ||
-> +           (sk->sk_state =3D=3D TCP_ESTABLISHED &&
-> +            (inet->inet_daddr !=3D rmt_addr ||
-> +            (inet->inet_dport !=3D rmt_port && inet->inet_dport))) ||
->             (inet->inet_rcv_saddr && inet->inet_rcv_saddr !=3D loc_addr) =
-||
->             ipv6_only_sock(sk) ||
->             !udp_sk_bound_dev_eq(net, sk->sk_bound_dev_if, dif, sdif))
-> @@ -2854,7 +2855,8 @@ static struct sock *__udp4_lib_demux_lookup(struct =
-net *net,
->         ports =3D INET_COMBINED_PORTS(rmt_port, hnum);
->
->         udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
-> -               if (inet_match(net, sk, acookie, ports, dif, sdif))
-> +               if (sk->sk_state =3D=3D TCP_ESTABLISHED &&
-> +                   inet_match(net, sk, acookie, ports, dif, sdif))
->                         return sk;
->                 /* Only check first socket in chain */
->                 break;
-> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-> index 010b909275dd..b93a9a3e7678 100644
-> --- a/net/ipv6/udp.c
-> +++ b/net/ipv6/udp.c
-> @@ -147,16 +147,16 @@ static int compute_score(struct sock *sk, const str=
-uct net *net,
->         score =3D 0;
->         inet =3D inet_sk(sk);
->
-> -       if (inet->inet_dport) {
-> +       if (sk->sk_state =3D=3D TCP_ESTABLISHED) {
->                 if (inet->inet_dport !=3D sport)
->                         return -1;
->                 score++;
-> -       }
->
-> -       if (!ipv6_addr_any(&sk->sk_v6_daddr)) {
-> -               if (!ipv6_addr_equal(&sk->sk_v6_daddr, saddr))
-> -                       return -1;
-> -               score++;
-> +               if (!ipv6_addr_any(&sk->sk_v6_daddr)) {
-
-This looks unnecessary.
-
-
-> +                       if (!ipv6_addr_equal(&sk->sk_v6_daddr, saddr))
-> +                               return -1;
-> +                       score++;
-> +               }
->         }
->
->         bound_dev_if =3D READ_ONCE(sk->sk_bound_dev_if);
-> @@ -949,9 +949,9 @@ static bool __udp_v6_is_mcast_sock(struct net *net, c=
-onst struct sock *sk,
->
->         if (udp_sk(sk)->udp_port_hash !=3D hnum ||
->             sk->sk_family !=3D PF_INET6 ||
-> -           (inet->inet_dport && inet->inet_dport !=3D rmt_port) ||
-> -           (!ipv6_addr_any(&sk->sk_v6_daddr) &&
-> -                   !ipv6_addr_equal(&sk->sk_v6_daddr, rmt_addr)) ||
-> +           (sk->sk_state =3D=3D TCP_ESTABLISHED &&
-> +            ((inet->inet_dport && inet->inet_dport !=3D rmt_port) ||
-> +            !ipv6_addr_equal(&sk->sk_v6_daddr, rmt_addr))) ||
->             !udp_sk_bound_dev_eq(net, READ_ONCE(sk->sk_bound_dev_if), dif=
-, sdif) ||
->             (!ipv6_addr_any(&sk->sk_v6_rcv_saddr) &&
->                     !ipv6_addr_equal(&sk->sk_v6_rcv_saddr, loc_addr)))
-> --
-> 2.53.0.1118.gaef5881109-goog
->
+Thanks
+Hangbin
 
