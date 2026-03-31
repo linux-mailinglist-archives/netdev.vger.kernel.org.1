@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-273457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273458-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WA09ErlGy2nSFAYAu9opvQ
-	(envelope-from <netdev+bounces-273457-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 05:59:53 +0200
+	id cMCwGSxGy2nSFAYAu9opvQ
+	(envelope-from <netdev+bounces-273458-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 05:57:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2137363CB4
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 05:59:52 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9363D363C86
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 05:57:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 61DA6305C4A6
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:57:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9BD0A30148A6
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E972F2C11E4;
-	Tue, 31 Mar 2026 03:56:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EC12C11E4;
+	Tue, 31 Mar 2026 03:57:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GwmN9fp3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sj20Yv4V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57FA1EF39E
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 03:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5641EF39E
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 03:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774929419; cv=none; b=u3k0BRnUxrzCH602M9L5wUKrr8BCLAp0iDbSMm6z5kTtRe3CF4htBmI5Rb73pdNMEsIlK7vgZbuXOeCNto7Q64817kC4cNCyBRNYt5aD1YeSp02V3vRcWtQg8t59Djw/p7eZtwhYynSS6B1BLHO1MQ+cw3Gq3Pnex5JL3WKhAtc=
+	t=1774929428; cv=none; b=hIdarpIJ4iiNta8F0L+K8c7oQGdoqLDN6mhgbi3jHb1u5ZyhDjXN9ENurYlabsVMbWP272+8etsNMiDXUVIgIFn9hgok01TmhmzwjjofYh/DMOPF9v/ZGw7mOdMb8iXSGjOnrH3xk5PqjIKnqnW4D7nzPX31Cobv+B9oU3k7XJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774929419; c=relaxed/simple;
-	bh=sBpTeIDTxFTEcP1EdffM+/HbnMaP4LD5XXijFqb4WO4=;
+	s=arc-20240116; t=1774929428; c=relaxed/simple;
+	bh=MKlnOkMzX+oq1WW0maV3Su1eTE5/Q6WgY2md3Hs/x2k=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=IigWw3Yn+Zr1xOJH7F6+DaOHwtArgP3wQDUscyAFnbClL5SDupd2GE9llopAJu0LMYVAyrTdACelzzNkcgWV+6Lm1RDbcehJWbw3y/FvBTj9I2LxBfM7qr6PoPLUjqn5rOpj2w0YCAEN5/rfS5E3GGu+JizKGNHYTXYKY0WEpLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GwmN9fp3; arc=none smtp.client-ip=209.85.215.175
+	 In-Reply-To:To:Cc; b=Nr1gF4d3hVwN4eYlXqRtVsaK3EyPkSDOUsLTnnpeSHoZEDiNrdZp8MaiYRFaVDCnBis/hZYcpmKrb3CNNhZIy2kQUqH2zXmVINWXnk5O/aSr8sMJN7EQOX9d2SA8Pt8WyLMQVkBULxrV+CzUzwS1oO43mW3FGBldplcH4b0cJk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sj20Yv4V; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-c76af79f029so173265a12.3
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 20:56:58 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2b0afa0210bso26516475ad.2
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 20:57:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774929418; x=1775534218; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1774929427; x=1775534227; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9gJ33OB4rjx34cR+Fv1tlLCTXuTAsGru5JzrTqHdTao=;
-        b=GwmN9fp39wdt/IxLIBbfJcb+sYUVSrctUVc+poyxZ1aLDq8MTNL0Aa1o58JL3vprZW
-         ZW4++IOUw6MSwmJRG3A2EbqN/P+XR9DwZREB168enQ3i8nc5IrCrGUlYyX59KnzZ+JS+
-         +7XfjOaITTV2FA1F9UIqOZ9zsnI87EVhKUOKNCl6Fmoj47aVEL70wERNWF+2mUHXhd3A
-         XLDw+KVC4ZVWsTkO8YiF3K+qTitGPbxV2QRMif69DVzIAH9DBVPduu303S/5JD+8MPBF
-         WlBap3AUuqKuxO+WDbQDzvuuG6e54m5kQ0Y8XoNidGO3hSPOfu9Vz0qq1fZ+IERIk0zY
-         Bd8w==
+        bh=XqQrrFc2/Gtic83J7TRLhKhXWW3jOenRMDXaQ79Hua4=;
+        b=Sj20Yv4V/5L3DMaRt3mHC94faIpMJDaXNTRaSMsLxmgUqrh+ifiRwNf6Its2ndvXza
+         NMNv/d4Sv1+QZzCjjd/O1jYmgiNiBKaLyejEzC7BiUAppB+rItiin48cBdNav6YIeD5P
+         zLfwiZKOYC7aBThN3igokIMLq9yq1y7J2tIdpLWLHCbnPFN9BJ1QKIQT5fJhA1Jv73qg
+         mQq6YDyKzE4ME0FvsiHC9e6x1hf+CWnr/j1j12UnoTgs0ATAdT3PvWpDGz1S3u3QdTYJ
+         WKaUOgdyYCVD+gAj1JesFpeIq0VZuXfR2n8BVK/P/ysQwNveE0F0UeoBTJFd2Hfoo93e
+         IrSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774929418; x=1775534218;
+        d=1e100.net; s=20251104; t=1774929427; x=1775534227;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=9gJ33OB4rjx34cR+Fv1tlLCTXuTAsGru5JzrTqHdTao=;
-        b=SQylI3YDRlwNqOQcmJLAOl7mi8fob0lLxasOA2P56TQOy0mXczgkU3NrV6aloihlUp
-         /Twy0smMycP/6bshnZiXaeO2pDovppCjsOPWWR4QfTy/JoAoSlrOWOUlFWFmapXbDXPJ
-         D7qkvb9cQXDY9XcsaLG+4nIvUvrbdJ76Yd5USgFPkyC/1uRXo5EJQpzu+eDn6F1uEc89
-         cLXngGLpXZnZRCD3ChVmATzOWIzG/Y9jPJEXDccLZe74sv9r3a4JQBNLWVVy/o+Vzq7c
-         xKgkek5bJXq6FDiXeX0Ov2tUQe6fO0c0KxhcV/ocwYNxdATqzAF/oOqgE5Mlzc62YjRc
-         wpYg==
-X-Gm-Message-State: AOJu0YwpQVZqJoqZa9ZcaKP5SIuBklGZ0n1vuo613U7enJmrsQO7mGU4
-	4YZa0HbJKoi0475JkD9gCJGJLmmDQP2G4OSeMIpR9v18KFWubW8TUhoC
-X-Gm-Gg: ATEYQzzouAy92/ELD5nbT7/n0U8jOEpLuGcb00Ry8mdQO8CY4CPtiRhd8dl8Ep3Sq6n
-	07Yfo2xJWsupwXuOtLckSs7GDQDtyqGHMXV7gcO95riLXHx5VEVc+YMAop49ze3V8UpGbCgpUsp
-	5sj1DzUFsTzx1vcHNda3Plrf00YltvYwJ/RLOSovtUvIIMvCc137dZU7B23XiGYYfGMREJnRMV1
-	Wn+p2D69GvGCUErF6eozuQp7Cotxq0Q1GPNlPr7n03BCpO2JHLsjk4hlZoTTBOjPcgjfuyAIgPD
-	ndjKMmP159g3wYXcgAAHLIEC1kLUb2EH068xExpxYZvWfAw1Qi/pSg4xfg+b2zPmEGkAk/fKBxZ
-	8tQNXnBwg9G78m6jABvDDuXbi6TeTBiv4cCTy4102tWhzGembORVUw6R0NV2mTs9oriS1kRUDad
-	JF9ULkEoI/hKDRJFN3kCEJP0esDxXT34PJrQ1l0NHMS6RP/cZUyth50NKO+wAa5hKgrVx+XXJrP
-	ARRrQjXDCmmPbD0tgyNPAin5112q6Z11Pd48GGUoR+4zhbthUk=
-X-Received: by 2002:a17:903:1aab:b0:2b2:539b:d29a with SMTP id d9443c01a7336-2b2539bd632mr62814925ad.23.1774929418137;
-        Mon, 30 Mar 2026 20:56:58 -0700 (PDT)
+        bh=XqQrrFc2/Gtic83J7TRLhKhXWW3jOenRMDXaQ79Hua4=;
+        b=l3LD431HapKyOvXZbvhCMoNGKX+lDk604J2IsHtNCdHncOVE97Xgb7YDG58KcSff38
+         mKcMOlnoeXM5EOeAj43p88hSNXmXbrrDEFHA1ofL0yzhFgFMFwYHbFoixoVILUz8PyO/
+         lOyfnQB7K6mnLYKPbJ2TBwPvAP8AaxN46vp8yjA9vArP++PM425cUGEBwFGmhxyD9mRO
+         cCypy1q/rNqAuuaTmqvZeN2NMvnMgPcGPPqIBn4ES5MqB6pWu2UA73JFg23Q5sXjcEFd
+         lPTsOuVmR9GtNZvH4QXL8ITHWQB+4vvJynAvnKtWn3dSsVJ6oVQd8P67Yvqc60LNVZtD
+         5j8Q==
+X-Gm-Message-State: AOJu0YxTcSQQEN07sA7SGRCRf1mSMe6W3RuyWfDNt/6JQmLt0ra4Hvgx
+	acRPdmB0qs6d8vCTwChl9ZiDKZOVq/rwAJKV8cNMgpMPRCS+w5Y+QAZT
+X-Gm-Gg: ATEYQzz0GvUPb47PLEOITmCah26BVHZhUfxJCmGOrf8+gRlIbXfbuhSv7NFYCoj4upd
+	7BE2PNfmpS3jtI57uwLq+YyvaKHMdpCetFsR9xQ/kYh3plyBEyKuKIcR/I4spf4hIWp5ytSHuMc
+	QPWbNg3fZ0QldPPC0VYaHPuWjbhhoJFAEKY2YjyGa5UWsT2VqVLi/6Fq5ZPb7giM49WEOHxnasQ
+	wA5DWz84tPQSLVVMjx8DZus14Jq2TjqoC3+ChwBwIZhsPV0jeIbyJbX0m7ImXkIVb5GrNfTS9m8
+	B/qSSJCs3LvuWWsFxYfsf7oZ9SKzSyiIuSX6df8tb1mNOoEMJLyGJiS8G2wAgEwkq5AB2WPY8L1
+	3ZJ/q/dt53/t7lT645uk75cLEnfyvicRo6wML50rniWQKvZgXuw/NSGiFJeiFR54ValoTm7pz0n
+	kghgxh+YDvs3V/LYMLEGkJnGip8Qb37br3Ulj8w773oAFfCjO+bv8e79yvL7S7kwSitPsjVtYyy
+	itebxDmN756W6dYxqn8fDB6I1COXpOaI+lBc7KrjAq6t/YNowo=
+X-Received: by 2002:a17:902:e54f:b0:2b0:65b8:b5b4 with SMTP id d9443c01a7336-2b0cdd830d7mr150042965ad.39.1774929426743;
+        Mon, 30 Mar 2026 20:57:06 -0700 (PDT)
 Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([240e:34c:5765:500:c92f:4f4e:9953:45b7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b24266e487sm94680625ad.24.2026.03.30.20.56.50
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b24266e487sm94680625ad.24.2026.03.30.20.56.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 20:56:57 -0700 (PDT)
+        Mon, 30 Mar 2026 20:57:06 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
-Date: Tue, 31 Mar 2026 11:56:13 +0800
-Subject: [PATCH net-next 3/4] ethtool: strset: check nla_len overflow
- before nla_nest_end
+Date: Tue, 31 Mar 2026 11:56:14 +0800
+Subject: [PATCH net-next 4/4] netlink: warn on nla_len overflow in
+ nla_nest_end()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,7 +88,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260331-b4-ynl_ethtool-v1-3-dda2a9b55df8@gmail.com>
+Message-Id: <20260331-b4-ynl_ethtool-v1-4-dda2a9b55df8@gmail.com>
 References: <20260331-b4-ynl_ethtool-v1-0-dda2a9b55df8@gmail.com>
 In-Reply-To: <20260331-b4-ynl_ethtool-v1-0-dda2a9b55df8@gmail.com>
 To: Donald Hunter <donald.hunter@gmail.com>, 
@@ -103,12 +103,12 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-273457-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273458-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com,lunn.ch];
 	TO_DN_SOME(0.00)[];
@@ -116,7 +116,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
@@ -127,46 +127,37 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A2137363CB4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9363D363C86
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The netlink attribute length field nla_len is a __u16, which can only
-represent values up to 65535 bytes. NICs with a large number of
-statistics strings (e.g. mlx5_core with thousands of ETH_SS_STATS
-entries) can produce a ETHTOOL_A_STRINGSET_STRINGS nest that exceeds
-this limit.
+The nla_len field in struct nlattr is a __u16, which can only hold
+values up to 65535. If a nested attribute grows beyond this limit,
+nla_nest_end() silently truncates the length, producing a corrupted
+netlink message with no indication of the problem.
 
-When nla_nest_end() writes the actual nest size back to nla_len, the
-value is silently truncated. This results in a corrupted netlink message
-being sent to userspace: the parser reads a wrong (truncated) attribute
-length and misaligns all subsequent attribute boundaries, causing decode
-errors.
-
-Fix this by checking whether the size of strings_attr would exceed
-U16_MAX after all strings have been written, and give up nla put if so.
+Since this is unlikely to happen, to avoid unnecessary checking every
+time on the production system, add a DEBUG_NET_WARN_ON_ONCE() before
+the assignment to make this overflow visible in the debug kernel log.
 
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- net/ethtool/strset.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/net/netlink.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/ethtool/strset.c b/net/ethtool/strset.c
-index f6a67109beda..9c502b290f5c 100644
---- a/net/ethtool/strset.c
-+++ b/net/ethtool/strset.c
-@@ -441,6 +441,10 @@ static int strset_fill_set(struct sk_buff *skb,
- 			if (strset_fill_string(skb, set_info, i) < 0)
- 				goto nla_put_failure;
- 		}
-+
-+		if (skb_tail_pointer(skb) - (unsigned char *)strings_attr > U16_MAX)
-+			goto nla_put_failure;
-+
- 		nla_nest_end(skb, strings_attr);
- 	}
- 
+diff --git a/include/net/netlink.h b/include/net/netlink.h
+index 1a8356ca4b78..00ea52dc08c4 100644
+--- a/include/net/netlink.h
++++ b/include/net/netlink.h
+@@ -2260,6 +2260,7 @@ static inline struct nlattr *nla_nest_start(struct sk_buff *skb, int attrtype)
+  */
+ static inline int nla_nest_end(struct sk_buff *skb, struct nlattr *start)
+ {
++	DEBUG_NET_WARN_ON_ONCE(skb_tail_pointer(skb) - (unsigned char *)start > U16_MAX);
+ 	start->nla_len = skb_tail_pointer(skb) - (unsigned char *)start;
+ 	return skb->len;
+ }
 
 -- 
 Git-155)
