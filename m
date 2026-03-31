@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-273398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273399-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mDu5MTUQy2lCDgYAu9opvQ
-	(envelope-from <netdev+bounces-273398-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:07:17 +0200
+	id 6A3CEIoQy2lCDgYAu9opvQ
+	(envelope-from <netdev+bounces-273399-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:08:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 486453628E3
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:07:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CF00362909
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:08:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C61CF30525EE
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:05:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 664CA3031CF5
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:05:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C23A1C28E;
-	Tue, 31 Mar 2026 00:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9E301E4AF;
+	Tue, 31 Mar 2026 00:05:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="RyauqpxM"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="KjxnaUoi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901E6EACD
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 00:05:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065C354763
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 00:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774915530; cv=none; b=pw78jjeW1qZQWKYNhgzyhiHt70x7q4lBZvdbJXSFBSF/qpR3QxVINVJtPY66PBgnVw08I3erW0gKJN5lN+KxoY0Pzbyucobtr+awwEGDcKi8rnR2U8cMggYikYZ3QU4P6cumZzMZHuINZhOZoJlYRT8RVFC6Mq7yRKKilcQrO/0=
+	t=1774915533; cv=none; b=PE/VEQgWmn16X9YXwmgraTa0twY9ZSTCgAnbd7yQlnI+7LRPC2UHUNDXTws0D019qt96bVN8FR58gmQFX6ceASsc3aCoObXl/F5U2oIPra25nFzJleS9Mf52y9uiy5PasyIUws3e0Ljtv5BpFdFlCCdoa9JISquhUOvMKOkiJGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774915530; c=relaxed/simple;
-	bh=5z2yLaquHwaRbRVurFabJyr8poot+bcmUNyqttPWU1s=;
+	s=arc-20240116; t=1774915533; c=relaxed/simple;
+	bh=+MLFM9wZPrv/i4EoZBg1aH6nlsKeZ8sX0XbZ6iofTkU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gUU3HP+ok6ct9/rgkbOyPU2v6BOVx3AjZuldDpoaIFbDfEadRM239oqlkQfEUXs7g6P5n078ygbDAdgw4a3LA7yKf8M00FpLgN4oAEVBNKV805MixJ4RCLD7BzWuP+YuVyFMxtX5z7vvyy1UrACi54uv96Sm3qdIGFzmEFbFONc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=RyauqpxM; arc=none smtp.client-ip=209.85.161.41
+	 MIME-Version; b=rmYO0l4XTMiKQ6z3QVUIrbQ+Zbyt2pxueIAkwJ52NJq+TsKg1HAzj37T03e8TKEI1QQBho9bHMuI/6jR+PxP4N376Yi9UsxbCPeij9Y6e5kw2fZIX73zJF+vuxpJzGtnCVFcc32v3aQ3PyYkLhNb2BL8LSDbiL89KeY40/ByjO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=KjxnaUoi; arc=none smtp.client-ip=209.85.161.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-67e00a230adso3188197eaf.3
-        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 17:05:27 -0700 (PDT)
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-67c20ed3076so2723674eaf.1
+        for <netdev@vger.kernel.org>; Mon, 30 Mar 2026 17:05:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1774915526; x=1775520326; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1774915530; x=1775520330; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kYhST0Zni1/WPU7XAD8zPZyDOWo96hNfSoSwdrUDc74=;
-        b=RyauqpxMABwKi1oURMjW/Xa9lC1oMj+wux6fNlFva2HJDKwhg9X6vTeF/ixf8Fmper
-         IYa0M5/z1ccMCX1679ce3YG9S6sXxRfzJrcNeN/ixx7sRr0XtlzqamQOhCa+ex1G2+uH
-         gnlr7zsr+tdr9dhZFl23CGGF6uaBdAdtqbCKHl8I9xpRMO2GTzRE9uYzWhmjoU6CNgTb
-         K4Odo86LhcvMdKdVujTp1hKx0UmASF9dHapkCTjG7beJE5UYYY0vbiNGsGtJKL35fXrj
-         l65dkFSyb9tsahpRi8eoUJGxX99DIwPkUkVMicJ96Ds+GXTZJWQnPTTRx+iuMAQU9UZc
-         wPMw==
+        bh=zhp80Q69OYuJ9ZZVd0saKnVE7KJTEpeYDcknvqihsw0=;
+        b=KjxnaUoio5kQTP2/xwOm6mi6EoshlHjqoiJa5cw1nWsZv16kFP9dwptKavNONoqE87
+         zed4TA9c5SkR2W9c/RHdwZW8zbH/1QYtIyUGxF+R5MOIlFGSFZ4RvxSvI0FSYJ5nTwEW
+         7Id0Ddm9Ng47P66irXdOrLNVXtrysubbZfV+ihawbMBRfmF2IH8xu7uAM0LNksW017WG
+         2cDudAAkby1lrp6S2X92UeBM4R4HE20plo6AB2pgCZSjXCxMUVJEhz4M20zmYET9BwCa
+         OxeaDh5BhcNtppfgMWyfQ3W+kYu+fc3o11reV8/4QeJYiv8E4xVLyrQ8S64ucJ9L44Mw
+         A/ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774915526; x=1775520326;
+        d=1e100.net; s=20251104; t=1774915530; x=1775520330;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=kYhST0Zni1/WPU7XAD8zPZyDOWo96hNfSoSwdrUDc74=;
-        b=WRrbrvs9+sjnpXebKEeUHQDMhIm1MIpAmD0np68tMaFpqdA3q1c4r+DDajy5B4dpAb
-         sXcHaRRs5TMZF//ux90VaZIXEZbYnAB7gy8Twi6c8ndkYnvBubEjUvDXybE/++1PX8WG
-         6SL6Ivpq8gOeyE9J85pZLpBtT52/3/GOMJ5mAdoLscw9Py/hDLLM2Wubi5OOqovJHh+Q
-         lpuCSGVr9qM1gmCXswFLd9Dk5PkHHNi7nGyRtDlcCNcxZrK3PHu13roLaZsamMPH+jKv
-         06Clbekd7zfQRTErxHNqNFp9QhJbb3j8zeYB6ceEDZNDTcD0fUNyr9F3dH/lOTPokMs8
-         kMqg==
-X-Gm-Message-State: AOJu0Ywx3enP72ZmEyeGCm+p5LCFi+DhCGa0UtbSJVCIXBg4+9VBABDF
-	z6IdapgK05X485xBeFyVqLLI8TfXBcd+x9N5gbjqXsB926jERY2DjdpNy32NLuDfG40EGXzgsZn
-	QfCRGQ5PaFlfu60TzCvk2skSECWw+Cff5T/5Z1Bup3Coj0NZwuH1FRvSumYL+H5lFRER+VWU69Q
-	ygxO4Y0zyE6Pyh+fUf2v7zA3iYwbHQwr9AYnJ0Wk9jjsuYqgM=
-X-Gm-Gg: ATEYQzxT65c1s5bmCv617DKvuq4uItTJuF4ooIXJVGpg+DLULGMY1nng9Oj1XeUB7To
-	Mt+59o3+V7j13X4sJC1mGanW8a8A7IJF92r8+X7uv3cneUne4ok90llHpikKdjIO87P/oAn8doP
-	Y1Jtwv7Tu39usg3lwnLjgI/ihn+6v0LVARo+4soazwUfuYGxHyzWMAiKIgVkVnsv6v+6PX+wFkw
-	Y9M82Ru4ZhG8PGN+QnivI03vzHMcikNc7olo5S/Di68A+1FemdFrJt1CRsTymLX88n/jydBTOyz
-	5OyrYPzrebCS3tb31rsUrw4S55sQlsdIrIOLDH5AuScFTFe5FuiGB1kticsaAcOf110gyOpeppy
-	tmT0o2xYFb64RIDoXsC7bZ3p9KOHNiD1b+XB9HBIdToalKHmKJVmfNpLohRmFJP2LNdiV9D+zBk
-	a0xQo++oloZ/E6EfKCpAXejua9fgsUvqSeVcEiJg5X1bHlh+UYO3GPmluxK1yOfYTBjKKdfjSoY
-	J0=
-X-Received: by 2002:a05:6820:1526:b0:67b:b40e:fc8c with SMTP id 006d021491bc7-67e1873257dmr7128545eaf.55.1774915525629;
-        Mon, 30 Mar 2026 17:05:25 -0700 (PDT)
+        bh=zhp80Q69OYuJ9ZZVd0saKnVE7KJTEpeYDcknvqihsw0=;
+        b=YIdfcDrdDf6OU3Z0me+XxsFzQ0aaejH5TRfxkc4NoE61gHXb0wzR57huzuUOkBv+Tv
+         B4p3OrRqAoDUgoe3Z2q7X/InCjeEuj+cxp5vVf65355dw7NjA2C/GfmpiwlqbjvjenAO
+         hwidMSq632h6VLRszMewK/94W2tjF15h/IcMwJGDEzHQQ5KMoJhH6heeISTvEdUGCO4U
+         fNwILXEOtv7n8T1pGdo8OSZNzb9wnbzlCyyoAZ0vvfiukoB8T0EmhadR//5DD8x3atT1
+         zetexvV4XVri5Ld/mvSLlgBIWwD62UAyijPD//dIuqvz9nUNmLFladod9+jn41TmEuXM
+         Jhpg==
+X-Gm-Message-State: AOJu0YwO7EZ+uUjWsItLc8CO7gocALH8O7fbxco78GjBOJOeKigZGJYy
+	a5xUBaWb108IZ1K4ySaV46GWxo02UXCxFoDG0PpViDuAbm111chjYgQiEmXkIOrGWZZzuM1ewyn
+	u+4iABtHlwkQEXNxlaFYFwoiFj+/e4bva7mqofNfLZQbxAN0bXUxN7uZ0VuB2RZJnZi0a3pmHC8
+	nikq7/fO9gu14K0wWEXKLNPvrhgkaswnmG9KctX+aLFj2kJ8U=
+X-Gm-Gg: ATEYQzwgfMH4Posvnuk8FhtWg2nDjQW+Xj5+7WOX1GOzIwSDLHI6mE1ehvjEqIbKHQT
+	rgPKL57sVHlAboqPb9ArgZMx1KpD79f65LnHEWa++tUrznL9UBXrVQNBUxuA+RJ0OY9EhfXhhKJ
+	KL2S8g91m7+vTEaVctcftLAlXkwBCJVKLXiDoJmMtcPgJRomDI3QEMh2mp9bqk1B8/VsayzfNNC
+	3vgkx9DcdQLB87c59EIbASYZ+pKl0bakJkI2USJ0K0Js7s7lXQ94gIosEYn8aMecvuIXL/zkAfc
+	33c+sN27hFzUd4VRkaEfI+3DGjiXhQPBh9YKUJeJSoItbVlewFgjTXiuooB/a+9zWN5Spg+1H3f
+	8KrBcYNOFSoTPBUXycCSJ1cFUfy9Pmx/lOpWaGDTKNKcBNbnTAlzQL5hCwZQXsOgjcZIHeAoNnO
+	w0OLUqlN8eNpR854KI8kdQOryQ1ePr7qLNHU9KQRH4f4gFWgMKKFQ5za4GjzZ/y6EgFN61HY/mi
+	aY=
+X-Received: by 2002:a05:6820:2082:b0:67d:e552:922e with SMTP id 006d021491bc7-67e187059bcmr7894767eaf.35.1774915529275;
+        Mon, 30 Mar 2026 17:05:29 -0700 (PDT)
 Received: from dev-rjethwani.tier4-kif-devvm.svc.slc-eng-prd2 ([208.88.159.128])
-        by smtp.googlemail.com with ESMTPSA id 006d021491bc7-67e231cb2e2sm5627807eaf.12.2026.03.30.17.05.24
+        by smtp.googlemail.com with ESMTPSA id 006d021491bc7-67e231cb2e2sm5627807eaf.12.2026.03.30.17.05.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 17:05:25 -0700 (PDT)
+        Mon, 30 Mar 2026 17:05:28 -0700 (PDT)
 From: Rishikesh Jethwani <rjethwani@purestorage.com>
 To: netdev@vger.kernel.org
 Cc: saeedm@nvidia.com,
@@ -92,9 +92,9 @@ Cc: saeedm@nvidia.com,
 	edumazet@google.com,
 	leon@kernel.org,
 	Rishikesh Jethwani <rjethwani@purestorage.com>
-Subject: [PATCH v10 5/6] tls: add hardware offload key update support
-Date: Mon, 30 Mar 2026 18:04:43 -0600
-Message-Id: <20260331000444.4103528-6-rjethwani@purestorage.com>
+Subject: [PATCH v10 6/6] selftests: net: add TLS hardware offload test
+Date: Mon, 30 Mar 2026 18:04:44 -0600
+Message-Id: <20260331000444.4103528-7-rjethwani@purestorage.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260331000444.4103528-1-rjethwani@purestorage.com>
 References: <20260331000444.4103528-1-rjethwani@purestorage.com>
@@ -111,7 +111,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[purestorage.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[purestorage.com:s=google2022];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -119,10 +119,10 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,queasysnail.net,davemloft.net,redhat.com,google.com,purestorage.com];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-273398-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273399-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[rjethwani@purestorage.com,netdev@vger.kernel.org];
@@ -133,1146 +133,1249 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,purestorage.com:dkim,purestorage.com:email,purestorage.com:mid]
-X-Rspamd-Queue-Id: 486453628E3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[purestorage.com:dkim,purestorage.com:email,purestorage.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tls_hw_offload.py:url,lib.py:url]
+X-Rspamd-Queue-Id: 6CF00362909
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-During a TLS 1.3 KeyUpdate the NIC key cannot be replaced immediately
-if previously encrypted HW records are awaiting ACK. start_rekey sets
-up a temporary SW context with the new key and redirects sendmsg through
-tls_sw_sendmsg_locked. When no records are pending, complete_rekey runs
-inline during setsockopt. Otherwise, clean_acked sets REKEY_READY once
-all old-key records are ACKed, and the next sendmsg calls complete_rekey.
-complete_rekey flushes remaining SW records, reinstalls HW offload at
-the current write_seq, and frees the temporary context.
-
-If another KeyUpdate arrives while a rekey is already pending,
-start_rekey just re-keys the existing SW AEAD in place.
-
-If complete_rekey fails (tls_dev_add or crypto_aead_setkey),
-we stay in SW mode (REKEY_FAILED) until a subsequent rekey
-succeeds, while maintaining TLS_HW configuration.
-
-Tested on Mellanox ConnectX-6 Dx (Crypto Enabled) with multiple
-TLS 1.3 key update cycles.
+Two-node kTLS hardware offload test using NetDrvEpEnv. Tests TLS
+1.2/1.3 with AES-GCM-128/256, rekey operations, and various buffer
+sizes.
 
 Signed-off-by: Rishikesh Jethwani <rjethwani@purestorage.com>
 ---
- include/net/tls.h             |  76 +++--
- include/uapi/linux/snmp.h     |   2 +
- net/tls/tls.h                 |  15 +-
- net/tls/tls_device.c          | 503 +++++++++++++++++++++++++++++-----
- net/tls/tls_device_fallback.c |  24 ++
- net/tls/tls_main.c            |  92 ++++---
- net/tls/tls_proc.c            |   2 +
- net/tls/tls_sw.c              |  30 +-
- 8 files changed, 604 insertions(+), 140 deletions(-)
+ .../selftests/drivers/net/hw/.gitignore       |   1 +
+ .../testing/selftests/drivers/net/hw/Makefile |   2 +
+ .../selftests/drivers/net/hw/tls_hw_offload.c | 902 ++++++++++++++++++
+ .../drivers/net/hw/tls_hw_offload.py          | 281 ++++++
+ 4 files changed, 1186 insertions(+)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/tls_hw_offload.c
+ create mode 100755 tools/testing/selftests/drivers/net/hw/tls_hw_offload.py
 
-diff --git a/include/net/tls.h b/include/net/tls.h
-index ebd2550280ae..f4c5579cd9b5 100644
---- a/include/net/tls.h
-+++ b/include/net/tls.h
-@@ -151,6 +151,22 @@ struct tls_record_info {
- 	skb_frag_t frags[MAX_SKB_FRAGS];
- };
+diff --git a/tools/testing/selftests/drivers/net/hw/.gitignore b/tools/testing/selftests/drivers/net/hw/.gitignore
+index 46540468a775..f0a5d15b469b 100644
+--- a/tools/testing/selftests/drivers/net/hw/.gitignore
++++ b/tools/testing/selftests/drivers/net/hw/.gitignore
+@@ -2,3 +2,4 @@
+ iou-zcrx
+ ncdevmem
+ toeplitz
++tls_hw_offload
+diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
+index a64140333a46..6b12b0920cae 100644
+--- a/tools/testing/selftests/drivers/net/hw/Makefile
++++ b/tools/testing/selftests/drivers/net/hw/Makefile
+@@ -15,6 +15,7 @@ endif
  
-+struct cipher_context {
-+	char iv[TLS_MAX_IV_SIZE + TLS_MAX_SALT_SIZE];
-+	char rec_seq[TLS_MAX_REC_SEQ_SIZE];
+ TEST_GEN_FILES := \
+ 	$(COND_GEN_FILES) \
++	tls_hw_offload \
+ # end of TEST_GEN_FILES
+ 
+ TEST_PROGS = \
+@@ -38,6 +39,7 @@ TEST_PROGS = \
+ 	rss_drv.py \
+ 	rss_flow_label.py \
+ 	rss_input_xfrm.py \
++	tls_hw_offload.py \
+ 	toeplitz.py \
+ 	tso.py \
+ 	xsk_reconfig.py \
+diff --git a/tools/testing/selftests/drivers/net/hw/tls_hw_offload.c b/tools/testing/selftests/drivers/net/hw/tls_hw_offload.c
+new file mode 100644
+index 000000000000..cf059368a801
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/hw/tls_hw_offload.c
+@@ -0,0 +1,902 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * TLS Hardware Offload Two-Node Test
++ *
++ * Tests kTLS hardware offload between two physical nodes using
++ * hardcoded keys. Supports TLS 1.2/1.3, AES-GCM-128/256, and rekey.
++ */
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <errno.h>
++#include <time.h>
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <netinet/in.h>
++#include <netinet/tcp.h>
++#include <arpa/inet.h>
++#include <net/if.h>
++#include <linux/tls.h>
++
++#define TLS_RECORD_TYPE_HANDSHAKE		22
++#define TLS_RECORD_TYPE_APPLICATION_DATA	23
++#define TLS_HANDSHAKE_KEY_UPDATE		0x18
++#define KEY_UPDATE_NOT_REQUESTED		0
++#define KEY_UPDATE_REQUESTED			1
++
++#define TEST_ITERATIONS	100
++#define MAX_REKEYS	99
++
++/* Initial key material */
++static struct tls12_crypto_info_aes_gcm_128 tls_info_key0_128 = {
++	.info = {
++		.version = TLS_1_3_VERSION,
++		.cipher_type = TLS_CIPHER_AES_GCM_128,
++	},
++	.iv = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 },
++	.key = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
++		 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10 },
++	.salt = { 0x01, 0x02, 0x03, 0x04 },
++	.rec_seq = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
 +};
 +
-+union tls_crypto_context {
-+	struct tls_crypto_info info;
-+	union {
-+		struct tls12_crypto_info_aes_gcm_128 aes_gcm_128;
-+		struct tls12_crypto_info_aes_gcm_256 aes_gcm_256;
-+		struct tls12_crypto_info_chacha20_poly1305 chacha20_poly1305;
-+		struct tls12_crypto_info_sm4_gcm sm4_gcm;
-+		struct tls12_crypto_info_sm4_ccm sm4_ccm;
-+	};
++static struct tls12_crypto_info_aes_gcm_256 tls_info_key0_256 = {
++	.info = {
++		.version = TLS_1_3_VERSION,
++		.cipher_type = TLS_CIPHER_AES_GCM_256,
++	},
++	.iv = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 },
++	.key = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
++		 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
++		 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
++		 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20 },
++	.salt = { 0x01, 0x02, 0x03, 0x04 },
++	.rec_seq = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
 +};
 +
- #define TLS_DRIVER_STATE_SIZE_TX	16
- struct tls_offload_context_tx {
- 	struct crypto_aead *aead_send;
-@@ -165,6 +181,11 @@ struct tls_offload_context_tx {
- 	void (*sk_destruct)(struct sock *sk);
- 	struct work_struct destruct_work;
- 	struct tls_context *ctx;
++static int do_rekey;
++static int num_rekeys = 1;
++static int rekeys_done;
++static int cipher_type = 128;
++static int tls_version = 13;
++static int server_port = 4433;
++static char *server_ip;
++static int addr_family = AF_INET;
 +
-+	struct tls_sw_context_tx rekey_sw;	/* SW context for new key */
-+	struct cipher_context rekey_tx;		/* IV, rec_seq for new key */
-+	union tls_crypto_context rekey_crypto_send; /* Crypto for new key */
++static int send_size = 16384;
++static int random_size_max;
 +
- 	/* The TLS layer reserves room for driver specific state
- 	 * Currently the belief is that there is not enough
- 	 * driver specific state to justify another layer of indirection
-@@ -189,22 +210,21 @@ enum tls_context_flags {
- 	 * tls_dev_del call in tls_device_down if it happens simultaneously.
- 	 */
- 	TLS_RX_DEV_CLOSED = 2,
--};
--
--struct cipher_context {
--	char iv[TLS_MAX_IV_SIZE + TLS_MAX_SALT_SIZE];
--	char rec_seq[TLS_MAX_REC_SEQ_SIZE];
--};
--
--union tls_crypto_context {
--	struct tls_crypto_info info;
--	union {
--		struct tls12_crypto_info_aes_gcm_128 aes_gcm_128;
--		struct tls12_crypto_info_aes_gcm_256 aes_gcm_256;
--		struct tls12_crypto_info_chacha20_poly1305 chacha20_poly1305;
--		struct tls12_crypto_info_sm4_gcm sm4_gcm;
--		struct tls12_crypto_info_sm4_ccm sm4_ccm;
--	};
-+	/* Flag for TX HW context deleted during failed rekey.
-+	 * Prevents double tls_dev_del in cleanup paths.
-+	 */
-+	TLS_TX_DEV_CLOSED = 3,
-+	/* TX rekey is pending, waiting for old-key data to be ACKed.
-+	 * While set, new data uses SW path with new key, HW keeps old key
-+	 * for retransmissions.
-+	 */
-+	TLS_TX_REKEY_PENDING = 4,
-+	/* All old-key data has been ACKed, ready to install new key in HW. */
-+	TLS_TX_REKEY_READY = 5,
-+	/* HW rekey failed, permanently stay in SW encrypt mode.
-+	 * Prevents tls_tcp_clean_acked from re-setting TLS_TX_REKEY_READY.
-+	 */
-+	TLS_TX_REKEY_FAILED = 6,
- };
- 
- struct tls_prot_info {
-@@ -253,6 +273,15 @@ struct tls_context {
- 			       */
- 	unsigned long flags;
- 
-+	/* TCP sequence number boundary for pending rekey.
-+	 * Packets with seq < this use old key, >= use new key.
-+	 */
-+	u32 rekey_boundary_seq;
-+
-+	/* Pointers to rekey contexts for SW encryption with new key */
-+	struct tls_sw_context_tx *rekey_sw_ctx;
-+	struct cipher_context *rekey_cipher_ctx;
-+
- 	/* cache cold stuff */
- 	struct proto *sk_proto;
- 	struct sock *sk;
-@@ -385,9 +414,21 @@ static inline struct tls_sw_context_rx *tls_sw_ctx_rx(
- static inline struct tls_sw_context_tx *tls_sw_ctx_tx(
- 		const struct tls_context *tls_ctx)
- {
-+	if (unlikely(tls_ctx->rekey_sw_ctx))
-+		return tls_ctx->rekey_sw_ctx;
-+
- 	return (struct tls_sw_context_tx *)tls_ctx->priv_ctx_tx;
- }
- 
-+static inline struct cipher_context *tls_tx_cipher_ctx(
-+		const struct tls_context *tls_ctx)
++static int detect_addr_family(const char *ip)
 +{
-+	if (unlikely(tls_ctx->rekey_cipher_ctx))
-+		return tls_ctx->rekey_cipher_ctx;
++	char addr_buf[INET6_ADDRSTRLEN];
++	struct in_addr addr4;
++	struct in6_addr addr6;
++	char *scope_sep;
 +
-+	return (struct cipher_context *)&tls_ctx->tx;
++	if (inet_pton(AF_INET, ip, &addr4) == 1)
++		return AF_INET;
++
++	strncpy(addr_buf, ip, sizeof(addr_buf) - 1);
++	addr_buf[sizeof(addr_buf) - 1] = '\0';
++	scope_sep = strchr(addr_buf, '%');
++	if (scope_sep)
++		*scope_sep = '\0';
++
++	if (inet_pton(AF_INET6, addr_buf, &addr6) == 1)
++		return AF_INET6;
++	return -1;
 +}
 +
- static inline struct tls_offload_context_tx *
- tls_offload_ctx_tx(const struct tls_context *tls_ctx)
- {
-@@ -500,6 +541,9 @@ struct sk_buff *tls_encrypt_skb(struct sk_buff *skb);
- #ifdef CONFIG_TLS_DEVICE
- void tls_device_sk_destruct(struct sock *sk);
- void tls_offload_tx_resync_request(struct sock *sk, u32 got_seq, u32 exp_seq);
-+struct sk_buff *
-+tls_validate_xmit_skb_rekey(struct sock *sk, struct net_device *dev,
-+			    struct sk_buff *skb);
- 
- static inline bool tls_is_sk_rx_device_offloaded(struct sock *sk)
- {
-diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
-index 49f5640092a0..39fa48821faa 100644
---- a/include/uapi/linux/snmp.h
-+++ b/include/uapi/linux/snmp.h
-@@ -369,6 +369,8 @@ enum
- 	LINUX_MIB_TLSTXREKEYOK,			/* TlsTxRekeyOk */
- 	LINUX_MIB_TLSTXREKEYERROR,		/* TlsTxRekeyError */
- 	LINUX_MIB_TLSRXREKEYRECEIVED,		/* TlsRxRekeyReceived */
-+	LINUX_MIB_TLSTXREKEYHWFAIL,             /* TlsTxRekeyHwFail */
-+	LINUX_MIB_TLSRXREKEYHWFAIL,		/* TlsRxRekeyHwFail */
- 	__LINUX_MIB_TLSMAX
- };
- 
-diff --git a/net/tls/tls.h b/net/tls/tls.h
-index 56eba13261d4..63f470308de0 100644
---- a/net/tls/tls.h
-+++ b/net/tls/tls.h
-@@ -157,6 +157,9 @@ void tls_update_rx_zc_capable(struct tls_context *tls_ctx);
- void tls_sw_strparser_arm(struct sock *sk, struct tls_context *ctx);
- void tls_sw_strparser_done(struct tls_context *tls_ctx);
- int tls_sw_sendmsg(struct sock *sk, struct msghdr *msg, size_t size);
-+int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size);
-+void tls_tx_work_handler(struct work_struct *work);
-+void tls_sw_ctx_tx_init(struct sock *sk, struct tls_sw_context_tx *sw_ctx);
- void tls_sw_splice_eof(struct socket *sock);
- void tls_sw_cancel_work_tx(struct tls_context *tls_ctx);
- void tls_sw_release_resources_tx(struct sock *sk);
-@@ -176,6 +179,7 @@ int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
- int tls_device_sendmsg(struct sock *sk, struct msghdr *msg, size_t size);
- void tls_device_splice_eof(struct socket *sock);
- int tls_tx_records(struct sock *sk, int flags);
-+int tls_encrypt_async_wait(struct tls_sw_context_tx *ctx);
- 
- void tls_sw_write_space(struct sock *sk, struct tls_context *ctx);
- void tls_device_write_space(struct sock *sk, struct tls_context *ctx);
-@@ -233,9 +237,11 @@ static inline bool tls_strp_msg_mixed_decrypted(struct tls_sw_context_rx *ctx)
- #ifdef CONFIG_TLS_DEVICE
- int tls_device_init(void);
- void tls_device_cleanup(void);
--int tls_set_device_offload(struct sock *sk);
-+int tls_set_device_offload(struct sock *sk,
-+			   struct tls_crypto_info *crypto_info);
- void tls_device_free_resources_tx(struct sock *sk);
--int tls_set_device_offload_rx(struct sock *sk, struct tls_context *ctx);
-+int tls_set_device_offload_rx(struct sock *sk, struct tls_context *ctx,
-+			      struct tls_crypto_info *crypto_info);
- void tls_device_offload_cleanup_rx(struct sock *sk);
- void tls_device_rx_resync_new_rec(struct sock *sk, u32 rcd_len, u32 seq);
- int tls_device_decrypted(struct sock *sk, struct tls_context *tls_ctx);
-@@ -244,7 +250,7 @@ static inline int tls_device_init(void) { return 0; }
- static inline void tls_device_cleanup(void) {}
- 
- static inline int
--tls_set_device_offload(struct sock *sk)
-+tls_set_device_offload(struct sock *sk, struct tls_crypto_info *crypto_info)
- {
- 	return -EOPNOTSUPP;
- }
-@@ -252,7 +258,8 @@ tls_set_device_offload(struct sock *sk)
- static inline void tls_device_free_resources_tx(struct sock *sk) {}
- 
- static inline int
--tls_set_device_offload_rx(struct sock *sk, struct tls_context *ctx)
-+tls_set_device_offload_rx(struct sock *sk, struct tls_context *ctx,
-+			  struct tls_crypto_info *crypto_info)
- {
- 	return -EOPNOTSUPP;
- }
-diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-index cd26873e9063..50266fbbf5a2 100644
---- a/net/tls/tls_device.c
-+++ b/net/tls/tls_device.c
-@@ -79,7 +79,9 @@ static void tls_device_tx_del_task(struct work_struct *work)
- 	netdev = rcu_dereference_protected(ctx->netdev,
- 					   !refcount_read(&ctx->refcount));
- 
--	netdev->tlsdev_ops->tls_dev_del(netdev, ctx, TLS_OFFLOAD_CTX_DIR_TX);
-+	if (!test_bit(TLS_TX_DEV_CLOSED, &ctx->flags))
-+		netdev->tlsdev_ops->tls_dev_del(netdev, ctx,
-+						TLS_OFFLOAD_CTX_DIR_TX);
- 	dev_put(netdev);
- 	ctx->netdev = NULL;
- 	tls_device_free_ctx(ctx);
-@@ -159,6 +161,249 @@ static void delete_all_records(struct tls_offload_context_tx *offload_ctx)
- 	offload_ctx->retransmit_hint = NULL;
- }
- 
-+static bool tls_has_unacked_records(struct tls_offload_context_tx *offload_ctx)
++/* Derive key for given generation (0 = initial, N = Nth rekey) */
++static void derive_key_128(struct tls12_crypto_info_aes_gcm_128 *key,
++			   int generation)
 +{
-+	struct tls_record_info *info;
-+	bool has_unacked = false;
-+	unsigned long flags;
++	unsigned char pattern;
++	int i;
 +
-+	spin_lock_irqsave(&offload_ctx->lock, flags);
-+	list_for_each_entry(info, &offload_ctx->records_list, list) {
-+		if (!tls_record_is_start_marker(info)) {
-+			has_unacked = true;
-+			break;
-+		}
++	memcpy(key, &tls_info_key0_128, sizeof(*key));
++	key->info.version = (tls_version == 12) ?
++			    TLS_1_2_VERSION : TLS_1_3_VERSION;
++
++	if (generation == 0)
++		return;
++
++	pattern = (unsigned char)((generation * 0x1B) ^ 0x63);
++	for (i = 0; i < TLS_CIPHER_AES_GCM_128_KEY_SIZE; i++) {
++		key->key[i] ^= pattern;
++		pattern = (pattern << 1) | (pattern >> 7);
 +	}
-+	spin_unlock_irqrestore(&offload_ctx->lock, flags);
 +
-+	return has_unacked;
++	pattern = (unsigned char)((generation * 0x2D) ^ 0x7C);
++	for (i = 0; i < TLS_CIPHER_AES_GCM_128_IV_SIZE; i++) {
++		key->iv[i] ^= pattern;
++		pattern = (pattern << 1) | (pattern >> 7);
++	}
++
++	for (i = 0; i < TLS_CIPHER_AES_GCM_128_SALT_SIZE; i++)
++		key->salt[i] ^= (unsigned char)(generation & 0xFF);
++
++	memset(key->rec_seq, 0, TLS_CIPHER_AES_GCM_128_REC_SEQ_SIZE);
 +}
 +
-+static int tls_device_init_rekey_sw(struct sock *sk,
-+				    struct tls_context *ctx,
-+				    struct tls_offload_context_tx *offload_ctx,
-+				    struct tls_crypto_info *new_crypto_info)
++static void derive_key_256(struct tls12_crypto_info_aes_gcm_256 *key,
++			   int generation)
 +{
-+	struct tls_sw_context_tx *sw_ctx = &offload_ctx->rekey_sw;
-+	const struct tls_cipher_desc *cipher_desc;
-+	char *key;
-+	int rc;
++	unsigned char pattern;
++	int i;
 +
-+	cipher_desc = get_cipher_desc(new_crypto_info->cipher_type);
-+	DEBUG_NET_WARN_ON_ONCE(!cipher_desc || !cipher_desc->offloadable);
++	memcpy(key, &tls_info_key0_256, sizeof(*key));
++	key->info.version = (tls_version == 12) ?
++			    TLS_1_2_VERSION : TLS_1_3_VERSION;
 +
-+	memset(sw_ctx, 0, sizeof(*sw_ctx));
-+	tls_sw_ctx_tx_init(sk, sw_ctx);
++	if (generation == 0)
++		return;
 +
-+	sw_ctx->aead_send = crypto_alloc_aead(cipher_desc->cipher_name, 0, 0);
-+	if (IS_ERR(sw_ctx->aead_send)) {
-+		rc = PTR_ERR(sw_ctx->aead_send);
-+		sw_ctx->aead_send = NULL;
-+		return rc;
++	pattern = (unsigned char)((generation * 0x1B) ^ 0x63);
++	for (i = 0; i < TLS_CIPHER_AES_GCM_256_KEY_SIZE; i++) {
++		key->key[i] ^= pattern;
++		pattern = (pattern << 1) | (pattern >> 7);
 +	}
 +
-+	key = crypto_info_key(new_crypto_info, cipher_desc);
-+	rc = crypto_aead_setkey(sw_ctx->aead_send, key, cipher_desc->key);
-+	if (rc)
-+		goto free_aead;
++	pattern = (unsigned char)((generation * 0x2D) ^ 0x7C);
++	for (i = 0; i < TLS_CIPHER_AES_GCM_256_IV_SIZE; i++) {
++		key->iv[i] ^= pattern;
++		pattern = (pattern << 1) | (pattern >> 7);
++	}
 +
-+	rc = crypto_aead_setauthsize(sw_ctx->aead_send, cipher_desc->tag);
-+	if (rc)
-+		goto free_aead;
++	for (i = 0; i < TLS_CIPHER_AES_GCM_256_SALT_SIZE; i++)
++		key->salt[i] ^= (unsigned char)(generation & 0xFF);
 +
++	memset(key->rec_seq, 0, TLS_CIPHER_AES_GCM_256_REC_SEQ_SIZE);
++}
++
++static const char *cipher_name(int cipher)
++{
++	switch (cipher) {
++	case 128: return "AES-GCM-128";
++	case 256: return "AES-GCM-256";
++	default: return "unknown";
++	}
++}
++
++static const char *version_name(int version)
++{
++	switch (version) {
++	case 12: return "TLS 1.2";
++	case 13: return "TLS 1.3";
++	default: return "unknown";
++	}
++}
++
++static int setup_tls_ulp(int fd)
++{
++	int ret;
++
++	ret = setsockopt(fd, IPPROTO_TCP, TCP_ULP, "tls", sizeof("tls"));
++	if (ret < 0) {
++		printf("TCP_ULP failed: %s\n", strerror(errno));
++		return -1;
++	}
 +	return 0;
-+
-+free_aead:
-+	crypto_free_aead(sw_ctx->aead_send);
-+	sw_ctx->aead_send = NULL;
-+	return rc;
 +}
 +
-+static int tls_device_start_rekey(struct sock *sk,
-+				  struct tls_context *ctx,
-+				  struct tls_offload_context_tx *offload_ctx,
-+				  struct tls_crypto_info *new_crypto_info)
++static int setup_tls_key(int fd, int is_tx, int generation, int cipher)
 +{
-+	bool rekey_pending = test_bit(TLS_TX_REKEY_PENDING, &ctx->flags);
-+	bool rekey_failed = test_bit(TLS_TX_REKEY_FAILED, &ctx->flags);
-+	const struct tls_cipher_desc *cipher_desc;
-+	char *key, *iv, *rec_seq, *salt;
-+	int rc;
++	int ret;
 +
-+	cipher_desc = get_cipher_desc(new_crypto_info->cipher_type);
-+	DEBUG_NET_WARN_ON_ONCE(!cipher_desc || !cipher_desc->offloadable);
++	if (cipher == 256) {
++		struct tls12_crypto_info_aes_gcm_256 key;
 +
-+	key = crypto_info_key(new_crypto_info, cipher_desc);
-+	iv = crypto_info_iv(new_crypto_info, cipher_desc);
-+	rec_seq = crypto_info_rec_seq(new_crypto_info, cipher_desc);
-+	salt = crypto_info_salt(new_crypto_info, cipher_desc);
-+
-+	if (rekey_pending || rekey_failed) {
-+		rc = crypto_aead_setkey(offload_ctx->rekey_sw.aead_send,
-+					key, cipher_desc->key);
-+		if (rc)
-+			return rc;
-+
-+		memcpy(offload_ctx->rekey_tx.iv, salt, cipher_desc->salt);
-+		memcpy(offload_ctx->rekey_tx.iv + cipher_desc->salt, iv,
-+		       cipher_desc->iv);
-+		memcpy(offload_ctx->rekey_tx.rec_seq, rec_seq,
-+		       cipher_desc->rec_seq);
-+
-+		if (rekey_failed) {
-+			set_bit(TLS_TX_REKEY_PENDING, &ctx->flags);
-+			clear_bit(TLS_TX_REKEY_FAILED, &ctx->flags);
-+		}
++		derive_key_256(&key, generation);
++		ret = setsockopt(fd, SOL_TLS, is_tx ? TLS_TX : TLS_RX,
++				 &key, sizeof(key));
 +	} else {
-+		rc = tls_device_init_rekey_sw(sk, ctx, offload_ctx,
-+					      new_crypto_info);
-+		if (rc)
-+			return rc;
++		struct tls12_crypto_info_aes_gcm_128 key;
 +
-+		memcpy(offload_ctx->rekey_tx.iv, salt, cipher_desc->salt);
-+		memcpy(offload_ctx->rekey_tx.iv + cipher_desc->salt, iv,
-+		       cipher_desc->iv);
-+		memcpy(offload_ctx->rekey_tx.rec_seq, rec_seq,
-+		       cipher_desc->rec_seq);
-+
-+		WRITE_ONCE(ctx->rekey_boundary_seq, tcp_sk(sk)->write_seq);
-+
-+		ctx->rekey_sw_ctx = &offload_ctx->rekey_sw;
-+		ctx->rekey_cipher_ctx = &offload_ctx->rekey_tx;
-+
-+		set_bit(TLS_TX_REKEY_PENDING, &ctx->flags);
-+
-+		/* Switch to rekey validator; new sends won't use HW offload */
-+		smp_store_release(&sk->sk_validate_xmit_skb,
-+				  tls_validate_xmit_skb_rekey);
++		derive_key_128(&key, generation);
++		ret = setsockopt(fd, SOL_TLS, is_tx ? TLS_TX : TLS_RX,
++				 &key, sizeof(key));
 +	}
 +
-+	unsafe_memcpy(&offload_ctx->rekey_crypto_send.info, new_crypto_info,
-+		      cipher_desc->crypto_info,
-+		      /* checked in do_tls_setsockopt_conf */);
-+	memzero_explicit(new_crypto_info, cipher_desc->crypto_info);
++	if (ret < 0) {
++		printf("TLS_%s %s (gen %d) failed: %s\n",
++		       is_tx ? "TX" : "RX", cipher_name(cipher),
++		       generation, strerror(errno));
++		return -1;
++	}
 +
++	printf("TLS_%s %s gen %d installed\n",
++	       is_tx ? "TX" : "RX", cipher_name(cipher), generation);
 +	return 0;
 +}
 +
-+static int tls_device_complete_rekey(struct sock *sk, struct tls_context *ctx)
++/* Send TLS 1.3 KeyUpdate handshake message */
++static int send_tls_key_update(int fd, int request_update)
 +{
-+	struct tls_offload_context_tx *offload_ctx = tls_offload_ctx_tx(ctx);
-+	struct tls_record_info *start_marker_record;
-+	const struct tls_cipher_desc *cipher_desc;
-+	struct net_device *netdev;
-+	unsigned long flags;
-+	__be64 rcd_sn;
-+	char *key;
-+	int rc;
++	char cmsg_buf[CMSG_SPACE(sizeof(unsigned char))];
++	unsigned char key_update_msg[5];
++	struct msghdr msg = {0};
++	struct cmsghdr *cmsg;
++	struct iovec iov;
 +
-+	cipher_desc = get_cipher_desc(offload_ctx->rekey_crypto_send.info.cipher_type);
-+	DEBUG_NET_WARN_ON_ONCE(!cipher_desc || !cipher_desc->offloadable);
++	key_update_msg[0] = TLS_HANDSHAKE_KEY_UPDATE;
++	key_update_msg[1] = 0;
++	key_update_msg[2] = 0;
++	key_update_msg[3] = 1;
++	key_update_msg[4] = request_update ? KEY_UPDATE_REQUESTED
++					   : KEY_UPDATE_NOT_REQUESTED;
 +
-+	/* Flush SW-encrypted records into TCP before switching to HW.
-+	 * Wait for async crypto first, then push ready records.  If
-+	 * the send buffer is full, bail out and retry next sendmsg.
-+	 */
-+	tls_encrypt_async_wait(tls_sw_ctx_tx(ctx));
-+	rc = tls_tx_records(sk, -1);
-+	if (rc < 0 || tls_is_partially_sent_record(ctx))
-+		return rc < 0 ? rc : -EAGAIN;
++	iov.iov_base = key_update_msg;
++	iov.iov_len = sizeof(key_update_msg);
 +
-+	start_marker_record = kmalloc_obj(*start_marker_record);
-+	if (!start_marker_record)
-+		return -ENOMEM;
++	msg.msg_iov = &iov;
++	msg.msg_iovlen = 1;
++	msg.msg_control = cmsg_buf;
++	msg.msg_controllen = sizeof(cmsg_buf);
 +
-+	down_read(&device_offload_lock);
++	cmsg = CMSG_FIRSTHDR(&msg);
++	cmsg->cmsg_level = SOL_TLS;
++	cmsg->cmsg_type = TLS_SET_RECORD_TYPE;
++	cmsg->cmsg_len = CMSG_LEN(sizeof(unsigned char));
++	*CMSG_DATA(cmsg) = TLS_RECORD_TYPE_HANDSHAKE;
++	msg.msg_controllen = cmsg->cmsg_len;
 +
-+	netdev = rcu_dereference_protected(ctx->netdev,
-+					   lockdep_is_held(&device_offload_lock));
-+	if (!netdev) {
-+		rc = -ENODEV;
-+		goto release_lock;
++	if (sendmsg(fd, &msg, 0) < 0) {
++		printf("sendmsg KeyUpdate failed: %s\n", strerror(errno));
++		return -1;
 +	}
 +
-+	if (!test_bit(TLS_TX_DEV_CLOSED, &ctx->flags)) {
-+		netdev->tlsdev_ops->tls_dev_del(netdev, ctx,
-+						TLS_OFFLOAD_CTX_DIR_TX);
-+		set_bit(TLS_TX_DEV_CLOSED, &ctx->flags);
-+	}
-+
-+	memcpy(crypto_info_rec_seq(&offload_ctx->rekey_crypto_send.info, cipher_desc),
-+	       offload_ctx->rekey_tx.rec_seq, cipher_desc->rec_seq);
-+
-+	rc = netdev->tlsdev_ops->tls_dev_add(netdev, sk, TLS_OFFLOAD_CTX_DIR_TX,
-+					     &offload_ctx->rekey_crypto_send.info,
-+					     tcp_sk(sk)->write_seq);
-+
-+release_lock:
-+	up_read(&device_offload_lock);
-+
-+	spin_lock_irqsave(&offload_ctx->lock, flags);
-+	memcpy(&rcd_sn, offload_ctx->rekey_tx.rec_seq, sizeof(rcd_sn));
-+	offload_ctx->unacked_record_sn = be64_to_cpu(rcd_sn) - 1;
-+	spin_unlock_irqrestore(&offload_ctx->lock, flags);
-+
-+	memcpy(ctx->tx.iv, offload_ctx->rekey_tx.iv,
-+	       cipher_desc->salt + cipher_desc->iv);
-+	memcpy(ctx->tx.rec_seq, offload_ctx->rekey_tx.rec_seq,
-+	       cipher_desc->rec_seq);
-+	unsafe_memcpy(&ctx->crypto_send.info,
-+		      &offload_ctx->rekey_crypto_send.info,
-+		      cipher_desc->crypto_info,
-+		      /* checked during rekey setup */);
-+
-+	if (rc)
-+		goto rekey_fail;
-+
-+	clear_bit(TLS_TX_DEV_CLOSED, &ctx->flags);
-+
-+	key = crypto_info_key(&offload_ctx->rekey_crypto_send.info, cipher_desc);
-+	rc = crypto_aead_setkey(offload_ctx->aead_send, key, cipher_desc->key);
-+	if (rc)
-+		goto rekey_fail;
-+
-+	/* Start marker: the NIC passes through everything before
-+	 * write_seq unencrypted (already SW-encrypted during rekey),
-+	 * same as during initial offload setup.
-+	 */
-+	spin_lock_irqsave(&offload_ctx->lock, flags);
-+	start_marker_record->end_seq = tcp_sk(sk)->write_seq;
-+	start_marker_record->len = 0;
-+	start_marker_record->num_frags = 0;
-+	list_add_tail_rcu(&start_marker_record->list,
-+			  &offload_ctx->records_list);
-+	spin_unlock_irqrestore(&offload_ctx->lock, flags);
-+
-+	/* Prevent a partial record straddling the SW/HW boundary. */
-+	tcp_write_collapse_fence(sk);
-+
-+	/* PENDING before READY: prevents clean_acked from
-+	 * re-setting REKEY_READY after we clear it.
-+	 */
-+	clear_bit(TLS_TX_REKEY_PENDING, &ctx->flags);
-+	smp_mb__after_atomic();
-+	clear_bit(TLS_TX_REKEY_READY, &ctx->flags);
-+	clear_bit(TLS_TX_REKEY_FAILED, &ctx->flags);
-+
-+	/* Switch back to HW offload validator */
-+	smp_store_release(&sk->sk_validate_xmit_skb, tls_validate_xmit_skb);
-+
-+	crypto_free_aead(tls_sw_ctx_tx(ctx)->aead_send);
-+	ctx->rekey_sw_ctx = NULL;
-+	ctx->rekey_cipher_ctx = NULL;
-+
-+	return 0;
-+
-+rekey_fail:
-+	kfree(start_marker_record);
-+	set_bit(TLS_TX_REKEY_FAILED, &ctx->flags);
-+	clear_bit(TLS_TX_REKEY_READY, &ctx->flags);
-+	clear_bit(TLS_TX_REKEY_PENDING, &ctx->flags);
-+	TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSTXREKEYHWFAIL);
-+
++	printf("Sent TLS KeyUpdate handshake message\n");
 +	return 0;
 +}
 +
- static void tls_tcp_clean_acked(struct sock *sk, u32 acked_seq)
- {
- 	struct tls_context *tls_ctx = tls_get_ctx(sk);
-@@ -187,6 +432,19 @@ static void tls_tcp_clean_acked(struct sock *sk, u32 acked_seq)
- 	}
- 
- 	ctx->unacked_record_sn += deleted_records;
++static int recv_tls_message(int fd, char *buf, size_t buflen, int *record_type)
++{
++	char cmsg_buf[CMSG_SPACE(sizeof(unsigned char))];
++	struct msghdr msg = {0};
++	struct cmsghdr *cmsg;
++	struct iovec iov;
++	int ret;
 +
-+	/* Once all old-key HW records are ACKed, set REKEY_READY to
-+	 * let sendmsg know it can finish the rekey and switch back
-+	 * to HW offload.
-+	 */
-+	if (test_bit(TLS_TX_REKEY_PENDING, &tls_ctx->flags) &&
-+	    !test_bit(TLS_TX_REKEY_FAILED, &tls_ctx->flags)) {
-+		u32 boundary_seq = READ_ONCE(tls_ctx->rekey_boundary_seq);
++	iov.iov_base = buf;
++	iov.iov_len = buflen;
 +
-+		if (!before(acked_seq, boundary_seq))
-+			set_bit(TLS_TX_REKEY_READY, &tls_ctx->flags);
++	msg.msg_iov = &iov;
++	msg.msg_iovlen = 1;
++	msg.msg_control = cmsg_buf;
++	msg.msg_controllen = sizeof(cmsg_buf);
++
++	ret = recvmsg(fd, &msg, 0);
++	if (ret <= 0)
++		return ret;
++
++	*record_type = TLS_RECORD_TYPE_APPLICATION_DATA;  /* default */
++
++	cmsg = CMSG_FIRSTHDR(&msg);
++	if (cmsg && cmsg->cmsg_level == SOL_TLS &&
++	    cmsg->cmsg_type == TLS_GET_RECORD_TYPE)
++		*record_type = *((unsigned char *)CMSG_DATA(cmsg));
++
++	return ret;
++}
++
++static int recv_tls_keyupdate(int fd)
++{
++	int record_type;
++	char buf[16];
++	int ret;
++
++	ret = recv_tls_message(fd, buf, sizeof(buf), &record_type);
++	if (ret < 0) {
++		printf("recv_tls_message failed: %s\n", strerror(errno));
++		return -1;
 +	}
 +
- 	spin_unlock_irqrestore(&ctx->lock, flags);
- }
- 
-@@ -218,6 +476,9 @@ void tls_device_free_resources_tx(struct sock *sk)
- 	struct tls_context *tls_ctx = tls_get_ctx(sk);
- 
- 	tls_free_partial_record(sk, tls_ctx);
++	if (record_type != TLS_RECORD_TYPE_HANDSHAKE) {
++		printf("Expected handshake record (0x%02x), got 0x%02x\n",
++		       TLS_RECORD_TYPE_HANDSHAKE, record_type);
++		return -1;
++	}
 +
-+	if (unlikely(tls_ctx->rekey_sw_ctx))
-+		tls_sw_release_resources_tx(sk);
- }
- 
- void tls_offload_tx_resync_request(struct sock *sk, u32 got_seq, u32 exp_seq)
-@@ -589,6 +850,19 @@ int tls_device_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
- 			goto out;
- 	}
- 
-+	/* Old-key records all ACKed; switch back to HW. */
-+	if (test_bit(TLS_TX_REKEY_READY, &tls_ctx->flags))
-+		tls_device_complete_rekey(sk, tls_ctx);
++	if (ret >= 1 && buf[0] == TLS_HANDSHAKE_KEY_UPDATE) {
++		printf("Received TLS KeyUpdate handshake (%d bytes)\n", ret);
++		return 0;
++	}
 +
-+	/* Use SW path if rekey is in progress (PENDING) or if HW rekey
-+	 * failed (FAILED).
-+	 */
-+	if (test_bit(TLS_TX_REKEY_PENDING, &tls_ctx->flags) ||
-+	    test_bit(TLS_TX_REKEY_FAILED, &tls_ctx->flags)) {
-+		rc = tls_sw_sendmsg_locked(sk, msg, size);
++	printf("Expected KeyUpdate (0x%02x), got 0x%02x\n",
++	       TLS_HANDSHAKE_KEY_UPDATE, (unsigned char)buf[0]);
++	return -1;
++}
++
++static void check_ekeyexpired(int fd)
++{
++	char buf[16];
++	int ret;
++
++	ret = recv(fd, buf, sizeof(buf), MSG_DONTWAIT);
++	if (ret == -1 && errno == EKEYEXPIRED)
++		printf("recv() returned EKEYEXPIRED as expected\n");
++	else if (ret == -1 && errno == EAGAIN)
++		printf("recv() returned EAGAIN (no pending data)\n");
++	else if (ret == -1)
++		printf("recv() returned error: %s\n", strerror(errno));
++}
++
++static int do_tls_rekey(int fd, int is_tx, int generation, int cipher)
++{
++	int ret;
++
++	printf("Performing TLS_%s %s rekey to generation %d...\n",
++	       is_tx ? "TX" : "RX", cipher_name(cipher), generation);
++
++	if (cipher == 256) {
++		struct tls12_crypto_info_aes_gcm_256 key;
++
++		derive_key_256(&key, generation);
++		ret = setsockopt(fd, SOL_TLS, is_tx ? TLS_TX : TLS_RX,
++				 &key, sizeof(key));
++	} else {
++		struct tls12_crypto_info_aes_gcm_128 key;
++
++		derive_key_128(&key, generation);
++		ret = setsockopt(fd, SOL_TLS, is_tx ? TLS_TX : TLS_RX,
++				 &key, sizeof(key));
++	}
++
++	if (ret < 0) {
++		printf("TLS_%s %s rekey failed: %s\n", is_tx ? "TX" : "RX",
++		       cipher_name(cipher), strerror(errno));
++		return -1;
++	}
++	printf("TLS_%s %s rekey to gen %d successful!\n",
++	       is_tx ? "TX" : "RX", cipher_name(cipher), generation);
++	return 0;
++}
++
++static int do_client(void)
++{
++	struct sockaddr_storage sa;
++	char *buf = NULL, *echo_buf = NULL;
++	int max_size, rekey_interval;
++	ssize_t echo_total, echo_n;
++	int csk = -1, ret, i, j;
++	int test_result = 0;
++	int current_gen = 0;
++	int next_rekey_at;
++	socklen_t sa_len;
++	ssize_t n;
++
++	if (!server_ip) {
++		printf("ERROR: Client requires -s <ip> option\n");
++		return -1;
++	}
++
++	max_size = random_size_max > 0 ? random_size_max : send_size;
++	buf = malloc(max_size);
++	echo_buf = malloc(max_size);
++	if (!buf || !echo_buf) {
++		printf("failed to allocate buffers\n");
++		test_result = -1;
 +		goto out;
 +	}
 +
- 	rc = tls_push_data(sk, &msg->msg_iter, size, msg->msg_flags,
- 			   record_type);
- 
-@@ -1068,57 +1342,31 @@ static struct tls_offload_context_tx *alloc_offload_ctx_tx(struct tls_context *c
- 	return offload_ctx;
- }
- 
--int tls_set_device_offload(struct sock *sk)
-+static int tls_set_device_offload_initial(struct sock *sk,
-+					  struct tls_context *ctx,
-+					  struct net_device *netdev,
-+					  struct tls_crypto_info *crypto_info,
-+					  const struct tls_cipher_desc *cipher_desc)
- {
-+	struct tls_prot_info *prot = &ctx->prot_info;
- 	struct tls_record_info *start_marker_record;
- 	struct tls_offload_context_tx *offload_ctx;
--	const struct tls_cipher_desc *cipher_desc;
--	struct tls_crypto_info *crypto_info;
--	struct tls_prot_info *prot;
--	struct net_device *netdev;
--	struct tls_context *ctx;
- 	char *iv, *rec_seq;
- 	int rc;
- 
--	ctx = tls_get_ctx(sk);
--	prot = &ctx->prot_info;
--
--	if (ctx->priv_ctx_tx)
--		return -EEXIST;
--
--	netdev = get_netdev_for_sock(sk);
--	if (!netdev) {
--		pr_err_ratelimited("%s: netdev not found\n", __func__);
--		return -EINVAL;
--	}
--
--	if (!(netdev->features & NETIF_F_HW_TLS_TX)) {
--		rc = -EOPNOTSUPP;
--		goto release_netdev;
--	}
--
--	crypto_info = &ctx->crypto_send.info;
--	cipher_desc = get_cipher_desc(crypto_info->cipher_type);
--	if (!cipher_desc || !cipher_desc->offloadable) {
--		rc = -EINVAL;
--		goto release_netdev;
--	}
-+	iv = crypto_info_iv(crypto_info, cipher_desc);
-+	rec_seq = crypto_info_rec_seq(crypto_info, cipher_desc);
- 
- 	rc = init_prot_info(prot, crypto_info, cipher_desc);
- 	if (rc)
--		goto release_netdev;
--
--	iv = crypto_info_iv(crypto_info, cipher_desc);
--	rec_seq = crypto_info_rec_seq(crypto_info, cipher_desc);
-+		return rc;
- 
- 	memcpy(ctx->tx.iv + cipher_desc->salt, iv, cipher_desc->iv);
- 	memcpy(ctx->tx.rec_seq, rec_seq, cipher_desc->rec_seq);
- 
- 	start_marker_record = kmalloc_obj(*start_marker_record);
--	if (!start_marker_record) {
--		rc = -ENOMEM;
--		goto release_netdev;
--	}
-+	if (!start_marker_record)
-+		return -ENOMEM;
- 
- 	offload_ctx = alloc_offload_ctx_tx(ctx);
- 	if (!offload_ctx) {
-@@ -1159,8 +1407,10 @@ int tls_set_device_offload(struct sock *sk)
- 	}
- 
- 	ctx->priv_ctx_tx = offload_ctx;
--	rc = netdev->tlsdev_ops->tls_dev_add(netdev, sk, TLS_OFFLOAD_CTX_DIR_TX,
--					     &ctx->crypto_send.info,
-+
-+	rc = netdev->tlsdev_ops->tls_dev_add(netdev, sk,
-+					     TLS_OFFLOAD_CTX_DIR_TX,
-+					     crypto_info,
- 					     tcp_sk(sk)->write_seq);
- 	trace_tls_device_offload_set(sk, TLS_OFFLOAD_CTX_DIR_TX,
- 				     tcp_sk(sk)->write_seq, rec_seq, rc);
-@@ -1175,7 +1425,6 @@ int tls_set_device_offload(struct sock *sk)
- 	 * by the netdev's xmit function.
- 	 */
- 	smp_store_release(&sk->sk_validate_xmit_skb, tls_validate_xmit_skb);
--	dev_put(netdev);
- 
- 	return 0;
- 
-@@ -1188,18 +1437,111 @@ int tls_set_device_offload(struct sock *sk)
- 	ctx->priv_ctx_tx = NULL;
- free_marker_record:
- 	kfree(start_marker_record);
-+	return rc;
-+}
-+
-+static int tls_set_device_offload_rekey(struct sock *sk,
-+					struct tls_context *ctx,
-+					struct net_device *netdev,
-+					struct tls_crypto_info *new_crypto_info)
-+{
-+	struct tls_offload_context_tx *offload_ctx = tls_offload_ctx_tx(ctx);
-+	bool rekey_pending = test_bit(TLS_TX_REKEY_PENDING, &ctx->flags);
-+	bool has_unacked = false;
-+	int rc;
-+
-+	if (!rekey_pending)
-+		has_unacked = tls_has_unacked_records(offload_ctx);
-+
-+	down_read(&device_offload_lock);
-+
-+	rc = tls_device_start_rekey(sk, ctx, offload_ctx, new_crypto_info);
-+	if (rc) {
-+		up_read(&device_offload_lock);
-+		return rc;
++	csk = socket(addr_family, SOCK_STREAM, IPPROTO_TCP);
++	if (csk < 0) {
++		printf("failed to create socket: %s\n", strerror(errno));
++		test_result = -1;
++		goto out;
 +	}
 +
-+	up_read(&device_offload_lock);
++	memset(&sa, 0, sizeof(sa));
++	if (addr_family == AF_INET6) {
++		struct sockaddr_in6 *sa6 = (struct sockaddr_in6 *)&sa;
++		char addr_buf[INET6_ADDRSTRLEN];
++		unsigned int scope_id = 0;
++		char *scope_sep;
 +
-+	if (!rekey_pending && !has_unacked)
-+		rc = tls_device_complete_rekey(sk, ctx);
-+
-+	return rc;
-+}
-+
-+int tls_set_device_offload(struct sock *sk,
-+			   struct tls_crypto_info *new_crypto_info)
-+{
-+	struct tls_crypto_info *crypto_info, *src_crypto_info;
-+	const struct tls_cipher_desc *cipher_desc;
-+	struct net_device *netdev;
-+	struct tls_context *ctx;
-+	int rc;
-+
-+	ctx = tls_get_ctx(sk);
-+
-+	/* Rekey is only supported for connections that are already
-+	 * using HW offload. For SW offload connections, the caller
-+	 * should fall back to tls_set_sw_offload() for rekey.
-+	 */
-+	if (new_crypto_info && ctx->tx_conf != TLS_HW)
-+		return -EINVAL;
-+
-+	netdev = get_netdev_for_sock(sk);
-+	if (!netdev) {
-+		pr_err_ratelimited("%s: netdev not found\n", __func__);
-+		return -EINVAL;
-+	}
-+
-+	if (!(netdev->features & NETIF_F_HW_TLS_TX)) {
-+		rc = -EOPNOTSUPP;
-+		goto release_netdev;
-+	}
-+
-+	crypto_info = &ctx->crypto_send.info;
-+	src_crypto_info = new_crypto_info ?: crypto_info;
-+	cipher_desc = get_cipher_desc(src_crypto_info->cipher_type);
-+	if (!cipher_desc || !cipher_desc->offloadable) {
-+		rc = -EINVAL;
-+		goto release_netdev;
-+	}
-+
-+	if (new_crypto_info)
-+		rc = tls_set_device_offload_rekey(sk, ctx, netdev,
-+						  src_crypto_info);
-+	else
-+		rc = tls_set_device_offload_initial(sk, ctx, netdev,
-+						    src_crypto_info,
-+						    cipher_desc);
-+
- release_netdev:
- 	dev_put(netdev);
- 	return rc;
- }
- 
--int tls_set_device_offload_rx(struct sock *sk, struct tls_context *ctx)
-+int tls_set_device_offload_rx(struct sock *sk, struct tls_context *ctx,
-+			      struct tls_crypto_info *new_crypto_info)
- {
--	struct tls12_crypto_info_aes_gcm_128 *info;
-+	struct tls_crypto_info *crypto_info, *src_crypto_info;
-+	const struct tls_cipher_desc *cipher_desc;
- 	struct tls_offload_context_rx *context;
- 	struct net_device *netdev;
-+	char *rec_seq;
- 	int rc = 0;
- 
-+	/* Rekey is only supported for connections that are already
-+	 * using HW offload. For SW offload connections, the caller
-+	 * should fall back to tls_set_sw_offload() for rekey.
-+	 */
-+	if (new_crypto_info && ctx->rx_conf != TLS_HW)
-+		return -EINVAL;
-+
-+	crypto_info = &ctx->crypto_recv.info;
-+	src_crypto_info = new_crypto_info ?: crypto_info;
-+	cipher_desc = get_cipher_desc(src_crypto_info->cipher_type);
-+	if (!cipher_desc || !cipher_desc->offloadable)
-+		return -EINVAL;
-+
- 	netdev = get_netdev_for_sock(sk);
- 	if (!netdev) {
- 		pr_err_ratelimited("%s: netdev not found\n", __func__);
-@@ -1225,29 +1567,50 @@ int tls_set_device_offload_rx(struct sock *sk, struct tls_context *ctx)
- 		goto release_lock;
- 	}
- 
--	context = kzalloc_obj(*context);
--	if (!context) {
--		rc = -ENOMEM;
--		goto release_lock;
-+	if (!new_crypto_info) {
-+		context = kzalloc_obj(*context);
-+		if (!context) {
-+			rc = -ENOMEM;
-+			goto release_lock;
++		strncpy(addr_buf, server_ip, sizeof(addr_buf) - 1);
++		addr_buf[sizeof(addr_buf) - 1] = '\0';
++		scope_sep = strchr(addr_buf, '%');
++		if (scope_sep) {
++			*scope_sep = '\0';
++			scope_id = if_nametoindex(scope_sep + 1);
++			if (scope_id == 0) {
++				printf("Invalid interface: %s\n", scope_sep + 1);
++				test_result = -1;
++				goto out;
++			}
 +		}
-+		context->resync_nh_reset = 1;
-+		ctx->priv_ctx_rx = context;
- 	}
--	context->resync_nh_reset = 1;
- 
--	ctx->priv_ctx_rx = context;
--	rc = tls_sw_ctx_init(sk, 0, NULL);
-+	rc = tls_sw_ctx_init(sk, 0, new_crypto_info);
- 	if (rc)
- 		goto release_ctx;
- 
-+	if (new_crypto_info && !test_bit(TLS_RX_DEV_CLOSED, &ctx->flags))
-+		netdev->tlsdev_ops->tls_dev_del(netdev, ctx,
-+						TLS_OFFLOAD_CTX_DIR_RX);
 +
- 	rc = netdev->tlsdev_ops->tls_dev_add(netdev, sk, TLS_OFFLOAD_CTX_DIR_RX,
--					     &ctx->crypto_recv.info,
-+					     src_crypto_info,
- 					     tcp_sk(sk)->copied_seq);
--	info = (void *)&ctx->crypto_recv.info;
-+
-+	rec_seq = crypto_info_rec_seq(src_crypto_info, cipher_desc);
- 	trace_tls_device_offload_set(sk, TLS_OFFLOAD_CTX_DIR_RX,
--				     tcp_sk(sk)->copied_seq, info->rec_seq, rc);
--	if (rc)
--		goto free_sw_resources;
-+				     tcp_sk(sk)->copied_seq, rec_seq, rc);
-+	if (rc) {
-+		if (new_crypto_info) {
-+			set_bit(TLS_RX_DEV_DEGRADED, &ctx->flags);
-+			set_bit(TLS_RX_DEV_CLOSED, &ctx->flags);
-+			TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSRXREKEYHWFAIL);
-+		} else {
-+			goto free_sw_resources;
++		sa6->sin6_family = AF_INET6;
++		if (inet_pton(AF_INET6, addr_buf, &sa6->sin6_addr) != 1) {
++			printf("Invalid IPv6 address: %s\n", addr_buf);
++			test_result = -1;
++			goto out;
 +		}
++		sa6->sin6_port = htons(server_port);
++		sa6->sin6_scope_id = scope_id;
++		sa_len = sizeof(*sa6);
++		printf("Connecting to [%s]:%d (scope_id=%u)...\n",
++		       server_ip, server_port, scope_id);
 +	} else {
-+		if (new_crypto_info) {
-+			clear_bit(TLS_RX_DEV_DEGRADED, &ctx->flags);
-+			clear_bit(TLS_RX_DEV_CLOSED, &ctx->flags);
-+		}
++		struct sockaddr_in *sa4 = (struct sockaddr_in *)&sa;
 +
-+		tls_device_attach(ctx, sk, netdev);
++		sa4->sin_family = AF_INET;
++		sa4->sin_addr.s_addr = inet_addr(server_ip);
++		sa4->sin_port = htons(server_port);
++		sa_len = sizeof(*sa4);
++		printf("Connecting to %s:%d...\n", server_ip, server_port);
 +	}
 +
-+	tls_sw_ctx_finalize(sk, 0, new_crypto_info);
- 
--	tls_device_attach(ctx, sk, netdev);
--	tls_sw_ctx_finalize(sk, 0, NULL);
- 	up_read(&device_offload_lock);
- 
- 	dev_put(netdev);
-@@ -1256,10 +1619,13 @@ int tls_set_device_offload_rx(struct sock *sk, struct tls_context *ctx)
- 
- free_sw_resources:
- 	up_read(&device_offload_lock);
--	tls_sw_free_resources_rx(sk);
-+	tls_sw_release_resources_rx(sk);
- 	down_read(&device_offload_lock);
- release_ctx:
--	ctx->priv_ctx_rx = NULL;
-+	if (!new_crypto_info) {
-+		kfree(ctx->priv_ctx_rx);
-+		ctx->priv_ctx_rx = NULL;
++	ret = connect(csk, (struct sockaddr *)&sa, sa_len);
++	if (ret < 0) {
++		printf("connect failed: %s\n", strerror(errno));
++		test_result = -1;
++		goto out;
 +	}
- release_lock:
- 	up_read(&device_offload_lock);
- release_netdev:
-@@ -1278,8 +1644,9 @@ void tls_device_offload_cleanup_rx(struct sock *sk)
- 	if (!netdev)
- 		goto out;
- 
--	netdev->tlsdev_ops->tls_dev_del(netdev, tls_ctx,
--					TLS_OFFLOAD_CTX_DIR_RX);
-+	if (!test_bit(TLS_RX_DEV_CLOSED, &tls_ctx->flags))
-+		netdev->tlsdev_ops->tls_dev_del(netdev, tls_ctx,
-+						TLS_OFFLOAD_CTX_DIR_RX);
- 
- 	if (tls_ctx->tx_conf != TLS_HW) {
- 		dev_put(netdev);
-@@ -1319,7 +1686,10 @@ static int tls_device_down(struct net_device *netdev)
- 		/* Stop offloaded TX and switch to the fallback.
- 		 * tls_is_skb_tx_device_offloaded will return false.
- 		 */
--		WRITE_ONCE(ctx->sk->sk_validate_xmit_skb, tls_validate_xmit_skb_sw);
-+		if (!test_bit(TLS_TX_REKEY_PENDING, &ctx->flags) &&
-+		    !test_bit(TLS_TX_REKEY_FAILED, &ctx->flags))
-+			WRITE_ONCE(ctx->sk->sk_validate_xmit_skb,
-+				   tls_validate_xmit_skb_sw);
- 
- 		/* Stop the RX and TX resync.
- 		 * tls_dev_resync must not be called after tls_dev_del.
-@@ -1336,13 +1706,18 @@ static int tls_device_down(struct net_device *netdev)
- 		synchronize_net();
- 
- 		/* Release the offload context on the driver side. */
--		if (ctx->tx_conf == TLS_HW)
-+		if (ctx->tx_conf == TLS_HW &&
-+		    !test_bit(TLS_TX_DEV_CLOSED, &ctx->flags)) {
- 			netdev->tlsdev_ops->tls_dev_del(netdev, ctx,
- 							TLS_OFFLOAD_CTX_DIR_TX);
-+			set_bit(TLS_TX_DEV_CLOSED, &ctx->flags);
++	printf("Connected!\n");
++
++	if (setup_tls_ulp(csk) < 0) {
++		test_result = -1;
++		goto out;
++	}
++
++	if (setup_tls_key(csk, 1, 0, cipher_type) < 0 ||
++	    setup_tls_key(csk, 0, 0, cipher_type) < 0) {
++		test_result = -1;
++		goto out;
++	}
++
++	if (do_rekey)
++		printf("TLS %s setup complete. Will perform %d rekey(s).\n",
++		       cipher_name(cipher_type), num_rekeys);
++	else
++		printf("TLS setup complete.\n");
++
++	if (random_size_max > 0)
++		printf("Sending %d messages of random size (1..%d bytes)...\n",
++		       TEST_ITERATIONS, random_size_max);
++	else
++		printf("Sending %d messages of %d bytes...\n",
++		       TEST_ITERATIONS, send_size);
++
++	rekey_interval = TEST_ITERATIONS / (num_rekeys + 1);
++	if (rekey_interval < 1)
++		rekey_interval = 1;
++	next_rekey_at = rekey_interval;
++
++	for (i = 0; i < TEST_ITERATIONS; i++) {
++		int this_size;
++
++		if (random_size_max > 0)
++			this_size = (rand() % random_size_max) + 1;
++		else
++			this_size = send_size;
++
++		for (j = 0; j < this_size; j++)
++			buf[j] = rand() & 0xFF;
++
++		n = send(csk, buf, this_size, 0);
++		if (n != this_size) {
++			printf("FAIL: send failed: %s\n", strerror(errno));
++			test_result = -1;
++			break;
 +		}
- 		if (ctx->rx_conf == TLS_HW &&
--		    !test_bit(TLS_RX_DEV_CLOSED, &ctx->flags))
-+		    !test_bit(TLS_RX_DEV_CLOSED, &ctx->flags)) {
- 			netdev->tlsdev_ops->tls_dev_del(netdev, ctx,
- 							TLS_OFFLOAD_CTX_DIR_RX);
-+			set_bit(TLS_RX_DEV_CLOSED, &ctx->flags);
++		printf("Sent %zd bytes (iteration %d)\n", n, i + 1);
++
++		echo_total = 0;
++		while (echo_total < n) {
++			echo_n = recv(csk, echo_buf + echo_total,
++				      n - echo_total, 0);
++			if (echo_n < 0) {
++				printf("FAIL: Echo recv failed: %s\n",
++				       strerror(errno));
++				test_result = -1;
++				break;
++			}
++			if (echo_n == 0) {
++				printf("FAIL: Connection closed during echo\n");
++				test_result = -1;
++				break;
++			}
++			echo_total += echo_n;
 +		}
- 
- 		dev_put(netdev);
- 
-diff --git a/net/tls/tls_device_fallback.c b/net/tls/tls_device_fallback.c
-index 99d5590d20b0..40a0ddde2fce 100644
---- a/net/tls/tls_device_fallback.c
-+++ b/net/tls/tls_device_fallback.c
-@@ -438,6 +438,30 @@ struct sk_buff *tls_validate_xmit_skb_sw(struct sock *sk,
- 	return tls_sw_fallback(sk, skb);
- }
- 
-+struct sk_buff *tls_validate_xmit_skb_rekey(struct sock *sk,
-+					    struct net_device *dev,
-+					    struct sk_buff *skb)
-+{
-+	struct tls_context *tls_ctx = tls_get_ctx(sk);
-+	u32 tcp_seq = ntohl(tcp_hdr(skb)->seq);
-+	u32 boundary_seq;
++		if (test_result != 0)
++			break;
 +
-+	if (test_bit(TLS_TX_REKEY_FAILED, &tls_ctx->flags))
-+		return skb;
++		if (memcmp(buf, echo_buf, n) != 0) {
++			printf("FAIL: Echo data mismatch!\n");
++			test_result = -1;
++			break;
++		}
++		printf("Received echo %zd bytes (ok)\n", echo_total);
 +
-+	/* If this packet is at or after the rekey boundary, it's already
-+	 * SW-encrypted with the new key, pass through unchanged
-+	 */
-+	boundary_seq = READ_ONCE(tls_ctx->rekey_boundary_seq);
-+	if (!before(tcp_seq, boundary_seq))
-+		return skb;
++		/* Rekey at intervals: send KeyUpdate, update TX, recv KeyUpdate, update RX */
++		if (do_rekey && rekeys_done < num_rekeys &&
++		    (i + 1) == next_rekey_at) {
++			current_gen++;
++			printf("\n=== Client Rekey #%d (gen %d) ===\n",
++			       rekeys_done + 1, current_gen);
 +
-+	/* Packet before boundary means retransmit of old data,
-+	 * use SW fallback with the old key
-+	 */
-+	return tls_sw_fallback(sk, skb);
++			ret = send_tls_key_update(csk, KEY_UPDATE_REQUESTED);
++			if (ret < 0) {
++				printf("FAIL: send KeyUpdate\n");
++				test_result = -1;
++				break;
++			}
++
++			ret = do_tls_rekey(csk, 1, current_gen, cipher_type);
++			if (ret < 0) {
++				test_result = -1;
++				break;
++			}
++
++			if (recv_tls_keyupdate(csk) < 0) {
++				printf("FAIL: recv KeyUpdate from server\n");
++				test_result = -1;
++				break;
++			}
++
++			check_ekeyexpired(csk);
++
++			ret = do_tls_rekey(csk, 0, current_gen, cipher_type);
++			if (ret < 0) {
++				test_result = -1;
++				break;
++			}
++
++			rekeys_done++;
++			next_rekey_at += rekey_interval;
++			printf("=== Client Rekey #%d Complete ===\n\n",
++			       rekeys_done);
++		}
++	}
++
++	if (i < TEST_ITERATIONS && test_result == 0) {
++		printf("FAIL: Only %d of %d iterations\n", i, TEST_ITERATIONS);
++		test_result = -1;
++	}
++
++	close(csk);
++	csk = -1;
++	if (do_rekey)
++		printf("Rekeys completed: %d/%d\n", rekeys_done, num_rekeys);
++
++out:
++	if (csk >= 0)
++		close(csk);
++	free(buf);
++	free(echo_buf);
++	return test_result;
 +}
 +
- struct sk_buff *tls_encrypt_skb(struct sk_buff *skb)
- {
- 	return tls_sw_fallback(skb->sk, skb);
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index fd04857fa0ab..ab701f166b57 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -371,6 +371,8 @@ static void tls_sk_proto_close(struct sock *sk, long timeout)
- 
- 	if (ctx->tx_conf == TLS_SW)
- 		tls_sw_cancel_work_tx(ctx);
-+	else if (ctx->tx_conf == TLS_HW && ctx->rekey_sw_ctx)
-+		tls_sw_cancel_work_tx(ctx);
- 
- 	lock_sock(sk);
- 	free_ctx = ctx->tx_conf != TLS_HW && ctx->rx_conf != TLS_HW;
-@@ -711,64 +713,68 @@ static int do_tls_setsockopt_conf(struct sock *sk, sockptr_t optval,
- 	}
- 
- 	if (tx) {
--		if (update && ctx->tx_conf == TLS_HW) {
--			rc = -EOPNOTSUPP;
--			goto err_crypto_info;
--		}
--
--		if (!update) {
--			rc = tls_set_device_offload(sk);
--			conf = TLS_HW;
--			if (!rc) {
-+		rc = tls_set_device_offload(sk, update ? crypto_info : NULL);
-+		conf = TLS_HW;
-+		if (!rc) {
-+			if (update) {
-+				TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSTXREKEYOK);
-+			} else {
- 				TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSTXDEVICE);
- 				TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSCURRTXDEVICE);
--				goto out;
- 			}
--		}
--
--		rc = tls_set_sw_offload(sk, 1, update ? crypto_info : NULL);
--		if (rc)
-+		} else if (update && ctx->tx_conf == TLS_HW) {
-+			/* HW rekey failed - return the actual error.
-+			 * Cannot fall back to SW for an existing HW connection.
-+			 */
- 			goto err_crypto_info;
--
--		if (update) {
--			TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSTXREKEYOK);
- 		} else {
--			TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSTXSW);
--			TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSCURRTXSW);
-+			rc = tls_set_sw_offload(sk, 1,
-+						update ? crypto_info : NULL);
-+			if (rc)
-+				goto err_crypto_info;
-+
-+			if (update) {
-+				TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSTXREKEYOK);
-+			} else {
-+				TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSTXSW);
-+				TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSCURRTXSW);
-+			}
-+			conf = TLS_SW;
- 		}
--		conf = TLS_SW;
- 	} else {
--		if (update && ctx->rx_conf == TLS_HW) {
--			rc = -EOPNOTSUPP;
--			goto err_crypto_info;
--		}
--
--		if (!update) {
--			rc = tls_set_device_offload_rx(sk, ctx);
--			conf = TLS_HW;
--			if (!rc) {
-+		rc = tls_set_device_offload_rx(sk, ctx,
-+					       update ? crypto_info : NULL);
-+		conf = TLS_HW;
-+		if (!rc) {
-+			if (update) {
-+				TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSRXREKEYOK);
-+			} else {
- 				TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSRXDEVICE);
- 				TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSCURRRXDEVICE);
--				tls_sw_strparser_arm(sk, ctx);
--				goto out;
- 			}
--		}
--
--		rc = tls_set_sw_offload(sk, 0, update ? crypto_info : NULL);
--		if (rc)
-+		} else if (update && ctx->rx_conf == TLS_HW) {
-+			/* HW rekey failed - return the actual error.
-+			 * Cannot fall back to SW for an existing HW connection.
-+			 */
- 			goto err_crypto_info;
--
--		if (update) {
--			TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSRXREKEYOK);
- 		} else {
--			TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSRXSW);
--			TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSCURRRXSW);
--			tls_sw_strparser_arm(sk, ctx);
-+			rc = tls_set_sw_offload(sk, 0,
-+						update ? crypto_info : NULL);
-+			if (rc)
-+				goto err_crypto_info;
-+
-+			if (update) {
-+				TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSRXREKEYOK);
-+			} else {
-+				TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSRXSW);
-+				TLS_INC_STATS(sock_net(sk), LINUX_MIB_TLSCURRRXSW);
-+			}
-+			conf = TLS_SW;
- 		}
--		conf = TLS_SW;
-+		if (!update)
-+			tls_sw_strparser_arm(sk, ctx);
- 	}
- 
--out:
- 	if (tx)
- 		ctx->tx_conf = conf;
- 	else
-diff --git a/net/tls/tls_proc.c b/net/tls/tls_proc.c
-index 4012c4372d4c..5599af306aab 100644
---- a/net/tls/tls_proc.c
-+++ b/net/tls/tls_proc.c
-@@ -27,6 +27,8 @@ static const struct snmp_mib tls_mib_list[] = {
- 	SNMP_MIB_ITEM("TlsTxRekeyOk", LINUX_MIB_TLSTXREKEYOK),
- 	SNMP_MIB_ITEM("TlsTxRekeyError", LINUX_MIB_TLSTXREKEYERROR),
- 	SNMP_MIB_ITEM("TlsRxRekeyReceived", LINUX_MIB_TLSRXREKEYRECEIVED),
-+	SNMP_MIB_ITEM("TlsTxRekeyHwFail", LINUX_MIB_TLSTXREKEYHWFAIL),
-+	SNMP_MIB_ITEM("TlsRxRekeyHwFail", LINUX_MIB_TLSRXREKEYHWFAIL),
- };
- 
- static int tls_statistics_seq_show(struct seq_file *seq, void *v)
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 424e0a11bcf4..62523416b146 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -521,7 +521,7 @@ static void tls_encrypt_done(void *data, int err)
- 		complete(&ctx->async_wait.completion);
- }
- 
--static int tls_encrypt_async_wait(struct tls_sw_context_tx *ctx)
-+int tls_encrypt_async_wait(struct tls_sw_context_tx *ctx)
- {
- 	if (!atomic_dec_and_test(&ctx->encrypt_pending))
- 		crypto_wait_req(-EINPROGRESS, &ctx->async_wait);
-@@ -554,11 +554,11 @@ static int tls_do_encryption(struct sock *sk,
- 		break;
- 	}
- 
--	memcpy(&rec->iv_data[iv_offset], tls_ctx->tx.iv,
-+	memcpy(&rec->iv_data[iv_offset], tls_tx_cipher_ctx(tls_ctx)->iv,
- 	       prot->iv_size + prot->salt_size);
- 
- 	tls_xor_iv_with_seq(prot, rec->iv_data + iv_offset,
--			    tls_ctx->tx.rec_seq);
-+			    tls_tx_cipher_ctx(tls_ctx)->rec_seq);
- 
- 	sge->offset += prot->prepend_size;
- 	sge->length -= prot->prepend_size;
-@@ -599,7 +599,7 @@ static int tls_do_encryption(struct sock *sk,
- 
- 	/* Unhook the record from context if encryption is not failure */
- 	ctx->open_rec = NULL;
--	tls_advance_record_sn(sk, prot, &tls_ctx->tx);
-+	tls_advance_record_sn(sk, prot, tls_tx_cipher_ctx(tls_ctx));
- 	return rc;
- }
- 
-@@ -806,7 +806,7 @@ static int tls_push_record(struct sock *sk, int flags,
- 	sg_chain(rec->sg_aead_out, 2, &msg_en->sg.data[i]);
- 
- 	tls_make_aad(rec->aad_space, msg_pl->sg.size + prot->tail_size,
--		     tls_ctx->tx.rec_seq, record_type, prot);
-+		     tls_tx_cipher_ctx(tls_ctx)->rec_seq, record_type, prot);
- 
- 	tls_fill_prepend(tls_ctx,
- 			 page_address(sg_page(&msg_en->sg.data[i])) +
-@@ -1022,8 +1022,7 @@ static int tls_sw_sendmsg_splice(struct sock *sk, struct msghdr *msg,
- 	return 0;
- }
- 
--static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
--				 size_t size)
-+int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- {
- 	long timeo = sock_sndtimeo(sk, msg->msg_flags & MSG_DONTWAIT);
- 	struct tls_context *tls_ctx = tls_get_ctx(sk);
-@@ -2621,7 +2620,7 @@ void tls_sw_free_resources_rx(struct sock *sk)
- }
- 
- /* The work handler to transmitt the encrypted records in tx_list */
--static void tx_work_handler(struct work_struct *work)
-+void tls_tx_work_handler(struct work_struct *work)
- {
- 	struct delayed_work *delayed_work = to_delayed_work(work);
- 	struct tx_work *tx_work = container_of(delayed_work,
-@@ -2654,6 +2653,15 @@ static void tx_work_handler(struct work_struct *work)
- 	}
- }
- 
-+void tls_sw_ctx_tx_init(struct sock *sk, struct tls_sw_context_tx *sw_ctx)
++static int do_server(void)
 +{
-+	crypto_init_wait(&sw_ctx->async_wait);
-+	atomic_set(&sw_ctx->encrypt_pending, 1);
-+	INIT_LIST_HEAD(&sw_ctx->tx_list);
-+	INIT_DELAYED_WORK(&sw_ctx->tx_work.work, tls_tx_work_handler);
-+	sw_ctx->tx_work.sk = sk;
++	struct sockaddr_storage sa;
++	int lsk = -1, csk = -1, ret;
++	ssize_t n, total = 0, sent;
++	int current_gen = 0;
++	int test_result = 0;
++	int recv_count = 0;
++	char *buf = NULL;
++	int record_type;
++	socklen_t sa_len;
++	int max_size;
++	int one = 1;
++
++	max_size = random_size_max > 0 ? random_size_max : send_size;
++	buf = malloc(max_size);
++	if (!buf) {
++		printf("failed to allocate buffer\n");
++		test_result = -1;
++		goto out;
++	}
++
++	lsk = socket(addr_family, SOCK_STREAM, IPPROTO_TCP);
++	if (lsk < 0) {
++		printf("failed to create socket: %s\n", strerror(errno));
++		test_result = -1;
++		goto out;
++	}
++
++	setsockopt(lsk, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
++
++	memset(&sa, 0, sizeof(sa));
++	if (addr_family == AF_INET6) {
++		struct sockaddr_in6 *sa6 = (struct sockaddr_in6 *)&sa;
++
++		sa6->sin6_family = AF_INET6;
++		sa6->sin6_addr = in6addr_any;
++		sa6->sin6_port = htons(server_port);
++		sa_len = sizeof(*sa6);
++	} else {
++		struct sockaddr_in *sa4 = (struct sockaddr_in *)&sa;
++
++		sa4->sin_family = AF_INET;
++		sa4->sin_addr.s_addr = INADDR_ANY;
++		sa4->sin_port = htons(server_port);
++		sa_len = sizeof(*sa4);
++	}
++
++	ret = bind(lsk, (struct sockaddr *)&sa, sa_len);
++	if (ret < 0) {
++		printf("bind failed: %s\n", strerror(errno));
++		test_result = -1;
++		goto out;
++	}
++
++	ret = listen(lsk, 5);
++	if (ret < 0) {
++		printf("listen failed: %s\n", strerror(errno));
++		test_result = -1;
++		goto out;
++	}
++
++	if (addr_family == AF_INET6)
++		printf("Server listening on [::]:%d (IPv6)\n", server_port);
++	else
++		printf("Server listening on 0.0.0.0:%d (IPv4)\n", server_port);
++	printf("Waiting for client connection...\n");
++
++	csk = accept(lsk, (struct sockaddr *)NULL, (socklen_t *)NULL);
++	if (csk < 0) {
++		printf("accept failed: %s\n", strerror(errno));
++		test_result = -1;
++		goto out;
++	}
++	printf("Client connected!\n");
++
++	if (setup_tls_ulp(csk) < 0) {
++		test_result = -1;
++		goto out;
++	}
++
++	if (setup_tls_key(csk, 1, 0, cipher_type) < 0 ||
++	    setup_tls_key(csk, 0, 0, cipher_type) < 0) {
++		test_result = -1;
++		goto out;
++	}
++
++	printf("TLS %s setup complete. Receiving...\n",
++	       cipher_name(cipher_type));
++
++	/* Main receive loop - detect KeyUpdate via MSG_PEEK + recvmsg */
++	while (1) {
++		n = recv(csk, buf, max_size, MSG_PEEK | MSG_DONTWAIT);
++		if (n < 0 &&
++		    (errno == EIO || errno == ENOMSG || errno == EAGAIN)) {
++			n = recv_tls_message(csk, buf, max_size, &record_type);
++		} else if (n > 0) {
++			n = recv_tls_message(csk, buf, max_size, &record_type);
++		} else if (n == 0) {
++			printf("Connection closed by client\n");
++			break;
++		}
++
++		if (n <= 0) {
++			if (n < 0)
++				printf("recv failed: %s\n", strerror(errno));
++			break;
++		}
++
++		/* Handle KeyUpdate: update RX, send response, update TX */
++		if (record_type == TLS_RECORD_TYPE_HANDSHAKE &&
++		    n >= 1 && buf[0] == TLS_HANDSHAKE_KEY_UPDATE) {
++			current_gen++;
++			printf("\n=== Server Rekey #%d (gen %d) ===\n",
++			       rekeys_done + 1, current_gen);
++			printf("Received KeyUpdate from client (%zd bytes)\n",
++			       n);
++
++			check_ekeyexpired(csk);
++
++			ret = do_tls_rekey(csk, 0, current_gen, cipher_type);
++			if (ret < 0) {
++				test_result = -1;
++				break;
++			}
++
++			ret = send_tls_key_update(csk,
++						  KEY_UPDATE_NOT_REQUESTED);
++			if (ret < 0) {
++				printf("Failed to send KeyUpdate\n");
++				test_result = -1;
++				break;
++			}
++
++			ret = do_tls_rekey(csk, 1, current_gen, cipher_type);
++			if (ret < 0) {
++				test_result = -1;
++				break;
++			}
++
++			rekeys_done++;
++			printf("=== Server Rekey #%d Complete ===\n\n",
++			       rekeys_done);
++			continue;
++		}
++
++		total += n;
++		recv_count++;
++		printf("Received %zd bytes (total: %zd, count: %d)\n",
++		       n, total, recv_count);
++
++		sent = send(csk, buf, n, 0);
++		if (sent < 0) {
++			printf("Echo send failed: %s\n", strerror(errno));
++			break;
++		}
++		if (sent != n)
++			printf("Echo partial: %zd of %zd bytes\n", sent, n);
++		printf("Echoed %zd bytes back to client\n", sent);
++	}
++
++	printf("Connection closed. Total received: %zd bytes\n", total);
++	if (do_rekey)
++		printf("Rekeys completed: %d\n", rekeys_done);
++
++out:
++	if (csk >= 0)
++		close(csk);
++	if (lsk >= 0)
++		close(lsk);
++	free(buf);
++	return test_result;
 +}
 +
- static bool tls_is_tx_ready(struct tls_sw_context_tx *ctx)
- {
- 	struct tls_rec *rec;
-@@ -2705,11 +2713,7 @@ static struct tls_sw_context_tx *init_ctx_tx(struct tls_context *ctx, struct soc
- 		sw_ctx_tx = ctx->priv_ctx_tx;
- 	}
- 
--	crypto_init_wait(&sw_ctx_tx->async_wait);
--	atomic_set(&sw_ctx_tx->encrypt_pending, 1);
--	INIT_LIST_HEAD(&sw_ctx_tx->tx_list);
--	INIT_DELAYED_WORK(&sw_ctx_tx->tx_work.work, tx_work_handler);
--	sw_ctx_tx->tx_work.sk = sk;
-+	tls_sw_ctx_tx_init(sk, sw_ctx_tx);
- 
- 	return sw_ctx_tx;
- }
++static void parse_rekey_option(const char *arg)
++{
++	int requested;
++
++	if (strncmp(arg, "--rekey=", 8) == 0) {
++		requested = atoi(arg + 8);
++		if (requested < 1) {
++			printf("WARNING: Invalid rekey count, using 1\n");
++			num_rekeys = 1;
++		} else if (requested > MAX_REKEYS) {
++			printf("WARNING: Rekey count %d > max %d, using %d\n",
++			       requested, MAX_REKEYS, MAX_REKEYS);
++			num_rekeys = MAX_REKEYS;
++		} else {
++			num_rekeys = requested;
++		}
++		do_rekey = 1;
++	} else if (strcmp(arg, "--rekey") == 0) {
++		do_rekey = 1;
++		num_rekeys = 1;
++	}
++}
++
++static int parse_cipher_option(const char *arg)
++{
++	if (strcmp(arg, "128") == 0) {
++		cipher_type = 128;
++		return 0;
++	} else if (strcmp(arg, "256") == 0) {
++		cipher_type = 256;
++		return 0;
++	}
++	printf("ERROR: Invalid cipher '%s'. Must be 128 or 256.\n", arg);
++	return -1;
++}
++
++static int parse_version_option(const char *arg)
++{
++	if (strcmp(arg, "1.2") == 0) {
++		tls_version = 12;
++		return 0;
++	} else if (strcmp(arg, "1.3") == 0) {
++		tls_version = 13;
++		return 0;
++	}
++	printf("ERROR: Invalid TLS version '%s'. Must be 1.2 or 1.3.\n", arg);
++	return -1;
++}
++
++static void print_usage(const char *prog)
++{
++	printf("TLS Hardware Offload Two-Node Test\n\n");
++	printf("Usage:\n");
++	printf("  %s server [OPTIONS]\n", prog);
++	printf("  %s client -s <ip> [OPTIONS]\n", prog);
++	printf("\nOptions:\n");
++	printf("  -s <ip>       Server IP to connect (client, required)\n");
++	printf("                Supports both IPv4 and IPv6 addresses\n");
++	printf("  -6            Use IPv6 (server only, default: IPv4)\n");
++	printf("  -p <port>     Server port (default: 4433)\n");
++	printf("  -b <size>     Send buffer (record) size (default: 16384)\n");
++	printf("  -r <max>      Use random send buffer sizes (1..<max>)\n");
++	printf("  -v <version>  TLS version: 1.2 or 1.3 (default: 1.3)\n");
++	printf("  -c <cipher>   Cipher: 128 or 256 (default: 128)\n");
++	printf("  --rekey[=N]   Enable rekey (default: 1, TLS 1.3 only)\n");
++	printf("  --help        Show this help message\n");
++	printf("\nExample (IPv4):\n");
++	printf("  Node A: %s server\n", prog);
++	printf("  Node B: %s client -s 192.168.20.2\n", prog);
++	printf("\nExample (IPv6):\n");
++	printf("  Node A: %s server -6\n", prog);
++	printf("  Node B: %s client -s 2001:db8::1\n", prog);
++	printf("\nRekey Example (3 rekeys, TLS 1.3 only):\n");
++	printf("  Node A: %s server --rekey=3\n", prog);
++	printf("  Node B: %s client -s 192.168.20.2 --rekey=3\n", prog);
++}
++
++int main(int argc, char *argv[])
++{
++	int i;
++
++
++	for (i = 1; i < argc; i++) {
++		if (strcmp(argv[i], "--help") == 0 ||
++		    strcmp(argv[i], "-h") == 0) {
++			print_usage(argv[0]);
++			return 0;
++		}
++	}
++
++	for (i = 1; i < argc; i++) {
++		parse_rekey_option(argv[i]);
++		if (strcmp(argv[i], "-s") == 0 && i + 1 < argc) {
++			server_ip = argv[i + 1];
++			addr_family = detect_addr_family(server_ip);
++			if (addr_family < 0) {
++				printf("ERROR: Invalid IP address '%s'\n",
++				       server_ip);
++				return -1;
++			}
++		}
++		if (strcmp(argv[i], "-p") == 0 && i + 1 < argc)
++			server_port = atoi(argv[i + 1]);
++		if (strcmp(argv[i], "-6") == 0)
++			addr_family = AF_INET6;
++		if (strcmp(argv[i], "-b") == 0 && i + 1 < argc) {
++			send_size = atoi(argv[i + 1]);
++			if (send_size < 1)
++				send_size = 1;
++		}
++		if (strcmp(argv[i], "-r") == 0 && i + 1 < argc) {
++			random_size_max = atoi(argv[i + 1]);
++			if (random_size_max < 1)
++				random_size_max = 1;
++		}
++		if (strcmp(argv[i], "-c") == 0 && i + 1 < argc) {
++			if (parse_cipher_option(argv[i + 1]) < 0)
++				return -1;
++		}
++		if (strcmp(argv[i], "-v") == 0 && i + 1 < argc) {
++			if (parse_version_option(argv[i + 1]) < 0)
++				return -1;
++		}
++	}
++
++	if (tls_version == 12 && do_rekey) {
++		printf("WARNING: TLS 1.2 does not support rekey\n");
++		do_rekey = 0;
++	}
++
++	printf("Address Family: %s\n", addr_family == AF_INET6 ? "IPv6" : "IPv4");
++	printf("TLS Version: %s\n", version_name(tls_version));
++	printf("Cipher: %s\n", cipher_name(cipher_type));
++	if (random_size_max > 0)
++		printf("Buffer size: random (1..%d)\n", random_size_max);
++	else
++		printf("Buffer size: %d\n", send_size);
++
++	if (do_rekey)
++		printf("Rekey testing ENABLED: %d rekey(s)\n", num_rekeys);
++
++	srand(time(NULL));
++
++	if (argc < 2 ||
++	    (strcmp(argv[1], "server") && strcmp(argv[1], "client"))) {
++		print_usage(argv[0]);
++		return -1;
++	}
++
++	if (!strcmp(argv[1], "client"))
++		return do_client();
++
++	return do_server();
++}
+diff --git a/tools/testing/selftests/drivers/net/hw/tls_hw_offload.py b/tools/testing/selftests/drivers/net/hw/tls_hw_offload.py
+new file mode 100755
+index 000000000000..5d14cb7d2e3c
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/hw/tls_hw_offload.py
+@@ -0,0 +1,281 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
++
++"""Test kTLS hardware offload using a C helper binary."""
++
++from lib.py import ksft_run, ksft_exit, ksft_pr, KsftSkipEx, ksft_true
++from lib.py import NetDrvEpEnv
++from lib.py import cmd, bkg, wait_port_listen, rand_port
++import time
++
++
++def check_tls_support(cfg):
++    try:
++        cmd("test -f /proc/net/tls_stat")
++        cmd("test -f /proc/net/tls_stat", host=cfg.remote)
++    except Exception as e:
++        raise KsftSkipEx(f"kTLS not supported: {e}")
++
++
++def read_tls_stats():
++    stats = {}
++    output = cmd("cat /proc/net/tls_stat")
++    for line in output.stdout.strip().split('\n'):
++        parts = line.split()
++        if len(parts) == 2:
++            stats[parts[0]] = int(parts[1])
++    return stats
++
++
++def verify_tls_counters(stats_before, stats_after, expected_rekeys, is_server):
++    tx_device_diff = (stats_after.get('TlsTxDevice', 0) -
++                      stats_before.get('TlsTxDevice', 0))
++    rx_device_diff = (stats_after.get('TlsRxDevice', 0) -
++                      stats_before.get('TlsRxDevice', 0))
++    tx_sw_diff = (stats_after.get('TlsTxSw', 0) -
++                  stats_before.get('TlsTxSw', 0))
++    rx_sw_diff = (stats_after.get('TlsRxSw', 0) -
++                  stats_before.get('TlsRxSw', 0))
++    decrypt_err_diff = (stats_after.get('TlsDecryptError', 0) -
++                        stats_before.get('TlsDecryptError', 0))
++
++    used_tx_hw = tx_device_diff >= 1
++    used_rx_hw = rx_device_diff >= 1
++    used_tx_sw = tx_sw_diff >= 1
++    used_rx_sw = rx_sw_diff >= 1
++
++    errors = 0
++
++    role = 'Server' if is_server else 'Client'
++    ksft_pr(f"=== Counter Verification ({role}) ===")
++
++    tx_dev_before = stats_before.get('TlsTxDevice', 0)
++    tx_dev_after = stats_after.get('TlsTxDevice', 0)
++    ksft_pr(f"TlsTxDevice: {tx_dev_before} -> {tx_dev_after} "
++            f"(diff: {tx_device_diff})")
++
++    tx_sw_before = stats_before.get('TlsTxSw', 0)
++    tx_sw_after = stats_after.get('TlsTxSw', 0)
++    ksft_pr(f"TlsTxSw: {tx_sw_before} -> {tx_sw_after} "
++            f"(diff: {tx_sw_diff})")
++
++    if used_tx_hw:
++        ksft_pr("TX Path: HARDWARE OFFLOAD")
++    elif used_tx_sw:
++        ksft_pr("TX Path: SOFTWARE")
++    else:
++        ksft_pr("TX Path: FAIL (no TLS TX activity detected)")
++        errors += 1
++
++    rx_dev_before = stats_before.get('TlsRxDevice', 0)
++    rx_dev_after = stats_after.get('TlsRxDevice', 0)
++    ksft_pr(f"TlsRxDevice: {rx_dev_before} -> {rx_dev_after} "
++            f"(diff: {rx_device_diff})")
++
++    rx_sw_before = stats_before.get('TlsRxSw', 0)
++    rx_sw_after = stats_after.get('TlsRxSw', 0)
++    ksft_pr(f"TlsRxSw: {rx_sw_before} -> {rx_sw_after} "
++            f"(diff: {rx_sw_diff})")
++
++    if used_rx_hw:
++        ksft_pr("RX Path: HARDWARE OFFLOAD")
++    elif used_rx_sw:
++        ksft_pr("RX Path: SOFTWARE")
++    else:
++        ksft_pr("RX Path: FAIL (no TLS RX activity detected)")
++        errors += 1
++
++    if expected_rekeys > 0:
++        tx_rekey_diff = (stats_after.get('TlsTxRekeyOk', 0) -
++                         stats_before.get('TlsTxRekeyOk', 0))
++        rx_rekey_diff = (stats_after.get('TlsRxRekeyOk', 0) -
++                         stats_before.get('TlsRxRekeyOk', 0))
++        rx_rekey_recv_diff = (stats_after.get('TlsRxRekeyReceived', 0) -
++                              stats_before.get('TlsRxRekeyReceived', 0))
++        tx_rekey_err_diff = (stats_after.get('TlsTxRekeyError', 0) -
++                             stats_before.get('TlsTxRekeyError', 0))
++        rx_rekey_err_diff = (stats_after.get('TlsRxRekeyError', 0) -
++                             stats_before.get('TlsRxRekeyError', 0))
++
++        tx_rekey_before = stats_before.get('TlsTxRekeyOk', 0)
++        tx_rekey_after = stats_after.get('TlsTxRekeyOk', 0)
++        ksft_pr(f"TlsTxRekeyOk: {tx_rekey_before} -> {tx_rekey_after} "
++                f"(diff: {tx_rekey_diff})")
++        if tx_rekey_diff < expected_rekeys:
++            ksft_pr(f"FAIL: Expected >= {expected_rekeys} TX rekeys")
++            errors += 1
++
++        rx_rekey_before = stats_before.get('TlsRxRekeyOk', 0)
++        rx_rekey_after = stats_after.get('TlsRxRekeyOk', 0)
++        ksft_pr(f"TlsRxRekeyOk: {rx_rekey_before} -> {rx_rekey_after} "
++                f"(diff: {rx_rekey_diff})")
++        if rx_rekey_diff < expected_rekeys:
++            ksft_pr(f"FAIL: Expected >= {expected_rekeys} RX rekeys")
++            errors += 1
++
++        if is_server:
++            rx_recv_before = stats_before.get('TlsRxRekeyReceived', 0)
++            rx_recv_after = stats_after.get('TlsRxRekeyReceived', 0)
++            ksft_pr(f"TlsRxRekeyReceived: {rx_recv_before} -> "
++                    f"{rx_recv_after} (diff: {rx_rekey_recv_diff})")
++            if rx_rekey_recv_diff < expected_rekeys:
++                ksft_pr(f"FAIL: Expected >= {expected_rekeys} "
++                        f"KeyUpdate messages")
++                errors += 1
++
++        if tx_rekey_err_diff > 0:
++            ksft_pr(f"ERROR: TlsTxRekeyError increased by "
++                    f"{tx_rekey_err_diff}")
++            errors += 1
++        if rx_rekey_err_diff > 0:
++            ksft_pr(f"ERROR: TlsRxRekeyError increased by "
++                    f"{rx_rekey_err_diff}")
++            errors += 1
++
++    if decrypt_err_diff > 0:
++        ksft_pr(f"ERROR: TlsDecryptError increased by {decrypt_err_diff}")
++        errors += 1
++
++    ksft_pr(f"=== Verification {'PASSED' if errors == 0 else 'FAILED'} ===\n")
++    return errors == 0
++
++
++def run_tls_test(cfg, cipher="128", tls_version="1.3", rekey=0, buffer_size=None, random_max=None):
++    port = rand_port()
++
++    server_cmd = f"{cfg.bin_remote} server -p {port} -c {cipher} -v {tls_version}"
++    if rekey > 0:
++        server_cmd += f" --rekey={rekey}"
++    if random_max:
++        server_cmd += f" -r {random_max}"
++    elif buffer_size:
++        server_cmd += f" -b {buffer_size}"
++
++    client_cmd = (f"{cfg.bin_local} client -s {cfg.remote_addr_v['4']} "
++                  f"-p {port} -c {cipher} -v {tls_version}")
++    if rekey > 0:
++        client_cmd += f" --rekey={rekey}"
++    if random_max:
++        client_cmd += f" -r {random_max}"
++    elif buffer_size:
++        client_cmd += f" -b {buffer_size}"
++
++    test_desc = f"cipher={cipher}, version={tls_version}, rekey={rekey}"
++    if random_max:
++        test_desc += f", random_size=1-{random_max}"
++    elif buffer_size:
++        test_desc += f", buffer={buffer_size}"
++    ksft_pr(f"Starting TLS test: {test_desc}")
++
++    stats_before_local = read_tls_stats()
++    stats_before_remote = read_tls_stats_remote(cfg)
++
++    with bkg(server_cmd, host=cfg.remote, exit_wait=True):
++        wait_port_listen(port, host=cfg.remote)
++        time.sleep(0.5)
++
++        ksft_pr("Running client...")
++        result = cmd(client_cmd, fail=False)
++        time.sleep(1)
++
++    stats_after_local = read_tls_stats()
++    stats_after_remote = read_tls_stats_remote(cfg)
++
++    ksft_pr("\n=== Client Side Verification ===")
++    client_ok = verify_tls_counters(stats_before_local, stats_after_local, rekey, False)
++
++    ksft_pr("\n=== Server Side Verification ===")
++    server_ok = verify_tls_counters(stats_before_remote, stats_after_remote, rekey, True)
++
++    ksft_true(result.ret == 0, "Client completed successfully")
++    ksft_true(client_ok, "Client TLS counters verified")
++    ksft_true(server_ok, "Server TLS counters verified")
++
++
++def read_tls_stats_remote(cfg):
++    stats = {}
++    output = cmd("cat /proc/net/tls_stat", host=cfg.remote)
++    for line in output.stdout.strip().split('\n'):
++        parts = line.split()
++        if len(parts) == 2:
++            stats[parts[0]] = int(parts[1])
++    return stats
++
++
++def test_tls_offload_basic(cfg):
++    cfg.require_ipver("4")
++    check_tls_support(cfg)
++    run_tls_test(cfg, cipher="128", tls_version="1.3", rekey=0)
++
++
++def test_tls_offload_aes256(cfg):
++    cfg.require_ipver("4")
++    check_tls_support(cfg)
++    run_tls_test(cfg, cipher="256", tls_version="1.3", rekey=0)
++
++
++def test_tls_offload_tls12(cfg):
++    cfg.require_ipver("4")
++    check_tls_support(cfg)
++    run_tls_test(cfg, cipher="128", tls_version="1.2", rekey=0)
++
++
++def test_tls_offload_tls12_aes256(cfg):
++    cfg.require_ipver("4")
++    check_tls_support(cfg)
++    run_tls_test(cfg, cipher="256", tls_version="1.2", rekey=0)
++
++
++def test_tls_offload_rekey(cfg):
++    cfg.require_ipver("4")
++    check_tls_support(cfg)
++    run_tls_test(cfg, cipher="128", tls_version="1.3", rekey=1)
++
++
++def test_tls_offload_rekey_multiple(cfg):
++    cfg.require_ipver("4")
++    check_tls_support(cfg)
++    run_tls_test(cfg, cipher="128", tls_version="1.3", rekey=99)
++
++
++def test_tls_offload_small_records(cfg):
++    cfg.require_ipver("4")
++    check_tls_support(cfg)
++    run_tls_test(cfg, cipher="128", tls_version="1.3", rekey=30, buffer_size=512)
++
++
++def test_tls_offload_large_records(cfg):
++    cfg.require_ipver("4")
++    check_tls_support(cfg)
++    run_tls_test(cfg, cipher="128", tls_version="1.3", rekey=10, buffer_size=2097152)
++
++
++def test_tls_offload_random_sizes(cfg):
++    cfg.require_ipver("4")
++    check_tls_support(cfg)
++    run_tls_test(cfg, cipher="128", tls_version="1.3", rekey=20, random_max=8192)
++
++
++def main() -> None:
++    with NetDrvEpEnv(__file__, nsim_test=False) as cfg:
++        cfg.bin_local = cfg.test_dir / "tls_hw_offload"
++        if not cfg.bin_local.exists():
++            raise KsftSkipEx(f"tls_hw_offload binary not found at {cfg.bin_local}")
++        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
++
++        ksft_run([
++            test_tls_offload_basic,
++            test_tls_offload_aes256,
++            test_tls_offload_tls12,
++            test_tls_offload_tls12_aes256,
++            test_tls_offload_rekey,
++            test_tls_offload_rekey_multiple,
++            test_tls_offload_small_records,
++            test_tls_offload_large_records,
++            test_tls_offload_random_sizes,
++        ], args=(cfg, ))
++    ksft_exit()
++
++
++if __name__ == "__main__":
++    main()
 -- 
 2.25.1
 
