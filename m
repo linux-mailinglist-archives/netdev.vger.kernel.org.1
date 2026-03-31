@@ -1,163 +1,172 @@
-Return-Path: <netdev+bounces-273602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273603-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KPjkHa+3y2mCKgYAu9opvQ
-	(envelope-from <netdev+bounces-273602-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 14:01:51 +0200
+	id eCKiIgu7y2kpKAYAu9opvQ
+	(envelope-from <netdev+bounces-273603-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 14:16:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBE223693E1
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 14:01:45 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4955369559
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 14:16:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2DC67301DC01
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:01:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A33A1308D3C0
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:10:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433BD3E121B;
-	Tue, 31 Mar 2026 12:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313EF3BE162;
+	Tue, 31 Mar 2026 12:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Brel6ArM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cb1nLBCQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA143E1CE4;
-	Tue, 31 Mar 2026 12:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774958485; cv=none; b=C5oAPMlb0cXZ0hepODpecIx9dx2Aboa7dYROx8k9V8xM0TKCs2zfAjMguuo8bCWQMGxqAePwuuwUS1G4V6QDfG1V41j96ebFQnXi97NhidCkYv/wN9X3XucAKIs0Y3uiN7q7JkUk3XTPTCC1/wLS/YV7xKO7+3Pj6xv66nVQKuk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774958485; c=relaxed/simple;
-	bh=19pbnbAimNIzR75qW8nQCtsMh4GPYhxXmu5AgTufCkg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FOqPrs68FY+fjQwXCd4Mq5n4QM5LMrf+2V93lltrF06n/kLmRduFmTPn8kxOUXJI8oPJcrVbOpuqz6UrxmiXAyixpAOWl83HHBQ4sN+kYpTKMBf5LX9OBRfQ1NUo67k/bT9gaUGo6ZUvvuLte+Dv3GCC5k36d1bdjGRG80G+KZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Brel6ArM; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZyyR0akWtd4Mb0R7I/8TtMbIbfwANm6SSQf2dtf2cO4=; b=Brel6ArMqPToKbIEcL9qm5xu+i
-	GLU+ilm4nbu/KjLa22PuJm00TH+5wE5PVuwLwbH0A6bu9lpfDb5J3azYJu5XYslJShsEkEG39egrZ
-	llecS410lhs6NddsLuGfu/SUm8upqUOX+2L2jFnq9/hA/xT0EPWPrP/iwt8rlxOvDiHDErmI1QcvG
-	wP+nR8C/CWs6TJ87iUX2aiRfr6+h5R4EqVNJcC5pSOi9c8i6wfHN+Qrmn3/3UOhs1hMUOenv0uKTM
-	BBYr+tUE6ZBHvUTgO1XkjElLhQKzmaVYWW3VOz3ZlOdnRx7Ziwt6+HG7/WiBPYHdTN7qhifYksK7m
-	2G5cPekA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49946)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w7Xma-000000001nt-0nGC;
-	Tue, 31 Mar 2026 13:01:20 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w7XmY-000000003ho-1UKs;
-	Tue, 31 Mar 2026 13:01:18 +0100
-Date: Tue, 31 Mar 2026 13:01:18 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Nicolai Buchwitz <nb@tipi-net.de>
-Cc: netdev@vger.kernel.org, Phil Elwell <phil@raspberrypi.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] net: phy: microchip: enable downshift by default
- on LAN88xx
-Message-ID: <acu3jgGklIfDVp-m@shell.armlinux.org.uk>
-References: <20260330224630.579937-1-nb@tipi-net.de>
- <20260330224630.579937-3-nb@tipi-net.de>
- <acuwvoydmJusuj9x@shell.armlinux.org.uk>
- <a7e4a17ed0ae027ee6ebfd5f79f7c85c@tipi-net.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4F63A5E65
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 12:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774959008; cv=pass; b=kFBrrHSBEQkKlMOLh24jmdQT4IPBCE4HzhldoAOT9YXYd0AWDqCDB0Ed/glNRDbKppkTunPjR+GjUVU7BIAILbXaiTJCCBNB0nGlHbjaONU2J445kzuJ3WF/SGEepRMNa2grGvd+Jod4huDUyUJbUx7AL1F4jOwmNRftGMdI7r8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774959008; c=relaxed/simple;
+	bh=vJMq57/wClwnNY5dpjMmFEdGhUe5I2y5Pp76zTkHmIM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nuNjTU2oUF2X5D/Qd7HDynSFImFaFPDO5m9VGzM//jUfSqN1eTmZJt49RFkr12rIWFfbmBTmKIpNozH0qr9B6g6ez/zb40KXX9jFRQs+PXVzqI4C7nRPHzgguTtksvIlkaHIKXUxxV/mw48+9DzTaH1/6fkb2ZQTM5YQm7f8mpc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cb1nLBCQ; arc=pass smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8cb5c9ba82bso1119787985a.2
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 05:10:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774959006; cv=none;
+        d=google.com; s=arc-20240605;
+        b=hQlgHmtXaYqD6STto6jztFbTiWzndIUDnWi5MY71Xfx/6H+A37GarwEXMrcvkRxoTZ
+         M91ctFu7Z+EwDpOc08mAcK9rbzZ5B7M3ULsOroQ9AYPvAPlRCCdaku+Y0OxKyO1IVRnc
+         66iQ7GZYIh+bgsWnRslEryacO+AIRq4nw5TjORgGeP/cJmOeR3pc25xeN+HF/bUAk3sz
+         zkTLSUJNOXiVyHQqoxvfmoSw6A0WaTo/Q6PP6s0XFZLZp7ICMEzO9iIyYb/ohH2yC859
+         0RjTtOR06dzxQiLQ0ZF9q70m/zUj4Urr/JPG9+LUdoofVjTUcZSsV6xSC0z2SFKbgWre
+         2f8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Yn95I3ICsqrJ7jTfACKZcGf3ErmbeIE6oN1Rzg5BGvE=;
+        fh=AyP4bLV3bPD/2MCDIfhXVxo54GHeFF87SCO1h6KYv1A=;
+        b=gf0WVV8/kL0IecZHb+YukN8P0NoYCD/nUddNNx9hDFW95nuGfDXT9x66+kHRvRs3/P
+         optJ0D9umyZsWJPMnRxtR9ySy/BDaKKm7cjCTK1Qz22Dgke1NthIMS5UQXimsU+ahCmb
+         /WxAUCQKUl46C08AyHca2xpEVRlXCDKJIAo9z1LaPhclrY8PWVMCLvm7JEBJjRnkJEG3
+         o63v7Y4n3ZCzrZUd59qpzKxFMEneetgqW05WPe87cjjBxq/fxBwTXivCjMRpPSkniSL/
+         U74e/fJacfc5+Ir6ddx9Jdsry9dnj90yFs4ja9Vc5BfE4BK8dLX4hi7NMSb94LnEIc9s
+         Yywg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774959006; x=1775563806; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yn95I3ICsqrJ7jTfACKZcGf3ErmbeIE6oN1Rzg5BGvE=;
+        b=cb1nLBCQAvEDcEZ0oYNNa7odmFM/8M7oU107QGoOshNacCNL5HgbFFh6GlTV3Nb+XW
+         OtyQOSn1kA1n4AHWhGLQcyG2TVi/xJdKaaTelBl8aUJV11diX71mTx6puMZHigfqe5W3
+         oJZQIrKsId6AiNvFpng5Bf/cKSIKxbsixJ2zyBlccuXjeROxk1smWQxVh/r31smmGxvy
+         GeN1Dun26GQWz6pEIQc15qa+R20yhVbB6ALh8gzs4AlFjVrzJfxTsGod1nVHzjq+mVDk
+         uDpdyqqEZ72Y1KIz2x+DzOdMZ6svtuefW4eSj1pndAqsbE2CmlsmkBkcxgPJztirHGlO
+         STZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774959006; x=1775563806;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Yn95I3ICsqrJ7jTfACKZcGf3ErmbeIE6oN1Rzg5BGvE=;
+        b=kaBiaLja2kH2CyGgaGvEy0+FDvz/6aUIByMB/7GNsrKBN+iZS70zmTQ3LKbyw1nvqD
+         Cjj292a6AFzn2oL431MMZjyOjYqY9FatoCCGEjT0YAo01RED0xtmUfxq/quqtJHzGhY+
+         m0+mFnv8DFrDRRecQklHPHA06ZNUMolxMv2/gce345GB4LrojUHzEQ6viUI67zPNtqL3
+         p3/wC3C1FxQ3xUZUJaZZJ0kgvvjckBed86FYTNh1n+Vy268jiX1gHO8pQ5fPGbdgG1UV
+         yxRA9jXRP2ZSiV4uLcWNWQiOUYdIsvMQAHf31cugklvW0knWG3y2ULg65vbpTkKl4xee
+         2emA==
+X-Forwarded-Encrypted: i=1; AJvYcCWM4oAVb28aIRCalFCoLY5ECj2/1SP1h1ZLpjp6wSSKVTWNGLm8N094SIlE1YI+KA3fK6CpkmU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQNhkrAu+KHP25Sg3X8W+6AUfZotGyjc65ebTpYVkM5t/lcFJ9
+	398il1g3AXBSS+RInDntNtPxggALDbLorjsbJhsgiD0sRprMYVOwVuqboro82n0UnAzuCZr9TH6
+	nb2W972cGQtgiYm4zt1XSHtOg/lgOiPqlfT0eCNRY
+X-Gm-Gg: ATEYQzw+SnZregdV2PF+W61v4hJAUf/i0+HLGgNVAxLI0Uk/ylJVWRLVJxigPuEDW5C
+	JjJOV76jPVRxYIlyknCJdmUHbz7acxT5vv1SYOYBYfvvYxDi3XgpsfW2U5kGii6368j2SnTiVSM
+	tN2XecH6wQaNkvCSxxzYOfmqKRmG1VtU2MOKX6wjWn+B+5l+xrMRk6Ygf2Bxe5mBppqBhgyLyw9
+	gWPq5QXZLWWlcGAZxF54Dd22q7oAMOUY56Cr87ybSAu+JT6fbBXCncSELheVt34aii2xndrxf0g
+	GYj7yEyVogBjL3w+
+X-Received: by 2002:a05:622a:18a8:b0:50b:49d4:e54 with SMTP id
+ d75a77b69052e-50ba3808c8amr227341241cf.15.1774959005183; Tue, 31 Mar 2026
+ 05:10:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a7e4a17ed0ae027ee6ebfd5f79f7c85c@tipi-net.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+References: <51dfd8ae-dc4e-4837-9b00-c596c457117e@redhat.com> <tencent_E0D6D670591F561A4020EBC8283A39504E08@qq.com>
+In-Reply-To: <tencent_E0D6D670591F561A4020EBC8283A39504E08@qq.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 31 Mar 2026 05:09:52 -0700
+X-Gm-Features: AQROBzDEqmRIa2Yi7l3tWriGwFhEZnjVNvF-nnSSZAR0RhLYkDOxGwy-86k9FBQ
+Message-ID: <CANn89iJXEmFMh7Sj4H-5xqjz1+h2Fnt8SBXbCnRFvezGsbfvpA@mail.gmail.com>
+Subject: Re:
+To: Wang Jun <1742789905@qq.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, gszhai@bjtu.edu.cn, 25125332@bjtu.edu.cn, 
+	25125283@bjtu.edu.cn, 23120469@bjtu.edu.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,raspberrypi.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	TAGGED_FROM(0.00)[bounces-273602-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273603-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RSPAMD_URIBL_FAIL(0.00)[armlinux.org.uk:query timed out];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FREEMAIL_TO(0.00)[qq.com];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.994];
 	PRECEDENCE_BULK(0.00)[];
-	NEURAL_SPAM(0.00)[0.436];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:email,shell.armlinux.org.uk:mid,armlinux.org.uk:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lunn.ch:email]
-X-Rspamd-Queue-Id: BBE223693E1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qq.com:email]
+X-Rspamd-Queue-Id: E4955369559
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 31, 2026 at 01:58:55PM +0200, Nicolai Buchwitz wrote:
-> On 31.3.2026 13:32, Russell King (Oracle) wrote:
-> > On Tue, Mar 31, 2026 at 12:46:27AM +0200, Nicolai Buchwitz wrote:
-> > > Enable auto-downshift from 1000BASE-T to 100BASE-TX after 2 failed
-> > > auto-negotiation attempts by default. This ensures that links with
-> > > faulty or missing cable pairs (C and D) fall back to 100Mbps without
-> > > requiring userspace configuration.
-> > > 
-> > > Users can override or disable downshift at runtime:
-> > > 
-> > >   ethtool --set-phy-tunable eth0 downshift off
-> > > 
-> > > Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
-> > > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> > 
-> > I'm slightly concerned by this commit. ->config_init() is called when
-> > the netdev attaches the PHY, and also during the resume path - and it's
-> > the second one which I believe is a problem here.
-> > 
-> > If the user has configured the downshift, it is reasonable for the user
-> > to expect the setting to be preserved over a suspend/resume. However,
-> > by placing this code in ->config_init(), you will overwrite the user's
-> > setting when the system resumes.
-> 
-> You have a valid point. Looking at other drivers, Marvell has the
-> same issue: m88e1112_config_init() unconditionally sets downshift to 3
-> on every config_init call.
-> 
-> I see two options:
-> 
-> 1. Save the user's setting in the driver's priv struct and restore it
-> in config_init instead of blindly applying the default.
-> 
-> 2. Handle it generically in the PHY core, saving/restoring tunable
-> state across suspend/resume for all drivers.
-> 
-> I'd lean towards (1) to keep this series simple. (2) could be a
-> follow-up that fixes Marvell and others too. What do you think?
+On Tue, Mar 31, 2026 at 4:15=E2=80=AFAM Wang Jun <1742789905@qq.com> wrote:
+>
+> Hi Paolo Abeni,
+>
+> This is v2 of the DMA mapping error handling fix for ns83820. Changes sin=
+ce v1:
+>
+> - Added queue restart check in error path to avoid potential TX queue sta=
+ll
+>   (as pointed out by the AI review)
+> - Adjusted variable declarations to follow reverse christmas tree order
+> - Switched from dma_unmap_single to dma_unmap_page for fragments
+>
+> Thanks to reviewers for the feedback.
+>
+> Subject: [PATCH v2] net: ns83820: fix DMA mapping error handling in
+>  hard_start_xmit
+>
 
-Or (3) configure the default it in the probe function?
+This is not how a new version of a patch needs to be submitted.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Look at https://patchwork.kernel.org/project/netdevbpf/list/ and
+compare your patch with others...
+
+Thanks.
 
