@@ -1,67 +1,76 @@
-Return-Path: <netdev+bounces-273638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273639-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iJKIDD3Oy2luLwYAu9opvQ
-	(envelope-from <netdev+bounces-273638-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:38:05 +0200
+	id 8Hk7CjXPy2mILwYAu9opvQ
+	(envelope-from <netdev+bounces-273639-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:42:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A081736A5DD
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:38:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 400C136A69A
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:42:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 73BFD3020ECF
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:35:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 77C483025732
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:38:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3653F317162;
-	Tue, 31 Mar 2026 13:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD242F39CE;
+	Tue, 31 Mar 2026 13:38:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K81gF7XR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kdEZvqlE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 121BC3019A4;
-	Tue, 31 Mar 2026 13:35:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B97723958D;
+	Tue, 31 Mar 2026 13:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774964149; cv=none; b=MWeDdKmHIOUqf6rhXshVIDodRRO+6GQ0+ove/PgadEmgSHoFkpiOXAtzD81fykLaxpkDDW0FS0q0pdB81I5VFflAuMblqw768KuEM73EHttQF+r2u2MmfwQK6EfjscleXlGpAEZyPPK57/AboYj3HzYt0nsVDf5kZEqz5UvKwqE=
+	t=1774964302; cv=none; b=Ys2BhaqI7e58wnVx+1v2vy4vexgOFEuipvlaZnl1liUynJf3wzYp20m+8qbyziYRS/IrU2/9S4IXAfCop7pBfSDyhzPh6ZmWFoMgZoXna46aG8rb+yINMZi5vmpmJ7p1K7oT0XJ6hbbv7xGMU+QKZzRfaOST3Vuc4a26k5MqxE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774964149; c=relaxed/simple;
-	bh=T7CKcWnw0/Y648smPZCLrFLT4ryWZtkgPW//JWGynMw=;
+	s=arc-20240116; t=1774964302; c=relaxed/simple;
+	bh=fM0kCdNQKvtQ3Sw8jKAxEzWo5iK4fm4bQbsosa1F5lg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dRIXuF14A9dmEff/2ajIU/vgUEMpj2Rn5NvSOEwzJLoAk/h2kb248yN5NYacE9Y0w0b9gFQgnHqnMElHhX/spxLm1JZEaaZuCO+7BzQL0QY9oABVsp1mvzzFZa7CIq3h+N5zAInygAlsa0oNkNTtltsGMAtY2KnzDyvfq2oeo/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K81gF7XR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3D6EC19423;
-	Tue, 31 Mar 2026 13:35:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774964148;
-	bh=T7CKcWnw0/Y648smPZCLrFLT4ryWZtkgPW//JWGynMw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=K81gF7XRIHDSqtDeXLYPJ49+bK0BxJmbsE9v1yZoU0aXCXcf96P4V2APhihTnCt0D
-	 CZOIQQqb58JErx9VcfbX3QTfkyJlb01SNRArlqjjUIXfVGLYt7dPW95Pu2KsdmNwNR
-	 4ycSoDd+/RPv701ksTbAW4Au8cr3OZ6ccMwL7zLJs9vwvFDWr9Cb0p6mjbIv6jds1V
-	 ISGAxfZurcIMqWk02UViuL5pFtTZ7LEBH/Nbg4ODW4iH8gas8f/cz9wuerbJU+JFxy
-	 8vTwwE1+2O+PEEyJSRDfcyZ43PerNEL+bUsfN06Z3IC2SVho9tK8ZuqvFYAQQJ1hfe
-	 xkPhRr1qLLchw==
-Date: Tue, 31 Mar 2026 07:35:46 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Zhiping Zhang <zhipingz@meta.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-rdma@vger.kernel.org,
-	linux-pci@vger.kernel.org, netdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, Yochai Cohen <yochai@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Bjorn Helgaas <helgaas@kernel.org>
-Subject: Re: [RFC v2 1/2] vfio: add callback to get tph info for dmabuf
-Message-ID: <acvNsvS5ShlQlrox@kbusch-mbp>
-References: <20260324234615.3731237-1-zhipingz@meta.com>
- <20260324234615.3731237-2-zhipingz@meta.com>
- <20260325082534.GN814676@unreal>
- <acW2BwQKaUbS3eL9@kbusch-mbp>
- <20260331083758.GA814676@unreal>
- <acvFV8c5QVxnt3Em@kbusch-mbp>
- <20260331132942.GC814676@unreal>
+	 Content-Type:Content-Disposition:In-Reply-To; b=iT2WYBXnPdd3vBzKJix4V1DfdyOdmlilwsCzP3rW6h9auzHphXpbzsKFyQrtjhYqWnXNrREDdEuuXLzo87VBXM7VUKMxnBt/0NeVZfXAmvxOXRPj7KivUWPo4sU9n/R0oQ0uWLmjIMybRv0WcEeTfR8SlXhXJ/7GcdY0NPe5cos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=kdEZvqlE; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=8SfiYxYPsCmBQN0cjhyBPejDkbLaM0G7dokSuXlFabI=; b=kdEZvqlEYcPTes5uvkczlOSatZ
+	WGsTV9x/GXoHkkrCfMbDf32NEDxsB3QV6WKqzQKMycmJUeMY0wkbgiYhD2koL+oOvCLpMXHckXDTd
+	Dt6Aj53q+wkqNzd9B/WaFoIgQDCgrXNym8IPYf63FcWYQRyZEnMtzKZhZJGxcfFeeaGT8jZrRGfPl
+	8Ro7CImCYu2MIOm8IhxbtVAGDWTMDlGvc8a/03Z74R2gfb89ULYIgFzIny40xkwvHyndSTlIpq7W1
+	IXi9988wv+CzCYVK/4Oz/lSobHoR1XqLVB3J2M/vkGV4RzE/3/hPLCuVwdeVCv2lMi/cw7PjjCicH
+	aSL4EtMw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51508)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1w7ZIG-000000001tK-3bYE;
+	Tue, 31 Mar 2026 14:38:09 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1w7ZIA-000000003lU-3Zkg;
+	Tue, 31 Mar 2026 14:38:02 +0100
+Date: Tue, 31 Mar 2026 14:38:02 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jan Hoffmann <jan@3e8.eu>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Markus Stockhausen <markus.stockhausen@gmx.de>,
+	Damien Dejean <dam.dejean@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: phy: realtek: support MDI swapping for
+ RTL8226-CG
+Message-ID: <acvOOnuc709EhdSo@shell.armlinux.org.uk>
+References: <20260327202001.413280-1-jan@3e8.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,61 +79,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260331132942.GC814676@unreal>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+In-Reply-To: <20260327202001.413280-1-jan@3e8.eu>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273638-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273639-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,makrotopia.org,gmx.de,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_SPAM(0.00)[0.656];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kbusch@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A081736A5DD
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
+X-Rspamd-Queue-Id: 400C136A69A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 31, 2026 at 04:29:42PM +0300, Leon Romanovsky wrote:
-> On Tue, Mar 31, 2026 at 07:00:07AM -0600, Keith Busch wrote:
-> > On Tue, Mar 31, 2026 at 11:37:58AM +0300, Leon Romanovsky wrote:
-> > > On Thu, Mar 26, 2026 at 04:41:11PM -0600, Keith Busch wrote:
-> > > > 
-> > > > You're suggesting that Ziping append the new fields to the end of this
-> > > > struct? I don't think we can modify the layout of a uapi.
-> > > 
-> > > He needs to add before flex array. This struct is submitted by the user
-> > > and kernel can easily calculate the position of that array.
-> > 
-> > No, you can't just do that. Existing applications would break when they
-> > compile against the updated kernel header. They don't know about this
-> > new "tph" supplied flag, but they'll all accidently use the new
-> > dma_ranges offset. 
-> 
-> So we need to always pass TPH flag and treat 0 as do-nothing-field.
+On Fri, Mar 27, 2026 at 08:32:28PM +0100, Jan Hoffmann wrote:
+> +static int rtl8226_config_init(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	ret = rtl8226_config_mdi_order(phydev);
+> +	if (ret)
+> +		return ret;
 
-I don't think you're understanding the implications. If Zhiping appends
-new fields in front of the flex array dma_ranges, then existing
-applications will implicitly use the new offset if they are recompiled
-against the new kernel header. But if the binary was compiled against
-the older kernel header, then that application would use the previous
-offset. Both applications have the TPH flag cleared to 0. How is the
-kernel supposed to know which offset the application used?
+As I've been pointing out in other patches, putting this "defaulting"
+here is not a good idea - this path gets called when the PHY is attached
+to the netdev and also when the PHY is being resumed - which will wipe
+out the user's configuration just because their system suspended.
+
+I don't think that gives the user a good experience.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
