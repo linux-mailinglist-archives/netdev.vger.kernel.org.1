@@ -1,126 +1,121 @@
-Return-Path: <netdev+bounces-273423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273425-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0BlhGdwcy2kEEAYAu9opvQ
-	(envelope-from <netdev+bounces-273423-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:01:16 +0200
+	id 8DqQCHAdy2kEEAYAu9opvQ
+	(envelope-from <netdev+bounces-273425-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:03:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7C27362F48
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:01:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 483C8362F83
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:03:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9D6373013A83
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:00:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CFEB8301113D
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 01:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05F992236E8;
-	Tue, 31 Mar 2026 01:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B65199EAD;
+	Tue, 31 Mar 2026 01:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gijhxp5S"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bKGtF3rm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C4618859B
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 01:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1E440DFB9;
+	Tue, 31 Mar 2026 01:03:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774918821; cv=none; b=MsUjSZ/bX1GvXhB7kr4D3B6TgzJF/xQmeTkuyfpS4qv8+0z783gh0X0xQBBQn3DcKXMCk/y1hBafCLGhlBPCglQKNfYDAw62PS+Stxy6oAjBGONsQNRyJMJhiTP07ikuYyOVESZVDXZX2hhFq3h84kxWwBRtFVgfjBuCAlzDSgE=
+	t=1774919000; cv=none; b=jxgxJNf1mCQD5tiIzrtwGewEKwpGqIVnp1cafcxKP1RmQr2jOFmLo9DMMP377tJHTIks3NYjsU035Oo/wNsYY0S9FIUiUMsWAkjYvfcdpb8gQaMVWO6a/8nNseaQv/IbWFRIGvmjEBrZtXdtvZTp6XeMButFvfhdlherps6yTHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774918821; c=relaxed/simple;
-	bh=szpEjX0j6heXzguxWqJ0qH7qpPaR+6vOp8U6CI4dkXA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FurC3Ff70ImOzvyD1UwV/gCtuNN4Mx6f5EmlP3zCG1cfMbN7nRFWsxsy4lH09eelH1jX6/e7XLMiJltjQ7mGhDLkVEl5jmetolPbFLSFwWLA8/DMc4BolmH22NWoHeKtTytG+n+rTXl3YXQ8v7maioOlVdihlP4bftW7c6CbEnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gijhxp5S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90B15C4CEF7;
-	Tue, 31 Mar 2026 01:00:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774918821;
-	bh=szpEjX0j6heXzguxWqJ0qH7qpPaR+6vOp8U6CI4dkXA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Gijhxp5S35kX2LmIbq7BsLVAGOIjfArqd1GvOuzAQOh+x4TGgku2C2y7FVs0Nlxxm
-	 ghCe5TJkDmgUKYdRoA8dg/FmyPnS4kZPR/TI8SMxMWVHMw3cYt6QKg0NXK2+YiYUDh
-	 6UD1na2OlRGRbX/qg8EfeDPH1KMaYm/itnvlhhx9NvY8ZuCY3r107qop1wK+L5m7v9
-	 MEqO3HZyqXCOvzostCgW1VfxkQDUYEl+3Fc6bpBZ7XPLeLh2qwj9rhv7RzG6ecvQw5
-	 gXHVaAyK4a3680PvndlYtcX248+u7nRel7+s5CBeI/QZbNmLORQ/ozHIMyfQorAhvr
-	 XZGwwQLpaj07w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B2A41392FF97;
-	Tue, 31 Mar 2026 01:00:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1774919000; c=relaxed/simple;
+	bh=EEnGHDGcPXbkA4XoPEgIoHMDOY3ZA9HT/e9LOMKZytg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qDJ/MF7d0zokgsaOfspXwUuxKx3LQD4SdWygg4B/kOwvdmEd84hhVpcydqx6LvnoXR102FqZZcd+yid1iVRDShhpg0vmd+ooOm+SjQwgMdf4Jv5TCeCKjXBtMxDwanNQfhzPDKB1gRO5clR8XTbkNEiEiXaJGjJoByreb4CskXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bKGtF3rm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9jV5sRl7iwcYGmx0pZppSKRzzBz6NVBY7Uz72jbXcC4=; b=bKGtF3rmqCnWl/tm+oiS9c6MMi
+	ezxpdVlSFY/B3t2gcinwlpod2VDuBWo9C2/iWJD+jkhprTyZAFq5GqHHUWjb1xLKUHyPlpjI8B1LQ
+	s7ZMziCdkEkfcH1GQFIy9E8ZH9RImWaPCWO8yf8X1NP4mKpefbGWj7V+q0v46YJqqTow=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w7NVQ-00E7Oi-Fa; Tue, 31 Mar 2026 03:02:56 +0200
+Date: Tue, 31 Mar 2026 03:02:56 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: netdev@vger.kernel.org, Phil Elwell <phil@raspberrypi.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] net: phy: microchip: add downshift tunable
+ support for LAN88xx
+Message-ID: <1778259e-6513-4af3-bd43-63ffdcc1dc9c@lunn.ch>
+References: <20260330224630.579937-1-nb@tipi-net.de>
+ <20260330224630.579937-2-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: sched: cls_api: fix tc_chain_fill_node to initialize
- tcm_info to zero to prevent an info-leak
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177491880562.2039242.10970042830045841478.git-patchwork-notify@kernel.org>
-Date: Tue, 31 Mar 2026 01:00:05 +0000
-References: <20260328211436.1010152-1-echelonh@gmail.com>
-In-Reply-To: <20260328211436.1010152-1-echelonh@gmail.com>
-To: Yochai E <echelonh@gmail.com>
-Cc: davem@davemloft.net, jhs@mojatatu.com, jiri@resnulli.us,
- security@kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260330224630.579937-2-nb@tipi-net.de>
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273423-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[vger.kernel.org,raspberrypi.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
+	TAGGED_FROM(0.00)[bounces-273425-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D7C27362F48
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tipi-net.de:email]
+X-Rspamd-Queue-Id: 483C8362F83
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sun, 29 Mar 2026 00:14:36 +0300 you wrote:
-> When building netlink messages, tc_chain_fill_node() never initializes
-> the tcm_info field of struct tcmsg. Since the allocation is not zeroed,
-> kernel heap memory is leaked to userspace through this 4-byte field.
+On Tue, Mar 31, 2026 at 12:46:26AM +0200, Nicolai Buchwitz wrote:
+> Implement the standard ETHTOOL_PHY_DOWNSHIFT tunable for the LAN88xx
+> PHY. This allows runtime configuration of the auto-downshift feature
+> via ethtool:
 > 
-> The fix simply zeroes tcm_info alongside the other fields that are
-> already initialized.
+>   ethtool --set-phy-tunable eth0 downshift on count 3
 > 
-> [...]
+> The LAN88xx PHY supports downshifting from 1000BASE-T to 100BASE-TX
+> after 2-5 failed auto-negotiation attempts. Valid count values are
+> 2, 3, 4 and 5.
+> 
+> This is based on an earlier downstream implementation by Phil Elwell.
+> 
+> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
 
-Here is the summary with links:
-  - net: sched: cls_api: fix tc_chain_fill_node to initialize tcm_info to zero to prevent an info-leak
-    https://git.kernel.org/netdev/net/c/e6e3eb5ee89a
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+    Andrew
 
