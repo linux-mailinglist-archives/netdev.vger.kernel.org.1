@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-273420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273421-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wPIAKfwby2kEEAYAu9opvQ
-	(envelope-from <netdev+bounces-273420-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:57:32 +0200
+	id gP92Iqscy2kEEAYAu9opvQ
+	(envelope-from <netdev+bounces-273421-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:00:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 274BB362EBE
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 02:57:32 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6779362F0E
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 03:00:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 27A6D30396BD
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:55:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4EEDC30AE90A
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 00:55:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1752A3016F1;
-	Tue, 31 Mar 2026 00:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29457307481;
+	Tue, 31 Mar 2026 00:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bU4hc9ou"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LffY4bDa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E837D2F0C45
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 00:55:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E542F0C45
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 00:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774918549; cv=none; b=EuckH56/9V++E6K4O7yYVV5ZTHTnf6aYuwZwxJQXcrtuOXTX1LJHeu2J0x8m58oygCfW/hfrBLQHPGUMzyr5g94/z3P70JjcMU7+amXJz/BpU1VKQcAnTywz2KSrq3ovJt/UbjGVNaNa0T8T7A9ojQALPpqSXYiSHLe9vtbA+LU=
+	t=1774918551; cv=none; b=BxrqwdbCrBdAu0Nnihvl27s6lLOtnxpw+egG57LSNi6Novz1uV5KObR7a/neGTJ+emgGEhqwNCWa5OkEwtasYgqbopWGH2vFC67LWWH/mfs3Ty+LUBSaQ+4M7+eJ2FVfNZQR7mjV73gcVuhwl8NWb2Ufqz/NQCF+etaJg9X5FI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774918549; c=relaxed/simple;
-	bh=Z12xXaMLQzTv74SK2vyYxnztFcumyqBh9+YGmq+0VQY=;
+	s=arc-20240116; t=1774918551; c=relaxed/simple;
+	bh=3Ark8aQOY4Em3R/sHF7aPS9hggZ7ftzGSA3PfLmQP54=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BPo106v3jbPNPOtkfbaPS7y3m5YlmrAu7hJ40fqkyHKNxJyFyB+lTt6q0IQg+erOnD8l2ykT97EgOrA+u7iSrC1HWl+cC085sv890rxIQ+FihnRn2RR5WRaxkL3WOKWc9Itvu82x3HZRSarcR4+XeC5w/e5fn1mMuAG10fowQLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bU4hc9ou; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30D5EC19423;
-	Tue, 31 Mar 2026 00:55:47 +0000 (UTC)
+	 MIME-Version; b=gWuOoK31WDYzTAJ/xrGF7z40g0pBNg2srlA70uuV8kUq6NYF6RNRQZ6/CHzFCv+4MO32+IyDeND9Otvq1ao5+x9d7cJOdBFppHaGJ5tDuR3vEpPy+6GMkULCmnJdHhxReQ85UCBqyJRX+/lQSQWrdAfFWJteF1+cNspDOTUZSzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LffY4bDa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36FF3C19423;
+	Tue, 31 Mar 2026 00:55:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774918548;
-	bh=Z12xXaMLQzTv74SK2vyYxnztFcumyqBh9+YGmq+0VQY=;
+	s=k20201202; t=1774918550;
+	bh=3Ark8aQOY4Em3R/sHF7aPS9hggZ7ftzGSA3PfLmQP54=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bU4hc9oup64w+Z8SYhtNAY8Ii2AXSVBgSQhu/om3DN25sRaxXAz26/JTvbRL2rt6a
-	 fi1exbtEqgH+PQvJ8PDxESWRNA9Eo+9Hi5vyvNQzELDoxso6g4qJcUJpHRJhYEv9tP
-	 EjUNboDWCZbvhTUfbpYAhXM/vCjOYnqwigIakhMg0yw6gCTGClJjb3Gs8yW2xQyUvq
-	 nYGmjIv9H0XKBdUhnZtIS0RmBgF7oFMXwFwH5s+U1lk1Q6EY9Nip+n3vj1mBjW5IH7
-	 brhqT05z+d0Bd8FMt8PQ2zAo45xjLyS0eG2USAIJEf6uwXNylXF906JzGJUn9VGGC6
-	 i8bJ6QxrGi03w==
+	b=LffY4bDaAigmVthD8v/54Y8FenFC8hhtHpzs+VccKmu0W/7a1ozLBnexSNRm0sM15
+	 6PjIYkr4lCJUUyQR1xuY4XZfyaLCxvPSsmTHFukwG2RFvIPP1W1xJmog5pKqKsCscm
+	 Ex8LjoidMbrayj4CKXgIywIElrCveTSwSerExpexJMU+ivIHYYmAxFaZwgY9lCK8JN
+	 M/sa3xJRLPXvOs/c+kSmZM9MJqHtCT3ve0b1YQUSMcDXCV8JQn83ECzVF0hVansA3P
+	 fDqnMiSWu8Wpr2iKzb9E2r/qcepYximxTSvLn2kBID5CG79WZEX8UMUDtvz/f1KImF
+	 DufffcATgDRhA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: jiawenwu@trustnetic.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -63,12 +63,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	larysa.zaremba@intel.com,
 	abdun.nihaal@gmail.com,
 	leitao@debian.org
-Subject: Re: [PATCH net-next v6 09/11] net: wangxun: add Tx timeout process
-Date: Mon, 30 Mar 2026 17:55:45 -0700
-Message-ID: <20260331005546.3459790-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v6 10/11] net: wangxun: improve flow control setting
+Date: Mon, 30 Mar 2026 17:55:49 -0700
+Message-ID: <20260331005549.3459818-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260326021406.30444-10-jiawenwu@trustnetic.com>
-References: <20260326021406.30444-10-jiawenwu@trustnetic.com>
+In-Reply-To: <20260326021406.30444-11-jiawenwu@trustnetic.com>
+References: <20260326021406.30444-11-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,14 +83,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,net-swift.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,armlinux.org.uk,linux.intel.com,intel.com,dama.to,debian.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[18];
-	TAGGED_FROM(0.00)[bounces-273420-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273421-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -103,135 +103,160 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 274BB362EBE
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E6779362F0E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: wangxun: add Tx timeout process
+net: wangxun: improve flow control setting
 
-Implement .ndo_tx_timeout to handle Tx side timeout event. When Tx
-timeout event occur, it will triger driver into reset process.
+Save the current mode of flow control, check the pause frame statistics
+in watchdog to clear WX_HANG_CHECK_ARMED. The received pause frames are
+divided into XON and XOFF to be counted, and Tx XON pause is disabled by
+default for SP devices.
 
-The WX_HANG_CHECK_ARMED bit is set to indicate a potential hang. It will
-be cleared if a pause frame is received to remove false hang detection
-due to 802.3 frames, which is implemented in later commit.
-
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_err.c b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> new file mode 100644
-> index 0000000000000..bb77bdce69d22
-> --- /dev/null
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_err.c
-> @@ -0,0 +1,126 @@
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> index 2f71dc24306d4..4e0195f7df39e 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
 [ ... ]
-> +static void wx_reset_subtask(struct wx *wx)
+> @@ -2831,6 +2842,28 @@ int wx_fc_enable(struct wx *wx, bool tx_pause, bool rx_pause)
+>  }
+>  EXPORT_SYMBOL(wx_fc_enable);
+>  
+> +static void wx_update_xoff_rx_lfc(struct wx *wx)
 > +{
-> +	if (!test_bit(WX_FLAG_NEED_PF_RESET, wx->flags))
+> +	struct wx_hw_stats *hwstats = &wx->stats;
+> +	u64 data;
+> +	int i;
+> +
+> +	if (wx->fc.mode != wx_fc_full &&
+> +	    wx->fc.mode != wx_fc_rx_pause)
 > +		return;
 > +
+> +	data = rd64(wx, WX_MAC_LXOFFRXC);
+
+Is it possible that rd64() is reading a 32-bit register here?
+
+Looking at wx_clear_hw_cntrs(), WX_MAC_LXOFFRXC is cleared using rd32().
+
+If rd64() reads an adjacent unmapped address, could it populate the upper 32
+bits of data with garbage?
+
+> +	hwstats->lxoffrxc += data;
+> +
+> +	/* refill credits (no tx hang) if we received xoff */
+> +	if (!data)
+> +		return;
+> +
+> +	for (i = 0; i < wx->num_tx_queues; i++)
+> +		clear_bit(WX_HANG_CHECK_ARMED,
+> +			  wx->tx_ring[i]->state);
+> +}
+
+If data is populated with garbage from the upper 32 bits, would this bypass
+the check for zero and unconditionally clear the WX_HANG_CHECK_ARMED bit on
+all Tx queues, preventing the Tx hang recovery watchdog from operating?
+
+>  /**
+>   * wx_update_stats - Update the board statistics counters.
+>   * @wx: board private structure
+> @@ -2844,6 +2877,10 @@ void wx_update_stats(struct wx *wx)
+>  	u64 restart_queue = 0, tx_busy = 0;
+>  	u32 i;
+>  
 > +	if (!netif_running(wx->netdev) ||
 > +	    test_bit(WX_STATE_RESETTING, wx->state))
 > +		return;
 > +
-> +	rtnl_lock();
-> +
-> +	wx_warn(wx, "Reset adapter.\n");
-> +
-> +	if (test_bit(WX_FLAG_NEED_PF_RESET, wx->flags)) {
-> +		if (wx->do_reset)
-> +			wx->do_reset(wx->netdev, true);
 
-Can this race with dev_close()? 
+Does this early return cause the final hardware statistics to be lost on
+interface teardown?
 
-If the interface is brought down concurrently, dev_close() acquires rtnl_lock(),
-clears the running state, and frees resources. When wx_reset_subtask() later
-acquires the lock, it does not re-check netif_running(). 
-
-Could this result in calling do_reset() on a closed interface, leading to
-hardware state inconsistencies or use-after-free crashes?
-
-> +		clear_bit(WX_FLAG_NEED_PF_RESET,  wx->flags);
-
-Could this unconditionally clear WX_FLAG_NEED_PF_RESET even if another
-context sets it during the do_reset() execution? Should this use
-test_and_clear_bit() before the reset operation to avoid losing concurrent
-reset requests?
-
-> +	}
-> +
-> +	rtnl_unlock();
-> +}
+Since the explicit wx_update_stats() calls were removed from
+ngbe_disable_device() and txgbe_disable_device(), and the interface is
+marked down before hardware disablement completes, it seems any statistics
+accumulated since the last periodic service task will be lost when the
+registers are cleared on reset.
 
 [ ... ]
+> @@ -2893,7 +2932,10 @@ void wx_update_stats(struct wx *wx)
+>  	hwstats->mptc += rd64(wx, WX_TX_MC_FRAMES_GOOD_L);
+>  	hwstats->roc += rd32(wx, WX_RX_OVERSIZE_FRAMES_GOOD);
+>  	hwstats->ruc += rd32(wx, WX_RX_UNDERSIZE_FRAMES_GOOD);
+> -	hwstats->lxonoffrxc += rd32(wx, WX_MAC_LXONOFFRXC);
+> +	if (wx->mac.type >= wx_mac_aml)
+> +		hwstats->lxonrxc = rd32(wx, WX_MAC_LXONRXC_AML);
 
-> +void wx_tx_timeout(struct net_device *netdev, unsigned int txqueue)
-> +{
-> +	struct wx *wx = netdev_priv(netdev);
-> +	u32 head, tail;
-> +	int i;
-> +
-> +	for (i = 0; i < wx->num_tx_queues; i++) {
-> +		struct wx_ring *tx_ring = wx->tx_ring[i];
-> +
-> +		if (test_bit(WX_TX_DETECT_HANG, tx_ring->state) &&
-> +		    wx_check_tx_hang(tx_ring))
+Will this 64-bit software statistic wrap back to zero when the hardware
+counter overflows?
 
-Does calling wx_check_tx_hang() from the dev_watchdog softirq context cause
-data races with the NAPI polling context (wx_clean_tx_irq)? 
+As seen in wx_clear_hw_cntrs(), WX_MAC_LXONRXC_AML is cleared by writing 0:
 
-wx_check_tx_hang() modifies ring state bits (WX_HANG_CHECK_ARMED) and updates
-the 64-bit statistic tx_done_old. Can this lead to torn reads or writes on
-32-bit platforms and silent corruption of the hang detection state?
+    wr32(wx, WX_MAC_LXONRXC_AML, 0);
 
-> +			wx_warn(wx, "Real tx hang detected on queue %d\n", i);
-> +
+This suggests it is a continuous 32-bit hardware counter rather than
+clear-on-read. Direct assignment might break the monotonic property expected
+by ethtool.
 
+> +	else
+> +		hwstats->lxonrxc += rd32(wx, WX_MAC_LXONRXC);
+>  	hwstats->lxontxc += rd32(wx, WX_RDB_LXONTXC);
+>  	hwstats->lxofftxc += rd32(wx, WX_RDB_LXOFFTXC);
+>  	hwstats->o2bgptc += rd32(wx, WX_TDM_OS2BMC_CNT);
 [ ... ]
-
 > diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-> index baffcadb22690..b8db772c37c5c 100644
+> index b8db772c37c5c..080310a51ef86 100644
 > --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
 > +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-[ ... ]
-> @@ -370,6 +391,7 @@ static void ngbe_disable_device(struct wx *wx)
->  	wx_napi_disable_all(wx);
->  	netif_tx_stop_all_queues(netdev);
->  	netif_tx_disable(netdev);
-> +	timer_delete_sync(&wx->service_timer);
-
-Does this code leave the service task running? 
-
-timer_delete_sync() is called, but cancel_work_sync(&wx->service_task) is
-missing. If the work is already queued, could wx_check_tx_hang_subtask() run
-after the transmission and reception rings are freed, resulting in a
-use-after-free when accessing wx->tx_ring[i]->state?
-
->  	if (wx->gpio_ctrl)
->  		ngbe_sfp_modules_txrx_powerctl(wx, false);
->  	wx_irq_disable(wx);
-
-[ ... ]
-
-> @@ -816,6 +845,9 @@ static void ngbe_remove(struct pci_dev *pdev)
->  	struct wx *wx = pci_get_drvdata(pdev);
->  	struct net_device *netdev;
+> @@ -150,6 +150,7 @@ static void ngbe_service_task(struct work_struct *work)
+>  	struct wx *wx = container_of(work, struct wx, service_task);
 >  
-> +	timer_delete_sync(&wx->service_timer);
-> +	cancel_work_sync(&wx->service_task);
-> +
->  	netdev = wx->netdev;
->  	wx_disable_sriov(wx);
->  	unregister_netdev(netdev);
+>  	wx_handle_errors_subtask(wx);
+> +	wx_update_stats(wx);
+>  
+>  	wx_service_event_complete(wx);
+>  }
 
-Does this teardown order result in a use-after-free? 
+Can this introduce data races with userspace ethtool callbacks?
 
-cancel_work_sync() is called before unregister_netdev(). Since the network
-device is still active, could a concurrent timeout or interrupt re-queue the
-service task before unregister_netdev() finishes? This might allow the
-re-queued work item to execute and access the wx structure after it has been
-freed by devres.
+The service task executes asynchronously without holding rtnl_lock, while
+ethtool callbacks like wx_get_pause_stats() hold rtnl_lock() and also call
+wx_update_stats().
+
+This might lead to double-reads of clear-on-read hardware registers and
+lost software counter increments.
+
+Also, could this cause a concurrency issue during interface teardown?
+
+During reconfiguration, ngbe_close() deletes the service timer but does not
+call cancel_work_sync(&wx->service_task).
+
+If the service task runs concurrently with wx_clear_interrupt_scheme(),
+it might bypass early return checks and access wx->tx_ring[i] while it
+is being freed and set to NULL, potentially causing a use-after-free or
+NULL pointer dereference.
+
+[ ... ]
+> diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> index d4f87fbb95655..e9439e4ebe61e 100644
+> --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> @@ -132,6 +132,7 @@ static void txgbe_service_task(struct work_struct *work)
+>  	wx_handle_errors_subtask(wx);
+>  	txgbe_module_detection_subtask(wx);
+>  	txgbe_link_config_subtask(wx);
+> +	wx_update_stats(wx);
+>  
+>  	wx_service_event_complete(wx);
+>  }
+
+(Same questions apply to txgbe_service_task regarding data races and
+teardown concurrency.)
+
+[ ... ]
 
