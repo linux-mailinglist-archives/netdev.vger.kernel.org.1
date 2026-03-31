@@ -1,50 +1,51 @@
-Return-Path: <netdev+bounces-273708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273709-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SK3YBJD9y2nqNAYAu9opvQ
-	(envelope-from <netdev+bounces-273708-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 19:00:00 +0200
+	id CAC0BzEEzGljNQYAu9opvQ
+	(envelope-from <netdev+bounces-273709-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 19:28:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4A3236DA05
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 18:59:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 944CD36EC43
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 19:28:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6C4BC327BEF0
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:52:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9BBBB32D19D3
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 16:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB521426D09;
-	Tue, 31 Mar 2026 16:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 300BD426EA9;
+	Tue, 31 Mar 2026 16:51:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="d9pE7yCM"
+	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="pbSqU2tc"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay.virtuozzo.com (relay.virtuozzo.com [130.117.225.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B10B4266B9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B19E4266BA;
 	Tue, 31 Mar 2026 16:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.117.225.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774975907; cv=none; b=PVdVea2FCOunZ1RdOesAL+Nm6WAhgfvgJcs5iR6woglF+AW4zpU5q92EHymVdjqrhUlRr1vAkicPRMJL9Dvw3+W6qXDNgWhuC6827B/cdrCzjK/N9smPfKzKkVC1qil9YUl8tele7Kuoo/t8kTWELJALjz3TMpuyb4Ha3EwqXP4=
+	t=1774975911; cv=none; b=ko74yVaOo+FbU911dy5cBwSINN0ho/uWGep/EwtgY+l//wZLNWTvVrfZY7pOmI4aXPmz3oJ25yCKGc/Wor8YUPK+IFDTXVGJncI/+SpnqgJIJv8c1VNT2uRUHXr0kNuOwNR2+6gmW5jgd6I+tgZkwx74krARHWQzavZMu3LE52U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774975907; c=relaxed/simple;
-	bh=EiaNJVPttYdBYeGu7j4d2onwXrFeVG6ElVAQoG/6AGE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gWrc/DU6P1ztlANPWnVuBAl+djm6ndupCWVG3ag4Rmy5+P6p0eoStJvrAOewswDiv/qVq1ZGWHS2IHlzkdBqY1gPqX61SRTo2ZjjK9VNG2pB4HzmLhlDlTQ0m2bxpMLFi7d4VXWbW7HnBUNRyjBCZY2IfUuqlaGH00F04FmScgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=d9pE7yCM; arc=none smtp.client-ip=130.117.225.111
+	s=arc-20240116; t=1774975911; c=relaxed/simple;
+	bh=BCrwzD6ttTbaxfhTPSf9QJlID9s+VgHuvYje0FKxhw4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IqEOd+ENWi3cBOb3J4Ghs2Hd6jkz1wlmgzRi+FjxVDOqG90xumDdqmYPBhUL/Z9ZBoyO4koSr2GByc2LuUuKQNB9cALCHyRiLW8OGW80VocOvMnbCSYIEnyFri23TbHjuSZ4VxaAOr+HmxS9QJ5zT5r6fQGQVBm1DLgA/WBRpj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=pbSqU2tc; arc=none smtp.client-ip=130.117.225.111
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=virtuozzo.com; s=relay; h=Content-Type:MIME-Version:Message-ID:Date:Subject
-	:From; bh=ILcBB2yY0igmjaQ5LWrShiOv0Mp8hiYCVu036AOf+A4=; b=d9pE7yCM0H9Yk5xjWae
-	URhM0+2lwISsx4HPNWjhO/UBrqB+kOt5ScGuCanG6j6gDVRn9vOUH3Q3xVq+D47/tmXKDRsaUbwzv
-	dp110q9oKtsQm3WbM5OT5otTiQ+lUI5pmd2wiGGMrzhAVYwz86PwtqGmwASoIjQJqovqTTELV8kRS
-	KBulxj4xQxgNTiUArjJvKyApHvSSGoOYsEmVANDh2eLPQqj4C4ew8P9lUTikyNTRi2SWGgTcer72x
-	KLZrDQSGwqJKCZ46Imft9RFQQkTcm+rUgEAc2QJW5qCMOlMpO/xUgm6zUPyGzJBtAM+5yru2lypDu
-	vOdmZLK3Ej25M2A==;
+	:From; bh=cmyO4L0pupPYl2ZiDlWDHRDENJhqCYsBYc/D1uvpZJw=; b=pbSqU2tcrOFLN1kXXOo
+	ZUMKIfNd0GGv88LBo3ZdozmnFXM6LLxtieHRlHfnFJRchtBIuas3ZZNJzRXCYky+CcmfLXpQfXu4q
+	EpsSPN5f1xqzOY13G6y3VowXfCXfUW5/hmx/CB6G8JCazTazXLjiieR9w8pazfcO8EAbEirwdgiag
+	fbTDEjXZKKC98k0YzTYZKiVpz3ZZ+00GB6r/0n8qLyifSBUet+k4XN+WNSBXwTLnqO47KLrcPpE4D
+	xtcnXuj1NT5oSayG1D4VNJThkUKDn0yGTMhAl/lZGL4meWhkSYijRG+XMmH4W6TJ6159m4rFlbXpB
+	0qg4FywdHma/W6g==;
 Received: from [130.117.225.5] (helo=finist-alma9.vzint.dev)
 	by relay.virtuozzo.com with esmtp (Exim 4.96)
 	(envelope-from <khorenko@virtuozzo.com>)
-	id 1w7cHB-00HHGg-32;
+	id 1w7cHC-00HHGg-01;
 	Tue, 31 Mar 2026 18:51:16 +0200
 From: Konstantin Khorenko <khorenko@virtuozzo.com>
 To: "David S . Miller" <davem@davemloft.net>,
@@ -57,10 +58,12 @@ Cc: Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Konstantin Khorenko <khorenko@virtuozzo.com>
-Subject: [PATCH v2 0/1] Fix kernel build failure with CONFIG_GCOV_PROFILE_ALL=y
-Date: Tue, 31 Mar 2026 19:50:26 +0300
-Message-ID: <20260331165125.959833-1-khorenko@virtuozzo.com>
+Subject: [PATCH v2 1/1] net: fix skb_ext_total_length() BUILD_BUG_ON with CONFIG_GCOV_PROFILE_ALL
+Date: Tue, 31 Mar 2026 19:50:27 +0300
+Message-ID: <20260331165125.959833-2-khorenko@virtuozzo.com>
 X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20260331165125.959833-1-khorenko@virtuozzo.com>
+References: <20260331165125.959833-1-khorenko@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,92 +72,100 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.46 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[virtuozzo.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[virtuozzo.com:s=relay];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[virtuozzo.com:?];
-	TAGGED_FROM(0.00)[bounces-273708-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273709-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_SPAM(0.00)[0.974];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[khorenko@virtuozzo.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DMARC_DNSFAIL(0.00)[virtuozzo.com : query timed out];
+	DKIM_TRACE(0.00)[virtuozzo.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[10];
-	R_DKIM_TEMPFAIL(0.00)[virtuozzo.com:s=relay];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B4A3236DA05
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,weissschuh.net:email,virtuozzo.com:dkim,virtuozzo.com:email,virtuozzo.com:mid]
+X-Rspamd-Queue-Id: 944CD36EC43
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This patch fixes a build failure in net/core/skbuff.c that occurs when
-CONFIG_GCOV_PROFILE_ALL=y is enabled.
-
-v2: use __no_profile instead of preprocessor guards, as suggested
-    by Thomas Weißschuh.  This solves the root cause (GCOV counters
-    preventing constant folding) and also removes the existing
-    CONFIG_KCOV_INSTRUMENT_ALL guard which is no longer needed.
-
-Build failure without this patch
----------------------------------
-
-With the following configuration:
-
-  CONFIG_GCOV_KERNEL=y
-  CONFIG_GCOV_PROFILE_ALL=y
-  # CONFIG_GCOV_PROFILE_FTRACE is not set
-  CONFIG_GCOV_PROFILE_RDS=y
-  CONFIG_GCOV_PROFILE_URING=y
-
-The kernel fails to build with:
+When CONFIG_GCOV_PROFILE_ALL=y is enabled, the kernel fails to build:
 
   In file included from <command-line>:
   In function 'skb_extensions_init',
       inlined from 'skb_init' at net/core/skbuff.c:5214:2:
-  ././include/linux/compiler_types.h:706:45: error: call to '__compiletime_assert_1490' declared with attribute error: BUILD_BUG_ON failed: skb_ext_total_length() > 255
-    706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-        |                                             ^
-  ././include/linux/compiler_types.h:687:25: note: in definition of macro '__compiletime_assert'
-    687 |                         prefix ## suffix();                             \
-        |                         ^~~~~~
-  ././include/linux/compiler_types.h:706:9: note: in expansion of macro '_compiletime_assert'
-    706 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-        |         ^~~~~~~~~~~~~~~~~~~
-  ./include/linux/build_bug.h:40:37: note: in expansion of macro 'compiletime_assert'
-     40 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-        |                                     ^~~~~~~~~~~~~~~~~~
-  ./include/linux/build_bug.h:51:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
-     51 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
-        |         ^~~~~~~~~~~~~~~~
-  net/core/skbuff.c:5163:9: note: in expansion of macro 'BUILD_BUG_ON'
-   5163 |         BUILD_BUG_ON(skb_ext_total_length() > 255);
-        |         ^~~~~~~~~~~~
-  make[4]: *** [scripts/Makefile.build:289: net/core/skbuff.o] Error 1
+  ././include/linux/compiler_types.h:706:45: error: call to
+    '__compiletime_assert_1490' declared with attribute error:
+    BUILD_BUG_ON failed: skb_ext_total_length() > 255
 
-Testing
--------
+CONFIG_GCOV_PROFILE_ALL adds -fprofile-arcs -ftest-coverage
+-fno-tree-loop-im to CFLAGS globally. GCC inserts branch profiling
+counters into the skb_ext_total_length() loop and, combined with
+-fno-tree-loop-im (which disables loop invariant motion), cannot
+constant-fold the result. BUILD_BUG_ON requires a compile-time constant
+and fails.
 
-Tested with GCC 11.4.1 and GCC 16.0.1 20260327 (experimental) - both
-exhibit the same build failure without the patch.  Both compile
-successfully with the patch applied.
+The issue manifests in kernels with 5+ SKB extension types enabled
+(e.g., after addition of SKB_EXT_CAN, SKB_EXT_PSP). With 4 extensions
+GCC can still unroll and fold the loop despite GCOV instrumentation;
+with 5+ it gives up.
 
-Konstantin Khorenko (1):
-  net: fix skb_ext_total_length() BUILD_BUG_ON with CONFIG_GCOV_PROFILE_ALL
+Mark skb_ext_total_length() with __no_profile to prevent GCOV from
+inserting counters into this function. Without counters the loop is
+"clean" and GCC can constant-fold it even with -fno-tree-loop-im active.
+This allows BUILD_BUG_ON to work correctly while keeping GCOV profiling
+for the rest of the kernel.
 
+This also removes the CONFIG_KCOV_INSTRUMENT_ALL preprocessor guard
+introduced by d6e5794b06c0, as __no_profile handles both GCOV and KCOV
+instrumentation at the root cause level rather than just disabling the
+check.
+
+Fixes: 5d21d0a65b57 ("net: generalize calculation of skb extensions length")
+Fixes: d6e5794b06c0 ("net: avoid build bug in skb extension length calculation")
+
+Signed-off-by: Konstantin Khorenko <khorenko@virtuozzo.com>
+Reviewed-by: Thomas Weißschuh <linux@weissschuh.net>
+---
  net/core/skbuff.c | 4 +---
  1 file changed, 1 insertion(+), 3 deletions(-)
 
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 0e217041958a..47c7f0ab6e84 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -5145,7 +5145,7 @@ static const u8 skb_ext_type_len[] = {
+ #endif
+ };
+ 
+-static __always_inline unsigned int skb_ext_total_length(void)
++static __always_inline __no_profile unsigned int skb_ext_total_length(void)
+ {
+ 	unsigned int l = SKB_EXT_CHUNKSIZEOF(struct skb_ext);
+ 	int i;
+@@ -5159,9 +5159,7 @@ static __always_inline unsigned int skb_ext_total_length(void)
+ static void skb_extensions_init(void)
+ {
+ 	BUILD_BUG_ON(SKB_EXT_NUM > 8);
+-#if !IS_ENABLED(CONFIG_KCOV_INSTRUMENT_ALL)
+ 	BUILD_BUG_ON(skb_ext_total_length() > 255);
+-#endif
+ 
+ 	skbuff_ext_cache = kmem_cache_create("skbuff_ext_cache",
+ 					     SKB_EXT_ALIGN_VALUE * skb_ext_total_length(),
 -- 
 2.43.5
+
 
