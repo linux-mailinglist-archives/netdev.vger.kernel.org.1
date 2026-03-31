@@ -1,213 +1,220 @@
-Return-Path: <netdev+bounces-273765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273766-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +HB3BlhFzGm+RgYAu9opvQ
-	(envelope-from <netdev+bounces-273765-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 00:06:16 +0200
+	id OMQaG9BGzGm+RgYAu9opvQ
+	(envelope-from <netdev+bounces-273766-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 00:12:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61D883724A4
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 00:06:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C299D372569
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 00:12:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 567283028B34
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 22:04:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 41E5130177A4
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 22:10:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEE43ED5B7;
-	Tue, 31 Mar 2026 22:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00BBF45BD6B;
+	Tue, 31 Mar 2026 22:10:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HM6ab7h1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mXgi70GF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C73638F647
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 22:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5FD543CECA
+	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 22:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774994664; cv=pass; b=bpX6XTihC4x4UI0au+h0E2G+luRrQQWUxwVpVX2x5p29Fc5rik9rt3V4to1Fwy5aHKeLA0mPiu7engCOXuXYWLgr1CsWpT3Q9+4xgjNmqpfSmL9HXyfjj0tr5ygTOmEf1Dh9csHUqD4vRqjG3AYDZE31wNlOc4khLE2dqCbhppE=
+	t=1774995004; cv=pass; b=B6lu1+DaOmVYJwqtLKalXiU5G0s3bCVOWk3GA+TvVttLqdiALvRh03X9B9yu4Lh42JK03XUHNSC/TC+R8IFhg2rxtJE26lSu5LbU5iKD2SiCMH2CYh2g1vlBbebnzYcS2/ZWrGuCFeu6DIWEjrr9KmNwKE0UBqpKG+tPu4hJ55Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774994664; c=relaxed/simple;
-	bh=KXz8Z1YsAvBqjHVB5QBXZKVYV6oF9RS44FiMgG7zIIk=;
+	s=arc-20240116; t=1774995004; c=relaxed/simple;
+	bh=dd/z6ajyuojBoe6LH5YiHMam4R726TRDidQH5DNOycM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D48MIu6SGs1ZVoP4p69GNpFAWRR2ZBIkjLuFCw67E8QO6ffXN+lD8GYOhsMqTeQLqcq1fUEBAm4eXuK87N1B4/qBZ0jWkN/lObtOBbAEnwU8krDqAL8eogiI2SS9lE4UqXnHVhcvrGuiKXPiaVMmwCCh4tHImqO2hlxcqJsm5Ts=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HM6ab7h1; arc=pass smtp.client-ip=74.125.82.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-1271195d2a7so675071c88.0
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 15:04:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774994662; cv=none;
+	 To:Cc:Content-Type; b=i6a0XHT19a1V4yls7IzpzFll5UZ6R0PMYY0925xgKLGb7M5Ujy2oDTCiRn5XtzApEOf/n+L8POvp5lkXM4TKUEwaoRFzOSQXAsNpPe0iKwvl0mskHiXkcRv0ruHbs0Gz925E5GBvvGDJpO5I3402EhtMuhlwxaTZcK9RuaAo+6c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mXgi70GF; arc=pass smtp.client-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-7d743d94d5eso952316a34.0
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 15:10:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774995002; cv=none;
         d=google.com; s=arc-20240605;
-        b=T4x4rye043s0gjtnePps/DHBPA5LtMITMgtaGcPqscaH+tCwvlRozoz+LmJjKjozGW
-         8KhGOfsguvew8/hULhha528bdCBD8Jri9qjF17mqd+mBTJ4M0CS4Ye4EP5rPtVzeJI1q
-         KSgRI76UTbvLiFPMPzMYJQgso5k86Zz2L6ndw9fZhoqWkevgmfEKzbttu+rr8hJgX6pb
-         dYbAy4O/pn8SZJt6u8BnGur9wDosWmGqvS+aEKrmNcF344XZ7wwwwzXw3l3E/gSS+8TW
-         cjrZPBwX5BrwtgyzRrGYajndW6xNjl7OO+4E6y4wtCyrUQWsyBGfmakfnO+JKLhtF2iD
-         xckw==
+        b=QfdRyUjUyOQv05Nre43yP9rnkYa7kH6MWNcNM159p0WdUE6s/6jQwhO92TBs8BdaVe
+         qpZYGhvs//72gHe+29Y7UXPXJrTkRVQEXJtgD9lZXsgLE0yO88sT2fXCXbhPUoTc+AGP
+         RWyShE2BShMh+nuZ4uZ5gTQn0cQyQqWTGJgK0I78EsXckqEBe2ubOad0Sl9RVv7o78qN
+         ZSB6Bnh8urK4zdHfwF+qCQ6aX4BdbpBVdCmqi1/xCkCpnHXzz0xsrKw7hwBfFd2pcdlI
+         3i8zbqSz+HlK027+QWPgjZ7jQ+VACOOH8yrhEQxNCWzqxtS1oAvTpYgmvb+m71P8VjnQ
+         8oCQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=r4kc3eBNKApVvBhR0MrUdh/NwLBBmhES3WTvFsU9iGI=;
-        fh=SVZIt2nK4ptZ0g+GnL6zH/Yv1mmWjLYOzXfqo1vDGxk=;
-        b=P/1p+YoeDIuq1Ra5BAuZYLGa5TTSm54qYkXAhqvwV7HOziwb9TP/oRHOYLy4VzvLr/
-         0RlUopCw5IdqWvtXFFaUG4hX9McFbIEyDDyd9lEuj/7qNQsXRQbHs8IRu2goefHW9NAR
-         cYaHVI+X5YnPaA1OJfygTBQtc9T9ZXPeoGF88h7OwO4A67Lcg5WMBzNc38ZXEYQkTIkp
-         m0uvg1kzohTL0e2Ip6b8zoooccuGWZJ0SsABeC7qdX7GbLGNJ+0uEcSqb0wbL6W9M7zf
-         Cw4XVX1rZTM70+jEnm+tn+lKnl+G7fR0TmMdqV5ZGuASZyaDIO7In+isXxS8Qs87RFes
-         ZhHg==;
+        bh=fOyr4lApH+Yi8FAn9EuB2zfM+rDRkdgUXNhTN76lUJ0=;
+        fh=H8c9WxbJiTCOeqRsgzc/2tlfc6S4phJdV26sywHRpr8=;
+        b=XAJuS04hhCt53hqmk0SOJawK7LryYyzRgCKxzLzdlKUXMVd57pVuAXoeWHZ45aVW6L
+         mJjiB6OR3knrGeGLMr+vFvEefkwJ5KEzebhfX/8KgeI6FM47OBdckkArJ73IRtBOu4uq
+         Sx9FgmlZWEug2LF3hqMdMx0P4uuDb+BBT3nCfKtk6j3TyRqW65D4HHZtFvi72Fk+Ih7u
+         1EQEVQVqqydClZ/UynYNNW8+adtvN+MKA77CWdXBiHjwDKFq51vOh+y+UDQDGzW9WPiW
+         2hYnkoH57I1BINjkhnGYvi9owt9nn+rIb30xJg2Mphe9p7hDfufbeRnsTMyV9e9e4XvK
+         Loaw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774994662; x=1775599462; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1774995002; x=1775599802; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=r4kc3eBNKApVvBhR0MrUdh/NwLBBmhES3WTvFsU9iGI=;
-        b=HM6ab7h1ilYQVfb/3UM4pRXH1ZputZepe+FLPcABlQtMy83+hm5vnj4MOLSP6EaR6u
-         t92P5IAkgNgly2CBF3mrNzm39DAeZtC3fiL9SZ+Fa8tU7RbB8vxqySEQWqTgk/n5QG+h
-         Ikzfa1+kZMkqLf+fO/3kC4aSAS6dNCawWSzQMrwswnQLFEjpjk/WyhT8HfOZnH+2biVC
-         V+Lt7BxvoXcwQJXM9deBF75sJLTo5KVsOINRt62RB/DbqbOxgTfavY2V4OlMXvGmkGop
-         qxBhvfEaN+mAU+EHemXchi+Q1vw0USBuh0pZ44o9JsV/I3tdaHPZv8QbzqUSYsvWlmUZ
-         PXow==
+        bh=fOyr4lApH+Yi8FAn9EuB2zfM+rDRkdgUXNhTN76lUJ0=;
+        b=mXgi70GFBnq+BLIoW9sxocpgBA6Oj3sO8T+wimc2PiKmqIs8kz1F2l9+mw/j70OEX5
+         fk0ZOH5c6cHsRFuKmOWF/h9kdEp1dmJMZ1e13iz1dwUwUiKvQ8fsBJAAE7r9oXhUpI+y
+         FVZCQjGwSOA0ocsOQWSkN5r/VYNXQZkgp2n53KMzdl2NKzdSveZbArTNbnuJhN81npDr
+         TlbR76/JGd/I/bxwZrIr/pl+EFXf/apYNm0X7LWFNr7iMM9KBJ2WBHcLuNPzkBjuIf7E
+         j/WJuWq9HQKkBT0Ex0Yv1B17DhLiR6NF0RXfceVQDfvEMz7Nz2C9UzRcsNK83RbPhyDE
+         GKEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774994662; x=1775599462;
+        d=1e100.net; s=20251104; t=1774995002; x=1775599802;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=r4kc3eBNKApVvBhR0MrUdh/NwLBBmhES3WTvFsU9iGI=;
-        b=n7EvK78tE8+Lzv15J47KB6xMZWthTGnoyDla2b3xnsuGz4vRSpc0WuqPDLaB1F+io8
-         PKWCQ0nJVF+OQx/jgf1qNepMbOyQe0R6bCsyPWdv6ssqPUBLp+10vl/jgJdtmhFW7HJB
-         JVfbKvw/ktSDIMgkm13Q/OBbO4vGmgflef8Xta0rUDmTe8HbhDmQPcnnSIfIkDqPcRW0
-         4pPeL5dxKbG7oQbQsbWe0ejDmQ3TxseTnBcjbCmjLYdQYwB9XQc6UuJY1Z90PqZnKVbq
-         wCjhaY4qm3QLtUXnIuhm5P6mMBJFE4if6z9G56XLHaxztiR2BG/ezHRJJ+JTpd1lATEu
-         e5qA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/HkKYfDWHEGUXih/bRQrgA8CaoWfVlXAmeZYfM/dus2N+MZJeX1sf6cmEHE3gE0muGV9r+mQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyo6SPa+4+qSBx57ADR1DaEqi8bZ6pFVvyeuylvQKkb87UGm/Av
-	xyFYcWjXLbXvsSKtAmcMHag54Q+VNkg3Tc5ak8r0Gl3yRhKHvFC3qK+/UrEPbqJpuoKFxBmBXl0
-	uZTSG2BS2jE+pgEu5Z1elUXrCYDN1jdD7e8U7eoCD
-X-Gm-Gg: ATEYQzz3FeoTh5lVH1qaeT3qcKrH4ZPuzpRqRn8zDNQRi/wA3EszauxJn5KxgEHxkzA
-	6NElh7hax/Rssv7cqPE1ognRD3T7Ui8ksXC6V5D0etFLd3viH/130Z/m0hKNc3sX+oFgdQ5IPqQ
-	22k2oced2yyFvK4yx+Y89Y+U/wktmY9G+ILOp2qUSon81g/+c1Z0vCuaGDWYDUtQ17hD1K4evGg
-	HL+bE7wJURLPdYSdTXxjUo55do3H4T4lsB4sZt1dr6a+EJAzfUUsLs6HEUePHz3amrNAYk+4Xhf
-	CvAzZsAc2V1p/jMZVQlorcg3Dat5LJBAFm27KeJ5cN4Hv/HLiuVnFPSO6IvckP7d/gG/NQ==
-X-Received: by 2002:a05:7022:684:b0:123:2c98:f65d with SMTP id
- a92af1059eb24-12be6437dd6mr762968c88.13.1774994661813; Tue, 31 Mar 2026
- 15:04:21 -0700 (PDT)
+        bh=fOyr4lApH+Yi8FAn9EuB2zfM+rDRkdgUXNhTN76lUJ0=;
+        b=MG1lN9lTiSHGDFibnaMrAIdI7aUDOA5FbVWzZmRM7wixf25hvcJNFfCYYtBwRy2MKf
+         bmAxrvn9pPuZUv1oEuB9gBecnEynTuJwZJOJApbaENcGdfsu22SUn0bvRI/EetouOOL9
+         p4rImBHFaCJQIKKd5xN31WL5rgH1T1iA0w3be+y85t+6FRccqDx6EmGmhm36TxL1ddcT
+         GJ+INp+P5ouAjb1KODAvmIREURaJuWPavrGg68yNXW587QZFD2aafT4/iQGHGfzVgggh
+         bXIRs0MbpuFFA8TES48oj/f45zyJpmDJdub5l+oAg/DgGS8HEdRUmrT7P4xpROALJzvI
+         Q22Q==
+X-Gm-Message-State: AOJu0Yx2NgcU9toMxVgc0+UmcALuwgjvjqQl4+VD5Z3reR0MTMwfd71h
+	gssC0ZE1Lh4y5isGTKWJeqwfJSeGAZqN7s4vSI79/ICosNlg5EHcgazDmmZ+wZznBPWjYdOBDAH
+	DVFpf9XB+zOSz174vRYhMzCPiYXEY8vw=
+X-Gm-Gg: ATEYQzyVBG6qXASKn9V18Lr++4fnaUAO48T7eEEll/CHRomIxX8LpO8oQV5MzSH/Hr4
+	rpH2CFJg1YKk5xiis3dn09EseSbHRseivzo0WzG4S1Rw/EBWSbfrOvJFrXr//AsFqXup/DUa+3B
+	QKRh+IB1fAvQQUY7Eiccr+q/xcmy7cB8wp9egNRR7W7lZ9/U3m6QuV8MdCx5MF+5k+xQZJ+3ZMa
+	alzmKODJ3eVq2nwSZQHH4LvE8b3ZWg6BvhNi/eGB5HppMRXWzRdF8FiEHKEATfZrMBTzR2yXK+U
+	x0NLxS8ss2TWC2/p
+X-Received: by 2002:a05:6808:2448:b0:467:de9:3ea3 with SMTP id
+ 5614622812f47-46ae01b8491mr482463b6e.7.1774995002405; Tue, 31 Mar 2026
+ 15:10:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260330080746.319680-2-jiayuan.chen@linux.dev>
- <6ee24770a2b014219d86839b2243e1b7bad4dc4f520457269d5e8ca2b21c2cb8@mail.kernel.org>
- <d1a739d2-c4ea-4fae-aeaf-f49e75dac0f3@linux.dev> <CAAVpQUD1n7L6LkP32H_Ct71RLNpJ2RQWFc8w08+c8h=U_tDjpQ@mail.gmail.com>
- <79805496-9996-40b6-8cbf-0beaf7dd5473@linux.dev>
-In-Reply-To: <79805496-9996-40b6-8cbf-0beaf7dd5473@linux.dev>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 31 Mar 2026 15:04:09 -0700
-X-Gm-Features: AQROBzAQ8y8qSCQrKpuNkixRyfIBAjxtkwpMokHCZ1Bvt_oQRokJ_pel-hcekD4
-Message-ID: <CAAVpQUBbAQO8rSE-WSS1M7kEcD_sQ_9zHTyJg-+v2FoVuHZ8Kw@mail.gmail.com>
-Subject: Re: [PATCH bpf v4 1/2] bpf: tcp: Reject non-TCP skb in bpf_sk_assign_tcp_reqsk()
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, bot+bpf-ci@kernel.org, bpf@vger.kernel.org, 
-	clm@meta.com, daniel@iogearbox.net, john.fastabend@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	martin.lau@kernel.org, ihor.solodrai@linux.dev
+References: <20260330223143.2394706-1-weibunny.kernel@gmail.com>
+ <20260330223143.2394706-6-weibunny.kernel@gmail.com> <956aefbd-b795-48be-ab73-58f489b1b535@gmail.com>
+In-Reply-To: <956aefbd-b795-48be-ab73-58f489b1b535@gmail.com>
+From: Wei Wang <weibunny.kernel@gmail.com>
+Date: Tue, 31 Mar 2026 15:09:50 -0700
+X-Gm-Features: AQROBzD-pcr6I4oueJdIykQbQ_hihCIb18zd_FL2t3AdqQr3A2Mk5s7ILzbLhpQ
+Message-ID: <CAGqc4nUx8et5Snydii=HqRNru8YqWC4XSJxmvLRMdmYGjF=BFw@mail.gmail.com>
+Subject: Re: [PATCH v9 net-next 5/5] selftest/net: psp: Add test for dev-assoc/disassoc
+To: Daniel Zahka <daniel.zahka@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Wei <dw@davidwei.uk>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Wei Wang <weibunny@fb.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273765-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273766-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,davidwei.uk,lunn.ch,davemloft.net,google.com,fb.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	FREEMAIL_CC(0.00)[linux.dev,kernel.org,vger.kernel.org,meta.com,iogearbox.net,gmail.com,fomichev.me,google.com,davemloft.net,redhat.com];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[weibunnykernel@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 61D883724A4
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C299D372569
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 30, 2026 at 8:19=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
+On Tue, Mar 31, 2026 at 7:04=E2=80=AFAM Daniel Zahka <daniel.zahka@gmail.co=
+m> wrote:
 >
-> On 3/30/26 6:35 PM, Kuniyuki Iwashima wrote:
-> > On Mon, Mar 30, 2026 at 2:26=E2=80=AFAM Jiayuan Chen <jiayuan.chen@linu=
-x.dev> wrote:
-> >>
-> >>
-> >> On 3/30/26 5:00 PM, bot+bpf-ci@kernel.org wrote:
-> >>>> #if IS_BUILTIN(CONFIG_IPV6)
-> >>>>       case htons(ETH_P_IPV6):
-> >>>> +            if (ipv6_hdr(skb)->nexthdr !=3D IPPROTO_TCP)
-> >>>> +                    return -EINVAL;
-> >>>> +
-> >>>>               ops =3D &tcp6_request_sock_ops;
-> >>> For IPv6, ipv6_hdr(skb)->nexthdr gives the type of the header
-> >>> immediately following the base IPv6 header. If extension headers
-> >>> are present (hop-by-hop options, routing, etc.), nexthdr would be
-> >>> the extension header type rather than IPPROTO_TCP, even when the
-> >>> packet is a valid TCP segment.
-> >>>
-> >>> Would it be worth using ipv6_find_hdr() here, similar to
-> >>> bpf_update_srh_state() in the same file, to walk past any extension
-> >>> headers? The IPv4 check above is fine since ip_hdr(skb)->protocol
-> >>> always identifies the transport protocol directly.
-> >>>
-> >>> In practice this is very unlikely to matter since TCP SYN packets
-> >>> with IPv6 extension headers are essentially non-existent, but the
-> >>> check as written would reject them.
-> >>>
-> >>>
-> >>> ---
-> >>> AI reviewed your patch. Please fix the bug or email reply why it's no=
-t a bug.
-> >>> See:https://github.com/kernel-patches/vmtest/blob/master/ci/claude/RE=
-ADME.md
-> >>>
-> >>> CI run summary:https://github.com/kernel-patches/bpf/actions/runs/237=
-35111188
-> >>
-> >>
-> >> Thanks for the analysis.
-> >>
-> >> There are many places in the kernel that check nexthdr directly withou=
-t
-> >> walking extension headers.
-> >>
-> >> I'd prefer to keep it simple for now and leave ipv6_find_hdr() as a
-> >> potential future improvement if needed.
-> >
-> > +1.
-> >
-> > Given this feature is to create a reqsk to process on this running
-> > host, it does not make sense to support such ext options.
 >
-> While at header reading, does it need a pskb_may_pull() before reading?
+> On 3/30/26 6:31 PM, Wei Wang wrote:
+> > +
+> > +def _dev_assoc_no_nsid(cfg):
+> > +    """ Test dev-assoc and dev-disassoc without nsid attribute """
+> > +    _init_psp_dev(cfg, True)
+> > +    psp_dev_id =3D cfg.psp_dev_id
+> > +
+> > +    # Get nk_host's ifindex (in host namespace, same as caller)
+> > +    nk_host_dev =3D ip(f"link show dev {cfg._nk_host_ifname}", json=3D=
+True)[0]
+> > +    nk_host_ifindex =3D nk_host_dev['ifindex']
+> > +
+> > +    # Associate without nsid - should look up ifindex in caller's netn=
+s
+> > +    cfg.pspnl.dev_assoc({'id': psp_dev_id, 'ifindex': nk_host_ifindex}=
+)
+> > +
+> > +    # Verify assoc-list contains the device
+> > +    dev_info =3D cfg.pspnl.dev_get({'id': psp_dev_id})
+> > +    ksft_true('assoc-list' in dev_info, "No assoc-list after associati=
+on")
+> > +    found =3D False
+> > +    for assoc in dev_info['assoc-list']:
+> > +        if assoc['ifindex'] =3D=3D nk_host_ifindex:
+> > +            found =3D True
+> > +            break
+> > +    ksft_true(found, "Associated device not found in assoc-list")
+> > +
+> > +    # Disassociate without nsid - should also use caller's netns
+> > +    cfg.pspnl.dev_disassoc({'id': psp_dev_id, 'ifindex': nk_host_ifind=
+ex})
+> > +
+> > +    # Verify assoc-list no longer contains the device
+> > +    dev_info =3D cfg.pspnl.dev_get({'id': psp_dev_id})
+> > +    found =3D False
+> > +    if 'assoc-list' in dev_info:
+> > +        for assoc in dev_info['assoc-list']:
+> > +            if assoc['ifindex'] =3D=3D nk_host_ifindex:
+> > +                found =3D True
+> > +                break
+> > +    ksft_true(not found, "Device should not be in assoc-list after dis=
+association")
+> > +
+> > +    del cfg.psp_dev_id
+> > +    del cfg.psp_info
+> > +
+> ...
+> > +
+> > +@ksft_variants([
+> > +    KsftNamedVariant(f"v{v}_ip6", v, "6")
+> > +    for v in range(4)
+> > +])
+> > +def dev_assoc_no_nsid(cfg, version, ipver):
+> > +    cfg.require_ipver(ipver)
+> > +    _dev_assoc_no_nsid(cfg)
+> > +
+>
+>
+> Why do we need ip connectivity for this test? Why are you parameterizing
+> over PSP version?
 
-Ah good point, now that we read skb->data, pskb_may_pull() is needed indeed=
-.
+Yea. This test does not need ip connectivity. And no need to test over
+multiple PSP versions. Will remove the variants.
+
+>
+>
 
