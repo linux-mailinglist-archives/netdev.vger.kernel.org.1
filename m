@@ -1,211 +1,136 @@
-Return-Path: <netdev+bounces-273625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273626-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CLdbMDvGy2mnLgYAu9opvQ
-	(envelope-from <netdev+bounces-273625-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:03:55 +0200
+	id 2BJ+KHTGy2mnLgYAu9opvQ
+	(envelope-from <netdev+bounces-273626-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:04:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2916F369E7E
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:03:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08BAA369E9F
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 15:04:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5DFAA300B07B
-	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 12:58:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 820CD302DB4E
+	for <lists+netdev@lfdr.de>; Tue, 31 Mar 2026 13:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D466D3E3C4E;
-	Tue, 31 Mar 2026 12:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67ED53E3C7F;
+	Tue, 31 Mar 2026 13:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hfYhvb9W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D1GvVZwr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5BB3E3C4A
-	for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 12:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427153E3C56;
+	Tue, 31 Mar 2026 13:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774961907; cv=none; b=n0U4JJa10y9uZ79WRmKb7QF2MjtBAdp6xc+cAVbE8TAN5JaBuMrF6emKO2uf6OhYkDp2FX6OemjQwjxTkj03L2Fhqzln7Ymq1KSxiPIBKDUlOKza/s/KjfK7Z3eg49wM8S6L5ExWY7KjJuv1kwwex9Z9hRKyFB0JclayTA7n67A=
+	t=1774962010; cv=none; b=LwmYFPa2sGIEXL/P1Mn+H145iQOM9NxKP6D2kI5ZQ2rSA7FB4Bvc0wz5S+860UigggeohwJ/gd9XtVJf+cF3RZVn8RjpPKE7vVLsdSdTch6X44wBdHx2WuYXevTBy8sS1RebLFV/47OCOH91A4FKmEYtdd+xIp4aNyPvgAj/kOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774961907; c=relaxed/simple;
-	bh=djHK6/e1j3FccuHU3wL+GIytWjfnGOh6XecERoS/cM4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Bm8n2weqnKJXpifrNZllhp9kB7b4Bsq/6ESVFRLdseSY7YY6iLdPsyErjtn4shGXH6ilSLmiA2GZb9Vgi5Goj6KIrG4RGIfdVFIa6XhIxN6JnQrbxGrl7+R5Urphct2zW9p3+uwjMguxgNeXRMKZNChpNKTkgl7qAQJ67/Z3Y1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hfYhvb9W; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-486fd3a577eso52095895e9.1
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 05:58:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1774961904; x=1775566704; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=2cLRzPgMh1jzUyXR5ubz7SX1AzTAShSPRbVtdWw9nFk=;
-        b=hfYhvb9WchuQPrqngIng5KlXfNH7f/24CVSdshH7wIbPWpOSUHFw4C9qzbMIGbXGwh
-         thzRryEBpaWu63vqMOx8CeROn8UQ0LyPpBc9bepSAnjV+vxhxqLRVy5Sdh8NgCIdL1vt
-         OG1ay1BrA2xie8umdNpbnA9dC/M0HRZj5mSdF8RjYNVyYHiPs7WwYW7CQj5LmoTBZavg
-         HNex1PZbGrJpz+nykaGNDdFfSaE2y5Y7ICor4++LQd9vGefOaTj3LXlPgePcPlmlixrR
-         dvDyTpST2MLubPfGoK0WhqGkpfIfEqjYbeuu3j6HDBW9TWnU1MTnlXnFMAul6XeXjJoB
-         6y/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774961904; x=1775566704;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2cLRzPgMh1jzUyXR5ubz7SX1AzTAShSPRbVtdWw9nFk=;
-        b=geh9dTrh95XpAFZnZoHxL7MzTaSuKjoM8FDBDLn1fe2UriOGcBRg04z0tNtWmcZkPM
-         xudmzErCOGcitYElGyi4j4q1Cdv6InNkNS5fwnYtNSPoVNZQ/NhTCx/VSJaXfbKgbz4h
-         2XAUO3J0EkY64dv6SQpiiQE86BpAo+ZfHXSBlpxv59MRs/CqUazQ3SQL6LrnbRyb4hS+
-         6IWnRQNMz8CS74i2gX68bW5Pj1XyEF5fClfQpBrTW5UxbgNsgWMOrXBG4HEn4F9p6rlI
-         Mjke3PfrNHeO8X4bVo2slk2765l5e5J9xsg4fTQLk0c5gjl41unOlZ0ql327yXIyELHC
-         3JDw==
-X-Gm-Message-State: AOJu0YxBuiAOSn0GQ4XW89flQnSRMNnl2r4jxvNwpPJBJWhOzumb96p2
-	KeoiLvS/iqLEnMJau+V8YEGC3MDj3gM6eDJ8udBs9oUcdwVfIZxj2Lt9
-X-Gm-Gg: ATEYQzz8vBcqwTAdcdSJ+WACIaB68USnc+7MOU+dr6vbx2zw3T2gh3m2F7D7WK91UQF
-	F5Uh0cwV5LMZ9/5A8ArvCdj6P7BsiqN9zgHlI6jFJ+NJ/8PCVRRfYDYcdlBgzIS9xXyR0Y50gxX
-	2ZdvaOtDQc6k0+MOQYAKsk/iomTSnlXXVDSroYWzX3BYWJubIePaEhRubRR3HdzVVgIC8Az8YLC
-	bo70A8HJc9NVLjtZ+nd2RZyyB0jchU9M7xz+UXxE0JEJfNmKQq5S3bIggfBp+g30h9YOaW3kfjj
-	1BlXXydnAla3lTcgfJX76NwsS2t7d1aUhQQWNX+wgCTljlkcEVZjNzd3t76sgKmZK0GJhDNQ8BV
-	lCMifO4nMgKbV5HHwbX7U/uDGahTboKf6EGPAsoah0R9b7ux31nJpxr1yO5K3yIwND5lPVOXbhu
-	IudydubAMU1lTB9kDAj2sjr87jfp7eVvxj3s4IzkFXLg2dCbS/jNz/Nao=
-X-Received: by 2002:a05:600c:a012:b0:480:6bef:63a0 with SMTP id 5b1f17b1804b1-48727ede8d3mr291577115e9.21.1774961904134;
-        Tue, 31 Mar 2026 05:58:24 -0700 (PDT)
-Received: from nixos-office (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887e93c0cfsm38946535e9.9.2026.03.31.05.58.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 05:58:23 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-From: Julian Braha <julianbraha@gmail.com>
-To: manabian@gmail.com,
-	davem@davemloft.net,
-	peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com,
-	mcoquelin.stm32@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Julian Braha <julianbraha@gmail.com>
-Subject: [PATCH] stmmac: cleanup dead dependencies on STMMAC_PLATFORM and STMMAC_ETH in Kconfig
-Date: Tue, 31 Mar 2026 13:58:17 +0100
-Message-ID: <20260331125817.117091-1-julianbraha@gmail.com>
-X-Mailer: git-send-email 2.51.2
+	s=arc-20240116; t=1774962010; c=relaxed/simple;
+	bh=Aid6A4kU1rFuiXFfYoqlUcE12Y1zwl4OGNPuijYgxwQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kXwv8iogwHKgw71VKhGcEcC56jx9bnBZQjdMU+DR1dYPaezl+2XQAh6z+sRmEnDq+OI2sqiS+vVmSttUX/1uHeTljEqgp0B5NsGlmyAl3NJ5PU0Gm/CPiC/y1+Crfc+pJGmXmTJNKr8ptCz72to1kaTgGHK7GRxdeamGARQwsVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D1GvVZwr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5715FC19423;
+	Tue, 31 Mar 2026 13:00:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774962009;
+	bh=Aid6A4kU1rFuiXFfYoqlUcE12Y1zwl4OGNPuijYgxwQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=D1GvVZwrBJF+RmNmadu1Zd61sTNOaNDCVjyCiMVFWQWQUMH+6Zzw1Hz9oznH2f3ks
+	 ljnsOTeYS0CRUSQrFS62kxo3o64EI2TpzBCxN9YSxtR1BxnimRdrdbRJ8y+vT/5pXU
+	 6ieoDwrOo6tkLAJP7hqhT7bXIx4yxGfg/E4FdIipIi1mejoJD0XpfZrs6bQnMwQFfB
+	 uiHpGijKiTtJ/HdI8OxLMiqKha8jj/0Mbfxjx5oCFIwRfLoyLosrSvvdg42a1BQ87h
+	 ASGO07Q6376XU49mwx6thSd118eOZPEc3avvWEdnznnVHDetxJ5BpVRMlfQAqSb+Dz
+	 9S//mLmMysm2g==
+Date: Tue, 31 Mar 2026 07:00:07 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Zhiping Zhang <zhipingz@meta.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-rdma@vger.kernel.org,
+	linux-pci@vger.kernel.org, netdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, Yochai Cohen <yochai@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Bjorn Helgaas <helgaas@kernel.org>
+Subject: Re: [RFC v2 1/2] vfio: add callback to get tph info for dmabuf
+Message-ID: <acvFV8c5QVxnt3Em@kbusch-mbp>
+References: <20260324234615.3731237-1-zhipingz@meta.com>
+ <20260324234615.3731237-2-zhipingz@meta.com>
+ <20260325082534.GN814676@unreal>
+ <acW2BwQKaUbS3eL9@kbusch-mbp>
+ <20260331083758.GA814676@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260331083758.GA814676@unreal>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[gmail.com,davemloft.net,st.com,foss.st.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-273625-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[julianbraha@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-273626-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kbusch@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2916F369E7E
+X-Rspamd-Queue-Id: 08BAA369E9F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-There are already 'if STMMAC_ETH' and 'STMMAC_PLATFORM'
-conditions wrapping these config options, making the
-'depends on' statements duplicate dependencies (dead code).
+On Tue, Mar 31, 2026 at 11:37:58AM +0300, Leon Romanovsky wrote:
+> On Thu, Mar 26, 2026 at 04:41:11PM -0600, Keith Busch wrote:
+> > 
+> > You're suggesting that Ziping append the new fields to the end of this
+> > struct? I don't think we can modify the layout of a uapi.
+> 
+> He needs to add before flex array. This struct is submitted by the user
+> and kernel can easily calculate the position of that array.
 
-I propose leaving the outer 'if STMMAC_PLATFORM...endif' and
-'if STMMAC_ETH...endif' conditions, and removing the
-individual 'depends on' statements.
-
-This dead code was found by kconfirm, a static analysis tool for Kconfig.
-
-Signed-off-by: Julian Braha <julianbraha@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/Kconfig | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index c2cb530fd0a2..ba5473b8dae0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -20,7 +20,6 @@ if STMMAC_ETH
- config STMMAC_SELFTESTS
- 	bool "Support for STMMAC Selftests"
- 	depends on INET
--	depends on STMMAC_ETH
- 	default n
- 	help
- 	  This adds support for STMMAC Selftests using ethtool. Enable this
-@@ -29,7 +28,6 @@ config STMMAC_SELFTESTS
+No, you can't just do that. Existing applications would break when they
+compile against the updated kernel header. They don't know about this
+new "tph" supplied flag, but they'll all accidently use the new
+dma_ranges offset. 
  
- config STMMAC_PLATFORM
- 	tristate "STMMAC Platform bus support"
--	depends on STMMAC_ETH
- 	select MFD_SYSCON
- 	default y
- 	help
-@@ -53,7 +51,6 @@ config DWMAC_DWC_QOS_ETH
- 
- config DWMAC_GENERIC
- 	tristate "Generic driver for DWMAC"
--	default STMMAC_PLATFORM
- 	help
- 	  Generic DWMAC driver for platforms that don't require any
- 	  platform specific code to function or is using platform
-@@ -336,7 +333,6 @@ config DWMAC_IMX8
- config DWMAC_INTEL_PLAT
- 	tristate "Intel dwmac support"
- 	depends on OF && COMMON_CLK
--	depends on STMMAC_ETH
- 	help
- 	  Support for ethernet controllers on Intel SoCs
- 
-@@ -371,7 +367,7 @@ config DWMAC_VISCONTI
- 	help
- 	  Support for ethernet controller on Visconti SoCs.
- 
--endif
-+endif # STMMAC_PLATFORM
- 
- config STMMAC_LIBPCI
- 	tristate
-@@ -381,7 +377,7 @@ config STMMAC_LIBPCI
- config DWMAC_INTEL
- 	tristate "Intel GMAC support"
- 	default X86
--	depends on X86 && STMMAC_ETH && PCI
-+	depends on X86 && PCI
- 	depends on COMMON_CLK
- 	depends on ACPI
- 	help
-@@ -420,4 +416,4 @@ config STMMAC_PCI
- 	  If you have a controller with this interface, say Y or M here.
- 
- 	  If unsure, say N.
--endif
-+endif # STMMAC_ETH
--- 
-2.51.2
-
+> Something like this:
+> diff --git a/drivers/vfio/pci/vfio_pci_dmabuf.c b/drivers/vfio/pci/vfio_pci_dmabuf.c
+> index b1d658b8f7b51..d78d915992232 100644
+> --- a/drivers/vfio/pci/vfio_pci_dmabuf.c
+> +++ b/drivers/vfio/pci/vfio_pci_dmabuf.c
+> @@ -237,7 +237,11 @@ int vfio_pci_core_feature_dma_buf(struct vfio_pci_core_device *vdev, u32 flags,
+>         if (get_dma_buf.region_index >= VFIO_PCI_ROM_REGION_INDEX)
+>                 return -ENODEV;
+> 
+> -       dma_ranges = memdup_array_user(&arg->dma_ranges, get_dma_buf.nr_ranges,
+> +       if (!tph_supplied)
+> +               dma_ranges = memdup_array_user(old_dma_ranges_pos, get_dma_buf.nr_ranges,
+> +                                      sizeof(*dma_ranges));
+> +       else
+> +               dma_ranges = memdup_array_user(&arg->dma_ranges, get_dma_buf.nr_ranges,
+>                                        sizeof(*dma_ranges));
+>         if (IS_ERR(dma_ranges))
+>                 return PTR_ERR(dma_ranges);
+> ~
 
