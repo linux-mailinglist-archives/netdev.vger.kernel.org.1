@@ -1,184 +1,202 @@
-Return-Path: <netdev+bounces-274080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274081-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qNM4Mj4TzWmMZwYAu9opvQ
-	(envelope-from <netdev+bounces-274080-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:44:46 +0200
+	id 8OZgJzQMzWnhZgYAu9opvQ
+	(envelope-from <netdev+bounces-274081-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:14:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DCD637AA88
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:44:46 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EEA437A452
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:14:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 84C0E303EC0E
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:10:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E142F3014600
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:12:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE52405AC3;
-	Wed,  1 Apr 2026 12:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1D840243C;
+	Wed,  1 Apr 2026 12:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b="eRemQYHB"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="MFbVrkyK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.amicon.ru (mail.amicon.ru [77.108.111.100])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898003FEB1D;
-	Wed,  1 Apr 2026 12:09:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.108.111.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6483C9EFB
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 12:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775045395; cv=none; b=U1fbj9oP1+8r6jinC0w7Wc3QQNWlR9qvl1fG01ram8aW0FNiPJyYvUCySyOfd8WpI0JsoH4QtZUE/hhz5KfoKJaEyuatHOphEFEHC2XTCOCQM9GiDhWPhwr+R2Dwzo3+aDrlFCPhGgFdir72a2dSzv0sJrVV+pjZefzqhp+Chro=
+	t=1775045569; cv=none; b=dyZKAQLPEYYOQcm5B4YfHjbR06cXmP6gXIkseAKAJynZy4ADVjQiPV4v/Hn9YhrYAjz2M4wVSIZC9Ao9suXb0G12mNU1ivW7uDMZtsbywT6xJmatRxtAFGecy3sarvM7dSCyt7UNX2kRMpe6vV+qqpTP88qdAbbdi9t5cSnBi5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775045395; c=relaxed/simple;
-	bh=d7GuwT6Jl1KQtz7eotNRQp6Eo286Tux6gD8IH2Y6PeY=;
-	h=Content-Type:From:To:CC:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version; b=O9LlU+yfc/KDCBK82woQt6Y2i1cguanSU2GDgSgJMPCzTm5SOMJTW1mWxnFNWfFDEoeOgYwf/J7l4FaM5j0vdss3RT5J5e2sG95/vm8G+4rojqddCtaXDEYHTLW2M/djBMkOl2GcbMbx2ZFLBN4Uo7wCwpteq3oiKIFo/wFDj/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amicon.ru; spf=pass smtp.mailfrom=amicon.ru; dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b=eRemQYHB; arc=none smtp.client-ip=77.108.111.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amicon.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amicon.ru
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; d=amicon.ru; s=mail; c=simple/simple;
-	t=1775045378; h=from:subject:to:date:message-id;
-	bh=d7GuwT6Jl1KQtz7eotNRQp6Eo286Tux6gD8IH2Y6PeY=;
-	b=eRemQYHB779uyNY7U10z6sTwbZOkk3cqeASFZGOdut2qCgujhTL6eTZJl4jXBD/m79nNZwZ+RQH
-	h1szsSisywG3l6GEydnjLtk2borwwAPVz77zqhfEB373MFggnQzgytiD70v7h1gb3X/LbeK4nbLE7
-	xo3LDm1Xw8qjRoWoOIXSxuvq8PD0mFox5i7SF5dclGGuF3/33PafSSuy4EMUVg1GxuMUcq3jCljXS
-	w4Rw7mNPjjaKj5YJH1XK8G7/FD76KTdtsiv3eD/jBsUfog7apH9Y+CM42Es+17Jr0wHQ//m2tlISt
-	A5zY8rW7JQ5EX+1pj8kqDaTxnhFEnqynmzBg==
-Received: from example.com (172.16.2.46) by mail.amicon.lan (192.168.0.59)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.27; Wed, 1 Apr
- 2026 15:09:38 +0300
-From: Agalakov Daniil <ade@amicon.ru>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-CC: Agalakov Daniil <ade@amicon.ru>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>, "Daniil
- Iskhakov" <dish@amicon.ru>, Roman Razov <rrv@amicon.ru>
-Subject: [PATCH net-next v3 2/2] e1000e: limit endianness conversion to boundary words
-Date: Wed, 1 Apr 2026 15:08:24 +0300
-Message-ID: <20260401120919.282668-3-ade@amicon.ru>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260401120919.282668-1-ade@amicon.ru>
-References: <20260325151615.1407182-1-ade@amicon.ru>
- <20260401120919.282668-1-ade@amicon.ru>
+	s=arc-20240116; t=1775045569; c=relaxed/simple;
+	bh=Fsp/6US/7KL1XzPKpRKXB3hb8A3DUAEdX9NBLia0CCw=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=TkAGBAULPgt7odYR2jH8J92BfFS8usz9GIBT1eKhCYq3maAmoujZTjRZsbnkdw2kWB7XUWXiB61/KTGz6x1FQRib9Mhc1p+5w7IJYfigEc5kJU8h5Xadgxs99XTHsYGFQIAqhStX+Fz4wsykTvGP9IiaePZBMxxiBGwaF9zzIoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=MFbVrkyK; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 49B57A56EE;
+	Wed,  1 Apr 2026 14:12:43 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1775045563; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=DTaYfdkSL8cJwRACnfK1wtT8yim3JnxhmL9znpKAzSA=;
+	b=MFbVrkyK8/HNVwU1Gg+cT9TfEFjp6W/REFI6Udbc1P1oEXgu/p9Ua3BX+/scP2SNsDY1kB
+	tDslAO8ldIW78estrcPS7DzCB94VMV9CV7p4g5kwsup9hpVpmf4Z0XIg0QyTTFFocZRJWX
+	xUZ9wq8U+8SQHa7oUSPGke6E8T4HyGgeH15r2NA8Q6uwfkWUZj6MGnoZztpxcIY1PGSgdq
+	ss65z7LnA8zlg5jmQU5eUf3LYRCj3O3bEmbb9P4Mswm2/T63zP7ZP9ZJPxt/L/HMARSz/u
+	lrdpanDjJSz13FyQA6vjdQs1PJfUtJQ1J3Exh0idVD38+v8ZegjW6MPqKYcuEg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ClientProxiedBy: mail.amicon.lan (192.168.0.59) To mail.amicon.lan
- (192.168.0.59)
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Date: Wed, 01 Apr 2026 14:12:43 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
+Subject: Re: RFC: phylink: disable PHY autonomous EEE when MAC manages LPI
+In-Reply-To: <aczMqBNesQH-tHx0@shell.armlinux.org.uk>
+References: <d86c53213a6328b701b8aabbde5d1c83@tipi-net.de>
+ <04ff15af-26be-4278-bc2a-889e7802d271@lunn.ch>
+ <aczMqBNesQH-tHx0@shell.armlinux.org.uk>
+Message-ID: <ccb68eaaca5512d5d662326d0817bd50@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[amicon.ru,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[amicon.ru:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-274080-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ade@amicon.ru,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-274081-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amicon.ru:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	RCPT_COUNT_THREE(0.00)[3];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amicon.ru:dkim,amicon.ru:email,amicon.ru:mid,linuxtesting.org:url]
-X-Rspamd-Queue-Id: 2DCD637AA88
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3EEA437A452
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-[Why]
-In e1000_set_eeprom(), the eeprom_buff is allocated to hold a range of
-words. However, only the boundary words (the first and the last) are
-populated from the EEPROM if the write request is not word-aligned.
-The words in the middle of the buffer remain uninitialized because they
-are intended to be completely overwritten by the new data via memcpy().
+On 1.4.2026 09:43, Russell King (Oracle) wrote:
+> On Wed, Apr 01, 2026 at 12:56:08AM +0200, Andrew Lunn wrote:
+>> On Tue, Mar 31, 2026 at 11:27:20PM +0200, Nicolai Buchwitz wrote:
+>> > Hi
+>> >
+>> > Some PHYs (e.g. Broadcom BCM54xx "AutogrEEEn") manage EEE LPI
+>> > autonomously without forwarding LPI signaling to the MAC. This works
+>> > fine when the MAC doesn't support EEE, but conflicts with MACs that
+>> > implement their own LPI control via phylink's mac_enable_tx_lpi /
+>> > mac_disable_tx_lpi.
+>> >
+>> > When the MAC has lpi_capabilities set, the PHY should use Native EEE
+>> > mode so the MAC can control LPI entry/exit and observe RX LPI
+>> > transitions.
+>> >
+>> > I'm thinking of a flag on phy_device (similar to mac_managed_pm) that
+>> > phylink sets when the MAC has lpi_capabilities, and that PHY drivers
+>> > check in config_init to disable their autonomous EEE mode:
+>> >
+>> >   /* set by phylink when MAC manages LPI */
+>> >   phydev->mac_managed_lpi = true;
+>> >
+>> >   /* in bcm54xx_config_init: */
+>> >   if (phydev->mac_managed_lpi)
+>> >       bcm_phy_modify_exp(phydev, MII_BUF_CNTL0,
+>> >                          AUTOGREEEN_EN, 0);
+>> >
+>> > This came up while adding EEE support to the Cadence macb driver (used
+>> > on Raspberry Pi 5 with a BCM54210PE PHY). The PHY's AutogrEEEn mode
+>> > prevented the MAC from tracking LPI state. As a workaround, the
+>> > Raspberry Pi tree currently carries a downstream patch that
+>> > unconditionally disables AutogrEEEn for all BCM54xx PHYs, since both
+>> > genet and macb now support EEE properly. That's obviously not suitable
+>> > for upstream where other MACs paired with BCM54xx may not have LPI
+>> > support.
+>> >
+>> > Does this seem like a reasonable approach, or is there a better way to
+>> > handle PHY autonomous EEE within phylink?
+>> 
+>> You should also think about it from the other direction. What happens
+>> with the MAC does not indicate it supports EEE, but the PHY has
+>> autonomous EEE. At some point in the future we are going to want the
+>> PHY drivers to export API calls so that phylink/phylib can implement
+>> ethtool set_eee and get_eee using this autonomous EEE.
+> 
+> Indeed - this needs to first be solved in phylib so that non-phylink
+> drivers can work before adding support to phylink.
+> 
+>> Maybe it makes more sense for Broadcom BCM54xx etc, to implement a
+>> .set_eee() call which only accepts eee_enable == False, and when
+>> called so, disables autonomous EEE. .get_eee() can similarly return
+>> that EEE is disabled. When phylink sees the MAC implements EEE it can
+>> calll into the PHY driver to turn off autonomous EEE. And we have a
+>> path to later add support for turning on and fully configuring
+>> autonomous EEE.
+> 
+> I think the current phylink_ethtool_[sg]et_eee() may eventually need
+> tweaking - for the case where the MAC eee ops are populated but the
+> MAC support is disabled for some reason - e.g. the instance doesn't
+> support EEE but the driver does for other instances.
+> 
+> However, I don't think we can re-use phy_ethtool_set_eee() for this -
+> even with MAC based EEE, we still call through to phylib's
+> phy_ethtool_set_eee() which would change the on-PHY EEE support in
+> ways we wouldn't want. This call remains necessary because of the
+> requirement to configure the EEE advertisement which happens at phylib
+> level.
+> 
+> I think we need a separate phylib interface which disables PHY-based
+> EEE.
 
-The previous implementation had a loop that performed le16_to_cpus()
-on the entire buffer. This resulted in endianness conversion being
-performed on uninitialized memory for all interior words.
+Thanks Russell and Andrew. You're both heading in the same direction,
+so to make sure I understand correctly:
 
-Fix this by converting the endianness only for the boundary words
-immediately after they are successfully read from the EEPROM.
+1. Add a new phylib interface (separate from phy_ethtool_set_eee) to
+    control PHY-autonomous EEE, e.g. phy_set_autonomous_eee(phydev,
+    enable) and phy_get_autonomous_eee(phydev) to query the current
+    state.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+2. PHY drivers implement it where applicable. BCM54xx AutogrEEEn as
+    the first user, Realtek RTL8211F as a second - it already
+    unconditionally disables PHY-mode EEE in config_init with the same
+    intent.
 
-Co-developed-by: Iskhakov Daniil <dish@amicon.ru>
-Signed-off-by: Iskhakov Daniil <dish@amicon.ru>
-Signed-off-by: Agalakov Daniil <ade@amicon.ru>
----
-v3:
- - Reverted to v1's "check-then-convert" logic: the return value of
-   e1000_read_nvm() is now checked before performing le16_to_cpus().
- - Removed the redundant full-buffer loops that caused double endianness
-   conversion in v2.
+3. phylib calls it when the MAC registers EEE support, phylink can
+    build on top of that. Since EEE advertisement happens during
+    autoneg and LPI management is independent, the autonomous EEE
+    mode can be switched at any point after probe.
 
-v2:
- - Split from the original bugfix series and targeted at 'net-next'.
- - Removed the Fixes: tag; limiting the conversion scope is an
-   improvement to avoid unnecessary processing of uninitialized memory.
- - Improved commit description for clarity.
- - Note on e1000e: this driver already contains the necessary return
-   value checks for EEPROM reads, so only the endianness conversion
-   cleanup is included for e1000e.
+4. phy_ethtool_set_eee() handles EEE advertisement at the autoneg
+    level and stays untouched. The new phy_set_autonomous_eee() only
+    controls who manages LPI after EEE is negotiated: the PHY
+    autonomously or the MAC.
 
- drivers/net/ethernet/intel/e1000e/ethtool.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+I think solving this properly in phylib is the right approach. Having
+to guess whether autonomous EEE is interfering with MAC-managed LPI is
+a recurring pain point, so it's worth getting a clean interface for it.
 
-diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
-index dbed30943ef4..a8b35ae41141 100644
---- a/drivers/net/ethernet/intel/e1000e/ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
-@@ -583,20 +583,25 @@ static int e1000_set_eeprom(struct net_device *netdev,
- 		/* need read/modify/write of first changed EEPROM word */
- 		/* only the second byte of the word is being modified */
- 		ret_val = e1000_read_nvm(hw, first_word, 1, &eeprom_buff[0]);
-+		if (ret_val)
-+			goto out;
-+
-+		/* Device's eeprom is always little-endian, word addressable */
-+		le16_to_cpus(&eeprom_buff[0]);
-+
- 		ptr++;
- 	}
--	if (((eeprom->offset + eeprom->len) & 1) && (!ret_val))
-+	if ((eeprom->offset + eeprom->len) & 1) {
- 		/* need read/modify/write of last changed EEPROM word */
- 		/* only the first byte of the word is being modified */
- 		ret_val = e1000_read_nvm(hw, last_word, 1,
- 					 &eeprom_buff[last_word - first_word]);
-+		if (ret_val)
-+			goto out;
- 
--	if (ret_val)
--		goto out;
--
--	/* Device's eeprom is always little-endian, word addressable */
--	for (i = 0; i < last_word - first_word + 1; i++)
--		le16_to_cpus(&eeprom_buff[i]);
-+		/* Device's eeprom is always little-endian, word addressable */
-+		le16_to_cpus(&eeprom_buff[last_word - first_word]);
-+	}
- 
- 	memcpy(ptr, bytes, eeprom->len);
- 
--- 
-2.51.0
+I'd put together patches once we've agreed on the overall architecture.
 
+Nicolai
 
