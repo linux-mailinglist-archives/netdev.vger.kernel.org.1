@@ -1,237 +1,220 @@
-Return-Path: <netdev+bounces-274196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274198-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sIfnNapOzWkWbwYAu9opvQ
-	(envelope-from <netdev+bounces-274196-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:58:18 +0200
+	id CCX+C51SzWmnbwYAu9opvQ
+	(envelope-from <netdev+bounces-274198-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 19:15:09 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D9F137E492
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:58:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6819C37E7DC
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 19:15:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4450B3061E32
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 16:56:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9D601306B9F4
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 17:00:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A607E47B413;
-	Wed,  1 Apr 2026 16:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F1647CC9B;
+	Wed,  1 Apr 2026 16:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="W9amduMA"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rC7fNxoD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E47547A0BE
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 16:55:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775062558; cv=pass; b=uPmr1CMnli4PI8auQGHWB6IpHrsN9vqx8gZ+U0ckYRjKJCeKVLGdXJbEdQUPyG0g8ASx1+7btOP/efsZ9xd4uZx878AfrFaNkyRAM7EhAYN30gmS5zvQ5rSogB45ExQDzupfH7GGiuGLCywfg9NHPZqgghG5v3ynyoI5Wwakd+Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775062558; c=relaxed/simple;
-	bh=eO/Aj+ZtlXpxdIHMKMSgcDj7n5rRQmBw8M490hgHXi8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d9nnz95nUinz6kLYWLmvcnvafYRdk+bvPNjiDfLxms5G/3rIunhEMe1D7UQe8WB75QmC0LygP6WJqSWC0NXyD2Q2Wq6wJzSVHBQczmXw9RccPXpayKCfUcG+moze7nSEtOgkZfZ6fHMDhvXyrxNIAckQs207bpm5IR182a0/Iwo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=W9amduMA; arc=pass smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-43d029f346eso2643442f8f.3
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 09:55:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775062554; cv=none;
-        d=google.com; s=arc-20240605;
-        b=JC53aaVULxXtl0s/8xCFjkR1kz1tZ29TqCgjJwps9Qlgf8MVvVqPr5ajPjh+ja08Fb
-         463ylWS0TvqM7NVt25r4JwRQwgMxHhocnw367+NcDKrePxID73+8KF5Djaq212Y8HTvZ
-         IpsDh9pdHGa/Ii0FH3dCvCUkhBl7M9paXQlrDdXQs7Q2hJy0fKPf7oiGWLQwrtKbsTTf
-         e4DXx7rcJuPxvzArPhBe/DbP9QHhrRCd3gFixrTYyszPo5HatSLqyvpUs73zexXH4ocQ
-         3cnI+x5xxslZt4K5IQMKuD03AQxGNaa2Fc00UkOH1WQnLbN5RMZZVNPLV+VlnVyQGQdC
-         WWfw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=1xx4YVdOSk31B8m52xPv3EMBRuAXgAy60np1RaxKVjE=;
-        fh=kqhjXIqTkYBcur4RVVE//dNJ5+Zo70J6CWsy425OAtw=;
-        b=gSW643OOEb4HBaDYzuxskNRPb7sA0zn0fm5hCt7sRTRKWM6vezSN01VTQCnmui1j3t
-         l76xqkRI4C5hBkFhdRpq4+B32k7sB/da918cqkOM9OD3bEUEkGJkBRMHhVG2nTb3Mzmv
-         VyLKnCtFsxzscisH9LAMLOJqhklFsmXpeAJB32st56rHPhqmSH/BPpXc0KZxwySIm8bA
-         Z8voD6A/boFIzo+oeChtIf9Twj/tMZb5Ncud6Jm2HC9misj1k65JwsRFIpzqC7kO8FFw
-         2o83YSgfO4msQfS7ZZWs5y1G5/pnALXQDlClTzr3askEVXdzTtVwUaL+TrmnuC1gbeA+
-         Bqfg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1775062554; x=1775667354; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=1xx4YVdOSk31B8m52xPv3EMBRuAXgAy60np1RaxKVjE=;
-        b=W9amduMAZBgtkSZoKKwHg6JGvGTJpLQITjCs5521xt4shBY3kqm/5zJnO4+/EgyvX5
-         +CaGzkX9ZIfZlalbHBIFNNNpE62gJvFM8aUp5GAXkGFmXy/rKqjLppN58zLcDHMONQ25
-         kBEBbEAPHK+QGagjS3Q6TqqOJ7g1dgusB9AkICQEWW1HZ/IQrIHmRY3V8dmEmYFIcbV0
-         8JzA6JJ0r0K3vM0/lv3TGBBAQkTh52apoq4k+HrOKLxoYeBDGzEYTUkQn3TdazrRaoNx
-         H+9TE4EQo4e93tILpBZ5SYqf3qiNgNCb2Dyq3HY0r80zZ/Qg1q/s8EIVfHAEFhOv3fBW
-         32vA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775062554; x=1775667354;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1xx4YVdOSk31B8m52xPv3EMBRuAXgAy60np1RaxKVjE=;
-        b=O2kmKVHbjmlvhXxBH77FdeMEnpK01SAN7YHqjcIu5s8xG2mnfuh8B/GTKof6qc+iow
-         fPPJdFoJQg40pIjyf8h/nNfzLAbz/pXcCdxQUeJvHRLBz3wR2RFeSXmlwAs09RLylwtS
-         HsbjjKSUEpb7pFabbTeLscR1xJ9gB79tyGG0LzTSdBKSAbMPN7YLmQl2g0zyuzFoVSWR
-         dN1GzdpSMBw4d8Z5iB/bhISwM+Vw4mzwlOc7gK8mp3IKipJgyVYJN/600+AhRApnj/H9
-         2bRwgoX0AL712bLOBxEoiI42GsN93hPCJ3LxLp2TTJnbek2c7KhBJ8TeMMX2NZQn+/3Z
-         7yhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV+/f9w9qZdOqLdRx3xWEosfJBjPF72i2tIKPhygK3bJKHW3MS3b/kWKjYnG0N2U3rY988fHjk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxi2Jw4UaZjXzDtw0C9KAW6XHaIlSkzB1WiFvgxo4FhJ/XtCgOm
-	w1ySbwthZGhbE7VcF4Y/5L8A/TVxkSegyfpji8qkVL9WsZfEh0P7TkEmq0o58WgIfrL3tALouxb
-	vLQ8/cVABntGP4c2R2P4Cw0dx+kAuDZFQAi57o3PXdg==
-X-Gm-Gg: ATEYQzzvjqtnHvrXCN5L6Mmv233/n7OkZwbxSsSUMIZgVJHAVqJazfiAasiudK01xN0
-	98GCTrRqAeeAV9bjOshcSQQpJ/vuvRA6suM+elAmPlBEPc/f1lpAIF8S8sf3tDAI/cE+7+mLyQn
-	qKN3Vxjb+MapzKLkqyG4c/l9siE+t+jO3Zv7uG4VpQJKh9t/vt1tP+4yx/upf637eFsUV3AJ9i1
-	NWr9bg4iPvEnfVb1SW3ozjQoyKs4K47JH+j3aOp6C3HAhAa7MeOH4XA5u0XtH6HOFAVxWozp9Lc
-	qxYBCWtUr76Q41xnFFCOMo5rp2q9dd7afie3rNIISslYjmxAuw94dBCjpDyjLBFL3k0Bv9fTDY5
-	Okk3c
-X-Received: by 2002:a05:6000:601:b0:43b:3d44:6624 with SMTP id
- ffacd0b85a97d-43d1f1c03femr79938f8f.2.1775062554435; Wed, 01 Apr 2026
- 09:55:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 750543DCDA2
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 16:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775062793; cv=none; b=n9NPGCePmPrBq6seMS0z83vAajqp1bAe+WHP5R1NtepluAWKnpKJwu7tkfaC8y9IQugQS5JD9t2fY27N00Lnd+9dOPTghbmghjjQ5h6YJLwlsiwpyDHl3oee6i6tzggxCHsorbG+/DclllIyieFSQpdxLW1WbNY2I0KHS81ZGoM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775062793; c=relaxed/simple;
+	bh=kJjatoj12q1IVFN7ceHnVQp6+VKfe2YdEN9hKvtcchQ=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=sD1pe4oS2Brby9kalFyggLP5icpoR0fx0+t99zKz9Fw9ATaVvm28MmAew75pWL1+M2LB6wr1BwAPMoINcy6eI4UN5PNnJ0Ho2nqLoGDEdv8tntVflogs2mOmLCW+rNWPLhIsHbp6unzzdLiZFhLpxy4fPOQ7KHIjMIml7u32s4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rC7fNxoD; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <4fba57892e5bd6a1afc4a36a80b40e3ecc28cac5.camel@web.de>
- <fd609cfe186ee48e0e9a08e35764175a2516dd14.camel@web.de> <2369ba83d204290dcfe157aed3f943206213b979.camel@web.de>
- <aa02f39ec4640c9d98963f42121b76e59b58371d.camel@web.de> <20260218073036.AlkNRoAP@linutronix.de>
- <ae213d2b908e46d34856be9daec891d7210f46f7.camel@web.de> <20260226172927.2Ck9wZMw@linutronix.de>
- <20260318103009.2120920-1-neelx@suse.com> <20260318111849._MMol8Hr@linutronix.de>
- <CAPjX3FcRYNkYK2gerbRL4C9wXZPxWSs6=oTjzv5+msm4PQrfqA@mail.gmail.com> <20260318145101._iaDDpbE@linutronix.de>
-In-Reply-To: <20260318145101._iaDDpbE@linutronix.de>
-From: Daniel Vacek <neelx@suse.com>
-Date: Wed, 1 Apr 2026 18:55:43 +0200
-X-Gm-Features: AQROBzCCROIdCe9kvHP9iYGHGkzUiotwHvSMgwQTbWweollZ6Da-pHq3fXh3bLE
-Message-ID: <CAPjX3FePCKQTaxB6zuo+_V09PZct=utw3vgJUTM_GrZQtv7_TA@mail.gmail.com>
-Subject: Re: "Dead loop on virtual device" error without softirq-BKL on PREEMPT_RT
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rt-devel@lists.linux.dev, netdev@vger.kernel.org, spasswolf@web.de, 
-	tglx@linutronix.de
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+Mime-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775062788;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PpiUdagjamy+bZwyP2hl/BIuvfqngZCXPP6zxd4vuSE=;
+	b=rC7fNxoDQSUfZxMXYaIV4WUpwL6FDs2YYR5tH6ZkyWvnqFqzYBLAK6zMNgeokKBQT1QFUh
+	9yleGRp4Kni9JuAJzwI6UUZmVDdIQYvFrdaaT2LPdxXG9xxJPt3UB319vj/QxTyAMH/+M/
+	nyzycow4vxNCpA3zsbXD0WPcXL83SnQ=
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 01 Apr 2026 18:59:44 +0200
+Message-Id: <DHHZ8POWJINS.1CRKQT33EM1WW@linux.dev>
+Cc: <netdev@vger.kernel.org>, <fmaurer@redhat.com>, <horms@kernel.org>
+Subject: Re: [PATCH net-next v4 1/2] net: hsr: require valid EOT supervision
+ TLV
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Luka Gejak" <luka.gejak@linux.dev>
+To: "Fernando Fernandez Mancera" <fmancera@suse.de>, <luka.gejak@linux.dev>,
+ <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+ <pabeni@redhat.com>
+References: <20260401092324.52266-1-luka.gejak@linux.dev>
+ <20260401092324.52266-2-luka.gejak@linux.dev>
+ <2d94a1a6-e6c5-427c-b10f-63377cb10407@suse.de>
+In-Reply-To: <2d94a1a6-e6c5-427c-b10f-63377cb10407@suse.de>
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,vger.kernel.org,lists.linux.dev,web.de,linutronix.de];
-	TAGGED_FROM(0.00)[bounces-274196-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-274198-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[neelx@suse.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luka.gejak@linux.dev,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,linutronix.de:email,suse.com:dkim]
-X-Rspamd-Queue-Id: 7D9F137E492
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6819C37E7DC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, 18 Mar 2026 at 15:51, Sebastian Andrzej Siewior
-<bigeasy@linutronix.de> wrote:
-> On 2026-03-18 15:43:52 [+0100], Daniel Vacek wrote:
-> > On Wed, 18 Mar 2026 at 12:18, Sebastian Andrzej Siewior
-> > <bigeasy@linutronix.de> wrote:
-> > >
-> > > On 2026-03-18 11:30:09 [+0100], Daniel Vacek wrote:
-> > > > > --- a/net/core/dev.c
-> > > > > +++ b/net/core/dev.c
-> > > > > @@ -4821,7 +4821,7 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
-> > > > >             /* Other cpus might concurrently change txq->xmit_lock_owner
-> > > > >              * to -1 or to their cpu id, but not to our id.
-> > > > >              */
-> > > > > -           if (READ_ONCE(txq->xmit_lock_owner) != cpu) {
-> > > > > +           if (rt_mutex_owner(&txq->_xmit_lock.lock) != current) {
-> > > >
-> > > > Ain't this changing the behavior for !RT case? Previously, if it was the same thread
-> > > > which has already locked the queue (and hence the same CPU) evaluating this condition,
-> > > > the condition was skipped, which is no longer the case with this change.
-> > >
-> > > The above was me thinking and does not even compile for !RT. Commit
-> > > b824c3e16c190 ("net: Provide a PREEMPT_RT specific check for
-> > > netdev_queue::_xmit_lock") is what was merged in the end.
+On Wed Apr 1, 2026 at 4:47 PM CEST, Fernando Fernandez Mancera wrote:
+> On 4/1/26 11:23 AM, luka.gejak@linux.dev wrote:
+>> From: Luka Gejak <luka.gejak@linux.dev>
+>>=20
+>> Supervision frames are only valid if terminated with a zero-length EOT
+>> TLV. The current check fails to reject non-EOT entries as the terminal
+>> TLV, potentially allowing malformed supervision traffic.
+>>=20
+>> Fix this by strictly requiring the terminal TLV to be HSR_TLV_EOT
+>> with a length of zero.
+>>=20
+>> Reviewed-by: Felix Maurer <fmaurer@redhat.com>
+>> Signed-off-by: Luka Gejak <luka.gejak@linux.dev>
+>> ---
+>>   net/hsr/hsr_forward.c | 41 ++++++++++++++++++++++-------------------
+>>   1 file changed, 22 insertions(+), 19 deletions(-)
+>>=20
+>> diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+>> index 0aca859c88cb..17b705235c4a 100644
+>> --- a/net/hsr/hsr_forward.c
+>> +++ b/net/hsr/hsr_forward.c
+>> @@ -82,39 +82,42 @@ static bool is_supervision_frame(struct hsr_priv *hs=
+r, struct sk_buff *skb)
+>>   	    hsr_sup_tag->tlv.HSR_TLV_length !=3D sizeof(struct hsr_sup_payloa=
+d))
+>>   		return false;
+>>  =20
+>> -	/* Get next tlv */
+>> +	/* Advance past the first TLV payload to reach next TLV header */
+>>   	total_length +=3D hsr_sup_tag->tlv.HSR_TLV_length;
+>> -	if (!pskb_may_pull(skb, total_length))
+>> +	/* Linearize next TLV header before access */
+>> +	if (!pskb_may_pull(skb, total_length + sizeof(struct hsr_sup_tlv)))
+>>   		return false;
+>>   	skb_pull(skb, total_length);
+>>   	hsr_sup_tlv =3D (struct hsr_sup_tlv *)skb->data;
+>>   	skb_push(skb, total_length);
+>>  =20
+>> -	/* if this is a redbox supervision frame we need to verify
+>> -	 * that more data is available
+>> +	/* Walk through TLVs to find end-of-TLV marker, skipping any unknown
+>> +	 * extension TLVs to maintain forward compatibility.
+>>   	 */
+>> -	if (hsr_sup_tlv->HSR_TLV_type =3D=3D PRP_TLV_REDBOX_MAC) {
+>> -		/* tlv length must be a length of a mac address */
+>> -		if (hsr_sup_tlv->HSR_TLV_length !=3D sizeof(struct hsr_sup_payload))
+>> -			return false;
+>> +	for (;;) {
+>> +		if (hsr_sup_tlv->HSR_TLV_type =3D=3D HSR_TLV_EOT &&
+>> +		    hsr_sup_tlv->HSR_TLV_length =3D=3D 0)
+>> +			return true;
+>>  =20
+>
+> I do not follow this approach, why a loop? From IEC 62439-3, I do not=20
+> understand that supervision frames could have multiple=20
+> PRP_TLV_REDBOX_MAC TLVs. The current code handles the TLVs correctly.
+>
+> Which makes me wonder, how are you testing this? Do you have some=20
+> hardware with HSR/PRP support that is sending these frames? If so, which=
+=20
+> one? Are you testing this using a HSR/PRP environment with purely Linux=
+=20
+> devices?
+>
+> Thanks,
+> Fernando.
+>
+>> -		/* make sure another tlv follows */
+>> -		total_length +=3D sizeof(struct hsr_sup_tlv) + hsr_sup_tlv->HSR_TLV_l=
+ength;
+>> -		if (!pskb_may_pull(skb, total_length))
+>> +		/* Validate known TLV types */
+>> +		if (hsr_sup_tlv->HSR_TLV_type =3D=3D PRP_TLV_REDBOX_MAC) {
+>> +			if (hsr_sup_tlv->HSR_TLV_length !=3D
+>> +			    sizeof(struct hsr_sup_payload))
+>> +				return false;
+>> +		}
+>> +
+>> +		/* Advance past current TLV: header + payload */
+>> +		total_length +=3D sizeof(struct hsr_sup_tlv) +
+>> +				hsr_sup_tlv->HSR_TLV_length;
+>> +		/* Linearize next TLV header before access */
+>> +		if (!pskb_may_pull(skb,
+>> +				   total_length + sizeof(struct hsr_sup_tlv)))
+>>   			return false;
+>>  =20
+>> -		/* get next tlv */
+>>   		skb_pull(skb, total_length);
+>>   		hsr_sup_tlv =3D (struct hsr_sup_tlv *)skb->data;
+>>   		skb_push(skb, total_length);
+>>   	}
 
-Thinking about it again, wouldn't it be better to have one generic
-solution rather then special-casing for PREEMPT_RT vs. !PREEMPT_RT?
+Hi Fernando,
 
---nX
+You are right that IEC 62439-3 does not specify multiple=20
+PRP_TLV_REDBOX_MAC TLVs. My intention with the loop was not to handle=20
+multiple RedBox MACs, but rather to make the parser robust against=20
+unknown TLV types. If a future revision of the standard or a vendor=20
+extension introduces a new TLV, the loop allows the kernel to safely=20
+skip over unrecognized TLVs by reading their length, ensuring it can=20
+still validate the HSR_TLV_EOT marker at the end.
 
-> >
-> > Hmm, that means txq->xmit_lock_owner is not used at all for PREEMT_RT.
-> > It's pointless to even store it. Shall we care?
->
-> For PREEMPT_RT the xmit_lock_owner member is only stored and not used
-> otherwise. It could be removed as in ifdef-ed away but I do not care
-> enough to sprinkle it and the gain is little (proof me wrong). So I am
-> happy as-is.
->
-> As for the check itself as we have now, we detect the deadlock before it
-> happens and this is nice to have. The alternative (in case of a
-> deadlock) would be the deadlock detection in rtmutex code which would
-> freeze the thread.
->
-> > --nX
-> >
-> Sebastian
+However, if the preference for the HSR subsystem is strict adherence to=20
+only currently defined TLVs over forward compatibility, I completely=20
+understand.
 
-On Wed, 18 Mar 2026 at 15:51, Sebastian Andrzej Siewior
-<bigeasy@linutronix.de> wrote:
->
-> On 2026-03-18 15:43:52 [+0100], Daniel Vacek wrote:
-> > On Wed, 18 Mar 2026 at 12:18, Sebastian Andrzej Siewior
-> > <bigeasy@linutronix.de> wrote:
-> > >
-> > > On 2026-03-18 11:30:09 [+0100], Daniel Vacek wrote:
-> > > > > --- a/net/core/dev.c
-> > > > > +++ b/net/core/dev.c
-> > > > > @@ -4821,7 +4821,7 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
-> > > > >             /* Other cpus might concurrently change txq->xmit_lock_owner
-> > > > >              * to -1 or to their cpu id, but not to our id.
-> > > > >              */
-> > > > > -           if (READ_ONCE(txq->xmit_lock_owner) != cpu) {
-> > > > > +           if (rt_mutex_owner(&txq->_xmit_lock.lock) != current) {
-> > > >
-> > > > Ain't this changing the behavior for !RT case? Previously, if it was the same thread
-> > > > which has already locked the queue (and hence the same CPU) evaluating this condition,
-> > > > the condition was skipped, which is no longer the case with this change.
-> > >
-> > > The above was me thinking and does not even compile for !RT. Commit
-> > > b824c3e16c190 ("net: Provide a PREEMPT_RT specific check for
-> > > netdev_queue::_xmit_lock") is what was merged in the end.
-> >
-> > Hmm, that means txq->xmit_lock_owner is not used at all for PREEMT_RT.
-> > It's pointless to even store it. Shall we care?
->
-> For PREEMPT_RT the xmit_lock_owner member is only stored and not used
-> otherwise. It could be removed as in ifdef-ed away but I do not care
-> enough to sprinkle it and the gain is little (proof me wrong). So I am
-> happy as-is.
->
-> As for the check itself as we have now, we detect the deadlock before it
-> happens and this is nice to have. The alternative (in case of a
-> deadlock) would be the deadlock detection in rtmutex code which would
-> freeze the thread.
->
-> > --nX
-> >
-> Sebastian
+Furthermore, I am testing this using a purely Linux environment by=20
+using a virtual HSR environment on Arch Linux. I set up two network=20
+namespaces connected via veth pairs and instantiated HSR interfaces.
+
+The nodes successfully synchronized and maintained the connection. I=20
+confirmed this by observing the expected duplicate packets (DUP!)=20
+during ping tests between namespaces and by verifying that supervision=20
+frames were correctly parsed, allowing the nodes to populate their=20
+remote node tables.
+
+Let me know if you'd prefer I drop the loop for v5.
+Best regards,
+Luka Gejak
 
