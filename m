@@ -1,154 +1,217 @@
-Return-Path: <netdev+bounces-273978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273979-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +EDiNHzWzGnnWwYAu9opvQ
-	(envelope-from <netdev+bounces-273978-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 10:25:32 +0200
+	id wOFgFjHWzGnnWwYAu9opvQ
+	(envelope-from <netdev+bounces-273979-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 10:24:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09A46376BD2
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 10:25:31 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7FF1376B86
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 10:24:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5444A303EAC1
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 08:13:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 73F7D3063016
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 08:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03C233D4E2;
-	Wed,  1 Apr 2026 08:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1413AE1BE;
+	Wed,  1 Apr 2026 08:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U1oeOcm6"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="NR81kuGT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3F6313293;
-	Wed,  1 Apr 2026 08:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A765F3AE6F2;
+	Wed,  1 Apr 2026 08:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775031237; cv=none; b=RN8NZpY+fOFYIt4wUPMvoGijyBPCU4a1T4lfJQ0Z4wQTPjzcaaASj06QHW2QVOK9LfTh6ty9qAwLvwFpg6S87YLw+8vk2cFMyxGtJy8xZbHcJlXan0pZrRbuJkpHcbea6B8qD5i/F9bNIx4ZvlSllHvkkEjbCBY3ZCVPbqLcfDA=
+	t=1775031447; cv=none; b=MJM1mK6Rs4/0ckLIKpwaZ2mGxv/pry+OBwj2IbT+8b0H5KC64hWpOwkRUIouIvNJaayIt5Nbh4o1ilDlCDpTGNW8dh/aNOvC9JA5HzO3ILqPisA9gk8A97zxTFRtOpbbDrF9j9zWIQQ6hgt4DJDhcjp97hWpriVYGoJQFr84640=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775031237; c=relaxed/simple;
-	bh=pKfBEcybALzZFL9h7jJzIO8omtnH+z8QFMPiH8hqRq0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pp5qhGJK8kloRS4sh73OD/H2KOHvKt4qWWnVIrU+gvVU87bMYCgTCFCC2mdJf/BXzsmQKPcUpvuM88X4eBIATn9nFx1CIBUtFYJACOakfIU6EY4GRCaJKanhw2QcDBY/WLNIIdnxyQ4M4De6g5wlj7aybOR/PetsRHyCR69j//o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U1oeOcm6; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1775031447; c=relaxed/simple;
+	bh=Ni04/9G4SIsoNZG/RxPat+gme/lPsnTjF/lZIzHivpc=;
+	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XFP1PFD5/AbsJ8i95DPjd7haEoE6WKGDdFiAzUNS/BxpW51nNJnqfjelthFH2voVKtccL/QyX7uXJ7Uq71cEdtxJWtcp1b860h9p10kBawEB8d0Fm1Ld4apzb3J8pIs/Wva56ikWmUUEMAJzJS3PeqQ++XFYZKnpsxsty8iLlIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=NR81kuGT; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775031236; x=1806567236;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pKfBEcybALzZFL9h7jJzIO8omtnH+z8QFMPiH8hqRq0=;
-  b=U1oeOcm6Dc7VsCHD0J2pyGq/rgbjtCumUbHG1xJr87gpTVXsmtNezTj5
-   xUojFh+efYtuJMbxufWNzr1IMaihdOwM/+0lf7xmiBFJXXjeK0dxSTRd6
-   npR945E8FZ/+dOJk7Ujho1b6J0dW6i7r6qC5M2EpiJZMJAvN7Zw8RI5Ha
-   SuUJP7zVrgFs7tTgeeUUsoSa69UHCa3CU+a5BieBKg98ka/iuYHcdSLdF
-   3cH4wz8rWktvQWoH8TYvCBY9UBfvFMw8srtFOvxzQmYW3lebhF3829DEl
-   UJhx8HLI710poLvXwJSc36lBVpHxWCo3ELIi9eV/P/zqdobaTLlm2v/89
-   A==;
-X-CSE-ConnectionGUID: I5sd8vFmRKe6R1TBfcjxRw==
-X-CSE-MsgGUID: WOXEgvwORru8B8O79Zdvdw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11745"; a="87137772"
-X-IronPort-AV: E=Sophos;i="6.23,153,1770624000"; 
-   d="scan'208";a="87137772"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2026 01:13:55 -0700
-X-CSE-ConnectionGUID: WWWEyMSfRqi1fazbT+7RqQ==
-X-CSE-MsgGUID: nPzOmMCkTAqzSEss4p1HsQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,153,1770624000"; 
-   d="scan'208";a="223728622"
-Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2026 01:13:54 -0700
-Date: Wed, 1 Apr 2026 01:13:47 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Laight <david.laight.linux@gmail.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v8 04/10] x86/vmscape: Rename x86_ibpb_exit_to_user to
- x86_predictor_flush_exit_to_user
-Message-ID: <20260401081347.cfw6blo56i5vk2ji@desk>
-References: <20260324-vmscape-bhb-v8-0-68bb524b3ab9@linux.intel.com>
- <20260324-vmscape-bhb-v8-4-68bb524b3ab9@linux.intel.com>
- <acwJVUeW9KoLft4d@google.com>
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1775031444; x=1806567444;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=Ni04/9G4SIsoNZG/RxPat+gme/lPsnTjF/lZIzHivpc=;
+  b=NR81kuGTf6rAW8DivIT97WKNlZNbiO0G2cYqxjAPdhRqN/KLAgKhZKsw
+   YaXS+KyPG1Khx2QPoRXwY3pVDelQoPXaSp8HAw2G/mwzVlj1BnH9n369J
+   eiU1sPO9LZpfv4ZMkCDW9LzrBS48feBVO0duFJhbuDAL1f/Ew9qXKbiVS
+   mFfgXwPPzF445O5ERoImCkV3v0OAcxBts9gbytWWIsAY49YpRE999tscE
+   BYZeqqRzmpQn+IJc187eiJavWqvP3KxB4wn1GaUMzcklA/crQRY98eQlP
+   raIfuRmBXPObELy9Coyirck4FJP+c9DG+K9XEs0S2CHgjqSXPNSXdGfT6
+   g==;
+X-CSE-ConnectionGUID: ZqHib0C6R5S5HUDka/KWCQ==
+X-CSE-MsgGUID: Sn8Fp7uiSuyFNME6zMPA2g==
+X-IronPort-AV: E=Sophos;i="6.23,153,1770620400"; 
+   d="scan'208";a="55944410"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2026 01:17:23 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
+ chn-vm-ex2.mchp-main.com (10.10.87.31) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.35; Wed, 1 Apr 2026 01:17:00 -0700
+Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Wed, 1 Apr 2026 01:16:57 -0700
+Message-ID: <2a2de46c493fe7d9fcae5c02406d374c40c997eb.camel@microchip.com>
+Subject: Re: [PATCH net-next v2 2/9] dt-bindings: net: lan9645x: add
+ LAN9645X switch bindings
+From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <UNGLinuxDriver@microchip.com>, <andrew@lunn.ch>, <olteanv@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<horms@kernel.org>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+	<conor+dt@kernel.org>, <woojung.huh@microchip.com>, <linux@armlinux.org.uk>,
+	<Steen.Hegelund@microchip.com>, <daniel.machon@microchip.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>
+Date: Wed, 1 Apr 2026 10:16:57 +0200
+In-Reply-To: <20260329195625.2789069-1-kuba@kernel.org>
+References: <20260324-dsa_lan9645x_switch_driver_base-v2-2-f7504e3b0681@microchip.com>
+	 <20260329195625.2789069-1-kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acwJVUeW9KoLft4d@google.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273978-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[37];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,google.com,lwn.net,vger.kernel.org,intel.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273979-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,armlinux.org.uk,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 09A46376BD2
+	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,0.0.0.9:email]
+X-Rspamd-Queue-Id: C7FF1376B86
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 31, 2026 at 10:50:13AM -0700, Sean Christopherson wrote:
-> On Tue, Mar 24, 2026, Pawan Gupta wrote:
-> > With the upcoming changes x86_ibpb_exit_to_user will also be used when BHB
-> > clearing sequence is used. Rename it cover both the cases.
-> > 
-> > No functional change.
-> > 
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> > ---
-> 
-> Acked-by: Sean Christopherson <seanjc@google.com>
+On Sun, 2026-03-29 at 12:56 -0700, Jakub Kicinski wrote:
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
+e content is safe
+>=20
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> dt-bindings: net: lan9645x: add LAN9645X switch bindings
+>=20
+> Add bindings for LAN9645X switch. We use a fallback compatible for the
+> smallest SKU microchip,lan96455s-switch.
+>=20
+> > diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,lan964=
+55s-switch.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,lan96=
+455s-switch.yaml
+> > new file mode 100644
+> > index 000000000000..0282e25c05d4
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/dsa/microchip,lan96455s-swi=
+tch.yaml
+>=20
+> [ ... ]
+>=20
+> > +patternProperties:
+> > +  "^(ethernet-)?ports$":
+> > +    type: object
+> > +    additionalProperties: true
+> > +    patternProperties:
+> > +      "^(ethernet-)?port@[0-8]$":
+>=20
+> Does having additionalProperties set to true bypass the port number
+> restriction?
+>=20
+> Since dsa.yaml allows port@[0-9a-f]+, it seems port@9 would silently pass
+> validation as an additional property. Should this be unevaluatedPropertie=
+s
+> set to false instead?
+>=20
 
-Thanks.
+Yes it is true the port regex has no effect, but I do not think
+
+unevaluatedProperties: false
+
+is what I want here. That rejects other properties from the parent. I can
+remove the explicit additionalProperties: true. This is similar to
+
+Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+
+and the port number restriction still serves as documentation, even if it i=
+s
+not applied during validation.
+
+
+> > +        type: object
+> > +        description: Ethernet switch ports
+> > +
+> > +        $ref: dsa-port.yaml#
+> > +
+> > +        properties:
+> > +          rx-internal-delay-ps:
+> > +            const: 2000
+> > +
+> > +          tx-internal-delay-ps:
+> > +            const: 2000
+>=20
+> Does enforcing a 2000ps delay conflict with standard rgmii bindings?
+>=20
+> As documented in net/ethernet-controller.yaml, a full 2ns delay is
+> typically modeled using phy-mode set to rgmii-id rather than hardcoding t=
+he
+> delay properties with a base rgmii mode.
+>=20
+
+No this was explicitly requested on v1 to enable adding a delay with mac2ma=
+c links.
+I enforce 2000ps because that is the only supported value.
+
+> [ ... ]
+>=20
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +
+> > +unevaluatedProperties: false
+>=20
+> How are the five integrated 10/100/1000Base-T phys mentioned in the
+> description modeled?
+>=20
+> Since unevaluatedProperties is false at the top level and there is no
+> definition or reference for an mdio node, wouldn't adding an mdio subnode
+> to configure these phys fail schema validation?
+>=20
+> Should there be a reference to /schemas/net/mdio.yaml#?
+
+No, the MDIO busses will be part of a parent MFD device node, not the switc=
+h node.
+
 
