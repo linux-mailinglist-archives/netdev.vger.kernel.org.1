@@ -1,178 +1,130 @@
-Return-Path: <netdev+bounces-273802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273803-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qDEGKlFvzGnJSwYAu9opvQ
-	(envelope-from <netdev+bounces-273802-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 03:05:21 +0200
+	id iMh9Nl5vzGnLSwYAu9opvQ
+	(envelope-from <netdev+bounces-273803-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 03:05:34 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 207A6373582
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 03:05:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DCAE373598
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 03:05:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E6CE43023306
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 01:05:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A65EA3040022
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 01:05:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B6E239E76;
-	Wed,  1 Apr 2026 01:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FD0239E76;
+	Wed,  1 Apr 2026 01:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pNZJEJjb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIVC5wxL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EE11E5018
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 01:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC3E1E5018;
+	Wed,  1 Apr 2026 01:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775005517; cv=none; b=AtEvDtvbrlNoXKBdE5HjbU3P6BywfmpPsp7A8Ajqx4FfSxX4+TZRZjG1EgOxPPvqTuteG/JjC5DI7UUWzsTLjyYwCcbe8uu3QWr71ln7YUf8N1H8IBP+szh8Yu2vZxMhyFwnkYNNMmsfyfwi56ZH6mhz5ce3L9RI5ZS1p9TZit0=
+	t=1775005524; cv=none; b=VOq9z5MJcDFSkcPQXtXui3e/djdj/ixEu/BbJ7IAwQo0EOxU1B1ZgcPEYKjuwIBKMBqsbhQfcpInFe/NMimauB8woLTgrCDLZ7h5B7m7VwnBTrrsc+hZ4eFZlUEUYDKiP0h26BExGBWwvXXObCl7L1wQCWFl8HCZJjjRwhl62lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775005517; c=relaxed/simple;
-	bh=CPNTE8tzCVGAOF9o8mcrIX6f6heRWkwKn0jZAUVBrzk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PfhxAbyWGfBWPkHzwthJySJ8I1sV9z4/SLs6xxQbY623QPfdetK3J8UUZyZrA0nYGnNxvVIguD3LwBFsKgkAxNU9tfLScCsC705zn3rey7eH/PtCFYgkNnu2jXfv0RnQc45f+WrxaP2Ny2sy4O2VdtEy/yrNbmffUl3UvbB6EiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pNZJEJjb; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3590042fa8eso4194210a91.1
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 18:05:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775005515; x=1775610315; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7z1thZP8yYGMiKbnDNmtSPLqeR+cQiCFdf1/ng8Yk70=;
-        b=pNZJEJjbrH3rGiXc+ByNjP0fJerKZbdQqmacId6VzwU0f50yW8jOmDzXecE0oLiRtG
-         KDQsmTC7futfk3D9FmWUp4is0/zKIHlg17lL4oJHYkPms976XUYb25sibjzPH94HHtDu
-         mplQqB4hTA1d7Xol9x3NZCAlMqLD6xpzZPMT/d8ss1qZsQn1nnlv60qVhSWD3/X+kUmo
-         DRBUiCnZSQ2hj75Nu98lTMwVfvGMg95f+QRpX8mKy8vEqk5S58yaIjgSotQXtofrNTGW
-         FUfWbonLy2U5aT6WK8T5TyfNqboxINsMsRyJYmKA+HDVAy7JT1ZN6tf9pzeNas+KpI6z
-         0v6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775005515; x=1775610315;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7z1thZP8yYGMiKbnDNmtSPLqeR+cQiCFdf1/ng8Yk70=;
-        b=mK0bTUMowhTPR5TF3OM914NW91vzOfdF6Z8bCaWrwCjRPaOkXI+JNHgwTiS/OrqelC
-         OtEfJKdMNsF+iDpo84KPDDk0l6Omv+XPzKjIDa4exDjgO9GCYNLSMp+NycdsgIjpuGc+
-         ZBBjA6J/2rpQ2nN3oPSlmyzvAd7HOHqCzblxRQhHrm5mfCXamlcV0JRbyfa9m8eQwlx7
-         kDlu6tPKzM+MRV9KhHeRl0f6ilAAqH+p6qQxI46I89HxuJCRqSJHBaSLo36nzB5cMtlb
-         wuPAl3Fftk2bNLpxKKQsnDjDyasHvROZZAFedZ+alKFlvOnAGka1W2IAKHk7lzlezOcc
-         +SFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWFZYJiLccqtRPT9IbGNqNiycvihBQNmOKsQ7VkZmBlTnPKxXR7oldsjuKLXBzSeg5hwyzCldE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyk3eBPyV6eSIbOYJvz/M/X4I+lvEPJR4JBxnCinfZvlhg68FsT
-	F48xHJQyhiPsZUNZSXH3BKbXyTaFVYZeDYs/BW28AM4OhkprRJQD8VF1
-X-Gm-Gg: ATEYQzzJPbR8rfykIM+FA2yDMh8vqkWXapXjpQgus41d/rOv7GelQ1t6/29AShbE7lO
-	RaEmVUJNTV6omJNRoB8BoBxCk6/nm5ZW87a5M9nOyx+ZvVejwbh4/vHY6Y74KSMG+p2m5jfRL9J
-	p4vvT7j2/DXnadPejFjd6iBIT1MVqokevQSQsOeweK1hdIObhk62f7Pb7t2vqAfBiat6/v3nRYK
-	A1rtQpLWKILgKvOy9MZ/IKYtmDL/KxYD4rCbVdazUrnBcE0ENX4cN7/8Cw5AfxasGR5EthywWpc
-	Uu1Ut7FaLTS7jNiMGDWZHS6fiFkYtGYYuZTF6ckpv8nstsLmMbQuub1J4Riw5hAXeLj7s6DhYrY
-	pPxl/5CxIQnHgaFh9MEw+MgHH0hfZTLmqe7+i1Vv+mCmOIqI50Ezil/u4dpPeln5xfYtpX/hGXw
-	tH/RhuYzcIouF3p1EginUBzZK3suE=
-X-Received: by 2002:a17:90b:57c6:b0:35d:a542:2dcb with SMTP id 98e67ed59e1d1-35dc6fae2ecmr1289781a91.16.1775005514806;
-        Tue, 31 Mar 2026 18:05:14 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35dbe5e4ba7sm2824076a91.4.2026.03.31.18.05.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 18:05:13 -0700 (PDT)
-Date: Wed, 1 Apr 2026 01:05:04 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-kselftest@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
-	Brendan Jackman <jackmanb@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCHv3] selftests: Use ktap helpers for runner.sh
-Message-ID: <acxvQJsySH0NBmB1@fedora>
-References: <20260225010833.11301-1-liuhangbin@gmail.com>
- <014b54f0-c4a6-40f2-afd0-0ea3e2f796e4@linuxfoundation.org>
+	s=arc-20240116; t=1775005524; c=relaxed/simple;
+	bh=ByDXKuHai140NrVm7ahWH+xM2F6/SDBLhHluQ1Ex/FY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qzbfpfiNBULJpDuqcSuZYf0C/nlICtXzUHVqvqYOox81sdMtxw9at122iTg0w75XcH4A2AE1lj9ILqHqGvJg6eFMqJ5HZsU57oBFp1HVbdt+EFuMt31ftIhT9lbaQygDWJcV1sdk/GAwGi324kiL6wJnaj2Zx6u9mACU/eYXqM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VIVC5wxL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C0B5C2BCB0;
+	Wed,  1 Apr 2026 01:05:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775005524;
+	bh=ByDXKuHai140NrVm7ahWH+xM2F6/SDBLhHluQ1Ex/FY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VIVC5wxLlIXQHrHwokUCek+jrgGpTIDiYTrs8YZnlbjpHErRPL+HqZI/uMk1YoKvY
+	 cgFHixFJDW4dMiX5D1jJYgqYrULcTRRofdayL7rG1X6ABTEd1rV0mQ+rP40QB8kFoo
+	 Wm9fWqSJqoYEMbHBRTYWh4Ja7aHYVErKe3kl/KnrnqfpqcR/vHHC9aULHvHy5Y9zfZ
+	 vTQZiAe9m0QqN+vDlER9AFJcwt1C4Xep2/9bFURNxMd2VyV0RPMZ3lmk8U9nqjIlBf
+	 94p58cPsDFClm6zqwMR545mDZOogMzQvAMPd62alkXlYOFM+faE3sJiJyilEHlRlQS
+	 3+j7RcHRydCvA==
+Date: Tue, 31 Mar 2026 18:05:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Srujana Challa <schalla@marvell.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+ "jasowang@redhat.com" <jasowang@redhat.com>, "xuanzhuo@linux.alibaba.com"
+ <xuanzhuo@linux.alibaba.com>, "eperezma@redhat.com" <eperezma@redhat.com>,
+ "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, Nithin Kumar Dabilpuram <ndabilpuram@marvell.com>,
+ Shiva Shankar Kommula <kshankar@marvell.com>, "stable@vger.kernel.org"
+ <stable@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [PATCH net,v5] virtio_net: clamp
+ rss_max_key_size to NETDEV_RSS_KEY_LEN
+Message-ID: <20260331180522.64ef9886@kernel.org>
+In-Reply-To: <20260331104737-mutt-send-email-mst@kernel.org>
+References: <20260326142344.1171317-1-schalla@marvell.com>
+	<ba027306-e5e0-4d4d-8357-f6080441167d@redhat.com>
+	<CH3PR18MB6379D39BA068565667CF2B06A053A@CH3PR18MB6379.namprd18.prod.outlook.com>
+	<68ca0a8c-27f9-45f1-94cc-7e3c7936181f@redhat.com>
+	<20260331104737-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <014b54f0-c4a6-40f2-afd0-0ea3e2f796e4@linuxfoundation.org>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273802-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273803-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,run_kselftest.sh:url,runner.sh:url]
-X-Rspamd-Queue-Id: 207A6373582
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5DCAE373598
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 31, 2026 at 02:51:48PM -0600, Shuah Khan wrote:
-> On 2/24/26 18:08, Hangbin Liu wrote:
-> > Instead of manually writing ktap messages, we should use the formal
-> > ktap helpers in runner.sh. Brendan did some work in d9e6269e3303
-> > ("selftests/run_kselftest.sh: exit with error if tests fail") to make
-> > run_kselftest.sh exit with the correct return value. However, the output
-> > does not include the total results, such as how many tests passed or failed.
+On Tue, 31 Mar 2026 10:48:41 -0400 Michael S. Tsirkin wrote:
+> > > Thank you for the feedback. In net-next, NETDEV_RSS_KEY_LEN is 256. This fix is
+> > > also intended for stable kernels, where NETDEV_RSS_KEY_LEN is 52, and
+> > > I added the message to make clamping visible in that case.
+> > > I will remove the check and send the next version.    
 > > 
-> > Let’s convert all manually printed messages in runner.sh to use the
-> > formal ktap helpers. Here are what I changed:
+> > I'm sorry, I haven't looked at the historical context when I wrote my
+> > previous reply.
 > > 
-> >    1. Move TAP header from runner.sh to run_kselftest.sh, since run_kselftest.sh
-> >       is the only caller of run_many().
-> >    2. In run_kselftest.sh, call run_many() in main process to count the
-> >       pass/fail numbers.
-> >    3. In run_kselftest.sh, do not generate kselftest_failures_file. Just
-> >       use ktap_print_totals to report the result.
-> >    4. In runner.sh run_one(), get the return value and use ktap helpers for
-> >       all pass/fail reporting. This allows counting pass/fail numbers in the
-> >       main process.
-> >    5. In runner.sh run_in_netns(), also return the correct rc, so we can
-> >       count results during wait.
+> > IMHO the additional check does not make sense in the current net tree.
+> > On the flip side stable trees will need it. I suggest:
 > > 
-> > After the change, the printed result looks like:
+> > - dropping the check for the 'net' patch
+> > - also dropping CC: stable tag
+> > - explicitly sending to stable the fix variant including the size check.
 > > 
-> >    not ok 4 4 selftests: clone3: clone3_cap_checkpoint_restore # exit=1
-> >    # Totals: pass:3 fail:1 xfail:0 xpass:0 skip:0 error:0
-> > 
-> >    ]# echo $?
-> >    1
-> > 
-> > Tested-by: Brendan Jackman <jackmanb@google.com>
-> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> > ---
-> > 
-> 
-> Applied to linux-kselftest next for Linux 7.1-rc1
-> 
-> I had to fix commit description and long lines in change log.
-> In the future make sure to run checkpatch to catch errors
-> related to commit descriptions.
+> > @Michael: WDYT?
+>
+> I was the one who suggested it, the extra check is harmless, I'm
+> inclined to always have it.  Less work than maintaining two patches.
 
-Thanks, I will take care of this.
-
-Hangbin
-> 
-> thanks,
-> -- Shuah
+Give us an RB tag please and lets close this one? :)
 
