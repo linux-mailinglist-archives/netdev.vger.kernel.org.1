@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-274184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274185-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CGkmOxpLzWl6bgYAu9opvQ
-	(envelope-from <netdev+bounces-274184-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:43:06 +0200
+	id UNTyLjlLzWl6bgYAu9opvQ
+	(envelope-from <netdev+bounces-274185-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:43:37 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D074137E10B
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:43:06 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F9CB37E120
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:43:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AB6E0306DD6F
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 16:39:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 67CD93082848
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 16:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE2B47A0A9;
-	Wed,  1 Apr 2026 16:39:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D9D47B405;
+	Wed,  1 Apr 2026 16:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="zLlB3BlQ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="WJZqPxzo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A452F310651
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 16:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA20478E56
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 16:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775061575; cv=none; b=kSEkCcLokrsX5YfukZwUrl0ZnkYqTrs6p3wbbBenI5XoQofLxKyUqIDMh0INgn/FpKK3u//IHUw1eK/KZ1IKeZQkRgGxALx+AZNnWMjGnwoz+wmnAa+ZF7/oWa1KAqrMisGAEAfNbNMNs+AMiNVz73LhhHei76lXLmeMfCONqqk=
+	t=1775061577; cv=none; b=WMXQ3vgXWkAKqzYlJNq0hww8++iZbJ6jrN7VR3QADMe7/7Vev6lyoCkaF3ASATORocprQydugt7N+8fJgpdJZHiMGSET10/VheXhJ6k3NMZqpncyoNBfIrdjEyqEiDebxunWjUGLbf/G/vNXp5nmKeke4j9uxvhpJSBCdtJkJVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775061575; c=relaxed/simple;
-	bh=2Li85y3O0B5xRflVjiPQmdDthz1Sij/s+po81PL0O5g=;
+	s=arc-20240116; t=1775061577; c=relaxed/simple;
+	bh=p7Luq0FBAy6wiOaPfbXiHVPf61+o5ImPPHQwzl94OEU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bbMJBfpsXkFaM1Fs5ePff/80tI+zXBIO7aNkUms++/ayc52/2P0rC3OvsykYlmi75tCxivTaBDGtSWnHzrx8D+mXeG+jboW+YDWYqVoDE2FmYn0Fv06qreb5nn4uMHFLqWr3YdyZ6xX3m2EYndFaADjE2ry8Y0E9dOrlOXAHAlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=zLlB3BlQ; arc=none smtp.client-ip=185.246.84.56
+	 In-Reply-To:To:Cc; b=kK6mmWT8x1ULRYhzFm4NpZcWB9zN6gFJ/2D7dXJnQkp/MR2zhgoC3GFVJOIOcK7IcxXtgPXtatCrjOhEO41WyAgf2TACul7P1mRKnvsTCIkC1U9XVRcd9Yxw/Cxu3QYRHbKNQKL7UaPTn+czGD0yIIvoCA+NQbFCM9hniI1vFPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=WJZqPxzo; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 3B2DD1A30B4;
-	Wed,  1 Apr 2026 16:39:31 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 50BA3C59970;
+	Wed,  1 Apr 2026 16:40:04 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 11656602BF;
-	Wed,  1 Apr 2026 16:39:31 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 94F7510450306;
-	Wed,  1 Apr 2026 18:39:27 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 3FCB4602BF;
+	Wed,  1 Apr 2026 16:39:33 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 31F9110450637;
+	Wed,  1 Apr 2026 18:39:30 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1775061569; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1775061572; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=DWtIq6jd1F1PaNYVYR5QTVPdsPIiGubpvbe0+JPvC9s=;
-	b=zLlB3BlQyXf0HvaA39mmXsTSYrpAbohWHoKNcgIHs/WQY9I8t1pcHN7rJve5bTQj44YoCc
-	kcuTvlG2XKfElBvPFaB9o7sDtBvSQROixp6HFz8kO0POj8kZmX2m+bBNlJ0CkYpG8f14xn
-	EYd6cj3QMz12TIRtOl07ia0X77M0jUMjbGvVUz0PWA4hjjSUl3zqB5zwUUh9dJM7C6YP/1
-	YnbPM+JzbjOSTcrpHIz1qCJBlcrkUiiO9FbVEV8t9m7yT6R8ThA6Low2zy2mqv5SOgRkw5
-	Oea+L/PcETGAyUtlkR4JIbhfJzh8eIrtx1qhKK4VR6OeaP8PphL5ASsxF9JCqA==
+	bh=LzXtFxzisqeODwJ7M+kJsVHj+h3/fdo/aXOIgPH+rH4=;
+	b=WJZqPxzoDxgKLSqV6DIzBuDbL4Co9jn4dfWSWNQwSAD1swxTvQd7NIQo6l6Bx/E8q+x4Kf
+	UgopVt4fN6enfhXuitg7+ueABP4mZDGigufUosjtKF27md6UKIKvJkV5qv7Rwv9/WMEh2l
+	fZ3zhEDAINqzH5m5Dem3xmvlNU8AiZmtGWE14Im2xtSEgj9GRK81+KzE1RQbxpuNAHdiub
+	3Citc1ZiL8/G8Oto/fNNc9qdSf6zW7PR+6aPEkWM8aqaWGrXMFrgAIsKYXCLzUcMM1I4B9
+	bGbXbMeHo0sbDBjMoR3WdPjuOBkZjqiFY6P2C3OXVdUDQsNg+qDTeHteRdB+hw==
 From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Wed, 01 Apr 2026 18:39:06 +0200
-Subject: [PATCH net-next 03/11] net: macb: unify queue index variable
- naming convention and types
+Date: Wed, 01 Apr 2026 18:39:07 +0200
+Subject: [PATCH net-next 04/11] net: macb: enforce reverse christmas tree
+ (RCT) convention
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260401-macb-context-v1-3-9590c5ab7272@bootlin.com>
+Message-Id: <20260401-macb-context-v1-4-9590c5ab7272@bootlin.com>
 References: <20260401-macb-context-v1-0-9590c5ab7272@bootlin.com>
 In-Reply-To: <20260401-macb-context-v1-0-9590c5ab7272@bootlin.com>
 To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
@@ -90,11 +90,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
 	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274184-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274185-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FREEMAIL_TO(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk];
@@ -102,7 +102,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[bootlin.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCPT_COUNT_TWELVE(0.00)[21];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
@@ -113,141 +113,160 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: D074137E10B
+X-Rspamd-Queue-Id: 5F9CB37E120
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Variables are named q or queue_index. Types are int, unsigned int, u32
-and u16. Use `unsigned int q` everywhere.
+Enforce the reverse christmas tree convention in those functions:
 
-Skip over taprio functions. They use `u8 queue_id` which fits with the
-`struct macb_queue_enst_config` field. Using `queue_id` everywhere
-would be too verbose.
+   macb_tx_error_task()
+   gem_rx_refill()
+   gem_rx()
+   macb_rx_frame()
+   macb_init_rx_ring()
+   macb_rx()
+   macb_rx_pending()
+   macb_start_xmit()
+
+The goal is to minimise unrelated diff in future patches.
 
 Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 ---
- drivers/net/ethernet/cadence/macb_main.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 61 ++++++++++++++++----------------
+ 1 file changed, 30 insertions(+), 31 deletions(-)
 
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 05ccb6f186f7..087401163771 100644
+index 087401163771..081f220f6756 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -873,7 +873,7 @@ static void gem_shuffle_tx_one_ring(struct macb_queue *queue)
- static void gem_shuffle_tx_rings(struct macb *bp)
+@@ -1250,20 +1250,19 @@ static dma_addr_t macb_get_addr(struct macb *bp, struct macb_dma_desc *desc)
+ 
+ static void macb_tx_error_task(struct work_struct *work)
  {
- 	struct macb_queue *queue;
--	int q;
-+	unsigned int q;
+-	struct macb_queue	*queue = container_of(work, struct macb_queue,
+-						      tx_error_task);
+-	bool			halt_timeout = false;
+-	struct macb		*bp = queue->bp;
+-	unsigned int		q;
+-	u32			packets = 0;
+-	u32			bytes = 0;
+-	struct macb_tx_skb	*tx_skb;
+-	struct macb_dma_desc	*desc;
+-	struct sk_buff		*skb;
+-	unsigned int		tail;
+-	unsigned long		flags;
++	struct macb_queue *queue = container_of(work, struct macb_queue,
++						tx_error_task);
++	unsigned int q = queue - queue->bp->queues;
++	struct macb *bp = queue->bp;
++	struct macb_tx_skb *tx_skb;
++	struct macb_dma_desc *desc;
++	bool halt_timeout = false;
++	struct sk_buff *skb;
++	unsigned long flags;
++	unsigned int tail;
++	u32 packets = 0;
++	u32 bytes = 0;
  
- 	for (q = 0, queue = bp->queues; q < bp->num_queues; q++, queue++)
- 		gem_shuffle_tx_one_ring(queue);
-@@ -1254,7 +1254,7 @@ static void macb_tx_error_task(struct work_struct *work)
- 						      tx_error_task);
- 	bool			halt_timeout = false;
- 	struct macb		*bp = queue->bp;
--	u32			queue_index;
-+	unsigned int		q;
- 	u32			packets = 0;
- 	u32			bytes = 0;
- 	struct macb_tx_skb	*tx_skb;
-@@ -1263,9 +1263,9 @@ static void macb_tx_error_task(struct work_struct *work)
- 	unsigned int		tail;
- 	unsigned long		flags;
- 
--	queue_index = queue - bp->queues;
-+	q = queue - bp->queues;
+-	q = queue - bp->queues;
  	netdev_vdbg(bp->netdev, "macb_tx_error_task: q = %u, t = %u, h = %u\n",
--		    queue_index, queue->tx_tail, queue->tx_head);
-+		    q, queue->tx_tail, queue->tx_head);
+ 		    q, queue->tx_tail, queue->tx_head);
  
- 	/* Prevent the queue NAPI TX poll from running, as it calls
- 	 * macb_tx_complete(), which in turn may call netif_wake_subqueue().
-@@ -1338,7 +1338,7 @@ static void macb_tx_error_task(struct work_struct *work)
- 		macb_tx_unmap(bp, tx_skb, 0);
- 	}
+@@ -1483,11 +1482,11 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
  
--	netdev_tx_completed_queue(netdev_get_tx_queue(bp->netdev, queue_index),
-+	netdev_tx_completed_queue(netdev_get_tx_queue(bp->netdev, q),
- 				  packets, bytes);
+ static void gem_rx_refill(struct macb_queue *queue)
+ {
+-	unsigned int		entry;
+-	struct sk_buff		*skb;
+-	dma_addr_t		paddr;
+ 	struct macb *bp = queue->bp;
+ 	struct macb_dma_desc *desc;
++	struct sk_buff *skb;
++	unsigned int entry;
++	dma_addr_t paddr;
  
- 	/* Set end of TX queue */
-@@ -1403,7 +1403,7 @@ static bool ptp_one_step_sync(struct sk_buff *skb)
- static int macb_tx_complete(struct macb_queue *queue, int budget)
+ 	while (CIRC_SPACE(queue->rx_prepared_head, queue->rx_tail,
+ 			bp->rx_ring_size) > 0) {
+@@ -1580,11 +1579,11 @@ static int gem_rx(struct macb_queue *queue, struct napi_struct *napi,
+ 		  int budget)
  {
  	struct macb *bp = queue->bp;
--	u16 queue_index = queue - bp->queues;
-+	unsigned int q = queue - bp->queues;
- 	unsigned long flags;
- 	unsigned int tail;
- 	unsigned int head;
-@@ -1465,14 +1465,14 @@ static int macb_tx_complete(struct macb_queue *queue, int budget)
- 		}
- 	}
+-	unsigned int		len;
+-	unsigned int		entry;
+-	struct sk_buff		*skb;
+-	struct macb_dma_desc	*desc;
+-	int			count = 0;
++	struct macb_dma_desc *desc;
++	struct sk_buff *skb;
++	unsigned int entry;
++	unsigned int len;
++	int count = 0;
  
--	netdev_tx_completed_queue(netdev_get_tx_queue(bp->netdev, queue_index),
-+	netdev_tx_completed_queue(netdev_get_tx_queue(bp->netdev, q),
- 				  packets, bytes);
- 
- 	queue->tx_tail = tail;
--	if (__netif_subqueue_stopped(bp->netdev, queue_index) &&
-+	if (__netif_subqueue_stopped(bp->netdev, q) &&
- 	    CIRC_CNT(queue->tx_head, queue->tx_tail,
- 		     bp->tx_ring_size) <= MACB_TX_WAKEUP_THRESH(bp))
--		netif_wake_subqueue(bp->netdev, queue_index);
-+		netif_wake_subqueue(bp->netdev, q);
- 	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
- 
- 	if (packets)
-@@ -2496,10 +2496,10 @@ static int macb_pad_and_fcs(struct sk_buff **skb, struct net_device *netdev)
- static netdev_tx_t macb_start_xmit(struct sk_buff *skb,
- 				   struct net_device *netdev)
+ 	while (count < budget) {
+ 		u32 ctrl;
+@@ -1670,12 +1669,12 @@ static int gem_rx(struct macb_queue *queue, struct napi_struct *napi,
+ static int macb_rx_frame(struct macb_queue *queue, struct napi_struct *napi,
+ 			 unsigned int first_frag, unsigned int last_frag)
  {
--	u16 queue_index = skb_get_queue_mapping(skb);
- 	struct macb *bp = netdev_priv(netdev);
--	struct macb_queue *queue = &bp->queues[queue_index];
-+	unsigned int q = skb_get_queue_mapping(skb);
+-	unsigned int len;
+-	unsigned int frag;
++	struct macb *bp = queue->bp;
++	struct macb_dma_desc *desc;
+ 	unsigned int offset;
+ 	struct sk_buff *skb;
+-	struct macb_dma_desc *desc;
+-	struct macb *bp = queue->bp;
++	unsigned int frag;
++	unsigned int len;
+ 
+ 	desc = macb_rx_desc(queue, last_frag);
+ 	len = desc->ctrl & bp->rx_frm_len_mask;
+@@ -1751,9 +1750,9 @@ static int macb_rx_frame(struct macb_queue *queue, struct napi_struct *napi,
+ 
+ static inline void macb_init_rx_ring(struct macb_queue *queue)
+ {
++	struct macb_dma_desc *desc = NULL;
+ 	struct macb *bp = queue->bp;
+ 	dma_addr_t addr;
+-	struct macb_dma_desc *desc = NULL;
+ 	int i;
+ 
+ 	addr = queue->rx_buffers_dma;
+@@ -1772,9 +1771,9 @@ static int macb_rx(struct macb_queue *queue, struct napi_struct *napi,
+ {
+ 	struct macb *bp = queue->bp;
+ 	bool reset_rx_queue = false;
+-	int received = 0;
+-	unsigned int tail;
+ 	int first_frag = -1;
++	unsigned int tail;
++	int received = 0;
+ 
+ 	for (tail = queue->rx_tail; budget > 0; tail++) {
+ 		struct macb_dma_desc *desc = macb_rx_desc(queue, tail);
+@@ -1849,8 +1848,8 @@ static int macb_rx(struct macb_queue *queue, struct napi_struct *napi,
+ static bool macb_rx_pending(struct macb_queue *queue)
+ {
+ 	struct macb *bp = queue->bp;
+-	unsigned int		entry;
+-	struct macb_dma_desc	*desc;
++	struct macb_dma_desc *desc;
++	unsigned int entry;
+ 
+ 	entry = macb_rx_ring_wrap(bp, queue->rx_tail);
+ 	desc = macb_rx_desc(queue, entry);
+@@ -2500,10 +2499,10 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb,
+ 	unsigned int q = skb_get_queue_mapping(skb);
  	unsigned int desc_cnt, nr_frags, frag_size, f;
-+	struct macb_queue *queue = &bp->queues[q];
+ 	struct macb_queue *queue = &bp->queues[q];
++	netdev_tx_t ret = NETDEV_TX_OK;
  	unsigned int hdrlen;
  	unsigned long flags;
  	bool is_lso;
-@@ -2539,7 +2539,7 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb,
- #if defined(DEBUG) && defined(VERBOSE_DEBUG)
- 	netdev_vdbg(bp->netdev,
- 		    "start_xmit: queue %hu len %u head %p data %p tail %p end %p\n",
--		    queue_index, skb->len, skb->head, skb->data,
-+		    q, skb->len, skb->head, skb->data,
- 		    skb_tail_pointer(skb), skb_end_pointer(skb));
- 	print_hex_dump(KERN_DEBUG, "data: ", DUMP_PREFIX_OFFSET, 16, 1,
- 		       skb->data, 16, true);
-@@ -2565,7 +2565,7 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb,
- 	/* This is a hard error, log it. */
- 	if (CIRC_SPACE(queue->tx_head, queue->tx_tail,
- 		       bp->tx_ring_size) < desc_cnt) {
--		netif_stop_subqueue(netdev, queue_index);
-+		netif_stop_subqueue(netdev, q);
- 		netdev_dbg(netdev, "tx_head = %u, tx_tail = %u\n",
- 			   queue->tx_head, queue->tx_tail);
- 		ret = NETDEV_TX_BUSY;
-@@ -2581,7 +2581,7 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb,
- 	/* Make newly initialized descriptor visible to hardware */
- 	wmb();
- 	skb_tx_timestamp(skb);
--	netdev_tx_sent_queue(netdev_get_tx_queue(bp->netdev, queue_index),
-+	netdev_tx_sent_queue(netdev_get_tx_queue(bp->netdev, q),
- 			     skb->len);
+-	netdev_tx_t ret = NETDEV_TX_OK;
  
- 	spin_lock(&bp->lock);
-@@ -2590,7 +2590,7 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb,
- 	spin_unlock(&bp->lock);
- 
- 	if (CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_ring_size) < 1)
--		netif_stop_subqueue(netdev, queue_index);
-+		netif_stop_subqueue(netdev, q);
- 
- unlock:
- 	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
+ 	if (macb_clear_csum(skb)) {
+ 		dev_kfree_skb_any(skb);
 
 -- 
 2.53.0
