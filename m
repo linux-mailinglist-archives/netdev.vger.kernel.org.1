@@ -1,181 +1,172 @@
-Return-Path: <netdev+bounces-273964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273967-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2GhSJgPPzGlFWwYAu9opvQ
-	(envelope-from <netdev+bounces-273964-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 09:53:39 +0200
+	id MKYQN+PPzGlFWwYAu9opvQ
+	(envelope-from <netdev+bounces-273967-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 09:57:23 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B2A637651F
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 09:53:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD3653765E5
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 09:57:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 96FC43088F04
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 07:46:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 381433072108
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 07:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F7939A05C;
-	Wed,  1 Apr 2026 07:45:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07513932D1;
+	Wed,  1 Apr 2026 07:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ICgU3kYI"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="Z7TzvARy"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E702B35E936;
-	Wed,  1 Apr 2026 07:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0483338B157
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 07:47:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775029547; cv=none; b=NQ++2YkEVUvJxdfNb8+aDqCgpjoJumppJXjSj4Wzg0jIPjs4STQMz/4knnWFwcAnpp+f1spxlVZmdisID6BKOsghdFhyJh1c6MpuVZnXUzeCOrgcdWzfR+bkYm0Vgh2EOG1vAtctQWu6PaJRs2IhhL9utEX/dzuBeHV35WWcv0Y=
+	t=1775029659; cv=none; b=K372T94W7tvFD0ROrI5g3sit/PvCgyKyFnTw1zPzAUvlvbfN/RBIY7Vqw1uJ8/rBhBzaW5H+UE5RXf9P82kkY7Wcp44YwOGgsNEvq+XFw2NZWvltWY1AR10TpDA3XLLDDcfyECEQdpLuldAXPfCy0jwm1Co2YBMA4rff0dGFfG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775029547; c=relaxed/simple;
-	bh=kApfysLmil/v0Oj2JmnKLBK0dorCkw228crfG1s8AD0=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xpes9io5/H/23AXuW3XYrkaIxb2kXso3Qv/alnLwHoAEtSUgbo8guJbFlAoQMYeV/fcc+vv3IwMdIMwr8rzMQYC54nzznCGJm85Zjy/9KwPZczQKWFvqNNGezIYE4yAkRnLIM7orkcH9CspWxkwwpOatgdUjyxrmS60zVneIe3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ICgU3kYI; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:To:From:Reply-To:
-	Cc:Content-Type:Content-ID:Content-Description;
-	bh=TjlEaZufkIfdPkUMCDh5SD89kPYTqyaHCXw8Muwc4Dk=; b=ICgU3kYIYD7TcubUA2flzaCQ0/
-	Y1xq8IIwcHVpeuRBs2Sk5bzpKgsAJH4Ach8Tt1JHYt4wh0jYcY6e+SATwyK4RcZ/7221wQ27l1y2E
-	O3cgTAk/OztH7NNk72E5Bf2RwSS34DSuaYUnyizucHQyG/+WmOWj1vdkACs6nq4qlMsZGSsEfWGNS
-	hXSAVX0fEOkaA99zZ9kqYN6yxmdUYCJQkEtOxNFaQ7BJhkHkfggNP9lw9mMGOfHK6IUONyvssH4Q0
-	9gZpb8pHebi9BTlNi6Yopj0pLSCVCcKonmuA4rkAb/dLverJuSQ9UZS7Ic1Jul4M9LMCBmkEXo8vL
-	C49g96Qw==;
-Received: from [2001:8b0:10b:1::425] (helo=i7.infradead.org)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w7qGN-0000000HLQS-0BKX;
-	Wed, 01 Apr 2026 07:45:19 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w7qGM-00000007xeP-3Bbt;
-	Wed, 01 Apr 2026 08:45:18 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	Guillaume Nault <gnault@redhat.com>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Kees Cook <kees@kernel.org>,
-	Alexei Lazar <alazar@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Paul Moore <paul@paul-moore.com>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	oss-drivers@corigine.com,
-	bridge@lists.linux.dev,
-	bpf@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	torvalds@linux-foundation.org,
-	jon.maddog.hall@gmail.com
-Subject: [PATCH 6/6] net: Warn when processes listen on AF_INET sockets
-Date: Wed,  1 Apr 2026 08:44:20 +0100
-Message-ID: <20260401074509.1897527-7-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20260401074509.1897527-1-dwmw2@infradead.org>
-References: <20260401074509.1897527-1-dwmw2@infradead.org>
+	s=arc-20240116; t=1775029659; c=relaxed/simple;
+	bh=ta/b9mb9PhX7NWzYBYsjlwKw1j/ZhvuAs1Q63BONb/0=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=cBAgojYq2pPU5lZ9t+tbx1hykrID2y+o6BpVe65vXyIKFjqX+kzTq7vCWYPdgeV2G42zQri1bvU3EE1SPxeENPN+qf+Squ+nK9ZaSzX9OUGDqQ/XeUviYjxG0OSmAM07CoI4dAqbac9k7TQRBGGgcw4AIfczukG9VgwYlbGOW3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=Z7TzvARy; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 87B39A5860;
+	Wed,  1 Apr 2026 09:47:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1775029652; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=TJ/onB010N86yTqr2fxvYvqXl6w6EoERbIpLsKzY7Y0=;
+	b=Z7TzvARy3/IwS9VW01zvrISZWToXS/Q3FONvj6r8bJFGnqh4ZnrZUDHV1+wdhFEDEoERwF
+	mzX931x97J9rE4+3j89mrlM0+7NyGAOmWWB9v1H4cBKcBJFhO+dspRHLt+MvqDt+hyvw2G
+	zppFh4xgo9gVJ7judSTZeoIn+zDLbawT3fZdTfYkfXIhSWl8UgDakIpvTPg5JU7zgWJb7P
+	D/Hu/y+mPWEHqNsDvem/kCp//Q5jFAv+NWio8E0yXqCtLOhwStdQUfG4TwfDfr/idex3nE
+	yJ55/mlJMg/ddL5RkCcPUsRD8Rfh9WIkxQ4HpPa8DSJyzmi8MlBgwDGQWGkM5A==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spamd-Result: default: False [0.84 / 15.00];
+Date: Wed, 01 Apr 2026 09:47:31 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Justin Chen <justin.chen@broadcom.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
+ bcm-kernel-feedback-list@broadcom.com, florian.fainelli@broadcom.com,
+ opendmb@gmail.com
+Subject: Re: [PATCH net v2 4/4] net: bcmgenet: relax the xmit ring full case
+In-Reply-To: <20260401003840.3112454-5-justin.chen@broadcom.com>
+References: <20260401003840.3112454-1-justin.chen@broadcom.com>
+ <20260401003840.3112454-5-justin.chen@broadcom.com>
+Message-ID: <71b87f5416d6d6d41396b5008702ccac@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[nvidia.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,blackwall.org,linux.dev,iogearbox.net,gmail.com,fomichev.me,sipsolutions.net,netfilter.org,strlen.de,nwl.cc,amazon.co.uk,paul-moore.com,vger.kernel.org,corigine.com,lists.linux.dev,linux-foundation.org];
-	RCPT_COUNT_TWELVE(0.00)[49];
+	FREEMAIL_CC(0.00)[vger.kernel.org,redhat.com,kernel.org,google.com,davemloft.net,lunn.ch,broadcom.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-273967-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273964-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[infradead.org:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	DMARC_DNSFAIL(0.00)[tipi-net.de : query timed out];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.999];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amazon.co.uk:email,infradead.org:dkim,infradead.org:mid]
-X-Rspamd-Queue-Id: 7B2A637651F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,tipi-net.de:dkim,tipi-net.de:mid]
+X-Rspamd-Queue-Id: CD3653765E5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+On 1.4.2026 02:38, Justin Chen wrote:
+> We have a queue size of 32. If a packet is multiple fragments we can
+> run through this queue really quickly. Currently we stop the xmit
+> queue at SKB_FRAG_SIZE which by default can take up half the queue.
+> Instead lets just look at the incoming packet and freeze the queue
+> if the incoming packet has more fragments than free_bds. This will
+> relieve some of the queue timeouts we have been seeing.
+> 
+> Fixes: 1c1008c793fa ("net: bcmgenet: add main driver file")
+> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+> ---
+>  drivers/net/ethernet/broadcom/genet/bcmgenet.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c 
+> b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> index 54f71b1e85fc..a1aa1278842e 100644
+> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> @@ -2018,10 +2018,10 @@ static int bcmgenet_tx_poll(struct napi_struct 
+> *napi, int budget)
+> 
+>  	spin_lock(&ring->lock);
+>  	work_done = __bcmgenet_tx_reclaim(ring->priv->dev, ring);
+> -	if (ring->free_bds > (MAX_SKB_FRAGS + 1)) {
+> -		txq = netdev_get_tx_queue(ring->priv->dev, ring->index);
+> +	txq = netdev_get_tx_queue(ring->priv->dev, ring->index);
+> +	if (netif_tx_queue_stopped(txq))
+>  		netif_tx_wake_queue(txq);
+> -	}
+> +
+>  	spin_unlock(&ring->lock);
+> 
+>  	if (work_done == 0) {
+> @@ -2224,9 +2224,6 @@ static netdev_tx_t bcmgenet_xmit(struct sk_buff 
+> *skb, struct net_device *dev)
+> 
+>  	netdev_tx_sent_queue(txq, GENET_CB(skb)->bytes_sent);
+> 
+> -	if (ring->free_bds <= (MAX_SKB_FRAGS + 1))
+> -		netif_tx_stop_queue(txq);
+> -
 
-There is no need to listen on AF_INET sockets; a modern application can
-listen on IPv6 (without IPV6_V6ONLY) and will accept connections from
-the 20th century via IPv4-mapped addresses (::ffff:x.x.x.x) on the IPv6
-socket.
+With this removed, the only queue stop is the NETDEV_TX_BUSY path at
+entry. That means every ring-full hits BUSY and requeues rather than
+stopping proactively on the previous transmit.
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- net/ipv4/af_inet.c | 3 +++
- 1 file changed, 3 insertions(+)
+Would it work to keep the proactive stop but base it on the actual
+packet size instead of MAX_SKB_FRAGS?
 
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index dc358faa1647..3838782a8437 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -240,6 +240,9 @@ int inet_listen(struct socket *sock, int backlog)
- 	struct sock *sk = sock->sk;
- 	int err = -EINVAL;
- 
-+	pr_warn_once("process '%s' (pid %d) is listening on an AF_INET socket. Consider using AF_INET6 with IPV6_V6ONLY=0 instead.\n",
-+		     current->comm, task_pid_nr(current));
-+
- 	lock_sock(sk);
- 
- 	if (sock->state != SS_UNCONNECTED || sock->type != SOCK_STREAM)
--- 
-2.51.0
+	if (ring->free_bds <= (nr_frags + 1))
+		netif_tx_stop_queue(txq);
 
+That avoids reserving half the ring for the worst case while still
+preventing BUSY from becoming the normal path.
+
+>  	if (!netdev_xmit_more() || netif_xmit_stopped(txq))
+>  		/* Packets are ready, update producer index */
+>  		bcmgenet_tdma_ring_writel(priv, ring->index,
+
+This wakes unconditionally even if only 1 BD was reclaimed. Combined
+with the above, it can create a tight stop/wake/BUSY thrash when the
+ring is near-full.
+
+Thanks
+
+Nicolai
 
