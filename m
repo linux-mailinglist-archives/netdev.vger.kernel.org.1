@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-274050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274051-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qCUVE8H9zGnRYgYAu9opvQ
-	(envelope-from <netdev+bounces-274050-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 13:13:05 +0200
+	id aE9lFZD8zGnRYgYAu9opvQ
+	(envelope-from <netdev+bounces-274051-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 13:08:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C593D3792DF
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 13:13:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F28E837918E
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 13:07:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4D78030ED5DD
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 10:58:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 89EBE3103015
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 10:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06DFE402453;
-	Wed,  1 Apr 2026 10:57:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70BE34070FB;
+	Wed,  1 Apr 2026 10:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f/o95FuO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J7XN6VX1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753B03F881A
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 10:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C22405ACC
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 10:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775041020; cv=none; b=SN0eg4RIgY+uRjyFgjWAzMvzIWWZiiyPbCmWKhtGl06o/7ptPJQxlVPhN08Dvu2TOl9atOhj9ED2cyiLre6WeWDLWO370MYuHBODPHh6DYJm7ICmsh7QTRe4+maV0md9L323JNyd8hL9Tqx894D0iQu3rW1GAK1cFigdQ0Cvkl4=
+	t=1775041026; cv=none; b=f6/5FfChRUXEZN4Qsm9RqibBqzrhm0K9eMKxM+Qq6kW8hQ+nF0+vTjtvMfLO+46csfHVm54kgYl6bht7w8DTcKiwY3WHp4sEXjVfnSYD5wkjtF1cjZe7eOsS2Z2zPVt7iMHFwOgkBuWnDEkG7oPPbuY3Hp6YKLEXABBv2euHX/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775041020; c=relaxed/simple;
-	bh=17g4hvNQMMpAUpoaLUiLVXqFttcrTD0anT7Y2Sd8WPE=;
+	s=arc-20240116; t=1775041026; c=relaxed/simple;
+	bh=i2+6T5laS6iXW24MjsOpSAQSe/11jAwSQhKVgP6EJWc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HhcRe8+DbleIC+K38lEA1U6mOX8qXXwJdrZ5zQSc9R81VyXtTAQvtsktq9pbq001dFPr2UcBXKMdBh8zf6k5vMGEPCKuLNzX8cDX8f526CcRQYsBC32IYQZtMwB3E3P1G/VFP3xxamdT2Vtj4pLiweqvr9vnnIPyVXsC00nbmrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f/o95FuO; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=Ui7sMXfuSC9UthQ59MVqplq6GXY6pQuqqqrby2Qn1qj/47bvqEJKkQATzwVO2lYSex89mwxiWGnMZMeLvKmfOhsXEqEMyjjiOKXOYj6XdE/zVQo0t3z6MNJANybQhtIXBeU50lGWybbDBf2fz1Q/Fpz+E5AarT/+NztjJLMgzE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J7XN6VX1; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775041018;
+	s=mimecast20190719; t=1775041024;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=S5pjKdmNSjXJ3DxvcxT0rNJEpKaZqy9yPHCzHCad11w=;
-	b=f/o95FuOlw6KEj/7uixMG3ZZ1miPLgiz1fq4TRHvJnRr3SJUJuB3kWbI+29XAVW2b3Yptg
-	tNCiyOyXg4Vd9XtxJZwTo93bwhOJ1tW3heQqeT+OjmJhqArqpEhk+uO+Ehkty9Tix2FA6W
-	WT8v/afsbbwnKQy1hjFV9XAAPma+dbk=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=5LLb+kvWly++E+vGdyFSJ+eIakQ89ZsZ0xRogJGUpqc=;
+	b=J7XN6VX15WCv8uVVeLfvq/QRNxKS6Y768dPXhtFmpvw3/0rKghAXaMgz/AnDwI89LcoPLi
+	ntN1N+KEKZuA05CkjkLYZD/78t3yxAZUf7O03Th4cLgFiWqtnFO6zZNlB+Un4ZVskXrJJF
+	Nf088V2b6Nb6frqgbjql6PFtDDWkRoU=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-125-nNHNcf6UOma6JqVy0MoK6A-1; Wed,
- 01 Apr 2026 06:56:53 -0400
-X-MC-Unique: nNHNcf6UOma6JqVy0MoK6A-1
-X-Mimecast-MFC-AGG-ID: nNHNcf6UOma6JqVy0MoK6A_1775041011
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-526-VsvuYi-5OBS7jgS8dx7PjA-1; Wed,
+ 01 Apr 2026 06:56:58 -0400
+X-MC-Unique: VsvuYi-5OBS7jgS8dx7PjA-1
+X-Mimecast-MFC-AGG-ID: VsvuYi-5OBS7jgS8dx7PjA_1775041017
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4F3BC1800283;
-	Wed,  1 Apr 2026 10:56:51 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E8C611956062;
+	Wed,  1 Apr 2026 10:56:56 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.35.245])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3F8D91955F2B;
-	Wed,  1 Apr 2026 10:56:47 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E9AAD1954102;
+	Wed,  1 Apr 2026 10:56:52 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -70,13 +70,13 @@ Cc: David Howells <dhowells@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
+	Oleh Konko <security@1seal.org>,
 	Jeffrey Altman <jaltman@auristor.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
 	Simon Horman <horms@kernel.org>,
 	stable@kernel.org
-Subject: [PATCH net v4 04/15] rxrpc: Fix call removal to use RCU safe deletion
-Date: Wed,  1 Apr 2026 11:55:57 +0100
-Message-ID: <20260401105614.1696001-5-dhowells@redhat.com>
+Subject: [PATCH net v4 05/15] rxrpc: Fix RxGK token loading to check bounds
+Date: Wed,  1 Apr 2026 11:55:58 +0100
+Message-ID: <20260401105614.1696001-6-dhowells@redhat.com>
 In-Reply-To: <20260401105614.1696001-1-dhowells@redhat.com>
 References: <20260401105614.1696001-1-dhowells@redhat.com>
 Precedence: bulk
@@ -86,14 +86,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -101,7 +101,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCPT_COUNT_TWELVE(0.00)[13];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274050-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274051-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
@@ -113,32 +113,41 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[auristor.com:email,sashiko.dev:url,davemloft.net:email,infradead.org:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux-foundation.org:email]
-X-Rspamd-Queue-Id: C593D3792DF
+	DBL_BLOCKED_OPENRESOLVER(0.00)[auristor.com:email,davemloft.net:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,infradead.org:email]
+X-Rspamd-Queue-Id: F28E837918E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Fix rxrpc call removal from the rxnet->calls list to use list_del_rcu()
-rather than list_del_init() to prevent stuffing up reading
-/proc/net/rxrpc/calls from potentially getting into an infinite loop.
+From: Oleh Konko <security@1seal.org>
 
-This, however, means that list_empty() no longer works on an entry that's
-been deleted from the list, making it harder to detect prior deletion.  Fix
-this by:
+rxrpc_preparse_xdr_yfs_rxgk() reads the raw key length and ticket length
+from the XDR token as u32 values and passes each through round_up(x, 4)
+before using the rounded value for validation and allocation.  When the raw
+length is >= 0xfffffffd, round_up() wraps to 0, so the bounds check and
+kzalloc both use 0 while the subsequent memcpy still copies the original
+~4 GiB value, producing a heap buffer overflow reachable from an
+unprivileged add_key() call.
 
-Firstly, make rxrpc_destroy_all_calls() only dump the first ten calls that
-are unexpectedly still on the list.  Limiting the number of steps means
-there's no need to call cond_resched() or to remove calls from the list
-here, thereby eliminating the need for rxrpc_put_call() to check for that.
+Fix this by:
 
-rxrpc_put_call() can then be fixed to unconditionally delete the call from
-the list as it is the only place that the deletion occurs.
+ (1) Rejecting raw key lengths above AFSTOKEN_GK_KEY_MAX and raw ticket
+     lengths above AFSTOKEN_GK_TOKEN_MAX before rounding, consistent with
+     the caps that the RxKAD path already enforces via AFSTOKEN_RK_TIX_MAX.
 
-Closes: https://sashiko.dev/#/patchset/20260319150150.4189381-1-dhowells%40redhat.com
+ (2) Sizing the flexible-array allocation from the validated raw key
+     length via struct_size_t() instead of the rounded value.
+
+ (3) Caching the raw lengths so that the later field assignments and
+     memcpy calls do not re-read from the token, eliminating a class of
+     TOCTOU re-parse.
+
+The control path (valid token with lengths within bounds) is unaffected.
+
+Fixes: 0ca100ff4df6 ("rxrpc: Add YFS RxGK (GSSAPI) security class")
+Signed-off-by: Oleh Konko <security@1seal.org>
 Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Jeffrey Altman <jaltman@auristor.com>
 cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Jeffrey Altman <jaltman@auristor.com>
-cc: Linus Torvalds <torvalds@linux-foundation.org>
 cc: Eric Dumazet <edumazet@google.com>
 cc: "David S. Miller" <davem@davemloft.net>
 cc: Jakub Kicinski <kuba@kernel.org>
@@ -148,72 +157,90 @@ cc: linux-afs@lists.infradead.org
 cc: netdev@vger.kernel.org
 cc: stable@kernel.org
 ---
- include/trace/events/rxrpc.h |  2 +-
- net/rxrpc/call_object.c      | 24 +++++++++---------------
- 2 files changed, 10 insertions(+), 16 deletions(-)
+ net/rxrpc/key.c | 30 +++++++++++++++++-------------
+ 1 file changed, 17 insertions(+), 13 deletions(-)
 
-diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
-index 869f97c9bf73..a826cd80007b 100644
---- a/include/trace/events/rxrpc.h
-+++ b/include/trace/events/rxrpc.h
-@@ -347,7 +347,7 @@
- 	EM(rxrpc_call_see_release,		"SEE release ") \
- 	EM(rxrpc_call_see_userid_exists,	"SEE u-exists") \
- 	EM(rxrpc_call_see_waiting_call,		"SEE q-conn  ") \
--	E_(rxrpc_call_see_zap,			"SEE zap     ")
-+	E_(rxrpc_call_see_still_live,		"SEE !still-l")
+diff --git a/net/rxrpc/key.c b/net/rxrpc/key.c
+index 26d4336a4a02..77237a82be3b 100644
+--- a/net/rxrpc/key.c
++++ b/net/rxrpc/key.c
+@@ -13,6 +13,7 @@
+ #include <crypto/skcipher.h>
+ #include <linux/module.h>
+ #include <linux/net.h>
++#include <linux/overflow.h>
+ #include <linux/skbuff.h>
+ #include <linux/key-type.h>
+ #include <linux/ctype.h>
+@@ -171,7 +172,7 @@ static int rxrpc_preparse_xdr_yfs_rxgk(struct key_preparsed_payload *prep,
+ 	size_t plen;
+ 	const __be32 *ticket, *key;
+ 	s64 tmp;
+-	u32 tktlen, keylen;
++	size_t raw_keylen, raw_tktlen, keylen, tktlen;
  
- #define rxrpc_txqueue_traces \
- 	EM(rxrpc_txqueue_await_reply,		"AWR") \
-diff --git a/net/rxrpc/call_object.c b/net/rxrpc/call_object.c
-index 918f41d97a2f..59329cfe1532 100644
---- a/net/rxrpc/call_object.c
-+++ b/net/rxrpc/call_object.c
-@@ -654,11 +654,9 @@ void rxrpc_put_call(struct rxrpc_call *call, enum rxrpc_call_trace why)
- 	if (dead) {
- 		ASSERTCMP(__rxrpc_call_state(call), ==, RXRPC_CALL_COMPLETE);
+ 	_enter(",{%x,%x,%x,%x},%x",
+ 	       ntohl(xdr[0]), ntohl(xdr[1]), ntohl(xdr[2]), ntohl(xdr[3]),
+@@ -181,18 +182,22 @@ static int rxrpc_preparse_xdr_yfs_rxgk(struct key_preparsed_payload *prep,
+ 		goto reject;
  
--		if (!list_empty(&call->link)) {
--			spin_lock(&rxnet->call_lock);
--			list_del_init(&call->link);
--			spin_unlock(&rxnet->call_lock);
--		}
-+		spin_lock(&rxnet->call_lock);
-+		list_del_rcu(&call->link);
-+		spin_unlock(&rxnet->call_lock);
+ 	key = xdr + (6 * 2 + 1);
+-	keylen = ntohl(key[-1]);
+-	_debug("keylen: %x", keylen);
+-	keylen = round_up(keylen, 4);
++	raw_keylen = ntohl(key[-1]);
++	_debug("keylen: %zx", raw_keylen);
++	if (raw_keylen > AFSTOKEN_GK_KEY_MAX)
++		goto reject;
++	keylen = round_up(raw_keylen, 4);
+ 	if ((6 * 2 + 2) * 4 + keylen > toklen)
+ 		goto reject;
  
- 		rxrpc_cleanup_call(call);
- 	}
-@@ -730,24 +728,20 @@ void rxrpc_destroy_all_calls(struct rxrpc_net *rxnet)
- 	_enter("");
+ 	ticket = xdr + (6 * 2 + 1 + (keylen / 4) + 1);
+-	tktlen = ntohl(ticket[-1]);
+-	_debug("tktlen: %x", tktlen);
+-	tktlen = round_up(tktlen, 4);
++	raw_tktlen = ntohl(ticket[-1]);
++	_debug("tktlen: %zx", raw_tktlen);
++	if (raw_tktlen > AFSTOKEN_GK_TOKEN_MAX)
++		goto reject;
++	tktlen = round_up(raw_tktlen, 4);
+ 	if ((6 * 2 + 2) * 4 + keylen + tktlen != toklen) {
+-		kleave(" = -EKEYREJECTED [%x!=%x, %x,%x]",
++		kleave(" = -EKEYREJECTED [%zx!=%x, %zx,%zx]",
+ 		       (6 * 2 + 2) * 4 + keylen + tktlen, toklen,
+ 		       keylen, tktlen);
+ 		goto reject;
+@@ -206,7 +211,7 @@ static int rxrpc_preparse_xdr_yfs_rxgk(struct key_preparsed_payload *prep,
+ 	if (!token)
+ 		goto nomem;
  
- 	if (!list_empty(&rxnet->calls)) {
--		spin_lock(&rxnet->call_lock);
-+		int shown = 0;
+-	token->rxgk = kzalloc(sizeof(*token->rxgk) + keylen, GFP_KERNEL);
++	token->rxgk = kzalloc(struct_size_t(struct rxgk_key, _key, raw_keylen), GFP_KERNEL);
+ 	if (!token->rxgk)
+ 		goto nomem_token;
  
--		while (!list_empty(&rxnet->calls)) {
--			call = list_entry(rxnet->calls.next,
--					  struct rxrpc_call, link);
--			_debug("Zapping call %p", call);
-+		spin_lock(&rxnet->call_lock);
+@@ -221,9 +226,9 @@ static int rxrpc_preparse_xdr_yfs_rxgk(struct key_preparsed_payload *prep,
+ 	token->rxgk->enctype	= tmp = xdr_dec64(xdr + 5 * 2);
+ 	if (tmp < 0 || tmp > UINT_MAX)
+ 		goto reject_token;
+-	token->rxgk->key.len	= ntohl(key[-1]);
++	token->rxgk->key.len	= raw_keylen;
+ 	token->rxgk->key.data	= token->rxgk->_key;
+-	token->rxgk->ticket.len = ntohl(ticket[-1]);
++	token->rxgk->ticket.len = raw_tktlen;
  
--			rxrpc_see_call(call, rxrpc_call_see_zap);
--			list_del_init(&call->link);
-+		list_for_each_entry(call, &rxnet->calls, link) {
-+			rxrpc_see_call(call, rxrpc_call_see_still_live);
+ 	if (token->rxgk->endtime != 0) {
+ 		expiry = rxrpc_s64_to_time64(token->rxgk->endtime);
+@@ -236,8 +241,7 @@ static int rxrpc_preparse_xdr_yfs_rxgk(struct key_preparsed_payload *prep,
+ 	memcpy(token->rxgk->key.data, key, token->rxgk->key.len);
  
- 			pr_err("Call %p still in use (%d,%s,%lx,%lx)!\n",
- 			       call, refcount_read(&call->ref),
- 			       rxrpc_call_states[__rxrpc_call_state(call)],
- 			       call->flags, call->events);
- 
--			spin_unlock(&rxnet->call_lock);
--			cond_resched();
--			spin_lock(&rxnet->call_lock);
-+			if (++shown >= 10)
-+				break;
- 		}
- 
- 		spin_unlock(&rxnet->call_lock);
+ 	/* Pad the ticket so that we can use it directly in XDR */
+-	token->rxgk->ticket.data = kzalloc(round_up(token->rxgk->ticket.len, 4),
+-					   GFP_KERNEL);
++	token->rxgk->ticket.data = kzalloc(tktlen, GFP_KERNEL);
+ 	if (!token->rxgk->ticket.data)
+ 		goto nomem_yrxgk;
+ 	memcpy(token->rxgk->ticket.data, ticket, token->rxgk->ticket.len);
 
 
