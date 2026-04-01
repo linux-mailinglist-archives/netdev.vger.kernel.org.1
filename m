@@ -1,91 +1,93 @@
-Return-Path: <netdev+bounces-273793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273794-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GwxNx9pzGlXSwYAu9opvQ
-	(envelope-from <netdev+bounces-273793-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 02:38:55 +0200
+	id eGoqNCVpzGlXSwYAu9opvQ
+	(envelope-from <netdev+bounces-273794-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 02:39:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6BFF3732AE
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 02:38:54 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA06A3732B5
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 02:39:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 089523008D3D
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 00:38:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F41223029F75
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 00:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F8E1A9F87;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6AA71BD9CE;
 	Wed,  1 Apr 2026 00:38:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KXqGmZk+"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="W1qbRkvU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f99.google.com (mail-yx1-f99.google.com [74.125.224.99])
+Received: from mail-dy1-f228.google.com (mail-dy1-f228.google.com [74.125.82.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A15654774
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 00:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7588C1A680C
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 00:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775003928; cv=none; b=hWg+7JtTk0zReqGEXFplsK4cULu36DhVzlTwaBGdxXeprACzddlqe4PsBWcSbR/gTHJvZ51f0ksT8ws/ReAsz9c8iW+AxPF3TFMsg/NhnNLFZwDeBDpWOnnCp/ieVXNPcfIK/NcFdsMFwYQI1oHZFmDz2QzXMcQ0t362j3nAfIs=
+	t=1775003929; cv=none; b=hwMU7lh4o45YZHSFLUxmItbDCCynTKZr1kf5jsP4+68vqejRhsXpFGWLKkr0Q1pLUGW4ryk/Pu82DpfS5vL4b+FrYBdId7YeOpvRRZXK8rzl6i0eaL3KhmRb6jYgU8qUGW/rOpVA4/+TpIljU0jAqlr/GEBhbGnNRGkecKDEMrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775003928; c=relaxed/simple;
-	bh=8Kc4oE3SHaIhwDJaM3ICrQZFp/2ofgh10Oeasz6SR1I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FwMzjP9pkEr3YFHfgyjSoolUuF5NOIxiEpesyLhml/jeY4OqQ3UYRUR+jq4rhQELxUWM4HmEE8ZRYZmRp2gkGSPuFzOvmm9Nt4RnaOSkD37sxwRy9oMVPyAEf7C6dt7YMgXSwWccq0oPumOuNuubwem6j5HhmFDXa7lvn3eYUN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KXqGmZk+; arc=none smtp.client-ip=74.125.224.99
+	s=arc-20240116; t=1775003929; c=relaxed/simple;
+	bh=FKS1l8B4iRLYjoPZ4ZCQvX1ylPejp+uMV3jJCEcCCkM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=qCVuVIy90SggiUSwKTOo683JIM3Y+85u4UF8P9nqq74iTcBRgm6GJ0GiTLFOBNsxZR8eTNE3iUkBpugafqz1MlfuhWuTLLi/LBSVIUzCIDpHUR7VlqDjxXO81fVMduJVHN6JZK/Hcmbt0vxZdwlncDllUhq3OW6DJidtuU18UQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=W1qbRkvU; arc=none smtp.client-ip=74.125.82.228
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yx1-f99.google.com with SMTP id 956f58d0204a3-64937edbc9eso8296493d50.2
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 17:38:47 -0700 (PDT)
+Received: by mail-dy1-f228.google.com with SMTP id 5a478bee46e88-2c7d8bbad06so1462897eec.1
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 17:38:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775003926; x=1775608726;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O+tm8JvSYTJFLSh8j5yFrep5/YuYO2X2J6QMiwLluOo=;
-        b=GoSlZrvTQMzG0HypyM8LV9SGoduurzhJ+0oJayLrgDjUjcFzIDxiezc3UkxiUSEvDO
-         FSb7Hw/KTBN1gdJiW+Mn3v9GUsNUhUm+kGr49lLkTD56RAVjWPimm/OKUs6TAfQiB8tF
-         Pp/fdptrtdL9Mhyuary+CvqaUmrzI/dOiMQzldsjHTOE4glpNFmLXyQxE5uEpRzql77D
-         0vZTtKXT+MPJDnpPvTjtaBRQbzfvnPuB6wfPjvruEKmv8a1sXuM2ImpxsY/3YAUclMQX
-         juWtNXQBo0zX9PyN4VIk3MwMhT5EhOELSy8lYGk3NgPuYv5t27Os/mEXU0ukczZs+Pd5
-         iU0A==
-X-Gm-Message-State: AOJu0YxyY4wR6ZObyRcMU+Otbz+SNDfo6UcEZOLlRHKR8+hjIkZg+Jul
-	l3btFFqnkzhb+NzX22q12j/VBl0ctKr1qb1p6gTa/K6lO3CWQO0f4LJYv/YPN086nyRf9jMZMNC
-	2g3vZ0pupNm8IvC9PYDjZY8hlg/q3teU70EuO1tafHzCA+Vh2dS0c0KwHJN6RrqZa8Dc0eR91te
-	j5LxEA8wYOZgCaIVB9TyCVPjAhOdWEPrfUcngxHnYL9+SQKwykWrADq+00mgL0jwYZ9QT2Qtkw2
-	Reh0HJ3ng==
-X-Gm-Gg: ATEYQzw45H7iXcs178cD5Yslxu3bQYdVYqwoQAuGlO4VZ4OTAHkEAAabfe0YRWFC6su
-	CtUB1OJW1b+q9vCVR4jPxH/OiH3gbGaUT8gowUSDBve5SqqCrZ1etIHYw9LjfDttQ3xfL+WQ9AW
-	Qc7D536zdnB02yZ2zoTQLHCFY7sSsbHwYZoWeh4s4PJwClA+c8BU0HtuzBDnznUkzt3zQ5yg4fe
-	iwUmO9ATBktwevz0mUsV7KYb24xLLtCYC7TINjXmYTwSuLtVttr+qTuJmqHbMEVDBzZOsvXPHLI
-	2xd/oYadhdl+YMloaVhMESDkwMjAFQ02LNgH5yuhlsBhAi9nf3SI9es5TSZO81e+wZ7r0DMijzv
-	LU2rQ1WPzPfeE3nx9VAwK5SQr4P+OFBWmTJmjjAY+2nvb4wSXeNJoXPWYGd723HTgM9kwRa99Cj
-	Ko8ZXfYMFOfwDvRr3xiwq3mHqOUlv9o4jKPRIgEu5KZHtispqmkZPK/Mw=
-X-Received: by 2002:a53:a2c7:0:b0:64c:a59d:b0d1 with SMTP id 956f58d0204a3-6502fe554a5mr1129550d50.39.1775003926387;
-        Tue, 31 Mar 2026 17:38:46 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-15.dlp.protect.broadcom.com. [144.49.247.15])
-        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-6500923c4casm1423293d50.4.2026.03.31.17.38.45
+        d=1e100.net; s=20251104; t=1775003928; x=1775608728;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fYiLqhfEZMc7XkuMVbvPJdbLFT6h1JgI6C1KdlgLPZw=;
+        b=AYEoIEQWnHcyC9vF7eXrcHMS6vkP3tO1FyCsuzIvLSR2Imgsl/lKsQERY4w4T1UbI9
+         QwB+F8D7l2OjP5hdDF6RJKJffkUmQYewzN1bR0cJkxzD0D3lYmvqAPA4LbwBWXEI0bSf
+         FQwhRkGarMQNXZzDz2ZXUl39pcjF4ArTojYUp9DMNwISdJhp6U/dtsxdzLs08sWr1F5F
+         Ru2jIcet24cmKSkohLvbCGrDL5uPjnm6OxIMyBtkLKWx2cTgVPBM4+WK90Soe/pu0ZBQ
+         JtfGA2hf8k6ldp3IJbcegxbkqHQf9fpWVgHXCxtyE7CvwIlI7ah0g9ddxNqM7A9TQrk7
+         amKw==
+X-Gm-Message-State: AOJu0Yz5gcmMYm7f1pwMOGZL8PdIRbn/PKRIjXdvKbMJiPny5VpmkkcJ
+	+u+UUVeBn9rVICtWUh+QJaFBsq+GnWdGIzYr6tOMgBQ/rn2uvf4vgXWx9P4+FITbwedXEKzWafk
+	bWXZJiSN+br45y1sPiLKV7s4Gb/hYtrgninsQSzY9ahEDkAXi4L40GEKdIaQRU2Ta/E7iJn/Zqr
+	gG+RUPO3sfzS32s/CPQ2Dk2izT3GmFL0AgiTfsjscBeXn6lwBrvszEVXCGKnPRjDOqsTYd4u5xJ
+	MPyrRkGOQ==
+X-Gm-Gg: ATEYQzwxvYohqP3vb0/Gc7ZIr3SXZFURb9ryrI4lp6EYh0Eo/6rP/SXzCEffRLVusbb
+	6Uu4nUHVUStTnSaBlJ1v0aGursvOuSB+Eb2IQoBiDIOwceYyCyDAwUnDBONdoiyazY03SrHvE3d
+	iecTqOrY4IRz20fLmOFETLVc1sNEsBk40/L7gomeLl3PdeOX0MvTnO1JLNf30occtUz9SJEg1GO
+	q+nFHVYJhc89qPIEip43lG48XeKx7KUjbHcwQPZJLUgFotzfx7znWXQXU38xtlYWvAw0PiQpt5I
+	Ca8Hj1T3Roso2p3ey8L6uI6aYch7ZP8+zDuMyeg4ymOy+NZtP9Ga6Ad+7enCAC0sPWoqqb4WZiK
+	Rg+DfSjvbLN+XmxuWCm4+QebWWZm2F3Ot65PUcPrpiKSk+ue0v6y9u0l0IIltKx9n9MsLZPxTPQ
+	iT1Y4=
+X-Received: by 2002:a05:7300:fb8b:b0:2c7:2c0b:f33b with SMTP id 5a478bee46e88-2c9323bacd4mr936231eec.20.1775003927482;
+        Tue, 31 Mar 2026 17:38:47 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com ([144.49.247.127])
+        by smtp-relay.gmail.com with ESMTPS id 5a478bee46e88-2c963c7622asm43261eec.25.2026.03.31.17.38.47
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 31 Mar 2026 17:38:46 -0700 (PDT)
+        Tue, 31 Mar 2026 17:38:47 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-2c8ac8e422dso1612640eec.0
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 17:38:45 -0700 (PDT)
+Received: by mail-dl1-f71.google.com with SMTP id a92af1059eb24-127337c8e52so10072217c88.1
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 17:38:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1775003924; x=1775608724; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=O+tm8JvSYTJFLSh8j5yFrep5/YuYO2X2J6QMiwLluOo=;
-        b=KXqGmZk+taufpaNCaz+4H72cM5YMYgWyXhtQsUwHp61pfk8uzFeGc1IQYY2ILDOi7y
-         9zVd5caH/HcBcvPoWYF9oKxrCCFUb5s8w5GqPbZZ7rzX32jVY7MMt10gY6jDUuA+z4He
-         gIckpumHR13cY7yIWLXTIP9fG0I0WSw0xfeiQ=
-X-Received: by 2002:a05:7022:2395:b0:11f:2c9e:87f8 with SMTP id a92af1059eb24-12be6535cf9mr1009515c88.34.1775003924291;
+        d=broadcom.com; s=google; t=1775003925; x=1775608725; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fYiLqhfEZMc7XkuMVbvPJdbLFT6h1JgI6C1KdlgLPZw=;
+        b=W1qbRkvUtf8DZ5169VuKDWqfVQVnMBCqT68VJ4tJ7fD3Vr/WaAMAPTXgL+HF1tFylq
+         JdIyYg3MQlGQ/zW1xmmPNG/0PVNIt79bAC3gN72V8pbZLp9XG93AFaSIqKOGyT8SPcD9
+         f5jzVVwXwrqNWbZE3ZbeUNt3UHag2On3+Pr8E=
+X-Received: by 2002:a05:7022:123:b0:128:ca6f:adf0 with SMTP id a92af1059eb24-12be6557593mr994199c88.17.1775003925337;
+        Tue, 31 Mar 2026 17:38:45 -0700 (PDT)
+X-Received: by 2002:a05:7022:123:b0:128:ca6f:adf0 with SMTP id a92af1059eb24-12be6557593mr994181c88.17.1775003924678;
         Tue, 31 Mar 2026 17:38:44 -0700 (PDT)
-X-Received: by 2002:a05:7022:2395:b0:11f:2c9e:87f8 with SMTP id a92af1059eb24-12be6535cf9mr1009481c88.34.1775003923581;
-        Tue, 31 Mar 2026 17:38:43 -0700 (PDT)
 Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12aba581027sm17663190c88.4.2026.03.31.17.38.42
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12aba581027sm17663190c88.4.2026.03.31.17.38.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 17:38:43 -0700 (PDT)
+        Tue, 31 Mar 2026 17:38:44 -0700 (PDT)
 From: Justin Chen <justin.chen@broadcom.com>
 To: netdev@vger.kernel.org
 Cc: pabeni@redhat.com,
@@ -98,10 +100,12 @@ Cc: pabeni@redhat.com,
 	opendmb@gmail.com,
 	nb@tipi-net.de,
 	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net v2 0/4] fix queue lock up and reduce timeouts
-Date: Tue, 31 Mar 2026 17:38:36 -0700
-Message-Id: <20260401003840.3112454-1-justin.chen@broadcom.com>
+Subject: [PATCH net v2 1/4] net: bcmgenet: fix off-by-one in bcmgenet_put_txcb
+Date: Tue, 31 Mar 2026 17:38:37 -0700
+Message-Id: <20260401003840.3112454-2-justin.chen@broadcom.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260401003840.3112454-1-justin.chen@broadcom.com>
+References: <20260401003840.3112454-1-justin.chen@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -116,7 +120,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -125,7 +129,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,lunn.ch,broadcom.com,gmail.com,tipi-net.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273793-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273794-lists,netdev=lfdr.de];
 	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -133,45 +137,50 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:mid];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: E6BFF3732AE
+X-Rspamd-Queue-Id: DA06A3732B5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-We have been seeing reports of logs like this.
-# [   39.713199] bcmgenet 1001300000.ethernet eth0: NETDEV WATCHDOG: CPU: 0: transmit queue 2 timed out 7991 ms
-[   41.761198] bcmgenet 1001300000.ethernet eth0: NETDEV WATCHDOG: CPU: 0: transmit queue 2 timed out 10039 ms
-[   43.745198] bcmgenet 1001300000.ethernet eth0: NETDEV WATCHDOG: CPU: 0: transmit queue 2 timed out 12023 ms
-[   45.729198] bcmgenet 1001300000.ethernet eth0: NETDEV WATCHDOG: CPU: 0: transmit queue 2 timed out 14007 ms
+The write_ptr points to the next open tx_cb. We want to return the
+tx_cb that gets rewinded, so we must rewind the pointer first then
+return the tx_cb that it points to. That way the txcb can be correctly
+cleaned up.
 
-We have two issues. The persistent queue timeouts and the eventual lock up of the entire transmit.
+Fixes: 876dbadd53a7 ("net: bcmgenet: Fix unmapping of fragments in bcmgenet_xmit()")
+Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/genet/bcmgenet.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-This is due to two issues.
-- We have a small queue that is prone to timeouts. We optimize this by relaxing the tx queue stop conditions.
-- We have a racing and leaking timeout handler that is also fixed.
-
-v2
-- These patches stayed the same.
-  net: bcmgenet: fix off-by-one in bcmgenet_put_txcb
-  net: bcmgenet: fix leaking free_bds
-- New patches that fix a few other slightly related issues.
-  net: bcmgenet: fix off-by-one in bcmgenet_put_txcb
-  net: bcmgenet: relax the xmit ring full case
-
-Justin Chen (4):
-  net: bcmgenet: fix off-by-one in bcmgenet_put_txcb
-  net: bcmgenet: fix leaking free_bds
-  net: bcmgenet: fix racing timeout handler
-  net: bcmgenet: relax the xmit ring full case
-
- .../net/ethernet/broadcom/genet/bcmgenet.c    | 39 ++++++++-----------
- 1 file changed, 17 insertions(+), 22 deletions(-)
-
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+index 482a31e7b72b..0f6e4baba25b 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+@@ -1819,15 +1819,15 @@ static struct enet_cb *bcmgenet_put_txcb(struct bcmgenet_priv *priv,
+ {
+ 	struct enet_cb *tx_cb_ptr;
+ 
+-	tx_cb_ptr = ring->cbs;
+-	tx_cb_ptr += ring->write_ptr - ring->cb_ptr;
+-
+ 	/* Rewinding local write pointer */
+ 	if (ring->write_ptr == ring->cb_ptr)
+ 		ring->write_ptr = ring->end_ptr;
+ 	else
+ 		ring->write_ptr--;
+ 
++	tx_cb_ptr = ring->cbs;
++	tx_cb_ptr += ring->write_ptr - ring->cb_ptr;
++
+ 	return tx_cb_ptr;
+ }
+ 
 -- 
 2.34.1
 
