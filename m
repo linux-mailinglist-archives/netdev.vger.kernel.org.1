@@ -1,163 +1,234 @@
-Return-Path: <netdev+bounces-274134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274135-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mEDtApc3zWlwawYAu9opvQ
-	(envelope-from <netdev+bounces-274134-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:19:51 +0200
+	id wIPPFIUyzWn0agYAu9opvQ
+	(envelope-from <netdev+bounces-274135-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 16:58:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53F1A37CE84
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:19:50 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7EDC37C908
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 16:58:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6096430107DF
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 14:48:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4F89E31569AC
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 14:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41C4328B7F;
-	Wed,  1 Apr 2026 14:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6984381B02;
+	Wed,  1 Apr 2026 14:47:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Y6huQ0Sr"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="KKlfMgZ2";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hSQCAb3m";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="KKlfMgZ2";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hSQCAb3m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CA01E1E12
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 14:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF15244685
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 14:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775054799; cv=none; b=NvhSvvcKTztkWJKQ+kT1qgKJAtN+5q+ihW2rCVcduKpzfbwSTFo5CjIXEcjIla+I1p34YIHaQOIaI9U5reUUr+seSYjjHnaLi2Npkq9l0SXV1EfWYk6zE3vYxj7FsSnR1MIuRfbQygFtB2YIDR6I6DzjckNB8GO3TqCt1Sn1LcQ=
+	t=1775054828; cv=none; b=M7lkkQqyJUuboe3SByTaRk66DJKCoDoGagJCv/1xh/7kyRmZP1/9V7wCH0/CuhbdlUWK6lYeIaW6uHqE4EC7aauujpkf7ki8+tFRbfGtneCR8uQOIZck4I5G2pxmjVLwMN6G5n2Yd3fORUO03YvpwVJ1bET9rnNuE3cFQkKO2Xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775054799; c=relaxed/simple;
-	bh=JiSXnswUDUF47LO23pImSu3SMOjwZCmHwgX+M1cp5eY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ROV9vm90ky3rxKggk/DfEmmYtd4obZWEjW968MrY1pDOEQ3bF4oV6ZL/bVlL5mQLkzL3KhlGOns9FCfq38pvTx65G3RF/wd4mUQ05iYKHLgzdlbHOi/tXEoUExvMMXmIWnY7lBRS11f87LWyO/Qkm7ec7Gh3FI5G13GY6lIrunA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Y6huQ0Sr; arc=none smtp.client-ip=74.125.82.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-2ba9c484e5eso6271795eec.1
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 07:46:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1775054797; x=1775659597; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ft4oYfRoZ/X9cwiRcAvC3uw1qVfkVHb2EItjBcnB5Qc=;
-        b=Y6huQ0SrZOlhVH09btc87C+QiKPBFSb9f89bHHnDwM6d9CZO8G73IgA/LMatlTuLCY
-         1yCKc6UoMVywnPGhp/I0H+kkFnr1hBeI+Isks+yuZuoFkxGRR06ja7nmkPIbu/ZvuGRT
-         B6ALOM6kHAkeJr65NRRvzL2hQK1n+wEH5A7KIWSeCmQayb0rCp0RsBGdZ4FyDFVYNxMd
-         uHvCFSS0EwbeU6LT3OJDUUxa8LOiYq75SkG1dsHO3Mb4FQn74ci35ZhBTOGcKwF6UwXc
-         1lKDA+XKmglVpBN+kEXhDob4dj0mN9XK8C+qxMprbM84QRMdYWeeQMzu1LfnvwyBfJeU
-         D6DQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775054797; x=1775659597;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ft4oYfRoZ/X9cwiRcAvC3uw1qVfkVHb2EItjBcnB5Qc=;
-        b=P1TyFxAowWTGhSzNdIth2iEgDn1XzXiDQQRXY/B3E9vVG3Ymi7yAXl3k/EzkGSKAby
-         09X3EyOBbFliH3QMGzJUW5wSHRUr68SduH9gTn0eGzXvh6EIoywcfk5EDAqdBkkHORgb
-         uAjZ2xTxK8lNciAAjQRUVxVTHWGtQQfiwzcai7+sQk0pp4ERrQ8CZQRSAfYFMLTJAArE
-         5nWyHi0U7Ws9ugKC99zj1rf+nn6sdg8OiGOfKFeuUJMynJq/V6TJ0DZt/+LIfXVe3W6F
-         1iphGFX/3nfBwuR8pj0zfkGIIYSP+SGV7XCamldAGWNiM59MPy1LQpVpc0SILiMo4pGI
-         3ZGA==
-X-Forwarded-Encrypted: i=1; AJvYcCVpSWG36GPNEaW83W9HikbnnBRpKdwSK15ynGYPNHTt35Y0fXTyr4tM4NVRjXnGsojaBy4yYLc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLUiIm7pA0Qguxin4BHn6d0+M65INInxm/PI+WDxFZ9pazJxI1
-	yXtPj6Uq4z4uwskx6+1kntEUIVMUf7+zxipF+JjtsfXilDN1Fek/n1JAoH/VTW/dmcg=
-X-Gm-Gg: ATEYQzznAN44YD7LFuKrd6z2M5hdhCrTeKgTFmvcY4de/hjbHAtv9j6qLFDqBbOnXiq
-	KAKGbWkiyPSJSFi+CjXi5Tb2gtQ34WfoLq/JMSJ7XTVxkYn2VJ9IYSs24X9N1Aj+ttgt3/gXDb5
-	S/3qRpDpIF+Y3vslfMZccYINtePDoCg0vZQUUExiRRJXcpNxiYkAROBXXoQ29bYxy+xqUkXJ25M
-	z65z7peDBIuYlpP3Qtki3pIXvnTvrD8qKo8DPwfXivMqbN20W3ZO6kGgLdfVqUlLTSVbNHpM/rX
-	xW6pzmd8bdn8puzWantkycgI8Abizo6xVjnGR+BcrSzHU02s7BiUTZrtXoSZ1KKAT0Kr76iDW/B
-	Z/LGOZzKnkxlbHRarThp0GiVQP+ouufJ9psRqSD8wmALDforkp/MwryE6hi/fC2hUfN37PVIzl9
-	/Z2OYRdkdD42l3TwF8J6xWZLHGeEhYfgA0cBw=
-X-Received: by 2002:a05:7300:2391:b0:2c7:2cac:8123 with SMTP id 5a478bee46e88-2c9307905d6mr1980236eec.4.1775054796800;
-        Wed, 01 Apr 2026 07:46:36 -0700 (PDT)
-Received: from phoenix.local ([104.202.41.210])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c8d8776daasm2917590eec.1.2026.04.01.07.46.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Apr 2026 07:46:36 -0700 (PDT)
-Date: Wed, 1 Apr 2026 07:46:31 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Yucheng Lu <kanolyc@gmail.com>
-Cc: security@kernel.org, netdev@vger.kernel.org, jhs@mojatatu.com,
- jiri@resnulli.us, davem@davemloft.net, Jason@zx2c4.com, kees@kernel.org,
- yifanwucs@gmail.com, tomapufckgml@gmail.com, tanyuan98@outlook.com,
- bird@lzu.edu.cn, z1652074432@gmail.com
-Subject: Re: [PATCH RESEND net v2 1/1] net/sched: sch_netem: fix
- out-of-bounds access in packet corruption
-Message-ID: <20260401074631.60d11dff@phoenix.local>
-In-Reply-To: <45435c0935df877853a81e6d06205ac738ec65fa.1774941614.git.kanolyc@gmail.com>
-References: <cover.1773323637.git.kanolyc@gmail.com>
-	<45435c0935df877853a81e6d06205ac738ec65fa.1774941614.git.kanolyc@gmail.com>
+	s=arc-20240116; t=1775054828; c=relaxed/simple;
+	bh=xJ+CqyPpDr4RnKGIVXZY0Ht+UeYZcW48kLAFNsToGGc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GCVgKPLpPb+XpIUxZWx8R7ah7gZ2Nz487POyMRgDBq15pWB+9yc7zPbH5GzJyiFNJqEV6k1ArlOJ5uI9eQXFA0R6r1inlphDXjVccONtXm7oBf09pq5HFCTY0ChbDgZIbg1c5IO8vB+EWekjyDM0VYqJRC3Be/baLPJYHWv89Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=KKlfMgZ2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hSQCAb3m; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=KKlfMgZ2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hSQCAb3m; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 5E2B34D1E1;
+	Wed,  1 Apr 2026 14:47:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1775054825; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gXvZg1FyR/cH6YcJsLt+q7RXOcXCtioeZOpkJEW3wNY=;
+	b=KKlfMgZ2QUosLFfb9O/n9T4rZwSEcEtT6j5CzVqtB0Utl+W4R7yvhsWrbFE33JufwQ8NUH
+	yF38IQwQeIBmDReSTdZZ9HkxHKGbR8hXxxSY97tZjQbu5aFlQJl1XyhwxDbYVXk0bvAioR
+	HGJDZpqkITyikBGMxanalI4xWntdEAE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1775054825;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gXvZg1FyR/cH6YcJsLt+q7RXOcXCtioeZOpkJEW3wNY=;
+	b=hSQCAb3mOIM0FtUm5O3nQoChrnPPKDWK9XPOJAOtUNferxmKt3Wn0UI/Wwjfv9tWZ1yU9+
+	tgmO7TTwIqXMA1AQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=KKlfMgZ2;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=hSQCAb3m
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1775054825; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gXvZg1FyR/cH6YcJsLt+q7RXOcXCtioeZOpkJEW3wNY=;
+	b=KKlfMgZ2QUosLFfb9O/n9T4rZwSEcEtT6j5CzVqtB0Utl+W4R7yvhsWrbFE33JufwQ8NUH
+	yF38IQwQeIBmDReSTdZZ9HkxHKGbR8hXxxSY97tZjQbu5aFlQJl1XyhwxDbYVXk0bvAioR
+	HGJDZpqkITyikBGMxanalI4xWntdEAE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1775054825;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gXvZg1FyR/cH6YcJsLt+q7RXOcXCtioeZOpkJEW3wNY=;
+	b=hSQCAb3mOIM0FtUm5O3nQoChrnPPKDWK9XPOJAOtUNferxmKt3Wn0UI/Wwjfv9tWZ1yU9+
+	tgmO7TTwIqXMA1AQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E0D754A0B0;
+	Wed,  1 Apr 2026 14:47:04 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id UgP+M+gvzWl/GAAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Wed, 01 Apr 2026 14:47:04 +0000
+Message-ID: <2d94a1a6-e6c5-427c-b10f-63377cb10407@suse.de>
+Date: Wed, 1 Apr 2026 16:47:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/2] net: hsr: require valid EOT supervision
+ TLV
+To: luka.gejak@linux.dev, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, fmaurer@redhat.com, horms@kernel.org
+References: <20260401092324.52266-1-luka.gejak@linux.dev>
+ <20260401092324.52266-2-luka.gejak@linux.dev>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260401092324.52266-2-luka.gejak@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.56 / 15.00];
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274134-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,mojatatu.com,resnulli.us,davemloft.net,zx2c4.com,gmail.com,outlook.com,lzu.edu.cn];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[networkplumber-org.20230601.gappssmtp.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_FROM(0.00)[bounces-274135-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[networkplumber.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,outlook.com:email]
-X-Rspamd-Queue-Id: 53F1A37CE84
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C7EDC37C908
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, 31 Mar 2026 16:00:21 +0800
-Yucheng Lu <kanolyc@gmail.com> wrote:
-
-> In netem_enqueue(), the packet corruption logic uses
-> get_random_u32_below(skb_headlen(skb)) to select an index for
-> modifying skb->data. When an AF_PACKET TX_RING sends fully non-linear
-> packets over an IPIP tunnel, skb_headlen(skb) evaluates to 0.
+On 4/1/26 11:23 AM, luka.gejak@linux.dev wrote:
+> From: Luka Gejak <luka.gejak@linux.dev>
 > 
-> Passing 0 to get_random_u32_below() takes the variable-ceil slow path
-> which returns an unconstrained 32-bit random integer. Using this
-> unconstrained value as an offset into skb->data results in an
-> out-of-bounds memory access.
+> Supervision frames are only valid if terminated with a zero-length EOT
+> TLV. The current check fails to reject non-EOT entries as the terminal
+> TLV, potentially allowing malformed supervision traffic.
 > 
-> Fix this by verifying skb_headlen(skb) is non-zero before attempting
-> to corrupt the linear data area. Fully non-linear packets will silently
-> bypass the corruption logic.
+> Fix this by strictly requiring the terminal TLV to be HSR_TLV_EOT
+> with a length of zero.
 > 
-> Fixes: c865e5d99e25 ("[PKT_SCHED] netem: packet corruption option")
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Signed-off-by: Yuan Tan <tanyuan98@outlook.com>
-> Signed-off-by: Xin Liu <bird@lzu.edu.cn>
-> Signed-off-by: Yuhang Zheng <z1652074432@gmail.com>
-> Signed-off-by: Yucheng Lu <kanolyc@gmail.com>
+> Reviewed-by: Felix Maurer <fmaurer@redhat.com>
+> Signed-off-by: Luka Gejak <luka.gejak@linux.dev>
 > ---
+>   net/hsr/hsr_forward.c | 41 ++++++++++++++++++++++-------------------
+>   1 file changed, 22 insertions(+), 19 deletions(-)
+> 
+> diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+> index 0aca859c88cb..17b705235c4a 100644
+> --- a/net/hsr/hsr_forward.c
+> +++ b/net/hsr/hsr_forward.c
+> @@ -82,39 +82,42 @@ static bool is_supervision_frame(struct hsr_priv *hsr, struct sk_buff *skb)
+>   	    hsr_sup_tag->tlv.HSR_TLV_length != sizeof(struct hsr_sup_payload))
+>   		return false;
+>   
+> -	/* Get next tlv */
+> +	/* Advance past the first TLV payload to reach next TLV header */
+>   	total_length += hsr_sup_tag->tlv.HSR_TLV_length;
+> -	if (!pskb_may_pull(skb, total_length))
+> +	/* Linearize next TLV header before access */
+> +	if (!pskb_may_pull(skb, total_length + sizeof(struct hsr_sup_tlv)))
+>   		return false;
+>   	skb_pull(skb, total_length);
+>   	hsr_sup_tlv = (struct hsr_sup_tlv *)skb->data;
+>   	skb_push(skb, total_length);
+>   
+> -	/* if this is a redbox supervision frame we need to verify
+> -	 * that more data is available
+> +	/* Walk through TLVs to find end-of-TLV marker, skipping any unknown
+> +	 * extension TLVs to maintain forward compatibility.
+>   	 */
+> -	if (hsr_sup_tlv->HSR_TLV_type == PRP_TLV_REDBOX_MAC) {
+> -		/* tlv length must be a length of a mac address */
+> -		if (hsr_sup_tlv->HSR_TLV_length != sizeof(struct hsr_sup_payload))
+> -			return false;
+> +	for (;;) {
+> +		if (hsr_sup_tlv->HSR_TLV_type == HSR_TLV_EOT &&
+> +		    hsr_sup_tlv->HSR_TLV_length == 0)
+> +			return true;
+>   
 
-This is the correct fix for the net tree. Will make a more robust
-fix for net-next which handles non linear packets better.
+I do not follow this approach, why a loop? From IEC 62439-3, I do not 
+understand that supervision frames could have multiple 
+PRP_TLV_REDBOX_MAC TLVs. The current code handles the TLVs correctly.
 
-Reviewed-by: Stephen Hemminger <stephen@networkplumber.org>
+Which makes me wonder, how are you testing this? Do you have some 
+hardware with HSR/PRP support that is sending these frames? If so, which 
+one? Are you testing this using a HSR/PRP environment with purely Linux 
+devices?
 
+Thanks,
+Fernando.
+
+> -		/* make sure another tlv follows */
+> -		total_length += sizeof(struct hsr_sup_tlv) + hsr_sup_tlv->HSR_TLV_length;
+> -		if (!pskb_may_pull(skb, total_length))
+> +		/* Validate known TLV types */
+> +		if (hsr_sup_tlv->HSR_TLV_type == PRP_TLV_REDBOX_MAC) {
+> +			if (hsr_sup_tlv->HSR_TLV_length !=
+> +			    sizeof(struct hsr_sup_payload))
+> +				return false;
+> +		}
+> +
+> +		/* Advance past current TLV: header + payload */
+> +		total_length += sizeof(struct hsr_sup_tlv) +
+> +				hsr_sup_tlv->HSR_TLV_length;
+> +		/* Linearize next TLV header before access */
+> +		if (!pskb_may_pull(skb,
+> +				   total_length + sizeof(struct hsr_sup_tlv)))
+>   			return false;
+>   
+> -		/* get next tlv */
+>   		skb_pull(skb, total_length);
+>   		hsr_sup_tlv = (struct hsr_sup_tlv *)skb->data;
+>   		skb_push(skb, total_length);
+>   	}
 
