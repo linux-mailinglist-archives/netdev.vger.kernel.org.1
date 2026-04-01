@@ -1,182 +1,251 @@
-Return-Path: <netdev+bounces-274162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274163-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8M/SJhs9zWn5awYAu9opvQ
-	(envelope-from <netdev+bounces-274162-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:43:23 +0200
+	id GN6uN1A+zWkkbAYAu9opvQ
+	(envelope-from <netdev+bounces-274163-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:48:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E01A37D5A5
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:43:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 95D8037D6E3
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:48:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F01A630434F6
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 15:39:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A5BCD3066726
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 15:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15CD3B0AD8;
-	Wed,  1 Apr 2026 15:39:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117D03BD647;
+	Wed,  1 Apr 2026 15:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="x+7tO0Fo"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="eHh2Fpxt"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F72384242
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 15:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9322821257B;
+	Wed,  1 Apr 2026 15:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775057975; cv=none; b=c8hopSYvnINlr5YLV29BKG1lwlMO6JxdfPEBAU64fp1luEa4hBlquZaRFg/DavvVnXI+FpdlmbtYPiX2P7lVEJi4bQnQlXyTnUQqAZ/swXvw6Pe2+2/DAWN/5LM9VkajpS4AmnqyVrfGumgX1wqGEqtv+E6mDM6m6qgNbt6uh+k=
+	t=1775058300; cv=none; b=CQredBvIxu0mBLH5+Miod5bJelKwY1qEsRYRJeDV6MQc7IdPKNcyB+cb3nFiFGpbDaHfr06aEhhaf5n6ENToHt+2lhyPG/crHmuR4Uwg2L1g5xzQsSt/4vvTuBMQs6TUqj26VtQTByKL/UkVIWScT2VDkBrxJf8theJH/ZOsUr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775057975; c=relaxed/simple;
-	bh=Mu6hKdatik9ZMJJtwZgql98CyxOVff4TkwCo1o6/JaU=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=cs6etc8dsFX29L7MOqLtR3jG0wrniKRMLD2auZKvavIbEjt3ypmBKDC2tmK3TFIHjSpFiIRD0eH/W0Ox/P+MaE8risLU01q+D4mIrSyJvxsLUzNK2SrCv5ClbX6Doj9eA9d82DrLf1T6TvViSnn6cniV2oFmB7kKxyUqF0IAXiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=x+7tO0Fo; arc=none smtp.client-ip=162.62.57.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1775057967; bh=rWJTDXtf7btF2BKyo9SNlIT4oe/5A/4pOHharg1NEmk=;
-	h=From:To:Cc:Subject:Date;
-	b=x+7tO0FoLpxjqsY/zR56hqlfGhqT1xUE3QQ1ZIZJRhfFd1loPrac2fAZqM+0CPSHX
-	 ntR1MRCBiFMbyC9/RP0Yf6xYeOhbnZgOPdNIyopq4qIwVBfku0aysnapkDmQga5Grr
-	 HgrI6n9N/L3/smfoQugDAI4vufiRItPmGMZdKcII=
-Received: from CGG7X9MGDG.corp.ebay.com ([216.113.165.51])
-	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
-	id 9C4B5ED3; Wed, 01 Apr 2026 23:39:04 +0800
-X-QQ-mid: xmsmtpt1775057944te0b7xgb9
-Message-ID: <tencent_4A3E1C339C75D359093BE4F08648AFAA6009@qq.com>
-X-QQ-XMAILINFO: Nx5J06Esz7r7L/P7JjrRw2OQ96/QQu1sjbUpPUf/S8cXgzPtZ2f3uIQXACb/wH
-	 tkBJeAETqlzjuQtZCE0raxVeHmg/LJvlmUiZDn/Boir0G+gJ3OlTulAoVCT6QO7DtdodPaajMaKg
-	 D5wGUhVZyYLbOTN7VE+nuLm1ZKHVOXANNAW6iGarRWoeVBz4qee0/yT+E3jw/G9nU7GJAT0v5E32
-	 pfk9IW+EWV24WJmHsYceb/lYWrqXPxEyxsWDl4VvY5LfqAAkX5SR9jAk+hgs13LP8UPTA/XDyAdx
-	 6bwbi0bTHLCZJcSD8kx6Z3HSiyCSUrrUCpMgj5aTq6MkZIY8DiUkhWPiM4U3kiyGYP+PHt078GP/
-	 kcKCbfIaIEiVTRdyXPQUdLkQt6TshFYagr01HY34NIZrX/X57T0NuKwAIS4iiTPUIWslSaXetyLJ
-	 ytole5zgpB7SEKs4ntKkG6BTMPkOcDu4MdJmDjib3Ow0/vg3xsJmscXucSMZ4o0PB491CNqJ2Y50
-	 QMqUv8pkNrWm5TT0TCyetLKVjPwgl3zidyxwWJI/PuNsjz6oDSPxpkMlpFswhikn9ZlmBJjCGWRL
-	 x9V0qyMckigOAn+pQxtiXVUW8+Kjwkoi+aay8v1LzP/8T7N/A8WjfzfZPN3B5fCP84SW+Geaf0Cx
-	 Bd7SMYRb+mn7WuKcnEZ/hK9tislZgKNIyjfOQHVCnzKxyzn/9xQKS2FpPex90ADwcO1gHaBe7kxR
-	 L53clAF12YSHsSfazgbcCwq3TH4LUB/2WKjmn3g3I7A0dHnlY2TlH4k8fgCnVXBMXoDnlBztkOfN
-	 HZm/vl1LlFMCV/QnM2bkenDwQUusjIZIviVjCxj0M/vYPsrI0NmVu8vYZ4z+DHOrmWBtfU03vVRy
-	 S8x5Km4lqWhFJj3CWBcAYoif1OQYHuNVd+ZOMb+1ZTalNALCNPzN4nktswa6+FWM25GCXCrpl+0O
-	 NniofjFa+TWNOHuYtshq5e8sHmwq507U7ZOcGzr+2+0uRJvymYHpKz73t4YWj+
-X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
-From: Yingnan Zhang <342144303@qq.com>
-To: horms@verge.net.au,
-	ja@ssi.bg
-Cc: pablo@netfilter.org,
-	fw@strlen.de,
-	phil@nwl.cc,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org,
-	Yingnan Zhang <342144303@qq.com>
-Subject: [PATCH net] ipvs: fix MTU check for GSO packets in tunnel mode
-Date: Wed,  1 Apr 2026 23:38:57 +0800
-X-OQ-MSGID: <20260401153857.31562-1-342144303@qq.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1775058300; c=relaxed/simple;
+	bh=A30oFn3i3XwkbKi5Z4CboB8jSWUWd5dBj/4qrotLwnM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mymGARqSzFev28Q6y1KB74Uu4WVlaIMp6YqC0f22XS4Bh0PnPw99OGQtfWPUEI7jAh9JDTb1Kt65vqBoYsPYLT08tJV/BvOsCXlnkvXeaKHcCHdMnK+LISxV1pNeWyOxxrOg/ffR2R99uKouZVJDO00eX0PvJ3wzm+SPMJyWCiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=eHh2Fpxt; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-Id:Date:Subject:From:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=5QKW3/JXml+7tBXgZ6SvgOOOhlSastlScs8q9qXL1w0=; b=eHh2Fpxt4SMnhfAzFby4vBLBh7
+	LXpSTC5vgOuUT42A1ISnoHyeNSB15COUsX9w90WkTg467kQQbQSR1EiXy1m3fFmuHG36T9Yqnb7e0
+	gxDNe9X8CvJFkRi7V52XnnrGWqCURu/C01SYP4Jl7EplYaw99zMfABJHhvdoUOiWH5KcFVF0WJ6Gz
+	5vw6JMaRy/kamz60gKx0wrZC4LSezlrBI66xegBFN4xJhl4/Swb/wizDRjnVWVeC1lXNH8sfSU5Yb
+	eej6CCaUGtzteYEcKZTSG4Xq7FnMxbjVf0RGkybwel5E56uJ2L9XlTLK+bZRgBWAlKO8CojStpQSy
+	rstcvzdQ==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1w7xkR-0035cG-0Y;
+	Wed, 01 Apr 2026 15:44:50 +0000
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v2 0/4] net: move .getsockopt away from __user
+ buffers
+Date: Wed, 01 Apr 2026 08:44:25 -0700
+Message-Id: <20260401-getsockopt-v2-0-611df6771aff@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAFo9zWkC/22NwQ6DIBAFf4XsWRrASqKn/ofxILjotgkYoMbG+
+ O+N9NrzmzdzQMJImKBjB0TcKFHw0DFVMbDL6GfkNEHHQAmlhawFnzGnYF9hzbx1tdaqQZysgYr
+ BGtHRXmQ9eMzc455h+C3pbZ5o8+W62IVSDvFTupssj3+JTXLBW9ncnXVOu7Z5TGho9LcQZxjO8
+ /wCmuVjNMEAAAA=
+X-Change-ID: 20260130-getsockopt-9f36625eedcb
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ Willem de Bruijn <willemb@google.com>, metze@samba.org, axboe@kernel.dk, 
+ Stanislav Fomichev <sdf@fomichev.me>
+Cc: io-uring@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+ Linus Torvalds <torvalds@linux-foundation.org>, 
+ linux-kernel@vger.kernel.org, kernel-team@meta.com, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.16-dev-453a6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5092; i=leitao@debian.org;
+ h=from:subject:message-id; bh=A30oFn3i3XwkbKi5Z4CboB8jSWUWd5dBj/4qrotLwnM=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpzT1sy5qPnN/bcUWwUiP6vHavgdHNrCVpO+Tht
+ WLQaI4tNUuJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCac09bAAKCRA1o5Of/Hh3
+ bXg2D/96PuNkqd5ke9E4OICZTdj+8OyhH0MWyE54+kLBsDsOj7W6Sn8D/A33N0KFjKNkc4+5uJf
+ 8DuEg+3ApbctxPzSDvCaKfk/NziGUniSJxCzAJQf9ZdURkMwRlDNMj7xSw+zJGBHSYjQzTNoGqE
+ Dc8RODWKqsI0cr8OSgmq12DKWPFBPjTtPie/AsmcrU9ZfZJnA9Lh3Ff4UaTZC4bv46pQpRBCWS0
+ 2yjO1fwACpD3sE9tzrYS+x1e6Ww1nvNOUeaFago0RAej+jox1gBhtZmqqkfQFXhXnHSEof1FY8g
+ oy3ztaPFrCwjeIq1x6KSNu3bW4HWindLWPrjcJHylz3tj8JkF09NFMGRmHMPNueTQihXDcKEssV
+ vpz7YSkXIeRzFOf1EuLc47Nf78ZOKV6G/mJsPDdwUMJle6pjbnyl5+94iCbHBg0mBWEqZaA2ms1
+ j6C9qdqtqJ6txR9c0nG5//dfdi3T+SnoxuDkERwWbr0i/07WjvCo6Zj09wH/SrbqBbWHsRGXCLV
+ 7p6JyS8eKPTt/zDRAawEChddkRVTShUiJhC5Z0MpZ2glWbOgZ+kWEK9LWT6WLzp6aDoJo6/qXhc
+ 03i0bIhspzKdNG+aLY9dlux44qwGMHxBv/Nh0iaaN5wDJW0+t99RbmN8oEZDRQSn70HFiEr75cs
+ OcuypxXp+obxm3w==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
 X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[qq.com];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274162-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,qq.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[342144303@qq.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qq.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[debian.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-274163-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[debian.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,qq.com:dkim,qq.com:email,qq.com:mid]
-X-Rspamd-Queue-Id: 3E01A37D5A5
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,msgid.link:url]
+X-Rspamd-Queue-Id: 95D8037D6E3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Currently, IPVS skips MTU checks for GSO packets by excluding them with
-the !skb_is_gso(skb) condition. This creates problems when IPVS tunnel
-mode encapsulates GSO packets with IPIP headers.
+Currently, the .getsockopt callback requires __user pointers:
 
-The issue manifests in two ways:
+  int (*getsockopt)(struct socket *sock, int level,
+                    int optname, char __user *optval, int __user *optlen);
 
-1. MTU violation after encapsulation:
-   When a GSO packet passes through IPVS tunnel mode, the original MTU
-   check is bypassed. After adding the IPIP tunnel header, the packet
-   size may exceed the outgoing interface MTU, leading to unexpected
-   fragmentation at the IP layer.
+This prevents kernel callers (io_uring, BPF) from using getsockopt on
+levels other than SOL_SOCKET, since they pass kernel pointers.
 
-2. Fragmentation with problematic IP IDs:
-   When net.ipv4.vs.pmtu_disc=1 and a GSO packet with multiple segments
-   is fragmented after encapsulation, each segment gets a sequentially
-   incremented IP ID (0, 1, 2, ...). This happens because:
+Following Linus' suggestion [0], this series introduces sockopt_t, a
+type-safe wrapper around iov_iter, and a getsockopt_iter callback that
+works with both user and kernel buffers. AF_PACKET and CAN raw are
+converted as initial users, with selftests covering the trickiest
+conversion patterns.
 
-   a) The GSO packet bypasses MTU check and gets encapsulated
-   b) At __ip_finish_output, the oversized GSO packet is split into
-      separate SKBs (one per segment), with IP IDs incrementing
-   c) Each SKB is then fragmented again based on the actual MTU
+[0] https://lore.kernel.org/all/CAHk-=whmzrO-BMU=uSVXbuoLi-3tJsO=0kHj1BCPBE3F2kVhTA@mail.gmail.com/
 
-   This sequential IP ID allocation differs from the expected behavior
-   and can cause issues with fragment reassembly and packet tracking.
+Below are some questions raised during the RFC discussion:
 
-Fix this by removing the GSO packet exception from the MTU check and
-properly validating GSO packets using skb_gso_validate_network_len().
-This function correctly validates whether the GSO segments will fit
-within the MTU after segmentation. If validation fails, send an ICMP
-Fragmentation Needed message to enable proper PMTU discovery.
+1) Should optlen be an iov_iter as well?
+  No. optlen can remain a plain kernel int since do_sock_getsockopt_iter() syncs
+  it back to userspace on both success and failure. The existing callback
+  patterns all work with this approach:
 
-Fixes: 4cdd34084d53 ("netfilter: nf_conntrack_ipv6: improve fragmentation handling")
-Signed-off-by: Yingnan Zhang <342144303@qq.com>
+  a) Most callbacks (roughly 2/3) always write back optlen.
+
+  b) Some callbacks read optlen but never update it. The original
+     value is written back unchanged.
+
+  c) CAN raw updates optlen even on error (-ERANGE) to report the
+     required buffer size:
+
+          err = -ERANGE;
+          if (put_user(fsize, optlen))
+                  err = -EFAULT;
+
+     No regression, since opt.optlen is always written back to
+     userspace by the wrapper.
+
+  d) Bluetooth uses put_user() with mixed sizes (u32, u16, u8) but
+     never updates optlen. Same as case (b).
+
+2) Can callbacks change iov_iter direction mid-flight?
+
+  Yes. Some protocols read from and then write back to optval in the same
+  getsockopt call. For example, PACKET_HDRLEN reads a tpacket version from optval
+  and writes back the corresponding header size.
+
+  The converted callback handles this by temporarily flipping the iter direction,
+  reverting the position, and writing back:
+
+          case PACKET_HDRLEN:
+                  // opt->iter.data_source is ITER_SOURCE;
+                  if (copy_from_iter(&val, len, &opt->iter) != len)
+                          return -EFAULT;
+		  // unroll the bytes
+                  iov_iter_revert(&opt->iter, len);
+                  opt->iter.data_source = ITER_DEST;
+                  // ... update val ...
+                  if (copy_to_iter(&val, len, &opt->iter) != len)
+                          return -EFAULT;
+
+  The callback needs to handle two things after reading from the iter:
+  reset the position with iov_iter_revert(), and flip data_source back
+  to ITER_DEST before writing.
+
+  - ITER_DEST — the iter is a destination (kernel writes to it).
+		copy_to_iter() works, copy_from_iter() refuses.
+  - ITER_SOURCE — the iter is a source (kernel reads from it).
+		copy_from_iter() works, copy_to_iter() refuses.
+
+3) In which case iov_iter_revert() needs to be called?
+
+  When a callback needs to read from and then write back to the same
+  buffer in a single getsockopt call. The iter advances its position on
+  copy_from_iter(), so you need iov_iter_revert() to reset the position
+  back to the start before you can copy_to_iter() into the same location.
+
+  Without the revert, copy_to_iter() would write past the end of the
+  buffer since the iter already advanced during the read.
+
+4) Do we have any selftest for this change?
+
+  Yes, I've created a commit that I am using to test it, but, I am not
+  sure how useful it is rigth now, so, not appending it here.
+
+  You can find it at
+  https://github.com/leitao/linux/commit/2d9311947061f1baa43858f597dd6c54d7ccc5d2
+
+Note: The dance regarding changes to iov_iter_revert() (2) and
+opt->iter.data_source (3) is a bit fragile. It will not be a bad idea to
+creaet a helper (e.g., sockopt_read_val()) would be safer to prevent
+others from getting it wrong.
+
+I am not adding it now, so, it is easier to read the bare bones of the
+change and helpers can come later.
+
+Link: https://lore.kernel.org/all/CAHk-=whmzrO-BMU=uSVXbuoLi-3tJsO=0kHj1BCPBE3F2kVhTA@mail.gmail.com/ [0]
 ---
- net/netfilter/ipvs/ip_vs_xmit.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Changes in v2:
+- Restore optlen even on error path (getsockopt_iter fails)
+- Move af_packet.c and can instead of netlink (given these are the most
+  complicate ones).
+- Link to v1: https://patch.msgid.link/20260130-getsockopt-v1-0-9154fcff6f95@debian.org
 
-diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
-index 3601eb86d..82f2e7a32 100644
---- a/net/netfilter/ipvs/ip_vs_xmit.c
-+++ b/net/netfilter/ipvs/ip_vs_xmit.c
-@@ -232,8 +232,15 @@ static inline bool ensure_mtu_is_adequate(struct netns_ipvs *ipvs, int skb_af,
- 			return true;
- 
- 		if (unlikely(ip_hdr(skb)->frag_off & htons(IP_DF) &&
--			     skb->len > mtu && !skb_is_gso(skb) &&
-+			     skb->len > mtu &&
- 			     !ip_vs_iph_icmp(ipvsh))) {
-+			if (skb_is_gso(skb)) {
-+				if (skb_gso_validate_network_len(skb, mtu))
-+					return true;
-+				icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED, htonl(mtu));
-+				IP_VS_DBG(1, "frag needed for %pI4\n", &ip_hdr(skb)->saddr);
-+				return false;
-+			}
- 			icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED,
- 				  htonl(mtu));
- 			IP_VS_DBG(1, "frag needed for %pI4\n",
--- 
-2.51.0
+---
+Breno Leitao (4):
+      net: add getsockopt_iter callback to proto_ops
+      net: call getsockopt_iter if available
+      af_packet: convert to getsockopt_iter
+      can: raw: convert to getsockopt_iter
+
+ include/linux/net.h    | 19 +++++++++++++++++++
+ net/can/raw.c          | 28 +++++++++++++---------------
+ net/packet/af_packet.c | 18 ++++++++++--------
+ net/socket.c           | 48 +++++++++++++++++++++++++++++++++++++++++++++---
+ 4 files changed, 87 insertions(+), 26 deletions(-)
+---
+base-commit: 2d9311947061f1baa43858f597dd6c54d7ccc5d2
+change-id: 20260130-getsockopt-9f36625eedcb
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
