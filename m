@@ -1,398 +1,256 @@
-Return-Path: <netdev+bounces-274113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274120-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MCmgH3YezWnOaAYAu9opvQ
-	(envelope-from <netdev+bounces-274113-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:32:38 +0200
+	id MPIjD8wkzWlkaQYAu9opvQ
+	(envelope-from <netdev+bounces-274120-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:59:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30E5637B48A
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:32:37 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B92837BBA0
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:59:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0338A3008D6D
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 13:32:23 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 8AACC30086BA
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 13:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0F42BE026;
-	Wed,  1 Apr 2026 13:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="IYf90vKQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3164743E48A;
+	Wed,  1 Apr 2026 13:45:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5477E29D294
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 13:32:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775050340; cv=pass; b=FhYOvrtGD6JuPzYFaueX70VJ1IjnBlCJotzRjU+vZ0RHNXvQbUGRjN6loMd7ugxztZu+b2dzpL0jxDscMuf3LaBExv+ay0lSXTNHGANg6+OAhNZsydLHsGR2OpPEWbsaawVWbEAdYvx0sxxFtq3CD3IymcCnGTxBZFUJRQXJANs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775050340; c=relaxed/simple;
-	bh=ykQYpIr849OOIDjLXpVI4Ic/6DsLZ9LnNWTQxd0yrhc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PccEKgbXAHKoNHFV9TgzwhUVge+tFGWrx6RN4bmIC5l1/TuiqAOOj6LnoMaFWDiMg6rbPL4bTTu3jt1pWiZwN5zyziK0r/OmSJenAd+O6QIClXIupSowmX4UJ5vJrmxNomOAsfy+h5NngIuVFYhTtAk/CdfPZ1E8yJJRM353nsU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=IYf90vKQ; arc=pass smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-66c5b2e41c1so2992909a12.1
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 06:32:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775050337; cv=none;
-        d=google.com; s=arc-20240605;
-        b=kONE3g4fgdHNjmPO019AfSMFF8csl0a47pF8CvISM8uycs+7bTZcT0Dy8Ils6Tj8PT
-         NllYK4FOjb0qDgVryp9oKO/nXHO8pGt1eAddRRLpgjvWBGC8ogLTANga6Ak9yRnJwQG5
-         fEU4SSA0d/+r2jqplA+yinJ6CRw7EGbvqT+5HUhUVTPCYVv7/0C5PxpGpqM/Y5qm3hMu
-         5mtj/pBz6ErWXkctEedKdy3ahVT78SCQOadUmCo9GGffKXJjWZ/0hC7FRii30iD5Ojb+
-         lRrWAllgzpZ3ivF67vB5pSrczsM2GFWAVGefVguiVWHyRbevWfWqB4Qjs/i/DHFp1SPB
-         OaIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=gIE8jQyRjrcrddwXuE5cIpyEHP3IztKvb+gkeBWSXM8=;
-        fh=8i4BkJ7A2sbsgM1+Fe68SjLDkqmJfGNb+pxYd/lDi1E=;
-        b=CCG0kj4Y3aBP//xFhOHs584n+K2fk/zGoCsYENtQWvRaZr0slfATTPbCmS5+i6DGnS
-         7RKcBoqbOjlMCeMmRGWRcTwz43FagzFx5c9UBZgBRKVVzXrAa3rmXOEWb9XaYYzy6flS
-         aUBXXjOJ4EEqa9PfTX9jhG+8on6hIlijKjjaB+Pg3CrE8HJOgt/yI7iRrgscts050QA2
-         1MaS/oYl3GfXA/dVJYxKHWJvDsLWF7WRJVhlGRt1y2We56N8UJdp22kWn8xTeNBYuJmg
-         Rhi/g7k8En63F23ZvOrZOosQL/JY3D2p1hh1pw0YRmDvzsKFhor/zTwmSFCeawbCrQ57
-         52ng==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1775050337; x=1775655137; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gIE8jQyRjrcrddwXuE5cIpyEHP3IztKvb+gkeBWSXM8=;
-        b=IYf90vKQtboJxl2kHz7IYOlVXvEMSL0Ew01Xr3neycbuf4UIzsfjoZjbsyi5H+i2jF
-         9wVbnTbI7mE8PsoG2CLcy7Ub+4uYW/v/MBI/0HAILSXfPHLPracRue+OrxAuQaizgu3t
-         E2Mw8t0PYW0TT58aqgU7aoDhyUoAxEm4Zb6IUA1jWNPOyBnne8W9PLMoc4XpBdA8Bg8f
-         dnaEgdO2UZdfqex+cgg6/JIQMhJ/0zJBygeLyk1oYDw6mNfpd3CFC3076jaI3eN3fuoq
-         yPEehAqRvrA52nNBk8b1uS6KktSHgW/pPgpmkvV4WE4GTrtgnRvaK+fj8eBhZkFWRxNQ
-         XITg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775050337; x=1775655137;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gIE8jQyRjrcrddwXuE5cIpyEHP3IztKvb+gkeBWSXM8=;
-        b=daar/oijTBrnFHhR0jBCCWN4EScMxPAWOv35WX59tpkWyNimGgPVrgbpWB78Yrrnp+
-         fxTWGc2K9rTkziTYuRPnV+2vCQOxOF5JvWFZiJ8XWT5QG2mC6xxj2O1jeKpR5pRdkKLZ
-         bxncQJINPpxiHsbwaOUZUUMtzKXrAauEwVY/BuVG84lzqmJd6LMKhKeLXtoIOKfJJ9ua
-         6W+oIEaL5lU2g3+5pzQ+UCLAyxne4S9MOKF7PCDxOKsj85UX+/oP0+iUkogctqW5AF9O
-         4b/ouK+zRYGj/RvvjofkmTmyduC1kU5g2M6H04MoAjITYNoiYXpOQQVnTVCShJKTG88S
-         TLbQ==
-X-Gm-Message-State: AOJu0YzmYMVhcSyyjfKwba6vBPMWrZhzITILV68emFQ+isXbm16HV4Xf
-	3jMtxq7oHMJIdGLFkdR0Ouv0qnJiH1CPbqll0C1e0yo3zMCDb7teEi6F8Tf32OkwB14P9ZUL7vg
-	Ei1iEWUKPi4lpIgyn7oXbOD8YvoEwvTSurYAMyyyCYw==
-X-Gm-Gg: ATEYQzxRh89QR5KA1vAfB8HQ9ijBFeu5cs2/pOx4dCGNQKBzBNigqBySXGRbkEXeNCy
-	8dcH3P/7fzH2eDJnK6z2hsulT+3LJfHmFbDDv2E/GtAQfoN6nUZZOMHXtf5bw/B5KQpELR+sLac
-	wz8IjM0AqDEsN2Yd0CV0oTuxIN5yoqQBxSFjrL0b5kJANjDkUbjrzUK9RA7E8kE/c3K5WDYxiBh
-	7Y5L+48u8eeULl/x9wCtzEfKm+5w2sNHXhkmnnuxPQZdth2x7tMdQcjv80Lb7n08EgzSwOrIMoQ
-	PwVqhA==
-X-Received: by 2002:a17:907:841:b0:b9b:f6c:a67e with SMTP id
- a640c23a62f3a-b9c133756e1mr251574866b.0.1775050336411; Wed, 01 Apr 2026
- 06:32:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E70E43D4FD;
+	Wed,  1 Apr 2026 13:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775051109; cv=none; b=LdadHxwaLye9Dvo1UWdWXVwmstHEhVnGIt4aw4EvftB+2UtiW4xpqfOpau/3mX4j6WqEqp6ke3ld/TZhBNSin/dowZ6z8B2PF3lek3iVX53ehcJLnPiJkw+I66LsHtjFPw59fwr0WqC/2dPTo15lz+yGAWdllXYPcuYk4Qc8rmo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775051109; c=relaxed/simple;
+	bh=zAoADbvlCrxObJ5zfEE2hNMeHVZm3aZNaZmGUksvL8c=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=lqc53g/BaEjd8kth9KIo0w3Ix03OtdIorkmcPz/z55gyLX/RaW9Bi2JlgRJmq8h/wIsld/asInyTPqnJNrdJXRFxzaWSe6WaPYk5ltq4BfKxs9O3MQYcCkEXPZiTfwXbnPAoufioZW+/aHT7YjZg379RkB3cFjGfBqa89GiY+Ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1w7vi3-000000001eU-0JaD;
+	Wed, 01 Apr 2026 13:34:15 +0000
+Date: Wed, 1 Apr 2026 14:34:11 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Yang <mmyangfl@gmail.com>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [PATCH net-next v9 0/4] net: dsa: mxl862xx: add support for bridge
+ offloading
+Message-ID: <cover.1775049897.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260325134439.3048615-1-louis.scalbert@6wind.com>
- <20260325134439.3048615-2-louis.scalbert@6wind.com> <CAJ5u_OcpOGSPYK-EzYeW8LdpJrLd16fGn6zN6cvk+tCjCi+QxA@mail.gmail.com>
- <118159.1774630613@vermin>
-In-Reply-To: <118159.1774630613@vermin>
-From: Louis Scalbert <louis.scalbert@6wind.com>
-Date: Wed, 1 Apr 2026 15:32:04 +0200
-X-Gm-Features: AQROBzBArbK8fUuaC8SXxQzAN0IrdRnSUx5GcIyLsuASPRHVShVxJFJJnXFKsL8
-Message-ID: <CAJ5u_OceyA2oXopDbB96sQ7UG7AMFm3KtjXiZNZicd2S7PK7QA@mail.gmail.com>
-Subject: Re: [PATCH net v2 1/3] bonding: 3ad: fix carrier when no valid slaves
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, fbl@redhat.com, andy@greyhouse.net, 
-	shemminger@vyatta.com, maheshb@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
-	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spamd-Result: default: False [-0.46 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274113-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-274120-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[makrotopia.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[6wind.com:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.482];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[louis.scalbert@6wind.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,6wind.com:dkim,6wind.com:email,jvosburgh.net:email]
-X-Rspamd-Queue-Id: 30E5637B48A
+	RCPT_COUNT_TWELVE(0.00)[20];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 3B92837BBA0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello,
+As a next step to complete the mxl862xx DSA driver, add support for
+offloading forwarding between bridged ports to the switch hardware.
 
-Thank you to Mahesh and Jay for your helpful feedback.
+This works pretty much without any big surprises, apart from two
+subtleties:
+ * per-port control over flooding behavior has to be implemented by
+   (ab)using a 0-rate QoS meters as stopper in lack of any better
+   option.
+ * STP state transition unconditionally enables learning on a port
+   even if it was previously explicitely disabled (a firmware bug)
 
-I have reviewed the IEEE LACP standard on this specific topic and conducted
-tests to provide as accurate a response as possible.
+Note that as the driver is still lacking all VLAN features (which
+are going to be added next), at this point some of the
+bridge_vlan_aware.sh tests are failing after applying this series.
 
-Le ven. 27 mars 2026 =C3=A0 17:56, Jay Vosburgh <jv@jvosburgh.net> a =C3=A9=
-crit :
->
-> Louis Scalbert <louis.scalbert@6wind.com> wrote:
->
-> >Hi everyone,
-> >
-> >Le mer. 25 mars 2026 =C3=A0 14:44, Louis Scalbert
-> ><louis.scalbert@6wind.com> a =C3=A9crit :
-> >>
-> >> When an 802.3ad (LACP) bonding interface has no slaves in the
-> >> collecting/distributing state, the bonding master may still report
-> >> carrier as up. In this situation, no slave is actually able to transmi=
-t
-> >> or receive traffic.
-> >>
-> >I=E2=80=99ve just realized that the issue description is not entirely ac=
-curate.
-> >
-> >Bonding links that are not in LACP Collecting/Distributing state are
-> >excluded from traffic
-> >distribution in favor of those that are. However, if no links are in
-> >Collecting/Distributing state,
-> >the kernel considers all links as valid for distributing traffic.
-> >
-> >> As a result, upper-layer daemons consider the interface operational
-> >> while traffic is effectively blackholed.
-> >
-> >There are situations where traffic is not blackholed.
-> >
-> >For example, a Linux machine A is connected to machine B using two
-> >aggregated links.
-> >On A, LACP is configured, but not on B. As a result, LACP will not
-> >reach the Collecting/Distributing
-> >state since B does not send LACP frames. However, the bonding
-> >interface will still be up on both
-> >sides, and traffic can be exchanged.
->
->         Bonding does this because, in the absense of a LACP partner, the
-> interfaces in the bond will become Individual links, each of which will
-> become its own aggregator, one of which will be chosen to be active.
+This is expected and cannot be avoided without implementing
+port_vlan_filtering + port_vlan_add/del. And adding both bridge and
+VLAN offloading at the same time would be too much for anyone to
+review, so VLAN support is going to be submitted in a follow-up
+series immediately after this series has been accepted.
 
-Thank you for the detailed description of the current behavior. I
-confirm that this matches
-what I am observing: only one link is selected for both transmitting
-and receiving traffic,
-while traffic received on the other enslaved links is discarded.
->
->
->         This is in compliance with the standard, (802.1AX-2014, 6.1.1.j)
-> and is intended to permit some communication between a system that is
-> LACP-enabled and a system that is not.  The common example I'm familiar
+All other relevant selftests (including bridge_vlan_unaware.sh) are
+still passing.
 
-The exact statement is:
-"Backwards compatibility with aggregation-unaware devices - Links that
-cannot take part in
-Link Aggregation because of their inherent capabilities, management
-configuration, or the
-capabilities of the devices to which they attach operate as normal,
-individual links."
+Inspired by the comments received from Paolo Abeni as reply to v5
+the driver now no longer caches bridge port membership in the
+driver, but instead imports an existing helper from yt921x.c to dsa.h
+in order to allow the driver to easily iterate over bridge members.
+The mapping between DSA bridge num and firmware bridge ID is done
+using a simple fixed-size array in mxl862xx_priv.
 
-This wording has remained unchanged from 802.3ad-2000 through 802.1AX-2020.
+Changes since v8:
+ * eliminate all driver-cached portmaps as way to address concerns
+   raised by AI review regarding stale state after error on
+   .port_bridge_join which would prevent later freeing the firmware
+   refcounted bridge port. Rollback on error is not perfect in this
+   way (but it isn't in any other driver either), but at least the
+   DSA-assumed state is sync'ed to hardware at any later change
+   (such as other ports leaving the bridge)
+ * always apply host-flood setting to single-port bridge (do not
+   loose state)
+ * cancel any pending host_flood_work in probe error path
+ * fix missing p->learning reset when reverting port to standalone
+   on bridge leave
+ * remove mxl862xx_add_single_port_bridge(); fold bridge FID
+   allocation and mxl862xx_bridge_config_fwd() call into port_setup()
+   directly, and move standalone port state reset (portmap, learning,
+   flood_block) into mxl862xx_set_bridge_port() for the !dp->bridge
+   user-port path
+ * refactor mxl862xx_allocate_bridge() to return the allocated FID
+   directly, with a negative value indicating error
+ * document in commit message that MASK_VLAN_BASED_MAC_LEARNING is
+   intentionally absent as SVL is the firmware's reset default
+ * add comment noting that a FID leaked on port_setup() failure is
+   tolerable as the port transitions to unused and the pool accounts
+   for this
 
-It implies that when the partner does not support aggregation (i.e.,
-does not run LACP), all
-bond slaves should fall back to operating as normal, individual links.
+Changes since v7:
+ * add missing fields to kernel-doc for struct mxl862xx_priv
+ * const'ify some function parameters
 
-However, this is not how the kernel behaves today: it selects only a
-single link for forwarding,
-while traffic received on the other enslaved links is discarded.
+Changes since v6:
+ * drop wrong addition of 'priv' pointer to struct dsa_bridge
+   -> use simple array to track firmware bridge to dsa bridge mapping
+ * move existing dsa_bridge_ports() helper from yt921x.c to dsa.h
+ * replace propesed dsa_bridge_for_each_member() by new
+   dsa_switch_for_each_bridge_member() taking (struct net_device *)
+   instead of (struct dsa_bridge *), aligned with the existing
+   helpers
+ * fix bridge allocation resource leak in case of
+   mxl862xx_sync_bridge_members() failing for the first port to join a
+   bridge
+ * zero-initialize struct mxl862xx_cfg in mxl862xx_set_ageing_time
+ * set initial=1 to always reset cursor at start when interating over
+   FDB in .fdb_dump
+ * hack zero-rate meter to truly always block
+ * use asynchronous worker for port_set_host_flood which runs from
+   atomic context and hence cannot sleep
+ * reorder function to minimize diffstat of planned follow-up
+   commits
 
-As such, the current implementation does not comply with the standard.
+Changes since v5:
+ * add new DSA helpers to interate over bridge members
+ * add driver-private pointer to struct dsa_bridge
+ * eliminate struct mxl862xx_bridge and driver-private bridge list,
+   store firmware bridge FID in new dsa_bridge->priv instead
+ * rework sync_bridge_members() to use dsa_bridge_for_each_member()
+   instead of for_each_set_bit() on driver-private portmap
+ * rework port_bridge_join/leave to use dsa_bridge.priv for first-
+   member detection and dsa_bridge_ports() for empty-bridge check
+ * derive active FID from dp->bridge->priv in set_bridge_port()
+ * simplify allocate_bridge()/free_bridge() to take struct dsa_bridge
+   pointer directly, drop kzalloc/kfree/list management
+ * simplify get_fid() to read db.bridge.priv directly
+ * remove mxl862xx_find_bridge()
+ * remove unnecessary default bridge config call in setup()
 
->
-> with is a host that PXE boots over a network, connected to a
-> LACP-enabled switch.  During early boot, the PXE environment does not
-> perform LACP, but still needs to communicate with the switch.
+Changes since v4:
+ * move link-local check before dsa_strip_etype_header()
+ * introduce port_map helpers
+ * properly implement port_mdb_{add,del} operations
 
-In this scenario, the switch is the Linux machine. The current
-behavior is only effective
-if the kernel happens, by chance, to select the port used by PXE.
+Changes since v3:
+ * add missing cpu_to_le32 in mxl862xx_bridge_config_fwd()
+ * use little-endian 32-bit type for (unused) age_timer API field
+ * better comment in port_set_host_flood() documenting architectural
+   limitation
+ * fix typo in comment "matche" should be "matches"
+ * few whitespace fixes
 
-On Cisco Catalyst switches, when LACP fails to negotiate on all links,
-the PortChannel
-interface is placed in a suspended state, resulting in carrier down.
-To achieve the
-IEEE-defined behavior, the user must explicitly configure "no
-port-channel standalone-disable".
-In that mode, all links operate independently, meaning the switch
-forwarding table maintains
-MAC entries per link rather than per PortChannel interface. This
-allows PXE to function correctly
-in such scenarios.
+Changes since v2:
+ * refactor .port_bridge_join and .port_bridge_leave as requested
+   by Vladimir Oltean
+ * include linux/etherdevice.h which was missing and causing build
+   to fail (it accidentally slipped into a follow-up patch)
+ * remove left-over manual reset of learning state for port leaving
+   bridge
+ * remove unnecessary call to mxl862xx_port_fast_age() for port
+   leaving bridge
+ * add kernel-doc comments in mxl862xx.h instead of sporadic inline
+   comments covering only some of the struct members
+ * some other minor cosmetics (linebreaks, whitespace) here and there
 
-On Cisco routers, however, the only possible state in this situation
-is a suspended PortChannel
-(carrier down). There is no option to fall back to independent links.
+Changes since v1:
+ * don't set dsa_default_offload_fwd_mark() on link-local frames
+ * fix kernel-doc comments in API header
+ * use bitfield helpers for compound tci field in fdb API
+ * add missing endian conversion for mxl862xx_stp_port_cfg.port_state
+   as well as mxl862xx_mac_table_read.tci (spotted by AI review)
+ * drop manually resetting port learning state on bridge<->standalone
+   transitions, DSA framework takes care of that
+ * don't abort updating bridge ports on error, return error at the end
+ * report error in mxl862xx_port_bridge_leave()
+ * create mxl862xx_get_fid() helper and use it in
+   mxl862xx_port_fdb_add() and mxl862xx_port_fdb_del()
+ * propagete error of callback function in mxl862xx_port_fdb_dump()
+ * manually mxl862xx_port_fast_age() in mxl862xx_port_stp_state_set()
+   to avoid FDB poisoning due to race condition
 
-As far as I know, this default behavior (disabling the aggregation
-when LACP is not negotiated)
-is also the default on other vendors such as Juniper, and is the
-behavior I intend to implement
-to address the traffic blackholing issue.
+Daniel Golle (4):
+  net: dsa: move dsa_bridge_ports() helper to dsa.h
+  net: dsa: add bridge member iteration macro
+  dsa: tag_mxl862xx: set dsa_default_offload_fwd_mark()
+  net: dsa: mxl862xx: implement bridge offloading
 
-Implementing the IEEE-compliant behavior would only be relevant for
-bonding interfaces
-enslaved to bridge interfaces. My tests in this scenario, without any
-LACP negotiation, show
-that the bridge only learns forwarding database (FDB) entries behind
-the bonding interface,
-rather than per individual link. This capability could still be added
-in the future if needed.
+ drivers/net/dsa/mxl862xx/mxl862xx-api.h | 225 +++++++-
+ drivers/net/dsa/mxl862xx/mxl862xx-cmd.h |  20 +-
+ drivers/net/dsa/mxl862xx/mxl862xx.c     | 736 ++++++++++++++++++++++--
+ drivers/net/dsa/mxl862xx/mxl862xx.h     |  99 ++++
+ drivers/net/dsa/yt921x.c                |  13 -
+ include/net/dsa.h                       |  16 +
+ net/dsa/tag_mxl862xx.c                  |   3 +
+ 7 files changed, 1041 insertions(+), 71 deletions(-)
 
->
->
-> >This behavior is, of course, not compliant with the LACP (802.3ad)
-> >standard, but applying this fix
-> >as-is could introduce regressions in some setups. Under normal
-> >conditions, having no Collecting /
-> >Distributing links means that no interfaces are operational for
-> >handling traffic - that is precisely the
-> >purpose of using LACP.
->
->         FWIW, generally speaking we've settled on IEEE 802.1AX-2014 as
-> the version of the standard to which the bonding implementation should
-> be conformant.  There is a more recent version, -2020, but it is a
-> significant change from the prior versions.
-
-Good to know - thanks for pointing that out.
-
->
->
-> >I will publish a new version with a knob to enforce compliance with
-> >the LACP standard. It will be
-> >disabled by default for backward compatibility.
-> >
-> >What do you think of "lacp_strict" or "lacp_enforce" ?
->
->         I'm not convinced that we are in violation of the standard with
-> the present behavior.  That said, if such a switch is necessary, I'd
-> vote for "lacp_strict".
-
-I suggest addressing the traffic blackholing issue by introducing the follo=
-wing
-configuration knob. lacp_fallback_mode:
-- legacy or 0 (default) value: the current behavior
-- strict or 1: set the carrier down
-- A value of 2 could be added later to support the IEEE-compliant mode
-with bridge
-  interfaces, if needed.
-
-Best regards,
-
-Louis Scalbert
-
-
-
->
->
->         -J
->
-> >>
-> >> Fix this by asserting carrier only when at least 'min_links' slaves ar=
-e
-> >> in the collecting/distributing state (or collecting only if the
-> >> coupled_control default behavior is disabled).
-> >>
-> >> Fixes: 655f8919d549 ("bonding: add min links parameter to 802.3ad")
-> >> Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
-> >> ---
-> >>  drivers/net/bonding/bond_3ad.c | 24 ++++++++++++++++++++++--
-> >>  1 file changed, 22 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond=
-_3ad.c
-> >> index af7f74cfdc08..6d3613755d45 100644
-> >> --- a/drivers/net/bonding/bond_3ad.c
-> >> +++ b/drivers/net/bonding/bond_3ad.c
-> >> @@ -745,6 +745,22 @@ static void __set_agg_ports_ready(struct aggregat=
-or *aggregator, int val)
-> >>         }
-> >>  }
-> >>
-> >> +static int __agg_valid_ports(struct aggregator *agg)
-> >> +{
-> >> +       struct port *port;
-> >> +       int valid =3D 0;
-> >> +
-> >> +       for (port =3D agg->lag_ports; port;
-> >> +            port =3D port->next_port_in_aggregator) {
-> >> +               if (port->actor_oper_port_state & LACP_STATE_COLLECTIN=
-G &&
-> >> +                   (!port->slave->bond->params.coupled_control ||
-> >> +                    port->actor_oper_port_state & LACP_STATE_DISTRIBU=
-TING))
-> >> +                       valid++;
-> >> +       }
-> >> +
-> >> +       return valid;
-> >> +}
-> >> +
-> >>  static int __agg_active_ports(struct aggregator *agg)
-> >>  {
-> >>         struct port *port;
-> >> @@ -2120,6 +2136,7 @@ static void ad_enable_collecting_distributing(st=
-ruct port *port,
-> >>                           port->actor_port_number,
-> >>                           port->aggregator->aggregator_identifier);
-> >>                 __enable_port(port);
-> >> +               bond_3ad_set_carrier(port->slave->bond);
-> >>                 /* Slave array needs update */
-> >>                 *update_slave_arr =3D true;
-> >>                 /* Should notify peers if possible */
-> >> @@ -2141,6 +2158,7 @@ static void ad_disable_collecting_distributing(s=
-truct port *port,
-> >>                           port->actor_port_number,
-> >>                           port->aggregator->aggregator_identifier);
-> >>                 __disable_port(port);
-> >> +               bond_3ad_set_carrier(port->slave->bond);
-> >>                 /* Slave array needs an update */
-> >>                 *update_slave_arr =3D true;
-> >>         }
-> >> @@ -2819,8 +2837,10 @@ int bond_3ad_set_carrier(struct bonding *bond)
-> >>         }
-> >>         active =3D __get_active_agg(&(SLAVE_AD_INFO(first_slave)->aggr=
-egator));
-> >>         if (active) {
-> >> -               /* are enough slaves available to consider link up? */
-> >> -               if (__agg_active_ports(active) < bond->params.min_link=
-s) {
-> >> +               /* are enough slaves in collecting (and distributing) =
-state to consider
-> >> +                * link up?
-> >> +                */
-> >> +               if (__agg_valid_ports(active) < bond->params.min_links=
-) {
-> >>                         if (netif_carrier_ok(bond->dev)) {
-> >>                                 netif_carrier_off(bond->dev);
-> >>                                 goto out;
-> >> --
-> >> 2.39.2
-> >>
->
-> ---
->         -Jay Vosburgh, jv@jvosburgh.net
+-- 
+2.53.0
 
