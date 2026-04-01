@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-274246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274247-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uPdaIpN2zWnYdgYAu9opvQ
-	(envelope-from <netdev+bounces-274246-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 21:48:35 +0200
+	id cJwQC9F1zWnYdgYAu9opvQ
+	(envelope-from <netdev+bounces-274247-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 21:45:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34C6D37FF20
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 21:48:35 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE11537FED4
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 21:45:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 45B9430315D3
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 19:45:16 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 576FA304EF20
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 19:45:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF364218592;
-	Wed,  1 Apr 2026 19:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3051FBEA8;
+	Wed,  1 Apr 2026 19:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M8V5crTC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ps3qzglP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53EDE2E36F8
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 19:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A72A2264D3
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 19:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775072715; cv=none; b=AMZfctzLAgV7SLi3BatDyYMoExttgdYXNmomig+TcQeP/IDzZJZ0oHHSzmrELw5qfIjL+vYaX+EH03IdJkpc+k0aRBWfofnN2M+JsndafAhC6Awi2YXyov42odiYvqf2ruH67DEgGFi45dArJlx5Ke7riCNIOFLxkvZJhDVYNqA=
+	t=1775072717; cv=none; b=I5jH97OqwWTRsWCGuyO4NrjZ3cr35FbpSMiCnmj+gHA4QsY5LiAw0mOSa3ozHrwX8qeQPCp4/sIXdze/zogIr3D3Mlua64JATwexk0vKIor3KR6oB4EPd3f8lgX9cRqPlNm9fo8d/S0JgDEweRBbss6ClYMTtCC7S8WfRrd7ozc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775072715; c=relaxed/simple;
-	bh=MIawscDzMwcdDHmCytX9FTLicxult7SPqIZhevQrc/8=;
+	s=arc-20240116; t=1775072717; c=relaxed/simple;
+	bh=K/C5RiQvezMqdjxGdHvqhiMKDBfTwXMlVebggJpqfAs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=D49d/1Ys9F7RiZbhXRouBUoRRqvdn1Zc3ixZKfA+w0hGOxPrcVBG5VhYIGMs8DBqMadktaI2UmtifKXMNJfm6mJOYoGy/fViYS4YzZGXaaFrgZOEVq9BljTGM77LrqmQ0+mLynLiK/2HaAmKmex16NWK0ZWRx2G/U7BWID8VvYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--praan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M8V5crTC; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=WkOrQDtynOYKSbqUofBlEeLIX5PNxhHlUyz0nHTNyPGwEdksn9Q1uMj+BReFFsPwwPMVLqw1qaen7NBhDtCu0XiIq8uOvkfWMkJxkFSkjYA2B+fgwaD7rJoS4UKBFnB4ypQ/56XeDaVmAV9lCp5w2nwQpEv0yW8L38PW6TeXWYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--praan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ps3qzglP; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--praan.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-35c12a3bbb9so43135a91.3
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 12:45:14 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-c76bd4feb9fso31452a12.0
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 12:45:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775072714; x=1775677514; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1775072716; x=1775677516; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2ILPcdOAlFLDQ1M/h8Zfpg04MJ61ulMteVybRV3p/w4=;
-        b=M8V5crTCDOPwCgF/mo16DV9TxDa08+maksXJ5Zv1VmTMxqAR0NvcTdNBWLl5D5h3hb
-         U8i1XfsAdVAwA2TEhNR7F/BJozdH5aBwcvnYB9zYTjGwg7xlfb58MG6lmKEQ1ksFN7J5
-         v4EyBSXUWmCHuteMBv60Z08y5AI2Ln1q0Uft5DI3gZChsniPdUr5kmPOQpqNRT1AU/RF
-         n895SKBGdduNgH6oJTkLR9h5PqdRNaVcDyjfCeIOwBCLqTFIUbzhalES7aOxBXwUjtGQ
-         N5Zp3itpxEz5ChLa05oxgscT00NPN8N2Ghw2lMNmjFM5dJHYk5Vo9xIgmP9SeExSX2Gl
-         Homw==
+        bh=oQP2C+IMjyjgMW+B1RfW1hGccxvNm+Zehoy+ZU6LGwk=;
+        b=ps3qzglPPNEW6X3kEK9aHtJLjcRtzbBShJ5mppRqmkxfw7rbA824yZW+JFBXMAIMZe
+         HxQrqv4XE4MhtythxGenHykvB9Z5wZ6KnZlHvczyXNTFqqdXFvmkrAySvqgXZFlFtTBF
+         uRCElbFKKkNYKecubBGMwPcYbh+yeX0iCQLFmxKjQpN+WU9gV6BhowDl1TiIknoKTw+0
+         A/j+W08qoWTCJY3MJC7keKclapnOGl5rXJAR5w/tpyEWxY5pOzkHLOGGrYvjkNZtp7OE
+         51t7c9a82hUsA/cK4Y6HUEKdWrwGMCLkA8Bqx3GD5W2dju/9HZgJIfIOaRCe/84iE52i
+         olXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775072714; x=1775677514;
+        d=1e100.net; s=20251104; t=1775072716; x=1775677516;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2ILPcdOAlFLDQ1M/h8Zfpg04MJ61ulMteVybRV3p/w4=;
-        b=Ec5gigVyYrVJWhVeXbe7NmEBxs4SfpNHTExFlod+cHkavenvkjewl0MimAWBKYIE44
-         dx2bcnVtQnMook8Ik6JlxQ6IbRd1rG8JVav+hv/GSGiaOeb73nbBI6nNBQayP9Luwz6K
-         lOHVGnjCOusNz/XBpAXw9Cgf1bU6+ZSeRCjKvwaz2pC8KdZicrEGAwxUxCitOKyhuvOH
-         f2spJY7rkpDgX++7mV9q/7x3tD1NpzHn/fk4TAT43AvfFyW+pI7bbqYfv5/YWTl8bHxb
-         aSv//GOUL4HpY0jRUcimLtadZRWlyoPYEWSt5Kdji6aafZ73sFkRRj7Oj5Zi0gFIbPVm
-         thUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXlCtQQPRpFvBFdYQITNBFI4qr1sH1n5sz07SOguNh1WCtAin9LhS81Lxh3LSun4S/7XCijBks=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw11WWIM7+N9RszwkFe+mhwRqdj7u+fIahnVEpluDqkKksgoOzb
-	oZb3i7nBi7zYV1RBxPI0+6kFarpaHbB1+WuTrIeyepZdIwWcODlX5O9BQDJA/Doq3OEgiLJphSx
-	fFg==
-X-Received: from pgdj2.prod.google.com ([2002:a05:6a02:5202:b0:c76:bc8f:4eb4])
- (user=praan job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:224e:b0:35d:974d:8f3
- with SMTP id 98e67ed59e1d1-35dc6edc187mr4602486a91.15.1775072713480; Wed, 01
- Apr 2026 12:45:13 -0700 (PDT)
-Date: Wed,  1 Apr 2026 19:44:58 +0000
+        bh=oQP2C+IMjyjgMW+B1RfW1hGccxvNm+Zehoy+ZU6LGwk=;
+        b=Q4cfHlcctapCodl6pf8/XIxDb6nr35BJ1oC9GcypOU4Komb1cKvnSQNoX5ln1jZhgy
+         LNR5SYzc7trmiCOPmbHjvPP0mL+bRxPXpTu0BTLTrBwDu+lLhHczh1BBJ9DDpB44pBTH
+         5anLqhyeu92O63VwjSPowQST0a7e4/SiN/hoa1LklD/xcKue3dPQmEvxVAJD02GH53je
+         K7Dgu1L7Eoq4L+DvsBFB1q7dPqaIcPwibm6fJK+w+dea/2Wm2no1I/v9AZn/6VMbMWuG
+         IZ+jm2xuXXRx6i85XyDoLyBGl6w4w60CsjvIkRs3AVyP7nQ/1CaUxm12owk4oFx7ANR2
+         BZxA==
+X-Forwarded-Encrypted: i=1; AJvYcCWv8j/MlDZw+DQWP8lXi41TgVkJYk/UOMjDcKy2QXayfOO3bEz7J2UGRw8O+OKScDnytYECo40=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCFwSEN2MwvcGWIkPDMOir3JfaYX0LW3TbMvhylJB/o3ptg7Nc
+	c9vI/5h50dhuUjNDmokLqUNB1ki6f+DYImgqkzIuYXIUjXwXodDIovcONm4qbCdRAtIcyKT8JXW
+	Glg==
+X-Received: from pfbik7.prod.google.com ([2002:a05:6a00:8d07:b0:82c:da3b:301])
+ (user=praan job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2343:b0:81c:446d:6bd0
+ with SMTP id d2e1a72fcca58-82cfb88acbemr798432b3a.23.1775072715637; Wed, 01
+ Apr 2026 12:45:15 -0700 (PDT)
+Date: Wed,  1 Apr 2026 19:44:59 +0000
 In-Reply-To: <20260401194501.2269200-1-praan@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260401194501.2269200-1-praan@google.com>
 X-Mailer: git-send-email 2.53.0.1185.g05d4b7b318-goog
-Message-ID: <20260401194501.2269200-3-praan@google.com>
-Subject: [RFC PATCH 2/4] nfs: add NFS_CAP_P2PDMA and detect transport support
+Message-ID: <20260401194501.2269200-4-praan@google.com>
+Subject: [RFC PATCH 3/4] nfs: make nfs_page pin-aware
 From: Pranjal Shrivastava <praan@google.com>
 To: trond.myklebust@hammerspace.com, anna@kernel.org
 Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com, 
@@ -92,11 +92,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274246-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274247-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -109,170 +109,138 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[praan@google.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 34C6D37FF20
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EE11537FED4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The NFS server capabilities bitmask (server->caps) is currently full,
-utilizing all 32 bits of the existing unsigned int. Expand the bitmask
-to 64 bits (u64) to allow for new feature flags.
+The migration to iov_iter_extract_pages() for Direct I/O introduces
+page pinning (GUP) instead of standard page referencing. To handle this
+correctly, nfs_page must track whether it holds a pin or a standard
+reference.
 
-Introduce a new capability bit, NFS_CAP_P2PDMA, to indicate that the
-local mount is backed by hardware and a transport capable of PCI
-Peer-to-Peer DMA.
+Add a new flag, PG_PINNED, to struct nfs_page. Update the creation
+path (nfs_page_create_from_page) to accept a 'pinned' boolean and
+set the flag accordingly. If the page is pinned, we skip the standard
+get_page() as the pin itself acts as a reference.
 
-Update nfs_server_set_init_caps() to query the underlying SunRPC
-transport for P2PDMA support during the mount process. If the transport
-(e.g., RDMA) signals support, set the NFS_CAP_P2PDMA bit in the mount's
-capabilities. This allows the high-performance Direct I/O path to
-efficiently determine if it should allow P2P memory buffers.
+Update nfs_clear_request() to use unpin_user_page() instead of
+put_page() when the PG_PINNED flag is set. This ensures that memory
+remains safely locked for DMA and that kernel page accounting stays
+consistent. Ensure subrequests inherit the pin status from their
+parent request.
 
 Signed-off-by: Pranjal Shrivastava <praan@google.com>
 ---
- fs/nfs/client.c           |  8 +++++
- fs/nfs/nfs4_fs.h          |  2 +-
- fs/nfs/super.c            |  2 +-
- include/linux/nfs_fs_sb.h | 67 ++++++++++++++++++++-------------------
- 4 files changed, 44 insertions(+), 35 deletions(-)
+ fs/nfs/direct.c          |  4 ++--
+ fs/nfs/pagelist.c        | 18 +++++++++++++-----
+ include/linux/nfs_page.h |  2 ++
+ 3 files changed, 17 insertions(+), 7 deletions(-)
 
-diff --git a/fs/nfs/client.c b/fs/nfs/client.c
-index be02bb227741..f177cf098d44 100644
---- a/fs/nfs/client.c
-+++ b/fs/nfs/client.c
-@@ -712,6 +712,8 @@ static void nfs4_server_set_init_caps(struct nfs_server *server)
+diff --git a/fs/nfs/direct.c b/fs/nfs/direct.c
+index 48d89716193a..c8429b430181 100644
+--- a/fs/nfs/direct.c
++++ b/fs/nfs/direct.c
+@@ -370,7 +370,7 @@ static ssize_t nfs_direct_read_schedule_iovec(struct nfs_direct_req *dreq,
+ 			struct nfs_page *req;
+ 			unsigned int req_len = min_t(size_t, bytes, PAGE_SIZE - pgbase);
+ 			/* XXX do we need to do the eof zeroing found in async_filler? */
+-			req = nfs_page_create_from_page(dreq->ctx, pagevec[i],
++			req = nfs_page_create_from_page(dreq->ctx, pagevec[i], false,
+ 							pgbase, pos, req_len);
+ 			if (IS_ERR(req)) {
+ 				result = PTR_ERR(req);
+@@ -898,7 +898,7 @@ static ssize_t nfs_direct_write_schedule_iovec(struct nfs_direct_req *dreq,
+ 			struct nfs_page *req;
+ 			unsigned int req_len = min_t(size_t, bytes, PAGE_SIZE - pgbase);
  
- void nfs_server_set_init_caps(struct nfs_server *server)
- {
-+	struct rpc_xprt *xprt;
-+
- 	switch (server->nfs_client->rpc_ops->version) {
- 	case 2:
- 		server->caps = NFS_CAP_HARDLINKS | NFS_CAP_SYMLINKS;
-@@ -725,6 +727,12 @@ void nfs_server_set_init_caps(struct nfs_server *server)
- 		nfs4_server_set_init_caps(server);
- 		break;
+-			req = nfs_page_create_from_page(dreq->ctx, pagevec[i],
++			req = nfs_page_create_from_page(dreq->ctx, pagevec[i], false,
+ 							pgbase, pos, req_len);
+ 			if (IS_ERR(req)) {
+ 				result = PTR_ERR(req);
+diff --git a/fs/nfs/pagelist.c b/fs/nfs/pagelist.c
+index a9373de891c9..72d3da0fb654 100644
+--- a/fs/nfs/pagelist.c
++++ b/fs/nfs/pagelist.c
+@@ -413,11 +413,14 @@ static void nfs_page_assign_folio(struct nfs_page *req, struct folio *folio)
  	}
-+
-+	rcu_read_lock();
-+	xprt = rcu_dereference(server->client->cl_xprt);
-+	if (xprt->ops->supports_p2pdma && xprt->ops->supports_p2pdma(xprt))
-+		server->caps |= NFS_CAP_P2PDMA;
-+	rcu_read_unlock();
  }
- EXPORT_SYMBOL_GPL(nfs_server_set_init_caps);
  
-diff --git a/fs/nfs/nfs4_fs.h b/fs/nfs/nfs4_fs.h
-index b48e5b87cb2a..a309cc739fa3 100644
---- a/fs/nfs/nfs4_fs.h
-+++ b/fs/nfs/nfs4_fs.h
-@@ -60,7 +60,7 @@ enum nfs4_client_state {
- struct nfs_seqid_counter;
- struct nfs4_minor_version_ops {
- 	u32	minor_version;
--	unsigned init_caps;
-+	u64	init_caps;
+-static void nfs_page_assign_page(struct nfs_page *req, struct page *page)
++static void nfs_page_assign_page(struct nfs_page *req, struct page *page, bool pinned)
+ {
+ 	if (page != NULL) {
+ 		req->wb_page = page;
+-		get_page(page);
++		if (pinned)
++			set_bit(PG_PINNED, &req->wb_flags);
++		else
++			get_page(page);
+ 	}
+ }
  
- 	int	(*init_client)(struct nfs_client *);
- 	void	(*shutdown_client)(struct nfs_client *);
-diff --git a/fs/nfs/super.c b/fs/nfs/super.c
-index 7a318581f85b..b2de13a355df 100644
---- a/fs/nfs/super.c
-+++ b/fs/nfs/super.c
-@@ -672,7 +672,7 @@ int nfs_show_stats(struct seq_file *m, struct dentry *root)
- 	show_implementation_id(m, nfss);
- 
- 	seq_puts(m, "\n\tcaps:\t");
--	seq_printf(m, "caps=0x%x", nfss->caps);
-+	seq_printf(m, "caps=0x%llx", nfss->caps);
- 	seq_printf(m, ",wtmult=%u", nfss->wtmult);
- 	seq_printf(m, ",dtsize=%u", nfss->dtsize);
- 	seq_printf(m, ",bsize=%u", nfss->bsize);
-diff --git a/include/linux/nfs_fs_sb.h b/include/linux/nfs_fs_sb.h
-index 4daee27fa5eb..e66818c7a0b8 100644
---- a/include/linux/nfs_fs_sb.h
-+++ b/include/linux/nfs_fs_sb.h
-@@ -175,7 +175,7 @@ struct nfs_server {
- #define NFS_AUTOMOUNT_INHERIT_RSIZE	0x0002
- #define NFS_AUTOMOUNT_INHERIT_WSIZE	0x0004
- 
--	unsigned int		caps;		/* server capabilities */
-+	__u64			caps;		/* server capabilities */
- 	__u64			fattr_valid;	/* Valid attributes */
- 	unsigned int		rsize;		/* read size */
- 	unsigned int		rpages;		/* read size (in pages) */
-@@ -299,36 +299,37 @@ struct nfs_server {
+@@ -435,6 +438,7 @@ static void nfs_page_assign_page(struct nfs_page *req, struct page *page)
+  */
+ struct nfs_page *nfs_page_create_from_page(struct nfs_open_context *ctx,
+ 					   struct page *page,
++					   bool pinned,
+ 					   unsigned int pgbase, loff_t offset,
+ 					   unsigned int count)
+ {
+@@ -446,7 +450,7 @@ struct nfs_page *nfs_page_create_from_page(struct nfs_open_context *ctx,
+ 	ret = nfs_page_create(l_ctx, pgbase, offset >> PAGE_SHIFT,
+ 			      offset_in_page(offset), count);
+ 	if (!IS_ERR(ret)) {
+-		nfs_page_assign_page(ret, page);
++		nfs_page_assign_page(ret, page, pinned);
+ 		nfs_page_group_init(ret, NULL);
+ 	}
+ 	nfs_put_lock_context(l_ctx);
+@@ -500,7 +504,8 @@ nfs_create_subreq(struct nfs_page *req,
+ 		if (folio)
+ 			nfs_page_assign_folio(ret, folio);
+ 		else
+-			nfs_page_assign_page(ret, page);
++			nfs_page_assign_page(ret, page,
++					     test_bit(PG_PINNED, &req->wb_flags));
+ 		/* find the last request */
+ 		for (last = req->wb_head;
+ 		     last->wb_this_page != req->wb_head;
+@@ -556,7 +561,10 @@ static void nfs_clear_request(struct nfs_page *req)
+ 		req->wb_folio = NULL;
+ 		clear_bit(PG_FOLIO, &req->wb_flags);
+ 	} else if (page != NULL) {
+-		put_page(page);
++		if (test_and_clear_bit(PG_PINNED, &req->wb_flags))
++			unpin_user_page(page);
++		else
++			put_page(page);
+ 		req->wb_page = NULL;
+ 	}
+ 	if (l_ctx != NULL) {
+diff --git a/include/linux/nfs_page.h b/include/linux/nfs_page.h
+index afe1d8f09d89..cae67540a2ae 100644
+--- a/include/linux/nfs_page.h
++++ b/include/linux/nfs_page.h
+@@ -37,6 +37,7 @@ enum {
+ 	PG_REMOVE,		/* page group sync bit in write path */
+ 	PG_CONTENDED1,		/* Is someone waiting for a lock? */
+ 	PG_CONTENDED2,		/* Is someone waiting for a lock? */
++	PG_PINNED,		/* page is pinned by GUP */
  };
  
- /* Server capabilities */
--#define NFS_CAP_READDIRPLUS	(1U << 0)
--#define NFS_CAP_HARDLINKS	(1U << 1)
--#define NFS_CAP_SYMLINKS	(1U << 2)
--#define NFS_CAP_ACLS		(1U << 3)
--#define NFS_CAP_ATOMIC_OPEN	(1U << 4)
--#define NFS_CAP_LGOPEN		(1U << 5)
--#define NFS_CAP_CASE_INSENSITIVE	(1U << 6)
--#define NFS_CAP_CASE_PRESERVING	(1U << 7)
--#define NFS_CAP_REBOOT_LAYOUTRETURN	(1U << 8)
--#define NFS_CAP_OFFLOAD_STATUS	(1U << 9)
--#define NFS_CAP_ZERO_RANGE	(1U << 10)
--#define NFS_CAP_DIR_DELEG	(1U << 11)
--#define NFS_CAP_OPEN_XOR	(1U << 12)
--#define NFS_CAP_DELEGTIME	(1U << 13)
--#define NFS_CAP_POSIX_LOCK	(1U << 14)
--#define NFS_CAP_UIDGID_NOMAP	(1U << 15)
--#define NFS_CAP_STATEID_NFSV41	(1U << 16)
--#define NFS_CAP_ATOMIC_OPEN_V1	(1U << 17)
--#define NFS_CAP_SECURITY_LABEL	(1U << 18)
--#define NFS_CAP_SEEK		(1U << 19)
--#define NFS_CAP_ALLOCATE	(1U << 20)
--#define NFS_CAP_DEALLOCATE	(1U << 21)
--#define NFS_CAP_LAYOUTSTATS	(1U << 22)
--#define NFS_CAP_CLONE		(1U << 23)
--#define NFS_CAP_COPY		(1U << 24)
--#define NFS_CAP_OFFLOAD_CANCEL	(1U << 25)
--#define NFS_CAP_LAYOUTERROR	(1U << 26)
--#define NFS_CAP_COPY_NOTIFY	(1U << 27)
--#define NFS_CAP_XATTR		(1U << 28)
--#define NFS_CAP_READ_PLUS	(1U << 29)
--#define NFS_CAP_FS_LOCATIONS	(1U << 30)
--#define NFS_CAP_MOVEABLE	(1U << 31)
-+#define NFS_CAP_READDIRPLUS	(1ULL << 0)
-+#define NFS_CAP_HARDLINKS	(1ULL << 1)
-+#define NFS_CAP_SYMLINKS	(1ULL << 2)
-+#define NFS_CAP_ACLS		(1ULL << 3)
-+#define NFS_CAP_ATOMIC_OPEN	(1ULL << 4)
-+#define NFS_CAP_LGOPEN		(1ULL << 5)
-+#define NFS_CAP_CASE_INSENSITIVE	(1ULL << 6)
-+#define NFS_CAP_CASE_PRESERVING	(1ULL << 7)
-+#define NFS_CAP_REBOOT_LAYOUTRETURN	(1ULL << 8)
-+#define NFS_CAP_OFFLOAD_STATUS	(1ULL << 9)
-+#define NFS_CAP_ZERO_RANGE	(1ULL << 10)
-+#define NFS_CAP_DIR_DELEG	(1ULL << 11)
-+#define NFS_CAP_OPEN_XOR	(1ULL << 12)
-+#define NFS_CAP_DELEGTIME	(1ULL << 13)
-+#define NFS_CAP_POSIX_LOCK	(1ULL << 14)
-+#define NFS_CAP_UIDGID_NOMAP	(1ULL << 15)
-+#define NFS_CAP_STATEID_NFSV41	(1ULL << 16)
-+#define NFS_CAP_ATOMIC_OPEN_V1	(1ULL << 17)
-+#define NFS_CAP_SECURITY_LABEL	(1ULL << 18)
-+#define NFS_CAP_SEEK		(1ULL << 19)
-+#define NFS_CAP_ALLOCATE	(1ULL << 20)
-+#define NFS_CAP_DEALLOCATE	(1ULL << 21)
-+#define NFS_CAP_LAYOUTSTATS	(1ULL << 22)
-+#define NFS_CAP_CLONE		(1ULL << 23)
-+#define NFS_CAP_COPY		(1ULL << 24)
-+#define NFS_CAP_OFFLOAD_CANCEL	(1ULL << 25)
-+#define NFS_CAP_LAYOUTERROR	(1ULL << 26)
-+#define NFS_CAP_COPY_NOTIFY	(1ULL << 27)
-+#define NFS_CAP_XATTR		(1ULL << 28)
-+#define NFS_CAP_READ_PLUS	(1ULL << 29)
-+#define NFS_CAP_FS_LOCATIONS	(1ULL << 30)
-+#define NFS_CAP_MOVEABLE	(1ULL << 31)
-+#define NFS_CAP_P2PDMA		(1ULL << 32)
- #endif
+ struct nfs_inode;
+@@ -124,6 +125,7 @@ struct nfs_pageio_descriptor {
+ 
+ extern struct nfs_page *nfs_page_create_from_page(struct nfs_open_context *ctx,
+ 						  struct page *page,
++						  bool pinned,
+ 						  unsigned int pgbase,
+ 						  loff_t offset,
+ 						  unsigned int count);
 -- 
 2.53.0.1185.g05d4b7b318-goog
 
