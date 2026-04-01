@@ -1,48 +1,49 @@
-Return-Path: <netdev+bounces-274212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274213-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cAuaOhhkzWkHdAYAu9opvQ
-	(envelope-from <netdev+bounces-274212-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 20:29:44 +0200
+	id IG9WEC5kzWkHdAYAu9opvQ
+	(envelope-from <netdev+bounces-274213-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 20:30:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7970E37F473
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 20:29:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E144637F486
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 20:30:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 27BA6302A6AE
+	by sea.lore.kernel.org (Postfix) with ESMTP id C1882302E437
 	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 18:26:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC4935AC25;
-	Wed,  1 Apr 2026 18:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 743693803D9;
+	Wed,  1 Apr 2026 18:26:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XqDxpVoT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tvj59M2F"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3F22E62C6;
-	Wed,  1 Apr 2026 18:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BD037DEB8;
+	Wed,  1 Apr 2026 18:26:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775067992; cv=none; b=lCS/0m7V5zvQzBcs/FtcdAMt1wzqqcOgad08gJ5XC2Wq4BrRvFn3rnNCoAZMaPCLRUl+DD9C1la5A9PaoAHiH2At7yb4AIkXMYCrHbahRRqbL8OuEZl95OPD5uLcucYrdbuiHl6hs4Ka+VWDMTNTQ4ht78R/1Llx0INzZBf1Wtk=
+	t=1775067993; cv=none; b=iEwowb5nod/GzHB7Ro1NYqWDCaOe3PxYkHCOKx05UwOqXVd8jNb43TGxqQwPZej2o+XyYVckKMJ0mpwLRyusJ3aL9JeIdeqCgdr5O4DZ20Mxi6nVyKMD+qj3EPhBvQzP/qMYtVyw24VTZ5W5dlfQ9NSQebcufWQZMTQhN2YyX7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775067992; c=relaxed/simple;
-	bh=76gV41/mAXFYVbweMSrf1MZ3p4NcRgYn0MinbuKkCUU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IEC/4SYY4AV1a4lwvXcMob4rl5Rk3/kznRSudku+6xQnQ4SRCA09BxArXwvCYM+r9OdIh4uKYt+KFSsmP/Z6xmjZSOYyQmMwku+0ONtq1kGBeGZ7uYHfj2CpMAXeKERCm59Y1MsvnlJwHAeN5YPuu1ZpkqjpNuyMsQkjOwlOe6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XqDxpVoT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFF72C4CEF7;
-	Wed,  1 Apr 2026 18:26:31 +0000 (UTC)
+	s=arc-20240116; t=1775067993; c=relaxed/simple;
+	bh=7LbvwLMEtASpVz1VnSq0X0Qyml0y8mF7qPhSUHUQ4Vo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nvIhsGP4uLgW6RL+FmZCkjiQxIrbzSOO5Hmkd9qB4jKFFayyTpSIZk5MlX38LhwrXofBqj2/4wHJsWOXElAiigA3r4oWvZoADGa3BhDvA5mKfv568Vm8ubR7gyP7eWtQPmi4rWHWna2BpHhGFoSMOd/OZEz2cvalMv4nD4cTDL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tvj59M2F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CA12C19423;
+	Wed,  1 Apr 2026 18:26:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775067992;
-	bh=76gV41/mAXFYVbweMSrf1MZ3p4NcRgYn0MinbuKkCUU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=XqDxpVoTLSNU70kQKXnvDrJAYNM2xdIIdXnk4muRimx8W4s5ibWKS021oBG9cNTPe
-	 Hr08r23JsXhOi/6UVxXNp6KDQ56HYEN/M3+QlA1kDRhZjwqheFSB2Mqgz6zSk4OGxw
-	 QiytFo6w8U/O71tTHPCtNogPKbEnb8QFVwTkbTnY8unyOJZBj0VFFfvIWGxzd3H7YO
-	 3ROWEu0NlGuYdSucquyjc1bNUFG5cEPH5/hN0c5l0llhCNF/U4JmkOiUjFTYtOb3zI
-	 EzV4yf1PQ8x9vhJUkjYuHZJUv3glQ44zMLt5bm9lOaSIXTK4HEN+B3ciy+Ag8kgbP0
-	 +d73qiaw2+gBQ==
+	s=k20201202; t=1775067993;
+	bh=7LbvwLMEtASpVz1VnSq0X0Qyml0y8mF7qPhSUHUQ4Vo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=tvj59M2FXQEV0aRDbf1bXtljOumQAJh8vrwRt5oyPvKL1wu/yCT65xQHRS/x5jvdL
+	 90Q0VtdT9kCzEdu7FnCFQzfS04Tp8d6VIz1ueExzWuR5x1Sre8EJ2FFNuzgCI7WzAb
+	 8RGCjTo3sSjNt9YSPfupzR+N9qFfKd/S/ReneUbUg8LuwgdPOsO1haUl8V+gaM4q7+
+	 1rGnwbIO3roWNwfaZ9LW6wTn9KnJZ+I7ZbDJyUeZMP7lleyW8WVhqPKDDCL1zx9IEU
+	 OpAOl6YI2q8RGZ4KTGB1TtPLbaoX+q8j/2QAP+5u4SzbmzVdmRhWs2OnS2PhGf8vZy
+	 YuIWDnisL341g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -57,10 +58,12 @@ Cc: netdev@vger.kernel.org,
 	richardbgobert@gmail.com,
 	linux-kselftest@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 0/6] selftests: drv-net: gro: more test cases
-Date: Wed,  1 Apr 2026 11:26:19 -0700
-Message-ID: <20260401182625.372605-1-kuba@kernel.org>
+Subject: [PATCH net-next 1/6] selftests: drv-net: gro: add data burst test case
+Date: Wed,  1 Apr 2026 11:26:20 -0700
+Message-ID: <20260401182625.372605-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260401182625.372605-1-kuba@kernel.org>
+References: <20260401182625.372605-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,14 +78,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,nvidia.com,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-274212-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274213-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -95,26 +98,83 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7970E37F473
+X-Rspamd-Queue-Id: E144637F486
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a few more test cases for GRO.
+Add a test trying to induce a GRO context timeout followed
+by another sequence of packets for the same flow. The second
+burst arrives 100ms after the first one so any implementation
+(SW or HW) must time out waiting at that point. We expect both
+bursts to be aggregated successfully but separately.
 
-Jakub Kicinski (6):
-  selftests: drv-net: gro: add data burst test case
-  selftests: drv-net: gro: add 1 byte payload test
-  selftests: drv-net: gro: always wait for FIN in the capacity test
-  selftests: drv-net: gro: prepare for ip6ip6 support
-  selftests: drv-net: gro: test ip6ip6
-  selftests: drv-net: gro: add a test for bad IPv4 csum
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ tools/testing/selftests/net/lib/gro.c      | 21 +++++++++++++++++++++
+ tools/testing/selftests/drivers/net/gro.py |  2 +-
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 
- tools/testing/selftests/net/lib/gro.c      | 171 +++++++++++++++------
- tools/testing/selftests/drivers/net/gro.py |  24 ++-
- 2 files changed, 143 insertions(+), 52 deletions(-)
-
+diff --git a/tools/testing/selftests/net/lib/gro.c b/tools/testing/selftests/net/lib/gro.c
+index 3e611ae25f61..4d002af4a7aa 100644
+--- a/tools/testing/selftests/net/lib/gro.c
++++ b/tools/testing/selftests/net/lib/gro.c
+@@ -12,6 +12,7 @@
+  *   - data_same:    same size packets coalesce
+  *   - data_lrg_sml: large then small coalesces
+  *   - data_sml_lrg: small then large doesn't coalesce
++ *   - data_burst:   two bursts of two, separated by 100ms
+  *
+  * ack:
+  *  Pure ACK does not coalesce.
+@@ -1298,6 +1299,21 @@ static void gro_sender(void)
+ 	} else if (strcmp(testname, "data_sml_lrg") == 0) {
+ 		send_data_pkts(txfd, &daddr, PAYLOAD_LEN / 2, PAYLOAD_LEN);
+ 		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
++	} else if (strcmp(testname, "data_burst") == 0) {
++		static char buf[MAX_HDR_LEN + PAYLOAD_LEN];
++
++		create_packet(buf, 0, 0, PAYLOAD_LEN, 0);
++		write_packet(txfd, buf, total_hdr_len + PAYLOAD_LEN, &daddr);
++		create_packet(buf, PAYLOAD_LEN, 0, PAYLOAD_LEN, 0);
++		write_packet(txfd, buf, total_hdr_len + PAYLOAD_LEN, &daddr);
++
++		usleep(100 * 1000); /* 100ms */
++		create_packet(buf, PAYLOAD_LEN * 2, 0, PAYLOAD_LEN, 0);
++		write_packet(txfd, buf, total_hdr_len + PAYLOAD_LEN, &daddr);
++		create_packet(buf, PAYLOAD_LEN * 3, 0, PAYLOAD_LEN, 0);
++		write_packet(txfd, buf, total_hdr_len + PAYLOAD_LEN, &daddr);
++
++		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
+ 
+ 	/* ack test */
+ 	} else if (strcmp(testname, "ack") == 0) {
+@@ -1463,6 +1479,11 @@ static void gro_receiver(void)
+ 		correct_payload[0] = PAYLOAD_LEN / 2;
+ 		correct_payload[1] = PAYLOAD_LEN;
+ 		check_recv_pkts(rxfd, correct_payload, 2);
++	} else if (strcmp(testname, "data_burst") == 0) {
++		printf("two bursts of two data packets: ");
++		correct_payload[0] = PAYLOAD_LEN * 2;
++		correct_payload[1] = PAYLOAD_LEN * 2;
++		check_recv_pkts(rxfd, correct_payload, 2);
+ 
+ 	/* ack test */
+ 	} else if (strcmp(testname, "ack") == 0) {
+diff --git a/tools/testing/selftests/drivers/net/gro.py b/tools/testing/selftests/drivers/net/gro.py
+index 70709bf670c7..10da5d4bee9b 100755
+--- a/tools/testing/selftests/drivers/net/gro.py
++++ b/tools/testing/selftests/drivers/net/gro.py
+@@ -289,7 +289,7 @@ def _run_gro_bin(cfg, test_name, protocol=None, num_flows=None,
+ 
+     # Tests that work for all protocols
+     common_tests = [
+-        "data_same", "data_lrg_sml", "data_sml_lrg",
++        "data_same", "data_lrg_sml", "data_sml_lrg", "data_burst",
+         "ack",
+         "flags_psh", "flags_syn", "flags_rst", "flags_urg", "flags_cwr",
+         "tcp_csum", "tcp_seq", "tcp_ts", "tcp_opt",
 -- 
 2.53.0
 
