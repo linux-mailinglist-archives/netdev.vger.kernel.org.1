@@ -1,92 +1,70 @@
-Return-Path: <netdev+bounces-274208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274209-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WHOYALVXzWk5cAYAu9opvQ
-	(envelope-from <netdev+bounces-274208-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 19:36:53 +0200
+	id yPXtHHpczWkRcQYAu9opvQ
+	(envelope-from <netdev+bounces-274209-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 19:57:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E10437EB6F
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 19:36:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFEB937EE95
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 19:57:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B7AD53063AFE
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 17:33:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1C9F73144D3B
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 17:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18BAD47DD4F;
-	Wed,  1 Apr 2026 17:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63980477E57;
+	Wed,  1 Apr 2026 17:43:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jN3S4vo9"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="oDuLf1ZQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B77FC47A0C7
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 17:33:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0F71D7E41;
+	Wed,  1 Apr 2026 17:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775064816; cv=none; b=U2h0rjM5T+faO6I8HH+OugFfVqhHGCyHFSMrGpNTJw7V1Pyy/bMEQQdYhKiyVmx0RdRHX2/dZxJdboNoRFJZzMrocWvLpmSPY99Js2yGt9PFsz/SqmtOedPUYHpcmMYJgABIJK60PcfC8mpDFjGnNE/fRKYYXS6tsXCj7eQ7vJI=
+	t=1775065426; cv=none; b=bPT4FZvrtarqmbPGi0zVbZ6cOE+PKrxhX97Jf9/wtMLy7EQTDn8iFXkw0rWO0K2OdoqktndvKrKYkuLpibguNkuKVvTVovS0Ut+9tuNXYVCXDYS0qrTdd9Cw7XF0Y1AAnJbDfm3etD9gV9YMhIzs3knQ8pWF/0us9blAnq/YAF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775064816; c=relaxed/simple;
-	bh=GALUpL9FcmSNoTtHE6SpePyLmLDTRd/mTbP3SWjUuZY=;
+	s=arc-20240116; t=1775065426; c=relaxed/simple;
+	bh=jf/+fqzmXNiUBaLm7xRsAlJNstHg9Cqyf+RSomUr0h0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UBfXcZ0UdXVi5Aj+T+AYZc6t0+wHK1jZW4iZcQ1hZGl9f37iI2Na3/MV5P0CIHjGlh0s8MIiDsFFTUXtPUxBG+CVH9z+C081qdqJdq0feSMTaOSofKHgyoIcG14T0Iz9aip9mGogPBWtBS0iLaqZ+oJljsvi7nGGlMr+LFOeYMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jN3S4vo9; arc=none smtp.client-ip=74.125.224.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-6500040ef83so2254d50.2
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 10:33:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775064814; x=1775669614; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aLnfQJSw9REm8a9+311bKseMryW3/suAyHmSGj3g0SU=;
-        b=jN3S4vo9GyI2XB8Fn/2MYWFXOCDgzoUTeZjXWDVdiUqT5EiNDMAgL0TppgHK4Pb1GQ
-         w7gwMrL2qoaPoVHje+nFVixsYdAxvZXYuqrRGcUVcKkAE403IqYC0c0bwhvmx7Jb5c6H
-         YV4ORyoMHUwNIonuUnYgtwDyNvoifgjRn6yGopphXa/sb+UbXF3yPRM1Hd74sfhYuhy8
-         32v0wkH5kbXdzL5uN8r7uIKXRjcpWj6l5cGBxso0XI/jndUsqqlHz3KQMhhhd7XK+vQX
-         +WdaTHrO6T8RLsTVNNsnn1FxwrQQsmEJdmRKl8Bg/kg0k/JYbPkPr1x99xOhfBRI79jP
-         jNmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775064814; x=1775669614;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aLnfQJSw9REm8a9+311bKseMryW3/suAyHmSGj3g0SU=;
-        b=CiLbNK9i8EA0VexOrTGMVInRTamNDw2S6eotfQgySu6UJN/yQxu19oNqdseI2fC5tB
-         8nbedE3gXf/Ae/VuApoep8kXZLiayjdAAz3Qtj+B3zjl55NPpXcpBE/C0zoQTsqxP8Uj
-         2u1JJ+KOrqWHKvsadEsQ02wQ/WHFFFK411R5pUjWIL//02Z+NxH5ZXNGyBVEjA91RCr1
-         vf1uoiFso8/jt9/OJ7JOYOpavquprtW2r9aFpSvU7ZXMOYG8XAAk7QOv8wCAENrePlMi
-         DZQkoBFlHaWQuxcm1nQ8Km3sqBgkjiAHQqu/STa5lsKDgCgBaVd0IrRTf4pgBpH6DsRY
-         ezCw==
-X-Gm-Message-State: AOJu0Yznm6MjhCZAyIiinokyKu83TZkPK/YLJ4HtsvaxGNh+NCY+gG15
-	jvQCNxIOw9umIzz2Hy+utMpQdbgUDZAK0iLJM+3LUKsJB4/yXKw+okru
-X-Gm-Gg: ATEYQzyMKJUL74e7yTKWnyABdBeQTDDo7EJLHjWKbPe0Kc2m/bhpRlugZL9f2EM/o3M
-	jH52DY80mnYIo/teBr6//vX0k1fzn5aqpPZA2/piMpSbX1ETL5TToDqFAOW1sKdUTXlkgHUHtW9
-	uxCg0SY4w3kMGsV6qNlwal0wvLfjtLXyK/rWp/k4l8gCAVJic5ZXWtmh61MFtapwyBMwqd7rVLH
-	IsumMN8y4iJ8h2bjZMV2vilUtLUhCj48zSQLnjICIxMgyB3K2LSvnT08/ihb7/aJqONfVsDhuEj
-	4SBAH/Xv4nyislkTUox/gZOttqQwuci8vkR1BLkKJdHotA76On2cBWQUBkl0VC2FnSoVnDUV29C
-	0iffmQOsWST/DYbyMLbeKPXIj5u15M6RcUw/EwzUoDGIiWsuOFsj6tyQ+ZkNYURkSW31XQHeNfn
-	m2C8KyN2QfQgvAXjm0shYl1XYuvEe9PW4d
-X-Received: by 2002:a05:690e:1c20:b0:650:3aae:e2e6 with SMTP id 956f58d0204a3-6503aaee65fmr764874d50.20.1775064813767;
-        Wed, 01 Apr 2026 10:33:33 -0700 (PDT)
-Received: from syzkaller ([2a03:2880:25ff:5c::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6503a828f3csm214698d50.3.2026.04.01.10.33.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Apr 2026 10:33:32 -0700 (PDT)
-Date: Wed, 1 Apr 2026 10:33:27 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org,
-	Bobby Eshleman <bobbyeshleman@meta.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	virtualization@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jin Liu <jinl@redhat.com>
-Subject: Re: [PATCH net] vsock: initialize child_ns_mode_locked in
- vsock_net_init()
-Message-ID: <ac1W53WyCMYyOv4f@syzkaller>
-References: <20260401092153.28462-1-sgarzare@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=upvwUjEod+fieV078i0fRro9qspm0UxwGS9fAKVqifOrTwXYTlXFA1UMEXccWM/968XvifbPp01zq78PFW0FbSRgGbv4lkI5+q5gfO89NijF2ninezLhAHfw88mK+Xvc06Z2fIx5deUhpZAGSlDqUeOF++UEVqc+SkE7ksg/7o8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=oDuLf1ZQ; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=gDvOqA3KegP64c2/sDFkov6sRayaEdrePMAGlwCEHm8=; b=oDuLf1ZQtZDyyybFJbzqYety9Z
+	9/ya58lJZKD2xLRf9HfIz5Y6bRXU2tEmPrBaGgZBnq/CKfP6VjEXokgKwQqA16MPZvRXZC6V9D69x
+	vIOhE2PvvF2+FGKMOJA3Iv4oZdnenA6Op8CuyPj5vHiC6VdO+Uz1690aDjC1q3tIBdakZRztojkwP
+	70vMqbI498ud0HOvzJlzR4WOqO4iCasWfRr0QSP+NcKla81pYffBSqrY+UrwMfJ06LHHkYzYsJ1dA
+	7te7o3LaeaTdrH++RxN0c6pCVf/MXWHi/ggnDS1p8ca7kYK2i9oXCuC0hlUHuI/6iFuMzN9jVmy6X
+	eTrYm98w==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1w7zbI-0039mm-2z;
+	Wed, 01 Apr 2026 17:43:31 +0000
+Date: Wed, 1 Apr 2026 10:43:26 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, metze@samba.org, 
+	axboe@kernel.dk, Stanislav Fomichev <sdf@fomichev.me>, io-uring@vger.kernel.org, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Linus Torvalds <torvalds@linux-foundation.org>, linux-kernel@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH net-next v2 2/4] net: call getsockopt_iter if available
+Message-ID: <ac1Pzt4tpt73SkC6@gmail.com>
+References: <20260401-getsockopt-v2-0-611df6771aff@debian.org>
+ <20260401-getsockopt-v2-2-611df6771aff@debian.org>
+ <ac1I_CMr43XTpvHj@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,91 +73,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260401092153.28462-1-sgarzare@redhat.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+In-Reply-To: <ac1I_CMr43XTpvHj@mini-arch>
+X-Debian-User: leitao
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_MATCH_TO(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[debian.org:s=smtpauto.stravinsky];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274208-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[debian.org];
+	FROM_NEQ_ENVFROM(0.00)[leitao@debian.org,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-274209-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DKIM_TRACE(0.00)[debian.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	URIBL_MULTI_FAIL(0.00)[sea.lore.kernel.org:server fail];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,meta.com:email]
-X-Rspamd-Queue-Id: 6E10437EB6F
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CFEB937EE95
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 01, 2026 at 11:21:53AM +0200, Stefano Garzarella wrote:
-> From: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> The `child_ns_mode_locked` field lives in `struct net`, which persists
-> across vsock module reloads. When the module is unloaded and reloaded,
-> `vsock_net_init()` resets `mode` and `child_ns_mode` back to their
-> default values, but does not reset `child_ns_mode_locked`.
-> 
-> The stale lock from the previous module load causes subsequent writes
-> to `child_ns_mode` to silently fail: `vsock_net_set_child_mode()` sees
-> the old lock, skips updating the actual value, and returns success
-> when the requested mode matches the stale lock. The sysctl handler
-> reports no error, but `child_ns_mode` remains unchanged.
-> 
-> Steps to reproduce:
->     $ modprobe vsock
->     $ echo local > /proc/sys/net/vsock/child_ns_mode
->     $ cat /proc/sys/net/vsock/child_ns_mode
->     local
->     $ modprobe -r vsock
->     $ modprobe vsock
->     $ echo local > /proc/sys/net/vsock/child_ns_mode
->     $ cat /proc/sys/net/vsock/child_ns_mode
->     global    <--- expected "local"
-> 
-> Fix this by initializing `child_ns_mode_locked` to 0 (unlocked) in
-> `vsock_net_init()`, so the write-once mechanism works correctly after
-> module reload.
-> 
-> Fixes: 102eab95f025 ("vsock: lock down child_ns_mode as write-once")
-> Cc: bobbyeshleman@meta.com
-> Reported-by: Jin Liu <jinl@redhat.com>
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  net/vmw_vsock/af_vsock.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> index 2f7d94d682cb..d912ed2f012a 100644
-> --- a/net/vmw_vsock/af_vsock.c
-> +++ b/net/vmw_vsock/af_vsock.c
-> @@ -2928,6 +2928,7 @@ static void vsock_net_init(struct net *net)
->  		net->vsock.mode = vsock_net_child_mode(current->nsproxy->net_ns);
->  
->  	net->vsock.child_ns_mode = net->vsock.mode;
-> +	net->vsock.child_ns_mode_locked = 0;
->  }
->  
->  static __net_init int vsock_sysctl_init_net(struct net *net)
-> -- 
-> 2.53.0
-> 
+On Wed, Apr 01, 2026 at 09:34:04AM -0700, Stanislav Fomichev wrote:
+> > +static int do_sock_getsockopt_iter(struct socket *sock,
+> > +				   const struct proto_ops *ops, int level,
+> > +				   int optname, sockptr_t optval,
+> > +				   sockptr_t optlen)
+>
+> If we want to eventually remove sockptr_t, why not make this new handler
+> work with iov_iters from the beginning? The callers can have some new temporary
+> sockptr_to_iter() or something?
 
-Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
+The goal is to eliminate __user memory from the callbacks entirely, which
+would make sockptr_t unnecessary. This series removes the callbacks that
+originally necessitated sockptr_t's existence.
+
+Therefore, working from the callbacks back to userspace seem to be a more
+logical approach than replacing the middle layers of the implementation,
+and then touching the callbacks.
+
+So, yes, the sockptr_t() is used here as temporary glue to be able to
+get rid of the elephant in the room.
+
+> > +	/* iter is initialized as ITER_DEST. Callbacks that need to read
+> > +	 * from optval (e.g. PACKET_HDRLEN) must flip data_source to
+> > +	 * ITER_SOURCE, then restore ITER_DEST before writing back.
+> > +	 */
+>
+> Have you considered creating two iters? opt.iter_in and opt.iter_out.
+> That way you don't have to flip the source back and forth in the
+> handlers.
+
+That's a good suggestion I hadn't considered. My initial thought was to
+create a helper like sockopt_read_val() to handle the flip-read-flip
+dance.
+
+Would opt.iter_in and opt.iter_out be clearer than the helper approach?
+
+Thanks for the review,
+--breno
 
