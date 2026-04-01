@@ -1,195 +1,194 @@
-Return-Path: <netdev+bounces-274136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274137-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0LHjDa8yzWn0agYAu9opvQ
-	(envelope-from <netdev+bounces-274136-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 16:58:55 +0200
+	id UBupJzIxzWn0agYAu9opvQ
+	(envelope-from <netdev+bounces-274137-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 16:52:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D69C437C94B
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 16:58:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4135B37C75F
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 16:52:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B1AEA311CC09
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 14:49:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2068C300D763
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 14:50:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B30646AEF5;
-	Wed,  1 Apr 2026 14:47:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9CF317144;
+	Wed,  1 Apr 2026 14:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oTU24f2b"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Vu/wm++2";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LCg+kR6x";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="saGQBAIq";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="fW+H5sRe"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98283449EA5
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 14:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29000227B94
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 14:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775054866; cv=none; b=oJIPn1U/aSHCuuY4963Q0Gnvw/Nto5U/01yMJZtf3LH2UvI/ThZa68WVEet2jUf4uahtQa1I/DGyOrveCBs1vYiWDpbU2iD6YEZozA5PTbN++J8Hm/FWeYEQTjn5bERFzfWM/473zxw1ig80rmpvbDdutUIEEy59Uv0rQynPw0Q=
+	t=1775055047; cv=none; b=cmK1HJwOhG4wUgCpPpkNLl0UKjBnAVSgZppthC5YQhs3PbPmGYsxHIDom4PU65HpNVePDC2CWQYJoBW/JnB4TjO8fDEIKtQYS92SpCaRpkfrh/KFsvnBneqPM6kTSWzkYLDjMK4w8ZEn7RuoLKr2fG16VfJUhObnuJdC7vJDCFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775054866; c=relaxed/simple;
-	bh=IcfTPYv0xO0mqFn38HgKw9SA8wev2KEgBkVuLys6+KY=;
+	s=arc-20240116; t=1775055047; c=relaxed/simple;
+	bh=NR79chiDTTUvbAAnB8eHo7GKrLd/SQFM0qUTs6t4WBA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jAN3Bfvc5B63dOB7j4o9QrZ96QvGKkW4cZbt8twCNQeEmd7aNhZpJrGZ2bt4Djwj3mSmxE63jLGP2Lks+jzbnbjgYkU+mfJM3JSTaq/BHKnD6tWIIYZ0/lfkskObXpP3AlUzPCW/XDz7OA0Sa9hWUKuY+P0Nnm8HeXNNuG7ddlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oTU24f2b; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ccb93d19-19a9-4dd9-8ac7-e0d41dbb884d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775054852;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=RiXLdTB306JXQYxNscZgP61RyQhaFTuS/g1052hU+vINxCg9ZVS9gPWD77Kksmce87tZD+T5gje+RyQc8N8LktLgvmFmlU/QQB415UDl8q3p7jZ+5t9+AyEY3L/prNa/xQya7bmhcqVQSPIome3AqD8ry0zyswOpY7tALQ4c+n8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Vu/wm++2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LCg+kR6x; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=saGQBAIq; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=fW+H5sRe; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id D55605BD8A;
+	Wed,  1 Apr 2026 14:50:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1775055042; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UsSHmJeqtLdwZRWpgLpBgw3zlzwJ3e/H16bClqxSpSc=;
-	b=oTU24f2bI9vYawXmQTRGgR4sqLZHqJq8d3UD46iw1BSBjIaRaH9+wbIOA9R/D8TlvEqSs/
-	HJ11YmHD/kwPvuYOxnI40Gf0CTdh8xJnO+nz9RE7fRO9kXRDxBBpaQPZoBHXKDth7mOzBA
-	P0ETpp2Lloayd45l1rqJuTLHNeAfZsU=
-Date: Wed, 1 Apr 2026 15:47:21 +0100
+	bh=vUjZYblrcVCpcCkO/Mc57Hxu3KBAf8QIzvbIFndnm9k=;
+	b=Vu/wm++2LqrNSvgj2m+yXMhKF9y9zW+aV2EZHm5tdm13bsYLc0VXcelPHmgNjFvkNAIlnK
+	Im9jgPjlINIoQ9Cz9lQ0SUEKngTyXiGekooPxDY3GBGa798arQBW1gz60lpMr6U7b3x51j
+	0oVktXI6bRmsj/vbYRqfCrG+yIson1A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1775055042;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vUjZYblrcVCpcCkO/Mc57Hxu3KBAf8QIzvbIFndnm9k=;
+	b=LCg+kR6xDJJ1vkWs6shKIME2kwzuQ0EUShvMnLWSXWifhfcWJTVD1W/g4xboMMWDDTOaaj
+	Mb9tmD0dJDV403Bg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=saGQBAIq;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=fW+H5sRe
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1775055041; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vUjZYblrcVCpcCkO/Mc57Hxu3KBAf8QIzvbIFndnm9k=;
+	b=saGQBAIqu/Y219uzqKvoGDn9pXOOU0JsiHr1zGKUyV4RbNZVAXfRZ36wKO71biTL48DC5g
+	HgC3ESK2BuZYbUXQBP8RspkhaxOgk4IUrrQSdE48XrwrdlyMcK26wGgHVHfNirSxRWCoZd
+	5LhdLBqw8vbWx1Fqs70nhDu3gSo+65I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1775055041;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vUjZYblrcVCpcCkO/Mc57Hxu3KBAf8QIzvbIFndnm9k=;
+	b=fW+H5sReHMsLNQlK2y3rT3QZGkvKbw1Mb+iwTO3Pjlkn8SqdCO+FKIbHG+oVORnz8jhV5E
+	xttJT3L6Fj5grTBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3F0F74A0B0;
+	Wed,  1 Apr 2026 14:50:41 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id VHSADMEwzWnSGwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Wed, 01 Apr 2026 14:50:41 +0000
+Message-ID: <17d4d7e2-3b55-4eac-926c-e1355fbc1cd3@suse.de>
+Date: Wed, 1 Apr 2026 16:50:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3 2/3] dpll: add frequency monitoring callback
- ops
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
-Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- "David S. Miller" <davem@davemloft.net>,
- Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
- Jonathan Corbet <corbet@lwn.net>, Michal Schmidt <mschmidt@redhat.com>,
- Paolo Abeni <pabeni@redhat.com>, Petr Oros <poros@redhat.com>,
- Prathosh Satish <Prathosh.Satish@microchip.com>,
- Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260401091237.1071995-1-ivecera@redhat.com>
- <20260401091237.1071995-3-ivecera@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2 net v2] ipv4: nexthop: allocate skb dynamically in
+ rtm_get_nexthop()
+To: netdev@vger.kernel.org
+Cc: idosch@nvidia.com, petrm@nvidia.com, horms@kernel.org, pabeni@redhat.com,
+ kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ dsahern@kernel.org, kees@kernel.org, Yiming Qian <yimingqian591@gmail.com>
+References: <20260401081741.4273-1-fmancera@suse.de>
+ <20260401081741.4273-2-fmancera@suse.de>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20260401091237.1071995-3-ivecera@redhat.com>
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260401081741.4273-2-fmancera@suse.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274136-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,lwn.net,redhat.com,microchip.com,linuxfoundation.org,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274137-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,redhat.com,google.com,davemloft.net,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D69C437C94B
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.980];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 4135B37C75F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 01/04/2026 10:12, Ivan Vecera wrote:
-> Add new callback operations for a dpll device:
-> - freq_monitor_get(..) - to obtain current state of frequency monitor
->    feature from dpll device,
-> - freq_monitor_set(..) - to allow feature configuration.
+On 4/1/26 10:17 AM, Fernando Fernandez Mancera wrote:
+> When querying a nexthop object via RTM_GETNEXTHOP, the kernel currently
+> allocates a fixed-size skb using NLMSG_GOODSIZE. While sufficient for
+> single nexthops and small Equal-Cost Multi-Path groups, this fixed
+> allocation fails for large nexthop groups like 512 nexthops.
 > 
-> Add new callback operation for a dpll pin:
-> - measured_freq_get(..) - to obtain the measured frequency in mHz.
+> This results in the following warning splat:
 > 
-> Obtain the feature state value using the get callback and provide it to
-> the user if the device driver implements callbacks. The measured_freq_get
-> pin callback is only invoked when the frequency monitor is enabled.
-> The freq_monitor_get device callback is required when measured_freq_get
-> is provided by the driver.
+>   WARNING: net/ipv4/nexthop.c:3395 at rtm_get_nexthop+0x176/0x1c0, CPU#20: rep/4608
+>   [...]
+>   RIP: 0010:rtm_get_nexthop (net/ipv4/nexthop.c:3395)
+>   [...]
+>   Call Trace:
+>    <TASK>
+>    rtnetlink_rcv_msg (net/core/rtnetlink.c:6989)
+>    netlink_rcv_skb (net/netlink/af_netlink.c:2550)
+>    netlink_unicast (net/netlink/af_netlink.c:1319 net/netlink/af_netlink.c:1344)
+>    netlink_sendmsg (net/netlink/af_netlink.c:1894)
+>    ____sys_sendmsg (net/socket.c:721 net/socket.c:736 net/socket.c:2585)
+>    ___sys_sendmsg (net/socket.c:2641)
+>    __sys_sendmsg (net/socket.c:2671)
+>    do_syscall_64 (arch/x86/entry/syscall_64.c:63 arch/x86/entry/syscall_64.c:94)
+>    entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+>    </TASK>
 > 
-> Execute the set callback upon user requests.
+> Fix this by allocating the size dynamically using nh_nlmsg_size() and
+> using nlmsg_new(), this is consistent with nexthop_notify() behavior. In
+> addition, adjust nh_nlmsg_size_grp() so it calculates the size needed
+> based on flags passed.
 > 
-> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> ---
-> Changes v2 -> v3:
-> - Made freq_monitor_get required when measured_freq_get is present (Jakub)
+> This cannot be reproduced via iproute2 as the group size is currently
+> limited and the command fails as follows:
 > 
-> Changes v1 -> v2:
-> - Renamed actual-frequency to measured-frequency (Vadim)
-> ---
->   drivers/dpll/dpll_netlink.c | 92 +++++++++++++++++++++++++++++++++++++
->   include/linux/dpll.h        | 10 ++++
->   2 files changed, 102 insertions(+)
+> addattr_l ERROR: message exceeded bound of 1048
 > 
-> diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
-> index 83cbd64abf5a4..576d0cd074bd4 100644
-> --- a/drivers/dpll/dpll_netlink.c
-> +++ b/drivers/dpll/dpll_netlink.c
-> @@ -175,6 +175,26 @@ dpll_msg_add_phase_offset_monitor(struct sk_buff *msg, struct dpll_device *dpll,
->   	return 0;
->   }
->   
-> +static int
-> +dpll_msg_add_freq_monitor(struct sk_buff *msg, struct dpll_device *dpll,
-> +			  struct netlink_ext_ack *extack)
-> +{
-> +	const struct dpll_device_ops *ops = dpll_device_ops(dpll);
-> +	enum dpll_feature_state state;
-> +	int ret;
-> +
-> +	if (ops->freq_monitor_set && ops->freq_monitor_get) {
-> +		ret = ops->freq_monitor_get(dpll, dpll_priv(dpll),
-> +					    &state, extack);
-> +		if (ret)
-> +			return ret;
-> +		if (nla_put_u32(msg, DPLL_A_FREQUENCY_MONITOR, state))
-> +			return -EMSGSIZE;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->   static int
->   dpll_msg_add_phase_offset_avg_factor(struct sk_buff *msg,
->   				     struct dpll_device *dpll,
-> @@ -400,6 +420,40 @@ static int dpll_msg_add_ffo(struct sk_buff *msg, struct dpll_pin *pin,
->   			    ffo);
->   }
->   
-> +static int dpll_msg_add_measured_freq(struct sk_buff *msg, struct dpll_pin *pin,
-> +				      struct dpll_pin_ref *ref,
-> +				      struct netlink_ext_ack *extack)
-> +{
-> +	const struct dpll_device_ops *dev_ops = dpll_device_ops(ref->dpll);
-> +	const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
-> +	struct dpll_device *dpll = ref->dpll;
-> +	enum dpll_feature_state state;
-> +	u64 measured_freq;
-> +	int ret;
-> +
-> +	if (!ops->measured_freq_get)
-> +		return 0;
-> +	if (WARN_ON(!dev_ops->freq_monitor_get))
-> +		return -EINVAL;
+> Fixes: 430a049190de ("nexthop: Add support for nexthop groups")
+> Reported-by: Yiming Qian <yimingqian591@gmail.com>
+> Closes: https://lore.kernel.org/netdev/CAL_bE8Li2h4KO+AQFXW4S6Yb_u5X4oSKnkywW+LPFjuErhqELA@mail.gmail.com/
+> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 
-I think pin registration function has to be adjusted to not allow
-measured_freq_get() callback if device doesn't have freq_monitor_get()
-callback (or both freq_monitor_{s,g}et). Then this defensive part can
-be completely removed.
+As Ido requested some changes, update the status in patchwork.
 
-> +	ret = dev_ops->freq_monitor_get(dpll, dpll_priv(dpll),
+-- 
+pw-bot: cr
 
