@@ -1,193 +1,203 @@
-Return-Path: <netdev+bounces-273975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273976-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +EtnIhzSzGlFWwYAu9opvQ
-	(envelope-from <netdev+bounces-273975-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 10:06:52 +0200
+	id 8OAxLxPUzGlFWwYAu9opvQ
+	(envelope-from <netdev+bounces-273976-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 10:15:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A4913767A2
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 10:06:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CA7A376900
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 10:15:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E69AF3054B11
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 08:00:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AB17B301D68D
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 08:07:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D6BF392824;
-	Wed,  1 Apr 2026 08:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F1703A4F27;
+	Wed,  1 Apr 2026 08:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HnlDtbNi"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="VB9zQOMS";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="OX6ZYRT6";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="UumfGlpe";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="9DVUgKCQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5CDA287268
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 08:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F1A2D9EF4
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 08:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775030448; cv=none; b=HzVpHHfPHcg40yvwxdKIAz7jyfE/dSerobtSfAdOlVCBnrMyFgJHWBladiYw2+4S7WNYsBVh/XqjsPiCr+eyy95dSIkeV87PyE/0tda6v6KfIWhWx3GXI1lgkuRHR9IZzhNU10l+mXAIQjty41XL+KU16LeeFoXQwpTzNcKvV4Q=
+	t=1775030842; cv=none; b=vCL1ZmAaKSuMBytHnYhyEVFh5/GVbK4pzDnk4mKYrMx2fL+QFAam4parlSOhm2DART3KM8XNhwwc226ZOWPoazagd40CX81XwpszngiewuDVs6NQ2aPorK8hy+0KCGCYNLrRSoWNo/LK4NzA21zEwx3N4lZ07L72SMBTrExU3/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775030448; c=relaxed/simple;
-	bh=IPr2oYPn/26eQSmWxcSleR1D2ek6vWmOS678MnORj2o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GgUx+m8ghMctwF716N0aUdju0lQSwvZ7y0teMS0/31rhzt4winIMBud9ispcHMbgXyGUd45tSVVXlGbxCuHCkTIbyMZSjQH8mngjM1XM62aIiSGvC0+ub417m8oW2hc5FVHfJZ49fYa3xp7B2coWPYIhxlHAgod261Yz1g/mJuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HnlDtbNi; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-c74244dc0b3so3942754a12.2
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 01:00:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775030446; x=1775635246; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2y8dUPGFi+UBO55SBUip5Hfz6jHTFtt4ylYjmLjQEmw=;
-        b=HnlDtbNiLMneGLpWqFnifSQaPv14PcjRdIP6OuLaTJvhit+92zAPvm5zwqbtO26tub
-         zMEWYmhjaJX0lxSMph241x1sJVwJTNgpKrhlwbs4w4kD0J1+JggpTaknNKWswBOpyuoE
-         58Q4acqJXuJaio+Q4xObL2vVC7zzD8d55YsOLGA5+HtnKPdbJevveFsKWtqjgLvzN8ZK
-         7Dn8wtHseyeJymCBbbMvAADrvGifMvI8Vj/1wsiR1CA1p3YPr/ZkihAefaD7g3LnjExa
-         KwcuJGZQY/Bl4EXCrAzdg4oNaWbhjx1ruCJ/wEsoEyLhbIkKgkGFf/LVEAsUlWizCkhe
-         ZBWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775030446; x=1775635246;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2y8dUPGFi+UBO55SBUip5Hfz6jHTFtt4ylYjmLjQEmw=;
-        b=PbFUstQEEBqKb++IGOxP4GaC0K1dfaWvUNuD9tneTI7gaYgUH265LUspy1y85EHG5S
-         prpFvUy/e4WWfz2u7V5jbhEC6X1ICFTNfGmAMshZ4jEu24LPBUpZ3DuTHsV93pLCF4Vn
-         VHnw6fSQZbh6eqQ1Srk28rr3vPm5YosYfeWdR+j6AnN4n2nH3OWfi8uNB9YjekIwBMmu
-         a+z32rKBFyuH14Ic+5Vo2nqpADWXnn7hJvhJBHHs5wDxEVSGP3q8dwEXk39izNxP5W/k
-         Qlw5pACmgJH7XGFgsj9lUhMVc6THuW52rQl3bP7ZDCaK/Jl2DyjxeSQ9cIkaSVZe/rra
-         Pfdg==
-X-Forwarded-Encrypted: i=1; AJvYcCW/Vpk+F5BOQWZFfJi9S3OpI9oh4HCh3mQL6Ff1HtdVPuJi9BKjDB02j4xF/8w9hxfka5z99Oo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxw5EbBqbaULTw1cTvwNkHMxzA50JlKnUmzOWwb6MhhPYqVEOPN
-	ArbLYfaYORI+onD+eBrHV6HQcCHdFEJnhl0bPit44dPgvH8ER8dW6pLb
-X-Gm-Gg: ATEYQzxeNZ69e+i2+4V9ENSj5G+OtrnoeXEW1vZMtTfpHZKwlRP9qYzKonA8zrUyQ5P
-	4w+xIkbYLn5sZz7GxdIWRRA9uCBCw6xhsKSOp0mhurnnVZfjqAUL/zV29Q8IcwYn5/S7qBYP1vS
-	SL3GXlyFYrm3Wt/H92gdPFrq8EUKUeWAD7+8EswQvS3AoGfkAnpK2hV0yXAnXz5vxIyeIUi9CuW
-	1qdloS7dk3CFwWPdyFsXplHpqt0pSs3MDgRVV4ZF/UE9ATv0zNr3csCyYvRnOb/fidvh2zWWuzl
-	n7aJDr6NbO27vl9fu1xAbtz4QRTu8LmEe1UaeqoYebJxnvY9JTOEABoMzBXn6EMgN+ST1iX849t
-	mHkpeo5fMJMHzVNpNYDIycDm7m3ZcOwOOhYynDwDiK6X7+1BK9tfwLDasrKNOBnrQmH8xZiw0L2
-	Aa8VdSiryHkt4FSv8+U8kvR+diuxd5F8OYHf88Qc+05qgBIks6Ax7MHZw+l/QmJck/a8A1MFr6Q
-	6BaJ04F2A5y
-X-Received: by 2002:a05:6a20:2592:b0:394:5513:ce5 with SMTP id adf61e73a8af0-39ef774ffadmr2721870637.51.1775030446152;
-        Wed, 01 Apr 2026 01:00:46 -0700 (PDT)
-Received: from SLSGDTSWING002.tail0ac356.ts.net ([129.126.109.177])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82ca846e08dsm12865913b3a.24.2026.04.01.01.00.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Apr 2026 01:00:45 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: Simon Horman <horms@verge.net.au>,
-	Julian Anastasov <ja@ssi.bg>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Phil Sutter <phil@nwl.cc>,
-	netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	Xiang Mei <xmei5@asu.edu>,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH net v2] ipvs: fix NULL deref in ip_vs_add_service error path
-Date: Wed,  1 Apr 2026 15:58:01 +0800
-Message-ID: <20260401075800.3344266-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1775030842; c=relaxed/simple;
+	bh=CCx+GFAORQjDm/2O1NV4OJKRWSjlc+6Y6ZiWC9pYoiA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=dtrRg/k3CVJyeBOjzxXgSc+EkICxRv/HjTwdkEoc6Z7red+3S1ty2VcxnVy3I2sQ3dEQAuVnozFHmGOSl/ef1SaQIockJdDyxxbu0Iye8uJYQ1NDQ+BsRAnP3k1IzZfITRmtfbOVp0JbgiNUH6yissMuKPH2w4lAtu1BMIxP/I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VB9zQOMS; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=OX6ZYRT6; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=UumfGlpe; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=9DVUgKCQ; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id BC7414D1E6;
+	Wed,  1 Apr 2026 08:07:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1775030839; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XxElQ1mKL+40DbJrKWdPV5blyGGdtJ7Ol4ZcG0VUW8g=;
+	b=VB9zQOMSu+/79FqZGb4QKiNjM48c9y9y2hT63fknB2qki9ANwYF33Ti5dw4wPP1DTJ0o9f
+	ju2feKQc5NBgsEEgDOL59uxeQqUkGldHg9qX/1fVAAaRNekh77ZQxtKu5rBiDaycxF6NLi
+	w5VifXEgy4UYnv0vFRFFoc2KiLC7lXQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1775030839;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XxElQ1mKL+40DbJrKWdPV5blyGGdtJ7Ol4ZcG0VUW8g=;
+	b=OX6ZYRT6B/jOrZXGBQwTNiiKCedPi2A6TEjRf1vhqrUO3ghftCTnNjW3pIaNkoQtU5mY+k
+	0tbgZMEIIzHv7hDQ==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=UumfGlpe;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=9DVUgKCQ
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1775030838; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XxElQ1mKL+40DbJrKWdPV5blyGGdtJ7Ol4ZcG0VUW8g=;
+	b=UumfGlpeBZ9uFiThr/HUVcFG48FqBqF61QCK9ba479A6Xtab5CK5lPZm28acp+Tx2z5DHc
+	omNSfmEnwHIVlLbCuNJ3knNW80VzUXAadW797/yAgXt28dxJxjZvRQtZ/zb4qi7wMwGM6t
+	yO7ALJkKMcU5UjO7pSLGlS9aEDRl9NQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1775030838;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XxElQ1mKL+40DbJrKWdPV5blyGGdtJ7Ol4ZcG0VUW8g=;
+	b=9DVUgKCQYkafabgN/89Y8m75p2RUkalDiYDEH4T5pK50lCZnkIyayKSDkWuIPcc3/XRTSa
+	DyM1FlrzsCWGUXDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0D6B24A0B0;
+	Wed,  1 Apr 2026 08:07:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Ig1cADTSzGmjbwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Wed, 01 Apr 2026 08:07:16 +0000
+Message-ID: <42caa438-3854-449c-b0ee-4f40772e5c1b@suse.de>
+Date: Wed, 1 Apr 2026 10:07:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] Deprecate Legacy IP
+To: David Woodhouse <dwmw2@infradead.org>, Saeed Mahameed
+ <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Ido Schimmel <idosch@nvidia.com>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>,
+ Phil Sutter <phil@nwl.cc>, Guillaume Nault <gnault@redhat.com>,
+ David Woodhouse <dwmw@amazon.co.uk>, Kees Cook <kees@kernel.org>,
+ Alexei Lazar <alazar@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+ Paul Moore <paul@paul-moore.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ oss-drivers@corigine.com, bridge@lists.linux.dev, bpf@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, torvalds@linux-foundation.org,
+ jon.maddog.hall@gmail.com
+References: <20260401074509.1897527-1-dwmw2@infradead.org>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260401074509.1897527-1-dwmw2@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[nwl.cc,vger.kernel.org,netfilter.org,asu.edu,gmail.com];
-	TAGGED_FROM(0.00)[bounces-273975-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[infradead.org,nvidia.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,blackwall.org,linux.dev,iogearbox.net,gmail.com,fomichev.me,sipsolutions.net,netfilter.org,strlen.de,nwl.cc,amazon.co.uk,paul-moore.com,vger.kernel.org,corigine.com,lists.linux.dev,linux-foundation.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273976-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[suse.de:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bestswngs@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_GT_50(0.00)[50];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2A4913767A2
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:dkim,suse.de:email,suse.de:mid]
+X-Rspamd-Queue-Id: 1CA7A376900
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When ip_vs_bind_scheduler() succeeds in ip_vs_add_service(), the local
-variable sched is set to NULL.  If ip_vs_start_estimator() subsequently
-fails, the out_err cleanup calls ip_vs_unbind_scheduler(svc, sched)
-with sched == NULL.  ip_vs_unbind_scheduler() passes the cur_sched NULL
-check (because svc->scheduler was set by the successful bind) but then
-dereferences the NULL sched parameter at sched->done_service, causing a
-kernel panic at offset 0x30 from NULL.
+On 4/1/26 9:44 AM, David Woodhouse wrote:
+> RFC1883, the IPv6 standard, was published in the final decade of the 1900s.
+> That's closer in time to the Apollo 11 moon landing than it was to today.
+> 
+> Even our esteemed Maddog has worked with computers for longer in the IPv6
+> era, than he ever did before it.
+> 
+> Yet Linux still can't even be *built* with only IPv6 support and without
+> support for Legacy IP. This long overdue patch series fixes that, and
+> immediately marks Legacy IP for deprecation.
+> 
+> It also cleans up a few tautological "INET && IPV6" and "INET || IPV6"
+> checks, since IPV6 (and now LEGACY_IP) cannot be selected without the
+> overall CONFIG_INET option.
+> 
+> For now, we only add a warning when a process *listens* on a Legacy IP
+> socket (since you can listen on IPv6 and still accept connections which
+> have come through a timewarp from the 20th century. Adding warnings for
+> making outbound connections or *accepting* on Legacy IP can come later.
+> 
+>    'I would be happy if "Legacy IP" ceased to be the "industry standard"
+>     and IPv6 be the default, even if I had to beat IPv6 into the head of
+>     every single network administrator's head with a shovel.' said Jon
+>    'maddog' Hall, ancient supporter of Free and Open Source Software.
+> 
 
- Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] PREEMPT SMP KASAN NOPTI
- KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
- RIP: 0010:ip_vs_unbind_scheduler (net/netfilter/ipvs/ip_vs_sched.c:69)
- Call Trace:
-  <TASK>
-  ip_vs_add_service.isra.0 (net/netfilter/ipvs/ip_vs_ctl.c:1500)
-  do_ip_vs_set_ctl (net/netfilter/ipvs/ip_vs_ctl.c:2809)
-  nf_setsockopt (net/netfilter/nf_sockopt.c:102)
-  ip_setsockopt (net/ipv4/ip_sockglue.c:1427)
-  raw_setsockopt (net/ipv4/raw.c:850)
-  do_sock_setsockopt (net/socket.c:2322)
-  __sys_setsockopt (net/socket.c:2339)
-  __x64_sys_setsockopt (net/socket.c:2350)
-  do_syscall_64 (arch/x86/entry/syscall_64.c:94)
-  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-  </TASK>
+Dammit, you've beaten me to it! This was my next step for 7.2.
 
-Fix by simply not clearing the local sched variable after a successful
-bind.  ip_vs_unbind_scheduler() already detects whether a scheduler is
-installed via svc->scheduler, and keeping sched non-NULL ensures the
-error path passes the correct pointer to both ip_vs_unbind_scheduler()
-and ip_vs_scheduler_put().
-
-Fixes: 05f00505a89a ("ipvs: fix crash if scheduler is changed")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
-v2: Remove "sched = NULL" instead of recovering it in out_err (Julian)
-
- net/netfilter/ipvs/ip_vs_ctl.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-index 35642de2a0fee..2aaf50f52c8e8 100644
---- a/net/netfilter/ipvs/ip_vs_ctl.c
-+++ b/net/netfilter/ipvs/ip_vs_ctl.c
-@@ -1452,7 +1452,6 @@ ip_vs_add_service(struct netns_ipvs *ipvs, struct ip_vs_service_user_kern *u,
- 		ret = ip_vs_bind_scheduler(svc, sched);
- 		if (ret)
- 			goto out_err;
--		sched = NULL;
- 	}
- 
- 	ret = ip_vs_start_estimator(ipvs, &svc->stats);
--- 
-2.43.0
-
+Fully-endorsed-by: Fernando Fernandez Mancera <fmancera@suse.de>
 
