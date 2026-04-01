@@ -1,194 +1,161 @@
-Return-Path: <netdev+bounces-273797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273798-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eGGmKixpzGlXSwYAu9opvQ
-	(envelope-from <netdev+bounces-273797-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 02:39:08 +0200
+	id 8Eq1MrtpzGlXSwYAu9opvQ
+	(envelope-from <netdev+bounces-273798-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 02:41:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C2013732D1
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 02:39:08 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45EC037338E
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 02:41:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 054273034213
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 00:39:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 381FC3009576
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 00:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3369F1E7C03;
-	Wed,  1 Apr 2026 00:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 300881B4223;
+	Wed,  1 Apr 2026 00:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="MowRYZGV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZZLVdXlZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f99.google.com (mail-yx1-f99.google.com [74.125.224.99])
+Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57D01DED63
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 00:38:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38B01A680C
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 00:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775003933; cv=none; b=i7rX3wMgGxrrrLCu11XOfnTv3H6aAbQtT9zitg8g4H9jkaCFYuonXiT+OyB9h9cdgJViSnfgcNfxw3TeaYQbxpbQfUsC3NN3kctrr82+UkT3dks1owlp9gy3vk0BCFwdj6A6cZerfdkctq3kyqMtzvbtnnFCVQvL7wYYPjd08qo=
+	t=1775004088; cv=none; b=VhMUyeA0xcys56ziER5ZRuE9Gsf1HuoDfGqI9WtcaxrkP2jqxhnZ9Z5XqjFw6gXI/r8lULKOjwbgiVWOv0hp9EAlOQPl6rodqzSCL44BXCSi8mIOmY8CkrylUW6M+zxNHMHuODjODZtiDyt+pchqhqsm7TIv+pXXtA+u9NL+05o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775003933; c=relaxed/simple;
-	bh=4pJnECj4tZ/2xt2dNt+IO5ACybP9g1nzyKC5qg7VLAY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SbeZhq5cLjoXkuVMgNK4xpNiCfAf5ojgETZgRBA2FNyNuxRQLDbMP8MGuQcZgjabPkMP47ItmAaK9FtlCX3HI4PVkqTzo+uT1yWw6FRUh2zFArDfxO5FaMR7lUJDbpsW0TywJt/IURwMWQRhfb7awTvYHU47R1PvwCStpoHF954=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=MowRYZGV; arc=none smtp.client-ip=74.125.224.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-yx1-f99.google.com with SMTP id 956f58d0204a3-64d5a7926cfso9434906d50.2
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 17:38:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775003931; x=1775608731;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=94QS47puTSztp2rJkXie5yl9O8a/8r86kaWdVOjoH3A=;
-        b=rzODQsUKR6N6vWCyH59wvma2QbU96Vjc+DvTyh0ynn6iu1NvmEqDQ4tx4GSlHE92V+
-         OOHMkvIkMcqwekg9+KD1I9y7b5LO3AM+xmWbiy3YRfGYA9Zn1lZBNDCRdJJLHCop5fdR
-         QUiPxjZjAnTk7q4C024UoMIvi+LJlUd8Wfb8K6P0CFJYPpzLM18NpVtrxKzQVgcWOJ5u
-         paf511Wk7RgRDN78lZornZyXGcwHlDLr5m8ZdwCt+JWTOLJH+DGaDdRHGKN9iu6ZSAUY
-         NAOTB+sJFij8fmI80VYYRam4FLTRlheyfs1NKCzEiAiRfjfNWUmSM6vWZ/bYSaujpqXS
-         rJgA==
-X-Gm-Message-State: AOJu0Ywm5T3LhZBZO1A6AO9rIijcPhXPJBPpzyPj71yaSavA81pZnZN3
-	4j2kzVzs6LK9ibjZf8U8WP37Jgero/ouCLF9d5G1VwmV0QWeXkjupzGdCOoEti4COAq85gCscXD
-	bPSLjWcr+9KU3P88CLwXp7m7NEwYY+Ol254Ebrv/OMDRosXp+0CaUPrC9yhjtEIruQm5laeEJ8J
-	IpDN4WFmWEb1HWZB+K/qnOCXXdglAnxmZ4OmlkugwQ2wARxA2dhHlEuIPlp0tOI4tseGHQ8OnCQ
-	QI2gnKc1g==
-X-Gm-Gg: ATEYQzxKm+APvUWDsg3vFA/8wTBF+Id2hA7hxf0YvGxQmOQTOWIQUnJBSSvBtAzB8Qt
-	WQdIOubSz0QbwOiRaBFOdIsiaUEzV/gBCu0GaLGUvYrzZQ8g3r8i6Zfk4Tu7ZG4AVdE4JDZXEI9
-	FLvXuJptiVAHlhv4JTl5waqdc6pkxqvoObGmKqCtK/HPM1loqPnj7G5g4Kr9EzkqSD5/5Kk+DG9
-	MMez/m4CekeDM1WOZmFiQd7jhWjpHHtkgu81Lyoc2meOKptRUPIwOYybLF13EAagDqLo6iAafFQ
-	TG5bTmgw3djGEi3wtuOlIWfi6Jm23JJs2VHidAYR+bJFuxTDx9aqWlQy7WzOfE0bDHL+eP3dvqm
-	9vktgVwVsF7Qu/L0TKqcsz9CCLTUAkfzqEz63eXKzVtfpI3QShBIyzCmNoCvCQNmTnjb0MegQ0d
-	dmanN15EsHM9/Y3jOKl75bTR6Wy+6hNhGtfKFXgc/n1u3+f+ab/IxQZtc=
-X-Received: by 2002:a53:eb85:0:b0:64e:e90c:5691 with SMTP id 956f58d0204a3-6502fe83061mr1069031d50.64.1775003930775;
-        Tue, 31 Mar 2026 17:38:50 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-15.dlp.protect.broadcom.com. [144.49.247.15])
-        by smtp-relay.gmail.com with ESMTPS id 956f58d0204a3-6500921bdf0sm1415821d50.3.2026.03.31.17.38.50
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 31 Mar 2026 17:38:50 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dl1-f70.google.com with SMTP id a92af1059eb24-12721cd1a2aso4069691c88.1
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 17:38:50 -0700 (PDT)
+	s=arc-20240116; t=1775004088; c=relaxed/simple;
+	bh=k15qr5bFq1kXFV3bPI/a5fnwulbjc61G4OSeVCSCg48=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=gowdfkzMsmnFyIVYupNhxKOXSfXK9m1sLG6NozOszS5zdGJi02bMnX/l4sW0gXNvecye1/vRQaYKyRqp3/xlmpwjqP588nJc17QilUNXB0ez+/JvhCJzhKbuyxzT0jjkMbmTP1JAcgChuIueN8Fq+d5c8cF4TtG6mJjTrlk/5HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZZLVdXlZ; arc=none smtp.client-ip=74.125.82.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-12732e6a123so2366928c88.1
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 17:41:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1775003929; x=1775608729; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1775004086; x=1775608886; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject:cc
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=94QS47puTSztp2rJkXie5yl9O8a/8r86kaWdVOjoH3A=;
-        b=MowRYZGVazWaPz7xynSYeyrid5ovcirwsjdp8ppzzlbFY0j6sqirtWj8L2CYK5c870
-         2HtlzrVrPn3qyPD7kNaSlYywkpLPnOgObUv/PJY/4mBJuvTFWKf+4XtT1shXGwFezay0
-         pjYOFmfNqULmsg7Ic+bP7OpWHLS3llaim97Xg=
-X-Received: by 2002:a05:7022:6707:b0:128:d714:3ca6 with SMTP id a92af1059eb24-12be6462064mr1073818c88.12.1775003929191;
-        Tue, 31 Mar 2026 17:38:49 -0700 (PDT)
-X-Received: by 2002:a05:7022:6707:b0:128:d714:3ca6 with SMTP id a92af1059eb24-12be6462064mr1073792c88.12.1775003928540;
-        Tue, 31 Mar 2026 17:38:48 -0700 (PDT)
-Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12aba581027sm17663190c88.4.2026.03.31.17.38.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 17:38:48 -0700 (PDT)
-From: Justin Chen <justin.chen@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	bcm-kernel-feedback-list@broadcom.com,
-	florian.fainelli@broadcom.com,
-	opendmb@gmail.com,
-	nb@tipi-net.de,
-	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net v2 4/4] net: bcmgenet: relax the xmit ring full case
-Date: Tue, 31 Mar 2026 17:38:40 -0700
-Message-Id: <20260401003840.3112454-5-justin.chen@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260401003840.3112454-1-justin.chen@broadcom.com>
-References: <20260401003840.3112454-1-justin.chen@broadcom.com>
+        bh=k15qr5bFq1kXFV3bPI/a5fnwulbjc61G4OSeVCSCg48=;
+        b=ZZLVdXlZ2gyPFX9uzH2VKKaN2wIXuGkZFvzmFVMoo3DOT17aQIAwHociZIr+N7OhvC
+         CXRIzJIPugfKaDa0VofDqET0RGPMKMiQ0XtlBBOYlkGJ9KqB1GFrVxMYYYyodYiabu2s
+         0f2s1yZnD/cE64foGFLdBaDxKfSJJhG/GunHXBb/bCQM+/z6r2qQBMknvEI0WrGHzi81
+         FzTbGEXo6FrASyWigh6MSOaU3bEuGmeACie9fxkHDpZRNKzkf5S0GUlAoEgwCR3EJP78
+         RbnOtQhAblRa7EZ3WnPBIb3VHp4j0yINTldXiiiNNBjMVbT9L/vFWmwOKi1NOvmGtgil
+         27bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775004086; x=1775608886;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject:cc
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=k15qr5bFq1kXFV3bPI/a5fnwulbjc61G4OSeVCSCg48=;
+        b=qrpdI3HbcUYmliz06jiJIvNkZ/eupZpoJZXoyUDIiI6jKG9UAQ48+tXryl8/0O20iT
+         gqHjCksjoaPqZpHGxGcVIQAqieLUbx956JCLJO+WWSFLiKWaNPCiEtaCr5zhBuFUNpxK
+         AudsHoweBaX06rg4W0khjzLey+fQHMyBHMfw4xaWJyqikARR1+HsTm5jfmYcdR1wE/yq
+         2DEm/53XaoE3+foFSDpQa4v+sNNkX9hJRIQOXI9oBAZc2KbcsOd1yf4CAqqOUnVbBFyd
+         IaEuf14YWyZA2ojU2GYTFg7XzYvOnoay6XInZhahkRvYA0jl4jnEyVPBbmaiXo5dCjxi
+         F5DQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQZR4bO8hi6h8kB2J3fcTwCOl93a0brO37q2JftyrfI6f7OBLf+JAbo2qcqAiWuIu/06up7F8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3MfOKzoaq6PQ59lGjTNxWCGPvyJsDpLrl0VrqHuZYkbsVoR0A
+	DkfOoN+ZioZi0Jr9JU9X2a+upTpw4eSEiB2cy160GCzv5tItYzuEXqpw
+X-Gm-Gg: ATEYQzxu7FJ8yHMoiiORGR0+MBT6Bi2kgqAyo6u6tnZmbHg6VVQHGzBNsyOmKic3wYF
+	+/QvIrTAdfaTt/zevTaUT5pdx0phhRsDL92Q3WAFYjCcd8Bj+wskoH+DUHmLpcPU6kt3Fg9YIL3
+	mGDYIinjnqYzJ43HjIdudU2Ct2Piutir2Ma6+/cDZGDafOvOy9uLKRJ2VOxiXAbUMm+zU2aNjou
+	pYsgWLciMpMW61r+afRqnr42wpKG9CwoTj0BjWin/8GnALieAaRSUGcWut1TZmAH4+7/dfYjZfS
+	bpgbfv4wDrW1hgHUNdmvCAG7CJpd7aEu8c7rPKySwvgziXCcQ1XEFg1og2pZ9VvzTwE/+RQIiP7
+	cPyZRZjGqBcLU4E00KFWyKUG1rbYwQvnxAL9ACXOAMyxd5+JVUjJxZMJSaa6fBnAI0Vsqk+FD55
+	RXdDDpTcuhN850ne9wVAI0jCGmfa7cHi0ZtVHl
+X-Received: by 2002:a05:7022:4398:b0:128:d2b3:5df with SMTP id a92af1059eb24-12be64db363mr970380c88.23.1775004085670;
+        Tue, 31 Mar 2026 17:41:25 -0700 (PDT)
+Received: from [10.0.0.2] ([169.235.25.186])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12ab97cb08csm18574623c88.3.2026.03.31.17.41.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Mar 2026 17:41:25 -0700 (PDT)
+Message-ID: <4631f54a-bcc8-454b-9355-15a21f9e1e21@gmail.com>
+Date: Tue, 31 Mar 2026 17:41:17 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: yuantan098@gmail.com, security@kernel.org, netdev@vger.kernel.org,
+ davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, afaerber@suse.de, mani@kernel.org,
+ yoshfuji@linux-ipv6.org, yifanwucs@gmail.com, tomapufckgml@gmail.com,
+ bird@lzu.edu.cn, enjou1224z@gmail.com, zcliangcn@gmail.com
+Subject: Re: [PATCH 1/1] net: ipv6: flowlabel: defer exclusive option free
+ until RCU teardown
+To: Eric Dumazet <edumazet@google.com>, Ren Wei <n05ec@lzu.edu.cn>
+References: <cover.1774855883.git.zcliangcn@gmail.com>
+ <07351f0ec47bcee289576f39f9354f4a64add6e4.1774855883.git.zcliangcn@gmail.com>
+ <CANn89iJ+pDwKy0kKKG8PrSWMXEStgsMP9YGLxwvjcmMJP1PwrA@mail.gmail.com>
+From: Yuan Tan <yuantan098@gmail.com>
+In-Reply-To: <CANn89iJ+pDwKy0kKKG8PrSWMXEStgsMP9YGLxwvjcmMJP1PwrA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,kernel.org,vger.kernel.org,davemloft.net,redhat.com,suse.de,linux-ipv6.org,lzu.edu.cn];
+	TAGGED_FROM(0.00)[bounces-273798-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,lunn.ch,broadcom.com,gmail.com,tipi-net.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273797-lists,netdev=lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[yuantan098@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 8C2013732D1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:email]
+X-Rspamd-Queue-Id: 45EC037338E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-We have a queue size of 32. If a packet is multiple fragments we can
-run through this queue really quickly. Currently we stop the xmit
-queue at SKB_FRAG_SIZE which by default can take up half the queue.
-Instead lets just look at the incoming packet and freeze the queue
-if the incoming packet has more fragments than free_bds. This will
-relieve some of the queue timeouts we have been seeing.
 
-Fixes: 1c1008c793fa ("net: bcmgenet: add main driver file")
-Signed-off-by: Justin Chen <justin.chen@broadcom.com>
----
- drivers/net/ethernet/broadcom/genet/bcmgenet.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+On 3/31/2026 1:52 AM, Eric Dumazet wrote:
+> On Tue, Mar 31, 2026 at 1:34 AM Ren Wei <n05ec@lzu.edu.cn> wrote:
+>> From: Zhengchuan Liang <zcliangcn@gmail.com>
+>>
+>> `ip6fl_seq_show()` walks the global flowlabel hash under the seq-file
+>> RCU read-side lock and prints `fl->opt->opt_nflen` when an option block
+>> is present.
+> Some points :
+>
+> Please do not CC security@ if you submit a public patch, there is
+> absolutely no reason for it.
+>
+> Please do not resend the same version within 24 hours; this creates noise.
+> Your patch wasn't lost; we have many patch reviews and similar bugs to address.
+>
+> Thank you.
 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 54f71b1e85fc..a1aa1278842e 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -2018,10 +2018,10 @@ static int bcmgenet_tx_poll(struct napi_struct *napi, int budget)
- 
- 	spin_lock(&ring->lock);
- 	work_done = __bcmgenet_tx_reclaim(ring->priv->dev, ring);
--	if (ring->free_bds > (MAX_SKB_FRAGS + 1)) {
--		txq = netdev_get_tx_queue(ring->priv->dev, ring->index);
-+	txq = netdev_get_tx_queue(ring->priv->dev, ring->index);
-+	if (netif_tx_queue_stopped(txq))
- 		netif_tx_wake_queue(txq);
--	}
-+
- 	spin_unlock(&ring->lock);
- 
- 	if (work_done == 0) {
-@@ -2224,9 +2224,6 @@ static netdev_tx_t bcmgenet_xmit(struct sk_buff *skb, struct net_device *dev)
- 
- 	netdev_tx_sent_queue(txq, GENET_CB(skb)->bytes_sent);
- 
--	if (ring->free_bds <= (MAX_SKB_FRAGS + 1))
--		netif_tx_stop_queue(txq);
--
- 	if (!netdev_xmit_more() || netif_xmit_stopped(txq))
- 		/* Packets are ready, update producer index */
- 		bcmgenet_tdma_ring_writel(priv, ring->index,
--- 
-2.34.1
+We sincerely apologize for the confusion caused by our previous email. Previously, when we sent reports and patches to the security list, we were advised that patches should be submitted to netdev@ for public review. To follow this, we are now sending the full vulnerability details to security@ while additionally submitting the patches to netdev@. Please let us know if this is the correct way to handle such cases.
+
+Regarding the CC list, could you provide further guidance on who we should include? Currently, we are CCing everyone suggested by get_maintainer.pl because we previously received feedback about missing relevant maintainers. For public mailing lists, we should only including netdev@. Should we be more selective?
+
+Finally, regarding our tags, our team has a clear division of labor—some focus on finding vulnerabilities, others on fixing them, followed by an internal review and testing before a dedicated member handles community outreach.
+
+We welcome any guidance and will improve our upcoming patches accordingly. To be honest, we are currently a bit uncertain about the exact workflow the community prefers, and we are eager to align our process with your expectations.
 
 
