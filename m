@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-273904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273905-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4PXzDVK4zGnMVwYAu9opvQ
-	(envelope-from <netdev+bounces-273904-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 08:16:50 +0200
+	id wMFUC0S5zGmcWAYAu9opvQ
+	(envelope-from <netdev+bounces-273905-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 08:20:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB34F3751B3
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 08:16:49 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A3D23751E9
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 08:20:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 28BF83037781
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 06:16:47 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8BEDD301F49C
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 06:20:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE23732C923;
-	Wed,  1 Apr 2026 06:16:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F246D32F757;
+	Wed,  1 Apr 2026 06:20:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JLDkjwlP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XAPieLNq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E478928CF4A
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 06:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC0828CF4A
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 06:20:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775024206; cv=none; b=NOqf3F5GXN0JW7W1dhVe7Lv1M1bA30DpgsxieDAGOpLdWkiAtCxDfm/vtMz7nPjcVzRXIJgWnHZG+iX+taSpz8Wcd0JaDfUoCiHVDH9dmJrxfmkPkYJ7fE9f2tHVGtzvLTEvvoRjDq5sGcQ2XD3jZ7bwFqVfWtHL/AHETL+b+ps=
+	t=1775024448; cv=none; b=ird4sJiv5kcg1dbZJjJdg/LbmC4LCI2FMhyBIXOCyS8UwQHWh5dpyYFKDYooZ0ZWhhnfCrNOuknUFHIsZ0lpPhUKu468VHmMQWob6eJGTNwo2ZTh2gF0R9rfSWsYIoDqshBgmqH98MbgRIIW39e/X8mbnJZOHIxPHMGFmGKfXG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775024206; c=relaxed/simple;
-	bh=+IO+GWB3m7JSfYZ1W6+fElUGIem2tndtrO+W2FP60gg=;
+	s=arc-20240116; t=1775024448; c=relaxed/simple;
+	bh=N0WRdyiipvwhpsT7REngNaXtefNGBNwEs9FzPtYDKd0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=biURi2LMXt1ChaYNehps7zoo3+6ANeYx6CsH5aLQx8I4SdrRpoJnugtLK3/K3t3f764Xkk4Fq8bd3nMz7nSkhWMcfCB8l/nPGwJ2pQhcDSfNATNsQTyFfVqnaD1l1BKx1FhRj92/F7Ln3KafFa9BDp10uP5ppyRGFBI4WXirQxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JLDkjwlP; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=dwXIUwyqQZ52S9mneN4oCoQp/ibMc/lHudS33nCTlq/F5Rtv5LdYlNizq5mcz8XaBiaa9w2I6rLYMEK24JA0hKv6AhXM7D7hfuSePIldNbZxoeckmm+abC//t4CvTl99JfBKsnWjC29hX2VeL/cmkY++YwPLWYsfriV677zROyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XAPieLNq; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775024203;
+	s=mimecast20190719; t=1775024445;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5EMxhr6NKZiRLAY+R8lkBaVG5o0DsE+kCNZTpv9LkBE=;
-	b=JLDkjwlPiBIXzyFmSh16YcaYyi1XWHvvmULuNSz9IkzwmHjGzsu2v9d4n9ca/IAYjHKriC
-	/17/sFMPxspdAdu6sSsUqnEGro6S89CWXhFwpUIlOqzEYOBQlnjsOzo42NPm1FjPAYPHSV
-	yHDJcgJnMElrZJnR9GJQjipSrNPLJLk=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=9E5jPoCdsK8lSlhp/+0AlFkBKV0lIvLqzx3CiNVXlhU=;
+	b=XAPieLNq4K1VX0dSO/yNxfFjIM176cbi4DcrEbPkDoTJ0g4ERSlffPe+YAV8hvKaSJOENl
+	2mSXIH+fJBNuvxT4jaBdje4+3oL57o0DFgLOEiajQmZhewYB1iCHRcXuHb1zHwG1FnzpPx
+	O8nXrA4ehVbn31YcXYY2cd/cQRSWVXE=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-348-MlBoq-UrPAyPQMwezfJu4g-1; Wed,
- 01 Apr 2026 02:16:37 -0400
-X-MC-Unique: MlBoq-UrPAyPQMwezfJu4g-1
-X-Mimecast-MFC-AGG-ID: MlBoq-UrPAyPQMwezfJu4g_1775024196
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-693-Rf-lKEyLM5uNAaykHgnFeA-1; Wed,
+ 01 Apr 2026 02:20:42 -0400
+X-MC-Unique: Rf-lKEyLM5uNAaykHgnFeA-1
+X-Mimecast-MFC-AGG-ID: Rf-lKEyLM5uNAaykHgnFeA_1775024440
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 43F5018005B8;
-	Wed,  1 Apr 2026 06:16:35 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 74D8E195607B;
+	Wed,  1 Apr 2026 06:20:40 +0000 (UTC)
 Received: from [10.44.32.46] (unknown [10.44.32.46])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 81B8D19560AB;
-	Wed,  1 Apr 2026 06:16:30 +0000 (UTC)
-Message-ID: <3ee5bbc9-fd0f-4abc-9b56-f53efc800221@redhat.com>
-Date: Wed, 1 Apr 2026 08:16:29 +0200
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E476219539A0;
+	Wed,  1 Apr 2026 06:20:34 +0000 (UTC)
+Message-ID: <a4f21dfe-e3a8-4d98-9b12-b1d7856b4985@redhat.com>
+Date: Wed, 1 Apr 2026 08:20:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,8 +69,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/3] dpll: add frequency monitoring to netlink
- spec
+Subject: Re: [PATCH net-next v2 2/3] dpll: add frequency monitoring callback
+ ops
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
  Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
@@ -82,19 +82,19 @@ Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
  Prathosh Satish <Prathosh.Satish@microchip.com>, Petr Oros
  <poros@redhat.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20260330105505.715099-1-ivecera@redhat.com>
- <20260330105505.715099-2-ivecera@redhat.com>
- <20260331200535.6a73e940@kernel.org>
+ <20260330105505.715099-3-ivecera@redhat.com>
+ <20260331201001.03339bab@kernel.org>
 Content-Language: en-US
 From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <20260331200535.6a73e940@kernel.org>
+In-Reply-To: <20260331201001.03339bab@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -102,11 +102,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273904-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-273905-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[vger.kernel.org,linux.dev,intel.com,resnulli.us,lwn.net,linuxfoundation.org,davemloft.net,google.com,redhat.com,kernel.org,gmail.com,microchip.com];
 	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
@@ -117,63 +117,37 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TO_DN_SOME(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AB34F3751B3
+X-Rspamd-Queue-Id: 9A3D23751E9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Kuba,
 
-On 4/1/26 5:05 AM, Jakub Kicinski wrote:
-> On Mon, 30 Mar 2026 12:55:03 +0200 Ivan Vecera wrote:
->> Add DPLL_A_FREQUENCY_MONITOR device attribute to allow control over
->> the frequency monitor feature. The attribute uses the existing
->> dpll_feature_state enum (enable/disable) and is present in both
->> device-get reply and device-set request.
->>
->> Add DPLL_A_PIN_MEASURED_FREQUENCY pin attribute to expose the measured
->> input frequency in Hz. The attribute is present in the pin-get reply.
+On 4/1/26 5:10 AM, Jakub Kicinski wrote:
+>> +static int dpll_msg_add_measured_freq(struct sk_buff *msg, struct dpll_pin *pin,
+>> +				      struct dpll_pin_ref *ref,
+>> +				    struct netlink_ext_ack *extack)
+>> +{
+>> +	const struct dpll_device_ops *dev_ops = dpll_device_ops(ref->dpll);
+>> +	const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
+>> +	struct dpll_device *dpll = ref->dpll;
+>> +	enum dpll_feature_state state;
+>> +	u64 measured_freq;
+>> +	int ret;
+>> +
+>> +	if (!ops->measured_freq_get)
+>> +		return 0;
+>> +	if (dev_ops->freq_monitor_get) {
+> what are you trying to cater to by making freq_monitor_get optional
+> here? I thought maybe some devices would have it always enabled, but
+> then dpll_msg_add_freq_monitor() should presumably report enabled
+> if !freq_monitor_get && measured_freq_get ?
 > 
-> 
->> +      -
->> +        name: frequency-monitor
->> +        type: u32
->> +        enum: feature-state
->> +        doc: Receive or request state of frequency monitor feature.
-> 
-> reads a bit clunkily - how about:
-> 
-> 	Current or desired state of the frequency monitor feature.
-> 
-> ?
+> Maybe there's some precedent in surrounding code outside of the context
+> but the intention of the patch reads a bit off.
 
-Agreed, will update.
-
-> 
->> +          If enabled, dpll device shall measure all currently available
->> +          inputs for their actual input frequency.
->>     -
->>       name: pin
->>       enum-name: dpll_a_pin
->> @@ -456,6 +463,13 @@ attribute-sets:
->>             Value is in PPT (parts per trillion, 10^-12).
->>             Note: This attribute provides higher resolution than the standard
->>             fractional-frequency-offset (which is in PPM).
->> +      -
->> +        name: measured-frequency
->> +        type: u64
->> +        doc: |
->> +          The measured frequency of the input pin in Hz.
->> +          This is the actual frequency being received on the pin,
->> +          as measured by the dpll device hardware.
-> 
-> If we make this a u64 should it be fixed point? Seems dubious that we'd
-> ever be able to measure >4Ghz frequencies, much more likely that we'd
-> want sub-1 precision ? So let's say this is fixed point 34.30 ?
-> 
-Good point. I'm going with a decimal divider (1000) instead of 34.30, 
-following the same approach as DPLL_PHASE_OFFSET_DIVIDER. The value
-is now in millihertz (mHz) with a DPLL_PIN_MEASURED_FREQUENCY_DIVIDER
-constant for userspace to extract integer and fractional parts.
+You're right, making it optional was not well thought out. I'm going to 
+change it so that .freq_monitor_get() will be required when
+.measured_freq_get() is provided.
 
 Thanks,
 Ivan
