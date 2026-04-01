@@ -1,138 +1,216 @@
-Return-Path: <netdev+bounces-274108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274109-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YHIUAMghzWlZaQYAu9opvQ
-	(envelope-from <netdev+bounces-274108-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:46:48 +0200
+	id YJOyBMcczWnOaAYAu9opvQ
+	(envelope-from <netdev+bounces-274109-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:25:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DF4F37B802
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:46:47 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id F18FC37B2E1
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:25:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C59E1317CFB1
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 13:11:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1A25D300A7E8
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 13:18:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 436683D8121;
-	Wed,  1 Apr 2026 13:11:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qEyN2lO1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FCD032D7FA;
+	Wed,  1 Apr 2026 13:18:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE28338C2DF
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 13:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA5638F25C;
+	Wed,  1 Apr 2026 13:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775049095; cv=none; b=nyMFTw7k88HHMUxQCIL8bzQRoZYvQ+If9e87jekIoDIpcdZY+RXuCV7h0V+c18TP8NmagE93lbS5BNgDAwrQvw2h18CwdgvaKte9zGppolO9McLYal/UK/QXyYe9s7PDandrYmqLNIQTBIUyYdKMiW+uJseTSnj1M+f9Doq1cx4=
+	t=1775049524; cv=none; b=irfKitzBvYRgWmPHqXrZkGzsHUhTACitj/Afxpr+uD0n6SMZlXoRAYyRXfKmjooKxgRhkltAdNzY437tiHi2Cre8ObCwBVQ0VFvpkY50y/ATeYoAv2u78dV5bkWH9IXNa94l9kP7gezuJOKUm5p0vzzjRsqwc4g0Ec22QCoq8/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775049095; c=relaxed/simple;
-	bh=TmXuWhLBRhppl4oK9aaPfpWnyQFgU7qDqxwW5MSEBho=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=udG7pmgPAAOZjAt5zetL8dC8EYaCW3dM4m1BvTVVn61HE9fkHSLANKgc2rcyiRjHv8At+9t0lmqTrRymnY0OSEHv5wOzzJoOyW9Te/weF6n/eRzSgi26GTNRwOya5wZKKdUvxUjPrpnayBAXgBQjZpXixNDsXZvuKXPnzmK6XLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qEyN2lO1; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=TGsWuisMMtPheOsEqS56ym7J2ivZZmE/CfR/ItpZwAw=; b=qEyN2lO1PRiAY0CrHUGkewkL58
-	AUq7P7Xpake4dGGeduRHe0i/1GlJQLSnQ8jBAEoMl6pEBjyWE8KhXBgOxJhfhDfBwVLpE1WD9M4DH
-	bfxM/gTPUTMljPkZhl5OuOgSfk4p5WiUNGbiDj94+pysp+nU+nfRM92hY7LkaWydQrzc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w7vLw-00EMFB-CD; Wed, 01 Apr 2026 15:11:24 +0200
-Date: Wed, 1 Apr 2026 15:11:24 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Nicolai Buchwitz <nb@tipi-net.de>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org
-Subject: Re: RFC: phylink: disable PHY autonomous EEE when MAC manages LPI
-Message-ID: <48abd3e3-a3ee-4e85-a3d8-20c8ceedfb77@lunn.ch>
-References: <d86c53213a6328b701b8aabbde5d1c83@tipi-net.de>
- <04ff15af-26be-4278-bc2a-889e7802d271@lunn.ch>
- <aczMqBNesQH-tHx0@shell.armlinux.org.uk>
- <ccb68eaaca5512d5d662326d0817bd50@tipi-net.de>
+	s=arc-20240116; t=1775049524; c=relaxed/simple;
+	bh=uQ8xz5ZVCOaxajR/YZaBP19QeYVZgCHHYym7P/lBskI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KjYhoO0ELZOSOTWZ9Y2ni8vbn66hIkdvrehEWSGEVKL0TxRmvWdQfBOwJvwBm1GxcnbqJyUdhpb9HXI4xuJ0/0g1sCcIPG6IAO1HsK+KEhIxwrn3KXYqHxMC+4j3RhGIS6MZsPF5zR+bEtJWuTB42vMOVZm9tFVpiB42OQDi078=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from ubuntu.. (unknown [202.112.113.208])
+	by APP-01 (Coremail) with SMTP id qwCowACnT2sVG81pSvbdCw--.49770S2;
+	Wed, 01 Apr 2026 21:18:21 +0800 (CST)
+From: Ma Ke <make24@iscas.ac.cn>
+To: vz@mleia.com
+Cc: alexandre.belloni@bootlin.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	make24@iscas.ac.cn,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	piotr.wojtaszczyk@timesys.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net: lpc_eth: Fix a possible memory leak in lpc_mii_probe()
+Date: Wed,  1 Apr 2026 21:18:13 +0800
+Message-ID: <20260401131813.139167-1-make24@iscas.ac.cn>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <b44db9e6-f820-439d-a7ed-c1e2514579a8@mleia.com>
+References: <b44db9e6-f820-439d-a7ed-c1e2514579a8@mleia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ccb68eaaca5512d5d662326d0817bd50@tipi-net.de>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowACnT2sVG81pSvbdCw--.49770S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxXw4ktw18AFWfWw1kWF4DJwb_yoW5Kw4Dp3
+	y5GaySkFykGry7K395Za1UAryavw42yw1rGFy2yan0g3Z8XryrAryUKrWj93s8AFWkWF40
+	vr1ayF93Xa1kXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8Jw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAG
+	YxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwV
+	W5GwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
+	6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
+	Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
+	Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
+	IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUgvtAUUUUU
+	=
+X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	TAGGED_FROM(0.00)[bounces-274108-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274109-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 5DF4F37B802
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.985];
+	FROM_NEQ_ENVFROM(0.00)[make24@iscas.ac.cn,netdev@vger.kernel.org];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,iscas.ac.cn:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: F18FC37B2E1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> Thanks Russell and Andrew. You're both heading in the same direction,
-> so to make sure I understand correctly:
+On 3/30/26 13:04, Vladimir Zapolskiy wrote:
+> On 3/30/26 11:16, Ma Ke wrote:
+> > lpc_mii_probe() calls of_phy_find_device() to obtain a phy_device
+> > pointer. of_phy_find_device() increments the refcount of the device.
+> > The current implementation does not decrement the refcount after using
+> > the pointer, which leads to a memory leak.
 > 
-> 1. Add a new phylib interface (separate from phy_ethtool_set_eee) to
->    control PHY-autonomous EEE, e.g. phy_set_autonomous_eee(phydev,
->    enable) and phy_get_autonomous_eee(phydev) to query the current
->    state.
+> this is correct, there is an actual detected bug.
+> 
+> > 
+> > Add phy_device_free() to balance the refcount.
+> 
+> But this does not sound right, you shoud use of_node_put(pldat->phy_node).
+> 
+> > 
+> > Found by code review.
+> > 
+> > Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+> > Cc: stable@vger.kernel.org
+> > Fixes: 3503bf024b3e ("net: lpc_eth: parse phy nodes from device tree")
+> > ---
+> >   drivers/net/ethernet/nxp/lpc_eth.c | 11 ++++++-----
+> >   1 file changed, 6 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/nxp/lpc_eth.c b/drivers/net/ethernet/nxp/lpc_eth.c
+> > index 8b9a3e3bba30..8ce7c9bb6dd6 100644
+> > --- a/drivers/net/ethernet/nxp/lpc_eth.c
+> > +++ b/drivers/net/ethernet/nxp/lpc_eth.c
+> > @@ -751,7 +751,7 @@ static void lpc_handle_link_change(struct net_device *ndev)
+> >   static int lpc_mii_probe(struct net_device *ndev)
+> >   {
+> >   	struct netdata_local *pldat = netdev_priv(ndev);
+> > -	struct phy_device *phydev;
+> > +	struct phy_device *phydev, *phydev_tmp;
+> >   
+> >   	/* Attach to the PHY */
+> >   	if (lpc_phy_interface_mode(&pldat->pdev->dev) == PHY_INTERFACE_MODE_MII)
+> > @@ -760,17 +760,18 @@ static int lpc_mii_probe(struct net_device *ndev)
+> >   		netdev_info(ndev, "using RMII interface\n");
+> >   
+> >   	if (pldat->phy_node)
+> > -		phydev =  of_phy_find_device(pldat->phy_node);
+> > +		phydev_tmp =  of_phy_find_device(pldat->phy_node);
+> >   	else
+> > -		phydev = phy_find_first(pldat->mii_bus);
+> > -	if (!phydev) {
+> > +		phydev_tmp = phy_find_first(pldat->mii_bus);
+> > +	if (!phydev_tmp) {
+> 
+> I didn't get it, why the new phydev_tmp is needed above, please
+> restore the original code above.
+> 
+> >   		netdev_err(ndev, "no PHY found\n");
+> >   		return -ENODEV;
+> >   	}
+> >   
+> > -	phydev = phy_connect(ndev, phydev_name(phydev),
+> > +	phydev = phy_connect(ndev, phydev_name(phydev_tmp),
+> >   			     &lpc_handle_link_change,
+> >   			     lpc_phy_interface_mode(&pldat->pdev->dev));
+> > +	phy_device_free(phydev_tmp);
+> 
+> This is plainly wrong and has to be dropped or changed to
+> 
+> 	if (pldat->phy_node)
+> 		of_node_put(pldat->phy_node);
+> 
+> >   	if (IS_ERR(phydev)) {
+> >   		netdev_err(ndev, "Could not attach to PHY\n");
+> >   		return PTR_ERR(phydev);
+> 
+> Is it AI generated fix or what?.. The change looks bad, it introduces
+> more severe issues than it fixes.
+> 
+> If you think you cannot create a proper change, let me know.
+> 
+> -- 
+> Best wishes,
+> Vladimir
+Thank you very much for your detailed review and guidance.
 
-In the end, we want the MAC driver using phylib to just call the
-phylib methods for configuring EEE, and the MAC driver should not care
-if EEE is actually implemented in the PHY or the MAC. The adjust_link
-callback would simply not enable LPI if the PHY is doing EEE.
+Now I think your point probably is: you are saying that the real leak 
+is not from of_phy_find_device(), but from the device node 
+pldat->phy_node which was obtained earlier (probably by 
+of_parse_phandle()) and never freed by of_node_put(). And you suggest 
+to add of_node_put(pldat->phy_node) instead of my wrong 
+phy_device_free().
 
-The phylink API should do the same, the MAC driver should not care, it
-calls into phylink, but phylink never tells it to enable LPI.
+However, I am still a little confused. In lpc_mii_probe(), 
+of_phy_find_device() is called. From my understanding, this function 
+increases the reference count of the device. To balance it, I thought
+phy_device_free() (which calls put_device()) should be used.
 
-So any API you add here should only be for phylink to phylib.
+Could you please kindly advise the correct patch? I will follow your
+guidance and submit a proper fix.
 
-> 2. PHY drivers implement it where applicable. BCM54xx AutogrEEEn as
->    the first user, Realtek RTL8211F as a second - it already
->    unconditionally disables PHY-mode EEE in config_init with the same
->    intent.
+I apologize again for my previous wrong patch. Thank you very much for
+your help.
 
-We might want to think about this lower API, the driver
-API. Historically EEE has been a mess because MAC drivers have been
-left to implement the whole API, they each did it differently, and
-many were wrong. There has been a push over the last few years to put
-the core of EEE support onto phylib/phylink, so leaving the MAC
-drivers to do a small amount.
+Best regards,
+Ma Ke
 
-We should learn from this, and try to think about what can the phylib
-core should do for PHY level EEE, and what does the PHY driver need to
-do?  Maybe passing the whole struct ethtool_keee to the PHY driver is
-just asking for problems. We want a much simpler API to start with.
-Just add an autonomous_eee_disable() call for the moment, leaving it
-open to later add a autonomous_eee_enable() call with just the needed
-parameters.
-
-Sorry this is different to what i said yesterday. A night of thinking
-about it made me refine my thoughts.
-
-      Andrew
 
