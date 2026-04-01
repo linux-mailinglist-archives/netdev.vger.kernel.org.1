@@ -1,419 +1,224 @@
-Return-Path: <netdev+bounces-274101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274102-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yCccDekdzWnOaAYAu9opvQ
-	(envelope-from <netdev+bounces-274101-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:30:17 +0200
+	id 2GwRDvMdzWnOaAYAu9opvQ
+	(envelope-from <netdev+bounces-274102-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:30:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B547B37B3FF
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:30:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 906C037B406
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:30:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EB8FA305CA8A
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:52:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9168830D443C
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDBB40823E;
-	Wed,  1 Apr 2026 12:52:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47993408237;
+	Wed,  1 Apr 2026 12:52:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="fvO4+brC"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QhoiamnK"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBAB33F8DE5;
-	Wed,  1 Apr 2026 12:52:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCAE63FCB10;
+	Wed,  1 Apr 2026 12:52:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775047970; cv=none; b=EdjhO+vyM8WKgRsG+PexEO5GxO1ubkNZ9dcN34TlMe6og8vlz+7cBeVheuTOjmBxUWOJ2F/SJLfsYRIM/3CCupyiJ1mmMJI4Ksz5djUyvaj3E+TnoTs1C1VcrH8e4h32gwRw4Jy2bCoEqfZhRke88hnqHAAMW6+NjLhJf1Qwklk=
+	t=1775047975; cv=none; b=V5HjywAdOlJ4jSwmAsC0rW4jmtxUJYsg9ON4N2EfacPLE7ROR5BnhrBUBZVJa+uSSWhiQtK8ia2+9CkH2WWFmrmNu7CZQB7vPdXFTr900KP7/AakxYm/jQKBRl6m9RMmo/s39xGt1i+x29XF9/kjVtOC+EYk9mQgttPZaDjjLqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775047970; c=relaxed/simple;
-	bh=nMMeGeai7+jxo/XxU/rMhAsLGO/BMZd5lafH1QEnAN0=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Gw5A06kpvbgvGYcwm9BC5/WQ0rfYp6nePUVYqL5FdKVX7c9Md31h05Fb20b2+aovZigZWCeVBzW5vhdxaHTehYCdW0pOUS/Z8+VHFdV/TKNPrdCmOXZA8pAXBUerBOwV+UFzuSSJc3V6Qin7CdKHwXDaMlx/OLvmBOKFF909GEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=fvO4+brC; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1775047967; x=1806583967;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=nMMeGeai7+jxo/XxU/rMhAsLGO/BMZd5lafH1QEnAN0=;
-  b=fvO4+brCSr02uO86HEat1UV3Iem1Kv7d0T8XNatyHDGiV6TWSyZtT66D
-   HkgqNW4ZeFJqqtYw9B136HTiZEN7KC3rTEjR3EEN/UeWvpC2xg3CMnF1X
-   /y7BvXMo7vRROHCNtr0WNhRjzdH5BATElNjBvewDaL1jAOPiIXPNx/kS4
-   i/cNyupTvwZTbMKr7vlMkThh/WXivaCN7KtaJIvoE0IiQmvU/P5HXF0cV
-   wBsHWtBcevyi9NveTiofqyCU6RKSKWpSNW1AZSbymZ6kweYRC8IuBqXSF
-   TM/W3yCMOc5Dqqm4yKzkDdSflMqlHFF0zkDd73eu97WIkUIhSFadBrewD
-   A==;
-X-CSE-ConnectionGUID: 2YBp1MG4SB+fC8V+138tSQ==
-X-CSE-MsgGUID: ezyv4A4HS1SqZZK5pn/iWw==
-X-IronPort-AV: E=Sophos;i="6.23,153,1770620400"; 
-   d="scan'208";a="55952462"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2026 05:52:46 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
- chn-vm-ex2.mchp-main.com (10.10.87.31) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Wed, 1 Apr 2026 05:52:06 -0700
-Received: from DEN-DL-M77643.microsemi.net (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Wed, 1 Apr 2026 05:52:03 -0700
-Message-ID: <dbfadc24cc15c6b5fd1b75fe0eb11d155ee6f3c4.camel@microchip.com>
-Subject: Re: [PATCH net-next v2 5/9] net: dsa: lan9645x: add bridge support
-From: Jens Emil Schulz Ostergaard <jensemil.schulzostergaard@microchip.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <UNGLinuxDriver@microchip.com>, <andrew@lunn.ch>, <olteanv@gmail.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-	<conor+dt@kernel.org>, <woojung.huh@microchip.com>, <linux@armlinux.org.uk>,
-	<Steen.Hegelund@microchip.com>, <daniel.machon@microchip.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>
-Date: Wed, 1 Apr 2026 14:52:02 +0200
-In-Reply-To: <20260329195631.2789158-1-kuba@kernel.org>
-References: <20260324-dsa_lan9645x_switch_driver_base-v2-5-f7504e3b0681@microchip.com>
-	 <20260329195631.2789158-1-kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2.1 
+	s=arc-20240116; t=1775047975; c=relaxed/simple;
+	bh=qPwYNJVb98u9/MTZG4HqC635wtkgWN7FSxBwMahFlFM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=CTdOjaK/WhhlSaWhft/KEghrzowBLXX9kAQ4aLGnq1h2PtfUtSespZLrdo99KUbn2JLkBMzMxxFeO+IIO1ol2xXWVQpLzrcXI+Yhuw/yPa98d8S0Ls01jNCHQsB/GXBWpnAndA7UlnUMwluV3IF7ZbTyNBvqL5tAkDAoS1yXS4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=QhoiamnK; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=qPwYNJVb98u9/MTZG4HqC635wtkgWN7FSxBwMahFlFM=; b=QhoiamnKe1MNG5R1NElP5oVF4f
+	2qYfkm3puihUnBZWg+rT7oRH3N5jXCDLvWBpKwS3De1cOXUmpP60Usy3XWy7dH+9SMwfwLDEI0YN5
+	Xkd4GY0CXpaGqGrlq/NRxLaUp6PtovGHdlEE64B9+SQKUWlUWu3SRjPwZAQeofW0grO2/lapoPCIZ
+	Fv8vhTxWLK7OPRFcYjRqXF3E4O+KccC3+v7hyeVGKseTaXIritDc19n2xE7ZdN4EIbeCohE0+cjBv
+	31oj6kCfQ38ULNG+IuX4rAfPhIFN+owJ26gL5nYLnjS2FC1yZ9cUR+f/RSblHxpkW7xNgAGaC8HHV
+	EH9gOIpA==;
+Received: from [213.122.4.78] (helo=u09cd745991455d.ant.amazon.com)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1w7v3u-00000000OXg-2RTn;
+	Wed, 01 Apr 2026 12:52:46 +0000
+Message-ID: <4a14d7826ce59562bfc685e49c70c75c3fd88ed1.camel@infradead.org>
+Subject: Re: [PATCH 02/10 net-next] ipv6: replace IS_BUILTIN(CONFIG_IPV6)
+ with IS_ENABLED(CONFIG_IPV6)
+From: David Woodhouse <dwmw2@infradead.org>
+To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>, David Ahern
+ <dsahern@kernel.org>, Alexei Starovoitov <ast@kernel.org>,  Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>,  Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, "open list:BPF [GENERAL] (Safe Dynamic Programs and
+ Tools)" <bpf@vger.kernel.org>
+Date: Wed, 01 Apr 2026 13:52:45 +0100
+In-Reply-To: <20260309022013.5199-3-fmancera@suse.de>
+References: <20260309022013.5199-1-fmancera@suse.de>
+	 <20260309022013.5199-3-fmancera@suse.de>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-nCk/MUAV9RvcHF+QcIjv"
+User-Agent: Evolution 3.52.3-0ubuntu1.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-Spamd-Result: default: False [-2.76 / 15.00];
+	SIGNED_SMIME(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=desiato.20200630];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274101-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,davemloft.net,google.com,redhat.com,kernel.org,armlinux.org.uk,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-274102-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jensemil.schulzostergaard@microchip.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[microchip.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:dkim,microchip.com:mid]
-X-Rspamd-Queue-Id: B547B37B3FF
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FROM_HAS_DN(0.00)[];
+	HAS_ATTACHMENT(0.00)[];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dwmw2@infradead.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,gmail.com,fomichev.me];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:dkim,infradead.org:mid]
+X-Rspamd-Queue-Id: 906C037B406
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, 2026-03-29 at 12:56 -0700, Jakub Kicinski wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content is safe
->=20
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> ---
-> net: dsa: lan9645x: add bridge support
->=20
-> This commit adds support for hardware offloading of the bridge in the
-> lan9645x DSA driver. It enables a single bridge device to be used with
-> the switch.
->=20
-> > diff --git a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c b/drive=
-rs/net/dsa/microchip/lan9645x/lan9645x_main.c
-> > index a0908cbf89c7..599e589c4ec3 100644
-> > --- a/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-> > +++ b/drivers/net/dsa/microchip/lan9645x/lan9645x_main.c
-> [ ... ]
-> > @@ -145,6 +155,8 @@ static int lan9645x_setup(struct dsa_switch *ds)
-> >               return err;
-> >       }
-> >=20
-> > +     mutex_init(&lan9645x->fwd_domain_lock);
-> > +
-> >       /* Link Aggregation Mode: NETDEV_LAG_HASH_L2 */
-> >       lan_wr(ANA_AGGR_CFG_AC_SMAC_ENA |
-> >              ANA_AGGR_CFG_AC_DMAC_ENA,
-> [ ... ]
-> > @@ -240,6 +252,11 @@ static int lan9645x_setup(struct dsa_switch *ds)
-> >=20
-> >       lan9645x_port_set_tail_drop_wm(lan9645x);
-> >=20
-> > +     lan9645x->owq =3D alloc_ordered_workqueue("%s-owq", 0,
-> > +                                             dev_name(lan9645x->dev));
-> > +     if (!lan9645x->owq)
-> > +             return -ENOMEM;
-> > +
->=20
-> Is it possible that the hardware remains initialized if the call to
-> alloc_ordered_workqueue fails? Because the setup callback returns an erro=
-r,
-> the DSA core will skip the teardown callback. This would bypass
-> lan9645x_npi_port_deinit, potentially leaving the conduit netdev in a
-> corrupted state with hardware tagging enabled.
 
-I do not think it is common practice to undo switch register writes in the
-error path here. We reset the switch registers in .setup. If we exit
-here there is nothing to teardown.
+--=-nCk/MUAV9RvcHF+QcIjv
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->=20
-> Also in lan9645x_setup, the initialization loop for PGID_ENTRIES iterates
-> through index 88:
->=20
-> for (int i =3D 0; i < PGID_ENTRIES; ++i)
->         lan_wr(ANA_PGID_CFG_OBEY_VLAN_SET(1),
->                lan9645x, ANA_PGID_CFG(i));
->=20
-> Could this leave the CPU port's source configuration in an undefined stat=
-e?
-> The CPU port is port 9, which has its source analysis register at PGID_SR=
-C
-> (80) + 9 =3D 89, but the loop terminates before reaching it.
->=20
+On Mon, 2026-03-09 at 03:19 +0100, Fernando Fernandez Mancera wrote:
+> -#if IS_BUILTIN(CONFIG_IPV6)
+> +#if IS_ENABLED(CONFIG_IPV6)
 
-No as I mentioned in another mail this OBEY_VLAN does not make sense for
-pgid 89.
-
-> > @@ -258,6 +275,271 @@ static void lan9645x_port_phylink_get_caps(struct=
- dsa_switch *ds, int port,
-> >       lan9645x_phylink_get_caps(ds->priv, port, config);
-> >  }
-> >=20
-> > +static int lan9645x_set_ageing_time(struct dsa_switch *ds, unsigned in=
-t msecs)
-> > +{
-> > +     u32 age_secs =3D max(1, msecs / MSEC_PER_SEC / 2);
-> > +     struct lan9645x *lan9645x =3D ds->priv;
-> > +
-> > +     /* Entry is must suffer two aging scans before it is removed, so =
-it is
-> > +      * aged after 2*AGE_PERIOD, and the unit is in seconds.
-> > +      * An age period of 0 disables automatic aging.
-> > +      */
-> > +     lan_rmw(ANA_AUTOAGE_AGE_PERIOD_SET(age_secs),
-> > +             ANA_AUTOAGE_AGE_PERIOD,
-> > +             lan9645x, ANA_AUTOAGE);
-> > +     return 0;
-> > +}
->=20
-> Does this function properly disable automatic aging when requested? When =
-the
-> Linux bridge passes msecs =3D 0 to disable aging, the max macro evaluates=
- to 1.
-> Since writing 1 configures an aggressive 2-second aging period, it appear=
-s
-> this might not fulfill the user's intent.
->=20
-
-Yes that is right. I will change it to:
+Couldn't this just be #ifdef CONFIG_IPV6?
 
 
-	lan_rmw(ANA_AUTOAGE_AGE_PERIOD_SET(msecs ? age_secs : 0),
-		ANA_AUTOAGE_AGE_PERIOD,
-		lan9645x, ANA_AUTOAGE);
+--=-nCk/MUAV9RvcHF+QcIjv
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
+ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
+AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
+BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
+MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
+a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
+jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
+GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
+aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
+nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
+8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
+HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
+IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
+KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
+BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
+QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
+QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
+ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
+/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
+uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
+xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
+W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
+c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
+VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
+NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
+DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
+sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
+w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
+i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
+kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
+0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
+ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
+blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
+hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
+VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
+HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
+ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
+AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
+cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
+cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
+AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
+aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
+hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
+iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
+8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
+JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
+xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
+EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
+B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
+MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
+KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
+Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
+nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
+WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
+W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
+nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
+g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
+9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
+9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
+sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
+a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
+ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
+AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
+dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
+Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
+MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
+YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
+4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
+6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
+QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
+nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
+MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
+VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
+ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI2MDQwMTEyNTI0
+NVowLwYJKoZIhvcNAQkEMSIEIGme1mK9Qvp1BhVCu5EQ6bvSdoOen2KeidI0I6eVjWDPMGQGCSsG
+AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
+cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
+VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
+cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAjIBXt6qpZW0p
+6tnNCml6nY9wJxarGMR5apouyfRzSqe/u/4a0TJC8DysZMbfLXUUEgqjdg2A+m3Wh4fMm0MdtSZJ
+042QxfnowGF4QJ4RkFTN5r86FQ8A+ZzLAZOUzPFhPRkPSGXJQuOM0l6EV8WRsQG1OZmmO+T1pRM6
+ay0hAkxpTmIb+yFtPCjh5PDjXpf0cl+Jd9viFFvkYIIw+rpzdgFeZcc6TPcy1wcEP+zsJMBubWLs
+x31NKei6Ftg/K5ZCJIPAhZXMen2CllBMiDw6C5MrfOlZtVz5uDCcKKmeWc+C/B25J3ZYM6Xnm76R
+iHyN6VV+2ETdu5cMmWV+OUffM49vwsGD6A5yUDZ235xCR8xDGxV0J98RmS6Tchzyjx2wx/7Jr3Bx
+ZCvWtP3TnyUPQnov3+t+g9nNgT4H9A4Z0OQndLLka7wzfftXpF/VdUOe3ke/i6tAWhGjevnr9JHt
+xN6Acc7PBlYPkzfVMtJrrZvnvInVsgb7UOsa4Z3nMvysE4JO7pDbLduXDMmYaZU645bIdIiG9QKR
+VWM8WVbOD6yyrSkDzHjHvhNdYwvhYPE11lrPDbUhIt5T7/kzHMpdtS4Hn+yoJURuRaw3sNRGBAAB
+20/NyMZSMSBt0Lmi8rHEXVc6T2rsxoArAzo3chyavzSEnkvMs0Gk92AojMexhz0AAAAAAAA=
 
 
-> [ ... ]
-> > +static void __lan9645x_port_set_host_flood(struct lan9645x *lan9645x, =
-int port,
-> > +                                        bool uc, bool mc)
-> > +{
-> > +     bool mc_ena, uc_ena;
-> > +
-> > +     lockdep_assert_held(&lan9645x->fwd_domain_lock);
-> > +
-> > +     /* We want promiscuous and all_multi to affect standalone ports, =
-for
-> > +      * debug and test purposes.
-> > +      *
-> > +      * However, the linux bridge is incredibly eager to put bridged p=
-orts in
-> > +      * promiscuous mode.
-> > +
-> > +      * This is unfortunate since lan9645x flood masks are global and =
-not per
-> > +      * ingress port. When some port triggers unknown uc/mc to the CPU=
-, the
-> > +      * traffic from any port is forwarded to the CPU.
-> > +      *
-> > +      * If the host CPU is weak, this can cause tremendous stress. The=
-refore,
-> > +      * we compromise by ignoring this host flood request for bridged =
-ports.
-> > +      */
-> > +     if (lan9645x_port_is_bridged(lan9645x_to_port(lan9645x, port)))
-> > +             return;
->=20
-> Will ignoring the host flood request for bridged ports break IPv6 Neighbo=
-r
-> Discovery? IPv6 ND relies on multicast, and the PGID_MC and PGID_MCIPV6 m=
-asks
-> do not include the CPU port by default. By ignoring the bridge's request =
-to
-> enable multicast flooding, the CPU port may fail to receive ICMPv6 ND pac=
-kets.
->=20
-
-No that is handled by other mechanisms. There are explicit handles to make =
-sure
-such traffic reaches the cpu.
-
-> [ ... ]
-> > +/* Called in atomic context */
-> > +static void lan9645x_port_set_host_flood(struct dsa_switch *ds, int po=
-rt,
-> > +                                      bool uc, bool mc)
-> > +{
-> > +     struct lan9645x *lan9645x =3D ds->priv;
-> > +     struct lan9645x_host_flood_work *w;
-> > +
-> > +     w =3D kzalloc_obj(*w, GFP_ATOMIC);
->=20
-> Is kzalloc_obj an available kernel function? Using it might cause a build
-> error, as the standard API would be kzalloc(sizeof(*w), GFP_ATOMIC).
->=20
-> > +     if (!w)
-> > +             return;
->=20
-> Are there consequences to returning silently when the allocation fails?
-> If this allocation fails under memory pressure, the network stack will st=
-ill
-> assume the configuration was successfully applied, leaving the hardware s=
-tate
-> out of sync.
->=20
-
-But we can not return any error in the dsa op to the network stack, so I th=
-ink
-this is our only option.
-
-> [ ... ]
-> > +static int lan9645x_port_bridge_join(struct dsa_switch *ds, int port,
-> > +                                  struct dsa_bridge bridge,
-> > +                                  bool *tx_fwd_offload,
-> > +                                  struct netlink_ext_ack *extack)
-> > +{
-> [ ... ]
-> > +     /* The bridge puts ports in IFF_ALLMULTI before calling
-> > +      * port_bridge_join, so clean up before the port is marked as bri=
-dged.
-> > +      */
-> > +     __lan9645x_port_set_host_flood(lan9645x, port, false, false);
-> > +     lan9645x->bridge_mask |=3D BIT(p->chip_port);
-> > +
-> > +     mutex_unlock(&lan9645x->fwd_domain_lock);
-> > +
-> > +     /* Later: stp_state_set updates forwarding */
-> > +
-> > +     return 0;
-> > +}
->=20
-> Could clearing the host flood masks here lead to lost hardware state when=
- the
-> port leaves the bridge? If a user previously enabled IFF_PROMISC or
-> IFF_ALLMULTI on the standalone port, the software netdev flags remain set=
-.
-> When lan9645x_port_bridge_leave is called, it does not restore the hardwa=
-re's
-> promiscuous or multicast state to match the unchanged software flags.
->=20
-
-Yes this is a bug. I will split flood requests and register writes, and mak=
-e sure
-the requested state is restored on bridge leave.
-
-> > +static void lan9645x_port_bridge_stp_state_set(struct dsa_switch *ds, =
-int port,
-> > +                                            u8 state)
-> > +{
-> > +     struct lan9645x *lan9645x;
-> > +     struct lan9645x_port *p;
-> > +     bool learn_ena;
-> > +
-> > +     lan9645x =3D ds->priv;
-> > +     p =3D lan9645x_to_port(lan9645x, port);
-> > +
-> > +     mutex_lock(&lan9645x->fwd_domain_lock);
-> > +
-> > +     p->stp_state =3D state;
-> > +
-> > +     if (state =3D=3D BR_STATE_FORWARDING)
-> > +             lan9645x->bridge_fwd_mask |=3D BIT(p->chip_port);
-> > +     else
-> > +             lan9645x->bridge_fwd_mask &=3D ~BIT(p->chip_port);
-> > +
-> > +     learn_ena =3D (state =3D=3D BR_STATE_LEARNING ||
-> > +                  state =3D=3D BR_STATE_FORWARDING) && p->learn_ena;
-> > +
-> > +     lan_rmw(ANA_PORT_CFG_LEARN_ENA_SET(learn_ena),
-> > +             ANA_PORT_CFG_LEARN_ENA, lan9645x,
-> > +             ANA_PORT_CFG(p->chip_port));
-> > +
-> > +     lan9645x_update_fwd_mask(lan9645x);
-> > +     mutex_unlock(&lan9645x->fwd_domain_lock);
-> > +}
->=20
-> Are ingress data frames correctly dropped for ports in non-forwarding STP
-> states? When the port is removed from bridge_fwd_mask,
-> lan9645x_update_fwd_mask calculates the source PGID mask as
-> bridge_mask & bridge_fwd_mask & ~BIT(dp->index).
->=20
-> This evaluates to the set of all other forwarding ports in the bridge. Si=
-nce
-> ingress forwarding is not explicitly disabled on the port (for example, b=
-y
-> setting ANA_PORT_CFG_PORTID_VAL to NONE), data frames received on a block=
-ing
-> or learning port can enter the analyzer and be forwarded.
->=20
-
-Yes this is a bug, I need to use a zero mask for the src pgid when a port i=
-s
-in non-forwarding STP state.
-
-> > +static void lan9645x_port_bridge_leave(struct dsa_switch *ds, int port=
-,
-> > +                                    struct dsa_bridge bridge)
-> > +{
-> > +     struct lan9645x *lan9645x =3D ds->priv;
-> > +     struct lan9645x_port *p;
-> > +
-> > +     p =3D lan9645x_to_port(lan9645x, port);
-> > +
-> > +     mutex_lock(&lan9645x->fwd_domain_lock);
-> > +
-> > +     lan9645x->bridge_mask &=3D ~BIT(p->chip_port);
-> > +
-> > +     /* Last port leaving clears bridge dev */
-> > +     if (!lan9645x->bridge_mask)
-> > +             lan9645x->bridge =3D NULL;
-> > +
-> > +     lan9645x_update_fwd_mask(lan9645x);
-> > +
-> > +     mutex_unlock(&lan9645x->fwd_domain_lock);
-> > +}
->=20
-> Should p->learn_ena be reset when a port leaves the bridge?
->=20
-> During port_bridge_flags, p->learn_ena is set to true. When leaving the
-> bridge, this flag remains true. The DSA core will transition the leaving
-> port to BR_STATE_FORWARDING, which calls lan9645x_port_bridge_stp_state_s=
-et
-> and leaves hardware learning enabled. This can pollute the shared FDB wit=
-h
-> MAC addresses from standalone ports, leading to silent packet drops if
-> bridged ports attempt to forward traffic to them.
-
-
-No I believe DSA core takes care of this with dsa_port_clear_brport_flags.
+--=-nCk/MUAV9RvcHF+QcIjv--
 
