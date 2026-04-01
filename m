@@ -1,311 +1,198 @@
-Return-Path: <netdev+bounces-273806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273807-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UESTLdlxzGn1SwYAu9opvQ
-	(envelope-from <netdev+bounces-273806-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 03:16:09 +0200
+	id cBG+H5lyzGn1SwYAu9opvQ
+	(envelope-from <netdev+bounces-273807-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 03:19:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C13CD373694
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 03:16:08 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24BC73736D2
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 03:19:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 083CB3058450
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 01:15:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8F37E3033961
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 01:19:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7146282F31;
-	Wed,  1 Apr 2026 01:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vanvalzah-com.20230601.gappssmtp.com header.i=@vanvalzah-com.20230601.gappssmtp.com header.b="ph9Ny3rZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8A51D8E01;
+	Wed,  1 Apr 2026 01:19:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
+Received: from mail-dy1-f176.google.com (mail-dy1-f176.google.com [74.125.82.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E187B2853F2
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 01:15:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557CC3D994
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 01:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775006111; cv=none; b=LBi5Y00ACyeY9QmyMGQM7nexzV3O19xv8/W/fX9X1uhl2OERCJGtsJpqk04yS/GraWQdUWeCx+7SCATTRfoUADyuXXn3qqH53qpa2wU4V0BvwJ+4MEYfNN8UWLoJr861lzi0cPZCCvAeLVshD51UIauRKR1FjfGBP9Wmwzii0ZM=
+	t=1775006357; cv=none; b=RGrO0A+y52dltT8epQUZyQ1UGLOihV7s+KKfKNCXZx8dPBJ4xKcSF35ydrTkgiCnf+LPjUMsrfhdDR5zmEv2ajULMKU2K9XQg61C4MRKnqJW04mC+0jkT1XmmD/hFbHMz+mFhMSSx7K/V/iuSb86NEy7sKRBzTDx82cXOPj7Na0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775006111; c=relaxed/simple;
-	bh=EAdNCTpnm0o3FjGR4EQxD11XzSl37BZXCQ8+0vaw+lk=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=Oy94MWWw2xQVyNGNrjscydAGih3FbFrqXV1+ccib2XBELY1Z2OuJjbCZiZw+E5he2aYqa33kwVMAWaicpJ4KOwIon889aot2EbzQXpLKhgQ3ncp8bpx1DunRq3l75dXMl9FpQraf2Ztm8meB1dp6rT11mC7l0UvxNSdeWMdPjD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vanvalzah.com; spf=none smtp.mailfrom=vanvalzah.com; dkim=pass (2048-bit key) header.d=vanvalzah-com.20230601.gappssmtp.com header.i=@vanvalzah-com.20230601.gappssmtp.com header.b=ph9Ny3rZ; arc=none smtp.client-ip=74.125.82.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vanvalzah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=vanvalzah.com
-Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-2ba9c484e5eso5653925eec.1
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 18:15:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vanvalzah-com.20230601.gappssmtp.com; s=20230601; t=1775006109; x=1775610909; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aIG+o0e1lfuEhl1N7MrCiLFaDTM++cyzhQ07Sz+94dM=;
-        b=ph9Ny3rZWUTSvYvEvrsgK2c2fkOAaC22rAp4GDSRIKdCyIiYaz3HTu3Ksrgd6BsvMX
-         njQWJQ0btGDVc3sd7S8bPMA9t872FMjZkC6C8Jq9ztwEDA+wxaAhdUnpvOm8tGBbTzzR
-         Li0DJu4TnCPop3Sy6nN+ps8Y0ot8kXARbJfzlS5+Q2sv3TkYsP6J3EvBo6leQe+1fm2Z
-         J1pfHiKs8smxaReZlNyWSDQAME+LoU1FuKAjbOwZyD7mD6WlyE2wQODqPqt6kv8Ty13O
-         cPZ+VJ84SWuuwVLEHaceHwIjYtDeFDPHrzKaUB2zMVRRJVTTozDDrxeEmqEeb9DwMIFI
-         eKzQ==
+	s=arc-20240116; t=1775006357; c=relaxed/simple;
+	bh=BmFMJVbMjB8yAUd6iDlaBqH0LPG3ZQdGUnb6LyUEoY8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EzsajcF+ByKRmlJjpmEhUEdtJby6b/QYl3hTPhzrKzmv6yvcsBY+w6JiD3XzrAwHnMkDsprelUCzyUO+lJbqbOD+Bbw6phFiU0NqzF72AaBTBSf08tUBgSRL7BMx/b1J/rdp7c7YWb1bfdUAMmIS8GPCT+ccjhOeD1JfvDfb1dM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.82.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f176.google.com with SMTP id 5a478bee46e88-2bdcf5970cdso405460eec.0
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 18:19:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775006109; x=1775610909;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aIG+o0e1lfuEhl1N7MrCiLFaDTM++cyzhQ07Sz+94dM=;
-        b=CTvUkEnZJlfp97E+eqVuSCBkgTzTNZzlXHSVVPhGO5e70wYvo3Oe7YY4N+yVdbbkME
-         DvSB5F/L31uu4fIs6MzWrkaNNQj+kXmp/uT7lxr/fYP2nROK/E5v+1jrfc7groxA/a28
-         Eob0MnjmKCfB1dZ+6pfUDG6ml3iAVpCQrcpjTkSYO8j5xc6cHAeBxigUgTTjbu15PLVQ
-         M7QXli+q3OcOmWdCTXwnysRXciV65+bHWBVKJQ34uMdNz1EoS1FrfcyT6SOABkfJtm31
-         DX8mMTI8BQWY2fRvOS3VolGltLGWKYwZot0pxTv5Q6dqHpRGRQ5N/5PsjEQZ1OAmkGwQ
-         YWlA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfCfDGytndezDMSyePQgAlrlWGlOdyIhU4CdJqft8aBjePgLmgFKsWe08rvvoHinjog/ide7M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDBiiqrIaP6ypzzyqS6evLXVgA35dhp1+8IFSE3SVoHAlPdBQu
-	U/rUwx1oFxypTNFIIaHKGfAytRQAe3IVCT6Kox4IL98pqCwXDlPYrW6UjzKLdtzJHtYyak5mImG
-	1ttIcuzwIeg==
-X-Gm-Gg: ATEYQzwhVVX2h4Yn7L+elxM+OARCb5yUIQVdTTpOerSsnO7xbHZIzU0BP/kZU+UV3dS
-	EXbIkYFaQ4YIgJ9n4GstzGz9JO28F2PF0aHuzVAV0EtQ3VF5dQks0G3j3TzBGHjqVdGQaunh97G
-	9HNnmWPmallbH0WK5A/jqvZ9t5HZPI78rgikPpX5B4mqfNM52WJjNZSAIgew+TCgeEwIRO+PWH4
-	phb4CUeUs7MSjBECtqiNssk7muKU3io1iimo1yBF6jmOkNrskfv2SQxcKDZ/lfuVG8d9nvkQs1L
-	K9fd2yb6SN4IDNzDY1BlWyvkZq9Fitrc/GfJX4NEo/X6O0PiciPmQ8iI7W7vO+hQgxhRuu2Egr0
-	n+kolF/jUJhXKf+vwq7+mEVnzlIlOW/sL4tkfpc4ONQQ5oFNF5S6aIeZTAgdDbtZ/Yy7pnFTZKz
-	Mq9GWVSHF9dzYALCl74H0DY/vVUMO8N7aVJe4xGJK/vB28S9p3yfA6xVYbsD8HfixEkdpU1xsiO
-	vCavekz
-X-Received: by 2002:a05:7301:6895:b0:2ba:6b3a:7696 with SMTP id 5a478bee46e88-2c930e6bd20mr867370eec.8.1775006108584;
-        Tue, 31 Mar 2026 18:15:08 -0700 (PDT)
-Received: from smtpclient.apple (syn-108-178-167-002.biz.spectrum.com. [108.178.167.2])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c3c4cbbc1fsm11057586eec.13.2026.03.31.18.15.07
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 31 Mar 2026 18:15:08 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+        d=1e100.net; s=20251104; t=1775006355; x=1775611155;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jNANywZgK12a0bHAMhwc/o5iExnroG81lBymkAI/CWQ=;
+        b=lDnMUiiG0Z6biWDu7jlYWM6aYkXJYthgsnNPp9/QOVG2hoxkBfffrYAGwqf2lvxwGB
+         5GVbH4biFfb+fFb8dMHG6KrHY7bQuP2yAW2e+P0X8Nf7JQ7ubQf8EtBB0QsEWJ9KxuIo
+         K1Bj4ttMhMWFAY/yeFcxeV659viDO5NOePAft33Xse0l/tL5iN6Wn6kNEx1kgACJzTif
+         bWYCLkB0p4PBXngQFnHs9rSw/hawXHiwOBNKBPghiIixt/tsWOVw2FQEwXNAGqEfMc6j
+         QmIUqSBIcutTwmi54zAY82q11peeHDJYRRHJYgnoiavPC8yCGc28M5IwYxdDZv3mFqpX
+         hlMw==
+X-Gm-Message-State: AOJu0Yy9V2/tGkpqrWbkNsYb0+tWR0j7Z0np/zQJOgVqFud/hD5dJQPl
+	ZJ0Oij6/PBGNg4L24Iy96Inf75TPrqrqYoPt653VKLPEo6b1UY8Z8HAThCYp
+X-Gm-Gg: ATEYQzyZ+qh1svK9UYGYJLVH/92De27/XH4TiivIhWj2dugrMJ6ZmIJwLLeN6hMGhQb
+	8Ohc9Jfl4klvLXCLVRXpODCqiNnVaotJMm1c7lG5O5NNRTcZiVMSu50vwnp7Ysw0LStydsZ5lm0
+	MF7Ny3Sa4a6osZ7q2cIOgptnkuwyD6t6QmOf/Z73nUWvz7GiUN8GYYvS6Pj/1lGFYdWcDGqiENm
+	fGq9FkXNzu9fchjV+31l9XQjXqMLGmNjCOYi41Dj5HaCHZn20nBOjT7rL83clygLwCeAVEmjZDx
+	/+c8RGh2NMoEMQiwYnKXKVSllXsssbZASkC3lRBq+uu6dHGSIbtyQIutI56FODkNFee7pdwRblI
+	lZMpEJA9AhMcw3wRneEfi1AGRCaBROssandyD9phwVAb+i+QqVuamVy7z4GnmIsbHqdDKwu2N9N
+	RF4uX+MUme51Rreq8sDx9x4rUv8f6tlVyClD30gRA7zSfcezJPKewtow/OvelJ34m2n3iaGeFea
+	N0C9k1jqri7zIPIBw==
+X-Received: by 2002:a05:7300:cc12:b0:2c1:67e1:61a9 with SMTP id 5a478bee46e88-2c92b0237b1mr782307eec.13.1775006355109;
+        Tue, 31 Mar 2026 18:19:15 -0700 (PDT)
+Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2c3c68b2ff2sm11670870eec.18.2026.03.31.18.19.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Mar 2026 18:19:14 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH net-next v4 00/14] net: sleepable ndo_set_rx_mode
+Date: Tue, 31 Mar 2026 18:19:00 -0700
+Message-ID: <20260401011914.1716692-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.400.21\))
-Subject: Re: [PATCH] igc: fix Tx timestamp timeout caused by unlocked TIMINCA
- write in adj fine
-From: Bob Van Valzah <bob@vanvalzah.com>
-In-Reply-To: <B22CCB1A-15FE-4233-9F47-7FE522C8D6FF@VanValzah.Com>
-Date: Tue, 31 Mar 2026 18:14:57 -0700
-Cc: intel-wired-lan@lists.osuosl.org,
- anthony.l.nguyen@intel.com,
- netdev@vger.kernel.org,
- julianstj@fb.com,
- jeff@jeffgeerling.com,
- Lasse Johnsen <lasse@timebeat.app>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <CAD61B95-35BF-4BAC-AC26-6AC043DE6FC1@vanvalzah.com>
-References: <D1C3B3DF-960F-40C7-BBD7-994359F0C8AD@vanvalzah.com>
- <65977d5b-16eb-418c-995e-6a918f67707a@linux.dev>
- <B22CCB1A-15FE-4233-9F47-7FE522C8D6FF@VanValzah.Com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-X-Mailer: Apple Mail (2.3864.400.21)
-X-Spamd-Result: default: False [-1.66 / 15.00];
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[vanvalzah-com.20230601.gappssmtp.com:s=20230601];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[vanvalzah-com.20230601.gappssmtp.com:+];
-	TAGGED_FROM(0.00)[bounces-273806-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[vanvalzah.com];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-273807-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[fomichev.me];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sdf@fomichev.me,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bob@vanvalzah.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	APPLE_MAILER_COMMON(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-0.453];
+	TO_DN_NONE(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,vanvalzah.com:email,vanvalzah.com:mid,vanvalzah-com.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: C13CD373694
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 24BC73736D2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-There is one other symptom of this bug that we neglected to report =
-previously: PEROUT stops. That=E2=80=99s PPS OUT for us, so it=E2=80=99s =
-how we first noticed the problem. Recovery was to unload and reload the =
-igc driver.
+This series adds a new ndo_set_rx_mode_async callback that enables
+drivers to handle address list updates in a sleepable context. The
+current ndo_set_rx_mode is called under the netif_addr_lock spinlock
+with BHs disabled, which prevents drivers from sleeping. This is
+problematic for ops-locked drivers that need to sleep.
 
-I take this as further evidence for my hunch that the hardware just =
-reaches some internal =E2=80=9Cthis should never happen=E2=80=9D state =
-and the PHC just stops ticking.
+The approach:
+1. Add snapshot/reconcile infrastructure for address lists
+2. Introduce dev_rx_mode_work that takes snapshots under the lock,
+   drops the lock, calls the driver, then reconciles changes back
+3. Move promiscuity handling into the scheduled work as well
+4. Convert existing ops-locked drivers to ndo_set_rx_mode_async
+5. Add a warning for ops-locked drivers still using ndo_set_rx_mode
+6. Add a selftest exercising the team+bridge+macvlan topology that
+   triggers the addr_lock -> ops_lock ordering issue
 
-Hoping this additional symptom report might help with diagnosis.
+v4:
+- rebase on https://lore.kernel.org/netdev/20260319005456.82745-1-saeed@kernel.org/T/#u (Cosmin)
+- reword ndo_set_rx_mode_async kdoc (Jakub)
+- s/EXPORT_SYMBOL/EXPORT_SYMBOL_IF_KUNIT/ (Jakub)
+- remove netif_up_and_present (Jakub)
+- netif_addr_lists_snapshot + netif_addr_lists_reconcile to better
+  explain mix-and-match between
+  ndo_set_rx_mode/ndo_set_rx_mode_async/ndo_change_rx_flags (Jakub)
+- s/cancel_work_sync/flush_work/ (Jakub)
+- separate commit to cache snapshot entries (Jakub)
+- add dev_addr_test_snapshot_benchmark (Jakub)
+  - dev_addr_test_snapshot_benchmark: 1024 addrs x 1000 snapshots: 89872802 ns total, 89872 ns/iter
+- remove redundant bnxt_uc_list_updated (Michael)
+- switch to linkwatch-like work stealing (Jakub)
 
-	Bob
+v3:
+- module_export(__rtnl_unlock) (nipa)
+- s/netdev_uc_count/netdev_hw_addr_list_count/ in bnxt (Aleksandr)
 
-> On Mar 30, 2026, at 12:42=E2=80=AFPM, Bob Van Valzah =
-<Bob@VanValzah.Com> wrote:
->=20
-> Thanks for following up Vadim. To be clear, we do not see our patch as =
-a solution to the problem, since it does not eliminate the underlying =
-contention, it just reduces the likelihood.
->=20
-> We now have a bit more hands-on time running the patch and can see its =
-limitations. The driver just throws the timeout error less often now. =
-Moreover, our code calling adjfine() has to be ready for an EBUSY. The =
-patch is certainly not an elegant solution. It may well have worked =
-better, or perhaps been a complete fix, if we had taken tmreg_lock. =
-Sorry if we sent our patch prematurely.
->=20
-> We think the contention happens when a system call made by a clock =
-disciplining daemon like ts2phc changes a PHC's frequency, while a =
-timestamping daemon like ptp4l has requested a timestamp against that =
-same PHC. A plausible explanation is that the hardware fails to produce =
-a timestamp for a packet when it collides with a PHC frequency =
-adjustment, leading to the timestamp timeout. We see this contention =
-128x more often than the average user because we cranked our PTP sync =
-rate up to 128 Hz. We care about every ns here. The likelihood probably =
-also scales with the number of PTP clients.
->=20
-> Sorry, in retrospect, we may have overstated our case in declaring the =
-root cause as the lack of locking, since our locking only reduces the =
-likelihood of the timestamp timeout. Intel may provide insight to the =
-underlying cause of the timeout, but my hunch is that the collision of a =
-timestamp request against a PHC and a frequency change of the same PHC =
-causes the timestamp request to fail, leading to the timeout. Our repro =
-code makes this happen so reliably that it should be easy for the =
-hardware guys to explain exactly what=E2=80=99s going on. Hopefully, =
-they can advise on a more elegant avoidance strategy than our ham-handed =
-lock.
->=20
-> We have not tried recovering a timestamp following the error. We may =
-have used the term =E2=80=9Ccorrupted=E2=80=9D poorly here. Since the =
-error message says =E2=80=9Ctimeout," that could mean the hardware =
-produced no timestamp at all, rather than a corrupted one.
->=20
-> This isn=E2=80=99t a show-stopper for us, but we note that timekeeping =
-daemons with imperfect error handling could react to this situation =
-poorly and perhaps fail silently.
->=20
-> Bob
->=20
->> On Mar 30, 2026, at 11:39=E2=80=AFAM, Vadim Fedorenko =
-<vadim.fedorenko@linux.dev> wrote:
->>=20
->> On 29/03/2026 04:25, Bob Van Valzah wrote:
->>> Hi,
->>> We found a race in igc_ptp_adjfine_i225() that causes "Tx timestamp
->>> timeout" errors and eventually wedges EXTTS when a PTP grandmaster
->>> (ptp4l with hardware timestamping) runs concurrently with PHC
->>> frequency discipline (any GPSDO calling clock_adjtime =
-ADJ_FREQUENCY).
->>> Root cause: igc_ptp_adjfine_i225() writes IGC_TIMINCA without =
-holding
->>> any lock.  Every other PTP clock operation in igc_ptp.c (adjtime,
->>> gettime, settime) holds tmreg_lock, but adjfine does not.  When the
->>> increment rate changes while the hardware is capturing a TX =
-timestamp,
->>> the captured value is corrupt.  The driver retries for
->>> IGC_PTP_TX_TIMEOUT (15s), then logs the timeout and frees the skb.
->>> Repeated occurrences eventually prevent EXTTS from delivering =
-events.
->>> The attached reproducer (triggers in ~17 seconds on i226):
->>>  One thread calling clock_adjtime(ADJ_FREQUENCY) at ~200k/s on the
->>>  PHC, another sending UDP packets with SO_TIMESTAMPING requesting
->>>  hardware TX timestamps at ~100k/s.  A Python reproducer is at:
->>>  =
-https://github.com/bobvan/PePPAR-Fix/blob/main/tools/igc_tx_timeout_repro.=
-py
->>>  At realistic rates (1 Hz adjfine from a GPSDO + ptp4l at 128 Hz
->>>  sync), the race triggers in ~30 minutes.
->>> The attached patch holds ptp_tx_lock around the TIMINCA write and
->>> skips the write if any TX timestamps are pending (tx_tstamp[i].skb
->>> !=3D NULL), returning -EBUSY.  This doesn't fully close the hardware
->>> race (a new TX capture can start between the check and the write),
->>> but at realistic rates the residual probability gives ~25 year MTBF
->>> vs ~30 minutes without the patch.
->>> A complete fix would likely require either disabling TX timestamping
->>> around TIMINCA writes (via TSYNCTXCTL), or making the timeout =
-recovery
->>> path more robust so a single corrupt timestamp doesn't wedge the
->>> subsystem.  We'd welcome guidance from the igc maintainers on the
->>> preferred approach.
->>> Tested on:
->>>  - Intel i226 (TimeHAT v5 board on Raspberry Pi 5)
->>>  - Kernel 6.12.62+rpt-rpi-2712 (Raspberry Pi OS)
->>>  - Intel out-of-tree igc driver 5.4.0-7642.46
->>>  - Stock upstream igc_ptp.c (same code, same bug)
->>> Bob
->>> ---
->>> drivers/net/ethernet/intel/igc/igc_ptp.c | 18 +++++++++++++++++-
->>> 1 file changed, 17 insertions(+), 1 deletion(-)
->>> diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c =
-b/drivers/net/ethernet/intel/igc/igc_ptp.c
->>> index XXXXXXX..XXXXXXX 100644
->>> --- a/drivers/net/ethernet/intel/igc/igc_ptp.c
->>> +++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
->>> @@ -47,8 +47,10 @@ static int igc_ptp_adjfine_i225(struct =
-ptp_clock_info *ptp, long scaled_ppm)
->>> {
->>>        struct igc_adapter *igc =3D container_of(ptp, struct =
-igc_adapter,
->>>                                               ptp_caps);
->>>        struct igc_hw *hw =3D &igc->hw;
->>> +       unsigned long flags;
->>>        int neg_adj =3D 0;
->>>        u64 rate;
->>>        u32 inca;
->>> +       int i;
->>>        if (scaled_ppm < 0) {
->>>                neg_adj =3D 1;
->>> @@ -63,7 +65,21 @@ static int igc_ptp_adjfine_i225(struct =
-ptp_clock_info *ptp, long scaled_ppm)
->>>        if (neg_adj)
->>>                inca |=3D ISGN;
->>> -       wr32(IGC_TIMINCA, inca);
->>> +       /* Changing the clock increment rate while a TX timestamp is =
-being
->>> +        * captured by the hardware can corrupt the timestamp, =
-causing the
->>> +        * driver to report "Tx timestamp timeout" and eventually =
-wedging
->>> +        * the EXTTS subsystem.  Serialize with pending TX =
-timestamps:
->>> +        * skip the rate change if any are in flight.
->>> +        */
->>> +       spin_lock_irqsave(&igc->ptp_tx_lock, flags);
->>> +       for (i =3D 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
->>> +               if (igc->tx_tstamp[i].skb) {
->>> +                       spin_unlock_irqrestore(&igc->ptp_tx_lock, =
-flags);
->>> +                       return -EBUSY;
->>> +               }
->>> +       }
->>> +       wr32(IGC_TIMINCA, inca);
->>> +       spin_unlock_irqrestore(&igc->ptp_tx_lock, flags);
->>=20
->> It's a bit weird solution, because in this case we may end up having =
-no
->> successful calls to adjfine with high amount of TX timestamp packets =
-in flight. Another problem here is that access to timing registers is
->> guarded by tmreg_lock, but here you use ptp_tx_lock, which protects
->> queue.
->>=20
->> Were you able to recover "corrupted" time stamps to figure out why =
-they
->> are discarded?
->>=20
->>=20
->>>        return 0;
->>> }
->>> --
->>> 2.39.2
->=20
->=20
+v2:
+- wifi: cfg80211: use __rtnl_unlock in nl80211_pre_doit (syzbot)
+- simplify mlx5e_sync_netdev_addr for !uc (Cosmin)
+- switch to snapshot in bnxt_cfg_rx_mode (Michael)
+- add team to net/config (Jakub)
+
+Stanislav Fomichev (14):
+  net: add address list snapshot and reconciliation infrastructure
+  net: introduce ndo_set_rx_mode_async and netdev_rx_mode_work
+  net: move promiscuity handling into netdev_rx_mode_work
+  net: cache snapshot entries for ndo_set_rx_mode_async
+  fbnic: convert to ndo_set_rx_mode_async
+  mlx5: convert to ndo_set_rx_mode_async
+  bnxt: convert to ndo_set_rx_mode_async
+  bnxt: use snapshot in bnxt_cfg_rx_mode
+  iavf: convert to ndo_set_rx_mode_async
+  netdevsim: convert to ndo_set_rx_mode_async
+  dummy: convert to ndo_set_rx_mode_async
+  net: warn ops-locked drivers still using ndo_set_rx_mode
+  selftests: net: add team_bridge_macvlan rx_mode test
+  selftests: net: use ip commands instead of teamd in team rx_mode test
+
+ Documentation/networking/netdevices.rst       |  13 +
+ drivers/net/dummy.c                           |   6 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  62 +--
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  14 +-
+ .../net/ethernet/mellanox/mlx5/core/en/fs.h   |   5 +-
+ .../net/ethernet/mellanox/mlx5/core/en_fs.c   |  32 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  13 +-
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  20 +-
+ .../net/ethernet/meta/fbnic/fbnic_netdev.h    |   4 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |   4 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c   |   2 +-
+ drivers/net/netdevsim/netdev.c                |   8 +-
+ include/linux/netdevice.h                     |  26 ++
+ net/core/dev.c                                |  69 +---
+ net/core/dev.h                                |   4 +
+ net/core/dev_addr_lists.c                     | 373 ++++++++++++++++-
+ net/core/dev_addr_lists_test.c                | 386 +++++++++++++++++-
+ net/core/dev_api.c                            |   3 +
+ net/core/dev_ioctl.c                          |   6 +-
+ net/core/rtnetlink.c                          |   1 +
+ .../selftests/drivers/net/bonding/lag_lib.sh  |  17 +-
+ .../drivers/net/team/dev_addr_lists.sh        |   2 -
+ tools/testing/selftests/net/config            |   3 +
+ tools/testing/selftests/net/rtnetlink.sh      |  44 ++
+ 24 files changed, 975 insertions(+), 142 deletions(-)
+
+-- 
+2.53.0
 
 
