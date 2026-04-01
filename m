@@ -1,216 +1,223 @@
-Return-Path: <netdev+bounces-274109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274110-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YJOyBMcczWnOaAYAu9opvQ
-	(envelope-from <netdev+bounces-274109-lists+netdev=lfdr.de@vger.kernel.org>)
+	id akCEB8cczWk0aQYAu9opvQ
+	(envelope-from <netdev+bounces-274110-lists+netdev=lfdr.de@vger.kernel.org>)
 	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:25:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F18FC37B2E1
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:25:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E75C37B2E8
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:25:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1A25D300A7E8
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 13:18:47 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 690D8301DB4F
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 13:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FCD032D7FA;
-	Wed,  1 Apr 2026 13:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE911423A97;
+	Wed,  1 Apr 2026 13:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="sPNY4QSE";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jhGBGzOK";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="sPNY4QSE";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jhGBGzOK"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA5638F25C;
-	Wed,  1 Apr 2026 13:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE19425CDD
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 13:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775049524; cv=none; b=irfKitzBvYRgWmPHqXrZkGzsHUhTACitj/Afxpr+uD0n6SMZlXoRAYyRXfKmjooKxgRhkltAdNzY437tiHi2Cre8ObCwBVQ0VFvpkY50y/ATeYoAv2u78dV5bkWH9IXNa94l9kP7gezuJOKUm5p0vzzjRsqwc4g0Ec22QCoq8/o=
+	t=1775049907; cv=none; b=XZ47xd4Fm/N4JWB3XJoI+yK1QyqyBlK9yYoLSNt3k4kU+dljgIoQv6NmVMlyH7vDaRzD/fJWb1RJ6b+TJu80bk56FPrc0sAqVxDJ4QbU7iwmVnzWSRLeUWymyDJW6TzJz+Mxfr68up5BRLB6wykSF4p3mg4w4dA/J0XglHgnIgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775049524; c=relaxed/simple;
-	bh=uQ8xz5ZVCOaxajR/YZaBP19QeYVZgCHHYym7P/lBskI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KjYhoO0ELZOSOTWZ9Y2ni8vbn66hIkdvrehEWSGEVKL0TxRmvWdQfBOwJvwBm1GxcnbqJyUdhpb9HXI4xuJ0/0g1sCcIPG6IAO1HsK+KEhIxwrn3KXYqHxMC+4j3RhGIS6MZsPF5zR+bEtJWuTB42vMOVZm9tFVpiB42OQDi078=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from ubuntu.. (unknown [202.112.113.208])
-	by APP-01 (Coremail) with SMTP id qwCowACnT2sVG81pSvbdCw--.49770S2;
-	Wed, 01 Apr 2026 21:18:21 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: vz@mleia.com
-Cc: alexandre.belloni@bootlin.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	make24@iscas.ac.cn,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	piotr.wojtaszczyk@timesys.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net: lpc_eth: Fix a possible memory leak in lpc_mii_probe()
-Date: Wed,  1 Apr 2026 21:18:13 +0800
-Message-ID: <20260401131813.139167-1-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <b44db9e6-f820-439d-a7ed-c1e2514579a8@mleia.com>
-References: <b44db9e6-f820-439d-a7ed-c1e2514579a8@mleia.com>
+	s=arc-20240116; t=1775049907; c=relaxed/simple;
+	bh=yrAiEe3hMwdtMqlM5yyE08W+WcGcpRKJkzW6T+Zj62Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PwWt8f6CHsOFtz1WZLDpDA6jAtQMWHjYkdNygiwayd57tsYCZ+4OAbil/wlfe5BiS7iMhJO4H46IGZH0Q0xMEPYiyouMKo4LdrrABOs7bipTTRSVVFvtnPgfV9bb+HxmPgG2cxmlNgAy6//69cKZN5RsYKPGjimmBqAakfmhC7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=sPNY4QSE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jhGBGzOK; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=sPNY4QSE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jhGBGzOK; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 7FE0B5C055;
+	Wed,  1 Apr 2026 13:25:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1775049903; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cflPi1gwmWX95H1Di+2W7uMrJ74d0vZDUiJvvvqQrCI=;
+	b=sPNY4QSEeDFv/Ac1CD3IuG66bOQxNLXlURFSuRx2d7Paw2XsJRVTB31LVT2FQrUjWxeXD9
+	qdq+Qw5R4CRWAQHr6u1/bzcnoaOrrMnymabTj/d2ffeeZ13d7iFwIujfT7MCYMRm03msPu
+	ZpjfXOaSvtSG+qqxDTbDzJ7/KFAihtU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1775049903;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cflPi1gwmWX95H1Di+2W7uMrJ74d0vZDUiJvvvqQrCI=;
+	b=jhGBGzOKd5CnPeq/Fq9fhG7IevPWYHkbLt6qM/rmLVQvcbBxFMcici2Q06v0c1YrDBdmfF
+	C5tRajdFRh4zdEAw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=sPNY4QSE;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=jhGBGzOK
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1775049903; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cflPi1gwmWX95H1Di+2W7uMrJ74d0vZDUiJvvvqQrCI=;
+	b=sPNY4QSEeDFv/Ac1CD3IuG66bOQxNLXlURFSuRx2d7Paw2XsJRVTB31LVT2FQrUjWxeXD9
+	qdq+Qw5R4CRWAQHr6u1/bzcnoaOrrMnymabTj/d2ffeeZ13d7iFwIujfT7MCYMRm03msPu
+	ZpjfXOaSvtSG+qqxDTbDzJ7/KFAihtU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1775049903;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cflPi1gwmWX95H1Di+2W7uMrJ74d0vZDUiJvvvqQrCI=;
+	b=jhGBGzOKd5CnPeq/Fq9fhG7IevPWYHkbLt6qM/rmLVQvcbBxFMcici2Q06v0c1YrDBdmfF
+	C5tRajdFRh4zdEAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D3BCA4A0B0;
+	Wed,  1 Apr 2026 13:25:02 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id V3KLMK4czWk9QgAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Wed, 01 Apr 2026 13:25:02 +0000
+Message-ID: <e10d488a-8c37-49ab-9dd9-61625958039a@suse.de>
+Date: Wed, 1 Apr 2026 15:24:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowACnT2sVG81pSvbdCw--.49770S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxXw4ktw18AFWfWw1kWF4DJwb_yoW5Kw4Dp3
-	y5GaySkFykGry7K395Za1UAryavw42yw1rGFy2yan0g3Z8XryrAryUKrWj93s8AFWkWF40
-	vr1ayF93Xa1kXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
-	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8Jw
-	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAG
-	YxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwV
-	W5GwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
-	6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
-	Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
-	Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
-	IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUgvtAUUUUU
-	=
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2 net v2] ipv4: nexthop: allocate skb dynamically in
+ rtm_get_nexthop()
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, petrm@nvidia.com, horms@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, dsahern@kernel.org, kees@kernel.org,
+ Yiming Qian <yimingqian591@gmail.com>
+References: <20260401081741.4273-1-fmancera@suse.de>
+ <20260401081741.4273-2-fmancera@suse.de> <20260401130257.GB1808730@shredder>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260401130257.GB1808730@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274109-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,kernel.org,redhat.com,google.com,davemloft.net,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274110-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.985];
-	FROM_NEQ_ENVFROM(0.00)[make24@iscas.ac.cn,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.976];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,iscas.ac.cn:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F18FC37B2E1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,sashiko.dev:url]
+X-Rspamd-Queue-Id: 9E75C37B2E8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/30/26 13:04, Vladimir Zapolskiy wrote:
-> On 3/30/26 11:16, Ma Ke wrote:
-> > lpc_mii_probe() calls of_phy_find_device() to obtain a phy_device
-> > pointer. of_phy_find_device() increments the refcount of the device.
-> > The current implementation does not decrement the refcount after using
-> > the pointer, which leads to a memory leak.
+On 4/1/26 3:02 PM, Ido Schimmel wrote:
+> On Wed, Apr 01, 2026 at 10:17:41AM +0200, Fernando Fernandez Mancera wrote:
+>> -static size_t nh_nlmsg_size_grp(struct nexthop *nh)
+>> +static size_t nh_nlmsg_size_grp(struct nexthop *nh, u32 op_flags)
+>>   {
+>>   	struct nh_group *nhg = rtnl_dereference(nh->nh_grp);
+>>   	size_t sz = sizeof(struct nexthop_grp) * nhg->num_nh;
+>> @@ -1013,6 +1013,21 @@ static size_t nh_nlmsg_size_grp(struct nexthop *nh)
+>>   	if (nhg->resilient)
+>>   		tot += nh_nlmsg_size_grp_res(nhg);
+>>   
+>> +	if (op_flags & NHA_OP_FLAG_DUMP_STATS) {
+>> +		tot += nla_total_size(0) +	  /* NHA_GROUP_STATS */
+>> +		       nla_total_size(4);	  /* NHA_HW_STATS_ENABLE */
+>> +		tot += nhg->num_nh *
+>> +		       (nla_total_size(0) +	  /* NHA_GROUP_STATS_ENTRY */
+>> +			nla_total_size(4) +	  /* NHA_GROUP_STATS_ENTRY_ID */
+>> +			nla_total_size_64bit(8)); /* NHA_GROUP_STATS_ENTRY_PACKETS */
+>> +
+>> +		if (op_flags & NHA_OP_FLAG_DUMP_HW_STATS) {
+>> +			tot += nhg->num_nh *
+>> +			       nla_total_size_64bit(8); /* NHA_GROUP_STATS_ENTRY_PACKETS_HW */
+>> +			tot += nla_total_size(4);	/* NHA_HW_STATS_USED */
+>> +		}
+>> +	}
+>> +
 > 
-> this is correct, there is an actual detected bug.
+> This looks correct
 > 
-> > 
-> > Add phy_device_free() to balance the refcount.
+>>   	return tot;
+>>   }
+>>   
+>> @@ -1047,14 +1062,14 @@ static size_t nh_nlmsg_size_single(struct nexthop *nh)
+>>   	return sz;
+>>   }
+>>   
+>> -static size_t nh_nlmsg_size(struct nexthop *nh)
+>> +static size_t nh_nlmsg_size(struct nexthop *nh, u32 op_flags)
+>>   {
+>>   	size_t sz = NLMSG_ALIGN(sizeof(struct nhmsg));
+>>   
+>>   	sz += nla_total_size(4); /* NHA_ID */
+>>   
+>>   	if (nh->is_group)
+>> -		sz += nh_nlmsg_size_grp(nh) +
+>> +		sz += nh_nlmsg_size_grp(nh, op_flags) +
+>>   		      nla_total_size(4) +	/* NHA_OP_FLAGS */
+>>   		      0;
 > 
-> But this does not sound right, you shoud use of_node_put(pldat->phy_node).
+> But the AI review [1] also mentions missing accounting for NHA_FDB which
+> seems like a legit issue (even if we can't currently trigger it).
 > 
-> > 
-> > Found by code review.
-> > 
-> > Signed-off-by: Ma Ke <make24@iscas.ac.cn>
-> > Cc: stable@vger.kernel.org
-> > Fixes: 3503bf024b3e ("net: lpc_eth: parse phy nodes from device tree")
-> > ---
-> >   drivers/net/ethernet/nxp/lpc_eth.c | 11 ++++++-----
-> >   1 file changed, 6 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/nxp/lpc_eth.c b/drivers/net/ethernet/nxp/lpc_eth.c
-> > index 8b9a3e3bba30..8ce7c9bb6dd6 100644
-> > --- a/drivers/net/ethernet/nxp/lpc_eth.c
-> > +++ b/drivers/net/ethernet/nxp/lpc_eth.c
-> > @@ -751,7 +751,7 @@ static void lpc_handle_link_change(struct net_device *ndev)
-> >   static int lpc_mii_probe(struct net_device *ndev)
-> >   {
-> >   	struct netdata_local *pldat = netdev_priv(ndev);
-> > -	struct phy_device *phydev;
-> > +	struct phy_device *phydev, *phydev_tmp;
-> >   
-> >   	/* Attach to the PHY */
-> >   	if (lpc_phy_interface_mode(&pldat->pdev->dev) == PHY_INTERFACE_MODE_MII)
-> > @@ -760,17 +760,18 @@ static int lpc_mii_probe(struct net_device *ndev)
-> >   		netdev_info(ndev, "using RMII interface\n");
-> >   
-> >   	if (pldat->phy_node)
-> > -		phydev =  of_phy_find_device(pldat->phy_node);
-> > +		phydev_tmp =  of_phy_find_device(pldat->phy_node);
-> >   	else
-> > -		phydev = phy_find_first(pldat->mii_bus);
-> > -	if (!phydev) {
-> > +		phydev_tmp = phy_find_first(pldat->mii_bus);
-> > +	if (!phydev_tmp) {
+> In the single nexthop case we have:
 > 
-> I didn't get it, why the new phydev_tmp is needed above, please
-> restore the original code above.
+> sz = nla_total_size(4);  /* NHA_OIF */
 > 
-> >   		netdev_err(ndev, "no PHY found\n");
-> >   		return -ENODEV;
-> >   	}
-> >   
-> > -	phydev = phy_connect(ndev, phydev_name(phydev),
-> > +	phydev = phy_connect(ndev, phydev_name(phydev_tmp),
-> >   			     &lpc_handle_link_change,
-> >   			     lpc_phy_interface_mode(&pldat->pdev->dev));
-> > +	phy_device_free(phydev_tmp);
+> Which covers NHA_FDB since it's mutually exclusive with NHA_OIF.
 > 
-> This is plainly wrong and has to be dropped or changed to
-> 
-> 	if (pldat->phy_node)
-> 		of_node_put(pldat->phy_node);
-> 
-> >   	if (IS_ERR(phydev)) {
-> >   		netdev_err(ndev, "Could not attach to PHY\n");
-> >   		return PTR_ERR(phydev);
-> 
-> Is it AI generated fix or what?.. The change looks bad, it introduces
-> more severe issues than it fixes.
-> 
-> If you think you cannot create a proper change, let me know.
-> 
-> -- 
-> Best wishes,
-> Vladimir
-Thank you very much for your detailed review and guidance.
 
-Now I think your point probably is: you are saying that the real leak 
-is not from of_phy_find_device(), but from the device node 
-pldat->phy_node which was obtained earlier (probably by 
-of_parse_phandle()) and never freed by of_node_put(). And you suggest 
-to add of_node_put(pldat->phy_node) instead of my wrong 
-phy_device_free().
+Yes, seems legit. Probably the issue cannot be reproduced because some 
+padding might be absorbing the impact. Thank you Ido for pointing it out.
 
-However, I am still a little confused. In lpc_mii_probe(), 
-of_phy_find_device() is called. From my understanding, this function 
-increases the reference count of the device. To balance it, I thought
-phy_device_free() (which calls put_device()) should be used.
+I guess it makes sense to fix this on a v3 instead of a separate patch. 
+Even though, this has been affecting nexthop_notify() path since group 
+support was implemented.
 
-Could you please kindly advise the correct patch? I will follow your
-guidance and submit a proper fix.
+Thanks,
+Fernando.
 
-I apologize again for my previous wrong patch. Thank you very much for
-your help.
-
-Best regards,
-Ma Ke
+> [1] https://sashiko.dev/#/patchset/20260401081741.4273-1-fmancera%40suse.de
 
 
