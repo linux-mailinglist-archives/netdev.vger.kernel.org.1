@@ -1,191 +1,315 @@
-Return-Path: <netdev+bounces-274256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274257-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0sojNjyFzWkregYAu9opvQ
-	(envelope-from <netdev+bounces-274256-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 22:51:08 +0200
+	id oGcJA7CGzWkregYAu9opvQ
+	(envelope-from <netdev+bounces-274257-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 22:57:20 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 363D238061C
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 22:51:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69D0E380696
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 22:57:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B031D30A1111
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 20:41:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4251E302F990
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 20:50:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0523793DD;
-	Wed,  1 Apr 2026 20:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A581936404F;
+	Wed,  1 Apr 2026 20:50:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="CR2tPumz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o6mijIx3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5F535B138
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 20:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.216.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775076069; cv=pass; b=ZSpvC4avB7fTAZh+0LhJ9eE/sGDBn4gBD4UDq01NKNC2eOeitWaGnMXLtlAOkgE0RtBjhypq0N1qbrha4o62HjPV+4br8BEh0ZjuXBG1pNuFyZdGGhEEYjdKoxLYHJRRqzOa+TP4VPC6gd9wJjS+R+tBKYcVP/Ow/hvQjkGxGps=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775076069; c=relaxed/simple;
-	bh=z94+ohkVsVxUyep1qRj19M46dqyZ6y+PuOLQwmnDEDQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rE/5I9f33OkHSFTV1C6M3dN/FIk6NGWC+mdc+pkHSPBxU9+xvydG9lONn8w+l50AkgEZCt2LpmlDbv9UjyafgftoRxklWJnsiQBLRNh+K8IZnEgsPaOXJqqIGZ4yhNHdXYWRgbkjued9pzTyxkm+vvCvOlSxvZRFLZcJpjoAZ3U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=CR2tPumz; arc=pass smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-35dac556bb2so73670a91.1
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 13:41:07 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775076067; cv=none;
-        d=google.com; s=arc-20240605;
-        b=StHpb8zZL8t91uBZ5oFu7QPgdfQ+3ZZQmScDHrEbRJmq0GW/HBKlFtVQ8mg+LSwjO4
-         yn02qJD3MhDd+oBukx1UrU8V15lPWtttu5TpvShV7Fr6bE8jtPvznVeC7KDl9kUiJ8sc
-         OB2g9C8sYLM4C85qZy7Db6XSIl/1doCAh7vtyfzwt1Y5in9Pkb+rLnGhvXTaY9KHeveA
-         QUspVQxNFbO2UxuY3TuR6F6jrEUqTysN1qr7B/MEnqM0V6z5dkR1VaTMZ+4emTZE3oHV
-         XqBLyzTt50lOqofqQMMSuOGgD3P0/sCZuZix7wZVXCxJOC+Iy8fwaF8X6XR4GNVEkM13
-         tGOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=KijIFQe0NqqeKl69HCXypV3vUYAKuByHe78TDARydIY=;
-        fh=1ykmmKcHSinBwwhKuCGHhyrhKm/8a9YlZHIdS5MayoY=;
-        b=I82hlv16r0GMbRxjS2MbNFnEySSr99QnWiutVJ9UFi/cysM6w6hXfVRp7FYAS0A4TS
-         VKiImf7t4uKACUmeQmWz0ifXYU6c0jyg84z9jzgH2vI1/hYULV6bnBdBtpRPFr7K0GOS
-         ZTMFVMlanSRO8I3s0FeDoft/pAjHsFIbRnUWH+d1UHqOT8DCTy2qebp1kgI6Ym1nr28b
-         4jMUKTt2dz3rz6Am9XWkCqYqh4m/OuGynOzY9LfGjgYwQzB4eoWcd+3n0URVY1DU/vNf
-         pl9IcCDLG6dsGI5MnMCwyG0URRw6dO8Ifto4/BBhQ+TFvo5ReHS3vd+3zqVyi73Eh7lW
-         pcAg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C52B32ABC0
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 20:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775076648; cv=none; b=UK5cS8UrZ8MUc1bsjTIgovNdkoQoO6KXmmMeOrOO0MgAUL6soMkIf8fhQu6BcIqbh7RVcN0lzKT5LKog6LsvPAN9vGV8c5IOERGKBM0hX6NHNEEqGY8fRIeAUk3z6sU4IxlhjavGQLHL7V4pJcl7avOzFMYPTFHAGwfssOIElZg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775076648; c=relaxed/simple;
+	bh=ktMqHT24bw1r5kmyz2JATopbIzzfJb9qr1AXckVYhVE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k+3VwHFJrhCcNci8TNkRKcYPbxK//iI4UdYJ7yrjrdJ2EZNFja3QMGZIW86z8x8RobRnqAI7ScHT1W3RRQ/69D+yqMr+tGWnGkZRk3//E8sThRYZzfkiqAcA0raM3EIGJLu9xPUld54u6UN5OrqLD3rxxjoizJ37Z9fJKI1hSWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o6mijIx3; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2b0c12be0ecso11945ad.0
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 13:50:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1775076067; x=1775680867; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KijIFQe0NqqeKl69HCXypV3vUYAKuByHe78TDARydIY=;
-        b=CR2tPumzdkXJ16Ay4LC8b6tb+kofbtVpbJGZ957Ivlg9ei7WwcRIYiQZxSRI2DeYKV
-         85wSUemEBYfi6kahngaNtoLKHsjIUJ25jFBWWPU23Ux/wvzjm2uNtMZoBY7+GCDzheaX
-         Rk0R4VUBTc63DrSB50iaBWvdzVVtPSg8e67Umgn4oik4SKnTbnSjiv0cV4K6YogGLBQ3
-         vJCYSc2p0j/2NdYNq3I1KY8OSDfQz8lrqYIf/i3J8NKGdXJtgl9buhIqTrkSC1qY2jVx
-         OBi4KjQYPf8N5BNJbGjAURKyrRT8Hq9fSlqHkUEWe4OAQQPt9AmPuFt17c5pnvpsMSwP
-         TqCQ==
+        d=google.com; s=20251104; t=1775076646; x=1775681446; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=LjEEKe36C/xvbCnEOY0kz8sYomKUfM5nFzyVZeOUVCo=;
+        b=o6mijIx3cqA/UL1aEw1d0WqG9Hc41TsZRVSuWru/DEcuA3Aj6zJh8OvEjV8szaC/Cu
+         50JrDo1RSZCyuBFiPw84AznFpDi8YXV5ZzUtVZ2+KIBNdUg6VprmEMX+hxT6zEV1FPla
+         hhICInAVis25fZ9SQWPuCGg58S5aisQPJ3UGbTQRje4RIWl9HAEahkLuB31FwdEOxNAY
+         srIOMhrJW8tIU1g8/s2VOU5orWLC0rK1XU/duB+qk4MCLdoo1XaEhTEi5a0UsqMqqdg1
+         oJHKJooy+K+W8GNMut4XLqCb4W6aynIZmfWXWCRRMPNS3e1PVzT8JPJpeqCTMetTUAWM
+         qYEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775076067; x=1775680867;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KijIFQe0NqqeKl69HCXypV3vUYAKuByHe78TDARydIY=;
-        b=c5z86NEXPpwYO2LvuWDw5yVBG/wMaf0AeNgWCfCU9u8EjrD11lKO3K3q7avV1ebTaK
-         DkZLh6l3DzEDbEkXJ5XfZSOir07dAr5Wie6KWvYLG0RpfI/ie+37OLNWy5853Fdd5kqm
-         mJivMdbNjdzuRio2CY3B0e4ssRBiqh1TpA0aBOysBtF6emSd2Jl5fvJRxYlEb1I/MJMh
-         HwGH2lkLYFnOuYBZSSAcQVmf+voyB7I6pVSNAxxxRVPfwCoioyKL9RhkbO4K7m55GaSN
-         c3eMPNgwcBrrwU3sMb3awNolSUsCMVBhO8NwEIL51AJWNRqVtZbpX5KKeyjJOCNN7iX1
-         rS7g==
-X-Forwarded-Encrypted: i=1; AJvYcCUY6ZVYgNWyQIMptvxYTqjPgJEdvx3BJxX9+AZHYzmPAjG+mMAaZ07InodqML1Z0CIDJqAA8dU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz28TSKdDfY66vclYF9YKFgOeHKC60APAQCKVQItZl5RuFRbpgD
-	E2qdlMw9kXyMjDl5Z/OphhhnxwgN0YBWDhNRlBc9+u0XFo3QxY+EHVGHASdkqG18sr7bQbZvkuT
-	+hzzOdlIleesbaUkVS7OQ9si0cU0g01/aMtrxzGUm
-X-Gm-Gg: ATEYQzygNqD4nM8I6w5BpcWoRldJOmjxhKYDpqxWLxP0JmPtvNsAyILwV66EULdraFk
-	hp6at8hHfnvKUF0lIH7snrzy/LuqA7N/lVPrfB8cEyTq1WGQn3WlKxxoS/e2SoIc7T7w5o90zlw
-	f1JcKj146h3y/CZzNX4NnGaPUcwSGOv+f7YuX/n3r15Xiym6fbTU+x9l0IXpTKQpZ1NUPqTy18g
-	4LKfRSrbP79+2LtdbR4dZKRGG9YzOaX3g3HfBqlbj1HKxcXFr2lSeO07Tm3DzB38c5DEDNdISwi
-	PE/OWI6V
-X-Received: by 2002:a17:90b:3f90:b0:35b:9ab6:1d4a with SMTP id
- 98e67ed59e1d1-35dc6edc398mr4533888a91.18.1775076067232; Wed, 01 Apr 2026
- 13:41:07 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1775076646; x=1775681446;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LjEEKe36C/xvbCnEOY0kz8sYomKUfM5nFzyVZeOUVCo=;
+        b=QB/NwJjbnSXSSQ5DMeCOQfrnWLEH0UVV8HWh775aB+4VxSLRUL+8zYN0wD3dy9TexG
+         aK/tBZE1TpBvsDf4wrLMc07DXEOkygvU3v8QpW4oMSO0yi2tg957NlpHRxcNCRxpKnBy
+         5Nmp3hBKAO3ikQZfDT/OPnEnsge56mpEtdXDlzqf3Eyh547Lnbjvnaq6xDSEZbSJBRo/
+         4RmTx8atQ6mjYZbrkTKQsRkUamRCDui3r8mC95iblSO/iPKOJF8O/yTYZWFNIwtTiZSS
+         td4REtCfkN09tUemX+coMjD4M8vLAr77YvlVEG3LZ7y0znZKuzyrQMsl/GmiCnrOX4+z
+         WcJQ==
+X-Gm-Message-State: AOJu0Yzoogm9foII6JRAlPsm/WzJ45jexm7aA82uKOE7rVpChCqtwT0n
+	pNXA6QSuzUyeY2+EtuZyROOdEpDXjeD0KLMzYrvk0JTbi+VRtn/jHZ2H9Wxhkp4YgA==
+X-Gm-Gg: ATEYQzwBtjAIFaJRJtnzDlmzzFX4kXlwdL8OWoGhHjT5sYbI/+RAIGgPx2IRmfHA/62
+	3e0/OoumKvBg2xDnR7Tik5fT+8+iHD+odmu8MKPmvwxsD3OTGeO21rpkAkilclFcOHHbgrD+d7Y
+	6Ssh+4wzEnIJta7Ypu+qC/AUdlT471mUj+mXI38v/oUYu3dMdnIeeVcyhmXTlBEtrt54ANoEzeE
+	qyn65OIAWFWBNsByuBcBqE52j0Gi8ElH2aeABA0aIW6kd1z6nyLuE4vSEwlu5FU3ms45wE6Oj9A
+	6yJ5kTGH2kchXhXCiD+4rEOBjZ7oksAHujTXqJDnJOWfli+U2GKtuXulrvMOg7anknccS75NnOL
+	9Cw1CIKPEh2UOok/7EFFiUBiSFakUTTVgINd0OgLWg9wV4nfjek8iuEPkziWLN4XOnv2j+5I3g4
+	YhOsEcLa+8cA8lmaLqqnunNZ1ysFRcW7zLXKgT9fLCBchgWFbisCdYRuLCFLQrN7r/6M8O
+X-Received: by 2002:a17:903:1ac3:b0:2b0:5cc5:9405 with SMTP id d9443c01a7336-2b276aa3b35mr504265ad.1.1775076645947;
+        Wed, 01 Apr 2026 13:50:45 -0700 (PDT)
+Received: from google.com (127.200.82.34.bc.googleusercontent.com. [34.82.200.127])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35dd36a1d04sm831961a91.17.2026.04.01.13.50.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Apr 2026 13:50:45 -0700 (PDT)
+Date: Wed, 1 Apr 2026 20:50:41 +0000
+From: Jordan Rife <jrife@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>, 
+	Yusuke Suzuki <yusuke.suzuki@isovalent.com>, Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH net-next v3 1/4] udp: Only compare daddr/dport when
+ sk_state == TCP_ESTABLISHED
+Message-ID: <ac1qqMc8M96aDORI@google.com>
+References: <20260330215707.2374657-1-jrife@google.com>
+ <20260330215707.2374657-2-jrife@google.com>
+ <CAAVpQUDk1ywgsuCtreVCV4yVJRm_mcjsnC-+LuUwLRLHWavtZA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260401195735.564488-1-xmei5@asu.edu> <ac2Ce-hHidTY8Z6V@strlen.de>
-In-Reply-To: <ac2Ce-hHidTY8Z6V@strlen.de>
-From: Xiang Mei <xmei5@asu.edu>
-Date: Wed, 1 Apr 2026 13:40:56 -0700
-X-Gm-Features: AQROBzCEzF8ToAv3_cJAUvbyWqTP6wVFWJTiej9ApJ7ZMVfa7_KDYNu0viJXQsg
-Message-ID: <CAPpSM+StQs6poh21nz5qTG0-QpRHi0S5RO=AM5gQOfd8rOAVWQ@mail.gmail.com>
-Subject: Re: [PATCH net] netfilter: nfnetlink_log: initialize nfgenmsg in
- NLMSG_DONE terminator
-To: Florian Westphal <fw@strlen.de>
-Cc: netfilter-devel@vger.kernel.org, pablo@netfilter.org, phil@nwl.cc, 
-	davem@davemloft.net, eric@inl.fr, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, bestswngs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAVpQUDk1ywgsuCtreVCV4yVJRm_mcjsnC-+LuUwLRLHWavtZA@mail.gmail.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,netfilter.org,nwl.cc,davemloft.net,inl.fr,gmail.com];
-	TAGGED_FROM(0.00)[bounces-274256-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DKIM_TRACE(0.00)[google.com:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,google.com,iogearbox.net,linux.dev,fomichev.me,kernel.org,isovalent.com];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274257-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
 	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[jrife@google.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,asu.edu:dkim,asu.edu:email,strlen.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 363D238061C
+	NEURAL_HAM(-0.00)[-0.995];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 69D0E380696
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Thanks for the suggestion. I'll send a v2 with nfnl_msg_put.
+On Mon, Mar 30, 2026 at 06:21:39PM -0700, Kuniyuki Iwashima wrote:
+> On Mon, Mar 30, 2026 at 2:57 PM Jordan Rife <jrife@google.com> wrote:
+> >
+> > Adjust lookups and scoring to keep their results equivalent to before
+> > even if inet_daddr+inet_dport are left intact after disconnecting a
+> > socket (sk_state == TCP_CLOSE). sk_state == TCP_ESTABLISHED implies that
+> > *daddr is non-zero, so remove redundant checks for that at the same
+> > time. Note that __udp6_lib_demux_lookup already checks if sk_state ==
+> > TCP_ESTABLISHED, so no change was needed there [1].
+> >
+> > I could find no discernible difference in performance in
+> > udp4_lib_lookup2 before and after the change in compute_score.
+> 
+> What workload did you test the series with ?
 
-On Wed, Apr 1, 2026 at 1:39=E2=80=AFPM Florian Westphal <fw@strlen.de> wrot=
-e:
->
-> Xiang Mei <xmei5@asu.edu> wrote:
-> > When batching multiple NFLOG messages (inst->qlen > 1), __nfulnl_send()
-> > appends an NLMSG_DONE terminator with sizeof(struct nfgenmsg) payload v=
-ia
-> > nlmsg_put(), but never initializes the nfgenmsg bytes. The nlmsg_put()
-> > helper only zeroes alignment padding after the payload, not the payload
-> > itself, so four bytes of stale kernel heap data are leaked to userspace
-> > in the NLMSG_DONE message body.
+These measurements were taken on the server side while running a netperf
+UDP_STREAM test over a 100 Gbps link.
+
+> I think we want to see results under DDoS.
+
+Intuitively, it seems like the performance should be similar.
+sk_state resides in the same cache line as inet_daddr, inet_dport, and
+sk_v6_daddr, and we trade a comparison with inet_daddr/sk_v6_daddr for
+one with sk_state. Of course, code-level intuition can be wrong, so I'm
+happy to do some more extensive testing if you feel it's warranted to
+make sure that performance isn't regressing.
+ 
 > >
-> > Initialize the nfgenmsg struct after nlmsg_put(), consistent with how
-> > __build_packet_message() populates nfgenmsg for regular NFULNL_MSG_PACK=
-ET
-> > messages, to prevent leaking kernel heap data to userspace.
+> > (AMD Ryzen 9 9900X)
 > >
-> > Fixes: 29c5d4afba51 ("[NETFILTER]: nfnetlink_log: fix sending of multip=
-art messages")
-> > Reported-by: Weiming Shi <bestswngs@gmail.com>
-> > Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> > kprobe:udp4_lib_lookup2 {
+> >         @start[cpu] = nsecs;
+> > }
+> > kretprobe:udp4_lib_lookup2 {
+> >         @lookup[cpu] = hist(nsecs - @start[cpu], 2);
+> > }
+> >
+> > BEFORE
+> > ======
+> > @lookup[11]:
+> > [80, 96)         1387077 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> > [96, 112)         364973 |@@@@@@@@@@@@@                                       |
+> > [112, 128)         34261 |@                                                   |
+> > [128, 160)          7246 |                                                    |
+> > [160, 192)           215 |                                                    |
+> > [192, 224)           126 |                                                    |
+> >
+> > AFTER
+> > =====
+> > @lookup[11]:
+> > [80, 96)         1408594 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> > [96, 112)         340568 |@@@@@@@@@@@@                                        |
+> > [112, 128)         30753 |@                                                   |
+> > [128, 160)          8019 |                                                    |
+> > [160, 192)           231 |                                                    |
+> > [192, 224)           157 |                                                    |
+> >
+> > [1]: https://lore.kernel.org/netdev/20170623222537.130493-1-tracywwnj@gmail.com/
+> >
+> > Signed-off-by: Jordan Rife <jrife@google.com>
 > > ---
-> >  net/netfilter/nfnetlink_log.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
+> >  net/ipv4/udp.c | 20 +++++++++++---------
+> >  net/ipv6/udp.c | 18 +++++++++---------
+> >  2 files changed, 20 insertions(+), 18 deletions(-)
 > >
-> > diff --git a/net/netfilter/nfnetlink_log.c b/net/netfilter/nfnetlink_lo=
-g.c
-> > index fcbe54940b2e..ad4eaf27590e 100644
-> > --- a/net/netfilter/nfnetlink_log.c
-> > +++ b/net/netfilter/nfnetlink_log.c
-> > @@ -361,6 +361,7 @@ static void
-> >  __nfulnl_send(struct nfulnl_instance *inst)
-> >  {
-> >       if (inst->qlen > 1) {
-> > +             struct nfgenmsg *nfmsg;
-> >               struct nlmsghdr *nlh =3D nlmsg_put(inst->skb, 0, 0,
-> >                                                NLMSG_DONE,
-> >                                                sizeof(struct nfgenmsg),
->
-> Would you mind sending a v2 that replaces nlmsg_put with nfnl_msg_put() ?
->
-> We already use this helper in __build_packet_message() and it takes
-> care of initialising the nfgenmsg.
+> > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > index b60fad393e18..d91c587c3657 100644
+> > --- a/net/ipv4/udp.c
+> > +++ b/net/ipv4/udp.c
+> > @@ -385,16 +385,16 @@ static int compute_score(struct sock *sk, const struct net *net,
+> >         score = (sk->sk_family == PF_INET) ? 2 : 1;
+> >
+> >         inet = inet_sk(sk);
+> > -       if (inet->inet_daddr) {
+> > +       if (sk->sk_state == TCP_ESTABLISHED) {
+> >                 if (inet->inet_daddr != saddr)
+> >                         return -1;
+> >                 score += 4;
+> > -       }
+> >
+> > -       if (inet->inet_dport) {
+> > -               if (inet->inet_dport != sport)
+> > -                       return -1;
+> > -               score += 4;
+> > +               if (inet->inet_dport) {
+> > +                       if (inet->inet_dport != sport)
+> > +                               return -1;
+> > +                       score += 4;
+> > +               }
+> >         }
+> >
+> >         dev_match = udp_sk_bound_dev_eq(net, sk->sk_bound_dev_if,
+> > @@ -796,8 +796,9 @@ static inline bool __udp_is_mcast_sock(struct net *net, const struct sock *sk,
+> >
+> >         if (!net_eq(sock_net(sk), net) ||
+> >             udp_sk(sk)->udp_port_hash != hnum ||
+> > -           (inet->inet_daddr && inet->inet_daddr != rmt_addr) ||
+> > -           (inet->inet_dport != rmt_port && inet->inet_dport) ||
+> > +           (sk->sk_state == TCP_ESTABLISHED &&
+> > +            (inet->inet_daddr != rmt_addr ||
+> > +            (inet->inet_dport != rmt_port && inet->inet_dport))) ||
+> >             (inet->inet_rcv_saddr && inet->inet_rcv_saddr != loc_addr) ||
+> >             ipv6_only_sock(sk) ||
+> >             !udp_sk_bound_dev_eq(net, sk->sk_bound_dev_if, dif, sdif))
+> > @@ -2854,7 +2855,8 @@ static struct sock *__udp4_lib_demux_lookup(struct net *net,
+> >         ports = INET_COMBINED_PORTS(rmt_port, hnum);
+> >
+> >         udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
+> > -               if (inet_match(net, sk, acookie, ports, dif, sdif))
+> > +               if (sk->sk_state == TCP_ESTABLISHED &&
+> > +                   inet_match(net, sk, acookie, ports, dif, sdif))
+> >                         return sk;
+> >                 /* Only check first socket in chain */
+> >                 break;
+> > diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+> > index 010b909275dd..b93a9a3e7678 100644
+> > --- a/net/ipv6/udp.c
+> > +++ b/net/ipv6/udp.c
+> > @@ -147,16 +147,16 @@ static int compute_score(struct sock *sk, const struct net *net,
+> >         score = 0;
+> >         inet = inet_sk(sk);
+> >
+> > -       if (inet->inet_dport) {
+> > +       if (sk->sk_state == TCP_ESTABLISHED) {
+> >                 if (inet->inet_dport != sport)
+> >                         return -1;
+> >                 score++;
+> > -       }
+> >
+> > -       if (!ipv6_addr_any(&sk->sk_v6_daddr)) {
+> > -               if (!ipv6_addr_equal(&sk->sk_v6_daddr, saddr))
+> > -                       return -1;
+> > -               score++;
+> > +               if (!ipv6_addr_any(&sk->sk_v6_daddr)) {
+> 
+> This looks unnecessary.
+
+Yep, thanks. This is inverted. It should have been similar to the ipv4
+logic where the unnecessary `if (inet->inet_daddr)` check was removed
+after adding if `(sk->sk_state == TCP_ESTABLISHED)`:
+
+	if (sk->sk_state == TCP_ESTABLISHED) {
+		if (inet->inet_dport) {
+			if (inet->inet_dport != sport)
+				return -1;
+			score++;
+		}
+
+		if (!ipv6_addr_equal(&sk->sk_v6_addr, saddr))
+			return -1;
+		score++;
+	}
+ 
+> 
+> > +                       if (!ipv6_addr_equal(&sk->sk_v6_daddr, saddr))
+> > +                               return -1;
+> > +                       score++;
+> > +               }
+> >         }
+> >
+> >         bound_dev_if = READ_ONCE(sk->sk_bound_dev_if);
+> > @@ -949,9 +949,9 @@ static bool __udp_v6_is_mcast_sock(struct net *net, const struct sock *sk,
+> >
+> >         if (udp_sk(sk)->udp_port_hash != hnum ||
+> >             sk->sk_family != PF_INET6 ||
+> > -           (inet->inet_dport && inet->inet_dport != rmt_port) ||
+> > -           (!ipv6_addr_any(&sk->sk_v6_daddr) &&
+> > -                   !ipv6_addr_equal(&sk->sk_v6_daddr, rmt_addr)) ||
+> > +           (sk->sk_state == TCP_ESTABLISHED &&
+> > +            ((inet->inet_dport && inet->inet_dport != rmt_port) ||
+> > +            !ipv6_addr_equal(&sk->sk_v6_daddr, rmt_addr))) ||
+> >             !udp_sk_bound_dev_eq(net, READ_ONCE(sk->sk_bound_dev_if), dif, sdif) ||
+> >             (!ipv6_addr_any(&sk->sk_v6_rcv_saddr) &&
+> >                     !ipv6_addr_equal(&sk->sk_v6_rcv_saddr, loc_addr)))
+> > --
+> > 2.53.0.1118.gaef5881109-goog
+> >
+
+Thanks,
+Jordan
 
