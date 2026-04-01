@@ -1,261 +1,181 @@
-Return-Path: <netdev+bounces-273895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273897-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UFoqMAetzGnNVAYAu9opvQ
-	(envelope-from <netdev+bounces-273895-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 07:28:39 +0200
+	id kL1nHRW2zGnMVwYAu9opvQ
+	(envelope-from <netdev+bounces-273897-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 08:07:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61CBE374E77
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 07:28:39 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5D2C3750B2
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 08:07:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F14FA301379E
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 05:28:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A0EDA307B205
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 06:05:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B313815FC;
-	Wed,  1 Apr 2026 05:28:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2E43314C2;
+	Wed,  1 Apr 2026 06:05:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="ktMLcu5X"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CtSCfDq4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-dy1-f202.google.com (mail-dy1-f202.google.com [74.125.82.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57FBA37FF6A
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 05:28:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E772C236B
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 06:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775021282; cv=none; b=XdsIe4tAar8WSCqAGbDuHugEhzT+uYi443fMfTZ+torBSVSgnLOU25nrONE6EFcZG81Od4G3BG9WI0dxhVWigr6L80Q/ScksXz4XNDuWBQ9UtSKMsrUTzb0Vss4K7CeyaRWceePIV7kMBLyZyvkndm4+abercpM0uuBLyzqHJd4=
+	t=1775023544; cv=none; b=DJ0Wc+IFZuL1GRJQy1ASkZ5Q5b7WNeQj1U61X7lsfKCUJotweGxEVpa1d/Q8zivig36BarGeLduM5jqvhpLlU1s/jXSVhyXyf6lyPM6EI/x7KZL2o0GLOdUdwqrrBMHrHk1NZBBLVU9SSe6XrDP/AbwMF1qvQFte3dlMyVmTERg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775021282; c=relaxed/simple;
-	bh=VD/BrkY+P9EZvzyKieGsPzn58utPMgfLt7RRVf8OBvg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MfAz7tziUlIjreD70MR3e3HwhAetavJ5RWNMvaBMi395QPP1WjPoy0KUQ5UU801Ni9ABsBmsTe4ZwMTuM674ThxBxWrguVJHYv/32bCofrJpzYJqx+T2AQHUGCd+tc/761j+TrvCT74w/J98lbcDDMEw4Gw9E6CiKr1scyn9Mgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=ktMLcu5X; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2ab232cc803so31071245ad.3
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 22:28:01 -0700 (PDT)
+	s=arc-20240116; t=1775023544; c=relaxed/simple;
+	bh=15hnnoslM5ivK5iHcnK9XCmoGjgYdOmkj5nkTKztHis=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ntTMddudu3qaYnaxB4FXjmCCYKb+M6TTaDrhgMJvLHqtpvXr51W7QTI6Ul8ESpWPZO0Uy63NBdPAU3J5WsvAMICfocZCkK5twwtExZL1k+V9kbfKHk73B8Z5BR8zgm1szjix7tpd00Qbo9n2dS33Im7uWKFBK41ItUYKao0QDdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CtSCfDq4; arc=none smtp.client-ip=74.125.82.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com
+Received: by mail-dy1-f202.google.com with SMTP id 5a478bee46e88-2c5b48baf75so6451690eec.0
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 23:05:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shopee.com; s=shopee.com; t=1775021280; x=1775626080; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+dtnjV/UQsHz5i0eYil7AmCFv4jaBC0RE9vTuxD9kdg=;
-        b=ktMLcu5XPuPdlQoZ+w0ftcniQbvv+JariVNU6Q9c+4hnjfd7qsJzH4VG244gD0CNzD
-         80QtsygCSL1rH9gUYEBMBLGasR5zc9FYK7SlsZfopXTJYlLwfWqOU/VeD1fr0PX3VuwC
-         MwZq4Au2bOlLY4zxyEZAlnni5KIPcowzd9pDrBqB1jD93YldM35jpzbTazxnRasJMFDk
-         628k6FP+hlHSZJxkOMGFcxreOrW/CEMv77zwtrwv7MCJ/ofnuUaJcRSeFBUcUK5GZucA
-         T9AjwI6BjhSCTzGwjUj1Fkq9Q4t+6Vr2hJHi7QxTsCqqHSm91pB1pxFgk5bDs/Q6AbRF
-         Dsnw==
+        d=google.com; s=20251104; t=1775023540; x=1775628340; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=iHiW2fA6FQ0gm2ne9i1cNEZehf2oFJcgxVJhfgdRX+k=;
+        b=CtSCfDq42IRjUvgb5MQgH6FcQCPwhDSL2JNfp74Z+w4SZpw9MH1XRcWPoN/Yj9CNJr
+         R7e4bwDwyDz/YT+/tyMNe+5SkZ5S9AdG/LZBIzTwh5gd66aJbhoHnsQdVcCV6PyZpPwo
+         IjUcC6M0/2sGUAaEPNPlXefmYm4NQOIq7IfJ2vfvCWTDWBcWSdScEF3zNZAnvI/8WNDG
+         aNqlGNA2k2qt8s/71UcOB/hYA5W9sOXsbmFQUm/oThp0TIFZ3m/sHcoB6NNK/nzCNFpM
+         YCfklEdvA6+Yj1jQBb7IwjcH+TbqLTGKAbNv+o6lmYxukP74xAJE6GkO8RcRI5CrmWQu
+         o5Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775021280; x=1775626080;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+dtnjV/UQsHz5i0eYil7AmCFv4jaBC0RE9vTuxD9kdg=;
-        b=magc/dMSqywia9kdY4LMJxzMZjjP7hiA+9Ie2tU8PcidgM/K8sEGpg27cashIuyZMZ
-         2Y0tKjzw+9bqV/6SbNcRIiEkdiPteu2ZBmo7cp92LNr3NZP4VtcNqQBKiEgm2joBhDYX
-         0rN/zUQu546aJA4Tt+teF4RMd2Aiu/yyqzHeoMjFyqA+ArztT0cH5bUH+MlHL8QyOsqH
-         jS27Qp9r8Lm2l/nsFoMsenvFYDZ2TIiZSdbmcTFxbS4tdzzyBh3+7RzSdc5BiagwGFqS
-         sJHB0VydhHChksH+DIzi13CqGMV9B5jtQwyAB0W++gmyOGQlLBMI3PIrytsrxh/zMrf0
-         YaBw==
-X-Gm-Message-State: AOJu0YxRXOBO6AkdKi8wMy3akMgfpUh+tgVk7IFyrCXCb+mSGBpuxl7H
-	mRmxZLJu6hG1WpQ82OwNy2dBQlFEKjdUljgo/amoEATaxqDkvN0TYoSoFVWxS1TTGSyvXd7xd96
-	uuH8FIdFeiCtlRGGpyelWcJ0MpnUO4fFTJampHeXwsA7I3JqF6EWMtuR8GaFIY3rf/ZhEAHVICn
-	OyJARE30jO8F6FwNJuq815DkgbU3S0jEvK+1XRA8xuzjB+bw==
-X-Gm-Gg: ATEYQzyXHNRfL15ryN5qK9GGfW4FFYMb6XB/VFr6aX7VOOtk3ejOYq1i9nK/UVxT/Gh
-	4KZxKWArl9OIKhg/ciyTNZVn7Xls9wa6PZAGUL7T1S3lAQqQYH0anFNI+qtFfZo8C53reexWxyS
-	Yn71MAzv5/EvRDX537EC944/KzCKQEUUsdTbzm93RwcvJcwie2MR2Cxvd7mXZMlfJutM6E8I9yn
-	+efV8G2z6GU2LFbMiyREy6l40J9H8AMsEfYtqWIKbjXRUcWr7wR9kVii/+pk5o8gNdzDRAYGbxn
-	dJFYwgifnCjiGIj6cRHH7e1Lt2uFxc3E5fr1lf7QjDsdh7nAGyDs62OlMcik+t9OcFZM7skCs/a
-	l2OdSt0+tyaoRHi3kFGeveAkXxRcJaZg6PhaxEf/v+wXWUoeIBOAUFq/ATYb/uv2RvmFR9W8Hl/
-	voctSJYX5RK04ryfLRsHa520P8OZaP29ro8+udwklLHrjyj75Z1w==
-X-Received: by 2002:a17:902:f708:b0:2b2:6cab:313c with SMTP id d9443c01a7336-2b26cab38b2mr12456065ad.20.1775021280346;
-        Tue, 31 Mar 2026 22:28:00 -0700 (PDT)
-Received: from bms-ytl-d1-app-10-251-178-27 ([147.136.157.1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b24266b92fsm134019025ad.23.2026.03.31.22.27.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Mar 2026 22:27:59 -0700 (PDT)
-From: Leon Hwang <leon.huangfu@shopee.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Leon Hwang <leon.huangfu@shopee.com>
-Subject: [PATCH net-next] selftests/net: Add two xdp tests to xdp.py
-Date: Wed,  1 Apr 2026 13:27:46 +0800
-Message-ID: <20260401052746.314667-1-leon.huangfu@shopee.com>
-X-Mailer: git-send-email 2.53.0
+        d=1e100.net; s=20251104; t=1775023540; x=1775628340;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iHiW2fA6FQ0gm2ne9i1cNEZehf2oFJcgxVJhfgdRX+k=;
+        b=Vm2wMV9zD40kvcgEbSC5RA8+gnxsqoCOlL9yMcws0pisODNs0203tR37SKRakzSx09
+         SL1W77oN8IWOwQjKGGGIYQTmO5RBgON+A9yTZtHvyBq7VZlC3xbXdQyenbA6E/WYNB7+
+         ve5g2tbldE6IPuL2NM/RSAKfhxLNy0kMmLAnsPUzns82o4b9IQn2gW0AaVPkWvjQJGcj
+         lI+NNaEKzEqLnCAhxqVnBrh1aEreCnQlKL1AzZBXVbQ3qw7nQViYCgNQrlqTfsu8WM1k
+         XvUrd9D6ejnXec2Eyp0JYm07GiPYgoGsDMxGWcUPqJDRTtHxQ5A/JiMZkp10WqIJncoI
+         La2w==
+X-Gm-Message-State: AOJu0Yz75k6xMk0z8HugI+H7IlwDi5AENbe7gv1KX6Xfu3PohPuwtjnw
+	8YG3WAGDNVSIB3mgHiih70o3qu11g03Rfhif6nbNTOm0q6s62M32bmzDpH4ZWQa98HUwObs969r
+	6QFVA/JoXjyaVkSzaJCd5SQ==
+X-Received: from dyx7.prod.google.com ([2002:a05:693c:8207:b0:2be:710c:1d1])
+ (user=marcharvey job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:7300:cc12:b0:2c4:ec89:be7 with SMTP id 5a478bee46e88-2c9328a61eamr1278254eec.23.1775023539614;
+ Tue, 31 Mar 2026 23:05:39 -0700 (PDT)
+Date: Wed, 01 Apr 2026 06:05:24 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAKS1zGkC/x3MQQrCMBBG4auUWTswxtIWryIuQvOnDtRRJqEUS
+ u9ucPkt3juowBWF7t1Bjk2LfqwhXDqaX9EWsKZmChIG6eXKFfGttnBy3eCsVuEWV55uOWSRsU/ DRK3+OrLu//ODDJUNe6Xnef4Aj72PIHMAAAA=
+X-Change-Id: 20260401-teaming-driver-internal-83f2f0074d68
+X-Developer-Key: i=marcharvey@google.com; a=ed25519; pk=OzOeciadbfF5Bug/4/hyEAwfrruSY4tn0Q0LocyYUL0=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1775023538; l=2643;
+ i=marcharvey@google.com; s=20260401; h=from:subject:message-id;
+ bh=15hnnoslM5ivK5iHcnK9XCmoGjgYdOmkj5nkTKztHis=; b=fQbE9ksUrfC8qptLzLiYHMfnYBevOZ6D8FSBuBZVce8T2nj/RRv72+dlwQziYQCVdsxPfxqu2
+ CyMX2suukVqBlTKD1kTCjz5PEhdPAa7vOfYZq32rv6ZDrX4j9+v4qOO
+X-Mailer: b4 0.14.3
+Message-ID: <20260401-teaming-driver-internal-v2-0-f80c1291727b@google.com>
+Subject: [PATCH net-next v2 0/7] Decouple receive and transmit enablement in
+ team driver
+From: Marc Harvey <marcharvey@google.com>
+To: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Marc Harvey <marcharvey@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[shopee.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[shopee.com:s=shopee.com];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,shopee.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-273895-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-273897-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon.huangfu@shopee.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[shopee.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,xdp.py:url]
-X-Rspamd-Queue-Id: 61CBE374E77
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B5D2C3750B2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In "bpf: Disallow freplace on XDP with mismatched xdp_has_frags values" [1],
-these two XDP tests are suggested to add to xdp.py.
+Allow independent control over receive and transmit enablement states
+for aggregated ports in the team driver.
 
-1. Verify the failure of attaching non-frag-capable prog to mtu=9k driver.
-2. Verify the failure of updating frag-capable prog with non-frag-capable
-   prog, when the frag-capable prog attaches to mtu=9k driver.
+The motivation is that IEE 802.3ad LACP "independent control" can't
+be implemented for the team driver currently. This was added to the
+bonding driver in commit 240fd405528b ("bonding: Add independent
+control state machine").
 
-They have been verified against Mellanox CX6 and Intel 82599ES NICs.
+This series also has a few patches that add tests to show that the old
+coupled enablement still works and that the new decoupled enablement
+works as intended (4, 5, and 7).
 
-With dropping other tests, here are the test logs.
+There are three patches with small fixes as well, with the goal of
+making the final decouplement patch clearer (1, 2, and 3).
 
- # ethtool -i eth0
- driver: mlx5_core
- version: 6.19.0-061900-generic
-
- # NETIF=eth0 python3 xdp.py
- TAP version 13
- 1..2
- ok 1 xdp.test_xdp_native_attach_sb_to_mb
- ok 2 xdp.test_xdp_native_update_mb_to_sb
- # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
-
- # ethtool -i eth0
- driver: ixgbe
- version: 6.19.0-061900-generic
-
- # NETIF=eth0 python3 xdp.py
- TAP version 13
- 1..2
- ok 1 xdp.test_xdp_native_attach_sb_to_mb # SKIP RTNETLINK answers: Invalid argument
- ok 2 xdp.test_xdp_native_update_mb_to_sb # SKIP RTNETLINK answers: Invalid argument
- # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:2 error:0
-
-Links:
-[1] https://lore.kernel.org/bpf/20260326124205.1a3bb825@kernel.org/
-
-Signed-off-by: Leon Hwang <leon.huangfu@shopee.com>
+Signed-off-by: Marc Harvey <marcharvey@google.com>
 ---
- tools/testing/selftests/drivers/net/xdp.py | 53 +++++++++++++++++++++-
- 1 file changed, 52 insertions(+), 1 deletion(-)
+Changes in v2:
+- Patch 4 and 5: Fix shellcheck errors and warnings, use iperf3
+  instead of netcat+pv, fix dependency checking.
+- Patch 7: Fix shellcheck errors and warnings, fix dependency
+  checking.
+- Link to v1: https://lore.kernel.org/all/20260331053353.2504254-1-marcharvey@google.com/
 
-diff --git a/tools/testing/selftests/drivers/net/xdp.py b/tools/testing/selftests/drivers/net/xdp.py
-index d86446569f89..fe34b491778b 100755
---- a/tools/testing/selftests/drivers/net/xdp.py
-+++ b/tools/testing/selftests/drivers/net/xdp.py
-@@ -13,7 +13,7 @@ from enum import Enum
- 
- from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_ge, ksft_ne, ksft_pr
- from lib.py import KsftNamedVariant, ksft_variants
--from lib.py import KsftFailEx, NetDrvEpEnv
-+from lib.py import KsftFailEx, KsftSkipEx, NetDrvEpEnv
- from lib.py import EthtoolFamily, NetdevFamily, NlError
- from lib.py import bkg, cmd, rand_port, wait_port_listen
- from lib.py import ip, defer
-@@ -693,6 +693,55 @@ def test_xdp_native_qstats(cfg, act):
-             ksft_ge(after['tx-packets'], before['tx-packets'])
- 
- 
-+def _set_jumbo_mtu(cfg, mtu):
-+    ip(f"link set dev {cfg.ifname} mtu {mtu}")
-+    defer(ip, f"link set dev {cfg.ifname} mtu 1500")
-+
-+
-+def _exec_cmd(cfg, obj, sec, ip_opts=""):
-+    return cmd(f"ip {ip_opts} link set dev {cfg.ifname} xdpdrv obj {obj} sec {sec}", shell=True, fail=False)
-+
-+
-+def test_xdp_native_attach_sb_to_mb(cfg):
-+    obj = cfg.net_lib_dir / "xdp_dummy.bpf.o"
-+    mtu = 9000
-+
-+    _set_jumbo_mtu(cfg, mtu)
-+
-+    probe = _exec_cmd(cfg, obj, "xdp.frags")
-+    if probe.ret != 0:
-+        output = probe.stderr.strip() or probe.stdout.strip()
-+        raise KsftSkipEx(output or "device does not support multi-buffer XDP")
-+
-+    ip(f"link set dev {cfg.ifname} xdpdrv off")
-+
-+    probe = _exec_cmd(cfg, obj, "xdp")
-+    if probe.ret == 0:
-+        ip(f"link set dev {cfg.ifname} xdpdrv off")
-+        raise KsftFailEx(f"driver unexpectedly allows non-multi-buffer XDP at MTU {mtu}")
-+
-+
-+def test_xdp_native_update_mb_to_sb(cfg):
-+    obj = cfg.net_lib_dir / "xdp_dummy.bpf.o"
-+
-+    _set_jumbo_mtu(cfg, 9000)
-+
-+    attach = _exec_cmd(cfg, obj, "xdp.frags")
-+    if attach.ret != 0:
-+        output = attach.stderr.strip() or attach.stdout.strip()
-+        raise KsftSkipEx(output or "device does not support multi-buffer XDP")
-+
-+    defer(ip, f"link set dev {cfg.ifname} xdpdrv off")
-+
-+    update1 = _exec_cmd(cfg, obj, "xdp.frags", "-force")
-+    if update1.ret != 0:
-+        raise KsftFailEx("device fails to update multi-buffer XDP")
-+
-+    update2 = _exec_cmd(cfg, obj, "xdp", "-force")
-+    if update2.ret == 0:
-+        raise KsftFailEx("device unexpectedly updates non-multi-buffer XDP")
-+
-+
- def main():
-     """
-     Main function to execute the XDP tests.
-@@ -718,6 +767,8 @@ def main():
-                 test_xdp_native_adjst_head_grow_data,
-                 test_xdp_native_adjst_head_shrnk_data,
-                 test_xdp_native_qstats,
-+                test_xdp_native_attach_sb_to_mb,
-+                test_xdp_native_update_mb_to_sb,
-             ],
-             args=(cfg,))
-     ksft_exit()
+---
+Marc Harvey (7):
+      net: team: Annotate reads and writes for mixed lock accessed values
+      net: team: Remove unused team_mode_op, port_enabled
+      net: team: Rename port_disabled team mode op to port_tx_disabled
+      selftests: net: Add tests for failover of team-aggregated ports
+      selftests: net: Add test for enablement of ports with teamd
+      net: team: Decouple rx and tx enablement in the team driver
+      selftests: net: Add tests for team driver decoupled tx and rx control
+
+ drivers/net/team/team_core.c                       | 241 +++++++++++++++++---
+ drivers/net/team/team_mode_loadbalance.c           |   8 +-
+ drivers/net/team/team_mode_random.c                |   4 +-
+ drivers/net/team/team_mode_roundrobin.c            |   2 +-
+ include/linux/if_team.h                            |  63 +++---
+ tools/testing/selftests/drivers/net/team/Makefile  |   4 +
+ tools/testing/selftests/drivers/net/team/config    |   4 +
+ .../drivers/net/team/decoupled_enablement.sh       | 249 +++++++++++++++++++++
+ .../testing/selftests/drivers/net/team/options.sh  |  99 +++++++-
+ .../testing/selftests/drivers/net/team/team_lib.sh | 115 ++++++++++
+ .../drivers/net/team/teamd_activebackup.sh         | 207 +++++++++++++++++
+ .../drivers/net/team/transmit_failover.sh          | 151 +++++++++++++
+ tools/testing/selftests/net/lib.sh                 |  13 ++
+ 13 files changed, 1090 insertions(+), 70 deletions(-)
+---
+base-commit: f1359c240191e686614847905fc861cbda480b47
+change-id: 20260401-teaming-driver-internal-83f2f0074d68
+
+Best regards,
 -- 
-2.53.0
+Marc Harvey <marcharvey@google.com>
 
 
