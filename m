@@ -1,50 +1,48 @@
-Return-Path: <netdev+bounces-274005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274006-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6N65JPnmzGk/XwYAu9opvQ
-	(envelope-from <netdev+bounces-274005-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 11:35:53 +0200
+	id iNalKDflzGmjXQYAu9opvQ
+	(envelope-from <netdev+bounces-274006-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 11:28:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB3CC377C03
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 11:35:52 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45DE3377974
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 11:28:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B9F393103FE0
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 09:23:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B37F930087E0
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 09:23:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D423CF679;
-	Wed,  1 Apr 2026 09:23:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8705382F1B;
+	Wed,  1 Apr 2026 09:23:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iXYM6iFl"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HxJ8I3Y0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248AC3CEBA9
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 09:23:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EF73BBA1D
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 09:23:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775035397; cv=none; b=m2VPTREBzhuMQJhAZln1SDU/oDwaCojXxQfHNcrl6HMhKSHF7zxlv9b0KQlOvyqiM4gyHDTsRSjOmals+OkW94dpMTYOxCZ5TB1dT0S9wBdb3+zjJXF44NkpKVKVThSdrmYuIj4iJngtkCVjVy31D/3/Y/jHBrFA7E8YjQ4wfMA=
+	t=1775035431; cv=none; b=IJbE6PelsIkyql8AgTTBnmtx6LqRorx1Kl+h+2utc4WseDKQba91bupOl/ve92H3hTIVIOO83jqHmOdkR0Kxj8EvpeKEM56n6e0hxybW5w+AfQS3ltwZkhM8mhTeaLEe+NYnclY5n4huLvDVlmQE7yOL5FNGG+SaB0vt+bdYzU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775035397; c=relaxed/simple;
-	bh=t1Y/gHfQJL/gVsVXfl8JZO/kakKelJ8QyQ5MoB9sXYw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LDvRf8+8sNLNwBnUeSVUyn2CjSP1CGMa/rXB5O7fsnJf/WtdlG1Os3hbxmJV1H351UDzj8DFVh8UejGOBqgupA0WaRydOT/aTE2bwItPWBfAW3R0sf4zusu8rzZ46Bn8oDAQdpoFZ9DzHH5z/TO5HVQvDIeiCupIYGc1abJfUac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iXYM6iFl; arc=none smtp.client-ip=91.218.175.173
+	s=arc-20240116; t=1775035431; c=relaxed/simple;
+	bh=rPPx5WkBU9Jvqt81h7Y1Ix6AVdkAzhYYixTLHgOtStg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rZq/uzOQmkqpf5pxePJ7Slhp9pSTF+d5qE9DZd8aKk5rIFc5AnuajuSBylxBhPBj/ZaXQ7mRQEvAIc3Sib2AEXClNH1/wzNntgEWqSpobnf23hkLUSrXaPYvTDV+ISr4bA7LcAJtnTXjWOC/Oxd3SJ5oUkaxv7rL6tkosVVbG0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HxJ8I3Y0; arc=none smtp.client-ip=95.215.58.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775035394;
+	t=1775035428;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q/+XkSjyDeCzx867EDSJ+ErRP7Kp2hPRuM05EkkxRf0=;
-	b=iXYM6iFlaxuRyDFauarjMVAxIfu/zk9RUtzW3gBSh78d01+FU30DXSj1uaqu1YGSfh1vUh
-	J8n1P3Pd/QAL+w91aSfW0jgnFHCASiJg9whi2MT7busXMP2GbM92vq/3OF9Wox9s/ioFWP
-	8ki6Qt4VDQUzkS4EMmT4jZxZNnPm5pQ=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+Hzvzw3XsDopvM0mKzRMgGwQFxynYJ9646hbuSOHwZ8=;
+	b=HxJ8I3Y0xkYw2KsuYAeFIC/s1z1KnEJsgQj5oRBuJ57pDm++U4QlVzJwtpmOha6G8KE3fm
+	8KQHsRGGkpVYx6RJrdlPrfj5rKKqPKA0OUz5PSxCZLAL9e0hkha4xY4gLKkTkaA5YBI/Wy
+	7EaaZCgRgUi9GDBxOjwM5vb+hEMCYMo=
 From: luka.gejak@linux.dev
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -53,14 +51,10 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	fmaurer@redhat.com,
 	horms@kernel.org,
-	bigeasy@linutronix.de,
-	m-karicheri2@ti.com,
 	luka.gejak@linux.dev
-Subject: [PATCH net v4 2/2] net: hsr: fix VLAN add unwind on slave errors
-Date: Wed,  1 Apr 2026 11:22:43 +0200
-Message-ID: <20260401092243.52121-3-luka.gejak@linux.dev>
-In-Reply-To: <20260401092243.52121-1-luka.gejak@linux.dev>
-References: <20260401092243.52121-1-luka.gejak@linux.dev>
+Subject: [PATCH net-next v4 0/2] net: hsr: strict supervision TLV validation
+Date: Wed,  1 Apr 2026 11:23:21 +0200
+Message-ID: <20260401092324.52266-1-luka.gejak@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,17 +69,17 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
-	TAGGED_FROM(0.00)[bounces-274005-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274006-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FROM_NO_DN(0.00)[];
 	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -93,93 +87,45 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EB3CC377C03
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
+X-Rspamd-Queue-Id: 45DE3377974
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Luka Gejak <luka.gejak@linux.dev>
 
-When vlan_vid_add() fails for a secondary slave, the error path calls
-vlan_vid_del() on the failing port instead of the peer slave that had
-already succeeded. This results in asymmetric VLAN state across the HSR
-pair.
+This series improves the robustness of HSR supervision frame parsing. 
+It enforces strict supervision frame TLV validation and improves Netlink
+error reporting for invalid interlink attributes.
 
-Fix this by switching to a centralized unwind path that removes the VID
-from any slave device that was already programmed.
+These were previously part of a 4-patch set. The first two patches 
+(fixes) have been sent separately to the 'net' tree.
 
-Fixes: 1a8a63a5305e ("net: hsr: Add VLAN CTAG filter support")
-Signed-off-by: Luka Gejak <luka.gejak@linux.dev>
----
- net/hsr/hsr_device.c | 32 +++++++++++++++++---------------
- 1 file changed, 17 insertions(+), 15 deletions(-)
+Changes in v4:
+ - Split from a 4-patch series into 'net' and 'net-next' as requested.
+ - Implemented a TLV walker in Patch 1 to correctly handle extension
+   TLVs and avoid regressions on paged frames/non-linearized skbs.
+ - Corrected pskb_may_pull() logic to include the TLV header size.
 
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index 90236028817d..5555b71ab19b 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -532,8 +532,8 @@ static void hsr_change_rx_flags(struct net_device *dev, int change)
- static int hsr_ndo_vlan_rx_add_vid(struct net_device *dev,
- 				   __be16 proto, u16 vid)
- {
--	bool is_slave_a_added = false;
--	bool is_slave_b_added = false;
-+	struct net_device *slave_a_dev = NULL;
-+	struct net_device *slave_b_dev = NULL;
- 	struct hsr_port *port;
- 	struct hsr_priv *hsr;
- 	int ret = 0;
-@@ -549,33 +549,35 @@ static int hsr_ndo_vlan_rx_add_vid(struct net_device *dev,
- 		switch (port->type) {
- 		case HSR_PT_SLAVE_A:
- 			if (ret) {
--				/* clean up Slave-B */
- 				netdev_err(dev, "add vid failed for Slave-A\n");
--				if (is_slave_b_added)
--					vlan_vid_del(port->dev, proto, vid);
--				return ret;
-+				goto unwind;
- 			}
--
--			is_slave_a_added = true;
-+			slave_a_dev = port->dev;
- 			break;
--
- 		case HSR_PT_SLAVE_B:
- 			if (ret) {
--				/* clean up Slave-A */
- 				netdev_err(dev, "add vid failed for Slave-B\n");
--				if (is_slave_a_added)
--					vlan_vid_del(port->dev, proto, vid);
--				return ret;
-+				goto unwind;
- 			}
--
--			is_slave_b_added = true;
-+			slave_b_dev = port->dev;
- 			break;
- 		default:
-+			if (ret)
-+				goto unwind;
- 			break;
- 		}
- 	}
- 
- 	return 0;
-+
-+unwind:
-+	if (slave_a_dev)
-+		vlan_vid_del(slave_a_dev, proto, vid);
-+
-+	if (slave_b_dev)
-+		vlan_vid_del(slave_b_dev, proto, vid);
-+
-+	return ret;
- }
- 
- static int hsr_ndo_vlan_rx_kill_vid(struct net_device *dev,
+History of pre-separation series (v1-v3):
+Changes in v3:
+ - addressed Felix review feedback in the VLAN add unwind fix
+ - removed the superfluous empty line
+
+Changes in v2:
+ - picked up Reviewed-by tags on patches 1, 3 and 4
+ - changes in patch 2 per advice of Felix Maurer
+
+Luka Gejak (2):
+  net: hsr: require valid EOT supervision TLV
+  net: hsr: reject unresolved interlink ifindex
+
+ net/hsr/hsr_forward.c | 41 ++++++++++++++++++++++-------------------
+ net/hsr/hsr_netlink.c |  7 ++++++-
+ 2 files changed, 28 insertions(+), 20 deletions(-)
+
 -- 
 2.53.0
 
