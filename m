@@ -1,280 +1,359 @@
-Return-Path: <netdev+bounces-273970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273971-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4Fq8F+PSzGlFWwYAu9opvQ
-	(envelope-from <netdev+bounces-273970-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 10:10:11 +0200
+	id 2OQtBnrQzGlFWwYAu9opvQ
+	(envelope-from <netdev+bounces-273971-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 09:59:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B55FF37683B
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 10:10:10 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2A24376699
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 09:59:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2A66E3177F9D
+	by sto.lore.kernel.org (Postfix) with ESMTP id C657D3064142
 	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 07:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BEE371052;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48DC386C3A;
 	Wed,  1 Apr 2026 07:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E5nFnIwJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lbA51mQJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f41.google.com (mail-dl1-f41.google.com [74.125.82.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE8F36BCE8;
-	Wed,  1 Apr 2026 07:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775029985; cv=fail; b=RHaGIP7LdW8t8ZHAkTAZ07l8AdFMHthZ4hCcwJwYtL+ZDoHViEyFHx9sOyxDDD7kaCRnQZlek8KTYnD3U23+mNpbYxI7BjBlBQ9hRTavkLwFKszrPsaKu+QXCnO9tXwwvENANx3OTJ+kWtdzMPFD/2f3GGKoLwu26+p2vt1hQmY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ECE32F7AC1
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 07:53:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775029985; cv=none; b=uPCiULBtO1O15aMsAw3x8R5enfNE4mYVUxTxXxJFWDK35suOwaV7UpS5Rw/otTtFwozd7kylDgUDP7RLqid7lVaFJYVsZBHzoVIJflOjkw0WdA0Pme0/hcwqVt0PwoVlCkQCHt5nLYWH+lde3zpRHfw3S4cs0M27IZEG+gSEF4w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775029985; c=relaxed/simple;
-	bh=sPa0+BoLYaSDfofvlwHmmIEBubwDX1fbMg9Mw5jZGSQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=MuOwcZDDnpgGe+3DQsix8clJ53Atm7Cq4pJ8iOWX1s9NneaRc1l1DjZYzEMxx8yp/jvb+IYhgd3NkdKbPMa3R5Of2yNS169xWVcDwfK1gcdltBr1k30eCtxyx1yr28eLL2m9sxosR52sewmMFX+VwOB7nwi82yYePsLVIcLSnbA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E5nFnIwJ; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775029983; x=1806565983;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=sPa0+BoLYaSDfofvlwHmmIEBubwDX1fbMg9Mw5jZGSQ=;
-  b=E5nFnIwJVOL0tJivV+R2WynAM/TXrafMunQgWXAHVG+cafCaMnam1uF+
-   FcCohz8hMIIhnjMrYM2myUe26pix1bTbFyZ/bxNmrl/d2xe8EsrBzQKzU
-   3SojmMZgblb8mPM/VWRELMvnRj8C6N+HbATkGYro0hbCMnDF/2AyET2SF
-   6/pnyeHAl0v9gBoc48bEVzpBj0axiodOKeZh3c0CVgh+ics33R4pWIB0F
-   9/Ops45e2Nm9YhIlQh6hJb53asjlTAaARLY4m8p8g/pNja2VzQFcxiGdI
-   H9Dcmzit72/0UXvxScZ2o2OlH2L0fCcZ7/4BFq7qvvdkb1Rp7opBEkq1R
-   Q==;
-X-CSE-ConnectionGUID: 0ZIRhpjkTqicgPQtzr49qg==
-X-CSE-MsgGUID: DWbi/Ai0S/eDjGsRtLyMRw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11745"; a="93452087"
-X-IronPort-AV: E=Sophos;i="6.23,153,1770624000"; 
-   d="scan'208";a="93452087"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2026 00:53:03 -0700
-X-CSE-ConnectionGUID: U76yRrP8TC6Ah4ad+0vH7w==
-X-CSE-MsgGUID: CrjHQAODS0mqG9QQn0LpQQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,153,1770624000"; 
-   d="scan'208";a="231021356"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2026 00:53:02 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 1 Apr 2026 00:53:02 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Wed, 1 Apr 2026 00:53:02 -0700
-Received: from CY3PR05CU001.outbound.protection.outlook.com (40.93.201.69) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Wed, 1 Apr 2026 00:52:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Fb2r3Z/wDfWLZKznvbtSQX/+mYAc89dXasLSVjmzC6vg3VtBSCcmLv8juO/PUdWSNCUF7YjXcrYq0OsugVlZ3nIRroQ5QOoJE+ssxFDGWrXMgvKKqzvrYmTxUIlKBdW7vjZCBgcI7vk0DQD4T43tby/kJ6sMTYDvv40AWi/LyWRrumRCXl5ZFjmpkAThnu/AIgizsuIXCwBxN9k7fmQha7q/nnZF2Luo/6QIzNFFF8/6R8wpCee7z8cbA37MAWrpr4IHZlNjWaj0wyrygp08NhVYYZViaymuxQ15VVadoNRk2KvsbVEIWtmweYWa4P+2NV7sVcRPKY68sZx8rrojcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xnLqsmTednL/LzWrMhLmFWMLEPubVcbDGhO4xzbcn1w=;
- b=OnUEv9+gq1Qvi/BN2Wx6SFipuLatmeJSj8PiIgpQYBU6FzC5SknJisyBMY7kNryJSf318GyRITCLi2Fdh5r9Lq6YLfQ9a3yA8kaK3xwHL12PAhq79JxZaMvf5m1RZUMuQRWaMFsVXAu1TQESIjkYZ3cb/IPrh4yAI8UofVtGKRJv4cDOPc+fuP6F9HyZdfwgmqg9APoo3YS2/C/Yo6mylmhS26okPR3uYWtyKtHn7WME0Fhg/gd3WWj2GwV/yjUz78DSxfzN25foM6HWHcb9CvuLL0nhh7y6O3fCs73vyb6ZHNF5YTVvo9qeftasnp2ywCMxziZmgxLbDWiQt7GPFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by LV3PR11MB8556.namprd11.prod.outlook.com (2603:10b6:408:1b4::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.17; Wed, 1 Apr
- 2026 07:52:54 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9745.012; Wed, 1 Apr 2026
- 07:52:54 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Daiki Harada <daiky0325@gmail.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kohei Enju
-	<kohei@enjuk.jp>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v1 1/2] igb: use
- napi_schedule_irqoff() instead of napi_schedule()
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v1 1/2] igb: use
- napi_schedule_irqoff() instead of napi_schedule()
-Thread-Index: AQHcwSMmF+rqm1qaS0ymJ8GNUovbGLXJ1r/w
-Date: Wed, 1 Apr 2026 07:52:54 +0000
-Message-ID: <IA3PR11MB8986F7FACEC1C5866FBA0146E550A@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260331103924.36422-1-daiky0325@gmail.com>
- <20260331103924.36422-2-daiky0325@gmail.com>
-In-Reply-To: <20260331103924.36422-2-daiky0325@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|LV3PR11MB8556:EE_
-x-ms-office365-filtering-correlation-id: dd0a824d-11b0-4ea1-013b-08de8fc3ae7f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|38070700021|18002099003|22082099003|56012099003;
-x-microsoft-antispam-message-info: TA/vL9egpCFQR+xs8YHPF59uzGkcFn14Q5fR6TU7m2tBhzDjKmjoDjF7Fpazu1HhSZlpH89OVQzb4ojLIcMM1wquqPBWRi4Nf7iUo1do8RC3T4gwBSQPD7rIGsioPx3cEGt0y+tgpvmfVYo2tbxvF89RLli5V2gmjQ3KemZ4uGFDsOOtqXUbAovryirhgHHRQOfObZY8kcMF25OhjTh0hwQwJWGDnLk95jW/VRVx62ejJGIUm2+VYb1UB9cs1v4camWzofsef0OYwK7UdOBoKNaUwZyktG8PI3ZWQyq8q8YgfTgIzLxAg+Wc+U7S1cO1p9IAdVpt10MJCu48xOBZrBMJ8imNkKiP2IDPN8OZzzgGNjaWOJSk/pPdlWiCTXmiB7nVMd3OFx7Oy7E9JW+bxEotnkuyGfQb2ndnPYrJL1NF7oYc+3W+ew9ISKFkGs+Ai4xpgISCn/NEcKUdgRaSxb2L2rmQ3EuZQ8+tz7JmCwwrmhRonwioIt2NxfTUg3gFbXxo/eNRi+HmaTPCmeYS8ARHJZ4rOD4UN3QlA0B6HFslG14nPKl51RsPoLu9cFGswjdeYVGWc2hMuIizcgjv9hRduN0DdB+iKAgZb88yS//UREjZDp6eyAt4jyQveu7PTVg9uh2RJNs/jdrHXThSddpleGMSDUvsPYPOdpWSSpr/LXBrIQcN20qA572vA9aoUVkQTTVIvO32tqnwRQe54qB+OqIejO8lzFC1XtxV75IMlYS9SPAIuMWshfU1qB58sO0M+eMv740LZHZiQAPgkQf06q9vVKrf1gpwWj5lusk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?xefpktewHjBaZvaXHh4Mwmjuebl6/fQaMwSKqOFoZAtzCFow444Jq5z7PkR7?=
- =?us-ascii?Q?jZXIvRL3s1zgedjhx8dduEgBuJVtRgXaDIZnR9YZmwRnRvBW1kbrJJ8/gq0x?=
- =?us-ascii?Q?UcFOxyH+gMJ5HeeL+VyVVDx77nL71J9G1buSprbxqy4KP83xlokFyM1laSn2?=
- =?us-ascii?Q?DrwDnoTRKAw/W1Aow3RM6BPZJaiFsVU7QD9CmIqH9qqqqDW0OLOuGEmHLRYA?=
- =?us-ascii?Q?LDCj/jva57SdGymAj0drp3CnY6QiH0wOxSAQTyNSJXYDiXm08UEpDWxlGTH+?=
- =?us-ascii?Q?BjsqkW0Xlik2YvKUbup7+1Ka25QXWZuxVIHRNWW2mlo/0MzA4aS+E2e3npLs?=
- =?us-ascii?Q?zLB6a058laQuhky3JYJYe0qiG744YQ810PgwaGh2lGAhi3jvJj0F3OcDvsCk?=
- =?us-ascii?Q?zl6pHLOS1C/ZFSsWq+8kPOXJxroiQeumiccI8ekzFLECFCq7NPBIEHd5EjqV?=
- =?us-ascii?Q?OhnGi+tEJojESVnNugS1pZMjHsaqHkzgkgKAqbxXHvXs/fnt7fCi6EEsgh1f?=
- =?us-ascii?Q?T9dBxSrZCwNomkVbhlIzmq5NKvS9pZtegH30oyseorKPPhqKS3J7WZqTpf/D?=
- =?us-ascii?Q?s92uVKPz2GXnKiaiuVbReKHzmYYucF2l8yiwjLX/Yaaf0m8z0N+8ChZWxGEG?=
- =?us-ascii?Q?wRm0tuNZ38M78OrdYgFQfLpzxC6sJ42Umk1bFE2YQGTivBre1HHKBnBvYLDH?=
- =?us-ascii?Q?fkEUbqpSXSK5YZmqJn10kpLxniM+Y8drndlst8o0X0lGwvT1rSt2hTw6Ve4/?=
- =?us-ascii?Q?kX/tl/ng6jbJjxjIV6S+UPdVdRjT7VPvNPqP1x+gN3KXWyQ6/Qh4ufb722e5?=
- =?us-ascii?Q?Pnea+VaNJR7pb24j3sW18gckRoja8wgF9yJXthzcw5m3gDzzgJFHJ85+StaQ?=
- =?us-ascii?Q?6R75x8A3sUEw+5oagsTc7h9DCU6mO14Se3mOEBthRqcPW7epkSuHcu4THaH1?=
- =?us-ascii?Q?qz4K7V46CZhFrr/aQvuLNx3cO5UQoQywMQqdBnf/GZm/pi5xUM29APW/UVHk?=
- =?us-ascii?Q?+cfxS7C/ULs9oR9a1sK/S19co8ctHVLh3PANXTo6oY7mPdYJ+dRcoJeOkG9x?=
- =?us-ascii?Q?Wxt8v5da/PjE5FyskX0d/O9+rotiIN+kMHBss/XF2TGQfhR3SqaJaGWwKvYn?=
- =?us-ascii?Q?ybXJkURHCXnLpf8v6eQQt3x1ZMv7z1g3zrOEuvgBMDHzUOD5UyZdFg+BoWyb?=
- =?us-ascii?Q?pEDEh1hjksGh/LQQj+6kypDfjy9HsVIZSQlxrimB6ll+os9rCoiw6KMNwV4F?=
- =?us-ascii?Q?sKHrNg9pTzFs/Cu0pc8cEPnTKBTGaglggnxh5PVzuq546bxX3z51m36O7AkQ?=
- =?us-ascii?Q?9tfWwx+OI0xu4S9zYT6T2dyQ7YTFBFcnXjF5riVfbLjAxVUIia6cbGEFE8ur?=
- =?us-ascii?Q?clH8KYSXouvrpnDjKO7UeEG0Jg8ix45qdJjDLiJsZwtrCtObJ4XvXAqLfzyN?=
- =?us-ascii?Q?i2N6iTcX5xu7PepEdQPzH5grXzE1e56F7Fkr4blyL0+GnuNutfb7jHoiNhCS?=
- =?us-ascii?Q?Agowm8vjenV5KVsEim01Q/pZ3kKKVcXWlK2QALK7x6QJTvAuuzM9oLgYOi43?=
- =?us-ascii?Q?NcLmWNpfNHOlzH60NPo9KCVevKdeqJmq6QbwZJruNxq5vvVsIaZancIK7geG?=
- =?us-ascii?Q?kKIz2yWaeYSO7Y9hMSAKA+sBNPg52gpDVujP64paFm7J6+0yqR93Z5+WlxBx?=
- =?us-ascii?Q?/majRCmoioCezlOuYXXTBtMBKzEjE3A6Dlqff3WM3qvmUHTXGeUFnZobhIUh?=
- =?us-ascii?Q?oWdYGJ88tcgeOXNCzXbSIysmRhbqkLU=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	bh=zOZC2aKClSnAidR0vLOY85xgZZqHZ5x5vrQqdnyVDhI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Jydhz39iOAF/eegY4CoyI7J3VBLHwUUUgdkGK+1IZZZfbm/0U5dHH1ZWeicLWhkBgWzMBiDciSyh1P0xwXTss56CPl6l/lPqziTlUj/LbLundnhHVXjM9zVyM0YMsXJKfl8mWOkKvdJww0Hssu8uIc6cuveDyDTQ5N+RWuRK0SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lbA51mQJ; arc=none smtp.client-ip=74.125.82.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f41.google.com with SMTP id a92af1059eb24-126ea4b77adso9399520c88.1
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 00:53:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775029983; x=1775634783; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gn7BFBkoPg/Mi40J2CvkBtL8T6I0G+ldprB7tkZkwBc=;
+        b=lbA51mQJreoSSy6Zfm6ppyHazRemK9OOQ3Fx3MsQcU/h+bsd0C0/tnQKjG8ccLAfII
+         mzDtVpCM9T1mhg5tEdeCuFqBK1hb55wJnPntJdBjSErneivH3bNTXjC7IeNTLEa8/a6T
+         qDy1SwDfbLPkqUp3Sh/2ksJVlmfErlvnhvUijKMQ8V8iFmpcee09mU9DkeCjMjNhitVz
+         rEN2ZcoXyt8GjYLQ3b/EE/ApjAG4xuhbbZPOWYXUo5c1qd4oEI9lyNbi/pZQILrGDeGX
+         yqvuv3u28ITfjUrejXUhmHcWjtPDV9had3zaosZ3kJR23Jix7T1WR6bshnY4wy3oHswP
+         2WFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775029983; x=1775634783;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gn7BFBkoPg/Mi40J2CvkBtL8T6I0G+ldprB7tkZkwBc=;
+        b=IuyUYnMj3h0ZJkPc1UpT9b2XdcUBGbPJyjo2f4ib+Vfp4BzihLf1KEGp4TI0rStj5J
+         P0iIcWLZam7gWASdW+ifnjx/ICCyOIpTw6er88uLv6SSPYgSZcWZN0HfG3ZL0SzGJBkV
+         4JIsc4G/rSr3G1+cwRw982C4+B2eSdxSpYozylttI8iRl73vVDPGYExLjc/67TxJdvAx
+         kB9Bs+YPvMjds40e5yPxuwuFjbLk4XxWIMyGXBC6authv8bShOJZScUc5AIzs3KCiyWr
+         crP8pos5EzDzOXmonjazg2U9i33g0EcE4uR3ltrNCnIEQIgyvQSEAcETHbYW8zZxyVQP
+         QMcw==
+X-Forwarded-Encrypted: i=1; AJvYcCUnjIiEAkskuQNpjxk3/gX9qny1DFews2bFuop6KHTjvOvawXBeYM5DhtdX730g62r32A+p0rQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywfxs3ZPguv1NRAATrDh6wTM4x24r0pxGXn314pwo1w0i8eqM5D
+	EnI1EA4Lx6vPUhyzD2TxlBhH6OZAVnr66f2bwQ/gtUM/IGe2LJwfqNcU
+X-Gm-Gg: ATEYQzz5efyJKpCAqoXSXruNIzFjMxPRmWanH1x4tw9+Q/pBLJN2qUpymL+NlIjQMi8
+	E2BL/g4Ttwbdo3RL2qkqHZ/YScWj1ahS4SGefOj4tGZXqtOwA0h35ayrNcurcdhE6rpVKEh9GuO
+	Ih48BHhKe90w4t74JIxOXiaI9orR4rTs3YUHe1WlgcMvw42vu0r3Qj0jV2qPiPrTRcMRsI2XkWn
+	l0p9eRyJuKFNO3V40UyeiCrWFxkus9Lk86VcKt9AZ65O4mYFt/VI4fE8iIFRJQfrn/5K1e1BFC3
+	AlBjynOD5MWeBnuO1hrT9cNWw99TRYzYFNwCd+mgtROMA8AM1yev2XgAem3gjLtiLacy1eZD+MJ
+	XOSMQcjQcEUG+7rJBJn8LO73oUZfSZwnR6qTcut48Tb3BbOUrLPZCYGK/MV9c399hQu4EQCpZlD
+	hIxH4WISlTPVftbDNoCxOE2YXSg1ojV2vmrs87O+dpAYQE+7ABVf8oe51d1X+IbihNjkTroCU=
+X-Received: by 2002:a05:7022:b81:b0:127:3f2a:af21 with SMTP id a92af1059eb24-12be647ca0amr1320002c88.15.1775029982608;
+        Wed, 01 Apr 2026 00:53:02 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c085:21e1::139a? ([2620:10d:c090:400::5:51bb])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12ab983f904sm17793034c88.9.2026.04.01.00.53.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Apr 2026 00:53:01 -0700 (PDT)
+Message-ID: <18d5a9b7-9c8d-4fc4-9332-fab27449dc58@gmail.com>
+Date: Wed, 1 Apr 2026 00:53:00 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: s5WP+/vroNbRYCA4wgInk9j+fANoG0LVNOVReVN04dL412LV7JYiIxcKrDZwea7FT9ftOlGF1YWlk31buzp9+SUrOqGi+SAsj4BUI5kBJm1mrrYc4r8omP+JgkYvghFZYp+yTGLkONXDnoRuIN5hhNXE+pI/g0exdSxnvvdpzvTyyJ0FQPRlFdUKERByDOuAy2Uyry6slfjULIgzSmom3pEyr4Wg+QnyCDZIdBXvYL/ip2q/dONGzdvr+1SkvY2I7bbdc6Q4lBN6Hex3CMB+ODRxU9NhltBVmciwD97DXbXEj/n89vEJ5fwCvqoQRmeoa4ijGz74+coabK8ikBb8oQ==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dd0a824d-11b0-4ea1-013b-08de8fc3ae7f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Apr 2026 07:52:54.1732
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9CIwo1Bj/NMIcKfk3xTCe+i6xmj3qUbjVY2WIttLakUbCcNXImqXKyWPNi0Oo2lApw6hGntdwuWD8zekyoogY18oiCz+3szVCC0Et3e9xfA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8556
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.34 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v03 3/6] hinic3: Add ethtool coalesce ops
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Ioana Ciornei <ioana.ciornei@nxp.com>
+Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ luosifu <luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>,
+ Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+ Shi Jing <shijing34@huawei.com>, Zheng Jiezhen
+ <zhengjiezhen@h-partners.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>
+References: <cover.1774940117.git.zhuyikai1@h-partners.com>
+ <ffc357656b2412abf6e8de4200d289e761f3e6ea.1774940117.git.zhuyikai1@h-partners.com>
+Content-Language: en-US
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+In-Reply-To: <ffc357656b2412abf6e8de4200d289e761f3e6ea.1774940117.git.zhuyikai1@h-partners.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273970-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,lists.osuosl.org,vger.kernel.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,IA3PR11MB8986.namprd11.prod.outlook.com:mid,lunn.ch:email,intel.com:dkim,intel.com:email,osuosl.org:email,davemloft.net:email,enjuk.jp:email];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-273971-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mohsinbashr@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: B55FF37683B
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B2A24376699
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 
+> +static int is_coalesce_exceed_limit(struct net_device *netdev,
+> +				    const struct ethtool_coalesce *coal)
+> +{
+> +	const struct {
+> +		const char *name;
+> +		u32 value;
+> +		u32 limit;
+> +	} coalesce_limits[] = {
+> +		{"rx_coalesce_usecs",
+> +		 coal->rx_coalesce_usecs,
+> +		 COALESCE_MAX_TIMER_CFG},
+> +		{"rx_max_coalesced_frames",
+> +		 coal->rx_max_coalesced_frames,
+> +		 COALESCE_MAX_PENDING_LIMIT},
+> +		{"rx_max_coalesced_frames_low",
+> +		 coal->rx_max_coalesced_frames_low,
+> +		 COALESCE_MAX_PENDING_LIMIT},
+> +		{"rx_max_coalesced_frames_high",
+> +		 coal->rx_max_coalesced_frames_high,
+> +		 COALESCE_MAX_PENDING_LIMIT},
+> +	};
+> +
+> +	for (int i = 0; i < ARRAY_SIZE(coalesce_limits); i++) {
+> +		if (coalesce_limits[i].value > coalesce_limits[i].limit) {
+> +			netdev_err(netdev, "%s out of range %d-%d\n",
+> +				   coalesce_limits[i].name, 0,
+> +				   coalesce_limits[i].limit);
+> +			return -EOPNOTSUPP;
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Daiki Harada
-> Sent: Tuesday, March 31, 2026 12:39 PM
-> To: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
-> Przemyslaw <przemyslaw.kitszel@intel.com>; Andrew Lunn
-> <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric
-> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
-> Abeni <pabeni@redhat.com>; Daiki Harada <daiky0325@gmail.com>; Kohei
-> Enju <kohei@enjuk.jp>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v1 1/2] igb: use
-> napi_schedule_irqoff() instead of napi_schedule()
->=20
-> Replace napi_schedule() with napi_schedule_irqoff() in the interrupt
-> handler path in igb driver
->=20
-> Tested on QEMU with igb NIC emulation (-nic user,model=3Digb)
->=20
-> Suggested-by: Kohei Enju <kohei@enjuk.jp>
-> Signed-off-by: Daiki Harada <daiky0325@gmail.com>
-> ---
->  drivers/net/ethernet/intel/igb/igb_main.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c
-> b/drivers/net/ethernet/intel/igb/igb_main.c
-> index ee99fd8fd513..d7a6ae938cc5 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_main.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-> @@ -7158,7 +7158,7 @@ static irqreturn_t igb_msix_ring(int irq, void
-> *data)
->  	/* Write the ITR value calculated from the previous interrupt.
-> */
->  	igb_write_itr(q_vector);
->=20
-> -	napi_schedule(&q_vector->napi);
-> +	napi_schedule_irqoff(&q_vector->napi);
->=20
->  	return IRQ_HANDLED;
->  }
-> @@ -8199,7 +8199,7 @@ static irqreturn_t igb_intr_msi(int irq, void
-> *data)
->  	if (icr & E1000_ICR_TS)
->  		igb_tsync_interrupt(adapter);
->=20
-> -	napi_schedule(&q_vector->napi);
-> +	napi_schedule_irqoff(&q_vector->napi);
->=20
->  	return IRQ_HANDLED;
->  }
-> @@ -8245,7 +8245,7 @@ static irqreturn_t igb_intr(int irq, void *data)
->  	if (icr & E1000_ICR_TS)
->  		igb_tsync_interrupt(adapter);
->=20
-> -	napi_schedule(&q_vector->napi);
-> +	napi_schedule_irqoff(&q_vector->napi);
->=20
->  	return IRQ_HANDLED;
->  }
-> --
-> 2.53.0
+Since we are failing a range check, maybe -ERANGE or -EINVAL would be 
+more appropriate here.
 
+> +		}
+> +	}
+> +	return 0;
+> +}
+> +
+> +static int is_coalesce_legal(struct net_device *netdev,
+> +			     const struct ethtool_coalesce *coal)
+> +{
+> +	int err;
+> +
+> +	err = is_coalesce_exceed_limit(netdev, coal);
+> +	if (err)
+> +		return err;
+> +
+> +	if (coal->rx_max_coalesced_frames_low >=
+> +	    coal->rx_max_coalesced_frames_high &&
+> +	    coal->rx_max_coalesced_frames_high > 0) {
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+So this would allow non-zero low and zero high. For example, low = 10, 
+high = 0. Is this expected?
+
+> +		netdev_err(netdev, "invalid coalesce frame high %u, low %u, unit %d\n",
+> +			   coal->rx_max_coalesced_frames_high,
+> +			   coal->rx_max_coalesced_frames_low,
+> +			   COALESCE_PENDING_LIMIT_UNIT);
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void check_coalesce_align(struct net_device *netdev,
+> +				 u32 item, u32 unit, const char *str)
+> +{
+> +	if (item % unit)
+> +		netdev_warn(netdev, "%s in %d units, change to %u\n",
+> +			    str, unit, item - item % unit);
+> +}
+> +
+> +#define CHECK_COALESCE_ALIGN(member, unit) \
+> +	check_coalesce_align(netdev, member, unit, #member)
+> +
+> +static void check_coalesce_changed(struct net_device *netdev,
+> +				   u32 item, u32 unit, u32 ori_val,
+> +				   const char *obj_str, const char *str)
+> +{
+> +	if ((item / unit) != ori_val)
+> +		netdev_dbg(netdev, "Change %s from %d to %u %s\n",
+> +			   str, ori_val * unit, item - item % unit, obj_str);
+> +}
+> +
+> +#define CHECK_COALESCE_CHANGED(member, unit, ori_val, obj_str) \
+> +	check_coalesce_changed(netdev, member, unit, ori_val, obj_str, #member)
+> +
+> +static int hinic3_set_hw_coal_param(struct net_device *netdev,
+> +				    struct hinic3_intr_coal_info *intr_coal)
+> +{
+> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> +	int err;
+> +	u16 i;
+> +
+> +	for (i = 0; i < nic_dev->max_qps; i++) {
+> +		err = hinic3_set_queue_coalesce(netdev, i, intr_coal);
+> +		if (err)
+> +			return err;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int hinic3_get_coalesce(struct net_device *netdev,
+> +			       struct ethtool_coalesce *coal,
+> +			       struct kernel_ethtool_coalesce *kernel_coal,
+> +			       struct netlink_ext_ack *extack)
+> +{
+> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> +	struct hinic3_intr_coal_info *interrupt_info;
+> +
+> +	interrupt_info = &nic_dev->intr_coalesce[0];
+> +
+> +	/* TX/RX uses the same interrupt.
+> +	 * So we only declare RX ethtool_coalesce parameters.
+> +	 */
+> +	coal->rx_coalesce_usecs = interrupt_info->coalesce_timer_cfg *
+> +				  COALESCE_TIMER_CFG_UNIT;
+> +	coal->rx_max_coalesced_frames = interrupt_info->pending_limit *
+> +					COALESCE_PENDING_LIMIT_UNIT;
+> +
+> +	coal->use_adaptive_rx_coalesce = nic_dev->adaptive_rx_coal;
+> +
+> +	coal->rx_max_coalesced_frames_high =
+> +		interrupt_info->rx_pending_limit_high *
+> +		COALESCE_PENDING_LIMIT_UNIT;
+> +
+> +	coal->rx_max_coalesced_frames_low =
+> +		interrupt_info->rx_pending_limit_low *
+> +		COALESCE_PENDING_LIMIT_UNIT;
+> +
+> +	return 0;
+> +}
+> +
+> +static int hinic3_set_coalesce(struct net_device *netdev,
+> +			       struct ethtool_coalesce *coal,
+> +			       struct kernel_ethtool_coalesce *kernel_coal,
+> +			       struct netlink_ext_ack *extack)
+> +{
+> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> +	struct hinic3_intr_coal_info *ori_intr_coal;
+> +	struct hinic3_intr_coal_info intr_coal = {};
+> +	char obj_str[32];
+> +	int err;
+> +
+> +	err = is_coalesce_legal(netdev, coal);
+> +	if (err)
+> +		return err;
+> +
+> +	CHECK_COALESCE_ALIGN(coal->rx_coalesce_usecs, COALESCE_TIMER_CFG_UNIT);
+> +	CHECK_COALESCE_ALIGN(coal->rx_max_coalesced_frames,
+> +			     COALESCE_PENDING_LIMIT_UNIT);
+> +	CHECK_COALESCE_ALIGN(coal->rx_max_coalesced_frames_high,
+> +			     COALESCE_PENDING_LIMIT_UNIT);
+> +	CHECK_COALESCE_ALIGN(coal->rx_max_coalesced_frames_low,
+> +			     COALESCE_PENDING_LIMIT_UNIT);
+> +
+> +	ori_intr_coal = &nic_dev->intr_coalesce[0];
+> +	snprintf(obj_str, sizeof(obj_str), "for netdev");
+> +
+> +	CHECK_COALESCE_CHANGED(coal->rx_coalesce_usecs, COALESCE_TIMER_CFG_UNIT,
+> +			       ori_intr_coal->coalesce_timer_cfg, obj_str);
+> +	CHECK_COALESCE_CHANGED(coal->rx_max_coalesced_frames,
+> +			       COALESCE_PENDING_LIMIT_UNIT,
+> +			       ori_intr_coal->pending_limit, obj_str);
+> +	CHECK_COALESCE_CHANGED(coal->rx_max_coalesced_frames_high,
+> +			       COALESCE_PENDING_LIMIT_UNIT,
+> +			       ori_intr_coal->rx_pending_limit_high, obj_str);
+> +	CHECK_COALESCE_CHANGED(coal->rx_max_coalesced_frames_low,
+> +			       COALESCE_PENDING_LIMIT_UNIT,
+> +			       ori_intr_coal->rx_pending_limit_low, obj_str);
+> +
+> +	intr_coal.coalesce_timer_cfg =
+> +		(u8)(coal->rx_coalesce_usecs / COALESCE_TIMER_CFG_UNIT);
+> +	intr_coal.pending_limit = (u8)(coal->rx_max_coalesced_frames /
+> +				      COALESCE_PENDING_LIMIT_UNIT);
+> +
+> +	nic_dev->adaptive_rx_coal = coal->use_adaptive_rx_coalesce;
+> +
+> +	intr_coal.rx_pending_limit_high =
+> +		(u8)(coal->rx_max_coalesced_frames_high /
+> +		     COALESCE_PENDING_LIMIT_UNIT);
+> +
+> +	intr_coal.rx_pending_limit_low =
+> +		(u8)(coal->rx_max_coalesced_frames_low /
+> +		     COALESCE_PENDING_LIMIT_UNIT);
+> +
+> +	/* coalesce timer or pending set to zero will disable coalesce */
+> +	if (!nic_dev->adaptive_rx_coal &&
+> +	    (!intr_coal.coalesce_timer_cfg || !intr_coal.pending_limit))
+> +		netdev_warn(netdev, "Coalesce will be disabled\n");
+> +
+> +	return hinic3_set_hw_coal_param(netdev, &intr_coal);
+> +}
+> +
+>   static const struct ethtool_ops hinic3_ethtool_ops = {
+> -	.supported_coalesce_params      = ETHTOOL_COALESCE_USECS |
+> -					  ETHTOOL_COALESCE_PKT_RATE_RX_USECS,
+> +	.supported_coalesce_params      = ETHTOOL_COALESCE_RX_USECS |
+> +					  ETHTOOL_COALESCE_RX_MAX_FRAMES |
+> +					  ETHTOOL_COALESCE_USE_ADAPTIVE_RX |
+> +					  ETHTOOL_COALESCE_RX_MAX_FRAMES_LOW |
+> +					  ETHTOOL_COALESCE_RX_MAX_FRAMES_HIGH,
+
+Looks like ETHTOOL_COALESCE_TX_USECS support got dropped. is it intentional?
+
+>   	.get_link_ksettings             = hinic3_get_link_ksettings,
+>   	.get_drvinfo                    = hinic3_get_drvinfo,
+>   	.get_msglevel                   = hinic3_get_msglevel,
+> @@ -1004,6 +1231,8 @@ static const struct ethtool_ops hinic3_ethtool_ops = {
+>   	.get_eth_ctrl_stats             = hinic3_get_eth_ctrl_stats,
+>   	.get_rmon_stats                 = hinic3_get_rmon_stats,
+>   	.get_pause_stats                = hinic3_get_pause_stats,
+> +	.get_coalesce                   = hinic3_get_coalesce,
+> +	.set_coalesce                   = hinic3_set_coalesce,
+>   };
+>   
+>   void hinic3_set_ethtool_ops(struct net_device *netdev)
+
 
