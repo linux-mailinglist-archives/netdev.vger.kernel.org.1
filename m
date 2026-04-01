@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-274079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274080-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mMKQABwTzWmMZwYAu9opvQ
-	(envelope-from <netdev+bounces-274079-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:44:12 +0200
+	id qNM4Mj4TzWmMZwYAu9opvQ
+	(envelope-from <netdev+bounces-274080-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:44:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BF2537AA53
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:44:11 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DCD637AA88
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ABEE731C176B
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:10:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 84C0E303EC0E
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BC7402444;
-	Wed,  1 Apr 2026 12:09:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE52405AC3;
+	Wed,  1 Apr 2026 12:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b="F4Ar2ddm"
+	dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b="eRemQYHB"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.amicon.ru (mail.amicon.ru [77.108.111.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F9D3FCB10;
-	Wed,  1 Apr 2026 12:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898003FEB1D;
+	Wed,  1 Apr 2026 12:09:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.108.111.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775045393; cv=none; b=dNPddUTDotFd70bnqQrGsO6mZDYaY9JZ+3JLoqelmDYe6m+XsAKAo5AdaojlL/b9mGr/wsVfeLsfIuNQm2S0oS/mSYAEC5WZ4pu5VfJXAr1Ucdnr24pU+FRTPAsgqQ1mACXGEbe4M6RXi6R4FWEimjxwSN3PlR5aZjlpJSr48ag=
+	t=1775045395; cv=none; b=U1fbj9oP1+8r6jinC0w7Wc3QQNWlR9qvl1fG01ram8aW0FNiPJyYvUCySyOfd8WpI0JsoH4QtZUE/hhz5KfoKJaEyuatHOphEFEHC2XTCOCQM9GiDhWPhwr+R2Dwzo3+aDrlFCPhGgFdir72a2dSzv0sJrVV+pjZefzqhp+Chro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775045393; c=relaxed/simple;
-	bh=HE4n1sAvPUoflg+jZgW88p4JQucSMSdvmERWpA9XOM0=;
+	s=arc-20240116; t=1775045395; c=relaxed/simple;
+	bh=d7GuwT6Jl1KQtz7eotNRQp6Eo286Tux6gD8IH2Y6PeY=;
 	h=Content-Type:From:To:CC:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version; b=tB8TzlNkO6FjQWT0qX54lBtHR860dWrJrYVbZZgGrcHWsSXG5m6cZyAryTfAH9jiODMO4H0XPfi2mfcQwBuP2kvu/oy9H8Fa58XievaIHVUMWbDPjvNeCqzlXNyqvBSjiofhJEhc/cVkacx1OCmO+GDiSOCb3vDmTwuJIQ3F2bA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amicon.ru; spf=pass smtp.mailfrom=amicon.ru; dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b=F4Ar2ddm; arc=none smtp.client-ip=77.108.111.100
+	 References:MIME-Version; b=O9LlU+yfc/KDCBK82woQt6Y2i1cguanSU2GDgSgJMPCzTm5SOMJTW1mWxnFNWfFDEoeOgYwf/J7l4FaM5j0vdss3RT5J5e2sG95/vm8G+4rojqddCtaXDEYHTLW2M/djBMkOl2GcbMbx2ZFLBN4Uo7wCwpteq3oiKIFo/wFDj/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amicon.ru; spf=pass smtp.mailfrom=amicon.ru; dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b=eRemQYHB; arc=none smtp.client-ip=77.108.111.100
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amicon.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amicon.ru
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; d=amicon.ru; s=mail; c=simple/simple;
 	t=1775045378; h=from:subject:to:date:message-id;
-	bh=HE4n1sAvPUoflg+jZgW88p4JQucSMSdvmERWpA9XOM0=;
-	b=F4Ar2ddmu/V0RE31MzZB4vvAvI6SUAbdOdr/ny05IXiXQSOEgR752n0SRkKrE/E9eL/gy2jhi7f
-	Ju8OiYOYr1eAcf1QkzP+q+Ig+fNwCRUpjtknQMA4lJ/zuiHjDEQg/TxhgIs4fwibVWA6BH9aYyiod
-	X690AtZeDrLy+9eGIzs7hK9JFmLR3FogT0WAIdWn/oVIcImHhihnay4UtE00LQpXO3EgSWZq68/CK
-	itGRZP41wpu6A/SC9OhUB4msBV7hhOLcBkT5PPfkU3152nqEEM/0hW9IwxclVy86U8iatntVDLa2v
-	qOPLc0TC+o2xy2ktXcaPVrFfHwG+m1uJWSvg==
+	bh=d7GuwT6Jl1KQtz7eotNRQp6Eo286Tux6gD8IH2Y6PeY=;
+	b=eRemQYHB779uyNY7U10z6sTwbZOkk3cqeASFZGOdut2qCgujhTL6eTZJl4jXBD/m79nNZwZ+RQH
+	h1szsSisywG3l6GEydnjLtk2borwwAPVz77zqhfEB373MFggnQzgytiD70v7h1gb3X/LbeK4nbLE7
+	xo3LDm1Xw8qjRoWoOIXSxuvq8PD0mFox5i7SF5dclGGuF3/33PafSSuy4EMUVg1GxuMUcq3jCljXS
+	w4Rw7mNPjjaKj5YJH1XK8G7/FD76KTdtsiv3eD/jBsUfog7apH9Y+CM42Es+17Jr0wHQ//m2tlISt
+	A5zY8rW7JQ5EX+1pj8kqDaTxnhFEnqynmzBg==
 Received: from example.com (172.16.2.46) by mail.amicon.lan (192.168.0.59)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.27; Wed, 1 Apr
- 2026 15:09:37 +0300
+ 2026 15:09:38 +0300
 From: Agalakov Daniil <ade@amicon.ru>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>
 CC: Agalakov Daniil <ade@amicon.ru>, Przemek Kitszel
@@ -57,9 +57,9 @@ CC: Agalakov Daniil <ade@amicon.ru>, Przemek Kitszel
 	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>, "Daniil
  Iskhakov" <dish@amicon.ru>, Roman Razov <rrv@amicon.ru>
-Subject: [PATCH net-next v3 1/2] e1000: limit endianness conversion to boundary words
-Date: Wed, 1 Apr 2026 15:08:23 +0300
-Message-ID: <20260401120919.282668-2-ade@amicon.ru>
+Subject: [PATCH net-next v3 2/2] e1000e: limit endianness conversion to boundary words
+Date: Wed, 1 Apr 2026 15:08:24 +0300
+Message-ID: <20260401120919.282668-3-ade@amicon.ru>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260401120919.282668-1-ade@amicon.ru>
 References: <20260325151615.1407182-1-ade@amicon.ru>
@@ -79,12 +79,12 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[amicon.ru,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[amicon.ru:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-274079-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274080-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -96,10 +96,10 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DKIM_TRACE(0.00)[amicon.ru:+];
 	PRECEDENCE_BULK(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,amicon.ru:dkim,amicon.ru:email,amicon.ru:mid,linuxtesting.org:url]
-X-Rspamd-Queue-Id: 5BF2537AA53
+X-Rspamd-Queue-Id: 2DCD637AA88
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -123,36 +123,52 @@ Co-developed-by: Iskhakov Daniil <dish@amicon.ru>
 Signed-off-by: Iskhakov Daniil <dish@amicon.ru>
 Signed-off-by: Agalakov Daniil <ade@amicon.ru>
 ---
+v3:
+ - Reverted to v1's "check-then-convert" logic: the return value of
+   e1000_read_nvm() is now checked before performing le16_to_cpus().
+ - Removed the redundant full-buffer loops that caused double endianness
+   conversion in v2.
+
 v2:
  - Split from the original bugfix series and targeted at 'net-next'.
  - Removed the Fixes: tag; limiting the conversion scope is an
    improvement to avoid unnecessary processing of uninitialized memory.
  - Improved commit description for clarity.
+ - Note on e1000e: this driver already contains the necessary return
+   value checks for EEPROM reads, so only the endianness conversion
+   cleanup is included for e1000e.
 
- drivers/net/ethernet/intel/e1000/e1000_ethtool.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/intel/e1000e/ethtool.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/e1000/e1000_ethtool.c b/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
-index ab232b3fbbd0..38b1f91823ef 100644
---- a/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
-@@ -496,6 +496,10 @@ static int e1000_set_eeprom(struct net_device *netdev,
- 		 */
- 		ret_val = e1000_read_eeprom(hw, first_word, 1,
- 					    &eeprom_buff[0]);
+diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
+index dbed30943ef4..a8b35ae41141 100644
+--- a/drivers/net/ethernet/intel/e1000e/ethtool.c
++++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
+@@ -583,20 +583,25 @@ static int e1000_set_eeprom(struct net_device *netdev,
+ 		/* need read/modify/write of first changed EEPROM word */
+ 		/* only the second byte of the word is being modified */
+ 		ret_val = e1000_read_nvm(hw, first_word, 1, &eeprom_buff[0]);
++		if (ret_val)
++			goto out;
 +
 +		/* Device's eeprom is always little-endian, word addressable */
 +		le16_to_cpus(&eeprom_buff[0]);
 +
  		ptr++;
  	}
- 	if (((eeprom->offset + eeprom->len) & 1) && (ret_val == 0)) {
-@@ -504,11 +508,10 @@ static int e1000_set_eeprom(struct net_device *netdev,
- 		 */
- 		ret_val = e1000_read_eeprom(hw, last_word, 1,
- 					    &eeprom_buff[last_word - first_word]);
--	}
+-	if (((eeprom->offset + eeprom->len) & 1) && (!ret_val))
++	if ((eeprom->offset + eeprom->len) & 1) {
+ 		/* need read/modify/write of last changed EEPROM word */
+ 		/* only the first byte of the word is being modified */
+ 		ret_val = e1000_read_nvm(hw, last_word, 1,
+ 					 &eeprom_buff[last_word - first_word]);
++		if (ret_val)
++			goto out;
  
+-	if (ret_val)
+-		goto out;
+-
 -	/* Device's eeprom is always little-endian, word addressable */
 -	for (i = 0; i < last_word - first_word + 1; i++)
 -		le16_to_cpus(&eeprom_buff[i]);
