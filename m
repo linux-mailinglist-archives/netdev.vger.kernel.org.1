@@ -1,153 +1,175 @@
-Return-Path: <netdev+bounces-274082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274089-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6DjyLXoWzWmMZwYAu9opvQ
-	(envelope-from <netdev+bounces-274082-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:58:34 +0200
+	id OGgYEGIRzWmMZwYAu9opvQ
+	(envelope-from <netdev+bounces-274089-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:36:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E45A37AD88
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:58:34 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 479BA37A869
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:36:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B6125323D637
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:19:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 20022309F89E
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 186E33DCDAF;
-	Wed,  1 Apr 2026 12:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F104240711E;
+	Wed,  1 Apr 2026 12:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qNEW2nQK"
+	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="Voah0Pii"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from www537.your-server.de (www537.your-server.de [188.40.3.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F563A16B0
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 12:19:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87572E8DEC;
+	Wed,  1 Apr 2026 12:26:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.3.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775045982; cv=none; b=euLwbU8udp7kqFplPzg430MtsL7XGy0gpcsWbtHheM/G0liZKA21YgeIiLIvYEmKTlButArfXHmWc2qzpKWR4U0o/Hto4xt2LvacjRXQU54DfjZK7U77Y7lqpjiqx+2Qz0bPqINCuchdT6Imku6ebXLnXOfXDHU6rN3lB2ienME=
+	t=1775046369; cv=none; b=FgN5trwouadk6Lmrb7LIg5f4v1v/10ACqekfPeCtLu80nNBE+icam8LrzXrxPUkh8HfwvCGkbuIqWG6kq8ySpqrphg5yeTiJ7o/DWw1MeujZwnsuLDI6ozgHCvWOZ5BPW7+2THThusmUBGTDLZ7C7afxQXa2/GmM+bXg/nSKYo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775045982; c=relaxed/simple;
-	bh=UomKkk4BjFfyv7HUqrBcjYNYioPovtxbqhl/XaetAgI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sx6tWivn4QMk3zAHD7ifALu6feKdcEOJ4UbvpAfqOKCwDJYoF0q4VQWIryZIj/NDLYQGPccbCCAdg+0Pg+W0chmICd2nBuewkf6z157gutDG+akLXdTJCdcZTI20tsPq2xkobC2jpimnG2eJPIaByVApF0CGJvp3bSF40KY5mJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qNEW2nQK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=pcxQWoLJn9G0dptO93Z+OY78wD/jANP0+W3nIgxkSVw=; b=qNEW2nQKRTDZc2S5ljnvrwFD2S
-	ynwfBvwdcAUg9wB9O2BQNo3gsYQBmZWC8+uiTL/bKTKBxga2nWKqXPIxb022Mtqb1OBj0ktBqfItp
-	9zPLZJy1ZZlSRAZ2HEbzBs6x5maVTqWMfCM3b+e0uhiaUzx8BfBnLQxfqUtlE2lYy8eY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w7uXf-00ELhN-8m; Wed, 01 Apr 2026 14:19:27 +0200
-Date: Wed, 1 Apr 2026 14:19:27 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1775046369; c=relaxed/simple;
+	bh=U/vmET87/7jfdbNUxMDjD8n3bscYZ1KZ5mcNwJJFrp8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WrrNyU9oOF/7rU3FxMHzoPXUvudOWj8TGIYsv2VNGiuhu5Tv2KBNBD9z8bIRMqHyU2qyJl+Xcrr5ApBRIg/TNX0I6fpcmmFjMa/eEqxCDWRn4nVZUlYG1WhYbKym3o2aBqSu/0WlyZsvyniLR8lYDXoxx6gH/TF5zYqykylR9NE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=Voah0Pii; arc=none smtp.client-ip=188.40.3.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=ew.tq-group.com; s=default2602; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=l0q4mDPNZn9d2zngjDTeDMoVQBeBADZn5IY9XJjSkRU=; b=Voah0Piiz36h8FePLR/6Apla9L
+	94vZXyylBhu3oMrpPw+a+M6YSjVWi7/ls26IleNSIgkTg0Jt821RJg9voO/mWuj8z5ZEjrKr+WsLp
+	/qieh7YXXxuCbBrhWDrAWJM+Wj2mMiCxFC3PzciBOF6iFhzAGjXDkgT9jOFgB+Zwf9tFKv/dAEJLV
+	oQ12t9MB6tJZBUMUb6MTlJVxzbayjES0Yx1d/by0nrpU+OUxe+mEEQtbq/4+elbj9nP+H8V/ftVTh
+	eUz8zzrGRBgg2/VY5eDFYvUo9sr9+vkXdv6iOpE34p38j/PrTFTAlNQYKQ+ZXvMNYBpL43xmy68cb
+	FKmJOEpw==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www537.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <nora.schiffer@ew.tq-group.com>)
+	id 1w7ue2-000IQS-1Z;
+	Wed, 01 Apr 2026 14:26:02 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <nora.schiffer@ew.tq-group.com>)
+	id 1w7ue1-00089b-38;
+	Wed, 01 Apr 2026 14:26:01 +0200
+From: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+To: Nishanth Menon <nm@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-phy@lists.infradead.org,
 	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	Ong Boon Leong <boon.leong.ong@intel.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 00/14] net: stmmac: TSO fixes/cleanups
-Message-ID: <420f910f-523d-4a74-a255-2fe48909283a@lunn.ch>
-References: <aczHVF04LIGq_lYO@shell.armlinux.org.uk>
+	linux@ew.tq-group.com,
+	Nora Schiffer <nora.schiffer@ew.tq-group.com>
+Subject: [PATCH v3 0/5] J722S SGMII support
+Date: Wed,  1 Apr 2026 14:25:20 +0200
+Message-ID: <cover.1775045279.git.nora.schiffer@ew.tq-group.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aczHVF04LIGq_lYO@shell.armlinux.org.uk>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27958/Wed Apr  1 08:24:34 2026)
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[ew.tq-group.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[ew.tq-group.com:s=default2602];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274082-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-274089-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3E45A37AD88
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nora.schiffer@ew.tq-group.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ew.tq-group.com:+];
+	NEURAL_HAM(-0.00)[-0.994];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tq-group.com:url,ew.tq-group.com:dkim,ew.tq-group.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 479BA37A869
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> I'm moving the setup of the GSO features, cleaning those up, and
-> adding a warning if platform glue requests this to be enabled but the
-> hardware has no support. Hopefully this will never trigger if everyone
-> got the STMMAC_FLAG_TSO_EN flag correct.
+The J722S CPSW and SERDES are very similar to the variants found on the
+AM64, but they additionally support SGMII. Introduce new compatible
+strings for the J722S to add this support to the drivers.
 
-Is this:
+This is a prerequisite for the Single-Pair Ethernet interface of the
+TQ-Systems MBa67xx baseboard for the TQMa67xx SoM, which will be
+submitted separately.
 
-  snps,tso:
-    $ref: /schemas/types.yaml#/definitions/flag
-    description:
-      Enables the TSO feature otherwise it will be managed by MAC HW capability
-      register.
+For SGMII to actually work on the J722S, the am65-cpsw needs to be extended
+as well, which has been submitted for net-next:
+https://patchwork.kernel.org/project/netdevbpf/list/?series=1075806
 
-I would not be too surprised if there is cargo cult copy/paste going
-on and some do get it wrong.
+Fallback compatible strings allow for the patches to be applied in any
+order and to go through different trees without breaking existing
+functionality.
 
-arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi:			snps,tso;
-arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi:			snps,tso;
-arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi:			snps,tso;
-arch/arm64/boot/dts/toshiba/tmpv7708.dtsi:			snps,tso;
-arch/arm64/boot/dts/rockchip/rk3588-extra.dtsi:		snps,tso;
-arch/arm64/boot/dts/rockchip/rk3588-base.dtsi:		snps,tso;
-arch/arm64/boot/dts/rockchip/rk3576.dtsi:			snps,tso;
-arch/arm64/boot/dts/rockchip/rk3576.dtsi:			snps,tso;
-arch/arm64/boot/dts/rockchip/rk3568.dtsi:		snps,tso;
-arch/arm64/boot/dts/rockchip/rk3528.dtsi:			snps,tso;
-arch/arm64/boot/dts/rockchip/rk3528.dtsi:			snps,tso;
-arch/arm64/boot/dts/rockchip/rk356x-base.dtsi:		snps,tso;
-arch/arm64/boot/dts/qcom/qcs404.dtsi:			snps,tso;
-arch/arm64/boot/dts/qcom/lemans.dtsi:			snps,tso;
-arch/arm64/boot/dts/qcom/lemans.dtsi:			snps,tso;
-arch/arm64/boot/dts/qcom/sm8150.dtsi:			snps,tso;
-arch/arm64/boot/dts/qcom/sc8280xp.dtsi:			snps,tso;
-arch/arm64/boot/dts/qcom/sc8280xp.dtsi:			snps,tso;
-arch/arm64/boot/dts/qcom/monaco.dtsi:			snps,tso;
-arch/arm64/boot/dts/st/stm32mp253.dtsi:		snps,tso;
-arch/arm64/boot/dts/st/stm32mp233.dtsi:		snps,tso;
-arch/arm64/boot/dts/st/stm32mp231.dtsi:				snps,tso;
-arch/arm64/boot/dts/st/stm32mp251.dtsi:				snps,tso;
-arch/riscv/boot/dts/sophgo/sg2042.dtsi:			snps,tso;
-arch/riscv/boot/dts/sophgo/sg2044.dtsi:			snps,tso;
-arch/riscv/boot/dts/starfive/jh7110.dtsi:			snps,tso;
-arch/riscv/boot/dts/starfive/jh7110.dtsi:			snps,tso;
-arch/arm/boot/dts/axis/artpec6.dtsi:			snps,tso;
-arch/arm/boot/dts/rockchip/rv1126.dtsi:		snps,tso;
-arch/arm/boot/dts/st/stm32mp131.dtsi:				snps,tso;
-arch/arm/boot/dts/st/stm32mp133.dtsi:		snps,tso;
-arch/arm/boot/dts/st/stm32mp151.dtsi:				snps,tso;
+v3:
+- Drop am65-cpsw changes from this series, they need to go through net-next
+- Fix missing PHY_GMII_SEL_RGMII_ID_MODE and PHY_GMII_SEL_FIXED_TX_DELAY in
+  gmii-sel driver for RGMII delay mode configuration
 
-   Andrew
+v2:
+- Keep support for the AM64 compatible strings as a fallback, adjust commit
+  messages
+- Drop reference to AM64_CPSW_QUIRK_CUT_THRU flag, which only exists in the
+  TI vendor kernel
+
+Nora Schiffer (5):
+  dt-bindings: phy: ti: phy-j721e-wiz: Add ti,j722s-wiz-10g compatible
+  dt-bindings: phy: ti: phy-gmii-sel: Add ti,j722s-phy-gmii-sel
+    compatible
+  phy: ti: phy-j721e-wiz: add support for J722S SoC family
+  phy: ti: gmii-sel: add support for J722S SoC family
+  arm64: dts: ti: k3-j722s-main: use J722S compatibles for WIZ, gmii-sel
+    and CPSW3G
+
+ .../bindings/phy/ti,phy-gmii-sel.yaml         | 24 ++++++++++++-------
+ .../bindings/phy/ti,phy-j721e-wiz.yaml        | 20 ++++++++++------
+ arch/arm64/boot/dts/ti/k3-j722s-main.dtsi     | 12 ++++++++--
+ drivers/phy/ti/phy-gmii-sel.c                 | 13 ++++++++++
+ drivers/phy/ti/phy-j721e-wiz.c                | 24 +++++++++++++++++++
+ 5 files changed, 75 insertions(+), 18 deletions(-)
+
+-- 
+TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht München, HRB 105018
+Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+https://www.tq-group.com/
 
