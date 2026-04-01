@@ -1,112 +1,173 @@
-Return-Path: <netdev+bounces-274073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274076-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yOZBBesKzWnhZgYAu9opvQ
-	(envelope-from <netdev+bounces-274073-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:09:15 +0200
+	id aHTZEisTzWmMZwYAu9opvQ
+	(envelope-from <netdev+bounces-274076-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:44:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F64837A2E9
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:09:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A709837AA69
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:44:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 24D9030224C9
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 11:59:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6BFCE31852B2
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2E73D5672;
-	Wed,  1 Apr 2026 11:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205AE3FADEE;
+	Wed,  1 Apr 2026 12:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b="FBAezy0i"
+	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="fnuKjJIa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
+Received: from www537.your-server.de (www537.your-server.de [188.40.3.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F43D3DCDA2;
-	Wed,  1 Apr 2026 11:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E49636AB50;
+	Wed,  1 Apr 2026 12:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.3.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775044794; cv=none; b=fdDFPzW1bv4x7ew/UxiXKN7rh1tpc9Zxf2YEcR90eBnW3tdmZwXDk1LAMBQl9kckDEMX7L881nBd+oNEuCb9usx4RBLydsgQDhqS7xakJr8+H5JvyZ4ABhHuGDfnRenTWFTsVZ8VpePT5uNWaQXBK7aRBnV7e8svilMedM5VdXE=
+	t=1775045206; cv=none; b=nGPaG3CkC3it8CqTHl90JU1rKXjhfCez4zsOH4C78sizj7RaOKge6pAVCEtCJwRPPuelgm9v1QzNgU42OlfcTqO7XRc9oedtpi0Gxk+PNy+Q5RhkJ9Ui7saDl/Friuc0vCpRD/AwYKYAaTduuo8hOaSehkWolJCH4Zg0bWnOHSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775044794; c=relaxed/simple;
-	bh=yoddX4IZ4ec77cwOPa2F4+K1rvtdfnrzECWap8mVxMc=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H6QuLta/uKweoa1fcS+3ylxA+xfxkZszTHd45EpmdQsaCcOs4TPY85q6f9N6UeLH1+6O/KVc3BlDg2BbZQwm0OM4A4xAY/C4Hg6M+hdRr5Adl2WoFV5SBZHspxfWNgrcBCnCb0r/Z0xlHQpY6ye5e97L0S/VuSvLkl1CPjexWT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org; spf=pass smtp.mailfrom=1g4.org; dkim=pass (2048-bit key) header.d=1g4.org header.i=@1g4.org header.b=FBAezy0i; arc=none smtp.client-ip=185.70.43.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=1g4.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1g4.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1g4.org;
-	s=protonmail2; t=1775044789; x=1775303989;
-	bh=yoddX4IZ4ec77cwOPa2F4+K1rvtdfnrzECWap8mVxMc=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=FBAezy0i8n5XTo5BiP3WmhXMeoNEz01bghNaPIh+y0owMr9ZvJBMPKa41yhYcO1Yx
-	 c1pCi4ZC8X44Oj4pK9WgvyTIMzGu//Dy8LWmEN+wECd1mNoDGx0nAySSni2z2rp3Uo
-	 wpz3bOfhBzYNY6sZADMfIRAvA368LPt33mOPDZvki0/+3U2m0YhckdUlLW2KWwV2SJ
-	 NRcpGx0hAb8DvVvEBHjP8FKw42pgRXde9lSLMrJgB6NrIFGHHlidIzdg98+35mEEQ0
-	 o/ALJTecRgusj6UccrFGBRFFLHaMvRsYuhQJ5eMqd+ab4nmoLreEBK2WOjOVnv5iAr
-	 o5e19RrkwN+PQ==
-Date: Wed, 01 Apr 2026 11:59:46 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-From: Paul Moses <p@1g4.org>
-Cc: Kangzheng Gu <xiaoguai0992@gmail.com>, gregkh@linuxfoundation.org, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, kees@kernel.org, netdev@vger.kernel.org, stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net-shapers: free rollback entries using kfree_rcu
-Message-ID: <AA-_oeafacETaUw-zXqE2GL70EacawnSC7XXZnHEdy9N1gMfMr6X2N-8_ReZ35CpJl097iWNsCafQjaSiLLfhqttBeen2cUWRdRkomYEWG0=@1g4.org>
-In-Reply-To: <20260331183358.3d6f9799@kernel.org>
-References: <CAKvcANOzRwFk0jm4xBfMGVNJrgGhBT8zvb6r49qc=WdB5zP_fg@mail.gmail.com> <20260328185804.41325-1-xiaoguai0992@gmail.com> <20260330181541.5a3c9f73@kernel.org> <CAKvcANN1OEqXv9fo=cxTEEnq+=qs8NnZBrDTf=FTzdo9rHYJbQ@mail.gmail.com> <20260331183358.3d6f9799@kernel.org>
-Feedback-ID: 8253658:user:proton
-X-Pm-Message-ID: e1f4d0d7beda9c064e2a86bf6a40840f82f327d3
+	s=arc-20240116; t=1775045206; c=relaxed/simple;
+	bh=ige1mHpDUOJSc8Xyb/oveMemNufurk82SCH+gfklp7M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lv26w6jTp9fSY+25Id2r1aezgVtvfCxeMfok+33hGOCwqybBRyCCp5Dj3Q6Jgph419aOJMTsepDAsgowLowaOdff6TvlOSGclSY+QLSL4AfJfbEvwhi9kn3RIswGsLy5QJ+23zco6Ni6mU+aoSenyz218PgP7no8LcWT/Gxqu0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=fnuKjJIa; arc=none smtp.client-ip=188.40.3.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=ew.tq-group.com; s=default2602; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=047O0Bnm7X7eFxP7dbf2lFni3tJL8l/+lwR4gP4mP0c=; b=fnuKjJIash0Ly3Blm7dlknBg/R
+	tJyMWI2S9H7Ak8KNXtF4BV4SVuzswduPWcxnXRpDKmQzb+Vbx6toOQKI5DDCQR5CwWB7+gs++rg40
+	p/5BB+JcZFqvcdmF5K0CqwJrQ4NKWgUw91YsqNPxDHB+xt7W1bw1VoKtDoLy6DW9W939yhIUpy/BF
+	/HZ/BjpcrcLbHVfapirJ9S/YChNH9T2C2WIDZLafFLGPkBXuiBlRF2ESIimaWLtqZTAzoJ9qED0/o
+	9uTycrK52cXBM/3gdEOXAerUgGJ1PzfwwyK59ADYfD4cUTuSygNjsYOnxW5KyeMNTdQLuf8OKpEeb
+	TvbA5+JQ==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www537.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <nora.schiffer@ew.tq-group.com>)
+	id 1w7uLH-000FCz-2X;
+	Wed, 01 Apr 2026 14:06:39 +0200
+Received: from localhost ([127.0.0.1])
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <nora.schiffer@ew.tq-group.com>)
+	id 1w7uLH-000JGT-1D;
+	Wed, 01 Apr 2026 14:06:39 +0200
+From: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Nishanth Menon <nm@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux@ew.tq-group.com,
+	Nora Schiffer <nora.schiffer@ew.tq-group.com>
+Subject: [PATCH net-next v3 1/2] dt-bindings: net: ti: k3-am654-cpsw-nuss: Add ti,j722s-cpsw-nuss compatible
+Date: Wed,  1 Apr 2026 14:05:42 +0200
+Message-ID: <e7ec1b928357d1240a962a88dc6ac67fd2c92357.1774958552.git.nora.schiffer@ew.tq-group.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.4.3/27958/Wed Apr  1 08:24:34 2026)
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[1g4.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[1g4.org:s=protonmail2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[ew.tq-group.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[ew.tq-group.com:s=default2602];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,linuxfoundation.org,davemloft.net,google.com,redhat.com,kernel.org,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-274073-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-274076-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[1g4.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[p@1g4.org,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7F64837A2E9
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nora.schiffer@ew.tq-group.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ew.tq-group.com:+];
+	NEURAL_HAM(-0.00)[-0.977];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tq-group.com:email,tq-group.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ew.tq-group.com:dkim,ew.tq-group.com:mid]
+X-Rspamd-Queue-Id: A709837AA69
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> I noticed this patch
-> https://patchwork.kernel.org/project/netdevbpf/patch/20260309173450.53802=
-6-1-p@1g4.org/,
-> but it seems that there is no further progress on it.
+The J722S CPSW3G is mostly identical to the AM64's, but additionally
+supports SGMII. The AM64 compatible ti,am642-cpsw-nuss is used as a
+fallback.
 
-> Please experiment and return once you are sure.
-> netdevsim (netdev simulator) driver supports net_shapers, so you can
-> easily exercise this code in a VM.
->
+Signed-off-by: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+---
 
-Unfortunately in the case of shaper.c, netdevsim only implemented stubs=20
-that return 0, so it's a not a 1:1 representation of the physical drivers.
-The rollback path specifically is not reliably reachable with netdevsim,
-whereas it looks like a proper trigger with real hardware.
+v2: keep ti,am642-cpsw-nuss as a fallback
+v3: resubmission for net-next, no changes
+
+ .../bindings/net/ti,k3-am654-cpsw-nuss.yaml   | 20 ++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+index a959c1d7e643a..70d25f5ff1cfe 100644
+--- a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
++++ b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+@@ -53,13 +53,19 @@ properties:
+   "#size-cells": true
+ 
+   compatible:
+-    enum:
+-      - ti,am642-cpsw-nuss
+-      - ti,am654-cpsw-nuss
+-      - ti,j7200-cpswxg-nuss
+-      - ti,j721e-cpsw-nuss
+-      - ti,j721e-cpswxg-nuss
+-      - ti,j784s4-cpswxg-nuss
++    oneOf:
++      - items:
++          - enum:
++              - ti,am642-cpsw-nuss
++              - ti,am654-cpsw-nuss
++              - ti,j7200-cpswxg-nuss
++              - ti,j721e-cpsw-nuss
++              - ti,j721e-cpswxg-nuss
++              - ti,j784s4-cpswxg-nuss
++      - items:
++          - enum:
++              - ti,j722s-cpsw-nuss
++          - const: ti,am642-cpsw-nuss
+ 
+   reg:
+     maxItems: 1
+-- 
+TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht München, HRB 105018
+Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+https://www.tq-group.com/
 
