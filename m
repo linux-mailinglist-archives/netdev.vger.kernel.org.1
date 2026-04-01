@@ -1,254 +1,180 @@
-Return-Path: <netdev+bounces-274152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274153-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yIa6MiY4zWmxawYAu9opvQ
-	(envelope-from <netdev+bounces-274152-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:22:14 +0200
+	id MFb8BJw/zWkkbAYAu9opvQ
+	(envelope-from <netdev+bounces-274153-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:54:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C88437CF2E
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:22:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D86237D83B
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:54:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 522F5319F40D
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 15:13:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 36B0630CB54F
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 15:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 638953DA5B3;
-	Wed,  1 Apr 2026 15:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FF433914EE;
+	Wed,  1 Apr 2026 15:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PV+tXhY5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qv/4tX0l"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C7B3A6EFA
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 15:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775056416; cv=none; b=dDojGrPBTsUwNTza4/CyPJ28rVSyNIGRx2Nw98mnyMTHyIptYvkW7cULWmg9L23iMZaWlbc0iqZNKVB3JeeE7tjKA7kB/l+vnP2OAzjQ+L+ljrR0xi6m0Eo9WvDJ0nemP8HDMzvueE00WcyJCjFrpkDZD9iWE5qI8X705N0VZ04=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775056416; c=relaxed/simple;
-	bh=Vx31kPj8WzRhzbsHW7UHSZzpuFvTyhoJHSe1Ji0Xm8E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pXl27CBcK/oYGOt9ieciqsq3hJGvLlezg0mTQsoIFBF9MbVkQ3C21hgnkeKacJEAPIVUgZ7c8h/kKNht/dxyu1SoJP2PySP+Iy+oqyBxaWtZQf9//TtCRhOpOoSHhn79/SBHyD+F/F7dLA3My82jOZIRD4XFWCZOK30CQBVvHPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PV+tXhY5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775056404;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qxBR3iXengsp3kpZeNErIksVg/dBeXg0IjlLomymZ64=;
-	b=PV+tXhY5GQC2JZvCYqbZ4A8oPBoaG0qFwfTxRzu2hCZeIO6ndJxqYmjiQlvkbTYBT3SCbF
-	Pnc/PhazYHiDCgFO7toLsFPyqA7/C3ByUukC2ppkUzfSi6/xSyzPuLHLLsVbLbGL8jezne
-	rl5PxZuhmDx6n/dM1Dng/ZR8EG/ha6k=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-110-A6DpxH2rOJarDmVSk27dNA-1; Wed,
- 01 Apr 2026 11:13:19 -0400
-X-MC-Unique: A6DpxH2rOJarDmVSk27dNA-1
-X-Mimecast-MFC-AGG-ID: A6DpxH2rOJarDmVSk27dNA_1775056397
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 77BD91955DB6;
-	Wed,  1 Apr 2026 15:13:16 +0000 (UTC)
-Received: from [10.22.81.104] (unknown [10.22.81.104])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 27BFF19560AB;
-	Wed,  1 Apr 2026 15:13:12 +0000 (UTC)
-Message-ID: <81fb8d07-01c2-4fde-930a-03ea72b30978@redhat.com>
-Date: Wed, 1 Apr 2026 11:13:11 -0400
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0EB223DCE
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 15:28:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775057281; cv=pass; b=DSaUUdY/QqbCzNJh652cqF6FIyE4YQZcp9Fx/bpIyS8JrDy6fhXUkOB80WqbrLavRGzcN3ayq+6lkT+a92ObgjWSgWVa4NXmBZYdUVGwoDTiP5qgRLRyzWImH2SFHOYFbaCS2IAHlakSpmIDrLIIE2t1qIvIQEOzB1BuTq0tkzY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775057281; c=relaxed/simple;
+	bh=4A/xg9VYn45t8YYunHBNUwIaHOOxM2gP1TF/kZTTzrA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HcMWpOdPSPjioO0xqnrJycYEYJum30uLFK9D1/5A3qR8pjl86UcfZIMYjkmcqNQHyEr0Ve1p5pQb2urQCkEx8cJ9ldnj7wTMTU0DI0l6c2jjRACpHHhpWuRkE2FQok5hHkVfjqZB5tWoIyRwNf9Irc7cUd9hPTzCzSGxY7UrGuk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qv/4tX0l; arc=pass smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-486fb439299so66021855e9.0
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 08:27:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775057278; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NiDHPL8DoujGKFIqZBZWPj0d1pChuJTAGGRNEqbygMNWSeqDx0YCUHZ4Os2e2lj7Uy
+         mqMSbNRXXceOIfv5FPCSR32Q36iHqlpIb/br6LsgaujmQBlDLq3VRK287MYAu+loCKLU
+         PNxB7HGBghFEU/MpeL6kMwbLGgwxQXhUBOpvzA/7C/RiZJ9gLMkWNXS/1RB2l4HeT0iW
+         FGHel+5mvSJTQUoQO0hxsfu+/EDc+fJciAykZ+V8uPtuA9GpEqOiCY0KRPFWI/dZG80R
+         AVUxBsUDJN9PeEQlbT9IDXEl/gX3Io34ceAujYvJpvfQSSlWr6pnACWTV2zxSOqEPIwH
+         Gc2Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vCOHypGKguo8wBkpBnEw63yLvcdsQkVdKAKwk74anwg=;
+        fh=JRWQ63YGL0Lb7gbeeF1NScIx2NJ/nSB4XGjveQQfxH4=;
+        b=LvOXVsPt5CCQHTf4U783GQ7VecawQTUqoZesA1ROPxYhWcHSKjFjIWrI+UJJMrISY0
+         eaulhKVKqVEV6L6dVW5HgiYJYEmnfvTK+G5qsPamMPsX6qAZPDwSYA6hkxyPV6UQPUND
+         WMvy8JhdWNCcpoMdHATGldAZpvAeoV7zeAGjnfC2DRmaPsaVoOjCOnh41zzjI/2t1BPC
+         jLA8P1nenJZTaMgK4/iBW8Vcr5X0r9EPrAHLzTegrMI9oTrVZokzaLE0ZHIbU+5yuCww
+         09r94SXK5e7MgVLtyAVvKbai8h5Yo3388mT1EB3ITGWMvAo0+ODlmTGLu5FJufKG7oOV
+         5vig==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775057278; x=1775662078; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vCOHypGKguo8wBkpBnEw63yLvcdsQkVdKAKwk74anwg=;
+        b=qv/4tX0l9OKhkkJH+vDrBljtZYiuCoqt+CNRC1p+kUUZkNUmGpdPGRgxuNhRGrmUWV
+         OWawQIcjEVj8SYGrwpmnmzhPeUEAXRAsVuqv4IvFHnwr51jpZ0GLVZmYY5p9pt8VX0qj
+         tS2OOjphaT0Cj2NQSYJwIi0eqGqkA9jP9W9KewXaUD8qm6EpUxkUlkC05Z79W2+AbxFY
+         igeq6svQN3ddMILocr52O5rr/sf5RWZ+j3bhk2Lar+whTrKsFxmDBEgLH/A/5V0bfSJs
+         yoL90cf2n3RqS/Evk48BBfWiLHSdCj3zpsJur787ARAog5z8+OWi2H3UpYgXbWNPNg8l
+         NcvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775057278; x=1775662078;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=vCOHypGKguo8wBkpBnEw63yLvcdsQkVdKAKwk74anwg=;
+        b=a0qnCsCD00bQiBZLZz/1/NQECEaRsIcsQdwCzERpyXXcRWD94pZGNwOo0Nl8/1gTXU
+         IxybMttpd/cw71wXnegj6vLQ2nw4SqV7Fa2BjzDk9q0u6atKsLKinhNY/QhrZcaO7qll
+         YIQFbPNxWcS2edHSfbdWqXTUTgE61JFG8TfqQ2rVFjvgwWtvHcArWQcUw8ivc4FOLCO8
+         uVX6rmVyy1151AcXnQx6tPDzdHkZwjNwJswlTxkrHJkyAR8Rh0O0MeXzZQlX4YubJbdX
+         +ERZDfx0ZqWn4YDX6nd3DOpkFdcuwfIv5GaYD1OD8ii3vPgbpVR/Uizaeh1nExbU/yzH
+         Etdw==
+X-Forwarded-Encrypted: i=1; AJvYcCWd+v3P6xZjlKsA3cop+KAfcVAyx+WpTo1576XAWJvysczDB+7nftRe4WKM6qfNi8ZI8U8937M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxK7XExk9jf1upyDbLUIOjuH71QXzY85c/p0bgvNaxtWBk6QuIO
+	fVZD6i7dQv+c+TFnCZ+hWR197ee9yJDRQeEY0i2BYk5mWYqrtGvnIu7QmI1X0Cc00hQPs/XlMno
+	OtOUop97tHuBC5ZucvdxhoBO67ZyAalo=
+X-Gm-Gg: ATEYQzxhW62HNoWccyy6rcBOWzOvEZBZIMFPf1qJsxqrSg286Ev8t6HImNrz72MlifE
+	BhYBx0FT/PFPodmqBAIFdKTRre4CISL5P83kCO+CiiX9XxeTA23s5UgDNB6Xd+2V4dU9ByPizHk
+	GBkih8Hx+AxbTcBxLABULKRLEt66IQw3fjYiZc07CtviT9UU2NBdMtuWLd3Bi+3SXgC3/FV+BiG
+	di1VAsVbCVj6FJSUCGV1i7lH8zQUys0gRtIp4MLy/E88rwbpLeVJ21eyAWq9KUg6jPGKGZCM6jv
+	HnFibBv1F1WtwNTAXg6+ocrXuCNp5i/kiUodbonqbuPmphfQtYjWjMA7C9z5DaqtTaeSkvtz7d2
+	J/WfERoP4fvWNyqAvJcodhTUSKw==
+X-Received: by 2002:a05:600c:1f11:b0:486:fd3a:fd22 with SMTP id
+ 5b1f17b1804b1-48883568b21mr60612905e9.4.1775057278387; Wed, 01 Apr 2026
+ 08:27:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH-next v2 2/2] ipvs: Guard access of HK_TYPE_KTHREAD cpumask
- with RCU
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>,
- Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
- Chen Ridong <chenridong@huawei.com>, Phil Auld <pauld@redhat.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, sheviks <sheviks@gmail.com>
-References: <20260331165015.2777765-1-longman@redhat.com>
- <20260331165015.2777765-3-longman@redhat.com>
- <ac0VfO3XiD_F1gv-@localhost.localdomain>
-Content-Language: en-US
-From: Waiman Long <longman@redhat.com>
-In-Reply-To: <ac0VfO3XiD_F1gv-@localhost.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <ac0Pr9K1Qbn1-Dn9@sirena.org.uk>
+In-Reply-To: <ac0Pr9K1Qbn1-Dn9@sirena.org.uk>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 1 Apr 2026 08:27:46 -0700
+X-Gm-Features: AQROBzC7wcHLCyA-6tldZ7Ce9lGnYrr2f0ucx0sfqhOnFZehMHR_aY88d-OhHDw
+Message-ID: <CAADnVQJdQRi+763mE8pVoYjgCzhUJNFj5b2YYOrrcLhv9s9-uQ@mail.gmail.com>
+Subject: Re: linux-next: manual merge of the bpf-next tree with the bpf tree
+To: Mark Brown <broonie@kernel.org>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Networking <netdev@vger.kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[verge.net.au,ssi.bg,davemloft.net,kernel.org,google.com,redhat.com,netfilter.org,strlen.de,nwl.cc,huawei.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-274152-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274153-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[iogearbox.net,kernel.org,vger.kernel.org,gmail.com];
+	TO_DN_ALL(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[longman@redhat.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[alexeistarovoitov@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3C88437CF2E
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 9D86237D83B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/1/26 8:54 AM, Frederic Weisbecker wrote:
-> Le Tue, Mar 31, 2026 at 12:50:15PM -0400, Waiman Long a écrit :
->> The ip_vs_ctl.c file and the associated ip_vs.h file are the only places
->> in the kernel where HK_TYPE_KTHREAD cpumask is being retrieved and used.
->> Now that HK_TYPE_KTHREAD/HK_TYPE_DOMAIN cpumask can be changed at run
->> time. We need to use RCU to guard access to this cpumask to avoid a
->> potential UAF problem as the returned cpumask may be freed before it
->> is being used.
->>
->> We can replace HK_TYPE_KTHREAD by HK_TYPE_DOMAIN as they are aliases
->> of each other, but keeping the HK_TYPE_KTHREAD name can highlight the
->> fact that it is the kthread initiated by ipvs that is being controlled.
->>
->> Signed-off-by: Waiman Long <longman@redhat.com>
-> Oh I see you're handling a few concerns here. But it's too late, the previous
-> patch broke bisection.
-Good point. So I have to either reverse the patch order, or just change 
-HK_TYPE_KTHREAD to HK_TYPE_DOMAIN & drop the first one.
+On Wed, Apr 1, 2026 at 5:29=E2=80=AFAM Mark Brown <broonie@kernel.org> wrot=
+e:
 >
->> ---
->>   include/net/ip_vs.h            | 20 ++++++++++++++++----
->>   net/netfilter/ipvs/ip_vs_ctl.c | 13 ++++++++-----
->>   2 files changed, 24 insertions(+), 9 deletions(-)
->>
->> diff --git a/include/net/ip_vs.h b/include/net/ip_vs.h
->> index 72d325c81313..7bda92fd3fe6 100644
->> --- a/include/net/ip_vs.h
->> +++ b/include/net/ip_vs.h
->> @@ -1411,7 +1411,7 @@ static inline int sysctl_run_estimation(struct netns_ipvs *ipvs)
->>   	return ipvs->sysctl_run_estimation;
->>   }
->>   
->> -static inline const struct cpumask *sysctl_est_cpulist(struct netns_ipvs *ipvs)
->> +static inline const struct cpumask *__sysctl_est_cpulist(struct netns_ipvs *ipvs)
->>   {
->>   	if (ipvs->est_cpulist_valid)
->>   		return ipvs->sysctl_est_cpulist;
->> @@ -1529,7 +1529,7 @@ static inline int sysctl_run_estimation(struct netns_ipvs *ipvs)
->>   	return 1;
->>   }
->>   
->> -static inline const struct cpumask *sysctl_est_cpulist(struct netns_ipvs *ipvs)
->> +static inline const struct cpumask *__sysctl_est_cpulist(struct netns_ipvs *ipvs)
->>   {
->>   	return housekeeping_cpumask(HK_TYPE_KTHREAD);
->>   }
->> @@ -1564,6 +1564,18 @@ static inline int sysctl_svc_lfactor(struct netns_ipvs *ipvs)
->>   	return READ_ONCE(ipvs->sysctl_svc_lfactor);
->>   }
->>   
->> +static inline bool sysctl_est_cpulist_empty(struct netns_ipvs *ipvs)
->> +{
->> +	guard(rcu)();
->> +	return cpumask_empty(__sysctl_est_cpulist(ipvs));
->> +}
->> +
->> +static inline unsigned int sysctl_est_cpulist_weight(struct netns_ipvs *ipvs)
->> +{
->> +	guard(rcu)();
->> +	return cpumask_weight(__sysctl_est_cpulist(ipvs));
->> +}
->> +
->>   /* IPVS core functions
->>    * (from ip_vs_core.c)
->>    */
->> @@ -1895,7 +1907,7 @@ static inline void ip_vs_est_stopped_recalc(struct netns_ipvs *ipvs)
->>   	/* Stop tasks while cpulist is empty or if disabled with flag */
->>   	ipvs->est_stopped = !sysctl_run_estimation(ipvs) ||
->>   			    (ipvs->est_cpulist_valid &&
->> -			     cpumask_empty(sysctl_est_cpulist(ipvs)));
->> +			     sysctl_est_cpulist_empty(ipvs));
-> It's not needed, if ipvs->est_cpulist_valid, sysctl_est_cpulist() doesn't
-> refer to housekeeping.
-Right.
->>   #endif
->>   }
->>   
->> @@ -1911,7 +1923,7 @@ static inline bool ip_vs_est_stopped(struct netns_ipvs *ipvs)
->>   static inline int ip_vs_est_max_threads(struct netns_ipvs *ipvs)
->>   {
->>   	unsigned int limit = IPVS_EST_CPU_KTHREADS *
->> -			     cpumask_weight(sysctl_est_cpulist(ipvs));
->> +			     sysctl_est_cpulist_weight(ipvs);
-> That probably works for callers ip_vs_start_estimator().
+> Hi all,
 >
-> But this is not handling the core issue that related kthreads should be updated,
-> as is done in ipvs_proc_est_cpumask_set(), when HK_TYPE_DOMAIN mask changes.
+> Today's linux-next merge of the bpf-next tree got a conflict in:
+>
+>   kernel/bpf/verifier.c
+>
+> between commit:
+>
+>   a8502a79e832b ("bpf: Fix regsafe() for pointers to packet")
+>
+> from the bpf tree and commit:
+>
+>   022ac07508836 ("bpf: use reg->var_off instead of reg->off for pointers"=
+)
+>
+> from the bpf-next tree.
+>
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
 
-If ipvs_proc_est_cpumask_set() has been called, the real affinity should 
-be the intersection of the given cpumask and HK_TYPE_DOMAIN cpumask. Is 
-that what you are referring to?
-
-Cheers,
-Longman
-
->
->>   
->>   	return max(1U, limit);
->>   }
->> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
->> index 032425025d88..e253a1ceef48 100644
->> --- a/net/netfilter/ipvs/ip_vs_ctl.c
->> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
->> @@ -2338,11 +2338,14 @@ static int ipvs_proc_est_cpumask_get(const struct ctl_table *table,
->>   
->>   	mutex_lock(&ipvs->est_mutex);
->>   
->> -	if (ipvs->est_cpulist_valid)
->> -		mask = *valp;
->> -	else
->> -		mask = (struct cpumask *)housekeeping_cpumask(HK_TYPE_KTHREAD);
->> -	ret = scnprintf(buffer, size, "%*pbl\n", cpumask_pr_args(mask));
->> +	/* HK_TYPE_KTHREAD cpumask needs RCU protection */
->> +	scoped_guard(rcu) {
->> +		if (ipvs->est_cpulist_valid)
->> +			mask = *valp;
->> +		else
->> +			mask = (struct cpumask *)housekeeping_cpumask(HK_TYPE_KTHREAD);
->> +		ret = scnprintf(buffer, size, "%*pbl\n", cpumask_pr_args(mask));
->> +	}
-> And that works.
->
-> Thanks.
->
->>   
->>   	mutex_unlock(&ipvs->est_mutex);
->>   
->> -- 
->> 2.53.0
->>
-
+thanks for headsup.
+lgtm
+we will get it resolved once bpf tree gets pulled.
 
