@@ -1,216 +1,237 @@
-Return-Path: <netdev+bounces-274197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274196-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ODr1JEdPzWkWbwYAu9opvQ
-	(envelope-from <netdev+bounces-274197-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 19:00:55 +0200
+	id sIfnNapOzWkWbwYAu9opvQ
+	(envelope-from <netdev+bounces-274196-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:58:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D03137E500
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 19:00:54 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D9F137E492
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:58:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A067830B61C8
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 16:56:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4450B3061E32
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 16:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8FE047AF6B;
-	Wed,  1 Apr 2026 16:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A607E47B413;
+	Wed,  1 Apr 2026 16:55:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ciPsfua7"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="W9amduMA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6085647CC7E;
-	Wed,  1 Apr 2026 16:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775062594; cv=none; b=jd1espSPOhXADpKkpguom2NqlCrCEAV6ORgE7hZD9KuCQdI+5S3MuwXyw18izwJzxiFrq6eSyC1enXtRjf4gQD7DHNbK+t/I5lVyttS2MNFzKgcc1kV8IhE2jTAe3s3//af8VeiipZ4gZQKaEF0besSGt+botl2ycQO9vTuuytU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775062594; c=relaxed/simple;
-	bh=rGzIkMjGgut585CN3VOg0XUDnVimGxpKVxfZ7xuFWQA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Vz5Htra6LUK4rhm2syq6y7Hto7jfg87mqXXBcMVMAgBUcrxeQL4dlw6I5biYuW5gzHWnIxtRzPEqgn0fgHXpPTt9LHnv3c7rgs/9sYQzv9jyXfhp+d5k2E+nsZLKEFp4Hv9F+eh6oZ4wUU79A/qrFDzVCwJLYKhYDiOsFtaCoxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ciPsfua7; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6319diBc4036177;
-	Wed, 1 Apr 2026 16:56:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=OnuL3r
-	zlzIEr4MZtc6JVwkA/w4TfoM4dP2yVRbDVUTE=; b=ciPsfua7U5ucNGK+0Ki9oR
-	XhPPjkLRkJ7+RfPAyW0buzl7l6B5gDLtunz9oO45LGKL4anCQ4V8d45yCs1JVcHS
-	rtlBnzh4CfzkY7AHiteOntAuqxvkGpJJ35pG0Zeo0D7yjhzG7SWLlDlZkl2g+WhW
-	gAuzTlFK3kWYMmo2SX3mrbjktw+wjV2L09PBI/4rClt436YwMojMj0n4C561+48i
-	deuAvyoRsHrK9CSynXcdJV4puZ4K9+ps8g2ukn6hT8HmEIumyuxr4lgO4aXWL8pk
-	V1dl0/7xMobGwdy+xrKoXRxo4acA8shEQhW0dmX6+pExXcT6JcBVT+xQmMbLYasQ
-	==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4d66ms8dwb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 01 Apr 2026 16:56:21 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 631EpJ65005910;
-	Wed, 1 Apr 2026 16:56:21 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4d6spy6m2u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 01 Apr 2026 16:56:21 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 631GuK5x31326796
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 1 Apr 2026 16:56:20 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 114C65805F;
-	Wed,  1 Apr 2026 16:56:20 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0D8F958054;
-	Wed,  1 Apr 2026 16:56:17 +0000 (GMT)
-Received: from [9.111.188.215] (unknown [9.111.188.215])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  1 Apr 2026 16:56:16 +0000 (GMT)
-Message-ID: <007cd524-06c6-47b9-98b4-4ecf4d0ba421@linux.ibm.com>
-Date: Wed, 1 Apr 2026 18:55:27 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E47547A0BE
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 16:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775062558; cv=pass; b=uPmr1CMnli4PI8auQGHWB6IpHrsN9vqx8gZ+U0ckYRjKJCeKVLGdXJbEdQUPyG0g8ASx1+7btOP/efsZ9xd4uZx878AfrFaNkyRAM7EhAYN30gmS5zvQ5rSogB45ExQDzupfH7GGiuGLCywfg9NHPZqgghG5v3ynyoI5Wwakd+Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775062558; c=relaxed/simple;
+	bh=eO/Aj+ZtlXpxdIHMKMSgcDj7n5rRQmBw8M490hgHXi8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d9nnz95nUinz6kLYWLmvcnvafYRdk+bvPNjiDfLxms5G/3rIunhEMe1D7UQe8WB75QmC0LygP6WJqSWC0NXyD2Q2Wq6wJzSVHBQczmXw9RccPXpayKCfUcG+moze7nSEtOgkZfZ6fHMDhvXyrxNIAckQs207bpm5IR182a0/Iwo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=W9amduMA; arc=pass smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-43d029f346eso2643442f8f.3
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 09:55:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775062554; cv=none;
+        d=google.com; s=arc-20240605;
+        b=JC53aaVULxXtl0s/8xCFjkR1kz1tZ29TqCgjJwps9Qlgf8MVvVqPr5ajPjh+ja08Fb
+         463ylWS0TvqM7NVt25r4JwRQwgMxHhocnw367+NcDKrePxID73+8KF5Djaq212Y8HTvZ
+         IpsDh9pdHGa/Ii0FH3dCvCUkhBl7M9paXQlrDdXQs7Q2hJy0fKPf7oiGWLQwrtKbsTTf
+         e4DXx7rcJuPxvzArPhBe/DbP9QHhrRCd3gFixrTYyszPo5HatSLqyvpUs73zexXH4ocQ
+         3cnI+x5xxslZt4K5IQMKuD03AQxGNaa2Fc00UkOH1WQnLbN5RMZZVNPLV+VlnVyQGQdC
+         WWfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=1xx4YVdOSk31B8m52xPv3EMBRuAXgAy60np1RaxKVjE=;
+        fh=kqhjXIqTkYBcur4RVVE//dNJ5+Zo70J6CWsy425OAtw=;
+        b=gSW643OOEb4HBaDYzuxskNRPb7sA0zn0fm5hCt7sRTRKWM6vezSN01VTQCnmui1j3t
+         l76xqkRI4C5hBkFhdRpq4+B32k7sB/da918cqkOM9OD3bEUEkGJkBRMHhVG2nTb3Mzmv
+         VyLKnCtFsxzscisH9LAMLOJqhklFsmXpeAJB32st56rHPhqmSH/BPpXc0KZxwySIm8bA
+         Z8voD6A/boFIzo+oeChtIf9Twj/tMZb5Ncud6Jm2HC9misj1k65JwsRFIpzqC7kO8FFw
+         2o83YSgfO4msQfS7ZZWs5y1G5/pnALXQDlClTzr3askEVXdzTtVwUaL+TrmnuC1gbeA+
+         Bqfg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1775062554; x=1775667354; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=1xx4YVdOSk31B8m52xPv3EMBRuAXgAy60np1RaxKVjE=;
+        b=W9amduMAZBgtkSZoKKwHg6JGvGTJpLQITjCs5521xt4shBY3kqm/5zJnO4+/EgyvX5
+         +CaGzkX9ZIfZlalbHBIFNNNpE62gJvFM8aUp5GAXkGFmXy/rKqjLppN58zLcDHMONQ25
+         kBEBbEAPHK+QGagjS3Q6TqqOJ7g1dgusB9AkICQEWW1HZ/IQrIHmRY3V8dmEmYFIcbV0
+         8JzA6JJ0r0K3vM0/lv3TGBBAQkTh52apoq4k+HrOKLxoYeBDGzEYTUkQn3TdazrRaoNx
+         H+9TE4EQo4e93tILpBZ5SYqf3qiNgNCb2Dyq3HY0r80zZ/Qg1q/s8EIVfHAEFhOv3fBW
+         32vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775062554; x=1775667354;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1xx4YVdOSk31B8m52xPv3EMBRuAXgAy60np1RaxKVjE=;
+        b=O2kmKVHbjmlvhXxBH77FdeMEnpK01SAN7YHqjcIu5s8xG2mnfuh8B/GTKof6qc+iow
+         fPPJdFoJQg40pIjyf8h/nNfzLAbz/pXcCdxQUeJvHRLBz3wR2RFeSXmlwAs09RLylwtS
+         HsbjjKSUEpb7pFabbTeLscR1xJ9gB79tyGG0LzTSdBKSAbMPN7YLmQl2g0zyuzFoVSWR
+         dN1GzdpSMBw4d8Z5iB/bhISwM+Vw4mzwlOc7gK8mp3IKipJgyVYJN/600+AhRApnj/H9
+         2bRwgoX0AL712bLOBxEoiI42GsN93hPCJ3LxLp2TTJnbek2c7KhBJ8TeMMX2NZQn+/3Z
+         7yhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV+/f9w9qZdOqLdRx3xWEosfJBjPF72i2tIKPhygK3bJKHW3MS3b/kWKjYnG0N2U3rY988fHjk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxi2Jw4UaZjXzDtw0C9KAW6XHaIlSkzB1WiFvgxo4FhJ/XtCgOm
+	w1ySbwthZGhbE7VcF4Y/5L8A/TVxkSegyfpji8qkVL9WsZfEh0P7TkEmq0o58WgIfrL3tALouxb
+	vLQ8/cVABntGP4c2R2P4Cw0dx+kAuDZFQAi57o3PXdg==
+X-Gm-Gg: ATEYQzzvjqtnHvrXCN5L6Mmv233/n7OkZwbxSsSUMIZgVJHAVqJazfiAasiudK01xN0
+	98GCTrRqAeeAV9bjOshcSQQpJ/vuvRA6suM+elAmPlBEPc/f1lpAIF8S8sf3tDAI/cE+7+mLyQn
+	qKN3Vxjb+MapzKLkqyG4c/l9siE+t+jO3Zv7uG4VpQJKh9t/vt1tP+4yx/upf637eFsUV3AJ9i1
+	NWr9bg4iPvEnfVb1SW3ozjQoyKs4K47JH+j3aOp6C3HAhAa7MeOH4XA5u0XtH6HOFAVxWozp9Lc
+	qxYBCWtUr76Q41xnFFCOMo5rp2q9dd7afie3rNIISslYjmxAuw94dBCjpDyjLBFL3k0Bv9fTDY5
+	Okk3c
+X-Received: by 2002:a05:6000:601:b0:43b:3d44:6624 with SMTP id
+ ffacd0b85a97d-43d1f1c03femr79938f8f.2.1775062554435; Wed, 01 Apr 2026
+ 09:55:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/4] gcov: use atomic counter updates to fix concurrent
- access crashes
-To: Konstantin Khorenko <khorenko@virtuozzo.com>,
-        Mikhail Zaslonko <zaslonko@linux.ibm.com>,
-        =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Josh Poimboeuf
- <jpoimboe@kernel.org>,
-        Vasileios Almpanis
- <vasileios.almpanis@virtuozzo.com>,
-        Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>
-References: <20260401142020.1434243-1-khorenko@virtuozzo.com>
- <20260401142020.1434243-5-khorenko@virtuozzo.com>
-From: Peter Oberparleiter <oberpar@linux.ibm.com>
-Content-Language: en-US
-In-Reply-To: <20260401142020.1434243-5-khorenko@virtuozzo.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=J6enLQnS c=1 sm=1 tr=0 ts=69cd4e36 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=TYBLyS7eAAAA:8
- a=VnNF1IyMAAAA:8 a=GFBSSUJuQz_BDAv-O8oA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=zvYvwCWiE4KgVXXeO06c:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDAxMDE1NyBTYWx0ZWRfX5xbjruUR5NtP
- uZCMrRequfOXapSg5i/7qT2kpk8wRXzKBY5YSmI+mkJKs8Hp9b4V31ACY2BFHJbBfQov7AJyApI
- atexni3Oc+V7C7e9cPn0qkUCyisKsX2S+xF9gQxgMVCy1o1BjcpQJiylW1ty2NptolkZlR5kFip
- iy6knv8OXIj6F2S92RiPb5NRnPIc4RjeRhW5GMeWlZKIziKSkllGg+s1jZ2+L+DOxsp3X7O19yu
- bJ4bzp9W2ogZflz1cbiMqncJPt8UCYCkCub890x/5wjsg4cmFI6kG1J4FvWPk3FUdumugaWadg1
- i3k3HwnSu7hdLBWELD15xfW+mQj/pKkE51t3FtzL3MF6TYo5ERaPjF1QED3pjPe17SPAb+sZ4Xs
- 39KV2nJXY4bz/NPDop5lA1a7tZFn8beL1VDeeTiBrXbCCLAjL3sbZi6pqKQHHVbDtOlTDjjPhA/
- 9fu4uhxbXoztAsZVvqQ==
-X-Proofpoint-GUID: FhHeyWQILF-ObIYtSUTAdW3_PzKFXe3x
-X-Proofpoint-ORIG-GUID: d7DOFv_A9vaxFjF4Fz6xh6Qu4bWJCYax
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-01_04,2026-04-01_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 clxscore=1011 adultscore=0 priorityscore=1501 bulkscore=0
- phishscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2604010157
+References: <4fba57892e5bd6a1afc4a36a80b40e3ecc28cac5.camel@web.de>
+ <fd609cfe186ee48e0e9a08e35764175a2516dd14.camel@web.de> <2369ba83d204290dcfe157aed3f943206213b979.camel@web.de>
+ <aa02f39ec4640c9d98963f42121b76e59b58371d.camel@web.de> <20260218073036.AlkNRoAP@linutronix.de>
+ <ae213d2b908e46d34856be9daec891d7210f46f7.camel@web.de> <20260226172927.2Ck9wZMw@linutronix.de>
+ <20260318103009.2120920-1-neelx@suse.com> <20260318111849._MMol8Hr@linutronix.de>
+ <CAPjX3FcRYNkYK2gerbRL4C9wXZPxWSs6=oTjzv5+msm4PQrfqA@mail.gmail.com> <20260318145101._iaDDpbE@linutronix.de>
+In-Reply-To: <20260318145101._iaDDpbE@linutronix.de>
+From: Daniel Vacek <neelx@suse.com>
+Date: Wed, 1 Apr 2026 18:55:43 +0200
+X-Gm-Features: AQROBzCCROIdCe9kvHP9iYGHGkzUiotwHvSMgwQTbWweollZ6Da-pHq3fXh3bLE
+Message-ID: <CAPjX3FePCKQTaxB6zuo+_V09PZct=utw3vgJUTM_GrZQtv7_TA@mail.gmail.com>
+Subject: Re: "Dead loop on virtual device" error without softirq-BKL on PREEMPT_RT
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rt-devel@lists.linux.dev, netdev@vger.kernel.org, spasswolf@web.de, 
+	tglx@linutronix.de
+Content-Type: text/plain; charset="UTF-8"
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ibm.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[ibm.com:s=pp1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-274197-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[ibm.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.ibm.com:mid,virtuozzo.com:email];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[oberpar@linux.ibm.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,vger.kernel.org,lists.linux.dev,web.de,linutronix.de];
+	TAGGED_FROM(0.00)[bounces-274196-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[neelx@suse.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[11]
-X-Rspamd-Queue-Id: 0D03137E500
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,linutronix.de:email,suse.com:dkim]
+X-Rspamd-Queue-Id: 7D9F137E492
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 01.04.2026 16:20, Konstantin Khorenko wrote:
-> GCC's GCOV instrumentation can merge global branch counters with loop
-> induction variables as an optimization.  In inflate_fast(), the inner
-> copy loops get transformed so that the GCOV counter value is loaded
-> multiple times to compute the loop base address, start index, and end
-> bound.  Since GCOV counters are global (not per-CPU), concurrent
-> execution on different CPUs causes the counter to change between loads,
-> producing inconsistent values and out-of-bounds memory writes.
-> 
-> The crash manifests during IPComp (IP Payload Compression) processing
-> when inflate_fast() runs concurrently on multiple CPUs:
-> 
->   BUG: unable to handle page fault for address: ffffd0a3c0902ffa
->   RIP: inflate_fast+1431
->   Call Trace:
->    zlib_inflate
->    __deflate_decompress
->    crypto_comp_decompress
->    ipcomp_decompress [xfrm_ipcomp]
->    ipcomp_input [xfrm_ipcomp]
->    xfrm_input
-> 
-> At the crash point, the compiler generated three loads from the same
-> global GCOV counter (__gcov0.inflate_fast+216) to compute base, start,
-> and end for an indexed loop.  Another CPU modified the counter between
-> loads, making the values inconsistent — the write went 3.4 MB past a
-> 65 KB buffer.
-> 
-> Add -fprofile-update=atomic to CFLAGS_GCOV at the global level in the
-> top-level Makefile.  This tells GCC that GCOV counters may be
-> concurrently accessed, causing counter updates to use atomic
-> instructions (lock addq) instead of plain load/store.  This prevents
-> the compiler from merging counters with loop induction variables.
-> 
-> Applying this globally rather than per-subsystem not only addresses the
-> observed crash in zlib but makes GCOV coverage data more consistent
-> overall, preventing similar issues in any kernel code path that may
-> execute concurrently.
-> 
-> Signed-off-by: Konstantin Khorenko <khorenko@virtuozzo.com>
+On Wed, 18 Mar 2026 at 15:51, Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+> On 2026-03-18 15:43:52 [+0100], Daniel Vacek wrote:
+> > On Wed, 18 Mar 2026 at 12:18, Sebastian Andrzej Siewior
+> > <bigeasy@linutronix.de> wrote:
+> > >
+> > > On 2026-03-18 11:30:09 [+0100], Daniel Vacek wrote:
+> > > > > --- a/net/core/dev.c
+> > > > > +++ b/net/core/dev.c
+> > > > > @@ -4821,7 +4821,7 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+> > > > >             /* Other cpus might concurrently change txq->xmit_lock_owner
+> > > > >              * to -1 or to their cpu id, but not to our id.
+> > > > >              */
+> > > > > -           if (READ_ONCE(txq->xmit_lock_owner) != cpu) {
+> > > > > +           if (rt_mutex_owner(&txq->_xmit_lock.lock) != current) {
+> > > >
+> > > > Ain't this changing the behavior for !RT case? Previously, if it was the same thread
+> > > > which has already locked the queue (and hence the same CPU) evaluating this condition,
+> > > > the condition was skipped, which is no longer the case with this change.
+> > >
+> > > The above was me thinking and does not even compile for !RT. Commit
+> > > b824c3e16c190 ("net: Provide a PREEMPT_RT specific check for
+> > > netdev_queue::_xmit_lock") is what was merged in the end.
 
-Thanks, this looks good to me!
+Thinking about it again, wouldn't it be better to have one generic
+solution rather then special-casing for PREEMPT_RT vs. !PREEMPT_RT?
 
-Successfully tested this series on s390 (except for patch 3 which
-depends on x86) using GCC 15.2.0, GCC 10.1.0, and current Clang from git
-(20260401).
+--nX
 
-Tested-by: Peter Oberparleiter <oberpar@linux.ibm.com>
-Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
+> >
+> > Hmm, that means txq->xmit_lock_owner is not used at all for PREEMT_RT.
+> > It's pointless to even store it. Shall we care?
+>
+> For PREEMPT_RT the xmit_lock_owner member is only stored and not used
+> otherwise. It could be removed as in ifdef-ed away but I do not care
+> enough to sprinkle it and the gain is little (proof me wrong). So I am
+> happy as-is.
+>
+> As for the check itself as we have now, we detect the deadlock before it
+> happens and this is nice to have. The alternative (in case of a
+> deadlock) would be the deadlock detection in rtmutex code which would
+> freeze the thread.
+>
+> > --nX
+> >
+> Sebastian
 
--- 
-Peter Oberparleiter
-Linux on IBM Z Development - IBM Germany R&D
+On Wed, 18 Mar 2026 at 15:51, Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+>
+> On 2026-03-18 15:43:52 [+0100], Daniel Vacek wrote:
+> > On Wed, 18 Mar 2026 at 12:18, Sebastian Andrzej Siewior
+> > <bigeasy@linutronix.de> wrote:
+> > >
+> > > On 2026-03-18 11:30:09 [+0100], Daniel Vacek wrote:
+> > > > > --- a/net/core/dev.c
+> > > > > +++ b/net/core/dev.c
+> > > > > @@ -4821,7 +4821,7 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+> > > > >             /* Other cpus might concurrently change txq->xmit_lock_owner
+> > > > >              * to -1 or to their cpu id, but not to our id.
+> > > > >              */
+> > > > > -           if (READ_ONCE(txq->xmit_lock_owner) != cpu) {
+> > > > > +           if (rt_mutex_owner(&txq->_xmit_lock.lock) != current) {
+> > > >
+> > > > Ain't this changing the behavior for !RT case? Previously, if it was the same thread
+> > > > which has already locked the queue (and hence the same CPU) evaluating this condition,
+> > > > the condition was skipped, which is no longer the case with this change.
+> > >
+> > > The above was me thinking and does not even compile for !RT. Commit
+> > > b824c3e16c190 ("net: Provide a PREEMPT_RT specific check for
+> > > netdev_queue::_xmit_lock") is what was merged in the end.
+> >
+> > Hmm, that means txq->xmit_lock_owner is not used at all for PREEMT_RT.
+> > It's pointless to even store it. Shall we care?
+>
+> For PREEMPT_RT the xmit_lock_owner member is only stored and not used
+> otherwise. It could be removed as in ifdef-ed away but I do not care
+> enough to sprinkle it and the gain is little (proof me wrong). So I am
+> happy as-is.
+>
+> As for the check itself as we have now, we detect the deadlock before it
+> happens and this is nice to have. The alternative (in case of a
+> deadlock) would be the deadlock detection in rtmutex code which would
+> freeze the thread.
+>
+> > --nX
+> >
+> Sebastian
 
