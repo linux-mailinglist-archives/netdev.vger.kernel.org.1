@@ -1,223 +1,163 @@
-Return-Path: <netdev+bounces-274110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274111-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id akCEB8cczWk0aQYAu9opvQ
-	(envelope-from <netdev+bounces-274110-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:25:27 +0200
+	id mCQPDN4fzWnOaAYAu9opvQ
+	(envelope-from <netdev+bounces-274111-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:38:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E75C37B2E8
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:25:26 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84C3A37B5A1
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:38:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 690D8301DB4F
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 13:25:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7B342305B0FA
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 13:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE911423A97;
-	Wed,  1 Apr 2026 13:25:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D12742EEC7;
+	Wed,  1 Apr 2026 13:30:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="sPNY4QSE";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jhGBGzOK";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="sPNY4QSE";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jhGBGzOK"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="t5e8U/1x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE19425CDD
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 13:25:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775049907; cv=none; b=XZ47xd4Fm/N4JWB3XJoI+yK1QyqyBlK9yYoLSNt3k4kU+dljgIoQv6NmVMlyH7vDaRzD/fJWb1RJ6b+TJu80bk56FPrc0sAqVxDJ4QbU7iwmVnzWSRLeUWymyDJW6TzJz+Mxfr68up5BRLB6wykSF4p3mg4w4dA/J0XglHgnIgo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775049907; c=relaxed/simple;
-	bh=yrAiEe3hMwdtMqlM5yyE08W+WcGcpRKJkzW6T+Zj62Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PwWt8f6CHsOFtz1WZLDpDA6jAtQMWHjYkdNygiwayd57tsYCZ+4OAbil/wlfe5BiS7iMhJO4H46IGZH0Q0xMEPYiyouMKo4LdrrABOs7bipTTRSVVFvtnPgfV9bb+HxmPgG2cxmlNgAy6//69cKZN5RsYKPGjimmBqAakfmhC7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=sPNY4QSE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jhGBGzOK; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=sPNY4QSE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jhGBGzOK; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 7FE0B5C055;
-	Wed,  1 Apr 2026 13:25:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1775049903; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cflPi1gwmWX95H1Di+2W7uMrJ74d0vZDUiJvvvqQrCI=;
-	b=sPNY4QSEeDFv/Ac1CD3IuG66bOQxNLXlURFSuRx2d7Paw2XsJRVTB31LVT2FQrUjWxeXD9
-	qdq+Qw5R4CRWAQHr6u1/bzcnoaOrrMnymabTj/d2ffeeZ13d7iFwIujfT7MCYMRm03msPu
-	ZpjfXOaSvtSG+qqxDTbDzJ7/KFAihtU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1775049903;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cflPi1gwmWX95H1Di+2W7uMrJ74d0vZDUiJvvvqQrCI=;
-	b=jhGBGzOKd5CnPeq/Fq9fhG7IevPWYHkbLt6qM/rmLVQvcbBxFMcici2Q06v0c1YrDBdmfF
-	C5tRajdFRh4zdEAw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=sPNY4QSE;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=jhGBGzOK
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1775049903; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cflPi1gwmWX95H1Di+2W7uMrJ74d0vZDUiJvvvqQrCI=;
-	b=sPNY4QSEeDFv/Ac1CD3IuG66bOQxNLXlURFSuRx2d7Paw2XsJRVTB31LVT2FQrUjWxeXD9
-	qdq+Qw5R4CRWAQHr6u1/bzcnoaOrrMnymabTj/d2ffeeZ13d7iFwIujfT7MCYMRm03msPu
-	ZpjfXOaSvtSG+qqxDTbDzJ7/KFAihtU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1775049903;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cflPi1gwmWX95H1Di+2W7uMrJ74d0vZDUiJvvvqQrCI=;
-	b=jhGBGzOKd5CnPeq/Fq9fhG7IevPWYHkbLt6qM/rmLVQvcbBxFMcici2Q06v0c1YrDBdmfF
-	C5tRajdFRh4zdEAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D3BCA4A0B0;
-	Wed,  1 Apr 2026 13:25:02 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id V3KLMK4czWk9QgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Wed, 01 Apr 2026 13:25:02 +0000
-Message-ID: <e10d488a-8c37-49ab-9dd9-61625958039a@suse.de>
-Date: Wed, 1 Apr 2026 15:24:56 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C4C42EED0
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 13:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775050239; cv=pass; b=fbKYhkv36hTiaYn6YcwnY4JO4PSA6g5Cw5qAnCmhROWtZmAwwJ2WeVyvHxky91kPi+aNHNdOkHGlCRKDBVHwbo6Ja9uSp3/cnSqBUwclNMtaQbgR6OxPp/s+vH6PynpSgwbla+FaTW7KkTcz923KmZdRHyZ+FmV4PQWQQnUJKfc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775050239; c=relaxed/simple;
+	bh=BRfaxlgXcaC4MwKGbrVI1gU9LqJpM6bbpHxRtdhQuco=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Axz50gzc2YpthM4Nx+cL0y2zL5Tpc50WnceGTnlXH4xxBJphNFLheqjO8RgF3Y+TU0cR5tPuTWY8pFz/co8GZjIPW5w7UJKz10CMxiZ0Laul+5OK51N4i6SAvh2CfHxETKloq66lWGYTQD6l71zoLFdPw/fOcIKbucve2NkQeoU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=t5e8U/1x; arc=pass smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-82cf96ca071so18542b3a.1
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 06:30:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775050237; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Y51e9TSDFcFA7zBHU8teo/8wLBBR5Buc2/iCydFCJrOPDA2GZQ40MtCuddEn6M4/Gq
+         M8s900EKVkGfT2hLbZoHK77oC+D+vjjb6OKGyWQPgh+rxE4HlX9c2InNqs3JS6ooG7xX
+         Cv83YMIgd/vhJYKBD5WD/ZT+2CoMTBIXIaxr7QzscsY9Q0rf0jZvfeSkDsMDB+qcIVbM
+         j+xohWASVLSjBwG5Ha0VF3I2JYwQUie11BQF2zb/+POKuT8jhEzB9rBiLRytN6jHQCBJ
+         AoW5hKoc5TlAM1joTZhnI3XJUZxi6xsJ234WlU7MfoeyamUvtj+FiKOB7zJRQwzoPEEV
+         Cq3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:dkim-signature;
+        bh=T7NuR3Bw6Qb5rckRbbyyN8y03wjGHotEoDAqQmFwpLY=;
+        fh=lBu3/v7o40Vg3xGxsLnhAVyQ6gzMitjrNM/vrosLT10=;
+        b=PeKcm1V6OQp3LO/TLSio6Qzkq/jQnf9FxqXjEFTW018/tcwjfHjsHuFVYV9JNeMMQJ
+         qYqld97vu+tjAvoUEIi0qk2iyfFp6b5wiCHiJwWH39w2Y5I9tNeBWgHS/2Jt3jp8/+rl
+         dwCXSgxU8TDW3AwYviFLDFWjQoSthUMZOPzsBIa4pO38oOgGRGd9g3bes1MSfceBkHym
+         1fVVORXHIDDs9Q6Sd7JLc1cp91tqPUpns/Lf3yhO4G3c6sTEhwuSzW+u1kAn0TZ3Wn5C
+         2jjxAZcJNf2aaaZpuLm7SEATDIfeDplSCeTMU/Ghw3TOrly++M1/mEI7GhRfUJE8kfcz
+         jn1A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1775050237; x=1775655037; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=T7NuR3Bw6Qb5rckRbbyyN8y03wjGHotEoDAqQmFwpLY=;
+        b=t5e8U/1xZ4c5uGBTHMld6TI1/QXjnvmHNjvQ5T+Jm2n39tqyd2cm+XRC/80ktQlpci
+         rwYTXq4DFcshYjfrqCJrDMj7zKqNVcRhYEJ0ST2CEoenxEAV1nrUCTi6hfNPCGOjsBWY
+         wIdGs9CmL/nTTFTkF99PGhOOiRuv4PmMOV8aZSTeI/QZNOqNQHIdJXIpJNW+uDoNpMoL
+         IY8oqXyEEcjjIkvCzGTz7nRBahav/GlZI56TXRYFujav9hD9j4mSoQboUXjii6XL8kJq
+         w/vVdsMnZ5whhHNYoj/VFtZkdMrewKh+LctrfAVHRW+2qX15m5iy3e7Eg1yuXFfLPl9I
+         V3Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775050237; x=1775655037;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T7NuR3Bw6Qb5rckRbbyyN8y03wjGHotEoDAqQmFwpLY=;
+        b=UOd+gVzPs5HEhjVuDfq9ajs8IP5tp8vZWWFr8O+tDGwe+d+wM3KlT9E/8QpQSug+L7
+         wjLyxTno0YCh6kw0rWCccNLcLI3GgAjfWVXbZpUBqoprSCeIVZ6aE6TfzkLRCcUTegdH
+         iKZSXdN59RVQIyv/HyEkOnB0SKL20FY3UDxdFTqmQbk8uXWKHeNQrVXTfY7LZL+QwSeL
+         AFgZeyL/xlz7NcJk7cxXGHjIZJnZXUZzcc5/8xV81xN+h0HB4Mzac7wrhAMt749EeyJs
+         BaQS4toaGrxlqZfdKwMvlLXlw0zpipebDASSPWKm+jlW8F981d5QlSFGpI/5nTS426ah
+         vR+A==
+X-Gm-Message-State: AOJu0YwrUt0BV1Jy7VkkKLIRdyDSONCm5APVY7ikLf3DorcvukLMKfGw
+	5AX9kokUssePITJpPp3RED6IhYHyR1M4oqdpwOrd6ixM+PGj3Nm8Yf/8/rrcM/7CpSb5o+87j33
+	bkHGSg4xMfg2cK2sWGjCqBkOz06vdty22f4uWI2q+DxhlSbp/GdEg7A==
+X-Gm-Gg: ATEYQzwWwzTUiyo20rabJcnVwj3uVs6B/z1kNtGu6OqvXNiTveqDzWX0IkzwSp/lT9t
+	DOHan3rfFhBQ2GMOUnNvQsjbIkoza4BLTtMytjdb5qWPXPkirEhXStEo+/h03oV6bYWl9hHPaDU
+	bYKizUHbH9ZSOFNCeMJJl2bUnBPKuyl1aBIlN4w9qf9vLQeHOsxaFEgJUiMQR/w1ONhzg5sLolq
+	iyqhlKbzXOd4s2bYP+w6C1sSu3IJ5gbq+72DEgpVLispUSRvm3Z7hRVxZN9dF5623la4a20bjZT
+	paJsorEGtdEno3rKHbU05NXufdfU0w==
+X-Received: by 2002:aa7:908f:0:b0:82c:ebbd:9eca with SMTP id
+ d2e1a72fcca58-82cebbdba6cmr2579095b3a.11.1775050236598; Wed, 01 Apr 2026
+ 06:30:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2 net v2] ipv4: nexthop: allocate skb dynamically in
- rtm_get_nexthop()
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, petrm@nvidia.com, horms@kernel.org,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, dsahern@kernel.org, kees@kernel.org,
- Yiming Qian <yimingqian591@gmail.com>
-References: <20260401081741.4273-1-fmancera@suse.de>
- <20260401081741.4273-2-fmancera@suse.de> <20260401130257.GB1808730@shredder>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260401130257.GB1808730@shredder>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 1 Apr 2026 09:30:24 -0400
+X-Gm-Features: AQROBzBVzmwXdf2WGM_n4Zy09fnWYZkggVAvYshhunotULUmqQbgAETJrZK1gAM
+Message-ID: <CAM0EoMkHo-e5Smq2yi7c4HxA1dJWzXRYkOo0A6NmbF-HkzaAgQ@mail.gmail.com>
+Subject: 0x1A: Dates And Location for upcoming conference
+To: people <people@netdevconf.info>
+Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>, Christie Geldart <christie@ambedia.com>, 
+	Kimberley Jeffries <kimberleyjeffries@gmail.com>, LWN <lwn@lwn.net>, 
+	"board@netdevconf.org" <board@netdevconf.info>, linux-wireless <linux-wireless@vger.kernel.org>, 
+	netfilter-devel@vger.kernel.org, lartc@vger.kernel.org, 
+	Stefano Salsano <stefano.salsano@uniroma2.it>, Andrea Mayer <andrea.mayer@uniroma2.it>, 
+	Carlo Filippi <carlo@common-net.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-1.66 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,kernel.org,redhat.com,google.com,davemloft.net,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274110-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274111-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,ambedia.com,gmail.com,lwn.net,netdevconf.info,uniroma2.it,common-net.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.976];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,sashiko.dev:url]
-X-Rspamd-Queue-Id: 9E75C37B2E8
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netdevconf.info:url,mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mojatatu-com.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 84C3A37B5A1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/1/26 3:02 PM, Ido Schimmel wrote:
-> On Wed, Apr 01, 2026 at 10:17:41AM +0200, Fernando Fernandez Mancera wrote:
->> -static size_t nh_nlmsg_size_grp(struct nexthop *nh)
->> +static size_t nh_nlmsg_size_grp(struct nexthop *nh, u32 op_flags)
->>   {
->>   	struct nh_group *nhg = rtnl_dereference(nh->nh_grp);
->>   	size_t sz = sizeof(struct nexthop_grp) * nhg->num_nh;
->> @@ -1013,6 +1013,21 @@ static size_t nh_nlmsg_size_grp(struct nexthop *nh)
->>   	if (nhg->resilient)
->>   		tot += nh_nlmsg_size_grp_res(nhg);
->>   
->> +	if (op_flags & NHA_OP_FLAG_DUMP_STATS) {
->> +		tot += nla_total_size(0) +	  /* NHA_GROUP_STATS */
->> +		       nla_total_size(4);	  /* NHA_HW_STATS_ENABLE */
->> +		tot += nhg->num_nh *
->> +		       (nla_total_size(0) +	  /* NHA_GROUP_STATS_ENTRY */
->> +			nla_total_size(4) +	  /* NHA_GROUP_STATS_ENTRY_ID */
->> +			nla_total_size_64bit(8)); /* NHA_GROUP_STATS_ENTRY_PACKETS */
->> +
->> +		if (op_flags & NHA_OP_FLAG_DUMP_HW_STATS) {
->> +			tot += nhg->num_nh *
->> +			       nla_total_size_64bit(8); /* NHA_GROUP_STATS_ENTRY_PACKETS_HW */
->> +			tot += nla_total_size(4);	/* NHA_HW_STATS_USED */
->> +		}
->> +	}
->> +
-> 
-> This looks correct
-> 
->>   	return tot;
->>   }
->>   
->> @@ -1047,14 +1062,14 @@ static size_t nh_nlmsg_size_single(struct nexthop *nh)
->>   	return sz;
->>   }
->>   
->> -static size_t nh_nlmsg_size(struct nexthop *nh)
->> +static size_t nh_nlmsg_size(struct nexthop *nh, u32 op_flags)
->>   {
->>   	size_t sz = NLMSG_ALIGN(sizeof(struct nhmsg));
->>   
->>   	sz += nla_total_size(4); /* NHA_ID */
->>   
->>   	if (nh->is_group)
->> -		sz += nh_nlmsg_size_grp(nh) +
->> +		sz += nh_nlmsg_size_grp(nh, op_flags) +
->>   		      nla_total_size(4) +	/* NHA_OP_FLAGS */
->>   		      0;
-> 
-> But the AI review [1] also mentions missing accounting for NHA_FDB which
-> seems like a legit issue (even if we can't currently trigger it).
-> 
-> In the single nexthop case we have:
-> 
-> sz = nla_total_size(4);  /* NHA_OIF */
-> 
-> Which covers NHA_FDB since it's mutually exclusive with NHA_OIF.
-> 
+Hi,
 
-Yes, seems legit. Probably the issue cannot be reproduced because some 
-padding might be absorbing the impact. Thank you Ido for pointing it out.
+This is a pre-announcement so folks can plan travel etc.
 
-I guess it makes sense to fix this on a v3 instead of a separate patch. 
-Even though, this has been affecting nexthop_notify() path since group 
-support was implemented.
+Netdev conf 0x1A will be a hybrid conference.  We will update you with
+the exact coordinates in the near future.
+Either watch https://netdevconf.info/0x1A/ or join people@ mailing
+list[1] for more frequent updates.
 
-Thanks,
-Fernando.
+Netdev 0x1A is scheduled to be in Rome - Italy July 13th-16th.
+Location: Universit=C3=A0 Roma TRE - Via Ostiense, 236, 00144 Rome RM, Ital=
+y
 
-> [1] https://sashiko.dev/#/patchset/20260401081741.4273-1-fmancera%40suse.de
+Be ready to share your work with the community. CFS coming soon.
 
+sincerely,
+Netdev Society Board:
+PJ, Roopa Prabhu, Shrijeet Mukherjee, Tom Herbert, Jamal Hadi Salim
+
+[1] https://lists.netdevconf.info/postorius/lists/people.netdevconf.info/
 
