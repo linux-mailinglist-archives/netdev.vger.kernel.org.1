@@ -1,326 +1,118 @@
-Return-Path: <netdev+bounces-274237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274239-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EL/YOR1tzWnvdQYAu9opvQ
-	(envelope-from <netdev+bounces-274237-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 21:08:13 +0200
+	id oCWPLStszWnvdQYAu9opvQ
+	(envelope-from <netdev+bounces-274239-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 21:04:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 965AB37FA7A
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 21:08:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A9C737F990
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 21:04:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 94AD03052BAA
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 18:59:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 08F7B3009567
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 19:01:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2762D47DF87;
-	Wed,  1 Apr 2026 18:59:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA9C833D501;
+	Wed,  1 Apr 2026 19:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="x867PCu2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E06D47DD61;
-	Wed,  1 Apr 2026 18:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A393382DE;
+	Wed,  1 Apr 2026 19:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775069980; cv=none; b=l99rS4G0ostpNXjw/CcoGCpqSXmyQ+C5UDA1B5M6W1CZ9AX56GLQKgviRx25JepyxvsIAC3tltLoDFd3GHlL0xOw9IE32wr17+nGFqk7AeS67mMYUa5UdDeaTMuevswaT3aAAMCG3wHlMhkJbKqeekqKAezDvzEng2hKMpagXE8=
+	t=1775070068; cv=none; b=Q3xjrlw9Kv6z/ZZuPqDHyCOp94kobRdq9+z9mudVOAyw0J5vZ2FK26GmfMCZXT3XCaJT5ZQzdi5cORKT3Bp7cxMXyPXUe1+KzUxCLlLNYG5mRr1gBLbLCYNlmOBDqyMoVdmuvFaVGPOr00e0xaeKtzxPuLdjQ1ky3Dhiqr8m+HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775069980; c=relaxed/simple;
-	bh=PddmO3ll7X4KzOLLF4jhSMEIQsdAM2OrEVy93XuOfqA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZrUHXvmqSwQxYfyPjKBG2pa20YPuUcElA9TIFrhGI3d1CzkVNn7KvcHAqclTSESKqpKaFlnUtRUXqgpJExKh1OrBX5+wz0WZukA1sciAxQ6wIBngdRThIP21O2hKvlYVy8CwKOchoYSdVlOLuCw3yX/Jd6G3IuyOA/IYXso1HBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; arc=none smtp.client-ip=160.80.4.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from localhost.localdomain ([160.80.103.126])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 631Ix8mj029079;
-	Wed, 1 Apr 2026 20:59:15 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org,
-        david.lebrun@uclouvain.be, stefano.salsano@uniroma2.it,
-        paolo.lungaroni@uniroma2.it, nicolas.dichtel@6wind.com,
-        linux-kernel@vger.kernel.org, Andrea Mayer <andrea.mayer@uniroma2.it>,
-        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org
-Subject: [PATCH net v2 2/2] selftests: seg6: add test for dst_cache isolation in seg6 lwtunnel
-Date: Wed,  1 Apr 2026 20:57:55 +0200
-Message-Id: <20260401185755.29813-3-andrea.mayer@uniroma2.it>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20260401185755.29813-1-andrea.mayer@uniroma2.it>
-References: <20260401185755.29813-1-andrea.mayer@uniroma2.it>
+	s=arc-20240116; t=1775070068; c=relaxed/simple;
+	bh=uvh8oOR8f012iFbqSPUUmUgjDYv1sLltGScE5WU8BrI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n6G1LyV7UF7kh0AY1xXDEqHh9ezsqi3AmKqfGLoZ8B8Tft8Pqtj1CubkD27RKljhXXpyCLeO7jQwy+i8+pNa1Mv4q0xQ1fwRymj2nSNyx13Fddq84Xoe3+GDtfX46MtWHI9Dbfbe4/05SxU9gpuW/W3ge89vXdg4709H9zBV0Rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=x867PCu2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8MpH8X6sjaPrUpqh7/He3PqKvB7B8nmD6tdg+fBP6uI=; b=x867PCu238MpZ7Gonv8MF+FBKO
+	2R8qti0IOEIscNfG9s4Qhcov6/9FV8f3bhiwehCJWt7Pt02/SrmPE7bHADzj/hWFfnD5eowxG7Fnp
+	Py9i/cIc8Zo0lTwCEh2fh3UzfMvHQXOZQr7rMdglK8kyoDBY/PL6yVvK/rQ/NeSQjQo0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w80o7-00EP25-Ha; Wed, 01 Apr 2026 21:00:51 +0200
+Date: Wed, 1 Apr 2026 21:00:51 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Birger Koblitz <mail@birger-koblitz.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 1/2] r8152: Add support for 5Gbit Link Speeds
+ and EEE
+Message-ID: <f308c593-a186-4a2b-ac4d-78491d6e7255@lunn.ch>
+References: <20260324-rtl8157_next-v4-1-034312b12de5@birger-koblitz.de>
+ <20260329193449.2764517-1-kuba@kernel.org>
+ <50dc7e8c-6c6d-47d1-866e-677638b4deaf@birger-koblitz.de>
+ <20260331175649.729e60a7@kernel.org>
+ <59b4be26-1fee-40f1-b9ff-45881cddc7df@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
-X-Spamd-Result: default: False [0.14 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <59b4be26-1fee-40f1-b9ff-45881cddc7df@birger-koblitz.de>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[uniroma2.it : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	TAGGED_FROM(0.00)[bounces-274237-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.955];
+	TAGGED_FROM(0.00)[bounces-274239-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[srv6_iptunnel_cache.sh:url,lib.sh:url,6wind.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,uniroma2.it:email,uniroma2.it:mid]
-X-Rspamd-Queue-Id: 965AB37FA7A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:dkim,lunn.ch:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2A9C737F990
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a selftest that verifies the dst_cache in seg6 lwtunnel is not
-shared between the input (forwarding) and output (locally generated)
-paths.
+>  One thing I
+> noticed in particular is that the AI does not seem to take into account
+> that the code actually works: suspecting broken SRAM-access or wrong
+> descriptor-size settings would break the driver at such a fundamental level,
+> it would not be able to work at all.
 
-The test creates three namespaces (ns_src, ns_router, ns_dst)
-connected in a line. An SRv6 encap route on ns_router encapsulates
-traffic destined to cafe::1 with SID fc00::100. The SID is
-reachable only for forwarded traffic (from ns_src) via an ip rule
-matching the ingress interface (iif veth-r0 lookup 100), and
-blackholed in the main table.
+The flip side to this is that we get a lot of patches which are
+compile tested only. So assuming the patch has run on real hardware is
+a poor assumption to make.
 
-The test verifies that:
+We humans however do have a feeling about who is submitting the
+patches and how likely they have run it on hardware. So we know to
+look for fundamental problems or not.
 
-  1. A packet generated locally on ns_router does not reach
-     ns_dst with an empty cache, since the SID is blackholed;
-  2. A forwarded packet from ns_src populates the input cache
-     from table 100 and reaches ns_dst;
-  3. A packet generated locally on ns_router still does not
-     reach ns_dst after the input cache is populated,
-     confirming the output path does not reuse the input
-     cache entry.
-
-Both the forwarded and local packets are pinned to the same CPU
-with taskset, since dst_cache is per-cpu.
-
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: linux-kselftest@vger.kernel.org
-Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
-Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
----
-Changes v1 -> v2:
- - fix SKIP message wording (Nicolas)
----
- tools/testing/selftests/net/Makefile          |   1 +
- .../selftests/net/srv6_iptunnel_cache.sh      | 177 ++++++++++++++++++
- 2 files changed, 178 insertions(+)
- create mode 100755 tools/testing/selftests/net/srv6_iptunnel_cache.sh
-
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 605c54c0e8a3..c709523c99c6 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -89,6 +89,7 @@ TEST_PROGS := \
- 	srv6_end_x_next_csid_l3vpn_test.sh \
- 	srv6_hencap_red_l3vpn_test.sh \
- 	srv6_hl2encap_red_l2vpn_test.sh \
-+	srv6_iptunnel_cache.sh \
- 	stress_reuseport_listen.sh \
- 	tcp_fastopen_backup_key.sh \
- 	test_bpf.sh \
-diff --git a/tools/testing/selftests/net/srv6_iptunnel_cache.sh b/tools/testing/selftests/net/srv6_iptunnel_cache.sh
-new file mode 100755
-index 000000000000..1f3ebb930eb2
---- /dev/null
-+++ b/tools/testing/selftests/net/srv6_iptunnel_cache.sh
-@@ -0,0 +1,177 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# author: Andrea Mayer <andrea.mayer@uniroma2.it>
-+
-+# This test verifies that the seg6 lwtunnel does not share the dst_cache
-+# between the input (forwarding) and output (locally generated) paths.
-+#
-+# A shared dst_cache allows a forwarded packet to populate the cache and a
-+# subsequent locally generated packet to silently reuse that entry, bypassing
-+# its own route lookup. To expose this, the SID is made reachable only for
-+# forwarded traffic (via an ip rule matching iif) and blackholed for everything
-+# else. A local ping on ns_router must always hit the blackhole;
-+# if it succeeds after a forwarded packet has populated the
-+# cache, the bug is confirmed.
-+#
-+# Both forwarded and local packets are pinned to the same CPU with taskset,
-+# since dst_cache is per-cpu.
-+#
-+#
-+# +--------------------+                        +--------------------+
-+# |      ns_src        |                        |      ns_dst        |
-+# |                    |                        |                    |
-+# |  veth-s0           |                        |           veth-d0  |
-+# |  fd00::1/64        |                        |        fd01::2/64  |
-+# +-------|------------+                        +----------|---------+
-+#         |                                                |
-+#         |            +--------------------+              |
-+#         |            |     ns_router      |              |
-+#         |            |                    |              |
-+#         +----------->+ veth-r0   veth-r1  +<-------------+
-+#                      | fd00::2   fd01::1  |
-+#                      +--------------------+
-+#
-+#
-+# ns_router: encap (main table)
-+# +---------+---------------------------------------+
-+# | dst     | action                                |
-+# +---------+---------------------------------------+
-+# | cafe::1 | encap seg6 mode encap segs fc00::100  |
-+# +---------+---------------------------------------+
-+#
-+# ns_router: post-encap SID resolution
-+# +-------+------------+----------------------------+
-+# | table | dst        | action                     |
-+# +-------+------------+----------------------------+
-+# | 100   | fc00::100  | via fd01::2 dev veth-r1    |
-+# +-------+------------+----------------------------+
-+# | main  | fc00::100  | blackhole                  |
-+# +-------+------------+----------------------------+
-+#
-+# ns_router: ip rule
-+# +------------------+------------------------------+
-+# | match            | action                       |
-+# +------------------+------------------------------+
-+# | iif veth-r0      | lookup 100                   |
-+# +------------------+------------------------------+
-+#
-+# ns_dst: SRv6 decap (main table)
-+# +--------------+----------------------------------+
-+# | SID          | action                           |
-+# +--------------+----------------------------------+
-+# | fc00::100    | End.DT6 table 255 (local)        |
-+# +--------------+----------------------------------+
-+
-+source lib.sh
-+
-+readonly SID="fc00::100"
-+readonly DEST="cafe::1"
-+
-+readonly SRC_MAC="02:00:00:00:00:01"
-+readonly RTR_R0_MAC="02:00:00:00:00:02"
-+readonly RTR_R1_MAC="02:00:00:00:00:03"
-+readonly DST_MAC="02:00:00:00:00:04"
-+
-+cleanup()
-+{
-+	cleanup_ns "${NS_SRC}" "${NS_RTR}" "${NS_DST}"
-+}
-+
-+check_prerequisites()
-+{
-+	if ! command -v taskset &>/dev/null; then
-+		echo "SKIP: taskset not found"
-+		exit "${ksft_skip}"
-+	fi
-+}
-+
-+setup()
-+{
-+	setup_ns NS_SRC NS_RTR NS_DST
-+
-+	ip link add veth-s0 netns "${NS_SRC}" type veth \
-+		peer name veth-r0 netns "${NS_RTR}"
-+	ip link add veth-r1 netns "${NS_RTR}" type veth \
-+		peer name veth-d0 netns "${NS_DST}"
-+
-+	ip -n "${NS_SRC}" link set veth-s0 address "${SRC_MAC}"
-+	ip -n "${NS_RTR}" link set veth-r0 address "${RTR_R0_MAC}"
-+	ip -n "${NS_RTR}" link set veth-r1 address "${RTR_R1_MAC}"
-+	ip -n "${NS_DST}" link set veth-d0 address "${DST_MAC}"
-+
-+	# ns_src
-+	ip -n "${NS_SRC}" link set veth-s0 up
-+	ip -n "${NS_SRC}" addr add fd00::1/64 dev veth-s0 nodad
-+	ip -n "${NS_SRC}" -6 route add "${DEST}"/128 via fd00::2
-+
-+	# ns_router
-+	ip -n "${NS_RTR}" link set veth-r0 up
-+	ip -n "${NS_RTR}" addr add fd00::2/64 dev veth-r0 nodad
-+	ip -n "${NS_RTR}" link set veth-r1 up
-+	ip -n "${NS_RTR}" addr add fd01::1/64 dev veth-r1 nodad
-+	ip netns exec "${NS_RTR}" sysctl -qw net.ipv6.conf.all.forwarding=1
-+
-+	ip -n "${NS_RTR}" -6 route add "${DEST}"/128 \
-+		encap seg6 mode encap segs "${SID}" dev veth-r0
-+	ip -n "${NS_RTR}" -6 route add "${SID}"/128 table 100 \
-+		via fd01::2 dev veth-r1
-+	ip -n "${NS_RTR}" -6 route add blackhole "${SID}"/128
-+	ip -n "${NS_RTR}" -6 rule add iif veth-r0 lookup 100
-+
-+	# ns_dst
-+	ip -n "${NS_DST}" link set veth-d0 up
-+	ip -n "${NS_DST}" addr add fd01::2/64 dev veth-d0 nodad
-+	ip -n "${NS_DST}" addr add "${DEST}"/128 dev lo nodad
-+	ip -n "${NS_DST}" -6 route add "${SID}"/128 \
-+		encap seg6local action End.DT6 table 255 dev veth-d0
-+	ip -n "${NS_DST}" -6 route add fd00::/64 via fd01::1
-+
-+	# static neighbors
-+	ip -n "${NS_SRC}" -6 neigh add fd00::2 dev veth-s0 \
-+		lladdr "${RTR_R0_MAC}" nud permanent
-+	ip -n "${NS_RTR}" -6 neigh add fd00::1 dev veth-r0 \
-+		lladdr "${SRC_MAC}" nud permanent
-+	ip -n "${NS_RTR}" -6 neigh add fd01::2 dev veth-r1 \
-+		lladdr "${DST_MAC}" nud permanent
-+	ip -n "${NS_DST}" -6 neigh add fd01::1 dev veth-d0 \
-+		lladdr "${RTR_R1_MAC}" nud permanent
-+}
-+
-+test_cache_isolation()
-+{
-+	RET=0
-+
-+	# local ping with empty cache: must fail (SID is blackholed)
-+	if ip netns exec "${NS_RTR}" taskset -c 0 \
-+			ping6 -c 1 -W 2 "${DEST}" &>/dev/null; then
-+		echo "SKIP: local ping succeeded, topology broken"
-+		exit "${ksft_skip}"
-+	fi
-+
-+	# forward from ns_src to populate the input cache
-+	if ! ip netns exec "${NS_SRC}" taskset -c 0 \
-+			ping6 -c 1 -W 2 "${DEST}" &>/dev/null; then
-+		echo "SKIP: forwarded ping failed, topology broken"
-+		exit "${ksft_skip}"
-+	fi
-+
-+	# local ping again: must still fail; if the output path reuses
-+	# the input cache, it bypasses the blackhole and the ping succeeds
-+	if ip netns exec "${NS_RTR}" taskset -c 0 \
-+			ping6 -c 1 -W 2 "${DEST}" &>/dev/null; then
-+		echo "FAIL: output path used dst cached by input path"
-+		RET="${ksft_fail}"
-+	else
-+		echo "PASS: output path dst_cache is independent"
-+	fi
-+
-+	return "${RET}"
-+}
-+
-+trap cleanup EXIT
-+
-+check_prerequisites
-+setup
-+test_cache_isolation
-+exit "${RET}"
--- 
-2.43.0
-
+	Andrew
 
