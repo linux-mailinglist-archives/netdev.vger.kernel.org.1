@@ -1,95 +1,75 @@
-Return-Path: <netdev+bounces-274072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274074-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EBgJMx8JzWm3ZgYAu9opvQ
-	(envelope-from <netdev+bounces-274072-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:01:35 +0200
+	id 6KjUIc0LzWnhZgYAu9opvQ
+	(envelope-from <netdev+bounces-274074-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:13:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA11737A0AC
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:01:30 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8909D37A3F9
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:13:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id AC4FA30255CA
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 11:53:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id CF571307F71B
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B26940B6C8;
-	Wed,  1 Apr 2026 11:51:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C722F3C7E05;
+	Wed,  1 Apr 2026 12:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UPcL+11t"
+	dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b="MthuQN5U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA21840B6CA
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 11:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F41D372661;
+	Wed,  1 Apr 2026 12:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775044267; cv=none; b=Ztx6gi1tkO5DF/3id0KRhVgVVp3CDEeD4iC2OQHzFKDrcSxSg/AiZ/HWXo+ZWSgIwgpbvLdh4CGiV3OtN5A08ZHkldDzDoJeFT9S0hLBegAqwguE5d2GM08lwv2kuOLHouVCy6L5nQeMVKZdMEU4GIb/aQMnJOlffYAtjQzzGZM=
+	t=1775044851; cv=none; b=nRGC1AXUtE1D+VtIflnWTjlcV1u3Dbuo8m+aLQ0NdA8GdXAgMLro2eHhFc7LQB1RSJytg3WH8gmJ0zMh14AZ0OVlCzFjf37zfE/XXB458BxwWDx7GApTxLRjg3iSP6Ys4YYQBbFqDg461lYdUT07GH1ag8YfWeuNnUbT+rJanGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775044267; c=relaxed/simple;
-	bh=x5wBMRf9REXeqaw3JhjM4+SIbO+3GwPThHBMJHmSn08=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B03Ays6U+WaP6+R2lbpDI51Vq97/sWUZCVOJqosu4bF7rJlCnFe6Q6DHggCALa9wfFi4ZlqiRI7VbKMj1YEIAfYOM2IYa0zvYl8mnTOwAWWr9SjzDXkoim0tk2u+fECSbP1ZRp1E+/0DAqH+ZQs2ip1But1lzgEE0+GlgXE8/Xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UPcL+11t; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-43cf5ad500fso3607998f8f.0
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 04:51:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775044264; x=1775649064; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ykKcOeoNKH8nXWk+DCod1qUgx5fH/3oGVEQk5ZNMGPw=;
-        b=UPcL+11tosOj2OnWXKkVcP9YOe0ONBG824EMILuSli6j4P90vPgW+jG1YuiHHXSwOq
-         YjS+0dcRlua677u2x2eSi9VfetTNc6tnwFB4BFrg8l1FAN/9SzH8zIUUjwAIRglUSXmV
-         tqM9cBkNQAdoqN78JmUSMfRgkjUQMegpnOVaqVCIL6tzIVrOqR9CdwYFks2iWKZPtdlo
-         js3I9wcrOAvX5av+6JaPR5coNl+R0WFxY987+w5kXqDq3+ewXV/vJtkIpDKhnfHKbi0U
-         QDhvW14iANnwvLZbZlDzqh4BqJEczz59NFVcu2u8hkwfmcDvuaIVmtka2lsTYztYJXNz
-         9DPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775044264; x=1775649064;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ykKcOeoNKH8nXWk+DCod1qUgx5fH/3oGVEQk5ZNMGPw=;
-        b=ZOru3T76H8yLQXP4T29CmwOlZQJld4cztWjCeRZg98Mbmw8aaQGVfIXYRgEbYyb8Eu
-         SfA/OpPe8lQmGfYIGnxKllLDQnjm6ypYXTnlf3Qh1Jgei+oJF/l0H2DQkvywi69XSnhc
-         BhXxenEsobtpa6jTSN6xgbgR90ZaRzACDuf+UmfvRbR/dBJzbuS6jxLV6LtwiM7nfbm9
-         Gq9OXe6pXK/OfBmf4ZXrxJGJuL6kf1f4bfQTf6seJD9rV6+aDL/AbqYiF8tgTKmbDug8
-         m/9OTGAXpwg3NgirOFibUDRqt33JRCuzCTpTYDFhvp2273CY1Ok5VZw0stej/NfGGMiS
-         8ReQ==
-X-Gm-Message-State: AOJu0YyBHfDeP8fGbhBxW8D/Fw/tmyYRY44R51ncn7O0TGRhkBmK3RCW
-	UXDlH/WiICmptC+VLwyvPYf6UcHe7bjTk46TVEFqbsQMicGMY6c6cQrBEnlCOg==
-X-Gm-Gg: ATEYQzw9PEe8++oa/ETvKhrg4aIaeODTuxvtIFNQMRb9q/WnyJe8WVKqlfI65k+hzfm
-	WP8wgCxY0eG3k0AOA2KoeVrpuGoeMALcF/IIWnXJ+1EuYTWIwpnqhkT5USBicG+D92fcb0MH18X
-	jnK3WPUdUzjQl2fFLi1Id5Yx4kfVsV27qujfWWT/RLSlgSn/eEHsaWobX5YhZNA9FhOz7YfhhPE
-	qcJ4d4TmxdZAOG+Cte22RwisA1XjHMaS+SMncgBRkVGcjMJWtbecFSk8PRyGIwSl63ACaqfJHMd
-	SfD60RDDCaTnxh2mN3f8aH4SroxqRqOD559ZQL8xwvaxiwtnV10R6eDl+QBspO90fIbIy/0fX53
-	LvmdLhZeM+sz8b6QMxL9UcvV4sJmKIEh7FHxzTiLRGAj6P+Wa52oYP7PqBmQ+qRh7uEfOJxVma5
-	gNT1tM+3Y8OPXJE6zjaf9b74w0eRn80p83LEhlUMckg0LhacqqnZSOxIc1nAeV8zspWrg9lxgcg
-	/5W1sdgi6GQWA5X
-X-Received: by 2002:a05:6000:26c3:b0:43b:495a:a75d with SMTP id ffacd0b85a97d-43d15042dcemr6286414f8f.5.1775044262448;
-        Wed, 01 Apr 2026 04:51:02 -0700 (PDT)
-Received: from 6850u.ox.dtw.sh (cpc69060-oxfd26-2-0-cust335.4-3.cable.virginm.net. [82.6.49.80])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43cf245f8a3sm37142640f8f.24.2026.04.01.04.51.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Apr 2026 04:51:01 -0700 (PDT)
-From: Daniel Wagner <wagner.daniel.t@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	bcm-kernel-feedback-list@broadcom.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Daniel Wagner <wagner.daniel.t@gmail.com>
-Subject: [PATCH net-next] net: phy: bcm84881: add LED framework support for BCM84891/BCM84892
-Date: Wed,  1 Apr 2026 12:49:31 +0100
-Message-ID: <20260401114931.3091818-1-wagner.daniel.t@gmail.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1775044851; c=relaxed/simple;
+	bh=/XVIYgs8c1K0hkydh6nKHYEu03DUZJv/Npx79K6spMQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=knrtHwyEDswH4+cb4g5o6ezbx07ptqYXEIdKycocgiE+0ZTpARBTyO4yKRdXoyukYkzDgzjSuYtPDS/ysxaPcf20di9aUf6SgXpjXiLw3buPJlGJ3kSQPqvUgDz4HNLnsq9SgXXC/UXh2pVfDKqPVLMnzdDfom/m9rGMf/AzKKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=pass (2048-bit key) header.d=realtek.com header.i=@realtek.com header.b=MthuQN5U; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.80 with qID 631C0JpiC1033663, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=realtek.com; s=dkim;
+	t=1775044819; bh=4rEODMMXW5a9qKNeOVjFTfXYt/R/mm+wrGelqwPbXuo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=MthuQN5Uw2U1dGlbj27XlM2i+65JIxqYGC72RL5+fY8IDIlJwo8tX7kmnD0wi0Qst
+	 oj+YGz0nPh5rrQKstZbrvCf9j9SW2m54QcQmwENWxyWio5t0aGXxJwVY+fGgEfaLeL
+	 DzzbuWLxwMy4QhYSonCqwACJ1xAl6ReWM8NM34NUQqy6pd7eV4ccY97akFjT7mh52U
+	 VO+9XytASa9t7APG62Nqu9lkvbeAXPdAcdTtH93z8SCxK0XB7ZMyWzkfxdTlny4nz7
+	 lpx7W2T3/tDvC88jwnBORX10EXnNyeLR+LNm8XY/lvNgqXWeMVjh8z+m+nFuo8vhVW
+	 6qmwCIlW3HPxA==
+Received: from mail.realtek.com (rtkexhmbs02.realtek.com.tw[172.21.6.41])
+	by rtits2.realtek.com.tw (8.15.2/3.26/5.94) with ESMTPS id 631C0JpiC1033663
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 1 Apr 2026 20:00:19 +0800
+Received: from RTKEXHMBS06.realtek.com.tw (10.21.1.56) by
+ RTKEXHMBS02.realtek.com.tw (172.21.6.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Wed, 1 Apr 2026 20:00:17 +0800
+Received: from RTKEXHMBS05.realtek.com.tw (10.21.1.55) by
+ RTKEXHMBS06.realtek.com.tw (10.21.1.56) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.10; Wed, 1 Apr 2026 19:55:56 +0800
+Received: from fc40.realtek.com.tw (172.22.241.7) by
+ RTKEXHMBS05.realtek.com.tw (10.21.1.55) with Microsoft SMTP Server id
+ 15.2.1748.10 via Frontend Transport; Wed, 1 Apr 2026 19:55:56 +0800
+From: Chih Kai Hsu <hsu.chih.kai@realtek.com>
+To: <kuba@kernel.org>, <davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <nic_swsd@realtek.com>,
+        <linux-kernel@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+        <edumazet@google.com>, <bjorn@mork.no>, <pabeni@redhat.com>,
+        Chih Kai Hsu
+	<hsu.chih.kai@realtek.com>
+Subject: [PATCH net-next] r8152: Add helper functions for SRAM2
+Date: Wed, 1 Apr 2026 19:55:41 +0800
+Message-ID: <20260401115542.34601-1-nic_swsd@realtek.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,255 +77,284 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	DMARC_POLICY_ALLOW(-0.50)[realtek.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[realtek.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274072-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hsu.chih.kai@realtek.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-274074-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[broadcom.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wagnerdanielt@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[realtek.com:+];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	RSPAMD_EMAILBL_FAIL(0.00)[wagnerdanielt.gmail.com:query timed out];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,realtek.com:dkim,realtek.com:email,realtek.com:mid];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BA11737A0AC
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 8909D37A3F9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Expose LED1 and LED2 pins via the PHY LED framework. Each pin has a
-source mask (MASK_LOW + MASK_EXT registers) selecting which hardware
-events light it, plus a CTL field in the shared 0xA83B register
-(RMW; LED4 is firmware-controlled per the datasheet).
+Add the following helper functions for SRAM2 access to simplify the code
+and improve readability:
 
-Hardware can offload per-speed link triggers (1000/2500/5000/10000),
-RX/TX activity, and force-on. LINK_100 is accepted only alongside
-LINK_1000: source bit 4 lights at both speeds and 100-alone isn't
-representable, so the unrepresentable case falls to software.
+- sram2_write() - write data to SRAM2 address
+- sram2_read() - read data from SRAM2 address
+- sram2_write_w0w1() - read-modify-write operation
 
-The chip has five LED pins; only LED1/LED2 are exposed here as those
-are the only ones characterized on tested hardware. LED4 is firmware-
-controlled regardless of strap configuration.
-
-Tested on TRENDnet TEG-S750 (LED1/LED2 wired to an antiparallel
-bicolor LED): brightness_set via sysfs; netdev trigger offloaded=1
-with amber lit at 100M/1G/2.5G and green lit at 10G via respective
-link_* modes; LED off immediately on cable unplug with no software
-involvement.
-
-Signed-off-by: Daniel Wagner <wagner.daniel.t@gmail.com>
+Signed-off-by: Chih Kai Hsu <hsu.chih.kai@realtek.com>
 ---
- drivers/net/phy/bcm84881.c | 156 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 156 insertions(+)
+ drivers/net/usb/r8152.c | 178 +++++++++++++++++-----------------------
+ 1 file changed, 75 insertions(+), 103 deletions(-)
 
-diff --git a/drivers/net/phy/bcm84881.c b/drivers/net/phy/bcm84881.c
-index f114212dd3..2ae70dcf82 100644
---- a/drivers/net/phy/bcm84881.c
-+++ b/drivers/net/phy/bcm84881.c
-@@ -20,6 +20,33 @@ enum {
- 	MDIO_AN_C22 = 0xffe0,
- };
- 
-+/* BCM8489x LED controller (BCM84891L datasheet 2.4.1.58). Each pin has
-+ * CTL bits in 0xA83B (stride 3: 2-bit CTL + 1-bit OE_N) plus MASK_LOW/
-+ * MASK_EXT source selects. LED4 is firmware-controlled; always RMW.
-+ */
-+#define BCM8489X_LED_CTL		0xa83b
-+#define BCM8489X_LED_CTL_ON(i)		(0x2 << ((i) * 3))
-+#define BCM8489X_LED_CTL_MASK(i)	(0x3 << ((i) * 3))
-+
-+#define BCM8489X_LED_SRC_RX		BIT(1)
-+#define BCM8489X_LED_SRC_TX		BIT(2)
-+#define BCM8489X_LED_SRC_1000		BIT(3)	/* high only at 1000 */
-+#define BCM8489X_LED_SRC_100_1000	BIT(4)	/* high at 100 and 1000 */
-+#define BCM8489X_LED_SRC_FORCE		BIT(5)	/* always-1 source */
-+#define BCM8489X_LED_SRC_10G		BIT(7)
-+#define BCM8489X_LED_SRCX_2500		BIT(2)
-+#define BCM8489X_LED_SRCX_5000		BIT(3)
-+
-+#define BCM8489X_MAX_LEDS		2
-+
-+static const struct {
-+	u16 mask_low;
-+	u16 mask_ext;
-+} bcm8489x_led_regs[BCM8489X_MAX_LEDS] = {
-+	{ 0xa82c, 0xa8ef },	/* LED1 */
-+	{ 0xa82f, 0xa8f0 },	/* LED2 */
-+};
-+
- static int bcm84881_wait_init(struct phy_device *phydev)
- {
- 	int val;
-@@ -69,6 +96,127 @@ static int bcm8489x_config_init(struct phy_device *phydev)
- 				  MDIO_CTRL1_LPOWER);
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index 8747c55e0a48..1765da5bd6cf 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -213,6 +213,8 @@
+ #define OCP_PHY_PATCH_STAT	0xb800
+ #define OCP_PHY_PATCH_CMD	0xb820
+ #define OCP_PHY_LOCK		0xb82e
++#define OCP_SRAM2_ADDR		0xb87c
++#define OCP_SRAM2_DATA		0xb87e
+ #define OCP_ADC_IOFFSET		0xbcfc
+ #define OCP_ADC_CFG		0xbc06
+ #define OCP_SYSCLK_CFG		0xc416
+@@ -1764,6 +1766,27 @@ static void sram_set_bits(struct r8152 *tp, u16 addr, u16 set)
+ 	sram_write_w0w1(tp, addr, 0, set);
  }
  
-+static int bcm8489x_led_write(struct phy_device *phydev, u8 index,
-+			      u16 low, u16 ext)
++static void sram2_write(struct r8152 *tp, u16 addr, u16 data)
 +{
-+	int ret;
-+
-+	ret = phy_write_mmd(phydev, MDIO_MMD_PMAPMD,
-+			    bcm8489x_led_regs[index].mask_low, low);
-+	if (ret)
-+		return ret;
-+	ret = phy_write_mmd(phydev, MDIO_MMD_PMAPMD,
-+			    bcm8489x_led_regs[index].mask_ext, ext);
-+	if (ret)
-+		return ret;
-+	return phy_modify_mmd(phydev, MDIO_MMD_PMAPMD, BCM8489X_LED_CTL,
-+			      BCM8489X_LED_CTL_MASK(index),
-+			      (low | ext) ? BCM8489X_LED_CTL_ON(index) : 0);
++	ocp_reg_write(tp, OCP_SRAM2_ADDR, addr);
++	ocp_reg_write(tp, OCP_SRAM2_DATA, data);
 +}
 +
-+static int bcm8489x_led_brightness_set(struct phy_device *phydev,
-+				       u8 index, enum led_brightness value)
++static u16 sram2_read(struct r8152 *tp, u16 addr)
 +{
-+	if (index >= BCM8489X_MAX_LEDS)
-+		return -EINVAL;
-+
-+	return bcm8489x_led_write(phydev, index,
-+				  value ? BCM8489X_LED_SRC_FORCE : 0, 0);
++	ocp_reg_write(tp, OCP_SRAM2_ADDR, addr);
++	return ocp_reg_read(tp, OCP_SRAM2_DATA);
 +}
 +
-+static const unsigned long bcm8489x_supported_triggers =
-+	BIT(TRIGGER_NETDEV_LINK) |
-+	BIT(TRIGGER_NETDEV_LINK_100) |
-+	BIT(TRIGGER_NETDEV_LINK_1000) |
-+	BIT(TRIGGER_NETDEV_LINK_2500) |
-+	BIT(TRIGGER_NETDEV_LINK_5000) |
-+	BIT(TRIGGER_NETDEV_LINK_10000) |
-+	BIT(TRIGGER_NETDEV_RX) |
-+	BIT(TRIGGER_NETDEV_TX);
-+
-+static int bcm8489x_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+					unsigned long rules)
++static void sram2_write_w0w1(struct r8152 *tp, u16 addr, u16 clear, u16 set)
 +{
-+	if (index >= BCM8489X_MAX_LEDS)
-+		return -EINVAL;
++	u16 data;
 +
-+	if (rules & ~bcm8489x_supported_triggers)
-+		return -EOPNOTSUPP;
-+
-+	/* Source bit 4 lights at both 100 and 1000; "100 only" isn't
-+	 * representable in hardware. Accept LINK_100 only alongside
-+	 * LINK_1000 or LINK so the offload is precise.
-+	 */
-+	if ((rules & BIT(TRIGGER_NETDEV_LINK_100)) &&
-+	    !(rules & (BIT(TRIGGER_NETDEV_LINK_1000) |
-+		       BIT(TRIGGER_NETDEV_LINK))))
-+		return -EOPNOTSUPP;
-+
-+	return 0;
++	data = sram2_read(tp, addr);
++	data = (data & ~clear) | set;
++	ocp_reg_write(tp, OCP_SRAM2_DATA, data);
 +}
 +
-+static int bcm8489x_led_hw_control_set(struct phy_device *phydev, u8 index,
-+				       unsigned long rules)
-+{
-+	u16 low = 0, ext = 0;
-+
-+	if (index >= BCM8489X_MAX_LEDS)
-+		return -EINVAL;
-+
-+	if (rules & (BIT(TRIGGER_NETDEV_LINK_100) | BIT(TRIGGER_NETDEV_LINK)))
-+		low |= BCM8489X_LED_SRC_100_1000;
-+	if (rules & (BIT(TRIGGER_NETDEV_LINK_1000) | BIT(TRIGGER_NETDEV_LINK)))
-+		low |= BCM8489X_LED_SRC_1000;
-+	if (rules & (BIT(TRIGGER_NETDEV_LINK_2500) | BIT(TRIGGER_NETDEV_LINK)))
-+		ext |= BCM8489X_LED_SRCX_2500;
-+	if (rules & (BIT(TRIGGER_NETDEV_LINK_5000) | BIT(TRIGGER_NETDEV_LINK)))
-+		ext |= BCM8489X_LED_SRCX_5000;
-+	if (rules & (BIT(TRIGGER_NETDEV_LINK_10000) | BIT(TRIGGER_NETDEV_LINK)))
-+		low |= BCM8489X_LED_SRC_10G;
-+	if (rules & BIT(TRIGGER_NETDEV_RX))
-+		low |= BCM8489X_LED_SRC_RX;
-+	if (rules & BIT(TRIGGER_NETDEV_TX))
-+		low |= BCM8489X_LED_SRC_TX;
-+
-+	return bcm8489x_led_write(phydev, index, low, ext);
-+}
-+
-+static int bcm8489x_led_hw_control_get(struct phy_device *phydev, u8 index,
-+				       unsigned long *rules)
-+{
-+	int low, ext;
-+
-+	if (index >= BCM8489X_MAX_LEDS)
-+		return -EINVAL;
-+
-+	low = phy_read_mmd(phydev, MDIO_MMD_PMAPMD,
-+			   bcm8489x_led_regs[index].mask_low);
-+	if (low < 0)
-+		return low;
-+	ext = phy_read_mmd(phydev, MDIO_MMD_PMAPMD,
-+			   bcm8489x_led_regs[index].mask_ext);
-+	if (ext < 0)
-+		return ext;
-+
-+	*rules = 0;
-+	if (low & BCM8489X_LED_SRC_100_1000)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_100);
-+	if (low & BCM8489X_LED_SRC_1000)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_1000);
-+	if (ext & BCM8489X_LED_SRCX_2500)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_2500);
-+	if (ext & BCM8489X_LED_SRCX_5000)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_5000);
-+	if (low & BCM8489X_LED_SRC_10G)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_10000);
-+	if (low & BCM8489X_LED_SRC_RX)
-+		*rules |= BIT(TRIGGER_NETDEV_RX);
-+	if (low & BCM8489X_LED_SRC_TX)
-+		*rules |= BIT(TRIGGER_NETDEV_TX);
-+
-+	return 0;
-+}
-+
- static int bcm84881_probe(struct phy_device *phydev)
+ static void r8152_mdio_clr_bit(struct r8152 *tp, u16 addr, u16 clear)
  {
- 	/* This driver requires PMAPMD and AN blocks */
-@@ -290,6 +438,10 @@ static struct phy_driver bcm84881_drivers[] = {
- 		.config_aneg	= bcm84881_config_aneg,
- 		.aneg_done	= bcm84881_aneg_done,
- 		.read_status	= bcm84881_read_status,
-+		.led_brightness_set = bcm8489x_led_brightness_set,
-+		.led_hw_is_supported = bcm8489x_led_hw_is_supported,
-+		.led_hw_control_set = bcm8489x_led_hw_control_set,
-+		.led_hw_control_get = bcm8489x_led_hw_control_get,
- 	}, {
- 		PHY_ID_MATCH_MODEL(0x359050a0),
- 		.name		= "Broadcom BCM84892",
-@@ -300,6 +452,10 @@ static struct phy_driver bcm84881_drivers[] = {
- 		.config_aneg	= bcm84881_config_aneg,
- 		.aneg_done	= bcm84881_aneg_done,
- 		.read_status	= bcm84881_read_status,
-+		.led_brightness_set = bcm8489x_led_brightness_set,
-+		.led_hw_is_supported = bcm8489x_led_hw_is_supported,
-+		.led_hw_control_set = bcm8489x_led_hw_control_set,
-+		.led_hw_control_get = bcm8489x_led_hw_control_get,
- 	},
- };
+ 	int data;
+@@ -7195,16 +7218,12 @@ static void r8156_hw_phy_cfg(struct r8152 *tp)
+ 		ocp_reg_write(tp, 0xad4c, 0x00a8);
+ 		ocp_reg_write(tp, 0xac5c, 0x01ff);
+ 		ocp_reg_w0w1(tp, 0xac8a, 0xf0, BIT(4) | BIT(5));
+-		ocp_reg_write(tp, 0xb87c, 0x8157);
+-		ocp_reg_w0w1(tp, 0xb87e, 0xff00, 0x0500);
+-		ocp_reg_write(tp, 0xb87c, 0x8159);
+-		ocp_reg_w0w1(tp, 0xb87e, 0xff00, 0x0700);
++		sram2_write_w0w1(tp, 0x8157, 0xff00, 0x0500);
++		sram2_write_w0w1(tp, 0x8159, 0xff00, 0x0700);
  
+ 		/* AAGC */
+-		ocp_reg_write(tp, 0xb87c, 0x80a2);
+-		ocp_reg_write(tp, 0xb87e, 0x0153);
+-		ocp_reg_write(tp, 0xb87c, 0x809c);
+-		ocp_reg_write(tp, 0xb87e, 0x0153);
++		sram2_write(tp, 0x80a2, 0x0153);
++		sram2_write(tp, 0x809c, 0x0153);
+ 
+ 		/* EEE parameter */
+ 		ocp_write_word(tp, MCU_TYPE_PLA, PLA_EEE_TXTWSYS_2P5G, 0x0056);
+@@ -7402,82 +7421,48 @@ static void r8156b_hw_phy_cfg(struct r8152 *tp)
+ 		ocp_reg_write(tp, 0xacc8, 0xa0d3);
+ 		ocp_reg_write(tp, 0xad08, 0x0007);
+ 
+-		ocp_reg_write(tp, 0xb87c, 0x8560);
+-		ocp_reg_write(tp, 0xb87e, 0x19cc);
+-		ocp_reg_write(tp, 0xb87c, 0x8562);
+-		ocp_reg_write(tp, 0xb87e, 0x19cc);
+-		ocp_reg_write(tp, 0xb87c, 0x8564);
+-		ocp_reg_write(tp, 0xb87e, 0x19cc);
+-		ocp_reg_write(tp, 0xb87c, 0x8566);
+-		ocp_reg_write(tp, 0xb87e, 0x147d);
+-		ocp_reg_write(tp, 0xb87c, 0x8568);
+-		ocp_reg_write(tp, 0xb87e, 0x147d);
+-		ocp_reg_write(tp, 0xb87c, 0x856a);
+-		ocp_reg_write(tp, 0xb87e, 0x147d);
+-		ocp_reg_write(tp, 0xb87c, 0x8ffe);
+-		ocp_reg_write(tp, 0xb87e, 0x0907);
+-		ocp_reg_write(tp, 0xb87c, 0x80d6);
+-		ocp_reg_write(tp, 0xb87e, 0x2801);
+-		ocp_reg_write(tp, 0xb87c, 0x80f2);
+-		ocp_reg_write(tp, 0xb87e, 0x2801);
+-		ocp_reg_write(tp, 0xb87c, 0x80f4);
+-		ocp_reg_write(tp, 0xb87e, 0x6077);
++		sram2_write(tp, 0x8560, 0x19cc);
++		sram2_write(tp, 0x8562, 0x19cc);
++		sram2_write(tp, 0x8564, 0x19cc);
++		sram2_write(tp, 0x8566, 0x147d);
++		sram2_write(tp, 0x8568, 0x147d);
++		sram2_write(tp, 0x856a, 0x147d);
++		sram2_write(tp, 0x8ffe, 0x0907);
++		sram2_write(tp, 0x80d6, 0x2801);
++		sram2_write(tp, 0x80f2, 0x2801);
++		sram2_write(tp, 0x80f4, 0x6077);
+ 		ocp_reg_write(tp, 0xb506, 0x01e7);
+ 
+-		ocp_reg_write(tp, 0xb87c, 0x8013);
+-		ocp_reg_write(tp, 0xb87e, 0x0700);
+-		ocp_reg_write(tp, 0xb87c, 0x8fb9);
+-		ocp_reg_write(tp, 0xb87e, 0x2801);
+-		ocp_reg_write(tp, 0xb87c, 0x8fba);
+-		ocp_reg_write(tp, 0xb87e, 0x0100);
+-		ocp_reg_write(tp, 0xb87c, 0x8fbc);
+-		ocp_reg_write(tp, 0xb87e, 0x1900);
+-		ocp_reg_write(tp, 0xb87c, 0x8fbe);
+-		ocp_reg_write(tp, 0xb87e, 0xe100);
+-		ocp_reg_write(tp, 0xb87c, 0x8fc0);
+-		ocp_reg_write(tp, 0xb87e, 0x0800);
+-		ocp_reg_write(tp, 0xb87c, 0x8fc2);
+-		ocp_reg_write(tp, 0xb87e, 0xe500);
+-		ocp_reg_write(tp, 0xb87c, 0x8fc4);
+-		ocp_reg_write(tp, 0xb87e, 0x0f00);
+-		ocp_reg_write(tp, 0xb87c, 0x8fc6);
+-		ocp_reg_write(tp, 0xb87e, 0xf100);
+-		ocp_reg_write(tp, 0xb87c, 0x8fc8);
+-		ocp_reg_write(tp, 0xb87e, 0x0400);
+-		ocp_reg_write(tp, 0xb87c, 0x8fca);
+-		ocp_reg_write(tp, 0xb87e, 0xf300);
+-		ocp_reg_write(tp, 0xb87c, 0x8fcc);
+-		ocp_reg_write(tp, 0xb87e, 0xfd00);
+-		ocp_reg_write(tp, 0xb87c, 0x8fce);
+-		ocp_reg_write(tp, 0xb87e, 0xff00);
+-		ocp_reg_write(tp, 0xb87c, 0x8fd0);
+-		ocp_reg_write(tp, 0xb87e, 0xfb00);
+-		ocp_reg_write(tp, 0xb87c, 0x8fd2);
+-		ocp_reg_write(tp, 0xb87e, 0x0100);
+-		ocp_reg_write(tp, 0xb87c, 0x8fd4);
+-		ocp_reg_write(tp, 0xb87e, 0xf400);
+-		ocp_reg_write(tp, 0xb87c, 0x8fd6);
+-		ocp_reg_write(tp, 0xb87e, 0xff00);
+-		ocp_reg_write(tp, 0xb87c, 0x8fd8);
+-		ocp_reg_write(tp, 0xb87e, 0xf600);
++		sram2_write(tp, 0x8013, 0x0700);
++		sram2_write(tp, 0x8fb9, 0x2801);
++		sram2_write(tp, 0x8fba, 0x0100);
++		sram2_write(tp, 0x8fbc, 0x1900);
++		sram2_write(tp, 0x8fbe, 0xe100);
++		sram2_write(tp, 0x8fc0, 0x0800);
++		sram2_write(tp, 0x8fc2, 0xe500);
++		sram2_write(tp, 0x8fc4, 0x0f00);
++		sram2_write(tp, 0x8fc6, 0xf100);
++		sram2_write(tp, 0x8fc8, 0x0400);
++		sram2_write(tp, 0x8fca, 0xf300);
++		sram2_write(tp, 0x8fcc, 0xfd00);
++		sram2_write(tp, 0x8fce, 0xff00);
++		sram2_write(tp, 0x8fd0, 0xfb00);
++		sram2_write(tp, 0x8fd2, 0x0100);
++		sram2_write(tp, 0x8fd4, 0xf400);
++		sram2_write(tp, 0x8fd6, 0xff00);
++		sram2_write(tp, 0x8fd8, 0xf600);
+ 
+ 		ocp_byte_set_bits(tp, MCU_TYPE_PLA, PLA_USB_CFG,
+ 				  EN_XG_LIP | EN_G_LIP);
+ 
+-		ocp_reg_write(tp, 0xb87c, 0x813d);
+-		ocp_reg_write(tp, 0xb87e, 0x390e);
+-		ocp_reg_write(tp, 0xb87c, 0x814f);
+-		ocp_reg_write(tp, 0xb87e, 0x790e);
+-		ocp_reg_write(tp, 0xb87c, 0x80b0);
+-		ocp_reg_write(tp, 0xb87e, 0x0f31);
++		sram2_write(tp, 0x813d, 0x390e);
++		sram2_write(tp, 0x814f, 0x790e);
++		sram2_write(tp, 0x80b0, 0x0f31);
+ 		ocp_reg_set_bits(tp, 0xbf4c, BIT(1));
+ 		ocp_reg_set_bits(tp, 0xbcca, BIT(9) | BIT(8));
+-		ocp_reg_write(tp, 0xb87c, 0x8141);
+-		ocp_reg_write(tp, 0xb87e, 0x320e);
+-		ocp_reg_write(tp, 0xb87c, 0x8153);
+-		ocp_reg_write(tp, 0xb87e, 0x720e);
+-		ocp_reg_write(tp, 0xb87c, 0x8529);
+-		ocp_reg_write(tp, 0xb87e, 0x050e);
++		sram2_write(tp, 0x8141, 0x320e);
++		sram2_write(tp, 0x8153, 0x720e);
++		sram2_write(tp, 0x8529, 0x050e);
+ 		ocp_reg_clr_bits(tp, OCP_EEE_CFG, CTAP_SHORT_EN);
+ 
+ 		sram_write(tp, 0x816c, 0xc4a0);
+@@ -7489,27 +7474,17 @@ static void r8156b_hw_phy_cfg(struct r8152 *tp)
+ 		sram_write(tp, 0x8ff1, 0x0404);
+ 
+ 		ocp_reg_write(tp, 0xbf4a, 0x001b);
+-		ocp_reg_write(tp, 0xb87c, 0x8033);
+-		ocp_reg_write(tp, 0xb87e, 0x7c13);
+-		ocp_reg_write(tp, 0xb87c, 0x8037);
+-		ocp_reg_write(tp, 0xb87e, 0x7c13);
+-		ocp_reg_write(tp, 0xb87c, 0x803b);
+-		ocp_reg_write(tp, 0xb87e, 0xfc32);
+-		ocp_reg_write(tp, 0xb87c, 0x803f);
+-		ocp_reg_write(tp, 0xb87e, 0x7c13);
+-		ocp_reg_write(tp, 0xb87c, 0x8043);
+-		ocp_reg_write(tp, 0xb87e, 0x7c13);
+-		ocp_reg_write(tp, 0xb87c, 0x8047);
+-		ocp_reg_write(tp, 0xb87e, 0x7c13);
+-
+-		ocp_reg_write(tp, 0xb87c, 0x8145);
+-		ocp_reg_write(tp, 0xb87e, 0x370e);
+-		ocp_reg_write(tp, 0xb87c, 0x8157);
+-		ocp_reg_write(tp, 0xb87e, 0x770e);
+-		ocp_reg_write(tp, 0xb87c, 0x8169);
+-		ocp_reg_write(tp, 0xb87e, 0x0d0a);
+-		ocp_reg_write(tp, 0xb87c, 0x817b);
+-		ocp_reg_write(tp, 0xb87e, 0x1d0a);
++		sram2_write(tp, 0x8033, 0x7c13);
++		sram2_write(tp, 0x8037, 0x7c13);
++		sram2_write(tp, 0x803b, 0xfc32);
++		sram2_write(tp, 0x803f, 0x7c13);
++		sram2_write(tp, 0x8043, 0x7c13);
++		sram2_write(tp, 0x8047, 0x7c13);
++
++		sram2_write(tp, 0x8145, 0x370e);
++		sram2_write(tp, 0x8157, 0x770e);
++		sram2_write(tp, 0x8169, 0x0d0a);
++		sram2_write(tp, 0x817b, 0x1d0a);
+ 
+ 		sram_write_w0w1(tp, 0x8217, 0xff00, 0x5000);
+ 		sram_write_w0w1(tp, 0x821a, 0xff00, 0x5000);
+@@ -7574,12 +7549,9 @@ static void r8156b_hw_phy_cfg(struct r8152 *tp)
+ 		fallthrough;
+ 	case RTL_VER_15:
+ 		/* EEE parameter */
+-		ocp_reg_write(tp, 0xb87c, 0x80f5);
+-		ocp_reg_write(tp, 0xb87e, 0x760e);
+-		ocp_reg_write(tp, 0xb87c, 0x8107);
+-		ocp_reg_write(tp, 0xb87e, 0x360e);
+-		ocp_reg_write(tp, 0xb87c, 0x8551);
+-		ocp_reg_w0w1(tp, 0xb87e, 0xff00, 0x0800);
++		sram2_write(tp, 0x80f5, 0x760e);
++		sram2_write(tp, 0x8107, 0x360e);
++		sram2_write_w0w1(tp, 0x8551, 0xff00, 0x0800);
+ 
+ 		/* ADC_PGA parameter */
+ 		ocp_reg_w0w1(tp, 0xbf00, 0xe000, 0xa000);
 -- 
-2.47.3
+2.34.1
 
 
