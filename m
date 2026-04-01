@@ -1,61 +1,64 @@
-Return-Path: <netdev+bounces-274062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274063-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6Pg/B0j9zGnRYgYAu9opvQ
-	(envelope-from <netdev+bounces-274062-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 13:11:04 +0200
+	id UExeBZP/zGnRYgYAu9opvQ
+	(envelope-from <netdev+bounces-274063-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 13:20:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB5A0379260
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 13:11:03 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7589337946B
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 13:20:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BD8CA3076743
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 11:05:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5FF1D317D079
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 11:06:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD6C3D6CB8;
-	Wed,  1 Apr 2026 11:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32803DEAE3;
+	Wed,  1 Apr 2026 11:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nWUFtDZ0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IEBtDruy"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EBE93264F4
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 11:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3533D3D03;
+	Wed,  1 Apr 2026 11:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775041548; cv=none; b=FUoylDB+6NN63Z0OlhHe2QjeG1wAfmY52JU/8Wd+O/a5GaxbDqrRzMY3IaO3efmFrWBmWaT996kQQO5410ucTSMGF14eyk4jgy+OIbwG6LbKP8OzotMuwPmbzuMpDZ92YLZt7NTPz1dYF2/T2QHxrB8RHABFYEzjYJGA6/96uRo=
+	t=1775041551; cv=none; b=Rm7WpR51U1hs/gL2Ey31+CqIkW3fkEszidB/Oz0JbAmO+2daaAbFX9F/MbWRwBWzKltjm8hxZnklxevIIHgVI3rWAhzH7sCocxrq8LT04Kodj70KiLIG9lfBrBiLqB/5KCkLkeSbz5EjkyY1DLLBVqlG0zSttmTwkOfwRmZbn50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775041548; c=relaxed/simple;
-	bh=QX6YcIS8aDtWOlo3nRiP3ADhmeIP9kM1kSmfsZ36zGc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DQUD686THmmQPKgB/d6ioUHvvOC9yhCx0dP4bOqTHvCAQSo9pDGH1Lfzg4Lc1E+Pqn2NnRQvOtqAI8qZsaVbKQRMNpE9Wkbe+Hee0rGAlTA1g2eDeKiMWYRIQ/RzRSiXh0pYPy9Cx7JNLPXb1VhzzBn7b2udFrJbWe7KAFqRYUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nWUFtDZ0; arc=none smtp.client-ip=91.218.175.173
+	s=arc-20240116; t=1775041551; c=relaxed/simple;
+	bh=Xj61EosfzjfHOO1sRpO/zWhpNA5ArLWmsHWmI2lirz0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AjfyvmKc7mGVpsYVU30StU1Qs3sDoMwcxY3s3WWmyAKcdL7OvIXR1udsH84Qknv7J9QUnIYsieTkaw3MdRRTtwTpy57iyeew9eUkgok0qOurH+bdbVnRWc9avFus/3RNMMgZLOene1iDzziafJZkhJJGOTl59drK66qZjCxZlPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IEBtDruy; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775041533;
+	t=1775041546;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=awnZxp/u7WMTZ1nHWIvAJbHaDUNgRFNmp2rxXHzr9ZM=;
-	b=nWUFtDZ0inpwwANY7t9NH3zzcZy082lPqJffG3i4D0YFe9DbO9YIPUMKrg4pW4Z4hEeCZq
-	u5goBt3tcq08TrKgsu9+juK5EM2T62h6eqOPTIG+Cre0y8YQbbVLac3KJRqQuTEbbVs844
-	uJ7iMq0zmop90zZTldYOXaDLT8lf3fQ=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nVZBa8UEvqHRKoYhIdivobtFZ6ps7cQbsfMsNGbhoHs=;
+	b=IEBtDruyY5LD0VUQf2G4SAU/UWeYTCExNtUepsyMrfNZzrbn2EXYIcosLinbOmMOwTRe2y
+	ORN1Tqe3jP7MMoBvEoXJ0aB83Y3hNpPV4yuHQN/cEhnX3PYG/oWHSEEKnM12yPk0vRcwhI
+	NJUk3ZAyR/k/ibf+LSdozax71r5XUiY=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: bpf@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
 	Martin KaFai Lau <martin.lau@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
 	Eduard Zingerman <eddyz87@gmail.com>,
 	Song Liu <song@kernel.org>,
 	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
 	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
 	Hao Luo <haoluo@google.com>,
 	Jiri Olsa <jolsa@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -64,14 +67,14 @@ Cc: Jiayuan Chen <jiayuan.chen@shopee.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	Shuah Khan <shuah@kernel.org>,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf v5 0/2] bpf: tcp: Fix null-ptr-deref in arbitrary SYN Cookie
-Date: Wed,  1 Apr 2026 19:04:48 +0800
-Message-ID: <20260401110511.73355-1-jiayuan.chen@linux.dev>
+Subject: [PATCH bpf v5 1/2] bpf: tcp: Reject non-TCP skb in bpf_sk_assign_tcp_reqsk()
+Date: Wed,  1 Apr 2026 19:04:49 +0800
+Message-ID: <20260401110511.73355-2-jiayuan.chen@linux.dev>
+In-Reply-To: <20260401110511.73355-1-jiayuan.chen@linux.dev>
+References: <20260401110511.73355-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,14 +90,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[shopee.com,kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,google.com,davemloft.net,redhat.com,vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux.dev,google.com,iogearbox.net,gmail.com,fomichev.me,kernel.org,davemloft.net,redhat.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	TAGGED_FROM(0.00)[bounces-274062-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-274063-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -105,24 +108,24 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shopee.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: BB5A0379260
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7589337946B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jiayuan Chen <jiayuan.chen@shopee.com>
+bpf_sk_assign_tcp_reqsk() only validates skb->protocol (L3) but does not
+check the L4 protocol in the IP header. A BPF program can call this kfunc
+on a UDP skb with a valid TCP listener socket, which will succeed and
+attach a TCP reqsk to the UDP skb.
 
-bpf_sk_assign_tcp_reqsk() does not validate the L4 protocol of the skb,
-only checking skb->protocol (L3). A BPF program that calls this kfunc on
-a non-TCP skb (e.g. UDP) will succeed, attaching a TCP reqsk to the skb.
-
-When the skb enters the UDP receive path, skb_steal_sock() returns the
-TCP listener socket from the reqsk. The UDP code then casts this TCP
-socket to udp_sock and accesses UDP-specific fields at invalid offsets,
-causing a null pointer dereference:
+When the UDP skb enters the UDP receive path, skb_steal_sock() returns
+the TCP listener from the reqsk. The UDP code then passes this TCP socket
+to udp_unicast_rcv_skb() -> __udp_enqueue_schedule_skb(), which casts
+it to udp_sock and accesses UDP-specific fields at invalid offsets,
+causing a null pointer dereference and kernel panic:
 
   BUG: KASAN: null-ptr-deref in __udp_enqueue_schedule_skb+0x19d/0x1df0
   Read of size 4 at addr 0000000000000008 by task test_progs/537
@@ -146,52 +149,48 @@ causing a null pointer dereference:
    __netif_receive_skb_one_core (net/core/dev.c:6164 (discriminator 4))
    __netif_receive_skb (net/core/dev.c:6280)
 
-Solution
+Fix this by checking the IP header's protocol field in
+bpf_sk_assign_tcp_reqsk() and rejecting non-TCP skbs with -EINVAL.
 
-Patch 1: Add L4 protocol validation in bpf_sk_assign_tcp_reqsk(). Check
-ip_hdr(skb)->protocol (IPv4) and ipv6_hdr(skb)->nexthdr (IPv6) against
-IPPROTO_TCP, returning -EINVAL for non-TCP skbs.
-Patch 2: Add selftest that calls bpf_sk_assign_tcp_reqsk() on a UDP skb
-and verifies the kfunc rejects it.
+Note that for IPv6, the nexthdr check does not walk extension headers.
+This is uncommon for TCP SYN packets in practice, and keeping it simple
+was agreed upon by Kuniyuki Iwashima.
 
-
+Fixes: e472f88891ab ("bpf: tcp: Support arbitrary SYN Cookie.")
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
-v1: https://lore.kernel.org/bpf/20260323105510.51990-1-jiayuan.chen@linux.dev/
-v2: https://lore.kernel.org/bpf/20260326062657.88446-1-jiayuan.chen@linux.dev/
-v3: https://lore.kernel.org/bpf/20260327133915.286037-1-jiayuan.chen@linux.dev/
-v4: https://lore.kernel.org/bpf/20260330080746.319680-1-jiayuan.chen@linux.dev/
+ net/core/filter.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Changes in v5:
-- Add pskb_may_pull before accessing IP/IPv6 headers in kfunc
-- Use buf[] instead of buf[32], verify recv data with ASSERT_STREQ
-- Remove unnecessary variable initializations in selftest and BPF
-
-Changes in v4:
-- Check if assign_ret is EINVAL instead of checking if it is 0
-
-Changes in v3:
-- Add IPv6 test coverage, reuse test_cases[] to iterate over both
-  address families
-- Share TCP/UDP port to simplify BPF program, remove unnecessary
-  global variables
-- Use connect_to_fd() + send()/recv() instead of manual sockaddr
-  construction
-- Suggested by Kuniyuki Iwashima
-
-Changes in v2:
-- Add Reviewed-by tag from Kuniyuki Iwashima for patch 1
-- Use UDP socket recv() instead of kern_sync_rcu() for synchronization
-  in selftest
-
-Jiayuan Chen (2):
-  bpf: tcp: Reject non-TCP skb in bpf_sk_assign_tcp_reqsk()
-  selftests/bpf: Add protocol check test for bpf_sk_assign_tcp_reqsk()
-
- net/core/filter.c                             |  12 ++
- .../bpf/prog_tests/tcp_custom_syncookie.c     |  93 ++++++++++++++-
- .../bpf/progs/test_tcp_custom_syncookie.c     | 109 ++++++++++++++++++
- 3 files changed, 210 insertions(+), 4 deletions(-)
-
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 78b548158fb0..f251744025e2 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -12248,11 +12248,23 @@ __bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct __sk_buff *s, struct sock *sk,
+ 
+ 	switch (skb->protocol) {
+ 	case htons(ETH_P_IP):
++		if (!pskb_may_pull(skb, sizeof(struct iphdr)))
++			return -EINVAL;
++
++		if (ip_hdr(skb)->protocol != IPPROTO_TCP)
++			return -EINVAL;
++
+ 		ops = &tcp_request_sock_ops;
+ 		min_mss = 536;
+ 		break;
+ #if IS_BUILTIN(CONFIG_IPV6)
+ 	case htons(ETH_P_IPV6):
++		if (!pskb_may_pull(skb, sizeof(struct ipv6hdr)))
++			return -EINVAL;
++
++		if (ipv6_hdr(skb)->nexthdr != IPPROTO_TCP)
++			return -EINVAL;
++
+ 		ops = &tcp6_request_sock_ops;
+ 		min_mss = IPV6_MIN_MTU - 60;
+ 		break;
 -- 
 2.43.0
 
