@@ -1,145 +1,131 @@
-Return-Path: <netdev+bounces-274042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274043-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QJ1CMPb2zGl9YQYAu9opvQ
-	(envelope-from <netdev+bounces-274042-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 12:44:06 +0200
+	id GFdBBGD3zGl9YQYAu9opvQ
+	(envelope-from <netdev+bounces-274043-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 12:45:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DB9F378B63
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 12:44:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D9C7378BC2
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 12:45:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 36BC83095B57
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 10:38:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7BCCB31680CE
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 10:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5753FA5FE;
-	Wed,  1 Apr 2026 10:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3CF3ACEE6;
+	Wed,  1 Apr 2026 10:38:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="SwHPz7XY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eOBRxeSS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC46A3F8DFD;
-	Wed,  1 Apr 2026 10:37:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D65FF3DE452
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 10:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775039828; cv=none; b=l5ROR0De9XK4u9IHa0hSdjaxb/v04HqWaPGRmy6OK0rHftXx+90vBX/APmMCaBvVmPuSWlvg2ZfkqzJeWiegr1Uy3SYp2OT6Zgli7HUquuA0MHzMija0IHl317bhddTonbb+Pea+bzu8quYzIc2ml8F9pJgPg4zZBB++UrkyL8E=
+	t=1775039894; cv=none; b=s04nIetHodPw5Qytm0MxVOrQuP0C0oKgI+ln0sQeQt8rAt6lVXZwC3cciC7Utrmk6wRKT+5wvNaArQy9xIXOuez/Wo9KkmnffHb75e3Gj3qYPuIUIKtVAR+rH5TWmsMYETG9PA7QxuyKbmrkDfL0gSgsVS0YmmNYAfDT0swZ5S4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775039828; c=relaxed/simple;
-	bh=nOrYf/IMx6gxtyNB26R22xBOp5onhSiSZFVuQ29Nk68=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bbaMVSUppdbc0y7QKf1cqTwZ2SvsglUU/0eJ3Lxzl0F2LkxbqmcUoy1XWF8y1NFG22zX84ekmt1VwXSx+bpXSwn9gsKJa/Vblr/tMex4/Yq1sQSW3Zdo2PM2oE3kXyWkJcjJ9F2wgWTQZ1UWxkFAqw1AiCGUZp6ZHSdNTwuhiSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=SwHPz7XY; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 9B74C60273;
-	Wed,  1 Apr 2026 12:37:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1775039825;
-	bh=+IqVeh6fcqQR1yjRdh4IDMPM19qNlFOEOVlD6u4VHlA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SwHPz7XYeISSIn6nrk7vy5p99BE2IgKvg6lYqLpBvnEctCkcZeRj6zkVwHlBroEEQ
-	 q5bAdzAwLvCByiZ8kgmIv1rLBKcSOGz3hi7bwCWcazAM44u5X603OycElhfXwolHKp
-	 Dz4wejQDMusrh0CNxqnJrRm5nyrN4pkcDuQX6VPiYNy+iRr4kXn9UxncFohCU7Rzo5
-	 jddqbroKBlPbvWRaJLeYIOaiMiJJeuhMVWV1dF28bjUtmUy1/u1pfuNwdsRxc2aiGb
-	 FRMT28AiSZwjkK6oIpClj7fwtgUo1KPJDnYYKAvzhO7w2NBkRKWf1jNM40F58mi2vb
-	 ZcjEQIhFw9IKw==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH net 10/10] netfilter: nf_tables: reject immediate NF_QUEUE verdict
-Date: Wed,  1 Apr 2026 12:36:46 +0200
-Message-ID: <20260401103646.1015423-11-pablo@netfilter.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260401103646.1015423-1-pablo@netfilter.org>
-References: <20260401103646.1015423-1-pablo@netfilter.org>
+	s=arc-20240116; t=1775039894; c=relaxed/simple;
+	bh=ZQY0ZsTDJLtXEEqVgymubMBDilgcol19qa87fW2fFJY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=faE67VwNOpFDQImuC+kVA49QL2oUjUrJU6B8CLywDV5+NfiMD67BCBTzbBsVj5n/+E/X5RxaeVrXsSjw3wzi6pxtZNf/OLKJqLr6syaMNSOcP562XnsYHS6bbix52QdfVuBsRD02GrezW/JERYW78lmRxh+CSCEyUpbHFjWm3jE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eOBRxeSS; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-8cb52a9c0eeso2543935985a.2
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 03:38:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775039892; x=1775644692; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MM7hnTcLGZoTV7tJl2qgT6kRbUgGV6GNMML/ykmn7YI=;
+        b=eOBRxeSSXn3NwzIWwNKvdvBRiFredsteQE/c6n3r2sBfuh4MJpuS8MB8WDtRhnOv8q
+         VZdCbe8AP6M3MKi9Fpc2dHesPh/09zgzB7loWGpVm/aoBqw6MNaBua8Lv56EkSy64gwD
+         i3n5dToqWjD+bnTN4CGUfZ77VIPKUML/ObiRsOUJ2MsdvzWN0H5Xa11Lq/v1Yp4esbFO
+         pcRuB1eu9CU0MRImiTX/gkYqiL/PFxwQibd1GGzbQQN609uyUmSGTRzv22MlRmgYSezm
+         dp2POlIGOnASsGw59ftlJMzf2xFlod7pPydqP40llrPzYaWdScvcOoo3fI/MYiCBFnh6
+         paKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775039892; x=1775644692;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MM7hnTcLGZoTV7tJl2qgT6kRbUgGV6GNMML/ykmn7YI=;
+        b=By9uWyQhh10HU3Fbmj+VsaWbnojiSsi9Xem7yNYmTsr6+gQZWGrQe72fUZNVXY67U0
+         mN3360jGBemY12hhXeP7fLucvhRjKoTLEEpzOjKxbAXd1e6Xt06BMZya+te22YSaJZ4B
+         rbI4BQ3swsv6jUpJ4imhXqsImMlcxF/T222bW50xC1nGmQsbcWC5+Ht7ZmR66aXAOU1i
+         JUT3vsnEgMRc/WHrn9/4Mg7kDuL5FCOzyxv0H8cAwOdApbuNFAR905R5xrg3ZI7OxEuZ
+         OC17S3vSR1iqyAZwtW4xDpW0GBuHalrh6LRYu0eUquoI85AB01zpIFsDuLNjrXnT79pd
+         yzgg==
+X-Forwarded-Encrypted: i=1; AJvYcCW6nnx3qPSiBaUki22ve3ozO5qZVVhBPAlBWgdAAgPlsCQNXquVkcMiFT96m6TfBXuMt7xPO4k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyY178/GOoFNhWfb3nzDL3VyEQquHuKHfUj66dJSjmUlxHZ7F5
+	Op7qWeA8PUQ9SGReozY696hv18Rf3EUn5EQgd4pZMf91HRfqnpTJJxgkAU7gL04a1w0AEtJEl4s
+	94PiegCuge0Umbg==
+X-Received: from qvpu15.prod.google.com ([2002:a0c:ea4f:0:b0:89c:cf3f:7746])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4613:b0:8cf:e933:d5ed with SMTP id af79cd13be357-8d1b5bfde9amr460905085a.61.1775039891532;
+ Wed, 01 Apr 2026 03:38:11 -0700 (PDT)
+Date: Wed,  1 Apr 2026 10:38:07 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.1118.gaef5881109-goog
+Message-ID: <20260401103809.3038139-1-edumazet@google.com>
+Subject: [PATCH net-next 0/2] macvlan: broadcast delivery changes
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	DMARC_NA(0.00)[netfilter.org];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274042-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,vger.kernel.org,gmail.com,google.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274043-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	RCPT_COUNT_SEVEN(0.00)[8];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,netfilter.org:dkim,netfilter.org:email,netfilter.org:mid]
-X-Rspamd-Queue-Id: 9DB9F378B63
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6D9C7378BC2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-nft_queue is always used from userspace nftables to deliver the NF_QUEUE
-verdict. Immediately emitting an NF_QUEUE verdict is never used by the
-userspace nft tools, so reject immediate NF_QUEUE verdicts.
+First patch adds data-race annotations.
 
-The arp family does not provide queue support, but such an immediate
-verdict is still reachable. Globally reject NF_QUEUE immediate verdicts
-to address this issue.
+Second patch changes macvlan_broadcast_enqueue() to return
+early if the queue is full.
 
-Fixes: f342de4e2f33 ("netfilter: nf_tables: reject QUEUE/DROP verdict parameters")
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nf_tables_api.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Eric Dumazet (2):
+  macvlan: annotate data-races around port->bc_queue_len_used
+  macvlan: avoid spinlock contention in macvlan_broadcast_enqueue()
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 3922cff1bb3d..8c42247a176c 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -11667,8 +11667,6 @@ static int nft_verdict_init(const struct nft_ctx *ctx, struct nft_data *data,
- 	switch (data->verdict.code) {
- 	case NF_ACCEPT:
- 	case NF_DROP:
--	case NF_QUEUE:
--		break;
- 	case NFT_CONTINUE:
- 	case NFT_BREAK:
- 	case NFT_RETURN:
-@@ -11703,6 +11701,11 @@ static int nft_verdict_init(const struct nft_ctx *ctx, struct nft_data *data,
- 
- 		data->verdict.chain = chain;
- 		break;
-+	case NF_QUEUE:
-+		/* The nft_queue expression is used for this purpose, an
-+		 * immediate NF_QUEUE verdict should not ever be seen here.
-+		 */
-+		fallthrough;
- 	default:
- 		return -EINVAL;
- 	}
+ drivers/net/macvlan.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
 -- 
-2.47.3
+2.53.0.1118.gaef5881109-goog
 
 
