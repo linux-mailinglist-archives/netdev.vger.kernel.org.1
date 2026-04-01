@@ -1,202 +1,398 @@
-Return-Path: <netdev+bounces-274112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274113-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +FrrFighzWlWaQYAu9opvQ
-	(envelope-from <netdev+bounces-274112-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:44:08 +0200
+	id MCmgH3YezWnOaAYAu9opvQ
+	(envelope-from <netdev+bounces-274113-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:32:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E3EE37B6F8
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:44:07 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30E5637B48A
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:32:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 0F5DD3086EBE
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 13:32:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 0338A3008D6D
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 13:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18B643C076;
-	Wed,  1 Apr 2026 13:31:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0F42BE026;
+	Wed,  1 Apr 2026 13:32:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mYgSyRWG"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="IYf90vKQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C0342882D
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 13:31:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775050314; cv=none; b=LG5CwQSdX7evZgS0NQcfav20MFEVC+9EQkdxnsRl//mTMM0v4zB1fVf41ByH8LZ2fegHRJ6LX3RHrLAOYWG/vIGIhnEo+Mpv5Mt0kfU9Bz7Nm5Wb3jpnoO8EIvJwmXM1+YCJ0XEgapGCczf5p8OhD60pREd69m4LpDGvWV2DD9I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775050314; c=relaxed/simple;
-	bh=7WSD0xVpd+t5WYgcMNTEAF0v1OnqUTar5TxLkrMoM9o=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=qbzHzwQVrQ1AL57tI85WItqtqywbnACCnYgeU+Vcj1c6wkIDQIU2UvA73weQoW64t8g2GSJ9TZPWYA+t+59rvn5cRgjEHEighX/NY5F536Q3aVVwJt10dW1qcsA/uVEpk3VweLVOIxl6dRp68EK7sPZlbayXZyH27Z3eLrrknRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mYgSyRWG; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 01 Apr 2026 15:31:42 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775050310;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7WSD0xVpd+t5WYgcMNTEAF0v1OnqUTar5TxLkrMoM9o=;
-	b=mYgSyRWGLJ0v75Jv6zgDKtWWqH5XkN7YHbkBbiVnjDriAecS/HaT59DqCBjAjwBrXEFmwb
-	PMMqfZnfHEzB5y7lqZrQlNSJMq3LU+5AeDuFkgnYU2Vn79atpx28g7v7dJdwePmBJIzcKi
-	npXbG2jBH/MH4JOC6urJP1ea9sRlhxI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Luka Gejak <luka.gejak@linux.dev>
-To: Fernando Fernandez Mancera <fmancera@suse.de>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-CC: netdev@vger.kernel.org, fmaurer@redhat.com, horms@kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net-next_v4_1/2=5D_net=3A_hs?=
- =?US-ASCII?Q?r=3A_require_valid_EOT_supervision_TLV?=
-In-Reply-To: <1a22150a-0f4c-412a-9789-ece497d1c92c@suse.de>
-References: <20260401092324.52266-1-luka.gejak@linux.dev> <20260401092324.52266-2-luka.gejak@linux.dev> <4549f521-6395-4c26-921e-eaead7248a36@suse.de> <85A635E3-DF1B-42CA-B552-729943E5C0D5@linux.dev> <1a22150a-0f4c-412a-9789-ece497d1c92c@suse.de>
-Message-ID: <7540A920-76E7-4768-9E62-6666D0FECFA9@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5477E29D294
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 13:32:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775050340; cv=pass; b=FhYOvrtGD6JuPzYFaueX70VJ1IjnBlCJotzRjU+vZ0RHNXvQbUGRjN6loMd7ugxztZu+b2dzpL0jxDscMuf3LaBExv+ay0lSXTNHGANg6+OAhNZsydLHsGR2OpPEWbsaawVWbEAdYvx0sxxFtq3CD3IymcCnGTxBZFUJRQXJANs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775050340; c=relaxed/simple;
+	bh=ykQYpIr849OOIDjLXpVI4Ic/6DsLZ9LnNWTQxd0yrhc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PccEKgbXAHKoNHFV9TgzwhUVge+tFGWrx6RN4bmIC5l1/TuiqAOOj6LnoMaFWDiMg6rbPL4bTTu3jt1pWiZwN5zyziK0r/OmSJenAd+O6QIClXIupSowmX4UJ5vJrmxNomOAsfy+h5NngIuVFYhTtAk/CdfPZ1E8yJJRM353nsU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=IYf90vKQ; arc=pass smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-66c5b2e41c1so2992909a12.1
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 06:32:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775050337; cv=none;
+        d=google.com; s=arc-20240605;
+        b=kONE3g4fgdHNjmPO019AfSMFF8csl0a47pF8CvISM8uycs+7bTZcT0Dy8Ils6Tj8PT
+         NllYK4FOjb0qDgVryp9oKO/nXHO8pGt1eAddRRLpgjvWBGC8ogLTANga6Ak9yRnJwQG5
+         fEU4SSA0d/+r2jqplA+yinJ6CRw7EGbvqT+5HUhUVTPCYVv7/0C5PxpGpqM/Y5qm3hMu
+         5mtj/pBz6ErWXkctEedKdy3ahVT78SCQOadUmCo9GGffKXJjWZ/0hC7FRii30iD5Ojb+
+         lRrWAllgzpZ3ivF67vB5pSrczsM2GFWAVGefVguiVWHyRbevWfWqB4Qjs/i/DHFp1SPB
+         OaIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=gIE8jQyRjrcrddwXuE5cIpyEHP3IztKvb+gkeBWSXM8=;
+        fh=8i4BkJ7A2sbsgM1+Fe68SjLDkqmJfGNb+pxYd/lDi1E=;
+        b=CCG0kj4Y3aBP//xFhOHs584n+K2fk/zGoCsYENtQWvRaZr0slfATTPbCmS5+i6DGnS
+         7RKcBoqbOjlMCeMmRGWRcTwz43FagzFx5c9UBZgBRKVVzXrAa3rmXOEWb9XaYYzy6flS
+         aUBXXjOJ4EEqa9PfTX9jhG+8on6hIlijKjjaB+Pg3CrE8HJOgt/yI7iRrgscts050QA2
+         1MaS/oYl3GfXA/dVJYxKHWJvDsLWF7WRJVhlGRt1y2We56N8UJdp22kWn8xTeNBYuJmg
+         Rhi/g7k8En63F23ZvOrZOosQL/JY3D2p1hh1pw0YRmDvzsKFhor/zTwmSFCeawbCrQ57
+         52ng==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1775050337; x=1775655137; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gIE8jQyRjrcrddwXuE5cIpyEHP3IztKvb+gkeBWSXM8=;
+        b=IYf90vKQtboJxl2kHz7IYOlVXvEMSL0Ew01Xr3neycbuf4UIzsfjoZjbsyi5H+i2jF
+         9wVbnTbI7mE8PsoG2CLcy7Ub+4uYW/v/MBI/0HAILSXfPHLPracRue+OrxAuQaizgu3t
+         E2Mw8t0PYW0TT58aqgU7aoDhyUoAxEm4Zb6IUA1jWNPOyBnne8W9PLMoc4XpBdA8Bg8f
+         dnaEgdO2UZdfqex+cgg6/JIQMhJ/0zJBygeLyk1oYDw6mNfpd3CFC3076jaI3eN3fuoq
+         yPEehAqRvrA52nNBk8b1uS6KktSHgW/pPgpmkvV4WE4GTrtgnRvaK+fj8eBhZkFWRxNQ
+         XITg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775050337; x=1775655137;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=gIE8jQyRjrcrddwXuE5cIpyEHP3IztKvb+gkeBWSXM8=;
+        b=daar/oijTBrnFHhR0jBCCWN4EScMxPAWOv35WX59tpkWyNimGgPVrgbpWB78Yrrnp+
+         fxTWGc2K9rTkziTYuRPnV+2vCQOxOF5JvWFZiJ8XWT5QG2mC6xxj2O1jeKpR5pRdkKLZ
+         bxncQJINPpxiHsbwaOUZUUMtzKXrAauEwVY/BuVG84lzqmJd6LMKhKeLXtoIOKfJJ9ua
+         6W+oIEaL5lU2g3+5pzQ+UCLAyxne4S9MOKF7PCDxOKsj85UX+/oP0+iUkogctqW5AF9O
+         4b/ouK+zRYGj/RvvjofkmTmyduC1kU5g2M6H04MoAjITYNoiYXpOQQVnTVCShJKTG88S
+         TLbQ==
+X-Gm-Message-State: AOJu0YzmYMVhcSyyjfKwba6vBPMWrZhzITILV68emFQ+isXbm16HV4Xf
+	3jMtxq7oHMJIdGLFkdR0Ouv0qnJiH1CPbqll0C1e0yo3zMCDb7teEi6F8Tf32OkwB14P9ZUL7vg
+	Ei1iEWUKPi4lpIgyn7oXbOD8YvoEwvTSurYAMyyyCYw==
+X-Gm-Gg: ATEYQzxRh89QR5KA1vAfB8HQ9ijBFeu5cs2/pOx4dCGNQKBzBNigqBySXGRbkEXeNCy
+	8dcH3P/7fzH2eDJnK6z2hsulT+3LJfHmFbDDv2E/GtAQfoN6nUZZOMHXtf5bw/B5KQpELR+sLac
+	wz8IjM0AqDEsN2Yd0CV0oTuxIN5yoqQBxSFjrL0b5kJANjDkUbjrzUK9RA7E8kE/c3K5WDYxiBh
+	7Y5L+48u8eeULl/x9wCtzEfKm+5w2sNHXhkmnnuxPQZdth2x7tMdQcjv80Lb7n08EgzSwOrIMoQ
+	PwVqhA==
+X-Received: by 2002:a17:907:841:b0:b9b:f6c:a67e with SMTP id
+ a640c23a62f3a-b9c133756e1mr251574866b.0.1775050336411; Wed, 01 Apr 2026
+ 06:32:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+References: <20260325134439.3048615-1-louis.scalbert@6wind.com>
+ <20260325134439.3048615-2-louis.scalbert@6wind.com> <CAJ5u_OcpOGSPYK-EzYeW8LdpJrLd16fGn6zN6cvk+tCjCi+QxA@mail.gmail.com>
+ <118159.1774630613@vermin>
+In-Reply-To: <118159.1774630613@vermin>
+From: Louis Scalbert <louis.scalbert@6wind.com>
+Date: Wed, 1 Apr 2026 15:32:04 +0200
+X-Gm-Features: AQROBzBArbK8fUuaC8SXxQzAN0IrdRnSUx5GcIyLsuASPRHVShVxJFJJnXFKsL8
+Message-ID: <CAJ5u_OceyA2oXopDbB96sQ7UG7AMFm3KtjXiZNZicd2S7PK7QA@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/3] bonding: 3ad: fix carrier when no valid slaves
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, fbl@redhat.com, andy@greyhouse.net, 
+	shemminger@vyatta.com, maheshb@google.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.96 / 15.00];
-	SUBJ_EXCESS_QP(1.20)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[6wind.com,none];
+	R_DKIM_ALLOW(-0.20)[6wind.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274112-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-274113-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luka.gejak@linux.dev,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[6wind.com:+];
 	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[louis.scalbert@6wind.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 3E3EE37B6F8
+	RCPT_COUNT_SEVEN(0.00)[10];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,mail.gmail.com:mid,6wind.com:dkim,6wind.com:email,jvosburgh.net:email]
+X-Rspamd-Queue-Id: 30E5637B48A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On April 1, 2026 2:05:49 PM GMT+02:00, Fernando Fernandez Mancera <fmancera=
-@suse=2Ede> wrote:
->On 4/1/26 1:06 PM, Luka Gejak wrote:
->> On April 1, 2026 11:52:02 AM GMT+02:00, Fernando Fernandez Mancera <fma=
-ncera@suse=2Ede> wrote:
->>> On 4/1/26 11:23 AM, luka=2Egejak@linux=2Edev wrote:
->>>> From: Luka Gejak <luka=2Egejak@linux=2Edev>
->>>>=20
->>>> Supervision frames are only valid if terminated with a zero-length EO=
-T
->>>> TLV=2E The current check fails to reject non-EOT entries as the termi=
-nal
->>>> TLV, potentially allowing malformed supervision traffic=2E
->>>>=20
->>>> Fix this by strictly requiring the terminal TLV to be HSR_TLV_EOT
->>>> with a length of zero=2E
->>>>=20
->>>> Reviewed-by: Felix Maurer <fmaurer@redhat=2Ecom>
->>>> Signed-off-by: Luka Gejak <luka=2Egejak@linux=2Edev>
->>>> ---
->>>=20
->>> Hi,
->>>=20
->>> This has not been reviewed by Felix=2E Felix provided his Reviewed-by =
-tag for the v1 which was completely different than this=2E
->>>=20
->>> Revisions of this patch:
->>>=20
->>> v3: https://lore=2Ekernel=2Eorg/all/20260329112313=2E17164-4-luka=2Ege=
-jak@linux=2Edev/
->>>=20
->>> v2: https://lore=2Ekernel=2Eorg/all/20260326154715=2E38405-4-luka=2Ege=
-jak@linux=2Edev/
->>>=20
->>> v1: https://lore=2Ekernel=2Eorg/all/20260324143503=2E187642-4-luka=2Eg=
-ejak@linux=2Edev/
->>>=20
->>> Are these contributions LLM/AI generated? I believe so based on the em=
-ail history=2E
->>>=20
->>> AI generated review on rtl8723bs: https://lore=2Ekernel=2Eorg/all/B239=
-4A3C-25FD-4CEA-8557-3E68F1F60357@linux=2Edev/
->>>=20
->>> Another AI generated review on rtl8723bs: https://lore=2Ekernel=2Eorg/=
-all/3831D599-655E-40B2-9E5D-9DF956013088@linux=2Edev/
->>>=20
->>> Likely an AI generated review on a 1 year old HSR patch: https://lore=
-=2Ekernel=2Eorg/all/DHFG26KI6L23=2E1YCOVQ5SSYMO5@linux=2Edev/
->>>=20
->>> If these are indeed, AI generated contributions or reviews they should=
- be disclosed beforehand=2E Also there is the Assisted-by: tag=2E Also note=
- that developer must take full responsibility for the contribution which me=
-ans understanding it completely=2E
->>>=20
->>> https://docs=2Ekernel=2Eorg/process/coding-assistants=2Ehtml#signed-of=
-f-by-and-developer-certificate-of-origin
->>>=20
->>> Thanks,
->>> Fernando=2E
->>=20
->> Hi Fernando,
->> About the Reviewed-by tag, that was my mistake=2E I forgot to remove it
->> when rebasing=2E And about AI=2E I=E2=80=99ve been using it to help for=
-mat my
->> emails and translate them into English since it isn't my native
->> language=2E However, the technical logic and the code itself are my own
->> work, written without AI=2E
->
->So I don't think this change in code is related to rebasing at all=2E The=
- code in this function is identical when comparing net and net-next tree so=
- why a rebase would cause such change in the code? Am I missing something h=
-ere?
->
->In addition to that, the new logic does not make any sense=2E What motiva=
-ted the diff from v3 to v4? All that information is missing=2E
->
->Thanks,
->Fernando=2E
->
->Should I send v5, and if so, what should I
->> do besides stripping the Reviewed-by tag? I've read the documentation
->> on coding assistants you linked and will make sure to follow it on the
->> next revision=2E
->> Best regards,
->> Luka Gejak
->>=20
->
+Hello,
 
-Hi Fernando,
-These 2 patches were in the same patch series as 2 other patches=2E=20
-Then, when rebasing to edit 3rd patch in original patch series(3/4), I
-forgot to remove the Reviewed-by tag(I ran git commit --amend=20
---no-edit)=2E Then I separated 1st 2 and 2nd 2 patches into separate=20
-series (one for net and other for net-next) because I was instructed=20
-to do so by Jakub Kicinski=2E His email:
->I think that patches 1 and 2 need to go to net with a Fixes tag=2E
->They look like run of the mill bug fixes=2E 3 and 4 are logical
->fixes and change behavior so net-next makes sense=2E
+Thank you to Mahesh and Jay for your helpful feedback.
+
+I have reviewed the IEEE LACP standard on this specific topic and conducted
+tests to provide as accurate a response as possible.
+
+Le ven. 27 mars 2026 =C3=A0 17:56, Jay Vosburgh <jv@jvosburgh.net> a =C3=A9=
+crit :
 >
->FWIW AI has something to say about patch 3, I did not investigate:
->https://sashiko=2Edev/#/patchset/20260329112313=2E17164-2-luka=2Egejak@li=
-nux=2Edev
->--=20
->pw-bot: cr
+> Louis Scalbert <louis.scalbert@6wind.com> wrote:
+>
+> >Hi everyone,
+> >
+> >Le mer. 25 mars 2026 =C3=A0 14:44, Louis Scalbert
+> ><louis.scalbert@6wind.com> a =C3=A9crit :
+> >>
+> >> When an 802.3ad (LACP) bonding interface has no slaves in the
+> >> collecting/distributing state, the bonding master may still report
+> >> carrier as up. In this situation, no slave is actually able to transmi=
+t
+> >> or receive traffic.
+> >>
+> >I=E2=80=99ve just realized that the issue description is not entirely ac=
+curate.
+> >
+> >Bonding links that are not in LACP Collecting/Distributing state are
+> >excluded from traffic
+> >distribution in favor of those that are. However, if no links are in
+> >Collecting/Distributing state,
+> >the kernel considers all links as valid for distributing traffic.
+> >
+> >> As a result, upper-layer daemons consider the interface operational
+> >> while traffic is effectively blackholed.
+> >
+> >There are situations where traffic is not blackholed.
+> >
+> >For example, a Linux machine A is connected to machine B using two
+> >aggregated links.
+> >On A, LACP is configured, but not on B. As a result, LACP will not
+> >reach the Collecting/Distributing
+> >state since B does not send LACP frames. However, the bonding
+> >interface will still be up on both
+> >sides, and traffic can be exchanged.
+>
+>         Bonding does this because, in the absense of a LACP partner, the
+> interfaces in the bond will become Individual links, each of which will
+> become its own aggregator, one of which will be chosen to be active.
+
+Thank you for the detailed description of the current behavior. I
+confirm that this matches
+what I am observing: only one link is selected for both transmitting
+and receiving traffic,
+while traffic received on the other enslaved links is discarded.
+>
+>
+>         This is in compliance with the standard, (802.1AX-2014, 6.1.1.j)
+> and is intended to permit some communication between a system that is
+> LACP-enabled and a system that is not.  The common example I'm familiar
+
+The exact statement is:
+"Backwards compatibility with aggregation-unaware devices - Links that
+cannot take part in
+Link Aggregation because of their inherent capabilities, management
+configuration, or the
+capabilities of the devices to which they attach operate as normal,
+individual links."
+
+This wording has remained unchanged from 802.3ad-2000 through 802.1AX-2020.
+
+It implies that when the partner does not support aggregation (i.e.,
+does not run LACP), all
+bond slaves should fall back to operating as normal, individual links.
+
+However, this is not how the kernel behaves today: it selects only a
+single link for forwarding,
+while traffic received on the other enslaved links is discarded.
+
+As such, the current implementation does not comply with the standard.
+
+>
+> with is a host that PXE boots over a network, connected to a
+> LACP-enabled switch.  During early boot, the PXE environment does not
+> perform LACP, but still needs to communicate with the switch.
+
+In this scenario, the switch is the Linux machine. The current
+behavior is only effective
+if the kernel happens, by chance, to select the port used by PXE.
+
+On Cisco Catalyst switches, when LACP fails to negotiate on all links,
+the PortChannel
+interface is placed in a suspended state, resulting in carrier down.
+To achieve the
+IEEE-defined behavior, the user must explicitly configure "no
+port-channel standalone-disable".
+In that mode, all links operate independently, meaning the switch
+forwarding table maintains
+MAC entries per link rather than per PortChannel interface. This
+allows PXE to function correctly
+in such scenarios.
+
+On Cisco routers, however, the only possible state in this situation
+is a suspended PortChannel
+(carrier down). There is no option to fall back to independent links.
+
+As far as I know, this default behavior (disabling the aggregation
+when LACP is not negotiated)
+is also the default on other vendors such as Juniper, and is the
+behavior I intend to implement
+to address the traffic blackholing issue.
+
+Implementing the IEEE-compliant behavior would only be relevant for
+bonding interfaces
+enslaved to bridge interfaces. My tests in this scenario, without any
+LACP negotiation, show
+that the bridge only learns forwarding database (FDB) entries behind
+the bonding interface,
+rather than per individual link. This capability could still be added
+in the future if needed.
+
+>
+>
+> >This behavior is, of course, not compliant with the LACP (802.3ad)
+> >standard, but applying this fix
+> >as-is could introduce regressions in some setups. Under normal
+> >conditions, having no Collecting /
+> >Distributing links means that no interfaces are operational for
+> >handling traffic - that is precisely the
+> >purpose of using LACP.
+>
+>         FWIW, generally speaking we've settled on IEEE 802.1AX-2014 as
+> the version of the standard to which the bonding implementation should
+> be conformant.  There is a more recent version, -2020, but it is a
+> significant change from the prior versions.
+
+Good to know - thanks for pointing that out.
+
+>
+>
+> >I will publish a new version with a knob to enforce compliance with
+> >the LACP standard. It will be
+> >disabled by default for backward compatibility.
+> >
+> >What do you think of "lacp_strict" or "lacp_enforce" ?
+>
+>         I'm not convinced that we are in violation of the standard with
+> the present behavior.  That said, if such a switch is necessary, I'd
+> vote for "lacp_strict".
+
+I suggest addressing the traffic blackholing issue by introducing the follo=
+wing
+configuration knob. lacp_fallback_mode:
+- legacy or 0 (default) value: the current behavior
+- strict or 1: set the carrier down
+- A value of 2 could be added later to support the IEEE-compliant mode
+with bridge
+  interfaces, if needed.
+
+Best regards,
+
+Louis Scalbert
+
+
+
+>
+>
+>         -J
+>
+> >>
+> >> Fix this by asserting carrier only when at least 'min_links' slaves ar=
+e
+> >> in the collecting/distributing state (or collecting only if the
+> >> coupled_control default behavior is disabled).
+> >>
+> >> Fixes: 655f8919d549 ("bonding: add min links parameter to 802.3ad")
+> >> Signed-off-by: Louis Scalbert <louis.scalbert@6wind.com>
+> >> ---
+> >>  drivers/net/bonding/bond_3ad.c | 24 ++++++++++++++++++++++--
+> >>  1 file changed, 22 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond=
+_3ad.c
+> >> index af7f74cfdc08..6d3613755d45 100644
+> >> --- a/drivers/net/bonding/bond_3ad.c
+> >> +++ b/drivers/net/bonding/bond_3ad.c
+> >> @@ -745,6 +745,22 @@ static void __set_agg_ports_ready(struct aggregat=
+or *aggregator, int val)
+> >>         }
+> >>  }
+> >>
+> >> +static int __agg_valid_ports(struct aggregator *agg)
+> >> +{
+> >> +       struct port *port;
+> >> +       int valid =3D 0;
+> >> +
+> >> +       for (port =3D agg->lag_ports; port;
+> >> +            port =3D port->next_port_in_aggregator) {
+> >> +               if (port->actor_oper_port_state & LACP_STATE_COLLECTIN=
+G &&
+> >> +                   (!port->slave->bond->params.coupled_control ||
+> >> +                    port->actor_oper_port_state & LACP_STATE_DISTRIBU=
+TING))
+> >> +                       valid++;
+> >> +       }
+> >> +
+> >> +       return valid;
+> >> +}
+> >> +
+> >>  static int __agg_active_ports(struct aggregator *agg)
+> >>  {
+> >>         struct port *port;
+> >> @@ -2120,6 +2136,7 @@ static void ad_enable_collecting_distributing(st=
+ruct port *port,
+> >>                           port->actor_port_number,
+> >>                           port->aggregator->aggregator_identifier);
+> >>                 __enable_port(port);
+> >> +               bond_3ad_set_carrier(port->slave->bond);
+> >>                 /* Slave array needs update */
+> >>                 *update_slave_arr =3D true;
+> >>                 /* Should notify peers if possible */
+> >> @@ -2141,6 +2158,7 @@ static void ad_disable_collecting_distributing(s=
+truct port *port,
+> >>                           port->actor_port_number,
+> >>                           port->aggregator->aggregator_identifier);
+> >>                 __disable_port(port);
+> >> +               bond_3ad_set_carrier(port->slave->bond);
+> >>                 /* Slave array needs an update */
+> >>                 *update_slave_arr =3D true;
+> >>         }
+> >> @@ -2819,8 +2837,10 @@ int bond_3ad_set_carrier(struct bonding *bond)
+> >>         }
+> >>         active =3D __get_active_agg(&(SLAVE_AD_INFO(first_slave)->aggr=
+egator));
+> >>         if (active) {
+> >> -               /* are enough slaves available to consider link up? */
+> >> -               if (__agg_active_ports(active) < bond->params.min_link=
+s) {
+> >> +               /* are enough slaves in collecting (and distributing) =
+state to consider
+> >> +                * link up?
+> >> +                */
+> >> +               if (__agg_valid_ports(active) < bond->params.min_links=
+) {
+> >>                         if (netif_carrier_ok(bond->dev)) {
+> >>                                 netif_carrier_off(bond->dev);
+> >>                                 goto out;
+> >> --
+> >> 2.39.2
+> >>
+>
+> ---
+>         -Jay Vosburgh, jv@jvosburgh.net
 
