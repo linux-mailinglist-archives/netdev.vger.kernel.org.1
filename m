@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-274087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274088-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qPB5FQ0ZzWnOaAYAu9opvQ
-	(envelope-from <netdev+bounces-274087-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:09:33 +0200
+	id eOtTNDMYzWnOaAYAu9opvQ
+	(envelope-from <netdev+bounces-274088-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:05:55 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4686F37AF63
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:09:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B1BC37AEE8
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:05:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E9159317D0E1
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:26:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1DB9332B797B
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:26:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EEA3405ACD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96EF407115;
 	Wed,  1 Apr 2026 12:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="qUPqjwtj"
+	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="HZ2L4lL7"
 X-Original-To: netdev@vger.kernel.org
 Received: from www537.your-server.de (www537.your-server.de [188.40.3.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86D92517AF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4C43CEB89;
 	Wed,  1 Apr 2026 12:26:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.3.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775046369; cv=none; b=P5P8Rf9avZchsH7+2BsgIWG1dqljbamoA+iI3M2iQI1pQAfOkmfnL7P4pbV9Jl2SLTctdXon6W8jC/vmHviWMQlx6dCxkEs0d1lWMfmfduKN2H2SV2CRZvc/6cvfpw0//3YMAkEyEYiG1h6q+ZYOJ2CtM91c8oxof1arh9LPEAs=
+	t=1775046369; cv=none; b=m4fdmTWpGe2dVkjp3SIiG+tB80hsaaa1+4SjiiCVAP/bs1WfgSA7CdKl/5gcfVTiitI5YgwxaXxspbvFI4l/iF5ZQ1Od61/rErG6oFLWoNvAOTJPImeacczU3ciBhMmKNU19iWh0Rw4ubYEO1auQJoK0b5qTnXEoACwOI3lnNMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775046369; c=relaxed/simple;
-	bh=gMJ4qA4+BpPEiz7VEhBVeNQFffnLFENP2d7DPETg0gw=;
+	bh=Dyd9F+V79y9hNb/JUAVClmv+qWMBAkFMPXJfQHrsDSU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zl2f0vCXcPwia/eTbtifyQDsMpVeRib6K7P71qT8ht2hs6EH30MAaHyluDsSPi9mkqnoDxBT7uXqIlgI5lg33FR+6hgk5vXhAuM4gsivZJZpseg/Ym13FlO2KihoCo4iNR3PsyjPKEtbT/UbO2IpA5lZJSA6grbXgm612c9QfuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=qUPqjwtj; arc=none smtp.client-ip=188.40.3.216
+	 MIME-Version:Content-Type; b=kpup5osMbU7i38x/a0wWFkp7XHJchc/HS7NhVk3yPNOOQDIhV6lvXha2CPJCk0g6FuG9xdI72AnCcQ4OBfw35zQ/sxQu56T3NTjADmGAkgkE9L2EYDthi0FbEDY7R2BTCQ0ND1nOYysP0nyqqpqvNEW+2xGP7ImygSxzKmYzHFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=HZ2L4lL7; arc=none smtp.client-ip=188.40.3.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -39,24 +39,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=E2G3cP9X4cNiCp8YAHg4IjVGgRKZxQbDkjOgRFSfK7s=; b=qUPqjwtj78zGf4p2xh8VKaEQ+Q
-	nXh0ts7fQKRqRNCbcMe+P/Qdiy6M/f2n/Gkt+xCOOKyQSjQAVmiVAsngP00UMTqqrNikSusWRdnyJ
-	HoAOnGFoKlFfEWH+8ewMciN9PotAn5dqkZuL5zQbxgSz+r7SPxXXi1AfOk0u3DUJuj9zE4HxWSclL
-	Wxr41qgXd//s/IAhl9wvXLV+9vWEWF3NytCTUTN7M9548MRofsfaMaCtjzwh0qzQA3bgMJGqo9ExM
-	hl/fGl4BPN3TATHfh8JfCQLqCLmTz+Iso5CHa0lnTN2KXpe7xM2cNxBsWPbnoqe37oLgDZG+CGlaY
-	5u0no4Uw==;
+	bh=Ri29mMECTRLPmj/f28VKUr01MxVHN14NYrO0oRv5ApA=; b=HZ2L4lL7AGedirOqb9tjtBdAlV
+	1qJiVnnR+Yi01Pq4ofNg0n9DUg4j5WAldI9fdZdPGYA/gvzdaDF9VJF24lSWA1zFhRYwzyu9C11PP
+	NwglrqTzTIxGd2/fwobjTI0i/BTxUfqi+nHYtczInCJok2TQd7k4UFcC1KwpAMcSxvRo/vXAa/iSe
+	zW5vR7bYYoWOFx44AijBiBBkCf29z9wYD9+AjmiskBJ4qhG75etHcuW9OHcTGjqEk3Lir0hcMdNIV
+	/ja3zYgNngwI0ORPqr/U7edKYst61l3GpFO+R+4Gsw02LQySL9vRQsgva+BDc0LVWrKtevRhLhQvv
+	AB93wUrA==;
 Received: from sslproxy07.your-server.de ([78.47.199.104])
 	by www537.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96.2)
 	(envelope-from <nora.schiffer@ew.tq-group.com>)
-	id 1w7ue3-000IQk-26;
-	Wed, 01 Apr 2026 14:26:03 +0200
+	id 1w7ue4-000IQz-0t;
+	Wed, 01 Apr 2026 14:26:04 +0200
 Received: from localhost ([127.0.0.1])
 	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <nora.schiffer@ew.tq-group.com>)
-	id 1w7ue3-00089b-0X;
-	Wed, 01 Apr 2026 14:26:02 +0200
+	id 1w7ue3-00089b-2W;
+	Wed, 01 Apr 2026 14:26:03 +0200
 From: Nora Schiffer <nora.schiffer@ew.tq-group.com>
 To: Nishanth Menon <nm@ti.com>,
 	Vignesh Raghavendra <vigneshr@ti.com>,
@@ -80,9 +80,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	linux-arm-kernel@lists.infradead.org,
 	linux@ew.tq-group.com,
 	Nora Schiffer <nora.schiffer@ew.tq-group.com>
-Subject: [PATCH v3 2/5] dt-bindings: phy: ti: phy-gmii-sel: Add ti,j722s-phy-gmii-sel compatible
-Date: Wed,  1 Apr 2026 14:25:22 +0200
-Message-ID: <5ac1c52827a1a246584dddb62335f9ce4715eceb.1775045279.git.nora.schiffer@ew.tq-group.com>
+Subject: [PATCH v3 3/5] phy: ti: phy-j721e-wiz: add support for J722S SoC family
+Date: Wed,  1 Apr 2026 14:25:23 +0200
+Message-ID: <feb36d4077a57767572b72d8a47c0e582d3e358f.1775045279.git.nora.schiffer@ew.tq-group.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1775045279.git.nora.schiffer@ew.tq-group.com>
 References: <cover.1775045279.git.nora.schiffer@ew.tq-group.com>
@@ -105,7 +105,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274087-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274088-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -122,55 +122,96 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tq-group.com:email,tq-group.com:url,ew.tq-group.com:dkim,ew.tq-group.com:mid]
-X-Rspamd-Queue-Id: 4686F37AF63
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ew.tq-group.com:dkim,ew.tq-group.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tq-group.com:email,tq-group.com:url]
+X-Rspamd-Queue-Id: 2B1BC37AEE8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The J722S gmii-sel is mostly identical to the AM64's, but additionally
-supports SGMII. The AM64 compatible ti,am654-phy-gmii-sel is used as a
-fallback.
+The J722S WIZ is mostly identical to the AM64's, but additionally supports
+SGMII.
 
 Signed-off-by: Nora Schiffer <nora.schiffer@ew.tq-group.com>
 ---
- .../bindings/phy/ti,phy-gmii-sel.yaml         | 24 ++++++++++++-------
- 1 file changed, 15 insertions(+), 9 deletions(-)
+ drivers/phy/ti/phy-j721e-wiz.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/phy/ti,phy-gmii-sel.yaml b/Documentation/devicetree/bindings/phy/ti,phy-gmii-sel.yaml
-index be41b4547ec6d..6e12a75100eb8 100644
---- a/Documentation/devicetree/bindings/phy/ti,phy-gmii-sel.yaml
-+++ b/Documentation/devicetree/bindings/phy/ti,phy-gmii-sel.yaml
-@@ -47,15 +47,21 @@ description: |
+diff --git a/drivers/phy/ti/phy-j721e-wiz.c b/drivers/phy/ti/phy-j721e-wiz.c
+index 6e9ecb88dc8b7..99a80740cdc6b 100644
+--- a/drivers/phy/ti/phy-j721e-wiz.c
++++ b/drivers/phy/ti/phy-j721e-wiz.c
+@@ -331,6 +331,7 @@ enum wiz_type {
+ 	J721E_WIZ_16G,
+ 	J721E_WIZ_10G,	/* Also for J7200 SR1.0 */
+ 	AM64_WIZ_10G,
++	J722S_WIZ_10G,
+ 	J7200_WIZ_10G,  /* J7200 SR2.0 */
+ 	J784S4_WIZ_10G,
+ 	J721S2_WIZ_10G,
+@@ -1020,6 +1021,7 @@ static void wiz_clock_cleanup(struct wiz *wiz, struct device_node *node)
  
- properties:
-   compatible:
--    enum:
--      - ti,am3352-phy-gmii-sel
--      - ti,dra7xx-phy-gmii-sel
--      - ti,am43xx-phy-gmii-sel
--      - ti,dm814-phy-gmii-sel
--      - ti,am654-phy-gmii-sel
--      - ti,j7200-cpsw5g-phy-gmii-sel
--      - ti,j721e-cpsw9g-phy-gmii-sel
--      - ti,j784s4-cpsw9g-phy-gmii-sel
-+    oneOf:
-+      - items:
-+          - enum:
-+              - ti,am3352-phy-gmii-sel
-+              - ti,dra7xx-phy-gmii-sel
-+              - ti,am43xx-phy-gmii-sel
-+              - ti,dm814-phy-gmii-sel
-+              - ti,am654-phy-gmii-sel
-+              - ti,j7200-cpsw5g-phy-gmii-sel
-+              - ti,j721e-cpsw9g-phy-gmii-sel
-+              - ti,j784s4-cpsw9g-phy-gmii-sel
-+      - items:
-+          - enum:
-+              - ti,j722s-phy-gmii-sel
-+          - const: ti,am654-phy-gmii-sel
+ 	switch (wiz->type) {
+ 	case AM64_WIZ_10G:
++	case J722S_WIZ_10G:
+ 	case J7200_WIZ_10G:
+ 	case J784S4_WIZ_10G:
+ 	case J721S2_WIZ_10G:
+@@ -1089,6 +1091,7 @@ static void wiz_clock_init(struct wiz *wiz)
  
-   reg:
-     maxItems: 1
+ 	switch (wiz->type) {
+ 	case AM64_WIZ_10G:
++	case J722S_WIZ_10G:
+ 	case J7200_WIZ_10G:
+ 		switch (rate) {
+ 		case REF_CLK_100MHZ:
+@@ -1158,6 +1161,7 @@ static int wiz_clock_probe(struct wiz *wiz, struct device_node *node)
+ 
+ 	switch (wiz->type) {
+ 	case AM64_WIZ_10G:
++	case J722S_WIZ_10G:
+ 	case J7200_WIZ_10G:
+ 	case J784S4_WIZ_10G:
+ 	case J721S2_WIZ_10G:
+@@ -1246,6 +1250,14 @@ static int wiz_phy_fullrt_div(struct wiz *wiz, int lane)
+ 		if (wiz->lane_phy_type[lane] == PHY_TYPE_SGMII)
+ 			return regmap_field_write(wiz->p0_fullrt_div[lane], 0x2);
+ 		break;
++
++	case J722S_WIZ_10G:
++		if (wiz->lane_phy_type[lane] == PHY_TYPE_PCIE)
++			return regmap_field_write(wiz->p0_fullrt_div[lane], 0x1);
++		if (wiz->lane_phy_type[lane] == PHY_TYPE_SGMII)
++			return regmap_field_write(wiz->p0_fullrt_div[lane], 0x2);
++		break;
++
+ 	default:
+ 		return 0;
+ 	}
+@@ -1350,6 +1362,15 @@ static struct wiz_data am64_10g_data = {
+ 	.clk_div_sel_num = WIZ_DIV_NUM_CLOCKS_10G,
+ };
+ 
++static struct wiz_data j722s_10g_data = {
++	.type = J722S_WIZ_10G,
++	.pll0_refclk_mux_sel = &pll0_refclk_mux_sel,
++	.pll1_refclk_mux_sel = &pll1_refclk_mux_sel,
++	.refclk_dig_sel = &refclk_dig_sel_10g,
++	.clk_mux_sel = clk_mux_sel_10g,
++	.clk_div_sel_num = WIZ_DIV_NUM_CLOCKS_10G,
++};
++
+ static struct wiz_data j7200_pg2_10g_data = {
+ 	.type = J7200_WIZ_10G,
+ 	.pll0_refclk_mux_sel = &sup_pll0_refclk_mux_sel,
+@@ -1389,6 +1410,9 @@ static const struct of_device_id wiz_id_table[] = {
+ 	{
+ 		.compatible = "ti,am64-wiz-10g", .data = &am64_10g_data,
+ 	},
++	{
++		.compatible = "ti,j722s-wiz-10g", .data = &j722s_10g_data,
++	},
+ 	{
+ 		.compatible = "ti,j7200-wiz-10g", .data = &j7200_pg2_10g_data,
+ 	},
 -- 
 TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
 Amtsgericht München, HRB 105018
