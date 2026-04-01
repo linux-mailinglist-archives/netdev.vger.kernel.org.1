@@ -1,139 +1,254 @@
-Return-Path: <netdev+bounces-274151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274152-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GA+qM1g9zWn5awYAu9opvQ
-	(envelope-from <netdev+bounces-274151-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:44:24 +0200
+	id yIa6MiY4zWmxawYAu9opvQ
+	(envelope-from <netdev+bounces-274152-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:22:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5033D37D5FB
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:44:24 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C88437CF2E
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:22:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2446C311A93F
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 15:10:38 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 522F5319F40D
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 15:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56114370D7C;
-	Wed,  1 Apr 2026 15:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 638953DA5B3;
+	Wed,  1 Apr 2026 15:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pUjewFnI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PV+tXhY5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327702EC083;
-	Wed,  1 Apr 2026 15:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C7B3A6EFA
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 15:13:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775056237; cv=none; b=Zg9ODoFqhfoAE7TPGzJEt3vpN4MCrU5iOAkJrCzvsHbAfntjYaYUo+ziaDNX3eIow2k+LV6l9fniY5dgTCENargm90MUXRSRZU5DIeKEXvdDWZj81HcfurCvvFRBl4udgeromjTJDC1iLyvunxG8gWZy5BIMxcIAJi2vzBS6okI=
+	t=1775056416; cv=none; b=dDojGrPBTsUwNTza4/CyPJ28rVSyNIGRx2Nw98mnyMTHyIptYvkW7cULWmg9L23iMZaWlbc0iqZNKVB3JeeE7tjKA7kB/l+vnP2OAzjQ+L+ljrR0xi6m0Eo9WvDJ0nemP8HDMzvueE00WcyJCjFrpkDZD9iWE5qI8X705N0VZ04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775056237; c=relaxed/simple;
-	bh=dUggK2Z/RSrKdEz6hBYx2oKXZ3+aAG/sQMXxAisukQI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cch/5PJGB62Q/c1q0Ma/AGEdMqUTo7UyMBXTDQYG2aEi8J6laG1ae8j3cLGoNDqY3cQbKg/3KUZ8UfDB6TVJ+vZJ9hFK5MnICgj2xa0pBEguDGIoQV+tR5zDAow8F4QAZ0opXHUcMFhmwLhoEVncQu53UekqF2OXeAyZEQD8+sQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pUjewFnI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44D9CC4CEF7;
-	Wed,  1 Apr 2026 15:10:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775056236;
-	bh=dUggK2Z/RSrKdEz6hBYx2oKXZ3+aAG/sQMXxAisukQI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pUjewFnIw1dEO/HoyUnIlPpT/EXB3rDKVXq8QsyJcQbZ2n11gtq78vY6nEWyt/ps2
-	 EoPPhSMG4L45fOU+g4qdfm8ki+TdXUhh4tzG+/YmwBM67epDfRFBTGjvvplRutOD1+
-	 vM8Zk9VV9G8Gc/acPFk7gturlK8p8igwfBrzc5hUO4x2RJHd100hnGNvLRQwPZm7Ot
-	 DqDCiprJvjA9HHiPGOyz9niIpsD7Xd3eJrR2b4+IQk7qtvz17UXWYP7p+mKWEF4V8x
-	 6sKfRAFxO/IiQN8xmDOv9kmdxfDRNtVX786/KwN10brmBO9/AYtnqvD4qYHDFJ/5vZ
-	 Ga+fXiqXEU1RA==
-Date: Wed, 1 Apr 2026 08:10:30 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Felix Maurer <fmaurer@redhat.com>, Sebastian
- Andrzej Siewior <bigeasy@linutronix.de>, "Matthieu Baerts (NGI0)"
- <matttbe@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-ppp@vger.kernel.org,
- netdev@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>
-Subject: Re: [PATCH net-next v7] selftests: net: add tests for PPP
-Message-ID: <20260401081030.29b050d5@kernel.org>
-In-Reply-To: <20260330035604.133073-1-dqfext@gmail.com>
-References: <20260330035604.133073-1-dqfext@gmail.com>
+	s=arc-20240116; t=1775056416; c=relaxed/simple;
+	bh=Vx31kPj8WzRhzbsHW7UHSZzpuFvTyhoJHSe1Ji0Xm8E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pXl27CBcK/oYGOt9ieciqsq3hJGvLlezg0mTQsoIFBF9MbVkQ3C21hgnkeKacJEAPIVUgZ7c8h/kKNht/dxyu1SoJP2PySP+Iy+oqyBxaWtZQf9//TtCRhOpOoSHhn79/SBHyD+F/F7dLA3My82jOZIRD4XFWCZOK30CQBVvHPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PV+tXhY5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1775056404;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qxBR3iXengsp3kpZeNErIksVg/dBeXg0IjlLomymZ64=;
+	b=PV+tXhY5GQC2JZvCYqbZ4A8oPBoaG0qFwfTxRzu2hCZeIO6ndJxqYmjiQlvkbTYBT3SCbF
+	Pnc/PhazYHiDCgFO7toLsFPyqA7/C3ByUukC2ppkUzfSi6/xSyzPuLHLLsVbLbGL8jezne
+	rl5PxZuhmDx6n/dM1Dng/ZR8EG/ha6k=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-110-A6DpxH2rOJarDmVSk27dNA-1; Wed,
+ 01 Apr 2026 11:13:19 -0400
+X-MC-Unique: A6DpxH2rOJarDmVSk27dNA-1
+X-Mimecast-MFC-AGG-ID: A6DpxH2rOJarDmVSk27dNA_1775056397
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 77BD91955DB6;
+	Wed,  1 Apr 2026 15:13:16 +0000 (UTC)
+Received: from [10.22.81.104] (unknown [10.22.81.104])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 27BFF19560AB;
+	Wed,  1 Apr 2026 15:13:12 +0000 (UTC)
+Message-ID: <81fb8d07-01c2-4fde-930a-03ea72b30978@redhat.com>
+Date: Wed, 1 Apr 2026 11:13:11 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH-next v2 2/2] ipvs: Guard access of HK_TYPE_KTHREAD cpumask
+ with RCU
+To: Frederic Weisbecker <frederic@kernel.org>
+Cc: Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>,
+ Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+ Chen Ridong <chenridong@huawei.com>, Phil Auld <pauld@redhat.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, sheviks <sheviks@gmail.com>
+References: <20260331165015.2777765-1-longman@redhat.com>
+ <20260331165015.2777765-3-longman@redhat.com>
+ <ac0VfO3XiD_F1gv-@localhost.localdomain>
+Content-Language: en-US
+From: Waiman Long <longman@redhat.com>
+In-Reply-To: <ac0VfO3XiD_F1gv-@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274151-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[verge.net.au,ssi.bg,davemloft.net,kernel.org,google.com,redhat.com,netfilter.org,strlen.de,nwl.cc,huawei.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-274152-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[longman@redhat.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pppoe.sh:url,pppoe.so:url]
-X-Rspamd-Queue-Id: 5033D37D5FB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3C88437CF2E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 30 Mar 2026 11:55:44 +0800 Qingfang Deng wrote:
-> Add ping and iperf3 tests for ppp_async.c and pppoe.c.
+On 4/1/26 8:54 AM, Frederic Weisbecker wrote:
+> Le Tue, Mar 31, 2026 at 12:50:15PM -0400, Waiman Long a écrit :
+>> The ip_vs_ctl.c file and the associated ip_vs.h file are the only places
+>> in the kernel where HK_TYPE_KTHREAD cpumask is being retrieved and used.
+>> Now that HK_TYPE_KTHREAD/HK_TYPE_DOMAIN cpumask can be changed at run
+>> time. We need to use RCU to guard access to this cpumask to avoid a
+>> potential UAF problem as the returned cpumask may be freed before it
+>> is being used.
+>>
+>> We can replace HK_TYPE_KTHREAD by HK_TYPE_DOMAIN as they are aliases
+>> of each other, but keeping the HK_TYPE_KTHREAD name can highlight the
+>> fact that it is the kthread initiated by ipvs that is being controlled.
+>>
+>> Signed-off-by: Waiman Long <longman@redhat.com>
+> Oh I see you're handling a few concerns here. But it's too late, the previous
+> patch broke bisection.
+Good point. So I have to either reverse the patch order, or just change 
+HK_TYPE_KTHREAD to HK_TYPE_DOMAIN & drop the first one.
+>
+>> ---
+>>   include/net/ip_vs.h            | 20 ++++++++++++++++----
+>>   net/netfilter/ipvs/ip_vs_ctl.c | 13 ++++++++-----
+>>   2 files changed, 24 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/include/net/ip_vs.h b/include/net/ip_vs.h
+>> index 72d325c81313..7bda92fd3fe6 100644
+>> --- a/include/net/ip_vs.h
+>> +++ b/include/net/ip_vs.h
+>> @@ -1411,7 +1411,7 @@ static inline int sysctl_run_estimation(struct netns_ipvs *ipvs)
+>>   	return ipvs->sysctl_run_estimation;
+>>   }
+>>   
+>> -static inline const struct cpumask *sysctl_est_cpulist(struct netns_ipvs *ipvs)
+>> +static inline const struct cpumask *__sysctl_est_cpulist(struct netns_ipvs *ipvs)
+>>   {
+>>   	if (ipvs->est_cpulist_valid)
+>>   		return ipvs->sysctl_est_cpulist;
+>> @@ -1529,7 +1529,7 @@ static inline int sysctl_run_estimation(struct netns_ipvs *ipvs)
+>>   	return 1;
+>>   }
+>>   
+>> -static inline const struct cpumask *sysctl_est_cpulist(struct netns_ipvs *ipvs)
+>> +static inline const struct cpumask *__sysctl_est_cpulist(struct netns_ipvs *ipvs)
+>>   {
+>>   	return housekeeping_cpumask(HK_TYPE_KTHREAD);
+>>   }
+>> @@ -1564,6 +1564,18 @@ static inline int sysctl_svc_lfactor(struct netns_ipvs *ipvs)
+>>   	return READ_ONCE(ipvs->sysctl_svc_lfactor);
+>>   }
+>>   
+>> +static inline bool sysctl_est_cpulist_empty(struct netns_ipvs *ipvs)
+>> +{
+>> +	guard(rcu)();
+>> +	return cpumask_empty(__sysctl_est_cpulist(ipvs));
+>> +}
+>> +
+>> +static inline unsigned int sysctl_est_cpulist_weight(struct netns_ipvs *ipvs)
+>> +{
+>> +	guard(rcu)();
+>> +	return cpumask_weight(__sysctl_est_cpulist(ipvs));
+>> +}
+>> +
+>>   /* IPVS core functions
+>>    * (from ip_vs_core.c)
+>>    */
+>> @@ -1895,7 +1907,7 @@ static inline void ip_vs_est_stopped_recalc(struct netns_ipvs *ipvs)
+>>   	/* Stop tasks while cpulist is empty or if disabled with flag */
+>>   	ipvs->est_stopped = !sysctl_run_estimation(ipvs) ||
+>>   			    (ipvs->est_cpulist_valid &&
+>> -			     cpumask_empty(sysctl_est_cpulist(ipvs)));
+>> +			     sysctl_est_cpulist_empty(ipvs));
+> It's not needed, if ipvs->est_cpulist_valid, sysctl_est_cpulist() doesn't
+> refer to housekeeping.
+Right.
+>>   #endif
+>>   }
+>>   
+>> @@ -1911,7 +1923,7 @@ static inline bool ip_vs_est_stopped(struct netns_ipvs *ipvs)
+>>   static inline int ip_vs_est_max_threads(struct netns_ipvs *ipvs)
+>>   {
+>>   	unsigned int limit = IPVS_EST_CPU_KTHREADS *
+>> -			     cpumask_weight(sysctl_est_cpulist(ipvs));
+>> +			     sysctl_est_cpulist_weight(ipvs);
+> That probably works for callers ip_vs_start_estimator().
+>
+> But this is not handling the core issue that related kthreads should be updated,
+> as is done in ipvs_proc_est_cpumask_set(), when HK_TYPE_DOMAIN mask changes.
 
-Hi! I added the new TARGET to netdev CI, the pppoe.sh test does not
-seem happy:
+If ipvs_proc_est_cpumask_set() has been called, the real affinity should 
+be the intersection of the given cpumask and HK_TYPE_DOMAIN cpumask. Is 
+that what you are referring to?
 
-# timeout set to 45
-# selftests: net/ppp: pppoe.sh
-# Plugin pppoe.so loaded.
-# PPPoE plugin from pppd 2.5.1
-# Send PPPOE Discovery V1T1 PADI session 0x0 length 12
-#  dst ff:ff:ff:ff:ff:ff  src b2:36:d8:0d:61:83
-#  [service-name] [host-uniq 9b 08 00 00]
-# Recv PPPOE Discovery V1T1 PADO session 0x0 length 73
-#  dst b2:36:d8:0d:61:83  src 4e:f5:66:23:13:38
-#  [AC-name vmksft-net-extra,debug-threads=on] [service-name] [AC-cookie e5 e4 8c f0 87 72 d8 3a 60 66 4e 32 e4 ee af 6f 9a 08 00 00] [host-uniq 9b 08 00 00]
-# Send PPPOE Discovery V1T1 PADR session 0x0 length 36
-#  dst 4e:f5:66:23:13:38  src b2:36:d8:0d:61:83
-#  [service-name] [host-uniq 9b 08 00 00] [AC-cookie e5 e4 8c f0 87 72 d8 3a 60 66 4e 32 e4 ee af 6f 9a 08 00 00]
-# Recv PPPOE Discovery V1T1 PADS session 0x1 length 12
-#  dst b2:36:d8:0d:61:83  src 4e:f5:66:23:13:38
-#  [service-name] [host-uniq 9b 08 00 00]
-# PPP session is 1
-# Connected to 4E:F5:66:23:13:38 via interface veth-client
-# using channel 1
-# Using interface ppp0
-# Connect: ppp0 <--> veth-client
-# sent [LCP ConfReq id=0x1 <mru 1492> <magic 0x6db8fab4>]
-# Modem hangup
-# Connection terminated.
-# Send PPPOE Discovery V1T1 PADT session 0x1 length 32
-#  dst 4e:f5:66:23:13:38  src b2:36:d8:0d:61:83
-#  [host-uniq 9b 08 00 00] [AC-cookie e5 e4 8c f0 87 72 d8 3a 60 66 4e 32 e4 ee af 6f 9a 08 00 00]
-# Sent PADT
-# ping: connect: Network is unreachable
-# iperf3: error - unable to connect to server - server may have stopped running or use a different port, firewall issue, etc.: Network is unreachable
-# TEST: PPPoE                                                         [FAIL]
-not ok 1 selftests: net/ppp: pppoe.sh # exit=1
+Cheers,
+Longman
+
+>
+>>   
+>>   	return max(1U, limit);
+>>   }
+>> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+>> index 032425025d88..e253a1ceef48 100644
+>> --- a/net/netfilter/ipvs/ip_vs_ctl.c
+>> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
+>> @@ -2338,11 +2338,14 @@ static int ipvs_proc_est_cpumask_get(const struct ctl_table *table,
+>>   
+>>   	mutex_lock(&ipvs->est_mutex);
+>>   
+>> -	if (ipvs->est_cpulist_valid)
+>> -		mask = *valp;
+>> -	else
+>> -		mask = (struct cpumask *)housekeeping_cpumask(HK_TYPE_KTHREAD);
+>> -	ret = scnprintf(buffer, size, "%*pbl\n", cpumask_pr_args(mask));
+>> +	/* HK_TYPE_KTHREAD cpumask needs RCU protection */
+>> +	scoped_guard(rcu) {
+>> +		if (ipvs->est_cpulist_valid)
+>> +			mask = *valp;
+>> +		else
+>> +			mask = (struct cpumask *)housekeeping_cpumask(HK_TYPE_KTHREAD);
+>> +		ret = scnprintf(buffer, size, "%*pbl\n", cpumask_pr_args(mask));
+>> +	}
+> And that works.
+>
+> Thanks.
+>
+>>   
+>>   	mutex_unlock(&ipvs->est_mutex);
+>>   
+>> -- 
+>> 2.53.0
+>>
+
 
