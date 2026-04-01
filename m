@@ -1,140 +1,182 @@
-Return-Path: <netdev+bounces-274161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274162-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2FcLGgRCzWkkbAYAu9opvQ
-	(envelope-from <netdev+bounces-274161-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:04:20 +0200
+	id 8M/SJhs9zWn5awYAu9opvQ
+	(envelope-from <netdev+bounces-274162-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:43:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD7CB37DA71
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:04:19 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E01A37D5A5
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 17:43:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1A88F3011BF0
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 15:38:34 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F01A630434F6
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 15:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B827F36494A;
-	Wed,  1 Apr 2026 15:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15CD3B0AD8;
+	Wed,  1 Apr 2026 15:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pTwVqz/B"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="x+7tO0Fo"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B774376BD3
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 15:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F72384242
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 15:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775057913; cv=none; b=ETB7BFEfwNZXR9h9YYOlswM9xHZ9pOryhECr3J8bSEnErIqSPFK7fQTYZUjD4oaqAp1/OebM6FNGuyNCkbMGKK5IKDH96NK0mjgknztej3Akd0QZtCZfJ4cgVf32QyU54oWVVcumnAZCYY443jt47qfz+tTJjzzW7o1SFfIZMss=
+	t=1775057975; cv=none; b=c8hopSYvnINlr5YLV29BKG1lwlMO6JxdfPEBAU64fp1luEa4hBlquZaRFg/DavvVnXI+FpdlmbtYPiX2P7lVEJi4bQnQlXyTnUQqAZ/swXvw6Pe2+2/DAWN/5LM9VkajpS4AmnqyVrfGumgX1wqGEqtv+E6mDM6m6qgNbt6uh+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775057913; c=relaxed/simple;
-	bh=PV2WUyCNxZsTEzWvaE6YE1Uo9Sqb9ySZd54noc/aseg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dVPaFVqDX6iPf4ryIYcpShGbsHayb4XDYnkRqOCpjCZ584N2u+I4K38QSpBagIViT2sukDlJ68MuLCx/P4At07ZEKqVpu53Q3shpvoaLC/WJi4+JkPyjjbUL5I3s0nvJF0+0VuCMRDWUzLJoGSxlweXqH9kV2k9cKTaa0nJ6/58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pTwVqz/B; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=dlvekUpkNUvVrcxx8wGKU4Wqnvw5G90EbFLhti+p1u0=; b=pTwVqz/Bk8fnteG1sl1TsHBsnv
-	7STf73U+sSDdDK9LGRhX07NYXNxHGE/5H3pfUq7Z1YhOf3G51cwMrS1yjBbwD/GhQEdFiL573bhPg
-	PunbpT9XzjqmT+q/kgmJDuisC+3ocUMspgUd69PggCTXzArH1m9njItfZf2qceIEbl2Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w7xeB-00ENUI-1q; Wed, 01 Apr 2026 17:38:23 +0200
-Date: Wed, 1 Apr 2026 17:38:23 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Nicolai Buchwitz <nb@tipi-net.de>, netdev@vger.kernel.org
-Subject: Re: RFC: phylink: disable PHY autonomous EEE when MAC manages LPI
-Message-ID: <ea94e96c-3e76-4c2b-a08c-43ce6decca08@lunn.ch>
-References: <d86c53213a6328b701b8aabbde5d1c83@tipi-net.de>
- <04ff15af-26be-4278-bc2a-889e7802d271@lunn.ch>
- <aczMqBNesQH-tHx0@shell.armlinux.org.uk>
- <ccb68eaaca5512d5d662326d0817bd50@tipi-net.de>
- <48abd3e3-a3ee-4e85-a3d8-20c8ceedfb77@lunn.ch>
- <ac00PIpzXPjxktzC@shell.armlinux.org.uk>
+	s=arc-20240116; t=1775057975; c=relaxed/simple;
+	bh=Mu6hKdatik9ZMJJtwZgql98CyxOVff4TkwCo1o6/JaU=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=cs6etc8dsFX29L7MOqLtR3jG0wrniKRMLD2auZKvavIbEjt3ypmBKDC2tmK3TFIHjSpFiIRD0eH/W0Ox/P+MaE8risLU01q+D4mIrSyJvxsLUzNK2SrCv5ClbX6Doj9eA9d82DrLf1T6TvViSnn6cniV2oFmB7kKxyUqF0IAXiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=x+7tO0Fo; arc=none smtp.client-ip=162.62.57.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1775057967; bh=rWJTDXtf7btF2BKyo9SNlIT4oe/5A/4pOHharg1NEmk=;
+	h=From:To:Cc:Subject:Date;
+	b=x+7tO0FoLpxjqsY/zR56hqlfGhqT1xUE3QQ1ZIZJRhfFd1loPrac2fAZqM+0CPSHX
+	 ntR1MRCBiFMbyC9/RP0Yf6xYeOhbnZgOPdNIyopq4qIwVBfku0aysnapkDmQga5Grr
+	 HgrI6n9N/L3/smfoQugDAI4vufiRItPmGMZdKcII=
+Received: from CGG7X9MGDG.corp.ebay.com ([216.113.165.51])
+	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
+	id 9C4B5ED3; Wed, 01 Apr 2026 23:39:04 +0800
+X-QQ-mid: xmsmtpt1775057944te0b7xgb9
+Message-ID: <tencent_4A3E1C339C75D359093BE4F08648AFAA6009@qq.com>
+X-QQ-XMAILINFO: Nx5J06Esz7r7L/P7JjrRw2OQ96/QQu1sjbUpPUf/S8cXgzPtZ2f3uIQXACb/wH
+	 tkBJeAETqlzjuQtZCE0raxVeHmg/LJvlmUiZDn/Boir0G+gJ3OlTulAoVCT6QO7DtdodPaajMaKg
+	 D5wGUhVZyYLbOTN7VE+nuLm1ZKHVOXANNAW6iGarRWoeVBz4qee0/yT+E3jw/G9nU7GJAT0v5E32
+	 pfk9IW+EWV24WJmHsYceb/lYWrqXPxEyxsWDl4VvY5LfqAAkX5SR9jAk+hgs13LP8UPTA/XDyAdx
+	 6bwbi0bTHLCZJcSD8kx6Z3HSiyCSUrrUCpMgj5aTq6MkZIY8DiUkhWPiM4U3kiyGYP+PHt078GP/
+	 kcKCbfIaIEiVTRdyXPQUdLkQt6TshFYagr01HY34NIZrX/X57T0NuKwAIS4iiTPUIWslSaXetyLJ
+	 ytole5zgpB7SEKs4ntKkG6BTMPkOcDu4MdJmDjib3Ow0/vg3xsJmscXucSMZ4o0PB491CNqJ2Y50
+	 QMqUv8pkNrWm5TT0TCyetLKVjPwgl3zidyxwWJI/PuNsjz6oDSPxpkMlpFswhikn9ZlmBJjCGWRL
+	 x9V0qyMckigOAn+pQxtiXVUW8+Kjwkoi+aay8v1LzP/8T7N/A8WjfzfZPN3B5fCP84SW+Geaf0Cx
+	 Bd7SMYRb+mn7WuKcnEZ/hK9tislZgKNIyjfOQHVCnzKxyzn/9xQKS2FpPex90ADwcO1gHaBe7kxR
+	 L53clAF12YSHsSfazgbcCwq3TH4LUB/2WKjmn3g3I7A0dHnlY2TlH4k8fgCnVXBMXoDnlBztkOfN
+	 HZm/vl1LlFMCV/QnM2bkenDwQUusjIZIviVjCxj0M/vYPsrI0NmVu8vYZ4z+DHOrmWBtfU03vVRy
+	 S8x5Km4lqWhFJj3CWBcAYoif1OQYHuNVd+ZOMb+1ZTalNALCNPzN4nktswa6+FWM25GCXCrpl+0O
+	 NniofjFa+TWNOHuYtshq5e8sHmwq507U7ZOcGzr+2+0uRJvymYHpKz73t4YWj+
+X-QQ-XMRINFO: Mp0Kj//9VHAxzExpfF+O8yhSrljjwrznVg==
+From: Yingnan Zhang <342144303@qq.com>
+To: horms@verge.net.au,
+	ja@ssi.bg
+Cc: pablo@netfilter.org,
+	fw@strlen.de,
+	phil@nwl.cc,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org,
+	Yingnan Zhang <342144303@qq.com>
+Subject: [PATCH net] ipvs: fix MTU check for GSO packets in tunnel mode
+Date: Wed,  1 Apr 2026 23:38:57 +0800
+X-OQ-MSGID: <20260401153857.31562-1-342144303@qq.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ac00PIpzXPjxktzC@shell.armlinux.org.uk>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	TAGGED_FROM(0.00)[bounces-274161-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[qq.com];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274162-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,qq.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[342144303@qq.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[qq.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CD7CB37DA71
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,qq.com:dkim,qq.com:email,qq.com:mid]
+X-Rspamd-Queue-Id: 3E01A37D5A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 01, 2026 at 04:05:32PM +0100, Russell King (Oracle) wrote:
-> On Wed, Apr 01, 2026 at 03:11:24PM +0200, Andrew Lunn wrote:
-> > > Thanks Russell and Andrew. You're both heading in the same direction,
-> > > so to make sure I understand correctly:
-> > > 
-> > > 1. Add a new phylib interface (separate from phy_ethtool_set_eee) to
-> > >    control PHY-autonomous EEE, e.g. phy_set_autonomous_eee(phydev,
-> > >    enable) and phy_get_autonomous_eee(phydev) to query the current
-> > >    state.
-> > 
-> > In the end, we want the MAC driver using phylib to just call the
-> > phylib methods for configuring EEE, and the MAC driver should not care
-> > if EEE is actually implemented in the PHY or the MAC. The adjust_link
-> > callback would simply not enable LPI if the PHY is doing EEE.
-> 
-> This won't work.
-> 
-> If we mask out eee.tx_lpi_enabled when calling into phylib to tell
-> phylib drivers to disable SmartEEE (that's what I'm calling it here
-> because it's easier to type)),
+Currently, IPVS skips MTU checks for GSO packets by excluding them with
+the !skb_is_gso(skb) condition. This creates problems when IPVS tunnel
+mode encapsulates GSO packets with IPIP headers.
 
-We need phylib to handle some state information. Are we doing MAC EEE
-or SmartEEE? We can then set phydev->enable_tx_lpi == True to indicate
-if the MAC should be sending LPI indications, if and only if the
-phylib knows we are doing MAC EEE and it should be enabled because the
-user said so.
+The issue manifests in two ways:
 
-then phylib records that tx_lpi_enabled
-> was false. This then makes the following in phy_check_link_status():
-> 
->                 phydev->enable_tx_lpi = phydev->eee_cfg.tx_lpi_enabled &&
->                                         phydev->eee_active;
+1. MTU violation after encapsulation:
+   When a GSO packet passes through IPVS tunnel mode, the original MTU
+   check is bypassed. After adding the IPIP tunnel header, the packet
+   size may exceed the outgoing interface MTU, leading to unexpected
+   fragmentation at the IP layer.
 
-Which will need to change to take into account the state information.
+2. Fragmentation with problematic IP IDs:
+   When net.ipv4.vs.pmtu_disc=1 and a GSO packet with multiple segments
+   is fragmented after encapsulation, each segment gets a sequentially
+   incremented IP ID (0, 1, 2, ...). This happens because:
 
-However, i think this is down the road. If the MAC driver calls
-phy_support_eee(), we should call the SmartEEE disable method of the
-PHY driver. When we add support for SmartEEE then we need this
-additional state information.
+   a) The GSO packet bypasses MTU check and gets encapsulated
+   b) At __ip_finish_output, the oversized GSO packet is split into
+      separate SKBs (one per segment), with IP IDs incrementing
+   c) Each SKB is then fragmented again based on the actual MTU
 
-	Andrew
+   This sequential IP ID allocation differs from the expected behavior
+   and can cause issues with fragment reassembly and packet tracking.
+
+Fix this by removing the GSO packet exception from the MTU check and
+properly validating GSO packets using skb_gso_validate_network_len().
+This function correctly validates whether the GSO segments will fit
+within the MTU after segmentation. If validation fails, send an ICMP
+Fragmentation Needed message to enable proper PMTU discovery.
+
+Fixes: 4cdd34084d53 ("netfilter: nf_conntrack_ipv6: improve fragmentation handling")
+Signed-off-by: Yingnan Zhang <342144303@qq.com>
+---
+ net/netfilter/ipvs/ip_vs_xmit.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
+index 3601eb86d..82f2e7a32 100644
+--- a/net/netfilter/ipvs/ip_vs_xmit.c
++++ b/net/netfilter/ipvs/ip_vs_xmit.c
+@@ -232,8 +232,15 @@ static inline bool ensure_mtu_is_adequate(struct netns_ipvs *ipvs, int skb_af,
+ 			return true;
+ 
+ 		if (unlikely(ip_hdr(skb)->frag_off & htons(IP_DF) &&
+-			     skb->len > mtu && !skb_is_gso(skb) &&
++			     skb->len > mtu &&
+ 			     !ip_vs_iph_icmp(ipvsh))) {
++			if (skb_is_gso(skb)) {
++				if (skb_gso_validate_network_len(skb, mtu))
++					return true;
++				icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED, htonl(mtu));
++				IP_VS_DBG(1, "frag needed for %pI4\n", &ip_hdr(skb)->saddr);
++				return false;
++			}
+ 			icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED,
+ 				  htonl(mtu));
+ 			IP_VS_DBG(1, "frag needed for %pI4\n",
+-- 
+2.51.0
+
 
