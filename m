@@ -1,196 +1,210 @@
-Return-Path: <netdev+bounces-274193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274180-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6IubE2JRzWmnbwYAu9opvQ
-	(envelope-from <netdev+bounces-274193-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 19:09:54 +0200
+	id uIW2AeJOzWkWbwYAu9opvQ
+	(envelope-from <netdev+bounces-274180-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:59:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EDB337E6D1
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 19:09:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8467437E4BC
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:59:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 45BFD314EC95
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 16:44:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5D6F53012EA2
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 16:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9D84779B2;
-	Wed,  1 Apr 2026 16:44:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BC7477984;
+	Wed,  1 Apr 2026 16:37:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=zabbadoz.net header.i=@zabbadoz.net header.b="M1b/lTq0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TANrpt4y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx-01.divo.sbone.de (legacy1.sbone.de [80.151.10.34])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC43472760;
-	Wed,  1 Apr 2026 16:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.151.10.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CBCC31F9A3
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 16:37:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775061885; cv=none; b=hHQBbbSfjt9Y8UUlrMmo8fC9aZynqwudBQd7tW+cm2F/SRN2HXYWYVMM3k1mcP5G9in9Qxk67wtV2vOPA65HpZ0wxSPrWDikGnMNJv6dT2P2CViIOeTEkPWueBybRlu+GQIbZAAuRSFjrdI7Fe0wG8ym1iK/e/p0HlXHipmnx+E=
+	t=1775061467; cv=none; b=tH2Elvw8/6/Ng/R7VmTZNRa6FfJb6Qsc0X6WkPbAE4Y75tqkvv4QWBr9UcxzJYBYr7y1zNNj12o9Jdb9Ts5jgQ00QlAjg1HKCUv/S+J4E3oFut0ZgEl2bs9BSvNsmTwEx01Lb7D07bZxKLsBSQSi9XXZ3wc94LfPx5t7e/xK/iM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775061885; c=relaxed/simple;
-	bh=L7QYUKOAasoCSYere7gl554w+Twajp2xHlhYrh3+o4s=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:MIME-Version:
-	 Content-Type:Message-Id; b=FryMQoaMSyFOTOgQeX0f94wSh6C0oaMJ+qHcDS9X2BMtk43tOyEpQ8F50QiUZ3b6haxNyyiS/8zbRdZ0WegiZB4NBkJV43LOJ0zYkbk1DrEsoMsuFsyOnpAaa+WG3vCJdSOZQBDOunnxLmsG9gHbfRdctJ/6hfeyMN+XEHZ6rCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lists.zabbadoz.net; spf=pass smtp.mailfrom=lists.zabbadoz.net; dkim=pass (4096-bit key) header.d=zabbadoz.net header.i=@zabbadoz.net header.b=M1b/lTq0; arc=none smtp.client-ip=80.151.10.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lists.zabbadoz.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lists.zabbadoz.net
-Received: from mail.sbone.de (mail.sbone.de [IPv6:fde9:577b:c1a9:4902:0:7404:2:1025])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by mx-01.divo.sbone.de (Postfix) with ESMTPS id D9902A64805;
-	Wed, 01 Apr 2026 16:34:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=zabbadoz.net;
-	s=20240622; t=1775061285;
-	bh=L7QYUKOAasoCSYere7gl554w+Twajp2xHlhYrh3+o4s=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=M1b/lTq05e8KeboSTmXSX7M1YW9zV+QAk2vw6i+E8gwT1jgX8ScvW5jMD08uWILnk
-	 hjmryFuzVdO6KTWrTwpfjPv+/9jNSOSN4abNHubpizWYq68eJ6NKlMeKSrY31UJQgk
-	 +OqnAPYrDptHXN77ujSvPs7GsD4F8VTJx24/Oo8A5LKasyca8kBPPajU3vwSVrGHVc
-	 7D+WzRaTjhyhYzS5R/w3aKdjjU1KHLzqZxNGWv4dHUxnI3/vwKzh09LcVOgxm4KOtg
-	 zVjCJ1qBIN+NdzlhA+f0zP8ojXW0WYy/bORGZMtTUfZOCj928GNLhLKmRXyeiJDe9+
-	 ZIP5oyrNsYdM+wZuZjZhoglbRXUmMVdHSknEYsjgXeztybOHVcfCMBfvep6X7sN0VS
-	 YaeCs+e1c0yfnHD940PJyp7+EHpZkLukoP0+pC1C+xXylHVFRo7DhKbfTgqEsS/iZU
-	 DvqAN9R7c4dRylj+uHD7onpO3y4oDDI20o3N3GTeK/RPsIBIU1wL7kcMbWQ67/NuvO
-	 cMWKiLg1ww3avLz+Rahz0w7JZqN0p+ekNxl19IVby5BBH+hq/qCEb3YOoCZClU5ARv
-	 F+UDmS+dArLaOr9eOg0CMQp9PJcn4sFG5peJB/zGrPeHzFtW76RdyLZQXsfclUyRKt
-	 XrdKNAmsvH9zIf1fV5hZILXk=
-Received: from content-filter.t4-02.sbone.de (content-filter.t4-02.sbone.de [IPv6:fde9:577b:c1a9:4902:0:7404:2:2742])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.sbone.de (Postfix) with ESMTPS id 8CD4A2D029E9;
-	Wed,  1 Apr 2026 16:35:04 +0000 (UTC)
-X-Virus-Scanned: amavisd-new at sbone.de
-Received: from mail.sbone.de ([IPv6:fde9:577b:c1a9:4902:0:7404:2:1025])
-	by content-filter.t4-02.sbone.de (content-filter.t4-02.sbone.de [IPv6:fde9:577b:c1a9:4902:0:7404:2:2742]) (amavisd-new, port 10024)
-	with ESMTP id 2IW08zsrTcK7; Wed,  1 Apr 2026 16:35:03 +0000 (UTC)
-Received: from nv.t4-02.sbone.de (nv.t4-02.sbone.de [IPv6:fde9:577b:c1a9:4902:0:7404:2:22])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.sbone.de (Postfix) with ESMTPSA id AE4862D029D8;
-	Wed,  1 Apr 2026 16:35:00 +0000 (UTC)
-Date: Wed, 1 Apr 2026 16:35:00 +0000 (UTC)
-From: "Bjoern A. Zeeb" <bzeeb-lists@lists.zabbadoz.net>
-To: David Woodhouse <dwmw2@infradead.org>
-cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-    Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-    Andrew Lunn <andrew+netdev@lunn.ch>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-    Nikolay Aleksandrov <razor@blackwall.org>, 
-    Ido Schimmel <idosch@nvidia.com>, Martin KaFai Lau <martin.lau@linux.dev>, 
-    Daniel Borkmann <daniel@iogearbox.net>, 
-    John Fastabend <john.fastabend@gmail.com>, 
-    Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>, 
-    Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-    Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-    KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, 
-    Jiri Olsa <jolsa@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-    Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-    Neal Cardwell <ncardwell@google.com>, 
-    Johannes Berg <johannes@sipsolutions.net>, 
-    Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, 
-    Phil Sutter <phil@nwl.cc>, Guillaume Nault <gnault@redhat.com>, 
-    David Woodhouse <dwmw@amazon.co.uk>, Kees Cook <kees@kernel.org>, 
-    Alexei Lazar <alazar@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
-    Paul Moore <paul@paul-moore.com>, netdev@vger.kernel.org, 
-    linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
-    oss-drivers@corigine.com, bridge@lists.linux.dev, bpf@vger.kernel.org, 
-    linux-wireless@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-    coreteam@netfilter.org, torvalds@linux-foundation.org, 
-    jon.maddog.hall@gmail.com
-Subject: Re: [PATCH 0/6] Deprecate Legacy IP
-In-Reply-To: <20260401074509.1897527-1-dwmw2@infradead.org>
-References: <20260401074509.1897527-1-dwmw2@infradead.org>
+	s=arc-20240116; t=1775061467; c=relaxed/simple;
+	bh=nuoQhq0m6dI/iXvqGriSqSvBUUReXI7pTT5nO34AccU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q63RrggHdUhoD0dZvUH0f8SIWm/F9Nkq/y8H0FUgbHA5++/IWDUIh6zQRYydfg2SxgqV7wcQH4iGfGaPznJ+u4j/vCQWLgvMd4VOoMoFYPPA4ODwkyPCk0Sc++MtsCi4wUdTIQqet1ddkqp71laFRewpD8wOf3kVsYe7t36wBKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TANrpt4y; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <360f36e2-4ff9-4707-b661-be242970811d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775061452;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ok/UIDzQfKSCTfq4WRzgEXWxUjOMvqRKwtV5Slboj8g=;
+	b=TANrpt4yphvmQ4ahVR/spQ0/y1JrAGnaBmDSYOzpAfxCl9HyAQRXQFCN4JUISRc+fEfxAj
+	VMRGzA+y+uNsD4WfICae9yi5mePINQqVTVCa5Y19KKFqK1Z9ND8twQJUhsXTFALUCsxHYb
+	BmYCgzYaVoCSyGscnzP/3zr4MLVMUbY=
+Date: Wed, 1 Apr 2026 17:37:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-Message-Id: <20260401163500.AE4862D029D8@mail.sbone.de>
+Subject: Re: [PATCH net-next v3 2/3] dpll: add frequency monitoring callback
+ ops
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+ Jonathan Corbet <corbet@lwn.net>, Michal Schmidt <mschmidt@redhat.com>,
+ Paolo Abeni <pabeni@redhat.com>, Petr Oros <poros@redhat.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Shuah Khan <skhan@linuxfoundation.org>, Simon Horman <horms@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260401091237.1071995-1-ivecera@redhat.com>
+ <20260401091237.1071995-3-ivecera@redhat.com>
+ <ccb93d19-19a9-4dd9-8ac7-e0d41dbb884d@linux.dev>
+ <CE3CDF40-CA7B-43A5-9DBD-A04FA37F4E57@redhat.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <CE3CDF40-CA7B-43A5-9DBD-A04FA37F4E57@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[zabbadoz.net,none];
-	R_DKIM_ALLOW(-0.20)[zabbadoz.net:s=20240622];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,blackwall.org,linux.dev,iogearbox.net,gmail.com,fomichev.me,sipsolutions.net,netfilter.org,strlen.de,nwl.cc,amazon.co.uk,paul-moore.com,vger.kernel.org,corigine.com,lists.linux.dev,linux-foundation.org];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[freebsdfoundation.org:url,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.sbone.de:mid,zabbadoz.net:dkim];
-	DKIM_TRACE(0.00)[zabbadoz.net:+];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274193-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bzeeb-lists@lists.zabbadoz.net,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-274180-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,lwn.net,redhat.com,microchip.com,linuxfoundation.org,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vadim.fedorenko@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 8EDB337E6D1
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 8467437E4BC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/1/26 07:44, David Woodhouse wrote:
-
-Hi David,
-
-(fun fishing this out from nntp.lore.kernel.org needing NAT64)
-
-> RFC1883, the IPv6 standard, was published in the final decade of the 1900s.
-> That's closer in time to the Apollo 11 moon landing than it was to today.
+On 01/04/2026 17:29, Ivan Vecera wrote:
+> Hi Vadim,
 > 
-> Even our esteemed Maddog has worked with computers for longer in the IPv6
-> era, than he ever did before it.
+> 1. dubna 2026 16:47:21 SELČ, Vadim Fedorenko <vadim.fedorenko@linux.dev> napsal:
+>> On 01/04/2026 10:12, Ivan Vecera wrote:
+>>> Add new callback operations for a dpll device:
+>>> - freq_monitor_get(..) - to obtain current state of frequency monitor
+>>>     feature from dpll device,
+>>> - freq_monitor_set(..) - to allow feature configuration.
+>>>
+>>> Add new callback operation for a dpll pin:
+>>> - measured_freq_get(..) - to obtain the measured frequency in mHz.
+>>>
+>>> Obtain the feature state value using the get callback and provide it to
+>>> the user if the device driver implements callbacks. The measured_freq_get
+>>> pin callback is only invoked when the frequency monitor is enabled.
+>>> The freq_monitor_get device callback is required when measured_freq_get
+>>> is provided by the driver.
+>>>
+>>> Execute the set callback upon user requests.
+>>>
+>>> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>>> ---
+>>> Changes v2 -> v3:
+>>> - Made freq_monitor_get required when measured_freq_get is present (Jakub)
+>>>
+>>> Changes v1 -> v2:
+>>> - Renamed actual-frequency to measured-frequency (Vadim)
+>>> ---
+>>>    drivers/dpll/dpll_netlink.c | 92 +++++++++++++++++++++++++++++++++++++
+>>>    include/linux/dpll.h        | 10 ++++
+>>>    2 files changed, 102 insertions(+)
+>>>
+>>> diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+>>> index 83cbd64abf5a4..576d0cd074bd4 100644
+>>> --- a/drivers/dpll/dpll_netlink.c
+>>> +++ b/drivers/dpll/dpll_netlink.c
+>>> @@ -175,6 +175,26 @@ dpll_msg_add_phase_offset_monitor(struct sk_buff *msg, struct dpll_device *dpll,
+>>>    	return 0;
+>>>    }
+>>>    +static int
+>>> +dpll_msg_add_freq_monitor(struct sk_buff *msg, struct dpll_device *dpll,
+>>> +			  struct netlink_ext_ack *extack)
+>>> +{
+>>> +	const struct dpll_device_ops *ops = dpll_device_ops(dpll);
+>>> +	enum dpll_feature_state state;
+>>> +	int ret;
+>>> +
+>>> +	if (ops->freq_monitor_set && ops->freq_monitor_get) {
+>>> +		ret = ops->freq_monitor_get(dpll, dpll_priv(dpll),
+>>> +					    &state, extack);
+>>> +		if (ret)
+>>> +			return ret;
+>>> +		if (nla_put_u32(msg, DPLL_A_FREQUENCY_MONITOR, state))
+>>> +			return -EMSGSIZE;
+>>> +	}
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>>    static int
+>>>    dpll_msg_add_phase_offset_avg_factor(struct sk_buff *msg,
+>>>    				     struct dpll_device *dpll,
+>>> @@ -400,6 +420,40 @@ static int dpll_msg_add_ffo(struct sk_buff *msg, struct dpll_pin *pin,
+>>>    			    ffo);
+>>>    }
+>>>    +static int dpll_msg_add_measured_freq(struct sk_buff *msg, struct dpll_pin *pin,
+>>> +				      struct dpll_pin_ref *ref,
+>>> +				      struct netlink_ext_ack *extack)
+>>> +{
+>>> +	const struct dpll_device_ops *dev_ops = dpll_device_ops(ref->dpll);
+>>> +	const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
+>>> +	struct dpll_device *dpll = ref->dpll;
+>>> +	enum dpll_feature_state state;
+>>> +	u64 measured_freq;
+>>> +	int ret;
+>>> +
+>>> +	if (!ops->measured_freq_get)
+>>> +		return 0;
+>>> +	if (WARN_ON(!dev_ops->freq_monitor_get))
+>>> +		return -EINVAL;
+>>
+>> I think pin registration function has to be adjusted to not allow
+>> measured_freq_get() callback if device doesn't have freq_monitor_get()
+>> callback (or both freq_monitor_{s,g}et). Then this defensive part can
+>> be completely removed.
 > 
-> Yet Linux still can't even be *built* with only IPv6 support and without
-> support for Legacy IP. This long overdue patch series fixes that, and
-> ...
+> Ok, make sense... Will move such check to pin registration function...
+> 
+> Q: with WARN_ON or without?
 
-This is very interesting; I'll be happy to read the more serious 
-discussions for 6/6 this year then :)
+Well, we have to provide reason for blocking device registration
+somehow, and the only way to this is via "WARN_ON"...
 
-That said, I've been there 15 years ago and done that for real,
-just not for Linux:
-https://freebsdfoundation.org/blog/freebsd-foundation-and-ixsystems-announce-ipv6-only-testing-versions-of-freebsd-and-pc-bsd/
+> 
+> Thanks
+> Ivan
+> 
 
-A lot of parts (e.g., PC-BSD,the IPv6-only snapshots we published 
-back then, websites) are long gone, but FreeBSD today still has NO-INET
-(as well as NO-INET6 and NO-IP) kernel configs which are regularly tested
-as part of a universe build to make sure the status-quo stayed, along with
-options to build (large parts) of userspace without IPv4 support.
-
-I have since run real IPv6-only machines :]]
-EAFNOSUPPORT and EPROTONOSUPPORT are (were) a good friend of mine.
-
-It helped a lot back then to find applications which had real trouble
-working without IPv4.
-It was fun sitting in a UKNOF presentation years later to hear about
-all these applications just working on IPv6-only and knowing why, whereas
-the presenter was unaware, and still had a 127.1 on his loopback *sigh*
-
-IPv6-only is something a lot of people will not understand and someone
-just has to do it!  It is a worthwhile goal, even if late, as you say.
-My reminder to people these days is: DNSsec is even older than IPv6.
-
-I have moved on (though would love to go back to more IPv6);
-please feel free to get in touch in case you want me to go and swap in
-some more memories from that time to share experience and help.
-
-To the global deployment of IPv6!
-/bz
 
