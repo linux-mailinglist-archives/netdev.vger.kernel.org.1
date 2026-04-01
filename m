@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-274216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274217-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cACzCYZkzWkHdAYAu9opvQ
-	(envelope-from <netdev+bounces-274216-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 20:31:34 +0200
+	id yIRPNqZkzWkHdAYAu9opvQ
+	(envelope-from <netdev+bounces-274217-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 20:32:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BDA337F4B3
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 20:31:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5626437F4D1
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 20:32:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 909C930465D8
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 18:26:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CDD21304BCDE
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 18:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71B1B3A1695;
-	Wed,  1 Apr 2026 18:26:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C2B83F2119;
+	Wed,  1 Apr 2026 18:26:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XcQ0r3o1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fGPBv+OD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D75639E6E4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B5439FCC5;
 	Wed,  1 Apr 2026 18:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775067995; cv=none; b=h48H6JWBGxausuG26Js8zGLm+ROCwsPMfiV2sIko5BerrzwNUoeSRGtnW+A2cJlJpMtydwPzTrXSilNhsjHMKCtvrvdykLXYM6TZR7HmxZ85uT1Ijk+9s8AbnSAXrtoJPcoMowYv58+txd/xzefGeLWCoAVOz01CMxaTeJ18TLQ=
+	t=1775067996; cv=none; b=mkFYqm5acGwdOylH9Z5C5AOBOYXayPqSss+OmL+v1BazKN5ISNGhS4DrgwFvd/DvPmW0RKK6kK+CgpMzxyr/O9PXGbB45YUifLWsz2gT/Z0V98MPPH692WsRULKwEB4AeYqDD72rJSyqdQGu0tBIriUoSOO0IQy1KAtJr7NVxJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775067995; c=relaxed/simple;
-	bh=4yW9gvXzOG/U2TOx5e8UdZLjYLINsc9D08raRJRQCqw=;
+	s=arc-20240116; t=1775067996; c=relaxed/simple;
+	bh=Xi+dTdDIK5HDbWpLyGuLlpABz13saNlRwVqi3YkzRKI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=meQTsmV8Xa6/Gh2c1q0UryJx83yhPUuQdBoIXfMLZ2jp5TSdc5bBUNOyCuF2TXeDhUpm1XkI+n52ws2qXwvZjjFT52LnrfGWyMLP2rHYWNgSpAr3CeedHhXt5F7JZchJyp4UdoDbZgxx0Bq06NRnvGnCw/cuySqH+arRQ4vSlEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XcQ0r3o1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0E50C2BCB2;
-	Wed,  1 Apr 2026 18:26:34 +0000 (UTC)
+	 MIME-Version; b=szNabBMGB7MTJOyZ+WAwIdt+tZqRtzCHt24C7OyojAlWJyUppt6UFNkAqn5Jt2HG0ye4IIEJWcs2eGubVYiBJcWyAIHz+8EmgT6tTYTcKBdqJETs0vh5N5ACc3wU0C7/3OhIq/6coXkF47zYVeR9ZDAiXftMdujtiulFhlltXdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fGPBv+OD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 503E2C2BCB5;
+	Wed,  1 Apr 2026 18:26:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1775067995;
-	bh=4yW9gvXzOG/U2TOx5e8UdZLjYLINsc9D08raRJRQCqw=;
+	bh=Xi+dTdDIK5HDbWpLyGuLlpABz13saNlRwVqi3YkzRKI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XcQ0r3o1G4supwXliKtZgp7OUJYCMF3e7dyE1kv/hYvVkSoopDFOfvZiwaMkJV/aI
-	 b1uhQPbpqB7rj4K7K0MNOznypQaXIDUnZe9TJDXW6nEv/G+bP1RV3sdikQ9CfUMMT8
-	 iGVY78V+4oOG07gaoz4DiXRJLTYPNKd6YscLzJZTNeLux12ytb8h9BilNpakf5OmVo
-	 pT5O9s1htM2STbI1YDTfTnuqbSXhQ+F52/3bXuBWg8u0Hc5Y9rmE80+pUR4Q3Xunxb
-	 PAWhWssyFrkxh5jCbm9A1GPoWL/XWu/2YHCtKhsnq+fkXvQm/p9vXIJPxH8idmu2mn
-	 ujYacSrqnZerw==
+	b=fGPBv+ODnfHd1bCIignZcrqw6q9YpphjHZdraE8gC3fcK28wfYBjw4fhUNf5Uatra
+	 I7wJbIqaj7OERH+U7MyDW2CoOVyylfslVe3qu9rf66Ss5VVdTyBjzHgSg5WEvf6B9P
+	 bKyTzYm6BhKfwFNt/dNWWi+4Eig6h68wloewuADmboo4A7WgO2NHSYNBqLVd50R24V
+	 qMUeRujg7bPErVbo6eTfdYlC9uunxx5l9MUFRCCS0744XRdLl1769adsJKTg3V1v4y
+	 lsCZ5uDeLmfIkyeakJc50HbhmJchQfs9vk/CgxaFV1jjMG2vG7BNpbuzGOf4kGkcPL
+	 6FbdzHnTZFgsQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: netdev@vger.kernel.org,
 	richardbgobert@gmail.com,
 	linux-kselftest@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 4/6] selftests: drv-net: gro: prepare for ip6ip6 support
-Date: Wed,  1 Apr 2026 11:26:23 -0700
-Message-ID: <20260401182625.372605-5-kuba@kernel.org>
+Subject: [PATCH net-next 5/6] selftests: drv-net: gro: test ip6ip6
+Date: Wed,  1 Apr 2026 11:26:24 -0700
+Message-ID: <20260401182625.372605-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260401182625.372605-1-kuba@kernel.org>
 References: <20260401182625.372605-1-kuba@kernel.org>
@@ -78,14 +78,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,nvidia.com,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-274216-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274217-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -98,172 +98,178 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7BDA337F4B3
+X-Rspamd-Queue-Id: 5626437F4D1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Try to use already calculated offsets and not depend on the ipip
-flag as much. This patch should not change any functionality,
-it's just a cleanup to make ip6ip6 support easier.
+We explicitly test ipip encap. Let's add ip6ip6, too. Having
+just ipip seems like favoring IPv4 which we should not do :)
+Testing all combinations is left for future work, not sure
+it's actually worth it.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/testing/selftests/net/lib/gro.c | 73 +++++++++++++++------------
- 1 file changed, 41 insertions(+), 32 deletions(-)
+ tools/testing/selftests/net/lib/gro.c      | 29 ++++++++++++++++------
+ tools/testing/selftests/drivers/net/gro.py | 19 ++++++++------
+ 2 files changed, 34 insertions(+), 14 deletions(-)
 
 diff --git a/tools/testing/selftests/net/lib/gro.c b/tools/testing/selftests/net/lib/gro.c
-index f05398c18e0c..57080ecc3df8 100644
+index 57080ecc3df8..762e88932ed2 100644
 --- a/tools/testing/selftests/net/lib/gro.c
 +++ b/tools/testing/selftests/net/lib/gro.c
-@@ -139,6 +139,14 @@ static bool order_check;
+@@ -94,11 +94,14 @@
+ #define START_SEQ 100
+ #define START_ACK 100
+ #define ETH_P_NONE 0
+-#define TOTAL_HDR_LEN (ETH_HLEN + sizeof(struct ipv6hdr) + sizeof(struct tcphdr))
++#define TOTAL_HDR_LEN \
++	(ETH_HLEN + sizeof(struct ipv6hdr) * 2 + sizeof(struct tcphdr))
+ #define MSS (4096 - sizeof(struct tcphdr) - sizeof(struct ipv6hdr))
+-#define MAX_PAYLOAD (IP_MAXPACKET - sizeof(struct tcphdr) - sizeof(struct ipv6hdr))
++#define MAX_PAYLOAD \
++	(IP_MAXPACKET - sizeof(struct tcphdr) - sizeof(struct ipv6hdr))
+ #define NUM_LARGE_PKT (MAX_PAYLOAD / MSS)
+-#define MAX_HDR_LEN (ETH_HLEN + sizeof(struct ipv6hdr) + sizeof(struct tcphdr))
++#define MAX_HDR_LEN \
++	(ETH_HLEN + sizeof(struct ipv6hdr) * 2 + sizeof(struct tcphdr))
+ #define MIN_EXTHDR_SIZE 8
+ #define EXT_PAYLOAD_1 "\x00\x00\x00\x00\x00\x00"
+ #define EXT_PAYLOAD_2 "\x11\x11\x11\x11\x11\x11"
+@@ -131,6 +134,7 @@ static int tcp_offset = -1;
+ static int total_hdr_len = -1;
+ static int ethhdr_proto = -1;
+ static bool ipip;
++static bool ip6ip6;
+ static uint64_t txtime_ns;
+ static int num_flows = 4;
+ static bool order_check;
+@@ -1113,7 +1117,8 @@ static void check_recv_pkts(int fd, int *correct_payload,
  
- #define TXTIME_DELAY_MS 5
+ 		if (iph->version == 4)
+ 			ip_ext_len = (iph->ihl - 5) * 4;
+-		else if (ip6h->version == 6 && ip6h->nexthdr != IPPROTO_TCP)
++		else if (ip6h->version == 6 && !ip6ip6 &&
++			 ip6h->nexthdr != IPPROTO_TCP)
+ 			ip_ext_len = MIN_EXTHDR_SIZE;
  
-+/* Max TCP payload that GRO will coalesce. The outer header overhead
-+ * varies by encapsulation, reducing the effective max payload.
-+ */
-+static int max_payload(void)
-+{
-+	return IP_MAXPACKET - (total_hdr_len - ETH_HLEN);
-+}
-+
- static void vlog(const char *fmt, ...)
- {
- 	va_list args;
-@@ -156,15 +164,13 @@ static void setup_sock_filter(int fd)
- 	const int ethproto_off = offsetof(struct ethhdr, h_proto);
- 	int optlen = 0;
- 	int ipproto_off, opt_ipproto_off;
--	int next_off;
+ 		tcph = (struct tcphdr *)(buffer + tcp_offset + ip_ext_len);
+@@ -1175,7 +1180,8 @@ static void check_capacity_pkts(int fd)
  
--	if (ipip)
--		next_off = sizeof(struct iphdr) + offsetof(struct iphdr, protocol);
--	else if (proto == PF_INET)
--		next_off = offsetof(struct iphdr, protocol);
-+	if (proto == PF_INET)
-+		ipproto_off = tcp_offset - sizeof(struct iphdr) +
-+			      offsetof(struct iphdr, protocol);
- 	else
--		next_off = offsetof(struct ipv6hdr, nexthdr);
--	ipproto_off = ETH_HLEN + next_off;
-+		ipproto_off = tcp_offset - sizeof(struct ipv6hdr) +
-+			      offsetof(struct ipv6hdr, nexthdr);
+ 		if (iph->version == 4)
+ 			ip_ext_len = (iph->ihl - 5) * 4;
+-		else if (ip6h->version == 6 && ip6h->nexthdr != IPPROTO_TCP)
++		else if (ip6h->version == 6 && !ip6ip6 &&
++			 ip6h->nexthdr != IPPROTO_TCP)
+ 			ip_ext_len = MIN_EXTHDR_SIZE;
  
- 	/* Overridden later if exthdrs are used: */
- 	opt_ipproto_off = ipproto_off;
-@@ -381,19 +387,23 @@ static void write_packet(int fd, char *buf, int len, struct sockaddr_ll *daddr)
- static void create_packet(void *buf, int seq_offset, int ack_offset,
- 			  int payload_len, int fin)
- {
-+	int ip_hdr_len = (proto == PF_INET) ?
-+			 sizeof(struct iphdr) : sizeof(struct ipv6hdr);
-+	int inner_ip_off = tcp_offset - ip_hdr_len;
-+
- 	memset(buf, 0, total_hdr_len);
- 	memset(buf + total_hdr_len, 'a', payload_len);
+ 		tcph = (struct tcphdr *)(buffer + tcp_offset + ip_ext_len);
+@@ -1688,6 +1694,7 @@ static void parse_args(int argc, char **argv)
+ 		{ "ipv4", no_argument, NULL, '4' },
+ 		{ "ipv6", no_argument, NULL, '6' },
+ 		{ "ipip", no_argument, NULL, 'e' },
++		{ "ip6ip6", no_argument, NULL, 'E' },
+ 		{ "num-flows", required_argument, NULL, 'n' },
+ 		{ "rx", no_argument, NULL, 'r' },
+ 		{ "saddr", required_argument, NULL, 's' },
+@@ -1699,7 +1706,7 @@ static void parse_args(int argc, char **argv)
+ 	};
+ 	int c;
  
- 	fill_transportlayer(buf + tcp_offset, seq_offset, ack_offset,
- 			    payload_len, fin);
- 
--	if (ipip) {
--		fill_networklayer(buf + ETH_HLEN, payload_len + sizeof(struct iphdr),
--				  IPPROTO_IPIP);
--		fill_networklayer(buf + ETH_HLEN + sizeof(struct iphdr),
--				  payload_len, IPPROTO_TCP);
--	} else {
--		fill_networklayer(buf + ETH_HLEN, payload_len, IPPROTO_TCP);
-+	fill_networklayer(buf + inner_ip_off, payload_len, IPPROTO_TCP);
-+	if (inner_ip_off > ETH_HLEN) {
-+		int encap_proto = (proto == PF_INET) ?
-+				  IPPROTO_IPIP : IPPROTO_IPV6;
-+
-+		fill_networklayer(buf + ETH_HLEN,
-+				  payload_len + ip_hdr_len, encap_proto);
- 	}
- 
- 	fill_datalinklayer(buf);
-@@ -547,8 +557,7 @@ static void send_ack(int fd, struct sockaddr_ll *daddr)
- static void recompute_packet(char *buf, char *no_ext, int extlen)
- {
- 	struct tcphdr *tcphdr = (struct tcphdr *)(buf + tcp_offset);
--	struct ipv6hdr *ip6h = (struct ipv6hdr *)(buf + ETH_HLEN);
--	struct iphdr *iph = (struct iphdr *)(buf + ETH_HLEN);
-+	int off;
- 
- 	memmove(buf, no_ext, total_hdr_len);
- 	memmove(buf + total_hdr_len + extlen,
-@@ -558,18 +567,22 @@ static void recompute_packet(char *buf, char *no_ext, int extlen)
- 	tcphdr->check = 0;
- 	tcphdr->check = tcp_checksum(tcphdr, PAYLOAD_LEN + extlen);
- 	if (proto == PF_INET) {
--		iph->tot_len = htons(ntohs(iph->tot_len) + extlen);
--		iph->check = 0;
--		iph->check = checksum_fold(iph, sizeof(struct iphdr), 0);
-+		for (off = ETH_HLEN; off < tcp_offset;
-+		     off += sizeof(struct iphdr)) {
-+			struct iphdr *iph = (struct iphdr *)(buf + off);
- 
--		if (ipip) {
--			iph += 1;
- 			iph->tot_len = htons(ntohs(iph->tot_len) + extlen);
- 			iph->check = 0;
- 			iph->check = checksum_fold(iph, sizeof(struct iphdr), 0);
- 		}
+-	while ((c = getopt_long(argc, argv, "46d:D:ei:n:rs:S:t:ov", opts, NULL)) != -1) {
++	while ((c = getopt_long(argc, argv, "46d:D:eEi:n:rs:S:t:ov", opts, NULL)) != -1) {
+ 		switch (c) {
+ 		case '4':
+ 			proto = PF_INET;
+@@ -1714,6 +1721,11 @@ static void parse_args(int argc, char **argv)
+ 			proto = PF_INET;
+ 			ethhdr_proto = htons(ETH_P_IP);
+ 			break;
++		case 'E':
++			ip6ip6 = true;
++			proto = PF_INET6;
++			ethhdr_proto = htons(ETH_P_IPV6);
++			break;
+ 		case 'd':
+ 			addr4_dst = addr6_dst = optarg;
+ 			break;
+@@ -1758,12 +1770,15 @@ int main(int argc, char **argv)
+ 	if (ipip) {
+ 		tcp_offset = ETH_HLEN + sizeof(struct iphdr) * 2;
+ 		total_hdr_len = tcp_offset + sizeof(struct tcphdr);
++	} else if (ip6ip6) {
++		tcp_offset = ETH_HLEN + sizeof(struct ipv6hdr) * 2;
++		total_hdr_len = tcp_offset + sizeof(struct tcphdr);
+ 	} else if (proto == PF_INET) {
+ 		tcp_offset = ETH_HLEN + sizeof(struct iphdr);
+ 		total_hdr_len = tcp_offset + sizeof(struct tcphdr);
+ 	} else if (proto == PF_INET6) {
+ 		tcp_offset = ETH_HLEN + sizeof(struct ipv6hdr);
+-		total_hdr_len = MAX_HDR_LEN;
++		total_hdr_len = tcp_offset + sizeof(struct tcphdr);
  	} else {
--		ip6h->payload_len = htons(ntohs(ip6h->payload_len) + extlen);
-+		for (off = ETH_HLEN; off < tcp_offset;
-+		     off += sizeof(struct ipv6hdr)) {
-+			struct ipv6hdr *ip6h = (struct ipv6hdr *)(buf + off);
-+
-+			ip6h->payload_len =
-+				htons(ntohs(ip6h->payload_len) + extlen);
-+		}
+ 		error(1, 0, "Protocol family is not ipv4 or ipv6");
  	}
- }
+diff --git a/tools/testing/selftests/drivers/net/gro.py b/tools/testing/selftests/drivers/net/gro.py
+index 73436d16b40d..68b7b29ea2ee 100755
+--- a/tools/testing/selftests/drivers/net/gro.py
++++ b/tools/testing/selftests/drivers/net/gro.py
+@@ -213,7 +213,7 @@ def _run_gro_bin(cfg, test_name, protocol=None, num_flows=None,
+     return rx_proc
  
-@@ -1425,14 +1438,12 @@ static void gro_sender(void)
  
- 	/* large sub-tests */
- 	} else if (strcmp(testname, "large_max") == 0) {
--		int offset = (proto == PF_INET && !ipip) ? 20 : 0;
--		int remainder = (MAX_PAYLOAD + offset) % MSS;
-+		int remainder = max_payload() % MSS;
+-def _setup(cfg, mode, test_name):
++def _setup(cfg, mode, test_name, protocol):
+     """ Setup hardware loopback mode for GRO testing. """
  
- 		send_large(txfd, &daddr, remainder);
- 		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
- 	} else if (strcmp(testname, "large_rem") == 0) {
--		int offset = (proto == PF_INET && !ipip) ? 20 : 0;
--		int remainder = (MAX_PAYLOAD + offset) % MSS;
-+		int remainder = max_payload() % MSS;
+     if not hasattr(cfg, "bin_remote"):
+@@ -225,10 +225,15 @@ def _run_gro_bin(cfg, test_name, protocol=None, num_flows=None,
+         cfg.remote_feat = ethtool(f"-k {cfg.remote_ifname}",
+                                   host=cfg.remote, json=True)[0]
  
- 		send_large(txfd, &daddr, remainder + 1);
- 		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
-@@ -1636,19 +1647,17 @@ static void gro_receiver(void)
+-    # "large_*" tests need at least 4k MTU
++    # "large_*" tests need at least 4k MTU, bump more for encapsulation
+     if test_name.startswith("large_"):
+-        _set_mtu_restore(cfg.dev, 4096, None)
+-        _set_mtu_restore(cfg.remote_dev, 4096, cfg.remote)
++        mtu = 4096
++        if protocol == "ipip":
++            mtu += 20  # outer IPv4 header
++        elif protocol == "ip6ip6":
++            mtu += 40  # outer IPv6 header
++        _set_mtu_restore(cfg.dev, mtu, None)
++        _set_mtu_restore(cfg.remote_dev, mtu, cfg.remote)
  
- 	/* large sub-tests */
- 	} else if (strcmp(testname, "large_max") == 0) {
--		int offset = (proto == PF_INET && !ipip) ? 20 : 0;
--		int remainder = (MAX_PAYLOAD + offset) % MSS;
-+		int remainder = max_payload() % MSS;
+     if mode == "sw":
+         flush_path = f"/sys/class/net/{cfg.ifname}/gro_flush_timeout"
+@@ -313,7 +318,7 @@ def _run_gro_bin(cfg, test_name, protocol=None, num_flows=None,
+     ]
  
--		correct_payload[0] = (MAX_PAYLOAD + offset);
-+		correct_payload[0] = max_payload();
- 		correct_payload[1] = remainder;
- 		printf("Shouldn't coalesce if exceed IP max pkt size: ");
- 		check_recv_pkts(rxfd, correct_payload, 2);
- 	} else if (strcmp(testname, "large_rem") == 0) {
--		int offset = (proto == PF_INET && !ipip) ? 20 : 0;
--		int remainder = (MAX_PAYLOAD + offset) % MSS;
-+		int remainder = max_payload() % MSS;
+     for mode in ["sw", "hw", "lro"]:
+-        for protocol in ["ipv4", "ipv6", "ipip"]:
++        for protocol in ["ipv4", "ipv6", "ipip", "ip6ip6"]:
+             for test_name in common_tests:
+                 yield mode, protocol, test_name
  
- 		/* last segment sent individually, doesn't start new segment */
--		correct_payload[0] = (MAX_PAYLOAD + offset) - remainder;
-+		correct_payload[0] = max_payload() - remainder;
- 		correct_payload[1] = remainder + 1;
- 		correct_payload[2] = remainder + 1;
- 		printf("last segment sent individually: ");
+@@ -332,7 +337,7 @@ def _run_gro_bin(cfg, test_name, protocol=None, num_flows=None,
+     ipver = "6" if protocol[-1] == "6" else "4"
+     cfg.require_ipver(ipver)
+ 
+-    _setup(cfg, mode, test_name)
++    _setup(cfg, mode, test_name, protocol)
+ 
+     # Each test is run 6 times to deflake, because given the receive timing,
+     # not all packets that should coalesce will be considered in the same flow
+@@ -382,7 +387,7 @@ def _run_gro_bin(cfg, test_name, protocol=None, num_flows=None,
+     """
+     max_retries = 3
+ 
+-    _setup(cfg, mode, "capacity")
++    _setup(cfg, mode, "capacity", None)
+     queue_id = setup_func(cfg)
+ 
+     num_flows = 8
 -- 
 2.53.0
 
