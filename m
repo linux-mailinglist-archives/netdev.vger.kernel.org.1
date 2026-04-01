@@ -1,220 +1,225 @@
-Return-Path: <netdev+bounces-273882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273883-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CNKdBb+dzGkDUgYAu9opvQ
-	(envelope-from <netdev+bounces-273882-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 06:23:27 +0200
+	id YFJUEv+czGkaUgYAu9opvQ
+	(envelope-from <netdev+bounces-273883-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 06:20:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AD1D374A2E
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 06:23:26 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8BAE3749DA
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 06:20:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EB62F3088328
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 04:19:48 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 56DD4302EE9C
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 04:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC041371870;
-	Wed,  1 Apr 2026 04:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB6636E484;
+	Wed,  1 Apr 2026 04:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jgLk86pz"
+	dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b="FiRIGAFb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49688368975
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 04:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775017187; cv=none; b=qcZinezyvACVrYrAfJ96SiaaOmy5Xecz9AJYamgb8kOY4OcYMzakDs3bHWdy89bJ39elTdjfpTxskKo+FuGco3MVUpfrXU3RRinGCfdeHLJhlNFAZGm1w8aXF+qjV2EtEYUIgM9nXNvR8G7YqQK2kjSt6AuVEs9ftIAtKvT1Y5I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775017187; c=relaxed/simple;
-	bh=GAdIAHgb5u8TBTPtWedEhpVmApFhU9W97TdtUCLjE8k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y5ba6BOPlGnFTv+TqnZVo8cBs4G1P7kL+UR8lFoELChUEq5H/04WKxvediY/SQ0whnMhLvWbJeTJIZ2NEEjj8a5OTHSqPznGISFCqHNAJq7BK6KHCWyu3lT8LhUc8TgN77iIph8v4TMYNw5TZzCEfaC16abTNRAAROVPHPF1I6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jgLk86pz; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7d4be94eeacso6096166a34.2
-        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 21:19:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2772DBF76
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 04:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.181
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775017213; cv=pass; b=RLg03O86WNSzSMSSs+cj+OMpjVoGnWXnt+bs5abLPhZwFJrwtj90qLR0GJPPOlTfV7iPW6vlo46Z2eZSmY4Bce4ITpWtGqHtU1WZUVsZ1t0gCGrtbWBQLaRF9HFUZmw1qemzDWwIJwlLl1GMCAF1oWvJser6326wLOc+w6z6OSQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775017213; c=relaxed/simple;
+	bh=hSIlCijvb+O9fAJX4JT7gS/ZykG42ddR4OkZF238iZA=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=FqtqryeHQqGF2GQJ7aMXmHOaOCxmSxVYN1GQK6pOn55ZfAQUw3YmSem48COTHmvJEROPBYBjR8kFzbn2ryvJZ+UCzaERFR7Gl0//8X7wHFpwqXItQBHKgMuUQgZFgb3IYrq3Qe59OZgE+vWUd8iXGvh8sWVmiGT1UHaemAzodEc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com; spf=pass smtp.mailfrom=allelesecurity.com; dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b=FiRIGAFb; arc=pass smtp.client-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=allelesecurity.com
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-56cc6fe8815so2637839e0c.1
+        for <netdev@vger.kernel.org>; Tue, 31 Mar 2026 21:20:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775017211; cv=none;
+        d=google.com; s=arc-20240605;
+        b=APW2gmNDjjoNRV1PajCzOvKFLkZPqLf6sXqIKjfx0dV8AfKNGR8yoURRinNRww0Bzb
+         2wAC0UjFgF7y6VFmOJv/H5h8yW+iXf3OTzIj6NgvfCrAwMdugJUWw48P5MBwNO4p4Png
+         S/NVu6wIqqlMRFdGxAhrmon300T+9zPQWkLR7EoAaVnL9iTE81+gRroJbvZjxaVJfJjz
+         QB2TDOws9iAt6b5Ol7dJqLplklJSHtAdlW6+opuvgEDPkjBMey3MvLuFbTWAfgn6zlUN
+         q8jQtk3/lo7GSal96UN1GBYghUnFOVy2pPS0n/A0fjrlC1+87ABNu+DgGlCCnFTENRv3
+         opgA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=lggviiDhO1ulOczVkg1BAAuiMur/dnkCZ+TpfZ9eNBo=;
+        fh=7CWqjkp/EgjLIOP5idJa3i9xhiN9s2dmmbshbq5GNpQ=;
+        b=STj3G08mY50ivd+Q0OGBsEJH9jUNE1scTLuCiL56zCI9A40oNRXeCslKYJ4qCkzdxW
+         UCmdtUOhkG63CQsQ8lffylpOMBfm40kPZxZqW3CbWVv58U/1ZsvvQpSHNfjap4XMnKBR
+         z0+JveQIZn2Wsws0fqAkxS5mb1XUXvJLCSHlCmqUz9s2fWD8TTI7qxi0UbLTDjdKWSVr
+         lEiHYDtKx3OO0LHqzw/DSntNPSPOT9IdF/Zparw/xkkkSv6BG3IgDM5WYC5uNznnP1SI
+         Sw2kEGYqUtKSRm18akFjE7bIx+8D47W/hd+z3+R7T7EOwAaSBBubSIjwLju2kH0ZGnAP
+         fb1Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775017185; x=1775621985; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p8Gs/LCy7pdaKThZ7lAOXGPZaybDiCKVdDXO7zMbjMs=;
-        b=jgLk86pzUrhwLsvuIoofPtJtdzC9jkp4q2yu3+b+aD6v9CY80WufZD792fupnei2r7
-         tqjNCBl5Ulp5cxpPneOUj1FYB3oOaItKxVBatGJsc6lInjVkADEvab5R85HjQAi81png
-         WrMdFJb4FwdlxcaAoKGG7bJkcCCJKkJQGc/HaaiCC7UKViaaKSP3kXzTzXLnrZDOH7S7
-         zDMMNPo486tkY9NrGNmCCiee1Yrp/CPxo9KtA99sV3Q8SdR3tA2TYIJBYkcQrvIn3pPh
-         1JymKGhRzo6IZtdJxLtziS/2RD15DKuMmR+0T6NMWNY6p5DzV0ry4wGS4FLqM8sPl0P2
-         J5OQ==
+        d=allelesecurity.com; s=google; t=1775017211; x=1775622011; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lggviiDhO1ulOczVkg1BAAuiMur/dnkCZ+TpfZ9eNBo=;
+        b=FiRIGAFbgPdsAtjKvVsDaDv8XjUr3O2yO2vg1mrG8wDL29usRCUtvMAELDwdn/yMeP
+         ATk1Q9DS7ENGteC49ZvnRlAOeVtVhgAjTGJFbejV3NGeg4B+v57N2AWdU41z+mSX1kdC
+         fUnb7kN079mYEqHAcjf1k81u4oc6djcjV3XTk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775017185; x=1775621985;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=p8Gs/LCy7pdaKThZ7lAOXGPZaybDiCKVdDXO7zMbjMs=;
-        b=XfHxIEbmAKXoyBrtXzLk9P/mqUBiEdmWQ5FTfzXrX6v6WhvpmgY4Nht+rPedu/Kx1G
-         YDGZ2XNOULY5iTuYaXoyO9ni4PHBgPtCuoyJjNixhJpGhoxNCcI7VIyHft+s1zA9GTYe
-         KqP4Ir3LvscwR0QziWxXkwiV9rrk4yzVQpoC7An76Lavb8IEG+Z7aFLY7umBxNFSu8te
-         7qICNutN6DsgO8dUFs3e1TpLAdrJp1rDBx19NfcWFUl1L55TXIyewZAk2m0VXFzF+scI
-         BfcTxFc5YSnf9L9RPLd/dHs/HsjSA+FY4N94kUy/gzc7oH9Ee5Xu/Mcatg7tmpPouDNo
-         z9ig==
-X-Forwarded-Encrypted: i=1; AJvYcCVYL7pDlmFzy0ki5TvJq0Ecw4H24ZyCq0nah6sdft37ehLRYA55sx3ZQtllACLrRzZLuA+HnF0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkIsIvnrfE9IJY36ljy3BLAJAPVNfJzeFAo7k1whmhs1fD81ca
-	2ieO+MRU+TIu67+4rfU4hbRilNhTDGxnAWv6qfmeBS5XvXA2w4gAhpft
-X-Gm-Gg: ATEYQzxfgRBCYaZmMjBgY0+sDl87yQ8ATBPV1pwTShcOlfwbMrf5OAv/NPwbvKMftUb
-	INOgwg2k2l/5udKUldFV38uMV890EQgk1q7eBxOhxzgRirEOIvY37wRsRG6s1NQM2YChzUFREW7
-	rJUvcyCrGq5sQ03fd3qNQ2+Bur7V4pTpF1GjU1+mMd81EVxyFl82Ea2cCWppCm7CzLZiPka8/qb
-	bjdzJPEQvrNV/nVUi+xXRLGPn6rrBoFrSRW+bnEdai1ILVrH6nvXtmCnu+Zt5pBahNb3UJVv/6z
-	VaYGFDbsnxGGbxuJBfKUY2Zj7Auyr9INN0M1157k8PdZLm4R5l8ANXFCcxR8Ip0Z3e7Rn8xqdJV
-	OuEJPgdIhPOLE29T4jTx3uKZq7yh0p5SlmhMJkz5hDcIf3vchyhhpqj7V+h4iI1BO3Dl2ULKNCS
-	byF13sCHIcnZVvsGE99loH5P9hGeAB2M1ZFEA/uyAuY7CAVO5mN7NZ3idt6hw=
-X-Received: by 2002:a05:6830:3709:b0:7c7:69c8:2d2 with SMTP id 46e09a7af769-7db9925b999mr1505891a34.13.1775017185265;
-        Tue, 31 Mar 2026 21:19:45 -0700 (PDT)
-Received: from localhost (static-23-234-115-121.cust.tzulo.com. [23.234.115.121])
-        by smtp.gmail.com with UTF8SMTPSA id 46e09a7af769-7da0a7b5b41sm9925868a34.15.2026.03.31.21.19.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Mar 2026 21:19:44 -0700 (PDT)
-From: Sam Edwards <cfsworks@gmail.com>
-X-Google-Original-From: Sam Edwards <CFSworks@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Baruch Siach <baruch@tkos.co.il>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Sam Edwards <CFSworks@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net v4 2/2] net: stmmac: Prevent indefinite RX stall on buffer exhaustion
-Date: Tue, 31 Mar 2026 21:19:29 -0700
-Message-ID: <20260401041929.12392-3-CFSworks@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260401041929.12392-1-CFSworks@gmail.com>
-References: <20260401041929.12392-1-CFSworks@gmail.com>
+        d=1e100.net; s=20251104; t=1775017211; x=1775622011;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lggviiDhO1ulOczVkg1BAAuiMur/dnkCZ+TpfZ9eNBo=;
+        b=rw8GYsb0PWKaan9Zv+0itmKzhLMXJzbPWpOAYEPrl0/6sdw+rMkN5oZ6fSzcjjIOFR
+         /HrNyCfwpkoEwwFIwOvXKdvmL6t5CHktpYEsyJKdiTCpDoS9BNwrh44CbM31QzIRBHys
+         RUl8+2E3/+bg505gIfUFj34qpT2xtlAmcns+w0cef0Ug/QIwuAZfDHabVntAvWBcFTVJ
+         R40v2l3eRpdNdfru3gf8Xfgh2G3n8r2pGu8GDNItuU+6raTCNp7ozpZ/59bZGznVviiw
+         nxaO0Gkxz30p9XQrc+aS1wEayeb14w8xDWJWAjv4qZcCAh9UuM31uWH4/R48YrzaG3kF
+         1npg==
+X-Gm-Message-State: AOJu0Yx9/qlh/b2dgtfSNx7TosNuvuyzLI4CUahH3xkc9Ua3qMluIlB9
+	1oyJlpZ7Tsa32CL/XY2tcP7K6+/R8DWg/mO4/xuX6b5MhJSEBZRpXR9dscaMSFSnG0Fc1kE1XxA
+	VN1M73BFIW8I6iCTH1rDZh1YRqo4yRUmD5306LChTrCQUkTFkjTPfupA=
+X-Gm-Gg: ATEYQzzYUx9qAhNENHjjHTvbvPJnbmWWw0mTh/5fvIKXu4ohX3m6sGzn15gImd5nF53
+	G/zjqCjSc4BGbHVrMrIZr8Fq67dJrzgzFsnfnZkv7bnqD+s+fACplfMiB1PzvPT9TGTKJjBRNZj
+	0EGrubr2zZhAMJLms0vrcUlC95iA2mL+JFzkfMtL9q9bB+oPyVYREm3MDFuQcahZdimGuzOBF3T
+	mtnFWS0DBVZpDhwiy9L28DrLjPVzKzqRUqYFmglNXh46LK2iGwe4t+sqq3EUG6H5d/d0wigO1fK
+	L+BiULne
+X-Received: by 2002:a05:6122:3982:b0:56b:960a:a4b7 with SMTP id
+ 71dfb90a1353d-56d8a831824mr928799e0c.5.1775017210759; Tue, 31 Mar 2026
+ 21:20:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+From: Anderson Nascimento <anderson@allelesecurity.com>
+Date: Wed, 1 Apr 2026 01:19:59 -0300
+X-Gm-Features: AQROBzAoYMFr5WQUPEwtX5FedLN7yAQB3veEuX2tn6McmyHFKyrAriM5i67pGXs
+Message-ID: <CAPhRvkyFrKO3O=D9YZoWWVwykCZ1-fXkzA9NyaJ8aaX9b-pcXw@mail.gmail.com>
+Subject: [BUG] rxrpc: Client connection leak and BUG() call during kernel IO
+ thread exit
+To: netdev@vger.kernel.org
+Cc: Anderson Nascimento <anderson@allelesecurity.com>, dhowells@redhat.com, 
+	Marc Dionne <marc.dionne@auristor.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
+	Jeffrey Altman <jaltman@auristor.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[allelesecurity.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[allelesecurity.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-273882-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FREEMAIL_CC(0.00)[gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,renesas.com,nxp.com,tkos.co.il,st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cfsworks@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-273883-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[allelesecurity.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[anderson@allelesecurity.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6AD1D374A2E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E8BAE3749DA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The stmmac driver handles interrupts in the usual NAPI way: an interrupt
-arrives, the NAPI instance is scheduled and interrupts are masked, and
-the actual work occurs in the NAPI polling function. Once no further
-work remains, interrupts are unmasked and the NAPI instance is put to
-sleep to await a future interrupt. In the receive case, the MAC only
-sends the interrupt when a DMA operation completes; thus the driver must
-make sure a usable RX DMA descriptor exists before expecting a future
-interrupt.
+Hello,
 
-The main receive loop in stmmac_rx() exits under one of 3 conditions:
-1) It encounters a DMA descriptor with OWN=1, indicating that no further
-   pending data exists. The MAC will use this descriptor for the next
-   RX DMA operation, so the driver can expect a future interrupt.
-2) It exhausts the NAPI budget. In this case, the driver doesn't know
-   whether the MAC has any usable DMA descriptors. But when the driver
-   consumes its full budget, that signals NAPI to keep polling, so the
-   question is moot.
-3) It runs out of (non-dirty) descriptors in the RX ring. In this case,
-   the MAC will only have a usable descriptor if stmmac_rx_refill()
-   succeeds (at least partially).
+I have identified a reliable way to trigger a BUG() in the RxRPC
+protocol at rxrpc_destroy_client_conn_ids(). This occurs because the
+kernel IO thread can exit while there are still active connection
+objects registered in the local IDR (local->conn_ids).
 
-Currently, stmmac_rx() lacks any check against scenario #3 and
-stmmac_rx_refill() failing: it will stop NAPI polling and unmask
-interrupts to await an interrupt that will never arrive, stalling the
-receive pipeline indefinitely.
+I did a quick analysis and the result is the following. When the IO
+thread exits, it calls rxrpc_destroy_local(), which in turn calls
+rxrpc_clean_up_local_conns(). However, that function only iterates
+over the local->idle_client_conns list. If a connection was recently
+created by rxrpc_connect_client_calls() (via
+rxrpc_alloc_client_connection()) but has not yet been deactivated or
+moved to the idle list, it is completely missed during this cleanup
+phase.
 
-Also: even if not all descriptors are dirty, letting them accumulate
-risks dropping frames in the next incoming traffic burst, if large
-enough to exhaust the remaining valid ones.
+Because the connection remains in the IDR, the subsequent call to
+rxrpc_destroy_client_conn_ids() finds the entry, logs an "AF_RXRPC:
+Leaked client conn" error, and hits a BUG().
 
-Fix both of these problems by checking stmmac_rx_dirty() before return:
-Use the same threshold as the zero-copy path (STMMAC_RX_FILL_BATCH) for
-an unacceptably high number of neglected dirties, and tell NAPI to keep
-polling (i.e. return budget) when that threshold is met.
+I can reliably reproduce this using a client and server where the
+server calls close() immediately after sendmsg().
 
-Fixes: 47dd7a540b8a ("net: add support for STMicroelectronics Ethernet controllers.")
-Cc: stable@vger.kernel.org
-Signed-off-by: Sam Edwards <CFSworks@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+My suggestion for a fix is to update rxrpc_clean_up_local_conns() to
+check the local IDR instead of just the idle list, ensuring all
+allocated connections are reaped during teardown. I don't have the
+time to properly test a patch or verify if the teardown for a
+brand-new conn differs significantly from an idle one, so I wanted to
+report my quick analysis to the maintainers. I tested on Fedora 43 on
+kernel 6.18.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index fc11f75f7dc0..6822ca27cb0f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -5604,6 +5604,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
- 	unsigned int desc_size;
- 	struct sk_buff *skb = NULL;
- 	struct stmmac_xdp_buff ctx;
-+	int budget = limit;
- 	int xdp_status = 0;
- 	int bufsz;
- 
-@@ -5870,6 +5871,14 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
- 	priv->xstats.rx_dropped += rx_dropped;
- 	priv->xstats.rx_errors += rx_errors;
- 
-+	/* stmmac_rx_refill() may fail, leaving some dirty entries behind.
-+	 * A few is OK, but if it gets out of hand, we risk dropping frames
-+	 * in the next traffic burst; in the worst case (100% dirty) we won't
-+	 * even receive any future "DMA completed" interrupts.
-+	 */
-+	if (unlikely(stmmac_rx_dirty(priv, queue) >= STMMAC_RX_FILL_BATCH))
-+		return budget;
-+
- 	return count;
- }
- 
+420 void rxrpc_destroy_local(struct rxrpc_local *local)
+421 {
+...
+433         rxrpc_clean_up_local_conns(local);
+...
+451         rxrpc_purge_client_connections(local);
+...
+453 }
+
+813 void rxrpc_clean_up_local_conns(struct rxrpc_local *local)
+814 {
+815         struct rxrpc_connection *conn;
+...
+823         while ((conn = list_first_entry_or_null(&local->idle_client_conns,
+824                                                 struct
+rxrpc_connection, cache_link))) {
+825                 list_del_init(&conn->cache_link);
+826                 atomic_dec(&conn->active);
+827                 trace_rxrpc_client(conn, -1, rxrpc_client_discard);
+828                 rxrpc_unbundle_conn(conn);
+829                 rxrpc_put_connection(conn, rxrpc_conn_put_local_dead);
+830         }
+...
+833 }
+
+54 static void rxrpc_destroy_client_conn_ids(struct rxrpc_local *local)
+55 {
+56         struct rxrpc_connection *conn;
+57         int id;
+58
+59         if (!idr_is_empty(&local->conn_ids)) {
+60                 idr_for_each_entry(&local->conn_ids, conn, id) {
+61                         pr_err("AF_RXRPC: Leaked client conn %p {%d}\n",
+62                                conn, refcount_read(&conn->ref));
+63                 }
+64                 BUG();
+65         }
+66
+67         idr_destroy(&local->conn_ids);
+68 }
+
+[88656.300130] rxrpc: AF_RXRPC: Leaked client conn 00000000cf1d5a14 {1}
+[88656.300702] ------------[ cut here ]------------
+[88656.301099] kernel BUG at net/rxrpc/conn_client.c:64!
+[88656.301442] Oops: invalid opcode: 0000 [#17] SMP NOPTI
+[88656.301765] CPU: 0 UID: 0 PID: 3989526 Comm: krxrpcio/7001 Tainted:
+G      D W           6.18.13-200.fc43.x86_64 #1 PREEMPT(lazy)
+[88656.302039] Tainted: [D]=DIE, [W]=WARN
+[88656.302323] Hardware name: VMware, Inc. VMware Virtual
+Platform/440BX Desktop Reference Platform, BIOS 6.00 11/12/2020
+[88656.302599] RIP: 0010:rxrpc_purge_client_connections+0x58/0xa0 [rxrpc]
+
+Regards,
+
 -- 
-2.52.0
-
+Anderson Nascimento
+Allele Security Intelligence
+https://www.allelesecurity.com
 
