@@ -1,189 +1,174 @@
-Return-Path: <netdev+bounces-274083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274077-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id a+o/ArcOzWmMZwYAu9opvQ
-	(envelope-from <netdev+bounces-274083-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:25:27 +0200
+	id eIlIAXcTzWmMZwYAu9opvQ
+	(envelope-from <netdev+bounces-274077-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:45:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DA4737A674
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:25:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BF7D37AAC1
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:45:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4A1AB301A7A4
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:25:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 25092318C5E0
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:06:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE1F3E51DA;
-	Wed,  1 Apr 2026 12:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A3A3401A06;
+	Wed,  1 Apr 2026 12:06:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="B5UxFNul"
+	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="brDjBLXn"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from www537.your-server.de (www537.your-server.de [188.40.3.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB6E2E8DEC;
-	Wed,  1 Apr 2026 12:24:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5273F7E98;
+	Wed,  1 Apr 2026 12:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.3.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775046263; cv=none; b=avbmpEGZZnecal/tbKJFIU2o3LHFG4CTaYzzHY8Z77MNJRRnAKr1UEPMFTuEmup+b8kUI5xQcEAhyGHqOMsZ9zxauAhz7KJflt2RhQqbAvLHg+NNnvGc5oyJaNnxCOlRRUAoPBkH9kBGuCa+35LeU53UvyOGV6zMGRSLMNwZr6A=
+	t=1775045207; cv=none; b=a8clB2VjaWlLHrNfMW5RJGLpXLGuZtwYwhjhwEgslpPw8m+xubq0d2atcJIhc0kHhF3FUhtDjVpmPxP3FgxEXAYtxlwDQwS+wV3/gKOKSmWMOzkD3dhcEwJLtF2ffOOQXxMuPrqptNuDsM65BVMNmOm53dJ6vHSfacoSCTAIncY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775046263; c=relaxed/simple;
-	bh=0Wf4DPMZIk9Be5bWwa+W75w20Pl3W3M0ANIftpiY1CI=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=O6ZnTCcCsmCssS3/56BVX5vMZZSc2IeT6txTnsGDZHwSgkIDHtTtBZp3hizE32YXYC7fwCNRELl1kmjP5JrANiSiAZaODqlAWwYjJTWohx9ZFCOiWqFsJPFwi+S4EvA4lOGFUZ9hqbxCK5ntSIT+5pFsoniTPHfvRNSA4hPP/zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=B5UxFNul; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+	s=arc-20240116; t=1775045207; c=relaxed/simple;
+	bh=MTmvBtZd/sjRcIktgSvHy1gERFiqdGjvRNbfBBKS54M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OwOCEbP5LKHWQDuojOUTfFNMtoTEbHjdUHlcOaO2TJe76K2kBicnh1IJ7KmE3CHmYkj6mdcm/Y5Su7trnKKigcGL6zL4k/If93vMuOwtCBu9oNWW3XmhtG4visYosBixRtIotMvzEJ+c+wpshaY5DQHmm8w4Do/A3/bPYZkLgkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=brDjBLXn; arc=none smtp.client-ip=188.40.3.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:References:Cc:To:From:Subject:MIME-Version:Date:Message-ID:Sender
+	d=ew.tq-group.com; s=default2602; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=AtPBdLCBXTcM+5To5d5wUNl3QoncQ95q/HEmvGQ4mnc=; b=B5UxFNulXKHqHfUF+s3cZyNkJt
-	hbToGQZcN1M3SKlhQNTiPYGLA78ybO4VQcD9MfLuTKQ1w8RuwwyYmblMRe8ovfLENNJBaj9L4dqsB
-	tIVYAM12LOg+iqSAJIpH7O7Iq47KV9aWTWBzE1+8G9Ye1eg/Hhhzbr1O2gk0cQXS/S2moXUtBwRsQ
-	TO3REIKWorzTV7iOzrfklR5IqS5yOaaDbH7zOr0irn1u1/GiR9gunXew1okPNyi1Rsz6tUHo3goxK
-	L5TbulQV7lDAHISIImFWNyLG9xUaq2kY1QFVdJzc2vqKJFzrMvWysE+6MUNL85TMcKCWz/H5pRe6D
-	TYyCNgPw==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	bh=Xz26XmtLPh8Q2Btds6GvvjYzsY1TXEbe251OyLODAwU=; b=brDjBLXn/qdmzEzVOCUUZqcQ8B
+	c611c7W5boiORR/heLJgtZPx6iK6ej3Us/6D6DYXUcf0IyxHpvL+oO06G8TftLKTmSNCKpaicdGFy
+	vFoYZUT0/p4Wi8QxuTGq5bzG74yD6uqP4U+8rJP0oWSnLYvKt+VeQNriSavl8mClgZsCJ0akiT+wT
+	45yR5Ryp31PxjE13ahZbJW1MTryHgFplznyycLTUAgrgvJ/A07qltrnrANgR4O+0ZkAA5/oO7D26v
+	lTtjibK1ts6JIu8+E+hvRcAXw2fYNVMu1zEogQvCWGY6bOZhk1DuyRuZxdC/DDrhSvDRHnHFYU4SH
+	d2x0PA8A==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www537.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1w7uKP-0009Yr-2D;
-	Wed, 01 Apr 2026 14:05:45 +0200
+	(envelope-from <nora.schiffer@ew.tq-group.com>)
+	id 1w7uLI-000FD0-13;
+	Wed, 01 Apr 2026 14:06:40 +0200
 Received: from localhost ([127.0.0.1])
-	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1w7uKO-000EMZ-0t;
-	Wed, 01 Apr 2026 14:05:44 +0200
-Message-ID: <d8b72cf2-470a-4a8c-bb9f-223f27939715@iogearbox.net>
-Date: Wed, 1 Apr 2026 14:05:43 +0200
+	(envelope-from <nora.schiffer@ew.tq-group.com>)
+	id 1w7uLH-000JGT-2r;
+	Wed, 01 Apr 2026 14:06:39 +0200
+From: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Nishanth Menon <nm@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux@ew.tq-group.com,
+	Nora Schiffer <nora.schiffer@ew.tq-group.com>
+Subject: [PATCH net-next v3 2/2] net: ethernet: ti: am65-cpsw: add support for J722S SoC family
+Date: Wed,  1 Apr 2026 14:05:43 +0200
+Message-ID: <a6e31f3bf2f540d3c97574fbfdc0f2a4c1db72ce.1774958552.git.nora.schiffer@ew.tq-group.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <e7ec1b928357d1240a962a88dc6ac67fd2c92357.1774958552.git.nora.schiffer@ew.tq-group.com>
+References: <e7ec1b928357d1240a962a88dc6ac67fd2c92357.1774958552.git.nora.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 00/14] netkit: Support for io_uring zero-copy
- and AF_XDP
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
- razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
- john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, dw@davidwei.uk,
- toke@redhat.com, yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-References: <20260327121049.334562-1-daniel@iogearbox.net>
-Content-Language: en-US
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <20260327121049.334562-1-daniel@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Virus-Scanned: Clear (ClamAV 1.4.3/27958/Wed Apr  1 08:24:34 2026)
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[iogearbox.net,reject];
-	R_DKIM_ALLOW(-0.20)[iogearbox.net:s=default2302];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[ew.tq-group.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[ew.tq-group.com:s=default2602];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,davemloft.net,blackwall.org,redhat.com,google.com,fomichev.me,gmail.com,jrife.io,intel.com,davidwei.uk,bytedance.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274077-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274083-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[iogearbox.net:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[daniel@iogearbox.net,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_NONE(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-0.911];
+	FROM_NEQ_ENVFROM(0.00)[nora.schiffer@ew.tq-group.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[ew.tq-group.com:+];
+	NEURAL_HAM(-0.00)[-0.995];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,sashiko.dev:url]
-X-Rspamd-Queue-Id: 7DA4737A674
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ew.tq-group.com:dkim,ew.tq-group.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tq-group.com:email,tq-group.com:url]
+X-Rspamd-Queue-Id: 4BF7D37AAC1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/27/26 1:10 PM, Daniel Borkmann wrote:
-> Containers use virtual netdevs to route traffic from a physical netdev
-> in the host namespace. They do not have access to the physical netdev
-> in the host and thus can't use memory providers or AF_XDP that require
-> reconfiguring/restarting queues in the physical netdev.
-> 
-> This patchset adds the concept of queue leasing to virtual netdevs that
-> allow containers to use memory providers and AF_XDP at native speed.
-> Leased queues are bound to a real queue in a physical netdev and act
-> as a proxy.
-> 
-> Memory providers and AF_XDP operations take an ifindex and queue id,
-> so containers would pass in an ifindex for a virtual netdev and a queue
-> id of a leased queue, which then gets proxied to the underlying real
-> queue.
-> 
-> We have implemented support for this concept in netkit and tested the
-> latter against Nvidia ConnectX-6 (mlx5) as well as Broadcom BCM957504
-> (bnxt_en) 100G NICs. For more details see the individual patches.
-> 
-> v9->v10:
-fyi, I'm planning to push a v11. I've investigated the latest sashiko
-run on this series [0] and 2 out of the 11 findings were correct and
-I've fixed them locally already.
+The J722S CPSW3G is mostly identical to the AM64's, but additionally
+supports SGMII.
 
-Thanks,
-Daniel
+Signed-off-by: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+---
 
-   [0] https://sashiko.dev/#/patchset/20260327121049.334562-1-daniel%40iogearbox.net
+v2: drop AM64_CPSW_QUIRK_CUT_THRU flag, which is a downstream ti-linux feature
+v3: resubmission for net-next, no changes
+
+SGMII operation also requires changes to the phy-j721e-wiz and gmii-sel drivers.
+The full series was previously posted here:
+https://lore.kernel.org/lkml/cover.1774354734.git.nora.schiffer@ew.tq-group.com/
+
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index d9400599e80a4..7ac75fc8cdcf4 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -3468,6 +3468,13 @@ static const struct am65_cpsw_pdata am64x_cpswxg_pdata = {
+ 	.fdqring_mode = K3_RINGACC_RING_MODE_RING,
+ };
+ 
++static const struct am65_cpsw_pdata j722s_cpswxg_pdata = {
++	.quirks = AM64_CPSW_QUIRK_DMA_RX_TDOWN_IRQ,
++	.ale_dev_id = "am64-cpswxg",
++	.fdqring_mode = K3_RINGACC_RING_MODE_RING,
++	.extra_modes = BIT(PHY_INTERFACE_MODE_SGMII),
++};
++
+ static const struct am65_cpsw_pdata j7200_cpswxg_pdata = {
+ 	.quirks = 0,
+ 	.ale_dev_id = "am64-cpswxg",
+@@ -3495,6 +3502,7 @@ static const struct of_device_id am65_cpsw_nuss_of_mtable[] = {
+ 	{ .compatible = "ti,am654-cpsw-nuss", .data = &am65x_sr1_0},
+ 	{ .compatible = "ti,j721e-cpsw-nuss", .data = &j721e_pdata},
+ 	{ .compatible = "ti,am642-cpsw-nuss", .data = &am64x_cpswxg_pdata},
++	{ .compatible = "ti,j722s-cpsw-nuss", .data = &j722s_cpswxg_pdata},
+ 	{ .compatible = "ti,j7200-cpswxg-nuss", .data = &j7200_cpswxg_pdata},
+ 	{ .compatible = "ti,j721e-cpswxg-nuss", .data = &j721e_cpswxg_pdata},
+ 	{ .compatible = "ti,j784s4-cpswxg-nuss", .data = &j784s4_cpswxg_pdata},
+-- 
+TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht München, HRB 105018
+Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+https://www.tq-group.com/
 
