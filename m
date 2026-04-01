@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-274085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274086-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YFsHKQMYzWnOaAYAu9opvQ
-	(envelope-from <netdev+bounces-274085-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:05:07 +0200
+	id aPYzMf4QzWmMZwYAu9opvQ
+	(envelope-from <netdev+bounces-274086-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:35:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1D5337AEB5
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:05:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8516337A814
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 14:35:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3CB1B32AA4F9
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:26:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C8744305B494
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 12:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D0A3FA5FF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E781402B87;
 	Wed,  1 Apr 2026 12:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="daEpk33G"
+	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="cY/aMbdt"
 X-Original-To: netdev@vger.kernel.org
 Received: from www537.your-server.de (www537.your-server.de [188.40.3.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99AD2F25F5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27A53A9D88;
 	Wed,  1 Apr 2026 12:26:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.3.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775046369; cv=none; b=dRccF0klu+F76B9gOnyx7RxFPlWChPt5FQHE0S93ODe+fTK/uKotUK1nq1NEQgKwP+eHez9S7E3FrwAb69AkaZaIAQBVdV+l8+B07UlW2C6AjE+yw9VeLG0LBRrAw27bMNE45c4CityhRvxOoK8yRmdWooFYGNmFZn5jjG0jXGg=
+	t=1775046369; cv=none; b=C4uMQKcccSljIhmgcOT4V3jleLYTk8dmmDloF3d7q8t5HUvPt0DfRSqklixvmAjHMj+sCfNV/+UsNiT6oOqHHfo4QGqTynvveWUec7ZZtLOUuL6wqrC5gfohB0fg7v9G8EDygbClRWw6aZ9KllT/62TJBsxtOM918/SPrCpjiR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775046369; c=relaxed/simple;
-	bh=elOkFKDQ2iLnY6Lwi1yUa5fsSkfhgO+93XSNmLHQ0PU=;
+	bh=67pUq+Zzouat6pnv7Ak0f4xBhOcxS1uB3sfXCVAiQR4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oWXOxebzoKnBnmhP4zTGrDBj8o+a4QC5Zm/I0Kqars8E4EgvTImr5mD32YiaFUlnhyhFpefzEfBuqmVqY+YOgbSkAhdxGEXDrwc7+LoAQcnZrTjU8q+eb3Ixq61TNLSyw/4zJo+jKX1JHcxAKqcSE06Vg2M6eZz6b2nbqglaLGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=daEpk33G; arc=none smtp.client-ip=188.40.3.216
+	 MIME-Version:Content-Type; b=I9B4m4RAXyVIDKWj+AKMO4OYZJgXhWE6ad2EfvpovArFZYuO8f9PZWGiHpT2V1P6GUOtqvfQU9WjZ/wIgJmPjQae3DTg4m96asq0sGJOFvk5E30dm52j0BbEegfSnpe9+OeyECJ4Di/sHm40uGZg6FHzIdzCl9hvm2X1bvEssRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=cY/aMbdt; arc=none smtp.client-ip=188.40.3.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -39,23 +39,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=fdD+gNdnYJuuk/C6povOAz6skeNjsbW/eErWFsyNXSU=; b=daEpk33GuNEpIhAxxg/M583qNc
-	xZWuid1EuT5B0Id7XqbOvBCBMy+BWiuLdr9rgf98OwOcp/qmQRYbH3x5pqgab5r2HZjKtCqRxrT0a
-	XUnQxyIr7RMT1t5qMgZvPOgZQG1rK51G0UVDTPE4Hm1bUzUZsYGyRilME6gBG4TD9X+Mw17eGOX5I
-	N+2MvqoVxJq5rtdajdn1GpjRroPlHpdUmkJ27e9TM4woV4ox1WwDw3FPfGfwuNMr4/0YfOtnt39X5
-	31cNM3TCHqhk8DBieX0U+/S46J9cwS+RKyTSQr0/qt6aBDPFp5qd7ZO0VQ7s2cscT/awBU7UWQBpE
-	c7NZL8GA==;
+	bh=iXZKh39YA9QQda5suRG0NPBgfkw/vmM7xN5WKLiYDaU=; b=cY/aMbdtyM7606X2A+IiHSBqXd
+	Gx1sHTKTaYJDjkJRa+JgRFvk/dUSEYTeNJbzFdV6Pfy/0gFTKq1l8yHFL+rN+YuaqLlCn+YLXjL5N
+	3wexm59ZPQjxoWswaGfuyiybwJekliqtE2RQXPK4URSmkJW1H33stARljCt4FjYwAEpAwhzYTCrS8
+	z9HtTjX//SRyMXBKnFS9QUgpngFo6haEyF28w2froKsDDJMzg3k9F5Fvm6QKjS9me8uFAg08QhioA
+	+oKadGNiQqS3ETWLLkOnQTn8oyrxbfYZNCY+5T0cYAMJQJszlI/5qHN8IOj7CNJlkZvxMwhZSA6J0
+	pCTApuWw==;
 Received: from sslproxy07.your-server.de ([78.47.199.104])
 	by www537.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96.2)
 	(envelope-from <nora.schiffer@ew.tq-group.com>)
-	id 1w7ue4-000IR7-2k;
-	Wed, 01 Apr 2026 14:26:04 +0200
+	id 1w7ue5-000IRC-1N;
+	Wed, 01 Apr 2026 14:26:05 +0200
 Received: from localhost ([127.0.0.1])
 	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <nora.schiffer@ew.tq-group.com>)
-	id 1w7ue4-00089b-1B;
+	id 1w7ue4-00089b-35;
 	Wed, 01 Apr 2026 14:26:04 +0200
 From: Nora Schiffer <nora.schiffer@ew.tq-group.com>
 To: Nishanth Menon <nm@ti.com>,
@@ -80,9 +80,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	linux-arm-kernel@lists.infradead.org,
 	linux@ew.tq-group.com,
 	Nora Schiffer <nora.schiffer@ew.tq-group.com>
-Subject: [PATCH v3 4/5] phy: ti: gmii-sel: add support for J722S SoC family
-Date: Wed,  1 Apr 2026 14:25:24 +0200
-Message-ID: <25a07fea53b0f7de3cef41866e208036ef1de0d9.1775045279.git.nora.schiffer@ew.tq-group.com>
+Subject: [PATCH v3 5/5] arm64: dts: ti: k3-j722s-main: use J722S compatibles for WIZ, gmii-sel and CPSW3G
+Date: Wed,  1 Apr 2026 14:25:25 +0200
+Message-ID: <55607ba1ca2bcf5c60a7d1e3c88fd20053a8be5c.1775045279.git.nora.schiffer@ew.tq-group.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1775045279.git.nora.schiffer@ew.tq-group.com>
 References: <cover.1775045279.git.nora.schiffer@ew.tq-group.com>
@@ -101,11 +101,11 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[ew.tq-group.com,quarantine];
 	R_DKIM_ALLOW(-0.20)[ew.tq-group.com:s=default2602];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274085-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274086-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -118,54 +118,61 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[nora.schiffer@ew.tq-group.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[ew.tq-group.com:+];
-	NEURAL_HAM(-0.00)[-0.975];
+	NEURAL_HAM(-0.00)[-0.980];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D1D5337AEB5
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tq-group.com:email,tq-group.com:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ew.tq-group.com:dkim,ew.tq-group.com:mid,0.0.15.230:email,f000000:email]
+X-Rspamd-Queue-Id: 8516337A814
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The J722S gmii-sel is mostly identical to the AM64's, but additionally
-supports SGMII.
+Update WIZ, gmii-sel and CPSW3G to use the J722S-specific compatible
+strings, enabling SGMII support. The fallback compatibles preserve
+compatibility of the updated Device Trees with older kernels.
 
 Signed-off-by: Nora Schiffer <nora.schiffer@ew.tq-group.com>
 ---
- drivers/phy/ti/phy-gmii-sel.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ arch/arm64/boot/dts/ti/k3-j722s-main.dtsi | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/phy/ti/phy-gmii-sel.c b/drivers/phy/ti/phy-gmii-sel.c
-index 6213c2b6005a5..c2865a6b1d7fb 100644
---- a/drivers/phy/ti/phy-gmii-sel.c
-+++ b/drivers/phy/ti/phy-gmii-sel.c
-@@ -251,6 +251,15 @@ struct phy_gmii_sel_soc_data phy_gmii_sel_soc_am654 = {
- 	.regfields = phy_gmii_sel_fields_am654,
+diff --git a/arch/arm64/boot/dts/ti/k3-j722s-main.dtsi b/arch/arm64/boot/dts/ti/k3-j722s-main.dtsi
+index 9ee5d0c8ffd1e..70f430aa3a944 100644
+--- a/arch/arm64/boot/dts/ti/k3-j722s-main.dtsi
++++ b/arch/arm64/boot/dts/ti/k3-j722s-main.dtsi
+@@ -18,7 +18,7 @@ serdes_refclk: clk-0 {
+ 
+ &cbass_main {
+ 	serdes_wiz0: phy@f000000 {
+-		compatible = "ti,am64-wiz-10g";
++		compatible = "ti,j722s-wiz-10g", "ti,am64-wiz-10g";
+ 		ranges = <0x0f000000 0x0 0x0f000000 0x00010000>;
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+@@ -56,7 +56,7 @@ serdes0: serdes@f000000 {
+ 	};
+ 
+ 	serdes_wiz1: phy@f010000 {
+-		compatible = "ti,am64-wiz-10g";
++		compatible = "ti,j722s-wiz-10g", "ti,am64-wiz-10g";
+ 		ranges = <0x0f010000 0x0 0x0f010000 0x00010000>;
+ 		#address-cells = <1>;
+ 		#size-cells = <1>;
+@@ -451,6 +451,14 @@ pcie0_ctrl: pcie0-ctrl@4070 {
+ 	};
  };
  
-+static const
-+struct phy_gmii_sel_soc_data phy_gmii_sel_soc_j722s = {
-+	.use_of_data = true,
-+	.features = BIT(PHY_GMII_SEL_RGMII_ID_MODE) |
-+		    BIT(PHY_GMII_SEL_FIXED_TX_DELAY),
-+	.regfields = phy_gmii_sel_fields_am654,
-+	.extra_modes = BIT(PHY_INTERFACE_MODE_SGMII),
++&cpsw3g {
++	compatible = "ti,j722s-cpsw-nuss", "ti,am642-cpsw-nuss";
 +};
 +
- static const
- struct phy_gmii_sel_soc_data phy_gmii_sel_cpsw5g_soc_j7200 = {
- 	.use_of_data = true,
-@@ -307,6 +316,10 @@ static const struct of_device_id phy_gmii_sel_id_table[] = {
- 		.compatible	= "ti,am654-phy-gmii-sel",
- 		.data		= &phy_gmii_sel_soc_am654,
- 	},
-+	{
-+		.compatible	= "ti,j722s-phy-gmii-sel",
-+		.data		= &phy_gmii_sel_soc_j722s,
-+	},
- 	{
- 		.compatible	= "ti,j7200-cpsw5g-phy-gmii-sel",
- 		.data		= &phy_gmii_sel_cpsw5g_soc_j7200,
++&phy_gmii_sel {
++	compatible = "ti,j722s-phy-gmii-sel", "ti,am654-phy-gmii-sel";
++};
++
+ &oc_sram {
+ 	reg = <0x00 0x70000000 0x00 0x40000>;
+ 	ranges = <0x00 0x00 0x70000000 0x40000>;
 -- 
 TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
 Amtsgericht München, HRB 105018
