@@ -1,519 +1,191 @@
-Return-Path: <netdev+bounces-274000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274001-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gOeGIFLjzGmjXQYAu9opvQ
-	(envelope-from <netdev+bounces-274000-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 11:20:18 +0200
+	id GD15LOvjzGmjXQYAu9opvQ
+	(envelope-from <netdev+bounces-274001-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 11:22:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECEE637776F
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 11:20:17 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A54BA377800
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 11:22:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 572793126534
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 09:13:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 68F183002937
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 09:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83BFF3A8746;
-	Wed,  1 Apr 2026 09:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D96A3CB2EF;
+	Wed,  1 Apr 2026 09:15:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mg5Jd1Rv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PcbMzFc1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF7D3AD538
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 09:13:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775034789; cv=none; b=GDVy4mCeUSEVNigtFpNw3xLSNUUjSGyT9zLwGEMY29xLvlvhKpbUaWdMtQLfPsFxQo1sfDoJA0h9zizUzgPBwC6y1wwGCIxA80AHP9ENOWY9INSfH05TqvQQLSvvO5UDZ2sFFWJ7HDs+WWh8KUl08CcZpXIqOnq2BiTiqAxfIFU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775034789; c=relaxed/simple;
-	bh=mhuTpIbfyq3SIzgk0CJMINKU5CuIKzC3LnXUSUFv45M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T/KVkLvzrgk4qYXu6WNs3XNCkiIqXeHCGk9by4siKXS2HU/n5WhSPYQ+eXmGF//AtglJx+4xJqEq4ecmhSpwtBrcJxwjTST6l6tk11ihUPpK/yamF9XIPLnBe3v5EQp1kftAYD59av2WSx8QbHpWjMF1ddJW/KnaVs9U5VrWguY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mg5Jd1Rv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775034786;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6AFoE+BHETSvnDnn6Q4Tz2Gj1izB0cSeVWxhoo852x4=;
-	b=Mg5Jd1RvfIQazBlaFJy0SeF8mt2EuO+yd7YyBpmi8Tlr5zb2/qEh+Y4o9AnjO5q3X5dH/7
-	Br+kwQdj9jDPsDu0WjI95Qi35YoV1CD4PsgxN0w6/ZCOZ7YD2UyvMMP0LJ+XLhY0Pt+nOQ
-	qxhqfds97Y3/BAvzDdV0YbpUykhNkTw=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-27-5A_U-xVaMj2K6bVLX-KRfg-1; Wed,
- 01 Apr 2026 05:13:03 -0400
-X-MC-Unique: 5A_U-xVaMj2K6bVLX-KRfg-1
-X-Mimecast-MFC-AGG-ID: 5A_U-xVaMj2K6bVLX-KRfg_1775034781
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1E8DE1800371;
-	Wed,  1 Apr 2026 09:13:01 +0000 (UTC)
-Received: from p16v.redhat.com (unknown [10.44.33.175])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1A5F119560AB;
-	Wed,  1 Apr 2026 09:12:55 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Petr Oros <poros@redhat.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Simon Horman <horms@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 3/3] dpll: zl3073x: implement frequency monitoring
-Date: Wed,  1 Apr 2026 11:12:37 +0200
-Message-ID: <20260401091237.1071995-4-ivecera@redhat.com>
-In-Reply-To: <20260401091237.1071995-1-ivecera@redhat.com>
-References: <20260401091237.1071995-1-ivecera@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 796173CBE60
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 09:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775034900; cv=pass; b=TIrh5LK8z/jArdxImMbu+WfGSFZskfe9uHAUKaEYg3V+MtcaAZKE+T8nDwj9OPjd1PcVHrjB3kySrmfUdf81f9u+/Qch2w69U+05ftKDnd8f+uvNb4XGxHA5X5RvLc9BkuSMoG8ZkXjxtC1fiApXFlABfQBl2M2MzbhiL2nVa/U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775034900; c=relaxed/simple;
+	bh=Px8VZ/mZa/wVBiSvlhUqswxvgLPunBza8vM2mBYbtJ0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uE9eZzg1mMqFwvU+r21ijqIqBEIwmgCI7SkqTN1WLoiE2zNvK3g/5C9VREgcAhyP6WiyBsNGZVjj4TJStr0pC58cIoDfnhGcpHAwxdL/FnfDjD4P8mjbEmNck36pXV2BudJp8HVrIfbni5u627IVin1fD+ovoC3QxoSwYayMKkM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PcbMzFc1; arc=pass smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-50baf2df711so43305311cf.2
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 02:14:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775034898; cv=none;
+        d=google.com; s=arc-20240605;
+        b=HF5g5+KeO/AJZT32/RciaDki/diB2y2ewYQB/5fc9Bp12bAVsiQ/mWgDAV+HYI26CA
+         HJ3TQYE7IZID24rrgwPgcPvpDG9Zo1CF3cRC/J/0S8+LweilNa9T2RZTTBoRft+yuB1R
+         jsJfBejOCJNE1vGZncnnpQ38+vhbrvZnMGbo8ExrHmqDbae9ZeK+np5gSES7tlUNLMjG
+         AkwTMMEJaNuX+l6663fLnxlR2Wtlza9LFQw2iNNBcPWb+wk1Al+mSZ06tAVn8UQ+B8zj
+         XBoH0m4aJXdw3l4KWV5bgcoo0WufvsjERXknHD/usK7bqCVtEl4RvQ1vGsrDJLTb5Kbh
+         x/kg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=QNCKy3dqIhDpgGkChFZLtJKaP66u94+8Bb0TUa2FxLg=;
+        fh=k5P61lJoa1bM4J1pKAe8qvoWKIV12tz+Pl2zCcFjsDA=;
+        b=TkmtRdBkXe8YzO+BVNUk/0/KopkUykCGTT2GQ/VwWehFzlGuSvgIvlfd9bEY4syFZ/
+         0aJ73f2AVryXFG6fjZQoagDDlqnjeRDQ0jAnAHQxoF9P6kLrYpJbxDLwMGaI7tY5hFZM
+         l4t27LK37HbwwuRxAUmxtCP7BOu3kbvLjv4eAWAtF0x7wd78hQoVEGoEAMtO8+TaEnxP
+         j+DDeJKcj0FSMZD/kp/AcvyhG7XniT9dmAbqb9+sRcbsoN4QHSRyPr9zUhO8U0RVoGr4
+         hIcYulbFqRsugKyS0w3mB1s4bnqC4J9fhPrB2FR/rt7oSuXw6ocHV/4wrbg+WrxlIYnI
+         dssA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775034898; x=1775639698; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QNCKy3dqIhDpgGkChFZLtJKaP66u94+8Bb0TUa2FxLg=;
+        b=PcbMzFc143UJPNLa1IszL9pPW8NVryFgbF485R7GCAGuU6p+ZrBk02ECuyE3QGpPPR
+         s8PmzFSS1wArBXxvuc+UtXXMnAOwCJ+jq+1vNSV+UniMmd1Z5E8/yTmPY7jdYzGGTVr6
+         NzWp9TOvjIix3ogAaxIjggzONpWn1bnYrGEVP35Jv2A4mKUlB7v6q/VKR1ubhl2Awk3s
+         Kxcz59bI9slSkfdhXbqubS/KzGRsdYjcTJgVAK0tjaZi0oohw05fsUO/dcsMUFE+pl0E
+         aVByIpngrWTZAFOiI7hgEJOSTa3dRZmFq7KhzfK0ZJxLzy54WLBvphLnzo2fZIpudTwx
+         M7AQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775034898; x=1775639698;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=QNCKy3dqIhDpgGkChFZLtJKaP66u94+8Bb0TUa2FxLg=;
+        b=EIid/hiWzL0Dn+2MIxx06MlYXOO/hv/nyPpuyalk+/bc0BjwGS4sXCGoKUKUmf68na
+         5MxK3rk7REZh/7abwG4HY3oto3T43CqJLqk+hWOT08cL4AtHnAgM7jxB38YjXt+PCRXm
+         ZilnFac9BNejpbKu2gFq3pMcHB7dsrJsk4O7Jobloa5t6aDHHh9ONWrFxQiA/lzS0JsT
+         asFtpiaDkSJTzHqvgl2yk569YC8jCaGKPuzP7WpsbnsSqbnVE34MbBuhmSTINVqhnBA6
+         3SPdYL/YqURAAvlMQF+pODYVOg7j4+rTIQif7nTRvjDT+JJyhQYUkq4LH4YrH4zPNXs8
+         1NNA==
+X-Forwarded-Encrypted: i=1; AJvYcCVDcgBz8XttkFxR6GljkbTl+1hWI7KnJY/JvEnyiK80sKgAm8N+N6xJGQdLmLv1Akdu597onVM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlAk6qte/l7x3E4S1Q+aj1ltOeYOQUsc3cei/jM9CtklZQ0YJy
+	eTrW09X46fvYvSWpiiKtCWWLyXwUrZwQEmgL5F8xvwmJxNbsyezB3yJltwYARbyLsMED6cmx/w3
+	kzDIWkfpy/vpjjnm9wDhNOZyan4FsyDgkIXD1tHMc
+X-Gm-Gg: ATEYQzynkvtwvxhzydkxMlMvrALE1hiRP9KdRO/FmSINZo3n+T34w2UM4vUhCG9Eac2
+	hqt547GGpfTcqtIUG+EIFwQsa0McUDuJcLiyVOWnc84Z/Ju7aZSxfN4hZCRbI/qlVqb8KNiEvaF
+	K0XCldwv5GjR1ahzH9f6oTZq88GLah5uLYVnMzf8wngvzPD5JwZMnRq8NG2Bsf8syvTLc2jJTYC
+	/cUJd/vObL7h4nxJo3fx7OjzDfC5ArsSg9Qv1P8dl8dJleXUWZFQm/LmTZi3SOQC7GY/QnbJgDW
+	+xAeNQ==
+X-Received: by 2002:a05:622a:1c05:b0:509:2ef7:7034 with SMTP id
+ d75a77b69052e-50d3bcf5f5dmr36705111cf.50.1775034897967; Wed, 01 Apr 2026
+ 02:14:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Spamd-Result: default: False [0.84 / 15.00];
+References: <20260401074509.1897527-1-dwmw2@infradead.org> <20260401074509.1897527-4-dwmw2@infradead.org>
+In-Reply-To: <20260401074509.1897527-4-dwmw2@infradead.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 1 Apr 2026 02:14:45 -0700
+X-Gm-Features: AQROBzAoGbAvZgGI1SP1QOjEPB9AfHu4JQqffzH3Pc3uWqwtvvbxFW3VGI6Tc4w
+Message-ID: <CANn89i+iRUgqtd+eirfSUM3k+keNZKzLwsHxZtwE+vHdv7H5PQ@mail.gmail.com>
+Subject: Re: [PATCH 3/6] net: Guard Legacy IP entry points with CONFIG_LEGACY_IP
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
+	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Daniel Borkmann <daniel@iogearbox.net>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>, 
+	Guillaume Nault <gnault@redhat.com>, David Woodhouse <dwmw@amazon.co.uk>, Kees Cook <kees@kernel.org>, 
+	Alexei Lazar <alazar@nvidia.com>, Gal Pressman <gal@nvidia.com>, Paul Moore <paul@paul-moore.com>, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, oss-drivers@corigine.com, 
+	bridge@lists.linux.dev, bpf@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	torvalds@linux-foundation.org, jon.maddog.hall@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[redhat.com,intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,lwn.net,microchip.com,linuxfoundation.org,linux.dev,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274000-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ivecera@redhat.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-274001-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[49];
+	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,lunn.ch,davemloft.net,redhat.com,blackwall.org,linux.dev,iogearbox.net,gmail.com,fomichev.me,google.com,sipsolutions.net,netfilter.org,strlen.de,nwl.cc,amazon.co.uk,paul-moore.com,vger.kernel.org,corigine.com,lists.linux.dev,linux-foundation.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: ECEE637776F
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,infradead.org:email,amazon.co.uk:email]
+X-Rspamd-Queue-Id: A54BA377800
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Extract common measurement latch logic from zl3073x_ref_ffo_update()
-into a new zl3073x_ref_freq_meas_latch() helper and add
-zl3073x_ref_freq_meas_update() that uses it to latch and read absolute
-input reference frequencies in Hz.
+On Wed, Apr 1, 2026 at 12:45=E2=80=AFAM David Woodhouse <dwmw2@infradead.or=
+g> wrote:
+>
+> From: David Woodhouse <dwmw@amazon.co.uk>
+>
+> Wrap the IPv4-specific registrations in inet_init() with
+> CONFIG_LEGACY_IP guards. When LEGACY_IP is disabled, the kernel
+> will not:
+>  - Register the AF_INET socket family
+>  - Register the ETH_P_IP packet handler (ip_rcv)
+>  - Initialize ARP, ICMP, IGMP, or IPv4 routing
+>  - Register IPv4 protocol handlers (TCP/UDP/ICMP over IPv4)
+>  - Initialize IPv4 multicast routing, proc entries, or fragmentation
+>
+> The shared INET infrastructure (tcp_prot, udp_prot, tcp_init, etc.)
+> remains initialized for use by IPv6.
+>
 
-Add meas_freq field to struct zl3073x_ref and the corresponding
-zl3073x_ref_meas_freq_get() accessor. The measured frequencies are
-updated periodically alongside the existing FFO measurements.
+...
 
-Add freq_monitor boolean to struct zl3073x_dpll and implement the
-freq_monitor_set/get device callbacks to enable/disable frequency
-monitoring via the DPLL netlink interface.
+>
+>         /* Add UDP-Lite (RFC 3828) */
+> -       udplite4_register();
+> +       if (IS_ENABLED(CONFIG_LEGACY_IP))
+> +               udplite4_register();
 
-Implement measured_freq_get pin callback for input pins that returns the
-measured input frequency in mHz.
+udplite has been removed in net-next.
 
-Reviewed-by: Petr Oros <poros@redhat.com>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
-Changes v2 -> v3:
-- Changed measured_freq_get to return value in mHz
-
-Changes v1 -> v2:
-- Renamed actual-frequency to measured-frequency (Vadim)
----
- drivers/dpll/zl3073x/core.c |  88 ++++++++++++++++++++++++++-----
- drivers/dpll/zl3073x/dpll.c | 100 ++++++++++++++++++++++++++++++++++--
- drivers/dpll/zl3073x/dpll.h |   2 +
- drivers/dpll/zl3073x/ref.h  |  14 +++++
- 4 files changed, 187 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
-index 6363002d48d46..cb47a5db061aa 100644
---- a/drivers/dpll/zl3073x/core.c
-+++ b/drivers/dpll/zl3073x/core.c
-@@ -632,22 +632,21 @@ int zl3073x_ref_phase_offsets_update(struct zl3073x_dev *zldev, int channel)
- }
- 
- /**
-- * zl3073x_ref_ffo_update - update reference fractional frequency offsets
-+ * zl3073x_ref_freq_meas_latch - latch reference frequency measurements
-  * @zldev: pointer to zl3073x_dev structure
-+ * @type: measurement type (ZL_REF_FREQ_MEAS_CTRL_*)
-  *
-- * The function asks device to update fractional frequency offsets latch
-- * registers the latest measured values, reads and stores them into
-+ * The function waits for the previous measurement to finish, selects all
-+ * references and requests a new measurement of the given type.
-  *
-  * Return: 0 on success, <0 on error
-  */
- static int
--zl3073x_ref_ffo_update(struct zl3073x_dev *zldev)
-+zl3073x_ref_freq_meas_latch(struct zl3073x_dev *zldev, u8 type)
- {
--	int i, rc;
-+	int rc;
- 
--	/* Per datasheet we have to wait for 'ref_freq_meas_ctrl' to be zero
--	 * to ensure that the measured data are coherent.
--	 */
-+	/* Wait for previous measurement to finish */
- 	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
- 				  ZL_REF_FREQ_MEAS_CTRL);
- 	if (rc)
-@@ -663,15 +662,64 @@ zl3073x_ref_ffo_update(struct zl3073x_dev *zldev)
- 	if (rc)
- 		return rc;
- 
--	/* Request frequency offset measurement */
--	rc = zl3073x_write_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
--			      ZL_REF_FREQ_MEAS_CTRL_REF_FREQ_OFF);
-+	/* Request measurement */
-+	rc = zl3073x_write_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL, type);
- 	if (rc)
- 		return rc;
- 
- 	/* Wait for finish */
--	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
--				  ZL_REF_FREQ_MEAS_CTRL);
-+	return zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
-+				    ZL_REF_FREQ_MEAS_CTRL);
-+}
-+
-+/**
-+ * zl3073x_ref_freq_meas_update - update measured input reference frequencies
-+ * @zldev: pointer to zl3073x_dev structure
-+ *
-+ * The function asks device to latch measured input reference frequencies
-+ * and stores the results in the ref state.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_ref_freq_meas_update(struct zl3073x_dev *zldev)
-+{
-+	int i, rc;
-+
-+	rc = zl3073x_ref_freq_meas_latch(zldev, ZL_REF_FREQ_MEAS_CTRL_REF_FREQ);
-+	if (rc)
-+		return rc;
-+
-+	/* Read measured frequencies in Hz (unsigned 32-bit, LSB = 1 Hz) */
-+	for (i = 0; i < ZL3073X_NUM_REFS; i++) {
-+		u32 value;
-+
-+		rc = zl3073x_read_u32(zldev, ZL_REG_REF_FREQ(i), &value);
-+		if (rc)
-+			return rc;
-+
-+		zldev->ref[i].meas_freq = value;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * zl3073x_ref_ffo_update - update reference fractional frequency offsets
-+ * @zldev: pointer to zl3073x_dev structure
-+ *
-+ * The function asks device to latch the latest measured fractional
-+ * frequency offset values, reads and stores them into the ref state.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_ref_ffo_update(struct zl3073x_dev *zldev)
-+{
-+	int i, rc;
-+
-+	rc = zl3073x_ref_freq_meas_latch(zldev,
-+					 ZL_REF_FREQ_MEAS_CTRL_REF_FREQ_OFF);
- 	if (rc)
- 		return rc;
- 
-@@ -714,6 +762,20 @@ zl3073x_dev_periodic_work(struct kthread_work *work)
- 		dev_warn(zldev->dev, "Failed to update phase offsets: %pe\n",
- 			 ERR_PTR(rc));
- 
-+	/* Update measured input reference frequencies if any DPLL has
-+	 * frequency monitoring enabled.
-+	 */
-+	list_for_each_entry(zldpll, &zldev->dplls, list) {
-+		if (zldpll->freq_monitor) {
-+			rc = zl3073x_ref_freq_meas_update(zldev);
-+			if (rc)
-+				dev_warn(zldev->dev,
-+					 "Failed to update measured frequencies: %pe\n",
-+					 ERR_PTR(rc));
-+			break;
-+		}
-+	}
-+
- 	/* Update references' fractional frequency offsets */
- 	rc = zl3073x_ref_ffo_update(zldev);
- 	if (rc)
-diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
-index a29f606318f6d..d788ca45a17e5 100644
---- a/drivers/dpll/zl3073x/dpll.c
-+++ b/drivers/dpll/zl3073x/dpll.c
-@@ -39,6 +39,7 @@
-  * @pin_state: last saved pin state
-  * @phase_offset: last saved pin phase offset
-  * @freq_offset: last saved fractional frequency offset
-+ * @measured_freq: last saved measured frequency
-  */
- struct zl3073x_dpll_pin {
- 	struct list_head	list;
-@@ -54,6 +55,7 @@ struct zl3073x_dpll_pin {
- 	enum dpll_pin_state	pin_state;
- 	s64			phase_offset;
- 	s64			freq_offset;
-+	u32			measured_freq;
- };
- 
- /*
-@@ -202,6 +204,21 @@ zl3073x_dpll_input_pin_ffo_get(const struct dpll_pin *dpll_pin, void *pin_priv,
- 	return 0;
- }
- 
-+static int
-+zl3073x_dpll_input_pin_measured_freq_get(const struct dpll_pin *dpll_pin,
-+					 void *pin_priv,
-+					 const struct dpll_device *dpll,
-+					 void *dpll_priv, u64 *measured_freq,
-+					 struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll_pin *pin = pin_priv;
-+
-+	*measured_freq = pin->measured_freq;
-+	*measured_freq *= DPLL_PIN_MEASURED_FREQUENCY_DIVIDER;
-+
-+	return 0;
-+}
-+
- static int
- zl3073x_dpll_input_pin_frequency_get(const struct dpll_pin *dpll_pin,
- 				     void *pin_priv,
-@@ -1116,6 +1133,35 @@ zl3073x_dpll_phase_offset_monitor_set(const struct dpll_device *dpll,
- 	return 0;
- }
- 
-+static int
-+zl3073x_dpll_freq_monitor_get(const struct dpll_device *dpll,
-+			      void *dpll_priv,
-+			      enum dpll_feature_state *state,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll *zldpll = dpll_priv;
-+
-+	if (zldpll->freq_monitor)
-+		*state = DPLL_FEATURE_STATE_ENABLE;
-+	else
-+		*state = DPLL_FEATURE_STATE_DISABLE;
-+
-+	return 0;
-+}
-+
-+static int
-+zl3073x_dpll_freq_monitor_set(const struct dpll_device *dpll,
-+			      void *dpll_priv,
-+			      enum dpll_feature_state state,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll *zldpll = dpll_priv;
-+
-+	zldpll->freq_monitor = (state == DPLL_FEATURE_STATE_ENABLE);
-+
-+	return 0;
-+}
-+
- static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
- 	.direction_get = zl3073x_dpll_pin_direction_get,
- 	.esync_get = zl3073x_dpll_input_pin_esync_get,
-@@ -1123,6 +1169,7 @@ static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
- 	.ffo_get = zl3073x_dpll_input_pin_ffo_get,
- 	.frequency_get = zl3073x_dpll_input_pin_frequency_get,
- 	.frequency_set = zl3073x_dpll_input_pin_frequency_set,
-+	.measured_freq_get = zl3073x_dpll_input_pin_measured_freq_get,
- 	.phase_offset_get = zl3073x_dpll_input_pin_phase_offset_get,
- 	.phase_adjust_get = zl3073x_dpll_input_pin_phase_adjust_get,
- 	.phase_adjust_set = zl3073x_dpll_input_pin_phase_adjust_set,
-@@ -1151,6 +1198,8 @@ static const struct dpll_device_ops zl3073x_dpll_device_ops = {
- 	.phase_offset_avg_factor_set = zl3073x_dpll_phase_offset_avg_factor_set,
- 	.phase_offset_monitor_get = zl3073x_dpll_phase_offset_monitor_get,
- 	.phase_offset_monitor_set = zl3073x_dpll_phase_offset_monitor_set,
-+	.freq_monitor_get = zl3073x_dpll_freq_monitor_get,
-+	.freq_monitor_set = zl3073x_dpll_freq_monitor_set,
- 	.supported_modes_get = zl3073x_dpll_supported_modes_get,
- };
- 
-@@ -1572,6 +1621,7 @@ zl3073x_dpll_pin_ffo_check(struct zl3073x_dpll_pin *pin)
- 	struct zl3073x_dev *zldev = zldpll->dev;
- 	const struct zl3073x_ref *ref;
- 	u8 ref_id;
-+	s64 ffo;
- 
- 	/* Get reference monitor status */
- 	ref_id = zl3073x_input_pin_ref_get(pin->id);
-@@ -1582,10 +1632,47 @@ zl3073x_dpll_pin_ffo_check(struct zl3073x_dpll_pin *pin)
- 		return false;
- 
- 	/* Compare with previous value */
--	if (pin->freq_offset != ref->ffo) {
-+	ffo = zl3073x_ref_ffo_get(ref);
-+	if (pin->freq_offset != ffo) {
- 		dev_dbg(zldev->dev, "%s freq offset changed: %lld -> %lld\n",
--			pin->label, pin->freq_offset, ref->ffo);
--		pin->freq_offset = ref->ffo;
-+			pin->label, pin->freq_offset, ffo);
-+		pin->freq_offset = ffo;
-+
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+/**
-+ * zl3073x_dpll_pin_measured_freq_check - check for pin measured frequency
-+ * change
-+ * @pin: pin to check
-+ *
-+ * Check for the given pin's measured frequency change.
-+ *
-+ * Return: true on measured frequency change, false otherwise
-+ */
-+static bool
-+zl3073x_dpll_pin_measured_freq_check(struct zl3073x_dpll_pin *pin)
-+{
-+	struct zl3073x_dpll *zldpll = pin->dpll;
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	const struct zl3073x_ref *ref;
-+	u8 ref_id;
-+	u32 freq;
-+
-+	if (!zldpll->freq_monitor)
-+		return false;
-+
-+	ref_id = zl3073x_input_pin_ref_get(pin->id);
-+	ref = zl3073x_ref_state_get(zldev, ref_id);
-+
-+	freq = zl3073x_ref_meas_freq_get(ref);
-+	if (pin->measured_freq != freq) {
-+		dev_dbg(zldev->dev, "%s measured freq changed: %u -> %u\n",
-+			pin->label, pin->measured_freq, freq);
-+		pin->measured_freq = freq;
- 
- 		return true;
- 	}
-@@ -1677,13 +1764,18 @@ zl3073x_dpll_changes_check(struct zl3073x_dpll *zldpll)
- 			pin_changed = true;
- 		}
- 
--		/* Check for phase offset and ffo change once per second */
-+		/* Check for phase offset, ffo, and measured freq change
-+		 * once per second.
-+		 */
- 		if (zldpll->check_count % 2 == 0) {
- 			if (zl3073x_dpll_pin_phase_offset_check(pin))
- 				pin_changed = true;
- 
- 			if (zl3073x_dpll_pin_ffo_check(pin))
- 				pin_changed = true;
-+
-+			if (zl3073x_dpll_pin_measured_freq_check(pin))
-+				pin_changed = true;
- 		}
- 
- 		if (pin_changed)
-diff --git a/drivers/dpll/zl3073x/dpll.h b/drivers/dpll/zl3073x/dpll.h
-index 115ee4f67e7ab..434c32a7db123 100644
---- a/drivers/dpll/zl3073x/dpll.h
-+++ b/drivers/dpll/zl3073x/dpll.h
-@@ -15,6 +15,7 @@
-  * @id: DPLL index
-  * @check_count: periodic check counter
-  * @phase_monitor: is phase offset monitor enabled
-+ * @freq_monitor: is frequency monitor enabled
-  * @ops: DPLL device operations for this instance
-  * @dpll_dev: pointer to registered DPLL device
-  * @tracker: tracking object for the acquired reference
-@@ -28,6 +29,7 @@ struct zl3073x_dpll {
- 	u8				id;
- 	u8				check_count;
- 	bool				phase_monitor;
-+	bool				freq_monitor;
- 	struct dpll_device_ops		ops;
- 	struct dpll_device		*dpll_dev;
- 	dpll_tracker			tracker;
-diff --git a/drivers/dpll/zl3073x/ref.h b/drivers/dpll/zl3073x/ref.h
-index 06d8d4d97ea26..be16be20dbc7e 100644
---- a/drivers/dpll/zl3073x/ref.h
-+++ b/drivers/dpll/zl3073x/ref.h
-@@ -23,6 +23,7 @@ struct zl3073x_dev;
-  * @sync_ctrl: reference sync control
-  * @config: reference config
-  * @ffo: current fractional frequency offset
-+ * @meas_freq: measured input frequency in Hz
-  * @mon_status: reference monitor status
-  */
- struct zl3073x_ref {
-@@ -40,6 +41,7 @@ struct zl3073x_ref {
- 	);
- 	struct_group(stat, /* Status */
- 		s64	ffo;
-+		u32	meas_freq;
- 		u8	mon_status;
- 	);
- };
-@@ -68,6 +70,18 @@ zl3073x_ref_ffo_get(const struct zl3073x_ref *ref)
- 	return ref->ffo;
- }
- 
-+/**
-+ * zl3073x_ref_meas_freq_get - get measured input frequency
-+ * @ref: pointer to ref state
-+ *
-+ * Return: measured input frequency in Hz
-+ */
-+static inline u32
-+zl3073x_ref_meas_freq_get(const struct zl3073x_ref *ref)
-+{
-+	return ref->meas_freq;
-+}
-+
- /**
-  * zl3073x_ref_freq_get - get given input reference frequency
-  * @ref: pointer to ref state
--- 
-2.52.0
-
+I would think your patch series is net-next material ?
 
