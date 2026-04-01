@@ -1,202 +1,151 @@
-Return-Path: <netdev+bounces-273933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-273934-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ODe+Dn/JzGn5WgYAu9opvQ
-	(envelope-from <netdev+bounces-273933-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 09:30:07 +0200
+	id GDQNH63JzGn5WgYAu9opvQ
+	(envelope-from <netdev+bounces-273934-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 09:30:53 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90F6D375E7B
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 09:30:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08780375EAF
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 09:30:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0429630DD906
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 07:22:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F68430DF6F6
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 07:22:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51BBF37BE6F;
-	Wed,  1 Apr 2026 07:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2C637C922;
+	Wed,  1 Apr 2026 07:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YPWoPziv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pj4C94Gl"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E9737BE6C
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 07:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E7C37C0E5
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 07:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775028121; cv=none; b=J1DAol3Mueq8HcUYcuWt+h+4hGCZNukJ+vN7lSvPeDJW9vmdtTZoev76I7QdA1m0a6A1XlaVNuAYXe2svDaVeB/k8jBf6JSeg89HmwuZzEa0FyWVZ6RTd0wZjmqYdF0Bq7tmENSx7OtZixJI5jMPs/DHG4kZogyaEIzQQO2eSak=
+	t=1775028124; cv=none; b=EVvEd7m5iVtNlQgdouMGz4HLG4MF85b/50TrFbINqC+fjvsot1W2jR9T8uUvHumRtOgA+AjszJfmaivP9XoxhYN2Gf61Xn7EgFVrOwWLyn5ptxlJ4A8ABBl1wQMfrPAvrzp1nm+g/GNd3AIjYdSqG5zpNZ0WNM+QxwF8CbRG8KU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775028121; c=relaxed/simple;
-	bh=e6SojoCkMeGKm8lzGHx9/g0cPtsrOYqgRPMxNz8IpDQ=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=ZX2Nr/YL9/4SzhiiIqbFLHWKXscWVe2D6fQNOXGjJ0WnxwjbTCFlZw36diplvxPn5ntO1fxsvBUHC0VDipvslGpr42ZuMUfrMFfbnANzg/j0p3zTXuMIe93O6AJxQ+at867JD6cIawuDiM6ghafUxdZP/OxGfZpl+eHb3+EhYAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YPWoPziv; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=r3zNFXyOKF+BLz89Sva1o0uRJQ4NNntdmHQyPfgJhJ4=; b=YPWoPzivQBHQrro+coYNy2DvvG
-	jQyG8o4qVCZbJgTTipRgxggrJAz2LZCbyyb0/bR8tGDIVB8+iCFnvP4T7984cOt9VH8p5xG8P1yap
-	AokkJp34dL0o/0J14ojiqEqfXLg9R2jWZ7QtKc9EF1bvD6DH30BXpAwA/QLt1dTVwshx/rur9IO+A
-	0hFfKB2Vd+nUFnnZTjsYRyl44AQYp9tbiXKN8mWZF/jeABZA3nl+XbP41FA2YULN1dEDohu3Dbwku
-	3p0m4D0fDLXBdfOxVIGpjlBhz2EhQnzMzhsOQhG7g2XxEpIMPyd6JwTKbjy4+5BcWJ4mUB4e7lCRj
-	LSBf5m8Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:57410 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1w7ptf-000000002hX-1Ygn;
-	Wed, 01 Apr 2026 08:21:51 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1w7pte-0000000EatU-0ILt;
-	Wed, 01 Apr 2026 08:21:50 +0100
-In-Reply-To: <aczHVF04LIGq_lYO@shell.armlinux.org.uk>
-References: <aczHVF04LIGq_lYO@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1775028124; c=relaxed/simple;
+	bh=zoMzCwLz58hsOtyKlOVT1dSDiy6GUF38z6feI7bv1Vc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KntY659WQf6sqezD1Ck5sTmrKO448jthMF7nRTSD10SU4lw9t4mtayrKlV3Pz0hLGN5zqidQi3Jv0UyoK0emJiox9NVa9zNGi+xNfg4uGqtIc3IBXagyNQFxP1gDzZNrkpeb+8EopwOOawGZWx6U1EsnXfSBEoL+0M7Ubvl38I0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pj4C94Gl; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2b256a4c6b5so17418485ad.0
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 00:22:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775028123; x=1775632923; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jQNznQ9kFgYwHnnqDt5/rCEInESrDADfWL0k3BeYRCU=;
+        b=Pj4C94Gl9cbbI6mKlI5M/W/3gly9FICMboC536Q2Z5YsFmQENo5HTfFcZEaX0H3c5r
+         D+UIgz2iePUa5TQEgha/q87h0ARaPrsEpryRDPFrGSzyVig1VCCLlB4q/C/rTMPBl2+r
+         5BmmJ+5mTIfqhoh3MhaLdAOdy9U5SRxdvz4BouyvoNh/I1Zfb859oa14UEdJUBH16PBW
+         lt6nXK9VNuomCE3c1EB1QzkHj2esr3QTvOYc4IOGQ+a1gsJ6zzemAhmsgxULVf4BK3Ap
+         NUmQ4j/XoncSS4iOdv3usEF8Je4D46G/wa98TtYh9whs93FY9V4uPCoHzLBj87FrMicv
+         UTDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775028123; x=1775632923;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jQNznQ9kFgYwHnnqDt5/rCEInESrDADfWL0k3BeYRCU=;
+        b=qH2Nc4pU2fKe+XL7UNlmYteneeN6RZ3bSymlWdzVSRsXlD5XXHAAWTjwRUlbrY3kZX
+         8lz0/2XFmL+wjoUwIdThej8Eonbpf2cdJrMgqpy+vJ/cw1FJPHoUj3rHOxjw5Dd7gBkk
+         7pDdCAYVnj4W+eIPZsRUR0RfIFZZYRWfGCx2LUtf/swo+rzie0DsydZ59WWaO66MQgum
+         jNQxyvNFn/z7TsXITS3yTE1H4Kuw/pMfcSBY46mRiaof6oELzImYyTrnOowmLXHh6vBB
+         /8cJZoeGrT4RI5s6Qhp4Jrs0JcyTy+B9/VK7RNf28ZDlps0Jd0ghvRZECjKw4CZ1oZJi
+         M2mg==
+X-Forwarded-Encrypted: i=1; AJvYcCWCcYbkxuwCEh5fdyZ1HzZ+yqshcFUCihZ2qpLxP3f/Pq3bJsR3EqFQB66FCrMhR8nuE+tt4pA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysfGdw+Ot5ag7T6WEdUFzvHl0CoXENyHmpcdRklVLamcNGiQVj
+	F9C3RW7tPKm80+S7Fn3d/N0qyLbTQbSxixvCUZKlMItaYIou1ua5nskT
+X-Gm-Gg: ATEYQzxj4ZAaep9and7zC9tcAFX43JOa70rdtbNGQIDzzlIuJCAcIKlXRjM/DvyYbpD
+	3/XzQRw5S0tbJsqkQj6IN/sga7xsYaxLhJIXdYg5xyGLliHk+rKDODDegxV9YHvWWNTb6d9mB8n
+	LMoQ5DpgWdlG9GHdUvs96n2wOvmYChfQxPQzQgrm3omyDd3+wkBmE40olK5JpBFNufN+M2WJ8yw
+	BLYubCRvpcbiyO3hn1TzPf6VnV964ZSvRd0H0CpzUw5/E1HO8TLQlG8spLK8KF4HvEVfGMGvbXV
+	qVdeEqdbpSWOqawfd4cJtm2E2Ogy+knuhSuNDGR10+LtQ0zG03b3yCBgMdSs0f7O/rTbFjiHbyC
+	fWbn/ts3ZXq6Nx7oQOTo0PhvHKCEEofo5idqE/q8Fem+xaNPN3EciRrYcZDILSGKTNUt/f+fPei
+	uVmjZD/Zh0S+NiH3CIN+mJzRuW0WA=
+X-Received: by 2002:a17:902:f54f:b0:2ae:4555:479e with SMTP id d9443c01a7336-2b269ac86a1mr22411875ad.18.1775028122935;
+        Wed, 01 Apr 2026 00:22:02 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b24ddc0afbsm139505495ad.64.2026.04.01.00.21.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Apr 2026 00:22:02 -0700 (PDT)
+Date: Wed, 1 Apr 2026 07:21:54 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Donald Hunter <donald.hunter@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	netdev@vger.kernel.org,
-	Ong Boon Leong <boon.leong.ong@intel.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v2 08/14] net: stmmac: move check for hardware
- checksum supported
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] tools: ynl: ethtool: use doit instead of
+ dumpit for per-device GET
+Message-ID: <aczHkqj_0ErqCfXS@fedora>
+References: <20260331-b4-ynl_ethtool-v1-0-dda2a9b55df8@gmail.com>
+ <20260331-b4-ynl_ethtool-v1-1-dda2a9b55df8@gmail.com>
+ <20260331185028.45dffe3a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1w7pte-0000000EatU-0ILt@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 01 Apr 2026 08:21:50 +0100
-X-Spamd-Result: default: False [1.14 / 15.00];
+In-Reply-To: <20260331185028.45dffe3a@kernel.org>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-273933-lists,netdev=lfdr.de,kernel];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-273934-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,lunn.ch,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.872];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,rmk-PC.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 90F6D375E7B
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 08780375EAF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a check in .ndo_features_check() to indicate whether hardware
-checksum can be performed on the skbuff. Where hardware checksum is
-not supported - either because the channel does not support Tx COE
-or the skb isn't suitable (stmmac uses a tighter test than
-can_checksum_protocol()) we also need to disable TSO, which will be
-done by harmonize_features() in net/core/dev.c
+On Tue, Mar 31, 2026 at 06:50:28PM -0700, Jakub Kicinski wrote:
+> On Tue, 31 Mar 2026 11:56:11 +0800 Hangbin Liu wrote:
+> > +++ b/tools/net/ynl/pyynl/ethtool.py
+> 
+> We have converted all the samples to selftests so this script is 
+> the last piece of random "PoC" code we still have laying around.
+> Should we also move it to tests/ ?
+> 
+> If there's a reason to keep it as is -- could you please add that reason
+> at the top of the file for my future self? I'm pretty sure I already
+> questioned this script in the past ;)
 
-This fixes a bug where a channel which has COE disabled may still
-receive TSO skbuffs.
+I have no objection to this. Will you keep it as it is when moving it to
+tests/ ? Should I wait for your moving first?
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 38 +++++++++----------
- 1 file changed, 19 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index c67f042a90af..d3cbe71b9af1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4757,22 +4757,6 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	/* Check if VLAN can be inserted by HW */
- 	has_vlan = stmmac_vlan_insert(priv, skb, tx_q);
- 
--	csum_insertion = (skb->ip_summed == CHECKSUM_PARTIAL);
--	/* DWMAC IPs can be synthesized to support tx coe only for a few tx
--	 * queues. In that case, checksum offloading for those queues that don't
--	 * support tx coe needs to fallback to software checksum calculation.
--	 *
--	 * Packets that won't trigger the COE e.g. most DSA-tagged packets will
--	 * also have to be checksummed in software.
--	 */
--	if (csum_insertion &&
--	    (priv->plat->tx_queues_cfg[queue].coe_unsupported ||
--	     !stmmac_has_ip_ethertype(skb))) {
--		if (unlikely(skb_checksum_help(skb)))
--			goto dma_map_err;
--		csum_insertion = !csum_insertion;
--	}
--
- 	entry = tx_q->cur_tx;
- 	first_entry = entry;
- 	WARN_ON(tx_q->tx_skbuff[first_entry]);
-@@ -4788,6 +4772,8 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	if (enh_desc)
- 		is_jumbo = stmmac_is_jumbo_frm(priv, skb->len, enh_desc);
- 
-+	csum_insertion = skb->ip_summed == CHECKSUM_PARTIAL;
-+
- 	if (unlikely(is_jumbo)) {
- 		entry = stmmac_jumbo_frm(priv, tx_q, skb, csum_insertion);
- 		if (unlikely(entry < 0) && (entry != -EINVAL))
-@@ -4949,11 +4935,25 @@ static netdev_features_t stmmac_features_check(struct sk_buff *skb,
- 					       struct net_device *dev,
- 					       netdev_features_t features)
- {
--	u16 queue;
-+	struct stmmac_priv *priv = netdev_priv(dev);
-+	u16 queue = skb_get_queue_mapping(skb);
-+
-+	/* DWMAC IPs can be synthesized to support tx coe only for a few tx
-+	 * queues. In that case, checksum offloading for those queues that don't
-+	 * support tx coe needs to fallback to software checksum calculation.
-+	 *
-+	 * Packets that won't trigger the COE e.g. most DSA-tagged packets will
-+	 * also have to be checksummed in software.
-+	 *
-+	 * Note that disabling hardware checksumming also disables TSO. See
-+	 * harmonize_features() in net/core/dev.c
-+	 */
-+	if (priv->plat->tx_queues_cfg[queue].coe_unsupported ||
-+	    !stmmac_has_ip_ethertype(skb))
-+		features &= ~(NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM);
- 
- 	if (skb_is_gso(skb)) {
--		queue = skb_get_queue_mapping(skb);
--		if (!stmmac_tso_channel_permitted(netdev_priv(dev), queue) ||
-+		if (!stmmac_tso_channel_permitted(priv, queue) ||
- 		    !stmmac_tso_valid_packet(skb))
- 			features &= ~NETIF_F_GSO_MASK;
- 
--- 
-2.47.3
-
+Hangbin
 
