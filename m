@@ -1,163 +1,202 @@
-Return-Path: <netdev+bounces-274111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274112-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mCQPDN4fzWnOaAYAu9opvQ
-	(envelope-from <netdev+bounces-274111-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:38:38 +0200
+	id +FrrFighzWlWaQYAu9opvQ
+	(envelope-from <netdev+bounces-274112-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:44:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84C3A37B5A1
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:38:37 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E3EE37B6F8
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 15:44:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7B342305B0FA
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 13:30:40 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0F5DD3086EBE
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 13:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D12742EEC7;
-	Wed,  1 Apr 2026 13:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18B643C076;
+	Wed,  1 Apr 2026 13:31:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="t5e8U/1x"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mYgSyRWG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C4C42EED0
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 13:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775050239; cv=pass; b=fbKYhkv36hTiaYn6YcwnY4JO4PSA6g5Cw5qAnCmhROWtZmAwwJ2WeVyvHxky91kPi+aNHNdOkHGlCRKDBVHwbo6Ja9uSp3/cnSqBUwclNMtaQbgR6OxPp/s+vH6PynpSgwbla+FaTW7KkTcz923KmZdRHyZ+FmV4PQWQQnUJKfc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775050239; c=relaxed/simple;
-	bh=BRfaxlgXcaC4MwKGbrVI1gU9LqJpM6bbpHxRtdhQuco=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Axz50gzc2YpthM4Nx+cL0y2zL5Tpc50WnceGTnlXH4xxBJphNFLheqjO8RgF3Y+TU0cR5tPuTWY8pFz/co8GZjIPW5w7UJKz10CMxiZ0Laul+5OK51N4i6SAvh2CfHxETKloq66lWGYTQD6l71zoLFdPw/fOcIKbucve2NkQeoU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=t5e8U/1x; arc=pass smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-82cf96ca071so18542b3a.1
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 06:30:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775050237; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Y51e9TSDFcFA7zBHU8teo/8wLBBR5Buc2/iCydFCJrOPDA2GZQ40MtCuddEn6M4/Gq
-         M8s900EKVkGfT2hLbZoHK77oC+D+vjjb6OKGyWQPgh+rxE4HlX9c2InNqs3JS6ooG7xX
-         Cv83YMIgd/vhJYKBD5WD/ZT+2CoMTBIXIaxr7QzscsY9Q0rf0jZvfeSkDsMDB+qcIVbM
-         j+xohWASVLSjBwG5Ha0VF3I2JYwQUie11BQF2zb/+POKuT8jhEzB9rBiLRytN6jHQCBJ
-         AoW5hKoc5TlAM1joTZhnI3XJUZxi6xsJ234WlU7MfoeyamUvtj+FiKOB7zJRQwzoPEEV
-         Cq3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:dkim-signature;
-        bh=T7NuR3Bw6Qb5rckRbbyyN8y03wjGHotEoDAqQmFwpLY=;
-        fh=lBu3/v7o40Vg3xGxsLnhAVyQ6gzMitjrNM/vrosLT10=;
-        b=PeKcm1V6OQp3LO/TLSio6Qzkq/jQnf9FxqXjEFTW018/tcwjfHjsHuFVYV9JNeMMQJ
-         qYqld97vu+tjAvoUEIi0qk2iyfFp6b5wiCHiJwWH39w2Y5I9tNeBWgHS/2Jt3jp8/+rl
-         dwCXSgxU8TDW3AwYviFLDFWjQoSthUMZOPzsBIa4pO38oOgGRGd9g3bes1MSfceBkHym
-         1fVVORXHIDDs9Q6Sd7JLc1cp91tqPUpns/Lf3yhO4G3c6sTEhwuSzW+u1kAn0TZ3Wn5C
-         2jjxAZcJNf2aaaZpuLm7SEATDIfeDplSCeTMU/Ghw3TOrly++M1/mEI7GhRfUJE8kfcz
-         jn1A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1775050237; x=1775655037; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=T7NuR3Bw6Qb5rckRbbyyN8y03wjGHotEoDAqQmFwpLY=;
-        b=t5e8U/1xZ4c5uGBTHMld6TI1/QXjnvmHNjvQ5T+Jm2n39tqyd2cm+XRC/80ktQlpci
-         rwYTXq4DFcshYjfrqCJrDMj7zKqNVcRhYEJ0ST2CEoenxEAV1nrUCTi6hfNPCGOjsBWY
-         wIdGs9CmL/nTTFTkF99PGhOOiRuv4PmMOV8aZSTeI/QZNOqNQHIdJXIpJNW+uDoNpMoL
-         IY8oqXyEEcjjIkvCzGTz7nRBahav/GlZI56TXRYFujav9hD9j4mSoQboUXjii6XL8kJq
-         w/vVdsMnZ5whhHNYoj/VFtZkdMrewKh+LctrfAVHRW+2qX15m5iy3e7Eg1yuXFfLPl9I
-         V3Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775050237; x=1775655037;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T7NuR3Bw6Qb5rckRbbyyN8y03wjGHotEoDAqQmFwpLY=;
-        b=UOd+gVzPs5HEhjVuDfq9ajs8IP5tp8vZWWFr8O+tDGwe+d+wM3KlT9E/8QpQSug+L7
-         wjLyxTno0YCh6kw0rWCccNLcLI3GgAjfWVXbZpUBqoprSCeIVZ6aE6TfzkLRCcUTegdH
-         iKZSXdN59RVQIyv/HyEkOnB0SKL20FY3UDxdFTqmQbk8uXWKHeNQrVXTfY7LZL+QwSeL
-         AFgZeyL/xlz7NcJk7cxXGHjIZJnZXUZzcc5/8xV81xN+h0HB4Mzac7wrhAMt749EeyJs
-         BaQS4toaGrxlqZfdKwMvlLXlw0zpipebDASSPWKm+jlW8F981d5QlSFGpI/5nTS426ah
-         vR+A==
-X-Gm-Message-State: AOJu0YwrUt0BV1Jy7VkkKLIRdyDSONCm5APVY7ikLf3DorcvukLMKfGw
-	5AX9kokUssePITJpPp3RED6IhYHyR1M4oqdpwOrd6ixM+PGj3Nm8Yf/8/rrcM/7CpSb5o+87j33
-	bkHGSg4xMfg2cK2sWGjCqBkOz06vdty22f4uWI2q+DxhlSbp/GdEg7A==
-X-Gm-Gg: ATEYQzwWwzTUiyo20rabJcnVwj3uVs6B/z1kNtGu6OqvXNiTveqDzWX0IkzwSp/lT9t
-	DOHan3rfFhBQ2GMOUnNvQsjbIkoza4BLTtMytjdb5qWPXPkirEhXStEo+/h03oV6bYWl9hHPaDU
-	bYKizUHbH9ZSOFNCeMJJl2bUnBPKuyl1aBIlN4w9qf9vLQeHOsxaFEgJUiMQR/w1ONhzg5sLolq
-	iyqhlKbzXOd4s2bYP+w6C1sSu3IJ5gbq+72DEgpVLispUSRvm3Z7hRVxZN9dF5623la4a20bjZT
-	paJsorEGtdEno3rKHbU05NXufdfU0w==
-X-Received: by 2002:aa7:908f:0:b0:82c:ebbd:9eca with SMTP id
- d2e1a72fcca58-82cebbdba6cmr2579095b3a.11.1775050236598; Wed, 01 Apr 2026
- 06:30:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C0342882D
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 13:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775050314; cv=none; b=LG5CwQSdX7evZgS0NQcfav20MFEVC+9EQkdxnsRl//mTMM0v4zB1fVf41ByH8LZ2fegHRJ6LX3RHrLAOYWG/vIGIhnEo+Mpv5Mt0kfU9Bz7Nm5Wb3jpnoO8EIvJwmXM1+YCJ0XEgapGCczf5p8OhD60pREd69m4LpDGvWV2DD9I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775050314; c=relaxed/simple;
+	bh=7WSD0xVpd+t5WYgcMNTEAF0v1OnqUTar5TxLkrMoM9o=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=qbzHzwQVrQ1AL57tI85WItqtqywbnACCnYgeU+Vcj1c6wkIDQIU2UvA73weQoW64t8g2GSJ9TZPWYA+t+59rvn5cRgjEHEighX/NY5F536Q3aVVwJt10dW1qcsA/uVEpk3VweLVOIxl6dRp68EK7sPZlbayXZyH27Z3eLrrknRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mYgSyRWG; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 01 Apr 2026 15:31:42 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775050310;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7WSD0xVpd+t5WYgcMNTEAF0v1OnqUTar5TxLkrMoM9o=;
+	b=mYgSyRWGLJ0v75Jv6zgDKtWWqH5XkN7YHbkBbiVnjDriAecS/HaT59DqCBjAjwBrXEFmwb
+	PMMqfZnfHEzB5y7lqZrQlNSJMq3LU+5AeDuFkgnYU2Vn79atpx28g7v7dJdwePmBJIzcKi
+	npXbG2jBH/MH4JOC6urJP1ea9sRlhxI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Luka Gejak <luka.gejak@linux.dev>
+To: Fernando Fernandez Mancera <fmancera@suse.de>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+CC: netdev@vger.kernel.org, fmaurer@redhat.com, horms@kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net-next_v4_1/2=5D_net=3A_hs?=
+ =?US-ASCII?Q?r=3A_require_valid_EOT_supervision_TLV?=
+In-Reply-To: <1a22150a-0f4c-412a-9789-ece497d1c92c@suse.de>
+References: <20260401092324.52266-1-luka.gejak@linux.dev> <20260401092324.52266-2-luka.gejak@linux.dev> <4549f521-6395-4c26-921e-eaead7248a36@suse.de> <85A635E3-DF1B-42CA-B552-729943E5C0D5@linux.dev> <1a22150a-0f4c-412a-9789-ece497d1c92c@suse.de>
+Message-ID: <7540A920-76E7-4768-9E62-6666D0FECFA9@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 1 Apr 2026 09:30:24 -0400
-X-Gm-Features: AQROBzBVzmwXdf2WGM_n4Zy09fnWYZkggVAvYshhunotULUmqQbgAETJrZK1gAM
-Message-ID: <CAM0EoMkHo-e5Smq2yi7c4HxA1dJWzXRYkOo0A6NmbF-HkzaAgQ@mail.gmail.com>
-Subject: 0x1A: Dates And Location for upcoming conference
-To: people <people@netdevconf.info>
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>, Christie Geldart <christie@ambedia.com>, 
-	Kimberley Jeffries <kimberleyjeffries@gmail.com>, LWN <lwn@lwn.net>, 
-	"board@netdevconf.org" <board@netdevconf.info>, linux-wireless <linux-wireless@vger.kernel.org>, 
-	netfilter-devel@vger.kernel.org, lartc@vger.kernel.org, 
-	Stefano Salsano <stefano.salsano@uniroma2.it>, Andrea Mayer <andrea.mayer@uniroma2.it>, 
-	Carlo Filippi <carlo@common-net.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	R_DKIM_ALLOW(-0.20)[mojatatu-com.20230601.gappssmtp.com:s=20230601];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.96 / 15.00];
+	SUBJ_EXCESS_QP(1.20)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[mojatatu.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274111-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,ambedia.com,gmail.com,lwn.net,netdevconf.info,uniroma2.it,common-net.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274112-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mojatatu-com.20230601.gappssmtp.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[luka.gejak@linux.dev,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netdevconf.info:url,mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mojatatu-com.20230601.gappssmtp.com:dkim]
-X-Rspamd-Queue-Id: 84C3A37B5A1
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 3E3EE37B6F8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+On April 1, 2026 2:05:49 PM GMT+02:00, Fernando Fernandez Mancera <fmancera=
+@suse=2Ede> wrote:
+>On 4/1/26 1:06 PM, Luka Gejak wrote:
+>> On April 1, 2026 11:52:02 AM GMT+02:00, Fernando Fernandez Mancera <fma=
+ncera@suse=2Ede> wrote:
+>>> On 4/1/26 11:23 AM, luka=2Egejak@linux=2Edev wrote:
+>>>> From: Luka Gejak <luka=2Egejak@linux=2Edev>
+>>>>=20
+>>>> Supervision frames are only valid if terminated with a zero-length EO=
+T
+>>>> TLV=2E The current check fails to reject non-EOT entries as the termi=
+nal
+>>>> TLV, potentially allowing malformed supervision traffic=2E
+>>>>=20
+>>>> Fix this by strictly requiring the terminal TLV to be HSR_TLV_EOT
+>>>> with a length of zero=2E
+>>>>=20
+>>>> Reviewed-by: Felix Maurer <fmaurer@redhat=2Ecom>
+>>>> Signed-off-by: Luka Gejak <luka=2Egejak@linux=2Edev>
+>>>> ---
+>>>=20
+>>> Hi,
+>>>=20
+>>> This has not been reviewed by Felix=2E Felix provided his Reviewed-by =
+tag for the v1 which was completely different than this=2E
+>>>=20
+>>> Revisions of this patch:
+>>>=20
+>>> v3: https://lore=2Ekernel=2Eorg/all/20260329112313=2E17164-4-luka=2Ege=
+jak@linux=2Edev/
+>>>=20
+>>> v2: https://lore=2Ekernel=2Eorg/all/20260326154715=2E38405-4-luka=2Ege=
+jak@linux=2Edev/
+>>>=20
+>>> v1: https://lore=2Ekernel=2Eorg/all/20260324143503=2E187642-4-luka=2Eg=
+ejak@linux=2Edev/
+>>>=20
+>>> Are these contributions LLM/AI generated? I believe so based on the em=
+ail history=2E
+>>>=20
+>>> AI generated review on rtl8723bs: https://lore=2Ekernel=2Eorg/all/B239=
+4A3C-25FD-4CEA-8557-3E68F1F60357@linux=2Edev/
+>>>=20
+>>> Another AI generated review on rtl8723bs: https://lore=2Ekernel=2Eorg/=
+all/3831D599-655E-40B2-9E5D-9DF956013088@linux=2Edev/
+>>>=20
+>>> Likely an AI generated review on a 1 year old HSR patch: https://lore=
+=2Ekernel=2Eorg/all/DHFG26KI6L23=2E1YCOVQ5SSYMO5@linux=2Edev/
+>>>=20
+>>> If these are indeed, AI generated contributions or reviews they should=
+ be disclosed beforehand=2E Also there is the Assisted-by: tag=2E Also note=
+ that developer must take full responsibility for the contribution which me=
+ans understanding it completely=2E
+>>>=20
+>>> https://docs=2Ekernel=2Eorg/process/coding-assistants=2Ehtml#signed-of=
+f-by-and-developer-certificate-of-origin
+>>>=20
+>>> Thanks,
+>>> Fernando=2E
+>>=20
+>> Hi Fernando,
+>> About the Reviewed-by tag, that was my mistake=2E I forgot to remove it
+>> when rebasing=2E And about AI=2E I=E2=80=99ve been using it to help for=
+mat my
+>> emails and translate them into English since it isn't my native
+>> language=2E However, the technical logic and the code itself are my own
+>> work, written without AI=2E
+>
+>So I don't think this change in code is related to rebasing at all=2E The=
+ code in this function is identical when comparing net and net-next tree so=
+ why a rebase would cause such change in the code? Am I missing something h=
+ere?
+>
+>In addition to that, the new logic does not make any sense=2E What motiva=
+ted the diff from v3 to v4? All that information is missing=2E
+>
+>Thanks,
+>Fernando=2E
+>
+>Should I send v5, and if so, what should I
+>> do besides stripping the Reviewed-by tag? I've read the documentation
+>> on coding assistants you linked and will make sure to follow it on the
+>> next revision=2E
+>> Best regards,
+>> Luka Gejak
+>>=20
+>
 
-This is a pre-announcement so folks can plan travel etc.
-
-Netdev conf 0x1A will be a hybrid conference.  We will update you with
-the exact coordinates in the near future.
-Either watch https://netdevconf.info/0x1A/ or join people@ mailing
-list[1] for more frequent updates.
-
-Netdev 0x1A is scheduled to be in Rome - Italy July 13th-16th.
-Location: Universit=C3=A0 Roma TRE - Via Ostiense, 236, 00144 Rome RM, Ital=
-y
-
-Be ready to share your work with the community. CFS coming soon.
-
-sincerely,
-Netdev Society Board:
-PJ, Roopa Prabhu, Shrijeet Mukherjee, Tom Herbert, Jamal Hadi Salim
-
-[1] https://lists.netdevconf.info/postorius/lists/people.netdevconf.info/
+Hi Fernando,
+These 2 patches were in the same patch series as 2 other patches=2E=20
+Then, when rebasing to edit 3rd patch in original patch series(3/4), I
+forgot to remove the Reviewed-by tag(I ran git commit --amend=20
+--no-edit)=2E Then I separated 1st 2 and 2nd 2 patches into separate=20
+series (one for net and other for net-next) because I was instructed=20
+to do so by Jakub Kicinski=2E His email:
+>I think that patches 1 and 2 need to go to net with a Fixes tag=2E
+>They look like run of the mill bug fixes=2E 3 and 4 are logical
+>fixes and change behavior so net-next makes sense=2E
+>
+>FWIW AI has something to say about patch 3, I did not investigate:
+>https://sashiko=2Edev/#/patchset/20260329112313=2E17164-2-luka=2Egejak@li=
+nux=2Edev
+>--=20
+>pw-bot: cr
 
