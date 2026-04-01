@@ -1,340 +1,208 @@
-Return-Path: <netdev+bounces-274027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274029-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +MEdMk/0zGl9YQYAu9opvQ
-	(envelope-from <netdev+bounces-274027-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 12:32:47 +0200
+	id INN7Dor2zGl9YQYAu9opvQ
+	(envelope-from <netdev+bounces-274029-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 12:42:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 665E73788BF
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 12:32:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 797BD378A7F
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 12:42:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4619C30A3FFD
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 10:27:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0EE9F3040AB3
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 10:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15B093F210E;
-	Wed,  1 Apr 2026 10:25:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070783E8C6F;
+	Wed,  1 Apr 2026 10:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="frBARuNw"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="iIoXX629"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011029.outbound.protection.outlook.com [40.107.208.29])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012044.outbound.protection.outlook.com [40.93.195.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4723F2111;
-	Wed,  1 Apr 2026 10:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7240B3DE43C;
+	Wed,  1 Apr 2026 10:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775039157; cv=fail; b=sOQBgpbjsxA2VgjXy6jOeFTt2cKCcFOpXEtElUNXd/nMQKXYETKQ+XziSH1DSDsLm3cFAEffGVB+gvbnO4kA2iWugtq114iUCe3K+RiEYNG/vyIJtDJT/fUXf2Nt2uqdYnhOyRtONlfDhq660fACmrtvb0PI3Ro7wSPADL+PkQA=
+	t=1775039403; cv=fail; b=lz/Y87lTNtdNhG/rYvIgtVVEhqxtL87OcdtJwTYa0tSMgJlxrt94Aql6dYejJ4vxtCJfh2f4BzV0fPPDPpra5PlV+YaeitOhLL9Dl1DnH8G5fky61JBROe8qc1uAhuVbJAtuKSmT6qQThfYsFSh6+VWXiINmZSCjV6jX7QCEVbs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775039157; c=relaxed/simple;
-	bh=eMYNowOFUhuRcDDp73Hi3cFIYgTd17uUvVPQt5dokHU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K7zl+UiV7zS3hPMWiCHqrNn/KSagSv06Bm22nTtC/IQJUgNZcriLlnoy+rMwlSje1chrDL8oTTjQkmD/HYTrPunqeaUmymrEzAULqifB5oS3b0P+w3hA4reQCWrgxu9aNXNw/R0NsfDCkNEF1e0Zjv1SO1PdeA18HszrcPbWLUE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=frBARuNw; arc=fail smtp.client-ip=40.107.208.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1775039403; c=relaxed/simple;
+	bh=9z2DoO4vlF5ZWUL6PY8p6CcEeKQbE8EdWcUQpHrDfCc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CFW+V7s7JSSZ3D+qBq4NPFfnfzw2nBBOUdifOYh7iZNEsfo+qwuNK020R4fuVoJhOksi8vIDC87Bc13oDm07IapSNvdfim+25hIk1SFHCxW6zZ1oPpbyZETtJSMOs4cUKzXO8p8PgTzFU+bb/dQ0KNmIMgM/AJExI7S1NrUMoZM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=iIoXX629; arc=fail smtp.client-ip=40.93.195.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=D2DN7S++DQrXkEqeH01xuI/DqhKpugf87sPgrwMjitLO58ySAN0xljslYKTuwzrNLD0645erpkJDpi2Vd85V7Us/T2uaE9OBufGpi6+k7OnkuKnMU1KwnDptTkna5rJ0KuMZwYwqwkj7lbj9fgiEkSFNkhN1I0RVRanQSCgfapYlGq0rykELAlu8VZMbaUZiz5PJ63Ue1LXQz69xF0bWnTdK9yCo+8ygtaBHmkdRFCXtjPsDRetMjxsrwUiKolbdqz8ipgH3w4iZF8Oj7X2nGjszlrhGaNmemJf095pm0ZopmIrg4O5S8N0Wu/zvSO2hLEes6EBV3QL4MNLiVw8esA==
+ b=q6SKwiTChRVxNJaIyHRFD2QNKuzdz2q6U2qxtIc24eYayojAiaBSEmlHqH/F34AE7A0x3rwOm5rszWIWGXPbqziab3SL6d9SARJgmODQLjorPzdMagqESAvl6bBrQAEVB2vvsdixOLaHyNeBb5cNsLPN3L5N/7klXniWzJ3MIIjPmelSsfZIrFYMyxBBa0CHBGk4FFHpxpqVAnz08cwqZ5hkHziexqNEz3QtTDDfP9zzIi7xv+EuJlcLZliysjygy48e1q/QLyuRlyJq45GUaMiDdsrT3aWXSHh3J09KTMr+Qg0p3RZqNywrcAJeZAWNGjw4NSsfi5ytDI3hyuTZOQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yMe7Azw7JSxyTgI/jHxFnhhmL0JukzyPj2qiasOI90w=;
- b=toWed/BjhhXT1bi4rXbfOO9feU7DjDT/0LpIx7hhsIhukIeP6xWKZHUWUkgt2R1Qt8JRqpjWIqKHY+ZGHqwOQNOJn35vnB1BMBNAalkxVW5OL5BeX6vDw2x+znrOvYru5CUqEiYT3zPS7wG7dSuvepK9itdt/ws79RifuQHk5JSNgDkjrEdWhF9DiYDtK9taJB/e0g6NG95jk2auql6dxVNxgAzAqo4+wJ31+dpv5OoB1WZ/NvPoRuDIhLxNp1qLx7TWxUkxOQV8ySduIMJj2xn/VsF+gVo8+ArtxB0UJm4HwZfp0DLD1KPV51PEGjGrwFgTHct/8ynW/DhWQdTSJA==
+ bh=IqNI9tWosoLvpJ553mQqbOhGY8N2OsO/1+Z8Nm8rwsI=;
+ b=RxBEXrEt0OsMBHkvR2XvODkBIaiqVEVwTjTK37s+oQo7Ij2dYreDUCQv5pPgr6eWUSD86f1BTyQnLzhalX863WuGwfAn/sQL8o1ZKUQQhJIO5qI9mEgLqz1vclhlTGSStjBeKtxd0uIm6mvpX07uGyID3FBSdo1saoncb4G+SSwqtcx5/ntGb/x7kk/2dwZ+M+VxmfBrVXW95Bdzs3/pCsQkGoDHzChQCY86WlIeSOZ6Ioe//TgGcr6MZiCpFg3Le78QbQg5r5btfGJkL0GJB5bXeF7oVphcz9lujKEoN7Ax0cyWjK4FXkXAgqBP96nmzXi3649RYjtMfjAcU4MUzQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=ziepe.ca smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ 216.228.118.233) smtp.rcpttodomain=lunn.ch smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yMe7Azw7JSxyTgI/jHxFnhhmL0JukzyPj2qiasOI90w=;
- b=frBARuNwoalReaCcGyejVs7+IMBHRwJEw0W1xaw+yatlm5JODB2sciHYcywjTsb08Wzl6fOS/hpsfjN9uPW2KStAT1svGN+N8trGVfL4A5iwCWbEYblK13H8xeY8PQ4oCiosb5uhoAF8gZ6kAznbKOlElVlcynIfz83G+VEowk4=
-Received: from DM6PR03CA0073.namprd03.prod.outlook.com (2603:10b6:5:333::6) by
- SAWPR12MB999142.namprd12.prod.outlook.com (2603:10b6:806:4e1::12) with
+ bh=IqNI9tWosoLvpJ553mQqbOhGY8N2OsO/1+Z8Nm8rwsI=;
+ b=iIoXX629CXHh2IQ9tb0RL9AWrHFeau3NGvEAFNOBM1tgENFnvKc09z4r0eZNWxcYuHP3g+nwZP5B2BnuyP8KDztrgnhaprHdyqFMN987IA9o84I0A1cu4ZilF+LToUxhw3iBU5eVZZCWUx/wp4Mc6USDl/npsHktBLpg6Ih2NmXzopszR9sNXpqhOPltvG5cVciIFn7jvg9uvaHZT5wXL1v6bt/y8R1ACSL26/W+DOUqmhzLzarSGrxVVn8dI8ZWtXFkyxzGlJi3/QGp9MzxUfiQV5jjJ4b8Kb+eL97eM/kJ5YQMGwKPKx7hbfnt/TJU/V0WSq0KuE66D9TGj+exFg==
+Received: from BN0PR02CA0030.namprd02.prod.outlook.com (2603:10b6:408:e4::35)
+ by IA1PR12MB6115.namprd12.prod.outlook.com (2603:10b6:208:3e9::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.17; Wed, 1 Apr
- 2026 10:25:51 +0000
-Received: from DS3PEPF000099E0.namprd04.prod.outlook.com
- (2603:10b6:5:333:cafe::be) by DM6PR03CA0073.outlook.office365.com
- (2603:10b6:5:333::6) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9745.30 via Frontend Transport; Wed,
- 1 Apr 2026 10:25:50 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
-Received: from satlexmb08.amd.com (165.204.84.17) by
- DS3PEPF000099E0.mail.protection.outlook.com (10.167.17.203) with Microsoft
+ 2026 10:29:58 +0000
+Received: from BN2PEPF000044AA.namprd04.prod.outlook.com
+ (2603:10b6:408:e4:cafe::34) by BN0PR02CA0030.outlook.office365.com
+ (2603:10b6:408:e4::35) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9745.29 via Frontend Transport; Wed,
+ 1 Apr 2026 10:29:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ BN2PEPF000044AA.mail.protection.outlook.com (10.167.243.105) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9769.17 via Frontend Transport; Wed, 1 Apr 2026 10:25:50 +0000
-Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 1 Apr
- 2026 05:25:49 -0500
-Received: from xhdipdslab46.xilinx.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.17 via Frontend
- Transport; Wed, 1 Apr 2026 05:25:46 -0500
-From: Abhijit Gangurde <abhijit.gangurde@amd.com>
-To: <jgg@ziepe.ca>, <leon@kernel.org>, <brett.creeley@amd.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <allen.hubbe@amd.com>, <nikhil.agarwal@amd.com>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Abhijit Gangurde <abhijit.gangurde@amd.com>
-Subject: [PATCH 4/4] RDMA/ionic: add completion timestamp to CQE format
-Date: Wed, 1 Apr 2026 15:55:01 +0530
-Message-ID: <20260401102501.3395305-5-abhijit.gangurde@amd.com>
+ 15.20.9769.17 via Frontend Transport; Wed, 1 Apr 2026 10:29:57 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 1 Apr
+ 2026 03:29:49 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Wed, 1 Apr 2026 03:29:49 -0700
+Received: from moonraker.nvidia.com (10.127.8.14) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Wed, 1 Apr 2026 03:29:47 -0700
+From: Jon Hunter <jonathanh@nvidia.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Thierry Reding <thierry.reding@kernel.org>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-tegra@vger.kernel.org>, Jon Hunter <jonathanh@nvidia.com>
+Subject: [PATCH V4 0/3] net: stmmac: Fix Tegra234 MGBE clock
+Date: Wed, 1 Apr 2026 11:29:38 +0100
+Message-ID: <20260401102941.17466-1-jonathanh@nvidia.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260401102501.3395305-1-abhijit.gangurde@amd.com>
-References: <20260401102501.3395305-1-abhijit.gangurde@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-NVConfidentiality: public
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099E0:EE_|SAWPR12MB999142:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6884ffcd-c2cd-4afc-dc53-08de8fd90bfd
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044AA:EE_|IA1PR12MB6115:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7234cbc7-58aa-4dc0-3d41-08de8fd99f64
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|7416014|1800799024|36860700016|18002099003|56012099003|22082099003;
+	BCL:0;ARA:13230040|82310400026|36860700016|7416014|376014|1800799024|56012099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	I4kDUpiUVez6sgvKdYIG2nhx6n/nrKUiuG6DBnLdVju9zgFKGUlTJVqYk868zremDbViTG7VXGpkmgxjANuOL1B2mKmVrz3c7GVDmMmt8SoUmhbHiFpMMN25nP9mWcMjaXbmrSkWot9/jTyse+tVM8r37xg5J2nWg/mGIARKxD8CuxU2YaaMtpF+5rVp7I0bT5yzjGcTHGgveOjNTnmHhWfgBBVYhMHQf9EbspjyrPjU9gKuBc7wron6TiU4NIVCaif375HLp7VOxgHml+YyWCJSPVpFM0abslpFgEZLQJqkhUCOwMQWHZbYkCr//p767OKQwUjFmpRFl5DYEuB/LaEaWC3HAaVBr+JPqxOHoSeGMlR7pTd+PbV2rh6TtOmol89WUODP0k4AveRHxa+im0o98B05/ZGWYTMFUU12+Buj8/d2NaW9dU1YJSOkau26zUREOnjcbJv4Z1CC65MfVREvP1q0EAmrBMDmd40YJD4BdIz7WBuLk58nrweoC4o0wXk9Lr72cK5Xgwil5SzF3FgZc0lxltqYV82RPSfPvuox9jSn9u7eDCsFrCMXNvUbfWgUHwIfDkReuEdwSCeA4y9R7IAklBG1tJc+K2TFpWN7gioXlhrjWE/tZzDStg9vT+AADWiCdW5RX2p3PnnjxOOPSGx0BNsD2Lx+2mVDJ221ekkL0uBO0y8N2rtIkOsBx1+MKTpL/QR8NGLYQAIAaQhFkp82/u3NcUq3swCe7q2XEOvdVXvKhoKnBZQdu/jZZiTWpcjy5OTjhHqS1dIRaQ==
+	obf+FadFGINSVpIkugnRJhptuDpKdhVii+Nd4b8VJ4fjwACntrTugXnf6pkdf63F0ZkGecYzLsOdhZJsQkG9Z+CotdXqxC0MA6aEmYyTFp1Q3glz37eTHBBlAWLrnt0taUKupzUJGqh8Jnoc6Tz41r5xNBczTulstfcx9yOHcV89m0EYIDtV64AtaiwZEV2fBYki2G6+swhqRfGGfDEYpyek2sc8gYL8ebd2Mdil6cvFB9emKLglrc9MQBIkJvV4a+R+NMbc6BWCi81SEKHs2ABVHIzF7TG/rNMvQenBLjqvcq/7UntR0kn+kEDtnaGnD5m4PsxbNGcaJycWY0gqjC/Gs9QSCVglLXJPpGmNKyf36s+OXUIOSCPaKtmmMm1agBaDqJFq2yTDqXe8FrFTkHzMw7yZh1InH4lMYboHUfFfemNijB/XLX3Q3UIPkdVnR7AbiHNiTcXHgLnHc2K9wikiOVnxw/Bv05Yiibm2KeLPLB70vfYnk5eTGvjMgPi9m0ZHLyQhkZSSKUN55dDkru51tSr87qqZbXcSLNlkoBHG4s7/njQnVzps/xL20DkPj1iGWKPgnIDERNx6H2VUxULb7rrGiLzR7JKKW8u/Y+IR+r7gsGhHur0wL5tj5edfYyWYiKBluapmC0F30w1UFjn2in5DqlSmuH4iPMShJuMQC7gGURi1TqcaecXZ9TnsVk2i0nMZ3ujtyFKmFEzUJVMNiucwjYr1IklkrJYn2yuJYqaQjv29vXbIaGxAE3T4eajFpA6tt7K7hOp0Afxuog==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(7416014)(1800799024)(36860700016)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(7416014)(376014)(1800799024)(56012099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	ZVSPEImS2QiqFg3W0cHxDHcZuxa6VvwTlqJuavfwne8JsiJIjpU5Vq83pEy3Kw+UAV9kYkGceGwpppOdv9+GFaUP+I5Jr+a8TEf0bMjarz8Kz8t45F7eBZreJ/z/MwLYKfdpb92p7w/7pXqgqY07yno3gajzMlfj1NgHnC3u0zcBPf0kAIro/C9tBf+Y0n4tTidK/jiXamG0pVSNyR7QrQiIO0CRvtxzzBF1m5iInLyRZGTGYKhcz0vON/Z+3IcVqAmNAxTE/Q8KeWXIViuEDkNlhpq3rosqJqKrh+GKzJl1/1NCty7jSGF4M4NeyTXXYRkttE5Ps+doCIs4nntyJJJTsvvu8kfjv4n9pUjJ+rzOqeGXrbTIIULL6nLq6BGBWjurV6yoiV9p34N5avsKC/RReypgDJD1YVFj4e9q496Q0AX6Q6wh/Az6qa+06mfH
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2026 10:25:50.4282
+	FUJuBFzDANUM06ytii/mIbi3ZlwMm3gdI+247vJoz4SzzYHn3BSOUr4bAuu36glUooI3A/EnQT8Ydtajj876w5b2oPThu+aX853KhHNXzN2+9Jzi1DmaEh6tccA4P11IbyK3oOvipWl7XVBxfC5nJgbQhU1ztt+jf5zzinb7eljrKDLEz6eQrT2OtnaL8bp8He619qBmy1tZw5n0W5YYiAtw3hpNjTk9CqOama37IRqWH4rj8L7zVGW3NB/ijpBWqEjuupP/o4wbv1L67iVjQNHkSu1J2A+TTfm1fgdWK+jghReZh/GkBpSRCZATTVNP9W4wMGIk7cxsAvz+r5Hq8Hye4TuX1RMcPtjnbyplNPG1knCLgU5iMDctT0NsQmkz1fg9gK0Yitz8wdIucIwCunBdZ/wu0lHCbP/WAhcVPIfzPFAEZuf7OGFvrAVXCdfx
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2026 10:29:57.6203
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6884ffcd-c2cd-4afc-dc53-08de8fd90bfd
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7234cbc7-58aa-4dc0-3d41-08de8fd99f64
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099E0.namprd04.prod.outlook.com
+	BN2PEPF000044AA.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SAWPR12MB999142
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6115
 X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274027-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274029-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[abhijit.gangurde@amd.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jonathanh@nvidia.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[amd.com:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,amd.com:dkim,amd.com:email,amd.com:mid];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 665E73788BF
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:mid];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: 797BD378A7F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Update the CQE structure to include hardware timestamp.
-When firmware supports RDMA completion timestamps,
-the hardware populates the timestamp field.
+The name of the PTP ref clock for the Tegra234 MGBE ethernet controller
+does not match the generic name in the stmmac platform driver. Despite
+this basic ethernet is functional on the Tegra234 platforms that use
+this driver and as far as I know, we have not tested PTP support with
+this driver. Hence, the risk of breaking any functionality is low.
 
-Co-developed-by: Allen Hubbe <allen.hubbe@amd.com>
-Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
-Signed-off-by: Abhijit Gangurde <abhijit.gangurde@amd.com>
----
- drivers/infiniband/hw/ionic/ionic_datapath.c | 43 ++++++++++----------
- drivers/infiniband/hw/ionic/ionic_fw.h       | 12 ++++--
- 2 files changed, 31 insertions(+), 24 deletions(-)
+The previous attempt to fix this in the stmmac platform driver, by
+supporting the Tegra234 PTP clock name, was rejected [0]. The preference
+from the netdev maintainers is to fix this in the DT binding for
+Tegra234.
 
-diff --git a/drivers/infiniband/hw/ionic/ionic_datapath.c b/drivers/infiniband/hw/ionic/ionic_datapath.c
-index aa2944887f23..3e2300f7ea10 100644
---- a/drivers/infiniband/hw/ionic/ionic_datapath.c
-+++ b/drivers/infiniband/hw/ionic/ionic_datapath.c
-@@ -32,6 +32,7 @@ static int ionic_flush_recv(struct ionic_qp *qp, struct ib_wc *wc)
- {
- 	struct ionic_rq_meta *meta;
- 	struct ionic_v1_wqe *wqe;
-+	u64 wqe_idx;
- 
- 	if (!qp->rq_flush)
- 		return 0;
-@@ -40,21 +41,22 @@ static int ionic_flush_recv(struct ionic_qp *qp, struct ib_wc *wc)
- 		return 0;
- 
- 	wqe = ionic_queue_at_cons(&qp->rq);
-+	wqe_idx = le64_to_cpu(wqe->base.wqe_idx);
- 
--	/* wqe_id must be a valid queue index */
--	if (unlikely(wqe->base.wqe_id >> qp->rq.depth_log2)) {
-+	/* wqe_idx must be a valid queue index */
-+	if (unlikely(wqe_idx >> qp->rq.depth_log2)) {
- 		ibdev_warn(qp->ibqp.device,
- 			   "flush qp %u recv index %llu invalid\n",
--			   qp->qpid, (unsigned long long)wqe->base.wqe_id);
-+			   qp->qpid, (unsigned long long)wqe_idx);
- 		return -EIO;
- 	}
- 
--	/* wqe_id must indicate a request that is outstanding */
--	meta = &qp->rq_meta[wqe->base.wqe_id];
-+	/* wqe_idx must indicate a request that is outstanding */
-+	meta = &qp->rq_meta[wqe_idx];
- 	if (unlikely(meta->next != IONIC_META_POSTED)) {
- 		ibdev_warn(qp->ibqp.device,
- 			   "flush qp %u recv index %llu not posted\n",
--			   qp->qpid, (unsigned long long)wqe->base.wqe_id);
-+			   qp->qpid, (unsigned long long)wqe_idx);
- 		return -EIO;
- 	}
- 
-@@ -133,8 +135,8 @@ static int ionic_poll_recv(struct ionic_ibdev *dev, struct ionic_cq *cq,
- {
- 	struct ionic_qp *qp = NULL;
- 	struct ionic_rq_meta *meta;
-+	u16 vlan_tag, wqe_idx;
- 	u32 src_qpn, st_len;
--	u16 vlan_tag;
- 	u8 op;
- 
- 	if (cqe_qp->rq_flush)
-@@ -144,7 +146,7 @@ static int ionic_poll_recv(struct ionic_ibdev *dev, struct ionic_cq *cq,
- 
- 	st_len = be32_to_cpu(cqe->status_length);
- 
--	/* ignore wqe_id in case of flush error */
-+	/* ignore wqe_idx in case of flush error */
- 	if (ionic_v1_cqe_error(cqe) && st_len == IONIC_STS_WQE_FLUSHED_ERR) {
- 		cqe_qp->rq_flush = true;
- 		cq->flush = true;
-@@ -160,20 +162,19 @@ static int ionic_poll_recv(struct ionic_ibdev *dev, struct ionic_cq *cq,
- 		return -EIO;
- 	}
- 
--	/* wqe_id must be a valid queue index */
--	if (unlikely(cqe->recv.wqe_id >> qp->rq.depth_log2)) {
-+	wqe_idx = le64_to_cpu(cqe->recv.wqe_idx_timestamp) & IONIC_V1_CQE_WQE_IDX_MASK;
-+	/* wqe_idx must be a valid queue index */
-+	if (unlikely(wqe_idx >> qp->rq.depth_log2)) {
- 		ibdev_warn(&dev->ibdev,
--			   "qp %u recv index %llu invalid\n",
--			   qp->qpid, (unsigned long long)cqe->recv.wqe_id);
-+			   "qp %u recv index %u invalid\n", qp->qpid, wqe_idx);
- 		return -EIO;
- 	}
- 
--	/* wqe_id must indicate a request that is outstanding */
--	meta = &qp->rq_meta[cqe->recv.wqe_id];
-+	/* wqe_idx must indicate a request that is outstanding */
-+	meta = &qp->rq_meta[wqe_idx];
- 	if (unlikely(meta->next != IONIC_META_POSTED)) {
- 		ibdev_warn(&dev->ibdev,
--			   "qp %u recv index %llu not posted\n",
--			   qp->qpid, (unsigned long long)cqe->recv.wqe_id);
-+			   "qp %u recv index %u not posted\n", qp->qpid, wqe_idx);
- 		return -EIO;
- 	}
- 
-@@ -408,7 +409,7 @@ static int ionic_comp_msn(struct ionic_qp *qp, struct ionic_v1_cqe *cqe)
- static int ionic_comp_npg(struct ionic_qp *qp, struct ionic_v1_cqe *cqe)
- {
- 	struct ionic_sq_meta *meta;
--	u16 cqe_idx;
-+	u16 wqe_idx;
- 	u32 st_len;
- 
- 	if (qp->sq_flush)
-@@ -430,8 +431,8 @@ static int ionic_comp_npg(struct ionic_qp *qp, struct ionic_v1_cqe *cqe)
- 		return 0;
- 	}
- 
--	cqe_idx = cqe->send.npg_wqe_id & qp->sq.mask;
--	meta = &qp->sq_meta[cqe_idx];
-+	wqe_idx = le64_to_cpu(cqe->send.npg_wqe_idx_timestamp) & qp->sq.mask;
-+	meta = &qp->sq_meta[wqe_idx];
- 	meta->local_comp = true;
- 
- 	if (ionic_v1_cqe_error(cqe)) {
-@@ -811,7 +812,7 @@ static void ionic_prep_base(struct ionic_qp *qp,
- 	meta->signal = false;
- 	meta->local_comp = false;
- 
--	wqe->base.wqe_id = qp->sq.prod;
-+	wqe->base.wqe_idx = cpu_to_le64(qp->sq.prod);
- 
- 	if (wr->send_flags & IB_SEND_FENCE)
- 		wqe->base.flags |= cpu_to_be16(IONIC_V1_FLAG_FENCE);
-@@ -1205,7 +1206,7 @@ static int ionic_prep_recv(struct ionic_qp *qp,
- 
- 	meta->wrid = wr->wr_id;
- 
--	wqe->base.wqe_id = meta - qp->rq_meta;
-+	wqe->base.wqe_idx = cpu_to_le64(meta - qp->rq_meta);
- 	wqe->base.num_sge_key = wr->num_sge;
- 
- 	/* total length for recv goes in base imm_data_key */
-diff --git a/drivers/infiniband/hw/ionic/ionic_fw.h b/drivers/infiniband/hw/ionic/ionic_fw.h
-index adfbb89d856c..ee23062a1762 100644
---- a/drivers/infiniband/hw/ionic/ionic_fw.h
-+++ b/drivers/infiniband/hw/ionic/ionic_fw.h
-@@ -332,7 +332,7 @@ struct ionic_v1_cqe {
- 			__le16		old_rq_cq_cindex;
- 		} admin;
- 		struct {
--			__u64		wqe_id;
-+			__le64		wqe_idx_timestamp;
- 			__be32		src_qpn_op;
- 			__u8		src_mac[6];
- 			__be16		vlan_tag;
-@@ -342,13 +342,19 @@ struct ionic_v1_cqe {
- 			__u8		rsvd[4];
- 			__be32		msg_msn;
- 			__u8		rsvd2[8];
--			__u64		npg_wqe_id;
-+			__le64		npg_wqe_idx_timestamp;
- 		} send;
- 	};
- 	__be32				status_length;
- 	__be32				qid_type_flags;
- };
- 
-+/* bits for cqe wqe_idx and timestamp */
-+enum ionic_v1_cqe_wqe_idx_timestamp_bits {
-+	IONIC_V1_CQE_WQE_IDX_MASK	= 0xffff,
-+	IONIC_V1_CQE_TIMESTAMP_SHIFT	= 16,
-+};
-+
- /* bits for cqe recv */
- enum ionic_v1_cqe_src_qpn_bits {
- 	IONIC_V1_CQE_RECV_QPN_MASK	= 0xffffff,
-@@ -423,7 +429,7 @@ static inline u32 ionic_v1_cqe_qtf_qid(u32 qtf)
- 
- /* v1 base wqe header */
- struct ionic_v1_base_hdr {
--	__u64				wqe_id;
-+	__le64				wqe_idx;
- 	__u8				op;
- 	__u8				num_sge_key;
- 	__be16				flags;
+This series fixes this by correcting the device-tree binding to align
+with the generic name for the PTP clock. I understand that this is
+breaking the ABI for this device, which we should never do, but this
+is a last resort for getting this fixed. I am open to any better ideas
+to fix this. Please note that we still maintain backward compatibility
+in the driver to allow older device-trees to work, but we don't
+advertise this via the binding, because I did not see any value in doing
+so.
+
+Changes since V3:
+- Added Krzysztof's reviewed-by for device-tree changes.
+- Re-worked logic in MGBE driver for detecting the legacy clock to make
+  it more explicit and clear.
+
+Changes since V2:
+- Corrected example in dt-binding doc.
+
+Changes since V1:
+- Moved handling of different PTP clock names into Tegra234 MGBE driver.
+- Add changes to update the Tegra234 MGBE DT binding and DT source.
+
+[0] https://lore.kernel.org/linux-tegra/20250612062032.293275-1-jonathanh@nvidia.com/
+
+Jon Hunter (3):
+  net: stmmac: Fix PTP ref clock for Tegra234
+  dt-bindings: net: Fix Tegra234 MGBE PTP clock
+  arm64: tegra: Fix Tegra234 MGBE PTP clock
+
+ .../bindings/net/nvidia,tegra234-mgbe.yaml    |  4 ++--
+ arch/arm64/boot/dts/nvidia/tegra234.dtsi      |  8 ++++----
+ .../net/ethernet/stmicro/stmmac/dwmac-tegra.c | 20 +++++++++++++++++--
+ 3 files changed, 24 insertions(+), 8 deletions(-)
+
 -- 
 2.43.0
 
