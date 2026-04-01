@@ -1,80 +1,83 @@
-Return-Path: <netdev+bounces-274244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274245-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cA1fKG52zWnYdgYAu9opvQ
-	(envelope-from <netdev+bounces-274244-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 21:47:58 +0200
+	id aIn7K352zWnYdgYAu9opvQ
+	(envelope-from <netdev+bounces-274245-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 21:48:14 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BE9337FF0B
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 21:47:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A4B237FF12
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 21:48:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E2580301E3D6
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 19:45:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CDD073026AAD
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 19:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE235346A1E;
-	Wed,  1 Apr 2026 19:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3387521E098;
+	Wed,  1 Apr 2026 19:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A6Dd56uL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hA1W8m8z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8CE314D37
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 19:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E299E215055
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 19:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775072709; cv=none; b=GNbLrdyLk8wJZc1urJUa6W7Yl88UfDP1AhFDLPROyVE3uGa825V/Q/9MmGg0UlCzBNiYRaSdg6U6Zb+imzWrXzSjl2Vu7iQqTCux/fSqVGDQd/xYo8qr7kGsHpd+l/2tJdHlx4uAQcB/0sDoaYki7EVaEn1FGQzOhYVb8LTNg/o=
+	t=1775072713; cv=none; b=tTrSBsZd66j/BY7fO4gy/bYIvQS3gBJN+m5bFtw+5KZeL7tAZl9mhUv9wruF6rdsnpFXAruQv2H12l35zfUVabgYYf18OZrYbxHtBlksGWR5qxURVJgmYdk4dH1vDQeXX/T0S2jTtN3Xa6sv0ErDfVX8L9VtCthutxlo+z44KF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775072709; c=relaxed/simple;
-	bh=rRO3oXxMQ5K+aJS3fz/IzsEi+KzV3CVpOeh/nVrRirw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=UKt68cgBck1ux/3+JQbCeF2x5lMjgjlVYMDjGsHNE3XV45hrlCg9W5qVsyiHmn94ZFPDbfUq6lbmOxbOVu+bqfNUPgviMiEZm0ck/1hWsb5vIsHzLVTCkF+wOPO4AIYgpPcuq/J8kDMhcHwVS6ddIj7HAydXOFVXBMbkJZ2S96I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--praan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A6Dd56uL; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1775072713; c=relaxed/simple;
+	bh=CdMDlHbKywlpFCBGl3OVn97IqE1emiTs97NUtj79NW4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QwF0GL1+T5uE3c1hlbZS+MBVunrj4XiM8hEeC8UqN6KM4RyLHxXt0ayT6jW9Yk30RMHf9YhijxLQ1sNZYCWtw4LZNNp5j4ZoUAGXSxtytfUIxFCdAN4houL32N7vbNJLlbtonqpxnGwfuyY6y3H8oMXQaDHywkaP651RRCqS9oY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--praan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hA1W8m8z; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--praan.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2b258636d16so643935ad.2
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 12:45:07 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-35da97f6a6dso63412a91.0
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 12:45:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775072707; x=1775677507; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KOVihVZmvAI72pQYZS6lCrpErGIBVs1asnwx+4bn+hA=;
-        b=A6Dd56uLHed01H/Iuw+2YxYPg7mwDwVHU5XmKBzPq8qMiByS3sBHfTBPHvyB44xJ7X
-         A3qP4mBGE34Ga4ErK+mk1Qh00MTC/JmDjrLjaxqy8wx9LKtUs7NJiK9cy7/05oMU1w2/
-         m4xKd9macxX27RcuTrgQjC0NoD05cHem8dq+yIfwh03TtcivX8NBjc2hfLVuDg21Mjq4
-         /KtFcJfKfr6V6YV5uwHSMQvckCy7pDamWwxEZulBsUu9tERlD16bwM32jiRB6J+oBuFZ
-         x4DG/tDDvXj1S10moXawrPE9w3V3UvHeAhMggYFSA4A7HnN0CAWmMydNrYvCyoVVZZvR
-         Wnbw==
+        d=google.com; s=20251104; t=1775072711; x=1775677511; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aZuzvlEZmJ6kG3JliNifQvylb1PwJkEr7RALOkoPIGk=;
+        b=hA1W8m8zgARuk77AsW8or92x/33K/8LRlhGO2Qov8VBXJpR8pO/txk3b/C99NTZz61
+         mMSYiGAvwrXauP5RQkdoxFO6pXftp1ERcF4XQT/DLzrxk2jwwmMVBa1Ip+90Cf7OOg2e
+         vwgG0lemNHUaFWWHRNqukxr+wwAIiCEYypUbU/zqi70nyntWheOWMI9dEivUyUkvgUZN
+         maVJvxCeO8UZv+Gk5gb1yUgLyfPaGA6YlMIwz/DcYjRaTjg6JyNFB/fnVZgUty4+H3U/
+         lpav3gLad6XQsTfoXyEzk7162fj7y/QA0ebOVSeSMJVevFk+zWqXK6XyMUWnXi09GQGv
+         GXFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775072707; x=1775677507;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KOVihVZmvAI72pQYZS6lCrpErGIBVs1asnwx+4bn+hA=;
-        b=FfFpmwazwxRPQ+kRHwf7Rbmsbt2ttuS1J3SLtBPD8oO+LoK8Qvjgu+AKpmcwjwCBAg
-         nSEyGW7AwpdIRalFdX6gDkMpfXlHALSoKQK2/lVkoXxiA5v9aJIhJecd5Ea3p3qXCyUf
-         s1rD4l7hUUoJgP0Lv+Ray03S3j3prbpmBtTj7PwM/ZZvUXgY3yqFH/56hoMXd/pS5147
-         rOuXkr/dohW+6aEtcT7d6xBVVIQoX6iw2oUqoi5AXS3ifMLaL0g7z0SsSnSl5dYfd4f4
-         znuQFHPO9JxuUSSTvfYM/4X+yrLZ3hqQhWMg21y1wHVi1bOMT/+YbmXaZh/IpFYkZwsY
-         /DBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWRE914waTAp1ikieTRh7b5IzdWo/761DnG1Z/TCdMV4do8ke52PnnNbwuRr+pmqgWLTu67Rc0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy21oH+sz0B/3pzLW+iluA/w368gnejE17X2JUO4e1vE58t3Lgh
-	+SDCFu6MoVvBteBR36iQZiFIQR5Kgx7aBmy00Skzkk49oE7kg5hLFnbgoQc2uF/yk2XAn1oNE5G
-	ufw==
-X-Received: from plbkc3.prod.google.com ([2002:a17:903:33c3:b0:2b0:a8dc:303f])
- (user=praan job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ebc3:b0:2b2:5503:1b8c
- with SMTP id d9443c01a7336-2b269abcbe7mr51526225ad.11.1775072706837; Wed, 01
- Apr 2026 12:45:06 -0700 (PDT)
-Date: Wed,  1 Apr 2026 19:44:56 +0000
+        d=1e100.net; s=20251104; t=1775072711; x=1775677511;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aZuzvlEZmJ6kG3JliNifQvylb1PwJkEr7RALOkoPIGk=;
+        b=IDctxeyQqiD5pLBoqRnICMslCslfKWY7A0aWVwB0OlANW8Jjg3x7V1jk4cIluN/WQ2
+         bLaxeJRsIRhMwOPKyZiZBP8WeU3NpepqwFNxMXw5CY2bOkaat29S7YmvSiIpMk5Do5NQ
+         5fy3LUW/jmNFb8yIC/AAD8mF10hYdXl/k7tLeDawzbP8FKCtj+G9X7YQhwGJ8zK/mgnR
+         M2OCJNihmP6JB2PfrKQR4/3faknAFWKu/5yYk0zW3umkYE0Ryg3/L5PtCqmGLn63fGP7
+         I6KKOT5ECANlm2ImxYIZIFiF4Qhsmss8oFirVmfiUn58ckYdaeMHUn3AUIa7gnqaBGIY
+         tJvA==
+X-Forwarded-Encrypted: i=1; AJvYcCXCk828L8bmMBi6M5DIZbYDcnuVmbtLBP1skG1G01wI5giT56NkL4aGWh/KznCVspSStTaM+xA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzs6KIH2R/oKVsO70Rqu71eZX4T5qH3uxTaWN30flXk3ZNn0wZj
+	mQ3ehIfRVPm0Z91f7MxckwiezsrBEMTdLYJSrFJTEY07USwMhUipBiCV7DhKmvr6MIfLGvg7b9j
+	rUw==
+X-Received: from pge24.prod.google.com ([2002:a05:6a02:2d18:b0:c76:a209:f392])
+ (user=praan job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:d491:b0:39b:f026:6f8e
+ with SMTP id adf61e73a8af0-39ef7685e24mr4884632637.34.1775072711051; Wed, 01
+ Apr 2026 12:45:11 -0700 (PDT)
+Date: Wed,  1 Apr 2026 19:44:57 +0000
+In-Reply-To: <20260401194501.2269200-1-praan@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260401194501.2269200-1-praan@google.com>
 X-Mailer: git-send-email 2.53.0.1185.g05d4b7b318-goog
-Message-ID: <20260401194501.2269200-1-praan@google.com>
-Subject: [RFC PATCH 0/4] nfs: Enable PCI Peer-to-Peer DMA (P2PDMA) support
+Message-ID: <20260401194501.2269200-2-praan@google.com>
+Subject: [RFC PATCH 1/4] sunrpc: add supports_p2pdma to rpc_xprt_ops
 From: Pranjal Shrivastava <praan@google.com>
 To: trond.myklebust@hammerspace.com, anna@kernel.org
 Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com, 
@@ -93,7 +96,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274244-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274245-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -109,87 +112,64 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4BE9337FF0B
+X-Rspamd-Queue-Id: 2A4B237FF12
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-As high-performance storage environments increasingly rely on direct
-data movement between PCIe endpoints (e.g., moving data directly between
-an NVMe Controller Memory Buffer and a Network Interface), support for 
-Peer-to-Peer DMA (P2PDMA) in the network filesystem layer becomes 
-essential. This series introduces P2PDMA support for the NFS Direct I/O.
+Add a new transport op, supports_p2pdma, to allow upper layers (such as
+NFS) to query whether the underlying RPC transport supports PCI
+Peer-to-Peer DMA (P2PDMA).
 
-Currently, NFS O_DIRECT operations fail with -EREMOTEIO if the user
-buffer resides in PCIe BAR memory. This is primarily due to the use of
-the legacy `iov_iter_get_pages_alloc2()` API, which cannot pass the 
-required `FOLL_PCI_P2PDMA` flag, and a request lifecycle that is unaware
- of the pinning requirements for P2P memory.
+Since the capability is hardware-dependent. For the RDMA transport,
+implement this by querying the underlying InfiniBand device via
+ib_dma_pci_p2p_dma_supported() to ensures that P2PDMA is only
+attempted when both the transport and the HCA drivers support it.
 
-Design
-=======
-The proposed design centers around making the NFS request lifecycle
-"pin-aware" and upgrading the infrastructure to support modern memory 
-extraction APIs.
+Signed-off-by: Pranjal Shrivastava <praan@google.com>
+---
+ include/linux/sunrpc/xprt.h     | 1 +
+ net/sunrpc/xprtrdma/transport.c | 9 +++++++++
+ 2 files changed, 10 insertions(+)
 
-1. 64-bit Capability Infrastructure
-The existing nfs_server->caps bitmask is limited to 32 bits and is
-currently exhausted. This series expands the bitmask to 64 bits to
-accommodate NFS_CAP_P2PDMA. Crucially, it also refactors the NFS_CAP_*
-constants to use ULL definitions. This prevents a subtle 32-bit
-truncation bug where bitwise negations (e.g., caps &= ~NFS_CAP_ACLS)
-would accidentally clear the high bits of the 64-bit capability field.
-
-2. Transport-Level Detection
-P2PDMA support is a property of the local transport hardware. A new
-supports_p2pdma operation is added to the SunRPC transport ops. For RDMA,
-this is implemented by querying the underlying device via 
-ib_dma_pci_p2p_dma_supported(). The NFS client queries this during mount
-and sets the NFS_CAP_P2PDMA bit accordingly.
-
-3. Pin-Aware Request Lifecycle
-Standard NFS requests use get_page() and put_page() for memory 
-management. However, memory extracted via iov_iter_extract_pages()
-requires explicit pinning and unpinning (unpin_user_page()).
-
-This series introduces a PG_PINNED flag in struct nfs_page. When set,
-the request lifecycle skips standard page referencing and ensures that
-unpin_user_page() is called only when the I/O is complete. This ensures
-that physical memory remains pinned for the duration of the DMA transfer
-
-4. API Migration
-The Direct I/O path is migrated to the modern iov_iter_extract_pages()
-API. The ITER_ALLOW_P2PDMA flag is passed to the iterator only when the
-local mount has signaled P2P support via the capability bit. This ensures
-that "normal" users on standard TCP/UDP transports see no change in
-behavior or overhead.
-
-Call for review
-===============
-Any insights on the proposed changes to the nfs_page lifecycle and the
-64-bit capability expansion are appreciated. If this approach is deemed
-incorrect or if there is a more idiomatic way for this, please direct me
-in the right direction.
-
-Thanks,
-Praan
-
-Pranjal Shrivastava (4):
-  sunrpc: add supports_p2pdma to rpc_xprt_ops
-  nfs: add NFS_CAP_P2PDMA and detect transport support
-  nfs: make nfs_page pin-aware
-  nfs: allow P2PDMA in direct I/O path
-
- fs/nfs/client.c                 |  8 ++++
- fs/nfs/direct.c                 | 51 ++++++++++++++++++-------
- fs/nfs/nfs4_fs.h                |  2 +-
- fs/nfs/pagelist.c               | 18 ++++++---
- fs/nfs/super.c                  |  2 +-
- include/linux/nfs_fs_sb.h       | 67 +++++++++++++++++----------------
- include/linux/nfs_page.h        |  2 +
- include/linux/sunrpc/xprt.h     |  1 +
- net/sunrpc/xprtrdma/transport.c |  9 +++++
- 9 files changed, 106 insertions(+), 54 deletions(-)
-
+diff --git a/include/linux/sunrpc/xprt.h b/include/linux/sunrpc/xprt.h
+index f46d1fb8f71a..e451acd2e047 100644
+--- a/include/linux/sunrpc/xprt.h
++++ b/include/linux/sunrpc/xprt.h
+@@ -187,6 +187,7 @@ struct rpc_xprt_ops {
+ 	void		(*bc_free_rqst)(struct rpc_rqst *rqst);
+ 	void		(*bc_destroy)(struct rpc_xprt *xprt,
+ 				      unsigned int max_reqs);
++	bool		(*supports_p2pdma)(struct rpc_xprt *xprt);
+ };
+ 
+ /*
+diff --git a/net/sunrpc/xprtrdma/transport.c b/net/sunrpc/xprtrdma/transport.c
+index 9a8ce5df83ca..1c1714189a29 100644
+--- a/net/sunrpc/xprtrdma/transport.c
++++ b/net/sunrpc/xprtrdma/transport.c
+@@ -717,6 +717,14 @@ xprt_rdma_disable_swap(struct rpc_xprt *xprt)
+ {
+ }
+ 
++static bool
++xprt_rdma_supports_p2pdma(struct rpc_xprt *xprt)
++{
++	struct rpcrdma_xprt *r_xprt = rpcx_to_rdmax(xprt);
++
++	return ib_dma_pci_p2p_dma_supported(r_xprt->rx_ep->re_id->device);
++}
++
+ /*
+  * Plumbing for rpc transport switch and kernel module
+  */
+@@ -742,6 +750,7 @@ static const struct rpc_xprt_ops xprt_rdma_procs = {
+ 	.enable_swap		= xprt_rdma_enable_swap,
+ 	.disable_swap		= xprt_rdma_disable_swap,
+ 	.inject_disconnect	= xprt_rdma_inject_disconnect,
++	.supports_p2pdma	= xprt_rdma_supports_p2pdma,
+ #if defined(CONFIG_SUNRPC_BACKCHANNEL)
+ 	.bc_setup		= xprt_rdma_bc_setup,
+ 	.bc_maxpayload		= xprt_rdma_bc_maxpayload,
 -- 
 2.53.0.1185.g05d4b7b318-goog
 
