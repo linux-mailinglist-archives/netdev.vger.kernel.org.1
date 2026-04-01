@@ -1,189 +1,247 @@
-Return-Path: <netdev+bounces-274172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274173-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OB2eGzRFzWkkbAYAu9opvQ
-	(envelope-from <netdev+bounces-274172-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:17:56 +0200
+	id sNprNlhJzWn4bQYAu9opvQ
+	(envelope-from <netdev+bounces-274173-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:35:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FBC037DCDD
-	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:17:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F71F37DF6A
+	for <lists+netdev@lfdr.de>; Wed, 01 Apr 2026 18:35:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0F1DF30ADCBB
-	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 16:15:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 36DD0300F503
+	for <lists+netdev@lfdr.de>; Wed,  1 Apr 2026 16:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D45472764;
-	Wed,  1 Apr 2026 16:14:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB08A31E838;
+	Wed,  1 Apr 2026 16:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b="Y7vIHXh/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BNE45O+3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5595D39A046
-	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 16:14:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9D03644D5
+	for <netdev@vger.kernel.org>; Wed,  1 Apr 2026 16:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775060053; cv=none; b=hkEjC90IH42Bi9f5e4d9rc3GL7ipWx2M0T36imn4kksE6uexlTzLd+OaTZGSgZ75PWgROSuQ0GdNfKB5DHLQdvOqazlkKjLqRkDZbrnDCgvZFHTORXjT8VSDrK2BwHeNAk+u1beU7FOrM26ffZUSw4s+IXnsz/fCiZmXZkzQTFc=
+	t=1775060462; cv=none; b=Cm8Rh6iJvMq0PchmAE3jg5kjhHhXVSqcvX2qvjP/3FIPCBQShdcyccCcuKvUrecDulgl/rr4tkGC8jqJaHhV29RMJfGCycwQBhAccSLDBmuxDOmsGJmoHyMr/qrqH5XjRYHX21GLg8MOFXswBkh1IxEl1XKfGxuFxPGVJOtHfNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775060053; c=relaxed/simple;
-	bh=5vsaEaZXu0b60Fw2daY4xBXRpr8mZ34kaMt1aHDy5Kc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TfvybbWgquEFgl4GiRqiu6ES8dITloGTfB6XpM22SrcUzGmUNDq7b+AGXnbL13zWJQbMsCAkxagk1XGhEfnPG/lecU4AQjnIfbv8KEMX4fVP3jJrPwifAbJyOEObcFK+m4hV+jrICUDm9BiHTVqF4ypkc0ncHdUDem7jvxfkO9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com; spf=pass smtp.mailfrom=allelesecurity.com; dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b=Y7vIHXh/; arc=none smtp.client-ip=209.85.221.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=allelesecurity.com
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-56d924c7183so523519e0c.0
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 09:14:10 -0700 (PDT)
+	s=arc-20240116; t=1775060462; c=relaxed/simple;
+	bh=vqf1PiQgIrSLvLOIqCuthN86/GGCYXPRBreHnHltp80=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=REbcPzipV86HYS1Okxeup1fQKXMZlcXKhXwYE0PZiY0JcVFG0XEpCzyQswGX/IOZrfqC2aQWx+zOfYK3B8XGS1Nz+D5+nvDXJQpWC88Rn6HEFBdJ+kluiR0JSsBqCXu/HXswYBIfS7eUtcFM/F1RZhU3wGrHjxKJhCqSh/BnzNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BNE45O+3; arc=none smtp.client-ip=74.125.82.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-2c160cb021cso7419164eec.1
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 09:21:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=allelesecurity.com; s=google; t=1775060049; x=1775664849; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=e+Q1jXLiEJexeZZTXwdCnetPvxe3gmMyFGRYsaWGRvY=;
-        b=Y7vIHXh/iyIIc/cnelQ7eBASDDUFHCz3hiO89qemg9+J6BDBYdK6bMrXheNmsb/Y/E
-         JSzR2DgPwwTwkbR2S4IxCqZLuEozX3VRIHyGTkkS36NvwMCJSljKFyZu4r72zQipQUDK
-         ZfLm/nH8NQKU8zbY0hCBjmCKZA0mOxHjngLI4=
+        d=gmail.com; s=20251104; t=1775060460; x=1775665260; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6brUS/+KN+QlXTcwRDDuVwUelenxIPcKdQxQmBulR1c=;
+        b=BNE45O+3NVsAQGgQj1RNyaCUlBChtmDeBTLHeVtYINkc/ccArh4lb3w+uEBU5yahai
+         UNh+Ndpqd9XuNVjqnqwdaq0xc3owzEU237n17YEGADTta8CUXIn4orZYlC/VrSxGpAOc
+         Eh7dFf533GJO+rWiGiSInXk+Rvhn0y+ff4K/agx0KF4vqXSGo69d3Ygbv4O1AWDlZsMw
+         GmTCjdKykQ7jVnwmcHACAXfMCThmI0Uc2wk1chAaWtIxoOnK2+oqHf1EwEl/7LxUjKyF
+         W69NDNTHjl8nO5VW2zh4JPFrs3uOmeVM3ecRgox7fv3HLKiqQ/f5YGhEG+9a53YqUjuJ
+         uBHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775060049; x=1775664849;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=e+Q1jXLiEJexeZZTXwdCnetPvxe3gmMyFGRYsaWGRvY=;
-        b=XUipmtyotl1uML4a9/PNh8kRLnL7Tr9YmaHDGAp7NhBfZ1Kk5I/3aMUxoWvcmKLBE0
-         emP4B2zOvCkE4wAqAVUmvCf/zyXxDrGMIKhzL9giNos2YeA+QPlX/I/SvZzf0j/XL8fU
-         uRV0L+cbp0SSpf5N/ZVnRMaDcYLfjAbr1EEiIrTS6qdlqxHJJ4EJwa9z2sA4YkinR/wL
-         LYnLTv/Nk4fc7fY9saaiTmXuL8Cv9ytxf6WeNmj2f7Nzca2HrFVKZP7BBtBO9RMB7wYU
-         Oaut8sWks2Qd6uDjkWrlfUhWlwf4VU73mBCW45A9ikrUjm0+JfeI6q5HCouyn/qapraY
-         cN5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUKqeQDDw8bSzDtmDQQwSVXwpoM3Dy19iwBX+3T1R8V0tQz/3lYmr6FBB4tMwLERgCpwuw6YjQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywzcp1fxshinuq3LgfbgciHbxj0dEx6DucSHMJWNC+d/IcdlXTn
-	Tjy0aOaolKfUe9tJ7J7EhQfRauSPzmtzeq1qaLWCVddQKrK3JzKMn3TrjhvfRqEYjrw=
-X-Gm-Gg: ATEYQzxpgLzZyrGWv0qUUG21eDEBNrDRhZfBthvRHuDWgMqFkt+/UHq0u4aJx440VA/
-	QXOW/NbaWEjcHiIwCCKNsPA3t6LjG61txY+EXfxO5ZY5WXRAJuFlZRpPWv7XfAYa3bz6C+7ghrj
-	UwPM/vWvmtODxgbnhz/n3RurWeDEcx06jbp7hxZgtDPgGEPX6TabN3ktoZbntfn9hX5UW3WMjtW
-	4Owk3Tx3KHETDJ80P524bi3hOV1wM3/mzlV6Qe3qQCApS+J0SssUm5efuoHqaGV2KoWhvpGK/XP
-	XWZLZ2P28laknY0kzO6CN2JN0qSfBqdJdioZ+6rI95Knf0gzhYpE4Grcb9I9+GcY8lV6w962sLM
-	Tz6IQ+AvyMDpk2BAJTHKeXWUQu0WjBhr6ohkujZuy5A1jY/gbPO+gBstnOPjQKnEnFiJ0SG2fCt
-	+ZfDaUSJdjYcFXhuT1AKxmDf1TSfFPeLG6wBoj
-X-Received: by 2002:a05:6122:553:b0:56b:8ba0:fd58 with SMTP id 71dfb90a1353d-56d8b04d750mr1470500e0c.6.1775060049263;
-        Wed, 01 Apr 2026 09:14:09 -0700 (PDT)
-Received: from [192.168.1.2] ([179.105.152.82])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56d58a46f4dsm17612731e0c.15.2026.04.01.09.14.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Apr 2026 09:14:09 -0700 (PDT)
-Message-ID: <aa7aeb86-2430-4c67-9d5d-bb27ad037865@allelesecurity.com>
-Date: Wed, 1 Apr 2026 13:14:00 -0300
+        d=1e100.net; s=20251104; t=1775060460; x=1775665260;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6brUS/+KN+QlXTcwRDDuVwUelenxIPcKdQxQmBulR1c=;
+        b=HjoYfEv/wf61sH0BFKS41c51nXEQjCv/21ZUmUrN5k/+SnT6G0FFhfm7QfbJ/jTkgm
+         ruCZQjq0JsVWLPCu7mogVv+4qNbRfCYk10seMthwmLR4DXXfbeI2juX6EvlsiOIdjcsS
+         Ppd0/sM7B80r566K4zvU7ZQIajU6pqE3Ave09jPXPosN1s0qMXhF1TwhbICNuEvQA5z1
+         7yMxSkOy4nj3WhxqFWlTdkSWhOYxwrrQn3EIkpDMorKlYQGNPuyEEXlMyPEG21Tc1krO
+         qwxhFipLIF+ab/gHfMVptTVXkPI8YYFAAxCOTq3tr3/UMcwAmkreiLbWA+BMZVUuUrr1
+         F6hw==
+X-Forwarded-Encrypted: i=1; AJvYcCUshtP5dg0F+00+TkCAnIc47gmD+AkRj5gR8ic5H/paG0Sn6t+5NZ2RY/UI8nge4PQ8g7slKz4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNbCObf/4bp7mntMfSXPlfC3GhBX2taHAiNIaIQGZozdcMuRZt
+	mtS9MV4exw4IoaTmk3iItCMpktm8sCuCtuqL1/FPaH7QFLo9p+v0rCE=
+X-Gm-Gg: ATEYQzx30YBg6jsBQIBYsOEkWkmGEW2gEM2UdZSUkEXyLqPPKwRAHTbwKL0sebVcPwH
+	WGickeonihhhkdSprYIm3KhokBYfYg/QJ1PAjpOM17I8puHbF9zol7Re+MaxMSdbzrC/6LWNUym
+	oxH8lSrfHS3JxoniGXfaHeQM1250tYhvilYLjqDK2V08qSKAyIC4cBsTr8yesWPX93b/uY07hBd
+	DgoSIcvA+Co215/VkFyovbGcOKuTcBi7fvEFXmZeuV1xLwC532Jf0jeN+Pj5oW0iC0yAugEPtHc
+	x6O2Mez6H6OYqGWIS1/5beEBS0kOqS4iHoMHBRqDqpskE7mt3BECYtUkRMd2payZuOPV0IsAM/+
+	G80jjdCv1KW7lO4KUtUymNVCakfGg6ECKlgjxnYvxnYSbYUYcA2SLOeSS6MXEP86A+gJZdBNjqP
+	HL4FaABp8XjpS2AHGEzzUNatxw2kohROMuV1Szi1jvPP8M3SUa06PptipLJGx73GP+4IEL0GcEZ
+	g2tEsoWJCs6cUu59g==
+X-Received: by 2002:a05:7301:4090:b0:2c1:b26:8424 with SMTP id 5a478bee46e88-2c933d8e814mr2313816eec.33.1775060459420;
+        Wed, 01 Apr 2026 09:20:59 -0700 (PDT)
+Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ca792f3f54sm144003eec.7.2026.04.01.09.20.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Apr 2026 09:20:59 -0700 (PDT)
+Date: Wed, 1 Apr 2026 09:20:58 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	Guillaume Nault <gnault@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>, Kees Cook <kees@kernel.org>,
+	Alexei Lazar <alazar@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Paul Moore <paul@paul-moore.com>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	oss-drivers@corigine.com, bridge@lists.linux.dev,
+	bpf@vger.kernel.org, linux-wireless@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	torvalds@linux-foundation.org, jon.maddog.hall@gmail.com
+Subject: Re: [PATCH 6/6] net: Warn when processes listen on AF_INET sockets
+Message-ID: <ac1F6hIHcoZo-soO@mini-arch>
+Mail-Followup-To: Stanislav Fomichev <stfomichev@gmail.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Neal Cardwell <ncardwell@google.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	Guillaume Nault <gnault@redhat.com>,
+	David Woodhouse <dwmw@amazon.co.uk>, Kees Cook <kees@kernel.org>,
+	Alexei Lazar <alazar@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Paul Moore <paul@paul-moore.com>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	oss-drivers@corigine.com, bridge@lists.linux.dev,
+	bpf@vger.kernel.org, linux-wireless@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	torvalds@linux-foundation.org, jon.maddog.hall@gmail.com
+References: <20260401074509.1897527-1-dwmw2@infradead.org>
+ <20260401074509.1897527-7-dwmw2@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4 15/15] rxrpc: fix reference count leak in
- rxrpc_server_keyring()
-To: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
-Cc: Marc Dionne <marc.dionne@auristor.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org,
- linux-kernel@vger.kernel.org, Luxiao Xu <rakukuip@gmail.com>,
- Yifan Wu <yifanwucs@gmail.com>, Juefei Pu <tomapufckgml@gmail.com>,
- Yuan Tan <yuantan098@gmail.com>, Xin Liu <bird@lzu.edu.cn>,
- Ren Wei <enjou1224z@gmail.com>, Ren Wei <n05ec@lzu.edu.cn>,
- Simon Horman <horms@kernel.org>, stable@kernel.org,
- anderson@allelesecurity.com
-References: <20260401105614.1696001-1-dhowells@redhat.com>
- <20260401105614.1696001-16-dhowells@redhat.com>
-Content-Language: en-US
-From: Anderson Nascimento <anderson@allelesecurity.com>
-In-Reply-To: <20260401105614.1696001-16-dhowells@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260401074509.1897527-7-dwmw2@infradead.org>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[allelesecurity.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[allelesecurity.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[auristor.com,kernel.org,davemloft.net,google.com,redhat.com,lists.infradead.org,vger.kernel.org,gmail.com,lzu.edu.cn,allelesecurity.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274172-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[allelesecurity.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,blackwall.org,linux.dev,iogearbox.net,gmail.com,fomichev.me,sipsolutions.net,netfilter.org,strlen.de,nwl.cc,amazon.co.uk,paul-moore.com,vger.kernel.org,corigine.com,lists.linux.dev,linux-foundation.org];
+	TAGGED_FROM(0.00)[bounces-274173-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anderson@allelesecurity.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.984];
+	FROM_NEQ_ENVFROM(0.00)[stfomichev@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[50];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,davemloft.net:email,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: 0FBC037DCDD
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: 3F71F37DF6A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/1/26 7:56 AM, David Howells wrote:
-> From: Luxiao Xu <rakukuip@gmail.com>
->
-> This patch fixes a reference count leak in rxrpc_server_keyring()
-> by checking if rx->securities is already set.
->
-> Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by userspace and kernel both")
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-> Suggested-by: Xin Liu <bird@lzu.edu.cn>
-> Tested-by: Ren Wei <enjou1224z@gmail.com>
-> Signed-off-by: Luxiao Xu <rakukuip@gmail.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Marc Dionne <marc.dionne@auristor.com>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: Simon Horman <horms@kernel.org>
-> cc: linux-afs@lists.infradead.org
-> cc: netdev@vger.kernel.org
-> cc: stable@kernel.org
+On 04/01, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> There is no need to listen on AF_INET sockets; a modern application can
+> listen on IPv6 (without IPV6_V6ONLY) and will accept connections from
+> the 20th century via IPv4-mapped addresses (::ffff:x.x.x.x) on the IPv6
+> socket.
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 > ---
->   net/rxrpc/server_key.c | 3 +++
->   1 file changed, 3 insertions(+)
->
-> diff --git a/net/rxrpc/server_key.c b/net/rxrpc/server_key.c
-> index 36b05fd842a7..d4777851079f 100644
-> --- a/net/rxrpc/server_key.c
-> +++ b/net/rxrpc/server_key.c
-> @@ -125,6 +125,9 @@ int rxrpc_server_keyring(struct rxrpc_sock *rx, sockptr_t optval, int optlen)
->   
->   	_enter("");
->   
-> +	if (rx->securities)
-> +		return -EEXIST;
+>  net/ipv4/af_inet.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+> index dc358faa1647..3838782a8437 100644
+> --- a/net/ipv4/af_inet.c
+> +++ b/net/ipv4/af_inet.c
+> @@ -240,6 +240,9 @@ int inet_listen(struct socket *sock, int backlog)
+>  	struct sock *sk = sock->sk;
+>  	int err = -EINVAL;
+>  
+> +	pr_warn_once("process '%s' (pid %d) is listening on an AF_INET socket. Consider using AF_INET6 with IPV6_V6ONLY=0 instead.\n",
+> +		     current->comm, task_pid_nr(current));
 > +
->   	if (optlen <= 0 || optlen > PAGE_SIZE - 1)
->   		return -EINVAL;
->   
->
-Isn't this the same issue addressed by my patch "[PATCH net v4 08/15] 
-rxrpc: Fix keyring reference count leak in rxrpc_setsockopt()"? Just 
-asking to make sure this is intended.
+>  	lock_sock(sk);
+>  
+>  	if (sock->state != SS_UNCONNECTED || sock->type != SOCK_STREAM)
+> -- 
+> 2.51.0
+> 
 
---
-Anderson Nascimento
-Allele Security Intelligence
-https://www.allelesecurity.com
+Does this also need to look at the proto? inet6_stream_ops seem to be
+using inet_listen as well.
 
+const struct proto_ops inet6_stream_ops = {
+        .family            = PF_INET6,
+        .owner             = THIS_MODULE,
+        .release           = inet6_release,
+        .bind              = inet6_bind,
+        .connect           = inet_stream_connect,       /* ok           */
+        .socketpair        = sock_no_socketpair,        /* a do nothing */
+        .accept            = inet_accept,               /* ok           */
+        .getname           = inet6_getname,
+        .poll              = tcp_poll,                  /* ok           */
+        .ioctl             = inet6_ioctl,               /* must change  */
+        .gettstamp         = sock_gettstamp,
+        .listen            = inet_listen,               /* ok           */
 
