@@ -1,174 +1,158 @@
-Return-Path: <netdev+bounces-274712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274713-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gB+XAK3lzmk5rQYAu9opvQ
-	(envelope-from <netdev+bounces-274712-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 23:54:53 +0200
+	id EJGmElfnzmlvrwYAu9opvQ
+	(envelope-from <netdev+bounces-274713-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 00:01:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C57438E7E7
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 23:54:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D933D38E9C9
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 00:01:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id EB0E9301DDDD
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 21:54:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 04320301F329
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 21:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87EC43876C6;
-	Thu,  2 Apr 2026 21:54:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7B138A71C;
+	Thu,  2 Apr 2026 21:58:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jugfr0Nv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KBJzCsq7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCB1387590;
-	Thu,  2 Apr 2026 21:54:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC8931B803;
+	Thu,  2 Apr 2026 21:58:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775166888; cv=none; b=uoTfHy9k08jMO6tpeDVrDa91bQTwwprfjAj7H9dL0vp/D3G/qiH/ZPfwLA7VxOEaP156GvofjYusVGVnX6etuXaoXutlvG8K4YjW6rlQsUAmSauCHCAa2p2OOIIB4HOT1c6zt6i84c5cP+Qw5R9WUBsXXXnLHU/obS4SYwwcMWw=
+	t=1775167107; cv=none; b=k0KTnsXAl0U1zEWJXPFqqxg/0Ps3JXPapOn3I1EGDoeKTvF9US/PyIfdG+xpLI7tvChHd36X2Tl7BxvkXQId6eqjJ0CvRUFjBPnNvmh0R8aT2gMib5ftcekYMyYcmiA1YqUefTFMScCkjx1iMYXus6GRMr0nosElGxpPdOE0UK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775166888; c=relaxed/simple;
-	bh=8xG47UVaicBg3PGvoKmkcXt2eBzcPg4SMCh5HpVNuIY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k1tpWK9l/GDQJ/XlN2+U/7WB44t3jSHUKgVJu1/mNV01159j239XymjiSZmW1+cxMvOP5uYxT1/kIAqWKcFuHh+eKCAz+2+4PdZyRa7DCK8Vuqm8ChxVHNbiaXHQlj0h9Z52+MX91Pps0ne+zsjJZH+aQTxusvHgN50b8V3sk3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jugfr0Nv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE97FC116C6;
-	Thu,  2 Apr 2026 21:54:46 +0000 (UTC)
+	s=arc-20240116; t=1775167107; c=relaxed/simple;
+	bh=QvUc9vANqYsb1luDp8UYk1f8BqkeVaTMVXLV75eutnQ=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=DVJp2RZb27ELpuSXbKU4Hp/Y6oxtY4GVZi+hvh0cGpfFqwLi3iiECU8FkXW3LsP2E4BFa3lHd7gKiNOQi5H6gIaKO0hKHraIz2ZSgvjaY8pL8Nj3ueFJ33XzKXy8KKHzyLjplHoEp/PCfYJu8MKrJG/teYDsTZ/J1SYs3fWx0zQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KBJzCsq7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76D96C116C6;
+	Thu,  2 Apr 2026 21:58:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775166887;
-	bh=8xG47UVaicBg3PGvoKmkcXt2eBzcPg4SMCh5HpVNuIY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=jugfr0NvB1mIYoQZ/YuvrKSYo/SX+02atopM5EUi7Yv0Nmfwv0r+3n9o4nqOGgQNL
-	 mUxmXo3gaqtFN19dmH0/OPHlHcHT9Eoy11LYUUykyYdjsgkl3NMzekhqWNL0OUD7M4
-	 fhVAMNaITjHmJoDLywZ1tpxYiwM/HIOmGJcOCNSvgUyBCnwspj8E815chE8ZmgMhVB
-	 x6lZH6un8ZcW4i0CeU4niVKB5WT2DzqHQSSzUm6b9QWorQ6nEzyQ9kIqM8lyBEmjDb
-	 ux/A5YFcAgZKRn5E6rujsvb16TQtMbOYz5XyUmvIDL2BOi+Sn5l2CNbqsbyOEfFnEx
-	 KUjPDISeA8jYw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Willem de Bruijn <willemb@google.com>,
-	Joe Damato <joe@dama.to>,
-	shuah@kernel.org,
-	petrm@nvidia.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v2] selftests: net: py: color the basics in the output
-Date: Thu,  2 Apr 2026 14:54:44 -0700
-Message-ID: <20260402215444.1589893-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.53.0
+	s=k20201202; t=1775167106;
+	bh=QvUc9vANqYsb1luDp8UYk1f8BqkeVaTMVXLV75eutnQ=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+	b=KBJzCsq7TNcgHpU+TWPAd3W8YuuJXdgpviR9Ow38UzYp/E+eDMYCQdUq5+04/Mnru
+	 vF8yruBgH9Kqoxj3RdUA00tDQnEgnr1qE7AXbmqG7qka9IVu/f1eZKTg86JWT+ETrn
+	 TjxI1jdECoYVYFvAydaPvhTr0DLyOkSNS0rHhfEWArmmkmeciwTpFwX+5aQHpstoUl
+	 foXfbAlUvknuR2UINHvJ3kK1f5ozCCWUSVy6PFFL3eEN4gpoDz+keSHvFP6Ep2zvPe
+	 Ej2doeiB7lotVTyVy6ov80wS5IsFWdnGSH4WR6z1XJ7lBV9TObDwXGWdYhpggyK3MT
+	 1b1VbHt8uneOw==
+Date: Thu, 2 Apr 2026 15:58:18 -0600 (MDT)
+From: Paul Walmsley <pjw@kernel.org>
+To: Yury Norov <ynorov@nvidia.com>
+cc: Andrew Morton <akpm@linux-foundation.org>, 
+    "David S. Miller" <davem@davemloft.net>, 
+    "Michael S. Tsirkin" <mst@redhat.com>, Theodore Ts'o <tytso@mit.edu>, 
+    Albert Ou <aou@eecs.berkeley.edu>, Alexander Duyck <alexanderduyck@fb.com>, 
+    Alexander Gordeev <agordeev@linux.ibm.com>, 
+    Alexander Viro <viro@zeniv.linux.org.uk>, 
+    Alexandra Winter <wintera@linux.ibm.com>, 
+    Andreas Dilger <adilger.kernel@dilger.ca>, 
+    Andrew Lunn <andrew+netdev@lunn.ch>, Anna Schumaker <anna@kernel.org>, 
+    Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
+    Arnaldo Carvalho de Melo <acme@kernel.org>, 
+    Aswin Karuvally <aswin@linux.ibm.com>, Borislav Petkov <bp@alien8.de>, 
+    Carlos Maiolino <cem@kernel.org>, 
+    Catalin Marinas <catalin.marinas@arm.com>, Chao Yu <chao@kernel.org>, 
+    Christian Borntraeger <borntraeger@linux.ibm.com>, 
+    Christian Brauner <brauner@kernel.org>, 
+    Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+    Dave Hansen <dave.hansen@linux.intel.com>, 
+    David Airlie <airlied@gmail.com>, 
+    Dominique Martinet <asmadeus@codewreck.org>, 
+    Dongsheng Yang <dongsheng.yang@linux.dev>, 
+    Eric Dumazet <edumazet@google.com>, 
+    Eric Van Hensbergen <ericvh@kernel.org>, 
+    Heiko Carstens <hca@linux.ibm.com>, 
+    Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, 
+    Jaegeuk Kim <jaegeuk@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+    Jani Nikula <jani.nikula@linux.intel.com>, 
+    Janosch Frank <frankja@linux.ibm.com>, Jaroslav Kysela <perex@perex.cz>, 
+    Jens Axboe <axboe@kernel.dk>, 
+    Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
+    Latchesar Ionkov <lucho@ionkov.net>, Linus Walleij <linusw@kernel.org>, 
+    Madhavan Srinivasan <maddy@linux.ibm.com>, Mark Brown <broonie@kernel.org>, 
+    Michael Ellerman <mpe@ellerman.id.au>, Miklos Szeredi <miklos@szeredi.hu>, 
+    Namhyung Kim <namhyung@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+    Paolo Abeni <pabeni@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+    Paul Walmsley <pjw@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+    Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+    Sean Christopherson <seanjc@google.com>, Simona Vetter <simona@ffwll.ch>, 
+    Takashi Iwai <tiwai@suse.com>, Thomas Gleixner <tglx@kernel.org>, 
+    Trond Myklebust <trondmy@kernel.org>, 
+    Tvrtko Ursulin <tursulin@ursulin.net>, Vasily Gorbik <gor@linux.ibm.com>, 
+    Will Deacon <will@kernel.org>, Yury Norov <yury.norov@gmail.com>, 
+    Zheng Gu <cengku@gmail.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
+    linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
+    linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+    linux-s390@vger.kernel.org, linux-block@vger.kernel.org, 
+    intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+    dm-devel@lists.linux.dev, netdev@vger.kernel.org, 
+    linux-spi@vger.kernel.org, linux-ext4@vger.kernel.org, 
+    linux-f2fs-devel@lists.sourceforge.net, linux-fsdevel@vger.kernel.org, 
+    linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org, 
+    linux-crypto@vger.kernel.org, linux-mm@kvack.org, 
+    linux-perf-users@vger.kernel.org, v9fs@lists.linux.dev, 
+    virtualization@lists.linux.dev, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 8/8] arch: use rest_of_page() macro where appropriate
+In-Reply-To: <20260304012717.201797-9-ynorov@nvidia.com>
+Message-ID: <ee15482d-22a8-9686-ba64-d216b25d8e68@kernel.org>
+References: <20260304012717.201797-1-ynorov@nvidia.com> <20260304012717.201797-9-ynorov@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-274712-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[linux-foundation.org,davemloft.net,redhat.com,mit.edu,eecs.berkeley.edu,fb.com,linux.ibm.com,zeniv.linux.org.uk,dilger.ca,lunn.ch,kernel.org,opensynergy.com,alien8.de,arm.com,linux.intel.com,gmail.com,codewreck.org,linux.dev,google.com,gondor.apana.org.au,perex.cz,kernel.dk,ionkov.net,ellerman.id.au,szeredi.hu,dabbelt.com,infradead.org,intel.com,ffwll.ch,suse.com,ursulin.net,vger.kernel.org,lists.infradead.org,lists.ozlabs.org,lists.freedesktop.org,lists.linux.dev,lists.sourceforge.net,kvack.org];
+	TAGGED_FROM(0.00)[bounces-274713-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[86];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pjw@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,fomichev.me:email,dama.to:email]
-X-Rspamd-Queue-Id: 8C57438E7E7
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D933D38E9C9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Sometimes it's hard to spot the ok / not ok lines in the output.
-This is especially true for the GRO tests which retries a lot
-so there's a wall of non-fatal output printed.
+On Tue, 3 Mar 2026, Yury Norov wrote:
 
-Try to color the crucial lines green / red / yellow when running
-in a terminal.
+> Switch arch code to using the macro. No functional changes intended.
+> 
+> Signed-off-by: Yury Norov <ynorov@nvidia.com>
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Acked-by: Joe Damato <joe@dama.to>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - use functools instead of open coding the caching (pylint)
-v1: https://lore.kernel.org/20260401183309.378671-1-kuba@kernel.org
+Acked-by: Paul Walmsley <pjw@kernel.org> # arch/riscv
 
-CC: shuah@kernel.org
-CC: petrm@nvidia.com
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/net/lib/py/ksft.py | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
 
-diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
-index 6cdfb8afccb5..7b8af463e35d 100644
---- a/tools/testing/selftests/net/lib/py/ksft.py
-+++ b/tools/testing/selftests/net/lib/py/ksft.py
-@@ -2,6 +2,7 @@
- 
- import functools
- import inspect
-+import os
- import signal
- import sys
- import time
-@@ -31,6 +32,17 @@ KSFT_DISRUPTIVE = True
-     pass
- 
- 
-+@functools.lru_cache()
-+def _ksft_supports_color():
-+    if os.environ.get("NO_COLOR") is not None:
-+        return False
-+    if not hasattr(sys.stdout, "isatty") or not sys.stdout.isatty():
-+        return False
-+    if os.environ.get("TERM") == "dumb":
-+        return False
-+    return True
-+
-+
- def ksft_pr(*objs, **kwargs):
-     """
-     Print logs to stdout.
-@@ -165,6 +177,14 @@ KSFT_DISRUPTIVE = True
-         res += "." + case_name
-     if comment:
-         res += " # " + comment
-+    if _ksft_supports_color():
-+        if comment.startswith(("SKIP", "XFAIL")):
-+            color = "\033[33m"
-+        elif ok:
-+            color = "\033[32m"
-+        else:
-+            color = "\033[31m"
-+        res = color + res + "\033[0m"
-     print(res, flush=True)
- 
- 
--- 
-2.53.0
-
+- Paul
 
