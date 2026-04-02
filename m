@@ -1,186 +1,147 @@
-Return-Path: <netdev+bounces-274326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274327-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OEIGG+TTzWmWiAYAu9opvQ
-	(envelope-from <netdev+bounces-274326-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 04:26:44 +0200
+	id CORSEczUzWmWiAYAu9opvQ
+	(envelope-from <netdev+bounces-274327-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 04:30:36 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A4B3382A74
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 04:26:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F5AD382AAB
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 04:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1223230293F4
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 02:26:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 234A6301650E
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 02:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9331332EC8;
-	Thu,  2 Apr 2026 02:26:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A61312459C6;
+	Thu,  2 Apr 2026 02:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p4aFogyf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tc0skWy9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955D22566D3
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 02:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.179
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775096784; cv=pass; b=S2SbPRU/PQBhwUjFR15IlfYUPAKC1QpYT1eh7nXbcB6SnkfQBYVwd2PxTuLKEJm8UdaxIPamB7kEZ+x0tUaW5/SYoPpaIiX66RxyPP43fV/FNWHHwOf2V7/37BEyIoEf0oWDpjBWggeCY6H66LVZPZe6J2qEL+7GwBlH0Xj3RMY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775096784; c=relaxed/simple;
-	bh=tWl3PMbY8WSVMBe70id0QojUsUjc22+YUzk3cAiXrqI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PyvY8a0BzsTpnQvWow4x+fINC9dkg6pcMNQbjXd2e0V74drnV3PWNVT3HEiqWi+HjT+WMHQjmvtBLFR+lY4YfnLAg/rjL9hjkkThmhJBnd4EYYL//6j7nrgtLqEpaKNWK1GT93VdTcIDJnRpJiI3f8DO4qIIDp2A6QNurVVUsiA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p4aFogyf; arc=pass smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7a17bc5745eso3583237b3.1
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 19:26:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775096782; cv=none;
-        d=google.com; s=arc-20240605;
-        b=WXEzn4uXtwjH8l0hPQ7i7x+puQdL0OSaZBcwA2acmlG2NOW56bLTVQXkLdgYCN7U3i
-         chJaFqlkje6Bt4soOtWchWhqsAbFcR21zaEIsh0v78QyoYceDXoKglGjVX0mUrBgu4dY
-         hooN2KutnaYXrudwtGaK/BBPBH0mX8/ggaQCvj7fzW2f4sPitkxYqRqmMAzb89T6bgPj
-         pjwcRg+fp71BtZYWQ0NA9YOf208rE2gq4ecEOtKEVNXPcyz8T09+Z8td/bKjZTalQSg/
-         4BCq3hW+KiGJ120xndPsEncmp12b8qf5F03dP0zSbzmHDdozxINnBLQ+wr6/Epqld7oU
-         3S0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=jbcLxyNKssJ/qsojKtaGf1w4cEtkGVy5OnWNXj+J5+I=;
-        fh=1aHYbChdmOM77gSPLyXOzG/RGQl3uo+CneOz4GH9s3I=;
-        b=k0PKNQGg0W+itPKE4sGHbDPMU+qpwBFYDoV4NnaFXmNYpJ9z+4Pj419jsGo779Gkqc
-         QcMMWXblRvAOers9+n+PblkcLXbC32QBx3lf5KBiGjMQ+gjveD47r+koxQxxWCzpESMP
-         N0zp232zZIXu9puZIuufbEHUL9hMqghgwOnqL7oMz5O1uNLAPmSyBDWYSb0j4GfyvqUy
-         TCXeG1zPtVpJd5DGP+bA0jqGXJoBmHhodXLI1NXxlfV8Orzt+yIO5D+4A1oM0fpcngvb
-         Xgdmq+GqRXP9zccesAqrpnT7KTXdNSfNwZ+3GoHY7dJ61zHKgh3+OKikLKHhl4OM2eHt
-         Fmrg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775096782; x=1775701582; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jbcLxyNKssJ/qsojKtaGf1w4cEtkGVy5OnWNXj+J5+I=;
-        b=p4aFogyfFr6le/lnlniUfRCoP7kFoelYDJjViX9zSJow1SN/7nRdsyh16+zn6tyTBC
-         c3FnPv0hxAJkGyded0hKEK9fJ24TmzC2jSFUYpto2nLTOkvgodS2mJCYi/rjfDFHz1xT
-         y2c/mrdkAI5qYvyOZM4/xvrnRnUH8otrnRrXAh4B3qMIeAIPDCFgD4WbhXDf5dB7VS1q
-         4ZWmln7A4Ljxu5QGzYecl0r48R+ntnmblYHyFvdjgOocsRqrSJNYvzGJJYH4FaL13A81
-         V8Tl6OY+vIPjrnjJuQGOeZWF5VmEcGrkleWaB9wtA0ix9Gr9sio7VQworo+nctlvWrFL
-         jFcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775096782; x=1775701582;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=jbcLxyNKssJ/qsojKtaGf1w4cEtkGVy5OnWNXj+J5+I=;
-        b=lgz0U+uAKYZhHwHuQmntH1IOLNyVb3H4OnA+GJVrcZH0ztRvo5K9lWV2gcksf5Th9L
-         x370S4aaP1CcJDcT/2vVAc7g8iWvElnegYPXEY0ydXjAsi3bqNAIWVdoExuNWMKVKWp8
-         hIbWlhN0NmNtspApRjm1x7CyZ//40/GhXSzFTYrtLpjU8v5oqyILqcR0MgKrpwon91St
-         Whntr8ZMAg+ohVhL8wN5CDNW9xO4nfLlcO6XZ3tuNDg5rGyQcDcmMvstN7q6thx82Ik4
-         ry4TXSdFQz6Wh0DjeZ/DqV8YApfBg0iiHrwYoZRd20czj/4e6mn5rhaGF2o03Wew9mzq
-         sk0A==
-X-Forwarded-Encrypted: i=1; AJvYcCVkPVM+nFmYKxj+ZUji7H9mAXS4+qgCvFCiqkzQdAHLe+N/ayQL5gSO5aWLgM9b2GI3Sn50BhM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5LxlnqrP/QiARpEl4BiflDM5jsLN6rIIEysPLTPWy+20gyESz
-	lw1fkZApT7yVQK0gdwGr6RFBP4ry/HG/9yyNo76XclUkjG+yb38kgGdqHu2XNeRj9kHDrbTdL9K
-	gwvFkH6kz7STUDpqla+E93mIzY28iBT0=
-X-Gm-Gg: AeBDievGNRL4ZYe50RpOqPbgFNUHHrlb5ufji0ua+X+Ue9NHOUNo27b8HJpLUtOWvA/
-	hRFHtsVJrN7eFw1RgQYt9IBC5CTHzpWWZB8Z4wP6Ya7+9tg81cFA62TwKRKzKKXHpRWNxvqVZqB
-	xS0z7F8gciE7L7V07al8rCu4hCAFLi0PB4vTm0r3lPhSepSzHwzN5c6HR0rSmZOkegFrum1wjim
-	AInIPffSAFw6MA22Vt3GR7nSkiqcxP9FOtMKTSgGLgG/n/tu8oduPkrTOiDunETBdej0AI4wdmB
-	zveLeJ0CbXy/TchS7ptTuyIK13ILSALrQCZo6MoZ
-X-Received: by 2002:a05:690c:13:b0:79a:5164:bb2b with SMTP id
- 00721157ae682-7a20f6eec2bmr61155537b3.7.1775096782537; Wed, 01 Apr 2026
- 19:26:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829D3CA6F;
+	Thu,  2 Apr 2026 02:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775097033; cv=none; b=Rl/WcRACKv/5GGx8zEEi9ATDWgI0VfZlhJUs9zIhY+b5O6d9jEbXgFWBthsLM+EWpDjOeJC/Kd9QFWon0dhjxMERI4PdsTCoyQt+4O4vW0CtCfgz9a3QsbXhB3a9NeOyfzebis8AY14SpZlpaTVXfmT4FUih4SIcRjZvlLvaNB4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775097033; c=relaxed/simple;
+	bh=0t2FTGPpUs8MIzO5VovB547dkJjFvPxp7Cug6WWD60I=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=dyqGJHgAkL2vtZiSC0r3yvtrp1uxX+RfhQBCPewcSubTH1fumY/Wx8wR8pko1aD9UU4FMGWfzdhnkg1RofLlqA33gTCfmdn6WVEHFEqZIGhyhHl4jwrOK02VWYuItyDMvy1U1x3DYyMYgXcoWIoG3kft8cI6RLLg0Oi9mE7hZJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tc0skWy9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12C39C4CEF7;
+	Thu,  2 Apr 2026 02:30:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775097033;
+	bh=0t2FTGPpUs8MIzO5VovB547dkJjFvPxp7Cug6WWD60I=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tc0skWy9NtWVgafam0nyP7sKy7W734ZMjZy2O088/BeKASmhmbr+qaxOwnkZdaYw2
+	 f7EZgtHwo2arUzZ2InnJxjUZ6czyrsrqrpTl3xCwuyG9x/HzutqLdY0uwoQXke3+3e
+	 VK90V40lgJWYAUtl3iJk0E28GZmO3TrWXSB6MECPax6UhMesBzWb+ycmxeHyTP8Ks5
+	 2o+VOS8nQvW339qugUhQY2msIK2yEYinH2IsgmJXDPkktohlDYMwXj/KCfoae/pEMc
+	 GmI77MX7atD48GIiZYGV7EqXVCQDweVCFpvvji4URmaGHT71Z1AeaKW0KD+jRxQhqn
+	 iTGlTyRMbKG+w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02F273808203;
+	Thu,  2 Apr 2026 02:30:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260330035604.133073-1-dqfext@gmail.com> <20260401081030.29b050d5@kernel.org>
- <CALW65jahWApDnVmFReW+Y3HDxBEmCwzsT1oyh03SW7X5ry6PzA@mail.gmail.com> <20260401175621.549c492e@kernel.org>
-In-Reply-To: <20260401175621.549c492e@kernel.org>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Thu, 2 Apr 2026 10:26:11 +0800
-X-Gm-Features: AQROBzCtPXGaDqROF8pKtII2foTv_tDo-gjdvN7lGgVfBU6XpEEcgXimHm6lXKs
-Message-ID: <CALW65jaTbaosbO8ypKZ6G37HxuxXabeTaP_Fhq72xTovmDj+8g@mail.gmail.com>
-Subject: Re: [PATCH net-next v7] selftests: net: add tests for PPP
-To: Jakub Kicinski <kuba@kernel.org>, Dianne Skoll <dianne@skoll.ca>
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Felix Maurer <fmaurer@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-ppp@vger.kernel.org, 
-	netdev@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 01/10] netfilter: flowtable: strictly check for
+ maximum
+ number of actions
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177509701579.3957493.7764709553225868642.git-patchwork-notify@kernel.org>
+Date: Thu, 02 Apr 2026 02:30:15 +0000
+References: <20260401103646.1015423-2-pablo@netfilter.org>
+In-Reply-To: <20260401103646.1015423-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de, horms@kernel.org
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274326-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dqfext@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274327-lists,netdev=lfdr.de,netdevbpf];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 0A4B3382A74
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9F5AD382AAB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+Hello:
 
-On Thu, Apr 2, 2026 at 8:56=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Wed, 1 Apr 2026 23:45:38 +0800 Qingfang Deng wrote:
-> > > # iperf3: error - unable to connect to server - server may have stopp=
-ed running or use a different port, firewall issue, etc.: Network is unreac=
-hable
-> > > # TEST: PPPoE                                                        =
- [FAIL]
-> > > not ok 1 selftests: net/ppp: pppoe.sh # exit=3D1
-> >
-> > It looks like pppoe-server fails to start. You may check the syslog to
-> > see what's going on.
->
-> Hm, we don't capture syslog automatically :S We capture stdout and
-> stderr
->
-> I'm not even sure there's something listening on syslog in virtme-ng
-> Is it possible to make the daemon log to stdout or a file and dump
-> that file to stdout on failure? Even if we fix the current issue
-> it will be quite inconvenient if we have to go into syslog every time
-> the test is failing. The test output should provide enough info to
-> debug failures.
+This series was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
 
-Add Cc: Dianne
+On Wed,  1 Apr 2026 12:36:37 +0200 you wrote:
+> The maximum number of flowtable hardware offload actions in IPv6 is:
+> 
+> * ethernet mangling (4 payload actions, 2 for each ethernet address)
+> * SNAT (4 payload actions)
+> * DNAT (4 payload actions)
+> * Double VLAN (4 vlan actions, 2 for popping vlan, and 2 for pushing)
+>   for QinQ.
+> * Redirect (1 action)
+> 
+> [...]
 
-I checked the man page of pppoe-server and did not find such option.
-We can instead start our own listener and redirect the syslog to a
-file or stdout:
+Here is the summary with links:
+  - [net,01/10] netfilter: flowtable: strictly check for maximum number of actions
+    https://git.kernel.org/netdev/net/c/76522fcdbc3a
+  - [net,02/10] netfilter: nfnetlink_log: account for netlink header size
+    https://git.kernel.org/netdev/net/c/6d52a4a0520a
+  - [net,03/10] netfilter: x_tables: ensure names are nul-terminated
+    https://git.kernel.org/netdev/net/c/a958a4f90ddd
+  - [net,04/10] netfilter: ipset: use nla_strcmp for IPSET_ATTR_NAME attr
+    https://git.kernel.org/netdev/net/c/b7e8590987aa
+  - [net,05/10] netfilter: nf_conntrack_helper: pass helper to expect cleanup
+    https://git.kernel.org/netdev/net/c/a242a9ae58aa
+  - [net,06/10] netfilter: ctnetlink: zero expect NAT fields when CTA_EXPECT_NAT absent
+    https://git.kernel.org/netdev/net/c/35177c687713
+  - [net,07/10] netfilter: ctnetlink: ignore explicit helper on new expectations
+    https://git.kernel.org/netdev/net/c/917b61fa2042
+  - [net,08/10] netfilter: ipset: drop logically empty buckets in mtype_del
+    https://git.kernel.org/netdev/net/c/9862ef9ab0a1
+  - [net,09/10] netfilter: x_tables: restrict xt_check_match/xt_check_target extensions for NFPROTO_ARP
+    https://git.kernel.org/netdev/net/c/3d5d488f1177
+  - [net,10/10] netfilter: nf_tables: reject immediate NF_QUEUE verdict
+    https://git.kernel.org/netdev/net/c/da107398cbd4
 
-socat -u UNIX-RECV:/dev/log,ignoreeof STDOUT &
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Regards,
-Qingfang
+
 
