@@ -1,127 +1,127 @@
-Return-Path: <netdev+bounces-274599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274600-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +M2aCMeLzmlMoQYAu9opvQ
-	(envelope-from <netdev+bounces-274599-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 17:31:19 +0200
+	id wBupOe6NzmkbogYAu9opvQ
+	(envelope-from <netdev+bounces-274600-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 17:40:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87BA638B49B
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 17:31:18 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DE3D38B588
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 17:40:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E2D930214F2
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 15:30:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 16EE4302199A
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 15:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31FC930C35F;
-	Thu,  2 Apr 2026 15:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38A4737474B;
+	Thu,  2 Apr 2026 15:37:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DPdcprMe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D392ZXZS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E64E1DC198;
-	Thu,  2 Apr 2026 15:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14C9A33A007;
+	Thu,  2 Apr 2026 15:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775143824; cv=none; b=vC5IuyuXQhgikM9EnZmHIk3UyMH2ulEQAwgW9wCqzSaz3vTz6kl/+iK3JZAtucDmoMEkzSVIoRa/3SizEOx5XzU9VLNGW7lwlrUOr/3M1slh6IR2Gqvhl66SEOnI4IMaYehltaqgGp+wqaeCvzLDw8kOnwGtK07fX8AlkIN1SWM=
+	t=1775144270; cv=none; b=UdovXm6J7Wl3EY38MA5e1+BNrJnc4Im7U1Bnn6eryhEAvNFfzpBpcKyQaGvM9WRaCBMZ+yOse0YpkRuGlJoOlgJTOwsbWHEn0R9lZ1j3NWk/Bu/3EW2nJlu+QKD9b2DwW8ZlIBElRT8XwOKpfttxPO4OTU8KcSEfeOehvMhhfK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775143824; c=relaxed/simple;
-	bh=Dvei2zgYz+6qevmJy8xRqAYuoOOqh4Tgi/RoGGKx0Mc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=idDtAd7qu+mo433bT4ZxovbuJd2TVjmAM1JD0IRtIc4DS57bdbwWtkSH+5O1F2YwBLmyicYHgmVr4Oq14A9/DdZrublMdan39l4eecL/8dWtkid3nUOjAypIzMm+COnn3Ivw0yIl5e081UUq+rHb7kTHK2uROJ0FwJBiOlDWW0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DPdcprMe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70E2BC116C6;
-	Thu,  2 Apr 2026 15:30:23 +0000 (UTC)
+	s=arc-20240116; t=1775144270; c=relaxed/simple;
+	bh=ohZ2HDtp4Z/Z6WJrkpeUxDLSzAUSROOullIzOzd8hmY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jfMYYj8kanDE3TmTHi0aXblBbFqTqoZIX0PgmkZy/IHzwCpjtfAOVXfcL61B46b1Rqf47lMkrq5jToRc+NFXtB8rKLrT3jjho6DxZYOIZKTy1eeaNWa0BP9WKQMc58dWQatfDrsfjzNfaYU5AJF0/U2vL7dQtKY6UHXOjgLREHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D392ZXZS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E81EAC116C6;
+	Thu,  2 Apr 2026 15:37:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775143823;
-	bh=Dvei2zgYz+6qevmJy8xRqAYuoOOqh4Tgi/RoGGKx0Mc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DPdcprMen7la1emKIGzJZY0E+gTdFLVdcgE3AgC4IjVw2HAsTyNq1SsD062+/4Bka
-	 7BoeHQnj22g9u3et7DnuiHOL1H90yIgBvYn05rdq/nqjdT9mnbmBbv4vpPXqCh1HYy
-	 W8mu/LYKtaoYdVwhhDsAp13fuMAwr4juFTUSRjZOecmVU/v0jfovpU6THL879Vv/hv
-	 +hWjnyplhbFD5II9AVmNLjAPQY1srxxM+R44BHEtFwaOhfMB997l5u+MpWCIQuDAoL
-	 HWsFhLHv4Lt3hDnPHy75pw+2gbNpNY77hEnDlOxvfCgKsiSD/g0ea8P1DAk5+1HIMA
-	 /34kOYesThxbw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02D323809A05;
-	Thu,  2 Apr 2026 15:30:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1775144269;
+	bh=ohZ2HDtp4Z/Z6WJrkpeUxDLSzAUSROOullIzOzd8hmY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=D392ZXZSh4jR48UCxYhNi9SeatNR+FbXthOJM98LYHxJS9/Q6CONIEPD74QcqMxQa
+	 EP1c6Pistguv12W1E7eSJMU7joPtxbgo/dcwshmT3/9oPnicJ4D3slH5e+RYqBfu5L
+	 RApvGw0q/8xSqB3md7/+O/g75ejuU5M7szSbBuiZeLs4QM+lXnYPELyuMaWIpzVS60
+	 81KIfgxKH1k3mxUyJ7VQyyMJkCEuMxkQ71KMHPgkgPRATCEN1QU9KzEUVsXRPHvf0D
+	 aqa2DCPNmhvLAotVQTPrGaMNAGjY4uF5yCQBrMbJiuYnhTJ0Z0GooBanRADjFJWqRi
+	 Tb4uru2vjG0Zg==
+Date: Thu, 2 Apr 2026 08:37:47 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Zefir Kurtisi <zefir.kurtisi@westermo.com>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>, Wei Fang <wei.fang@nxp.com>, Clark
+ Wang <xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Ioana Ciornei <ioana.ciornei@nxp.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Simon
+ Horman <horms@kernel.org>, bpf@vger.kernel.org, imx@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 2/3] net: enetc: pad short frames in software
+Message-ID: <20260402083747.4f496c9a@kernel.org>
+In-Reply-To: <20260401172246.1075883-3-vladimir.oltean@nxp.com>
+References: <20260401172246.1075883-1-vladimir.oltean@nxp.com>
+	<20260401172246.1075883-3-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] vsock: initialize child_ns_mode_locked in
- vsock_net_init()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177514380579.495568.7004810880826599315.git-patchwork-notify@kernel.org>
-Date: Thu, 02 Apr 2026 15:30:05 +0000
-References: <20260401092153.28462-1-sgarzare@redhat.com>
-In-Reply-To: <20260401092153.28462-1-sgarzare@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-kernel@vger.kernel.org,
- bobbyeshleman@meta.com, kuba@kernel.org, horms@kernel.org,
- virtualization@lists.linux.dev, edumazet@google.com, pabeni@redhat.com,
- jinl@redhat.com
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-274600-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274599-lists,netdev=lfdr.de,netdevbpf];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,westermo.com,nxp.com,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 87BA638B49B
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5DE3D38B588
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed,  1 Apr 2026 11:21:53 +0200 you wrote:
-> From: Stefano Garzarella <sgarzare@redhat.com>
+On Wed,  1 Apr 2026 20:22:45 +0300 Vladimir Oltean wrote:
+> The ENETC does not support BUF_LEN or FRM_LEN in TX buffer descriptors
+> less than 16. This is written in the reference manual of all SoCs
+> supported by the driver: LS1028A, i.MX943, i.MX95 etc.
 > 
-> The `child_ns_mode_locked` field lives in `struct net`, which persists
-> across vsock module reloads. When the module is unloaded and reloaded,
-> `vsock_net_init()` resets `mode` and `child_ns_mode` back to their
-> default values, but does not reset `child_ns_mode_locked`.
+>   Frames must not have a FRM_LEN that is less than 16 bytes. Frames of
+>   0-15 bytes are not supported.
+>   (...)
+>   The first descriptor in a chain must not have a BUFF_LEN that is less
+>   than 16 bytes.
 > 
-> [...]
+> I don't think proper attention was paid to this during development, we
+> found the text at the end of a bug investigation. Therefore, the driver
+> does not enforce this.
 
-Here is the summary with links:
-  - [net] vsock: initialize child_ns_mode_locked in vsock_net_init()
-    https://git.kernel.org/netdev/net/c/b18c83388874
-
-You are awesome, thank you!
+AI points out that the frame may be longer than 16B but fragmented.
+Only the Ethernet header is guaranteed to be in the linear part.
+So you may need to also toss something like pskb_may_pull(16) after
+that padding call.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
