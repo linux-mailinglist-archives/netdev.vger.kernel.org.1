@@ -1,150 +1,150 @@
-Return-Path: <netdev+bounces-274579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274580-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8BuoMoR/zmkqoAYAu9opvQ
-	(envelope-from <netdev+bounces-274579-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:39:00 +0200
+	id MKNVNjaAzmk9oAYAu9opvQ
+	(envelope-from <netdev+bounces-274580-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:41:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A28B38AAC4
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:39:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5215838ABD7
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:41:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 025963043FA9
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 14:35:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E50DE30D02DC
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 14:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D7D3DEFE5;
-	Thu,  2 Apr 2026 14:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38533E5593;
+	Thu,  2 Apr 2026 14:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hiunMrka"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KsuNwpld"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF2562D0603;
-	Thu,  2 Apr 2026 14:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CCE3CA4AB;
+	Thu,  2 Apr 2026 14:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775140522; cv=none; b=RV9byVoqZuAe5zEaiEeKSvUdbQkKVAOyOyTtEpT1n+poyyJBawwfWNcTdG/jyhnGKGBIYSXWz/T92RdMIQp5vOr7sV/4J+HBLf+uESA4Ubhco7+6aR55CN8G7vH+XWQSn1BxTbRuIe1qw8pEXkzCP8qYaf9Xr0jPkldAt/0ElaQ=
+	t=1775140646; cv=none; b=q4nxFrv5odopNaqGEfze2ROAf5+03422z4x2M/oRIbafvyhbxuEFQyIZKx30rKLxI8nssp5SUbBpHnRt6TE3hp3mcmCo3OT5PUntUvrHSIiBseqvBK1kfvBGntGJJHUJd+XsGeC9/nVaWc7HmU409+A2ItyyFdPmbaGcmtxCsRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775140522; c=relaxed/simple;
-	bh=Ehxrl/qgHg9vBeDxMprCB7n2Uvojn/WK7PPS3gbJYeg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HSrCpzMAg1/biB6498u9vjr+/XNlzNks+laQK3EaMLTAwoaOujElN3yOAhYTwh2ZHJPglP5pVPTCoQNJ65H5o18CG11gKg0Vp/7Vc6pqD9ALyArwEvMJ4Q/XFb2a1LKSSIOc8W7jFaLmp78aKEf3e1Y6H8NC/+C/nEOjlrDD/xY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hiunMrka; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90091C116C6;
-	Thu,  2 Apr 2026 14:35:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775140522;
-	bh=Ehxrl/qgHg9vBeDxMprCB7n2Uvojn/WK7PPS3gbJYeg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hiunMrkaAWdLyhJiicbHDYHGMgx9FVWLxhMJombymF+QtBSKfB/SLKmKRTxmzb/Pz
-	 JGmkTsvxvsIJFUwgMTkZ2i/sbh55iY2CfC6hHiP/UdLgLNfN5c4SSuGMkV0ehhvIhy
-	 oaV+H5aR4tlMI1E5kuzHQsFSq34EylEQY71iqYur19GW6ZMIE5zS1Ou+FZGbkgbh/7
-	 +PDeiLvWUMRUomBsIjh6yTCWhqSocIxdhmc+jTMy4zhsHjuA1P20HdlzfuF2EyqTv4
-	 z7Tcle4m9m75f88ha3TeJjTeA3vwx99wFrTQjsVQuGiLl1YoXhKrpajZYQi7UJ+yy9
-	 aCUcIakwqUUTA==
-Date: Thu, 2 Apr 2026 07:35:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Hwang <leon.hwang@linux.dev>
-Cc: Leon Hwang <leon.huangfu@shopee.com>, netdev@vger.kernel.org, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah
- Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev
- <sdf@fomichev.me>, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next] selftests/net: Add two xdp tests to xdp.py
-Message-ID: <20260402073520.697dde02@kernel.org>
-In-Reply-To: <6c1d6987-ca73-40de-adab-bc6f9fce67f6@linux.dev>
-References: <20260401052746.314667-1-leon.huangfu@shopee.com>
-	<20260401132048.3a15601e@kernel.org>
-	<6c1d6987-ca73-40de-adab-bc6f9fce67f6@linux.dev>
+	s=arc-20240116; t=1775140646; c=relaxed/simple;
+	bh=hFW1WirWB3PBVHlQq9qrz+g5bLZ5tFr+4BQGJ7+vcQ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wt+uKGjm6SCu/Oai14td3b2j9X9CQ6OzE4JBGtrHNWgltAkEUp10qrfO529vir5PSPABgitvWaxMMmh3HDPEF8/gy+Xvvr4lDF22Lu1llW7lpcvAVbG7JRmSI41dMhFjgKMeforoFx5anDN/2d+vFRwHqC728Y7V5LCj4NCKsKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KsuNwpld; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=T0tZRmojfGOL+npL3ZUwNlI8atXbTusRZk4xOnYHYNg=; b=Ks
+	uNwpldTkYZHn0EYOV5BOZj/SoKQ8sJicSmjQaqJ9qIaaiAyRJnTFOnyRkkbK6TzTI7htQ4+VEK88/
+	84mAEyDK7VHuFtAnqbnhm/GHQogNUKUcjdjKgma3chUBF/RFWQPzQCbm55AV0Uije02Jd1ZvWw+3N
+	vkymZS45Ly/YFtM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w8JAL-00EWvA-4K; Thu, 02 Apr 2026 16:37:01 +0200
+Date: Thu, 2 Apr 2026 16:37:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Dianne Skoll <dianne@skoll.ca>, Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+	Felix Maurer <fmaurer@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
+	Paul Mackerras <paulus@ozlabs.org>, Jaco Kroon <jaco@uls.co.za>
+Subject: Re: [PATCH net-next v7] selftests: net: add tests for PPP
+Message-ID: <24aea6cc-d599-4935-8a75-34f38b852d1e@lunn.ch>
+References: <20260330035604.133073-1-dqfext@gmail.com>
+ <20260401081030.29b050d5@kernel.org>
+ <CALW65jahWApDnVmFReW+Y3HDxBEmCwzsT1oyh03SW7X5ry6PzA@mail.gmail.com>
+ <20260401175621.549c492e@kernel.org>
+ <CALW65jaTbaosbO8ypKZ6G37HxuxXabeTaP_Fhq72xTovmDj+8g@mail.gmail.com>
+ <50ae3c69-2c4e-499f-a46a-cbd207ff5f09@redhat.com>
+ <CALW65ja1FV-OcqSazgKZhQhKf3oqr=kcGxyGkOGbhurGLOJ0-w@mail.gmail.com>
+ <cb43761b-d414-4878-bf41-4ef6c988f881@redhat.com>
+ <CALW65jZszAVHNSYgo9Fav8J-Ph9dXzR34CYr1-Ar776mOy4Lbw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALW65jZszAVHNSYgo9Fav8J-Ph9dXzR34CYr1-Ar776mOy4Lbw@mail.gmail.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274579-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[shopee.com,vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,kernel.org,iogearbox.net,gmail.com,fomichev.me];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-274580-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4A28B38AAC4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,pppoe.so:url]
+X-Rspamd-Queue-Id: 5215838ABD7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 2 Apr 2026 11:22:15 +0800 Leon Hwang wrote:
-> >> +def test_xdp_native_update_mb_to_sb(cfg):
-> >> +    obj = cfg.net_lib_dir / "xdp_dummy.bpf.o"
-> >> +
-> >> +    _set_jumbo_mtu(cfg, 9000)
-> >> +
-> >> +    attach = _exec_cmd(cfg, obj, "xdp.frags")
-> >> +    if attach.ret != 0:
-> >> +        output = attach.stderr.strip() or attach.stdout.strip()
-> >> +        raise KsftSkipEx(output or "device does not support multi-buffer XDP")
-> >> +
-> >> +    defer(ip, f"link set dev {cfg.ifname} xdpdrv off")
-> >> +
-> >> +    update1 = _exec_cmd(cfg, obj, "xdp.frags", "-force")
-> >> +    if update1.ret != 0:
-> >> +        raise KsftFailEx("device fails to update multi-buffer XDP")
-> >> +
-> >> +    update2 = _exec_cmd(cfg, obj, "xdp", "-force")
-> >> +    if update2.ret == 0:
-> >> +        raise KsftFailEx("device unexpectedly updates non-multi-buffer XDP")  
+On Thu, Apr 02, 2026 at 08:04:23PM +0800, Qingfang Deng wrote:
+> On Thu, Apr 2, 2026 at 7:17 PM Paolo Abeni <pabeni@redhat.com> wrote:
+> >
+> > On 4/2/26 12:13 PM, Qingfang Deng wrote:
+> >
+> > > What distro do you run CI tests on? On Ubuntu 24.04, "rp-pppoe.so" is
+> > > a symlink to "pppoe.so" in apt package "ppp". Maybe an additional
+> > > package is required for the distro you use, or I may work around that
+> > > by manually creating the symlink.
+> >
+> > It's fedora 43 with ppp and pppoe installed.
+> >
+> > ppp provides pppoe.so, and AFAICS nothink provides rp-pppoe.so, and the
+> > pppoe-server is looking for a non existing /etc/ppp/plugins/rp-pppoe.so
+> > plugin.
+> >
+> > Before I mess with the nipa testbed, could you please double check that
+> >
+> > ln -n /usr/lib64/pppd/2.5.1/pppoe.so /etc/ppp/plugins/rp-pppoe.so
+> >
+> > should solve?
 > 
-> From sashiko's review [1]:
-> 
-> On architectures with larger page sizes, such as 16KB or 64KB on ARM64 or
-> PowerPC, a 9000-byte packet can fit entirely within a single buffer. In
-> these environments, the driver might legally accept a non-frag XDP program,
-> which would lead to a false positive failure here.
+> Hard links will also work.
+> Alternatively, if your rp-pppoe version is 4.0, you can use the new
+> option `-g` to specify the full path of the pppoe.so plugin.
 
-Yes the test is indeed not checking all the corner cases, it should be:
+It should be possible for anybody to run these self tests. So we don't
+want specially crafted setups, but generic setups which will work for
+as many people as possible.
 
-	# set mtu to 9k
+It looks like v4.0 we released 2024-09-09. So can we make that the
+minimum version? Fail the test if an older version is found? Can the
+test poke around the file system and find rp-pppoe.so and pass it
+using -g?
 
-	# try attach xdp
-	# if ret == 0:
-	#    return // must be 64k pages or something
-
-	# try attach xdp.frags
-	# if ret != 0:
-	#    raise SKIP // driver doesn't support multi-buf
-
-	# defer xdp off
-
-	# try --froce switch to xdp
-	# if ret == 0:
-	#   raise FAIL // replace is missing a check
+      Andrew
 
