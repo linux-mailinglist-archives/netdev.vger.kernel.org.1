@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-274664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274665-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SBwFBdS4zmmTpgYAu9opvQ
-	(envelope-from <netdev+bounces-274664-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:43:32 +0200
+	id GO/kMSi6zmmTpgYAu9opvQ
+	(envelope-from <netdev+bounces-274665-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:49:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B1B938D511
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:43:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3529B38D64B
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:49:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 51E30302C997
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 18:41:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EAC5F301D06F
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 18:41:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7493C3F20FD;
-	Thu,  2 Apr 2026 18:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05753F54DF;
+	Thu,  2 Apr 2026 18:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BhAHnmKj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cDEFmea5"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB1E3F077B
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 18:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F72C3F54B7
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 18:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775155282; cv=none; b=p5iDQG35gbogJrJhLVxKEAIU2CIz+nUfV/5iESQJzwpWZRANe/PXUc31E4ZLTFdtimPUGOIG8077iceo0joiyIu68yXTOpKIjSPV1/hOdjrJR/ZZQb0vCR3f+X0jdRfM/4n8vgKaBWcUhzILlvpXIDRSMWB1wGFInaPdIrqIBrQ=
+	t=1775155289; cv=none; b=A5MNxFWQKng+5AKYyRIa6b19l8ngzQgKkhoYO+vmuvmiBwu+xF2wp47heZgrT/0lyF5ZrROvxOHTyI0e9dq2NACLgRUVCc7Vl46DznY3NOKI3rgu+3JH6kV5SegEtfx2uI6NDJHips6tuwndsjqTV1oOngX0nWo3hC8He3hoZ+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775155282; c=relaxed/simple;
-	bh=wuAoegQ01Qa5dReyKQHfuW/SEZdOhweHTlDvod5Iia8=;
+	s=arc-20240116; t=1775155289; c=relaxed/simple;
+	bh=cQmjmbgzqLw04tNyP5XL+5RUu9xHNFr0EmLNy2mjU9w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KnsYXzbpPy2e9zEVp+gSEIrWhqJrSbi4dm2hzSLQYkA25mxagqJgU5WkcOXs01MLKJC859Edan1BicqGG+URQXM33MLrhf0CIkKVhu7DozqbAmQ/P4aPxJxz+x/24KvkWdmoK9LtQjkflVSy7PEjeyo5h4o2wmArYisFYfXLY+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BhAHnmKj; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=kLC9z2Fm6DWcbFZg6LOtqqPV5aq5q6fpZR3GYdTOn6q7jNFWytdW+eWTNWN/cAoojhNMJkXkXDuhZ0hsicQE4VaXrpEBRvbA5UyDTtzEI7j5z/WlXedj7MC4/AhZ6P1LrWvja2CiRtzOFIx0ddAL1DO70+v5OopjgZsM3ceE7XI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cDEFmea5; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775155280;
+	s=mimecast20190719; t=1775155285;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=a9ixCCRnlZXftcFZfA52ZQtqPi0laT0HBu2BocVPdZY=;
-	b=BhAHnmKjO2JxfrKQ+afZRKn55QmEPvelp0IOHDMBkfK1Lgm9uX8FXobRG7CTW0FHSxTkJ7
-	JCHNQ1JpoGWh/YpYQJZ3UdFS5SxB8nSOwAYomlDA7MAleAD3w+uwHLIoOh8Xhpdh/jRD7X
-	+ohGcfjTXcUs7m2wJQfz9BSBOynUm70=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=1a8ccUApP1qkXCTfOa+pqgC9xhNBfS907MRswyOhv5w=;
+	b=cDEFmea5JeACi5AgvgYiwKuldp3Nori6q3qBTEHN/tbqlRbHI5YbAm0oS85+BruVcCEwOh
+	ltHhK51r+uonE8NKV1aCFhd+MQXM5RURqvvCsfiMWyonQRwiEqM1t3+v7wrcg/2tqWcbzA
+	TT/kMtxK9EhYgZBq5wi6cobqLbzNAMI=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-561-DRhLRLxgMBW7_4m6FIGdvw-1; Thu,
- 02 Apr 2026 14:41:16 -0400
-X-MC-Unique: DRhLRLxgMBW7_4m6FIGdvw-1
-X-Mimecast-MFC-AGG-ID: DRhLRLxgMBW7_4m6FIGdvw_1775155274
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-661-I8SZdhptP5msTw0sEibrQg-1; Thu,
+ 02 Apr 2026 14:41:21 -0400
+X-MC-Unique: I8SZdhptP5msTw0sEibrQg-1
+X-Mimecast-MFC-AGG-ID: I8SZdhptP5msTw0sEibrQg_1775155279
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 081A018005B0;
-	Thu,  2 Apr 2026 18:41:14 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3C41A1956058;
+	Thu,  2 Apr 2026 18:41:19 +0000 (UTC)
 Received: from p16v.luc.cera.cz (unknown [10.44.32.129])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3CF8D1800361;
-	Thu,  2 Apr 2026 18:41:09 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 72BDC180035F;
+	Thu,  2 Apr 2026 18:41:14 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+Cc: Petr Oros <poros@redhat.com>,
 	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Donald Hunter <donald.hunter@gmail.com>,
@@ -72,15 +72,15 @@ Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	Jonathan Corbet <corbet@lwn.net>,
 	Michal Schmidt <mschmidt@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Petr Oros <poros@redhat.com>,
 	Prathosh Satish <Prathosh.Satish@microchip.com>,
 	Shuah Khan <skhan@linuxfoundation.org>,
 	Simon Horman <horms@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 2/3] dpll: add frequency monitoring callback ops
-Date: Thu,  2 Apr 2026 20:40:56 +0200
-Message-ID: <20260402184057.1890514-3-ivecera@redhat.com>
+Subject: [PATCH v4 3/3] dpll: zl3073x: implement frequency monitoring
+Date: Thu,  2 Apr 2026 20:40:57 +0200
+Message-ID: <20260402184057.1890514-4-ivecera@redhat.com>
 In-Reply-To: <20260402184057.1890514-1-ivecera@redhat.com>
 References: <20260402184057.1890514-1-ivecera@redhat.com>
 Precedence: bulk
@@ -97,15 +97,15 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,lwn.net,redhat.com,microchip.com,linuxfoundation.org,vger.kernel.org];
+	FREEMAIL_CC(0.00)[redhat.com,intel.com,davemloft.net,gmail.com,google.com,kernel.org,resnulli.us,lwn.net,microchip.com,linuxfoundation.org,linux.dev,vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274664-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274665-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
@@ -118,226 +118,395 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0B1B938D511
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3529B38D64B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add new callback operations for a dpll device:
-- freq_monitor_get(..) - to obtain current state of frequency monitor
-  feature from dpll device,
-- freq_monitor_set(..) - to allow feature configuration.
+Extract common measurement latch logic from zl3073x_ref_ffo_update()
+into a new zl3073x_ref_freq_meas_latch() helper and add
+zl3073x_ref_freq_meas_update() that uses it to latch and read absolute
+input reference frequencies in Hz.
 
-Add new callback operation for a dpll pin:
-- measured_freq_get(..) - to obtain the measured frequency in mHz.
+Add meas_freq field to struct zl3073x_ref and the corresponding
+zl3073x_ref_meas_freq_get() accessor. The measured frequencies are
+updated periodically alongside the existing FFO measurements.
 
-Obtain the feature state value using the get callback and provide it to
-the user if the device driver implements callbacks. The measured_freq_get
-pin callback is only invoked when the frequency monitor is enabled.
-The freq_monitor_get device callback is required when measured_freq_get
-is provided by the driver.
+Add freq_monitor boolean to struct zl3073x_dpll and implement the
+freq_monitor_set/get device callbacks to enable/disable frequency
+monitoring via the DPLL netlink interface.
 
-Execute the set callback upon user requests.
+Implement measured_freq_get pin callback for input pins that returns the
+measured input frequency in mHz.
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Reviewed-by: Petr Oros <poros@redhat.com>
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
-Changes v3 -> v4:
-- Moved freq_monitor_{g,s}et validation from netlink to pin
-  registration with WARN_ON (Vadim)
+ drivers/dpll/zl3073x/core.c |  88 ++++++++++++++++++++++++++-----
+ drivers/dpll/zl3073x/dpll.c | 100 ++++++++++++++++++++++++++++++++++--
+ drivers/dpll/zl3073x/dpll.h |   2 +
+ drivers/dpll/zl3073x/ref.h  |  14 +++++
+ 4 files changed, 187 insertions(+), 17 deletions(-)
 
-Changes v2 -> v3:
-- Made freq_monitor_get required when measured_freq_get is present (Jakub)
-
-Changes v1 -> v2:
-- Renamed actual-frequency to measured-frequency (Vadim)
----
- drivers/dpll/dpll_core.c    |  5 ++-
- drivers/dpll/dpll_netlink.c | 90 +++++++++++++++++++++++++++++++++++++
- include/linux/dpll.h        | 10 +++++
- 3 files changed, 104 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
-index 3f54754cdec4b..cbb635db43210 100644
---- a/drivers/dpll/dpll_core.c
-+++ b/drivers/dpll/dpll_core.c
-@@ -876,7 +876,10 @@ dpll_pin_register(struct dpll_device *dpll, struct dpll_pin *pin,
+diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
+index 6363002d48d46..cb47a5db061aa 100644
+--- a/drivers/dpll/zl3073x/core.c
++++ b/drivers/dpll/zl3073x/core.c
+@@ -632,22 +632,21 @@ int zl3073x_ref_phase_offsets_update(struct zl3073x_dev *zldev, int channel)
+ }
  
- 	if (WARN_ON(!ops) ||
- 	    WARN_ON(!ops->state_on_dpll_get) ||
--	    WARN_ON(!ops->direction_get))
-+	    WARN_ON(!ops->direction_get) ||
-+	    WARN_ON(ops->measured_freq_get &&
-+		    (!dpll_device_ops(dpll)->freq_monitor_get ||
-+		     !dpll_device_ops(dpll)->freq_monitor_set)))
- 		return -EINVAL;
+ /**
+- * zl3073x_ref_ffo_update - update reference fractional frequency offsets
++ * zl3073x_ref_freq_meas_latch - latch reference frequency measurements
+  * @zldev: pointer to zl3073x_dev structure
++ * @type: measurement type (ZL_REF_FREQ_MEAS_CTRL_*)
+  *
+- * The function asks device to update fractional frequency offsets latch
+- * registers the latest measured values, reads and stores them into
++ * The function waits for the previous measurement to finish, selects all
++ * references and requests a new measurement of the given type.
+  *
+  * Return: 0 on success, <0 on error
+  */
+ static int
+-zl3073x_ref_ffo_update(struct zl3073x_dev *zldev)
++zl3073x_ref_freq_meas_latch(struct zl3073x_dev *zldev, u8 type)
+ {
+-	int i, rc;
++	int rc;
  
- 	mutex_lock(&dpll_lock);
-diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
-index 83cbd64abf5a4..af7ce62ec55ca 100644
---- a/drivers/dpll/dpll_netlink.c
-+++ b/drivers/dpll/dpll_netlink.c
-@@ -175,6 +175,26 @@ dpll_msg_add_phase_offset_monitor(struct sk_buff *msg, struct dpll_device *dpll,
+-	/* Per datasheet we have to wait for 'ref_freq_meas_ctrl' to be zero
+-	 * to ensure that the measured data are coherent.
+-	 */
++	/* Wait for previous measurement to finish */
+ 	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
+ 				  ZL_REF_FREQ_MEAS_CTRL);
+ 	if (rc)
+@@ -663,15 +662,64 @@ zl3073x_ref_ffo_update(struct zl3073x_dev *zldev)
+ 	if (rc)
+ 		return rc;
+ 
+-	/* Request frequency offset measurement */
+-	rc = zl3073x_write_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
+-			      ZL_REF_FREQ_MEAS_CTRL_REF_FREQ_OFF);
++	/* Request measurement */
++	rc = zl3073x_write_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL, type);
+ 	if (rc)
+ 		return rc;
+ 
+ 	/* Wait for finish */
+-	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
+-				  ZL_REF_FREQ_MEAS_CTRL);
++	return zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
++				    ZL_REF_FREQ_MEAS_CTRL);
++}
++
++/**
++ * zl3073x_ref_freq_meas_update - update measured input reference frequencies
++ * @zldev: pointer to zl3073x_dev structure
++ *
++ * The function asks device to latch measured input reference frequencies
++ * and stores the results in the ref state.
++ *
++ * Return: 0 on success, <0 on error
++ */
++static int
++zl3073x_ref_freq_meas_update(struct zl3073x_dev *zldev)
++{
++	int i, rc;
++
++	rc = zl3073x_ref_freq_meas_latch(zldev, ZL_REF_FREQ_MEAS_CTRL_REF_FREQ);
++	if (rc)
++		return rc;
++
++	/* Read measured frequencies in Hz (unsigned 32-bit, LSB = 1 Hz) */
++	for (i = 0; i < ZL3073X_NUM_REFS; i++) {
++		u32 value;
++
++		rc = zl3073x_read_u32(zldev, ZL_REG_REF_FREQ(i), &value);
++		if (rc)
++			return rc;
++
++		zldev->ref[i].meas_freq = value;
++	}
++
++	return 0;
++}
++
++/**
++ * zl3073x_ref_ffo_update - update reference fractional frequency offsets
++ * @zldev: pointer to zl3073x_dev structure
++ *
++ * The function asks device to latch the latest measured fractional
++ * frequency offset values, reads and stores them into the ref state.
++ *
++ * Return: 0 on success, <0 on error
++ */
++static int
++zl3073x_ref_ffo_update(struct zl3073x_dev *zldev)
++{
++	int i, rc;
++
++	rc = zl3073x_ref_freq_meas_latch(zldev,
++					 ZL_REF_FREQ_MEAS_CTRL_REF_FREQ_OFF);
+ 	if (rc)
+ 		return rc;
+ 
+@@ -714,6 +762,20 @@ zl3073x_dev_periodic_work(struct kthread_work *work)
+ 		dev_warn(zldev->dev, "Failed to update phase offsets: %pe\n",
+ 			 ERR_PTR(rc));
+ 
++	/* Update measured input reference frequencies if any DPLL has
++	 * frequency monitoring enabled.
++	 */
++	list_for_each_entry(zldpll, &zldev->dplls, list) {
++		if (zldpll->freq_monitor) {
++			rc = zl3073x_ref_freq_meas_update(zldev);
++			if (rc)
++				dev_warn(zldev->dev,
++					 "Failed to update measured frequencies: %pe\n",
++					 ERR_PTR(rc));
++			break;
++		}
++	}
++
+ 	/* Update references' fractional frequency offsets */
+ 	rc = zl3073x_ref_ffo_update(zldev);
+ 	if (rc)
+diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
+index a29f606318f6d..d788ca45a17e5 100644
+--- a/drivers/dpll/zl3073x/dpll.c
++++ b/drivers/dpll/zl3073x/dpll.c
+@@ -39,6 +39,7 @@
+  * @pin_state: last saved pin state
+  * @phase_offset: last saved pin phase offset
+  * @freq_offset: last saved fractional frequency offset
++ * @measured_freq: last saved measured frequency
+  */
+ struct zl3073x_dpll_pin {
+ 	struct list_head	list;
+@@ -54,6 +55,7 @@ struct zl3073x_dpll_pin {
+ 	enum dpll_pin_state	pin_state;
+ 	s64			phase_offset;
+ 	s64			freq_offset;
++	u32			measured_freq;
+ };
+ 
+ /*
+@@ -202,6 +204,21 @@ zl3073x_dpll_input_pin_ffo_get(const struct dpll_pin *dpll_pin, void *pin_priv,
  	return 0;
  }
  
 +static int
-+dpll_msg_add_freq_monitor(struct sk_buff *msg, struct dpll_device *dpll,
-+			  struct netlink_ext_ack *extack)
++zl3073x_dpll_input_pin_measured_freq_get(const struct dpll_pin *dpll_pin,
++					 void *pin_priv,
++					 const struct dpll_device *dpll,
++					 void *dpll_priv, u64 *measured_freq,
++					 struct netlink_ext_ack *extack)
 +{
-+	const struct dpll_device_ops *ops = dpll_device_ops(dpll);
-+	enum dpll_feature_state state;
-+	int ret;
++	struct zl3073x_dpll_pin *pin = pin_priv;
 +
-+	if (ops->freq_monitor_set && ops->freq_monitor_get) {
-+		ret = ops->freq_monitor_get(dpll, dpll_priv(dpll),
-+					    &state, extack);
-+		if (ret)
-+			return ret;
-+		if (nla_put_u32(msg, DPLL_A_FREQUENCY_MONITOR, state))
-+			return -EMSGSIZE;
-+	}
++	*measured_freq = pin->measured_freq;
++	*measured_freq *= DPLL_PIN_MEASURED_FREQUENCY_DIVIDER;
 +
 +	return 0;
 +}
 +
  static int
- dpll_msg_add_phase_offset_avg_factor(struct sk_buff *msg,
- 				     struct dpll_device *dpll,
-@@ -400,6 +420,38 @@ static int dpll_msg_add_ffo(struct sk_buff *msg, struct dpll_pin *pin,
- 			    ffo);
- }
- 
-+static int dpll_msg_add_measured_freq(struct sk_buff *msg, struct dpll_pin *pin,
-+				      struct dpll_pin_ref *ref,
-+				      struct netlink_ext_ack *extack)
-+{
-+	const struct dpll_device_ops *dev_ops = dpll_device_ops(ref->dpll);
-+	const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
-+	struct dpll_device *dpll = ref->dpll;
-+	enum dpll_feature_state state;
-+	u64 measured_freq;
-+	int ret;
-+
-+	if (!ops->measured_freq_get)
-+		return 0;
-+	ret = dev_ops->freq_monitor_get(dpll, dpll_priv(dpll),
-+					&state, extack);
-+	if (ret)
-+		return ret;
-+	if (state == DPLL_FEATURE_STATE_DISABLE)
-+		return 0;
-+	ret = ops->measured_freq_get(pin, dpll_pin_on_dpll_priv(dpll, pin),
-+				    dpll, dpll_priv(dpll), &measured_freq,
-+				    extack);
-+	if (ret)
-+		return ret;
-+	if (nla_put_64bit(msg, DPLL_A_PIN_MEASURED_FREQUENCY,
-+			  sizeof(measured_freq), &measured_freq,
-+			  DPLL_A_PIN_PAD))
-+		return -EMSGSIZE;
-+
-+	return 0;
-+}
-+
- static int
- dpll_msg_add_pin_freq(struct sk_buff *msg, struct dpll_pin *pin,
- 		      struct dpll_pin_ref *ref, struct netlink_ext_ack *extack)
-@@ -670,6 +722,9 @@ dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
- 	if (ret)
- 		return ret;
- 	ret = dpll_msg_add_ffo(msg, pin, ref, extack);
-+	if (ret)
-+		return ret;
-+	ret = dpll_msg_add_measured_freq(msg, pin, ref, extack);
- 	if (ret)
- 		return ret;
- 	ret = dpll_msg_add_pin_esync(msg, pin, ref, extack);
-@@ -722,6 +777,9 @@ dpll_device_get_one(struct dpll_device *dpll, struct sk_buff *msg,
- 	if (ret)
- 		return ret;
- 	ret = dpll_msg_add_phase_offset_avg_factor(msg, dpll, extack);
-+	if (ret)
-+		return ret;
-+	ret = dpll_msg_add_freq_monitor(msg, dpll, extack);
- 	if (ret)
- 		return ret;
- 
-@@ -948,6 +1006,32 @@ dpll_phase_offset_avg_factor_set(struct dpll_device *dpll, struct nlattr *a,
- 						extack);
+ zl3073x_dpll_input_pin_frequency_get(const struct dpll_pin *dpll_pin,
+ 				     void *pin_priv,
+@@ -1116,6 +1133,35 @@ zl3073x_dpll_phase_offset_monitor_set(const struct dpll_device *dpll,
+ 	return 0;
  }
  
 +static int
-+dpll_freq_monitor_set(struct dpll_device *dpll, struct nlattr *a,
-+		      struct netlink_ext_ack *extack)
++zl3073x_dpll_freq_monitor_get(const struct dpll_device *dpll,
++			      void *dpll_priv,
++			      enum dpll_feature_state *state,
++			      struct netlink_ext_ack *extack)
 +{
-+	const struct dpll_device_ops *ops = dpll_device_ops(dpll);
-+	enum dpll_feature_state state = nla_get_u32(a), old_state;
-+	int ret;
++	struct zl3073x_dpll *zldpll = dpll_priv;
 +
-+	if (!(ops->freq_monitor_set && ops->freq_monitor_get)) {
-+		NL_SET_ERR_MSG_ATTR(extack, a,
-+				    "dpll device not capable of frequency monitor");
-+		return -EOPNOTSUPP;
-+	}
-+	ret = ops->freq_monitor_get(dpll, dpll_priv(dpll), &old_state,
-+				    extack);
-+	if (ret) {
-+		NL_SET_ERR_MSG(extack,
-+			       "unable to get current state of frequency monitor");
-+		return ret;
-+	}
-+	if (state == old_state)
-+		return 0;
++	if (zldpll->freq_monitor)
++		*state = DPLL_FEATURE_STATE_ENABLE;
++	else
++		*state = DPLL_FEATURE_STATE_DISABLE;
 +
-+	return ops->freq_monitor_set(dpll, dpll_priv(dpll), state, extack);
++	return 0;
 +}
 +
- static int
- dpll_pin_freq_set(struct dpll_pin *pin, struct nlattr *a,
- 		  struct netlink_ext_ack *extack)
-@@ -1878,6 +1962,12 @@ dpll_set_from_nlattr(struct dpll_device *dpll, struct genl_info *info)
- 			if (ret)
- 				return ret;
- 			break;
-+		case DPLL_A_FREQUENCY_MONITOR:
-+			ret = dpll_freq_monitor_set(dpll, a,
-+						    info->extack);
-+			if (ret)
-+				return ret;
-+			break;
- 		}
- 	}
- 
-diff --git a/include/linux/dpll.h b/include/linux/dpll.h
-index 2ce295b46b8cd..b7277a8b484d2 100644
---- a/include/linux/dpll.h
-+++ b/include/linux/dpll.h
-@@ -52,6 +52,12 @@ struct dpll_device_ops {
- 	int (*phase_offset_avg_factor_get)(const struct dpll_device *dpll,
- 					   void *dpll_priv, u32 *factor,
- 					   struct netlink_ext_ack *extack);
-+	int (*freq_monitor_set)(const struct dpll_device *dpll, void *dpll_priv,
-+				enum dpll_feature_state state,
-+				struct netlink_ext_ack *extack);
-+	int (*freq_monitor_get)(const struct dpll_device *dpll, void *dpll_priv,
-+				enum dpll_feature_state *state,
-+				struct netlink_ext_ack *extack);
++static int
++zl3073x_dpll_freq_monitor_set(const struct dpll_device *dpll,
++			      void *dpll_priv,
++			      enum dpll_feature_state state,
++			      struct netlink_ext_ack *extack)
++{
++	struct zl3073x_dpll *zldpll = dpll_priv;
++
++	zldpll->freq_monitor = (state == DPLL_FEATURE_STATE_ENABLE);
++
++	return 0;
++}
++
+ static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
+ 	.direction_get = zl3073x_dpll_pin_direction_get,
+ 	.esync_get = zl3073x_dpll_input_pin_esync_get,
+@@ -1123,6 +1169,7 @@ static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
+ 	.ffo_get = zl3073x_dpll_input_pin_ffo_get,
+ 	.frequency_get = zl3073x_dpll_input_pin_frequency_get,
+ 	.frequency_set = zl3073x_dpll_input_pin_frequency_set,
++	.measured_freq_get = zl3073x_dpll_input_pin_measured_freq_get,
+ 	.phase_offset_get = zl3073x_dpll_input_pin_phase_offset_get,
+ 	.phase_adjust_get = zl3073x_dpll_input_pin_phase_adjust_get,
+ 	.phase_adjust_set = zl3073x_dpll_input_pin_phase_adjust_set,
+@@ -1151,6 +1198,8 @@ static const struct dpll_device_ops zl3073x_dpll_device_ops = {
+ 	.phase_offset_avg_factor_set = zl3073x_dpll_phase_offset_avg_factor_set,
+ 	.phase_offset_monitor_get = zl3073x_dpll_phase_offset_monitor_get,
+ 	.phase_offset_monitor_set = zl3073x_dpll_phase_offset_monitor_set,
++	.freq_monitor_get = zl3073x_dpll_freq_monitor_get,
++	.freq_monitor_set = zl3073x_dpll_freq_monitor_set,
+ 	.supported_modes_get = zl3073x_dpll_supported_modes_get,
  };
  
- struct dpll_pin_ops {
-@@ -110,6 +116,10 @@ struct dpll_pin_ops {
- 	int (*ffo_get)(const struct dpll_pin *pin, void *pin_priv,
- 		       const struct dpll_device *dpll, void *dpll_priv,
- 		       s64 *ffo, struct netlink_ext_ack *extack);
-+	int (*measured_freq_get)(const struct dpll_pin *pin, void *pin_priv,
-+				 const struct dpll_device *dpll,
-+				 void *dpll_priv, u64 *measured_freq,
-+				 struct netlink_ext_ack *extack);
- 	int (*esync_set)(const struct dpll_pin *pin, void *pin_priv,
- 			 const struct dpll_device *dpll, void *dpll_priv,
- 			 u64 freq, struct netlink_ext_ack *extack);
+@@ -1572,6 +1621,7 @@ zl3073x_dpll_pin_ffo_check(struct zl3073x_dpll_pin *pin)
+ 	struct zl3073x_dev *zldev = zldpll->dev;
+ 	const struct zl3073x_ref *ref;
+ 	u8 ref_id;
++	s64 ffo;
+ 
+ 	/* Get reference monitor status */
+ 	ref_id = zl3073x_input_pin_ref_get(pin->id);
+@@ -1582,10 +1632,47 @@ zl3073x_dpll_pin_ffo_check(struct zl3073x_dpll_pin *pin)
+ 		return false;
+ 
+ 	/* Compare with previous value */
+-	if (pin->freq_offset != ref->ffo) {
++	ffo = zl3073x_ref_ffo_get(ref);
++	if (pin->freq_offset != ffo) {
+ 		dev_dbg(zldev->dev, "%s freq offset changed: %lld -> %lld\n",
+-			pin->label, pin->freq_offset, ref->ffo);
+-		pin->freq_offset = ref->ffo;
++			pin->label, pin->freq_offset, ffo);
++		pin->freq_offset = ffo;
++
++		return true;
++	}
++
++	return false;
++}
++
++/**
++ * zl3073x_dpll_pin_measured_freq_check - check for pin measured frequency
++ * change
++ * @pin: pin to check
++ *
++ * Check for the given pin's measured frequency change.
++ *
++ * Return: true on measured frequency change, false otherwise
++ */
++static bool
++zl3073x_dpll_pin_measured_freq_check(struct zl3073x_dpll_pin *pin)
++{
++	struct zl3073x_dpll *zldpll = pin->dpll;
++	struct zl3073x_dev *zldev = zldpll->dev;
++	const struct zl3073x_ref *ref;
++	u8 ref_id;
++	u32 freq;
++
++	if (!zldpll->freq_monitor)
++		return false;
++
++	ref_id = zl3073x_input_pin_ref_get(pin->id);
++	ref = zl3073x_ref_state_get(zldev, ref_id);
++
++	freq = zl3073x_ref_meas_freq_get(ref);
++	if (pin->measured_freq != freq) {
++		dev_dbg(zldev->dev, "%s measured freq changed: %u -> %u\n",
++			pin->label, pin->measured_freq, freq);
++		pin->measured_freq = freq;
+ 
+ 		return true;
+ 	}
+@@ -1677,13 +1764,18 @@ zl3073x_dpll_changes_check(struct zl3073x_dpll *zldpll)
+ 			pin_changed = true;
+ 		}
+ 
+-		/* Check for phase offset and ffo change once per second */
++		/* Check for phase offset, ffo, and measured freq change
++		 * once per second.
++		 */
+ 		if (zldpll->check_count % 2 == 0) {
+ 			if (zl3073x_dpll_pin_phase_offset_check(pin))
+ 				pin_changed = true;
+ 
+ 			if (zl3073x_dpll_pin_ffo_check(pin))
+ 				pin_changed = true;
++
++			if (zl3073x_dpll_pin_measured_freq_check(pin))
++				pin_changed = true;
+ 		}
+ 
+ 		if (pin_changed)
+diff --git a/drivers/dpll/zl3073x/dpll.h b/drivers/dpll/zl3073x/dpll.h
+index 115ee4f67e7ab..434c32a7db123 100644
+--- a/drivers/dpll/zl3073x/dpll.h
++++ b/drivers/dpll/zl3073x/dpll.h
+@@ -15,6 +15,7 @@
+  * @id: DPLL index
+  * @check_count: periodic check counter
+  * @phase_monitor: is phase offset monitor enabled
++ * @freq_monitor: is frequency monitor enabled
+  * @ops: DPLL device operations for this instance
+  * @dpll_dev: pointer to registered DPLL device
+  * @tracker: tracking object for the acquired reference
+@@ -28,6 +29,7 @@ struct zl3073x_dpll {
+ 	u8				id;
+ 	u8				check_count;
+ 	bool				phase_monitor;
++	bool				freq_monitor;
+ 	struct dpll_device_ops		ops;
+ 	struct dpll_device		*dpll_dev;
+ 	dpll_tracker			tracker;
+diff --git a/drivers/dpll/zl3073x/ref.h b/drivers/dpll/zl3073x/ref.h
+index 06d8d4d97ea26..be16be20dbc7e 100644
+--- a/drivers/dpll/zl3073x/ref.h
++++ b/drivers/dpll/zl3073x/ref.h
+@@ -23,6 +23,7 @@ struct zl3073x_dev;
+  * @sync_ctrl: reference sync control
+  * @config: reference config
+  * @ffo: current fractional frequency offset
++ * @meas_freq: measured input frequency in Hz
+  * @mon_status: reference monitor status
+  */
+ struct zl3073x_ref {
+@@ -40,6 +41,7 @@ struct zl3073x_ref {
+ 	);
+ 	struct_group(stat, /* Status */
+ 		s64	ffo;
++		u32	meas_freq;
+ 		u8	mon_status;
+ 	);
+ };
+@@ -68,6 +70,18 @@ zl3073x_ref_ffo_get(const struct zl3073x_ref *ref)
+ 	return ref->ffo;
+ }
+ 
++/**
++ * zl3073x_ref_meas_freq_get - get measured input frequency
++ * @ref: pointer to ref state
++ *
++ * Return: measured input frequency in Hz
++ */
++static inline u32
++zl3073x_ref_meas_freq_get(const struct zl3073x_ref *ref)
++{
++	return ref->meas_freq;
++}
++
+ /**
+  * zl3073x_ref_freq_get - get given input reference frequency
+  * @ref: pointer to ref state
 -- 
 2.52.0
 
