@@ -1,87 +1,55 @@
-Return-Path: <netdev+bounces-274404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274406-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8LnJNgYbzml7lAYAu9opvQ
-	(envelope-from <netdev+bounces-274404-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:30:14 +0200
+	id oNbgJbQdzml7lAYAu9opvQ
+	(envelope-from <netdev+bounces-274406-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:41:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CD4A385332
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:30:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6307385550
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:41:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D020F30D0FF3
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 07:27:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3B6CB30C26B2
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 07:27:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F3438B158;
-	Thu,  2 Apr 2026 07:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Hoqfv21U";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GD0qN7Fx";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Hoqfv21U";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GD0qN7Fx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4F039EF22;
+	Thu,  2 Apr 2026 07:26:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E21F389102
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 07:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB6438BF92
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 07:26:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775114788; cv=none; b=YxjVb3a31LFISHNCtLfY9OEHZSFGdA0HNVvReyRKS+m8IkeOyJYjU9J/zIle9WvVnFHGnnGTvuxfrxSdN9SZkK23x6iK1dQBweQAGC/QFYwEX7T46ej9ojdwcJuyJNy2VNITqTSW8QYzbvkGw7rArmTKHSxF0uckJjQTAfT+HXo=
+	t=1775114796; cv=none; b=reAjvCMrLzb0cYZqf+zGyF1akznnR1hasppqRrR12stw6zSRmMH+1Z8RriJA11/tRFwKm13s6rS/Ek59J738CJLJn6AhGuQzTu0iqyx46NkvMfPFmf9To22+bAILz5cCL9pPCXdi5FndaSXY2MFjzgxRbl8fT8V7mf1s+GtyP/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775114788; c=relaxed/simple;
-	bh=EzzNJROCVpXXtgj1qqAdUzjKzDi3tyrjV5f5Kb53Knk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nk64/nu3wSoK4if1kblLcFs29Bmgz7DzmJR8W0+YE42xSMqJSGvxSxt/EgyqIMwOxPPAR+MA5YSMvmDzoPel4FxKchrNQVtjbJnewMokq6m1D05da0gsy6/ovR1LmXHxDQEaz7PR3HsZAJ+8+ZumRvhQ2YkBG45cgfkwXbnkWqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Hoqfv21U; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GD0qN7Fx; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Hoqfv21U; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GD0qN7Fx; arc=none smtp.client-ip=195.135.223.131
+	s=arc-20240116; t=1775114796; c=relaxed/simple;
+	bh=MTUKsZMQhqavcLs0bYu45unM5oI1oNCah3f+jH1mpZ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AVnoG5arGkAuxiJp+NSuPp6Fmkzumw+iWZiR+08rS4yMhzszMNx6CrgOksetQl/g8ZEQy7/ZxsN8jO2fo3isq05RLXCFA0z+r8LaXoETqIBYk0nhfotBKBnHwncqKTzFEQDfLJu/yA6CxLmWO9MI8gLIHNZ2FwKpGyzx16XmO8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id C10DA5BD36;
-	Thu,  2 Apr 2026 07:26:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1775114785; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=5ZVrcfyKGLY6sqPCsrPpAw1NcYSEOMbqKtcTCumZApM=;
-	b=Hoqfv21URcIi6s/Tv2jy+naFZbwyFoA3GqWI1mCgEzSFTAfq4/jgCCE23nRAKtklB41LWC
-	vdv6bBumTAzW3dSujOQuhglDQr3DZowq6mRPCKF2uLR9iF/98HG3rAs/qWWd3PSdVVtFoY
-	V+3rQR1srxArF430G/l3X8Ww3PRJWuk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1775114785;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=5ZVrcfyKGLY6sqPCsrPpAw1NcYSEOMbqKtcTCumZApM=;
-	b=GD0qN7Fx65GX90kf9TSNqyt5pqIbxogVX4zY4BgwTEci13VpaRFNVq4UoP/tZUcfb9qaeg
-	Ef6mVEakG0fO6uDg==
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 941615BD95;
+	Thu,  2 Apr 2026 07:26:29 +0000 (UTC)
 Authentication-Results: smtp-out2.suse.de;
 	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1775114785; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=5ZVrcfyKGLY6sqPCsrPpAw1NcYSEOMbqKtcTCumZApM=;
-	b=Hoqfv21URcIi6s/Tv2jy+naFZbwyFoA3GqWI1mCgEzSFTAfq4/jgCCE23nRAKtklB41LWC
-	vdv6bBumTAzW3dSujOQuhglDQr3DZowq6mRPCKF2uLR9iF/98HG3rAs/qWWd3PSdVVtFoY
-	V+3rQR1srxArF430G/l3X8Ww3PRJWuk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1775114785;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=5ZVrcfyKGLY6sqPCsrPpAw1NcYSEOMbqKtcTCumZApM=;
-	b=GD0qN7Fx65GX90kf9TSNqyt5pqIbxogVX4zY4BgwTEci13VpaRFNVq4UoP/tZUcfb9qaeg
-	Ef6mVEakG0fO6uDg==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1F2814A0B0;
-	Thu,  2 Apr 2026 07:26:25 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DCFDC4A0B0;
+	Thu,  2 Apr 2026 07:26:28 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id qROtBCEazmn5agAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Thu, 02 Apr 2026 07:26:25 +0000
+	id UIQRMyQazmn5agAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Thu, 02 Apr 2026 07:26:28 +0000
 From: Fernando Fernandez Mancera <fmancera@suse.de>
 To: netdev@vger.kernel.org
 Cc: idosch@nvidia.com,
@@ -93,11 +61,14 @@ Cc: idosch@nvidia.com,
 	davem@davemloft.net,
 	dsahern@kernel.org,
 	kees@kernel.org,
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH 1/2 net v3] ipv4: nexthop: avoid duplicate NHA_HW_STATS_ENABLE on nexthop group dump
-Date: Thu,  2 Apr 2026 09:26:12 +0200
-Message-ID: <20260402072613.25262-1-fmancera@suse.de>
+	Fernando Fernandez Mancera <fmancera@suse.de>,
+	Yiming Qian <yimingqian591@gmail.com>
+Subject: [PATCH 2/2 net v3] ipv4: nexthop: allocate skb dynamically in rtm_get_nexthop()
+Date: Thu,  2 Apr 2026 09:26:13 +0200
+Message-ID: <20260402072613.25262-2-fmancera@suse.de>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260402072613.25262-1-fmancera@suse.de>
+References: <20260402072613.25262-1-fmancera@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,23 +76,29 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
 X-Spam-Flag: NO
-X-Spam-Score: -2.80
+X-Spam-Score: -4.00
 X-Spam-Level: 
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [0.14 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[suse.de : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[suse.de:+];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_CC(0.00)[nvidia.com,kernel.org,redhat.com,google.com,davemloft.net,suse.de,gmail.com];
+	TAGGED_FROM(0.00)[bounces-274406-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274404-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
@@ -129,46 +106,151 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_FIVE(0.00)[6];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.344];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,nvidia.com:email,suse.de:dkim,suse.de:email,suse.de:mid]
-X-Rspamd-Queue-Id: 9CD4A385332
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,suse.de:email,suse.de:mid]
+X-Rspamd-Queue-Id: E6307385550
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Currently NHA_HW_STATS_ENABLE is included twice everytime a dump of
-nexthop group is performed with NHA_OP_FLAG_DUMP_STATS. As all the stats
-querying were moved to nla_put_nh_group_stats(), leave only that
-instance of the attribute querying.
+When querying a nexthop object via RTM_GETNEXTHOP, the kernel currently
+allocates a fixed-size skb using NLMSG_GOODSIZE. While sufficient for
+single nexthops and small Equal-Cost Multi-Path groups, this fixed
+allocation fails for large nexthop groups like 512 nexthops.
 
-Fixes: 5072ae00aea4 ("net: nexthop: Expose nexthop group HW stats to user space")
+This results in the following warning splat:
+
+ WARNING: net/ipv4/nexthop.c:3395 at rtm_get_nexthop+0x176/0x1c0, CPU#20: rep/4608
+ [...]
+ RIP: 0010:rtm_get_nexthop (net/ipv4/nexthop.c:3395)
+ [...]
+ Call Trace:
+  <TASK>
+  rtnetlink_rcv_msg (net/core/rtnetlink.c:6989)
+  netlink_rcv_skb (net/netlink/af_netlink.c:2550)
+  netlink_unicast (net/netlink/af_netlink.c:1319 net/netlink/af_netlink.c:1344)
+  netlink_sendmsg (net/netlink/af_netlink.c:1894)
+  ____sys_sendmsg (net/socket.c:721 net/socket.c:736 net/socket.c:2585)
+  ___sys_sendmsg (net/socket.c:2641)
+  __sys_sendmsg (net/socket.c:2671)
+  do_syscall_64 (arch/x86/entry/syscall_64.c:63 arch/x86/entry/syscall_64.c:94)
+  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+  </TASK>
+
+Fix this by allocating the size dynamically using nh_nlmsg_size() and
+using nlmsg_new(), this is consistent with nexthop_notify() behavior. In
+addition, adjust nh_nlmsg_size_grp() so it calculates the size needed
+based on flags passed. While at it, also add the size of NHA_FDB for
+nexthop group size calculation as it was missing too.
+
+This cannot be reproduced via iproute2 as the group size is currently
+limited and the command fails as follows:
+
+addattr_l ERROR: message exceeded bound of 1048
+
+Fixes: 430a049190de ("nexthop: Add support for nexthop groups")
+Reported-by: Yiming Qian <yimingqian591@gmail.com>
+Closes: https://lore.kernel.org/netdev/CAL_bE8Li2h4KO+AQFXW4S6Yb_u5X4oSKnkywW+LPFjuErhqELA@mail.gmail.com/
 Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 ---
-v2: patch added
-v3: no changes
+v2: adjust nh_nlmsg_size_grp() to handle size for stats and add symbols
+to the trace in commit message
+v3: include NHA_FDB size into nh_nlmsg_size_grp() calculation
 ---
- net/ipv4/nexthop.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ net/ipv4/nexthop.c | 38 +++++++++++++++++++++++++++-----------
+ 1 file changed, 27 insertions(+), 11 deletions(-)
 
 diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index c942f1282236..a0c694583299 100644
+index a0c694583299..2c9036c719b6 100644
 --- a/net/ipv4/nexthop.c
 +++ b/net/ipv4/nexthop.c
-@@ -902,8 +902,7 @@ static int nla_put_nh_group(struct sk_buff *skb, struct nexthop *nh,
- 		goto nla_put_failure;
+@@ -1003,16 +1003,32 @@ static size_t nh_nlmsg_size_grp_res(struct nh_group *nhg)
+ 		nla_total_size_64bit(8);/* NHA_RES_GROUP_UNBALANCED_TIME */
+ }
  
- 	if (op_flags & NHA_OP_FLAG_DUMP_STATS &&
--	    (nla_put_u32(skb, NHA_HW_STATS_ENABLE, nhg->hw_stats) ||
--	     nla_put_nh_group_stats(skb, nh, op_flags)))
-+	    nla_put_nh_group_stats(skb, nh, op_flags))
- 		goto nla_put_failure;
+-static size_t nh_nlmsg_size_grp(struct nexthop *nh)
++static size_t nh_nlmsg_size_grp(struct nexthop *nh, u32 op_flags)
+ {
+ 	struct nh_group *nhg = rtnl_dereference(nh->nh_grp);
+ 	size_t sz = sizeof(struct nexthop_grp) * nhg->num_nh;
+ 	size_t tot = nla_total_size(sz) +
+-		nla_total_size(2); /* NHA_GROUP_TYPE */
++		nla_total_size(2) +	/* NHA_GROUP_TYPE */
++		nla_total_size(0);	/* NHA_FDB */
  
- 	return 0;
+ 	if (nhg->resilient)
+ 		tot += nh_nlmsg_size_grp_res(nhg);
+ 
++	if (op_flags & NHA_OP_FLAG_DUMP_STATS) {
++		tot += nla_total_size(0) +	  /* NHA_GROUP_STATS */
++		       nla_total_size(4);	  /* NHA_HW_STATS_ENABLE */
++		tot += nhg->num_nh *
++		       (nla_total_size(0) +	  /* NHA_GROUP_STATS_ENTRY */
++			nla_total_size(4) +	  /* NHA_GROUP_STATS_ENTRY_ID */
++			nla_total_size_64bit(8)); /* NHA_GROUP_STATS_ENTRY_PACKETS */
++
++		if (op_flags & NHA_OP_FLAG_DUMP_HW_STATS) {
++			tot += nhg->num_nh *
++			       nla_total_size_64bit(8); /* NHA_GROUP_STATS_ENTRY_PACKETS_HW */
++			tot += nla_total_size(4);	/* NHA_HW_STATS_USED */
++		}
++	}
++
+ 	return tot;
+ }
+ 
+@@ -1047,14 +1063,14 @@ static size_t nh_nlmsg_size_single(struct nexthop *nh)
+ 	return sz;
+ }
+ 
+-static size_t nh_nlmsg_size(struct nexthop *nh)
++static size_t nh_nlmsg_size(struct nexthop *nh, u32 op_flags)
+ {
+ 	size_t sz = NLMSG_ALIGN(sizeof(struct nhmsg));
+ 
+ 	sz += nla_total_size(4); /* NHA_ID */
+ 
+ 	if (nh->is_group)
+-		sz += nh_nlmsg_size_grp(nh) +
++		sz += nh_nlmsg_size_grp(nh, op_flags) +
+ 		      nla_total_size(4) +	/* NHA_OP_FLAGS */
+ 		      0;
+ 	else
+@@ -1070,7 +1086,7 @@ static void nexthop_notify(int event, struct nexthop *nh, struct nl_info *info)
+ 	struct sk_buff *skb;
+ 	int err = -ENOBUFS;
+ 
+-	skb = nlmsg_new(nh_nlmsg_size(nh), gfp_any());
++	skb = nlmsg_new(nh_nlmsg_size(nh, 0), gfp_any());
+ 	if (!skb)
+ 		goto errout;
+ 
+@@ -3376,15 +3392,15 @@ static int rtm_get_nexthop(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 	if (err)
+ 		return err;
+ 
+-	err = -ENOBUFS;
+-	skb = alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
+-	if (!skb)
+-		goto out;
+-
+ 	err = -ENOENT;
+ 	nh = nexthop_find_by_id(net, id);
+ 	if (!nh)
+-		goto errout_free;
++		goto out;
++
++	err = -ENOBUFS;
++	skb = nlmsg_new(nh_nlmsg_size(nh, op_flags), GFP_KERNEL);
++	if (!skb)
++		goto out;
+ 
+ 	err = nh_fill_node(skb, nh, RTM_NEWNEXTHOP, NETLINK_CB(in_skb).portid,
+ 			   nlh->nlmsg_seq, 0, op_flags);
 -- 
 2.53.0
 
