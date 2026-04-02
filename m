@@ -1,305 +1,288 @@
-Return-Path: <netdev+bounces-274642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274643-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iPLoIw2szml+pQYAu9opvQ
-	(envelope-from <netdev+bounces-274642-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:49:01 +0200
+	id SFD7INyrzml+pQYAu9opvQ
+	(envelope-from <netdev+bounces-274643-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:48:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38C2838CC0E
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:49:01 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F377E38CBE2
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:48:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 707633031815
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 17:44:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E5FDC302B500
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 17:46:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7F53C5DBE;
-	Thu,  2 Apr 2026 17:44:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE3D33F075B;
+	Thu,  2 Apr 2026 17:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p+lmZaO7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RhtC0Cid"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82AF035DA6A
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 17:44:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775151873; cv=none; b=S1ryosmRblTvTfsDPJn/4+hxutHo/wh/3kYS70U8jWw4u8aNQmEqvbAfK/eKofnWZ4jBgj9Vq4Y67LHmfj/6Go/v3KgnPWcxOMZuk+jhzYzurnNJGmjZ6BvlpCtWq0+MJ1sG8grGX9KqEyXLSJw13bbNTk6x1zbh/nHpQQ/B8Aw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775151873; c=relaxed/simple;
-	bh=lf/PpzKFCibcl4h4xLmp5BkRheQl1OeL9XlcJ8QMfg4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cdCSH0LUtTThDo+HlNjfAe7Of1ORSGIqJ1Mz3PsxMSVGJB6KL9s/8Bt9qXOK3uBP6RHHl/4ELqX3Ql7AJe5wPlmA6/N912pZGA/QnNDqeuGy/lKKuETops1gq3EZGTs99CGrYKlVB6Z/bnyPb2nBpRYByXC4TsCn9yDL+eiQ3dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p+lmZaO7; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-50b3544bc7bso16158551cf.2
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 10:44:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E13836C0D6
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 17:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775151962; cv=pass; b=AOeAbtx7JmKJ7VKhh1F0Yh6XkBLut1Hv3SQgIVghRUGbvG3JWtYMCwJ2mgjSp2kXiXIRvOZg5l19IXs+9ZJ60xOERv8gEXrbfTu2Rzs1Zv72AIDz0z7nQYWvKLxxq7nH9xqRHBPlSJb2FUhl0+PVdsw+PvVO6L+XJ404ihd4ST0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775151962; c=relaxed/simple;
+	bh=tojv1aMsDMqXST17MzgGYQM39sIEZXweMpssAefWpSM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V6FbCmcN42IVIlTWLu4jyMrao1BFFZtPWnpzBT8NdUxLTupaBS/aH+yiL4Fuo68jZublPyrcv7nQ2Sb9EA59+ayc8YodWWshNatBNGSJx3/0mlVsrqITxLXknIgvLsnafxlF069mBPyNmuwGW/SlboysczHwImb4K/Lw7hZmqZM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RhtC0Cid; arc=pass smtp.client-ip=209.85.160.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-4152698e745so504964fac.1
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 10:46:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775151960; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NQ5MM06ezfSey4cQKEnurA26DlnGfyPsbfdCfsnbrhqBzSNuOF66YYf8C89bFdeoki
+         QXaGfrv6Q1nT1eZjyxFcad+HWjh3Cso/6TpMi+nF2qbsuLMX7VSZWzLuC6jqGXSup0/f
+         8ianXZxsIzPMCfWEYD7TB3kolhPhzqR44mxIabZcqNGPSWj+5O+3XtNwEJ75rdA1rwdo
+         cXwhAPZ3KHJymuP/0uTu58tAqL9LKKp0czAUGNOUBZBl1mJt+vfRV3/b1kLgfeiHYBOb
+         SiA1hv0Ko8sCtck2l/P61D9S7i25eM05lqB3Kah+UnE5dW9i/SqESt/4ZuV0GzQT6lxj
+         YMQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=drNSS/8xqoOB/vk6Azz5QoQdOOaSz/N84Q7K+Cojxxs=;
+        fh=Dduuoo9rPBLSa6g6Ek+Gm5d9yM5mhuK7u2EPjU6Pct0=;
+        b=InrxxptnmRpPuUTJ5onQom1ojpDvjxBSpkB5YcRzCrG1BGdydH4sNK4I1kgtHH1Ewy
+         QfZlbQ6mHqsywJbbXpXgjzQTUN3p1P6sAdfONVA2lgbbY9+6qhiwMbWdR7CP6MRqpQ03
+         HY4/EnjppQ3ZbeZ1vfGE/kXBvyRsk0Lh5nYq857fdwdl668ppr7iMnDGd7jBZXP5p6rT
+         lQAS+QE+PWATel9sT2MDEincRB5bvSpJ1Oa0soF0V3dJluadUQUoKfn/UEqswNJzlDLb
+         LZZzRa/FoqjLlHWXMPvT3FBvDDlAfH+HX5YDx7X3DHEiQnWSKRiJFSJ1FMesQu7MsT/X
+         TGfg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775151871; x=1775756671; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=og+1QrbZz526bye7PyWeHOCm/FjVJLrkTCnbvweDwo4=;
-        b=p+lmZaO7vcarlehzeEbOBqLJraGKgUvcMllbL8NWRLTcfJ2jz9nbQ0Q/eAE4ZcLpaM
-         YUsXRqm2xwkQsy6gF+FM2Sdu4PAJrOcxntAoKiDX3wpn5L9GLcz3ju7EF2yRiS6IKXtK
-         BRfSjY77M6ouY2ZqecGp6SlcSmxpxLfNd6FZPTDvQZKtJePQ2Z3VCVvOCNgclbdSrRUZ
-         jEqBYGLvgh66AFbC72jCifJENX87eCgB+7KMAPx+Y6OLGqq5JP2ODP4D3SPj7sD+kJKr
-         Uyn3kM2ZRYOe2GksSpYcSz9c4OL7j+6tpmbe+St8AA69rn2fOp4u9lSej9P4F3BPljw+
-         pBqg==
+        d=gmail.com; s=20251104; t=1775151960; x=1775756760; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=drNSS/8xqoOB/vk6Azz5QoQdOOaSz/N84Q7K+Cojxxs=;
+        b=RhtC0CidW91uHg6Y27QAV6zLFrTWI+8lvLrVn0qHB6La5+MER7gNhevKyS4TMVkvwg
+         4azjU8r7ztUCs6AIdahRgXITTeiory2bZDEMuaClew8ltMV68WsMoxDyaZB+hbmH8bxY
+         PLlzCJ0dwKDkEikQ6xgDT/t32x1jIZo0BQaeza5Pb6gdmn5UJYvmpeNpsZNqWQQe2Qxh
+         1ztMSVcyrz/ogePvdRfXEm3/OoXMUe1wbTv7xllGI2idLU9XSuxKNcQN0IrZ4Q2Q2J/P
+         wzrhZywFHirdx6mT9Ax90uz5D8in1zPZOVhaZhUdwf8ii90vasgxciAhoZ77LdkneF2j
+         4MjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775151871; x=1775756671;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=og+1QrbZz526bye7PyWeHOCm/FjVJLrkTCnbvweDwo4=;
-        b=siP9vwRDeLZy45kg2y7LrQqml5V5M/oCS/NfYD4ZC7ZKsncIIroRDdfTwO7TKlASA+
-         brfxvzDuOEQUk7uZJwIfMpTKQ4evmCM0VFYKjt7kR65KzZ/FRf/QCK5h5RIwvEzY3Z25
-         MgaWiD5tNfs4MAF8rv797WQ5suugSdOXaYcfxFKa1H8BXHqnyI3eeP0STbO0m68u5vsp
-         gXOI/p0Jq46+Kj7XKD6tQC40KJM7jraniuAOC2v8C/Lko0mpxMYvZ2/d0hXGmqlzi4mP
-         omRk7tF6PoIoTKFhPTxZZ0a8TVKI5LnoZEtji2zEJaim3k2rI+FYnv44z2Q4mS3RuWMU
-         fSxg==
-X-Forwarded-Encrypted: i=1; AJvYcCX6lIAVZfJqx4MfzMMWmMSf38paDUDq1hAT5ANQ2TMnzJ5T+jWJ5HxmJ8i1CWj9DFz8vFT86F4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBuGxrQDguQKYX4dGQ3yXgoQ5nzlU8rOSSfP0u77wPowMBnXs0
-	/uu4k9et0Vn2G4eEMprvS7xVfpXFS/u62hdr7pZbpD3jfD9plw316o100aiD8zw4yFFh2kF+BGX
-	iGYHVjsVV5FlIDg==
-X-Received: from qvr2.prod.google.com ([2002:a05:6214:d42:b0:89c:56ed:47d1])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:65ca:b0:50b:51a0:f752 with SMTP id d75a77b69052e-50d628ae407mr2306441cf.15.1775151871102;
- Thu, 02 Apr 2026 10:44:31 -0700 (PDT)
-Date: Thu,  2 Apr 2026 17:44:30 +0000
+        d=1e100.net; s=20251104; t=1775151960; x=1775756760;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=drNSS/8xqoOB/vk6Azz5QoQdOOaSz/N84Q7K+Cojxxs=;
+        b=Z+gLazcQ5zdOhcuyY5WinT62Z2E+QKyKuKvY5ig5jt05p0wdgiyQ04FMtLjlcBVhbH
+         1HYRRW+y0f5eR8WYduGl01g4fDe0nFUBQvev1zwoFaYB486Yw2+HlhtHelvwJhe2afu9
+         Ycp66Ki5+G2HF1hSuT+i2rFLFb2l0tJhQCNWv5vUypsB5YPTSKBG7VORI5UgJdz6AoVw
+         O4i1i1boVwjxV8UG6x7cN39lboO/UbUCo7WKlUe30IxEcg9dOloMjkiITkh/1owDVtrZ
+         fEDQ7TfEQVZ7I/J3ECXPQZWFruRjuKLGynIwrX1s1q6uSZ5FyVdb5d/Qp9oy6IpYxZ28
+         uviA==
+X-Gm-Message-State: AOJu0Yy4Z83VdBSZmdNNZl/zx/1Z8ltmEktAwGJAEmF0TvfrBQLI82Du
+	1dmYn96pB2KsLIUR/H/nIakTnDdtUKJDsQj6LmfLZ5Cis1QBNz8GMVFx6swdf8BvyGx7p3H77S8
+	X5fnxmDUZF9dIKVk9rVFWSCFGWW0PjZ0=
+X-Gm-Gg: ATEYQzxVZIyICttB2b9PoWM5io5sy0Kqc97Zxs6fVEC0p2ixvFPQEP74/p4Mf6k8g1A
+	n+MjwwLKNTZDimal4JNW0awRcZ7ZIggLo2CW8UczO6xoTO1zs/LtnNUcXQBt5wskt9d5eHjvpGq
+	Ovavt2+pBfL5MkIgSKW2NxQrZssry+WKRQUvrLQV/9SVk1Yrt5erxsWi6AEqlDGiV56DXWCMRdZ
+	BQcQ5yDvWYGifxsNx67V5b3Lrqh2YHaPQXUfhuu5Cl2J4xFo+N13XL3qigG7bWOzZUUbLjVG3AA
+	er/nwjtBWqqo+E5uw/LdxyPG6zazsgkYV7CdFZVlXhfi0bKer81KZ2JCtKoR1O5gAIXn0UVZZRX
+	MKdX41RIDApCmXIMh1bELa5w=
+X-Received: by 2002:a05:6820:208e:b0:67e:1ce7:77cb with SMTP id
+ 006d021491bc7-6821dc62870mr52530eaf.24.1775151959932; Thu, 02 Apr 2026
+ 10:45:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
-Message-ID: <20260402174430.2462800-1-edumazet@google.com>
-Subject: [PATCH net-next] inet: remove leftover EXPORT_SYMBOL()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+References: <20260328213338.450601-1-nickgarlis@gmail.com> <20260401194553.6e8a17f8@kernel.org>
+In-Reply-To: <20260401194553.6e8a17f8@kernel.org>
+From: Nikolaos Gkarlis <nickgarlis@gmail.com>
+Date: Thu, 2 Apr 2026 19:45:48 +0200
+X-Gm-Features: AQROBzBlTUf3p8BLQZJX7VoAVd4igdQjkexD-LrDDx6vlpy4B8e6yCgaBP8ZRNk
+Message-ID: <CA+jwDR=9UgxAW828FF4geu8RukGyi7OLTS0ShVr4S8-36SWamw@mail.gmail.com>
+Subject: Re: [PATCH net v4] rtnetlink: add missing netlink_ns_capable() check
+ for peer netns
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, kuniyu@google.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,gmail.com];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274643-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274642-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nickgarlis@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 38C2838CC0E
+	FREEMAIL_FROM(0.00)[gmail.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: F377E38CBE2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-IPv6 is no longer a module, we no longer need to export these symbols.
+On Thu, Apr 2, 2026 at 4:45=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Sat, 28 Mar 2026 22:33:38 +0100 Nikolaos Gkarlis wrote:
+> > -static struct net *rtnl_get_peer_net(const struct rtnl_link_ops *ops,
+> > +static struct net *rtnl_get_peer_net(struct sk_buff *skb,
+> > +                                  const struct rtnl_link_ops *ops,
+> >                                    struct nlattr *tbp[],
+> >                                    struct nlattr *data[],
+> >                                    struct netlink_ext_ack *extack)
+> >  {
+> >       struct nlattr *tb[IFLA_MAX + 1];
+> > +     struct net *net;
+> >       int err;
+> >
+> >       if (!data || !data[ops->peer_type])
+>
+> There's an early return hiding outside of the context here.
+> the patch is technically correct, I think, because if we take this
+> shortcut we end up with the same netns as tgt_net so we'll validate
+> that it's capable later. But it's probably not obvious to a casual
+> reader of this code (or AI agents, sigh)
+>
+> So let's rewrite this along the lines of:
+>
+>         struct nlattr *tb[IFLA_MAX + 1], **attrs;
+>         struct net *net;
+>         int err;
+>
+>         if (!data || !data[ops->peer_type]) {
+>                attrs =3D tbp;
+>         } else {
+>                 err =3D rtnl_nla_parse_ifinfomsg(tb, data[ops->peer_type]=
+, extack);
+>                 if (err < 0)
+>                         return ERR_PTR(err);
+>
+>                 if (ops->validate) {
+>                         err =3D ops->validate(tb, NULL, extack);
+>                         if (err < 0)
+>                                 return ERR_PTR(err);
+>                 }
+>
+>                 attrs =3D tb;
+>         }
+>
+>         net =3D rtnl_link_get_net_ifla(attrs);
+>         if (IS_ERR_OR_NULL(net))
+>                 return net;
+>
+>         if (!netlink_ns_capable(skb, net->user_ns, CAP_NET_ADMIN)) {
+> ...
+>
+> ?
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/icmp.c        |  4 ----
- net/ipv4/ipmr_base.c   | 13 -------------
- net/ipv4/udp_offload.c |  4 ----
- 3 files changed, 21 deletions(-)
+I agree it=E2=80=99s a bit confusing with the early exit. I=E2=80=99ll appl=
+y the suggested
+changes and send a v5.
 
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index fb397fbb28fc67f012d39398de5e9fdd1dd216bd..2f4fac22d1aba3d100c57a56b51efd57283430a5 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -263,7 +263,6 @@ bool icmp_global_allow(struct net *net)
- 	}
- 	return true;
- }
--EXPORT_SYMBOL(icmp_global_allow);
- 
- void icmp_global_consume(struct net *net)
- {
-@@ -273,7 +272,6 @@ void icmp_global_consume(struct net *net)
- 	if (credits)
- 		atomic_sub(credits, &net->ipv4.icmp_global_credit);
- }
--EXPORT_SYMBOL(icmp_global_consume);
- 
- static bool icmpv4_mask_allow(struct net *net, int type, int code)
- {
-@@ -1378,7 +1376,6 @@ bool icmp_build_probe(struct sk_buff *skb, struct icmphdr *icmphdr)
- 	icmphdr->code = ICMP_EXT_CODE_MAL_QUERY;
- 	return true;
- }
--EXPORT_SYMBOL_GPL(icmp_build_probe);
- 
- /*
-  *	Handle ICMP Timestamp requests.
-@@ -1600,7 +1597,6 @@ void ip_icmp_error_rfc4884(const struct sk_buff *skb,
- 	if (!ip_icmp_error_rfc4884_validate(skb, off))
- 		out->flags |= SO_EE_RFC4884_FLAG_INVALID;
- }
--EXPORT_SYMBOL_GPL(ip_icmp_error_rfc4884);
- 
- int icmp_err(struct sk_buff *skb, u32 info)
- {
-diff --git a/net/ipv4/ipmr_base.c b/net/ipv4/ipmr_base.c
-index fd27f2ca69783bc04e76a42c0382b87a64069a07..37a3c144276c75d56d5d295a2c852f5ffd262f65 100644
---- a/net/ipv4/ipmr_base.c
-+++ b/net/ipv4/ipmr_base.c
-@@ -27,7 +27,6 @@ void vif_device_init(struct vif_device *v,
- 	else
- 		v->link = dev->ifindex;
- }
--EXPORT_SYMBOL(vif_device_init);
- 
- struct mr_table *
- mr_table_alloc(struct net *net, u32 id,
-@@ -60,7 +59,6 @@ mr_table_alloc(struct net *net, u32 id,
- 	table_set(mrt, net);
- 	return mrt;
- }
--EXPORT_SYMBOL(mr_table_alloc);
- 
- void *mr_mfc_find_parent(struct mr_table *mrt, void *hasharg, int parent)
- {
-@@ -74,7 +72,6 @@ void *mr_mfc_find_parent(struct mr_table *mrt, void *hasharg, int parent)
- 
- 	return NULL;
- }
--EXPORT_SYMBOL(mr_mfc_find_parent);
- 
- void *mr_mfc_find_any_parent(struct mr_table *mrt, int vifi)
- {
-@@ -89,7 +86,6 @@ void *mr_mfc_find_any_parent(struct mr_table *mrt, int vifi)
- 
- 	return NULL;
- }
--EXPORT_SYMBOL(mr_mfc_find_any_parent);
- 
- void *mr_mfc_find_any(struct mr_table *mrt, int vifi, void *hasharg)
- {
-@@ -109,7 +105,6 @@ void *mr_mfc_find_any(struct mr_table *mrt, int vifi, void *hasharg)
- 
- 	return mr_mfc_find_any_parent(mrt, vifi);
- }
--EXPORT_SYMBOL(mr_mfc_find_any);
- 
- #ifdef CONFIG_PROC_FS
- void *mr_vif_seq_idx(struct net *net, struct mr_vif_iter *iter, loff_t pos)
-@@ -124,7 +119,6 @@ void *mr_vif_seq_idx(struct net *net, struct mr_vif_iter *iter, loff_t pos)
- 	}
- 	return NULL;
- }
--EXPORT_SYMBOL(mr_vif_seq_idx);
- 
- void *mr_vif_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- {
-@@ -143,7 +137,6 @@ void *mr_vif_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 	}
- 	return NULL;
- }
--EXPORT_SYMBOL(mr_vif_seq_next);
- 
- void *mr_mfc_seq_idx(struct net *net,
- 		     struct mr_mfc_iter *it, loff_t pos)
-@@ -168,7 +161,6 @@ void *mr_mfc_seq_idx(struct net *net,
- 	it->cache = NULL;
- 	return NULL;
- }
--EXPORT_SYMBOL(mr_mfc_seq_idx);
- 
- void *mr_mfc_seq_next(struct seq_file *seq, void *v,
- 		      loff_t *pos)
-@@ -203,7 +195,6 @@ void *mr_mfc_seq_next(struct seq_file *seq, void *v,
- 
- 	return NULL;
- }
--EXPORT_SYMBOL(mr_mfc_seq_next);
- #endif
- 
- int mr_fill_mroute(struct mr_table *mrt, struct sk_buff *skb,
-@@ -275,7 +266,6 @@ int mr_fill_mroute(struct mr_table *mrt, struct sk_buff *skb,
- 	rtm->rtm_type = RTN_MULTICAST;
- 	return 1;
- }
--EXPORT_SYMBOL(mr_fill_mroute);
- 
- static bool mr_mfc_uses_dev(const struct mr_table *mrt,
- 			    const struct mr_mfc *c,
-@@ -347,7 +337,6 @@ int mr_table_dump(struct mr_table *mrt, struct sk_buff *skb,
- 	cb->args[1] = e;
- 	return err;
- }
--EXPORT_SYMBOL(mr_table_dump);
- 
- int mr_rtm_dumproute(struct sk_buff *skb, struct netlink_callback *cb,
- 		     struct mr_table *(*iter)(struct net *net,
-@@ -390,7 +379,6 @@ int mr_rtm_dumproute(struct sk_buff *skb, struct netlink_callback *cb,
- 
- 	return skb->len;
- }
--EXPORT_SYMBOL(mr_rtm_dumproute);
- 
- int mr_dump(struct net *net, struct notifier_block *nb, unsigned short family,
- 	    int (*rules_dump)(struct net *net,
-@@ -444,4 +432,3 @@ int mr_dump(struct net *net, struct notifier_block *nb, unsigned short family,
- 
- 	return 0;
- }
--EXPORT_SYMBOL(mr_dump);
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 98e92da726b5ec1ce2d12f8de2642f9c11f056a4..a0813d425b7162367866786f1f5d862d1efdcbf5 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -343,7 +343,6 @@ struct sk_buff *skb_udp_tunnel_segment(struct sk_buff *skb,
- 
- 	return segs;
- }
--EXPORT_SYMBOL(skb_udp_tunnel_segment);
- 
- static void __udpv4_gso_segment_csum(struct sk_buff *seg,
- 				     __be32 *oldip, __be32 *newip,
-@@ -635,7 +634,6 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
- 	}
- 	return segs;
- }
--EXPORT_SYMBOL_GPL(__udp_gso_segment);
- 
- static struct sk_buff *udp4_ufo_fragment(struct sk_buff *skb,
- 					 netdev_features_t features)
-@@ -852,7 +850,6 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
- 	skb_gro_flush_final(skb, pp, flush);
- 	return pp;
- }
--EXPORT_SYMBOL(udp_gro_receive);
- 
- static struct sock *udp4_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
- 					__be16 dport)
-@@ -957,7 +954,6 @@ int udp_gro_complete(struct sk_buff *skb, int nhoff,
- 
- 	return err;
- }
--EXPORT_SYMBOL(udp_gro_complete);
- 
- INDIRECT_CALLABLE_SCOPE int udp4_gro_complete(struct sk_buff *skb, int nhoff)
- {
--- 
-2.53.0.1213.gd9a14994de-goog
+That said, would it make sense to introduce a separate
+rtnl_nets_add_capable() helper that wraps rtnl_nets_add() instead?
 
+Something along these lines:
+
+@@ -334,6 +334,19 @@ static void rtnl_nets_add(struct rtnl_nets
+*rtnl_nets, struct net *net)
+     rtnl_nets->len++;
+ }
+
++static struct net *rtnl_nets_add_capable(struct sk_buff *skb,
++                                         struct rtnl_nets *rtnl_nets,
++                                         struct net *net)
++{
++    if (!netlink_ns_capable(skb, net->user_ns, CAP_NET_ADMIN)) {
++        put_net(net);
++        return ERR_PTR(-EPERM);
++    }
++
++    rtnl_nets_add(rtnl_nets, net);
++    return net;
++}
++
+ static void rtnl_nets_lock(struct rtnl_nets *rtnl_nets)
+ {
+     int i;
+@@ -4059,18 +4072,29 @@ static int rtnl_newlink(struct sk_buff *skb,
+struct nlmsghdr *nlh,
+         ret =3D PTR_ERR(peer_net);
+         goto put_ops;
+     }
+-    if (peer_net)
+-        rtnl_nets_add(&rtnl_nets, peer_net);
++    if (peer_net) {
++        peer_net =3D rtnl_nets_add_capable(skb,
++                                        &rtnl_nets,
++                                        peer_net);
++        if (IS_ERR(peer_net)) {
++            ret =3D PTR_ERR(peer_net);
++            goto put_ops;
++        }
++    }
+     }
+     }
+
+-    tgt_net =3D rtnl_link_get_net_capable(skb, sock_net(skb->sk), tb,
+CAP_NET_ADMIN);
++   tgt_net =3D rtnl_link_get_net_by_nlattr(sock_net(skb->sk), tb);
+     if (IS_ERR(tgt_net)) {
+         ret =3D PTR_ERR(tgt_net);
+         goto put_net;
+     }
+
+-    rtnl_nets_add(&rtnl_nets, tgt_net);
++    tgt_net =3D rtnl_nets_add_capable(skb, &rtnl_nets, tgt_net);
++    if (IS_ERR(tgt_net)) {
++        ret =3D PTR_ERR(tgt_net);
++        goto put_net;
++    }
+
+     if (tb[IFLA_LINK_NETNSID]) {
+         int id =3D nla_get_s32(tb[IFLA_LINK_NETNSID]);
+@@ -4082,10 +4106,10 @@ static int rtnl_newlink(struct sk_buff *skb,
+struct nlmsghdr *nlh,
+         goto put_net;
+     }
+
+-    rtnl_nets_add(&rtnl_nets, link_net);
+-
+-    if (!netlink_ns_capable(skb, link_net->user_ns, CAP_NET_ADMIN)) {
+-        ret =3D -EPERM;
++    link_net =3D rtnl_nets_add_capable(skb, &rtnl_nets,
++                                    link_net);
++    if (IS_ERR(link_net)) {
++        ret =3D PTR_ERR(link_net);
+         goto put_net;
+     }
+     }
+
+Note that this changes the order in link_net, checking capabilities
+before creating the object.
+
+Disclaimer: I=E2=80=99m not very familiar with this code, so this may be a =
+bad idea.
 
