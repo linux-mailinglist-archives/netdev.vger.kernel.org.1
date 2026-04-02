@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-274535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274536-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yEe8KYBpzmmpngYAu9opvQ
-	(envelope-from <netdev+bounces-274535-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:05:04 +0200
+	id gBnTC09szmmpngYAu9opvQ
+	(envelope-from <netdev+bounces-274536-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:17:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1396F38963D
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:05:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A7CF389842
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:17:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 17C2130EE957
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:00:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 10C1A30FB70F
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:01:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB9F03E63A8;
-	Thu,  2 Apr 2026 12:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDCF93BED18;
+	Thu,  2 Apr 2026 13:00:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WbLXCquc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gjJAQ2B3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF133E6390
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 12:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926C73DDDAC
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 12:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775134796; cv=none; b=rqHH2nBJvUiEWEeViAiHtXGaSBzD7zzDjbxBn/ydhsFuL1YjQ/cgDzdP4mAHwSVQKZiNf5PEQlYPx35a2THXcof7gRp/3+GM9HYP2pwLBKywkGq4szLVfSshZu2unkVpRjwV75k5WN5gQH4rvgKDHRJyUk8w6MpvhCiOzOCV7E4=
+	t=1775134803; cv=none; b=PwY34C4aGx3In+611WvxfyjettIFxPqIU375IPuhB7RaiuU68ib8Mu7wxAc0ZIrTcvLTwsssuU38we16jhzDEScF4xRYgTdnbaWKmfLMweTdwV1z4/qMmMff7VAWY8MGQyQeRc6f26f/KHoMeULU3x+LiSpCED3ZK8vRyu91bHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775134796; c=relaxed/simple;
-	bh=KukBV6WGKRPi1Kds2J/Oz3l26tHgaeKoWXdQFvqvEvA=;
+	s=arc-20240116; t=1775134803; c=relaxed/simple;
+	bh=rJlVF6btIcaXXJBehkJBf5du3lWAMcSKQm5Fd90DhJ4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bVy6cVj51XXYFU77ywgVGE+mXisXko5K1EJumCQC5YxlIsYyDNk19JiaU73/Wwx+BsAXt3fsBrZymINKxjkRbjx2Uyn3NkmeCjr1yugcP1rUM0c0XfVIKjrYUiXsEo1c5aK1dPLFaAd8Rcu8S2Lyy9oUeunaoQWyk33jaJNqceY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WbLXCquc; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=S+A+4+akAh8CgKFgtlntU0Y6hCwliEY5rbpHFEGdl+V/YHF+cZLbUXGtafapZ0NdYsTBMRonMN+OhuZMU3e8/B9wMJz5n0f2t2/llvbKyTMRpaBTJQY3GznytnD5OjttVoxk/1tkmH3W4ID/nfzDmKfN/SS1QQmsJ26XVyCvKW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gjJAQ2B3; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775134784;
+	s=mimecast20190719; t=1775134790;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=aakrSKhK37sQCyaPYMW6k7c3cbgfBIms5977wT19pQ0=;
-	b=WbLXCquc2DMxWfkY2FSOwfH1tFVzi+KmKrNdARFPLmvtHCQKfT5ND5e9V1R+/LPSYu+HQy
-	Gl57Dum20BsWXfmHRl5DHLilYa6Rvj8WsGNTsCDV2Y/uKl+DngAwowI2iLMIgO4cJcRTK3
-	idFUuwCokKSTv9dLgat/c/UYJ5C95/8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=AAtmYjJ6HzRwUZEgzh4K3hz5UXpVLyq08wfrpo9YLvo=;
+	b=gjJAQ2B3NuKqzkxAOShprN0KYNFur//4fNQjCiPmhsfhkP/Q6dHA5JNc3waWuHlTCDSgYB
+	rLpWxd0zrvhf9W4vixgzo3+87OLHkjIqiFLP6Me5stYpMwqTi92Uq1P/Zli/jSTORkDp57
+	6reHjIl5EbzUtdF5kU2kPpwTUXpQfsA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-152-ShtkL7SBMCucRdN--DM6Kw-1; Thu,
- 02 Apr 2026 08:59:40 -0400
-X-MC-Unique: ShtkL7SBMCucRdN--DM6Kw-1
-X-Mimecast-MFC-AGG-ID: ShtkL7SBMCucRdN--DM6Kw_1775134779
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-647-hBWsHWh6O2OX9A7GMcbQAQ-1; Thu,
+ 02 Apr 2026 08:59:47 -0400
+X-MC-Unique: hBWsHWh6O2OX9A7GMcbQAQ-1
+X-Mimecast-MFC-AGG-ID: hBWsHWh6O2OX9A7GMcbQAQ_1775134786
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2C3801956089;
-	Thu,  2 Apr 2026 12:59:39 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E4A3B18002CA;
+	Thu,  2 Apr 2026 12:59:45 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.44.32.195])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1A98F180076C;
-	Thu,  2 Apr 2026 12:59:34 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3D50630002D2;
+	Thu,  2 Apr 2026 12:59:41 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: michael.dege@renesas.com
 Cc: paul@pbarker.dev,
@@ -73,11 +73,11 @@ Cc: paul@pbarker.dev,
 	linux-renesas-soc@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net
-Subject: Re: [net-next,v3,06/13] net: renesas: rswitch: add forwarding rules for gwca
-Date: Thu,  2 Apr 2026 14:59:32 +0200
-Message-ID: <20260402125933.234477-1-pabeni@redhat.com>
-In-Reply-To: <20260331-rswitch_add_vlans-v3-6-c37f41b1c556@renesas.com>
-References: <20260331-rswitch_add_vlans-v3-6-c37f41b1c556@renesas.com>
+Subject: Re: [net-next,v3,12/13] net: renesas: rswitch: add handler for FDB notification
+Date: Thu,  2 Apr 2026 14:59:39 +0200
+Message-ID: <20260402125939.234488-1-pabeni@redhat.com>
+In-Reply-To: <20260331-rswitch_add_vlans-v3-12-c37f41b1c556@renesas.com>
+References: <20260331-rswitch_add_vlans-v3-12-c37f41b1c556@renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,7 +85,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
@@ -93,17 +93,17 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274535-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274536-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
@@ -113,8 +113,8 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1396F38963D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6A7CF389842
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -123,71 +123,217 @@ email has considered the AI review valid, or at least plausible.
 
 For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
 ---
-net: renesas: rswitch: add forwarding rules for gwca
+net: renesas: rswitch: add handler for FDB notification
 
-Add rules to forward packets from the Ethernet ports to the CPU port (GWCA)
-using L2 forwarding instead of port forwarding.
+The SWITCHDEV_FDB_ADD_TO_DEVICE notification writes the bridge MAC
+address to the GWCA and adds a static rule to the MAC table. The
+SWITCHDEV_FDB_DEL_TO_DEVICE removes the static rule from the MAC table.
 
-> diff --git a/drivers/net/ethernet/renesas/rswitch_l2.c b/drivers/net/ethernet/renesas/rswitch_l2.c
-> index 709524c8a5c4..cabf1f92ad0c 100644
-> --- a/drivers/net/ethernet/renesas/rswitch_l2.c
-> +++ b/drivers/net/ethernet/renesas/rswitch_l2.c
-> @@ -93,10 +93,32 @@ static void rswitch_update_l2_hw_forwarding(struct rswitch_private *priv)
->  	}
->  }
->
-> +static void rswitch_update_l2_hw_forwarding_gwca(struct rswitch_private *priv)
-> +{
-> +	struct rswitch_device *rdev;
-> +	u32 fwpc0_set, fwpc0_clr, fwpc2_set, fwpc2_clr;
-> +
-> +	fwpc0_clr = FWPC0_MACSSA | FWPC0_MACDSA | FWPC0_MACRUDA;
-> +	fwpc0_set = fwpc0_clr;
-> +	fwpc2_clr = FIELD_PREP(FWPC2_LTWFW, BIT(AGENT_INDEX_GWCA));
-> +	fwpc2_set = fwpc2_clr;
-> +
-> +	(priv->offload_brdev) ? (fwpc0_clr = 0, fwpc2_set = 0)
-> +			      : (fwpc0_set = 0, fwpc2_set = 0);
->                                             ^^^^^^^^^^^
-
-Does the false branch have a copy-paste error? Looking at the ternary
-operator:
-
-The TRUE branch (when offload_brdev is set) assigns:
-    fwpc0_clr = 0
-    fwpc2_set = 0
-
-The FALSE branch (when offload_brdev is NULL) assigns:
-    fwpc0_set = 0
-    fwpc2_set = 0   <- assigns to fwpc2_set
-
-Both branches assign to fwpc2_set, leaving fwpc2_clr unchanged with the
-initialized value FIELD_PREP(FWPC2_LTWFW, BIT(AGENT_INDEX_GWCA)).
-
-This appears to break the logic for non-offloaded mode. The FALSE branch
-passes fwpc2_clr with the GWCA bit set to rswitch_modify(), which clears
-the GWCA bit from the FWPC2 registers. Is this the intended behavior when
-bridge offload is disabled?
-
-The symmetric pattern in the TRUE branch suggests the FALSE branch should
-be (fwpc0_set = 0, fwpc2_clr = 0) instead.
-
-> +
-> +	rswitch_modify(priv->addr, FWPC0(AGENT_INDEX_GWCA), fwpc0_clr, fwpc0_set);
-> +
-> +	rswitch_for_all_ports(priv, rdev) {
-> +		rswitch_modify(priv->addr, FWPC2(rdev->etha->index),
-> +			       fwpc2_clr, fwpc2_set);
-> +	}
-> +}
-> +
->  void rswitch_update_l2_offload(struct rswitch_private *priv)
->  {
->  	rswitch_update_l2_hw_learning(priv);
->  	rswitch_update_l2_hw_forwarding(priv);
-> +	rswitch_update_l2_hw_forwarding_gwca(priv);
->  }
+> diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
+> index 6dfc53c6b985..443fc4e49602 100644
+> --- a/drivers/net/ethernet/renesas/rswitch.h
+> +++ b/drivers/net/ethernet/renesas/rswitch.h
 
 [ ... ]
+
+> diff --git a/drivers/net/ethernet/renesas/rswitch_l2.c b/drivers/net/ethernet/renesas/rswitch_l2.c
+> index f1c5c96027ba..ea95a87ed234 100644
+> --- a/drivers/net/ethernet/renesas/rswitch_l2.c
+> +++ b/drivers/net/ethernet/renesas/rswitch_l2.c
+
+[ ... ]
+
+> @@ -285,6 +269,181 @@ static int rswitch_switchdev_blocking_event(struct notifier_block *nb,
+>  	return notifier_from_errno(ret);
+>  }
+>
+> +static int rswitch_gwca_write_mac_address(struct rswitch_private *priv, const u8 *mac)
+> +{
+> +	int err;
+> +
+> +	err = rswitch_gwca_change_mode(priv, GWMC_OPC_CONFIG);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	iowrite32((mac[0] << 8) | mac[1], priv->addr + GWMAC0);
+> +	iowrite32((mac[2] << 24) | (mac[3] << 16) | (mac[4] << 8) | mac[5],
+> +		  priv->addr + GWMAC1);
+> +
+> +	return rswitch_gwca_change_mode(priv, GWMC_OPC_OPERATION);
+> +}
+> +
+> +static int rswitch_add_addr_to_mactable(struct rswitch_private *priv, const u8 *mac)
+> +{
+> +	u32 index = priv->gwca.l2_shared_rx_queue->index;
+> +	int err;
+> +
+> +	rswitch_modify(priv->addr, FWMACTL0, FWMACTL0_ED, 0);
+> +	iowrite32((mac[0] << 8) | mac[1], priv->addr + FWMACTL1);
+> +	iowrite32((mac[2] << 24) | (mac[3] << 16) | (mac[4] << 8) | mac[5],
+> +		  priv->addr + FWMACTL2);
+> +	iowrite32(FWMACTL3_DSLV | FWMACTL3_SSLV,
+> +		  priv->addr + FWMACTL3);
+> +	iowrite32(FIELD_PREP(FWMACTL4_CSDL, index),
+> +		  priv->addr + FWMACTL4(GWCA_INDEX));
+> +	iowrite32(FIELD_PREP(FWMACTL5_DV, BIT(AGENT_INDEX_GWCA)),
+> +		  priv->addr + FWMACTL5);
+> +
+> +	err = rswitch_reg_wait(priv->addr, FWMACTLR, FWMACTLR_L, 0);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	if (ioread32(priv->addr + FWMACTLR))
+> +		return NOTIFY_BAD;
+> +
+> +	return NOTIFY_DONE;
+> +}
+> +
+> +static int rswitch_del_addr_from_mactable(struct rswitch_private *priv, const u8 *mac)
+> +{
+> +	int err;
+> +
+> +	rswitch_modify(priv->addr, FWMACTL0, 0, FWMACTL0_ED);
+> +	iowrite32((mac[0] << 8) | mac[1], priv->addr + FWMACTL1);
+> +	iowrite32((mac[2] << 24) | (mac[3] << 16) | (mac[4] << 8) | mac[5],
+> +		  priv->addr + FWMACTL2);
+> +	iowrite32(FWMACTL3_DSLV | FWMACTL3_SSLV,
+> +		  priv->addr + FWMACTL3);
+> +	iowrite32(FIELD_PREP(FWMACTL4_CSDL, BIT(0)),
+> +		  priv->addr + FWMACTL4(GWCA_INDEX));
+> +	iowrite32(FIELD_PREP(FWMACTL5_DV, BIT(AGENT_INDEX_GWCA)),
+> +		  priv->addr + FWMACTL5);
+> +
+> +	err = rswitch_reg_wait(priv->addr, FWMACTLR, FWMACTLR_L, 0);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	err = ioread32(priv->addr + FWMACTLR);
+> +	if (err)
+> +		return NOTIFY_BAD;
+> +
+> +	return NOTIFY_DONE;
+> +}
+> +
+> +static void rswitch_switchdev_bridge_fdb_event_work(struct work_struct *work)
+> +{
+> +	struct rswitch_switchdev_event_work *switchdev_work;
+> +	struct rswitch_device *rdev;
+> +	struct net_device *ndev;
+> +
+> +	switchdev_work = container_of(work, struct rswitch_switchdev_event_work, work);
+> +	ndev = switchdev_work->ndev;
+> +
+> +	rtnl_lock();
+> +
+> +	/* Unfortunately all net_device members point to br0, there is no simple way to check
+> +	 * if the event was triggered by a port device setting.
+> +	 */
+> +	rswitch_for_all_ports(switchdev_work->priv, rdev) {
+> +		if (ether_addr_equal(rdev->ndev->dev_addr, switchdev_work->fdb_info.addr))
+> +			goto out;
+> +	}
+> +
+> +	/* Handle only bridge device */
+> +	if (is_rdev(ndev))
+> +		goto out;
+> +
+> +	switch (switchdev_work->event) {
+> +	case SWITCHDEV_FDB_ADD_TO_DEVICE:
+> +		rswitch_gwca_write_mac_address(switchdev_work->priv, switchdev_work->fdb_info.addr);
+> +		rswitch_add_addr_to_mactable(switchdev_work->priv, switchdev_work->fdb_info.addr);
+> +		break;
+> +	case SWITCHDEV_FDB_DEL_TO_DEVICE:
+> +		rswitch_del_addr_from_mactable(switchdev_work->priv, switchdev_work->fdb_info.addr);
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +
+> +out:
+> +	rtnl_unlock();
+> +
+> +	kfree(switchdev_work->fdb_info.addr);
+> +	kfree(switchdev_work);
+> +	dev_put(ndev);
+> +}
+> +
+> +/* called under rcu_read_lock() */
+> +static int rswitch_switchdev_event(struct notifier_block *nb,
+> +				   unsigned long event,
+> +				   void *ptr)
+> +{
+> +	struct net_device *ndev = switchdev_notifier_info_to_dev(ptr);
+> +	struct rswitch_switchdev_event_work *switchdev_work;
+> +	struct switchdev_notifier_fdb_info *fdb_info;
+> +	struct switchdev_notifier_info *info = ptr;
+> +	struct rswitch_private *priv;
+> +	int err;
+> +
+> +	priv = container_of(nb, struct rswitch_private, rswitch_switchdev_nb);
+> +
+> +	switch (event) {
+> +	case SWITCHDEV_FDB_ADD_TO_DEVICE:
+> +		fallthrough;
+> +	case SWITCHDEV_FDB_DEL_TO_DEVICE:
+> +		switchdev_work = kzalloc(sizeof(*switchdev_work), GFP_ATOMIC);
+> +
+> +		if (!switchdev_work)
+> +			return NOTIFY_BAD;
+> +
+> +		switchdev_work->ndev = info->dev;
+> +		switchdev_work->priv = priv;
+> +		switchdev_work->event = event;
+> +
+> +		fdb_info = container_of(info,
+> +					struct switchdev_notifier_fdb_info,
+> +					info);
+> +
+> +		INIT_WORK(&switchdev_work->work, rswitch_switchdev_bridge_fdb_event_work);
+> +
+> +		memcpy(&switchdev_work->fdb_info, ptr, sizeof(switchdev_work->fdb_info));
+> +
+> +		switchdev_work->fdb_info.addr = kzalloc(ETH_ALEN, GFP_ATOMIC);
+> +		if (!switchdev_work->fdb_info.addr)
+> +			goto err_addr_alloc;
+> +
+> +		ether_addr_copy((u8 *)switchdev_work->fdb_info.addr,
+> +				fdb_info->addr);
+> +		dev_hold(ndev);
+> +		queue_work(system_long_wq, &switchdev_work->work);
+> +
+> +		break;
+> +	case SWITCHDEV_PORT_ATTR_SET:
+> +		err = switchdev_handle_port_attr_set(ndev, ptr,
+> +						     is_rdev,
+> +						     rswitch_port_attr_set);
+> +		return notifier_from_errno(err);
+> +
+> +		if (!is_rdev(ndev))
+> +			return NOTIFY_DONE;
+> +
+> +		return notifier_from_errno(-EOPNOTSUPP);
+
+Are these lines in the SWITCHDEV_PORT_ATTR_SET case reachable? The
+return notifier_from_errno(err) above them looks like it returns
+unconditionally.
+
+Note: this dead code is removed in the next commit in the series
+(ed3ab4a0a727 'net: renesas: rswitch: add vlan aware switching'),
+which moves PORT_ATTR_SET handling to rswitch_switchdev_blocking_event
+and removes this entire case from rswitch_switchdev_event.
+
+> +	}
+> +
+> +	return NOTIFY_DONE;
+> +
+> +err_addr_alloc:
+> +	kfree(switchdev_work);
+> +
+> +	return NOTIFY_BAD;
+> +}
+> +
+>  int rswitch_register_notifiers(struct rswitch_private *priv)
+>  {
+>  	int err;
 
 
