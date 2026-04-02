@@ -1,667 +1,186 @@
-Return-Path: <netdev+bounces-274381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274382-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4IcAAaILzmmnkgYAu9opvQ
-	(envelope-from <netdev+bounces-274381-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 08:24:34 +0200
+	id +AAiOqYLzmmnkgYAu9opvQ
+	(envelope-from <netdev+bounces-274382-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 08:24:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0E0B3846DE
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 08:24:33 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E62783846E6
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 08:24:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 23E33300FC56
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 06:23:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5DB103002B40
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 06:24:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15DD37CD55;
-	Thu,  2 Apr 2026 06:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A20C37CD50;
+	Thu,  2 Apr 2026 06:24:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WzUiQ4mf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QjKfYoGb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f201.google.com (mail-dy1-f201.google.com [74.125.82.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83848263F5E;
-	Thu,  2 Apr 2026 06:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FB937C0FF
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 06:24:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775111011; cv=none; b=g79gS5VfS/ZtF8a8Ils5EToccfo9D/fj+0w1l/mLpd1DTO8dcR6IDU0Dxuk94AG8msD+NXyqxiNOvlGRecTV7YpP8pGJExAlNXl2+MCilpk7EjftD+Pwmp8CnP8HLRxnBE7Xa/IY2r3Ezm47NEY9xmi1UMPnvHh2Ur+PpzuzA0M=
+	t=1775111073; cv=none; b=JcskgY8Ot1MG2bEdzKV6BhrcFHOdkqetdSAHoSdXtFwqr7aN9McrmRA5LnW1dtT+ncNezg/NxDYSSAJmg04xXp6iVF3p8hitWd49T7unAGjt8S/pV6nRjCeMXVm9d3+UHHwR5BCq7SQxknxPzs6Q29JLXPVIfUau0Zifa32cNlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775111011; c=relaxed/simple;
-	bh=1hQ/0S8oRZgtSiNRnqfKOBu3rBMgkc0Kel/5lQ1b46A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NIkxXBaVKZD3koNEkJlOHlKv5DEVZXzJH2j7tTVkJlaYgSqedd6HMmx88nD5hyhZHxxs141N9KOp01iioX8Yec2hgav19ZnWHDMi3UHvQVYqq6/XiZU8g0SFLh18uIOGpMcPP07gpWIJpNs05d5+ZHM9j0OQQckhDSRhyRY/feY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WzUiQ4mf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4408CC19423;
-	Thu,  2 Apr 2026 06:23:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775111011;
-	bh=1hQ/0S8oRZgtSiNRnqfKOBu3rBMgkc0Kel/5lQ1b46A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WzUiQ4mfFOS756slYDURtvWpR2Ytv3yQGpI4Sf4C+iWVOYt8cVr7mG7+EbAssI0Uz
-	 tKt3bupqMb0IGEo0l5QMWenRFYuepZSlE59dndMiGgTzN5OHCtgK+epcuRpDWewria
-	 OvFr5G45c/vo6qPb7lH7943uGc6KOcS5L1LUHhJfeEVaarY8UK/7QjnuXdvJaaQTIi
-	 WxkvdWbD/gpALn/M//30PYbtyIH5X9KuZbEjYsbnU/pdNp3gVzw9VWHkLaQVs/ICPH
-	 WXfTOkssuLue1cK7zBOnJggMvNmxsCQId3WDUEPpIDhAv4w/Y0VYE3FujAvPdKogIB
-	 EgNAsgH3eSveA==
-Date: Thu, 2 Apr 2026 11:53:12 +0530
-From: Sumit Garg <sumit.garg@kernel.org>
-To: Harshal Dev <harshal.dev@oss.qualcomm.com>
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-	linux-media@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
-	linux-remoteproc@vger.kernel.org, andersson@kernel.org,
-	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
-	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-	airlied@gmail.com, simona@ffwll.ch, vikash.garodia@oss.qualcomm.com,
-	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
-	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
-	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
-	pavan.kondeti@oss.qualcomm.com, jorge.ramirez@oss.qualcomm.com,
-	tonyh@qti.qualcomm.com, vignesh.viswanathan@oss.qualcomm.com,
-	srinivas.kandagatla@oss.qualcomm.com,
-	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
-	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-	skare@qti.qualcomm.com, linux-kernel@vger.kernel.org,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>
-Subject: Re: [PATCH v3 04/15] firmware: qcom: Add a PAS TEE service
-Message-ID: <ac4LUJbR6jUIWNgI@sumit-xelite>
-References: <20260327131043.627120-1-sumit.garg@kernel.org>
- <20260327131043.627120-5-sumit.garg@kernel.org>
- <000abdb5-a8b4-47c4-860b-5666e650b545@oss.qualcomm.com>
+	s=arc-20240116; t=1775111073; c=relaxed/simple;
+	bh=jNNY6xH+1KGT9YM6pvXjPQXXBllRdf1QVqkq35Y6vJ8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cM4qlKm7vy7ozaflfXDwIRlNQdJLzZsSXbHek4R/PtbRk4/BWtmaDRtcE7cjzSCZyeha/Xo/yVuSTjM632veYzBtlKfhOoKdDyozJSE9dnWYJNr2oo758l8LxQkRjvr5QAA16zd9OF7HSitfd7h+hasQahgrpwnqFQB/PFt5FmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QjKfYoGb; arc=none smtp.client-ip=74.125.82.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com
+Received: by mail-dy1-f201.google.com with SMTP id 5a478bee46e88-2c4cfe08c9dso3727521eec.1
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 23:24:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775111071; x=1775715871; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kHhJ1PGkTf+U3ICNlGbkmQaGPWwbR8hI+GskGCVVpx8=;
+        b=QjKfYoGbbzBG0nbPHOTamLhb68BKznRS47UOFt8vDlV62DzBUkpmfj6vUHLBo4jqMQ
+         H2ELEjMWqStzU8cICCmpIGMZB+7EQlTa5dji9lC0ZnWRTEJEKQPe8zKtRyvSyknfVQlB
+         eiTVIaOaZzhRCWR43aVr1QYFV2XdEcJkc90ZXyF0/pBWkEAOlaF6rJ4Huyz3mZTWHF5y
+         PflAn+/0D3J4s+BitHSvv4AwGGCUWsoM2dsSBfv8q0IuCvSdI/rk+R11aosE5q5dj44k
+         o7iWtP6W9lLRRubZAiJNbkMH9dodMhnvmp2mt2nmVxVIu6wJ7jorP8Azxcfu9k6xcsl/
+         6Iog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775111071; x=1775715871;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kHhJ1PGkTf+U3ICNlGbkmQaGPWwbR8hI+GskGCVVpx8=;
+        b=U2+nWHqonKYkCPKRfNwZNfHQ3rqIIsuky1H741Lz8Bl7QKEKgwLd/ciSKGsBn4E+zS
+         sgQ5zkb8F4cfA8N1RQYAox971qkSs7//+TS0TWDSK98+jjxGBQgXHSRLFTC1cjqVK7ZH
+         a25GyRYtiGs7apPHy5Fh4CygYgCkvoDLTUxFO4pVL6g1jpBg84olarhRae4MYv3bgXLC
+         GiG0O8tZMp0ChEiUOoaraZTqSVLR6nlJOSzHseU8wu4Ls/anfqFSoJG5N97BlL3L8b3t
+         +mAd3VFDhv1syUJtsOyXe8r+enzhNsO+3jf+rWAAYEfpKM9lGF6Qo62/9PMmxDQNbosz
+         VCgw==
+X-Gm-Message-State: AOJu0YxkTjUNpnaLdi5GHqM4/btOGDpC/w80bscS8miqmBNW/6vr/hCw
+	OwmESacOWOjkegaBk0/zFw6kpsuwbCJ7WHUH7/9SFB5yVWNyghAN8Y8vKzJ71Sfn1+nw1fn32QP
+	iOQWYtN+0CzmC+F1fuOoVXQ==
+X-Received: from dybhk14.prod.google.com ([2002:a05:7301:288e:b0:2c8:6bd1:63ba])
+ (user=marcharvey job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:7300:d519:b0:2c8:409:a9bb with SMTP id 5a478bee46e88-2c92db5659bmr3891805eec.0.1775111070700;
+ Wed, 01 Apr 2026 23:24:30 -0700 (PDT)
+Date: Thu, 02 Apr 2026 06:24:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000abdb5-a8b4-47c4-860b-5666e650b545@oss.qualcomm.com>
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAI0LzmkC/4WNQQqDMBBFryKz7pQxitqueo/iwuokDmgiSQgW8
+ e4NXqDLx+O/f0BgLxzgWRzgOUkQZzNUtwLGebCGUabMoEg1VFOJkYdVrMHJS2KPYiN7OyzYVVp
+ poraemg7yevOsZb/Kb7Ac0fIeoc9mlhCd/16XSV3+bz0pJNQdjaV6lK1qPy/jnFn4ProV+vM8f +PG4QXJAAAA
+X-Change-Id: 20260401-teaming-driver-internal-83f2f0074d68
+X-Developer-Key: i=marcharvey@google.com; a=ed25519; pk=OzOeciadbfF5Bug/4/hyEAwfrruSY4tn0Q0LocyYUL0=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1775111069; l=2821;
+ i=marcharvey@google.com; s=20260401; h=from:subject:message-id;
+ bh=jNNY6xH+1KGT9YM6pvXjPQXXBllRdf1QVqkq35Y6vJ8=; b=0iQ9V2HUcMbmnnk8AcjAiGI57v+Zdo9KC7s9bBkzcWiyLcDH6ly2Q4tfB82N9u4IwUmFGvH18
+ /ng1pLe+ey5DPTujJw9pJLNKva+sHedDvB8PqzHibKg7iTcFo0YxLd5
+X-Mailer: b4 0.14.3
+Message-ID: <20260402-teaming-driver-internal-v3-0-e8cfdec3b5c2@google.com>
+Subject: [PATCH net-next v3 0/7] Decouple receive and transmit enablement in
+ team driver
+From: Marc Harvey <marcharvey@google.com>
+To: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Marc Harvey <marcharvey@google.com>
+Content-Type: text/plain; charset="utf-8"
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274381-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	TAGGED_FROM(0.00)[bounces-274382-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:email]
-X-Rspamd-Queue-Id: A0E0B3846DE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E62783846E6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Mar 30, 2026 at 04:06:47PM +0530, Harshal Dev wrote:
-> 
-> 
-> On 3/27/2026 6:40 PM, Sumit Garg wrote:
-> > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> > 
-> > Add support for Peripheral Authentication Service (PAS) driver based
-> > on TEE bus with OP-TEE providing the backend PAS service implementation.
-> > 
-> > The TEE PAS service ABI is designed to be extensible with additional API
-> > as PTA_QCOM_PAS_CAPABILITIES. This allows to accommodate any future
-> > extensions of the PAS service needed while still maintaining backwards
-> > compatibility.
-> > 
-> > Signed-off-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> > ---
-> >  drivers/firmware/qcom/Kconfig        |  10 +
-> >  drivers/firmware/qcom/Makefile       |   1 +
-> >  drivers/firmware/qcom/qcom_pas_tee.c | 478 +++++++++++++++++++++++++++
-> >  3 files changed, 489 insertions(+)
-> >  create mode 100644 drivers/firmware/qcom/qcom_pas_tee.c
-> >
-> [...]
-> 
-> > diff --git a/drivers/firmware/qcom/qcom_pas_tee.c b/drivers/firmware/qcom/qcom_pas_tee.c
-> > new file mode 100644
-> > index 000000000000..d63122c34f04
-> > --- /dev/null
-> > +++ b/drivers/firmware/qcom/qcom_pas_tee.c
-> > @@ -0,0 +1,478 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-> > + */
-> > +
-> > +#include <linux/delay.h>
-> > +#include <linux/of.h>
-> > +#include <linux/firmware/qcom/qcom_pas.h>
-> > +#include <linux/kernel.h>
-> > +#include <linux/module.h>
-> > +#include <linux/slab.h>
-> > +#include <linux/tee_drv.h>
-> > +#include <linux/uuid.h>
-> > +
-> > +#include "qcom_pas.h"
-> > +
-> > +/*
-> > + * Peripheral Authentication Service (PAS) supported.
-> > + *
-> > + * [in]  params[0].value.a:	Unique 32bit remote processor identifier
-> > + */
-> > +#define TA_QCOM_PAS_IS_SUPPORTED		1
-> > +
-> > +/*
-> > + * PAS capabilities.
-> > + *
-> > + * [in]  params[0].value.a:	Unique 32bit remote processor identifier
-> > + * [out] params[1].value.a:	PAS capability flags
-> > + */
-> > +#define TA_QCOM_PAS_CAPABILITIES		2
-> > +
-> > +/*
-> > + * PAS image initialization.
-> > + *
-> > + * [in]  params[0].value.a:	Unique 32bit remote processor identifier
-> > + * [in]  params[1].memref:	Loadable firmware metadata
-> > + */
-> > +#define TA_QCOM_PAS_INIT_IMAGE			3
-> > +
-> > +/*
-> > + * PAS memory setup.
-> > + *
-> > + * [in]  params[0].value.a:	Unique 32bit remote processor identifier
-> > + * [in]  params[0].value.b:	Relocatable firmware size
-> > + * [in]  params[1].value.a:	32bit LSB relocatable firmware memory address
-> > + * [in]  params[1].value.b:	32bit MSB relocatable firmware memory address
-> > + */
-> > +#define TA_QCOM_PAS_MEM_SETUP			4
-> > +
-> > +/*
-> > + * PAS get resource table.
-> > + *
-> > + * [in]     params[0].value.a:	Unique 32bit remote processor identifier
-> > + * [inout]  params[1].memref:	Resource table config
-> > + */
-> > +#define TA_QCOM_PAS_GET_RESOURCE_TABLE		5
-> > +
-> > +/*
-> > + * PAS image authentication and co-processor reset.
-> > + *
-> > + * [in]  params[0].value.a:	Unique 32bit remote processor identifier
-> > + * [in]  params[0].value.b:	Firmware size
-> > + * [in]  params[1].value.a:	32bit LSB firmware memory address
-> > + * [in]  params[1].value.b:	32bit MSB firmware memory address
-> > + * [in]  params[2].memref:	Optional fw memory space shared/lent
-> > + */
-> > +#define TA_QCOM_PAS_AUTH_AND_RESET		6
-> > +
-> > +/*
-> > + * PAS co-processor set suspend/resume state.
-> > + *
-> > + * [in]  params[0].value.a:	Unique 32bit remote processor identifier
-> > + * [in]  params[0].value.b:	Co-processor state identifier
-> > + */
-> > +#define TA_QCOM_PAS_SET_REMOTE_STATE		7
-> > +
-> > +/*
-> > + * PAS co-processor shutdown.
-> > + *
-> > + * [in]  params[0].value.a:	Unique 32bit remote processor identifier
-> > + */
-> > +#define TA_QCOM_PAS_SHUTDOWN			8
-> > +
-> > +#define TEE_NUM_PARAMS				4
-> > +
-> > +/**
-> > + * struct qcom_pas_tee_private - PAS service private data
-> > + * @dev:		PAS service device.
-> > + * @ctx:		TEE context handler.
-> > + * @session_id:		PAS TA session identifier.
-> 
-> Nit: Column alignment of comment descriptions.
+Allow independent control over receive and transmit enablement states
+for aggregated ports in the team driver.
 
-These are aligned if you look at them after applying the patch-set.
-Plain email text isn't good at showing the alignment here.
+The motivation is that IEE 802.3ad LACP "independent control" can't
+be implemented for the team driver currently. This was added to the
+bonding driver in commit 240fd405528b ("bonding: Add independent
+control state machine").
 
-> 
-> > + */
-> > +struct qcom_pas_tee_private {
-> > +	struct device *dev;
-> > +	struct tee_context *ctx;
-> > +	u32 session_id;
-> > +};
-> > +
-> > +static bool qcom_pas_tee_supported(struct device *dev, u32 pas_id)
-> > +{
-> > +	struct qcom_pas_tee_private *data = dev_get_drvdata(dev);
-> > +	struct tee_ioctl_invoke_arg inv_arg = {
-> > +		.func = TA_QCOM_PAS_IS_SUPPORTED,
-> > +		.session = data->session_id,
-> > +		.num_params = TEE_NUM_PARAMS
-> > +	};
-> > +	struct tee_param param[4] = {
-> > +		[0] = {
-> > +			.attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT,
-> > +			.u.value.a = pas_id
-> > +		}
-> > +	};
-> > +	int ret;
-> > +
-> > +	ret = tee_client_invoke_func(data->ctx, &inv_arg, param);
-> > +	if (ret < 0 || inv_arg.ret != 0) {
-> > +		dev_err(dev, "PAS not supported, pas_id: %d, err: %x\n",
-> > +			pas_id, inv_arg.ret);
-> 
-> I can see that similar error handling pattern for tee_client_invoke_func() is
-> being done by other clients. But it seems that this error log doesn't really convey
-> whether we failed before or after entering OPTEE (or some other TEE) for invoking
-> the service.
-> 
-> Could be better if we print 'ret' when ret < 0. And print 'inv_arg.ret' when
-> inv_arg.ret != 0. So for example, if the param marshalling fails, or some other
-> issue is encountered when processing the params in a different back-end TEE
-> driver, we could know from the logs.
+This series also has a few patches that add tests to show that the old
+coupled enablement still works and that the new decoupled enablement
+works as intended (4, 5, and 7).
 
-Okay, I will add print for "ret" as well.
+There are three patches with small fixes as well, with the goal of
+making the final decouplement patch clearer (1, 2, and 3).
 
-> 
-> > +		return false;
-> > +	}
-> > +
-> > +	return true;
-> > +}
-> > +
-> > +static int qcom_pas_tee_init_image(struct device *dev, u32 pas_id,
-> > +				   const void *metadata, size_t size,
-> > +				   struct qcom_pas_context *ctx)
-> > +{
-> > +	struct qcom_pas_tee_private *data = dev_get_drvdata(dev);
-> > +	struct tee_ioctl_invoke_arg inv_arg = {
-> > +		.func = TA_QCOM_PAS_INIT_IMAGE,
-> > +		.session = data->session_id,
-> > +		.num_params = TEE_NUM_PARAMS
-> > +	};
-> > +	struct tee_param param[4] = {
-> > +		[0] = {
-> > +			.attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT,
-> > +			.u.value.a = pas_id
-> > +		},
-> > +		[1] = {
-> > +			.attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INPUT,
-> > +		}
-> > +	};
-> > +	struct tee_shm *mdata_shm;
-> > +	u8 *mdata_buf = NULL;
-> > +	int ret;
-> > +
-> > +	if (!ctx)
-> > +		return -EINVAL;
-> > +
-> > +	mdata_shm = tee_shm_alloc_kernel_buf(data->ctx, size);
-> 
-> Why not move the DEFINE_FREE() above this function so we can use scoped free
-> here as well for mdata_shm?
-> 
-> struct tee_shm *mdata_shm __free(shm_free) = ...
+Signed-off-by: Marc Harvey <marcharvey@google.com>
+---
+Changes in v3:
+- Patch 5: In test cleanup, kill teamd to fix timeout.
+- Link to v2: https://lore.kernel.org/r/20260401-teaming-driver-internal-v2-0-f80c1291727b@google.com
 
-mdata_shm gets freed as part of qcom_pas_tee_metadata_release(), so no
-automatic free here.
+Changes in v2:
+- Patch 4 and 5: Fix shellcheck errors and warnings, use iperf3
+  instead of netcat+pv, fix dependency checking.
+- Patch 7: Fix shellcheck errors and warnings, fix dependency
+  checking.
+- Link to v1: https://lore.kernel.org/all/20260331053353.2504254-1-marcharvey@google.com/
 
-> 
-> > +	if (IS_ERR(mdata_shm)) {
-> > +		dev_err(dev, "mdata_shm allocation failed\n");
-> > +		return PTR_ERR(mdata_shm);
-> > +	}
-> > +
-> > +	mdata_buf = tee_shm_get_va(mdata_shm, 0);
-> > +	if (IS_ERR(mdata_buf)) {
-> > +		dev_err(dev, "mdata_buf get VA failed\n");
-> > +		tee_shm_free(mdata_shm);
-> > +		return PTR_ERR(mdata_buf);
-> > +	}
-> > +	memcpy(mdata_buf, metadata, size);
-> > +
-> > +	param[1].u.memref.shm = mdata_shm;
-> > +	param[1].u.memref.size = size;
-> > +
-> > +	ret = tee_client_invoke_func(data->ctx, &inv_arg, param);
-> > +	if (ret < 0 || inv_arg.ret != 0) {
-> > +		dev_err(dev, "PAS init image failed, pas_id: %d, err: %x\n",
-> 
-> Nit: We can prefix %x with 0x. "err: 0x%x\n."
+---
+Marc Harvey (7):
+      net: team: Annotate reads and writes for mixed lock accessed values
+      net: team: Remove unused team_mode_op, port_enabled
+      net: team: Rename port_disabled team mode op to port_tx_disabled
+      selftests: net: Add tests for failover of team-aggregated ports
+      selftests: net: Add test for enablement of ports with teamd
+      net: team: Decouple rx and tx enablement in the team driver
+      selftests: net: Add tests for team driver decoupled tx and rx control
 
-Ack
+ drivers/net/team/team_core.c                       | 241 +++++++++++++++++---
+ drivers/net/team/team_mode_loadbalance.c           |   8 +-
+ drivers/net/team/team_mode_random.c                |   4 +-
+ drivers/net/team/team_mode_roundrobin.c            |   2 +-
+ include/linux/if_team.h                            |  63 +++---
+ tools/testing/selftests/drivers/net/team/Makefile  |   4 +
+ tools/testing/selftests/drivers/net/team/config    |   4 +
+ .../drivers/net/team/decoupled_enablement.sh       | 249 +++++++++++++++++++++
+ .../testing/selftests/drivers/net/team/options.sh  |  99 +++++++-
+ .../testing/selftests/drivers/net/team/team_lib.sh | 115 ++++++++++
+ .../drivers/net/team/teamd_activebackup.sh         | 217 ++++++++++++++++++
+ .../drivers/net/team/transmit_failover.sh          | 151 +++++++++++++
+ tools/testing/selftests/net/lib.sh                 |  13 ++
+ 13 files changed, 1100 insertions(+), 70 deletions(-)
+---
+base-commit: cee10a01e286e88e0949979e91231270ca9fdb8e
+change-id: 20260401-teaming-driver-internal-83f2f0074d68
 
-> 
-> > +			pas_id, inv_arg.ret);
-> > +		tee_shm_free(mdata_shm);
-> > +		return -EINVAL;
-> > +	}
-> > +	ctx->ptr = (void *)mdata_shm;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int qcom_pas_tee_mem_setup(struct device *dev, u32 pas_id,
-> > +				  phys_addr_t addr, phys_addr_t size)
-> > +{
-> > +	struct qcom_pas_tee_private *data = dev_get_drvdata(dev);
-> > +	struct tee_ioctl_invoke_arg inv_arg = {
-> > +		.func = TA_QCOM_PAS_MEM_SETUP,
-> > +		.session = data->session_id,
-> > +		.num_params = TEE_NUM_PARAMS
-> > +	};
-> > +	struct tee_param param[4] = {
-> > +		[0] = {
-> > +			.attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT,
-> > +			.u.value.a = pas_id,
-> > +			.u.value.b = size,
-> > +		},
-> > +		[1] = {
-> > +			.attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT,
-> > +			.u.value.a = lower_32_bits(addr),
-> > +			.u.value.b = upper_32_bits(addr),
-> > +		}
-> > +	};
-> > +	int ret;
-> > +
-> > +	ret = tee_client_invoke_func(data->ctx, &inv_arg, param);
-> > +	if (ret < 0 || inv_arg.ret != 0) {
-> > +		dev_err(dev, "PAS mem setup failed, pas_id: %d, err: %x\n",
-> > +			pas_id, inv_arg.ret);
-> > +		return -EINVAL;
-> 
-> I can see that originally in-case of error, qcom_scm_pas_mem_setup() bubbles
-> up the return value from qcom_scm_call(). Perhaps we should do the same as well,
-> return ret here instead of hard-coded '-EINVAL' which overrides any useful
-> return values returned from the back-end TEE driver.
+Best regards,
+-- 
+Marc Harvey <marcharvey@google.com>
 
-ret can even be 0 while still error from TEE. Let's rather do following:
-
-	return ret ? ret : -EINVAL;
-
->  
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +DEFINE_FREE(shm_free, struct tee_shm *, tee_shm_free(_T))
-> > +
-> > +static void *qcom_pas_tee_get_rsc_table(struct device *dev,
-> > +					struct qcom_pas_context *ctx,
-> > +					void *input_rt, size_t input_rt_size,
-> > +					size_t *output_rt_size)
-> > +{
-> > +	struct qcom_pas_tee_private *data = dev_get_drvdata(dev);
-> > +	struct tee_ioctl_invoke_arg inv_arg = {
-> > +		.func = TA_QCOM_PAS_GET_RESOURCE_TABLE,
-> > +		.session = data->session_id,
-> > +		.num_params = TEE_NUM_PARAMS
-> > +	};
-> > +	struct tee_param param[4] = {
-> > +		[0] = {
-> > +			.attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT,
-> > +			.u.value.a = ctx->pas_id,
-> > +		},
-> > +		[1] = {
-> > +			.attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INOUT,
-> > +			.u.memref.size = input_rt_size,
-> > +		}
-> > +	};
-> > +	void *rt_buf = NULL;
-> > +	int ret;
-> > +
-> > +	ret = tee_client_invoke_func(data->ctx, &inv_arg, param);
-> > +	if (ret < 0 || inv_arg.ret != 0) {
-> > +		dev_err(dev, "PAS get RT failed, pas_id: %d, err: %x\n",
-> > +			ctx->pas_id, inv_arg.ret);
-> > +		return ERR_PTR(-EINVAL);
-> 
-> Same comment here, we could return ERR_PTR(ret) instead of overriding to
-> '-EINVAL'.
-> 
-> > +	}
-> > +
-> > +	if (param[1].u.memref.size) {
-> > +		struct tee_shm *rt_shm __free(shm_free) =
-> > +			tee_shm_alloc_kernel_buf(data->ctx,
-> > +						 param[1].u.memref.size);
-> > +		void *rt_shm_va;
-> > +
-> > +		if (IS_ERR(rt_shm)) {
-> > +			dev_err(dev, "rt_shm allocation failed\n");
-> > +			return rt_shm;
-> > +		}
-> > +
-> > +		rt_shm_va = tee_shm_get_va(rt_shm, 0);
-> > +		if (IS_ERR_OR_NULL(rt_shm_va)) {
-> > +			dev_err(dev, "rt_shm get VA failed\n");
-> > +			return ERR_PTR(-EINVAL);
-> 
-> Why not just return rt_shm_va? It already encodes the error in the pointer.
-
-Again let me add a null check while returning rt_shm_va.
-
-> 
-> > +		}
-> > +		memcpy(rt_shm_va, input_rt, input_rt_size);
-> > +
-> > +		param[1].u.memref.shm = rt_shm;
-> > +		ret = tee_client_invoke_func(data->ctx, &inv_arg, param);
-> > +		if (ret < 0 || inv_arg.ret != 0) {
-> > +			dev_err(dev, "PAS get RT failed, pas_id: %d, err: %x\n",
-> > +				ctx->pas_id, inv_arg.ret);
-> > +			return ERR_PTR(-EINVAL);
-> 
-> Same comment.
-> 
-> > +		}
-> > +
-> > +		if (param[1].u.memref.size) {
-> 
-> Is it possible for param[1].u.memref.size to be 0 after a successful tee_client_invoke_func()?
-
-Yeah it's possible if there is no resource table entry needed for a
-particular PAS id.
-
-> 
-> > +			*output_rt_size = param[1].u.memref.size;
-> > +			rt_buf = kmemdup(rt_shm_va, *output_rt_size, GFP_KERNEL);
-> > +			if (!rt_buf)
-> > +				return ERR_PTR(-ENOMEM);
-> > +		}
-> > +	}
-> > +
-> > +	return rt_buf;
-> > +}
-> > +
-> > +static int __qcom_pas_tee_auth_and_reset(struct device *dev, u32 pas_id,
-> > +					 phys_addr_t mem_phys, size_t mem_size)
-> > +{
-> > +	struct qcom_pas_tee_private *data = dev_get_drvdata(dev);
-> > +	struct tee_ioctl_invoke_arg inv_arg = {
-> > +		.func = TA_QCOM_PAS_AUTH_AND_RESET,
-> > +		.session = data->session_id,
-> > +		.num_params = TEE_NUM_PARAMS
-> > +	};
-> > +	struct tee_param param[4] = {
-> > +		[0] = {
-> > +			.attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT,
-> > +			.u.value.a = pas_id,
-> > +			.u.value.b = mem_size,
-> > +		},
-> > +		[1] = {
-> > +			.attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT,
-> > +			.u.value.a = lower_32_bits(mem_phys),
-> > +			.u.value.b = upper_32_bits(mem_phys),
-> > +		},
-> > +		/* Reserved for fw memory space to be shared or lent */
-> 
-> Can you explain this comment a bit more? Plan is to allow passing a MEM_REF here
-> which could be lent/shared to TEE via FFA ABI?
-
-This param is added for future compatibility where PAS firmware is
-loaded in arbitrarity allocated memory region by the kernel. Then that
-can be shared or lend with TZ for authentication and reset sequence.
-
-Right now the kernel is already loading the PAS firmware is fixed
-reserved memory regions, for which this param is unused.
-
-> 
-> > +		[2] = {
-> > +			.attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INPUT,
-> > +		}
-> > +	};
-> > +	int ret;
-> > +
-> > +	ret = tee_client_invoke_func(data->ctx, &inv_arg, param);
-> > +	if (ret < 0 || inv_arg.ret != 0) {
-> > +		dev_err(dev, "PAS auth reset failed, pas_id: %d, err: %x\n",
-> > +			pas_id, inv_arg.ret);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int qcom_pas_tee_auth_and_reset(struct device *dev, u32 pas_id)
-> 
-> I'm guessing once all clients have migrated to PAS, plan is to drop this wrapper?
-
-Yeah, this patch-set doesn't aim to change the kernel client PAS API
-contract apart from just renaming APIs. Surely future work can change
-the PAS API contract as needed.
-
-> 
-> > +{
-> > +	return __qcom_pas_tee_auth_and_reset(dev, pas_id, 0, 0);
-> > +}
-> > +
-> > +static int qcom_pas_tee_prepare_and_auth_reset(struct device *dev,
-> > +					       struct qcom_pas_context *ctx)
-> > +{
-> > +	return __qcom_pas_tee_auth_and_reset(dev, ctx->pas_id, ctx->mem_phys,
-> > +					     ctx->mem_size);
-> > +}
-> > +
-> > +static int qcom_pas_tee_set_remote_state(struct device *dev, u32 state,
-> > +					 u32 pas_id)
-> > +{
-> > +	struct qcom_pas_tee_private *data = dev_get_drvdata(dev);
-> > +	struct tee_ioctl_invoke_arg inv_arg = {
-> > +		.func = TA_QCOM_PAS_SET_REMOTE_STATE,
-> > +		.session = data->session_id,
-> > +		.num_params = TEE_NUM_PARAMS
-> > +	};
-> > +	struct tee_param param[4] = {
-> > +		[0] = {
-> > +			.attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT,
-> > +			.u.value.a = pas_id,
-> > +			.u.value.b = state,
-> > +		}
-> > +	};
-> > +	int ret;
-> 
-> Nit: Why not ret = 0 initialize and always use ret?
-
-zero init will still be redundant..
-
-> 
-> > +
-> > +	ret = tee_client_invoke_func(data->ctx, &inv_arg, param);
-> > +	if (ret < 0 || inv_arg.ret != 0) {
-> > +		dev_err(dev, "PAS shutdown failed, pas_id: %d, err: %x\n",
-> > +			pas_id, inv_arg.ret);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	return 0;
-
-.. will rather change this to return ret.
-
-> > +}
-> > +
-> > +static int qcom_pas_tee_shutdown(struct device *dev, u32 pas_id)
-> > +{
-> > +	struct qcom_pas_tee_private *data = dev_get_drvdata(dev);
-> > +	struct tee_ioctl_invoke_arg inv_arg = {
-> > +		.func = TA_QCOM_PAS_SHUTDOWN,
-> > +		.session = data->session_id,
-> > +		.num_params = TEE_NUM_PARAMS
-> > +	};
-> > +	struct tee_param param[4] = {
-> > +		[0] = {
-> > +			.attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_INPUT,
-> > +			.u.value.a = pas_id
-> > +		}
-> > +	};
-> > +	int ret = 0;
-> > +
-> > +	ret = tee_client_invoke_func(data->ctx, &inv_arg, param);
-> > +	if (ret < 0 || inv_arg.ret != 0) {
-> > +		dev_err(dev, "PAS shutdown failed, pas_id: %d, err: %x\n",
-> > +			pas_id, inv_arg.ret);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	return 0;
-> 
-> You could just return 'ret' here. :)
-
-Ack.
-
-> 
-> > +}
-> > +
-> > +static void qcom_pas_tee_metadata_release(struct device *dev,
-> > +					  struct qcom_pas_context *ctx)
-> > +{
-> > +	struct tee_shm *mdata_shm = ctx->ptr;
-> > +
-> 
-> Nit: Unnecessary extra line.
-
-Extra line is recommended after variables declaration.
-
-> 
-> > +	tee_shm_free(mdata_shm);
-> > +}
-> > +
-> 
-> [...]
-> 
-> > +
-> > +module_tee_client_driver(optee_pas_tee_driver);
-> > +
-> > +MODULE_LICENSE("GPL");
-> > +MODULE_DESCRIPTION("TEE bus based Qualcomm PAS driver");
-> 
-> Since this is a tee_client driver, isn't it self-explanatary that it's TEE bus based?
-> 
-
-I can rather say:
-
-MODULE_DESCRIPTION("Qualcomm PAS TEE driver");
-
--Sumit
 
