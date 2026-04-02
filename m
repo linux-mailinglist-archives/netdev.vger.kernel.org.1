@@ -1,340 +1,180 @@
-Return-Path: <netdev+bounces-274558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274559-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ALuuBFF0zmkpnwYAu9opvQ
-	(envelope-from <netdev+bounces-274558-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:51:13 +0200
+	id CMh0Gg92zmk6nwYAu9opvQ
+	(envelope-from <netdev+bounces-274559-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:58:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7742C38A092
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:51:12 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A7FB38A20A
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:58:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EAB8C30FDF62
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:42:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 12EBC3015ED7
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:44:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41000344040;
-	Thu,  2 Apr 2026 13:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E8D3C871B;
+	Thu,  2 Apr 2026 13:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B0w+ZiPr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rHa/uVf8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0F530DD3C
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 13:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD40611E
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 13:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775137342; cv=none; b=KQA2rod4ZZh6QEdmuE/SeYoEHSifaFhtOksds/LiX3d+WQNlD6KlAYvGIB3w2YZNxKdjSqk5SvZpXV+N9xxKPKojxaT7VuPSxyPPTraXnvqv9y0Tuvp182CBJ60WwTscABU4ImmvKSkU9IrhI8HbwaOy60b7Ou9lXk7px6flqrQ=
+	t=1775137470; cv=none; b=fIJeJD1D3iOtuU6TiFmHm5TmiqG0AihIUoLv2bqV+K8JAScr3w2WWm7ata4oqyGidsITdTknxOjyOegGHXttVqj6u5MdXqhulePD0NvGNJx9K+4v3j2qFgE8NULlPu1nh7vwOUrQdQ0MLPvrq2h+/8OOmU7rxiR51pLokPC/AYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775137342; c=relaxed/simple;
-	bh=ggbMyFNI4oR5jXTpuMssIaiIJjkIK1Al+TR0Q7cDQ0s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Cut21za2oDiP7k5pLVnz3VIzcUhQ3ul9+5A2GMhCyX5E+yq2W/UscIG/CK3lzBWpyEE+GswQ4yQaQAJKTHT/2fpuTEwVMtdq/J4Dp0S1vLCWo0z+oOiPTc3FMtVVBspnHO2mi+tefScZI9wlRfuolfzquRePMyjLXrWoToSWRho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B0w+ZiPr; arc=none smtp.client-ip=209.85.219.42
+	s=arc-20240116; t=1775137470; c=relaxed/simple;
+	bh=Z+qPhBp9y4NgDaGjDqYC7FJZi9JldU7bS4Ysv9kcAcA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VYOiX7nUvnbstFMPmiNuzU4hzG2+zoZNWYkxAncwdsAB/TSve+QSuOWzBBKMkFBakN18Azl5ndJ/sEIwThvt5qDBo+dYnfD2XyzoqM6MN4XMbJAopfrMW5+Gce/QZVaUDznubeWb7JhuLDWFkTMTdm21tqKxjbfVTb2sH7LJaUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rHa/uVf8; arc=none smtp.client-ip=74.125.82.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8a05c388b27so16359506d6.3
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 06:42:20 -0700 (PDT)
+Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-2ca4ff720ccso882393eec.0
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 06:44:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775137340; x=1775742140; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QL2fekYDuWvWPoY7tEE3cu+9puC9Reyu9saYkqON9gc=;
-        b=B0w+ZiPrn93DUJ7KZUBlZqUKvTpKW4vUl6OC81Y8K+X2Kfz7pjhh24ENomStqH0Ks+
-         gjwlR5QepFJI6W+IA19DYjNNB+WGeDJ3HnQjpPW2B5HiXlLmWTUnOhk5TvfTSkEhDFAv
-         5wR3XQhWqcpcJ/AY9u+2uLeeFAC06U6YzG0ILaWvoiiu5q9Hi8y9yjClNBhl5/WAYnVj
-         HsVFeP6mh04XqkvTLnduC7X6kustcwHi51ibF2DkVfq2+goZgEZPZPu1qtGDSE/Fvab/
-         tMnlwnk611xvh2SFzplZc5xQGO5idrsQl0kdpFhxrb6Zy5rbmBjEMUzHTCzdlyb7Yga0
-         QOYQ==
+        d=gmail.com; s=20251104; t=1775137467; x=1775742267; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z+qPhBp9y4NgDaGjDqYC7FJZi9JldU7bS4Ysv9kcAcA=;
+        b=rHa/uVf87B9tRuMlZoao4vsNI7ssZ5FvD4nAchy5IR76+zsbfI326TFPolsRJXR0V0
+         Yh+y/30K1WPzGmbhNwMNkoDM+WzcX9A122lQJdJn4qYfqxBkuOXKsvxV+XaNquYxV3JQ
+         yA19wbnZ6UyI76D6SGk9HQTTIplqb0Ccq4jveyEg2dZ07DrrpWe5IjFLw8s/wZmUJQbk
+         FwEsnpneY730qqqGBBnD7eUvPsxjZFPLyLhfmZmwBMXVqpvaCqINyNS1g08Fw/0UfPk6
+         qUPp7E6s3lARHvquCmqQCl4WBJ5bHhTzxRXu9YgBvM1OqVVU+3mO+CcoN0r/r2RO5+uB
+         V+CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775137340; x=1775742140;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=QL2fekYDuWvWPoY7tEE3cu+9puC9Reyu9saYkqON9gc=;
-        b=CBEHCmCBMDlmDh8ubYgQBXlgWkXqiKE8qyDCd6eCG40TohkOOSYhSc8FcPwSHh2NzB
-         SDCJVG/Kd/d5LF5wDsqafHCPd/rq+guUq8tSq+G7XGLhWl8bLQkig4Xq3I5lE2vLzPVQ
-         LkzN5mAe85OQTTWPyasSCzgDND6dYS/Ab7znnE1GRipiWfIrZaknjvyZAjXaljnSHikt
-         lNNH/x7Wfye373dnnrF3Vc0QMQcN5J56ZmD7wU6zWjJb/cdmjT1/lxOmRyl1deXCGwoC
-         CQOid3OxsJ1XsZA5nEG9b3VhIr99AZ1AhQbA3g5eE0Vb77Weg9Zy2apYSLAmA9PJqoUV
-         HWOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXG+YcBNNH8/aY9fccLYUePzUGA6dUK5sk8xxq9SGLmElv1FABq45/JYoGtevnD2yTPtgWHQ3U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzm0mTHY4Pc88PQihxV3Ep7XfNhZs6mBXUDTYHgP7YRQ5PB8M6a
-	gSZ8bax0Kw8BNX5tTR3yP/CMNHMyMIxL71wn8um9+xVMFA+epY14YcJF
-X-Gm-Gg: AeBDiettT1pWbU97oDwPND+5SEULx+4nDKiS8YfRSSYoyM/o6Jyz1uhlss0L7V2Rq7U
-	tHpH7A43Xf0/OFJy8RrQpdxKBJLPiz0IxQL3c2nR/hWrGDtaf4WJolW+kcRXgGRlKzfdO/mpwIa
-	9MPlnfFBRMlTtrF5PFa4nTU2ge49Nb8rWnGP7ej8oFRW4qtLuDiFQRHcD8q/17zLc6Gzv/i+t40
-	SnCD3jTtLpZcdWhTWp89w5wfh6zVnXpnAGVtjil9qpHs9yGFDJUeHNJE/TrVtmvohbsi0xqx3+X
-	Pg0k7fFDrUeK4S9NSkrYLHrus9eXt8Iqjwu3bbRRxCK/XwY6J3uDLaAefxe67QbDO5eIC7kgX/V
-	ArBtUhIsRc7GCkrlq4+82M8XSzwWX4reFHh7omj6oUucKVeYOBU3ElCT8rddC78NewTDixWmBnW
-	N2K5vM24IoceZSBrex4mWnaH4Hj7d8Nq+N
-X-Received: by 2002:a05:6214:3316:b0:89c:de0e:263b with SMTP id 6a1803df08f44-8a439b98c26mr99279426d6.42.1775137339433;
-        Thu, 02 Apr 2026 06:42:19 -0700 (PDT)
-Received: from localhost.localdomain ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8a593bf4f0fsm22636786d6.16.2026.04.02.06.42.15
+        d=1e100.net; s=20251104; t=1775137467; x=1775742267;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Z+qPhBp9y4NgDaGjDqYC7FJZi9JldU7bS4Ysv9kcAcA=;
+        b=e6xjIFFRGj6bev31ujaGWghAkPrJS0TtFKerCYjimOSAT1EGSXvPhdJBwHB/or00kR
+         TFV7R9zLCcx+hRTmI0QIEJyw1oHP+s8bSzdGlv6mv0Xv2/ulW0Ob7WN0R07EBYmgm5Gz
+         dnTSnRtAtPkx6egANdxxfsvyIY/XTLCuBaAYZzzh2VRmCrfwQiWU0OL8uJyk6lqRwqI1
+         hgpUtlfyKUIsG8TDDH+q0qZT9etbNH0dM6lQI0EsJLjk1jez24nB6BkJBrh5RHIL7TAc
+         1cUtUZm5hl1dNTGog53+1l2OOi3hHuoSgqYXdLBRiFvHiqoBE7W7A7xVRmptkzBmqoEQ
+         LGtg==
+X-Forwarded-Encrypted: i=1; AJvYcCVuj+Ccip6iy1eXlbdd9HeSLZueL5T+l9BkMqpMcRR0O5TOPX9Uv9GcQh+XK2g6aV4LoteAIKM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNd4WHIg7ReguQqrWObNNl87q1q0m71C7NCm6oAPz8rDkWNWuw
+	3DdH/QR3saDv3qQQ9bM+T2KeXCLDwAd3SCxAQh3qTd57fEuK74/T6fI/
+X-Gm-Gg: AeBDiesPNunAgmGxNUKfz9BHxJvhL4ldfH4p/T5sTes4NYmuyVrDRZlScjIownymLqP
+	6zKOQNsfjXn+FhHczyTm0C/cchLSgyztZ5H2BbdsxqNp5Meuzjso8HRrevads7JfZBThxe8/sU9
+	Bmy9C843w1tN0IvhOtI2Hzbq6tTDMZ/6XKlfWUpbyvwOZya2YLUAzixmaJVgFRBtsmFrNLCI/sH
+	FOQ+GMftPJhiaGGg6/EJR/he5Ro9Y9wo2bncmCGvGTF04jNJeC3AmSyx9ptGVUY2OnN+e8JWfSf
+	HrU8VtCKZAI4STXiNNCr79QCmZFAH4/pO/hMm4IBLjM+MvF53lPmwcNi53Szhz1QcyEp+VHKlvE
+	NiVjsuuU/37SDCSVNoA1Yh5bpPNQImThbS/IVHAuPTyIUApA/yp/IgwpY7PZgsKg7/lmYKGKpE8
+	T7siSWPQXLi3kEBMqTlMo=
+X-Received: by 2002:a05:7300:2d09:b0:2c4:8990:393a with SMTP id 5a478bee46e88-2cad8a53d7dmr1022191eec.19.1775137467167;
+        Thu, 02 Apr 2026 06:44:27 -0700 (PDT)
+Received: from pek-khao-d3 ([128.224.246.2])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ca7c20b195sm2435549eec.16.2026.04.02.06.44.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 06:42:19 -0700 (PDT)
+        Thu, 02 Apr 2026 06:44:26 -0700 (PDT)
+Date: Thu, 2 Apr 2026 21:44:20 +0800
 From: Kevin Hao <haokexin@gmail.com>
-Date: Thu, 02 Apr 2026 21:41:25 +0800
-Subject: [PATCH net-next v2 4/4] net: macb: Remove dedicated IRQ handler
- for WoL
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 2/4] net: macb: Consolidate
+ MACB_CAPS_ISR_CLEAR_ON_WRITE checks in IRQ handler
+Message-ID: <ac5ytN_VLuq8NLtZ@pek-khao-d3>
+References: <20260328-macb-irq-v1-0-7b3e622fb46c@gmail.com>
+ <20260328-macb-irq-v1-2-7b3e622fb46c@gmail.com>
+ <20260331195400.16bb697c@kernel.org>
+ <aczly5AD_PkYv6mJ@pek-khao-d3>
+ <e113d9e0ad3d3b63bfe124509c4af851@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260402-macb-irq-v2-4-942d98ab1154@gmail.com>
-References: <20260402-macb-irq-v2-0-942d98ab1154@gmail.com>
-In-Reply-To: <20260402-macb-irq-v2-0-942d98ab1154@gmail.com>
-To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Kevin Hao <haokexin@gmail.com>, netdev@vger.kernel.org, 
- Nicolai Buchwitz <nb@tipi-net.de>
-X-Mailer: b4 0.14.2
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="hqEX76IGBaiYAsNh"
+Content-Disposition: inline
+In-Reply-To: <e113d9e0ad3d3b63bfe124509c4af851@tipi-net.de>
+X-Spamd-Result: default: False [-2.26 / 15.00];
+	SIGNED_PGP(-2.00)[];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,tipi-net.de];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274559-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274558-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
 	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,amd-zynqmp:email]
-X-Rspamd-Queue-Id: 7742C38A092
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5A7FB38A20A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In the current implementation, the suspend/resume path frees the
-existing IRQ handler and sets up a dedicated WoL IRQ handler, then
-restores the original handler upon resume. This approach is not used
-by any other Ethernet driver and unnecessarily complicates the
-suspend/resume process. After adjusting the IRQ handler in the previous
-patches, we can now handle WoL interrupts without introducing any
-overhead in the TX/RX hot path. Therefore, the dedicated WoL IRQ
-handler is removed.
 
-I have verified WoL functionality on my AMD ZynqMP board using the
-following steps:
-  root@amd-zynqmp:~# ifconfig end0 192.168.3.3
-  root@amd-zynqmp:~# ethtool -s end0 wol a
-  root@amd-zynqmp:~# echo mem >/sys/power/state
+--hqEX76IGBaiYAsNh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Kevin Hao <haokexin@gmail.com>
----
- drivers/net/ethernet/cadence/macb_main.c | 112 ++++++++-----------------------
- 1 file changed, 27 insertions(+), 85 deletions(-)
+On Wed, Apr 01, 2026 at 01:49:28PM +0200, Nicolai Buchwitz wrote:
+>=20
+> I'm always a fan of optimizations, but I guess in this case the
+> saved ldrb is negligible next to the MMIO in the same path. We're
+> talking a single L1 cache hit (~1ns) vs an uncacheable register
+> write (~100ns+). Patch 3 also re-reads bp->caps in
+> macb_interrupt_misc() anyway, undoing the local bool for the misc
+> path.
+>=20
+> I'd ack Jakub's helper approach. A macb_queue_isr_clear() would
+> be consistent across all callsites, including the 7 other
+> instances you counted outside macb_interrupt().
 
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 98da191a2428b471ff9ac54e1f24beb3a882c546..a4961abb95ae7fa2e40e61b5a8f0da5a83572131 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -71,7 +71,8 @@ struct sifive_fu540_macb_mgmt {
- 					| MACB_BIT(TXUBR))
- 
- #define MACB_INT_MISC_FLAGS	(MACB_TX_ERR_FLAGS | MACB_BIT(RXUBR) | \
--				 MACB_BIT(ISR_ROVR) | MACB_BIT(HRESP))
-+				 MACB_BIT(ISR_ROVR) | MACB_BIT(HRESP) | \
-+				 GEM_BIT(WOL) | MACB_BIT(WOL))
- 
- /* Max length of transmit frame must be a multiple of 8 bytes */
- #define MACB_TX_LEN_ALIGN	8
-@@ -2025,60 +2026,30 @@ static void macb_hresp_error_task(struct work_struct *work)
- 	netif_tx_start_all_queues(dev);
- }
- 
--static irqreturn_t macb_wol_interrupt(int irq, void *dev_id)
-+static void macb_wol_interrupt(struct macb_queue *queue, u32 status)
- {
--	struct macb_queue *queue = dev_id;
- 	struct macb *bp = queue->bp;
--	u32 status;
- 
--	status = queue_readl(queue, ISR);
--
--	if (unlikely(!status))
--		return IRQ_NONE;
--
--	spin_lock(&bp->lock);
--
--	if (status & MACB_BIT(WOL)) {
--		queue_writel(queue, IDR, MACB_BIT(WOL));
--		macb_writel(bp, WOL, 0);
--		netdev_vdbg(bp->dev, "MACB WoL: queue = %u, isr = 0x%08lx\n",
--			    (unsigned int)(queue - bp->queues),
--			    (unsigned long)status);
--		macb_queue_isr_clear(bp, queue, MACB_BIT(WOL));
--		pm_wakeup_event(&bp->pdev->dev, 0);
--	}
--
--	spin_unlock(&bp->lock);
--
--	return IRQ_HANDLED;
-+	queue_writel(queue, IDR, MACB_BIT(WOL));
-+	macb_writel(bp, WOL, 0);
-+	netdev_vdbg(bp->dev, "MACB WoL: queue = %u, isr = 0x%08lx\n",
-+		    (unsigned int)(queue - bp->queues),
-+		    (unsigned long)status);
-+	macb_queue_isr_clear(bp, queue, MACB_BIT(WOL));
-+	pm_wakeup_event(&bp->pdev->dev, 0);
- }
- 
--static irqreturn_t gem_wol_interrupt(int irq, void *dev_id)
-+static void gem_wol_interrupt(struct macb_queue *queue, u32 status)
- {
--	struct macb_queue *queue = dev_id;
- 	struct macb *bp = queue->bp;
--	u32 status;
- 
--	status = queue_readl(queue, ISR);
--
--	if (unlikely(!status))
--		return IRQ_NONE;
--
--	spin_lock(&bp->lock);
--
--	if (status & GEM_BIT(WOL)) {
--		queue_writel(queue, IDR, GEM_BIT(WOL));
--		gem_writel(bp, WOL, 0);
--		netdev_vdbg(bp->dev, "GEM WoL: queue = %u, isr = 0x%08lx\n",
--			    (unsigned int)(queue - bp->queues),
--			    (unsigned long)status);
--		macb_queue_isr_clear(bp, queue, GEM_BIT(WOL));
--		pm_wakeup_event(&bp->pdev->dev, 0);
--	}
--
--	spin_unlock(&bp->lock);
--
--	return IRQ_HANDLED;
-+	queue_writel(queue, IDR, GEM_BIT(WOL));
-+	gem_writel(bp, WOL, 0);
-+	netdev_vdbg(bp->dev, "GEM WoL: queue = %u, isr = 0x%08lx\n",
-+		    (unsigned int)(queue - bp->queues),
-+		    (unsigned long)status);
-+	macb_queue_isr_clear(bp, queue, GEM_BIT(WOL));
-+	pm_wakeup_event(&bp->pdev->dev, 0);
- }
- 
- static int macb_interrupt_misc(struct macb_queue *queue, u32 status)
-@@ -2132,6 +2103,14 @@ static int macb_interrupt_misc(struct macb_queue *queue, u32 status)
- 		macb_queue_isr_clear(bp, queue, MACB_BIT(HRESP));
- 	}
- 
-+	if (macb_is_gem(bp)) {
-+		if (status & GEM_BIT(WOL))
-+			gem_wol_interrupt(queue, status);
-+	} else {
-+		if (status & MACB_BIT(WOL))
-+			macb_wol_interrupt(queue, status);
-+	}
-+
- 	return 0;
- }
- 
-@@ -6004,7 +5983,6 @@ static int __maybe_unused macb_suspend(struct device *dev)
- 	unsigned long flags;
- 	u32 tmp, ifa_local;
- 	unsigned int q;
--	int err;
- 
- 	if (!device_may_wakeup(&bp->dev->dev))
- 		phy_exit(bp->phy);
-@@ -6067,39 +6045,15 @@ static int __maybe_unused macb_suspend(struct device *dev)
- 			/* write IP address into register */
- 			tmp |= MACB_BFEXT(IP, ifa_local);
- 		}
--		spin_unlock_irqrestore(&bp->lock, flags);
- 
--		/* Change interrupt handler and
--		 * Enable WoL IRQ on queue 0
--		 */
--		devm_free_irq(dev, bp->queues[0].irq, bp->queues);
- 		if (macb_is_gem(bp)) {
--			err = devm_request_irq(dev, bp->queues[0].irq, gem_wol_interrupt,
--					       IRQF_SHARED, netdev->name, bp->queues);
--			if (err) {
--				dev_err(dev,
--					"Unable to request IRQ %d (error %d)\n",
--					bp->queues[0].irq, err);
--				return err;
--			}
--			spin_lock_irqsave(&bp->lock, flags);
- 			queue_writel(bp->queues, IER, GEM_BIT(WOL));
- 			gem_writel(bp, WOL, tmp);
--			spin_unlock_irqrestore(&bp->lock, flags);
- 		} else {
--			err = devm_request_irq(dev, bp->queues[0].irq, macb_wol_interrupt,
--					       IRQF_SHARED, netdev->name, bp->queues);
--			if (err) {
--				dev_err(dev,
--					"Unable to request IRQ %d (error %d)\n",
--					bp->queues[0].irq, err);
--				return err;
--			}
--			spin_lock_irqsave(&bp->lock, flags);
- 			queue_writel(bp->queues, IER, MACB_BIT(WOL));
- 			macb_writel(bp, WOL, tmp);
--			spin_unlock_irqrestore(&bp->lock, flags);
- 		}
-+		spin_unlock_irqrestore(&bp->lock, flags);
- 
- 		enable_irq_wake(bp->queues[0].irq);
- 	}
-@@ -6141,7 +6095,6 @@ static int __maybe_unused macb_resume(struct device *dev)
- 	struct macb_queue *queue;
- 	unsigned long flags;
- 	unsigned int q;
--	int err;
- 
- 	if (!device_may_wakeup(&bp->dev->dev))
- 		phy_init(bp->phy);
-@@ -6167,17 +6120,6 @@ static int __maybe_unused macb_resume(struct device *dev)
- 		macb_queue_isr_clear(bp, bp->queues, -1);
- 		spin_unlock_irqrestore(&bp->lock, flags);
- 
--		/* Replace interrupt handler on queue 0 */
--		devm_free_irq(dev, bp->queues[0].irq, bp->queues);
--		err = devm_request_irq(dev, bp->queues[0].irq, macb_interrupt,
--				       IRQF_SHARED, netdev->name, bp->queues);
--		if (err) {
--			dev_err(dev,
--				"Unable to request IRQ %d (error %d)\n",
--				bp->queues[0].irq, err);
--			return err;
--		}
--
- 		disable_irq_wake(bp->queues[0].irq);
- 
- 		/* Now make sure we disable phy before moving
+Fair enough. I have used macb_queue_isr_clear() in v2.
 
--- 
-2.53.0
+Thanks,
+Kevin
 
+--hqEX76IGBaiYAsNh
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEHc6qFoLCZqgJD98Zk1jtMN6usXEFAmnOcrQACgkQk1jtMN6u
+sXHyhwf/YFEkkfUL+CxTx+6P4yFzfZsR5J9t8WJ56pSPwQArVu6wroIBj1tH2eSW
+eOUxXPgLoxNz/sPBMZJDK4dZtJoWFoSxhVgQCrRtj6RJhLVXilrR362XdjkG+TG2
+/fXoTNnuWQajq5ct5oilQwNfla+2MSGYPiYmqF49ftx8wc4doEDZyXU3+8kZpZqn
+HZliZbCEjd6fXst+ELp5gjAYKvdSvy5uk9OVs5GJojIgpuzODOKWGe8XKnFv/5B2
+2MY0yv4e2Tg7q9itfg6X2Vy7Pf5+aArEfkt1qXBC/i1rIKd83zwqJGfKIbXPuz0+
+yB2JZA70jTZCW2/hXIsf74subgyqsA==
+=jopF
+-----END PGP SIGNATURE-----
+
+--hqEX76IGBaiYAsNh--
 
