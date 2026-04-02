@@ -1,224 +1,466 @@
-Return-Path: <netdev+bounces-274467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274469-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KJXUGM5LzmmjmgYAu9opvQ
-	(envelope-from <netdev+bounces-274467-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:58:22 +0200
+	id ONIMFmFOzmmjmgYAu9opvQ
+	(envelope-from <netdev+bounces-274469-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:09:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B46AD388006
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:58:21 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFD583881DA
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:09:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DFD4530465FA
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 10:56:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5034B309E0D9
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 11:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A25B38F93D;
-	Thu,  2 Apr 2026 10:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b="zpsZ1T9N"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB1BB3C1981;
+	Thu,  2 Apr 2026 11:06:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012036.outbound.protection.outlook.com [52.101.66.36])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8D435E95A;
-	Thu,  2 Apr 2026 10:56:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.36
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775127364; cv=fail; b=h38LZBLL259Z/WNN0yBbwsuPDkIknPNwYKaXczIULCVThuTvKuNSnrd0wbRcIIKlw7c+e9VyyS+kH1C0zjrHtNS6sZLwqld11/9/GE225KEUhVvN8DReAnVjkLt/sBQK1cSs4imbmjN7Gip4q/AprvYSMp2+F9UCrPwOV4y+Xbs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775127364; c=relaxed/simple;
-	bh=dFFC74rgnfHafveoGrfIiYA7BTMy750XTkr1O1/BzX8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=UXVo7rcWAlZSyc/PipvnnBw7bwZe5tE4T6UFgI8m7JUqon1HwcPVCtWv74PMeNs4hn/g0D2Q7Bi/CKQz29nk8AA3gSKx8tm5e8810v2Q5Au617kXSVXi6K3XaowzbM+9JwRDVDvITUrnHZwbKHzvfK7MZhZFMBwEQPiM4uPYpxo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=zpsZ1T9N; arc=fail smtp.client-ip=52.101.66.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=w6ZllIitG/COYZw4Pb8mtY2NDK8EZJZ9xUZb+erxc+fT2VbwHHrCTH2Uo7uyyEr4CCWXsTNYZJ0euojANmjvlIS5wJ8/toeQm3MQK90AyybtDojDWYZKQyBXdpjrE7dSAFzx+ezngdxwgTG5qt9ujb70NMwPMRwybKoppCr2GCZWeDCgXLIYLmOfE4HV/tvjpUhF6l0+NG+3X73a+8uLlLERM/EvngDFaBesVreiG6lUCVdnYNPgS6H+KUAjpI0D6aauRwS0iFhGi6GA7Tz+siCKcOeKU60v3bnGezZD3EjMPAIVmRF0proIffIWLauH7cbQkd2aWrW+YleX4glDqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dFFC74rgnfHafveoGrfIiYA7BTMy750XTkr1O1/BzX8=;
- b=upya/+9TOhcI4IoUgQG4x9pMt+BRfWsTt9DIKtGhQ6X0UoGTqJFyC5Nlz4v4cnbFB0ZBk38K5pmvGu7cmmcucdaL6IqpiX6KZHcTRrO5UB7JCpZFT55b8Om4/8qln+HF3wsjCi7rthoeWXxdoOwq5bwosbCfS2ANoGjxMXY24nsCs8EmiYv3EPKD16EfbxaaaHhXZri3/4Dh99n4uRJiNDvZaUyIBArJRC0bgpPb+MSRdESh8/2ZyrIQJdZRjT0Ol0jh183AEwfhOPFsTOotWEDB8sCtrqiNaxPCkn0gbc+wI0QCJpmxLq5m/hms/jzRtDISN4iDA4FK/EhdDQOw+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
- dkim=pass header.d=est.tech; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dFFC74rgnfHafveoGrfIiYA7BTMy750XTkr1O1/BzX8=;
- b=zpsZ1T9N+Oh0HpjnsvvhYmzFUos/LglnbwBClYWOlBsPuxKCCO3212CPIqrjqSymEIfUfL81PG4iRxxaPtrbTsH64RcmTfkeSmaCKdIPuBe3SwBjm+qDy5Ya2OtzLn3CqJS7Sw+J33i1gip0elKPJSv3a7TROUqzpk3wWW9MBY+snPg1isq7Po0V4UTh+pMV+ZjeHI6//4XbQWS7WhIQxp+guqkyWIUdSHE6Sw1uqXPyNlGaPZfGUjpqIpJk/RRsCtyEDp9GLnVjn4P9lZesE7BCPk9IVOMLJp3rPUxuAkbppngzEwYLOX7aiU84JBOB7gswtTasLJNYYk7hFx6cNw==
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
- VI0P189MB3357.EURP189.PROD.OUTLOOK.COM (2603:10a6:800:2b2::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9769.17; Thu, 2 Apr 2026 10:55:58 +0000
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7%5]) with mapi id 15.20.9769.016; Thu, 2 Apr 2026
- 10:55:57 +0000
-From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-To: Oleh Konko <security@1seal.org>
-CC: "jmaloy@redhat.com" <jmaloy@redhat.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"tipc-discussion@lists.sourceforge.net"
-	<tipc-discussion@lists.sourceforge.net>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH net v3] tipc: fix bc_ackers underflow on duplicate
- GRP_ACK_MSG
-Thread-Topic: [PATCH net v3] tipc: fix bc_ackers underflow on duplicate
- GRP_ACK_MSG
-Thread-Index: AQHcwoXtbgM45gO9AE+JdR/jF4ztBrXLmNzw
-Date: Thu, 2 Apr 2026 10:55:57 +0000
-Message-ID:
- <GV1P189MB19882190ACEB3707F90F5C3BC651A@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-References: <41a4833f368641218e444fdcff822039.security@1seal.org>
-In-Reply-To: <41a4833f368641218e444fdcff822039.security@1seal.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=est.tech;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: GV1P189MB1988:EE_|VI0P189MB3357:EE_
-x-ms-office365-filtering-correlation-id: 488d7b34-0c58-4a96-c97c-08de90a66b7e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700021|18002099003|22082099003|56012099003;
-x-microsoft-antispam-message-info:
- nkxbEOEGcqbtjqMt+7ZmD/FoEhHaqqQXF0aE2s3sqqQjq3zFcwwlUzTyv7ONOO6NffemWAQezNgG2oA9OzpUrfa1uE+ETHW8VcQ3/mzyLH6e/vBhR/m1/yBi7i59X1AAVddGc+uLhYExGIakr3CkuBysQGwdSAznNBqHZmAmjnTEOq8p0bxKoqijH/pKb67zwN6/vqiQhuANsX8REOuLS+SIx5dj6V14hiXrQ8pW/w05rIsoP+qXN+LDPk85ezyYmHq+iyyJ2tFuEM4+NjhAa4gwcU1MbzNZvoLw4eew00TBGzhiQzQ7N/7wZQAktz9WOf5qN0gWQz0jyms6roa/16SGre+OPlAzEvgM7IGewEnyf06EJoZO/H65SOgRDMRvdY3TsAxTczOWd4UZGaAwsRkBfOzrBhqWaEkcs4qBxiSC9Y7OlyqGD6wuTYHU2ZOlhYFGYRrGrxv5AvFcgvWGdlUA1N94LwYiat/gXF1L6ZQL4JLFzL6kt69j8HcLvKPadcqI2KXZi1yB0ZlbkYuuspTYBLQj03Ey5EUn2pUI1NqoZC2M1fbBCwq3SyvNhMEbRKrRn8JuToPXcBfJo8vxlKzCDQuxk4rvklDpYBmSiuSyOBOCYOnqX+0c/DCVyIvBrYY5N9y0bnKKPgoyhzX+G6hFvFoGmGsddhrVHBOSUm0PPlmk53RcLxoc28NLkkfrAFOYXdzWsE/ct6wzBo4y8tIOBXNdvoEpqZqeDimaUEBibU7pK4iw0KOY9Vbb2/XnZW0Y6zjgXXeNrceTemsFbBky4jaDlWt4qdcWlovmLA0=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?Mkhxa2lqdjNYc2NnSzNtWTJadGovNCtzMGMxK1MrOUFLMWxaNEtnWGI4UTVE?=
- =?utf-8?B?UlgzaW5ESDRjM2FXZ0hmR2pnSGY5alpyZzdBYUg5cm9sU0c2RzFqUjZ0R2g0?=
- =?utf-8?B?YkVRKzhYRzc5dlNOQkEwczVLelRLLzJzbVdCQkhvMDJ3RXB1TFBGcEZWbFAv?=
- =?utf-8?B?WUJSeXE0MXUwVnozVml0V2J4TWVUcFVKSmlmbS96ajJEQUZlcWJpS3ZOMlpL?=
- =?utf-8?B?M3VLQk45aXFZeWV5c1FJMlpkcEtXYXNtaFd6cjh3ejRoQ1ZrSGk3NXRRSEdO?=
- =?utf-8?B?YkxPUHdsRHBRakI2WEw4c2hzV0lRWjg4TVNrUnVJbDZIejlSRndOd25iWS90?=
- =?utf-8?B?WmtGcHk5NWZvMFlWZkk1RlE5cEdtYVloNHJLalFBckp2TEpqYXZYaGsvcWVM?=
- =?utf-8?B?ZnNYbW1WbExVNzFqd1pvTFZ3azVvci96MFo4WEI1L1BlQVlGUTJPTTVycE1L?=
- =?utf-8?B?aTVxTW4xQWZXY0FXVW9STURaVkRGL25sRHZILzdZdHozNFd5cVhYeEo5VENS?=
- =?utf-8?B?YXRzOTdGRkFFelNYZXNPNkFZNEtQb2hGZVdxU1JvK2FPZVVQM25mc3FrWXBt?=
- =?utf-8?B?anZUK2RyM2MraE9ZUVZiRkp4MnZEb00zQWZDTzNQdy8raVZocnJIWlFDYmJC?=
- =?utf-8?B?SU5xVEhFYm9ZMnpqazVSN0t2VkxkZmFDc3d4dWhNOUpjSGhLQWgvYjdyNVJM?=
- =?utf-8?B?WmxuTEZiOTNXWWNySVhqZW9OTFhDUDhPdUtTQy9mblFQVklZZjFsdUc2M3Nu?=
- =?utf-8?B?bzlkanlaR2FpMjFYaHFCSzRPdzhWMmI5UFhCUE5FTWdiUkVhVWg0OXFsRHZP?=
- =?utf-8?B?Q2dMUkM3VkdGTStOZEMrc25BYUVNZFZ4d0xXR0R6NnZyQWFGV2lTaS9PeGpk?=
- =?utf-8?B?MElucmo2ei95cFRaRjl5NkhwY01Kb2l4eTZsY2N0UENURzh1VUJpajNTV0hu?=
- =?utf-8?B?VW5Md1B2bS9adU4zMHpabHMwM1VVT25FME5rb1ovY2dSbWo3VXlYanN3MTRn?=
- =?utf-8?B?bk9VdTdYWXFCcWFRZUJ6QitIZkhnMjBUc3NKS2ZGalYxNXYrT29wSkZqOWpN?=
- =?utf-8?B?WDYxbXk5Um4vRC9VT29EVUZRTi8xUWJqSEQ4VmNBYUE3RjhDNjdsSjdBWEhP?=
- =?utf-8?B?NFNoUDBJbFlhQUdmZG9pMDVsZUtubzJ4L1BHM2VlZlh4bWJGczh1S252Q1d1?=
- =?utf-8?B?Q2o2OVlYNDlJWkhkRW5NMHViSXVDYW82VTRsaTJGc1loclBxSnlocEJ3VW5j?=
- =?utf-8?B?OXdqN08xZFFOK2tIb0pYUzRuZmZYTU1ld0UrUmF5MFBvRndWaXJZWGVuYnJu?=
- =?utf-8?B?cG1sTUt4eEVXazVhM2V4N2ZzcDJCQzVadTFnQ0xaMkswbVZaNEdlMTE3QjhH?=
- =?utf-8?B?L3pIY3FXWEpCMGo4aUtnYjd2ZFJ6VWNYUm92QURsNStqV3dXUGkwcTZxS292?=
- =?utf-8?B?Q2VYSDNSUnQvcFlzT0RxYUFzaVByN1JPR1gwU081bkZBSkpnY0x6Y25PMzFs?=
- =?utf-8?B?NXhwUnFqdXBYS1M3aEdCdTBtVkxRd3pWcHNkSHA4cVRLbUJEb1l4K1F4SmQ0?=
- =?utf-8?B?L0NhblJXUFdJUGgwb1oxaldkWDRpK3JVUzQ0TURTK1M2OVJFaGJ4Tkx2T2xG?=
- =?utf-8?B?N1VQd1RJM29ZME9yUzR3bGhBRnFLeERQQzRHS0RhWG5SUWM4S3BZWmNiRFB6?=
- =?utf-8?B?UmtuNnZhRXd3YTFBdmJPcjhHdU01SFNMQWUveFNwcE1VZHVaSmtCZjRDNWFx?=
- =?utf-8?B?YTVMMGgyYTJSdXJmQVhhV2IzSFJjTEoyTnlTV3EvVGp6T0EzQ3lVTEhPVTV1?=
- =?utf-8?B?VzFvQ2hIaEFMdVJvZGpVelNTZjBmeFVrRCtDSW9JMlduVEU5QWZTbmdBTWxP?=
- =?utf-8?B?OGpaVVRzYWd2dS8rNmtFRSsydzlWdHVMNmd2RW1KaVVrUWlDU0tqSXd6cFF5?=
- =?utf-8?B?U0hySlQ4Tmh1VlE0bmttM0hLMUhmaDhwK0x4SzdjNm9HN1lxbEZjaEZZTE9w?=
- =?utf-8?B?Szl3NC9QRENPQkVnVFZCWVhJcS92cGVFRmMyQzNqZnlUZUdqMXJIV1Bxc1hs?=
- =?utf-8?B?UW4raWRXZVpHaENzcURjd3JoRXdJVUwrUkVrOTZBaHkwYWlSSkZRSzRmNlAv?=
- =?utf-8?B?RzJjNXRwTEt1RXB3a2ZGUnp0MkFCNGtmNHFGT1ZIK243M2M0eXRmZ2JVSERk?=
- =?utf-8?B?cjdrU0ZyYkViM0ZkY2VTdEhKOWVrejk3WWh4MDhuaVR1WUsxQUUzRENSNnov?=
- =?utf-8?B?L2pscXVoNVhBRlArU2hCY3ZXZHFSQVE1dWYvMlAzR2FGTG9vVGZ1RzNPOVpz?=
- =?utf-8?B?aGFmbE1OaWFteHlDa2FhQnI3dHJaWFBHNmNlQ3RqOFZqMmpJa0dSZz09?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0553C1992
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 11:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775128000; cv=none; b=IABmhK2N/k5VLxGRektVu607/91Gy8fpqy9Egl8cYTBOJjJdtbani5219qecuqxnW9KhXJneK1rUofHc5mmP4bwcrJuLBnIxS/1bwRRZidIGfslga80cF7Ws5veGxwjnNP0NuoEC9DR/H6FflJooicyQveBX4ZSUWneWR0HwGes=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775128000; c=relaxed/simple;
+	bh=Yd/6Pc5loOp6q2Ae4swq/Wc1w/fliWxGIpt5pwIb6ZE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R1MQHvSoV2ITtlafbtYvkxBiNtvbNEKYpUrsKapv7Qj/N5lCffCOtTpojReL8XsrYHbStak9RVccrU80zgMVf+7Uvgv9N+k/8+dpWJ4jqVYR8cP5H85Jc+xtUWYl3V+VAw4IdUVwqCO7rtoA/UFFE+1A5JuWloQoxr65WXBuG6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1w8Fru-0004ZY-BZ; Thu, 02 Apr 2026 13:05:46 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1w8Frs-003MQs-2L;
+	Thu, 02 Apr 2026 13:05:44 +0200
+Received: from pengutronix.de (p4ffb2dc6.dip0.t-ipconnect.de [79.251.45.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 57352514511;
+	Thu, 02 Apr 2026 11:05:44 +0000 (UTC)
+Date: Thu, 2 Apr 2026 13:05:43 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: a0282524688@gmail.com
+Cc: tmyu0@nuvoton.com, linusw@kernel.org, brgl@kernel.org, 
+	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org, mailhol@kernel.org, 
+	alexandre.belloni@bootlin.com, wim@linux-watchdog.org, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
+Subject: Re: [PATCH v1 2/2] mfd: Add Host Interface (HIF) support for Nuvoton
+ NCT6694
+Message-ID: <20260402-warping-chameleon-of-prowess-9df780-mkl@pengutronix.de>
+X-AI: stop_reason: "refusal"
+References: <20260402051442.1426672-1-a0282524688@gmail.com>
+ <20260402051442.1426672-3-a0282524688@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 488d7b34-0c58-4a96-c97c-08de90a66b7e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Apr 2026 10:55:57.4999
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TyjR68RwI4T7QksPydfbLk095gbQ0f6QDuar8Za9fMGabgUCAdJYg99GmAF4CskJmwb2jszHtvABEnjzdwGGeKozXf3xZnX+H8+D1aFngT0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0P189MB3357
-X-Spamd-Result: default: False [1.44 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MIME_BASE64_TEXT_BOGUS(1.00)[];
-	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="eduyjgnvxkh2zrsd"
+Content-Disposition: inline
+In-Reply-To: <20260402051442.1426672-3-a0282524688@gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spamd-Result: default: False [-1.06 / 15.00];
+	SIGNED_PGP(-2.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[est.tech];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274467-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	DMARC_NA(0.00)[pengutronix.de];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-274469-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	NEURAL_SPAM(0.00)[0.273];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[est.tech:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[est.tech:dkim,est.tech:email,1seal.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B46AD388006
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,pengutronix.de:mid,pengutronix.de:url]
+X-Rspamd-Queue-Id: EFD583881DA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-PlN1YmplY3Q6IFtQQVRDSCBuZXQgdjNdIHRpcGM6IGZpeCBiY19hY2tlcnMgdW5kZXJmbG93IG9u
-IGR1cGxpY2F0ZQ0KPkdSUF9BQ0tfTVNHDQo+DQo+VGhlIEdSUF9BQ0tfTVNHIGhhbmRsZXIgaW4g
-dGlwY19ncm91cF9wcm90b19yY3YoKSBjdXJyZW50bHkgZGVjcmVtZW50cw0KPmJjX2Fja2VycyBv
-biBldmVyeSBpbmJvdW5kIGdyb3VwIEFDSywgZXZlbiB3aGVuIHRoZSBzYW1lIG1lbWJlciBoYXMN
-Cj5hbHJlYWR5IGFja25vd2xlZGdlZCB0aGUgY3VycmVudCBicm9hZGNhc3Qgcm91bmQuDQo+DQo+
-QmVjYXVzZSBiY19hY2tlcnMgaXMgYSB1MTYsIGEgZHVwbGljYXRlIEFDSyByZWNlaXZlZCBhZnRl
-ciB0aGUgbGFzdCBsZWdpdGltYXRlDQo+QUNLIHdyYXBzIHRoZSBjb3VudGVyIHRvIDY1NTM1LiBP
-bmNlIHdyYXBwZWQsDQo+dGlwY19ncm91cF9iY19jb25nKCkga2VlcHMgcmVwb3J0aW5nIGNvbmdl
-c3Rpb24gYW5kIGxhdGVyIGdyb3VwIGJyb2FkY2FzdHMNCj5vbiB0aGUgYWZmZWN0ZWQgc29ja2V0
-IHN0YXkgYmxvY2tlZCB1bnRpbCB0aGUgZ3JvdXAgaXMgcmVjcmVhdGVkLg0KPg0KPkZpeCB0aGlz
-IGJ5IGlnbm9yaW5nIGR1cGxpY2F0ZSBvciBzdGFsZSBBQ0tzIGJlZm9yZSB0b3VjaGluZyBiY19h
-Y2tlZCBvcg0KPmJjX2Fja2Vycy4gVGhpcyBtYWtlcyByZXBlYXRlZCBHUlBfQUNLX01TRyBoYW5k
-bGluZyBpZGVtcG90ZW50IGFuZA0KPnByZXZlbnRzIHRoZSB1bmRlcmZsb3cgcGF0aC4NCj4NCj5G
-aXhlczogMmY0ODc3MTJiODkzICgidGlwYzogZ3VhcmFudGVlIHRoYXQgZ3JvdXAgYnJvYWRjYXN0
-IGRvZXNuJ3QgYnlwYXNzDQo+Z3JvdXAgdW5pY2FzdCIpDQo+Q2M6IHN0YWJsZUB2Z2VyLmtlcm5l
-bC5vcmcNCj5TaWduZWQtb2ZmLWJ5OiBPbGVoIEtvbmtvIDxzZWN1cml0eUAxc2VhbC5vcmc+DQo+
-LS0tDQo+djM6DQo+LSBjb3JyZWN0IHRoZSBGaXhlcyB0YWcgdG8gdGhlIGNvbW1pdCB0aGF0IGlu
-dHJvZHVjZWQgR1JQX0FDS19NU0cgYW5kDQo+YmNfYWNrZXJzDQo+DQo+djI6DQo+LSBtYWtlIGR1
-cGxpY2F0ZSBvciBzdGFsZSBHUlBfQUNLX01TRyBhIGZ1bGwgbm8tb3AgdmlhIGVhcmx5IHJldHVy
-bg0KPi0gcGxhY2UgYWNrZWQgaW4gcmV2ZXJzZSB4bWFzIHRyZWUgc3R5bGUNCj4NCj4gbmV0L3Rp
-cGMvZ3JvdXAuYyB8IDYgKysrKystDQo+IDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKyks
-IDEgZGVsZXRpb24oLSkNCj4NCj5kaWZmIC0tZ2l0IGEvbmV0L3RpcGMvZ3JvdXAuYyBiL25ldC90
-aXBjL2dyb3VwLmMgaW5kZXgNCj5lMGU2MjI3YjQzMy4uMTRlNjczMjYyNGUgMTAwNjQ0DQo+LS0t
-IGEvbmV0L3RpcGMvZ3JvdXAuYw0KPisrKyBiL25ldC90aXBjL2dyb3VwLmMNCj5AQCAtNzQ2LDYg
-Kzc0Niw3IEBAIHZvaWQgdGlwY19ncm91cF9wcm90b19yY3Yoc3RydWN0IHRpcGNfZ3JvdXAgKmdy
-cCwgYm9vbA0KPip1c3Jfd2FrZXVwLA0KPiAJdTMyIHBvcnQgPSBtc2dfb3JpZ3BvcnQoaGRyKTsN
-Cj4gCXN0cnVjdCB0aXBjX21lbWJlciAqbSwgKnBtOw0KPiAJdTE2IHJlbWl0dGVkLCBpbl9mbGln
-aHQ7DQo+Kwl1MTYgYWNrZWQ7DQo+DQo+IAlpZiAoIWdycCkNCj4gCQlyZXR1cm47DQo+QEAgLTc5
-OCw3ICs3OTksMTAgQEAgdm9pZCB0aXBjX2dyb3VwX3Byb3RvX3JjdihzdHJ1Y3QgdGlwY19ncm91
-cCAqZ3JwLA0KPmJvb2wgKnVzcl93YWtldXAsDQo+IAljYXNlIEdSUF9BQ0tfTVNHOg0KPiAJCWlm
-ICghbSkNCj4gCQkJcmV0dXJuOw0KPi0JCW0tPmJjX2Fja2VkID0gbXNnX2dycF9iY19hY2tlZCho
-ZHIpOw0KPisJCWFja2VkID0gbXNnX2dycF9iY19hY2tlZChoZHIpOw0KPisJCWlmIChsZXNzX2Vx
-KGFja2VkLCBtLT5iY19hY2tlZCkpDQo+KwkJCXJldHVybjsNCj4rCQltLT5iY19hY2tlZCA9IGFj
-a2VkOw0KPiAJCWlmICgtLWdycC0+YmNfYWNrZXJzKQ0KPiAJCQlyZXR1cm47DQo+IAkJbGlzdF9k
-ZWxfaW5pdCgmbS0+c21hbGxfd2luKTsNCj4tLQ0KPjIuNTAuMA0KUmV2aWV3ZWQtYnk6IFR1bmcg
-Tmd1eWVuIDx0dW5nLnF1YW5nLm5ndXllbkBlc3QudGVjaD4NCg==
+
+--eduyjgnvxkh2zrsd
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 2/2] mfd: Add Host Interface (HIF) support for Nuvoton
+ NCT6694
+MIME-Version: 1.0
+
+On 02.04.2026 13:14:42, a0282524688@gmail.com wrote:
+> From: Ming Yu <a0282524688@gmail.com>
+>
+> The Nuvoton NCT6694 also provides a Host Interface (HIF) via eSPI
+> to the host to access its features.
+>
+> Sub-devices can use the common functions nct6694_read_msg() and
+> nct6694_write_msg() to issue a command. They can also request
+> interrupts that will be called when the HIF device triggers a
+> shared memory interrupt.
+>
+> To support multiple transports, the driver configuration is
+> updated to allow selecting between the USB and HIF interfaces.
+>
+> Signed-off-by: Ming Yu <a0282524688@gmail.com>
+> ---
+>  MAINTAINERS                         |   1 +
+>  drivers/gpio/gpio-nct6694.c         |   7 -
+>  drivers/hwmon/nct6694-hwmon.c       |  21 -
+>  drivers/i2c/busses/i2c-nct6694.c    |   7 -
+>  drivers/mfd/Kconfig                 |  47 +-
+>  drivers/mfd/Makefile                |   3 +-
+>  drivers/mfd/nct6694-hif.c           | 649 ++++++++++++++++++++++++++++
+>  drivers/mfd/nct6694.c               |  97 +++--
+>  drivers/net/can/usb/nct6694_canfd.c |   6 -
+>  drivers/rtc/rtc-nct6694.c           |   7 -
+>  drivers/watchdog/nct6694_wdt.c      |   7 -
+>  include/linux/mfd/nct6694.h         |  51 ++-
+>  12 files changed, 787 insertions(+), 116 deletions(-)
+>  create mode 100644 drivers/mfd/nct6694-hif.c
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index c3fe46d7c4bc..7b6241faa6df 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -18899,6 +18899,7 @@ S:	Supported
+>  F:	drivers/gpio/gpio-nct6694.c
+>  F:	drivers/hwmon/nct6694-hwmon.c
+>  F:	drivers/i2c/busses/i2c-nct6694.c
+> +F:	drivers/mfd/nct6694-hif.c
+>  F:	drivers/mfd/nct6694.c
+>  F:	drivers/net/can/usb/nct6694_canfd.c
+>  F:	drivers/rtc/rtc-nct6694.c
+> diff --git a/drivers/gpio/gpio-nct6694.c b/drivers/gpio/gpio-nct6694.c
+> index 3703a61209e6..a279510ece89 100644
+> --- a/drivers/gpio/gpio-nct6694.c
+> +++ b/drivers/gpio/gpio-nct6694.c
+> @@ -12,13 +12,6 @@
+>  #include <linux/module.h>
+>  #include <linux/platform_device.h>
+>
+> -/*
+> - * USB command module type for NCT6694 GPIO controller.
+> - * This defines the module type used for communication with the NCT6694
+> - * GPIO controller over the USB interface.
+> - */
+> -#define NCT6694_GPIO_MOD	0xFF
+> -
+>  #define NCT6694_GPIO_VER	0x90
+>  #define NCT6694_GPIO_VALID	0x110
+>  #define NCT6694_GPI_DATA	0x120
+> diff --git a/drivers/hwmon/nct6694-hwmon.c b/drivers/hwmon/nct6694-hwmon.c
+> index 6dcf22ca5018..581451875f2c 100644
+> --- a/drivers/hwmon/nct6694-hwmon.c
+> +++ b/drivers/hwmon/nct6694-hwmon.c
+> @@ -15,13 +15,6 @@
+>  #include <linux/platform_device.h>
+>  #include <linux/slab.h>
+>
+> -/*
+> - * USB command module type for NCT6694 report channel
+> - * This defines the module type used for communication with the NCT6694
+> - * report channel over the USB interface.
+> - */
+> -#define NCT6694_RPT_MOD			0xFF
+> -
+>  /* Report channel */
+>  /*
+>   * The report channel is used to report the status of the hardware monit=
+or
+> @@ -38,13 +31,6 @@
+>  #define NCT6694_TIN_STS(x)		(0x6A + (x))
+>  #define NCT6694_FIN_STS(x)		(0x6E + (x))
+>
+> -/*
+> - * USB command module type for NCT6694 HWMON controller.
+> - * This defines the module type used for communication with the NCT6694
+> - * HWMON controller over the USB interface.
+> - */
+> -#define NCT6694_HWMON_MOD		0x00
+> -
+>  /* Command 00h - Hardware Monitor Control */
+>  #define NCT6694_HWMON_CONTROL		0x00
+>  #define NCT6694_HWMON_CONTROL_SEL	0x00
+> @@ -53,13 +39,6 @@
+>  #define NCT6694_HWMON_ALARM		0x02
+>  #define NCT6694_HWMON_ALARM_SEL		0x00
+>
+> -/*
+> - * USB command module type for NCT6694 PWM controller.
+> - * This defines the module type used for communication with the NCT6694
+> - * PWM controller over the USB interface.
+> - */
+> -#define NCT6694_PWM_MOD			0x01
+> -
+>  /* PWM Command - Manual Control */
+>  #define NCT6694_PWM_CONTROL		0x01
+>  #define NCT6694_PWM_CONTROL_SEL		0x00
+> diff --git a/drivers/i2c/busses/i2c-nct6694.c b/drivers/i2c/busses/i2c-nc=
+t6694.c
+> index 7d8ad997f6d2..7ee209a04d16 100644
+> --- a/drivers/i2c/busses/i2c-nct6694.c
+> +++ b/drivers/i2c/busses/i2c-nct6694.c
+> @@ -11,13 +11,6 @@
+>  #include <linux/module.h>
+>  #include <linux/platform_device.h>
+>
+> -/*
+> - * USB command module type for NCT6694 I2C controller.
+> - * This defines the module type used for communication with the NCT6694
+> - * I2C controller over the USB interface.
+> - */
+> -#define NCT6694_I2C_MOD			0x03
+> -
+>  /* Command 00h - I2C Deliver */
+>  #define NCT6694_I2C_DELIVER		0x00
+>  #define NCT6694_I2C_DELIVER_SEL		0x00
+> diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
+> index 7192c9d1d268..8a715ec2f79f 100644
+> --- a/drivers/mfd/Kconfig
+> +++ b/drivers/mfd/Kconfig
+> @@ -1164,19 +1164,46 @@ config MFD_MENF21BMC
+>  	  will be called menf21bmc.
+>
+>  config MFD_NCT6694
+> -	tristate "Nuvoton NCT6694 support"
+> +	tristate
+>  	select MFD_CORE
+> +	help
+> +	  Core MFD support for the Nuvoton NCT6694 peripheral expander.
+> +	  This provides the common APIs and shared structures used by all
+> +	  interfaces (USB, HIF) to access the NCT6694 hardware features
+> +	  such as GPIO, I2C, CAN-FD, Watchdog, ADC, PWM, and RTC.
+> +
+> +	  It is selected automatically by the transport interface drivers.
+> +
+> +config MFD_NCT6694_HIF
+> +	tristate "Nuvoton NCT6694 HIF (eSPI) interface support"
+> +	depends on HAS_IOPORT && ACPI
+> +	select MFD_NCT6694
+> +	select REGMAP_MMIO
+> +	help
+> +	  This enables support for the Nuvoton NCT6694 peripheral expander
+> +	  connected via the Host Interface (HIF) using eSPI transport.
+> +
+> +	  The transport driver uses Super-I/O mapping and shared memory to
+> +	  communicate with the NCT6694 firmware. Enable this option if you
+> +	  are using the NCT6694 over an eSPI interface on an ACPI platform.
+> +
+> +	  To compile this driver as a module, choose M here: the module
+> +	  will be called nct6694-hif.
+> +
+> +config MFD_NCT6694_USB
+> +	tristate "Nuvoton NCT6694 USB interface support"
+> +	select MFD_NCT6694
+>  	depends on USB
+>  	help
+> -	  This enables support for the Nuvoton USB device NCT6694, which shares
+> -	  peripherals.
+> -	  The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
+> -	  6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
+> -	  PWM, and RTC.
+> -	  This driver provides core APIs to access the NCT6694 hardware
+> -	  monitoring and control features.
+> -	  Additional drivers must be enabled to utilize the specific
+> -	  functionalities of the device.
+> +	  This enables support for the Nuvoton NCT6694 peripheral expander
+> +	  connected via the USB interface.
+> +
+> +	  The transport driver uses USB bulk and interrupt transfers to
+> +	  communicate with the NCT6694 firmware. Enable this option if you
+> +	  are using the NCT6694 via a USB connection.
+> +
+> +	  To compile this driver as a module, choose M here: the module
+> +	  will be called nct6694.
+>
+>  config MFD_OCELOT
+>  	tristate "Microsemi Ocelot External Control Support"
+> diff --git a/drivers/mfd/Makefile b/drivers/mfd/Makefile
+> index e75e8045c28a..4cee9b74978c 100644
+> --- a/drivers/mfd/Makefile
+> +++ b/drivers/mfd/Makefile
+> @@ -124,7 +124,8 @@ obj-$(CONFIG_MFD_MC13XXX_I2C)	+=3D mc13xxx-i2c.o
+>
+>  obj-$(CONFIG_MFD_PF1550)	+=3D pf1550.o
+>
+> -obj-$(CONFIG_MFD_NCT6694)	+=3D nct6694.o
+> +obj-$(CONFIG_MFD_NCT6694_HIF)	+=3D nct6694-hif.o
+> +obj-$(CONFIG_MFD_NCT6694_USB)	+=3D nct6694.o
+>
+>  obj-$(CONFIG_MFD_CORE)		+=3D mfd-core.o
+>
+> diff --git a/drivers/mfd/nct6694-hif.c b/drivers/mfd/nct6694-hif.c
+> new file mode 100644
+> index 000000000000..a5953c951eb5
+> --- /dev/null
+> +++ b/drivers/mfd/nct6694-hif.c
+> @@ -0,0 +1,649 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2026 Nuvoton Technology Corp.
+> + *
+> + * Nuvoton NCT6694 host-interface (eSPI) transport driver.
+> + */
+> +
+> +#include <linux/acpi.h>
+> +#include <linux/bits.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/io.h>
+> +#include <linux/iopoll.h>
+> +#include <linux/irq.h>
+> +#include <linux/irqdomain.h>
+> +#include <linux/kernel.h>
+> +#include <linux/mfd/core.h>
+> +#include <linux/mfd/nct6694.h>
+> +#include <linux/module.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/regmap.h>
+> +#include <linux/unaligned.h>
+> +
+> +#define DRVNAME "nct6694-hif"
+> +
+> +#define NCT6694_POLL_INTERVAL_US	10
+> +#define NCT6694_POLL_TIMEOUT_US		10000
+> +
+> +/*
+> + * Super-I/O registers
+> + */
+> +#define SIO_REG_LDSEL		0x07	/* Logical device select */
+> +#define SIO_REG_DEVID		0x20	/* Device ID (2 bytes) */
+> +#define SIO_REG_LD_SHM		0x0F	/* Logical device shared memory control */
+> +
+> +#define SIO_REG_SHM_ENABLE	0x30	/* Enable shared memory */
+> +#define SIO_REG_SHM_BASE_ADDR	0x60	/* Shared memory base address (2 byte=
+s) */
+> +#define SIO_REG_SHM_IRQ_NR	0x70	/* Shared memory interrupt number */
+> +
+> +#define SIO_REG_UNLOCK_KEY	0x87	/* Key to enable Super-I/O */
+> +#define SIO_REG_LOCK_KEY	0xAA	/* Key to disable Super-I/O */
+> +
+> +#define SIO_NCT6694B_ID		0xD029
+> +#define SIO_NCT6694D_ID		0x5832
+> +
+> +/*
+> + * Super-I/O Shared Memory Logical Device registers
+> + */
+> +#define NCT6694_SHM_COFS_STS			0x2E
+> +#define NCT6694_SHM_COFS_STS_COFS4W		BIT(7)
+> +
+> +#define NCT6694_SHM_COFS_CTL2			0x3B
+> +#define NCT6694_SHM_COFS_CTL2_COFS4W_IE		BIT(3)
+> +
+> +#define NCT6694_SHM_INTR_STATUS			0x9C	/* Interrupt status register (4 b=
+ytes) */
+> +
+> +enum nct6694_chips {
+> +	NCT6694B =3D 0,
+> +	NCT6694D,
+> +};
+> +
+> +enum nct6694_module_id {
+> +	NCT6694_GPIO0 =3D 0,
+> +	NCT6694_GPIO1,
+> +	NCT6694_GPIO2,
+> +	NCT6694_GPIO3,
+> +	NCT6694_GPIO4,
+> +	NCT6694_GPIO5,
+> +	NCT6694_GPIO6,
+> +	NCT6694_GPIO7,
+> +	NCT6694_GPIO8,
+> +	NCT6694_GPIO9,
+> +	NCT6694_GPIOA,
+> +	NCT6694_GPIOB,
+> +	NCT6694_GPIOC,
+> +	NCT6694_GPIOD,
+> +	NCT6694_GPIOE,
+> +	NCT6694_GPIOF,
+> +	NCT6694_I2C0,
+> +	NCT6694_I2C1,
+> +	NCT6694_I2C2,
+> +	NCT6694_I2C3,
+> +	NCT6694_I2C4,
+> +	NCT6694_I2C5,
+> +	NCT6694_CAN0,
+> +	NCT6694_CAN1,
+> +};
+> +
+> +struct __packed nct6694_msg {
+> +	struct nct6694_cmd_header cmd_header;
+> +	struct nct6694_response_header response_header;
+> +	unsigned char *data;
+> +};
+> +
+> +struct nct6694_sio_data {
+> +	enum nct6694_chips chip;
+> +	int sioreg;	/* Super-I/O index port */
+> +
+> +	/* Super-I/O access functions */
+> +	int (*sio_enter)(struct nct6694_sio_data *sio_data);
+> +	void (*sio_exit)(struct nct6694_sio_data *sio_data);
+> +	void (*sio_select)(struct nct6694_sio_data *sio_data, int ld);
+> +	int (*sio_inb)(struct nct6694_sio_data *sio_data, int reg);
+> +	int (*sio_inw)(struct nct6694_sio_data *sio_data, int reg);
+> +	void (*sio_outb)(struct nct6694_sio_data *sio_data, int reg, int val);
+
+The signatures of the function look a bit strange. I expect functions
+reading/writing bytes use u8 not int, register offsets should probably
+be an unsigned int.
+
+Why do you have pointers to the access functions? Why not use them
+directly?
+
+Marc
+
+--
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--eduyjgnvxkh2zrsd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSl+MghEFFAdY3pYJLMOmT6rpmt0gUCac5NhQAKCRDMOmT6rpmt
+0iiOAQDPnaCTCz7cHPZcUdH6WW5DKZHAXFfgb03FMRkx/xPipgD/X+mA6FYqehlp
+FMnxD26sUBwZidoKAtEpXxguwwLFGgo=
+=+i7v
+-----END PGP SIGNATURE-----
+
+--eduyjgnvxkh2zrsd--
 
