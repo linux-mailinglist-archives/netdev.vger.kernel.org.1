@@ -1,466 +1,322 @@
-Return-Path: <netdev+bounces-274469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274527-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ONIMFmFOzmmjmgYAu9opvQ
-	(envelope-from <netdev+bounces-274469-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:09:21 +0200
+	id kGUzNhJnzmlRngYAu9opvQ
+	(envelope-from <netdev+bounces-274527-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 14:54:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFD583881DA
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:09:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39F6238944D
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 14:54:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5034B309E0D9
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 11:07:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9B716302F0F6
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 12:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB1BB3C1981;
-	Thu,  2 Apr 2026 11:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E573E2755;
+	Thu,  2 Apr 2026 12:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bbQ9cFSS"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f66.google.com (mail-ua1-f66.google.com [209.85.222.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0553C1992
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 11:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09B23B9DAC
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 12:48:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775128000; cv=none; b=IABmhK2N/k5VLxGRektVu607/91Gy8fpqy9Egl8cYTBOJjJdtbani5219qecuqxnW9KhXJneK1rUofHc5mmP4bwcrJuLBnIxS/1bwRRZidIGfslga80cF7Ws5veGxwjnNP0NuoEC9DR/H6FflJooicyQveBX4ZSUWneWR0HwGes=
+	t=1775134139; cv=none; b=G9QJbcX1F3fxT9eqv068SZ878gIfrM+0IRw2u0Pe0DbYq+QxZg6H5E5sv1fk9dtcik2IuK01uAMtpK3eCyFsGJZeMYaGVSrAyyKhgJuyNMCxmYoqz1XRFm+6J0v76mWrJs+o8a1Gza1msLOPeDmtrHyCFZi7mChOYr9lAny+MvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775128000; c=relaxed/simple;
-	bh=Yd/6Pc5loOp6q2Ae4swq/Wc1w/fliWxGIpt5pwIb6ZE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R1MQHvSoV2ITtlafbtYvkxBiNtvbNEKYpUrsKapv7Qj/N5lCffCOtTpojReL8XsrYHbStak9RVccrU80zgMVf+7Uvgv9N+k/8+dpWJ4jqVYR8cP5H85Jc+xtUWYl3V+VAw4IdUVwqCO7rtoA/UFFE+1A5JuWloQoxr65WXBuG6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1w8Fru-0004ZY-BZ; Thu, 02 Apr 2026 13:05:46 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1w8Frs-003MQs-2L;
-	Thu, 02 Apr 2026 13:05:44 +0200
-Received: from pengutronix.de (p4ffb2dc6.dip0.t-ipconnect.de [79.251.45.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 57352514511;
-	Thu, 02 Apr 2026 11:05:44 +0000 (UTC)
-Date: Thu, 2 Apr 2026 13:05:43 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: a0282524688@gmail.com
-Cc: tmyu0@nuvoton.com, linusw@kernel.org, brgl@kernel.org, 
-	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org, mailhol@kernel.org, 
-	alexandre.belloni@bootlin.com, wim@linux-watchdog.org, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH v1 2/2] mfd: Add Host Interface (HIF) support for Nuvoton
- NCT6694
-Message-ID: <20260402-warping-chameleon-of-prowess-9df780-mkl@pengutronix.de>
-X-AI: stop_reason: "refusal"
-References: <20260402051442.1426672-1-a0282524688@gmail.com>
- <20260402051442.1426672-3-a0282524688@gmail.com>
+	s=arc-20240116; t=1775134139; c=relaxed/simple;
+	bh=ik7uUTib9+LCz0UAAdU8wVthAJCsJQ9Tt8iu7WwCWkA=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=fnv/6FHMH/FC3ajEWpDDPvsgzeXgu7/gnWnXDCiaxLOxw/wevkfFbNvi0NPMnPhkwcG7hm7qvlCozL9AwSYmEFmI9mUO9loPg+tSy3HQcq1NQjeQp17hjIRrd6wpM0hNOQFjwYe9rlKSPDXE4A8Zmk8NinFoByho3QqMVdYPrM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bbQ9cFSS; arc=none smtp.client-ip=209.85.222.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f66.google.com with SMTP id a1e0cc1a2514c-953ac1602f8so1347982241.1
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 05:48:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775134131; x=1775738931; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:subject:cc:to:from
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=f10hXx8Ya/o2nsVJSMU9jz32XKIcCmbLZ6lBcgyEWlM=;
+        b=bbQ9cFSSls6GyfWBbnjfpg4bx3I6UDLFklF/yyHHImy2dNQIf0h4TfdnUgAvGz9Ul0
+         CA2P02iji+o2VwsmYNg+8K6+/MBTCMDgptTGmGRRPtZ1keY9J47qcInI7AlAK2UnMXkc
+         haqpgr2a3hQUN4uYDBRsrARPs+s8V6DOsJVFwQjljAbqTAnNrvr4XQ7OoSJUH8o6yYEg
+         AxN2GLms2fofVgaW5yAzulG3pZrt0RPHHPsFqkKM89hE8P8739ct/F4rqqhDXevHdEQw
+         XFfCtz48TXk+oq9YvKkKr7AkbTo4vvXll939cZeqD79hwlD+Zoikj6cHrVvyg+E1Jf0g
+         Js5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775134131; x=1775738931;
+        h=content-transfer-encoding:mime-version:date:subject:cc:to:from
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f10hXx8Ya/o2nsVJSMU9jz32XKIcCmbLZ6lBcgyEWlM=;
+        b=OLUsZl410iQ7ddBiyTokRwA9vggayHwoBqGSumUi744JzAPOmVrcrABr/I0/tHtZ6q
+         Yc5LlCwhghhBSlaUxzlc3M96Kv9OAjI/M2KbNe4sQPihcBT86c5tGmT5coyizN0lsRh2
+         KYvr9baLB8rGXMRYDI+Re+PCidWTbQzwGM68HQFrn7Uwcfk2oScANY6voJ6ygupAb12L
+         lcNYsTkTD1uwSf1HpMgk4qlNewAOqTcwcdnbX+IWjKEICteEpoxHZTCcc5qgF8rYNu3C
+         /1BlISYoKPU8a8RNiyUw7RWrkLjq6x2tDf3L4uS7h4UrPduTKKbEAoducVymWl4ZyhzB
+         COnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW9JVZpNy+Sl5LzVcEX1KDRpOhn5AFJIFfOYex3taBAoK4LVP6dsHwxAuaEQ91RfOf3STHZkg4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzDJa3ZiB+h0pfatTn9srUF/zXshtSRT7rzNIQPBCWvEW18l4i
+	2IL3ZsfURw8rdp7HNIgqbsdkqgqXNne3UZhLA9XC129iSqRTW09H28a+0x2gOmYGqG3UNkHW
+X-Gm-Gg: ATEYQzwO0YPcDFIjDRIQ3s2TP7etpvVCkHpTK4qJkyfIGsi5D7SPE9/UL+ln+TXl+Ks
+	gAYn+DYZ808apV81QVScXwJSOt1BV5q6jP0cXpkgxkC1yAXDviO4+Bvpvf7weAtuxTfRdPUvAfx
+	TkrRxbE+PCJd+3+ov05j31eWmTeELi5cal4Yf7WI0kEuAwOq8HvZf4UwE+xQdIcMqek/I7Pz1bJ
+	vuAehFdK8yrFjYxheLPNccfbi6Dx1Plx+CVc4Io8iWTEU3h7CePtGJf0dSOdn31z+ne4xwnUyEp
+	7UXQW14FaeqH/09WJS5Z8VBR+eJ2JwhLB0D4LAXdd1IMLgw0Fq78t3PydN102FRq072IrF4N3/+
+	9FDrMIx2zVj0ghe7J5Npa/LEevk020N7F/kBMZV2NGCMbYl2EP5YOBIYj2EFPcMtNAYkHbvt8nu
+	7VsbO0ZKi9e7PHKdXgXSk=
+X-Received: by 2002:a17:90b:1f85:b0:359:8957:7285 with SMTP id 98e67ed59e1d1-35dd67257bbmr1602746a91.3.1775128030888;
+        Thu, 02 Apr 2026 04:07:10 -0700 (PDT)
+Received: from localhost ([137.132.22.254])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35dd35364edsm2447388a91.0.2026.04.02.04.07.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2026 04:07:10 -0700 (PDT)
+Message-ID: <69ce4dde.170a0220.39732d.82c2@mx.google.com>
+From: ven0mfuzzer <ven0mkernelfuzzer@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+        Tom Talpey <tom@talpey.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Kuniyuki Iwashima <kuniyu@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Steve French <smfrench@gmail.com>,
+        Neal Cardwell <ncardwell@google.com>,
+        Simon Horman <horms@kernel.org>,
+        Willem de Bruijn <willemb@google.com>,
+        David Ahern <dsahern@kernel.org>
+Cc: linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [BUG] Linux Kernel ksmbd Multiple Memory Leaks in Session Handling
+Date: Thu, 02 Apr 2026 19:07:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="eduyjgnvxkh2zrsd"
-Content-Disposition: inline
-In-Reply-To: <20260402051442.1426672-3-a0282524688@gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spamd-Result: default: False [-1.06 / 15.00];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Mailer: KernelStackFuzz send_email.sh
+X-Spamd-Result: default: False [-2.15 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FREEMAIL_TO(0.00)[gmail.com];
-	TAGGED_FROM(0.00)[bounces-274469-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	NEURAL_SPAM(0.00)[0.273];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FREEMAIL_TO(0.00)[kernel.org,talpey.com,chromium.org,google.com,davemloft.net,redhat.com,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-274527-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mkl@pengutronix.de,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
+	FROM_NEQ_ENVFROM(0.00)[ven0mkernelfuzzer@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.836];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,pengutronix.de:mid,pengutronix.de:url]
-X-Rspamd-Queue-Id: EFD583881DA
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mx.google.com:mid]
+X-Rspamd-Queue-Id: 39F6238944D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Linux Kernel ksmbd Multiple Memory Leaks in Session Handling
 
---eduyjgnvxkh2zrsd
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v1 2/2] mfd: Add Host Interface (HIF) support for Nuvoton
- NCT6694
-MIME-Version: 1.0
+  1. Vulnerability Title
 
-On 02.04.2026 13:14:42, a0282524688@gmail.com wrote:
-> From: Ming Yu <a0282524688@gmail.com>
->
-> The Nuvoton NCT6694 also provides a Host Interface (HIF) via eSPI
-> to the host to access its features.
->
-> Sub-devices can use the common functions nct6694_read_msg() and
-> nct6694_write_msg() to issue a command. They can also request
-> interrupts that will be called when the HIF device triggers a
-> shared memory interrupt.
->
-> To support multiple transports, the driver configuration is
-> updated to allow selecting between the USB and HIF interfaces.
->
-> Signed-off-by: Ming Yu <a0282524688@gmail.com>
-> ---
->  MAINTAINERS                         |   1 +
->  drivers/gpio/gpio-nct6694.c         |   7 -
->  drivers/hwmon/nct6694-hwmon.c       |  21 -
->  drivers/i2c/busses/i2c-nct6694.c    |   7 -
->  drivers/mfd/Kconfig                 |  47 +-
->  drivers/mfd/Makefile                |   3 +-
->  drivers/mfd/nct6694-hif.c           | 649 ++++++++++++++++++++++++++++
->  drivers/mfd/nct6694.c               |  97 +++--
->  drivers/net/can/usb/nct6694_canfd.c |   6 -
->  drivers/rtc/rtc-nct6694.c           |   7 -
->  drivers/watchdog/nct6694_wdt.c      |   7 -
->  include/linux/mfd/nct6694.h         |  51 ++-
->  12 files changed, 787 insertions(+), 116 deletions(-)
->  create mode 100644 drivers/mfd/nct6694-hif.c
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index c3fe46d7c4bc..7b6241faa6df 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -18899,6 +18899,7 @@ S:	Supported
->  F:	drivers/gpio/gpio-nct6694.c
->  F:	drivers/hwmon/nct6694-hwmon.c
->  F:	drivers/i2c/busses/i2c-nct6694.c
-> +F:	drivers/mfd/nct6694-hif.c
->  F:	drivers/mfd/nct6694.c
->  F:	drivers/net/can/usb/nct6694_canfd.c
->  F:	drivers/rtc/rtc-nct6694.c
-> diff --git a/drivers/gpio/gpio-nct6694.c b/drivers/gpio/gpio-nct6694.c
-> index 3703a61209e6..a279510ece89 100644
-> --- a/drivers/gpio/gpio-nct6694.c
-> +++ b/drivers/gpio/gpio-nct6694.c
-> @@ -12,13 +12,6 @@
->  #include <linux/module.h>
->  #include <linux/platform_device.h>
->
-> -/*
-> - * USB command module type for NCT6694 GPIO controller.
-> - * This defines the module type used for communication with the NCT6694
-> - * GPIO controller over the USB interface.
-> - */
-> -#define NCT6694_GPIO_MOD	0xFF
-> -
->  #define NCT6694_GPIO_VER	0x90
->  #define NCT6694_GPIO_VALID	0x110
->  #define NCT6694_GPI_DATA	0x120
-> diff --git a/drivers/hwmon/nct6694-hwmon.c b/drivers/hwmon/nct6694-hwmon.c
-> index 6dcf22ca5018..581451875f2c 100644
-> --- a/drivers/hwmon/nct6694-hwmon.c
-> +++ b/drivers/hwmon/nct6694-hwmon.c
-> @@ -15,13 +15,6 @@
->  #include <linux/platform_device.h>
->  #include <linux/slab.h>
->
-> -/*
-> - * USB command module type for NCT6694 report channel
-> - * This defines the module type used for communication with the NCT6694
-> - * report channel over the USB interface.
-> - */
-> -#define NCT6694_RPT_MOD			0xFF
-> -
->  /* Report channel */
->  /*
->   * The report channel is used to report the status of the hardware monit=
-or
-> @@ -38,13 +31,6 @@
->  #define NCT6694_TIN_STS(x)		(0x6A + (x))
->  #define NCT6694_FIN_STS(x)		(0x6E + (x))
->
-> -/*
-> - * USB command module type for NCT6694 HWMON controller.
-> - * This defines the module type used for communication with the NCT6694
-> - * HWMON controller over the USB interface.
-> - */
-> -#define NCT6694_HWMON_MOD		0x00
-> -
->  /* Command 00h - Hardware Monitor Control */
->  #define NCT6694_HWMON_CONTROL		0x00
->  #define NCT6694_HWMON_CONTROL_SEL	0x00
-> @@ -53,13 +39,6 @@
->  #define NCT6694_HWMON_ALARM		0x02
->  #define NCT6694_HWMON_ALARM_SEL		0x00
->
-> -/*
-> - * USB command module type for NCT6694 PWM controller.
-> - * This defines the module type used for communication with the NCT6694
-> - * PWM controller over the USB interface.
-> - */
-> -#define NCT6694_PWM_MOD			0x01
-> -
->  /* PWM Command - Manual Control */
->  #define NCT6694_PWM_CONTROL		0x01
->  #define NCT6694_PWM_CONTROL_SEL		0x00
-> diff --git a/drivers/i2c/busses/i2c-nct6694.c b/drivers/i2c/busses/i2c-nc=
-t6694.c
-> index 7d8ad997f6d2..7ee209a04d16 100644
-> --- a/drivers/i2c/busses/i2c-nct6694.c
-> +++ b/drivers/i2c/busses/i2c-nct6694.c
-> @@ -11,13 +11,6 @@
->  #include <linux/module.h>
->  #include <linux/platform_device.h>
->
-> -/*
-> - * USB command module type for NCT6694 I2C controller.
-> - * This defines the module type used for communication with the NCT6694
-> - * I2C controller over the USB interface.
-> - */
-> -#define NCT6694_I2C_MOD			0x03
-> -
->  /* Command 00h - I2C Deliver */
->  #define NCT6694_I2C_DELIVER		0x00
->  #define NCT6694_I2C_DELIVER_SEL		0x00
-> diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
-> index 7192c9d1d268..8a715ec2f79f 100644
-> --- a/drivers/mfd/Kconfig
-> +++ b/drivers/mfd/Kconfig
-> @@ -1164,19 +1164,46 @@ config MFD_MENF21BMC
->  	  will be called menf21bmc.
->
->  config MFD_NCT6694
-> -	tristate "Nuvoton NCT6694 support"
-> +	tristate
->  	select MFD_CORE
-> +	help
-> +	  Core MFD support for the Nuvoton NCT6694 peripheral expander.
-> +	  This provides the common APIs and shared structures used by all
-> +	  interfaces (USB, HIF) to access the NCT6694 hardware features
-> +	  such as GPIO, I2C, CAN-FD, Watchdog, ADC, PWM, and RTC.
-> +
-> +	  It is selected automatically by the transport interface drivers.
-> +
-> +config MFD_NCT6694_HIF
-> +	tristate "Nuvoton NCT6694 HIF (eSPI) interface support"
-> +	depends on HAS_IOPORT && ACPI
-> +	select MFD_NCT6694
-> +	select REGMAP_MMIO
-> +	help
-> +	  This enables support for the Nuvoton NCT6694 peripheral expander
-> +	  connected via the Host Interface (HIF) using eSPI transport.
-> +
-> +	  The transport driver uses Super-I/O mapping and shared memory to
-> +	  communicate with the NCT6694 firmware. Enable this option if you
-> +	  are using the NCT6694 over an eSPI interface on an ACPI platform.
-> +
-> +	  To compile this driver as a module, choose M here: the module
-> +	  will be called nct6694-hif.
-> +
-> +config MFD_NCT6694_USB
-> +	tristate "Nuvoton NCT6694 USB interface support"
-> +	select MFD_NCT6694
->  	depends on USB
->  	help
-> -	  This enables support for the Nuvoton USB device NCT6694, which shares
-> -	  peripherals.
-> -	  The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
-> -	  6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
-> -	  PWM, and RTC.
-> -	  This driver provides core APIs to access the NCT6694 hardware
-> -	  monitoring and control features.
-> -	  Additional drivers must be enabled to utilize the specific
-> -	  functionalities of the device.
-> +	  This enables support for the Nuvoton NCT6694 peripheral expander
-> +	  connected via the USB interface.
-> +
-> +	  The transport driver uses USB bulk and interrupt transfers to
-> +	  communicate with the NCT6694 firmware. Enable this option if you
-> +	  are using the NCT6694 via a USB connection.
-> +
-> +	  To compile this driver as a module, choose M here: the module
-> +	  will be called nct6694.
->
->  config MFD_OCELOT
->  	tristate "Microsemi Ocelot External Control Support"
-> diff --git a/drivers/mfd/Makefile b/drivers/mfd/Makefile
-> index e75e8045c28a..4cee9b74978c 100644
-> --- a/drivers/mfd/Makefile
-> +++ b/drivers/mfd/Makefile
-> @@ -124,7 +124,8 @@ obj-$(CONFIG_MFD_MC13XXX_I2C)	+=3D mc13xxx-i2c.o
->
->  obj-$(CONFIG_MFD_PF1550)	+=3D pf1550.o
->
-> -obj-$(CONFIG_MFD_NCT6694)	+=3D nct6694.o
-> +obj-$(CONFIG_MFD_NCT6694_HIF)	+=3D nct6694-hif.o
-> +obj-$(CONFIG_MFD_NCT6694_USB)	+=3D nct6694.o
->
->  obj-$(CONFIG_MFD_CORE)		+=3D mfd-core.o
->
-> diff --git a/drivers/mfd/nct6694-hif.c b/drivers/mfd/nct6694-hif.c
-> new file mode 100644
-> index 000000000000..a5953c951eb5
-> --- /dev/null
-> +++ b/drivers/mfd/nct6694-hif.c
-> @@ -0,0 +1,649 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2026 Nuvoton Technology Corp.
-> + *
-> + * Nuvoton NCT6694 host-interface (eSPI) transport driver.
-> + */
-> +
-> +#include <linux/acpi.h>
-> +#include <linux/bits.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/io.h>
-> +#include <linux/iopoll.h>
-> +#include <linux/irq.h>
-> +#include <linux/irqdomain.h>
-> +#include <linux/kernel.h>
-> +#include <linux/mfd/core.h>
-> +#include <linux/mfd/nct6694.h>
-> +#include <linux/module.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/regmap.h>
-> +#include <linux/unaligned.h>
-> +
-> +#define DRVNAME "nct6694-hif"
-> +
-> +#define NCT6694_POLL_INTERVAL_US	10
-> +#define NCT6694_POLL_TIMEOUT_US		10000
-> +
-> +/*
-> + * Super-I/O registers
-> + */
-> +#define SIO_REG_LDSEL		0x07	/* Logical device select */
-> +#define SIO_REG_DEVID		0x20	/* Device ID (2 bytes) */
-> +#define SIO_REG_LD_SHM		0x0F	/* Logical device shared memory control */
-> +
-> +#define SIO_REG_SHM_ENABLE	0x30	/* Enable shared memory */
-> +#define SIO_REG_SHM_BASE_ADDR	0x60	/* Shared memory base address (2 byte=
-s) */
-> +#define SIO_REG_SHM_IRQ_NR	0x70	/* Shared memory interrupt number */
-> +
-> +#define SIO_REG_UNLOCK_KEY	0x87	/* Key to enable Super-I/O */
-> +#define SIO_REG_LOCK_KEY	0xAA	/* Key to disable Super-I/O */
-> +
-> +#define SIO_NCT6694B_ID		0xD029
-> +#define SIO_NCT6694D_ID		0x5832
-> +
-> +/*
-> + * Super-I/O Shared Memory Logical Device registers
-> + */
-> +#define NCT6694_SHM_COFS_STS			0x2E
-> +#define NCT6694_SHM_COFS_STS_COFS4W		BIT(7)
-> +
-> +#define NCT6694_SHM_COFS_CTL2			0x3B
-> +#define NCT6694_SHM_COFS_CTL2_COFS4W_IE		BIT(3)
-> +
-> +#define NCT6694_SHM_INTR_STATUS			0x9C	/* Interrupt status register (4 b=
-ytes) */
-> +
-> +enum nct6694_chips {
-> +	NCT6694B =3D 0,
-> +	NCT6694D,
-> +};
-> +
-> +enum nct6694_module_id {
-> +	NCT6694_GPIO0 =3D 0,
-> +	NCT6694_GPIO1,
-> +	NCT6694_GPIO2,
-> +	NCT6694_GPIO3,
-> +	NCT6694_GPIO4,
-> +	NCT6694_GPIO5,
-> +	NCT6694_GPIO6,
-> +	NCT6694_GPIO7,
-> +	NCT6694_GPIO8,
-> +	NCT6694_GPIO9,
-> +	NCT6694_GPIOA,
-> +	NCT6694_GPIOB,
-> +	NCT6694_GPIOC,
-> +	NCT6694_GPIOD,
-> +	NCT6694_GPIOE,
-> +	NCT6694_GPIOF,
-> +	NCT6694_I2C0,
-> +	NCT6694_I2C1,
-> +	NCT6694_I2C2,
-> +	NCT6694_I2C3,
-> +	NCT6694_I2C4,
-> +	NCT6694_I2C5,
-> +	NCT6694_CAN0,
-> +	NCT6694_CAN1,
-> +};
-> +
-> +struct __packed nct6694_msg {
-> +	struct nct6694_cmd_header cmd_header;
-> +	struct nct6694_response_header response_header;
-> +	unsigned char *data;
-> +};
-> +
-> +struct nct6694_sio_data {
-> +	enum nct6694_chips chip;
-> +	int sioreg;	/* Super-I/O index port */
-> +
-> +	/* Super-I/O access functions */
-> +	int (*sio_enter)(struct nct6694_sio_data *sio_data);
-> +	void (*sio_exit)(struct nct6694_sio_data *sio_data);
-> +	void (*sio_select)(struct nct6694_sio_data *sio_data, int ld);
-> +	int (*sio_inb)(struct nct6694_sio_data *sio_data, int reg);
-> +	int (*sio_inw)(struct nct6694_sio_data *sio_data, int reg);
-> +	void (*sio_outb)(struct nct6694_sio_data *sio_data, int reg, int val);
+Linux Kernel ksmbd Server Multiple Kernel Memory Leak Vulnerability in Session Setup/Teardown
 
-The signatures of the function look a bit strange. I expect functions
-reading/writing bytes use u8 not int, register offsets should probably
-be an unsigned int.
+  2. High-Level Overview
 
-Why do you have pointers to the access functions? Why not use them
-directly?
+Seven distinct kernel memory leaks exist in the ksmbd (in-kernel SMB server) session handling paths. During SMB session setup and teardown, multiple kernel objects — including socket inodes (1344 bytes), LSM security blobs (120 and 32 bytes), TCP connection structures (3264 bytes), ksmbd connection contexts (64 and 16 bytes), and network skb buffers (240 bytes) — are allocated but never freed. These leaks accumulate over time with repeated session establishment, allowing a remote attacker to exhaust kernel memory by repeatedly connecting and disconnecting SMB sessions. This constitutes a denial-of-service vulnerability.
 
-Marc
+This vulnerability was discovered using ven0mfuzzer, our custom-designed MITM-based network filesystem fuzzer developed by our team. Following the common syzkaller practice, we submit the kernel crash trace as the primary reproduction artifact.
 
---
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+  3. Affected Product and Version Information
 
---eduyjgnvxkh2zrsd
-Content-Type: application/pgp-signature; name="signature.asc"
+Product: Linux Kernel (upstream mainline)
+Affected Component: `fs/smb/server/` — ksmbd session setup/teardown, connection handling
+Supporting Components:
+- `fs/smb/server/transport_tcp.c` — `ksmbd_kthread_fn()`, `ksmbd_tcp_readv()`
+- `fs/smb/server/connection.c` — connection context allocation
+- `net/socket.c` — `sock_alloc_inode()`, `kernel_accept()`
+- `net/ipv4/tcp_minisocks.c` — `tcp_create_openreq_child()`
 
------BEGIN PGP SIGNATURE-----
+  Tested Versions (confirmed vulnerable)
+- Linux kernel 6.19.0 (mainline, commit `44331bd6a610`, gcc 11.4.0, built 2026-02-13)
+- Linux kernel 6.12.74 (LTS, used in Google kernelCTF COS target)
 
-iHUEABYKAB0WIQSl+MghEFFAdY3pYJLMOmT6rpmt0gUCac5NhQAKCRDMOmT6rpmt
-0iiOAQDPnaCTCz7cHPZcUdH6WW5DKZHAXFfgb03FMRkx/xPipgD/X+mA6FYqehlp
-FMnxD26sUBwZidoKAtEpXxguwwLFGgo=
-=+i7v
------END PGP SIGNATURE-----
+  Affected Version Range
+All kernels with ksmbd support (approximately 5.15 through 6.19) are believed affected.
 
---eduyjgnvxkh2zrsd--
+  Affected Distributions and Products
+
+ |  Vendor / Product  |  Notes  | 
+ | --- | --- | 
+ |  Red Hat Enterprise Linux (RHEL 9.x)  |  Ships kernels >= 5.14 with ksmbd module  | 
+ |  Ubuntu (22.04 LTS, 24.04 LTS)  |  HWE kernels 6.x include ksmbd  | 
+ |  SUSE Linux Enterprise Server (SLES 15 SP5+)  |  Kernel 6.x based  | 
+ |  Debian (Bookworm, Trixie)  |  Kernels 6.1+  | 
+ |  Fedora (39+)  |  Kernels 6.5+  | 
+ |  Amazon Linux 2023  |  Kernel 6.1 LTS based  | 
+ |  Google ChromeOS / COS  |  kernelCTF target, confirmed vulnerable on 6.12.74  | 
+
+  4. Root Cause Analysis
+
+  4.a. Detailed Description
+
+The kmemleak detector identified 7 unreferenced kernel objects allocated during ksmbd session handling that are never freed. These leaks occur across multiple subsystems involved in SMB connection management:
+
+1. Socket inode (1344 bytes): Allocated by `sock_alloc_inode()` during `kernel_accept()` in `ksmbd_kthread_fn()`. The accepted socket's inode is not properly released when the connection is torn down.
+
+2. LSM security blob (120 bytes): Allocated by `security_inode_alloc()` during inode initialization for the socket. Leaked because the parent inode is leaked.
+
+3. TCP connection structure (3264 bytes): Allocated by `sk_prot_alloc()` during `tcp_create_openreq_child()` when accepting a new TCP connection. The TCP socket is not properly closed on session teardown.
+
+4. LSM security blob for socket (32 bytes): Allocated by `security_sk_alloc()` for the cloned TCP socket. Leaked with the parent TCP structure.
+
+5. ksmbd connection context (64 bytes): Allocated by `ksmbd_kthread_fn()` for per-connection state. Not freed when the connection handler exits abnormally.
+
+6. ksmbd TCP read buffer (16 bytes): Allocated by `ksmbd_tcp_readv()` for receiving SMB messages. Not freed when read is interrupted.
+
+7. SKB buffer (240 bytes): Allocated by `build_skb()` in the virtio-net receive path for incoming SMB packets. Orphaned when the associated socket is leaked.
+
+  4.b. Code Flow
+
+---
+ksmbd_kthread_fn()                    [fs/smb/server/transport_tcp.c]
+  → kernel_accept()                   ← allocates socket inode (1344B) + security blob (120B)
+    → sock_alloc() → alloc_inode()
+    → security_inode_alloc()
+
+TCP SYN_RECV → ESTABLISHED:
+  → tcp_create_openreq_child()        ← allocates TCP sock (3264B) + security blob (32B)
+    → sk_prot_alloc() → sk_clone()
+    → security_sk_alloc()
+
+ksmbd_kthread_fn() continued:
+  → kmalloc (64B)                     ← ksmbd connection context
+
+ksmbd_conn_handler_loop():
+  → ksmbd_tcp_readv()
+    → kmalloc (16B)                   ← TCP read buffer
+
+[on session teardown — objects NOT freed due to missing cleanup]
+---
+
+  4.c. Crash Trace
+
+This vulnerability was discovered by ven0mfuzzer. The following kmemleak output is submitted following syzkaller's common practice of providing the raw kernel trace as the primary reproduction evidence:
+
+---
+unreferenced object 0xffff88810af3d180 (size 1344):
+  comm "ksmbd-eth0", pid 328, jiffies 4294901355
+  backtrace (crc 1a26ccb4):
+    kmem_cache_alloc_lru_noprof+0x3ed/0x5f0
+    sock_alloc_inode+0x25/0x1c0
+    alloc_inode+0x64/0x240
+    sock_alloc+0x40/0x280
+    sock_create_lite+0x82/0x120
+    kernel_accept+0x16b/0x380
+    ksmbd_kthread_fn+0xee/0xf30
+
+unreferenced object 0xffff888107243bd0 (size 120):
+  comm "ksmbd-eth0", pid 328, jiffies 4294901355
+  backtrace (crc 6bd3e180):
+    kmem_cache_alloc_noprof+0x3ed/0x5f0
+    security_inode_alloc+0x3b/0x140
+    inode_init_always_gfp+0xbf9/0xf20
+    alloc_inode+0x86/0x240
+    sock_alloc+0x40/0x280
+    sock_create_lite+0x82/0x120
+    kernel_accept+0x16b/0x380
+    ksmbd_kthread_fn+0xee/0xf30
+
+unreferenced object 0xffff88810fbfa980 (size 3264):
+  comm "softirq", pid 0, jiffies 4294902189
+  backtrace (crc c2de1a0c):
+    kmem_cache_alloc_noprof+0x3ed/0x5f0
+    sk_prot_alloc+0x60/0x2a0
+    sk_clone+0x79/0x14f0
+    inet_csk_clone_lock+0x2f/0x760
+    tcp_create_openreq_child+0x34/0x26a0
+    tcp_v4_syn_recv_sock+0x115/0x10e0
+
+unreferenced object 0xffff888108c514a0 (size 32):
+  comm "softirq", pid 0, jiffies 4294902189
+  backtrace (crc ea16adaf):
+    __kmalloc_noprof+0x4eb/0x760
+    lsm_blob_alloc+0x68/0x90
+    security_sk_alloc+0x2f/0xd0
+    sk_prot_alloc+0xfb/0x2a0
+    sk_clone+0x79/0x14f0
+
+unreferenced object 0xffff88810fd0b540 (size 64):
+  comm "ksmbd-eth0", pid 328, jiffies 4294902189
+  backtrace (crc f2da5eae):
+    __kmalloc_cache_noprof+0x411/0x610
+    ksmbd_kthread_fn+0x288/0xf30
+
+unreferenced object 0xffff8881063426f0 (size 16):
+  comm "ksmbd:::ffff:10", pid 434, jiffies 4294902190
+  backtrace (crc 9e6ee6c8):
+    __kmalloc_cache_noprof+0x411/0x610
+    ksmbd_tcp_readv.constprop.0+0x16d/0x700
+    ksmbd_tcp_read+0x88/0xc0
+    ksmbd_conn_handler_loop+0x5dd/0xfd0
+
+unreferenced object 0xffff88810fa94200 (size 240):
+  comm "softirq", pid 0, jiffies 4294902419
+  backtrace (crc 4367e44b):
+    kmem_cache_alloc_noprof+0x3ed/0x5f0
+    build_skb+0x46/0x370
+    page_to_skb+0x5df/0xb30
+    receive_buf+0xa3e/0x4940
+    virtnet_poll+0xfb6/0x1750
+---
+
+Total leaked per session: approximately 5,080 bytes (1344 + 120 + 3264 + 32 + 64 + 16 + 240). An attacker establishing and tearing down sessions repeatedly can exhaust kernel memory.
+
+  4.d. Suggested Fix
+
+The ksmbd session teardown path (`ksmbd_sessions_deregister` / `ksmbd_conn_handler_loop` exit) must properly release all allocated resources:
+1. Close the accepted socket via `sock_release()` to free the socket inode and associated LSM blobs
+2. Properly tear down the cloned TCP socket
+3. Free the ksmbd connection context and read buffers on all exit paths, including error/abort paths
+
+  5. Discovery Method and Reproduction
+
+  5.a. Discovery
+
+This vulnerability was discovered using ven0mfuzzer, a custom-designed MITM-based network filesystem fuzzer developed by our team. The fuzzer operates by positioning an AF_PACKET/TCP transparent proxy between a Linux kernel filesystem client (VM-A) and its server (VM-B), then mutating network protocol messages in-flight.
+
+Following the common syzkaller practice, we submit the kernel kmemleak output as the primary reproduction artifact. The output above was captured with CONFIG_DEBUG_KMEMLEAK enabled on kernel 6.19.0.
+
+  5.b. Reproduction Setup
+
+---
+VM-A (CIFS client) ──SMB2──► Host:44446 (MITM proxy) ──TCP──► Host:44445 ──hostfwd──► VM-B:445 (ksmbd)
+---
+
+Trigger condition: Repeated SMB session establishment and teardown, especially when the MITM proxy disrupts the session setup handshake, forcing abnormal teardown paths.
+
+---
+Reported-by: ven0mfuzzer <ven0mkernelfuzzer@gmail.com>
+Link: https://github.com/KernelStackFuzz/KernelStackFuzz
 
