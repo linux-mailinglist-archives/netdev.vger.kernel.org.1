@@ -1,553 +1,347 @@
-Return-Path: <netdev+bounces-274300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274301-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iAmzGhW9zWlmgQYAu9opvQ
-	(envelope-from <netdev+bounces-274300-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 02:49:25 +0200
+	id WBFNKyO9zWlmgQYAu9opvQ
+	(envelope-from <netdev+bounces-274301-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 02:49:39 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CF6F382140
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 02:49:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 516FB38214F
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 02:49:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 18FA1302087F
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 00:49:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DDACC3026896
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 00:49:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B444D81AA8;
-	Thu,  2 Apr 2026 00:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vanvalzah-com.20230601.gappssmtp.com header.i=@vanvalzah-com.20230601.gappssmtp.com header.b="oTGkKiUF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D8BA230BD9;
+	Thu,  2 Apr 2026 00:49:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f46.google.com (mail-dl1-f46.google.com [74.125.82.46])
+Received: from mail-oi1-f207.google.com (mail-oi1-f207.google.com [209.85.167.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A91DC2EA
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 00:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEAE24A06A
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 00:49:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775090961; cv=none; b=Lf5mRKJglvUIEIbEDVTjZYJH/EVaA/P0zkO7/VTy6y7A3dtigWISIiLz83Xkzd+Y+m0uzX1+Jul9DzsvcREp1RtXqb6wkGypbTZCi8X4rHFfD604+tnelIQlxga2KVmjk2KvRG0DaRWDmCBZfYBE17MT0Lg5/wbvUIXm12EgB0U=
+	t=1775090965; cv=none; b=BO+qC8D2pk0srfkszUuhSZFcGkLFWP07Pdt1eCr77PzIrQXLbP524IFwvcZc8BtSdgnqmhQ95zeeyeo9DAnMcxMuBv8MGgcDDXL5RJy3Jrw38FhW8O1RAUVY2ShbXl4ctM/wbHo9qHQRZv8HLNG8PauELTWenFn2c5Q82I3H/IY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775090961; c=relaxed/simple;
-	bh=vMgz41CEzHAaJ8ChJEtiS0jEvTzD5r94FKfumFYM5EQ=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=dnJmIO3eNwbLr9M1YNljnKVkkyeEZr1NOFzBWmWvji0KpWknH26CoD6mkbiWZdSHgVxidtLOcXG9wI83jtcYzGzDfBzAJCI2JXxyOLBx0k2EurjhEKNdbR98Ma2R+gxjuMqOTBXvbOMt3oZojXHlRsPDgDR8F5VOOj8fRbkk2Gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vanvalzah.com; spf=none smtp.mailfrom=vanvalzah.com; dkim=pass (2048-bit key) header.d=vanvalzah-com.20230601.gappssmtp.com header.i=@vanvalzah-com.20230601.gappssmtp.com header.b=oTGkKiUF; arc=none smtp.client-ip=74.125.82.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=vanvalzah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=vanvalzah.com
-Received: by mail-dl1-f46.google.com with SMTP id a92af1059eb24-126ea4b77adso607460c88.1
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 17:49:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vanvalzah-com.20230601.gappssmtp.com; s=20230601; t=1775090958; x=1775695758; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J0mm8Q+hlh6VRKVwIi/bFhcu/urWowNBuqerynEwGNc=;
-        b=oTGkKiUF6teRzX5U0qS9ZmOXlr/p3O9OBh9m5NIiBx1SIhn3muzfCKjG9LBCAeEtq5
-         oVzoetLySwN0SNFN2XwPrxbESwHPu9N5+e4rg6n4yWlDP2jYm2hak1SqE/FqDeoDaUU1
-         Tf1/IZQebx0rzFzYPbqHKNTNiqq/EQDKEg5UWTcMq0Ygx7HkgCYADxd/DmZAO9iWZcX7
-         OduLoeKcFhzOIkgsOb7h3GOKuc9+4eRkxwTX5v3MUS6aILNW9GAmovgxV+RbNY4p5pJ6
-         QUql02xhgnweC84G6shwujC8ODyVjmQmqf3YujMgTIORnOyxCF3X3Plc2QcrzP+0DnRM
-         xd5g==
+	s=arc-20240116; t=1775090965; c=relaxed/simple;
+	bh=quIeK+Mo7MQBsJsAeqRrnJkkRUswjh2/gNO5H4ef/Tk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QcPVhg4XuX+97j3Rrfy1AKDnZlbozploxbbOaXfzTzMfCms9UYMqyef2eb7rOB4v6HDPCEj8lUSZ/FNf/XB81EwT7k7hksBslsX81GxeKARVl9CCs6tBWMLcUvZnwt9hn6aDU4RMlDpX4KAyfvaMolfOZbLLQ372EkpoeLdn4pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f207.google.com with SMTP id 5614622812f47-467b2af6710so1018785b6e.2
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 17:49:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775090958; x=1775695758;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
+        d=1e100.net; s=20251104; t=1775090962; x=1775695762;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=J0mm8Q+hlh6VRKVwIi/bFhcu/urWowNBuqerynEwGNc=;
-        b=lWUOAY00wLmaYsCr2RoX9Tpki/7uiGKp6gqwMeXAsG/ZZGhai2AhLRldT9utMcU2um
-         KINGR4eXOc2F4GGZJu9t1fj7YqZxiBgOIJJwvhFzyg49z2m/96AxlqwYHlRMFQCGhy7g
-         NKsp1FN2aMVNGw4Q2dV3CDQOVxCFxNGEelvZSikrYhIQxhdVXzfMyW/EOyYHf+x05MM+
-         zEKXwu3u6xkvSBOfJtEUFrTOjhO9nzimAbwI8yOeKrvHUoiCM2xo2HqqXiHnTTxW8MBy
-         EYZbF/9oBZrDIwbeKdvu/9qmt41+5voPnLa5xJ47QZwPxR4+sNrZQ545bHM+7P8Ok9i7
-         a+nw==
-X-Forwarded-Encrypted: i=1; AJvYcCUwKQM6pwDYD+0H9zcHuChgFWrvO7N+9w2rr+CcBWpwiXU2DKSf6NZoeBAvrYK+QPWiJQCRP8Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/ZM/8A1ZZyeI0ulvYNJ53OD85YHbool78WzIBnsbVi0zNGV8D
-	T76rbDkq2195HUqI12GNqAvvCaiSTXk9HbR4Hx3vIMZSxzUmsPWmBAEyHDFZGcAon4g=
-X-Gm-Gg: ATEYQzx1PSLnn1IuEePQapkdVtpM7O0b/hzFZWuYj/wWFT7igkEpSAEuvY2duNduzof
-	sV08H0DN5Q3gXUA69kVcGKYRM7fIJ4d1pj3FV5/77fPPDidAU1PQ+uvfwE7dJEbNJD+nIb9zLL4
-	dbJEnQaj+MxcBAtaSQq8Vac5wHEqYrz+we0BRpYpEXg4K75p+DF9SJXv+4Iv631Ejg0gcBABWxB
-	uobP57ToUtCMgyeH2+57Jl0pUHpIbZ/HhCeScPaB0764Ri1zKHhMxtr5cDcdpnr9gpHjyqdIRRR
-	UZQb4Ltscuy4VEdsPx4g6E+RHWxxnKsL/M6xq2UlhNt5OUEbWbBd86FExY5m2ynd4ubbfpA6MlG
-	0UwEtVIE8eqbtKNtxXHUxmCMOxkjwZV0JsVmKiCeb8zao65dUWMkEe5mJj9Wx1OPW0sm6nADmHx
-	W59SePFajPcANFeFETtZBWrnknJocCXn/AGZJ/26GK0lEJBQ2iWgwFGqiVa3DyUKYq1jNvBTkcC
-	X/puUCz
-X-Received: by 2002:a05:7022:670a:b0:128:ce84:f68b with SMTP id a92af1059eb24-12bee5fbe77mr844804c88.4.1775090958271;
-        Wed, 01 Apr 2026 17:49:18 -0700 (PDT)
-Received: from smtpclient.apple (syn-108-178-167-002.biz.spectrum.com. [108.178.167.2])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12bede5a225sm1898759c88.9.2026.04.01.17.49.16
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 01 Apr 2026 17:49:17 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+        bh=UZ9s30YRo/jePoB2r5BZAQsb8eyW6fRXRgrpJnfnwVw=;
+        b=Rq3uBnYPagG0Dg+PPJhiU/JUiwJUwvN+jsvjSxGjvUs68nuHv5VOg4Js7BKUYagfVc
+         IwPrvSwmWVU4/o8duneVkkv+GYdhOdK0Ew6qLFNi7cTI0n1+jxJ/TgMZbM+2UPOBbhYM
+         m5RLDA0yTXuYDkLIG3YRgQRcdoeGL+4SQbqP3s9iO/Srl2716cEa5HrAb6aaEhBsDdy5
+         s15III8bOvGTn35QO0/cTXf9XKL/rJcLSCeDF8I6R+3Jc3QVgNHEVqmUMlyBKmPJNXPS
+         cA27AmPznU3xRSxMsH4p4t4moWKGFSdhC7FC5fooak+6CwFrJhRD2SLYnblBrDCDPm6C
+         vmiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVuyjOLDQiufGOkbecV6KMMBafJ99j0oHICIPMBTnhbV/qJ78h0R+q6xM0Hq9Ji/zam1iwab/8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOXcVMXIndCAn+Uyt8fURHHv9BzKA8HqFgtQO7vk4M0+6dRuPq
+	zSDkg1+wxofMR9vtlZy9ZaeV2LyBeQEvoNUwbjoeOQdUecupsGnOIen+EAWYw2+RNr6tJ2mkos4
+	3zOwSlodLNbgS21ulV/18osIlrbIebX+ojKBSSPaSb3ooBbcIMryrYR9Oi/E=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.400.21\))
-Subject: Re: [PATCH] igc: fix Tx timestamp timeout caused by unlocked TIMINCA
- write in adj fine]
-From: Bob Van Valzah <bob@vanvalzah.com>
-In-Reply-To: <CAD61B95-35BF-4BAC-AC26-6AC043DE6FC1@vanvalzah.com>
-Date: Wed, 1 Apr 2026 17:49:03 -0700
-Cc: intel-wired-lan@lists.osuosl.org,
- anthony.l.nguyen@intel.com,
- netdev@vger.kernel.org,
- julianstj@fb.com,
- jeff@jeffgeerling.com,
- Lasse Johnsen <lasse@timebeat.app>,
- Ian Gough <ian@timebeat.app>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <CDC20B85-E83B-4AC9-9261-24B3D967DCA6@vanvalzah.com>
-References: <D1C3B3DF-960F-40C7-BBD7-994359F0C8AD@vanvalzah.com>
- <65977d5b-16eb-418c-995e-6a918f67707a@linux.dev>
- <B22CCB1A-15FE-4233-9F47-7FE522C8D6FF@VanValzah.Com>
- <CAD61B95-35BF-4BAC-AC26-6AC043DE6FC1@vanvalzah.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-X-Mailer: Apple Mail (2.3864.400.21)
-X-Spamd-Result: default: False [-1.66 / 15.00];
+MIME-Version: 1.0
+X-Received: by 2002:a05:6820:1986:b0:67f:ab5d:1748 with SMTP id
+ 006d021491bc7-67fabd020c7mr3101243eaf.48.1775090962240; Wed, 01 Apr 2026
+ 17:49:22 -0700 (PDT)
+Date: Wed, 01 Apr 2026 17:49:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69cdbd12.050a0220.70c3a.0007.GAE@google.com>
+Subject: [syzbot] [net?] [bpf?] KASAN: slab-use-after-free Read in __sk_msg_recvmsg
+From: syzbot <syzbot+431f9a9e3f5227fbb904@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, jakub@cloudflare.com, john.fastabend@gmail.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [1.14 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=71d49d824b43a0d9];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[vanvalzah-com.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[vanvalzah-com.20230601.gappssmtp.com:+];
-	TAGGED_FROM(0.00)[bounces-274300-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[vanvalzah.com];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FREEMAIL_TO(0.00)[kernel.org,vger.kernel.org,iogearbox.net,davemloft.net,google.com,cloudflare.com,gmail.com,redhat.com,googlegroups.com];
+	TAGGED_FROM(0.00)[bounces-274301-lists,netdev=lfdr.de,431f9a9e3f5227fbb904];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,goo.gl:url,appspotmail.com:email,googlegroups.com:email];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bob@vanvalzah.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	APPLE_MAILER_COMMON(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.982];
+	REDIRECTOR_URL(0.00)[goo.gl];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:email]
-X-Rspamd-Queue-Id: 7CF6F382140
+	SUBJECT_HAS_QUESTION(0.00)[]
+X-Rspamd-Queue-Id: 516FB38214F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Vadim,
+Hello,
 
-Thanks for the feedback on our first patch. We've spent more time in
-the lab studying the igc TX timestamp behavior under stress. We
-understand the failure modes much better now.
+syzbot found the following issue on:
 
-You were right that ptp_tx_lock was the wrong lock =E2=80=94 it guards =
-the TX
-queue, not the timing registers. You suggested tmreg_lock instead. We
-tested tmreg_lock alone (v2) and found it doesn't fix the bug: it =
-appears
-that the race is between the software TIMINCA write and the hardware=E2=80=
-=99s
-asynchronous TX timestamp capture pipeline, not between two software =
-threads.
-tmreg_lock serializes software register accesses but can't prevent the =
-hardware
-from reading TIMINCA at the instant software writes it.
+HEAD commit:    93d04e76bcf1 Merge branch 'r8152-add-helper-functions-for-..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=14fde46a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=71d49d824b43a0d9
+dashboard link: https://syzkaller.appspot.com/bug?extid=431f9a9e3f5227fbb904
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11b9baba580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=152c5e26580000
 
-Our v3 patch (attached) takes tmreg_lock as you suggested, and
-additionally disables TX timestamping in hardware via TSYNCTXCTL around
-the TIMINCA write. This prevents the hardware from starting new
-timestamp captures during the rate change:
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/953c48b40f73/disk-93d04e76.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/edb39d99bd41/vmlinux-93d04e76.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/656d4ad35e4a/bzImage-93d04e76.xz
 
-    spin_lock_irqsave(&igc->tmreg_lock, flags);
-    txctl =3D rd32(IGC_TSYNCTXCTL);
-    wr32(IGC_TSYNCTXCTL, txctl & ~IGC_TSYNCTXCTL_ENABLED);
-    wr32(IGC_TIMINCA, inca);
-    wr32(IGC_TSYNCTXCTL, txctl);
-    spin_unlock_irqrestore(&igc->tmreg_lock, flags);
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+431f9a9e3f5227fbb904@syzkaller.appspotmail.com
 
-v3 doesn't return -EBUSY, so there's no risk of adjfine starvation
-under TX load. It always completes the TIMINCA write.
+==================================================================
+BUG: KASAN: slab-use-after-free in __sk_msg_recvmsg+0x19b/0xe70 net/core/skmsg.c:431
+Read of size 8 at addr ffff88807eeac2b0 by task syz.0.31/6071
 
-This still isn't a complete fix. Under extreme stress (100k+ adjfine/s
-concurrent with 100k+ TX timestamps/s), disabling TSYNCTXCTL can strand
-an in-progress capture that started before the disable. The stranded
-slot sits occupied for IGC_PTP_TX_TIMEOUT (15s) before the watchdog
-clears it. However, these rates are far beyond any realistic PTP
-deployment. At realistic rates (1 Hz adjfine + 128 Hz PTP sync), v3
-passes all our tests cleanly.
+CPU: 0 UID: 0 PID: 6071 Comm: syz.0.31 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/18/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xba/0x230 mm/kasan/report.c:482
+ kasan_report+0x117/0x150 mm/kasan/report.c:595
+ __sk_msg_recvmsg+0x19b/0xe70 net/core/skmsg.c:431
+ udp_bpf_recvmsg+0x196/0xac0 net/ipv4/udp_bpf.c:83
+ sock_recvmsg_nosec net/socket.c:1071 [inline]
+ sock_recvmsg+0x155/0x1b0 net/socket.c:1093
+ ____sys_recvmsg+0x1e6/0x4a0 net/socket.c:2805
+ ___sys_recvmsg+0x215/0x590 net/socket.c:2847
+ do_recvmmsg+0x334/0x800 net/socket.c:2942
+ __sys_recvmmsg net/socket.c:3016 [inline]
+ __do_sys_recvmmsg net/socket.c:3039 [inline]
+ __se_sys_recvmmsg net/socket.c:3032 [inline]
+ __x64_sys_recvmmsg+0x198/0x250 net/socket.c:3032
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f4a3579c819
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f4a365f2028 EFLAGS: 00000246 ORIG_RAX: 000000000000012b
+RAX: ffffffffffffffda RBX: 00007f4a35a16180 RCX: 00007f4a3579c819
+RDX: 0000000000000012 RSI: 0000200000000400 RDI: 0000000000000003
+RBP: 00007f4a35832c91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000040000021 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f4a35a16218 R14: 00007f4a35a16180 R15: 00007ffda3b0e6c8
+ </TASK>
 
-We don't know of a way to prevent pathological system call patterns
-from causing the hardware to lock up. The vulnerable window seems to
-span the hardware's internal capture-to-latch pipeline, not just the
-TIMINCA write instant, and there's no software-visible indication of
-when a capture is mid-flight.
+Allocated by task 6069:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
+ kasan_kmalloc include/linux/kasan.h:263 [inline]
+ __kmalloc_cache_noprof+0x31c/0x660 mm/slub.c:5380
+ kmalloc_noprof include/linux/slab.h:950 [inline]
+ kzalloc_noprof include/linux/slab.h:1188 [inline]
+ alloc_sk_msg net/core/skmsg.c:525 [inline]
+ sk_psock_skb_ingress_self+0x5e/0x370 net/core/skmsg.c:627
+ sk_psock_verdict_apply net/core/skmsg.c:1062 [inline]
+ sk_psock_verdict_recv+0x7d9/0x8d0 net/core/skmsg.c:1260
+ udp_read_skb+0x5d9/0x6b0 net/ipv4/udp.c:2014
+ sk_psock_verdict_data_ready+0x12d/0x590 net/core/skmsg.c:1281
+ __udp_enqueue_schedule_skb+0xc4b/0x12e0 net/ipv4/udp.c:1745
+ __udp_queue_rcv_skb net/ipv4/udp.c:2311 [inline]
+ udp_queue_rcv_one_skb+0x831/0x1230 net/ipv4/udp.c:2401
+ __udp4_lib_mcast_deliver+0xad7/0xb70 net/ipv4/udp.c:2513
+ udp_rcv+0xcc2/0x24c0 net/ipv4/udp.c:2638
+ ip_protocol_deliver_rcu+0x282/0x440 net/ipv4/ip_input.c:207
+ ip_local_deliver_finish+0x3bb/0x6f0 net/ipv4/ip_input.c:241
+ NF_HOOK+0x336/0x3c0 include/linux/netfilter.h:318
+ dst_input include/net/dst.h:480 [inline]
+ ip_sublist_rcv_finish+0x1f0/0x240 net/ipv4/ip_input.c:623
+ ip_list_rcv_finish net/ipv4/ip_input.c:667 [inline]
+ ip_sublist_rcv+0x5c6/0xa70 net/ipv4/ip_input.c:683
+ ip_list_rcv+0x3f1/0x450 net/ipv4/ip_input.c:717
+ __netif_receive_skb_list_ptype net/core/dev.c:6233 [inline]
+ __netif_receive_skb_list_core+0x7e5/0x810 net/core/dev.c:6280
+ __netif_receive_skb_list net/core/dev.c:6332 [inline]
+ netif_receive_skb_list_internal+0x995/0xcf0 net/core/dev.c:6423
+ netif_receive_skb_list+0x55/0x4b0 net/core/dev.c:6475
+ xdp_recv_frames net/bpf/test_run.c:269 [inline]
+ xdp_test_run_batch net/bpf/test_run.c:350 [inline]
+ bpf_test_run_xdp_live+0x1946/0x1cf0 net/bpf/test_run.c:379
+ bpf_prog_test_run_xdp+0x81c/0x1160 net/bpf/test_run.c:1397
+ bpf_prog_test_run+0x2c7/0x340 kernel/bpf/syscall.c:4722
+ __sys_bpf+0x643/0x950 kernel/bpf/syscall.c:6246
+ __do_sys_bpf kernel/bpf/syscall.c:6341 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:6339 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6339
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Test methodology
-----------------
+Freed by task 6070:
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:584
+ poison_slab_object mm/kasan/common.c:253 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:285
+ kasan_slab_free include/linux/kasan.h:235 [inline]
+ slab_free_hook mm/slub.c:2685 [inline]
+ slab_free mm/slub.c:6165 [inline]
+ kfree+0x1c1/0x630 mm/slub.c:6483
+ kfree_sk_msg include/linux/skmsg.h:418 [inline]
+ __sk_msg_recvmsg+0xc7e/0xe70 net/core/skmsg.c:491
+ udp_bpf_recvmsg+0x196/0xac0 net/ipv4/udp_bpf.c:83
+ sock_recvmsg_nosec net/socket.c:1071 [inline]
+ sock_recvmsg+0x155/0x1b0 net/socket.c:1093
+ ____sys_recvmsg+0x1e6/0x4a0 net/socket.c:2805
+ ___sys_recvmsg+0x215/0x590 net/socket.c:2847
+ do_recvmmsg+0x334/0x800 net/socket.c:2942
+ __sys_recvmmsg net/socket.c:3016 [inline]
+ __do_sys_recvmmsg net/socket.c:3039 [inline]
+ __se_sys_recvmmsg net/socket.c:3032 [inline]
+ __x64_sys_recvmmsg+0x198/0x250 net/socket.c:3032
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Our earlier multi-test runs gave misleading results because the
-15-second timeout pipeline carried stranded slots from one test into
-the next. We now reload the igc driver between each test to ensure
-clean hardware state. The reproducer is the same one we submitted
-previously:
+The buggy address belongs to the object at ffff88807eeac000
+ which belongs to the cache kmalloc-1k of size 1024
+The buggy address is located 688 bytes inside of
+ freed 1024-byte region [ffff88807eeac000, ffff88807eeac400)
 
-  =
-https://github.com/bobvan/PePPAR-Fix/blob/main/tools/igc_tx_timeout_repro.=
-py
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x7eea8
+head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 00fff00000000040 ffff88813fea6dc0 dead000000000100 dead000000000122
+raw: 0000000000000000 0000000800100010 00000000f5000000 0000000000000000
+head: 00fff00000000040 ffff88813fea6dc0 dead000000000100 dead000000000122
+head: 0000000000000000 0000000800100010 00000000f5000000 0000000000000000
+head: 00fff00000000003 ffffea0001fbaa01 00000000ffffffff 00000000ffffffff
+head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd2820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 176, tgid 176 (kworker/u8:7), ts 108779589894, free_ts 108254079914
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x231/0x280 mm/page_alloc.c:1889
+ prep_new_page mm/page_alloc.c:1897 [inline]
+ get_page_from_freelist+0x24dc/0x2580 mm/page_alloc.c:3962
+ __alloc_frozen_pages_noprof+0x18d/0x380 mm/page_alloc.c:5250
+ alloc_slab_page mm/slub.c:3292 [inline]
+ allocate_slab+0x77/0x660 mm/slub.c:3481
+ new_slab mm/slub.c:3539 [inline]
+ refill_objects+0x331/0x3c0 mm/slub.c:7175
+ refill_sheaf mm/slub.c:2812 [inline]
+ __pcs_replace_empty_main+0x2e6/0x730 mm/slub.c:4615
+ alloc_from_pcs mm/slub.c:4717 [inline]
+ slab_alloc_node mm/slub.c:4851 [inline]
+ __do_kmalloc_node mm/slub.c:5259 [inline]
+ __kmalloc_noprof+0x474/0x760 mm/slub.c:5272
+ kmalloc_noprof include/linux/slab.h:954 [inline]
+ kzalloc_noprof include/linux/slab.h:1188 [inline]
+ ieee802_11_parse_elems_full+0x159/0x2ab0 net/mac80211/parse.c:1051
+ ieee802_11_parse_elems net/mac80211/ieee80211_i.h:2496 [inline]
+ ieee80211_rx_mgmt_probe_beacon net/mac80211/ibss.c:1565 [inline]
+ ieee80211_ibss_rx_queued_mgmt+0x4ca/0x2ce0 net/mac80211/ibss.c:1596
+ ieee80211_iface_process_skb net/mac80211/iface.c:1757 [inline]
+ ieee80211_iface_work+0x845/0x1380 net/mac80211/iface.c:1811
+ cfg80211_wiphy_work+0x2ab/0x4a0 net/wireless/core.c:513
+ process_one_work kernel/workqueue.c:3276 [inline]
+ process_scheduled_works+0xb6e/0x18c0 kernel/workqueue.c:3359
+ worker_thread+0xa53/0xfc0 kernel/workqueue.c:3440
+ kthread+0x388/0x470 kernel/kthread.c:436
+ ret_from_fork+0x51e/0xb90 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+page last free pid 6064 tgid 6061 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ __free_pages_prepare mm/page_alloc.c:1433 [inline]
+ __free_frozen_pages+0xc2b/0xdb0 mm/page_alloc.c:2978
+ __slab_free+0x263/0x2b0 mm/slub.c:5573
+ qlink_free mm/kasan/quarantine.c:163 [inline]
+ qlist_free_all+0x97/0x100 mm/kasan/quarantine.c:179
+ kasan_quarantine_reduce+0x148/0x160 mm/kasan/quarantine.c:286
+ __kasan_slab_alloc+0x22/0x80 mm/kasan/common.c:350
+ kasan_slab_alloc include/linux/kasan.h:253 [inline]
+ slab_post_alloc_hook mm/slub.c:4538 [inline]
+ slab_alloc_node mm/slub.c:4866 [inline]
+ __do_kmalloc_node mm/slub.c:5259 [inline]
+ __kmalloc_noprof+0x316/0x760 mm/slub.c:5272
+ kmalloc_noprof include/linux/slab.h:954 [inline]
+ iovec_from_user+0x87/0x250 lib/iov_iter.c:1321
+ __import_iovec+0x163/0x7e0 lib/iov_iter.c:1375
+ import_iovec+0x73/0xa0 lib/iov_iter.c:1440
+ copy_msghdr_from_user net/socket.c:2522 [inline]
+ recvmsg_copy_msghdr net/socket.c:2771 [inline]
+ ___sys_recvmsg+0x4bd/0x590 net/socket.c:2843
+ do_recvmmsg+0x334/0x800 net/socket.c:2942
+ __sys_recvmmsg net/socket.c:3016 [inline]
+ __do_sys_recvmmsg net/socket.c:3039 [inline]
+ __se_sys_recvmmsg net/socket.c:3032 [inline]
+ __x64_sys_recvmmsg+0x198/0x250 net/socket.c:3032
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-We also have a single-test runner that reloads the driver automatically:
-
-  =
-https://github.com/bobvan/PePPAR-Fix/blob/main/tools/igc_tx_single_test.py=
-
-
-
-Results (clean state, driver reloaded between each test)
---------------------------------------------------------
-
-Stock driver (no patch):
-
-  TX 100/s  + adj 1/s     : no timeout in 60s  (0 TO, 0 skip)
-  TX 1k/s   + adj 1/s     : no timeout in 60s  (0 TO, 0 skip)
-  TX 10k/s  + adj 1/s     : no timeout in 60s  (0 TO, 0 skip)
-  TX 1k/s   + adj 10k/s   : no timeout in 60s  (0 TO, 0 skip)
-  TX 10k/s  + adj 100k/s  : no timeout in 60s  (0 TO, 0 skip)
-  TX 100k/s + adj 100k/s  : FAIL at 16s        (3 TO, 76 skip)
-  TX 100k/s + no adj      : FAIL at 16s        (4 TO, 8M skip)
-
-v3 (tmreg_lock + TSYNCTXCTL disable/enable):
-
-  TX 128/s  + adj 1/s     : no timeout in 300s (0 TO, 0 skip)
-  TX 100k/s + adj 100k/s  : FAIL at 17s        (12 TO, 1.7M skip)
-
-Three distinct failure modes
-----------------------------
-
-1. TIMINCA corruption (the original bug):
-
-   adjfine writes TIMINCA while a TX timestamp capture is in progress.
-   The hardware latches a value computed with an inconsistent increment
-   rate. The valid bit in TSYNCTXCTL is never set, the slot stays
-   occupied, and the watchdog times out after 15 seconds.
-
-   Signature: low skip count + moderate timeout count. The capture
-   acquired a slot normally but the timestamp was corrupt.
-
-   This is the bug that matters in practice. At 1 Hz adjfine + 128 Hz
-   PTP sync, the collision probability per adjfine call is low but
-   nonzero =E2=80=94 we measured ~30 minute MTBF empirically.
-
-2. TX timestamp slot exhaustion:
-
-   At extreme TX rates (100k+) without adjfine, all 4 timestamp slots
-   (IGC_MAX_TX_TSTAMP_REGS) stay occupied because the interrupt/drain
-   path can't keep up. New packets requesting timestamps are skipped
-   (tx_hwtstamp_skipped). Eventually some slot's 15-second timeout
-   fires.
-
-   Signature: massive skip count (millions), timeout count =3D 4 (one
-   per slot). This is unrelated to the TIMINCA race.
-
-3. TSYNCTXCTL stranding (v3 side effect):
-
-   When v3 disables TSYNCTXCTL_ENABLED, a capture that was already
-   in progress may never complete =E2=80=94 the hardware won't set the =
-valid
-   bit for a capture started while timestamping was enabled if it
-   finishes after timestamping is disabled. The slot stays occupied
-   for 15 seconds.
-
-   Signature: high skip count + high timeout count. At 100k adj/s,
-   timestamping is disabled 100k times per second, frequently
-   stranding captures.
-
-   This doesn't occur at realistic rates because the 1 Hz adjfine
-   only creates one brief (~1 =C2=B5s) disable window per second.
-
-
-PTP GM scaling implications
----------------------------
-
-With adjfine fixed at 1/s (realistic for any GPSDO), the adjfine race
-is not the scaling bottleneck.  The limit is the 4-slot TX timestamp
-queue (IGC_MAX_TX_TSTAMP_REGS).  We swept TX timestamp rates from
-128/s to 150k/s with 1 Hz adjfine and driver reload between each
-test (v3 patch):
-
-  TX   128/s + adj 1/s : clean 60s   (1 PTP client at 128 Hz)
-  TX  1024/s + adj 1/s : clean 60s   (~8 clients)
-  TX  8192/s + adj 1/s : clean 60s   (~64 clients)
-  TX 65536/s + adj 1/s : clean 60s   (~512 clients)
-  TX 100k/s  + adj 1/s : FAIL 17s    (12 TO, 9M skip =E2=80=94 slot =
-exhaustion)
-  TX 100k/s  + NO adj  : FAIL 17s    (12 TO, 10M skip =E2=80=94 same =
-without adj)
-
-The 100k/s failure is slot exhaustion (identical with and without
-adjfine), not the TIMINCA race.  The i225/i226 hardware can handle
-roughly 65k TX timestamps per second before the 4-slot queue becomes
-the bottleneck.  This limits the i226 to approximately 500 PTP
-clients at logSyncInterval -7 (128 Hz sync).
-
-The adjfine race itself has negligible probability at 1 Hz adjfine.
-The TSYNCTXCTL disable window in v3 is ~1 =C2=B5s per second =E2=80=94 a =
-duty
-cycle of 10^-6.  Even at 65k TX timestamps/s, the probability of
-a capture starting during that window is ~0.065 per second, giving
-an estimated MTBF of many hours.
-
-
-Note on igc_ptp_tx_hang
-------------------------
-
-We noticed that igc_ptp_tx_hang() does not check TSYNCTXCTL valid
-bits before declaring a timeout. It only checks whether 15 seconds
-have elapsed since the slot was assigned. If the hardware captured a
-valid timestamp but the completion interrupt was lost or coalesced,
-the valid timestamp is thrown away by the timeout handler (which reads
-TXSTMPH_0 to clear all valid bits). A more robust timeout handler
-could check TSYNCTXCTL and salvage valid-but-undelivered timestamps
-before declaring a timeout. This wouldn't fix the TIMINCA race but
-would make the system more resilient to lost interrupts.
-
-
-Tested on:
-  - Intel i226 (TimeHAT board on Raspberry Pi 5)
-  - Kernel 6.12.62+rpt-rpi-2712 (Raspberry Pi OS)
-  - Intel out-of-tree igc driver 5.4.0-7642.46
-
-Thanks,
-Bob Van Valzah
-
-=E2=80=94
-
- drivers/net/ethernet/intel/igc/igc_ptp.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c =
-b/drivers/net/ethernet/int
-el/igc/igc_ptp.c
---- a/drivers/net/ethernet/intel/igc/igc_ptp.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
-@@ -47,6 +47,8 @@ static int igc_ptp_adjfine_i225(struct ptp_clock_info =
-*ptp, lo
-ng scaled_ppm)
- {
-        struct igc_adapter *igc =3D container_of(ptp, struct =
-igc_adapter,
-                                               ptp_caps);
-        struct igc_hw *hw =3D &igc->hw;
-+       unsigned long flags;
-+       u32 txctl;
-        int neg_adj =3D 0;
-        u64 rate;
-        u32 inca;
-@@ -63,7 +65,17 @@ static int igc_ptp_adjfine_i225(struct ptp_clock_info =
-*ptp, l
-ong scaled_ppm)
-        if (neg_adj)
-                inca |=3D ISGN;
-
--       wr32(IGC_TIMINCA, inca);
-+       /* Changing TIMINCA while the hardware is capturing a TX =
-timestamp
-+        * corrupts the timestamp, causing "Tx timestamp timeout."
-+        * Temporarily disable TX timestamping so no new capture can =
-start
-+        * during the rate change.
-+        */
-+       spin_lock_irqsave(&igc->tmreg_lock, flags);
-+       txctl =3D rd32(IGC_TSYNCTXCTL);
-+       wr32(IGC_TSYNCTXCTL, txctl & ~IGC_TSYNCTXCTL_ENABLED);
-+       wr32(IGC_TIMINCA, inca);
-+       wr32(IGC_TSYNCTXCTL, txctl);
-+       spin_unlock_irqrestore(&igc->tmreg_lock, flags);
-
-        return 0;
- }
---
-2.39.2
+Memory state around the buggy address:
+ ffff88807eeac180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88807eeac200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88807eeac280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                     ^
+ ffff88807eeac300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88807eeac380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
 
-> On Mar 31, 2026, at 6:14=E2=80=AFPM, Bob Van Valzah =
-<Bob@VanValzah.Com> wrote:
->=20
-> There is one other symptom of this bug that we neglected to report =
-previously: PEROUT stops. That=E2=80=99s PPS OUT for us, so it=E2=80=99s =
-how we first noticed the problem. Recovery was to unload and reload the =
-igc driver.
->=20
-> I take this as further evidence for my hunch that the hardware just =
-reaches some internal =E2=80=9Cthis should never happen=E2=80=9D state =
-and the PHC just stops ticking.
->=20
-> Hoping this additional symptom report might help with diagnosis.
->=20
-> Bob
->=20
->> On Mar 30, 2026, at 12:42=E2=80=AFPM, Bob Van Valzah =
-<Bob@VanValzah.Com> wrote:
->>=20
->> Thanks for following up Vadim. To be clear, we do not see our patch =
-as a solution to the problem, since it does not eliminate the underlying =
-contention, it just reduces the likelihood.
->>=20
->> We now have a bit more hands-on time running the patch and can see =
-its limitations. The driver just throws the timeout error less often =
-now. Moreover, our code calling adjfine() has to be ready for an EBUSY. =
-The patch is certainly not an elegant solution. It may well have worked =
-better, or perhaps been a complete fix, if we had taken tmreg_lock. =
-Sorry if we sent our patch prematurely.
->>=20
->> We think the contention happens when a system call made by a clock =
-disciplining daemon like ts2phc changes a PHC's frequency, while a =
-timestamping daemon like ptp4l has requested a timestamp against that =
-same PHC. A plausible explanation is that the hardware fails to produce =
-a timestamp for a packet when it collides with a PHC frequency =
-adjustment, leading to the timestamp timeout. We see this contention =
-128x more often than the average user because we cranked our PTP sync =
-rate up to 128 Hz. We care about every ns here. The likelihood probably =
-also scales with the number of PTP clients.
->>=20
->> Sorry, in retrospect, we may have overstated our case in declaring =
-the root cause as the lack of locking, since our locking only reduces =
-the likelihood of the timestamp timeout. Intel may provide insight to =
-the underlying cause of the timeout, but my hunch is that the collision =
-of a timestamp request against a PHC and a frequency change of the same =
-PHC causes the timestamp request to fail, leading to the timeout. Our =
-repro code makes this happen so reliably that it should be easy for the =
-hardware guys to explain exactly what=E2=80=99s going on. Hopefully, =
-they can advise on a more elegant avoidance strategy than our ham-handed =
-lock.
->>=20
->> We have not tried recovering a timestamp following the error. We may =
-have used the term =E2=80=9Ccorrupted=E2=80=9D poorly here. Since the =
-error message says =E2=80=9Ctimeout," that could mean the hardware =
-produced no timestamp at all, rather than a corrupted one.
->>=20
->> This isn=E2=80=99t a show-stopper for us, but we note that =
-timekeeping daemons with imperfect error handling could react to this =
-situation poorly and perhaps fail silently.
->>=20
->> Bob
->>=20
->>> On Mar 30, 2026, at 11:39=E2=80=AFAM, Vadim Fedorenko =
-<vadim.fedorenko@linux.dev> wrote:
->>>=20
->>> On 29/03/2026 04:25, Bob Van Valzah wrote:
->>>> Hi,
->>>> We found a race in igc_ptp_adjfine_i225() that causes "Tx timestamp
->>>> timeout" errors and eventually wedges EXTTS when a PTP grandmaster
->>>> (ptp4l with hardware timestamping) runs concurrently with PHC
->>>> frequency discipline (any GPSDO calling clock_adjtime =
-ADJ_FREQUENCY).
->>>> Root cause: igc_ptp_adjfine_i225() writes IGC_TIMINCA without =
-holding
->>>> any lock.  Every other PTP clock operation in igc_ptp.c (adjtime,
->>>> gettime, settime) holds tmreg_lock, but adjfine does not.  When the
->>>> increment rate changes while the hardware is capturing a TX =
-timestamp,
->>>> the captured value is corrupt.  The driver retries for
->>>> IGC_PTP_TX_TIMEOUT (15s), then logs the timeout and frees the skb.
->>>> Repeated occurrences eventually prevent EXTTS from delivering =
-events.
->>>> The attached reproducer (triggers in ~17 seconds on i226):
->>>> One thread calling clock_adjtime(ADJ_FREQUENCY) at ~200k/s on the
->>>> PHC, another sending UDP packets with SO_TIMESTAMPING requesting
->>>> hardware TX timestamps at ~100k/s.  A Python reproducer is at:
->>>> =
-https://github.com/bobvan/PePPAR-Fix/blob/main/tools/igc_tx_timeout_repro.=
-py
->>>> At realistic rates (1 Hz adjfine from a GPSDO + ptp4l at 128 Hz
->>>> sync), the race triggers in ~30 minutes.
->>>> The attached patch holds ptp_tx_lock around the TIMINCA write and
->>>> skips the write if any TX timestamps are pending (tx_tstamp[i].skb
->>>> !=3D NULL), returning -EBUSY.  This doesn't fully close the =
-hardware
->>>> race (a new TX capture can start between the check and the write),
->>>> but at realistic rates the residual probability gives ~25 year MTBF
->>>> vs ~30 minutes without the patch.
->>>> A complete fix would likely require either disabling TX =
-timestamping
->>>> around TIMINCA writes (via TSYNCTXCTL), or making the timeout =
-recovery
->>>> path more robust so a single corrupt timestamp doesn't wedge the
->>>> subsystem.  We'd welcome guidance from the igc maintainers on the
->>>> preferred approach.
->>>> Tested on:
->>>> - Intel i226 (TimeHAT v5 board on Raspberry Pi 5)
->>>> - Kernel 6.12.62+rpt-rpi-2712 (Raspberry Pi OS)
->>>> - Intel out-of-tree igc driver 5.4.0-7642.46
->>>> - Stock upstream igc_ptp.c (same code, same bug)
->>>> Bob
->>>> ---
->>>> drivers/net/ethernet/intel/igc/igc_ptp.c | 18 +++++++++++++++++-
->>>> 1 file changed, 17 insertions(+), 1 deletion(-)
->>>> diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c =
-b/drivers/net/ethernet/intel/igc/igc_ptp.c
->>>> index XXXXXXX..XXXXXXX 100644
->>>> --- a/drivers/net/ethernet/intel/igc/igc_ptp.c
->>>> +++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
->>>> @@ -47,8 +47,10 @@ static int igc_ptp_adjfine_i225(struct =
-ptp_clock_info *ptp, long scaled_ppm)
->>>> {
->>>>       struct igc_adapter *igc =3D container_of(ptp, struct =
-igc_adapter,
->>>>                                              ptp_caps);
->>>>       struct igc_hw *hw =3D &igc->hw;
->>>> +       unsigned long flags;
->>>>       int neg_adj =3D 0;
->>>>       u64 rate;
->>>>       u32 inca;
->>>> +       int i;
->>>>       if (scaled_ppm < 0) {
->>>>               neg_adj =3D 1;
->>>> @@ -63,7 +65,21 @@ static int igc_ptp_adjfine_i225(struct =
-ptp_clock_info *ptp, long scaled_ppm)
->>>>       if (neg_adj)
->>>>               inca |=3D ISGN;
->>>> -       wr32(IGC_TIMINCA, inca);
->>>> +       /* Changing the clock increment rate while a TX timestamp =
-is being
->>>> +        * captured by the hardware can corrupt the timestamp, =
-causing the
->>>> +        * driver to report "Tx timestamp timeout" and eventually =
-wedging
->>>> +        * the EXTTS subsystem.  Serialize with pending TX =
-timestamps:
->>>> +        * skip the rate change if any are in flight.
->>>> +        */
->>>> +       spin_lock_irqsave(&igc->ptp_tx_lock, flags);
->>>> +       for (i =3D 0; i < IGC_MAX_TX_TSTAMP_REGS; i++) {
->>>> +               if (igc->tx_tstamp[i].skb) {
->>>> +                       spin_unlock_irqrestore(&igc->ptp_tx_lock, =
-flags);
->>>> +                       return -EBUSY;
->>>> +               }
->>>> +       }
->>>> +       wr32(IGC_TIMINCA, inca);
->>>> +       spin_unlock_irqrestore(&igc->ptp_tx_lock, flags);
->>>=20
->>> It's a bit weird solution, because in this case we may end up having =
-no
->>> successful calls to adjfine with high amount of TX timestamp packets =
-in flight. Another problem here is that access to timing registers is
->>> guarded by tmreg_lock, but here you use ptp_tx_lock, which protects
->>> queue.
->>>=20
->>> Were you able to recover "corrupted" time stamps to figure out why =
-they
->>> are discarded?
->>>=20
->>>=20
->>>>       return 0;
->>>> }
->>>> --
->>>> 2.39.2
->>=20
->>=20
->=20
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
