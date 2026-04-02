@@ -1,249 +1,249 @@
-Return-Path: <netdev+bounces-274421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274422-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qLpdMBIozmnIlQYAu9opvQ
-	(envelope-from <netdev+bounces-274421-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 10:25:54 +0200
+	id QADFIlgnzmnIlQYAu9opvQ
+	(envelope-from <netdev+bounces-274422-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 10:22:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EC0E385FA4
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 10:25:54 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F551385F21
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 10:22:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 980B93044B7B
+	by sea.lore.kernel.org (Postfix) with ESMTP id 18C27303FF0D
 	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 08:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D663603D1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3BF236C9C8;
 	Thu,  2 Apr 2026 08:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="TDFOXP0y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UxkEk+bO";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gRSjU4NF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D404930276A;
-	Thu,  2 Apr 2026 08:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F5E3314C2
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 08:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775117997; cv=none; b=PbXP+kPgSc5eW99+ieoS4gT6TsAGVwigT3ncA5cKzkmpVKsWzl6MW8/3SEDOVeIicPHWbWMDKNobTQMOBXDjPMYK1ZV663roof6lcZKupExAuGpwDkPvtRg3/f6Jlfc/KJwOwMyIL1FXuR6lQaJUctN9E5iEeZsK1ylwmtuEdOk=
+	t=1775117997; cv=none; b=c1AY1/DnHGqDM5gGEv0wD6ZAS8kQT3ohK0vmCBQb7MMekVM7mJuGNUbGmDyfywBiOht0OrmUl7kTatxKh/tJjnFTvtWQOqrKIrGgljaNmC3f62kVL6DU43QfZLxnjOH4+2BCfBppmBLlFm/0qCsXbq63cDk9OE1yeDS42wvvgoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775117997; c=relaxed/simple;
-	bh=cHZTSUwDXfFNbumoLgzKe705GExS6CeHXehC56/l7oE=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=OHr9+6bjMdhnDLbQTWHCzUUgQiOt8jYQXgDU6lkiopIx7a8X4CK/tfr1xzYhzVsjNuKKSa/bPGZjEQz9QxmYGvv+0Ppv5WXVc/EaWzlb6lFQEZSYLSPboHE3m3P0asGBbVOP/Svx8VwvDdYW9bdYAThptZF9sYR8J301+OTNnRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=TDFOXP0y; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 70C46A5889;
-	Thu,  2 Apr 2026 10:19:46 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1775117990; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=7FmUTRudoDjBs2TfT2uUEICTUomf7L/YVLbRjYx6tJI=;
-	b=TDFOXP0ynnwrqV3WVem9dZiqeTilrjd/6e2EHtQ7/3LKacVF8ZZFAyYdtkBEdoQu/IFcW9
-	oHvMreYaERytp6zxDmulX+TZcgFrOkn0K9xyVaYMhqqslsoufdlCcun+4z6a4aQuNGpqSf
-	G4SDHEyd+shU9a7n53CfHG3YEoSLRN/7R+QO7n83/zOoStjjFWeJgZcXMG6uVOeO9i0yFO
-	bSLnrUFs6F7t16wGNEA84wFFwzBZCL63UAQuUE2J40qgT12fXrCFumD+5a88Fjsqe8UboV
-	Je4taX7DaZrgo9Hp8CcvjGZEFXIB1c22eGPJ4Z6UUgJfKRD1w6nBQDXMmepWmw==
+	bh=1CNWH0RD5qB7Qw6/e0icv6lX2ZvaieGolweobAmdkbk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QJ3HtubHCT7KPEvIxEuFN5apEJkqFY2qVqmXjodCjMFebSNQEJx67lF2T66O9/ZmkkuLSCsLo07K7bGtKNiJS7wrH8HeGeE02c0chTW/6o+7XVJFot/jAFtPSi/5AncUnqhcNXUbWEefDjL82AP6BO2EjvVnJovk0OPKCOk02Fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UxkEk+bO; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gRSjU4NF; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1775117995;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yAgv/iNQwR7zFYK7CL0OQLgq1P0LTe7Yih5B8afXkEw=;
+	b=UxkEk+bO2y2C4QQNdS8JuHrTZWR+4zYilxwX2wm/xyP5pnxRkcDX36w/LJaW+HpKCW2MKZ
+	jZVGel6yaDd2XcYKMT/ZXghxnIgxjsxwZF54UxJwBJkLE/Rkzhn2DqC5fXnuFn4DFTOzZN
+	gaZn/mhmbeZqAKwZHM/iESPL+tv4NzQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515-KH-h72GFMNaVmBISE9M73g-1; Thu, 02 Apr 2026 04:19:52 -0400
+X-MC-Unique: KH-h72GFMNaVmBISE9M73g-1
+X-Mimecast-MFC-AGG-ID: KH-h72GFMNaVmBISE9M73g_1775117991
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-486fc42c83aso4988055e9.0
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 01:19:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1775117991; x=1775722791; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yAgv/iNQwR7zFYK7CL0OQLgq1P0LTe7Yih5B8afXkEw=;
+        b=gRSjU4NF1ZC75IzfLe8wkVKvdXcUj3uEfCBVs12bmUIt3ACq7D8Ac7zf2WP7jJTVXo
+         L3CHKBR/B4MgSrkJNrq8DiXrtWRA1huL9HuuwuwiDLMfUApH3iWiqWPTeM4Cu9VJn8Rc
+         p54gZQLhPKeQ4SldJQCB7gXavdrIaAOyQ1fhYEk2nQ20KjlXY7YlloMmbcqMbAeOC4iq
+         9Pezqn59ALbM0UQD/LNKfaZD6adqO5QwFL1mx5YEtnx7boR3hWYMpty6Ij5F78HKMG/4
+         m7yZ7KM1LC5FFD7LIxjsOpFjJZQWlq5Hmkv2tuFAc0Lh3xymi08iTAEOGK0hkWReLvUT
+         OxKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775117991; x=1775722791;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yAgv/iNQwR7zFYK7CL0OQLgq1P0LTe7Yih5B8afXkEw=;
+        b=YFHWXzodWTZUxYxxinJbjT3ANC8zxrGNJN15Y1ug0QoNE+T/vF9oVHEarqTmKrPWzc
+         jmZMEHl2iH/fQbtW+z+v8u9krpYbgL5pUq3PN4Xk7yKaKoCiu5ze4R9vNrMoE1CqThdM
+         yzWcc5KA2Uid8I/4gRjXurtoWeUDxdFAFgsfX4/HMWsstWGT9UAv9o1Y8bF2CBVm5Rli
+         MDmuWPduCotW1uL6wQuANiRsRwZA6Wz7W3cr+lWC2rh/bl3GqrZl2aRP2jYgHRC3gX1k
+         SBwLR8ranjSIwMqGCz/r+r+nP8ZMhYcylOFpT5yMBHP08oXLLZATOMbv8NrHg01pgGVp
+         FeDA==
+X-Forwarded-Encrypted: i=1; AJvYcCWzHucCZAUz1FqwwYB256YhPDef5F48as4GKTdneKQlRyU99ys29AI7lAEZoldvZjCxT/uu4gk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFv/n4pKTyMroOp1F9jAxKI4Th9fJy6er6+QrBLX3VDdYj/kbV
+	w3lBU1kvUzx6GjNbl9ljVFa/2t/AWwLsHIgbdAbUThLoaun3coUjqeD/+Pub/tuOKzfbZuFdMSM
+	msH2aeJ7GD5VtAzZxu91thbday8N9VvUZqmGyTED53XR2UPFieDsnHUEc+g==
+X-Gm-Gg: ATEYQzxMgx1riHj/Hbp+jyLQ7YCjdc/kLEzeB4nreKVsrznMXBSPATEE23P/H0wQ55J
+	JVs1lkoDCwjg8Fquha0rfS7AKl9W621pKzPXb+ErceNwMHQc2BkBgLBpEzVPgpRUKqtZHya/+rY
+	bilTdxgwlGD16cYC6OmERqrw6A66LSjUgjqfb9O+cLHCNWCIWv83wPj73b/un58XGt06twDYGqz
+	fHdhAX6H5cTxPKAerRvgcclEmqyjgUaDqbVwnO+GaWpAUIjzzyX5BFYVZyr7bDsvFpPK44T9wdp
+	1Nx5fdbwZv3s6LbJcYs5iiCvUoOV2qr9wUAvH4vg4TqB+BnvUueMyuNcVQytuCyASZtnpkC3sZq
+	z90ByNv3r0E3I2hQWjgyP9i+/wYeLU1KT+NbwpSb3nRJ3tpt5KX/W4tOjSA==
+X-Received: by 2002:a05:600c:34d0:b0:485:3c66:e21d with SMTP id 5b1f17b1804b1-4888355e6d5mr123196075e9.2.1775117991012;
+        Thu, 02 Apr 2026 01:19:51 -0700 (PDT)
+X-Received: by 2002:a05:600c:34d0:b0:485:3c66:e21d with SMTP id 5b1f17b1804b1-4888355e6d5mr123195415e9.2.1775117990458;
+        Thu, 02 Apr 2026 01:19:50 -0700 (PDT)
+Received: from [192.168.88.32] ([212.105.153.248])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4888a66c766sm48158205e9.8.2026.04.02.01.19.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Apr 2026 01:19:49 -0700 (PDT)
+Message-ID: <d8464e0b-4622-43f8-b527-f6200bafd632@redhat.com>
+Date: Thu, 2 Apr 2026 10:19:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 02 Apr 2026 10:19:46 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, justin.chen@broadcom.com, horms@kernel.org,
- opendmb@gmail.com, florian.fainelli@broadcom.com,
- bcm-kernel-feedback-list@broadcom.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- sdf@fomichev.me, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v5 4/6] net: bcmgenet: add XDP_TX support
-In-Reply-To: <20260402032722.905829-1-kuba@kernel.org>
-References: <20260328230513.415790-5-nb@tipi-net.de>
- <20260402032722.905829-1-kuba@kernel.org>
-Message-ID: <36659d94abbf4c9a078ce71f64b12bfa@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v36 3/8] eea: probe the netdevice and create
+ adminq
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Wen Gu <guwen@linux.alibaba.com>,
+ Philo Lu <lulie@linux.alibaba.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, Dong Yibo <dong100@mucse.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Dust Li <dust.li@linux.alibaba.com>
+References: <20260329132222.130912-1-xuanzhuo@linux.alibaba.com>
+ <20260329132222.130912-4-xuanzhuo@linux.alibaba.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260329132222.130912-4-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
+	TAGGED_FROM(0.00)[bounces-274422-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274421-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,broadcom.com,kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,fomichev.me];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tipi-net.de:dkim,tipi-net.de:mid]
-X-Rspamd-Queue-Id: 3EC0E385FA4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2F551385F21
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2.4.2026 05:27, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> ---
-> net: bcmgenet: add XDP_TX support
-> 
-> This commit implements XDP_TX using ring 16, which is dedicated to XDP 
-> TX
-> for isolation from SKB TX queues. It also changes the page_pool DMA
-> direction to bidirectional to allow TX reuse of the existing DMA 
-> mapping.
-> 
->> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c 
->> b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
->> index b45ba2c2857e..687c3b12d44f 100644
->> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
->> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-> [ ... ]
->> @@ -2299,11 +2328,96 @@ static struct sk_buff 
->> *bcmgenet_xdp_build_skb(struct bcmgenet_rx_ring *ring,
->>  	return skb;
->>  }
->> 
->> +static bool bcmgenet_xdp_xmit_frame(struct bcmgenet_priv *priv,
->> +				     struct xdp_frame *xdpf, bool dma_map)
->> +{
-> [ ... ]
->> +	} else {
->> +		struct page *page = virt_to_page(xdpf->data);
->> +
->> +		/* For local XDP_TX the caller already prepended the TSB
->> +		 * into xdpf->data/len, so dma_len == xdpf->len.
->> +		 */
->> +		dma_len = xdpf->len;
->> +		mapping = page_pool_get_dma_addr(page) +
->> +			  sizeof(*xdpf) + xdpf->headroom;
-> 
-> When the RX page pool is created in bcmgenet_rx_ring_create_pool(), it 
-> is
-> initialized with .offset = GENET_XDP_HEADROOM. Does the DMA address
-> calculation here need to include this GENET_XDP_HEADROOM offset? 
-> Without it,
-> it appears the hardware might be given a DMA address that is 256 bytes
-> before the actual packet data, transmitting uninitialized memory.
+On 3/29/26 3:22 PM, Xuan Zhuo wrote:
+> +static int eea_adminq_submit(struct eea_net *enet, u16 cmd,
+> +			     dma_addr_t req_addr, dma_addr_t res_addr,
+> +			     u32 req_size, u32 res_size)
+> +{
+> +	struct eea_aq_cdesc *cdesc;
+> +	struct eea_aq_desc *desc;
+> +	int ret;
+> +
+> +	desc = ering_aq_alloc_desc(enet->adminq.ring);
+> +
+> +	desc->classid = cmd >> 8;
 
-The DMA address calculation is correct. page_pool_get_dma_addr()
-returns the base DMA address of the page, not offset by the pool's
-.offset parameter. sizeof(*xdpf) + xdpf->headroom correctly offsets
-to xdpf->data where the TSB starts.
+Here there are a couple of example where a reply to the AI reviews would
+have been very useful.
 
-> 
-> [ ... ]
->> @@ -2311,14 +2425,42 @@ static unsigned int bcmgenet_run_xdp(struct 
->> bcmgenet_rx_ring *ring,
->>  	switch (act) {
->>  	case XDP_PASS:
->>  		return XDP_PASS;
->> +	case XDP_TX:
->> +		/* Prepend a zeroed TSB (Transmit Status Block).  The GENET
->> +		 * MAC has TBUF_64B_EN set globally, so hardware expects every
->> +		 * TX buffer to begin with a 64-byte struct status_64.  Back
->> +		 * up xdp->data into the RSB area (which is no longer needed
->> +		 * after the BPF program ran) and zero it.
->> +		 */
->> +		if (xdp->data - xdp->data_hard_start <
->> +		    sizeof(struct status_64)) {
->> +			page_pool_put_full_page(ring->page_pool, rx_page,
->> +						true);
->> +			return XDP_DROP;
->> +		}
->> +		xdp->data -= sizeof(struct status_64);
->> +		xdp->data_meta -= sizeof(struct status_64);
->> +		memset(xdp->data, 0, sizeof(struct status_64));
->> +
->> +		xdpf = xdp_convert_buff_to_frame(xdp);
-> 
-> Does this headroom check account for the additional sizeof(struct 
-> xdp_frame)
-> required by xdp_convert_buff_to_frame()?
+Sashiko says:
 
-The TSB headroom check doesn't account for sizeof(struct xdp_frame), but 
-xdp_update_frame_from_buff() has its own check that returns -ENOSPC if 
-headroom - metasize < sizeof(*xdp_frame). We handle the NULL return by 
-dropping the frame. I'll tighten the check to include sizeof(struct 
-xdp_frame) to fail early.
+---
+Is it possible for ering_aq_alloc_desc() to return NULL if the admin
+ring is full?
+If so, will this cause a NULL pointer dereference when accessing
+desc->classid?
+---
 
-> 
-> If metadata is present, xdp->data_meta could potentially underflow
-> xdp->data_hard_start. If the remaining headroom minus metasize becomes
-> negative in xdp_convert_buff_to_frame(), could it undergo integer 
-> promotion
-> to a large unsigned value and bypass the internal safety check? This 
-> might
-> cause the struct xdp_frame to overwrite the newly zeroed status_64 
-> block.
+AFAICS this is allucinating, as ering_aq_alloc_desc() never returns NULL.
 
-xdp_update_frame_from_buff() handles this - it clamps metasize to >= 0 
-and checks (headroom - metasize) < sizeof(*xdp_frame), returning NULL on 
-insufficient space.
+> +	desc->flags = cpu_to_le16(enet->adminq.phase);
+> +
+> +	ering_sq_commit_desc(enet->adminq.ring);
+> +
+> +	ering_kick(enet->adminq.ring);
+> +
+> +	++enet->adminq.num;
+> +
+> +	if ((enet->adminq.num % enet->adminq.ring->num) == 0)
+> +		enet->adminq.phase ^= EEA_RING_DESC_F_AQ_PHASE;
 
-> 
-> [ ... ]
->> @@ -2556,9 +2698,15 @@ static int bcmgenet_rx_poll(struct napi_struct 
->> *napi, int budget)
->>  {
->>  	struct bcmgenet_rx_ring *ring = container_of(napi,
->>  			struct bcmgenet_rx_ring, napi);
->> +	struct bcmgenet_priv *priv = ring->priv;
->>  	struct dim_sample dim_sample = {};
->>  	unsigned int work_done;
->> 
->> +	/* Reclaim completed XDP TX frames (ring 16 has no interrupt) */
->> +	if (priv->xdp_prog)
->> +		bcmgenet_tx_reclaim(priv->dev,
->> +				    &priv->xdp_tx_ring, false);
->> +
-> 
-> What happens to in-flight frames if the XDP program is detached at 
-> runtime
-> and priv->xdp_prog becomes NULL? Will this permanently lose track of 
-> the
-> page pool buffers and DMA mappings since the NAPI poll stops reclaiming
-> them?
+Sashiko says:
 
-Good catch. The reclaim in rx_poll is gated on priv->xdp_prog, so
-in-flight frames on the TX ring would never be reclaimed after detach.
-I'll change the condition to check for pending frames on the ring
-instead.
+---
+Does this code require a lock to serialize access?
+Concurrently modifying enet->adminq.num and enet->adminq.phase from
+multiple threads could lead to data races and ring corruption if
+administrative commands are triggered simultaneously.
+---
 
-> 
-> Additionally, if the interface is the target of an XDP_REDIRECT from 
-> another
-> device, a local XDP program is not required and priv->xdp_prog could be
-> NULL. Does this mean the transmitted frames for redirected traffic will
-> never be reclaimed, eventually filling the TX ring?
+Again, AFAICS this is allucinating, as all the calls are under the rtnl
+lock. This check took a lot of time to me, because I had to go up in the
+call stack a few hops looking for any lock. A reply clarifying the
+locking would have been very helpful.
 
-The redirect-without-local-prog case can't happen since
-xdp_features_set_redirect_target is tied to program attachment.
-But the detach race is real - will fix in v6.
+> +	ret = le32_to_cpu(cdesc->status);
+> +
+> +	ering_cq_ack_desc(enet->adminq.ring, 1);
+> +
+> +	if (ret)
+> +		netdev_err(enet->netdev,
+> +			   "adminq exec failed. cmd: %d ret %d\n", cmd, ret);
+> +
+> +	return ret;
+> +}
 
-Thanks
-Nicolai
+Sashiko says:
+
+---
+Are device statuses returned as positive integers?
+If this returns a positive value during eea_net_probe(), it will bubble
+up to the PCI subsystem. Since the driver model treats a return value >
+0 as a successful probe, the PCI core might believe the device is
+successfully bound even though the error path in eea_net_probe() freed
+the resources.
+Could this lead to a use-after-free during device removal?
+---
+
+This looks real to me, and was already reported in the previous
+iteration. The question is: why do you consider this invalid? Or did you
+miss the remark? A reply to this comment would have been helpful.
+
+The bottom line is please go over the comments reported by sashiko, and
+either take care of them (dropping a line in the changelog about the
+update) or reply on the ML explaining why the comment is not valid, with
+a single reply per patch touching all the relevant comments.
+
+I understand it takes a significant effort, but if you leave this
+entirely on us, the only choice we have is to unconditionally set to
+change request any patches with AI remarks due to the volume of comments
+and capacity limits.
+
+Thanks,
+
+Paolo
+
 
