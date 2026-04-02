@@ -1,162 +1,141 @@
-Return-Path: <netdev+bounces-274586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274587-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8KCiF+CCzmmDoAYAu9opvQ
-	(envelope-from <netdev+bounces-274586-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:53:20 +0200
+	id SJZ9OheCzmmDoAYAu9opvQ
+	(envelope-from <netdev+bounces-274587-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:49:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B34DB38AD9F
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:53:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5560E38ACDB
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:49:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 723D030604F9
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 14:47:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7BAD1303CC21
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 14:47:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3850C3EDAA2;
-	Thu,  2 Apr 2026 14:46:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3BD0846F;
+	Thu,  2 Apr 2026 14:47:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d1Z5RoTX"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48DD11BF33
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 14:46:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F931BF33
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 14:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775141213; cv=none; b=hUAkIgd94zl5qtSJYkOoHmhR4Jq1a0M85O505gzRfs2chShls3J8p/IH8z0Na5LMW43cNwrnzrwRkg6beB4Acc9FUCaQaLz7CPz1zACoAdBV1yQCrXbVT444wvI+IS9XLxvCPkEXpWI2IuUEW8LN/SopNXXpEfWO/2P4MznmE0o=
+	t=1775141248; cv=none; b=cxUeop8MwC75HSpdqDulGbbeN5u7SOde4ECKzKuDb731wvoZ/mry6u5rgiTepdWDGtdrBHpzA1mEy2z5wRfpMYL4w8BPuthJS6LQzCSs3R2v5Ebg+d2qYcFwWe1vIJKj0bgQBPbS+lg8wyrBrHGO5/wNHUxSQPiDsI2RzofMntE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775141213; c=relaxed/simple;
-	bh=XwOfAdEK+gqTJYqZiWRWo7L+IlmDVJAOASLMtEajcqA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m7N4mLvUTcT2yJCJvjrpw5poM73Xg4df45V+xgJwatpsSBYqqhZhkn5VkVGCk5GC6g3C7lbFMJxe15rCSwjv5jUcXJbtz2Js9qUsg+t2Htiinth4nx9hOTyPsAUYMXfyog4oIZb1i24ZfqAOwDx0BJfCiJHZr9FS18j5cQKJLRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.161.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowACXB_g9gc5pVBehAA--.362S3;
-	Thu, 02 Apr 2026 22:46:24 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	elibr@mellanox.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	yuantan098@gmail.com,
-	bird@lzu.edu.cn,
-	enjou1224z@gmail.com,
-	caoruide123@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 1/1] net: sched: act_csum: validate nested VLAN headers
-Date: Thu,  2 Apr 2026 22:46:20 +0800
-Message-ID: <22df2fcb49f410203eafa5d97963dd36089f4ecf.1774892775.git.caoruide123@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1774892775.git.caoruide123@gmail.com>
-References: <cover.1774892775.git.caoruide123@gmail.com>
+	s=arc-20240116; t=1775141248; c=relaxed/simple;
+	bh=syQhn3FKDSt7aahom2Cd5r2lVp93DM2NQ4SMHj+9K0s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l4Qa4XDux73PEd+thq9CGjeJAO1MF3kkNfEFoyLCmnKRS3Kk7Q17h0yh6wk+9N8GNWBQxS67BMdpNoAReXFoImAImhrb7DCA2beXSFqYX47csExf6ezgePAT5Krh0lVbMq/2CJaP/sMR8T/8VY8IQEFXNShqzWgMul7wpCS6le4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d1Z5RoTX; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4838c15e3cbso7973705e9.3
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 07:47:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775141246; x=1775746046; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=syQhn3FKDSt7aahom2Cd5r2lVp93DM2NQ4SMHj+9K0s=;
+        b=d1Z5RoTXvsRwDc/LzwAq0eR5Jo7LOkmQaJkg640eZK4MNBcqYh/AokZ1MqzVf4q1mu
+         4UU5wUcTjxeUBLOfLj5fP1/vGetDZCW93zkEAhXYlrBtD0xhLMqqKjSEMuyH+NvSA7Xw
+         3DT+K/9W6znJ4N9zWTDq2/ZkuY2VQKNiNxEd9Vxn4WWdgogDqtiQanMl5kWNXnf60xpg
+         Y60wkH6V11t1twotoMjynVySYirCfzeNUHGW0kJalS7nW5TXnd1S4D3Cqk28Cmj2l8v9
+         ByocPnBCEQjlY8TcUa4Bm+DYjjigjplnToyaaMkyF5PFtyVhd6Wi8Lylyu0DEFdq4r26
+         Uwwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775141246; x=1775746046;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=syQhn3FKDSt7aahom2Cd5r2lVp93DM2NQ4SMHj+9K0s=;
+        b=UXAJplrt5iqjxjJ4tO9XFmQDV0SoYBEDXwa/vUTpEergMM5mlsaqosD1z/UTlasRqW
+         g/YegYoj5W+rKQebm6m4gOMR28bdOCfwEkafvfQwKf4G0556xh5gNi6XCk2EI/jvUHZm
+         eyvpfrJOLF+dOMeB1H1rFbioh6BTYvXXGr8deHDQAn1kfcsEnv7hHRnsTbFlJNCYlfTf
+         6V9ROFJKEZtPfEBUUE9q1uipihOExNi/V2b4mht/e6PxPzrQzd1SpFag7zFM3KWgoa4P
+         FbstTuwkof6/us6dsp7cP+oMoaxfcjZWirWiT6WSMFiQ04cvrQw7Z9dCpcOZb33zY/9i
+         p9/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVUEeqf7APRkaici0f2iuUgIGD9ZgSUBoV2cO2EmFAHd36r7xhY4ON3BDl6Uc9Y9nqRbhX8FoU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXZwhrSDWwLxx2//dzsJyOuVq8u9tmB4l4o8CSRb8CJrd5r6EE
+	AhFemR9zgx/EJPJm25lHLSOsjY57s0Uder4tYTF6apGfP7UZOWByl9lg
+X-Gm-Gg: ATEYQzwwKSn2r73DXjIf2BZ7ycu1rJ3C8gMfM206zFG3syHSySMxGIg674R+CzBvrky
+	A572M004ys4onXkcbBst/vJNB7D6AOeV3Ed38Hh2pmBVIN1D2EGV3y7TKIvlSxBNvv465zK8tYI
+	iPUv8RfluzrPvqSQJnk74704WvjAd8pEGe+Q+Pnao1l6pDh6B4Sxjg5lZvxj8Z8BtGqx37mVf7G
+	Y+/WP18C2LLWqv+WVUgV75rjjCByuufsFlRc4E230rf4lvR7rT3pqN/0NPY13zJiTKoN4IuZKdi
+	2hMDushlt1V4IBT0mYfD9SsqjtykXcnEhIuQ1cbkR2V4avdDfFtjSxHh9KWSULpebTYseEdgBDq
+	yLN3Tb6DlJ4RBYPJpAUr0lFyJrr+fbjjKx2FmZv92VT/dX0Fr3YzHfYIEy2dswZt8tCucobfhKj
+	sh9EJQvxUOPQ6Wfbx0H7dDb11mjDxdAgjJGZNaZwxgUL/VifvFiU/ynDNXrw==
+X-Received: by 2002:a05:600c:4f08:b0:487:1826:d89b with SMTP id 5b1f17b1804b1-4888b6f7f8emr56182235e9.9.1775141245586;
+        Thu, 02 Apr 2026 07:47:25 -0700 (PDT)
+Received: from [10.128.11.51] (195-23-151-163.net.novis.pt. [195.23.151.163])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887ad8d28bsm87489185e9.10.2026.04.02.07.47.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Apr 2026 07:47:25 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+Message-ID: <cec5001d-7ac7-4b21-a3d6-6052e1d8fc87@gmail.com>
+Date: Thu, 2 Apr 2026 15:47:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowACXB_g9gc5pVBehAA--.362S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7KF4rKrWruw43tFWftF18Krg_yoW8Cw1rpF
-	ZIgF1kKrZ7GF17Xw18t348Gay3XFZ5G3Zxt3ykGrW5tanYgw4FvF1UKFnruw48ur4SkFyS
-	yr1q9ry7urn8ArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
-	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQMFCWnNP3wX9QAAsL
-X-Spamd-Result: default: False [-0.96 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] stmmac: cleanup dead dependencies on STMMAC_PLATFORM and
+ STMMAC_ETH in Kconfig
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: manabian@gmail.com, davem@davemloft.net, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, mcoquelin.stm32@gmail.com,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20260331125817.117091-1-julianbraha@gmail.com>
+ <20260401185814.45dfc444@kernel.org>
+Content-Language: en-US
+From: Julian Braha <julianbraha@gmail.com>
+In-Reply-To: <20260401185814.45dfc444@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274586-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[mojatatu.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,mellanox.com,gmail.com,lzu.edu.cn];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,st.com,foss.st.com,vger.kernel.org,lists.infradead.org];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274587-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.985];
-	TO_DN_NONE(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[julianbraha@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: B34DB38AD9F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5560E38ACDB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Ruide Cao <caoruide123@gmail.com>
+Whoops! You're right, good catch. Looks like I've been staring at too
+many 'depends on' lately...
 
-tcf_csum_act() walks nested VLAN headers directly from skb->data when an
-skb still carries in-payload VLAN tags. The current code reads
-vlan->h_vlan_encapsulated_proto and then pulls VLAN_HLEN bytes without
-first ensuring that the full VLAN header is present in the linear area.
-
-If only part of an inner VLAN header is linearized, accessing
-h_vlan_encapsulated_proto reads past the linear area, and the following
-skb_pull(VLAN_HLEN) may violate skb invariants.
-
-Fix this by requiring pskb_may_pull(skb, VLAN_HLEN) before accessing and
-pulling each nested VLAN header. If the header still is not fully
-available, drop the packet through the existing error path.
-
-Fixes: 2ecba2d1e45b ("net: sched: act_csum: Fix csum calc for tagged packets")
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Suggested-by: Xin Liu <bird@lzu.edu.cn>
-Tested-by: Ren Wei <enjou1224z@gmail.com>
-Signed-off-by: Ruide Cao <caoruide123@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- net/sched/act_csum.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/net/sched/act_csum.c b/net/sched/act_csum.c
-index 213e1ce9d2da..a9e4635d899e 100644
---- a/net/sched/act_csum.c
-+++ b/net/sched/act_csum.c
-@@ -604,8 +604,12 @@ TC_INDIRECT_SCOPE int tcf_csum_act(struct sk_buff *skb,
- 			protocol = skb->protocol;
- 			orig_vlan_tag_present = true;
- 		} else {
--			struct vlan_hdr *vlan = (struct vlan_hdr *)skb->data;
-+			struct vlan_hdr *vlan;
- 
-+			if (!pskb_may_pull(skb, VLAN_HLEN))
-+				goto drop;
-+
-+			vlan = (struct vlan_hdr *)skb->data;
- 			protocol = vlan->h_vlan_encapsulated_proto;
- 			skb_pull(skb, VLAN_HLEN);
- 			skb_reset_network_header(skb);
--- 
-2.34.1
-
+I'll send out a v2 - thanks for reviewing Jakub!
 
