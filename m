@@ -1,205 +1,255 @@
-Return-Path: <netdev+bounces-274533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274531-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IMXKHRBpzmmpngYAu9opvQ
-	(envelope-from <netdev+bounces-274533-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:03:12 +0200
+	id +ITTBNNozmmpngYAu9opvQ
+	(envelope-from <netdev+bounces-274531-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:02:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 401313895BB
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:03:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C1838389591
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:02:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 67A4E30B0800
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:00:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CF5BB308D47F
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 12:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F163BAD81;
-	Thu,  2 Apr 2026 12:59:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5089E31AAB8;
+	Thu,  2 Apr 2026 12:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="lz5ffsq5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U+fMGmXf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B2839DBC3;
-	Thu,  2 Apr 2026 12:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E1C2046BA
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 12:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775134784; cv=none; b=laOBmk6dUbvyG0VXlCj5/Hppn059CNNogNhCjt9CzYQXQooUuZYReaQU+gS69QzxN/8aBJH6WZ1bO6vxkEvr+WDbVtXJakrL4kWo8aGuKPvA4q+RkUcGkZumUuI2C5nqGpc38aQFZuY3qKukLqRSeEm+L0k7rCk6kZqugcXnT8Y=
+	t=1775134777; cv=none; b=S8OAzufBhqq5QNg+LeSjzCAafBdpNWHzT1Ox0NhSFzTgMkmWK5QdVou8vHrkZLfbEPUP0eg0bBKtobyUsvqu0x3gr8HXenUKDDkx/jNJnum5C48VeFerRhDfHJ9HKAVV3pzfhMJrYqRJzV9HOo57Ky8ltfXEfiURZXK+l81QIe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775134784; c=relaxed/simple;
-	bh=GpTKSsPQis8JmixA5Puhzjs8NazzWDMx0MuXfJDcGlM=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=NujOT3xdwGw649Xkh1Z78s5Jn19iRJ03LUCkjbpIpAsIBgBp2P+LDo5BGIg1PPfEurLPwTI1cOnpDH06oGae11/dLJv4XXShk7U1U9h9KyULCo4IyQesAmFxafj05ecuhhirew/ue35kleS97j9cAJe8SKu+tGq77tq1IkFwG18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=lz5ffsq5; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id 477DE21C4D;
-	Thu, 02 Apr 2026 15:59:21 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=MuezM3xnd950a5gFnNRCzv+I/b9PjCrkZt4BLcO3eh8=; b=lz5ffsq5TLJa
-	4vjkm2LhCDoQd4wf1Uchg1UCtVk8Dm7XcGYwHrOg9iO+cUKsJx/yhcoqTvyIZ687
-	Ka9rBcrQ8HcNytWP0oiwFimHua7KhctgBJH/5FBS5HIzvBeq1LuKno9CXRr4CQpu
-	pihmJ4jkxHNGEIJrUdS6jR33P21bUpU9McTEtyOQdBnx74Oh9ynPtkisBc8VD5rE
-	mw8VDfxR8rS54rQqLUqyPebzjjl91Lh0zKh+3aG7hI20iOtKCUYF0SwtdnTrLHRn
-	XH8bDcLLw6iVXlDaw1Cd+EllT4grD+7ZBoWxMXELr8ChPpqkcXxIuqdSWQASDXIf
-	nazVQ1qvzuhkhXcuur/3HUi6nYISlEZiNkVxpkowJgEmKO0l4bcR28F7NSG4IxZS
-	rHZQk8C9bNz3bVFNcq15SuhY/jk6vvS1Q271LPsBvOw1FQx8OnTfT0p2t45f4Xfg
-	xI5fd0M+fm502JT1TLRuFVclmok2bt5bW6v2+PdMX2929vQCmWakTsoftsH0yaJy
-	8DqQ+F/bwZ/yxO4aGKC8bKTueBgiT07LaMtgRjIF2z1Bws1HigMQPvn+dNsw/bPT
-	haPZuJ62AgpBce/+jH2YBCVQxbcDtyTYCgGRcAYYX/16Q3OINt3FFy5zzqYBR/X4
-	whUmGgXrTkJDtuqfkXPNOO+GUcF1b7A=
-Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Thu, 02 Apr 2026 15:59:19 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by box.ssi.bg (Potsfix) with ESMTPSA id 98C18609A6;
-	Thu,  2 Apr 2026 15:59:17 +0300 (EEST)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 632CxAGR045254;
-	Thu, 2 Apr 2026 15:59:12 +0300
-Date: Thu, 2 Apr 2026 15:59:10 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Yingnan Zhang <342144303@qq.com>
-cc: horms@verge.net.au, pablo@netfilter.org, fw@strlen.de, phil@nwl.cc,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] ipvs: fix MTU check for GSO packets in tunnel
- mode
-In-Reply-To: <tencent_CA2C1C219C99D315086BE55E8654AF7E6009@qq.com>
-Message-ID: <841b490f-c01e-293c-9c5d-5871b9a5a383@ssi.bg>
-References: <tencent_CA2C1C219C99D315086BE55E8654AF7E6009@qq.com>
+	s=arc-20240116; t=1775134777; c=relaxed/simple;
+	bh=JeAwOslyRoazVMCoQf4HfMImDtopo6ldkZCe++vxnFA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UDbMSeJ9v2O+oHkxezT2chSw5nL3S5DeNCnUgPrcNaKcTrHQvGY4qDFFHWPA6MqMKUspnh6ty8fXAGxw3B/D/mEV42lc6/XjWo6udOga0hC71HDTyQKVaHDSmizO5YxCueBKKAxkpIY+0/cHyHRwenUwMmt5ke4dNbTDeHNnkjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U+fMGmXf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1775134766;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vldI4wk7pqregV0SbJoGkh53C8cySKyV4SyxvHpsdeI=;
+	b=U+fMGmXfgPQwroMbnlou31ZpSZ51VGzb3LAabV8TS4AF9LE2Hb7CSJpFvYg00JYsZPlemw
+	1+uMcxoMQZEU1/2Adi8i5hghypKr5jp8Fd0X5X8+WrJfAjbzYZUVV6Wncjz1b6nIFtzSm7
+	thobkyVbwSBqxjzGja+s4G5inwbsnik=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-542-RgxLgiSoMhqPY-l-MrnQ6A-1; Thu,
+ 02 Apr 2026 08:59:21 -0400
+X-MC-Unique: RgxLgiSoMhqPY-l-MrnQ6A-1
+X-Mimecast-MFC-AGG-ID: RgxLgiSoMhqPY-l-MrnQ6A_1775134759
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 50552195609F;
+	Thu,  2 Apr 2026 12:59:19 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.32.195])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 49B8819560A6;
+	Thu,  2 Apr 2026 12:59:15 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: michael.dege@renesas.com
+Cc: paul@pbarker.dev,
+	niklas.soderlund@ragnatech.se,
+	kuba@kernel.org,
+	yoshihiro.shimoda.uh@renesas.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	linux-renesas-soc@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net
+Subject: Re: [net-next,v3,01/13] net: renesas: rswitch: improve port change mode functions
+Date: Thu,  2 Apr 2026 14:59:12 +0200
+Message-ID: <20260402125912.234434-1-pabeni@redhat.com>
+In-Reply-To: <20260331-rswitch_add_vlans-v3-1-c37f41b1c556@renesas.com>
+References: <20260331-rswitch_add_vlans-v3-1-c37f41b1c556@renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[ssi.bg,reject];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[ssi.bg:s=ssi];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qq.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ssi.bg:dkim,ssi.bg:email,ssi.bg:mid];
-	TAGGED_FROM(0.00)[bounces-274533-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[qq.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[ssi.bg:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274531-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ja@ssi.bg,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.987];
+	RCVD_COUNT_FIVE(0.00)[6];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 401313895BB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: C1838389591
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-	Hello,
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+net: renesas: rswitch: improve port change mode functions
 
-On Thu, 2 Apr 2026, Yingnan Zhang wrote:
+For ETHA and GWCA ports every mode change from operational to
+configuration and vice-versa requires to change the mode to "disable"
+first. This was done by calling the function twice. Let the change_mode
+function take care of this required step in a single call.
 
-> Currently, IPVS skips MTU checks for GSO packets by excluding them with
-> the !skb_is_gso(skb) condition in both IPv4 and IPv6 code paths. This
-> creates problems when IPVS tunnel mode encapsulates GSO packets with
-> IPIP or IPv6 tunnel headers.
-> 
-> The issue manifests in two ways:
-> 
-> 1. MTU violation after encapsulation:
->    When a GSO packet passes through IPVS tunnel mode, the original MTU
->    check is bypassed. After adding the tunnel header, the packet size
->    may exceed the outgoing interface MTU, leading to unexpected
->    fragmentation at the IP layer.
-> 
-> 2. Fragmentation with problematic IP IDs:
->    When net.ipv4.vs.pmtu_disc=1 and a GSO packet with multiple segments
->    is fragmented after encapsulation, each segment gets a sequentially
->    incremented IP ID (0, 1, 2, ...). This happens because:
-> 
->    a) The GSO packet bypasses MTU check and gets encapsulated
->    b) At __ip_finish_output, the oversized GSO packet is split into
->       separate SKBs (one per segment), with IP IDs incrementing
->    c) Each SKB is then fragmented again based on the actual MTU
-> 
->    This sequential IP ID allocation differs from the expected behavior
->    and can cause issues with fragment reassembly and packet tracking.
-> 
-> Fix this by removing the GSO packet exception from the MTU check in both
-> IPv4 and IPv6 paths, and properly validating GSO packets using
-> skb_gso_validate_network_len(). The condition is refactored to avoid
-> code duplication.
-> 
-> Fixes: 4cdd34084d53 ("netfilter: nf_conntrack_ipv6: improve fragmentation handling")
-> Signed-off-by: Yingnan Zhang <342144303@qq.com>
-> ---
-> Changes in v2:
-> - Added IPv6 fix in __mtu_check_toobig_v6() per Julian's review
-> - Refactored to avoid code duplication per Julian's suggestion
-> - Applied same validation pattern to both IPv4 and IPv6 paths
-> 
-> v1: https://lore.kernel.org/netdev/20260401152228.31190-1-342144303@qq.com/
-> 
->  net/netfilter/ipvs/ip_vs_xmit.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
-> index 3601eb86d..ac2ad7518 100644
-> --- a/net/netfilter/ipvs/ip_vs_xmit.c
-> +++ b/net/netfilter/ipvs/ip_vs_xmit.c
-> @@ -112,7 +112,8 @@ __mtu_check_toobig_v6(const struct sk_buff *skb, u32 mtu)
->  		if (IP6CB(skb)->frag_max_size > mtu)
->  			return true; /* largest fragment violate MTU */
+> diff --git a/drivers/net/ethernet/renesas/rswitch_main.c b/drivers/net/ethernet/renesas/rswitch_main.c
+> index 6fe964816322..f6d1e610e7fa 100644
+> --- a/drivers/net/ethernet/renesas/rswitch_main.c
+> +++ b/drivers/net/ethernet/renesas/rswitch_main.c
+> @@ -176,14 +176,19 @@ static int rswitch_gwca_change_mode(struct rswitch_private *priv,
+>  	if (!rswitch_agent_clock_is_enabled(priv->addr, priv->gwca.index))
+>  		rswitch_agent_clock_ctrl(priv->addr, priv->gwca.index, 1);
+>
+> -	iowrite32(mode, priv->addr + GWMC);
+> +	iowrite32(GWMC_OPC_DISABLE, priv->addr + GWMC);
+>
+> -	ret = rswitch_reg_wait(priv->addr, GWMS, GWMS_OPS_MASK, mode);
+> +	ret = rswitch_reg_wait(priv->addr, GWMS, GWMS_OPS_MASK, GWMC_OPC_DISABLE);
+>
+> -	if (mode == GWMC_OPC_DISABLE)
+> +	if (mode == GWMC_OPC_DISABLE) {
+>  		rswitch_agent_clock_ctrl(priv->addr, priv->gwca.index, 0);
+>
+> -	return ret;
+> +		return ret;
+> +	}
+> +
+> +	iowrite32(mode, priv->addr + GWMC);
+> +
+> +	return rswitch_reg_wait(priv->addr, GWMS, GWMS_OPS_MASK, mode);
+
+Should the error from the initial DISABLE transition be checked before
+proceeding? When mode != GWMC_OPC_DISABLE, this code stores the result of
+rswitch_reg_wait() for the DISABLE transition in 'ret' but never checks it.
+If the hardware fails to reach DISABLE state, the function silently proceeds
+to write the target mode.
+
+Before this patch, callers explicitly checked the error after calling
+rswitch_gwca_change_mode(priv, GWMC_OPC_DISABLE):
+
+rswitch_gwca_hw_init() and rswitch_gwca_hw_deinit():
+    err = rswitch_gwca_change_mode(priv, GWMC_OPC_DISABLE);
+    if (err < 0)
+        return err;
+
+This patch removes those caller-side checks but doesn't replicate the error
+checking inside rswitch_gwca_change_mode(). If the first rswitch_reg_wait()
+returns -ETIMEDOUT, should the function return that error before attempting
+to write the target mode?
+
+>  }
+>
+>  static int rswitch_gwca_mcast_table_reset(struct rswitch_private *priv)
+> @@ -682,9 +687,6 @@ static int rswitch_gwca_hw_init(struct rswitch_private *priv)
+>  	unsigned int i;
+>  	int err;
+>
+> -	err = rswitch_gwca_change_mode(priv, GWMC_OPC_DISABLE);
+> -	if (err < 0)
+> -		return err;
+>  	err = rswitch_gwca_change_mode(priv, GWMC_OPC_CONFIG);
+>  	if (err < 0)
+>  		return err;
+
+[ ... ]
+
+> @@ -717,9 +719,6 @@ static int rswitch_gwca_hw_init(struct rswitch_private *priv)
+>  			return err;
 >  	}
+>
+> -	err = rswitch_gwca_change_mode(priv, GWMC_OPC_DISABLE);
+> -	if (err < 0)
+> -		return err;
+>  	return rswitch_gwca_change_mode(priv, GWMC_OPC_OPERATION);
+>  }
+>
+> @@ -727,9 +726,6 @@ static int rswitch_gwca_hw_deinit(struct rswitch_private *priv)
+>  {
+>  	int err;
+>
+> -	err = rswitch_gwca_change_mode(priv, GWMC_OPC_DISABLE);
+> -	if (err < 0)
+> -		return err;
+>  	err = rswitch_gwca_change_mode(priv, GWMC_OPC_RESET);
+>  	if (err < 0)
+>  		return err;
 
-	You should remove the above line because compilation fails...
+[ ... ]
 
-> -	else if (skb->len > mtu && !skb_is_gso(skb)) {
-> +	} else if (skb->len > mtu &&
-> +		   !(skb_is_gso(skb) && skb_gso_validate_network_len(skb, mtu))) {
->  		return true; /* Packet size violate MTU size */
->  	}
->  	return false;
-> @@ -232,8 +233,9 @@ static inline bool ensure_mtu_is_adequate(struct netns_ipvs *ipvs, int skb_af,
->  			return true;
->  
->  		if (unlikely(ip_hdr(skb)->frag_off & htons(IP_DF) &&
-> -			     skb->len > mtu && !skb_is_gso(skb) &&
-> -			     !ip_vs_iph_icmp(ipvsh))) {
-> +		     skb->len > mtu && !ip_vs_iph_icmp(ipvsh) &&
-> +		     !(skb_is_gso(skb) &&
-> +		       skb_gso_validate_network_len(skb, mtu)))) {
+> @@ -1116,14 +1112,18 @@ static int rswitch_etha_change_mode(struct rswitch_etha *etha,
+>  	if (!rswitch_agent_clock_is_enabled(etha->coma_addr, etha->index))
+>  		rswitch_agent_clock_ctrl(etha->coma_addr, etha->index, 1);
+>
+> -	iowrite32(mode, etha->addr + EAMC);
+> -
+> -	ret = rswitch_reg_wait(etha->addr, EAMS, EAMS_OPS_MASK, mode);
+> +	iowrite32(EAMC_OPC_DISABLE, etha->addr + EAMC);
+> +	ret = rswitch_reg_wait(etha->addr, EAMS, EAMS_OPS_MASK, EAMC_OPC_DISABLE);
+>
+> -	if (mode == EAMC_OPC_DISABLE)
+> +	if (mode == EAMC_OPC_DISABLE) {
+>  		rswitch_agent_clock_ctrl(etha->coma_addr, etha->index, 0);
+>
+> -	return ret;
+> +		return ret;
+> +	}
+> +
+> +	iowrite32(mode, etha->addr + EAMC);
+> +
+> +	return rswitch_reg_wait(etha->addr, EAMS, EAMS_OPS_MASK, mode);
 
-	Please keep the indentation, just like in my example
+Same pattern here in rswitch_etha_change_mode(). When mode !=
+EAMC_OPC_DISABLE, the return value from rswitch_reg_wait() for the
+intermediate DISABLE transition is stored in 'ret' but never checked.
 
->  			icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED,
->  				  htonl(mtu));
->  			IP_VS_DBG(1, "frag needed for %pI4\n",
-> -- 
-> 2.51.0
+Before this patch, rswitch_etha_hw_init() explicitly called
+rswitch_etha_change_mode(etha, EAMC_OPC_DISABLE) with error checking before
+calling it with EAMC_OPC_CONFIG. This patch removes that caller-side check
+but doesn't replicate it inside the function. Should there be a check like
+'if (ret < 0) return ret;' after the first rswitch_reg_wait()?
 
-Regards
+>  }
+>
+>  static void rswitch_etha_read_mac_address(struct rswitch_etha *etha)
 
---
-Julian Anastasov <ja@ssi.bg>
+[ ... ]
 
 
