@@ -1,139 +1,173 @@
-Return-Path: <netdev+bounces-274595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274596-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2MgMLySGzmnfoAYAu9opvQ
-	(envelope-from <netdev+bounces-274595-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 17:07:16 +0200
+	id WIZ6AdeHzmnfoAYAu9opvQ
+	(envelope-from <netdev+bounces-274596-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 17:14:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F45138B0B7
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 17:07:16 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA3D638B1F5
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 17:14:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C69F03003D0F
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 15:06:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DCEF03013CB7
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 15:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F413EC2E1;
-	Thu,  2 Apr 2026 15:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qbsyW7eS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DFF93EDAA2;
+	Thu,  2 Apr 2026 15:13:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3882D207DF7
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 15:06:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A285F3EE1D7
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 15:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775142372; cv=none; b=LV5/I1QtueKmz7HHz+yaucIS1q/0tWp4nfw3d7d6WRfCkE0RZCVdon7D24EYzQo8/LqhvoU60ukzz8Oz7bFQFkXHJmMCsrxzBtNqt5DJ/sbHvuJrJrZgEBTjNlX4MFimORhYxrIVubLYAzgHc39RdqDaQTIehJ3NR0DKS2OyXuo=
+	t=1775142785; cv=none; b=EgOLfH05YkantWQyXujBCnfpg0cepwFlbfMuYI3akvVFo7rBuuo0ZyK14ELOtZLKDT/RfIY/gzXdOoA3i4luPDkEhRgWDbN0lIBJroh9SSTGlt26/sOFwg1Ie2FfU2mLq8ABQX7LqFfkyALA2wUsoRTdzJKJTCCOlNqJqO6vlTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775142372; c=relaxed/simple;
-	bh=pUnsQ8hrWA9FDAWUFzBYTnamZlaoNs3DoOd2vZT+Im4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t8Q4X6NVNwi9pcItBUjDjcEv1ssAnnw1G9KXkJOgK7tHiQCFvq4iFWN+wKS0cJEaxhym0fubW7Xo7O5lcd6qdnClZJX3gL5o8mLPIc/DiB62xxbw5tV5t18j6IzhnNLniBWVBPbvqURmvIMdKX0qpxShkpt6EXCakzZVLom3eCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qbsyW7eS; arc=none smtp.client-ip=74.125.82.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2b4520f6b32so1195610eec.0
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 08:06:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775142370; x=1775747170; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XSCodcX988r60q6ljV1fu4dW8EF3MyDwPr7Ap09ibhE=;
-        b=qbsyW7eSiz0QyQll2gzDdvPEetMdyamRuB6G7vMnGdQkhWzGFPiOd0LTRbPGyr3Ioa
-         20Y7H8zHiiK9R53c76AcQZ0JG/IknfyY/CKh88J/JeD70NC8wGI+W/3oVNVsHdCU8eGA
-         UYHyEmDCQeEB+Uf5MWisUZmje4C5BIgh3+qur6Tmju5+CbV42NEjMJg7kuoa4w4F7qpo
-         5opfsdv8L0BfzpLzSykCfRSHT4WxDt1bf7OArHzXgq+ZBRdAmjAqM+i7wechbqvr7OwV
-         ydyoJmwRTfQqa+WQ5LHfBcxElPT6mdDgRRuspAbyIa2beokfprn2IpJIlG+13dc3ZmSx
-         YJXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775142370; x=1775747170;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XSCodcX988r60q6ljV1fu4dW8EF3MyDwPr7Ap09ibhE=;
-        b=EH9A4YT6JHEsuySN0ftciLFH64lLWv7Nju8tkp/JJXEMrlQ2Q4g3yq+BLrUP/vurNV
-         4Pz5iKXEbmn4iqhbz4SqxXbWOw0gDJrv6ql0CWn5d0P9fna3f7ERZhfNqSo0844Hgo4M
-         iu0eT5iusCQBvPEfweDJgKxCLdx3vej4M9RQAM9kzQMRwXIxu6KPlG01Zw1e0GSrjK2c
-         GSoToMZrgQssV4eRFtuzA0+C488k0Yw/HQDlH4pRCaDn1VEOUbALDYdqW+9X4Q7dWbMw
-         ZjOi8znyWslWvJa1rCJxyz3puqOAXpmHqhBp3mLx6boucooyb2SN9vemETtZY0xLXgtF
-         2EGw==
-X-Forwarded-Encrypted: i=1; AJvYcCUdrJssWkIAYsZE3xID5IiAt7p/ySpV5BadcUtoAUHlWiXl2WpIaFbqREndGD86IOz2Eestd0U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbC6GPu2hapJmA9Il7SmSwlApp7FmJqdzJFvAEodTUTuHBPFnj
-	nnWY5nufMwHfHC6S1RbLhl9l7pOcvE++4s5fWDm397xlJChw4LRDnOw66Wvc
-X-Gm-Gg: AeBDiesQ+AQRGH2sFCZchC+ARE24W9XwmE49bO6cnke+oe0VJuPsJKJPEbAiCVEsQFx
-	nFFkO/HTQTR5uy1Kc/oCR7cMoUbTQILvMoteLaQ4Xs5/Y7eEUuE8Ta5RVGJnL5PtC2ij+WEjPDb
-	LhcCe4CAEXgPBp9vY8Gp5VB08+EwDApNgnDRMnpnJnHLyRF5bYvWYYMcRfAd2RxCFuKhECp4xYi
-	hLf4xBLVucsn6JoI39V1ss7nxEX+fNul/erRcIs6DQYtRVe9GlutaNxDHUylQrL8k/Y137oHot/
-	NIPFunaQukYk3yNq9yk5XeQB/UmSYyZoO6kO2xD0lCyJZIg/fIXunUpaB0Z3C46oFNNI6ylCABz
-	xmLeTN0jrwriAdBgUffWFaouNvrouGP17CXwwX+xt+NW/e4Q7F7t8rB+af7c2ahxz6mxgKI7ap7
-	J//NlVbaN9sHF+JyXY9K+PdQL5RegZY6E97AZd43rZdgaDJWvUM7ZfdDSNFhI0QtxFZhKEYPLYh
-	4FHsGZjdPYx81zuGg==
-X-Received: by 2002:a05:7300:fb8b:b0:2c3:b172:83c2 with SMTP id 5a478bee46e88-2c9329a0fb2mr3918473eec.20.1775142369953;
-        Thu, 02 Apr 2026 08:06:09 -0700 (PDT)
-Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2cafd073194sm1606138eec.28.2026.04.02.08.06.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 08:06:09 -0700 (PDT)
-Date: Thu, 2 Apr 2026 08:06:08 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com
-Subject: Re: [PATCH net-next v4 00/14] net: sleepable ndo_set_rx_mode
-Message-ID: <ac6F4G-C3kltoVS8@mini-arch>
-References: <20260401011914.1716692-1-sdf@fomichev.me>
- <20260401203831.6deee0e4@kernel.org>
+	s=arc-20240116; t=1775142785; c=relaxed/simple;
+	bh=F8kBlwvtGeXHsOy7KlqLaw/eem2ltChN8vbS1kHkLwA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lPGa28w+XmEArFTGRb4rKOgrbexDX+2G0IvKLf2d0Z/HLBzsmda6vvY/C9Dpkig/2ME0eKAlYirLqbg778FdmCUVLiu3dgrhpi35D3ExJcW9DZHLAYbsNMP5l6CkbuqMMRmIH4d/E9Zq77BOX0h5RKN4tgVicEflwOpIgXBYv7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=206.189.21.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowACnHwBgh85pjSKhAA--.35323S3;
+	Thu, 02 Apr 2026 23:12:34 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: b.a.t.m.a.n@lists.open-mesh.org,
+	netdev@vger.kernel.org
+Cc: marek.lindner@mailbox.org,
+	sw@simonwunderlich.de,
+	antonio@mandelbit.com,
+	sven@narfation.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	enjou1224z@gmail.com,
+	caoruide123@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net 1/1] batman-adv: reject oversized global TT response buffers
+Date: Thu,  2 Apr 2026 23:12:31 +0800
+Message-ID: <f1ae21c92be31b48651378f1ceba0dbbb43c2847.1774947926.git.caoruide123@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1774947926.git.caoruide123@gmail.com>
+References: <cover.1774947926.git.caoruide123@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260401203831.6deee0e4@kernel.org>
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowACnHwBgh85pjSKhAA--.35323S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7uryDZr4rAF13Cw1fXFykGrg_yoW8uw4rpF
+	WfGryDGrZ3J3sxJFn2y340vr4FkFs7Gr1UtasYv3Z0va1kKr93JayYkryqvF4rJayIkFWY
+	vF1Y9FW7Xa1DZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
+	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
+	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
+	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_GFv_Wrylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
+	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7sRi_HU3UUUUU==
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQQFCWnNP3wYUwAAsl
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274595-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stfomichev@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274596-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[mailbox.org,simonwunderlich.de,mandelbit.com,narfation.org,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,lzu.edu.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.986];
+	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[6];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5F45138B0B7
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,lzu.edu.cn:email]
+X-Rspamd-Queue-Id: DA3D638B1F5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 04/01, Jakub Kicinski wrote:
-> On Tue, 31 Mar 2026 18:19:00 -0700 Stanislav Fomichev wrote:
-> > sleepable ndo_set_rx_mode
-> 
-> Appears not to be "buildable" on 32bit x86 tho..
-> -- 
-> pw-bot: cr
+From: Ruide Cao <caoruide123@gmail.com>
 
-This is what I get for writing unit tests :-(
+batadv_tt_prepare_tvlv_global_data() builds the allocation length for a
+global TT response in 16-bit temporaries. When a remote originator
+advertises a large enough global TT, the TT payload length plus the VLAN
+header offset can exceed 65535 and wrap before kmalloc().
+
+The full-table response path still uses the original TT payload length when
+it fills tt_change, so the wrapped allocation is too small and
+batadv_tt_prepare_tvlv_global_data() writes past the end of the heap object
+before the later packet-size check runs.
+
+Fix this by rejecting TT responses whose TVLV value length cannot fit in
+the 16-bit TVLV payload length field.
+
+Fixes: 7ea7b4a14275 ("batman-adv: make the TT CRC logic VLAN specific")
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Ren Wei <enjou1224z@gmail.com>
+Signed-off-by: Ruide Cao <caoruide123@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+---
+ net/batman-adv/translation-table.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/net/batman-adv/translation-table.c b/net/batman-adv/translation-table.c
+index 6e95e883c2bf..05cddcf994f6 100644
+--- a/net/batman-adv/translation-table.c
++++ b/net/batman-adv/translation-table.c
+@@ -798,8 +798,8 @@ batadv_tt_prepare_tvlv_global_data(struct batadv_orig_node *orig_node,
+ {
+ 	u16 num_vlan = 0;
+ 	u16 num_entries = 0;
+-	u16 change_offset;
+-	u16 tvlv_len;
++	u16 tvlv_len = 0;
++	unsigned int change_offset;
+ 	struct batadv_tvlv_tt_vlan_data *tt_vlan;
+ 	struct batadv_orig_node_vlan *vlan;
+ 	u8 *tt_change_ptr;
+@@ -816,6 +816,11 @@ batadv_tt_prepare_tvlv_global_data(struct batadv_orig_node *orig_node,
+ 	if (*tt_len < 0)
+ 		*tt_len = batadv_tt_len(num_entries);
+ 
++	if (change_offset > U16_MAX || *tt_len > U16_MAX - change_offset) {
++		*tt_len = 0;
++		goto out;
++	}
++
+ 	tvlv_len = *tt_len;
+ 	tvlv_len += change_offset;
+ 
+-- 
+2.34.1
+
 
