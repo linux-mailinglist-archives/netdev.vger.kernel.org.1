@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-274477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274524-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aDi6BOdQzmmjmgYAu9opvQ
-	(envelope-from <netdev+bounces-274477-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:20:07 +0200
+	id WCMtG8lizmmXnQYAu9opvQ
+	(envelope-from <netdev+bounces-274524-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 14:36:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 620FA38839F
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:20:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 055D13891FF
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 14:36:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0E727308A97E
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 11:12:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7C3E0300F184
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 12:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1E13BFE2E;
-	Thu,  2 Apr 2026 11:12:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C9C3DA7C5;
+	Thu,  2 Apr 2026 12:32:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2136.outbound.protection.partner.outlook.cn [139.219.17.136])
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2103.outbound.protection.partner.outlook.cn [139.219.17.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696EE3BE64C;
-	Thu,  2 Apr 2026 11:12:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B62C3E51F4;
+	Thu,  2 Apr 2026 12:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.103
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775128332; cv=fail; b=TicyODTc6vGICugV94kL8QmIZbaWSCgyvJjr/hTYUJHGhVeONy4Vu8fVCuL0Ln6q4m1Tgpb9lgbgRX7K1QRuVXcUijw4p0Lm0eVOeG043s1dvXwg845bFC3UQP+flgZZgHyNsT74555p0Ka7MXwdG609JpVwpLI8pT+c3zRxeTs=
+	t=1775133123; cv=fail; b=SitLYiwJ7dn7MFw2cK4EketMy61B8TfrtPHofgz3d7IujM3r79M/i97RiPnd3ELax5BaY1nx4wdIEszSitJ4iM1GV++v8MQgx/Au24x57vv6MkM9r6Dgnpwt2JOSUQiewQYc5tY0iHvMCR/GDVOnyxqolXFgp/ThTj6tlJKHgqo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775128332; c=relaxed/simple;
-	bh=u6iXGUIzHLxqk1ZLENVJoQUdD3oaVAkgn4qp9jB1cYA=;
+	s=arc-20240116; t=1775133123; c=relaxed/simple;
+	bh=GUCZJ6aYhlvrAePXMAWxl4kNarsMDmKfRXir3l7kATI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cNMWkaOZ09xXJjxbqp4qe3N1xXI8MfAqhdSI2ufD56qZJqh8HjwtGbIutRqhiQ+2ej/j2P5CLc3Mqk5N8oik9fDq+zOo/aNglalsnjCavXxaihsk3yrXdHbqC90Y3yLkGemH8cmTazEK1UiGCnamI/GkSHuPt6/Kjuk6FNCMcNA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.136
+	 Content-Type:MIME-Version; b=GQ5j3TrcgQtu1/ICSvZwloSHk5uJ4jVxphb9XzQ8sYB9mxU8I/ZD7fAPIyT2sYizkMyvEBgqmdJ5h5OBJMq2qUSWMCucJ0a8Vr8WnZ6hdcXQAmjqCSG+e2KmV2/4Ew4+9yRGjLLixuALgvhqiWPhQXOW88BJ55j2nT0d74SK6pU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.103
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EiYdiAkFU3AOpzCKPk1quoa1K/Xhd6aBsksM5ceiiBhncH/0tCNQlEtEhpZr/vWm3jPngNqPAigDlM7uDxhm10tZL1OigOl1o/2p6J537Dlf9osjX4BGjKkMql0JjGikScNWydcjnKnjgvJewU4Vuvk3aAAfPai5VKOU/wH2uqsr4KkcnEozY/y5oBjgdDvk9v9ehfMQgZ6ogORwYOl0ksz/sggaKJum6web4uOKiHQeoZJPcdVyoqBT56NntnMavfRJ7gDiMICVjLr0ZXDfQ9LSSZ//V+/xiQX/aSA6tX8/S8b5t88V9JWiS05XRbfjSIPcusP65869h6qfgEbvOw==
+ b=i4xJTyqTcK60A6pvP/cO/EyA2/3xgbQI8y+WaYEtB+erbZUgxNOJER/FHixjjGqHxcoZ4O0ngLprim7+sQmL+xuj65gRaJZSBCuaDiBV/qk4TTsmkk8fTIY4yvmu5NuqZWSUuYI2evvQeuL4PA7PJNiYpq36AfztNg+yniTeePJzoLC7cVnZzj615aaRHSow+9Pn7IloIqibiohaOIUX/tt5yqU9z1yVQWhTHVzZ9QAglFRH58Vzmhra37Rs6mbBs19i8Ekt+mWBsT7NqY0Yze9MP1uq6+mow6Kl+AS4aeG+dUYEPB9NsirIRHl9XwLdti8vcZykg2FTDHI4FfT+EA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BU4eruqZBSF4wUwhAYrDH+JiS/7GwK2cT/70pSo0/xc=;
- b=WF+4r8a1V3QCY6F2r0Vzb0aU4AhUzxdEQyYUiDsGovKNdlfgj1Q9HmRiWC427kpvUZZaHdS6jPmMrusJ9I1iviOpHPAFdL/VPb/vN0hxLNtW2KJKWC2K6J1Y5C2fXlC9JzztLVjmPOpBZlsfEUODnCHw0L4NzLE59klfv+Gd4Coom/bIbhelBMUGbMbM8hs+KzeOqbZ6Ch1JbZmVwbqd0L3U9hqLUIUKY9Ov6eXWNkRruSLJ3zOaN6WL3tjFYYjtZ5kDUnfmgkxkAoqRPlt30o+9//XnqGNqYig5lrKqooaU6e/b22NGw8Q+rhtvLYsYlq9NsPeCnAARSJ5SMXA5bA==
+ bh=tjg4CJ2yBlk65q5tGEiVjBoZxix05wwTbHDygPjDEs8=;
+ b=UGUxbgfWlRhHw3t/4rpUhz0QSg3ecS9TcAcY9boKPJ+zPljGp0KRuMyqdr36PBCeTPvSDn/qt0NHM42SIWPsQTHLfL591WHqanenSqCrusXSfPWTzJKLwoLARcgvQ9NtjdcEUGpRNEL/FJEY8W0fSyDaileh1+jBZIxuCpXJJfUP4wl2/pfn3v3gv11zRyfZTDIghBVCrSs7k3qda+c1YodKm91Hdpk4kTlapcM92YrmjPoI3WgLLwhUziY81I4Qu9Pc9hhTdWChLiWy8NqxISFFq63L4f0gr1TOVoPvVVa7VspHei8gTtPoDTwZmeBdRX3rneNURWL6xX0ir0srBw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=starfivetech.com; dmarc=pass action=none
  header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
@@ -48,11 +48,11 @@ Received: from ZQ0PR01MB1208.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c550:19::5) by ZQ0PR01MB1048.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c550:d::14) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.20; Thu, 2 Apr
- 2026 10:56:09 +0000
+ 2026 10:56:11 +0000
 Received: from ZQ0PR01MB1208.CHNPR01.prod.partner.outlook.cn
  ([fe80::63d1:b688:cab7:50cb]) by
  ZQ0PR01MB1208.CHNPR01.prod.partner.outlook.cn ([fe80::63d1:b688:cab7:50cb%7])
- with mapi id 15.20.9769.017; Thu, 2 Apr 2026 10:56:09 +0000
+ with mapi id 15.20.9769.017; Thu, 2 Apr 2026 10:56:11 +0000
 From: Changhuang Liang <changhuang.liang@starfivetech.com>
 To: Michael Turquette <mturquette@baylibre.com>,
 	Rob Herring <robh@kernel.org>,
@@ -78,9 +78,9 @@ Cc: linux-clk@vger.kernel.org,
 	Hal Feng <hal.feng@starfivetech.com>,
 	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
 	Changhuang Liang <changhuang.liang@starfivetech.com>
-Subject: [PATCH v1 13/22] clk: starfive: Expand the storage of clock parent index
-Date: Thu,  2 Apr 2026 03:55:14 -0700
-Message-Id: <20260402105523.447523-14-changhuang.liang@starfivetech.com>
+Subject: [PATCH v1 14/22] clk: starfive: Add StarFive JHB100 Peripheral-0 clock driver
+Date: Thu,  2 Apr 2026 03:55:15 -0700
+Message-Id: <20260402105523.447523-15-changhuang.liang@starfivetech.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260402105523.447523-1-changhuang.liang@starfivetech.com>
 References: <20260402105523.447523-1-changhuang.liang@starfivetech.com>
@@ -96,56 +96,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: ZQ0PR01MB1208:EE_|ZQ0PR01MB1048:EE_
-X-MS-Office365-Filtering-Correlation-Id: b163252f-c520-46b7-6c45-08de90a67236
+X-MS-Office365-Filtering-Correlation-Id: 690e7c05-8279-4898-e9f7-08de90a673ca
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|1800799024|7416014|52116014|376014|366016|921020|38350700014|22082099003|18002099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	FA0rAy5zPO9QQG8fDU/yMXkIvgEtS1/S5OnRW66tBAnbKj31Ribq5bQvJDPim18idmE0HT/fYejgsobbbZPWr0bQ4f7BhC8GenQQkxL56Ry+HfVjCxTwuCa8wQkZxsvCX4nzRWd7TNsQQ2m5zGyWCUAHrnPq9Il36JMxlRpOyRuGBpXgjIqXlF1mepLKa6haB/lDl8plsbZyJRB4tahLQJ8fC7nEt62YTVPx4uHSckPfivj0MtfMA0PEu1s7LuGmP0ukqmQG4A0C8AJVoVMo6Ne6AbpoDBNMzhOpHd3jnDMCkW337m3xs6Sy4v+LMSv9D9CmE/F4U2pYDxJ4OwQcEsUybVw+Wob5HAZeWX0M0yUMqtAUwBbiljWRvlZbxQpnIfcSs1SsaS1GXAI9SzKcB/2nzxMMGb/EfGaIU2hF4xgKQkuJAYGHtRw8ETJXMw1t6wVRKp+B3NSGVaA2aYlxguLBmBEIMIUPk/sk9XB6pddmTQkDpXeRsNupOY6gg6WEzteuvOOPxBxBH+1m7LSkitsA39jFEdkkJ+Gx5UATysA8iVv3zX82QReSSYCcnWxn2f6XCzKwjyMEXanin/yOCLVBk4MI1RE1cPNEKkd/rPM=
+	rqaUK/ZOul9/qgOQk/xMDJVCiRWFx/a/qkqoP07yWuJ9W9s26IMDnbJAW1p9Jcmp8HOn3xL8QuUhiNZe+eUgbDdS3Y+cUvdiumZvptYM3ebRjtiM3I8p5pYar/kAWsfoADoODjUSHr57O7xKZh0cgHI8gOQPoesdi4jDhlXKJ9wObOoir3xtfm3xX4Hv688qzZHEsbIWltxuMWmqMUxASyTJJOxeJE0twK2uviML/CFKMGG2Sj5y6bE57z6ue6+rToCu25jh87KVFrLjK38Eh3Rx3Yy6Ho8PEmvUztsqJBhW/ZcuZNgdxtBOOHb/gXQakYWSfrk/KuhcjoNBokuuhwvPLtk5l4fbKSa0rCvpvwPCn5B2iwT3YNQvSe2Z77gMkkJvOQCMUP+y5c4tNUx6BbmFQhzhgaHVil/PIiN53c4R9ryFF3jLLjEa1nHpTLy1xRCbjuSm/d4EvxY4v6qEQOPU2XQV8cq0Do3nBLKF1strZ8oeciNQrWPt8ZHGUA5gHisTGtQtDQN0/l2O1woyYDbanVz5F+F7cNjAB6jGBtYZz0BdI1+PGIfJONJCW9pt/NjYtIM1iWmTgiexAPWCAlw8sFHFgHek/4ZZ+W8HsAc=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQ0PR01MB1208.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(52116014)(376014)(366016)(921020)(38350700014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?G6RwZhR340/k45SOLaDGWGfZqyweZhRUOZ0gMCxu/5ehiCemRHJAY/GInJdl?=
- =?us-ascii?Q?RguqZwYdrVJ4+0ED6+eZ8rWA7a/JbuV+OeHXeJnzmixfxkVWQHROYHyWUXkx?=
- =?us-ascii?Q?m7FoJrK1Y0/OraE/nJITGIV5V6zNasb58uG9vco7C73h6qSsUbtiI3jSNg9j?=
- =?us-ascii?Q?4+0b8OHUb9MJ/xez7l3ep4WHJb+u9InugbUpRxian3WcmH46SuX9Ossjnoqt?=
- =?us-ascii?Q?oPlKyk/zqofX3jN0F1ieZEVBi4jh3sS4BGSzeWG+p1LTW5tA87y8fzWhkNQh?=
- =?us-ascii?Q?g2iXBWCOB/NLQuv6+Igcfutz9v2Pl60xpFO61Id6FabxiGTTILQfL0Mx8hBP?=
- =?us-ascii?Q?diYCQ4Kv5ni4JriwFNI/LcuOA5r8HznDFhN2A6B+rvI01aInqeHjicQJI401?=
- =?us-ascii?Q?pbja59/bKdNilXG1omZunv6QeeNs7SzjkFcIENS5xWO6T0k5jaGn+bB/4WMR?=
- =?us-ascii?Q?UloBi7YSwskasjTI2uGZovosedM5qumDVqxKqodMftlFyce1+YSuikU6rj9M?=
- =?us-ascii?Q?PlNzQO6GWZ0rAGX13k8Tv26AuGIw5TPW9xZgJf65NwH6COER3hJ4KJN+NX9E?=
- =?us-ascii?Q?5Q2/yg+Fz9umRj6W2B2jiv7OfyToNccc65/n9GtKJyEbPHvT9Bm51j+17mlL?=
- =?us-ascii?Q?mF71i8wpBwJ2DAO5djWfNALBkJU2IqyY7R0mwra0kwzqU7p4a0j+j4xAKTW0?=
- =?us-ascii?Q?9r9Pz7TZPgy60R41ZaW/YNgSDjvj5xxELf7AmdW0D94lVOnwj4dXA4t4cdiL?=
- =?us-ascii?Q?V4lOj1a6C9WWpdNW3HDOclld2Wnipz95FSKjjOQHYQGWusSKHg+2S+1a6/4b?=
- =?us-ascii?Q?NhNnIz8YKDv7odrCzpD26fdgcbIpz70SQeCvOpn4WdeIVaxK4n+YMW1q2Q+M?=
- =?us-ascii?Q?1J/+0AmObU30vhqLjxXG11LLIlroRcnJD15SxZlq4SFCS2R4Gxtnl3CBpT5U?=
- =?us-ascii?Q?Z3khYdcGSvfcEN8CPjAs4PPOlFdPC1WGK0QzONr0ao/OErZ96J289KPJi0R1?=
- =?us-ascii?Q?lYasu+6qu+0t47ZhIS2DBdhXkCr45Q1fKHzEUu5OGnBM69YktFRv7E4dFp8P?=
- =?us-ascii?Q?6Q5EKuKfgke5FiepOEZ2EkNIu+H+cntnpblWGTFkLIyU8cEHeWfmQmTeXhOD?=
- =?us-ascii?Q?cWav1CSl6rUGsQdl2elUK60yuM7VqKnI2GAX5hFMbvuE3lbisfWMvP/QEohn?=
- =?us-ascii?Q?WmmAAEW1FbOmZhQ77D1LjPiP6IQ4y62r/L7C8zFaxuYLTzt0q1/7w5uINxOh?=
- =?us-ascii?Q?Dky3WqNNd4URT/I57AcarUFpd7eMxHHi78O7/CycwHFbkYlvF3E/muuU5uge?=
- =?us-ascii?Q?RQlpqrvrE0mG0CTH976fY+QkjGKxCJUW0k9Vr+U7IrFAeTfiyqth9uUrVs2y?=
- =?us-ascii?Q?itmNkgyCOoTdufOp3nUqv+EkOLqVfmAxJEf8ILzkSWjOPgeur9yDXU4nIOdf?=
- =?us-ascii?Q?3y2DGw1L7ILYSVwk5hJm4HH83bPfEU9AUQRjXF5NEj41wMqUKbm6fOZOwje9?=
- =?us-ascii?Q?hFg9DBGPiT7aKQU297jVFnMgMxEtfTxs0WxYZxEzh2fQOYAlvDvg143nYxZn?=
- =?us-ascii?Q?QxIpzWB7Xn52/t9cjYFIpjYDwap9JpTNrb1t7c4hmJpgROfIZdEB7wJ/6EpI?=
- =?us-ascii?Q?uBQux6w9fvRwZki3jTtW7JQ4AElgtvJ4Dtlbdjp1cU+6xCYde9swAVXO+qu+?=
- =?us-ascii?Q?HuA+JtWduW24wbdAX8pVIor6WrY03lnrrWHDx+ac1NdgSQkzAK+FjP6VFxZ2?=
- =?us-ascii?Q?8+OQMfk3hENQuevMBbegfoTv8vm73sitzq00Z1ft8WgzAA8iy9Ch?=
+	=?us-ascii?Q?rJ+dShq20D7id2UNafUGUTQOmdpYU2URrhh3hFxx4EjMfOKWli4xWhr5iDT9?=
+ =?us-ascii?Q?14HDr2yUoy+8dJCiouZ3bYa5w1Bcv84t6M9n0QXGnPI+xVl4+gco4+Il5ody?=
+ =?us-ascii?Q?bsI+fnF468mfU1hzPFIVruw71k96RBTrnVRBSuj8ywAoh1geV1gzw9Iiv7UC?=
+ =?us-ascii?Q?NF33toWGXWUmztnMK5pdwxos294e2gLzN09bFB3yk9eAlS67N+fqPLbT9pJe?=
+ =?us-ascii?Q?uk62lEAm5vBmhWYEC+7Ea4SguhWbr4VCGuUwsF9GIcPgPQVYYU7034kZZFux?=
+ =?us-ascii?Q?Hc07aMxT7Ub4ZRs0r5i+hsFZsnaYKuDdcPcOEAzBxuI7/oEbtybDz1tIK0uu?=
+ =?us-ascii?Q?A1GbWZL2VDOml9MUnsU3UQZlk+ehlz/zcUo+EdVvYhnd5Xax+4nj43DIzgw8?=
+ =?us-ascii?Q?EtddTECp7GOYJAyiLlc4SPvFpUSpEDr94F8IiZMIbLnQxdd/ubOMaCU7CnZA?=
+ =?us-ascii?Q?Oy8CdFraJWppAYqjV+nIRcT1+A1KettaqFiMqYDbtFuuw2xHseh6QLB8ln9Q?=
+ =?us-ascii?Q?RUZLTLbt8dxyznCXjjOoya9/7AhsWmb+J7+nbeAnKkb3uBvAAMIb/bXbhOw8?=
+ =?us-ascii?Q?ajJHrX8rzqbN0x4nrlqOMKUH/5HPkaz/h8JEcskgzzbaajkQZoocx0y3whqB?=
+ =?us-ascii?Q?yZqxqJg4sLu1BgBlclAPlprbzyD9lUp/Mbj246pxTb+iHR/69F0/DCjV3e+e?=
+ =?us-ascii?Q?y7h7sEGyAUyVjwwe/r4CI7gJJtlHhtuPxL5EKeR2Nvp2GZldx5DvtBn8ReWL?=
+ =?us-ascii?Q?ViHSqhvio8kOJLYA+gQ2pNGlcM1OpxfvzEHIXj99QCAh8K7wi+RTAC2LCbXt?=
+ =?us-ascii?Q?DRd7TmwzPu19vhmLXgQDJJgFntNToI6sTftN5jmidxwT05lQMcKv63tHIrAN?=
+ =?us-ascii?Q?0JyWCTEi41H+Ds4l4ZUYjIFvN5oP/9TwJB0f7pZaUXEPMaojQuvgzK5A9CKE?=
+ =?us-ascii?Q?RYThwQ9LtntBJyeJPcDLUpVzBToDotpRXwi3fIyupgpe4hgFueKXngb8SCU1?=
+ =?us-ascii?Q?TL3Aj+zqkQxmZHW1pJL9+1Daul3A3kIeDx9nw09toNp9tMGO+AO368dCe/Fn?=
+ =?us-ascii?Q?FXmEQh6aDH4rbvrZvQ2A2gLdhdhPB7AB2lvUlaTVSFjFSGWxfCEjVSnVJKCQ?=
+ =?us-ascii?Q?MTrA9y6+Sfl/HOlf6mmRooqh9JFXCeGs/91qaEULeG0wiqtQLptmnTl9QIi1?=
+ =?us-ascii?Q?6ZukI0Tq4uSkJghLY8Jyx7ceBYiJrVgXNO4XCEnoYLf3fjh6n+2+4B/h2D3R?=
+ =?us-ascii?Q?PeZHs0LuaL9mgBu6NpSES9sngbXeHcoGD2+jM/gpFiw1lv1eHEJkRShBfVpK?=
+ =?us-ascii?Q?CEXekY1L7xcjPhmhsfK4SIBMbUNqoCWidqFO2FfSyWo9y55MxQsKU1EHT2p4?=
+ =?us-ascii?Q?XMFSnnt05HtOp0/nvrtYzV3DJg9bxujwZB/ZnPSctaQKJzp1u2U1a9jGuq3e?=
+ =?us-ascii?Q?HtuE5GSAAI/5tzrDyMCJrItDfj7ZgS1WpOV7j6QFtj+7vaFCYlXIflHPb0Nw?=
+ =?us-ascii?Q?XGXyETJh4mW0khMM0sRPr6LlA0lhfQwn9ezCyOXUy1hs7jQRMdy/drWxQ5bS?=
+ =?us-ascii?Q?fZv8WuKXATlRk5obgpdh1Hlc45kfrmXGB3xQY2PzQiOhg73Q5KRveKiY7LJ8?=
+ =?us-ascii?Q?EbF87G0y2jqvNsVRaL2Osu4HZg1XrikBndXPlZvN2pNy0HrUXFvlzO9nLLbL?=
+ =?us-ascii?Q?3sGg4U9BlehsXDNtblsSYngK4pNlw9gqKSWNfCzjAvQni/D6SmJwXfvccPto?=
+ =?us-ascii?Q?V86/GyKY3xrfKir5p4Co6Y9xg9P4oYBdkWlW/djC4wc+8yvpcH5D?=
 X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b163252f-c520-46b7-6c45-08de90a67236
+X-MS-Exchange-CrossTenant-Network-Message-Id: 690e7c05-8279-4898-e9f7-08de90a673ca
 X-MS-Exchange-CrossTenant-AuthSource: ZQ0PR01MB1208.CHNPR01.prod.partner.outlook.cn
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2026 10:56:09.0238
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2026 10:56:11.6632
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: P3NhVsMbKWKsFRjllVMFuhlJxB1+55sVZxC4QOH82UNDuhq+LoJfSTOFcsEhxA7UjEvpMnjTbZf1kEs+35zEBcmS6GvhkFQomG8nPc7r+PXj/u3NUgdRRhAC63H0vMBa
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9DfdapBPTb0+PuWlvvdg9xvbLQjwxOl9WWFg7P1HxZCwbf/WMxbce6OJyjQbhZYF72Jzj3MSXUJJ5N4nLZk+GKEkBvALWbZnVClDUHRgGt/yX7nXxKIkXGZ6OCn3MOBF
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQ0PR01MB1048
 X-Spamd-Result: default: False [5.04 / 15.00];
 	DMARC_POLICY_QUARANTINE(1.50)[starfivetech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
@@ -153,52 +153,734 @@ X-Spamd-Result: default: False [5.04 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274477-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[24];
 	FREEMAIL_TO(0.00)[baylibre.com,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,pengutronix.de,esmil.dk,gmail.com];
+	GREYLIST(0.00)[pass,meta];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	GREYLIST(0.00)[pass,body];
-	FROM_NEQ_ENVFROM(0.00)[changhuang.liang@starfivetech.com,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-274524-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FROM_HAS_DN(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.916];
 	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.894];
+	FROM_NEQ_ENVFROM(0.00)[changhuang.liang@starfivetech.com,netdev@vger.kernel.org];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 620FA38839F
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[starfivetech.com:email,starfivetech.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 055D13891FF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Expand the storage of clock parent index for per0 domain, which parent
-index over 255. So change u8 to u16.
+Add driver for the StarFive JHB100 Peripheral-0 clock controller.
 
 Signed-off-by: Changhuang Liang <changhuang.liang@starfivetech.com>
 ---
- drivers/clk/starfive/clk-starfive-common.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/clk/starfive/Kconfig                  |   8 +
+ drivers/clk/starfive/Makefile                 |   1 +
+ .../clk/starfive/clk-starfive-jhb100-per0.c   | 655 ++++++++++++++++++
+ 3 files changed, 664 insertions(+)
+ create mode 100644 drivers/clk/starfive/clk-starfive-jhb100-per0.c
 
-diff --git a/drivers/clk/starfive/clk-starfive-common.h b/drivers/clk/starfive/clk-starfive-common.h
-index fd9bf6f20152..8edc6c516451 100644
---- a/drivers/clk/starfive/clk-starfive-common.h
-+++ b/drivers/clk/starfive/clk-starfive-common.h
-@@ -26,7 +26,7 @@ struct starfive_clk_data {
- 	const char *name;
- 	unsigned long flags;
- 	u32 max;
--	u8 parents[4];
-+	u16 parents[4];
- };
+diff --git a/drivers/clk/starfive/Kconfig b/drivers/clk/starfive/Kconfig
+index 729bdfce7b8a..adf97444f460 100644
+--- a/drivers/clk/starfive/Kconfig
++++ b/drivers/clk/starfive/Kconfig
+@@ -73,6 +73,14 @@ config CLK_STARFIVE_JH7110_VOUT
+ 	  Say yes here to support the Video-Output clock controller
+ 	  on the StarFive JH7110 SoC.
  
- #define STARFIVE_GATE(_idx, _name, _flags, _parent)				\
++config CLK_STARFIVE_JHB100_PER0
++	bool "StarFive JHB100 peripheral-0 clock support"
++	depends on CLK_STARFIVE_JHB100_SYS2
++	default ARCH_STARFIVE
++	help
++	  Say yes here to support the peripheral-0 clock controller
++	  on the StarFive JHB100 SoC.
++
+ config CLK_STARFIVE_JHB100_SYS0
+ 	bool "StarFive JHB100 system-0 clock support"
+ 	depends on ARCH_STARFIVE || COMPILE_TEST
+diff --git a/drivers/clk/starfive/Makefile b/drivers/clk/starfive/Makefile
+index 90b6390296bd..2f605d0fd6da 100644
+--- a/drivers/clk/starfive/Makefile
++++ b/drivers/clk/starfive/Makefile
+@@ -11,6 +11,7 @@ obj-$(CONFIG_CLK_STARFIVE_JH7110_STG)	+= clk-starfive-jh7110-stg.o
+ obj-$(CONFIG_CLK_STARFIVE_JH7110_ISP)	+= clk-starfive-jh7110-isp.o
+ obj-$(CONFIG_CLK_STARFIVE_JH7110_VOUT)	+= clk-starfive-jh7110-vout.o
+ 
++obj-$(CONFIG_CLK_STARFIVE_JHB100_PER0)		+= clk-starfive-jhb100-per0.o
+ obj-$(CONFIG_CLK_STARFIVE_JHB100_SYS0)		+= clk-starfive-jhb100-sys0.o
+ obj-$(CONFIG_CLK_STARFIVE_JHB100_SYS1)		+= clk-starfive-jhb100-sys1.o
+ obj-$(CONFIG_CLK_STARFIVE_JHB100_SYS2)		+= clk-starfive-jhb100-sys2.o
+diff --git a/drivers/clk/starfive/clk-starfive-jhb100-per0.c b/drivers/clk/starfive/clk-starfive-jhb100-per0.c
+new file mode 100644
+index 000000000000..e8fbf3ba308d
+--- /dev/null
++++ b/drivers/clk/starfive/clk-starfive-jhb100-per0.c
+@@ -0,0 +1,655 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * StarFive JHB100 Peripheral-0 Clock Driver
++ *
++ * Copyright (C) 2024 StarFive Technology Co., Ltd.
++ *
++ * Author: Changhuang Liang <changhuang.liang@starfivetech.com>
++ *
++ */
++
++#include <dt-bindings/clock/starfive,jhb100-crg.h>
++#include <linux/clk-provider.h>
++#include <linux/io.h>
++#include <linux/platform_device.h>
++
++#include "clk-starfive-jhb100.h"
++
++#define JHB100_PER0CLK_NUM_CLKS			(JHB100_PER0CLK_MAIN_ICG_EN_TRNG + 1)
++
++/* external clocks */
++#define JHB100_PER0CLK_200_INIT			(JHB100_PER0CLK_NUM_CLKS + 0)
++#define JHB100_PER0CLK_400			(JHB100_PER0CLK_NUM_CLKS + 1)
++#define JHB100_PER0CLK_600			(JHB100_PER0CLK_NUM_CLKS + 2)
++#define JHB100_PER0CLK_OSC			(JHB100_PER0CLK_NUM_CLKS + 3)
++#define JHB100_PER0CLK_800			(JHB100_PER0CLK_NUM_CLKS + 4)
++#define JHB100_PER0CLK_PLL6			(JHB100_PER0CLK_NUM_CLKS + 5)
++
++static const struct starfive_clk_data jhb100_per0crg_clk_data[] = {
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C0, "cdr_i3c0", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C1, "cdr_i3c1", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C2, "cdr_i3c2", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C3, "cdr_i3c3", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C4, "cdr_i3c4", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C5, "cdr_i3c5", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C6, "cdr_i3c6", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C7, "cdr_i3c7", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C8, "cdr_i3c8", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C9, "cdr_i3c9", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C10, "cdr_i3c10", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C11, "cdr_i3c11", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C12, "cdr_i3c12", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C13, "cdr_i3c13", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C14, "cdr_i3c14", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE_GATE(JHB100_PER0CLK_CDR_I3C15, "cdr_i3c15", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_800),
++	STARFIVE__DIV(JHB100_PER0CLK_200, "per0_200", 3,
++		      JHB100_PER0CLK_600),
++	STARFIVE__DIV(JHB100_PER0CLK_600_DIV6, "per0_600_div6", 6,
++		      JHB100_PER0CLK_600),
++	STARFIVE__DIV(JHB100_PER0CLK_600_DIV6_DIV5, "per0_600_div6_div5", 5,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_TIMER0_DUALTIMER0, "timer0_dualtimer0", 0,
++		      JHB100_PER0CLK_600_DIV6_DIV5),
++	STARFIVE_GATE(JHB100_PER0CLK_TIMER1_DUALTIMER0, "timer1_dualtimer0", 0,
++		      JHB100_PER0CLK_600_DIV6_DIV5),
++	STARFIVE_GATE(JHB100_PER0CLK_TIMER0_DUALTIMER1, "timer0_dualtimer1", 0,
++		      JHB100_PER0CLK_600_DIV6_DIV5),
++	STARFIVE_GATE(JHB100_PER0CLK_TIMER1_DUALTIMER1, "timer1_dualtimer1", 0,
++		      JHB100_PER0CLK_600_DIV6_DIV5),
++	STARFIVE_GATE(JHB100_PER0CLK_TIMER0_DUALTIMER2, "timer0_dualtimer2", 0,
++		      JHB100_PER0CLK_600_DIV6_DIV5),
++	STARFIVE_GATE(JHB100_PER0CLK_TIMER1_DUALTIMER2, "timer1_dualtimer2", 0,
++		      JHB100_PER0CLK_600_DIV6_DIV5),
++	STARFIVE__DIV(JHB100_PER0CLK_1200_PH0_LVDS0, "1200_ph0_lvds0", 2,
++		      JHB100_PER0CLK_PH0_LTPI0),
++	STARFIVE__DIV(JHB100_PER0CLK_1200_PH0_LVDS1, "1200_ph0_lvds1", 2,
++		      JHB100_PER0CLK_PH0_LTPI1),
++	STARFIVE__DIV(JHB100_PER0CLK_1200_CORE0, "1200_core0", 2,
++		      JHB100_PER0CLK_PLL6),
++	STARFIVE__DIV(JHB100_PER0CLK_1200_CORE1, "1200_core1", 2,
++		      JHB100_PER0CLK_PLL6),
++	STARFIVE__DIV(JHB100_PER0CLK_1200_SHIFT90_LVDS0, "1200_shift90_lvds0", 2,
++		      JHB100_PER0CLK_PH90_LTPI0),
++	STARFIVE__DIV(JHB100_PER0CLK_1200_SHIFT90_LVDS1, "1200_shift90_lvds1", 2,
++		      JHB100_PER0CLK_PH90_LTPI1),
++	STARFIVE__DIV(JHB100_PER0CLK_1200_DIV5_CORE0, "1200_div5_core0", 5,
++		      JHB100_PER0CLK_1200_CORE0),
++	STARFIVE__DIV(JHB100_PER0CLK_1200_DIV5_CORE1, "1200_div5_core1", 5,
++		      JHB100_PER0CLK_1200_CORE1),
++	STARFIVE__DIV(JHB100_PER0CLK_PH0_LTPI0, "ph0_ltpi0", 48,
++		      JHB100_PER0CLK_PLL6),
++	STARFIVE__DIV(JHB100_PER0CLK_PH0_LTPI1, "ph0_ltpi1", 48,
++		      JHB100_PER0CLK_PLL6),
++	STARFIVE_IDIV(JHB100_PER0CLK_PH90_LTPI0, "ph90_ltpi0", 0, 48,
++		      JHB100_PER0CLK_PLL6),
++	STARFIVE_IDIV(JHB100_PER0CLK_PH90_LTPI1, "ph90_ltpi1", 0, 48,
++		      JHB100_PER0CLK_PLL6),
++	STARFIVE__DIV(JHB100_PER0CLK_240_CORE_LTPI0, "240_core_ltpi0", 4,
++		      JHB100_PER0CLK_1200_DIV5_CORE0),
++	STARFIVE__DIV(JHB100_PER0CLK_240_CORE_LTPI1, "240_core_ltpi1", 4,
++		      JHB100_PER0CLK_1200_DIV5_CORE1),
++	STARFIVE_GATE(JHB100_PER0CLK_AXI_DMA_I2C_INIT, "axi_dma_i2c_init", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_400),
++	STARFIVE_GATE(JHB100_PER0CLK_AXI_DMA_I3C_INIT, "axi_dma_i3c_init", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_400),
++	STARFIVE_GATE(JHB100_PER0CLK_AXI_DMA_UART_INIT, "axi_dma_uart_init", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_400),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_DMAC0, "core_dmac0", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200_INIT),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_DMAC1, "core_dmac1", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200_INIT),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_DMAC2, "core_dmac2", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200_INIT),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C0, "hdr_tx_i3c0", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C1, "hdr_tx_i3c1", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C2, "hdr_tx_i3c2", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C3, "hdr_tx_i3c3", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C4, "hdr_tx_i3c4", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C5, "hdr_tx_i3c5", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C6, "hdr_tx_i3c6", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C7, "hdr_tx_i3c7", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C8, "hdr_tx_i3c8", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C9, "hdr_tx_i3c9", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C10, "hdr_tx_i3c10", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C11, "hdr_tx_i3c11", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C12, "hdr_tx_i3c12", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C13, "hdr_tx_i3c13", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C14, "hdr_tx_i3c14", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HDR_TX_I3C15, "hdr_tx_i3c15", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C0, "core_i2c0", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C1, "core_i2c1", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C2, "core_i2c2", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C3, "core_i2c3", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C4, "core_i2c4", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C5, "core_i2c5", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C6, "core_i2c6", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C7, "core_i2c7", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C8, "core_i2c8", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C9, "core_i2c9", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C10, "core_i2c10", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C11, "core_i2c11", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C12, "core_i2c12", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C13, "core_i2c13", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C14, "core_i2c14", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I2C15, "core_i2c15", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_WDOGCLK_WDT0, "wdogclk_wdt0", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_WDOGCLK_WDT1, "wdogclk_wdt1", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_WDOGCLK_WDT2, "wdogclk_wdt2", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_WDOGCLK_WDT3, "wdogclk_wdt3", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_WDOGCLK_WDT_EXTERNAL, "wdogclk_wdt_external",
++		      CLK_IGNORE_UNUSED, JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_SCLK_UART4, "sclk_uart4", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_SCLK_UART5, "sclk_uart5", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_SCLK_UART6, "sclk_uart6", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_SCLK_UART7, "sclk_uart7", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_SCLK_UART8, "sclk_uart8", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_SCLK_UART9, "sclk_uart9", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_SCLK_UART10, "sclk_uart10", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_SCLK_UART11, "sclk_uart11", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_SCLK_UART12, "sclk_uart12", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_SCLK_UART13, "sclk_uart13", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_SCLK_UART14, "sclk_uart14", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_PCLK_DMA_UART_CFG, "pclk_dma_uart_cfg", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_PCLK_DMA_I2C_CFG, "pclk_dma_i2c_cfg", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_PCLK_DMA_I3C_CFG, "pclk_dma_i3c_cfg", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_PCLK_DUALTIMER0, "pclk_dualtimer0", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_PCLK_DUALTIMER1, "pclk_dualtimer1", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_PCLK_DUALTIMER2, "pclk_dualtimer2", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_HCLK_TRNG, "hclk_trng", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200_INIT),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C0, "apb_i2c0", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C1, "apb_i2c1", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C2, "apb_i2c2", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C3, "apb_i2c3", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C4, "apb_i2c4", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C5, "apb_i2c5", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C6, "apb_i2c6", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C7, "apb_i2c7", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C8, "apb_i2c8", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C9, "apb_i2c9", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C10, "apb_i2c10", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C11, "apb_i2c11", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C12, "apb_i2c12", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C13, "apb_i2c13", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C14, "apb_i2c14", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2C15, "apb_i2c15", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF0, "apb_i2cf0", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF1, "apb_i2cf1", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF2, "apb_i2cf2", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF3, "apb_i2cf3", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF4, "apb_i2cf4", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF5, "apb_i2cf5", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF6, "apb_i2cf6", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF7, "apb_i2cf7", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF8, "apb_i2cf8", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF9, "apb_i2cf9", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF10, "apb_i2cf10", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF11, "apb_i2cf11", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF12, "apb_i2cf12", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF13, "apb_i2cf13", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF14, "apb_i2cf14", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I2CF15, "apb_i2cf15", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C0, "apb_i3c0", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C1, "apb_i3c1", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C2, "apb_i3c2", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C3, "apb_i3c3", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C4, "apb_i3c4", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C5, "apb_i3c5", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C6, "apb_i3c6", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C7, "apb_i3c7", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C8, "apb_i3c8", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C9, "apb_i3c9", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C10, "apb_i3c10", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C11, "apb_i3c11", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C12, "apb_i3c12", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C13, "apb_i3c13", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C14, "apb_i3c14", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_I3C15, "apb_i3c15", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART0, "apb_uart0", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART1, "apb_uart1", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART2, "apb_uart2", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART3, "apb_uart3", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART4, "apb_uart4", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART5, "apb_uart5", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART6, "apb_uart6", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART7, "apb_uart7", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART8, "apb_uart8", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART9, "apb_uart9", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART10, "apb_uart10", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART11, "apb_uart11", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART12, "apb_uart12", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART13, "apb_uart13", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_APB_UART14, "apb_uart14", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C0, "dma_i3c0", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C1, "dma_i3c1", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C2, "dma_i3c2", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C3, "dma_i3c3", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C4, "dma_i3c4", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C5, "dma_i3c5", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C6, "dma_i3c6", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C7, "dma_i3c7", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C8, "dma_i3c8", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C9, "dma_i3c9", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C10, "dma_i3c10", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C11, "dma_i3c11", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C12, "dma_i3c12", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C13, "dma_i3c13", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C14, "dma_i3c14", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_DMA_I3C15, "dma_i3c15", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C0, "core_i3c0", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C1, "core_i3c1", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C2, "core_i3c2", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C3, "core_i3c3", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C4, "core_i3c4", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C5, "core_i3c5", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C6, "core_i3c6", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C7, "core_i3c7", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C8, "core_i3c8", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C9, "core_i3c9", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C10, "core_i3c10", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C11, "core_i3c11", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C12, "core_i3c12", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C13, "core_i3c13", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C14, "core_i3c14", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_CORE_I3C15, "core_i3c15", CLK_IGNORE_UNUSED,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_DMAC_AXI_PERIPH0_HS_CLK_I2C, "dmac_axi_periph0_hs_clk_i2c",
++		      CLK_IGNORE_UNUSED, JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C0, "main_icg_en_i3c0", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C1, "main_icg_en_i3c1", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C2, "main_icg_en_i3c2", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C3, "main_icg_en_i3c3", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C4, "main_icg_en_i3c4", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C5, "main_icg_en_i3c5", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C6, "main_icg_en_i3c6", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C7, "main_icg_en_i3c7", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C8, "main_icg_en_i3c8", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C9, "main_icg_en_i3c9", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C10, "main_icg_en_i3c10", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C11, "main_icg_en_i3c11", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C12, "main_icg_en_i3c12", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C13, "main_icg_en_i3c13", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C14, "main_icg_en_i3c14", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I3C15, "main_icg_en_i3c15", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_DUALTIMER0, "main_icg_en_dualtimer0",
++		      CLK_IS_CRITICAL, JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_DUALTIMER1, "main_icg_en_dualtimer1",
++		      CLK_IS_CRITICAL, JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_DUALTIMER2, "main_icg_en_dualtimer2",
++		      CLK_IS_CRITICAL, JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_LTPI0, "main_icg_en_ltpi0", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_LTPI1, "main_icg_en_ltpi1", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_DMAC_I2C, "main_icg_en_dmac_i2c",
++		      CLK_IS_CRITICAL, JHB100_PER0CLK_400),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_DMAC_I3C, "main_icg_en_dmac_i3c",
++		      CLK_IS_CRITICAL, JHB100_PER0CLK_400),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_DMAC_UART, "main_icg_en_dmac_uart",
++		      CLK_IS_CRITICAL, JHB100_PER0CLK_400),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_SOL4, "main_icg_en_sol4", 0,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_SOL5, "main_icg_en_sol5", 0,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_SOL6, "main_icg_en_sol6", 0,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_SOL7, "main_icg_en_sol7", 0,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_SOL8, "main_icg_en_sol8", 0,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_SOL9, "main_icg_en_sol9", 0,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_SOL10, "main_icg_en_sol10", 0,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_SOL11, "main_icg_en_sol11", 0,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_SOL12, "main_icg_en_sol12", 0,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_SOL13, "main_icg_en_sol13", 0,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_SOL14, "main_icg_en_sol14", 0,
++		      JHB100_PER0CLK_200),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C0, "main_icg_en_i2c0", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C1, "main_icg_en_i2c1", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C2, "main_icg_en_i2c2", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C3, "main_icg_en_i2c3", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C4, "main_icg_en_i2c4", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C5, "main_icg_en_i2c5", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C6, "main_icg_en_i2c6", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C7, "main_icg_en_i2c7", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C8, "main_icg_en_i2c8", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C9, "main_icg_en_i2c9", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C10, "main_icg_en_i2c10", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C11, "main_icg_en_i2c11", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C12, "main_icg_en_i2c12", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C13, "main_icg_en_i2c13", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C14, "main_icg_en_i2c14", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_I2C15, "main_icg_en_i2c15", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_WDT0, "main_icg_en_wdt0", 0,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_WDT1, "main_icg_en_wdt1", 0,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_WDT2, "main_icg_en_wdt2", 0,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_WDT3, "main_icg_en_wdt3", 0,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_WDT_EXTERNAL, "main_icg_en_wdt_external", 0,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_UART4, "main_icg_en_uart4", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_UART5, "main_icg_en_uart5", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_UART6, "main_icg_en_uart6", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_UART7, "main_icg_en_uart7", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_UART8, "main_icg_en_uart8", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_UART9, "main_icg_en_uart9", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_UART10, "main_icg_en_uart10", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_UART11, "main_icg_en_uart11", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_UART12, "main_icg_en_uart12", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_UART13, "main_icg_en_uart13", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_UART14, "main_icg_en_uart14", CLK_IS_CRITICAL,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_LDO0, "main_icg_en_ldo0", 0,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_LDO1, "main_icg_en_ldo1", 0,
++		      JHB100_PER0CLK_OSC),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_SENSORS_PERIPH0, "main_icg_en_sensors_periph0", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_SENSORS_DMAC, "main_icg_en_sensors_dmac", 0,
++		      JHB100_PER0CLK_600_DIV6),
++	STARFIVE_GATE(JHB100_PER0CLK_MAIN_ICG_EN_TRNG, "main_icg_en_trng", 0,
++		      JHB100_PER0CLK_200_INIT),
++};
++
++static int jhb100_per0crg_probe(struct platform_device *pdev)
++{
++	struct starfive_clk_priv *priv;
++	unsigned int idx;
++	int ret;
++
++	priv = devm_kzalloc(&pdev->dev,
++			    struct_size(priv, reg, JHB100_PER0CLK_NUM_CLKS),
++			    GFP_KERNEL);
++	if (!priv)
++		return -ENOMEM;
++
++	spin_lock_init(&priv->rmw_lock);
++	priv->num_reg = JHB100_PER0CLK_NUM_CLKS;
++	priv->dev = &pdev->dev;
++	priv->base = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(priv->base))
++		return PTR_ERR(priv->base);
++
++	for (idx = 0; idx < JHB100_PER0CLK_NUM_CLKS; idx++) {
++		u32 max = jhb100_per0crg_clk_data[idx].max;
++		struct clk_parent_data parents[4] = {};
++		struct clk_init_data init = {
++			.name = jhb100_per0crg_clk_data[idx].name,
++			.ops = starfive_clk_ops(max),
++			.parent_data = parents,
++			.num_parents =
++				((max & STARFIVE_CLK_MUX_MASK) >> STARFIVE_CLK_MUX_SHIFT) + 1,
++			.flags = jhb100_per0crg_clk_data[idx].flags,
++		};
++		struct starfive_clk *clk = &priv->reg[idx];
++		unsigned int i;
++
++		if (!init.name)
++			continue;
++
++		for (i = 0; i < init.num_parents; i++) {
++			unsigned int pidx = jhb100_per0crg_clk_data[idx].parents[i];
++
++			if (pidx < JHB100_PER0CLK_NUM_CLKS)
++				parents[i].hw = &priv->reg[pidx].hw;
++			else if (pidx == JHB100_PER0CLK_200_INIT)
++				parents[i].fw_name = "per0_200_init";
++			else if (pidx == JHB100_PER0CLK_400)
++				parents[i].fw_name = "per0_400";
++			else if (pidx == JHB100_PER0CLK_600)
++				parents[i].fw_name = "per0_600";
++			else if (pidx == JHB100_PER0CLK_OSC)
++				parents[i].fw_name = "osc";
++			else if (pidx == JHB100_PER0CLK_800)
++				parents[i].fw_name = "per0_800";
++			else
++				parents[i].fw_name = "pll6";
++		}
++
++		clk->hw.init = &init;
++		clk->idx = idx;
++		clk->max_div = max & STARFIVE_CLK_DIV_MASK;
++
++		ret = devm_clk_hw_register(&pdev->dev, &clk->hw);
++		if (ret)
++			return ret;
++	}
++
++	ret = devm_of_clk_add_hw_provider(&pdev->dev, starfive_clk_get, priv);
++	if (ret)
++		return ret;
++
++	return jhb100_reset_controller_register(priv, "r-per0", 0);
++}
++
++static const struct of_device_id jhb100_per0crg_match[] = {
++	{ .compatible = "starfive,jhb100-per0crg" },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(of, jhb100_per0crg_match);
++
++static struct platform_driver jhb100_per0crg_driver = {
++	.probe = jhb100_per0crg_probe,
++	.driver = {
++		.name = "clk-starfive-jhb100-per0",
++		.of_match_table = jhb100_per0crg_match,
++	},
++};
++module_platform_driver(jhb100_per0crg_driver);
++
++MODULE_AUTHOR("Changhuang Liang <changhuang.liang@starfivetech.com>");
++MODULE_DESCRIPTION("StarFive JHB100 Peripheral-0 Clock Driver");
++MODULE_LICENSE("GPL");
 -- 
 2.25.1
 
