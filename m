@@ -1,403 +1,406 @@
-Return-Path: <netdev+bounces-274720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274721-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aHRVKGXvzmktsAYAu9opvQ
-	(envelope-from <netdev+bounces-274720-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 00:36:21 +0200
+	id GO+SFZ7vzmktsAYAu9opvQ
+	(envelope-from <netdev+bounces-274721-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 00:37:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F59E38ED45
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 00:36:21 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5625838ED5B
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 00:37:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 11100305E61E
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 22:35:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 45A2E301FB53
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 22:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD20F373BE0;
-	Thu,  2 Apr 2026 22:35:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F57D3B38A0;
+	Thu,  2 Apr 2026 22:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FgrjnXCm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qLWB8JIF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45CAA3CA489
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 22:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775169309; cv=none; b=Ag8NCPC0cGKCm0yRzzxy/xja+bdsNiA2sHC8JA7IcRGvl3ayNRx7TRutx51ZRx/eCP4r/Q9e2/HyjQIzcUa2O6h9xRizRZMrW9n4zM4DrAawFeLvq7hifwdNlKfwBXJh2fu9d9mi9teLC6sAnju6ZK4+rXqhh+v+LILhWRiwywQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775169309; c=relaxed/simple;
-	bh=q9D4v4DiLbfopMD597VLIizyXwdamEPtJut/pHfserM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TED7PvZwYTxl7QB9utoc0MHgSLbShgBTKBLa/gb611BsuK9TyOzhY9fqSBeEQ63lQ7KXvL90FxUtWHB6izs6Vw5IM7n0ZcSS+l7RnEpQ6JJVmsZnr8A2EdAHlzxZD5kifNJ/RBadkKbdw5095nuCw7wf27DfiFj/7SXIhvgO/oQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FgrjnXCm; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-82cdb4ab547so689213b3a.2
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 15:35:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984D9361DD5
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 22:37:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775169432; cv=pass; b=VLw3/FV998qOdpeTwlp7xccTXFaFs/lM2vLa24WzLvU+E+sKlbvAUQ+3Tve0VKkfZya67vwIoHm9oEPNcqaYa7otS4pSXBpCPnpv2FiN/zGOoFEfnn6FytNdPUFsKBY15QpiX7v53MdE302UeNfPoG/jC/dqDWnPMjjpEh+5x8E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775169432; c=relaxed/simple;
+	bh=1Jh0vxXr4ZFHOzGbkLJdU9z7cLnd46O/8Fi79peIc8M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t5TiRws1OoZHFQVQdx3IaPskRGdK5fFjhUgJmyVVzYgwoBAPbqZabZyQ1PvG97cAkjpOeff+w6OUHkqEjORkRO8R84rxGRSiErJ99rk6cyMStuaWgpnaMOBttEN8YnnmufSPazlxpATId0X6LxwgX5B7ZHCwZN7xqynnuIr9Pmw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qLWB8JIF; arc=pass smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-66baa7fdfd3so2012a12.1
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 15:37:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775169429; cv=none;
+        d=google.com; s=arc-20240605;
+        b=gPCWOUAgLYFs7NCZfxOGpZQlCwGaGpskagNypckDrkKVecgZuOlFjU1abPTTrlfSYu
+         WPIxMVVzh7/g2aS196pV82NpsltksKpB4tLLTQT51S8G6WP2q2rnCJ0GnopR8ZLmTXjM
+         wMVa7WRjFAgl69JaRpcJ9Qj6cgDufTxHS3qnkofkiPjlAcV8zlPcg2dbFZTY/Uad3kq3
+         /mKYgRkKHShwROANBcfp6hPPUxeZ8+4v0ud7BsrbBu152Ylq9/Ko65tO5C2Lv31tzID1
+         erlCd7dBU6w9uKGQ8txH48vBV/NUmRO9FIIJyBWXU83g7cWK3d2A5xoETjw6YmoBaLrA
+         DP7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=qQbXMp17s0qmSHCOH/pf215QEhTjMWbLAgi5xYalmoI=;
+        fh=W2RhlZbcaHYT+kK1vP1fQcMOjx5qy+rpVWUUJqGwVA0=;
+        b=V9wKpEgq5FAx9I1+dloUdGTD0Un1ymd8jP+DTEKzv7ppmxDuyW6LO+d2H5oAWZIwI7
+         bqDUkqTjHhIK3txspx6A5ETueQZ3hczKmXILh1/04l3/LP43bh4K9KNfJJ8O3iyPFLaB
+         /IVy+0pnkb39CBwS0ip3CiDrUhbr9MYhqqCeTKvkVfshaBZom+/ZMEfADc8QIOr1lkVJ
+         u62D2tVzc6tDcXvvmd9W5zIbdS4XtdIwvPw7kUwYqmDeIMDzvP5aBTToLMlvwR6wCFmH
+         qwh6+onMgoDn9SQjwYZiqmYhlebB9ZeZLL9XRGhquMC2oolF0yW8XPZsu82jaXAhY84c
+         3FKg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775169307; x=1775774107; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20251104; t=1775169429; x=1775774229; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aBBb0dSCbw/VgdEeWJ3io/3ohDhEz9KduwD7tGY/ZSs=;
-        b=FgrjnXCmtrfVxC+71KhnWY7KkQZD5Za2E7pBHehJ6oWUHFCI6SsVMwthJayBwJ2wO/
-         Y9lfQgITGapzmHCAWXaBvrZWamWC9gtxYMs7KamZB8Wwz/wu1J71MqXNsArdPGdyYft3
-         r90iBAMJmhC+JCOWO7AGqJgxHGEtF9xd1boOSvbV3/+N9xztla4U/68Cg2gV5FKZD130
-         7AWz8BwuEKsuUBMShg/zgL0Yz3Ipt6VLcecA4RaVD75PkN8cd911MLbObVkg4CXew+pp
-         AkXYJcDSz6a+4DMuSPjicPIFQs4dtcN9ZHtqXRAaI1sb4HhycRnY84/9pHuZ1CMZVhuY
-         vWKg==
+        bh=qQbXMp17s0qmSHCOH/pf215QEhTjMWbLAgi5xYalmoI=;
+        b=qLWB8JIFBav8QMIDxNItptqxbN6eah53qQCReXH8S2ZaYEU+L59a9rf05Gf+3Xo/ns
+         tpslPk6OOnrMXq3d5plyPYQQLTRBP/0XKS3rAf+hIOpmeU0XT9g51Yv15+2iOEdi4viy
+         okIPPglHu/8LP5Eg17+i7n8thl4BER/GeakS637/x34TkbVMbkmWj9DXMziNmrBZjr2Z
+         0B5xLcRXd8zzx1q0keAu/JB3kR8pQkX7AVMyWPHz0OVv9iWsApCednsky1HbNeJplF3N
+         UKJMEShdTf2zZsWNax/k9WlrwaN6GIzEITaAhPPZiEkvoNt5+phrRGj/Ow6nn7VI/8RQ
+         XR2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775169307; x=1775774107;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1775169429; x=1775774229;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=aBBb0dSCbw/VgdEeWJ3io/3ohDhEz9KduwD7tGY/ZSs=;
-        b=LFSThVLuEQg16EpWa+D8W9ViCy7+2ob3AD+4lVS4eBYauwOegjsfq7hC3H/POVUKeW
-         FHrmLNJVYp/s5HXj4eQaFw9uhqiDOtJstDLCeKE5ucJtpXz3r2W05LpMf6zn4D4f4zAT
-         0omq3ZclGVixjYdML1v6W7PUPXjUW73+RpxWIgVgfqtWy/qXtV24/kWDNSJiTF2Nd2PJ
-         qe5zATfAAHUws3JlMYcOf4Fnc5ym50/NkAlTR1tzzEtlTDovzRpRiYgWq8AVLlbAmQ5S
-         4BdWJ0lmkTPXqKtzRE4w+EWhiOWho8r7mZ1KGYoqnOhnukdvV+7PJhCE9cvIsVZ3b3n9
-         XxHw==
-X-Gm-Message-State: AOJu0YzbXwvRg4beBhpc6VuKnM6vjbxlrOEIRgYNxj5pOgdRwzaONXTj
-	lyk8KRIWe60zhiKuDzk2LvlZN1yjFUGCfh0OCTDd26kKKg37v8cwnfy7ok4Rfw==
-X-Gm-Gg: ATEYQzylwCUYvU9v7Udq1wbACNGXli1eut3lOmli1mCNkeFs/plWIV3dkIJkpOab2aG
-	8LUdrW+yPXbXhKHHNe7UqMjLkoWKAfkzwGd/tnXgS0LCfR4cPcWNTYzQssEesh/DgG7ApY+aszJ
-	wfgUkkMO1cZTN+6xTEyRnYHfQuBTpOb/jPLmfv02rcsgTTI62txCcL+5K2W5plyxuOf2riK2rwT
-	Y8iz3hZqBj3aA5utW0DNe1+qu7hTfaaSyoNuXIqdlPg3CO6NVeKyMBA+J/BIGV6tSHoTMggDT4d
-	HHkPviTvyeSLU20gPbft4HgX8NOodthpsiZFjVMI4Gof/s/J7O2nhy2znOhBZnD33qJk480TGU/
-	yTFmxx5EZVrMS2xNSlLvWU83czC66Bnog92AwGvwjO+ZXAtNlf82RXwQM97fH9w2Li78cpInFJS
-	76k9O4wXpHP/rhQaBn328vf58xebWbbPD3GeuE5R8CF0Gi79Z2kw==
-X-Received: by 2002:a05:6a21:99a3:b0:39b:e789:7d06 with SMTP id adf61e73a8af0-39f2f0f7b40mr508358637.51.1775169307482;
-        Thu, 02 Apr 2026 15:35:07 -0700 (PDT)
-Received: from d.home.yangfl.dn42 ([2a09:bac5:661f:3046::4cf:90])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9ca1f28sm4294291b3a.57.2026.04.02.15.35.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 15:35:07 -0700 (PDT)
-From: David Yang <mmyangfl@gmail.com>
-To: netdev@vger.kernel.org
-Cc: David Yang <mmyangfl@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 4/4] net: dsa: yt921x: Add port qdisc tbf support
-Date: Fri,  3 Apr 2026 06:34:32 +0800
-Message-ID: <20260402223437.109097-5-mmyangfl@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260402223437.109097-1-mmyangfl@gmail.com>
-References: <20260402223437.109097-1-mmyangfl@gmail.com>
+        bh=qQbXMp17s0qmSHCOH/pf215QEhTjMWbLAgi5xYalmoI=;
+        b=PpPZq8RaNlp65s9fqXJy2tw65HWANQMqO9TmtI9O3KbL2mqfJ8MTD5M7ReDUBv/v1a
+         rdEda9pR+IsxCb2KhOLSYvssS+jQrcq59o7vSMzRVspU9+ANtMAZmfbORr6r3uHUsv9y
+         sIQonETVpm4t4TZlNuSMzrwfTe7sNLuctAoQ+qalTcHBzsxqTmYlu3ZM5TSl7qQysfhj
+         V+1i8mf90FP+tQql0obYGfi+PAMGCcSnguHJOMjRinjn6rNXzsOkfmgff796o8SjhX90
+         wPIEvTvMYYVDJ/R1hk3gBGbol50AIzMq/YHnVuwCFom0uzbfPLIxz+32sOkTc5JxOC9q
+         exdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUQtUfYeC5uBMloD+bQTX7Fax7bCzlfuJS6SOy3zYjMizDnmE3+6ygNta5ekwkPD6aVXSy6dgE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1mNgIc02ayj92yOG6er5G354qo1Kk0cXpnkZ3KnGrUAP4Z+Bn
+	9KwZXsNejwo6HE/sXEuttSBOEK5KMQTeDv4sB7eOSzYcmcMr6TzZ1mSr4XygjeETt0AbDhHW0BS
+	l/dTquMR9CeRnzSc1h33Sr4J2XrZ9Mxa8vKhbwlCD
+X-Gm-Gg: AeBDievt+d5L5X+1mO9NqBF7uMAsCFmiBKItBZcghRMxgB1DCMGM+C4EWaAL5+HMt/f
+	lzdnjsHDsxslgx3bN3X2tIBZPwyRH9hsy/Mg+dNaXg3LcwmApjYlHDLHv5LqpZPG/H8PPnrwVgC
+	ioikMh8xv22uYd/pMy5J6JwbYTSY7vDvaJzQaNVRJ8mq4L6j/oawSgUUqCEgKsoNMD/Trn+PkLg
+	TaEQf1fT1mptJzpsGXr59/iFCKIkS0+PJdWEpY29WVhmfCbnWFimk4qS+vLBsCxorWebjkgpoNj
+	C0Ms18y6JyANSiUCYfNgFa8FGA4O2PGyDl1J37bi7Rx6qzyI
+X-Received: by 2002:aa7:c457:0:b0:668:c2b6:9fa2 with SMTP id
+ 4fb4d7f45d1cf-66e43f2e6ccmr1735a12.7.1775169428404; Thu, 02 Apr 2026 15:37:08
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260326224527.1044097-4-hramamurthy@google.com>
+ <20260329212002.2875815-1-kuba@kernel.org> <CA+mzVtuK6NSrnZdcwyToTseFqBU86jRn9nbdeLGFjhjeok=q2g@mail.gmail.com>
+ <CAMP57yWZkgU989sN38ycxiR1p5w48mssAwycZY4BZS28nDObRw@mail.gmail.com>
+ <CA+mzVtv-91ru7v6GxOS80xihE4ZbwGqdyQdKPTHv+woKaeOhuQ@mail.gmail.com>
+ <CAMP57yVS3OiFX+Qjcr9djO46OLZ=KuW2awD-7fCPZ=k2SdHNnw@mail.gmail.com> <CA+mzVtuL9iZ71VkMhb8vhs8idqOfJ=heWwgMLkYUjv6F0L91kQ@mail.gmail.com>
+In-Reply-To: <CA+mzVtuL9iZ71VkMhb8vhs8idqOfJ=heWwgMLkYUjv6F0L91kQ@mail.gmail.com>
+From: Jordan Rhee <jordanrhee@google.com>
+Date: Thu, 2 Apr 2026 15:36:56 -0700
+X-Gm-Features: AQROBzB1fuleJobk1NTpIdxLyekNycrNmrboJoEL591WfodxL-pnKMwjR_2oxGk
+Message-ID: <CA+mzVtst5BJt1rU_MP11wqU8T_89gRfqLr-mA6wdiffFyh=K8w@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] gve: implement PTP gettimex64
+To: Naman Gulati <namangulati@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, hramamurthy@google.com, netdev@vger.kernel.org, 
+	joshwash@google.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, richardcochran@gmail.com, 
+	willemb@google.com, nktgrg@google.com, jfraker@google.com, 
+	ziweixiao@google.com, maolson@google.com, thostet@google.com, 
+	jefrogers@google.com, alok.a.tiwari@oracle.com, yyd@google.com, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-274720-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-274721-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,lunn.ch,davemloft.net,redhat.com,gmail.com,oracle.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_NEQ_ENVFROM(0.00)[jordanrhee@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1F59E38ED45
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5625838ED5B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Enable port shaping and support limiting the rate of outgoing traffic.
+On Thu, Apr 2, 2026 at 9:15=E2=80=AFAM Jordan Rhee <jordanrhee@google.com> =
+wrote:
+>
+> The iowrite32be() inside gve_adminq_report_nic_ts() will prevent
+> reordering by the compiler because it uses volatile, and the VM exit
+> will prevent speculative execution by the CPU.
 
-Signed-off-by: David Yang <mmyangfl@gmail.com>
----
- drivers/net/dsa/yt921x.c | 122 +++++++++++++++++++++++++++++++++++++++
- drivers/net/dsa/yt921x.h |  65 ++++++++++++++++++++-
- 2 files changed, 186 insertions(+), 1 deletion(-)
+After some offline discussion with Naman we agree it's functionally
+correct without
+a barrier. However, since it's not explicitly part of the contract of
+gve_adminq_issue_cmd() that
+it causes a VM exit, it would be best to use an rmb() to prevent the
+2nd get_cycles()
+from being speculatively executed before gve_adminq_issue_cmd(). This would
+prevent a subtle bug if gve_adminq_issue_cmd() were to change, and the
+performance hit of the barrier is negligible compared to the VM exit.
 
-diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-index 54d99e54dda7..0f97d0a4f042 100644
---- a/drivers/net/dsa/yt921x.c
-+++ b/drivers/net/dsa/yt921x.c
-@@ -24,6 +24,7 @@
- #include <net/dsa.h>
- #include <net/dscp.h>
- #include <net/ieee8021q.h>
-+#include <net/pkt_cls.h>
- 
- #include "yt921x.h"
- 
-@@ -1340,6 +1341,112 @@ yt921x_dsa_port_policer_add(struct dsa_switch *ds, int port,
- 	return res;
- }
- 
-+static int
-+yt921x_tbf_validate(struct yt921x_priv *priv,
-+		    const struct tc_tbf_qopt_offload *qopt, int *queuep)
-+{
-+	struct device *dev = to_device(priv);
-+	int queue = -1;
-+
-+	if (qopt->parent != TC_H_ROOT) {
-+		dev_err(dev, "Parent should be \"root\"\n");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	switch (qopt->command) {
-+	case TC_TBF_REPLACE: {
-+		const struct tc_tbf_qopt_offload_replace_params *p;
-+
-+		p = &qopt->replace_params;
-+
-+		if (!p->rate.mpu) {
-+			dev_info(dev, "Assuming you want mpu = 64\n");
-+		} else if (p->rate.mpu != 64) {
-+			dev_err(dev, "mpu other than 64 not supported\n");
-+			return -EINVAL;
-+		}
-+		break;
-+	}
-+	default:
-+		break;
-+	}
-+
-+	*queuep = queue;
-+	return 0;
-+}
-+
-+static int
-+yt921x_dsa_port_setup_tc_tbf_port(struct dsa_switch *ds, int port,
-+				  const struct tc_tbf_qopt_offload *qopt)
-+{
-+	struct yt921x_priv *priv = to_yt921x_priv(ds);
-+	u32 ctrls[2];
-+	int res;
-+
-+	switch (qopt->command) {
-+	case TC_TBF_DESTROY:
-+		ctrls[0] = 0;
-+		ctrls[1] = 0;
-+		break;
-+	case TC_TBF_REPLACE: {
-+		const struct tc_tbf_qopt_offload_replace_params *p;
-+		struct yt921x_meter meter;
-+		u64 burst;
-+
-+		p = &qopt->replace_params;
-+
-+		/* where is burst??? */
-+		burst = div_u64(priv->port_shape_slot_ns * p->rate.rate_bytes_ps,
-+				1000000000) + 10000;
-+		res = yt921x_meter_tfm(priv, port, priv->port_shape_slot_ns,
-+				       p->rate.rate_bytes_ps, burst,
-+				       YT921X_METER_SINGLE_BUCKET,
-+				       YT921X_SHAPE_RATE_MAX,
-+				       YT921X_SHAPE_BURST_MAX,
-+				       YT921X_SHAPE_UNIT_MAX, &meter);
-+		if (res)
-+			return res;
-+
-+		ctrls[0] = YT921X_PORT_SHAPE_CTRLa_CIR(meter.cir) |
-+			   YT921X_PORT_SHAPE_CTRLa_CBS(meter.cbs);
-+		ctrls[1] = YT921X_PORT_SHAPE_CTRLb_UNIT(meter.unit) |
-+			   YT921X_PORT_SHAPE_CTRLb_EN;
-+		break;
-+	}
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	mutex_lock(&priv->reg_lock);
-+	res = yt921x_reg64_write(priv, YT921X_PORTn_SHAPE_CTRL(port), ctrls);
-+	mutex_unlock(&priv->reg_lock);
-+
-+	return res;
-+}
-+
-+static int
-+yt921x_dsa_port_setup_tc(struct dsa_switch *ds, int port,
-+			 enum tc_setup_type type, void *type_data)
-+{
-+	struct yt921x_priv *priv = to_yt921x_priv(ds);
-+	int res;
-+
-+	switch (type) {
-+	case TC_SETUP_QDISC_TBF: {
-+		const struct tc_tbf_qopt_offload *qopt = type_data;
-+		int queue;
-+
-+		res = yt921x_tbf_validate(priv, qopt, &queue);
-+		if (res)
-+			return res;
-+
-+		return yt921x_dsa_port_setup_tc_tbf_port(ds, port, qopt);
-+	}
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
- static int
- yt921x_mirror_del(struct yt921x_priv *priv, int port, bool ingress)
- {
-@@ -3499,6 +3606,20 @@ static int yt921x_chip_setup_tc(struct yt921x_priv *priv)
- 		return res;
- 	priv->meter_slot_ns = ctrl * op_ns;
- 
-+	ctrl = max(priv->port_shape_slot_ns / op_ns,
-+		   YT921X_PORT_SHAPE_SLOT_MIN);
-+	res = yt921x_reg_write(priv, YT921X_PORT_SHAPE_SLOT, ctrl);
-+	if (res)
-+		return res;
-+	priv->port_shape_slot_ns = ctrl * op_ns;
-+
-+	ctrl = max(priv->queue_shape_slot_ns / op_ns,
-+		   YT921X_QUEUE_SHAPE_SLOT_MIN);
-+	res = yt921x_reg_write(priv, YT921X_QUEUE_SHAPE_SLOT, ctrl);
-+	if (res)
-+		return res;
-+	priv->queue_shape_slot_ns = ctrl * op_ns;
-+
- 	return 0;
- }
- 
-@@ -3655,6 +3776,7 @@ static const struct dsa_switch_ops yt921x_dsa_switch_ops = {
- 	/* rate */
- 	.port_policer_del	= yt921x_dsa_port_policer_del,
- 	.port_policer_add	= yt921x_dsa_port_policer_add,
-+	.port_setup_tc		= yt921x_dsa_port_setup_tc,
- 	/* hsr */
- 	.port_hsr_leave		= dsa_port_simple_hsr_leave,
- 	.port_hsr_join		= dsa_port_simple_hsr_join,
-diff --git a/drivers/net/dsa/yt921x.h b/drivers/net/dsa/yt921x.h
-index e7022657c994..2ec59e03043d 100644
---- a/drivers/net/dsa/yt921x.h
-+++ b/drivers/net/dsa/yt921x.h
-@@ -524,6 +524,12 @@ enum yt921x_app_selector {
- #define  YT921X_PORT_VLAN_CTRL1_CVLAN_DROP_TAGGED	BIT(1)
- #define  YT921X_PORT_VLAN_CTRL1_CVLAN_DROP_UNTAGGED	BIT(0)
- 
-+#define YT921X_PORTn_PRIO_UCAST_QUEUE(port)	(0x300200 + 4 * (port))
-+#define  YT921X_PORT_PRIOm_UCAST_QUEUE_M(m)	(7 << (3 * (m)))
-+#define   YT921X_PORT_PRIOm_UCAST_QUEUE(m, x)		((x) << (3 * (m)))
-+#define YT921X_PORTn_PRIO_MCAST_QUEUE(port)	(0x300280 + 4 * (port))
-+#define  YT921X_PORT_PRIOm_MCAST_QUEUE_M(m)	(3 << (2 * (m)))
-+#define   YT921X_PORT_PRIOm_MCAST_QUEUE(m, x)		((x) << (2 * (m)))
- #define YT921X_MIRROR			0x300300
- #define  YT921X_MIRROR_IGR_PORTS_M		GENMASK(26, 16)
- #define   YT921X_MIRROR_IGR_PORTS(x)			FIELD_PREP(YT921X_MIRROR_IGR_PORTS_M, (x))
-@@ -534,6 +540,47 @@ enum yt921x_app_selector {
- #define  YT921X_MIRROR_PORT_M			GENMASK(3, 0)
- #define   YT921X_MIRROR_PORT(x)				FIELD_PREP(YT921X_MIRROR_PORT_M, (x))
- 
-+#define YT921X_QUEUE_SHAPE_SLOT		0x340008
-+#define  YT921X_QUEUE_SHAPE_SLOT_SLOT_M		GENMASK(11, 0)
-+#define YT921X_PORT_SHAPE_SLOT		0x34000c
-+#define  YT921X_PORT_SHAPE_SLOT_SLOT_M		GENMASK(11, 0)
-+#define YT921X_QUEUEn_SCH(x)		(0x341000 + 4 * (x))
-+#define  YT921X_QUEUE_SCH_E_DWRR_M		GENMASK(27, 18)
-+#define   YT921X_QUEUE_SCH_E_DWRR(x)			FIELD_PREP(YT921X_QUEUE_SCH_E_DWRR_M, (x))
-+#define  YT921X_QUEUE_SCH_C_DWRR_M		GENMASK(17, 8)
-+#define   YT921X_QUEUE_SCH_C_DWRR(x)			FIELD_PREP(YT921X_QUEUE_SCH_C_DWRR_M, (x))
-+#define  YT921X_QUEUE_SCH_E_PRIO_M		GENMASK(7, 4)
-+#define   YT921X_QUEUE_SCH_E_PRIO(x)			FIELD_PREP(YT921X_QUEUE_SCH_E_PRIO_M, (x))
-+#define  YT921X_QUEUE_SCH_C_PRIO_M		GENMASK(3, 0)
-+#define   YT921X_QUEUE_SCH_C_PRIO(x)			FIELD_PREP(YT921X_QUEUE_SCH_C_PRIO_M, (x))
-+#define YT921X_C_DWRRn(x)		(0x342000 + 4 * (x))
-+#define YT921X_E_DWRRn(x)		(0x343000 + 4 * (x))
-+#define  YT921X_DWRR_PKT_MODE			BIT(0)	/* 0: byte rate mode */
-+#define YT921X_QUEUEn_SHAPE_CTRL(x)	(0x34c000 + 0x10 * (x))
-+#define  YT921X_QUEUE_SHAPE_CTRLc_TOKEN_OVERFLOW_EN	BIT(6)
-+#define  YT921X_QUEUE_SHAPE_CTRLc_E_EN		BIT(5)
-+#define  YT921X_QUEUE_SHAPE_CTRLc_C_EN		BIT(4)
-+#define  YT921X_QUEUE_SHAPE_CTRLc_PKT_MODE	BIT(3)	/* 0: byte rate mode */
-+#define  YT921X_QUEUE_SHAPE_CTRLc_UNIT_M	GENMASK(2, 0)
-+#define   YT921X_QUEUE_SHAPE_CTRLc_UNIT(x)		FIELD_PREP(YT921X_QUEUE_SHAPE_CTRLc_UNIT_M, (x))
-+#define  YT921X_QUEUE_SHAPE_CTRLb_EBS_M		GENMASK(31, 18)
-+#define   YT921X_QUEUE_SHAPE_CTRLb_EBS(x)		FIELD_PREP(YT921X_QUEUE_SHAPE_CTRLb_EBS_M, (x))
-+#define  YT921X_QUEUE_SHAPE_CTRLb_EIR_M		GENMASK(17, 0)
-+#define   YT921X_QUEUE_SHAPE_CTRLb_EIR(x)		FIELD_PREP(YT921X_QUEUE_SHAPE_CTRLb_EIR_M, (x))
-+#define  YT921X_QUEUE_SHAPE_CTRLa_CBS_M		GENMASK(31, 18)
-+#define   YT921X_QUEUE_SHAPE_CTRLa_CBS(x)		FIELD_PREP(YT921X_QUEUE_SHAPE_CTRLa_CBS_M, (x))
-+#define  YT921X_QUEUE_SHAPE_CTRLa_CIR_M		GENMASK(17, 0)
-+#define   YT921X_QUEUE_SHAPE_CTRLa_CIR(x)		FIELD_PREP(YT921X_QUEUE_SHAPE_CTRLa_CIR_M, (x))
-+#define YT921X_PORTn_SHAPE_CTRL(port)	(0x354000 + 8 * (port))
-+#define  YT921X_PORT_SHAPE_CTRLb_EN		BIT(4)
-+#define  YT921X_PORT_SHAPE_CTRLb_PKT_MODE	BIT(3)	/* 0: byte rate mode */
-+#define  YT921X_PORT_SHAPE_CTRLb_UNIT_M		GENMASK(2, 0)
-+#define   YT921X_PORT_SHAPE_CTRLb_UNIT(x)		FIELD_PREP(YT921X_PORT_SHAPE_CTRLb_UNIT_M, (x))
-+#define  YT921X_PORT_SHAPE_CTRLa_CBS_M		GENMASK(31, 18)
-+#define   YT921X_PORT_SHAPE_CTRLa_CBS(x)		FIELD_PREP(YT921X_PORT_SHAPE_CTRLa_CBS_M, (x))
-+#define  YT921X_PORT_SHAPE_CTRLa_CIR_M		GENMASK(17, 0)
-+#define   YT921X_PORT_SHAPE_CTRLa_CIR(x)		FIELD_PREP(YT921X_PORT_SHAPE_CTRLa_CIR_M, (x))
-+
- #define YT921X_EDATA_EXTMODE	0xfb
- #define YT921X_EDATA_LEN	0x100
- 
-@@ -559,6 +606,11 @@ enum yt921x_fdb_entry_status {
- #define YT921X_METER_UNIT_MAX	((1 << 3) - 1)
- #define YT921X_METER_BURST_MAX	((1 << 16) - 1)
- #define YT921X_METER_RATE_MAX	((1 << 18) - 1)
-+#define YT921X_PORT_SHAPE_SLOT_MIN	80
-+#define YT921X_QUEUE_SHAPE_SLOT_MIN	132
-+#define YT921X_SHAPE_UNIT_MAX	((1 << 3) - 1)
-+#define YT921X_SHAPE_BURST_MAX	((1 << 14) - 1)
-+#define YT921X_SHAPE_RATE_MAX	((1 << 18) - 1)
- 
- #define YT921X_LAG_NUM		2
- #define YT921X_LAG_PORT_NUM	4
-@@ -576,7 +628,16 @@ enum yt921x_fdb_entry_status {
- #define YT921X_TAG_LEN	8
- 
- /* 8 internal + 2 external + 1 mcu */
--#define YT921X_PORT_NUM			11
-+#define YT921X_PORT_NUM		11
-+#define YT921X_UCAST_QUEUE_NUM	8
-+#define YT921X_MCAST_QUEUE_NUM	4
-+#define YT921X_PORT_QUEUE_NUM \
-+	(YT921X_UCAST_QUEUE_NUM + YT921X_MCAST_QUEUE_NUM)
-+#define YT921X_UCAST_QUEUE_ID(port, queue) \
-+	(YT921X_UCAST_QUEUE_NUM * (port) + (queue))
-+#define YT921X_MCAST_QUEUE_ID(port, queue) \
-+	(YT921X_UCAST_QUEUE_NUM * YT921X_PORT_NUM + \
-+	 YT921X_MCAST_QUEUE_NUM * (port) + (queue))
- 
- #define yt921x_port_is_internal(port) ((port) < 8)
- #define yt921x_port_is_external(port) (8 <= (port) && (port) < 9)
-@@ -655,6 +716,8 @@ struct yt921x_priv {
- 
- 	const struct yt921x_info *info;
- 	unsigned int meter_slot_ns;
-+	unsigned int port_shape_slot_ns;
-+	unsigned int queue_shape_slot_ns;
- 	/* cache of dsa_cpu_ports(ds) */
- 	u16 cpu_ports_mask;
- 	u8 cycle_ns;
--- 
-2.53.0
-
+>
+> On Thu, Apr 2, 2026 at 8:53=E2=80=AFAM Naman Gulati <namangulati@google.c=
+om> wrote:
+> >
+> > On Thu, Apr 2, 2026 at 8:38=E2=80=AFAM Jordan Rhee <jordanrhee@google.c=
+om> wrote:
+> > >
+> > > We know that gve_adminq_report_nic_ts() will cause a VM exit, which
+> > > will act as a full barrier. Additional barriers are not strictly
+> > > necessary from a functional perspective. Can we rely on this fact or
+> > > do we need explicit barriers?
+> >
+> > I don't think that's enough. Without a barrier get_cycles can be
+> > speculatively executed before gve_adminq_report_nic_ts.
+> >
+> > >
+> > >
+> > > On Tue, Mar 31, 2026 at 11:05=E2=80=AFAM Naman Gulati <namangulati@go=
+ogle.com> wrote:
+> > > >
+> > > > On Sun, Mar 29, 2026 at 9:31=E2=80=AFPM Jordan Rhee <jordanrhee@goo=
+gle.com> wrote:
+> > > > >
+> > > > > On Sun, Mar 29, 2026 at 2:20=E2=80=AFPM Jakub Kicinski <kuba@kern=
+el.org> wrote:
+> > > > > >
+> > > > > > This is an AI-generated review of your patch. The human sending=
+ this
+> > > > > > email has considered the AI review valid, or at least plausible=
+.
+> > > > > > ---
+> > > > > > Subject: gve: implement PTP gettimex64
+> > > > > >
+> > > > > > This commit implements the PTP gettimex64 function to enable ch=
+rony and
+> > > > > > phc2sys to synchronize the system clock to the NIC clock. It re=
+ads the
+> > > > > > NIC timestamp along with pre and post system cycle counters to =
+minimize
+> > > > > > the uncertainty window.
+> > > > > >
+> > > > > > > diff --git a/drivers/net/ethernet/google/gve/gve_ptp.c b/driv=
+ers/net/ethernet/google/gve/gve_ptp.c
+> > > > > > > index 140b8fbce4f4..bea794541f30 100644
+> > > > > > > --- a/drivers/net/ethernet/google/gve/gve_ptp.c
+> > > > > > > +++ b/drivers/net/ethernet/google/gve/gve_ptp.c
+> > > > > > > @@ -10,28 +10,203 @@
+> > > > > >
+> > > > > > [ ... ]
+> > > > > >
+> > > > > > > +static int gve_adminq_read_timestamp(struct gve_priv *priv,
+> > > > > > > +                                  cycles_t *pre_cycles,
+> > > > > > > +                                  cycles_t *post_cycles)
+> > > > > > > +{
+> > > > > > > +     unsigned long delay_us =3D 1000;
+> > > > > > > +     int retry_count =3D 0;
+> > > > > > > +     int err;
+> > > > > > > +
+> > > > > > > +     lockdep_assert_held(&priv->nic_ts_read_lock);
+> > > > > > > +
+> > > > > > > +     do {
+> > > > > > > +             *pre_cycles =3D get_cycles();
+> > > > > > > +             err =3D gve_adminq_report_nic_ts(priv, priv->ni=
+c_ts_report_bus);
+> > > > > > > +
+> > > > > > > +             /* Ensure cycle counter is sampled after AdminQ=
+ cmd returns */
+> > > > > > > +             rmb();
+> > > > > > > +             *post_cycles =3D get_cycles();
+> > > > > >
+> > > > > > Are execution barriers needed around get_cycles() here? rmb() o=
+rders
+> > > > > > memory accesses, but the CPU might still speculatively execute =
+the cycle
+> > > > > > counter reads out of order with respect to the AdminQ commands.
+> > > > > >
+> > > > > > Could this speculative reordering cause the strict bounds valid=
+ation in
+> > > > > > gve_ptp_gettimex64() to fail spuriously?
+> > > > >
+> > > > > I will add mb() barriers to be totally safe.
+> > > >
+> > > > I'm not so sure that rmb() is insufficient here. In x86_64 rmb() is=
+ an
+> > > > lfence. lfence is used to prevent speculative execution (per the x8=
+6
+> > > > barrier_nospec implementation) and rdtsc_ordered, which is called b=
+y
+> > > > the ktime* helpers, also prefaces rdtsc with an lfence. On ARM the
+> > > > get_cycles implementation adds an isb instruction before reading
+> > > > cntvct_el0.
+> > > >
+> > > >
+> > > > >
+> > > > > > [ ... ]
+> > > > > >
+> > > > > > >  static int gve_ptp_gettimex64(struct ptp_clock_info *info,
+> > > > > > >                             struct timespec64 *ts,
+> > > > > > >                             struct ptp_system_timestamp *sts)
+> > > > > > >  {
+> > > > > > > -     return -EOPNOTSUPP;
+> > > > > > > +     struct gve_ptp *ptp =3D container_of(info, struct gve_p=
+tp, info);
+> > > > > > > +     struct gve_sysclock_sample sysclock =3D {0};
+> > > > > > > +     struct gve_priv *priv =3D ptp->priv;
+> > > > > > > +     struct system_time_snapshot snap;
+> > > > > > > +     u64 nic_ts;
+> > > > > > > +     int err;
+> > > > > > > +
+> > > > > > > +     /* Take system clock snapshot before sampling cycle cou=
+nters */
+> > > > > > > +     if (sts)
+> > > > > > > +             ktime_get_snapshot(&snap);
+> > > > > > > +
+> > > > > > > +     err =3D gve_clock_nic_ts_read(priv, &nic_ts, &sysclock)=
+;
+> > > > > >
+> > > > > > Could the system time snapshot become stale here?
+> > > > > >
+> > > > > > If priv->nic_ts_read_lock is contended, or if gve_adminq_read_t=
+imestamp()
+> > > > > > retries and sleeps, the snapshot might be taken significantly b=
+efore the
+> > > > > > actual hardware read.
+> > > > > >
+> > > > > > Would it be more accurate to take the snapshot immediately befo=
+re reading the
+> > > > > > hardware, inside the mutex?
+> > > > >
+> > > > > Ack, will fix.
+> > > > >
+> > > > > >
+> > > > > > > +     if (err)
+> > > > > > > +             return err;
+> > > > > > > +
+> > > > > > > +     if (sts) {
+> > > > > > > +             /* Reject samples with out of order system cloc=
+k values */
+> > > > > > > +             if (!(sysclock.host_pre_cycles <=3D sysclock.ni=
+c_pre_cycles &&
+> > > > > > > +                   sysclock.nic_pre_cycles  <=3D sysclock.ni=
+c_post_cycles &&
+> > > > > > > +                   sysclock.nic_post_cycles <=3D sysclock.ho=
+st_post_cycles)) {
+> > > > > > > +                     dev_err_ratelimited(&priv->pdev->dev,
+> > > > > > > +                                         "AdminQ system cloc=
+k cycle counts out of order. Expecting %llu <=3D %llu <=3D %llu <=3D %llu\n=
+",
+> > > > > > > +                                         (u64)sysclock.host_=
+pre_cycles,
+> > > > > > > +                                         sysclock.nic_pre_cy=
+cles,
+> > > > > > > +                                         sysclock.nic_post_c=
+ycles,
+> > > > > > > +                                         (u64)sysclock.host_=
+post_cycles);
+> > > > > > > +                     return -EBADMSG;
+> > > > > >
+> > > > > > How does this behave on architectures where get_cycles() is not=
+ implemented
+> > > > > > and returns 0, or with older firmware that leaves nic_pre_cycle=
+s and
+> > > > > > nic_post_cycles as 0?
+> > > > >
+> > > > > Firmware is not allowed to return 0. 0 should trigger the check.
+> > > > >
+> > > > > > It looks like the bounds check would unconditionally fail and r=
+eturn -EBADMSG.
+> > > > > > Since userspace tools like chrony usually expect -EOPNOTSUPP fo=
+r unsupported
+> > > > > > extended ioctls to fall back to basic PTP ioctls, will returnin=
+g -EBADMSG
+> > > > > > cause a hard failure for clock synchronization?
+> > > > >
+> > > > > Will fix. GVE is only supported on x86_64 and arm64, and will fai=
+l on
+> > > > > other architectures with -EOPNOTSUPP due to the check in
+> > > > > gve_cycles_to_clock_fn(). However, if an architecture returns
+> > > > > get_cycles() as 0, it will fail here first with -EBADMSG. I will =
+add
+> > > > > an explicit check for x86 || arm64 earlier in this function.
+> > > > >
+> > > > > >
+> > > > > > [ ... ]
+> > > > > >
+> > > > > > > @@ -132,7 +307,7 @@ int gve_init_clock(struct gve_priv *priv)
+> > > > > > >               goto release_ptp;
+> > > > > > >       }
+> > > > > > >       mutex_init(&priv->nic_ts_read_lock);
+> > > > > > > -     err =3D gve_clock_nic_ts_read(priv, &nic_raw);
+> > > > > > > +     err =3D gve_clock_nic_ts_read(priv, &nic_raw, NULL);
+> > > > > > >       if (err) {
+> > > > > > >               dev_err(&priv->pdev->dev, "failed to read NIC c=
+lock %d\n", err);
+> > > > > > >               goto release_nic_ts_report;
+> > > > > >
+> > > > > > Is there a race condition exposing the PTP device to userspace =
+before its
+> > > > > > resources are fully initialized?
+> > > > > >
+> > > > > > Looking at gve_init_clock(), gve_ptp_init() is called before al=
+locating
+> > > > > > nic_ts_report and initializing nic_ts_read_lock:
+> > > > > >
+> > > > > >     err =3D gve_ptp_init(priv);
+> > > > > >     if (err)
+> > > > > >         return err;
+> > > > > >
+> > > > > >     priv->nic_ts_report =3D dma_alloc_coherent(...);
+> > > > > >     ...
+> > > > > >     mutex_init(&priv->nic_ts_read_lock);
+> > > > > >
+> > > > > > If a concurrent userspace process immediately invokes the
+> > > > > > PTP_SYS_OFFSET_EXTENDED ioctl after gve_ptp_init() registers th=
+e /dev/ptpX
+> > > > > > device, could it call gve_ptp_gettimex64() and attempt to lock =
+the
+> > > > > > uninitialized mutex or dereference the NULL nic_ts_report point=
+er?
+> > > > > >
+> > > > > > Additionally, in the error path for gve_init_clock():
+> > > > > >
+> > > > > >     release_nic_ts_report:
+> > > > > >         mutex_destroy(&priv->nic_ts_read_lock);
+> > > > > >         dma_free_coherent(...);
+> > > > > >         priv->nic_ts_report =3D NULL;
+> > > > > >     release_ptp:
+> > > > > >         gve_ptp_release(priv);
+> > > > > >
+> > > > > > Could destroying the mutex and freeing the memory before gve_pt=
+p_release()
+> > > > > > create a use-after-free window if an ioctl is currently running=
+?
+> > > > >
+> > > > > Will be fixed in the previous patch in the series.
 
