@@ -1,216 +1,204 @@
-Return-Path: <netdev+bounces-274294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274295-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kFa4AUa4zWkLgAYAu9opvQ
-	(envelope-from <netdev+bounces-274294-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 02:28:54 +0200
+	id gMmtGdW4zWm5gAYAu9opvQ
+	(envelope-from <netdev+bounces-274295-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 02:31:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FC0A382000
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 02:28:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9B6138200A
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 02:31:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F3E5530388D2
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 00:28:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 223D93005D36
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 00:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A45F1DF27D;
-	Thu,  2 Apr 2026 00:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B20C194C95;
+	Thu,  2 Apr 2026 00:31:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qZyxaZhF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BoECNvID"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC5B1DED42
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 00:28:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACF881AA8
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 00:31:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775089729; cv=none; b=a1633yN/9FUdCRco2TZAQg3E7yKGmpnelWkjGZ4POYzp0Cn6cDtj2386WJLpTeNwAjimLH/lJe/lL304pBCYdSSqWZwOFRrygIs+8Rj2SvMIG8vdaPZWQb9WZEeQ5KlV2FAEsqfkxhlM8xd8rvKZBNTomnfOqAfQAd77uYX1q14=
+	t=1775089874; cv=none; b=Cjz7RMwpHEUpvdyFIKCX8EeWTb40zdhA6mLCNamkWLEoQuDqJBjYFeFwmlPDw3/zrEO+XGugejQfwEiugx4dR4CV2TefXfbph8Zo++AiVgruYCEHSfJ19EAaqFdAqSEobV/s7T+LLZjL6bRKskzKvwN09ok6cm2RF/6A3LVh51Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775089729; c=relaxed/simple;
-	bh=NsFHEc9cLIhxwHd8GCARIIYerKt25yqMowBZFNTuQ6s=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=B/r4sRBypoSnJwq67jiAVpAzKHFjQIBM0pSWArnP8lWUBoeXVfRBeca0eL5AT8N6AyB9Grf9H3q7BoMgQ1JebuWlRbFMAUSoTOcHbPfbrUF4c2noRwYnyHYhPneyzZKDr7fjXk1ymkRkNyURku8h9rtKD9oVKiNYWGOsod1Ybmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qZyxaZhF; arc=none smtp.client-ip=74.125.224.49
+	s=arc-20240116; t=1775089874; c=relaxed/simple;
+	bh=2iwCLWZ4VLKRtnQx7QyjpjFIZKV8KdDMkRsHy/Rus6I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SgjkIbtiIidfFFsMFa6NNq8p5ndEogkWBjz/NIFQ8XPyGA0zt8VdNe32XWS6hcBUWqSgOKVlxfn02EFG1OrILUGtzvKPl+fuko8JUG0zUyXYOeCPkkozcOuGY+aMEnXW/dfMN7V/K3Ibp8SdzHL8C02vUQfnXQINEW0IgHKj7mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BoECNvID; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-6501d32b04bso362022d50.2
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 17:28:48 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-486fb14227cso3337435e9.3
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 17:31:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775089727; x=1775694527; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1775089871; x=1775694671; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EG+TGuMH7iRqP+SEgh1/fCjYkx8AoXZpEYux/97XIDg=;
-        b=qZyxaZhFXBrp9Fddl2ELPB719MzoC7PMpKO3lEqRjpVNhgB03tJSQ15MbjrZCTrYpd
-         7bVwTOwVBsgqAjsc+mR/XfDAPAAoCvKz/Vawi4KSiPScE5cf7ujXW56dCmgPV85pDlQX
-         siCSwO3UKCVyVwyO2bk3pB/I7eRYOlZSy/j8sRnp/dN0i55IxH9QdVzDLRS4rVF3QVNU
-         BPIFeexvp0tCeGEPthVnfZfekgiFYP+B04NLnNGmjBBU7vPbyrrtuH5//zjBHcLBrrMe
-         QTui1ZeZi6rPhL1JmbSk+fz59GdU0WM1aqVPqmHgbQU+oUxGmENtMdkHVNOyOrN4aI9l
-         On9Q==
+        bh=ckU4tVP2UGswkeqkYvSpP/w2XpfG0QEws3yAc9wqFaE=;
+        b=BoECNvID+w47/y6zjgdCe06a/b3Q6psOasUsGZVhmopVeJxcdyH4JzlYT/vT8r89x1
+         3PZfTKqQ92tAbS7lysNtm2Av17qDoCNnOb1cV1IOIQRuEPcBYVfb8DoI3DRt1f90rQs3
+         cFC3Jyy9i3tw21u0yjDc+7OcDnojjG8zDJp6J5g8E6hBLashVL8lJrKp0O1l5bEnybvn
+         k3tXRyVxCzFI02h6/7Rop7SBmQPmesZ5jyP1CwoK+AMZ5SdFSXAHLKmY9ITsWW23BuHI
+         YWgaRcNYuVIKvd1ZLZ4LekkwunMNTv5UHu03+nJbt12MXdfWCV2ufthlYHpDU3+Q73Mf
+         3zVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775089727; x=1775694527;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EG+TGuMH7iRqP+SEgh1/fCjYkx8AoXZpEYux/97XIDg=;
-        b=rZ8qTRdLl9tbcnXPAXyBbHXAMs5e9C51cfp3n+vf3X7jWvBtxUS7R9ZgPokKR7Inb/
-         WydNUbKpOCE5MAt9rhDx/bryAWkfHoB3b+BqHQk0Zbu8p29L/a639dOMVL51FhQeg4vf
-         vVxOqIDam5c4djO3nTt0/P03a374dkojvy1AKJJNKE6S6uYDgMww24GybkiWiSnowx2s
-         E2ZCRYhW/6yHY/5eKdTs2TDGUsqLJjXO4b30vRrJzR23xldEY8Z7G0RrSNW0Vj5OgpLE
-         eo9vIdug8RzrxUKhrgJW9CgfrzyEMk/xLSkEKOzqSxfSr6EHZv4dFu7LRStPFEA83UG4
-         BLYg==
-X-Gm-Message-State: AOJu0YxPg18W1GNcKHmho9pFNIsPoFxhHYYI7i4ZQHR25tpNxk9rxtZN
-	ZhVIzroUL22INtbZ8HH6vqOsQ1zIqUhushGXGNfzsW7ZZVLtcGrCdo0h
-X-Gm-Gg: AeBDievkQEVPOQGArfcCnQXrDyXeVLcGUrq+ambcswPhhpF5UwrN0SDU4wFYF5HjwKN
-	8ijDgWJ8BOmb8sBjMR8hNiRKSwuP49wJXJC4IajgUXxUAnN2PcgclW+iryOZM5bILqiDfmjPxgv
-	O1J4fWhg+ltGuwEWOiTvzyXgWOq0EIarnqfSDYSi8oeRx1l/rPhsz1ZbQfF77D2cx/70XTKiJHv
-	puJEWTy5pyeTR3oNmCzPUXtZLqCXJerou3BDgjiGzpvR3NLvZarA5j+tg5ddyQ8N6o5hqNjSiNK
-	gQK8DMWy/64rHuUgGlXUVChSWo3i1x70ODKBXmwIs/+fpPMD3QaPsHA8d2ocT72ZzE72cNgxN5A
-	+069JMO5GgRdGs+DYZd8koLgP+/qLzseGdXxRHgrL6g8ONVRmXK5jzAOnN3B+ZvwPvl9JE0F41z
-	J5NkpdsK1j03TXnKuW60LgHcF6H1y4ANysFbfG0+cnZNLiOZO8mBUohKsaW5SU+cYKDafj0YfeN
-	pfP
-X-Received: by 2002:a53:420d:0:b0:650:2257:e085 with SMTP id 956f58d0204a3-6502fde2b85mr3979331d50.30.1775089727443;
-        Wed, 01 Apr 2026 17:28:47 -0700 (PDT)
-Received: from gmail.com (180.134.85.34.bc.googleusercontent.com. [34.85.134.180])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6503a9cabaesm573157d50.18.2026.04.01.17.28.46
+        d=1e100.net; s=20251104; t=1775089871; x=1775694671;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ckU4tVP2UGswkeqkYvSpP/w2XpfG0QEws3yAc9wqFaE=;
+        b=IqQVPVw7JYz9MUkOqJnCYZtJAB7xzsLc/Uptm39j2sJuJReJOtTA62E3wo+Cs8uq//
+         dDFm9MMr9RfBxeK66dibQG07wWiGXQz5vQWlkSE7L2m+f80w5bfwCHruUYKZu0SLRJuU
+         G4M82UGYCgIDOYNskmk98pgRydTuVABu7zBPF1a4b6TNqTa81sacYqNi0WDibAs5oWeE
+         nq2fwEnoaKhKwyFa+nYowbu3ikD0uM8e2WcXWWYwT0bKqwHFqjWcPIP5BREyDiwvzZKc
+         fcUBElyWOG3lpSMbxnVkB3gHYdZ2y8KQZEzEUjuuuND4trk8Hq/PUpCDQRJSspDYbbtN
+         8UDw==
+X-Forwarded-Encrypted: i=1; AJvYcCXoSexbnspNEgJKtcDnXgLneOHbistJUIk5KYV9HJX9xovVrYTJcCJ0tdcYzNVQ2XxMJVFr1og=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQFmSh5VQNbEG6k8GZXUu0Ez00Ewy+6OtjHqbeV0+uS1TMU7CS
+	hg2CRHq5cfS0wD1OYIAPO04Zcs3P9cmotQmrjUSh8+FZz1pNsl9dZLAo
+X-Gm-Gg: ATEYQzzkljZ9ETFlmNDkWnpsK/EBs9pXZeHgBAUZvsj1yrBhywV/OWi/ie1y8s/BX8Z
+	R3fTOpqV/dtwXwHRblzKXZMb5e/6cDcvemhCiCV4IV68AsYFVzaiAgEQk6uh7gaffMrPLkNtOYV
+	ht3GAFatUUPTb2OF1OfjG/qgVm0G2VqGpe47YJUMxzmq2NDPY+/fX0vr6zeRyNiizozAx0t9HL5
+	O03Z/sV6i4LKPnA4ZdDNQt+hEhm6jqgaJAB3irYPLR8xGCb4ZjRZINQ3FRL20JMVny9UK63p84U
+	KXA+fL9KRuAgKdQxCkXYNWbsUaYebdaCo2cZ/I4eE348AhO9eJlMK+nwAS8EE70VglJhLHSBK2l
+	eJYg/t/BSp1qEVQUxDosllDPddS1F1tvjxSnbycE1qsRiW+mFiBMI6donJ2liFhAjxvrarQRjDl
+	Connzi9qXGQSC7oUrD+OGPbwhalBqaQI452LNj6XuPasSuYUSszw/Ks9RY2z3mV/2NbrTLxkMXx
+	6u7uvnui7Na4ivhafpb51i7s/H69BwTYhZo1+oLjt5qBx2c
+X-Received: by 2002:a05:600c:c056:b0:485:3a03:ceca with SMTP id 5b1f17b1804b1-488835b30a7mr64106445e9.23.1775089871151;
+        Wed, 01 Apr 2026 17:31:11 -0700 (PDT)
+Received: from DESKTOP-NQ2T5I7.localdomain (heme-13-b2-v4wan-167795-cust403.vm32.cable.virginm.net. [81.108.45.148])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4888a65635fsm31433565e9.6.2026.04.01.17.31.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Apr 2026 17:28:46 -0700 (PDT)
-Date: Wed, 01 Apr 2026 20:28:46 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- shuah@kernel.org, 
- willemb@google.com, 
- petrm@nvidia.com, 
- anubhavsinggh@google.com, 
- richardbgobert@gmail.com, 
- linux-kselftest@vger.kernel.org, 
- Jakub Kicinski <kuba@kernel.org>
-Message-ID: <willemdebruijn.kernel.14f444719030c@gmail.com>
-In-Reply-To: <20260401182625.372605-7-kuba@kernel.org>
-References: <20260401182625.372605-1-kuba@kernel.org>
- <20260401182625.372605-7-kuba@kernel.org>
-Subject: Re: [PATCH net-next 6/6] selftests: drv-net: gro: add a test for bad
- IPv4 csum
+        Wed, 01 Apr 2026 17:31:10 -0700 (PDT)
+From: Prathamesh Deshpande <prathameshdeshpande7@gmail.com>
+To: prathameshdeshpande7@gmail.com
+Cc: leon@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	mbloch@nvidia.com,
+	netdev@vger.kernel.org,
+	richardcochran@gmail.com,
+	saeedm@nvidia.com,
+	tariqt@nvidia.com
+Subject: [PATCH v2] net/mlx5: Fix OOB access and stack information leak in PTP event handling
+Date: Thu,  2 Apr 2026 01:30:47 +0100
+Message-ID: <20260402003047.24684-1-prathameshdeshpande7@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260331153152.16766-1-prathameshdeshpande7@gmail.com>
+References: <20260331153152.16766-1-prathameshdeshpande7@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274294-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,nvidia.com,gmail.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274295-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,nvidia.com,gmail.com];
 	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[prathameshdeshpande7@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
+	TO_DN_NONE(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9FC0A382000
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A9B6138200A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Jakub Kicinski wrote:
-> We have a test for coalescing with bad TCP checksum, let's also
-> test bad IPv4 header checksum.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  tools/testing/selftests/net/lib/gro.c      | 25 ++++++++++++++++++++++
->  tools/testing/selftests/drivers/net/gro.py |  1 +
->  2 files changed, 26 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/lib/gro.c b/tools/testing/selftests/net/lib/gro.c
-> index 762e88932ed2..a458cfbd11eb 100644
-> --- a/tools/testing/selftests/net/lib/gro.c
-> +++ b/tools/testing/selftests/net/lib/gro.c
-> @@ -36,6 +36,7 @@
->   *  Packets with different (ECN, TTL, TOS) header, IP options or
->   *  IP fragments shouldn't coalesce.
->   *   - ip_ecn, ip_tos:            shared between IPv4/IPv6
-> + *   - ip_csum:                   IPv4 only, bad IP header checksum
->   *   - ip_ttl, ip_opt, ip_frag4:  IPv4 only
->   *   - ip_id_df*:                 IPv4 IP ID field coalescing tests
->   *   - ip_frag6, ip_v6ext_*:      IPv6 only
-> @@ -675,6 +676,21 @@ static void send_changed_checksum(int fd, struct sockaddr_ll *daddr)
->  	write_packet(fd, buf, pkt_size, daddr);
->  }
->  
-> +/* Packets with incorrect IPv4 header checksum don't coalesce. */
-> +static void send_changed_ip_checksum(int fd, struct sockaddr_ll *daddr)
-> +{
-> +	static char buf[MAX_HDR_LEN + PAYLOAD_LEN];
-> +	struct iphdr *iph = (struct iphdr *)(buf + ETH_HLEN);
-> +	int pkt_size = total_hdr_len + PAYLOAD_LEN;
-> +
-> +	create_packet(buf, 0, 0, PAYLOAD_LEN, 0);
-> +	write_packet(fd, buf, pkt_size, daddr);
-> +
-> +	create_packet(buf, PAYLOAD_LEN, 0, PAYLOAD_LEN, 0);
-> +	iph->check = iph->check - 1;
-> +	write_packet(fd, buf, pkt_size, daddr);
-> +}
-> +
->   /* Packets with non-consecutive sequence number don't coalesce.*/
->  static void send_changed_seq(int fd, struct sockaddr_ll *daddr)
->  {
-> @@ -1392,6 +1408,10 @@ static void gro_sender(void)
->  		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
->  
->  	/* ip sub-tests - IPv4 only */
-> +	} else if (strcmp(testname, "ip_csum") == 0) {
-> +		send_changed_ip_checksum(txfd, &daddr);
-> +		usleep(fin_delay_us);
-> +		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
->  	} else if (strcmp(testname, "ip_ttl") == 0) {
->  		send_changed_ttl(txfd, &daddr);
->  		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
-> @@ -1588,6 +1608,11 @@ static void gro_receiver(void)
->  		check_recv_pkts(rxfd, correct_payload, 2);
->  
->  	/* ip sub-tests - IPv4 only */
-> +	} else if (strcmp(testname, "ip_csum") == 0) {
-> +		correct_payload[0] = PAYLOAD_LEN;
-> +		correct_payload[1] = PAYLOAD_LEN;
-> +		printf("bad ip checksum doesn't coalesce: ");
-> +		check_recv_pkts(rxfd, correct_payload, 2);
+In mlx5_pps_event(), several critical issues were identified during
+review by Sashiko:
 
-This verifies that a packet with bad csum does not coalesce to a valid
-packet. Perhaps too paranoid but, do you also want to test the reverse
-case?
+1. The 'pin' index from the hardware event was used without bounds
+   checking to index 'pin_config' and 'pps_info->start', leading to
+   potential out-of-bounds memory access.
+2. 'ptp_event' was not zero-initialized. Since it contains a union,
+   assigning a timestamp partially leaves the 'ts_raw' field with
+   uninitialized stack memory, which can leak kernel data or
+   corrupt time sync logic in hardpps().
+3. A NULL 'pin_config' could be dereferenced if initialization failed.
+4. 'clock->ptp' could be NULL if ptp_clock_register() failed.
 
-Can be a single test by adding another write_packet and observing all
-three separate packets.
+Fix these by zero-initializing the event struct, adding a bounds
+check against MAX_PIN_NUM, and adding appropriate NULL guards.
+
+Fixes: 7c39afb394c7 ("net/mlx5: PTP code migration to driver core section")
+
+Signed-off-by: Prathamesh Deshpande <prathameshdeshpande7@gmail.com>
+---
+v2:
+- Zero-initialize ptp_event to prevent stack information leak [Sashiko].
+- Add bounds check for hardware pin index to prevent OOB access [Sashiko].
+- Add NULL guard for pin_config to handle initialization failures [Sashiko].
+- Add NULL check for clock->ptp as originally intended.
+
+ drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+index bd4e042077af..a4d8c5c39abc 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+@@ -1164,12 +1164,18 @@ static int mlx5_pps_event(struct notifier_block *nb,
+ 							       pps_nb);
+ 	struct mlx5_core_dev *mdev = clock_state->mdev;
+ 	struct mlx5_clock *clock = mdev->clock;
+-	struct ptp_clock_event ptp_event;
++	struct ptp_clock_event ptp_event = {};
+ 	struct mlx5_eqe *eqe = data;
+ 	int pin = eqe->data.pps.pin;
+ 	unsigned long flags;
+ 	u64 ns;
+ 
++	if (!clock->ptp_info.pin_config)
++		return NOTIFY_OK;
++
++	if (pin < 0 || pin >= MAX_PIN_NUM)
++		return NOTIFY_OK;
++
+ 	switch (clock->ptp_info.pin_config[pin].func) {
+ 	case PTP_PF_EXTTS:
+ 		ptp_event.index = pin;
+@@ -1185,8 +1191,8 @@ static int mlx5_pps_event(struct notifier_block *nb,
+ 		} else {
+ 			ptp_event.type = PTP_CLOCK_EXTTS;
+ 		}
+-		/* TODOL clock->ptp can be NULL if ptp_clock_register fails */
+-		ptp_clock_event(clock->ptp, &ptp_event);
++		if (clock->ptp)
++			ptp_clock_event(clock->ptp, &ptp_event);
+ 		break;
+ 	case PTP_PF_PEROUT:
+ 		if (clock->shared) {
+-- 
+2.43.0
+
 
