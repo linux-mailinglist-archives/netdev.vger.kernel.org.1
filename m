@@ -1,160 +1,159 @@
-Return-Path: <netdev+bounces-274702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274704-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GA6tNnTbzmmGqgYAu9opvQ
-	(envelope-from <netdev+bounces-274702-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 23:11:16 +0200
+	id 4OpvCxPdzmmGqgYAu9opvQ
+	(envelope-from <netdev+bounces-274704-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 23:18:11 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EFF138E445
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 23:11:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EF5538E4D8
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 23:18:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AACC930086C3
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 21:08:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F25C6301E223
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 21:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04994382392;
-	Thu,  2 Apr 2026 21:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2813B2FD2;
+	Thu,  2 Apr 2026 21:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XEe1fCc5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DVJ51DWI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E87204C36;
-	Thu,  2 Apr 2026 21:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775164131; cv=none; b=k+wUSv1CYxVaenbAWOifT/jWwBT2F0GGIYNORdySiQr8+umazfVnA6iWTp4GN5g1C3r0WavaMsSiS/cUtuoYJhbLi/GZ+I49JnLZyEYmGpS/tJ8BICki0zr8FEtj5AuAl+QzwZKo75GSqRCnpyDhXlYd5JFb+dagOqQUHVo05oE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775164131; c=relaxed/simple;
-	bh=8V19yQPUf7XED54pgj6wnQOvP1KeE1ujGFv7TD0JL5o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ok7Wfsj1yY6dDFmfX2SE2TDtOLedFZcd9qqkc2b1GnussgoprURvOLxtFsMlmxWGu4GbgltmvT4jade4S+81LapFE1toCtimct2d3TeW06VaufY9QQkuU8qejTIl4vpfQGG9YDUQNmuMZ3E2wlgvAOcEXi5Pj3tFQ2Zyo+bTp9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XEe1fCc5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2623FC116C6;
-	Thu,  2 Apr 2026 21:08:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775164131;
-	bh=8V19yQPUf7XED54pgj6wnQOvP1KeE1ujGFv7TD0JL5o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XEe1fCc5kDC0Fuqy72hIOi+R2xKhI3tr3kEtTfexldS5XElYXHdeRCTsfXleX/tKl
-	 7hU1+uW+ps48WvBxqnv4qgK/1QPxPTSzPqj4Uysaxvkj47mE4+zwjJuvCdx02a/gy+
-	 msCYm1QpYb2El9Em3kie6CdCFjrkzTD86dMriGn5LvVcorK5YJHLkcFrQv+Fw4zzfQ
-	 A58c7XB7804tE/jg9MWp/1sB2sWZUtAKRfpmTR6QGoD1eSevxkcJaBCb/pGI3EpUS9
-	 p+/Gs4bMTn5/naCoZcfPrlFb9bml48WDRHTVxPToGYEsBxdknych7XF7+FgDlmvJHO
-	 NE5xNoF7INy9Q==
-From: Chuck Lever <cel@kernel.org>
-To: NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jeff Layton <jlayton@kernel.org>
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	linux-nfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 00/13] nfsd/sunrpc: add support for netlink upcalls for mountd/exportd
-Date: Thu,  2 Apr 2026 17:08:45 -0400
-Message-ID: <177516411713.3059543.823840324914491662.b4-ty@b4>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260325-exportd-netlink-v2-0-067df016ea95@kernel.org>
-References: <20260325-exportd-netlink-v2-0-067df016ea95@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B073A4535
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 21:17:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775164628; cv=pass; b=nF0DVYm4tIfTm+3LmdTn4jAxX3W4z1DkMJ/+DiIhQqu+iGGFZ5D0+xoZt5zFlwI+MWhdhMytXuWrt+MArBLk4owB5CfWB1eFxyn/hSNc/TFdMLUaleIovMc4aYpVir2eAhsZubnW2xaUKWjB4Kt5/fqTP/kLRQlCevSDWLvW/+Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775164628; c=relaxed/simple;
+	bh=JYemv0pFJukvLWAyAa8iu4BJ0hea3asYhAZuD5UD2pk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AsG0qoIUR5fQz48qRzM+ehk7bJs7XxKcHsyCaPHu1b+Qnas4r46jxmIC2rlhgmWTVkA7++eNbtU0DhCFhtEwaitHAr6omwDEoA1KF426peFArF8YZYILdm9YNj94OjXALijkneqtpJUZLWuR0xYRVBcO7xAMCFDJGinA7ztZuTM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DVJ51DWI; arc=pass smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-66b0dc690bcso1324a12.1
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 14:17:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775164625; cv=none;
+        d=google.com; s=arc-20240605;
+        b=iHJMhb/aR9muSvXbWHrxlnzTw6VgPkECFZ+ExT4rF4arTaNe7+vh1vnUJa/gQN1Mqd
+         8IZBIiMEPLxLa9NNwyHnTsPwyfuKounqmRHo+Hjz5NGxDVyZMeV/GJEcXuQDpxsBHetu
+         I5DhTkzzmY9L4WeFuXLo6FL4wsUI58W9fhGQEWesRHJGcLDhNzB7m2jJx+7tYkdYyfEj
+         VECIjnBg/kitLiteo0mOBZEASnsaxVFcaB74F7ewF8HJ4Y7s3maPQlM4EWBbYWhsYYoY
+         FT43zI9uu85+7xD+iPh6nIYVvbLLyghCmLfisFIE/nHBUddNNr5JWWGUpVZqIKeBf7dI
+         tyag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=JYemv0pFJukvLWAyAa8iu4BJ0hea3asYhAZuD5UD2pk=;
+        fh=1Y6/fLEqFgIlvuKtrxfHEmLjB4St1Azi7szVvYxjXSY=;
+        b=Q9/DmeZU3cFPxSdBasSjN3BTzAiXTutrxp/JbUxDItpPiHQV7Yl/VZdxPHvckCkYat
+         NgcNBu5aLdMAZ8U7g1FlJhc1AQFI+QF/nf+lgwUmU8/SjsyZCz9y0ETBVgjr5aZdDJlC
+         zjJxehMkhNa5Xw3RRuG1SzKVE4FEvBum/NiO+ihLVQRUANU81kYZwlu6pI6mDQNRlnKG
+         4nUtmB0RduWbfcfx2WrN2QOaRiTwjVlFCB9gkBTir2tVUdRXBYuB1GuziotGJ/hvd0qq
+         UfY4WvrHVK8uC5egiOwX8JOYOGxYbqFehor9ZH0hImXJeesRx92OMIThGjt7Eo2oyv30
+         deyw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775164625; x=1775769425; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JYemv0pFJukvLWAyAa8iu4BJ0hea3asYhAZuD5UD2pk=;
+        b=DVJ51DWIGVmvUkMPVa8dvWQXoI8HwPjgGEwI/4aWN9F1LCOJ+EcnjNFfHozgXoYw9n
+         QxFPskwAZWtzbhMV2452RLmMLijMADld6KZGlx18W7nJgAje+NG1Km1o2BtRU/9fHh0g
+         82TWBcUrx8waqJ7+F2U0z6/cJP3YUItWl9RwRvVxDv979EAMTneoiKXVXf2P4mamyewp
+         Q1vOSCeyeEbZNJ1az3hX233/uufXsrbeBBZylBBKOMvQJw0h9lPWNoi5QV+b+8el9slm
+         g+1oPyUj434iB6kkrQ4dqQxtuLfXHS5ymkOMJ1c5mRkpNEozwUHLAh5Un4lnWLCF70u3
+         g6TQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775164625; x=1775769425;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=JYemv0pFJukvLWAyAa8iu4BJ0hea3asYhAZuD5UD2pk=;
+        b=kxl9P+8NYbkatHr0XWPEtE+C3+/KZf+gidZCLvLlfg3tRlL9nrsFOO72h5ILs6aPge
+         LichRxxDCnZ2oUxxkkQwqEL5AxvUPXttA8xSmyH8q9jrZPRNfpaGoAnrYy0tkT8dlnai
+         Ol5PTuwf+ZNVerHV1BMRGOsvgzqQEYI8okNdE+xHnXqmrLcr9KGnR8hphicv0vomubTX
+         IwaufeKzVtUvtVbfUXwR1u1P+sB2OdIsKDJ8UUoGRQjIdEKh27g8HdT5g3giXKevEu4P
+         p9XljtQwEn64R9v46HIo//0UuhSWOgqUK0arIclJVygYybc0p9n2G6eFnoJglMiIUx53
+         zNaw==
+X-Forwarded-Encrypted: i=1; AJvYcCXuBB7KZhWTwHaJSxsAdtbZM9GnAt+u5Y/mEtqljwk8ZfDgiAG1u5CpMUkm+BVNYWHx7A/rzVY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzzrc5HLJSRG12aCd2fBIP5ZPuGT1IeRL5DyhKWMaHRTebTPgkT
+	4V3Whv1zOqa8L1UBMDEfxXKsjtkUG8KtfclZmNEk73+OSW0P9e/IKJpnTVmkF9fQGwSLtLxcy55
+	rJ9zI6MdMUORwPdjEFW0YYNccf0VXR2XcyM8BkOoa
+X-Gm-Gg: AeBDievbysL1AzTRAKMHkwq5QueA3gw+rhv+1IK2ku41zPOkFYj3i8bSRr43PGKsvM9
+	qI1HJeTi+gHO9Y0DXvOV9Zxel41fbImw38mzQcJlgI5Elb6hDUQAk+LaewyWa7cbrLq8GN7cGPo
+	FKCwHhqYYuLXwH3+2W9ZBvG7wZdK53ksv6Xm77F+Oh2IgWXtDc7VXaFU+YEQoFkWsZcCYIcbLSR
+	eTvD4GfqqVrJfuX0DdNODqtc8A9r1b+R+rRaCC3dvZcEhk3AYfw98ktw3byERzcf+RglvcV2E3f
+	yBNdgt24pQWYLux5vLIESB7tsHEOzecYdI48mKC/hVAeqrj9tQL1v5mb3Tb+d/iNbgdtBrLY9mx
+	spbWP
+X-Received: by 2002:aa7:cd13:0:b0:66b:ea0e:1782 with SMTP id
+ 4fb4d7f45d1cf-66e40f43978mr6990a12.2.1775164624812; Thu, 02 Apr 2026 14:17:04
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+References: <20260402-teaming-driver-internal-v3-0-e8cfdec3b5c2@google.com>
+ <20260402-teaming-driver-internal-v3-6-e8cfdec3b5c2@google.com> <j4tjzpbsfu57r5bbqcpo4lfnzzonnmgye23kiyu4la5d7cxuq7@63nrgj4f3xto>
+In-Reply-To: <j4tjzpbsfu57r5bbqcpo4lfnzzonnmgye23kiyu4la5d7cxuq7@63nrgj4f3xto>
+From: Marc Harvey <marcharvey@google.com>
+Date: Thu, 2 Apr 2026 14:16:51 -0700
+X-Gm-Features: AQROBzAH5HMbiL0k4hiF5gpVjnYSC-HQWNnE9Kb7GP-2itiiWEQcG4Uq-kpwXM4
+Message-ID: <CANkEMgmW693-_tiP8rC7ciKuvLOPwRJzFsP=c2bYdQyHREpKcQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 6/7] net: team: Decouple rx and tx enablement
+ in the team driver
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274704-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[brown.name,redhat.com,oracle.com,talpey.com,davemloft.net,google.com,kernel.org,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274702-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email]
-X-Rspamd-Queue-Id: 3EFF138E445
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,resnulli.us:email]
+X-Rspamd-Queue-Id: 7EF5538E4D8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Chuck Lever <chuck.lever@oracle.com>
+On Thu, Apr 2, 2026 at 5:54=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote:
+> I see multiple patches squashed here. Could you please split for
+> easier review?
+>
+> Renames separate, preparations separate, adding rx_en separate, adding
+> tx_en separata etc?
+>
+> Thanks!
 
-On Wed, 25 Mar 2026 10:40:21 -0400, Jeff Layton wrote:
-> This version should address most of Chuck's review comments. The
-> userland patch series is unchanged. I've added the netdev folks this
-> time too in order to get more experienced eyes on the netlink bits.
-> 
-> Original cover letter follows:
-> 
-> mountd/exportd use the sunrpc cache mechanism for some of its internal
-> caches that are populated by userland. These currently use some very
-> antiquated interfaces in /proc to handle upcalls and downcalls. While it
-> has worked well for decades and is relatively stable, it has some
-> problems.
-> 
-> [...]
-
-Applied to nfsd-testing, thanks!
-
-[01/13] nfsd: move struct nfsd_genl_rqstp to nfsctl.c
-        commit: 9255d64c38df86b504fd9928c4599f506e0e9a5f
-[02/13] sunrpc: rename sunrpc_cache_pipe_upcall() to sunrpc_cache_upcall()
-        commit: 296a9a594de51e5d4f875a56ece878dab3a4afd0
-[03/13] sunrpc: rename sunrpc_cache_pipe_upcall_timeout()
-        commit: 4695f0a549afde54672311ff3b70e4a8c9f67ee4
-[04/13] sunrpc: rename cache_pipe_upcall() to cache_do_upcall()
-        commit: 9699085b61700e040ddb500828cf5430e0a9f7f3
-[05/13] sunrpc: add a cache_notify callback
-        commit: 0f2e29eb49430fba0ddcc9f0a8fb10334751e9f8
-[06/13] sunrpc: add helpers to count and snapshot pending cache requests
-        commit: d5d861c2a0340a70c869b5688c57741564956875
-[07/13] sunrpc: add a generic netlink family for cache upcalls
-        commit: 44139e2b768b1bfd9fcc8fbefdcc5a425ef448cf
-[08/13] sunrpc: add netlink upcall for the auth.unix.ip cache
-        commit: 8f056ebed4272238de8f003925d91bdb4e6726ae
-[09/13] sunrpc: add netlink upcall for the auth.unix.gid cache
-        commit: 6bfbaa6d611bcde1d62435982a2d8895ca0082e8
-[10/13] nfsd: add netlink upcall for the svc_export cache
-        commit: cfefcaec25438cc82344ac3ea22c474798e05531
-[11/13] nfsd: add netlink upcall for the nfsd.fh cache
-        commit: dbd292f2d787b7ae0d471da9783996eb8eea759e
-[12/13] sunrpc: add SUNRPC_CMD_CACHE_FLUSH netlink command
-        commit: e91b082fdae41cdeb73772aeeee2f61937d14c65
-[13/13] nfsd: add NFSD_CMD_CACHE_FLUSH netlink command
-        commit: 895a916e2c31d86a11b867c16ac0e4e167298e5e
-
---
-Chuck Lever
-
+Thanks, I will split this in v4.
 
