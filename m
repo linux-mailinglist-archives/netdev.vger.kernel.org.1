@@ -1,41 +1,42 @@
-Return-Path: <netdev+bounces-274768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274646-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2FkuIrT7zmn7sAYAu9opvQ
-	(envelope-from <netdev+bounces-274768-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 01:28:52 +0200
+	id 2Gz+JRytzml+pQYAu9opvQ
+	(envelope-from <netdev+bounces-274646-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:53:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F340038F38E
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 01:28:51 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE83D38CC71
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:53:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 78D76306C84F
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 23:26:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B7C7F30276A6
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 17:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F09CC37F75A;
-	Thu,  2 Apr 2026 23:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE9B3CF690;
+	Thu,  2 Apr 2026 17:52:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b="ArlR5UpR"
+	dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b="lhuT3Ia0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+Received: from mail-m128153.netease.com (mail-m128153.netease.com [103.209.128.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D447A371894;
-	Thu,  2 Apr 2026 23:26:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49479304BDC;
+	Thu,  2 Apr 2026 17:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.209.128.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775172405; cv=none; b=g8y0cE7dh3snImXda9EcKKgNTLt9GFS4MsESi9Lm0k3z/4+C4h3fMePXCVyLElPN+pZ3Sdeu9g+bu8RrYIZNd24SdTTiQJvss4e+PyAA8WC5U/tgNevh3gdM2Qmc7ZkRDW3/p/zkmI9xNXLQqDPPhuBYpBksnBKmAALpkIbFIo8=
+	t=1775152370; cv=none; b=iI8UjXvwBgTVu/HIayl6vjPZ3gOLcsgpq0vnF3NdMh4p8NEH4vFvWu4n1XPHQiVKB009tgfWZRC/cVSDRq8+HjJkyXiJ+YE3or0oSroj8DkwN6Xca87bRG7myHH6EnqNOzS8nZLEx/FIxnVsrPeBUqma8UMEOJCcEaYQVxvCmdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775172405; c=relaxed/simple;
-	bh=OyFXrtaIREt5Mvg5IohzDWe1YdeCFr+GRBZBVtcHM3w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=smn4FKMtrtn970vmYsphTJCq4hd8EfpHu8Hpx+E484TgF3Ia73bDETLJOW2AdEpB49lfn0HktvINSCA7su3cQyP8+29T+ZEhH4pTBFdZtS+cNrm+Rz/gUn5IOaQ53s7CtvIjmXdwdxvIL7IV+Mvr8rq9362GnmSTTSDiSJepAUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ruc.edu.cn; spf=pass smtp.mailfrom=ruc.edu.cn; dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b=ArlR5UpR; arc=none smtp.client-ip=45.254.49.197
+	s=arc-20240116; t=1775152370; c=relaxed/simple;
+	bh=56UAlDrw2MVJbfQhHM8iVveF06uJGnsbg6eCsCsjn2Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=u4LbWamH/ZwOM21BkTKoVpHXXKWZJeTLmFy/yja8RI4LLCA8KvEMf9oQtrj9dICi8/AU64IQbfwpmIg7IEfToRy88sfq+vlhd26snO0tVm93cZQ31bT87w6IfCHAB/+pzYwyPoPO0qpq3BNpv+BvSlS+p9a55RLrCTvmrOmLGqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ruc.edu.cn; spf=pass smtp.mailfrom=ruc.edu.cn; dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b=lhuT3Ia0; arc=none smtp.client-ip=103.209.128.153
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ruc.edu.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ruc.edu.cn
 Received: from lwz.tail698a0e.ts.net (gy-adaptive-ssl-proxy-4-entmail-virt151.gy.ntes [36.112.3.244])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 3956a558e;
-	Fri, 3 Apr 2026 00:36:50 +0800 (GMT+08:00)
+	by smtp.qiye.163.com (Hmail) with ESMTP id 3956a5591;
+	Fri, 3 Apr 2026 00:36:57 +0800 (GMT+08:00)
 From: Wenzhao Liao <wenzhaoliao@ruc.edu.cn>
 To: rust-for-linux@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -54,10 +55,12 @@ Cc: linux-kernel@vger.kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [RFC PATCH 0/6] rust: net: introduce minimal rtnl/netdevice abstractions and nlmon reference driver
-Date: Thu,  2 Apr 2026 12:36:34 -0400
-Message-Id: <20260402163640.1079056-1-wenzhaoliao@ruc.edu.cn>
+Subject: [RFC PATCH 1/6] rust: bindings: expose networking headers needed by nlmon
+Date: Thu,  2 Apr 2026 12:36:35 -0400
+Message-Id: <20260402163640.1079056-2-wenzhaoliao@ruc.edu.cn>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260402163640.1079056-1-wenzhaoliao@ruc.edu.cn>
+References: <20260402163640.1079056-1-wenzhaoliao@ruc.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,15 +68,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9d4f0dfe2803a2kunm6754def456bf0d
+X-HM-Tid: 0a9d4f0e189103a2kunm6754def456bf19
 X-HM-MType: 10
 X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlDGk1CVkxCHUMdH05OTU1JT1YeHw5VEwETFhoSFy
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlCS0pKVkkZTxpISB0ZShpPHVYeHw5VEwETFhoSFy
 	QUDg9ZV1kYEgtZQVlITVVKSklVSFVJT09ZV1kWGg8SFR0UWUFZT0tIVUpLSEpOTE5VSktLVUpCS0
 	tZBg++
 DKIM-Signature: a=rsa-sha256;
-	b=ArlR5UpRSpw/UaSNxCKSdQVuQLlvpDNJr+LXgkmWpRdgX3oYdrC9NjHbVluj5Oiv7CryXyr5EoXvAxWYps5RlJ0xbrFwchRORL8qh1dMgOjGoxxlLvA09sN11o1+DnOZNeclhK8W3Mk+wZoydsXAurpljLZjhz//oWbNgnyP964=; c=relaxed/relaxed; s=default; d=ruc.edu.cn; v=1;
-	bh=YKAAwYb4mtekaS6vgI940JW2tJJCQEqwWtepoxJLGfI=;
+	b=lhuT3Ia02h5qaCmBbzBmWtwx9H8A2NQvan9sQMTJ3JPO0C2UHjF2m1boDz0zPPOm4tSU7uei3V0xjk30b6JSbqlOfQQEutv75FHzTZQFxPTUO6DgVJyV6SWdk8sqPbaoawJ1yI0PU0B7ut0SMjP4FXMgaAZcHxJmtBn2k4f2qrQ=; c=relaxed/relaxed; s=default; d=ruc.edu.cn; v=1;
+	bh=EtrAAqKgIFaObfmYMvH+CIpV3k5p6IY+gei6OvVIHxo=;
 	h=date:mime-version:subject:message-id:from;
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
@@ -81,7 +84,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[ruc.edu.cn,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[ruc.edu.cn:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -89,7 +92,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,garyguo.net,protonmail.com,google.com,umich.edu,lunn.ch,davemloft.net,redhat.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274768-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274646-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -101,99 +104,53 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ruc.edu.cn:dkim,ruc.edu.cn:mid]
-X-Rspamd-Queue-Id: F340038F38E
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ruc.edu.cn:dkim,ruc.edu.cn:email,ruc.edu.cn:mid]
+X-Rspamd-Queue-Id: EE83D38CC71
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+Expose the networking declarations consumed by the minimal Rust nlmon
+reference driver before higher level wrappers are introduced.
 
-This RFC proposes a minimal set of Rust networking abstractions for
-link-type drivers, together with a Rust implementation of nlmon as a
-reference driver.
+This includes the core net_device, rtnl_link_ops, statistics, sk_buff,
+and netlink tap declarations needed by the planned abstractions.
 
-The scope is intentionally narrow. The series only tries to cover the
-pieces needed to model:
+Signed-off-by: Wenzhao Liao <wenzhaoliao@ruc.edu.cn>
+---
+ rust/bindings/bindings_helper.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-- rtnl link registration and validation
-- net_device private state allocation
-- sk_buff transmit ownership
-- netlink tap lifetime management
-- per-device stats updates
-
-nlmon is a useful target for this because it is small, self-contained,
-and exercises rtnl registration, netdevice setup, tap lifecycle, and
-stats handling without introducing hardware-specific probe or teardown
-paths.
-
-The series is structured as follows:
-
-- patches 1-2 expose the required bindings and helper glue
-- patches 3-4 add the minimal Rust net abstractions
-- patch 5 adds the Rust nlmon reference driver
-- patch 6 adds scoped MAINTAINERS entries
-
-The driver itself is built with #![forbid(unsafe_code)] and does not
-call raw bindings directly. Unsafe is confined to small abstraction
-implementations under rust/kernel/net/.
-
-Validation so far:
-
-- drivers/net/nlmon_rust.o builds successfully
-- x86_64 bzImage builds successfully
-- QEMU smoke passes:
-  ip link add nlmon0 type nlmon
-  ip link set nlmon0 up
-  ip link show nlmon0
-  ip link set nlmon0 down
-  ip link del nlmon0
-
-The Rust implementation is kept behind CONFIG_NLMON_RUST so the new
-abstractions and the reference driver can be reviewed without displacing
-the existing C implementation.
-
-Feedback on the abstraction shape, the lifetime model, and whether
-nlmon is a suitable reference driver would be especially appreciated.
-
-I would also be grateful for guidance on any aspect of this series that
-does not match Rust-for-Linux or netdev expectations. If the direction
-is useful but the submission, factoring, or abstraction boundary needs
-to change, I am happy to revise the series accordingly and resubmit.
-
-Thanks,
-Wenzhao Liao
-
-Wenzhao Liao (6):
-  rust: bindings: expose networking headers needed by nlmon
-  rust: helpers: add net_device and sk_buff helper wrappers
-  rust: net: add minimal skbuff, netdevice, and stats abstractions
-  rust: net: add minimal rtnl registration and netlink tap support
-  net: add Rust reference driver for nlmon
-  MAINTAINERS: add Rust net and nlmon entries
-
- MAINTAINERS                     |  19 ++
- drivers/net/Kconfig             |   9 +
- drivers/net/Makefile            |   6 +-
- drivers/net/nlmon_rust.rs       |  93 ++++++++++
- rust/bindings/bindings_helper.h |   4 +
- rust/helpers/helpers.c          |   1 +
- rust/helpers/net.c              |  19 ++
- rust/kernel/net.rs              |   5 +
- rust/kernel/net/netdevice.rs    | 319 ++++++++++++++++++++++++++++++++
- rust/kernel/net/netlink_tap.rs  |  89 +++++++++
- rust/kernel/net/rtnl.rs         | 221 ++++++++++++++++++++++
- rust/kernel/net/skbuff.rs       |  67 +++++++
- rust/kernel/net/stats.rs        |  17 ++
- 13 files changed, 868 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/nlmon_rust.rs
- create mode 100644 rust/helpers/net.c
- create mode 100644 rust/kernel/net/netdevice.rs
- create mode 100644 rust/kernel/net/netlink_tap.rs
- create mode 100644 rust/kernel/net/rtnl.rs
- create mode 100644 rust/kernel/net/skbuff.rs
- create mode 100644 rust/kernel/net/stats.rs
-
+diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
+index 083cc44aa952..ee56505e03f9 100644
+--- a/rust/bindings/bindings_helper.h
++++ b/rust/bindings/bindings_helper.h
+@@ -57,6 +57,7 @@
+ #include <linux/file.h>
+ #include <linux/firmware.h>
+ #include <linux/fs.h>
++#include <linux/if_arp.h>
+ #include <linux/i2c.h>
+ #include <linux/interrupt.h>
+ #include <linux/io-pgtable.h>
+@@ -66,6 +67,8 @@
+ #include <linux/mdio.h>
+ #include <linux/mm.h>
+ #include <linux/miscdevice.h>
++#include <linux/netdevice.h>
++#include <linux/netlink.h>
+ #include <linux/of_device.h>
+ #include <linux/pci.h>
+ #include <linux/phy.h>
+@@ -88,6 +91,7 @@
+ #include <linux/wait.h>
+ #include <linux/workqueue.h>
+ #include <linux/xarray.h>
++#include <net/rtnetlink.h>
+ #include <trace/events/rust_sample.h>
+ 
+ /*
 -- 
 2.34.1
+
 
