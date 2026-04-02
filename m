@@ -1,145 +1,165 @@
-Return-Path: <netdev+bounces-274401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274402-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0H7XBs0YzmmnkgYAu9opvQ
-	(envelope-from <netdev+bounces-274401-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:20:45 +0200
+	id 2J54M3AZzmmnkgYAu9opvQ
+	(envelope-from <netdev+bounces-274402-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:23:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E57C3850C9
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:20:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A33138514A
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:23:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E99FF30663FD
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 07:12:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C7862301E239
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 07:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89088387585;
-	Thu,  2 Apr 2026 07:12:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E144436DA16;
+	Thu,  2 Apr 2026 07:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=temperror (0-bit key) header.d=dev.tdt.de header.i=@dev.tdt.de header.b="FOOoIjav"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2728248166;
-	Thu,  2 Apr 2026 07:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C1431F9B8;
+	Thu,  2 Apr 2026 07:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775113959; cv=none; b=eu/xsN6Bo3nFpC07tsvFxA7UAxnI+SNg9ocFOJVoEeKJYmMD+4t/BZEjq6b6bGvfY2R5tdfyG0J1DL35VbE3nsb6ALuXdOQmfeGgfMJqaQEV63SuPhXc2aHPKyo9UydsyQubi1LwNtito0THSMKlDIQc6ElNsc9Fx78EBHDOyD0=
+	t=1775114092; cv=none; b=aPpLc4LcDi/y3UzQsBWn+jUAc1dK/0P74kglhrrQO7KYz0XMt0dQnJ6YD4GP6nrodkTmjYEn+5EiBTG6G0B8XI11Kb+bBo7aC7yEzptPw02bQHP67AI8M4Rr8ukahyNH2nS96kFP2nitnSFAvO7Askrv2bnTu3+B6skAO0sSZJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775113959; c=relaxed/simple;
-	bh=cifMcKVqHYHY+DlglYL+hlGOyoWlPUkkv3WM47LKj/U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pL6QIKvkmNmFzNGaixyEzMYai/BuOZpdbDP5RE5cgJ5HC+IYYQdd4RwIMFQ9P4TdRnR7OkJX5hDkvSF5Q9yj1l5yYvTkUAkjiGwW+lb8ZhWEh0XKcrbdT5ID69tptBt4G5FI/xAoo5B7Damd8WO1CTvk+zvHtgkB59KEjJgtAO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [111.196.245.197])
-	by APP-05 (Coremail) with SMTP id zQCowADHWQ3IFs5pCDFCDA--.19527S2;
-	Thu, 02 Apr 2026 15:12:08 +0800 (CST)
-From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-To: Stefan Wahren <wahrenst@gmx.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pengpeng@iscas.ac.cn,
-	stable@vger.kernel.org
-Subject: [PATCH] net: qualcomm: qca_uart: report the consumed byte on RX skb allocation failure
-Date: Thu,  2 Apr 2026 15:12:07 +0800
-Message-ID: <20260402071207.4036-1-pengpeng@iscas.ac.cn>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1775114092; c=relaxed/simple;
+	bh=PjRBbHyCDRs5giP5cHIj0UQ85MPBUDBHa3e7t/RsNA8=;
+	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
+	 References:Message-ID; b=kRXmcMh5u7/NNRy2oar3IAu8HEbKwl/pLzENDdtPHv+Edga3WsXepX7We7Kwe4TiCUNReh9Y75VxSWLTafjJznfPtmeuno+Bt4JIj2vzlTeGZNqTK39HouAsyrXepua6OkJDG3+Ejldq4iZAfvkvcFvLsqH2dRqjRXwR3yvhnCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; dkim=temperror (0-bit key) header.d=dev.tdt.de header.i=@dev.tdt.de header.b=FOOoIjav; arc=none smtp.client-ip=194.37.255.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dev.tdt.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
+Received: from [194.37.255.9] (helo=mxout.expurgate.net)
+	by relay.expurgate.net with smtp (Exim 4.92)
+	(envelope-from <prvs=6566d59578=ms@dev.tdt.de>)
+	id 1w8CGJ-00ATtn-5K; Thu, 02 Apr 2026 09:14:43 +0200
+Received: from [195.243.126.94] (helo=securemail.tdt.de)
+	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ms@dev.tdt.de>)
+	id 1w8CGI-005hTl-1N; Thu, 02 Apr 2026 09:14:42 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dev.tdt.de;
+	s=z1-selector1; t=1775114081;
+	bh=lmFCqlfBE1fnq5/a2R/XBJFQiWLUI085rhhck3qDYPo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FOOoIjavVRyTUPmFdkJZsNNZkzXcVcISOxtTcUf8yaL/OdmWyKG0SjI0SspO2lnmx
+	 dHboeRz7Q6g05aU5jJd70wNpMnZWlNT674aythhN0qovbZlLVBmGZX7uaTMdWb8v4k
+	 XZJYiGy9A4UGkH3yT+GmODkmrtXp3eWQaX0XaHkvHXlPxVgipAwFjf5ATByzuJl0j1
+	 s28NYh6xd7bZNp5LDL8zMC7zObjd0CVJWHkf5HcKff4Bsn2qKqu5QPqN2TFxAl4EJI
+	 /HXx6Sz1ZMNaS+C2/k5BG1K8iECOYf0a2orAd6Nuzmh+fUPifMBU3bSD86uQLsXD2y
+	 hNxqQ3y+ZEBGA==
+Received: from securemail.tdt.de (localhost [127.0.0.1])
+	by securemail.tdt.de (Postfix) with ESMTP id 807F4240040;
+	Thu,  2 Apr 2026 09:14:41 +0200 (CEST)
+Received: from mail.dev.tdt.de (unknown [10.2.4.42])
+	by securemail.tdt.de (Postfix) with ESMTP id 6C45B240036;
+	Thu,  2 Apr 2026 09:14:41 +0200 (CEST)
+Received: from mail.dev.tdt.de (localhost [IPv6:::1])
+	by mail.dev.tdt.de (Postfix) with ESMTP id 0E98423CE4;
+	Thu,  2 Apr 2026 09:14:40 +0200 (CEST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowADHWQ3IFs5pCDFCDA--.19527S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Zw4rKF1Dtw1UXFWrWF43trb_yoW8Xry3pa
-	yDKa4kCw1vkr17JanrJr1xXFZxCa9Yyry3GFZ8Aw1fZwnxJrW2gF98Ka4jgw1DXay8CFW2
-	yF4qvr43C3Z5JaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
-	IxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUqeHgUUUUU=
-X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Thu, 2 Apr 2026 09:14:40 +0200 (CEST)
+From: Martin Schiller <ms@dev.tdt.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	yimingqian591@gmail.com, linux-x25@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	security@kernel.org
+Subject: Re: [PATCH net v2] net/x25: Fix overflow when accumulating packets
+Organization: TDT AG
+In-Reply-To: <20260402024855.842920-1-kuba@kernel.org>
+References: <20260327-x25_fraglen-v2-1-143911c3f62a@dev.tdt.de>
+ <20260402024855.842920-1-kuba@kernel.org>
+Message-ID: <8aa013a16fec55cdd7a2ba374bf37437@dev.tdt.de>
+X-Sender: ms@dev.tdt.de
+User-Agent: Roundcube Webmail/1.3.17
+X-purgate-type: clean
+X-purgate: clean
+X-purgate-ID: 151534::1775114082-B3EDD76A-8F68A85E/0/0
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[tdt.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[dev.tdt.de:s=z1-selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmx.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274401-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.894];
-	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
-	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,gmail.com,vger.kernel.org,kernel.org];
+	TAGGED_FROM(0.00)[bounces-274402-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[dev.tdt.de:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ms@dev.tdt.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,iscas.ac.cn:email,iscas.ac.cn:mid]
-X-Rspamd-Queue-Id: 0E57C3850C9
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 2A33138514A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-qca_tty_receive() consumes each input byte before checking whether a
-completed frame needs a fresh receive skb. When the current byte completes
-a frame, the driver delivers that frame and then allocates a new skb for
-the next one.
+On 2026-04-02 04:48, Jakub Kicinski wrote:
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> net/x25: Fix overflow when accumulating packets
+> 
+> This commit adds a check to prevent x25_sock.fraglen from overflowing
+> during packet accumulation. It also resets the fragment length when
+> purging the fragment queue.
+> 
+>> diff --git a/net/x25/x25_in.c b/net/x25/x25_in.c
+>> index b981a4828d08..cb84c683d249 100644
+>> --- a/net/x25/x25_in.c
+>> +++ b/net/x25/x25_in.c
+>> @@ -34,6 +34,12 @@ static int x25_queue_rx_frame(struct sock *sk, 
+>> struct sk_buff *skb, int more)
+>>  	struct sk_buff *skbo, *skbn = skb;
+>>  	struct x25_sock *x25 = x25_sk(sk);
+>> 
+>> +	/* make sure we don't overflow */
+>> +	if (x25->fraglen + skb->len > USHRT_MAX) {
+>> +		kfree_skb(skb);
+>> +		return 1;
+>> +	}
+> 
+> Does this cause the skb to be freed twice?
+> 
+> When x25_queue_rx_frame() frees the skb and returns 1, the caller
+> x25_state3_machine() leaves its local queued variable as 0 and returns 
+> 0.
+> 
+> This 0 value propagates up through x25_process_rx_frame() to callers
+> like x25_backlog_rcv() or x25_lapb_receive_frame(). Since the return
+> value indicates the packet was not consumed by the protocol stack, 
+> these
+> upper-level functions will call kfree_skb(skb) again on the already
+> freed skb.
+> 
+> Would it be safer to return 1 without calling kfree_skb(skb) here so
+> the callers can handle freeing the unconsumed packet?
 
-If that allocation fails, the current code returns i even though data[i]
-has already been consumed and may already have completed the delivered
-frame. Since serdev interprets the return value as the number of accepted
-bytes, this under-reports progress by one byte and can replay the final
-byte of the completed frame into a fresh parser state on the next call.
-
-Return i + 1 in that failure path so the accepted-byte count matches the
-actual receive-state progress.
-
-Fixes: dfc768fbe618 ("net: qualcomm: add QCA7000 UART driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
----
- drivers/net/ethernet/qualcomm/qca_uart.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/qualcomm/qca_uart.c b/drivers/net/ethernet/qualcomm/qca_uart.c
-index 37efb1ea9fcd..847a5f928e41 100644
---- a/drivers/net/ethernet/qualcomm/qca_uart.c
-+++ b/drivers/net/ethernet/qualcomm/qca_uart.c
-@@ -100,7 +100,7 @@ qca_tty_receive(struct serdev_device *serdev, const u8 *data, size_t count)
- 			if (!qca->rx_skb) {
- 				netdev_dbg(netdev, "recv: out of RX resources\n");
- 				n_stats->rx_errors++;
--				return i;
-+				return i + 1;
- 			}
- 		}
- 	}
--- 
-2.50.1 (Apple Git-155)
-
+This is already fixed / changed in the v4 patch set.
 
