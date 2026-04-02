@@ -1,273 +1,223 @@
-Return-Path: <netdev+bounces-274572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274575-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sHf2LKx6zmmMnwYAu9opvQ
-	(envelope-from <netdev+bounces-274572-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:18:20 +0200
+	id 8JkXHY58zmnBnwYAu9opvQ
+	(envelope-from <netdev+bounces-274575-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:26:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23A4F38A5C3
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:18:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37BE638A7A1
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:26:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1C9FC30F005D
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 14:11:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DF4D9310CC06
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 14:18:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D28C12D949C;
-	Thu,  2 Apr 2026 14:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mTUnTzsy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832FA3EDAA0;
+	Thu,  2 Apr 2026 14:18:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1DE83E715C;
-	Thu,  2 Apr 2026 14:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8F6396D1B
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 14:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.76.78.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775139092; cv=none; b=iyrBODHKlxiRzcmZwMDJyeTT5Tee2hO5eqOWpUlGNoXkQs/ZJDhpSsOr9BHhauY/iM7F/QKNjKkEtcZjWYPpQZECKl0SyVn/YHkgQqXMQp6oDtcagZ+z/l39g+FDz5R9zhnMsBErTGxf07n7mO1eFvEX1Ng5QlFm4umgvqjJng8=
+	t=1775139523; cv=none; b=Q2FQUEiTeXRZ/c7XsGKAv7izA1xWuMYCASTahdvp7p9ohR3FWmexstDyO6mJleCF8vNVdIr7+n+Hr9oK2BkFxJwXYi8HKE7sMwM1s6LewexVVSeo+/pQu0/2ga2qSCmj5yWAE3gRwYkaUfxHPCs2TTMOuvkS6hccqUGKZtLLPSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775139092; c=relaxed/simple;
-	bh=vSvOJMywDX1Dp4g8jKCdfWkYlFrhYqz4NkTXZxOL6mM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=VrO44iXHmDk4F3u3gsIytWSLV5aASwhKpHqT9mkmCfM33bbq0R0ffPY2J6axRC+Z0Opv+CncCFNHRZaoT8fQI18p80qQtCYhFnLAE7jDcJMpX0sV648KoCZ1mqCJUv41pIHjSzVrS4Y9R5B4UsKeLog7/9dPDGYdPMX1zq10GI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mTUnTzsy; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 0DF281A30FB;
-	Thu,  2 Apr 2026 14:11:27 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CDBA95FDEB;
-	Thu,  2 Apr 2026 14:11:26 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 409F410450264;
-	Thu,  2 Apr 2026 16:11:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1775139085; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=F+1R4q8i6GJ7YHYI0qiErpl7+oF0W1MmTLsQ9Hqk7x8=;
-	b=mTUnTzsyKsL7bqQhm4KFzonWj0QwypgK7cO+GGKuk1SMX8BWV6zJmMypHbmP6/OPiUJ6Gj
-	XGV2IZvS88+SUQwKLr0g8R+58PeavkILrbVgOZ1TTDRRwQVtHJO7yPClg2ZN6RvXUYtVja
-	sPCEijf0sUCvFjD1ow0DQl+BQeV3KIlRoyPM7A1Luuy5/gvVmuDk6gg9oOq3Gto55VUMxS
-	+SPoEewMPl6RBRVee6oX4+CVYWSlkQ6hBAss+am2xJbHSj7ngcU3pPfAFGCCinKkCk+FEA
-	BpVozzZGyZRnEJyR76YRrOi4KS7Mw3qDqGN+W/kFwEl/85e93uyBi06FcAdLiA==
+	s=arc-20240116; t=1775139523; c=relaxed/simple;
+	bh=bz9rAVsx+xcLaoo9qheWN6CB+zwEoZYFRgIT3yUQDdw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=X0/1d/lJkCznYbYufaYJkI6nsrEpd6ugmcy6+IiDvP/DnJeIgKnpc7rv5NGEt3YVPgwfZrN4aKt9cp/OEIwbUVyexKv+H5nboaEFGll3NBxg/Tu3R4lgLjTpU1Tsv/dMTaoebkygdVDP9TN93y6d5/qZBMZ6vbcrotq9urVtGlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=13.76.78.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from Draw.localdomain (unknown [172.23.236.123])
+	by app2 (Coremail) with SMTP id zQmowABX7oSmes5pNmswAA--.18793S2;
+	Thu, 02 Apr 2026 22:18:14 +0800 (CST)
+From: Ao Zhou <n05ec@lzu.edu.cn>
+To: netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Felix Maurer <fmaurer@redhat.com>,
+	Murali Karicheri <m-karicheri2@ti.com>,
+	Shaurya Rane <ssrane_b23@ee.vjti.ac.in>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Ingo Molnar <mingo@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Yifan Wu <yifanwucs@gmail.com>,
+	Juefei Pu <tomapufckgml@gmail.com>,
+	Yuan Tan <yuantan098@gmail.com>,
+	Xin Liu <bird@lzu.edu.cn>,
+	Yuqi Xu <xuyuqiabc@gmail.com>,
+	Ao Zhou <n05ec@lzu.edu.cn>
+Subject: [PATCH 1/1] net: hsr: avoid learning nodes from ordinary PRP SAN traffic
+Date: Thu,  2 Apr 2026 22:18:14 +0800
+Message-ID: <9c88b4b7844f867d065e7a7aba28b2c026386168.1775056603.git.royenheart@outlook.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1775056603.git.royenheart@outlook.com>
+References: <cover.1775056603.git.royenheart@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 02 Apr 2026 16:11:21 +0200
-Message-Id: <DHIQAC7SA3E0.2U7L5MI8IQ4SH@bootlin.com>
-Subject: Re: [PATCH net-next 06/11] net: macb: introduce macb_context struct
- for buffer management
-Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Richard Cochran" <richardcochran@gmail.com>, "Russell King"
- <linux@armlinux.org.uk>, "Paolo Valerio" <pvalerio@redhat.com>, "Conor
- Dooley" <conor@kernel.org>, "Vladimir Kondratiev"
- <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
- <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
- <benoit.monin@bootlin.com>, "Tawfik Bayouk" <tawfik.bayouk@mobileye.com>,
- "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Maxime Chevallier"
- <maxime.chevallier@bootlin.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-To: "Nicolai Buchwitz" <nb@tipi-net.de>, =?utf-8?q?Th=C3=A9o_Lebrun?=
- <theo.lebrun@bootlin.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260401-macb-context-v1-0-9590c5ab7272@bootlin.com>
- <20260401-macb-context-v1-6-9590c5ab7272@bootlin.com>
- <70b176b84fbff4a57d7f6be5f42fc753@tipi-net.de>
-In-Reply-To: <70b176b84fbff4a57d7f6be5f42fc753@tipi-net.de>
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQmowABX7oSmes5pNmswAA--.18793S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxZFW3Jr1UAryUZr48CF1rJFb_yoWrXryxpa
+	yfGrn5JrWktr17CrW0ya18ZrsIyF1kGw47KrWrA3s2vrnrJFyYvFZxKF90vF1rCrW8WFWa
+	yF40qrs5uw1DXrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9S1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
+	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
+	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
+	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8GwCFx2IqxV
+	CFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r10
+	6r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxV
+	WUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG
+	6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr
+	1UYxBIdaVFxhVjvjDU0xZFpf9x0pRpOJnUUUUU=
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQQFCWnNP3wXiAAAsx
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274572-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,mobileye.com,bootlin.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274575-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,ti.com,ee.vjti.ac.in,linutronix.de,gmail.com,lzu.edu.cn];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.985];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.995];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:dkim,bootlin.com:mid,bootlin.com:email,bootlin.com:url]
-X-Rspamd-Queue-Id: 23A4F38A5C3
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,outlook.com:mid]
+X-Rspamd-Queue-Id: 37BE638A7A1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu Apr 2, 2026 at 1:22 PM CEST, Nicolai Buchwitz wrote:
-> On 1.4.2026 18:39, Th=C3=A9o Lebrun wrote:
->> Whenever an operation requires buffer realloc, we close the interface,
->> update parameters and reopen. To improve reliability under memory
->> pressure, we should rather alloc new buffers, reconfigure HW and free
->> old buffers. This requires MACB to support having multiple "contexts"
->> in parallel.
->>=20
->> Introduce this concept by adding the macb_context struct, which owns=20
->> all
->> queue buffers and the parameters associated. We do not yet support
->> multiple contexts in parallel, because all functions access bp->ctx
->> (the currently active context) directly.
->>=20
->> Steps:
->>=20
->>  - Introduce `struct macb_context` and its children `struct macb_rxq`
->>    and `struct macb_txq`. Context fields are stolen from `struct macb`
->>    and rxq/txq fields are from `struct macb_queue`.
->>=20
->>    Making it two separate structs per queue simplifies accesses: we=20
->> grab
->>    a txq/rxq local variable and access fields like txq->head instead of
->>    queue->tx_head. It also anecdotally improves data locality.
->>=20
->>  - macb_init_dflt() does not set bp->ctx->{rx,tx}_ring_size to default
->>    values as ctx is not allocated yet. Instead, introduce
->>    bp->configured_{rx,tx}_ring_size which get updated on user requests.
->>=20
->>  - macb_open() starts by allocating bp->ctx. It gets freed in the
->>    open error codepath or by macb_close().
->>=20
->>  - Guided by compile errors, update all codepaths. Most diff is=20
->> changing
->>    `queue->tx_*` to `txq->*` and `queue->rx_*` to `rxq->*`, with a new
->>    local variable. Also rx_buffer_size / rx_ring_size / tx_ring_size
->>    move from bp to bp->ctx.
->>=20
->>    Introduce two helpers macb_tx|rx() functions to convert macb_queue
->>    pointers.
->>=20
->> Signed-off-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
->> ---
->>  drivers/net/ethernet/cadence/macb.h      |  49 ++--
->>  drivers/net/ethernet/cadence/macb_main.c | 442=20
->> ++++++++++++++++++-------------
->>  2 files changed, 296 insertions(+), 195 deletions(-)
->>=20
->
->> [...]
->
->> diff --git a/drivers/net/ethernet/cadence/macb_main.c=20
->> b/drivers/net/ethernet/cadence/macb_main.c
->> index d5023fdc0756..0f63d9b89c11 100644
->> --- a/drivers/net/ethernet/cadence/macb_main.c
->> +++ b/drivers/net/ethernet/cadence/macb_main.c
->
->> [...]
->
->> @@ -3596,14 +3677,15 @@ static void macb_get_regs(struct net_device=20
->> *netdev, struct ethtool_regs *regs,
->>  			  void *p)
->>  {
->>  	struct macb *bp =3D netdev_priv(netdev);
->> +	struct macb_txq *txq =3D &bp->ctx->txq[0];
->
-> bp->ctx is NULL when the interface is down. This will crash if
-> ethtool -d is called while the interface is not running. Same
-> issue below in macb_get_ringparam().
+From: Haoze Xie <royenheart@gmail.com>
 
-Agreed. Will check if context is alive and use default values otherwise.
-Something like this for V2:
+PRP slave ports accept ordinary SAN traffic and forward it to the
+master device without needing a persistent node entry. Creating one
+node per previously unseen SAN source lets arbitrary source MAC floods
+grow node_db until the prune timer catches up.
 
-static void macb_get_regs(struct net_device *netdev, struct ethtool_regs *r=
-egs,
-			  void *p)
-{
-	dma_addr_t tx_dma_tail =3D 0, tx_dma_head =3D 0;
-	struct macb *bp =3D netdev_priv(netdev);
-	unsigned int tail =3D 0, head =3D 0;
-	struct macb_txq *txq;
-	u32 *regs_buff =3D p;
+Keep the receive path for ordinary PRP SAN traffic, but stop learning a
+new node when the frame is untagged and does not carry a PRP trailer.
+Continue to deliver the frame locally and only keep node state for
+actual HSR/PRP senders or nodes that have already been learned.
 
-	regs->version =3D (macb_readl(bp, MID) & ((1 << MACB_REV_SIZE) - 1))
-			| MACB_GREGS_VERSION;
+Fixes: 451d8123f897 ("net: prp: add packet handling support")
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Yuqi Xu <xuyuqiabc@gmail.com>
+Signed-off-by: Haoze Xie <royenheart@gmail.com>
+Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
+---
+ net/hsr/hsr_forward.c  | 14 ++++++++++----
+ net/hsr/hsr_framereg.c | 16 +++++++++++++---
+ 2 files changed, 23 insertions(+), 7 deletions(-)
 
-	if (bp->ctx) {
-		txq =3D &bp->ctx->txq[0];
-		tail =3D macb_tx_ring_wrap(bp->ctx, txq->tail);
-		head =3D macb_tx_ring_wrap(bp->ctx, txq->head);
-		tx_dma_tail =3D macb_tx_dma(&bp->queues[0], tail);
-		tx_dma_head =3D macb_tx_dma(&bp->queues[0], head);
-	}
-
-	regs_buff[0]  =3D macb_readl(bp, NCR);
-	regs_buff[1]  =3D macb_or_gem_readl(bp, NCFGR);
-	regs_buff[2]  =3D macb_readl(bp, NSR);
-	regs_buff[3]  =3D macb_readl(bp, TSR);
-	regs_buff[4]  =3D macb_readl(bp, RBQP);
-	regs_buff[5]  =3D macb_readl(bp, TBQP);
-	regs_buff[6]  =3D macb_readl(bp, RSR);
-	regs_buff[7]  =3D macb_readl(bp, IMR);
-
-	regs_buff[8]  =3D tail;
-	regs_buff[9]  =3D head;
-	regs_buff[10] =3D tx_dma_tail;
-	regs_buff[11] =3D tx_dma_head;
-
-	if (!(bp->caps & MACB_CAPS_USRIO_DISABLED))
-		regs_buff[12] =3D macb_or_gem_readl(bp, USRIO);
-	if (macb_is_gem(bp->caps))
-		regs_buff[13] =3D gem_readl(bp, DMACFG);
-}
-
->
->>  	unsigned int tail, head;
->>  	u32 *regs_buff =3D p;
->>=20
->>  	regs->version =3D (macb_readl(bp, MID) & ((1 << MACB_REV_SIZE) - 1))
->>  			| MACB_GREGS_VERSION;
->>=20
->> -	tail =3D macb_tx_ring_wrap(bp, bp->queues[0].tx_tail);
->> -	head =3D macb_tx_ring_wrap(bp, bp->queues[0].tx_head);
->> +	tail =3D macb_tx_ring_wrap(bp, txq->tail);
->> +	head =3D macb_tx_ring_wrap(bp, txq->head);
->>=20
->>  	regs_buff[0]  =3D macb_readl(bp, NCR);
->>  	regs_buff[1]  =3D macb_or_gem_readl(bp, NCFGR);
->> @@ -3682,8 +3764,8 @@ static void macb_get_ringparam(struct net_device=
-=20
->> *netdev,
->>  	ring->rx_max_pending =3D MAX_RX_RING_SIZE;
->>  	ring->tx_max_pending =3D MAX_TX_RING_SIZE;
->>=20
->> -	ring->rx_pending =3D bp->rx_ring_size;
->> -	ring->tx_pending =3D bp->tx_ring_size;
->> +	ring->rx_pending =3D bp->ctx->rx_ring_size;
->> +	ring->tx_pending =3D bp->ctx->tx_ring_size;
->
-> Same NULL ctx issue as above. This one could just read from
-> bp->configured_{rx,tx}_ring_size instead.
-
-Agreed with the fix, easy one.
-
-Thanks!
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+index aefc9b6936ba..5fbfc42997d2 100644
+--- a/net/hsr/hsr_forward.c
++++ b/net/hsr/hsr_forward.c
+@@ -403,7 +403,8 @@ static void hsr_deliver_master(struct sk_buff *skb, struct net_device *dev,
+ 	int res, recv_len;
+ 
+ 	was_multicast_frame = (skb->pkt_type == PACKET_MULTICAST);
+-	hsr_addr_subst_source(node_src, skb);
++	if (node_src)
++		hsr_addr_subst_source(node_src, skb);
+ 	skb_pull(skb, ETH_HLEN);
+ 	recv_len = skb->len;
+ 	res = netif_rx(skb);
+@@ -699,8 +700,12 @@ static int fill_frame_info(struct hsr_frame_info *frame,
+ 
+ 	frame->node_src = hsr_get_node(port, n_db, skb,
+ 				       frame->is_supervision, port->type);
+-	if (!frame->node_src)
+-		return -1; /* Unknown node and !is_supervision, or no mem */
++	if (IS_ERR(frame->node_src)) {
++		ret = PTR_ERR(frame->node_src);
++		if (ret != -ENOENT)
++			return ret;
++		frame->node_src = NULL;
++	}
+ 
+ 	ethhdr = (struct ethhdr *)skb_mac_header(skb);
+ 	frame->is_vlan = false;
+@@ -739,7 +744,8 @@ void hsr_forward_skb(struct sk_buff *skb, struct hsr_port *port)
+ 	if (fill_frame_info(&frame, skb, port) < 0)
+ 		goto out_drop;
+ 
+-	hsr_register_frame_in(frame.node_src, port, frame.sequence_nr);
++	if (frame.node_src)
++		hsr_register_frame_in(frame.node_src, port, frame.sequence_nr);
+ 	hsr_forward_do(&frame);
+ 	rcu_read_unlock();
+ 	/* Gets called for ingress frames as well as egress from master port.
+diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
+index 50996f4de7f9..13e1a0484879 100644
+--- a/net/hsr/hsr_framereg.c
++++ b/net/hsr/hsr_framereg.c
+@@ -230,7 +230,7 @@ struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
+ 	bool san = false;
+ 
+ 	if (!skb_mac_header_was_set(skb))
+-		return NULL;
++		return ERR_PTR(-EINVAL);
+ 
+ 	ethhdr = (struct ethhdr *)skb_mac_header(skb);
+ 
+@@ -263,14 +263,24 @@ struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
+ 	    ethhdr->h_proto == htons(ETH_P_HSR)) {
+ 		/* Check if skb contains hsr_ethhdr */
+ 		if (skb->mac_len < sizeof(struct hsr_ethhdr))
+-			return NULL;
++			return ERR_PTR(-EINVAL);
+ 	} else {
+ 		rct = skb_get_PRP_rct(skb);
+ 		if (!rct && rx_port != HSR_PT_MASTER)
+ 			san = true;
+ 	}
+ 
+-	return hsr_add_node(hsr, node_db, ethhdr->h_source, san, rx_port);
++	/* PRP accepts ordinary SAN traffic on slave ports without learning a
++	 * persistent node entry.
++	 */
++	if (hsr->prot_version == PRP_V1 && san)
++		return ERR_PTR(-ENOENT);
++
++	node = hsr_add_node(hsr, node_db, ethhdr->h_source, san, rx_port);
++	if (!node)
++		return ERR_PTR(-ENOMEM);
++
++	return node;
+ }
+ 
+ static bool hsr_seq_block_is_old(struct hsr_seq_block *block)
+-- 
+2.53.0
 
 
