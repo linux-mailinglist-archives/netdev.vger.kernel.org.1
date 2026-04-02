@@ -1,252 +1,195 @@
-Return-Path: <netdev+bounces-274458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274459-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UBlQKKZEzmlQmQYAu9opvQ
-	(envelope-from <netdev+bounces-274458-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:27:50 +0200
+	id MLXXCwBFzmlQmQYAu9opvQ
+	(envelope-from <netdev+bounces-274459-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:29:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12D45387B70
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:27:50 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7100387BCA
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:29:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7E0FC303F44F
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 10:26:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F1A073028B28
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 10:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92FD939FCDC;
-	Thu,  2 Apr 2026 10:26:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21B463AA50D;
+	Thu,  2 Apr 2026 10:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PpoFbSH/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hkrfya3A";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="A7p58Ar1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F723BD24D
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 10:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50FF3921DF
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 10:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775125602; cv=none; b=SP3SODeCi8oBwubtVt2H8ApcAuCsR6UfvAZdLr7bmf3IQC0J7YHoJQw66ZoVHw8iGg7thW/1/QGmZbcPDTkOb3rhq9j5r/OVh4NjoBodoi4wyx0jvAQm7Q7j4CWn9QzIfl7RRzypdt1rmVdkHGbmqZqFvOUSC0RTVveRcvhQ/O4=
+	t=1775125754; cv=none; b=Gp6i9m2mNC/+0fvoFeoW74z8dPtYRTFP6ix2kbS+CIc2IUytBXDC6fCqkz5u0rCh56SAEwVKezP3X7lZ/x1XexbF1mgZ8sionjIoKVEy4cRGA8ilsiciz/H64Ss7M2lejYuU/lp+tOtnKULhBECPZ3pzUz6nugRvkC768G0nvk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775125602; c=relaxed/simple;
-	bh=QocVP8RliyD57oYi8LKapgnuAL11EjWCrBQsYJjeP5I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JQ4b+qvV1IQTcQi1JE32tVP3tPDU6wI2jYo6v1NATAP9ClD34aZgTfEANzX3lJEVzxkgpFsPEkxwWMxyoIgOm002KKD4jMFJim92Y1DDYGScPquRqOmE/x82Es0iIvN4gB7W8yph03GsolgxPR+1k+iyS8ulL0fX/R5wMRlpCwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PpoFbSH/; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1775125754; c=relaxed/simple;
+	bh=IW1lOPDfzNo6iyC+RTfQZKz7s0OSLg8gYMFYo/QQozk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A+g1sttA4Uix7K5pAFjYb/60BifZF4I9+DBP4WM7CzrlaPveTB9EUD+rhjg2IrNTlTGumfpn5bCuY1QxhoyKAmiSCL8lcB1ZhIsuxirtACZqdnUS0shT+MSeCdr3g7UuXg+dzGO8EZ/naaVvjOleKRlW6LfcNP44HyVlPJNBzfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hkrfya3A; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=A7p58Ar1; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775125600;
+	s=mimecast20190719; t=1775125751;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tbiNW6fo2qH/eLsmPCaBwN/Htf3MbxA5LWFsoCSTCfM=;
-	b=PpoFbSH/uahGJb/YHHyLYY0Aaro5eqzQ1+SGgPG0wegbdfG4yVaHJm/p4uaPchTIcYxrWL
-	H11aQoeoEBiMm/CX8FuXWCCFKUJYyBj+UKEmRRaZi+uFd8EPCqI9gfimjW34Vf3XY78jou
-	+6cM+y2/QJtBQzcUrPrDXoKFincjgfY=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-632-kUBRL3a7NfGvSW6G-M2Hug-1; Thu,
- 02 Apr 2026 06:26:38 -0400
-X-MC-Unique: kUBRL3a7NfGvSW6G-M2Hug-1
-X-Mimecast-MFC-AGG-ID: kUBRL3a7NfGvSW6G-M2Hug_1775125594
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 850481956089;
-	Thu,  2 Apr 2026 10:26:33 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.195])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id ECC091800351;
-	Thu,  2 Apr 2026 10:26:20 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: anthony.l.nguyen@intel.com
-Cc: andriy.shevchenko@intel.com,
-	pmenzel@molgen.mpg.de,
-	aleksandr.loktionov@intel.com,
-	mika.westerberg@linux.intel.com,
-	pabeni@redhat.com,
-	mbloch@nvidia.com,
-	saeedm@nvidia.com,
-	piotr.kwapulinski@intel.com,
-	sx.rinitha@intel.com,
-	kuba@kernel.org,
-	grzegorz.nitka@intel.com,
-	netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com,
-	arkadiusz.kubalewski@intel.com,
-	tariqt@nvidia.com,
-	davem@davemloft.net,
-	dima.ruinskiy@intel.com,
-	bhelgaas@google.com,
-	andrew+netdev@lunn.ch,
-	lukas@wunner.de,
-	jacob.e.keller@intel.com,
-	richardcochran@gmail.com,
-	takkozu@amazon.com,
-	enjuk@amazon.com,
-	maximilianpezzullo@gmail.com,
-	joe@dama.to,
-	przemyslaw.korba@intel.com,
-	leon@kernel.org,
-	vgrinber@redhat.com,
-	linux-pci@vger.kernel.org,
-	sunithax.d.mekala@intel.com,
-	corbet@lwn.net,
-	vinicius.gomes@intel.com,
-	ilpo.jarvinen@linux.intel.com,
-	edumazet@google.com,
-	linux-doc@vger.kernel.org,
-	kohei.enju@gmail.com,
-	kohei@enjuk.jp,
-	horms@kernel.org,
-	avigailx.dahan@intel.com
-Subject: Re: [net-next,13/15] ice: add support for unmanaged DPLL on E830 NIC
-Date: Thu,  2 Apr 2026 12:26:16 +0200
-Message-ID: <20260402102616.177883-1-pabeni@redhat.com>
-In-Reply-To: <20260330230248.646900-14-anthony.l.nguyen@intel.com>
-References: <20260330230248.646900-14-anthony.l.nguyen@intel.com>
+	bh=w1QNFZcjlbQfqCAZ+2Rv3blmsKd4Db0pLwQogOddra4=;
+	b=Hkrfya3AsuV4FIAhrIdE1gh/476Ix3GB1xnpLmKXdZgi8A96CJyejyMsXJnSFhGSdhSXeN
+	8R2aUs3oYx8IgT8EH3BLjHQ3fVuKVbeC8RCxWPTVNisc15UKfnqErLnMaLqfI4zti+3NQP
+	9hMc15tV8IvvKWBdnKt+cni9OnHvthc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-591-N2NHAFVqN9eeHTJwtey--g-1; Thu, 02 Apr 2026 06:29:10 -0400
+X-MC-Unique: N2NHAFVqN9eeHTJwtey--g-1
+X-Mimecast-MFC-AGG-ID: N2NHAFVqN9eeHTJwtey--g_1775125749
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-43d00dd913cso967874f8f.1
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 03:29:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1775125749; x=1775730549; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w1QNFZcjlbQfqCAZ+2Rv3blmsKd4Db0pLwQogOddra4=;
+        b=A7p58Ar1DL/9I3ktXWNzHczcrXqYTd9XdCFVZlNNYm+xkot//ajZxllbCYpyOGvJy5
+         g+aOBRcBa5N+PbUNE+y7GrPkvMmdB5IfFKuCq3T8ZdZbcnuLXsUBIhhEtpCNPPw1CbJX
+         Uzx6mavsMi+d+bWH/QfOzHOoaa8sxbcDrGzUCu0vI3A51xhLHdCfz9bYGR881mn6qk7x
+         gcLq/OjhWA03FpSrHq+PG5D7fLvjeTkB78V713/2W4QCPeMITT2B8NUWQxuYHK5eCqLp
+         05ISewfbCwAablWhFf3xSpzJ6kU6pX4wJP4MvnV/ajiV+TYDUC20BfXGuSkNr/29Ht8j
+         HA4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775125749; x=1775730549;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w1QNFZcjlbQfqCAZ+2Rv3blmsKd4Db0pLwQogOddra4=;
+        b=oYZxFB0w+9qloxael0/BNJ6r2eCNBWiJgL5IroCRDSwWYLmvV5bWcMs3NsPWIAcUvI
+         +NhR5hWqwHfx+Lyph7FdsXJ/IXPjwqyC5403nxcyRUNi3lJ7P6aheajt0skDhmJocamh
+         z2p/rPyLwDTxKOtacEzoUKwZImv/rU6dTtZiNptW7TeyqzC3kdNChsQ+qo2KfcqrJ7zJ
+         LF0XhIwtnvz/kYgzZKx+VVKa+GSh/H9hDg/Po7InAD16ixD1UZXt7yI8Wj52xPk3gUSI
+         oGcf74YplhOq5dpMMMBfIhJbunvc0kTH4qVrnKxtAw8BW1aT7cc7HK934zpeQzLGsdHC
+         dxzA==
+X-Forwarded-Encrypted: i=1; AJvYcCXl5pXZOvjTp9WW7vZwsshopRLGLjLE7Xr2KTkmi59eMolAuTX6r6fRSmLloR4IA1yOPCvqRj0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBjKV77D4jik/P+WQuZ1fNHPj3I5cSFH7ql4gnWUGMva5ieSQG
+	DG/qhNkYFzRABwiyEULIHQLBY199kLCgJx7XE9V0clPOxt2FMjbNa8+2YXpJw1hXyfhhN0Xf4+t
+	ZEIIVpiuAbxTffuQZpc40uU4FExZoab+V8bgEdhp4pGBdeKfrvBeUeZ/yrg==
+X-Gm-Gg: AeBDieugAsWGnaxsaRdWvDZZat6z5xibHI9Y4IyEziupnMIyRFOdKqIcKrFlSXqA18V
+	lYz3KKwh7Po95aM1GrWZNyOgdFX8esDxNvKWfZ4HHykbJzWjV+LF84JfdK2pMCpsg7gGRSp0VY9
+	RnKLAWEGuh/ZJtwjYdGylLgCxRK2uiQOcS0UmENlk8PxCC3LbrVnACIYdvpLUUnQ9Fbnhq9ad5a
+	y1WvZYVEqElppGTq9MHajEX3GnlRtkA+QnlvPR4sUdL+xcZm9rCl6CWxSWKc47JpbKabBJW7g0D
+	yd5NJj+UEnjWxuB//MifzSt00IaMDcOANcg/DIPOeUW1qScUy0rkFHHlu6uoi3AN61koOKcxJng
+	u4dgVQ9ll+8roossF6Q1a2dObsiYzL1dt3lxKXj1fZGZkSmatcmrufPakgg==
+X-Received: by 2002:a05:6000:2c06:b0:43c:f5c6:49bf with SMTP id ffacd0b85a97d-43d1504985cmr12930728f8f.5.1775125749348;
+        Thu, 02 Apr 2026 03:29:09 -0700 (PDT)
+X-Received: by 2002:a05:6000:2c06:b0:43c:f5c6:49bf with SMTP id ffacd0b85a97d-43d1504985cmr12930682f8f.5.1775125748892;
+        Thu, 02 Apr 2026 03:29:08 -0700 (PDT)
+Received: from [192.168.88.32] ([212.105.153.248])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e4f843dsm6658714f8f.37.2026.04.02.03.29.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Apr 2026 03:29:08 -0700 (PDT)
+Message-ID: <9f169800-12f2-4f98-ab99-e4433b2b49a9@redhat.com>
+Date: Thu, 2 Apr 2026 12:29:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
-X-Spamd-Result: default: False [0.84 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 01/15] igc: Call netif_queue_set_napi() with rtnl
+ locked
+To: Bjorn Helgaas <helgaas@kernel.org>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ Mika Westerberg <mika.westerberg@linux.intel.com>,
+ andriy.shevchenko@intel.com, ilpo.jarvinen@linux.intel.com,
+ dima.ruinskiy@intel.com, mbloch@nvidia.com, leon@kernel.org,
+ linux-pci@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
+ lukas@wunner.de, bhelgaas@google.com, richardcochran@gmail.com,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ Jacob Keller <jacob.e.keller@intel.com>,
+ Avigail Dahan <avigailx.dahan@intel.com>
+References: <20260331173728.GA146742@bhelgaas>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20260331173728.GA146742@bhelgaas>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274458-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[intel.com,molgen.mpg.de,linux.intel.com,redhat.com,nvidia.com,kernel.org,vger.kernel.org,davemloft.net,google.com,lunn.ch,wunner.de,gmail.com,amazon.com,dama.to,lwn.net,enjuk.jp];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,lunn.ch,vger.kernel.org,linux.intel.com,intel.com,nvidia.com,wunner.de,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
 	DKIM_TRACE(0.00)[redhat.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[41];
+	TAGGED_FROM(0.00)[bounces-274459-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 12D45387B70
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: C7100387BCA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
+On 3/31/26 7:37 PM, Bjorn Helgaas wrote:
+> On Mon, Mar 30, 2026 at 04:02:30PM -0700, Tony Nguyen wrote:
+>> From: Mika Westerberg <mika.westerberg@linux.intel.com>
+>>
+>> When runtime resuming igc we get:
+>>
+>>   [  516.161666] RTNL: assertion failed at ./include/net/netdev_lock.h (72)
+>>
+>> Happens because commit 310ae9eb2617 ("net: designate queue -> napi
+>> linking as "ops protected"") added check for this. For this reason drop
+>> the special case for runtime PM from __igc_resume(). This makes it take
+>> rtnl lock unconditionally.
+> 
+> Taking the rtnl lock unconditionally certainly makes the code nicer,
+> but the commit log only mentions the "avoid the warning" benefit, not
+> the actual reason this is safe to do.
 
-For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+Sashiko says it's not safe:
+
 ---
-ice: add support for unmanaged DPLL on E830 NIC
+Can this regression cause a self-deadlock when a runtime resume is
+triggered from paths that already hold the rtnl lock?
+If the network interface is logically up but the link is disconnected,
+igc_runtime_idle() allows the device to enter runtime suspend. When a
+user queries the device using ethtool, the networking core acquires
+rtnl_lock() and then calls pm_runtime_get_sync() to ensure the hardware
+is awake.
+This synchronously executes the driver's runtime resume callback, which
+calls __igc_resume(). Because netif_running(netdev) is true, the
+modified __igc_resume() unconditionally attempts to acquire rtnl_lock().
+Since the executing thread already holds this non-recursive mutex, it
+appears the system would self-deadlock, hanging the network stack.
+---
 
-Hardware variants of E830 may support an unmanaged DPLL where the
-configuration is hardcoded within the hardware and firmware, meaning
-users cannot modify settings. However, users are able to check the DPLL
-lock status and obtain configuration information through the Linux DPLL
-and devlink health subsystem.
-
-> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-> index 62f75701d652..2a9eb233dbf4 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-
-[ ... ]
-
-> @@ -3148,12 +3176,15 @@ ice_dpll_init_direct_pins(struct ice_pf *pf, bool cgu,
->  	int ret;
->
->  	ret = ice_dpll_get_pins(pf, pins, start_idx, count, pf->dplls.clock_id);
-> -	if (ret)
-> +	if (!cgu || ret)
->  		return ret;
-> -	if (cgu) {
-> +
-> +	if (first) {
->  		ret = ice_dpll_register_pins(first, pins, ops, count);
->  		if (ret)
->  			goto release_pins;
-> +	}
-> +	if (second) {
->  		ret = ice_dpll_register_pins(second, pins, ops, count);
->  		if (ret)
->  			goto unregister_first;
-> @@ -3162,7 +3193,8 @@ ice_dpll_init_direct_pins(struct ice_pf *pf, bool cgu,
->  	return 0;
->
->  unregister_first:
-> -	ice_dpll_unregister_pins(first, pins, ops, count);
-> +	if (first)
-> +		ice_dpll_unregister_pins(first, pins, ops, count);
->  release_pins:
->  	ice_dpll_release_pins(pins, count);
->  	return ret;
-
-NULL checks were added to ice_dpll_init_direct_pins for handling unmanaged
-DPLL initialization where only one DPLL device is active. However, is the
-corresponding cleanup function ice_dpll_deinit_direct_pins missing the same
-NULL checks?
-
-In unmanaged mode, only pf->dplls.pps.dpll is initialized while
-pf->dplls.eec.dpll remains NULL. When ice_dpll_init_pins calls
-ice_dpll_init_direct_pins(pf, true, outputs, count, num_outputs,
-output_ops, eec.dpll, pps.dpll), if this second call (for output pins)
-fails, the error path calls ice_dpll_deinit_direct_pins(pf, true, ...,
-pps.dpll, eec.dpll).
-
-Looking at ice_dpll_deinit_direct_pins:
-
-static void ice_dpll_deinit_direct_pins(struct ice_pf *pf, bool cgu,
-					struct ice_dpll_pin *pins, int count,
-					const struct dpll_pin_ops *ops,
-					struct dpll_device *first,
-					struct dpll_device *second)
-{
-	if (cgu) {
-		ice_dpll_unregister_pins(first, pins, ops, count);
-		ice_dpll_unregister_pins(second, pins, ops, count);
-	}
-	ice_dpll_release_pins(pins, count);
-}
-
-When cgu=true and second=NULL, ice_dpll_unregister_pins is called with
-dpll=NULL. Then dpll_pin_unregister(dpll, pin) dereferences dpll with
-xa_empty(&dpll->pin_refs), causing a NULL pointer dereference.
-
-Shouldn't ice_dpll_deinit_direct_pins add NULL checks for first and second,
-matching the guards you added in ice_dpll_init_direct_pins?
-
-> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.h b/drivers/net/ethernet/intel/ice/ice_dpll.h
-> index ae42cdea0ee1..2c98b6c6deb0 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_dpll.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_dpll.h
-
-[ ... ]
-
-> @@ -173,3 +181,5 @@ static inline void ice_dpll_deinit(struct ice_pf *pf) { }
->  #define ICE_CGU_R11_SYNCE_S_BYP_CLK		GENMASK(6, 1)
->
->  #define ICE_CGU_BYPASS_MUX_OFFSET_E825C		3
-> +#define ICE_DPLL_UNMANAGED_PIN_NUM		4
-> +#define ICE_DPLL_IN_ESYNC_ENABLED	ICE_AQC_GET_CGU_IN_CFG_FLG2_ESYNC_EN
-
-This isn't a bug, but ICE_DPLL_UNMANAGED_PIN_NUM is defined but never
-used. Looking at the unmanaged pin descriptors, ice_e830_unmanaged_inputs
-has 1 entry and ice_e830_unmanaged_outputs has 2 entries (totaling 3 pins,
-not 4).
+/P
 
 
