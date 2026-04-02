@@ -1,146 +1,191 @@
-Return-Path: <netdev+bounces-274497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274499-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IEA9EnFZzmkxnAYAu9opvQ
-	(envelope-from <netdev+bounces-274497-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:56:33 +0200
+	id cADXA5BYzmkxnAYAu9opvQ
+	(envelope-from <netdev+bounces-274499-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:52:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D36E388A67
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:56:32 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B623889A0
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:52:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 33B88301BCD4
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 11:32:09 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 07393305F299
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 11:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01FF0196C7C;
-	Thu,  2 Apr 2026 11:32:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A79C36921C;
+	Thu,  2 Apr 2026 11:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="KHAgDBas"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="ETAGn2VG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B6003AD538
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 11:31:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03C03CCFAE;
+	Thu,  2 Apr 2026 11:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775129527; cv=none; b=dmoGJxrrDTHVZMVBDWxKpNrUcfzI0QKhUZYsJ/pHBQDWsV8WcawLrOUMHFI6ylB6fle3goil/ZP6rGza6tmTmYrVXG5ZIoEBqxojU3DU9k/qDIU6KnKkT+nS6kG+BMwdSYrFDYUpJDs7Qgm3DWIj+zpede37WSsopS/GHKMs/xo=
+	t=1775129749; cv=none; b=hP4pU0xioMTXVVXf4w1391oHK7xM7jqs/ICUityrXE8/Hu3v3kpoml1M5eq0XQmEmMBZtMHuFOlwwLYY7yksegdzj9PGOo3io2MT/nq88gklISsJl0wqmfwizS1SXOiaAbGVlqJAZviTNcrpLzY/hxKS4fi6PeJfCEx66Jh2zzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775129527; c=relaxed/simple;
-	bh=muLRHVKKCxa7THcGz+9Z64cjD57wbeN8h5gvpYkbALc=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SfdAs4s0+vcuTIcvBFRjwpXm8Meur0s7aktZlt22k9dhmkzvsugJRUtc+sH7+FZ8iHq02JFseJLJPinDgvbqPPSWD/z974FsWSa7P0H7oEuKZ6sEEw8+UXiJwbl1Pqc79baEYIwrrJfEjTwbk+NdMHXTokkPEIv/S8qNKRqr7Oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=KHAgDBas; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id A61532088A;
-	Thu,  2 Apr 2026 13:31:53 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pQWdtPZSa-DA; Thu,  2 Apr 2026 13:31:53 +0200 (CEST)
-Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 254D5205DD;
-	Thu,  2 Apr 2026 13:31:53 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 254D5205DD
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1775129513;
-	bh=RFAEwZW1ULGjo1FzYux4gg5LXrejoNZAV0wTbiHEnKQ=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=KHAgDBas/S8wG3b9YerVJeYGm5RlsjmWtEUeLnZu3/PoHelvbLzF69dHoisCSJECD
-	 8KRYtLZ2H/0t2T3AwXgSnsE28a+pCGBNrF2AddcMnJ7I706jMmVLPeWauB1tbtTi3L
-	 g8dFZ/hEQPkl2xbGEEypPYXFmLSMpc0fcKgPDXSThaT9vp51JVlRuK2J1lp9fucl5w
-	 T4ynfJ7ZRRtO6ufwq23hzkFnx8QtzAGmOvyYymF2QEZEDaKtLK4jEfkt+2hZKYYODk
-	 FGwr1XJBNCfHBNuk8R4ise9Dd0O9dHy6zK4r/xKibLYiHShzvR9/s/m7x7tFVDlnk2
-	 8k4QB61EorWlg==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 2 Apr
- 2026 13:31:52 +0200
-Received: (nullmailer pid 3788822 invoked by uid 1000);
-	Thu, 02 Apr 2026 11:31:52 -0000
-Date: Thu, 2 Apr 2026 13:31:52 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: <netdev@vger.kernel.org>
-CC: Florian Westphal <fw@strlen.de>
-Subject: [PATCH ipsec 2/2] xfrm: Wait for RCU readers during state netns exit
-Message-ID: <ac5TqJaXXg66dqBy@secunet.com>
-References: <ac5TePdKtegtWiRG@secunet.com>
+	s=arc-20240116; t=1775129749; c=relaxed/simple;
+	bh=DDcpPxNStIKhIOddN8K9dB6cJ3YY5lGjbE25N3Iu3XM=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=YS+COqG5Dvr8BFsi3cQKRS6f6D220aTrkMsQgmBKmD0Mv5X3CGEq9ZkEUE/D0zSqHOesRUWn/d//vscMAcZU+ud9CQTCelSMYKmXiZqUY9SlO1IdFwLO6qBdNepAjdq+ta2TtOfXAfcPnQWZqauxw5QQrFRuPKrSd/JvA1ahoz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=ETAGn2VG; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 37848A5889;
+	Thu,  2 Apr 2026 13:35:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1775129738; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=KC1FZpvBCsFRD+ZZsA1/QCAOrkb0VRBzQzjA60MBHPM=;
+	b=ETAGn2VGHKTlOvxUNI+DlLDU3qW+DRxCyTCUUpDTIObVk92IXg7GpbCULFxxYz3D/TYM/t
+	LtOViG4Akg8vf/GQhpOW41Hv3Q9a3U71/k5VNhspHO3Pg59Y/Ed2v5RzYCl5n8cnqTwGnk
+	iYCTI6oMBfgX4Nx4qJSOiyMgI8Mpvz8A8VspSylPzLflosYPvclh8s5DmVPWHfit9Ki50v
+	zs7S6CdbxipMqulO7el4a4PxHPxqk/GrH5uTkQsSuoSR4JbVpbewQBWOFdsOH6n7xZ+idh
+	qYmTZF1R7oC0Nl9rHfY5m72qdwT22bJbktzI7PaNq/zJBghbZbkvj0+m386uSQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ac5TePdKtegtWiRG@secunet.com>
-X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
- (10.32.0.171)
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Date: Thu, 02 Apr 2026 13:35:37 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
+ <claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
+ <richardcochran@gmail.com>, Russell King <linux@armlinux.org.uk>, Paolo
+ Valerio <pvalerio@redhat.com>, Conor Dooley <conor@kernel.org>, Vladimir
+ Kondratiev <vladimir.kondratiev@mobileye.com>, Gregory CLEMENT
+ <gregory.clement@bootlin.com>, =?UTF-8?Q?Beno=C3=AEt_Monin?=
+ <benoit.monin@bootlin.com>, Tawfik Bayouk <tawfik.bayouk@mobileye.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 00/11] net: macb: implement context swapping
+In-Reply-To: <20260401-macb-context-v1-0-9590c5ab7272@bootlin.com>
+References: <20260401-macb-context-v1-0-9590c5ab7272@bootlin.com>
+Message-ID: <f399076d1791d9df325f967e50184c2e@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[secunet.com,none];
-	R_DKIM_ALLOW(-0.20)[secunet.com:s=202301];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	TAGGED_FROM(0.00)[bounces-274497-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[secunet.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[steffen.klassert@secunet.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-274499-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,mobileye.com,bootlin.com,vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 9D36E388A67
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 12B623889A0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-xfrm_state_fini() flushes the resize and GC work, destroys all states, and
-then frees the state hash tables and the inbound percpu state cache.
-Those objects can still be observed by concurrent RCU readers. We need
-to wait for a RCU grace period before freeing the hash tables and the
-percpu cache to avoid netns teardown racing with lockless lookups.
+On 1.4.2026 18:39, Théo Lebrun wrote:
+> MACB has a pretty primitive approach to buffer management. They are all
+> stored in `struct macb *bp`. On operations that require buffer realloc
+> (set_ringparam & change_mtu ATM), the only option is to close the
+> interface, change our global state and re-open the interface.
+> 
+> Two issues:
+> - It doesn't fly on memory pressured systems; we free our precious
+>   buffers and don't manage to reallocate fully, meaning our machine
+>   just lost its network access.
+> - Anecdotally, it is pretty slow because it implies a full PHY reinit.
+> 
+> Instead, we shall:
+>  - allocate a new context (including buffers) first
+>  - if it fails, early return without any impact to the interface
+>  - stop interface
+>  - update global state (bp, netdev, etc)
+>  - pass newly allocated buffer pointers to the hardware
+>  - start interface
+>  - free old context
+> 
+> This is what we implement here. Both .set_ringparam() and
+> .ndo_change_mtu() are covered by this series. In the future,
+> at least .set_channels() [0], XDP [1] and XSK [2] would benefit.
 
-Fix this by adding synchronize_rcu() before freeing the state hash
-tables and the inbound percpu state cache.
+Thanks for your work, the context swapping approach probably
+makes a lot of sense and will finally bring proper MTU change
+support that I tried to patch earlier.
 
-Fixes: c8406998b801 ("xfrm: state: use rcu_deref and assign_pointer helpers")
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- net/xfrm/xfrm_state.c | 2 ++
- 1 file changed, 2 insertions(+)
+> 
+> The change is super intrusive so conflicts will be major. Sorry!
+> 
+> Thanks,
+> Have a nice day,
+> Théo
+> 
+> [0]: 
+> https://lore.kernel.org/netdev/20260317-macb-set-channels-v4-0-1bd4f4ffcfca@bootlin.com/
+> [1]: 
+> https://lore.kernel.org/netdev/20260323221047.2749577-1-pvalerio@redhat.com/
+> [2]: 
+> https://lore.kernel.org/netdev/20260304-macb-xsk-v1-0-ba2ebe2bdaa3@bootlin.com/
+> 
+> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+> ---
+> Théo Lebrun (11):
+>       net: macb: unify device pointer naming convention
+>       net: macb: unify `struct macb *` naming convention
+>       net: macb: unify queue index variable naming convention and types
+>       net: macb: enforce reverse christmas tree (RCT) convention
+>       net: macb: allocate tieoff descriptor once across device lifetime
+>       net: macb: introduce macb_context struct for buffer management
+>       net: macb: avoid macb_init_rx_buffer_size() modifying state
+>       net: macb: make `struct macb` subset reachable from macb_context 
+> struct
+>       net: macb: introduce macb_context_alloc() helper
+>       net: macb: use context swapping in .set_ringparam()
+>       net: macb: use context swapping in .ndo_change_mtu()
+> 
+>  drivers/net/ethernet/cadence/macb.h      |  119 +-
+>  drivers/net/ethernet/cadence/macb_main.c | 1731 
+> +++++++++++++++++-------------
+>  drivers/net/ethernet/cadence/macb_pci.c  |   46 +-
+>  drivers/net/ethernet/cadence/macb_ptp.c  |   26 +-
+>  4 files changed, 1090 insertions(+), 832 deletions(-)
+> ---
+> base-commit: 321d1ee521de1362c22adadbc0ce066050a17783
 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 1748d374abca..84fbf1591138 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -3327,6 +3327,8 @@ void xfrm_state_fini(struct net *net)
- 	xfrm_state_flush(net, 0, false);
- 	flush_work(&xfrm_state_gc_work);
- 
-+	synchronize_rcu();
-+
- 	WARN_ON(!list_empty(&net->xfrm.state_all));
- 
- 	for (i = 0; i <= net->xfrm.state_hmask; i++) {
--- 
-2.43.0
+The series didn't apply cleanly on current net-next. The
+base commit 321d1ee521de doesn't seem to be upstream yet, is
+this based on your set_channels v4 series?
 
+> change-id: 20260401-macb-context-bd0caf20414d
+> 
+> Best regards,
+> --
+> Théo Lebrun <theo.lebrun@bootlin.com>
+
+Thanks
+Nicolai
 
