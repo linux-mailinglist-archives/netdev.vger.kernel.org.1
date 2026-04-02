@@ -1,136 +1,129 @@
-Return-Path: <netdev+bounces-274505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274506-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iLgoFLBYzmkxnAYAu9opvQ
-	(envelope-from <netdev+bounces-274505-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:53:20 +0200
+	id OFOPHBxczmmgnAYAu9opvQ
+	(envelope-from <netdev+bounces-274506-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 14:07:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E397D3889C0
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:53:19 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 209DD388D1D
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 14:07:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C578A30819D2
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 11:49:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3915730300E6
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 11:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9CAB3CBE7D;
-	Thu,  2 Apr 2026 11:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6243B52EF;
+	Thu,  2 Apr 2026 11:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="HhKqODwm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F1gseKUt"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DFA3C9459
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 11:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097DE3C6A47;
+	Thu,  2 Apr 2026 11:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775130527; cv=none; b=GY+HBnwYT03Tr22qVRPMEx5sxm7A5JbguMvAYLNK6GFbPZ2f98wMW/cFzjzO5CZk4eOv3Wu2jRGmngTuHYbmDquy2s/bFYEoz5L8kat2krox1JB2IZA3V38ZVK6K3ExZ0XlbzCQ63jUh4UFQ6kiYEJyGjdBjhySa1HwjdZrpsa8=
+	t=1775130627; cv=none; b=EdKgJOy0ibouP7RVU2eSbTbVJUvcXGNZpDr9vDe/rw3HDU0PF7RUsILJnukyeoEHAhkF9BKAZ3WR/uygx2QFA7ISrQWGffcD9CKiGPNsVUHR/3rY/scFE8TPBLQQUj/xJm5pLDYLodHwhE4MtTR0lfWIC9d3+cqB0IYOkY1m7RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775130527; c=relaxed/simple;
-	bh=ZC0mFusg8QtnBwKB+xDHtVzUxcGHi5zJsTVo23phRnk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sC8aCnWdAOOUf1pDbs34w1yNraXy/lSXZT8rvJVI6srrWt2tSNtI9wrGVVnjvGz9W4Zxawqk2SOwqeSYf4O5vvOPA4OvjrlSwZQQc70fcxtCGSpCSSMPo8A6p9KdolMZGrDqNxxjFbOPgUfYSv63T9dBVXDCO3WPjBSWOzUt4Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=HhKqODwm; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1775130510;
-	bh=ZC0mFusg8QtnBwKB+xDHtVzUxcGHi5zJsTVo23phRnk=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=HhKqODwm+kGM+aPRLLSfa9xVjBI/60JnS0jLrIszoMnezZZlJRJBsnCsiFkFSwZ4Z
-	 K8BnXNeXqk0w4aTLrt5XFKYDvQM/gILFnVsy3R0lL2scmnXhPWiZSP7KQGEwL4eEko
-	 cheSaJsB/ETa/lYmBj1klXGPlXbddFCY7d+BXfoh7G09fe3CvZVWAM1Ca3LhL9frpp
-	 j+toIvYXx3M0xIKmbb3U6HnTRqk6SJQVshABQ4hx/kfuneXok5gVfWxKeemZ51yGoS
-	 H1/HcY0i5wlUP8+SWwXiYErbLDcjKwD/jJeV5A1lH7fqZLbe5RgCV7bgCUgziQWhES
-	 FF01HM/MfxS6Q==
-Received: from sparky.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 8D11060AF7;
-	Thu,  2 Apr 2026 19:48:29 +0800 (AWST)
-Message-ID: <f3d485e57d89b9939b1930eb7310db78f47d1756.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net-next 1/3] net: mctp: perform source address lookups
- when we populate our dst
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Paolo Abeni <pabeni@redhat.com>, Matt Johnston
- <matt@codeconstruct.com.au>,  "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Simon
- Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org
-Date: Thu, 02 Apr 2026 19:48:29 +0800
-In-Reply-To: <05c7a9b4-9874-42e6-acae-a5d66d33428f@redhat.com>
-References: 
-	<20260331-dev-mctp-null-eids-v1-0-b4d047372eaf@codeconstruct.com.au>
-	 <20260331-dev-mctp-null-eids-v1-1-b4d047372eaf@codeconstruct.com.au>
-	 <05c7a9b4-9874-42e6-acae-a5d66d33428f@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2+deb12u1 
+	s=arc-20240116; t=1775130627; c=relaxed/simple;
+	bh=vEoba+fMvFDveHycMeExA5QONJY3k3BViAl1ncI9DhY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=U8OFwzTF3VWCdct4qJg46sAuOH8CSd8IdklX8KUrud4neAjjQ7CbZfKtO0EUQZtKVaRN7P9bx5TZ53cjeD2PMDobuW8mhdHlly86KlhbcyvKsQAdOhWrGR3gmS4YUMb2mHGExouP5qq3TiolpnfKw5VICiOM+4Ls/U5aCkL5D0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F1gseKUt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14A61C19423;
+	Thu,  2 Apr 2026 11:50:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775130626;
+	bh=vEoba+fMvFDveHycMeExA5QONJY3k3BViAl1ncI9DhY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=F1gseKUtBpwrjvnxksoIBG1UFzJ0P4IhMA/UDXS9QXY8EJLsXdUk3+syxCRsS9Y6v
+	 0q0aTIFRj+xB3z2ZcP2qSGUnwnte4JjBTqBhdmzDtApdfiCs8k9nZg1Gp8cfDtRokN
+	 eCkWeWAdbfGa9CB0vBAxkx2Ae6KY2DqP68XJjP22s/5O60Gx4nag7rHtJWsyZvW9Q/
+	 E1TyDZlQgTuDLu6unRpdvgskq/3hx+WjDq8kpmf5EQLJSRRzH2su6/H/BXZVjBxQc1
+	 x4doTLfNRU2PioYPz2QkROFC/XWqe/9fX4Nuqvj5XhdxCg6o090Xm2NOlel1Q9nzp6
+	 uG2gh2STb9o0w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9EA7380820D;
+	Thu,  2 Apr 2026 11:50:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v4 0/2] net/x25: Fix overflow and double free
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177513060854.4158057.16194132816256127315.git-patchwork-notify@kernel.org>
+Date: Thu, 02 Apr 2026 11:50:08 +0000
+References: <20260331-x25_fraglen-v4-0-3e69f18464b4@dev.tdt.de>
+In-Reply-To: <20260331-x25_fraglen-v4-0-3e69f18464b4@dev.tdt.de>
+To: Martin Schiller <ms@dev.tdt.de>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, yimingqian591@gmail.com,
+ linux-x25@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, security@kernel.org
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
-	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
-	TAGGED_FROM(0.00)[bounces-274505-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274506-lists,netdev=lfdr.de,netdevbpf];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.989];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: E397D3889C0
+X-Rspamd-Queue-Id: 209DD388D1D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Pablo,
+Hello:
 
-> > Rather than querying the output device for its address in
-> > mctp_local_output, set up the source address when we're populating the
-> > dst structure. If no address is assigned, use MCTP_ADDR_NULL.
-> >=20
-> > This will allow us more flexibility when routing for NULL-source-eid
-> > cases. For now though, we still reject a NULL source address in the
-> > output path.
-> >=20
-> > We need to update the tests a little, so that addresses are assigned
-> > before we do the dst lookups.
-> >=20
-> > Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
->=20
-> Sashiko pointed to a possible pre-existent issue:
->=20
-> https://sashiko.dev/#/patchset/20260331-dev-mctp-null-eids-v1-0-b4d047372=
-eaf%40codeconstruct.com.au
->=20
-> please have a look and follow-up if needed.
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Yes, I've just been checking that out this afternoon. While there's
-nothing pressing there (the findings are somewhat valid, but don't
-affect any typical behaviour), I think it's worth a fix.
+On Tue, 31 Mar 2026 09:43:16 +0200 you wrote:
+> This patch set includes 2 fixes:
+> 
+> The first removes a potential double free of received skb
+> The second fixes an overflow when accumulating packets with the more-bit
+> set.
+> 
+> Signed-off-by: Martin Schiller <ms@dev.tdt.de>
+> 
+> [...]
 
-Given the merge to net-next, I assume a patch on top of the series is in
-order, but let me know if you'd like something else.
+Here is the summary with links:
+  - [net,v4,1/2] net/x25: Fix potential double free of skb
+    https://git.kernel.org/netdev/net/c/d10a26aa4d07
+  - [net,v4,2/2] net/x25: Fix overflow when accumulating packets
+    https://git.kernel.org/netdev/net/c/a1822cb524e8
 
-Cheers,
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Jeremy
 
