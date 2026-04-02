@@ -1,174 +1,199 @@
-Return-Path: <netdev+bounces-274627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274768-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MOY3DEmfzmlZpAYAu9opvQ
-	(envelope-from <netdev+bounces-274627-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:54:33 +0200
+	id 2FkuIrT7zmn7sAYAu9opvQ
+	(envelope-from <netdev+bounces-274768-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 01:28:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2819638C39B
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:54:32 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F340038F38E
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 01:28:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4B2F6301492A
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 16:36:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 78D76306C84F
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 23:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A13233FE2F;
-	Thu,  2 Apr 2026 16:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F09CC37F75A;
+	Thu,  2 Apr 2026 23:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OwhXBHWn"
+	dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b="ArlR5UpR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274B526E6E1
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 16:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D447A371894;
+	Thu,  2 Apr 2026 23:26:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775147807; cv=none; b=VJHGNSxvJiCTQxksV77SoYpQWPitq6h3j/mJsm9BSmmNq6vPfVSZL+8kuPtdoSbQiOxX1Xoc6EMUpHN7Lsj0OpknaM4FErG8anHt/tV2gvoHFinZdJXXXL2srLNL05rKXT+IZ+6FhaDLJCet3z6YIykZWnckUbLg37KHXDeFaK8=
+	t=1775172405; cv=none; b=g8y0cE7dh3snImXda9EcKKgNTLt9GFS4MsESi9Lm0k3z/4+C4h3fMePXCVyLElPN+pZ3Sdeu9g+bu8RrYIZNd24SdTTiQJvss4e+PyAA8WC5U/tgNevh3gdM2Qmc7ZkRDW3/p/zkmI9xNXLQqDPPhuBYpBksnBKmAALpkIbFIo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775147807; c=relaxed/simple;
-	bh=uLmS0HsUDr2BokeD+jSdwx3Xz2Gctb+uLNXQ4boAXU0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=MN45fptqyN2VOsMmNUhZYq0G6/o8MoEFoK8UNVHWkxyyXVW4vUKtT4w1/B9j6/9/Wq2kfimnSyefHKo64n+PixCvYuR8bDBJXYlSPMBumlLHVm7SfbToefT3ZItVeHmE3Gv89sJ7VtxCWMdhIJwx5/MEHTrolnz9KLeMpHukQ3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OwhXBHWn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D028C19423;
-	Thu,  2 Apr 2026 16:36:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775147806;
-	bh=uLmS0HsUDr2BokeD+jSdwx3Xz2Gctb+uLNXQ4boAXU0=;
-	h=From:Date:Subject:To:Cc:From;
-	b=OwhXBHWnXxQbgi+Lr/d+FvS3AagvKuOJYOhfaXr08zbUSER3M5c3OxYjwjYv1c0Tj
-	 ZF2yShxfaOil38PS1vqkSxJnvE4VW98G385tH3yHFDyuW4QVLvnkI7oY+1zX0wS5zg
-	 hw9sCi/Ys6iEnDf6wIq55kG1f6CJQPU6PonA/mEcjhwBiuYNrf6y2pmrMvPfzPPoFW
-	 Krb47bfx+9KYhZA1PL+O/O6uO0BY2p5MFBFgTYwUbbp/cN5PjKyosdYEEccBIkFbuj
-	 w57xRsiPbM1DoOoiRjuGtpRRTujC1WyHHDN5ub32eSW8FfraqyrjDtfc/fPGKCMFUD
-	 KDfUjKtjwIyuA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Thu, 02 Apr 2026 18:36:28 +0200
-Subject: [PATCH net] net: airoha: Add dma_rmb() and READ_ONCE() in
- airoha_qdma_rx_process()
+	s=arc-20240116; t=1775172405; c=relaxed/simple;
+	bh=OyFXrtaIREt5Mvg5IohzDWe1YdeCFr+GRBZBVtcHM3w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=smn4FKMtrtn970vmYsphTJCq4hd8EfpHu8Hpx+E484TgF3Ia73bDETLJOW2AdEpB49lfn0HktvINSCA7su3cQyP8+29T+ZEhH4pTBFdZtS+cNrm+Rz/gUn5IOaQ53s7CtvIjmXdwdxvIL7IV+Mvr8rq9362GnmSTTSDiSJepAUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ruc.edu.cn; spf=pass smtp.mailfrom=ruc.edu.cn; dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b=ArlR5UpR; arc=none smtp.client-ip=45.254.49.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ruc.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ruc.edu.cn
+Received: from lwz.tail698a0e.ts.net (gy-adaptive-ssl-proxy-4-entmail-virt151.gy.ntes [36.112.3.244])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 3956a558e;
+	Fri, 3 Apr 2026 00:36:50 +0800 (GMT+08:00)
+From: Wenzhao Liao <wenzhaoliao@ruc.edu.cn>
+To: rust-for-linux@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	ojeda@kernel.org,
+	boqun@kernel.org,
+	gary@garyguo.net,
+	bjorn3_gh@protonmail.com,
+	lossin@kernel.org,
+	a.hindborg@kernel.org,
+	aliceryhl@google.com,
+	tmgross@umich.edu,
+	dakr@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: [RFC PATCH 0/6] rust: net: introduce minimal rtnl/netdevice abstractions and nlmon reference driver
+Date: Thu,  2 Apr 2026 12:36:34 -0400
+Message-Id: <20260402163640.1079056-1-wenzhaoliao@ruc.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260402-airoha_qdma_rx_process-fix-reordering-v1-1-53278474f062@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2N0QrCMAwAf2Xk2UCNdoq/IqPUNW55sJ2JyGDs3
- w0+Hhx3GxirsMGt20D5KyatOhwPHYxzrhOjFGegQH04B8Is2uac3uWVk65p0TayGT5lReWmxXN
- 1wgvRKVwpxkcfwVuLshv/zx0qf2DY9x9LzFK9fAAAAA==
-X-Change-ID: 20260402-airoha_qdma_rx_process-fix-reordering-722308255b65
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Xuegang Lu <xuegang.lu@airoha.com>, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- netdev@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-HM-Tid: 0a9d4f0dfe2803a2kunm6754def456bf0d
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlDGk1CVkxCHUMdH05OTU1JT1YeHw5VEwETFhoSFy
+	QUDg9ZV1kYEgtZQVlITVVKSklVSFVJT09ZV1kWGg8SFR0UWUFZT0tIVUpLSEpOTE5VSktLVUpCS0
+	tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=ArlR5UpRSpw/UaSNxCKSdQVuQLlvpDNJr+LXgkmWpRdgX3oYdrC9NjHbVluj5Oiv7CryXyr5EoXvAxWYps5RlJ0xbrFwchRORL8qh1dMgOjGoxxlLvA09sN11o1+DnOZNeclhK8W3Mk+wZoydsXAurpljLZjhz//oWbNgnyP964=; c=relaxed/relaxed; s=default; d=ruc.edu.cn; v=1;
+	bh=YKAAwYb4mtekaS6vgI940JW2tJJCQEqwWtepoxJLGfI=;
+	h=date:mime-version:subject:message-id:from;
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[ruc.edu.cn,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	R_DKIM_ALLOW(-0.20)[ruc.edu.cn:s=default];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274627-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,garyguo.net,protonmail.com,google.com,umich.edu,lunn.ch,davemloft.net,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274768-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[wenzhaoliao@ruc.edu.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[ruc.edu.cn:+];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 2819638C39B
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,ruc.edu.cn:dkim,ruc.edu.cn:mid]
+X-Rspamd-Queue-Id: F340038F38E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add missing dma_rmb() in airoha_qdma_rx_process routine to make sure the
-DMA read operations are completed when the NIC reports the processing on
-the current descriptor is done. Moreover, add missing READ_ONCE() in
-airoha_qdma_rx_process() for DMA descriptor control fields in order to
-avoid any compiler reordering.
+Hi,
 
-Fixes: 23020f0493270 ("net: airoha: Introduce ethernet support for EN7581 SoC")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+This RFC proposes a minimal set of Rust networking abstractions for
+link-type drivers, together with a Rust implementation of nlmon as a
+reference driver.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 95ba99b89428e4cafb91ff7813e43ffeb38e6d9b..29dea8b35f64bfdcf88bc09fd711e0d8b4f7b6fa 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -612,15 +612,17 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 	while (done < budget) {
- 		struct airoha_queue_entry *e = &q->entry[q->tail];
- 		struct airoha_qdma_desc *desc = &q->desc[q->tail];
--		u32 hash, reason, msg1 = le32_to_cpu(desc->msg1);
--		struct page *page = virt_to_head_page(e->buf);
--		u32 desc_ctrl = le32_to_cpu(desc->ctrl);
-+		u32 hash, reason, msg1, desc_ctrl;
- 		struct airoha_gdm_port *port;
- 		int data_len, len, p;
-+		struct page *page;
- 
-+		desc_ctrl = le32_to_cpu(READ_ONCE(desc->ctrl));
- 		if (!(desc_ctrl & QDMA_DESC_DONE_MASK))
- 			break;
- 
-+		dma_rmb();
-+
- 		q->tail = (q->tail + 1) % q->ndesc;
- 		q->queued--;
- 
-@@ -637,6 +639,7 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 		if (p < 0 || !eth->ports[p])
- 			goto free_frag;
- 
-+		page = virt_to_head_page(e->buf);
- 		port = eth->ports[p];
- 		if (!q->skb) { /* first buffer */
- 			q->skb = napi_build_skb(e->buf, q->buf_size);
-@@ -670,8 +673,8 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 			 * DMA descriptor. Report DSA tag to the DSA stack
- 			 * via skb dst info.
- 			 */
--			u32 sptag = FIELD_GET(QDMA_ETH_RXMSG_SPTAG,
--					      le32_to_cpu(desc->msg0));
-+			u32 msg0 = le32_to_cpu(READ_ONCE(desc->msg0));
-+			u32 sptag = FIELD_GET(QDMA_ETH_RXMSG_SPTAG, msg0);
- 
- 			if (sptag < ARRAY_SIZE(port->dsa_meta) &&
- 			    port->dsa_meta[sptag])
-@@ -679,6 +682,7 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 						  &port->dsa_meta[sptag]->dst);
- 		}
- 
-+		msg1 = le32_to_cpu(READ_ONCE(desc->msg1));
- 		hash = FIELD_GET(AIROHA_RXD4_FOE_ENTRY, msg1);
- 		if (hash != AIROHA_RXD4_FOE_ENTRY)
- 			skb_set_hash(q->skb, jhash_1word(hash, 0),
+The scope is intentionally narrow. The series only tries to cover the
+pieces needed to model:
 
----
-base-commit: ec7067e661193403a7a00980bda8612db5954142
-change-id: 20260402-airoha_qdma_rx_process-fix-reordering-722308255b65
+- rtnl link registration and validation
+- net_device private state allocation
+- sk_buff transmit ownership
+- netlink tap lifetime management
+- per-device stats updates
 
-Best regards,
+nlmon is a useful target for this because it is small, self-contained,
+and exercises rtnl registration, netdevice setup, tap lifecycle, and
+stats handling without introducing hardware-specific probe or teardown
+paths.
+
+The series is structured as follows:
+
+- patches 1-2 expose the required bindings and helper glue
+- patches 3-4 add the minimal Rust net abstractions
+- patch 5 adds the Rust nlmon reference driver
+- patch 6 adds scoped MAINTAINERS entries
+
+The driver itself is built with #![forbid(unsafe_code)] and does not
+call raw bindings directly. Unsafe is confined to small abstraction
+implementations under rust/kernel/net/.
+
+Validation so far:
+
+- drivers/net/nlmon_rust.o builds successfully
+- x86_64 bzImage builds successfully
+- QEMU smoke passes:
+  ip link add nlmon0 type nlmon
+  ip link set nlmon0 up
+  ip link show nlmon0
+  ip link set nlmon0 down
+  ip link del nlmon0
+
+The Rust implementation is kept behind CONFIG_NLMON_RUST so the new
+abstractions and the reference driver can be reviewed without displacing
+the existing C implementation.
+
+Feedback on the abstraction shape, the lifetime model, and whether
+nlmon is a suitable reference driver would be especially appreciated.
+
+I would also be grateful for guidance on any aspect of this series that
+does not match Rust-for-Linux or netdev expectations. If the direction
+is useful but the submission, factoring, or abstraction boundary needs
+to change, I am happy to revise the series accordingly and resubmit.
+
+Thanks,
+Wenzhao Liao
+
+Wenzhao Liao (6):
+  rust: bindings: expose networking headers needed by nlmon
+  rust: helpers: add net_device and sk_buff helper wrappers
+  rust: net: add minimal skbuff, netdevice, and stats abstractions
+  rust: net: add minimal rtnl registration and netlink tap support
+  net: add Rust reference driver for nlmon
+  MAINTAINERS: add Rust net and nlmon entries
+
+ MAINTAINERS                     |  19 ++
+ drivers/net/Kconfig             |   9 +
+ drivers/net/Makefile            |   6 +-
+ drivers/net/nlmon_rust.rs       |  93 ++++++++++
+ rust/bindings/bindings_helper.h |   4 +
+ rust/helpers/helpers.c          |   1 +
+ rust/helpers/net.c              |  19 ++
+ rust/kernel/net.rs              |   5 +
+ rust/kernel/net/netdevice.rs    | 319 ++++++++++++++++++++++++++++++++
+ rust/kernel/net/netlink_tap.rs  |  89 +++++++++
+ rust/kernel/net/rtnl.rs         | 221 ++++++++++++++++++++++
+ rust/kernel/net/skbuff.rs       |  67 +++++++
+ rust/kernel/net/stats.rs        |  17 ++
+ 13 files changed, 868 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/nlmon_rust.rs
+ create mode 100644 rust/helpers/net.c
+ create mode 100644 rust/kernel/net/netdevice.rs
+ create mode 100644 rust/kernel/net/netlink_tap.rs
+ create mode 100644 rust/kernel/net/rtnl.rs
+ create mode 100644 rust/kernel/net/skbuff.rs
+ create mode 100644 rust/kernel/net/stats.rs
+
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
-
+2.34.1
 
