@@ -1,266 +1,234 @@
-Return-Path: <netdev+bounces-274377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274378-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kO1gCCgEzml+kQYAu9opvQ
-	(envelope-from <netdev+bounces-274377-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 07:52:40 +0200
+	id QKbaDDwEzml+kQYAu9opvQ
+	(envelope-from <netdev+bounces-274378-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 07:53:00 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 278D13842F7
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 07:52:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D414A384300
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 07:52:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AE5DB304135A
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 05:50:56 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 02C81302D446
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 05:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3CBE352C51;
-	Thu,  2 Apr 2026 05:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A82135CBD6;
+	Thu,  2 Apr 2026 05:52:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="K0/pktxt"
+	dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b="lnwnmM1U"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE712FE582
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 05:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+Received: from outbound.baidu.com (jpmx.baidu.com [119.63.196.201])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id AC23A2FE582;
+	Thu,  2 Apr 2026 05:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.63.196.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775109053; cv=none; b=BM4eZpf7oBBOeQkNpn6wRczMmp4GDOJQ3T8g6V/4nblo6b8g9oLzrBA6OJG5MKizsCWxN6eXspRQz3YXjIbIonxneyf/Mp0uxoCaWsTL98cvetg/PDz6SIsC8TALTwu3geK1aPY+Gozi4WLI/dASJfgoXthhamW1iIdtXDeHmzg=
+	t=1775109159; cv=none; b=a4vX6z7L5kCoMd9iqzAHfwqgPQmQU7vMm7SdNy2ZH76ySmSACQsigwwdhQyCk1F8byhdcas9jmBi5sYVCzpQYQQSO1QwGUpu+wDsRkMTJwxIHXQKKxAv6hVkcYZY0cNVcU19aYzfJe6BqR5u8p+XYJy2pnxrdd8HDvRo+lcn/dU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775109053; c=relaxed/simple;
-	bh=HBQBkDwJxeVCMUVrUn68E5qKSQ0UstcHwEs1oNJboiM=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=SsRJjYwjSWufM7DZUoKu/mmox0yp9XHjVmDJrrLPcrxyGpZVdYoEZ9qd0QVZgGfC18ZGNywVMvFe8J+VFpuo0YJRnJJfLTMrhmi+j/UkloZ+ZUmdkbU9aT1yBZS/LtJKJmX6+CayJbaUeb5yfonh8pAikVXB/i/8VRtlOYGxTlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=K0/pktxt; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1775109159; c=relaxed/simple;
+	bh=PQppXGaETl7HsBl4FNqbEK6u0tJ+4rAmM7mQIV1pMso=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FabLClXTWZ9XJNsfqQs7NWE1m+BZ2RvUBpM1d6JudHwyS4gw0Ngu1vN6YspCYXHDX2vZT1/3FhL4VC10OazojjINdA4wc6w5XNzJGX2IKSdeIrbKP0sTL4oVIpEto0MQV5DOe/87x6d29QBZtBwgisqiSnlc69CC/lYgRWGuSIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b=lnwnmM1U; arc=none smtp.client-ip=119.63.196.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+X-MD-Sfrom: lirongqing@baidu.com
+X-MD-SrcIP: 172.31.50.47
+From: lirongqing <lirongqing@baidu.com>
+To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
+	Boris Pismenny <borisp@nvidia.com>, Richard Cochran
+	<richardcochran@gmail.com>, Cosmin Ratiu <cratiu@nvidia.com>, Dragos Tatulea
+	<dtatulea@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Li RongQing
+	<lirongqing@baidu.com>, Kees Cook <kees@kernel.org>, Akiva Goldberger
+	<agoldberger@nvidia.com>, Simon Horman <horms@kernel.org>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
+Subject: [PATCH net-next] net/mlx5: Use dma_wmb() for completion queue doorbell updates
+Date: Thu, 2 Apr 2026 01:52:06 -0400
+Message-ID: <20260402055206.2311-1-lirongqing@baidu.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775109039;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A2IxQXDTDghIiyuotp3O84vD+rLQkEIhubPuL16ueno=;
-	b=K0/pktxteFCz4rfz1V6ek6NdCs1QO9Re6Gv5UDhf8sz8XK+V59QPpgEvkm74cswxBJHXHs
-	pv8fd/vJIIqkQ8XUFPwhNHmbffCFCKQtkgsH4C/1PMElEP0dI/5xtJVWTEzMH3LCgYiBhd
-	/kgc/b5ujgIDPiSnz6qRw+AE59z5xpE=
-Date: Thu, 02 Apr 2026 05:50:33 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Frank Wunderlich" <frank.wunderlich@linux.dev>
-Message-ID: <4dbc3dabfdbc3bdf6b8d411e62a27fa8988e3388@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH v4 net-next 5/5] net: pcs: pcs-mtk-lynxi: deprecate
- "mediatek,pnswap"
-To: "Vladimir Oltean" <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org, "Daniel
- Golle" <daniel@makrotopia.org>, "Horatiu Vultur"
- <horatiu.vultur@microchip.com>, "=?utf-8?B?QmriiJriiI9ybiBNb3Jr?="
- <bjorn@mork.no>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "Heiner Kallweit"
- <hkallweit1@gmail.com>, "Russell King" <linux@armlinux.org.uk>, "David S.
- Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski"
- <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Matthias
- Brugger" <matthias.bgg@gmail.com>, "AngeloGioacchino Del Regno"
- <angelogioacchino.delregno@collabora.com>, "Eric Woudstra"
- <ericwouds@gmail.com>, "Alexander Couzens" <lynxis@fe80.eu>, "Chester A.
- Unal" <chester.a.unal@arinc9.com>, "DENG Qingfang" <dqfext@gmail.com>,
- "Sean Wang" <sean.wang@mediatek.com>, "Felix Fietkau" <nbd@nbd.name>
-In-Reply-To: <20260330190443.bol5vjfqqitz7kuo@skbuf>
-References: <20260119091220.1493761-1-vladimir.oltean@nxp.com>
- <20260119091220.1493761-6-vladimir.oltean@nxp.com>
- <e0ad52862d34cf4e0169c9850a7f164f127d0093@linux.dev>
- <20260326215404.krh6v3mmnqdlndli@skbuf>
- <d9639ac711ff8f1186a684fa120ba77247669051@linux.dev>
- <20260330190443.bol5vjfqqitz7kuo@skbuf>
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain
+X-ClientProxiedBy: bjkjy-exc13.internal.baidu.com (172.31.51.13) To
+ bjkjy-exc3.internal.baidu.com (172.31.50.47)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=baidu.com;
+	s=selector1; t=1775109140;
+	bh=OkYJlBEhGU26NMF/nb5A1ytM4XV7GIufN+Se8VGdGyc=;
+	h=From:To:Subject:Date:Message-ID:Content-Type;
+	b=lnwnmM1UPi9HcCJlunM4oqGJy6xxHBysvOaX/ybrWHhwb82H+z3eM5+AEQtwK0wPW
+	 fqvG+O8pY4jziu04XNiwfmelBPvqcXue/lyQmgL3CVXBzB6s6IxtIXwGdeoaQ/nMgB
+	 Bkx6PNGY/OZZgt/EusO6WFgnbIWRQ+jZdnt+OiMLJgUugz8KV7sfgQRYNCaYN5l6r+
+	 t4aVAEt0g7mlp1DhdAa66UK2G7z5M2qsQc2HecvvvNP87yTvK+eXyITob2zyel5kHU
+	 4MxZ2lvw+nj0OkhaaRycMZvz1PNoBvDcqAVRyua5wECOYmRLSZfgUVVlI3BmRGfzZo
+	 eV5xDsaL1JkKw==
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-274378-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274377-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[27];
 	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.infradead.org,makrotopia.org,microchip.com,mork.no,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,collabora.com,fe80.eu,arinc9.com,mediatek.com,nbd.name];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[nvidia.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,gmail.com,fomichev.me,baidu.com,vger.kernel.org];
+	NEURAL_SPAM(0.00)[0.982];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	DMARC_DNSFAIL(0.00)[baidu.com : SPF/DKIM temp error,quarantine];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[frank.wunderlich@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[lirongqing@baidu.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[baidu.com:?];
+	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:url,linux.dev:dkim,linux.dev:mid,0.0.0.0:email,0.230.104.96:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,0.0.0.1:email]
-X-Rspamd-Queue-Id: 278D13842F7
+	R_DKIM_TEMPFAIL(0.00)[baidu.com:s=selector1];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: D414A384300
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+From: Li RongQing <lirongqing@baidu.com>
 
-i tried using these properties in sgmiisys0 node (which should be mapped =
-to mac0 and the mt7530 switch) without success [1].
+dma_wmb() barriers are specifically for ordering writes to DMA
+coherent memory that is accessible to both the CPU and DMA capable
+devices.
 
-it looks like these properties are not read somewhere.
+The dma_wmb() barrier is lighter than wmb() on some architectures
+because it only ensures ordering for DMA writes, not for all writes
+including MMIO accesses.
 
-the flow is
+In the MLX5 driver, completion queue (CQ) doorbell records are
+allocated as DMA coherent memory via mlx5_dma_zalloc_coherent_node().
+The CQ update pattern is:
+  1. Update CQ space (device reads via DMA)
+  2. Update doorbell record (device reads via DMA)
+  3. Memory barrier
+  4. Enable more CQEs
 
-mtk_probe (eth driver)
+Since only DMA coherent memory accesses are involved (no MMIO accesses
+follow), can safely use dma_wmb() instead of wmb().
 
-if (MTK_HAS_CAPS(eth->soc->caps, MTK_SGMII)) {
-	err =3D mtk_sgmii_init(eth);
+This change improves performance slightly on architectures where
+dma_wmb() is lighter than wmb().
 
-and there calling mtk_pcs_lynxi_create with the sgmiisys-node (for each m=
-ac, so imho mac0=3Dsgmiisys0)
-but handling the sgmiisys only as syscon, not a "real" pcs node [2].
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c    | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c    | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_rx.c     | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tx.c     | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/fpga/conn.c | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/lib/aso.c   | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/wc.c        | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
 
-but your new code calls phy_get_tx_polarity and should read out this prop=
-erties, but from subnode "pcs", so next try was
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
+index 1b76647..7bd6dfc 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
+@@ -259,7 +259,7 @@ static bool mlx5e_ptp_poll_ts_cq(struct mlx5e_cq *cq, int napi_budget)
+ 	mlx5_cqwq_update_db_record(cqwq);
+ 
+ 	/* ensure cq space is freed before enabling more cqes */
+-	wmb();
++	dma_wmb();
+ 
+ 	while (metadata_buff_sz > 0)
+ 		mlx5e_ptp_metadata_fifo_push(&ptpsq->metadata_freelist,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+index 80f9fc1..dde8856 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+@@ -805,7 +805,7 @@ bool mlx5e_poll_xdpsq_cq(struct mlx5e_cq *cq)
+ 	mlx5_cqwq_update_db_record(&cq->wq);
+ 
+ 	/* ensure cq space is freed before enabling more cqes */
+-	wmb();
++	dma_wmb();
+ 
+ 	sq->cc = sqcc;
+ 	return (i == MLX5E_TX_CQ_POLL_BUDGET);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+index 268e208..f17e7f1 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+@@ -2447,7 +2447,7 @@ int mlx5e_poll_rx_cq(struct mlx5e_cq *cq, int budget)
+ 	mlx5_cqwq_update_db_record(cqwq);
+ 
+ 	/* ensure cq space is freed before enabling more cqes */
+-	wmb();
++	dma_wmb();
+ 
+ 	return work_done;
+ }
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+index 9f02726..7ba319f 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+@@ -849,7 +849,7 @@ bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
+ 	mlx5_cqwq_update_db_record(&cq->wq);
+ 
+ 	/* ensure cq space is freed before enabling more cqes */
+-	wmb();
++	dma_wmb();
+ 
+ 	sq->dma_fifo_cc = dma_fifo_cc;
+ 	sq->cc = sqcc;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fpga/conn.c b/drivers/net/ethernet/mellanox/mlx5/core/fpga/conn.c
+index 1f6bde5..1341874 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fpga/conn.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fpga/conn.c
+@@ -384,7 +384,7 @@ static inline void mlx5_fpga_conn_cqes(struct mlx5_fpga_conn *conn,
+ 
+ 	mlx5_fpga_dbg(conn->fdev, "Re-arming CQ with cc# %u\n", conn->cq.wq.cc);
+ 	/* ensure cq space is freed before enabling more cqes */
+-	wmb();
++	dma_wmb();
+ 	mlx5_fpga_conn_arm_cq(conn);
+ }
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/aso.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/aso.c
+index 614cd57..8f7a89a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/aso.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/aso.c
+@@ -421,7 +421,7 @@ int mlx5_aso_poll_cq(struct mlx5_aso *aso, bool with_data)
+ 	mlx5_cqwq_update_db_record(&cq->wq);
+ 
+ 	/* ensure cq space is freed before enabling more cqes */
+-	wmb();
++	dma_wmb();
+ 
+ 	if (with_data)
+ 		aso->cc += MLX5_ASO_WQEBBS_DATA;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/wc.c b/drivers/net/ethernet/mellanox/mlx5/core/wc.c
+index 7d3d4d7..1afbdd19 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/wc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/wc.c
+@@ -314,7 +314,7 @@ static void mlx5_wc_post_nop(struct mlx5_wc_sq *sq, unsigned int *offset,
+ 	/* ensure doorbell record is visible to device before ringing the
+ 	 * doorbell
+ 	 */
+-	wmb();
++	dma_wmb();
+ 
+ 	mlx5_iowrite64_copy(sq, mmio_wqe, sizeof(mmio_wqe), *offset);
+ 
+-- 
+2.9.4
 
-&sgmiisys0 {
-	pcs {
-		rx-polarity =3D <PHY_POL_NORMAL>;
-		tx-polarity =3D <PHY_POL_INVERT>;
-	};
-};
-
-which results in completely strange behaviour (looks like sgmiisys1 is ma=
-pped to mac0, but based on code in mtk_sgmii_init 0=3D0 should be right):
-
-[    2.765218] SGMSYS_QPHY_WRAP_CTRL =3D 0x501, will write 0x500
-[    9.143849] SGMSYS_QPHY_WRAP_CTRL =3D 0x500, will write 0x501
-
-but nevertheless i tried changing sgmiisys0 to sgmiisys1 and got the dame=
- result as before
-
-[    2.713644] SGMSYS_QPHY_WRAP_CTRL =3D 0x501, will write 0x500
-[    9.061509] SGMSYS_QPHY_WRAP_CTRL =3D 0x500, will write 0x500
-
-i can only change the second serdes with sgmiisys0, but not the first.
-
-mapping between mac and sgmiisys in dts in mt7986a.dtsi [3] are like this=
-:
-
-eth: ethernet@15100000 {
-	compatible =3D "mediatek,mt7986-eth";
-	mediatek,sgmiisys =3D <&sgmiisys0>, <&sgmiisys1>;
-	...
-};
-
-&eth {
-	status =3D "okay";
-
-	gmac0: mac@0 {
-		compatible =3D "mediatek,eth-mac";
-	...
-	};
-
-	gmac1: mac@1 {
-		compatible =3D "mediatek,eth-mac";
-	...
-	};
-};
-
-maybe it is time to revive the PCS framework discussion ([4]-[6])?
-
-[1] https://github.com/frank-w/BPI-Router-Linux/commit/4846a7bb352fe59111=
-36cba33813f099bac035fd
-[2] https://elixir.bootlin.com/linux/v7.0-rc4/source/drivers/net/ethernet=
-/mediatek/mtk_eth_soc.c#L5001
-[3] https://elixir.bootlin.com/linux/v7.0-rc4/source/arch/arm64/boot/dts/=
-mediatek/mt7986a.dtsi#L528
-
-[4] * https://patchwork.kernel.org/project/netdevbpf/patch/20250610233134=
-.3588011-4-sean.anderson@linux.dev/ (v6)
-> pcs-framework itself had not yet got a response from netdev maintainer =
-(only other parts)
-[5] * https://patchwork.kernel.org/project/netdevbpf/patch/20250511201250=
-.3789083-4-ansuelsmth@gmail.com/ (v4)
-> discussion: https://lore.kernel.org/netdev/20250511201250.3789083-1-ans=
-uelsmth@gmail.com/
-[6] * https://patchwork.kernel.org/project/netdevbpf/patch/ba4e359584a6b3=
-bc4b3470822c42186d5b0856f9.1721910728.git.daniel@makrotopia.org/
-> discussion: https://patchwork.kernel.org/project/netdevbpf/patch/8aa905=
-080bdb6760875d62cb3b2b41258837f80e.1702352117.git.daniel@makrotopia.org/
-
-Am 30. M=C3=A4rz 2026 um 21:04 schrieb "Vladimir Oltean" <vladimir.oltean=
-@nxp.com mailto:vladimir.oltean@nxp.com?to=3D%22Vladimir%20Oltean%22%20%3=
-Cvladimir.oltean%40nxp.com%3E >:
->=20
->=20Hi Frank,
->=20
->=20On Mon, Mar 30, 2026 at 05:52:17PM +0000, Frank Wunderlich wrote:
->=20
->=20>=20
->=20> Hi Vladimir
-> >=20=20
->=20>  Thanks for the patch and sorry for my delay...i was away this week=
-end so i was not able to test.
-> >=20=20
->=20>  traffic works again (but there is only read now) and this is the r=
-esult of your debug prints:
-> >=20=20
->=20>  root@bpi-r3:~# mailto:root@bpi-r3:~#  dmesg | grep SGMSYS_QPHY_WRA=
-P_CTRL
-> >  [ 2.706963] SGMSYS_QPHY_WRAP_CTRL =3D 0x501, intending to write 0x50=
-0
-> >  [ 9.134081] SGMSYS_QPHY_WRAP_CTRL =3D 0x500, intending to write 0x50=
-0
-> >=20=20
->=20>  R3/mt7986 has 2 MAC, and switch is on the first, so value will cha=
-nge, not sure why this is different.
-> >=20=20
->=20>  i have not found SGMSYS_QPHY_WRAP_CTRL or something related with p=
-olarity in ethernet/mac-
-> >  (drivers/net/ethernet/mediatek/mtk_eth_soc.c) or switch-driver (driv=
-ers/net/dsa/mt7530{,-mdio}.c)
-> >  in case they manipulate this register too (of course they should not=
-). Also looked into the pcs-handling
-> >  in both drivers, but see nothing related to polarity. And looked for=
- possible duplicate register const
-> >  definition (other name for 0xec).
-> >=20
->=20This result means that your default QPHY_WRAP_CTRL register value has
-> the SGMII_PN_SWAP_TX bit set. Whether that comes from U-Boot or hardwar=
-e
-> default or otherwise, it doesn't really matter. Curious that the
-> SGMII_SW_RESET doesn't clear TX inversion, though. I guess you wouldn't
-> have documentation that would suggest this setting is sticky?
->=20
->=20In Documentation/devicetree/bindings/net/pcs/mediatek,sgmiisys.yaml,
-> it is not specified what happens when the "mediatek,pnswap" property is
-> missing. I thought the most logical thing would be for the lane
-> polarities to not be swapped - because how would you describe normal
-> lane polarities otherwise? My bad for thinking the original vendor
-> bindings were more sane than they were.
->=20
->=20The only way to describe the polarities that this SGMSYS block needs =
-on
-> a particular board is to use the newly introduced 'rx-polarity =3D
-> <PHY_POL_NORMAL>' and 'tx-polarity =3D <PHY_POL_INVERT>'. Which I stron=
-gly
-> recommend you to do, even if the attached patch should restore
-> functionality with your current device tree.
->=20
-
-regards=20Frank
 
