@@ -1,113 +1,134 @@
-Return-Path: <netdev+bounces-274337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274338-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CBWgKU/bzWmliQYAu9opvQ
-	(envelope-from <netdev+bounces-274337-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 04:58:23 +0200
+	id qGN0OXDczWmliQYAu9opvQ
+	(envelope-from <netdev+bounces-274338-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 05:03:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30D9A382E51
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 04:58:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E3C0382EBF
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 05:03:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0B57B30C10D3
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 02:55:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 788D8305542E
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 03:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B25355F3A;
-	Thu,  2 Apr 2026 02:54:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC7B352C51;
+	Thu,  2 Apr 2026 03:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tJ9eLlfT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C9iYTT4r"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6423559F5;
-	Thu,  2 Apr 2026 02:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B41333F5BD
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 03:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775098497; cv=none; b=jBgYyK39p7ZqL5XA0Bx8BMAKcCX09DxcEowHQivnFB7kKIEox5SWKfInQOxrDgtkQS3y5HWwQhHDBytEpP1FW/AitPgL2kf6VitNmG7YFVn4RvuNjf1vSSAOXwDxWq+ISmWSFqPdklHKP7im3MWCHQJfev1Lh9WCtMTmtYK+bQ4=
+	t=1775098827; cv=none; b=U183z3mhlxwTdk5jDXKgN1g62oBpg4HQQ52zIXtiZCnGmVALwRIiDhVM3SjZ2nzcrXm60B6X4unbjpR7ob59FqCQBYj8Wx7GuFLPdSHDrzCT/8TtcH6s4Ir0Bpeh8+rilbtgGhHXCMuWUFfDIJ1AGBRO+c08m51F7rxG1pgassI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775098497; c=relaxed/simple;
-	bh=6y8m9lKrIl5oqGsP2iAAVKka5afAWJWZxkBTDRHd1Z4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=th4ji2dvtydBs8BcIpBshTq8OU4/4U5OFkVeEdDso8oDvffxjolN2WRcGLEye9ZoL9ueZIDZ6RDLQUGigALe49qhGT70g/havAuMNmgjAQIJsZf48pOZpD+zctfydXhKnj2dBRdGaAroaXrLDO2XWo7yxrbXYuXqjBKnkrMOhJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tJ9eLlfT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C47EC2BCAF;
-	Thu,  2 Apr 2026 02:54:57 +0000 (UTC)
+	s=arc-20240116; t=1775098827; c=relaxed/simple;
+	bh=/4lOMunxi9ShGwn4euLA0Eur+izGkkrnm06TTE9GlhU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PVN7ieJUiWL70h8w06THG+lJn/wmtX7b7bfRfVIXdb/LSkZQwmHKpZ0qyfzu8Rk6BDK5ZX1KNvh7XPK8gIRyeZlkjZ2W3LTejnQ/LqXExosPF39ADtl06lGzhTaQq0FuD3gO5Okyhcs3v75yYRUaSa5E59Hepwvk8AC4RduNj+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C9iYTT4r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A22FDC4CEF7;
+	Thu,  2 Apr 2026 03:00:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775098497;
-	bh=6y8m9lKrIl5oqGsP2iAAVKka5afAWJWZxkBTDRHd1Z4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tJ9eLlfTajYGCPQcAsEInjeUCf5cS9tbvNNfcgBJY4GVbjFsVZTUCcNwXi1Ky4/Jq
-	 4N3i6NXG6RmVUdKs3yLa54LtCWq0F1yCfXkzAMCFGsabbWT5EaY+ys6JWdlvXL8mo+
-	 jLaqml9Sqqy9k6SSu6H8jpUkNKj4Jc4A2bG71+cIZttkbh1pPzV3rK8Hi3Qly5pIlO
-	 sOtglWv1iy+UWzHZG92tm1xADknKFqVOtwkUwTHL52Ik1IdXIQaUWNwzm8hnyc8YxX
-	 qjGXKVL1CMMqgUZ9k6lIIpywzVTcZ19LBP4Dfb+LYl+IW13t37KGFDDKzDnQ/b6feC
-	 m4PO6/8Ws7JWA==
-Date: Wed, 1 Apr 2026 19:54:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Cosmin Ratiu <cratiu@nvidia.com>, <netdev@vger.kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Shuah
- Khan <shuah@kernel.org>, <linux-kselftest@vger.kernel.org>, Dragos Tatulea
- <dtatulea@nvidia.com>
-Subject: Re: [PATCH net v6 0/4] macsec: Add support for VLAN filtering in
- offload mode
-Message-ID: <20260401195456.6158e9cb@kernel.org>
-In-Reply-To: <20260330130130.989236-1-cratiu@nvidia.com>
-References: <20260330130130.989236-1-cratiu@nvidia.com>
+	s=k20201202; t=1775098826;
+	bh=/4lOMunxi9ShGwn4euLA0Eur+izGkkrnm06TTE9GlhU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=C9iYTT4rpcf572uGkYLNpi0ArYVYKCSPM00MO65ZoOefo7xZ2dKrWnx2nUT1mN5Va
+	 g14HtHSvtq89eu2Ddk81xs9E5Vtvg4VIHXaEVC39Z+IEO3FZGvkWRmia1BGnLk/nXF
+	 GFZ9iYcXzzvU1XLKAPvgGLGqfQGGYIOSgsVKYNSbvz6hOKWKvYisJYSOiM3umMJaaQ
+	 gSobegxIOLxZXvkMXYk6l8f4xokRpomceUg+kt8yK+oWsvqfmWHLHGqS4P2iRpmz1R
+	 y6fB2PPvighLCEFqhD48y/2jchcBxbqyBVYKT+YbdlfvMNUPyqWxw8qADNZSERlACp
+	 /XBegIJPtpHkA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CE123808203;
+	Thu,  2 Apr 2026 03:00:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RESEND net v2 1/1] net/sched: sch_netem: fix out-of-bounds
+ access in packet corruption
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177509880929.3966658.1444595257739812877.git-patchwork-notify@kernel.org>
+Date: Thu, 02 Apr 2026 03:00:09 +0000
+References: 
+ <45435c0935df877853a81e6d06205ac738ec65fa.1774941614.git.kanolyc@gmail.com>
+In-Reply-To: 
+ <45435c0935df877853a81e6d06205ac738ec65fa.1774941614.git.kanolyc@gmail.com>
+To: Yucheng Lu <kanolyc@gmail.com>
+Cc: security@kernel.org, stephen@networkplumber.org, netdev@vger.kernel.org,
+ jhs@mojatatu.com, jiri@resnulli.us, davem@davemloft.net, Jason@zx2c4.com,
+ kees@kernel.org, yifanwucs@gmail.com, tomapufckgml@gmail.com,
+ tanyuan98@outlook.com, bird@lzu.edu.cn, z1652074432@gmail.com
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274337-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,networkplumber.org,vger.kernel.org,mojatatu.com,resnulli.us,davemloft.net,zx2c4.com,gmail.com,outlook.com,lzu.edu.cn];
+	TAGGED_FROM(0.00)[bounces-274338-lists,netdev=lfdr.de,netdevbpf];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.994];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 30D9A382E51
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4E3C0382EBF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 30 Mar 2026 16:01:26 +0300 Cosmin Ratiu wrote:
-> This short series adds support for VLANs in MACsec devices when offload
-> mode is enabled. This allows VLAN netdevs on top of MACsec netdevs to
-> function, which accidentally used to be the case in the past, but was
-> broken. This series adds back proper support.
-> 
-> As part of this, the existing nsim-only MACsec offload tests were
-> translated to Python so they can run against real HW and new
-> traffic-based tests were added for VLAN filter propagation, since
-> there's currently no uAPI to check VLAN filters.
+Hello:
 
-Hi Sabrina, how does this look to you?
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 31 Mar 2026 16:00:21 +0800 you wrote:
+> In netem_enqueue(), the packet corruption logic uses
+> get_random_u32_below(skb_headlen(skb)) to select an index for
+> modifying skb->data. When an AF_PACKET TX_RING sends fully non-linear
+> packets over an IPIP tunnel, skb_headlen(skb) evaluates to 0.
+> 
+> Passing 0 to get_random_u32_below() takes the variable-ceil slow path
+> which returns an unconstrained 32-bit random integer. Using this
+> unconstrained value as an offset into skb->data results in an
+> out-of-bounds memory access.
+> 
+> [...]
+
+Here is the summary with links:
+  - [RESEND,net,v2,1/1] net/sched: sch_netem: fix out-of-bounds access in packet corruption
+    https://git.kernel.org/netdev/net/c/d64cb81dcbd5
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
