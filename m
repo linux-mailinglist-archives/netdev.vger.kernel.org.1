@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-274340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274341-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OBolEKrczWmliQYAu9opvQ
-	(envelope-from <netdev+bounces-274340-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 05:04:10 +0200
+	id KIGQFiLfzWlVigYAu9opvQ
+	(envelope-from <netdev+bounces-274341-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 05:14:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A27D0382EF3
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 05:04:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B055E383033
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 05:14:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F03AF3064E20
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 03:00:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1E9F63007C9E
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 03:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B53355F5C;
-	Thu,  2 Apr 2026 03:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E914311958;
+	Thu,  2 Apr 2026 03:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ERMhb8fv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RN3ejrT2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04C6355057;
-	Thu,  2 Apr 2026 03:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0B62BEC23;
+	Thu,  2 Apr 2026 03:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775098829; cv=none; b=J2cd7T3AHEM86hph74Y85otrDmaXAsZoGBy4FsG7PC2rt6vmo1Qx00Tl3TV0e8EFNihggT4SmmzV+I1Vb7iGNDXfkKZy8xXKArMGsxGfPIk4Se5XvFuRx+0MRvUcrW0MhveRc5aN6QSoiFRkCHEqVbOBHNt0BEzV3mz3j1+VJnI=
+	t=1775099324; cv=none; b=qIVq+hce0SlbJWJ0lz3rWcg8MEl+S327cZEGAnjPpMWuWKhIONwfEOmTcem6D0N067m9GDBG5nXI/jSmmjN5F1krBaRSgipA7oXPBpFImZTed9aauFs5QN6TI9LVriy19pi1ImlL14KqJrgBx0lTqxCPNebBuPTG/OUk1IkX018=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775098829; c=relaxed/simple;
-	bh=5NKIqcecnLtsnKn0cxi0SwUoFKRhC0G+JRcQ2rsql8A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DZRQ5rAvh/IMPzcFzK8lB8iqO2ziu2G7lEiuf8Trbs6pn+ONBlmb/Rz1tn8HO3M7VDcLBBBlo0mK4mXaWfQ9NOkEVTL7kbQqpHpFr2thO7X1pouytoKLYzSs1UCum15J4i6Y+7ulGmEehFTpEbkcq+65gRWm5o+Cg0KWILw7xbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ERMhb8fv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E60EC2BCAF;
-	Thu,  2 Apr 2026 03:00:29 +0000 (UTC)
+	s=arc-20240116; t=1775099324; c=relaxed/simple;
+	bh=9WcfmINy8tur5KnVTbq1a7pXjZq5fNEd5bvED0yc7JA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jF+hXnv/cTSyYOcF1SkayVEVHmpRu2xUy9I0FgioE5f9CPqTP8Hrg8eblBLohBx6oQiY2p/0MvkIzWER+gCKKAQUL+Bge+HYccPZX8KBqwgOP4CG1TrqTA9ulsqCcsHRMxIY0Pxv7vGilfQEH/ojZaM9bcNTf5FIeH0/AdHXC7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RN3ejrT2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 443C6C19421;
+	Thu,  2 Apr 2026 03:08:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775098829;
-	bh=5NKIqcecnLtsnKn0cxi0SwUoFKRhC0G+JRcQ2rsql8A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ERMhb8fvpKal0dBLdrSN45dhZxUMyQF7o6KNTtWej9t123iHQD5T67iPtkBVXONvW
-	 hAc7NYJIKkFLNmMXZngjMXazCOv4nd5f6aqmtMV3mqXt/XKyYqx6JGHQL4QBm3GUt1
-	 48pvXLabE54gy1zVJDSWEBjnrtL7Kly/dtmyZnmfHPfTYy6xOLEIjkIU71t91HE01w
-	 1Fk3pj6hIgTeBh58dW+Vo0yWYo1C4CW2VOKMSADb1n4ebzyHh3YuyYVhGkV7rZifsA
-	 vaY/Y04hakAcfqgzneWoBAJIkUCwvjD8utDeVOQ+mHsw1icBEDnKqovWy4YQp2xQ0s
-	 3Fjhp1ZyaOmXQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD9B3808203;
-	Thu,  2 Apr 2026 03:00:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1775099324;
+	bh=9WcfmINy8tur5KnVTbq1a7pXjZq5fNEd5bvED0yc7JA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RN3ejrT2w6RAnfT4sPeyNVCFLdmODJ3O5bfwMwMeRvu03kv3t1rqlamHOLDPn1iab
+	 BOqX9x1bjBGIRWAF7/A7JkJMOaNbfm1Cj9J9UxKL2ZXJMw5sGtU6mqD5gYFOLvMmKc
+	 lIKvU8SGkW2ZrtI1+L6DCfTDjHKTN3ET/w2A1UOqIIbB5+UOCIf7AJHXk5bfNyW8Us
+	 NhFVEPnnrbNCjRFHNO5M6cgw8AxKg3cpUT6QL2SSj3LUokhFyeGuAhqH6Y0KndMS7j
+	 j3gtdBI20V6LX4tQNGjM1G7xYZN7PM1OxXGq9OwbFwsGvRdxIe0tT1CEqi1JbZBv8P
+	 kIWSM9LN/VMgA==
+Date: Wed, 1 Apr 2026 20:08:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, "Mark Bloch"
+ <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Shay Drory
+ <shayd@nvidia.com>, Simon Horman <horms@kernel.org>, Kees Cook
+ <kees@kernel.org>, Parav Pandit <parav@nvidia.com>, Patrisious Haddad
+ <phaddad@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+ <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net 1/3] net/mlx5e: SD, Fix race condition in secondary
+ device probe/remove
+Message-ID: <20260401200842.79322a24@kernel.org>
+In-Reply-To: <20260330193412.53408-2-tariqt@nvidia.com>
+References: <20260330193412.53408-1-tariqt@nvidia.com>
+	<20260330193412.53408-2-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/2] net: macb: fix clk handling on PCI glue driver
- removal
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177509881178.3966658.17912738150226737431.git-patchwork-notify@kernel.org>
-Date: Thu, 02 Apr 2026 03:00:11 +0000
-References: <20260330184542.626619-1-pchelkin@ispras.ru>
-In-Reply-To: <20260330184542.626619-1-pchelkin@ispras.ru>
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
- theo.lebrun@bootlin.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ztong0001@gmail.com,
- bfolta@cadence.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- lvc-project@linuxtesting.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -78,55 +79,70 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274340-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[microchip.com,tuxon.dev,bootlin.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,cadence.com,vger.kernel.org,linuxtesting.org];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274341-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A27D0382EF3
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:email]
+X-Rspamd-Queue-Id: B055E383033
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 30 Mar 2026 21:45:40 +0300 you wrote:
-> platform_device_unregister() may still want to use the registered clks
-> during runtime resume callback.
+On Mon, 30 Mar 2026 22:34:10 +0300 Tariq Toukan wrote:
+> From: Shay Drory <shayd@nvidia.com>
 > 
-> Note that there is a commit d82d5303c4c5 ("net: macb: fix use after free
-> on rmmod") that addressed the similar problem of clk vs platform device
-> unregistration but just moved the bug to another place.
+> When utilizing Socket-Direct single netdev functionality the driver
+> resolves the actual auxiliary device using mlx5_sd_get_adev(). However,
+> the current implementation returns the primary ETH auxiliary device
+> without holding the device lock, leading to a potential race condition
+> where the ETH device could be unbound or removed concurrently during
+> probe, suspend, resume, or remove operations.[1]
 > 
-> [...]
+> Fix this by introducing mlx5_sd_put_adev() and updating
+> mlx5_sd_get_adev() so that secondaries devices would acquire the device
+> lock of the returned auxiliary device. After the lock is acquired, a
+> second devcom check is needed[2].
+> In addition, update The callers to pair the get operation with the new
+> put operation, ensuring the lock is held while the auxiliary device is
+> being operated on and released afterwards.
 
-Here is the summary with links:
-  - [net,1/2] net: macb: fix clk handling on PCI glue driver removal
-    https://git.kernel.org/netdev/net/c/ce8fe5287b87
-  - [net,2/2] net: macb: properly unregister fixed rate clocks
-    https://git.kernel.org/netdev/net/c/f0f367a4f459
+Please explain why the "primary" designation is reliable, and therefore
+we can be sure there will be no ABBA deadlock here
 
-You are awesome, thank you!
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> index b6c12460b54a..5761f655f488 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> @@ -6657,8 +6657,11 @@ static int mlx5e_resume(struct auxiliary_device *adev)
+>  		return err;
+>  
+>  	actual_adev = mlx5_sd_get_adev(mdev, adev, edev->idx);
+> -	if (actual_adev)
+> -		return _mlx5e_resume(actual_adev);
+> +	if (actual_adev) {
+> +		err = _mlx5e_resume(actual_adev);
+> +		mlx5_sd_put_adev(actual_adev, adev);
+> +		return err;
+> +	}
+>  	return 0;
+
+Feels like I recently complained about similar code y'all were trying
+to add. Magically and conditionally locking something in a get helper
+makes for extremely confusing code.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
