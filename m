@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-274694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274695-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QFW/MljZzmmGqgYAu9opvQ
-	(envelope-from <netdev+bounces-274694-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 23:02:16 +0200
+	id uHEpIBrZzmmGqgYAu9opvQ
+	(envelope-from <netdev+bounces-274695-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 23:01:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73E8238E345
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 23:02:16 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id B638138E30D
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 23:01:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 244623053BF7
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 21:00:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BC3863035485
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 21:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C380037AA95;
-	Thu,  2 Apr 2026 21:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE0D37C0F9;
+	Thu,  2 Apr 2026 21:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SqeSKa/b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HVD49D7a"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EA9366564;
-	Thu,  2 Apr 2026 21:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B62C37BE7F;
+	Thu,  2 Apr 2026 21:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775163610; cv=none; b=ttdlWqf4JWv6PEUrAtqpnNQG96X9Aitxp8Wl5PSplYx1eSqBByzFWcHJguDKSL/8g9kHtbYpxoYdP0GJ96QcWeTazeYYSoIcKgy7u3M/xb/5XRn1xMfnbOdyBjTrktVV8nZGUB+CLvMaVAg7Iy0vB0+/jfyczL0meTa4cQ0S6hQ=
+	t=1775163611; cv=none; b=MQClRQ/u/knwjr+8oryAegHK4dx2M1gg3LWgBCUhI1rI0Kdwh9tbHS6fAl5EAI7+DF0xeyddUJKgxct7Ax6fnj59W9xL5KOy1uJK+h8c84GNvRH2hsSVnQQbRgCDPtWl6kvwccpT8TmIxJ8UBau1aRManbjmCn6oGpPIfv5fNN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775163610; c=relaxed/simple;
-	bh=7LbvwLMEtASpVz1VnSq0X0Qyml0y8mF7qPhSUHUQ4Vo=;
+	s=arc-20240116; t=1775163611; c=relaxed/simple;
+	bh=nyXWWdLpKVrxz9WCZV7E0Iv9P2IG1bKGFpdoW/2TgLg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DG22b26GD2aUIE916zNmb+HkyakRepyEMEN2hLhXpN6rHhHvmUXoAFHh+J5Nk6Ax4jOxIwQsKAhV52S11itlAPXkqToaUrSI3YBLPc5sZ4kOvpnTZ7kwNy7dAFtiwYuhTdbqFhnZEpVvCM4VldO4bkcde+d8h90HWx6wDg9JtxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SqeSKa/b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B56F1C19424;
-	Thu,  2 Apr 2026 21:00:09 +0000 (UTC)
+	 MIME-Version; b=h+0RX3MSHAXzLUj21sS5X7QynDaS1wC3TMa0f2qaJhtZuwPO56wQp9jVYrbr3aa+QDSL91FZJJzvv4dvZhv9uapM5kW+N2CUrvOo5bJfvbapeWi5NnYWvc0+HNAWjDD1aMYZWUVEms8/VmRdK60kzkMIAQ4oBF5pg+XJWYitv3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HVD49D7a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83987C2BCB0;
+	Thu,  2 Apr 2026 21:00:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775163610;
-	bh=7LbvwLMEtASpVz1VnSq0X0Qyml0y8mF7qPhSUHUQ4Vo=;
+	s=k20201202; t=1775163611;
+	bh=nyXWWdLpKVrxz9WCZV7E0Iv9P2IG1bKGFpdoW/2TgLg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SqeSKa/bnliip1+nwNvNcT2RzuCKzDXouRoaAon+ANIcMphFzy03V7CWBJsZf+9gU
-	 HWc8VywISxxPzvMqFIMSmblvvsj2rUcezbvLQivtFczOGN1ZAYuG5TAc/oInVZQuol
-	 zHLp1yJiNyUv9dv/ybMv2AbmURHdjnS7Mr+VVrZd0t/X8XfKYjcap/sK7nSX8g0Qd2
-	 lcS8X21jVkWIxAZoOg21tQ3phwod6LBF/uFbjCriy4pRgSTB6KrIrBjTNiPiz8UE5z
-	 cEKiJRnQ/vdABtU4b7OtAICVVUdjNeYYSP1hI2txX+RWulH9cqGrqmdZVW1PsACXhA
-	 ivWjwQwjXgBqw==
+	b=HVD49D7aHoLp4jR4ZiHckwohtRxF1hvLREJSmxrWY7Ve3aVU7FTmV8j/mgPtxpddv
+	 AlsAazqTxqowaHM1RbOhpSpIS6y+Pk85GOYzOu6ykBnyl3oRJiaSyeBtjTgkvAU4we
+	 rMVxTxOGjdjIPiGqTqZ8b14lMhfg8DLAiYyng7x0l6f5HG+Bou1PezQPUMYylClVFR
+	 U5soVkmSaKaZMpojoK/yNv1GLm0OKPpQmX85EOUBb1FJTf0bNfEMZdcw0A2h3ICqfP
+	 eqHncaHT5JQ//ArSD3sBXSJzqZfQvvvaYaaIsdXPBJhs8oCfrg+Lvw1hGXWP0g2f0+
+	 lAEcWoPhuZYlw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -58,9 +58,9 @@ Cc: netdev@vger.kernel.org,
 	richardbgobert@gmail.com,
 	linux-kselftest@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 1/8] selftests: drv-net: gro: add data burst test case
-Date: Thu,  2 Apr 2026 13:59:53 -0700
-Message-ID: <20260402210000.1512696-2-kuba@kernel.org>
+Subject: [PATCH net-next v2 2/8] selftests: drv-net: gro: add 1 byte payload test
+Date: Thu,  2 Apr 2026 13:59:54 -0700
+Message-ID: <20260402210000.1512696-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260402210000.1512696-1-kuba@kernel.org>
 References: <20260402210000.1512696-1-kuba@kernel.org>
@@ -78,14 +78,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,nvidia.com,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[13];
-	TAGGED_FROM(0.00)[bounces-274694-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274695-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -98,80 +98,80 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 73E8238E345
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B638138E30D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a test trying to induce a GRO context timeout followed
-by another sequence of packets for the same flow. The second
-burst arrives 100ms after the first one so any implementation
-(SW or HW) must time out waiting at that point. We expect both
-bursts to be aggregated successfully but separately.
+Small IPv4 packets get padded to 60B, this may break / confuse
+some buggy implementations. Add a test to coalesce a 1B payload.
+Keep this separate from the lrg_sml test because I suspect some
+implementations may not handle this case (treat padded frames
+as ineligible for coalescing).
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/testing/selftests/net/lib/gro.c      | 21 +++++++++++++++++++++
- tools/testing/selftests/drivers/net/gro.py |  2 +-
- 2 files changed, 22 insertions(+), 1 deletion(-)
+ tools/testing/selftests/net/lib/gro.c      | 12 ++++++++++--
+ tools/testing/selftests/drivers/net/gro.py |  4 +++-
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/tools/testing/selftests/net/lib/gro.c b/tools/testing/selftests/net/lib/gro.c
-index 3e611ae25f61..4d002af4a7aa 100644
+index 4d002af4a7aa..27ccd742615a 100644
 --- a/tools/testing/selftests/net/lib/gro.c
 +++ b/tools/testing/selftests/net/lib/gro.c
-@@ -12,6 +12,7 @@
+@@ -10,8 +10,9 @@
+  *  packet coalesced: it can be smaller than the rest and coalesced
+  *  as long as it is in the same flow.
   *   - data_same:    same size packets coalesce
-  *   - data_lrg_sml: large then small coalesces
-  *   - data_sml_lrg: small then large doesn't coalesce
-+ *   - data_burst:   two bursts of two, separated by 100ms
+- *   - data_lrg_sml: large then small coalesces
+- *   - data_sml_lrg: small then large doesn't coalesce
++ *   - data_lrg_sml:   large then small coalesces
++ *   - data_lrg_1byte: large then 1 byte coalesces (Ethernet padding)
++ *   - data_sml_lrg:   small then large doesn't coalesce
+  *   - data_burst:   two bursts of two, separated by 100ms
   *
   * ack:
-  *  Pure ACK does not coalesce.
-@@ -1298,6 +1299,21 @@ static void gro_sender(void)
+@@ -1296,6 +1297,9 @@ static void gro_sender(void)
+ 	} else if (strcmp(testname, "data_lrg_sml") == 0) {
+ 		send_data_pkts(txfd, &daddr, PAYLOAD_LEN, PAYLOAD_LEN / 2);
+ 		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
++	} else if (strcmp(testname, "data_lrg_1byte") == 0) {
++		send_data_pkts(txfd, &daddr, PAYLOAD_LEN, 1);
++		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
  	} else if (strcmp(testname, "data_sml_lrg") == 0) {
  		send_data_pkts(txfd, &daddr, PAYLOAD_LEN / 2, PAYLOAD_LEN);
  		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
-+	} else if (strcmp(testname, "data_burst") == 0) {
-+		static char buf[MAX_HDR_LEN + PAYLOAD_LEN];
-+
-+		create_packet(buf, 0, 0, PAYLOAD_LEN, 0);
-+		write_packet(txfd, buf, total_hdr_len + PAYLOAD_LEN, &daddr);
-+		create_packet(buf, PAYLOAD_LEN, 0, PAYLOAD_LEN, 0);
-+		write_packet(txfd, buf, total_hdr_len + PAYLOAD_LEN, &daddr);
-+
-+		usleep(100 * 1000); /* 100ms */
-+		create_packet(buf, PAYLOAD_LEN * 2, 0, PAYLOAD_LEN, 0);
-+		write_packet(txfd, buf, total_hdr_len + PAYLOAD_LEN, &daddr);
-+		create_packet(buf, PAYLOAD_LEN * 3, 0, PAYLOAD_LEN, 0);
-+		write_packet(txfd, buf, total_hdr_len + PAYLOAD_LEN, &daddr);
-+
-+		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
- 
- 	/* ack test */
- 	} else if (strcmp(testname, "ack") == 0) {
-@@ -1463,6 +1479,11 @@ static void gro_receiver(void)
+@@ -1474,6 +1478,10 @@ static void gro_receiver(void)
+ 		printf("large data packets followed by a smaller one: ");
+ 		correct_payload[0] = PAYLOAD_LEN * 1.5;
+ 		check_recv_pkts(rxfd, correct_payload, 1);
++	} else if (strcmp(testname, "data_lrg_1byte") == 0) {
++		printf("large data packet followed by a 1 byte one: ");
++		correct_payload[0] = PAYLOAD_LEN + 1;
++		check_recv_pkts(rxfd, correct_payload, 1);
+ 	} else if (strcmp(testname, "data_sml_lrg") == 0) {
+ 		printf("small data packets followed by a larger one: ");
  		correct_payload[0] = PAYLOAD_LEN / 2;
- 		correct_payload[1] = PAYLOAD_LEN;
- 		check_recv_pkts(rxfd, correct_payload, 2);
-+	} else if (strcmp(testname, "data_burst") == 0) {
-+		printf("two bursts of two data packets: ");
-+		correct_payload[0] = PAYLOAD_LEN * 2;
-+		correct_payload[1] = PAYLOAD_LEN * 2;
-+		check_recv_pkts(rxfd, correct_payload, 2);
- 
- 	/* ack test */
- 	} else if (strcmp(testname, "ack") == 0) {
 diff --git a/tools/testing/selftests/drivers/net/gro.py b/tools/testing/selftests/drivers/net/gro.py
-index 70709bf670c7..10da5d4bee9b 100755
+index 10da5d4bee9b..73436d16b40d 100755
 --- a/tools/testing/selftests/drivers/net/gro.py
 +++ b/tools/testing/selftests/drivers/net/gro.py
-@@ -289,7 +289,7 @@ def _run_gro_bin(cfg, test_name, protocol=None, num_flows=None,
+@@ -11,6 +11,7 @@ coalescing behavior.
+ Test cases:
+   - data_same: Same size data packets coalesce
+   - data_lrg_sml: Large packet followed by smaller one coalesces
++  - data_lrg_1byte: Large packet followed by 1B one coalesces (Ethernet padding)
+   - data_sml_lrg: Small packet followed by larger one doesn't coalesce
+   - ack: Pure ACK packets do not coalesce
+   - flags_psh: Packets with PSH flag don't coalesce
+@@ -289,7 +290,8 @@ def _run_gro_bin(cfg, test_name, protocol=None, num_flows=None,
  
      # Tests that work for all protocols
      common_tests = [
--        "data_same", "data_lrg_sml", "data_sml_lrg",
-+        "data_same", "data_lrg_sml", "data_sml_lrg", "data_burst",
+-        "data_same", "data_lrg_sml", "data_sml_lrg", "data_burst",
++        "data_same", "data_lrg_sml", "data_sml_lrg", "data_lrg_1byte",
++        "data_burst",
          "ack",
          "flags_psh", "flags_syn", "flags_rst", "flags_urg", "flags_cwr",
          "tcp_csum", "tcp_seq", "tcp_ts", "tcp_opt",
