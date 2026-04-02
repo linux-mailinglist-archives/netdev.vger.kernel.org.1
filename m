@@ -1,322 +1,226 @@
-Return-Path: <netdev+bounces-274527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274471-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kGUzNhJnzmlRngYAu9opvQ
-	(envelope-from <netdev+bounces-274527-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 14:54:42 +0200
+	id KCNLMmlQzmmjmgYAu9opvQ
+	(envelope-from <netdev+bounces-274471-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:18:01 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39F6238944D
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 14:54:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EBA238834F
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:18:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B716302F0F6
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 12:49:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9D86F30479C5
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 11:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E573E2755;
-	Thu,  2 Apr 2026 12:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860E83AC0FB;
+	Thu,  2 Apr 2026 11:11:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bbQ9cFSS"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PP4Xq2xT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f66.google.com (mail-ua1-f66.google.com [209.85.222.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010001.outbound.protection.outlook.com [52.101.56.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09B23B9DAC
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 12:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.66
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775134139; cv=none; b=G9QJbcX1F3fxT9eqv068SZ878gIfrM+0IRw2u0Pe0DbYq+QxZg6H5E5sv1fk9dtcik2IuK01uAMtpK3eCyFsGJZeMYaGVSrAyyKhgJuyNMCxmYoqz1XRFm+6J0v76mWrJs+o8a1Gza1msLOPeDmtrHyCFZi7mChOYr9lAny+MvI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775134139; c=relaxed/simple;
-	bh=ik7uUTib9+LCz0UAAdU8wVthAJCsJQ9Tt8iu7WwCWkA=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=fnv/6FHMH/FC3ajEWpDDPvsgzeXgu7/gnWnXDCiaxLOxw/wevkfFbNvi0NPMnPhkwcG7hm7qvlCozL9AwSYmEFmI9mUO9loPg+tSy3HQcq1NQjeQp17hjIRrd6wpM0hNOQFjwYe9rlKSPDXE4A8Zmk8NinFoByho3QqMVdYPrM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bbQ9cFSS; arc=none smtp.client-ip=209.85.222.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f66.google.com with SMTP id a1e0cc1a2514c-953ac1602f8so1347982241.1
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 05:48:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775134131; x=1775738931; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:subject:cc:to:from
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=f10hXx8Ya/o2nsVJSMU9jz32XKIcCmbLZ6lBcgyEWlM=;
-        b=bbQ9cFSSls6GyfWBbnjfpg4bx3I6UDLFklF/yyHHImy2dNQIf0h4TfdnUgAvGz9Ul0
-         CA2P02iji+o2VwsmYNg+8K6+/MBTCMDgptTGmGRRPtZ1keY9J47qcInI7AlAK2UnMXkc
-         haqpgr2a3hQUN4uYDBRsrARPs+s8V6DOsJVFwQjljAbqTAnNrvr4XQ7OoSJUH8o6yYEg
-         AxN2GLms2fofVgaW5yAzulG3pZrt0RPHHPsFqkKM89hE8P8739ct/F4rqqhDXevHdEQw
-         XFfCtz48TXk+oq9YvKkKr7AkbTo4vvXll939cZeqD79hwlD+Zoikj6cHrVvyg+E1Jf0g
-         Js5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775134131; x=1775738931;
-        h=content-transfer-encoding:mime-version:date:subject:cc:to:from
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f10hXx8Ya/o2nsVJSMU9jz32XKIcCmbLZ6lBcgyEWlM=;
-        b=OLUsZl410iQ7ddBiyTokRwA9vggayHwoBqGSumUi744JzAPOmVrcrABr/I0/tHtZ6q
-         Yc5LlCwhghhBSlaUxzlc3M96Kv9OAjI/M2KbNe4sQPihcBT86c5tGmT5coyizN0lsRh2
-         KYvr9baLB8rGXMRYDI+Re+PCidWTbQzwGM68HQFrn7Uwcfk2oScANY6voJ6ygupAb12L
-         lcNYsTkTD1uwSf1HpMgk4qlNewAOqTcwcdnbX+IWjKEICteEpoxHZTCcc5qgF8rYNu3C
-         /1BlISYoKPU8a8RNiyUw7RWrkLjq6x2tDf3L4uS7h4UrPduTKKbEAoducVymWl4ZyhzB
-         COnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW9JVZpNy+Sl5LzVcEX1KDRpOhn5AFJIFfOYex3taBAoK4LVP6dsHwxAuaEQ91RfOf3STHZkg4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzDJa3ZiB+h0pfatTn9srUF/zXshtSRT7rzNIQPBCWvEW18l4i
-	2IL3ZsfURw8rdp7HNIgqbsdkqgqXNne3UZhLA9XC129iSqRTW09H28a+0x2gOmYGqG3UNkHW
-X-Gm-Gg: ATEYQzwO0YPcDFIjDRIQ3s2TP7etpvVCkHpTK4qJkyfIGsi5D7SPE9/UL+ln+TXl+Ks
-	gAYn+DYZ808apV81QVScXwJSOt1BV5q6jP0cXpkgxkC1yAXDviO4+Bvpvf7weAtuxTfRdPUvAfx
-	TkrRxbE+PCJd+3+ov05j31eWmTeELi5cal4Yf7WI0kEuAwOq8HvZf4UwE+xQdIcMqek/I7Pz1bJ
-	vuAehFdK8yrFjYxheLPNccfbi6Dx1Plx+CVc4Io8iWTEU3h7CePtGJf0dSOdn31z+ne4xwnUyEp
-	7UXQW14FaeqH/09WJS5Z8VBR+eJ2JwhLB0D4LAXdd1IMLgw0Fq78t3PydN102FRq072IrF4N3/+
-	9FDrMIx2zVj0ghe7J5Npa/LEevk020N7F/kBMZV2NGCMbYl2EP5YOBIYj2EFPcMtNAYkHbvt8nu
-	7VsbO0ZKi9e7PHKdXgXSk=
-X-Received: by 2002:a17:90b:1f85:b0:359:8957:7285 with SMTP id 98e67ed59e1d1-35dd67257bbmr1602746a91.3.1775128030888;
-        Thu, 02 Apr 2026 04:07:10 -0700 (PDT)
-Received: from localhost ([137.132.22.254])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35dd35364edsm2447388a91.0.2026.04.02.04.07.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 04:07:10 -0700 (PDT)
-Message-ID: <69ce4dde.170a0220.39732d.82c2@mx.google.com>
-From: ven0mfuzzer <ven0mkernelfuzzer@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-        Tom Talpey <tom@talpey.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Kuniyuki Iwashima <kuniyu@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Steve French <smfrench@gmail.com>,
-        Neal Cardwell <ncardwell@google.com>,
-        Simon Horman <horms@kernel.org>,
-        Willem de Bruijn <willemb@google.com>,
-        David Ahern <dsahern@kernel.org>
-Cc: linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [BUG] Linux Kernel ksmbd Multiple Memory Leaks in Session Handling
-Date: Thu, 02 Apr 2026 19:07:09 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16731386453;
+	Thu,  2 Apr 2026 11:11:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.1
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775128286; cv=fail; b=F6tYM0CyLke5srXn3w9FzL5ShMMX1IGOBu1tsx6JH+sS+3caqjln9I/TlYtC6YUzJqfBtqg+FgIfC+jk+hopg0koUVVTxNFj2YiSPKPgcE/Hco0XhRdhcTJQ9cmcvV0Yhf9vH/huLt8oVWYl3kpRM8YooSwYwQc7UsRZEKpiPSs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775128286; c=relaxed/simple;
+	bh=fVnvIrRSAlAyBwrQ6pFdjM5aWVzsLbDZ9Mzca7qw2XU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=loMjtusVuM7w5Dyz+jXUXH+ddV/NfNvcepixNHlOdR0SEFShDb6kKftb19SACiR+8vhpZicxeJfyw1oO6e27qeYXcYJcMfWKNFJO8llyA4kXJG+T1QngYyK3jOZJ8HlSE5wHm54MA8TQsOBPBBRyBxzkhFtOnQYaJ/j6XMjqWXM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PP4Xq2xT; arc=fail smtp.client-ip=52.101.56.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=tplPPCfjp7xHz7/2aQkAhaSZ+iQG9pnXLTrT9P4OgAwK0LhW6LeWr75Sp2QFKVuz25nblj1ErZHa5vNp7pyrwX1pLBSUV3SCR6YmIZz5Ey9kF++ekiFHlV9qEUWNAkjKFyVnD8Hrm6Jw9s12KGvSCYg9TirM4m1Jx/gnG1wOEtI9Cpd7vv6mHtiQD/FyOMmyTiTUDFiRNIF+aPgLuAJA8nnX5JdRldB8UC1Nv7SeOGVrBFZEZM2cpSR7P5uzb5Z0otipKz1ynkGdaPghXTH4NIVgL0lmbXH5lyCzPY03elAcjC56NWPKNTKtmsvr6d2epMRDnqBDUjZi1EQGEEjzGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HnlmygM/FfERX9rHvfkb8GqaKdH6iW2cgftHmTaB5rQ=;
+ b=qJ+W8Bc8zJ/nJZhCH8chsZV/x8M8vKEKvftfhXb3zyYtac/xU2jlqdZzCRUVvJC/ZPu0ePZ1+hVjjrfN50Q0Ub0W29Hg0qY1aYpWZaVOS7E5ULro6o5oOnk3MH1sJWiH4w5dySMJxpevqHWtdQJw2Ds7budy68sCDxebGR/h+bfTa2KLlTeEFV0MArYKqYIQdKSMvUDlFNGYqtB/r7M8ZV0rpaqIRmyQgCS9Fq+UiqcHIGb0wFgMaxkZeBzJPtJ2ztyjAO0lNE4agL3ijDRiOqufxV0pQH2NczAU5zzDioX1oH4HNW2/uHsqq9niMvfaOl6uYEThrt4chK0LAPs6qg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HnlmygM/FfERX9rHvfkb8GqaKdH6iW2cgftHmTaB5rQ=;
+ b=PP4Xq2xTOdH2YixQDPtZBtCD0WPEsZgdDlg92IcWyGqiwtPOqZWXWy9uh/hQnuc2bVSM4cHpBgFp0jdbqp6W+50cBDIwM6cUw1w819nEzN7obStRiOYp9EBcMrtZoTClu6AtSz8CisDuWasUD4XFznvpTPJvnOXfUkdZDS8Gg4pHCAMXN1OGn2iEYMuvN0210pgR5fZ72WJCgCvPNdgC5E/04+qnCDeeNKTDTaXWq67VQOnI5fsergzeIAJNXNiEG8VG/Eb3VuQ9EIfj4XLGtidNFbfDTSxpGx+Fdklug8O/MrXc9ClVBbbr3gNBI7eL9yOlxLmRWSsIJAJrA1AKCA==
+Received: from BY5PR16CA0027.namprd16.prod.outlook.com (2603:10b6:a03:1a0::40)
+ by SJ2PR12MB8955.namprd12.prod.outlook.com (2603:10b6:a03:542::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.15; Thu, 2 Apr
+ 2026 11:11:15 +0000
+Received: from SJ5PEPF000001D2.namprd05.prod.outlook.com
+ (2603:10b6:a03:1a0:cafe::b5) by BY5PR16CA0027.outlook.office365.com
+ (2603:10b6:a03:1a0::40) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9745.30 via Frontend Transport; Thu,
+ 2 Apr 2026 11:11:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ5PEPF000001D2.mail.protection.outlook.com (10.167.242.54) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9769.17 via Frontend Transport; Thu, 2 Apr 2026 11:11:14 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 2 Apr
+ 2026 04:10:56 -0700
+Received: from c-237-113-240-247.mtl.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Thu, 2 Apr 2026 04:10:53 -0700
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: Sabrina Dubroca <sd@queasysnail.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Simon
+ Horman" <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, David Wei
+	<dw@davidwei.uk>, Shuah Khan <shuah@kernel.org>,
+	<linux-kselftest@vger.kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>, "Dragos
+ Tatulea" <dtatulea@nvidia.com>
+Subject: [PATCH net v7 0/4] macsec: Add support for VLAN filtering in offload mode
+Date: Thu, 2 Apr 2026 14:10:30 +0300
+Message-ID: <20260402111034.1494714-1-cratiu@nvidia.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Mailer: KernelStackFuzz send_email.sh
-X-Spamd-Result: default: False [-2.15 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D2:EE_|SJ2PR12MB8955:EE_
+X-MS-Office365-Filtering-Correlation-Id: 908eba36-e7e0-4bcc-4a99-08de90a88e57
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700016|7416014|376014|1800799024|13003099007|56012099003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	+5rjucn1lorQilDJkEsjS1MJLd4TbGkZHHlZxfVrCZ4UEzDb5iXp9j0buGuqW099ElDh6cK1eakN9hqoDlDIcuUEyEnjBAhXtOfaagjQLVkwgMYDeli9SF+M5W2X0s11UwSSD3ogkJzE5r8G5hAgIjXJELzb2LeUth+E1F8CnngWMtSMmLYjLqMu0/3H72DgqFQiARgJHJxMew1skxj/ShoIzEFLgtb1ainAsEnEZVF63q78Z/UpNKtX2AS0qw3Uqz86MU6u8h1Yw7zJCJiUSdlpfW65iuRhBrPioSOWFhU/YWoSDkub98NejXqDc0TDjfQ+dadfimOfnksP29VKZiNSx+DkkUK68ff3/4oXHNl7MFL7Oj+gKuilgHXNlDHNE9iYPUqXU+24cKMfXKHgnKHmuiWFNU48aWtwBjK2PZvFVyyVc5867gSPrzWhZlj6hhibkPCf1NwL9V09Bq/q3/xKC4eRnFp1phJJOp+Llhy2aEUbIkdVF5qtE7Bt4/3F1oLolGE+nhqRAeSn6RhIx+lNYo0jwVxk0PuQHXSxJV2TEPawC532g8g2KcLAhXKofIrUMYIIC/cSLRo4XS7CRiOyRuKBXEkpDJdNDfFpSdNKi5MIMKeJdcK+PbKqw6Sy6RGOhA81yTSJ9FpVPm1VzmnkIDm0ptM6YxS+TtHHR6hxRte/+1XAn/gZvJZ8inWarvLjGQtHvWTaAAQSUHS2LdwGUV6KN7cMvYgffWqoDaTwzC99nuguLczIg+ivzVyL8/dlbae0dPW4DCKeGXnufw==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(7416014)(376014)(1800799024)(13003099007)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	kMuBuSxZS7fzyDhGld8ZZZFH+zg0T1FbBe21NwCYZUNW0a93E5EuGwxt0CTlc4nWS9OlG6Yk2eDqJguHoRmJsGWSru7JtkzpFgBSjc7vhZHhIdmqnjx9DyGFPaX3Y7ES33rchdUcvBJSKGMVtSCoGl1qBkhBscFOwpV85oZRkDVHsUepFF5ViJmcvt27nuYJKRXKXP9kh6tC3ohX4xvydDwLd/ZorYvHyh1j65PKBUjfUkdtndggcHNvnlNZc3MRW3VGPZD0zS3Mg9s6nCY3ajg995XmuEs/Poq8pk7c4g8GAzB2kdf75mlX0JYILFA2rexXaTRnuy6YaokXyYntGwkxaUGi7y5Jc+18fGWB3itcXJX/oCwy4Cwkj6YC5y6zCkIEYH1YtSElI4OgBrMYJ+nzH9quYeI/RcsNUw86AGGGsPWGon5dH0/RHy+9FH5S
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2026 11:11:14.8701
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 908eba36-e7e0-4bcc-4a99-08de90a88e57
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001D2.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8955
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,talpey.com,chromium.org,google.com,davemloft.net,redhat.com,gmail.com];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-274527-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-274471-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ven0mkernelfuzzer@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	NEURAL_HAM(-0.00)[-0.836];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[cratiu@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,nvidia.com:mid,Nvidia.com:dkim];
 	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mx.google.com:mid]
-X-Rspamd-Queue-Id: 39F6238944D
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 6EBA238834F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Linux Kernel ksmbd Multiple Memory Leaks in Session Handling
+This short series adds support for VLANs in MACsec devices when offload
+mode is enabled. This allows VLAN netdevs on top of MACsec netdevs to
+function, which accidentally used to be the case in the past, but was
+broken. This series adds back proper support.
 
-  1. Vulnerability Title
-
-Linux Kernel ksmbd Server Multiple Kernel Memory Leak Vulnerability in Session Setup/Teardown
-
-  2. High-Level Overview
-
-Seven distinct kernel memory leaks exist in the ksmbd (in-kernel SMB server) session handling paths. During SMB session setup and teardown, multiple kernel objects — including socket inodes (1344 bytes), LSM security blobs (120 and 32 bytes), TCP connection structures (3264 bytes), ksmbd connection contexts (64 and 16 bytes), and network skb buffers (240 bytes) — are allocated but never freed. These leaks accumulate over time with repeated session establishment, allowing a remote attacker to exhaust kernel memory by repeatedly connecting and disconnecting SMB sessions. This constitutes a denial-of-service vulnerability.
-
-This vulnerability was discovered using ven0mfuzzer, our custom-designed MITM-based network filesystem fuzzer developed by our team. Following the common syzkaller practice, we submit the kernel crash trace as the primary reproduction artifact.
-
-  3. Affected Product and Version Information
-
-Product: Linux Kernel (upstream mainline)
-Affected Component: `fs/smb/server/` — ksmbd session setup/teardown, connection handling
-Supporting Components:
-- `fs/smb/server/transport_tcp.c` — `ksmbd_kthread_fn()`, `ksmbd_tcp_readv()`
-- `fs/smb/server/connection.c` — connection context allocation
-- `net/socket.c` — `sock_alloc_inode()`, `kernel_accept()`
-- `net/ipv4/tcp_minisocks.c` — `tcp_create_openreq_child()`
-
-  Tested Versions (confirmed vulnerable)
-- Linux kernel 6.19.0 (mainline, commit `44331bd6a610`, gcc 11.4.0, built 2026-02-13)
-- Linux kernel 6.12.74 (LTS, used in Google kernelCTF COS target)
-
-  Affected Version Range
-All kernels with ksmbd support (approximately 5.15 through 6.19) are believed affected.
-
-  Affected Distributions and Products
-
- |  Vendor / Product  |  Notes  | 
- | --- | --- | 
- |  Red Hat Enterprise Linux (RHEL 9.x)  |  Ships kernels >= 5.14 with ksmbd module  | 
- |  Ubuntu (22.04 LTS, 24.04 LTS)  |  HWE kernels 6.x include ksmbd  | 
- |  SUSE Linux Enterprise Server (SLES 15 SP5+)  |  Kernel 6.x based  | 
- |  Debian (Bookworm, Trixie)  |  Kernels 6.1+  | 
- |  Fedora (39+)  |  Kernels 6.5+  | 
- |  Amazon Linux 2023  |  Kernel 6.1 LTS based  | 
- |  Google ChromeOS / COS  |  kernelCTF target, confirmed vulnerable on 6.12.74  | 
-
-  4. Root Cause Analysis
-
-  4.a. Detailed Description
-
-The kmemleak detector identified 7 unreferenced kernel objects allocated during ksmbd session handling that are never freed. These leaks occur across multiple subsystems involved in SMB connection management:
-
-1. Socket inode (1344 bytes): Allocated by `sock_alloc_inode()` during `kernel_accept()` in `ksmbd_kthread_fn()`. The accepted socket's inode is not properly released when the connection is torn down.
-
-2. LSM security blob (120 bytes): Allocated by `security_inode_alloc()` during inode initialization for the socket. Leaked because the parent inode is leaked.
-
-3. TCP connection structure (3264 bytes): Allocated by `sk_prot_alloc()` during `tcp_create_openreq_child()` when accepting a new TCP connection. The TCP socket is not properly closed on session teardown.
-
-4. LSM security blob for socket (32 bytes): Allocated by `security_sk_alloc()` for the cloned TCP socket. Leaked with the parent TCP structure.
-
-5. ksmbd connection context (64 bytes): Allocated by `ksmbd_kthread_fn()` for per-connection state. Not freed when the connection handler exits abnormally.
-
-6. ksmbd TCP read buffer (16 bytes): Allocated by `ksmbd_tcp_readv()` for receiving SMB messages. Not freed when read is interrupted.
-
-7. SKB buffer (240 bytes): Allocated by `build_skb()` in the virtio-net receive path for incoming SMB packets. Orphaned when the associated socket is leaked.
-
-  4.b. Code Flow
+As part of this, the existing nsim-only MACsec offload tests were
+translated to Python so they can run against real HW and new
+traffic-based tests were added for VLAN filter propagation, since
+there's currently no uAPI to check VLAN filters.
 
 ---
-ksmbd_kthread_fn()                    [fs/smb/server/transport_tcp.c]
-  → kernel_accept()                   ← allocates socket inode (1344B) + security blob (120B)
-    → sock_alloc() → alloc_inode()
-    → security_inode_alloc()
 
-TCP SYN_RECV → ESTABLISHED:
-  → tcp_create_openreq_child()        ← allocates TCP sock (3264B) + security blob (32B)
-    → sk_prot_alloc() → sk_clone()
-    → security_sk_alloc()
+V7: 
+- Added missing ethtool feature checks.
 
-ksmbd_kthread_fn() continued:
-  → kmalloc (64B)                     ← ksmbd connection context
+V6: https://lore.kernel.org/netdev/20260330130130.989236-1-cratiu@nvidia.com/T/#u
+- Resurrected nsim debugfs file for VLAN filters.
+- Switched to WARN_ON_ONCE in nsim, which is always compiled in.
+- Tweaked tests to check the nsim VLAN filter file on nsim.
+- Disabled ping on nsim in offload mode, data plane doesn't work.
+- Added CONFIG_VLAN_8021Q to the test config.
 
-ksmbd_conn_handler_loop():
-  → ksmbd_tcp_readv()
-    → kmalloc (16B)                   ← TCP read buffer
+V5: https://lore.kernel.org/netdev/20260323123633.756163-1-cratiu@nvidia.com/T/#u
+- Merged tests and macsec lib in a single file.
+- Fixed Python linter issues.
+- Added CONFIG_MACSEC to tools/testing/selftests/drivers/net/config
 
-[on session teardown — objects NOT freed due to missing cleanup]
----
+V4: https://lore.kernel.org/netdev/20260313105227.1884391-1-cratiu@nvidia.com/T/#u
+- Migrated nsim-only macsec tests to Python, usable against real hw.
+- Ran these tests against both nsim and mlx5.
+- Gave up on nsim patches since the tests no longer use them.
 
-  4.c. Crash Trace
+V3: https://lore.kernel.org/netdev/20260306151004.2862198-1-cratiu@nvidia.com/t/#u
+- Moved back to net.
+- Added proper rollback support for VLAN filters in case of failure.
+- Added VLAN as a requirement for the new macsec tests.
 
-This vulnerability was discovered by ven0mfuzzer. The following kmemleak output is submitted following syzkaller's common practice of providing the raw kernel trace as the primary reproduction evidence:
+V2: https://lore.kernel.org/netdev/20260227090227.1552512-1-cratiu@nvidia.com/
+- Sent to net-next instead of net because of apparent complexity.
+- Changed VLAN filtering to only function in offload mode.
+- Added tests.
 
----
-unreferenced object 0xffff88810af3d180 (size 1344):
-  comm "ksmbd-eth0", pid 328, jiffies 4294901355
-  backtrace (crc 1a26ccb4):
-    kmem_cache_alloc_lru_noprof+0x3ed/0x5f0
-    sock_alloc_inode+0x25/0x1c0
-    alloc_inode+0x64/0x240
-    sock_alloc+0x40/0x280
-    sock_create_lite+0x82/0x120
-    kernel_accept+0x16b/0x380
-    ksmbd_kthread_fn+0xee/0xf30
+V1: https://lore.kernel.org/netdev/20260107104723.2750725-1-cratiu@nvidia.com/
 
-unreferenced object 0xffff888107243bd0 (size 120):
-  comm "ksmbd-eth0", pid 328, jiffies 4294901355
-  backtrace (crc 6bd3e180):
-    kmem_cache_alloc_noprof+0x3ed/0x5f0
-    security_inode_alloc+0x3b/0x140
-    inode_init_always_gfp+0xbf9/0xf20
-    alloc_inode+0x86/0x240
-    sock_alloc+0x40/0x280
-    sock_create_lite+0x82/0x120
-    kernel_accept+0x16b/0x380
-    ksmbd_kthread_fn+0xee/0xf30
+Cosmin Ratiu (4):
+  selftests: Migrate nsim-only MACsec tests to Python
+  nsim: Add support for VLAN filters
+  selftests: Add MACsec VLAN propagation traffic test
+  macsec: Support VLAN-filtering lower devices
 
-unreferenced object 0xffff88810fbfa980 (size 3264):
-  comm "softirq", pid 0, jiffies 4294902189
-  backtrace (crc c2de1a0c):
-    kmem_cache_alloc_noprof+0x3ed/0x5f0
-    sk_prot_alloc+0x60/0x2a0
-    sk_clone+0x79/0x14f0
-    inet_csk_clone_lock+0x2f/0x760
-    tcp_create_openreq_child+0x34/0x26a0
-    tcp_v4_syn_recv_sock+0x115/0x10e0
+ drivers/net/macsec.c                          |  44 ++-
+ drivers/net/netdevsim/netdev.c                |  65 +++-
+ drivers/net/netdevsim/netdevsim.h             |   8 +
+ tools/testing/selftests/drivers/net/Makefile  |   1 +
+ tools/testing/selftests/drivers/net/config    |   2 +
+ .../selftests/drivers/net/lib/py/env.py       |   9 +
+ tools/testing/selftests/drivers/net/macsec.py | 343 ++++++++++++++++++
+ .../selftests/drivers/net/netdevsim/Makefile  |   1 -
+ .../drivers/net/netdevsim/macsec-offload.sh   | 117 ------
+ 9 files changed, 465 insertions(+), 125 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/macsec.py
+ delete mode 100755 tools/testing/selftests/drivers/net/netdevsim/macsec-offload.sh
 
-unreferenced object 0xffff888108c514a0 (size 32):
-  comm "softirq", pid 0, jiffies 4294902189
-  backtrace (crc ea16adaf):
-    __kmalloc_noprof+0x4eb/0x760
-    lsm_blob_alloc+0x68/0x90
-    security_sk_alloc+0x2f/0xd0
-    sk_prot_alloc+0xfb/0x2a0
-    sk_clone+0x79/0x14f0
+-- 
+2.53.0
 
-unreferenced object 0xffff88810fd0b540 (size 64):
-  comm "ksmbd-eth0", pid 328, jiffies 4294902189
-  backtrace (crc f2da5eae):
-    __kmalloc_cache_noprof+0x411/0x610
-    ksmbd_kthread_fn+0x288/0xf30
-
-unreferenced object 0xffff8881063426f0 (size 16):
-  comm "ksmbd:::ffff:10", pid 434, jiffies 4294902190
-  backtrace (crc 9e6ee6c8):
-    __kmalloc_cache_noprof+0x411/0x610
-    ksmbd_tcp_readv.constprop.0+0x16d/0x700
-    ksmbd_tcp_read+0x88/0xc0
-    ksmbd_conn_handler_loop+0x5dd/0xfd0
-
-unreferenced object 0xffff88810fa94200 (size 240):
-  comm "softirq", pid 0, jiffies 4294902419
-  backtrace (crc 4367e44b):
-    kmem_cache_alloc_noprof+0x3ed/0x5f0
-    build_skb+0x46/0x370
-    page_to_skb+0x5df/0xb30
-    receive_buf+0xa3e/0x4940
-    virtnet_poll+0xfb6/0x1750
----
-
-Total leaked per session: approximately 5,080 bytes (1344 + 120 + 3264 + 32 + 64 + 16 + 240). An attacker establishing and tearing down sessions repeatedly can exhaust kernel memory.
-
-  4.d. Suggested Fix
-
-The ksmbd session teardown path (`ksmbd_sessions_deregister` / `ksmbd_conn_handler_loop` exit) must properly release all allocated resources:
-1. Close the accepted socket via `sock_release()` to free the socket inode and associated LSM blobs
-2. Properly tear down the cloned TCP socket
-3. Free the ksmbd connection context and read buffers on all exit paths, including error/abort paths
-
-  5. Discovery Method and Reproduction
-
-  5.a. Discovery
-
-This vulnerability was discovered using ven0mfuzzer, a custom-designed MITM-based network filesystem fuzzer developed by our team. The fuzzer operates by positioning an AF_PACKET/TCP transparent proxy between a Linux kernel filesystem client (VM-A) and its server (VM-B), then mutating network protocol messages in-flight.
-
-Following the common syzkaller practice, we submit the kernel kmemleak output as the primary reproduction artifact. The output above was captured with CONFIG_DEBUG_KMEMLEAK enabled on kernel 6.19.0.
-
-  5.b. Reproduction Setup
-
----
-VM-A (CIFS client) ──SMB2──► Host:44446 (MITM proxy) ──TCP──► Host:44445 ──hostfwd──► VM-B:445 (ksmbd)
----
-
-Trigger condition: Repeated SMB session establishment and teardown, especially when the MITM proxy disrupts the session setup handshake, forcing abnormal teardown paths.
-
----
-Reported-by: ven0mfuzzer <ven0mkernelfuzzer@gmail.com>
-Link: https://github.com/KernelStackFuzz/KernelStackFuzz
 
