@@ -1,86 +1,61 @@
-Return-Path: <netdev+bounces-274585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274586-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cFSpMnCBzmkqoAYAu9opvQ
-	(envelope-from <netdev+bounces-274585-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:47:12 +0200
+	id 8KCiF+CCzmmDoAYAu9opvQ
+	(envelope-from <netdev+bounces-274586-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:53:20 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1389F38AC80
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:47:12 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B34DB38AD9F
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:53:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 72CA43008269
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 14:46:53 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 723D030604F9
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 14:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DCF73E3DBD;
-	Thu,  2 Apr 2026 14:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="zoqgMluG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3850C3EDAA2;
+	Thu,  2 Apr 2026 14:46:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-64.mail.qq.com (out162-62-57-64.mail.qq.com [162.62.57.64])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1554B33B949
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 14:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.64
+Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48DD11BF33
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 14:46:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775141211; cv=none; b=fYTpqozrKbiGgp+CVBGvhOWQkxJ3H8SONBz4vGw32/JUVgiNB7tNznedldlpFLBK7ZFnIv5faOXe4PGcmcwCiKxPfaEyn0QMJMxJT7tYP+YsApOVsolP1d2xA2oZqFkAEK0P4zNEvmcFXJLb4aYN33VT58Fpr+3vnhTGUxHVdvU=
+	t=1775141213; cv=none; b=hUAkIgd94zl5qtSJYkOoHmhR4Jq1a0M85O505gzRfs2chShls3J8p/IH8z0Na5LMW43cNwrnzrwRkg6beB4Acc9FUCaQaLz7CPz1zACoAdBV1yQCrXbVT444wvI+IS9XLxvCPkEXpWI2IuUEW8LN/SopNXXpEfWO/2P4MznmE0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775141211; c=relaxed/simple;
-	bh=FQHo6U9VEoZMugXQr0YOzn6Rm9Cu5lBl/ry6GmnS8YI=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=SwMveA7fGxJxSpdgyEdHJUEfx74B9jhIhbNfv3n5SnSLPKOu5R3F4GILOUgcKKyQlQcgs7YQIBAcK8/goirDBwffvAVWmTI0znfiuJpUv6LKKXb74N9EuIWSCQp6wzfGzkreaBmlcrMtjN/bt5yxWIDnmBQlBwe3ChjONIBQWvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=zoqgMluG; arc=none smtp.client-ip=162.62.57.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1775141203; bh=lOqkosB1cy8FAZlTKkIIXR4ABmZ8edQgswyaTcSUgEg=;
-	h=From:To:Cc:Subject:Date;
-	b=zoqgMluGHAZSMKUF6kJ2193MDgkFlQR1d3PrcuAXXR+kj8RS0U+6837r0Fpd4zQnQ
-	 gryHGKgOKZpoDWA+6Aq3Nhi6on5GnUgmcypPF/DIY60ANFzXe1LupOIZmTCFZ9E8si
-	 Tjox3VBWUEvYYMzJhuXpnuqwcWaOu2Nvsx/j5T5I=
-Received: from CGG7X9MGDG.corp.ebay.com ([216.113.165.51])
-	by newxmesmtplogicsvrsza63-0.qq.com (NewEsmtp) with SMTP
-	id B93814B2; Thu, 02 Apr 2026 22:46:19 +0800
-X-QQ-mid: xmsmtpt1775141179te7ao89w8
-Message-ID: <tencent_73010FBD5FA1C05C3BC23A07A50B11CEC90A@qq.com>
-X-QQ-XMAILINFO: MEDSETqIY7u4C1UcUwfTjaOD1C7TOZh+316zk7NiEpZe+6lJyBd1dHEKCRTwoL
-	 kYce6S30ORgrYiGhHmOvVhaOYWxlRdW5e1GEgNZ44rjVK69MHT9neMZd9VXQpls1O8tJRVZc/bIe
-	 Zj8ORqpX3zGXgakDEk1fqKIBl6jGKIntlKMNGsgOZgTnSlxOZOrVg/1cnX5GxUQ+1rKNwgr+liXt
-	 GONW6vGP72zxABES6Yk/ClZLgVyJepAy8QpTeuT3Y+4/yIOjfJSErgIvXEZ8/6WGGD/N0K17lG5n
-	 NToL2WsjeiwyrONDR85bEQeOOpvyWmXBvttFtuhptCKTjFDpQqr06Qhwgd0N2/hXYZaLOk9sSTrf
-	 /QLmaY/T/kGsBXtkTj7n+sPlxQbfJ16/3oURoNWobPXBamlPI2TTBZo0OvLrlmjGvoT7yhVU3EA6
-	 Yj6aAyxscdsSDTaTEKB57asp35F3m5caves50HW1qBTDoYBeMGqE9rgjHT5nlrRyKFaZJ059/90h
-	 f1U3/NB9Cn6fimPhVoQ4GxRQLvkPCfEnsgRpUm+hcUmXcIQz8oMjT79295agIn6UrKBgVuOkLezS
-	 pqPMU2Cp98kCnHZRm+c0L75Ss1B+8I1PDlDMPdsap5DXuEunlPA8yJ+FZpRz2om7DmDLdW0ijmoR
-	 6qKXoriCJ7KcZ14vpLbYauDdTenxSlkxk0VtVT1dhmFJA6dGZx2N1P54kuWp4qE2zZp0mINlJo+C
-	 RwI0blfPZDKm/4+sapu1y7E869T2gmC6dLGGjzKu4Xo+fA8rTho3E/cI9k2Ozuu3Jkx93VhSRm83
-	 lpSBY3/rSxVNgkTDJPrsGnrtj03tnMgnDjLB529hMHxocYp0Q9WiSMrxdbctD47BmOiWiDgx+/Jl
-	 W5V6cs8NUqsyKB3IOVn7j2Zw6WIbgpQpNedor+9bS3ZSpEWju7ge784qNpnLWJtLVEEAhkSLINpy
-	 MzUYTtOgPSKH2AqmpaKqkV2mIe5Ty5SF88jzOtiP9MpsZdrQn/gUT8E4O4mLX/ZwTI51Pmvof0kv
-	 8hN7n/jyVCN5vzVjcWtiFKgYz8A3VsQlA1MYOk0wjLssPX5ieshhi241+eJNbT7ot+Efzyn3CskS
-	 CArUz1
-X-QQ-XMRINFO: M/715EihBoGS47X28/vv4NpnfpeBLnr4Qg==
-From: Yingnan Zhang <342144303@qq.com>
-To: horms@verge.net.au,
-	ja@ssi.bg
-Cc: pablo@netfilter.org,
-	fw@strlen.de,
-	phil@nwl.cc,
+	s=arc-20240116; t=1775141213; c=relaxed/simple;
+	bh=XwOfAdEK+gqTJYqZiWRWo7L+IlmDVJAOASLMtEajcqA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=m7N4mLvUTcT2yJCJvjrpw5poM73Xg4df45V+xgJwatpsSBYqqhZhkn5VkVGCk5GC6g3C7lbFMJxe15rCSwjv5jUcXJbtz2Js9qUsg+t2Htiinth4nx9hOTyPsAUYMXfyog4oIZb1i24ZfqAOwDx0BJfCiJHZr9FS18j5cQKJLRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.161.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowACXB_g9gc5pVBehAA--.362S3;
+	Thu, 02 Apr 2026 22:46:24 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: netdev@vger.kernel.org
+Cc: jhs@mojatatu.com,
+	jiri@resnulli.us,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org,
-	Yingnan Zhang <342144303@qq.com>
-Subject: [PATCH net v3] ipvs: fix MTU check for GSO packets in tunnel mode
-Date: Thu,  2 Apr 2026 22:46:16 +0800
-X-OQ-MSGID: <20260402144616.53289-1-342144303@qq.com>
+	horms@kernel.org,
+	elibr@mellanox.com,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	enjou1224z@gmail.com,
+	caoruide123@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net 1/1] net: sched: act_csum: validate nested VLAN headers
+Date: Thu,  2 Apr 2026 22:46:20 +0800
+Message-ID: <22df2fcb49f410203eafa5d97963dd36089f4ecf.1774892775.git.caoruide123@gmail.com>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1774892775.git.caoruide123@gmail.com>
+References: <cover.1774892775.git.caoruide123@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,110 +63,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.66 / 15.00];
+X-CM-TRANSID:ygmowACXB_g9gc5pVBehAA--.362S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KF4rKrWruw43tFWftF18Krg_yoW8Cw1rpF
+	ZIgF1kKrZ7GF17Xw18t348Gay3XFZ5G3Zxt3ykGrW5tanYgw4FvF1UKFnruw48ur4SkFyS
+	yr1q9ry7urn8ArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
+	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
+	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
+	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
+	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQMFCWnNP3wX9QAAsL
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[qq.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[qq.com:s=s201512];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_FROM(0.00)[qq.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274585-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,qq.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[342144303@qq.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-274586-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[mojatatu.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,mellanox.com,gmail.com,lzu.edu.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[qq.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	NEURAL_HAM(-0.00)[-0.985];
+	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,qq.com:dkim,qq.com:email,qq.com:mid]
-X-Rspamd-Queue-Id: 1389F38AC80
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:email]
+X-Rspamd-Queue-Id: B34DB38AD9F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Currently, IPVS skips MTU checks for GSO packets by excluding them with
-the !skb_is_gso(skb) condition. This creates problems when IPVS tunnel
-mode encapsulates GSO packets with IPIP headers.
+From: Ruide Cao <caoruide123@gmail.com>
 
-The issue manifests in two ways:
+tcf_csum_act() walks nested VLAN headers directly from skb->data when an
+skb still carries in-payload VLAN tags. The current code reads
+vlan->h_vlan_encapsulated_proto and then pulls VLAN_HLEN bytes without
+first ensuring that the full VLAN header is present in the linear area.
 
-1. MTU violation after encapsulation:
-   When a GSO packet passes through IPVS tunnel mode, the original MTU
-   check is bypassed. After adding the IPIP tunnel header, the packet
-   size may exceed the outgoing interface MTU, leading to unexpected
-   fragmentation at the IP layer.
+If only part of an inner VLAN header is linearized, accessing
+h_vlan_encapsulated_proto reads past the linear area, and the following
+skb_pull(VLAN_HLEN) may violate skb invariants.
 
-2. Fragmentation with problematic IP IDs:
-   When net.ipv4.vs.pmtu_disc=1 and a GSO packet with multiple segments
-   is fragmented after encapsulation, each segment gets a sequentially
-   incremented IP ID (0, 1, 2, ...). This happens because:
+Fix this by requiring pskb_may_pull(skb, VLAN_HLEN) before accessing and
+pulling each nested VLAN header. If the header still is not fully
+available, drop the packet through the existing error path.
 
-   a) The GSO packet bypasses MTU check and gets encapsulated
-   b) At __ip_finish_output, the oversized GSO packet is split into
-      separate SKBs (one per segment), with IP IDs incrementing
-   c) Each SKB is then fragmented again based on the actual MTU
-
-   This sequential IP ID allocation differs from the expected behavior
-   and can cause issues with fragment reassembly and packet tracking.
-
-Fix this by properly validating GSO packets using
-skb_gso_validate_network_len(). This function correctly validates
-whether the GSO segments will fit within the MTU after segmentation. If
-validation fails, send an ICMP Fragmentation Needed message to enable
-proper PMTU discovery.
-
-Fixes: 4cdd34084d53 ("netfilter: nf_conntrack_ipv6: improve fragmentation handling")
-Signed-off-by: Yingnan Zhang <342144303@qq.com>
+Fixes: 2ecba2d1e45b ("net: sched: act_csum: Fix csum calc for tagged packets")
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Ren Wei <enjou1224z@gmail.com>
+Signed-off-by: Ruide Cao <caoruide123@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
-v3:
-- Fixed compilation error (removed extra closing brace in IPv6 function)
-- Fixed indentation to match kernel style
+ net/sched/act_csum.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-v2: https://lore.kernel.org/netdev/20260402030541.27855-1-342144303@qq.com/
-v1: https://lore.kernel.org/netdev/20260401152228.31190-1-342144303@qq.com/
----
- net/netfilter/ipvs/ip_vs_xmit.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
-index 3601eb86d..a4ca7cad0 100644
---- a/net/netfilter/ipvs/ip_vs_xmit.c
-+++ b/net/netfilter/ipvs/ip_vs_xmit.c
-@@ -111,8 +111,8 @@ __mtu_check_toobig_v6(const struct sk_buff *skb, u32 mtu)
- 		 */
- 		if (IP6CB(skb)->frag_max_size > mtu)
- 			return true; /* largest fragment violate MTU */
--	}
--	else if (skb->len > mtu && !skb_is_gso(skb)) {
-+	} else if (skb->len > mtu &&
-+		   !(skb_is_gso(skb) && skb_gso_validate_network_len(skb, mtu))) {
- 		return true; /* Packet size violate MTU size */
- 	}
- 	return false;
-@@ -232,8 +232,9 @@ static inline bool ensure_mtu_is_adequate(struct netns_ipvs *ipvs, int skb_af,
- 			return true;
+diff --git a/net/sched/act_csum.c b/net/sched/act_csum.c
+index 213e1ce9d2da..a9e4635d899e 100644
+--- a/net/sched/act_csum.c
++++ b/net/sched/act_csum.c
+@@ -604,8 +604,12 @@ TC_INDIRECT_SCOPE int tcf_csum_act(struct sk_buff *skb,
+ 			protocol = skb->protocol;
+ 			orig_vlan_tag_present = true;
+ 		} else {
+-			struct vlan_hdr *vlan = (struct vlan_hdr *)skb->data;
++			struct vlan_hdr *vlan;
  
- 		if (unlikely(ip_hdr(skb)->frag_off & htons(IP_DF) &&
--			     skb->len > mtu && !skb_is_gso(skb) &&
--			     !ip_vs_iph_icmp(ipvsh))) {
-+			     skb->len > mtu && !ip_vs_iph_icmp(ipvsh) &&
-+			     !(skb_is_gso(skb) &&
-+			       skb_gso_validate_network_len(skb, mtu)))) {
- 			icmp_send(skb, ICMP_DEST_UNREACH, ICMP_FRAG_NEEDED,
- 				  htonl(mtu));
- 			IP_VS_DBG(1, "frag needed for %pI4\n",
++			if (!pskb_may_pull(skb, VLAN_HLEN))
++				goto drop;
++
++			vlan = (struct vlan_hdr *)skb->data;
+ 			protocol = vlan->h_vlan_encapsulated_proto;
+ 			skb_pull(skb, VLAN_HLEN);
+ 			skb_reset_network_header(skb);
 -- 
-2.51.0
+2.34.1
 
 
