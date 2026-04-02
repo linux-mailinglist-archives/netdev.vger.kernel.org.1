@@ -1,268 +1,235 @@
-Return-Path: <netdev+bounces-274668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274669-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFepM1S6zmmTpgYAu9opvQ
-	(envelope-from <netdev+bounces-274668-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:49:56 +0200
+	id s19lCuq/zmmqpwYAu9opvQ
+	(envelope-from <netdev+bounces-274669-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 21:13:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BF8638D67E
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:49:56 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 736A638D92D
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 21:13:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3156C3077DCC
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 18:49:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3DEA93014C3E
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 19:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47BCB35E952;
-	Thu,  2 Apr 2026 18:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA7033D9DA0;
+	Thu,  2 Apr 2026 19:13:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AC7baZDu"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TpYatVaY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242F1314A60;
-	Thu,  2 Apr 2026 18:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775155738; cv=none; b=TMBOrXZHxsDzD+Y5wRvD1w5u7aO0AzYO/bGM3xYx+13uXnPjxt3MZUKdTslVaD2TKnv5hXupu3sqaG61Bsyjd92HzpjtjuR4GNJ8TnZIG2+eax3DbGbX1C82WG6++LEqT7Xw7gjB29RIOpOMSSQoQz3Fww7Jc1J3vwkG7k6bBkQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775155738; c=relaxed/simple;
-	bh=lyS5QMvT0kZXsl8fR1ISlH93yHXC/MQdVlrEF0Agmfk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mmur32/xAB3hbkaKSRF90PgKatx8O/p8SHbOiptuPdZi/xICqQK2nKBEGa+zGxn7esAPuMuKelKN0jTr4+ZqsVRfnOJgk0/Zf1DZ+cf1As1hoU56onNDYUuE7YI4qnL4Ky4JWD/ORg0AE+cC3WVTvd7NSjd0TGS4KegMRzbpPV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AC7baZDu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09A6BC19424;
-	Thu,  2 Apr 2026 18:48:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775155737;
-	bh=lyS5QMvT0kZXsl8fR1ISlH93yHXC/MQdVlrEF0Agmfk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AC7baZDupL0QHOXXxiM0v3ee9ai2qs7PDhYjC3+gQGedNxeBHT7+dRjqGP5LtZyHx
-	 6tenCrRzan8YMuPq0TDRvIwDlwKy0Oc/G0Wkgw1aRIDwytsBByX4YaTpgNvMuJ34E0
-	 NfnxkJXu5DjHJsZLGM2uhA9dKQGiP48EihJSI74zwGvqATGRcIiZSBWvcer9/ACnhf
-	 68rgCaFm9WnSHgISxtxwV07q6k5pn/8c/WtKNNKbG2z+8bEplfAUPjXSlzHgJ7wMxa
-	 H114gGwZmjwwm61CBt7yF68YakkamM5aJ9yfgHqvWV1j3Qa4ZnWl1lKnhhn0Z5H+hS
-	 XSucpa5ifsGyg==
-From: Arnd Bergmann <arnd@kernel.org>
-To: netdev@vger.kernel.org,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
-	linux-omap@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] [v4, net-next] dpaa2: avoid linking objects into multiple modules
-Date: Thu,  2 Apr 2026 20:46:55 +0200
-Message-Id: <20260402184726.3746487-3-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260402184726.3746487-1-arnd@kernel.org>
-References: <20260402184726.3746487-1-arnd@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4E329B224
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 19:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775157219; cv=pass; b=KDVo6zXN27UP4YM8HLtKnxxdtvqgB33acoj1z0njt6y5gJ45ZK2RDog4OSX5JqEyN/nawZLwKelBPXg0k9LUEpWxGFOev94DY3dC2hqFpYoBKO5dzYTTPz8QkhFfKKUOdXRfN3925v+Nj8AETEMXAt/S518RkNsshU2evQSQwpU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775157219; c=relaxed/simple;
+	bh=kbdroWpZEMKTTAqDWbBammpetQN187fleojAyiGM9/I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Pq9WLlUgZPLp/Dw8tkwCkfGDT19p+soTSJ03OgdL3l3DjCgyjDiGCQoVt+gJ2GoqKsTUiMXGcmzos487E6yXyxCkzlTVdU+Lk/HMXxm4akq7aQdinPlSozMBJg9+rWbMCQg5cvqnPOzN7vpSogo62LM4U4aqs+88WEL4PhIBHCc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TpYatVaY; arc=pass smtp.client-ip=74.125.224.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-6501725d888so1040559d50.0
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 12:13:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775157217; cv=none;
+        d=google.com; s=arc-20240605;
+        b=eNu34unS+YzRWVn6G6x1v079nA9Vfdvq5adxrh2rMqoKem+gpbwZOFBASlOhxnCoud
+         T44Beu+lo84KXBttVHFh+L4a/RxiPUVhqZgrs6rHHwKOU7UFVNdBO+iKGsaeAEtdvfUr
+         TDgNp9A4DV7MzG2ke96E+J987kbz/BlahNfwLAaA1kR7qPogeU8DgiqrGU1hqT4GmP61
+         fwn5lxkHRUOIQwRW8pI9Al3/24HJfEU1sxRasNlCVbUDM9bIyXZ2gV3kOdHIf8/gWa6O
+         TiakyVbA2EFQz7q7EYSZckOBSjH5LGulXmU15oyqwQYorlc9WDTER/mZpeP60UQ+GQhU
+         rzxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=DTIBlLEpNAQHphhX4QRSQjCX/tO4T/H0V6TBXe0t2+c=;
+        fh=p78vUy2fJDkcS2s8euRBMg097jB5aVw5sqwbTIhWv1E=;
+        b=RCo74Zf9Gxf9ID5D41tP3lvfhS0ONDT6tXjZvrDLnjoALIo1uqo4kDUUkNqVuu+A2z
+         RiRCyx51N15f5SuScABKcjHXb5bgstKBwC16qHnf2aydFrwbpDw/mpTL3BINvmcxGrIp
+         0xkyH1sQEgOVXcCeIdYT5hZ+RZH03v1scpPF333q7RicoWQ2zI5rdxeyPoIZuYorv21b
+         XH/BnkNY1gBo6CY4z6A9IgNCG+SOiVyhFkhtmyIhUgbHczMm/I79SerMWt2on3ksfYQ/
+         gzujO43PWLLGpSXQKGFbtqX7MoPYrdokn130PH7ya3fg+I7hCe/FMt+OvXcBQtiuIlG3
+         i2LQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1775157217; x=1775762017; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=DTIBlLEpNAQHphhX4QRSQjCX/tO4T/H0V6TBXe0t2+c=;
+        b=TpYatVaYkkQeIEdZCcGBDTWfoKuHi2HXU6TqpIt7ml8i5SOtJK1FWg0fOdGSVEU87s
+         RRChXnic9ctQ6IZY53FxXZgajBsHs7tOycL6KRAQBqkmXn3qOkOgfJuZezx/He1S5h1U
+         /O8aWJNPU3y8dE4/VrWSG4aPIs9lp5Hhr0FTT3SRVRr6RvXj9rY/i+fE10F1VwH4WfdL
+         w9kUxJhm59bSqWHu/ek92WupZC1x0ILc7GHdkk8Bc+7P8fj7oAPGr5Mx66/wXNb+dtax
+         5+BkDdfMd48QaAYT6lK3Kveu9C56pkqljzerxMuSkrVQ+fOxbCd1eUMhLAS/WUvFPQa/
+         gbRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775157217; x=1775762017;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DTIBlLEpNAQHphhX4QRSQjCX/tO4T/H0V6TBXe0t2+c=;
+        b=kHPy4wVYxa8rAOycptGM+IpO5ta7kNBGYEDVJytgoszx33PcAxUIhgarGZ2L3h3HLu
+         YGUNVhZllsYfOa+wxXhotNkjx0p/+EknsII6zMsNEXDmlGQh1iKu5pnd9RAxZZG81tin
+         V5mjSpxBJ1htCxH01MEZ1GAD8lxps/cIIvMhEL9bB96oLV3DdItGXOGv+hV/jciI8jDu
+         +AIOVK9pa25gpNJI+yYg33vIFZ+B8x9Mf9+wHhobJ/8NdLLQ2Lg6Z1C8m6sZUzlRng5e
+         8ioJbzRdRuBEt5L3MoQExdxvQUlkLL1m69zDpfTFHGG+908Fpl+b2nh9EqMM/8rgAEex
+         R87A==
+X-Gm-Message-State: AOJu0YwLWv2zPkwQ+kuoLd9+EfR0qHIqaSlXfak5XX8b3xAd3W/+Z/IY
+	LmB70JOd/EWOTilelxnIBlI9cMP7fMSWesGt+m2jKWvUqrQzh2b4oxcDRlv0lhRQE14dBD6jXqU
+	d2v0vnPaYfn82xbFGHJPchsofrUL6Vtc58/UpqvGCrw==
+X-Gm-Gg: AeBDieuSZOPQw0OC8abCpBka/v9ggZ/pmOuEcbZGkI+Bm44MaJQ2nfs2cUI35Cuj+5o
+	ptdLu+s2UnJ7f1F1AoLl7yz+/jzWZk8vLIAP4c5dC33MPgc3megrt07UT9OluVnWnFu1xoduo+d
+	UsZMkdeXWjA1oFVvhL7fyvhwoy1HnqIz04WnLSPthf1ZiiTFM5q+Vv/Rri368GztoCukZR8pkiX
+	h04Yei4+vhg4E+52PV7ZOu0UisLZPtnA0sU2STrgJSaDNkl9t1iilMHboYpeoE+Cb25d19yu/d0
+	AewhcKrlJRJtc2FWKINRnAo1R8u5sJUYymGmfxaHngYwQ/4n1uzDML2Ce0GzLU7ZOjUM7tDij9X
+	7337L9Q6E15X4A8AVIXbp/u/o9EFsGjhjtf/WkiDQJyIMGTPD4VgGSjEew2S62zWk6My5cofE9A
+	IUWE1cChtXOIkhUUqy2DxXkdNRENQ7l+haNtyTswhrHSRNlD+h4ePUs39eEVnZd8GmtEqhwTF/8
+	RvTwzYGbTeyBh/hVHEPB/qOAfIuxQt9Bt41R2A8I8lcXa+NCbF9ycj9GE28WJ7sB2pkg7lzGHDn
+	VXWiA/VYRYHwEz3xEaIXHEUE/VgM+REi2RFtw4mLPrE=
+X-Received: by 2002:a05:690e:4142:b0:650:367f:7f3f with SMTP id
+ 956f58d0204a3-6504885f0a0mr104144d50.50.1775157217199; Thu, 02 Apr 2026
+ 12:13:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+References: <20260402184726.3746487-1-arnd@kernel.org>
+In-Reply-To: <20260402184726.3746487-1-arnd@kernel.org>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Thu, 2 Apr 2026 22:13:00 +0300
+X-Gm-Features: AQROBzCYBRGvnozxFzTvK5IcNSvZvT_9cSUVFQZZjVD30n0NBtqh91pIYRAmGH0
+Message-ID: <CAC_iWj+vjZ0WnKUuqeFfaPeSoj5ovxZiEmUD5R8hPsRfkqMihQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] [v4, net-next] net: ethernet: ti-cpsw:: rename
+ soft_reset() function
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Grygorii Strashko <grygorii.strashko@ti.com>, Murali Karicheri <m-karicheri2@ti.com>, 
+	Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, 
+	Vladimir Oltean <vladimir.oltean@nxp.com>, Alexander Sverdlin <alexander.sverdlin@gmail.com>, 
+	Ioana Ciornei <ioana.ciornei@nxp.com>, linux-omap@vger.kernel.org, 
+	Arnd Bergmann <arnd@arndb.de>, Kevin Hao <haokexin@gmail.com>, 
+	Daniel Zahka <daniel.zahka@gmail.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[linaro.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linaro.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[ti.com,kernel.org,nxp.com,gmail.com,vger.kernel.org,arndb.de];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274669-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-274668-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,ti.com,nxp.com,gmail.com,arndb.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[arnd@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NEQ_ENVFROM(0.00)[ilias.apalodimas@linaro.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linaro.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,arndb.de:email]
-X-Rspamd-Queue-Id: 4BF8638D67E
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,arndb.de:email,linaro.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 736A638D92D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Arnd Bergmann <arnd@arndb.de>
+Hi Arnd,
 
-Each object file contains information about which module it gets linked
-into, so linking the same file into multiple modules now causes a warning:
+On Thu, 2 Apr 2026 at 21:47, Arnd Bergmann <arnd@kernel.org> wrote:
+>
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> While looking at the glob symbols shared between the cpsw drivers,
+> I noticed that soft_reset() is the only one that is missing a proper
+> namespace prefix, and will pollute the kernel namespace, so rename
+> it to be consistent with the other symbols.
+>
+> Fixes: c5013ac1dd0e1 ("net: ethernet: ti: cpsw: move set of common functions in cpsw_priv")
 
-scripts/Makefile.build:254: drivers/net/ethernet/freescale/dpaa2/Makefile: dpaa2-mac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
-scripts/Makefile.build:254: drivers/net/ethernet/freescale/dpaa2/Makefile: dpmac.o is added to multiple modules: fsl-dpaa2-eth fsl-dpaa2-switch
+The patch seems fine, but why the Fixes: tag?
 
-Change the way that dpaa2 is built by moving the two common files into a
-separate module with exported symbols instead.
-
-Tested-by: Ioana Ciornei <ioana.ciornei@nxp.com>
-Reviewed-by: Ioana Ciornei <ioana.ciornei@nxp.com>
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-v2: add missing module description
-v3: rename "common" to "mac"
-    drop Kconfig change
-    rebase to linux-next
-v4: fix changlog comment
-    post along with the corresponding ti-cpsw driver change
----
- drivers/net/ethernet/freescale/dpaa2/Makefile    |  9 +++++----
- drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c | 16 ++++++++++++++++
- 2 files changed, 21 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/dpaa2/Makefile b/drivers/net/ethernet/freescale/dpaa2/Makefile
-index 1b05ba8d1cbf..5f74be76434f 100644
---- a/drivers/net/ethernet/freescale/dpaa2/Makefile
-+++ b/drivers/net/ethernet/freescale/dpaa2/Makefile
-@@ -3,15 +3,16 @@
- # Makefile for the Freescale DPAA2 Ethernet controller
- #
- 
--obj-$(CONFIG_FSL_DPAA2_ETH)		+= fsl-dpaa2-eth.o
-+obj-$(CONFIG_FSL_DPAA2_ETH)		+= fsl-dpaa2-eth.o fsl-dpaa2-mac.o
- obj-$(CONFIG_FSL_DPAA2_PTP_CLOCK)	+= fsl-dpaa2-ptp.o
--obj-$(CONFIG_FSL_DPAA2_SWITCH)		+= fsl-dpaa2-switch.o
-+obj-$(CONFIG_FSL_DPAA2_SWITCH)		+= fsl-dpaa2-switch.o fsl-dpaa2-mac.o
- 
--fsl-dpaa2-eth-objs	:= dpaa2-eth.o dpaa2-ethtool.o dpni.o dpaa2-mac.o dpmac.o dpaa2-eth-devlink.o dpaa2-xsk.o
-+fsl-dpaa2-eth-objs	:= dpaa2-eth.o dpaa2-ethtool.o dpni.o dpaa2-eth-devlink.o dpaa2-xsk.o
- fsl-dpaa2-eth-${CONFIG_FSL_DPAA2_ETH_DCB} += dpaa2-eth-dcb.o
- fsl-dpaa2-eth-${CONFIG_DEBUG_FS} += dpaa2-eth-debugfs.o
- fsl-dpaa2-ptp-objs	:= dpaa2-ptp.o dprtc.o
--fsl-dpaa2-switch-objs	:= dpaa2-switch.o dpaa2-switch-ethtool.o dpsw.o dpaa2-switch-flower.o dpaa2-mac.o dpmac.o
-+fsl-dpaa2-switch-objs	:= dpaa2-switch.o dpaa2-switch-ethtool.o dpsw.o dpaa2-switch-flower.o
-+fsl-dpaa2-mac-objs	+= dpaa2-mac.o dpmac.o
- 
- # Needed by the tracing framework
- CFLAGS_dpaa2-eth.o := -I$(src)
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-index ad812ebf3139..1f80a527264a 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
-@@ -544,6 +544,7 @@ void dpaa2_mac_start(struct dpaa2_mac *mac)
- 
- 	phylink_start(mac->phylink);
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_start);
- 
- void dpaa2_mac_stop(struct dpaa2_mac *mac)
- {
-@@ -554,6 +555,7 @@ void dpaa2_mac_stop(struct dpaa2_mac *mac)
- 	if (mac->serdes_phy)
- 		phy_power_off(mac->serdes_phy);
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_stop);
- 
- int dpaa2_mac_connect(struct dpaa2_mac *mac)
- {
-@@ -646,6 +648,7 @@ int dpaa2_mac_connect(struct dpaa2_mac *mac)
- 
- 	return err;
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_connect);
- 
- void dpaa2_mac_disconnect(struct dpaa2_mac *mac)
- {
-@@ -658,6 +661,7 @@ void dpaa2_mac_disconnect(struct dpaa2_mac *mac)
- 	of_phy_put(mac->serdes_phy);
- 	mac->serdes_phy = NULL;
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_disconnect);
- 
- int dpaa2_mac_open(struct dpaa2_mac *mac)
- {
-@@ -729,6 +733,7 @@ int dpaa2_mac_open(struct dpaa2_mac *mac)
- 	dpmac_close(mac->mc_io, 0, dpmac_dev->mc_handle);
- 	return err;
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_open);
- 
- void dpaa2_mac_close(struct dpaa2_mac *mac)
- {
-@@ -753,6 +758,7 @@ void dpaa2_mac_close(struct dpaa2_mac *mac)
- 	if (mac->fw_node)
- 		fwnode_handle_put(mac->fw_node);
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_close);
- 
- static void dpaa2_mac_transfer_stats(const struct dpmac_counter *counters,
- 				     size_t num_counters, void *s,
-@@ -824,6 +830,7 @@ void dpaa2_mac_get_rmon_stats(struct dpaa2_mac *mac,
- 
- 	*ranges = dpaa2_mac_rmon_ranges;
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_get_rmon_stats);
- 
- void dpaa2_mac_get_pause_stats(struct dpaa2_mac *mac,
- 			       struct ethtool_pause_stats *s)
-@@ -835,6 +842,7 @@ void dpaa2_mac_get_pause_stats(struct dpaa2_mac *mac,
- 				     DPAA2_MAC_NUM_PAUSE_STATS,
- 				     dpaa2_mac_pause_stats, s);
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_get_pause_stats);
- 
- void dpaa2_mac_get_ctrl_stats(struct dpaa2_mac *mac,
- 			      struct ethtool_eth_ctrl_stats *s)
-@@ -846,6 +854,7 @@ void dpaa2_mac_get_ctrl_stats(struct dpaa2_mac *mac,
- 				     DPAA2_MAC_NUM_ETH_CTRL_STATS,
- 				     dpaa2_mac_eth_ctrl_stats, s);
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_get_ctrl_stats);
- 
- void dpaa2_mac_get_eth_mac_stats(struct dpaa2_mac *mac,
- 				 struct ethtool_eth_mac_stats *s)
-@@ -857,11 +866,13 @@ void dpaa2_mac_get_eth_mac_stats(struct dpaa2_mac *mac,
- 				     DPAA2_MAC_NUM_ETH_MAC_STATS,
- 				     dpaa2_mac_eth_mac_stats, s);
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_get_eth_mac_stats);
- 
- int dpaa2_mac_get_sset_count(void)
- {
- 	return DPAA2_MAC_NUM_ETHTOOL_STATS;
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_get_sset_count);
- 
- void dpaa2_mac_get_strings(u8 **data)
- {
-@@ -870,6 +881,7 @@ void dpaa2_mac_get_strings(u8 **data)
- 	for (i = 0; i < DPAA2_MAC_NUM_ETHTOOL_STATS; i++)
- 		ethtool_puts(data, dpaa2_mac_ethtool_stats[i].name);
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_get_strings);
- 
- void dpaa2_mac_get_ethtool_stats(struct dpaa2_mac *mac, u64 *data)
- {
-@@ -921,3 +933,7 @@ void dpaa2_mac_get_ethtool_stats(struct dpaa2_mac *mac, u64 *data)
- 		*(data + i) = value;
- 	}
- }
-+EXPORT_SYMBOL_GPL(dpaa2_mac_get_ethtool_stats);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("DPAA2 Ethernet MAC library");
--- 
-2.39.5
-
+Cheers
+/Ilias
+> Reviewed-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/net/ethernet/ti/cpsw.c      | 2 +-
+>  drivers/net/ethernet/ti/cpsw_new.c  | 2 +-
+>  drivers/net/ethernet/ti/cpsw_priv.c | 2 +-
+>  drivers/net/ethernet/ti/cpsw_priv.h | 2 +-
+>  4 files changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/ti/cpsw.c b/drivers/net/ethernet/ti/cpsw.c
+> index b0e18bdc2c85..aa3531e844e8 100644
+> --- a/drivers/net/ethernet/ti/cpsw.c
+> +++ b/drivers/net/ethernet/ti/cpsw.c
+> @@ -706,7 +706,7 @@ static void cpsw_init_host_port(struct cpsw_priv *priv)
+>         struct cpsw_common *cpsw = priv->cpsw;
+>
+>         /* soft reset the controller and initialize ale */
+> -       soft_reset("cpsw", &cpsw->regs->soft_reset);
+> +       cpsw_soft_reset("cpsw", &cpsw->regs->soft_reset);
+>         cpsw_ale_start(cpsw->ale);
+>
+>         /* switch to vlan aware mode */
+> diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
+> index 7f42f58a4b03..c5be359f3c66 100644
+> --- a/drivers/net/ethernet/ti/cpsw_new.c
+> +++ b/drivers/net/ethernet/ti/cpsw_new.c
+> @@ -573,7 +573,7 @@ static void cpsw_init_host_port(struct cpsw_priv *priv)
+>         u32 control_reg;
+>
+>         /* soft reset the controller and initialize ale */
+> -       soft_reset("cpsw", &cpsw->regs->soft_reset);
+> +       cpsw_soft_reset("cpsw", &cpsw->regs->soft_reset);
+>         cpsw_ale_start(cpsw->ale);
+>
+>         /* switch to vlan aware mode */
+> diff --git a/drivers/net/ethernet/ti/cpsw_priv.c b/drivers/net/ethernet/ti/cpsw_priv.c
+> index bc4fdf17a99e..c6eb6b785b0b 100644
+> --- a/drivers/net/ethernet/ti/cpsw_priv.c
+> +++ b/drivers/net/ethernet/ti/cpsw_priv.c
+> @@ -275,7 +275,7 @@ void cpsw_set_slave_mac(struct cpsw_slave *slave, struct cpsw_priv *priv)
+>         slave_write(slave, mac_lo(priv->mac_addr), SA_LO);
+>  }
+>
+> -void soft_reset(const char *module, void __iomem *reg)
+> +void cpsw_soft_reset(const char *module, void __iomem *reg)
+>  {
+>         unsigned long timeout = jiffies + HZ;
+>
+> diff --git a/drivers/net/ethernet/ti/cpsw_priv.h b/drivers/net/ethernet/ti/cpsw_priv.h
+> index acb6181c5c9e..fddd7a79f4b0 100644
+> --- a/drivers/net/ethernet/ti/cpsw_priv.h
+> +++ b/drivers/net/ethernet/ti/cpsw_priv.h
+> @@ -458,7 +458,7 @@ int cpsw_tx_poll(struct napi_struct *napi_tx, int budget);
+>  int cpsw_rx_mq_poll(struct napi_struct *napi_rx, int budget);
+>  int cpsw_rx_poll(struct napi_struct *napi_rx, int budget);
+>  void cpsw_rx_vlan_encap(struct sk_buff *skb);
+> -void soft_reset(const char *module, void __iomem *reg);
+> +void cpsw_soft_reset(const char *module, void __iomem *reg);
+>  void cpsw_set_slave_mac(struct cpsw_slave *slave, struct cpsw_priv *priv);
+>  void cpsw_ndo_tx_timeout(struct net_device *ndev, unsigned int txqueue);
+>  int cpsw_need_resplit(struct cpsw_common *cpsw);
+> --
+> 2.39.5
+>
 
