@@ -1,689 +1,474 @@
-Return-Path: <netdev+bounces-274622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274623-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MP1qMI6XzmkBowYAu9opvQ
-	(envelope-from <netdev+bounces-274622-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:21:34 +0200
+	id CLg0M6GZzmkBowYAu9opvQ
+	(envelope-from <netdev+bounces-274623-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:30:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ACF638BC6D
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:21:34 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65EE138BDF4
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:30:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F3FFD301DB7B
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 16:21:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6E7FD3082D9A
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 16:25:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55603EFD1B;
-	Thu,  2 Apr 2026 16:21:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356A13F0775;
+	Thu,  2 Apr 2026 16:25:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="JuvIwXUP";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="A6leeqYO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Coy43pY4"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29F4C3D3CEA
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 16:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C013EF0B7;
+	Thu,  2 Apr 2026 16:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775146886; cv=none; b=a0eOvq6GEUVbQwxYrNBbOS4qYsuCdT4Wlw1Rrm5wC3Pjw0q1NWmD+BXr+SBQ/bPcQOIDyPDmn97sWy2soOBCKazLyB1Vtdpy0XxrrIDjpc11+H+5v8Io8MeUI74uHpgSnAj6SfpRY1BXqfy/Cp9fIGhQfHph8uyvo8Dg6jd7Tjg=
+	t=1775147124; cv=none; b=EMna5AcuucNDQVEMBxd/cd3vLSh8IBNA8/qO7wm9TcgYsvPO6ld9l4a4ggf+yL/8tzvOxD0UbrKUU8TbGDkwSO/qEWzruOhcwOHst3cZxrz41nk54Ry8kizOGJwK2K9HJ9wCV6ia0UmM31ebJbwSuRNz/ZqNOyTGXcJJgocZOcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775146886; c=relaxed/simple;
-	bh=OQqVAZertr0MqEb4OL9FMHWJmK0TnhI0czbi30Fs8yg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DY1TDBeX2b/Xm0+ddu8bWxGYBF5eghbQvsUt3SYjqFzLixQMkBBGuSDbgXW5+DL6YC/4DY+aG5ajkdLUkzk0n9fjDSIpXxFQ88HaODQweanWebhL+sjXctjKdkZdviyECGs7hoY4etXbjvPvobnVIaUaVtZImppmWFqqhVdgozU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=JuvIwXUP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=A6leeqYO; arc=none smtp.client-ip=103.168.172.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id 231A8EC001C;
-	Thu,  2 Apr 2026 12:21:20 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Thu, 02 Apr 2026 12:21:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1775146880; x=
-	1775233280; bh=vsfWwIb2twbOqOZFXB1PpTJUU05T9jTZgiPsUAhT/RM=; b=J
-	uvIwXUP4IrrJgWWIMvJmfrekiag21KD0mkldObzcd7t+JzlRFUkZIn9Vm282B1JV
-	ECrCSfGb9xSMnz2fiW00LDR9G59EcJbVTyoWQGWm1qAjjtb1O+2NktfczsfWfSMV
-	h0qxQwB6a4NwKX8jNKFIYpsP+RrVfFpq5CoRkHoEfaR5uLIwULl3wWWY3YdmLqj4
-	7/faJXmvtnrPg4S9NXBT32fZZYj1HWQTLerm67I8yMj4vZrY8sRluEbOaFSj2ASQ
-	vAesA1zY2jY2tnfVolMO+98c0edyDhhFS800u/NH3akz3b81e/DtHsYQ/n0vxvUT
-	HAYYvP8wId4xYreDXfnKw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1775146880; x=1775233280; bh=vsfWwIb2twbOqOZFXB1PpTJUU05T9jTZgiP
-	sUAhT/RM=; b=A6leeqYO9btL4yHlQUAjMJGw4D8YYIqq20U0m6UjndKOnfnMrfl
-	XYPS2uETUv3Jy8k4L9QbFZ3w4BW8MtgUidgdk05ngC9/ccqgJevHzDaBhJTDkts6
-	yA6+P4GPufBDS2FQ7z4PMaBRGrPxX7SIwZMNCQ0r7ZU31/mq8uLEU8JkN/wdsSFp
-	2tFIUNvobc5X9kDm18uaFiaWa0EEkO5XmsPUbZi5Tf65YIagsqurF5jlLH8HvwzP
-	T4gAOW3JZLrKdXEXM7WJ03n9AQa0O1CChkPNUVi7VO9AKq6j8aZH7yn3PlmjFR6q
-	cc6hUdX66ttFDClDpsoQKAgH199PcaUAMXQ==
-X-ME-Sender: <xms:f5fOae7RktMnPV4grTsldQGjypkoAtKSr_E_5rRwpJvSxDWNCBAunw>
-    <xme:f5fOaTuhuKYdXbsBGI3EoC4dObAY5z6M5j509iRb9sRGsKDt1aa8NxRnMdG7h7oX8
-    SQdiuY7uhxZsfBSU9SUnjwvvFSPoZ3lrQbvG5OZl2DqD_6mLTao54I>
-X-ME-Received: <xmr:f5fOaY3hLHK8MZUap-UwJRLle1a7kxBjQO8el33odL_Jlot5OW3rd5UgQqFa>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdeihedtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    epfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhnrgcu
-    ffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrfgrth
-    htvghrnhepgefhieehffdvfeetledugfekieevtdeileekgfeliedvgefhkeetudeftdfg
-    ieetnecuffhomhgrihhnpehvrghrihgrnhhtshdrthhoohhlshenucevlhhushhtvghruf
-    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghi
-    lhdrnhgvthdpnhgspghrtghpthhtohepuddvpdhmohguvgepshhmthhpohhuthdprhgtph
-    htthhopehrjhgvthhhfigrnhhisehpuhhrvghsthhorhgrghgvrdgtohhmpdhrtghpthht
-    ohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshgrvg
-    gvughmsehnvhhiughirgdrtghomhdprhgtphhtthhopehtrghrihhqthesnhhvihguihgr
-    rdgtohhmpdhrtghpthhtohepmhgslhhotghhsehnvhhiughirgdrtghomhdprhgtphhtth
-    hopegsohhrihhsphesnhhvihguihgrrdgtohhmpdhrtghpthhtohepjhhohhhnrdhfrghs
-    thgrsggvnhgusehgmhgrihhlrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlh
-    drohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvght
-X-ME-Proxy: <xmx:f5fOaUr0alaDtciFCXXpxA_eGgwd1CS3Vt2tCrn9lWqXmUYzpONZiw>
-    <xmx:f5fOaQIWx4kRrg5DcGRRAVuxN_C5GZjjRoSYtnmvOaa7x7N8JG-EMQ>
-    <xmx:f5fOaYT8YLizuXPohAiAlEs6OvmBJQ82GfOOQEg5KiNpLwNbC6OqhA>
-    <xmx:f5fOaQMqc69ZVpjFh0Ev9JIjImkBkFWdQzKXli9BNTJjYyrJgQgV0w>
-    <xmx:gJfOacvH9WzngM4s5uUMUyRAGJjggBbAWs_nto5DeHevtrj1kjhyOS7j>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 2 Apr 2026 12:21:19 -0400 (EDT)
-Date: Thu, 2 Apr 2026 18:21:17 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Rishikesh Jethwani <rjethwani@purestorage.com>
-Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
-	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com,
-	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, leon@kernel.org
-Subject: Re: [PATCH v11 6/6] selftests: net: add TLS hardware offload test
-Message-ID: <ac6XfZJ9I6itcXxE@krikkit>
-References: <20260331163757.149343-1-rjethwani@purestorage.com>
- <20260331163757.149343-7-rjethwani@purestorage.com>
+	s=arc-20240116; t=1775147124; c=relaxed/simple;
+	bh=+cEuwGniw8jie2a1Gp6VPjs5LbKlyS3DkqDlrV6u0g0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RzlibCidImHzJIzKxmuIAxVidpNWAgcYoKm7akfG88haYjKR1AuumBiLmFfVC3Tj+tRLNPR1sX5NxK8U13WgGsd/2NiHCh33qA/ipKRIxpDQoQ1W0IZlmx5a2mE49xvBYfgzG3mZBYsei58Ponbv47eKF86gtlI+dZh19QxRFzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Coy43pY4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D366C2BC9E;
+	Thu,  2 Apr 2026 16:25:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775147123;
+	bh=+cEuwGniw8jie2a1Gp6VPjs5LbKlyS3DkqDlrV6u0g0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Coy43pY4EIj62nWy81lxYnnie7HQTdh7gkAH3YC0uSNOES8hvlG2yawuQCnvUX/qG
+	 +rZ+xo6CoQTZ4KsUyiKcCrwXSAHontmp0Z8WSlN0Ctm7Nt8TBEEq5y4hXCGxT0RyXK
+	 fg1EXRC8AKjiTwOcaZcO3AvS+uof1dqHfvJj6B3mPW97wVQYOhQ4qtIGi2YxfUvJs0
+	 tNTyqxCcb+OhaqmnYZKdJ2YPBUW5BYillGlzvgn2lBSpl6fRCql9MzaPtoZ9kRd431
+	 Vq785nPlOO9NhXQpyqQ3dQt5E4+J6SH3X7E0Jx2RbY6d8Jpzhyw4rBXadO43WFjN+f
+	 bWUNeHC8RvEUw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v7.0-rc7
+Date: Thu,  2 Apr 2026 09:25:22 -0700
+Message-ID: <20260402162522.666383-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260331163757.149343-7-rjethwani@purestorage.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-1.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274622-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,kernel.org,davemloft.net,redhat.com,google.com];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274623-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.997];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 2ACF638BC6D
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6]
+X-Rspamd-Queue-Id: 65EE138BDF4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-03-31, 10:37:57 -0600, Rishikesh Jethwani wrote:
-> diff --git a/tools/testing/selftests/drivers/net/hw/tls_hw_offload.c b/tools/testing/selftests/drivers/net/hw/tls_hw_offload.c
-> new file mode 100644
-> index 000000000000..69ee834bfabd
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/hw/tls_hw_offload.c
-[...]
-> +static int do_rekey;
-> +static int num_rekeys = 1;
-> +static int rekeys_done;
-> +static int cipher_type = 128;
-> +static int tls_version = 13;
-
-You could directly use the uapi constants (TLS_1_3_VERSION,
-TLS_CIPHER_AES_GCM_128) instead of coming up with your own.
-
-> +static int server_port = 4433;
-> +static char *server_ip;
-> +static int addr_family = AF_INET;
-> +
-> +static int send_size = 16384;
-> +static int random_size_max;
-> +
-> +static int detect_addr_family(const char *ip)
-
-The python code only runs IPv4 tests.
-(do_client, do_server, and main also have some v6 stuff that will
-never get used)
-
-
-[...]
-> +static void derive_key_256(struct tls12_crypto_info_aes_gcm_256 *key,
-> +			   int generation)
-
-That's almost an exact c/p of derive_key_128, except for a few s/128/256/.
-
-
-[...]
-> +/* Send TLS 1.3 KeyUpdate handshake message */
-> +static int send_tls_key_update(int fd, int request_update)
-> +{
-> +	char cmsg_buf[CMSG_SPACE(sizeof(unsigned char))];
-> +	unsigned char key_update_msg[5];
-> +	struct msghdr msg = {0};
-> +	struct cmsghdr *cmsg;
-> +	struct iovec iov;
-> +
-> +	key_update_msg[0] = TLS_HANDSHAKE_KEY_UPDATE;
-> +	key_update_msg[1] = 0;
-> +	key_update_msg[2] = 0;
-> +	key_update_msg[3] = 1;
-> +	key_update_msg[4] = request_update ? KEY_UPDATE_REQUESTED
-> +					   : KEY_UPDATE_NOT_REQUESTED;
-
-All callers are already passing KEY_UPDATE_REQUESTED or
-KEY_UPDATE_NOT_REQUESTED. But I'm not sure why you're bothering with
-this, since the RX side only checks buf[0] == TLS_HANDSHAKE_KEY_UPDATE.
-
-[...]
-> +static int recv_tls_message(int fd, char *buf, size_t buflen, int *record_type)
-> +{
-> +	char cmsg_buf[CMSG_SPACE(sizeof(unsigned char))];
-> +	struct msghdr msg = {0};
-> +	struct cmsghdr *cmsg;
-> +	struct iovec iov;
-> +	int ret;
-> +
-> +	iov.iov_base = buf;
-> +	iov.iov_len = buflen;
-> +
-> +	msg.msg_iov = &iov;
-> +	msg.msg_iovlen = 1;
-> +	msg.msg_control = cmsg_buf;
-> +	msg.msg_controllen = sizeof(cmsg_buf);
-> +
-> +	ret = recvmsg(fd, &msg, 0);
-> +	if (ret <= 0)
-> +		return ret;
-> +
-> +	*record_type = TLS_RECORD_TYPE_APPLICATION_DATA;  /* default */
-
-Is a default value actually needed? When userspace provides cmsg
-space, tls_sw_recvmsg always fills it.
-
-> +	cmsg = CMSG_FIRSTHDR(&msg);
-> +	if (cmsg && cmsg->cmsg_level == SOL_TLS &&
-> +	    cmsg->cmsg_type == TLS_GET_RECORD_TYPE)
-> +		*record_type = *((unsigned char *)CMSG_DATA(cmsg));
-> +
-> +	return ret;
-> +}
-
-[...]
-> +static void check_ekeyexpired(int fd)
-> +{
-> +	char buf[16];
-> +	int ret;
-> +
-> +	ret = recv(fd, buf, sizeof(buf), MSG_DONTWAIT);
-> +	if (ret == -1 && errno == EKEYEXPIRED)
-> +		printf("recv() returned EKEYEXPIRED as expected\n");
-> +	else if (ret == -1 && errno == EAGAIN)
-> +		printf("recv() returned EAGAIN (no pending data)\n");
-> +	else if (ret == -1)
-> +		printf("recv() returned error: %s\n", strerror(errno));
-
-Nothing for "we expected EKEYEXPIRED but actually got data"?
-
-And this is only for logging/debugging? It's not having on impact on
-the pass/fail results.
-
-> +}
-> +
-> +static int do_tls_rekey(int fd, int is_tx, int generation, int cipher)
-
-That's almost exact c/p of setup_tls_key. Please clean up all this
-duplicated code.
-
-[...]
-> +static int do_client(void)
-> +{
-> +	struct sockaddr_storage sa;
-> +	char *buf = NULL, *echo_buf = NULL;
-> +	int max_size, rekey_interval;
-> +	ssize_t echo_total, echo_n;
-> +	int csk = -1, ret, i, j;
-> +	int test_result = 0;
-> +	int current_gen = 0;
-> +	int next_rekey_at;
-> +	socklen_t sa_len;
-> +	ssize_t n;
-> +
-> +	if (!server_ip) {
-> +		printf("ERROR: Client requires -s <ip> option\n");
-> +		return -1;
-> +	}
-> +
-> +	max_size = random_size_max > 0 ? random_size_max : send_size;
-> +	if (max_size < MIN_BUF_SIZE)
-> +		max_size = MIN_BUF_SIZE;
-> +	buf = malloc(max_size);
-> +	echo_buf = malloc(max_size);
-> +	if (!buf || !echo_buf) {
-> +		printf("failed to allocate buffers\n");
-> +		test_result = -1;
-> +		goto out;
-> +	}
-> +
-> +	csk = socket(addr_family, SOCK_STREAM, IPPROTO_TCP);
-> +	if (csk < 0) {
-> +		printf("failed to create socket: %s\n", strerror(errno));
-> +		test_result = -1;
-> +		goto out;
-> +	}
-> +
-> +	memset(&sa, 0, sizeof(sa));
-> +	if (addr_family == AF_INET6) {
-
-This will never get used.
-
-[...]
-
-> +	if (setup_tls_key(csk, 1, 0, cipher_type) < 0 ||
-> +	    setup_tls_key(csk, 0, 0, cipher_type) < 0) {
-
-This could just use TLS_TX/TLS_RX directly instead of is_tx={0,1}.
-
-> +		test_result = -1;
-> +		goto out;
-> +	}
-> +
-> +	if (do_rekey)
-> +		printf("TLS %s setup complete. Will perform %d rekey(s).\n",
-> +		       cipher_name(cipher_type), num_rekeys);
-> +	else
-> +		printf("TLS setup complete.\n");
-> +
-> +	if (random_size_max > 0)
-> +		printf("Sending %d messages of random size (1..%d bytes)...\n",
-> +		       TEST_ITERATIONS, random_size_max);
-> +	else
-> +		printf("Sending %d messages of %d bytes...\n",
-> +		       TEST_ITERATIONS, send_size);
-> +
-> +	rekey_interval = TEST_ITERATIONS / (num_rekeys + 1);
-> +	if (rekey_interval < 1)
-> +		rekey_interval = 1;
-> +	next_rekey_at = rekey_interval;
-> +
-> +	for (i = 0; i < TEST_ITERATIONS; i++) {
-> +		int this_size;
-> +
-> +		if (random_size_max > 0)
-> +			this_size = (rand() % random_size_max) + 1;
-> +		else
-> +			this_size = send_size;
-> +
-> +		for (j = 0; j < this_size; j++)
-> +			buf[j] = rand() & 0xFF;
-> +
-> +		n = send(csk, buf, this_size, 0);
-> +		if (n != this_size) {
-> +			printf("FAIL: send failed: %s\n", strerror(errno));
-> +			test_result = -1;
-> +			break;
-> +		}
-> +		printf("Sent %zd bytes (iteration %d)\n", n, i + 1);
-> +
-> +		echo_total = 0;
-> +		while (echo_total < n) {
-> +			echo_n = recv(csk, echo_buf + echo_total,
-> +				      n - echo_total, 0);
-> +			if (echo_n < 0) {
-> +				printf("FAIL: Echo recv failed: %s\n",
-> +				       strerror(errno));
-> +				test_result = -1;
-> +				break;
-> +			}
-> +			if (echo_n == 0) {
-> +				printf("FAIL: Connection closed during echo\n");
-> +				test_result = -1;
-> +				break;
-> +			}
-> +			echo_total += echo_n;
-> +		}
-> +		if (test_result != 0)
-> +			break;
-
-nit: replacing the breaks from the echo_total loop with gotos would be
-more readable than this double break (but then it probably makes sense
-to also replace all the "test_result = -1; break;" from the whole
-TEST_ITERATIONS loop)
-
-> +
-> +		if (memcmp(buf, echo_buf, n) != 0) {
-> +			printf("FAIL: Echo data mismatch!\n");
-> +			test_result = -1;
-> +			break;
-> +		}
-> +		printf("Received echo %zd bytes (ok)\n", echo_total);
-> +
-> +		/* Rekey at intervals: send KeyUpdate, update TX, recv KeyUpdate, update RX */
-> +		if (do_rekey && rekeys_done < num_rekeys &&
-> +		    (i + 1) == next_rekey_at) {
-> +			current_gen++;
-> +			printf("\n=== Client Rekey #%d (gen %d) ===\n",
-> +			       rekeys_done + 1, current_gen);
-
-If I'm reading this loop correctly, rekeys_done+1 is always equal to
-current_gen here, since we'll either break out or also increment
-rekeys_done at the end of the block.  (same in do_server)
-
-[...]
-> +static int do_server(void)
-> +{
-> +	struct sockaddr_storage sa;
-> +	int lsk = -1, csk = -1, ret;
-> +	ssize_t n, total = 0, sent;
-> +	int current_gen = 0;
-> +	int test_result = 0;
-> +	int recv_count = 0;
-> +	char *buf = NULL;
-> +	int record_type;
-> +	socklen_t sa_len;
-> +	int max_size;
-> +	int one = 1;
-> +
-> +	max_size = random_size_max > 0 ? random_size_max : send_size;
-
-The server side is always reading max_size if it can. Just skip the
-"random" on server? Otherwise make it receive and echo back random
-amounts of bytes at each iteration.
-
-[...]
-> +	/* Main receive loop - detect KeyUpdate via MSG_PEEK + recvmsg */
-> +	while (1) {
-> +		n = recv(csk, buf, max_size, MSG_PEEK | MSG_DONTWAIT);
-> +		if (n < 0 &&
-> +		    (errno == EIO || errno == ENOMSG || errno == EAGAIN)) {
-
-I don't think ktls ever produces ENOMSG.
-
-> +			n = recv_tls_message(csk, buf, max_size, &record_type);
-> +		} else if (n > 0) {
-> +			n = recv_tls_message(csk, buf, max_size, &record_type);
-
-Why the PEEK if you're always going to call recv_tls_message afterwards?
-
-> +		} else if (n == 0) {
-> +			printf("Connection closed by client\n");
-> +			break;
-> +		}
-> +
-> +		if (n <= 0) {
-> +			if (n < 0)
-> +				printf("recv failed: %s\n", strerror(errno));
-> +			break;
-> +		}
-> +
-> +		/* Handle KeyUpdate: update RX, send response, update TX */
-> +		if (record_type == TLS_RECORD_TYPE_HANDSHAKE &&
-> +		    n >= 1 && buf[0] == TLS_HANDSHAKE_KEY_UPDATE) {
-
-We just excluded n <= 0, so n >= 1 is always true here.
-
-[...]
-> +		sent = send(csk, buf, n, 0);
-> +		if (sent < 0) {
-> +			printf("Echo send failed: %s\n", strerror(errno));
-> +			break;
-> +		}
-> +		if (sent != n)
-> +			printf("Echo partial: %zd of %zd bytes\n", sent, n);
-
-If this happens, the client will fall out of sync with the server and
-get stuck in the "echo_total < n" loop?
-
-> +		printf("Echoed %zd bytes back to client\n", sent);
-> +	}
-> +
-> +	printf("Connection closed. Total received: %zd bytes\n", total);
-> +	if (do_rekey)
-> +		printf("Rekeys completed: %d\n", rekeys_done);
-> +
-> +out:
-> +	if (csk >= 0)
-> +		close(csk);
-> +	if (lsk >= 0)
-> +		close(lsk);
-> +	free(buf);
-> +	return test_result;
-> +}
-> +
-> +static void parse_rekey_option(const char *arg)
-> +{
-> +	int requested;
-> +
-> +	if (strncmp(arg, "--rekey=", 8) == 0) {
-> +		requested = atoi(arg + 8);
-> +		if (requested < 1) {
-> +			printf("WARNING: Invalid rekey count, using 1\n");
-> +			num_rekeys = 1;
-> +		} else if (requested > MAX_REKEYS) {
-> +			printf("WARNING: Rekey count %d > max %d, using %d\n",
-> +			       requested, MAX_REKEYS, MAX_REKEYS);
-
-Why not just abort the test if we get invalid input? When called
-through the python wrapper we'll never get broken arguments, and if
-invoked manually I think it's better to abort than do something
-semi-random.
-
-> +			num_rekeys = MAX_REKEYS;
-> +		} else {
-> +			num_rekeys = requested;
-> +		}
-> +		do_rekey = 1;
-> +	} else if (strcmp(arg, "--rekey") == 0) {
-
-The python wrapper never uses that.
-
-> +		do_rekey = 1;
-> +		num_rekeys = 1;
-> +	}
-> +}
-> +
-
-[...]
-> +static void print_usage(const char *prog)
-> +{
-> +	printf("TLS Hardware Offload Two-Node Test\n\n");
-> +	printf("Usage:\n");
-> +	printf("  %s server [OPTIONS]\n", prog);
-> +	printf("  %s client -s <ip> [OPTIONS]\n", prog);
-> +	printf("\nOptions:\n");
-> +	printf("  -s <ip>       Server IP to connect (client, required)\n");
-> +	printf("                Supports both IPv4 and IPv6 addresses\n");
-> +	printf("  -6            Use IPv6 (server only, default: IPv4)\n");
-> +	printf("  -p <port>     Server port (default: 4433)\n");
-> +	printf("  -b <size>     Send buffer (record) size (default: 16384)\n");
-
-nit: not record sizes since this can go beyond the maximum record
-size.
-
-
-> +	printf("  -r <max>      Use random send buffer sizes (1..<max>)\n");
-> +	printf("  -v <version>  TLS version: 1.2 or 1.3 (default: 1.3)\n");
-> +	printf("  -c <cipher>   Cipher: 128 or 256 (default: 128)\n");
-> +	printf("  --rekey[=N]   Enable rekey (default: 1, TLS 1.3 only)\n");
-> +	printf("  --help        Show this help message\n");
-> +	printf("\nExample (IPv4):\n");
-> +	printf("  Node A: %s server\n", prog);
-> +	printf("  Node B: %s client -s 192.168.20.2\n", prog);
-> +	printf("\nExample (IPv6):\n");
-> +	printf("  Node A: %s server -6\n", prog);
-> +	printf("  Node B: %s client -s 2001:db8::1\n", prog);
-> +	printf("\nRekey Example (3 rekeys, TLS 1.3 only):\n");
-> +	printf("  Node A: %s server --rekey=3\n", prog);
-> +	printf("  Node B: %s client -s 192.168.20.2 --rekey=3\n", prog);
-> +}
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	int i;
-> +
-> +
-> +	for (i = 1; i < argc; i++) {
-> +		if (strcmp(argv[i], "--help") == 0 ||
-> +		    strcmp(argv[i], "-h") == 0) {
-> +			print_usage(argv[0]);
-> +			return 0;
-> +		}
-> +	}
-> +
-> +	for (i = 1; i < argc; i++) {
-
-I'm not a huge fan of getopt(3) but... please use it.
-
-[...]
-> +	if (tls_version == 12 && do_rekey) {
-> +		printf("WARNING: TLS 1.2 does not support rekey\n");
-
-I'd also abort the test here.
-
-
-
-[...]
-> diff --git a/tools/testing/selftests/drivers/net/hw/tls_hw_offload.py b/tools/testing/selftests/drivers/net/hw/tls_hw_offload.py
-> new file mode 100755
-> index 000000000000..5d14cb7d2e3c
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/hw/tls_hw_offload.py
-> @@ -0,0 +1,281 @@
-> +#!/usr/bin/env python3
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +"""Test kTLS hardware offload using a C helper binary."""
-> +
-> +from lib.py import ksft_run, ksft_exit, ksft_pr, KsftSkipEx, ksft_true
-> +from lib.py import NetDrvEpEnv
-> +from lib.py import cmd, bkg, wait_port_listen, rand_port
-> +import time
-> +
-> +
-> +def check_tls_support(cfg):
-> +    try:
-> +        cmd("test -f /proc/net/tls_stat")
-> +        cmd("test -f /proc/net/tls_stat", host=cfg.remote)
-> +    except Exception as e:
-> +        raise KsftSkipEx(f"kTLS not supported: {e}")
-> +
-> +
-> +def read_tls_stats():
-> +    stats = {}
-> +    output = cmd("cat /proc/net/tls_stat")
-> +    for line in output.stdout.strip().split('\n'):
-> +        parts = line.split()
-> +        if len(parts) == 2:
-> +            stats[parts[0]] = int(parts[1])
-> +    return stats
-> +
-> +
-> +def verify_tls_counters(stats_before, stats_after, expected_rekeys, is_server):
-> +    tx_device_diff = (stats_after.get('TlsTxDevice', 0) -
-> +                      stats_before.get('TlsTxDevice', 0))
-
-Not a big python person, but maybe use defaultdict to make this a bit
-more readable?
-
-> +    rx_device_diff = (stats_after.get('TlsRxDevice', 0) -
-> +                      stats_before.get('TlsRxDevice', 0))
-> +    tx_sw_diff = (stats_after.get('TlsTxSw', 0) -
-> +                  stats_before.get('TlsTxSw', 0))
-> +    rx_sw_diff = (stats_after.get('TlsRxSw', 0) -
-> +                  stats_before.get('TlsRxSw', 0))
-> +    decrypt_err_diff = (stats_after.get('TlsDecryptError', 0) -
-> +                        stats_before.get('TlsDecryptError', 0))
-> +
-> +    used_tx_hw = tx_device_diff >= 1
-> +    used_rx_hw = rx_device_diff >= 1
-> +    used_tx_sw = tx_sw_diff >= 1
-> +    used_rx_sw = rx_sw_diff >= 1
-> +
-> +    errors = 0
-> +
-> +    role = 'Server' if is_server else 'Client'
-> +    ksft_pr(f"=== Counter Verification ({role}) ===")
-> +
-> +    tx_dev_before = stats_before.get('TlsTxDevice', 0)
-> +    tx_dev_after = stats_after.get('TlsTxDevice', 0)
-> +    ksft_pr(f"TlsTxDevice: {tx_dev_before} -> {tx_dev_after} "
-> +            f"(diff: {tx_device_diff})")
-> +
-> +    tx_sw_before = stats_before.get('TlsTxSw', 0)
-> +    tx_sw_after = stats_after.get('TlsTxSw', 0)
-> +    ksft_pr(f"TlsTxSw: {tx_sw_before} -> {tx_sw_after} "
-> +            f"(diff: {tx_sw_diff})")
-
-I don't know how nice we want the selftest code to be but... this
-whole function is just the same "get before/get after/diff/print"
-repeated all over. Please clean this up.
-
-
-[...]
-> +def run_tls_test(cfg, cipher="128", tls_version="1.3", rekey=0, buffer_size=None, random_max=None):
-> +    port = rand_port()
-> +
-> +    server_cmd = f"{cfg.bin_remote} server -p {port} -c {cipher} -v {tls_version}"
-> +    if rekey > 0:
-> +        server_cmd += f" --rekey={rekey}"
-
-The rekey option has no effect on the server side.
-
-[...]
-> +def read_tls_stats_remote(cfg):
-> +    stats = {}
-> +    output = cmd("cat /proc/net/tls_stat", host=cfg.remote)
-> +    for line in output.stdout.strip().split('\n'):
-> +        parts = line.split()
-> +        if len(parts) == 2:
-> +            stats[parts[0]] = int(parts[1])
-> +    return stats
-
-And that's again almost exactly a c/p of read_tls_stats().
-
-
-> +def test_tls_offload_basic(cfg):
-> +    cfg.require_ipver("4")
-> +    check_tls_support(cfg)
-> +    run_tls_test(cfg, cipher="128", tls_version="1.3", rekey=0)
-> +
-> +
-> +def test_tls_offload_aes256(cfg):
-> +    cfg.require_ipver("4")
-> +    check_tls_support(cfg)
-> +    run_tls_test(cfg, cipher="256", tls_version="1.3", rekey=0)
-
-Looks like you want test variants.
-
-(tools/testing/selftests/drivers/net/README.rst "ksft_variants")
-
-
--- 
-Sabrina
+Hi Linus!
+
+The following changes since commit 453a4a5f97f0c95b7df458e6afb98d4ab057d90b:
+
+  Merge tag 'net-7.0-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2026-03-26 09:53:08 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-7.0-rc7
+
+for you to fetch changes up to ec7067e661193403a7a00980bda8612db5954142:
+
+  eth: fbnic: Increase FBNIC_QUEUE_SIZE_MIN to 64 (2026-04-02 08:38:34 -0700)
+
+----------------------------------------------------------------
+With fixes from wireless, bluetooth and Netfilter included we're back
+to each PR carrying 30%+ more fixes than in previous era. The good
+news is that so far none of the "extra" fixes are themselves
+causing real regressions. Not sure how much comfort that is.
+
+Current release - fix to a fix:
+
+ - netdevsim: fix build if SKB_EXTENSIONS=n
+
+ - eth: stmmac: skip VLAN restore when VLAN hash ops are missing
+
+Previous releases - regressions:
+
+ - wifi: iwlwifi: mvm: don't send a 6E related command when
+   not supported
+
+Previous releases - always broken:
+
+ - some info leak fixes
+
+ - add missing clearing of skb->cb[] on ICMP paths from tunnels
+
+ - ipv6: flowlabel: defer exclusive option free until RCU teardown
+
+ - ipv6: avoid overflows in ip6_datagram_send_ctl()
+
+ - mpls: add seqcount to protect platform_labels from OOB access
+
+ - bridge: improve safety of parsing ND options
+
+ - Bluetooth: fix leaks, overflows and races in hci_sync
+
+ - netfilter: add more input validation, some to address bugs directly
+   some to prevent exploits from cooking up broken configurations
+
+ - wifi: ath: avoid poor performance due to stopping the wrong
+   aggregation session
+
+ - wifi: virt_wifi: remove SET_NETDEV_DEV to avoid use-after-free
+
+ - eth: fec: fix the PTP periodic output sysfs interface
+
+ - eth: enetc: safely reinitialize TX BD ring when it has unsent frames
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Alexander Popov (1):
+      wifi: virt_wifi: remove SET_NETDEV_DEV to avoid use-after-free
+
+Alexey Velichayshiy (1):
+      wifi: iwlwifi: mvm: fix potential out-of-bounds read in iwl_mvm_nd_match_info_handler()
+
+Buday Csaba (1):
+      net: fec: fix the PTP periodic output sysfs interface
+
+Cen Zhang (1):
+      Bluetooth: SCO: fix race conditions in sco_sock_connect()
+
+David Carlier (1):
+      net: ti: icssg-prueth: fix missing data copy and wrong recycle in ZC RX dispatch
+
+Dimitri Daskalakis (3):
+      eth: fbnic: Account for page fragments when updating BDQ tail
+      eth: fbnic: Fix debugfs output for BDQ's with page frags
+      eth: fbnic: Increase FBNIC_QUEUE_SIZE_MIN to 64
+
+Dipayaan Roy (1):
+      net: mana: Fix RX skb truesize accounting
+
+Emmanuel Grumbach (1):
+      wifi: iwlwifi: mvm: don't send a 6E related command when not supported
+
+Eric Dumazet (3):
+      ipv6: icmp: clear skb2->cb[] in ip6_err_gen_icmpv6_unreach()
+      ip6_tunnel: clear skb2->cb[] in ip4ip6_err()
+      ipv6: avoid overflows in ip6_datagram_send_ctl()
+
+Fedor Pchelkin (2):
+      net: macb: fix clk handling on PCI glue driver removal
+      net: macb: properly unregister fixed rate clocks
+
+Florian Westphal (3):
+      netfilter: nfnetlink_log: account for netlink header size
+      netfilter: x_tables: ensure names are nul-terminated
+      netfilter: ipset: use nla_strcmp for IPSET_ATTR_NAME attr
+
+Guoyu Su (1):
+      net: use skb_header_pointer() for TCPv4 GSO frag_off check
+
+Hangbin Liu (1):
+      ipv6: fix data race in fib6_metric_set() using cmpxchg
+
+Jakub Kicinski (10):
+      Merge tag 'wireless-2026-03-26' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
+      Merge branch 'net-enetc-safely-reinitialize-tx-bd-ring-when-it-has-unsent-frames'
+      Merge branch 'fix-page-fragment-handling-when-page_size-4k'
+      Merge branch 'bridge-vxlan-harden-nd-option-parsing-paths'
+      Merge branch 'net-enetc-add-more-checks-to-enetc_set_rxfh'
+      Merge tag 'for-net-2026-04-01' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
+      Merge tag 'nf-26-04-01' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+      Merge branch 'mlx5-misc-fixes-2026-03-30'
+      Merge branch 'bnxt_en-bug-fixes'
+      Merge branch 'net-hsr-fixes-for-prp-duplication-and-vlan-unwind'
+
+Jiayuan Chen (1):
+      net: qrtr: replace qrtr_tx_flow radix_tree with xarray to fix memory leak
+
+Johannes Berg (3):
+      wifi: iwlwifi: mld: correctly set wifi generation data
+      Merge tag 'iwlwifi-fixes-2026-03-24' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
+      Merge tag 'ath-current-20260324' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
+
+Jonathan Rissanen (1):
+      Bluetooth: hci_h4: Fix race during initialization
+
+Keenan Dong (2):
+      Bluetooth: MGMT: validate LTK enc_size on load
+      Bluetooth: MGMT: validate mesh send advertising payload length
+
+Li Xiasong (1):
+      mptcp: fix soft lockup in mptcp_recvmsg()
+
+Lorenzo Bianconi (2):
+      net: airoha: Add missing cleanup bits in airoha_qdma_cleanup_rx_queue()
+      net: airoha: Delay offloading until all net_devices are fully registered
+
+Luiz Augusto von Dentz (1):
+      Bluetooth: hci_sync: Fix UAF in le_read_features_complete
+
+Luka Gejak (2):
+      net: hsr: serialize seq_blocks merge across nodes
+      net: hsr: fix VLAN add unwind on slave errors
+
+Marek Behún (1):
+      net: sfp: Fix Ubiquiti U-Fiber Instant SFP module on mvneta
+
+Martin Schiller (2):
+      net/x25: Fix potential double free of skb
+      net/x25: Fix overflow when accumulating packets
+
+Michael Chan (2):
+      bnxt_en: Refactor some basic ring setup and adjustment logic
+      bnxt_en: Don't assume XDP is never enabled in bnxt_init_dflt_ring_mode()
+
+Michal Piekos (1):
+      net: stmmac: skip VLAN restore when VLAN hash ops are missing
+
+Oleh Konko (3):
+      Bluetooth: hci_event: move wake reason storage into validated event handlers
+      Bluetooth: SMP: force responder MITM requirements before building the pairing response
+      Bluetooth: SMP: derive legacy responder STK authentication from MITM state
+
+Pablo Neira Ayuso (4):
+      netfilter: flowtable: strictly check for maximum number of actions
+      netfilter: ctnetlink: ignore explicit helper on new expectations
+      netfilter: x_tables: restrict xt_check_match/xt_check_target extensions for NFPROTO_ARP
+      netfilter: nf_tables: reject immediate NF_QUEUE verdict
+
+Pagadala Yesu Anjaneyulu (1):
+      wifi: iwlwifi: mld: Fix MLO scan timing
+
+Paolo Abeni (3):
+      ipv6: prevent possible UaF in addrconf_permanent_addr()
+      Merge branch 'correct-bd-length-masks-and-bql-accounting-for-multi-bd-tx-packets'
+      Merge branch 'net-x25-fix-overflow-and-double-free'
+
+Pauli Virtanen (5):
+      Bluetooth: hci_sync: call destroy in hci_cmd_sync_run if immediate
+      Bluetooth: hci_sync: hci_cmd_sync_queue_once() return -EEXIST if exists
+      Bluetooth: hci_sync: fix leaks when hci_cmd_sync_queue_once fails
+      Bluetooth: hci_conn: fix potential UAF in set_cig_params_sync
+      Bluetooth: hci_event: fix potential UAF in hci_le_remote_conn_param_req_evt
+
+Pavan Chebbi (1):
+      bnxt_en: Restore default stat ctxs for ULP when resource is available
+
+Pengpeng Hou (4):
+      wifi: wl1251: validate packet IDs before indexing tx_frames
+      net/ipv6: ioam6: prevent schema length wraparound in trace fill
+      bnxt_en: set backing store type from query type
+      NFC: pn533: bound the UART receive buffer
+
+Qi Tang (2):
+      netfilter: nf_conntrack_helper: pass helper to expect cleanup
+      netfilter: ctnetlink: zero expect NAT fields when CTA_EXPECT_NAT absent
+
+Qingfang Deng (1):
+      netdevsim: fix build if SKB_EXTENSIONS=n
+
+Reshma Immaculate Rajkumar (2):
+      wifi: ath11k: Pass the correct value of each TID during a stop AMPDU session
+      wifi: ath12k: Pass the correct value of each TID during a stop AMPDU session
+
+Sabrina Dubroca (1):
+      mpls: add seqcount to protect the platform_label{,s} pair
+
+Saeed Mahameed (2):
+      net/mlx5: Avoid "No data available" when FW version queries fail
+      net/mlx5: Fix switchdev mode rollback in case of failure
+
+Shay Drory (1):
+      net/mlx5: lag: Check for LAG device before creating debugfs
+
+Srujana Challa (1):
+      virtio_net: clamp rss_max_key_size to NETDEV_RSS_KEY_LEN
+
+Stefano Garzarella (1):
+      vsock: initialize child_ns_mode_locked in vsock_net_init()
+
+Suraj Gupta (2):
+      net: xilinx: axienet: Correct BD length masks to match AXIDMA IP spec
+      net: xilinx: axienet: Fix BQL accounting for multi-BD TX packets
+
+Sven Eckelmann (Plasma Cloud) (1):
+      net: ethernet: mtk_ppe: avoid NULL deref when gmac0 is disabled
+
+Thomas Bogendoerfer (1):
+      tg3: Fix race for querying speed/duplex
+
+Wei Fang (5):
+      net: enetc: reset PIR and CIR if they are not equal when initializing TX ring
+      net: enetc: add graceful stop to safely reinitialize the TX Ring
+      net: enetc: do not access non-existent registers on pseudo MAC
+      net: enetc: check whether the RSS algorithm is Toeplitz
+      net: enetc: do not allow VF to configure the RSS key
+
+Weiming Shi (1):
+      rds: ib: reject FRMR registration before IB connection is established
+
+Xiang Mei (7):
+      net/sched: sch_hfsc: fix divide-by-zero in rtsc_min()
+      selftests/tc-testing: add test for HFSC divide-by-zero in rtsc_min()
+      net: bonding: fix use-after-free in bond_xmit_broadcast()
+      bridge: mrp: reject zero test interval to avoid OOM panic
+      net/sched: cls_fw: fix NULL pointer dereference on shared blocks
+      net/sched: cls_flow: fix NULL pointer dereference on shared blocks
+      selftests/tc-testing: add tests for cls_fw and cls_flow on shared blocks
+
+Yang Yang (3):
+      bridge: br_nd_send: linearize skb before parsing ND options
+      bridge: br_nd_send: validate ND option lengths
+      vxlan: validate ND option lengths in vxlan_na_create
+
+Yasuaki Torimaru (1):
+      wifi: wilc1000: fix u8 overflow in SSID scan buffer size calculation
+
+Yifan Wu (1):
+      netfilter: ipset: drop logically empty buckets in mtype_del
+
+Yochai Eisenrich (2):
+      net: ipv6: ndisc: fix ndisc_ra_useropt to initialize nduseropt_padX fields to zero to prevent an info-leak
+      net: sched: cls_api: fix tc_chain_fill_node to initialize tcm_info to zero to prevent an info-leak
+
+Yucheng Lu (1):
+      net/sched: sch_netem: fix out-of-bounds access in packet corruption
+
+Yufan Chen (1):
+      net: ftgmac100: fix ring allocation unwind on open failure
+
+Zhengchuan Liang (1):
+      net: ipv6: flowlabel: defer exclusive option free until RCU teardown
+
+hkbinbin (1):
+      Bluetooth: hci_sync: fix stack buffer overflow in hci_le_big_create_sync
+
+ drivers/bluetooth/hci_h4.c                         |   3 -
+ drivers/net/bonding/bond_main.c                    |   2 +-
+ drivers/net/ethernet/airoha/airoha_eth.c           |  20 ++-
+ drivers/net/ethernet/airoha/airoha_eth.h           |   1 +
+ drivers/net/ethernet/airoha/airoha_ppe.c           |   7 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c          |  76 +++++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h          |   1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c  |   5 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c      |   5 +-
+ drivers/net/ethernet/broadcom/tg3.c                |   2 +-
+ drivers/net/ethernet/cadence/macb_pci.c            |  10 +-
+ drivers/net/ethernet/faraday/ftgmac100.c           |  28 ++-
+ drivers/net/ethernet/freescale/enetc/enetc.c       |  13 +-
+ drivers/net/ethernet/freescale/enetc/enetc4_hw.h   |  11 ++
+ drivers/net/ethernet/freescale/enetc/enetc4_pf.c   | 118 +++++++++++--
+ .../net/ethernet/freescale/enetc/enetc_ethtool.c   |  10 +-
+ drivers/net/ethernet/freescale/fec_ptp.c           |   3 -
+ drivers/net/ethernet/mediatek/mtk_ppe_offload.c    |  21 ++-
+ drivers/net/ethernet/mellanox/mlx5/core/devlink.c  |   4 +-
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |   2 +
+ drivers/net/ethernet/mellanox/mlx5/core/fw.c       |  49 ++++--
+ .../net/ethernet/mellanox/mlx5/core/lag/debugfs.c  |   3 +
+ .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |   4 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c    |   2 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c       |   6 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h       |   2 +-
+ drivers/net/ethernet/microsoft/mana/mana_en.c      |   7 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  14 +-
+ drivers/net/ethernet/ti/icssg/icssg_common.c       |   2 +-
+ drivers/net/ethernet/xilinx/xilinx_axienet.h       |   4 +-
+ drivers/net/ethernet/xilinx/xilinx_axienet_main.c  |   9 +-
+ drivers/net/phy/sfp.c                              |   7 +-
+ drivers/net/virtio_net.c                           |  20 +--
+ drivers/net/vxlan/vxlan_core.c                     |   6 +-
+ drivers/net/wireless/ath/ath11k/dp_rx.c            |  15 +-
+ drivers/net/wireless/ath/ath12k/dp_rx.c            |   4 +-
+ .../net/wireless/intel/iwlwifi/fw/api/commands.h   |   5 +
+ drivers/net/wireless/intel/iwlwifi/fw/api/scan.h   |  10 ++
+ drivers/net/wireless/intel/iwlwifi/mld/iface.c     | 101 +++++++----
+ drivers/net/wireless/intel/iwlwifi/mld/mac80211.c  |  19 ++
+ drivers/net/wireless/intel/iwlwifi/mld/mld.c       |   1 +
+ drivers/net/wireless/intel/iwlwifi/mld/mlo.c       |   4 +-
+ drivers/net/wireless/intel/iwlwifi/mld/notif.c     |   5 +
+ drivers/net/wireless/intel/iwlwifi/mld/scan.c      |  30 +++-
+ drivers/net/wireless/intel/iwlwifi/mld/scan.h      |   9 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/d3.c        |   2 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/fw.c        |   3 +-
+ drivers/net/wireless/microchip/wilc1000/hif.c      |   2 +-
+ drivers/net/wireless/ti/wl1251/tx.c                |   8 +-
+ drivers/net/wireless/virtual/virt_wifi.c           |   1 -
+ drivers/nfc/pn533/uart.c                           |   3 +
+ include/linux/netfilter/ipset/ip_set.h             |   2 +-
+ include/linux/skbuff.h                             |   1 +
+ include/net/netns/mpls.h                           |   1 +
+ net/bluetooth/hci_conn.c                           |   8 +-
+ net/bluetooth/hci_event.c                          | 127 ++++++-------
+ net/bluetooth/hci_sync.c                           |  88 ++++++---
+ net/bluetooth/mgmt.c                               |  17 +-
+ net/bluetooth/sco.c                                |  30 +++-
+ net/bluetooth/smp.c                                |  11 +-
+ net/bridge/br_arp_nd_proxy.c                       |  18 +-
+ net/bridge/br_mrp_netlink.c                        |   4 +-
+ net/core/dev.c                                     |  11 +-
+ net/hsr/hsr_device.c                               |  32 ++--
+ net/hsr/hsr_framereg.c                             |  38 +++-
+ net/ipv6/addrconf.c                                |   6 +-
+ net/ipv6/datagram.c                                |  10 ++
+ net/ipv6/icmp.c                                    |   3 +
+ net/ipv6/ioam6.c                                   |   4 +-
+ net/ipv6/ip6_fib.c                                 |  14 +-
+ net/ipv6/ip6_flowlabel.c                           |   5 -
+ net/ipv6/ip6_tunnel.c                              |   5 +
+ net/ipv6/ndisc.c                                   |   3 +
+ net/mpls/af_mpls.c                                 |  29 ++-
+ net/mptcp/protocol.c                               |  11 +-
+ net/netfilter/ipset/ip_set_core.c                  |   4 +-
+ net/netfilter/ipset/ip_set_hash_gen.h              |   2 +-
+ net/netfilter/ipset/ip_set_list_set.c              |   4 +-
+ net/netfilter/nf_conntrack_helper.c                |   2 +-
+ net/netfilter/nf_conntrack_netlink.c               |  60 ++-----
+ net/netfilter/nf_flow_table_offload.c              | 196 ++++++++++++++-------
+ net/netfilter/nf_tables_api.c                      |   7 +-
+ net/netfilter/nfnetlink_log.c                      |   2 +-
+ net/netfilter/x_tables.c                           |  23 +++
+ net/netfilter/xt_cgroup.c                          |   6 +
+ net/netfilter/xt_rateest.c                         |   5 +
+ net/qrtr/af_qrtr.c                                 |  31 ++--
+ net/rds/ib_rdma.c                                  |   7 +-
+ net/sched/cls_api.c                                |   1 +
+ net/sched/cls_flow.c                               |  10 +-
+ net/sched/cls_fw.c                                 |  14 +-
+ net/sched/sch_hfsc.c                               |   4 +-
+ net/sched/sch_netem.c                              |   5 +-
+ net/vmw_vsock/af_vsock.c                           |   1 +
+ net/x25/x25_in.c                                   |   9 +-
+ net/x25/x25_subr.c                                 |   1 +
+ .../tc-testing/tc-tests/infra/filter.json          |  44 +++++
+ .../tc-testing/tc-tests/infra/qdiscs.json          |  25 +++
+ 98 files changed, 1147 insertions(+), 493 deletions(-)
 
