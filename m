@@ -1,171 +1,219 @@
-Return-Path: <netdev+bounces-274503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274504-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mArRHddZzml2nAYAu9opvQ
-	(envelope-from <netdev+bounces-274503-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:58:15 +0200
+	id ICxSFkVZzmkxnAYAu9opvQ
+	(envelope-from <netdev+bounces-274504-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:55:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2017F388AD7
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:58:14 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A575A388A49
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:55:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 2DD943007A59
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 11:45:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 703C630E49F8
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 11:48:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55E103C5DCA;
-	Thu,  2 Apr 2026 11:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91663E025A;
+	Thu,  2 Apr 2026 11:46:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="ioOLEhK9";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ozLlAdi6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UPhOcr/Q";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="enP1a3Or"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABBA3CA49D;
-	Thu,  2 Apr 2026 11:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40763DDDB2
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 11:46:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775130309; cv=none; b=i8eUTIooXDv3oeRLhnBC2fzLYcywlWoThRdRa9e2x/mTLO7Y2lbzBvdWvEIs/aTtrolIrKvDNnVuIE6YrzitlJwbjGQJRfDWYdB8n0vm6JdEISJGCoDMHdBCbewcTHSSTP5flCaLNh6GoTBGGZJpGSKovzK6mfq5TFK2CF0q43A=
+	t=1775130400; cv=none; b=CsMVlgsw0v7DkK6b7fFF3BY3EXIqToJs5iOCLT0tWQcxTR7kOviGXhEi2Ia0i4VfbVCfSjc/7+HkKSWiN978PtORuoae/B5efYWdH4SJtdjJCeOHQ7J+GXBfMbm9/6468cHlPkjMouj/ru4tNJFSB5gMsHuJX8+yEraGfqWSo68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775130309; c=relaxed/simple;
-	bh=bLJ24ALkCOyv2BYpQw/HvK9MHn5DT7Sn4UhQSFyAfjY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R/VBrb46t8sFyssSK8tVa4jX7aWnyhOjisb1STtm/DoEFBC/6LIZCPOESTim/6nllAmLoeoT1xDIUeeclzlA/OGKGCb7I8vD+efmrHPe0eTZ9Cc3FLwyUrM99GcqXcJgZjQ1v5KaccuLKu9WkbVLsSRsOP8bh8CnVjnGhihaS/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=ioOLEhK9; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ozLlAdi6; arc=none smtp.client-ip=103.168.172.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id BFFF9EC0218;
-	Thu,  2 Apr 2026 07:44:58 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Thu, 02 Apr 2026 07:44:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1775130298; x=
-	1775216698; bh=wt4uugK6D4ZSntGA1q6SDx8XBsohHO+lhiewq/9Xgvw=; b=i
-	oOLEhK9nssd9R6HghZyHBi1rEMxENTyHaHwBQJRaHZdqMuGd3jYn2yFsb0kpxDQ1
-	QtX7zs6/7ug35A0jkFQ7ircy2cePssUmZOkyX53yn0hY2BvCHziMbQGKm8D+XaKQ
-	mmDgK/xEpFKvop3LyQ6YJJfqHkN/CgkVwIWKtkbD12GiAmt0vUEPde0sFosGIuyQ
-	SxWGG/J5DHKj3X+SO1nCi4c1s7H/tzo/q54rZGJutg4R8rHyrNUs6cRe3vEeK+im
-	8pg9HuiYb8RSWlK3xhrvXvS7gVkYGCBqPFvzg5DkeyLerTvWWhD40mjvM0KGdYkQ
-	VsCBdp+M/t+SLNXSLxi7w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1775130298; x=1775216698; bh=wt4uugK6D4ZSntGA1q6SDx8XBsohHO+lhie
-	wq/9Xgvw=; b=ozLlAdi6W8fOUZ8Ge/fy8hmrZrhk6Y1F/KO+wQw6SJNhez+Bqfh
-	L7w/dUaVI3Gamy5b+jt3DyR670gaN8AxY45B/gt61ufbxrmFQrax1eSnzKW5VR/P
-	7O/YsPC/i1CyopBund8IXZ5OubI7y4Aam6dDpTrS0nHmYCzmNVJuvDLkm7Fgv1+2
-	4yhePqm6vzwJYi2OFneC/Nbml5jUlzhKP+hi+3J4xBX5rGm+U+3fcnFR3dW0jZxy
-	6aF1yvWnuO259lWPrFsKKDOlgCYdcA/iJKP0veZCBx0HquZxsuX41U3bFOazA671
-	cx1qt5AnZuPjNUfwHU/WiCnuf3TSM+0SWJQ==
-X-ME-Sender: <xms:ulbOafVy-Z81-pDpRiclOMqIR05sgQZ1_5DDa8hx5sG-jVg778CRbA>
-    <xme:ulbOaeGvxw-KGHKORN69Ff8mspZVRC-kXW6M4hpKyasSHBEHkyjUhsBSV6ceaK6na
-    vNJ7MRczbmGmBrBOSQAc3HYH9t1G7Xsk87IFAP0aAgW3v0OUwYLFCNb>
-X-ME-Received: <xmr:ulbOaZYTYPoyp8dL7yMySQgCMlApm9ZCD8MJ1hATkLRP0UT2AvzLx1Slsf5K>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdehleegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    epfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhnrgcu
-    ffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrfgrth
-    htvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvuefffefg
-    udffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsh
-    gusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedufedpmhhouggv
-    pehsmhhtphhouhhtpdhrtghpthhtoheptghrrghtihhusehnvhhiughirgdrtghomhdprh
-    gtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmh
-    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
-    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtohepshgufhesfhhomhhitghhvghvrdhmvg
-X-ME-Proxy: <xmx:ulbOadFmcxwB2DUryfK3wvXpmQqg5N5t6sMUj45Xr7iqD73tEL2SVQ>
-    <xmx:ulbOaf1vHEwRmMJiCeAi_FNtMevy_0ttGgr5HGiX1f7vTwMvWu-jIw>
-    <xmx:ulbOaRzwujWuEKdtuWUyES42h3l_YxRiARQIekWeHdQICQ19OAialA>
-    <xmx:ulbOaYixmD0lATDNB7KMdvSG9pUEpZuKdiaH0GFQrKWTkcZP0NX3hg>
-    <xmx:ulbOaV2jqx3nXEOqVfm3bLzCFMPqxbdBDvoiT1RRlbt1ylpzeI4pyLPj>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 2 Apr 2026 07:44:57 -0400 (EDT)
-Date: Thu, 2 Apr 2026 13:44:55 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>, David Wei <dw@davidwei.uk>,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [PATCH net v7 0/4] macsec: Add support for VLAN filtering in
- offload mode
-Message-ID: <ac5Wt4vWxHMTcsae@krikkit>
-References: <20260402111034.1494714-1-cratiu@nvidia.com>
+	s=arc-20240116; t=1775130400; c=relaxed/simple;
+	bh=96/WVMIDSBKKgJSfQ4EIO42g3fE0wTNJnou+Effn79M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aPtE2tK7+841SYc/lUWtnZKOI1odDpGp3OvZT76+EMgx3CM5IWep93AD7gjE4iToGY80uK7nXakh6j5M9RMbfxZ3+e4FVdgnhgHCHYWWqx6D98vyzBPJFHencxtSy0BPT6GfnLnFSpNl0wNDtzgHvC3JVtdeef030MWBHtDHvs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UPhOcr/Q; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=enP1a3Or; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1775130389;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WURTvV+4CxxPQ1jYB89C/0nV6RrkAMgvkGrvpp0Vmfk=;
+	b=UPhOcr/QGPtWmNzdv/wi2PljI+aNH2/qsv4IVAGrlw7A8fVIXWrOanGr655u5O/kWwm/C8
+	3uiUIhSQ331Vw81W0kGa20EAFxrfNdaD8hmvTSo/3Icv1F8zsrEz7pq92g1674EcSr5DBM
+	R0l4tQmV5GqcdfPumjrGUGXKeXf49xw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-144-hhOalWF2PVWA9d8NQSXcHA-1; Thu, 02 Apr 2026 07:46:28 -0400
+X-MC-Unique: hhOalWF2PVWA9d8NQSXcHA-1
+X-Mimecast-MFC-AGG-ID: hhOalWF2PVWA9d8NQSXcHA_1775130387
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-486fb142205so7017235e9.1
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 04:46:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1775130387; x=1775735187; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WURTvV+4CxxPQ1jYB89C/0nV6RrkAMgvkGrvpp0Vmfk=;
+        b=enP1a3OrP3GpfEEarv4+JTv3C0WAGcaypormI5DRQkQ5YXwR7ky3e+AFOu1sjrnvzh
+         9cPQDCzWeN2b31nlCHoOf7LMNSGO7zMtmHNhZ6CSOWHa3bzZmUx4x2kfs1DlHv/+lH6g
+         zgqCE4VCWfAqrFuA+BwVmuZwTEjXd5dijRpvrLtt+bN0KDpJ2cMNImME1kxkwAFVZFhi
+         iNL3vRXdE+mTi+vcHzNFfHtRF0IIzuo1JwhOEIekOFDT1JqfiRcGK7CA5fD3+3HlfQ7l
+         yKQlr15Qr8m1ygIf+FjX/EBQcgBwL6N04bb1KpzBntxJS0GVg5ha2OU8Rm9YSxpHGYF6
+         q1EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775130387; x=1775735187;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WURTvV+4CxxPQ1jYB89C/0nV6RrkAMgvkGrvpp0Vmfk=;
+        b=N2W22m9PWCpIaZgkZXeiUURlrKquQmV9MgCmyp194+e0SfwxuImn/9Y65R4SJEJarW
+         gxa2kAC4A5qhOBGzpuy+pupmU+JqnX/gtQrmjxA/pzJBmNb0V06aH+DX7O8Cx5XEvd+t
+         o5qY/Hqv1pFl4/A464hJ+EZ/5LIWLRVI90M90ByXzNL9FrIMQ9Pm5I/0aQNFVpztWM9H
+         /62Lks0fZ9XspukjALuDqngc2bW6HwJIVp+2+WNOpvblhg+GvFJcB7sECwcuyxfAifdJ
+         GwP5ItsSSSNUOG25RHWqS3unu7GOVMsXg/CLkBuAM+ivjQR3pA2BYdM/FpHLrI9pDJBo
+         10XA==
+X-Forwarded-Encrypted: i=1; AJvYcCV3uR+gquG93By02f5Bcnh/8YudEnat6UhLjeJQ1GB01zCkB6swIE7D0xRyV1OcFUK/Tw3eFZM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyms+eJMiba2EnItB4aM+B9/QdYDO50Tfkp95ccfJs+4MfwL4NE
+	q2uYxA4UEPmpamqEenkPipzgAHf6bHdVHsknoigOdWNqy4SwF/HqKe3bQxaFTDxuSeFTyhXoNMU
+	qgoOGl7Dhb1p5GqMkOZESZIdte8ozbNoxjbjRS+F7UPfs6D8RbK1NUnwHRQ==
+X-Gm-Gg: ATEYQzxMP+E5in3cQXy4wuQu5tCsi2F/r7rAQhpnigwuu4CWQ6LHWs+de3zUkTGERtP
+	Gfdits3+WR0QfQKwMimfwZYBkzvnzhRBzICOOWDUufIZdA191xqzT7u+ZT1LM3LHfBvHJ/vep/9
+	OAwoK6OBHeoTRfTaNVK2aO9jbbgxo6VVd3Z+xfjlz24o5H2wMpAV8rTaieNjrehna97ALZOD3sN
+	j0FvIjh+Xeqzal6eEPJ0uqMlevZG3Qu0oel8GSdZVkYHoR9GLvwpJIYOpMQhFFKclaYNV8ObPFq
+	ZMFOpDiiE+UEWg8wrtrL/weK59VhYLDLfgM4nh0s7Xz7xtSlUSTCy+eGp293SfAQy9AdW01+F+F
+	+vrzhAwb50VkA3SzGxSYnpS6xdsglNxkfhu9NccIUYi9OjoiWK1eQOTGEBA==
+X-Received: by 2002:a05:600c:a406:b0:483:709e:f238 with SMTP id 5b1f17b1804b1-4888b7a0b07mr41585385e9.29.1775130387295;
+        Thu, 02 Apr 2026 04:46:27 -0700 (PDT)
+X-Received: by 2002:a05:600c:a406:b0:483:709e:f238 with SMTP id 5b1f17b1804b1-4888b7a0b07mr41585005e9.29.1775130386828;
+        Thu, 02 Apr 2026 04:46:26 -0700 (PDT)
+Received: from [192.168.88.32] ([212.105.153.248])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4888a63c9b1sm62293295e9.5.2026.04.02.04.46.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Apr 2026 04:46:26 -0700 (PDT)
+Message-ID: <d088beb8-d957-48a9-85c6-85775fef2ef4@redhat.com>
+Date: Thu, 2 Apr 2026 13:46:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260402111034.1494714-1-cratiu@nvidia.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] bnxt_en: fix out-of-bounds write in
+ bnxt_alloc_vf_resources()
+To: Junrui Luo <moonafterrain@outlook.com>,
+ Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Prashant Sreedharan <prashant@broadcom.com>,
+ Jeffrey Huang <huangjw@broadcom.com>, Eddie Wai <eddie.wai@broadcom.com>
+Cc: Michael Chan <mchan@broadcom.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Yuhao Jiang <danisjiang@gmail.com>,
+ stable@vger.kernel.org
+References: <SYBPR01MB78817B7EE349BB2CF0FC6873AF53A@SYBPR01MB7881.ausprd01.prod.outlook.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <SYBPR01MB78817B7EE349BB2CF0FC6873AF53A@SYBPR01MB7881.ausprd01.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-274504-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274503-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[outlook.com,broadcom.com,lunn.ch,davemloft.net,google.com,kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[broadcom.com,vger.kernel.org,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	NEURAL_HAM(-0.00)[-0.993];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,queasysnail.net:dkim,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: 2017F388AD7
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,outlook.com:email]
+X-Rspamd-Queue-Id: A575A388A49
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-04-02, 14:10:30 +0300, Cosmin Ratiu wrote:
-> This short series adds support for VLANs in MACsec devices when offload
-> mode is enabled. This allows VLAN netdevs on top of MACsec netdevs to
-> function, which accidentally used to be the case in the past, but was
-> broken. This series adds back proper support.
+On 3/31/26 11:57 AM, Junrui Luo wrote:
+> bnxt_alloc_vf_resources() derives the number of DMA pages for VF HWRM
+> command buffers from num_vfs and stores them in the fixed-size arrays
+> hwrm_cmd_req_addr[4] and hwrm_cmd_req_dma_addr[4]. The vf_event_bmap
+> bitmap is similarly fixed at 128 bits.
 > 
-> As part of this, the existing nsim-only MACsec offload tests were
-> translated to Python so they can run against real HW and new
-> traffic-based tests were added for VLAN filter propagation, since
-> there's currently no uAPI to check VLAN filters.
+> If num_vfs exceeds 128, the allocation loop writes past the arrays,
+> corrupting adjacent fields in bnxt_pf_info.
 > 
+> Add BNXT_MAX_VFS to cap num_vfs at 128, matching the existing array and
+> bitmap capacity.
+> 
+> Fixes: c0c050c58d84 ("bnxt_en: New Broadcom ethernet driver.")
+> Reported-by: Yuhao Jiang <danisjiang@gmail.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Junrui Luo <moonafterrain@outlook.com>
 > ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.h       | 2 ++
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c | 6 ++++++
+>  2 files changed, 8 insertions(+)
 > 
-> V7: 
-> - Added missing ethtool feature checks.
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> index a97d651130df..cee67ca2955d 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> @@ -1398,6 +1398,8 @@ struct bnxt_vf_info {
+>  };
+>  #endif
+>  
+> +#define BNXT_MAX_VFS	128
+> +
+>  struct bnxt_pf_info {
+>  #define BNXT_FIRST_PF_FID	1
+>  #define BNXT_FIRST_VF_FID	128
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+> index 7f9829287c49..18ac0aaf4166 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+> @@ -459,6 +459,12 @@ static int bnxt_alloc_vf_resources(struct bnxt *bp, int num_vfs)
+>  	struct pci_dev *pdev = bp->pdev;
+>  	u32 nr_pages, size, i, j, k = 0;
+>  
+> +	if (num_vfs > BNXT_MAX_VFS) {
+> +		netdev_warn(bp->dev, "Too many VFs (%d), max is %d\n",
+> +			    num_vfs, BNXT_MAX_VFS);
+> +		return -EINVAL;
+> +	}
+> +
+>  	bp->pf.vf = kzalloc_objs(struct bnxt_vf_info, num_vfs);
+>  	if (!bp->pf.vf)
+>  		return -ENOMEM;
+> 
 
-Sorry that I couldn't get to your patches earlier (-EBUSY, progressing
-toward -ENOTRECOVERABLE), but please don't rush to repost while I was
-still going through what you had already posted.
+Makes sense to me. It would be nice some explicit ack/testing from
+someone @broadcom.
 
--- 
-Sabrina
+Thanks,
+
+Paolo
+
 
