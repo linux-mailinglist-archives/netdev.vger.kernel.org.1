@@ -1,163 +1,180 @@
-Return-Path: <netdev+bounces-274670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274671-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GAq2BMLAzmmqpwYAu9opvQ
-	(envelope-from <netdev+bounces-274670-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 21:17:22 +0200
+	id kJs2NMbAzmmqpwYAu9opvQ
+	(envelope-from <netdev+bounces-274671-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 21:17:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 196E038D97B
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 21:17:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 032C338D982
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 21:17:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C91EA300BE9C
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 19:16:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4AFF03020D62
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 19:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A1B31F991;
-	Thu,  2 Apr 2026 19:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC2E33603F7;
+	Thu,  2 Apr 2026 19:16:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iq4ntF6H"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="RODUo8QT";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="m9yMKUrY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f43.google.com (mail-dl1-f43.google.com [74.125.82.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5164F328616
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 19:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775157396; cv=pass; b=UjfbcB5X2fO+J3NWRUFfqsfEdq6yywPJrhNKS/qqiD7GWJFHh37sbbWFERzCitlekLR56hEeOCD8w7T0jNwF1GRzovNkZAtNhmPqONQd8kgzDAUgS4+zYXCZXryNw6V13QI8Xk6uZvl/ml31F/cyFObCSmmngEtSa26EtZvj+MY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775157396; c=relaxed/simple;
-	bh=tur2mv3Eh6thrz4z1Nb/H3iuiz5myAzHtYCYdQ6gUeo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GdB8nYW++hFHuws4lu17yAVhYnsbyxqWydSu+Qe7RQFc5ABZKndoA2RZHFltIdEO8J5E+3Eh+BmaP4qu1M3jQVKU4sT7FvN18nQiBfenRMt6jhxJvnMKCaeDmQBlm5f7wOrt2rnS8xRjIhpMxd485ZJtFvXscX4wlGgwAi97gDM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iq4ntF6H; arc=pass smtp.client-ip=74.125.82.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-dl1-f43.google.com with SMTP id a92af1059eb24-126ea4b77adso1778137c88.1
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 12:16:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775157394; cv=none;
-        d=google.com; s=arc-20240605;
-        b=h7VjaKBdsNHCwLakfspzhKZ7kakX3QtGrfKNt7DBuTtpBcO5LQ6/7LQTM0RJq/cBPW
-         twRBCqw8gGmGYBvFz8q+JUrw7+VMHaAwJI7xWQg3NrA6CY73ORYtiFNoboH0HOlymiuj
-         FJi1HzixgBolER3gMbWfeAfps9zFXXrBQwKusO8znC7gJefslxAv7IbHUpO2TKaxqzL2
-         aype9gba5pfVfcMZ6PYCfB3hKnZHd40zwk6ZwIGW2knEc0p2mDM8xymQrS5lCS9BC2Vp
-         LuUkSRv65qSEaSvXrwGRt0KCQcF47RvOJfPYhGNyf1UTPCnKMP5fAUH1sAsB00ynUwpN
-         GBjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=tur2mv3Eh6thrz4z1Nb/H3iuiz5myAzHtYCYdQ6gUeo=;
-        fh=sLcLFHH8jvYha3R8WrhKldB31Yp6edTt89E3Sdmhdto=;
-        b=CX72WlhrN8rMuwjxugYpECQUdEXl39pxBOH1OYJmDc7ADABkKAjkdUo73uGRiGmPb/
-         JTwso6Y1ktew7VDmulPUVNIuhACO/vd+aqmik2JPWOwscpCC77E6afTwQMZpka9u7yjI
-         kJLEZr/lUBnB4QRJeoP74YWcTPoLXJYkRdXYvJiqk5WX8NvLcp0SGB/R0ojRWs0AiUOv
-         Tf/RF8F37JWBMwsTqe6UzUAe96i+f9+VDkbdZyqzTZK26zcsjol1qX+DxDd+UtMUcYFz
-         qOBybOollO54Ev3FZFIjBqhfgVQMURcZ4CZE4WcLQQQh4goi4GdfyOFIZety/Tj+syTM
-         k9hw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775157394; x=1775762194; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tur2mv3Eh6thrz4z1Nb/H3iuiz5myAzHtYCYdQ6gUeo=;
-        b=iq4ntF6HS6T8+qeAkAL+d36R16ynvTwVPfea47zKIAU2E6MM1zJTeUKQ5h1q/fPY42
-         u3N7wr4NuGYpD12f27kDEsNKtYKh13THi+v33GRGQFiJKJg8Mijr/vYE8RdUyIBDz8I1
-         bIyUfLUTQJLsWJPV/3NTkoBaXAvV3AHIHdtkl0gwx2c97nKHteDGOYhmZa9sXcn+88vz
-         cL4EmMAgSLjgmh8sLxJuI2gKJFHeyPp8KRHyDUOHOZMcDETSU9E+mMg8vcqSMgULJOGo
-         faixKc/+dMo29hCib91EU+6L6fcYikSdUFfhLSGU61GK/8zCyi0+Mc7JFdRmijxs4KQG
-         qgNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775157394; x=1775762194;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tur2mv3Eh6thrz4z1Nb/H3iuiz5myAzHtYCYdQ6gUeo=;
-        b=eEf0PLOpxH2olBKsbjmWFqh+RkmVMF7CXFC49V09FHdu1OjyGDEW0Liq81n+tRN9In
-         BdXH29+VGnRiovksU8fOnUuukak4IVrHIyGnfUiZIYwId5P9zFpkWhEjzMUCaeEiLLiJ
-         a5SX73ZiGZP3Az4ic4kIvAUpuJBt1TEzRoeZ6MBWTKgP5Tp4v75ZTchwNBIXz0fL47Dd
-         hruPbz3OKkQmgi6wOQ2Zib7MXbe8K28EEZuE0AgtUln9O+TJojjWffgmMIOTPCwMZARN
-         uhLYc4EvJUXbNix/0LBEgRtZV6POZweWMjH8y6lIYX8quLq+ufMIEEBP10I3VrXcnG2S
-         YiVA==
-X-Gm-Message-State: AOJu0YzyXxAHCW6jLVF+mLGx0zquUhVziJZYl0ya+8dcytJ8tXIN3dwz
-	kGmNCSd6uOdW0cqqAeK7U6kYzCrjT9z2/p6Dvp5r4hemIl46H8p8TM8wAc6g4eK/4p10ii8o9B6
-	8A1ldpb/bntc0J9Zz+BwEo6tiYBZS2RKqd4uSC8N95gGfWLwwyggzMjb1
-X-Gm-Gg: ATEYQzyliUUIc30ynWQg/0eGfvs9xZDBLivWr2ySu+rsh9XnO/ifg6UakjET3OUlu6y
-	9Pr3gjbXI2icDzlHCYgyyOLgMD3mxPBbdEWM6L2o7Cn8+pUp+EwlBD04pgQEjnS08fByAIug0Sj
-	hDSAd2XWGGmThx024e+t78+GIYb7dSuK3MsNG2PKldrLz55tvnbLH/ccvf7Vh+Cl/Oow5hD1qd0
-	A7D32E8IQFAyvl7IbOQ0pJbogr+GT96tbVqnZNL+wGgmICVDKfXzQaid3ez9WJtG0Vt1f0pZEjt
-	c8/004yvBK37X+G10rAk+mWc1H9vmwV2xbSsvP93U5YXC9dXVGchIiFvNfKeZ78lf/qivWzkaQ2
-	U/rvb
-X-Received: by 2002:a05:7022:6613:b0:12a:7181:2f1a with SMTP id
- a92af1059eb24-12bfb6ec537mr139031c88.5.1775157393737; Thu, 02 Apr 2026
- 12:16:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D4E33B95A;
+	Thu,  2 Apr 2026 19:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775157417; cv=none; b=NTdEXVy2gDqGS+bjKZ9xc/3OCYBO2HlC4mFmmAK/raBcahl0+76r1ejPpIpuIcSjqUwjHiuRZQq/WTrmAkQyhHUG1CiOGybKdzabYplNC/lyyFxRPy+Y0cpA48uRkMTbYbdvhaqU1KWEa3E0bQVGrKfBXADsuRl0LJN2o08x99I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775157417; c=relaxed/simple;
+	bh=lnxe9dbZw5P54TSEcNU418OcO/GysgalCaKrea+c0Wc=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=l1/jLTUmJDOXPsTXrbHF9JKTjIeobmR75KGZ9S3xNDLxgG0K6plUVxQ5vtUlzPxM64ZgMv8lGGz3MNcxyTJRsBboWjJZPFIOYFLPSHZgZ78PsX5rmwM6FaDUjtlxezeP0YL2VFFSfJiarMqx0WWIhAHxRkp43du76790MS9j2zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=RODUo8QT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=m9yMKUrY; arc=none smtp.client-ip=202.12.124.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 418D07A012C;
+	Thu,  2 Apr 2026 15:16:51 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-04.internal (MEProxy); Thu, 02 Apr 2026 15:16:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1775157410;
+	 x=1775243810; bh=vvagKRVIBbGmbpkuKlGSXdVXQTCiinPbfNczkdfG7kg=; b=
+	RODUo8QTQ0JzG1OKPUrbbjkVy7sI+82Uoi7eAdDSlKA3JSP0CTIYirWdi1zalpis
+	j7NyUjt7yjZJgCTUCW1sBDtPygAWPN7SqLImmGoR0fyze4ErS0a5d1FDnAvYT7vN
+	mTUqbAjH72+KH5/qxfxFvPS2wD/gIPYTOE3pNvHNS/WC7J6vmBzbKwLuNsm5UXeD
+	TAoKBPTtNVXNtpUirU8e1ZzoXnq4pCvCp1m3rUgi4q+7nJc9J1XncTTPNxDOxnfv
+	eTTExVS0jHPoPIrYF1pAqOTUJ9bJQ8JFgokXmK1lsnyvOA3ZSje9oeIhLhKRxS0R
+	/htiyND7KLb7tELcc3sHQA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1775157410; x=
+	1775243810; bh=vvagKRVIBbGmbpkuKlGSXdVXQTCiinPbfNczkdfG7kg=; b=m
+	9yMKUrYmu459oQsb8YHdPLHG8y3NSiXVR7rtT2NaakhpfB89pxeEnKfHN5WpQD9x
+	jeMy3ZNYtR5yhhOrnVHwFRS3kmtQF7ypeQFhigbuK6JHcCpKUVABkRJiI1QbtOx5
+	pR2sO1kF14dmgOLiiuY9+vri2/zN+REWJ+Q4DdGcAxs7qdP3M7KLrVYRsx3of7q+
+	cHevdXF9bGX2UGxUJhmRJBiU7+2O5JX5oSr0uQJjNHwdxg57Zmo1fmwXXk9I7UE3
+	qkRvQmrFq1Q77ICIDy70Me4/ax3jb3JAalGNZe8mhFxWsBcF0aIJaSJBX9IDRuMk
+	lZ4d0rd00IzoOmGHNJZVQ==
+X-ME-Sender: <xms:osDOabxKLBE8atubEbpjnNtKcIlQ80P5oYs0bUT-0I7WzEb839rLFg>
+    <xme:osDOaeGN3-PQ7_RYKtEQTwtoTdUJ80nJdCJiAV9boJ0or0qlLrnUoLzKpRNxwyY1J
+    hYo-pj9JZRMaK6_IAPZylRYZ4rC_BQKgmSlokQp3EAf9TX59cqKQXA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdeikeehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
+    epofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhguuceu
+    vghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvghrnh
+    ephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdeinecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhguse
+    grrhhnuggsrdguvgdpnhgspghrtghpthhtohepudelpdhmohguvgepshhmthhpohhuthdp
+    rhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprg
+    hlvgigrghnuggvrhdrshhvvghrughlihhnsehgmhgrihhlrdgtohhmpdhrtghpthhtohep
+    uggrnhhivghlrdiirghhkhgrsehgmhgrihhlrdgtohhmpdhrtghpthhtohephhgrohhkvg
+    igihhnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
+    vgdrtghomhdprhgtphhtthhopegrrhhnugeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehrohhgvghrqheskhgvrhhn
+    vghlrdhorhhgpdhrtghpthhtohepihhlihgrshdrrghprghlohguihhmrghssehlihhnrg
+    hrohdrohhrgh
+X-ME-Proxy: <xmx:osDOaSLL2z1pgHZ1wjK8uu-9AKK0S6NLlIjClY_JJQxu0v5SVW2RLg>
+    <xmx:osDOaRFnUaPr3HTEY82fDD5bHWC5CE-zf3zEYUJuHsFEwt23TUSWMA>
+    <xmx:osDOaXx63R907KFH50O1FHm0yCK_nmKW0-20riCTxfcFnmAxdvQ0Uw>
+    <xmx:osDOaejGXiQRZq6zyEmwKyzxnP0IBsazD_fQAMbEydWnVUVPSKf1GA>
+    <xmx:osDOaYh8S2z10gTHYSPjFfZMQAz4FiM3V_-mj5ukcXM406ZEkIE2HhtM>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id E240E700065; Thu,  2 Apr 2026 15:16:49 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260402181432.4126920-1-nickgarlis@gmail.com>
-In-Reply-To: <20260402181432.4126920-1-nickgarlis@gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 2 Apr 2026 12:16:22 -0700
-X-Gm-Features: AQROBzBxXgEGrHkVa2JIF85ugNuP07x53ZP25zusZX8PJBT4M7ZJipmK_w9EQog
-Message-ID: <CAAVpQUCAuNbOAxmVwu_Hk4kdeCvimqwJ2Ak9cMc2GOj_7m7NzQ@mail.gmail.com>
-Subject: Re: [PATCH v5] rtnetlink: add missing netlink_ns_capable() check for
- peer netns
-To: Nikolaos Gkarlis <nickgarlis@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+X-ThreadId: AxeJrQzD9Ui3
+Date: Thu, 02 Apr 2026 21:16:29 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Ilias Apalodimas" <ilias.apalodimas@linaro.org>,
+ "Arnd Bergmann" <arnd@kernel.org>
+Cc: Netdev <netdev@vger.kernel.org>, "Andrew Lunn" <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>,
+ "Grygorii Strashko" <grygorii.strashko@ti.com>,
+ "Murali Karicheri" <m-karicheri2@ti.com>,
+ "Siddharth Vadapalli" <s-vadapalli@ti.com>,
+ "Roger Quadros" <rogerq@kernel.org>,
+ "Vladimir Oltean" <vladimir.oltean@nxp.com>,
+ "Alexander Sverdlin" <alexander.sverdlin@gmail.com>,
+ "Ioana Ciornei" <ioana.ciornei@nxp.com>,
+ Linux-OMAP <linux-omap@vger.kernel.org>, "Kevin Hao" <haokexin@gmail.com>,
+ "Daniel Zahka" <daniel.zahka@gmail.com>, linux-kernel@vger.kernel.org
+Message-Id: <4498f664-15ca-4859-a050-a593f124105f@app.fastmail.com>
+In-Reply-To: 
+ <CAC_iWj+vjZ0WnKUuqeFfaPeSoj5ovxZiEmUD5R8hPsRfkqMihQ@mail.gmail.com>
+References: <20260402184726.3746487-1-arnd@kernel.org>
+ <CAC_iWj+vjZ0WnKUuqeFfaPeSoj5ovxZiEmUD5R8hPsRfkqMihQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] [v4, net-next] net: ethernet: ti-cpsw:: rename soft_reset()
+ function
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.65 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm1,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274670-lists,netdev=lfdr.de];
+	XM_UA_NO_VERSION(0.01)[];
+	TAGGED_FROM(0.00)[bounces-274671-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	DKIM_TRACE(0.00)[google.com:+];
+	FROM_HAS_DN(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,ti.com,nxp.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[3];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 196E038D97B
+	NEURAL_HAM(-0.00)[-0.995];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[arndb.de:dkim,arndb.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,app.fastmail.com:mid]
+X-Rspamd-Queue-Id: 032C338D982
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 2, 2026 at 11:15=E2=80=AFAM Nikolaos Gkarlis <nickgarlis@gmail.=
-com> wrote:
+On Thu, Apr 2, 2026, at 21:13, Ilias Apalodimas wrote:
+> Hi Arnd,
 >
-> rtnl_newlink() lacks a CAP_NET_ADMIN capability check on the peer
-> network namespace when creating paired devices (veth, vxcan,
-> netkit). This allows an unprivileged user with a user namespace
-> to create interfaces in arbitrary network namespaces, including
-> init_net.
+> On Thu, 2 Apr 2026 at 21:47, Arnd Bergmann <arnd@kernel.org> wrote:
+>>
+>> From: Arnd Bergmann <arnd@arndb.de>
+>>
+>> While looking at the glob symbols shared between the cpsw drivers,
+>> I noticed that soft_reset() is the only one that is missing a proper
+>> namespace prefix, and will pollute the kernel namespace, so rename
+>> it to be consistent with the other symbols.
+>>
+>> Fixes: c5013ac1dd0e1 ("net: ethernet: ti: cpsw: move set of common functions in cpsw_priv")
 >
-> Add a netlink_ns_capable() check for CAP_NET_ADMIN in the peer
-> namespace before allowing device creation to proceed.
->
-> Fixes: 81adee47dfb6 ("net: Support specifying the network namespace upon =
-device creation.")
-> Signed-off-by: Nikolaos Gkarlis <nickgarlis@gmail.com>
+> The patch seems fine, but why the Fixes: tag?
 
-Looks good, thanks !
+Before the c5013ac1dd0e1 commit, this was a 'static inline' function,
+which is allowed to clash with other identifiers. Making it a global
+symbol during the move was a problem.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+       Arnd
 
