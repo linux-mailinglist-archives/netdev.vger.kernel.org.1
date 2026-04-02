@@ -1,176 +1,191 @@
-Return-Path: <netdev+bounces-274440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274433-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kFyeGh8zzmkpmAYAu9opvQ
-	(envelope-from <netdev+bounces-274440-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 11:13:03 +0200
+	id QIGJHgcxzmnIlQYAu9opvQ
+	(envelope-from <netdev+bounces-274433-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 11:04:07 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDA50386956
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 11:13:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD6BB386720
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 11:04:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CE902305ED0B
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 09:06:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 719B6300D959
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 08:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A813832E72F;
-	Thu,  2 Apr 2026 09:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFE09325726;
+	Thu,  2 Apr 2026 08:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="VqTbZRFE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aYAoCrIs"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [46.38.247.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378C731F9A4
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 09:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.38.247.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68B72D0C9C
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 08:58:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775120768; cv=none; b=kZnV0uK3FpszoxWSFGEuhijFw5dq7Z+wH+4rRHius/6GrttnDML6JnQNzV/ez3RqniCe4sbM2MIOxOdhbNGwtfN76Za7CUmeLE9GQt8r/zxWVeRKV4ypGLWKq7BLyF5f2Q5DalkE8nLfMQgU7jtUeYtGMd704DMQreLzXjoSIxI=
+	t=1775120331; cv=none; b=rDj8TvOd7rJhQoX1T6MsE/mtHmyoxriGjSqqQ9BMnheiotiCI3lUORwJoo9m+KOKeEURIRafLmc5KjZN6cFO407qbLs8IzY+b41PdGuu5asF/ICEwTYDVOZ4A/xqhVOXpvYyKSk1vsJyLOOEgosvRUWE7cwiEIIM7CHIt6knXck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775120768; c=relaxed/simple;
-	bh=Nc7fhhLS5YUR+CO/VR1vbBlId/eSXlrs+lyAwDCOALU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eCf9qpgsCYHNGI/jk7JFnYqnFQ++OoVVuhdGHJnLYDRkYQ6UEkF+6e90aExKEC4E3JZjKZ3rMCwuhbakf0ZN1PWA6TbjiQqIFP7HDc6AAJVRZxXJueA4Hrt+QNOwvru98XB17ZsIElq9j6VihY/xtHzV7vqMl+mJ2rCqG3fP/VA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=VqTbZRFE; arc=none smtp.client-ip=46.38.247.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-Received: from mors-relay-8404.netcup.net (localhost [127.0.0.1])
-	by mors-relay-8404.netcup.net (Postfix) with ESMTPS id 4fmbM13zkhz8DKf;
-	Thu,  2 Apr 2026 10:56:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leemhuis.info;
-	s=key2; t=1775120205;
-	bh=Nc7fhhLS5YUR+CO/VR1vbBlId/eSXlrs+lyAwDCOALU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VqTbZRFEYygA9iumgyXVFVTRTHBab236GDx+i/RjMy7r8TlutjBlKo7rEgv8wFiWm
-	 tgYjqDXdAuywbKpAEron5OL6NwKWi1wRWhptvlbBTs96CQWF06b9AQ1EA+PdYXgb+Z
-	 ZELXSTVnoEHv1vVChVCBq0FYQeAFZd58v0glIQLHCWbR5egnJl70nGABInDlZ+MHzR
-	 WSJGRdHFI3dFSQjY5lrJ0Xn+Y1N2BvAwkuHz4kmMqEOIhinODb0ppuwkADY90YvFEl
-	 TedjM65CJiOOHD+AkFljunxBXAHHy8gZjALKB1Q6v7Z5jMeyOGti5v8g5oZv/Pf6CG
-	 PwkuhW5tIhCwA==
-Received: from policy01-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-8404.netcup.net (Postfix) with ESMTPS id 4fmbM13H1pz4xNZ;
-	Thu,  2 Apr 2026 10:56:45 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at policy01-mors.netcup.net
-X-Spam-Flag: NO
-X-Spam-Score: -2.901
-X-Spam-Level: 
-Received: from mxe9fb.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy01-mors.netcup.net (Postfix) with ESMTPS id 4fmbLy4g7kz8tXc;
-	Thu,  2 Apr 2026 10:56:42 +0200 (CEST)
-Received: from [IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f] (unknown [IPv6:2a02:8108:8984:1d00:a0cf:1912:4be:477f])
-	by mxe9fb.netcup.net (Postfix) with ESMTPSA id B9DB763618;
-	Thu,  2 Apr 2026 10:56:41 +0200 (CEST)
-Authentication-Results: mxe9fb;
-        spf=pass (sender IP is 2a02:8108:8984:1d00:a0cf:1912:4be:477f) smtp.mailfrom=regressions@leemhuis.info smtp.helo=[IPV6:2a02:8108:8984:1d00:a0cf:1912:4be:477f]
-Received-SPF: pass (mxe9fb: connection is authenticated)
-Message-ID: <14d65103-8809-4a1b-b115-bf5f8d7110ea@leemhuis.info>
-Date: Thu, 2 Apr 2026 10:56:40 +0200
+	s=arc-20240116; t=1775120331; c=relaxed/simple;
+	bh=HeWDqnuCUNbOc87pipFww7ZSD9lUJ4uF/bVhvwUP5dk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LOEp4/qm1phxa5Wmit3Chqbu6gML+L1+/ayqsYG1kmUdTy6HynMPuPef4evXZJHUjAP1mUsuLjhgjK/92fSgF3HMUeDJ1/c92Or1sCnCtRQNqfY9h4f6H275KNY9diQKHWsMMCe+ULT3XI/sDWQE6qxFZvTVHbP6+HQpR62nCWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aYAoCrIs; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2ad617d5b80so3346725ad.1
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 01:58:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775120330; x=1775725130; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=p7eDGaE6Ein2wXGTpixfHgCZRKEO6wTdrWwl2xXLB1w=;
+        b=aYAoCrIsb+zsEfXeBalK6vn2sH2SAhPEr+t3qE+nSABdDpzxD9f3whjFwQ4DIM+R7p
+         3xadKY/hR5wij5uOTjDDVqLanZBTcv/6h0CuCP+Dcfc89rkS+VKNxGoNWTRWiCtCedih
+         142xZcM74ex5ZY34TvLwweVx8RnEpvtkoDoJHNvUL6yb+XxaCdXPWtg4dBF4Y7HdtvLY
+         sCkWb4HC4q0fY3NvXWHgVVRg2sJ6wemspkSuCui1vA25eIsBcJSKBmojwvS/01Q4gNhO
+         fLdAudsVche9+9oODiiGZ1lLJOgOTsofJTbN1gvxIgM9WocRDTgcuwrx0QXiMdwnLj7W
+         wKDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775120330; x=1775725130;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p7eDGaE6Ein2wXGTpixfHgCZRKEO6wTdrWwl2xXLB1w=;
+        b=TT2pRMhVsxToqYe1d2KJvuYBH3dNvS2t1NeeFkAdgfE5eLvvk9429QJoTlrTDvMh4Z
+         8nHXSf5tIG3tgdDTnffAUCNvjyxcPR1fJLtjLW6YfudduRG3qTRopwjpmtDK284Zfcx+
+         gomqFo9Z2yWQxuYs5rfYVCoNqdTPFDriN1+nayXH+E9/t4z82FFI5afHuSG/uxiufpja
+         nvWPy0Dsmgmsg6FAzlH6ISY4ZcqjMQZjqDbx3AL2AJHVJjeh5Q2tJYmPtebVJmx830gC
+         /Eab4F5TcLGHrmO+uoE8dyXungl8ZBKq0XbMEhV22SIY75GqG1MHzJkgfw9zSj8Xfx3A
+         Q+Aw==
+X-Gm-Message-State: AOJu0YwX9+POghAio0GrNW2ehLDpWIl+1LAAYNvNMrCFflUmFSr537wL
+	aBhgdNuYlYZFSuJZSYQ53EC4D9sBW79GtISrH2tyiyxQcvS9TyMnNeTX
+X-Gm-Gg: AeBDiet3ZfPKFwhBRuWMH682GML/030jxcYzwQc5SP/or9GBQeewcPpbabffeJAtviT
+	IWhdtd7ZkuRqaEEBqm0uOlmoW7tS8XRczcdSP7Nag4+9F0VhzfaR9uPfdaytkJ8q8JxhyOtNi+t
+	IzqPgjgQnusyNodJ1tX+pofpN9+3PEMsYbq6KL4Lmbv5f/dyJSBjzX9kTeZFJArJ7upp491eHyK
+	+J42o2MXHV4ZByfuCQiJMnZen2nYFS69Lsk+/B9SSpRM6PtzXxOLWISg2mebplEQ5DREK/aUias
+	jmg6VbhwbpYY/1kM+iIKc/PLge4ISAFpA56GkpfMwiT7Wzr/a1FXPPlYFLumcTLlH1vZhCCfHGB
+	2iOdI3hDBclTBU5XYyNRTW7+zSaH/Ttqabab9NkLtyZCKZUIE5scNWuVf2CCCUMOO3Q7uTTcaQL
+	lMpVHteIBH+6Qoxtdp0WgZWmHrYFd18aiWo9J2Y1KauxV60zCpNcOZnx5iV9Xuncxh73OmNQ==
+X-Received: by 2002:a17:903:2c8:b0:2b0:b41e:c5c3 with SMTP id d9443c01a7336-2b269c57341mr69585175ad.29.1775120329967;
+        Thu, 02 Apr 2026 01:58:49 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b27472d1a2sm23524595ad.7.2026.04.02.01.58.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2026 01:58:49 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	willemb@google.com
+Cc: netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>,
+	Yushan Zhou <katrinzhou@tencent.com>
+Subject: [PATCH net-next] net-timestamp: take track of the skb when wait_for_space occurs
+Date: Thu,  2 Apr 2026 16:58:31 +0800
+Message-Id: <20260402085831.36983-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: commit 0c4f1c02d27a880b cause a deadlock issue
-To: "He, Guocai (CN)" <Guocai.He.CN@windriver.com>
-Cc: "miriam.rachel.korenblit@intel.com" <miriam.rachel.korenblit@intel.com>,
- "johannes.berg@intel.com" <johannes.berg@intel.com>,
- Friend <netdev@vger.kernel.org>,
- Linux kernel regressions list <regressions@lists.linux.dev>
-References: 
- <CO6PR11MB5586A4475A5EEC47FC10398BCD53A@CO6PR11MB5586.namprd11.prod.outlook.com>
- <PH0PR11MB55934A1C9A8C35B1E751C247CD50A@PH0PR11MB5593.namprd11.prod.outlook.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: de-DE, en-US
-In-Reply-To: 
- <PH0PR11MB55934A1C9A8C35B1E751C247CD50A@PH0PR11MB5593.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-PPP-Message-ID: 
- <177512020201.1134988.17516151596232902051@mxe9fb.netcup.net>
-X-NC-CID: fZLlAXXf+FKoAxYFp4qKaeb9AU+B8xkJpdFCkTbvyXFJMJeOsE4=
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[leemhuis.info:s=key2];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[leemhuis.info];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274440-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274433-lists,netdev=lfdr.de];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[leemhuis.info:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[regressions@leemhuis.info,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.986];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: BDA50386956
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tencent.com:email]
+X-Rspamd-Queue-Id: CD6BB386720
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/1/26 04:28, He, Guocai (CN) wrote:
-> Johannes and Miriam and all:
-> 
-> when we test on kernel 6.1.166, find a deadlock caused by commit
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=0c4f1c02d27a880b10b58c63f574f13bed4f711d
+From: Jason Xing <kernelxing@tencent.com>
 
-Does this problem happen with 6.19/7.0-rc6 as well? That is an important
-detail to know if this is a general problem (that needs to be fixed in
-mainline) or something the backport caused (which mainline developers
-might not care about, as that is the domain of the stable team).
+Tag the skb in tcp_sendmsg_locked() when wait_for_space occurs even
+though it might not carry the last byte of the sendmsg.
 
-Ciao, Thorsten
+If we don't do so, we might be faced with no single timestamp that
+can be received by application from the error queue. The following steps
+reproduce this:
+1) skb A is the current last skb before entering wait_for_space process
+2) tcp_push() pushes A without any tag
+3) A is transmitted from TCP to driver without putting any skb carring
+   timestamps in the error queue, like SCHED, DRV/HARDWARE.
+4) sk_stream_wait_memory() sleeps for a while and then returns with an
+   error code. Note that the socket lock is released.
+5) skb A finally gets acked and removed from the rtx queue.
+6) continue with the rest of tcp_sendmsg_locked(): it will jump to(goto)
+   'do_error' label and then 'out' label.
+7) at this moment, skb A turns out to be the last one in this send
+   syscall, and miss the following tcp_tx_timestamp() opportunity before
+   the final tcp_push
+8) application receives no timestamps this time
 
-> test by command "rtcwake -m mem -s 10"
-> It will hang (detail please see the attached test.log file )
-> 
-> I revert this commit and it works.
-> 
-> #my analysis:
-> 
-> This creates the following call chain:
-> wiphy_suspend()
-> cfg80211_leave_all()
-> cfg80211_leave() # takes wdev->mtx <- LOCK #1
-> __cfg80211_leave()
-> cfg80211_stop_p2p_device() # <-  NEW from 0c4f1c02d27a
-> ieee80211_stop_p2p_device() # mac80211 callback
-> ieee80211_sdata_stop()
-> ieee80211_do_stop()
-> sdata_lock(sdata) # = mutex_lock(&sdata->wdev.mtx)
->                                    <- LOCK #2, SAME mutex!
->                                         DEADLOCK
-> 
-> 
-> In 6.1.x:
-> cfg80211_leave define as:
-> 	wdev_lock(wdev);
-> 	__cfg80211_leave(rdev, wdev);
-> 	wdev_unlock(wdev);
-> 
-> but upstream, __cfg80211_leave is renamed to cfg80211_leave.
-> call cfg80211_leave directly. so have no this issue.
-> 
-> Do anybody meets this issue too?
-> 
-> 
-> Thanks very much.
-> 
-> Guocai
+The original commit ad02c4f54782 ("tcp: provide timestamps for partial writes")
+says it is best effort. Now it's time to cover the only potential point
+to avoid missing record.
+
+The side effect is obvious that we might record more than one time for a
+single send syscall since the skb that we keep track of in this scenario
+might not be the last one. But tracing more than one skb is not a bad
+thing since there is an emerging/promissing trend to do a detailed
+packet granularity monitor.
+
+Thanks to the great ID, namely, tskey, application that is responsible
+for the collect/sort of timestamps leverages it to put that record in
+between two consecutive send syscalls correctly.
+
+Signed-off-by: Yushan Zhou <katrinzhou@tencent.com>
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+ net/ipv4/tcp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 516087c622ad..2db80d75cfa4 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -1411,9 +1411,11 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+ wait_for_space:
+ 		set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
+ 		tcp_remove_empty_skb(sk);
+-		if (copied)
++		if (copied) {
++			tcp_tx_timestamp(sk, &sockc);
+ 			tcp_push(sk, flags & ~MSG_MORE, mss_now,
+ 				 TCP_NAGLE_PUSH, size_goal);
++		}
+ 
+ 		err = sk_stream_wait_memory(sk, &timeo);
+ 		if (err != 0)
+-- 
+2.41.3
 
 
