@@ -1,50 +1,88 @@
-Return-Path: <netdev+bounces-274364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274365-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oAtGLGrwzWkzjQYAu9opvQ
-	(envelope-from <netdev+bounces-274364-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 06:28:26 +0200
+	id KA83KMf0zWlLjgYAu9opvQ
+	(envelope-from <netdev+bounces-274365-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 06:47:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12FC4383946
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 06:28:26 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D93C383BD7
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 06:47:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 242353064BEC
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 04:22:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A226030241AD
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 04:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E513624A8;
-	Thu,  2 Apr 2026 04:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CE3B299943;
+	Thu,  2 Apr 2026 04:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oi9Uw6vT"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-dy1-f170.google.com (mail-dy1-f170.google.com [74.125.82.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841A230C371;
-	Thu,  2 Apr 2026 04:21:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E182D34DCD7
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 04:46:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775103721; cv=none; b=HTPuPejwLPcNWM6sZ309AgHKxdo+/3fFsdQw3gjQEPg1WtfmhTVAR2Zc8NkGvJxkTLR0WQP9My9dVzpZIVIKmURbJeHd7p5QQf7nMuQc+ZQcps5ydfPAO2aeBklvs/Hj9nTNqCQ/mxKEfYM1CIqxY7JVn4jLWHCUSp4xeJdTKnM=
+	t=1775105221; cv=none; b=QcZlfh5H6QWxt68hyPNo/KhyyM/FxZ4wd4i0Hh9RN45W4ZggryM9bzRy9Vz+xLO2sMVESCUceUh98GuUqr17FEYIxWFgSKGSj7pqIC5UNQ8iRH1YsXOhTSAmJZLoo7+bCL2x+XxuT5EFqfNa97vjao2ySW9c+DD9F/Zj1D2COdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775103721; c=relaxed/simple;
-	bh=PqEcBA2A5b9cJkiPpiRNEoBquqciKCg2vR5h3FlNsug=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M8/v+WTL56i8VzSK8D3DwPhIbJ1jHT0jB5PkUFlRl0IekFa0OnQSCMejRfFm5+V5d5sjdRd10a32JcrI+SFi7MXxgkOm5ir8HsCH+Kj1JbMsaHQkj2jbG34RP5V891kmmItyP4KaDbmunYPkn97Zd8fNVC0TLefkiDSn12ytHo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [111.196.245.197])
-	by APP-01 (Coremail) with SMTP id qwCowADXfWnc7s1pfEzwCw--.40389S2;
-	Thu, 02 Apr 2026 12:21:48 +0800 (CST)
-From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Bongsu Jeon <bongsu.jeon@samsung.com>,
+	s=arc-20240116; t=1775105221; c=relaxed/simple;
+	bh=jV5CWtutJqLa16q3x6lGkU+AgLFtOqIMJk0X4qmwhUc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T1gOpuFkHPMMH5tOFsvMfOktcfYWlAXTvAZvNNQKLCk9Sp15L7WA7XpHIeNVFtnRXxM2yY6xlp4rvAH/GyUnxKWGugSySF103xK7floZ4C7wyoH6OoVuu2NleqZdF3tPOfNt+DPpvQQMBakTd8Ec8L/AdDlP1YhE7aWL5Nkdtzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oi9Uw6vT; arc=none smtp.client-ip=74.125.82.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dy1-f170.google.com with SMTP id 5a478bee46e88-2c87871133dso658237eec.0
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 21:46:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775105218; x=1775710018; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yNPRt9AdqdMzFCaTU2ZjYAQXhCSBuqIya6uWjrlqzLU=;
+        b=Oi9Uw6vT6nwb1v3cEktRNaeh6XRB92tS+IqfprMCPwfX6mmha847COPNCpps3iLD34
+         YvnCa5HQlINOSvAM206vJi4D23qSNwbLAGBDIRqRGZYPHsUeqij+ogAeGWNMTGDKaJgM
+         KOUlsKhrW1YKBsNJCZohYlSNlXEsBNyETWdGWkd8d0TuS6ypF8l8/FUppXZou0wubHMu
+         k4PwCnLviJtrYvQBBuLe7XSJ9+4tJN7H29s/QplrgQGfKWotkanHN0C4Uh1JcNLaMPgA
+         mwrgeMJI2GGS9lu8/pc4Jcz5Or79bOrGGBlZoUh7i+loKvdxoTJ81V2D/hdrpGZI7g3y
+         FfdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775105218; x=1775710018;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yNPRt9AdqdMzFCaTU2ZjYAQXhCSBuqIya6uWjrlqzLU=;
+        b=RAgWbnNMfmfeQrERE6EGLSyZc6yO2614UZL8LykEPDlYKd/5CpKIfPH4Tc+yT2OZo0
+         G/16v+phsznaFcDs2J2ivO2A+l1eXSO02NU82JkHZwY9XtKCJWNDhRQbhgBg02PG97ef
+         2qWGh+EA7PfsmSmIrmDM2/UnXqLNXhw4xsonWMykAFLREoH18eNBGGmyA2+mskhKKnIP
+         PIFK9a0LEMkqzdBBASCztCY1nK9PgBGkcoUzkAGjpjuE8/f5sk7jMHAyORNgsqO2BIW4
+         gx/cLyEADKATmpg1nJq/Gkd5Ex98gudjulD/f6+6n54cB9lXv9OZ9+RD3tRY9Q86xzYE
+         2G/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWB38g1oz+sVn4PxE+c2zxX7iVICMl29gzTwhsDpNFasCy/3Z4LthpWSARrrvjp3zhH47wpsaY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzF6rOt6c1UY/iS9fPytQ9qyc2uJmj1Bx0ZcM7FhvgUXwOtk02e
+	VTKyKwsu3bnVT80Qre19NcPadni7cUozpEJrcrdImTgI6NzZPr0dGBtK
+X-Gm-Gg: ATEYQzwnqjK1FAcPWrHDH5zVDYJUfxsaAPUWnkDGe3UlbDru89dLp0QCnMwxzTre+ZL
+	j61bB0ULZtn9YnL1Z4htWqMbBivcE/udQ257mWzPO2QSROGFdW7ni2FFiNItq2H2xz6TSTsN2Bs
+	9+PbyJFgHnY9lhjfLTNpLSelwBbnwvJyauLpjUvRPpHOGMqeiR1iWnWb5yNFKhWg1WuHk2RQ4Z4
+	5+Hz/H/EhWtgsstlR2E8T9gVyeCcSEZSNNgJyr/4MSDoYNWDG3Qr1yHV1jcLl/8jmn+mZ6d3z0L
+	ZFyODPFeBBW/kZJbhQiHeJG2vExsBiCHi+MA60zHftbeKLh4Bgr5ZXs9VLEcYH1FqjUWnAgme/r
+	Y1UBOHZOZhGK2658bO0qyOsVZEWi0FlmAg4BcF/8gnhcoQeR/XZzuJ/T3RckO8XQVgHQ8vBkrXF
+	a97EcfbLIVq6KVbd1whCNwLfgJkH9oD3EtwI70SjY5GSlkatb9Zk1IIAZbz+QR
+X-Received: by 2002:a05:7300:724b:b0:2c5:30ed:5e99 with SMTP id 5a478bee46e88-2ca8dbde026mr1140306eec.14.1775105217820;
+        Wed, 01 Apr 2026 21:46:57 -0700 (PDT)
+Received: from elmini.. (c-98-42-127-152.hsd1.ca.comcast.net. [98.42.127.152])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ca760b0518sm1554832eec.0.2026.04.01.21.46.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Apr 2026 21:46:57 -0700 (PDT)
+From: Laurence Rowe <laurencerowe@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: virtualization@lists.linux.dev,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pengpeng@iscas.ac.cn,
-	stable@vger.kernel.org
-Subject: [PATCH] nfc: s3fwrn5: allocate rx skb before consuming bytes
-Date: Thu,  2 Apr 2026 12:21:48 +0800
-Message-ID: <20260402042148.65236-1-pengpeng@iscas.ac.cn>
-X-Mailer: git-send-email 2.50.1
+	Laurence Rowe <laurencerowe@gmail.com>
+Subject: [PATCH] vsock: avoid timeout for non-blocking accept() with empty backlog
+Date: Wed,  1 Apr 2026 21:46:37 -0700
+Message-ID: <20260402044637.73531-1-laurencerowe@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,102 +90,119 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowADXfWnc7s1pfEzwCw--.40389S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7CF1rJrW3Aw1fJr13Ar4fKrg_yoW8AF4UpF
-	45J3Wjqry8tr43J3WDCw18WFy5Ca4fJFW5Gry5Kw48ZrWfJrZ5JayI9Fyj9r4rXr4kWFW3
-	AF4xJa1rC3W0vrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkG14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
-	AVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
-	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUSNtxUUU
-	UU=
-X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
-X-Spamd-Result: default: False [0.04 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	PRECEDENCE_BULK(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274364-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.989];
+	TAGGED_FROM(0.00)[bounces-274365-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCPT_COUNT_THREE(0.00)[4];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[laurencerowe@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,iscas.ac.cn:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 12FC4383946
+	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1D93C383BD7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-s3fwrn82_uart_read() reports the number of accepted bytes to the serdev
-core. The current code consumes bytes into recv_skb and may already
-deliver a complete frame before allocating a fresh receive buffer.
+A common pattern in epoll network servers is to eagerly accept all
+pending connections from the non-blocking listening socket after
+epoll_wait indicates the socket is ready by calling accept in a loop
+until EAGAIN is returned indicating that the backlog is empty.
 
-If that alloc_skb() fails, the callback returns 0 even though it has
-already consumed bytes, and it leaves recv_skb as NULL for the next
-receive callback. That breaks the receive_buf() accounting contract and
-can also lead to a NULL dereference on the next skb_put_u8().
+Scheduling a timeout for a non-blocking accept with an empty backlog
+meant AF_VSOCK sockets used by epoll network servers incurred hundreds
+of microseconds of additional latency per accept loop compared to
+AF_INET or AF_UNIX sockets.
 
-Allocate the receive skb lazily before consuming the next byte instead.
-If allocation fails, return the number of bytes already accepted.
-
-Fixes: 3f52c2cb7e3a ("nfc: s3fwrn5: Support a UART interface")
-Cc: stable@vger.kernel.org
-
-Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Signed-off-by: Laurence Rowe <laurencerowe@gmail.com>
 ---
- drivers/nfc/s3fwrn5/uart.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nfc/s3fwrn5/uart.c b/drivers/nfc/s3fwrn5/uart.c
-index 9c09c10c2a46..4ee481bd7e96 100644
---- a/drivers/nfc/s3fwrn5/uart.c
-+++ b/drivers/nfc/s3fwrn5/uart.c
-@@ -58,6 +58,12 @@ static size_t s3fwrn82_uart_read(struct serdev_device *serdev,
- 	size_t i;
+This fixes the observed issue for me:
+
+1. With loopback vsock on the host running Linux v6.19.10 built with
+config-6.17.0-19-generic from Ubuntu 24.04 and make olddefconfig.
+
+2. With Firecracker guests with current torvalds/master, v6.19.10, and
+amazonlinux/microvm-kernel-6.1.166-24.303.amzn2023 used in Firecracker
+CI and examples. (Firecracker guest vsocks are unix sockets on the host
+side so this fix works there with just a fixed guest kernel.)
+
+I struggled to build a generic 6.1.166 kernel that worked as a
+Firecracker guest but the patch applies (conflict due to change of
+`flags` to `arg->flags` in surrounding context) so I believe it should
+work for generic v6.1.166 kernel.
+
+Alternatively a minimal version of this fix is to just wrap the
+`schedule_timeout` in an `if (timeout != 0)` but that leaves an
+unnecessary additional `lock_sock` call.
+
+There are ftrace's and reproduction tools at:
+https://github.com/lrowe/linux-vsock-accept-timeout-investigation
+---
+ net/vmw_vsock/af_vsock.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index 2f7d94d682..483889b6d8 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -1850,11 +1850,11 @@ static int vsock_accept(struct socket *sock, struct socket *newsock,
+ 	 * created upon connection establishment.
+ 	 */
+ 	timeout = sock_rcvtimeo(listener, arg->flags & O_NONBLOCK);
+-	prepare_to_wait(sk_sleep(listener), &wait, TASK_INTERRUPTIBLE);
  
- 	for (i = 0; i < count; i++) {
-+		if (!phy->recv_skb) {
-+			phy->recv_skb = alloc_skb(NCI_SKB_BUFF_LEN, GFP_KERNEL);
-+			if (!phy->recv_skb)
-+				return i;
-+		}
-+
- 		skb_put_u8(phy->recv_skb, *data++);
- 
- 		if (phy->recv_skb->len < S3FWRN82_NCI_HEADER)
-@@ -69,9 +75,7 @@ static size_t s3fwrn82_uart_read(struct serdev_device *serdev,
- 
- 		s3fwrn5_recv_frame(phy->common.ndev, phy->recv_skb,
- 				   phy->common.mode);
--		phy->recv_skb = alloc_skb(NCI_SKB_BUFF_LEN, GFP_KERNEL);
--		if (!phy->recv_skb)
--			return 0;
-+		phy->recv_skb = NULL;
+ 	while ((connected = vsock_dequeue_accept(listener)) == NULL &&
+-	       listener->sk_err == 0) {
++	       listener->sk_err == 0 && timeout != 0) {
+ 		release_sock(listener);
++		prepare_to_wait(sk_sleep(listener), &wait, TASK_INTERRUPTIBLE);
+ 		timeout = schedule_timeout(timeout);
+ 		finish_wait(sk_sleep(listener), &wait);
+ 		lock_sock(listener);
+@@ -1862,17 +1862,15 @@ static int vsock_accept(struct socket *sock, struct socket *newsock,
+ 		if (signal_pending(current)) {
+ 			err = sock_intr_errno(timeout);
+ 			goto out;
+-		} else if (timeout == 0) {
+-			err = -EAGAIN;
+-			goto out;
+ 		}
+-
+-		prepare_to_wait(sk_sleep(listener), &wait, TASK_INTERRUPTIBLE);
  	}
+-	finish_wait(sk_sleep(listener), &wait);
  
- 	return i;
+-	if (listener->sk_err)
++	if (listener->sk_err) {
+ 		err = -listener->sk_err;
++	} else if (timeout == 0 && connected == NULL) {
++		err = -EAGAIN;
++		goto out;
++	}
+ 
+ 	if (connected) {
+ 		sk_acceptq_removed(listener);
 -- 
-2.50.1 (Apple Git-155)
+2.43.0
 
 
