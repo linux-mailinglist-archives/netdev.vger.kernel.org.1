@@ -1,65 +1,96 @@
-Return-Path: <netdev+bounces-274308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274309-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ENNfHCLFzWlVhAYAu9opvQ
-	(envelope-from <netdev+bounces-274308-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 03:23:46 +0200
+	id iGCVJ8jFzWmqhAYAu9opvQ
+	(envelope-from <netdev+bounces-274309-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 03:26:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2B73382339
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 03:23:45 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 467ED382389
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 03:26:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id BDEC9302D5AB
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 01:23:44 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 73872302FF2F
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 01:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA8D24A058;
-	Thu,  2 Apr 2026 01:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1DE27C162;
+	Thu,  2 Apr 2026 01:26:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mI42KxeR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UrxMK/Fl"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A644219EED3
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 01:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A893264CC
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 01:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775093022; cv=none; b=frmgpJOdBqWj4/8ouS0cpmOLB2c7EbkbnIsj4BCgq0H1IfRAeOxuiZVzXFB33TiazySNOR1v/Ec6L/ORN7dOewdgUAbqFkdzEenju/VS9WEnUFPIN9ki2GV9qJOX5cURfoVtW7c9o8Dmf96NMAS1CFKgmn+K8vWhxUU800ZVVbc=
+	t=1775093188; cv=none; b=NBn6L3hCq5V7RHf9npLFev4/GSdBHEayN5QLcNeDsBDyIC2Aj9ncHLaNI3Ez/FMEYlHAIcU+qBqqJUPMcSZ4g+vuJ3BI+WPvfcc21JMs8FhdYxiyQ8t8ubklI0JVs56McTqi2/RdJImq2EW0PsLNP/bkff0OhYw5d2Dc1DgGfes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775093022; c=relaxed/simple;
-	bh=IY74TKvYyJuTf4HhHheLEmU7/wifkxG4ZbTulLSo+v4=;
+	s=arc-20240116; t=1775093188; c=relaxed/simple;
+	bh=fFvNsLhha199OotYo0quLtlpCAq0uiox2AqskEJlh2s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iNcmCvtjjZYKcw5qNkIzWuy2uXjCjBE/lDlDJrsB8VFhUsHXg4a2Ibbi49xsxkikiipzSjQG+BrA1TVp6SsVWtICBJnNhFfGooc8Bb+H8DsNl/4ggrV529iqRQsamfWzKgRtzLd54+RzbCoVZ4TL1fGRNo0iYwoDtvo/Iam4m+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mI42KxeR; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=uY732acVgv/m3sV9JI1hkfqAR86FQ+1iVAHhiOzwBpA=; b=mI42KxeRRRdVbbiFn2b7lQMQr5
-	ApRKJBI6RPAM/RVC8V9qP2Mmz2Od50WLL5R+qEt/9KmdBJCseJtkfhhoJYiAAYM6mOO0SVZbkPyOI
-	n6fZCdVEZPRNdBYoWpVbk32sqh2R3soNJQfF6vN5LLnt9N3GbJcMOybI0IcO6pqmZtjU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w86mW-00ER7p-25; Thu, 02 Apr 2026 03:23:36 +0200
-Date: Thu, 2 Apr 2026 03:23:36 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Wagner <wagner.daniel.t@gmail.com>
-Cc: netdev@vger.kernel.org,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	bcm-kernel-feedback-list@broadcom.com,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net: phy: bcm84881: add LED framework support
- for BCM84891/BCM84892
-Message-ID: <81ae5337-5752-429f-bdc4-a0a7857739b5@lunn.ch>
-References: <20260401114931.3091818-1-wagner.daniel.t@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xko1UTsuFonqE0D5XSyE3UDFnHuTmSzfDS5jedExUnYH4VJS5JuQ9c//u0FP6hJLWivvvpqXB/v1q9gEp5bXTomKWqga5lJhd+U8CU2t4EmOMwyNwhn3YPk32TohYhEc7QyJc2bpiaGjQwzwhf+muyFids72a4htLfusotnXWws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UrxMK/Fl; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2ad21f437eeso1679085ad.0
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 18:26:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775093186; x=1775697986; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=crvac5GNsvhV8fP5KBRwJInEe3qXMRAYNJlxMQ0YphE=;
+        b=UrxMK/FlUjbREfYw7iNN1PTNL2JytczOlgZeDKX01cvqjVRQOfNkqbHEuTXx949cNC
+         NueeEEEOnQyr2Sl0ZoggKHZooD+/ZU3ppYYCuCKKIAtNfAzPpktPUSYmQKW2HyyZ5UBe
+         wFRqGg2pkNrVqigt/Pfi4kVawHwd+tEQu6YxC1CQFt4KqELgPw0Yg2CNXVUBbK8D9C+3
+         SUTKHbU6GOgxtEwWhonK3l6IWx2q2JvNBTp2/OADKCWcVve7QeaUARU+fDgjf4atSsBx
+         4RXi8nNEw+rYVzsUq1IhXr15KgJPdGxAO9X8sVzxex2bN8q9b0zX0CnQx1fuMX6wEcsO
+         JThA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775093186; x=1775697986;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=crvac5GNsvhV8fP5KBRwJInEe3qXMRAYNJlxMQ0YphE=;
+        b=hjLHEFPHthangCI6DjsFk6EEAyUUeRbGzdiMLTNKm41VN1RNmtEtDffW8GbGxXSDtp
+         YrO7DnORkZVJj68OywgC8tcgJZCpZdek10uuSFbn2MAXkQ6DFnD6oB/Gm3so1q+9kCFM
+         1EJLvdErHQBH//wR1/F6Nbi6nlHutQe9GJAPjTittPI2mh5dRyFPdcQudn6YBXCN2i8K
+         wDKo2BMrt+zkurhZZeQ2vCvn9VupFKVE2t+quVd6/ReroBMAfaml4k4TC/0Pz+IWXgi5
+         wuLZd3bJ2TUBhUla+OixB0OrjEDjlXHh22b1R7hNmhSjzmL2YxKLF9BcbRx+UCYZGY1f
+         bdwA==
+X-Forwarded-Encrypted: i=1; AJvYcCVicarsz88sHlAbt9P8rbmwbYdTRKtwboaOqojppu+K+WZ48yOVXF5q9tJFXW/08RxtOHPQgyA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRzBCVmdWedypb7c/JZqFaveQCNYnGp2VkrwUD5mo2GrgjiE8U
+	yYQ7uh5G+E8PrL0sVnv6FxxBjcBoeishkSRnCGNDjMQ0SPZLWO/SuXBH
+X-Gm-Gg: ATEYQzzk5qqNdjqO/DgNHJC925T0tkZE39REoa/cfM28xQzyQbnHDPsgftY1NII6yvX
+	yqA97djT6HCdDKSC0P4T9QzV+C2EmVA0p9515kGGZjWtNoSQuikWulSaqFt7i+5hFlvTSd9IbtE
+	F1c15ruVcoukCCnOuI03V4SrgFuWfeHPDvR5pjvafkMkkV9atGUIn8lxIddllSqijjPjp13lzZo
+	rQ/Fu96l+Car0LtR8QjiNbeb+pX801Ob74of2dH6zaWeRPTwmwm7NewDgsOxOe0X/+Gbp0/hsZh
+	L5ZYmZRWSWniDK8qEX01vhF3mhmQc7wxnApTdGcHSfxsuRUFOsUaU4vZZ5Agtb3XLKuGgk9SVWw
+	QXKEM7FmAXBthFjGWusp4qbzr/2OVbuC2yxMs11BaxzBOHPImcfwFPwHhMN67oZaQAlnZu8Yb2Z
+	jd22JYFfAV+xOaOutYDlKqkm6OPPU=
+X-Received: by 2002:a17:903:240b:b0:2b0:91e6:bc18 with SMTP id d9443c01a7336-2b277e0bd66mr4557705ad.14.1775093186327;
+        Wed, 01 Apr 2026 18:26:26 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b27472d280sm10176925ad.17.2026.04.01.18.26.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Apr 2026 18:26:25 -0700 (PDT)
+Date: Thu, 2 Apr 2026 01:26:18 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Donald Hunter <donald.hunter@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] tools: ynl: ethtool: use doit instead of
+ dumpit for per-device GET
+Message-ID: <ac3Fun6L-9MiTYUV@fedora>
+References: <20260331-b4-ynl_ethtool-v1-0-dda2a9b55df8@gmail.com>
+ <20260331-b4-ynl_ethtool-v1-1-dda2a9b55df8@gmail.com>
+ <20260331185028.45dffe3a@kernel.org>
+ <aczHkqj_0ErqCfXS@fedora>
+ <20260401175117.1e4a5e6c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,64 +99,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260401114931.3091818-1-wagner.daniel.t@gmail.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+In-Reply-To: <20260401175117.1e4a5e6c@kernel.org>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274308-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[vger.kernel.org,broadcom.com,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274309-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmail.com,davemloft.net,google.com,redhat.com,kernel.org,lunn.ch,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C2B73382339
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[liuhangbin@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 467ED382389
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 01, 2026 at 12:49:31PM +0100, Daniel Wagner wrote:
-> Expose LED1 and LED2 pins via the PHY LED framework. Each pin has a
-> source mask (MASK_LOW + MASK_EXT registers) selecting which hardware
-> events light it, plus a CTL field in the shared 0xA83B register
-> (RMW; LED4 is firmware-controlled per the datasheet).
+On Wed, Apr 01, 2026 at 05:51:17PM -0700, Jakub Kicinski wrote:
+> On Wed, 1 Apr 2026 07:21:54 +0000 Hangbin Liu wrote:
+> > On Tue, Mar 31, 2026 at 06:50:28PM -0700, Jakub Kicinski wrote:
+> > > On Tue, 31 Mar 2026 11:56:11 +0800 Hangbin Liu wrote:  
+> > > > +++ b/tools/net/ynl/pyynl/ethtool.py  
+> > > 
+> > > We have converted all the samples to selftests so this script is 
+> > > the last piece of random "PoC" code we still have laying around.
+> > > Should we also move it to tests/ ?
+> > > 
+> > > If there's a reason to keep it as is -- could you please add that reason
+> > > at the top of the file for my future self? I'm pretty sure I already
+> > > questioned this script in the past ;)  
+> > 
+> > I have no objection to this. Will you keep it as it is when moving it to
+> > tests/ ? Should I wait for your moving first?
 > 
-> Hardware can offload per-speed link triggers (1000/2500/5000/10000),
-> RX/TX activity, and force-on. LINK_100 is accepted only alongside
-> LINK_1000: source bit 4 lights at both speeds and 100-alone isn't
-> representable, so the unrepresentable case falls to software.
-> 
-> The chip has five LED pins; only LED1/LED2 are exposed here as those
-> are the only ones characterized on tested hardware. LED4 is firmware-
-> controlled regardless of strap configuration.
-> 
-> Tested on TRENDnet TEG-S750 (LED1/LED2 wired to an antiparallel
-> bicolor LED): brightness_set via sysfs; netdev trigger offloaded=1
-> with amber lit at 100M/1G/2.5G and green lit at 10G via respective
-> link_* modes; LED off immediately on cable unplug with no software
-> involvement.
-> 
-> Signed-off-by: Daniel Wagner <wagner.daniel.t@gmail.com>
+> Would you mind moving it as part of your series?
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+OK, I will do it.
 
-    Andrew
+Thanks
+Hangbin
 
