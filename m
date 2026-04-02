@@ -1,207 +1,174 @@
-Return-Path: <netdev+bounces-274564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274565-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SJT7LDh4zmmMnwYAu9opvQ
-	(envelope-from <netdev+bounces-274564-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:07:52 +0200
+	id WFvDOI55zmmMnwYAu9opvQ
+	(envelope-from <netdev+bounces-274565-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:13:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BC3438A3D7
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:07:52 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE31538A4E3
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:13:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ED83431057C7
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:59:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AD56B303C116
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:59:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46FF73E3DA2;
-	Thu,  2 Apr 2026 13:57:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744603E9281;
+	Thu,  2 Apr 2026 13:58:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gaM0wYYg"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="YZnrXn/u"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63AB0310655;
-	Thu,  2 Apr 2026 13:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775138273; cv=none; b=Zw+QkJTbFJ+MOj7jse4hIm0lCZYd47MGMh0Spc4hupu1v4mj3NUd/EDzohFjxiRDK3WBXREm7tqliua34n9Y51/eDUZiqbuwDTHz123GFmQwnNxyVdFunGnU7Gk1zeDHOc1mywSFIKgAE+AU4ZTmQT7K1gZqjpAKHNgxShHIbkE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775138273; c=relaxed/simple;
-	bh=B6XHVrDu4cRpr7JHMEQjOwY23wmaawcouOP1Kt6Y9e8=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
-	 References:In-Reply-To; b=WhjBTZ+JX4K+UVkm7CQF+JZOk7/TFjlI7JkNh/JW3qdBo/yv3/AWsZtrpI09/5oeDls7G8+BDGVijTGr+Z59lS3NHhBjiubnIagwZe31Z2aPaBucxQpJ3pCz7LLpSfH3W6GfZtzcSs59xFUnz7QdGedhatSsrV+wHSBZ7Zi7BOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gaM0wYYg; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 96244C59F46;
-	Thu,  2 Apr 2026 13:58:18 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 174255FDEB;
-	Thu,  2 Apr 2026 13:57:47 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B5F4110450264;
-	Thu,  2 Apr 2026 15:57:41 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1775138266; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=GkRbx1KLnlIONYrPbKgeBqIosRCm1oaDFZI+qcdxXlQ=;
-	b=gaM0wYYgUCY8eKzjNEC0Z1n6a5u1rokGSWlWgR1p3OFbr8YNzqg6e3uJE9sKjJmOosPhX9
-	cPro91YokI7JDnbu64PGC4BEIZ1eiJsmKljOlzOdBRPghPpbl3ZcGnUBcWqRXrHRXim1xO
-	y5arF9M635+cdEMKgY6Tk7PDs6O91MqE7SvaEVE3hnRQi3e+goWZnWCXrXYiJEneqpMpij
-	VkguGkRnBepqCpckpdkuy0bt2tPTznvK0cXGeB1tU2aaCy2KzmuKdzqqk36R7hExZKO/16
-	PPAowRDQ+hB9KQ+M5/kc8lCRN8Nhzo6VR0PKSWy30rcXqsquz0+ok4O18qB+MQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480233A0B0B
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 13:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775138319; cv=pass; b=H1hV9oEQa7R5zdt+OaTj89ZxnPBRfOVN+HEjrco1oWGjTRYo2zdAYDhxFpYT7BnDHvgf4avCI5RZIngFLlVTV/GkR3K+8sa06O72s0RpfEJc8v/prpxUSjxnbMvJK0D6kUBn0x1PmCX7ICztTYTnkeAAbyz+Tvv2JLcCZVNT1Uo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775138319; c=relaxed/simple;
+	bh=VU0AbFtlLFJSKOUB5IbB1iaCG7SEJEo5AKtWU3UUzNE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nm2RN7zhP+52mhLQq1kuR2R32aFRRMFqJnIleJ6uwUcJiJtUaSs9Jl5s+dbC7xmNwsoT/h5BH6Qja2AZXcSOCDobuG52GckHC7q1lPiGGI/8gzSJ8cwXzqQObc9A7f5j6edf4I4dewnACRq9k7miV0j/CWTVqX+iiGgV7LtQfGE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=YZnrXn/u; arc=pass smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-43d01d6b50cso801720f8f.1
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 06:58:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775138314; cv=none;
+        d=google.com; s=arc-20240605;
+        b=iZs6Q40xS9+pJdok/apgOLTKTeUP4oMg6zbThwUN9iVOSxL56tz2ztltXVE0SGCf/3
+         33aK/3sKagypvp90pXM5PEAweWfSfXtgvtXyK8FF1X6ziVy0qNoiNOhZIFeLUGKxozsB
+         tjF42ZKUeL1eAuerpxVrSOH3/VEHIKv54ael0lOyrzJ+yOD5ybWEwtER86GZSdy8QL3B
+         H0opUvD6K9INsOoJ0q79WJhSwpB2b99qs35TwKxD/93MZBzIhwUV1eqIOkyPFI/CRBP/
+         rRwPTElH58nAK6l1V3DSHNRP+YmrWw2WxYI7AwLSZFLJGjP2E5yv38nu6faHk9BHr+oI
+         6/PA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=VU0AbFtlLFJSKOUB5IbB1iaCG7SEJEo5AKtWU3UUzNE=;
+        fh=5oPE0GCY8fNT4Tyl1J15Ht/fkVoH08XUWqCwvgG94CQ=;
+        b=bRC+pGOsSAMS1WKo0OUfRePbzZlsPrCM2vFjNZqbM98bWXFFVfyV7ePnesm95S22zt
+         iDna22OF2dPIzctQv5x2tW90eR20HXh3ytf6nSChqts1CDDhDYTPbd0Wki3QkkfyQxP3
+         YLupphR+Rjf8AtAjUp2h+Wlpk7SqFQbfUEcIQC5rnXjVNd44Bdx3XbJH4EMqOOcOIu5w
+         bn/dDrvh8lQBWmqSKdyQUz72ZJRzcZmSM8tthYzIgX8n8HVI45Q6FNeA0YND97+oRnNy
+         PAH9eFCoamSoDPIcjF2vaeIS/o+GYR4zb2z0ybC2tYxCHdCAmdUvLOs6aFHUsvLiiIN2
+         0oKg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1775138314; x=1775743114; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=VU0AbFtlLFJSKOUB5IbB1iaCG7SEJEo5AKtWU3UUzNE=;
+        b=YZnrXn/uX7S4av5pNnuujvcI08mYLP/l5fhpqXLgfQQM8fhcA43BSYVurFvL5nJPAe
+         v53/7ZFdUyKBaOe1zPAqgGzonr63be8UJ2nm+uJScWqm6jcYV72ohpmErcX66SoO5/dI
+         vLRsr35LgQfJ2wluOTAHS51NfwPzYYA/BY2YjXT+RITLiBKUzm72hrKpzW/kCkbUfoAB
+         Wsmdrr2LP8Yi2B8Ew6xVh7dqM746azCJfTbvrOiA7X646G9NBbGfKyzcje6SQAimNaYm
+         lIilxLAaBeJViByhms732p1Tdp6LqvYaOmV5JSRCDqG3tj/wlIhJdqMsgIDUfWGbfSk6
+         0EPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775138314; x=1775743114;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VU0AbFtlLFJSKOUB5IbB1iaCG7SEJEo5AKtWU3UUzNE=;
+        b=b9yYtD6UmRMIKYsiEXP+xtzYm+klF6M+rx/mQDVIrtkzWbx7a9fVoTtMJvR6KbVwAx
+         I6CUcPzk6nXK2/nQEhCvMCZJwT5l+Uo7NjJr2OsCs9F6O6q8aAoMV9KNPDDCtM4VKuIS
+         D+xjc/Nc6gHDlvDIQw5l8s0sZ4U2QMcTl3ng7jqldisXTu3snQsO6+wXrHZ2uFXeyOyC
+         oSe3wHtk1mPmCXjMziZpj6NQh9WfqX6SsYaQap6wRmvffZ1oTYgzKjHrT94TDC15T9El
+         k0TOON3rovckz3X2NhqqsqI6NYGYok3bLBCzUv8pmF9gLUEOUcEkd+y0/ttrqDejaUuN
+         tXxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVu2OwzizdRGfEgekfBo4wlrqO5dB7M9eYK2o7lC/fWKTB4WM7A5wZ/frFyjxF1o36ZhR7lsU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7GFXIFD07Lax3AZdjc0tTJiltGVP4m6CY1UprabWCGATs6RZh
+	L3cfQ1VWZSZimEj2L741IIdZXwvSva0bn94Vk4E8YSkO1/y+4JkTYavFVdfo7R4Pm9An3PEEYvJ
+	rpJjCKu3uD+K1yT+SvN3J4tQI6Tz7v3W6J7fmAU3e6w==
+X-Gm-Gg: AeBDieuCwCFrj5EN8fvnVQ0f71PeQ9iOQvhlxLOSD8LK4fcPODWB/6vnp/BzGZMLFiY
+	sLGFhGFuuzVP2YgOZv+3oRnESOD0Eh8AYzdsIQ4RP0fPtyWajIS31NvQuvQY64iOf0aH1q2y1Ii
+	Kyuej8izbpDB0HCQRiO7CG1zdHkX2dzaRvGcbkvC3HGymnsBcfSAArsiZrc1UuZHnwqxvsG06/e
+	OIDWkdm9RbuSRu12gI8/5GXRB6fwN0oYH2CGplEBXMgA4v1kOYX5LAmxirBpCkKIMLsdKXpPJ9F
+	DD8V/bnzQOWEPdjMMZUoI3Re2Pk5AMxoCu2dR+CLfxzRNmJVxTjAEbx651Ax74UnxsLjsFbBMxe
+	DTKZS
+X-Received: by 2002:a05:6000:2010:b0:43c:ffee:ee95 with SMTP id
+ ffacd0b85a97d-43d1505649emr15414743f8f.16.1775138314295; Thu, 02 Apr 2026
+ 06:58:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 02 Apr 2026 15:57:41 +0200
-Message-Id: <DHIPZVAI06HW.34RS9K2PB52OV@bootlin.com>
-Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Richard Cochran" <richardcochran@gmail.com>, "Russell King"
- <linux@armlinux.org.uk>, "Paolo Valerio" <pvalerio@redhat.com>, "Conor
- Dooley" <conor@kernel.org>, "Vladimir Kondratiev"
- <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
- <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
- <benoit.monin@bootlin.com>, "Tawfik Bayouk" <tawfik.bayouk@mobileye.com>,
- "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Maxime Chevallier"
- <maxime.chevallier@bootlin.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-To: "Nicolai Buchwitz" <nb@tipi-net.de>, =?utf-8?q?Th=C3=A9o_Lebrun?=
- <theo.lebrun@bootlin.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net-next 05/11] net: macb: allocate tieoff descriptor
- once across device lifetime
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260401-macb-context-v1-0-9590c5ab7272@bootlin.com>
- <20260401-macb-context-v1-5-9590c5ab7272@bootlin.com>
- <8c500ccc919ac2d7b350eacca0ab6ccf@tipi-net.de>
-In-Reply-To: <8c500ccc919ac2d7b350eacca0ab6ccf@tipi-net.de>
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+MIME-Version: 1.0
+References: <20260226172927.2Ck9wZMw@linutronix.de> <20260318103009.2120920-1-neelx@suse.com>
+ <20260318111849._MMol8Hr@linutronix.de> <CAPjX3FcRYNkYK2gerbRL4C9wXZPxWSs6=oTjzv5+msm4PQrfqA@mail.gmail.com>
+ <20260318145101._iaDDpbE@linutronix.de> <CAPjX3FePCKQTaxB6zuo+_V09PZct=utw3vgJUTM_GrZQtv7_TA@mail.gmail.com>
+ <20260402070319.vhRd6c-f@linutronix.de> <CAPjX3Ffz22M_ADE1xPqHOCyni1wLwc+reLTVyOrJ+gqNYY6vwg@mail.gmail.com>
+ <20260402083123.1H4kyAEn@linutronix.de> <CAPjX3Ff8Zv2EArKaCSKFAAFfBCCVu0YgqHk3SV85BBPm6-D7HQ@mail.gmail.com>
+ <20260402134633.bRxz1V8a@linutronix.de>
+In-Reply-To: <20260402134633.bRxz1V8a@linutronix.de>
+From: Daniel Vacek <neelx@suse.com>
+Date: Thu, 2 Apr 2026 15:58:22 +0200
+X-Gm-Features: AQROBzCJXTJV8hcjctLKcmZ2hBR3GmC6EUKHtExZ92lQyFZHUvwnLJh4BAs_1v4
+Message-ID: <CAPjX3FebJxdSMJV9Qs=3BtgL4mT7q55C6Te9c3OqpUhR5C+Ekg@mail.gmail.com>
+Subject: Re: "Dead loop on virtual device" error without softirq-BKL on PREEMPT_RT
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rt-devel@lists.linux.dev, netdev@vger.kernel.org, spasswolf@web.de, 
+	tglx@linutronix.de, Aaron Tomlin <atomlin@atomlin.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274564-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,mobileye.com,bootlin.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,vger.kernel.org,lists.linux.dev,web.de,linutronix.de,atomlin.com];
+	TAGGED_FROM(0.00)[bounces-274565-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.994];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,bootlin.com:dkim,bootlin.com:mid,bootlin.com:email,bootlin.com:url]
-X-Rspamd-Queue-Id: 4BC3438A3D7
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[neelx@suse.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.996];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,suse.com:dkim,linutronix.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DE31538A4E3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu Apr 2, 2026 at 1:14 PM CEST, Nicolai Buchwitz wrote:
-> On 1.4.2026 18:39, Th=C3=A9o Lebrun wrote:
->> The tieoff descriptor is a RX DMA descriptor ring of size one. It gets
->> configured onto queues for Wake-on-LAN during system-wide suspend when
->> hardware does not support disabling individual queues
->> (MACB_CAPS_QUEUE_DISABLE).
->>=20
->> MACB/GEM driver allocates it alongside the main RX ring
->> inside macb_alloc_consistent() at open. Free is done by
->> macb_free_consistent() at close.
->>=20
->> Change to allocate once at probe and free on probe failure or device
->> removal. This makes the tieoff descriptor lifetime much longer,
->> avoiding repeating coherent buffer allocation on each open/close cycle.
->>=20
->> Main benefit: we dissociate its lifetime from the main ring's lifetime.
->> That way there is less work to be doing on resources (re)alloc. This
->> currently happens on close/open, but will soon also happen on context
->> swap operations (set_ringparam, change_mtu, set_channels, etc).
->>=20
->> Signed-off-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
->> ---
->>  drivers/net/ethernet/cadence/macb_main.c | 70=20
->> ++++++++++++++++----------------
+On Thu, 2 Apr 2026 at 15:46, Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+> On 2026-04-02 11:21:20 [+0200], Daniel Vacek wrote:
+> >
+> > Well, that's the patch I originally sent then.
+> >
+> > https://lore.kernel.org/linux-rt-devel/20260318103009.2120920-1-neelx@suse.com/
 >
->> [...]
+> That was an alternative after everything was already done.
+
+That is true. I don't mean to complain. But also because I haven't
+seen the applied version on the mailing list. That's why I originally
+sent my patch as a reply to this thread.
+
+I'm simply asking whether we should proceed with the discussed
+approach? Would that be better in the end?
+
+If you don't object, I can send a rebased version along with a
+follow-up cleanup.
+
+--nX
+
+> > --nX
 >
->>=20
->> +static int macb_alloc_tieoff(struct macb *bp)
->> +{
->> +	/* Tieoff is a workaround in case HW cannot disable queues, for PM.=20
->> */
->> +	if (bp->caps & MACB_CAPS_QUEUE_DISABLE)
->> +		return 0;
->> +
->> +	bp->rx_ring_tieoff =3D dma_alloc_coherent(&bp->pdev->dev,
->> +						macb_dma_desc_get_size(bp),
->> +						&bp->rx_ring_tieoff_dma,
->> +						GFP_KERNEL);
->> +	if (!bp->rx_ring_tieoff)
->> +		return -ENOMEM;
->> +
->> +	return 0;
->> +}
->
-> The old macb_init_tieoff() that wrote WRAP+USED into the
-> descriptor is deleted but its work is not replicated here.
-> dma_alloc_coherent zeroes the memory, so RX_USED=3D0 and the
-> hardware will treat it as a valid receive buffer pointing to
-> DMA address 0 during suspend.
->
-> Shouldn't this have a macb_set_addr() + ctrl=3D0 after the
-> allocation?
-
-Clearly! This V1 uses tieoff uninitialised. The two instructions from
-old macb_init_tieoff() have been appended to macb_alloc_tieoff().
-
-static int macb_alloc_tieoff(struct macb *bp)
-{
-	/* Tieoff is a workaround in case HW cannot disable queues, for PM. */
-	if (bp->caps & MACB_CAPS_QUEUE_DISABLE)
-		return 0;
-
-	bp->rx_ring_tieoff =3D dma_alloc_coherent(&bp->pdev->dev,
-						macb_dma_desc_get_size(bp),
-						&bp->rx_ring_tieoff_dma,
-						GFP_KERNEL);
-	if (!bp->rx_ring_tieoff)
-		return -ENOMEM;
-
-	macb_set_addr(bp, bp->rx_ring_tieoff,
-		      MACB_BIT(RX_WRAP) | MACB_BIT(RX_USED));
-
-	bp->rx_ring_tieoff->ctrl =3D 0;
-
-	return 0;
-}
-
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+> Sebastian
 
