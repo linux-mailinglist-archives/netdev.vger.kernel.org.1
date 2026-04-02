@@ -1,362 +1,385 @@
-Return-Path: <netdev+bounces-274620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274621-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OE7hC2OWzmkBowYAu9opvQ
-	(envelope-from <netdev+bounces-274620-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:16:35 +0200
+	id UDrvF3aWzmkBowYAu9opvQ
+	(envelope-from <netdev+bounces-274621-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:16:54 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B8F438BB93
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:16:34 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E21038BB9B
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:16:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 757A4300D90A
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 16:09:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A1C8630095CC
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 16:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80142D5432;
-	Thu,  2 Apr 2026 16:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42923EF678;
+	Thu,  2 Apr 2026 16:16:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="clJcJyAb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KXP5YL5r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291E83CB2DC
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 16:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A9335F605
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 16:16:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775146195; cv=pass; b=dJrRvWzQEVrQBTQ0W1ECtaQ+V6Kns0rPkRYAlz+ZeoSs3F4OAg44O1Pfy6dGn52kaef/ZSDDYdYfcu+pG57bfZfcKVnyt64gl1xXzouunLVPPUFjq9WELnBl3f4FWPcPumQyGowTZSo1VIdsYEqzuMLyo5siUC+Rm4XGM0VlorQ=
+	t=1775146571; cv=pass; b=RNarmCrCEVZ50/Jb68RTcWzkeD16aEzpyK7VqdYetEvHxKKDHdDwVQVzIJPg94aAovYhe0CUfYzZGAB1d5rpSrvIH4k7CY+cCfFE6DJgoqTAwxPMtNXUUgO0gC6RxYAaAYoZJsr+Js8XgLsn7m1z9/ROu+1B4EV05WUIwpyIgnE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775146195; c=relaxed/simple;
-	bh=H965XUjsASqj7oo6DqcAKqRFQOH7DqtiVe7MLNrZevU=;
+	s=arc-20240116; t=1775146571; c=relaxed/simple;
+	bh=D60EDa61LqhPW5o5D86PD0M639K04WgxXc9SFQwKl8w=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dq089dclTfIWWWO00QgmsQSkU/iKhkoT0m5uCgOmZUmAObdGX8ve9YMM90sbRO/k9P9Xf2qKNKfzBlO7HP5dQlOsQpPMITlEpKK83o3+9jVfq5cVKFyrxZhF/WMYMPYqRUAE+qb3aVdegmeYzMy2ehg/mgXrPcRFIv8A1fXmFgU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=clJcJyAb; arc=pass smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5a12cd0bd79so1297938e87.2
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 09:09:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775146192; cv=none;
+	 To:Cc:Content-Type; b=pB+t1KMCanyqOBy9UchTYgwqt9jl9+omjAFnQUVkkfqYlkRzfUh+Sha9sTQBzSu9TLeXnYH7s3Lma64pGZ8Ck4Q6jKnbjoohdF1GkPvlovnwZFo7mN4oVJI2g5HCzqykRpruQYXppf3FZRgg1PsBK0CRqASo+yvlaf+IHvl3oG4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KXP5YL5r; arc=pass smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-66baa7fdfd3so11437a12.1
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 09:16:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775146566; cv=none;
         d=google.com; s=arc-20240605;
-        b=ao93cGcs1ptZvWzZV9J67YaFLtiFRSm7l9tEAfTXxg9y4h8bfV4Tv/W+59fi/wOIAc
-         pZvvCONExctrfpipSWbRe/etuyyzqa4Wx7H6CayUyM7fI+jhjgkFLX/fUMvZSGDeR1ux
-         s+nFx3BBb2UXl+852h+YOSLyFOy3eejyCTujJEw4YMg16U4MrjoOtUR8nJHDl1px2ag0
-         DWXqcGsB814svEvQdH/ZjkEipMbKYn3wKBr74ZMnALhngTyRXmiM+NormdgVCFzS8VJp
-         M/C6lwSIDYrCRoaxK7h88PHMNIDwg+4xE+TbqTCKin14sr+Pab6Fqer0QVjA9tEtt3Jj
-         QcYw==
+        b=Q2lf0Yykawjx38RU5+1aJ9Y2yIX/IYrslsmStHE4M4GtkfKr40eMFZL3EM88LYKxGZ
+         JIoYeG49113CTtfe4yqBsvk6w/LeA8qEwiJbfp+h9Hw3pJrSteEwKrYb3RHCQqOaeur8
+         ZjZ2W/5jtG/fsi1svFtXRn+/DUW6v41a9mvbVRaZZygG/ZSmPH8YAGm8s4JHwbVs8e2H
+         EZLxIY50WqwSlYhT8bBjhztI1SUWAg3QEVZ4KARqaRs0ci6mSZWZCvo0zHF2NE34XToK
+         vm/uk1Q3wJVvmsEYnMoWy9cMeRHZn4yn0ZUDfVeJP43ZYerwGb0VXaE8k5TNx4q6rBv7
+         FsYQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=A9ixqSdFX6BlrRiQhJMQlwW8R5HTrOah8/gClvdNOHM=;
-        fh=QFg3RcYmEE+iHs8k+fYr3eScMJ1mpnEIkxGaZi951UU=;
-        b=Z0uG2iKM1vQscht8RM6WtO/6aEhnGZ5wVS3A+PFmBY/jwD7UOb3JO4D0QDZQbfOQOr
-         SXx9vtL8bRzoW5tVIyyJqBw6mSb4AhcC/Rz08DjmZKDBSbEved/2EUD9+lVucUa5tL0a
-         hDsCFLjk+zIR7rScVGBwXxWsTMyjhSuzhEk7HGew3h5a+N55LK9pLmqHCK7yaDygUexw
-         82R7dxIF4vBHRxr4hu1RTMt5VjAbzX5/xR8x5K4Eyi7Krpyz/N7XHB1JBCh/EB++/lqi
-         y+9y7EVDFPkpN64C4Gsk1p3+W4MY2kv+AAvvKx8OYYVurUUarv8I2/X8eaSZdZsuR0g9
-         /AnA==;
+        bh=XpWeMAPNa4kjUUqgfe+POmovFhY+dw9PcsRJmCuy9so=;
+        fh=rx+UcZcJJ2eigJ799Q5WvnSSt3+JOx/FCek26EkrdI4=;
+        b=Nu/wYoG05XSLht2eOC57SfQyKPZvOvg8fqlgmtfgCiF9XzTtdcjY4mG0aC1gmfiW18
+         k58UKjPDKwn4dA8N8kTjKmC4NQF90qUSXxR/cHo1ne85b2flf2/HOroDVFxsHIms7VKV
+         5+FgLvY8UJgVM8jLFTt175cl9OcQqfleZmhkHRNyWhGOO/VGttiS6GU9caVQb1LBP0x+
+         Zhs2wbRRkmzmnpUTdwulahBrO/P8vthb/6ljank1rz+HwJ6fHG8LJfvQwUqU+WkOlUMz
+         oohhs9psCTBSEei/S7mmpKp1DB0JJTqJEyiA5eu3BqHM9MgYsV0iLn/56xvQcjyluA9R
+         GIHw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775146192; x=1775750992; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1775146566; x=1775751366; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A9ixqSdFX6BlrRiQhJMQlwW8R5HTrOah8/gClvdNOHM=;
-        b=clJcJyAbVa3fconAwfoxGC1jOZ+2d2Ei7/+jARpDly5Shxdn1j/aV+dL1gZXXj0lGi
-         bFxxc2crE4dECHALueU5IZqSVdlbBdozYw3bDbwq87Opz2yqwZ7anh1pU6iSqLjCZPR3
-         ojUeXuxe8xIuGWESygN/hbw+gNd67ep797IJzSSk1G4yYgheORIdoB4JEFIeP5DNuoDT
-         +ufQdvhunghNoEVRZHRWeVXTk6U2AQhnfcuWkLmUNe/3q3awxMFVaWG1HImJQGeMeP4L
-         F3bniu1aTNMgKK8mR9EkKnggmQNCybtlp0lUgBlik+K95n2/Q9y5QNH0bkHR5YfVRRrh
-         i0vA==
+        bh=XpWeMAPNa4kjUUqgfe+POmovFhY+dw9PcsRJmCuy9so=;
+        b=KXP5YL5r7/B7fcaKQY/B+SWa3ptPtvxl7/KtGo3N504FXqmOZtbFPQlDY371UFCZXB
+         GOOQXCA4HQ4utlxuh72n8KDuPZsGxdXXqbliZ9XR9wDJp9GikbeSLRSUC4SEy3Ic0WOv
+         e2d07kb5aRQqJgLruSfPeqWS2jZvaUf035JXoG2SPahdMc1/pf6K+A3H8vdMezNI4e/z
+         7EdqGr1JLig+4K83VFGONHaNCogehOpw+l2RhEEDvPFK78skTfqoCVPThlgHlKtZMM3l
+         MIM0eXVEJH4N/EX6ktNLLPmDIybstdJg/cOg5dZfGx9a028v15Oph52ubJ1z3OpI89dl
+         b//g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775146192; x=1775750992;
+        d=1e100.net; s=20251104; t=1775146566; x=1775751366;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=A9ixqSdFX6BlrRiQhJMQlwW8R5HTrOah8/gClvdNOHM=;
-        b=DmJQif9bxJiPyqrfmx2zU83YtF9sWIz9vlmJ7ohIH0659WPRELxaV+lkOBL8YVg6mU
-         63tnJZqQ/pzCDd/nRSMr7nEJWPtIxNWdWFmB6Lla5DpVWEXdaUFr2JWl37nIRMTdpnqc
-         MOVz64FXNYUV+5sIt8icO7ZrYuHzQhohJaK96gOrByLZGS1/WQReIOSnmAQN2FjZmWzK
-         +4XNg+nGr3vzj2rSrkegeHV0mQV4vbZ6aahn5WtIWqYN73DETldXliIq87e7USTwwchS
-         KPKRZp/F4PjqPVPa0sjiaUlKczDUxcsFgH5iQ0XN1OekYR+hBK0Q7IO2LTRTQYiSBZ3X
-         jYwg==
-X-Forwarded-Encrypted: i=1; AJvYcCXivv4HZPS1JlwmOKvoxNpdtc/idfcJpF0PsCEXbK9zWDWdkK8MiF4fSIoh7Y/kQjLieNbWws8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8F2651tS0sZkOkEVl682cC72HM8gWEQwLzhlwyF/YVV9cy6Na
-	m48pfTWnQkhL2hQLjrRDBKiDlQK+z9eLX+lS5lGg37wgxBT3VwXMECygtMwJIkyuAP1Rm1bZ+NZ
-	N01y3CufIM8Zl3ZBGjQyqXFbpdWvtA4AyGsP5CsY=
-X-Gm-Gg: ATEYQzxYGD3E3bVf0bixkOP/JkzcfjQMwEe2pJIjGQ1jwrMb+RddKXl/4D7QGyOGa59
-	a30D9MQCxNzMsUdbj6SDAEd4BZdduySiBa2cxh+ogUpLMz7BlpObnxNCjXljF9DvJzj61pkupno
-	mCLBTs+DFt1UlvKPpWQ23bMRqZAOgEsZD6leXlRXjqMeG+V/eWN+a50zBcCXWvinuCcGRExQ9us
-	Ma/1ApqnlJMmhxKiiLX06xKnbIVwCYACr31RxJ666B9y6SecSGtHPtyV/VAdoQ2R+g70xQSX60x
-	ROydiB8EredktOJeIA==
-X-Received: by 2002:a05:6512:114f:b0:5a2:a703:971 with SMTP id
- 2adb3069b0e04-5a2c1ee2edcmr3146971e87.1.1775146191915; Thu, 02 Apr 2026
- 09:09:51 -0700 (PDT)
+        bh=XpWeMAPNa4kjUUqgfe+POmovFhY+dw9PcsRJmCuy9so=;
+        b=pxunQAvxHSqjSpKBMSKDbV9jXyIeYz96Vc1UhjRLQAwHX9Rhl9aiDQyJQ85EicUzSD
+         /Jw60aqZlhsA18f/ErXYRrwdx0fGzJNwX/UhOGkNxpsA0L65GE6iPwgvRrdeb725T0O5
+         UFDy9I2JKpmOnwAVTMsNvUXYBh422cx5atMx48UIk84MSyLPwmYqwR8nx6I1KoZ4B7YF
+         jlIgssw/7S/YvGYZU42BmVD3GPhO32WrzjoBlO1NVvDLQ7QFjZ79PLDPy0kO13BU5Og6
+         ohuPB2xUhuUa5ZfgqPyFC1lBUPtK4M82C/ycZ0v6+mlULValzxlmfKMzdK+5UF9WiOdx
+         DF9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVF8/hXen8bZfxdVXuQUPAGBOsQ9gl1KW+moVc1IT3b6JmSsvCiPZd/SlKYXNxQF2oVslFmXkU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5TOJcAnutexgxPIR/008q0IeF3QHZiULHMm4ZPhyDPPo8pxJF
+	iT5tvPufIvviYdFNWnEuDMI4deh1hQ19NpLOQt0OYELzXPIGcKWhjGHbCTRVFhVFe0kQTX9od2E
+	HbFPx/d6bTyIFMoqoLlF8F5v8oi3ztAf8P2ttJp1Q
+X-Gm-Gg: ATEYQzyjux6qAqdRgRinItVTUGnPdRsALKwd+7jb2Gu9EHQbnBxhqg/irWL+4YNXWIo
+	PNDtpm3i9WOnYrkpjE1fwrGvW3BqrEKMwLzRJyLoFDbKigeC1Cbs/gZyZviGFQ7D7oKJSzJhUUu
+	w0awPIdFdSUrZmMPsB+m6bds3lCOu5kP4N47pfsxxTxjc8+9+ouTW7WdKulK7s/IU9bAeBIfyho
+	8XMeUhTZJxA8nawzAeSnghtq2s0bRyvFkhS0qJ+0W6LqL6b75mWr2Gy0yWORIfcdBMSmQIh1FVa
+	rVcTULFTK0t5pyitQ62k5Vxz/xzlOckY+fh+9A==
+X-Received: by 2002:aa7:ccd2:0:b0:66b:fcbf:11ad with SMTP id
+ 4fb4d7f45d1cf-66e082d709amr41208a12.2.1775146565852; Thu, 02 Apr 2026
+ 09:16:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260402085831.36983-1-kerneljasonxing@gmail.com>
- <CANn89iK-e1=yQhN0t48Cm7ru9cYwKwBw1_DDRcVffX91s4wWNA@mail.gmail.com>
- <CAL+tcoDiyptBUch5LZuRKn5BbJK_6TcgSi91D31axRtjqpSzzw@mail.gmail.com> <CANn89i+J=OBqHFh3jWNVXm7QWhSDJ=PHtmMtzyBrTpOoNtmu5w@mail.gmail.com>
-In-Reply-To: <CANn89i+J=OBqHFh3jWNVXm7QWhSDJ=PHtmMtzyBrTpOoNtmu5w@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 3 Apr 2026 00:09:14 +0800
-X-Gm-Features: AQROBzAVnPDdub99dfIfcrr9unLeUyjrR4PrCC19uSgYYXqWu_O5ioyEAz1U3sE
-Message-ID: <CAL+tcoBB+d-PwNzx1ugjDwZZBaQf8vxb3XooM3ARw9CtbiFeqw@mail.gmail.com>
-Subject: Re: [PATCH net-next] net-timestamp: take track of the skb when
- wait_for_space occurs
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	willemb@google.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>, Yushan Zhou <katrinzhou@tencent.com>
+References: <20260326224527.1044097-4-hramamurthy@google.com>
+ <20260329212002.2875815-1-kuba@kernel.org> <CA+mzVtuK6NSrnZdcwyToTseFqBU86jRn9nbdeLGFjhjeok=q2g@mail.gmail.com>
+ <CAMP57yWZkgU989sN38ycxiR1p5w48mssAwycZY4BZS28nDObRw@mail.gmail.com>
+ <CA+mzVtv-91ru7v6GxOS80xihE4ZbwGqdyQdKPTHv+woKaeOhuQ@mail.gmail.com> <CAMP57yVS3OiFX+Qjcr9djO46OLZ=KuW2awD-7fCPZ=k2SdHNnw@mail.gmail.com>
+In-Reply-To: <CAMP57yVS3OiFX+Qjcr9djO46OLZ=KuW2awD-7fCPZ=k2SdHNnw@mail.gmail.com>
+From: Jordan Rhee <jordanrhee@google.com>
+Date: Thu, 2 Apr 2026 09:15:53 -0700
+X-Gm-Features: AQROBzBybDyhkaLO4W6f0OfSinHsRNQr4EvsqYPgibT3LjRjm-UBCE2LZLpbEWY
+Message-ID: <CA+mzVtuL9iZ71VkMhb8vhs8idqOfJ=heWwgMLkYUjv6F0L91kQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] gve: implement PTP gettimex64
+To: Naman Gulati <namangulati@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, hramamurthy@google.com, netdev@vger.kernel.org, 
+	joshwash@google.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, richardcochran@gmail.com, 
+	willemb@google.com, nktgrg@google.com, jfraker@google.com, 
+	ziweixiao@google.com, maolson@google.com, thostet@google.com, 
+	jefrogers@google.com, alok.a.tiwari@oracle.com, yyd@google.com, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274620-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274621-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[kernel.org,google.com,vger.kernel.org,lunn.ch,davemloft.net,redhat.com,gmail.com,oracle.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jordanrhee@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,tencent.com:email]
-X-Rspamd-Queue-Id: 9B8F438BB93
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5E21038BB9B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 2, 2026 at 11:40=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, Apr 2, 2026 at 8:03=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
-> >
-> > On Thu, Apr 2, 2026 at 10:24=E2=80=AFPM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > On Thu, Apr 2, 2026 at 1:58=E2=80=AFAM Jason Xing <kerneljasonxing@gm=
-ail.com> wrote:
-> > > >
-> > > > From: Jason Xing <kernelxing@tencent.com>
-> > > >
-> > > > Tag the skb in tcp_sendmsg_locked() when wait_for_space occurs even
-> > > > though it might not carry the last byte of the sendmsg.
-> > > >
-> > > > If we don't do so, we might be faced with no single timestamp that
-> > > > can be received by application from the error queue. The following =
-steps
-> > > > reproduce this:
-> > > > 1) skb A is the current last skb before entering wait_for_space pro=
-cess
-> > > > 2) tcp_push() pushes A without any tag
-> > > > 3) A is transmitted from TCP to driver without putting any skb carr=
-ing
-> > > >    timestamps in the error queue, like SCHED, DRV/HARDWARE.
-> > > > 4) sk_stream_wait_memory() sleeps for a while and then returns with=
- an
-> > > >    error code. Note that the socket lock is released.
-> > > > 5) skb A finally gets acked and removed from the rtx queue.
-> > > > 6) continue with the rest of tcp_sendmsg_locked(): it will jump to(=
-goto)
-> > > >    'do_error' label and then 'out' label.
-> > > > 7) at this moment, skb A turns out to be the last one in this send
-> > > >    syscall, and miss the following tcp_tx_timestamp() opportunity b=
-efore
-> > > >    the final tcp_push
-> > > > 8) application receives no timestamps this time
-> > > >
-> > > > The original commit ad02c4f54782 ("tcp: provide timestamps for part=
-ial writes")
-> > > > says it is best effort. Now it's time to cover the only potential p=
-oint
-> > > > to avoid missing record.
-> > > >
-> > > > The side effect is obvious that we might record more than one time =
-for a
-> > > > single send syscall since the skb that we keep track of in this sce=
-nario
-> > > > might not be the last one. But tracing more than one skb is not a b=
-ad
-> > > > thing since there is an emerging/promissing trend to do a detailed
-> > > > packet granularity monitor.
-> > >
-> > > This is rather weak/lazy, especially if you do not know how long the
-> > > thread is put to sleep?
-> >
-> > Thanks for the review!
-> >
-> > I actually thought about how to recognize which one should be the last
-> > skb in each send syscall. But it turns out that much more complicated
-> > work needs to be done which hurts the stack and common structures like
-> > tcp_sock. That's why I gave up and instead chose a much simpler way to
-> > minimize the impact.
-> >
-> > >
-> > > >
-> > > > Thanks to the great ID, namely, tskey, application that is responsi=
-ble
-> > > > for the collect/sort of timestamps leverages it to put that record =
-in
-> > > > between two consecutive send syscalls correctly.
-> > > >
-> > > > Signed-off-by: Yushan Zhou <katrinzhou@tencent.com>
-> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > ---
-> > > >  net/ipv4/tcp.c | 4 +++-
-> > > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > > > index 516087c622ad..2db80d75cfa4 100644
-> > > > --- a/net/ipv4/tcp.c
-> > > > +++ b/net/ipv4/tcp.c
-> > > > @@ -1411,9 +1411,11 @@ int tcp_sendmsg_locked(struct sock *sk, stru=
-ct msghdr *msg, size_t size)
-> > > >  wait_for_space:
-> > > >                 set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
-> > > >                 tcp_remove_empty_skb(sk);
-> > > > -               if (copied)
-> > > > +               if (copied) {
-> > > > +                       tcp_tx_timestamp(sk, &sockc);
-> > > >                         tcp_push(sk, flags & ~MSG_MORE, mss_now,
-> > > >                                  TCP_NAGLE_PUSH, size_goal);
-> > > > +               }
-> > > >
-> > > >                 err =3D sk_stream_wait_memory(sk, &timeo);
-> > > >                 if (err !=3D 0)
-> > >
-> > > I think non blocking model should be used by modern applications,
-> > > especially ones caring about timestamps.
-> >
-> > Please note that BPF timestamping has already been merged. It's a
-> > standalone script that monitors all kinds of flows and discovers those
-> > strange/unexpected behaviors. So we normally don't take a look at the
-> > implementation of each application before spotting any exceptions.
-> >
-> > Besides, sometimes monitoring the latency of the host doesn't have
-> > much to do with the mode of application. People might want to observe
-> > more deeper into the underlying layer. Right now, without the patch,
-> > the monitor possibly ends up missing the record of this send syscall,
-> > which has been reliably reproduced by Yushan.
-> >
-> > >
-> > > This patch has performance implications.
-> > >
-> > >  tcp_tx_timestamp() is quite big and was inlined because it had a sin=
-gle caller.
-> > >
-> > > After this patch, it is no longer inlined.
-> > >
-> > > scripts/bloat-o-meter -t vmlinux.before vmlinux.after
-> > > add/remove: 2/0 grow/shrink: 0/1 up/down: 239/-192 (47)
-> > > Function                                     old     new   delta
-> > > tcp_tx_timestamp                               -     223    +223
-> > > __pfx_tcp_tx_timestamp                         -      16     +16
-> > > tcp_sendmsg_locked                          4560    4368    -192
-> > > Total: Before=3D29652698, After=3D29652745, chg +0.00%
-> >
-> > That's right and I really appreciate your recent great effort trying
-> > to mitigate the impact of function calls.
-> >
-> > My take is that it is a trade off. Adding one more track of the skb
-> > (which adds a function call) actually doesn't hurt much especially for
-> > this scenario and the last skb scenario. This path basically is not
-> > that hot. There are some left things to be done to improve the
-> > socket/BPF timestamping feature. And I plan to push more patches
-> > (sure, very carefully) to enhance the ability of BPF timestamping to
-> > observe TCP which is inevitable to add some extra functions and if
-> > statements.
-> >
-> > I'm wondering if the above makes sense to you.
->
-> If you mostly care about BPF, I would suggest:
+The iowrite32be() inside gve_adminq_report_nic_ts() will prevent
+reordering by the compiler because it uses volatile, and the VM exit
+will prevent speculative execution by the CPU.
 
-For me, yes, I've been internally working on this stuff for a long
-while and still struggling with what part is worth upstreaming. I'm
-not sure how Willem thinks of the socket timestamping feature.
-
+On Thu, Apr 2, 2026 at 8:53=E2=80=AFAM Naman Gulati <namangulati@google.com=
+> wrote:
 >
-> iff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index bd2c3c4587e133897aa057bd3b26c29df050607f..444254b8870c4406a7105cd3c=
-e177745fb1b6c0a
-> 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -506,6 +506,20 @@ static void tcp_tx_timestamp(struct sock *sk,
-> struct sockcm_cookie *sockc)
->                 bpf_skops_tx_timestamping(sk, skb,
-> BPF_SOCK_OPS_TSTAMP_SENDMSG_CB);
->  }
+> On Thu, Apr 2, 2026 at 8:38=E2=80=AFAM Jordan Rhee <jordanrhee@google.com=
+> wrote:
+> >
+> > We know that gve_adminq_report_nic_ts() will cause a VM exit, which
+> > will act as a full barrier. Additional barriers are not strictly
+> > necessary from a functional perspective. Can we rely on this fact or
+> > do we need explicit barriers?
 >
-> +static void tcp_tx_timestamp_before_wait_memory(struct sock *sk)
-> +{
-> +       struct sk_buff *skb;
-> +
-> +       if (!cgroup_bpf_enabled(CGROUP_SOCK_OPS) ||
-> +           !SK_BPF_CB_FLAG_TEST(sk, SK_BPF_CB_TX_TIMESTAMPING))
-> +               return;
-> +
-> +       skb =3D tcp_write_queue_tail(sk);
-> +       if (skb)
-> +               bpf_skops_tx_timestamping(sk, skb,
-> +                                         BPF_SOCK_OPS_TSTAMP_SENDMSG_CB)=
-;
-> +}
-> +
->  /* @wake is one when sk_stream_write_space() calls us.
->   * This sends EPOLLOUT only if notsent_bytes is half the limit.
->   * This mimics the strategy used in sock_def_write_space().
-> @@ -1403,10 +1417,11 @@ int tcp_sendmsg_locked(struct sock *sk, struct
-> msghdr *msg, size_t size)
->  wait_for_space:
->                 set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
->                 tcp_remove_empty_skb(sk);
-> -               if (copied)
-> +               if (copied) {
-> +                       tcp_tx_timestamp_before_wait_memory(sk);
->                         tcp_push(sk, flags & ~MSG_MORE, mss_now,
->                                  TCP_NAGLE_PUSH, size_goal);
-> -
-> +               }
->                 err =3D sk_stream_wait_memory(sk, &timeo);
->                 if (err !=3D 0)
->                         goto do_error;
+> I don't think that's enough. Without a barrier get_cycles can be
+> speculatively executed before gve_adminq_report_nic_ts.
 >
-
-Great, thanks, Eric!!
-
->
-> Note: You also could use a different skops to differentiate cases in
-> your monitoring.
->
-> $ scripts/bloat-o-meter -t vmlinux.old vmlinux.new
-> add/remove: 0/0 grow/shrink: 1/0 up/down: 69/0 (69)
-> Function                                     old     new   delta
-> tcp_sendmsg_locked                          4848    4917     +69
-> Total: Before=3D29651496, After=3D29651565, chg +0.00%
-
-Thanks again. I will give it a try tomorrow morning :)
-
-Thanks,
-Jason
+> >
+> >
+> > On Tue, Mar 31, 2026 at 11:05=E2=80=AFAM Naman Gulati <namangulati@goog=
+le.com> wrote:
+> > >
+> > > On Sun, Mar 29, 2026 at 9:31=E2=80=AFPM Jordan Rhee <jordanrhee@googl=
+e.com> wrote:
+> > > >
+> > > > On Sun, Mar 29, 2026 at 2:20=E2=80=AFPM Jakub Kicinski <kuba@kernel=
+.org> wrote:
+> > > > >
+> > > > > This is an AI-generated review of your patch. The human sending t=
+his
+> > > > > email has considered the AI review valid, or at least plausible.
+> > > > > ---
+> > > > > Subject: gve: implement PTP gettimex64
+> > > > >
+> > > > > This commit implements the PTP gettimex64 function to enable chro=
+ny and
+> > > > > phc2sys to synchronize the system clock to the NIC clock. It read=
+s the
+> > > > > NIC timestamp along with pre and post system cycle counters to mi=
+nimize
+> > > > > the uncertainty window.
+> > > > >
+> > > > > > diff --git a/drivers/net/ethernet/google/gve/gve_ptp.c b/driver=
+s/net/ethernet/google/gve/gve_ptp.c
+> > > > > > index 140b8fbce4f4..bea794541f30 100644
+> > > > > > --- a/drivers/net/ethernet/google/gve/gve_ptp.c
+> > > > > > +++ b/drivers/net/ethernet/google/gve/gve_ptp.c
+> > > > > > @@ -10,28 +10,203 @@
+> > > > >
+> > > > > [ ... ]
+> > > > >
+> > > > > > +static int gve_adminq_read_timestamp(struct gve_priv *priv,
+> > > > > > +                                  cycles_t *pre_cycles,
+> > > > > > +                                  cycles_t *post_cycles)
+> > > > > > +{
+> > > > > > +     unsigned long delay_us =3D 1000;
+> > > > > > +     int retry_count =3D 0;
+> > > > > > +     int err;
+> > > > > > +
+> > > > > > +     lockdep_assert_held(&priv->nic_ts_read_lock);
+> > > > > > +
+> > > > > > +     do {
+> > > > > > +             *pre_cycles =3D get_cycles();
+> > > > > > +             err =3D gve_adminq_report_nic_ts(priv, priv->nic_=
+ts_report_bus);
+> > > > > > +
+> > > > > > +             /* Ensure cycle counter is sampled after AdminQ c=
+md returns */
+> > > > > > +             rmb();
+> > > > > > +             *post_cycles =3D get_cycles();
+> > > > >
+> > > > > Are execution barriers needed around get_cycles() here? rmb() ord=
+ers
+> > > > > memory accesses, but the CPU might still speculatively execute th=
+e cycle
+> > > > > counter reads out of order with respect to the AdminQ commands.
+> > > > >
+> > > > > Could this speculative reordering cause the strict bounds validat=
+ion in
+> > > > > gve_ptp_gettimex64() to fail spuriously?
+> > > >
+> > > > I will add mb() barriers to be totally safe.
+> > >
+> > > I'm not so sure that rmb() is insufficient here. In x86_64 rmb() is a=
+n
+> > > lfence. lfence is used to prevent speculative execution (per the x86
+> > > barrier_nospec implementation) and rdtsc_ordered, which is called by
+> > > the ktime* helpers, also prefaces rdtsc with an lfence. On ARM the
+> > > get_cycles implementation adds an isb instruction before reading
+> > > cntvct_el0.
+> > >
+> > >
+> > > >
+> > > > > [ ... ]
+> > > > >
+> > > > > >  static int gve_ptp_gettimex64(struct ptp_clock_info *info,
+> > > > > >                             struct timespec64 *ts,
+> > > > > >                             struct ptp_system_timestamp *sts)
+> > > > > >  {
+> > > > > > -     return -EOPNOTSUPP;
+> > > > > > +     struct gve_ptp *ptp =3D container_of(info, struct gve_ptp=
+, info);
+> > > > > > +     struct gve_sysclock_sample sysclock =3D {0};
+> > > > > > +     struct gve_priv *priv =3D ptp->priv;
+> > > > > > +     struct system_time_snapshot snap;
+> > > > > > +     u64 nic_ts;
+> > > > > > +     int err;
+> > > > > > +
+> > > > > > +     /* Take system clock snapshot before sampling cycle count=
+ers */
+> > > > > > +     if (sts)
+> > > > > > +             ktime_get_snapshot(&snap);
+> > > > > > +
+> > > > > > +     err =3D gve_clock_nic_ts_read(priv, &nic_ts, &sysclock);
+> > > > >
+> > > > > Could the system time snapshot become stale here?
+> > > > >
+> > > > > If priv->nic_ts_read_lock is contended, or if gve_adminq_read_tim=
+estamp()
+> > > > > retries and sleeps, the snapshot might be taken significantly bef=
+ore the
+> > > > > actual hardware read.
+> > > > >
+> > > > > Would it be more accurate to take the snapshot immediately before=
+ reading the
+> > > > > hardware, inside the mutex?
+> > > >
+> > > > Ack, will fix.
+> > > >
+> > > > >
+> > > > > > +     if (err)
+> > > > > > +             return err;
+> > > > > > +
+> > > > > > +     if (sts) {
+> > > > > > +             /* Reject samples with out of order system clock =
+values */
+> > > > > > +             if (!(sysclock.host_pre_cycles <=3D sysclock.nic_=
+pre_cycles &&
+> > > > > > +                   sysclock.nic_pre_cycles  <=3D sysclock.nic_=
+post_cycles &&
+> > > > > > +                   sysclock.nic_post_cycles <=3D sysclock.host=
+_post_cycles)) {
+> > > > > > +                     dev_err_ratelimited(&priv->pdev->dev,
+> > > > > > +                                         "AdminQ system clock =
+cycle counts out of order. Expecting %llu <=3D %llu <=3D %llu <=3D %llu\n",
+> > > > > > +                                         (u64)sysclock.host_pr=
+e_cycles,
+> > > > > > +                                         sysclock.nic_pre_cycl=
+es,
+> > > > > > +                                         sysclock.nic_post_cyc=
+les,
+> > > > > > +                                         (u64)sysclock.host_po=
+st_cycles);
+> > > > > > +                     return -EBADMSG;
+> > > > >
+> > > > > How does this behave on architectures where get_cycles() is not i=
+mplemented
+> > > > > and returns 0, or with older firmware that leaves nic_pre_cycles =
+and
+> > > > > nic_post_cycles as 0?
+> > > >
+> > > > Firmware is not allowed to return 0. 0 should trigger the check.
+> > > >
+> > > > > It looks like the bounds check would unconditionally fail and ret=
+urn -EBADMSG.
+> > > > > Since userspace tools like chrony usually expect -EOPNOTSUPP for =
+unsupported
+> > > > > extended ioctls to fall back to basic PTP ioctls, will returning =
+-EBADMSG
+> > > > > cause a hard failure for clock synchronization?
+> > > >
+> > > > Will fix. GVE is only supported on x86_64 and arm64, and will fail =
+on
+> > > > other architectures with -EOPNOTSUPP due to the check in
+> > > > gve_cycles_to_clock_fn(). However, if an architecture returns
+> > > > get_cycles() as 0, it will fail here first with -EBADMSG. I will ad=
+d
+> > > > an explicit check for x86 || arm64 earlier in this function.
+> > > >
+> > > > >
+> > > > > [ ... ]
+> > > > >
+> > > > > > @@ -132,7 +307,7 @@ int gve_init_clock(struct gve_priv *priv)
+> > > > > >               goto release_ptp;
+> > > > > >       }
+> > > > > >       mutex_init(&priv->nic_ts_read_lock);
+> > > > > > -     err =3D gve_clock_nic_ts_read(priv, &nic_raw);
+> > > > > > +     err =3D gve_clock_nic_ts_read(priv, &nic_raw, NULL);
+> > > > > >       if (err) {
+> > > > > >               dev_err(&priv->pdev->dev, "failed to read NIC clo=
+ck %d\n", err);
+> > > > > >               goto release_nic_ts_report;
+> > > > >
+> > > > > Is there a race condition exposing the PTP device to userspace be=
+fore its
+> > > > > resources are fully initialized?
+> > > > >
+> > > > > Looking at gve_init_clock(), gve_ptp_init() is called before allo=
+cating
+> > > > > nic_ts_report and initializing nic_ts_read_lock:
+> > > > >
+> > > > >     err =3D gve_ptp_init(priv);
+> > > > >     if (err)
+> > > > >         return err;
+> > > > >
+> > > > >     priv->nic_ts_report =3D dma_alloc_coherent(...);
+> > > > >     ...
+> > > > >     mutex_init(&priv->nic_ts_read_lock);
+> > > > >
+> > > > > If a concurrent userspace process immediately invokes the
+> > > > > PTP_SYS_OFFSET_EXTENDED ioctl after gve_ptp_init() registers the =
+/dev/ptpX
+> > > > > device, could it call gve_ptp_gettimex64() and attempt to lock th=
+e
+> > > > > uninitialized mutex or dereference the NULL nic_ts_report pointer=
+?
+> > > > >
+> > > > > Additionally, in the error path for gve_init_clock():
+> > > > >
+> > > > >     release_nic_ts_report:
+> > > > >         mutex_destroy(&priv->nic_ts_read_lock);
+> > > > >         dma_free_coherent(...);
+> > > > >         priv->nic_ts_report =3D NULL;
+> > > > >     release_ptp:
+> > > > >         gve_ptp_release(priv);
+> > > > >
+> > > > > Could destroying the mutex and freeing the memory before gve_ptp_=
+release()
+> > > > > create a use-after-free window if an ioctl is currently running?
+> > > >
+> > > > Will be fixed in the previous patch in the series.
 
