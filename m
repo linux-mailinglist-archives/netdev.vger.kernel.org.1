@@ -1,231 +1,128 @@
-Return-Path: <netdev+bounces-274561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274562-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0LeTL5R1zmk6nwYAu9opvQ
-	(envelope-from <netdev+bounces-274561-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:56:36 +0200
+	id kCWGI6Z1zmk6nwYAu9opvQ
+	(envelope-from <netdev+bounces-274562-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:56:54 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FB2238A199
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:56:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8B4038A1A8
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:56:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CED5330632BB
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:46:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 74EE2306A1F1
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:46:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C6E2E0901;
-	Thu,  2 Apr 2026 13:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9CFE3264F2;
+	Thu,  2 Apr 2026 13:46:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ajROOsn1"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kIpD+0UJ";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="U4zQupY9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350273C454B
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 13:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97ACD3254A3;
+	Thu,  2 Apr 2026 13:46:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775137584; cv=none; b=fpBr+DlHLSbVxFl4uVvk407d/COeoGKcz+mibxKhhUen1lFmV36yOHqnPqTwAafpSpwm0ixEnq2REufAjHkDa/oR8DyWm5VRYKYxV4pxuWLpFZnSTM7b6U1fugyxb2onrANUB6b2SBSrha4DguyqkSYR3kj0jJ3kGZn8F0qmxk0=
+	t=1775137598; cv=none; b=GO5ckxNMZ9on5gDHaSVIhuWa8ygcscmqTsGU2QSRl83N5pdkpWtEvDfM2nIhrSFmzdDo0/cgGhoBrwUDFEBQsTgiDEIKIfpa2HzNzf7Fum1XQXrJyq2ZQQ+dIdTstnMfOulUVsgJ1DCPGthcOzGdr0U9NXc2notIl4DCUHCHCvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775137584; c=relaxed/simple;
-	bh=aHZ0S5vkSIsoJ7VYMzJPdRUpX0WJTbEOIGe0bUE4jp8=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
-	 References:In-Reply-To; b=KKIHT320+D8ovJG/8/4h0ONOQ+YHzF7kKupYVaXibNUN6rRgGT7KbsrXoM68KLfurHz7s/HcHcuxhFtA0Vd1CLi3tH41PtGkJ9Dk9HAohjogi1N2TYKisXwoz2KQqkPRLaqdXotyqPMK3hPuCcIK27fIIhdCpDbzSqIY7mnx8fE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ajROOsn1; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id C90434E428AE;
-	Thu,  2 Apr 2026 13:46:14 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 902DA5FDEB;
-	Thu,  2 Apr 2026 13:46:14 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id F2D4510450262;
-	Thu,  2 Apr 2026 15:46:07 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1775137573; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=Cja/NfeVOSO+/W7+EGsBFPgZjU9HqugPbefIoVB0XY4=;
-	b=ajROOsn1SgPjCsZoKvuJ2CZiPusXmWczDSfbdaHud6AWwAan5VPeCFtAZl/+ydofTifspI
-	byisYyp7PGCkY6jLeGoDu+eO+IdtpjK46hq8Hi6NpWSwcGfc3UA0gV6ofqT461u513OsP/
-	CHWiuHwnbNPIcTW/iqpFFL+iokXCTokjMmCHHNn6snRB5yDZ8IGxPJHRYNbYoYcgGsdTyo
-	il7LDk3H4JN6MoV6qP1ETD4R9mnajygMLKcxMnW4yAR/ylk71PrGgDO4cHYhMdgZlGF/a3
-	G14HKSaiYRk4tZxgeeA0pf0if3KHczx3meCW0xpNY8rUvIbNgPNt4RzjBCxpxg==
+	s=arc-20240116; t=1775137598; c=relaxed/simple;
+	bh=d+P+EsqVeeoMF8/3WOEXPIQ3KE1cp8zvoEmXP+T1AMk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z9kb9X9U0gn76E0SIPFN1jsUglLPf01qH/w+s3JJZjzpa0oXeB3qQ/1SAsJSlN7wmuEZHV69a9vU9nzR+TKLB55Sd2fRfTG9s2z3WKLINVukBLeEqvq75RWinGby7+KF2UQpQPC89l/C60qnfcLAhhv2IafteNABVr2q/o1HSK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=kIpD+0UJ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=U4zQupY9; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 2 Apr 2026 15:46:33 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1775137595;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7+1mm6JU2ay/udIfhcEewU+WST4SDt/bfv6S8nospS0=;
+	b=kIpD+0UJtHUyzBV86+b5wKoWeqPSEyTg0G3fx6XNQ2Zu52ql0HMWuiuvfAy9tb0R+dQ52F
+	l8z9uDlq+ya+pN/j4pndjYrGQiDTzFvgQwSWAb9suLFWMOp6yp23EhArDkUnrB4tDsFeD+
+	G/ngTrgdzjTWjd3aArb4RqG3OegeKpHbEhdfiZ1sGvD0Pyf32yyXTuDDS8XqLtmwY4dSv8
+	Q0TAzhQ8A68aKqd3Kh3CKh3ZUCWXDE2b/BOLKXQUfhhs4NIvyqo3otWwpwaVC79cXpWYZZ
+	RXVJujzDrHOjkgGTJQlGzZPVW3OBZmdx+AsVzR2TVA8njHacNaXCh89qn04qrQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1775137595;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7+1mm6JU2ay/udIfhcEewU+WST4SDt/bfv6S8nospS0=;
+	b=U4zQupY97iwE1tX2M84I6aNUk4aYHhMrk8zMde6PREwwCN+VNMKDdxtiENfMk+FsC9j3u5
+	FLhtry/8BAh3RNAg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Daniel Vacek <neelx@suse.com>
+Cc: edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev, netdev@vger.kernel.org,
+	spasswolf@web.de, tglx@linutronix.de,
+	Aaron Tomlin <atomlin@atomlin.com>
+Subject: Re: "Dead loop on virtual device" error without softirq-BKL on
+ PREEMPT_RT
+Message-ID: <20260402134633.bRxz1V8a@linutronix.de>
+References: <20260226172927.2Ck9wZMw@linutronix.de>
+ <20260318103009.2120920-1-neelx@suse.com>
+ <20260318111849._MMol8Hr@linutronix.de>
+ <CAPjX3FcRYNkYK2gerbRL4C9wXZPxWSs6=oTjzv5+msm4PQrfqA@mail.gmail.com>
+ <20260318145101._iaDDpbE@linutronix.de>
+ <CAPjX3FePCKQTaxB6zuo+_V09PZct=utw3vgJUTM_GrZQtv7_TA@mail.gmail.com>
+ <20260402070319.vhRd6c-f@linutronix.de>
+ <CAPjX3Ffz22M_ADE1xPqHOCyni1wLwc+reLTVyOrJ+gqNYY6vwg@mail.gmail.com>
+ <20260402083123.1H4kyAEn@linutronix.de>
+ <CAPjX3Ff8Zv2EArKaCSKFAAFfBCCVu0YgqHk3SV85BBPm6-D7HQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 02 Apr 2026 15:46:07 +0200
-Message-Id: <DHIPR0HVCE5W.1ZVH5VSPC1FSN@bootlin.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net-next 00/11] net: macb: implement context swapping
-Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Richard Cochran" <richardcochran@gmail.com>, "Russell King"
- <linux@armlinux.org.uk>, "Paolo Valerio" <pvalerio@redhat.com>, "Conor
- Dooley" <conor@kernel.org>, "Vladimir Kondratiev"
- <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
- <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
- <benoit.monin@bootlin.com>, "Tawfik Bayouk" <tawfik.bayouk@mobileye.com>,
- "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Maxime Chevallier"
- <maxime.chevallier@bootlin.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-To: "Nicolai Buchwitz" <nb@tipi-net.de>, =?utf-8?q?Th=C3=A9o_Lebrun?=
- <theo.lebrun@bootlin.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260401-macb-context-v1-0-9590c5ab7272@bootlin.com>
- <f399076d1791d9df325f967e50184c2e@tipi-net.de>
-In-Reply-To: <f399076d1791d9df325f967e50184c2e@tipi-net.de>
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAPjX3Ff8Zv2EArKaCSKFAAFfBCCVu0YgqHk3SV85BBPm6-D7HQ@mail.gmail.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274561-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,mobileye.com,bootlin.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[google.com,kernel.org,vger.kernel.org,lists.linux.dev,web.de,linutronix.de,atomlin.com];
+	TAGGED_FROM(0.00)[bounces-274562-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linutronix.de:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,bootlin.com:email,bootlin.com:url]
-X-Rspamd-Queue-Id: 2FB2238A199
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:dkim,linutronix.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E8B4038A1A8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello Nicolai,
+On 2026-04-02 11:21:20 [+0200], Daniel Vacek wrote:
+> 
+> Well, that's the patch I originally sent then.
+> 
+> https://lore.kernel.org/linux-rt-devel/20260318103009.2120920-1-neelx@suse.com/
 
-On Thu Apr 2, 2026 at 1:35 PM CEST, Nicolai Buchwitz wrote:
-> On 1.4.2026 18:39, Th=C3=A9o Lebrun wrote:
->> MACB has a pretty primitive approach to buffer management. They are all
->> stored in `struct macb *bp`. On operations that require buffer realloc
->> (set_ringparam & change_mtu ATM), the only option is to close the
->> interface, change our global state and re-open the interface.
->>=20
->> Two issues:
->> - It doesn't fly on memory pressured systems; we free our precious
->>   buffers and don't manage to reallocate fully, meaning our machine
->>   just lost its network access.
->> - Anecdotally, it is pretty slow because it implies a full PHY reinit.
->>=20
->> Instead, we shall:
->>  - allocate a new context (including buffers) first
->>  - if it fails, early return without any impact to the interface
->>  - stop interface
->>  - update global state (bp, netdev, etc)
->>  - pass newly allocated buffer pointers to the hardware
->>  - start interface
->>  - free old context
->>=20
->> This is what we implement here. Both .set_ringparam() and
->> .ndo_change_mtu() are covered by this series. In the future,
->> at least .set_channels() [0], XDP [1] and XSK [2] would benefit.
->
-> Thanks for your work, the context swapping approach probably
-> makes a lot of sense and will finally bring proper MTU change
-> support that I tried to patch earlier.
+That was an alternative after everything was already done.
 
-Thanks for the review!
+> --nX
 
->> The change is super intrusive so conflicts will be major. Sorry!
->>=20
->> Thanks,
->> Have a nice day,
->> Th=C3=A9o
->>=20
->> [0]:=20
->> https://lore.kernel.org/netdev/20260317-macb-set-channels-v4-0-1bd4f4ffc=
-fca@bootlin.com/
->> [1]:=20
->> https://lore.kernel.org/netdev/20260323221047.2749577-1-pvalerio@redhat.=
-com/
->> [2]:=20
->> https://lore.kernel.org/netdev/20260304-macb-xsk-v1-0-ba2ebe2bdaa3@bootl=
-in.com/
->>=20
->> Signed-off-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
->> ---
->> Th=C3=A9o Lebrun (11):
->>       net: macb: unify device pointer naming convention
->>       net: macb: unify `struct macb *` naming convention
->>       net: macb: unify queue index variable naming convention and types
->>       net: macb: enforce reverse christmas tree (RCT) convention
->>       net: macb: allocate tieoff descriptor once across device lifetime
->>       net: macb: introduce macb_context struct for buffer management
->>       net: macb: avoid macb_init_rx_buffer_size() modifying state
->>       net: macb: make `struct macb` subset reachable from macb_context=
-=20
->> struct
->>       net: macb: introduce macb_context_alloc() helper
->>       net: macb: use context swapping in .set_ringparam()
->>       net: macb: use context swapping in .ndo_change_mtu()
->>=20
->>  drivers/net/ethernet/cadence/macb.h      |  119 +-
->>  drivers/net/ethernet/cadence/macb_main.c | 1731=20
->> +++++++++++++++++-------------
->>  drivers/net/ethernet/cadence/macb_pci.c  |   46 +-
->>  drivers/net/ethernet/cadence/macb_ptp.c  |   26 +-
->>  4 files changed, 1090 insertions(+), 832 deletions(-)
->> ---
->> base-commit: 321d1ee521de1362c22adadbc0ce066050a17783
->
-> The series didn't apply cleanly on current net-next. The
-> base commit 321d1ee521de doesn't seem to be upstream yet, is
-> this based on your set_channels v4 series?
-
-Surprising. I fetched net-next/main yesterday morning. My branch is:
- - net-next/main @ f1359c240191
- - my three series needed for working networking on MACB [0][1][2]
- - some dev defconfigs
- - finally the series sent upstream (b4 cover letter then series)
-
-I confirm it applies on f1359c240191 but not on today's
-net-next/main @ 269389ba5398.
-
-I should experiment with b4 series dependency management. IIUC it would
-have exposed through public metadata that my parent commit was
-f1359c240191 even if it isn't strictly true locally.
-
-We happen to add macb_{alloc,free}_tieoff() just above
-at91_default_usrio which got edited by Conor in cee10a01e286 ("net:
-macb: fix use of at91_default_usrio without CONFIG_OF"). Will fix in V2.
-
-Thanks,
-
-[0]: https://lore.kernel.org/all/20260225-macb-phy-v7-0-665bd8619d51@bootli=
-n.com/
-[1]: https://lore.kernel.org/all/20260225-macb-phy-v7-0-d3c9842ec931@bootli=
-n.com/
-[2]: https://lore.kernel.org/linux-phy/20260309-macb-phy-v9-0-5afd87d9db43@=
-bootlin.com/
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Sebastian
 
