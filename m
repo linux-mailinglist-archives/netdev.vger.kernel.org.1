@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-274765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274766-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QNj0KYv6zmn7sAYAu9opvQ
-	(envelope-from <netdev+bounces-274765-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 01:23:55 +0200
+	id gMKaNmf6zmn7sAYAu9opvQ
+	(envelope-from <netdev+bounces-274766-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 01:23:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F1E738F2FE
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 01:23:55 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id BECA438F2D7
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 01:23:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0B2F83064697
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 23:22:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id DEDB03034A86
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 23:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83CE3A641C;
-	Thu,  2 Apr 2026 23:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63EA3A9DA9;
+	Thu,  2 Apr 2026 23:22:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="CNJijNab"
+	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="UjhHxjKB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6057B3A1A55
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 23:22:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA0F38425A
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 23:22:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775172165; cv=none; b=ia0VzAYk4oiAV6blGZ+ObA9jEBIRnI65SmCBvu6NzTNs7FZ2DNSsk/TDdZy1+ae7YPYrr655TtyKcjVX31kQS/9uOvczLVfl9iOVFQxmoRfWOI6Ybv83TxHmn2zLW6ic0kJrwXAuivTaMEX/sZ9H5JkZCIzI6Oz3mGDky3c02I8=
+	t=1775172167; cv=none; b=lLAc8oPq2/peZAS9C/szAn1YYiPs3MSCVisGfd83hxGpFWYE/yhcwffOyyAguoNY62U7AeWdZ/TROj8b3dIhQjsydmw+WLEGhN8hKNeF+uC1iMWOdb4ROz/yhP3oPsN87TKe3ASxK+eCnde/DDgmDsZImhTsif0fMkDaVexl3Gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775172165; c=relaxed/simple;
-	bh=Tjl8imYH1OqXLWE1hPP3jcyr3QCjzn5ejtwy1XlU14c=;
+	s=arc-20240116; t=1775172167; c=relaxed/simple;
+	bh=DTdy0wGHn9nJPdYwvVneV3WjcTxwCTyqAhd+aFkuiNE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FqOusMeTJLEWHlv1NEpxS9v+DTZa+YXf5TIqjJjGqkeQhs97uNu4LfM4GhGXLnXFJdwTRZrPgoGsMRo9D4L9OcA0CtyA4vMPpRmQ53FNjyGymoIMzHJQcjOLxToa8dbkl6sklEqesYkhgUVsvp7D+E5Gk27o9LRewBZAVMoMS5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=CNJijNab; arc=none smtp.client-ip=209.85.210.178
+	 MIME-Version; b=SRqzytaXNlqQcopQ90SxmIujLzPLik282/rWctje95S9EPwJSRusP/YkiQTxkPrsyzB4BbGmTtUS0W+DijjaZI02ryoNQFMfAMCG6XLnlzy6t7VZCesVIpnLF7Alg3Kvq07pNW/+71Bb0miZIiXUdUi7yt4k0W7C6Wx2wO2PG7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=UjhHxjKB; arc=none smtp.client-ip=209.85.215.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-82c20b9fb15so652742b3a.3
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 16:22:44 -0700 (PDT)
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-c70f91776fcso548427a12.0
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 16:22:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775172163; x=1775776963; darn=vger.kernel.org;
+        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775172165; x=1775776965; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Syye3jGbYJUGP9iil2Gf3tWEkqi92NaZ66fdyleX4E8=;
-        b=CNJijNabvExYIGaObQNLzgv9yFh6J2hhDbMpfvlv3j0cS0QRWRFj+PLaRkHdimwYOA
-         xxnihqq0KFrDxQywV6mcf9y5w1BJKKF4ISFqJFlutgpeQUwo7d/x0gulT0cpoTbSyF7o
-         LSeFvKi4oIxHr2F3ZsRymVTqN6eTOWJapchTz8JY60gx7363UK7TVIsyXia0MbGEnPIo
-         kdmDTPlWD7pqacX9ZMoOFkwr//XfRxDnBdiT4NXsR1JWo019XLYx01hIZ99E/ctfdeq6
-         SHuElnk9jxHPhsryLNqn9QfSIWOeYhIJeqAXpq0Ze6S+dMWehlRDqjfDrk0pu2ZDAqhT
-         py7Q==
+        bh=tPx/23GDUuRn7oQUGbzWX+WqVXLgjJ891p+NWHhkBJw=;
+        b=UjhHxjKB4J/ucIQj7IzKGn5JTn6iaN1jQ2phJYbD3qQjYP3JQNZYyzgsUzemltU19P
+         LAXcC448YSqCnrv378IUKrc06/+7EZss4kPEeExTjLgRaRsSZoJCu30Vc8rsfIPXksnw
+         FWFIxiNGRf5AQbpBfM9HZiEbqnarvsRND0AlXI5/FPN7ByZQlJ13/BUYMP8y2panWQ0X
+         pGxjjZ3sEUpnqkmefTmf26MqjtBLDsZ6waPPPc3yS4/yIgXoTLoevSIsDtH2Frj8crek
+         ggjn21Nq73noJsTwpOZaHJVZ4mt3H+LnQRtqm/ac0WYHeUPy4U7UPkyPizYauOkGg13H
+         iQWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775172163; x=1775776963;
+        d=1e100.net; s=20251104; t=1775172165; x=1775776965;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Syye3jGbYJUGP9iil2Gf3tWEkqi92NaZ66fdyleX4E8=;
-        b=Ir+c5N6s1CpZkaxtp4qMi9hyT4D80okt3EvQaHEM2EtImi3h8+znhqHu7/whycdFf2
-         VDbr4e8ivY12EG1oRomR7hKx1KObvN7SNBcnA/iLyQ+EMJXkTcO1OjCkhnRhuKWhGudD
-         sIM09dkps6tGZbOK+YaXsNMHQrRJuBPw9MaJDrS4b5Nk823Fy+Pqjc7UNUufX9x4Q1Nu
-         vNX4IAIcKfR1irBvTHAP7YdH2hS0hXOoPF0fJCAYfEbng6OTSG/I0IiiE0NjG/AN1kTL
-         3X7eVc13Yw4zMruep4zMPWdcH5gbUYwZ64k3n2vVcFSt8GZO+ybmNi3xC1Txgz+1TwPd
-         1DAQ==
-X-Gm-Message-State: AOJu0YzN3OMFgc7aBA+3KZ3K4uHZv5GPNJV18iBHHQK9KSGxEUwY19DZ
-	QY+Q/OyCxzvlqplMfqQIm9YfJ72pYu6VaGi+LolZxojuQQP4XE2CgKamn0tNlEOJWRM4oEqPgt3
-	Lyq+seJM=
-X-Gm-Gg: ATEYQzy2dXYU8GRzOaKmKX/61KZlJGrd6otM8Mm8c+nysg2bIealTQ8H5kwVv6UWc/o
-	9/8OPJN2zfPtS8Lp/NdY5269LmIUksHrT50/IrtCyPIbmq3+T939a+ugStP2BCbeVsu+QVt/YF5
-	NzVF+EkW54TIrf9r8g1AGAQomwC3yMkIzMjEc7oqyFMcy8+DlyoegSyf2tPa10pm4DuuAd2NVzG
-	CG4H3LHt9EW8RzoGulD621E5p5lVLXlFRLI71GYcdmX5XapglNvmpeydERIzQ3w9PV3+ZKqKqIY
-	nric2Jwlcq6k3Tw2sRhQuFGi8poi+UyNzY60WpQB0Iqa0iBqAq64tiJzEbgxpp+tHobD54jyO7r
-	9mMLtETf/efhR+l4x1zXRUvWmbUAd0znYflriAsLgZh+EBU21FM+yE6j/sQxyB/8/EQTT5bLZSO
-	j4qCu5
-X-Received: by 2002:a05:6a00:4b53:b0:82c:e1a3:986f with SMTP id d2e1a72fcca58-82d0db93629mr734500b3a.43.1775172163414;
-        Thu, 02 Apr 2026 16:22:43 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:47::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9b3ccc8sm5445968b3a.19.2026.04.02.16.22.42
+        bh=tPx/23GDUuRn7oQUGbzWX+WqVXLgjJ891p+NWHhkBJw=;
+        b=oS2qwu/KrRI/OTViyisEKaXoY38rfZdlc1/D8DEw4LSG/bEjziEFv/4frJMw2XxbUP
+         E/FdjC8sh0Pul6NgUmMPLmglALl0iuwdM2UuCmlcYW9shIrCtnPBaSU62CUjM7WxRgoF
+         T/Yv+usgrnuwDQiEQrDkv9ZWfJlQhertldhmLAQB2Eneq8ViYWPJy1Zp55LBZRXU5WCN
+         7xXVEBh7n6EzZkKur9O0e53q4rwJ/UwfWqNZFgw4Og4Fu/LCZh4wM5KjwU8F0V+l77l/
+         fYA4tq20cenQwfxoxa3C7Uo66bPt+weyQ+0WrfIvXK8IAMCataA728QHoPeDAmOD174S
+         1J3A==
+X-Gm-Message-State: AOJu0YyQX49f3iK+RTpsVXeyipwa4f6dKH3fONRh4cF8awykaIO4w9RD
+	gabkwHk7hBmU7cJHfQmhnJdSfixwqfo0PUD8eYlxn3lJdxepKbn571HzeV1t1RCmLa9fipvgGMo
+	Z3LoC46o=
+X-Gm-Gg: AeBDievjAJzNLLQv8Cp1vDT3IAuMHglvu4X+XCSY4psUJPooXr5nzPfMFZvwE7KGEpo
+	qxacI8hVso3NDX4c4VycmSWPxmYA8Q769CubgUfmifcDQGZ1ynqRwAxjDosp7QdijSD7jViFdQO
+	WzNqMrIMf3fgCANyiIgF0nYWwUcI9DT99EK34r4kurrZP1FzI+scMIDb5oIGwcgQAZn54A+pdc6
+	3NJUnixy44uYFH0ZECDdkF/i9zgXcsOztAX8MDrPFhSQK/5pBbBSzCpWRIPgsYetso1nu51vcaN
+	lI0MkFL1XqyHCq/4RQ4lhLhmzqAlLU9Ea7JwKDhsAmmymsaqA5GQdg8bJtoWNtbhykZFxcWTT8p
+	DqVSD/d6SfpTP5z7aoUjoowkiD1vYldJpljXs0GElfz0VNhPtzYssidxY4M+FmgOap4z0lIIugB
+	zIUC4Ma++ITIisDsI=
+X-Received: by 2002:a17:902:f611:b0:2b2:65db:8c51 with SMTP id d9443c01a7336-2b28164cba3mr11916705ad.8.1775172165399;
+        Thu, 02 Apr 2026 16:22:45 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:5d::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2749794e8sm42617235ad.53.2026.04.02.16.22.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 16:22:43 -0700 (PDT)
+        Thu, 02 Apr 2026 16:22:44 -0700 (PDT)
 From: Joe Damato <joe@dama.to>
 To: netdev@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
@@ -89,9 +89,9 @@ Cc: andrew+netdev@lunn.ch,
 	willemb@google.com,
 	Joe Damato <joe@dama.to>,
 	linux-kselftest@vger.kernel.org
-Subject: [net-next 2/3] selftests/net: Test PACKET_STATISTICS drops
-Date: Thu,  2 Apr 2026 16:21:58 -0700
-Message-ID: <20260402232203.2004496-3-joe@dama.to>
+Subject: [net-next 3/3] selftests/net: Test PACKET_AUXDATA
+Date: Thu,  2 Apr 2026 16:21:59 -0700
+Message-ID: <20260402232203.2004496-4-joe@dama.to>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260402232203.2004496-1-joe@dama.to>
 References: <20260402232203.2004496-1-joe@dama.to>
@@ -108,18 +108,18 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-274765-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274766-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DMARC_NA(0.00)[dama.to];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
@@ -130,170 +130,138 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,dama-to.20251104.gappssmtp.com:dkim,dama.to:email,dama.to:mid]
-X-Rspamd-Queue-Id: 5F1E738F2FE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dama.to:email,dama.to:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BECA438F2D7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Extend psock_snd to test drops by setting a tiny receive buffer and
-sending a large burst of packets.
+Extend the packet socket selftest, adding a recvmsg path, to test
+PACKET_AUXDATA. Check basic attributes of tpacket_auxdata.
 
 Signed-off-by: Joe Damato <joe@dama.to>
 ---
- tools/testing/selftests/net/psock_snd.c  | 52 ++++++++++++++++++++----
+ tools/testing/selftests/net/psock_snd.c  | 57 ++++++++++++++++++++++--
  tools/testing/selftests/net/psock_snd.sh |  5 +++
- 2 files changed, 48 insertions(+), 9 deletions(-)
+ 2 files changed, 59 insertions(+), 3 deletions(-)
 
 diff --git a/tools/testing/selftests/net/psock_snd.c b/tools/testing/selftests/net/psock_snd.c
-index 5be481a3d2bd..7bbce274b9f0 100644
+index 7bbce274b9f0..682e0afe364d 100644
 --- a/tools/testing/selftests/net/psock_snd.c
 +++ b/tools/testing/selftests/net/psock_snd.c
-@@ -39,6 +39,7 @@ static bool	cfg_use_gso;
- static bool	cfg_use_qdisc_bypass;
+@@ -40,6 +40,7 @@ static bool	cfg_use_qdisc_bypass;
  static bool	cfg_use_vlan;
  static bool	cfg_use_vnet;
-+static bool	cfg_drop;
+ static bool	cfg_drop;
++static bool	cfg_aux_data;
  
  static char	*cfg_ifname = "lo";
  static int	cfg_mtu	= 1500;
-@@ -49,6 +50,8 @@ static uint16_t	cfg_port = 8000;
- /* test sending up to max mtu + 1 */
- #define TEST_SZ	(sizeof(struct virtio_net_hdr) + ETH_HLEN + ETH_MAX_MTU + 1)
+@@ -281,9 +282,26 @@ static int setup_rx(void)
  
-+#define BURST_CNT (1000)
+ static void do_rx(int fd, int expected_len, char *expected)
+ {
++	char cmsg_buf[1024] = {};
++	struct msghdr msg = {};
++	struct iovec iov[1];
+ 	int ret;
+ 
+-	ret = recv(fd, rbuf, sizeof(rbuf), 0);
++	if (cfg_aux_data) {
++		iov[0].iov_base = rbuf;
++		iov[0].iov_len = sizeof(rbuf);
 +
- static char tbuf[TEST_SZ], rbuf[TEST_SZ];
++		msg.msg_iov = iov;
++		msg.msg_iovlen = 1;
++
++		msg.msg_control = cmsg_buf;
++		msg.msg_controllen = sizeof(cmsg_buf);
++
++		ret = recvmsg(fd, &msg, 0);
++	} else {
++		ret = recv(fd, rbuf, sizeof(rbuf), 0);
++	}
++
+ 	if (ret == -1)
+ 		error(1, errno, "recv");
+ 	if (ret != expected_len)
+@@ -292,6 +310,31 @@ static void do_rx(int fd, int expected_len, char *expected)
+ 	if (memcmp(rbuf, expected, ret))
+ 		error(1, 0, "recv: data mismatch");
  
- static unsigned long add_csum_hword(const uint16_t *start, int num_u16)
-@@ -212,13 +215,14 @@ static void do_send(int fd, char *buf, int len)
- 	if (ret != len)
- 		error(1, 0, "write: %u %u", ret, len);
- 
--	fprintf(stderr, "tx: %u\n", ret);
-+	if (!cfg_drop)
-+		fprintf(stderr, "tx: %u\n", ret);
++	if (cfg_aux_data) {
++		struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
++		struct tpacket_auxdata *adata;
++
++		if (!cmsg)
++			error(1, 0, "auxdata null");
++
++		if (cmsg->cmsg_level != SOL_PACKET)
++			error(1, 0, "cmsg_level != SOL_PACKET");
++
++		if (cmsg->cmsg_type != PACKET_AUXDATA)
++			error(1, 0, "cmsg_type != PACKET_AUXDATA");
++
++		adata = (struct tpacket_auxdata *)CMSG_DATA(cmsg);
++
++		if (adata->tp_net != ETH_HLEN)
++			error(1, 0, "cmsg tp_net != ETH_HLEN");
++
++		if (adata->tp_len != expected_len)
++			error(1, 0, "cmsg tp_len != %u", expected_len);
++
++		if (adata->tp_snaplen != expected_len)
++			error(1, 0, "cmsg tp_snaplen != %u", expected_len);
++	}
++
+ 	fprintf(stderr, "rx: %u\n", ret);
  }
  
--static int do_tx(void)
-+static int do_tx(bool burst)
- {
- 	const int one = 1;
--	int fd, len;
-+	int i, fd, len;
+@@ -312,6 +355,10 @@ static int setup_sniffer(void)
+ 		if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &one, sizeof(one)))
+ 			error(1, errno, "setsockopt SO_RCVBUF");
  
- 	fd = socket(PF_PACKET, cfg_use_dgram ? SOCK_DGRAM : SOCK_RAW, 0);
- 	if (fd == -1)
-@@ -242,6 +246,10 @@ static int do_tx(void)
- 
- 	do_send(fd, tbuf, len);
- 
-+	if (burst)
-+		for (i = 0; i < BURST_CNT; i++)
-+			do_send(fd, tbuf, len);
-+
- 	if (close(fd))
- 		error(1, errno, "close t");
- 
-@@ -290,6 +298,7 @@ static void do_rx(int fd, int expected_len, char *expected)
- static int setup_sniffer(void)
- {
- 	struct timeval tv = { .tv_usec = 100 * 1000 };
-+	const int one = 1;
- 	int fd;
- 
- 	fd = socket(PF_PACKET, SOCK_RAW, 0);
-@@ -299,6 +308,10 @@ static int setup_sniffer(void)
- 	if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)))
- 		error(1, errno, "setsockopt rcv timeout");
- 
-+	if (cfg_drop)
-+		if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &one, sizeof(one)))
-+			error(1, errno, "setsockopt SO_RCVBUF");
++	if (cfg_aux_data)
++		if (setsockopt(fd, SOL_PACKET, PACKET_AUXDATA, &one, sizeof(one)))
++			error(1, errno, "setsockopt PACKET_AUXDATA");
 +
  	pair_udp_setfilter(fd);
  	do_bind(fd);
  
-@@ -309,7 +322,7 @@ static void parse_opts(int argc, char **argv)
+@@ -322,8 +369,11 @@ static void parse_opts(int argc, char **argv)
  {
  	int c;
  
--	while ((c = getopt(argc, argv, "bcCdgl:qt:vV")) != -1) {
-+	while ((c = getopt(argc, argv, "bcCdDgl:qt:vV")) != -1) {
+-	while ((c = getopt(argc, argv, "bcCdDgl:qt:vV")) != -1) {
++	while ((c = getopt(argc, argv, "abcCdDgl:qt:vV")) != -1) {
  		switch (c) {
++		case 'a':
++			cfg_aux_data = true;
++			break;
  		case 'b':
  			cfg_use_bind = true;
-@@ -323,6 +336,9 @@ static void parse_opts(int argc, char **argv)
- 		case 'd':
- 			cfg_use_dgram = true;
  			break;
-+		case 'D':
-+			cfg_drop = true;
-+			break;
- 		case 'g':
- 			cfg_use_gso = true;
- 			break;
-@@ -367,11 +383,23 @@ static void check_packet_stats(int fd)
- 	if (getsockopt(fd, SOL_PACKET, PACKET_STATISTICS, &st, &len))
- 		error(1, errno, "getsockopt packet statistics");
+@@ -436,7 +486,8 @@ static void run_test(void)
+ 		check_packet_stats(fds);
+ 	}
  
--	if (st.tp_packets != 1)
--		error(1, 0, "stats: tp_packets %u != 1", st.tp_packets);
-+	if (cfg_drop) {
-+		/* PACKET_STATISTICS reports all packets seen (including
-+		 * drops) in tp_packets
-+		 */
-+		if (st.tp_packets < st.tp_drops)
-+			error(1, 0, "stats: tp_packets %u < tp_drops %u",
-+			      st.tp_packets, st.tp_drops);
+-	do_rx(fdr, cfg_payload_len, tbuf + total_len - cfg_payload_len);
++	if (!cfg_aux_data)
++		do_rx(fdr, cfg_payload_len, tbuf + total_len - cfg_payload_len);
  
--	if (st.tp_drops != 0)
--		error(1, 0, "stats: tp_drops %u != 0", st.tp_drops);
-+		if (st.tp_drops == 0)
-+			error(1, 0, "stats: expected drops but tp_drops == 0");
-+	} else {
-+		if (st.tp_packets != 1)
-+			error(1, 0, "stats: tp_packets %u != 1", st.tp_packets);
-+
-+		if (st.tp_drops != 0)
-+			error(1, 0, "stats: tp_drops %u != 0", st.tp_drops);
-+	}
- 
- 	/* verify clear on read */
- 	memset(&st, 0xff, sizeof(st));
-@@ -394,7 +422,12 @@ static void run_test(void)
- 	fdr = setup_rx();
- 	fds = setup_sniffer();
- 
--	total_len = do_tx();
-+	total_len = do_tx(cfg_drop);
-+
-+	if (cfg_drop) {
-+		check_packet_stats(fds);
-+		goto out;
-+	}
- 
- 	/* BPF filter accepts only this length, vlan changes MAC */
- 	if (cfg_payload_len == DATA_LEN && !cfg_use_vlan) {
-@@ -405,6 +438,7 @@ static void run_test(void)
- 
- 	do_rx(fdr, cfg_payload_len, tbuf + total_len - cfg_payload_len);
- 
-+out:
+ out:
  	if (close(fds))
- 		error(1, errno, "close s");
- 	if (close(fdr))
 diff --git a/tools/testing/selftests/net/psock_snd.sh b/tools/testing/selftests/net/psock_snd.sh
-index 1cbfeb5052ec..b6ef12fad5d5 100755
+index b6ef12fad5d5..111c9e2f0d21 100755
 --- a/tools/testing/selftests/net/psock_snd.sh
 +++ b/tools/testing/selftests/net/psock_snd.sh
-@@ -92,4 +92,9 @@ echo "raw gso max size"
- echo "raw gso max size + 1 (expected to fail)"
- (! ./in_netns.sh ./psock_snd -v -c -g -l "${max_mss_exceeds}")
+@@ -97,4 +97,9 @@ echo "raw gso max size + 1 (expected to fail)"
+ echo "test drops statistics"
+ ./in_netns.sh ./psock_snd -D
  
-+# test drops statistics
++# test aux data
 +
-+echo "test drops statistics"
-+./in_netns.sh ./psock_snd -D
++echo "test aux data"
++./in_netns.sh ./psock_snd -a
 +
  echo "OK. All tests passed"
 -- 
