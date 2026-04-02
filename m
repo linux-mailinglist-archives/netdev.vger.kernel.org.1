@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-274556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274557-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +Kz8AzF0zmkpnwYAu9opvQ
-	(envelope-from <netdev+bounces-274556-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:50:41 +0200
+	id UOl2DsByzmnxngYAu9opvQ
+	(envelope-from <netdev+bounces-274557-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:44:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 788BC38A07B
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:50:40 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18A02389F18
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:44:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EF0CC310F60E
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:42:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 05E25302D14B
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:42:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A3531DDBB;
-	Thu,  2 Apr 2026 13:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A503612F0;
+	Thu,  2 Apr 2026 13:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KlTCWIrO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L96TY6w8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B1C31B823
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 13:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D8B322DB7
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 13:42:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775137334; cv=none; b=JQwDte6dvc1jp7W4/Hlw0zZspmxsUwc9gZuwA6Bt08+yRhfxY4wxoSQJJHwvWxvyoeaI28KZU51fdcgajWrRsfgVa6liVboDMxvdoaROSawYaScZLLWos9PE6xO0mti/XqupvBha3LibWYu8SiDwZNytsa5fiTZivMCYT7tEs5A=
+	t=1775137338; cv=none; b=eQNAg0NKn6FstERWQ+nhMGUyyQGfkvYN+QAJX10HjqRI3LH2LcrGUSt7we7IIlT9OkJ6HMfTc/rf/wsRAaQR8O5aGZVxpPXs6wvsP5TuidsM8s+FTzvIl9sJYoUIA8zCqE0Gj9lX9j2dsFMkCNLuZFEa3ogQwQPmfcAyz9aKHxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775137334; c=relaxed/simple;
-	bh=fui2k7W3kzqHbEp2RxjvyLK/uCqTY0twaQHgAjBBcnQ=;
+	s=arc-20240116; t=1775137338; c=relaxed/simple;
+	bh=Yhegt7iU5rV6n8tWQ8XcSc+1i6PCYAHTe/z9RabDIkk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=aOAOZ/c+BLvlf32cU7wVKgqFlKto4fYhEb2W5YlCC8s7Z0uU7wu9wroV0NeuLoH61E0F5imRj8+LcsQ73Cl12NiIKdSDPFE4CVZyS3LqG0xq0L9Driz5RrKAPHjccgp1a2vkUEZS9SVccJYhRV4PMtPs9TWXEeoLLFR7X67AS+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KlTCWIrO; arc=none smtp.client-ip=209.85.219.45
+	 In-Reply-To:To:Cc; b=ETsVj7Hm4vWFRBN97S6oVkiGcw2ET68SfFZj0CQuqTV+ymcOA4gUFH+G+17sGZNhS4SwIhKhJh8a5eyBfcoMi5YYu8p0UL/xQsmwWN83vqgKxk5QL5a+fmZVr3hwsMlrsy1Z9euraN0hkDgWR06eogVgAj4GotlNOFPsghMq/nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L96TY6w8; arc=none smtp.client-ip=209.85.219.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-89f68634786so11250476d6.1
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 06:42:12 -0700 (PDT)
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8a56ca653ceso8986666d6.2
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 06:42:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775137332; x=1775742132; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775137336; x=1775742136; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jI9s4pV6axUzNz1v0OmTIzWI9NyLRrETyGajDoGdJf8=;
-        b=KlTCWIrOoeqtpdsd1pZtrYFMRGfIocbtjBOc4vvJRMk2W7OoFviKbhBQYBhWJsia6x
-         1ACdAIWd/LkV8df5fXG3h5Fo/QNL7Yx/+wcyRl1urgyXT1KdA+gkMBM3Do71Abc1olSA
-         PpcHEBVHzm2xen6YwVmbleNrQCspjiGv3VKJHr6+KSunp5WQBo2b4clKZhETmLGPaN3O
-         jIE6H9c9Qf/pTqjM6ycadDz55HdQs0X3nskCWvsi45qW1yOOEHHHrdv5rRFSQPzwX5xg
-         MKGVU2kQsXyiicVbITzfMYC5WWZXvH333UYjLxnuHIWHcLXkv8zmLVYlvNOblgLv46uy
-         jG8g==
+        bh=vD0JpGCIUJCZt+e3PHlWs2HiuWiKIa27B0E9SKBDPpU=;
+        b=L96TY6w8b06yGByHB3oonfpFW1GyiQ9BYQB1lv1S2r7d8gtNVritr2GRZ5ezqzLsXe
+         EZLzgvU4btWNJYyugxjcEnLybK4FDJjgslvMXIgPRKixD2wLeg7+xQ+4T8yWtiItoUxS
+         OCiiqWf/Ywp7Rf1NTHskiTg7Hj2cESdu7o2dbaLmYsF1wJ9J1j1TuEiFic2WsVOiGBBc
+         fOf/d3EyU/P18NMwLXxY/psNsLT27J9OfLEm9LQt/DRU6kQQ6rVSr711DlHPDMtRzK30
+         z+dLBD/w/B5MI/B4FF4kkr9TSQk2V9M/g96JIFZMEpgr8aYaJ5M5o9uiVZsifnQxv9RA
+         WXyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775137332; x=1775742132;
+        d=1e100.net; s=20251104; t=1775137336; x=1775742136;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=jI9s4pV6axUzNz1v0OmTIzWI9NyLRrETyGajDoGdJf8=;
-        b=S5ob1AYntI1BxHenp45TLuzOUlGdx0Op7xcr6CMdJ7GMz1dGEmKOohBeIoYGltVVYK
-         0v9mqYfs5ReSGTtMlU2H1IiLo2YSlDCoJ9uwcPnPW+okqW2hEWc2O7DKZtimrKRTEfCF
-         TF3JWKfXe6LEI84hOuyL2gVoZvR1jg5iJvWkZ8J6ixFaLgwe0aPC99EzI3Pco1r95HDr
-         BDtSt0WulOhCGzwYhYHdz5RBy4e/hKOtWFHbVcNykauLEKTQb8Ww06MrPq8B2LfHGye2
-         3F7N7fbiTejh9o4vPxIimdVUbJbrPARsYQ4jbQtvFhiF5bj46PA7zsBMYw1htnSdXE+V
-         RBsA==
-X-Forwarded-Encrypted: i=1; AJvYcCV02z1dfhVJ3fWg80kQN0Pgntkf9POwTVyr9ELZlu8pQnJp05o6jI2BIj3BrHSkkB6OA5l6iHU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8kJkaEOaXZ08y9wpujppY9d/Uzj8CzYHr9RWkXKpAKoFeyGES
-	dwAlFXJ+mSv9JlvcBseNgreQC6+fDhW6ktu2DhBQbCvkY4xke5LnXWvH
-X-Gm-Gg: AeBDieuuy2UBGZilzPTmQrblWrLdtlO7XkfQAnpCELC6I3w0OwJ07EdGHThz2AQlvxa
-	RFN1Y6kTiGTjKO/F8yJlGlx5O2/cEBvKBTChwHmFKAxIS6oyPBm4f2OmKdvr+f4uuItXPQLmmm0
-	ebDHJTOqVVcqWoibtle52vssUO1hx+vq7RwWkffy5MGNGA1FkIIjXwcyIWsU2MYWE3tkvNZqMEq
-	l8FI2qgR9TauJyLBxSNYdxYwlSu1l2V7nQbrdTY5sqoZBDoTzKivUlql8ne6hc4r+cLW2U2Gjwq
-	cts4RPLQDxbaO+h4Frck+OSsnFiXBHyMbEs2gRkyJUuHM3+cfb/mpmq2lIt9O5UJ+9w37I3HgV4
-	N2WO1xEmISrrCYAS4QutSeq5yA1pr6GtVCQuvw1EuiPaJ76vkW7lnYTblDzj/HxpT2+jg//rsc6
-	o/42CrZI5kiQRh0HGqJbVTx52HpH8m5Ae5
-X-Received: by 2002:a05:6214:c81:b0:89c:c5cc:4bf4 with SMTP id 6a1803df08f44-8a59f66bc73mr49736506d6.16.1775137331884;
-        Thu, 02 Apr 2026 06:42:11 -0700 (PDT)
+        bh=vD0JpGCIUJCZt+e3PHlWs2HiuWiKIa27B0E9SKBDPpU=;
+        b=S5se3Kh0i8BoM+1n8J4l2s7L3JJZVWkzBsweuBMS+2FipDghkVZKhCBR/5WcjE6sJL
+         uJRsyFMaXpVOeu6WQWga9G1uJq7Sg9PUNgYxJHe1EKDIViLWzshU6WhTxUiCM9d0iyj6
+         Y6h4QxIqynuqHQ1gAD3N4KJHLeg/lzkJ4/Zx0UgI4AI2wNIhDRYPEqb2A/2AZ7HMMcOD
+         2/TYCrei69qfFk+bpkWmsSmg0OeTumSRFYj/BMXYmlz/HNVw19/SYhgMggKib0/f9hjI
+         DGl1tD3kK7VBhLZfVnbAb9akDguZRUcXNCh30UUHFItJ1cMdu0KmqRZl/sTthcMHkHBL
+         a0Jg==
+X-Forwarded-Encrypted: i=1; AJvYcCXApVaJtQca1YsttjIDXmajy889nP3Am7zDFa6b6gpfHQm9eksr53JyAh4RZQ0WCmYFEYhupW4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxf1qk7ti57NYvMyMA/hxcljn5gFSvG5aqMXQaPNOBpXFxm6+Jh
+	2t9cZYRhu62T8zC8Be2sTeuaHe0volSSTsrkt9hJO/FOCN1k7G74w25B
+X-Gm-Gg: AeBDies2u2oQ9W49miw/7I2+OI8PsAh7sO2afaNY+6ZZsA1pdbjLBBPtF6QQJIZmz7y
+	k25L6foM6dS4UBw1aB1ygLXGf4vUa6/3Zp7PY89kk6G3jCz/paYG1sObjARXn6+6cRpyTnld6SA
+	mq4G3fqu9twsjseHLelLcSWq13RHAMwOOvQjNFmjHkKMy3Ri7GqbUSkm5rKBJB6KhlLhIkxFBaN
+	VKcySvt9ZxUI5bpz4IeYZ08GZBrVZTh0fw4QUBHdjXeMWqQd7YR8D+e2QL9aHF3eDih0c7qmla2
+	g9QMDPsWju0VsqXOvmqpHdjF+EqKfchVqTjzL76znfEzIDXO4Is8bmjKG5iZ/6tYeimiIuP/xLD
+	+tbPdPizxcP9uLk3JR8vz3FPjaMocIRyBD+2wY9mc8uQlQuVMzM1W4zygCVhdY5EOMXYOtNmDYJ
+	VlvtwgW3JG6ugNhcNKXglI80B5xBg9vKJEmeCel6SiIrQ=
+X-Received: by 2002:a0c:f09b:0:b0:8a0:f8b7:391d with SMTP id 6a1803df08f44-8a43999b698mr104207136d6.31.1775137335592;
+        Thu, 02 Apr 2026 06:42:15 -0700 (PDT)
 Received: from localhost.localdomain ([128.224.253.2])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8a593bf4f0fsm22636786d6.16.2026.04.02.06.42.08
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8a593bf4f0fsm22636786d6.16.2026.04.02.06.42.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 06:42:11 -0700 (PDT)
+        Thu, 02 Apr 2026 06:42:15 -0700 (PDT)
 From: Kevin Hao <haokexin@gmail.com>
-Date: Thu, 02 Apr 2026 21:41:23 +0800
-Subject: [PATCH net-next v2 2/4] net: macb: Introduce
- macb_queue_isr_clear() helper function
+Date: Thu, 02 Apr 2026 21:41:24 +0800
+Subject: [PATCH net-next v2 3/4] net: macb: Factor out the handling of
+ non-hot IRQ events into a separate function
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,7 +88,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260402-macb-irq-v2-2-942d98ab1154@gmail.com>
+Message-Id: <20260402-macb-irq-v2-3-942d98ab1154@gmail.com>
 References: <20260402-macb-irq-v2-0-942d98ab1154@gmail.com>
 In-Reply-To: <20260402-macb-irq-v2-0-942d98ab1154@gmail.com>
 To: Nicolas Ferre <nicolas.ferre@microchip.com>, 
@@ -103,7 +103,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -113,7 +113,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274556-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274557-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -121,200 +121,168 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[haokexin@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_SEVEN(0.00)[10];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 788BC38A07B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 18A02389F18
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The current implementation includes several occurrences of the
-following pattern:
-	if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
-		queue_writel(queue, ISR, value);
+In the current code, the IRQ handler checks each IRQ event sequentially.
+Since most IRQ events are related to TX/RX operations, while other
+events occur infrequently, this approach introduces unnecessary overhead
+in the hot path for TX/RX processing. This patch reduces such overhead
+by extracting the handling of all non-TX/RX events into a new function
+and consolidating these events under a new flag. As a result, only a
+single check is required to determine whether any non-TX/RX events have
+occurred. If such events exist, the handler jumps to the new function.
+This optimization reduces four conditional checks to one and prevents
+the instruction cache from being polluted with rarely used code in the
+hot path.
 
-Introduces a helper function to consolidate these repeated code
-segments. No functional changes are made.
-
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Kevin Hao <haokexin@gmail.com>
 ---
- drivers/net/ethernet/cadence/macb.h      |  7 +++++
- drivers/net/ethernet/cadence/macb_main.c | 51 ++++++++++----------------------
- 2 files changed, 22 insertions(+), 36 deletions(-)
+ drivers/net/ethernet/cadence/macb_main.c | 103 ++++++++++++++++++-------------
+ 1 file changed, 61 insertions(+), 42 deletions(-)
 
-diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index 16527dbab875dc2f65c74987c54b5b323a0c252c..2de56017ee0d6152dbe2c4ad0d8d7a8dfadbb3d5 100644
---- a/drivers/net/ethernet/cadence/macb.h
-+++ b/drivers/net/ethernet/cadence/macb.h
-@@ -1474,6 +1474,13 @@ static inline bool macb_dma_ptp(struct macb *bp)
- 	       bp->caps & MACB_CAPS_DMA_PTP;
- }
- 
-+static inline void macb_queue_isr_clear(struct macb *bp,
-+					struct macb_queue *queue, u32 value)
-+{
-+	if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
-+		queue_writel(queue, ISR, value);
-+}
-+
- /**
-  * struct macb_platform_data - platform data for MACB Ethernet used for PCI registration
-  * @pclk:		platform clock
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 6bfba329bc9f1c918295d44ebfa38eefe209b648..aa25bfed67b67b1dc059e7aefcfb351bc298b3b1 100644
+index aa25bfed67b67b1dc059e7aefcfb351bc298b3b1..98da191a2428b471ff9ac54e1f24beb3a882c546 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -1887,8 +1887,7 @@ static int macb_rx_poll(struct napi_struct *napi, int budget)
- 		 */
- 		if (macb_rx_pending(queue)) {
- 			queue_writel(queue, IDR, bp->rx_intr_mask);
--			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--				queue_writel(queue, ISR, MACB_BIT(RCOMP));
-+			macb_queue_isr_clear(bp, queue, MACB_BIT(RCOMP));
- 			netdev_vdbg(bp->dev, "poll: packets pending, reschedule\n");
- 			napi_schedule(napi);
- 		}
-@@ -1975,8 +1974,7 @@ static int macb_tx_poll(struct napi_struct *napi, int budget)
- 		 */
- 		if (macb_tx_complete_pending(queue)) {
- 			queue_writel(queue, IDR, MACB_BIT(TCOMP));
--			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--				queue_writel(queue, ISR, MACB_BIT(TCOMP));
-+			macb_queue_isr_clear(bp, queue, MACB_BIT(TCOMP));
- 			netdev_vdbg(bp->dev, "TX poll: packets pending, reschedule\n");
- 			napi_schedule(napi);
- 		}
-@@ -2043,8 +2041,7 @@ static irqreturn_t macb_wol_interrupt(int irq, void *dev_id)
- 		netdev_vdbg(bp->dev, "MACB WoL: queue = %u, isr = 0x%08lx\n",
- 			    (unsigned int)(queue - bp->queues),
- 			    (unsigned long)status);
--		if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--			queue_writel(queue, ISR, MACB_BIT(WOL));
-+		macb_queue_isr_clear(bp, queue, MACB_BIT(WOL));
- 		pm_wakeup_event(&bp->pdev->dev, 0);
- 	}
+@@ -70,6 +70,9 @@ struct sifive_fu540_macb_mgmt {
+ #define MACB_TX_INT_FLAGS	(MACB_TX_ERR_FLAGS | MACB_BIT(TCOMP)	\
+ 					| MACB_BIT(TXUBR))
  
-@@ -2072,8 +2069,7 @@ static irqreturn_t gem_wol_interrupt(int irq, void *dev_id)
- 		netdev_vdbg(bp->dev, "GEM WoL: queue = %u, isr = 0x%08lx\n",
- 			    (unsigned int)(queue - bp->queues),
- 			    (unsigned long)status);
--		if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--			queue_writel(queue, ISR, GEM_BIT(WOL));
-+		macb_queue_isr_clear(bp, queue, GEM_BIT(WOL));
- 		pm_wakeup_event(&bp->pdev->dev, 0);
- 	}
- 
-@@ -2100,8 +2096,7 @@ static irqreturn_t macb_interrupt(int irq, void *dev_id)
- 		/* close possible race with dev_close */
- 		if (unlikely(!netif_running(dev))) {
- 			queue_writel(queue, IDR, -1);
--			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--				queue_writel(queue, ISR, -1);
-+			macb_queue_isr_clear(bp, queue, -1);
- 			break;
- 		}
- 
-@@ -2117,19 +2112,15 @@ static irqreturn_t macb_interrupt(int irq, void *dev_id)
- 			 * now.
- 			 */
- 			queue_writel(queue, IDR, bp->rx_intr_mask);
--			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--				queue_writel(queue, ISR, MACB_BIT(RCOMP));
--
-+			macb_queue_isr_clear(bp, queue, MACB_BIT(RCOMP));
- 			napi_schedule(&queue->napi_rx);
- 		}
- 
- 		if (status & (MACB_BIT(TCOMP) |
- 			      MACB_BIT(TXUBR))) {
- 			queue_writel(queue, IDR, MACB_BIT(TCOMP));
--			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--				queue_writel(queue, ISR, MACB_BIT(TCOMP) |
--							 MACB_BIT(TXUBR));
--
-+			macb_queue_isr_clear(bp, queue, MACB_BIT(TCOMP) |
-+							MACB_BIT(TXUBR));
- 			if (status & MACB_BIT(TXUBR)) {
- 				queue->txubr_pending = true;
- 				wmb(); // ensure softirq can see update
-@@ -2141,10 +2132,7 @@ static irqreturn_t macb_interrupt(int irq, void *dev_id)
- 		if (unlikely(status & (MACB_TX_ERR_FLAGS))) {
- 			queue_writel(queue, IDR, MACB_TX_INT_FLAGS);
- 			schedule_work(&queue->tx_error_task);
--
--			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--				queue_writel(queue, ISR, MACB_TX_ERR_FLAGS);
--
-+			macb_queue_isr_clear(bp, queue, MACB_TX_ERR_FLAGS);
- 			break;
- 		}
- 
-@@ -2164,9 +2152,7 @@ static irqreturn_t macb_interrupt(int irq, void *dev_id)
- 			macb_writel(bp, NCR, ctrl & ~MACB_BIT(RE));
- 			wmb();
- 			macb_writel(bp, NCR, ctrl | MACB_BIT(RE));
--
--			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--				queue_writel(queue, ISR, MACB_BIT(RXUBR));
-+			macb_queue_isr_clear(bp, queue, MACB_BIT(RXUBR));
- 		}
- 
- 		if (status & MACB_BIT(ISR_ROVR)) {
-@@ -2177,17 +2163,13 @@ static irqreturn_t macb_interrupt(int irq, void *dev_id)
- 			else
- 				bp->hw_stats.macb.rx_overruns++;
- 			spin_unlock(&bp->stats_lock);
--
--			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--				queue_writel(queue, ISR, MACB_BIT(ISR_ROVR));
-+			macb_queue_isr_clear(bp, queue, MACB_BIT(ISR_ROVR));
- 		}
- 
- 		if (status & MACB_BIT(HRESP)) {
- 			queue_work(system_bh_wq, &bp->hresp_err_bh_work);
- 			netdev_err(dev, "DMA bus error: HRESP not OK\n");
--
--			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--				queue_writel(queue, ISR, MACB_BIT(HRESP));
-+			macb_queue_isr_clear(bp, queue, MACB_BIT(HRESP));
- 		}
- 		status = queue_readl(queue, ISR);
- 	}
-@@ -2883,8 +2865,7 @@ static void macb_reset_hw(struct macb *bp)
- 	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
- 		queue_writel(queue, IDR, -1);
- 		queue_readl(queue, ISR);
--		if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--			queue_writel(queue, ISR, -1);
-+		macb_queue_isr_clear(bp, queue, -1);
- 	}
++#define MACB_INT_MISC_FLAGS	(MACB_TX_ERR_FLAGS | MACB_BIT(RXUBR) | \
++				 MACB_BIT(ISR_ROVR) | MACB_BIT(HRESP))
++
+ /* Max length of transmit frame must be a multiple of 8 bytes */
+ #define MACB_TX_LEN_ALIGN	8
+ #define MACB_MAX_TX_LEN		((unsigned int)((1 << MACB_TX_FRMLEN_SIZE) - 1) & ~((unsigned int)(MACB_TX_LEN_ALIGN - 1)))
+@@ -2078,12 +2081,66 @@ static irqreturn_t gem_wol_interrupt(int irq, void *dev_id)
+ 	return IRQ_HANDLED;
  }
  
-@@ -6053,8 +6034,7 @@ static int __maybe_unused macb_suspend(struct device *dev)
- 			/* Disable all interrupts */
- 			queue_writel(queue, IDR, -1);
- 			queue_readl(queue, ISR);
--			if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--				queue_writel(queue, ISR, -1);
-+			macb_queue_isr_clear(bp, queue, -1);
- 		}
- 		/* Enable Receive engine */
- 		macb_writel(bp, NCR, tmp | MACB_BIT(RE));
-@@ -6165,8 +6145,7 @@ static int __maybe_unused macb_resume(struct device *dev)
- 		}
- 		/* Clear ISR on queue 0 */
- 		queue_readl(bp->queues, ISR);
--		if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
--			queue_writel(bp->queues, ISR, -1);
-+		macb_queue_isr_clear(bp, bp->queues, -1);
- 		spin_unlock_irqrestore(&bp->lock, flags);
++static int macb_interrupt_misc(struct macb_queue *queue, u32 status)
++{
++	struct macb *bp = queue->bp;
++	struct net_device *dev;
++	u32 ctrl;
++
++	dev = bp->dev;
++
++	if (unlikely(status & (MACB_TX_ERR_FLAGS))) {
++		queue_writel(queue, IDR, MACB_TX_INT_FLAGS);
++		schedule_work(&queue->tx_error_task);
++		macb_queue_isr_clear(bp, queue, MACB_TX_ERR_FLAGS);
++		return -1;
++	}
++
++	/* Link change detection isn't possible with RMII, so we'll
++	 * add that if/when we get our hands on a full-blown MII PHY.
++	 */
++
++	/* There is a hardware issue under heavy load where DMA can
++	 * stop, this causes endless "used buffer descriptor read"
++	 * interrupts but it can be cleared by re-enabling RX. See
++	 * the at91rm9200 manual, section 41.3.1 or the Zynq manual
++	 * section 16.7.4 for details. RXUBR is only enabled for
++	 * these two versions.
++	 */
++	if (status & MACB_BIT(RXUBR)) {
++		ctrl = macb_readl(bp, NCR);
++		macb_writel(bp, NCR, ctrl & ~MACB_BIT(RE));
++		wmb();
++		macb_writel(bp, NCR, ctrl | MACB_BIT(RE));
++		macb_queue_isr_clear(bp, queue, MACB_BIT(RXUBR));
++	}
++
++	if (status & MACB_BIT(ISR_ROVR)) {
++		/* We missed at least one packet */
++		spin_lock(&bp->stats_lock);
++		if (macb_is_gem(bp))
++			bp->hw_stats.gem.rx_overruns++;
++		else
++			bp->hw_stats.macb.rx_overruns++;
++		spin_unlock(&bp->stats_lock);
++		macb_queue_isr_clear(bp, queue, MACB_BIT(ISR_ROVR));
++	}
++
++	if (status & MACB_BIT(HRESP)) {
++		queue_work(system_bh_wq, &bp->hresp_err_bh_work);
++		netdev_err(dev, "DMA bus error: HRESP not OK\n");
++		macb_queue_isr_clear(bp, queue, MACB_BIT(HRESP));
++	}
++
++	return 0;
++}
++
+ static irqreturn_t macb_interrupt(int irq, void *dev_id)
+ {
+ 	struct macb_queue *queue = dev_id;
+ 	struct macb *bp = queue->bp;
+ 	struct net_device *dev = bp->dev;
+-	u32 status, ctrl;
++	u32 status;
  
- 		/* Replace interrupt handler on queue 0 */
+ 	status = queue_readl(queue, ISR);
+ 
+@@ -2129,48 +2186,10 @@ static irqreturn_t macb_interrupt(int irq, void *dev_id)
+ 			napi_schedule(&queue->napi_tx);
+ 		}
+ 
+-		if (unlikely(status & (MACB_TX_ERR_FLAGS))) {
+-			queue_writel(queue, IDR, MACB_TX_INT_FLAGS);
+-			schedule_work(&queue->tx_error_task);
+-			macb_queue_isr_clear(bp, queue, MACB_TX_ERR_FLAGS);
+-			break;
+-		}
++		if (unlikely(status & MACB_INT_MISC_FLAGS))
++			if (macb_interrupt_misc(queue, status))
++				break;
+ 
+-		/* Link change detection isn't possible with RMII, so we'll
+-		 * add that if/when we get our hands on a full-blown MII PHY.
+-		 */
+-
+-		/* There is a hardware issue under heavy load where DMA can
+-		 * stop, this causes endless "used buffer descriptor read"
+-		 * interrupts but it can be cleared by re-enabling RX. See
+-		 * the at91rm9200 manual, section 41.3.1 or the Zynq manual
+-		 * section 16.7.4 for details. RXUBR is only enabled for
+-		 * these two versions.
+-		 */
+-		if (status & MACB_BIT(RXUBR)) {
+-			ctrl = macb_readl(bp, NCR);
+-			macb_writel(bp, NCR, ctrl & ~MACB_BIT(RE));
+-			wmb();
+-			macb_writel(bp, NCR, ctrl | MACB_BIT(RE));
+-			macb_queue_isr_clear(bp, queue, MACB_BIT(RXUBR));
+-		}
+-
+-		if (status & MACB_BIT(ISR_ROVR)) {
+-			/* We missed at least one packet */
+-			spin_lock(&bp->stats_lock);
+-			if (macb_is_gem(bp))
+-				bp->hw_stats.gem.rx_overruns++;
+-			else
+-				bp->hw_stats.macb.rx_overruns++;
+-			spin_unlock(&bp->stats_lock);
+-			macb_queue_isr_clear(bp, queue, MACB_BIT(ISR_ROVR));
+-		}
+-
+-		if (status & MACB_BIT(HRESP)) {
+-			queue_work(system_bh_wq, &bp->hresp_err_bh_work);
+-			netdev_err(dev, "DMA bus error: HRESP not OK\n");
+-			macb_queue_isr_clear(bp, queue, MACB_BIT(HRESP));
+-		}
+ 		status = queue_readl(queue, ISR);
+ 	}
+ 
 
 -- 
 2.53.0
