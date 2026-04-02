@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-274327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274328-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CORSEczUzWmWiAYAu9opvQ
-	(envelope-from <netdev+bounces-274327-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 04:30:36 +0200
+	id ML3cA/LUzWn1iAYAu9opvQ
+	(envelope-from <netdev+bounces-274328-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 04:31:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F5AD382AAB
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 04:30:35 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 525DA382AE4
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 04:31:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 234A6301650E
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 02:30:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B90E730166E4
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 02:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A61312459C6;
-	Thu,  2 Apr 2026 02:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBB55277017;
+	Thu,  2 Apr 2026 02:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tc0skWy9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K8/4gOBg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829D3CA6F;
-	Thu,  2 Apr 2026 02:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DA72153D8;
+	Thu,  2 Apr 2026 02:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775097033; cv=none; b=Rl/WcRACKv/5GGx8zEEi9ATDWgI0VfZlhJUs9zIhY+b5O6d9jEbXgFWBthsLM+EWpDjOeJC/Kd9QFWon0dhjxMERI4PdsTCoyQt+4O4vW0CtCfgz9a3QsbXhB3a9NeOyfzebis8AY14SpZlpaTVXfmT4FUih4SIcRjZvlLvaNB4=
+	t=1775097047; cv=none; b=LcdNA0Zabd0BrfcbCOCbg41mH9j4x+FeeCinx06SMuNzVd7uIkaOhay/XG3lK41wmd1AMz6QCVr752RKj4GyuOHlfbZLs880X0uSFmSWIVotiQamtPd1aRxrEIyz+4YNp7oT8gOWx100g3oXuY6oo18pSAJ3ay0Vl63QL8XyH6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775097033; c=relaxed/simple;
-	bh=0t2FTGPpUs8MIzO5VovB547dkJjFvPxp7Cug6WWD60I=;
+	s=arc-20240116; t=1775097047; c=relaxed/simple;
+	bh=u9jO/d+tjE5HUITuq2k3nNBzifTjF/tHg52G6x5MFWU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dyqGJHgAkL2vtZiSC0r3yvtrp1uxX+RfhQBCPewcSubTH1fumY/Wx8wR8pko1aD9UU4FMGWfzdhnkg1RofLlqA33gTCfmdn6WVEHFEqZIGhyhHl4jwrOK02VWYuItyDMvy1U1x3DYyMYgXcoWIoG3kft8cI6RLLg0Oi9mE7hZJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tc0skWy9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12C39C4CEF7;
-	Thu,  2 Apr 2026 02:30:33 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=imZva2wIohKpMBU+0RN5Hq+7Ur7Mgyjwn8OmOkZ/7DF2IN3pBjYdAp1rLDJLXy4ZsnQWeplO+tk/ijbC2CKP0rLX5xxLuDxphGhdnB7SnwC5lU8Y/mfZrQfuxdN8xi2eUGUufOm2ho+Hcmh1WzVArjWfied56E6qLKuaeHeTq9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K8/4gOBg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1219BC19421;
+	Thu,  2 Apr 2026 02:30:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775097033;
-	bh=0t2FTGPpUs8MIzO5VovB547dkJjFvPxp7Cug6WWD60I=;
+	s=k20201202; t=1775097047;
+	bh=u9jO/d+tjE5HUITuq2k3nNBzifTjF/tHg52G6x5MFWU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tc0skWy9NtWVgafam0nyP7sKy7W734ZMjZy2O088/BeKASmhmbr+qaxOwnkZdaYw2
-	 f7EZgtHwo2arUzZ2InnJxjUZ6czyrsrqrpTl3xCwuyG9x/HzutqLdY0uwoQXke3+3e
-	 VK90V40lgJWYAUtl3iJk0E28GZmO3TrWXSB6MECPax6UhMesBzWb+ycmxeHyTP8Ks5
-	 2o+VOS8nQvW339qugUhQY2msIK2yEYinH2IsgmJXDPkktohlDYMwXj/KCfoae/pEMc
-	 GmI77MX7atD48GIiZYGV7EqXVCQDweVCFpvvji4URmaGHT71Z1AeaKW0KD+jRxQhqn
-	 iTGlTyRMbKG+w==
+	b=K8/4gOBgKqBcOnF+bhU7i6LW8h/8GQsheGC1TaWrvpHASnyiNQR/w/zuSS2nfAdM5
+	 XqO70TIxEuzkYyEQplIHDmn25BPRVOWfbu5cUzcuN8+149nDav+fWA/f40yNO91Vtx
+	 bZ+I2aDXJGPJ9M0pUtQHyj0/o5tcIpG9rLttc6FqqXFkEQoCtEUKCleLGT+VD3XJfm
+	 5LcZbFtxUfbo3wLgOVM24rAgvW0ZaB6yuRBd7D179/6fT6wMrXonXXmKwse5zputFM
+	 FP/8NdQsoepVtR4faluK2im5hEH7JHpdLyporkeVlF1KUB2BAR7lCY4kni4nJiTnQG
+	 BNLBu3bhWkfZg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02F273808203;
-	Thu,  2 Apr 2026 02:30:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02E5A3808203;
+	Thu,  2 Apr 2026 02:30:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,23 +55,22 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 01/10] netfilter: flowtable: strictly check for
- maximum
- number of actions
+Subject: Re: [PATCH net-next 1/6] dt-bindings: can: mcp251xfd: add
+ microchip,xstbyen property
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177509701579.3957493.7764709553225868642.git-patchwork-notify@kernel.org>
-Date: Thu, 02 Apr 2026 02:30:15 +0000
-References: <20260401103646.1015423-2-pablo@netfilter.org>
-In-Reply-To: <20260401103646.1015423-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
+ <177509702978.3957493.8041660566894873320.git-patchwork-notify@kernel.org>
+Date: Thu, 02 Apr 2026 02:30:29 +0000
+References: <20260401073338.5592-2-mkl@pengutronix.de>
+In-Reply-To: <20260401073338.5592-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de,
+ viken.dadhaniya@oss.qualcomm.com, conor.dooley@microchip.com
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -80,7 +79,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	RCVD_TLS_LAST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274327-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-274328-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_NO_DN(0.00)[];
@@ -89,54 +88,48 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[netfilter.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9F5AD382AAB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,qualcomm.com:email,microchip.com:email]
+X-Rspamd-Queue-Id: 525DA382AE4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+This series was applied to netdev/net-next.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-On Wed,  1 Apr 2026 12:36:37 +0200 you wrote:
-> The maximum number of flowtable hardware offload actions in IPv6 is:
+On Wed,  1 Apr 2026 09:30:09 +0200 you wrote:
+> From: Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>
 > 
-> * ethernet mangling (4 payload actions, 2 for each ethernet address)
-> * SNAT (4 payload actions)
-> * DNAT (4 payload actions)
-> * Double VLAN (4 vlan actions, 2 for popping vlan, and 2 for pushing)
->   for QinQ.
-> * Redirect (1 action)
+> Add the boolean property 'microchip,xstbyen' to enable the dedicated
+> transceiver standby control function on the INT0/GPIO0/XSTBY pin of
+> the MCP251xFD family.
+> 
+> Signed-off-by: Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+> Link: https://patch.msgid.link/20260321135031.3107408-2-viken.dadhaniya@oss.qualcomm.com
+> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,01/10] netfilter: flowtable: strictly check for maximum number of actions
-    https://git.kernel.org/netdev/net/c/76522fcdbc3a
-  - [net,02/10] netfilter: nfnetlink_log: account for netlink header size
-    https://git.kernel.org/netdev/net/c/6d52a4a0520a
-  - [net,03/10] netfilter: x_tables: ensure names are nul-terminated
-    https://git.kernel.org/netdev/net/c/a958a4f90ddd
-  - [net,04/10] netfilter: ipset: use nla_strcmp for IPSET_ATTR_NAME attr
-    https://git.kernel.org/netdev/net/c/b7e8590987aa
-  - [net,05/10] netfilter: nf_conntrack_helper: pass helper to expect cleanup
-    https://git.kernel.org/netdev/net/c/a242a9ae58aa
-  - [net,06/10] netfilter: ctnetlink: zero expect NAT fields when CTA_EXPECT_NAT absent
-    https://git.kernel.org/netdev/net/c/35177c687713
-  - [net,07/10] netfilter: ctnetlink: ignore explicit helper on new expectations
-    https://git.kernel.org/netdev/net/c/917b61fa2042
-  - [net,08/10] netfilter: ipset: drop logically empty buckets in mtype_del
-    https://git.kernel.org/netdev/net/c/9862ef9ab0a1
-  - [net,09/10] netfilter: x_tables: restrict xt_check_match/xt_check_target extensions for NFPROTO_ARP
-    https://git.kernel.org/netdev/net/c/3d5d488f1177
-  - [net,10/10] netfilter: nf_tables: reject immediate NF_QUEUE verdict
-    https://git.kernel.org/netdev/net/c/da107398cbd4
+  - [net-next,1/6] dt-bindings: can: mcp251xfd: add microchip,xstbyen property
+    https://git.kernel.org/netdev/net-next/c/2f41d7867800
+  - [net-next,2/6] net: can: ctucanfd: remove useless copy of PCI_DEVICE_DATA macro
+    https://git.kernel.org/netdev/net-next/c/1e41cbbe68e6
+  - [net-next,3/6] can: kvaser_usb: leaf: refactor endpoint lookup
+    https://git.kernel.org/netdev/net-next/c/495fac90b8ec
+  - [net-next,4/6] can: mcp251xfd: add support for XSTBYEN transceiver standby control
+    https://git.kernel.org/netdev/net-next/c/ae20301b6119
+  - [net-next,5/6] can: rcar_can: Convert to FIELD_MODIFY()
+    https://git.kernel.org/netdev/net-next/c/11d94d3516c0
+  - [net-next,6/6] can: ucan: refactor endpoint lookup
+    https://git.kernel.org/netdev/net-next/c/581281cb5a1b
 
 You are awesome, thank you!
 -- 
