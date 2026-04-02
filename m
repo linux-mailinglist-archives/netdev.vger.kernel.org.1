@@ -1,418 +1,248 @@
-Return-Path: <netdev+bounces-274656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274657-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SPD5DnO1zmlVpgYAu9opvQ
-	(envelope-from <netdev+bounces-274656-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:29:07 +0200
+	id oBQvOtW1zmmApgYAu9opvQ
+	(envelope-from <netdev+bounces-274657-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:30:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D280838D1B9
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:29:06 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6533A38D21C
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:30:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1565D304C7D7
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 18:27:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 91628305ACA8
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 18:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A743F1667;
-	Thu,  2 Apr 2026 18:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D2D3DEAFF;
+	Thu,  2 Apr 2026 18:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="hiYl/pfU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g6OTV792"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FDC037B019;
-	Thu,  2 Apr 2026 18:27:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5873DCD9A
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 18:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775154432; cv=none; b=YIafw2aK0WSUKg/7re+N1oBbvKtPHjIpBAFC329V/e9V96Bu2qlB5gzvhmDPaBywm5RUisK4kDb4u45Cl8zjN88Wn10hS2xkJrvN54yplez/hsGMVRfaMoqlD1SjbAwa19l7Gi1VioA2v5PYPogG4bkSoIi+8mCDYX4yAdO6Iiw=
+	t=1775154607; cv=none; b=JH3TMsAYOEpdyA8VzJYA9YLCLIS5HbyDBVzcWfhLYYQqaJtwKK0gaQx4jVp+lf88pn5JSqEXdxS7GVvtg8Jp+J7pkvyoffbgJN7psE7z+AkyuLAyFcl9CorccdbND7BkwK2ncigyGvSV07UIy2EjCy3/LUDP6UMgMh1I8+vA/e4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775154432; c=relaxed/simple;
-	bh=KM+vRCXvDH1mJkniUKKJw5mXwm6dl5ojwryg6efovps=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BGt6Pp9x+2lKuVwyzik+wpehhjIt7L+Zfw+lOkW2ximUbRG4+WYcOLrx36bsf4JpNijux4WS37C4RmJyppW5AKk8hm0pjLD7WdunHYRLG5uoKGDatTB+OtAJq8Gj+0JZMc+qR8E1+yYJrngEnYR6JwwrlP93K/3HIf0wxEZYmKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=hiYl/pfU; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id C705E20B7007; Thu,  2 Apr 2026 11:27:10 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C705E20B7007
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1775154430;
-	bh=efPfZLtYAx6QBRwJEdUEn5OmWaUjQHuaKdhwqm+yoyY=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=hiYl/pfUmIk4vbLnD56SMBF7Sht5lTwGrlhsw5U3dqCV3nAonKLFlNTfpSsetPqRf
-	 G2oRoKo64Q912xa8Fn2UumV6Ejp5XFLFqJrwAPz+ZJ7B2H2j0fTb4OZ/xI14h4KUY2
-	 VfEmfHan5OBRkaBbQmHKLkOJK1tHW1+E+3VrQq2I=
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kotaranov@microsoft.com,
-	horms@kernel.org,
-	shradhagupta@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	yury.norov@gmail.com,
-	kees@kernel.org,
-	ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	gargaditya@linux.microsoft.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH net-next v5 3/3] net: mana: Expose hardware diagnostic info via debugfs
-Date: Thu,  2 Apr 2026 11:26:57 -0700
-Message-ID: <20260402182704.2474739-4-ernis@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260402182704.2474739-1-ernis@linux.microsoft.com>
-References: <20260402182704.2474739-1-ernis@linux.microsoft.com>
+	s=arc-20240116; t=1775154607; c=relaxed/simple;
+	bh=DS8IBS91i62jn8rja2VJw785maHOIJIUi+yPRXeo48A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iMboemlDdu4jYRxuC5/nVnrlrYOG6iLlXGL36IXi81f04ApAXZ8U+aVjnf7Xzqj8ya3sxzaLzV8UE2fiH22OWvsIK4N7B1zDJiSKQj6R2B9FNuLCSFztxAtJWbet4UyVrANOC6rLf6cxUrfLODjatQToz39LtC1JTihwr/f/aQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g6OTV792; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b97e6e48b24so182484666b.2
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 11:30:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775154604; x=1775759404; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KEu3yUtBUuZccyyj8V1hymKx7VBvoK6SXdlQQoWr1mI=;
+        b=g6OTV792BbA64J8v5kT83Z/lN8p81OXQhKKu9uYvX0SZ7Nh6ZOaSTzMLk3/MK+tnH/
+         twcSqx1hmLzUxEWdJBJJ/6h2hDhAmU8Q4dnWjrgM65EBnaD7FBqy759ws/FJtA/JPfkL
+         NuSGagDrBgkdGdWnAWA43ic59Pq3xFuHNGBrR5O7jO88rV6yMmXEMFTbl3L7nuXxnrMx
+         5MawwsnsBIyKmkUad39spWxZJi3pyacvOClTBWFTif1jnwNym4xV2NMle4noWu47PKmy
+         tzIa1uX5Yqms2u56KF3fCObgtPl6vy/0JjXwfc1uCe2HvagIJ/723h3TP+z7lDyphP5K
+         Fqfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775154604; x=1775759404;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KEu3yUtBUuZccyyj8V1hymKx7VBvoK6SXdlQQoWr1mI=;
+        b=f3FiO1xzrvQBwkncWS1TOMAL4ZSN5mEyHcrOZzlTYdsjmFUkMrkD6NbDY4ZZOEFuob
+         xQN5IV/VwyOSeQMI/PCEn5Dx+6VvEzGxDsjWV1OYSzTCDsleB+ThBvNstyEw2oVS3W4Q
+         3Y8wdocLX4w113FH6UVZej3MRPsTHwx8eDYuXVCUHG+m6NCkxP8tsi/QJJ8dNYB3k27q
+         5AV9R38eQb44emYmqdYXrKWfyAPCwQ1JC4I79Vh9qipfi511J8d43Vz1/e46Of/TV60n
+         WK3IfVnyUfYgWyTsEknHGzeC1oxBXHrxKJlDOwU7ueuOVRe45tH3uutkycyjZfTUIiQl
+         j6vQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV609r2+vliHIM6yMeQU2vtefVzjaXiPJVZ6wwVP6a2N9z+YDzOLEmwMZuyi3aDSZeBFosDxIA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyovH6XsZTnlnrL0B50OmZbl7I5uvfLuFi2ZdOFFGFdMpXsKEBg
+	QHBSUkyeGSGvfjOoK9OJzqnw/z4aEo6iM5WcCQFFgI/N2kkPLozprBmy
+X-Gm-Gg: ATEYQzyiAuGzZl+ddx3qm3gHYx5kAKKXOIYsIsrfXFclNOjR4kEmTWWEQPiYq4D9AjD
+	/LDkCm/EAHNRYwpwLMGB2AaROFlLG9Jz3Jg2Ppo06CHSXIpSZRMlXHO9GU2FT+rlGgX1QZ20pq/
+	wCr2Hx6PnNOtQaNn5IeecHH4J1CAmgjU18RzoC8EAb7hu0X/YbCVSJOcXScdra+Bgmiwe49uSTO
+	jE40zq+gN48wUrAOEj71hX3ZMfo8tZXcX8XjNE2jR0v7L1vKj88Anmnlh3tjLz/kpQGAEhky2NB
+	9gZsZhWzeAvjZvPNCunef8Br35gBqePlRXB0Gv2yCN9CCGLp5COyglAH2L4ucGQXVmA+OFncNRe
+	8NvAIJRKK+heoYR9dLhjDMGId3U+9JGdmiJIhdSPtY0837Sj8eIezxq2L7p6kGyGwQ5wGh/RIrY
+	uSFy11qlsrcOrMzFWxEvluQ6mnCOQBDEFR19tCgDPVGtpgOO8UDRR3ehTjwTCK1r8S5gYn9ctWA
+	WhUbA==
+X-Received: by 2002:a17:906:f40e:b0:b98:4c5f:6603 with SMTP id a640c23a62f3a-b9c1390aa9cmr556518166b.18.1775154604017;
+        Thu, 02 Apr 2026 11:30:04 -0700 (PDT)
+Received: from ?IPV6:2a02:a03f:a75e:9a00:248c:6c47:3ce1:a121? ([2a02:a03f:a75e:9a00:248c:6c47:3ce1:a121])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9c3c972181sm119683866b.8.2026.04.02.11.30.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Apr 2026 11:30:03 -0700 (PDT)
+Message-ID: <841c82b6-464c-4308-ba37-73ef07454377@gmail.com>
+Date: Thu, 2 Apr 2026 20:30:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/2] seg6: separate dst_cache for input and output
+ paths in seg6 lwtunnel
+To: Andrea Mayer <andrea.mayer@uniroma2.it>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, dsahern@kernel.org,
+ david.lebrun@uclouvain.be, stefano.salsano@uniroma2.it,
+ paolo.lungaroni@uniroma2.it, nicolas.dichtel@6wind.com,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20260401185755.29813-1-andrea.mayer@uniroma2.it>
+ <20260401185755.29813-2-andrea.mayer@uniroma2.it>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@gmail.com>
+In-Reply-To: <20260401185755.29813-2-andrea.mayer@uniroma2.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-274657-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274656-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,gmail.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ernis@linux.microsoft.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.microsoft.com:dkim,linux.microsoft.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D280838D1B9
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,6wind.com:email,uniroma2.it:email]
+X-Rspamd-Queue-Id: 6533A38D21C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add debugfs entries to expose hardware configuration and diagnostic
-information that aids in debugging driver initialization and runtime
-operations without adding noise to dmesg.
+On 4/1/26 20:57, Andrea Mayer wrote:
+> The seg6 lwtunnel uses a single dst_cache per encap route, shared
+> between seg6_input_core() and seg6_output_core(). These two paths
+> can perform the post-encap SID lookup in different routing contexts
+> (e.g., ip rules matching on the ingress interface, or VRF table
+> separation). Whichever path runs first populates the cache, and the
+> other reuses it blindly, bypassing its own lookup.
+> 
+> Fix this by splitting the cache into cache_input and cache_output,
+> so each path maintains its own cached dst independently.
+> 
+> Fixes: 6c8702c60b88 ("ipv6: sr: add support for SRH encapsulation and injection with lwtunnels")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
+> Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> ---
+>   net/ipv6/seg6_iptunnel.c | 34 +++++++++++++++++++++++-----------
+>   1 file changed, 23 insertions(+), 11 deletions(-)
+> 
+> diff --git a/net/ipv6/seg6_iptunnel.c b/net/ipv6/seg6_iptunnel.c
+> index 3e1b9991131a..d6a0f7df9080 100644
+> --- a/net/ipv6/seg6_iptunnel.c
+> +++ b/net/ipv6/seg6_iptunnel.c
+> @@ -48,7 +48,8 @@ static size_t seg6_lwt_headroom(struct seg6_iptunnel_encap *tuninfo)
+>   }
+>   
+>   struct seg6_lwt {
+> -	struct dst_cache cache;
+> +	struct dst_cache cache_input;
+> +	struct dst_cache cache_output;
+>   	struct seg6_iptunnel_encap tuninfo[];
+>   };
+>   
+> @@ -488,7 +489,7 @@ static int seg6_input_core(struct net *net, struct sock *sk,
+>   	slwt = seg6_lwt_lwtunnel(lwtst);
+>   
+>   	local_bh_disable();
+> -	dst = dst_cache_get(&slwt->cache);
+> +	dst = dst_cache_get(&slwt->cache_input);
+>   	local_bh_enable();
+>   
+>   	err = seg6_do_srh(skb, dst);
+> @@ -504,7 +505,7 @@ static int seg6_input_core(struct net *net, struct sock *sk,
+>   		/* cache only if we don't create a dst reference loop */
+>   		if (!dst->error && lwtst != dst->lwtstate) {
+>   			local_bh_disable();
+> -			dst_cache_set_ip6(&slwt->cache, dst,
+> +			dst_cache_set_ip6(&slwt->cache_input, dst,
+>   					  &ipv6_hdr(skb)->saddr);
+>   			local_bh_enable();
+>   		}
+> @@ -564,7 +565,7 @@ static int seg6_output_core(struct net *net, struct sock *sk,
+>   	slwt = seg6_lwt_lwtunnel(orig_dst->lwtstate);
+>   
+>   	local_bh_disable();
+> -	dst = dst_cache_get(&slwt->cache);
+> +	dst = dst_cache_get(&slwt->cache_output);
+>   	local_bh_enable();
+>   
+>   	err = seg6_do_srh(skb, dst);
+> @@ -591,7 +592,7 @@ static int seg6_output_core(struct net *net, struct sock *sk,
+>   		/* cache only if we don't create a dst reference loop */
+>   		if (orig_dst->lwtstate != dst->lwtstate) {
+>   			local_bh_disable();
+> -			dst_cache_set_ip6(&slwt->cache, dst, &fl6.saddr);
+> +			dst_cache_set_ip6(&slwt->cache_output, dst, &fl6.saddr);
+>   			local_bh_enable();
+>   		}
+>   
+> @@ -701,11 +702,13 @@ static int seg6_build_state(struct net *net, struct nlattr *nla,
+>   
+>   	slwt = seg6_lwt_lwtunnel(newts);
+>   
+> -	err = dst_cache_init(&slwt->cache, GFP_ATOMIC);
+> -	if (err) {
+> -		kfree(newts);
+> -		return err;
+> -	}
+> +	err = dst_cache_init(&slwt->cache_input, GFP_ATOMIC);
+> +	if (err)
+> +		goto err_free_newts;
+> +
+> +	err = dst_cache_init(&slwt->cache_output, GFP_ATOMIC);
+> +	if (err)
+> +		goto err_destroy_input;
+>   
+>   	memcpy(&slwt->tuninfo, tuninfo, tuninfo_len);
+>   
+> @@ -720,11 +723,20 @@ static int seg6_build_state(struct net *net, struct nlattr *nla,
+>   	*ts = newts;
+>   
+>   	return 0;
+> +
+> +err_destroy_input:
+> +	dst_cache_destroy(&slwt->cache_input);
+> +err_free_newts:
+> +	kfree(newts);
+> +	return err;
+>   }
+>   
+>   static void seg6_destroy_state(struct lwtunnel_state *lwt)
+>   {
+> -	dst_cache_destroy(&seg6_lwt_lwtunnel(lwt)->cache);
+> +	struct seg6_lwt *slwt = seg6_lwt_lwtunnel(lwt);
+> +
+> +	dst_cache_destroy(&slwt->cache_input);
+> +	dst_cache_destroy(&slwt->cache_output);
+>   }
+>   
+>   static int seg6_fill_encap_info(struct sk_buff *skb,
 
-The debugfs directory creation and removal for each PCI device is
-integrated into mana_gd_setup() and mana_gd_cleanup_device()
-respectively, so that all callers (probe, remove, suspend, resume,
-shutdown) share a single code path.
-
-Device-level entries (under /sys/kernel/debug/mana/<BDF>/):
-  - num_msix_usable, max_num_queues: Max resources from hardware
-  - gdma_protocol_ver, pf_cap_flags1: VF version negotiation results
-  - num_vports, bm_hostmode: Device configuration
-
-Per-vPort entries (under /sys/kernel/debug/mana/<BDF>/vportN/):
-  - port_handle: Hardware vPort handle
-  - max_sq, max_rq: Max queues from vPort config
-  - indir_table_sz: Indirection table size
-  - steer_rx, steer_rss, steer_update_tab, steer_cqe_coalescing:
-    Last applied steering configuration parameters
-
-Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
----
-Changes in v5:
-* Update commit message.
-* Fix conflicts to align with the new patches.
-* Make it part of patchset.
-Changes in v4:
-* Rebase and fix conflicts.
-Changes in v3:
-* Rename mana_gd_cleanup to mana_gd_cleanup_device.
-* Add creation of debugfs entries in mana_gd_setup.
-* Add removal of debugfs entries in mana_gd_cleanup_device.
-* Remove bm_hostmode and num_vports from debugfs in mana_remove itself,
-  because "ac" gets freed before debugfs_remove_recursive, to avoid
-  Use-After-Free error.
-* Add "goto out:" in mana_cfg_vport_steering to avoid populating apc
-  values when resp.hdr.status is not NULL.
-Changes in v2:
-* Add debugfs_remove_recursice for gc>mana_pci_debugfs in
-  mana_gd_suspend to handle multiple duplicates creation in
-  mana_gd_setup and mana_gd_resume path.
-* Move debugfs creation for num_vports and bm_hostmode out of
-  if(!resuming) condition since we have to create it again even for
-  resume.
-* Recreate mana_pci_debugfs in mana_gd_resume.
----
- .../net/ethernet/microsoft/mana/gdma_main.c   | 59 ++++++++++---------
- drivers/net/ethernet/microsoft/mana/mana_en.c | 33 +++++++++++
- include/net/mana/gdma.h                       |  1 +
- include/net/mana/mana.h                       |  8 +++
- 4 files changed, 74 insertions(+), 27 deletions(-)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 098fbda0d128..7a99db9afa03 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -194,6 +194,11 @@ static int mana_gd_query_max_resources(struct pci_dev *pdev)
- 	if (gc->max_num_queues > gc->num_msix_usable - 1)
- 		gc->max_num_queues = gc->num_msix_usable - 1;
- 
-+	debugfs_create_u32("num_msix_usable", 0400, gc->mana_pci_debugfs,
-+			   &gc->num_msix_usable);
-+	debugfs_create_u32("max_num_queues", 0400, gc->mana_pci_debugfs,
-+			   &gc->max_num_queues);
-+
- 	return 0;
- }
- 
-@@ -1264,6 +1269,13 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
- 		return err ? err : -EPROTO;
- 	}
- 	gc->pf_cap_flags1 = resp.pf_cap_flags1;
-+	gc->gdma_protocol_ver = resp.gdma_protocol_ver;
-+
-+	debugfs_create_x64("gdma_protocol_ver", 0400, gc->mana_pci_debugfs,
-+			   &gc->gdma_protocol_ver);
-+	debugfs_create_x64("pf_cap_flags1", 0400, gc->mana_pci_debugfs,
-+			   &gc->pf_cap_flags1);
-+
- 	if (resp.pf_cap_flags1 & GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG) {
- 		err = mana_gd_query_hwc_timeout(pdev, &hwc->hwc_timeout);
- 		if (err) {
-@@ -1943,15 +1955,20 @@ static int mana_gd_setup(struct pci_dev *pdev)
- 	struct gdma_context *gc = pci_get_drvdata(pdev);
- 	int err;
- 
-+	gc->mana_pci_debugfs = debugfs_create_dir(pci_name(pdev),
-+						  mana_debugfs_root);
-+
- 	err = mana_gd_init_registers(pdev);
- 	if (err)
--		return err;
-+		goto remove_debugfs;
- 
- 	mana_smc_init(&gc->shm_channel, gc->dev, gc->shm_base);
- 
- 	gc->service_wq = alloc_ordered_workqueue("gdma_service_wq", 0);
--	if (!gc->service_wq)
--		return -ENOMEM;
-+	if (!gc->service_wq) {
-+		err = -ENOMEM;
-+		goto remove_debugfs;
-+	}
- 
- 	err = mana_gd_setup_hwc_irqs(pdev);
- 	if (err) {
-@@ -1992,11 +2009,14 @@ static int mana_gd_setup(struct pci_dev *pdev)
- free_workqueue:
- 	destroy_workqueue(gc->service_wq);
- 	gc->service_wq = NULL;
-+remove_debugfs:
-+	debugfs_remove_recursive(gc->mana_pci_debugfs);
-+	gc->mana_pci_debugfs = NULL;
- 	dev_err(&pdev->dev, "%s failed (error %d)\n", __func__, err);
- 	return err;
- }
- 
--static void mana_gd_cleanup(struct pci_dev *pdev)
-+static void mana_gd_cleanup_device(struct pci_dev *pdev)
- {
- 	struct gdma_context *gc = pci_get_drvdata(pdev);
- 
-@@ -2008,6 +2028,10 @@ static void mana_gd_cleanup(struct pci_dev *pdev)
- 		destroy_workqueue(gc->service_wq);
- 		gc->service_wq = NULL;
- 	}
-+
-+	debugfs_remove_recursive(gc->mana_pci_debugfs);
-+	gc->mana_pci_debugfs = NULL;
-+
- 	dev_dbg(&pdev->dev, "mana gdma cleanup successful\n");
- }
- 
-@@ -2065,9 +2089,6 @@ static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	gc->dev = &pdev->dev;
- 	xa_init(&gc->irq_contexts);
- 
--	gc->mana_pci_debugfs = debugfs_create_dir(pci_name(pdev),
--						  mana_debugfs_root);
--
- 	err = mana_gd_setup(pdev);
- 	if (err)
- 		goto unmap_bar;
-@@ -2096,16 +2117,8 @@ static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- cleanup_mana:
- 	mana_remove(&gc->mana, false);
- cleanup_gd:
--	mana_gd_cleanup(pdev);
-+	mana_gd_cleanup_device(pdev);
- unmap_bar:
--	/*
--	 * at this point we know that the other debugfs child dir/files
--	 * are either not yet created or are already cleaned up.
--	 * The pci debugfs folder clean-up now, will only be cleaning up
--	 * adapter-MTU file and apc->mana_pci_debugfs folder.
--	 */
--	debugfs_remove_recursive(gc->mana_pci_debugfs);
--	gc->mana_pci_debugfs = NULL;
- 	xa_destroy(&gc->irq_contexts);
- 	pci_iounmap(pdev, bar0_va);
- free_gc:
-@@ -2155,11 +2168,7 @@ static void mana_gd_remove(struct pci_dev *pdev)
- 	mana_rdma_remove(&gc->mana_ib);
- 	mana_remove(&gc->mana, false);
- 
--	mana_gd_cleanup(pdev);
--
--	debugfs_remove_recursive(gc->mana_pci_debugfs);
--
--	gc->mana_pci_debugfs = NULL;
-+	mana_gd_cleanup_device(pdev);
- 
- 	xa_destroy(&gc->irq_contexts);
- 
-@@ -2181,7 +2190,7 @@ int mana_gd_suspend(struct pci_dev *pdev, pm_message_t state)
- 	mana_rdma_remove(&gc->mana_ib);
- 	mana_remove(&gc->mana, true);
- 
--	mana_gd_cleanup(pdev);
-+	mana_gd_cleanup_device(pdev);
- 
- 	return 0;
- }
-@@ -2220,11 +2229,7 @@ static void mana_gd_shutdown(struct pci_dev *pdev)
- 	mana_rdma_remove(&gc->mana_ib);
- 	mana_remove(&gc->mana, true);
- 
--	mana_gd_cleanup(pdev);
--
--	debugfs_remove_recursive(gc->mana_pci_debugfs);
--
--	gc->mana_pci_debugfs = NULL;
-+	mana_gd_cleanup_device(pdev);
- 
- 	pci_disable_device(pdev);
- }
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 78522205c5d0..33464a28e5d5 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -1269,6 +1269,9 @@ static int mana_query_vport_cfg(struct mana_port_context *apc, u32 vport_index,
- 	apc->port_handle = resp.vport;
- 	ether_addr_copy(apc->mac_addr, resp.mac_addr);
- 
-+	apc->vport_max_sq = *max_sq;
-+	apc->vport_max_rq = *max_rq;
-+
- 	return 0;
- }
- 
-@@ -1423,6 +1426,11 @@ static int mana_cfg_vport_steering(struct mana_port_context *apc,
- 
- 	netdev_info(ndev, "Configured steering vPort %llu entries %u\n",
- 		    apc->port_handle, apc->indir_table_sz);
-+
-+	apc->steer_rx = rx;
-+	apc->steer_rss = apc->rss_state;
-+	apc->steer_update_tab = update_tab;
-+	apc->steer_cqe_coalescing = req->cqe_coalescing_enable;
- out:
- 	kfree(req);
- 	return err;
-@@ -3147,6 +3155,23 @@ static int mana_init_port(struct net_device *ndev)
- 	eth_hw_addr_set(ndev, apc->mac_addr);
- 	sprintf(vport, "vport%d", port_idx);
- 	apc->mana_port_debugfs = debugfs_create_dir(vport, gc->mana_pci_debugfs);
-+
-+	debugfs_create_u64("port_handle", 0400, apc->mana_port_debugfs,
-+			   &apc->port_handle);
-+	debugfs_create_u32("max_sq", 0400, apc->mana_port_debugfs,
-+			   &apc->vport_max_sq);
-+	debugfs_create_u32("max_rq", 0400, apc->mana_port_debugfs,
-+			   &apc->vport_max_rq);
-+	debugfs_create_u32("indir_table_sz", 0400, apc->mana_port_debugfs,
-+			   &apc->indir_table_sz);
-+	debugfs_create_u32("steer_rx", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_rx);
-+	debugfs_create_u32("steer_rss", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_rss);
-+	debugfs_create_u32("steer_update_tab", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_update_tab);
-+	debugfs_create_u32("steer_cqe_coalescing", 0400, apc->mana_port_debugfs,
-+			   &apc->steer_cqe_coalescing);
- 	debugfs_create_u32("current_speed", 0400, apc->mana_port_debugfs,
- 			   &apc->speed);
- 	return 0;
-@@ -3639,6 +3664,11 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
- 
- 	ac->bm_hostmode = bm_hostmode;
- 
-+	debugfs_create_u16("num_vports", 0400, gc->mana_pci_debugfs,
-+			   &ac->num_ports);
-+	debugfs_create_u8("bm_hostmode", 0400, gc->mana_pci_debugfs,
-+			  &ac->bm_hostmode);
-+
- 	if (!resuming) {
- 		ac->num_ports = num_ports;
- 
-@@ -3779,6 +3809,9 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
- 
- 	mana_gd_deregister_device(gd);
- 
-+	debugfs_lookup_and_remove("bm_hostmode", gc->mana_pci_debugfs);
-+	debugfs_lookup_and_remove("num_vports", gc->mana_pci_debugfs);
-+
- 	if (suspending)
- 		return;
- 
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 7fe3a1b61b2d..c4e3ce5147f7 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -442,6 +442,7 @@ struct gdma_context {
- 	struct gdma_dev		mana_ib;
- 
- 	u64 pf_cap_flags1;
-+	u64 gdma_protocol_ver;
- 
- 	struct workqueue_struct *service_wq;
- 
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 96d21cbbdee2..6d2e05a7368c 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -568,6 +568,14 @@ struct mana_port_context {
- 
- 	/* Debugfs */
- 	struct dentry *mana_port_debugfs;
-+
-+	/* Cached vport/steering config for debugfs */
-+	u32 vport_max_sq;
-+	u32 vport_max_rq;
-+	u32 steer_rx;
-+	u32 steer_rss;
-+	u32 steer_update_tab;
-+	u32 steer_cqe_coalescing;
- };
- 
- netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev);
--- 
-2.34.1
-
+Reviewed-by: Justin Iurman <justin.iurman@gmail.com>
 
