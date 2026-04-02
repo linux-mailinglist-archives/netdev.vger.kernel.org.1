@@ -1,180 +1,264 @@
-Return-Path: <netdev+bounces-274450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274451-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mAy5GhpBzmlQmQYAu9opvQ
-	(envelope-from <netdev+bounces-274450-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:12:42 +0200
+	id CCISKEJAzmlQmQYAu9opvQ
+	(envelope-from <netdev+bounces-274451-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:09:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D88FF387882
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:12:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A7023877B9
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:09:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B68D8302DE2B
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 10:03:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1E82630488EA
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 10:06:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADC363D9DB4;
-	Thu,  2 Apr 2026 10:03:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 557A13DCD88;
+	Thu,  2 Apr 2026 10:06:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Dby5lTAs";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GyI+nYQi"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="nRHJM3au"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9113D9DA2;
-	Thu,  2 Apr 2026 10:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9253138C2C7;
+	Thu,  2 Apr 2026 10:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775124228; cv=none; b=CItqrc2YCFztJXF7lIa9vPnzoP+X0W7t77GgojzvNhx/J+YuzEfg0VhiRmjTkhcGazjq0MKxyOEWhHqj1UcT1tzWwsVGrlCq29ubsPmgC+sP2ssE7dOHjyUxvlUDkvTrJlZMkaG14R1r7gPqovsCgIgovyhkuwO2jAPKX8dZsRs=
+	t=1775124364; cv=none; b=ai0pgXujaqd39CZLzEVdJzXL+DvjGHwuA6iNCxsWbDQCJG9+9q7lLUUALd+qH51lAqYJnU8rGiPSz0vDyvDakTW2427OPDH/Uw6bignNHTXx7wkSAfkWkIZrZ/DPyUEVc/vK3WQQL9SteV4Lb2zzcl6AIfttu3DFsrIbHicyTFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775124228; c=relaxed/simple;
-	bh=Es7mj+dqk9IjsLZgauQ941j3zmmFqxCxkCRxqLFw1Qw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WkU4YKFE0GyoFF6J/trw5bveu8a443PL0d+bcXJvo3WIsCOq4O/secX7AbzyeIFto+zxF4NoFpvITcjomJtG54iBd/80Z6CO4gWZMRLnJ9Q7RKxGXGBVlGNR5v59R7i2Rs849VibycZpQGIBcg+5eLr8uGjklgsOLVeIiIieBuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Dby5lTAs; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GyI+nYQi; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 589CB140019B;
-	Thu,  2 Apr 2026 06:03:44 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Thu, 02 Apr 2026 06:03:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1775124224; x=
-	1775210624; bh=31BfsB1ksQ9uLm8RwHMSEtjdx9AbBKTp/giRFpN+ieY=; b=D
-	by5lTAs5uIFRc0dRltUZT501i6C8SKOb28x4JPK0hhBzq6LRquHHeTCRfIq7e7Ms
-	FLObI45C5BSHpp/wVwicbCilVKuBkLDl9CDSSaNB3AHrw/fcvDmzKXnbMcyGUDWQ
-	9OMxmM8GZ05TYEhNdgROwVFBqAeLja3QhtvChWndT/T1e9Mkhp39nNMHJev/PwRf
-	7/u7VG8H8NBSt7t9keE09Pz0/C+6O1+eHikqRDd0edsntqRld9qQHwvTKmH6cGDm
-	Edpj6mMoEh5zNd11+eGdNPRMdl0cuza5sOf6if7PybMe9KbCdDx1xS36Nk2PieA9
-	cy3FXNz1WFTbPYQIJQPgg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1775124224; x=1775210624; bh=31BfsB1ksQ9uLm8RwHMSEtjdx9AbBKTp/gi
-	RFpN+ieY=; b=GyI+nYQi4zmJWUMXtGiTkXSbHQ9fSxVmRtQi+dZTtOpZ4GlB96S
-	t6dMYdt/2HSfDEPKkvsgPy5Ucip++j89mVw381ZWoFlZfKdSivOeZGW7o0kjp6BL
-	P3xtJkGW1vABEQJaZo6xdxse/4rmK7vPlyDpaiOlLWqfSfX2aE+Lx8FLO+XOqnss
-	U6clEWHc7PDlXXodgXX6QusdwJQxjliRcJo+RJaM3gAyy8piQjXLaoVm6zrAN/Dt
-	NmFK0Rc6Jsde6PuQWg5JgxzZ0Fj8Trj8NJ0Y6Su0jFGnMBxiqnTMf8waweZFan+E
-	lG22FNH4rXhL+1kLHh7+sqbz0c4En2VXs2w==
-X-ME-Sender: <xms:_z7OaT69qCoImun6Gasks2kNOrzS0FeDWZMSk_aLVPM4MTnY3WeyIQ>
-    <xme:_z7OaaeEtC9ihT0HZkliIF5W16Bc-EKjTn3LuhVbnV3d9vHtdRsD17IBc-sAjcoRd
-    FbPDJajCiykMeDzMhfqV4vlBEw2K3T4wrHuo64KUjiBdsiWRraW_jg>
-X-ME-Received: <xmr:_z7OaZsbieEzAu5GWXdHo5JtgoGTCIGumncLmpItkinQtar9oGcivkSpb8LV>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdehjeefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    epfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhnrgcu
-    ffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrfgrth
-    htvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvuefffefg
-    udffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsh
-    gusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduvddpmhhouggv
-    pehsmhhtphhouhhtpdhrtghpthhtoheptghrrghtihhusehnvhhiughirgdrtghomhdprh
-    gtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmh
-    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
-    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtohepshgufhesfhhomhhitghhvghvrdhmvg
-X-ME-Proxy: <xmx:_z7OaanUED5OBZfuSXKTJ-mgvZBlPC5BCwAJ1mdssCh5e3XKGDX43A>
-    <xmx:_z7OacRvn-8c6zbBbNIfhc3m6kcpdk5kwZt1XwH5yPG_Yz0JLQGQ6A>
-    <xmx:_z7OaQItZ5hnlUri5phthUqx6XV2wJIaxOnNauXq0CPIrmHEKY9nhg>
-    <xmx:_z7OaWEXJk0caw5zX4rsGZT38tKde24--CfavIsKIQelsoi2XxxqGA>
-    <xmx:AD_OabLjYK24TzQWeyKe2rBSwHd_mPbEjw-syrDOb7dOc5zQHMgHKPox>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 2 Apr 2026 06:03:43 -0400 (EDT)
-Date: Thu, 2 Apr 2026 12:03:41 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>, Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [PATCH net v6 1/4] selftests: Migrate nsim-only MACsec tests to
- Python
-Message-ID: <ac4-_ZPJSlXV4Vmd@krikkit>
-References: <20260330130130.989236-1-cratiu@nvidia.com>
- <20260330130130.989236-2-cratiu@nvidia.com>
+	s=arc-20240116; t=1775124364; c=relaxed/simple;
+	bh=D4kfl7vQPG5i2TDOvaJ3hANWJtrLLrfKi0I6ESNoUBs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XOIsHoOcR2rue9YOMlbL/Lz1UxAOUOGqH5rdzfUiu3r2jvTFPcA/Qs3VoxoGQc+rzOtpWNwVzT/onPO1Ya5P9sGdoO4L2lhM9OQgbwteLFR2uUK1RWqNvFWuFa6XqhEWxNDOzcwA/idP45j1RV81D7w5yeRoicEMdKOZxafVxmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=nRHJM3au; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1775124355;
+	bh=D4kfl7vQPG5i2TDOvaJ3hANWJtrLLrfKi0I6ESNoUBs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=nRHJM3auCioWf+U0lXNf1DZ9gI4HLqoLnXqJQpjK6TuZsG9eGFNv66ISHZTp2Fsf9
+	 4+KQuuqnFfDlcwxSRhSX9dCkDB05hBwx3nPMGi7F0x1EFo1spXfrGcB/J5NQCl/nh3
+	 ag9YWUXhz1aubhJ/gq27GHnYIVutjnU6rioAydOUSPF8+8HLcbzc+n9G7OB/a34IHm
+	 sWAE+DffuBhhDmc7g1NV38A/CoWRxmoWbg7sdMGLOiGQjDjcmE4sLuevU4vfqgTCNU
+	 F8wZT8Mct0gVg9s3Uy8Forr2bfWqRAziqSbeVIDa6a8SdQTVY7t28t7DtfnbqBQ0LN
+	 qUi7hMlU4TDhg==
+Received: from laura.lan (unknown [IPv6:2001:b07:646b:e2:54e2:77ca:8340:99bd])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: laura.nao)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 19DCC17E76A5;
+	Thu,  2 Apr 2026 12:05:54 +0200 (CEST)
+From: Laura Nao <laura.nao@collabora.com>
+To: jason-jh.lin@mediatek.com
+Cc: Guangjie.Song@mediatek.com,
+	Nancy.Lin@mediatek.com,
+	Paul-pl.Chen@mediatek.com,
+	Project_Global_Chrome_Upstream_Group@mediatek.com,
+	Singo.Chang@mediatek.com,
+	Sirius.Wang@mediatek.com,
+	angelogioacchino.delregno@collabora.com,
+	conor+dt@kernel.org,
+	devicetree@vger.kernel.org,
+	kernel@collabora.com,
+	krzk+dt@kernel.org,
+	laura.nao@collabora.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-clk@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	matthias.bgg@gmail.com,
+	mturquette@baylibre.com,
+	netdev@vger.kernel.org,
+	nfraprado@collabora.com,
+	p.zabel@pengutronix.de,
+	richardcochran@gmail.com,
+	robh@kernel.org,
+	sboyd@kernel.org,
+	wenst@chromium.org
+Subject: Re: [PATCH v5 23/27] clk: mediatek: Add MT8196 disp-ao clock support
+Date: Thu,  2 Apr 2026 12:05:38 +0200
+Message-Id: <20260402100538.27291-1-laura.nao@collabora.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <2d418383ff2d6ff40ffb3b4f8e2b0c0e665c3b58.camel@mediatek.com>
+References: <2d418383ff2d6ff40ffb3b4f8e2b0c0e665c3b58.camel@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260330130130.989236-2-cratiu@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[collabora.com:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274450-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[mediatek.com,collabora.com,kernel.org,vger.kernel.org,lists.infradead.org,gmail.com,baylibre.com,pengutronix.de,chromium.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-274451-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[26];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[laura.nao@collabora.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[collabora.com:+];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,queasysnail.net:dkim,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: D88FF387882
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mediatek.com:email,collabora.com:dkim,collabora.com:email,collabora.com:mid]
+X-Rspamd-Queue-Id: 4A7023877B9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-03-30, 16:01:27 +0300, Cosmin Ratiu wrote:
-> -#
-> -# test ethtool features when toggling offload
-> -#
-> -
-> -ip link add link $NSIM_NETDEV $MACSEC_NETDEV type macsec offload mac
-> -TMP_FEATS_ON_1="$(ethtool -k $MACSEC_NETDEV)"
-> -
-> -ip link set $MACSEC_NETDEV type macsec offload off
-> -TMP_FEATS_OFF_1="$(ethtool -k $MACSEC_NETDEV)"
-> -
-> -ip link set $MACSEC_NETDEV type macsec offload mac
-> -TMP_FEATS_ON_2="$(ethtool -k $MACSEC_NETDEV)"
-> -
-> -[ "$TMP_FEATS_ON_1" = "$TMP_FEATS_ON_2" ]
-> -check $?
-[...]
-> -TMP_FEATS_OFF_2="$(ethtool -k $MACSEC_NETDEV)"
-> -[ "$TMP_FEATS_OFF_1" = "$TMP_FEATS_OFF_2" ]
-> -check $?
-[...]
-> -TMP_FEATS_ON_3="$(ethtool -k $MACSEC_NETDEV)"
-> -[ "$TMP_FEATS_ON_1" = "$TMP_FEATS_ON_3" ]
-> -check $?
+Hi Jason-JH,
 
-Those feature comparisons are missing in the new python test. The rest
-of the patch looks good.
+On 4/2/26 08:30, Jason-JH Lin (林睿祥) wrote:
+> On Fri, 2025-08-29 at 11:19 +0200, Laura Nao wrote:
+>> Add support for the MT8196 disp-ao clock controller, which provides
+>> clock gate control for the display system. It is integrated with the
+>> mtk-mmsys driver, which registers the disp-ao clock driver via
+>> platform_device_register_data().
+>>
+>> Reviewed-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+>> Reviewed-by: AngeloGioacchino Del Regno
+>> <angelogioacchino.delregno@collabora.com>
+>> Signed-off-by: Laura Nao <laura.nao@collabora.com>
+>> ---
+>>  drivers/clk/mediatek/Makefile              |  2 +-
+>>  drivers/clk/mediatek/clk-mt8196-vdisp_ao.c | 80
+>> ++++++++++++++++++++++
+>>  2 files changed, 81 insertions(+), 1 deletion(-)
+>>  create mode 100644 drivers/clk/mediatek/clk-mt8196-vdisp_ao.c
+>>
+>> diff --git a/drivers/clk/mediatek/Makefile
+>> b/drivers/clk/mediatek/Makefile
+>> index fe5699411d8b..5b8969ff1985 100644
+>> --- a/drivers/clk/mediatek/Makefile
+>> +++ b/drivers/clk/mediatek/Makefile
+>> @@ -157,7 +157,7 @@ obj-$(CONFIG_COMMON_CLK_MT8196_IMP_IIC_WRAP) +=
+>> clk-mt8196-imp_iic_wrap.o
+>>  obj-$(CONFIG_COMMON_CLK_MT8196_MCUSYS) += clk-mt8196-mcu.o
+>>  obj-$(CONFIG_COMMON_CLK_MT8196_MDPSYS) += clk-mt8196-mdpsys.o
+>>  obj-$(CONFIG_COMMON_CLK_MT8196_MFGCFG) += clk-mt8196-mfg.o
+>> -obj-$(CONFIG_COMMON_CLK_MT8196_MMSYS) += clk-mt8196-disp0.o clk-
+>> mt8196-disp1.o
+>> +obj-$(CONFIG_COMMON_CLK_MT8196_MMSYS) += clk-mt8196-disp0.o clk-
+>> mt8196-disp1.o clk-mt8196-vdisp_ao.o
+>>  obj-$(CONFIG_COMMON_CLK_MT8196_PEXTPSYS) += clk-mt8196-pextp.o
+>>  obj-$(CONFIG_COMMON_CLK_MT8196_UFSSYS) += clk-mt8196-ufs_ao.o
+>>  obj-$(CONFIG_COMMON_CLK_MT8365) += clk-mt8365-apmixedsys.o clk-
+>> mt8365.o
+>> diff --git a/drivers/clk/mediatek/clk-mt8196-vdisp_ao.c
+>> b/drivers/clk/mediatek/clk-mt8196-vdisp_ao.c
+>> new file mode 100644
+>> index 000000000000..fddb69d1c3eb
+>> --- /dev/null
+>> +++ b/drivers/clk/mediatek/clk-mt8196-vdisp_ao.c
+>> @@ -0,0 +1,80 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * Copyright (c) 2025 MediaTek Inc.
+>> + *                    Guangjie Song <guangjie.song@mediatek.com>
+>> + * Copyright (c) 2025 Collabora Ltd.
+>> + *                    Laura Nao <laura.nao@collabora.com>
+>> + */
+>> +#include <dt-bindings/clock/mediatek,mt8196-clock.h>
+>> +
+>> +#include <linux/clk-provider.h>
+>> +#include <linux/module.h>
+>> +#include <linux/of_device.h>
+>> +#include <linux/platform_device.h>
+>> +
+>> +#include "clk-gate.h"
+>> +#include "clk-mtk.h"
+>> +
+>> +static const struct mtk_gate_regs mm_v_cg_regs = {
+>> +	.set_ofs = 0x104,
+>> +	.clr_ofs = 0x108,
+>> +	.sta_ofs = 0x100,
+>> +};
+>> +
+>> +static const struct mtk_gate_regs mm_v_hwv_regs = {
+>> +	.set_ofs = 0x0030,
+>> +	.clr_ofs = 0x0034,
+>> +	.sta_ofs = 0x2c18,
+>> +};
+>> +
+>> +#define GATE_MM_AO_V(_id, _name, _parent, _shift) {	\
+>> +		.id = _id,				\
+>> +		.name = _name,				\
+>> +		.parent_name = _parent,			\
+>> +		.regs = &mm_v_cg_regs,			\
+>> +		.shift = _shift,			\
+>> +		.ops = &mtk_clk_gate_ops_setclr,	\
+>> +		.flags = CLK_OPS_PARENT_ENABLE |	\
+>> +			 CLK_IS_CRITICAL,		\
+>> +	}
+>> +
+>> +#define GATE_HWV_MM_V(_id, _name, _parent, _shift) {	\
+>> +		.id = _id,				\
+>> +		.name = _name,				\
+>> +		.parent_name = _parent,			\
+>> +		.regs = &mm_v_cg_regs,			\
+>> +		.hwv_regs = &mm_v_hwv_regs,		\
+>> +		.shift = _shift,			\
+>> +		.ops = &mtk_clk_gate_hwv_ops_setclr,	\
+>> +		.flags = CLK_OPS_PARENT_ENABLE,		\
+>> +	}
+>> +
+>> +static const struct mtk_gate mm_v_clks[] = {
+>> +	GATE_HWV_MM_V(CLK_MM_V_DISP_VDISP_AO_CONFIG,
+>> "mm_v_disp_vdisp_ao_config", "disp", 0),
+>> +	GATE_HWV_MM_V(CLK_MM_V_DISP_DPC, "mm_v_disp_dpc", "disp",
+>> 16),
+>> +	GATE_MM_AO_V(CLK_MM_V_SMI_SUB_SOMM0, "mm_v_smi_sub_somm0",
+>> "disp", 2),
+>> +};
+>> +
+>> +static const struct mtk_clk_desc mm_v_mcd = {
+>> +	.clks = mm_v_clks,
+>> +	.num_clks = ARRAY_SIZE(mm_v_clks),
+>> +};
+>> +
+>> +static const struct of_device_id of_match_clk_mt8196_vdisp_ao[] = {
+>> +	{ .compatible = "mediatek,mt8196-vdisp-ao", .data =
+>> &mm_v_mcd },
+>
+> Hi Laura,
+>
+> We are going to send mtk-mmsys driver for MT8196 recently, but we found
+> the compatible name is used here.
+>
+> As your commit message, vdisp-ao is integrated with the mtk-mmsys
+> driver, which registers the vdisp-ao clock driver via 
+> platform_device_register_data().
+>
+> Shouldn't this compatible name belong to mmsys driver for MT8196?
+>
 
--- 
-Sabrina
+That's right, my fault for missing that! Thanks for the heads up.
+
+I'm aware Angelo is currently restructuring mediatek-drm (including 
+mmsys and mutex), and that might affect the way vdisp-ao is loaded too. 
+So I'm not sure whether it makes sense to send a patch to fix this 
+right away.
+
+Best,
+
+Laura
+
 
