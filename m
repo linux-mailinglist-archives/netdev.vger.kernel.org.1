@@ -1,249 +1,254 @@
-Return-Path: <netdev+bounces-274422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274423-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QADFIlgnzmnIlQYAu9opvQ
-	(envelope-from <netdev+bounces-274422-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 10:22:48 +0200
+	id EJUXB6EpzmnIlQYAu9opvQ
+	(envelope-from <netdev+bounces-274423-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 10:32:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F551385F21
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 10:22:48 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 887693860D1
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 10:32:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 18C27303FF0D
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 08:19:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 35588304A229
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 08:25:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3BF236C9C8;
-	Thu,  2 Apr 2026 08:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF4A3314C2;
+	Thu,  2 Apr 2026 08:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UxkEk+bO";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gRSjU4NF"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="T0m6LneL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F5E3314C2
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 08:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C19435958;
+	Thu,  2 Apr 2026 08:25:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775117997; cv=none; b=c1AY1/DnHGqDM5gGEv0wD6ZAS8kQT3ohK0vmCBQb7MMekVM7mJuGNUbGmDyfywBiOht0OrmUl7kTatxKh/tJjnFTvtWQOqrKIrGgljaNmC3f62kVL6DU43QfZLxnjOH4+2BCfBppmBLlFm/0qCsXbq63cDk9OE1yeDS42wvvgoU=
+	t=1775118344; cv=none; b=YIF7sbMy0rlKcTRliNVh383wo8XSqHVnrXwvs0a/jPG1h6m5t0++OW5ei0bSiXUZgSTVcm0krkyQdHKKsWuFCPLvKrRwlDX04RSoskWSMmhG9qqKrBPsSE09/SPJSSp6IPLF4AN5u79zwFmbg6m3pta8fpIQRxOsBMQhYvwhnl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775117997; c=relaxed/simple;
-	bh=1CNWH0RD5qB7Qw6/e0icv6lX2ZvaieGolweobAmdkbk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QJ3HtubHCT7KPEvIxEuFN5apEJkqFY2qVqmXjodCjMFebSNQEJx67lF2T66O9/ZmkkuLSCsLo07K7bGtKNiJS7wrH8HeGeE02c0chTW/6o+7XVJFot/jAFtPSi/5AncUnqhcNXUbWEefDjL82AP6BO2EjvVnJovk0OPKCOk02Fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UxkEk+bO; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gRSjU4NF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775117995;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yAgv/iNQwR7zFYK7CL0OQLgq1P0LTe7Yih5B8afXkEw=;
-	b=UxkEk+bO2y2C4QQNdS8JuHrTZWR+4zYilxwX2wm/xyP5pnxRkcDX36w/LJaW+HpKCW2MKZ
-	jZVGel6yaDd2XcYKMT/ZXghxnIgxjsxwZF54UxJwBJkLE/Rkzhn2DqC5fXnuFn4DFTOzZN
-	gaZn/mhmbeZqAKwZHM/iESPL+tv4NzQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-515-KH-h72GFMNaVmBISE9M73g-1; Thu, 02 Apr 2026 04:19:52 -0400
-X-MC-Unique: KH-h72GFMNaVmBISE9M73g-1
-X-Mimecast-MFC-AGG-ID: KH-h72GFMNaVmBISE9M73g_1775117991
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-486fc42c83aso4988055e9.0
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 01:19:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1775117991; x=1775722791; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yAgv/iNQwR7zFYK7CL0OQLgq1P0LTe7Yih5B8afXkEw=;
-        b=gRSjU4NF1ZC75IzfLe8wkVKvdXcUj3uEfCBVs12bmUIt3ACq7D8Ac7zf2WP7jJTVXo
-         L3CHKBR/B4MgSrkJNrq8DiXrtWRA1huL9HuuwuwiDLMfUApH3iWiqWPTeM4Cu9VJn8Rc
-         p54gZQLhPKeQ4SldJQCB7gXavdrIaAOyQ1fhYEk2nQ20KjlXY7YlloMmbcqMbAeOC4iq
-         9Pezqn59ALbM0UQD/LNKfaZD6adqO5QwFL1mx5YEtnx7boR3hWYMpty6Ij5F78HKMG/4
-         m7yZ7KM1LC5FFD7LIxjsOpFjJZQWlq5Hmkv2tuFAc0Lh3xymi08iTAEOGK0hkWReLvUT
-         OxKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775117991; x=1775722791;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yAgv/iNQwR7zFYK7CL0OQLgq1P0LTe7Yih5B8afXkEw=;
-        b=YFHWXzodWTZUxYxxinJbjT3ANC8zxrGNJN15Y1ug0QoNE+T/vF9oVHEarqTmKrPWzc
-         jmZMEHl2iH/fQbtW+z+v8u9krpYbgL5pUq3PN4Xk7yKaKoCiu5ze4R9vNrMoE1CqThdM
-         yzWcc5KA2Uid8I/4gRjXurtoWeUDxdFAFgsfX4/HMWsstWGT9UAv9o1Y8bF2CBVm5Rli
-         MDmuWPduCotW1uL6wQuANiRsRwZA6Wz7W3cr+lWC2rh/bl3GqrZl2aRP2jYgHRC3gX1k
-         SBwLR8ranjSIwMqGCz/r+r+nP8ZMhYcylOFpT5yMBHP08oXLLZATOMbv8NrHg01pgGVp
-         FeDA==
-X-Forwarded-Encrypted: i=1; AJvYcCWzHucCZAUz1FqwwYB256YhPDef5F48as4GKTdneKQlRyU99ys29AI7lAEZoldvZjCxT/uu4gk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFv/n4pKTyMroOp1F9jAxKI4Th9fJy6er6+QrBLX3VDdYj/kbV
-	w3lBU1kvUzx6GjNbl9ljVFa/2t/AWwLsHIgbdAbUThLoaun3coUjqeD/+Pub/tuOKzfbZuFdMSM
-	msH2aeJ7GD5VtAzZxu91thbday8N9VvUZqmGyTED53XR2UPFieDsnHUEc+g==
-X-Gm-Gg: ATEYQzxMgx1riHj/Hbp+jyLQ7YCjdc/kLEzeB4nreKVsrznMXBSPATEE23P/H0wQ55J
-	JVs1lkoDCwjg8Fquha0rfS7AKl9W621pKzPXb+ErceNwMHQc2BkBgLBpEzVPgpRUKqtZHya/+rY
-	bilTdxgwlGD16cYC6OmERqrw6A66LSjUgjqfb9O+cLHCNWCIWv83wPj73b/un58XGt06twDYGqz
-	fHdhAX6H5cTxPKAerRvgcclEmqyjgUaDqbVwnO+GaWpAUIjzzyX5BFYVZyr7bDsvFpPK44T9wdp
-	1Nx5fdbwZv3s6LbJcYs5iiCvUoOV2qr9wUAvH4vg4TqB+BnvUueMyuNcVQytuCyASZtnpkC3sZq
-	z90ByNv3r0E3I2hQWjgyP9i+/wYeLU1KT+NbwpSb3nRJ3tpt5KX/W4tOjSA==
-X-Received: by 2002:a05:600c:34d0:b0:485:3c66:e21d with SMTP id 5b1f17b1804b1-4888355e6d5mr123196075e9.2.1775117991012;
-        Thu, 02 Apr 2026 01:19:51 -0700 (PDT)
-X-Received: by 2002:a05:600c:34d0:b0:485:3c66:e21d with SMTP id 5b1f17b1804b1-4888355e6d5mr123195415e9.2.1775117990458;
-        Thu, 02 Apr 2026 01:19:50 -0700 (PDT)
-Received: from [192.168.88.32] ([212.105.153.248])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4888a66c766sm48158205e9.8.2026.04.02.01.19.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Apr 2026 01:19:49 -0700 (PDT)
-Message-ID: <d8464e0b-4622-43f8-b527-f6200bafd632@redhat.com>
-Date: Thu, 2 Apr 2026 10:19:48 +0200
+	s=arc-20240116; t=1775118344; c=relaxed/simple;
+	bh=WazBELmidOWFZeUlpkcMJnK5BF4AfWpSzb3HgA0zJYE=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=iJR6g+L8fNROJYrYbEG80uUCU7iYVzMpDwsyAF47TSTHL6OkKlgZ78HQ7tRodATPeqjLprNB4gQAJ2i4DkxIJAhScl6OpfOmiMLeGLstO2wWuaow8XyBtjtor3hxU4kmXBpZlMJhhSiNMlttkd4KMRsDmSUx0SrK5P+SCLBiIkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=T0m6LneL; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0C2B9A5849;
+	Thu,  2 Apr 2026 10:25:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1775118340; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=yERmGdmSHYIkXp7UksjKm55jnHNM2DSfFiQqHT5YTws=;
+	b=T0m6LneLS+ojJEHRXy68YVB1+xlrfACK4tThM1qo4TfsXtRroUCpD/YdmNtQDMAm6sb0hB
+	ImUoJ9/rT12TNTVBmEsdgUWBkEnP2JyV/3SZW+DvGAjTVFJRXmNLiYQ9nrlW2V2bjabDmf
+	2yUkACQq3EuGpw2H9zwM5anbwzSk6HnnSYWKRTtktNdENnPaYIAG27CtzE7mrcwB/8rKG6
+	qZWJW8s5NeeFD0JWxs7WJKdOJay16axtotl39A8OGPQnJIyB7psCEpEqDny0Ndr1HV1pS3
+	vD9JocZAmqX1IG9SitrpzqGkD4go0tPXP7aod4gMMBUthFdtVEpqc9LzPBukaA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v36 3/8] eea: probe the netdevice and create
- adminq
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Wen Gu <guwen@linux.alibaba.com>,
- Philo Lu <lulie@linux.alibaba.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, Dong Yibo <dong100@mucse.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Dust Li <dust.li@linux.alibaba.com>
-References: <20260329132222.130912-1-xuanzhuo@linux.alibaba.com>
- <20260329132222.130912-4-xuanzhuo@linux.alibaba.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260329132222.130912-4-xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
+Date: Thu, 02 Apr 2026 10:25:38 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Justin Chen <justin.chen@broadcom.com>, Simon
+ Horman <horms@kernel.org>, Doug Berger <opendmb@gmail.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v5 3/6] net: bcmgenet: add basic XDP support
+ (PASS/DROP)
+In-Reply-To: <20260401202702.0b0b6dec@kernel.org>
+References: <20260328230513.415790-1-nb@tipi-net.de>
+ <20260328230513.415790-4-nb@tipi-net.de>
+ <20260401202702.0b0b6dec@kernel.org>
+Message-ID: <bc616b9914372a63c740c2f35f5dd8ef@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,linux.alibaba.com,linux.dev,mucse.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-274422-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274423-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[vger.kernel.org,broadcom.com,kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,fomichev.me];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2F551385F21
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 887693860D1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/29/26 3:22 PM, Xuan Zhuo wrote:
-> +static int eea_adminq_submit(struct eea_net *enet, u16 cmd,
-> +			     dma_addr_t req_addr, dma_addr_t res_addr,
-> +			     u32 req_size, u32 res_size)
-> +{
-> +	struct eea_aq_cdesc *cdesc;
-> +	struct eea_aq_desc *desc;
-> +	int ret;
-> +
-> +	desc = ering_aq_alloc_desc(enet->adminq.ring);
-> +
-> +	desc->classid = cmd >> 8;
+On 2.4.2026 05:27, Jakub Kicinski wrote:
+> On Sun, 29 Mar 2026 00:05:06 +0100 Nicolai Buchwitz wrote:
+>> @@ -2403,26 +2456,52 @@ static unsigned int bcmgenet_desc_rx(struct 
+>> bcmgenet_rx_ring *ring,
+>>  			goto next;
+>>  		} /* error packet */
+>> 
+>> -		/* Build SKB from the page - data starts at hard_start,
+>> -		 * frame begins after RSB(64) + pad(2) = 66 bytes.
+>> -		 */
+>> -		skb = napi_build_skb(hard_start, PAGE_SIZE - GENET_XDP_HEADROOM);
+>> -		if (unlikely(!skb)) {
+>> -			BCMGENET_STATS64_INC(stats, dropped);
+>> -			page_pool_put_full_page(ring->page_pool, rx_page,
+>> -						true);
+>> -			goto next;
+>> -		}
+>> -
+>> -		skb_mark_for_recycle(skb);
+>> +		/* XDP: frame data starts after RSB + pad */
+>> +		if (xdp_prog) {
+>> +			struct xdp_buff xdp;
+>> +			unsigned int xdp_act;
+>> +			int pkt_len;
+>> +
+>> +			pkt_len = len - GENET_RSB_PAD;
+>> +			if (priv->crc_fwd_en)
+>> +				pkt_len -= ETH_FCS_LEN;
+>> +
+>> +			xdp_init_buff(&xdp, PAGE_SIZE, &ring->xdp_rxq);
+>> +			xdp_prepare_buff(&xdp, page_address(rx_page),
+>> +					 GENET_RX_HEADROOM, pkt_len, true);
+>> +
+>> +			xdp_act = bcmgenet_run_xdp(ring, xdp_prog, &xdp,
+>> +						   rx_page);
+>> +			if (xdp_act != XDP_PASS)
+>> +				goto next;
+>> +
+>> +			/* XDP_PASS: build SKB from (possibly modified) xdp */
+>> +			skb = bcmgenet_xdp_build_skb(ring, &xdp, rx_page);
+>> +			if (unlikely(!skb)) {
+>> +				BCMGENET_STATS64_INC(stats, dropped);
+>> +				page_pool_put_full_page(ring->page_pool,
+>> +							rx_page, true);
+>> +				goto next;
+>> +			}
+>> +		} else {
+>> +			/* Build SKB from the page - data starts at
+>> +			 * hard_start, frame begins after RSB(64) + pad(2).
+>> +			 */
+>> +			skb = napi_build_skb(hard_start,
+>> +					     PAGE_SIZE - GENET_XDP_HEADROOM);
+>> +			if (unlikely(!skb)) {
+>> +				BCMGENET_STATS64_INC(stats, dropped);
+>> +				page_pool_put_full_page(ring->page_pool,
+>> +							rx_page, true);
+>> +				goto next;
+>> +			}
+> 
+> The large branches here are quite unusual, normally drivers fully
+> prepare the xdp_buff and if there's no xdp prog attached act as
+> if there was one and it returned XDP_PASS. Saves LoC and therefore 
+> bugs.
 
-Here there are a couple of example where a reply to the AI reviews would
-have been very useful.
+Agreed, will refactor to always prepare xdp_buff and use
+bcmgenet_xdp_build_skb for both paths in v6.
 
-Sashiko says:
+> 
+>> 
+>> -		/* Reserve the RSB + pad, then set the data length */
+>> -		skb_reserve(skb, GENET_RSB_PAD);
+>> -		__skb_put(skb, len - GENET_RSB_PAD);
+>> +			skb_mark_for_recycle(skb);
+>> +			skb_reserve(skb, GENET_RSB_PAD);
+>> +			__skb_put(skb, len - GENET_RSB_PAD);
+>> 
+>> -		if (priv->crc_fwd_en) {
+>> -			skb_trim(skb, skb->len - ETH_FCS_LEN);
+>> -			len -= ETH_FCS_LEN;
+>> +			if (priv->crc_fwd_en)
+>> +				skb_trim(skb, skb->len - ETH_FCS_LEN);
+>>  		}
+>> 
+>>  		/* Set up checksum offload */
+> 
+> AI points out that :
+> 
+>   The status_64 structure is located at the start of the page
+>   before the frame data. Since this resides inside the XDP headroom, if 
+> an XDP
+>   program expands the header backwards (e.g., via bpf_xdp_adjust_head() 
+> or
+>   metadata via bpf_xdp_adjust_meta()), could it physically overwrite
+>   status->rx_csum?
+> 
+>   Since the driver reads status->rx_csum after executing the XDP 
+> program, it
+>   could risk reading garbage data if the headroom was used. Should the 
+> driver
+>   skip setting CHECKSUM_COMPLETE when an XDP program is loaded?
 
----
-Is it possible for ering_aq_alloc_desc() to return NULL if the admin
-ring is full?
-If so, will this cause a NULL pointer dereference when accessing
-desc->classid?
----
+Makes sense, status->rx_csum is read after XDP runs and an
+adjust_head could overwrite the RSB. I'll save rx_csum before
+running the XDP program rather than skipping CHECKSUM_COMPLETE
+entirely, so XDP_PASS packets that weren't modified still benefit
+from HW checksum offload.
 
-AFAICS this is allucinating, as ering_aq_alloc_desc() never returns NULL.
+> 
+>> @@ -3745,6 +3824,39 @@ static int bcmgenet_change_carrier(struct 
+>> net_device *dev, bool new_carrier)
+>>  	return 0;
+>>  }
+>> 
+>> +static int bcmgenet_xdp_setup(struct net_device *dev,
+>> +			      struct netdev_bpf *xdp)
+>> +{
+>> +	struct bcmgenet_priv *priv = netdev_priv(dev);
+>> +	struct bpf_prog *old_prog;
+>> +	struct bpf_prog *prog = xdp->prog;
+>> +
+>> +	if (prog && dev->mtu > PAGE_SIZE - GENET_RX_HEADROOM -
+>> +	    SKB_DATA_ALIGN(sizeof(struct skb_shared_info))) {
+>> +		NL_SET_ERR_MSG_MOD(xdp->extack,
+>> +				   "MTU too large for single-page XDP buffer");
+>> +		return -EOPNOTSUPP;
+>> +	}
+>> +
+>> +	old_prog = xchg(&priv->xdp_prog, prog);
+>> +	if (old_prog) {
+>> +		synchronize_net();
+> 
+> Why? BPF prog gets freed after a RCU grace period I think?
 
-> +	desc->flags = cpu_to_le16(enet->adminq.phase);
-> +
-> +	ering_sq_commit_desc(enet->adminq.ring);
-> +
-> +	ering_kick(enet->adminq.ring);
-> +
-> +	++enet->adminq.num;
-> +
-> +	if ((enet->adminq.num % enet->adminq.ring->num) == 0)
-> +		enet->adminq.phase ^= EEA_RING_DESC_F_AQ_PHASE;
+You're right, bpf_prog_put handles this via call_rcu. Will remove
+the synchronize_net().
 
-Sashiko says:
+> 
+>> +		bpf_prog_put(old_prog);
 
----
-Does this code require a lock to serialize access?
-Concurrently modifying enet->adminq.num and enet->adminq.phase from
-multiple threads could lead to data races and ring corruption if
-administrative commands are triggered simultaneously.
----
-
-Again, AFAICS this is allucinating, as all the calls are under the rtnl
-lock. This check took a lot of time to me, because I had to go up in the
-call stack a few hops looking for any lock. A reply clarifying the
-locking would have been very helpful.
-
-> +	ret = le32_to_cpu(cdesc->status);
-> +
-> +	ering_cq_ack_desc(enet->adminq.ring, 1);
-> +
-> +	if (ret)
-> +		netdev_err(enet->netdev,
-> +			   "adminq exec failed. cmd: %d ret %d\n", cmd, ret);
-> +
-> +	return ret;
-> +}
-
-Sashiko says:
-
----
-Are device statuses returned as positive integers?
-If this returns a positive value during eea_net_probe(), it will bubble
-up to the PCI subsystem. Since the driver model treats a return value >
-0 as a successful probe, the PCI core might believe the device is
-successfully bound even though the error path in eea_net_probe() freed
-the resources.
-Could this lead to a use-after-free during device removal?
----
-
-This looks real to me, and was already reported in the previous
-iteration. The question is: why do you consider this invalid? Or did you
-miss the remark? A reply to this comment would have been helpful.
-
-The bottom line is please go over the comments reported by sashiko, and
-either take care of them (dropping a line in the changelog about the
-update) or reply on the ML explaining why the comment is not valid, with
-a single reply per patch touching all the relevant comments.
-
-I understand it takes a significant effort, but if you leave this
-entirely on us, the only choice we have is to unconditionally set to
-change request any patches with AI remarks due to the volume of comments
-and capacity limits.
-
-Thanks,
-
-Paolo
-
+Thanks
+Nicolai
 
