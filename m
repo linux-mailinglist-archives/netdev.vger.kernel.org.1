@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-274475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274477-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IPGSM0xSzmmjmgYAu9opvQ
-	(envelope-from <netdev+bounces-274475-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:26:04 +0200
+	id aDi6BOdQzmmjmgYAu9opvQ
+	(envelope-from <netdev+bounces-274477-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:20:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91088388499
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:26:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 620FA38839F
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 13:20:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CC3923014618
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 11:12:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0E727308A97E
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 11:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 528C13BE16F;
-	Thu,  2 Apr 2026 11:12:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1E13BFE2E;
+	Thu,  2 Apr 2026 11:12:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2126.outbound.protection.partner.outlook.cn [139.219.17.126])
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2136.outbound.protection.partner.outlook.cn [139.219.17.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 831B935E95A;
-	Thu,  2 Apr 2026 11:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.126
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696EE3BE64C;
+	Thu,  2 Apr 2026 11:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.136
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775128325; cv=fail; b=UqHfNEzY7Wf2j/jjDpZtO2S3L4a//tF2SO3431GMAd6cnGaREW4rBnRrXfXKQv5HrYNh2JkYkLfAWNfSzp5UVQIadCg1MsV5PVY+ChwZ8FHYiCV0VbxsZnhiwsI1wpCVLAfAvzR7ck6k62f04ot2nFiTvP708guB1/cF6/LAN/s=
+	t=1775128332; cv=fail; b=TicyODTc6vGICugV94kL8QmIZbaWSCgyvJjr/hTYUJHGhVeONy4Vu8fVCuL0Ln6q4m1Tgpb9lgbgRX7K1QRuVXcUijw4p0Lm0eVOeG043s1dvXwg845bFC3UQP+flgZZgHyNsT74555p0Ka7MXwdG609JpVwpLI8pT+c3zRxeTs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775128325; c=relaxed/simple;
-	bh=mPPvdk4MXMbbzaV1vMEtDxOyCQH+P7JX/iYGb5GSjBU=;
+	s=arc-20240116; t=1775128332; c=relaxed/simple;
+	bh=u6iXGUIzHLxqk1ZLENVJoQUdD3oaVAkgn4qp9jB1cYA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=coeztMWf5BTTltHIuUNrrVXbYh7X2o87Jn77ujr5UMlCbJQ7axOUz4/PdqblphZxitSd4a6/yksEZNc3+vC2i3UdtMe08ELcP2DJwIbvcbsyK69hVaogTrU8RCIM4uPEfFCajFcB0BrtmWtKPniRE+IWPANfVdLhQLKLlXCYBig=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.126
+	 Content-Type:MIME-Version; b=cNMWkaOZ09xXJjxbqp4qe3N1xXI8MfAqhdSI2ufD56qZJqh8HjwtGbIutRqhiQ+2ej/j2P5CLc3Mqk5N8oik9fDq+zOo/aNglalsnjCavXxaihsk3yrXdHbqC90Y3yLkGemH8cmTazEK1UiGCnamI/GkSHuPt6/Kjuk6FNCMcNA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.136
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hKRIvodLm7MgblSgyQPoy81wmUmIK2wXXEvX10ez+1zlUoxjtqNgcHMbP0+hmiikygpRlwZ1nIybo0U4o5H6/HTIi7/A1c4rFew0sFg9/mGLLxHGz0qfjRe5UmavQ2MOzGpNMJGVNIb+pn1ayNygS09MbGPlbPPdOHy1RfPXJMb8CEYVBRbwZNmC4NXKvD1FjrQXdW0n6YExMkpgtUunLZnbdvq0R5ZZ/ysFBpzm8eIGv0+825V1xYbn7uSMwcJ68dDe2tgPS3zSzJn9swW7YkJGiYeD0gVdWimDlrsD1D5kQvbOBCBEUslLv2z2hmxAj97o7+8+j7wWqYQlnJfGsg==
+ b=EiYdiAkFU3AOpzCKPk1quoa1K/Xhd6aBsksM5ceiiBhncH/0tCNQlEtEhpZr/vWm3jPngNqPAigDlM7uDxhm10tZL1OigOl1o/2p6J537Dlf9osjX4BGjKkMql0JjGikScNWydcjnKnjgvJewU4Vuvk3aAAfPai5VKOU/wH2uqsr4KkcnEozY/y5oBjgdDvk9v9ehfMQgZ6ogORwYOl0ksz/sggaKJum6web4uOKiHQeoZJPcdVyoqBT56NntnMavfRJ7gDiMICVjLr0ZXDfQ9LSSZ//V+/xiQX/aSA6tX8/S8b5t88V9JWiS05XRbfjSIPcusP65869h6qfgEbvOw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZsGsxV/w7Fgx9XqfFGZEoSDxwiP2eaq5CFxLCDDdwzI=;
- b=EqmHRoggtjSjMOQ2TekWyC3o5A/q0GSLNKoaeWdjcfy4/PRRg577YAuHJbZebocRzRYyjZAjmB6rz/dVtc8cHXhXMgtVDkWlgk3Y0lYedGKo6XF5KW4ZXJd38VGHhG91Eql/Qq90p4sVOb0VVxxgn5O8fe0s9chGFDWrc1Ohy6nKUJdOHcSu/exHVORjyj7F6B17Sore/JNJQOMhKgXLIy3rVu9Bp7bZKXABOT0mGHUbMVwudJTqaAAeuFEqn9m2vCEcbhVQWX6JrewWv0Bx/9uRULZxBQebyivZPM3TXFoKlOQnwNQ8jTo7XbP3kUE7gCnWBJCQoUe7uUUbzJrgnA==
+ bh=BU4eruqZBSF4wUwhAYrDH+JiS/7GwK2cT/70pSo0/xc=;
+ b=WF+4r8a1V3QCY6F2r0Vzb0aU4AhUzxdEQyYUiDsGovKNdlfgj1Q9HmRiWC427kpvUZZaHdS6jPmMrusJ9I1iviOpHPAFdL/VPb/vN0hxLNtW2KJKWC2K6J1Y5C2fXlC9JzztLVjmPOpBZlsfEUODnCHw0L4NzLE59klfv+Gd4Coom/bIbhelBMUGbMbM8hs+KzeOqbZ6Ch1JbZmVwbqd0L3U9hqLUIUKY9Ov6eXWNkRruSLJ3zOaN6WL3tjFYYjtZ5kDUnfmgkxkAoqRPlt30o+9//XnqGNqYig5lrKqooaU6e/b22NGw8Q+rhtvLYsYlq9NsPeCnAARSJ5SMXA5bA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=starfivetech.com; dmarc=pass action=none
  header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
@@ -48,11 +48,11 @@ Received: from ZQ0PR01MB1208.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c550:19::5) by ZQ0PR01MB1048.CHNPR01.prod.partner.outlook.cn
  (2406:e500:c550:d::14) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.20; Thu, 2 Apr
- 2026 10:56:07 +0000
+ 2026 10:56:09 +0000
 Received: from ZQ0PR01MB1208.CHNPR01.prod.partner.outlook.cn
  ([fe80::63d1:b688:cab7:50cb]) by
  ZQ0PR01MB1208.CHNPR01.prod.partner.outlook.cn ([fe80::63d1:b688:cab7:50cb%7])
- with mapi id 15.20.9769.017; Thu, 2 Apr 2026 10:56:07 +0000
+ with mapi id 15.20.9769.017; Thu, 2 Apr 2026 10:56:09 +0000
 From: Changhuang Liang <changhuang.liang@starfivetech.com>
 To: Michael Turquette <mturquette@baylibre.com>,
 	Rob Herring <robh@kernel.org>,
@@ -78,9 +78,9 @@ Cc: linux-clk@vger.kernel.org,
 	Hal Feng <hal.feng@starfivetech.com>,
 	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
 	Changhuang Liang <changhuang.liang@starfivetech.com>
-Subject: [PATCH v1 12/22] clk: starfive: Introduce inverter and divider
-Date: Thu,  2 Apr 2026 03:55:13 -0700
-Message-Id: <20260402105523.447523-13-changhuang.liang@starfivetech.com>
+Subject: [PATCH v1 13/22] clk: starfive: Expand the storage of clock parent index
+Date: Thu,  2 Apr 2026 03:55:14 -0700
+Message-Id: <20260402105523.447523-14-changhuang.liang@starfivetech.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260402105523.447523-1-changhuang.liang@starfivetech.com>
 References: <20260402105523.447523-1-changhuang.liang@starfivetech.com>
@@ -96,56 +96,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: ZQ0PR01MB1208:EE_|ZQ0PR01MB1048:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2c48a104-c745-441e-2c70-08de90a67129
+X-MS-Office365-Filtering-Correlation-Id: b163252f-c520-46b7-6c45-08de90a67236
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|1800799024|7416014|52116014|376014|366016|921020|38350700014|22082099003|18002099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	sCTLQhow/pkVqZh+v/iEh3LFn+sBTmbkeo8KktOi6c1rMKGCUm6Z7NT7vYbDKmHU7NpYvE6CcjutsNJRPD5F8lWM7S0v4IhC/ESQG8r1w11sPOkbP4+Qz52BLZeXAl4LyGUwHKn/hn3kblbb/DqCvI0BJ4VEzbNQjMiNYEBuv8yZM4vo7tXryxaHyFxQ29STlyupgv26Ze3uOBRW1z1ieMxa4fX3MutikfuxmK/TT61XTZMXZi62A2h4uVGy8ALUTbE/cN9vHevGa7nDNA6G+dOdglEnP03zXxATx2KqArJ/C++RWuxZRLabo/sZZfsWqPkDHkngK2VUXJvd837hLAOO4sLaaJcLaABtJbDd6pgktUDhA0BNsEKZsXtS75s9pdkvq+ljFKGGsom5hcjvumRNrfijhaaxOGHnWwQ4AifE6ujxG+lpLjdHTyh+ethq5bJIlb4ps3qII6b8gcUebMWgrijc7E0AVAbX3ODZfdM25N01eJ64QAjBmZm1kAbbMZeVdblAvA3UHm9XtNScpMCo0mhIZDMQVp/VBsS7kJwlBmbT3ms1uYaXvkgIyVGknZy8XXfxH/1HJBmeVvB+h4aM8S3j96Niop+jEs+Rs1I=
+	FA0rAy5zPO9QQG8fDU/yMXkIvgEtS1/S5OnRW66tBAnbKj31Ribq5bQvJDPim18idmE0HT/fYejgsobbbZPWr0bQ4f7BhC8GenQQkxL56Ry+HfVjCxTwuCa8wQkZxsvCX4nzRWd7TNsQQ2m5zGyWCUAHrnPq9Il36JMxlRpOyRuGBpXgjIqXlF1mepLKa6haB/lDl8plsbZyJRB4tahLQJ8fC7nEt62YTVPx4uHSckPfivj0MtfMA0PEu1s7LuGmP0ukqmQG4A0C8AJVoVMo6Ne6AbpoDBNMzhOpHd3jnDMCkW337m3xs6Sy4v+LMSv9D9CmE/F4U2pYDxJ4OwQcEsUybVw+Wob5HAZeWX0M0yUMqtAUwBbiljWRvlZbxQpnIfcSs1SsaS1GXAI9SzKcB/2nzxMMGb/EfGaIU2hF4xgKQkuJAYGHtRw8ETJXMw1t6wVRKp+B3NSGVaA2aYlxguLBmBEIMIUPk/sk9XB6pddmTQkDpXeRsNupOY6gg6WEzteuvOOPxBxBH+1m7LSkitsA39jFEdkkJ+Gx5UATysA8iVv3zX82QReSSYCcnWxn2f6XCzKwjyMEXanin/yOCLVBk4MI1RE1cPNEKkd/rPM=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQ0PR01MB1208.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(52116014)(376014)(366016)(921020)(38350700014)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?N1cV/2ALdFlnkB3N4ybnPPQl81j3rch7bSmRNW4jouf8dcSExMipb/9Qxtfv?=
- =?us-ascii?Q?KlCR8gBnYERbTcLq9X4vtCqI3D+yf33iPbcaZzpMgk69ykwAqAfiGb5/pcZJ?=
- =?us-ascii?Q?PkAtBquNYpP4fxuYxXvdUGVjZ9X3gT2sPxMv13TlpwTNG0hjPkkOE6unK8lo?=
- =?us-ascii?Q?GYlfwUYpgo1ASGrGwukxGvS9uRaZDGtzbQkKlZ7bljVIYLkUMv7brTWdNHaP?=
- =?us-ascii?Q?eb4k1dnsu1AS4nnm4iRVVDm5yEDnpgUDTXu+WZLwlWs3f5o+X2IN1ly6Yi/h?=
- =?us-ascii?Q?BC7JMHs8BZOHnn8XnN/inT4R6ZKo3+MyPYN7kt1diCkpwFvUmHxIE23F83Y7?=
- =?us-ascii?Q?F4Bhz1OiaVH7J04OLpMvz0vUCeRYxvCl4MusPWkx+y8Lf8ky3DP0fhe1AjZ7?=
- =?us-ascii?Q?P4GasdSPLI2riphZ0Fw5rFQE++/uUs1sntQ+m0lE3TFWEweVks60Lv0gXukA?=
- =?us-ascii?Q?W2x7R68jrZ51l7Fw1K1YTqTjC0OGClCjGwwNNNZPayKg7wPbiqTf/5IaT8Lo?=
- =?us-ascii?Q?PDTkd60ddh7etwtwckx6OqdrWy3FSD/PDczV2dp/AJ7nPNSWhK0DJkaGHvZI?=
- =?us-ascii?Q?N8Y3FUIaaKBPnVXUNDKiEqgXswzyMtkGliMXtI++9XpWUYNAbRWDwxu52ajp?=
- =?us-ascii?Q?SXBtaZUh9euYpTKBzkyUvUnGhPSKSP4/LcPqWpGvpYUXPCCUplbE6nP3zN+J?=
- =?us-ascii?Q?4+5DggRGDm6WSm/cUI4ok4ZmsuhIbzTdmi1XZEQtJ+AaqG4IXtIMlsxaVrc9?=
- =?us-ascii?Q?l3U19WN8R7eUX6kG4Adn0xEOgOA759yXcXdhgsGJj3xB1krVUIaxXGg+hVxO?=
- =?us-ascii?Q?sJ58TXKWBVWUIWBfWF42W+62hV70wANiC7XSsebRZijAICT9DfxSyt9izocZ?=
- =?us-ascii?Q?37n8b9Uln1LLnJft3PRtRRQSZjj8yix2jljFD4O3heMwrWy7T6oy37oCPvVl?=
- =?us-ascii?Q?pzER0nRX0FthmQB9eiizHkwcStB61xRbA6o3CAblUnVRjiN4Sy1/WmiTkQ2n?=
- =?us-ascii?Q?pwUkb7PWYyz+z9uRsIiJK/HzJ3tSWzKAZlD0OCIh+D481RQDvFubqAyEhCy0?=
- =?us-ascii?Q?ORu6zD8Gb4869CiHdgsMgjCah21GBl/XpDMReJCFmHn9gN5BaQ9d59//n7Yu?=
- =?us-ascii?Q?u4Cic8tZmIhL0X27avFNPwHWYvLNmT/7NRf7jBKta2VfNublUZfEUSTQZ5/G?=
- =?us-ascii?Q?HYt4S05Ei7TcGAay8J2FaiHzA6rw8BEcJvb03uUvsPeOF7DRxk6D9mPoqDff?=
- =?us-ascii?Q?a13geo+DXw/Zt68Rr1yJE8j6sY35TbJE656Mz0LC4z6DvXUJKUzTiYXAOKRW?=
- =?us-ascii?Q?b6p5/1YQPfoIL6L4Rt/1t4Ukvtw9KJnTpjv24klajybKiKD5miz9DkZStGmw?=
- =?us-ascii?Q?ylPmVElHQKfvso/8P3tihvjjhkZHp6kHb+SYR6dK1czn+JLhSN4eu+UGSaVW?=
- =?us-ascii?Q?Ih4fmcvjsBgeLK4Vn2LmzV1Sper1t/IJBqHMIhpmbxbPmy+NsXkaYhewF+qb?=
- =?us-ascii?Q?uBR3su3dWz6k6jJKw2y7SG/mrmkgUk51aPT0VkoasAow5H9roxiUngKDODfx?=
- =?us-ascii?Q?PY8cY9w9AiztUdND0ADTFfPplCv4turOGwxcWjJELb8+n1Kl7HubdfVPCI49?=
- =?us-ascii?Q?wfDZwIAhoN2/LPeydfAhhxKds4Bxq/wgnveU5UyKNM+FXsKccz05LB9rwozW?=
- =?us-ascii?Q?+X6OPdiU+/hKr6BDGLZPYtAIuRhRvNrH27/xqbkGOnBffOSAygTOJk4tGCE8?=
- =?us-ascii?Q?RSCKtJRwtBMlTcl6KaIWj11OGzM4RfQ6g7dVYQi7a0dLJgygPZvG?=
+	=?us-ascii?Q?G6RwZhR340/k45SOLaDGWGfZqyweZhRUOZ0gMCxu/5ehiCemRHJAY/GInJdl?=
+ =?us-ascii?Q?RguqZwYdrVJ4+0ED6+eZ8rWA7a/JbuV+OeHXeJnzmixfxkVWQHROYHyWUXkx?=
+ =?us-ascii?Q?m7FoJrK1Y0/OraE/nJITGIV5V6zNasb58uG9vco7C73h6qSsUbtiI3jSNg9j?=
+ =?us-ascii?Q?4+0b8OHUb9MJ/xez7l3ep4WHJb+u9InugbUpRxian3WcmH46SuX9Ossjnoqt?=
+ =?us-ascii?Q?oPlKyk/zqofX3jN0F1ieZEVBi4jh3sS4BGSzeWG+p1LTW5tA87y8fzWhkNQh?=
+ =?us-ascii?Q?g2iXBWCOB/NLQuv6+Igcfutz9v2Pl60xpFO61Id6FabxiGTTILQfL0Mx8hBP?=
+ =?us-ascii?Q?diYCQ4Kv5ni4JriwFNI/LcuOA5r8HznDFhN2A6B+rvI01aInqeHjicQJI401?=
+ =?us-ascii?Q?pbja59/bKdNilXG1omZunv6QeeNs7SzjkFcIENS5xWO6T0k5jaGn+bB/4WMR?=
+ =?us-ascii?Q?UloBi7YSwskasjTI2uGZovosedM5qumDVqxKqodMftlFyce1+YSuikU6rj9M?=
+ =?us-ascii?Q?PlNzQO6GWZ0rAGX13k8Tv26AuGIw5TPW9xZgJf65NwH6COER3hJ4KJN+NX9E?=
+ =?us-ascii?Q?5Q2/yg+Fz9umRj6W2B2jiv7OfyToNccc65/n9GtKJyEbPHvT9Bm51j+17mlL?=
+ =?us-ascii?Q?mF71i8wpBwJ2DAO5djWfNALBkJU2IqyY7R0mwra0kwzqU7p4a0j+j4xAKTW0?=
+ =?us-ascii?Q?9r9Pz7TZPgy60R41ZaW/YNgSDjvj5xxELf7AmdW0D94lVOnwj4dXA4t4cdiL?=
+ =?us-ascii?Q?V4lOj1a6C9WWpdNW3HDOclld2Wnipz95FSKjjOQHYQGWusSKHg+2S+1a6/4b?=
+ =?us-ascii?Q?NhNnIz8YKDv7odrCzpD26fdgcbIpz70SQeCvOpn4WdeIVaxK4n+YMW1q2Q+M?=
+ =?us-ascii?Q?1J/+0AmObU30vhqLjxXG11LLIlroRcnJD15SxZlq4SFCS2R4Gxtnl3CBpT5U?=
+ =?us-ascii?Q?Z3khYdcGSvfcEN8CPjAs4PPOlFdPC1WGK0QzONr0ao/OErZ96J289KPJi0R1?=
+ =?us-ascii?Q?lYasu+6qu+0t47ZhIS2DBdhXkCr45Q1fKHzEUu5OGnBM69YktFRv7E4dFp8P?=
+ =?us-ascii?Q?6Q5EKuKfgke5FiepOEZ2EkNIu+H+cntnpblWGTFkLIyU8cEHeWfmQmTeXhOD?=
+ =?us-ascii?Q?cWav1CSl6rUGsQdl2elUK60yuM7VqKnI2GAX5hFMbvuE3lbisfWMvP/QEohn?=
+ =?us-ascii?Q?WmmAAEW1FbOmZhQ77D1LjPiP6IQ4y62r/L7C8zFaxuYLTzt0q1/7w5uINxOh?=
+ =?us-ascii?Q?Dky3WqNNd4URT/I57AcarUFpd7eMxHHi78O7/CycwHFbkYlvF3E/muuU5uge?=
+ =?us-ascii?Q?RQlpqrvrE0mG0CTH976fY+QkjGKxCJUW0k9Vr+U7IrFAeTfiyqth9uUrVs2y?=
+ =?us-ascii?Q?itmNkgyCOoTdufOp3nUqv+EkOLqVfmAxJEf8ILzkSWjOPgeur9yDXU4nIOdf?=
+ =?us-ascii?Q?3y2DGw1L7ILYSVwk5hJm4HH83bPfEU9AUQRjXF5NEj41wMqUKbm6fOZOwje9?=
+ =?us-ascii?Q?hFg9DBGPiT7aKQU297jVFnMgMxEtfTxs0WxYZxEzh2fQOYAlvDvg143nYxZn?=
+ =?us-ascii?Q?QxIpzWB7Xn52/t9cjYFIpjYDwap9JpTNrb1t7c4hmJpgROfIZdEB7wJ/6EpI?=
+ =?us-ascii?Q?uBQux6w9fvRwZki3jTtW7JQ4AElgtvJ4Dtlbdjp1cU+6xCYde9swAVXO+qu+?=
+ =?us-ascii?Q?HuA+JtWduW24wbdAX8pVIor6WrY03lnrrWHDx+ac1NdgSQkzAK+FjP6VFxZ2?=
+ =?us-ascii?Q?8+OQMfk3hENQuevMBbegfoTv8vm73sitzq00Z1ft8WgzAA8iy9Ch?=
 X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2c48a104-c745-441e-2c70-08de90a67129
+X-MS-Exchange-CrossTenant-Network-Message-Id: b163252f-c520-46b7-6c45-08de90a67236
 X-MS-Exchange-CrossTenant-AuthSource: ZQ0PR01MB1208.CHNPR01.prod.partner.outlook.cn
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2026 10:56:07.2062
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2026 10:56:09.0238
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8Zss8ALPv8PjHiM+cPK183sw7Kcr1ErbrbGPvSS5UhnnyAzqOWNklhe+uvYSoPe4Z0/qqTNDw7X//KR7A6GLu6qH3wqaF4VZLkSz/VjBIXGSEM1y8uXLYvFcp6StYYEU
+X-MS-Exchange-CrossTenant-UserPrincipalName: P3NhVsMbKWKsFRjllVMFuhlJxB1+55sVZxC4QOH82UNDuhq+LoJfSTOFcsEhxA7UjEvpMnjTbZf1kEs+35zEBcmS6GvhkFQomG8nPc7r+PXj/u3NUgdRRhAC63H0vMBa
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQ0PR01MB1048
 X-Spamd-Result: default: False [5.04 / 15.00];
 	DMARC_POLICY_QUARANTINE(1.50)[starfivetech.com : SPF not aligned (relaxed), No valid DKIM,quarantine];
@@ -153,89 +153,52 @@ X-Spamd-Result: default: False [5.04 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_TO(0.00)[baylibre.com,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,pengutronix.de,esmil.dk,gmail.com];
-	GREYLIST(0.00)[pass,body];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274475-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274477-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[24];
-	FROM_HAS_DN(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.909];
+	FREEMAIL_TO(0.00)[baylibre.com,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,pengutronix.de,esmil.dk,gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	GREYLIST(0.00)[pass,body];
 	FROM_NEQ_ENVFROM(0.00)[changhuang.liang@starfivetech.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.916];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[starfivetech.com:email,starfivetech.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 91088388499
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 620FA38839F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Introduce inverter and divider for starfive clocks.
+Expand the storage of clock parent index for per0 domain, which parent
+index over 255. So change u8 to u16.
 
 Signed-off-by: Changhuang Liang <changhuang.liang@starfivetech.com>
 ---
- drivers/clk/starfive/clk-starfive-common.c | 12 ++++++++++++
- drivers/clk/starfive/clk-starfive-common.h |  8 ++++++++
- 2 files changed, 20 insertions(+)
+ drivers/clk/starfive/clk-starfive-common.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/clk/starfive/clk-starfive-common.c b/drivers/clk/starfive/clk-starfive-common.c
-index 9c0eb7a50d1e..d84b326c9aed 100644
---- a/drivers/clk/starfive/clk-starfive-common.c
-+++ b/drivers/clk/starfive/clk-starfive-common.c
-@@ -298,6 +298,15 @@ static const struct clk_ops starfive_clk_inv_ops = {
- 	.debug_init = starfive_clk_debug_init,
- };
- 
-+static const struct clk_ops starfive_clk_idiv_ops = {
-+	.get_phase = starfive_clk_get_phase,
-+	.set_phase = starfive_clk_set_phase,
-+	.recalc_rate = starfive_clk_recalc_rate,
-+	.determine_rate = starfive_clk_determine_rate,
-+	.set_rate = starfive_clk_set_rate,
-+	.debug_init = starfive_clk_debug_init,
-+};
-+
- const struct clk_ops *starfive_clk_ops(u32 max)
- {
- 	if (max & STARFIVE_CLK_DIV_MASK) {
-@@ -308,6 +317,9 @@ const struct clk_ops *starfive_clk_ops(u32 max)
- 		}
- 		if (max & STARFIVE_CLK_ENABLE)
- 			return &starfive_clk_gdiv_ops;
-+		else if (max & STARFIVE_CLK_INVERT)
-+			return &starfive_clk_idiv_ops;
-+
- 		if (max == STARFIVE_CLK_FRAC_MAX)
- 			return &starfive_clk_fdiv_ops;
- 		return &starfive_clk_div_ops;
 diff --git a/drivers/clk/starfive/clk-starfive-common.h b/drivers/clk/starfive/clk-starfive-common.h
-index a03824e9e75f..fd9bf6f20152 100644
+index fd9bf6f20152..8edc6c516451 100644
 --- a/drivers/clk/starfive/clk-starfive-common.h
 +++ b/drivers/clk/starfive/clk-starfive-common.h
-@@ -103,6 +103,14 @@ struct starfive_clk_data {
- 	.parents = { [0] = _parent },						\
- }
+@@ -26,7 +26,7 @@ struct starfive_clk_data {
+ 	const char *name;
+ 	unsigned long flags;
+ 	u32 max;
+-	u8 parents[4];
++	u16 parents[4];
+ };
  
-+#define STARFIVE_IDIV(_idx, _name, _flags, _max, _parent)			\
-+[_idx] = {									\
-+	.name = _name,								\
-+	.flags = _flags,							\
-+	.max = STARFIVE_CLK_INVERT | (_max),					\
-+	.parents = { [0] = _parent },						\
-+}
-+
- struct starfive_clk {
- 	struct clk_hw hw;
- 	unsigned int idx;
+ #define STARFIVE_GATE(_idx, _name, _flags, _parent)				\
 -- 
 2.25.1
 
