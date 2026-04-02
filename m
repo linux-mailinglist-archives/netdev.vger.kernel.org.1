@@ -1,191 +1,156 @@
-Return-Path: <netdev+bounces-274361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274363-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sMS4DnTvzWkzjQYAu9opvQ
-	(envelope-from <netdev+bounces-274361-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 06:24:20 +0200
+	id YNQHN+jvzWkzjQYAu9opvQ
+	(envelope-from <netdev+bounces-274363-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 06:26:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88B7B3838AA
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 06:24:19 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D985E383905
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 06:26:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2F0EB3043D36
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 04:15:49 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 6CFD530288A4
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 04:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 498E033E347;
-	Thu,  2 Apr 2026 04:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MZcgswfq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51657361670;
+	Thu,  2 Apr 2026 04:22:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A272314B62;
-	Thu,  2 Apr 2026 04:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8428635F193;
+	Thu,  2 Apr 2026 04:21:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775103348; cv=none; b=OYH90j6ED0aCcQBn/suhkNm1++4f69fKL13jVDSzEsNDEWPpZ++ofJ3BbKgVnP4/H8WfT7xdFJfxPt5Cruz2xIErGWi3UBcmEmaVeJh/lNGnZDITRV3J8RTnXH4VKGxWSaHq5j8e5jzKZf8LoHRD9/ur8TDPKriSAcL72RHW4FE=
+	t=1775103721; cv=none; b=kxJOVjbyHUl0sx7NH1+FB7r+rh4wNezGq2q2dAqR890euktMjMa7/t9xCx4EuhjN1XHuc4TckpZoGNYgMqd5P+7JxbLEZoEd98OGlncLM4rZbxA4PP3sA1gQETus4PHHsGF3LIS36odPGlw8VznVYmSFzyR3tUhAbTQbUmjkpBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775103348; c=relaxed/simple;
-	bh=XQJE4Gn0KfowgirQDluRqeuQqW/CPd193d46pEtgYBM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T2st7jxyNk1NIL3KWqlHvtFIbytSN/7RQmb5NTjKWohCZVfgG4vH9Y3d+tsB/r3vq/wZAsREwg6HRFkVjPJ8jr8CZSHNOjloKDAcUrv/BUG3c6+rw0qCYKKXo5Yq8TTlP3qLYEHm0qcefAZz3NZA/dRUh7OBpz+fN4cinrwBUNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MZcgswfq; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ad90b2a9-0f67-4796-94bc-9dbb76a575af@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775103344;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n5Io74XLqo3KNsgBYSXiYBVqhjr7FhR8/0nd+R5bTLU=;
-	b=MZcgswfqZ9iL6o+Q+tfn1Vy+DIC+L/Qt4TDqmK7oPt076dp+HIdN7SLrM7LbqA25ah72Up
-	V4hukdmWKqxWaJoaFvzri0feMqM+GVPcmQV5yBfPRTrJKGoaErOEcR2tEU8ikxr0cGDmSY
-	rvSkIXyEVEDsNKWWVlIO1raFA3OA8aY=
-Date: Thu, 2 Apr 2026 12:15:31 +0800
+	s=arc-20240116; t=1775103721; c=relaxed/simple;
+	bh=Ll+mejS5nwkcS0c9qW1Zj2uBUg2oi79+k8wAAp6wGS0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l8iR+tr7y3gl/JLToGaObVDJpfU2J3Yf/pV8pe5kDTb17n25cHJGPuZ+5B0bVYCuIMjsPtLP+RccvKfr5W62AyptnRKfmQeMiM0cD/BKrKalsHPZo0mmqGSnxmh+MjuTmTOplcSGmeuP385tup2CdOjGSn8Ur6qUcBWzfCx1CQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [111.196.245.197])
+	by APP-01 (Coremail) with SMTP id qwCowAAXvWjc7s1pfkzwCw--.800S2;
+	Thu, 02 Apr 2026 12:21:48 +0800 (CST)
+From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+To: netdev@vger.kernel.org
+Cc: Lars Poeschel <poeschel@lemonage.de>,
+	Duoming Zhou <duoming@zju.edu.cn>,
+	Rikard Falkeborn <rikard.falkeborn@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	pengpeng@iscas.ac.cn,
+	stable@vger.kernel.org
+Subject: [PATCH] nfc: pn533: allocate rx skb before consuming bytes
+Date: Thu,  2 Apr 2026 12:21:48 +0800
+Message-ID: <20260402042148.65251-1-pengpeng@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v1] net: skb: fix cross-cache free of KFENCE-allocated
- skb head
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Antonius <antonius@bluedragonsec.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jason Xing <kerneljasonxing@gmail.com>, Kuniyuki Iwashima
- <kuniyu@google.com>, Michal Luczaj <mhal@rbox.co>,
- Mina Almasry <almasrymina@google.com>, Eric Biggers <ebiggers@google.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Soheil Hassas Yeganeh <soheil@google.com>,
- Alexander Duyck <alexanderduyck@fb.com>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20260402033138.388574-1-jiayuan.chen@linux.dev>
- <CANn89iLdRZd-qO4tRpSGamHpggh=r5vM4xes5npYCnkwcNG89A@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <CANn89iLdRZd-qO4tRpSGamHpggh=r5vM4xes5npYCnkwcNG89A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-CM-TRANSID:qwCowAAXvWjc7s1pfkzwCw--.800S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZryUuFWruFyxKFy5Jw43ZFb_yoW8Ar17pF
+	Z3GF1rtryUXr47JwsrCw1rWFy5Ca4kAFWrGrWvka47urn3JFW3GFWaga42vFZ5XFWkXF4a
+	vFWDXF48CFyrua7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUGVWUXwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
+	AVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
+	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JU-0eJUUU
+	UU=
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274361-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-274363-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,bluedragonsec.com,davemloft.net,kernel.org,redhat.com,gmail.com,google.com,rbox.co,fb.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lemonage.de,zju.edu.cn,gmail.com,vger.kernel.org,iscas.ac.cn];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.960];
+	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
-X-Rspamd-Queue-Id: 88B7B3838AA
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,iscas.ac.cn:email,iscas.ac.cn:mid]
+X-Rspamd-Queue-Id: D985E383905
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+pn532_receive_buf() reports the number of accepted bytes to the serdev
+core. The current code consumes bytes into recv_skb and may already
+hand a complete frame to pn533_recv_frame() before allocating a fresh
+receive buffer.
 
-On 4/2/26 12:01 PM, Eric Dumazet wrote:
-> On Wed, Apr 1, 2026 at 8:32 PM Jiayuan Chen <jiayuan.chen@linux.dev> wrote:
->> SKB_SMALL_HEAD_CACHE_SIZE is intentionally set to a non-power-of-2
->> value (e.g. 704 on x86_64) to avoid collisions with generic kmalloc
->> bucket sizes. This ensures that skb_kfree_head() can reliably use
->> skb_end_offset to distinguish skb heads allocated from
->> skb_small_head_cache vs. generic kmalloc caches.
->>
->> However, when KFENCE is enabled, kfence_ksize() returns the exact
->> requested allocation size instead of the slab bucket size. If a caller
->> (e.g. bpf_test_init) allocates skb head data via kzalloc() and the
->> requested size happens to equal SKB_SMALL_HEAD_CACHE_SIZE, then
->> slab_build_skb() → ksize() returns that exact value. After subtracting
->> skb_shared_info overhead, skb_end_offset ends up matching
->> SKB_SMALL_HEAD_HEADROOM, causing skb_kfree_head() to incorrectly free
->> the object to skb_small_head_cache instead of back to the original
->> kmalloc cache, resulting in a slab cross-cache free:
->>
->>    kmem_cache_free(skbuff_small_head): Wrong slab cache. Expected
->>    skbuff_small_head but got kmalloc-1k
->>
->> Fix this by adding an is_kfence_address() check in skb_kfree_head().
->> When the head is a KFENCE object, we skip the kmem_cache_free() path
->> and fall through to kfree(), which correctly handles KFENCE objects
->> via kfence_free(). The check compiles away when CONFIG_KFENCE is
->> disabled.
->>
->> Fixes: bf9f1baa279f ("net: add dedicated kmem_cache for typical/small skb->head")
->> Reported-by: Antonius <antonius@bluedragonsec.com>
->> Closes: https://lore.kernel.org/netdev/CAK8a0jxC5L5N7hq-DT2_NhUyjBxrPocoiDazzsBk4TGgT1r4-A@mail.gmail.com/
->> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
->> ---
->>   net/core/skbuff.c | 4 +++-
->>   1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
->> index 0e217041958a..87cecd40381b 100644
->> --- a/net/core/skbuff.c
->> +++ b/net/core/skbuff.c
->> @@ -91,6 +91,7 @@
->>   #include <linux/user_namespace.h>
->>   #include <linux/indirect_call_wrapper.h>
->>   #include <linux/textsearch.h>
->> +#include <linux/kfence.h>
->>
->>   #include "dev.h"
->>   #include "devmem.h"
->> @@ -1083,7 +1084,8 @@ static int skb_pp_frag_ref(struct sk_buff *skb)
->>
->>   static void skb_kfree_head(void *head, unsigned int end_offset)
->>   {
->> -       if (end_offset == SKB_SMALL_HEAD_HEADROOM)
->> +       if (end_offset == SKB_SMALL_HEAD_HEADROOM &&
->> +           !is_kfence_address(head))
->>                  kmem_cache_free(net_hotdata.skb_small_head_cache, head);
->>          else
->>                  kfree(head);
-> Oh well, time to simply call kfree(head) ?
->
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index 3d6978dd0aa83f63984b994359d0c914c6427a00..6b35aed23b8936409f6b0d4ee8d378f726c569c6
-> 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -1072,10 +1072,7 @@ static int skb_pp_frag_ref(struct sk_buff *skb)
->
->   static void skb_kfree_head(void *head, unsigned int end_offset)
->   {
-> -       if (end_offset == SKB_SMALL_HEAD_HEADROOM)
-> -               kmem_cache_free(net_hotdata.skb_small_head_cache, head);
-> -       else
-> -               kfree(head);
-> +       kfree(head);
->   }
->
->   static void skb_free_head(struct sk_buff *skb)
+If that alloc_skb() fails, the callback returns 0 even though it has
+already consumed bytes, and it leaves recv_skb as NULL for the next
+receive callback. That breaks the receive_buf() accounting contract and
+can also lead to a NULL dereference on the next skb_put_u8().
 
+Allocate the receive skb lazily before consuming the next byte instead.
+If allocation fails, return the number of bytes already accepted.
 
-If we no longer care about the cost of accessing a struct page in the
-free path, which the original commit was trying to avoid, this is
-indeed the simplest fix — kfree() correctly handles objects via 
-virt_to_slab.
+Fixes: c656aa4c27b1 ("nfc: pn533: add UART phy driver")
+Cc: stable@vger.kernel.org
+
+Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
+---
+ drivers/nfc/pn533/uart.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/nfc/pn533/uart.c b/drivers/nfc/pn533/uart.c
+index 6d2f520a5bc8..412d341602aa 100644
+--- a/drivers/nfc/pn533/uart.c
++++ b/drivers/nfc/pn533/uart.c
+@@ -211,14 +211,19 @@ static size_t pn532_receive_buf(struct serdev_device *serdev,
+ 
+ 	timer_delete(&dev->cmd_timeout);
+ 	for (i = 0; i < count; i++) {
++		if (!dev->recv_skb) {
++			dev->recv_skb = alloc_skb(PN532_UART_SKB_BUFF_LEN,
++						  GFP_KERNEL);
++			if (!dev->recv_skb)
++				return i;
++		}
++
+ 		skb_put_u8(dev->recv_skb, *data++);
+ 		if (!pn532_uart_rx_is_frame(dev->recv_skb))
+ 			continue;
+ 
+ 		pn533_recv_frame(dev->priv, dev->recv_skb, 0);
+-		dev->recv_skb = alloc_skb(PN532_UART_SKB_BUFF_LEN, GFP_KERNEL);
+-		if (!dev->recv_skb)
+-			return 0;
++		dev->recv_skb = NULL;
+ 	}
+ 
+ 	return i;
+-- 
+2.50.1 (Apple Git-155)
 
 
