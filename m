@@ -1,151 +1,209 @@
-Return-Path: <netdev+bounces-274651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274652-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eI9jJsuyzml+pQYAu9opvQ
-	(envelope-from <netdev+bounces-274651-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:17:47 +0200
+	id gEI0E6W0zmlVpgYAu9opvQ
+	(envelope-from <netdev+bounces-274652-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:25:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1331838CFF2
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:17:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECC9D38D0FD
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 20:25:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ECA37301CFD7
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 18:17:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 890473016CBE
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 18:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C0436C0CB;
-	Thu,  2 Apr 2026 18:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fX77Y+Kf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98337372EE3;
+	Thu,  2 Apr 2026 18:22:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9376F35F8B7
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 18:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775153863; cv=pass; b=OynKjs9e033PQ1IqFOde42Mm3pmsNZEhlMnJRmKedKw/lzgYUSLay+KeK2D05RBgLifZTR8XD3H3Qvp70/HUll05pimHyKEseJBbr5xzG9EzLzt8GJKfEnsT0H71F6oqzSxnVytH+UaxqMn//WW1wyK3SofLQwUelGZec4pSmiA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775153863; c=relaxed/simple;
-	bh=UzeTID8TvfzRO0ZTqLHzXNSmnUg5WytpFzJJVtQy7Ds=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sPTkWUZIC4cDMANpad1i4dClkSbx8MnL+P/xKQtNlYJ6jUFnFkuqEIcLw/HdIWxuynszaoTKDlGsyoAMP+v5GnKlqPf0AjuzTfcbpquBKW/CEsFkoG0vLg2qaf+g+4bJdc3FcLjHPh91IBKRc0b6/tkFmpjvDQ9RuEfcmGsWjmc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fX77Y+Kf; arc=pass smtp.client-ip=209.85.167.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-4645dde00a7so1737408b6e.1
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 11:17:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775153861; cv=none;
-        d=google.com; s=arc-20240605;
-        b=IgTxvd2GnU3hSgljMtrCbND9BoEbNKHjWXVmol+ELgsNIcgdP7dtjRKPNGIH44rU/R
-         h0zmPY04E8OAEqiaOXq11XzV1MruOzltuer8H1ZQIDAvtF1gMNLbDL8CbTXdK+6zoPbA
-         WNUw7TbCFHhnaWt2UNPYo6tXBNApBMk2OTj8R90rrGKv2DfoQnEcBESeodF/1xaZkcCd
-         +U4BZLJUi4ocS4gDJ5FRD59E89BREUp6opTsxl5U7Gjvcr+hmcbH+6SsOKJjFT2ePo9n
-         rkx4kSBEakICWtm0hF10j6CwwPKsKGPT3vqG4BMVsYa7RLsOnW8YbiyH8x/OJTwlpRyB
-         RwNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=UzeTID8TvfzRO0ZTqLHzXNSmnUg5WytpFzJJVtQy7Ds=;
-        fh=sL/NF5ryEgfLDVRgfuubhZOHXFp10eyxR/kEIprmbi8=;
-        b=iq6wj2r0aBIoOFT8IuCd4EFsK9wroI0RyvIUmjPb8EYCgg0yGnst38zdcj1qwpZ2id
-         UQ4MzAkno0bROL9hM5obxHwPrtbaChpWg9PnueDOObxK6W9W9qR2cJv7o1wTPddOAdsx
-         WqQCk6BhgLvITUu7P1JaJhesUm1GA2G/DgaDjqlBspLMfOYzKoZi4SUBSsgOUxPSKOzQ
-         2RcrQxVSgONLaX/ccYALc3jQg30GqlKwnXkC17pIdqdE2HfPFA1pim2LCU7a/WC3D8Wd
-         jlWh8HN0DW5GrFeJ4ALJwHIS0cqo73/oucQAyIPC7VTZFMNKn76rzoVAa6E/2OzrRqAd
-         U4Tw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775153861; x=1775758661; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=UzeTID8TvfzRO0ZTqLHzXNSmnUg5WytpFzJJVtQy7Ds=;
-        b=fX77Y+KffVQcJIsC5buewyfb7wmNnBc/6SeoYd+Bf3T8dW/W+Xp9zmiZU++yisJqHT
-         znB7RhMm//OlcqG2y4VDb7FIcfQYfd62gf0Ak3o4oygD+WUsO6EntN34kKoiFE4iSoqo
-         KGJYG1R86BV8IePQICWCIeK5tYASLjcYGchV9xzytStjm1dQN8sxCkl+agCS4wdf3oYM
-         ndac8SZ217J3iA748zVqj/cjqntXp0S31IWvrNSCTje0uiAyeBr9rbXU+MECBlUvXyEz
-         XoC0FtJ6LHkuYfxIBZ4jVbmj9BBTvL2ml7M0AEpxki5vgr0xn8zjXcUxRwe4PuaTFFUD
-         yRvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775153861; x=1775758661;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UzeTID8TvfzRO0ZTqLHzXNSmnUg5WytpFzJJVtQy7Ds=;
-        b=FrJ5wI6CMgTTsQMuAYE9XLE6/evEAIGLOwKNMhXyEoU4M0RXM88QeSWBfcFJk0v9cJ
-         RkOBso+nJGk2CvpLmw0+ufMfDW41HgGnMAafnYwrWoA6dtW473ulOxm6ojRyLa47PIGd
-         pB+3drTL5UMobMrmUyHHs7D96EVqKsIVKsDejS8ibIPvQPfMz2by0INhGTlavokz58rq
-         wEVMHJs1Y4CHxEml6lDF8kVdM+SjuViEgLz+g/EKUZ0hCNOF9RMYMzP6NytU1Ncw2W2q
-         Yny+Jq9DVplRMl1RdbGwzGHNfPCJKLItHGJkdH2HYvXu/2xYz0vp6hvVN4tu7FXYIPRW
-         xknQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWD6MZDwciuryxJUd0jddflSisMXljGMlFJizcvXQhMLUiHICRfXbfXdGh8Lw090fe6v+Y0KeY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymsSRyQrIlJarmNCSQJrE8XJDdpri5ix4WPtaJZ12rK+8OMEEM
-	uvx4Pv2cVfPonP90MX/25DVkTOf9NwNb7EzBKWv1LmGqSLKXwGAjsUoqAO+sZcWEUIfTZzTepeX
-	lmdTT2Q/RDqsKakCZZ0WOzyY4GV9VQ54=
-X-Gm-Gg: ATEYQzyGd5il8cP5yRXLxwiyFbtn4m+Nla+epqe8G0K83ewNDBbMlQK9LKwCJ7xRWIN
-	0eyyw1Xyg2Y5idLHMwPN++zfnhGnhR48i2QnY1CsxUcgl9uHW6eaef+KouqZhnRfF67ymZarXvO
-	s2dDubyAtiB6QZh5r2vdHy5ayBBYbKhPFX0IKj5FhfjUnfImwGGYJeFF6gqzPGX1J4h4eC+kJTr
-	cmwVRGDLTffZYh2N/y9R7Aic9qnc/c14rJzWpV+COvV4QMGKIvFXAxXUhC2PPzlqKGEsdL+sP9O
-	NO2oEp9HKoUmx1HXwMbB29Jn6NMvAFZUR3nrsK31w6S7TmdS5tVJFNJOTlsB8y1r6o9KghyjFj9
-	mSWEmxaWi5UFVLO4ynCw56Nw=
-X-Received: by 2002:a05:6820:5389:b0:67d:875d:c83a with SMTP id
- 006d021491bc7-680f7e9625dmr1265844eaf.7.1775153861359; Thu, 02 Apr 2026
- 11:17:41 -0700 (PDT)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C484248896;
+	Thu,  2 Apr 2026 18:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.175.55.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775154120; cv=none; b=as9h8KgHEBJSWq9KmJYkpoknT4U9lcI9s8pomuZqOH9GoMxutVe8Cqqdlfi5DO+Y1lRC3ut0tfQKNiXsRVOMivGjIYD7SzHDqlqUvRz2r3TFTn4ewWfx18mdiVXxTJdPNghLUHPonSSwT/Wzu07RbF2Z1rMqLEQ5+6ZtWCAsLjI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775154120; c=relaxed/simple;
+	bh=lgoNUTaJxhgyGzRY56yJE0E1UczL7zUgigOg63Ad6Oo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GZnMdwHKg4HFsxG+V75LuhFCbiWi2/kJ6qOLo7KielfqdUR0+fc3StiS1oW6H7eC+1X0oMvJtOsmy7p7qnBIqR50xiXG8GvleW0r1sta7LjUnW6P/Vi2Vz2I/cMulu2K4CKJi48/cBFl2WcCiOzXcUA6zg63QbXw/QoYjSZz1bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.175.55.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowADXTwCes85pe3ehAA--.36831S2;
+	Fri, 03 Apr 2026 02:21:18 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: pablo@netfilter.org,
+	fw@strlen.de,
+	phil@nwl.cc,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	yasuyuki.kozakai@toshiba.co.jp,
+	kaber@trash.net,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	z1652074432@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH v3] netfilter: xt_multiport: validate range encoding in checkentry
+Date: Fri,  3 Apr 2026 02:21:17 +0800
+Message-ID: <d5c0d106e724c732436b985dd694272bcb813bb1.1775153311.git.n05ec@lzu.edu.cn>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1774624314.git.n05ec@lzu.edu.cn>
+References: <cover.1774624314.git.n05ec@lzu.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260328213338.450601-1-nickgarlis@gmail.com> <20260401194553.6e8a17f8@kernel.org>
- <CA+jwDR=9UgxAW828FF4geu8RukGyi7OLTS0ShVr4S8-36SWamw@mail.gmail.com> <CAAVpQUDPjpiC_rSx+ry5o0KLfEWPg4VEiN60ihkF9NwrOX_n1Q@mail.gmail.com>
-In-Reply-To: <CAAVpQUDPjpiC_rSx+ry5o0KLfEWPg4VEiN60ihkF9NwrOX_n1Q@mail.gmail.com>
-From: Nikolaos Gkarlis <nickgarlis@gmail.com>
-Date: Thu, 2 Apr 2026 20:17:29 +0200
-X-Gm-Features: AQROBzBTKSioxvYB4_7DPPTf352Ak5A8VJCWJYz8m1Qyx-oGr2jJNXzJoXtvF3E
-Message-ID: <CA+jwDRkFfhVC561ob10p_ZitbcpgZ7_uq+AVgM9efB9twoXgZA@mail.gmail.com>
-Subject: Re: [PATCH net v4] rtnetlink: add missing netlink_ns_capable() check
- for peer netns
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowADXTwCes85pe3ehAA--.36831S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxZw45Cw4UuF45ur18uF45Wrg_yoW5uryfpa
+	y5GF15GrWkXFWaqFs2yr1kJF15Cr4kJw48ua43G347trsxWrykta1rtF9FvFs8Jry5CFW8
+	JF4q9rn0kw15u37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVWUJVWUCwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
+	jsIE14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJwAS0I0E0xvYzx
+	vE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	JVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
+	AKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x02
+	62kKe7AKxVW8ZVWrXwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaV
+	Av8VW8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRpOJnUUUUU=
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQQFCWnOkPwA0AADsR
+X-Spamd-Result: default: False [0.04 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274651-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274652-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,toshiba.co.jp,trash.net,gmail.com,lzu.edu.cn];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nickgarlis@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.991];
+	TO_DN_NONE(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1331838CFF2
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lzu.edu.cn:email,lzu.edu.cn:mid]
+X-Rspamd-Queue-Id: ECC9D38D0FD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-> Let's focus on the fix in net.git.
+ports_match_v1() treats any non-zero pflags entry as the start of a
+port range and unconditionally consumes the next ports[] element as
+the range end.
 
-> Also, I don't want to hide rtnl_nets_add() in a helper.
+The checkentry path currently validates protocol, flags and count, but
+it does not validate the range encoding itself. As a result, malformed
+rules can mark the last slot as a range start or place two range starts
+back to back, leaving ports_match_v1() to step past the last valid
+ports[] element while interpreting the rule.
 
-I've now submitted v5. Thanks for reviewing, and apologies
-for the detour.
+Reject malformed multiport v1 rules in checkentry by validating that
+each range start has a following element and that the following element
+is not itself marked as another range start.
+
+Fixes: a89ecb6a2ef7 ("[NETFILTER]: x_tables: unify IPv4/IPv6 multiport match")
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Yuhang Zheng <z1652074432@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+---
+Changes in v2:
+- drop the selftest patch
+- send the fix publicly to netfilter-devel
+
+Changes in v3:
+- drop datatype cleanup from the fix
+- keep the original check() interface unchanged
+- validate malformed range encoding in checkentry
+
+ net/netfilter/xt_multiport.c | 30 ++++++++++++++++++++++++++----
+ 1 file changed, 26 insertions(+), 4 deletions(-)
+
+diff --git a/net/netfilter/xt_multiport.c b/net/netfilter/xt_multiport.c
+index 44a00f5acde8..07a0f2a3fc75 100644
+--- a/net/netfilter/xt_multiport.c
++++ b/net/netfilter/xt_multiport.c
+@@ -105,6 +105,24 @@ multiport_mt(const struct sk_buff *skb, struct xt_action_param *par)
+ 	return ports_match_v1(multiinfo, ntohs(pptr[0]), ntohs(pptr[1]));
+ }
+ 
++static inline bool
++multiport_valid_ranges(const struct xt_multiport_v1 *multiinfo)
++{
++	unsigned int i;
++
++	for (i = 0; i < multiinfo->count; i++) {
++		if (!multiinfo->pflags[i])
++			continue;
++
++		if (i + 1 >= multiinfo->count || multiinfo->pflags[i + 1])
++			return false;
++
++		i++;
++	}
++
++	return true;
++}
++
+ static inline bool
+ check(u_int16_t proto,
+       u_int8_t ip_invflags,
+@@ -127,8 +145,10 @@ static int multiport_mt_check(const struct xt_mtchk_param *par)
+ 	const struct ipt_ip *ip = par->entryinfo;
+ 	const struct xt_multiport_v1 *multiinfo = par->matchinfo;
+ 
+-	return check(ip->proto, ip->invflags, multiinfo->flags,
+-		     multiinfo->count) ? 0 : -EINVAL;
++	if (!check(ip->proto, ip->invflags, multiinfo->flags, multiinfo->count))
++		return -EINVAL;
++
++	return multiport_valid_ranges(multiinfo) ? 0 : -EINVAL;
+ }
+ 
+ static int multiport_mt6_check(const struct xt_mtchk_param *par)
+@@ -136,8 +156,10 @@ static int multiport_mt6_check(const struct xt_mtchk_param *par)
+ 	const struct ip6t_ip6 *ip = par->entryinfo;
+ 	const struct xt_multiport_v1 *multiinfo = par->matchinfo;
+ 
+-	return check(ip->proto, ip->invflags, multiinfo->flags,
+-		     multiinfo->count) ? 0 : -EINVAL;
++	if (!check(ip->proto, ip->invflags, multiinfo->flags, multiinfo->count))
++		return -EINVAL;
++
++	return multiport_valid_ranges(multiinfo) ? 0 : -EINVAL;
+ }
+ 
+ static struct xt_match multiport_mt_reg[] __read_mostly = {
+-- 
+2.51.0
+
 
