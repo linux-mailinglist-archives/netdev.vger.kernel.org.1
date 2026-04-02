@@ -1,162 +1,120 @@
-Return-Path: <netdev+bounces-274366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274367-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wEw0Hon4zWmrjwYAu9opvQ
-	(envelope-from <netdev+bounces-274366-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 07:03:05 +0200
+	id AK3aBGH5zWkdkAYAu9opvQ
+	(envelope-from <netdev+bounces-274367-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 07:06:41 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF75A383CFF
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 07:03:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A20E383D80
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 07:06:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BAF5C301B70B
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 05:02:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DAFD93012C53
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 05:04:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A2C314A60;
-	Thu,  2 Apr 2026 05:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 565BD54726;
+	Thu,  2 Apr 2026 05:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qlpe3Re6"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pRm30Ak+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DA9242D70
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 05:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77BF1A681B;
+	Thu,  2 Apr 2026 05:04:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775106133; cv=none; b=Hr6Jr9vS/T4xm1jnZFK51GyI2ZPLtCWnkkuqqyIJQHEShZRCFf9+b73MRuJ/bgLS0iX99D9MOC0ojrMNQLP9ABJGqgsqOIft202/LlCof7HLq0NLj/gg4a2S60G8KXiONstNE5hsrmohyaz6xTjaoaUm6WdZpUo4+tl3GkRDzBU=
+	t=1775106274; cv=none; b=PJPtm5xXaRwSxIY9CnlmDX1d6CGV2ewni8LR7uPT9AHRG/oXSHKRH6/TJyCdCstCrNXJimfd9cvNZHR57i7j7anwOkykHrjQsf1N/VRObNTXzR9WWs2gWySqjGXnGCoBPPk0b4he4BHAN47fl0E2Mp809YxFLBtOTqi+XZupDrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775106133; c=relaxed/simple;
-	bh=kaIriRj9Y96gVgW0M11CaZWr9mXieT69sbGTACNa2Kg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EIIZWorwsl2+/1TOGdUKP0O/ddhhEPepnD2KYAw+mZ6gD45iH9lUCFhbjbZuVsNDxcI//hgWgyGkKM5AnOlPcsYFCq1TwVdUUPOgnxZ1cnaPgqLRKGOo5CMhYxxYG/RK24QPgvNXHsYGiwt5uPG3jTlV96fnEUwPukzjnJ+BTNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qlpe3Re6; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775106115;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=GVUkhJyGAtL71Hz+teyMzQ1MPLUD8PLTuR8Ajua73K8=;
-	b=Qlpe3Re6gnDb63O5DY4YR+3DocRmh/nSMOG+THwa4f+b4GuhE/3nmDqLLtcDHaYPxXKyXS
-	AaI39Xyuslfqmby0TtwNm1NbuPjWkne5L4wTr5K6Zj/JBHTtMdYB822+SS1e6R/FzNf7uJ
-	7byaUgp47amZV9jNdlLvke3u7eEI8O0=
-From: Qingfang Deng <qingfang.deng@linux.dev>
-To: linux-ppp@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Qingfang Deng <qingfang.deng@linux.dev>,
-	Julian Braha <julianbraha@gmail.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Paul Mackerras <paulus@ozlabs.org>,
-	Dianne Skoll <dianne@skoll.ca>,
-	Jaco Kroon <jaco@uls.co.za>,
-	James Carlson <carlsonj@workingcode.com>
-Subject: [PATCH net-next v2] ppp: update Kconfig help message
-Date: Thu,  2 Apr 2026 13:00:50 +0800
-Message-ID: <20260402050053.144250-1-qingfang.deng@linux.dev>
+	s=arc-20240116; t=1775106274; c=relaxed/simple;
+	bh=qHaVVJcbhhys6SFB3R6XegUnjydo9F6y85Zqwp2/F+I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GpR4h4E/slD0Y5LwiOKaWo8YKNZeCWjqS3irJptxnZ/bj5rpCfKV64IWA40gG4rD9v22YWtLFW9GKIya1io5XpJbo/llv5L/gITATM6+Y4CreSQ0iTM7xC9mvqHfxL2y/VLzKFlohE+Vs66VXVXLRc27QyswpbBYlNrBGtrGw0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=pRm30Ak+; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=MHuWa9gjO/UjPCeuOgu73Q8GftjCDqIODtwfGH0CU/c=; b=pRm30Ak+86fJXgU4tJ9BbBzh/Y
+	xusbtW4s9Ot4n28Nqik4KKRJeQVRcvO8Wrc19yRqD9dbKHkV/Q3jxmMDqu/Ct4TMt5U0LtQ7j/H6S
+	6Xl3dNmhp+jrvblVQJ428GHvtGCcgv4Tt0QHGbgR5SQZwvfQfGwy/8x9uedTFymelVWzJoZLO0mYS
+	tVm0Rj2uXjmKwB1eklUtZYcPrbJttAWwl+sHeuE2BlDPIqtJ9na10z8A0OSvK2Om0wm0AggTnTkv2
+	J+L82XPS6+vwbYblSMVTtbWXXRErbPN8lsE7uZncbiC6BdyXelbneYa40p/mPxgHMSitnFlecxVx4
+	A9t1wqxg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1w8AEB-0000000Gn6i-1O9w;
+	Thu, 02 Apr 2026 05:04:23 +0000
+Date: Wed, 1 Apr 2026 22:04:23 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Pranjal Shrivastava <praan@google.com>
+Cc: trond.myklebust@hammerspace.com, anna@kernel.org, davem@davemloft.net,
+	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
+	chuck.lever@oracle.com, jlayton@kernel.org, tom@talpey.com,
+	okorniev@redhat.com, neil@brown.name, dai.ngo@oracle.com,
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH 3/4] nfs: make nfs_page pin-aware
+Message-ID: <ac341x4RXKoShXsB@infradead.org>
+References: <20260401194501.2269200-1-praan@google.com>
+ <20260401194501.2269200-4-praan@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260401194501.2269200-4-praan@google.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[infradead.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[infradead.org:s=bombadil.20210309];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274366-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274367-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,linux.dev,gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	DKIM_TRACE(0.00)[infradead.org:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	FROM_NEQ_ENVFROM(0.00)[hch@infradead.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,skoll.ca:url,tldp.org:url,roaringpenguin.com:url,samba.org:url]
-X-Rspamd-Queue-Id: CF75A383CFF
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,infradead.org:dkim,infradead.org:mid]
+X-Rspamd-Queue-Id: 6A20E383D80
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Both links of the PPPoE section are no longer valid, and the CVS version
-is no longer relevant.
+This conversion really should go first as it is badly needed independent
+of any P2P support.  And I wonder if it should go further - currently
+the NFS I/O code is using folios for buffered I/O, but pages for direct
+I/O, which makes larger I/O very inefficient.
 
-- Replace the TLDP URL with the pppd project homepage.
-- Update pppd version requirement for PPPoE.
-- Update RP-PPPoE project homepage, and clarify that it's only needed
-  for server mode.
+The iov_iter_extract_bvecs wrapper allows to extract bvecs instead, which
+might be a good choice here either by passing down the bvecs or
+converting to an nfs_page inline.  Or just open coding a variant of
+iov_iter_extract_bvecs that converts to nfs_page structures instead of
+bvecs.  This would pair with a helper similar to __bio_release_pages on
+the unlock side.
 
-Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
----
-v2:
- - replace TLDP URL with pppd homepage
- - update pppd version requirement
- - document that rp-pppoe is only required for server
- https://lore.kernel.org/netdev/20260331033303.5664-1-dqfext@gmail.com/
+> +			req = nfs_page_create_from_page(dreq->ctx, pagevec[i], false,
+>  							pgbase, pos, req_len);
+>
 
- drivers/net/ppp/Kconfig | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ppp/Kconfig b/drivers/net/ppp/Kconfig
-index f57fba84fe55..753354b4e36c 100644
---- a/drivers/net/ppp/Kconfig
-+++ b/drivers/net/ppp/Kconfig
-@@ -13,10 +13,9 @@ config PPP
- 	  otherwise you can't use it; most Internet access providers these
- 	  days support PPP rather than SLIP.
- 
--	  To use PPP, you need an additional program called pppd as described
--	  in the PPP-HOWTO, available at
--	  <http://www.tldp.org/docs.html#howto>.  Make sure that you have
--	  the version of pppd recommended in <file:Documentation/Changes>.
-+	  To use PPP, you need an additional program called pppd, available at
-+	  <https://ppp.samba.org>.  Make sure that you have the version of pppd
-+	  recommended in <file:Documentation/Changes>.
- 	  The PPP option enlarges your kernel by about 16 KB.
- 
- 	  There are actually two versions of PPP: the traditional PPP for
-@@ -116,11 +115,10 @@ config PPPOE
- 	help
- 	  Support for PPP over Ethernet.
- 
--	  This driver requires the latest version of pppd from the CVS
--	  repository at cvs.samba.org.  Alternatively, see the
--	  RoaringPenguin package (<http://www.roaringpenguin.com/pppoe>)
--	  which contains instruction on how to use this driver (under
--	  the heading "Kernel mode PPPoE").
-+	  To work in client mode, pppd version 2.4.2 or later is required.
-+	  To work in server mode, the pppoe-server command from the RP-PPPoE
-+	  package is also required, available at
-+	  <https://dianne.skoll.ca/projects/rp-pppoe/>.
- 
- choice
- 	prompt "Number of PPPoE hash bits"
--- 
-2.43.0
+A lot of this code reads pretty odd as it's overflowing the lines.
 
 
