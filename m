@@ -1,76 +1,77 @@
-Return-Path: <netdev+bounces-274725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274726-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oEHlECv0zmmzsAYAu9opvQ
-	(envelope-from <netdev+bounces-274725-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 00:56:43 +0200
+	id iEqMNzr0zmmzsAYAu9opvQ
+	(envelope-from <netdev+bounces-274726-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 00:56:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCA6638EE8A
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 00:56:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 40B8938EE99
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 00:56:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 00731303604C
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 22:55:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4958B303D309
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 22:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BD43D47C1;
-	Thu,  2 Apr 2026 22:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA35D3D47C1;
+	Thu,  2 Apr 2026 22:55:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E279436B071
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 22:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF80431E82A
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 22:55:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775170541; cv=none; b=ddnBNqJ4DnhtJr8tDl3+C8sqLvNojEaEQr4j0Hz5/q5rg2gLB+ocjfeimv6EYL7WAz9+JvVQtqgJqE9UqFSuT7xbrj8z7jHb+TgEhQXvjq0c+wkpyMEGzbbXcwebnORMHKlIwOeZYRTDTqxujpudv3wLftY7B5ckfBRu1/bqEKM=
+	t=1775170543; cv=none; b=mx3KchVZyBnJ0w5dax0muz8qSYzKWqPYz6D7P9dyX+kgh3kAlP4EfmoIs5dO5a04+JWKy6AgwyRq2JGs7PxNF81+/lVQpX2TTXnxSOFf7rlbRAsR2x7isH3IyX42/52ypZU28oNRMnBBmb0Wk7OOFEjgOaXB0XdSIFPPS4VEGc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775170541; c=relaxed/simple;
-	bh=ANN9pZ4lTIra6N6XGBnco0GKEh5uZh3Vq7wWaEUMM+I=;
+	s=arc-20240116; t=1775170543; c=relaxed/simple;
+	bh=i51jXvUiNab45g+OHZ6Ylm1arF2Y7OEsAKtK/0SWZj8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nJj3oKp5y4JSPIdRTD8xcGsVr7b3MhChH/vKYRQaJQis8Jl9EVBvv60jBu6KBNiVTOXfEvM0tODQ8AYKAzpfwaFFjDsF0RuVY2h6s9HvmOwRXRQBHKJnp5pridQxDPRJjVS2dYVbQGihkw95wIyBBetsRgIud4cz7HHaRuLlCc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.82.48
+	 MIME-Version; b=nDX/u2aJuJ1KY3v1QyxneKVnQgxrR9NQCw8Dv/OG4myQsUOlGM3mgvo07MbWDRsH1LHTDzbIHnBEDIfORGpU9w7WYqpqo6Ib+i5xHr6rpAjZbyqhhF70T6M2msqF1xzwAVchmnFO9zlnzi64oVie8kZ252Qfn5JDOnrJ8vWgyPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=74.125.82.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-12732165d1eso2153436c88.1
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 15:55:39 -0700 (PDT)
+Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2cc1534e026so154859eec.1
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 15:55:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775170539; x=1775775339;
+        d=1e100.net; s=20251104; t=1775170540; x=1775775340;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=P9w/BuaZmYhmJN2gKcL1+JpLnjDrEUZ4KI6CsaRHwvo=;
-        b=H2T+UjlCY3wf/VD8PuaXdAGHr2GeEhkbyh5tItIGzqkhkMv+R7l5JRr3cUi0YqNsEv
-         +6Za+ZWaYszSYvF5Hjf0wvs1EFo4IvE4Izuy/ZetYEN1QssCmqrZ9WE1R2avvbNDdxC3
-         j8OMC7DEbtg+AgN7RPMnU3kjcjHiMoW8VWH6c/LxIsx2YjKn5Tz068ehwcWxr7Gj4tOf
-         qeOdaAXLUvUNVFJvEcEp9/CKaQxv7nyhedZJPrhzl69D+LI1O5LhGyWzWiM85G/xSKuI
-         PxI12KI6GQ02BMGgnF1PdwyhbIn1KMOj85/yvDands8BOzoj7fEemOwDhPkoQnmqMSE6
-         Bs/A==
-X-Gm-Message-State: AOJu0YzSCVFNVSvnNxNh6+8+8Wx3UI5t6230Je9U2nc5iQ43kwKUxa1D
-	nLJ9TN8PwaAjecAq6mYx9+0HwltViTShk9QL/u0K6/LIcPNEgxjlF1nJEXDn
-X-Gm-Gg: ATEYQzw0ETT9rlWxOiwo4aYBYvzojp/atkjitX+Z8tdLNrexMCSI6eNWnlrpfKsxkzU
-	qdr+EyDKclmR9vGpLNoAboAKLyDfAkv6uXK2RKLUUAUJWHv4mT5090LRtY8M/ne6abyn0r7b5As
-	twugt09ikeQKpJ963ZnXkYjeNoy3xB9vNdsqiNK0Jghud4xoXpG7G+Y9xsLNkmKjgyEsVVolDf6
-	MH30olVxbieUkpKFS8v9Cir3ve8JtJ32F9gYgTXYZdhmS7HcU3jbqsWdU2zdCU+NknY8ss1s3nE
-	vLzOS+HOnzchMtq5yCuOn16R5HFXP4Ot496KDHTujCeRngeGOFAdUl63JCODbY6khv30GDELT/m
-	7yk6sMsBXp0Vc0D8Bk2W0EZF/P/5bgDdU+V4ZcDqqDonGsEBILFkgUJQiLvzqoJNfHJR5VhBWmV
-	TTn94amx8/K1nFGRK9JirP+wh0yvlFKCe4Z6MkL/MjVh4wBYHG4gv3VhgmfJ+4xS4BT8ZDJ3fVU
-	j4uFvuBD5skqm4dzA==
-X-Received: by 2002:a05:7022:10d:b0:12b:f616:1a4e with SMTP id a92af1059eb24-12bfb745ebcmr386357c88.23.1775170538630;
-        Thu, 02 Apr 2026 15:55:38 -0700 (PDT)
+        bh=v/kWZk6DHeBYgPdpwnO406rbhIY0ezwD1KqAmA/LXsc=;
+        b=L5JhksMM1y50NT1tw24ilmMtHA/Bey1AUb86T8s3sZxTUp6u+mTCtInslwS5YvkdFF
+         qBQsbqedHqJAnMf2ImS+UYlNrft0qhhxXIrDRldOvZ48S+jvWPAc2SVeybzNqzOcghKs
+         E2M+i53yo5ju8a3CJsc32KcPMDUFZJIaZeE61lyAh89hZownxMmJoXpIBu3Ll7zXvDmi
+         MZFyc6yJp13CHrn8AwA5HzkD1gMNHfqIjZz/8UgF1QWAXSUclll1kYMLjg3i7e67DSZ2
+         8JHkj4bbE87zhTniWceS7+pJV1pj0dCw7ya+J5mj5hamQ3nLVb5B0u2fz5LhR0YrnLTe
+         rveg==
+X-Gm-Message-State: AOJu0Yyb5vz9Si5wlrKnf/e6KWJY1fv/cJu1dnxS1e08lzp89dGxw/YS
+	/L2/Q+cACGqOgYhEJQcnnFkakqpj7LLYfqBol4DVgPaat6SyjmY7unILefVt
+X-Gm-Gg: AeBDietIDnBM3EFrl+vNN1Nc63KMGxkrwX2MxeZXuYGCQUs78mioFTOSkKDtijY2oMW
+	ktwO8v+92JXo8mttD/Ougsh4U+3UpzhQJdjEgSayOusSuskvbhfa7zEuaRW0eoYp0IeFccVePde
+	jK2p4pGXw/ipowKJHozjbSPGXQGOLN+VjnSgyx1u/SBQF44eHhCCxlID/QtvX/pep8+jdi73aXY
+	679V/thfBcAYR1q9M+nkNDejOcS/gJEUBGsPxthtSxRaWi6VpOb468476Y46duSMwww2FMGufy9
+	J4ZOwYQ9RbqF3IbhIdDfbyYX3GHbSvDZDqEaPh336ol7od/XfsUpttST3I4RHMnYoQhiox2GbK9
+	v9+ZZM/SH/ACh6rxDYv/XOJGUK+kXuKOFJctZ4hN3N+b8dyE5J5Qk32ShRgzOOfVGBFywUyIb2s
+	dcdMejrwiZz8rs/iW0BBa7b9MhFS4B47QoShw1BH0PBHjUFWIThdxRzreXOQ78ies0yFS2iTq8u
+	jDbPKu9fh9uIlFcuA==
+X-Received: by 2002:a05:7300:cd8a:b0:2c7:2c0b:f334 with SMTP id 5a478bee46e88-2cbfb4a6039mr511696eec.18.1775170539756;
+        Thu, 02 Apr 2026 15:55:39 -0700 (PDT)
 Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12bedd6901esm2889205c88.5.2026.04.02.15.55.38
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ca792f3f54sm3476899eec.7.2026.04.02.15.55.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 15:55:38 -0700 (PDT)
+        Thu, 02 Apr 2026 15:55:39 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH net-next v5 02/14] net: introduce ndo_set_rx_mode_async and netdev_rx_mode_work
-Date: Thu,  2 Apr 2026 15:55:23 -0700
-Message-ID: <20260402225535.4124525-3-sdf@fomichev.me>
+	pabeni@redhat.com,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH net-next v5 03/14] net: move promiscuity handling into netdev_rx_mode_work
+Date: Thu,  2 Apr 2026 15:55:24 -0700
+Message-ID: <20260402225535.4124525-4-sdf@fomichev.me>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260402225535.4124525-1-sdf@fomichev.me>
 References: <20260402225535.4124525-1-sdf@fomichev.me>
@@ -89,169 +90,220 @@ X-Spamd-Result: default: False [0.04 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_FROM(0.00)[bounces-274725-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[fomichev.me];
 	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274726-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[fomichev.me];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sdf@fomichev.me,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fomichev.me:email,fomichev.me:mid]
-X-Rspamd-Queue-Id: BCA6638EE8A
+	RCPT_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sdf@fomichev.me,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fomichev.me:email,fomichev.me:mid,intel.com:email]
+X-Rspamd-Queue-Id: 40B8938EE99
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add ndo_set_rx_mode_async callback that drivers can implement instead
-of the legacy ndo_set_rx_mode. The legacy callback runs under the
-netif_addr_lock spinlock with BHs disabled, preventing drivers from
-sleeping. The async variant runs from a work queue with rtnl_lock and
-netdev_lock_ops held, in fully sleepable context.
+Move unicast promiscuity tracking into netdev_rx_mode_work so it runs
+under netdev_ops_lock instead of under the addr_lock spinlock. This
+is required because __dev_set_promiscuity calls dev_change_rx_flags
+and __dev_notify_flags, both of which may need to sleep.
 
-When __dev_set_rx_mode() sees ndo_set_rx_mode_async, it schedules
-netdev_rx_mode_work instead of calling the driver inline. The work
-function takes two snapshots of each address list (uc/mc) under
-the addr_lock, then drops the lock and calls the driver with the
-work copies. After the driver returns, it reconciles the snapshots
-back to the real lists under the lock.
+Change ASSERT_RTNL() to netdev_ops_assert_locked() in
+__dev_set_promiscuity, netif_set_allmulti and __dev_change_flags
+since these are now called from the work queue under the ops lock.
 
-Add netif_rx_mode_sync() to opportunistically execute the pending
-workqueue update inline, so that rx mode changes are committed
-before returning to userspace:
-  - dev_change_flags (SIOCSIFFLAGS / RTM_NEWLINK)
-  - dev_set_promiscuity
-  - dev_set_allmulti
-  - dev_ifsioc SIOCADDMULTI / SIOCDELMULTI
-  - do_setlink (RTM_SETLINK)
-
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- Documentation/networking/netdevices.rst |   9 ++
- include/linux/netdevice.h               |  16 ++
- net/core/dev.c                          |  46 +-----
- net/core/dev.h                          |   3 +
- net/core/dev_addr_lists.c               | 194 ++++++++++++++++++++++++
- net/core/dev_api.c                      |   3 +
- net/core/dev_ioctl.c                    |   6 +-
- net/core/rtnetlink.c                    |   1 +
- 8 files changed, 235 insertions(+), 43 deletions(-)
+ Documentation/networking/netdevices.rst |  4 ++
+ net/core/dev.c                          | 16 ++---
+ net/core/dev_addr_lists.c               | 82 ++++++++++++++++++-------
+ 3 files changed, 68 insertions(+), 34 deletions(-)
 
 diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-index 35704d115312..8a488c21fd7c 100644
+index 8a488c21fd7c..390537323457 100644
 --- a/Documentation/networking/netdevices.rst
 +++ b/Documentation/networking/netdevices.rst
-@@ -289,6 +289,15 @@ struct net_device synchronization rules
- ndo_set_rx_mode:
- 	Synchronization: netif_addr_lock spinlock.
- 	Context: BHs disabled
-+	Notes: Deprecated in favor of ndo_set_rx_mode_async which runs
-+	in process context.
-+
-+ndo_set_rx_mode_async:
+@@ -299,6 +299,10 @@ struct net_device synchronization rules
+ 	Notes: Async version of ndo_set_rx_mode which runs in process
+ 	context. Receives snapshots of the unicast and multicast address lists.
+ 
++ndo_change_rx_flags:
 +	Synchronization: rtnl_lock() semaphore. In addition, netdev instance
 +	lock if the driver implements queue management or shaper API.
-+	Context: process (from a work queue)
-+	Notes: Async version of ndo_set_rx_mode which runs in process
-+	context. Receives snapshots of the unicast and multicast address lists.
- 
++
  ndo_setup_tc:
  	``TC_SETUP_BLOCK`` and ``TC_SETUP_FT`` are running under NFT locks
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 151d6f4fd9b3..cf3dd3f1eb0f 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1119,6 +1119,16 @@ struct netdev_net_notifier {
-  *	This function is called device changes address list filtering.
-  *	If driver handles unicast address filtering, it should set
-  *	IFF_UNICAST_FLT in its priv_flags.
-+ *	Cannot sleep, called with netif_addr_lock_bh held.
-+ *	Deprecated in favor of ndo_set_rx_mode_async.
-+ *
-+ * void (*ndo_set_rx_mode_async)(struct net_device *dev,
-+ *				 struct netdev_hw_addr_list *uc,
-+ *				 struct netdev_hw_addr_list *mc);
-+ *	Async version of ndo_set_rx_mode which runs in process context
-+ *	with rtnl_lock and netdev_lock_ops(dev) held. The uc/mc parameters
-+ *	are snapshots of the address lists - iterate with
-+ *	netdev_hw_addr_list_for_each(ha, uc).
-  *
-  * int (*ndo_set_mac_address)(struct net_device *dev, void *addr);
-  *	This function  is called when the Media Access Control address
-@@ -1439,6 +1449,10 @@ struct net_device_ops {
- 	void			(*ndo_change_rx_flags)(struct net_device *dev,
- 						       int flags);
- 	void			(*ndo_set_rx_mode)(struct net_device *dev);
-+	void			(*ndo_set_rx_mode_async)(
-+					struct net_device *dev,
-+					struct netdev_hw_addr_list *uc,
-+					struct netdev_hw_addr_list *mc);
- 	int			(*ndo_set_mac_address)(struct net_device *dev,
- 						       void *addr);
- 	int			(*ndo_validate_addr)(struct net_device *dev);
-@@ -1903,6 +1917,7 @@ enum netdev_reg_state {
-  *				has been enabled due to the need to listen to
-  *				additional unicast addresses in a device that
-  *				does not implement ndo_set_rx_mode()
-+ *	@rx_mode_node:		List entry for rx_mode work processing
-  *	@uc:			unicast mac addresses
-  *	@mc:			multicast mac addresses
-  *	@dev_addrs:		list of device hw addresses
-@@ -2294,6 +2309,7 @@ struct net_device {
- 	unsigned int		promiscuity;
- 	unsigned int		allmulti;
- 	bool			uc_promisc;
-+	struct list_head	rx_mode_node;
- #ifdef CONFIG_LOCKDEP
- 	unsigned char		nested_level;
- #endif
+ 	(i.e. no ``rtnl_lock`` and no device instance lock). The rest of
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 90d041390e29..b9f9e6a30963 100644
+index b9f9e6a30963..ae1fd30d1ef9 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -9574,7 +9574,7 @@ static void dev_change_rx_flags(struct net_device *dev, int flags)
- 		ops->ndo_change_rx_flags(dev, flags);
- }
+@@ -9581,7 +9581,7 @@ int __dev_set_promiscuity(struct net_device *dev, int inc, bool notify)
+ 	kuid_t uid;
+ 	kgid_t gid;
  
--static int __dev_set_promiscuity(struct net_device *dev, int inc, bool notify)
-+int __dev_set_promiscuity(struct net_device *dev, int inc, bool notify)
- {
- 	unsigned int old_flags = dev->flags;
- 	unsigned int promiscuity, flags;
-@@ -9678,46 +9678,6 @@ int netif_set_allmulti(struct net_device *dev, int inc, bool notify)
+-	ASSERT_RTNL();
++	netdev_ops_assert_locked(dev);
+ 
+ 	promiscuity = dev->promiscuity + inc;
+ 	if (promiscuity == 0) {
+@@ -9617,16 +9617,8 @@ int __dev_set_promiscuity(struct net_device *dev, int inc, bool notify)
+ 
+ 		dev_change_rx_flags(dev, IFF_PROMISC);
+ 	}
+-	if (notify) {
+-		/* The ops lock is only required to ensure consistent locking
+-		 * for `NETDEV_CHANGE` notifiers. This function is sometimes
+-		 * called without the lock, even for devices that are ops
+-		 * locked, such as in `dev_uc_sync_multiple` when using
+-		 * bonding or teaming.
+-		 */
+-		netdev_ops_assert_locked(dev);
++	if (notify)
+ 		__dev_notify_flags(dev, old_flags, IFF_PROMISC, 0, NULL);
+-	}
  	return 0;
  }
  
--/*
-- *	Upload unicast and multicast address lists to device and
-- *	configure RX filtering. When the device doesn't support unicast
-- *	filtering it is put in promiscuous mode while unicast addresses
-- *	are present.
-- */
--void __dev_set_rx_mode(struct net_device *dev)
--{
--	const struct net_device_ops *ops = dev->netdev_ops;
--
--	/* dev_open will call this function so the list will stay sane. */
--	if (!(dev->flags&IFF_UP))
+@@ -9648,7 +9640,7 @@ int netif_set_allmulti(struct net_device *dev, int inc, bool notify)
+ 	unsigned int old_flags = dev->flags, old_gflags = dev->gflags;
+ 	unsigned int allmulti, flags;
+ 
+-	ASSERT_RTNL();
++	netdev_ops_assert_locked(dev);
+ 
+ 	allmulti = dev->allmulti + inc;
+ 	if (allmulti == 0) {
+@@ -9716,7 +9708,7 @@ int __dev_change_flags(struct net_device *dev, unsigned int flags,
+ 	unsigned int old_flags = dev->flags;
+ 	int ret;
+ 
+-	ASSERT_RTNL();
++	netdev_ops_assert_locked(dev);
+ 
+ 	/*
+ 	 *	Set the flags on our device.
+diff --git a/net/core/dev_addr_lists.c b/net/core/dev_addr_lists.c
+index a05db3ac43ea..61589537b2d3 100644
+--- a/net/core/dev_addr_lists.c
++++ b/net/core/dev_addr_lists.c
+@@ -1204,10 +1204,34 @@ static void netif_addr_lists_reconcile(struct net_device *dev,
+ 	__hw_addr_list_reconcile(&dev->mc, mc_snap, mc_ref, dev->addr_len);
+ }
+ 
++/**
++ * netif_uc_promisc_update() - evaluate whether uc_promisc should be toggled.
++ * @dev: device
++ *
++ * Must be called under netif_addr_lock_bh.
++ * Return: +1 to enter promisc, -1 to leave, 0 for no change.
++ */
++static int netif_uc_promisc_update(struct net_device *dev)
++{
++	if (dev->priv_flags & IFF_UNICAST_FLT)
++		return 0;
++
++	if (!netdev_uc_empty(dev) && !dev->uc_promisc) {
++		dev->uc_promisc = true;
++		return 1;
++	}
++	if (netdev_uc_empty(dev) && dev->uc_promisc) {
++		dev->uc_promisc = false;
++		return -1;
++	}
++	return 0;
++}
++
+ static void netif_rx_mode_run(struct net_device *dev)
+ {
+ 	struct netdev_hw_addr_list uc_snap, mc_snap, uc_ref, mc_ref;
+ 	const struct net_device_ops *ops = dev->netdev_ops;
++	int promisc_inc;
+ 	int err;
+ 
+ 	might_sleep();
+@@ -1221,22 +1245,39 @@ static void netif_rx_mode_run(struct net_device *dev)
+ 	if (!(dev->flags & IFF_UP) || !netif_device_present(dev))
+ 		return;
+ 
+-	netif_addr_lock_bh(dev);
+-	err = netif_addr_lists_snapshot(dev, &uc_snap, &mc_snap,
+-					&uc_ref, &mc_ref);
+-	if (err) {
+-		netdev_WARN(dev, "failed to sync uc/mc addresses\n");
++	if (ops->ndo_set_rx_mode_async) {
++		netif_addr_lock_bh(dev);
++		err = netif_addr_lists_snapshot(dev, &uc_snap, &mc_snap,
++						&uc_ref, &mc_ref);
++		if (err) {
++			netdev_WARN(dev, "failed to sync uc/mc addresses\n");
++			netif_addr_unlock_bh(dev);
++			return;
++		}
++
++		promisc_inc = netif_uc_promisc_update(dev);
++		netif_addr_unlock_bh(dev);
++	} else {
++		netif_addr_lock_bh(dev);
++		promisc_inc = netif_uc_promisc_update(dev);
+ 		netif_addr_unlock_bh(dev);
 -		return;
--
--	if (!netif_device_present(dev))
--		return;
--
+ 	}
+-	netif_addr_unlock_bh(dev);
+ 
+-	ops->ndo_set_rx_mode_async(dev, &uc_snap, &mc_snap);
++	if (promisc_inc)
++		__dev_set_promiscuity(dev, promisc_inc, false);
+ 
+-	netif_addr_lock_bh(dev);
+-	netif_addr_lists_reconcile(dev, &uc_snap, &mc_snap,
+-				   &uc_ref, &mc_ref);
+-	netif_addr_unlock_bh(dev);
++	if (ops->ndo_set_rx_mode_async) {
++		ops->ndo_set_rx_mode_async(dev, &uc_snap, &mc_snap);
++
++		netif_addr_lock_bh(dev);
++		netif_addr_lists_reconcile(dev, &uc_snap, &mc_snap,
++					   &uc_ref, &mc_ref);
++		netif_addr_unlock_bh(dev);
++	} else if (ops->ndo_set_rx_mode) {
++		netif_addr_lock_bh(dev);
++		ops->ndo_set_rx_mode(dev);
++		netif_addr_unlock_bh(dev);
++	}
+ }
+ 
+ static void netdev_rx_mode_work(struct work_struct *work)
+@@ -1287,6 +1328,7 @@ static void netif_rx_mode_queue(struct net_device *dev)
+ void __dev_set_rx_mode(struct net_device *dev)
+ {
+ 	const struct net_device_ops *ops = dev->netdev_ops;
++	int promisc_inc;
+ 
+ 	/* dev_open will call this function so the list will stay sane. */
+ 	if (!(dev->flags & IFF_UP))
+@@ -1295,20 +1337,16 @@ void __dev_set_rx_mode(struct net_device *dev)
+ 	if (!netif_device_present(dev))
+ 		return;
+ 
+-	if (ops->ndo_set_rx_mode_async) {
++	if (ops->ndo_set_rx_mode_async || ops->ndo_change_rx_flags) {
+ 		netif_rx_mode_queue(dev);
+ 		return;
+ 	}
+ 
 -	if (!(dev->priv_flags & IFF_UNICAST_FLT)) {
--		/* Unicast addresses changes may only happen under the rtnl,
--		 * therefore calling __dev_set_promiscuity here is safe.
--		 */
 -		if (!netdev_uc_empty(dev) && !dev->uc_promisc) {
 -			__dev_set_promiscuity(dev, 1, false);
 -			dev->uc_promisc = true;
@@ -260,338 +312,14 @@ index 90d041390e29..b9f9e6a30963 100644
 -			dev->uc_promisc = false;
 -		}
 -	}
--
--	if (ops->ndo_set_rx_mode)
--		ops->ndo_set_rx_mode(dev);
--}
--
--void dev_set_rx_mode(struct net_device *dev)
--{
--	netif_addr_lock_bh(dev);
--	__dev_set_rx_mode(dev);
--	netif_addr_unlock_bh(dev);
--}
++	/* Legacy path for non-ops-locked HW devices. */
++
++	promisc_inc = netif_uc_promisc_update(dev);
++	if (promisc_inc)
++		__dev_set_promiscuity(dev, promisc_inc, false);
  
- /**
-  * netif_get_flags() - get flags reported to userspace
-@@ -12108,6 +12068,7 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
- #endif
- 
- 	mutex_init(&dev->lock);
-+	INIT_LIST_HEAD(&dev->rx_mode_node);
- 
- 	dev->priv_flags = IFF_XMIT_DST_RELEASE | IFF_XMIT_DST_RELEASE_PERM;
- 	setup(dev);
-@@ -12212,6 +12173,9 @@ void free_netdev(struct net_device *dev)
- 
- 	kfree(rcu_dereference_protected(dev->ingress_queue, 1));
- 
-+	if (netif_rx_mode_clean(dev))
-+		dev_put(dev);
-+
- 	/* Flush device addresses */
- 	dev_addr_flush(dev);
- 
-diff --git a/net/core/dev.h b/net/core/dev.h
-index acc925b7b337..50edb380ca94 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -146,6 +146,9 @@ int netif_change_carrier(struct net_device *dev, bool new_carrier);
- int dev_change_carrier(struct net_device *dev, bool new_carrier);
- 
- void __dev_set_rx_mode(struct net_device *dev);
-+int __dev_set_promiscuity(struct net_device *dev, int inc, bool notify);
-+bool netif_rx_mode_clean(struct net_device *dev);
-+void netif_rx_mode_sync(struct net_device *dev);
- 
- void __dev_notify_flags(struct net_device *dev, unsigned int old_flags,
- 			unsigned int gchanges, u32 portid,
-diff --git a/net/core/dev_addr_lists.c b/net/core/dev_addr_lists.c
-index 284fcfe9389b..a05db3ac43ea 100644
---- a/net/core/dev_addr_lists.c
-+++ b/net/core/dev_addr_lists.c
-@@ -11,10 +11,18 @@
- #include <linux/rtnetlink.h>
- #include <linux/export.h>
- #include <linux/list.h>
-+#include <linux/spinlock.h>
-+#include <linux/workqueue.h>
- #include <kunit/visibility.h>
- 
- #include "dev.h"
- 
-+static void netdev_rx_mode_work(struct work_struct *work);
-+
-+static LIST_HEAD(rx_mode_list);
-+static DEFINE_SPINLOCK(rx_mode_lock);
-+static DECLARE_WORK(rx_mode_work, netdev_rx_mode_work);
-+
- /*
-  * General list handling functions
-  */
-@@ -1159,3 +1167,189 @@ void dev_mc_init(struct net_device *dev)
- 	__hw_addr_init(&dev->mc);
- }
- EXPORT_SYMBOL(dev_mc_init);
-+
-+static int netif_addr_lists_snapshot(struct net_device *dev,
-+				     struct netdev_hw_addr_list *uc_snap,
-+				     struct netdev_hw_addr_list *mc_snap,
-+				     struct netdev_hw_addr_list *uc_ref,
-+				     struct netdev_hw_addr_list *mc_ref)
-+{
-+	int err;
-+
-+	err = __hw_addr_list_snapshot(uc_snap, &dev->uc, dev->addr_len);
-+	if (!err)
-+		err = __hw_addr_list_snapshot(uc_ref, &dev->uc, dev->addr_len);
-+	if (!err)
-+		err = __hw_addr_list_snapshot(mc_snap, &dev->mc,
-+					      dev->addr_len);
-+	if (!err)
-+		err = __hw_addr_list_snapshot(mc_ref, &dev->mc, dev->addr_len);
-+
-+	if (err) {
-+		__hw_addr_flush(uc_snap);
-+		__hw_addr_flush(uc_ref);
-+		__hw_addr_flush(mc_snap);
-+	}
-+
-+	return err;
-+}
-+
-+static void netif_addr_lists_reconcile(struct net_device *dev,
-+				       struct netdev_hw_addr_list *uc_snap,
-+				       struct netdev_hw_addr_list *mc_snap,
-+				       struct netdev_hw_addr_list *uc_ref,
-+				       struct netdev_hw_addr_list *mc_ref)
-+{
-+	__hw_addr_list_reconcile(&dev->uc, uc_snap, uc_ref, dev->addr_len);
-+	__hw_addr_list_reconcile(&dev->mc, mc_snap, mc_ref, dev->addr_len);
-+}
-+
-+static void netif_rx_mode_run(struct net_device *dev)
-+{
-+	struct netdev_hw_addr_list uc_snap, mc_snap, uc_ref, mc_ref;
-+	const struct net_device_ops *ops = dev->netdev_ops;
-+	int err;
-+
-+	might_sleep();
-+	netdev_ops_assert_locked(dev);
-+
-+	__hw_addr_init(&uc_snap);
-+	__hw_addr_init(&mc_snap);
-+	__hw_addr_init(&uc_ref);
-+	__hw_addr_init(&mc_ref);
-+
-+	if (!(dev->flags & IFF_UP) || !netif_device_present(dev))
-+		return;
-+
-+	netif_addr_lock_bh(dev);
-+	err = netif_addr_lists_snapshot(dev, &uc_snap, &mc_snap,
-+					&uc_ref, &mc_ref);
-+	if (err) {
-+		netdev_WARN(dev, "failed to sync uc/mc addresses\n");
-+		netif_addr_unlock_bh(dev);
-+		return;
-+	}
-+	netif_addr_unlock_bh(dev);
-+
-+	ops->ndo_set_rx_mode_async(dev, &uc_snap, &mc_snap);
-+
-+	netif_addr_lock_bh(dev);
-+	netif_addr_lists_reconcile(dev, &uc_snap, &mc_snap,
-+				   &uc_ref, &mc_ref);
-+	netif_addr_unlock_bh(dev);
-+}
-+
-+static void netdev_rx_mode_work(struct work_struct *work)
-+{
-+	struct net_device *dev;
-+
-+	rtnl_lock();
-+
-+	while (true) {
-+		spin_lock_bh(&rx_mode_lock);
-+		if (list_empty(&rx_mode_list)) {
-+			spin_unlock_bh(&rx_mode_lock);
-+			break;
-+		}
-+		dev = list_first_entry(&rx_mode_list, struct net_device,
-+				       rx_mode_node);
-+		list_del_init(&dev->rx_mode_node);
-+		spin_unlock_bh(&rx_mode_lock);
-+
-+		netdev_lock_ops(dev);
-+		netif_rx_mode_run(dev);
-+		netdev_unlock_ops(dev);
-+		dev_put(dev);
-+	}
-+
-+	rtnl_unlock();
-+}
-+
-+static void netif_rx_mode_queue(struct net_device *dev)
-+{
-+	spin_lock_bh(&rx_mode_lock);
-+	if (list_empty(&dev->rx_mode_node)) {
-+		list_add_tail(&dev->rx_mode_node, &rx_mode_list);
-+		dev_hold(dev);
-+	}
-+	spin_unlock_bh(&rx_mode_lock);
-+	schedule_work(&rx_mode_work);
-+}
-+
-+/**
-+ * __dev_set_rx_mode() - upload unicast and multicast address lists to device
-+ * and configure RX filtering.
-+ * @dev: device
-+ *
-+ * When the device doesn't support unicast filtering it is put in promiscuous
-+ * mode while unicast addresses are present.
-+ */
-+void __dev_set_rx_mode(struct net_device *dev)
-+{
-+	const struct net_device_ops *ops = dev->netdev_ops;
-+
-+	/* dev_open will call this function so the list will stay sane. */
-+	if (!(dev->flags & IFF_UP))
-+		return;
-+
-+	if (!netif_device_present(dev))
-+		return;
-+
-+	if (ops->ndo_set_rx_mode_async) {
-+		netif_rx_mode_queue(dev);
-+		return;
-+	}
-+
-+	if (!(dev->priv_flags & IFF_UNICAST_FLT)) {
-+		if (!netdev_uc_empty(dev) && !dev->uc_promisc) {
-+			__dev_set_promiscuity(dev, 1, false);
-+			dev->uc_promisc = true;
-+		} else if (netdev_uc_empty(dev) && dev->uc_promisc) {
-+			__dev_set_promiscuity(dev, -1, false);
-+			dev->uc_promisc = false;
-+		}
-+	}
-+
-+	if (ops->ndo_set_rx_mode)
-+		ops->ndo_set_rx_mode(dev);
-+}
-+
-+void dev_set_rx_mode(struct net_device *dev)
-+{
-+	netif_addr_lock_bh(dev);
-+	__dev_set_rx_mode(dev);
-+	netif_addr_unlock_bh(dev);
-+}
-+
-+bool netif_rx_mode_clean(struct net_device *dev)
-+{
-+	bool clean = false;
-+
-+	spin_lock_bh(&rx_mode_lock);
-+	if (!list_empty(&dev->rx_mode_node)) {
-+		list_del_init(&dev->rx_mode_node);
-+		clean = true;
-+	}
-+	spin_unlock_bh(&rx_mode_lock);
-+
-+	return clean;
-+}
-+
-+/**
-+ * netif_rx_mode_sync() - sync rx mode inline
-+ * @dev: network device
-+ *
-+ * Drivers implementing ndo_set_rx_mode_async() have their rx mode callback
-+ * executed from a workqueue. This allows the callback to sleep, but means
-+ * the hardware update is deferred and may not be visible to userspace
-+ * by the time the initiating syscall returns. netif_rx_mode_sync() steals
-+ * workqueue update and executes it inline. This preserves the atomicity of
-+ * operations to the userspace.
-+ */
-+void netif_rx_mode_sync(struct net_device *dev)
-+{
-+	if (netif_rx_mode_clean(dev)) {
-+		netif_rx_mode_run(dev);
-+		dev_put(dev);
-+	}
-+}
-diff --git a/net/core/dev_api.c b/net/core/dev_api.c
-index f28852078aa6..437947dd08ed 100644
---- a/net/core/dev_api.c
-+++ b/net/core/dev_api.c
-@@ -66,6 +66,7 @@ int dev_change_flags(struct net_device *dev, unsigned int flags,
- 
- 	netdev_lock_ops(dev);
- 	ret = netif_change_flags(dev, flags, extack);
-+	netif_rx_mode_sync(dev);
- 	netdev_unlock_ops(dev);
- 
- 	return ret;
-@@ -285,6 +286,7 @@ int dev_set_promiscuity(struct net_device *dev, int inc)
- 
- 	netdev_lock_ops(dev);
- 	ret = netif_set_promiscuity(dev, inc);
-+	netif_rx_mode_sync(dev);
- 	netdev_unlock_ops(dev);
- 
- 	return ret;
-@@ -311,6 +313,7 @@ int dev_set_allmulti(struct net_device *dev, int inc)
- 
- 	netdev_lock_ops(dev);
- 	ret = netif_set_allmulti(dev, inc, true);
-+	netif_rx_mode_sync(dev);
- 	netdev_unlock_ops(dev);
- 
- 	return ret;
-diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-index 7a8966544c9d..f3979b276090 100644
---- a/net/core/dev_ioctl.c
-+++ b/net/core/dev_ioctl.c
-@@ -586,24 +586,26 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
- 		return err;
- 
- 	case SIOCADDMULTI:
--		if (!ops->ndo_set_rx_mode ||
-+		if ((!ops->ndo_set_rx_mode && !ops->ndo_set_rx_mode_async) ||
- 		    ifr->ifr_hwaddr.sa_family != AF_UNSPEC)
- 			return -EINVAL;
- 		if (!netif_device_present(dev))
- 			return -ENODEV;
- 		netdev_lock_ops(dev);
- 		err = dev_mc_add_global(dev, ifr->ifr_hwaddr.sa_data);
-+		netif_rx_mode_sync(dev);
- 		netdev_unlock_ops(dev);
- 		return err;
- 
- 	case SIOCDELMULTI:
--		if (!ops->ndo_set_rx_mode ||
-+		if ((!ops->ndo_set_rx_mode && !ops->ndo_set_rx_mode_async) ||
- 		    ifr->ifr_hwaddr.sa_family != AF_UNSPEC)
- 			return -EINVAL;
- 		if (!netif_device_present(dev))
- 			return -ENODEV;
- 		netdev_lock_ops(dev);
- 		err = dev_mc_del_global(dev, ifr->ifr_hwaddr.sa_data);
-+		netif_rx_mode_sync(dev);
- 		netdev_unlock_ops(dev);
- 		return err;
- 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index fae8034efbff..f4e5ac70709d 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3431,6 +3431,7 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
- 					     dev->name);
- 	}
- 
-+	netif_rx_mode_sync(dev);
- 	netdev_unlock_ops(dev);
- 
- 	return err;
+ 	if (ops->ndo_set_rx_mode)
+ 		ops->ndo_set_rx_mode(dev);
 -- 
 2.53.0
 
