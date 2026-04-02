@@ -1,264 +1,165 @@
-Return-Path: <netdev+bounces-274451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274452-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CCISKEJAzmlQmQYAu9opvQ
-	(envelope-from <netdev+bounces-274451-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:09:06 +0200
+	id QIuODzlCzmlQmQYAu9opvQ
+	(envelope-from <netdev+bounces-274452-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:17:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A7023877B9
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:09:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A22D387938
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 12:17:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1E82630488EA
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 10:06:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D6F1730DD912
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 10:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 557A13DCD88;
-	Thu,  2 Apr 2026 10:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10FF3DEFF6;
+	Thu,  2 Apr 2026 10:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="nRHJM3au"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="D/PMtfr6";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VtvJWq0l"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9253138C2C7;
-	Thu,  2 Apr 2026 10:06:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7AB539658D;
+	Thu,  2 Apr 2026 10:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775124364; cv=none; b=ai0pgXujaqd39CZLzEVdJzXL+DvjGHwuA6iNCxsWbDQCJG9+9q7lLUUALd+qH51lAqYJnU8rGiPSz0vDyvDakTW2427OPDH/Uw6bignNHTXx7wkSAfkWkIZrZ/DPyUEVc/vK3WQQL9SteV4Lb2zzcl6AIfttu3DFsrIbHicyTFY=
+	t=1775124599; cv=none; b=ub2uXMBRU0hgHEW9gED8QSXeFkoB89UJrHzDke/riAhq0mudZdVNJw5dZA7pRa2kbEInY4+SG2KyvtPa7dGhbSZLDU9GsusHE0bGZSCEdaPotClIwtpRwSfMXEHVGT60jG6pCcdC1r86OKhh6DOIZhmhAb7yqL5ogSkkNWEgaPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775124364; c=relaxed/simple;
-	bh=D4kfl7vQPG5i2TDOvaJ3hANWJtrLLrfKi0I6ESNoUBs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XOIsHoOcR2rue9YOMlbL/Lz1UxAOUOGqH5rdzfUiu3r2jvTFPcA/Qs3VoxoGQc+rzOtpWNwVzT/onPO1Ya5P9sGdoO4L2lhM9OQgbwteLFR2uUK1RWqNvFWuFa6XqhEWxNDOzcwA/idP45j1RV81D7w5yeRoicEMdKOZxafVxmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=nRHJM3au; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1775124355;
-	bh=D4kfl7vQPG5i2TDOvaJ3hANWJtrLLrfKi0I6ESNoUBs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nRHJM3auCioWf+U0lXNf1DZ9gI4HLqoLnXqJQpjK6TuZsG9eGFNv66ISHZTp2Fsf9
-	 4+KQuuqnFfDlcwxSRhSX9dCkDB05hBwx3nPMGi7F0x1EFo1spXfrGcB/J5NQCl/nh3
-	 ag9YWUXhz1aubhJ/gq27GHnYIVutjnU6rioAydOUSPF8+8HLcbzc+n9G7OB/a34IHm
-	 sWAE+DffuBhhDmc7g1NV38A/CoWRxmoWbg7sdMGLOiGQjDjcmE4sLuevU4vfqgTCNU
-	 F8wZT8Mct0gVg9s3Uy8Forr2bfWqRAziqSbeVIDa6a8SdQTVY7t28t7DtfnbqBQ0LN
-	 qUi7hMlU4TDhg==
-Received: from laura.lan (unknown [IPv6:2001:b07:646b:e2:54e2:77ca:8340:99bd])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: laura.nao)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 19DCC17E76A5;
-	Thu,  2 Apr 2026 12:05:54 +0200 (CEST)
-From: Laura Nao <laura.nao@collabora.com>
-To: jason-jh.lin@mediatek.com
-Cc: Guangjie.Song@mediatek.com,
-	Nancy.Lin@mediatek.com,
-	Paul-pl.Chen@mediatek.com,
-	Project_Global_Chrome_Upstream_Group@mediatek.com,
-	Singo.Chang@mediatek.com,
-	Sirius.Wang@mediatek.com,
-	angelogioacchino.delregno@collabora.com,
-	conor+dt@kernel.org,
-	devicetree@vger.kernel.org,
-	kernel@collabora.com,
-	krzk+dt@kernel.org,
-	laura.nao@collabora.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-clk@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	matthias.bgg@gmail.com,
-	mturquette@baylibre.com,
-	netdev@vger.kernel.org,
-	nfraprado@collabora.com,
-	p.zabel@pengutronix.de,
-	richardcochran@gmail.com,
-	robh@kernel.org,
-	sboyd@kernel.org,
-	wenst@chromium.org
-Subject: Re: [PATCH v5 23/27] clk: mediatek: Add MT8196 disp-ao clock support
-Date: Thu,  2 Apr 2026 12:05:38 +0200
-Message-Id: <20260402100538.27291-1-laura.nao@collabora.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <2d418383ff2d6ff40ffb3b4f8e2b0c0e665c3b58.camel@mediatek.com>
-References: <2d418383ff2d6ff40ffb3b4f8e2b0c0e665c3b58.camel@mediatek.com>
+	s=arc-20240116; t=1775124599; c=relaxed/simple;
+	bh=Q8my8z2czIQTbbasLPpWnzgJlYNGB5PfMpthwy71GAo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ke3Q6f4wPgtD7tEYayMTMJOANP/OEKwrJZd0Mj9JfgPij4r5zVwczfIt3I/titarhULIroraY3rZWSTlDoJ1Ptb+F/kCxGviQ6mBj8Qtcc3nj2bvsjBtu0l9Puf5HaEi/m5jmpxSsJuFZa0cr9oMIIlvAIX08ZK3/e0693oH3zQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=D/PMtfr6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VtvJWq0l; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id E5F80140027D;
+	Thu,  2 Apr 2026 06:09:56 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Thu, 02 Apr 2026 06:09:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1775124596; x=
+	1775210996; bh=/X0lAsHuUwtq9gmFrxKkkryl3B8IzaJkdJQ1jRzZxrI=; b=D
+	/PMtfr61UJvI5m/aTZmvLqcnnWMEVtO/4pdim+MWiT34EoH8MJu0WyC43/6sjEao
+	R6QqMmQ7QEINma59qNcxVtAfYJPyf1XRwSx532d865Vd1ZmaUinTqeEUzTyMnoRP
+	vqn9rbv7OztMWL5svYpBqlMw+Baf539nghuiRqpJEZHn/VI/QHUxRzySRUobRAWi
+	80K9YUT4zUIzFArd7Dp40ZuczRuzmm2HFQ+XjeNQ0En5YF0gZgTZ5TXpb4jN+Tg+
+	PU9uM//MY2cr4yei0I8bpUFVP2CBp8YABFu3c4CUfmml0WY+jfIR1XhkghyPv0pf
+	XDEYgBD323MOfOlUSI7tg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1775124596; x=1775210996; bh=/X0lAsHuUwtq9gmFrxKkkryl3B8IzaJkdJQ
+	1jRzZxrI=; b=VtvJWq0l+QTsbUhUsEuf4nNO3Bq67hnFtGR6MO6hJCDyIuhqliG
+	L6D7aeCqt08dQInLduDaNxgeJ5IfuFzmClV78bWR17ITnTc3hZGBWV6KhMIxUgr3
+	dgbGyNJVL8y/NRuhpmgfBBC3iz72GQbJpSv0YCoPWylNHYHYLOcrntyJCIg0s6Jh
+	CALpvFwy0jdL7a6t+5tzbGsYjzKqyeP9GPZyhrv6pQ64biPaaF0yEHPXc1f6d5OR
+	sMzRbtplKPo8NLgFq37CB7lYzorg3QWpY0eZ6EXVw2QMaDW/RCFWJddQIptKKU+V
+	bgevOpJ5135220yFLWbkwjHGJglTFYYbyAg==
+X-ME-Sender: <xms:dEDOaYrrRt09ARH8sZ9nAkdk_8qmSYWBqMZt2ak4HrOV-1vYJZ-7GA>
+    <xme:dEDOaQODtvDGwTu33oTL3spiIP_-sIY0WuDr4vIEvzT0qLfIXXFAAJ14BxdLaQm4g
+    pxx_bhgxE8e2k8842MVpKEmLQZju9yZJtSA8C3swfIeNN4R_Pu4WB9E>
+X-ME-Received: <xmr:dEDOaccQuR72uwHHq6Or6Z9qhnRFq21hX9-pECj-rCJjBCbLazs6RlZkSRrY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdehjeegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
+    epfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhnrgcu
+    ffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrfgrth
+    htvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvuefffefg
+    udffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsh
+    gusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduvddpmhhouggv
+    pehsmhhtphhouhhtpdhrtghpthhtoheptghrrghtihhusehnvhhiughirgdrtghomhdprh
+    gtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmh
+    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
+    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtohepshgufhesfhhomhhitghhvghvrdhmvg
+X-ME-Proxy: <xmx:dEDOaWXAUY48p-_JymtpvTl3N_xTjcXH78ZgbOckuo9_Ii3TekhShg>
+    <xmx:dEDOadC2XshAQ3bkz_x-Xwu2NFlI5J3PjRrkTKQDGxn6DshML8e0Ng>
+    <xmx:dEDOaR41vaIyFjGT3Kiejp7MxmQXbgnEUBSIc0oiPf4TCTKgJJuusg>
+    <xmx:dEDOaU2z4MDDb5AevFSzXkFJOvx4mPyryiHucP85h6GWEKYjoTbOIg>
+    <xmx:dEDOaZturolf87oXhLZ5dss4220ghAwuVvNH1u_c-Td5I5ypYdQMV_xo>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 2 Apr 2026 06:09:56 -0400 (EDT)
+Date: Thu, 2 Apr 2026 12:09:54 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>, Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net v6 2/4] nsim: Add support for VLAN filters
+Message-ID: <ac5Acqsc9cbB089G@krikkit>
+References: <20260330130130.989236-1-cratiu@nvidia.com>
+ <20260330130130.989236-3-cratiu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260330130130.989236-3-cratiu@nvidia.com>
 X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[collabora.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[collabora.com:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[mediatek.com,collabora.com,kernel.org,vger.kernel.org,lists.infradead.org,gmail.com,baylibre.com,pengutronix.de,chromium.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274451-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-274452-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[26];
-	TO_DN_NONE(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[laura.nao@collabora.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[collabora.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mediatek.com:email,collabora.com:dkim,collabora.com:email,collabora.com:mid]
-X-Rspamd-Queue-Id: 4A7023877B9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[queasysnail.net:dkim,queasysnail.net:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,messagingengine.com:dkim,nvidia.com:email]
+X-Rspamd-Queue-Id: 8A22D387938
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jason-JH,
+2026-03-30, 16:01:28 +0300, Cosmin Ratiu wrote:
+> Add support for storing the list of VLANs in nsim devices, together with
+> ops for adding/removing them and a debug file to show them.
+> 
+> This will be used in upcoming tests.
+> 
+> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+> ---
+>  drivers/net/netdevsim/netdev.c    | 65 ++++++++++++++++++++++++++++++-
+>  drivers/net/netdevsim/netdevsim.h |  8 ++++
+>  2 files changed, 71 insertions(+), 2 deletions(-)
 
-On 4/2/26 08:30, Jason-JH Lin (林睿祥) wrote:
-> On Fri, 2025-08-29 at 11:19 +0200, Laura Nao wrote:
->> Add support for the MT8196 disp-ao clock controller, which provides
->> clock gate control for the display system. It is integrated with the
->> mtk-mmsys driver, which registers the disp-ao clock driver via
->> platform_device_register_data().
->>
->> Reviewed-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
->> Reviewed-by: AngeloGioacchino Del Regno
->> <angelogioacchino.delregno@collabora.com>
->> Signed-off-by: Laura Nao <laura.nao@collabora.com>
->> ---
->>  drivers/clk/mediatek/Makefile              |  2 +-
->>  drivers/clk/mediatek/clk-mt8196-vdisp_ao.c | 80
->> ++++++++++++++++++++++
->>  2 files changed, 81 insertions(+), 1 deletion(-)
->>  create mode 100644 drivers/clk/mediatek/clk-mt8196-vdisp_ao.c
->>
->> diff --git a/drivers/clk/mediatek/Makefile
->> b/drivers/clk/mediatek/Makefile
->> index fe5699411d8b..5b8969ff1985 100644
->> --- a/drivers/clk/mediatek/Makefile
->> +++ b/drivers/clk/mediatek/Makefile
->> @@ -157,7 +157,7 @@ obj-$(CONFIG_COMMON_CLK_MT8196_IMP_IIC_WRAP) +=
->> clk-mt8196-imp_iic_wrap.o
->>  obj-$(CONFIG_COMMON_CLK_MT8196_MCUSYS) += clk-mt8196-mcu.o
->>  obj-$(CONFIG_COMMON_CLK_MT8196_MDPSYS) += clk-mt8196-mdpsys.o
->>  obj-$(CONFIG_COMMON_CLK_MT8196_MFGCFG) += clk-mt8196-mfg.o
->> -obj-$(CONFIG_COMMON_CLK_MT8196_MMSYS) += clk-mt8196-disp0.o clk-
->> mt8196-disp1.o
->> +obj-$(CONFIG_COMMON_CLK_MT8196_MMSYS) += clk-mt8196-disp0.o clk-
->> mt8196-disp1.o clk-mt8196-vdisp_ao.o
->>  obj-$(CONFIG_COMMON_CLK_MT8196_PEXTPSYS) += clk-mt8196-pextp.o
->>  obj-$(CONFIG_COMMON_CLK_MT8196_UFSSYS) += clk-mt8196-ufs_ao.o
->>  obj-$(CONFIG_COMMON_CLK_MT8365) += clk-mt8365-apmixedsys.o clk-
->> mt8365.o
->> diff --git a/drivers/clk/mediatek/clk-mt8196-vdisp_ao.c
->> b/drivers/clk/mediatek/clk-mt8196-vdisp_ao.c
->> new file mode 100644
->> index 000000000000..fddb69d1c3eb
->> --- /dev/null
->> +++ b/drivers/clk/mediatek/clk-mt8196-vdisp_ao.c
->> @@ -0,0 +1,80 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Copyright (c) 2025 MediaTek Inc.
->> + *                    Guangjie Song <guangjie.song@mediatek.com>
->> + * Copyright (c) 2025 Collabora Ltd.
->> + *                    Laura Nao <laura.nao@collabora.com>
->> + */
->> +#include <dt-bindings/clock/mediatek,mt8196-clock.h>
->> +
->> +#include <linux/clk-provider.h>
->> +#include <linux/module.h>
->> +#include <linux/of_device.h>
->> +#include <linux/platform_device.h>
->> +
->> +#include "clk-gate.h"
->> +#include "clk-mtk.h"
->> +
->> +static const struct mtk_gate_regs mm_v_cg_regs = {
->> +	.set_ofs = 0x104,
->> +	.clr_ofs = 0x108,
->> +	.sta_ofs = 0x100,
->> +};
->> +
->> +static const struct mtk_gate_regs mm_v_hwv_regs = {
->> +	.set_ofs = 0x0030,
->> +	.clr_ofs = 0x0034,
->> +	.sta_ofs = 0x2c18,
->> +};
->> +
->> +#define GATE_MM_AO_V(_id, _name, _parent, _shift) {	\
->> +		.id = _id,				\
->> +		.name = _name,				\
->> +		.parent_name = _parent,			\
->> +		.regs = &mm_v_cg_regs,			\
->> +		.shift = _shift,			\
->> +		.ops = &mtk_clk_gate_ops_setclr,	\
->> +		.flags = CLK_OPS_PARENT_ENABLE |	\
->> +			 CLK_IS_CRITICAL,		\
->> +	}
->> +
->> +#define GATE_HWV_MM_V(_id, _name, _parent, _shift) {	\
->> +		.id = _id,				\
->> +		.name = _name,				\
->> +		.parent_name = _parent,			\
->> +		.regs = &mm_v_cg_regs,			\
->> +		.hwv_regs = &mm_v_hwv_regs,		\
->> +		.shift = _shift,			\
->> +		.ops = &mtk_clk_gate_hwv_ops_setclr,	\
->> +		.flags = CLK_OPS_PARENT_ENABLE,		\
->> +	}
->> +
->> +static const struct mtk_gate mm_v_clks[] = {
->> +	GATE_HWV_MM_V(CLK_MM_V_DISP_VDISP_AO_CONFIG,
->> "mm_v_disp_vdisp_ao_config", "disp", 0),
->> +	GATE_HWV_MM_V(CLK_MM_V_DISP_DPC, "mm_v_disp_dpc", "disp",
->> 16),
->> +	GATE_MM_AO_V(CLK_MM_V_SMI_SUB_SOMM0, "mm_v_smi_sub_somm0",
->> "disp", 2),
->> +};
->> +
->> +static const struct mtk_clk_desc mm_v_mcd = {
->> +	.clks = mm_v_clks,
->> +	.num_clks = ARRAY_SIZE(mm_v_clks),
->> +};
->> +
->> +static const struct of_device_id of_match_clk_mt8196_vdisp_ao[] = {
->> +	{ .compatible = "mediatek,mt8196-vdisp-ao", .data =
->> &mm_v_mcd },
->
-> Hi Laura,
->
-> We are going to send mtk-mmsys driver for MT8196 recently, but we found
-> the compatible name is used here.
->
-> As your commit message, vdisp-ao is integrated with the mtk-mmsys
-> driver, which registers the vdisp-ao clock driver via 
-> platform_device_register_data().
->
-> Shouldn't this compatible name belong to mmsys driver for MT8196?
->
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-That's right, my fault for missing that! Thanks for the heads up.
-
-I'm aware Angelo is currently restructuring mediatek-drm (including 
-mmsys and mutex), and that might affect the way vdisp-ao is loaded too. 
-So I'm not sure whether it makes sense to send a patch to fix this 
-right away.
-
-Best,
-
-Laura
-
+-- 
+Sabrina
 
