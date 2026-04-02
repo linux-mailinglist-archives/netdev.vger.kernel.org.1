@@ -1,82 +1,89 @@
-Return-Path: <netdev+bounces-274634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274635-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GK3jM9emzmkgpQYAu9opvQ
-	(envelope-from <netdev+bounces-274634-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:26:47 +0200
+	id uKRTIjWlzmlZpAYAu9opvQ
+	(envelope-from <netdev+bounces-274635-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:19:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25F7E38C81C
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:26:47 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 250DE38C78A
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:19:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BB2893028B1A
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 17:17:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 8175030388C8
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 17:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD203ECBF2;
-	Thu,  2 Apr 2026 17:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE3330E0E5;
+	Thu,  2 Apr 2026 17:19:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jhQTOP6F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q/jWpXbm"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F3F2C0F84;
-	Thu,  2 Apr 2026 17:17:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4404D361DA8
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 17:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775150239; cv=none; b=R790LG1KqUmlHmA2KvUqdmuAkd2VH3GPnYzanRAbrEa5+FlAgdEeWeRbdjNaMNL72aoc2Z4f1Wt/qV1ZJYnOABy5a5rEexI+FJ6mpQ87UMFZrjyuiGF3aFqeEmZJZ38/21pUqKsdkMYyn0PNS2uGq2XDUkWVFhb1GCzUqz6ZYiM=
+	t=1775150385; cv=none; b=FXTopr94WsnqmvwBpVzBWvaVOV0RPwUNDnbg5EoxzGfBKSB2q0asBu1sjwnuiRsc+lT+xFfEJx4R0jChzdffVR7DyP3Spm9wq0xLqfa686HFEzAym+3IDX0yXsFoeHDBJNN7Dx3M9MC0d4ySNQUTohheKht96vTs3R0sZuAPyAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775150239; c=relaxed/simple;
-	bh=aVzfzghN5cOsLgiYepOMfyFxBPNDrIM+MPv8k0Kx+iU=;
+	s=arc-20240116; t=1775150385; c=relaxed/simple;
+	bh=q+bH+MzBqzAaB1kR8c1eOTTKDhHAZs3b4rogy3u0En8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hfuAO9MxWhcQO32K1tcZcrdYLecHYyEPZ+ulVxhfiSeeM5hpso7YG5+nd9848Amj8svjhgpVdecwZV+B3KvRaq6Ixfy6EJxfTn/wiqSQF8/1/9ysYJRpwnMdj5Pjj7N7kmPltYu6y5j5pLj6IPD5oBgjDyyK7GxLHfdLWrsa+ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jhQTOP6F; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OBUNBOUtPI/k+VSXotfbt5ddiQ0C3Y6bmoMp5MELPG0=; b=jhQTOP6FbSgr96iF6NQ9PpTjPG
-	AMS8+vlXjAla1qlHlpYHs5nczppotue/hndP1ILMlgEIPAG9yuQxsYS3xiqtFL62ks9jszKXB/Ynj
-	AuDOmaI8uNBDjn05w5PCtk7+AL0k4mp3kEaMZ2rz9Y4IG1emsEK77XPZTA8euj7WpkcpCeyWN523Q
-	Tl0vm6hYqwLU3qV+7GICIKlCoM6ObHoFB9XK3zo/tAl1yjqeS0/TZJW5bSp7Jzd5ipTttcA9VLMVq
-	1gWirMUKBSmjLVn4PDvmaWHRTnYLdRyA5o1ycnuYBZLKTiXLE/E/QEcdeYdku9dF51cvqMz+IMbET
-	Zcel0E+Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52218)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w8Lf0-000000004kJ-2mdR;
-	Thu, 02 Apr 2026 18:16:50 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w8Lew-000000005wN-0dmu;
-	Thu, 02 Apr 2026 18:16:46 +0100
-Date: Thu, 2 Apr 2026 18:16:45 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Sam Edwards <cfsworks@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Baruch Siach <baruch@tkos.co.il>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v4 0/2] stmmac crash/stall fixes when under memory
- pressure
-Message-ID: <ac6kfQ98Xjt3dCGj@shell.armlinux.org.uk>
-References: <20260401041929.12392-1-CFSworks@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PKeQDj+20VOXwr3l2JWceeR9ppmCGplKWRSWfYwWgScwqK7kqkFpI3DDoJJ6qrfojnfp3hzDmSH09WFgnwmrr6/A6OBxpk6JR3NOw39//akwxigIYrQEmxZSxl34fojgpe/M+MWyF7xuvjj5YpY+pEVQoSWPRo/q2YIGZq7lyd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q/jWpXbm; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-79a60975dc5so11621477b3.0
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 10:19:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775150382; x=1775755182; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6UIU0kC8Y0nz3yhV5FHyC+ln+Iwi4Xg/ywzP08MRwPg=;
+        b=Q/jWpXbmJCpsaMf9hJxVN7/OFqY8dnsUkkjaXusvx9niIDk+Gv/byID300sg3SDcgP
+         YYDnA0BOziMACBzn74bULiHqgb/9RVQi9FumZyT/xTZEJ8rSVABn7XqkJZklNCKyXmaq
+         QfVT+ICT4t6YucftmbnRDpKh7UcC3VEnuHFUxH2jykTtNSh8ePakYUhExeqsvicyvOOK
+         3XW+kOzWtbeA6fsrre3/Jd6P4NxmMcOGdxxRmuISxQRAmpgTsSrPpysHMB2QuY2nYIA3
+         5ACZnJIk5WHouE+e1alo3/gBWpA1Dtq9PQPNVofEcwmnFe2Ps5MDFUOivaFvDblAezY3
+         jvuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775150382; x=1775755182;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6UIU0kC8Y0nz3yhV5FHyC+ln+Iwi4Xg/ywzP08MRwPg=;
+        b=shiTJu+xDu6tYw5YGSpslOIos58O7BVqSFjERbENkn9eFUL56iIoshIYp56+g5hSr+
+         s7MNPg2WJ9JH/DpEY65xBmF2OmMuSyRMBvaMUWtWLcqorpaKMlEPnK4XxDD9csGcrODZ
+         sjp+W5lL4+QqpaFNu3O7a0CKCBzjrfCXhN/xOEqHFlynbCtfOtTZ5VD3qNSYZ03gDVgt
+         +N6ja4GWbE5qK/CiEWh2kInmOXgYZ2lzvY2UT2hH51FwniHBW07v9iF+ty4A5TZrdOlq
+         SBDLQN0/n1jjeESnI1n4RhInmqjZfQ0ZWasfKKOUovd6nsyM+mk69STzx0A0GsAdhcDr
+         dzaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW08a5qdgOybEhl1S5ZsYM7OzTrkTDB1wRCNMCC1+fcTdKLQFhr98vExlzFAIzxmjq7Vh1Yyco=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5zfRzM089UQg3JffiJGbFMWg5C7SLJQas0CZEV/1xsh3NTImA
+	HYJs9xQj6+rW6LN1DbU/sTmEJGX9Brr3mzGG+XL3Vw0CYZNIuf5ShznNvaBMTw==
+X-Gm-Gg: AeBDieuDE2tiH3txn9nHJCD/Mr1sOGdPEib4X/jT1rEFIlfSJVXkInYPmh20OCzK7G3
+	2W8x8i9ysPXKn0XuFW9nukBV3b3TSjrtBxIugSzsGuvRihaw/MrAbP2VJgwEOpK8537Wda6bCnH
+	YGbJLVkDORwioZhyMXFb/6HBSPsLLEejNnml+4vJX45fKFpelweDFwk+GzfE6zNHbatF9qMwtgB
+	c1SwhJW9AkMtpZrL6zz25aM82HHnaqQVGgFdboUnZ3cIl3MZc1N+OZ/wqRvWupb2lFCeCB629uL
+	FBkNvB9krUfkbEp7vESNQ7eB15ZDDQ7VZtDbCMbAmf9XEOgzkYhgfzUi+lGMd01LTNpOy23Tfmo
+	bmSZI/QSZs2cO2/+3DNda2qXqDwOWZNdwkdrnBH/TlBsASQjLs72fVJNBgCScB0XwBtQxGbLJoN
+	3aQjAFhXJkxcnoGbD32JCnyw==
+X-Received: by 2002:a05:690c:6e87:b0:79a:da70:864 with SMTP id 00721157ae682-7a4d6152810mr1492807b3.49.1775150381775;
+        Thu, 02 Apr 2026 10:19:41 -0700 (PDT)
+Received: from syzkaller ([2a03:2880:25ff:4b::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7a3712f04aesm12714417b3.48.2026.04.02.10.19.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2026 10:19:41 -0700 (PDT)
+Date: Thu, 2 Apr 2026 10:19:37 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Laurence Rowe <laurencerowe@gmail.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH] vsock: avoid timeout for non-blocking accept() with
+ empty backlog
+Message-ID: <ac6lKTabFc04Fl35@syzkaller>
+References: <20260402044637.73531-1-laurencerowe@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,318 +92,123 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260401041929.12392-1-CFSworks@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+In-Reply-To: <20260402044637.73531-1-laurencerowe@gmail.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274634-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274635-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,bootlin.com,renesas.com,nxp.com,tkos.co.il,st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	NEURAL_SPAM(0.00)[0.716];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bobbyeshleman@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	NEURAL_HAM(-0.00)[-0.994];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tegra-ubuntu:email,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: 25F7E38C81C
+	FREEMAIL_FROM(0.00)[gmail.com];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 250DE38C78A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 31, 2026 at 09:19:27PM -0700, Sam Edwards wrote:
-> Hi netdev,
+On Wed, Apr 01, 2026 at 09:46:37PM -0700, Laurence Rowe wrote:
+> A common pattern in epoll network servers is to eagerly accept all
+> pending connections from the non-blocking listening socket after
+> epoll_wait indicates the socket is ready by calling accept in a loop
+> until EAGAIN is returned indicating that the backlog is empty.
 > 
-> This is v4 of my series containing a pair of bugfixes for the stmmac driver's
-> receive pipeline. These issues occur when stmmac_rx_refill() does not (fully)
-> succeed, which happens more frequently when free memory is low.
+> Scheduling a timeout for a non-blocking accept with an empty backlog
+> meant AF_VSOCK sockets used by epoll network servers incurred hundreds
+> of microseconds of additional latency per accept loop compared to
+> AF_INET or AF_UNIX sockets.
 > 
-> The first patch closes Bugzilla bug #221010 [1], where stmmac_rx() can circle
-> around to a still-dirty descriptor (with a NULL buffer pointer), mistake it for
-> a filled descriptor (due to OWN=0), and attempt to dereference the buffer.
+> Signed-off-by: Laurence Rowe <laurencerowe@gmail.com>
+> ---
 > 
-> In testing that patch, I discovered a second issue: starvation of available RX
-> buffers causes the NIC to stop sending interrupts; if the driver stops polling,
-> it will wait indefinitely for an interrupt that will never come. (Note: the
-> first patch makes this issue more prominent -- mostly because it lets the
-> system survive long enough to exhibit it -- but doesn't *cause* it.) The second
-> patch addresses that problem as well.
+> This fixes the observed issue for me:
 > 
-> Both patches are minimal, appropriate for stable, and designated to `net`. My
-> focus is on small, obviously-correct, easy-to-explain changes: I'll follow up
-> with another patch/series (something like [2]) for `net-next` that fixes the
-> ring in a more robust way.
+> 1. With loopback vsock on the host running Linux v6.19.10 built with
+> config-6.17.0-19-generic from Ubuntu 24.04 and make olddefconfig.
 > 
-> The tx and zc paths seem to have similar low-memory bugs, to be addressed in
-> separate series.
+> 2. With Firecracker guests with current torvalds/master, v6.19.10, and
+> amazonlinux/microvm-kernel-6.1.166-24.303.amzn2023 used in Firecracker
+> CI and examples. (Firecracker guest vsocks are unix sockets on the host
+> side so this fix works there with just a fixed guest kernel.)
+> 
+> I struggled to build a generic 6.1.166 kernel that worked as a
+> Firecracker guest but the patch applies (conflict due to change of
+> `flags` to `arg->flags` in surrounding context) so I believe it should
+> work for generic v6.1.166 kernel.
+> 
+> Alternatively a minimal version of this fix is to just wrap the
+> `schedule_timeout` in an `if (timeout != 0)` but that leaves an
+> unnecessary additional `lock_sock` call.
+> 
+> There are ftrace's and reproduction tools at:
+> https://github.com/lrowe/linux-vsock-accept-timeout-investigation
+> ---
+>  net/vmw_vsock/af_vsock.c | 16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> index 2f7d94d682..483889b6d8 100644
+> --- a/net/vmw_vsock/af_vsock.c
+> +++ b/net/vmw_vsock/af_vsock.c
+> @@ -1850,11 +1850,11 @@ static int vsock_accept(struct socket *sock, struct socket *newsock,
+>  	 * created upon connection establishment.
+>  	 */
+>  	timeout = sock_rcvtimeo(listener, arg->flags & O_NONBLOCK);
+> -	prepare_to_wait(sk_sleep(listener), &wait, TASK_INTERRUPTIBLE);
+>  
+>  	while ((connected = vsock_dequeue_accept(listener)) == NULL &&
+> -	       listener->sk_err == 0) {
+> +	       listener->sk_err == 0 && timeout != 0) {
+>  		release_sock(listener);
+> +		prepare_to_wait(sk_sleep(listener), &wait, TASK_INTERRUPTIBLE);
+>  		timeout = schedule_timeout(timeout);
+>  		finish_wait(sk_sleep(listener), &wait);
+>  		lock_sock(listener);
+> @@ -1862,17 +1862,15 @@ static int vsock_accept(struct socket *sock, struct socket *newsock,
+>  		if (signal_pending(current)) {
+>  			err = sock_intr_errno(timeout);
+>  			goto out;
+> -		} else if (timeout == 0) {
+> -			err = -EAGAIN;
+> -			goto out;
+>  		}
+> -
+> -		prepare_to_wait(sk_sleep(listener), &wait, TASK_INTERRUPTIBLE);
+>  	}
+> -	finish_wait(sk_sleep(listener), &wait);
+>  
+> -	if (listener->sk_err)
+> +	if (listener->sk_err) {
+>  		err = -listener->sk_err;
+> +	} else if (timeout == 0 && connected == NULL) {
+> +		err = -EAGAIN;
+> +		goto out;
+> +	}
 
-I've tested this on my Jetson Xavier platform. One of the issues I've
-had is that running iperf3 results in the receive side stalling because
-it runs out of descriptors. However, despite the receive ring
-eventually being re-filled and the hardware appropriately prodded, it
-steadfastly refuses to restart, despite the descriptors having been
-updated.
+I wonder if this goto can be omitted since the following 'if
+(connected)' guards the connected != NULL case? I don't have a strong
+opinion, just noticed it would keep if-else symmetrical.
 
-What I can see is there's 40 packets in the internal FIFOs via the
-PRXQ[13:0] field of the ETH_MTLRXQxDR register.
+All-in-all, LGTM.
 
-With your patches applied:
-
-root@tegra-ubuntu:~# iperf3 -c 192.168.248.1 -R
-Connecting to host 192.168.248.1, port 5201
-Reverse mode, remote host 192.168.248.1 is sending
-[  5] local 192.168.248.174 port 43728 connected to 192.168.248.1 port 5201
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-1.00   sec  30.3 MBytes   254 Mbits/sec
-[  5]   1.00-2.00   sec  0.00 Bytes  0.00 bits/sec
-[  5]   2.00-3.00   sec  0.00 Bytes  0.00 bits/sec
-[  5]   3.00-4.00   sec  0.00 Bytes  0.00 bits/sec
-[  5]   4.00-5.00   sec  0.00 Bytes  0.00 bits/sec
-[  5]   5.00-6.00   sec  0.00 Bytes  0.00 bits/sec
-...
-
-The remote system says:
-
-Accepted connection from 192.168.248.174, port 43720
-[  5] local 192.168.248.1 port 5201 connected to 192.168.248.174 port 43728
-[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
-[  5]   0.00-1.00   sec  31.8 MBytes   266 Mbits/sec    1   1.41 KBytes
-[  5]   1.00-2.00   sec  0.00 Bytes  0.00 bits/sec    1   1.41 KBytes
-[  5]   2.00-3.00   sec  0.00 Bytes  0.00 bits/sec    0   1.41 KBytes
-
-This is a dwmac v5.0. I think the relevant registers are:
-
-ETH_MTLQxICSR: Value at address 0x02490d2c: 0x00000002
-
-ETH_MTLRXQxDR: Value at address 0x02490d38: 0x00280020
-
- PRXQ[13:0]: Number of Packets in Receive Queue = 40
- RXQSTS[1:0]: MTL Rx Queue Fill-Level status = 2 (Rx queue fill-level
- above flow-control activate threshold)
- RRXSTS[1:0]: MTL Rx Queue Read Controller State = 0 (Idle)
- RWCSTS: MTL Rx Queue Write Controller Active Status = 0
-
-ETH_DMADS1R: Value at address 0x0249100c: 0x00006300
-
- RPS0[3:0]: DMA Channel Receive Process State = Running (Waiting for Rx
- packet)
-
-ETH_DMACxRXDTPR: Value at address 0x02491128: 0xffffe7d0
-
- RDT[31:0]: Receive Descriptor Tail Pointer (writes should apparently
- trigger DMA to start, but doesn't seem to)
-
-ETH_DMACxCARXDR: Value at address 0x0249114c: 0xffffe7d0
-
- CURRDESAPTR[31:0]: Application receive descriptor address pointer
-
-ETH_DMACxCARXBR: Value at address 0x0249115c: 0xffb55040
-
- CURRBUFAPTR[31:0]: Application receive buffer address pointer
-
- This makes it look like it's read the descriptor at 0x7fffffe7d0.
-
-ETH_DMAC0SR: Value at address 0x02491160: 0x00000484
-
- ETI (early transmit interrupt)=1 RBU (receive buffer unavailable)=1
- TBU (transmit buffer unavailable)=1
-
- Clearing RBU doesn't seem to help.
-
-Descriptors:
-
-123 [0x0000007fffffe7b0]: 0xffbba040 0x7f 0x0 0x81000000
-124 [0x0000007fffffe7c0]: 0xffbb9040 0x7f 0x0 0x81000000
-125 [0x0000007fffffe7d0]: 0xffb55040 0x7f 0x0 0x81000000 <---
-126 [0x0000007fffffe7e0]: 0xffc26040 0x7f 0x0 0x81000000
-127 [0x0000007fffffe7f0]: 0xfff95040 0x7f 0x0 0x81000000
-
-So they're all refilled.
-
-Any ideas?
-
-
-Full register dump via devmem2 (ethtool -d doesn't dump all registers):
-
-Value at address 0x02490000: 0x08072203
-Value at address 0x02490004: 0x00200000
-Value at address 0x02490008: 0x00010404
-Value at address 0x0249000c: 0x00000000
-Value at address 0x02490010: 0x00040008
-Value at address 0x02490014: 0x20000008
-Value at address 0x02490018: 0x00000001
-Value at address 0x0249001c: 0x00000001
-Value at address 0x02490020: 0x00000000
-Value at address 0x02490024: 0x00000000
-Value at address 0x02490028: 0x00000000
-Value at address 0x0249002c: 0x00000000
-Value at address 0x02490030: 0x00000000
-Value at address 0x02490034: 0x00000000
-Value at address 0x02490038: 0x00000000
-Value at address 0x0249003c: 0x00000000
-Value at address 0x02490040: 0x00000000
-Value at address 0x02490044: 0x00000000
-Value at address 0x02490048: 0x00000000
-Value at address 0x0249004c: 0x00000000
-Value at address 0x02490050: 0x01600000
-Value at address 0x02490054: 0x00000000
-Value at address 0x02490058: 0x00000000
-Value at address 0x0249005c: 0x00000000
-Value at address 0x02490060: 0x00120000
-Value at address 0x02490064: 0x00000000
-Value at address 0x02490068: 0x00000000
-Value at address 0x0249006c: 0x00000000
-Value at address 0x02490070: 0xffff0002
-Value at address 0x02490074: 0x00000000
-Value at address 0x02490078: 0x00000000
-Value at address 0x0249007c: 0x00000000
-Value at address 0x02490080: 0x00000000
-Value at address 0x02490084: 0x00000000
-Value at address 0x02490088: 0x00000000
-Value at address 0x0249008c: 0x00000000
-Value at address 0x02490090: 0x00000001
-Value at address 0x02490094: 0x00000000
-Value at address 0x02490098: 0x00000000
-Value at address 0x0249009c: 0x00000000
-Value at address 0x024900a0: 0x00000002
-Value at address 0x024900a4: 0x00000000
-Value at address 0x024900a8: 0x00000000
-Value at address 0x024900ac: 0x00000000
-Value at address 0x024900b0: 0x00000001
-Value at address 0x024900b4: 0x00001030
-Value at address 0x024900b8: 0x00000000
-Value at address 0x024900bc: 0x00000000
-Value at address 0x024900c0: 0x00000000
-Value at address 0x024900c4: 0x00000000
-Value at address 0x024900c8: 0x00000000
-Value at address 0x024900cc: 0x00000000
-Value at address 0x024900d0: 0x003b0200
-Value at address 0x024900d4: 0x03e8001e
-Value at address 0x024900d8: 0x000f4240
-Value at address 0x024900dc: 0x0000007c
-Value at address 0x024900e0: 0x00000000
-Value at address 0x024900e4: 0x00000000
-Value at address 0x024900e8: 0x00000000
-Value at address 0x024900ec: 0x00000000
-Value at address 0x024900f0: 0x00000000
-Value at address 0x024900f4: 0x00000000
-Value at address 0x024900f8: 0x000d0000
-Value at address 0x024900fc: 0x00000000
-Value at address 0x02490100: 0x00000000
-Value at address 0x02490104: 0x00000000
-Value at address 0x02490108: 0x00000000
-Value at address 0x0249010c: 0x00000000
-Value at address 0x02490110: 0x00001050
-Value at address 0x02490114: 0x00000000
-Value at address 0x02490118: 0x00000000
-Value at address 0x0249011c: 0x1bfd73f7
-Value at address 0x02490120: 0x421e7a49
-Value at address 0x02490124: 0x100c30c3
-Value at address 0x02490128: 0x00320220
-Value at address 0x02490200: 0x000e010c
-Value at address 0x02490204: 0x00000006
-Value at address 0x02490208: 0x00000000
-Value at address 0x0249020c: 0x00000000
-Value at address 0x02490210: 0x00000000
-Value at address 0x02490214: 0x00000000
-Value at address 0x02490218: 0x00000000
-Value at address 0x0249021c: 0x00000000
-Value at address 0x02490220: 0x00000000
-Value at address 0x02490224: 0x00000000
-Value at address 0x02490228: 0x00000000
-Value at address 0x0249022c: 0x00000000
-Value at address 0x02490230: 0x00000000
-Value at address 0x02490234: 0x00000000
-Value at address 0x02490238: 0x00000102
-Value at address 0x02490d00: 0x00ff000a
-Value at address 0x02490d04: 0x00000000
-Value at address 0x02490d08: 0x00000000
-Value at address 0x02490d0c: 0x00000000
-Value at address 0x02490d10: 0x00000000
-Value at address 0x02490d14: 0x00000030
-Value at address 0x02490d18: 0x00000000
-Value at address 0x02490d1c: 0x00000000
-Value at address 0x02490d20: 0x00000000
-Value at address 0x02490d24: 0x00000000
-Value at address 0x02490d28: 0x00000000
-Value at address 0x02490d2c: 0x00000002
-Value at address 0x02490d30: 0x0ff1c4e0
-Value at address 0x02490d34: 0x00000000
-Value at address 0x02490d38: 0x00280020
-Value at address 0x02490d3c: 0x00000000
-Value at address 0x02491000: 0x00000000
-Value at address 0x02491004: 0x0002180e
-Value at address 0x02491008: 0x00000000
-Value at address 0x0249100c: 0x00006300
-Value at address 0x02491010: 0x00000000
-Value at address 0x02491014: 0x00000000
-Value at address 0x02491018: 0x00000000
-Value at address 0x0249101c: 0x00000000
-Value at address 0x02491020: 0x00000000
-Value at address 0x02491024: 0x00000000
-Value at address 0x02491028: 0x00000000
-Value at address 0x0249102c: 0x00000000
-Value at address 0x02491030: 0x00000000
-Value at address 0x02491034: 0x00000000
-Value at address 0x02491038: 0x00000000
-Value at address 0x0249103c: 0x00000000
-Value at address 0x02491040: 0x00000000
-Value at address 0x02491044: 0x00000000
-Value at address 0x02491048: 0x00000000
-Value at address 0x0249104c: 0x00000000
-Value at address 0x02491050: 0x00000000
-Value at address 0x02491054: 0x00000000
-Value at address 0x02491100: 0x00010000
-Value at address 0x02491104: 0x00101011
-Value at address 0x02491108: 0x00080c01
-Value at address 0x0249110c: 0x00000000
-Value at address 0x02491110: 0x0000007f
-Value at address 0x02491114: 0xffffc000
-Value at address 0x02491118: 0x0000007f
-Value at address 0x0249111c: 0xffffe000
-Value at address 0x02491120: 0xffffc500
-Value at address 0x02491124: 0x00000000
-Value at address 0x02491128: 0xffffe7d0
-Value at address 0x0249112c: 0x000001ff
-Value at address 0x02491130: 0x000001ff
-Value at address 0x02491134: 0x0000d041
-Value at address 0x02491138: 0x000000a0
-Value at address 0x0249113c: 0x000d07c0
-Value at address 0x02491140: 0x00000000
-Value at address 0x02491144: 0xffffc500
-Value at address 0x02491148: 0x00000000
-Value at address 0x0249114c: 0xffffe7d0
-Value at address 0x02491150: 0x0000007f
-Value at address 0x02491154: 0xffc45b02
-Value at address 0x02491158: 0x0000007f
-Value at address 0x0249115c: 0xffb55040
-Value at address 0x02491160: 0x00000484
-Value at address 0x02491164: 0x00000000
-Value at address 0x02491168: 0x00000000
-Value at address 0x0249116c: 0x00000000
-Value at address 0x02491170: 0x00000000
-Value at address 0x02491174: 0x00000000
-Value at address 0x02491178: 0x00000000
-Value at address 0x0249117c: 0x00000000
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
 
