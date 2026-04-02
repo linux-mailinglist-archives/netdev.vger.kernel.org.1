@@ -1,324 +1,154 @@
-Return-Path: <netdev+bounces-274624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274625-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QMoyJzaczmnfowYAu9opvQ
-	(envelope-from <netdev+bounces-274624-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:41:26 +0200
+	id +GWSKGOczmnfowYAu9opvQ
+	(envelope-from <netdev+bounces-274625-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:42:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF3B238C131
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:41:25 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E62038C158
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9325C30B73F2
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 16:32:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1FEE93126BBC
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 16:33:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 553983F075E;
-	Thu,  2 Apr 2026 16:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D213EC2D7;
+	Thu,  2 Apr 2026 16:32:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JjfK2Ic3"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="eMOhEyPT";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="6AqVCuFc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A633E1232
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 16:31:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07EC63F54BE
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 16:32:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775147515; cv=none; b=a7dINOR0iktufwaSb+5xYHHP1muvQ+aiBQnILOyzHoFYG3SEhz/rV1lNABn7QJus9oy2B+0tpeF7tqSKbt0ec6sIVboCVQv9Ak7HSJ3ZqSWXkI9r/EY0FFAFHIfu9E5zaFFp3EkChqw8Yul2Tdp7rKD0wptbX8OwG7d8SHVLufk=
+	t=1775147562; cv=none; b=uJSZ85s1EGnMlD7xfuZXDGTv+AvcwASB2XWm3LmVKEVg6PpUcbLX7RdGCAyaP3sIGOwpA8K6E/ASOAXAkPtRD96KCkGl9LL3uV1ogxUZfmB9Xod5VHvTT0BxTKF+968jGQyBALEQidiiQRTUMGEKWvDsqaEx9oNTjk3Q2Doa8ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775147515; c=relaxed/simple;
-	bh=iP5bi6pBVk6bRLmDn5ibj4cXssFIig7lW3pum6a9cME=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
-	 References:In-Reply-To; b=KbLm9EnMfhPFj+eQyF6LX56qapAtdq3135Rna6D8symq19IXXIxaipEgO7wZnbrFHpMInntpbT6XO9uZH6AXp0POKNO1EYJapAfimEh0wj0A5jyvF4YZyY1cYD5EKZb2INgWnEMjWcF8yKfnaGhkkUXSZytUZsVUgvoBksOPagk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JjfK2Ic3; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 626941A3101;
-	Thu,  2 Apr 2026 16:31:52 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 26CA3602CD;
-	Thu,  2 Apr 2026 16:31:52 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 84CC610450283;
-	Thu,  2 Apr 2026 18:31:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1775147510; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=WuJZVZEKTSBFwqgMqy0xU+M9BhNKDah2gCQVIIC1fkE=;
-	b=JjfK2Ic3CJ6g0rp8Gh/J+AgRLlNdPsWkdKmyAWDxmEsND7kXMaKQcqO6HdrEOTs/UVy3GR
-	mxBLgVN/LNvz51nyrVs9XB5mlDNrOM3vHeWtt2qa0xLx9RmKeU0bqLr0qoESCi+wQEcA89
-	qGGZ44Daxt4Z3NwR7L2nSIr8JRgyz+WxRGr1X6O+3QrV2uHRtL9WNtx+tzxApmWc7sAQK0
-	vE3YcfLZbmo4NGHHZW5lTJleItCf2a+9kiAM9ujYRWogra4DuwYzmu76Gt0Ci6a6iYoar8
-	ZwZmR+g0dSkPykPvfN3jXvp2d3LlO59PVmkQTa5sa6D11Iruf6pxF9SWLrX+8g==
+	s=arc-20240116; t=1775147562; c=relaxed/simple;
+	bh=JR2o/Dc9KQQqFMs2hnW304fAynwgXnuFy/EOByn52Nw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TXnpKf72zDkvXtdTbPeEsT6txYtLUwCcpe0GUJUj3YeXo4oBPb9H/J5BnUZE5x60VJC8pQTO3Kv8lre7tO2xU+bQNx1JSWpO3zO9xdOFVvcHmPJwlBeoqhFLMrnb6kZfOMHHLcMCtOxLhWH+ZwdJPBWnVmp23qAyLdP26mRcC8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=eMOhEyPT; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=6AqVCuFc; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 2 Apr 2026 18:32:37 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1775147559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JR2o/Dc9KQQqFMs2hnW304fAynwgXnuFy/EOByn52Nw=;
+	b=eMOhEyPTU45GkNf/h1IYQsQon69FNInXZ4/egJiqsaby0sSkT0r9cUIx8DmMVQu4icudbG
+	71Vl7qMm7zXTtLXkKpEo1wlUEpDkZnmOxmebPUrfpXnupboSeDZQEjH3LP1MpHjfQRN2iC
+	oo66MXpiAqq6Q+WVN49mowhgQsL3IOkd3cLmYYzDqMDYFq1tUj6x7dJ7ABmI2rF8VD3bU7
+	d1Vagd7r099xSMJNkrFA6rnyEkYf013CPmWyPNMQTqhnYJtOE/3HXHAsyqtKA2CvnfRDEA
+	qgKV86mG2h649kHXOmWPqcAnA/3Akf9JWF5eCeriKJCucGX6s8L+XMGdhPwMXg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1775147559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JR2o/Dc9KQQqFMs2hnW304fAynwgXnuFy/EOByn52Nw=;
+	b=6AqVCuFcgm8NfkvkcuFzT+6kOyfZDv460at6EMrCJkrv7U4omptslPzMFsro2W2Y4zBCvx
+	UkDaiYTCIzaLE/BQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, "(JC), Jayachandran" <j-rameshbabu@ti.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Chintan Vankar <c-vankar@ti.com>, Danish Anwar <danishanwar@ti.com>,
+	Daolin Qiu <d-qiu@ti.com>, Eric Dumazet <edumazet@google.com>,
+	Felix Maurer <fmaurer@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	"Raghavendra, Vignesh" <vigneshr@ti.com>,
+	"Bajjuri, Praneeth" <praneeth@ti.com>,
+	"TK, Pratheesh Gangadhar" <pratheesh@ti.com>,
+	"Muralidharan, Neelima" <neelima@ti.com>
+Subject: Re: [PATCH RFC net-next v2 2/2] af_packet: Add port specific
+ handling for HSR
+Message-ID: <20260402163237.EIE16Pj_@linutronix.de>
+References: <20260312154253.UC-QUPvD@linutronix.de>
+ <willemdebruijn.kernel.be379ee17449@gmail.com>
+ <20260313092226.SscHp2zQ@linutronix.de>
+ <20260313160410.LEhav8Xz@linutronix.de>
+ <willemdebruijn.kernel.1fbf050c50d62@gmail.com>
+ <20260317172906.eG2LxlZ7@linutronix.de>
+ <willemdebruijn.kernel.17068ce38efa5@gmail.com>
+ <20260319142613.KHz32I-V@linutronix.de>
+ <willemdebruijn.kernel.8e323262df61@gmail.com>
+ <20260324163820.p9M2z27W@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 02 Apr 2026 18:31:44 +0200
-Message-Id: <DHIT9TPJQJ46.21A89R5UAFXVH@bootlin.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net-next 10/11] net: macb: use context swapping in
- .set_ringparam()
-Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Richard Cochran" <richardcochran@gmail.com>, "Russell King"
- <linux@armlinux.org.uk>, "Paolo Valerio" <pvalerio@redhat.com>, "Conor
- Dooley" <conor@kernel.org>, "Vladimir Kondratiev"
- <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
- <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
- <benoit.monin@bootlin.com>, "Tawfik Bayouk" <tawfik.bayouk@mobileye.com>,
- "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Maxime Chevallier"
- <maxime.chevallier@bootlin.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-To: "Nicolai Buchwitz" <nb@tipi-net.de>, =?utf-8?q?Th=C3=A9o_Lebrun?=
- <theo.lebrun@bootlin.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260401-macb-context-v1-0-9590c5ab7272@bootlin.com>
- <20260401-macb-context-v1-10-9590c5ab7272@bootlin.com>
- <90f843aa3940bdbabadddce27314c1f1@tipi-net.de>
-In-Reply-To: <90f843aa3940bdbabadddce27314c1f1@tipi-net.de>
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
+In-Reply-To: <20260324163820.p9M2z27W@linutronix.de>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[linutronix.de,none];
+	R_DKIM_ALLOW(-0.20)[linutronix.de:s=2020,linutronix.de:s=2020e];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274624-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[microchip.com,tuxon.dev,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,mobileye.com,bootlin.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[21];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-274625-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,ti.com,davemloft.net,lunn.ch,google.com,redhat.com,kernel.org,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[theo.lebrun@bootlin.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:mid,bootlin.com:email,bootlin.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EF3B238C131
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bigeasy@linutronix.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linutronix.de:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linutronix.de:dkim,linutronix.de:mid]
+X-Rspamd-Queue-Id: 1E62038C158
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu Apr 2, 2026 at 1:29 PM CEST, Nicolai Buchwitz wrote:
-> On 1.4.2026 18:39, Th=C3=A9o Lebrun wrote:
->> ethtool_ops.set_ringparam() is implemented using the primitive close /
->> update ring size / reopen sequence. Under memory pressure this does not
->> fly: we free our buffers at close and cannot reallocate new ones at
->> open. Also, it triggers a slow PHY reinit.
->>=20
->> Instead, exploit the new context mechanism and improve our sequence to:
->>  - allocate a new context (including buffers) first
->>  - if it fails, early return without any impact to the interface
->>  - stop interface
->>  - update global state (bp, netdev, etc)
->>  - pass buffer pointers to the hardware
->>  - start interface
->>  - free old context.
->>=20
->> The HW disable sequence is inspired by macb_reset_hw() but avoids
->> (1) setting NCR bit CLRSTAT and (2) clearing register PBUFRXCUT.
->>=20
->> The HW re-enable sequence is inspired by macb_mac_link_up(), skipping
->> over register writes which would be redundant (because values have not
->> changed).
->>=20
->> The generic context swapping parts are isolated into helper functions
->> macb_context_swap_start|end(), reusable by other operations=20
->> (change_mtu,
->> set_channels, etc).
->>=20
->> Signed-off-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
->> ---
->>  drivers/net/ethernet/cadence/macb_main.c | 89=20
->> +++++++++++++++++++++++++++++---
->>  1 file changed, 82 insertions(+), 7 deletions(-)
->>=20
->> diff --git a/drivers/net/ethernet/cadence/macb_main.c=20
->> b/drivers/net/ethernet/cadence/macb_main.c
->> index 42b19b969f3e..543356554c11 100644
->> --- a/drivers/net/ethernet/cadence/macb_main.c
->> +++ b/drivers/net/ethernet/cadence/macb_main.c
->> @@ -2905,6 +2905,76 @@ static struct macb_context=20
->> *macb_context_alloc(struct macb *bp,
->>  	return ctx;
->>  }
->>=20
->> +static void macb_context_swap_start(struct macb *bp)
->> +{
->> +	struct macb_queue *queue;
->> +	unsigned int q;
->> +	u32 ctrl;
->> +
->> +	/* Disable software Tx, disable HW Tx/Rx and disable NAPI. */
->> +
->> +	netif_tx_disable(bp->netdev);
->> +
->> +	ctrl =3D macb_readl(bp, NCR);
->> +	macb_writel(bp, NCR, ctrl & ~(MACB_BIT(RE) | MACB_BIT(TE)));
->> +
->> +	macb_writel(bp, TSR, -1);
->> +	macb_writel(bp, RSR, -1);
->> +
->> +	for (q =3D 0, queue =3D bp->queues; q < bp->num_queues; ++q, ++queue) =
-{
->> +		queue_writel(queue, IDR, -1);
->> +		queue_readl(queue, ISR);
->> +		if (bp->caps & MACB_CAPS_ISR_CLEAR_ON_WRITE)
->> +			queue_writel(queue, ISR, -1);
->> +	}
->> +
->> +	for (q =3D 0, queue =3D bp->queues; q < bp->num_queues; ++q, ++queue) =
-{
->> +		napi_disable(&queue->napi_rx);
->> +		napi_disable(&queue->napi_tx);
->> +	}
->
-> tx_error_task, hresp_err_bh_work, and tx_lpi_work all dereference
-> bp->ctx and could race with the pointer swap in swap_end.
-> macb_close() cancels at least tx_lpi_work here. Should these be
-> flushed too?
+Hi Willem,
 
-This is a large topic! While trying to find a solution as part of this
-series I am noticing many race conditions. With this context series we
-worsen some (by introducing bp->ctx NULL ptr dereference).
+On 2026-03-24 17:38:21 [+0100], To Willem de Bruijn wrote:
+> On 2026-03-19 12:27:57 [-0400], Willem de Bruijn wrote:
+> >=20
+> > Right, so this is simple without hardware offload. Does this HW
+> > offload exist, or is this aspirational. At least for infrequent PTP
+> > it does not sound important.
+>=20
+> The snippet below was for the icssg driver as-is and it works with
+> updated firmware to ignore PTP packets while HW offloading is enabled.
+=E2=80=A6
+> With the skb_ext I had, the mechanism was mostly the same but it relied
+> only on the skb_ext data. Now it has to look at skb->mark.
 
-Let's start by identifying all schedule-able contexts involved:
- - #1 any request from userspace, too many callbacks to list
- - #2 NAPI softirq or kthread context, macb_{rx,tx}_poll()
- - #3 bp->hresp_err_bh_work / macb_hresp_error_task()
- - #4 bp->tx_lpi_work / macb_tx_lpi_work_fn()
- - #5 queue->tx_error_task / macb_tx_error_task()
- - #6 IRQ context, macb_interrupt()
-
-Some race conditions:
-
- - #1 macb_close() doesn't cancel & wait upon #3 hresp_err_bh_work.
-   They could race, especially as #3 doesn't grab bp->lock. One race
-   example: #3 BP HRESP starts the interface after it has been closed
-   and buffers freed. RBQP/TBQP are not reset so MACB would occur
-   memory corruption on Rx and transmit memory content.
-
- - #1 macb_close() doesn't cancel & wait upon #5 tx_error_task. #5 does
-   grab bp->lock but that doesn't make it much safer. One race example:
-   same as above, restart of interface with ghost ring buffers.
-
- - #3 hresp_err_bh_work could collide with anything as it does no
-   locking, especially #1 (xmit for example) or #2 (NAPI). It is less
-   likely to collide with #6 IRQ because it starts by disabling those
-   but there is a possibility of the IRQ having already triggered and
-   macb_interrupt() already running in parallel of
-   macb_hresp_error_task().
-
- - #5 queue->tx_error_task writes to Tx head/tail inside bp->lock.
-   #1 macb_start_xmit() modifies those too, but inside
-   queue->tx_ptr_lock. Oops. There probably are other places modifying
-   head/tail or any other Tx queue value without queue->tx_ptr_lock.
-
- - #5 macb_tx_error_task() tries to gently disable TX but if it
-    times-out then it uses the global switch (TE field in NCR
-    register). That sounds racy with #2 NAPI that doesn't grab bp->lock
-    and would probably break if the interface is shutdown under its
-    feet.
-
-I don't see much more. To fix all that, someone ought to exhaustively go
-through all tasks (#1-6 above) & all shared data and reason one by one.
-Who will be that someone? ;-) But that sounds pretty unrelated to the
-series at hand, no?
-
-I'd agree that some locking of bp->lock around the swap operation would
-improve the series, and I'll add that in V2 for sure!
-
->
->> +}
->> +
->> +static void macb_context_swap_end(struct macb *bp,
->> +				  struct macb_context *new_ctx)
->> +{
->> +	struct macb_context *old_ctx;
->> +	struct macb_queue *queue;
->> +	unsigned int q;
->> +	u32 ctrl;
->> +
->> +	/* Swap contexts & give buffer pointers to HW. */
->> +
->> +	old_ctx =3D bp->ctx;
->> +	bp->ctx =3D new_ctx;
->> +	macb_init_buffers(bp);
->> +
->> +	/* Start NAPI, HW Tx/Rx and software Tx. */
->> +
->> +	for (q =3D 0, queue =3D bp->queues; q < bp->num_queues; ++q, ++queue) =
-{
->> +		napi_enable(&queue->napi_rx);
->> +		napi_enable(&queue->napi_tx);
->> +	}
->> +
->> +	if (!(bp->caps & MACB_CAPS_MACB_IS_EMAC)) {
->> +		for (q =3D 0, queue =3D bp->queues; q < bp->num_queues;
->> +		     ++q, ++queue) {
->> +			queue_writel(queue, IER,
->> +				     bp->rx_intr_mask |
->> +				     MACB_TX_INT_FLAGS |
->> +				     MACB_BIT(HRESP));
->> +		}
->> +	}
->> +
->> +	ctrl =3D macb_readl(bp, NCR);
->> +	macb_writel(bp, NCR, ctrl | MACB_BIT(RE) | MACB_BIT(TE));
->> +
->> +	netif_tx_start_all_queues(bp->netdev);
->> +
->> +	/* Free old context. */
->> +
->> +	macb_free_consistent(old_ctx);
->
-> 1. kfree(old_ctx) is missing. The context struct itself leaks on
->     every swap.
-
-Agreed.
-
-> 2. macb_close() calls netdev_tx_reset_queue() for each queue.
->     Shouldn't the swap do the same? BQL accounting will be stale
->     after switching to a fresh context.
-
-I explicitely left that out as I thought DQL would benefit from keeping
-past context of the traffic. But indeed as we start afresh from a new
-set of buffers we should reset DQL. fbnic, pointed out as an good
-example by Jakub recently, does that.
-
->
-> 3. macb_configure_dma() is not called after the swap. For
->     set_ringparam this is probably fine since rx_buffer_size
->     does not change, but this becomes a problem in patch 11.
-
-Indeed, I had missed it took bp->ctx->rx_buffer_size as a parameter.
-Will fix.
-
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Had you so time think about it? The proposed skb->mark solution kind of
+works but feels hacky.
+The version with skb_ext does touch packet's code but it is self
+contained and does not slowdown the !HSR+PTP case since the compare
+conditions are NOPed.
+How do we move forward here?
+=20
+Sebastian
 
