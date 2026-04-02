@@ -1,165 +1,165 @@
-Return-Path: <netdev+bounces-274637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274638-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gG6jIheozmkgpQYAu9opvQ
-	(envelope-from <netdev+bounces-274637-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:32:07 +0200
+	id MD+7DEanzmkgpQYAu9opvQ
+	(envelope-from <netdev+bounces-274638-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:28:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D92A538C8AE
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:32:06 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE4B038C83A
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:28:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC83E300B470
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 17:27:00 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A33613024325
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 17:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0DF03AA512;
-	Thu,  2 Apr 2026 17:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A019D396B96;
+	Thu,  2 Apr 2026 17:28:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wDot2J5q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gsmSrLL/"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A71E387585;
-	Thu,  2 Apr 2026 17:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAF63D6462
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 17:28:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775150819; cv=none; b=HLtnt/wB+8ZF5W1FBN5u3JCVqF2pT0b4Jh87reT/3s7kjDxSmAE7JF/mAk+j5EQU3f92RccR8e1jp+ppR29xNL9PGW4Oz45Rge2tFNtQzRpuZHcqRFiKbT/0ByAp0/M4LIFw1piGGtJcoVsyeaXPcysa0QBC1hrjItBnsOorkus=
+	t=1775150914; cv=none; b=UVoDKjlB1iKwurPy5aai4y1YFKauOUmk55671Iz1H5Ljdxv+McpQtDJIewi6qlDQHYRTpJLQe0GAlrZhVhYwhAs3hxhjxHI2omwCKuNHDfaoROP8pLpue1NAsYCCinp1rBLMH+E6ssj+PLAMCbO2tOZECvZQGcuVAU8wy3QaTnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775150819; c=relaxed/simple;
-	bh=456qpab/2Y+5583+hhZDWqU1vyjCcK0w3bOstF2nGuA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hBOOrSUEVVKH/hJXguKK8YLNksDvNNgvOHYX117nIeD0aJnEIPMYJz80fPjceUeUp8zgs2T/XMr+NSHXT5ugCH1UhzA2mx+WVIna4haJYd9nktzxZS7BaZyH5QhZvH0vE81U5hYQCjoSdzlKfWQY/F7FC0bw/+8S3v8ecSFX9HU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wDot2J5q; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=QUbBy1R8qutWlwjlRQhac0BmXJK/rX9BjT6Dj9HxJQQ=; b=wDot2J5qtw3A6g2m333Laq2P5Y
-	CbrFxolUQ2lEuAsFpcFJekG2vVb/DEVj5HBKSawTJ1zPeSE8SkDf+RJuJ/PUfke7Cjvn8Q/dA8I0C
-	MjmwpTj/TS9TfEp8lT1bWI7ONKujEpViZ6lYyf3qLUKLbmEGQvgluausuLtGS8yIOI+YjO8/XaD7r
-	OAaCFspJcOMXpgqp5HGEKKiMCXmkWV7zHC/tnl0mJmIdFM4gOfIILQpok75hiywGRZ4LudorzQpiH
-	ZBIZyRN0TyGBfsZrrC5x3mTVF1O2KZhb6iLgvQa+Yy9IKNLtllhNZNMSdgx0eyjVI6d+Q4nPU+bZ8
-	5Hh6cvPw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56110)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w8Log-000000004l2-2BYS;
-	Thu, 02 Apr 2026 18:26:50 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w8Loe-000000005wa-28B6;
-	Thu, 02 Apr 2026 18:26:48 +0100
-Date: Thu, 2 Apr 2026 18:26:48 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Sam Edwards <cfsworks@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Baruch Siach <baruch@tkos.co.il>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v4 0/2] stmmac crash/stall fixes when under memory
- pressure
-Message-ID: <ac6m2E6FIu4azGj0@shell.armlinux.org.uk>
-References: <20260401041929.12392-1-CFSworks@gmail.com>
- <ac6kfQ98Xjt3dCGj@shell.armlinux.org.uk>
+	s=arc-20240116; t=1775150914; c=relaxed/simple;
+	bh=w9Up1fKB2GEY6om9s47lJMNvXz+5zEdTXVEOI5jkmIU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rvM783LdLJsQ0ltGSXSBWlGm4wrfExDT5+IcrCjVlnc3Rs8w+QMnhriZtY5VrZRQRqtVoPTXnhWLr/5Dwop/50NxUdEAaZkQ28Hj81kVugKSyiFLSSPfoXtEiBQYFRAMrl+/srwHnpKOUnF4j/1LsU4r+hLL7kqqCaGuU958bkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gsmSrLL/; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-43cfbd17589so945638f8f.0
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 10:28:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775150909; x=1775755709; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LFVf762eS5hmMghaQTstY0t0CTwtXlUiAW2YdJ/qH4Y=;
+        b=gsmSrLL/qyh9kxG2HGpnDLpH9GENXHOhmBeO5rRcYFjGVAtLysi7vjB1z8cWYjkLl/
+         pTOW8ZF2hTDF+kecUtDr5V5ANPiD5ZEgOWd8q6ltyHQV2YeCJrSeY7UHY7MjWWokPx5p
+         OuOJonzTUuA5GjEjKJptRe8q/s2miAWVdskOMJBe25SyR618aE9GyYozHSWwdd0YzzP+
+         5QK8BbTTjdLDG6rTvwiHddfv9PApJ+LQ85IrJ5I9dnzn6ZT6CuMgEOmYeqC6g2AGnbZQ
+         lJwV5vFA7B4ZjBgOMcXHdqJ2eNUK+Kotr3EbD2xCctoK+XUkXwA83KJ3vMYT083DB58q
+         HBtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775150909; x=1775755709;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LFVf762eS5hmMghaQTstY0t0CTwtXlUiAW2YdJ/qH4Y=;
+        b=AKIiRio2eyjVuTCn6ubDB4KYuSjl/hixmZo/uXJxMHpakrIm4Q/Lrol72Vxxj2YQ+R
+         YY0IKT7HipQK339wNf+p7wv68FJaPkx81jd6LWlSDn5ij+vOyM/ozuFWS7oWnbQUPirS
+         sec+adGTaaxh2+PtDeMJcwQUDJ6yBl40GpSmuE3TGes3+inDvo9BZn/6lskBkQrIKL2H
+         IjEQ8X63/Thdx4rKhKDX0nDjt/iz5EEANyeLHqkHlet5iCXYHh71yZgk1rKAKBTKzr0x
+         3fckssVRlGDobZ4nvim9dlIb98ShT2+ir2jxWl+1kYaiJZcLN6ffkOSzrBS0zBMwjDky
+         21Uw==
+X-Gm-Message-State: AOJu0YwoqPvc37fHiT3HhIze8Br4yZgCPhcwxyxBPW6JXumRIh11calU
+	yL3ysIZlypu/rMPTs+D5ybw0uX/QAeRTQMZJQutI7PyWdbc/QWdiIurK
+X-Gm-Gg: AeBDieuT2na7YD5ARuV+/rikZVNdzmxpGJNQyIfQn26Hg4xBSF+C7hGgjK8a1yUh1x7
+	7/wcocieV1Z4ZF5oOkD2UqbCH1JAERpbEWFaUdGtfN2CJbZnKMcGGiW1gnM3z40A8JpneRir0fq
+	atcleQ43odFZUGDMJWQwj9kmHwKLVAoAeN73GSrPGS5k0SKRFv8+c0rn8raDf624wr05p2ABRsf
+	AspVxgJR/YBcbv4zpV0dABv6OTq9PNyHp2fxCjBfXa9FeUGoufAqpFUYhQoNrH67NjZzh8ktmQo
+	TArvdKtH940niq9u3BtRHzZYQcTIG2a4LKtYvvup4lKyM+JE38P/BDQ8MidF5SYcpG2Zi8U33V4
+	vFmgwhe2j5zkO9CP1/OrGklaoQ0fLqPhMTHpGsJgPvxlandKoVz1nMAm6vPeL4sEvixggIJloCs
+	gZ9h6DUyc2taEsU/tqz/Pf9fcoydRXIlPgr4Hbkesw7wTPeTxHIw35B6InQJvtqc8V1Rcu2r78F
+	O4c5bGVgZlA
+X-Received: by 2002:a05:6000:184d:b0:43d:2be:e54 with SMTP id ffacd0b85a97d-43d150ea521mr15893913f8f.39.1775150909175;
+        Thu, 02 Apr 2026 10:28:29 -0700 (PDT)
+Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e2c637asm9021482f8f.14.2026.04.02.10.28.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2026 10:28:28 -0700 (PDT)
+From: David Carlier <devnexen@gmail.com>
+To: horatiu.vultur@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	David Carlier <devnexen@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: lan966x: fix page_pool error handling in lan966x_fdma_rx_alloc_page_pool()
+Date: Thu,  2 Apr 2026 18:28:23 +0100
+Message-ID: <20260402172823.83467-1-devnexen@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ac6kfQ98Xjt3dCGj@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274637-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,foss.st.com,bootlin.com,renesas.com,nxp.com,tkos.co.il,st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	NEURAL_SPAM(0.00)[0.540];
+	TAGGED_FROM(0.00)[bounces-274638-lists,netdev=lfdr.de];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shell.armlinux.org.uk:mid,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: D92A538C8AE
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BE4B038C83A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 02, 2026 at 06:16:45PM +0100, Russell King (Oracle) wrote:
-> On Tue, Mar 31, 2026 at 09:19:27PM -0700, Sam Edwards wrote:
-> > Hi netdev,
-> > 
-> > This is v4 of my series containing a pair of bugfixes for the stmmac driver's
-> > receive pipeline. These issues occur when stmmac_rx_refill() does not (fully)
-> > succeed, which happens more frequently when free memory is low.
-> > 
-> > The first patch closes Bugzilla bug #221010 [1], where stmmac_rx() can circle
-> > around to a still-dirty descriptor (with a NULL buffer pointer), mistake it for
-> > a filled descriptor (due to OWN=0), and attempt to dereference the buffer.
-> > 
-> > In testing that patch, I discovered a second issue: starvation of available RX
-> > buffers causes the NIC to stop sending interrupts; if the driver stops polling,
-> > it will wait indefinitely for an interrupt that will never come. (Note: the
-> > first patch makes this issue more prominent -- mostly because it lets the
-> > system survive long enough to exhibit it -- but doesn't *cause* it.) The second
-> > patch addresses that problem as well.
-> > 
-> > Both patches are minimal, appropriate for stable, and designated to `net`. My
-> > focus is on small, obviously-correct, easy-to-explain changes: I'll follow up
-> > with another patch/series (something like [2]) for `net-next` that fixes the
-> > ring in a more robust way.
-> > 
-> > The tx and zc paths seem to have similar low-memory bugs, to be addressed in
-> > separate series.
-> 
-> I've tested this on my Jetson Xavier platform. One of the issues I've
-> had is that running iperf3 results in the receive side stalling because
-> it runs out of descriptors. However, despite the receive ring
-> eventually being re-filled and the hardware appropriately prodded, it
-> steadfastly refuses to restart, despite the descriptors having been
-> updated.
+page_pool_create() can return an ERR_PTR on failure. The return value
+is used unconditionally in the loop that follows, passing the error
+pointer through xdp_rxq_info_reg_mem_model() into page_pool_use_xdp_mem(),
+which dereferences it, causing a kernel oops.
 
-I'll make it clear: this problem exists without your patches, so it
-is not a regression.
+Add an IS_ERR check after page_pool_create() to return early on failure.
 
+Fixes: 11871aba1974 ("net: lan96x: Use page_pool API")
+Cc: stable@vger.kernel.org
+Signed-off-by: David Carlier <devnexen@gmail.com>
+---
+ drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
+index 7b6369e43451..34bbcae2f068 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
+@@ -92,6 +92,9 @@ static int lan966x_fdma_rx_alloc_page_pool(struct lan966x_rx *rx)
+ 
+ 	rx->page_pool = page_pool_create(&pp_params);
+ 
++	if (unlikely(IS_ERR(rx->page_pool)))
++		return PTR_ERR(rx->page_pool);
++
+ 	for (int i = 0; i < lan966x->num_phys_ports; ++i) {
+ 		struct lan966x_port *port;
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.53.0
+
 
