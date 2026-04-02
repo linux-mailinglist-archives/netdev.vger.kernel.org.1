@@ -1,411 +1,257 @@
-Return-Path: <netdev+bounces-274675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274676-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id oVawKFDIzmmtqAYAu9opvQ
-	(envelope-from <netdev+bounces-274675-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 21:49:36 +0200
+	id SFKEGHTIzmmtqAYAu9opvQ
+	(envelope-from <netdev+bounces-274676-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 21:50:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F131638DC90
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 21:49:35 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0518438DC9F
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 21:50:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 252343008224
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 19:49:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6650D3029C02
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 19:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F1D37B41B;
-	Thu,  2 Apr 2026 19:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBCA73D9DD4;
+	Thu,  2 Apr 2026 19:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mBA9Em2d"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="iz0gfrbC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013045.outbound.protection.outlook.com [40.93.196.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1532C3659F9
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 19:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775159372; cv=none; b=hQxGlSeAlTn1xaESMVWGFRygM+p69d9u4x5lz5sl4HrxjHyJMTZRnNQbE5RTv/qea0bolw1BMla9WV6FPeeqCzSoPdyb5yKhgOj/90Rwvuo+N2ZBbSFgLTj7WjoUqU9acQol54K8GnCgUtlIhKw0k6bPuZ8g6BvN4pqbgdXow8I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775159372; c=relaxed/simple;
-	bh=bXZVRbhyQyXsHPD+AK7JXDHMmDS9HrnLFBdnlZiPr8c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QZ/+rWAT6Rx0JKJBjolzKlSnSU9YaNcTKQbPKyr85Soq4jGHe12j7wcHCd9jd4+amHuw03Y/oEWQCupujrEbvMa/nVbCFJMh9Fxjj7k6G17Jjmf09omoV/MuHxkM0fKLC2+NeEaukBlGJzmTy3pkWmwnmEcPFIII9CixBy6c9BE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mBA9Em2d; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-50b268fba9aso10676461cf.3
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 12:49:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775159370; x=1775764170; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wB0nhkRSEuZ4VZIuA2RyZ5ktjm9nKZErCv/yIZXktnY=;
-        b=mBA9Em2dbPkkA7I08qzxznFEja+bCNUB7f59inF4r8dHYky7KHRmt19Tvz1S+ZvSsA
-         q9komwrBLJyn6bQN3NCye9A5qsb54KE4vlsdY7YAShhleQidkIy5PIcaMCIFffvlRvZX
-         ABL/dFJofiHYSnyzbgZbLLcaZMOqOSg22NSbNdUwkPsuX+SJyLkVyw/3d+0X1XGTZS3c
-         zeDKWsd1xBzsmt+TeR8hAD25SE0W0PP7RAMzJn4PP1n8IELxfL3YjPSrNWNxH+Cd0Kin
-         CU/MG3kp8qy4dM1XAtzz6fTnr6YM9BYyy0fMM3XCBmHdA3HhUC3W4pwPPUqNRgpyD3T6
-         VS8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775159370; x=1775764170;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wB0nhkRSEuZ4VZIuA2RyZ5ktjm9nKZErCv/yIZXktnY=;
-        b=FVr+J2zPDrT5BOraD/Y++ayUfxuKX/AG3YiJmAWwN7MnWHwYgcY2bvs8wUGkxkGqOY
-         1Caf0j39KUfucOCqyr6RnlL/XSzRYW79rKUlhdSo849ZELWrlP90uMhQ1TulL7v6gO8I
-         aaHB8NwbNLnOHL06KCxf2PdsKybOTHSIjIrr+dm6uzDMG9/goc4bsVPSNL6Z3oBH27Ci
-         g52pDWUAqCJ6Z/8FjRaitGGuK1V9TPKTmnQcVF3YFiFOMOwncTWTb18OPyTf3xPJwns3
-         1qSFMiCnhUeKm49v7LBGIRic3oBKuC7HXVY3gHrVsbR35k4NlSEZCUCFXDcvwkRLezwJ
-         9QyA==
-X-Forwarded-Encrypted: i=1; AJvYcCXIPCF7gbTnNVb/4gZQmooKPEv9zeWeNWTqG0mKkrG+pQP1hq/hgwZxO8XNEiF8qV2S9xm9kmY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYhJjYXzIsSlpVA4BnC+jHCG4md/ApMUFyjnKqdW9l3ouoq//I
-	FI8SL+OCpyBnZIpv6znHmZYkUxPaKW/q9vP84gr8FO+V+rrronzY2lPtkUmegnvq
-X-Gm-Gg: ATEYQzz0y2hZcqWZbqf8Rqm1Lt6ZyZHkds1lprLSt0lXiGRvBrhPuGjG4BR/93ixd2d
-	N/Nr3jjKyeDhnsukrp8RXOAiP4R77adw10zFd/jjiJh/6XwMW9k0BZtJINbQERPLhDXzh/ZHO2U
-	WMfuI5Xlt/CUl2Ek6KtfQ14HJ4Es5nBsOFOM+ayPVN2DCjK1VInTnR8xh+HSO3S8Fv/kLBZHofD
-	/zDjSgyOR7oQIFmrpRP5atwEJ1gfKDp6PIHzjd3kcshETBezPB/LukE9hBnmjydaFduRsTBSYXo
-	ffA5v6rm2jtF32GsXT6EHhsTU85ap+8CRQGY4ZfLeT6DI9oW7VvV6KqteUEERtaybj9NWu68+QD
-	7yLvrZkCNWmGcf8n034usah4xx8tNK9wiPlN2GJ3aRlibnODqVT03DY8xa4SSgj5ALMOACThKoW
-	MpqxxVhps9lTbOQMIPjS2TF08OEeBfh1zY9yerrsoEjwggxYTuUvhmoKD4UwHrbA==
-X-Received: by 2002:a17:903:238b:b0:2ad:d0ff:2ed4 with SMTP id d9443c01a7336-2b28164c3d7mr6124885ad.6.1775158959241;
-        Thu, 02 Apr 2026 12:42:39 -0700 (PDT)
-Received: from ubunut-vm.. (c-73-240-82-137.hsd1.or.comcast.net. [73.240.82.137])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b27472d5e5sm48432755ad.15.2026.04.02.12.42.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 12:42:38 -0700 (PDT)
-From: Joel <joelcrouch@gmail.com>
-To: andrew+netdev@lunn.ch
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Joel <joelcrouch@gmail.com>
-Subject: [PATCH] sungem: fix PHY initialization hardware failure check and pointe style
-Date: Thu,  2 Apr 2026 19:42:35 +0000
-Message-ID: <20260402194235.11986-1-joelcrouch@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55112372EEF;
+	Thu,  2 Apr 2026 19:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775159407; cv=fail; b=SFRk0Pb3ZvVxNeqzN2KpeOx9CE2DRoTZy6bl1ISjkPNReV9+mAFGb8+Hesc7AVcG6/h0U+8FqrweglW+zDeczm0zXTa4z97g2MAE+qQT22UG0beEXoGjQP1m5q/z3qAlnpmEeRW5xzAn6wvWOQHWGHq5PHfXUwR00XU8NGOKpus=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775159407; c=relaxed/simple;
+	bh=FP8ukfp6NsKB1o/vw5kzHJcwvwu9wJNM0GwU2w4+EiE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ZQpXMCZarWn/Y4qDhsRNdsIBAr+FUCH4f2dHTXv1VZrXwBBluFV0j5NgKLrTeLxzbcU0cL0j5GfECkwL8BWOwkiy6CFfYRmsnKwDTO17MTIUotFUPNRrXM9R2g4ZWNdwDQ4v3hV25mvxRAN+7K2u6uyUmjfzprSzUkT+60XpKTw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=iz0gfrbC; arc=fail smtp.client-ip=40.93.196.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KfBQTDQRUiUhMWqHu5TfLvELG7uQXun1HqokyAIZ/aOshhGNGOpEoLzzqlYChD0C/UMmKUj+2dC9LLaIw1gE2rrTdiE7oHGdWgykHVm++XMHBxEdKUiNrWx0qBSQTbrB7B1S5sjCZUuVPaz1y1O3vV2etCqnuV940dilCfnBGtAdQ56JpyPtYN0XRKdblyMYEXq6jBy36ov+aRwgVY2RbI/5Xx3+LG8Jt4emymxz1xkOxxVzWP8V5NL2CpA7SXjMqf/ylbj6rG1n9e3ovgYohip9bzH8cRUcrVdHOUt3QlNSP7S55QyaX2p3RvMoqraYNIkSbrhH4+iyjeEnSBE+iw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qmnBaRhO1z61QHrJ7qTMivnzXVIEB6d5s9cMxBZL6dM=;
+ b=SmM9ptQPCRfB2VM6o2wD4XA6q4Z530H9xApwdhsJ6410dYjdsefG3k5S+R8H34pjPTv/Np3ycgjK20TiVxyMP4xgQeK8WAx6ykdBnWM3bLe7jHE3IUmg3deUz+FtMhyimCnJOC8q/lGjK1zJgiQ85So6V1KxJKU2dDfin/+FHfCvG6Y0uVhIQzVccFdCyAv3tMmC0IgOgru/sJtMX6QgZ1XwMDN/ZXnQIawhxZQAAV+1vSGgMTXEX0lw82HuqhrTAoGAKm+/OtWDycJCD8Hu2ldGDjOQqGeJRJp1FVOSYlcP0TPdWVg3oK7bOM61auorMqxtUpIlotcWp4Z1shQHtA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qmnBaRhO1z61QHrJ7qTMivnzXVIEB6d5s9cMxBZL6dM=;
+ b=iz0gfrbCfZreSFcSD/p3Y6WPiXpTi6adr9AerI7t6vHqWrQQS+iu/Pia7hjab504VRJFYT6yJj7aJDhNHjygqWSyJMbDWyj4AmKPKASJKL81nXeUngSE9Rvw6u+FFU2Bmpxiem/NiS61bX+6xQW1D3LQAOW7srLwa7+VlBxumg4Z2BfQ5Bv6Wr49twdd4c7WxxpciYEeNyhlICCLBUeHjIoieGkxuJkpvvFZlS8I9rriSyAgv81NML+MzLA6akb5WBRjOf795d/oAsAF328XhZyh+VG1xIWXWiUl0DT0KhHaDmiacuugek2eXSNJeoj35TPY/E3ZD1Kz+Y2HNYYRuQ==
+Received: from BN8PR04CA0053.namprd04.prod.outlook.com (2603:10b6:408:d4::27)
+ by CH0PR12MB8508.namprd12.prod.outlook.com (2603:10b6:610:18c::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.17; Thu, 2 Apr
+ 2026 19:49:59 +0000
+Received: from BN1PEPF00004681.namprd03.prod.outlook.com
+ (2603:10b6:408:d4:cafe::f1) by BN8PR04CA0053.outlook.office365.com
+ (2603:10b6:408:d4::27) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9769.20 via Frontend Transport; Thu,
+ 2 Apr 2026 19:49:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN1PEPF00004681.mail.protection.outlook.com (10.167.243.87) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9769.17 via Frontend Transport; Thu, 2 Apr 2026 19:49:59 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 2 Apr
+ 2026 12:49:44 -0700
+Received: from [10.221.201.51] (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 2 Apr
+ 2026 12:49:38 -0700
+Message-ID: <526b3aa8-f601-4e6d-a1f4-16ec6501eaa5@nvidia.com>
+Date: Thu, 2 Apr 2026 22:49:35 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 3/3] net/mlx5: SD: Serialize init/cleanup
+To: Jakub Kicinski <kuba@kernel.org>, <tariqt@nvidia.com>
+CC: <edumazet@google.com>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <saeedm@nvidia.com>, <mbloch@nvidia.com>,
+	<leon@kernel.org>, <horms@kernel.org>, <kees@kernel.org>, <parav@nvidia.com>,
+	<phaddad@nvidia.com>, <gal@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20260330193412.53408-4-tariqt@nvidia.com>
+ <20260402030914.878606-1-kuba@kernel.org>
+Content-Language: en-US
+From: Shay Drori <shayd@nvidia.com>
+In-Reply-To: <20260402030914.878606-1-kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004681:EE_|CH0PR12MB8508:EE_
+X-MS-Office365-Filtering-Correlation-Id: 29e97d1c-8ac2-4a93-0bad-08de90f105ff
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|7416014|1800799024|376014|36860700016|18002099003|56012099003|22082099003;
+X-Microsoft-Antispam-Message-Info:
+	Xb5FhbBPcC2nN+ebOp3OWdxsrFZuKXeasU1biCKkKqKn9ATUdqGDFANtQr+NK6dMrmpdBHRcihnMSPoTw/OsbuVnqw9GtvHcW1/OiiWZhqN53eU5Ss/THgEKaDSC6uQ7H9SlL5cYX4BGb2Rn7kEpSWUJYyGy3HcAUkz8nKcpyuakqX5uxEQGO9kpX0grRyxBFTcm0h7jHLX63D4Lz69WIdsDfr5W9CqyFcH8d8keXFa7l/t9zuYFudeniPT1FhUzx/aBDwsJ2vV8zYQHYzCcCAkcmYfcMctxFLbwKX4ONIEKL/A497pqo4xR+i5Jdu7sy3iHd+BPkLcaDKiHGXemfZySRKde3TygBJ8p4jWfq9vhYtdi7RduRwA7I9enM7i6mTxWtjEN8DkrcyHG7FguJ5yXjRFRUgwN1Yv+RV98qynFb4GElv57aLT53yRnrUyYr/PAvHNP9H9/Wn3zLGC+rFfTf6uYcr3l1s3SGXGFJWFTRXTkpXi7e32/ifQESo7c4qP5IpwKvFCvVrR6fSya/d4LmOar8uCkmbfV7yMnzLIkQmf9js5BEykrZC2rqnoRmlhJxwL13Krdy+bJqd7CxPoXJvc9O3DOMfmcn7waVNQnNNNpf5I62t0cRPfHWRiGhul53LnbGvGbr6OzVZkQ1+TQ5FdZpGeTzT9l4RW2FYNbiI+Sb1Ruk3AELp50xgS3n4urTsPp+cVVpMCpILSCJHlYPvdWLbjZTgKN2auzGIyWA9475gxRgr9xCKYcBF/4FnTcw2POCukW2nZ/UeMNCg==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(1800799024)(376014)(36860700016)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	ResU4bUNmXSb6l8GF1gR1nH0cvwIKijzuM9kiWcrqZDnRaAypCKgOhfeJA52yPyGnrZ2S/qmBVlP3K2M9cNVJvzbRThdBNhmyIW2nAl5W5p8tj4TzWRg6ehKOKCL7Rcc8JHsWH+YxMy8kGTNxHkNlM2kM3a9Tf5wF2/zD2lWF9R+hzS/nwD8Vf5ofFYzYYA+GIuLyd+uKkxGTEwkRhd0mTeRytcqEAAoLGFeElProT0XIrKSVn7epDC5VAmFE0mtTsHC7FdLJRf51mCYYydaEWmmhtOfyYFLQMbi8gU9FYFR6UVvpUvVqbl/7t/2Lu8s+0RwE7LR6/Pohkc3Gh2dFES6MwA1VdD8TjVqxOOoazGrgmvWuGS4fCJmnSVt3WI+w8ukXn3KjF5tmf9i5gvE/nrPIfcwd2UTdqTfCtVE1DN1vqeXLa1KHNK7LcfYUsIa
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2026 19:49:59.3319
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 29e97d1c-8ac2-4a93-0bad-08de90f105ff
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00004681.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8508
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
+	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274675-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joelcrouch@gmail.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-274676-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,Nvidia.com:dkim,nvidia.com:mid];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[shayd@nvidia.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[Nvidia.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F131638DC90
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 0518438DC9F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Currently, bcm5411_init does not validate the result of the PHY register
-reads.  This can lead to silent failures if the hardware is unresponsive
-or the MDIO bus times out, as 0xffff would be treated as valid data.
 
-This patch:
-	1: Adds a check for -EIO and 0xffff during BCM5411 initialization.
-	2: Updates gem_init_phy to log an error message fi the PHY-
-	   specific init fails.
-	3: Cleans up pointer formatting(eg,. foo* bar to foo *bar) to
-	   align with Linux Kernel Coding Style in the modified files.
 
-Signed-off-by: Joel <joelcrouch@gmail.com>
----
- drivers/net/ethernet/sun/sungem.c |  8 +++--
- drivers/net/sungem_phy.c          | 60 +++++++++++++++++--------------
- 2 files changed, 39 insertions(+), 29 deletions(-)
+On 02/04/2026 6:09, Jakub Kicinski wrote:
+> External email: Use caution opening links or attachments
+> 
+> 
+> This is an AI-generated review of your patch. The human sending this
+> email has considered the AI review valid, or at least plausible.
+> ---
+> net/mlx5: SD: Serialize init/cleanup
+> 
+> This commit introduces a state tracker and locking around the Socket-Direct
+> init and cleanup routines. It prevents multiple physical functions from
+> concurrently bringing up or tearing down the SD group.
+> 
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+>> index 4c80b9d25283..374f27b78fbe 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+> 
+> [ ... ]
+> 
+>> @@ -505,11 +520,16 @@ void mlx5_sd_cleanup(struct mlx5_core_dev *dev)
+>>        if (!sd)
+>>                return;
+>>
+>> +     mlx5_devcom_comp_lock(sd->devcom);
+>>        if (!mlx5_devcom_comp_is_ready(sd->devcom))
+>> -             goto out;
+>> +             goto out_unlock;
+>>
+>>        primary = mlx5_sd_get_primary(dev);
+>>        primary_sd = mlx5_get_sd(primary);
+>> +
+>> +     if (primary_sd->state != MLX5_SD_STATE_UP)
+>> +             goto out_unlock;
+>> +
+>>        mlx5_sd_for_each_secondary(i, primary, pos)
+>>                sd_cmd_unset_secondary(pos);
+>>        sd_cmd_unset_primary(primary);
+>> @@ -517,7 +537,9 @@ void mlx5_sd_cleanup(struct mlx5_core_dev *dev)
+>>        primary_sd->dfs = NULL;
+>>
+>>        sd_info(primary, "group id %#x, uncombined\n", sd->group_id);
+>> -out:
+>> +     primary_sd->state = MLX5_SD_STATE_DOWN;
+>> +out_unlock:
+>> +     mlx5_devcom_comp_unlock(sd->devcom);
+>>        sd_unregister(dev);
+>>        sd_cleanup(dev);
+>>   }
+> 
+> Is there a race condition if a secondary PF calls mlx5_sd_init() while the
+> primary PF is running mlx5_sd_cleanup()?
+> 
+> In mlx5_sd_cleanup(), the code sets the state to MLX5_SD_STATE_DOWN and drops
+> the devcom lock before calling sd_unregister(). At this point, the primary
+> PF is still registered in the devcom group, so mlx5_devcom_comp_is_ready()
+> remains true.
+> 
+> If a secondary PF is concurrently probed, could it acquire the devcom lock
+> and observe this intermediate state?
+> 
+> CPU1
+> mlx5_sd_cleanup()
+>      primary_sd->state = MLX5_SD_STATE_DOWN;
+>      mlx5_devcom_comp_unlock(sd->devcom);
+>      // Preempted before sd_unregister(dev)
+> 
+> CPU2 would see this in mlx5_sd_init():
+>      mlx5_devcom_comp_lock(sd->devcom);
+>      if (!mlx5_devcom_comp_is_ready(sd->devcom)) // returns true
+>          goto out;
+> 
+>      primary = mlx5_sd_get_primary(dev);
+>      primary_sd = mlx5_get_sd(primary);
+> 
+>      if (primary_sd->state == MLX5_SD_STATE_UP) // returns false
+>          goto out;
+>      ...
+>      debugfs_create_file("primary", 0400, primary_sd->dfs, primary, &dev_fops);
+> 
+> Would CPU2 proceed to initialize the group using the dying primary PF?
+> 
+> If CPU1 then resumes and finishes sd_cleanup(), it would free the primary_sd
+> structure and the primary device. This might leave the secondary PF with
+> dangling pointers in the debugfs files, potentially leading to a
+> use-after-free on access.
+> 
+> Furthermore, when the secondary is later removed, mlx5_sd_cleanup(secondary)
+> might see is_ready as false and skip the teardown entirely, leaving the
+> dangling debugfs files permanently.
 
-diff --git a/drivers/net/ethernet/sun/sungem.c b/drivers/net/ethernet/sun/sungem.c
-index 8e69d917d..525aba527 100644
---- a/drivers/net/ethernet/sun/sungem.c
-+++ b/drivers/net/ethernet/sun/sungem.c
-@@ -1707,8 +1707,12 @@ static void gem_init_phy(struct gem *gp)
- 		sungem_phy_probe(&gp->phy_mii, gp->mii_phy_addr);
- 
- 		/* Init PHY */
--		if (gp->phy_mii.def && gp->phy_mii.def->ops->init)
--			gp->phy_mii.def->ops->init(&gp->phy_mii);
-+		if (gp->phy_mii.def && gp->phy_mii.def->ops->init) {
-+			int err = gp->phy_mii.def->ops->init(&gp->phy_mii);
-+
-+			if (err)
-+				netdev_err(gp->dev, "PHY init failed: %d\n", err);
-+		}
- 	} else {
- 		gem_pcs_reset(gp);
- 		gem_pcs_reinit_adv(gp);
-diff --git a/drivers/net/sungem_phy.c b/drivers/net/sungem_phy.c
-index c10198d44..ec8800c93 100644
---- a/drivers/net/sungem_phy.c
-+++ b/drivers/net/sungem_phy.c
-@@ -44,27 +44,27 @@ static const int phy_BCM5400_link_table[8][3] = {
- 	{ 1, 0, 1 },	/* 1000BT */
- };
- 
--static inline int __sungem_phy_read(struct mii_phy* phy, int id, int reg)
-+static inline int __sungem_phy_read(struct mii_phy *phy, int id, int reg)
- {
- 	return phy->mdio_read(phy->dev, id, reg);
- }
- 
--static inline void __sungem_phy_write(struct mii_phy* phy, int id, int reg, int val)
-+static inline void __sungem_phy_write(struct mii_phy *phy, int id, int reg, int val)
- {
- 	phy->mdio_write(phy->dev, id, reg, val);
- }
- 
--static inline int sungem_phy_read(struct mii_phy* phy, int reg)
-+static inline int sungem_phy_read(struct mii_phy *phy, int reg)
- {
- 	return phy->mdio_read(phy->dev, phy->mii_id, reg);
- }
- 
--static inline void sungem_phy_write(struct mii_phy* phy, int reg, int val)
-+static inline void sungem_phy_write(struct mii_phy *phy, int reg, int val)
- {
- 	phy->mdio_write(phy->dev, phy->mii_id, reg, val);
- }
- 
--static int reset_one_mii_phy(struct mii_phy* phy, int phy_id)
-+static int reset_one_mii_phy(struct mii_phy *phy, int phy_id)
- {
- 	u16 val;
- 	int limit = 10000;
-@@ -88,7 +88,7 @@ static int reset_one_mii_phy(struct mii_phy* phy, int phy_id)
- 	return limit <= 0;
- }
- 
--static int bcm5201_init(struct mii_phy* phy)
-+static int bcm5201_init(struct mii_phy *phy)
- {
- 	u16 data;
- 
-@@ -101,7 +101,7 @@ static int bcm5201_init(struct mii_phy* phy)
- 	return 0;
- }
- 
--static int bcm5201_suspend(struct mii_phy* phy)
-+static int bcm5201_suspend(struct mii_phy *phy)
- {
- 	sungem_phy_write(phy, MII_BCM5201_INTERRUPT, 0);
- 	sungem_phy_write(phy, MII_BCM5201_MULTIPHY, MII_BCM5201_MULTIPHY_SUPERISOLATE);
-@@ -109,7 +109,7 @@ static int bcm5201_suspend(struct mii_phy* phy)
- 	return 0;
- }
- 
--static int bcm5221_init(struct mii_phy* phy)
-+static int bcm5221_init(struct mii_phy *phy)
- {
- 	u16 data;
- 
-@@ -132,7 +132,7 @@ static int bcm5221_init(struct mii_phy* phy)
- 	return 0;
- }
- 
--static int bcm5221_suspend(struct mii_phy* phy)
-+static int bcm5221_suspend(struct mii_phy *phy)
- {
- 	u16 data;
- 
-@@ -147,7 +147,7 @@ static int bcm5221_suspend(struct mii_phy* phy)
- 	return 0;
- }
- 
--static int bcm5241_init(struct mii_phy* phy)
-+static int bcm5241_init(struct mii_phy *phy)
- {
- 	u16 data;
- 
-@@ -170,7 +170,7 @@ static int bcm5241_init(struct mii_phy* phy)
- 	return 0;
- }
- 
--static int bcm5241_suspend(struct mii_phy* phy)
-+static int bcm5241_suspend(struct mii_phy *phy)
- {
- 	u16 data;
- 
-@@ -185,7 +185,7 @@ static int bcm5241_suspend(struct mii_phy* phy)
- 	return 0;
- }
- 
--static int bcm5400_init(struct mii_phy* phy)
-+static int bcm5400_init(struct mii_phy *phy)
- {
- 	u16 data;
- 
-@@ -214,7 +214,7 @@ static int bcm5400_init(struct mii_phy* phy)
- 	return 0;
- }
- 
--static int bcm5400_suspend(struct mii_phy* phy)
-+static int bcm5400_suspend(struct mii_phy *phy)
- {
- #if 0 /* Commented out in Darwin... someone has those dawn docs ? */
- 	sungem_phy_write(phy, MII_BMCR, BMCR_PDOWN);
-@@ -222,7 +222,7 @@ static int bcm5400_suspend(struct mii_phy* phy)
- 	return 0;
- }
- 
--static int bcm5401_init(struct mii_phy* phy)
-+static int bcm5401_init(struct mii_phy *phy)
- {
- 	u16 data;
- 	int rev;
-@@ -270,7 +270,7 @@ static int bcm5401_init(struct mii_phy* phy)
- 	return 0;
- }
- 
--static int bcm5401_suspend(struct mii_phy* phy)
-+static int bcm5401_suspend(struct mii_phy *phy)
- {
- #if 0 /* Commented out in Darwin... someone has those dawn docs ? */
- 	sungem_phy_write(phy, MII_BMCR, BMCR_PDOWN);
-@@ -278,8 +278,9 @@ static int bcm5401_suspend(struct mii_phy* phy)
- 	return 0;
- }
- 
--static int bcm5411_init(struct mii_phy* phy)
-+static int bcm5411_init(struct mii_phy *phy)
- {
-+	int val;
- 	u16 data;
- 
- 	/* Here's some more Apple black magic to setup
-@@ -295,7 +296,12 @@ static int bcm5411_init(struct mii_phy* phy)
- 	sungem_phy_write(phy, MII_BMCR, BMCR_RESET);
- 	sungem_phy_write(phy, MII_BMCR, 0x1340);
- 
--	data = sungem_phy_read(phy, MII_BCM5400_GB_CONTROL);
-+	val = sungem_phy_read(phy, MII_BCM5400_GB_CONTROL);
-+
-+	if (val < 0 || val == 0xffff)
-+		return -EIO;
-+
-+	data = (u16)val;
- 	data |= MII_BCM5400_GB_CONTROL_FULLDUPLEXCAP;
- 	sungem_phy_write(phy, MII_BCM5400_GB_CONTROL, data);
- 
-@@ -408,14 +414,14 @@ static int genmii_read_link(struct mii_phy *phy)
- 	return 0;
- }
- 
--static int generic_suspend(struct mii_phy* phy)
-+static int generic_suspend(struct mii_phy *phy)
- {
- 	sungem_phy_write(phy, MII_BMCR, BMCR_PDOWN);
- 
- 	return 0;
- }
- 
--static int bcm5421_init(struct mii_phy* phy)
-+static int bcm5421_init(struct mii_phy *phy)
- {
- 	u16 data;
- 	unsigned int id;
-@@ -548,7 +554,7 @@ static int bcm54xx_read_link(struct mii_phy *phy)
- 	u16 val;
- 
- 	if (phy->autoneg) {
--	    	val = sungem_phy_read(phy, MII_BCM5400_AUXSTATUS);
-+		val = sungem_phy_read(phy, MII_BCM5400_AUXSTATUS);
- 		link_mode = ((val & MII_BCM5400_AUXSTATUS_LINKMODE_MASK) >>
- 			     MII_BCM5400_AUXSTATUS_LINKMODE_SHIFT);
- 		phy->duplex = phy_BCM5400_link_table[link_mode][0] ?
-@@ -568,7 +574,7 @@ static int bcm54xx_read_link(struct mii_phy *phy)
- 	return 0;
- }
- 
--static int marvell88e1111_init(struct mii_phy* phy)
-+static int marvell88e1111_init(struct mii_phy *phy)
- {
- 	u16 rev;
- 
-@@ -592,7 +598,7 @@ static int marvell88e1111_init(struct mii_phy* phy)
- 
- #define BCM5421_MODE_MASK	(1 << 5)
- 
--static int bcm5421_poll_link(struct mii_phy* phy)
-+static int bcm5421_poll_link(struct mii_phy *phy)
- {
- 	u32 phy_reg;
- 	int mode;
-@@ -616,7 +622,7 @@ static int bcm5421_poll_link(struct mii_phy* phy)
- 		return 1;
- }
- 
--static int bcm5421_read_link(struct mii_phy* phy)
-+static int bcm5421_read_link(struct mii_phy *phy)
- {
- 	u32 phy_reg;
- 	int mode;
-@@ -644,7 +650,7 @@ static int bcm5421_read_link(struct mii_phy* phy)
- 	return 0;
- }
- 
--static int bcm5421_enable_fiber(struct mii_phy* phy, int autoneg)
-+static int bcm5421_enable_fiber(struct mii_phy *phy, int autoneg)
- {
- 	/* enable fiber mode */
- 	sungem_phy_write(phy, MII_NCONFIG, 0x9020);
-@@ -665,7 +671,7 @@ static int bcm5421_enable_fiber(struct mii_phy* phy, int autoneg)
- #define BCM5461_FIBER_LINK	(1 << 2)
- #define BCM5461_MODE_MASK	(3 << 1)
- 
--static int bcm5461_poll_link(struct mii_phy* phy)
-+static int bcm5461_poll_link(struct mii_phy *phy)
- {
- 	u32 phy_reg;
- 	int mode;
-@@ -691,7 +697,7 @@ static int bcm5461_poll_link(struct mii_phy* phy)
- 
- #define BCM5461_FIBER_DUPLEX	(1 << 3)
- 
--static int bcm5461_read_link(struct mii_phy* phy)
-+static int bcm5461_read_link(struct mii_phy *phy)
- {
- 	u32 phy_reg;
- 	int mode;
-@@ -720,7 +726,7 @@ static int bcm5461_read_link(struct mii_phy* phy)
- 	return 0;
- }
- 
--static int bcm5461_enable_fiber(struct mii_phy* phy, int autoneg)
-+static int bcm5461_enable_fiber(struct mii_phy *phy, int autoneg)
- {
- 	/* select fiber mode, enable 1000 base-X registers */
- 	sungem_phy_write(phy, MII_NCONFIG, 0xfc0b);
--- 
-2.43.0
+Thank, Good catch. will fix in V2
 
 
