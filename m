@@ -1,181 +1,219 @@
-Return-Path: <netdev+bounces-274358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274359-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yAMbIynnzWmuiwYAu9opvQ
-	(envelope-from <netdev+bounces-274358-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 05:48:57 +0200
+	id sGezB+fpzWkLjAYAu9opvQ
+	(envelope-from <netdev+bounces-274359-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 06:00:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AB6A3833F3
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 05:48:56 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85D5638354A
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 06:00:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EC747300DDFF
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 03:41:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4E7453032DF4
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 04:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01B7035979;
-	Thu,  2 Apr 2026 03:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C207358369;
+	Thu,  2 Apr 2026 04:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P7VkyG8g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSfl4gve"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC2313FEE
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 03:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775101283; cv=none; b=nTM1r0oM64sbZ4rxdrqaxbzMVOgnxMYfukD29Cgq1gWXBHiEPfKt8OKsbp+szqSwZKxxZiILwiKPXLbTj4CbxMv3nlE5PNp5ikx2JKgMoHyAd/kTF1qB/aLyuD7cdV5Uz9X7oTEeqdZFh+2XrX5BeYznWuvaVSwwnYcl8Xj7xXs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775101283; c=relaxed/simple;
-	bh=AgtIA8XWuKpG74yfh+NlqmfGMcYWkD6MGsK6ieJWn40=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pUw9gtTLH0QYdANdmpxucW1EhXFdI6UU2XZ4JGSLC8aF7LNIYReXpNZuSdt7dyLeJBOcxEu3zbiv+gWyDHEFKd52N4OMNKhwMf8zCkq2LKGS8JQCANGxr52f1QjwATX2PpAKMC5NhAcvLz2SxJcCw+HhNgmlFZN1n6BSt3mP4uI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P7VkyG8g; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4A030EF91
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 04:00:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775102436; cv=pass; b=J3oo1Kcisf2CGjg+zyZQwvHAS2Lx0ZdqyeEFKVmq+7FUdn9MGLPmDLtOHSWriuSEQe+JwLAmuJK/XzQYipS1aMJmA0yp8AcHQjRUtzRu/H/yeVkKFR9mxsEZETu036OstoMfIZNLsPi3cCYe1I+OkGhxSWH38n9hKLbXGgSpvbk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775102436; c=relaxed/simple;
+	bh=O0TeM9i6/qLaqsg5LKpb+enuqkHhDe0EN+gXCLG6dNw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oMmXdopXbFC48ZB+9xSetGCnSHyH+JD4kE+u96P2fL3AEXRlmB4e4sxv008v7nQ8C4MI27X4yv1ShVVQ8ntaKJB++kxaqFx170J11ZzRPx+CDHTtK00peXUWiGp8MMHaznriHp1QKRKxXlNE9gIHmRwf1rDPEb+moj0FDiisCdo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JSfl4gve; arc=pass smtp.client-ip=209.85.208.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2ab232cc803so1610125ad.3
-        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 20:41:22 -0700 (PDT)
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6618bc129acso544123a12.2
+        for <netdev@vger.kernel.org>; Wed, 01 Apr 2026 21:00:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775102433; cv=none;
+        d=google.com; s=arc-20240605;
+        b=W0g7fEiaUNtIfTaje9kCT+fE56SyZ4C/YyNvTA3iagS7Xajm2dyv0m0YaycKZTSnFr
+         JnWtUzXWOjqSsw6s2sX//DU5sR8mGToh+pnnuiBE1wtNRcgnC5g1QON5coqw7AjSyBpK
+         340Zo3YzQ+UDd4J39aUMf6dDX+xMV6Hl7XQ53Ey93lQ8OREbwlIDprrPsNiSwLmPFJ4Z
+         +RWl/u0uxHMjzSj4aBJwCiDXnhA50ZgCF6Q2WjosdpyUhj+UEFR+7MKhQ7sQyWW/oTBP
+         jph5fTDHE8qHHP/lqX17v6lZhGUZXDuuqTVahDpE2enA0Smnn1HXKpvxSowPxSojx+AD
+         1wmA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=7y3866J1tJ66KhyO+k9tSAiEoA/N5hgTWOhMGCYWu/o=;
+        fh=2onbhbR9iz2HMiNmE82Hz6b7dE8+E+eGBXfql99aYdg=;
+        b=EZGycHxEGxi5ZG/yEhTlaUI8mSwFoOOlahyUIx7vLV/YDXCGEYX3A6jA1Qw9FJU47/
+         0zyS+uaN8WA3oQCIJ23g/B7aY1eodLaC0ZWccgFFZ6HrdZL/VEcJmEw7mcBlRD7k/m8n
+         rc3foWcpL7btFOowLEcxwZRq0T5aIseGrEnwWNOO7Hx8znZxCfaJ4Z8sluEbQQ3Eb8F2
+         aTwVmvJikttBY7aHzL8l1vllT7aZS9JBeO85AroceVLjhOoRZdUTnWCTKUWLZ8n+jIYY
+         nR/wTAflj8m7nsm9Q9nN431NNrexhxHfslPFciEvuiO2FPTRg26SAa4x4bCos54JLEcB
+         IHag==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775101282; x=1775706082; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WyBuDOfFWqt1pL9OY9FIAUE2TSjg17kkHvUPr80bywo=;
-        b=P7VkyG8g/Vny/kMpOgXDyIbm1KxMH1CKTiuIdF2wIiUilkvDURNo3h5isPDL/Xz0F9
-         KsBFD0Se8tGvGIAxIFfOeV6Om3wDS7egDy+T4Ix17zH2gM14m4BpyuDXT2IKduRs1UtF
-         e90PkFbAWXbht3IeXvlXOt5fpCUIUf16VOwzJ/fmZkc2eVy/KHfN4fgvXmDIxCmOjuEz
-         RHn/UN8UIpo4M0PZdCGzjIYQ0yIjjk0hiwlXXI9meIcQYPT8X5+WNQGlN6moQkZDLBPp
-         DUkfb5oKvczO0HjQfaDjhamc7rUDCFyyty8S7IEqftf9sIl+pIPyYIFfXDsVi1KQV2TB
-         EZEQ==
+        d=gmail.com; s=20251104; t=1775102433; x=1775707233; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=7y3866J1tJ66KhyO+k9tSAiEoA/N5hgTWOhMGCYWu/o=;
+        b=JSfl4gveALYHWLgMtsz0NjGGE11nwxq3wtZjmo6h6xG2v11ZZHiSUO39MUhn0w7YIS
+         pszuQ/J007ZHFJC9JqlvtC7pPtDEp9ujhnYOmKsPTU4DL1LhTJrC+y4q/RKg3f7soR/y
+         Vs1OlNiEuZp1exms9kt1MnfaFJ3r2s94gfazd/wDS9bc2bNzRPe6JBtw3utHdjRS4afw
+         eVs9RhqAZULSSRWmKHDK3oeMz0a1/52uT2MrYMKnRZomiyChSiTyfn6eNOTdVo31OrlZ
+         uJkuqOIM1hZegf1kuRkkk026CGl40pxUqS/Ma/lExaNuTmHHe8g8l9f/6inYYkgdQC+g
+         GSuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775101282; x=1775706082;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1775102433; x=1775707233;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WyBuDOfFWqt1pL9OY9FIAUE2TSjg17kkHvUPr80bywo=;
-        b=tJvyD2ADyh4KUXSN9+apQZ9KCwcS+7kBRLVHreXRUJF+3qQ5iJhYvD2No5aVSoxwM4
-         UsRMNUxO1VMOvqVCHv5EQGAc2OeNnAwYHmxAlWEQLYsndvErPPICoO1CRVohQRvlYAez
-         bVBVdJxDilQak12giOqekgyUEngXrsHtR/pQQRI73wnuVpceyNvVtwc1p0Z4d0APeWdp
-         Re6eIZEncujn/U/oyALIG51LxfKYFYpb9oRqPUOqDEC2cb2M/mcLUmfBg/p8Um3MyWn7
-         BC/Ne5iDsjK7j9lAEwx3WB0eG7NNqMUqu9FPjEGYhNqy834+a8/4i1ECodfKfr1ILspi
-         Zp0A==
-X-Gm-Message-State: AOJu0YyKdwHTXG/2zjtTUkTydlEXI7hWqueIcZeJ3DLYKIlLTOOcjYTa
-	y3xH2Yfbp7kPri4f1H3qCQrWXQBbAGIbspDrhsyoJSzR3uY6c0FYCKNt
-X-Gm-Gg: ATEYQzzFbjv0LPnSYUEAsMaAB8WhL7vo23VI0T+DFHAff7pPKgUmSIcWZdX2yjSh9oh
-	VLy4xZJNJJEMZE7gxpbQO+QX+XdnI9c+SUT+7pdfAB9RDXamH9OtNxpD3liIHfwsAJ+VPGnFj0a
-	YKvaSf9fR2xz+MODlQ3K06m+NtymflWZIugrqgSqBuqPrUBTrmquP6hO7HXKop7S+xfMfX9pdtK
-	EUVhD4AqLHC6WOQSUFKSlYgypEoYXNQ4J8xT7MoLftveL85ATf2TqGvRESw9a/BbzhNiV998YVo
-	gGquayhBN8X9+Ky8CC3Z4b11dyWfN4yXiDqZg0p2rBe5RYmBgYrFsM0zd8Ppa1wZ+OM//NkKQaE
-	qzIY5mc99TAmpM58LxAALCJ8h/3Z2Tgpp2AVcJzYKsCXjRjPfrkWJDTliVzxu5iRyvPDsRajF+Q
-	gEUY8haUvpcYzHDhOHKjk0bpN8X9KsPqmgzVc98nRkRUSB7dUsJ7TrY4h753YsjzTq7gWFjw==
-X-Received: by 2002:a17:903:3d0e:b0:2ae:825b:49a5 with SMTP id d9443c01a7336-2b2699a3e06mr59365825ad.0.1775101281913;
-        Wed, 01 Apr 2026 20:41:21 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b274757fa7sm12047385ad.21.2026.04.01.20.41.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Apr 2026 20:41:20 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH v4 net-next] net: advance skb_defer_disable_key check in napi_consume_skb
-Date: Thu,  2 Apr 2026 11:41:14 +0800
-Message-Id: <20260402034114.65766-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+        bh=7y3866J1tJ66KhyO+k9tSAiEoA/N5hgTWOhMGCYWu/o=;
+        b=XIJDw7O+qA+isjM8lJZ4/pF+d7ElMK39ttKCmal3y/pDx3p0hTbY69ft6Gc8J9AqKF
+         H1s516y5ryPe1p2QBdKV0ZzyNVVGzz9ZtS1RTWglny5rMlXhwz29TJ2u8soAWh5Ny7Yy
+         tCWtJgnH/Z1TDBvqINNz1V9YfcKmr1DJ1OHJD/AjEiP7kpFthKTyBocNRoyP0WzaMQwO
+         W2zpTrPn9qZSc8L/EiyV7pWyYjw8e1Rz4P/FzECVJgFtQ9WBkzSKW5EyKrghciYMmZjA
+         1dO2f3zAW6DoaqGurf0bkw9STCBzPVsPJKD/23eDXRFmx+/Y9PY7fvtkwD0cIkhoEtVt
+         31Dg==
+X-Forwarded-Encrypted: i=1; AJvYcCUmsQHfRJ6lKn/sWogOERklI5PYX1wR86dLImF0ULIem1jjclj3ZuGaVyWJP+O6IoFmqK03eQI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoSURV44X4LCK3Drpk09pOPdi7cMDvNcdejiULf+Qe3NUtGOTt
+	T4jLrEGkWl+PPO55SstP4xUzmwsG5va05iOkdRe9vo+JT9ldPaSUclv2P3XDMcftMHQKTRwyK3C
+	pNYr7YqDewuiqCQS9GlxgYolA++q7UEY=
+X-Gm-Gg: ATEYQzyTLPWIdG4+Zu+6NEZrcOQb/LEht0OOdFNFTJkMo4oUYju1mrpegLOn0G37vGj
+	fNNMyw1Gz36p3GOhwtHLDerYexuI6Ym3H/AHgwSo88Z8CCm/srh5MdJQV3JnsRuI0GW3fDHHZ1/
+	mW3yCwVFXP/iLsyThhDSpdQnObxOyslozrmJ2/hpnNkPiQjiYvClNrEYn3/ZPLKW5GwatKPyUYV
+	OTKo9DXmHaYKrUBMpofMNSQ1N6a2tyYLOy+mWlTXMttr99lLW0qQ8AaDs5/Jrm8hWJPTOLhkhwx
+	nKYIQnslyQOocaVoqWwVxU6NeCvhMHDn/SBk
+X-Received: by 2002:a05:6402:51d2:b0:66e:4cc:e64f with SMTP id
+ 4fb4d7f45d1cf-66e04cce8b7mr708130a12.8.1775102433074; Wed, 01 Apr 2026
+ 21:00:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com>
+ <20260331-realtek_forward-v1-4-44fb63033b7e@gmail.com> <acx_1dOF3EjvGt4B@yury>
+In-Reply-To: <acx_1dOF3EjvGt4B@yury>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Thu, 2 Apr 2026 01:00:20 -0300
+X-Gm-Features: AQROBzABb5pvk5bmnPEOdq_w_fxW8ZfaZbthLnZDHgJAtqph6gIpQ_iS2r50Bg4
+Message-ID: <CAJq09z7+cA9_1fWzkrJebutJD0b1BGhrC1sUyoqqb=ddKCAXcw@mail.gmail.com>
+Subject: Re: [net-next PATCH 04/10] bitfield.h: add FIELD_WIDTH()
+To: Yury Norov <ynorov@nvidia.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Linus Walleij <linusw@kernel.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274358-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274359-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 0AB6A3833F3
+	RCPT_COUNT_TWELVE(0.00)[15];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizluca@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 85D5638354A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jason Xing <kernelxing@tencent.com>
+> > +/**
+> > + * FIELD_WIDTH() - return the width of a bitfield
+> > + * @_mask: shifted mask defining the field's length and position
+> > + *
+> > + * Returns the number of contiguous bits covered by @_mask.
+> > + * This corresponds to the bit width of FIELD_MAX(@_mask).
+> > + */
+> > +#define FIELD_WIDTH(_mask)                                           \
+>
+> Please no underscored names unless necessary.
 
-When net.core.skb_defer_max is adjusted to zero, napi_consume_skb()
-shouldn't go into that deeper in skb_attempt_defer_free() because it adds
-an additional pair of local_bh_enable/disable() which is evidently not
-needed. Advancing the check of the static key saves more cycles and
-benefits non defer case.
+I used _mask to maintain consistency with the existing public macros
+in this file, such as FIELD_GET, FIELD_PREP, FIELD_MAX, and FIELD_FIT.
+All of them use the underscore prefix for parameters. Should I diverge
+from them?
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
-v4
-Link: https://lore.kernel.org/all/20260401033211.44463-1-kerneljasonxing@gmail.com/
-1. add the missing header file.
-Since a new sysctl might not be preferrable, I deicded to apply the
-current minimum patch to handle it. If in the future we receive some
-reports about this point, we will then consider it one more time.
+> > +     ({                                                              \
+> > +             __BF_FIELD_CHECK(_mask, 0ULL, 0ULL, "FIELD_WIDTH: ");   \
+> > +             __bf_shf(~FIELD_MAX(_mask));                            \
+> > +     })
+>
+> I believe, this should be:
+>
+>   #define FIELD_WIDTH(mask) ({                                  \
+>         __BF_FIELD_CHECK_MASK(mask, 0ULL, "FIELD_WIDTH: ");     \
+>         HWEIGHT(mask);                                          \
+>   })
 
-v3
-Link: https://lore.kernel.org/all/20260327153347.98647-1-kerneljasonxing@gmail.com/
-1. use a simpler approach to avoid adding a new sysctl. This is the
-   minimum change to improvement defer_max 0 case.
+HWEIGHT() is indeed much cleaner. However, to keep bitfield.h
+self-contained and avoid adding more includes, I'll try
+__builtin_popcountll() in a similar way __builtin_ffsll is already
+used.
 
-V2
-Link: https://lore.kernel.org/all/20260326144249.97213-1-kerneljasonxing@gmail.com/
-1. reuse proc_do_static_key() (Eric)
-2. add doc (Stan)
----
- net/core/skbuff.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+I also noticed the suggestion to use __BF_FIELD_CHECK_MASK instead of
+__BF_FIELD_CHECK. Both FIELD_MAX and FIELD_FIT currently use the full
+__BF_FIELD_CHECK with 0ULL as a dummy register to ensure the mask fits
+within the header's supported limits. If __BF_FIELD_CHECK_MASK is
+preferred for FIELD_WIDTH, I can certainly use it, but should we also
+update FIELD_MAX and FIELD_FIT for consistency?
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 3d6978dd0aa8..4045d7c484a1 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -94,6 +94,7 @@
- 
- #include "dev.h"
- #include "devmem.h"
-+#include "net-sysfs.h"
- #include "netmem_priv.h"
- #include "sock_destructor.h"
- 
-@@ -1519,7 +1520,8 @@ void napi_consume_skb(struct sk_buff *skb, int budget)
- 
- 	DEBUG_NET_WARN_ON_ONCE(!in_softirq());
- 
--	if (skb->alloc_cpu != smp_processor_id() && !skb_shared(skb)) {
-+	if (!static_branch_unlikely(&skb_defer_disable_key) &&
-+	    skb->alloc_cpu != smp_processor_id() && !skb_shared(skb)) {
- 		skb_release_head_state(skb);
- 		return skb_attempt_defer_free(skb);
- 	}
--- 
-2.41.3
+I intend to send a v2 with the following implementation:
 
+#define __bf_shf(x) (__builtin_ffsll(x) - 1)
++#define __bf_hweight(x) __builtin_popcountll(x)
+
+#define __scalar_type_to_unsigned_cases(type)                          \
+               unsigned type:  (unsigned type)0,                       \
+@@ -111,6 +112,19 @@
+               (typeof(_mask))((_mask) >> __bf_shf(_mask));            \
+       })
+
++/**
++ * FIELD_WIDTH() - return the width of a bitfield
++ * @_mask: shifted mask defining the field's length and position
++ *
++ * Returns the number of contiguous bits covered by @_mask.
++ * This corresponds to the bit width of FIELD_MAX(@_mask).
++ */
++#define FIELD_WIDTH(_mask)                                             \
++       ({                                                              \
++               __BF_FIELD_CHECK_MASK(_mask, 0ULL, "FIELD_WIDTH: ");   \
++               (typeof(_mask))__bf_hweight(_mask);                     \
++       })
++
+
+Regards,
+
+Luiz
 
