@@ -1,179 +1,186 @@
-Return-Path: <netdev+bounces-274631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274630-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wFogGpyhzmlZpAYAu9opvQ
-	(envelope-from <netdev+bounces-274631-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:04:28 +0200
+	id +GQ2JredzmnfowYAu9opvQ
+	(envelope-from <netdev+bounces-274630-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:47:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A74038C509
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 19:04:27 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3130238C2A9
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:47:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 90F7B3064749
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 16:46:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2DDFB300D1E9
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 16:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA5F128851C;
-	Thu,  2 Apr 2026 16:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1D63BC677;
+	Thu,  2 Apr 2026 16:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="VqytO2VQ";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="wAcoMQeA"
+	dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b="c9KuThKQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-y-209.mailbox.org (mout-y-209.mailbox.org [91.198.250.237])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26C43CFF70;
-	Thu,  2 Apr 2026 16:46:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.237
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5525B3191BA
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 16:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775148371; cv=none; b=RCwNyu8GJHlRSIoE2mIOQSx4it6UmqvJKMfvwEs2uLJkpfNhqGxNcnLwqgk+OSrxZAYAu2TF5qM03yDNwOBSibM6DmL5+iXqPWOnyUASycxFvRE3b6iqKEInUi9hHdELbX/vc755P4fy5V4XUj9+W4q3O/kNwn1X0CFiuLT7oy4=
+	t=1775148364; cv=none; b=MV3Ike4mxvAelX5oj2djzJ1vIIl5S9JD2PTIHUsouD+CrR9ukCAphtg4IglLSJsIL6ZfnSGZiouXFDIaDDYjjYmyiScoedT4htxkaOJ5CSZw6jYTwZI+acNoXSwYi3fG12Uow9fClR8Rnzc2zshDSA91hmQJsfqldKDQxeZuOLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775148371; c=relaxed/simple;
-	bh=sB67ueWqBnu1mPBMZhJBmeeNRoaU0BvbTCh73OcR71o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VALE+M3pgOnJdILYD5RwCBYB8RmcWa/SuJZXfMJAPnF+z3Jc0MI+3YNyIKO6fDE+1biz628V4esc9W4n7TmGm7zSsvWvn3Tt1ZXrkqTK49PtHbkdlGOqm/JoDAm58F9w3i+aqbUq5MJNXOtHWrr4dgFjcnvsyF7DsQenM9MizSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=VqytO2VQ; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=wAcoMQeA; arc=none smtp.client-ip=91.198.250.237
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-y-209.mailbox.org (Postfix) with ESMTPS id 4fmnmH6JkQzB14l;
-	Thu,  2 Apr 2026 18:45:51 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1775148351;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=2Y1IOn6UI1l+FnCu4bYLPIoEoDffaMMvju4NVkgxBWE=;
-	b=VqytO2VQ0/Ki8YBMMaG6LGYJTv/5fMucPNuQfco34nYc60+VSiMCsbq9Ta2DxjHjYsBCtu
-	X5/pzOlOCsnyOce2gH+VA4CmX11+DJyzA7kIS7wCvZxXw7hyAy6TdcsOGGR+dWEmzlCMLC
-	Pch7LHEn8XTkh7DwDGeJe5SBPLDDQK1sTti3GPQCAqJNyGsuDW6x85gHEMCrRS0Jx/dQdk
-	xuw0Oh6XHxXOJwA0hYQrV36xXVFegKsGI+mMlnVf/C+fX4HxmX19IeFudLjRXU9XUYW2ES
-	lb/JSoaCtSOW487ozP/HXPf1CA61thicbUFDeoIbBU/DDxV81yOWdrCQhI1i4Q==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=wAcoMQeA;
-	spf=pass (outgoing_mbo_mout: domain of mashiro.chen@mailbox.org designates 2001:67c:2050:b231:465::2 as permitted sender) smtp.mailfrom=mashiro.chen@mailbox.org
-From: Mashiro Chen <mashiro.chen@mailbox.org>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1775148349;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=2Y1IOn6UI1l+FnCu4bYLPIoEoDffaMMvju4NVkgxBWE=;
-	b=wAcoMQeA+mzD94qdHx/bInbTRdjwdifpXj7k6d+PFCNgZNJAw6yGv6WW7oQRtJoRQP9TB8
-	5zhh7P+IsC2FMWSBdDotvfunzpmrZz2AzzJfd8eNt0JeFyU4CgB7+hR2ZTtFIVwus9/NYk
-	9FjNP+FUjLDxZsUmkteKkrEvCW5wN2GteTGKlRD5bIcoaNjlQkUMkxVn7ISQsqCWYSAxdl
-	+K4q9ITspBV+sEVPLdypZP4jPcaviUbxu8iotJqfZVVPWn50muk5dggPnDESrn8Lkv4LlM
-	z1PMT/aS8teeme1BTF8Vt3gCuzt6XvBAd8WhLyGkvCINeClSOVrwAScArHdjzg==
-To: ajk@comnets.uni-bremen.de,
-	netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-hams@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Mashiro Chen <mashiro.chen@mailbox.org>,
-	syzbot+ecdb8c9878a81eb21e54@syzkaller.appspotmail.com
-Subject: [PATCH net] net: hamradio: 6pack: fix uninit-value in sixpack_receive_buf
-Date: Fri,  3 Apr 2026 00:45:25 +0800
-Message-ID: <20260402164525.134244-1-mashiro.chen@mailbox.org>
+	s=arc-20240116; t=1775148364; c=relaxed/simple;
+	bh=2hpKj0W2rpZV1X/Nk0YTKGlMEGHEBv4l7AGunYq/qzo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y2cjwRW4GYUOXnSJ4T4yJ3pgYF44yl0ZdfrPqejhV0vc748XCBx1/vFvEp+Py2xEhyCmc7uh6KK9NSTvieaZIskesfLYc9AQhncAv+gdsy4tsXrZz4vYmVB1mihvH5M63O0w4yfgT/sx+pdsKcd/ZnXSRL5VOUCbXGScHKY87+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20230601.gappssmtp.com header.i=@dama-to.20230601.gappssmtp.com header.b=c9KuThKQ; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-c76bde70ec9so427770a12.2
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 09:45:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20230601.gappssmtp.com; s=20230601; t=1775148355; x=1775753155; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cbhezx2WOqt+8+1TPDtVgJycu5mOCitaWwg/IVagY8o=;
+        b=c9KuThKQ0vrO0wR3O6YcONyNY+YNbu3QBk33RB5t3NIz/SQBmAhlgdJueikA8Wh8wu
+         NoX8sOPwApukUcRqtDiTyqr9NmNSk9A2pmGZrhuA9E93VTYjJYL2/HNUjRo3JrJp1uKO
+         aivSnLJ8CWC2sm6SwpqmZn18zQ5Rtv08yrV8GTHz3Zh3W61k+PjDXmNXGhXmer8qVTvc
+         AmHr61v6LNXpQ2lK89a/u2HqLuYEvHjO6QmxK3wq7eC9Y4h+YTuG3GlvmAgHYmq6VQKa
+         T7/KoVqtnlqnEt4nAhQJerPTXR2edKRd2eY1EaR/O/GQNa7MdyIh3SKagX2kXYEjhdKW
+         uhdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775148355; x=1775753155;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Cbhezx2WOqt+8+1TPDtVgJycu5mOCitaWwg/IVagY8o=;
+        b=W/1mppB3N/ysb1lRuWfAje/Z7Ww7d9YcERGpsCdIWaB43Rua1GHqgmzqVG8ju1W0zG
+         ENAZ2+aPwbor0Kxz91EErS/BNJUBcLGI8K4Z/XYH1pcIFTeWhUwrP5g4Mht+7h3UGWjw
+         4VYTyOIX6UFyCSVTnx7rnJZsel1TeStLcY1UTOm0uXfyLYvxEUKiKGFUSKpKyJw/An9g
+         qOn7tm2WB9XjOIVO4oVrXfT9YvJW2gAa3ohoKZ+5eaTSDDr31WFVQBHcRZM6iad8rWLQ
+         bD2vpV+YEzbitpyWqulma9tD2vR8+GRixEMjz5iIN/VRpfLI3IH9dBWTSlWgVwXnTJO1
+         4jog==
+X-Gm-Message-State: AOJu0YzZQ8ZaVrLKY7Rgc0VUUXGIfSwx2EdAo3mxzxYyOjRFtsIl0Yv+
+	EiGsGQ60ZYspxBVL+goyrR0iK5FwrV2CoGPhfN+w/UH6CGcIick4VKNtCSkaaXi8lUk=
+X-Gm-Gg: ATEYQzwwgIq0PotbtamtTH73A1Zh1/X5srUCNyZdA9m+uHOlnARzOA3ib3c2mAcVzQF
+	xKPpsgTYcdocXKF77UU4/RHgeywfs9l3j/cfKqjMSkFFHRKp1zK9l4NHzh10vxYQ2CZyWO/qWyJ
+	ZVvbW0XGkwrYys+hKdtQSq14n1cayg7BIbYhYij2M/W7xHAspWmjVZioiegXYiAGkEeMrn1n0XI
+	kzJf0q3FiVoO5UXTwyf6MeOUpAZiAdPuqvSsJBG6DmyiH3rhBT0jY542P9PMgCl+FZ9vl3p7e+O
+	DgcnBJudYFSb5hZ+JvTN0FDyC3PmignNtOlluoNZdzGiiAT9odQjSMyr7XCWqVP/MMCSBDYGfwv
+	LjP2x4sdxX51WyzfhoayqZ4SW4pE2+KQ7mstHZuXtnfvIwrvSuIzPG/w9N8GFP8wv69DHx++RsW
+	YGX+ea
+X-Received: by 2002:a05:6a21:3391:b0:39f:2c96:e0d7 with SMTP id adf61e73a8af0-39f2c96e653mr114237637.17.1775148355229;
+        Thu, 02 Apr 2026 09:45:55 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:5d::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76d2684b75sm22853a12.14.2026.04.02.09.45.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2026 09:45:54 -0700 (PDT)
+Date: Thu, 2 Apr 2026 09:45:53 -0700
+From: Joe Damato <joe@dama.to>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	horms@kernel.org, linux-kernel@vger.kernel.org, leon@kernel.org
+Subject: Re: [net-next v7 07/10] net: bnxt: Implement software USO
+Message-ID: <ac6dQa1HRrfcpBhX@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	horms@kernel.org, linux-kernel@vger.kernel.org, leon@kernel.org
+References: <20260401233745.2333858-1-joe@dama.to>
+ <20260401233745.2333858-8-joe@dama.to>
+ <CANn89i+dWeUvZW-sLU5ozZM5rHgDY1mXKOXM=EjdhJanumqVsw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-MBO-RS-ID: ac0aa81cf57e890b0e5
-X-MBO-RS-META: x3ydd4ypchmbgoc4jo3e9qb719gyu155
-X-Spamd-Result: default: False [0.84 / 15.00];
+In-Reply-To: <CANn89i+dWeUvZW-sLU5ozZM5rHgDY1mXKOXM=EjdhJanumqVsw@mail.gmail.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[dama-to.20230601.gappssmtp.com:s=20230601];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-274630-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274631-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mashiro.chen@mailbox.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[dama-to.20230601.gappssmtp.com:+];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[dama.to];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,ecdb8c9878a81eb21e54];
+	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:dkim,mailbox.org:email,mailbox.org:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,appspotmail.com:email,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: 7A74038C509
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,dama.to:email,dama-to.20230601.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 3130238C2A9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-sixpack_receive_buf() does not properly skip bytes with TTY error flags.
-The while loop iterates through the flags buffer but never advances the
-data pointer (cp), and passes the original count including error bytes
-to sixpack_decode(). This causes sixpack_decode() to process bytes that
-should have been skipped due to TTY errors.
+On Wed, Apr 01, 2026 at 05:35:14PM -0700, Eric Dumazet wrote:
+> On Wed, Apr 1, 2026 at 4:38 PM Joe Damato <joe@dama.to> wrote:
+> >
 
-Fix this by processing bytes one at a time, advancing cp on each
-iteration, and only passing non-error bytes to sixpack_decode().
-This matches the pattern used by slip_receive_buf() and
-mkiss_receive_buf() for the same purpose.
+[...]
 
-Reported-by: syzbot+ecdb8c9878a81eb21e54@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=ecdb8c9878a81eb21e54
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Mashiro Chen <mashiro.chen@mailbox.org>
----
- drivers/net/hamradio/6pack.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+> > +       /* Zero the csum fields so tso_build_hdr will propagate zeroes into
+> > +        * every segment header. HW csum offload will recompute from scratch.
+> > +        */
+> 
+> We might need a call to skb_cow_head(skb, 0) before changing ->check
+> (or anything in skb->head)
+> 
+> Alternative would be to perform the clears after each tso_build_hdr()
+> and leave skb->head untouched.
 
-diff --git a/drivers/net/hamradio/6pack.c b/drivers/net/hamradio/6pack.c
-index 885992951e8a6..c8b2dc5c1becc 100644
---- a/drivers/net/hamradio/6pack.c
-+++ b/drivers/net/hamradio/6pack.c
-@@ -391,7 +391,6 @@ static void sixpack_receive_buf(struct tty_struct *tty, const u8 *cp,
- 				const u8 *fp, size_t count)
- {
- 	struct sixpack *sp;
--	size_t count1;
- 
- 	if (!count)
- 		return;
-@@ -401,16 +400,16 @@ static void sixpack_receive_buf(struct tty_struct *tty, const u8 *cp,
- 		return;
- 
- 	/* Read the characters out of the buffer */
--	count1 = count;
--	while (count) {
--		count--;
-+	while (count--) {
- 		if (fp && *fp++) {
- 			if (!test_and_set_bit(SIXPF_ERROR, &sp->flags))
- 				sp->dev->stats.rx_errors++;
-+			cp++;
- 			continue;
- 		}
-+		sixpack_decode(sp, cp, 1);
-+		cp++;
- 	}
--	sixpack_decode(sp, cp, count1);
- 
- 	tty_unthrottle(tty);
- }
--- 
-2.53.0
+Thanks for the careful review; I appreciate your time and energy.
 
+I'll remove the existing clears you pointed and perform the clear after each
+tso_build_hdr() as you suggested with something like:
+
+@@ -103,6 +96,7 @@ netdev_tx_t bnxt_sw_udp_gso_xmit(struct bnxt *bp,
+                unsigned int offset;
+                dma_addr_t dma_addr;
+                struct tx_bd *txbd;
++               struct udphdr *uh;
+                void *this_hdr;
+                int bd_count;
+                __le32 csum;
+@@ -116,6 +110,17 @@ netdev_tx_t bnxt_sw_udp_gso_xmit(struct bnxt *bp,
+
+                tso_build_hdr(skb, this_hdr, &tso, seg_payload, last);
+
++               /* Zero stale csum fields copied from the original skb;
++                * HW offload recomputes from scratch.
++                */
++               uh = this_hdr + skb_transport_offset(skb);
++               uh->check = 0;
++               if (!tso.ipv6) {
++                       struct iphdr *iph = this_hdr + skb_network_offset(skb);
++
++                       iph->check = 0;
++               }
 
