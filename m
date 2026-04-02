@@ -1,222 +1,210 @@
-Return-Path: <netdev+bounces-274351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274352-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gJ/3JEDizWlVigYAu9opvQ
-	(envelope-from <netdev+bounces-274351-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 05:28:00 +0200
+	id MJENBGPjzWlVigYAu9opvQ
+	(envelope-from <netdev+bounces-274352-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 05:32:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3803E383221
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 05:28:00 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C3593832EE
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 05:32:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0CBB8300D1FE
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 03:27:07 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EAB17303F1FD
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 03:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6482135A385;
-	Thu,  2 Apr 2026 03:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F4035A93C;
+	Thu,  2 Apr 2026 03:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jRIXxVbK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p5apt1OP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB4A3328FA;
-	Thu,  2 Apr 2026 03:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D9E287263;
+	Thu,  2 Apr 2026 03:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775100424; cv=none; b=AMUuKu/xT35uqixbaz0CMjLsPvvF9lf4VZtyDVID8MH3jf7PHIsuOmp1bM79/TkUmeNbMwoyY1W1c5Y02e9sRFpfxiEEh8RJsrEZtxqK+2wxEgxDAHKP/vb6kW1WdaHFv3otBTAPA/Od9+K3yPhFj1MSLQJ9T5ZXErZ159+Qjcw=
+	t=1775100445; cv=none; b=BV3vUCDqE2PDr8Z/hMHKgzXr1tLl6CswCnBzvVnZrMTUOKxXlclgw98vUaV/4W6bbFW3mY4dyrRDH8ua1VLZwfCiQEtkb+IP9X23W7xCbwGjLAoSxYAH5ZAonbDolj5GofaT+07eDaxpwbM+zQPm7f7C/NnO6j0qW8sAyRDA11E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775100424; c=relaxed/simple;
-	bh=n1vZZJvZqq3JdYP5BL+bojHsEVzNPc6zMLMGtvBaWPQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xy2y73YDtRLbuNw7hdjGqDunWQKMNKxivm0fhCwd39PNIQqFIUjxdvgTkgvTd8K9tpakxVCJIvYRqm5dWOwnXaXfvg53Pw86I4Hpg9JMomRaq/m0bX1A/mcWFqCe2VbfvEh1RgBqJUZoE0oEed+KuVeg/jbTXetZq4qIpZd5m9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jRIXxVbK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFF87C4CEF7;
-	Thu,  2 Apr 2026 03:27:02 +0000 (UTC)
+	s=arc-20240116; t=1775100445; c=relaxed/simple;
+	bh=qJWv9KrDea6c7T2o8i+rQnp2JrBZDqEJPBpIfIVHAPE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rlMMrLsPHDCZAAmdTVmBsHMhdy2U1JCo0VAAh8OyIwiEmEM8ldWWAlsTLGjHwS7E6mLV4+VwkeLEOcYVMlkxYCxXOSv2h75aYEwsyLipcH/yv1YG6YXf3eiymiYUP9AEZImE4g0tShd7Zbggs7/cTGpAHqwJrnt3/woVyXL5bBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p5apt1OP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15E7AC4CEF7;
+	Thu,  2 Apr 2026 03:27:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775100423;
-	bh=n1vZZJvZqq3JdYP5BL+bojHsEVzNPc6zMLMGtvBaWPQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jRIXxVbKqqLbzP0ZQ88rmJJPWvn+GfPH6lNTatA0XCymVmvgE8tShVOTv4cvcEAnU
-	 GHf6+ji3N88+SsnAzFYtdtmzCOCqML6mM2KyckVsybhi8Qbt5Q1ugDHO8FG/ciUl8i
-	 k4Mfdj9x6dEFyu2sGuI01dO4mqmDeRyIynG0gZRYeAJcyF7kJD9pNGXy8g+kb0p6SQ
-	 MtVqORwyrG0TdZf/84z+41DysbrZkRqpz5A/ijotp4gzDfc/iLh0AH9VeQo9MedJcs
-	 mZN9tkAx9rXpgY5dqYS/TDYZ+Qej2GxJxYbnXYulda1hLbYRMOjc0cy2BlDsz+rJJ+
-	 VPP7Fo/Q7+CsQ==
-Date: Wed, 1 Apr 2026 20:27:02 -0700
+	s=k20201202; t=1775100444;
+	bh=qJWv9KrDea6c7T2o8i+rQnp2JrBZDqEJPBpIfIVHAPE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=p5apt1OPKa8bvJxPAu8pcm3t/hwRWm7kwWiMfPD9QX0Dt31WvoNpFpAa3cnGtUuOu
+	 N/w5493gsKLkl+IdBbeRV6InHpv3r4ac5EUQpiuu5zOp85Jpvm9DkuDHtqhOTne+Q5
+	 GCcc2QWGPni3pNinxzjk9sRx36iJWLDjN6kC8DK1WWOd71jiRUFhrFy0HQs4kdElYc
+	 6LzqgvnhCE1lCjWg5cwd5g6HdxJKbj5VCBhEJR4kfoC2YMsDKtUkRWpLCB4lNPRpTE
+	 L2GqUpDcLieq4goxgsnCuA2kRCEV2ZQWSiLwCRNt+L2KLZHJT4KNikaOPpplYcPjZy
+	 D2pCgraMmpQRA==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Nicolai Buchwitz <nb@tipi-net.de>
-Cc: netdev@vger.kernel.org, Justin Chen <justin.chen@broadcom.com>, Simon
- Horman <horms@kernel.org>, Doug Berger <opendmb@gmail.com>, Florian
- Fainelli <florian.fainelli@broadcom.com>, Broadcom internal kernel review
- list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v5 3/6] net: bcmgenet: add basic XDP support
- (PASS/DROP)
-Message-ID: <20260401202702.0b0b6dec@kernel.org>
-In-Reply-To: <20260328230513.415790-4-nb@tipi-net.de>
-References: <20260328230513.415790-1-nb@tipi-net.de>
-	<20260328230513.415790-4-nb@tipi-net.de>
+To: nb@tipi-net.de
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	justin.chen@broadcom.com,
+	horms@kernel.org,
+	opendmb@gmail.com,
+	florian.fainelli@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v5 4/6] net: bcmgenet: add XDP_TX support
+Date: Wed,  1 Apr 2026 20:27:22 -0700
+Message-ID: <20260402032722.905829-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260328230513.415790-5-nb@tipi-net.de>
+References: <20260328230513.415790-5-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274351-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,broadcom.com,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,fomichev.me];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,broadcom.com,kernel.org,gmail.com,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,fomichev.me];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	TAGGED_FROM(0.00)[bounces-274352-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3803E383221
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1C3593832EE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, 29 Mar 2026 00:05:06 +0100 Nicolai Buchwitz wrote:
-> @@ -2403,26 +2456,52 @@ static unsigned int bcmgenet_desc_rx(struct bcmgenet_rx_ring *ring,
->  			goto next;
->  		} /* error packet */
->  
-> -		/* Build SKB from the page - data starts at hard_start,
-> -		 * frame begins after RSB(64) + pad(2) = 66 bytes.
-> -		 */
-> -		skb = napi_build_skb(hard_start, PAGE_SIZE - GENET_XDP_HEADROOM);
-> -		if (unlikely(!skb)) {
-> -			BCMGENET_STATS64_INC(stats, dropped);
-> -			page_pool_put_full_page(ring->page_pool, rx_page,
-> -						true);
-> -			goto next;
-> -		}
-> -
-> -		skb_mark_for_recycle(skb);
-> +		/* XDP: frame data starts after RSB + pad */
-> +		if (xdp_prog) {
-> +			struct xdp_buff xdp;
-> +			unsigned int xdp_act;
-> +			int pkt_len;
-> +
-> +			pkt_len = len - GENET_RSB_PAD;
-> +			if (priv->crc_fwd_en)
-> +				pkt_len -= ETH_FCS_LEN;
-> +
-> +			xdp_init_buff(&xdp, PAGE_SIZE, &ring->xdp_rxq);
-> +			xdp_prepare_buff(&xdp, page_address(rx_page),
-> +					 GENET_RX_HEADROOM, pkt_len, true);
-> +
-> +			xdp_act = bcmgenet_run_xdp(ring, xdp_prog, &xdp,
-> +						   rx_page);
-> +			if (xdp_act != XDP_PASS)
-> +				goto next;
-> +
-> +			/* XDP_PASS: build SKB from (possibly modified) xdp */
-> +			skb = bcmgenet_xdp_build_skb(ring, &xdp, rx_page);
-> +			if (unlikely(!skb)) {
-> +				BCMGENET_STATS64_INC(stats, dropped);
-> +				page_pool_put_full_page(ring->page_pool,
-> +							rx_page, true);
-> +				goto next;
-> +			}
-> +		} else {
-> +			/* Build SKB from the page - data starts at
-> +			 * hard_start, frame begins after RSB(64) + pad(2).
-> +			 */
-> +			skb = napi_build_skb(hard_start,
-> +					     PAGE_SIZE - GENET_XDP_HEADROOM);
-> +			if (unlikely(!skb)) {
-> +				BCMGENET_STATS64_INC(stats, dropped);
-> +				page_pool_put_full_page(ring->page_pool,
-> +							rx_page, true);
-> +				goto next;
-> +			}
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+---
+net: bcmgenet: add XDP_TX support
 
-The large branches here are quite unusual, normally drivers fully
-prepare the xdp_buff and if there's no xdp prog attached act as
-if there was one and it returned XDP_PASS. Saves LoC and therefore bugs.
+This commit implements XDP_TX using ring 16, which is dedicated to XDP TX
+for isolation from SKB TX queues. It also changes the page_pool DMA
+direction to bidirectional to allow TX reuse of the existing DMA mapping.
 
->  
-> -		/* Reserve the RSB + pad, then set the data length */
-> -		skb_reserve(skb, GENET_RSB_PAD);
-> -		__skb_put(skb, len - GENET_RSB_PAD);
-> +			skb_mark_for_recycle(skb);
-> +			skb_reserve(skb, GENET_RSB_PAD);
-> +			__skb_put(skb, len - GENET_RSB_PAD);
->  
-> -		if (priv->crc_fwd_en) {
-> -			skb_trim(skb, skb->len - ETH_FCS_LEN);
-> -			len -= ETH_FCS_LEN;
-> +			if (priv->crc_fwd_en)
-> +				skb_trim(skb, skb->len - ETH_FCS_LEN);
->  		}
->  
->  		/* Set up checksum offload */
-
-AI points out that :
-
-  The status_64 structure is located at the start of the page
-  before the frame data. Since this resides inside the XDP headroom, if an XDP
-  program expands the header backwards (e.g., via bpf_xdp_adjust_head() or
-  metadata via bpf_xdp_adjust_meta()), could it physically overwrite
-  status->rx_csum?
-
-  Since the driver reads status->rx_csum after executing the XDP program, it
-  could risk reading garbage data if the headroom was used. Should the driver
-  skip setting CHECKSUM_COMPLETE when an XDP program is loaded?
-
-> @@ -3745,6 +3824,39 @@ static int bcmgenet_change_carrier(struct net_device *dev, bool new_carrier)
->  	return 0;
+> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> index b45ba2c2857e..687c3b12d44f 100644
+> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+[ ... ]
+> @@ -2299,11 +2328,96 @@ static struct sk_buff *bcmgenet_xdp_build_skb(struct bcmgenet_rx_ring *ring,
+>  	return skb;
 >  }
 >  
-> +static int bcmgenet_xdp_setup(struct net_device *dev,
-> +			      struct netdev_bpf *xdp)
+> +static bool bcmgenet_xdp_xmit_frame(struct bcmgenet_priv *priv,
+> +				     struct xdp_frame *xdpf, bool dma_map)
 > +{
-> +	struct bcmgenet_priv *priv = netdev_priv(dev);
-> +	struct bpf_prog *old_prog;
-> +	struct bpf_prog *prog = xdp->prog;
+[ ... ]
+> +	} else {
+> +		struct page *page = virt_to_page(xdpf->data);
 > +
-> +	if (prog && dev->mtu > PAGE_SIZE - GENET_RX_HEADROOM -
-> +	    SKB_DATA_ALIGN(sizeof(struct skb_shared_info))) {
-> +		NL_SET_ERR_MSG_MOD(xdp->extack,
-> +				   "MTU too large for single-page XDP buffer");
-> +		return -EOPNOTSUPP;
-> +	}
+> +		/* For local XDP_TX the caller already prepended the TSB
+> +		 * into xdpf->data/len, so dma_len == xdpf->len.
+> +		 */
+> +		dma_len = xdpf->len;
+> +		mapping = page_pool_get_dma_addr(page) +
+> +			  sizeof(*xdpf) + xdpf->headroom;
+
+When the RX page pool is created in bcmgenet_rx_ring_create_pool(), it is
+initialized with .offset = GENET_XDP_HEADROOM. Does the DMA address
+calculation here need to include this GENET_XDP_HEADROOM offset? Without it,
+it appears the hardware might be given a DMA address that is 256 bytes
+before the actual packet data, transmitting uninitialized memory.
+
+[ ... ]
+> @@ -2311,14 +2425,42 @@ static unsigned int bcmgenet_run_xdp(struct bcmgenet_rx_ring *ring,
+>  	switch (act) {
+>  	case XDP_PASS:
+>  		return XDP_PASS;
+> +	case XDP_TX:
+> +		/* Prepend a zeroed TSB (Transmit Status Block).  The GENET
+> +		 * MAC has TBUF_64B_EN set globally, so hardware expects every
+> +		 * TX buffer to begin with a 64-byte struct status_64.  Back
+> +		 * up xdp->data into the RSB area (which is no longer needed
+> +		 * after the BPF program ran) and zero it.
+> +		 */
+> +		if (xdp->data - xdp->data_hard_start <
+> +		    sizeof(struct status_64)) {
+> +			page_pool_put_full_page(ring->page_pool, rx_page,
+> +						true);
+> +			return XDP_DROP;
+> +		}
+> +		xdp->data -= sizeof(struct status_64);
+> +		xdp->data_meta -= sizeof(struct status_64);
+> +		memset(xdp->data, 0, sizeof(struct status_64));
 > +
-> +	old_prog = xchg(&priv->xdp_prog, prog);
-> +	if (old_prog) {
-> +		synchronize_net();
+> +		xdpf = xdp_convert_buff_to_frame(xdp);
 
-Why? BPF prog gets freed after a RCU grace period I think?
+Does this headroom check account for the additional sizeof(struct xdp_frame)
+required by xdp_convert_buff_to_frame()? 
 
-> +		bpf_prog_put(old_prog);
+If metadata is present, xdp->data_meta could potentially underflow 
+xdp->data_hard_start. If the remaining headroom minus metasize becomes
+negative in xdp_convert_buff_to_frame(), could it undergo integer promotion
+to a large unsigned value and bypass the internal safety check? This might
+cause the struct xdp_frame to overwrite the newly zeroed status_64 block.
+
+[ ... ]
+> @@ -2556,9 +2698,15 @@ static int bcmgenet_rx_poll(struct napi_struct *napi, int budget)
+>  {
+>  	struct bcmgenet_rx_ring *ring = container_of(napi,
+>  			struct bcmgenet_rx_ring, napi);
+> +	struct bcmgenet_priv *priv = ring->priv;
+>  	struct dim_sample dim_sample = {};
+>  	unsigned int work_done;
+>  
+> +	/* Reclaim completed XDP TX frames (ring 16 has no interrupt) */
+> +	if (priv->xdp_prog)
+> +		bcmgenet_tx_reclaim(priv->dev,
+> +				    &priv->xdp_tx_ring, false);
+> +
+
+What happens to in-flight frames if the XDP program is detached at runtime
+and priv->xdp_prog becomes NULL? Will this permanently lose track of the
+page pool buffers and DMA mappings since the NAPI poll stops reclaiming
+them?
+
+Additionally, if the interface is the target of an XDP_REDIRECT from another
+device, a local XDP program is not required and priv->xdp_prog could be
+NULL. Does this mean the transmitted frames for redirected traffic will
+never be reclaimed, eventually filling the TX ring?
+-- 
+pw-bot: cr
 
