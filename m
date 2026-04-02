@@ -1,174 +1,234 @@
-Return-Path: <netdev+bounces-274565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274566-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WFvDOI55zmmMnwYAu9opvQ
-	(envelope-from <netdev+bounces-274565-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:13:34 +0200
+	id 4LuWLC55zmmMnwYAu9opvQ
+	(envelope-from <netdev+bounces-274566-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:11:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE31538A4E3
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:13:33 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D30E38A4B6
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:11:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AD56B303C116
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:59:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E90C83046D9B
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 14:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744603E9281;
-	Thu,  2 Apr 2026 13:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1313A3E122C;
+	Thu,  2 Apr 2026 14:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="YZnrXn/u"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DwjJTO40"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480233A0B0B
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 13:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775138319; cv=pass; b=H1hV9oEQa7R5zdt+OaTj89ZxnPBRfOVN+HEjrco1oWGjTRYo2zdAYDhxFpYT7BnDHvgf4avCI5RZIngFLlVTV/GkR3K+8sa06O72s0RpfEJc8v/prpxUSjxnbMvJK0D6kUBn0x1PmCX7ICztTYTnkeAAbyz+Tvv2JLcCZVNT1Uo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775138319; c=relaxed/simple;
-	bh=VU0AbFtlLFJSKOUB5IbB1iaCG7SEJEo5AKtWU3UUzNE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nm2RN7zhP+52mhLQq1kuR2R32aFRRMFqJnIleJ6uwUcJiJtUaSs9Jl5s+dbC7xmNwsoT/h5BH6Qja2AZXcSOCDobuG52GckHC7q1lPiGGI/8gzSJ8cwXzqQObc9A7f5j6edf4I4dewnACRq9k7miV0j/CWTVqX+iiGgV7LtQfGE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=YZnrXn/u; arc=pass smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-43d01d6b50cso801720f8f.1
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 06:58:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775138314; cv=none;
-        d=google.com; s=arc-20240605;
-        b=iZs6Q40xS9+pJdok/apgOLTKTeUP4oMg6zbThwUN9iVOSxL56tz2ztltXVE0SGCf/3
-         33aK/3sKagypvp90pXM5PEAweWfSfXtgvtXyK8FF1X6ziVy0qNoiNOhZIFeLUGKxozsB
-         tjF42ZKUeL1eAuerpxVrSOH3/VEHIKv54ael0lOyrzJ+yOD5ybWEwtER86GZSdy8QL3B
-         H0opUvD6K9INsOoJ0q79WJhSwpB2b99qs35TwKxD/93MZBzIhwUV1eqIOkyPFI/CRBP/
-         rRwPTElH58nAK6l1V3DSHNRP+YmrWw2WxYI7AwLSZFLJGjP2E5yv38nu6faHk9BHr+oI
-         6/PA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=VU0AbFtlLFJSKOUB5IbB1iaCG7SEJEo5AKtWU3UUzNE=;
-        fh=5oPE0GCY8fNT4Tyl1J15Ht/fkVoH08XUWqCwvgG94CQ=;
-        b=bRC+pGOsSAMS1WKo0OUfRePbzZlsPrCM2vFjNZqbM98bWXFFVfyV7ePnesm95S22zt
-         iDna22OF2dPIzctQv5x2tW90eR20HXh3ytf6nSChqts1CDDhDYTPbd0Wki3QkkfyQxP3
-         YLupphR+Rjf8AtAjUp2h+Wlpk7SqFQbfUEcIQC5rnXjVNd44Bdx3XbJH4EMqOOcOIu5w
-         bn/dDrvh8lQBWmqSKdyQUz72ZJRzcZmSM8tthYzIgX8n8HVI45Q6FNeA0YND97+oRnNy
-         PAH9eFCoamSoDPIcjF2vaeIS/o+GYR4zb2z0ybC2tYxCHdCAmdUvLOs6aFHUsvLiiIN2
-         0oKg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490A93E1CE7
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 14:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775138570; cv=none; b=V8Ibdss7Yzg38TvphzVjdToS1YdlGrd5CucUws//yhVx23SHXrhzgdAFFsAN33AuJiy4LkD/Ce0liuNiWAM/X6Z9mrCjcyk1BJkIpPL3z+oYj51eC6eVDsLT5UyeJqLafA7WrSVIWwV/iHBrWRs709c6JcmQmbj/RW+QODWPd+I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775138570; c=relaxed/simple;
+	bh=QuDJlFmHBgvStEeocMY+izf+6lwz4dximZB3hxaYZr4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uw2Z6XlZWvFj8DK2GMHlxFqsm4bpTx0IQS3p12GakZSiVeG4XBwS45EO2CpLNNzjPRKWUUUJeKStgKL7189WqiKZ/3tn/6Wj02Vq+7WbVjjOu5T6fqBxhb/79dyN6LZCPcrepvG6FHzsXRGNOyNtStqt7elbdUZLMZ/3Ym1P3MQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DwjJTO40; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4836cd6e0d4so1093525e9.3
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 07:02:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1775138314; x=1775743114; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=VU0AbFtlLFJSKOUB5IbB1iaCG7SEJEo5AKtWU3UUzNE=;
-        b=YZnrXn/uX7S4av5pNnuujvcI08mYLP/l5fhpqXLgfQQM8fhcA43BSYVurFvL5nJPAe
-         v53/7ZFdUyKBaOe1zPAqgGzonr63be8UJ2nm+uJScWqm6jcYV72ohpmErcX66SoO5/dI
-         vLRsr35LgQfJ2wluOTAHS51NfwPzYYA/BY2YjXT+RITLiBKUzm72hrKpzW/kCkbUfoAB
-         Wsmdrr2LP8Yi2B8Ew6xVh7dqM746azCJfTbvrOiA7X646G9NBbGfKyzcje6SQAimNaYm
-         lIilxLAaBeJViByhms732p1Tdp6LqvYaOmV5JSRCDqG3tj/wlIhJdqMsgIDUfWGbfSk6
-         0EPA==
+        d=gmail.com; s=20251104; t=1775138566; x=1775743366; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fjebN745cPTznKlBAtXhIYhg+ckfnG5/mIokgKeD9ZM=;
+        b=DwjJTO40oMQ1s5uPBjD7/eYHiiYqyfyfVSAVPMvAlJJkHy3YOYWDr1YNPLf72aoIcC
+         MCcGVupMCzLXXfhoLaegWlqy7nTaR4yiI3Ha8F3HhC2Gh1oAmXzrCSnsRO/yJq67XBLs
+         NgBMFGs00PCft7Bd699PSVsCsdIt/TMd+nOKS4bqewhzoNUZutnx6ZMJ07/59tBAbqiB
+         DNvO8U9F2mF6JbIY0LXDPhDCOqieP4SIt+DUTOuJF+mUNXwM8Wj68HF63aCK+DURTMRS
+         /N2g0RJUW6kwax1dhq3X3xKk3Wx5ReuplW655mWfjVKybbBJh5hcpL0tovojxZIaISn1
+         noQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775138314; x=1775743114;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1775138566; x=1775743366;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VU0AbFtlLFJSKOUB5IbB1iaCG7SEJEo5AKtWU3UUzNE=;
-        b=b9yYtD6UmRMIKYsiEXP+xtzYm+klF6M+rx/mQDVIrtkzWbx7a9fVoTtMJvR6KbVwAx
-         I6CUcPzk6nXK2/nQEhCvMCZJwT5l+Uo7NjJr2OsCs9F6O6q8aAoMV9KNPDDCtM4VKuIS
-         D+xjc/Nc6gHDlvDIQw5l8s0sZ4U2QMcTl3ng7jqldisXTu3snQsO6+wXrHZ2uFXeyOyC
-         oSe3wHtk1mPmCXjMziZpj6NQh9WfqX6SsYaQap6wRmvffZ1oTYgzKjHrT94TDC15T9El
-         k0TOON3rovckz3X2NhqqsqI6NYGYok3bLBCzUv8pmF9gLUEOUcEkd+y0/ttrqDejaUuN
-         tXxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVVu2OwzizdRGfEgekfBo4wlrqO5dB7M9eYK2o7lC/fWKTB4WM7A5wZ/frFyjxF1o36ZhR7lsU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7GFXIFD07Lax3AZdjc0tTJiltGVP4m6CY1UprabWCGATs6RZh
-	L3cfQ1VWZSZimEj2L741IIdZXwvSva0bn94Vk4E8YSkO1/y+4JkTYavFVdfo7R4Pm9An3PEEYvJ
-	rpJjCKu3uD+K1yT+SvN3J4tQI6Tz7v3W6J7fmAU3e6w==
-X-Gm-Gg: AeBDieuCwCFrj5EN8fvnVQ0f71PeQ9iOQvhlxLOSD8LK4fcPODWB/6vnp/BzGZMLFiY
-	sLGFhGFuuzVP2YgOZv+3oRnESOD0Eh8AYzdsIQ4RP0fPtyWajIS31NvQuvQY64iOf0aH1q2y1Ii
-	Kyuej8izbpDB0HCQRiO7CG1zdHkX2dzaRvGcbkvC3HGymnsBcfSAArsiZrc1UuZHnwqxvsG06/e
-	OIDWkdm9RbuSRu12gI8/5GXRB6fwN0oYH2CGplEBXMgA4v1kOYX5LAmxirBpCkKIMLsdKXpPJ9F
-	DD8V/bnzQOWEPdjMMZUoI3Re2Pk5AMxoCu2dR+CLfxzRNmJVxTjAEbx651Ax74UnxsLjsFbBMxe
-	DTKZS
-X-Received: by 2002:a05:6000:2010:b0:43c:ffee:ee95 with SMTP id
- ffacd0b85a97d-43d1505649emr15414743f8f.16.1775138314295; Thu, 02 Apr 2026
- 06:58:34 -0700 (PDT)
+        bh=fjebN745cPTznKlBAtXhIYhg+ckfnG5/mIokgKeD9ZM=;
+        b=SP7bCG1jQ3V73iWgvqnVsnL2O9LjAuDbCKDNodmH0iyEJJ1RK7d9aG5i+VMseQPfGV
+         mVSCjIZNZ4srsWYnaTT7yYFaFExg3w6Fn4SRsFd6+bjaFKgCjXuA8NOQG6TI8iyZhpaY
+         GgsebJrzJxuJNy1H489Yew1ce3VB94BQfSQzv7jxK58E+TYcstGWtRmmyHTwTE0g9/qc
+         f6qK78Tg5+OKYE+JKrYbvexmfnbKs2+6t6lB5ACplAt55q5ToH5+HYyRX840OM4B/55g
+         cUgFiIGxdVnWeq/TySKVtcZ7Up51tvbgPWfZn4b5swFxRTQVx91TIFwmFFlwC5M+auKD
+         ehYg==
+X-Gm-Message-State: AOJu0YxMcvLCvPeavR1xk20/NZsSYh0+t1+rPGh+NG47SmsPHAjsnEbZ
+	P6NwGkx8hT5ySnr8QHWa8zaGO7+Py4k8822UBoY9gE8Y/ELypm2RN95PYNGiHgRs
+X-Gm-Gg: ATEYQzxRP4OaFZr9705dHiLC+OiQ4CoHXJQ8yw0TA7Cz7g64O4+DkUX2QMdD523eRT+
+	rHUgQqA212/ICN2DWX/ZM2j0USYBtmsXIU59MHD4VuGAVySEO5oeEMBCmem8SOBShg0diSZOPJG
+	PxmYe1EzsczSbX+4gAD6FUIfi6EBn8b+pHOD6xGwpb21dvWN6onHkcRnjDZwiN6gkJCJpcdqG3t
+	sXXRU1lIY0+j3OV7OZIjq3CXQ3IGUF4HkUb0/l/P+VXw8ks2UM9sSpU3tD9a+hB0L//0cRLJ8rd
+	Zdz9WoiBy5Oo/hxZjLlFXCm4V5q5JldW2ONNkn6fHup0XyQ0Mypx9sVi91RXLJW+Kwaid3ORiyf
+	/XIIBLMDuEs1DfSbdnZlsvDUScd430xxh4G/p/Bvzgb4AnDiXbmDso/Ua9xqET9B3xpUDgyz15F
+	RvvSu3DVb5O/D/vDjZqrYYArkmoDZ339NQv+BG/5TgyeXCFlVGLyBScNFrFPXdvy72dcV9USpVr
+	r7c1Os=
+X-Received: by 2002:a05:600c:474f:b0:485:3fc3:e8e9 with SMTP id 5b1f17b1804b1-48883592bf9mr79660525e9.3.1775138566110;
+        Thu, 02 Apr 2026 07:02:46 -0700 (PDT)
+Received: from ast-epyc4.inf.ethz.ch (ast-epyc4.inf.ethz.ch. [129.132.161.179])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e1fe0b0sm7683269f8f.0.2026.04.02.07.02.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2026 07:02:45 -0700 (PDT)
+From: Zijing Yin <yzjaurora@gmail.com>
+To: netdev@vger.kernel.org
+Cc: bridge@lists.linux.dev,
+	razor@blackwall.org,
+	idosch@nvidia.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com,
+	morbo@google.com,
+	justinstitt@google.com,
+	petrm@nvidia.com,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev,
+	Zijing Yin <yzjaurora@gmail.com>
+Subject: [PATCH net] bridge: guard local VLAN-0 FDB helpers against NULL vlan group
+Date: Thu,  2 Apr 2026 07:01:53 -0700
+Message-ID: <20260402140153.3925663-1-yzjaurora@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260226172927.2Ck9wZMw@linutronix.de> <20260318103009.2120920-1-neelx@suse.com>
- <20260318111849._MMol8Hr@linutronix.de> <CAPjX3FcRYNkYK2gerbRL4C9wXZPxWSs6=oTjzv5+msm4PQrfqA@mail.gmail.com>
- <20260318145101._iaDDpbE@linutronix.de> <CAPjX3FePCKQTaxB6zuo+_V09PZct=utw3vgJUTM_GrZQtv7_TA@mail.gmail.com>
- <20260402070319.vhRd6c-f@linutronix.de> <CAPjX3Ffz22M_ADE1xPqHOCyni1wLwc+reLTVyOrJ+gqNYY6vwg@mail.gmail.com>
- <20260402083123.1H4kyAEn@linutronix.de> <CAPjX3Ff8Zv2EArKaCSKFAAFfBCCVu0YgqHk3SV85BBPm6-D7HQ@mail.gmail.com>
- <20260402134633.bRxz1V8a@linutronix.de>
-In-Reply-To: <20260402134633.bRxz1V8a@linutronix.de>
-From: Daniel Vacek <neelx@suse.com>
-Date: Thu, 2 Apr 2026 15:58:22 +0200
-X-Gm-Features: AQROBzCJXTJV8hcjctLKcmZ2hBR3GmC6EUKHtExZ92lQyFZHUvwnLJh4BAs_1v4
-Message-ID: <CAPjX3FebJxdSMJV9Qs=3BtgL4mT7q55C6Te9c3OqpUhR5C+Ekg@mail.gmail.com>
-Subject: Re: "Dead loop on virtual device" error without softirq-BKL on PREEMPT_RT
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rt-devel@lists.linux.dev, netdev@vger.kernel.org, spasswolf@web.de, 
-	tglx@linutronix.de, Aaron Tomlin <atomlin@atomlin.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[suse.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,vger.kernel.org,lists.linux.dev,web.de,linutronix.de,atomlin.com];
-	TAGGED_FROM(0.00)[bounces-274565-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[lists.linux.dev,blackwall.org,nvidia.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	TAGGED_FROM(0.00)[bounces-274566-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[neelx@suse.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.996];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,suse.com:dkim,linutronix.de:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DE31538A4E3
+	FROM_NEQ_ENVFROM(0.00)[yzjaurora@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[netdev,lkml];
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3D30E38A4B6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 2 Apr 2026 at 15:46, Sebastian Andrzej Siewior
-<bigeasy@linutronix.de> wrote:
-> On 2026-04-02 11:21:20 [+0200], Daniel Vacek wrote:
-> >
-> > Well, that's the patch I originally sent then.
-> >
-> > https://lore.kernel.org/linux-rt-devel/20260318103009.2120920-1-neelx@suse.com/
->
-> That was an alternative after everything was already done.
+When CONFIG_BRIDGE_VLAN_FILTERING is not set, br_vlan_group() and
+nbp_vlan_group() return NULL (br_private.h stub definitions). The
+BR_BOOLOPT_FDB_LOCAL_VLAN_0 toggle code is compiled unconditionally and
+reaches br_fdb_delete_locals_per_vlan_port() and
+br_fdb_insert_locals_per_vlan_port(), where the NULL vlan group pointer
+is dereferenced via list_for_each_entry(v, &vg->vlan_list, vlist).
 
-That is true. I don't mean to complain. But also because I haven't
-seen the applied version on the mailing list. That's why I originally
-sent my patch as a reply to this thread.
+The observed crash is in the delete path, triggered when creating a
+bridge with IFLA_BR_MULTI_BOOLOPT containing BR_BOOLOPT_FDB_LOCAL_VLAN_0
+via RTM_NEWLINK. The insert helper has the same bug pattern.
 
-I'm simply asking whether we should proceed with the discussed
-approach? Would that be better in the end?
+  Oops: general protection fault, probably for non-canonical address 0xdffffc0000000056: 0000 [#1] KASAN NOPTI
+  KASAN: null-ptr-deref in range [0x00000000000002b0-0x00000000000002b7]
+  RIP: 0010:br_fdb_delete_locals_per_vlan+0x2b9/0x310
+  Call Trace:
+   br_fdb_toggle_local_vlan_0+0x452/0x4c0
+   br_toggle_fdb_local_vlan_0+0x31/0x80 net/bridge/br.c:276
+   br_boolopt_toggle net/bridge/br.c:313
+   br_boolopt_multi_toggle net/bridge/br.c:364
+   br_changelink net/bridge/br_netlink.c:1542
+   br_dev_newlink net/bridge/br_netlink.c:1575
 
-If you don't object, I can send a rebased version along with a
-follow-up cleanup.
+Add NULL checks for the vlan group pointer in both helpers, returning
+early when there are no VLANs to iterate. This matches the existing
+pattern used by other bridge FDB functions such as br_fdb_add() and
+br_fdb_delete().
 
---nX
+Fixes: 21446c06b441 ("net: bridge: Introduce UAPI for BR_BOOLOPT_FDB_LOCAL_VLAN_0")
+Signed-off-by: Zijing Yin <yzjaurora@gmail.com>
+---
+Tested on Linux v7.0-rc5 (upstream tag) with clang 20.1.0, KASAN
+enabled, CONFIG_BRIDGE_VLAN_FILTERING=n.
 
-> > --nX
->
-> Sebastian
+Bug independently reproduced with the attached C reproducer
+(repro_br_fdb.c). The crash triggers deterministically on the first
+run with CONFIG_BRIDGE_VLAN_FILTERING=n on a clang-built kernel.
+
+Exact crash signature from reproduction:
+
+  Oops: general protection fault, probably for non-canonical address 0xdffffc0000000056: 0000 [#1] KASAN NOPTI
+  KASAN: null-ptr-deref in range [0x00000000000002b0-0x00000000000002b7]
+  RIP: 0010:br_fdb_delete_locals_per_vlan+0x72/0x3f0
+  Call Trace:
+   br_fdb_toggle_local_vlan_0+0x3d/0x1d0
+   br_boolopt_toggle+0xba/0x1a0
+   br_boolopt_multi_toggle+0x129/0x250
+   br_changelink+0x1100/0x1490
+   br_dev_newlink+0x115/0x190
+   rtnl_newlink+0xe15/0x25c0
+
+Note: gcc 13.3 with the same config optimizes away the NULL dereference
+path (UB elimination), so the crash does not trigger on gcc-built
+kernels. The code is still incorrect regardless of compiler behavior.
+
+Reproducer (C source): [PASTE_URL_HERE]
+Kernel .config:        [PASTE_URL_HERE]
+
+To reproduce: compile the C reproducer with `gcc -static -o repro repro.c`,
+run as root on a clang-built kernel. The crash triggers during
+br_dev_newlink() -> br_changelink() when the boolopt toggle reaches
+br_fdb_delete_locals_per_vlan_port() with a NULL vlan group. Note:
+RTM_SETLINK on an existing bridge may not trigger it due to different
+code ordering.
+
+ net/bridge/br_fdb.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
+index 0501ffcb8..e2c17f620 100644
+--- a/net/bridge/br_fdb.c
++++ b/net/bridge/br_fdb.c
+@@ -597,6 +597,9 @@ static void br_fdb_delete_locals_per_vlan_port(struct net_bridge *br,
+ 		dev = br->dev;
+ 	}
+ 
++	if (!vg)
++		return;
++
+ 	list_for_each_entry(v, &vg->vlan_list, vlist)
+ 		br_fdb_find_delete_local(br, p, dev->dev_addr, v->vid);
+ }
+@@ -630,6 +633,9 @@ static int br_fdb_insert_locals_per_vlan_port(struct net_bridge *br,
+ 		dev = br->dev;
+ 	}
+ 
++	if (!vg)
++		return 0;
++
+ 	list_for_each_entry(v, &vg->vlan_list, vlist) {
+ 		if (!br_vlan_should_use(v))
+ 			continue;
+-- 
+2.43.0
+
 
