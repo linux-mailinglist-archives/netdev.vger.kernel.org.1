@@ -1,165 +1,157 @@
-Return-Path: <netdev+bounces-274402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274403-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2J54M3AZzmmnkgYAu9opvQ
-	(envelope-from <netdev+bounces-274402-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:23:28 +0200
+	id qLCCOCUazmmnkgYAu9opvQ
+	(envelope-from <netdev+bounces-274403-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:26:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A33138514A
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:23:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B1D4385213
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:26:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C7862301E239
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 07:14:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E08DC311E289
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 07:17:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E144436DA16;
-	Thu,  2 Apr 2026 07:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4D33876BB;
+	Thu,  2 Apr 2026 07:17:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=dev.tdt.de header.i=@dev.tdt.de header.b="FOOoIjav"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ZQ2nwntW";
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ZQ2nwntW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C1431F9B8;
-	Thu,  2 Apr 2026 07:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F1F31E828;
+	Thu,  2 Apr 2026 07:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775114092; cv=none; b=aPpLc4LcDi/y3UzQsBWn+jUAc1dK/0P74kglhrrQO7KYz0XMt0dQnJ6YD4GP6nrodkTmjYEn+5EiBTG6G0B8XI11Kb+bBo7aC7yEzptPw02bQHP67AI8M4Rr8ukahyNH2nS96kFP2nitnSFAvO7Askrv2bnTu3+B6skAO0sSZJA=
+	t=1775114254; cv=none; b=oDskB5t3O//NCyMmX9izyDmLv9wYTYFXxXwqc4NSr0SGIKqsZBYk3nCsegIDd+tF3mt6nIYRUK6dIsf8VnvfN4dj7zdcEOH0EStnB/taV7BjI9CuGODi7ZQZpUj2JMTiRL7CfQEftfqFO5i09+BZaQJeshWpXlXwr5N0YsEneyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775114092; c=relaxed/simple;
-	bh=PjRBbHyCDRs5giP5cHIj0UQ85MPBUDBHa3e7t/RsNA8=;
-	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
-	 References:Message-ID; b=kRXmcMh5u7/NNRy2oar3IAu8HEbKwl/pLzENDdtPHv+Edga3WsXepX7We7Kwe4TiCUNReh9Y75VxSWLTafjJznfPtmeuno+Bt4JIj2vzlTeGZNqTK39HouAsyrXepua6OkJDG3+Ejldq4iZAfvkvcFvLsqH2dRqjRXwR3yvhnCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; dkim=temperror (0-bit key) header.d=dev.tdt.de header.i=@dev.tdt.de header.b=FOOoIjav; arc=none smtp.client-ip=194.37.255.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dev.tdt.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
-Received: from [194.37.255.9] (helo=mxout.expurgate.net)
-	by relay.expurgate.net with smtp (Exim 4.92)
-	(envelope-from <prvs=6566d59578=ms@dev.tdt.de>)
-	id 1w8CGJ-00ATtn-5K; Thu, 02 Apr 2026 09:14:43 +0200
-Received: from [195.243.126.94] (helo=securemail.tdt.de)
-	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ms@dev.tdt.de>)
-	id 1w8CGI-005hTl-1N; Thu, 02 Apr 2026 09:14:42 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dev.tdt.de;
-	s=z1-selector1; t=1775114081;
-	bh=lmFCqlfBE1fnq5/a2R/XBJFQiWLUI085rhhck3qDYPo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FOOoIjavVRyTUPmFdkJZsNNZkzXcVcISOxtTcUf8yaL/OdmWyKG0SjI0SspO2lnmx
-	 dHboeRz7Q6g05aU5jJd70wNpMnZWlNT674aythhN0qovbZlLVBmGZX7uaTMdWb8v4k
-	 XZJYiGy9A4UGkH3yT+GmODkmrtXp3eWQaX0XaHkvHXlPxVgipAwFjf5ATByzuJl0j1
-	 s28NYh6xd7bZNp5LDL8zMC7zObjd0CVJWHkf5HcKff4Bsn2qKqu5QPqN2TFxAl4EJI
-	 /HXx6Sz1ZMNaS+C2/k5BG1K8iECOYf0a2orAd6Nuzmh+fUPifMBU3bSD86uQLsXD2y
-	 hNxqQ3y+ZEBGA==
-Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id 807F4240040;
-	Thu,  2 Apr 2026 09:14:41 +0200 (CEST)
-Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id 6C45B240036;
-	Thu,  2 Apr 2026 09:14:41 +0200 (CEST)
-Received: from mail.dev.tdt.de (localhost [IPv6:::1])
-	by mail.dev.tdt.de (Postfix) with ESMTP id 0E98423CE4;
-	Thu,  2 Apr 2026 09:14:40 +0200 (CEST)
+	s=arc-20240116; t=1775114254; c=relaxed/simple;
+	bh=MdVvdK7OeWAS1DKm0l/0TvjYex3NYeEQXi3a21Re5XU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AJqlwfEvQeWdcbeQWV8DpL41q7YJTEdz1euwI9/6bvsDku+ZlkBY3A0sKg+3d/F1Z0qJ3j99xKwnSPye5sJRbPjtK9aXEzPX2JQpjp4QXHm/C+b3RYU3NADqhTPfxRY7YqsfIIgM6hIKdZ+03U2FbXwU1mJxKHil4Ac0DUoHkKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ZQ2nwntW; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ZQ2nwntW; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=FjjN1O42JWfrYsE6u8cn0l/7c5bmdJr0V+5xnXYU6JY=;
+	b=ZQ2nwntW+O0v0pYpqNbuJtKxMYr5srxNfSvtLjBVXdR9j26Tw0IsyhUt8MotF2KgJMLdTSz6W
+	vEOI1UUomcRxFKk9wxk+wzdr096O4/U0It574FJCd2G8MFEePyqhn4IUtXVaKau/IWPgcJdZDwz
+	oHFNoOr9RqCOLJrVOcnnJdE=
+Received: from canpmsgout03.his.huawei.com (unknown [172.19.92.159])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTPS id 4fmY865xB4z1BFp0;
+	Thu,  2 Apr 2026 15:17:10 +0800 (CST)
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=FjjN1O42JWfrYsE6u8cn0l/7c5bmdJr0V+5xnXYU6JY=;
+	b=ZQ2nwntW+O0v0pYpqNbuJtKxMYr5srxNfSvtLjBVXdR9j26Tw0IsyhUt8MotF2KgJMLdTSz6W
+	vEOI1UUomcRxFKk9wxk+wzdr096O4/U0It574FJCd2G8MFEePyqhn4IUtXVaKau/IWPgcJdZDwz
+	oHFNoOr9RqCOLJrVOcnnJdE=
+Received: from mail.maildlp.com (unknown [172.19.162.140])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4fmY1g6x5WzpTKg;
+	Thu,  2 Apr 2026 15:11:35 +0800 (CST)
+Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
+	by mail.maildlp.com (Postfix) with ESMTPS id 88F6F203B3;
+	Thu,  2 Apr 2026 15:17:25 +0800 (CST)
+Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.189.124) by
+ kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Thu, 2 Apr 2026 15:17:24 +0800
+From: Fan Gong <gongfan1@huawei.com>
+To: <mohsin.bashr@gmail.com>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<gongfan1@huawei.com>, <guoxin09@huawei.com>, <horms@kernel.org>,
+	<ioana.ciornei@nxp.com>, <kuba@kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <luosifu@huawei.com>,
+	<maxime.chevallier@bootlin.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <shijing34@huawei.com>, <wulike1@huawei.com>,
+	<zhengjiezhen@h-partners.com>, <zhoushuai28@huawei.com>,
+	<zhuyikai1@h-partners.com>
+Subject: Re: Re: [PATCH net-next v03 4/6] hinic3: Add ethtool rss ops
+Date: Thu, 2 Apr 2026 15:17:19 +0800
+Message-ID: <20260402071719.1715-1-gongfan1@huawei.com>
+X-Mailer: git-send-email 2.51.0.windows.1
+In-Reply-To: <3b252b2b-6be7-4a8d-9782-39695e948635@gmail.com>
+References: <3b252b2b-6be7-4a8d-9782-39695e948635@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Thu, 2 Apr 2026 09:14:40 +0200 (CEST)
-From: Martin Schiller <ms@dev.tdt.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	yimingqian591@gmail.com, linux-x25@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	security@kernel.org
-Subject: Re: [PATCH net v2] net/x25: Fix overflow when accumulating packets
-Organization: TDT AG
-In-Reply-To: <20260402024855.842920-1-kuba@kernel.org>
-References: <20260327-x25_fraglen-v2-1-143911c3f62a@dev.tdt.de>
- <20260402024855.842920-1-kuba@kernel.org>
-Message-ID: <8aa013a16fec55cdd7a2ba374bf37437@dev.tdt.de>
-X-Sender: ms@dev.tdt.de
-User-Agent: Roundcube Webmail/1.3.17
-X-purgate-type: clean
-X-purgate: clean
-X-purgate-ID: 151534::1775114082-B3EDD76A-8F68A85E/0/0
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemf100013.china.huawei.com (7.202.181.12)
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[tdt.de,none];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[huawei.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[dev.tdt.de:s=z1-selector1];
+	R_DKIM_ALLOW(-0.20)[huawei.com:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,gmail.com,vger.kernel.org,kernel.org];
-	TAGGED_FROM(0.00)[bounces-274402-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274403-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	DKIM_TRACE(0.00)[dev.tdt.de:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ms@dev.tdt.de,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	DKIM_TRACE(0.00)[huawei.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gongfan1@huawei.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,huawei.com:dkim,huawei.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[8]
-X-Rspamd-Queue-Id: 2A33138514A
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 6B1D4385213
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2026-04-02 04:48, Jakub Kicinski wrote:
-> This is an AI-generated review of your patch. The human sending this
-> email has considered the AI review valid, or at least plausible.
-> ---
-> net/x25: Fix overflow when accumulating packets
-> 
-> This commit adds a check to prevent x25_sock.fraglen from overflowing
-> during packet accumulation. It also resets the fragment length when
-> purging the fragment queue.
-> 
->> diff --git a/net/x25/x25_in.c b/net/x25/x25_in.c
->> index b981a4828d08..cb84c683d249 100644
->> --- a/net/x25/x25_in.c
->> +++ b/net/x25/x25_in.c
->> @@ -34,6 +34,12 @@ static int x25_queue_rx_frame(struct sock *sk, 
->> struct sk_buff *skb, int more)
->>  	struct sk_buff *skbo, *skbn = skb;
->>  	struct x25_sock *x25 = x25_sk(sk);
->> 
->> +	/* make sure we don't overflow */
->> +	if (x25->fraglen + skb->len > USHRT_MAX) {
->> +		kfree_skb(skb);
->> +		return 1;
->> +	}
-> 
-> Does this cause the skb to be freed twice?
-> 
-> When x25_queue_rx_frame() frees the skb and returns 1, the caller
-> x25_state3_machine() leaves its local queued variable as 0 and returns 
-> 0.
-> 
-> This 0 value propagates up through x25_process_rx_frame() to callers
-> like x25_backlog_rcv() or x25_lapb_receive_frame(). Since the return
-> value indicates the packet was not consumed by the protocol stack, 
-> these
-> upper-level functions will call kfree_skb(skb) again on the already
-> freed skb.
-> 
-> Would it be safer to return 1 without calling kfree_skb(skb) here so
-> the callers can handle freeing the unconsumed packet?
+On 4/1/2026 3:53 PM, Mohsin Bashir wrote:
 
-This is already fixed / changed in the v4 patch set.
+> > +    err = hinic3_update_rss_hash_opts(netdev, cmd, rss_type);
+> > +    if (err)
+> > +        return err;
+> > +
+> > +    err = hinic3_set_rss_type(nic_dev->hwdev, *rss_type);
+> 
+> So if we fail here, we have already modified the rss_type in-place. From this on-wards, the HW state would diverge from in-memory state. How about use a local copy and only update if no error?
+> 
+> > +    if (err) {
+> > +        netdev_err(netdev, "Failed to set rss type\n");
+> > +        return err;
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > + 
+
+Thanks for your four patch reviews.
+
+For patch 01, we'll add nic_info to inform the user that depth is timmed and restore q_params.
+
+For patch 02, we'll remove const.
+
+For patch 03, we'll change errcode and modify rx_max_coalesced_frames_high  judgement condition.
+As tx and rx share interrupt, we only use ETHTOOL_COALESCE_RX_USECS to avoid user misunderstanding.
+So we do not add ETHTOOL_COALESCE_TX_USECS.
+
+For patch 04, we overlooked the recovery of rss_type in error handling and we'll fix it.
+
+We will fix them in next version.
+
+Fan gong
 
