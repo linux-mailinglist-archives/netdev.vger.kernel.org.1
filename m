@@ -1,77 +1,76 @@
-Return-Path: <netdev+bounces-274544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274546-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uFIgEUJuzmnxngYAu9opvQ
-	(envelope-from <netdev+bounces-274544-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:25:22 +0200
+	id oAraAsZuzmnxngYAu9opvQ
+	(envelope-from <netdev+bounces-274546-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:27:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C24C7389A79
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:25:21 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60FAF389B45
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:27:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1BD7B30EB5D7
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:13:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7C8413158408
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4233D9049;
-	Thu,  2 Apr 2026 13:13:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FA03E63B1;
+	Thu,  2 Apr 2026 13:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="hw4vKJu8"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="XrbtmThY"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0CA3CA486;
-	Thu,  2 Apr 2026 13:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5B23DA7F3;
+	Thu,  2 Apr 2026 13:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775135624; cv=none; b=csCPa2E7hQX9VzC0AbtH9Nmn+6/MIuUcqfph1KOKeS1umMjUNyL6lW8SQXQEzzeVcDcsEFvI5/5MW8EypqE7hA4QdAWuUGm75iAN39/J8ngwm1Tk9cy2XaNiqJ29w58khyQPk1Xgd6ceHXlGbFKT4tT7uctkTiMli/471PMM1YM=
+	t=1775135626; cv=none; b=KY/2Hr15iNySuGd82Vq/ZiLyYNsjBI7MitCtJBduFi/LBox/xIG6QqRfdjrug0qUjCf5U/9HHh5cMKq+VV40Fo8eupWGs2Xh3wXPQlRFUbgrdo3vOBjC17E37KYHBS2Ddb1/NfaJsK00yuVhzu4vODRrM5mtPPVISQGyKxUGBW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775135624; c=relaxed/simple;
-	bh=s98qxk1ebRktGWQPf6/Ewo1dJQkEc4uGmeI9Af5Ih1s=;
+	s=arc-20240116; t=1775135626; c=relaxed/simple;
+	bh=9J04dCwa/PtETLbw9AxUT8HLph5CiL5GvXuX5fSNofs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WEwwHUBMaqe21sXtgVkAVQok8wAw2RhfXz8jkZpEAOMh8fcKS6GOGJQZLrv7lUGAyNzGPX3sCFCcmie4IMn1nvslSWn1n28SsjHz7znwefG2Do/ezI/lVn/ChFudZaq4afdOy2wM9KN5WLHUY+mxIll5KrmRjxBmSmyqC9jo5Ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=hw4vKJu8; arc=none smtp.client-ip=68.232.153.233
+	 MIME-Version:Content-Type; b=F14eMtEHxerFYKUU1tmlflU3rRr53LSl2wSRXF/w7c+TeUkp4m/6a49MIyIeXyaHEyx+DEokQvYP/MgqUnanmlQYillpJbEH6Q/1IAiaDjEVbP1rGkYUKpNwvMqHurQ+iE8yVdeebPKYHZ0JIqV5E/zMhLhQDWGLJaDMePYOT+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=XrbtmThY; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1775135623; x=1806671623;
+  t=1775135625; x=1806671625;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=s98qxk1ebRktGWQPf6/Ewo1dJQkEc4uGmeI9Af5Ih1s=;
-  b=hw4vKJu81efQqjaZBfmgqaaGsHlBF1jzQnRVRpVRBZHve4lTKMks3Stf
-   xh6GeDX6QwSDcnL8lRiDwuHXW4HHLIttC2iGwbhb0QynArz8BM1fgMwbh
-   sKKdjsVg4mQcL9RP2TW3730zDTIRdlbdJGm1OevpU1xpA76zIZrC41mOH
-   2/zHXvt+kBAgazIZOXrgVYGPce42Cc3l/QOHDSn+isZHkSrjYcx/W+nBb
-   KG1uQ56ostHMdqWEErOqSlH9fc90JsmOTguSmC9y2w9yDKb2e48bobKz7
-   vZnJq6gzbSkhma0JZ8oOddgPBwcF1efEIUwlbkRqhY4cgsoBTotUBj+yi
-   w==;
-X-CSE-ConnectionGUID: TdHc25BnRSOHbOZMtgT0eA==
-X-CSE-MsgGUID: dTXQ+pNWSFOyeTXMDHUJKQ==
+  bh=9J04dCwa/PtETLbw9AxUT8HLph5CiL5GvXuX5fSNofs=;
+  b=XrbtmThYxRowp/rSReOYhEeV4rm3EyLAmm6FZOEkszIyzYPyJK34DtLm
+   KpnxK06iilTRJ1yrqz25ZKwnMmo58wVcPG19yZqLrcECQX1MlNh4444F7
+   uXXYnuqmMf6tDhCKujPby1OH8/vOyBPohh14d9FLPFd84DEdjCnYdM6w+
+   NjyygJ9JfC3mJ9ocnEFFe4CEfhYUS1bHa+e1Z28krxbrrKIcxO40UPWSK
+   l7VvJ59yqObQI633WEFTAZwHvK/hBSTZt9mxYpgXnkTS2Bb+DyKvFReuB
+   6seKegNXkg3UEJpyokLLeHil++GQIiMsXvsNRW8K3QOov78OFDbPsR+w+
+   A==;
+X-CSE-ConnectionGUID: UGofO4cJSXOAkJsSzS2N8A==
+X-CSE-MsgGUID: bKgYiNHZRi2D3ah/YMRG9A==
 X-IronPort-AV: E=Sophos;i="6.23,155,1770620400"; 
-   d="scan'208";a="55583669"
+   d="scan'208";a="55583671"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
   by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2026 06:13:43 -0700
 Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
- chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
+ chn-vm-ex3.mchp-main.com (10.10.87.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.35; Thu, 2 Apr 2026 06:13:14 -0700
+ 15.2.2562.35; Thu, 2 Apr 2026 06:13:20 -0700
 Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
  chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Thu, 2 Apr 2026 06:13:13 -0700
+ 15.1.2507.58 via Frontend Transport; Thu, 2 Apr 2026 06:13:19 -0700
 From: Charles Perry <charles.perry@microchip.com>
 To: <netdev@vger.kernel.org>
-CC: Charles Perry <charles.perry@microchip.com>, Maxime Chevallier
-	<maxime.chevallier@bootlin.com>, Andrew Lunn <andrew@lunn.ch>, "Heiner
- Kallweit" <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+CC: Charles Perry <charles.perry@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	"Jakub Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v4 2/3] net: mdio: add a driver for PIC64-HPSC/HX MDIO controller
-Date: Thu, 2 Apr 2026 06:12:23 -0700
-Message-ID: <20260402131229.319599-3-charles.perry@microchip.com>
+Subject: [PATCH net-next v4 3/3] net: phy: add a PHY write barrier when disabling interrupts
+Date: Thu, 2 Apr 2026 06:12:24 -0700
+Message-ID: <20260402131229.319599-4-charles.perry@microchip.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260402131229.319599-1-charles.perry@microchip.com>
 References: <20260402131229.319599-1-charles.perry@microchip.com>
@@ -89,13 +88,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274544-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[microchip.com,bootlin.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-274546-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	RCVD_COUNT_FIVE(0.00)[6];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -103,304 +102,85 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
 	DKIM_TRACE(0.00)[microchip.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,bootlin.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C24C7389A79
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,microchip.com:dkim,microchip.com:email,microchip.com:mid]
+X-Rspamd-Queue-Id: 60FAF389B45
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This adds an MDIO driver for PIC64-HPSC/HX. The hardware supports C22
-and C45 but only C22 is implemented in this commit.
+MDIO bus controllers are not required to wait for write transactions to
+complete before returning as synchronization is often achieved by polling
+status bits.
 
-This MDIO hardware is based on a Microsemi design supported in Linux by
-mdio-mscc-miim.c. However, The register interface is completely
-different with pic64hpsc, hence the need for a separate driver.
+This can cause issues when disabling interrupts since an interrupt could
+fire before the interrupt handler is unregistered and there's no status
+bit to poll.
 
-The documentation recommends an input clock of 156.25MHz and a prescaler
-of 39, which yields an MDIO clock of 1.95MHz.
-
-The hardware supports an interrupt pin or a "TRIGGER" bit that can be
-polled to signal transaction completion. This commit uses polling.
-
-This was tested on Microchip HB1301 evalkit with a VSC8574 and a
-VSC8541.
+Add a phy_write_barrier() function and use it in phy_disable_interrupts()
+to fix this issue. The write barrier just reads an MII register and
+discards the value, which is enough to guarantee that previous writes have
+completed.
 
 Signed-off-by: Charles Perry <charles.perry@microchip.com>
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
 
 Notes:
     Changes in v4:
-      - read: return FIELD_GET() directly instead of using "ret" (Russell)
-    
-    Changes in v3:
-      - Add a MAINTAINERS entry (Jakub)
-    
-    Changes in v2:
-      - Remove #define for unused registers (Maxime)
-      - Add "c22" to clause 22 read/write ops (Maxime)
-      - Remove the call to platform_set_drvdata() (Andrew)
-      - Make the clock mandatory (Andrew)
-      - Use 2.5MHz if no clock-frequency was specified (Andrew)
-      - Change the error message for bad clock-frequency (Andrew)
-      - Fix a use without initialization on bus_freq (Andrew)
+      - Add this patch (Russell, Andrew)
 
- MAINTAINERS                       |   6 +
- drivers/net/mdio/Kconfig          |   7 ++
- drivers/net/mdio/Makefile         |   1 +
- drivers/net/mdio/mdio-pic64hpsc.c | 190 ++++++++++++++++++++++++++++++
- 4 files changed, 204 insertions(+)
- create mode 100644 drivers/net/mdio/mdio-pic64hpsc.c
+ drivers/net/phy/phy.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e08767323763..9297c46dba91 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17216,6 +17216,12 @@ L:	linux-serial@vger.kernel.org
- S:	Maintained
- F:	drivers/tty/serial/8250/8250_pci1xxxx.c
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index 13dd1691886d..2be0b90e9947 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1368,14 +1368,39 @@ void phy_error(struct phy_device *phydev)
+ }
+ EXPORT_SYMBOL(phy_error);
  
-+MICROCHIP PIC64-HPSC/HX DRIVERS
-+M:	Charles Perry <charles.perry@microchip.com>
-+S:	Supported
-+F:	Documentation/devicetree/bindings/net/microchip,pic64hpsc-mdio.yaml
-+F:	drivers/net/mdio/mdio-pic64hpsc.c
-+
- MICROCHIP POLARFIRE FPGA DRIVERS
- M:	Conor Dooley <conor.dooley@microchip.com>
- L:	linux-fpga@vger.kernel.org
-diff --git a/drivers/net/mdio/Kconfig b/drivers/net/mdio/Kconfig
-index 44380378911b..7bdba8c3ddef 100644
---- a/drivers/net/mdio/Kconfig
-+++ b/drivers/net/mdio/Kconfig
-@@ -146,6 +146,13 @@ config MDIO_OCTEON
- 	  buses. It is required by the Octeon and ThunderX ethernet device
- 	  drivers on some systems.
- 
-+config MDIO_PIC64HPSC
-+	tristate "PIC64-HPSC/HX MDIO interface support"
-+	depends on HAS_IOMEM && OF_MDIO
-+	help
-+	  This driver supports the MDIO interface found on the PIC64-HPSC/HX
-+	  SoCs.
-+
- config MDIO_IPQ4019
- 	tristate "Qualcomm IPQ4019 MDIO interface support"
- 	depends on HAS_IOMEM && OF_MDIO
-diff --git a/drivers/net/mdio/Makefile b/drivers/net/mdio/Makefile
-index fbec636700e7..048586746026 100644
---- a/drivers/net/mdio/Makefile
-+++ b/drivers/net/mdio/Makefile
-@@ -20,6 +20,7 @@ obj-$(CONFIG_MDIO_MOXART)		+= mdio-moxart.o
- obj-$(CONFIG_MDIO_MSCC_MIIM)		+= mdio-mscc-miim.o
- obj-$(CONFIG_MDIO_MVUSB)		+= mdio-mvusb.o
- obj-$(CONFIG_MDIO_OCTEON)		+= mdio-octeon.o
-+obj-$(CONFIG_MDIO_PIC64HPSC)		+= mdio-pic64hpsc.o
- obj-$(CONFIG_MDIO_REALTEK_RTL9300)	+= mdio-realtek-rtl9300.o
- obj-$(CONFIG_MDIO_REGMAP)		+= mdio-regmap.o
- obj-$(CONFIG_MDIO_SUN4I)		+= mdio-sun4i.o
-diff --git a/drivers/net/mdio/mdio-pic64hpsc.c b/drivers/net/mdio/mdio-pic64hpsc.c
-new file mode 100644
-index 000000000000..28be77ad6cf7
---- /dev/null
-+++ b/drivers/net/mdio/mdio-pic64hpsc.c
-@@ -0,0 +1,190 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Microchip PIC64-HPSC/HX MDIO controller driver
++/**
++ * phy_write_barrier - ensure the last write completed for this PHY device
++ * @phydev: target phy_device struct
 + *
-+ * Copyright (c) 2026 Microchip Technology Inc. and its subsidiaries.
++ * MDIO bus controllers are not required to wait for write transactions to
++ * complete before returning. Calling this function ensures that the previous
++ * write has completed.
 + */
-+
-+#include <linux/bitops.h>
-+#include <linux/clk.h>
-+#include <linux/io.h>
-+#include <linux/iopoll.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/of_mdio.h>
-+#include <linux/platform_device.h>
-+
-+#define MDIO_REG_PRESCALER     0x20
-+#define MDIO_CFG_PRESCALE_MASK GENMASK(7, 0)
-+
-+#define MDIO_REG_FRAME_CFG_1 0x24
-+#define MDIO_WDATA_MASK	     GENMASK(15, 0)
-+
-+#define MDIO_REG_FRAME_CFG_2	 0x28
-+#define MDIO_TRIGGER_BIT	 BIT(31)
-+#define MDIO_REG_DEV_ADDR_MASK	 GENMASK(20, 16)
-+#define MDIO_PHY_PRT_ADDR_MASK	 GENMASK(8, 4)
-+#define MDIO_OPERATION_MASK	 GENMASK(3, 2)
-+#define MDIO_START_OF_FRAME_MASK GENMASK(1, 0)
-+
-+/* Possible value of MDIO_OPERATION_MASK */
-+#define MDIO_OPERATION_WRITE BIT(0)
-+#define MDIO_OPERATION_READ  BIT(1)
-+
-+#define MDIO_REG_FRAME_STATUS 0x2C
-+#define MDIO_READOK_BIT	      BIT(24)
-+#define MDIO_RDATA_MASK	      GENMASK(15, 0)
-+
-+struct pic64hpsc_mdio_dev {
-+	void __iomem *regs;
-+};
-+
-+static int pic64hpsc_mdio_wait_trigger(struct mii_bus *bus)
++static int phy_write_barrier(struct phy_device *phydev)
 +{
-+	struct pic64hpsc_mdio_dev *priv = bus->priv;
-+	u32 val;
-+	int ret;
++	int err;
 +
-+	/* The MDIO_TRIGGER bit returns 0 when a transaction has completed. */
-+	ret = readl_poll_timeout(priv->regs + MDIO_REG_FRAME_CFG_2, val,
-+				 !(val & MDIO_TRIGGER_BIT), 50, 10000);
-+
-+	if (ret < 0)
-+		dev_dbg(&bus->dev, "TRIGGER bit timeout: %x\n", val);
-+
-+	return ret;
-+}
-+
-+static int pic64hpsc_mdio_c22_read(struct mii_bus *bus, int mii_id, int regnum)
-+{
-+	struct pic64hpsc_mdio_dev *priv = bus->priv;
-+	u32 val;
-+	int ret;
-+
-+	ret = pic64hpsc_mdio_wait_trigger(bus);
-+	if (ret)
-+		return ret;
-+
-+	writel(MDIO_TRIGGER_BIT | FIELD_PREP(MDIO_REG_DEV_ADDR_MASK, regnum) |
-+		       FIELD_PREP(MDIO_PHY_PRT_ADDR_MASK, mii_id) |
-+		       FIELD_PREP(MDIO_OPERATION_MASK, MDIO_OPERATION_READ) |
-+		       FIELD_PREP(MDIO_START_OF_FRAME_MASK, 1),
-+	       priv->regs + MDIO_REG_FRAME_CFG_2);
-+
-+	ret = pic64hpsc_mdio_wait_trigger(bus);
-+	if (ret)
-+		return ret;
-+
-+	val = readl(priv->regs + MDIO_REG_FRAME_STATUS);
-+
-+	/* The MDIO_READOK is a 1-bit value reflecting the inverse of the MDIO
-+	 * bus value captured during the 2nd TA cycle. A PHY/Port should drive
-+	 * the MDIO bus with a logic 0 on the 2nd TA cycle, however, the
-+	 * PHY/Port could optionally drive a logic 1, to communicate a read
-+	 * failure. This feature is optional, not defined by the 802.3 standard
-+	 * and not supported in standard external PHYs.
-+	 */
-+	if (!(bus->phy_ignore_ta_mask & 1 << mii_id) &&
-+	    !FIELD_GET(MDIO_READOK_BIT, val)) {
-+		dev_dbg(&bus->dev, "READOK bit cleared\n");
-+		return -EIO;
-+	}
-+
-+	return FIELD_GET(MDIO_RDATA_MASK, val);
-+}
-+
-+static int pic64hpsc_mdio_c22_write(struct mii_bus *bus, int mii_id, int regnum,
-+				    u16 value)
-+{
-+	struct pic64hpsc_mdio_dev *priv = bus->priv;
-+	int ret;
-+
-+	ret = pic64hpsc_mdio_wait_trigger(bus);
-+	if (ret < 0)
-+		return ret;
-+
-+	writel(FIELD_PREP(MDIO_WDATA_MASK, value),
-+	       priv->regs + MDIO_REG_FRAME_CFG_1);
-+
-+	writel(MDIO_TRIGGER_BIT | FIELD_PREP(MDIO_REG_DEV_ADDR_MASK, regnum) |
-+		       FIELD_PREP(MDIO_PHY_PRT_ADDR_MASK, mii_id) |
-+		       FIELD_PREP(MDIO_OPERATION_MASK, MDIO_OPERATION_WRITE) |
-+		       FIELD_PREP(MDIO_START_OF_FRAME_MASK, 1),
-+	       priv->regs + MDIO_REG_FRAME_CFG_2);
++	err = phy_read(phydev, MII_PHYSID1);
++	if (err < 0)
++		return err;
 +
 +	return 0;
 +}
 +
-+static int pic64hpsc_mdio_probe(struct platform_device *pdev)
-+{
-+	struct device_node *np = pdev->dev.of_node;
-+	struct device *dev = &pdev->dev;
-+	struct pic64hpsc_mdio_dev *priv;
-+	struct mii_bus *bus;
-+	unsigned long rate;
-+	struct clk *clk;
-+	u32 bus_freq;
-+	u32 div;
-+	int ret;
+ /**
+  * phy_disable_interrupts - Disable the PHY interrupts from the PHY side
+  * @phydev: target phy_device struct
+  */
+ int phy_disable_interrupts(struct phy_device *phydev)
+ {
++	int err;
 +
-+	bus = devm_mdiobus_alloc_size(dev, sizeof(*priv));
-+	if (!bus)
-+		return -ENOMEM;
+ 	/* Disable PHY interrupts */
+-	return phy_config_interrupt(phydev, PHY_INTERRUPT_DISABLED);
++	err = phy_config_interrupt(phydev, PHY_INTERRUPT_DISABLED);
++	if (err)
++		return err;
 +
-+	priv = bus->priv;
-+
-+	priv->regs = devm_platform_ioremap_resource(pdev, 0);
-+	if (IS_ERR(priv->regs))
-+		return PTR_ERR(priv->regs);
-+
-+	bus->name = KBUILD_MODNAME;
-+	bus->read = pic64hpsc_mdio_c22_read;
-+	bus->write = pic64hpsc_mdio_c22_write;
-+	snprintf(bus->id, MII_BUS_ID_SIZE, "%s", dev_name(dev));
-+	bus->parent = dev;
-+
-+	clk = devm_clk_get_enabled(dev, NULL);
-+	if (IS_ERR(clk))
-+		return PTR_ERR(clk);
-+
-+	if (of_property_read_u32(np, "clock-frequency", &bus_freq))
-+		bus_freq = 2500000;
-+
-+	rate = clk_get_rate(clk);
-+
-+	div = DIV_ROUND_UP(rate, 2 * bus_freq) - 1;
-+	if (div == 0 || div & ~MDIO_CFG_PRESCALE_MASK) {
-+		dev_err(dev, "MDIO clock-frequency out of range\n");
-+		return -EINVAL;
-+	}
-+
-+	dev_dbg(dev, "rate=%lu bus_freq=%u real_bus_freq=%lu div=%u\n", rate,
-+		bus_freq, rate / (2 * (1 + div)), div);
-+	writel(div, priv->regs + MDIO_REG_PRESCALER);
-+
-+	ret = devm_of_mdiobus_register(dev, bus, np);
-+	if (ret) {
-+		dev_err(dev, "Cannot register MDIO bus (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static const struct of_device_id pic64hpsc_mdio_match[] = {
-+	{ .compatible = "microchip,pic64hpsc-mdio" },
-+	{}
-+};
-+MODULE_DEVICE_TABLE(of, pic64hpsc_mdio_match);
-+
-+static struct platform_driver pic64hpsc_mdio_driver = {
-+	.probe = pic64hpsc_mdio_probe,
-+	.driver = {
-+		.name = KBUILD_MODNAME,
-+		.of_match_table = pic64hpsc_mdio_match,
-+	},
-+};
-+module_platform_driver(pic64hpsc_mdio_driver);
-+
-+MODULE_AUTHOR("Charles Perry <charles.perry@microchip.com>");
-+MODULE_DESCRIPTION("Microchip PIC64-HPSC/HX MDIO driver");
-+MODULE_LICENSE("GPL");
++	return phy_write_barrier(phydev);
+ }
+ 
+ /**
 -- 
 2.47.3
 
