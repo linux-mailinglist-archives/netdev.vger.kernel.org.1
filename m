@@ -1,177 +1,224 @@
-Return-Path: <netdev+bounces-274588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274589-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gFbGCGyCzmmDoAYAu9opvQ
-	(envelope-from <netdev+bounces-274588-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:51:24 +0200
+	id oqv7E5qCzmmWoAYAu9opvQ
+	(envelope-from <netdev+bounces-274589-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:52:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C020C38AD1F
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:51:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B8F738AD40
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 16:52:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F6E0301F187
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 14:48:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 03875300B100
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 14:48:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97D839182C;
-	Thu,  2 Apr 2026 14:48:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D411F3EBF07;
+	Thu,  2 Apr 2026 14:48:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="yz0hZk2T"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="JQOuF3xZ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="o6fj7Gdg"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C528E25B30D;
-	Thu,  2 Apr 2026 14:47:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856473E0C45;
+	Thu,  2 Apr 2026 14:48:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775141281; cv=none; b=ZMvq5sMfuIE8gULEAZkznhBACEGc9OOSB6x1DHuMTUfJeiyi2wfX70Dpl9YQQDmrK2EsNRmq3GyStgJdlGvyEdJ3oLHBPjjoNq7vzG5MfVYVdyZuGrbrN1BEaM6lL/b+C4hDAombEgQDb917rGBBzvvwMjRSdNWWXjqY79RcqnQ=
+	t=1775141303; cv=none; b=SMx2Sbg6R2wvATyKVYqbm+o/tbNoxv5do0H/EiXWeQsQxIyRNBmsSawQS/+h9DbmeqgVMegebM2Jaf5Wfz+HT7ZQ/mdBC7YKmzA16Pn21BOzXyVlMVGCkiPDR8RumAdaeLC9ZQnn6sV7WPEmPQA1OEjd2u/PfOVk3e+IgqzytVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775141281; c=relaxed/simple;
-	bh=O+Z5Fpxv4NCjeuyfdcBZq+agmf3NULY5A5L0NkR4gJc=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=KudRNiTPdSmnsaryL3C+LHmtMWQr2uz/bX3Z7wjfmj40WufmD3nuMBaVTSZm1QKJ3hdXZSLoJKoZ2eGTHQ4dO1OHzFb4BlyHhOEjinBlRHnz31co3bn8VZCIPndTfbriyuAX6U+Bzoyzvusny9kKGoFZNTL/Bx2ppWxi4M1UnOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=yz0hZk2T; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=xD9Ws0wj/oKKCviSDFh+SyGUaZONQvwUQ/re7IVmgTY=; b=yz0hZk2TQ0z0WN4LzR8/RPaHBf
-	nAiQSMV47/v6hNhGL00u0kvvA+d4wkN6hBaKazAIonNrKRBBqpMWRvyaFD47A5qeRvpvn0sbr0QEO
-	jy1D9swn36xdIPvtU9pybae20tbQchAZOnbqc8nDyiWZ8OC8CcfpJXQWE71H73asbTI28r1cWC3pM
-	oHYUQ6dShP5Ju/BHedcgJsRExiUmoxaSF5+cWeN7A0UOlhRt7kboTYn+idcRYB9XUbtReSbaIMeAU
-	OD95J8ymPcdm4gcn+mL19jVZ0OFaMl1xrtfxUHtx3ugEUkstqPo6XJh9spVwECze1E4Ne1qicie0m
-	uwLwV3Ww==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:59264 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1w8JKs-000000004ao-2o1I;
-	Thu, 02 Apr 2026 15:47:54 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1w8JKr-0000000EdLC-41Bt;
-	Thu, 02 Apr 2026 15:47:54 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1775141303; c=relaxed/simple;
+	bh=wMBQiCs9KWhb3wZSPanFzYW+/vuSCs/Zb0o1JRU+LuA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JB4EX2yb/83ECgQMLtoOYqi/B4jPFWqYl5uBRg0uwjFOpJMI0qk7ot6byIoK8EZAWjqlXTntVYUfMyqWpZVFZapTBTYqaCT2wamZz8DTY+EyDDCZl0Cw8tsrh32fSr+orL8BJZkTj9kw2SOmZD0xKJ2L2Ys70SFI/ALCkQ4Xgqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=JQOuF3xZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=o6fj7Gdg; arc=none smtp.client-ip=103.168.172.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 8FE8E1400285;
+	Thu,  2 Apr 2026 10:48:19 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Thu, 02 Apr 2026 10:48:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1775141299; x=
+	1775227699; bh=Uy22VF3t2Ih4TkzJ7sG0SWRBj5Z6qy24lhBo/iuqstY=; b=J
+	QOuF3xZzfcJdTLhXe56S4ktxQNVwn/qzKFiv/QB1/QjDraVGVPiEEbk6STzpVxSD
+	TVHPa2Opj6ygsU9JlYP5YASAvUmfP53ZX47nu4JNjkKaxdZk2EdUdZqMrQrkDN7C
+	5Om26AlKItU1lSlrrXOnTvEZcthuhtx9W87AOPksLWVPVaxAKxQUExyKPLoWNfKi
+	UpQtmvsfwvdKXs28oc98nD/DlIxD49H33UWL25ybLIvkMF60twoMm1uygW1rhMIX
+	Sa7/GPobuh7sFIHFBrxSp68InWA+KkqB+6W43iURYGYjW9wYPkTgbrivw14b0G/m
+	RPVP63xj/UTTGPQxfkJ3A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1775141299; x=1775227699; bh=Uy22VF3t2Ih4TkzJ7sG0SWRBj5Z6qy24lhB
+	o/iuqstY=; b=o6fj7Gdg7iYzJrRg9IaOPXtMgrMI9TUnvVMowXXgt6erES9+f+B
+	3GcmfXaJ77XQtzEb7TO6KqZ5lfcUdXFv8wRzuaOBsoBqtvEzSMUK0Iz3lPk5zVEJ
+	oc7Y7Mn7PdgXn6BJmLZ6QNnlw7Mv65PEwbbnktXHyF/uE3PyV3rTFTg8a4vTjz/i
+	1G/Lcm4V9vPEaZuW+RKY3q9JiUHQBwfgg+4Gq47ZcYIx7/yH49ejY1dMuCwamFsQ
+	mu7plj7hn08+tc+j01L6lfKZORiKRWBsEBcm/df/hqS5FnwL2ouwr53MSkm8F3bo
+	NwQpu3hYUvPB9oZehKJr38D7Zcmhd2z31Kw==
+X-ME-Sender: <xms:s4HOaSEdvA4Aq4IqM5UUu-StRuYFXS-jBdVJ5xxCvQik2FBNwdb-ZQ>
+    <xme:s4HOaU5KXvNQY5XWUb7ZfiQbCK5UqAYDsQzHJeqhMYf1p19FQboUbZrTkTqdjLhJW
+    ie7NGerUGgfUQx2EhfZctVd-EPWhMIZK-sGHVxX6gQNnz1EnnW_sZk>
+X-ME-Received: <xmr:s4HOabZNWsCpdjMTAsM6Ldwe2TMraKGG9OePwE5wNFGdlN6RiQ0JILqXu3xq>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdeifeduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
+    epfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhnrgcu
+    ffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrfgrth
+    htvghrnhepleeujeeivdehheffleelvdffueeludfgjeegudduteeugfeuudejieegjeet
+    vdeunecuffhomhgrihhnpehsrghshhhikhhordguvghvnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhn
+    vghtpdhnsggprhgtphhtthhopeduvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
+    eptghrrghtihhusehnvhhiughirgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgv
+    ughhrghtrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrd
+    horhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgt
+    phhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuh
+    hmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghl
+    rdhorhhgpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    epshgufhesfhhomhhitghhvghvrdhmvg
+X-ME-Proxy: <xmx:s4HOaShsC6sEVPyxSuDE4eIY-UmJ32k7KJKQui78K-bQ2hYADQ1BmQ>
+    <xmx:s4HOadcKgkVeV6tmb37G_qYSs_bAJTpiant-zfdwAvNuHpIt8m1j7w>
+    <xmx:s4HOaRlGujCpKwJk57R7guOgxtlew4CCTdYh_axryqEZJsf6wlGnjw>
+    <xmx:s4HOaSxwRuRn4k_eCqbqvNSapxjH7cMsmqrdrPQjAaLSn2B5Nxr_bQ>
+    <xmx:s4HOabqT9kTDEnx8SYWN30WEZCnhAGDVrsaXyeiaFbc_mObONajtFvLx>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 2 Apr 2026 10:48:17 -0400 (EDT)
+Date: Thu, 2 Apr 2026 16:48:16 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Cosmin Ratiu <cratiu@nvidia.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: stmmac: qcom-ethqos: set clk_csr
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>, Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net v6 4/4] macsec: Support VLAN-filtering lower devices
+Message-ID: <ac6BsG4IhAajip1s@krikkit>
+References: <20260330130130.989236-1-cratiu@nvidia.com>
+ <20260330130130.989236-5-cratiu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1w8JKr-0000000EdLC-41Bt@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 02 Apr 2026 15:47:53 +0100
-X-Spamd-Result: default: False [1.14 / 15.00];
+In-Reply-To: <20260330130130.989236-5-cratiu@nvidia.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274588-lists,netdev=lfdr.de,kernel];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274589-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[queasysnail.net];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[rmk@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.556];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[rmk-PC.armlinux.org.uk:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:email,qualcomm.com:email]
-X-Rspamd-Queue-Id: C020C38AD1F
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,queasysnail.net:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: 4B8F738AD40
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The clocks for qcom-ethqos return a rate of zero as firmware manages
-their rate. According to hardware documentation, the clock which is
-fed to the slave AHB interface can range between 50 to 100MHz for
-non-RGMII and 30 to 75MHz for boards with a RGMII interfaces.
+2026-03-30, 16:01:30 +0300, Cosmin Ratiu wrote:
+> @@ -2616,14 +2616,22 @@ static int macsec_update_offload(struct net_device *dev, enum macsec_offload off
+>  	if (!ops)
+>  		return -EOPNOTSUPP;
+>  
+> -	macsec->offload = offload;
+> -
+>  	ctx.secy = &macsec->secy;
+>  	ret = offload == MACSEC_OFFLOAD_OFF ? macsec_offload(ops->mdo_del_secy, &ctx)
+>  					    : macsec_offload(ops->mdo_add_secy, &ctx);
+> -	if (ret) {
+> -		macsec->offload = prev_offload;
+> +	if (ret)
+>  		return ret;
+> +
+> +	/* Remove VLAN filters when disabling offload. */
+> +	if (offload == MACSEC_OFFLOAD_OFF) {
+> +		vlan_drop_rx_ctag_filter_info(dev);
+> +		vlan_drop_rx_stag_filter_info(dev);
+> +	}
+> +	macsec->offload = offload;
+> +	/* Add VLAN filters when enabling offload. */
+> +	if (prev_offload == MACSEC_OFFLOAD_OFF) {
+> +		vlan_get_rx_ctag_filter_info(dev);
+> +		vlan_get_rx_stag_filter_info(dev);
 
-Currently, stmmac uses an undefined divisor value. Instead, use
-STMMAC_CSR_60_100M which will mean we meet IEEE 802.3 specification
-since this will generate:
+Paolo pointed me to the sashiko review for this patch
+https://sashiko.dev/#/patchset/20260330130130.989236-1-cratiu%40nvidia.com
 
-  714kHz  @ 30MHz
-  1.19MHz @ 50MHz
-  1.79MHz @ 75MHz
-  2.42MHz @ 100MHz
+A simple way to trigger this is to do s/VLAN_N_VID/500/ in
+nsim_vlan_rx_*_vid.
 
-This gives MDC rates within the IEEE 802.3 specification, although the
-30MHz case is particularly slow.
+For example:
 
-Selecting the next lowest divisor, STMMAC_CSR_35_60M, which is /26
-will give:
+echo 1 > /sys/bus/netdevsim/new_device
+ip link add link eni1np1 macsec0 type macsec
+ip link add link macsec0 macsec0.1 type vlan id 1
+ip link add link macsec0 macsec0.1000 type vlan id 1000
+ip link set macsec0 type macsec offload mac
+cat /sys/kernel/debug/netdevsim/netdevsim1/ports/0/vlan      # empty
 
-   1.15MHz @ 30MHz
-   1.92MHz @ 50MHz
-   2.88MHz @ 75MHz (exceeding 802.3 spec)
-   3.85MHz @ 100MHz (exceeding 802.3 spec)
 
-Unfortunately, this divisor makes the upper bound of both ranges exeed
-the IEEE 802.3 specification, and thus we can not use it without knowing
-for certain what the current CSR clock rate actually is.
+If this happens on a real device, the VLAN filters will be broken. I'm
+not sure what the right behavior would be:
 
-So, STMMAC_CSR_60_100M is the best fit for all boards based on the
-information provided thus far.
+1. reject the request to enable offload
+2. switch to promiscuous mode
 
-Link: https://lore.kernel.org/r/acGhQ0oui+dVRdLY@oss.qualcomm.com
-Link: https://lore.kernel.org/r/acw1habUsiSqlrky@oss.qualcomm.com
-Reviewed-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index ad3a983d2a08..ac7d6d3e205a 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -764,6 +764,12 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 	qcom_ethqos_set_sgmii_loopback(ethqos, true);
- 	ethqos_set_func_clk_en(ethqos);
- 
-+	/* The clocks are controlled by firmware, so we don't know for certain
-+	 * what clock rate is being used. Hardware documentation mentions that
-+	 * the AHB slave clock will be in the range of 50 to 100MHz, which
-+	 * equates to a MDC between 1.19 and 2.38MHz.
-+	 */
-+	plat_dat->clk_csr = STMMAC_CSR_60_100M;
- 	plat_dat->bsp_priv = ethqos;
- 	plat_dat->set_clk_tx_rate = ethqos_set_clk_tx_rate;
- 	plat_dat->dump_debug_regs = rgmii_dump;
+OTOH maybe we don't need to care, since __netdev_update_features also
+(kind of) ignores those errors:
+
+echo 1 > /sys/bus/netdevsim/new_device
+ethtool -K eni1np1 rx-vlan-filter off
+ip link add link eni1np1 eni1np1.1 type vlan id 1
+ip link add link eni1np1 eni1np1.1000 type vlan id 1000
+cat /sys/kernel/debug/netdevsim/netdevsim1/ports/0/vlan      # empty as expected
+ethtool -K eni1np1 rx-vlan-filter on                         # succeeds
+ethtool -k eni1np1 | grep rx-vlan-filter                     # "rx-vlan-filter: on"
+cat /sys/kernel/debug/netdevsim/netdevsim1/ports/0/vlan      # still empty because id=1000 was rejected
+                                                             # and everything got rolled back
+ip link add link eni1np1 eni1np1.123 type vlan id 123        # succeeds
+cat /sys/kernel/debug/netdevsim/netdevsim1/ports/0/vlan      # only "ctag 123"
+
+
+[at this point running
+    ip link del eni1np1.1
+or
+    ethtool -K eni1np1 rx-vlan-filter off
+will splat because vlan_filter_push_vids did a rollback/never added
+id=1, and now we call vlan_kill_rx_filter_info, but that's specific to
+this vid limit]
+
 -- 
-2.47.3
-
+Sabrina
 
