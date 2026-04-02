@@ -1,234 +1,179 @@
-Return-Path: <netdev+bounces-274378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274379-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QKbaDDwEzml+kQYAu9opvQ
-	(envelope-from <netdev+bounces-274378-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 07:53:00 +0200
+	id cDObFvQGzmnpkQYAu9opvQ
+	(envelope-from <netdev+bounces-274379-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 08:04:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D414A384300
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 07:52:53 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D708C384446
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 08:04:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 02C81302D446
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 05:52:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E110A3037F15
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 06:03:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A82135CBD6;
-	Thu,  2 Apr 2026 05:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D35D937C917;
+	Thu,  2 Apr 2026 06:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b="lnwnmM1U"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="J4YIKq0s"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.baidu.com (jpmx.baidu.com [119.63.196.201])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id AC23A2FE582;
-	Thu,  2 Apr 2026 05:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.63.196.201
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4583A3264D2
+	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 06:03:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775109159; cv=none; b=a4vX6z7L5kCoMd9iqzAHfwqgPQmQU7vMm7SdNy2ZH76ySmSACQsigwwdhQyCk1F8byhdcas9jmBi5sYVCzpQYQQSO1QwGUpu+wDsRkMTJwxIHXQKKxAv6hVkcYZY0cNVcU19aYzfJe6BqR5u8p+XYJy2pnxrdd8HDvRo+lcn/dU=
+	t=1775109795; cv=none; b=BGUePoJ0ZgYiKx622ejSbUw5VkDUQtK4ZaMJyG+hAbtwbdtQNjyeG3GDvwBDyJboykzVMf08XUsKgoxRV7mfyvJJGNZNjf5mT9VRdTrCldbv4gUrgYeu6vPh807dxF6l1REsaY+AQQTQIx5Xgg0On4h0vGFcp9cBeac4hH/0JgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775109159; c=relaxed/simple;
-	bh=PQppXGaETl7HsBl4FNqbEK6u0tJ+4rAmM7mQIV1pMso=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FabLClXTWZ9XJNsfqQs7NWE1m+BZ2RvUBpM1d6JudHwyS4gw0Ngu1vN6YspCYXHDX2vZT1/3FhL4VC10OazojjINdA4wc6w5XNzJGX2IKSdeIrbKP0sTL4oVIpEto0MQV5DOe/87x6d29QBZtBwgisqiSnlc69CC/lYgRWGuSIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b=lnwnmM1U; arc=none smtp.client-ip=119.63.196.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-X-MD-Sfrom: lirongqing@baidu.com
-X-MD-SrcIP: 172.31.50.47
-From: lirongqing <lirongqing@baidu.com>
-To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>,
-	Boris Pismenny <borisp@nvidia.com>, Richard Cochran
-	<richardcochran@gmail.com>, Cosmin Ratiu <cratiu@nvidia.com>, Dragos Tatulea
-	<dtatulea@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Li RongQing
-	<lirongqing@baidu.com>, Kees Cook <kees@kernel.org>, Akiva Goldberger
-	<agoldberger@nvidia.com>, Simon Horman <horms@kernel.org>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
-Subject: [PATCH net-next] net/mlx5: Use dma_wmb() for completion queue doorbell updates
-Date: Thu, 2 Apr 2026 01:52:06 -0400
-Message-ID: <20260402055206.2311-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1775109795; c=relaxed/simple;
+	bh=5r13J6OybuNRUXFTInteQCtWxGnSgEkgkKGM9ySWNIc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AB/DivoVqKRagWGbC9HnNuaSk4Ldivvo1ssR+LLtnhR7ohGk70uZ/5HpiMeat0Ijmqljr2cRUEo1WE9Mw0aAB/d4zKuHVXMKdKGQW0uhw3fN1c9dRI/zsZ9HAsH6pQMotQ/VbvWwyW79RR+oPlOIOvSK2gVXkh2yFCsXSnBo+Rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=J4YIKq0s; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <f64c57ad-c162-480e-910a-e7a5a3460104@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775109781;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jp2Uz55WPBdKd3AM7qNmo54xU5IrnaTOu8LTItTYIug=;
+	b=J4YIKq0s4cYP92JAKqv6aRvi6n9JlpQAHEgGtKGWqKyMQ4ruZRQ+s0xty0oQsenkcyAyJm
+	6Z0/2DmQL1cdqwnEtlJcvRgt7fm/OlBzPi27EC9RnFUIyJDtrmHBreVstCB54hKY7P6hX8
+	XTsMvabMGofpgbRNwIF83N0FnxVPFkQ=
+Date: Thu, 2 Apr 2026 14:02:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: bjkjy-exc13.internal.baidu.com (172.31.51.13) To
- bjkjy-exc3.internal.baidu.com (172.31.50.47)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=baidu.com;
-	s=selector1; t=1775109140;
-	bh=OkYJlBEhGU26NMF/nb5A1ytM4XV7GIufN+Se8VGdGyc=;
-	h=From:To:Subject:Date:Message-ID:Content-Type;
-	b=lnwnmM1UPi9HcCJlunM4oqGJy6xxHBysvOaX/ybrWHhwb82H+z3eM5+AEQtwK0wPW
-	 fqvG+O8pY4jziu04XNiwfmelBPvqcXue/lyQmgL3CVXBzB6s6IxtIXwGdeoaQ/nMgB
-	 Bkx6PNGY/OZZgt/EusO6WFgnbIWRQ+jZdnt+OiMLJgUugz8KV7sfgQRYNCaYN5l6r+
-	 t4aVAEt0g7mlp1DhdAa66UK2G7z5M2qsQc2HecvvvNP87yTvK+eXyITob2zyel5kHU
-	 4MxZ2lvw+nj0OkhaaRycMZvz1PNoBvDcqAVRyua5wECOYmRLSZfgUVVlI3BmRGfzZo
-	 eV5xDsaL1JkKw==
-X-Spamd-Result: default: False [1.54 / 15.00];
+Subject: Re: [PATCH] udp_bpf: fix use-after-free in udp_bpf_recvmsg()
+To: Deepanshu Kartikey <kartikey406@gmail.com>, john.fastabend@gmail.com,
+ jakub@cloudflare.com, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ Kuniyuki Iwashima <kuniyu@google.com>
+Cc: ast@kernel.org, cong.wang@bytedance.com, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+431f9a9e3f5227fbb904@syzkaller.appspotmail.com
+References: <20260402050928.32946-1-kartikey406@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260402050928.32946-1-kartikey406@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274378-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-274379-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[gmail.com,cloudflare.com,davemloft.net,kernel.org,google.com,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[nvidia.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,iogearbox.net,gmail.com,fomichev.me,baidu.com,vger.kernel.org];
-	NEURAL_SPAM(0.00)[0.982];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DMARC_DNSFAIL(0.00)[baidu.com : SPF/DKIM temp error,quarantine];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lirongqing@baidu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[baidu.com:?];
-	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	R_DKIM_TEMPFAIL(0.00)[baidu.com:s=selector1];
 	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: D414A384300
+	NEURAL_HAM(-0.00)[-0.997];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,431f9a9e3f5227fbb904];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,syzkaller.appspot.com:url,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: D708C384446
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Li RongQing <lirongqing@baidu.com>
 
-dma_wmb() barriers are specifically for ordering writes to DMA
-coherent memory that is accessible to both the CPU and DMA capable
-devices.
+On 4/2/26 1:09 PM, Deepanshu Kartikey wrote:
+> udp_bpf_recvmsg() calls sk_msg_recvmsg() without holding lock_sock(),
+> unlike tcp_bpf_recvmsg() which properly acquires lock_sock() before
+> calling __sk_msg_recvmsg(). This allows concurrent tasks to race inside
+> sk_msg_recvmsg() on the same psock ingress queue, where one task can
+> free msg_rx via kfree_sk_msg() while another task is still reading it
+> via sk_msg_elem(), causing a slab-use-after-free.
+>
+> Fix this by adding lock_sock()/release_sock() around the sk_msg_recvmsg()
+> path in udp_bpf_recvmsg(), consistent with tcp_bpf_recvmsg(). Also make
+> udp_msg_wait_data() release lock_sock() before sleeping and reacquire it
+> after waking, so it can be called with the socket lock held, consistent
+> with how tcp_msg_wait_data() uses sk_wait_event() which does the same
+> internally.
+>
+> Note: syzbot testing shows a separate pre-existing warning:
+>    sk->sk_forward_alloc
+>    WARNING: net/ipv4/af_inet.c:162 inet_sock_destruct
+> This warning triggers from the idle CPU path (pv_native_safe_halt)
+> and is unrelated to this patch. It appears to be a pre-existing
+> memory accounting issue in the UDP sockmap path that requires
+> separate investigation.
+>
+>
+> Reported-by: syzbot+431f9a9e3f5227fbb904@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=431f9a9e3f5227fbb904
+> Fixes: 1f5be6b3b063 ("udp: Implement udp_bpf_recvmsg() for sockmap")
+> Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
+> ---
+>   net/ipv4/udp_bpf.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+>
+> diff --git a/net/ipv4/udp_bpf.c b/net/ipv4/udp_bpf.c
+> index 9f33b07b1481..f924b255cee6 100644
+> --- a/net/ipv4/udp_bpf.c
+> +++ b/net/ipv4/udp_bpf.c
+> @@ -50,7 +50,9 @@ static int udp_msg_wait_data(struct sock *sk, struct sk_psock *psock,
+>   	sk_set_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+>   	ret = udp_msg_has_data(sk, psock);
+>   	if (!ret) {
+> +		release_sock(sk);
+>   		wait_woken(&wait, TASK_INTERRUPTIBLE, timeo);
+> +		lock_sock(sk);
+>   		ret = udp_msg_has_data(sk, psock);
+>   	}
+>   	sk_clear_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+> @@ -79,6 +81,7 @@ static int udp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+>   		goto out;
+>   	}
+>   
+> +	lock_sock(sk);
+>   msg_bytes_ready:
+>   	copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
+>   	if (!copied) {
+> @@ -90,12 +93,14 @@ static int udp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+>   		if (data) {
+>   			if (psock_has_data(psock))
+>   				goto msg_bytes_ready;
+> +			release_sock(sk);
+>   			ret = sk_udp_recvmsg(sk, msg, len, flags);
+>   			goto out;
+>   		}
+>   		copied = -EAGAIN;
+>   	}
+>   	ret = copied;
+> +	release_sock(sk);
+>   out:
+>   	sk_psock_put(sk, psock);
+>   	return ret;
 
-The dma_wmb() barrier is lighter than wmb() on some architectures
-because it only ensures ordering for DMA writes, not for all writes
-including MMIO accesses.
+Kuniyuki  is already working on this. Please see the
+existing discussion.
 
-In the MLX5 driver, completion queue (CQ) doorbell records are
-allocated as DMA coherent memory via mlx5_dma_zalloc_coherent_node().
-The CQ update pattern is:
-  1. Update CQ space (device reads via DMA)
-  2. Update doorbell record (device reads via DMA)
-  3. Memory barrier
-  4. Enable more CQEs
+https://lore.kernel.org/bpf/20260221233234.3814768-4-kuniyu@google.com/
 
-Since only DMA coherent memory accesses are involved (no MMIO accesses
-follow), can safely use dma_wmb() instead of wmb().
-
-This change improves performance slightly on architectures where
-dma_wmb() is lighter than wmb().
-
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c    | 2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c    | 2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_rx.c     | 2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_tx.c     | 2 +-
- drivers/net/ethernet/mellanox/mlx5/core/fpga/conn.c | 2 +-
- drivers/net/ethernet/mellanox/mlx5/core/lib/aso.c   | 2 +-
- drivers/net/ethernet/mellanox/mlx5/core/wc.c        | 2 +-
- 7 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-index 1b76647..7bd6dfc 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-@@ -259,7 +259,7 @@ static bool mlx5e_ptp_poll_ts_cq(struct mlx5e_cq *cq, int napi_budget)
- 	mlx5_cqwq_update_db_record(cqwq);
- 
- 	/* ensure cq space is freed before enabling more cqes */
--	wmb();
-+	dma_wmb();
- 
- 	while (metadata_buff_sz > 0)
- 		mlx5e_ptp_metadata_fifo_push(&ptpsq->metadata_freelist,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-index 80f9fc1..dde8856 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-@@ -805,7 +805,7 @@ bool mlx5e_poll_xdpsq_cq(struct mlx5e_cq *cq)
- 	mlx5_cqwq_update_db_record(&cq->wq);
- 
- 	/* ensure cq space is freed before enabling more cqes */
--	wmb();
-+	dma_wmb();
- 
- 	sq->cc = sqcc;
- 	return (i == MLX5E_TX_CQ_POLL_BUDGET);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-index 268e208..f17e7f1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-@@ -2447,7 +2447,7 @@ int mlx5e_poll_rx_cq(struct mlx5e_cq *cq, int budget)
- 	mlx5_cqwq_update_db_record(cqwq);
- 
- 	/* ensure cq space is freed before enabling more cqes */
--	wmb();
-+	dma_wmb();
- 
- 	return work_done;
- }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-index 9f02726..7ba319f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
-@@ -849,7 +849,7 @@ bool mlx5e_poll_tx_cq(struct mlx5e_cq *cq, int napi_budget)
- 	mlx5_cqwq_update_db_record(&cq->wq);
- 
- 	/* ensure cq space is freed before enabling more cqes */
--	wmb();
-+	dma_wmb();
- 
- 	sq->dma_fifo_cc = dma_fifo_cc;
- 	sq->cc = sqcc;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fpga/conn.c b/drivers/net/ethernet/mellanox/mlx5/core/fpga/conn.c
-index 1f6bde5..1341874 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fpga/conn.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fpga/conn.c
-@@ -384,7 +384,7 @@ static inline void mlx5_fpga_conn_cqes(struct mlx5_fpga_conn *conn,
- 
- 	mlx5_fpga_dbg(conn->fdev, "Re-arming CQ with cc# %u\n", conn->cq.wq.cc);
- 	/* ensure cq space is freed before enabling more cqes */
--	wmb();
-+	dma_wmb();
- 	mlx5_fpga_conn_arm_cq(conn);
- }
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/aso.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/aso.c
-index 614cd57..8f7a89a 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/aso.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/aso.c
-@@ -421,7 +421,7 @@ int mlx5_aso_poll_cq(struct mlx5_aso *aso, bool with_data)
- 	mlx5_cqwq_update_db_record(&cq->wq);
- 
- 	/* ensure cq space is freed before enabling more cqes */
--	wmb();
-+	dma_wmb();
- 
- 	if (with_data)
- 		aso->cc += MLX5_ASO_WQEBBS_DATA;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/wc.c b/drivers/net/ethernet/mellanox/mlx5/core/wc.c
-index 7d3d4d7..1afbdd19 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/wc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/wc.c
-@@ -314,7 +314,7 @@ static void mlx5_wc_post_nop(struct mlx5_wc_sq *sq, unsigned int *offset,
- 	/* ensure doorbell record is visible to device before ringing the
- 	 * doorbell
- 	 */
--	wmb();
-+	dma_wmb();
- 
- 	mlx5_iowrite64_copy(sq, mmio_wqe, sizeof(mmio_wqe), *offset);
- 
--- 
-2.9.4
 
 
