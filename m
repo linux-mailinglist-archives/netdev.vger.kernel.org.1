@@ -1,192 +1,188 @@
-Return-Path: <netdev+bounces-274542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274543-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GA7lA+ZtzmnxngYAu9opvQ
-	(envelope-from <netdev+bounces-274542-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:23:50 +0200
+	id KAF7JP9uzmnxngYAu9opvQ
+	(envelope-from <netdev+bounces-274543-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:28:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76813389A06
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:23:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4639389BBA
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 15:28:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AD365316AA6A
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:11:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F148E3146F62
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 13:13:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B54F31690A;
-	Thu,  2 Apr 2026 13:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A39334BA49;
+	Thu,  2 Apr 2026 13:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="soZ2xrrJ"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="T//vQhcj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37EBD305E3B
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 13:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEFD131690A;
+	Thu,  2 Apr 2026 13:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775135486; cv=none; b=m/uILiUPHwEjMjAnwoYvGkXrEZ6mF8IcON9pn/JkeLgeK9G8UXRgHqLXmPTY8yCuU+zBitCzMnF4sEIZp5ggPftXCfdonnyoDLWUD14U3fLXJ75bAXbGTNSnzKT7JkVglz/cLcnuFplB2rKf/9/Pz3s+X3Z84zYPHvT5rU+KXTE=
+	t=1775135622; cv=none; b=itEM9HX0K9jl/tkS2aJ3+aj5ogp7cG+MYtCrwE4L1t9ARpf2fE7+6ON7njn6dCgMQCOytm6RGObFH/qRqjsPkrStVbgpwtNAMMv6aAxALSrPKQ7oCvhpj7AelhYkARj5hBzHvkOl0SHiquL8w2DxDm4tCdAWh8nsdt3L7pY7BFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775135486; c=relaxed/simple;
-	bh=bS15XMo/9WRu57PhJD5kvXO+TdOi27oIRuDCZQ2t9YI=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=asfsDJC8JPdwVlyfdDPzx5amqwzb1wm1CeIRgSMntK7So0ssZFRx5FfwfwWzJtSd5xRTQQZZ673SFSa9yfNW8l8cqBrdQDnZ0DFdUqydNKu6Esc+1EBbIuZCQHARcR8qWxxavBlabvQC9h88Vq/3r2IAdCKAyKhx1NZ9imiHdpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=soZ2xrrJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9CAEC116C6;
-	Thu,  2 Apr 2026 13:11:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775135486;
-	bh=bS15XMo/9WRu57PhJD5kvXO+TdOi27oIRuDCZQ2t9YI=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=soZ2xrrJBQw0JGVX++0BF4lX1h7yORUWY/AlLlcnKraN72iIYwyWlJwH/44Cai0cA
-	 1zHddRwyPY+Mc8UkTPmWLG+tcghl+d7ww//4JTA0/hFnyUtymZ1jlCodO9ehxHI1fJ
-	 1ksHG9gE5cueamMicHuHIkwOqZUCR4RFVP6S0gt2Vj4Jbqj1SP+Ya82mE1iKLVgapX
-	 d37zK5N41DQCPf9oq976ltW1n/NsHq5ZvAP9Pgm+3IrmkPZJk9X3mgoKZrOxnFHybO
-	 0pi0XJQrRwv2KqNsc+6A0MJZ5VoFuRAiaH48ju140A/UuBiumSPun0moDU20RuKTPQ
-	 t0qC3FOj3sZjQ==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id B3B1CF4007C;
-	Thu,  2 Apr 2026 09:11:24 -0400 (EDT)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Thu, 02 Apr 2026 09:11:24 -0400
-X-ME-Sender: <xms:_GrOaeZE5FrY1QR8VLt7qOytmcT1yQYv5ReC6wD-d_zx_E_kI_xJnA>
-    <xme:_GrOacPNrpxjAYXwhRSVPtJy6CA65Daq4OGFaaU8wLhAPFbIbqq5LXD6iag5J0KMs
-    sSAgfeQz6Kjxe9MKC4UfJO0bAeNw_lQlsReYqQ7R1J5nrKkVvd9GmS6>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdeiuddvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    epofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgtkhcu
-    nfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrhhnpe
-    fhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleenucev
-    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutghklh
-    gvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleelleeh
-    ledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrghilh
-    drtghomhdpnhgspghrtghpthhtohepudehpdhmohguvgepshhmthhpohhuthdprhgtphht
-    thhopehnvghilhessghrohifnhdrnhgrmhgvpdhrtghpthhtohepuggrvhgvmhesuggrvh
-    gvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgt
-    ohhmpdhrtghpthhtohepphhrrggrnhesghhoohhglhgvrdgtohhmpdhrtghpthhtohepth
-    hrohhnugdrmhihkhhlvggsuhhstheshhgrmhhmvghrshhprggtvgdrtghomhdprhgtphht
-    thhopegrnhhnrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhhlrgihthhonheskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopegthhhutghkrdhlvghvvghrsehorhgrtghlvgdrtghomh
-X-ME-Proxy: <xmx:_GrOaaWgZ-Z5pvBEcoaFVjOszvBmqvgog9Hx1JT0dfRqtpGtvL3eHA>
-    <xmx:_GrOaWDI9n041gvjfuTXfHbEajQZ2FtjfTr4251Son0qir2RO1yoZw>
-    <xmx:_GrOafeVxOaUz2ICQl4q8ZNrYBq-Huq8kBJAdFc5FGHlnX8So2WXug>
-    <xmx:_GrOaVo3zoWPbPr2gGXf10VINm2ol20xGh-IrtUFTwEDLTFwnWDEtA>
-    <xmx:_GrOaYTdY7Lg4sknk8ZuuKhh3I0tGQ_8TjKVZVuY8ab6SuXcY5ig8-Dt>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 88526780070; Thu,  2 Apr 2026 09:11:24 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1775135622; c=relaxed/simple;
+	bh=C2KY7sy/BojAlYbuWIeT4FOySSmwKdjjEEo4+Jx0PSQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OFEx6hiYeRzHtIyT+ZEd59nXe09bfIy+SbqOz0JpwMhci+pGQ+wPwzc9cz0pUXkxcXiRYE6hvuIUTjn4c3GQFQfKu3KGM8dH0LM6bMrr6Ana7yHVTzkdJ19t2PYThYB+boaI8JhRsBIQWxpHh8Y0kM06dQKSjcxbaQAFyopysS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=T//vQhcj; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1775135621; x=1806671621;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=C2KY7sy/BojAlYbuWIeT4FOySSmwKdjjEEo4+Jx0PSQ=;
+  b=T//vQhcjM13s7ybSevf+Rhvc3YNHwVU2+gkW1DlWpgTRDPd8CZqa99G3
+   MStvLTZhlqNBDFVCTUXSsIJY0LsV38swUuqbeVRu/QdAOGjqNO5VeOL3s
+   QgKPjKespfi7IWRpfDJL/qIuXKOqsygNGOoMtSgVHkj5rBkMHWBloLPvQ
+   qIy7r85FOzaLo3dRxiZIiQIYuoAEieQLtvIKwrSmvOvSM0Vs/hbX0jUqp
+   KTAGt4F2IBBZx/Bs3XRjv3wlvSIochlBz5yI4/ydcav5/XuuvY8sjAsfE
+   iyR2tOlfP4vwGrqkVDRw9cA+fdJINyD5/1ZNBJSWDKfye1dJWXUCq6+Ii
+   Q==;
+X-CSE-ConnectionGUID: DSzgFxBLReScRspQAdm+CQ==
+X-CSE-MsgGUID: qccmT4tXQ0WnJLRmxcHZIw==
+X-IronPort-AV: E=Sophos;i="6.23,155,1770620400"; 
+   d="scan'208";a="55583661"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Apr 2026 06:13:34 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Thu, 2 Apr 2026 06:13:02 -0700
+Received: from bby-cbu-swbuild03.eng.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Thu, 2 Apr 2026 06:13:01 -0700
+From: Charles Perry <charles.perry@microchip.com>
+To: <netdev@vger.kernel.org>
+CC: Charles Perry <charles.perry@microchip.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit
+	<hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+	<devicetree@vger.kernel.org>
+Subject: [PATCH net-next v4 0/3] Add support for PIC64-HPSC/HX MDIO controller
+Date: Thu, 2 Apr 2026 06:12:21 -0700
+Message-ID: <20260402131229.319599-1-charles.perry@microchip.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: Ae78tHgonjNg
-Date: Thu, 02 Apr 2026 09:11:04 -0400
-From: "Chuck Lever" <cel@kernel.org>
-To: "Pranjal Shrivastava" <praan@google.com>,
- "Trond Myklebust" <trond.myklebust@hammerspace.com>,
- "Anna Schumaker" <anna@kernel.org>
-Cc: davem@davemloft.net, "Jakub Kicinski" <kuba@kernel.org>,
- edumazet@google.com, "Paolo Abeni" <pabeni@redhat.com>,
- "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
- "Tom Talpey" <tom@talpey.com>, "Olga Kornievskaia" <okorniev@redhat.com>,
- NeilBrown <neil@brown.name>, "Dai Ngo" <dai.ngo@oracle.com>,
- linux-nfs@vger.kernel.org, netdev@vger.kernel.org
-Message-Id: <791991c2-1e8c-4041-9674-94acb4fe483c@app.fastmail.com>
-In-Reply-To: <20260401194501.2269200-3-praan@google.com>
-References: <20260401194501.2269200-1-praan@google.com>
- <20260401194501.2269200-3-praan@google.com>
-Subject: Re: [RFC PATCH 2/4] nfs: add NFS_CAP_P2PDMA and detect transport support
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.15 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[microchip.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[microchip.com:s=mchp];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274542-lists,netdev=lfdr.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[app.fastmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns];
+	FREEMAIL_CC(0.00)[microchip.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-274543-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[cel@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.993];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 76813389A06
+	FROM_NEQ_ENVFROM(0.00)[charles.perry@microchip.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[microchip.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-0.995];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[armlinux.org.uk:email,microchip.com:dkim,microchip.com:mid,lunn.ch:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,davemloft.net:email]
+X-Rspamd-Queue-Id: E4639389BBA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hello,
 
-On Wed, Apr 1, 2026, at 3:44 PM, Pranjal Shrivastava wrote:
-> The NFS server capabilities bitmask (server->caps) is currently full,
-> utilizing all 32 bits of the existing unsigned int. Expand the bitmask
-> to 64 bits (u64) to allow for new feature flags.
->
-> Introduce a new capability bit, NFS_CAP_P2PDMA, to indicate that the
-> local mount is backed by hardware and a transport capable of PCI
-> Peer-to-Peer DMA.
->
-> Update nfs_server_set_init_caps() to query the underlying SunRPC
-> transport for P2PDMA support during the mount process. If the transport
-> (e.g., RDMA) signals support, set the NFS_CAP_P2PDMA bit in the mount's
-> capabilities. This allows the high-performance Direct I/O path to
-> efficiently determine if it should allow P2P memory buffers.
+This series adds a driver for the two MDIO controllers of PIC64-HPSC/HX.
+The hardware supports C22 and C45 but only C22 is implemented for now.
 
-> diff --git a/fs/nfs/client.c b/fs/nfs/client.c
-> index be02bb227741..f177cf098d44 100644
-> --- a/fs/nfs/client.c
-> +++ b/fs/nfs/client.c
+This MDIO hardware is based on a Microsemi design supported in Linux by
+mdio-mscc-miim.c. However, The register interface is completely different
+with pic64hpsc, hence the need for a separate driver.
 
-> @@ -725,6 +727,12 @@ void nfs_server_set_init_caps(struct nfs_server *server)
->  		nfs4_server_set_init_caps(server);
->  		break;
->  	}
-> +
-> +	rcu_read_lock();
-> +	xprt = rcu_dereference(server->client->cl_xprt);
-> +	if (xprt->ops->supports_p2pdma && xprt->ops->supports_p2pdma(xprt))
-> +		server->caps |= NFS_CAP_P2PDMA;
-> +	rcu_read_unlock();
->  }
->  EXPORT_SYMBOL_GPL(nfs_server_set_init_caps);
+The documentation recommends an input clock of 156.25MHz and a prescaler of
+39, which yields an MDIO clock of 1.95MHz.
 
-Is the transport even connected when the NFS client does this
-test? If it isn't, xprtrdma and the RDMA core have not chosen
-an underlying device yet.
+This was tested on Microchip HB1301 evalkit which has a VSC8574 and a
+VSC8541 with clock frequencies of 0.6, 1.95 and 2.5 MHz.
 
-Note that, even if this logic /is/ correct, if the transport
-connection is lost the transport will reconnect automatically,
-doing the RDMA CM dance again and possibly resolving to a
-different device. The NFS client layer will be none-the-wiser
-and the NFS_CAP_P2PDMA flag setting will be stale at that point,
-and quite possibly incorrect if the new connection's device is
-not P2P-enabled.
+This series also adds a PHY write barrier when disabling PHY interrupts as
+discussed in [1].
 
-(Basically this is what happens when an RDMA device is removed).
+Thanks,
+Charles
 
-So this detection has to be done as part of xprtrdma's connection
-flow, and it needs to set a flag somewhere in the rpc_xprt. The
-NFS direct I/O code path then has to look for that flag before
-choosing the mechanism/flags it uses for each iov iter.
+[1]: https://lore.kernel.org/all/acvUqDgepCIScs8M@shell.armlinux.org.uk/
 
+Changes in v4:
+- 3/3: Add the PHY barrier patch (Russell, Andrew)
+- 2/3: return FIELD_GET() directly instead of using "ret" (Russell)
+
+Changes in v3:
+- 2/2: Add a MAINTAINERS entry (Jakub)
+
+Changes in v2:
+- 1/2: Make "clocks" and "interrupts" required (Andrew)
+- 1/2: Add a default value to "clock-frequency" (Andrew)
+- 2/2: Remove #define for unused registers (Maxime)
+- 2/2: Add "c22" to clause 22 read/write ops (Maxime)
+- 2/2: Remove the call to platform_set_drvdata() (Andrew)
+- 2/2: Make the clock mandatory (Andrew)
+- 2/2: Use 2.5MHz if no clock-frequency was specified (Andrew)
+- 2/2: Change the error message for bad clock-frequency (Andrew)
+- 2/2: Fix a use without initialization on bus_freq (Andrew)
+
+CC: Andrew Lunn <andrew+netdev@lunn.ch>
+CC: "David S. Miller" <davem@davemloft.net>
+CC: Eric Dumazet <edumazet@google.com>
+CC: Jakub Kicinski <kuba@kernel.org>
+CC: Paolo Abeni <pabeni@redhat.com>
+CC: Rob Herring <robh@kernel.org>
+CC: Krzysztof Kozlowski <krzk+dt@kernel.org>
+CC: Conor Dooley <conor+dt@kernel.org>
+CC: Heiner Kallweit <hkallweit1@gmail.com>
+CC: Russell King <linux@armlinux.org.uk>
+CC: netdev@vger.kernel.org
+CC: devicetree@vger.kernel.org
+
+Charles Perry (3):
+  dt-bindings: net: document Microchip PIC64-HPSC/HX MDIO controller
+  net: mdio: add a driver for PIC64-HPSC/HX MDIO controller
+  net: phy: add a PHY write barrier when disabling interrupts
+
+ .../net/microchip,pic64hpsc-mdio.yaml         |  68 +++++++
+ MAINTAINERS                                   |   6 +
+ drivers/net/mdio/Kconfig                      |   7 +
+ drivers/net/mdio/Makefile                     |   1 +
+ drivers/net/mdio/mdio-pic64hpsc.c             | 190 ++++++++++++++++++
+ drivers/net/phy/phy.c                         |  27 ++-
+ 6 files changed, 298 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/net/microchip,pic64hpsc-mdio.yaml
+ create mode 100644 drivers/net/mdio/mdio-pic64hpsc.c
 
 -- 
-Chuck Lever
+2.47.3
+
 
