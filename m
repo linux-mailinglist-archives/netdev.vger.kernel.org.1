@@ -1,157 +1,188 @@
-Return-Path: <netdev+bounces-274703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274628-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eOmXBoDczmmGqgYAu9opvQ
-	(envelope-from <netdev+bounces-274703-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 23:15:44 +0200
+	id GMYGKjuezmnfowYAu9opvQ
+	(envelope-from <netdev+bounces-274628-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:50:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 415EC38E498
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 23:15:43 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D52A38C31D
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 18:50:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 960E9301E210
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 21:13:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 480E5300CE7A
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 16:38:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BA93A6EE8;
-	Thu,  2 Apr 2026 21:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC7DA3F65EC;
+	Thu,  2 Apr 2026 16:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b="RFna+KE+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U3vICxvM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m83187.xmail.ntesmail.com (mail-m83187.xmail.ntesmail.com [156.224.83.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1413A5431;
-	Thu,  2 Apr 2026 21:13:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.224.83.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17933F211C;
+	Thu,  2 Apr 2026 16:38:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775164425; cv=none; b=CHCPmjGX6kFZ34O5vq9/dJ10oLR/Juu1pNN6xevDSPqbnTih/Z+Qb1WDpsHbRhTao+9YabJMJGRfTtoGz+Ar2qowCsB5cBTgp3FHunkyOAOyGxUd0A1MvhplhCJ04eWX61GynsU4NGddZMD1XJzlT26DgZCVEqmWOCSVoB7yStw=
+	t=1775147922; cv=none; b=FbaFtfGcVj5hvu0EG91QWcIvhLRWtwJl71zVKo3h0adLC/nRqeOPpU4dAIxIztuRAyk0C42wysbW9f3CN+LZVc+aVHQjA1p6DvNQ9UXaaMr2k5zqnGieb32BIcUE3neka4AooLfCB+qZZ97KhJCLQSYUr9AHsm+O/4p853czvK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775164425; c=relaxed/simple;
-	bh=mq1qNMND5KoaoFkHmrroSqLwyeymKan5QEYrdceyQKw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XmwxfICWFj6v/cForY5ErEmp//6XA1PJ51NoXCidbhQd+WcSMQd2YKJyIKvD+V/Mbaj+4t7DJ/63SH5x+fS3gyv+gO00LS1NVTwiSwBE6M0JOofbeuiP4sEYiR+pmLeqMMyWvPS+La2PdiIaBO1cnGDgNiGKaVZDNx3YhpDGAI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ruc.edu.cn; spf=pass smtp.mailfrom=ruc.edu.cn; dkim=pass (1024-bit key) header.d=ruc.edu.cn header.i=@ruc.edu.cn header.b=RFna+KE+; arc=none smtp.client-ip=156.224.83.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ruc.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ruc.edu.cn
-Received: from lwz.tail698a0e.ts.net (gy-adaptive-ssl-proxy-4-entmail-virt151.gy.ntes [36.112.3.244])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 3956a559d;
-	Fri, 3 Apr 2026 00:37:28 +0800 (GMT+08:00)
-From: Wenzhao Liao <wenzhaoliao@ruc.edu.cn>
-To: rust-for-linux@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	ojeda@kernel.org,
-	boqun@kernel.org,
-	gary@garyguo.net,
-	bjorn3_gh@protonmail.com,
-	lossin@kernel.org,
-	a.hindborg@kernel.org,
-	aliceryhl@google.com,
-	tmgross@umich.edu,
-	dakr@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [RFC PATCH 6/6] MAINTAINERS: add Rust net and nlmon entries
-Date: Thu,  2 Apr 2026 12:36:40 -0400
-Message-Id: <20260402163640.1079056-7-wenzhaoliao@ruc.edu.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260402163640.1079056-1-wenzhaoliao@ruc.edu.cn>
-References: <20260402163640.1079056-1-wenzhaoliao@ruc.edu.cn>
+	s=arc-20240116; t=1775147922; c=relaxed/simple;
+	bh=SS+BtVdttMvo6X20fLR3JClq/W5wC0bvQxoXCy/55dc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=ltqt2wDRJoBK05JjK+J50RfPayuCabZr4F35/tbp8WHV2iKyDBBKZ1MwYlOlmFXbKe2ZHdoNHZC10f0d3BlPCf3UjRAjjgEJuyo6E5klux5X1MqMCtbfge3LptRFCzx0jD5WpsXSi6ZI0fJ5AGQq1oegr6SenPZSJaib+qEJbhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U3vICxvM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDE30C116C6;
+	Thu,  2 Apr 2026 16:38:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775147922;
+	bh=SS+BtVdttMvo6X20fLR3JClq/W5wC0bvQxoXCy/55dc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=U3vICxvMqgBh7amR+oCizO3AJ7YOv3bxzO8OCsh6ZNB5XW45uHJ/8h8WJx54f1P91
+	 xDmPSvdX9WiW9SuHdR2YUbGunbzjakgfC9lpI1iEHTaYHIZ3/27UQhAdF5d8lWlB1x
+	 Pd5ZE1JHkCSZ9qd9lw5ug60ehF3zJp/hs6R1OwWeq/rWlnIZq277RkUEVs2UadCRmq
+	 K58kn3MHghtAlrqMVicW2YdHuCFzNec/LSZEHYXCPZmAh/+BkYJmoaCfBR6PS8wfU8
+	 uWou+k7OQkgxGJ5V+67qVIGW3r+gVfCohHAvry1cjRT3YXi9BZAFZ34kvNTES8g39K
+	 D+hKMQ+afiejw==
+Date: Thu, 2 Apr 2026 11:38:40 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Gerd Bayer <gbayer@linux.ibm.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>,
+	Jay Cornwall <Jay.Cornwall@amd.com>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Alexander Schmidt <alexs@linux.ibm.com>, linux-s390@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v7 0/3] PCI: AtomicOps: Fix
+ pci_enable_atomic_ops_to_root()
+Message-ID: <20260402163840.GA279690@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9d4f0e93eb03a2kunm6754def456bf74
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkaTR1JVhgeSkhDThgeHRhJQ1YeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlITVVKSklVSFVJT09ZV1kWGg8SFR0UWUFZT0tIVUpLSEpOTE5VSktLVUpCS0
-	tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=RFna+KE+V472iTrrDSAC/I/BvoC/Z3mD4LVKkw/c/WUSrdG8vy7sKm+S7aOF/Mje+ldx4jb00cKodLuruv6tkQLRpp8zeb1m3nbBsh0ZNyK9EkolV9OeChsFPw+njE/xQ/TsjArlYVH9FTNgAdsPlykRVnF9vZvAvc2A/oj4cNQ=; c=relaxed/relaxed; s=default; d=ruc.edu.cn; v=1;
-	bh=0RXe8FftK9+WQ4CtVqc+7/yKc01o6MTUrQjVs8zTSg4=;
-	h=date:mime-version:subject:message-id:from;
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260330-fix_pciatops-v7-0-f601818417e8@linux.ibm.com>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[ruc.edu.cn,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[ruc.edu.cn:s=default];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,garyguo.net,protonmail.com,google.com,umich.edu,lunn.ch,davemloft.net,redhat.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274703-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[wenzhaoliao@ruc.edu.cn,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274628-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[ruc.edu.cn:+];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ruc.edu.cn:dkim,ruc.edu.cn:email,ruc.edu.cn:mid,sipsolutions.net:email]
-X-Rspamd-Queue-Id: 415EC38E498
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[helgaas@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4D52A38C31D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add scoped maintainer entries for the new Rust networking abstraction
-files and for the Rust nlmon reference driver.
+On Mon, Mar 30, 2026 at 03:09:43PM +0200, Gerd Bayer wrote:
+> Hi Bjorn et al.
+> 
+> On s390, AtomicOp Requests are enabled on a PCI function that supports
+> them, despite the helper being ignorant about the root port's capability
+> to supporting their completion.
+> 
+> Patch 1: Do not enable AtomicOps Requests on RCiEPs
+> Patch 2: Fix the logic in pci_enable_atomic_ops_to_root()
+> Patch 3: Update references to PCIe spec in that function.
+> 
+> I did test that the issue is fixed with these patches. Also, I verified
+> that on a Mellanox/Nvidia ConnectX-6 adapter plugged straight into the
+> root port of a x86 system still gets AtomicOp Requests enabled.
+> 
+> Due to a lack of the required hardware, I did not test this with any PCIe
+> switches between root port and endpoint. So test exposure in other
+> environments is highly appreciated.
+> 
+> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
 
-This keeps future changes routed to the networking and Rust mailing
-lists while also giving the new code paths a direct maintainer contact.
+Thanks, applied to pci/atomics for v7.1 with minor rework of 2/3.
 
-Signed-off-by: Wenzhao Liao <wenzhaoliao@ruc.edu.cn>
----
- MAINTAINERS | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 77fdfcb55f06..d1c3eb61ea46 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -18335,6 +18335,25 @@ X:	Documentation/devicetree/bindings/net/wireless/
- X:	drivers/net/can/
- X:	drivers/net/wireless/
- 
-+NETWORKING LINK-TYPE ABSTRACTIONS [RUST]
-+M:	Wenzhao Liao <wenzhaoliao@ruc.edu.cn>
-+L:	netdev@vger.kernel.org
-+L:	rust-for-linux@vger.kernel.org
-+S:	Maintained
-+F:	rust/kernel/net.rs
-+F:	rust/kernel/net/netdevice.rs
-+F:	rust/kernel/net/netlink_tap.rs
-+F:	rust/kernel/net/rtnl.rs
-+F:	rust/kernel/net/skbuff.rs
-+F:	rust/kernel/net/stats.rs
-+
-+NLMON DRIVER [RUST]
-+M:	Wenzhao Liao <wenzhaoliao@ruc.edu.cn>
-+L:	netdev@vger.kernel.org
-+L:	rust-for-linux@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/nlmon_rust.rs
-+
- NETWORKING DRIVERS (WIRELESS)
- M:	Johannes Berg <johannes@sipsolutions.net>
- L:	linux-wireless@vger.kernel.org
--- 
-2.34.1
-
+> ---
+> Changes in v7:
+> - Prepend series with a patch to explicitly exclude RCiEPs from
+>   enablement of AtomicOps Requests
+> - Limit the core patch 2 to enforce a full check of the entire
+>   PCIe hierarchy for support of AtomicOps capabilities.
+> - Rebase to v7.0-rc6
+> - Link to v6: https://lore.kernel.org/r/20260325-fix_pciatops-v6-0-10bf19d76dd1@linux.ibm.com
+> 
+> Changes in v6:
+> - Incorporate Ilpo's editorial comments.
+> - Correct logic in pci_is_atomicops_capable_rp() (annotated by Sashiko)
+> - Link to v5: https://lore.kernel.org/r/20260323-fix_pciatops-v5-0-fada7233aea8@linux.ibm.com
+> 
+> Changes in v5:
+> - Introduce new pcibios_connects_to_atomicops_capable_rc() so arch's can
+>   declare AtomicOps support outside of PCIe config space. Defaults to
+>   "true" - except s390.
+> - rebase to 7.0-rc5
+> - Link to v4: https://lore.kernel.org/r/20260313-fix_pciatops-v4-0-93bc70a63935@linux.ibm.com
+> 
+> Changes in v4:
+> - drop patch 1 - it will become the base of a new series
+> - previous patch 2, now 1: reword commit message
+> - add a new patch to update references to PCI spec within
+>   pci_enable_atomic_ops_to_root()
+> - rebase to latest master
+> - Link to v3: https://lore.kernel.org/r/20260306-fix_pciatops-v3-0-99d12bcafb19@linux.ibm.com
+> 
+> Changes in v3:
+> - rebase to 7.0-rc2
+> - gentle ping
+> - add netdev and rdma lists for awareness
+> - Link to v2: https://lore.kernel.org/r/20251216-fix_pciatops-v2-0-d013e9b7e2ee@linux.ibm.com
+> 
+> Changes in v2:
+> - rebase to 6.19-rc1
+> - otherwise unchanged to v1
+> - Link to v1: https://lore.kernel.org/r/20251110-fix_pciatops-v1-0-edc58a57b62e@linux.ibm.com
+> 
+> ---
+> Gerd Bayer (3):
+>       PCI: AtomicOps: Do not enable requests by RCiEPs
+>       PCI: AtomicOps: Do not enable without support in root port
+>       PCI: AtomicOps: Update references to PCIe spec
+> 
+>  drivers/pci/pci.c | 48 ++++++++++++++++++++++++++----------------------
+>  1 file changed, 26 insertions(+), 22 deletions(-)
+> ---
+> base-commit: 7aaa8047eafd0bd628065b15757d9b48c5f9c07d
+> change-id: 20251106-fix_pciatops-7e8608eccb03
+> 
+> Best regards,
+> -- 
+> Gerd Bayer <gbayer@linux.ibm.com>
+> 
 
