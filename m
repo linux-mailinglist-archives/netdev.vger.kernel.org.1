@@ -1,126 +1,145 @@
-Return-Path: <netdev+bounces-274400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274401-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gMtnH3cYzmmnkgYAu9opvQ
-	(envelope-from <netdev+bounces-274400-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:19:19 +0200
+	id 0H7XBs0YzmmnkgYAu9opvQ
+	(envelope-from <netdev+bounces-274401-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:20:45 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1C6F38508E
-	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:19:18 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E57C3850C9
+	for <lists+netdev@lfdr.de>; Thu, 02 Apr 2026 09:20:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 009C63103B9E
-	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 07:11:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E99FF30663FD
+	for <lists+netdev@lfdr.de>; Thu,  2 Apr 2026 07:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66BD91EFFA1;
-	Thu,  2 Apr 2026 07:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="4eUAifkw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89088387585;
+	Thu,  2 Apr 2026 07:12:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F44131282F
-	for <netdev@vger.kernel.org>; Thu,  2 Apr 2026 07:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2728248166;
+	Thu,  2 Apr 2026 07:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775113904; cv=none; b=jqVbiIsyHkvn024bfsQc6N9ebfJO/bQUP3/plN8KQ/i7lvgALSZPAa9WXomdBWhsEXQrkLhZA6tCkGgm3XfFAZFV5xZiKdY1+sLp3P61tlERys2lQg7i9szSZOYmJPD83PaQQgEndTmHjZweijf0Mq4xEA0QAUpgI6/qcaIE88A=
+	t=1775113959; cv=none; b=eu/xsN6Bo3nFpC07tsvFxA7UAxnI+SNg9ocFOJVoEeKJYmMD+4t/BZEjq6b6bGvfY2R5tdfyG0J1DL35VbE3nsb6ALuXdOQmfeGgfMJqaQEV63SuPhXc2aHPKyo9UydsyQubi1LwNtito0THSMKlDIQc6ElNsc9Fx78EBHDOyD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775113904; c=relaxed/simple;
-	bh=maDL0r1nwq+s5hNZu7y70VYFLrIX11hW8/tEcL7LVbM=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=i4d/KbBJHY+rwK9UXIkc7pD+dxueH9LI/OACQbnksiGnLZJUsEXoARZ/z/c3l/UUDAYmY/n5wRAp0BnCps8DdXUSBIrfiMkWCZ4jesMPQoyJ92Sz78QYjkrgdiRsGWFhRSV/RyGDOAhS7pabDW1ZQ/3Rh0LdDDV873X6+n1zn6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=4eUAifkw; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A2042A5870;
-	Thu,  2 Apr 2026 09:11:21 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1775113883; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=LQnb0cSvMVZAKHjYuTbOfPHhBGVPX1yp8SB7YxT5h0Y=;
-	b=4eUAifkw6VDQRmGAaR6T8ePIPR5NqMC5S6kZ5AHj6VB5ND6fAAp4m13YQSklvS40ywIxv7
-	mUj/m7bWztfyfI/tfaxgbC1lljLKzJ5RWI8baDacVpgbwld2hRfhZIxAPrUXtz1Giw9tnR
-	yQDvJ1LCsu6D8fwQvDqHJqKhOqTFExLPviXx7DD9FvDpGMAfGyvWIy3NsDafWVGPM67Hhg
-	m9BBzXoRB2z+isiGfX391IgDSn6S+ThOw7+b0vH/2831AFjFQ7L5+L9j/Iuki9DfzZ6Z27
-	BpnVBsOOLc6cntROlNKBWM5TIugMk/5UdjhAbBWV5NclJW4uL4DNQLL4LUiV7A==
+	s=arc-20240116; t=1775113959; c=relaxed/simple;
+	bh=cifMcKVqHYHY+DlglYL+hlGOyoWlPUkkv3WM47LKj/U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pL6QIKvkmNmFzNGaixyEzMYai/BuOZpdbDP5RE5cgJ5HC+IYYQdd4RwIMFQ9P4TdRnR7OkJX5hDkvSF5Q9yj1l5yYvTkUAkjiGwW+lb8ZhWEh0XKcrbdT5ID69tptBt4G5FI/xAoo5B7Damd8WO1CTvk+zvHtgkB59KEjJgtAO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [111.196.245.197])
+	by APP-05 (Coremail) with SMTP id zQCowADHWQ3IFs5pCDFCDA--.19527S2;
+	Thu, 02 Apr 2026 15:12:08 +0800 (CST)
+From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+To: Stefan Wahren <wahrenst@gmx.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pengpeng@iscas.ac.cn,
+	stable@vger.kernel.org
+Subject: [PATCH] net: qualcomm: qca_uart: report the consumed byte on RX skb allocation failure
+Date: Thu,  2 Apr 2026 15:12:07 +0800
+Message-ID: <20260402071207.4036-1-pengpeng@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 02 Apr 2026 09:11:21 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Phil Elwell <phil@raspberrypi.com>, Russell King
- <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH net-next v3 0/2] net: phy: microchip: add downshift
- support for LAN88xx
-In-Reply-To: <20260401184833.024cdb7f@kernel.org>
-References: <20260329224202.500229-1-nb@tipi-net.de>
- <20260401123848.696766-1-nb@tipi-net.de>
- <20260401184833.024cdb7f@kernel.org>
-Message-ID: <bcc3c223b6da280259f84ec99da559f4@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowADHWQ3IFs5pCDFCDA--.19527S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zw4rKF1Dtw1UXFWrWF43trb_yoW8Xry3pa
+	yDKa4kCw1vkr17JanrJr1xXFZxCa9Yyry3GFZ8Aw1fZwnxJrW2gF98Ka4jgw1DXay8CFW2
+	yF4qvr43C3Z5JaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+	IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
+	IxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUqeHgUUUUU=
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[iscas.ac.cn];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmx.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274400-lists,netdev=lfdr.de];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274401-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-0.992];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.894];
+	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C1C6F38508E
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,iscas.ac.cn:email,iscas.ac.cn:mid]
+X-Rspamd-Queue-Id: 0E57C3850C9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 2.4.2026 03:48, Jakub Kicinski wrote:
-> On Wed,  1 Apr 2026 14:38:43 +0200 Nicolai Buchwitz wrote:
->> Add standard ETHTOOL_PHY_DOWNSHIFT tunable support for the Microchip
->> LAN88xx PHY, following the same pattern used by Marvell and other PHY
->> drivers.
-> 
-> Please do not post patches in reply to a previous posting.
+qca_tty_receive() consumes each input byte before checking whether a
+completed frame needs a fresh receive skb. When the current byte completes
+a frame, the driver delivers that frame and then allocates a new skb for
+the next one.
 
-Sorry, that was accidental. Previous versions were sent as fresh
-threads and I'll make sure to do so going forward.
+If that allocation fails, the current code returns i even though data[i]
+has already been consumed and may already have completed the delivered
+frame. Since serdev interprets the return value as the number of accepted
+bytes, this under-reports progress by one byte and can replay the final
+byte of the completed frame into a fresh parser state on the next call.
 
-> Add a lore link to the previous posting in the changelog.
+Return i + 1 in that failure path so the accepted-byte count matches the
+actual receive-state progress.
 
-Makes sense, I will add a lore link to the previous patches in future 
-changelogs.
+Fixes: dfc768fbe618 ("net: qualcomm: add QCA7000 UART driver")
+Cc: stable@vger.kernel.org
+Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
+---
+ drivers/net/ethernet/qualcomm/qca_uart.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> You're submitting quite a lot of patches, it'd be great if
-> you could give our docs a read before sending more :/
-> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+diff --git a/drivers/net/ethernet/qualcomm/qca_uart.c b/drivers/net/ethernet/qualcomm/qca_uart.c
+index 37efb1ea9fcd..847a5f928e41 100644
+--- a/drivers/net/ethernet/qualcomm/qca_uart.c
++++ b/drivers/net/ethernet/qualcomm/qca_uart.c
+@@ -100,7 +100,7 @@ qca_tty_receive(struct serdev_device *serdev, const u8 *data, size_t count)
+ 			if (!qca->rx_skb) {
+ 				netdev_dbg(netdev, "recv: out of RX resources\n");
+ 				n_stats->rx_errors++;
+-				return i;
++				return i + 1;
+ 			}
+ 		}
+ 	}
+-- 
+2.50.1 (Apple Git-155)
 
-Will do, thanks for the pointer.
-
-Nicolai
 
