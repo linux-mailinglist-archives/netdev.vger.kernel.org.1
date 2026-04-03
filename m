@@ -1,219 +1,119 @@
-Return-Path: <netdev+bounces-275120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275121-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +JFJLCzjz2kS1gYAu9opvQ
-	(envelope-from <netdev+bounces-275120-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:56:28 +0200
+	id jj5HMXPjz2mD1gYAu9opvQ
+	(envelope-from <netdev+bounces-275121-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:57:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F371B396011
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:56:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 543D6396050
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:57:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 54E95304D96A
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 15:53:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DB9433024CA1
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 15:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CBB3C5548;
-	Fri,  3 Apr 2026 15:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB6203CA480;
+	Fri,  3 Apr 2026 15:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tOjp5HqM"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD6F230BDB;
-	Fri,  3 Apr 2026 15:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B3F3C65E7;
+	Fri,  3 Apr 2026 15:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775231626; cv=none; b=VfwJ6j4TOdnG8ebaeYxfxVjF0azebyE6mC5DOajVdjFyS+Kw2WRQSNPGV/fh1vBKBbawvAiKu+Za7s1bQpZ2vCo5IpOhryjPtPKUoxlUVyOm/xufYBk+bRqefGbwBmOP9pIZ9uhEW9P3KV04lKWMFmlPm2xFz8tibS20OCWBpwM=
+	t=1775231733; cv=none; b=UPShruLrvKCv2GcrHOZ8AoZ1mLqJ7zzoF30SM5xtldlQE0aqaq5YYOrnN5TfM2IcyRDczYbIfpOjnDBC5AhedkTbNsa5oAjSr2CyZG+9II/TN5dQ4r7Y1bDTDNR9rznTCsp8fNx3LWuzYU7eRMQsMqFhkRQGmjbo1b69WTk1LsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775231626; c=relaxed/simple;
-	bh=D1e2olgVJeIYMvsd6OjKX99SYPIpmzcquojkKTFR1tI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m0tTAtTtSGkQPqZhgTAM5od6eTrL1CfqEypvCW2Jfi3uLV42p5w93UZ0nwbuzgEcNm5xDBHiWYj1BXvDXOd71a3HOCZweZCGgQzSSkL+eoU4P7Md6Ng5LtvTnTCKZFaz3XISGGwyuIkFfXTMcFQ/+9fC74kZLyGmZm57vhCwRjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=13.75.44.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowABXz_9U4s9p5d2jAA--.37129S2;
-	Fri, 03 Apr 2026 23:52:52 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: pablo@netfilter.org,
-	fw@strlen.de,
-	phil@nwl.cc,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	yasuyuki.kozakai@toshiba.co.jp,
-	kaber@trash.net,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	yuantan098@gmail.com,
-	bird@lzu.edu.cn,
-	z1652074432@gmail.com,
-	n05ec@lzu.edu.cn,
-	enjou1224z@gmail.com
-Subject: [PATCH v4] netfilter: xt_multiport: validate range encoding in checkentry
-Date: Fri,  3 Apr 2026 23:52:52 +0800
-Message-ID: <df9ac8b2cfbfcacf0cc4e6f2e01113f0b16ad37f.1775228821.git.n05ec@lzu.edu.cn>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1774624314.git.n05ec@lzu.edu.cn>
-References: <cover.1774624314.git.n05ec@lzu.edu.cn>
+	s=arc-20240116; t=1775231733; c=relaxed/simple;
+	bh=5zCdI3/H+C2yChLoNxakHbo/nK6sYvMuqWoXXXeX1xM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UCGsZwxQlD4KWoZqJWymnSFJtiyzBWQGN3TfWZdaAx/aNHQEgFaeDEtwN/7XzpwNKUe4DKcD3m7evPoSvXN62XW2QwzQWlSP19zV++9AREoBSVLClV+mv3jlQXR0vgBhMFVVgASAyXLYOsFGfua4hnFHM3Ix7remD/wKVmo4ujw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tOjp5HqM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BF1DC4CEF7;
+	Fri,  3 Apr 2026 15:55:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775231733;
+	bh=5zCdI3/H+C2yChLoNxakHbo/nK6sYvMuqWoXXXeX1xM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tOjp5HqMlfxqT8dJIb0IjSHeFSaxEgLddrpyBkKJIdaJeYCW5sEQ9ayITXYjdcSmy
+	 5F8bwW6PBPgJohc+QcKbboI4SzLiBsFYI2+csceuSx1lBK6mgEosFPd34EghQBCHps
+	 EdajSe9aiOVZQNK+zAQOl6BdUFroLLNQLK+VDWZhBGuIuBATjQiziJ0c3Gl0nG8d6g
+	 z98LvV7OTIxb8/BAOFw9xw0iqT4ELkK1MppSKO25nQmRBIw/9E8NaW22bWG4QHZJ6L
+	 v70rtSy/18LZXUuZh/QO1QfcCYCNeLeCGSSUfR3oHl+jdYXYy95BpsZX1l6SMJqYFc
+	 /ocOleUbPmjdA==
+Date: Fri, 3 Apr 2026 16:55:28 +0100
+From: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com,
+	syzbot+d8c285748fa7292580a9@syzkaller.appspotmail.com,
+	Martin Schiller <ms@dev.tdt.de>, linux-x25@vger.kernel.org
+Subject: Re: [PATCH v2 net] net: lapbether: handle NETDEV_PRE_TYPE_CHANGE
+Message-ID: <20260403155528.GA198235@horms.kernel.org>
+References: <20260402103519.1201565-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowABXz_9U4s9p5d2jAA--.37129S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxZw45Cw4UuF45ur18uF45Wrg_yoW5Kr1xpa
-	y5GF15GrWkZFWaqFsayr1kJF15Cr4kXr48ua43J3srJFsxWr95tw4rtF9IvFs8Ary5CFW8
-	tF4qvrn0kw15u37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBj1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
-	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
-	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
-	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
-	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kK
-	e7AKxVW8ZVWrXwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8V
-	W8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
-	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7
-	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
-	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRpOJnUUUUU=
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQMGCWnOkPwYCQAAsX
-X-Spamd-Result: default: False [0.04 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260402103519.1201565-1-edumazet@google.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275120-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,toshiba.co.jp,trash.net,gmail.com,lzu.edu.cn];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,vger.kernel.org,gmail.com,syzkaller.appspotmail.com,dev.tdt.de];
+	TAGGED_FROM(0.00)[bounces-275121-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.991];
-	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lzu.edu.cn:email,lzu.edu.cn:mid]
-X-Rspamd-Queue-Id: F371B396011
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,d8c285748fa7292580a9];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,appspotmail.com:email]
+X-Rspamd-Queue-Id: 543D6396050
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-ports_match_v1() treats any non-zero pflags entry as the start of a
-port range and unconditionally consumes the next ports[] element as
-the range end.
+On Thu, Apr 02, 2026 at 10:35:19AM +0000, Eric Dumazet wrote:
+> lapbeth_data_transmit() expects the underlying device type
+> to be ARPHRD_ETHER.
+> 
+> Returning NOTIFY_BAD from lapbeth_device_event() makes sure
+> bonding driver can not break this expectation.
+> 
+> Fixes: 872254dd6b1f ("net/bonding: Enable bonding to enslave non ARPHRD_ETHER")
+> Reported-by: syzbot+d8c285748fa7292580a9@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/69cd22a1.050a0220.70c3a.0002.GAE@google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Martin Schiller <ms@dev.tdt.de>
+> Cc: linux-x25@vger.kernel.org
+> ---
+> v2: cache lapbeth_get_x25_dev() result in @lapbeth.
+>     make sure @lapbeth is set before returning NOTIFY_BAD.
 
-The checkentry path currently validates protocol, flags and count, but
-it does not validate the range encoding itself. As a result, malformed
-rules can mark the last slot as a range start or place two range starts
-back to back, leaving ports_match_v1() to step past the last valid
-ports[] element while interpreting the rule.
-
-Reject malformed multiport v1 rules in checkentry by validating that
-each range start has a following element and that the following element
-is not itself marked as another range start.
-
-Fixes: a89ecb6a2ef7 ("[NETFILTER]: x_tables: unify IPv4/IPv6 multiport match")
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Suggested-by: Xin Liu <bird@lzu.edu.cn>
-Tested-by: Yuhang Zheng <z1652074432@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
-Changes in v2:
-- drop the selftest patch
-- send the fix publicly to netfilter-devel
-
-Changes in v3:
-- drop datatype cleanup from the fix
-- keep the original check() interface unchanged
-- validate malformed range encoding in checkentry
-
-Changes in v4:
-- follow Pablo's suggested validation form
-- drop inline from multiport_valid_ranges
-- reject reversed port ranges
-
- net/netfilter/xt_multiport.c | 34 ++++++++++++++++++++++++++++++----
- 1 file changed, 30 insertions(+), 4 deletions(-)
-
-diff --git a/net/netfilter/xt_multiport.c b/net/netfilter/xt_multiport.c
-index 44a00f5acde8..a1691ff405d3 100644
---- a/net/netfilter/xt_multiport.c
-+++ b/net/netfilter/xt_multiport.c
-@@ -105,6 +105,28 @@ multiport_mt(const struct sk_buff *skb, struct xt_action_param *par)
- 	return ports_match_v1(multiinfo, ntohs(pptr[0]), ntohs(pptr[1]));
- }
- 
-+static bool
-+multiport_valid_ranges(const struct xt_multiport_v1 *multiinfo)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < multiinfo->count; i++) {
-+		if (!multiinfo->pflags[i])
-+			continue;
-+
-+		if (++i >= multiinfo->count)
-+			return false;
-+
-+		if (multiinfo->pflags[i])
-+			return false;
-+
-+		if (multiinfo->ports[i - 1] > multiinfo->ports[i])
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
- static inline bool
- check(u_int16_t proto,
-       u_int8_t ip_invflags,
-@@ -127,8 +149,10 @@ static int multiport_mt_check(const struct xt_mtchk_param *par)
- 	const struct ipt_ip *ip = par->entryinfo;
- 	const struct xt_multiport_v1 *multiinfo = par->matchinfo;
- 
--	return check(ip->proto, ip->invflags, multiinfo->flags,
--		     multiinfo->count) ? 0 : -EINVAL;
-+	if (!check(ip->proto, ip->invflags, multiinfo->flags, multiinfo->count))
-+		return -EINVAL;
-+
-+	return multiport_valid_ranges(multiinfo) ? 0 : -EINVAL;
- }
- 
- static int multiport_mt6_check(const struct xt_mtchk_param *par)
-@@ -136,8 +160,10 @@ static int multiport_mt6_check(const struct xt_mtchk_param *par)
- 	const struct ip6t_ip6 *ip = par->entryinfo;
- 	const struct xt_multiport_v1 *multiinfo = par->matchinfo;
- 
--	return check(ip->proto, ip->invflags, multiinfo->flags,
--		     multiinfo->count) ? 0 : -EINVAL;
-+	if (!check(ip->proto, ip->invflags, multiinfo->flags, multiinfo->count))
-+		return -EINVAL;
-+
-+	return multiport_valid_ranges(multiinfo) ? 0 : -EINVAL;
- }
- 
- static struct xt_match multiport_mt_reg[] __read_mostly = {
--- 
-2.51.0
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
