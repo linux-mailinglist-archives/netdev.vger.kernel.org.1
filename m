@@ -1,289 +1,138 @@
-Return-Path: <netdev+bounces-275058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275059-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8GqaBTLGz2lH0QYAu9opvQ
-	(envelope-from <netdev+bounces-275058-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 15:52:50 +0200
+	id sK2/Cu/Fz2lH0QYAu9opvQ
+	(envelope-from <netdev+bounces-275059-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 15:51:43 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C9D9394B70
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 15:52:49 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id B08A3394B09
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 15:51:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 24D083055947
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 13:50:54 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 17E4C3021389
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 13:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48AA2EC086;
-	Fri,  3 Apr 2026 13:50:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2870329371;
+	Fri,  3 Apr 2026 13:51:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="a9vyhkXj"
+	dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b="IUdElz1L"
 X-Original-To: netdev@vger.kernel.org
-Received: from TY3P286CU002.outbound.protection.outlook.com (mail-japaneastazon11010054.outbound.protection.outlook.com [52.101.229.54])
+Received: from szelinsky.de (szelinsky.de [85.214.127.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D5F283CBF;
-	Fri,  3 Apr 2026 13:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.229.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775224249; cv=fail; b=pGbogRJj65A3L0d3QOARL6FtLbkvptyLUGub3moX8+raRcYqaZfKdaGwtn56lRZW5DeAonf1DMqWIgIw/4w7kTAy3qU5531lVfhWHAgs7z5WCTz5Sx0FIzzWGiDIOor0tVJ4rTmio8N7gBiORFYNLw+ivRD1uVk9bJEA/HxYKfo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775224249; c=relaxed/simple;
-	bh=Q4MCNTFp7hKKDiPxcyY9EGpIjGk0hFW1mXBsZy9Ch+E=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=hwvZu84LTNQN1IhKoteGdd48HM+vQDwuyqePaPOPIn1vL6bUUXOu2CPO524zntscRBIsRSfd/2kN2ZzEAHfo7lE2+BtDUKnE5ZaOaYvx6Z2liq+j39a5um0KL6z7jeVMwUFVGyUWEblk1kPitH8srkabAxk2RNdK1vwTOPpF/5A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=a9vyhkXj; arc=fail smtp.client-ip=52.101.229.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZqTT/e7GyqUJL7GfeWbabfHxTTMayxpilOYtUGX7oz7J5JUApDYJfS6wlGy2GqpsXLfbIO2MFoEc9J/hmIYP62KzWh1FlAuq4PJcovpdVqUoFMc/46Hb7Rgp4bCCK9IZF7bHyOkXRai0TLsVFHtIV8b004UGKhNGElgZCK1WrMdKgfjSqkGwU/OJFDHWx8ztyqV86VdCBUWQCPctcB+TllWy80FgdvWFimQl5jrpQKif1H4rZ0kVRz1og0EJfNYsQfT64peM6N/OPFq9YUpmEhe1eieL6/WBPY42ueF7SU8z5Afhg8jDaUhcgTXEZVriIdKMPHzClFVXzGGxOlhGOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Fo4wE9bBG2yFf8qyrrIIwNy7lkcXolzcWP1J0iXKFNE=;
- b=NyLvY4XPgeG7WXGCLMgaXA92z71/EhHWo+qmrkRA72U2+q30fYulzIE8+8KK+0RTzgvvXaDWLHtGqSLd4uBakUigoa3IqOO2FjJaypjmVEINVfwfpW9O34FFdSvKdHghnS7CSGNV53NB8lMBCo4oswrn64aH+82wNNTwd07PeCg5wuWfNN5A4kHJXyCH3Cb5PhLIUNsV8sPA+p/5sZkWJ4j8vFsfLarOZmZcZVSggrFlA9T0aYFNZdAc9oM1ZU7NXuVNyLKZQhoXHcK4GR+MNE/50wJt33AHOBmBG8QRRnLbmZsJkrUaIwluCSbA0+mDeps1fotdNYIPuD8bISY35Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Fo4wE9bBG2yFf8qyrrIIwNy7lkcXolzcWP1J0iXKFNE=;
- b=a9vyhkXjr/+GXzbhxgWJlYl5nvISNYBRK9ea+0ZYDkvSVihlTNFYHk1Tf/sSi5AWe0eYIdmdFx7J1KaG5qf5X86XMH1K5V14wPsSxduVh4Dh1vOLToZRuTgJD2JD5ytqltNRdcGEGp9wnnI2g2/9uDK54bbclIkYn7MyzsAdHKk=
-Received: from TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM (2603:1096:405:38d::6)
- by TYYP301MB1126.JPNP301.PROD.OUTLOOK.COM (2603:1096:405:10a::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.20; Fri, 3 Apr
- 2026 13:50:33 +0000
-Received: from TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM
- ([fe80::5b4b:dd0c:b302:7911]) by TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM
- ([fe80::5b4b:dd0c:b302:7911%5]) with mapi id 15.20.9769.015; Fri, 3 Apr 2026
- 13:50:33 +0000
-From: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-To: Biju Das <biju.das.jz@bp.renesas.com>, "andrew@lunn.ch" <andrew@lunn.ch>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>, "linux@armlinux.org.uk"
-	<linux@armlinux.org.uk>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
-Subject: RE: [PATCH net] net: phy: micrel: Fix MMD register access during SPD
- in ksz9131_resume()
-Thread-Topic: [PATCH net] net: phy: micrel: Fix MMD register access during SPD
- in ksz9131_resume()
-Thread-Index: AQHcw1uO2X7KYPO6jU26NrM/2Ym+OrXNSVkAgAAFtHCAAAgHAIAAAMXw
-Date: Fri, 3 Apr 2026 13:50:33 +0000
-Message-ID:
- <TY7P301MB198479332A7A0C00451120EDD35EA@TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM>
-References: <20260403111738.37749-1-ovidiu.panait.rb@renesas.com>
- <TYCPR01MB11332623A3F7FF4601FE8C35C865EA@TYCPR01MB11332.jpnprd01.prod.outlook.com>
- <TY7P301MB198462DF309670467625AD40D35EA@TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM>
- <TYCPR01MB113320392754A3B42F78A9FC5865EA@TYCPR01MB11332.jpnprd01.prod.outlook.com>
-In-Reply-To:
- <TYCPR01MB113320392754A3B42F78A9FC5865EA@TYCPR01MB11332.jpnprd01.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TY7P301MB1984:EE_|TYYP301MB1126:EE_
-x-ms-office365-filtering-correlation-id: e53686af-e0f0-4863-6778-08de9187fa17
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700021|56012099003|22082099003|18002099003;
-x-microsoft-antispam-message-info:
- s0vU9LBjg7P/TuJXK+pI3Pe1coGlWQWIzPEHtV2AVeDCsjoDLJHUPcgHUfK8QKWlALIfSDITknNVjtZ+dIpNjODxm8O/JROVFqWhCL/EJAQ3cMp4LXJAtq2oVb8pNZdnUAgfFirW1TcS1HKp2qMJ4+w2CW0I5/tikwB0U1KtNIC7f4LUFQVio7gkqcfM5pZNCOq/9mEGfTaErzqbP/MO3T+FSdPyoEZ2X7cKRLTOSNCrC+sJTIglUt/eQMMK0nOBCnCyX026zGHHsHt6jeTxDKm0v8Ddi4pPyt1o4pRVdWMluv2nUrqSGY17WSBcKwfxoCO4jmoFH6gJX3OOat3jPEkbDvBCw0qj4uUmAq/u6I6NXxT/3WegTEFE5ZzENhUi5kfEt2wknQ/OdHlIeNFuF5q82F2OyYdlP5I1s28jB0zZyWdKgLg+s6LE8eE3Mi+PQTCaZdtYnfsrCEPQJs9W4cNrvY4f1UfIslJIeByrd23I8RTkMznqmcWPGP6mG+Ya+FBc/rsqv1dQbN0D/L9XLXpBQM8hfDqjQVgYfxlKXiNwqFh6fiRqdeLrPwkMT/8dWQOEJ+veQQkELP1tJCLXhf1f8tQDoVJDmDHnGQUUvCevNt/vtubDMvBP7Exj2IMsInrteYwglUxhLKneowqHV1GrmvHFzoO35qY9TlWm/93ZM/Vf5pxZn/CZF0OJKyNsszd5P5VnECRXibY9imHQ264E461+TqwX0/3HsiuuZH2aTUlEq8hnZjDdgJAhEbtg
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700021)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?4EeArEn/kDjvSnXyRWYKJNkzhsgdIDzv9z6XxN2774g9GnCdwbZBeODmzsrh?=
- =?us-ascii?Q?DzsS3akHrQ1Nxb4cd9jKn0dzt3YQCgY4uKY3egyhZkNACyX2VTUCgx6bDwnu?=
- =?us-ascii?Q?DuE91IaIR5gt0i5g9QssgvGYMgd9LnsqCiy9bhCiuodpt12FvlesSYkbcIDE?=
- =?us-ascii?Q?fsLX5X29WQxCaofMHVLXemzTWDG6ltLrjxJ/lUuPe3cxWF4ml2dzDNLVkzgM?=
- =?us-ascii?Q?lEnNRmgWynpXIFFJZahg4PU8aEBGcE4SBeVu8IexljfGI6KnPIEFHwGu6e1b?=
- =?us-ascii?Q?mXiEWbo8X9iii0A9AjBd8bfomHmKe60qaUa9viRnF+DbKfhjbtbZ5CgFWeiZ?=
- =?us-ascii?Q?0LeHnIevfMx3/3T3kB1PBNyh8KCopHUyJUXysDIt3nfZmaZrAHTv+2n/an+j?=
- =?us-ascii?Q?nKe/wuE6Tinkj5O1gexuTBE/sQ/RTNB0fIvPTQd5xUBQ79pvvRN5wQ51FKSB?=
- =?us-ascii?Q?VaB5EmtYFD/Gg8v7qYLTZvoVCIDbT/wSZBKVBF6LlXEMSMQ/54T72W14kzni?=
- =?us-ascii?Q?GIQfGbE9S/3c/rf3LdFmZ3Ds1d17G3k3zPokjbKLbwkZBtiN6O/ZqKsBxCFd?=
- =?us-ascii?Q?vPYa09ZSEtVu3O5pOy2Vec4JTx9/jHLU7Lk4vpN4S3WSxzIH8Wlfav+GdKvt?=
- =?us-ascii?Q?QWVrEkqo1b5zwqGFFJ4g0WGS+fKzZvM6VxDvwILDoHm7wKPZeXJthH9y4gmj?=
- =?us-ascii?Q?xKBAjrIthlMy/cU4/z52/dKaJr+ZS8WRg/U4dXq+9nMJKIMgvsnaMjmkReVt?=
- =?us-ascii?Q?AnhBEw0BlUTGlveneth2eW/4ve0LguAx2PjshVsR5OYx75x7B2pJLTvAFGhG?=
- =?us-ascii?Q?3U/xFIWib6eMkeyTJNPuWqqsJcwApo86a9uQzA5apCR050giyRKoy4FDZzJj?=
- =?us-ascii?Q?UvFh8IbPFcYvG3XbXY1V9lejYmdkihPn9u94PuIVW+2OOnJEFYlu9dVunuIA?=
- =?us-ascii?Q?EN5mSQePJ5oc7Uo7YJlbNFzrEv5kRh8xzWgfCsnwmOqLQQ8JKTe8qWa7rhIa?=
- =?us-ascii?Q?dtXPlEH9lgbTuiNXkmFdMzVlla5Mz5LOxyshSEyDENIoqMOSeTnKVwKvkpWa?=
- =?us-ascii?Q?clozodbThSfBxrWZjRtG7ylP05Ljzbx475yYSkMbCq/R8Z5vjHojKKf+fRN/?=
- =?us-ascii?Q?+uiSrdXXp83Ka1azUiFTnTVU3PcQggAa7KadP90yKWSWDL2tMyfSg4HvORgc?=
- =?us-ascii?Q?OobpA9Akw5Z7eN7P/8b1eqWdi2pjAdh5RzeE+d9Pv05YEG8XjpbrXM1UeHU2?=
- =?us-ascii?Q?PMwKNEvE/mjISoaY9ShfqdUfbro6XFbRD8fMpC9uIS1gCnhz7kblwvuxJkDo?=
- =?us-ascii?Q?V4exfsUNQTKB1QR/kOCMTvKyBE3sGrTUJSQzZjM+/CjpD129qi5+KZTsLrJ4?=
- =?us-ascii?Q?oaUwS0RuKVQkcRK0l9uXW3M4zojmPh1/tml6hnFbhnALylqyIvG8iiDN1D3B?=
- =?us-ascii?Q?0ZVAfHQColWgCg8clhjE3hzLDl0684qm27+EbmGpUz/dRmOlZrrHqzI9OQAa?=
- =?us-ascii?Q?r35As6Rz4S9fkQBfm611CXFUhH0jUiD9HKoWKrbLs36ecGzn0i5iKjZdM8k+?=
- =?us-ascii?Q?/PU/CczWCu7vFYg1yLTKa7y/uXgG6HrlxOix02xI5NSvuqlO0/HPHl45uPhW?=
- =?us-ascii?Q?E1+tdB5ZOdioSjn35M7zEmq5AvSStGoO4dO/Tt1AaGBRi90S4uzqQ6dW2kuL?=
- =?us-ascii?Q?IGMQ6ORgavHxHGquYzjmYFSNRyfs9Z61NuOfmsUwrutpv4Ybd60NX3US9ofq?=
- =?us-ascii?Q?CbSPRzk5U/B1zYN/k7UEkn2zbiXRGwk=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4B72C21C7;
+	Fri,  3 Apr 2026 13:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.127.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775224299; cv=none; b=gS9Ywo6YnM6jhv0eogOe6Vecx3amG1a/0T9dqnT6EdxbqQIfWmkKjfsT1FN+HSfkqtSwDZXvB8tL5VF58cqhzJo9wBEzdia3Lr+NyS/gaIA9TxZI5iOPC+GJx6R9Ru9ZNdak24EckhV+/UUqQsiA5o0Y4cag28JePRXZ45Oy9no=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775224299; c=relaxed/simple;
+	bh=JtU4276nFgphg9HxLMW+Dm8FtS9A1GRUkcQTJc7sB0c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BHIKe11LM61i11gmBp3PPgxU3XcYy3KX2wdLGYaBDmnO06wXY9IsaGRHT4EB1QIu64CJAbdy+TlL9ElhxqPKt6TAL9JlkwYpPSiVu78EzRoxZvnWCKlXDMlVRqYVEyMaPQMXRWnJ+n10D7lzgD7q0sWwGbHJVzKSzPyLVN0ATgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=IUdElz1L; arc=none smtp.client-ip=85.214.127.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szelinsky.de
+Received: from localhost (localhost [127.0.0.1])
+	by szelinsky.de (Postfix) with ESMTP id 22DDEE8319A;
+	Fri,  3 Apr 2026 15:51:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
+	s=mail; t=1775224291;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JtU4276nFgphg9HxLMW+Dm8FtS9A1GRUkcQTJc7sB0c=;
+	b=IUdElz1LLgvkl32J24WhAZ/+TAS1sHdI8/w/yvI6/WQHYOmhe2kWIMkRhKLUvjNuFlh5Ob
+	XlK1Jy2Bbl2+QuLa8xlUMXQPdy9gorNT23kpeGHIeILrDzxY/dDpe3vVQZQpppKbdhZ41q
+	8zxN9hEHlDBEib8EezMcnF/TNsARtpY4SicyMOmOIqe9QJPJZlIYTIWTMhjGSm+ma96rAP
+	z2F4ca5H8/tR9sS/zfuOE7EdBS4TXb5z++FnFAUt5IqdigiGgKqiNl8X/PE577eqjIdwZb
+	9wNgOjXFGSlbNLPX4MPqHNA8HUU0111v5zXobcbLfsx3rMBCrkQr//mPQ6Ftxg==
+X-Virus-Scanned: Debian amavisd-new at szelinsky.de
+Received: from szelinsky.de ([127.0.0.1])
+	by localhost (szelinsky.de [127.0.0.1]) (amavisd-new, port 10025)
+	with ESMTP id Xx3uqIXaZtHS; Fri,  3 Apr 2026 15:51:31 +0200 (CEST)
+Received: from p14sgen5.fritz.box (dslb-002-205-089-102.002.205.pools.vodafone-ip.de [2.205.89.102])
+	by szelinsky.de (Postfix) with ESMTPSA;
+	Fri,  3 Apr 2026 15:51:30 +0200 (CEST)
+From: Carlo Szelinsky <github@szelinsky.de>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-leds@vger.kernel.org,
+	Carlo Szelinsky <github@szelinsky.de>
+Subject: Re: [PATCH net-next v3 1/3] dt-bindings: net: pse-pd: add poll-interval-ms property
+Date: Fri,  3 Apr 2026 15:51:21 +0200
+Message-ID: <20260403135121.3309161-1-github@szelinsky.de>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260330-spiritual-placid-jackal-cd4269@quoll>
+References: <20260330-spiritual-placid-jackal-cd4269@quoll>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: e53686af-e0f0-4863-6778-08de9187fa17
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Apr 2026 13:50:33.5602
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yod3Y5netbUIMt/maFeiU8WnNUCHuY4Xzt3WnaaAHlZgYSHYsaLT3xFI1lVAhuLfoMXD9TxjU/xXwmmzP7vzDpbXcrcj9SzJGFzB0SzSpYs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYYP301MB1126
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[renesas.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[renesas.com:s=selector1];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275058-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[bp.renesas.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[renesas.com:+];
-	MISSING_XM_UA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275059-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[ovidiu.panait.rb@renesas.com,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:url,renesas.com:dkim,renesas.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM:mid]
-X-Rspamd-Queue-Id: 5C9D9394B70
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[szelinsky.de:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,szelinsky.de:dkim,szelinsky.de:mid]
+X-Rspamd-Queue-Id: B08A3394B09
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Krzysztof,
 
-> >
-> > Hi,
-> >
-> > >
-> > > Hi Ovidiu Panait,
-> > >
-> > > Thanks for the patch.
-> > >
-> > > > -----Original Message-----
-> > > > From: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-> > > > Sent: 03 April 2026 12:18
-> > > > Subject: [PATCH net] net: phy: micrel: Fix MMD register access
-> > > > during
-> > > SPD in ksz9131_resume()
-> > > >
-> > > > During system suspend, phy_suspend() puts the PHY into Software
-> > > > Power-
-> > > Down
-> > > > (SPD) by setting the BMCR_PDOWN bit in MII_BMCR. According to the
-> > > KSZ9131 datasheet, MMD register
-> > > > access is restricted during SPD:
-> > > >
-> > > >   - Only access to the standard registers (0 through 31) is
-> supported.
-> > > >   - Access to MMD address spaces other than MMD address space 1 is
-> > > >     possible if the spd_clock_gate_override bit is set.
-> > > >   - Access to MMD address space 1 is not possible.
-> > > >
-> > > > However, ksz9131_resume() calls ksz9131_config_rgmii_delay() before
-> > > > kszphy_resume() clears BMCR_PDOWN. This means MMD registers are
-> > > > accessed
-> > > while the PHY is still in SPD,
-> > > > contrary to the datasheet.
-> > >
-> > > SPD mode: This mode is used to power down the device when it is not i=
-n
-> > > use after power-up.
-> > >           Previous register settings are maintained during and
-> > > following the removal of SPD.
-> > >
-> > > Suspend to Idle case, it is in SPD mode and the MMD register values
-> > > are retained.
-> > >
-> >
-> > On resume from s2idle, ksz9131_resume() calls
-> ksz9131_config_rgmii_delay() which does MMD accesses,
-> > while the PHY is in SPD. According to the datasheet, it shouldn't
-> happen. See commit e398822c4751
-> > ("net: phy: micrel: populate .soft_reset for KSZ9131") which fixes the
-> same issue.
->=20
-> On my board, while s2idle in SPD mode, it does not hang. The datasheet
-> does not explain
-> the behaviour when it is SPD mode. But it states that it retains all
-> previous register values
-> when it is out of SPD mode.
->=20
+Thanks for the review.
 
-According to the KSZ9131 datasheet ([1]):
+The idea was to let boards tune the poll rate in case I2C bus load
+matters, but you're right - that's a driver decision, not a hardware
+property. The controller either has an IRQ or it doesn't, and how
+often we poll is up to the driver.
 
-4.17.3 SOFTWARE POWER-DOWN MODE (SPD)
-...
-The following remain operational during SPD:
-MII Management Interface
-- Only access to the standard registers (0 through 31) is supported.
-- Access to MMD address spaces other than MMD address space 1 is
-  possible if the spd_clock_gate_override bit is set.
-- Access to MMD address space 1 is not possible.
+I'll drop this patch and the of_property_read_u32() call in patch 2,
+and just hardcode the 500ms default in the driver.
 
-
-The spd_clock_gate_override bit is not used in the KSZ9131 driver.
-
-While the datasheet does not specify exactly what happens if registers
-from an unsupported address space are accessed while the PHY is in SPD,
-I think it is correct for the driver to not do it in the first place.
-
-[1] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductD=
-ocuments/DataSheets/00002841D.pdf
+Does that work for you? Happy to send v4 with that change.
 
 Thanks,
-Ovidiu
-
-
-> >
-> > > But in Suspend to RAM, PHY loses power and the reset value of Power
-> > > Down bit 0 (ie normal mode), there is no restriction for accessing MM=
-D
-> > > registers in this mode.
-> > >
-> >
-> > If the PHY loses power, it loses all the configuration that was done by
-> ksz9131_config_init(). Right
-> > now, only the RGMII delays are restored, which is a subset of the
-> configurations done by
-> > ksz9131_config_init().
->=20
-> I agree, Only RZ/G3E reported this issue and with configuring only delays=
-,
-> it worked.
->=20
-> Calling ksz9131_config_init() restores more MMD registers or call
-> phy_init() like this patch.
->=20
-> Cheers,
-> Biju
+Carlo
 
