@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-274888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274889-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gEBSFQ5Tz2kCvQYAu9opvQ
-	(envelope-from <netdev+bounces-274888-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 07:41:34 +0200
+	id GC2II4FTz2kCvQYAu9opvQ
+	(envelope-from <netdev+bounces-274889-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 07:43:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3E6C39125F
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 07:41:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA5233912AA
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 07:43:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DC3FB30628C0
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 05:40:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 282ED30632A8
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 05:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D97C6344040;
-	Fri,  3 Apr 2026 05:40:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B44C435A3AD;
+	Fri,  3 Apr 2026 05:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V/kKrThw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kf+EfEXm"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BBE3542F8
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 05:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B70C30C632
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 05:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775194841; cv=none; b=oL15zEuaaYXAluzRaIRR2Y4dNQcySY5f4zKSjtqXoEhdarX/EIBQ2L1PMyojVmK7tpqHeZFb2PCEKv+QZsAolaRrYIDTIyYA68S7Xbbg4g1j5GbayYOtcSzw8QWUzzxfhCoFH8+PmM+0qOBpyjieeDn4iMwJTFu1xc1hUUBdEtQ=
+	t=1775194842; cv=none; b=Sk5/HMNea298abosNX2V5BImc8ToyZMhtZ4X9o1FpCq4l5ZGxRZpTm8ZM84+MPR/z4BBYi+T2fjgofNlFTmAlh+BX3bZMTC+m766DFwrE7ZXNOwNe732oNnjvBWNJBncODNe0xeejo4gCMHcTwQFW3QXp1c6Vo6zsEVgkIjaMfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775194841; c=relaxed/simple;
-	bh=jK3wjtpXszUhk9dYiDSEL6WygtA0YLoAGsaq2N23/UE=;
+	s=arc-20240116; t=1775194842; c=relaxed/simple;
+	bh=HT6+6y8kHjKZwAKXO8d3OVYIhr1SnK+5U5KWva9Y6hU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DRoBbkZKkkGSnwHn4aDJmBZ4GprtCNya2wbthWOt2RGHQgxEoInUBj6dpCsFE/0WwVHVpZ14JBLxw2S0UAbMPB7M7UJ3i10PdDNpVp9cQ2OzTw3lltlMH8sAlBvpBZF5s6sQiF1GDq3GP4YNQnzgNFH+wOPGytpF8JFleramnLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V/kKrThw; arc=none smtp.client-ip=198.175.65.20
+	 MIME-Version; b=lJnTX7NlE7wn2/hMswHuqILp5aH0AXJHiv8VmUELP2sGI1qCzqVSjJSdHLPQgJaFZYxqLflSoE5lbGQuizcMYDU/YEXzkj8bloP5rEeJuUSRqMvapk6BIdNYqX04wOn9dGSyrUegiX/dZ6sctmG9k41dzbUwTlqnQuwx3WFXGFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Kf+EfEXm; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775194840; x=1806730840;
+  t=1775194842; x=1806730842;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=jK3wjtpXszUhk9dYiDSEL6WygtA0YLoAGsaq2N23/UE=;
-  b=V/kKrThwPaavvtanlMOPFGyiSdKjSZcrZP32slYXN+/AqrZ5ARwv1Jbg
-   XtPkzUtG4qO54Tesyioh7Y04KNXGSN/zXDHBM6+Ud46H8VjtWTnyF/Sy7
-   f0MwHaE6zsMcOar4ixRpmj5G1DptQl9MK3QxlKf/5ls+TxIfOGZO1w40l
-   LSnhiz/GLNJuqAdDqX+UY4Lq5KKRzgY1nHYMXLg5bhUgbo+NboZSTfHgA
-   vQ0NxCTwUlyHNBBC7AZUslOaxon+lw2dOSdeiX5msaaDGiij1YvHJW7Bj
-   j+lcJBA9LEw9hOUQ8Vcv5E7VMIz1HaBx+8aWuYolOSN02sGsvLgF/GExd
-   A==;
-X-CSE-ConnectionGUID: 5QiHUNlzTeConxus3X/aaQ==
-X-CSE-MsgGUID: N/c34LMTTbGNeFA8rkbn1g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11747"; a="75981750"
+  bh=HT6+6y8kHjKZwAKXO8d3OVYIhr1SnK+5U5KWva9Y6hU=;
+  b=Kf+EfEXmeAljfrLKgHAkt6dns4O9HGkMYrl/QlpT3/qiPEUDCBmfy3WY
+   kxVCK3V4t3noi+T/IJer+KA500bcwK6Z5/UkJGXfqHPuDXXJZQoG6BGpB
+   L3a2ixA0t6G3g4eIvhRngT1Yj+jbrCvsLn9lqiWsijurm0M9TEqY/eEHJ
+   PvIY6ZT95gryfLAsVRjUt4GdMisL22sBE3XxJk/N3sTFESlv/ONBHD422
+   KILIBFDB6Kdh18Ih/SAUkz3zrmTnKz2uPhusJwxYkUqEfI7YAn7XI0Lzh
+   1EizFULF6qR+H0AMnRAKNrIIvLgDo0r8/NjJtj/3EPGlEfwVnB78frSvS
+   w==;
+X-CSE-ConnectionGUID: ZWYvXxadRmeVcZ/GqEsypg==
+X-CSE-MsgGUID: PkcGvV3sRhuaQ1Dg/EPhtQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11747"; a="75981752"
 X-IronPort-AV: E=Sophos;i="6.23,157,1770624000"; 
-   d="scan'208";a="75981750"
+   d="scan'208";a="75981752"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2026 22:40:40 -0700
-X-CSE-ConnectionGUID: 2HBAAWu1T9GmzwNZScerbQ==
-X-CSE-MsgGUID: e+GfxgQrTcmdfKlqDKVJug==
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2026 22:40:41 -0700
+X-CSE-ConnectionGUID: Qu7YQQCGT6aSwzqriAdn2A==
+X-CSE-MsgGUID: R/t7P284T+yjc6nkPXFTPQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,157,1770624000"; 
-   d="scan'208";a="223904939"
+   d="scan'208";a="223904942"
 Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by fmviesa007.fm.intel.com with ESMTP; 02 Apr 2026 22:40:38 -0700
+  by fmviesa007.fm.intel.com with ESMTP; 02 Apr 2026 22:40:40 -0700
 From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	anthony.l.nguyen@intel.com,
 	aleksandr.loktionov@intel.com
 Cc: netdev@vger.kernel.org,
-	Jan Glaza <jan.glaza@intel.com>
-Subject: [PATCH iwl-net 6/10] ice: check PHY autoneg capability before rejecting ethtool autoneg setting
-Date: Fri,  3 Apr 2026 07:40:24 +0200
-Message-ID: <20260403054029.3789616-7-aleksandr.loktionov@intel.com>
+	Grzegorz Nitka <grzegorz.nitka@intel.com>
+Subject: [PATCH iwl-net 7/10] ice: fix missing 50G single-lane ethtool link speed mappings
+Date: Fri,  3 Apr 2026 07:40:25 +0200
+Message-ID: <20260403054029.3789616-8-aleksandr.loktionov@intel.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260403054029.3789616-1-aleksandr.loktionov@intel.com>
 References: <20260403054029.3789616-1-aleksandr.loktionov@intel.com>
@@ -86,7 +86,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -94,9 +94,9 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274888-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274889-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCPT_COUNT_FIVE(0.00)[5];
 	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
@@ -105,47 +105,41 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: B3E6C39125F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: EA5233912AA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-ice_set_link_ksettings() rejects autoneg requests by comparing
-user settings against safe_ks which is populated by
-ice_phy_type_to_ethtool(). The Autoneg bit in safe_ks is set
-only if the current PHY configuration reports it supported,
-but this misses PHYs that support autoneg and have it available
-through PHY capabilities. Pull the autoneg flag from the actual
-PHY capabilities (already fetched earlier in the function) to
-ensure the user can toggle autoneg on any capable PHY.
+The ice_adv_lnk_speed_50000[] map is missing the single-lane
+50G modes: 50000baseCR_Full, 50000baseKR_Full, 50000baseSR_Full,
+and 50000baseLR_ER_FR_Full. When a user tries to advertise one
+of these modes the driver prints "Nothing changed, exiting
+without setting anything." even on hardware that supports them.
+Add the missing entries to fix the mapping.
 
-Fixes: 5cd349c349d6 ("ice: report supported and advertised autoneg using PHY capabilities")
+Fixes: 982b0192db45 ("ice: Refactor finding advertised link speed")
 Cc: stable@vger.kernel.org
-Signed-off-by: Jan Glaza <jan.glaza@intel.com>
+Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 49b9376..44483bc 100644
+index 44483bc..0279cc5 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -2654,6 +2654,14 @@ ice_set_link_ksettings(struct net_device *netdev,
- 	/* Get link modes supported by hardware.*/
- 	ice_phy_type_to_ethtool(netdev, &safe_ks);
+@@ -389,6 +389,10 @@ static const u32 ice_adv_lnk_speed_50000[] __initconst = {
+ 	ETHTOOL_LINK_MODE_50000baseCR2_Full_BIT,
+ 	ETHTOOL_LINK_MODE_50000baseKR2_Full_BIT,
+ 	ETHTOOL_LINK_MODE_50000baseSR2_Full_BIT,
++	ETHTOOL_LINK_MODE_50000baseCR_Full_BIT,
++	ETHTOOL_LINK_MODE_50000baseKR_Full_BIT,
++	ETHTOOL_LINK_MODE_50000baseSR_Full_BIT,
++	ETHTOOL_LINK_MODE_50000baseLR_ER_FR_Full_BIT,
+ };
  
-+	/* Pull the value of autoneg from phy caps to ensure we allow
-+	 * toggling it on all PHYs that support it.
-+	 */
-+	if (ice_is_phy_caps_an_enabled(phy_caps)) {
-+		ethtool_link_ksettings_add_link_mode(&safe_ks, supported, Autoneg);
-+		set_bit(ETHTOOL_LINK_MODE_FEC_NONE_BIT, safe_ks.link_modes.supported);
-+	}
-+
- 	/* and check against modes requested by user.
- 	 * Return an error if unsupported mode was set.
- 	 */
+ static const u32 ice_adv_lnk_speed_100000[] __initconst = {
 -- 
 2.52.0
 
