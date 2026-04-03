@@ -1,121 +1,142 @@
-Return-Path: <netdev+bounces-275039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275040-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KD7sDEe+z2nd0AYAu9opvQ
-	(envelope-from <netdev+bounces-275039-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 15:19:03 +0200
+	id iB1KJBO/z2kM0QYAu9opvQ
+	(envelope-from <netdev+bounces-275040-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 15:22:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95A633945EF
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 15:19:02 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4322394639
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 15:22:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7BA9A30158B1
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 13:19:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6285F3024506
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 13:22:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBDAB296BCB;
-	Fri,  3 Apr 2026 13:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE7FF3A960A;
+	Fri,  3 Apr 2026 13:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q11as0GM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S8Xgcu83"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87616A001
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 13:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7623A383C
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 13:22:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775222340; cv=none; b=B8L4XVmtoytiCp2MtTjX+S1UgP6dLbCrZealf2JwN8baY89h3RqjLnT7f6rtVoAXv6+JNFn13MN0x7ToBL11Jg9rc8ActMcfo5PNoWDbZNL+liDEe53g7JeA4DjA+T3FSTbQyI4lar1z8deNk49KYt+Skn6Dn2RLURH4MOYa69M=
+	t=1775222544; cv=none; b=p3g+gtDw3HdqSCsC1MOh6/LX5zPHZfPW5iir4qnDKIG/nSCGBH/u/Da2oOhAlrBMCFeDNr5ZFzO+atLaZDWnmzEafy30slS9rV2idwFU6FatT7lKiTHDM1biTYKcvlRj/XEM5bGxafI6/If9632j4bGhkGUitvUKkFOjTN6eJ5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775222340; c=relaxed/simple;
-	bh=g1nTip99Zbu1z+sH7Y5JE6BpjHLM/Tk8483oMhcrWfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iZeJReBnYMlzObpwsL66E0/wqN3YyW+yw8R7T4SBG/Y11/qZMZT3Lr3Vy1DADJY47mTQtq1iF/kJlohRuNYxqUEGo8bjIossuSX7LRLRpHCjMIweIg8UtOtEZigY1DK4LBvwQ4sNF4SgNjPgj7ytEQisOwYV1mK1YLnGMKBTHr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q11as0GM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87C51C4CEF7;
-	Fri,  3 Apr 2026 13:18:59 +0000 (UTC)
+	s=arc-20240116; t=1775222544; c=relaxed/simple;
+	bh=XJaKaKKd6LcAtQg1wJb8HMrtsWbfEKIHuq5U5a185ZU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JfBwPOUbI1XvIAiqGYz+BAdOVXASKEMn5rEf/LHIeFRRBfB5w6VAf54FlvalS1flXeRNG7ih/Ar/bLPbv6bjwqQgiKJHJf02VatfmzB8qlnk5c3yGdxlu25tBgDUXuyMaAkrFSTLG43/2c2yqTIDk8fn6qW6sjFLecZXH2QymsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S8Xgcu83; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3385AC4CEF7;
+	Fri,  3 Apr 2026 13:22:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775222340;
-	bh=g1nTip99Zbu1z+sH7Y5JE6BpjHLM/Tk8483oMhcrWfQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q11as0GMEFuBHP7c3Dwe7+zIKVYzMkaVTZFyDG+S69gQdGy5h1R56b16cJhMQoqJG
-	 jaM7BXrymI93BiW1rJ+apAo7EaNXEpAq9yUR1FXpAOEZUAlec1NXmk9nN3aptwe0pi
-	 TzqRlg/VaV0V8/w11pWVkpeAUf0RVrIvJ8xSeYS+8qKS3YIjiu/NFaCtDDeTV58JDF
-	 E4d63yTaLQsLlcB31PpN32w5E7Gs8jM3Eq85xDYmeR88V1W4uS9y1+Y9K9kFivtrTa
-	 LuDP/jz6LGyGzW3A3X+b4V0lUMeXGcwATIyhEboOForoPL3XGAFYxI9qFq80JUL4ic
-	 5dCogCWmFlg9Q==
-Date: Fri, 3 Apr 2026 14:18:57 +0100
+	s=k20201202; t=1775222544;
+	bh=XJaKaKKd6LcAtQg1wJb8HMrtsWbfEKIHuq5U5a185ZU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=S8Xgcu83rmjiuAHx96HukGqJKnEkqu790+UWaNwBTNHFniryumfHQgRr8S2JwIJbH
+	 q84Ho/tCh0N/QnuMEVqxjWXTCxvM+FC0+SU0YqiGEm25/b0h4NoQuytecixgsTWTim
+	 0KqU68/JAtnJQfEutYsTtHdCxteJojQh87Ib0WrNhbJ2QtpcvbhXAl4mzEsAg8J7Ui
+	 f29i8FnbIz9mJ9lugCx+9HoRzdLylFOMEOQ8hpAE8+XVMuhWYy7gwkdQ8bo5tJIlQJ
+	 LMAbzAu+9AN+fRdXXXWzRvMQG8axNx9pjRuyglz6bljZGx84Rx2S3yggW7jDpYk7AT
+	 Jnj0vtjlmhLgg==
 From: Simon Horman <horms@kernel.org>
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-next] ixgbe: fix ITR value overflow in adaptive
- interrupt throttling
-Message-ID: <20260403131857.GB113102@horms.kernel.org>
-References: <20260327073046.134085-1-aleksandr.loktionov@intel.com>
- <20260327073046.134085-11-aleksandr.loktionov@intel.com>
+To: aleksandr.loktionov@intel.com
+Cc: Simon Horman <horms@kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ixgbe: replace GFP_ATOMIC with GFP_KERNEL in ixgbe_fcoe_ddp_setup()
+Date: Fri,  3 Apr 2026 14:21:52 +0100
+Message-ID: <20260403132152.121293-1-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260327073046.134085-7-aleksandr.loktionov@intel.com>
+References: <20260327073046.134085-7-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260327073046.134085-11-aleksandr.loktionov@intel.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275039-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-275040-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email]
-X-Rspamd-Queue-Id: 95A633945EF
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:url]
+X-Rspamd-Queue-Id: D4322394639
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 27, 2026 at 08:30:45AM +0100, Aleksandr Loktionov wrote:
-> ixgbe_update_itr() packs a mode flag (IXGBE_ITR_ADAPTIVE_LATENCY, bit 7)
-> and a usecs delay (bits [6:0]) into an unsigned int, then stores it in
-> ring_container->itr which is u8.  Values above 0xFF wrap, corrupting both
-> the delay and the mode-flag on the next readback.
-> 
-> Separate the mode bits from the usecs sub-field; clamp only the latter to
-> [0, IXGBE_ITR_ADAPTIVE_LATENCY - 1] via min_t(unsigned int, ...) so
-> overflow cannot bleed into bit 7.  Add a WARN_ONCE() when the raw usecs
-> value exceeds U8_MAX so out-of-range ITR computations are visible in
-> dmesg during development and testing.
-> 
-> Fixes: b4ded8327fea ("ixgbe: Update adaptive ITR algorithm")
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
 
-Somehow - perhaps because there is no m/n notation present in the [] in the
-subject - Patchwork has treated each patch in this series as it's own
-patch-set.
+For local reproduction steps see https://netdev-ai.bots.linux.dev/ai-local.html
+---
+ixgbe: replace GFP_ATOMIC with GFP_KERNEL in ixgbe_fcoe_ddp_setup()
 
-And in the case of this patch, it didn't apply - I assume
-because in order to do so an earlier patch in the series
-needs to be present.
+This commit changes the memory allocation flag in ixgbe_fcoe_ddp_setup()
+from GFP_ATOMIC to GFP_KERNEL based on the claim that the function is
+never called from atomic context.
 
-So CI didn't run on this patch :(
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c
+> index 011fda9c6193..7fa0971073e5 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c
+> @@ -193,7 +193,7 @@ static int ixgbe_fcoe_ddp_setup(struct net_device *netdev, u16 xid,
+>  	}
+>
+>  	/* alloc the udl from per cpu ddp pool */
+> -	ddp->udl = dma_pool_alloc(ddp_pool->pool, GFP_ATOMIC, &ddp->udp);
+> +	ddp->udl = dma_pool_alloc(ddp_pool->pool, GFP_KERNEL, &ddp->udp);
+                                                    ^^^^^^^^^^
+Doesn't this allocation happen in atomic context? Looking at the function,
+get_cpu() is called earlier:
+
+ixgbe_fcoe_ddp_setup() {
+    ...
+    ddp_pool = per_cpu_ptr(fcoe->ddp_pool, get_cpu());
+    ...
+    ddp->udl = dma_pool_alloc(ddp_pool->pool, GFP_KERNEL, &ddp->udp);
+    ...
+    put_cpu();
+}
+
+get_cpu() disables preemption, which means GFP_KERNEL allocations (which
+can sleep during direct reclaim) would trigger a BUG() when attempted with
+preemption disabled.
+
+The commit message claims the function is "never from an atomic context",
+but while the callers may be in process context, the function itself creates
+atomic context via get_cpu().
+
+>  	if (!ddp->udl) {
+>  		e_err(drv, "failed allocated ddp context\n");
+>  		goto out_noddp_unmap;
 
