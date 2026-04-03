@@ -1,168 +1,123 @@
-Return-Path: <netdev+bounces-275012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275013-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qNXwNv6yz2l1zgYAu9opvQ
-	(envelope-from <netdev+bounces-275012-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:30:54 +0200
+	id aLApBD+zz2l1zgYAu9opvQ
+	(envelope-from <netdev+bounces-275013-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:31:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98CEE39403B
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:30:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FF9E39407B
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:31:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 367DC301C052
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 12:30:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B8FAC301DBB4
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 12:31:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E7E39A81B;
-	Fri,  3 Apr 2026 12:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B22278F2F;
+	Fri,  3 Apr 2026 12:31:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="OEf1FwAT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s2K6KcHA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899B538AC66;
-	Fri,  3 Apr 2026 12:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2893413AF2
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 12:31:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775219414; cv=none; b=o5EFx3ZNWR9CkINUcoMxyJnOzPm9n0FYH9IrvDWMvKpYb9HP+T/nteatwjI49T+MDuCHTx4bEc3QZ3pKvsTviu4VFWYQNCFQ9T6cjcAe1sDGojH/otQeqXk+qQat0QuoiJBO2y4CJtjpwOnvsoDxR7ofJFr6OajFEt1QuZ0WFUA=
+	t=1775219516; cv=none; b=P4nbiUxG41PsCbFRwhWUU3/yvRKE0R/wyx7fFP4piWuQJFsFXO4WbSK9+YZIAzMkuVdwZ44m7+Whbz4yieFTISTMJ3N1C1HU84lE5Rw/7X1KaRQCJvwunnHyaQGNRiiqKzxRA1YRvZLwk8k/OvuhPlHUuXQ2yZj4KIN8KGv68pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775219414; c=relaxed/simple;
-	bh=P36D0pir7MJhihtsq9xca0tJWBvWT/gFu4BIXWwSWpc=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=FrIr7WklpU2wYhDIalAwn4IeXGNyMGky1J0WHFtJvRZ0HlMB1mUeW6F7zro4bmq4Gibj5e4N3uYKoWeEWnT/A5i03l33gK/wtODt1K8Ch5ggASx1Ucep8VvJIVTJas/T7uQYKagLKo73EUBqJiloSgMJudcOpado7npLaGuzreI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=OEf1FwAT; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0BF1CA5842;
-	Fri,  3 Apr 2026 14:30:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1775219404; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=3IutcUR6m+dhKQLaSMXbQx2Xm49f/c8/BD6C6q4j+3w=;
-	b=OEf1FwAT0ui1jtvFVZzfawOJp4udw4sxZP8qUiippSjHqU6svXuR3pcp42JIFHDTu4btkz
-	jhbtExknKM8xzlNeBVUuAT24oSEai79VgwdpEkNsTAyaTqYLm33tK6SjMmklBpsvpW1RPe
-	bOY316JoYyOcrXZWT2qRxsWVLeAvdX2VI6Xfor9bgufFp4/AVo8dcextHt9PJnGVoDymOk
-	MJ64lU0O56GK/MHp+Dbe629FEFx6HzSjq/81Zpj3tvZfI1+kxVi3G04aWO0LcfwyOByixE
-	l3OahdY7//5KsWG4loGdMezzYZkj1U8NK4b0m9XzvLFJgqkuIMvgzvReCBuOrA==
+	s=arc-20240116; t=1775219516; c=relaxed/simple;
+	bh=C14Dn6CJWe28rasT0KhU5z40Y19aGc+j9gzla04hLYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZTgE38mFgiW2BH5+WpCSiZURcZso5RuA60WJk0RaBPZo1J9KvR0/bC6PN0T7KRjzh94sBHWm5VRkYRC9xoS8MGlvvfgoMV8qgtqBSnNGPL84R1yuBmnAPQ2kDBL1CVfnsuwD1rMCkH4Y1bkA85mrWcU9mY+pW/1pn5SCfMDdZc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s2K6KcHA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0018C4CEF7;
+	Fri,  3 Apr 2026 12:31:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775219515;
+	bh=C14Dn6CJWe28rasT0KhU5z40Y19aGc+j9gzla04hLYo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=s2K6KcHABx4bA638WrXtQBf/nDjyqvYOB/ggWc3LF1r3dQJdfXnZgI/dTwL1yOHOU
+	 i+DBbxj7o8chwjW0hK1EZICNOYQxYUN/q5tvARBSRfK1N32D47zi3DBV/zHuVrvrN0
+	 +hblTTKe0QS9kaOF10sPL1VRQN/YjjYz6PLKxD/iJGsI+x4uwxkYB8iTdNiHyxId98
+	 p+LCPag0dt/BxeKSkmdvoPuviHdWLIh6BX7hRagaA4QDsUGsVMqgBCefKc0NX0Nj4r
+	 n3xScGWD4tsAgQWx3o5WPe9RAAmloz6+o1X++Tr6Y/3WwSmssoNTMJWL4Z/BJu2B5h
+	 GCHHfrbUeGUcw==
+Date: Fri, 3 Apr 2026 13:31:52 +0100
+From: Simon Horman <horms@kernel.org>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org, Grzegorz Nitka <grzegorz.nitka@intel.com>
+Subject: Re: [PATCH net] ice: fix PTP hang for E825C devices
+Message-ID: <20260403123152.GA89018@horms.kernel.org>
+References: <20260327072332.130320-1-aleksandr.loktionov@intel.com>
+ <20260327072332.130320-4-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 03 Apr 2026 14:30:01 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, biju.das.jz@bp.renesas.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: micrel: Fix MMD register access during SPD
- in ksz9131_resume()
-In-Reply-To: <20260403111738.37749-1-ovidiu.panait.rb@renesas.com>
-References: <20260403111738.37749-1-ovidiu.panait.rb@renesas.com>
-Message-ID: <fbdabca34daf7eb4bdf3fbef1ceb95bc@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-1.46 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260327072332.130320-4-aleksandr.loktionov@intel.com>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275013-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275012-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,bp.renesas.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[tipi-net.de:?];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.662];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_DKIM_TEMPFAIL(0.00)[tipi-net.de:s=dkim];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,renesas.com:email]
-X-Rspamd-Queue-Id: 98CEE39403B
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:email,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: 5FF9E39407B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3.4.2026 13:17, Ovidiu Panait wrote:
-> During system suspend, phy_suspend() puts the PHY into Software 
-> Power-Down
-> (SPD) by setting the BMCR_PDOWN bit in MII_BMCR. According to the 
-> KSZ9131
-> datasheet, MMD register access is restricted during SPD:
+On Fri, Mar 27, 2026 at 08:23:27AM +0100, Aleksandr Loktionov wrote:
+> From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 > 
->   - Only access to the standard registers (0 through 31) is supported.
->   - Access to MMD address spaces other than MMD address space 1 is
->     possible if the spd_clock_gate_override bit is set.
->   - Access to MMD address space 1 is not possible.
+> Change the order of PTP reconfiguration when port goes down or up
+> (ice_down and ice_up calls) to be more graceful and consistent from
+> timestamp interrupts processing perspective.
 > 
-> However, ksz9131_resume() calls ksz9131_config_rgmii_delay() before
-> kszphy_resume() clears BMCR_PDOWN. This means MMD registers are 
-> accessed
-> while the PHY is still in SPD, contrary to the datasheet.
+> For both calls (ice_up and ice_down), accompanying ice_ptp_link_change
+> is called which starts/stops PTP timer. This patch changes the order:
+> - while link goes down: disable net device Tx first (netif_carrier_off,
+>   netif_tx_disable), then call ice_ptp_link_change
+> - while link goes up: ice_ptp_link_change called first, then re-enable
+>   net device Tx (netif_tx_start_all_queues)
 > 
-> Additionally, on platforms where the PHY loses power during suspend
-> (e.g. RZ/G3E), all settings from ksz9131_config_init(), not just the
-> RGMII delays, are lost and need to be restored. When the MAC driver
-> sets mac_managed_pm (e.g. stmmac), mdio_bus_phy_resume() is skipped,
-> so phy_init_hw() (which calls config_init to restore all PHY settings)
-> is never invoked during resume.
+> Otherwise, there is a narrow window in which PTP timestamp request has
+> been triggered and timestamp processing occurs when PTP timer is not
+> enabled yet (up case) or already disabled (down case). This may lead to
+> undefined behavior and receiving invalid timestamps. This case was
+> observed on E825C devices only.
 > 
-> Fix this by replacing the RGMII delay restoration with a call to
-> phy_init_hw(), which takes the PHY out of SPD and performs full
-> reinitialization.
-> 
-> Fixes: f25a7eaa897f ("net: phy: micrel: Add ksz9131_resume()")
-> Signed-off-by: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-> ---
->  drivers/net/phy/micrel.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-> index 2aa1dedd21b8..4236dbf4ad6b 100644
-> --- a/drivers/net/phy/micrel.c
-> +++ b/drivers/net/phy/micrel.c
-> @@ -6016,8 +6016,13 @@ static int lan8841_suspend(struct phy_device 
-> *phydev)
-> 
->  static int ksz9131_resume(struct phy_device *phydev)
->  {
-> -	if (phydev->suspended && phy_interface_is_rgmii(phydev))
-> -		ksz9131_config_rgmii_delay(phydev);
-> +	int ret;
-> +
-> +	if (phydev->suspended) {
-> +		ret = phy_init_hw(phydev);
-> +		if (ret)
-> +			return ret;
-> +	}
+> Fixes: 6b1ff5d39228 ("ice: always call ice_ptp_link_change and make it void")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-Fix looks correct.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-nit: phy_init_hw() already clears PDOWN, so the PDOWN clear and
-1ms sleep in kszphy_resume() become redundant. But this is probably
-something for a future cleanup.
-
-> 
->  	return kszphy_resume(phydev);
->  }
-
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
 
