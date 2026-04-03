@@ -1,302 +1,262 @@
-Return-Path: <netdev+bounces-275111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275112-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KLFpMObfz2mn1QYAu9opvQ
-	(envelope-from <netdev+bounces-275111-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:42:30 +0200
+	id WBrLNV/gz2kS1gYAu9opvQ
+	(envelope-from <netdev+bounces-275112-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:44:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF102395E28
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:42:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39790395E84
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:44:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 87A1D3002F7C
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 15:37:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 33772304289D
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 15:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A275A3C9EF3;
-	Fri,  3 Apr 2026 15:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700E93C3BF1;
+	Fri,  3 Apr 2026 15:37:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BiiCA28y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X65IIqZe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B1334F48C
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 15:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775230621; cv=fail; b=LrctiU2LXkET80FwNNnilNU/pEUtHrJp9idj3wPEAuT2CvgqIlfT9US2fjvYWG1sMujKUUia7UPhyzfiZk8Fk/t92PMjnX9LbKEqkCkyC3CpotrojcewaZV1k/AjLwzelXqn5zWE7TOvSyX77JV6ww//W8H0bgafWKoAA3q6R6I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775230621; c=relaxed/simple;
-	bh=CgRaT+HvBx2aWMrt2yhF0ueJaGmlEBInpHDvI4wpLA4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=RcgRhf+BIZxQoZAwqKI+v8H1UsThIsjAHW5Hk8nqMCvjMhyigNuLd0ZUL81VH8lYV/6UlEHVmc8parjsOeK4RLQL1GY2lS79FGQXB4DFOayAIozi0+uhvCIye3uUy1tdzCbjz7NzLQWd7bWs9DDNgWHWsVRO75adWAMxMIArHgY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BiiCA28y; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775230620; x=1806766620;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=CgRaT+HvBx2aWMrt2yhF0ueJaGmlEBInpHDvI4wpLA4=;
-  b=BiiCA28ykbbY3H6f2BmReYp4ymDg4qeD3/chbTH9KocRd+BmSiLXpv3+
-   BTCO+zq2elHrKdLe7qY3GbHCrVo1Re+Gr5eBuUfrYhX/SOQoWkGbYsn4n
-   VkjQtMSxMW8lF6H/6ZsN4gAWlc9OC5n3MTEkjd81ygLcjZG4R2OH6oDHI
-   HS5DxKBqQ/0kzcklZjoAvew90ZN4ItbGYkM2YSbADGqRHfk80XUkxCEtp
-   9sz/8BVwS3yjAFwNHKCFTPNk95p3IgQDnlhc4YbXEW7KM38H3W4A6c/Xn
-   NAP4nU+GzUoXOcY52CelNS1q2AUJdhV70eprD9BO4vMMyaoBEhgy7BSv5
-   w==;
-X-CSE-ConnectionGUID: VmhzUH6uQiyLbB/dG9EOVg==
-X-CSE-MsgGUID: raA1z1p2QOW+TTCrgHHWFw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11748"; a="76310340"
-X-IronPort-AV: E=Sophos;i="6.23,158,1770624000"; 
-   d="scan'208";a="76310340"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2026 08:36:59 -0700
-X-CSE-ConnectionGUID: NZB8yFaYRL20p7YxKDGClA==
-X-CSE-MsgGUID: CVf+tuTFTM+M/dJmdpJzFA==
-X-ExtLoop1: 1
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2026 08:36:59 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 3 Apr 2026 08:36:58 -0700
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Fri, 3 Apr 2026 08:36:58 -0700
-Received: from CO1PR03CU002.outbound.protection.outlook.com (52.101.46.60) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Fri, 3 Apr 2026 08:36:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WVQeGS+N/5Ltsg2YNbwCH2ay7Q7nHU2hgtOsEmlZT0nnoxtoiR2NeBJ5FZyTDar2uScapT7CxOnh6YG0KZuYqcwlYGIAUDMSf9I02ZRMY7hZw/IRLxgp4YZP80Nkq0GYTGwga+9cZv8UMKD4y2gXDT2hoSeGiobvNYr2VBCfa/FouOGoa4MBqyUWjCXA45dIYx7Lff9FRsJwDHU2WEGV3xbE+XdNKTlwBusra8GRqX17DBEQc2m6rS8pO5AJMM6aE6+sNHMivXOEtzaNGS7MG4WDOP4Od3vZiY/8p7TkZ1xaOypn9RdVZlgaziPCxg1PGbUOnGtRh9xYkULBUWotew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/Hwsyb9gwO71U+g3WpsqH0sVD4sm8EvzPkDoi4phcB0=;
- b=WXX0frlw9UKVKpJggqxUCSiqhlPYw5kRXNxXecAKQ0tfxeKYE2Y60iS6gMOSb3u9y3/l6lOXveJUP1x6iIxgB8uiPyGI4tWSUu0yl0Mh6/jMrCncosHTH5KX7H2QieceV6+tO3FT7N+RJy+Z9d70JkErg8LbT5eBMEjWBuAMdjXejJXomWqUCUOSoOlNGhpPRALKsWyv27ISdaU+dA1i2FhWqhCVbE00AYhnrVAqoEGiS8XIXwSfQHxq2RAcUx40FI2Z7VKIvVFVxPf/+0uutvor8/Tc5hvce4snZZtTLS5f8ZBc4zFClhFgCqhGzAAo9oYyYIw0WKbd7pzTLxvunA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by MW4PR11MB7161.namprd11.prod.outlook.com (2603:10b6:303:212::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.18; Fri, 3 Apr
- 2026 15:36:50 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::e6f0:6afb:6ef9:ab5c%5]) with mapi id 15.20.9745.012; Fri, 3 Apr 2026
- 15:36:50 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "Tantilov, Emil S" <emil.s.tantilov@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>, "Olech, Milena"
-	<milena.olech@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
-	"Ilichev, Konstantin" <konstantin.ilichev@intel.com>
-Subject: RE: [PATCH iwl-net] idpf: fix read_dev_clk_lock spinlock init in
- idpf_ptp_init()
-Thread-Topic: [PATCH iwl-net] idpf: fix read_dev_clk_lock spinlock init in
- idpf_ptp_init()
-Thread-Index: AQHcw3+F4e6WxAXyfEWS4RlTAH+0E7XNeEnQ
-Date: Fri, 3 Apr 2026 15:36:49 +0000
-Message-ID: <IA3PR11MB89867E058C1DF423893E850EE55EA@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20260403153538.11516-1-emil.s.tantilov@intel.com>
-In-Reply-To: <20260403153538.11516-1-emil.s.tantilov@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|MW4PR11MB7161:EE_
-x-ms-office365-filtering-correlation-id: da7a70e0-c461-44d6-e7e8-08de9196d2b9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|56012099003|18002099003|22082099003|38070700021;
-x-microsoft-antispam-message-info: Ym001hiypvbZk8xqf1p+6fEs+i5LGLz+4l+AOk1JktxXv0unin0XI5JR5nlY5ZfiV89+19w//ERgJNj6U9t66sZLd7a078Hb5bRMosoRqqiZdD33R33da/Sxd0W9yBQ6uj6y3AMgHEKW5bQ7w3V8vBeyqXIwg0RtiaJKHRT9+3yJV1Vz626mWDPLCTkN5ajlxtR9GnccYxDi6KUrUkfID18unhOrgAuCsl43ZrNEBV+AV0pAxp8Ti695tz++NNeAYcsYmlUPY9OxYqiC60xccj+36NFzjfYpTwOfSqYdhs6YJa5SpORqoEOX62uQHnzjW8M92FfQgbp0UASW6En/ZjomASlQWkO9BZkTm7yUPblKMQiO++pc366D/H8sK7ApSwEcCWfYdD/ihpk6vOch6aKA58OmHeoVcKzkYQbsemGvOi//13/IUppF5URLFjmE+nCGC/FSK6S17g88VNYy/f7YF+ahL5m5isfSnr0rZ9MRiwiylFDkXgcy0urduZuYY2hqHntR6arR6GQ8kcaxiZrKULNmuaJV4tDE6xemDDFqTeh4kdCF2yWIR+E2X9L9uAlGBiXNbNb+/plbsraaz/MqGwdOgx8pjKkrOz8jfME0KCxtVmXuLh7zi7vgDSgjylAMX9tZ9mGTrJOW9HGXgT+5ynPo44dMIswoFvu3jr9U8K5j8k0v6Aedxip1uBkKtSQa02WNf+X1RtNO5AsaDoYTcwkzLawGXjH98Ms4J06dRx4YT8W4ghMrvN2UCEmKRgwLaUIHcrAto0hBHNM3ry4c2cSGCfR9zxWWS7zblPY=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(56012099003)(18002099003)(22082099003)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?9bQyLRcOgzDU7SQyJLTGKPJqsCCMMNzyYI3CeboLdAVv2nrodV22nMepxPXR?=
- =?us-ascii?Q?kpYNQFRxS37zTAJ0nwyIWZB2l+8RlKV/twTL4oMQ/ecnrhSXGvm69/bzd0oF?=
- =?us-ascii?Q?JiByoqH/4CwGFkze7ATZ7SAsdrq4hCUsLTu9AAPPP5j9rMW/bQOB6sDyWw8N?=
- =?us-ascii?Q?pOPftujhVLz+Q+tNXBbZC8OcLEIGtV7SkC9o1c4wYOv9RGCvdkSRkylDPd+o?=
- =?us-ascii?Q?WY5kqaLnEhCLDv7D/nir1ASOzLmtTmmo3MtLZW9tE1OVsVJKN+qA0XBG5ntt?=
- =?us-ascii?Q?/cBIhaukJAdFHIn/xdInO/wfp6+JvN/T7nVOAGra0DqJ9NIvTyaWlN5PhhAQ?=
- =?us-ascii?Q?vYpsDsXGOmuXVuaUaGHCPe79kct8ZPTlmMZ6VZP1bFfgeXkgCC36fULceQSJ?=
- =?us-ascii?Q?NRJOHIlpkhu971Elyhs/RMh4CfwycKAH2EZsM2B0gbFCRYj8+2purOVAuCuD?=
- =?us-ascii?Q?hxVfwmgxOESt/PkPdM82Y2i4JVkX5ZPOTBHrT9vh8h2V4JNW5gR5LcfKFbe7?=
- =?us-ascii?Q?1FgaMkA/lSCVX7bxanwnTagHvaYWRphahN9bODLs6gBoAmriay4YA2MUDJpS?=
- =?us-ascii?Q?k680e1AwaqgRCgaJ92hVoIPAj6f+YThwcB9lxQOYT2PInBnKItwpYQ31XwuX?=
- =?us-ascii?Q?vZakwQ8cGwO61CANVMN/kfhVtCZM95rVazPvKCGqgd36I9gcDo9VjPTfjwRZ?=
- =?us-ascii?Q?ewGjXjJ5bSKpFf+FJPwASvrz/MjOxuQLzyvcD0h7JLPCp4QSWQTxiAut3NSh?=
- =?us-ascii?Q?1PMwtPamvwSiB5+1M3cvexaVyQKCbu36APf8REhCjJG+SCwfiXYbISrIMxuE?=
- =?us-ascii?Q?IUtlCPD/D3y0nTdOEGSnWlNCAu29hvZ2O4xvFza544nIQkL7ZBcOxi+x9qYa?=
- =?us-ascii?Q?yN4SJXwQ0OUoHTXPimr0Mqnq3qoiFfBKOllHyeAOHUBMGun25godxXtGckBy?=
- =?us-ascii?Q?OhT+1aPJuOWIFtJm0x/BpFfx2HSyzQAhp0VT71cyQS3fQcl1zTYwlRKtJ91h?=
- =?us-ascii?Q?6CwuvDTEl+DQzUIVfGTZIALWfLzjrVLjfvlwFLV2y0dbHUpsWS9hNGgpEVbf?=
- =?us-ascii?Q?p5rBumo32txlw59lLHW8hPV7+lsT64N6kA/v47ndXronUx+/NmXNRQLSKnDj?=
- =?us-ascii?Q?cXgEz0BoHkmIcr0M5wtoaZUZ88yJGYrVMeGr5r5GVQG3mbekLGimYM+4Tqkl?=
- =?us-ascii?Q?CYVXBySXdjiUWHZJmtObFc146q1Jj7uk11CJpHL2om+YnkAtHjppEjkhw+q0?=
- =?us-ascii?Q?pwXCfPLhJYZpoMPvkpjXYXQCQ9d2pP158J+5QFd5PcWqcXm2pB7tjHtlskwb?=
- =?us-ascii?Q?co2nCLQXyxjxhchyOwTuqLZo+ziwDbRhl9oaKga3gVBanisIWACSqz4G9JCq?=
- =?us-ascii?Q?AAHb+fLMif766InK6jx06dKAxXvRwfcTwPUuTuSP3Qm3QgHUmemM5NR8iHQO?=
- =?us-ascii?Q?DJXX775YPBHEsFsLehBhBw18I/rLbkZ2vPAn5BqSuWb7DEz3LhevCHcpmLTE?=
- =?us-ascii?Q?6WCA0smsHB8sduG8oA6YV8Y6jnG7qYtZo1wyQG5vGAIGhZ5oEICSPuT7qnG6?=
- =?us-ascii?Q?Zu2+igZts1w8qehVyFsxYcv1SzXaF5N7tuKBMr0+zpimzx7wGvQ/AuEL+Wwo?=
- =?us-ascii?Q?5vUFLIUz/YE77RdRDbUpup7XuYB7sjr1Mww2NWc56fb3McbAj28QNv3EluYg?=
- =?us-ascii?Q?fmg+kwkJX/VMPOfGZmaRGeMFLbuLEWccAIX0bwFrnHz9/tXtdIpVqcXQWqrk?=
- =?us-ascii?Q?a9lCVwjYz98NdI0N1BwGGkpZEwPX1HM=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A28134F48C
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 15:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775230633; cv=none; b=JQDYdHPqKZiwmzxRQBiJDV0Oe4chzH5TyYIgm1S2cDm9xzO+8vf5ugzwNrEgla9IoAPs7fSCOHwXu6KyRvbW+QiW8rIuCv1b7gwaAOu8gfm0mpIiaa8yfAFsY2eQ76/BL+2phT9k3hkL1whLiI3hrep+iMVIJcTzg9dbRQvyLg4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775230633; c=relaxed/simple;
+	bh=YZ9x9LlQUdaWzhrdGk3G6BEBa/K0v+Vx0017f8NKskQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=ro8k3ybvNKnc7XOw4diWQvltSEbCNYS+/iVcN/LeLtRgQCbVUpJEEETWlfoEHRo1TDhtlkaPWyzJNBrIpkvVt7uSTNLyrifh9jtoSIPrvlUTC2NiZbfewafqHodz57/ID8lfAhSAHpjTwEcTPSsM5tCTh/nHHTMtkyvpP0h2cvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X65IIqZe; arc=none smtp.client-ip=74.125.224.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-6500040f128so1846342d50.0
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 08:37:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775230631; x=1775835431; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KpuvJuy/tFtXZE3ikq8tJ0F1YYf2MuYLH559k2dBC5U=;
+        b=X65IIqZeuVffj6BLMsybZKW9d7TTWuCd9/LMImdp7VgmNlg3MlwLn6+In6wGr3V2lK
+         jiFdCpcDAcyFszfFS45ZN5nC1p6kRYNNlo2uTKDV3c4IQIO9Nr31gFDvgAJ1WortHWaG
+         0Gzo9EqJRijdNOjpmRVpHiQqWQi3trkclj9lvI6eSLf+7AdIGqmifqULjOWAKIf435iI
+         LEQ8Ns/Cp7jDXaMRNtVt6obbsZhX4wU7mp13Vj6fC/fihrv+b/AGYZrwASnaWt/ZHbGd
+         0wTpb9oeFg5fBZ2ZzD7f/03qyxklPCHg8swgOC+t26uiDUaKTzDsBvRoO0aQ8gdvYqK2
+         Eo+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775230631; x=1775835431;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KpuvJuy/tFtXZE3ikq8tJ0F1YYf2MuYLH559k2dBC5U=;
+        b=dmx7kc2q6Xl3+HgwexoZiNkD5Jwl3OlkzXGlc2Lq9DURvzYUsL0UKa/S6dOB8qgkGm
+         IHXomVWc7rmnPjaH49J8UkIOMFw2d+ejIYKc3czPCcYl81RFJIxQ9ff/lIt6hjUll5WD
+         EWeYRulAGK0NIsQ0UDCBmrIMzMSnjeICYh00LbQOeiSkqh+1/vdbA4P5F2nb2/QGca1b
+         3TYytBkLPRKavHenynZpFLDp2URFuKQ8DpkSebpP2bLSNm6H0PV7tEnWjfGLvH3SqytM
+         sf3w8PknKV0R+YzpbzxRP5amF49txL0Jx6EOXTj7Ve1FboRhyQQ4bkLAN0tYdUyBgXLL
+         Kpiw==
+X-Forwarded-Encrypted: i=1; AJvYcCXkkz8eNl9H9FizYIVCpl+JAhimobRbjvnIWmHHVH+lvmRTNw4LNcRUP+VM6at0E982vUJXX2w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5nMNsaCCy2iL8fPY8OkN/W811ezSmS5sFn5lk+ESkPTLKhpuE
+	tXuRV9KP4GItt+OqA0DfApoOqosWc8JBegDum7bDj0rLuRY1JJxDPZVh
+X-Gm-Gg: AeBDieskBuIZKgRo1LMxez/hOPAzPH56nfy6G2yEBUPsyJnwMC3uIy7u3Bqbz68lzjK
+	5ob87oOJZQvmTp8yrXq674f4IZv3Vj4MVuk5PdXEnNSMxK4COdN9M0IsMMiHI3hbps8S+Lim5ms
+	HOWJ553htuJYRW+pDrQ3WnH7kioBJ/KxqC3rIUK+YWwV9nfW16ZCC9eydOdUxGp+5YLcP4vIkB/
+	Rq+dEutcQl7UAZb8KaSBOsfwiN1Qilj15Hl8vPA8R1BGJpKJiRlIXwDMWHnAcU5Al93VAqRgey6
+	b4SlauBzFtvPPQSbBi1x2i8bwQseKixk2xP9Lz6RlCZv7Hum8ahtQqjg270roQxPpWTo83EX5mE
+	GTaHdeHzOwJGaLgDoQni5cBpKWBElJeRHMufl5ufKkFiUxhHiQJcfDq1V3fyay4n518DFUdyCBe
+	IYKhe5ugN+mZAfvBWk2lJJ5hYa5P1AwiaMgNnGtsB9eEMfYw4zQUOs9jS+7Pqu2Or+EZrQo5Mzq
+	Mqg
+X-Received: by 2002:a05:690c:dd4:b0:79a:b75e:1509 with SMTP id 00721157ae682-7a4d6158cbamr36144717b3.43.1775230631157;
+        Fri, 03 Apr 2026 08:37:11 -0700 (PDT)
+Received: from gmail.com (172.165.85.34.bc.googleusercontent.com. [34.85.165.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7a3709075besm22668317b3.25.2026.04.03.08.37.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Apr 2026 08:37:10 -0700 (PDT)
+Date: Fri, 03 Apr 2026 11:37:10 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Joe Damato <joe@dama.to>, 
+ netdev@vger.kernel.org, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: andrew+netdev@lunn.ch, 
+ linux-kernel@vger.kernel.org, 
+ willemb@google.com, 
+ Joe Damato <joe@dama.to>, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.fd5e56c96ff3@gmail.com>
+In-Reply-To: <20260402232203.2004496-4-joe@dama.to>
+References: <20260402232203.2004496-1-joe@dama.to>
+ <20260402232203.2004496-4-joe@dama.to>
+Subject: Re: [net-next 3/3] selftests/net: Test PACKET_AUXDATA
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Exchange-RoutingPolicyChecked: Ib+OA+YNTzOS6BM6sKBl4zZf60EeHIzcbaXIta/H9EAJ9Jh4vwRpxJ30o6NNcijMfUIMO9W5UbpYzVt1/HW5MqmdqTB3ocqpadtZf+zY5Y2WuouKdTcqJz7nnUzfznODF0wRE2JjVff3LsfBVZMKxla2qWhDPMZk3SsHq36jI5y2BIj1ZgMPNtZvVEjChUi+0/QIK0Yv8GufVirxLmoYBcXZ9Yw71NGoKG6xoHePledq0BmUNk5DTTQ9waGg+i0NawGiL3f0w9AI3qw6TNCGb5aTOvs/F9+/PRrB06SldjPsaO30AyDnOuZAKKhmhGnueRi2k/ZXjmHSvtcDdk85/g==
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: da7a70e0-c461-44d6-e7e8-08de9196d2b9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Apr 2026 15:36:49.9536
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: wXnCO7igow5WGhdy+gCmwtQTqfySqqD4DJgBdgGKuVGLO2Y+PEfDuuKqFYMkRsUs0i1Fr0cKgClZInNRj9TpdE+vPoUbWb7r5GsIB0lhr3U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB7161
-X-OriginatorOrg: intel.com
-X-Spamd-Result: default: False [1.34 / 15.00];
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275111-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lunn.ch:email,IA3PR11MB8986.namprd11.prod.outlook.com:mid,intel.com:dkim,intel.com:email,osuosl.org:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275112-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[10]
-X-Rspamd-Queue-Id: AF102395E28
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dama.to:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 39790395E84
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-
-
-> -----Original Message-----
-> From: Tantilov, Emil S <emil.s.tantilov@intel.com>
-> Sent: Friday, April 3, 2026 5:36 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; Loktionov, Aleksandr
-> <aleksandr.loktionov@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch;
-> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> pabeni@redhat.com; richardcochran@gmail.com; Olech, Milena
-> <milena.olech@intel.com>; Keller, Jacob E <jacob.e.keller@intel.com>;
-> Ilichev, Konstantin <konstantin.ilichev@intel.com>
-> Subject: [PATCH iwl-net] idpf: fix read_dev_clk_lock spinlock init in
-> idpf_ptp_init()
->=20
-> In idpf_ptp_init(), read_dev_clk_lock is initialized after
-> ptp_schedule_worker() had already been called (and after
-> idpf_ptp_settime64() could reach the lock). The PTP aux worker fires
-> immediately upon scheduling and can call into
-> idpf_ptp_read_src_clk_reg_direct(), which takes
-> spin_lock(&ptp->read_dev_clk_lock) on an uninitialized lock,
-> triggering the lockdep "non-static key" warning:
->=20
-> [12973.796587] idpf 0000:83:00.0: Device HW Reset initiated
-> [12974.094507] INFO: trying to register non-static key.
-> ...
-> [12974.097208] Call Trace:
-> [12974.097213]  <TASK>
-> [12974.097218]  dump_stack_lvl+0x93/0xe0 [12974.097234]
-> register_lock_class+0x4c4/0x4e0 [12974.097249]  ?
-> __lock_acquire+0x427/0x2290 [12974.097259]  __lock_acquire+0x98/0x2290
-> [12974.097272]  lock_acquire+0xc6/0x310 [12974.097281]  ?
-> idpf_ptp_read_src_clk_reg+0xb7/0x150 [idpf] [12974.097311]  ?
-> lockdep_hardirqs_on_prepare+0xde/0x190
-> [12974.097318]  ? finish_task_switch.isra.0+0xd2/0x350
-> [12974.097330]  ? __pfx_ptp_aux_kworker+0x10/0x10 [ptp] [12974.097343]
-> _raw_spin_lock+0x30/0x40 [12974.097353]  ?
-> idpf_ptp_read_src_clk_reg+0xb7/0x150 [idpf] [12974.097373]
-> idpf_ptp_read_src_clk_reg+0xb7/0x150 [idpf] [12974.097391]  ?
-> kthread_worker_fn+0x88/0x3d0 [12974.097404]  ?
-> kthread_worker_fn+0x4e/0x3d0 [12974.097411]
-> idpf_ptp_update_cached_phctime+0x26/0x120 [idpf] [12974.097428]  ?
-> _raw_spin_unlock_irq+0x28/0x50 [12974.097436]
-> idpf_ptp_do_aux_work+0x15/0x20 [idpf] [12974.097454]
-> ptp_aux_kworker+0x20/0x40 [ptp] [12974.097464]
-> kthread_worker_fn+0xd5/0x3d0 [12974.097474]  ?
-> __pfx_kthread_worker_fn+0x10/0x10 [12974.097482]  kthread+0xf4/0x130
-> [12974.097489]  ? __pfx_kthread+0x10/0x10 [12974.097498]
-> ret_from_fork+0x32c/0x410 [12974.097512]  ? __pfx_kthread+0x10/0x10
-> [12974.097519]  ret_from_fork_asm+0x1a/0x30 [12974.097540]  </TASK>
->=20
-> Move the call to spin_lock_init() up a bit to make sure
-> read_dev_clk_lock is not touched before it's been initialized.
->=20
-> Fixes: 5cb8805d2366 ("idpf: negotiate PTP capabilities and get PTP
-> clock")
-> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
-> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+Joe Damato wrote:
+> Extend the packet socket selftest, adding a recvmsg path, to test
+> PACKET_AUXDATA. Check basic attributes of tpacket_auxdata.
+> 
+> Signed-off-by: Joe Damato <joe@dama.to>
 > ---
->  drivers/net/ethernet/intel/idpf/idpf_ptp.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-> b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-> index eec91c4f0a75..4a51d2727547 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
-> @@ -952,6 +952,8 @@ int idpf_ptp_init(struct idpf_adapter *adapter)
->  		goto free_ptp;
->  	}
->=20
-> +	spin_lock_init(&adapter->ptp->read_dev_clk_lock);
+>  tools/testing/selftests/net/psock_snd.c  | 57 ++++++++++++++++++++++--
+>  tools/testing/selftests/net/psock_snd.sh |  5 +++
+>  2 files changed, 59 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/psock_snd.c b/tools/testing/selftests/net/psock_snd.c
+> index 7bbce274b9f0..682e0afe364d 100644
+> --- a/tools/testing/selftests/net/psock_snd.c
+> +++ b/tools/testing/selftests/net/psock_snd.c
+> @@ -40,6 +40,7 @@ static bool	cfg_use_qdisc_bypass;
+>  static bool	cfg_use_vlan;
+>  static bool	cfg_use_vnet;
+>  static bool	cfg_drop;
+> +static bool	cfg_aux_data;
+>  
+>  static char	*cfg_ifname = "lo";
+>  static int	cfg_mtu	= 1500;
+> @@ -281,9 +282,26 @@ static int setup_rx(void)
+>  
+>  static void do_rx(int fd, int expected_len, char *expected)
+>  {
+> +	char cmsg_buf[1024] = {};
+> +	struct msghdr msg = {};
+> +	struct iovec iov[1];
+>  	int ret;
+>  
+> -	ret = recv(fd, rbuf, sizeof(rbuf), 0);
+> +	if (cfg_aux_data) {
+> +		iov[0].iov_base = rbuf;
+> +		iov[0].iov_len = sizeof(rbuf);
 > +
->  	err =3D idpf_ptp_create_clock(adapter);
->  	if (err)
->  		goto free_ptp;
-> @@ -977,8 +979,6 @@ int idpf_ptp_init(struct idpf_adapter *adapter)
->  			goto remove_clock;
+> +		msg.msg_iov = iov;
+> +		msg.msg_iovlen = 1;
+> +
+> +		msg.msg_control = cmsg_buf;
+> +		msg.msg_controllen = sizeof(cmsg_buf);
+> +
+> +		ret = recvmsg(fd, &msg, 0);
+> +	} else {
+> +		ret = recv(fd, rbuf, sizeof(rbuf), 0);
+> +	}
+> +
+>  	if (ret == -1)
+>  		error(1, errno, "recv");
+>  	if (ret != expected_len)
+> @@ -292,6 +310,31 @@ static void do_rx(int fd, int expected_len, char *expected)
+>  	if (memcmp(rbuf, expected, ret))
+>  		error(1, 0, "recv: data mismatch");
+>  
+> +	if (cfg_aux_data) {
+> +		struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
+> +		struct tpacket_auxdata *adata;
+> +
+> +		if (!cmsg)
+> +			error(1, 0, "auxdata null");
+> +
+> +		if (cmsg->cmsg_level != SOL_PACKET)
+> +			error(1, 0, "cmsg_level != SOL_PACKET");
+> +
+> +		if (cmsg->cmsg_type != PACKET_AUXDATA)
+> +			error(1, 0, "cmsg_type != PACKET_AUXDATA");
+> +
+> +		adata = (struct tpacket_auxdata *)CMSG_DATA(cmsg);
+> +
+> +		if (adata->tp_net != ETH_HLEN)
+> +			error(1, 0, "cmsg tp_net != ETH_HLEN");
+> +
+> +		if (adata->tp_len != expected_len)
+> +			error(1, 0, "cmsg tp_len != %u", expected_len);
+> +
+> +		if (adata->tp_snaplen != expected_len)
+> +			error(1, 0, "cmsg tp_snaplen != %u", expected_len);
+> +	}
+> +
+>  	fprintf(stderr, "rx: %u\n", ret);
+>  }
+>  
+> @@ -312,6 +355,10 @@ static int setup_sniffer(void)
+>  		if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &one, sizeof(one)))
+>  			error(1, errno, "setsockopt SO_RCVBUF");
+>  
+> +	if (cfg_aux_data)
+> +		if (setsockopt(fd, SOL_PACKET, PACKET_AUXDATA, &one, sizeof(one)))
+> +			error(1, errno, "setsockopt PACKET_AUXDATA");
+> +
+>  	pair_udp_setfilter(fd);
+>  	do_bind(fd);
+>  
+> @@ -322,8 +369,11 @@ static void parse_opts(int argc, char **argv)
+>  {
+>  	int c;
+>  
+> -	while ((c = getopt(argc, argv, "bcCdDgl:qt:vV")) != -1) {
+> +	while ((c = getopt(argc, argv, "abcCdDgl:qt:vV")) != -1) {
+>  		switch (c) {
+> +		case 'a':
+> +			cfg_aux_data = true;
+> +			break;
+>  		case 'b':
+>  			cfg_use_bind = true;
+>  			break;
+> @@ -436,7 +486,8 @@ static void run_test(void)
+>  		check_packet_stats(fds);
 >  	}
->=20
-> -	spin_lock_init(&adapter->ptp->read_dev_clk_lock);
-> -
->  	pci_dbg(adapter->pdev, "PTP init successful\n");
->=20
->  	return 0;
-> --
-> 2.37.3
+>  
+> -	do_rx(fdr, cfg_payload_len, tbuf + total_len - cfg_payload_len);
+> +	if (!cfg_aux_data)
+> +		do_rx(fdr, cfg_payload_len, tbuf + total_len - cfg_payload_len);
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Slight preference to instead detect that this is a read not from a packet
+socket and skip the cmsg processing inside do_rx as a result.
+
+A roundabout way would be using getsockname. Simpler may be just to pass a new
+boolean to do_rx is_psock or os.
 
