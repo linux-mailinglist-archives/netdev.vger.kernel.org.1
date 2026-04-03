@@ -1,246 +1,168 @@
-Return-Path: <netdev+bounces-275156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275157-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2KXsHKv4z2lT2AYAu9opvQ
-	(envelope-from <netdev+bounces-275156-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:28:11 +0200
+	id iJDKCMT8z2nt2AYAu9opvQ
+	(envelope-from <netdev+bounces-275157-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:45:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB7E1396FEC
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:28:10 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77FB03971ED
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:45:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C0D5D3024CB8
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 17:26:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 29768304CEA0
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 17:42:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684823CBE67;
-	Fri,  3 Apr 2026 17:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A85323D34B9;
+	Fri,  3 Apr 2026 17:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f+pEtDRk"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Mh84Q3qV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f227.google.com (mail-qt1-f227.google.com [209.85.160.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5EA2248A5;
-	Fri,  3 Apr 2026 17:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393E72FD665
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 17:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775237211; cv=none; b=uQS5JYSZ9ecAeixR8HWmug9E0zNIdGu3YqXrTzBlNSH4hAMa3QEH5aFw+d0i2VQwxHVl1X9en1qTkQ0mOV0282+l+RfY+w9+6+3dsyJPIJBRI+ewNlPFtr9RgC+ERG+7jnQrD/k/Bu704i64KhafhnzDSCXNCvEW6+B+/Smm8Uo=
+	t=1775238166; cv=none; b=oqA3kYdiO7ngvM54IpwPcDnhfMWpJtokQfOhNSK6K85IFiQUipyYoQpHkdEa90n0/OebJk+eovo386CnAzcSl81JbChDLdnw5RFLtigCSCxROQXveipsTb0mH0L5IHK9eiHyqdbdTmcRp8x71EBp9ZKt+4lxvCSfz0VbtJcNqdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775237211; c=relaxed/simple;
-	bh=M6p3JmmzQexUHfSoR1LIGJcF55doBeHtQAVLzRfQu3I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o4LV5dUQ4OTSInssWc7zSt/OLYf9C9kxJToJe+uBorYHs9BV6POEjgdS6dgkt8dJj65rekHKlJc9y/z3B2yWboQH6+XqqpjILD4JN5U8hlWKRd1aUAv5gqlqqL9auXLkMCcYOGC45++tMqfmoBs7oJIGC/MzQwPT5emkQIDoCKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f+pEtDRk; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775237210; x=1806773210;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=M6p3JmmzQexUHfSoR1LIGJcF55doBeHtQAVLzRfQu3I=;
-  b=f+pEtDRkR/TJ/eJmCypB3iLE+2pnWMC8CkJ8RtyFaOr1NSz8iXNoB92c
-   kMaPgjWeiCq06QIQJdrP8n/XgKLXE9yCbWKUnFMjATPDzypCI9xEtXrKj
-   rIAzSrnFn8dm6oMNtAQM5KHOIipBAd2/cyASCWJSSrC+OHcLVO2KjRFVI
-   rv3ViW754DeDWfTTA2XtHl+a1VJLCRpA/qAFcoQDJNEndysY3NyWkONbE
-   KIqmwZlYi4rF7LAEkUBQ3gFY2y2mCQ5EdiNZNdpcHPShYFicev1nKREfb
-   5jlkBeGMKZS2Bz+rgOVQOcm1Crb7QkCvzpqS0QypyNf4+Tlh3BbPsFYM3
-   w==;
-X-CSE-ConnectionGUID: F9RSWatfTRi45C3ENY46uA==
-X-CSE-MsgGUID: WDZN+ZL2QG+S+DRiVQgSpA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11748"; a="76192441"
-X-IronPort-AV: E=Sophos;i="6.23,158,1770624000"; 
-   d="scan'208";a="76192441"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2026 10:26:49 -0700
-X-CSE-ConnectionGUID: 8aLnb5V0QhqxJSY99LLsvw==
-X-CSE-MsgGUID: kWetgwjETliORgt530tEaQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,158,1770624000"; 
-   d="scan'208";a="257775807"
-Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2026 10:26:49 -0700
-Date: Fri, 3 Apr 2026 10:26:43 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>, Borislav Petkov <bp@alien8.de>
-Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Laight <david.laight.linux@gmail.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v9 07/10] x86/vmscape: Use static_call() for predictor
- flush
-Message-ID: <20260403172643.fs2voyiy2kk6yzcx@desk>
-References: <20260402-vmscape-bhb-v9-0-94d16bc29774@linux.intel.com>
- <20260402-vmscape-bhb-v9-7-94d16bc29774@linux.intel.com>
- <ac_UJx99kDJY8j3t@google.com>
- <20260403164432.ltnr5oupddscwaqu@desk>
+	s=arc-20240116; t=1775238166; c=relaxed/simple;
+	bh=tAGSpXhdVDSX8wYYXotCgauFP4oRTrKJ6O66vUCaq0g=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=FWZqplQ4pHHrct8M1YUs54H0kmu6a+/llKXtKKgzsYldCxMR5GS4q+Ey4DEOq/KP8hojLNPCJY3ou2PcWCxZbNAyBy8MglwX8YZH58wEDfIC1rRhd1+Y921AmH533TsA7iDSACK4IJQY9OajwPz0Y0K9/BTe79f1KM2ups7RigE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Mh84Q3qV; arc=none smtp.client-ip=209.85.160.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qt1-f227.google.com with SMTP id d75a77b69052e-5094e1d17d3so22476151cf.3
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 10:42:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775238164; x=1775842964;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SvahecaH4ymg3e/cRaPdM/4xoBXYGz6dVojdP7GAtmY=;
+        b=hP5/JaaPVXiJUUGXrXjq86FHKslpMR1jlVjQtuSbJi26Rt7r/M0Uqf3bcNuwWgyP3/
+         k0WDMWcDwusZEPr/FGpgRHSgqavFeiRZ2R1id8lEYZMJNIM4hlmykW1fDsfo8LLC/hF9
+         iYT/6hHrX+CTZ4Zjg2rOlK198dgcAuV/amDc41xEmHwV6eH1yh+BOgOm1cQeiW6sQ7v7
+         C3EwhXiusH1Tmcph8n9I3ksIVEpt71YQlunL0OlO8pX0dPW0vNvb/PIo/QLhZt2M0ESC
+         yWVNsGpA+p7RFIXavdSPd9wcXGaJAMw/Cfp/MfJqczFBeCNDwG4yV5MsIP9JqS9FehWJ
+         owQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVOEStpSYX+PZrDvV5ZjYtP3K89HIuNF7FjRnkwXBZrZSlZoa0xzp+88Gld/iCLkk5zSh5BPxk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxO0nZdWZGtsdpdJIvZSeprUf32+inLTWxVVoK9Q+SbctK+T1hX
+	7N9vWYec6r89fY4uWqOTBy6qY4QyE7qBa648+xZdRoesVkYa9Ij0SGt6UuVCdYBramOtAKpS03e
+	IJWPeig4Q8f51baot2Sr7ZvsRFZa0Zj0f/CN57Gb6e78RN7NHZSZogJ8LArNN8V6655bFbknH5l
+	JfTwWPjvU89LptDEFzSIv17zmqRMvaIxfo/kx0A6ymW5IWghH6PXLlv7WNHjdp2lg8FNi8D1C/P
+	QUPquk3gLE=
+X-Gm-Gg: ATEYQzy4K20Krb7pZTvsSLxhvGrs/miKAYhYxPtVxVD68mrWmU7pSrZxCE6rLej5Uiu
+	I8abG4RPbyTejzKEbYTWwiiIFdkpPzfogzeDoiisdYOrlenYwgAZGGGdvRWAKwoWMtpG92mrHTw
+	p09rBlu8gb3CQq4ISLPNI8xJ6iShXyjLXCtBZUbZTTKxNMLlMOD8rxUaaDkmKq6grBXgwbAH9Mk
+	JUhP9eJk/vLbpY9Gk7vidSLwh2ZUdtitl6RJ+0LHZLZR30BpkgzGRwl6LLaN8A2LmsEeXKrnsca
+	IFgDEbX49RxjvI1ZcFCmUz0a7lKtVbzLwxGpA/PhP78uj39HVVCTdX2kr3nJ+QVmk4J+jUpdaD4
+	wmSX+ke2BtrmSfuVOjSfjs7oDi5M+Fp68DZKDa4izRtVTctBluBvkuVXZ311LblxyW7K2BoSWre
+	27JOewcOmQO5kULd0wKFncCEDJzzp5gTx6hiqo2QwccXCF87rTnq2PpaG+
+X-Received: by 2002:ac8:7e91:0:b0:4ff:c08a:52c4 with SMTP id d75a77b69052e-50d62772eb2mr59928001cf.18.1775238163958;
+        Fri, 03 Apr 2026 10:42:43 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-24.dlp.protect.broadcom.com. [144.49.247.24])
+        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-50d712c0eccsm443721cf.21.2026.04.03.10.42.43
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 03 Apr 2026 10:42:43 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-dl1-f69.google.com with SMTP id a92af1059eb24-127133794b6so3166825c88.1
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 10:42:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1775238162; x=1775842962; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SvahecaH4ymg3e/cRaPdM/4xoBXYGz6dVojdP7GAtmY=;
+        b=Mh84Q3qVVrGxGiFZ62hu3GdzXTPhhpgeamzbxS+OX/9ry1Qz2DxGhCoc5zH1wcKt42
+         /1/sessotTZ0YuIOXVL2hbSYE/GQb7GAcU1e5hls+m0LJpEC7KDSBdOfZgXuON+amPdf
+         ldKsSHB9vplgt2FRb43GZ5YgvPPZdY5PlkqxM=
+X-Forwarded-Encrypted: i=1; AJvYcCVYGio86LVBv5iiaSQC7rNCeveSFsEn8FSBdxKfBCfqRZjOCm6+8nkL41UUxkRdw2X/+cZ0Qp4=@vger.kernel.org
+X-Received: by 2002:a05:7022:929:b0:119:e56c:18be with SMTP id a92af1059eb24-12bfb7986f7mr1657144c88.38.1775238161764;
+        Fri, 03 Apr 2026 10:42:41 -0700 (PDT)
+X-Received: by 2002:a05:7022:929:b0:119:e56c:18be with SMTP id a92af1059eb24-12bfb7986f7mr1657126c88.38.1775238161050;
+        Fri, 03 Apr 2026 10:42:41 -0700 (PDT)
+Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12bedd4e4e3sm4660164c88.1.2026.04.03.10.42.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Apr 2026 10:42:40 -0700 (PDT)
+From: Michael Chan <michael.chan@broadcom.com>
+To: mkubecek@suse.cz,
+	kuba@kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH] ethtool: Add 2 new link_ext_state names
+Date: Fri,  3 Apr 2026 10:42:00 -0700
+Message-ID: <20260403174200.1180275-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.45.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260403164432.ltnr5oupddscwaqu@desk>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275156-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[37];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,google.com,lwn.net,vger.kernel.org,intel.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275157-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_THREE(0.00)[3];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CB7E1396FEC
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 77FB03971ED
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 03, 2026 at 09:44:32AM -0700, Pawan Gupta wrote:
-> On Fri, Apr 03, 2026 at 07:52:23AM -0700, Sean Christopherson wrote:
-> > On Thu, Apr 02, 2026, Pawan Gupta wrote:
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -11463,7 +11463,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
-> > >  	 * set for the CPU that actually ran the guest, and not the CPU that it
-> > >  	 * may migrate to.
-> > >  	 */
-> > > -	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
-> > > +	if (vmscape_mitigation_enabled())
-> > 
-> > This is pretty lame.  It turns a statically patched MOV
-> 
-> Yes it is, this was done ...
-> 
-> >   11548		if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
-> >   11549			this_cpu_write(x86_ibpb_exit_to_user, true);
-> >      0x000000000003c57a <+858>:	movb   $0x1,%gs:0x0(%rip)        # 0x3c582 <vcpu_enter_guest+866>
-> > 
-> > into a function call and two sets of conditional branches.  And with mitigations
-> > enabled, that function call may trigger the wonderful unret insanity
-> > 
-> >   11548		if (vmscape_mitigation_enabled())
-> >      0x000000000003c575 <+853>:	call   0x3c57a <vcpu_enter_guest+858>
-> >      0x000000000003c57a <+858>:	test   %al,%al
-> >      0x000000000003c57c <+860>:	je     0x3c586 <vcpu_enter_guest+870>
-> > 
-> >   11549			this_cpu_write(x86_predictor_flush_exit_to_user, true);
-> >      0x000000000003c57e <+862>:	movb   $0x1,%gs:0x0(%rip)        # 0x3c586 <vcpu_enter_guest+870>
-> > 
-> > 
-> >   3166	{
-> >      0xffffffff81285320 <+0>:	endbr64
-> >      0xffffffff81285324 <+4>:	call   0xffffffff812aa5a0 <__fentry__>
-> > 
-> >   3167		return !!static_call_query(vmscape_predictor_flush);
-> >      0xffffffff81285329 <+9>:	mov    0x13a4f30(%rip),%rax        # 0xffffffff8262a260 <__SCK__vmscape_predictor_flush>
-> >      0xffffffff81285330 <+16>:	test   %rax,%rax
-> >      0xffffffff81285333 <+19>:	setne  %al
-> > 
-> >   3168	}
-> >      0xffffffff81285336 <+22>:	jmp    0xffffffff81db1e30 <__x86_return_thunk>
-> > 
-> > While this isn't KVM's super hot inner run loop, it's still very much a hot path.
-> > Even more annoying, KVM will eat the function call on kernels with CPU_MITIGATIONS=n.
-> > 
-> > I'd like to at least do something like the below to make the common case of
-> > multiple guest entry/exits more or less free, and to avoid the CALL+(UN)RET
-> > overhead, but trying to include linux/static_call.h in processor.h (or any other
-> > core x86 header) creates a cyclical dependency :-/
-> > 
-> > diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
-> > index 20ab4dd588c6..0dc0680a80f8 100644
-> > --- a/arch/x86/include/asm/processor.h
-> > +++ b/arch/x86/include/asm/processor.h
-> > @@ -36,6 +36,7 @@ struct vm86;
-> >  #include <linux/err.h>
-> >  #include <linux/irqflags.h>
-> >  #include <linux/mem_encrypt.h>
-> > +#include <linux/static_call.h>
-> >  
-> >  /*
-> >   * We handle most unaligned accesses in hardware.  On the other hand
-> > @@ -753,7 +754,11 @@ enum mds_mitigations {
-> >  };
-> >  
-> >  extern bool gds_ucode_mitigated(void);
-> > -extern bool vmscape_mitigation_enabled(void);
-> > +
-> > +static inline bool vmscape_mitigation_enabled(void)
-> > +{
-> > +       return !!static_call_query(vmscape_predictor_flush);
-> > +}
-> >  
-> >  /*
-> >   * Make previous memory operations globally visible before
-> > diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-> > index 366ebe1e1fb9..02bf626f0773 100644
-> > --- a/arch/x86/kernel/cpu/bugs.c
-> > +++ b/arch/x86/kernel/cpu/bugs.c
-> > @@ -148,6 +148,7 @@ DEFINE_STATIC_KEY_FALSE(switch_mm_cond_l1d_flush);
-> >   * sequence. This defaults to no mitigation.
-> >   */
-> >  DEFINE_STATIC_CALL_NULL(vmscape_predictor_flush, write_ibpb);
-> > +EXPORT_STATIC_CALL_GPL(vmscape_predictor_flush);
-> 
-> ... to avoid exporting the static key, so that modules (other than KVM)
-> cannot do static_call_update(vmscape_predictor_flush).
-> 
-> Peter suggested changes that allowed adding EXPORT_STATIC_CALL_FOR_KVM():
-> 
->   https://lore.kernel.org/all/20260319214409.GL3738786@noisy.programming.kicks-ass.net/
+Add the corresponding names for 2 recently added ethtool_link_ext_state
+enums from kernel commit bc87b14594e3:
 
-Sorry, this is the correct link for EXPORT_STATIC_CALL_FOR_KVM():
+ETHTOOL_LINK_EXT_STATE_OTP_SPEED_VIOLATION
+ETHTOOL_LINK_EXT_STATE_BMC_REQUEST_DOWN
 
-  https://lore.kernel.org/all/20260320062206.bdrnmnvho6lhmejw@desk/
+for OTP (one-time-programmable) speed restrictions and
+BMC (Baseboard management controller) forcing the link down.
 
-> EXPORT_STATIC_CALL_FOR_KVM() seems to be a cleaner approach to me.
-> 
-> Boris, I know you didn't like exporting the static_key. But, as Sean said
-> this is a hot path, and avoiding the unnecessary call would benefit all
-> CPUs (affected or unaffected). Moreover, EXPORT_STATIC_CALL_FOR_KVM()
-> somewhat addresses your concern of exporting the static_key to the world.
-> Would you be okay with it?
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+---
+ netlink/settings.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/netlink/settings.c b/netlink/settings.c
+index 05d215e..b5e44f2 100644
+--- a/netlink/settings.c
++++ b/netlink/settings.c
+@@ -671,6 +671,8 @@ static const char *const names_link_ext_state[] = {
+ 	[ETHTOOL_LINK_EXT_STATE_POWER_BUDGET_EXCEEDED]	= "Power budget exceeded",
+ 	[ETHTOOL_LINK_EXT_STATE_OVERHEAT]		= "Overheat",
+ 	[ETHTOOL_LINK_EXT_STATE_MODULE]			= "Module",
++	[ETHTOOL_LINK_EXT_STATE_OTP_SPEED_VIOLATION]	= "OTP speed violation",
++	[ETHTOOL_LINK_EXT_STATE_BMC_REQUEST_DOWN]	= "BMC request down",
+ };
+ 
+ static const char *const names_autoneg_link_ext_substate[] = {
+-- 
+2.51.0
+
 
