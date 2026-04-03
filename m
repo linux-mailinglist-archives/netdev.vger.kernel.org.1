@@ -1,262 +1,123 @@
-Return-Path: <netdev+bounces-275112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275113-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WBrLNV/gz2kS1gYAu9opvQ
-	(envelope-from <netdev+bounces-275112-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:44:31 +0200
+	id wNnRNNvez2mn1QYAu9opvQ
+	(envelope-from <netdev+bounces-275113-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:38:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39790395E84
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:44:31 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A463395D8F
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:38:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 33772304289D
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 15:37:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7C33F300C032
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 15:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700E93C3BF1;
-	Fri,  3 Apr 2026 15:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 863DE3BE145;
+	Fri,  3 Apr 2026 15:38:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X65IIqZe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ThexqAzw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A28134F48C
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 15:37:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D163B7748;
+	Fri,  3 Apr 2026 15:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775230633; cv=none; b=JQDYdHPqKZiwmzxRQBiJDV0Oe4chzH5TyYIgm1S2cDm9xzO+8vf5ugzwNrEgla9IoAPs7fSCOHwXu6KyRvbW+QiW8rIuCv1b7gwaAOu8gfm0mpIiaa8yfAFsY2eQ76/BL+2phT9k3hkL1whLiI3hrep+iMVIJcTzg9dbRQvyLg4=
+	t=1775230680; cv=none; b=A9qJQPELtdJ0jzuwILAMF8koNgScuCuxuVNGPRWqD6CVctWIKZkm5OABKQtRAL2vvhHLB9wB8cxrcu10TnQrCT+MC4rE6mDks3KuaKX+DU+rEPWuSHWCr4Vx6Z/6HdNBvTDCJJW18IncMapCYy8UFQRUuk/K6AIch1YbtvomZYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775230633; c=relaxed/simple;
-	bh=YZ9x9LlQUdaWzhrdGk3G6BEBa/K0v+Vx0017f8NKskQ=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ro8k3ybvNKnc7XOw4diWQvltSEbCNYS+/iVcN/LeLtRgQCbVUpJEEETWlfoEHRo1TDhtlkaPWyzJNBrIpkvVt7uSTNLyrifh9jtoSIPrvlUTC2NiZbfewafqHodz57/ID8lfAhSAHpjTwEcTPSsM5tCTh/nHHTMtkyvpP0h2cvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X65IIqZe; arc=none smtp.client-ip=74.125.224.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-6500040f128so1846342d50.0
-        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 08:37:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775230631; x=1775835431; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KpuvJuy/tFtXZE3ikq8tJ0F1YYf2MuYLH559k2dBC5U=;
-        b=X65IIqZeuVffj6BLMsybZKW9d7TTWuCd9/LMImdp7VgmNlg3MlwLn6+In6wGr3V2lK
-         jiFdCpcDAcyFszfFS45ZN5nC1p6kRYNNlo2uTKDV3c4IQIO9Nr31gFDvgAJ1WortHWaG
-         0Gzo9EqJRijdNOjpmRVpHiQqWQi3trkclj9lvI6eSLf+7AdIGqmifqULjOWAKIf435iI
-         LEQ8Ns/Cp7jDXaMRNtVt6obbsZhX4wU7mp13Vj6fC/fihrv+b/AGYZrwASnaWt/ZHbGd
-         0wTpb9oeFg5fBZ2ZzD7f/03qyxklPCHg8swgOC+t26uiDUaKTzDsBvRoO0aQ8gdvYqK2
-         Eo+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775230631; x=1775835431;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KpuvJuy/tFtXZE3ikq8tJ0F1YYf2MuYLH559k2dBC5U=;
-        b=dmx7kc2q6Xl3+HgwexoZiNkD5Jwl3OlkzXGlc2Lq9DURvzYUsL0UKa/S6dOB8qgkGm
-         IHXomVWc7rmnPjaH49J8UkIOMFw2d+ejIYKc3czPCcYl81RFJIxQ9ff/lIt6hjUll5WD
-         EWeYRulAGK0NIsQ0UDCBmrIMzMSnjeICYh00LbQOeiSkqh+1/vdbA4P5F2nb2/QGca1b
-         3TYytBkLPRKavHenynZpFLDp2URFuKQ8DpkSebpP2bLSNm6H0PV7tEnWjfGLvH3SqytM
-         sf3w8PknKV0R+YzpbzxRP5amF49txL0Jx6EOXTj7Ve1FboRhyQQ4bkLAN0tYdUyBgXLL
-         Kpiw==
-X-Forwarded-Encrypted: i=1; AJvYcCXkkz8eNl9H9FizYIVCpl+JAhimobRbjvnIWmHHVH+lvmRTNw4LNcRUP+VM6at0E982vUJXX2w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5nMNsaCCy2iL8fPY8OkN/W811ezSmS5sFn5lk+ESkPTLKhpuE
-	tXuRV9KP4GItt+OqA0DfApoOqosWc8JBegDum7bDj0rLuRY1JJxDPZVh
-X-Gm-Gg: AeBDieskBuIZKgRo1LMxez/hOPAzPH56nfy6G2yEBUPsyJnwMC3uIy7u3Bqbz68lzjK
-	5ob87oOJZQvmTp8yrXq674f4IZv3Vj4MVuk5PdXEnNSMxK4COdN9M0IsMMiHI3hbps8S+Lim5ms
-	HOWJ553htuJYRW+pDrQ3WnH7kioBJ/KxqC3rIUK+YWwV9nfW16ZCC9eydOdUxGp+5YLcP4vIkB/
-	Rq+dEutcQl7UAZb8KaSBOsfwiN1Qilj15Hl8vPA8R1BGJpKJiRlIXwDMWHnAcU5Al93VAqRgey6
-	b4SlauBzFtvPPQSbBi1x2i8bwQseKixk2xP9Lz6RlCZv7Hum8ahtQqjg270roQxPpWTo83EX5mE
-	GTaHdeHzOwJGaLgDoQni5cBpKWBElJeRHMufl5ufKkFiUxhHiQJcfDq1V3fyay4n518DFUdyCBe
-	IYKhe5ugN+mZAfvBWk2lJJ5hYa5P1AwiaMgNnGtsB9eEMfYw4zQUOs9jS+7Pqu2Or+EZrQo5Mzq
-	Mqg
-X-Received: by 2002:a05:690c:dd4:b0:79a:b75e:1509 with SMTP id 00721157ae682-7a4d6158cbamr36144717b3.43.1775230631157;
-        Fri, 03 Apr 2026 08:37:11 -0700 (PDT)
-Received: from gmail.com (172.165.85.34.bc.googleusercontent.com. [34.85.165.172])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7a3709075besm22668317b3.25.2026.04.03.08.37.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2026 08:37:10 -0700 (PDT)
-Date: Fri, 03 Apr 2026 11:37:10 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Joe Damato <joe@dama.to>, 
- netdev@vger.kernel.org, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>
-Cc: andrew+netdev@lunn.ch, 
- linux-kernel@vger.kernel.org, 
- willemb@google.com, 
- Joe Damato <joe@dama.to>, 
- linux-kselftest@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.fd5e56c96ff3@gmail.com>
-In-Reply-To: <20260402232203.2004496-4-joe@dama.to>
-References: <20260402232203.2004496-1-joe@dama.to>
- <20260402232203.2004496-4-joe@dama.to>
-Subject: Re: [net-next 3/3] selftests/net: Test PACKET_AUXDATA
+	s=arc-20240116; t=1775230680; c=relaxed/simple;
+	bh=YMdC88NfcjjBQdTnGVu7BwTVATQ44Rq3GhtgP2i+B+U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l0hVVIo+8a3O5iviQIAgwlKZ1GLUE9tzTI1XbLtCp5mFauugBHNiHd63ll/P/rfNoSgpfHxCKtwuMV40dA/Pn+T5PeIHL3pgQg36C5U/RrO/jNug/p46V710ZQ+5F2AoS7QQojOvxKBaLPG7U9pk6zsgCUkP57UbX4FjodHJswM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ThexqAzw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2EA5C4CEF7;
+	Fri,  3 Apr 2026 15:37:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775230680;
+	bh=YMdC88NfcjjBQdTnGVu7BwTVATQ44Rq3GhtgP2i+B+U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ThexqAzwKKdK4nfvw6o+40xhFNOQJOw6GykOUrMZRz0iIKLAgXAxOdN+xeQYB13jI
+	 r7Tf0tSMvugl/ff+pWIe+S1vbVmIujo6CoYjvSlesBkJPBsYJcudC0Gxoj/5MMvDOt
+	 OPFs2zrFtCnO/fp4RoTbztAVMo7FUsCmqFRzNYdAM8M9/62JTmG94cC2R1soParoeB
+	 vKRn1E4vcr/QS/GPA/PdMsqpgvPiNEQ2cb+Jfw+iqbaEaOcMFyHHKmxvzb3fXqkbGg
+	 tlOO1j+GcXgP5J0YQ8gYVCOp1DIFi9i1J7xvpWJjHEAPZzIw3xdZVADG58QHPYFvhT
+	 GP1dxVJSfFL9g==
+Date: Fri, 3 Apr 2026 16:37:55 +0100
+From: Simon Horman <horms@kernel.org>
+To: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Cc: Stefan Wahren <wahrenst@gmx.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net: qualcomm: qca_uart: report the consumed byte on RX
+ skb allocation failure
+Message-ID: <20260403153755.GK113102@horms.kernel.org>
+References: <20260402071207.4036-1-pengpeng@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260402071207.4036-1-pengpeng@iscas.ac.cn>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275112-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[gmx.net,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275113-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dama.to:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 39790395E84
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,horms.kernel.org:mid,iscas.ac.cn:email]
+X-Rspamd-Queue-Id: 7A463395D8F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Joe Damato wrote:
-> Extend the packet socket selftest, adding a recvmsg path, to test
-> PACKET_AUXDATA. Check basic attributes of tpacket_auxdata.
+On Thu, Apr 02, 2026 at 03:12:07PM +0800, Pengpeng Hou wrote:
+> qca_tty_receive() consumes each input byte before checking whether a
+> completed frame needs a fresh receive skb. When the current byte completes
+> a frame, the driver delivers that frame and then allocates a new skb for
+> the next one.
 > 
-> Signed-off-by: Joe Damato <joe@dama.to>
-> ---
->  tools/testing/selftests/net/psock_snd.c  | 57 ++++++++++++++++++++++--
->  tools/testing/selftests/net/psock_snd.sh |  5 +++
->  2 files changed, 59 insertions(+), 3 deletions(-)
+> If that allocation fails, the current code returns i even though data[i]
+> has already been consumed and may already have completed the delivered
+> frame. Since serdev interprets the return value as the number of accepted
+> bytes, this under-reports progress by one byte and can replay the final
+> byte of the completed frame into a fresh parser state on the next call.
 > 
-> diff --git a/tools/testing/selftests/net/psock_snd.c b/tools/testing/selftests/net/psock_snd.c
-> index 7bbce274b9f0..682e0afe364d 100644
-> --- a/tools/testing/selftests/net/psock_snd.c
-> +++ b/tools/testing/selftests/net/psock_snd.c
-> @@ -40,6 +40,7 @@ static bool	cfg_use_qdisc_bypass;
->  static bool	cfg_use_vlan;
->  static bool	cfg_use_vnet;
->  static bool	cfg_drop;
-> +static bool	cfg_aux_data;
->  
->  static char	*cfg_ifname = "lo";
->  static int	cfg_mtu	= 1500;
-> @@ -281,9 +282,26 @@ static int setup_rx(void)
->  
->  static void do_rx(int fd, int expected_len, char *expected)
->  {
-> +	char cmsg_buf[1024] = {};
-> +	struct msghdr msg = {};
-> +	struct iovec iov[1];
->  	int ret;
->  
-> -	ret = recv(fd, rbuf, sizeof(rbuf), 0);
-> +	if (cfg_aux_data) {
-> +		iov[0].iov_base = rbuf;
-> +		iov[0].iov_len = sizeof(rbuf);
-> +
-> +		msg.msg_iov = iov;
-> +		msg.msg_iovlen = 1;
-> +
-> +		msg.msg_control = cmsg_buf;
-> +		msg.msg_controllen = sizeof(cmsg_buf);
-> +
-> +		ret = recvmsg(fd, &msg, 0);
-> +	} else {
-> +		ret = recv(fd, rbuf, sizeof(rbuf), 0);
-> +	}
-> +
->  	if (ret == -1)
->  		error(1, errno, "recv");
->  	if (ret != expected_len)
-> @@ -292,6 +310,31 @@ static void do_rx(int fd, int expected_len, char *expected)
->  	if (memcmp(rbuf, expected, ret))
->  		error(1, 0, "recv: data mismatch");
->  
-> +	if (cfg_aux_data) {
-> +		struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
-> +		struct tpacket_auxdata *adata;
-> +
-> +		if (!cmsg)
-> +			error(1, 0, "auxdata null");
-> +
-> +		if (cmsg->cmsg_level != SOL_PACKET)
-> +			error(1, 0, "cmsg_level != SOL_PACKET");
-> +
-> +		if (cmsg->cmsg_type != PACKET_AUXDATA)
-> +			error(1, 0, "cmsg_type != PACKET_AUXDATA");
-> +
-> +		adata = (struct tpacket_auxdata *)CMSG_DATA(cmsg);
-> +
-> +		if (adata->tp_net != ETH_HLEN)
-> +			error(1, 0, "cmsg tp_net != ETH_HLEN");
-> +
-> +		if (adata->tp_len != expected_len)
-> +			error(1, 0, "cmsg tp_len != %u", expected_len);
-> +
-> +		if (adata->tp_snaplen != expected_len)
-> +			error(1, 0, "cmsg tp_snaplen != %u", expected_len);
-> +	}
-> +
->  	fprintf(stderr, "rx: %u\n", ret);
->  }
->  
-> @@ -312,6 +355,10 @@ static int setup_sniffer(void)
->  		if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &one, sizeof(one)))
->  			error(1, errno, "setsockopt SO_RCVBUF");
->  
-> +	if (cfg_aux_data)
-> +		if (setsockopt(fd, SOL_PACKET, PACKET_AUXDATA, &one, sizeof(one)))
-> +			error(1, errno, "setsockopt PACKET_AUXDATA");
-> +
->  	pair_udp_setfilter(fd);
->  	do_bind(fd);
->  
-> @@ -322,8 +369,11 @@ static void parse_opts(int argc, char **argv)
->  {
->  	int c;
->  
-> -	while ((c = getopt(argc, argv, "bcCdDgl:qt:vV")) != -1) {
-> +	while ((c = getopt(argc, argv, "abcCdDgl:qt:vV")) != -1) {
->  		switch (c) {
-> +		case 'a':
-> +			cfg_aux_data = true;
-> +			break;
->  		case 'b':
->  			cfg_use_bind = true;
->  			break;
-> @@ -436,7 +486,8 @@ static void run_test(void)
->  		check_packet_stats(fds);
->  	}
->  
-> -	do_rx(fdr, cfg_payload_len, tbuf + total_len - cfg_payload_len);
-> +	if (!cfg_aux_data)
-> +		do_rx(fdr, cfg_payload_len, tbuf + total_len - cfg_payload_len);
+> Return i + 1 in that failure path so the accepted-byte count matches the
+> actual receive-state progress.
+> 
+> Fixes: dfc768fbe618 ("net: qualcomm: add QCA7000 UART driver")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
 
-Slight preference to instead detect that this is a read not from a packet
-socket and skip the cmsg processing inside do_rx as a result.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-A roundabout way would be using getsockname. Simpler may be just to pass a new
-boolean to do_rx is_psock or os.
 
