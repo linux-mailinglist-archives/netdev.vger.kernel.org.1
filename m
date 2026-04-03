@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-275147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275148-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kANPOynwz2mt1wYAu9opvQ
-	(envelope-from <netdev+bounces-275147-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 18:51:53 +0200
+	id qC2iHmrwz2mt1wYAu9opvQ
+	(envelope-from <netdev+bounces-275148-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 18:52:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B0123969F7
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 18:51:53 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21E5A396A18
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 18:52:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BD7CC30BB4DA
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 16:44:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 0A3A130466C6
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 16:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37FA3CF671;
-	Fri,  3 Apr 2026 16:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E863D0909;
+	Fri,  3 Apr 2026 16:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="KhYjomze"
+	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="npZTOynJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201D93A8721
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 16:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C69F3CF057
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 16:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775234647; cv=none; b=iGsUEHy+a18o0gJLLph7/xwWErxyOxPAb9Tcd9FbXy0+McEX33lXl6Xq4WTEdWi3Vs3cNbW3woS17TgM3ueQb4FR/83uOT6QGxK8i8Yidr7SXFuU5DuHbE13R2MxtwER9oF359iAvx+cIXX82JAHsM/ieNtVy9KkmOI98ulsJGg=
+	t=1775234649; cv=none; b=LQZ3WtRqk5I08pNv6cfKxko5r/5+POP2SvgixGlq46fmi2LUEtKe+Sx1vJQpnJDZlqZPJubhCn980J1d9SjoJmJbOjlrGWmibu+7+cTyuMnKKNJKv3LNAChKFnmV8I5QJcSogvRwixaYZVkQU4nSr2OqYmqYzheOUPyh66v0OnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775234647; c=relaxed/simple;
-	bh=vDbmeaqL6j039OEqNItmPJ9fxW8hfiNnCv9Ev3C9C08=;
+	s=arc-20240116; t=1775234649; c=relaxed/simple;
+	bh=jUo7g6I6p1JHRet0ueHk1c8pIkO2J9jMZW92HH837/g=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=bFfL6Qq8aZXUduWLC9/sZEnlwxYAUofW/kZNJOGb3lTtWQzkQjgFuat5/vLYggnh+YhZTT7w4SmEUs4Da5LxGBVxrQPEdsEhR2HgkZkNekhvVB4Ii+xDP/1KKMvcRuvXiwD4p94mQQLSGbgsLL9m9REu63eF0HKJOoD5XsC66JU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=KhYjomze; arc=none smtp.client-ip=209.85.218.44
+	 In-Reply-To:To:Cc; b=Jn2EnEdfIcrP3SH5tUVouJTdgSsDQwTQKpiU5S28QfIOXPDcpihtXi1WuITEpuLyJQa6/EbneRz8lri5PVRh3nrN4wMQbdwyGkRAIxF+DclYpS/CkqQdIjyVjy1NTMAR2c5A1cxxwZc/ouEqEU9UTUzysXnvLKo5niWoFPk+1p4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=npZTOynJ; arc=none smtp.client-ip=209.85.218.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b9c745e18a0so166547066b.1
-        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 09:44:05 -0700 (PDT)
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b9c01854477so340663566b.0
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 09:44:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1775234644; x=1775839444; darn=vger.kernel.org;
+        d=fairphone.com; s=fair; t=1775234646; x=1775839446; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7CKDzUVCGIYSeYc4ZNCps7II5Y1x+X+SqlRkbx3cDqc=;
-        b=KhYjomzem+V7R0EavqlwkPcYjpOag4mY5muiXu/ykKnnWBmH9iwZFhAI+hgEccWVS3
-         65jYrBj+GQ0kS4rwxQtNavczRNoXqwR2selZv66jS4VAlE2gtfc5CTSCQ2tLp9lupyrg
-         ewZigJ3/noibsB3Qy8VmoDoe/9tihmzhAJfC4NCn2OQns23pSYQgNQ3K1PwobndPcWW0
-         guG9lrogxQ7zc7bWff4l4jsyGmCaYMgKOYbRlWNl56Q4QX6vyug7Ttrk5tm2YzkIZDnV
-         V5JuIlvYoB2rCkrFLuar5Knuv4QNf+2bnfvh+P3B8o4IQUI+sIj9kgQppisu4pECed45
-         EdkQ==
+        bh=QjmM2Mpf5DG2HMl6DFCBhwEENmYRUZMzi1UWvgQwg/I=;
+        b=npZTOynJAVlQA/w7DPNPyaTcZ2lY8vtTPgacoSer+GuOj+uOljtK37q/P4SRsF3KK9
+         wP0XN5+6dcN2/hiePC0xPn+4ShGmXKy6D1kJYSowSdJrFY13qPj2gB22+iyAKGz0M/ee
+         ZOuEpRDfOlgKV5O6wz71EeKK1ekZJNyuHdIrd1wDrTrmABYYvITjwzp/feoq7+BiVUfU
+         0MptLTtZHPQl52OuL1nQCAKDWJLKgyIisWkUL8Krnz+8sqpDwgdFWIDY1cx54cy3DLDo
+         H8TE82qFTDQkQ6I+RHUXX5u1EB3HZrSPsMQ0PD2br9hV4s+AXiMHSUhemLCNvjP9mPye
+         j/9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775234644; x=1775839444;
+        d=1e100.net; s=20251104; t=1775234646; x=1775839446;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=7CKDzUVCGIYSeYc4ZNCps7II5Y1x+X+SqlRkbx3cDqc=;
-        b=oLwSKyJRAL2/NtPnZCtVqYK0A8H9gT1MI9wnQAeavZF/n4dmJxegHlz3mGQsbJp3Wh
-         G7a4dY8DQGQg2vXsDj5oK37Qg5Po09VtPCxT7nOHnaNKr0peTvPKP4vnnjk6d3B1kmvU
-         KOOIcuYqi6Sl5MoDzBf3voseM5c4bX1QXCn79h8d5zK4H2eaITENl9BC6ODex0miV8Ur
-         2bRG5fmH8waJSfIa3KOCrOg/6WifITM8uo8vE4IHT8te2Q/OMkNM/jsQrVd7Pnr4O0yx
-         HIA+2DtDE4y74TDQetwMSdgpHP9jKKYPrwRPWMNVjRBvGwD2ZeZ4ZX4ktPwD9cGnZjXP
-         axAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUj65BHF5nmEicb19jq/LEQXwuzieU+MK2OFn5kSye9/ObJ0jeOt1ySOyt6LQfwlzvxaG/8n9c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSwe/jY0EO4x44GvHIXqw0Fpz3oe1juvcC/CwGZmt9gbf3BdX8
-	GQXguu/1JlnGKejLhZU+KKpaWlBL8NOLYoO3c+Gjgb8IYpF5/ajL7rUeXUypkADecF0=
-X-Gm-Gg: AeBDievU2vlG9t5DeQkGYKtphN0cjobZds9wzOhmo4MWctgzwnQxm1oBmad1opcVsBA
-	vD6i+/9VGdRYUiu9nxwT8UmToiGLMYO8X8gGdVuDBo0TThgIH6ziiemW16NIVPZasHN7OJGcUkO
-	NheOymFXX6STf/3x240l52h1cux1AANf0dv8pYDZtYifvWRMgcJFf/+TBISJXxYIWBsDHEjyY99
-	3jlTdQRvgg4nFJy7MBJP66FvRnQVnnXouB1heQc6kD4fcwY9FH6JB20hE1C/YOHzFRvkBpX2Sn2
-	+Gy41q/r9ZD9F347wUkopP5lqm5M2o6ThVksvqYcDP5vs7S4rvFm4ilLbFlNKFkjzNROXk2So+w
-	3KP8pCNJvxPDapNSV84s4dPJx7gf3H/vOldpIXRtRrD7/drV/o9udVZyxQZOChVsGlNzE8WVJ9H
-	rBR/k/UIyXtMTxW1y8IpRxGt2pkvu4KjOF8lf+Txdh6z6MhFHuYuDXrgO2r09GlJss0jy3P6VNM
-	5ytvNV7Y8kxgGpurBFZDq0aC78PR8KfGcFwxQ==
-X-Received: by 2002:a17:907:3d0c:b0:b9c:7b62:7bc9 with SMTP id a640c23a62f3a-b9c7b628bf4mr89943966b.11.1775234644481;
-        Fri, 03 Apr 2026 09:44:04 -0700 (PDT)
+        bh=QjmM2Mpf5DG2HMl6DFCBhwEENmYRUZMzi1UWvgQwg/I=;
+        b=GxcVscL3Oaj9gjswSyMC/G2srYlE3dtX2Om60vaEPyNgKclAVyXfjCbIKDUR4MELLd
+         x3QVq6rU/WZ34hOv0xfntCnl4tkeAtHEMRBd1oZ8oViRs8V+vapTIQtaB8x3TCu0AHAx
+         mIcjuFEjEVLEekB/EPMQ6Ql/PyKq0NU5Vfz4eYWxQGWPqxUXY9TC0d8ddg1AiR92A6kj
+         OYA/VnPd20US3djsBgyW/C7ZG5cHWd2Vvtidy56aHkoh7sue91pWEvHTTR36Szidrrg/
+         IR7/ZNbkKQfrTyp8tqjjO09Cow9XUABIDKE5Ce4BY1vdFSWPayhaNvC1aVabwVmu+dnq
+         vVLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVdSZtHiknWR2wYktvZ5fOvPF4beV12Dmw3fRBtBYRMcMc9YhDmsjAN8UDE6SXoCkmdiqCbo98=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrAN1NXUipOYm5p4DxafDFk8uO+DDVVz5li5LFBsEZuN1wPEyy
+	w14aOxLgkVjAGBTiIm/DAqA/uVHtfMooRfaqCW6E5PcMfqvcZH4ZVCw4ySeab9Mbm/E=
+X-Gm-Gg: AeBDiesy2uLbljx3V7u8LWPiDeZB3LFZM5qUdfw6Ykbgot3Df4c1oeaopFQdUxc7YJn
+	gZvRiuSogVvafqYErw6VEPxOlhyzxcUvJRnH0rVSTvsSY+wqbtzckGtZU/CbS4VoZxXNHtQNim3
+	yQMDIrTk81wcJdqhEBDk9fH14PC7VXAtqYyUJ7gI1YCfVcnVUq2izh3DgXZYM1COkzk0LcCqkl8
+	uVLbyPffUL3SPiSfbq84gMnQtIhemYTBS7TmNcBZQ2L9Kk6PK0yb/P9jgnbys+FF3ffpl0/n48d
+	QR5qJGtEUa+AGtolhE1u0HoZYc6xMWP3mz86xj3aKa2tLxEDTDyAo9R3SiD+e0mR4eY2naqmfhU
+	3c1g81ZsIs6e2TRKBN6EfCOlVbuszbtnIysTiaBF7eRx4HKOCIXn7lzGAO8Z+1PhuFJZa1SOGdU
+	jfwP/XiXGsRApjShGF6OorCJNiX1xnGCWVCNOQmcK5rHzpyD7CdWnKRmHdxDsxXXjg5uGsy0D/t
+	TmVWN3gH0YIs3Jgy006UUmxHMdIhUC7/Op3oaDSjMf6jsZg
+X-Received: by 2002:a17:907:6eab:b0:b98:4a7a:d5f8 with SMTP id a640c23a62f3a-b9c67a10a6fmr185072266b.46.1775234645548;
+        Fri, 03 Apr 2026 09:44:05 -0700 (PDT)
 Received: from otso.local (2001-1c00-3b89-c600-71a4-084f-6409-1447.cable.dynamic.v6.ziggo.nl. [2001:1c00:3b89:c600:71a4:84f:6409:1447])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9c3ca9a145sm213492566b.25.2026.04.03.09.44.03
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9c3ca9a145sm213492566b.25.2026.04.03.09.44.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 03 Apr 2026 09:44:04 -0700 (PDT)
 From: Luca Weiss <luca.weiss@fairphone.com>
-Date: Fri, 03 Apr 2026 18:43:49 +0200
-Subject: [PATCH 3/6] dt-bindings: net: qcom,ipa: add Milos compatible
+Date: Fri, 03 Apr 2026 18:43:50 +0200
+Subject: [PATCH 4/6] net: ipa: add IPA v5.2 configuration data
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,7 +88,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260403-milos-ipa-v1-3-01e9e4e03d3e@fairphone.com>
+Message-Id: <20260403-milos-ipa-v1-4-01e9e4e03d3e@fairphone.com>
 References: <20260403-milos-ipa-v1-0-01e9e4e03d3e@fairphone.com>
 In-Reply-To: <20260403-milos-ipa-v1-0-01e9e4e03d3e@fairphone.com>
 To: Alex Elder <elder@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -103,18 +103,18 @@ Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
  Luca Weiss <luca.weiss@fairphone.com>
 X-Mailer: b4 0.15.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1775234639; l=699;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1775234639; l=15389;
  i=luca.weiss@fairphone.com; s=20250611; h=from:subject:message-id;
- bh=vDbmeaqL6j039OEqNItmPJ9fxW8hfiNnCv9Ev3C9C08=;
- b=mXWJEgU3e2IoxjKyItffyoAa4WLNpmWiImybdREDj076J1O8EJOtjTJ/7E60j+8rTZskknyqm
- 86UuGN77F5JBZbIiCMC4s+p6WmmcYX3+n9viols85CSHwizdDPeijAs
+ bh=jUo7g6I6p1JHRet0ueHk1c8pIkO2J9jMZW92HH837/g=;
+ b=FFV557m6AuzXzr7rZcZPUpu6eFseOqmjavF2MzNSYrIvBbIFl1EDhWxwMFEJ8Yf1rL0hk93Or
+ hCbkN2iIGXDCmgefKfNZH9TcWhFG0l4wH++5hpdN2yWYR6hKMI3S6Ko
 X-Developer-Key: i=luca.weiss@fairphone.com; a=ed25519;
  pk=O1aw+AAust5lEmgrNJ1Bs7PTY0fEsJm+mdkjExA69q8=
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[fairphone.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[fairphone.com:s=fair];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -122,7 +122,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[19];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275147-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275148-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[fairphone.com:+];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -131,35 +131,586 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[luca.weiss@fairphone.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fairphone.com:dkim,fairphone.com:email,fairphone.com:mid]
-X-Rspamd-Queue-Id: 4B0123969F7
+	DBL_BLOCKED_OPENRESOLVER(0.00)[fairphone.com:dkim,fairphone.com:email,fairphone.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 21E5A396A18
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add support for the Milos SoC, which uses IPA v5.2.
+Add the configuration data required for IPA v5.2, which is used in
+the Qualcomm Milos SoC.
 
 Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
 ---
- Documentation/devicetree/bindings/net/qcom,ipa.yaml | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ipa/Makefile             |   2 +-
+ drivers/net/ipa/data/ipa_data-v5.2.c | 452 +++++++++++++++++++++++++++++++++++
+ drivers/net/ipa/gsi_reg.c            |   1 +
+ drivers/net/ipa/ipa_data.h           |   1 +
+ drivers/net/ipa/ipa_main.c           |   4 +
+ drivers/net/ipa/ipa_reg.c            |   1 +
+ drivers/net/ipa/ipa_sysfs.c          |   2 +
+ drivers/net/ipa/ipa_version.h        |   2 +
+ 8 files changed, 464 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/net/qcom,ipa.yaml b/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-index e4bb627e1757..fdeaa81b9645 100644
---- a/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-+++ b/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-@@ -44,6 +44,7 @@ properties:
-   compatible:
-     oneOf:
-       - enum:
-+          - qcom,milos-ipa
-           - qcom,msm8998-ipa
-           - qcom,sc7180-ipa
-           - qcom,sc7280-ipa
+diff --git a/drivers/net/ipa/Makefile b/drivers/net/ipa/Makefile
+index d3abb38633e0..e148ec3c1a10 100644
+--- a/drivers/net/ipa/Makefile
++++ b/drivers/net/ipa/Makefile
+@@ -7,7 +7,7 @@ IPA_REG_VERSIONS	:=	3.1 3.5.1 4.2 4.5 4.7 4.9 4.11 5.0 5.5
+ # Some IPA versions can reuse another set of GSI register definitions.
+ GSI_REG_VERSIONS	:=	3.1 3.5.1 4.0 4.5 4.9 4.11 5.0
+ 
+-IPA_DATA_VERSIONS	:=	3.1 3.5.1 4.2 4.5 4.7 4.9 4.11 5.0 5.5
++IPA_DATA_VERSIONS	:=	3.1 3.5.1 4.2 4.5 4.7 4.9 4.11 5.0 5.2 5.5
+ 
+ obj-$(CONFIG_QCOM_IPA)	+=	ipa.o
+ 
+diff --git a/drivers/net/ipa/data/ipa_data-v5.2.c b/drivers/net/ipa/data/ipa_data-v5.2.c
+new file mode 100644
+index 000000000000..c56c4f1836ae
+--- /dev/null
++++ b/drivers/net/ipa/data/ipa_data-v5.2.c
+@@ -0,0 +1,452 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2023-2024 Linaro Ltd.
++ * Copyright (c) 2026, Luca Weiss <luca.weiss@fairphone.com>
++ */
++
++#include <linux/array_size.h>
++#include <linux/log2.h>
++
++#include "../ipa_data.h"
++#include "../ipa_endpoint.h"
++#include "../ipa_mem.h"
++#include "../ipa_version.h"
++
++/** enum ipa_resource_type - IPA resource types for an SoC having IPA v5.2 */
++enum ipa_resource_type {
++	/* Source resource types; first must have value 0 */
++	IPA_RESOURCE_TYPE_SRC_PKT_CONTEXTS		= 0,
++	IPA_RESOURCE_TYPE_SRC_DESCRIPTOR_LISTS,
++	IPA_RESOURCE_TYPE_SRC_DESCRIPTOR_BUFF,
++	IPA_RESOURCE_TYPE_SRC_HPS_DMARS,
++	IPA_RESOURCE_TYPE_SRC_ACK_ENTRIES,
++
++	/* Destination resource types; first must have value 0 */
++	IPA_RESOURCE_TYPE_DST_DATA_SECTORS		= 0,
++	IPA_RESOURCE_TYPE_DST_DPS_DMARS,
++	IPA_RESOURCE_TYPE_DST_ULSO_SEGMENTS,
++};
++
++/* Resource groups used for an SoC having IPA v5.2 */
++enum ipa_rsrc_group_id {
++	/* Source resource group identifiers */
++	IPA_RSRC_GROUP_SRC_UL				= 0,
++	IPA_RSRC_GROUP_SRC_DL,
++	IPA_RSRC_GROUP_SRC_URLLC,
++	IPA_RSRC_GROUP_SRC_COUNT,	/* Last in set; not a source group */
++
++	/* Destination resource group identifiers */
++	IPA_RSRC_GROUP_DST_UL				= 0,
++	IPA_RSRC_GROUP_DST_DL,
++	IPA_RSRC_GROUP_DST_UNUSED_1,
++	IPA_RSRC_GROUP_DST_DRB_IP,
++	IPA_RSRC_GROUP_DST_COUNT,	/* Last; not a destination group */
++};
++
++/* QSB configuration data for an SoC having IPA v5.2 */
++static const struct ipa_qsb_data ipa_qsb_data[] = {
++	[IPA_QSB_MASTER_DDR] = {
++		.max_writes		= 13,
++		.max_reads		= 13,
++		.max_reads_beats	= 0,
++	},
++};
++
++/* Endpoint configuration data for an SoC having IPA v5.2 */
++static const struct ipa_gsi_endpoint_data ipa_gsi_endpoint_data[] = {
++	[IPA_ENDPOINT_AP_COMMAND_TX] = {
++		.ee_id		= GSI_EE_AP,
++		.channel_id	= 6,
++		.endpoint_id	= 9,
++		.toward_ipa	= true,
++		.channel = {
++			.tre_count	= 256,
++			.event_count	= 256,
++			.tlv_count	= 20,
++		},
++		.endpoint = {
++			.config = {
++				.resource_group	= IPA_RSRC_GROUP_SRC_UL,
++				.dma_mode	= true,
++				.dma_endpoint	= IPA_ENDPOINT_AP_LAN_RX,
++				.tx = {
++					.seq_type = IPA_SEQ_DMA,
++				},
++			},
++		},
++	},
++	[IPA_ENDPOINT_AP_LAN_RX] = {
++		.ee_id		= GSI_EE_AP,
++		.channel_id	= 7,
++		.endpoint_id	= 11,
++		.toward_ipa	= false,
++		.channel = {
++			.tre_count	= 256,
++			.event_count	= 256,
++			.tlv_count	= 9,
++		},
++		.endpoint = {
++			.config = {
++				.resource_group	= IPA_RSRC_GROUP_DST_UL,
++				.aggregation	= true,
++				.status_enable	= true,
++				.rx = {
++					.buffer_size	= 8192,
++					.pad_align	= ilog2(sizeof(u32)),
++					.aggr_time_limit = 500,
++				},
++			},
++		},
++	},
++	[IPA_ENDPOINT_AP_MODEM_TX] = {
++		.ee_id		= GSI_EE_AP,
++		.channel_id	= 5,
++		.endpoint_id	= 2,
++		.toward_ipa	= true,
++		.channel = {
++			.tre_count	= 512,
++			.event_count	= 512,
++			.tlv_count	= 25,
++		},
++		.endpoint = {
++			.filter_support	= true,
++			.config = {
++				.resource_group	= IPA_RSRC_GROUP_SRC_UL,
++				.checksum       = true,
++				.qmap		= true,
++				.status_enable	= true,
++				.tx = {
++					.seq_type = IPA_SEQ_2_PASS_SKIP_LAST_UC,
++					.status_endpoint =
++						IPA_ENDPOINT_MODEM_AP_RX,
++				},
++			},
++		},
++	},
++	[IPA_ENDPOINT_AP_MODEM_RX] = {
++		.ee_id		= GSI_EE_AP,
++		.channel_id	= 9,
++		.endpoint_id	= 18,
++		.toward_ipa	= false,
++		.channel = {
++			.tre_count	= 256,
++			.event_count	= 256,
++			.tlv_count	= 9,
++		},
++		.endpoint = {
++			.config = {
++				.resource_group	= IPA_RSRC_GROUP_DST_DL,
++				.checksum       = true,
++				.qmap		= true,
++				.aggregation	= true,
++				.rx = {
++					.buffer_size	= 8192,
++					.aggr_time_limit = 500,
++					.aggr_close_eof	= true,
++				},
++			},
++		},
++	},
++	[IPA_ENDPOINT_MODEM_AP_TX] = {
++		.ee_id		= GSI_EE_MODEM,
++		.channel_id	= 0,
++		.endpoint_id	= 7,
++		.toward_ipa	= true,
++		.endpoint = {
++			.filter_support	= true,
++		},
++	},
++	[IPA_ENDPOINT_MODEM_AP_RX] = {
++		.ee_id		= GSI_EE_MODEM,
++		.channel_id	= 7,
++		.endpoint_id	= 16,
++		.toward_ipa	= false,
++	},
++	[IPA_ENDPOINT_MODEM_DL_NLO_TX] = {
++		.ee_id		= GSI_EE_MODEM,
++		.channel_id	= 2,
++		.endpoint_id	= 10,
++		.toward_ipa	= true,
++		.endpoint = {
++			.filter_support	= true,
++		},
++	},
++};
++
++/* Source resource configuration data for an SoC having IPA v5.2 */
++static const struct ipa_resource ipa_resource_src[] = {
++	[IPA_RESOURCE_TYPE_SRC_PKT_CONTEXTS] = {
++		.limits[IPA_RSRC_GROUP_SRC_UL] = {
++			.min = 1,	.max = 7,
++		},
++		.limits[IPA_RSRC_GROUP_SRC_DL] = {
++			.min = 1,	.max = 7,
++		},
++		.limits[IPA_RSRC_GROUP_SRC_URLLC] = {
++			.min = 0,	.max = 5,
++		},
++	},
++	[IPA_RESOURCE_TYPE_SRC_DESCRIPTOR_LISTS] = {
++		.limits[IPA_RSRC_GROUP_SRC_UL] = {
++			.min = 8,	.max = 8,
++		},
++		.limits[IPA_RSRC_GROUP_SRC_DL] = {
++			.min = 8,	.max = 8,
++		},
++		.limits[IPA_RSRC_GROUP_SRC_URLLC] = {
++			.min = 8,	.max = 8,
++		},
++	},
++	[IPA_RESOURCE_TYPE_SRC_DESCRIPTOR_BUFF] = {
++		.limits[IPA_RSRC_GROUP_SRC_UL] = {
++			.min = 10,	.max = 10,
++		},
++		.limits[IPA_RSRC_GROUP_SRC_DL] = {
++			.min = 12,	.max = 12,
++		},
++		.limits[IPA_RSRC_GROUP_SRC_URLLC] = {
++			.min = 12,	.max = 12,
++		},
++	},
++	[IPA_RESOURCE_TYPE_SRC_HPS_DMARS] = {
++		.limits[IPA_RSRC_GROUP_SRC_UL] = {
++			.min = 0,	.max = 63,
++		},
++		.limits[IPA_RSRC_GROUP_SRC_DL] = {
++			.min = 0,	.max = 63,
++		},
++		.limits[IPA_RSRC_GROUP_SRC_URLLC] = {
++			.min = 0,	.max = 63,
++		},
++	},
++	[IPA_RESOURCE_TYPE_SRC_ACK_ENTRIES] = {
++		.limits[IPA_RSRC_GROUP_SRC_UL] = {
++			.min = 15,	.max = 15,
++		},
++		.limits[IPA_RSRC_GROUP_SRC_DL] = {
++			.min = 15,	.max = 15,
++		},
++		.limits[IPA_RSRC_GROUP_SRC_URLLC] = {
++			.min = 12,	.max = 12,
++		},
++	},
++};
++
++/* Destination resource configuration data for an SoC having IPA v5.2 */
++static const struct ipa_resource ipa_resource_dst[] = {
++	[IPA_RESOURCE_TYPE_DST_DATA_SECTORS] = {
++		.limits[IPA_RSRC_GROUP_DST_UL] = {
++			.min = 3,	.max = 3,
++		},
++		.limits[IPA_RSRC_GROUP_DST_DL] = {
++			.min = 3,	.max = 3,
++		},
++		.limits[IPA_RSRC_GROUP_DST_DRB_IP] = {
++			.min = 23,	.max = 23,
++		},
++	},
++	[IPA_RESOURCE_TYPE_DST_DPS_DMARS] = {
++		.limits[IPA_RSRC_GROUP_DST_UL] = {
++			.min = 1,	.max = 2,
++		},
++		.limits[IPA_RSRC_GROUP_DST_DL] = {
++			.min = 1,	.max = 2,
++		},
++	},
++	[IPA_RESOURCE_TYPE_DST_ULSO_SEGMENTS] = {
++		.limits[IPA_RSRC_GROUP_DST_UL] = {
++			.min = 1,	.max = 63,
++		},
++		.limits[IPA_RSRC_GROUP_DST_DL] = {
++			.min = 1,	.max = 63,
++		},
++	},
++};
++
++/* Resource configuration data for an SoC having IPA v5.2 */
++static const struct ipa_resource_data ipa_resource_data = {
++	.rsrc_group_dst_count	= IPA_RSRC_GROUP_DST_COUNT,
++	.rsrc_group_src_count	= IPA_RSRC_GROUP_SRC_COUNT,
++	.resource_src_count	= ARRAY_SIZE(ipa_resource_src),
++	.resource_src		= ipa_resource_src,
++	.resource_dst_count	= ARRAY_SIZE(ipa_resource_dst),
++	.resource_dst		= ipa_resource_dst,
++};
++
++/* IPA-resident memory region data for an SoC having IPA v5.2 */
++static const struct ipa_mem ipa_mem_local_data[] = {
++	{
++		.id		= IPA_MEM_UC_SHARED,
++		.offset		= 0x0000,
++		.size		= 0x0080,
++		.canary_count	= 0,
++	},
++	{
++		.id		= IPA_MEM_UC_INFO,
++		.offset		= 0x0080,
++		.size		= 0x0200,
++		.canary_count	= 0,
++	},
++	{
++		.id		= IPA_MEM_V4_FILTER_HASHED,
++		.offset		= 0x0288,
++		.size		= 0x0078,
++		.canary_count	= 2,
++	},
++	{
++		.id		= IPA_MEM_V4_FILTER,
++		.offset		= 0x0308,
++		.size		= 0x0078,
++		.canary_count	= 2,
++	},
++	{
++		.id		= IPA_MEM_V6_FILTER_HASHED,
++		.offset		= 0x0388,
++		.size		= 0x0078,
++		.canary_count	= 2,
++	},
++	{
++		.id		= IPA_MEM_V6_FILTER,
++		.offset		= 0x0408,
++		.size		= 0x0078,
++		.canary_count	= 2,
++	},
++	{
++		.id		= IPA_MEM_V4_ROUTE_HASHED,
++		.offset		= 0x0488,
++		.size		= 0x0098,
++		.canary_count	= 2,
++	},
++	{
++		.id		= IPA_MEM_V4_ROUTE,
++		.offset		= 0x0528,
++		.size		= 0x0098,
++		.canary_count	= 2,
++	},
++	{
++		.id		= IPA_MEM_V6_ROUTE_HASHED,
++		.offset		= 0x05c8,
++		.size		= 0x0098,
++		.canary_count	= 2,
++	},
++	{
++		.id		= IPA_MEM_V6_ROUTE,
++		.offset		= 0x0668,
++		.size		= 0x0098,
++		.canary_count	= 2,
++	},
++	{
++		.id		= IPA_MEM_MODEM_HEADER,
++		.offset		= 0x0708,
++		.size		= 0x0240,
++		.canary_count	= 2,
++	},
++	{
++		.id		= IPA_MEM_AP_HEADER,
++		.offset		= 0x0948,
++		.size		= 0x01e0,
++		.canary_count	= 0,
++	},
++	{
++		.id		= IPA_MEM_MODEM_PROC_CTX,
++		.offset		= 0x0b40,
++		.size		= 0x0b20,
++		.canary_count	= 2,
++	},
++	{
++		.id		= IPA_MEM_AP_PROC_CTX,
++		.offset		= 0x1660,
++		.size		= 0x0200,
++		.canary_count	= 0,
++	},
++	{
++		.id		= IPA_MEM_STATS_QUOTA_MODEM,
++		.offset		= 0x1868,
++		.size		= 0x0060,
++		.canary_count	= 2,
++	},
++	{
++		.id		= IPA_MEM_STATS_QUOTA_AP,
++		.offset		= 0x18c8,
++		.size		= 0x0048,
++		.canary_count	= 0,
++	},
++	{
++		.id		= IPA_MEM_STATS_TETHERING,
++		.offset		= 0x1910,
++		.size		= 0x03c0,
++		.canary_count	= 0,
++	},
++	{
++		.id		= IPA_MEM_STATS_FILTER_ROUTE,
++		.offset		= 0x1cd0,
++		.size		= 0x0ba0,
++		.canary_count	= 0,
++	},
++	{
++		.id		= IPA_MEM_STATS_DROP,
++		.offset		= 0x2870,
++		.size		= 0x0020,
++		.canary_count	= 0,
++	},
++	{
++		.id		= IPA_MEM_MODEM,
++		.offset		= 0x2898,
++		.size		= 0x0d48,
++		.canary_count	= 2,
++	},
++	{
++		.id		= IPA_MEM_NAT_TABLE,
++		.offset		= 0x35e0,
++		.size		= 0x0900,
++		.canary_count	= 0,
++	},
++	{
++		.id		= IPA_MEM_PDN_CONFIG,
++		.offset		= 0x3ee8,
++		.size		= 0x0100,
++		.canary_count	= 2,
++	},
++};
++
++/* Memory configuration data for an SoC having IPA v5.2 */
++static const struct ipa_mem_data ipa_mem_data = {
++	.local_count	= ARRAY_SIZE(ipa_mem_local_data),
++	.local		= ipa_mem_local_data,
++	.smem_size	= 0x0000b000,
++};
++
++/* Interconnect rates are in 1000 byte/second units */
++static const struct ipa_interconnect_data ipa_interconnect_data[] = {
++	{
++		.name			= "memory",
++		.peak_bandwidth		= 1300000,	/* 1.3 GBps */
++		.average_bandwidth	= 600000,	/* 600 MBps */
++	},
++	/* Average rate is unused for the next interconnect */
++	{
++		.name			= "config",
++		.peak_bandwidth		= 76800,	/* 76.8 MBps */
++		.average_bandwidth	= 0,		/* unused */
++	},
++};
++
++/* Clock and interconnect configuration data for an SoC having IPA v5.2 */
++static const struct ipa_power_data ipa_power_data = {
++	.core_clock_rate	= 120 * 1000 * 1000,	/* Hz */
++	.interconnect_count	= ARRAY_SIZE(ipa_interconnect_data),
++	.interconnect_data	= ipa_interconnect_data,
++};
++
++/* Configuration data for an SoC having IPA v5.2. */
++const struct ipa_data ipa_data_v5_2 = {
++	.version		= IPA_VERSION_5_2,
++	.qsb_count		= ARRAY_SIZE(ipa_qsb_data),
++	.qsb_data		= ipa_qsb_data,
++	.modem_route_count	= 11,
++	.endpoint_count		= ARRAY_SIZE(ipa_gsi_endpoint_data),
++	.endpoint_data		= ipa_gsi_endpoint_data,
++	.resource_data		= &ipa_resource_data,
++	.mem_data		= &ipa_mem_data,
++	.power_data		= &ipa_power_data,
++};
+diff --git a/drivers/net/ipa/gsi_reg.c b/drivers/net/ipa/gsi_reg.c
+index 825598661188..e13cf835a013 100644
+--- a/drivers/net/ipa/gsi_reg.c
++++ b/drivers/net/ipa/gsi_reg.c
+@@ -110,6 +110,7 @@ static const struct regs *gsi_regs(struct gsi *gsi)
+ 		return &gsi_regs_v4_11;
+ 
+ 	case IPA_VERSION_5_0:
++	case IPA_VERSION_5_2:
+ 	case IPA_VERSION_5_5:
+ 		return &gsi_regs_v5_0;
+ 
+diff --git a/drivers/net/ipa/ipa_data.h b/drivers/net/ipa/ipa_data.h
+index f3bdc64cef05..3eb9dc2ce339 100644
+--- a/drivers/net/ipa/ipa_data.h
++++ b/drivers/net/ipa/ipa_data.h
+@@ -253,6 +253,7 @@ extern const struct ipa_data ipa_data_v4_7;
+ extern const struct ipa_data ipa_data_v4_9;
+ extern const struct ipa_data ipa_data_v4_11;
+ extern const struct ipa_data ipa_data_v5_0;
++extern const struct ipa_data ipa_data_v5_2;
+ extern const struct ipa_data ipa_data_v5_5;
+ 
+ #endif /* _IPA_DATA_H_ */
+diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
+index edead9c48d1f..8e2b4bf7b14e 100644
+--- a/drivers/net/ipa/ipa_main.c
++++ b/drivers/net/ipa/ipa_main.c
+@@ -669,6 +669,10 @@ static const struct of_device_id ipa_match[] = {
+ 		.compatible	= "qcom,sdx65-ipa",
+ 		.data		= &ipa_data_v5_0,
+ 	},
++	{
++		.compatible	= "qcom,milos-ipa",
++		.data		= &ipa_data_v5_2,
++	},
+ 	{
+ 		.compatible	= "qcom,sm8550-ipa",
+ 		.data		= &ipa_data_v5_5,
+diff --git a/drivers/net/ipa/ipa_reg.c b/drivers/net/ipa/ipa_reg.c
+index c574f798fdc9..30bd69f4c147 100644
+--- a/drivers/net/ipa/ipa_reg.c
++++ b/drivers/net/ipa/ipa_reg.c
+@@ -125,6 +125,7 @@ static const struct regs *ipa_regs(enum ipa_version version)
+ 	case IPA_VERSION_4_11:
+ 		return &ipa_regs_v4_11;
+ 	case IPA_VERSION_5_0:
++	case IPA_VERSION_5_2:
+ 		return &ipa_regs_v5_0;
+ 	case IPA_VERSION_5_5:
+ 		return &ipa_regs_v5_5;
+diff --git a/drivers/net/ipa/ipa_sysfs.c b/drivers/net/ipa/ipa_sysfs.c
+index a53e9e6f6cdf..8b805a9d49e6 100644
+--- a/drivers/net/ipa/ipa_sysfs.c
++++ b/drivers/net/ipa/ipa_sysfs.c
+@@ -39,6 +39,8 @@ static const char *ipa_version_string(struct ipa *ipa)
+ 		return "5.0";
+ 	case IPA_VERSION_5_1:
+ 		return "5.1";
++	case IPA_VERSION_5_2:
++		return "5.2";
+ 	case IPA_VERSION_5_5:
+ 		return "5.5";
+ 	default:
+diff --git a/drivers/net/ipa/ipa_version.h b/drivers/net/ipa/ipa_version.h
+index 38c47f51a50c..c157c72a5bad 100644
+--- a/drivers/net/ipa/ipa_version.h
++++ b/drivers/net/ipa/ipa_version.h
+@@ -23,6 +23,7 @@
+  * @IPA_VERSION_4_11:	IPA version 4.11/GSI version 2.11 (2.1.1)
+  * @IPA_VERSION_5_0:	IPA version 5.0/GSI version 3.0
+  * @IPA_VERSION_5_1:	IPA version 5.1/GSI version 3.0
++ * @IPA_VERSION_5_2:	IPA version 5.2/GSI version 5.2
+  * @IPA_VERSION_5_5:	IPA version 5.5/GSI version 5.5
+  * @IPA_VERSION_COUNT:	Number of defined IPA versions
+  *
+@@ -43,6 +44,7 @@ enum ipa_version {
+ 	IPA_VERSION_4_11,
+ 	IPA_VERSION_5_0,
+ 	IPA_VERSION_5_1,
++	IPA_VERSION_5_2,
+ 	IPA_VERSION_5_5,
+ 	IPA_VERSION_COUNT,			/* Last; not a version */
+ };
 
 -- 
 2.53.0
