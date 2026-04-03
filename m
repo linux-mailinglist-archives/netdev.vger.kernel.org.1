@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-275123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275124-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wMaqAPbjz2kS1gYAu9opvQ
-	(envelope-from <netdev+bounces-275123-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:59:50 +0200
+	id aPnXIC3lz2kS1gYAu9opvQ
+	(envelope-from <netdev+bounces-275124-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 18:05:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6940939608A
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:59:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BF02396106
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 18:05:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DED5C301B4C5
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 15:59:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A118D3008D0B
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 16:02:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43EC3C3432;
-	Fri,  3 Apr 2026 15:59:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7A743C7DF1;
+	Fri,  3 Apr 2026 16:02:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tFn92LJE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h+T2BHhW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C152C36D9E0
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 15:59:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38213C3C14;
+	Fri,  3 Apr 2026 16:02:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775231985; cv=none; b=Kz0rt8q9xu/Rz7AprI2IATNy5o7lSCtqX+qIZtW+XOlx8u1CEdMUGvhvedDCtuPvZYIlxnIL0J/7oRBdjYx43U7LxIRxmSgpo+d8GQg8yGWCYL7U0vhO/p8OQU23wRuUhVZ8rxqAzVaeeiiRd7GuJXR+PM6eVfB2OioJgDYDq/M=
+	t=1775232173; cv=none; b=Hv1ga3Zx48zDyAJF+KL62/9J1zjZpUDkN+Pq1xErRVnyg++hYirYpIHJBf/3mSQTo26KMMUkZEMlsTMMAuiqxE4hKnMaYBbGwL+tVrsdutUrL/cUatx6Jq67cCOggK81tBU6N4hYOF/wsUqPLTUINni8KYZEOkroE6ZUDXnX980=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775231985; c=relaxed/simple;
-	bh=COo09iCY2logus3uHqYWMR//alvUs6Kkf79Mc55dc4s=;
+	s=arc-20240116; t=1775232173; c=relaxed/simple;
+	bh=BNPbGQtpMtb7EJLXPZZidRn5FnuViXRDcfBMEOcMpoM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f6MujFNppgrYQQZc0qSaGs++8QhiiOZBTWQ9cg1D/4JtSNRRIKvjzPiqVbBogkPgKkn3PsCFBa0vTul27FC0E/1tFDqddXH11PPXcmZiPSdT1oas+XP3wkoOM3/UEuPpGf+1ZAdqO30qnF5EQG2vhhqQSZR6j+ebY8KLO07JfVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tFn92LJE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8E1EC4CEF7;
-	Fri,  3 Apr 2026 15:59:43 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=A9WL63W7x+xbJ6wQzy2KlPkwloWXpI/OVqE9D02oC3fuBB2hU/eBXPRvYyLr5h0VicKwFj4/eYsgIX7tko1KdFYB/Nqk3Mv+6c28PdWgr1w5wRh97SY0AjOU23CiD66HF7hf8VJ6Nla/1cvCcy0WGGjnpOtVELzYh1EGIHlvCRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h+T2BHhW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DE9AC4CEF7;
+	Fri,  3 Apr 2026 16:02:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775231985;
-	bh=COo09iCY2logus3uHqYWMR//alvUs6Kkf79Mc55dc4s=;
+	s=k20201202; t=1775232173;
+	bh=BNPbGQtpMtb7EJLXPZZidRn5FnuViXRDcfBMEOcMpoM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tFn92LJEpKEvuwYyt5u85xBMTrit5kKNA+hVNRjjAk7Op4bibl3p4f3WW/TT+YdLC
-	 7hg7Ridbk6/AF4fu9lWCmF8bWCWemozfxOFe2C66HEjF9txzh89W+mz5eZG7dDXGdA
-	 wbcqrssVL6vlvMw+xp4+2etaM38NyFWISHEHc8ZVbuEokLgWgZkYGG335JMgQwniro
-	 djDkVKdqcoCb0BZykNePdSc74W5aA5PbUHLBicYihiF+db8ZnWezpW8r8gBC0YmqT9
-	 4CjMsiELg3yxPDyexJ5ifToKd7r0D8PKrIP+I12r7sVNKR4L4bGF6/LRgYNyfW2ZHX
-	 TYuPw/1KtYidA==
-Date: Fri, 3 Apr 2026 16:59:41 +0100
+	b=h+T2BHhW+QNMdiKBVw4bPtbVkFy0PePJKkJXdRp6yu2l4mvddNz380uIuM/oK/wDe
+	 pKAKNLZ9I0IWO+BLyDnNSQAC3nJbK0SthBdWGVvhCjAu6HJkyAwvdohNPnzxCP3Xxm
+	 1Ur9EEdoIWyVV6CHt2Xi4xLAfpjR/YVfgxs/CRlAVNFNAk/JTmaX5V+Ig0bQG6eumo
+	 A6Y5Qwt4P8A2a4Bu+zkHEJHpNyElmTqfSPAjRRRMaX/tYEwGWIaOWvl6K+IZ5Fvt2Z
+	 AwfigUc8ltso8I5SJmTVFxOtC/GZEsAmkD9iS9dhNVHeBS/L2RZlrvmnioLOvWEtdE
+	 Hh0zd3XHG5bzQ==
+Date: Fri, 3 Apr 2026 17:02:48 +0100
 From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: airoha: Fix memory leak in
- airoha_qdma_rx_process()
-Message-ID: <20260403155941.GM113102@horms.kernel.org>
-References: <20260402-airoha_qdma_rx_process-mem-leak-fix-v1-1-b5706f402d3c@kernel.org>
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: fec: make FIXED_PHY dependency unconditional
+Message-ID: <20260403160248.GN113102@horms.kernel.org>
+References: <20260402141048.2713445-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,51 +65,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260402-airoha_qdma_rx_process-mem-leak-fix-v1-1-b5706f402d3c@kernel.org>
+In-Reply-To: <20260402141048.2713445-1-arnd@kernel.org>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275123-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,arndb.de,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275124-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 6940939608A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7BF02396106
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 02, 2026 at 02:57:10PM +0200, Lorenzo Bianconi wrote:
-> If an error occurs on the subsequents buffers belonging to the
-> non-linear part of the skb (e.g. due to an error in the payload length
-> reported by the NIC or if we consumed all the available fragments for
-> the skb), the page_pool fragment will not be linked to the skb so it will
-> not return to the pool in the airoha_qdma_rx_process() error path. Fix the
-> memory leak partially reverting commit 'd6d2b0e1538d ("net: airoha: Fix
-> page recycling in airoha_qdma_rx_process()")' and always running
-> page_pool_put_full_page routine in the airoha_qdma_rx_process() error
-> path.
+On Thu, Apr 02, 2026 at 04:10:40PM +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> Fixes: d6d2b0e1538d ("net: airoha: Fix page recycling in airoha_qdma_rx_process()")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> When CONFIG_FIXED_PHY is in a loadable module, the fec driver cannot be
+> built-in any more:
+> 
+> x86_64-linux-ld: vmlinux.o: in function `fec_enet_mii_probe':
+> fec_main.c:(.text+0xc4f367): undefined reference to `fixed_phy_unregister'
+> x86_64-linux-ld: vmlinux.o: in function `fec_enet_close':
+> fec_main.c:(.text+0xc59591): undefined reference to `fixed_phy_unregister'
+> x86_64-linux-ld: vmlinux.o: in function `fec_enet_mii_probe.cold':
+> 
+> Select the fixed phy support on all targets to make this build
+> correctly, not just on coldfire.
+> 
+> Notat that Essentially the stub helpers in include/linux/phy_fixed.h
+> cannot be used correctly because of this build time dependency,
+> and we could just remove them to hit the build failure more often
+> when a driver uses them without the 'select FIXED_PHY'.
+> 
+> Fixes: dc86b621e1b4 ("net: fec: register a fixed phy using fixed_phy_register_100fd if needed")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> I sent the same fix for B44 earlier, see commit 3f0f591b44b0 ("net: b44:
+> always select CONFIG_FIXED_PHY"). I checked that there are no other
+> conditional users of FIXED_PHY this time.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
