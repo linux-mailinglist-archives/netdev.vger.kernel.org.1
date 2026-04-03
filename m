@@ -1,415 +1,260 @@
-Return-Path: <netdev+bounces-274843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274844-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GH6DLIofz2latAYAu9opvQ
-	(envelope-from <netdev+bounces-274843-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 04:01:46 +0200
+	id 8ORhGf8fz2latAYAu9opvQ
+	(envelope-from <netdev+bounces-274844-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 04:03:43 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06BC6390373
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 04:01:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2CC43903D5
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 04:03:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 07CA53015C9E
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 01:59:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6485530265B6
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 02:02:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B895347500;
-	Fri,  3 Apr 2026 01:59:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55C630F7F2;
+	Fri,  3 Apr 2026 02:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o0Qfm/Um"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EC3C2lkq"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC36239E6C
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 01:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEB312D1F1;
+	Fri,  3 Apr 2026 02:02:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775181572; cv=none; b=X6Wx5bOvgN3GFq0fsqySxMO1NYeNKGd10Qmg293WE8b8yTZig9Ml4WDpiMOebtB/t8z7JiyVRDTTNoCFOROuEsKKuui7gkedcEyUxte42EqLEwrrhPFRvshoaWWere+Gc+9NhW85dRx/n8BugsPuPN6htM51iSpJqQNe3GoULWo=
+	t=1775181742; cv=none; b=q8GpJeSJ96W/ldXHEl7V2DbJuEnEdVcAyD5rNNLeSi6/EzqMKPS+aOsS5m3bIM2cs1Qx6WM2ZJDjjYGwtHZIQjir9VFDWWbdPPTkEr3Y/MV/dQsgBzeNRVwbjZcsecWBTLc6TOTl3FYwj64uGj+tDARtOtXGxLezIcBNAUtvyvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775181572; c=relaxed/simple;
-	bh=6dUxBEDNhW3MAetY24cgrY8xNq1MWn81ZBJDWtio8p4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S8BpgPBvnJzAJ0Y8ce0fVS6M66mAUE0F5rXbaWWeGUuEd1bcQBByhMRdqqGh404HzmB1kwOfhZJjiwRMeXifkvwqSIlH8/bdAS+pTfqktUvh4QtjEYbWmyJEUxBm+utuh25ryI2dkSZmM/5ypjMRQ3zoIIpkH3NuWYik/MEnPY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o0Qfm/Um; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775181568;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KMC42uovtC+rXRmpj5Y4SdXYF7vXj1Ojer2G7+inVAQ=;
-	b=o0Qfm/Uml6zzuXZ69wu5qu5PdL5IfozbvjsACDlayqjJfhIRvFfoRfmGZaKITRmjg/IxuM
-	FOoIZWi8cIy/cjUjxW07LfbxPeO6qgWk4L4gfsWgUQ2WnJr7Jj548W4fXGncxFLxEMplzW
-	ax8E6AcfoKy52bO4bXrM5IQc4JyDTBg=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: bpf@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf v6 2/2] selftests/bpf: Add protocol check test for bpf_sk_assign_tcp_reqsk()
-Date: Fri,  3 Apr 2026 09:58:28 +0800
-Message-ID: <20260403015851.148209-3-jiayuan.chen@linux.dev>
-In-Reply-To: <20260403015851.148209-1-jiayuan.chen@linux.dev>
-References: <20260403015851.148209-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1775181742; c=relaxed/simple;
+	bh=hBW6F4YpD0yqJIg2zZyuPH27KccORAZiNhePtVabi0s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QsyH1ZoA8cGJzTle7HlmRVp4z0+enCLRkrhzLF5rNP1kbbcHIwljg9yvVG4DJoanHPFC7cX9ChJUr5zIbIph0ny9pcr8uKYmBSc5EorMHYTJOr5qA7vKdEHCOQUc+LpDZfBdhl7/twQNE8QbQBG7qA0esGztKAsoBOXNKSKMkmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EC3C2lkq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA79AC116C6;
+	Fri,  3 Apr 2026 02:02:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775181742;
+	bh=hBW6F4YpD0yqJIg2zZyuPH27KccORAZiNhePtVabi0s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EC3C2lkqB7Bn7bQ13mLQk3s218ldUKnOv1X1OS96uBO7lAItMT5JQ81T4hrEQbgzn
+	 H0eOjqKOQkH4V0XESx9AT3gO8Wwdj6cGmmVASJFcE8KmNcL/CwQ5bbmXlcrzvH/uJr
+	 HS5uEJrjsZyMqa811+KxUJmatz0EcxgRhXzI0X6eq/x3ivhj9bG0DUBnHNBpQEjgKw
+	 Y0lOtlEmeRUbaXULuYsJLqBZ3teeFWcCjRGgkm75SLtenoGilEAWEEFZXwbvk1Uugd
+	 VFJDMCkc2zdOLpKUrWL8yF9zCMtr/cjqtDU3SS57ImJA0Whq1LjyWDt5IKMdNIOm/1
+	 65jg+CGIITnaw==
+Date: Thu, 2 Apr 2026 19:02:19 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Simon Horman <horms@kernel.org>, Donald Hunter
+ <donald.hunter@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet
+ <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, Saeed Mahameed
+ <saeedm@nvidia.com>, "Leon Romanovsky" <leon@kernel.org>, Mark Bloch
+ <mbloch@nvidia.com>, Shuah Khan <shuah@kernel.org>, Chuck Lever
+ <chuck.lever@oracle.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+ Carolina Jubran <cjubran@nvidia.com>, Or Har-Toov <ohartoov@nvidia.com>,
+ Moshe Shemesh <moshe@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ Shahar Shitrit <shshitrit@nvidia.com>, Daniel Zahka
+ <daniel.zahka@gmail.com>, Jacob Keller <jacob.e.keller@intel.com>, Cosmin
+ Ratiu <cratiu@nvidia.com>, Parav Pandit <parav@nvidia.com>, Shay Drori
+ <shayd@nvidia.com>, "Adithya Jayachandran" <ajayachandra@nvidia.com>, Kees
+ Cook <kees@kernel.org>, "Daniel Jurgens" <danielj@nvidia.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>, Gal Pressman <gal@nvidia.com>
+Subject: Re: [PATCH net-next V4 10/12] devlink: Add resource scope filtering
+ to resource dump
+Message-ID: <20260402190219.61ea7da1@kernel.org>
+In-Reply-To: <20260401184947.135205-11-tariqt@nvidia.com>
+References: <20260401184947.135205-1-tariqt@nvidia.com>
+	<20260401184947.135205-11-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-274844-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[google.com,redhat.com,lunn.ch,davemloft.net,kernel.org,gmail.com,resnulli.us,lwn.net,linuxfoundation.org,nvidia.com,oracle.com,intel.com,vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274843-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 06BC6390373
+	RCPT_COUNT_TWELVE(0.00)[35];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: B2CC43903D5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add test_tcp_custom_syncookie_protocol_check to verify that
-bpf_sk_assign_tcp_reqsk() rejects non-TCP skbs. The test sends a UDP
-packet through TC ingress where a BPF program calls
-bpf_sk_assign_tcp_reqsk() on it and checks that the kfunc returns an
-error. A UDP server recv() is used as synchronization to ensure the
-BPF program has finished processing before checking the result.
+On Wed, 1 Apr 2026 21:49:45 +0300 Tariq Toukan wrote:
+> @@ -873,6 +881,16 @@ attribute-sets:
+>          doc: Unique devlink instance index.
+>          checks:
+>            max: u32-max
+> +      -
+> +        name: resource-scope-mask
+> +        type: bitfield32
 
-Without the fix in bpf_sk_assign_tcp_reqsk(), the kfunc succeeds and
-attaches a TCP reqsk to the UDP skb, which causes a null pointer
-dereference panic when the kernel processes it through the UDP receive
-path.
+no need for a bitfield here, this is a simpler selector
+bitfield is for cases when we need to update some persistent
+state, in that case we want to indicate which bits we intend
+to update:
 
-Test result:
+	cfg = (cfg & ~bf.mask) | bf.val
 
-  ./test_progs -a tcp_custom_syncookie_protocol_check -v
-  setup_netns:PASS:create netns 0 nsec
-  setup_netns:PASS:ip 0 nsec
-  write_sysctl:PASS:open sysctl 0 nsec
-  write_sysctl:PASS:write sysctl 0 nsec
-  setup_netns:PASS:write_sysctl 0 nsec
-  test_tcp_custom_syncookie_protocol_check:PASS:open_and_load 0 nsec
-  setup_tc:PASS:qdisc add dev lo clsact 0 nsec
-  setup_tc:PASS:filter add dev lo ingress 0 nsec
-  run_protocol_check:PASS:start tcp_server 0 nsec
-  run_protocol_check:PASS:start udp_server 0 nsec
-  run_protocol_check:PASS:connect udp_client 0 nsec
-  run_protocol_check:PASS:send udp 0 nsec
-  run_protocol_check:PASS:recv udp 0 nsec
-  run_protocol_check:PASS:recv data 0 nsec
-  run_protocol_check:PASS:udp_intercepted 0 nsec
-  run_protocol_check:PASS:assign_ret 0 nsec
-  #471/1   tcp_custom_syncookie_protocol_check/IPv4 TCP:OK
-  run_protocol_check:PASS:start tcp_server 0 nsec
-  run_protocol_check:PASS:start udp_server 0 nsec
-  run_protocol_check:PASS:connect udp_client 0 nsec
-  run_protocol_check:PASS:send udp 0 nsec
-  run_protocol_check:PASS:recv udp 0 nsec
-  run_protocol_check:PASS:recv data 0 nsec
-  run_protocol_check:PASS:udp_intercepted 0 nsec
-  run_protocol_check:PASS:assign_ret 0 nsec
-  #471/2   tcp_custom_syncookie_protocol_check/IPv6 TCP:OK
-  #471     tcp_custom_syncookie_protocol_check:OK
-  Summary: 1/2 PASSED, 0 SKIPPED, 0 FAILED
+scope is a straight attribute, there's no updating of anything.
 
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- .../bpf/prog_tests/tcp_custom_syncookie.c     |  93 ++++++++++++++-
- .../bpf/progs/test_tcp_custom_syncookie.c     | 109 ++++++++++++++++++
- 2 files changed, 198 insertions(+), 4 deletions(-)
+u32 or unit would do
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c b/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
-index eaf441dc7e79b..017836581669f 100644
---- a/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
-+++ b/tools/testing/selftests/bpf/prog_tests/tcp_custom_syncookie.c
-@@ -5,6 +5,7 @@
- #include <sched.h>
- #include <stdlib.h>
- #include <net/if.h>
-+#include <netinet/in.h>
- 
- #include "test_progs.h"
- #include "cgroup_helpers.h"
-@@ -47,11 +48,10 @@ static int setup_netns(void)
- 	return -1;
- }
- 
--static int setup_tc(struct test_tcp_custom_syncookie *skel)
-+static int setup_tc(int prog_fd)
- {
- 	LIBBPF_OPTS(bpf_tc_hook, qdisc_lo, .attach_point = BPF_TC_INGRESS);
--	LIBBPF_OPTS(bpf_tc_opts, tc_attach,
--		    .prog_fd = bpf_program__fd(skel->progs.tcp_custom_syncookie));
-+	LIBBPF_OPTS(bpf_tc_opts, tc_attach, .prog_fd = prog_fd);
- 
- 	qdisc_lo.ifindex = if_nametoindex("lo");
- 	if (!ASSERT_OK(bpf_tc_hook_create(&qdisc_lo), "qdisc add dev lo clsact"))
-@@ -127,7 +127,7 @@ void test_tcp_custom_syncookie(void)
- 	if (!ASSERT_OK_PTR(skel, "open_and_load"))
- 		return;
- 
--	if (setup_tc(skel))
-+	if (setup_tc(bpf_program__fd(skel->progs.tcp_custom_syncookie)))
- 		goto destroy_skel;
- 
- 	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
-@@ -145,6 +145,91 @@ void test_tcp_custom_syncookie(void)
- 
- destroy_skel:
- 	system("tc qdisc del dev lo clsact");
-+	test_tcp_custom_syncookie__destroy(skel);
-+}
-+
-+/* Test: bpf_sk_assign_tcp_reqsk() should reject non-TCP skb.
-+ *
-+ * Send a UDP packet through TC ingress where a BPF program calls
-+ * bpf_sk_assign_tcp_reqsk() on it. The kfunc should return an error
-+ * because the skb carries UDP, not TCP.
-+ *
-+ * TCP and UDP servers share the same port. The BPF program intercepts
-+ * the UDP packet, looks up the TCP listener via the dest port, and
-+ * attempts to assign a TCP reqsk to the UDP skb.
-+ */
-+static void run_protocol_check(struct test_tcp_custom_syncookie *skel,
-+			       int family, const char *addr)
-+{
-+	int tcp_server, udp_server, udp_client;
-+	char buf[] = "test";
-+	int port, ret;
-+
-+	tcp_server = start_server(family, SOCK_STREAM, addr, 0, 0);
-+	if (!ASSERT_NEQ(tcp_server, -1, "start tcp_server"))
-+		return;
-+
-+	port = ntohs(get_socket_local_port(tcp_server));
-+
-+	/* UDP server on same port for synchronization and port sharing */
-+	udp_server = start_server(family, SOCK_DGRAM, addr, port, 0);
-+	if (!ASSERT_NEQ(udp_server, -1, "start udp_server"))
-+		goto close_tcp;
-+
-+	skel->bss->udp_intercepted = false;
-+	skel->bss->assign_ret = 0;
-+
-+	udp_client = connect_to_fd(udp_server, 0);
-+	if (!ASSERT_NEQ(udp_client, -1, "connect udp_client"))
-+		goto close_udp_server;
-+
-+	ret = send(udp_client, buf, sizeof(buf), 0);
-+	if (!ASSERT_EQ(ret, sizeof(buf), "send udp"))
-+		goto close_udp_client;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	/* recv() ensures TC ingress BPF has processed the skb */
-+	ret = recv(udp_server, buf, sizeof(buf), 0);
-+	if (!ASSERT_EQ(ret, sizeof(buf), "recv udp"))
-+		goto close_udp_client;
-+
-+	ASSERT_STREQ(buf, "test", "recv data");
-+	ASSERT_EQ(skel->bss->udp_intercepted, true, "udp_intercepted");
-+	ASSERT_EQ(skel->bss->assign_ret, -EINVAL, "assign_ret");
-+
-+close_udp_client:
-+	close(udp_client);
-+close_udp_server:
-+	close(udp_server);
-+close_tcp:
-+	close(tcp_server);
-+}
-+
-+void test_tcp_custom_syncookie_protocol_check(void)
-+{
-+	struct test_tcp_custom_syncookie *skel;
-+	int i;
-+
-+	if (setup_netns())
-+		return;
-+
-+	skel = test_tcp_custom_syncookie__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_and_load"))
-+		return;
-+
-+	if (setup_tc(bpf_program__fd(skel->progs.tcp_custom_syncookie_badproto)))
-+		goto destroy_skel;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_cases); i++) {
-+		if (!test__start_subtest(test_cases[i].name))
-+			continue;
- 
-+		run_protocol_check(skel, test_cases[i].family,
-+				   test_cases[i].addr);
-+	}
-+
-+destroy_skel:
-+	system("tc qdisc del dev lo clsact");
- 	test_tcp_custom_syncookie__destroy(skel);
- }
-diff --git a/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c b/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
-index 7d5293de19523..7e87773a95adb 100644
---- a/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
-+++ b/tools/testing/selftests/bpf/progs/test_tcp_custom_syncookie.c
-@@ -588,4 +588,113 @@ int tcp_custom_syncookie(struct __sk_buff *skb)
- 	return tcp_handle_ack(&ctx);
- }
- 
-+/* Test: call bpf_sk_assign_tcp_reqsk() on a UDP skb.
-+ * The kfunc should reject it because the skb is not TCP.
-+ *
-+ * TCP and UDP servers share the same port. The BPF program intercepts
-+ * UDP packets, looks up the TCP listener on the same port, and tries
-+ * to assign a TCP reqsk to the UDP skb.
-+ */
-+int assign_ret;
-+bool udp_intercepted;
-+
-+static int badproto_lookup_assign(struct __sk_buff *skb,
-+				  struct bpf_sock_tuple *tuple, u32 tuple_size)
-+{
-+	struct bpf_tcp_req_attrs attrs = {};
-+	struct bpf_sock *skc;
-+	struct sock *sk;
-+
-+	skc = bpf_skc_lookup_tcp(skb, tuple, tuple_size, -1, 0);
-+	if (!skc)
-+		return TC_ACT_OK;
-+
-+	if (skc->state != TCP_LISTEN) {
-+		bpf_sk_release(skc);
-+		return TC_ACT_OK;
-+	}
-+
-+	sk = (struct sock *)bpf_skc_to_tcp_sock(skc);
-+	if (!sk) {
-+		bpf_sk_release(skc);
-+		return TC_ACT_OK;
-+	}
-+
-+	attrs.mss = 1460;
-+	attrs.wscale_ok = 1;
-+	attrs.snd_wscale = 7;
-+	attrs.rcv_wscale = 7;
-+	attrs.sack_ok = 1;
-+
-+	assign_ret = bpf_sk_assign_tcp_reqsk(skb, sk, &attrs, sizeof(attrs));
-+
-+	bpf_sk_release(skc);
-+	return TC_ACT_OK;
-+}
-+
-+SEC("tc")
-+int tcp_custom_syncookie_badproto(struct __sk_buff *skb)
-+{
-+	void *data = (void *)(long)skb->data;
-+	void *data_end = (void *)(long)skb->data_end;
-+	struct bpf_sock_tuple tuple = {};
-+	struct ethhdr *eth;
-+	struct iphdr *iph;
-+	struct ipv6hdr *ip6h;
-+	struct udphdr *udp;
-+
-+	eth = (struct ethhdr *)data;
-+	if (eth + 1 > data_end)
-+		return TC_ACT_OK;
-+
-+	switch (bpf_ntohs(eth->h_proto)) {
-+	case ETH_P_IP:
-+		iph = (struct iphdr *)(eth + 1);
-+		if (iph + 1 > data_end)
-+			return TC_ACT_OK;
-+
-+		if (iph->protocol != IPPROTO_UDP)
-+			return TC_ACT_OK;
-+
-+		udp = (struct udphdr *)(iph + 1);
-+		if (udp + 1 > data_end)
-+			return TC_ACT_OK;
-+
-+		udp_intercepted = true;
-+
-+		tuple.ipv4.saddr = iph->saddr;
-+		tuple.ipv4.daddr = iph->daddr;
-+		tuple.ipv4.sport = udp->source;
-+		tuple.ipv4.dport = udp->dest;
-+
-+		return badproto_lookup_assign(skb, &tuple,
-+					      sizeof(tuple.ipv4));
-+	case ETH_P_IPV6:
-+		ip6h = (struct ipv6hdr *)(eth + 1);
-+		if (ip6h + 1 > data_end)
-+			return TC_ACT_OK;
-+
-+		if (ip6h->nexthdr != IPPROTO_UDP)
-+			return TC_ACT_OK;
-+
-+		udp = (struct udphdr *)(ip6h + 1);
-+		if (udp + 1 > data_end)
-+			return TC_ACT_OK;
-+
-+		udp_intercepted = true;
-+
-+		__builtin_memcpy(tuple.ipv6.saddr, &ip6h->saddr,
-+				 sizeof(tuple.ipv6.saddr));
-+		__builtin_memcpy(tuple.ipv6.daddr, &ip6h->daddr,
-+				 sizeof(tuple.ipv6.daddr));
-+		tuple.ipv6.sport = udp->source;
-+		tuple.ipv6.dport = udp->dest;
-+
-+		return badproto_lookup_assign(skb, &tuple,
-+					      sizeof(tuple.ipv6));
-+	default:
-+		return TC_ACT_OK;
-+	}
-+}
-+
- char _license[] SEC("license") = "GPL";
--- 
-2.43.0
+> +        enum: resource-scope
+> +        enum-as-flags: true
+> +        doc: |
+> +          Bitmask selecting which resource classes to include in a
+> +          resource-dump response. Bit 0 (dev) selects device-level
+> +          resources; bit 1 (port) selects port-level resources.
+> +          When absent all classes are returned.
+>    -
+>      name: dl-dev-stats
+>      subset-of: devlink
+> @@ -1775,7 +1793,11 @@ operations:
+>              - resource-list
+>        dump:
+>          request:
+> -          attributes: *dev-id-attrs
+> +          attributes:
+> +            - bus-name
+> +            - dev-name
+> +            - index
+> +            - resource-scope-mask
+>          reply: *resource-dump-reply
+>  
+>      -
+> diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+> index 7de2d8cc862f..e0a0b523ce5c 100644
+> --- a/include/uapi/linux/devlink.h
+> +++ b/include/uapi/linux/devlink.h
+> @@ -645,6 +645,7 @@ enum devlink_attr {
+>  	DEVLINK_ATTR_PARAM_RESET_DEFAULT,	/* flag */
+>  
+>  	DEVLINK_ATTR_INDEX,			/* uint */
+> +	DEVLINK_ATTR_RESOURCE_SCOPE_MASK,	/* bitfield32 */
+>  
+>  	/* Add new attributes above here, update the spec in
+>  	 * Documentation/netlink/specs/devlink.yaml and re-generate
+> @@ -704,6 +705,22 @@ enum devlink_resource_unit {
+>  	DEVLINK_RESOURCE_UNIT_ENTRY,
+>  };
+>  
+> +enum devlink_resource_scope {
+> +	DEVLINK_RESOURCE_SCOPE_DEV_BIT,
+> +	DEVLINK_RESOURCE_SCOPE_PORT_BIT,
+> +
+> +	__DEVLINK_RESOURCE_SCOPE_MAX_BIT,
+> +	DEVLINK_RESOURCE_SCOPE_MAX_BIT =
+
+do we need this? it's not an attr enum all we care about here is 
+the mask, really so just a trailing value which is max real value + 1
+is enough for all users?
+
+> +		__DEVLINK_RESOURCE_SCOPE_MAX_BIT - 1
+> +};
+> +
+> +#define DEVLINK_RESOURCE_SCOPE_DEV \
+> +	_BITUL(DEVLINK_RESOURCE_SCOPE_DEV_BIT)
+> +#define DEVLINK_RESOURCE_SCOPE_PORT \
+> +	_BITUL(DEVLINK_RESOURCE_SCOPE_PORT_BIT)
+> +#define DEVLINK_RESOURCE_SCOPE_VALID_MASK \
+> +	(_BITUL(__DEVLINK_RESOURCE_SCOPE_MAX_BIT) - 1)
+> +
+>  enum devlink_port_fn_attr_cap {
+>  	DEVLINK_PORT_FN_ATTR_CAP_ROCE_BIT,
+>  	DEVLINK_PORT_FN_ATTR_CAP_MIGRATABLE_BIT,
+
+> +static u32 devlink_resource_scope_get(struct nlattr **attrs, int *flags)
+> +{
+> +	struct nla_bitfield32 scope;
+> +	u32 value;
+> +
+> +	if (!attrs || !attrs[DEVLINK_ATTR_RESOURCE_SCOPE_MASK])
+> +		return DEVLINK_RESOURCE_SCOPE_VALID_MASK;
+> +
+> +	scope = nla_get_bitfield32(attrs[DEVLINK_ATTR_RESOURCE_SCOPE_MASK]);
+> +	value = scope.value & scope.selector;
+> +	if (value != DEVLINK_RESOURCE_SCOPE_VALID_MASK)
+> +		*flags |= NLM_F_DUMP_FILTERED;
+> +
+> +	return value;
+> +}
+> +
+>  static int
+>  devlink_resource_dump_fill_one(struct sk_buff *skb, struct devlink *devlink,
+>  			       struct devlink_port *devlink_port,
+> @@ -400,16 +416,27 @@ devlink_nl_resource_dump_one(struct sk_buff *skb, struct devlink *devlink,
+>  	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
+>  	struct devlink_port *devlink_port;
+>  	unsigned long port_idx;
+> +	u32 scope;
+>  	int err;
+>  
+> -	if (!state->port_number) {
+> +	scope = devlink_resource_scope_get(genl_info_dump(cb)->attrs, &flags);
+> +	if (!scope) {
+> +		NL_SET_ERR_MSG_ATTR(genl_info_dump(cb)->extack,
+> +				    genl_info_dump(cb)->attrs[DEVLINK_ATTR_RESOURCE_SCOPE_MASK],
+
+we have genl_info_dump(cb) 3 times here, let's save the pointer 
+on the stack to make the lines shorter.
+
+> +				    "empty resource scope selection");
+> +		return -EINVAL;
+> +	}
+> +	if (!state->port_number && (scope & DEVLINK_RESOURCE_SCOPE_DEV)) {
+>  		err = devlink_resource_dump_fill_one(skb, devlink, NULL,
+> -						     cb, flags, &state->idx);
+> +						     cb, flags,
+> +						     &state->idx);
+>  		if (err)
+>  			return err;
+>  		state->idx = 0;
+>  	}
+>  
+> +	if (!(scope & DEVLINK_RESOURCE_SCOPE_PORT))
+> +		goto out;
+>  	xa_for_each_start(&devlink->ports, port_idx, devlink_port,
+>  			  state->port_number ? state->port_number - 1 : 0) {
+>  		err = devlink_resource_dump_fill_one(skb, devlink, devlink_port,
+> @@ -420,6 +447,7 @@ devlink_nl_resource_dump_one(struct sk_buff *skb, struct devlink *devlink,
+>  		}
+>  		state->idx = 0;
+>  	}
+> +out:
+>  	state->port_number = 0;
+>  	return 0;
+>  }
 
 
