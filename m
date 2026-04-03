@@ -1,293 +1,134 @@
-Return-Path: <netdev+bounces-274804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274805-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4FLsKxgNz2kNsgYAu9opvQ
-	(envelope-from <netdev+bounces-274804-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:43:04 +0200
+	id YIxtKA4Pz2lysgYAu9opvQ
+	(envelope-from <netdev+bounces-274805-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:51:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AA5538F998
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:43:03 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91DF638FAB5
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:51:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 73373312ACF3
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 00:37:16 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 23C9F300BE89
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 00:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE14629ACD7;
-	Fri,  3 Apr 2026 00:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8154023D7DC;
+	Fri,  3 Apr 2026 00:40:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="VfvzpoH6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bNJsrNHf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2C2292B4B
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 00:36:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABBE23AB81;
+	Fri,  3 Apr 2026 00:40:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775176568; cv=none; b=tV+xS2q7+iGs1Q5MUMFpMl7WM7dxrMQU8Jl8N739ALk4qjNdAJVV5QTqK2RutVUkxvbKDhkz9258BzfM+GMjVdywhMs94p+EBO38hmp5Db0YbXBC3U65zkjpqa602RZENiH/b78Df2zVu7jVfhz6xkgNUPC4PthKBb4LnAHE7gE=
+	t=1775176851; cv=none; b=eFKQht50ZSyDE+gqYE0XPwOM8fPF1qb78AppZVQtzzYWuUZJv/T7CGr5PeW0yzRfE2S6TcUXMXv/zoAJ/MTEEQYV7KrH+2cXjgvn2ycUH7l8fqVKLx/0VViVCSWvmdgTcRuj18wXDHYRzZgzawiGsLqXQje6dYlT/hB67Kb7888=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775176568; c=relaxed/simple;
-	bh=8wDnYGmsZvC7abjvNEJ3Tk+IvO8q3U34sLBOd8TOXA8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ILY8jJEfh9e2oHDGSfBG0ujVjudQy2baKFSG1onzYfZlF93BVETxKzt0rtTzleFZOhohR/yauP89spOvQjBebrhO8XPZFxfuVEcPReex6gwftm+6o44p31gkQ8aokbfzQbEG3kJx5txGVjcO8zjbj+MmT8iwcnB0PaNrT8MRg9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=VfvzpoH6; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-35da1af3e10so1229887a91.3
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 17:36:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775176566; x=1775781366; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NLMUaKCgV8ol4xEA39jbeNRFpzXzgz54RkpOpnmPJPI=;
-        b=VfvzpoH6pNmkO3AKv5bsD/XwKnYjQs5Qycpuz7hrofgEvL2WyvJ8QYYqX/Ef/RTJ5w
-         HwiwG/NP55ALItUKag1Asr9FCxVH1dRYNuBIYE+AEgIiuvgNpGl6aLvJEPqrqStB/RKc
-         uxD8z8buOdOwDugaBZ4Ld+P+w5w1uvtXNq6YlNUGjRNUSGXW2XQrPRX9wDG2nZOhdYjT
-         R/76NBd1w0sMJSVx24jt1zRkeW1TCJFNjXs1o13DK2Wlljlfg+N0K9/iD2nSePyReFyk
-         bSFAEJmp3hvB4x0H5VyRl1BOf9Rx9rG50kD7eRtZotynIDeCq7PgcpDdukprsW21VrZe
-         /ShQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775176566; x=1775781366;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NLMUaKCgV8ol4xEA39jbeNRFpzXzgz54RkpOpnmPJPI=;
-        b=KMlZNTTWUZ+QiWCoMLqSAQdU48avyuWSJ/htRl63Rijb++RpP/DLJjUlzYryauF5Hm
-         8RM6KsOKgYcyXXh3JFJfYWYW1WmrImI2KAcHTVJok5Dh4ZcZuM0mmKaDUECNsukoPG8M
-         ChljE27fbzxIAVboZ/GiA2Sq+y0WMZ5g0WnfJwB3BWurNq6V38Aa3eu7/iedqT/TQBvK
-         h3thilOOB1NJU5tHBAzZhQgXFcw7OtFrUe7YKkwG+ycK3npk4I+mAXLNJR9Y3eXB/Bzy
-         tHhdUcAtnCe/yhBTJlXqsefJ0HXrcmsyS8IcVgkF7QeX8IasgAshWCrZt5a3dJbw7m6q
-         lMZg==
-X-Gm-Message-State: AOJu0YyKFvPw1lPyYc9rl1lnQE8qukb2DQhqKZkbaCPf34d8Mgav2Vol
-	HnWZKiVDAFPKgwERwzLIJMw3KV2wGNbDy5ChIZd+tnMHr2lZZecIs+RKLBcFsEuXVm4yKMhS92G
-	6C1uXN7M=
-X-Gm-Gg: AeBDiesPGQUCl9NzVEltxnuVnsjovLf1EA2VDbl33pBUfcGUScr1d426Lbfzels5dBO
-	TbxrpgtBd3ZAlPCHcybQxlQqNMTXSQrSw89lCUBpHPHGdftF2COL0Qlv/0WCsCNjkJ65kBRhBbe
-	UvHYhFPr36dWPxYvu1cxH9C/kX7Efvdc6AnP/fkif9cwouYVHf3Fxl++24vHTIZ33fhMQZ/cBb2
-	z1SofKsjTGq9G7zCyX070DMi66GamzEFYSM+PKqVDBsfFQLcgxSZnBw6pQajDgpGQi3wMidjkDA
-	azL5+PjMb2X9rVmSZS1XLk72n/PwOqdmL0Q8V9wpL1ej1x9E4fNn9NbJwVojsVKl+KFYOfrKLVE
-	IKV5xAtTmDJnTeXd15RmNLEMyZQJwFu+0yZfuXJbIlfS5X9/vmQOAuTPV7COTel6ackih2I+i0M
-	xNi58=
-X-Received: by 2002:a17:903:2a86:b0:2ae:ce35:2686 with SMTP id d9443c01a7336-2b281706f07mr13520335ad.5.1775176566421;
-        Thu, 02 Apr 2026 17:36:06 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:1::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2749cbd85sm38769725ad.74.2026.04.02.17.36.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 17:36:06 -0700 (PDT)
-From: Joe Damato <joe@dama.to>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: horms@kernel.org,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	linux-kernel@vger.kernel.org,
-	leon@kernel.org,
-	Joe Damato <joe@dama.to>,
-	linux-kselftest@vger.kernel.org
-Subject: [net-next v8 10/10] selftests: drv-net: Add USO test
-Date: Thu,  2 Apr 2026 17:35:17 -0700
-Message-ID: <20260403003524.2564973-11-joe@dama.to>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260403003524.2564973-1-joe@dama.to>
-References: <20260403003524.2564973-1-joe@dama.to>
+	s=arc-20240116; t=1775176851; c=relaxed/simple;
+	bh=NJ+8mEhNn9wUSa9R8VvhGJpfu23Mm7qVZmFxt2lVutQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Bd+8emBlhdt8QQMMpJgjxYEUFq5kOy8Effn+U/NKxiteqhb3da4uW2O+k8Pm0yk2xvjJoHRMAa592JtxXFLmaxJ+IBN6TcVefWQ/ADPnUq9bub7qAKmjukwR6+8PkORHJfxJqu5E19k2bAsVSj14FFMnylx9U3uUP+gLj6ddhPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bNJsrNHf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F130C116C6;
+	Fri,  3 Apr 2026 00:40:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775176851;
+	bh=NJ+8mEhNn9wUSa9R8VvhGJpfu23Mm7qVZmFxt2lVutQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bNJsrNHfYcRJm007j4S0gUwfNrjeWvZdoHliWvtkVxFWWc3/1jlesn+xPpAqsNfry
+	 HhSfY4bIiG6NLXrsbLCFeWKAJ6+3sJEDrdS8gHJ1u9OBgNqTkxXL7Y4Y3XuLfTkwbT
+	 gh3zzJA7WItfiCMP76cE/w0dGh4w88Q7/aeFZOpCpGt1s9fSkApVEdjpalyO83PeXY
+	 AEsd+6qBgB/SsrF3y4d8FXKBR+CCRachkUBXC0xV/V8w7UlVaYG9iD2h2Ry0bqJYP+
+	 9GBOnmYjagrPaC5X4llk/14Li576IXy7ywUsYIQbvNA0KxyjFvi+cYMfyynW6KI4lz
+	 UiTTZ3PrZQRrA==
+Date: Thu, 2 Apr 2026 17:40:49 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sam Edwards <cfsworks@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, "Russell King (Oracle)"
+ <rmk+kernel@armlinux.org.uk>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Ovidiu Panait
+ <ovidiu.panait.rb@renesas.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Baruch Siach <baruch@tkos.co.il>, Serge Semin <fancer.lancer@gmail.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v4 0/2] stmmac crash/stall fixes when under memory
+ pressure
+Message-ID: <20260402174049.0ac088cc@kernel.org>
+In-Reply-To: <CAH5Ym4j5peYXc5c9ycJzimy26Tv+4x18hyy+j-H4v7PyWuWhtA@mail.gmail.com>
+References: <20260401041929.12392-1-CFSworks@gmail.com>
+	<20260402080542.293e8729@kernel.org>
+	<CAH5Ym4j5peYXc5c9ycJzimy26Tv+4x18hyy+j-H4v7PyWuWhtA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.34 / 15.00];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-274804-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274805-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,foss.st.com,armlinux.org.uk,bootlin.com,renesas.com,nxp.com,tkos.co.il,st.com,vger.kernel.org,st-md-mailman.stormreply.com,lists.infradead.org];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[dama.to];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,dama-to.20251104.gappssmtp.com:dkim,uso.py:url,dama.to:email,dama.to:mid,lib.py:url]
-X-Rspamd-Queue-Id: 2AA5538F998
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 91DF638FAB5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a simple test for USO. Tests both ipv4 and ipv6 with several full
-segments and a partial segment.
+On Thu, 2 Apr 2026 09:53:43 -0700 Sam Edwards wrote:
+> On Thu, Apr 2, 2026 at 8:05=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+> > I meant we need both a threshold, and a delay :( =20
+>=20
+> Hi Jakub - got it: when the critical threshold is reached, allow the
+> NAPI instance to sleep and start a timer instead.
+>=20
+> 1) We'd either have to leave interrupts masked or let them race
+> against the timer. Either one is manageable, but I feel like those
+> interactions carry *just* enough regression risk to bump that patch to
+> -next.
+>=20
+> 2) Could you point out which NAPI driver best handles this situation?
+> I'd like to replicate its approach.
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Joe Damato <joe@dama.to>
----
- v7:
-   - Dropped Pavan's Reviewed-by as there were changes.
-   - Update to use ksft_variants with a generator and a parameterized test_uso
-     function.
-   - Save original USO state and restore it at the end of the test.
-   - Replace sleep with cfg.wait_hw_stats_settle
-   - Use a socat receiver and check tx stats locally instead of rx on the
-     remote.
+Not sure, the last few NICs I worked on had the ability for SW=20
+to trigger IRQs exactly because of the Rx buffer depletion issue.
+fbnic_napi_depletion_check() for example.
 
- v5:
-   - Added Pavan's Reviewed-by. No functional changes.
-
- v4:
-   - Fix python linter issues (unused imports, docstring, etc).
-
- rfcv2:
-   - new in rfcv2
-
- tools/testing/selftests/drivers/net/Makefile |   1 +
- tools/testing/selftests/drivers/net/uso.py   | 103 +++++++++++++++++++
- 2 files changed, 104 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/uso.py
-
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index 7c7fa75b80c2..335c2ce4b9ab 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -21,6 +21,7 @@ TEST_PROGS := \
- 	ring_reconfig.py \
- 	shaper.py \
- 	stats.py \
-+	uso.py \
- 	xdp.py \
- # end of TEST_PROGS
- 
-diff --git a/tools/testing/selftests/drivers/net/uso.py b/tools/testing/selftests/drivers/net/uso.py
-new file mode 100755
-index 000000000000..75bf02849075
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/uso.py
-@@ -0,0 +1,103 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+"""Test USO
-+
-+Sends large UDP datagrams with UDP_SEGMENT and verifies that the peer
-+receives the correct number of individual segments with correct sizes.
-+"""
-+import random
-+import socket
-+import string
-+
-+from lib.py import ksft_run, ksft_exit, KsftSkipEx
-+from lib.py import ksft_eq, ksft_ge, ksft_variants, KsftNamedVariant
-+from lib.py import NetDrvEpEnv
-+from lib.py import bkg, defer, ethtool, ip, rand_port, wait_port_listen
-+
-+# python doesn't expose this constant, so we need to hardcode it to enable UDP
-+# segmentation for large payloads
-+UDP_SEGMENT = 103
-+
-+
-+def _send_uso(cfg, ipver, mss, total_payload, port):
-+    if ipver == "4":
-+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-+        dst = (cfg.remote_addr_v["4"], port)
-+    else:
-+        sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
-+        dst = (cfg.remote_addr_v["6"], port)
-+
-+    sock.setsockopt(socket.IPPROTO_UDP, UDP_SEGMENT, mss)
-+    payload = ''.join(random.choice(string.ascii_lowercase)
-+                      for _ in range(total_payload))
-+    sock.sendto(payload.encode(), dst)
-+    sock.close()
-+    return payload
-+
-+
-+def _get_tx_packets(cfg):
-+    stats = ip(f"-s link show dev {cfg.ifname}", json=True)[0]
-+    return stats['stats64']['tx']['packets']
-+
-+
-+def _test_uso(cfg, ipver, mss, total_payload):
-+    cfg.require_ipver(ipver)
-+    cfg.require_cmd("socat", remote=True)
-+
-+    features = ethtool(f"-k {cfg.ifname}", json=True)
-+    uso_was_on = features[0]["tx-udp-segmentation"]["active"]
-+
-+    try:
-+        ethtool(f"-K {cfg.ifname} tx-udp-segmentation on")
-+    except Exception as exc:
-+        raise KsftSkipEx(
-+            "Device does not support tx-udp-segmentation") from exc
-+    if not uso_was_on:
-+        defer(ethtool, f"-K {cfg.ifname} tx-udp-segmentation off")
-+
-+    expected_segs = (total_payload + mss - 1) // mss
-+
-+    port = rand_port(stype=socket.SOCK_DGRAM)
-+    rx_cmd = f"socat -{ipver} -T 2 -u UDP-RECV:{port},reuseport STDOUT"
-+
-+    tx_before = _get_tx_packets(cfg)
-+
-+    with bkg(rx_cmd, host=cfg.remote, exit_wait=True) as rx:
-+        wait_port_listen(port, proto="udp", host=cfg.remote)
-+        _send_uso(cfg, ipver, mss, total_payload, port)
-+
-+    ksft_eq(len(rx.stdout), total_payload,
-+            comment=f"Received {len(rx.stdout)}B, expected {total_payload}B")
-+
-+    cfg.wait_hw_stats_settle()
-+
-+    tx_after = _get_tx_packets(cfg)
-+    tx_delta = tx_after - tx_before
-+
-+    ksft_ge(tx_delta, expected_segs,
-+            comment=f"Expected >= {expected_segs} tx packets, got {tx_delta}")
-+
-+
-+def _uso_variants():
-+    for ipver in ["4", "6"]:
-+        yield KsftNamedVariant(f"v{ipver}_partial", ipver, 1400, 1400 * 10 + 500)
-+        yield KsftNamedVariant(f"v{ipver}_exact", ipver, 1400, 1400 * 5)
-+
-+
-+@ksft_variants(_uso_variants())
-+def test_uso(cfg, ipver, mss, total_payload):
-+    """Send a USO datagram and verify the peer receives the expected segments."""
-+    _test_uso(cfg, ipver, mss, total_payload)
-+
-+
-+def main() -> None:
-+    """Run USO tests."""
-+    with NetDrvEpEnv(__file__) as cfg:
-+        ksft_run([test_uso],
-+                 args=(cfg, ))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.52.0
+But let's not overthink it.. say we arm a timer and let the IRQ=20
+be unmasked. The timer just runs napi_schedule(). napi_schedule()=20
+is thread-safe, if IRQ fires with the timer armed - no problem.
 
 
