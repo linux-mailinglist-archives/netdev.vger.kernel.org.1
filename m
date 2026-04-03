@@ -1,183 +1,307 @@
-Return-Path: <netdev+bounces-275165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275166-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QEnOG8AM0Gkp2wYAu9opvQ
-	(envelope-from <netdev+bounces-275165-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 20:53:52 +0200
+	id 0I1wNh4O0GlQ2wYAu9opvQ
+	(envelope-from <netdev+bounces-275166-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 20:59:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E6E239765E
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 20:53:51 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 242A739771D
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 20:59:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3C4DF3008C3E
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 18:53:51 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DEF8330193A4
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 18:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB123CAE65;
-	Fri,  3 Apr 2026 18:53:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A4D0308F07;
+	Fri,  3 Apr 2026 18:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KtK5YBSn"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b="oWuO98S5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C99A3C3445
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 18:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775242429; cv=none; b=bIzkSma7bcNPcIESfPs0pwp4AKH8OzUPMR4AqlfHQEyEQtaZYTaNZBFEhKV3KPdIVkcPhJn/SQRpMGB9CmNenJGyUa4hx/mXvIyYmHFkgnZ88cDlM8b1vHfMARnGxwXfegqeaI5FsuT7YlJ2F3yrI009IHft3yDrVty4zL2nDRs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775242429; c=relaxed/simple;
-	bh=/jVVlaYZFAwlin52R+2Ey9DOou+ZLFQYY+l+kE8eSHc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mszJkJyG3pCKma2cj09h4sn8MeGeIacAbaUfXYZuhuA3PlzWRNbiDhce3j7OYzmlEetCU+B9JZyMy95014YtEMO3d8Ly6v2QL5NA0KeFpycEcsueQIj62OrpaoQoVY2YntUc9QUTv0HJ8DhYlMhQFQw7t3kK0/uOHZ5xIEoLbo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KtK5YBSn; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-43cfde3c3f3so1989200f8f.3
-        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 11:53:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C06C359A90
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 18:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775242778; cv=pass; b=txKFMZgVDu/Mc17DKZXraJ8c5jdhA3mf1DQvG/B7ns7uN1HWrKBYf3DuPUpIpVFO8461UBYo42nCZRRDl1SeYllmw+tZgzDA7tgx68BY2gfFMSDqjWOZZ4OmcWfONXpc6O8fSz48Ic71gM9Af0dx7uFeLArlxlwKCmjhBgjYc0Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775242778; c=relaxed/simple;
+	bh=AEf/NVl9Xl48gtHpmRzXl4iivMy3IIKXcz2RuQUIAKg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WBgyjeK/yzDcAu+UFmgoZBnq9PmFrTMDSLoy5K2sRvGThxPmZXx2JJGlS6FTArFbWy38tN8jFZi7iQyJgH9wBQr7iCBvo+GTcTx2vv/O0SXUbEGqfcrw2Hs9lekYZRjMTfe1MJ0orGNdxeA0N74QMAIW0a2ABwBovnT7CrKGXsg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20251104.gappssmtp.com header.i=@mojatatu-com.20251104.gappssmtp.com header.b=oWuO98S5; arc=pass smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-82735a41920so732532b3a.2
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 11:59:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775242774; cv=none;
+        d=google.com; s=arc-20240605;
+        b=HFeWPCdCzk9F3bkz57KrNaBU5qVSeQnORayAiJWPeWNs0XRIVKWIYvGJ9yy2ZIXwJY
+         0GjviIhQ1nWlza7+YdwxEHWRtcmIUGQ9VjhIXOztTi6ZRPRyISxHoXQO6mvcJ1SCzohA
+         dcv0TEyI1gyy8iAwl1f31GK7N/ILRs7L8rp0V//4xBoachbxWDWOl02MdL+uRtF3qxza
+         dduKThdF413jVS9bD6yOgux3msl80VsrlheeI//8UTC5mAB+gTsKap4k33zvTF6QHEmA
+         /lsMkd9qLzKEvUH8mS5DhyC7+QwGzIWccUqzCb5UoGHXcD24d7eB87AlDLFqTrNjOAvy
+         D84g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=HbWiQegiRgK5gaUNH4IXslqVXBhUEQ4yp9oXUz/qaCI=;
+        fh=71KVowZ+YUc7NaA+sMtzLc/d0lwcFFizDfYzdBHhSm4=;
+        b=DpLZpPOEllAVwbjKCwtTHVdJ5I0aBKasgjTQplTgZ7A43e3BNUrjZM5ihxGpi7HdKU
+         XuVwewszCtMyAmLwKUQ+q3hPwJKzZfp/THjAARhWpGjsRz0g6GiCppYuMl7E+ci5pm4I
+         ZcWFoo2vOJaAkruLhvyFcox7o11vNQI+ik+etfcuaxJw3XQwahFmEBNfLUkJHgG78RGu
+         KIh5P1oVAtFKjPSfHkpgF9LIxgY6PaRk9SyMZhq4ZwMB+mMdor786ugbADHiCSHtNkFu
+         UbNS18ooJErb65XP1TDmVrUN5THZuYzRzpsudhMKL74wSDk2OENHpH/8ju4nWHcrTSEn
+         VvCw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775242427; x=1775847227; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=maeNfYkM/3PGyOug4UakihZPv8oRILxVm2J09dLBdmo=;
-        b=KtK5YBSnLPeC3oqAHwG2IFdDU6RrqXWDmlCpSUYaeo9plyoWLTvCpiB4IpOzZMW8XP
-         8DHrhlwvzYkpfb2eZUIkV71iwRK5X4IMSo6LJOoSqCmz2HyjDcheHkaYyBcr0YHnCzap
-         zfIUBtw6W8e1+w+lnicYEE6M+Uz3R8DvyZL7XXhpzfxfXnWg79iwr2aNO94/sF8FmIJ8
-         oL+HvTWvZIFMxMqp/LKsdf3tm8cs8zTTrNMPukaOEB83JpbPH8qSxwFlvzsZMMuwoQbT
-         Uf4KPTLab4Nx1NudHdA0sW7Bi8sEAur4hLgl2t1QiFKvBjcvmxFfpHeP87fL3C594O5T
-         dTsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775242427; x=1775847227;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=mojatatu-com.20251104.gappssmtp.com; s=20251104; t=1775242774; x=1775847574; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=maeNfYkM/3PGyOug4UakihZPv8oRILxVm2J09dLBdmo=;
-        b=a42LXqY4hhtVLpYynAfssK7/8OGjyJuvOLF5kCb4GtQY8Yn6uOaGfWaRWMpnTU+Vcg
-         q6AAr1QW2UtpsbMpqxM8D/jgMlrGrkkiJWu/6SAiX2ne/zKRKBk1hvZszqHWpkfdzvzD
-         PbpaHicmtjH+fqwamuFesT+rBYqo5gDG/F3C/72EdsG/CGvt79kttk+nWdkw3/4YFBYK
-         tqqWplDLGmxIhTHMoFiqvyP2v2X1hxPxOP0JA1EsPA0ciIPy6Wvnb/4cM2NtkUoGyFGK
-         pqnFPYAwd7xU2pbySOOStMfeSuJvaNQlH+EL7UrSBtn4D1C3gvzGgpeCUtUODrkkp5xA
-         VzRw==
-X-Forwarded-Encrypted: i=1; AJvYcCXV4bceKk87u7tSJ9vQgKAZo/MP6423dGoyeYRyGyFLJrY5PUTiS8PVV0MVIGUqWibHgB0qyHI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1jhF2B/d1HDn5vgpiVlTf4VkBuAwNDoWc/qy0TX4FAbA4ciDw
-	5siUVXqk1fUHb7PfyoGRX+sxC2MVLbimyQ4L/Irz6zVJL0yMXJii4btN
-X-Gm-Gg: AeBDiesWqoS3u28v8g4BSJ9BC6aOj8M7pcOVeIVRqqVgHQK8Wpk71spxC+wSfu620/Q
-	VMOH6oqxMweuVf1jFzYKqAR0FxU1D9Rf4WFQeQQsBG1hCRknn9R5kD1ElJWUj459qal8O//1SJ0
-	oU5LGKYREeU65mR19TD2VTclXQc4Yr/nBSwX9xG1NbqIEj8dUNRqlX3UXvfkH9pm2cgRKAPVGP7
-	7fQsKaVD74Q7KG9nMrso0wSrIcnzG6UN8NyZrZ9KjpIhB/7JYE7LH6C3aVU0ZaStger1alMWuQ0
-	Ry8S0CvCy1BKTrrqQ8xJY8gOaXtTTnyhVaFCWddLiPgrHUxOae9EqGFH2PjFdv2tvn3/14nQ3Od
-	hfXxQGE3iArMi5oyb5YnhEVUqHEladp7t+ghzDYaDr6oxRSYI3PTNFwev3u41JS/E1luPdHwlzo
-	WUe+7jo7VdpZDEeygVrtTQN29hKxsIJbePhluwRZIHUMyQWHZhDUyoIFTSJIN0Q7qoqWJrm7KAE
-	4gBzYl7UWiAFPNtGFXGt9Anrn0BtGmPyQMUOLyweJ5/LyOxShE=
-X-Received: by 2002:a05:6000:401f:b0:43d:2be:e4e with SMTP id ffacd0b85a97d-43d292ff520mr6572751f8f.46.1775242426634;
-        Fri, 03 Apr 2026 11:53:46 -0700 (PDT)
-Received: from localhost.localdomain (cpe-188-129-81-72.dynamic.amis.hr. [188.129.81.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e4d289asm17855349f8f.19.2026.04.03.11.53.45
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 03 Apr 2026 11:53:46 -0700 (PDT)
-From: Marino Dzalto <marino.dzalto@gmail.com>
-To: pablo@netfilter.org,
-	fw@strlen.de
-Cc: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Marino Dzalto <marino.dzalto@icloud.com>
-Subject: [PATCH] netfilter: xt_dscp: replace -EDOM with -EINVAL and unify match functions
-Date: Fri,  3 Apr 2026 20:53:37 +0200
-Message-ID: <20260403185337.87676-1-marino.dzalto@gmail.com>
-X-Mailer: git-send-email 2.50.1
+        bh=HbWiQegiRgK5gaUNH4IXslqVXBhUEQ4yp9oXUz/qaCI=;
+        b=oWuO98S5ldgU6PXxkqd2rVi7uvNYOqkUHSyGZLl+1YLRtURY/w3QEiKE7bSLA1kTZB
+         sO6KJtuT+U9hvT2qQcJB2ehwb7WAEm5yvRQFV1E+8TX+z1GlaLGuarW6L7arR3Pbasfn
+         iP9WUQKJL5i1Qh5/V9N/nM0Rguno8vk3vQAWkoeTwCH3Wett3cDhaq62Eb1lI5q2V0na
+         QseqijNneOT7Hb04hOT2fy5k/vwyCTJ/B5y5ac99Ype5iAoi5KbRWM27q2zdgi4k4Wws
+         CzZTtzQpaQ58CEeKoTewcA2TXOp/TplNbV6pzIhjR3/fotQuWyjnFU2u6TbdGsVsL2Zb
+         tQcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775242774; x=1775847574;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HbWiQegiRgK5gaUNH4IXslqVXBhUEQ4yp9oXUz/qaCI=;
+        b=XKPqxwbah2F61F89Ugz2Bh56y+bNeJbo5zCjzEa2UCP8TJLh6SjptX+Ldl+22SdXmJ
+         /dFAFsFAXr+BzeYF7gYIvzA1oQcKkYr5D7WFqSWqWC2WjH9Rwfj7A4PHTr1A/YacNADQ
+         Ogg6rOWwCqddVKRYTi0iBRhLHbfgY3OduabhoCffLFpQne+BLzWr0vVUmqqxSrrwAcKM
+         +/SNmobIW46xM5uRC2WVAeUcAv9Dj3rVu7ddsGOn159NfQPpfoGDXPb+F1ab769Ko0x6
+         fO2BPNkvb/zCzDgsVL8Sz8SkMBeiGJGyBBTHV3+tcgNo99SJ+e651vhQE9T/OqZ0I+SJ
+         gfAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXneyBw1KdOBBFjEmBGseCkSRAMRcicT7Mz2qH/LJYejHJ0nojBMSydQ9kDYvMs/C/BH4uTN2A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMnWf4y8eN38VspAIClrsftw0SICcEpaImh3EuO+NoiEUbQePi
+	SC7MEz901GtmUMNjQrUJpLODigPNnH5qusY3uLwzOMYWW6mb6EfwGmdaxf1hmGENItgztl2Dmmb
+	MbA9RyRRysntz3TqpOvqVyU14tztCtYs7LYE4AqdKrsPS6kr+LEMiPQ==
+X-Gm-Gg: ATEYQzwq9XiRDrYyQN4wxl5Jb2Hm6rPnjXjzuFMcWRpISFpXz0eZYOlSJzkAuVz9H1d
+	l6PMLQvYtKLpxRICsBSUbzOk0fhp+oN1kzuzUmHmSSRgH3tXCW2wdxLW8c8AsP9KL6cr0KPrePk
+	3e1IEVw0VvrgoBl0JenGVavM6jEx+GUw/jVSxmyXmsSYG+59STxd1GBe2050y0uLjqe6P2nkETc
+	LPMC1RUKGa42jq9sq042BaoRciYTsUJMTpv5AuM5wW5W7reSQTKEFVn+IaKnDvmhxwvvcMqnTfA
+	Z3rjANwliNixFYWc8LQ=
+X-Received: by 2002:a05:6a00:4292:b0:82a:6d3d:9ba1 with SMTP id
+ d2e1a72fcca58-82d0da9c60bmr3674970b3a.24.1775242774345; Fri, 03 Apr 2026
+ 11:59:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <dcd085bd504ec1d0698690e08e2e1c4d0edff8e4.1775232030.git.dcaratti@redhat.com>
+In-Reply-To: <dcd085bd504ec1d0698690e08e2e1c4d0edff8e4.1775232030.git.dcaratti@redhat.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 3 Apr 2026 14:59:22 -0400
+X-Gm-Features: AQROBzC3C7SMHHoGl7HxSgLKWBILjZPZQWRjGMIkobI47bZY_t8XiFc6kqs2Xls
+Message-ID: <CAM0EoMm2MpiZ-Rn7PVE8rYq8bOkrqs+0PAjuLi23iLN6Eih2sg@mail.gmail.com>
+Subject: Re: [PATCH net v2] net/sched: cls_fw: fix NULL dereference of "old"
+ filters before change()
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Xiang Mei <xmei5@asu.edu>, netdev@vger.kernel.org, 
+	Victor Nogueira <victor@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[mojatatu-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,netfilter.org,icloud.com];
-	TAGGED_FROM(0.00)[bounces-275165-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[mojatatu.com];
+	TAGGED_FROM(0.00)[bounces-275166-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[marinodzalto@gmail.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[mojatatu-com.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[jhs@mojatatu.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 0E6E239765E
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 242A739771D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Marino Dzalto <marino.dzalto@icloud.com>
+On Fri, Apr 3, 2026 at 12:04=E2=80=AFPM Davide Caratti <dcaratti@redhat.com=
+> wrote:
+>
+> Like pointed out by Sashiko [1],
 
-Signed-off-by: Marino Dzalto <marino.dzalto@icloud.com>
----
- net/netfilter/xt_dscp.c | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
+Just found out about this ;-> So bye-bye old AI? ;->
+I must say, finding this specific bug is impressive.
 
-diff --git a/net/netfilter/xt_dscp.c b/net/netfilter/xt_dscp.c
-index fb0169a8f..00137bff3 100644
---- a/net/netfilter/xt_dscp.c
-+++ b/net/netfilter/xt_dscp.c
-@@ -25,16 +25,12 @@ static bool
- dscp_mt(const struct sk_buff *skb, struct xt_action_param *par)
- {
- 	const struct xt_dscp_info *info = par->matchinfo;
--	u_int8_t dscp = ipv4_get_dsfield(ip_hdr(skb)) >> XT_DSCP_SHIFT;
-+	u8 dscp;
- 
--	return (dscp == info->dscp) ^ !!info->invert;
--}
--
--static bool
--dscp_mt6(const struct sk_buff *skb, struct xt_action_param *par)
--{
--	const struct xt_dscp_info *info = par->matchinfo;
--	u_int8_t dscp = ipv6_get_dsfield(ipv6_hdr(skb)) >> XT_DSCP_SHIFT;
-+	if (xt_family(par) == NFPROTO_IPV4)
-+		dscp = ipv4_get_dsfield(ip_hdr(skb)) >> XT_DSCP_SHIFT;
-+	else
-+		dscp = ipv6_get_dsfield(ipv6_hdr(skb)) >> XT_DSCP_SHIFT;
- 
- 	return (dscp == info->dscp) ^ !!info->invert;
- }
-@@ -44,7 +40,7 @@ static int dscp_mt_check(const struct xt_mtchk_param *par)
- 	const struct xt_dscp_info *info = par->matchinfo;
- 
- 	if (info->dscp > XT_DSCP_MAX)
--		return -EDOM;
-+		return -EINVAL;
- 
- 	return 0;
- }
-@@ -74,7 +70,7 @@ static struct xt_match dscp_mt_reg[] __read_mostly = {
- 		.name		= "dscp",
- 		.family		= NFPROTO_IPV6,
- 		.checkentry	= dscp_mt_check,
--		.match		= dscp_mt6,
-+		.match		= dscp_mt,
- 		.matchsize	= sizeof(struct xt_dscp_info),
- 		.me		= THIS_MODULE,
- 	},
--- 
-2.50.1 (Apple Git-155)
+>TC filters are added to a shared block
+> before their ->change() function is called. This is a problem for cls_fw:
+> an invalid filter created with the "old" method can still classify some
+> packets before it is destroyed by the validation logic added by Xiang.
+>
 
+I think the real issue is that the filter is exposed to the datapath
+before change() is invoked. i.e as you noted 1. init() was invoked, 2.
+then the filter was exposed and 3. The change() was initiated.
+So the packet arrived somewhere between step 2 and 3 and boom.
+In the past - before commit ed76f5edccc9
+(https://lore.kernel.org/netdev/20190204123301.4223-7-vladbu@mellanox.com/)
+you couldnt expose the filter to the datapath before the change() was
+completed..
+
+Observation on consistency pov:
+You will always get a "q" when you invoke tcf_block_q() if there are
+no shared blocks attached. But that doesnt mean the "create"
+configuration is complete; it is only complete if step 3 above
+completes. This is because we are not sure if change() will result in
+"old" or "new" lookup setup. So the check you added for q may be
+inconsistent from that perspective and fw should have returned -1 like
+all classifiers...
+I cant think of a simple solution to verify if the config is
+"inconsistent" other than to add something that gets checked in the
+datapath (and when absent, return -1)
+From that perspective, your check is not catastrophic, so it may be ok.
+At minimal the Fixes: needs to change to Vlads commit? Good news is
+only fw _seems_ to suffer from this challenge...
+
+
+cheers,
+jamal
+
+
+> Therefore, insisting with repeated runs of the following script:
+>
+>  # ip link add dev crash0 type dummy
+>  # ip link set dev crash0 up
+>  # mausezahn  crash0 -c 100000 -P 10 \
+>  > -A 4.3.2.1 -B 1.2.3.4 -t udp "dp=3D1234" -q &
+>  # sleep 1
+>  # tc qdisc add dev crash0 egress_block 1 clsact
+>  # tc filter add block 1 protocol ip prio 1 matchall \
+>  > action skbedit mark 65536 continue
+>  # tc filter add block 1 protocol ip prio 2 fw
+>  # ip link del dev crash0
+>
+> can still make fw_classify() hit the WARN_ON() in [2]:
+>
+>  WARNING: ./include/net/pkt_cls.h:88 at fw_classify+0x244/0x250 [cls_fw],=
+ CPU#18: mausezahn/1399
+>  Modules linked in: cls_fw(E) act_skbedit(E)
+>  CPU: 18 UID: 0 PID: 1399 Comm: mausezahn Tainted: G            E       7=
+.0.0-rc6-virtme #17 PREEMPT(full)
+>  Tainted: [E]=3DUNSIGNED_MODULE
+>  Hardware name: Red Hat KVM, BIOS 1.16.3-2.el9 04/01/2014
+>  RIP: 0010:fw_classify+0x244/0x250 [cls_fw]
+>  Code: 5c 49 c7 45 00 00 00 00 00 41 5d 41 5e 41 5f 5d c3 cc cc cc cc 5b =
+b8 ff ff ff ff 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc 90 <0f> 0b 90 eb a=
+0 0f 1f 80 00 00 00 00 90 90 90 90 90 90 90 90 90 90
+>  RSP: 0018:ffffd1b7026bf8a8 EFLAGS: 00010202
+>  RAX: ffff8c5ac9c60800 RBX: ffff8c5ac99322c0 RCX: 0000000000000004
+>  RDX: 0000000000000001 RSI: ffff8c5b74d7a000 RDI: ffff8c5ac8284f40
+>  RBP: ffffd1b7026bf8d0 R08: 0000000000000000 R09: ffffd1b7026bf9b0
+>  R10: 00000000ffffffff R11: 0000000000000000 R12: 0000000000010000
+>  R13: ffffd1b7026bf930 R14: ffff8c5ac8284f40 R15: 0000000000000000
+>  FS:  00007fca40c37740(0000) GS:ffff8c5b74d7a000(0000) knlGS:000000000000=
+0000
+>  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>  CR2: 00007fca40e822a0 CR3: 0000000005ca0001 CR4: 0000000000172ef0
+>  Call Trace:
+>   <TASK>
+>   tcf_classify+0x17d/0x5c0
+>   tc_run+0x9d/0x150
+>   __dev_queue_xmit+0x2ab/0x14d0
+>   ip_finish_output2+0x340/0x8f0
+>   ip_output+0xa4/0x250
+>   raw_sendmsg+0x147d/0x14b0
+>   __sys_sendto+0x1cc/0x1f0
+>   __x64_sys_sendto+0x24/0x30
+>   do_syscall_64+0x126/0xf80
+>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>  RIP: 0033:0x7fca40e822ba
+>  Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 41 89 =
+ca 64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 f=
+f ff 77 7e c3 0f 1f 44 00 00 41 54 48 83 ec 30 44 89
+>  RSP: 002b:00007ffc248a42c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+>  RAX: ffffffffffffffda RBX: 000055ef233289d0 RCX: 00007fca40e822ba
+>  RDX: 000000000000001e RSI: 000055ef23328c30 RDI: 0000000000000003
+>  RBP: 000055ef233289d0 R08: 00007ffc248a42d0 R09: 0000000000000010
+>  R10: 0000000000000000 R11: 0000000000000246 R12: 000000000000001e
+>  R13: 00000000000186a0 R14: 0000000000000000 R15: 00007fca41043000
+>   </TASK>
+>  irq event stamp: 1045778
+>  hardirqs last  enabled at (1045784): [<ffffffff864ec042>] __up_console_s=
+em+0x52/0x60
+>  hardirqs last disabled at (1045789): [<ffffffff864ec027>] __up_console_s=
+em+0x37/0x60
+>  softirqs last  enabled at (1045426): [<ffffffff874d48c7>] __alloc_skb+0x=
+207/0x260
+>  softirqs last disabled at (1045434): [<ffffffff874fe8f8>] __dev_queue_xm=
+it+0x78/0x14d0
+>
+> Then, because of the value in the packet's mark, dereference on 'q->handl=
+e'
+> with NULL 'q' occurs:
+>
+>  BUG: kernel NULL  pointer dereference, address: 0000000000000038
+>  [...]
+>  RIP: 0010:fw_classify+0x1fe/0x250 [cls_fw]
+>  [...]
+>
+> Skip "old-style" classification on shared blocks, so that the NULL
+> dereference is fixed and WARN_ON() is not hit anymore in the short
+> lifetime of invalid cls_fw "old-style" filters.
+>
+> V2: avoid NULL dereference without hitting WARN_ON() anymore (Sashiko)
+>
+> [1] https://sashiko.dev/#/patchset/20260331050217.504278-1-xmei5%40asu.ed=
+u
+> [2] https://elixir.bootlin.com/linux/v7.0-rc6/source/include/net/pkt_cls.=
+h#L86
+>
+> Fixes: faeea8bbf6e9 ("net/sched: cls_fw: fix NULL pointer dereference on =
+shared blocks")
+> Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+> ---
+>  net/sched/cls_fw.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
+> index 23884ef8b80c..646a730dca93 100644
+> --- a/net/sched/cls_fw.c
+> +++ b/net/sched/cls_fw.c
+> @@ -74,9 +74,13 @@ TC_INDIRECT_SCOPE int fw_classify(struct sk_buff *skb,
+>                         }
+>                 }
+>         } else {
+> -               struct Qdisc *q =3D tcf_block_q(tp->chain->block);
+> +               struct Qdisc *q;
+>
+>                 /* Old method: classify the packet using its skb mark. */
+> +               if (tcf_block_shared(tp->chain->block))
+> +                       return -1;
+> +
+> +               q =3D tcf_block_q(tp->chain->block);
+>                 if (id && (TC_H_MAJ(id) =3D=3D 0 ||
+>                            !(TC_H_MAJ(id ^ q->handle)))) {
+>                         res->classid =3D id;
+> --
+> 2.52.0
+>
 
