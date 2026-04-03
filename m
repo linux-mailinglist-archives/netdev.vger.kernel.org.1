@@ -1,148 +1,209 @@
-Return-Path: <netdev+bounces-275085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275086-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cN5uOCXQz2m50gYAu9opvQ
-	(envelope-from <netdev+bounces-275085-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 16:35:17 +0200
+	id 8CtkL+jSz2mY0wYAu9opvQ
+	(envelope-from <netdev+bounces-275086-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 16:47:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4034D3954B8
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 16:35:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AD423955C6
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 16:47:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4B9B330E6E07
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 14:29:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A1C4B3008766
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 14:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A0E53C554C;
-	Fri,  3 Apr 2026 14:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E784D34DCE0;
+	Fri,  3 Apr 2026 14:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="YiNCIvFc"
+	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="Nk6SyLpA";
+	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="YjWs4/xQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A91953C4568;
-	Fri,  3 Apr 2026 14:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A7522156C;
+	Fri,  3 Apr 2026 14:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775226552; cv=none; b=qL1tkecBqPdb9HMkRSrP0wlUFN9kfSe887/jtuJCGX7BnFVn1+PeivZ1+ePgE4vWTmVidz1lt8Ly5IBzpc1rg5mcz0F0hBenIN/qr7194kHdGljLf3A/s+fyHdFcd/XncveZOiT5gqjdrGd4NdGOjy9a8wd1mybeZ7RITE9xVPc=
+	t=1775227621; cv=none; b=mLYZm9AbcA0LQE9N92EMQKmBERuRrbgcWrJ9yXscCTVCJpRom9UC0ORZzr4ePwpPoJbaPQe1mYPAbJdCvCx+Hfy6Z69BtBHv5I1Trfd+akRKOq+fpQfD8Q3gCcHpa8Ueoo0ck+XHmfVEdSIkcjiXSTJrjvXaK3++gsNbGCCae6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775226552; c=relaxed/simple;
-	bh=Q8qjsmqNAraAJvaJy3VYZsFagpV6fVCDd5UdLIJD01s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C8AKkkgpHHNs783Qqoaotk+t68FJagqMpo+mLcQyB6WiLbNtAOUZMvKicvON31QIUGkBzgE6BLFGr6em4iKyLxQk1Gkl0EP26LAVXSyv57q4t09yWByR3OMztavBVPSDc6AYRB+a+BJKdpV08964mzTHd/fAemc38S+Aww+9dVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=YiNCIvFc; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id BFA1860265;
-	Fri,  3 Apr 2026 16:29:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1775226548;
-	bh=U4OCDIev93PFXK9ajmKbwQB4cm8t6Rku1D2I1wMB/ME=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YiNCIvFc+v9ST74eUMxKLOuhzEHsMrHMFeF0AIuVRbpVKbH5HAGpFQOCld2ySCrlR
-	 qn6Vu0S+oPZkJcr0+ENzFTNPowt0tarUsptcaO1/iFDfUyDSB/F6s8dUNxK+keuV51
-	 MhAICAjIBOaIv1GDUHheIN230C8w0jaDjdN4REnwPl3yhNG4sIpPJBOCozo8jHreSa
-	 k5WXQiyiRwzaRvs42j9hI1dGoh4ZjVpZ/Ia5e+BCqxbaqet3v9iqqKy1jn8TdHfOWI
-	 a3Pgzn3nOQdslW7M3QVOif2FO1Fkdy+vOZl+yDe/SR6r8Q85i7Gp4aXCXxaHPsmgKu
-	 0ozd3o9IKpPGg==
-Date: Fri, 3 Apr 2026 16:29:05 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Julian Anastasov <ja@ssi.bg>
-Cc: Waiman Long <longman@redhat.com>, Simon Horman <horms@verge.net.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Chen Ridong <chenridong@huawei.com>, Phil Auld <pauld@redhat.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, sheviks <sheviks@gmail.com>
-Subject: Re: [PATCH-next v2 0/2] ipvs: Fix incorrect use of HK_TYPE_KTHREAD
- housekeeping cpumask
-Message-ID: <ac_OscBPYRwt73ic@lemonverbena>
-References: <20260331165015.2777765-1-longman@redhat.com>
- <cd9afe18-9862-6005-f7d9-d69425b7d4cf@ssi.bg>
+	s=arc-20240116; t=1775227621; c=relaxed/simple;
+	bh=MUfPxn/Q9+bz73UceXrEBg6t1eCeckaRsXsjJcRKe8g=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=cGkTbIHbMIY4g+37VkBPINS2fTxK7rcbRwJ4p3hYCB3rOzMSx8dAZp7sO4mHuAYHWMitM5cGXscNavoLQVWvBevMSxLMx+VXE1w9IwhqP5kzfNcXvp8M7ZIv764g8NyX1kMD+4Y81y4dg2b9PQYI7tSeh5ENuauUJzVLKOz0iTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=Nk6SyLpA; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=YjWs4/xQ; arc=none smtp.client-ip=160.80.4.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 633Ek7Be016152;
+	Fri, 3 Apr 2026 16:46:12 +0200
+Received: from lubuntu-18.04 (unknown [160.80.103.126])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 3F28E12289F;
+	Fri,  3 Apr 2026 16:46:03 +0200 (CEST)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1775227563; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kcQvahFVMdD7UhY+90UTpiqjLUeMeXA4tfOKaLjxFds=;
+	b=Nk6SyLpANzW6hPOU5+FmMVhLAal7weNGfeSglJSFHv19WwW2suo0UAwm3nqYmreZwPYIJ+
+	892/zQJ0KwS4nqCg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1775227563; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kcQvahFVMdD7UhY+90UTpiqjLUeMeXA4tfOKaLjxFds=;
+	b=YjWs4/xQGLVNRGMeq5pC7P1AyzxMu/oZUrE40GFzH/LAIIJLdgcdn/6RZmiZprUJnvm9Nu
+	5FT4N9ZvuyQjawImojHoF5Jqw4E4O9NwwzeUXhZPFBzJyX7rKzoy4nUEAZW+bnQC6VCtLm
+	bS5pvv7xYTlsCDPn5g6MwjfzBgZOoJSgacvlnaj5169SYsJExS3FwTK7rJ5YiIfl6q1SAZ
+	a+OLCkyQeLkjNcC/ozy/ehwf5/zWicf9bAi0TjvPwksfsFe9xbEvOTu3EzPKKDuT08tfa6
+	XCZcGLBLgkI4NPLmawjH4PloYteimP6jG3qYW0F1R8746SAHf3j8ClJQCG7suA==
+Date: Fri, 3 Apr 2026 16:46:02 +0200
+From: Andrea Mayer <andrea.mayer@uniroma2.it>
+To: Justin Iurman <justin.iurman@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+        dsahern@kernel.org, david.lebrun@uclouvain.be,
+        stefano.salsano@uniroma2.it, paolo.lungaroni@uniroma2.it,
+        nicolas.dichtel@6wind.com, linux-kernel@vger.kernel.org,
+        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+        Andrea Mayer <andrea.mayer@uniroma2.it>
+Subject: Re: [PATCH net v2 2/2] selftests: seg6: add test for dst_cache
+ isolation in seg6 lwtunnel
+Message-Id: <20260403164602.1ca0e48f06ddbf1291627f0d@uniroma2.it>
+In-Reply-To: <d2b6a7fd-e09f-4e5d-838a-077ccecbd67f@gmail.com>
+References: <20260401185755.29813-1-andrea.mayer@uniroma2.it>
+	<20260401185755.29813-3-andrea.mayer@uniroma2.it>
+	<d2b6a7fd-e09f-4e5d-838a-077ccecbd67f@gmail.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cd9afe18-9862-6005-f7d9-d69425b7d4cf@ssi.bg>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[uniroma2.it,none];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[uniroma2.it:s=ed201904,uniroma2.it:s=rsa201904];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-275086-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-275085-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[uniroma2.it:+];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[redhat.com,verge.net.au,davemloft.net,kernel.org,google.com,strlen.de,nwl.cc,huawei.com,vger.kernel.org,netfilter.org,gmail.com];
+	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ssi.bg:email,netfilter.org:dkim]
-X-Rspamd-Queue-Id: 4034D3954B8
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,uniroma2.it:dkim,uniroma2.it:mid]
+X-Rspamd-Queue-Id: 1AD423955C6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 03, 2026 at 05:15:50PM +0300, Julian Anastasov wrote:
-> 
-> 	Hello,
-> 
-> On Tue, 31 Mar 2026, Waiman Long wrote:
-> 
-> >  v2:
-> >   - Rebased on top of linux-next
-> > 
-> > Since commit 041ee6f3727a ("kthread: Rely on HK_TYPE_DOMAIN for preferred
-> > affinity management"), the HK_TYPE_KTHREAD housekeeping cpumask may no
-> > longer be correct in showing the actual CPU affinity of kthreads that
-> > have no predefined CPU affinity. As the ipvs networking code is still
-> > using HK_TYPE_KTHREAD, we need to make HK_TYPE_KTHREAD reflect the
-> > reality.
-> > 
-> > This patch series makes HK_TYPE_KTHREAD an alias of HK_TYPE_DOMAIN
-> > and uses RCU to protect access to the HK_TYPE_KTHREAD housekeeping
-> > cpumask.
-> > 
-> > Waiman Long (2):
-> >   sched/isolation: Make HK_TYPE_KTHREAD an alias of HK_TYPE_DOMAIN
-> >   ipvs: Guard access of HK_TYPE_KTHREAD cpumask with RCU
-> 
-> 	The patchset looks good to me for nf-next, thanks!
-> 
-> Acked-by: Julian Anastasov <ja@ssi.bg>
-> 
-> 	Pablo, Florian, as a bugfix this patchset missed
-> the chance to be applied before the changes that are in
-> nf-next in ip_vs.h, there is little fuzz there. If there
-> is no chance to resolve it somehow, we can apply it
-> on top of nf-next where it now applies successfully.
+On Thu, 2 Apr 2026 20:35:12 +0200
+Justin Iurman <justin.iurman@gmail.com> wrote:
 
-One way to handle this is to follow up with nf-next as you suggest,
-then send a backport that applies cleanly for -stable once it is
-released.
+> On 4/1/26 20:57, Andrea Mayer wrote:
+> > Add a selftest that verifies the dst_cache in seg6 lwtunnel is not
+> > shared between the input (forwarding) and output (locally generated)
+> > paths.
+> > 
+> > The test creates three namespaces (ns_src, ns_router, ns_dst)
+> > connected in a line. An SRv6 encap route on ns_router encapsulates
+> > traffic destined to cafe::1 with SID fc00::100. The SID is
+> > reachable only for forwarded traffic (from ns_src) via an ip rule
+> > matching the ingress interface (iif veth-r0 lookup 100), and
+> > blackholed in the main table.
+> > 
+> > The test verifies that:
+> > 
+> >    1. A packet generated locally on ns_router does not reach
+> >       ns_dst with an empty cache, since the SID is blackholed;
+> >    2. A forwarded packet from ns_src populates the input cache
+> >       from table 100 and reaches ns_dst;
+> >    3. A packet generated locally on ns_router still does not
+> >       reach ns_dst after the input cache is populated,
+> >       confirming the output path does not reuse the input
+> >       cache entry.
+> > 
+> > Both the forwarded and local packets are pinned to the same CPU
+> > with taskset, since dst_cache is per-cpu.
+> > 
 
-Else, let me know if I am misunderstanding.
+> > [snip]
+
+> >
+> > +test_cache_isolation()
+> > +{
+> > +	RET=0
+> > +
+> > +	# local ping with empty cache: must fail (SID is blackholed)
+> > +	if ip netns exec "${NS_RTR}" taskset -c 0 \
+> > +			ping6 -c 1 -W 2 "${DEST}" &>/dev/null; then
+> > +		echo "SKIP: local ping succeeded, topology broken"
+> > +		exit "${ksft_skip}"
+> > +	fi
+> > +
+> > +	# forward from ns_src to populate the input cache
+> > +	if ! ip netns exec "${NS_SRC}" taskset -c 0 \
+> > +			ping6 -c 1 -W 2 "${DEST}" &>/dev/null; then
+> > +		echo "SKIP: forwarded ping failed, topology broken"
+> > +		exit "${ksft_skip}"
+> > +	fi
+> > +
+> > +	# local ping again: must still fail; if the output path reuses
+> > +	# the input cache, it bypasses the blackhole and the ping succeeds
+> > +	if ip netns exec "${NS_RTR}" taskset -c 0 \
+> > +			ping6 -c 1 -W 2 "${DEST}" &>/dev/null; then
+> > +		echo "FAIL: output path used dst cached by input path"
+> > +		RET="${ksft_fail}"
+> > +	else
+> > +		echo "PASS: output path dst_cache is independent"
+> > +	fi
+> > +
+> > +	return "${RET}"
+> > +}
+> > +
+> 
+> We should check it runs as root here (e.g, required for netns creation).
+> 
+> if [ "$(id -u)" -ne 0 ]; then
+> 	echo "SKIP: Need root privileges"
+> 	exit "${ksft_skip}"
+> fi
+> 
+
+Good catch! will fix in v3.
+
+> Otherwise, LGTM:
+> 
+> Reviewed-by: Justin Iurman <justin.iurman@gmail.com>
+
+Thanks for the review.
+
+Ciao,
+Andrea
 
