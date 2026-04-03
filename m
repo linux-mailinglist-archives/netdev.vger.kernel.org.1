@@ -1,80 +1,83 @@
-Return-Path: <netdev+bounces-274870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274871-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id JYP5BPFCz2k3ugYAu9opvQ
-	(envelope-from <netdev+bounces-274870-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 06:32:49 +0200
+	id kKl1N/pCz2k3ugYAu9opvQ
+	(envelope-from <netdev+bounces-274871-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 06:32:58 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07C48390E76
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 06:32:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29465390E7E
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 06:32:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C8EA63015FFC
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 04:32:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E7D24301AAB1
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 04:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94DB8199FAB;
-	Fri,  3 Apr 2026 04:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29ED62D0603;
+	Fri,  3 Apr 2026 04:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RqgWPvTA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z6kAJo54"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36AEA1E49F
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 04:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA4B20A5F3
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 04:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775190761; cv=none; b=kyzz+C/ctf+tLgdlBkcHukKZ2+UR+LA49tmzsk1ZIcl/ew9LfPnscaKoQ/RsIqhbkJw0UuLWltNR3nWj/ryOqIM98+QZVo/2rr8C8CqjN6ge+t0+YolU7Bee6wtBLgyy0yDA6ZSwFIGlWvSGW7MCgIocCAcAvMgGxBnrCWfQGcY=
+	t=1775190763; cv=none; b=NVLbM0J1BO3am9RnDAbDkT7d78cr/cW9fIiDCqVfO1U38scmD6P8X7LcgxMJ1LXBxopEfyK8ccGbcPG7cYQToPVhWKgygtA6Huvjg4mexaNZMOcd57JcCXeW4QHqDyxCiSDTwEB9hkZt8pc7hSgsybFGVQb7YSnwDhRlXj7D8CA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775190761; c=relaxed/simple;
-	bh=ycuB3KMTWi6OTQGME9zvccmnPlPiO3rH3en0YH76VHE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=b5qlVXfC8VDrEG2RzcHigkdMYKN3iFeLrUR2yDCFw6Xy0riXtYrsuMVOdAZZEMigPbg6J3jsj1cNeK6VQarHleSjk5t1nXh6wmu06jMccsuejA41oqkDpOG/Sl/ByeOPjmrh/44/RjtvygVui/EnQeAEh3NCdp4q1iOjKSlkB4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RqgWPvTA; arc=none smtp.client-ip=209.85.222.202
+	s=arc-20240116; t=1775190763; c=relaxed/simple;
+	bh=5YVX3ivlCSAhBCAVuCWzWfR+2p/zlWJ3n2GK84DvKGk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Q8dzcdkhy+cCR13Im6xPb3+Nz/+MAadvdWHcTlpyD9FYXEEqxSIMcdokv3wb5UqOOhfeBIRMbg4WhEBKBmZFSz1lhGdJiJL5rmN0xIU0HAA06tviWL9W47nlkaX1rh/cRkncIazU1tcZwZ4O/Y0sepa3Z85Wb/OwKG6tkIJ9/fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z6kAJo54; arc=none smtp.client-ip=209.85.160.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8cfcf23c0e1so410442585a.2
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 21:32:40 -0700 (PDT)
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-50b781542c1so31308251cf.1
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 21:32:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775190759; x=1775795559; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VMTEtuAm423nG3M+uXxYLj0sxb1CCJ3cVV2iHAZ/lgI=;
-        b=RqgWPvTAsRgptYIb+ocOC494xT9O5moOS87Ddbla6jWyf6xIAbLFEu0MsyFzVl9A87
-         gMoiNJj2TJM/+8rE77GLSFMJqBNYDYC+HjIi8uR1+k2vWkgFg+LLiXVjNXQtt5QsIMtI
-         tWii46xmrHt35BrBfBZSUYQCozEtJvX7Xt0wjp2fOUcGmGn0wIVZ8/IP07xqZOz4wVy4
-         iqEKz8RkJZ2o0HEg3lPPD80D5+3eo12teoiuxR/MI0hoKxXJNHm1S+z8iZK960WMvAKv
-         yCWSre06sjqd2cVkA57ORvV+5B8LEh2t6arQZRn84TpZZTLymiG1V7RE+vZp0asi9A73
-         72XQ==
+        d=google.com; s=20251104; t=1775190761; x=1775795561; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PEhlwyFqFTE3rGV5lsJ+IiUGMkxDGZa6L73MyOBa0RY=;
+        b=Z6kAJo54jFllQBEolVTyq3NmvThu8W4d4paRJTeiC6WEzIZdMtoSBE71gVod34+x3Y
+         bKzpIZTzIshQ46A8KdHE+czWpnDs7JZFCCqC3UvolRvKk10TIG1qnP0cxTdpeAwv//kK
+         sRq7o+XkS7EqemgDeFUx9vrd0Gqjx7WXVdSkenn0PZQTf8MHNDhx+Nmc8ssylcd2xu8T
+         i3G2EeV45MZZ9ii2bupgqQwftspyz8HAObqaDVchiJYvnEOKsbs3PffsotN2UaayfzfG
+         CrM6+0viDGdfcKScMBWEwH7wJzDHe5PPJP7jR/ZliIvKAVz874GILp7KGHD1UWjjxlT2
+         Evvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775190759; x=1775795559;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VMTEtuAm423nG3M+uXxYLj0sxb1CCJ3cVV2iHAZ/lgI=;
-        b=AzBsJavzbf6p4BMR+lRP3I9dxXSkjokMmVCMW6x5IFo6QVE5e5Zni4kbZ8Xz2H3uBP
-         QUcQSzu3afunLGQ7BKnbq/erBcfqctRMFuUFObh3c8gK7StQ6XRbpICHAlepUsyaNvQy
-         etOXkCVt5+QKLrQYgGo/yY30Ywvrx3OY+79ztsR3k3TOz38FfFQz45sjNF9gl2T7FvZZ
-         gES2NBD8hIPym+Z0gFvclD1FF6fWyopqcm9s5zTQOIGljfMgUV0XRHQYPGos3VT7rvZR
-         wlao5XV/lCpkJTWSaUyB5qQrbJIEPPEPd01+IU1yW2Rfg5c1Xjgl62KPVxstIxQmlaPN
-         m6PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW0ZXrGeoMEjKXMGvz82YhAo8U8eoXKhcqlGRg0Lv4NFdfyYowHQ66K+QgODg8pDoI+hqidyDk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOG77BtW0zA13UqCriVNDHY82A5cnRduenmqiKIF7BZ6GMVaND
-	3Z9DqV5lcgZ6SQU3zJG24HcKkgfgwajvYeT5KwH7a2MJ3Gv0Ca0sgTIdJ5ftITNLx7d4fHYdEd1
-	i8cKZ0jlUhCW9dg==
-X-Received: from qkak24-n1.prod.google.com ([2002:a05:620a:a0d8:10b0:8d4:abda:a95])
+        d=1e100.net; s=20251104; t=1775190761; x=1775795561;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PEhlwyFqFTE3rGV5lsJ+IiUGMkxDGZa6L73MyOBa0RY=;
+        b=kYSS/FrDqndjVGAqoDpKma2y9UPzWJ0HcRl341kjFZBwY8mqwdV5MjF8CaI/YME8jS
+         c1NLcCerObpxYfHEH/E+8WrMFjHld2TnvHTGF2ZEewo2r87FcT1AqfzHDZYtZiCvIE8F
+         qb63vCSCmVjQiKH3qc/aI4zNoR2tsM/+y966QIrwAJNbzqbFVDnS1nyPnHkBwPVvw7WK
+         Q9mNNR7EMnbhz1biVxw8/gyifYGXt+m8HCO/S5N7BpzfsjAaflKEsFHaw8leOrT8VVWn
+         2+v2qNUO+ehIcCCSXh+zct8Ylj1L8nuuuYLpoG/zkM03hhh7ACTQ9XKeeTNQ4vdLyayE
+         Sxjw==
+X-Forwarded-Encrypted: i=1; AJvYcCVf/Qy5o2mUPTabfg2ceZDgW59PMjgbZiPSUtVzvA1Tz+rIrGQFhS+rFjHq5lvF5xdrdKk0F/U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmGwQE+n4Pe5jELFEi0VkwlWxW41SCxweY+4t+2lavHUCP3Fvj
+	CmODxDKZWKwlwBSdckm/WmdSVTDGYUElokMpFM4bP3+ralpt4yLYBfK7bCj2xW9Jn/9OttZyYfD
+	lSe0/8SsrSuLIuw==
+X-Received: from qtoz25.prod.google.com ([2002:ac8:7119:0:b0:509:ce6:7b71])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:7084:b0:8cd:97a7:a334 with SMTP id af79cd13be357-8d41b8df04cmr251880085a.4.1775190758996;
- Thu, 02 Apr 2026 21:32:38 -0700 (PDT)
-Date: Fri,  3 Apr 2026 04:32:28 +0000
+ 2002:ac8:7fca:0:b0:509:1f95:f3b6 with SMTP id d75a77b69052e-50d625120afmr26420441cf.2.1775190760547;
+ Thu, 02 Apr 2026 21:32:40 -0700 (PDT)
+Date: Fri,  3 Apr 2026 04:32:29 +0000
+In-Reply-To: <20260403043237.3909226-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20260403043237.3909226-1-edumazet@google.com>
 X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
-Message-ID: <20260403043237.3909226-1-edumazet@google.com>
-Subject: [PATCH net-next 0/9] net: safe guard net/core/tso.c users
+Message-ID: <20260403043237.3909226-2-edumazet@google.com>
+Subject: [PATCH net-next 1/9] net: tso: add tso_features_check()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -88,7 +91,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -98,7 +101,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274870-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274871-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
@@ -110,52 +113,62 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 07C48390E76
+X-Rspamd-Queue-Id: 29465390E7E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Most net/core/tso.c users assume headers length is smaller than
-TSO_HEADER_SIZE. This is because they use pre-allocated and
-pre-mapped piece of memory of (N * TSO_HEADER_SIZE) bytes.
+net/core/tso.c users expecting headers size is smaller
+than TSO_HEADER_SIZE must fallback to GSO when headers
+are too big.
 
-Add tso_features_check() helper so that these drivers
-can request a fallback to GSO if headers are too big.
+Provide tso_features_check() for drivers .ndo_features_check().
 
-We could in the future add more checks in tso_features_check()
-against max number of segments per TSO packet, as many
-drivers also seem to drop packets if gso_size is too small
-relative to their TX ring sizes.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/tso.h | 11 +++++++++++
+ net/core/tso.c    | 12 ++++++++++++
+ 2 files changed, 23 insertions(+)
 
-Eric Dumazet (9):
-  net: tso: add tso_features_check()
-  net: mvneta: use tso_features_check()
-  net: thunderx: use tso_features_check()
-  dpaa2-eth: use tso_features_check()
-  net: enetc: use tso_features_check()
-  net: fec: use tso_features_check()
-  net: mv643xx_eth: use tso_features_check()
-  net: mvpp2: use tso_features_check()
-  octeontx2-pf: use tso_features_check()
-
- drivers/net/ethernet/cavium/thunder/nicvf_main.c     |  2 ++
- drivers/net/ethernet/cavium/thunder/nicvf_queues.c   |  1 +
- drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c     |  2 ++
- drivers/net/ethernet/freescale/enetc/enetc.c         |  2 ++
- drivers/net/ethernet/freescale/enetc/enetc4_pf.c     |  2 ++
- drivers/net/ethernet/freescale/enetc/enetc_pf.c      |  2 ++
- drivers/net/ethernet/freescale/enetc/enetc_vf.c      |  2 ++
- drivers/net/ethernet/freescale/fec_main.c            |  2 ++
- drivers/net/ethernet/marvell/mv643xx_eth.c           |  2 ++
- drivers/net/ethernet/marvell/mvneta.c                |  2 ++
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c      |  2 ++
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c |  2 ++
- .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.c   |  1 +
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c |  2 ++
- drivers/net/ethernet/marvell/octeontx2/nic/rep.c     |  2 ++
- include/net/tso.h                                    | 11 +++++++++++
- net/core/tso.c                                       | 12 ++++++++++++
- 17 files changed, 51 insertions(+)
-
+diff --git a/include/net/tso.h b/include/net/tso.h
+index e7e157ae0526c8d655aca67a8a49191ec870746b..9be7cb6553975a2a82e0987214fee6883bf74404 100644
+--- a/include/net/tso.h
++++ b/include/net/tso.h
+@@ -28,4 +28,15 @@ void tso_build_hdr(const struct sk_buff *skb, char *hdr, struct tso_t *tso,
+ void tso_build_data(const struct sk_buff *skb, struct tso_t *tso, int size);
+ int tso_start(struct sk_buff *skb, struct tso_t *tso);
+ 
++static inline int tso_compute_hdr_len(const struct sk_buff *skb)
++{
++	int tlen = skb_is_gso_tcp(skb) ? tcp_hdrlen(skb) : sizeof(struct udphdr);
++	int hdr_len = skb_transport_offset(skb) + tlen;
++
++	return hdr_len;
++}
++
++netdev_features_t tso_features_check(struct sk_buff *skb,
++				     struct net_device *dev,
++				     netdev_features_t features);
+ #endif	/* _TSO_H */
+diff --git a/net/core/tso.c b/net/core/tso.c
+index 6df997b9076e9842f3de7bb3e34599d8ff4e4fd4..81e2cc66d0dd29eeb647232e04032b1412382a6f 100644
+--- a/net/core/tso.c
++++ b/net/core/tso.c
+@@ -87,3 +87,15 @@ int tso_start(struct sk_buff *skb, struct tso_t *tso)
+ 	return hdr_len;
+ }
+ EXPORT_SYMBOL(tso_start);
++
++netdev_features_t tso_features_check(struct sk_buff *skb,
++				     struct net_device *dev,
++				     netdev_features_t features)
++{
++	if (skb_is_gso(skb)) {
++		if (tso_compute_hdr_len(skb) > TSO_HEADER_SIZE)
++			features &= ~NETIF_F_GSO_MASK;
++	}
++	return features;
++}
++EXPORT_SYMBOL(tso_features_check);
 -- 
 2.53.0.1213.gd9a14994de-goog
 
