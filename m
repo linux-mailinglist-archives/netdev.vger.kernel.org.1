@@ -1,97 +1,99 @@
-Return-Path: <netdev+bounces-274803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274804-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OKeGMB4Nz2kNsgYAu9opvQ
-	(envelope-from <netdev+bounces-274803-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:43:10 +0200
+	id 4FLsKxgNz2kNsgYAu9opvQ
+	(envelope-from <netdev+bounces-274804-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:43:04 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7716038F99F
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:43:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AA5538F998
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:43:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CA95B3127AEF
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 00:37:02 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 73373312ACF3
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 00:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B299C28A1E6;
-	Fri,  3 Apr 2026 00:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE14629ACD7;
+	Fri,  3 Apr 2026 00:36:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="MmAe2Oze"
+	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="VfvzpoH6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C443284B2F
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 00:36:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2C2292B4B
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 00:36:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775176566; cv=none; b=S9tnTT5BnIrC9cPHJZfePJEvgQUGcnpdA+Db9lmgnf4etNDtBNBeDKYJKWtvzYg3oqAKh/P5kH0xBXwcJZnPlqlgLroE4idwBbiMUlx4m4ggphkdNkXT9bWJ2dtCw6b0OLaEVXQM6quYyVGI4e1Ld7R/uMNUJVRARRWGEf1hvKI=
+	t=1775176568; cv=none; b=tV+xS2q7+iGs1Q5MUMFpMl7WM7dxrMQU8Jl8N739ALk4qjNdAJVV5QTqK2RutVUkxvbKDhkz9258BzfM+GMjVdywhMs94p+EBO38hmp5Db0YbXBC3U65zkjpqa602RZENiH/b78Df2zVu7jVfhz6xkgNUPC4PthKBb4LnAHE7gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775176566; c=relaxed/simple;
-	bh=i7LlFWSxtXSqs68JNjJJCKZTHI6dOrsEB4tMckHBawI=;
+	s=arc-20240116; t=1775176568; c=relaxed/simple;
+	bh=8wDnYGmsZvC7abjvNEJ3Tk+IvO8q3U34sLBOd8TOXA8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MEZl2yv9K9IEX+dMHqi6e7RrLTNrRIQrrq/6mFyLbSC4gtAGpVSRcFhK4XJ3+a1Q8uTMfWty0ZCho06R5RoYdaiAXX4UpT0lknAfoZQK38xz8TZRYOgS92cTjSEOC7IHYjx5b9yYNBg8NGzuobPub5ikCc0HtuJ7oTO0HEa/JSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=MmAe2Oze; arc=none smtp.client-ip=209.85.210.181
+	 MIME-Version; b=ILY8jJEfh9e2oHDGSfBG0ujVjudQy2baKFSG1onzYfZlF93BVETxKzt0rtTzleFZOhohR/yauP89spOvQjBebrhO8XPZFxfuVEcPReex6gwftm+6o44p31gkQ8aokbfzQbEG3kJx5txGVjcO8zjbj+MmT8iwcnB0PaNrT8MRg9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=VfvzpoH6; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-82d03827316so394516b3a.0
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 17:36:05 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-35da1af3e10so1229887a91.3
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 17:36:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775176564; x=1775781364; darn=vger.kernel.org;
+        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775176566; x=1775781366; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DhSdyxItZF7Zo/U3S2uuQtdffY9aqIoTVtx9G17MmZM=;
-        b=MmAe2OzeTwiq35q7vkF9ovVPa2opHPxGRfP3ECPEGhizcdzSqreUwbBgVmLwz1CP8E
-         qui2QZubVpcZfZ13kCkXoAZscyS/TMW8GFJnXppjSgyN4ruILDcF9Gg4d2+aKr4dxety
-         Ms5fj+dkcqT+Dx3f5zCzWTLxMlJ0QNMB688/0CvfUR/NFO+fVq7sVxwtRyoPR2r4LE+E
-         FLjK5efaYcUtu7v6TdHs24LydcpPFA40rpLhhCScD7rFGt2DPXrLUDYI9B4IH/Q+HFby
-         9mFC5WVH4SmvCyKd32TufXpJbuFUlsTv6qM9HzCDSr2QiIF5Q6nDDqu3cr1ERrL3M8QZ
-         UP8g==
+        bh=NLMUaKCgV8ol4xEA39jbeNRFpzXzgz54RkpOpnmPJPI=;
+        b=VfvzpoH6pNmkO3AKv5bsD/XwKnYjQs5Qycpuz7hrofgEvL2WyvJ8QYYqX/Ef/RTJ5w
+         HwiwG/NP55ALItUKag1Asr9FCxVH1dRYNuBIYE+AEgIiuvgNpGl6aLvJEPqrqStB/RKc
+         uxD8z8buOdOwDugaBZ4Ld+P+w5w1uvtXNq6YlNUGjRNUSGXW2XQrPRX9wDG2nZOhdYjT
+         R/76NBd1w0sMJSVx24jt1zRkeW1TCJFNjXs1o13DK2Wlljlfg+N0K9/iD2nSePyReFyk
+         bSFAEJmp3hvB4x0H5VyRl1BOf9Rx9rG50kD7eRtZotynIDeCq7PgcpDdukprsW21VrZe
+         /ShQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775176564; x=1775781364;
+        d=1e100.net; s=20251104; t=1775176566; x=1775781366;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=DhSdyxItZF7Zo/U3S2uuQtdffY9aqIoTVtx9G17MmZM=;
-        b=pe7SqvNEjgcBVq+CvbwHUtRIZ2pToHj9jZdyrd+BhdUdTPyZQsTACH1UA+imuueTBc
-         Y/kDLLQG4Sa+eZMPcQeyH/sCW4uB6GsYmaRE1LQYrt156DtOiqAMi8I3BP0IJcaC7fCW
-         LsYVI9sco9KVgxwzZIohm0P2hdB0HCwGUaqqqFilAfR6oadvS+hWkp6Zo2GgYLrfyczD
-         xgW6+ti8K+yVZeRQT2D3/CjHuML/romphulqTLViMGX2cmJ8mzoq78vsV2o18bsK+Lmx
-         U0cLCLkUqi+ZLC0vFrcxCtkkwVHd3KRc3oAdcyduV0CJhbUPJQWbs0A5mZRoKeV77LcG
-         x3Uw==
-X-Gm-Message-State: AOJu0YwIJVHQ3qEPAmEANudntpJLxHyThAC3ICM1kAlMunN2CDCF2CB6
-	rsRCqbYCYvPjYa+3aVnuWP0JaUwj8j1hASn5nrlL52zEk8Yal9qwC9BJm2qD0kHYbfEstu/lsXH
-	5ApVkQk0=
-X-Gm-Gg: ATEYQzzUfx6F8XDdxuvXAZcNqBO1vi5cLm8b3oMegWo2oq9YN6LLPylboWMbWXFAOUD
-	nJs8Te+IvVOGwkj+XyC1eAqfpYC2XRTFEwqibmSsLHTwgnNrjzo6XLnoh+sfKXR+mcyEIBd657+
-	6B4sfCkrpWehIghcMZPJPBKXBfxsAHffI/bo15GKlXQ/6VmfFgFrA3EaBbGLUK/Giry/kjTOpSN
-	BF1LiM6wvAHjnMjfcbj8IXG9MEMwZ/+HYatipdfcQC8Pphc0bJHCE93dX7X07X4fCGEDm5inMTz
-	20M2qdCKRAGleXQjo+YzALIHmT9Ef02CpfsCe0elNs1gBhwVjaSYc5ZV/uqx0FOKgwCmT+2lQXn
-	6iKyKuDPiQgLfVmuVGa5Wi1nR/oso1Io4jeHc3MTdJ6qGCqS/WqN3R73ie/clO89aeOjLpXppSE
-	F0QJ17
-X-Received: by 2002:a05:6a00:421a:b0:81f:32cc:b1fc with SMTP id d2e1a72fcca58-82d001e9b4dmr4081991b3a.3.1775176564568;
-        Thu, 02 Apr 2026 17:36:04 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:5d::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9c41bc6sm4252084b3a.29.2026.04.02.17.36.03
+        bh=NLMUaKCgV8ol4xEA39jbeNRFpzXzgz54RkpOpnmPJPI=;
+        b=KMlZNTTWUZ+QiWCoMLqSAQdU48avyuWSJ/htRl63Rijb++RpP/DLJjUlzYryauF5Hm
+         8RM6KsOKgYcyXXh3JFJfYWYW1WmrImI2KAcHTVJok5Dh4ZcZuM0mmKaDUECNsukoPG8M
+         ChljE27fbzxIAVboZ/GiA2Sq+y0WMZ5g0WnfJwB3BWurNq6V38Aa3eu7/iedqT/TQBvK
+         h3thilOOB1NJU5tHBAzZhQgXFcw7OtFrUe7YKkwG+ycK3npk4I+mAXLNJR9Y3eXB/Bzy
+         tHhdUcAtnCe/yhBTJlXqsefJ0HXrcmsyS8IcVgkF7QeX8IasgAshWCrZt5a3dJbw7m6q
+         lMZg==
+X-Gm-Message-State: AOJu0YyKFvPw1lPyYc9rl1lnQE8qukb2DQhqKZkbaCPf34d8Mgav2Vol
+	HnWZKiVDAFPKgwERwzLIJMw3KV2wGNbDy5ChIZd+tnMHr2lZZecIs+RKLBcFsEuXVm4yKMhS92G
+	6C1uXN7M=
+X-Gm-Gg: AeBDiesPGQUCl9NzVEltxnuVnsjovLf1EA2VDbl33pBUfcGUScr1d426Lbfzels5dBO
+	TbxrpgtBd3ZAlPCHcybQxlQqNMTXSQrSw89lCUBpHPHGdftF2COL0Qlv/0WCsCNjkJ65kBRhBbe
+	UvHYhFPr36dWPxYvu1cxH9C/kX7Efvdc6AnP/fkif9cwouYVHf3Fxl++24vHTIZ33fhMQZ/cBb2
+	z1SofKsjTGq9G7zCyX070DMi66GamzEFYSM+PKqVDBsfFQLcgxSZnBw6pQajDgpGQi3wMidjkDA
+	azL5+PjMb2X9rVmSZS1XLk72n/PwOqdmL0Q8V9wpL1ej1x9E4fNn9NbJwVojsVKl+KFYOfrKLVE
+	IKV5xAtTmDJnTeXd15RmNLEMyZQJwFu+0yZfuXJbIlfS5X9/vmQOAuTPV7COTel6ackih2I+i0M
+	xNi58=
+X-Received: by 2002:a17:903:2a86:b0:2ae:ce35:2686 with SMTP id d9443c01a7336-2b281706f07mr13520335ad.5.1775176566421;
+        Thu, 02 Apr 2026 17:36:06 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:1::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2749cbd85sm38769725ad.74.2026.04.02.17.36.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Apr 2026 17:36:04 -0700 (PDT)
+        Thu, 02 Apr 2026 17:36:06 -0700 (PDT)
 From: Joe Damato <joe@dama.to>
 To: netdev@vger.kernel.org,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>
 Cc: horms@kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
 	linux-kernel@vger.kernel.org,
 	leon@kernel.org,
-	Joe Damato <joe@dama.to>
-Subject: [net-next v8 09/10] net: bnxt: Dispatch to SW USO
-Date: Thu,  2 Apr 2026 17:35:16 -0700
-Message-ID: <20260403003524.2564973-10-joe@dama.to>
+	Joe Damato <joe@dama.to>,
+	linux-kselftest@vger.kernel.org
+Subject: [net-next v8 10/10] selftests: drv-net: Add USO test
+Date: Thu,  2 Apr 2026 17:35:17 -0700
+Message-ID: <20260403003524.2564973-11-joe@dama.to>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20260403003524.2564973-1-joe@dama.to>
 References: <20260403003524.2564973-1-joe@dama.to>
@@ -112,8 +114,8 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-274803-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	TAGGED_FROM(0.00)[bounces-274804-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
@@ -130,45 +132,161 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,dama-to.20251104.gappssmtp.com:dkim,dama.to:email,dama.to:mid,broadcom.com:email]
-X-Rspamd-Queue-Id: 7716038F99F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,dama-to.20251104.gappssmtp.com:dkim,uso.py:url,dama.to:email,dama.to:mid,lib.py:url]
+X-Rspamd-Queue-Id: 2AA5538F998
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Wire in the SW USO path added in preceding commits when hardware USO is
-not possible.
-
-When a GSO skb with SKB_GSO_UDP_L4 arrives and the NIC lacks HW USO
-capability, redirect to bnxt_sw_udp_gso_xmit() which handles software
-segmentation into individual UDP frames submitted directly to the TX
-ring.
+Add a simple test for USO. Tests both ipv4 and ipv6 with several full
+segments and a partial segment.
 
 Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Joe Damato <joe@dama.to>
 ---
+ v7:
+   - Dropped Pavan's Reviewed-by as there were changes.
+   - Update to use ksft_variants with a generator and a parameterized test_uso
+     function.
+   - Save original USO state and restore it at the end of the test.
+   - Replace sleep with cfg.wait_hw_stats_settle
+   - Use a socat receiver and check tx stats locally instead of rx on the
+     remote.
+
  v5:
    - Added Pavan's Reviewed-by. No functional changes.
 
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ v4:
+   - Fix python linter issues (unused imports, docstring, etc).
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 82bab63b5821..a89b0927118c 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -508,6 +508,11 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		}
- 	}
- #endif
-+	if (skb_is_gso(skb) &&
-+	    (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4) &&
-+	    !(bp->flags & BNXT_FLAG_UDP_GSO_CAP))
-+		return bnxt_sw_udp_gso_xmit(bp, txr, txq, skb);
+ rfcv2:
+   - new in rfcv2
+
+ tools/testing/selftests/drivers/net/Makefile |   1 +
+ tools/testing/selftests/drivers/net/uso.py   | 103 +++++++++++++++++++
+ 2 files changed, 104 insertions(+)
+ create mode 100755 tools/testing/selftests/drivers/net/uso.py
+
+diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+index 7c7fa75b80c2..335c2ce4b9ab 100644
+--- a/tools/testing/selftests/drivers/net/Makefile
++++ b/tools/testing/selftests/drivers/net/Makefile
+@@ -21,6 +21,7 @@ TEST_PROGS := \
+ 	ring_reconfig.py \
+ 	shaper.py \
+ 	stats.py \
++	uso.py \
+ 	xdp.py \
+ # end of TEST_PROGS
+ 
+diff --git a/tools/testing/selftests/drivers/net/uso.py b/tools/testing/selftests/drivers/net/uso.py
+new file mode 100755
+index 000000000000..75bf02849075
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/uso.py
+@@ -0,0 +1,103 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
 +
- 	free_size = bnxt_tx_avail(bp, txr);
- 	if (unlikely(free_size < skb_shinfo(skb)->nr_frags + 2)) {
- 		/* We must have raced with NAPI cleanup */
++"""Test USO
++
++Sends large UDP datagrams with UDP_SEGMENT and verifies that the peer
++receives the correct number of individual segments with correct sizes.
++"""
++import random
++import socket
++import string
++
++from lib.py import ksft_run, ksft_exit, KsftSkipEx
++from lib.py import ksft_eq, ksft_ge, ksft_variants, KsftNamedVariant
++from lib.py import NetDrvEpEnv
++from lib.py import bkg, defer, ethtool, ip, rand_port, wait_port_listen
++
++# python doesn't expose this constant, so we need to hardcode it to enable UDP
++# segmentation for large payloads
++UDP_SEGMENT = 103
++
++
++def _send_uso(cfg, ipver, mss, total_payload, port):
++    if ipver == "4":
++        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
++        dst = (cfg.remote_addr_v["4"], port)
++    else:
++        sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
++        dst = (cfg.remote_addr_v["6"], port)
++
++    sock.setsockopt(socket.IPPROTO_UDP, UDP_SEGMENT, mss)
++    payload = ''.join(random.choice(string.ascii_lowercase)
++                      for _ in range(total_payload))
++    sock.sendto(payload.encode(), dst)
++    sock.close()
++    return payload
++
++
++def _get_tx_packets(cfg):
++    stats = ip(f"-s link show dev {cfg.ifname}", json=True)[0]
++    return stats['stats64']['tx']['packets']
++
++
++def _test_uso(cfg, ipver, mss, total_payload):
++    cfg.require_ipver(ipver)
++    cfg.require_cmd("socat", remote=True)
++
++    features = ethtool(f"-k {cfg.ifname}", json=True)
++    uso_was_on = features[0]["tx-udp-segmentation"]["active"]
++
++    try:
++        ethtool(f"-K {cfg.ifname} tx-udp-segmentation on")
++    except Exception as exc:
++        raise KsftSkipEx(
++            "Device does not support tx-udp-segmentation") from exc
++    if not uso_was_on:
++        defer(ethtool, f"-K {cfg.ifname} tx-udp-segmentation off")
++
++    expected_segs = (total_payload + mss - 1) // mss
++
++    port = rand_port(stype=socket.SOCK_DGRAM)
++    rx_cmd = f"socat -{ipver} -T 2 -u UDP-RECV:{port},reuseport STDOUT"
++
++    tx_before = _get_tx_packets(cfg)
++
++    with bkg(rx_cmd, host=cfg.remote, exit_wait=True) as rx:
++        wait_port_listen(port, proto="udp", host=cfg.remote)
++        _send_uso(cfg, ipver, mss, total_payload, port)
++
++    ksft_eq(len(rx.stdout), total_payload,
++            comment=f"Received {len(rx.stdout)}B, expected {total_payload}B")
++
++    cfg.wait_hw_stats_settle()
++
++    tx_after = _get_tx_packets(cfg)
++    tx_delta = tx_after - tx_before
++
++    ksft_ge(tx_delta, expected_segs,
++            comment=f"Expected >= {expected_segs} tx packets, got {tx_delta}")
++
++
++def _uso_variants():
++    for ipver in ["4", "6"]:
++        yield KsftNamedVariant(f"v{ipver}_partial", ipver, 1400, 1400 * 10 + 500)
++        yield KsftNamedVariant(f"v{ipver}_exact", ipver, 1400, 1400 * 5)
++
++
++@ksft_variants(_uso_variants())
++def test_uso(cfg, ipver, mss, total_payload):
++    """Send a USO datagram and verify the peer receives the expected segments."""
++    _test_uso(cfg, ipver, mss, total_payload)
++
++
++def main() -> None:
++    """Run USO tests."""
++    with NetDrvEpEnv(__file__) as cfg:
++        ksft_run([test_uso],
++                 args=(cfg, ))
++    ksft_exit()
++
++
++if __name__ == "__main__":
++    main()
 -- 
 2.52.0
 
