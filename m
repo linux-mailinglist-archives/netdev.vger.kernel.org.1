@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-274831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274832-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ULunFWsWz2lZswYAu9opvQ
-	(envelope-from <netdev+bounces-274831-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 03:22:51 +0200
+	id aGZYGnEVz2k2swYAu9opvQ
+	(envelope-from <netdev+bounces-274832-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 03:18:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8B8738FFD8
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 03:22:50 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id E484C38FF1A
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 03:18:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 241BA30B97C1
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 01:17:48 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 03E11304AD3B
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 01:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BAB92765F8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616A1283CBF;
 	Fri,  3 Apr 2026 01:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MeW8Fp7e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OhBBdA+E"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB25B1BBBE5;
-	Fri,  3 Apr 2026 01:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2212820A9;
+	Fri,  3 Apr 2026 01:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775179062; cv=none; b=FmMS839mrOlfPVV461rrZmWfDWAiyD1nqPXglFyrumbdzCoDSugbRbCA8S2GPED/mAxQFVP9y8hqCWrPkCz1vlIfqqkYgdlbBiMbIE9rirZnZx1+U2JUGMcrYu4Wlf7K2dAUwR+xvVxosnIsMWMSOdTXyYBiu9AkUqCvku7nc+Y=
+	t=1775179063; cv=none; b=c2gvxYMfGd4G1ojVxwYinj9ASWZyJaah9B+ncHlz2uaAnaF9qx0ESbmxlBqA3EqQq1SQ6oF/k6/69GO8naZfgXIeiKQQaLwxdAZYLtV8AzAUG2ibojhhAcRJyJU957N6p7vha2bbunqmPwcEPj+nITfhC4ydqLkrPKJQffOOZ1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775179062; c=relaxed/simple;
-	bh=Qo5WYyKMeV7hp8RN7S6hSeBu5J+1l7VvgvLybc0R8cI=;
+	s=arc-20240116; t=1775179063; c=relaxed/simple;
+	bh=EFAVMQZdeYp3p63+e+4293CsTLGyJdiSV230CSFVXgY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=djidv0D7yvwK+JyAfPRYjNWhhlaIrTJxHIAItREfPGUNqcMon4iARbfb+pp4k4DhrirWTg2EcDssoedDNS7zEuR1SciZB9SO+xnch6FTj9wCBP/C8nBi67UYZubZx3wdETruCfXdPv+2YK8USV951oj4ueGusmP8pncFVicflMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MeW8Fp7e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A65CC116C6;
-	Fri,  3 Apr 2026 01:17:39 +0000 (UTC)
+	 MIME-Version; b=G7cQ5HvUiOPsNa0u2C3Kx8CXtR51o+wb38XUyeP/MV/gx+FBmHFQCZKqPSDH5BXbm7yJciMSUDvOsUKNE4l2nMiwVLf972ExPhbUj42Gp+b0g0p+XzLPCnzUtOuxwDrOpr1RPFigYl+qAEfm0pOAFf4vr2G6smYmjfUDOQHeHJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OhBBdA+E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC292C2BCB2;
+	Fri,  3 Apr 2026 01:17:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775179060;
-	bh=Qo5WYyKMeV7hp8RN7S6hSeBu5J+1l7VvgvLybc0R8cI=;
+	s=k20201202; t=1775179062;
+	bh=EFAVMQZdeYp3p63+e+4293CsTLGyJdiSV230CSFVXgY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MeW8Fp7eYP/CuVWuq7dX7B7pzgPFmvM6dhFAaKmM3gWLSO5f10MO+Ya+UeyMCy2YF
-	 RRZQYOk8eN60TuEF8jSk08eoCCq/3IF0kk/7O61DqFW67UypRKbQbISlfYAWNZr7E9
-	 nr3FvErd9D8PQ7uME3Uq6cvez2SrwAIjs3uKBuu3XKk0pNJXhhNjkfJT7LgS3l0haC
-	 RMhTu+dCGe2kSF15x7CnfeRL2plx6wC8AsMMZ+VXNq4RFhDgBl8teFOTqGYOD39298
-	 xiNAmGPb/zcB/kITk2cuLUWYuMvQm0RaehPff/7mLMgao/b+Sc/RykYvKTArOyNW+U
-	 l48zSk6T+aIMw==
+	b=OhBBdA+EJaT7h1MeQGXuyT3xlz3LIwg2zub97gRs8+YKaNLTv9i3rQJ6KpghcbHBC
+	 bSg9iIQ2UYl/BkWpegwYnRNu9yg/bqXeQHBU1j1XL/LBJtrQL2OinJ9KooKqP5APzT
+	 mSMO9yiM8d5S4EEnHiHcmnxiw6ufdRrtxI8MpsplXg/m1C6DGWFSf5Eq2P8XcE8eAv
+	 +6Prlu8zJJKuZnwhBJTP51sZZLpvHpSlP8iSlCifsp2LEt5tzZOUEA1I6B+UUZlx4D
+	 8ua3RGw2eDYd/hEgp8w8qRloHWD29H+5oB+SzhbqzuSC1mWSJBHDFc9f9KXHm13Qe0
+	 iGvMa0Nb+Zbhg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: wei.fang@nxp.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -69,12 +69,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	linuxppc-dev@lists.ozlabs.org,
 	linux-arm-kernel@lists.infradead.org,
 	imx@lists.linux.dev
-Subject: Re: [PATCH v4 net-next 10/14] net: dsa: netc: introduce NXP NETC switch driver for i.MX94
-Date: Thu,  2 Apr 2026 18:17:38 -0700
-Message-ID: <20260403011738.1795644-1-kuba@kernel.org>
+Subject: Re: [PATCH v4 net-next 11/14] net: dsa: netc: add phylink MAC operations
+Date: Thu,  2 Apr 2026 18:17:40 -0700
+Message-ID: <20260403011740.1795694-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260331113025.1566878-11-wei.fang@nxp.com>
-References: <20260331113025.1566878-11-wei.fang@nxp.com>
+In-Reply-To: <20260331113025.1566878-12-wei.fang@nxp.com>
+References: <20260331113025.1566878-12-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,14 +89,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,nxp.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org,lists.ozlabs.org,lists.infradead.org,lists.linux.dev];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-274831-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274832-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -109,186 +109,150 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A8B8738FFD8
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E484C38FF1A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: dsa: netc: introduce NXP NETC switch driver for i.MX94
-    
-This commit introduces the initial NXP NETC switch driver for the i.MX94
-series. It supports basic probe and remove functionality for the integrated
-802.1Q Ethernet switch. The switch includes 3 user ports and 1 CPU port
-connected to an internal ENETC.
+net: dsa: netc: add phylink MAC operations
+
+Different versions of NETC switches have different numbers of ports and
+MAC capabilities, so add .phylink_get_caps() to struct netc_switch_info.
+In addition, related interfaces of struct phylink_mac_ops are added.
 
 > diff --git a/drivers/net/dsa/netc/netc_main.c b/drivers/net/dsa/netc/netc_main.c
-> new file mode 100644
-> index 000000000000..5828fd3e342e
-> --- /dev/null
+> index 5828fd3e342e..f11f5d0f6a6d 100644
+> --- a/drivers/net/dsa/netc/netc_main.c
 > +++ b/drivers/net/dsa/netc/netc_main.c
 [ ... ]
-> +static int netc_port_create_emdio_bus(struct netc_port *np,
-> +				      struct device_node *node)
+> +static void netc_port_set_mac_mode(struct netc_port *np,
+> +				   unsigned int mode,
+> +				   phy_interface_t phy_mode)
 > +{
+> +	u32 mask = PM_IF_MODE_IFMODE | PM_IF_MODE_REVMII;
+> +	u32 val = 0;
+> +
+> +	switch (phy_mode) {
+> +	case PHY_INTERFACE_MODE_RGMII:
 [ ... ]
-> +	err = devm_of_mdiobus_register(dev, bus, node);
-> +	if (err)
-> +		return dev_err_probe(dev, err,
-> +				     "Cannot register EMDIO bus\n");
-> +
-> +	np->emdio = bus;
-> +
-> +	return 0;
-> +}
-[ ... ]
-> +static int netc_init_switch_id(struct netc_switch *priv)
-> +{
-> +	struct netc_switch_regs *regs = &priv->regs;
-> +	struct dsa_switch *ds = priv->ds;
-> +
-> +	/* The value of 0 is reserved for the VEPA switch and cannot
-> +	 * be used.
-> +	 */
-> +	if (ds->index > SWCR_SWID || !ds->index) {
-> +		dev_err(priv->dev, "Switch index %d out of range\n",
-> +			ds->index);
-> +		return -ERANGE;
-> +	}
-
-Does this check cause the probe to fail unconditionally for standard
-single-switch topologies?
-
-The DSA core typically assigns ds->index = 0 by default for the first switch.
-Because !ds->index evaluates to true for index 0, this setup function will
-always fail unless the dsa,member property is explicitly overridden in the
-device tree.
-
-Could the driver translate the hardware ID internally, for example by writing
-ds->index + 1 to NETC_SWCR, rather than forcing this hardware-specific
-restriction onto the software DSA index?
-
-> +
-> +	netc_base_wr(regs, NETC_SWCR, ds->index);
-> +
-> +	return 0;
-> +}
-[ ... ]
-> +static bool netc_port_is_emdio_consumer(struct device_node *node)
-> +{
-> +	struct device_node *mdio_node;
-> +
-> +	/* If the port node has phy-handle property and it does
-> +	 * not contain a mdio child node, then the port is the
-> +	 * EMDIO consumer.
-> +	 */
-> +	mdio_node = of_get_child_by_name(node, "mdio");
-> +	if (!mdio_node)
-> +		return true;
-> +
-> +	of_node_put(mdio_node);
-> +
-> +	return false;
-> +}
-> +
-> +/* Currently, phylink_of_phy_connect() is called by dsa_user_create(),
-> + * so if the switch uses the external MDIO controller (like the EMDIO
-> + * function) to manage the external PHYs. The MDIO bus may not be
-> + * created when phylink_of_phy_connect() is called, so it will return
-> + * an error and cause the switch driver to fail to probe.
-> + * This workaround can be removed when DSA phylink_of_phy_connect()
-> + * calls are moved from probe() to ndo_open().
-> + */
-> +static int netc_switch_check_emdio_is_ready(struct device *dev)
-> +{
-[ ... ]
-> +	for_each_available_child_of_node_scoped(ports, child) {
-> +		/* If the node does not have phy-handle property, then
-> +		 * the port does not connect to a PHY, so the port is
-> +		 * not the EMDIO consumer.
-> +		 */
-> +		phy_node = of_parse_phandle(child, "phy-handle", 0);
-> +		if (!phy_node)
-> +			continue;
-> +
-> +		if (!netc_port_is_emdio_consumer(child)) {
-> +			of_node_put(phy_node);
-> +			continue;
-> +		}
-> +
-> +		phydev = of_phy_find_device(phy_node);
-> +		of_node_put(phy_node);
-> +		if (!phydev) {
-> +			err = -EPROBE_DEFER;
-> +			goto out;
-> +		}
-
-Could this logic cause an infinite probe deferral loop for ports sharing an
-internal MDIO bus?
-
-The netc_port_is_emdio_consumer() function assumes any port node without an
-mdio child is an EMDIO consumer waiting for an external controller. However,
-if multiple sibling ports on the same switch share a single internal MDIO bus
-defined under one port, the other ports will lack an mdio child node.
-
-This would cause those ports to be mistakenly treated as external EMDIO
-consumers, calling of_phy_find_device(). Because the internal MDIO bus is not
-registered until later in netc_setup(), the PHY device cannot be found, and
-the driver returns -EPROBE_DEFER.
-
-Since netc_setup() is never reached, the MDIO bus is never registered,
-causing an infinite deferral loop. Could the driver more accurately identify
-whether the PHY belongs to its own switch before deferring?
-
-> +
-> +		put_device(&phydev->mdio.dev);
+> +	case PHY_INTERFACE_MODE_SGMII:
+> +	case PHY_INTERFACE_MODE_2500BASEX:
+> +		val |= IFMODE_SGMII;
+> +		break;
+> +	default:
+> +		break;
 > +	}
 > +
-> +out:
-> +	of_node_put(ports);
-> +
-> +	return err;
+> +	netc_mac_port_rmw(np, NETC_PM_IF_MODE(0), mask, val);
 > +}
-> +
-> +static int netc_switch_pci_init(struct pci_dev *pdev)
-> +{
+
+In imx94_switch_phylink_get_caps(), PHY_INTERFACE_MODE_1000BASEX is
+advertised as supported for ports 0 and 1. Does it need to be handled
+in this switch statement? As written, it appears it will fall through
+to the default case and clear the IFMODE bits, leaving the MAC in an
+undefined mode.
+
 [ ... ]
-> +	regs->base = pci_ioremap_bar(pdev, NETC_REGS_BAR);
-> +	if (!regs->base) {
-> +		err = -ENXIO;
-> +		dev_err(dev, "pci_ioremap_bar() failed\n");
-> +		goto release_mem_regions;
+> +static void netc_port_mac_rx_enable(struct netc_port *np)
+> +{
+> +	netc_port_rmw(np, NETC_POR, PCR_RXDIS, 0);
+> +	netc_mac_port_rmw(np, NETC_PM_CMD_CFG(0), PM_CMD_CFG_RX_EN,
+> +			  PM_CMD_CFG_RX_EN);
+> +}
+
+Pseudo ports (like the CPU port) bypass PMAC register accesses during
+graceful stop via is_netc_pseudo_port(). Should there be a similar check
+here, and in netc_port_set_mac_mode(), to prevent accessing physical MAC
+registers on pseudo ports?
+
+Additionally, when np->caps.pmac is true, netc_port_mac_rx_graceful_stop()
+disables the preemption MAC via NETC_PM_CMD_CFG(1). Should this function
+re-enable it when bringing the link back up?
+
+> +static void netc_port_wait_rx_empty(struct netc_port *np, int mac)
+> +{
+> +	u32 val;
+> +
+> +	if (read_poll_timeout(netc_port_rd, val, val & PM_IEVENT_RX_EMPTY,
+> +			      100, 10000, false, np, NETC_PM_IEVENT(mac)))
+> +		dev_warn(np->switch_priv->dev,
+> +			 "MAC %d of swp%d RX is not empty\n", mac,
+> +			 np->dp->index);
+> +}
+
+Is NETC_PM_IEVENT a sticky write-1-to-clear register? If the RX FIFO had
+previously emptied during normal operation, could this bit already be set,
+causing read_poll_timeout() to return immediately without waiting?
+
+> +static void netc_port_mac_rx_graceful_stop(struct netc_port *np)
+> +{
+> +	u32 val;
+> +
+> +	if (is_netc_pseudo_port(np))
+> +		goto check_rx_busy;
+> +
+> +	if (np->caps.pmac) {
+> +		netc_port_rmw(np, NETC_PM_CMD_CFG(1), PM_CMD_CFG_RX_EN, 0);
+> +		netc_port_wait_rx_empty(np, 1);
 > +	}
-[ ... ]
-> +static void netc_switch_pci_destroy(struct pci_dev *pdev)
-> +{
-> +	struct netc_switch *priv = pci_get_drvdata(pdev);
 > +
-> +	iounmap(priv->regs.base);
-> +	pci_release_mem_regions(pdev);
-> +	pci_disable_device(pdev);
+> +	netc_port_rmw(np, NETC_PM_CMD_CFG(0), PM_CMD_CFG_RX_EN, 0);
+> +	netc_port_wait_rx_empty(np, 0);
+> +
+> +check_rx_busy:
+> +	if (read_poll_timeout(netc_port_rd, val, !(val & PSR_RX_BUSY),
+> +			      100, 10000, false, np, NETC_PSR))
+> +		dev_warn(np->switch_priv->dev, "swp%d RX is busy\n",
+> +			 np->dp->index);
+> +
+> +	netc_port_rmw(np, NETC_POR, PCR_RXDIS, PCR_RXDIS);
 > +}
 
-Does unmapping the memory here introduce a use-after-unmap issue when the
-MDIO bus is unregistered?
+For pseudo ports, the code jumps directly to check_rx_busy and polls for
+PSR_RX_BUSY to clear. Since PCR_RXDIS is only set after the polling
+completes, will the RX pipeline continue accepting traffic and cause this
+poll to always timeout on an active link?
 
-The driver registers the MDIO bus using devm_of_mdiobus_register(), meaning
-devres cleans it up asynchronously after the remove function returns or when
-probe fails.
+> +static void netc_mac_link_up(struct phylink_config *config,
+> +			     struct phy_device *phy, unsigned int mode,
+> +			     phy_interface_t interface, int speed,
+> +			     int duplex, bool tx_pause, bool rx_pause)
+> +{
+> +	struct dsa_port *dp = dsa_phylink_to_port(config);
+> +	struct netc_port *np;
+> +
+> +	np = NETC_PORT(dp->ds, dp->index);
+> +	netc_port_set_speed(np, speed);
+> +
+> +	if (phy_interface_mode_is_rgmii(interface))
+> +		netc_port_set_rgmii_mac(np, speed, duplex);
+> +
+> +	if (interface == PHY_INTERFACE_MODE_RMII ||
+> +	    interface == PHY_INTERFACE_MODE_REVMII ||
+> +	    interface == PHY_INTERFACE_MODE_MII)
+> +		netc_port_set_rmii_mii_mac(np, speed, duplex);
+> +
+> +	netc_port_mac_rx_enable(np);
+> +}
 
-However, in netc_switch_pci_destroy(), the driver explicitly unmaps the PCI
-I/O memory via iounmap(). Since netc_switch_pci_destroy() is called
-synchronously inside the remove function and probe error paths, the memory is
-unmapped before the MDIO bus is unregistered by devres.
+The callback imx94_switch_phylink_get_caps() advertises MAC_ASYM_PAUSE and
+MAC_SYM_PAUSE capabilities. Is it expected that tx_pause and rx_pause are
+ignored here? If flow control is implemented in a subsequent patch, should
+the advertisement be deferred until then?
 
-When devres eventually unregisters the MDIO bus, it detaches PHY devices,
-which often perform MDIO transactions during removal. Because the underlying
-memory priv->regs.base is already unmapped, these MDIO read/write callbacks
-could trigger a synchronous external abort or kernel panic.
+> +static void netc_mac_link_down(struct phylink_config *config,
+> +			       unsigned int mode,
+> +			       phy_interface_t interface)
+> +{
+> +	struct dsa_port *dp = dsa_phylink_to_port(config);
+> +
+> +	netc_port_mac_rx_graceful_stop(NETC_PORT(dp->ds, dp->index));
+> +}
 
-Would it be better to use pcim_iomap() to tie the memory mapping lifecycle to
-devres, ensuring it outlives the MDIO bus?
+This correctly stops the RX pipeline, but should the TX path
+(PM_CMD_CFG_TX_EN or PCR_TXDIS) also be disabled when the link goes down?
 
