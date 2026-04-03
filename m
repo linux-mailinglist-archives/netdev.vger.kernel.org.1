@@ -1,215 +1,196 @@
-Return-Path: <netdev+bounces-274899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274900-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SLdxBzphz2kVvwYAu9opvQ
-	(envelope-from <netdev+bounces-274899-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 08:42:02 +0200
+	id SGSCA4tiz2lZvwYAu9opvQ
+	(envelope-from <netdev+bounces-274900-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 08:47:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 673BD39176E
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 08:42:01 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B1B63917B0
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 08:47:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 231DB301703C
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 06:41:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 042B0301CFEA
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 06:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6318F35A3BF;
-	Fri,  3 Apr 2026 06:41:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0F46A001;
+	Fri,  3 Apr 2026 06:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BZYMYLP9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JOU2EIey"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0ED836309F
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 06:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775198510; cv=pass; b=LTk42DiM22Bf0rnf6whpcWHU0kC/ub9D4ZRz9+Zi2Y/ocOEWk7+xQb4c/nmyYhHmU9iY/sTiRv92kp147JdUoDNDVkHRiL+l2uk5gTYqNKiBmVQXNdgG3CAH19DWrnum3FY/zTW/isxTOAC5SJJGwQoNz5AMIVSJeB2JkDwlHTE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775198510; c=relaxed/simple;
-	bh=g34Q7kaCdGutrL4RG/9Ww9dX+8MOecUwvEqAiZCWlPM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AlzCJcth5U7nqQVrtKYkal/m2vFhFgFWdMmoT36dUETURck6TXVXaIXMsz5tysBvvc3ydYNXmxnDDjoOlxVhx6N+fIDjcKx7hJwK0l3xyGVeQsTjNO+No9DUaNuQL1rENPylDZ+uOduTFOWO8yZydagdztNe+zR//x68xBfxROQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BZYMYLP9; arc=pass smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8cfdac74050so214742085a.3
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 23:41:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775198508; cv=none;
-        d=google.com; s=arc-20240605;
-        b=C7AvyoWg6foiu0mzD9iwNGp8R0+CyoQiOG6nd2pwajO4ic11faZ4VSX3y9KWuk5EVu
-         d3dkuvgOksSozcxaXtl+9j9rFiXp9/7zdTUNhGwdPSvlvqojNS8B5+WHvsxoezhoapJV
-         r3QKqWh8BD1bzwOHKBFbNFBGp7z+aFys1j8xHDXpILq49wTRx27BXv6SY3vJkArJyoSR
-         FBABrEPRAV+UHuzf8Iuu2EpoynQXLz02NVpqC0qnoA4fm2z7aZXPnekwdbwHYre194ti
-         t9PZrbydNK7Q9q27brrEq2Hk0GY5T+WwRAsFSv5eBsdKvkgt0o75xpaCqYw5KZlGaDKh
-         abPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=476jFsFJ6OvjFssD1jWF4sFE8F3LXSAtn8n1PRhwgZQ=;
-        fh=izaFAkB8ptIVxteM7TMtjVVwV6dwHDQxrPdWtgF2Pw8=;
-        b=k1JXarV2A7VrK/lADdIRb7rNWI+iMJDN96zj7/DrKQ06VB6J+rcU/mMOdBkmYcPuYh
-         QrjR9HFkYafe6Jhyvi0hIawAWSqfdy6l0WyNlrmoBcW50PxQfoWCf+10WSn9i5mlRUgV
-         mU0G4wzu/GWBDsc/kRFnglhsMfLHKbkG/aLWV0gCDYxZIZaL9U7RleywF3uZ+HVZLXjV
-         ZwMuy6hiMCBrY+Hk+DfXOcknpMpnzkOFnug8eoO4cRFrDCyk5Zvlo0J9z/4yf1bdomY5
-         QapWNtxb1VG3Y4AWuFBJDmGixqHdIFvpEC6Oz+5ug1+GhlHFuBLnNNlQHE6+ORawLE1S
-         XYDQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605EA2FF657
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 06:47:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775198854; cv=none; b=kenZAjceztrvHbZU2/XaHRK6uFUDF9G/ZScKIHI74mQJyvGFTjoDETbA+M2YyikyTRJg/NMwhwV3NwcSOIAZ5u2i6BhwEo8H2uFtjSXCVffiMIYHpZSK5ewMe3lDAVHhUCf2dwsO34jWN/WrWZRRoIJ0zXb1l94NM0W1CI4S94k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775198854; c=relaxed/simple;
+	bh=/Nlv6pv9dyh2rkzGIInhoEc+cQ18b9nVotbkcIs7kDs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=e5Y9p6pmxRzfq3Zx8DFzk0i3/W4IjND3VbUDu84IfDQr7Ln2JEpCKGFYPaM6k5ZQYzE3Cwh5Ke9M6P+ZMd5G+bs+jxxhhABGzpXnx3TepKfc74/coNM1lDbCC4JKUrXZ1JjvDB2pe2tf950Umkms/sJyrCplzC2S93uWHSeFeZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JOU2EIey; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-358dff8447cso218513a91.0
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 23:47:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775198508; x=1775803308; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1775198853; x=1775803653; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=476jFsFJ6OvjFssD1jWF4sFE8F3LXSAtn8n1PRhwgZQ=;
-        b=BZYMYLP9q4PUC4A/B8ZDY1Y4PLmKUrGgjQVMVS20K2IHQzSI9wKpOJytFLaxPPcy8J
-         3/wrEVmtAsbKCJ5OOhRkGqTlpZ6e/UQVYzHPJwombqkbT6hUYQxKQH/88j+I910pZwpM
-         zlInPo16Xm9nYKkjctXQUVdhBMQ43EO+1kqDvP7TCv27efw2N70wJgyVayi9/mDxP1Vl
-         5OnxH1QSPpi+eZKw/eAMLYE84tkuvaowRKBDwkNlphlOo4Iq2EW6ta9l84UxDhEsgKe0
-         yor7uYSeBUnv9Jcdhd4+9ThyHhP4onWToZiMyu8irOHsxQk8pIx6+haofuOU7Ojxjq4I
-         3MFQ==
+        bh=vQfPR85esVVTomimAESJxYAPjhrPwWLUtGGzTJec/vU=;
+        b=JOU2EIeyaEPiAk5JlfYDmie7GQ/129OitsH2ODnf5Z4YYklsqpTlLKyKFFjAP2faak
+         TSZlF5Bu5nfSpcz3rl9cbM/FrmCdvBVdQYGLfbf7T/OQcXUWHJt7U5gn7+BPHF16nkSu
+         gKwTx5timb0gPtFXPZAPdhYOOJxoEsDEfFWQ1xQDaWF9dSMdaTiiF7qDff67ShvY6ZMO
+         qBk1q2alV4B9FcVLaXtlF9357u40YV7hf89UKzJgKUsr4BoRv33uC/zIO3CRLqwgbNB3
+         BmrG+i6LjV8DKa3VtNEZm7nsdFSTSJzFslItE6g2ylTyfjv372wCrpIiLuGY2r5Wf5o4
+         5gZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775198508; x=1775803308;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1775198853; x=1775803653;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=476jFsFJ6OvjFssD1jWF4sFE8F3LXSAtn8n1PRhwgZQ=;
-        b=NLDbxNiPd5tTqc2KMlfkpT/BGeQ2C70sQl01d0EzSNjhSITg43wmJyyo/LXBOZVTW8
-         wA+rGn+G9/3Jd4E8Uc+QUPQ+4iS2Cej36ViOGjh9T+XFc0qwDqsMq+fa2m30meoZfF5q
-         C+tJV5yXIGYfRvR62nXQTYMq6pAV9TlmF550oEI71O71L/o7O7NewlbcoKqn5XMNYO4l
-         jOMvHMqWPk48ayO4mhHJ4qJC5VsWtsoOIkqDI+VIu2nGbCHzH5BgCzdGCo98iU+viC4U
-         NvqHldj94Qb3gTVc/f5u94fEL2dqL3zpHXcL8Mmg7ryT2ycpYy148W+pKUe1s12+EoxR
-         LkWg==
-X-Forwarded-Encrypted: i=1; AJvYcCXeo9OeamnGpHw1NV0w1qtQuAPxsKlzqIYNL1VQlXZCMUGprrIbWoh4ARsa82iiJuZY9//q/AU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKZ8pAb7CAyx8ZEFQY871WMi+OIPlPCVhv+S8WjfFjpXtN5BWd
-	Etx6n0RQGXPCuFRXvMZbH5OTEXlkmbJxoazfq8tQHZLKmM7ckHuf1xkrAhlbYQgEGwgAEZ/3wSz
-	ZCcPBu36Rh1QDvDp90MjOL0aJ/wak2zFwGTOh0JZM
-X-Gm-Gg: ATEYQzzqMd8nvvR0uLj4d8fSooGhmgNXh7k98W4W/EHkFJJBcoLP+/5ZBJp+hwrsmfw
-	cV8SrhqSRYs7AIfBsRUb1NQJa19DmlQ+1m47twbNc7sJTCjkL/wonDnETkCbscQUhpe7AqvWBV4
-	sbA5SfYmVpPFN246aKT4CJXUBFQ+UnmE18SKP7LEZeqaII8b5UVpb7MKsRM/aNC3nIVQGrK/vbD
-	qy0/pKQXB5D7hv+RBHGToSimTSOONLj50cpc8OVXREP2OAWG2KkwISWaOEmx89qSAlPaQIjNmaI
-	jovYfB4=
-X-Received: by 2002:a05:620a:480a:b0:8d0:8f7:36b4 with SMTP id
- af79cd13be357-8d41db50c79mr276130585a.32.1775198507282; Thu, 02 Apr 2026
- 23:41:47 -0700 (PDT)
+        bh=vQfPR85esVVTomimAESJxYAPjhrPwWLUtGGzTJec/vU=;
+        b=OWcbowet5JMfGuR0mZRe9VQ6GQGzSEUb+YQvc3O2+DaKLaGiyucBvrbjkiKmwN8Fkh
+         4nPh8lzmHL0n+W1xweooXtegbZ3KvkfbVw/Y4Tqgy51ksMrLVnjVttcZWh6FBFi2Ic7m
+         C4RDQs7GwJp9XYQ3P6yHsUIc+ODoj0MxJXF7p+yU6k5cWFGH38GiDLV9GF7mDf4vUHj5
+         turjp2uOEisqZjYoAjmyAzAFhFQek4R6mJiXeRXxRUDGOrD19+UvP9nzvi0fPwubb4ZC
+         PiivmPfHHt7jhn5UivFPiMipFf7hqGW/igGo/zoR8RzHoO5UI7PJZNm+3TWGcn07YlYJ
+         jOPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUlbJaKnABuZDBwIkSQR+heIUeKs9PL1qoKP+kQzdvxVJKN59175TiwDPVhLaY7x/FY4IPIAuM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBQp2p9tCA0OzJ4on1fiPz/tx5daVbbQUJLvbYP9GHDKBhjyeC
+	CpDU1aKPex6yh63okTW6Agd9AVeqO3lxNlNBXt1l063CdvOpyT3BN5bc
+X-Gm-Gg: AeBDietUXyhsPgLDZFoYISPlzDSVMKkAh0cbP74ZssTGbpfJBZEsdjXS6RzqcXhVvve
+	34ItSfI3IYnFJnKasnloRbtTEG2d019Th7e8SWGbJCvSOVtCFKUse1iezl+2iNJdXiD5PYg0so0
+	Oj677yp5AmrJtTGxM5NEGo2TTJ/EZG8QmJW5zOdViQ//G0xUKZ8e2BN/QVZhQbDohg2+Qsj5DRw
+	ryobFAqouxWow4orGYuZLhIOQ8554enEmq6zBoJJ0cemmz01HxK/aKKbZbOuTRPloBVdMcmYKBd
+	RKkJ6b8F8yP1YcPwovsbwU+p/FnF+PSBbM/5U9fZwOYyk1bVvYduPXq9s9iISqWVkPdSyz0e4Uj
+	mGKkR54fonInY0BCR4KD4j/4p5SBAVHY+v3m80wwBf/LwpXi2Iq36/kz45RoKnsZ85sPhGDu8+O
+	bfLe7N00spbmoPlNWKLOPSyB2n9HigvJi3
+X-Received: by 2002:a17:90b:1dc1:b0:35d:b736:e4d4 with SMTP id 98e67ed59e1d1-35de6954621mr1096597a91.4.1775198852754;
+        Thu, 02 Apr 2026 23:47:32 -0700 (PDT)
+Received: from localhost.localdomain ([189.1.242.96])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35dd35f50e9sm4813993a91.6.2026.04.02.23.47.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2026 23:47:32 -0700 (PDT)
+From: Yiqi Sun <sunyiqixm@gmail.com>
+To: pabeni@redhat.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	gnault@redhat.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	kuniyu@google.com,
+	leitao@debian.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	sunyiqixm@gmail.com
+Subject: Re: Re: [PATCH] net/mpls: fix missing NULL check in mpls_valid_fib_dump_req
+Date: Fri,  3 Apr 2026 14:47:04 +0800
+Message-Id: <20260403064704.2323691-1-sunyiqixm@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <c5c71526-047b-480d-bf4f-6ebc47357f49@redhat.com>
+References: <c5c71526-047b-480d-bf4f-6ebc47357f49@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260403043237.3909226-1-edumazet@google.com> <20260403043237.3909226-2-edumazet@google.com>
-In-Reply-To: <20260403043237.3909226-2-edumazet@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 2 Apr 2026 23:41:36 -0700
-X-Gm-Features: AQROBzBi3eNOEyZe4lajR8IzB7hPG-pqfUh6FzlcdCkHsVlu7bP8OaKeSZqCZyo
-Message-ID: <CANn89iK00Ttiq6CBkKZ1KdPbVwOgEMYwQP=6PK8fpYf2Fp9mDw@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/9] net: tso: add tso_features_check()
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Joe Damato <joe@dama.to>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,lunn.ch,dama.to,vger.kernel.org,gmail.com];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-274899-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274900-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[davemloft.net,google.com,redhat.com,kernel.org,debian.org,vger.kernel.org,gmail.com];
+	TO_DN_NONE(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[sunyiqixm@gmail.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 673BD39176E
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 6B1B63917B0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 2, 2026 at 9:32=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> net/core/tso.c users expecting headers size is smaller
-> than TSO_HEADER_SIZE must fallback to GSO when headers
-> are too big.
->
-> Provide tso_features_check() for drivers .ndo_features_check().
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On 3/26/26 11:25 AM, Paolo Abeni wrote:
+> On 3/23/26 8:15 AM, sunichi wrote:
+> > The attribute tb[RTA_OIF] is dereferenced without verifying if it is NULL.
+> > If this attribute is missing in the user netlink message, it will cause a
+> > NULL pointer dereference and kernel panic.
+> > 
+> > Add the necessary check before using the pointer to prevent the crash.
+> > 
+> > Signed-off-by: sunichi <sunyiqixm@gmail.com>
+> > ---
+> >  net/mpls/af_mpls.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
+> > index d5417688f69e..28bbea30aae3 100644
+> > --- a/net/mpls/af_mpls.c
+> > +++ b/net/mpls/af_mpls.c
+> > @@ -2174,6 +2174,8 @@ static int mpls_valid_fib_dump_req(struct net *net, const struct nlmsghdr *nlh,
+> >  		int ifindex;
+> >  
+> >  		if (i == RTA_OIF) {
+> > +			if (!tb[i])
+> > +				return -EINVAL;
+> >  			ifindex = nla_get_u32(tb[i]);
+> >  			filter->dev = dev_get_by_index_rcu(net, ifindex);
+> >  			if (!filter->dev)
+> 
+> If you reorder the check I think it will lead to better code:
+> 
 > ---
->  include/net/tso.h | 11 +++++++++++
->  net/core/tso.c    | 12 ++++++++++++
->  2 files changed, 23 insertions(+)
->
-> diff --git a/include/net/tso.h b/include/net/tso.h
-> index e7e157ae0526c8d655aca67a8a49191ec870746b..9be7cb6553975a2a82e098721=
-4fee6883bf74404 100644
-> --- a/include/net/tso.h
-> +++ b/include/net/tso.h
-> @@ -28,4 +28,15 @@ void tso_build_hdr(const struct sk_buff *skb, char *hd=
-r, struct tso_t *tso,
->  void tso_build_data(const struct sk_buff *skb, struct tso_t *tso, int si=
-ze);
->  int tso_start(struct sk_buff *skb, struct tso_t *tso);
->
-> +static inline int tso_compute_hdr_len(const struct sk_buff *skb)
-> +{
-> +       int tlen =3D skb_is_gso_tcp(skb) ? tcp_hdrlen(skb) : sizeof(struc=
-t udphdr);
-> +       int hdr_len =3D skb_transport_offset(skb) + tlen;
+> diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
+> index b32311f5cbf7..41510dce5329 100644
+> --- a/net/mpls/af_mpls.c
+> +++ b/net/mpls/af_mpls.c
+> @@ -2170,13 +2170,16 @@ static int mpls_valid_fib_dump_req(struct net
+> *net, const struct nlmsghdr *nlh,
+>         for (i = 0; i <= RTA_MAX; ++i) {
+>                 int ifindex;
+> 
+> +               if (!tb[i])
+> +                       continue;
 > +
-> +       return hdr_len;
-> +}
-> +
-> +netdev_features_t tso_features_check(struct sk_buff *skb,
-> +                                    struct net_device *dev,
-> +                                    netdev_features_t features);
->  #endif /* _TSO_H */
-> diff --git a/net/core/tso.c b/net/core/tso.c
-> index 6df997b9076e9842f3de7bb3e34599d8ff4e4fd4..81e2cc66d0dd29eeb647232e0=
-4032b1412382a6f 100644
-> --- a/net/core/tso.c
-> +++ b/net/core/tso.c
-> @@ -87,3 +87,15 @@ int tso_start(struct sk_buff *skb, struct tso_t *tso)
->         return hdr_len;
->  }
->  EXPORT_SYMBOL(tso_start);
-> +
-> +netdev_features_t tso_features_check(struct sk_buff *skb,
-> +                                    struct net_device *dev,
-> +                                    netdev_features_t features)
-> +{
-> +       if (skb_is_gso(skb)) {
-> +               if (tso_compute_hdr_len(skb) > TSO_HEADER_SIZE)
-> +                       features &=3D ~NETIF_F_GSO_MASK;
-> +       }
-> +       return features;
+>                 if (i == RTA_OIF) {
+>                         ifindex = nla_get_u32(tb[i]);
+>                         filter->dev = dev_get_by_index_rcu(net, ifindex);
+>                         if (!filter->dev)
+>                                 return -ENODEV;
+>                         filter->filter_set = 1;
+> -               } else if (tb[i]) {
+> +               } else {
+>                         NL_SET_ERR_MSG_MOD(extack, "Unsupported
+> attribute in dump request");
+>                         return -EINVAL;
+>                 }
 
-I forgot that netif_skb_features() uses:
+Thanks for the suggestion! The reordered version looks better to me.
 
-if (dev->netdev_ops->ndo_features_check)
-    features &=3D dev->netdev_ops->ndo_features_check(skb, dev,
-                                            features);
-else
-    features &=3D dflt_features_check(skb, dev, features);
+And sorry, forgot to add:
+Fixes: 196cfebf8972 ("net/mpls: Handle kernel side filtering of route dumps")
 
-So I need to call vlan_features_check() from tso_features_check()
-
-pw-bot: cr
 
