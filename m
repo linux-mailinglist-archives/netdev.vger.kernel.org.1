@@ -1,189 +1,160 @@
-Return-Path: <netdev+bounces-274807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274808-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IDKYHzUOz2lysgYAu9opvQ
-	(envelope-from <netdev+bounces-274807-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:47:49 +0200
+	id SMh2HrANz2lysgYAu9opvQ
+	(envelope-from <netdev+bounces-274808-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:45:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDB3B38FA60
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:47:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D33E338FA26
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:45:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AADBE3049E2F
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 00:44:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 86FD73030B31
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 00:45:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B769D20B810;
-	Fri,  3 Apr 2026 00:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2215822F767;
+	Fri,  3 Apr 2026 00:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UfWIcKvn"
+	dkim=pass (2048-bit key) header.d=cmpxchg.org header.i=@cmpxchg.org header.b="pW8IIkcM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FD7239E6C
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 00:44:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775177092; cv=pass; b=K4XL5NQ7SwcA02fR3AgaM+gdqhh7ojmvSSdoQHDMoIOXfhe6cl1HM9WvRnzfiwf0FnQPX97U9Jl+DdrxDqhUgIZcZOJRvV8s8ebdCoBkGwkVo+eKgQBTBu2v0d2qCoUGlmWpriol/KAX6NFqcN9KxAvZfVCFT8psG7ZpUSI+Huc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775177092; c=relaxed/simple;
-	bh=1TGiPZ0E/TiWquYkJ+GqPn2605yvKDUR7A65q5idzaM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pZCY/cmG9n2KyhKkB4i2jiMqvMOcSzQvUSekQH3F8Fi5vobVYlC2lmVDG9IjcxzR568/WC6xKgbKbg36UTf/A0nH9XKiFbsqvIGMcG69+gALo3lFpS0Ji7swHD2vnHnQPY88CKdi495kApGGjjhrCibvIzBjrDobxxRQ9xm3yyY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UfWIcKvn; arc=pass smtp.client-ip=209.85.210.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7d744d9acbeso578643a34.1
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 17:44:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775177089; cv=none;
-        d=google.com; s=arc-20240605;
-        b=fqvmohyjOF1ubyk5DyGAXAKKPrqA5/exU2/IIs3KA3vOO42c6/vPWgLV/warpXP2Qj
-         XAcbMKN2w2Za/VGGdOLE/DC1oUJjq4HbzuQ46QbPPzmrj2P3J50LqrJwPyCN5OcpcZFU
-         JjIf4aKJqQdXPlXQGECA0Jl7C2fk6+7FeiuYlPpNYp7o1jUqpDcx80sr4YsFJIVqAYuj
-         RGl5f/sLK4s8Wy5lLmxnh9sIgjzx2ShKRAyF4nNMipvmdzF9aqkNZ0N2Hpe8G8BaONS+
-         PMKuwEU/YN3YWZL/OfVNGTOe5uftS4Uew6xrKW77GtoWd/eTl5KYbzJwld3jJ23M+dBL
-         afRw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=/uKLs5sXjzRjDT+KuGM3nXX/PDvMAjn2HFtueCKeYro=;
-        fh=1ffhz1LCn+XjckKwJV4d58j3PNJFvGXtZYChy/J7jCo=;
-        b=JiulMY+Nt8NSJalROVVlHGXRaQjYlsNQUGJtAX9EEfkdIpDI8Qn9HmYEfyu+vxrG+N
-         KWHxhcWqCmeFTrb6b1M52B+sHU/5hJbPpFXlNWPpMER3JYTx8V/o+WU24Waq1LiOrbR3
-         vF7VHdliAe59ik+OLfkpfiA6zPPqmZvvOz6tjUJmXf1sYzKRVNY6krs57KSMnHEp9nFI
-         jeO62CDJ56zhHKAefpjNOh5DEkOn7fSLbEaCWKYN62JelE85rp9dsFLMNz7fQT8XSNCJ
-         pec7d4nmEOhPC2jgawn+EiZIyKBjxnAa7fO6z7qlW/EM9F/TuhcAzDSkMAQ97GTZQsFG
-         GNgg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0713523AB87
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 00:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775177106; cv=none; b=gST/ika9LsT0ikQ7mRFeYKS/Cb4oXU2RHO3xUpy70LlDhanUZiLPAPWkzNBonznm6E1Nj1wWFrV89CbC4nRWTO3GrL8C+mK/ystsd4syZS5NFxdYDgjXTamk9344tY9wrJnQ/Pp+mz14d2EzYajfl3VRX9csEbC5yImeK+AN6oQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775177106; c=relaxed/simple;
+	bh=Uo+eFa8ffM82vVc82HmTHe4hQtiePHyyfXhzDgRWbHM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qcskr/Zx/iWPvKrMEwrbOEeVupGrbnF8K2vvhYX0OYyzxt4al+66nfHN05sEnj8BDPymrK7MNxUwAE9YnK1iD9eg76S/tP35TMPtbXTk2Yts8TZ5DcbBtiwUspAyk85aYl9bHjpEUUsWi3T4JcpGaOW3HAXHRKvlrFWEgJ1g1+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org; spf=pass smtp.mailfrom=cmpxchg.org; dkim=pass (2048-bit key) header.d=cmpxchg.org header.i=@cmpxchg.org header.b=pW8IIkcM; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmpxchg.org
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-89f68634786so18437986d6.1
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 17:45:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775177089; x=1775781889; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/uKLs5sXjzRjDT+KuGM3nXX/PDvMAjn2HFtueCKeYro=;
-        b=UfWIcKvn41lqL/rXF/QnygPbTNfTFlIBF0FxcFjGmcRtfA8F1dseX5LzldoE7uSAMg
-         j1eOpHVSRn5OsunZh0WsZLDZkxm0QS+VFxuzqSlpbKAzsmTL0pj0OWCdAxMh77Ob/1os
-         ux3SENzvnwnMSfM3DLnMjvYXBlksIxOeBIhbLPwDJWetKx59Q5gd/8O8++J5cOoMrSZl
-         Vd/xx5CxbJoXDz72WUWkIa6tHyk5lZYU7R/O2ZYX7wn2GDCY9gp7UBUYdnKuBwdsgCs+
-         6ZDjAxabScJ9DKjjxHDA+hWgeil0tdSEq+DiS9RKXXWbioxESI09GCDFHuhBcCE/GEDi
-         E/tg==
+        d=cmpxchg.org; s=google; t=1775177103; x=1775781903; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nc2bWeNZtLKm/ctbiyRLlxDwOQ1uLVCnFLmdvpOYX6E=;
+        b=pW8IIkcMEebrPo4x2FLHdxCjZwPaW8CVQaBwRHSNo87N8QsO3f1eo5LM7d4BTxYDtp
+         3Rqf6/tD4MlxNxaFPwn/NCU8tzFnzP4v7MTNmKFjBQnQDU8NtqpoXAtSy8qVhdR2O8HZ
+         yyfnbr7ysAwdUEQJ/vQcq1slRwtoqh6PtXCGv25B9HgxE0d2Ap4TL5JmGcHGxO4GgACc
+         uWZytgwk3fxejkh+H7lFkynS6nROlXiQr9tO+9/ES52Aa8rpvzyZUK73w8iH8jAQ37NR
+         9U2ADHQ0ERuSejjXlffZ+ib8Zw6zHzNC3mNGYhYV+YpuwzUkpzsuXenSWOuKYeYj+zb6
+         8/vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775177089; x=1775781889;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/uKLs5sXjzRjDT+KuGM3nXX/PDvMAjn2HFtueCKeYro=;
-        b=LyWeJYJrsbsNzl+9+PpDksCbNZwfjNjX8nkgu2nyIlMymRboA+yZFfb3w8wysfzVj0
-         YwwzzLkSr7vFqDZ6D/wViYoAktK8tm94Q3JqPGCyUPMtyefJxOyz1MRvnNiTj/rfWJDL
-         5ch8727HqDCs6hBfq8FVvH9YK+4IAqS7Nuc7w/RV8fjmo2OUH4c/Fw3VlgJyAumtxWaF
-         ed6zXy92WDnqAJI9DFrk5UfyWtstnysM9LXD4MGQZJC8EHplu+7u/DAD2MoxSkcrTo3m
-         KpcsMF1Z145GsNlAkhWu5ALr0Z6Uh7gsy39PPUSrFfdjynwYgCZMotapE7Kvasnkx7KB
-         Xmfw==
-X-Gm-Message-State: AOJu0YyELR1ZKWvZOtqQtsfnl4Kr3uconQeMI/7LOjymVxLNCAAEldqD
-	4adLcycNMj7t+TDhkVemnDSHdxmVt71sDpZ8wCsjYzjPPzZN42p6ZIctDYafzUavnsx4OHLiMLq
-	K2llZJHKI/OY4eC2hfJrVeHbTpdmTDlAOpIZ2
-X-Gm-Gg: ATEYQzw98z8UF60IC8oqlx3LjtjwGvQIl0Pgyqa64EWJt/PSBMjQv0c/RPPNPqWRqBP
-	XxPWd/cmu61nCUYwkoqRitlTO1andg/S4SwLVY5CWYPWlKfsRSAGR6uAfESHSi5lmHlbNwh6pAp
-	YfLfXCQmRs7+NwX4F5sCNBWVLrLHPberKncxaLVKop6HbGiynmFehrfw9CMPbGkjS/b+owi0ls0
-	Jc+gqVKsCbpOK1DQN+nVqtu3rbrqtHehdTeGgJvei14lLqyUJGqqz8jRKL1ALQmywqWwG5INIq0
-	daSFyviXCKoWWBut44sTRQejZY998fNXvWq0DLAJhg==
-X-Received: by 2002:a05:6820:3084:b0:67d:95bf:b535 with SMTP id
- 006d021491bc7-6821a137d9amr747371eaf.0.1775177088674; Thu, 02 Apr 2026
- 17:44:48 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1775177103; x=1775781903;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nc2bWeNZtLKm/ctbiyRLlxDwOQ1uLVCnFLmdvpOYX6E=;
+        b=mrY2cuXzj6FaAmPZ9jWZLXoqWifnLoeId6FgzAi+GKKjUkEelveesWrA7lgmPiBcJE
+         f+0f71NWaK7jOxG3NM9alBFrBIJxddH26kK6Qr2yekr3vefOvVk3lSCeLel44jedWBIE
+         +mCFf5G+mp6JXEZ7R0QSn/ZeZ3PcP4cGQkQKJLhCVlG4JR9qWMcUgTnOcMJ4eScukCWf
+         WNybq2/RVtFh2qHj1Qf7ZH5f4fQTeuVn/k1ShGm7nntes8EV4q10lf2IctghOoDm/vwR
+         lNjjagQgJz8dNnI3KwPgsuGfoEzA3D/2xYpjQgc0sx4FJHZAUXE0QaTuaOKtZCLWCxKE
+         BXrg==
+X-Forwarded-Encrypted: i=1; AJvYcCWXXODciyIATM7CcA+V5Et5pfbwqpfabaZv2UF4aQUMrmoil5h/QmwLdotWi0+qUbOTtHAZNxg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyikz+KUp85mMFEY3BJLG7wUfm59muLA2j/U8zRrJ7eOlXcRmim
+	3wJ1CvelddNsW1edjWnqSwZ4fsFazF7s6hwKRBo56KzIfQKpZA+ZZaGvcvp2dOnm2zU=
+X-Gm-Gg: AeBDietxMX7oDS21I2XLXTVcNhscUAiCEXepgXvgE18yj8fhaf+JtSrMsKxqc0noZD4
+	YXmK3xsWAwWU3Pw9V9Agu/n6pzRTMibiAckzuj4EOjXXsePYu48JvkKK5BkHg4Sr8DIj8F3LpeM
+	eiJJjiQzNiMYCraB8E+3CiI5J9d4QWbDWpBADSUwA/ecDyK8p6rZ0zZRrAfjYzqMuVKQIqCDaxo
+	3VBlu/4xnboMLNQPInPe1cEZpbTuuJjwjZRjWbz+q3ysKdQFbeiB/kiYj97oHfWBn1+8JlsdLTL
+	XhdS5Mc0JhCBpNSjcR9QFYlCvWHiO1/uAzL1hR26T3twSaDFCGrVAzMXhFkMUeep7uSalJwZOoT
+	YOIB/yOTnCnpIa4VGx9zsETBjBql/Fsly5swgl1xWW9BWfP7fe7+q8p1wvk7mBgZq/lJhZbmEI2
+	er+a90WXtBrL9SKkQgtiW27Q==
+X-Received: by 2002:a05:6214:5f0d:b0:8a4:7977:e5fa with SMTP id 6a1803df08f44-8a702b96165mr25937426d6.25.1775177102854;
+        Thu, 02 Apr 2026 17:45:02 -0700 (PDT)
+Received: from localhost ([2603:7000:c00:3a00:365a:60ff:fe62:ff29])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8a596a0a655sm35304536d6.29.2026.04.02.17.45.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2026 17:45:02 -0700 (PDT)
+Date: Thu, 2 Apr 2026 20:45:01 -0400
+From: Johannes Weiner <hannes@cmpxchg.org>
+To: "JP Kobryn (Meta)" <jp.kobryn@linux.dev>
+Cc: linux-mm@kvack.org, willy@infradead.org, akpm@linux-foundation.org,
+	david@kernel.org, ljs@kernel.org, Liam.Howlett@oracle.com,
+	vbabka@kernel.org, rppt@kernel.org, surenb@google.com,
+	mhocko@suse.com, kasong@tencent.com, qi.zheng@linux.dev,
+	shakeel.butt@linux.dev, baohua@kernel.org, axelrasmussen@google.com,
+	yuanchu@google.com, weixugc@google.com, riel@surriel.com,
+	kuba@kernel.org, edumazet@google.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH v2] mm/vmpressure: skip socket pressure for costly order
+ reclaim
+Message-ID: <ac8NjV3kmSY95soh@cmpxchg.org>
+References: <20260402232511.17246-1-jp.kobryn@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260402223437.109097-1-mmyangfl@gmail.com> <20260402223437.109097-3-mmyangfl@gmail.com>
- <112370b9-0e2c-4d5c-a614-4eca5593b2d8@lunn.ch>
-In-Reply-To: <112370b9-0e2c-4d5c-a614-4eca5593b2d8@lunn.ch>
-From: David Yang <mmyangfl@gmail.com>
-Date: Fri, 3 Apr 2026 08:44:12 +0800
-X-Gm-Features: AQROBzDbhyz0QNutXTT1RmE7-SXncYuSUwzOqV0VMTI8OBEW3Wo4_Go5XLX550Q
-Message-ID: <CAAXyoMOYW1xZgZ3bYAEVnzMfJRBqtzxmZMz7GDHeyTqAByrp0A@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 2/4] net: dsa: yt921x: Refactor long register helpers
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260402232511.17246-1-jp.kobryn@linux.dev>
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[cmpxchg.org,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[cmpxchg.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274807-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274808-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[cmpxchg.org:+];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hannes@cmpxchg.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DDB3B38FA60
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email]
+X-Rspamd-Queue-Id: D33E338FA26
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 3, 2026 at 8:26=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > -static int yt921x_reg64_write(struct yt921x_priv *priv, u32 reg, u64 v=
-al)
->
-> > +yt921x_reg64_write(struct yt921x_priv *priv, u32 reg, const u32 *vals)
-> > +{
->
-> The old reg64_write actually took a u64 value, so the name fit. The
-> new one takes 2x a u32. So i'm not sure calling is reg64 actually
-> fits. Maybe yt921x_reg32x2_write()?
->
-> > +static int yt921x_vlan_del(struct yt921x_priv *priv, int port, u16 vid=
-)
-> >  {
-> > -     u64 mask64;
-> > +     u32 masks[2];
-> >
-> > -     mask64 =3D YT921X_VLAN_CTRL_PORTS(port) |
-> > -              YT921X_VLAN_CTRL_UNTAG_PORTn(port);
-> > +     masks[0] =3D YT921X_VLAN_CTRLa_PORTn(port);
-> > +     masks[1] =3D YT921X_VLAN_CTRLb_UNTAG_PORTn(port);
-> >
-> > -     return yt921x_reg64_clear_bits(priv, YT921X_VLANn_CTRL(vid), mask=
-64);
-> > +     return yt921x_reg64_clear_bits(priv, YT921X_VLANn_CTRL(vid), mask=
-s);
->
-> Or you could make yt921x_reg64_write() continue to take a u64, and
-> avoid all these changes?
->
+nOn Thu, Apr 02, 2026 at 04:25:11PM -0700, JP Kobryn (Meta) wrote:
+> When kswapd reclaims at high order due to fragmentation, vmpressure() can
+> report poor reclaim efficiency even though the system has plenty of free
+> memory. This is because kswapd scans many pages but finds little to reclaim
+> - the pages are actively in use and don't need to be freed. The resulting
+> scan:reclaim ratio triggers socket pressure, throttling TCP throughput
+> unnecessarily.
+> 
+> Net allocations do not exceed order 3 (PAGE_ALLOC_COSTLY_ORDER), so high
+> order reclaim difficulty should not trigger socket pressure. The kernel
+> already treats this order as the boundary where reclaim is no longer
+> expected to succeed and compaction may take over.
+> 
+> Make vmpressure() order-aware through an additional parameter sourced from
+> scan_control at existing call sites. Socket pressure is now only asserted
+> when order <= PAGE_ALLOC_COSTLY_ORDER.
+> 
+> Memcg reclaim is unaffected since try_to_free_mem_cgroup_pages() always
+> uses order 0, which passes the filter unconditionally. Similarly,
+> vmpressure_prio() now passes order 0 internally when calling vmpressure(),
+> ensuring critical pressure from low reclaim priority is not suppressed by
+> the order filter.
+> 
+> Signed-off-by: JP Kobryn (Meta) <jp.kobryn@linux.dev>
 
-I'd like so, but I hate much to use u64 for 2x and u32[] for 3x.
-
-> How does the datasheet describe these registers? Are they 64bit
-> registers, or 2x 32bit registers?
->
-
-They act more like 64b/96b registers since there are unaligned fields
-across the 32bit boundary.
-
->            Andrew
+Acked-by: Johannes Weiner <hannes@cmpxchg.org>
 
