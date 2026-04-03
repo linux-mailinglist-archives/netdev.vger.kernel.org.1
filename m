@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-275278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275279-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8LobESFJ0Glu5gYAu9opvQ
-	(envelope-from <netdev+bounces-275278-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 01:11:29 +0200
+	id OIBcBCdJ0Glu5gYAu9opvQ
+	(envelope-from <netdev+bounces-275279-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 01:11:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06086398F74
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 01:11:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B5DA7398F7B
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 01:11:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8B096300D346
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 23:11:12 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 04FE1301136E
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 23:11:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F06238C411;
-	Fri,  3 Apr 2026 23:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C043338C427;
+	Fri,  3 Apr 2026 23:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UuLEr3d2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l+BGEeaU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C8B5388E73
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 23:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF7B38AC96;
+	Fri,  3 Apr 2026 23:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775257861; cv=none; b=OrFeUjNvlMOIrkKXdJ3CQs9onvNd6knGxu8tM8R1ICjpCsP4Kp6HKneI4i0MHcsFFBpoR2GAY6KkRU6b2loQC9h6YNYbKPk79/Jl9B23JzUOuenEIiq3XCILAW7Bxl37UgvwBU2QNlvaGB/323lD+qr/1l6O8H9d7Kr08HCg/z4=
+	t=1775257862; cv=none; b=ZYADXYm00PodvnhLL1Nd27IVAD8eGsFvFtyqlhhUs35PbUfU+fShotnyt2kIMz/KCLvsRdA1R9WsMPlCJ/5GeiXT1X0Djww63kuaVaxnm5GjbdcGsJ/ybfCxRkJlEYYOjmedP+j8nvJYkHoJhx8mnnv7ssc/2qIDU+eT/oq9J1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775257861; c=relaxed/simple;
-	bh=p/jTlfNCs+/luZ9Mk406r7bskYTlCeoQVVIsHGRy2BM=;
+	s=arc-20240116; t=1775257862; c=relaxed/simple;
+	bh=Ix2IRtcBe4TdSRrbrGQsg4zxILQHqed8Jj50AlSSFKw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YJ+Ceuows2zO3ULBQBmBPK6zkr/8Hjqd71rbcaOynu70yzjoHnrpU4sH/T14Pwn57UWme9Gjz1BZ9vjh1SHxQ9d2x8s9KetFm+tacn7cyPGXDvgToA1OcmVcSuArEd/viHtGKTk0OHbX9r4qP0BZVC9fg/GP8rQJAQSdEjyjWmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UuLEr3d2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 054AAC19423;
-	Fri,  3 Apr 2026 23:11:01 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=d0OvGIhn5yqPQJLmch/IgnoUidn77+4RsD7elht5tmR3FR1xQzVoy0rd+yN5CvCKAErQBXsmI4GuZyIrGntlykrCSaCaSBsqugzvvz89Ewb0MlfopMJJEXToRRt2k4XmMhfKOMlg/KlHvUglXBsUvupRPmy0J5Df0XB7LVsbmTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l+BGEeaU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EABAC19423;
+	Fri,  3 Apr 2026 23:11:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775257861;
-	bh=p/jTlfNCs+/luZ9Mk406r7bskYTlCeoQVVIsHGRy2BM=;
+	s=k20201202; t=1775257862;
+	bh=Ix2IRtcBe4TdSRrbrGQsg4zxILQHqed8Jj50AlSSFKw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UuLEr3d2aCZmCrJ8yyw9ogHKHyDjH008uzlSKI0bA+fVqnxXToxeZ7C1WNBS9WErO
-	 l8/GwjxiTMTDsVc8kyvAY6xQCl++x+8tw27DZPvS7hP8yGVpt9FEt5t6O3tDhS2fk0
-	 Y5c3m7PSa/7NZRaaGDkAvFrpYokpcDj8wdUqOfhwiBjQZIVdyrR29KgSHpeCEDiFZm
-	 fNr/l/1HxsQpxzciVtLBM2bzp2kGGvBFbBWRX3aSAEWFMMvS0uks0fdUva/gachnj4
-	 rUJYZtOzHja26hUOg/Ql2RIOvfZp5UtxIvda2XNhrA4fz6uJDexwJwUtdK0CKV9/0F
-	 3Ts5gW0FvsBmQ==
+	b=l+BGEeaUXGXGiuqza2rMj/C8Pwd+lHAvH6Wqh4siKoOD1IO9tNQYNquuciKnCFZIs
+	 KbzgdRF2qc9oHFe68kfD2H/n6gilXKPBs+A2oG/GNfy/Z+OidU62BI3jDNoDEuEFdH
+	 t5G7VbJHfqjSj6+nfnmwRkjtHQoixKMLOm5OqC2GwJx+aV/T18S76bS0HZI+hb16C4
+	 iTeD9gyvaPX2vKnFuk1/H5Mh42vX820uA/Ea0neWggMuUrALdauETT2BL+1jI00tP4
+	 KBLSVjenSNEeGhHuAxZ3YSGgrH7Ae8o12TsD2G2fdAp+jRrqXE+kyG4X/fcAt3UyV3
+	 1m0svJmXE+Heg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA3243809A14;
-	Fri,  3 Apr 2026 23:10:43 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FCCB3809A14;
+	Fri,  3 Apr 2026 23:10:45 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,18 +55,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/4] net: macb: Remove dedicated IRQ handler
- for WoL
+Subject: Re: [PATCH net-next v2] ppp: update Kconfig help message
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177525784228.1484550.17207546456531120252.git-patchwork-notify@kernel.org>
-Date: Fri, 03 Apr 2026 23:10:42 +0000
-References: <20260402-macb-irq-v2-0-942d98ab1154@gmail.com>
-In-Reply-To: <20260402-macb-irq-v2-0-942d98ab1154@gmail.com>
-To: Kevin Hao <haokexin@gmail.com>
-Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, nb@tipi-net.de
+ <177525784378.1484550.10647579476191205570.git-patchwork-notify@kernel.org>
+Date: Fri, 03 Apr 2026 23:10:43 +0000
+References: <20260402050053.144250-1-qingfang.deng@linux.dev>
+In-Reply-To: <20260402050053.144250-1-qingfang.deng@linux.dev>
+To: Qingfang Deng <qingfang.deng@linux.dev>
+Cc: linux-ppp@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ julianbraha@gmail.com, ebiggers@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, paulus@ozlabs.org, dianne@skoll.ca,
+ jaco@uls.co.za, carlsonj@workingcode.com
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
@@ -76,54 +77,49 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275278-lists,netdev=lfdr.de,netdevbpf];
+	TAGGED_FROM(0.00)[bounces-275279-lists,netdev=lfdr.de,netdevbpf];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,ozlabs.org,skoll.ca,uls.co.za,workingcode.com];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	FROM_NO_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 06086398F74
+X-Rspamd-Queue-Id: B5DA7398F7B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 02 Apr 2026 21:41:21 +0800 you wrote:
-> During debugging of a suspend/resume issue, I observed that the macb driver
-> employs a dedicated IRQ handler for Wake-on-LAN (WoL) support. To my knowledge,
-> no other Ethernet driver adopts this approach. This implementation unnecessarily
-> complicates the suspend/resume process without providing any clear benefit.
-> Instead, we can easily modify the existing IRQ handler to manage WoL events,
-> avoiding any overhead in the TX/RX hot path.
+On Thu,  2 Apr 2026 13:00:50 +0800 you wrote:
+> Both links of the PPPoE section are no longer valid, and the CVS version
+> is no longer relevant.
+> 
+> - Replace the TLDP URL with the pppd project homepage.
+> - Update pppd version requirement for PPPoE.
+> - Update RP-PPPoE project homepage, and clarify that it's only needed
+>   for server mode.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/4] net: macb: Replace open-coded implementation with napi_schedule()
-    https://git.kernel.org/netdev/net-next/c/dc3bd465ea36
-  - [net-next,v2,2/4] net: macb: Introduce macb_queue_isr_clear() helper function
-    https://git.kernel.org/netdev/net-next/c/5986ff6e4136
-  - [net-next,v2,3/4] net: macb: Factor out the handling of non-hot IRQ events into a separate function
-    https://git.kernel.org/netdev/net-next/c/6d55ce805b26
-  - [net-next,v2,4/4] net: macb: Remove dedicated IRQ handler for WoL
-    https://git.kernel.org/netdev/net-next/c/6637c03f35fa
+  - [net-next,v2] ppp: update Kconfig help message
+    https://git.kernel.org/netdev/net-next/c/779fae61a3c8
 
 You are awesome, thank you!
 -- 
