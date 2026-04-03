@@ -1,58 +1,68 @@
-Return-Path: <netdev+bounces-274960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274959-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CNmGGpuDz2mwwwYAu9opvQ
-	(envelope-from <netdev+bounces-274960-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 11:08:43 +0200
+	id 6NxbEQiEz2n4wwYAu9opvQ
+	(envelope-from <netdev+bounces-274959-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 11:10:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 272EF392990
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 11:08:43 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DCB6392A0A
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 11:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E0F43303F3C6
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 09:08:08 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id AB8CE30489DF
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 09:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237C338AC8E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 221B1389452;
 	Fri,  3 Apr 2026 09:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="g+aNMFyd"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="SHUlefJz"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00753019C8
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 09:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC5E386554;
+	Fri,  3 Apr 2026 09:07:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775207278; cv=none; b=RtgZbjvUX5ekZ9zOdujBGKbrVhCZISffQoSJtItW/8B8RWXQHvMAVDp1N54gbYDDT+RuErLnFais76lDzqLVcpEOtBJAAlVlZ9GDyONAhH5xY/Re/mpOOoLOkf3dLoWccrTtuRqOYe5UTrmW8UXD8gSAixxDTGKVkEj8wTezFVk=
+	t=1775207278; cv=none; b=p/A+jpybbjSE0Sa9U4zCFwuu+TTSYF1c+j+f23OjgtET8xt+cIkBXMonxyNT5Oy/DNeYF05bEREP9nPB8Hj6RrmZLus26Nva1jwrNYztwMxg2VZGGYvuvLCT47dCdktWuq7c9PSt6rc8urNS7Jt8pe599JJoGBvobf+SaCjv5DA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775207278; c=relaxed/simple;
-	bh=nFUtTxq3fc8Oihv8f7ZfNtEVneLNEQOaOVD8Oxiem7U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gwpq3dqcf+iL5eZbugYDeucvGJaKrUlJjdwfPHNC/xKeNiTaIbgg3Ykda2LAhUZWxvgl7Tv+sLmcf6Kraz5S2tpqojrHe1JBKaJ++8i2zc7xgwR7o527GvFemwPPPB5ooRgIUSDp790KLLbXdG3TK2vrQom2tVVWg7vw88YJ5C4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=g+aNMFyd; arc=none smtp.client-ip=194.13.80.246
+	bh=x+Qg86ngmxvdCWSlsCOUUWdvTgT/jqF42u/ZJKIPiqE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OSw51xHErsY/zy0CXMaLINmdQJI5jdQYtM0pvi/bWc3cMwaOCUwXDd6zLhddcu274D2BkiNx9Y7A6CKo82u579DirGgsAhIiDG2xv4+lGx35CCXHvos25D9r/6nDkZWs4a9sOMAjjc26zogqzhwFyJ+TjS3Z89H9o/WstE57duo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=SHUlefJz; arc=none smtp.client-ip=194.13.80.246
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 59272A587B;
-	Fri,  3 Apr 2026 11:07:31 +0200 (CEST)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 44125A587E;
+	Fri,  3 Apr 2026 11:07:34 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1775207253; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding; bh=jdRS1z504heA2CIiGPHsb37aXBB+fOgruNm848vdgYs=;
-	b=g+aNMFyd+Usx3ch0sJ39Y2GOb0IikWO3mXlAVUaWr/22nvmVbACKA8c6QFtApeZbO6fOfE
-	ED193ZGm7r3VwcBLZwVXcr9Qw7p66OhZ/IIT6yOTebbItbOlLya/s2ST00qU60mogqcYmn
-	7IAX6P8BlUd/hmBpIrx25B0bLpJ784O6yeWhvil8rj+LTZJj/Fcycl1GTOQDWX372cCLhN
-	jDuvVOTCfemwoGhtYHY0aX1JWZXESw4g4xYzoJ4w47IATLyrOmB8bzeZqgFP0eyTMN7gGr
-	u40kASuKM4u3+oH4DIdR0RHBN9OhPRb9SY3v3LA+OpeGg8BW76ZhhD6jOOOMqA==
+	t=1775207256; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=iYmb1sSjS17BlK3cv6eC6Ie996k3le0BSTTtjEJ6ogE=;
+	b=SHUlefJzwml17QAV/sPsW2OoZjpkVjWRw0ZuPdAs18aD4AE40MLgd7vcCBidw9wwt9K1od
+	h1vZiTULSJrOef2FQKU7v+nvZm4+90IjG9pJ71j0qxMuu7UMi8LqTp3yIf9mwXRUila+A7
+	2X/Nrbc5nR/+ZIp0XL52H0JQMljlyqwbNsG278HURxNR5c+Cd900s9+fOUjOtBDARoCZp5
+	7uljS3nYv+uqFdD1L5K4cSdggmHUI3Kmfw+po8Y93IX/VpHxVCpm8GmsREOckpZf40BInT
+	XY1KK2SH3oqdel2x24mpo9R9vlQ0ItNT8JH434KxBM/X/JkUGKGlFlbv2DFFlw==
 From: Nicolai Buchwitz <nb@tipi-net.de>
 To: netdev@vger.kernel.org
 Cc: Russell King <linux@armlinux.org.uk>,
 	Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Nicolai Buchwitz <nb@tipi-net.de>
-Subject: [RFC PATCH net-next 0/3] net: phy: add support for disabling autonomous EEE
-Date: Fri,  3 Apr 2026 11:06:50 +0200
-Message-ID: <20260403090656.733985-1-nb@tipi-net.de>
+	Nicolai Buchwitz <nb@tipi-net.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH net-next 1/3] net: phy: add support for disabling PHY-autonomous EEE
+Date: Fri,  3 Apr 2026 11:06:51 +0200
+Message-ID: <20260403090656.733985-2-nb@tipi-net.de>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20260403090656.733985-1-nb@tipi-net.de>
+References: <20260403090656.733985-1-nb@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,83 +75,134 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TO_DN_SOME(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-274959-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[tipi-net.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,broadcom.com,tipi-net.de,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274960-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[tipi-net.de];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[tipi-net.de:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 272EF392990
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid]
+X-Rspamd-Queue-Id: 8DCB6392A0A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Some PHYs implement autonomous EEE where the PHY manages LPI signaling
-without forwarding it to the MAC. This conflicts with MACs that
-implement their own LPI control via phylink's mac_enable_tx_lpi /
-mac_disable_tx_lpi callbacks.
+Some PHYs (e.g. Broadcom BCM54xx, Realtek RTL8211F) implement
+autonomous EEE where the PHY manages LPI signaling without forwarding
+it to the MAC. This conflicts with MAC drivers that implement their own
+LPI control.
 
-This series adds a .disable_autonomous_eee callback to struct phy_driver
-and calls it from phy_support_eee(). When a MAC indicates it supports
-EEE, the PHY's autonomous EEE is automatically disabled so the MAC can
-manage LPI entry/exit. The setting is persisted across suspend/resume
-by re-applying it in phy_init_hw() after soft reset, following the same
-pattern suggested by Russell King for PHY tunables [1].
+Add a .disable_autonomous_eee callback to struct phy_driver and call it
+from phy_support_eee(). When a MAC driver indicates it supports EEE via
+phy_support_eee(), the PHY's autonomous EEE is automatically disabled so
+the MAC can manage LPI entry/exit.
 
-Patch 1 adds the phylib infrastructure.
-Patch 2 implements it for Broadcom BCM54xx (AutogrEEEn).
-Patch 3 converts the Realtek RTL8211F, which previously unconditionally
-  disabled PHY-mode EEE in config_init.
+Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+---
+ drivers/net/phy/phy_device.c | 22 ++++++++++++++++++++++
+ include/linux/phy.h          | 18 ++++++++++++++++++
+ 2 files changed, 40 insertions(+)
 
-This came up while adding EEE support to the Cadence macb driver (used
-on Raspberry Pi 5 with a BCM54210PE PHY). The PHY's AutogrEEEn mode
-prevented the MAC from tracking LPI state. The Realtek RTL8211F has
-the same pattern, unconditionally disabling PHY-mode EEE with the
-comment "Disable PHY-mode EEE so LPI is passed to the MAC".
-
-Other BCM54xx PHYs likely have the same AutogrEEEn register layout,
-but I only have access to the BCM54210PE/BCM54213PE datasheets. It
-would be appreciated if Florian or others could confirm which other
-BCM54xx variants share this register so we can wire them up too.
-
-Tested on Raspberry Pi CM4 (bcmgenet + BCM54210PE),
-Raspberry Pi CM5 (Cadence GEM + BCM54210PE) and
-Raspberry Pi 5 (Cadence GEM + BCM54213PE).
-
-[1] https://lore.kernel.org/netdev/acuwvoydmJusuj9x@shell.armlinux.org.uk/
-
-Previous discussion:
-  https://lore.kernel.org/netdev/d86c53213a6328b701b8aabbde5d1c83@tipi-net.de/
-
-Nicolai Buchwitz (3):
-  net: phy: add support for disabling PHY-autonomous EEE
-  net: phy: broadcom: implement .disable_autonomous_eee for BCM54xx
-  net: phy: realtek: convert RTL8211F to .disable_autonomous_eee
-
- drivers/net/phy/broadcom.c             |  7 +++++++
- drivers/net/phy/phy_device.c           | 22 ++++++++++++++++++++++
- drivers/net/phy/realtek/realtek_main.c |  7 ++++---
- include/linux/brcmphy.h                |  3 +++
- include/linux/phy.h                    | 18 ++++++++++++++++++
- 5 files changed, 54 insertions(+), 3 deletions(-)
-
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 0edff47478c2..cda4abf4e68c 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -1375,6 +1375,14 @@ int phy_init_hw(struct phy_device *phydev)
+ 			return ret;
+ 	}
+ 
++	/* Re-apply autonomous EEE disable after soft reset */
++	if (phydev->autonomous_eee_disabled &&
++	    phydev->drv->disable_autonomous_eee) {
++		ret = phydev->drv->disable_autonomous_eee(phydev);
++		if (ret)
++			return ret;
++	}
++
+ 	return 0;
+ }
+ EXPORT_SYMBOL(phy_init_hw);
+@@ -2898,6 +2906,20 @@ void phy_support_eee(struct phy_device *phydev)
+ 	linkmode_copy(phydev->advertising_eee, phydev->supported_eee);
+ 	phydev->eee_cfg.tx_lpi_enabled = true;
+ 	phydev->eee_cfg.eee_enabled = true;
++
++	/* If the PHY supports autonomous EEE, disable it so the MAC can
++	 * manage LPI signaling instead. The flag is stored so it can be
++	 * re-applied after a PHY soft reset (e.g. suspend/resume).
++	 */
++	if (phydev->drv && phydev->drv->disable_autonomous_eee) {
++		int ret = phydev->drv->disable_autonomous_eee(phydev);
++
++		if (ret)
++			phydev_warn(phydev, "Failed to disable autonomous EEE: %pe\n",
++				    ERR_PTR(ret));
++		else
++			phydev->autonomous_eee_disabled = true;
++	}
+ }
+ EXPORT_SYMBOL(phy_support_eee);
+ 
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 5de4b172cd0b..55d9cc6c3605 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -612,6 +612,8 @@ struct phy_oatc14_sqi_capability {
+  * @advertising_eee: Currently advertised EEE linkmodes
+  * @enable_tx_lpi: When True, MAC should transmit LPI to PHY
+  * @eee_active: phylib private state, indicating that EEE has been negotiated
++ * @autonomous_eee_disabled: Set when autonomous EEE has been disabled via
++ *	phy_support_eee(), used to re-apply after PHY soft reset
+  * @eee_cfg: User configuration of EEE
+  * @lp_advertising: Current link partner advertised linkmodes
+  * @host_interfaces: PHY interface modes supported by host
+@@ -739,6 +741,7 @@ struct phy_device {
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(eee_disabled_modes);
+ 	bool enable_tx_lpi;
+ 	bool eee_active;
++	bool autonomous_eee_disabled;
+ 	struct eee_config eee_cfg;
+ 
+ 	/* Host supported PHY interface types. Should be ignored if empty. */
+@@ -1359,6 +1362,21 @@ struct phy_driver {
+ 	void (*get_stats)(struct phy_device *dev,
+ 			  struct ethtool_stats *stats, u64 *data);
+ 
++	/**
++	 * @disable_autonomous_eee: Disable PHY-autonomous EEE
++	 *
++	 * Some PHYs manage EEE LPI autonomously without forwarding LPI
++	 * signaling to the MAC. This callback disables autonomous EEE so
++	 * that the MAC can control LPI entry/exit.
++	 *
++	 * Called by phy_support_eee() when the MAC indicates it supports
++	 * EEE. PHY drivers that implement autonomous EEE should provide
++	 * this callback.
++	 *
++	 * Return: 0 on success, negative errno on failure.
++	 */
++	int (*disable_autonomous_eee)(struct phy_device *dev);
++
+ 	/* Get and Set PHY tunables */
+ 	/** @get_tunable: Return the value of a tunable */
+ 	int (*get_tunable)(struct phy_device *dev,
 -- 
 2.51.0
 
