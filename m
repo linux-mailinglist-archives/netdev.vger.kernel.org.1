@@ -1,247 +1,236 @@
-Return-Path: <netdev+bounces-274853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274854-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wGYMHRIpz2mmtQYAu9opvQ
-	(envelope-from <netdev+bounces-274853-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 04:42:26 +0200
+	id bugfIkUsz2k3tgYAu9opvQ
+	(envelope-from <netdev+bounces-274854-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 04:56:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7542D3906D6
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 04:42:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE6703907D0
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 04:56:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 63B4F301C8EF
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 02:42:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AA69D300D6B0
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 02:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8375D33D511;
-	Fri,  3 Apr 2026 02:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1438A3469E0;
+	Fri,  3 Apr 2026 02:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fZk/q8nD"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Daw5TSTW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289C52C325C
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 02:42:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775184139; cv=pass; b=QMrSYdJlWri615gRk97T4YbC9H6tYUYdCUjVSzdezq4m7FXmESS9ee/YDdG676odnQ7ujM2lQARgqCsnaAkiUYT41TEFYlgtI7Ha5AivzCpzYQ0QpMnY+2H2IkEE5kj2VRAAiMzdsadSkAfnclNW9LoTyvxo9VTwImZjS694zYA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775184139; c=relaxed/simple;
-	bh=UeachB2j6pLo6eNgKCGjFpmNusN3p1LFsDmWL7xU2MA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E/FMykWO1wzbRTsKFrPXlAjCbnVbwOT+LVZn4FwVU58+2DpFKJ0fThYfSz85SzII0S0HYtkZ/rPJSa1T8igb+fPw02kqvmdqrKzneZKKBX6Gj6uimjJlAKY7iAGIrrTJ/OAIlIaWcLyQoreRm3AeDRoKJysNJPoungSdsZlvrHg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fZk/q8nD; arc=pass smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-79c20063a32so16102907b3.1
-        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 19:42:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775184137; cv=none;
-        d=google.com; s=arc-20240605;
-        b=U1xj3iwwGMTS+Y6QsheZ8WeRXWj0aPnG3x43SF4zpr1DOtSOzLYEOkocOLKDKt2Jtq
-         t9wfY8epwa5fHcdDxpbaw/ceVBjLUfMJHeyoTWrOdfdmgQJXFI0CI0tdR4tYAAY0LtR5
-         xP00bWVSwc9eE228jTNXSCNHdw3KvCITGWjAvZL5ucTwwi9dr3xbZ9ioXXNV9lwaMcZu
-         dzYtuWU3BF+5yzg3xgaWXFDbnMEtd98/IbMhVAdTt+5uu4qbzoGZcI0kAl2Fcfcd6uM/
-         kdblBZXKwP450ut322wZEmGpuvnrBVHIoe+1Z7RZuN7GtdorYexg8BvahWj8Aimb/cYF
-         bPWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=F7ypjviA7o91EG0ytVKFGPlLqM44PLzS4cGJrxrdO2k=;
-        fh=C+Z57gxiWTsU5/i6ra8N3IJPAbxIm3tCjsDz34hH+Ug=;
-        b=ZUjzOaaOeWep/F0DVY7piFRovtUIdIC/aZX4O/q4xJ1gMwypIVpIkbZgdzRuvxfnpZ
-         btXv52VRKMSGloWgzsh0GpizZNQeAp26LQdr+K6XrBh5dF/ImbIcXCwLtqe06F3fc0XU
-         +y7Q0LJGS40Hwx7u6XV7+Nz25MPSPyZu52j+ZRGJOIAtwrNvNoBrU3Xbn63dR4Q/Kkub
-         j1q2NwQQ0w5seCpZgelRmsN8y6TPRxl+7dVykQs2PCnItg++2m91fi06w6TMxZ8AULvT
-         i3AbT9mPK6aFgYievwGMt80J6mug5sevkgEfE415a+zaZLuxfVKOZyce+uGkJDfTnlgl
-         XNkA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775184137; x=1775788937; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F7ypjviA7o91EG0ytVKFGPlLqM44PLzS4cGJrxrdO2k=;
-        b=fZk/q8nDnuCE9IxGmEzBEWERRvmycABMVnuF/MsLxm+eP5g/o8VUXC522tRXPtbA4F
-         VYKQJdG35/mBaINcdIKuq1CtVaSNMfvXfsjfPXXx+6yPbpnOF4zpip44BgS79ihBCX/M
-         R46fQdSSBGBQKvajrr6Z2NctB4kUBifkDBftlNy5jMqkHsl/OA9MqAuDxSf7BALriehI
-         t7LxhgUgYFF8DiiQNtTRsmmqgjAxFqbtTW344qGpHHBK6jZa2FMLzDxHm6P262S4pVbj
-         YQ1r3vqgwkDyrBvhHjTt42Ow0G4LdaeZDMJWI1It5xTyD/8vdiR8+SWSmyQevAGCU7gM
-         sVBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775184137; x=1775788937;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=F7ypjviA7o91EG0ytVKFGPlLqM44PLzS4cGJrxrdO2k=;
-        b=YaDPthfCeombT/YYQtqyc6GnIRkgUfUSCabnkLurGJQ2rKb18jIfkwmDY7l475mOhs
-         l/yVIFsrN20WZ1DQeFVbcdU9d6LReMFKfdMcIz7nfWN8SmSJ9ehCcu3dNMGDwU/3kwjj
-         Fadi1yWCQB75Bbi1L112/uUTLFlHuVb2pBtc/v04OCWsLMU/18+vf5YCFk/QFIFdco+X
-         p58dw5DAepZOPMe3rXbIHTWOp8wlMZv153kC1q3Ojucks6ZPJl+Bf3psYM6blOqAkDeM
-         fD/lfkdI8GmhnZvH/XYK3DyG3bSP5uUS1tHfDFNUpV48D0sVLKvRBCjIt8BczDllVgOf
-         7+yA==
-X-Gm-Message-State: AOJu0Yxc4vJVA7w757mgadfRN/j+PG8gVl58N+Ii31Q/o+jXejXH0Uwz
-	+Vo79/BdrlyUuU6+qzPnIBugE+c2kbzoEW8ZDk5fYdbzyN+LmAz0zdw1swiIEZ0JfigX/RUk5zO
-	fv6o0buaxeu5Lvk429ulpK/AhsKs3C2Dy0BSrzXhJ
-X-Gm-Gg: AeBDieuxxfsFdQr84ta+1QC+ZoeSLSzci7gkTvABfVN87La1GSrNebRc6t9OVA8IkLb
-	PBxX1Ek8JKi+0Tggi67T5GuPB/yfpzQZaPnUIJc7mZLfs2gN9jHIXeXTk1+Y94CC7OgqIT59Dof
-	gp4muDz7+/Bz8CNifb3rcU9PlzekMEH+xmMxc3n6mhVreGneVAkH5UhHQQMeIKrgE9Cys9UB9Fd
-	epfJjdupiuirr7zhbTs/oxhW4duw64tg7H6+YdxiRNd4r+qTNUC6k+G+agrCL5sKFTu7SBGJiWZ
-	RjNVoHzd0qTYFqC+0Q==
-X-Received: by 2002:a05:690c:660e:b0:79c:3750:48b0 with SMTP id
- 00721157ae682-7a3be949d69mr39250727b3.31.1775184136801; Thu, 02 Apr 2026
- 19:42:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F24E1624C0;
+	Fri,  3 Apr 2026 02:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775184962; cv=none; b=rNOVwYTEwyMEtnhkXxUlIvEbKSRLfp9Wm+mc3Fte6Ea0zUTkmWYLvf+TGFzF3Qr/DHW2XlI+XCZzf36jszTCKyuJ16fvblWWYZWXLcDESzAyd39unti5eZIiX6hKeGYAlcUSHbIC9Ut0TA84wBShg0Y0XHqYkXLmYQo7cw3+HNE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775184962; c=relaxed/simple;
+	bh=JR4fy95WW08IWlsge4eBRX+EbI8vDHM17e8KYxtutMI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NUQ4QL/S47BVruHjaJNKT6Cet/jSVEZ2r0v3IZtV1Hja+1eetGqaDBuFqXhI2LdAQ8JjWCau64sPqbWA0waqKXVwqr5tl/gjigbSLMzPV/2+9vwHcPEPrJ9g4+y1BgPuPiMCC70+VgYlLIfkII3wy9pDVmHAIuoJP5226ah9g2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Daw5TSTW; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 632GBd6C1945593;
+	Thu, 2 Apr 2026 19:55:48 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=ZT1BjbPcsPlG4BongpTrydO
+	4v+bB6K4rYgMdXYQDgAA=; b=Daw5TSTWGLQKDgUHOJh7DmBZFT69tDSgP3R3uZ7
+	YLSNn3SXyLbg66+kSAbhFUa78DXfneuA/QOEw6rMKcHli5ruoOPgpYbbWOjLtlfj
+	Yn56dang9cCXXES0w3Y3OO9KclYMS6V0oAKK3RHNY5zVypeUTbqFUzhtyJfw7pQW
+	/qaS4nDDRzt7xrsCb8ofHmNq5lcBwZmP1fxlk2aSrRIQ9mxp6lcSHnK/6l5YFSQ1
+	Pb1Qj8+4YrDq3S9NTP3tNsbgakOlY0Rm0Z3WTl2B3B0OVdCLPVCb8XB/uLdpI/aW
+	yO8m7YA3tr8+3HKaUUPhkpvflBeOtwvBaRhkQXFD6pqo7Yg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4d9urtsk5v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 Apr 2026 19:55:47 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 2 Apr 2026 19:55:47 -0700
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 2 Apr 2026 19:55:46 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Thu, 2 Apr 2026 19:55:46 -0700
+Received: from rkannoth-OptiPlex-7090.. (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id D14703F7051;
+	Thu,  2 Apr 2026 19:55:39 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <donald.hunter@gmail.com>, <horms@kernel.org>, <jiri@resnulli.us>,
+        <chuck.lever@oracle.com>, <matttbe@kernel.org>, <cjubran@nvidia.com>,
+        <saeedm@nvidia.com>, <leon@kernel.org>, <tariqt@nvidia.com>,
+        <mbloch@nvidia.com>, <dtatulea@nvidia.com>,
+        Ratheesh Kannoth
+	<rkannoth@marvell.com>
+Subject: [PATCH v10 net-next 0/6] octeontx2-af: npc: Enhancements.
+Date: Fri, 3 Apr 2026 08:25:27 +0530
+Message-ID: <20260403025533.6250-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260403003524.2564973-1-joe@dama.to> <20260403003524.2564973-8-joe@dama.to>
-In-Reply-To: <20260403003524.2564973-8-joe@dama.to>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 2 Apr 2026 19:42:05 -0700
-X-Gm-Features: AQROBzA8v5E2r9v7HpvTI_gaJ2gr3fRBYlQoCqSukj-YJVqDlE1gS-cS-PG03QU
-Message-ID: <CANn89iLH92YCwciSirzGY2wyQg-zK7AKEMfDf-166utkBS4HNQ@mail.gmail.com>
-Subject: Re: [net-next v8 07/10] net: bnxt: Implement software USO
-To: Joe Damato <joe@dama.to>
-Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>, 
-	Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	horms@kernel.org, linux-kernel@vger.kernel.org, leon@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: RVcitrAuEiEgehh2Hz3kiPwCeOmT9aiT
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDAzMDAyNCBTYWx0ZWRfX5vUEjmqctq9S
+ cDVIjmXMykvmj13ky7E5NbrMWq9751TOqOe7BUnuhfhsSwrCPSKVWkFhdPZccpbGrK0Orj1HN2a
+ Z/xdvIuajPGKpTpn7x68dyyAdE2i1WH3TzhFb9ynGIOlEemLLTan18flpG2bHcUsVLM7lG7SaGi
+ iQtVz8dKhhtBvMs5QXO/1AEYQs21LCuKJKtaygfZ90g/xIH8f93s6jAio6S6hayv21ATlLny3M+
+ d1A9P4wKtcaFZ+ECQv6YaARnvxaTg2AgvvMTlogpT6fOrsX10UCJ6ooX6wjRFWNsrqtlU/IOUhV
+ yTweuyDdQrh/IPyla8uK87AlblcMDRqsdxEANBBUEsAmfNYn+ZU/je9wwto3Anuh8mWPnPJq/u4
+ DXJ54XkITaP5XxxpBxtnfQS4NCkyGLNOCIDdg+hQo3GPp0bIJoyWYlqQjo8XsvmHJ3JYYf60QMv
+ gK3neQfIjfEmvDzU9Ug==
+X-Proofpoint-GUID: RVcitrAuEiEgehh2Hz3kiPwCeOmT9aiT
+X-Authority-Analysis: v=2.4 cv=fLs0HJae c=1 sm=1 tr=0 ts=69cf2c33 cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=l0iWHRpgs5sLHlkKQ1IR:22
+ a=EAYMVhzMl8SCOHhVQcBL:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=F3GfQixlnA_JdfTOFKwA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-03_01,2026-04-02_05,2025-10-01_01
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[marvell.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[marvell.com:s=pfpt0220];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274853-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[marvell.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,resnulli.us,oracle.com,nvidia.com];
+	RCPT_COUNT_TWELVE(0.00)[21];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-274854-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[rkannoth@marvell.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[marvell.com:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,marvell.com:dkim,marvell.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 7542D3906D6
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[9]
+X-Rspamd-Queue-Id: CE6703907D0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 2, 2026 at 5:36=E2=80=AFPM Joe Damato <joe@dama.to> wrote:
->
-> Implement bnxt_sw_udp_gso_xmit() using the core tso_dma_map API and
-> the pre-allocated TX inline buffer for per-segment headers.
->
-> The xmit path:
-> 1. Calls tso_start() to initialize TSO state
-> 2. Stack-allocates a tso_dma_map and calls tso_dma_map_init() to
->    DMA-map the linear payload and all frags upfront.
-> 3. For each segment:
->    - Copies and patches headers via tso_build_hdr() into the
->      pre-allocated tx_inline_buf (DMA-synced per segment)
->    - Counts payload BDs via tso_dma_map_count()
->    - Emits long BD (header) + ext BD + payload BDs
->    - Payload BDs use tso_dma_map_next() which yields (dma_addr,
->      chunk_len, mapping_len) tuples.
->
-> Header BDs set dma_unmap_len=3D0 since the inline buffer is pre-allocated
-> and unmapped only at ring teardown.
->
-> Completion state is updated by calling tso_dma_map_completion_save() for
-> the last segment.
->
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Joe Damato <joe@dama.to>
-> ---
->
+This series extends Marvell octeontx2-af support for CN20K NPC (MCAM
+debuggability, allocation policy, default-rule lifetime, and optional
+KPU profiles from firmware files) and adds a devlink mechanism for
+multi-value parameters, with a small mlx5 follow-up to keep stack usage
+within -Wframe-larger-than limits once union devlink_param_value grows.
 
+Patch 1 improves CN20K MCAM visibility in debugfs: mcam_layout marks
+enabled entries, dstats reports per-entry hit deltas, and mismatch lists
+enabled entries without a PF mapping. MCAM enable state is tracked in a
+bitmap updated from the CN20K enable path.
 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.h
-> index 6b38b84924e0..fe50576ae525 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> @@ -11,6 +11,8 @@
->  #ifndef BNXT_H
->  #define BNXT_H
->
-> +#include <net/tso.h>
-> +
->  #define DRV_MODULE_NAME                "bnxt_en"
->
->  /* DO NOT CHANGE DRV_VER_* defines
-> @@ -899,6 +901,7 @@ struct bnxt_sw_tx_bd {
->                 u16                     rx_prod;
->                 u16                     txts_prod;
->         };
-> +       struct tso_dma_map_completion_state sw_gso_cstate;
->  };
->
->  #define BNXT_SW_GSO_MID                1
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c b/drivers/net/=
-ethernet/broadcom/bnxt/bnxt_gso.c
-> index b296769ee4fe..7a7d40e36cea 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c
-> @@ -19,11 +19,213 @@
->  #include "bnxt.h"
->  #include "bnxt_gso.h"
->
-> +static u32 bnxt_sw_gso_lhint(unsigned int len)
-> +{
-> +       if (len <=3D 512)
-> +               return TX_BD_FLAGS_LHINT_512_AND_SMALLER;
-> +       else if (len <=3D 1023)
-> +               return TX_BD_FLAGS_LHINT_512_TO_1023;
-> +       else if (len <=3D 2047)
-> +               return TX_BD_FLAGS_LHINT_1024_TO_2047;
-> +       else
-> +               return TX_BD_FLAGS_LHINT_2048_AND_LARGER;
-> +}
-> +
->  netdev_tx_t bnxt_sw_udp_gso_xmit(struct bnxt *bp,
->                                  struct bnxt_tx_ring_info *txr,
->                                  struct netdev_queue *txq,
->                                  struct sk_buff *skb)
->  {
-> +       unsigned int last_unmap_len __maybe_unused =3D 0;
-> +       dma_addr_t last_unmap_addr __maybe_unused =3D 0;
-> +       struct bnxt_sw_tx_bd *last_unmap_buf =3D NULL;
-> +       unsigned int hdr_len, mss, num_segs;
-> +       struct pci_dev *pdev =3D bp->pdev;
-> +       unsigned int total_payload;
-> +       struct tso_dma_map map;
-> +       u32 vlan_tag_flags =3D 0;
-> +       int i, bds_needed;
-> +       struct tso_t tso;
-> +       u16 cfa_action;
-> +       u16 prod;
-> +
-> +       hdr_len =3D tso_start(skb, &tso);
+Patch 2 heap-allocates the temporary devlink param value array in
+mlx5e_pcie_cong_get_thresh_config() so a larger union devlink_param_value
+does not overflow the stack (patch 3).
 
-Orthogonal to your patch:
+Patch 3 (Saeed) introduces DEVLINK_PARAM_TYPE_U64_ARRAY and nested
+DEVLINK_ATTR_PARAM_VALUE_DATA attributes so drivers and user space can
+exchange bounded u64 arrays; devlink_nl_param_fill() moves large locals
+to the heap as well.
 
-It seems that tso_start() users do not really check if hdr_len could
-be bigger than
-their expectations ( TSO_HEADER_SIZE for many of them).
+Patch 4 adds a runtime devlink parameter npc_srch_order (U64 array) to
+reorder CN20K subbank search during MCAM allocation.
 
-Presumably these drivers should have an ndo_features_check() to detect
-this and fallback to GSO.
+Patch 5 ties default MCAM entries (broadcast, multicast, promisc, ucast)
+to NIX LF alloc/free on CN20K, adds NIX_LF_DONT_FREE_DFT_IDXS for kernel
+PF suspend-style teardown, and adjusts free-all and default-entry paths
+so default rules are not freed as ordinary user rules.
 
-I can send a series to fix this.
+Patch 6 allows loading a custom KPU profile from /lib/firmware/kpu via
+module parameter kpu_profile on non-CN20K paths, with cam2/ptype support
+and shared helpers for firmware-sourced vs filesystem-sourced profiles;
+CN20K continues to use its existing custom KPU apply path.
+
+The mlx5 change is placed immediately before the devlink union growth
+so the series applies cleanly and stays warning-free when built
+incrementally.
+
+Ratheesh Kannoth (5):
+  octeontx2-af: npc: cn20k: debugfs enhancements
+  net/mlx5e: heap-allocate devlink param values
+  octeontx2-af: npc: cn20k: add subbank search order control
+  octeontx2-af: npc: cn20k: dynamically allocate and free default MCAM
+    entries
+  octeontx2-af: npc: Support for custom KPU profile from filesystem
+
+Saeed Mahameed (1):
+  devlink: Implement devlink param multi attribute nested data values
+
+ Documentation/netlink/specs/devlink.yaml      |   4 +
+ .../marvell/octeontx2/af/cn20k/debugfs.c      | 126 ++++-
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.c | 255 +++++++--
+ .../ethernet/marvell/octeontx2/af/cn20k/npc.h |  10 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |   1 +
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |  17 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   6 +-
+ .../marvell/octeontx2/af/rvu_devlink.c        |  92 +++-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  16 +-
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 521 ++++++++++++++----
+ .../ethernet/marvell/octeontx2/af/rvu_npc.h   |  17 +
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   1 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   6 +-
+ .../mellanox/mlx5/core/en/pcie_cong_event.c   |  11 +-
+ include/net/devlink.h                         |   8 +
+ include/uapi/linux/devlink.h                  |   1 +
+ net/devlink/netlink_gen.c                     |   2 +
+ net/devlink/param.c                           |  91 ++-
+ 18 files changed, 979 insertions(+), 206 deletions(-)
+
+--
+
+v9 -> v10: Addressed Paolo comments
+	https://lore.kernel.org/netdev/20260330053105.2722453-1-rkannoth@marvell.com/
+
+v8 -> v9: Addressed Simon comments
+	https://lore.kernel.org/netdev/20260325072159.1126964-1-rkannoth@marvell.com/
+
+v7 -> v8: Addressed Simon comments
+	https://lore.kernel.org/netdev/20260323035110.3908741-1-rkannoth@marvell.com/T/#t
+
+v6 -> v7: Addressed Simon comments
+	https://lore.kernel.org/netdev/20260320165432.98832-1-horms@kernel.org/
+
+v5 -> v6: Addressed Jakub,Jiri comments
+	https://lore.kernel.org/netdev/20260317045623.250187-1-rkannoth@marvell.com/
+
+v4 -> v5: Addressed Jakub comments
+	https://lore.kernel.org/netdev/20260312022754.2029595-6-rkannoth@marvell.com/
+
+v3 -> v4: Addressed Simon comments
+	https://lore.kernel.org/netdev/abDeXLpMMxp7G1v3@rkannoth-OptiPlex-7090/#t
+
+v2 -> v3: Addressed Simon comments.
+	https://lore.kernel.org/netdev/20260304043032.3661647-1-rkannoth@marvell.com/
+v1 -> v2: Addressed Jakub comments.
+	https://lore.kernel.org/netdev/20260302085803.2449828-1-rkannoth@marvell.com/#t
+
+2.43.0
 
