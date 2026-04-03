@@ -1,64 +1,61 @@
-Return-Path: <netdev+bounces-274941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274942-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QNDHDix7z2nrwgYAu9opvQ
-	(envelope-from <netdev+bounces-274941-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 10:32:44 +0200
+	id eE2GIgV8z2mvwgYAu9opvQ
+	(envelope-from <netdev+bounces-274942-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 10:36:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E6D13921C3
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 10:32:43 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7587A39223F
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 10:36:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 601A7302084E
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 08:32:42 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 494D83017B96
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 08:34:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D7F37649D;
-	Fri,  3 Apr 2026 08:32:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A61437C0E7;
+	Fri,  3 Apr 2026 08:34:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u2hU96MR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DlzcT3kt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A4F19D07E;
-	Fri,  3 Apr 2026 08:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E622337BE7B;
+	Fri,  3 Apr 2026 08:34:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775205159; cv=none; b=OZSRK5StSnftr5vu+ntrimbF+EX9fhGV+sAQt5fwszfEr1WczBFfapovOnLmkwCh+2QhfEEyu34CrhzZQ2eliLy9vL882xoBawm8T32FQN5KNds9z0U/TgzCqw82o5CrJN9RVbf/EBFSFzCBaZGaMQ1pUzOPgyHVEuSYvQSYN2o=
+	t=1775205260; cv=none; b=o+IRsfjVxz8y25DN10MBqnSivPjpNoVDEgoc2yLmiZ7G7OgY9yNOU2X4kemgwuokc4oo4Io0hHljvS3aolhIz+1CWvQVYu7wG0vF1NbWMQoQmyUTIF9xQ1RkeXnxGR20GnR8O8cKuKdPEX9yMWcBVEwmzHYBXa+ONbg6io0xqu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775205159; c=relaxed/simple;
-	bh=X3ue6DYRmQU5xsro/VZB8UpEGt/pWXZaKTyBr9gKgGk=;
+	s=arc-20240116; t=1775205260; c=relaxed/simple;
+	bh=nuJlVlBMINRwMCs4rlFUzaFahCcjaazDoKvrppFfk8I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pV/UMNRuOiYJyhdlMdJJr5OArZWMtAkUoneENc9BXa2EMj4Lv7K68f0B82x3SDJ9eoGf0QpG3jYCb2O4ynIS+6vhjcWgGjX4pBXsPoycDXFIz/wxCRr8UC0rGlgxE86h8JoUB4GuE0syW8QnHBFghApAvCso1OdRVDbXMw56NX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u2hU96MR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A4AEC4CEF7;
-	Fri,  3 Apr 2026 08:32:36 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=M85UALe2kYYudoASI0PLT+2AHZFP9TaiiHKi0OskDcuie4IjvmdFZelV0bEEVmMCnkiIXRXuJFK+8JWALLhof3D5YmAWgfCTKr+8H0htiAQzVR8c3CbqYP62X55yQ+JCxqgTkf+5JzOa5vu8OupM+uJwz4m1d1L35zEgV7tuxE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DlzcT3kt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFF93C4CEF7;
+	Fri,  3 Apr 2026 08:34:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775205158;
-	bh=X3ue6DYRmQU5xsro/VZB8UpEGt/pWXZaKTyBr9gKgGk=;
+	s=k20201202; t=1775205259;
+	bh=nuJlVlBMINRwMCs4rlFUzaFahCcjaazDoKvrppFfk8I=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=u2hU96MRIpzQYkGb167h4xmyBFNrwbLokMwgEqxXCiOPIbOq4xzTPd9wiEesX3yJo
-	 Z8QPziFbqDBpk8b77fVlER50eStl/1ltEgZgfErXp+aBW2zyuJR5evhK21HUvUsDvH
-	 NBx52eY+wyAkWj5YZtnNJnN7gachq2swi/eIuRFACHKSO3lpBvvfBwZnpr1bWX1ufZ
-	 WZmoH5cUjkQVzjhlsOVRjdSxeVXsr7H5Z7rg5MsBbtVfSH6bB9R9ZssRjblxZla8JB
-	 DgJUO6Wp+ANmkmBH9AUFeJKHNPN0JuQourHpqMluuMXyk7hiUvQC5YScTyrDR5Z9mp
-	 qfSUQTsxMrneA==
-Date: Fri, 3 Apr 2026 09:32:33 +0100
+	b=DlzcT3ktMNBhQGb2efXdQEHeRmVfmpMayOW+2XCHj8eDXCcN/Y+kzJvqAhPFx0qXZ
+	 QubrChyXOqNjk/DG2RbdXgbENMamtMJRzhapF8tqBZRVumHu3oybgQS7SuPXL+/nrV
+	 fCJY6R3uXU85Bh8IUdQafaR1CBV90B7aJelvytKqFNon0xNE7rvAPgUkOCwVK/dZiL
+	 o4FJ/hyarwWAL0dH1JKEQsLN3yTPrGLafVaUS+Ibk/qvE6FRw+kuUShH+WOJpVJqD5
+	 A49jYun/rZVBHM8U2gV5t3P/9QNGrhFjB8Q8cPW4eLQtdBj9jfCMDX8RhVsHBIAb+8
+	 jKLNKIjCQIj4g==
+Date: Fri, 3 Apr 2026 09:34:15 +0100
 From: Simon Horman <horms@kernel.org>
-To: Manivannan Sadhasivam <mani@kernel.org>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	andersson@kernel.org, yimingqian591@gmail.com,
-	chris.lew@oss.qualcomm.com, stable@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: qrtr: ns: Limit the maximum lookups per socket
-Message-ID: <20260403083233.GB11973@horms.kernel.org>
-References: <20260325104415.104972-1-manivannan.sadhasivam@oss.qualcomm.com>
- <20260325104415.104972-3-manivannan.sadhasivam@oss.qualcomm.com>
- <20260327100709.GD111839@horms.kernel.org>
- <b3i64wszqrmxmpl453z6mpaiqmuespxiioexb3wwbt3bz7mmen@rlewkfc4v25s>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Xiang Mei <xmei5@asu.edu>, netdev@vger.kernel.org,
+	bridge@lists.linux.dev, idosch@nvidia.com, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, bestswngs@gmail.com
+Subject: Re: [PATCH net] bridge: mrp: reject zero test interval to avoid OOM
+ panic
+Message-ID: <20260403083415.GC11973@horms.kernel.org>
+References: <20260326032438.3307549-1-xmei5@asu.edu>
+ <20260327113412.GD567789@horms.kernel.org>
+ <f7fea291-bde9-4f95-8a59-1b209407ee27@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,113 +64,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b3i64wszqrmxmpl453z6mpaiqmuespxiioexb3wwbt3bz7mmen@rlewkfc4v25s>
+In-Reply-To: <f7fea291-bde9-4f95-8a59-1b209407ee27@blackwall.org>
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274941-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[oss.qualcomm.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_CC(0.00)[asu.edu,vger.kernel.org,lists.linux.dev,nvidia.com,davemloft.net,google.com,redhat.com,gmail.com];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274942-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_TWELVE(0.00)[13];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 9E6D13921C3
+X-Rspamd-Queue-Id: 7587A39223F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 27, 2026 at 03:47:13PM +0530, Manivannan Sadhasivam wrote:
-> On Fri, Mar 27, 2026 at 10:07:09AM +0000, Simon Horman wrote:
-> > On Wed, Mar 25, 2026 at 04:14:15PM +0530, Manivannan Sadhasivam wrote:
-> > > Current code does no bound checking on the number of lookups a client can
-> > > perform per socket. Though the code restricts the lookups to local clients,
-> > > there is still a possibility of a malicious local client sending a flood of
-> > > NEW_LOOKUP messages over the same socket.
-> > > 
-> > > Fix this issue by limiting the maximum number of lookups to 64 per socket.
-> > > Note that, limit of 64 is chosen based on the current platform
-> > > requirements. If requirement changes in the future, this limit can be
-> > > increased.
-> > > 
-> > > Cc: stable@vger.kernel.org
-> > > Fixes: 0c2204a4ad71 ("net: qrtr: Migrate nameservice to kernel from userspace")
-> > > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> > > ---
-> > >  net/qrtr/ns.c | 18 ++++++++++++++++--
-> > >  1 file changed, 16 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
-> > > index fb4e8a2d370d..707fde809939 100644
-> > > --- a/net/qrtr/ns.c
-> > > +++ b/net/qrtr/ns.c
-> > > @@ -70,10 +70,11 @@ struct qrtr_node {
-> > >  	u32 server_count;
-> > >  };
-> > >  
-> > > -/* Max server limit is chosen based on the current platform requirements. If the
-> > > - * requirement changes in the future, this value can be increased.
-> > > +/* Max server, lookup limits are chosen based on the current platform requirements.
-> > > + * If the requirement changes in the future, these values can be increased.
-> > >   */
-> > >  #define QRTR_NS_MAX_SERVERS 256
-> > > +#define QRTR_NS_MAX_LOOKUPS 64
-> > >  
-> > >  static struct qrtr_node *node_get(unsigned int node_id)
-> > >  {
-> > > @@ -545,11 +546,24 @@ static int ctrl_cmd_new_lookup(struct sockaddr_qrtr *from,
-> > >  	struct qrtr_node *node;
-> > >  	unsigned long node_idx;
-> > >  	unsigned long srv_idx;
-> > > +	u8 count = 0;
-> > >  
-> > >  	/* Accept only local observers */
-> > >  	if (from->sq_node != qrtr_ns.local_node)
-> > >  		return -EINVAL;
-> > >  
-> > > +	/* Make sure the client performs only maximum allowed lookups */
-> > > +	list_for_each_entry(lookup, &qrtr_ns.lookups, li) {
-> > > +		if (lookup->sq.sq_node == from->sq_node &&
-> > > +		    lookup->sq.sq_port == from->sq_port)
-> > > +			count++;
+On Fri, Mar 27, 2026 at 01:46:39PM +0200, Nikolay Aleksandrov wrote:
+> On 27/03/2026 13:34, Simon Horman wrote:
+> > On Wed, Mar 25, 2026 at 08:24:38PM -0700, Xiang Mei wrote:
+> > > br_mrp_start_test() and br_mrp_start_in_test() accept the user-supplied
+> > > interval value from netlink without validation. When interval is 0,
+> > > usecs_to_jiffies(0) yields 0, causing the delayed work
+> > > (br_mrp_test_work_expired / br_mrp_in_test_work_expired) to reschedule
+> > > itself with zero delay. This creates a tight loop on system_percpu_wq
+> > > that allocates and transmits MRP test frames at maximum rate, exhausting
+> > > all system memory and causing a kernel panic via OOM deadlock.
 > > 
-> > This feels like it could get quite expensive.
-> > If many lookups are added, it feels like it may be O(n^2).
+> > I would suspect the primary outcome of this problem is high CPU consumption
+> > rather than memory exhaustion. Is there a reason to expect that
+> > the transmitted fames can't be consumed as fast as they are created?
 > > 
 > 
-> Lookups are not something that'll happen very often. A client only registers
-> for the lookup once per service that it depends on. That shouldn't be too
-> much. And then once lookup is registered, it will be used throughout the
-> lifetime of the client.
-> 
-> So there is no overhead associated with this check.
+> +1
+> More so with CAP_NET_ADMIN you can cause all sorts of OOM and high-cpu usage
+> conditions. This is a configuration error and OOM doesn't lead to panic unless
+> instructed to. I don't think this is worth changing at all.
 
-Thanks, and sorry for the delay: I was taking a holiday.
+Right, I was getting to think that too.
 
-I'm still slightly concerned that this may prove to be a problem.
-But we can leave that concern sit in a corner by itself for now.
-
-For this patch feel free to add,
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-I notice that this series has been marked as changes requested in patchwork.
-So, unless it's being handled by some other means that I can't see at this
-moment, I think it would be best to repost this series.
+...
 
