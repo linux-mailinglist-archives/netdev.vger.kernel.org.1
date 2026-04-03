@@ -1,52 +1,53 @@
-Return-Path: <netdev+bounces-274993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274994-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CA+QF8Skz2mZyQYAu9opvQ
-	(envelope-from <netdev+bounces-274993-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:30:12 +0200
+	id wMoNIc6kz2mZyQYAu9opvQ
+	(envelope-from <netdev+bounces-274994-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:30:22 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60722393B0E
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:30:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C071C393B16
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:30:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A4C8B3009E17
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 11:30:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2A2B5300809C
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 11:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6BBC3B6C08;
-	Fri,  3 Apr 2026 11:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635283B776F;
+	Fri,  3 Apr 2026 11:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FQ4Yg+kV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="atBA4lWr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFAED37BE78;
-	Fri,  3 Apr 2026 11:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D8838CFEF;
+	Fri,  3 Apr 2026 11:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775215795; cv=none; b=HoNG60D0vvlx8K2l0Z3tL9PO0tXlqyZYCpHiVousSVhTpoM0s1oEhCUr+B9BHGwsserCNAImegeeUIS1eDRsPaqYE+PXwkUhBlblLLl2h2F0T7M1RyfDQHhS87xkowKX3pBEj6vCvOKhObWvlVC5nj1NeR51nBTeBPaQ06sR8EM=
+	t=1775215798; cv=none; b=WNq073YgCnlRJf6Qt3nWK6idXSTXuzN2FQJCSFlyY5OyhBnRg4Mt9FzgNrkksLiEyXAesQQpRmrkROVXV5747fEVSr+yhqUHdc2316UQWI/u4fsVmlZ2vUmxrZswOLcu2UIsK01qQMOqhXHtLB1nf27dEFHI1bJdqmsRVA9ln0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775215795; c=relaxed/simple;
-	bh=VPuMCcSMn0fGFWGRYpAGvUyYaU9ngULkySrtJMxEQ3o=;
+	s=arc-20240116; t=1775215798; c=relaxed/simple;
+	bh=maJ5zzm7scL8ZbD0h1YkRJZCs2NsQFvup9oZE1mw5KU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hVtxdgb1bvHceJk/pc2b8GYqIo33hYRGBLIaYlnAyMN2vEnyolVA90bZWDURR72pO6pCpAn/95aMCLoE7yT4BI6EzmAeMF0H90015sLKmcNgBKTzSTWGhp6i59CZ6irqCw5YUitRGeVKboXrdICpN/imn4XSQz4Ambs/K9QMVOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FQ4Yg+kV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD50FC19423;
-	Fri,  3 Apr 2026 11:29:52 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=MzivNMeecDKabkEW8VWFGxKa/ahA9ts9sIIKF+6V6nNtDlU9MsP4jFg5YjACfgbUaV3jJlhYBTnbGMwQbBFlTzLQ1LSZAZHuHtHtf7nks6SITWE+DtDq4dAb3XiNVFRVuTj+wxMsJ+pXgkEYabDk0cgOckhFoNkcqcUwlztA2Ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=atBA4lWr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14FC1C2BCB9;
+	Fri,  3 Apr 2026 11:29:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775215794;
-	bh=VPuMCcSMn0fGFWGRYpAGvUyYaU9ngULkySrtJMxEQ3o=;
+	s=k20201202; t=1775215796;
+	bh=maJ5zzm7scL8ZbD0h1YkRJZCs2NsQFvup9oZE1mw5KU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=FQ4Yg+kVHjuAft1BIBzk/JrL3VR+FvEhtd7+E5N2mhI/KZMsDxgIt4WxYOQ2iFXoO
-	 vTrwADIaR2Qw7Ww+dXJWIGkn3KsiSsy7i+17Js7YVy6WjXhNAFoiKZyeEOh5OQp+8N
-	 ClX90mgoOT1bU1ck0VQ5LbYy+DeLNoimd8BpvxPTwE2vH06f3ee1Ml/qKTl9pQMG69
-	 SeB2doUr6C3gThEmTgMXKrgjPReZYN0otqEtW+EUBjbxDDBYnRSGRkSLE6aXN52bDp
-	 1ICv4i2e0M41oWPcsRRXcuwQcA0Lj9ZBJJibe2Sr0s2tWh+m+CYeu9rIsM7GbKDUS9
-	 n4cvk7SG2GDkw==
+	b=atBA4lWrFUG40jxyS092CpJFSQhoRlIuWVHwGblZNHRb1tO+LRV7vXCwFH8rF539S
+	 Tn8M48Pj9ShR4AOC3bDJy11QjemNmPHiCh+TORZOQtiNzxB7Qfoq05xKWNI/93ytSm
+	 Y2TPefhcZq3IP8SMMoyIJluAfKCXHWO/5EiNK3xSuPfUk7XYfGO3wU13YvII8vhWcs
+	 T9HYfYKjme8kolqb+mtYDK81GNPufnqjHICHaJowXBXert69C06TUUWjp78YKgnKAV
+	 p+4g720N5rSx1FcAnd0gQRm4RAo8xntdAZ4b6ROhXkJcalU06AWtFUCnCX1IacG2a9
+	 wpdX8Q/gAxfMg==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 03 Apr 2026 13:29:27 +0200
-Subject: [PATCH net-next 1/5] mptcp: reduce 'overhead' from u16 to u8
+Date: Fri, 03 Apr 2026 13:29:28 +0200
+Subject: [PATCH net-next 2/5] mptcp: preserve MSG_EOR semantics in sendmsg
+ path
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260403-net-next-mptcp-msg_eor-misc-v1-1-b0b33bea3fed@kernel.org>
+Message-Id: <20260403-net-next-mptcp-msg_eor-misc-v1-2-b0b33bea3fed@kernel.org>
 References: <20260403-net-next-mptcp-msg_eor-misc-v1-0-b0b33bea3fed@kernel.org>
 In-Reply-To: <20260403-net-next-mptcp-msg_eor-misc-v1-0-b0b33bea3fed@kernel.org>
 To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
@@ -66,12 +67,12 @@ Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
  linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
  Gang Yan <yangang@kylinos.cn>
 X-Mailer: b4 0.15.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1605; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=YCYDzaz5Nyw/pADvCjdf3hqBQ1LHqoworLozj+9TNkM=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDLPL1kVcX/X8p/ZRz0m1KZLLK9krPwtEir6qy/ZN8C5M
- fMqT7dcRykLgxgXg6yYIot0W2T+zOdVvCVefhYwc1iZQIYwcHEKwET81zH8L9kZtd+I8+mj/709
- VZGN75QN1wqIFbdGrNbfulH3R+y92wz/Q1qv+gsdqT15/dEtzljfqn1Xw3ZpLHbLc43mWc2Yl5r
- FBgA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3256; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=zyCtjJLAzhx558xwpPbkO4CJxWTtK4YZSUOCvm+2gtE=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDLPL1m91t7Q6pXc44bJ2XP6f4scnKgWJnPI4kSR1PuVd
+ 9UXzLWN6ChlYRDjYpAVU2SRbovMn/m8irfEy88CZg4rE8gQBi5OAZjIe25GhhOfVptqbehjW7y6
+ pznkw3HBkyxb9sbl/tjyOiP/j1zps8sM/zOfNF/64rmeMeT++acODo7rYp0aKt4/Ybt958b//G3
+ tV5kA
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Spamd-Result: default: False [-2.16 / 15.00];
@@ -83,7 +84,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274993-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274994-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
@@ -99,56 +100,104 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,kylinos.cn:email]
-X-Rspamd-Queue-Id: 60722393B0E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C071C393B16
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Gang Yan <yangang@kylinos.cn>
 
-The 'overhead' in struct mptcp_data_frag can safely use u8, as it
-represents 'alignment + sizeof(mptcp_data_frag)'. With a maximum
-alignment of 7('ALIGN(1, sizeof(long)) - 1'), the overhead is at most
-47, well below U8_MAX and validated with BUILD_BUG_ON().
+Extend MPTCP's sendmsg handling to recognize and honor the MSG_EOR flag,
+which marks the end of a record for application-level message boundaries.
 
-This patch also adds a field named 'unused' for further extensions.
+Data fragments tagged with MSG_EOR are explicitly marked in the
+mptcp_data_frag structure and skb context to prevent unintended
+coalescing with subsequent data chunks. This ensures the intent of
+applications using MSG_EOR is preserved across MPTCP subflows,
+maintaining consistent message segmentation behavior.
 
 Signed-off-by: Gang Yan <yangang@kylinos.cn>
 Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- net/mptcp/protocol.c | 6 ++++++
- net/mptcp/protocol.h | 3 ++-
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ net/mptcp/protocol.c | 24 +++++++++++++++++++++---
+ net/mptcp/protocol.h |  2 +-
+ 2 files changed, 22 insertions(+), 4 deletions(-)
 
 diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 239fb9e75c7c..79315e575d07 100644
+index 79315e575d07..e21e416cd19a 100644
 --- a/net/mptcp/protocol.c
 +++ b/net/mptcp/protocol.c
-@@ -4616,6 +4616,12 @@ void __init mptcp_proto_init(void)
- 	inet_register_protosw(&mptcp_protosw);
+@@ -1005,7 +1005,8 @@ static bool mptcp_frag_can_collapse_to(const struct mptcp_sock *msk,
+ 				       const struct page_frag *pfrag,
+ 				       const struct mptcp_data_frag *df)
+ {
+-	return df && pfrag->page == df->page &&
++	return df && !df->eor &&
++		pfrag->page == df->page &&
+ 		pfrag->size - pfrag->offset > 0 &&
+ 		pfrag->offset == (df->offset + df->data_len) &&
+ 		df->data_seq + df->data_len == msk->write_seq;
+@@ -1147,6 +1148,7 @@ mptcp_carve_data_frag(const struct mptcp_sock *msk, struct page_frag *pfrag,
+ 	dfrag->offset = offset + sizeof(struct mptcp_data_frag);
+ 	dfrag->already_sent = 0;
+ 	dfrag->page = pfrag->page;
++	dfrag->eor = 0;
  
- 	BUILD_BUG_ON(sizeof(struct mptcp_skb_cb) > sizeof_field(struct sk_buff, cb));
+ 	return dfrag;
+ }
+@@ -1408,6 +1410,13 @@ static int mptcp_sendmsg_frag(struct sock *sk, struct sock *ssk,
+ 		mptcp_update_infinite_map(msk, ssk, mpext);
+ 	trace_mptcp_sendmsg_frag(mpext);
+ 	mptcp_subflow_ctx(ssk)->rel_write_seq += copy;
 +
-+	/* struct mptcp_data_frag: 'overhead' corresponds to the alignment
-+	 * (ALIGN(1, sizeof(long)) - 1, so 8-1) + the struct's size
++	/* if this is the last chunk of a dfrag with MSG_EOR set,
++	 * mark the skb to prevent coalescing with subsequent data.
 +	 */
-+	BUILD_BUG_ON(ALIGN(1, sizeof(long)) - 1 + sizeof(struct mptcp_data_frag)
-+		     > U8_MAX);
++	if (dfrag->eor && info->sent + copy >= dfrag->data_len)
++		TCP_SKB_CB(skb)->eor = 1;
++
+ 	return copy;
  }
  
- #if IS_ENABLED(CONFIG_MPTCP_IPV6)
+@@ -1868,7 +1877,8 @@ static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	long timeo;
+ 
+ 	/* silently ignore everything else */
+-	msg->msg_flags &= MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL | MSG_FASTOPEN;
++	msg->msg_flags &= MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL |
++			  MSG_FASTOPEN | MSG_EOR;
+ 
+ 	lock_sock(sk);
+ 
+@@ -1975,8 +1985,16 @@ static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 			goto do_error;
+ 	}
+ 
+-	if (copied)
++	if (copied) {
++		/* mark the last dfrag with EOR if MSG_EOR was set */
++		if (msg->msg_flags & MSG_EOR) {
++			struct mptcp_data_frag *dfrag = mptcp_pending_tail(sk);
++
++			if (dfrag)
++				dfrag->eor = 1;
++		}
+ 		__mptcp_push_pending(sk, msg->msg_flags);
++	}
+ 
+ out:
+ 	release_sock(sk);
 diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
-index 0bd1ee860316..02031007100b 100644
+index 02031007100b..1208f317ac33 100644
 --- a/net/mptcp/protocol.h
 +++ b/net/mptcp/protocol.h
-@@ -263,7 +263,8 @@ struct mptcp_data_frag {
- 	u64 data_seq;
+@@ -264,7 +264,7 @@ struct mptcp_data_frag {
  	u16 data_len;
  	u16 offset;
--	u16 overhead;
-+	u8 overhead;
-+	u8 __unused;
+ 	u8 overhead;
+-	u8 __unused;
++	u8 eor;			/* currently using 1 bit */
  	u16 already_sent;
  	struct page *page;
  };
