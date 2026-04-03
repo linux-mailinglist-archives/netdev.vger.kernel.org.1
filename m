@@ -1,228 +1,321 @@
-Return-Path: <netdev+bounces-274930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274934-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YIVHMpBxz2nAwQYAu9opvQ
-	(envelope-from <netdev+bounces-274930-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 09:51:44 +0200
+	id EBbEBgJ1z2kewgYAu9opvQ
+	(envelope-from <netdev+bounces-274934-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 10:06:26 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EB7F391D6C
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 09:51:44 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA2E1391E83
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 10:06:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 963F930381BA
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 07:51:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 2E9033008241
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 08:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9466730B514;
-	Fri,  3 Apr 2026 07:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DFHRNrl4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48AC21B86C7;
+	Fri,  3 Apr 2026 08:06:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B586A001
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 07:51:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775202665; cv=pass; b=kLxHrDIo9TOJ98NEGF6STPdoSCiI+Dpv38gkpgHrrYTDey6r4YiiJdcaBX1Iz8R9vo6B7NjKzZbNcBRSDDFniusp6q3FuRqHpfgSVwfwz7VO+4vDJ6X6gkpJmgrIo8XsENMQQ4ad6dkRSwpv5srdPagMBlx9L/D7pG6JY3Ef6EE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775202665; c=relaxed/simple;
-	bh=dd0wcVBzvcg1oc0Uq/WGTRb+kCuStk1ncnJUMitvdEY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uEpWTnjRDlwp6DxWw8WRS0Tr0FX9bZ/YfVCXFjslkjoehjZhNnSgaKRCuCQnA5DfhdBdO3U+W4O6JGhmv4jl4qEUMdhJpHyyqaZv51R8x9B6Nguh2dX9P9B00qsK/XnaVeuOSdmSgcgSZtN1n0ddpwbMugljwRUMquH/HFKPbug=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DFHRNrl4; arc=pass smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b886fc047d5so265212566b.3
-        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 00:51:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775202662; cv=none;
-        d=google.com; s=arc-20240605;
-        b=aqCtojQSbXpnB4m8ekxBxcGSZplJ7vz4RDMTsp4ky4hfuhLaZrHtvD3NDNmiJ3L8s/
-         BV4RMbXujvQcNSqfytvAM1MB5Jei1fKLcfEsZUaHfTl6lKNlJ0CdlpcFVZNvM4r4W741
-         /bZ0O3JNKsh5JHvSt3c2ut64u4OmykHwL9nkX1HTQ9YTB86JFWe8ZLKcExsOk8uTTyrh
-         NcIjmoDGCjUwoC/rkVAcaNT7HPCrA1r27KdpNaFQ4QYvDl/K48m4lkEDFhvyZe27r8yp
-         B3uAxsCbzllNoOqJO2+2R0yvY88BkFOJlaGFx8O82hBUaI/EQk5S/COExKEnENs1t3XS
-         JxvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=NzoumJBKpZU/3O7s9r+rhYMdWgYGL90pbXwFIlwFZtw=;
-        fh=fBcIi6LOBmWIqPjiHNi6OVFzFGukj7I6cPN145TL/GQ=;
-        b=Czujy+m4MFiVENgKVqQArM28vF1Ne7jIIkap0ph1/qIo4iGUaCs9Rjdb3pafGXuGMI
-         f3qB2A04+2ht6igEaMT5i51/qKIFc96Gx0du/RDIqxZWtBUQx5E4BmqR1KlA4u0o42UF
-         YxKH1wYq2MMCDh0X4QcHHJmIdefHEY5Sp2t33BngTBeGI9vTGSoFaDm8ZICoFetpLE10
-         zPEHddJY+w5Ia8z9zlqZ+NIBV28AelBMk0JzOpvHESDyXVYOBrJk3Y0W7JN/3gF+Rbrd
-         Lux7aOCnPOL59dHANXqLAwtzhN4DpINJVNNLcH8EJU3Tt4nyZen/FeP3w9ZeVpnhmXYa
-         z31A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775202662; x=1775807462; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NzoumJBKpZU/3O7s9r+rhYMdWgYGL90pbXwFIlwFZtw=;
-        b=DFHRNrl4BPePVNp7vvg1hi9LbLQkMK/qSzBQK1/uSirS3eE+J5/F5UOS0tZj3dF7kn
-         VCUYwJf2SHlZWwnXCTIsnTwyGMuqMxzgeM33VbKkzAFtgYaIdse26gnA+oFqhLdP/gRk
-         0wsAv8itGxS3r6bTAi9/YxfFzrsW2IIf8bdSKv4dN9Qwk0FJE6Te7NK6GI4Tns36izpV
-         MPWnxMj4XIT0MKN75o6X82TegMPtJND0TZBLQkH2d5y3ncQ2YqLMGR8qODueJCLrXU48
-         9WejEc1lgVEcLiZCFGmENE1QrE0ufW8U3cmt6Ul086FpUOLifZ0qpR3r3qbTJOCm/7b0
-         1qPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775202662; x=1775807462;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NzoumJBKpZU/3O7s9r+rhYMdWgYGL90pbXwFIlwFZtw=;
-        b=ASKQeP3Ni8vlDNCgwliQM1wXP1an6ws38NMDtUTrz8SefT1pwt3fXhosPCnHHw0vBw
-         p70iHPnoSvdIZ54nw9O3U/GWQYZyacPlFfthSx7Vu6qRlDgVyFUJFANgHqxu2nU2heWD
-         DCL/JZ7fFHlN6MpzM8k3FgIb+2bjT+UbaCgVsilwJIl5FIJguPdOfGK1jNybT/v2/iVx
-         /LqdDquqPA/ynO+DhP2VJMmNgkhkZeCJKZa04PVy5ezcCl/1YZRrYqQnKRB/+Hh31EsE
-         F0lZNq7neVAvZYY2eosrkPLU2aKsMaIL2DZiur81LqhIMm+rVnyqErqPNtiZgi/U5sPx
-         qCtA==
-X-Forwarded-Encrypted: i=1; AJvYcCVcK9hIYigfuasse6DVNtesdHTOCQlTgB1dlQHu4Lkefahg0WR9KM1tzZz+19mPgtT6nWFNQuM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxfh82JPCy9ee8DB9BY6ZmnDMKE9c5U5X5psQNwM8srqj7JAxWj
-	gbyeEvzVJAYOXsUhyrZQSWf07ANTRCcj0t3y46OYafi0CZLi+lg/PoT+9n9ZE/DvbBzrBPzXXAG
-	DiKaOt0jY0mZVUM47cHHWsfZAUQXlTrU=
-X-Gm-Gg: ATEYQzxFtsWHK1PL8u7QV4508JGKEMuJauiz+hi0r7i1AJL4O8GIFvSy+W46zpNw0FY
-	RZtZQIUCljJYi3l2pVEdgRGqLcRp26vYzTa3fbktT4e9xuv9SVcoHKl7rZ4pgm7Xmtvy+1eDboe
-	mF7/meFvt/MMcifwlmcNgx1Q5S+wIrhP1Q7KNTYcgyK7XJeazFuRtaqzeKv065oehP8/g3Y++hT
-	HJ2tQHjvZCvsOWF98osKWsdblwjK+c4w6SSeCG1PnQJNOH4gOCJ0Xniv++kmMfR2P1A1xZnpEGR
-	UZp/zVmrnbTJb6+yXQ==
-X-Received: by 2002:a17:906:478e:b0:b98:1129:51 with SMTP id
- a640c23a62f3a-b9c675492c5mr95779166b.17.1775202662236; Fri, 03 Apr 2026
- 00:51:02 -0700 (PDT)
+Received: from zg8tmja5ljk3lje4mi4ymjia.icoremail.net (zg8tmja5ljk3lje4mi4ymjia.icoremail.net [209.97.182.222])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9D4D271464;
+	Fri,  3 Apr 2026 08:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.182.222
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775203561; cv=none; b=RB9EFWIWFe9oUD0hXOilgp56awjV761ZUFVgRFBs+Kf33KpX4zpu93WlerX7kIGZtSyTq/uYL8/lYJkDf1XMKGTZN2n669RfNATYyNcmtNAyzD9JEDTcjS9WpjpSqGPK5fafwKkzvs4CFxSidTLGPXhfbYDTpRC0/giqZ0UheT0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775203561; c=relaxed/simple;
+	bh=lNuXDaVMVTtjFpWDyGbBoy37vpqtUnAvB5VrdlJcpDc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=IF+f5zcE9tTn9xajXax7QBON/pHL07lVyiS3GB8VGwONaL0lriBmGIRO6wz9fnSaAfjtcbl81WosRxr9iMdW+04bh0OjhjEsxTLKI6esVr/3ZeEAvmR/ToLFQrVUMhp62inMiJKIrYcXN6KU/YSn9bEXNNj24b0cod26i8z4rzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=209.97.182.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowAAnoADQdM9pq_SiAA--.912S2;
+	Fri, 03 Apr 2026 16:05:36 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	enjou1224z@gmail.com,
+	wangjiexun2025@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH v2 1/1] Bluetooth: serialize accept_q access
+Date: Fri,  3 Apr 2026 16:05:28 +0800
+Message-ID: <06a6b4549acba207847ce532dedbf1c95ab22d13.1774925231.git.wangjiexun2025@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1774454568.git.wangjiexun2025@gmail.com>
+References: <cover.1774454568.git.wangjiexun2025@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f23ed1b3-6321-4e6d-9cda-ec5d34304f3b@blackwall.org>
- <20260330191611.16929-1-royujjal@gmail.com> <20260330191611.16929-6-royujjal@gmail.com>
- <20260331141347.GA1637150@shredder>
-In-Reply-To: <20260331141347.GA1637150@shredder>
-From: Ujjal Roy <royujjal@gmail.com>
-Date: Fri, 3 Apr 2026 13:20:49 +0530
-X-Gm-Features: AQROBzCimHZIQikwfz6IXnJcfEgHNzZT7diUDVok-XKy8P3nRmO5_SZI4DRIkdI
-Message-ID: <CAE2MWkn3gPc1kBwy2p7r5bx6QozMStM0N6oEutT7g7GnJrKteA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 5/5] selftests: net: bridge: add tests for
- igmpv3 MRC and QQIC validation
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	Andy Roulin <aroulin@nvidia.com>, Yong Wang <yongwang@nvidia.com>, 
-	Petr Machata <petrm@nvidia.com>, Ujjal Roy <ujjal@alumnux.com>, bridge@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowAAnoADQdM9pq_SiAA--.912S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3Jw47Cr43tryxCr48JF1UJrb_yoWxXryUpF
+	yUCas8GFWkJw45ur43taykurWayw1rWr43GayFvas5Ar9agFWrt3W2yayjvr1YyFZrCrsa
+	yF4jgwnxCr4UC3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
+	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
+	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
+	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
+	n4kS14v26r1q6r43MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
+	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQQGCWnOkPwEvQABs5
+X-Spamd-Result: default: False [0.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274934-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274930-lists,netdev=lfdr.de];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[holtmann.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,lzu.edu.cn];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.973];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[royujjal@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,nvidia.com:email,bridge_vlan_mcast.sh:url,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5EB7F391D6C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lzu.edu.cn:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AA2E1391E83
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Mar 31, 2026 at 7:44=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wr=
-ote:
->
-> On Mon, Mar 30, 2026 at 07:16:11PM +0000, Ujjal Roy wrote:
-> > Add bridge selftests that configure IGMPv3 parameters and validate the
-> > resulting Query packet fields for Max Resp Code (MRC) and Querier Query
-> > Interval Code (QQIC).
-> >
-> > This also adds helper binary to encode floating-point exponential field=
-s.
-> >
-> > Future extensions may cover corresponding IPv6 cases.
->
-> Please cover both IGMPv3 and MLDv2 since the patchset touches both. You
-> can add the MLDv2 tests in bridge_mld.sh.
->
-> Also, I think you can simplify the test by simply matching on the
-> expected values of MRC and QQIC using tc-u32.
->
-> For both IGMPv3 and MLDv2 please test both:
->
-> * MRC and QQIC in linear range.
-> * MRC and QQIC in non-linear range.
->
-> And please make sure the new test cases don't add new shellcheck
-> warnings / errors or it will fail in the CI. You can ignore existing
-> ones.
+From: Jiexun Wang <wangjiexun2025@gmail.com>
 
-I will upgrade the existing test cases in file bridge_vlan_mcast.sh
-instead of the previous file (bridge_igmp/mld.sh).
+bt_sock_poll() walks the accept queue without synchronization, while
+child teardown can unlink the same socket and drop its last reference.
 
-I have some doubts on test case logs reporting. Below are the logs
-without my patchset. API used vlmc_query_intvl_test() and
-vlmc_query_response_intvl_test().
-TEST: Vlan mcast_query_interval global option default value         [ OK ]
-TEST: Vlan 10 mcast_query_interval option changed to 200            [ OK ]
-TEST: Vlan mcast_query_response_interval global option default value   [ OK=
- ]
-TEST: Vlan 10 mcast_query_response_interval option changed to 200   [ OK ]
+Protect accept_q with a dedicated lock for queue updates and polling.
+Also rework bt_accept_dequeue() to take temporary child references under
+the queue lock before dropping it and locking the child socket.
 
-I am expecting some suggestions from the logs below. And are these
-covers both IGMPv3 and MLDv2 for QQIC and MRC?
-Actually mcast_query_interval=3DQQIC and
-mcast_query_response_interval=3DMRC we already know.
+Fixes: 1da177e4c3f41524e886b7f1b8a0c1fc7321cac2 ("Linux-2.6.12-rc2")
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Ren Wei <enjou1224z@gmail.com>
+Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+---
+Changes in v2:
+- add Tested-by: Ren Wei <enjou1224z@gmail.com>
+- resend to the public Bluetooth/netdev lists
 
-TEST: Vlan mcast_query_interval global option default value         [ OK ]
-TEST: Vlan 10 mcast_query_interval option changed to 200            [ OK ]
-TEST: Vlan 10 mcast_query_interval number of IGMPv2 general query   [
-OK ] -> old case added log
-TEST: Vlan 10 mcast_query_interval option changed to 6000           [ OK ]
-TEST: Vlan 10 mcast_query_interval in IGMPv3 is 60                  [ OK ]
-TEST: Vlan 10 mcast_query_interval in MLDv2 is 60                   [ OK ]
-TEST: Vlan 10 mcast_query_interval option changed to 16000          [ OK ]
-TEST: Vlan 10 mcast_query_interval in IGMPv3 is 160                 [ OK ]
-TEST: Vlan 10 mcast_query_interval in MLDv2 is 160                  [ OK ]
-TEST: Vlan mcast_query_response_interval global option default value   [ OK=
- ]
-TEST: Vlan 10 mcast_query_response_interval option changed to 600   [ OK ]
-TEST: Vlan 10 mcast_query_response_interval in IGMPv3 is 60         [ OK ]
-TEST: Vlan 10 mcast_query_response_interval option changed to 1600   [ OK ]
-TEST: Vlan 10 mcast_query_response_interval in IGMPv3 is 160        [ OK ]
-TEST: Vlan 10 mcast_query_response_interval option changed to 3000   [ OK ]
-TEST: Vlan 10 mcast_query_response_interval in MLDv2 is 30000       [ OK ]
-TEST: Vlan 10 mcast_query_response_interval option changed to 6000   [ OK ]
-TEST: Vlan 10 mcast_query_response_interval in MLDv2 is 60000       [ OK ]
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/af_bluetooth.c      | 85 +++++++++++++++++++++++--------
+ 2 files changed, 66 insertions(+), 20 deletions(-)
 
-Or is it better to name them properly instead of mcast option names, like b=
-elow?
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 69eed69f7f26..3faea66b1979 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -398,6 +398,7 @@ void baswap(bdaddr_t *dst, const bdaddr_t *src);
+ struct bt_sock {
+ 	struct sock sk;
+ 	struct list_head accept_q;
++	spinlock_t accept_q_lock; /* protects accept_q */
+ 	struct sock *parent;
+ 	unsigned long flags;
+ 	void (*skb_msg_name)(struct sk_buff *, void *, int *);
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 2b94e2077203..f44e1ecc83d8 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -154,6 +154,7 @@ struct sock *bt_sock_alloc(struct net *net, struct socket *sock,
+ 
+ 	sock_init_data(sock, sk);
+ 	INIT_LIST_HEAD(&bt_sk(sk)->accept_q);
++	spin_lock_init(&bt_sk(sk)->accept_q_lock);
+ 
+ 	sock_reset_flag(sk, SOCK_ZAPPED);
+ 
+@@ -214,6 +215,7 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
+ {
+ 	const struct cred *old_cred;
+ 	struct pid *old_pid;
++	struct bt_sock *par = bt_sk(parent);
+ 
+ 	BT_DBG("parent %p, sk %p", parent, sk);
+ 
+@@ -224,9 +226,12 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
+ 	else
+ 		lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
+ 
+-	list_add_tail(&bt_sk(sk)->accept_q, &bt_sk(parent)->accept_q);
+ 	bt_sk(sk)->parent = parent;
+ 
++	spin_lock_bh(&par->accept_q_lock);
++	list_add_tail(&bt_sk(sk)->accept_q, &par->accept_q);
++	spin_unlock_bh(&par->accept_q_lock);
++
+ 	/* Copy credentials from parent since for incoming connections the
+ 	 * socket is allocated by the kernel.
+ 	 */
+@@ -254,45 +259,73 @@ EXPORT_SYMBOL(bt_accept_enqueue);
+  */
+ void bt_accept_unlink(struct sock *sk)
+ {
++	struct sock *parent = bt_sk(sk)->parent;
++
+ 	BT_DBG("sk %p state %d", sk, sk->sk_state);
+ 
++	spin_lock_bh(&bt_sk(parent)->accept_q_lock);
+ 	list_del_init(&bt_sk(sk)->accept_q);
+-	sk_acceptq_removed(bt_sk(sk)->parent);
++	spin_unlock_bh(&bt_sk(parent)->accept_q_lock);
++
++	sk_acceptq_removed(parent);
+ 	bt_sk(sk)->parent = NULL;
+ 	sock_put(sk);
+ }
+ EXPORT_SYMBOL(bt_accept_unlink);
+ 
++static struct sock *bt_accept_get(struct sock *parent, struct sock *sk)
++{
++	struct bt_sock *bt = bt_sk(parent);
++	struct sock *next = NULL;
++
++	/* accept_q is modified from child teardown paths too, so take a
++	 * temporary reference before dropping the queue lock.
++	 */
++	spin_lock_bh(&bt->accept_q_lock);
++
++	if (sk) {
++		if (bt_sk(sk)->parent != parent)
++			goto out;
++
++		if (!list_is_last(&bt_sk(sk)->accept_q, &bt->accept_q)) {
++			next = &list_next_entry(bt_sk(sk), accept_q)->sk;
++			sock_hold(next);
++		}
++	} else if (!list_empty(&bt->accept_q)) {
++		next = &list_first_entry(&bt->accept_q,
++					 struct bt_sock, accept_q)->sk;
++		sock_hold(next);
++	}
++
++out:
++	spin_unlock_bh(&bt->accept_q_lock);
++	return next;
++}
++
+ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+ {
+-	struct bt_sock *s, *n;
+-	struct sock *sk;
++	struct sock *sk, *next;
+ 
+ 	BT_DBG("parent %p", parent);
+ 
+ restart:
+-	list_for_each_entry_safe(s, n, &bt_sk(parent)->accept_q, accept_q) {
+-		sk = (struct sock *)s;
+-
++	for (sk = bt_accept_get(parent, NULL); sk; sk = next) {
+ 		/* Prevent early freeing of sk due to unlink and sock_kill */
+-		sock_hold(sk);
+ 		lock_sock(sk);
+ 
+ 		/* Check sk has not already been unlinked via
+ 		 * bt_accept_unlink() due to serialisation caused by sk locking
+ 		 */
+-		if (!bt_sk(sk)->parent) {
++		if (bt_sk(sk)->parent != parent) {
+ 			BT_DBG("sk %p, already unlinked", sk);
+ 			release_sock(sk);
+ 			sock_put(sk);
+ 
+-			/* Restart the loop as sk is no longer in the list
+-			 * and also avoid a potential infinite loop because
+-			 * list_for_each_entry_safe() is not thread safe.
+-			 */
+ 			goto restart;
+ 		}
+ 
++		next = bt_accept_get(parent, sk);
++
+ 		/* sk is safely in the parent list so reduce reference count */
+ 		sock_put(sk);
+ 
+@@ -310,6 +343,8 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock)
+ 				sock_graft(sk, newsock);
+ 
+ 			release_sock(sk);
++			if (next)
++				sock_put(next);
+ 			return sk;
+ 		}
+ 
+@@ -518,18 +553,28 @@ EXPORT_SYMBOL(bt_sock_stream_recvmsg);
+ 
+ static inline __poll_t bt_accept_poll(struct sock *parent)
+ {
+-	struct bt_sock *s, *n;
++	struct bt_sock *bt = bt_sk(parent);
++	struct bt_sock *s;
+ 	struct sock *sk;
++	__poll_t mask = 0;
++
++	spin_lock_bh(&bt->accept_q_lock);
++	list_for_each_entry(s, &bt->accept_q, accept_q) {
++		int state;
+ 
+-	list_for_each_entry_safe(s, n, &bt_sk(parent)->accept_q, accept_q) {
+ 		sk = (struct sock *)s;
+-		if (sk->sk_state == BT_CONNECTED ||
+-		    (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags) &&
+-		     sk->sk_state == BT_CONNECT2))
+-			return EPOLLIN | EPOLLRDNORM;
++		state = READ_ONCE(sk->sk_state);
++
++		if (state == BT_CONNECTED ||
++		    (test_bit(BT_SK_DEFER_SETUP, &bt->flags) &&
++		     state == BT_CONNECT2)) {
++			mask = EPOLLIN | EPOLLRDNORM;
++			break;
++		}
+ 	}
++	spin_unlock_bh(&bt->accept_q_lock);
+ 
+-	return 0;
++	return mask;
+ }
+ 
+ __poll_t bt_sock_poll(struct file *file, struct socket *sock,
+-- 
+2.34.1
 
-Vlan 10 mcast_query_interval:
-TEST: Number of tagged IGMPv2 general query                         [ OK ]
-TEST: IGMPv3 QQIC linear value 60                                   [ OK ]
-TEST: IGMPv3 QQIC non linear value 160                              [ OK ]
-TEST: MLDv2 QQIC linear value 60                                    [ OK ]
-TEST: MLDv2 QQIC non linear value 160                               [ OK ]
 
