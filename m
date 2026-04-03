@@ -1,146 +1,112 @@
-Return-Path: <netdev+bounces-274990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274991-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0CmVAhqiz2nDyAYAu9opvQ
-	(envelope-from <netdev+bounces-274990-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:18:50 +0200
+	id iIPgHRukz2mZyQYAu9opvQ
+	(envelope-from <netdev+bounces-274991-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:27:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B8463939D0
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:18:49 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F125E393A8F
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:27:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B8230301BC20
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 11:18:17 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6A076300FB60
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 11:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBFF8371053;
-	Fri,  3 Apr 2026 11:18:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 820E13B636B;
+	Fri,  3 Apr 2026 11:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="i4k8v/4c"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A43B30ACF6;
-	Fri,  3 Apr 2026 11:18:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3EDEEBA;
+	Fri,  3 Apr 2026 11:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775215096; cv=none; b=WXs+0SXg6huCffeSzNy7a/I0iVJ9U88YkbnQWqEq/KkBA5YyEio5m5og3AIWteCBRDq3Nw4q712+91JPZ91ZgyUB8xkS1n8Q22OxO21HTloZjMBK5sbVBHc/ZiKxieeWl+7EtjehodKEU6Ah7cHCCBd17RGUlC5i3xsERyiqrls=
+	t=1775215638; cv=none; b=g8WvQWGa3zWBW6GQr7+31W1gz191zFYmB+iS33VP7En0dRNCUUOcKvM4lK3NcHtbT0lSm5xY0GA79LHHe4/osPiCpgVhbS0UbhjSFETg11ag4wfF5cbaP45jp+H3UqzcJYWILg8MVz+C8laDBXB6FTuwIFjJT6SX997z6PJm41g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775215096; c=relaxed/simple;
-	bh=0WYBgKMTlXkgYogwKOIICSopEf2A8gdXNbk8ZkLLbaw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XVA5hZIuc5peL6y/ijStp1w/YxI+tmgavt/XT7BTJC/CX52Rkdq+hzYArRCr/Iivuspk2MgAywDC4eyPZM6QSPGxI2UujOaElLsH4UhjfhERDSY9FWyIbkTbyyMOSrXj/QCljTOzhcNvAZfhk93fSbwEbkvKMEod36Ek0cS49kY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; arc=none smtp.client-ip=210.160.252.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-X-CSE-ConnectionGUID: mT98Qk6rSySVCJ8LWFNc7Q==
-X-CSE-MsgGUID: OTICCFi5Qp2oAkEINyfu6w==
-Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
-  by relmlie5.idc.renesas.com with ESMTP; 03 Apr 2026 20:18:07 +0900
-Received: from vm01.adwin.renesas.com (unknown [10.226.92.192])
-	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 3B57B401A654;
-	Fri,  3 Apr 2026 20:18:03 +0900 (JST)
-From: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	biju.das.jz@bp.renesas.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-Subject: [PATCH net] net: phy: micrel: Fix MMD register access during SPD in ksz9131_resume()
-Date: Fri,  3 Apr 2026 11:17:38 +0000
-Message-ID: <20260403111738.37749-1-ovidiu.panait.rb@renesas.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1775215638; c=relaxed/simple;
+	bh=8ptg6+lDlnNWXZzdode46v0AX6LoQ04u750EgYPk0mo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AlGBOOSRPIaAX3jr2wGZS9QLVdissSsYvd9mIHLbGS/0AcBmtKCvh/XPbeqUdVHn1ND87x/CcPjdgp3n+hVlbnO7GWpK9crrNZtrW2qW3+65lHW2iE9o2Kk3JzYORn902fFe7oL1G+jxjAZFWRog4ZEvFVW4e36i+ENIw12QB8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=i4k8v/4c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97984C4CEF7;
+	Fri,  3 Apr 2026 11:27:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1775215638;
+	bh=8ptg6+lDlnNWXZzdode46v0AX6LoQ04u750EgYPk0mo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=i4k8v/4ckXyOC7M7sWAWb1JozoO+vf07H/m8qMiGkHjkdVQK2G45PJXMPCU8sszgU
+	 7P+5OPGJ1Z90Mz4nfr+HO8NKtHhDFKwXBwSWKgGOOt4nIfN5BrBX81g8kYun/5Y5WL
+	 f3i2Wfsot35Q1V5FStGlUTmDrAkuIDqSbwDvB6ho=
+Date: Fri, 3 Apr 2026 13:27:15 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: "He, Guocai (CN)" <Guocai.He.CN@windriver.com>
+Cc: Thorsten Leemhuis <regressions@leemhuis.info>,
+	"miriam.rachel.korenblit@intel.com" <miriam.rachel.korenblit@intel.com>,
+	"johannes.berg@intel.com" <johannes.berg@intel.com>,
+	Friend <netdev@vger.kernel.org>,
+	Linux kernel regressions list <regressions@lists.linux.dev>
+Subject: Re: commit 0c4f1c02d27a880b cause a deadlock issue
+Message-ID: <2026040331-evasion-walk-f572@gregkh>
+References: <CO6PR11MB5586A4475A5EEC47FC10398BCD53A@CO6PR11MB5586.namprd11.prod.outlook.com>
+ <PH0PR11MB55934A1C9A8C35B1E751C247CD50A@PH0PR11MB5593.namprd11.prod.outlook.com>
+ <14d65103-8809-4a1b-b115-bf5f8d7110ea@leemhuis.info>
+ <CO6PR11MB5586DF3964BAB4E6131A86CDCD5EA@CO6PR11MB5586.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.14 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CO6PR11MB5586DF3964BAB4E6131A86CDCD5EA@CO6PR11MB5586.namprd11.prod.outlook.com>
+X-Spamd-Result: default: False [2.34 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[renesas.com : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,bp.renesas.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274990-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[ovidiu.panait.rb@renesas.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-0.986];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274991-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,renesas.com:email,renesas.com:mid]
-X-Rspamd-Queue-Id: 9B8463939D0
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linuxfoundation.org:dkim]
+X-Rspamd-Queue-Id: F125E393A8F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-During system suspend, phy_suspend() puts the PHY into Software Power-Down
-(SPD) by setting the BMCR_PDOWN bit in MII_BMCR. According to the KSZ9131
-datasheet, MMD register access is restricted during SPD:
+On Fri, Apr 03, 2026 at 11:08:46AM +0000, He, Guocai (CN) wrote:
+> No, The mainline have no this issue.
+> The changes of 0c4f1c02d27a880b is not in mainline.
 
-  - Only access to the standard registers (0 through 31) is supported.
-  - Access to MMD address spaces other than MMD address space 1 is
-    possible if the spd_clock_gate_override bit is set.
-  - Access to MMD address space 1 is not possible.
+That does not make sense, that commit is really commit e1696c8bd005
+("wifi: cfg80211: stop NAN and P2P in cfg80211_leave") which is in all
+of the following releases:
+	5.10.252 5.15.202 6.1.165 6.6.128 6.12.75 6.18.14 6.19.4 7.0-rc1
 
-However, ksz9131_resume() calls ksz9131_config_rgmii_delay() before
-kszphy_resume() clears BMCR_PDOWN. This means MMD registers are accessed
-while the PHY is still in SPD, contrary to the datasheet.
+confused,
 
-Additionally, on platforms where the PHY loses power during suspend
-(e.g. RZ/G3E), all settings from ksz9131_config_init(), not just the
-RGMII delays, are lost and need to be restored. When the MAC driver
-sets mac_managed_pm (e.g. stmmac), mdio_bus_phy_resume() is skipped,
-so phy_init_hw() (which calls config_init to restore all PHY settings)
-is never invoked during resume.
-
-Fix this by replacing the RGMII delay restoration with a call to
-phy_init_hw(), which takes the PHY out of SPD and performs full
-reinitialization.
-
-Fixes: f25a7eaa897f ("net: phy: micrel: Add ksz9131_resume()")
-Signed-off-by: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
----
- drivers/net/phy/micrel.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 2aa1dedd21b8..4236dbf4ad6b 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -6016,8 +6016,13 @@ static int lan8841_suspend(struct phy_device *phydev)
- 
- static int ksz9131_resume(struct phy_device *phydev)
- {
--	if (phydev->suspended && phy_interface_is_rgmii(phydev))
--		ksz9131_config_rgmii_delay(phydev);
-+	int ret;
-+
-+	if (phydev->suspended) {
-+		ret = phy_init_hw(phydev);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	return kszphy_resume(phydev);
- }
--- 
-2.51.0
-
+greg k-h
 
