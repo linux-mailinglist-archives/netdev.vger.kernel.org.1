@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-275229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275230-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WJOWN1Y00Gnm4gYAu9opvQ
-	(envelope-from <netdev+bounces-275229-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 23:42:46 +0200
+	id GJ00IOs00Gnm4gYAu9opvQ
+	(envelope-from <netdev+bounces-275230-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 23:45:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4852739880B
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 23:42:46 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E35A39884F
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 23:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A7272301E96D
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 21:42:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4DCEA3003498
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 21:44:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3435B37AA72;
-	Fri,  3 Apr 2026 21:42:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 098223CAE6D;
+	Fri,  3 Apr 2026 21:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qLIXmbTJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J12D1YOC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11185371CFB
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 21:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7FE303C9C
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 21:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775252564; cv=none; b=uYqjycZ0ez9Oi+33DWbyVDJXjOCtLNJ7pYPXMezSm8XIaRbWmYik9G8Xjkh5AVqSe7nL8H4jwcP2+m4A8v22WtNTpU729rKj1JZbh9Iz4Ni3Bvgy2W0XZeYeDoBo7aDFARwb6b9g2aD0d55J971L35oKX8FFy0NNl0pY1/KUO6A=
+	t=1775252675; cv=none; b=gXas+WLZ3vojHz93rGkrCGqnwfHtoBtMCmCyxiPopwgZ+FOyJwNnoxKOjVsf0cJxdo4OdI/KH3TrOoSVyuj86wjJWJZF9yzO7AbeRWNYeYq5TlKruAPu4rS2n9iKTunRKlA9ylRQoSy8y9cUTBcuUJeB4OsvlFOUdp9kPJWjbtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775252564; c=relaxed/simple;
-	bh=bdj8RXu3qgyKpumk5HWckExHJL+wZZpu0L3xUEHMOvc=;
+	s=arc-20240116; t=1775252675; c=relaxed/simple;
+	bh=kD2mhRtWb5aYeIEmE0f5JFYLQ6jAMpfpNSLm7FgcG4c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XhAJJpqMIbvCol/O6qGjXhtunmVXfifdzvX4lehA0ql3NAxLO7+93OWqq0p4S342T8qfxs7AKsa//9h96i5YWZtT4Rw5LmKqb1jA3wCCluHokqhp0Ua8iu44xcDxUrH5/wzEf6lHwcPTNB94z/q+ToGgGs+KgCgj81ZgiuNmRAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qLIXmbTJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E667DC4CEF7;
-	Fri,  3 Apr 2026 21:42:42 +0000 (UTC)
+	 MIME-Version; b=UXYejBjqhTsrnz1buxpFMQfEQNpbXJnWTFYPHMhJ2lfM0F/SSBJugu9B0YAOaFaXCQpksbKwpcNn7U1uDgDrP0QoQrxc+ywBfiPoaGE528/sBDuuaWFAlBZWT99JmVo+UJ+tSyqB3RSjVZrbsb5IOdjZNo1jpH3f6iqMPzSh3J0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J12D1YOC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA34FC4CEF7;
+	Fri,  3 Apr 2026 21:44:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775252563;
-	bh=bdj8RXu3qgyKpumk5HWckExHJL+wZZpu0L3xUEHMOvc=;
+	s=k20201202; t=1775252675;
+	bh=kD2mhRtWb5aYeIEmE0f5JFYLQ6jAMpfpNSLm7FgcG4c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qLIXmbTJFOvMHgvmx+IsIiO/p5g2tHkt75ezUxbSbPXEq1I0iflD+reTNHwPbyhnI
-	 7/LHdfxoz7QUStvGpRbfPj5izApbuatl2sDSlXuW6XWVOpdnWC/ov4sw1sQ1TyC4Ks
-	 EV/b3+NA8+14EvEA29s+Q1n5/Yub5iKu2W+vZwqJBuCO3Vq1QSHDf9u9RBmD3z0gUj
-	 /6EdwmvLhdCi5Tc59ENYFSBH1+nzq52VBCmCSViLW49kXcGfduqaZVBfL4OrEMLa8/
-	 3HIXzozEmPLifBHuKQ62QiOf/dBv0OHx0VbrsgdaV8j6dKlHhYGM5PyhAV7uJEr/LY
-	 7XjcuwFxC1tNw==
+	b=J12D1YOCIhyYAQYtfu7Lny8mmX8+FB3eTSXxOyOt06kWNVFZ5QGQVNUqzcFt6NPAB
+	 lzC+Sy4Eda/DploYUI7H8is24TTF+P8wFhXYJ5zD91XE8a81S909svBQR3LqkFna9L
+	 szqPxud5GRaGjCOC0KBhG12pr5XkrbYgD4GF8lcDf+DgXwnsr59D/lJe31zgAp7TZe
+	 uPFNTmFM6LjnvOPMPbz3TuXwIEGj+37cMo+bRkZhkId6HHW/UpENPtPd88+2pbfBQY
+	 89BvHWCU5w30kJZBkw8CIO57g6z3CA8tfvfY7/oNW8v5vTW0V+c/RCssQfpsdLxiGM
+	 +E3cqJLpl0Jbw==
 From: Jakub Kicinski <kuba@kernel.org>
-To: lorenzo@kernel.org
+To: edumazet@google.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
-	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
-	edumazet@google.com,
 	pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: airoha: Fix memory leak in airoha_qdma_rx_process()
-Date: Fri,  3 Apr 2026 14:42:24 -0700
-Message-ID: <20260403214223.2230561-2-kuba@kernel.org>
+	horms@kernel.org,
+	dsahern@kernel.org,
+	netdev@vger.kernel.org,
+	eric.dumazet@gmail.com,
+	yimingqian591@gmail.com,
+	justin.iurman@gmail.com
+Subject: Re: [PATCH net] ipv6: ioam: fix potential NULL dereferences in __ioam6_fill_trace_data()
+Date: Fri,  3 Apr 2026 14:44:19 -0700
+Message-ID: <20260403214418.2233266-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260402-airoha_qdma_rx_process-mem-leak-fix-v1-1-b5706f402d3c@kernel.org>
-References: <20260402-airoha_qdma_rx_process-mem-leak-fix-v1-1-b5706f402d3c@kernel.org>
+In-Reply-To: <20260402101732.1188059-1-edumazet@google.com>
+References: <20260402101732.1188059-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,99 +70,75 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,redhat.com,vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275229-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_FROM(0.00)[bounces-275230-lists,netdev=lfdr.de];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4852739880B
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 6E35A39884F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
-email says: "more thing to fix.."
+email says "more bugs to fix.."
 ---
-net: airoha: Fix memory leak in airoha_qdma_rx_process()
+ipv6: ioam: fix potential NULL dereferences in __ioam6_fill_trace_data()
 
-This commit fixes a memory leak in the error path of
-airoha_qdma_rx_process() by partially reverting a previous commit and
-always calling page_pool_put_full_page().
+This commit fixes potential NULL pointer dereferences in
+__ioam6_fill_trace_data() by checking __in6_dev_get() and using
+skb_dst_dev_rcu(). It also adds missing READ_ONCE() annotations.
 
-> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-> index 95ba99b89428e..91cb63a32d990 100644
-> --- a/drivers/net/ethernet/airoha/airoha_eth.c
-> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-> @@ -697,9 +697,8 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
+> diff --git a/net/ipv6/ioam6.c b/net/ipv6/ioam6.c
+> index 3978773bec42..05a0b7d7e2aa 100644
+> --- a/net/ipv6/ioam6.c
+> +++ b/net/ipv6/ioam6.c
+> @@ -710,7 +710,9 @@ static void __ioam6_fill_trace_data(struct sk_buff *skb,
+>  				    struct ioam6_schema *sc,
+>  				    unsigned int sclen, bool is_input)
+>  {
+> -	struct net_device *dev = skb_dst_dev(skb);
+> +	/* Note: skb_dst_dev_rcu() can't be NULL at this point. */
+> +	struct net_device *dev = skb_dst_dev_rcu(skb);
 
-This problem wasn't introduced by this patch, but while reviewing this
-function I noticed the descriptor field msg1 is read from memory before
-the ownership bit is validated:
+Could this code lead to an out-of-bounds access of the dev->_tx[] array
+further down in this function?
 
-airoha_qdma_rx_process() {
-        while (done < budget) {
-                struct airoha_queue_entry *e = &q->entry[q->tail];
-                struct airoha_qdma_desc *desc = &q->desc[q->tail];
-                u32 hash, reason, msg1 = le32_to_cpu(desc->msg1);
-                struct page *page = virt_to_head_page(e->buf);
-                u32 desc_ctrl = le32_to_cpu(desc->ctrl);
+While reviewing this patch, a pre-existing regression was noticed when
+trace->type.bit6 is set:
 
-                if (!(desc_ctrl & QDMA_DESC_DONE_MASK))
-                        break;
+    if (trace->type.bit6) {
+        ...
+        queue = skb_get_tx_queue(dev, skb);
+        qdisc = rcu_dereference(queue->qdisc);
 
-Could this lead to processing stale descriptor metadata? On weakly-ordered
-architectures, the CPU might reorder these reads before the device commits
-the new descriptor data. 
+When is_input is true, the packet is on the RX path and skb->queue_mapping
+contains the RX queue index of the ingress device.
 
-Are we missing a dma_rmb() after the ownership check?
+If the ingress device has more RX queues than the egress device (dev) has
+TX queues, skb_get_queue_mapping(skb) will exceed dev->num_tx_queues.
 
->  		if (q->skb) {
->  			dev_kfree_skb(q->skb);
->  			q->skb = NULL;
-> -		} else {
-> -			page_pool_put_full_page(q->page_pool, page, true);
->  		}
-
-This is also an existing issue, but does jumping to this error path on a
-scattered packet fragment leave the receive loop in an inconsistent state?
-
-If an error occurs while processing a middle fragment of a packet, q->skb
-is freed and set to NULL here. However, the loop continues to the next
-descriptor.
-
-Since q->skb is now NULL, won't the next fragment of the same corrupted
-packet be erroneously parsed as the start of a brand new Ethernet frame:
-
-                if (!q->skb) { /* first buffer */
-                        q->skb = napi_build_skb(e->buf, q->buf_size);
-
-Could this desynchronization allow arbitrary payload to be injected into
-the network stack as a legitimate packet? The driver may need to discard
-all subsequent fragments until a descriptor without QDMA_DESC_MORE_MASK is
-encountered.
-
-> +		page_pool_put_full_page(q->page_pool, page, true);
->  	}
->  	airoha_qdma_fill_rx_queue(q);
->
+Since skb_get_tx_queue() does not clamp the index, will it return an
+out-of-bounds pointer into the egress device's dev->_tx array, causing
+dereferencing queue->qdisc to read invalid memory?
 
