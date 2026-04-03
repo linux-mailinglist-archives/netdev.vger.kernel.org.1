@@ -1,98 +1,102 @@
-Return-Path: <netdev+bounces-275104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275106-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uBKnH4Xaz2mb1AYAu9opvQ
-	(envelope-from <netdev+bounces-275104-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:19:33 +0200
+	id CKp/GZzcz2mn1QYAu9opvQ
+	(envelope-from <netdev+bounces-275106-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:28:28 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6D15395B66
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:19:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F21BF395C55
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:28:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C257230210F0
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 15:18:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0BCD13080F83
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 15:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0233F313535;
-	Fri,  3 Apr 2026 15:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4D33C7E1F;
+	Fri,  3 Apr 2026 15:26:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aoKnDj51"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hPnSFXxx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD32B3D76
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 15:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648D937B011
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 15:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775229517; cv=none; b=i+QON0coG3HKgYdBHxnKZRyNOiGa2OC0WQP7gUn5c9BZPGjXuUOKbO+h90j8onsdIrbfpP/f8gPGgvgpiQWjCMxBP8AEl9RM3K9MQaDRYEUQuppkFnKm/qsd94NR3KQ6JFrGiaVTscgVxVMNooyPSWbU1HUsbK7az4tdOfou3U0=
+	t=1775229965; cv=none; b=utazRbP50JZnmuTcAfFXD3+cPSSd4rNet0icgmxHP7Cgr0N/neAkgFCHhutcCy+Djg+Eh9im2w/1MKRGV92gtVR/1rTzTAOtRhUeKKEtLys48j5fIHoXOKMwRlaXo/ttB0Gbd22zyGjH/oQ/0Uffr2qsnc/wyvB/pndMyzqCHzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775229517; c=relaxed/simple;
-	bh=X62u++GbKjKs6HX3LchQE4r05yJOf8Cci0iZtDrxreE=;
+	s=arc-20240116; t=1775229965; c=relaxed/simple;
+	bh=/iuUiBKd/QehSumXg68bTOYBxK/MWSEcoYlGJ5L4Wi4=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=CuZ0aW5A0hYlGYcjiOdcRurrWpalRu8YXxL1QmCIdJTar7YRoXCF/VwirXhDfrHygJXEe2E+ZrCZ7dhfQ2IRGzDcJCkONTLiN38PBVcFs+7SKiY5Qzg9LsWAEAjMVLZU9QIYPo6Ma+aRY3aSt71Sj9olZyL9NyipwCqiVacqB50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aoKnDj51; arc=none smtp.client-ip=209.85.128.182
+	 Mime-Version:Content-Type; b=lsQqIXEg6900Eh+p9Fqm1c5A34DXRWP2gZKj6Y/Er7/w2v96KTvV3gPeBeRE4HnPbfwjQNjSLADYC8pkUo86w5g7uYKUBDJVUvb+ac7m6s0gU1rIcYqjm5dAz94osQN43BxezM9ife+KnvT0dXNEGpxYemlVDGGWNI4vmDQmw9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hPnSFXxx; arc=none smtp.client-ip=209.85.128.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-79ab5fd969aso20673547b3.0
-        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 08:18:36 -0700 (PDT)
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-7a43424f861so16717987b3.1
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 08:26:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775229516; x=1775834316; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775229962; x=1775834762; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mEzOBamhUqvu1O1wLQNrqniJtzY/fr1ykFSE5CqsypY=;
-        b=aoKnDj51e3EGRPCPJxYJIQG2/xYrNgwQh6jcRzGjk07k1JLI5wPzthjMSjaVfLJ39N
-         9HiboBngKPnmZsBd++x9nbFhEGAMBXuetBvLHs2uNN7iWqG1lQo91D9lOE3FqrFO6wgk
-         LGDwmKfE45Vuj8KYR/hDcQLqhEfMl9c0Lkwbl2QlBnWJvB9iJi46yxS6scMaPj9cIPG6
-         SrjvSxh8GjtEKft3Sj198bGUlj4pKJpZL4WB9Dt8vk1BedDt138cGuFVfXHtDw6LZ8JT
-         W/LvNwNBikHRjWZUmmKxETXG7p07jFj1/6Npdgif7mXtB3O+yNm3wG9fDXmZK6/+TQ5q
-         ualw==
+        bh=phgEzarmetA3rPcVDi8C467Z7leoFPBcCeNvveOYnOE=;
+        b=hPnSFXxx15dfsYGWgXmJoQPNdxqnS+jk29YdsNJwJJKvnpCuyaEZBSVqXi2yVOvr7l
+         emsXExVs9Rysc4ukhZMufx5+2b5CGD5n5zJiwIyzNaDx3gCt4+TawoGbcKBeFpxlIpxP
+         CcwFnyi+SPBH3DeVIsgBth9xu1U12YiZ/L+ZgXxYHAFHmv/SR/n4HtXnSUlYlT5wPh6E
+         gppzDIigx1L4rRyjYfC2KsfTJlqUE2YfMcb9z7DBxB12EI1WnjnGZdspw1FeuA43a71G
+         rNgcA7HQxKwgVCiDiNnmN1QvcljMY3bONR12k9aoh+/IVZVY+sGyy99tt4dh7Hm+bdFS
+         +pWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775229516; x=1775834316;
+        d=1e100.net; s=20251104; t=1775229962; x=1775834762;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=mEzOBamhUqvu1O1wLQNrqniJtzY/fr1ykFSE5CqsypY=;
-        b=eSqqf4Yn4Lf1Zo1uHsld4etevu2IqMTcVMsLTMdU810wnfvfhjbtp2P7DrsNedFVOs
-         aaijozP3Qhs7htKppVvQhO8PGJZ+QtmTQP22w3+4b3bRC0iYzxvUmD9FftyWwfN0wKcs
-         L233K/61+J/14YsgXcuaw9vqyMFsSAbTLtGsZHlkBIAlB6Uu1XtpR542cJb/84rh9nCu
-         OJtYVoZA3iQGfUt8fU3PwIEa/0BkRL8vKLl+z/3oSRqU5vr8eS4+fD6IhVatEbk2LC6s
-         eNhEshtmx58TWDlgJcKftbyKWalxc5EEoWdXgAxMCdMNW3gOGKHWSJ1Pxq6YkS2pfGqk
-         AywA==
-X-Gm-Message-State: AOJu0YyoG+L0gKH4Bp4zwnkGDPk8DFp6PGK1bNe4+pw3V71Lwq/GfwEU
-	XoYx6Ej/sC/hgjfM3ZCJvkBt2hCPfuwS51+Lqd9otXMh/HIECEyskVM5
-X-Gm-Gg: AeBDiesriiRs7mLw92P3hcyO81THo83FzfU9MDHolyuJER9IhaHVHb+QVk6iMGTPRPu
-	CA0UBEK4j9tR7wMhWtArsZPy/EIbE/cL8C1fvsdOPbsx0RZyGHMOKIjVuBA6kym6Wq4NulvfQDw
-	wpjMVa+i44N508nT0x/wrEvCUi6fOOa1g72JIQI8XlH4csAsZ3fyDg9YVfdVp9e0sbwwYA2cibV
-	noJrGerQzul11UQqKOb7ZUY9Y+BdYe6KwnFlxqjZrQWc5IUOBYGHP4H0F/nT+Mu+ijz5jfm7DC5
-	0V6yXYSPtbCBIXVQ2uSdmn+74lN6JE9uAtGV/Cysb9nO66Ussb38PywHk6ecOORL+iYO73arUiy
-	dhMZB+WgHGYmzqP+KnxyFnzBQB77F3q1QLIrcKaPzjf3rXF/Lg5BBe+kRwSQsezUymECzqkFdaW
-	N7BSlvl7OnlUj3wsI1LtKRqUtwfywBkYGovRbjTK/mNzZrAKcZA3+W3JSkY8LEPCWFqRtjCYb2u
-	pra
-X-Received: by 2002:a05:690c:c4fa:b0:79b:deb2:f5d1 with SMTP id 00721157ae682-7a4d644733bmr33551917b3.51.1775229515765;
-        Fri, 03 Apr 2026 08:18:35 -0700 (PDT)
+        bh=phgEzarmetA3rPcVDi8C467Z7leoFPBcCeNvveOYnOE=;
+        b=CF1lKDE66REvCRs6ym2BgT+nOBMGmfW5GIXbrv3uiyk5xNid2eniBn6nACeG2+9mui
+         g7g/z73veGYkD+Z9MhvAhn40UuKLt1eq/Qhsh0Ye2w1DxlrrGMo105+4JfQRWH3iejvW
+         iLQhJ/GgIk1Jwkk7zIPD+7KA/qsSejBB/0aw3iwj0RGb1B1McdgXNTMfj442wfjRkveR
+         xc/iMuoY32pIj/txTDm50PpSyGyjCC1PQiQkzqCsk4mBPK6fP6LDJgTIpOk9YeWvwlWb
+         IswG92RwKx2nE+fkLSteIs/Gm3Km2+c0zTfDeKFWrAEXXz88IlzdyFu9tZVoGeMRlddE
+         szug==
+X-Forwarded-Encrypted: i=1; AJvYcCXnnbMBUyooDT+KVNbpMCh9qERxiO2WoVYf3l+XMYUjYDhuu/6vAD6QvB52ouJrgDhnvwJNb5g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEkscAxpvBH1/vGO+aAgO5VWg77GYkD6DEffJdCkt4Rbk2ADgK
+	kMxTQTj+Aae87i7RktlLdunGPpUxzBHVr0wLurZC+L0fGZQtAOMn9ue9
+X-Gm-Gg: AeBDievCP9jLrfbTk/o+KcQDhywfvi7V++qVfJLd1f3q2RBmR+Ao3RKdHnxoTnbH8k0
+	2OsHTsi5TD4/gKlwg9nmQ86SCd4+Xu+01RouXzhuSJHAhSGAMywh8ku6V3A4ob00P9zjLRUDYmc
+	jBsr+7aqnO4NUhMxoQPSXwxP2QsUZYnejIkuQ015s4HBZG5jXI0JlP7UNn4OTVl6EOKdzAwlCvM
+	Qn6IL1hudbx2RyrLpXKPk2cISpfnxFvi71g5ptFoYHsnb3Wln20yrTt3tXXE3k1CESJArsYwp+0
+	lLHev4ejhLLRZl8mIzdQkt1yce5jLXzd+UmI29Jfuu4bulpivb2kfJ3q/tYRSe7RdXqCeYAqDej
+	nv7INbNogng0m+zvgVW/5Vl/69mo8mIUPsLDa1syk2vkPaFUMjyLHL60zV/99XAdjq66hp7J+ST
+	Uo8poHwYPUQmzR+EZlrtz3Y397eNQtELbpPmZiSJJrW/iNYdZVCzbIxNfyilq6Z166/7B1BCVUJ
+	8xO
+X-Received: by 2002:a05:690c:d96:b0:79e:8d95:7ebb with SMTP id 00721157ae682-7a4d3ac7a7fmr35626207b3.14.1775229962152;
+        Fri, 03 Apr 2026 08:26:02 -0700 (PDT)
 Received: from gmail.com (172.165.85.34.bc.googleusercontent.com. [34.85.165.172])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7a36ea2872esm22830477b3.19.2026.04.03.08.18.34
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7a36e229135sm22909397b3.3.2026.04.03.08.26.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2026 08:18:34 -0700 (PDT)
-Date: Fri, 03 Apr 2026 11:18:34 -0400
+        Fri, 03 Apr 2026 08:26:01 -0700 (PDT)
+Date: Fri, 03 Apr 2026 11:26:01 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Daniel Zahka <daniel.zahka@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+To: Joe Damato <joe@dama.to>, 
+ netdev@vger.kernel.org, 
  "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, 
  Simon Horman <horms@kernel.org>, 
- Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.12f4cfec4b07a@gmail.com>
-In-Reply-To: <20260403-psp-yaml-fix-v1-1-dacee0663903@gmail.com>
-References: <20260403-psp-yaml-fix-v1-1-dacee0663903@gmail.com>
-Subject: Re: [PATCH net-next] psp: add missing device stats to get-stats reply
- attributes
+ Shuah Khan <shuah@kernel.org>
+Cc: andrew+netdev@lunn.ch, 
+ linux-kernel@vger.kernel.org, 
+ willemb@google.com, 
+ Joe Damato <joe@dama.to>, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.886450145305@gmail.com>
+In-Reply-To: <20260402232203.2004496-3-joe@dama.to>
+References: <20260402232203.2004496-1-joe@dama.to>
+ <20260402232203.2004496-3-joe@dama.to>
+Subject: Re: [net-next 2/3] selftests/net: Test PACKET_STATISTICS drops
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -112,41 +116,203 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275104-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275106-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org,davemloft.net,google.com,redhat.com];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D6D15395B66
+X-Rspamd-Queue-Id: F21BF395C55
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Daniel Zahka wrote:
-> Commit f05d26198cf2 ("psp: add stats from psp spec to driver facing
-> api") added device statistics (rx-packets, rx-bytes, rx-auth-fail,
-> rx-error, rx-bad, tx-packets, tx-bytes, tx-error) to the stats
-> attribute-set but did not add them to the get-stats operation reply
-> attributes. The kernel reports these attributes in the reply, so
-> list them in the spec to match.
+Joe Damato wrote:
+> Extend psock_snd to test drops by setting a tiny receive buffer and
+> sending a large burst of packets.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+> Signed-off-by: Joe Damato <joe@dama.to>
+> ---
+>  tools/testing/selftests/net/psock_snd.c  | 52 ++++++++++++++++++++----
+>  tools/testing/selftests/net/psock_snd.sh |  5 +++
+>  2 files changed, 48 insertions(+), 9 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/psock_snd.c b/tools/testing/selftests/net/psock_snd.c
+> index 5be481a3d2bd..7bbce274b9f0 100644
+> --- a/tools/testing/selftests/net/psock_snd.c
+> +++ b/tools/testing/selftests/net/psock_snd.c
+> @@ -39,6 +39,7 @@ static bool	cfg_use_gso;
+>  static bool	cfg_use_qdisc_bypass;
+>  static bool	cfg_use_vlan;
+>  static bool	cfg_use_vnet;
+> +static bool	cfg_drop;
+>  
+>  static char	*cfg_ifname = "lo";
+>  static int	cfg_mtu	= 1500;
+> @@ -49,6 +50,8 @@ static uint16_t	cfg_port = 8000;
+>  /* test sending up to max mtu + 1 */
+>  #define TEST_SZ	(sizeof(struct virtio_net_hdr) + ETH_HLEN + ETH_MAX_MTU + 1)
+>  
+> +#define BURST_CNT (1000)
+> +
+>  static char tbuf[TEST_SZ], rbuf[TEST_SZ];
+>  
+>  static unsigned long add_csum_hword(const uint16_t *start, int num_u16)
+> @@ -212,13 +215,14 @@ static void do_send(int fd, char *buf, int len)
+>  	if (ret != len)
+>  		error(1, 0, "write: %u %u", ret, len);
+>  
+> -	fprintf(stderr, "tx: %u\n", ret);
+> +	if (!cfg_drop)
+> +		fprintf(stderr, "tx: %u\n", ret);
+>  }
+>  
+> -static int do_tx(void)
+> +static int do_tx(bool burst)
+>  {
+>  	const int one = 1;
+> -	int fd, len;
+> +	int i, fd, len;
+>  
+>  	fd = socket(PF_PACKET, cfg_use_dgram ? SOCK_DGRAM : SOCK_RAW, 0);
+>  	if (fd == -1)
+> @@ -242,6 +246,10 @@ static int do_tx(void)
+>  
+>  	do_send(fd, tbuf, len);
+>  
+> +	if (burst)
+> +		for (i = 0; i < BURST_CNT; i++)
+> +			do_send(fd, tbuf, len);
+> +
+>  	if (close(fd))
+>  		error(1, errno, "close t");
+>  
+> @@ -290,6 +298,7 @@ static void do_rx(int fd, int expected_len, char *expected)
+>  static int setup_sniffer(void)
+>  {
+>  	struct timeval tv = { .tv_usec = 100 * 1000 };
+> +	const int one = 1;
+>  	int fd;
+>  
+>  	fd = socket(PF_PACKET, SOCK_RAW, 0);
+> @@ -299,6 +308,10 @@ static int setup_sniffer(void)
+>  	if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)))
+>  		error(1, errno, "setsockopt rcv timeout");
+>  
+> +	if (cfg_drop)
+> +		if (setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &one, sizeof(one)))
+> +			error(1, errno, "setsockopt SO_RCVBUF");
+> +
+>  	pair_udp_setfilter(fd);
+>  	do_bind(fd);
+>  
+> @@ -309,7 +322,7 @@ static void parse_opts(int argc, char **argv)
+>  {
+>  	int c;
+>  
+> -	while ((c = getopt(argc, argv, "bcCdgl:qt:vV")) != -1) {
+> +	while ((c = getopt(argc, argv, "bcCdDgl:qt:vV")) != -1) {
+>  		switch (c) {
+>  		case 'b':
+>  			cfg_use_bind = true;
+> @@ -323,6 +336,9 @@ static void parse_opts(int argc, char **argv)
+>  		case 'd':
+>  			cfg_use_dgram = true;
+>  			break;
+> +		case 'D':
+> +			cfg_drop = true;
+> +			break;
+>  		case 'g':
+>  			cfg_use_gso = true;
+>  			break;
+> @@ -367,11 +383,23 @@ static void check_packet_stats(int fd)
+>  	if (getsockopt(fd, SOL_PACKET, PACKET_STATISTICS, &st, &len))
+>  		error(1, errno, "getsockopt packet statistics");
+>  
+> -	if (st.tp_packets != 1)
+> -		error(1, 0, "stats: tp_packets %u != 1", st.tp_packets);
+> +	if (cfg_drop) {
+> +		/* PACKET_STATISTICS reports all packets seen (including
+> +		 * drops) in tp_packets
+> +		 */
+> +		if (st.tp_packets < st.tp_drops)
+> +			error(1, 0, "stats: tp_packets %u < tp_drops %u",
+> +			      st.tp_packets, st.tp_drops);
+>  
+> -	if (st.tp_drops != 0)
+> -		error(1, 0, "stats: tp_drops %u != 0", st.tp_drops);
+> +		if (st.tp_drops == 0)
+> +			error(1, 0, "stats: expected drops but tp_drops == 0");
+> +	} else {
+> +		if (st.tp_packets != 1)
+> +			error(1, 0, "stats: tp_packets %u != 1", st.tp_packets);
+> +
+> +		if (st.tp_drops != 0)
+> +			error(1, 0, "stats: tp_drops %u != 0", st.tp_drops);
+> +	}
+>  
+>  	/* verify clear on read */
+>  	memset(&st, 0xff, sizeof(st));
+> @@ -394,7 +422,12 @@ static void run_test(void)
+>  	fdr = setup_rx();
+>  	fds = setup_sniffer();
+>  
+> -	total_len = do_tx();
+> +	total_len = do_tx(cfg_drop);
 
-Acked-by: Willem de Bruijn <willemb@google.com>
+only if respinning: no need to pass global cfg_.. variables through
+function arguments.
+
+> +
+> +	if (cfg_drop) {
+> +		check_packet_stats(fds);
+> +		goto out;
+> +	}
+
+can this not use the check_packet_stats added in the previous patch
+right below?
+
+>  
+>  	/* BPF filter accepts only this length, vlan changes MAC */
+>  	if (cfg_payload_len == DATA_LEN && !cfg_use_vlan) {
+> @@ -405,6 +438,7 @@ static void run_test(void)
+>  
+>  	do_rx(fdr, cfg_payload_len, tbuf + total_len - cfg_payload_len);
+>  
+> +out:
+>  	if (close(fds))
+>  		error(1, errno, "close s");
+>  	if (close(fdr))
+> diff --git a/tools/testing/selftests/net/psock_snd.sh b/tools/testing/selftests/net/psock_snd.sh
+> index 1cbfeb5052ec..b6ef12fad5d5 100755
+> --- a/tools/testing/selftests/net/psock_snd.sh
+> +++ b/tools/testing/selftests/net/psock_snd.sh
+> @@ -92,4 +92,9 @@ echo "raw gso max size"
+>  echo "raw gso max size + 1 (expected to fail)"
+>  (! ./in_netns.sh ./psock_snd -v -c -g -l "${max_mss_exceeds}")
+>  
+> +# test drops statistics
+> +
+> +echo "test drops statistics"
+> +./in_netns.sh ./psock_snd -D
+> +
+>  echo "OK. All tests passed"
+> -- 
+> 2.52.0
+> 
+
+
 
