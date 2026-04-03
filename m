@@ -1,152 +1,134 @@
-Return-Path: <netdev+bounces-275283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275284-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SJx3JsRK0Glo5wYAu9opvQ
-	(envelope-from <netdev+bounces-275283-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 01:18:28 +0200
+	id 2PAXMz1L0Glo5wYAu9opvQ
+	(envelope-from <netdev+bounces-275284-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 01:20:29 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F421839905B
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 01:18:27 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B9B5399080
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 01:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AE1743023524
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 23:18:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 9CBB2301A172
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 23:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D703F37FF79;
-	Fri,  3 Apr 2026 23:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD5CD38A72F;
+	Fri,  3 Apr 2026 23:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hPB+POND"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NIW+IZEO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B389F279DAD;
-	Fri,  3 Apr 2026 23:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8862C346A0A;
+	Fri,  3 Apr 2026 23:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775258300; cv=none; b=VbxKpq/em3eAixTN9SImpPC4iOQDlaAd7DZIHbT4+fsxS3PJ0aivC7F7QhoqBbR1p+PnKvhC+umh/rtNktg4mvB5yUWahiwvTIKWOL5tOEw4RPHxoLV+dmbKyMfvAHfowtnuVqFyYGzqhsUAWWgPy3y7Qbe+SKo2k2TdJE9dTWE=
+	t=1775258424; cv=none; b=OodDYhyGZ19AC2kSAY7sWpEt2Hkurq3dhtoeIDcuVzgUbFc/yaW50vHOQ2yiDzopgQC4J5rVvF+xH0Ln5mEY1kX4f3WqcTWqSUi3GwiW44CgOmKcFDt2KYmZH3skK6H71Medz9ja1/NYeCTvG59uRKgQPCAYiaxkhAYqnrEB/bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775258300; c=relaxed/simple;
-	bh=p22xzdd5WFdNJOSce82DqA7KMujph7DW2LReoAWow08=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CTK5SHyTnG/bRFe60slmvNn6AtgdldVcxlUMJTEQm5Z2HbRNFyYxiQfogOBRiN2oC59QacjkeR+5EvlX9sQVB8WvkC5BKv/ZmOsrMiU0duicKg4PnJC7Efw6kPem0ivb/rwt0waMQSy1Uu6xqUDgShmEJgBq313FJ2luw1svGrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hPB+POND; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEFBFC4CEF7;
-	Fri,  3 Apr 2026 23:18:19 +0000 (UTC)
+	s=arc-20240116; t=1775258424; c=relaxed/simple;
+	bh=QkerLX1Rpx3AOOaOSFFMyjww6gQrB4azilYIG48kvIA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TtctbfqCOwtfLsDyvMZ+TOzrX5s07touRKfk1Y+XZkqDCAKLPTaowTY5mKBdP9J6mxv71zTZwnlt8laNzKV0iq8vxxj8vuoyrzy53uCGNJ4Z3YNpSFeDjtxSpbqzDpizhPSzjMK1fmQxNdwi0PiKE31siPJ9tjeDZMXn3q6134U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NIW+IZEO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C09F0C4CEF7;
+	Fri,  3 Apr 2026 23:20:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775258300;
-	bh=p22xzdd5WFdNJOSce82DqA7KMujph7DW2LReoAWow08=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hPB+PONDbndSqT9kqdks0T7s1wsbaFa7LBxOhfyFoYkltYqdnIrwQsoKNwUB7tU0n
-	 QvTgmrv428N2Bd/WU3Ls9YN0MAsSq9LwMbo3oD2Rhr/dsotYXxGkyEuI72w8QRIgfK
-	 GNPFjySvKnk92f0jG0zAweqzgtu9L4y9ktm3kUUEf4OPlqmwdwCU9Ij2rvEglUwuMh
-	 y1FhkaiCcXDt9NwApsuTkpdS+ZyiUFLkzD5c6E7JKVKmwy8c/Fa0KroOc6Me6BVRqN
-	 ey29VbuyswjHO9TeoXLxxhA0yLfUpyT0wfC/GwTjjAg/U4/pTy2PmRbT2ZYMBeUe1n
-	 I97RydV6H+gmA==
-Date: Fri, 3 Apr 2026 16:18:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Carlier <devnexen@gmail.com>
-Cc: horatiu.vultur@microchip.com, UNGLinuxDriver@microchip.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] net: lan966x: fix page pool and resources leak
- in error paths
-Message-ID: <20260403161809.4908a79c@kernel.org>
-In-Reply-To: <20260403230714.10667-2-devnexen@gmail.com>
-References: <20260403230714.10667-1-devnexen@gmail.com>
-	<20260403230714.10667-2-devnexen@gmail.com>
+	s=k20201202; t=1775258423;
+	bh=QkerLX1Rpx3AOOaOSFFMyjww6gQrB4azilYIG48kvIA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NIW+IZEO058x/ms+kWJzEszSH9gEt3CFdHr2GpLeoOPomuDgOC7FzmOF+5L4K871E
+	 jvsQxAPyEP7jIiVXJv/Aq8O+9BXfQ6niNwv2jAOKY4dj23CDMC028IX3pR+1AYx3E8
+	 CJJDalWlzgDTF2QeEqlq6LWiXb4nE37SSvKegd7OFLiF3ZsDIUssI10NDu/yAVx27L
+	 cmzbRMRjjQjQ2c+3Olocm+tVkTx4pHHTavNwxxlW/f+3gyK8mh3HVPCwjtlnyxBQUJ
+	 Y4rUkV3vBo+APsi42AEBZAOA9vXfRzTaDdPWUrIo8PgHwgI7TB25w+MYSIIGM2mD3L
+	 p3knegwFkhDuQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CDA23809A14;
+	Fri,  3 Apr 2026 23:20:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next] net: ethernet: ravb: Suspend and resume the
+ transmission
+ flow
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177525840529.1487571.3313008006044854673.git-patchwork-notify@kernel.org>
+Date: Fri, 03 Apr 2026 23:20:05 +0000
+References: <20260401183608.1852225-1-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20260401183608.1852225-1-niklas.soderlund+renesas@ragnatech.se>
+To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
+	=?utf-8?q?se=3E?=@codeaurora.org
+Cc: paul@pbarker.dev, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ yoshihiro.shimoda.uh@renesas.com
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	ARC_REJECT(1.00)[signature check failed: fail, {[1] = sig:subspace.kernel.org:reject}];
+	DMARC_POLICY_ALLOW_WITH_FAILURES(-0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275283-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[kernel.org:-];
+	R_DKIM_REJECT(0.00)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(0.00)[kernel.org,quarantine];
+	NEURAL_SPAM(0.00)[0.979];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275284-lists,netdev=lfdr.de,netdevbpf];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	FROM_NO_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_NONE(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	TO_DN_SOME(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas=40ragnatech=2E?=];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: F421839905B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[renesas.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3B9B5399080
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat,  4 Apr 2026 00:07:13 +0100 David Carlier wrote:
-> lan966x_fdma_rx_alloc() creates a page pool but does not destroy it if
-> the subsequent fdma_alloc_coherent() call fails, leaking the pool and
-> leaving a dangling pointer in rx->page_pool.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed,  1 Apr 2026 20:36:08 +0200 you wrote:
+> From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 > 
-> Similarly, lan966x_fdma_init() frees the coherent DMA memory when
-> lan966x_fdma_tx_alloc() fails but does not destroy the page pool that
-> was successfully created by lan966x_fdma_rx_alloc(), leaking it.
+> The current driver does not follow the latest datasheet and does not
+> suspend the flow when stopping DMA and resume it when starting. Update
+> the driver to do so.
 > 
-> Add the missing page_pool_destroy() calls in both error paths and
-> NULL-out rx->page_pool after destruction to avoid a dangling pointer.
-
-Okay...
-
-> Fixes: 11871aba1974 ("net: lan96x: Use page_pool API")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: David Carlier <devnexen@gmail.com>
-> ---
->  drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> [Niklas: Rebase from BSP and reword commit message]
+> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 > 
-> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> index 34bbcae2f068..b985ce64bb50 100644
-> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> @@ -120,8 +120,11 @@ static int lan966x_fdma_rx_alloc(struct lan966x_rx *rx)
->  		return PTR_ERR(rx->page_pool);
->  
->  	err = fdma_alloc_coherent(lan966x->dev, fdma);
-> -	if (err)
-> +	if (err) {
-> +		page_pool_destroy(rx->page_pool);
-> +		rx->page_pool = NULL;
->  		return err;
-> +	}
->  
->  	fdma_dcbs_init(fdma, FDMA_DCB_INFO_DATAL(fdma->db_size),
->  		       FDMA_DCB_STATUS_INTR);
-> @@ -958,6 +961,7 @@ int lan966x_fdma_init(struct lan966x *lan966x)
->  	err = lan966x_fdma_tx_alloc(&lan966x->tx);
->  	if (err) {
->  		fdma_free_coherent(lan966x->dev, &lan966x->rx.fdma);
-> +		page_pool_destroy(lan966x->rx.page_pool);
+> [...]
 
-but here the "dangling pointer" is fine?
-I don't care either way but be consistent.
+Here is the summary with links:
+  - [net-next] net: ethernet: ravb: Suspend and resume the transmission flow
+    https://git.kernel.org/netdev/net-next/c/353d8e7989b6
 
->  		return err;
->  	}
->  
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
