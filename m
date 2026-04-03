@@ -1,278 +1,167 @@
-Return-Path: <netdev+bounces-275228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275229-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QHGkE4oy0Gl84gYAu9opvQ
-	(envelope-from <netdev+bounces-275228-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 23:35:06 +0200
+	id WJOWN1Y00Gnm4gYAu9opvQ
+	(envelope-from <netdev+bounces-275229-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 23:42:46 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B68C4398780
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 23:35:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4852739880B
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 23:42:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6461F3022F71
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 21:34:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A7272301E96D
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 21:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF2E36C0DC;
-	Fri,  3 Apr 2026 21:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3435B37AA72;
+	Fri,  3 Apr 2026 21:42:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RnUw3Wf7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qLIXmbTJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB57E239E7E;
-	Fri,  3 Apr 2026 21:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11185371CFB
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 21:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775252095; cv=none; b=ssIKgg4da7BAHz8GOvvwz8l5uUkcf/UAf5bIigBwTHiA6yrmD2zlbZJkhVzzCVZPGfTh+/EZQyLv23IIyx+RGup37m38lUI3zc463+RDmb4Lm6kfEdztkgJ4IQkHslt+MP+zuSPgnEQrD1RbQNVvaQuT21uWjalBv1nlOZVtw34=
+	t=1775252564; cv=none; b=uYqjycZ0ez9Oi+33DWbyVDJXjOCtLNJ7pYPXMezSm8XIaRbWmYik9G8Xjkh5AVqSe7nL8H4jwcP2+m4A8v22WtNTpU729rKj1JZbh9Iz4Ni3Bvgy2W0XZeYeDoBo7aDFARwb6b9g2aD0d55J971L35oKX8FFy0NNl0pY1/KUO6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775252095; c=relaxed/simple;
-	bh=z8W2epKST2mjCiUgHohx5Bf+YaafQk44O9HWl7u4iLk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gJ+3z2sQSMucr7DNpAZj/JPC58Ld5QNskk2EWeRNH+AhaQZAqZ0/u4wTM1YmH6o+UbG6BF3+yA5K3Y1EZNrq+kRtSo3jq3GZaUtLgO5sqKZtFlnJapI1jrMrGoAr13jVFki1/UsMKVyX94OCjHysbhkL9nOlcQqKsV5zOGMBv+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RnUw3Wf7; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775252094; x=1806788094;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=z8W2epKST2mjCiUgHohx5Bf+YaafQk44O9HWl7u4iLk=;
-  b=RnUw3Wf7r7Z1BO/9kntuVlAskFEW4pCmtN52XxrGjsJ9R7bZcnoUqESU
-   o1weLVGWcPnaXvYzrWHLwH0wYb6T9WXTIsLxWBDkaCslPvT5kAiU6doOS
-   4lC4wurRdu4vrGsTp5R6IOPOZE9VbGswdq7ZBTS9FV9FMFXdR7l9ktiTk
-   ZELedJe4U8iljeZ8s3SrWIGB+qNZVKjYbzly9sw+qCdk1hvqj5rgyCL/H
-   msHXdVo1/cR4/q+rE6vTVdlHq9ujU5lrUcdqA5Vgc867ERfDdMjmP00Mz
-   8Z3qEuoU9R/IfDRGsFClxirGxplYgIzOuoej4rvinTP+mk8DUFmbd5N55
-   A==;
-X-CSE-ConnectionGUID: r4z6echPSrKFDhLpBZuWHQ==
-X-CSE-MsgGUID: l9nU4J67QxmgO8gNgsnWwg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11748"; a="87768988"
-X-IronPort-AV: E=Sophos;i="6.23,158,1770624000"; 
-   d="scan'208";a="87768988"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2026 14:34:53 -0700
-X-CSE-ConnectionGUID: mCCa1tHpQPm4rFRdtMD5dw==
-X-CSE-MsgGUID: WU/4d/KZSqK+ovrcANNEdg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,158,1770624000"; 
-   d="scan'208";a="250565689"
-Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2026 14:34:52 -0700
-Date: Fri, 3 Apr 2026 14:34:46 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Laight <david.laight.linux@gmail.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v9 02/10] x86/bhi: Make clear_bhb_loop() effective on
- newer CPUs
-Message-ID: <20260403213445.xzb4rxbfbg5un7li@desk>
-References: <20260402-vmscape-bhb-v9-0-94d16bc29774@linux.intel.com>
- <20260402-vmscape-bhb-v9-2-94d16bc29774@linux.intel.com>
- <CALMp9eSLVvr00mJ0J2f2_SPeCW-VS58kxMcxHgUW6etML+_+QA@mail.gmail.com>
- <20260403185236.sjgetnkha3o3a4d3@desk>
- <CALMp9eSPkMpKQELTnsaj6=gXD+EyE0n2_p93n4maDc93bPFe+w@mail.gmail.com>
+	s=arc-20240116; t=1775252564; c=relaxed/simple;
+	bh=bdj8RXu3qgyKpumk5HWckExHJL+wZZpu0L3xUEHMOvc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XhAJJpqMIbvCol/O6qGjXhtunmVXfifdzvX4lehA0ql3NAxLO7+93OWqq0p4S342T8qfxs7AKsa//9h96i5YWZtT4Rw5LmKqb1jA3wCCluHokqhp0Ua8iu44xcDxUrH5/wzEf6lHwcPTNB94z/q+ToGgGs+KgCgj81ZgiuNmRAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qLIXmbTJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E667DC4CEF7;
+	Fri,  3 Apr 2026 21:42:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775252563;
+	bh=bdj8RXu3qgyKpumk5HWckExHJL+wZZpu0L3xUEHMOvc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=qLIXmbTJFOvMHgvmx+IsIiO/p5g2tHkt75ezUxbSbPXEq1I0iflD+reTNHwPbyhnI
+	 7/LHdfxoz7QUStvGpRbfPj5izApbuatl2sDSlXuW6XWVOpdnWC/ov4sw1sQ1TyC4Ks
+	 EV/b3+NA8+14EvEA29s+Q1n5/Yub5iKu2W+vZwqJBuCO3Vq1QSHDf9u9RBmD3z0gUj
+	 /6EdwmvLhdCi5Tc59ENYFSBH1+nzq52VBCmCSViLW49kXcGfduqaZVBfL4OrEMLa8/
+	 3HIXzozEmPLifBHuKQ62QiOf/dBv0OHx0VbrsgdaV8j6dKlHhYGM5PyhAV7uJEr/LY
+	 7XjcuwFxC1tNw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: lorenzo@kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: airoha: Fix memory leak in airoha_qdma_rx_process()
+Date: Fri,  3 Apr 2026 14:42:24 -0700
+Message-ID: <20260403214223.2230561-2-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260402-airoha_qdma_rx_process-mem-leak-fix-v1-1-b5706f402d3c@kernel.org>
+References: <20260402-airoha_qdma_rx_process-mem-leak-fix-v1-1-b5706f402d3c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALMp9eSPkMpKQELTnsaj6=gXD+EyE0n2_p93n4maDc93bPFe+w@mail.gmail.com>
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275228-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[38];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,vger.kernel.org,intel.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275229-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B68C4398780
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4852739880B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 03, 2026 at 01:19:17PM -0700, Jim Mattson wrote:
-> On Fri, Apr 3, 2026 at 11:52 AM Pawan Gupta
-> <pawan.kumar.gupta@linux.intel.com> wrote:
-> >
-> > On Fri, Apr 03, 2026 at 11:10:08AM -0700, Jim Mattson wrote:
-> > > On Thu, Apr 2, 2026 at 5:32 PM Pawan Gupta
-> > > <pawan.kumar.gupta@linux.intel.com> wrote:
-> > > >
-> > > > As a mitigation for BHI, clear_bhb_loop() executes branches that overwrite
-> > > > the Branch History Buffer (BHB). On Alder Lake and newer parts this
-> > > > sequence is not sufficient because it doesn't clear enough entries. This
-> > > > was not an issue because these CPUs use the BHI_DIS_S hardware mitigation
-> > > > in the kernel.
-> > > >
-> > > > Now with VMSCAPE (BHI variant) it is also required to isolate branch
-> > > > history between guests and userspace. Since BHI_DIS_S only protects the
-> > > > kernel, the newer CPUs also use IBPB.
-> > > >
-> > > > A cheaper alternative to the current IBPB mitigation is clear_bhb_loop().
-> > > > But it currently does not clear enough BHB entries to be effective on newer
-> > > > CPUs with larger BHB. At boot, dynamically set the loop count of
-> > > > clear_bhb_loop() such that it is effective on newer CPUs too. Use the
-> > > > X86_FEATURE_BHI_CTRL feature flag to select the appropriate loop count.
-> > > >
-> > > > Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
-> > > > Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> > > > ---
-> > > >  arch/x86/entry/entry_64.S            |  8 +++++---
-> > > >  arch/x86/include/asm/nospec-branch.h |  2 ++
-> > > >  arch/x86/kernel/cpu/bugs.c           | 13 +++++++++++++
-> > > >  3 files changed, 20 insertions(+), 3 deletions(-)
-> > > >
-> > > > diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-> > > > index 3a180a36ca0e..bbd4b1c7ec04 100644
-> > > > --- a/arch/x86/entry/entry_64.S
-> > > > +++ b/arch/x86/entry/entry_64.S
-> > > > @@ -1536,7 +1536,9 @@ SYM_FUNC_START(clear_bhb_loop)
-> > > >         ANNOTATE_NOENDBR
-> > > >         push    %rbp
-> > > >         mov     %rsp, %rbp
-> > > > -       movl    $5, %ecx
-> > > > +
-> > > > +       movzbl    bhb_seq_outer_loop(%rip), %ecx
-> > > > +
-> > > >         ANNOTATE_INTRA_FUNCTION_CALL
-> > > >         call    1f
-> > > >         jmp     5f
-> > > > @@ -1556,8 +1558,8 @@ SYM_FUNC_START(clear_bhb_loop)
-> > > >          * This should be ideally be: .skip 32 - (.Lret2 - 2f), 0xcc
-> > > >          * but some Clang versions (e.g. 18) don't like this.
-> > > >          */
-> > > > -       .skip 32 - 18, 0xcc
-> > > > -2:     movl    $5, %eax
-> > > > +       .skip 32 - 20, 0xcc
-> > > > +2:     movzbl  bhb_seq_inner_loop(%rip), %eax
-> > > >  3:     jmp     4f
-> > > >         nop
-> > > >  4:     sub     $1, %eax
-> > > > diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
-> > > > index 70b377fcbc1c..87b83ae7c97f 100644
-> > > > --- a/arch/x86/include/asm/nospec-branch.h
-> > > > +++ b/arch/x86/include/asm/nospec-branch.h
-> > > > @@ -548,6 +548,8 @@ DECLARE_PER_CPU(u64, x86_spec_ctrl_current);
-> > > >  extern void update_spec_ctrl_cond(u64 val);
-> > > >  extern u64 spec_ctrl_current(void);
-> > > >
-> > > > +extern u8 bhb_seq_inner_loop, bhb_seq_outer_loop;
-> > > > +
-> > > >  /*
-> > > >   * With retpoline, we must use IBRS to restrict branch prediction
-> > > >   * before calling into firmware.
-> > > > diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-> > > > index 83f51cab0b1e..2cb4a96247d8 100644
-> > > > --- a/arch/x86/kernel/cpu/bugs.c
-> > > > +++ b/arch/x86/kernel/cpu/bugs.c
-> > > > @@ -2047,6 +2047,10 @@ enum bhi_mitigations {
-> > > >  static enum bhi_mitigations bhi_mitigation __ro_after_init =
-> > > >         IS_ENABLED(CONFIG_MITIGATION_SPECTRE_BHI) ? BHI_MITIGATION_AUTO : BHI_MITIGATION_OFF;
-> > > >
-> > > > +/* Default to short BHB sequence values */
-> > > > +u8 bhb_seq_outer_loop __ro_after_init = 5;
-> > > > +u8 bhb_seq_inner_loop __ro_after_init = 5;
-> > > > +
-> > > >  static int __init spectre_bhi_parse_cmdline(char *str)
-> > > >  {
-> > > >         if (!str)
-> > > > @@ -3242,6 +3246,15 @@ void __init cpu_select_mitigations(void)
-> > > >                 x86_spec_ctrl_base &= ~SPEC_CTRL_MITIGATIONS_MASK;
-> > > >         }
-> > > >
-> > > > +       /*
-> > > > +        * Switch to long BHB clear sequence on newer CPUs (with BHI_CTRL
-> > > > +        * support), see Intel's BHI guidance.
-> > > > +        */
-> > > > +       if (cpu_feature_enabled(X86_FEATURE_BHI_CTRL)) {
-> > > > +               bhb_seq_outer_loop = 12;
-> > > > +               bhb_seq_inner_loop = 7;
-> > > > +       }
-> > > > +
-> > >
-> > > How does this work for VMs in a heterogeneous migration pool that
-> > > spans the Alder Lake boundary? They can't advertise BHI_CTRL, because
-> > > it isn't available on all hosts in the migration pool, but they need
-> > > the long sequence when running on Alder Lake or newer.
-> >
-> > As we discussed elsewhere, support for migration pool is much more
-> > involved. It should be dealt in a separate QEMU/KVM focused series.
-> >
-> > A quickfix could be adding support for spectre_bhi=long that guests in a
-> > migration pool can use?
-> 
-> The simplest solution is to add "|
-> cpu_feature_enabled(X86_FEATURE_HYPERVISOR)" to the condition above.
-> If that is unacceptable for the performance of pre-Alder Lake
+This is an AI-generated review of your patch. The human sending this
+email says: "more thing to fix.."
+---
+net: airoha: Fix memory leak in airoha_qdma_rx_process()
 
-Yes, that would be unnecessary overhead.
+This commit fixes a memory leak in the error path of
+airoha_qdma_rx_process() by partially reverting a previous commit and
+always calling page_pool_put_full_page().
 
-> migration pools, you could define a CPUID or MSR bit that says
-> explicitly, "long BHB flush sequence needed," rather than trying to
-> intuit that property from the presence of BHI_CTRL. Like
-> IA32_ARCH_CAPABILITIES.SKIP_L1DFL_VMENTRY, the bit would only be set
-> by a hypervisor.
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+> index 95ba99b89428e..91cb63a32d990 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.c
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.c
+> @@ -697,9 +697,8 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
 
-I will think about this more.
+This problem wasn't introduced by this patch, but while reviewing this
+function I noticed the descriptor field msg1 is read from memory before
+the ownership bit is validated:
 
-> I am still skeptical of the need for MSR_VIRTUAL_ENUMERATION and
-> friends, unless there is a major guest OS out there that relies on
-> them.
+airoha_qdma_rx_process() {
+        while (done < budget) {
+                struct airoha_queue_entry *e = &q->entry[q->tail];
+                struct airoha_qdma_desc *desc = &q->desc[q->tail];
+                u32 hash, reason, msg1 = le32_to_cpu(desc->msg1);
+                struct page *page = virt_to_head_page(e->buf);
+                u32 desc_ctrl = le32_to_cpu(desc->ctrl);
 
-If we forget about MSR_VIRTUAL_ENUMERATION for a moment, userspace VMM is
-in the best position to decide whether a guest needs
-virtual.SPEC_CTRL[BHI_DIS_S]. Via a KVM interface userspace VMM can get
-BHI_DIS_S for the guests that are in migration pool?
+                if (!(desc_ctrl & QDMA_DESC_DONE_MASK))
+                        break;
+
+Could this lead to processing stale descriptor metadata? On weakly-ordered
+architectures, the CPU might reorder these reads before the device commits
+the new descriptor data. 
+
+Are we missing a dma_rmb() after the ownership check?
+
+>  		if (q->skb) {
+>  			dev_kfree_skb(q->skb);
+>  			q->skb = NULL;
+> -		} else {
+> -			page_pool_put_full_page(q->page_pool, page, true);
+>  		}
+
+This is also an existing issue, but does jumping to this error path on a
+scattered packet fragment leave the receive loop in an inconsistent state?
+
+If an error occurs while processing a middle fragment of a packet, q->skb
+is freed and set to NULL here. However, the loop continues to the next
+descriptor.
+
+Since q->skb is now NULL, won't the next fragment of the same corrupted
+packet be erroneously parsed as the start of a brand new Ethernet frame:
+
+                if (!q->skb) { /* first buffer */
+                        q->skb = napi_build_skb(e->buf, q->buf_size);
+
+Could this desynchronization allow arbitrary payload to be injected into
+the network stack as a legitimate packet? The driver may need to discard
+all subsequent fragments until a descriptor without QDMA_DESC_MORE_MASK is
+encountered.
+
+> +		page_pool_put_full_page(q->page_pool, page, true);
+>  	}
+>  	airoha_qdma_fill_rx_queue(q);
+>
 
