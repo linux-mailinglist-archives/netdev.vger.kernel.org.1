@@ -1,145 +1,220 @@
-Return-Path: <netdev+bounces-275249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275250-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aDjvEHo90GnW5AYAu9opvQ
-	(envelope-from <netdev+bounces-275249-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 00:21:46 +0200
+	id d9tPKqY+0GkL5QYAu9opvQ
+	(envelope-from <netdev+bounces-275250-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 00:26:46 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D95C8398B5F
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 00:21:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06B36398B97
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 00:26:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 70046301FD5F
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 22:21:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1E4C4301F9CF
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 22:26:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD3D303CAB;
-	Fri,  3 Apr 2026 22:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E36333C518;
+	Fri,  3 Apr 2026 22:26:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="SSj2t+P2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MRH4SFaD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C3A2765D7;
-	Fri,  3 Apr 2026 22:21:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0D1625;
+	Fri,  3 Apr 2026 22:26:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775254896; cv=none; b=XJ2XOY5EoYFYCR9chHkQVib4NcV2GOwFmmP/HB42plSRY3Rc4qtXQpR18/LOEKWc4lblGKlstEebWWCe2B94o29BiUD5CDPPf4o0FIyiPwka/ePvlIhhrytiyVZFUSmuDtUW3dalk5VVb0EdtxmufQ7/M2a1iU15xsc+/obhtlA=
+	t=1775255202; cv=none; b=X3OntXR16BAizqW5jtsUWo820oRnwrRCQKY2eD6mK+s6GB4gu37dc+vs3ruCT35cjNy5cgdAKICvgbQ6b8qieZn2FBSQLVWlISqD9oVSvDojHeUTiNJEH8CIsvQmCMC/EADssD187EGT71noPUvRzO7bFTZvmQ4UXXMAzqZd14Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775254896; c=relaxed/simple;
-	bh=k//gqAyAfRkF/zufsWKupqXJdQ266W7kPXaMFwSAh24=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=YylLMq9bD78U1+hPWLSpfkSqzT1QV4IgrRDF1XPefO1EXzlpQb8Ngf5sUzZvwQr5/z29gIg0k+e2ttXqfxnvDwHlbG2trCFyGABmoXwqG11JjB2CXmU7+W3JH5vohzN4zN2X3PD46/wf4dOMCqTU/1Hjh+arTk262AsC+GEul7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=SSj2t+P2; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 31CBFA5889;
-	Sat,  4 Apr 2026 00:21:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1775254889; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=A3VvB3z9hNbXI+VOhDK9RQbvHN9ZOugMlE+lSJYi8yE=;
-	b=SSj2t+P2ApNx5obb7Of6jGHTFJ0mp7W5/M+D/o4y5Nry4eJV0dVCK8oSOaavXoPN46IbcA
-	uAclCU34ZFnMvQpB0MBFeRIbdF5hm2dlhFnpSsBLRkJ8Kg2hd6REo/WvIYd7jW2mBhZomS
-	9QkKwmTMSSnWVvAWqXlMkE44l3WAY833doLN0Mg5ncre91BUZcID0eVB81uUZaNAMr8dHP
-	YSCV8K5XWE4Y5Fkfv3TJ/o6cuya0fwPOk3zONY9zE2ig7WzknaQGKbnMvMd0o3pcTPe0S3
-	J/MUIuz3yZac27e05dwAltGx6pmUHmHKw1FtKTORTBS2gg8jaI9I3ZMLWcXMvg==
+	s=arc-20240116; t=1775255202; c=relaxed/simple;
+	bh=7ufy+ZHgftsIsq8ig2HhUv3cMxcCahew1M3qeKmgSjc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=q5G5IYkp5v6Dutuh2CfpDawPuAOdobsSn1k7ozT5Q9AM/f+H7dswfl9ZpZnKZGn/xjiG/TBl+e0+J1ChS4Hb54vovHFUy+7sQl0L+fixrh3Dk6ggTqE+gAfmZOsWsx6Rgkum4KjQoySn2TDORyZATcszPnSh9leyc60WN7QU3S4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MRH4SFaD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 150B2C4CEF7;
+	Fri,  3 Apr 2026 22:26:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775255201;
+	bh=7ufy+ZHgftsIsq8ig2HhUv3cMxcCahew1M3qeKmgSjc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=MRH4SFaD6XPXRn5dambTucgppGVL4fVwWmuHM9ZYFE2gZ0jO4LhMYW78alaB7AnNk
+	 3vjy5tDWHnAu5yhOobQoR8WDYABJlE4a9N4oQWwfwjpkNFrq4Zr0nvo187W+Qi4pP2
+	 QuQTy+boCKsJIes9+1ABxmXybMzJkbiQ4HhaVEQjeqKS5VtJy4jxK+JEWihZ1iEoQ8
+	 0Yjq3ezRsFs2JWLuM4EJfeD55zlN1JwXKXgb0JY1a61Jm7Kwq3ukxhQxC2NgYrTrRi
+	 6fusp+iBlvijW8H4MIpgy4H8z4fNfhXsvmFMyVkQZYD3Y/V25wt6gessQ6M5i08TYC
+	 ZCe/QzwwFhyBw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: devnexen@gmail.com
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	horatiu.vultur@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net: lan966x: fix page_pool error handling in lan966x_fdma_rx_alloc_page_pool()
+Date: Fri,  3 Apr 2026 15:26:35 -0700
+Message-ID: <20260403222634.2287124-2-kuba@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260402172823.83467-1-devnexen@gmail.com>
+References: <20260402172823.83467-1-devnexen@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Sat, 04 Apr 2026 00:21:26 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Thomas Richard <thomas.richard@bootlin.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Aaro Koskinen <aaro.koskinen@iki.fi>, Andreas Kemnade
- <andreas@kemnade.info>, Kevin Hilman <khilman@baylibre.com>, Roger Quadros
- <rogerq@kernel.org>, Tony Lindgren <tony@atomide.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-omap@vger.kernel.org
-Subject: Re: [PATCH 0/2] Add USB Ethernet controller (LAN7500) node in
- VAR-SOM-OM44 devicetree
-In-Reply-To: <20260403151500.5225681d@kernel.org>
-References: <20260403-b4-var-som-om44-lan7500-v1-0-0dadde850143@bootlin.com>
- <20260403131801.359be561@kernel.org>
- <2f843cc38fce1c5df9291c2e4b064241@tipi-net.de>
- <20260403151500.5225681d@kernel.org>
-Message-ID: <8ccec77dbf8b8c76fe41201735f0987a@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275249-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[19];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275250-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	DMARC_DNSFAIL(0.00)[tipi-net.de : query timed out];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D95C8398B5F
+X-Rspamd-Queue-Id: 06B36398B97
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4.4.2026 00:15, Jakub Kicinski wrote:
-> On Fri, 03 Apr 2026 22:33:26 +0200 Nicolai Buchwitz wrote:
->> On 3.4.2026 22:18, Jakub Kicinski wrote:
->> > On Fri, 03 Apr 2026 21:02:22 +0200 Thomas Richard wrote:
->> >> The goal of this series is to add the USB Ethernet controller node in
->> >> the
->> >> VAR-SOM-OM44 devicetree in order to allow the bootloader to patch the
->> >> devicetree and pass a MAC address to the smsc75xx driver. This was
->> >> also a
->> >> good opportunity to create the schema file for LAN75XX devices.
->> >
->> > But there's no driver for it yet, right?
->> > IDK what the best practices are here, just unusual to see a schema
->> > without a driver, is all.
->> 
->> The smsc75xx driver has been in the tree since 2010 (d0cad871703b) and
->> already reads local-mac-address/mac-address from devicetree via
->> platform_get_ethdev_address() in smsc75xx_init_mac_address(), so the
->> binding should be covered on the driver side.
-> 
-> Curious. So USB core can tie the right USB device to the DT / OF
-> information automatically? I was thrown by the fact that there
-> are no matches on the compatibles anywhere in the kernel.
+This is an AI-generated review of your patch. The human sending this
+email says "Let's make sure the callers can handle the error, too."
+---
+net: lan966x: fix page_pool error handling in lan966x_fdma_rx_alloc_page_pool()
 
-Yes, USB core matches DT nodes by port topology (reg property), not by
-compatible (usb_of_get_device_node() in drivers/usb/core/of.c if you
-want to have a deeper look).
+This commit adds an IS_ERR check after page_pool_create() to return early
+on failure. This prevents passing an error pointer to
+xdp_rxq_info_reg_mem_model() which would cause a kernel oops when
+dereferenced.
 
-The existing microchip,lan95xx.yaml binding works the same way.
-For example Raspberry Pi models before the Pi 4 use exactly this
-pattern to pass the MAC address via firmware -> devicetree to the
-smsc95xx driver.
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
+> index 7b6369e43451d..34bbcae2f0685 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
+> @@ -92,6 +92,9 @@ static int lan966x_fdma_rx_alloc_page_pool(struct lan966x_rx *rx)
+>  
+>  	rx->page_pool = page_pool_create(&pp_params);
+>  
+> +	if (unlikely(IS_ERR(rx->page_pool)))
+> +		return PTR_ERR(rx->page_pool);
+> +
+
+This isn't a bug in the patch itself, but since this patch correctly handles
+errors from page_pool_create(), it makes the existing error recovery paths more
+reachable.
+
+If lan966x_fdma_rx_alloc_page_pool() succeeds here, it creates a new page pool
+and updates port->xdp_rxq memory models to point to it. If the subsequent
+fdma_alloc_coherent() call in lan966x_fdma_rx_alloc() fails:
+
+lan966x_fdma.c:lan966x_fdma_rx_alloc() {
+	if (lan966x_fdma_rx_alloc_page_pool(rx))
+		return PTR_ERR(rx->page_pool);
+
+	err = fdma_alloc_coherent(lan966x->dev, fdma);
+	if (err)
+		return err;
+    ...
+}
+
+Does this return an error without destroying the newly created page pool?
+
+During an MTU change in lan966x_fdma_reload(), this failure triggers a jump
+to the restore: label, which reverts rx->page_pool to the old pool:
+
+lan966x_fdma.c:lan966x_fdma_reload() {
+    ...
+	err = lan966x_fdma_rx_alloc(&lan966x->rx);
+	if (err)
+		goto restore;
+    ...
+restore:
+	lan966x->rx.page_pool = page_pool;
+    ...
+}
+
+Does this irrevocably leak the newly created page pool and leave the xdp_rxq
+memory models pointing to the leaked pool?
+
+Similarly, in lan966x_fdma_init(), if lan966x_fdma_tx_alloc() fails:
+
+lan966x_fdma.c:lan966x_fdma_init() {
+    ...
+	err = lan966x_fdma_rx_alloc(&lan966x->rx);
+	if (err)
+		return err;
+
+	err = lan966x_fdma_tx_alloc(&lan966x->tx);
+	if (err) {
+		fdma_free_coherent(lan966x->dev, &lan966x->rx.fdma);
+		return err;
+	}
+    ...
+}
+
+Does the error handler explicitly free rx.fdma via fdma_free_coherent() but
+forget to destroy rx.page_pool, resulting in a permanent memory leak during
+probe failure?
+
+Additionally, the error recovery path in lan966x_fdma_reload() appears to
+resume hardware DMA into freed pages.
+
+When lan966x_fdma_reload() runs, it first stops the hardware and calls
+lan966x_fdma_rx_free_pages(), which returns all RX ring pages back to the
+old page pool via page_pool_put_full_page(). If lan966x_fdma_rx_alloc()
+subsequently fails, execution jumps to the restore: label:
+
+lan966x_fdma.c:lan966x_fdma_reload() {
+    ...
+	lan966x_fdma_rx_free_pages(&lan966x->rx);
+    ...
+	err = lan966x_fdma_rx_alloc(&lan966x->rx);
+	if (err)
+		goto restore;
+    ...
+restore:
+	lan966x->rx.page_pool = page_pool;
+	memcpy(&lan966x->rx.fdma, &fdma_rx_old, sizeof(struct fdma));
+	lan966x_fdma_rx_start(&lan966x->rx);
+    ...
+}
+
+The restore block copies back the old FDMA descriptors, which point to the
+pages that were just freed, and calls lan966x_fdma_rx_start() to re-enable
+the hardware RX channel.
+
+Since it never re-allocates or re-maps pages for these restored descriptors,
+will the hardware actively resume DMAing incoming network packets into
+physical addresses that the page pool considers free? If the page pool
+returns these pages to the buddy allocator, could this overwrite memory
+owned by unrelated kernel subsystems?
+
+>  	for (int i = 0; i < lan966x->num_phys_ports; ++i) {
+>  		struct lan966x_port *port;
+>
 
