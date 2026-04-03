@@ -1,52 +1,53 @@
-Return-Path: <netdev+bounces-274995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274996-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8Lx6D+Kkz2mZyQYAu9opvQ
-	(envelope-from <netdev+bounces-274995-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:30:42 +0200
+	id 4P8+HVmlz2mZyQYAu9opvQ
+	(envelope-from <netdev+bounces-274996-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:32:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 693C0393B24
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:30:41 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E042C393B50
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:32:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DD5293017311
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 11:30:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A939030862D8
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 11:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A58093B892F;
-	Fri,  3 Apr 2026 11:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C943B47C2;
+	Fri,  3 Apr 2026 11:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WKwhqtuC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F6MxUSLV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630B43AF67D;
-	Fri,  3 Apr 2026 11:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4B431F99D;
+	Fri,  3 Apr 2026 11:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775215800; cv=none; b=P3YsQPNhgiVBebBrYBkC7r/rjXtrcJpb6OyHasPlS11+NEW58m6Pvefv/xAzk8IYUeSOLHMyRcHtTdA6eQ6FtNvvtUECSY14x2/jBOiuAvm4QWx97pqk+rihqxkB/Bw0M79FoccTha+qUrA4o6bQmNcSEIAhIkPrUuA01dhLqNU=
+	t=1775215803; cv=none; b=marzpDzc6dqQF0TlB9hDcJYZ1bN2K5HM6rMCkUdLPMFjgbxo/TeoiSa3oF2odf9Go6lEiEgKISRLNCEFV37r/1rV6iocIOG6bm5TSCOq5wSKSfOfcVpPYnLyAv31zZ0q8r3FKNb7ad8MNJkYXe2PDoga9XS+m6q9YVwwpprmWqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775215800; c=relaxed/simple;
-	bh=1OnAPENA2MFXmmi1fleaN8fDNv5hNv73y70P39B3O0A=;
+	s=arc-20240116; t=1775215803; c=relaxed/simple;
+	bh=Ws960Ue/zmcX7kdTuXX1aczhyesgjt82Y+UPAyP6JlQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=lo2C/icXZcb4b1LgZ/j9O6odo/fODrqUZGPMQbCrg8HhKYuMYbzNOaNwfGJIhYKr2oIsbUo/EbYtmXK6v7zRlmlRIksb/TG5Z6Jvyb1v4f7q4HCxDmoiAlndAf+/SIWeBJXxNixA1KT06XJXdVzsRacLr659t2TsjyrPqYRpayQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WKwhqtuC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50873C19424;
-	Fri,  3 Apr 2026 11:29:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BF50ZMF9I6Rc619Mcd/9FxjoQbfwYVsIvsrgrgQsob07pHTgnEDi8PTp/HOhP/dLQpzxpfe1xmCC2/mGaULxswtmkYFK2orEYR2HBgoDa95MpEkGG/gVYfmB18xKkByIKj9rfvM33onVU4N7IqY+lABtfFpIvrCaq9F69fNz7uQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F6MxUSLV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3D7DC19423;
+	Fri,  3 Apr 2026 11:29:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775215799;
-	bh=1OnAPENA2MFXmmi1fleaN8fDNv5hNv73y70P39B3O0A=;
+	s=k20201202; t=1775215801;
+	bh=Ws960Ue/zmcX7kdTuXX1aczhyesgjt82Y+UPAyP6JlQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=WKwhqtuCxfDBmUIWyFVeqJg+aWV829JhYhOzsJ/WlyfV3fZrYXY67EqoyaeSrLrat
-	 z7ECfxn51FaMirwGQRa75BEtJ2nGab9kwz450unzVdEEj1xfBgzyXVJackvsWMbOe0
-	 1p9Lim5pw7PHBXXYxxsyfZ2s3rWsaZMGo5NVR9g1VDfyrdwO9CyHXn9JoUTG9WUB6C
-	 UwjbRxn81TbKZbu8Rn5j2A5E0JUQ2/h7UqoxUmt+CgRtvVZYHJfg70iirxvF5/hNef
-	 Rb8XismDdsCqLXlGcGYcgeGGqPAPQi/eiST55RHT9qH6WIiQ6hevZqs0ja8wr8b26O
-	 +vgF8WYF4oXWQ==
+	b=F6MxUSLVaHNC2iTujCJ4ovks4WNWj8lVvkO9gN3sVyix/qFypX8s89mFSfOrCkyLa
+	 3ZYs4+53irOXCnX4PIuKVZnlmaahS/H08CJQA4NOt0M/DMvfndBQtrta0HDSei9AC1
+	 XknKA73stIFQy5CLJzooP3FCElwg5QdlHKbd++j3k/M7R7Nkyn0dAmq9SonWA4zpFJ
+	 iit15huOWEsKEA6AZSy+YL4Wt7y08H6f6tMpxkgLrD5aDzlh9uJyIWx+F3T1xp4h2c
+	 1mqH443N9NVW/qCHgwrtO34G6jrFKvXKaUIsFnV+ckNeAKQoF2tfzQxA+npo3D7FRF
+	 75Q3mNWci1Q1Q==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 03 Apr 2026 13:29:29 +0200
-Subject: [PATCH net-next 3/5] tcp: add recv_should_stop helper
+Date: Fri, 03 Apr 2026 13:29:30 +0200
+Subject: [PATCH net-next 4/5] mptcp: pm: in-kernel: remove
+ mptcp_pm_has_addr_attr_id
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260403-net-next-mptcp-msg_eor-misc-v1-3-b0b33bea3fed@kernel.org>
+Message-Id: <20260403-net-next-mptcp-msg_eor-misc-v1-4-b0b33bea3fed@kernel.org>
 References: <20260403-net-next-mptcp-msg_eor-misc-v1-0-b0b33bea3fed@kernel.org>
 In-Reply-To: <20260403-net-next-mptcp-msg_eor-misc-v1-0-b0b33bea3fed@kernel.org>
 To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
@@ -63,142 +64,130 @@ To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
  Simon Horman <horms@kernel.org>
 Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
- David Ahern <dsahern@kernel.org>, Geliang Tang <geliang@kernel.org>
+ linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.15.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3026; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=RqCCycHW2v6owPV/xj3gdIsfqbGE+49RDNfHEJrfcLY=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDLPL1kd/Suu86QCR83OhBdTauySTm1O7Hq7SzVX9VHkE
- Yab9ZyOHaUsDGJcDLJiiizSbZH5M59X8ZZ4+VnAzGFlAhnCwMUpABOR3cjwPzZxm9c24RlH/v1O
- 9hRuuNP5/NiZR5vD6qfyeBluUffY9IqRoetbulJAopJsvdDUBoYvUSxhfxinHF5+zdit6W5woXE
- bMwA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2965; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=Ws960Ue/zmcX7kdTuXX1aczhyesgjt82Y+UPAyP6JlQ=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDLPL1kjWTR17aT35/xKEg+9zFxy5vRnswfPZNbYbVrYM
+ zFUdHccd0cpC4MYF4OsmCKLdFtk/sznVbwlXn4WMHNYmUCGMHBxCsBE1uUxMhxZfJXXp8lAXkja
+ MCmaO7XTSuNEwNR4Qb+5ZXNUnzEWKzMyvPu1w2GmXPYW0/y6R5fktfcqazYfsZD6IGXGeehZqnw
+ FLwA=
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-274996-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274995-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[kylinos.cn:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 693C0393B24
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E042C393B50
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+There is no need to call this helper: it will check if the address ID
+attribute is set, but this attribute has already been parsed previously.
 
-Factor out a new helper tcp_recv_should_stop() from tcp_recvmsg_locked()
-and tcp_splice_read() to check whether to stop receiving. And use this
-helper in mptcp_recvmsg() and mptcp_splice_read() to reduce redundant code.
+Indeed, the value has been set in 'entry->addr.id' if it was set and
+positive, which is what we were looking at. Then only looking at this
+already parsed value is enough, not need to re-extract all Netlink
+attributes again.
 
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Acked-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Reviewed-by: Geliang Tang <geliang@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
-To: Neal Cardwell <ncardwell@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-To: David Ahern <dsahern@kernel.org>
----
- include/net/tcp.h    |  8 ++++++++
- net/ipv4/tcp.c       |  9 ++-------
- net/mptcp/protocol.c | 11 +++--------
- 3 files changed, 13 insertions(+), 15 deletions(-)
+ net/mptcp/pm_kernel.c | 24 +++++-------------------
+ 1 file changed, 5 insertions(+), 19 deletions(-)
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 565943c34b7e..6156d1d068e1 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -3077,4 +3077,12 @@ enum skb_drop_reason tcp_inbound_hash(struct sock *sk,
- 		const void *saddr, const void *daddr,
- 		int family, int dif, int sdif);
+diff --git a/net/mptcp/pm_kernel.c b/net/mptcp/pm_kernel.c
+index 82e59f9c6dd9..0ebf43be9939 100644
+--- a/net/mptcp/pm_kernel.c
++++ b/net/mptcp/pm_kernel.c
+@@ -720,7 +720,7 @@ static void __mptcp_pm_release_addr_entry(struct mptcp_pm_addr_entry *entry)
  
-+static inline int tcp_recv_should_stop(struct sock *sk)
-+{
-+	return sk->sk_err ||
-+	       sk->sk_state == TCP_CLOSE ||
-+	       (sk->sk_shutdown & RCV_SHUTDOWN) ||
-+	       signal_pending(current);
-+}
-+
- #endif	/* _TCP_H */
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index bd2c3c4587e1..e57eaffc007a 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -888,9 +888,7 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *ppos,
- 		release_sock(sk);
- 		lock_sock(sk);
- 
--		if (sk->sk_err || sk->sk_state == TCP_CLOSE ||
--		    (sk->sk_shutdown & RCV_SHUTDOWN) ||
--		    signal_pending(current))
-+		if (tcp_recv_should_stop(sk))
- 			break;
+ static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
+ 					     struct mptcp_pm_addr_entry *entry,
+-					     bool needs_id, bool replace)
++					     bool replace)
+ {
+ 	struct mptcp_pm_addr_entry *cur, *del_entry = NULL;
+ 	int ret = -EINVAL;
+@@ -779,7 +779,7 @@ static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
+ 		}
  	}
  
-@@ -2755,10 +2753,7 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
- 
- 		if (copied) {
- 			if (!timeo ||
--			    sk->sk_err ||
--			    sk->sk_state == TCP_CLOSE ||
--			    (sk->sk_shutdown & RCV_SHUTDOWN) ||
--			    signal_pending(current))
-+			    tcp_recv_should_stop(sk))
- 				break;
- 		} else {
- 			if (sock_flag(sk, SOCK_DONE))
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index e21e416cd19a..2f4776a4f06a 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -2333,11 +2333,8 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 			break;
- 
- 		if (copied) {
--			if (sk->sk_err ||
--			    sk->sk_state == TCP_CLOSE ||
--			    (sk->sk_shutdown & RCV_SHUTDOWN) ||
--			    !timeo ||
--			    signal_pending(current))
-+			if (tcp_recv_should_stop(sk) ||
-+			    !timeo)
- 				break;
- 		} else {
- 			if (sk->sk_err) {
-@@ -4520,9 +4517,7 @@ static ssize_t mptcp_splice_read(struct socket *sock, loff_t *ppos,
- 		release_sock(sk);
- 		lock_sock(sk);
- 
--		if (sk->sk_err || sk->sk_state == TCP_CLOSE ||
--		    (sk->sk_shutdown & RCV_SHUTDOWN) ||
--		    signal_pending(current))
-+		if (tcp_recv_should_stop(sk))
- 			break;
+-	if (!entry->addr.id && needs_id) {
++	if (!entry->addr.id) {
+ find_next:
+ 		entry->addr.id = find_next_zero_bit(pernet->id_bitmap,
+ 						    MPTCP_PM_MAX_ADDR_ID + 1,
+@@ -790,7 +790,7 @@ static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
+ 		}
  	}
  
+-	if (!entry->addr.id && needs_id)
++	if (!entry->addr.id)
+ 		goto out;
+ 
+ 	__set_bit(entry->addr.id, pernet->id_bitmap);
+@@ -923,7 +923,7 @@ int mptcp_pm_nl_get_local_id(struct mptcp_sock *msk,
+ 		return -ENOMEM;
+ 
+ 	entry->addr.port = 0;
+-	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry, true, false);
++	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry, false);
+ 	if (ret < 0)
+ 		kfree(entry);
+ 
+@@ -977,18 +977,6 @@ static int mptcp_nl_add_subflow_or_signal_addr(struct net *net,
+ 	return 0;
+ }
+ 
+-static bool mptcp_pm_has_addr_attr_id(const struct nlattr *attr,
+-				      struct genl_info *info)
+-{
+-	struct nlattr *tb[MPTCP_PM_ADDR_ATTR_MAX + 1];
+-
+-	if (!nla_parse_nested_deprecated(tb, MPTCP_PM_ADDR_ATTR_MAX, attr,
+-					 mptcp_pm_address_nl_policy, info->extack) &&
+-	    tb[MPTCP_PM_ADDR_ATTR_ID])
+-		return true;
+-	return false;
+-}
+-
+ /* Add an MPTCP endpoint */
+ int mptcp_pm_nl_add_addr_doit(struct sk_buff *skb, struct genl_info *info)
+ {
+@@ -1037,9 +1025,7 @@ int mptcp_pm_nl_add_addr_doit(struct sk_buff *skb, struct genl_info *info)
+ 			goto out_free;
+ 		}
+ 	}
+-	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry,
+-						!mptcp_pm_has_addr_attr_id(attr, info),
+-						true);
++	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry, true);
+ 	if (ret < 0) {
+ 		GENL_SET_ERR_MSG_FMT(info, "too many addresses or duplicate one: %d", ret);
+ 		goto out_free;
 
 -- 
 2.53.0
