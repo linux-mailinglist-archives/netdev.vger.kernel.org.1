@@ -1,176 +1,240 @@
-Return-Path: <netdev+bounces-275150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275151-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OGkfNaXuz2mt1wYAu9opvQ
-	(envelope-from <netdev+bounces-275150-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 18:45:25 +0200
+	id sLCvFxfvz2mt1wYAu9opvQ
+	(envelope-from <netdev+bounces-275151-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 18:47:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 821843968E9
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 18:45:25 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B64C939692E
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 18:47:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 524DC3036572
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 16:44:47 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A4172305AE91
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 16:45:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741AF3D1CA7;
-	Fri,  3 Apr 2026 16:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C673CEB93;
+	Fri,  3 Apr 2026 16:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="zqcdEjHa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e7on5wCw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418E33CFF6B
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 16:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0FCF3A8721;
+	Fri,  3 Apr 2026 16:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775234651; cv=none; b=UR2vvpT9E/uXoz0U5gvtn/Z/+Gy75Ym3RpN49LPRG9R/aasxKseU6sjdzY6XYxCVyHL0fMGeLYRgLz5ShVbiZ2Qhcu+n4Tc0vlRMvplXjjKY2aQ+E6EGiLPvVW7XoyMNQvLF2mLyCpt8kvCS019BbFFQ9fT/kkqJTf9wBJ3giMo=
+	t=1775234681; cv=none; b=F76mZgjoO7g9iO1iqIW04QnWanbxJGlesxpXOSCatBWCqyNT+wHAY92o2ZJb0m1uzpb5wbubyPG3EbhDaIvxvJxIJL09XVoWoKbgKO07VXjfM+jHz2mK9MbQdx6hFs6w/l4pPgxon76sXWssydlWTQ3fL6MVclPzHLlblvgX+S4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775234651; c=relaxed/simple;
-	bh=B17bVmBmnkP1hcqtGSn9ht5X8PSnvCu4sZaG15J8RhU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZNnU63SJPaPnzcD+0VpR08ad2kTgBmZITsj41amGP9ptFh1pDADDwX0ZfHDmzBkkWyBCduBgK5WVLN4rL7OZ4nPUGoWzxD7hYloZrpi3t1GlTW+ev0JSHXUYccpmUQTimURKo3X9aAZLgkDOvsA6QySyi9YntvRyJqhCJKYhHxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=zqcdEjHa; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fairphone.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-66e129e457dso1943982a12.1
-        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 09:44:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1775234647; x=1775839447; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/I8STiLmCdAUWAKR9dG6wn9ETGBCkr8LaZ1bDk3uHnc=;
-        b=zqcdEjHa9ePvncK9nBm3YpJMCC5jYwE6eAoc3miUGvEVknCKL+nwjw/1w/wiQwuFGB
-         x/WcPzyzFxyryMhvTpJvT7mDLVep5NGaxbP7mcCnOIWHdBe5Jv2SAfv2nU0e4HVhWBpW
-         mazepIQLnD8M134/ZF/p5JYxe+XKCkFkDvjlsXjGzuaECto2NVddXK+3vLJhTkmPuPAO
-         6HJKyPt9KZeufIyJpBQyDAw/4Evd1665uDyDxXETS2Fny0hXMLP0V7HuEuCQyDIvvsz7
-         Gkj6xrgK5eDU6KFCSZIw4MhcsFsptBU7+Te1bqcNTu93QPrl9OhSMpfET5Rih7GJQHTa
-         bJKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775234647; x=1775839447;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=/I8STiLmCdAUWAKR9dG6wn9ETGBCkr8LaZ1bDk3uHnc=;
-        b=jp1uo0xfFxfD35N/Coopn97ZiUK2YWLPoPqk038XyIHRRZYIozaO5SgjflWkImbs2O
-         0grkeHd3bwADc65SV9TvAsCVCJXyygFIoZFAAzjFH/oL2HXH17y82ZVChwu6LoWeBr/5
-         2yifsx5n5iy624mrefH0ghAMYWs6LEuQLnn20Z7o8D+B5tXyQRSE+dn0UYN+DhYO/d4+
-         gmnzxKevKwwqk/JFbFyEzDvuNDxH2rvQItS248YBqs3NSUAgwrPqjqG5rUoFHrasCzij
-         0Sw6QrPaPJxHyn6c2a7haeA+jkLEYrTRJSelRmkgeIqyJ87yfMnDMjenzVM3VCfX4QdJ
-         PJ2w==
-X-Forwarded-Encrypted: i=1; AJvYcCUnzbFkkgU9ensUdYY1QPeycRLj7vt+T083w+RYIjZdNWN+TuZ/Mka2jwa0s9DkGo+bbklZ5Hc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1B0VdxIxQQBBVtp7lhLZ4etcOsiuslFyoQFei1+j+P0qJcZ21
-	/2UTrz1iTMaYC91Wtu7kPVe7N6pq5cx2/DNm3tWeqOZFMcqQLZoYujStyPqQP8T1Zlg=
-X-Gm-Gg: AeBDieu7idsw8tXaepkHmSIbifFqLO6so+6d7vAe1+AZ7HC5YPOhHzTtNeAVcHYAFWG
-	u6qjU3EIfNZDY7oybaPfH8bu6U19d8gSWJXSjZFjlOr6hB3HR5ltF4AeJ1fETzE2aEl7iJ2QCo1
-	3+oH2xRIHNTzXoYKEHLEH+b2O8o7RByrK+LxQRaIfTOx031lSEd5hGh+mNd5+Bhb1yeT/jeDqoi
-	XBkroc1pZGeGMs4YZFAnRin6eE2aizN66j5VX1Xq/G+aNV91Ac6GotqepNT4IzOC8Tv+Et9M1sI
-	PWFrnwoQlu4SgBFIMtyOhky2yjFzBeLvkz50gEq/LxVY7D+BgYKNowzTKNZs80P5yTG3iMI7xGH
-	ecdeDVVtZKkd2wpETCxGfja6W+fCf0wBZlMPrSeFUqQ8t8aPaDg/Ij6yziYyJHb1+OoFeVwL6rS
-	l0IcCsPJm2+qTSbjTevr4/f/Aff54zPDUz3fjnJx52Xl2ltVIHE5/rywAcBZ3+oLM0euHT+xzv2
-	WOWNODT1CnxTvFvCizklGmnve8bT8AYSmRXcA==
-X-Received: by 2002:a17:907:6d05:b0:b98:8e42:95ee with SMTP id a640c23a62f3a-b9c67b9e36cmr170984166b.46.1775234647458;
-        Fri, 03 Apr 2026 09:44:07 -0700 (PDT)
-Received: from otso.local (2001-1c00-3b89-c600-71a4-084f-6409-1447.cable.dynamic.v6.ziggo.nl. [2001:1c00:3b89:c600:71a4:84f:6409:1447])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9c3ca9a145sm213492566b.25.2026.04.03.09.44.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2026 09:44:07 -0700 (PDT)
-From: Luca Weiss <luca.weiss@fairphone.com>
-Date: Fri, 03 Apr 2026 18:43:52 +0200
-Subject: [PATCH 6/6] arm64: dts: qcom: milos-fairphone-fp6: Enable IPA
+	s=arc-20240116; t=1775234681; c=relaxed/simple;
+	bh=OXMO+eu2CIMyzArmrlTbscTT8VTt7M7P2KwNOiAcqRE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mUfEr42wDxmSB7Jb/kiY83F3RsXAXEOiJVtkeSUCnClpZxgeOIvy2loN18xO6zMcnloLUYui7wNTmOXa81iyMzrgPm6nx1nI7VJwskt4Feiljq2Af+a5AnAhkjhWuDuwiU4Xo6PG6hMdaE9wxjnIhR3nnpi7TJtTFuNJtlwCNIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e7on5wCw; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775234679; x=1806770679;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=OXMO+eu2CIMyzArmrlTbscTT8VTt7M7P2KwNOiAcqRE=;
+  b=e7on5wCw7oSsO2weLorob0Scp7CkSU7+jDpV5qY9969PpU7YrD+FLeep
+   9sgl14+WC4NGWHG8pOVKoal3ptwCWgIJpO7qs8cpzsnXSfyi7vuYBTHRR
+   NdrukrXU2zJ2Wp4DdiyzTWoXhyVwd63pkNtfoCDrcLrhBlV6abY8kEbgJ
+   emdVeJzIQEWHVQeqdeFD+NxLFmeyWh1spAKADVsG8QWdGypaHay7FR80f
+   tY5tfaiLKaWH0/GFt/kQb9CbMUKsWflv90lYqG44Va/s2rswE37jEnyAx
+   URFBFRkQDXF6xr90AHKTc0OKijazPnL9vrH7S7sgG7EZ3HStsCfnN49H6
+   Q==;
+X-CSE-ConnectionGUID: crsmgjeGQvGH6VbADmYdrw==
+X-CSE-MsgGUID: UCCvGbqQT5W0+5kOHjROtA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11748"; a="63847953"
+X-IronPort-AV: E=Sophos;i="6.23,158,1770624000"; 
+   d="scan'208";a="63847953"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2026 09:44:38 -0700
+X-CSE-ConnectionGUID: 0VujJW2TQYmlhasa2AX4cA==
+X-CSE-MsgGUID: MAwu2oXJT2qvkBqe73B3KQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,158,1770624000"; 
+   d="scan'208";a="227159443"
+Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2026 09:44:38 -0700
+Date: Fri, 3 Apr 2026 09:44:32 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
+	Nikolay Borisov <nik.borisov@suse.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	David Kaplan <david.kaplan@amd.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Laight <david.laight.linux@gmail.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
+	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v9 07/10] x86/vmscape: Use static_call() for predictor
+ flush
+Message-ID: <20260403164432.ltnr5oupddscwaqu@desk>
+References: <20260402-vmscape-bhb-v9-0-94d16bc29774@linux.intel.com>
+ <20260402-vmscape-bhb-v9-7-94d16bc29774@linux.intel.com>
+ <ac_UJx99kDJY8j3t@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260403-milos-ipa-v1-6-01e9e4e03d3e@fairphone.com>
-References: <20260403-milos-ipa-v1-0-01e9e4e03d3e@fairphone.com>
-In-Reply-To: <20260403-milos-ipa-v1-0-01e9e4e03d3e@fairphone.com>
-To: Alex Elder <elder@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>, 
- Alexander Koskovich <akoskovich@pm.me>
-Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
- Luca Weiss <luca.weiss@fairphone.com>
-X-Mailer: b4 0.15.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1775234639; l=815;
- i=luca.weiss@fairphone.com; s=20250611; h=from:subject:message-id;
- bh=B17bVmBmnkP1hcqtGSn9ht5X8PSnvCu4sZaG15J8RhU=;
- b=JH5s532eJLrbkYEhCO81ATxiNZvSlOjA4jvYKqWx9Im6HP9GJB+uMtLmI6LL+WUd9YApjuxUY
- XnsscnhBa1nCaN9g1z2pFNSWuIl/LnuTKTRL9nqvdqAlri9/er5aUaD
-X-Developer-Key: i=luca.weiss@fairphone.com; a=ed25519;
- pk=O1aw+AAust5lEmgrNJ1Bs7PTY0fEsJm+mdkjExA69q8=
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ac_UJx99kDJY8j3t@google.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[fairphone.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[fairphone.com:s=fair];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275150-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[fairphone.com:+];
+	TAGGED_FROM(0.00)[bounces-275151-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[37];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,google.com,lwn.net,vger.kernel.org,intel.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[luca.weiss@fairphone.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,fairphone.com:dkim,fairphone.com:email,fairphone.com:mid]
-X-Rspamd-Queue-Id: 821843968E9
+	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
+	NEURAL_HAM(-0.00)[-0.996];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,intel.com:dkim]
+X-Rspamd-Queue-Id: B64C939692E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Configure and enable the node for IPA which enables mobile data on this
-device.
+On Fri, Apr 03, 2026 at 07:52:23AM -0700, Sean Christopherson wrote:
+> On Thu, Apr 02, 2026, Pawan Gupta wrote:
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -11463,7 +11463,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+> >  	 * set for the CPU that actually ran the guest, and not the CPU that it
+> >  	 * may migrate to.
+> >  	 */
+> > -	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
+> > +	if (vmscape_mitigation_enabled())
+> 
+> This is pretty lame.  It turns a statically patched MOV
 
-Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
----
- arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Yes it is, this was done ...
 
-diff --git a/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts b/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts
-index c1899db46e71..31c6d6627619 100644
---- a/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts
-+++ b/arch/arm64/boot/dts/qcom/milos-fairphone-fp6.dts
-@@ -690,6 +690,15 @@ vreg_l7p: ldo7 {
- 	/* AW86938FCR vibrator @ 0x5a */
- };
- 
-+&ipa {
-+	firmware-name = "qcom/milos/fairphone/fp6/ipa_fws.mbn";
-+	memory-region = <&ipa_fw_mem>;
-+
-+	qcom,gsi-loader = "self";
-+
-+	status = "okay";
-+};
-+
- &pm8550vs_c {
- 	status = "okay";
- };
+>   11548		if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
+>   11549			this_cpu_write(x86_ibpb_exit_to_user, true);
+>      0x000000000003c57a <+858>:	movb   $0x1,%gs:0x0(%rip)        # 0x3c582 <vcpu_enter_guest+866>
+> 
+> into a function call and two sets of conditional branches.  And with mitigations
+> enabled, that function call may trigger the wonderful unret insanity
+> 
+>   11548		if (vmscape_mitigation_enabled())
+>      0x000000000003c575 <+853>:	call   0x3c57a <vcpu_enter_guest+858>
+>      0x000000000003c57a <+858>:	test   %al,%al
+>      0x000000000003c57c <+860>:	je     0x3c586 <vcpu_enter_guest+870>
+> 
+>   11549			this_cpu_write(x86_predictor_flush_exit_to_user, true);
+>      0x000000000003c57e <+862>:	movb   $0x1,%gs:0x0(%rip)        # 0x3c586 <vcpu_enter_guest+870>
+> 
+> 
+>   3166	{
+>      0xffffffff81285320 <+0>:	endbr64
+>      0xffffffff81285324 <+4>:	call   0xffffffff812aa5a0 <__fentry__>
+> 
+>   3167		return !!static_call_query(vmscape_predictor_flush);
+>      0xffffffff81285329 <+9>:	mov    0x13a4f30(%rip),%rax        # 0xffffffff8262a260 <__SCK__vmscape_predictor_flush>
+>      0xffffffff81285330 <+16>:	test   %rax,%rax
+>      0xffffffff81285333 <+19>:	setne  %al
+> 
+>   3168	}
+>      0xffffffff81285336 <+22>:	jmp    0xffffffff81db1e30 <__x86_return_thunk>
+> 
+> While this isn't KVM's super hot inner run loop, it's still very much a hot path.
+> Even more annoying, KVM will eat the function call on kernels with CPU_MITIGATIONS=n.
+> 
+> I'd like to at least do something like the below to make the common case of
+> multiple guest entry/exits more or less free, and to avoid the CALL+(UN)RET
+> overhead, but trying to include linux/static_call.h in processor.h (or any other
+> core x86 header) creates a cyclical dependency :-/
+> 
+> diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
+> index 20ab4dd588c6..0dc0680a80f8 100644
+> --- a/arch/x86/include/asm/processor.h
+> +++ b/arch/x86/include/asm/processor.h
+> @@ -36,6 +36,7 @@ struct vm86;
+>  #include <linux/err.h>
+>  #include <linux/irqflags.h>
+>  #include <linux/mem_encrypt.h>
+> +#include <linux/static_call.h>
+>  
+>  /*
+>   * We handle most unaligned accesses in hardware.  On the other hand
+> @@ -753,7 +754,11 @@ enum mds_mitigations {
+>  };
+>  
+>  extern bool gds_ucode_mitigated(void);
+> -extern bool vmscape_mitigation_enabled(void);
+> +
+> +static inline bool vmscape_mitigation_enabled(void)
+> +{
+> +       return !!static_call_query(vmscape_predictor_flush);
+> +}
+>  
+>  /*
+>   * Make previous memory operations globally visible before
+> diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+> index 366ebe1e1fb9..02bf626f0773 100644
+> --- a/arch/x86/kernel/cpu/bugs.c
+> +++ b/arch/x86/kernel/cpu/bugs.c
+> @@ -148,6 +148,7 @@ DEFINE_STATIC_KEY_FALSE(switch_mm_cond_l1d_flush);
+>   * sequence. This defaults to no mitigation.
+>   */
+>  DEFINE_STATIC_CALL_NULL(vmscape_predictor_flush, write_ibpb);
+> +EXPORT_STATIC_CALL_GPL(vmscape_predictor_flush);
 
--- 
-2.53.0
+... to avoid exporting the static key, so that modules (other than KVM)
+cannot do static_call_update(vmscape_predictor_flush).
 
+Peter suggested changes that allowed adding EXPORT_STATIC_CALL_FOR_KVM():
+
+  https://lore.kernel.org/all/20260319214409.GL3738786@noisy.programming.kicks-ass.net/
+
+EXPORT_STATIC_CALL_FOR_KVM() seems to be a cleaner approach to me.
+
+Boris, I know you didn't like exporting the static_key. But, as Sean said
+this is a hot path, and avoiding the unnecessary call would benefit all
+CPUs (affected or unaffected). Moreover, EXPORT_STATIC_CALL_FOR_KVM()
+somewhat addresses your concern of exporting the static_key to the world.
+Would you be okay with it?
 
