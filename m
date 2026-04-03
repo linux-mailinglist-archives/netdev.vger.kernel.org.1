@@ -1,201 +1,258 @@
-Return-Path: <netdev+bounces-274793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274794-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SNQDHOcLz2kNsgYAu9opvQ
-	(envelope-from <netdev+bounces-274793-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:37:59 +0200
+	id aK7sKSEMz2kNsgYAu9opvQ
+	(envelope-from <netdev+bounces-274794-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:38:57 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C83A38F8BD
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:37:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DAA438F8FC
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 02:38:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0CE3030A35E3
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 00:33:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DA7D83057C7C
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 00:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1FE0231842;
-	Fri,  3 Apr 2026 00:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD3B23BD05;
+	Fri,  3 Apr 2026 00:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g89uFOhs"
+	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="Mu+oi+s3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585AF22576E;
-	Fri,  3 Apr 2026 00:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A1045BE3
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 00:35:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775176389; cv=none; b=fY5wUk3yya28gW8CUJqLQnoAm+kvFGzu7aviNeu+FGj1Z3a4GFm5YkDSs6tpSoMqs88/LhfE1dco/OYAKfT1xDpFw0c9GA2RuYPyC+DO2QTkX5aoMnqlw0ODBVPviY0zH3JYm/xrUcRAyhJ69ZTGay+oUtbOpwLj5itrYIqTAfc=
+	t=1775176550; cv=none; b=C4Yqe26LTfwyQznQmnkda8libsscKBhNwHXLtqZoT8FZJlkZnHuLGqTB5OuOdc7CMWTtxU6Yvj0xVpCtSqXtUfdkmgYYUiaWnQsvjRU+U3x9gscA8ki0GU/DcebnOOc+DokkjW52r7j24RTlPM5nrkUYtN+j6j13eOlKAMO3i6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775176389; c=relaxed/simple;
-	bh=Mae+zoSeH0IjM7IPUjJkYQd/usJgG+IDTrU4CPhalhs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QbKSMqPc0bERTOjyY7ipEc2igYFu7ZEIJKOKSbSNi0VBPiK71ofCLe5SthioZBG74y/hk9ryX9Vs+YHAqTYsxQbCX8pJ1B+LRMXgxaheNoo3pZ6yzbQuYPMs09YY07tX1Llcj5ZTmJbD0FLsQLoCNff6pI7sUZwt9HLZJUC6ts8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g89uFOhs; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775176388; x=1806712388;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Mae+zoSeH0IjM7IPUjJkYQd/usJgG+IDTrU4CPhalhs=;
-  b=g89uFOhsbMoEaMZKQ47EKxKcRMpGo/KJalCTM+dR38ZDgVMuNISBNoVk
-   ZHVmrRs2bW80A/8m+v1P/zqPrr8JMD4abWUEYDtN6S9MzMxgqcojoeWYD
-   U/umEgE6Ym9be0+T8ydMooaP/t0J5duk5Uj8OogaFj9DC9K40FdJCszG1
-   JCiH9ScNIzvfRbqG++X5zg9ZH/RMb92aXcCZyCJ0ciBBp413t4FmJktxk
-   auOFjZxZJlrsz2KX219rNdESeqvTl55E11H7dWqmWhvcUocFouzpxlE63
-   vaWZ6O1FkU3vfyLtvXWfkS2OZJTlsRQwZkdx+TAT/+RYzl7P14/6BXQ6Y
-   g==;
-X-CSE-ConnectionGUID: JwtsF8gPQaKj4nvhlpqLZw==
-X-CSE-MsgGUID: jnJQhLDWTXaH8dgalsXfig==
-X-IronPort-AV: E=McAfee;i="6800,10657,11747"; a="86864447"
-X-IronPort-AV: E=Sophos;i="6.23,156,1770624000"; 
-   d="scan'208";a="86864447"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2026 17:33:07 -0700
-X-CSE-ConnectionGUID: Ytm8/RvNSsC9fG9EKTMx2w==
-X-CSE-MsgGUID: H2lsZQBZQdCDfFwjUor96A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,156,1770624000"; 
-   d="scan'208";a="231511379"
-Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2026 17:33:08 -0700
-Date: Thu, 2 Apr 2026 17:33:07 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
-	Nikolay Borisov <nik.borisov@suse.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	David Kaplan <david.kaplan@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Laight <david.laight.linux@gmail.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	Asit Mallick <asit.k.mallick@intel.com>,
-	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: [PATCH v9 10/10] x86/vmscape: Add cmdline vmscape=on to override
- attack vector controls
-Message-ID: <20260402-vmscape-bhb-v9-10-94d16bc29774@linux.intel.com>
-X-Mailer: b4 0.15-dev
-References: <20260402-vmscape-bhb-v9-0-94d16bc29774@linux.intel.com>
+	s=arc-20240116; t=1775176550; c=relaxed/simple;
+	bh=GJOSz4HKixoo1Cb5OaACSUHZw8IGIdz2whTgQvq2fUI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VClXWWiXStnFhDbZYmlqltgXy3VQFVvXQ8PVHRvZBmuaLmhwC1Ix1eSLRC1QeaprY2lkga2J5mFCR1Z82vDmlqCdXSmfafJG6cnfGsvRYsppwFiW079p5Wxwa+3P1TsMSaptIaPyyqb/RVCHunG5t1sS77hHLhRTQj3C12+ogp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=Mu+oi+s3; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-35d90833cacso880200a91.2
+        for <netdev@vger.kernel.org>; Thu, 02 Apr 2026 17:35:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775176547; x=1775781347; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MO07hvK4b04lTgujdhZrKlC7UxEyCUQbTf0fJ0M4m9A=;
+        b=Mu+oi+s3xQKvsyn1UON4jvXGWmk9xqwczQBCvYX+Ga8fL+ILF1PphbdIgK6c1JIi6T
+         MbfzpgCi8cZ7gj8e1/LP8Zd5/CCewhwk7elFA1RSqC7LcY9GiTZY8Kjk4UXx1aD9v8mj
+         52CgQys5VdCBBL6ETQRB8I90JIYo5zpy3QE4gD1e0Ex3g6J67jIlJ6O9oIPK3j8/gCaR
+         YkpY577j34cB05KxaxQRVaGL4XAZGZaRd5C0WyNYat4jm3hIljoXbGC0J17yo4s6joV0
+         /2IhztRq3r27by+IO+NfcHdTUtm0ruvz+W9v2GWxy4eP3+ueLVD/ZviirYZBEvLJqRFF
+         EGMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775176547; x=1775781347;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MO07hvK4b04lTgujdhZrKlC7UxEyCUQbTf0fJ0M4m9A=;
+        b=XNCFyGmAFopaCX9X0o5dmpBMR4LbX8+nNt2Gth9J7lVyuqO1mwVrMKQp69W2Eq0qCc
+         fruYjzcahCgMhvTr3frd+voaLt2uktmX6QJDxaoUFlnJ09Bxf9fHd3Zd3nEvxUoEpkrk
+         nX0TM9fd3Xwr3E0sGhHaWjhTG84G2q42pyhXRhwPkxe5ZfSZe+71FduUvXd/CIsPGI9L
+         TkaWVDswyFB5/5BjsyFhI2hKeSZrPqbubNKyRMo2ECfZNE5+MVgLfrcz4qZ0KKKmzdTj
+         jeV5xid7CdNE5Qt4dfQX1kFcx4d6MaA/X2eMCFK+BWf9vIFKiCGG0s6m9DHtZ+lw5WNZ
+         MVOg==
+X-Gm-Message-State: AOJu0YwusjYmqmi7RCKc8hfE02d0qPoMRI0IKNZkMQYFEpRem/yk6jnR
+	OospLLR4UacXF5ZQJ/yK1lz0sowvPrvbMvbv3e+NcYA2QuOTnx2+lW9lWFKoLzHBcrZ769FIqIE
+	k/2uEeY4=
+X-Gm-Gg: AeBDievaFUPTspKC2HbLucpoqM9jB1W/zm7WEZyYSMnuQrCq6y8ptgpJiaIHyFzhK4B
+	9Z51p8hqDJERoLexyDLYqs3LwhWztN0ma4SOSxVVXpokfVVa4EQ4rIYGDim7nZ/D7zYc8TsNTGw
+	bEXLF62ezIbjNcJ/PdfiYyEtl/UMSSa/v6JqCwubbw2LhsjwtH8hJIwSTJ+GOHKFkhkuQI6cz+J
+	C8vx9eNCvnvjKc/3X6z0fUwnzO8PWFWRkfavgHGu+/N0DHhrmJOIuNshh0/9B9pStkMmuuwgXgy
+	uG2O8oIXI7/KAy6W4ezOdMT/nEoS/N0y7gjrgjK85daF/lRZFM4fmOfNk8bxIWtJkJyNWQGaqk9
+	OpO9Fk1QKcWevoTpRtPG/sOLXeiBJtWlmaxy5QEqQtDk033v28jZVaEA2EGhMO0pPUGIIpqB96b
+	sFvBbn
+X-Received: by 2002:a17:90b:3f4d:b0:35d:93ff:2859 with SMTP id 98e67ed59e1d1-35de69a6469mr812447a91.22.1775176546864;
+        Thu, 02 Apr 2026 17:35:46 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:49::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35dbe9709b8sm8663348a91.16.2026.04.02.17.35.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Apr 2026 17:35:46 -0700 (PDT)
+From: Joe Damato <joe@dama.to>
+To: netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	linux-kernel@vger.kernel.org,
+	leon@kernel.org,
+	Joe Damato <joe@dama.to>
+Subject: [net-next v8 00/10] Add TSO map-once DMA helpers and bnxt SW USO support
+Date: Thu,  2 Apr 2026 17:35:07 -0700
+Message-ID: <20260403003524.2564973-1-joe@dama.to>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260402-vmscape-bhb-v9-0-94d16bc29774@linux.intel.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [1.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
 	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274793-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TAGGED_FROM(0.00)[bounces-274794-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[37];
-	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[dama.to];
 	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
+	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,suse.com:email,linux.intel.com:mid,nutanix.com:email]
-X-Rspamd-Queue-Id: 2C83A38F8BD
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,dama-to.20251104.gappssmtp.com:dkim,dama.to:mid]
+X-Rspamd-Queue-Id: 2DAA438F8FC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In general, individual mitigation knobs override the attack vector
-controls. For VMSCAPE, =ibpb exists but nothing to select BHB clearing
-mitigation. The =force option would select BHB clearing when supported, but
-with a side-effect of also forcing the bug, hence deploying the mitigation
-on unaffected parts too.
+Greetings:
 
-Add a new cmdline option vmscape=on to enable the mitigation based on the
-VMSCAPE variant the CPU is affected by.
+This series extends net/tso to add a data structure and some helpers allowing
+drivers to DMA map headers and packet payloads a single time. The helpers can
+then be used to reference slices of shared mapping for each segment. This
+helps to avoid the cost of repeated DMA mappings, especially on systems which
+use an IOMMU. N per-packet DMA maps are replaced with a single map for the
+entire GSO skb. As of v3, the series uses the DMA IOVA API (as suggested by
+Leon [1]) and provides a fallback path when an IOMMU is not in use. The DMA
+IOVA API provides even better efficiency than the v2; see below.
 
-Reviewed-by: Nikolay Borisov <nik.borisov@suse.com>
-Tested-by: Jon Kohler <jon@nutanix.com>
-Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
----
- Documentation/admin-guide/hw-vuln/vmscape.rst   | 4 ++++
- Documentation/admin-guide/kernel-parameters.txt | 2 ++
- arch/x86/kernel/cpu/bugs.c                      | 2 ++
- 3 files changed, 8 insertions(+)
+The added helpers are then used in bnxt to add support for software UDP
+Segmentation Offloading (SW USO) for older bnxt devices which do not have
+support for USO in hardware. Since the helpers are generic, other drivers
+can be extended similarly.
 
-diff --git a/Documentation/admin-guide/hw-vuln/vmscape.rst b/Documentation/admin-guide/hw-vuln/vmscape.rst
-index 7c40cf70ad7a..2558a5c3d956 100644
---- a/Documentation/admin-guide/hw-vuln/vmscape.rst
-+++ b/Documentation/admin-guide/hw-vuln/vmscape.rst
-@@ -117,3 +117,7 @@ The mitigation can be controlled via the ``vmscape=`` command line parameter:
- 
-    Choose the mitigation based on the VMSCAPE variant the CPU is affected by.
-    (default when CONFIG_MITIGATION_VMSCAPE=y)
-+
-+ * ``vmscape=on``:
-+
-+   Same as ``auto``, except that it overrides attack vector controls.
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 3853c7109419..98204d464477 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -8383,6 +8383,8 @@ Kernel parameters
- 					  unaffected processors
- 			auto		- (default) use IBPB or BHB clear
- 					  mitigation based on CPU
-+			on		- same as "auto", but override attack
-+					  vector control
- 
- 	vsyscall=	[X86-64,EARLY]
- 			Controls the behavior of vsyscalls (i.e. calls to
-diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-index ba8389df467a..366ebe1e1fb9 100644
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -3087,6 +3087,8 @@ static int __init vmscape_parse_cmdline(char *str)
- 	} else if (!strcmp(str, "force")) {
- 		setup_force_cpu_bug(X86_BUG_VMSCAPE);
- 		vmscape_mitigation = VMSCAPE_MITIGATION_ON;
-+	} else if (!strcmp(str, "on")) {
-+		vmscape_mitigation = VMSCAPE_MITIGATION_ON;
- 	} else if (!strcmp(str, "auto")) {
- 		vmscape_mitigation = VMSCAPE_MITIGATION_AUTO;
- 	} else {
+The v2 showed a ~4x reduction in DMA mapping calls at the same wire packet
+rate on production traffic with a bnxt device. The v3, however, shows a larger
+reduction of about ~6x at the same wire packet rate. This is thanks to Leon's
+suggestion of using the DMA IOVA API [1].
 
+Special care is taken to make bnxt ethtool operations work correctly: the ring
+size cannot be reduced below a minimum threshold while USO is enabled and
+growing the ring automatically re-enables USO if it was previously blocked.
+
+The v8 includes a change suggested by Eric Dumazet in patch 7.
+
+I re-ran the python test and the test passed on my bnxt system.
+
+Running this v8 on a production system with real traffic and toggling USO off
+and on shows an ~84% reduction in DMA maps per second when USO is enabled.
+
+Thanks,
+Joe
+
+[1]: https://lore.kernel.org/netdev/20260316194419.GH61385@unreal/
+[2]: https://lore.kernel.org/netdev/ab1f764b-de03-48f5-a781-356495257d25@redhat.com/
+
+v8:
+  - Zero csum fields on per-segment header copy after tso_build_hdr()
+    instead of on the original skb, avoiding the need for skb_cow_head, as
+    suggested by Eric Dumazet.
+
+v7: https://lore.kernel.org/netdev/20260401233745.2333858-1-joe@dama.to/
+  - Squashed patches 1 and 2 of the v6 into patch 1 of this series, as
+    requested by Jakub.
+  - Added tso_dma_map_completion_state and helpers so that drivers don't call
+    any of the DMA IOVA API directly. See the changelog in patch 1 for
+    details.
+  - Changed the placement of the is_sw_gso field in struct bnxt_sw_tx_bd in
+    patch 6, as request by Jakub.
+  - Updated struct bnxt_sw_tx_bd to embed a tso_dma_map_completion_state for
+    tracking completion state and dropped an unnecessary slot check from patch
+    7.
+  - Added bnxt_min_tx_desc_cnt helper to factor out descriptor counting and
+    use the newly added tso_dma_map_complete from bnxt instead of calling the
+    DMA IOVA API directly in patch 8.
+  - Various fixes to the python test in patch 10: use ksft_variants, socat on
+    the receiving side, and cfg.wait_hw_stats_settle instead of sleep.
+
+v6: https://lore.kernel.org/netdev/20260326235238.2940471-1-joe@dama.to/
+  - Addressed Paolo's request [2] to avoid possible stale iova_state if the
+    IOVA API starts to fail transiently. See patch 8.
+
+v5: https://lore.kernel.org/netdev/20260323183844.3146982-1-joe@dama.to/
+  - Adjusted patch 8 to address the kernel test robot. See patch changelog, no
+    functional change.
+  - Added Pavan's Reviewed-by to patches 6-12.
+
+v4: https://lore.kernel.org/all/20260320144141.260246-1-joe@dama.to/
+  - Fixed kdoc issues in patch 2. No functional change.
+  - Added Pavan's Reviewed-by to patches 3, 4, and 5.
+  - Fixed the issue Pavan (and the AI review) pointed out in patch 8. See
+    patch changelog.
+  - Added parentheses around gso_type check in patch 11 for clarity. No
+    functional change.
+  - Fixed python linter issues in patch 12. No functional change.
+
+v3: https://lore.kernel.org/netdev/20260318191325.1819881-1-joe@dama.to/
+  - Converted from RFC to an actual submission.
+  - Updated based on Leon's feedback to use the DMA IOVA API. See individual
+    patches for update information.
+
+RFCv2: https://lore.kernel.org/netdev/20260312223457.1999489-1-joe@dama.to/
+  - Some bugs were discovered shortly after sending: incorrect handling of the
+    shared header space and a bug in the unmap path in the TX completion.
+    Sorry about that; I was more careful this time.
+  - On that note: this rfc includes a test.
+
+RFCv1: https://lore.kernel.org/netdev/20260310212209.2263939-1-joe@dama.to/
+
+Joe Damato (10):
+  net: tso: Introduce tso_dma_map and helpers
+  net: bnxt: Export bnxt_xmit_get_cfa_action
+  net: bnxt: Add a helper for tx_bd_ext
+  net: bnxt: Use dma_unmap_len for TX completion unmapping
+  net: bnxt: Add TX inline buffer infrastructure
+  net: bnxt: Add boilerplate GSO code
+  net: bnxt: Implement software USO
+  net: bnxt: Add SW GSO completion and teardown support
+  net: bnxt: Dispatch to SW USO
+  selftests: drv-net: Add USO test
+
+ drivers/net/ethernet/broadcom/bnxt/Makefile   |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 176 +++++++++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  32 +++
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  19 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c | 232 +++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h |  39 +++
+ include/linux/skbuff.h                        |  11 +
+ include/net/tso.h                             | 100 +++++++
+ net/core/tso.c                                | 269 ++++++++++++++++++
+ tools/testing/selftests/drivers/net/Makefile  |   1 +
+ tools/testing/selftests/drivers/net/uso.py    | 103 +++++++
+ 11 files changed, 944 insertions(+), 40 deletions(-)
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_gso.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnxt/bnxt_gso.h
+ create mode 100755 tools/testing/selftests/drivers/net/uso.py
+
+
+base-commit: f35340f2d653f1003602878403c901396ab03c17
 -- 
-2.34.1
-
+2.52.0
 
 
