@@ -1,188 +1,167 @@
-Return-Path: <netdev+bounces-275004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275005-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OOncCwKpz2lxywYAu9opvQ
-	(envelope-from <netdev+bounces-275004-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:48:18 +0200
+	id qB6FBGeqz2kPzAYAu9opvQ
+	(envelope-from <netdev+bounces-275005-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:54:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36B8F393CD6
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:48:16 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D8C8393D31
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:54:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1CF123010700
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 11:48:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AFB52300B77D
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 11:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83E9A3B776C;
-	Fri,  3 Apr 2026 11:48:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893CA3BC69C;
+	Fri,  3 Apr 2026 11:54:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aKa+m0+G"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b="wsYXyIz4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 462213AC0DF
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 11:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775216892; cv=pass; b=gmQF2/SGbtCaGqfih4ea2beiFx/R0vk+U12Pkd81NCwwWmiuo4k1LIvPkqT1CxWniv6AEqT9RfiHEOMwwcY+KOjA4Ha4RSzVRuUWO8U1MebUZDDv4TNhJN+8VjRIKd8WZl1ZhE/K3G+0DNMgE9dq88fO4KCVpGYl5DcMIJMGsME=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775216892; c=relaxed/simple;
-	bh=URfO4qXQmNwqn6yWmUmDTG0PuGd0UKqDBdiR0nFIs0o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CaJ1rWo3LI8YwLAwiQdeaZolQEJuqOeSyURgXqjBGiCsXkdlqjZFCwSCNNg1uD4x4azI06ka9cW9qLrYQ3EGduHHIl4uz03TcyDg5oPgtMlXPipWBB11kLZre2i9menAJMeU/D3nGn/0u3jY4Y6iYTnRv383pnJPr4mHeLLaJ0c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aKa+m0+G; arc=pass smtp.client-ip=209.85.160.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-40429b1d8baso681523fac.0
-        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 04:48:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775216890; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YMcJR0ApItRrI95KY1SjaaAm9k69zc+RDGMsmBkk9GafF2ObW9PWmh/CgT1gbK2zsd
-         X+UqIXmYcZUWeCftCQStALWZ58t/VMcZG1j/NWznkFHZVuV3MBMmWAKgCNeBj+WIIdyU
-         xyKkWg4db2dpVLlJVmq0rVVvRSYhwXaqP/FznFTX3xO5Cd+anc+MIpxTm8vqjXEMcHPM
-         16mSZGe4MRiq+Hq2/IM8Y08CQh6Dz3rsklVpY3vSPLhwOWlrcrwMIi3i/VPhIhA1Lk8t
-         9LVCiCCPQ3tg6b5GZI9h0Wh2VKx5ZBWQDpaUqrX7dzttBOIYvDFHlyeJUWW7Jm3y6CYB
-         Edpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=9zwNrIRDyDXomtxBsiInc7L3dN6ekhzZYrvMJHKrhcE=;
-        fh=ysTuxMZKLnjMGblIXQI+S/nyEO1KxUM/nbaD2l/jFBY=;
-        b=WnZ6bZNIdVSAf4ZSQxsw/51MRv77TxxmjRUXtJ2aMKYyXfhxqhEG9STbjTNs4W+LHr
-         yGycpLXpKn8DOsKsj4PG9EArg5cyB1AYsXzFWe2/4Ci3gKM2m5R/GTvZF78ypQAdYzIn
-         cKPVtdqs6+5acdlb1Sl+UBiM/FuoXt8+xFF6/meFZXavvrJs8N6BYpapBXOmz4AdDy+F
-         8kNMQlK9tvSVZsgOK+MNrsnbVK6qnohDm9jztM2a1fd6CUWJAgT9nRjy66D9YlmkUz3B
-         MwtwwW4yhOBD3ng5lxQ59Pj9MeKIQOFzlDeABVohp9V8SQcnNj6fxjz3OiicGFIxwRzk
-         VjIQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8272537F8DB
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 11:53:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775217243; cv=none; b=lFwcZlcVBxX7zz9sC0twT5F3zHJQ1tVFibjHj7SiJ97dotLQRMgYeHcXX4no8l84x61cmpr0GvS83heepoQ70un8KOhE+5nDULrQHPxTkYQzUGJDmLjhPadWlDXTSLZQ7wNcOFZ9w+rC2ayS7+8ZsTDbwQQcTy7HuzbG1f0OGiI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775217243; c=relaxed/simple;
+	bh=Ml/48AoKVgk/lM2IqSkjZTFMh/QvR8o9ecnoDoyG1pA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kYAa0Jb99W3kgFXiRrd8yDeBjj6oH9HXAynNskovW/0EDzKYCZwqV8FZiybaqZ0Uz5U0j0eOu1r5Hwc8f9lqspzjWHYbkFnTK0GmTxoiSrYicBjcRnnsYMNzn/MTEg7oiLuh/a2xSijWSWMuaPYjtLXvKMXzXADi9RcTVJifyP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20251104.gappssmtp.com header.i=@resnulli-us.20251104.gappssmtp.com header.b=wsYXyIz4; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-43b8e8e7432so1525464f8f.1
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 04:53:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775216890; x=1775821690; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9zwNrIRDyDXomtxBsiInc7L3dN6ekhzZYrvMJHKrhcE=;
-        b=aKa+m0+GY2iLL9slBEtgLVhT7mFnRDVZm3O/5OnPDoB5g7V5CJNhQhYPgjNK8XhxOz
-         hvlkHgJbKu+DlDr68MSK71jkYy4KAJLM+R2zJkaD8g/Rtfu/E+7SE/hTgOEqzMRkZ2Wy
-         tYzws9CM7Fv2DWDBQnuLsV8oCX8HhVy881EgK4p13e8e8uDA01fPqCS0oSFwikYFgdB9
-         +A0PloJv/LAmCswn4OFo3y7s58WN78fnl03YTMcATGbL82Gth9y+eS3OSjhwMpehga8J
-         7Nb3+nQ50gDIlYWfe9tZqR35c89udzMUPFMkqwQ1/gufp5bkg3DDxhwMix97DoOMpxYA
-         0D6g==
+        d=resnulli-us.20251104.gappssmtp.com; s=20251104; t=1775217238; x=1775822038; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/P3PGVnIBtbptqa66WcAt07NfhQIaerWQ7Q/aTRRjCU=;
+        b=wsYXyIz4HZQPcUq/lsywkFbTCHM5Rn6wJ1anlgGRLhgN9RsvmzKduJ5Ab1JqGL4dz/
+         fJc8T/e2L/1Y6CiozpQ9z2zBuHys10/JsgEnO7Alew9PJF4wjxqsNjt610OWv+y6bH6F
+         TIrvJTDu+e3LonyPjkM5NHXUgZWauhldrrd8wDhxCo+ns2GnkZGw3Jee805Z1NCNNkwi
+         PGTYUN4L59wmp7/7WxzlBx5z7RL2lrrpG+DVNHcSM2sYTystyoCoQJ2y66BVDtAiXO8i
+         McqsFu5TZE9Xmy+zKo80WtpQitn4OEo4Ky9PRn9e3qx8wCXosBhyDCth/l7DFDyx+cNw
+         7Isg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775216890; x=1775821690;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9zwNrIRDyDXomtxBsiInc7L3dN6ekhzZYrvMJHKrhcE=;
-        b=p93GrqagVV/niUwvejgz/gKCePNoeOJyjfmHRNVIZfHJou9vV4WkIdOVDcBzHHiOWP
-         1nS46s9mSNhTkFQwHYGCmtYrWjbkSl9mqtJDbBSCPSZ0zifUoh+Ax1DhJ40U1a6VTtAR
-         /zDOaBt+ZBDHbn/Ky5kJ0/5xZQtQWbUu5hCVTzNgGIbKKnw1vUciiLB9rQvxTlcXSHD8
-         3jYgpYXYogK02hZxqPo+l3k+GPIGMT2fUB07qmw5Pa/P7o3ocxjYYHAQXS6M4jKEFENN
-         19Tl7jQ4PXkryd4CPIy8WB8kI5L0x0sm3u+phyOMV6oUWNrwcU8LOAtvlLY6HonBusfa
-         DYVA==
-X-Forwarded-Encrypted: i=1; AJvYcCUnzmcRNm3QVEtyC8O34Z8bZaKXneQW7X4ru6acr1ok1sTzsR6d7hdC+zW1DiVuVckRjPJrTMs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4d4TIJfYv2lYhYh63N7624H2i9T6FbfumiCxGIaSve93leUrh
-	ZAur01pyvyQIQKhGMfp/3fNYmsZZ5Pr6BwxGROmWKnO3lWAZVv3cp3jnl7LxEpXxHbf8PUHw115
-	Ueu0cObAnnT02HGKEJSHn201aHesTayQ=
-X-Gm-Gg: ATEYQzw2Pgkj5Hi466HS+J++XDhXWEg6u3CQhu48Zjxqa8/fe0+sjpBSVELbkgnMUd4
-	9LBJhEzdYiXLrt4brDGSBOK492EeujAEUdjHhjjx4mFdQHnCturRIILtpyJlEWoay0hrTFUXCN9
-	jIEuXFKOe0Po+BRRGUvO1gLWQWzmIGHUkUcxMcUAAQFDx4iB0wJTmeGtF8goPV0ulBMJHMRUAnH
-	m+VFlavc650vNO//hcI9f4zifb6fZu259PEQ+gvHOXAxKqchacQOxaHIKAmUjLvWoiCesbptGeJ
-	UKWFBeTu0cQZfRpKlBE3CZ1fRgWeotgfbm4ZQQ==
-X-Received: by 2002:a05:6871:79b:b0:423:1a33:c275 with SMTP id
- 586e51a60fabf-4231a342d07mr837578fac.9.1775216890130; Fri, 03 Apr 2026
- 04:48:10 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1775217238; x=1775822038;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/P3PGVnIBtbptqa66WcAt07NfhQIaerWQ7Q/aTRRjCU=;
+        b=gpjuc/AVcSGisIeixpgcL0bskhgQ/rFeQzbyLub8jKDZfCfzh6mestkQ1zYZMtRE86
+         7hh1jb/ndlHDzazsqdPk+TIGS4MDGmM+TZK5BdjrLJ/xKR/4O9NhgyP/4nBmRhQSUGoq
+         gDLll0jEBpz6xdeLcoCTMTvSOnleZ8nmCncTweuz2ZKO8JZqTNaakszEpqKPDCl8Hk0D
+         o/ZYM3EBMlWt5dH7PPJIoGo/xvlKdTuQ/LVUC/pRHLWeSfF8/u+IzVsYx3AcutpppGcE
+         UCtaZXqNV6DJz2/ps8Rt3LJQplzB4QNB6lQC8U80K7fcn3SrY38mFTRLfb9hQaCqpEbz
+         ZgUQ==
+X-Gm-Message-State: AOJu0YzpI9LbkW78ZLH707U0VRWKoj4CEaQ9IDZ6g2sLJyBoQgH7msSo
+	5QymJJ7YeMN9isWccZf3CZHNY6SdzCrjgf1PZRT7G1tzkPd7Xtprf/3aXDH1I+0BlEg=
+X-Gm-Gg: AeBDieuT/q/oyLtboOE7lUGT1cztDbkrVJnQTUye2iXduuNQM9qAJNE73kBVdKAkHOz
+	3oN1wLvAIxJP1eDq+ZjnunHqv7Vl7PvfaEtZKQ59n2hLD7y2EVTzhYYDJQq8Ibg5OhN7nDq7Vgo
+	3PbClU+9bocepu92AiYdOG722xasDZBleenuB/9rPXnRZviOGdx7L/O/x7ChNZGQrTzN9iksTj1
+	w9Kore3uD/mt8cFFRnwloc5QjKDYItRqh5h5m5pNQ26dHeTR+TZfbytn1mMrTlE/YcPO5i2m/9a
+	4I1Ne5UKuYDGiGCBpP2pmmCxBnJIR5ti5vKMqs6yxXbJLyJRs2T3udto5PpCcKAmo0HEEmwfdst
+	IEb1H+tMg3CMlYndIuJ4undneY10SgDz7FjgZ9UyEGvQMnbAu/CZq+0JJSDieYshP3H8G/SFYmy
+	89HigT/d1zBpmDqANYTjhPUC7ysM0oD6kLdb/+9KD9YQ==
+X-Received: by 2002:a05:6000:2586:b0:43b:8f04:2ee1 with SMTP id ffacd0b85a97d-43d292daa45mr4482680f8f.27.1775217237109;
+        Fri, 03 Apr 2026 04:53:57 -0700 (PDT)
+Received: from FV6GYCPJ69 ([2001:1ae9:6084:ab00:dc3:ce9a:4aaa:6bb8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e4f843dsm14846357f8f.37.2026.04.03.04.53.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Apr 2026 04:53:56 -0700 (PDT)
+Date: Fri, 3 Apr 2026 13:53:53 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	intel-wired-lan@lists.osuosl.org, poros@redhat.com, richardcochran@gmail.com, 
+	andrew+netdev@lunn.ch, przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com, 
+	Prathosh.Satish@microchip.com, ivecera@redhat.com, arkadiusz.kubalewski@intel.com, 
+	vadim.fedorenko@linux.dev, donald.hunter@gmail.com, horms@kernel.org, pabeni@redhat.com, 
+	kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH v5 net-next 3/8] dpll: extend pin notifier and netlink
+ events with notification source ID
+Message-ID: <5wacj2o5m7knwtc7vxws4xct4ogpitrwnmrtvtsdn73blddsql@natpxrbsaske>
+References: <20260402230626.3826719-1-grzegorz.nitka@intel.com>
+ <20260402230626.3826719-4-grzegorz.nitka@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260403110238.16596-1-devnexen@gmail.com> <CANn89iJiB6QQ6qPQSnXLOqG_NhsqV-5J5ndSyKcf27pN3EeiMw@mail.gmail.com>
-In-Reply-To: <CANn89iJiB6QQ6qPQSnXLOqG_NhsqV-5J5ndSyKcf27pN3EeiMw@mail.gmail.com>
-From: David CARLIER <devnexen@gmail.com>
-Date: Fri, 3 Apr 2026 12:47:58 +0100
-X-Gm-Features: AQROBzAV-cZ7Lwo6cZ6k65vh0g1kAjYjcFfMc1jdULr6qoX4UM3ku51haJ1XjHk
-Message-ID: <CA+XhMqyYo8WwCwRg2kUv=HNo0bGXe+kOTDFH8rg2keDFJmvxhg@mail.gmail.com>
-Subject: Re: [PATCH] net/sched: act_nat: fix inner IP header checksum in ICMP
- error packets
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org, 
-	stable@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260402230626.3826719-4-grzegorz.nitka@intel.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[resnulli-us.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275004-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-275005-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[resnulli.us];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.osuosl.org,redhat.com,gmail.com,lunn.ch,intel.com,microchip.com,linux.dev,kernel.org,davemloft.net,google.com];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiri@resnulli.us,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[resnulli-us.20251104.gappssmtp.com:+];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 36B8F393CD6
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,resnulli-us.20251104.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: 6D8C8393D31
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi eric,
+Fri, Apr 03, 2026 at 01:06:21AM +0200, grzegorz.nitka@intel.com wrote:
+>Extend the DPLL pin notification API to include a source identifier
+>indicating where the notification originates. This allows notifier
+>consumers and netlink listeners to distinguish between notifications
+>coming from an associated DPLL instance, a parent pin, or the pin
+>itself.
+>
+>A new field, src_id, is added to struct dpll_pin_notifier_info and is
+>passed through all pin-related notification paths. Callers of
+>dpll_pin_notify() are updated to provide a meaningful source identifier
+>based on their context:
+>  - pin registration/unregistration uses the DPLL's clock_id,
+>  - pin-on-pin operations use the parent pin's clock_id,
+>  - pin changes use the pin's own clock_id.
+>
+>As introduced in the commit ("dpll: allow registering FW-identified pin
+>with a different DPLL"), it is possible to share the same physical pin
+>via firmware description (fwnode) with DPLL objects from different
+>kernel modules. This means that a given pin can be registered multiple
+>times.
+>
+>Driver such as ICE (E825 devices) rely on this mechanism when listening
+>for the event where a shared-fwnode pin appears, while avoiding reacting
+>to events triggered by their own registration logic.
+>
+>This change only extends the notification metadata and does not alter
+>existing semantics for drivers that do not use the new field.
+>
+>Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+>Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 
-On Fri, 3 Apr 2026 at 12:38, Eric Dumazet <edumazet@google.com> wrote:
->
-> On Fri, Apr 3, 2026 at 4:02=E2=80=AFAM David Carlier <devnexen@gmail.com>=
- wrote:
-> >
-> > Update the inner IP header checksum when rewriting addresses
-> > inside ICMP error payloads, matching netfilter's nf_nat_ipv4_manip_pkt(=
-)
-> > behavior.
-> >
-> > Fixes: b4219952356b ("[PKT_SCHED]: Add stateless NAT")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: David Carlier <devnexen@gmail.com>
-> > ---
-> >  net/sched/act_nat.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/sched/act_nat.c b/net/sched/act_nat.c
-> > index abb332dee836..cd1d299da57c 100644
-> > --- a/net/sched/act_nat.c
-> > +++ b/net/sched/act_nat.c
-> > @@ -242,7 +242,9 @@ TC_INDIRECT_SCOPE int tcf_nat_act(struct sk_buff *s=
-kb,
-> >                 new_addr &=3D mask;
-> >                 new_addr |=3D addr & ~mask;
-> >
-> > -               /* XXX Fix up the inner checksums. */
-> > +               /* Update inner IP header checksum after address rewrit=
-e */
-> > +               csum_replace4(&iph->check, addr, new_addr);
-> > +
->
-> ~20 years old code, are we sure this fix is needed?
-> How was this patch was tested?
->
-> A selftest would be great.
-
-Ok sounds fair
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
