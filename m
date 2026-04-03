@@ -1,346 +1,289 @@
-Return-Path: <netdev+bounces-275057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275058-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IC09FqnGz2lH0QYAu9opvQ
-	(envelope-from <netdev+bounces-275057-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 15:54:49 +0200
+	id 8GqaBTLGz2lH0QYAu9opvQ
+	(envelope-from <netdev+bounces-275058-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 15:52:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB25E394BAE
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 15:54:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C9D9394B70
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 15:52:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B657F30BE14F
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 13:50:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 24D083055947
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 13:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA38301486;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48AA2EC086;
 	Fri,  3 Apr 2026 13:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="BaEdaPFs"
+	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="a9vyhkXj"
 X-Original-To: netdev@vger.kernel.org
-Received: from LO0P265CU003.outbound.protection.outlook.com (mail-uksouthazon11022076.outbound.protection.outlook.com [52.101.96.76])
+Received: from TY3P286CU002.outbound.protection.outlook.com (mail-japaneastazon11010054.outbound.protection.outlook.com [52.101.229.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94B23195FC;
-	Fri,  3 Apr 2026 13:50:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.96.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D5F283CBF;
+	Fri,  3 Apr 2026 13:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.229.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775224248; cv=fail; b=NdbgCgOovZkIorRb84MvPbf2ZkzCOpcHEl3dtz4JLsg8cYRQBKFZcmgOStWSYTbxABOa96X7r4wktiGSksHS0Im+OzZYAROk2/XE4W2EgBp+6TpH0OAVNTwIUEj+YWG3ZVsInL52qG2eDWqJdrimHEq+g5Us7LFj1SBWWhYtDOY=
+	t=1775224249; cv=fail; b=pGbogRJj65A3L0d3QOARL6FtLbkvptyLUGub3moX8+raRcYqaZfKdaGwtn56lRZW5DeAonf1DMqWIgIw/4w7kTAy3qU5531lVfhWHAgs7z5WCTz5Sx0FIzzWGiDIOor0tVJ4rTmio8N7gBiORFYNLw+ivRD1uVk9bJEA/HxYKfo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775224248; c=relaxed/simple;
-	bh=u/Mp3NEkDJTO551AF3f74Y9mO0RNoffslVcPLoSzUlQ=;
-	h=Content-Type:Date:Message-Id:Cc:Subject:From:To:References:
-	 In-Reply-To:MIME-Version; b=D1CV3xXW3u8LdxaQtKsD2B/mRA4kHBGZ5qs63HksiUcVHDfKRzYXXTqIxK1mCdj7leRBvDw+AId9xl4gGZnnT2n6CDJlWvQW3kjhmdYTXSP+ZNfSuWRlWz0k9D+YtOoSVtvz4bfsBetk5c2noOQGSr/VBQa/pLsxECjfV0d/w0Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=BaEdaPFs; arc=fail smtp.client-ip=52.101.96.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
+	s=arc-20240116; t=1775224249; c=relaxed/simple;
+	bh=Q4MCNTFp7hKKDiPxcyY9EGpIjGk0hFW1mXBsZy9Ch+E=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=hwvZu84LTNQN1IhKoteGdd48HM+vQDwuyqePaPOPIn1vL6bUUXOu2CPO524zntscRBIsRSfd/2kN2ZzEAHfo7lE2+BtDUKnE5ZaOaYvx6Z2liq+j39a5um0KL6z7jeVMwUFVGyUWEblk1kPitH8srkabAxk2RNdK1vwTOPpF/5A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=a9vyhkXj; arc=fail smtp.client-ip=52.101.229.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=For7Mu5J4qT5DrlolwEREOQ0fsjaxOYlIU9DRbVCcM045EOcy8Wh56lZbCl5xwIglmNAoPtJofAGdRqfAk2Ih8w+2zLAq0IWKnF0+BvH949hZpH8MA1cw8JJUMkUINRb2c+6ft7Ur/m98LK+ug1fiAZy+Y/Njq/kaZpSKbQp1kRn5LspzHrXnh77ZuB/whj3sTMQ3RrRYt+FYY/POCCSBYQq2IyyqX97ZnnzFk6AIpMj1oNVDbVFkpkhU/QuO6yYpaXhUKqBE+QwXNN6tR+bW/KiBEomkVKVO+8rm2aVmnZPyqfk5ky9fepQ4aepYF9M19jjmqgli6tXV2bOW29eqw==
+ b=ZqTT/e7GyqUJL7GfeWbabfHxTTMayxpilOYtUGX7oz7J5JUApDYJfS6wlGy2GqpsXLfbIO2MFoEc9J/hmIYP62KzWh1FlAuq4PJcovpdVqUoFMc/46Hb7Rgp4bCCK9IZF7bHyOkXRai0TLsVFHtIV8b004UGKhNGElgZCK1WrMdKgfjSqkGwU/OJFDHWx8ztyqV86VdCBUWQCPctcB+TllWy80FgdvWFimQl5jrpQKif1H4rZ0kVRz1og0EJfNYsQfT64peM6N/OPFq9YUpmEhe1eieL6/WBPY42ueF7SU8z5Afhg8jDaUhcgTXEZVriIdKMPHzClFVXzGGxOlhGOg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=b+85aZHT3Q/aT1j3ih8ZA8LqUq/NZIvlhXip4s7bXHk=;
- b=ciJpynuen8omBeerwJ3L2VZLn2YSKfbul8ih4EVEwP+vwq+katwJqXp2R+VUOszh0TwnGWQKHP5QVn6wwexdTRjfkKQDuNg2BSto9h/ANKPikB8NT4l8G+yyitAgPfq9CrvkmVEsdjOvvJQd9QFty+M9GiTeYhltOSZUJyKbWI7ayOM2uVapxQFostyo6qm/7nJuGuXe9lYpEYR2h2ja0tpAH13lHW1LJkBEVQjoAFVYlIkJPWz56KmbekP0Xl1OWcIztQHNu6RqjJxfVn8MusnNXsyNb5niWcOLNImvcBKvkideXzBkT/2k56SMXm4PbwlxFGj1cLDSsH5DDtdaoA==
+ bh=Fo4wE9bBG2yFf8qyrrIIwNy7lkcXolzcWP1J0iXKFNE=;
+ b=NyLvY4XPgeG7WXGCLMgaXA92z71/EhHWo+qmrkRA72U2+q30fYulzIE8+8KK+0RTzgvvXaDWLHtGqSLd4uBakUigoa3IqOO2FjJaypjmVEINVfwfpW9O34FFdSvKdHghnS7CSGNV53NB8lMBCo4oswrn64aH+82wNNTwd07PeCg5wuWfNN5A4kHJXyCH3Cb5PhLIUNsV8sPA+p/5sZkWJ4j8vFsfLarOZmZcZVSggrFlA9T0aYFNZdAc9oM1ZU7NXuVNyLKZQhoXHcK4GR+MNE/50wJt33AHOBmBG8QRRnLbmZsJkrUaIwluCSbA0+mDeps1fotdNYIPuD8bISY35Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
+ dkim=pass header.d=renesas.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b+85aZHT3Q/aT1j3ih8ZA8LqUq/NZIvlhXip4s7bXHk=;
- b=BaEdaPFsG+uw0468r7Ji3hDJIhJY+dNWlmCvZAuIp4XnmrlICCTTRsFSW8MHrCftWIME+4+vGdapHfTvLibWHcXuhKi4LO/SZEHcQpfwupuVeQPCvMgrMgP8FrqWe6rVx7OAvlHynnmsp9yISu43PnIZOM7e4ixyJnBc6u373Gk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=garyguo.net;
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:488::16)
- by LO3P265MB2169.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:105::9) with
+ bh=Fo4wE9bBG2yFf8qyrrIIwNy7lkcXolzcWP1J0iXKFNE=;
+ b=a9vyhkXjr/+GXzbhxgWJlYl5nvISNYBRK9ea+0ZYDkvSVihlTNFYHk1Tf/sSi5AWe0eYIdmdFx7J1KaG5qf5X86XMH1K5V14wPsSxduVh4Dh1vOLToZRuTgJD2JD5ytqltNRdcGEGp9wnnI2g2/9uDK54bbclIkYn7MyzsAdHKk=
+Received: from TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM (2603:1096:405:38d::6)
+ by TYYP301MB1126.JPNP301.PROD.OUTLOOK.COM (2603:1096:405:10a::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.20; Fri, 3 Apr
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.20; Fri, 3 Apr
  2026 13:50:33 +0000
-Received: from LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986]) by LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1c3:ceba:21b4:9986%4]) with mapi id 15.20.9769.016; Fri, 3 Apr 2026
+Received: from TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM
+ ([fe80::5b4b:dd0c:b302:7911]) by TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM
+ ([fe80::5b4b:dd0c:b302:7911%5]) with mapi id 15.20.9769.015; Fri, 3 Apr 2026
  13:50:33 +0000
+From: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
+To: Biju Das <biju.das.jz@bp.renesas.com>, "andrew@lunn.ch" <andrew@lunn.ch>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>, "linux@armlinux.org.uk"
+	<linux@armlinux.org.uk>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
+Subject: RE: [PATCH net] net: phy: micrel: Fix MMD register access during SPD
+ in ksz9131_resume()
+Thread-Topic: [PATCH net] net: phy: micrel: Fix MMD register access during SPD
+ in ksz9131_resume()
+Thread-Index: AQHcw1uO2X7KYPO6jU26NrM/2Ym+OrXNSVkAgAAFtHCAAAgHAIAAAMXw
+Date: Fri, 3 Apr 2026 13:50:33 +0000
+Message-ID:
+ <TY7P301MB198479332A7A0C00451120EDD35EA@TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM>
+References: <20260403111738.37749-1-ovidiu.panait.rb@renesas.com>
+ <TYCPR01MB11332623A3F7FF4601FE8C35C865EA@TYCPR01MB11332.jpnprd01.prod.outlook.com>
+ <TY7P301MB198462DF309670467625AD40D35EA@TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM>
+ <TYCPR01MB113320392754A3B42F78A9FC5865EA@TYCPR01MB11332.jpnprd01.prod.outlook.com>
+In-Reply-To:
+ <TYCPR01MB113320392754A3B42F78A9FC5865EA@TYCPR01MB11332.jpnprd01.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=renesas.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TY7P301MB1984:EE_|TYYP301MB1126:EE_
+x-ms-office365-filtering-correlation-id: e53686af-e0f0-4863-6778-08de9187fa17
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700021|56012099003|22082099003|18002099003;
+x-microsoft-antispam-message-info:
+ s0vU9LBjg7P/TuJXK+pI3Pe1coGlWQWIzPEHtV2AVeDCsjoDLJHUPcgHUfK8QKWlALIfSDITknNVjtZ+dIpNjODxm8O/JROVFqWhCL/EJAQ3cMp4LXJAtq2oVb8pNZdnUAgfFirW1TcS1HKp2qMJ4+w2CW0I5/tikwB0U1KtNIC7f4LUFQVio7gkqcfM5pZNCOq/9mEGfTaErzqbP/MO3T+FSdPyoEZ2X7cKRLTOSNCrC+sJTIglUt/eQMMK0nOBCnCyX026zGHHsHt6jeTxDKm0v8Ddi4pPyt1o4pRVdWMluv2nUrqSGY17WSBcKwfxoCO4jmoFH6gJX3OOat3jPEkbDvBCw0qj4uUmAq/u6I6NXxT/3WegTEFE5ZzENhUi5kfEt2wknQ/OdHlIeNFuF5q82F2OyYdlP5I1s28jB0zZyWdKgLg+s6LE8eE3Mi+PQTCaZdtYnfsrCEPQJs9W4cNrvY4f1UfIslJIeByrd23I8RTkMznqmcWPGP6mG+Ya+FBc/rsqv1dQbN0D/L9XLXpBQM8hfDqjQVgYfxlKXiNwqFh6fiRqdeLrPwkMT/8dWQOEJ+veQQkELP1tJCLXhf1f8tQDoVJDmDHnGQUUvCevNt/vtubDMvBP7Exj2IMsInrteYwglUxhLKneowqHV1GrmvHFzoO35qY9TlWm/93ZM/Vf5pxZn/CZF0OJKyNsszd5P5VnECRXibY9imHQ264E461+TqwX0/3HsiuuZH2aTUlEq8hnZjDdgJAhEbtg
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700021)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?4EeArEn/kDjvSnXyRWYKJNkzhsgdIDzv9z6XxN2774g9GnCdwbZBeODmzsrh?=
+ =?us-ascii?Q?DzsS3akHrQ1Nxb4cd9jKn0dzt3YQCgY4uKY3egyhZkNACyX2VTUCgx6bDwnu?=
+ =?us-ascii?Q?DuE91IaIR5gt0i5g9QssgvGYMgd9LnsqCiy9bhCiuodpt12FvlesSYkbcIDE?=
+ =?us-ascii?Q?fsLX5X29WQxCaofMHVLXemzTWDG6ltLrjxJ/lUuPe3cxWF4ml2dzDNLVkzgM?=
+ =?us-ascii?Q?lEnNRmgWynpXIFFJZahg4PU8aEBGcE4SBeVu8IexljfGI6KnPIEFHwGu6e1b?=
+ =?us-ascii?Q?mXiEWbo8X9iii0A9AjBd8bfomHmKe60qaUa9viRnF+DbKfhjbtbZ5CgFWeiZ?=
+ =?us-ascii?Q?0LeHnIevfMx3/3T3kB1PBNyh8KCopHUyJUXysDIt3nfZmaZrAHTv+2n/an+j?=
+ =?us-ascii?Q?nKe/wuE6Tinkj5O1gexuTBE/sQ/RTNB0fIvPTQd5xUBQ79pvvRN5wQ51FKSB?=
+ =?us-ascii?Q?VaB5EmtYFD/Gg8v7qYLTZvoVCIDbT/wSZBKVBF6LlXEMSMQ/54T72W14kzni?=
+ =?us-ascii?Q?GIQfGbE9S/3c/rf3LdFmZ3Ds1d17G3k3zPokjbKLbwkZBtiN6O/ZqKsBxCFd?=
+ =?us-ascii?Q?vPYa09ZSEtVu3O5pOy2Vec4JTx9/jHLU7Lk4vpN4S3WSxzIH8Wlfav+GdKvt?=
+ =?us-ascii?Q?QWVrEkqo1b5zwqGFFJ4g0WGS+fKzZvM6VxDvwILDoHm7wKPZeXJthH9y4gmj?=
+ =?us-ascii?Q?xKBAjrIthlMy/cU4/z52/dKaJr+ZS8WRg/U4dXq+9nMJKIMgvsnaMjmkReVt?=
+ =?us-ascii?Q?AnhBEw0BlUTGlveneth2eW/4ve0LguAx2PjshVsR5OYx75x7B2pJLTvAFGhG?=
+ =?us-ascii?Q?3U/xFIWib6eMkeyTJNPuWqqsJcwApo86a9uQzA5apCR050giyRKoy4FDZzJj?=
+ =?us-ascii?Q?UvFh8IbPFcYvG3XbXY1V9lejYmdkihPn9u94PuIVW+2OOnJEFYlu9dVunuIA?=
+ =?us-ascii?Q?EN5mSQePJ5oc7Uo7YJlbNFzrEv5kRh8xzWgfCsnwmOqLQQ8JKTe8qWa7rhIa?=
+ =?us-ascii?Q?dtXPlEH9lgbTuiNXkmFdMzVlla5Mz5LOxyshSEyDENIoqMOSeTnKVwKvkpWa?=
+ =?us-ascii?Q?clozodbThSfBxrWZjRtG7ylP05Ljzbx475yYSkMbCq/R8Z5vjHojKKf+fRN/?=
+ =?us-ascii?Q?+uiSrdXXp83Ka1azUiFTnTVU3PcQggAa7KadP90yKWSWDL2tMyfSg4HvORgc?=
+ =?us-ascii?Q?OobpA9Akw5Z7eN7P/8b1eqWdi2pjAdh5RzeE+d9Pv05YEG8XjpbrXM1UeHU2?=
+ =?us-ascii?Q?PMwKNEvE/mjISoaY9ShfqdUfbro6XFbRD8fMpC9uIS1gCnhz7kblwvuxJkDo?=
+ =?us-ascii?Q?V4exfsUNQTKB1QR/kOCMTvKyBE3sGrTUJSQzZjM+/CjpD129qi5+KZTsLrJ4?=
+ =?us-ascii?Q?oaUwS0RuKVQkcRK0l9uXW3M4zojmPh1/tml6hnFbhnALylqyIvG8iiDN1D3B?=
+ =?us-ascii?Q?0ZVAfHQColWgCg8clhjE3hzLDl0684qm27+EbmGpUz/dRmOlZrrHqzI9OQAa?=
+ =?us-ascii?Q?r35As6Rz4S9fkQBfm611CXFUhH0jUiD9HKoWKrbLs36ecGzn0i5iKjZdM8k+?=
+ =?us-ascii?Q?/PU/CczWCu7vFYg1yLTKa7y/uXgG6HrlxOix02xI5NSvuqlO0/HPHl45uPhW?=
+ =?us-ascii?Q?E1+tdB5ZOdioSjn35M7zEmq5AvSStGoO4dO/Tt1AaGBRi90S4uzqQ6dW2kuL?=
+ =?us-ascii?Q?IGMQ6ORgavHxHGquYzjmYFSNRyfs9Z61NuOfmsUwrutpv4Ybd60NX3US9ofq?=
+ =?us-ascii?Q?CbSPRzk5U/B1zYN/k7UEkn2zbiXRGwk=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 03 Apr 2026 14:50:32 +0100
-Message-Id: <DHJKGY0F52GL.14FQPOWWO0F77@garyguo.net>
-Cc: <netdev@vger.kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
- <andrew+netdev@lunn.ch>, <horms@kernel.org>, <jes@trained-monkey.org>,
- <chenhuacai@kernel.org>, <kernel@xen0n.name>, <tsbogend@alpha.franken.de>,
- <James.Bottomley@HansenPartnership.com>, <deller@gmx.de>,
- <maddy@linux.ibm.com>, <mpe@ellerman.id.au>, <npiggin@gmail.com>,
- <chleroy@kernel.org>, <hca@linux.ibm.com>, <gor@linux.ibm.com>,
- <agordeev@linux.ibm.com>, <borntraeger@linux.ibm.com>,
- <svens@linux.ibm.com>, <bhelgaas@google.com>, <dakr@kernel.org>,
- <kwilczynski@kernel.org>, <ojeda@kernel.org>, <boqun@kernel.org>,
- <gary@garyguo.net>, <bjorn3_gh@protonmail.com>, <lossin@kernel.org>,
- <a.hindborg@kernel.org>, <aliceryhl@google.com>, <tmgross@umich.edu>,
- <ebiggers@google.com>, <ardb@kernel.org>, <tiwai@suse.de>, <tytso@mit.edu>,
- <enelsonmoore@gmail.com>, <martin.petersen@oracle.com>,
- <jirislaby@kernel.org>, <gregkh@linuxfoundation.org>,
- <geert@linux-m68k.org>, <herbert@gondor.apana.org.au>,
- <vineethr@linux.ibm.com>, <lirongqing@baidu.com>, <kshk@linux.ibm.com>,
- <vadim.fedorenko@linux.dev>, <dong100@mucse.com>,
- <wangruikang@iscas.ac.cn>, <hkallweit1@gmail.com>, <kees@kernel.org>,
- <loongarch@lists.linux.dev>, <linux-mips@vger.kernel.org>,
- <linux-parisc@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
- <linux-s390@vger.kernel.org>, <linux-pci@vger.kernel.org>,
- <rust-for-linux@vger.kernel.org>
-Subject: Re: [PATCH net-next] eth: remove the driver for acenic / tigon1&2
-From: "Gary Guo" <gary@garyguo.net>
-To: "Jakub Kicinski" <kuba@kernel.org>, <davem@davemloft.net>
-X-Mailer: aerc 0.21.0
-References: <20260402183029.1236713-1-kuba@kernel.org>
-In-Reply-To: <20260402183029.1236713-1-kuba@kernel.org>
-X-ClientProxiedBy: LO4P123CA0621.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:294::21) To LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:488::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LOVP265MB8871:EE_|LO3P265MB2169:EE_
-X-MS-Office365-Filtering-Correlation-Id: a403a136-a0ab-4411-1c28-08de9187fa24
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|10070799003|7416014|376014|56012099003|22082099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	WJEsDgxR/9xWNh1HFrejYaoiIoC+Qx0DZzyFr/kdZXc5xbuveigxyERg0B2PA1e73p4DZi0gXjP1xGYV5r2OGoEJ9LlHwoD7szLZ+bpF7c0vjwAajIg09VBlGTR1oQSZwLbDLc+l5DoYDG2d717su1gzvyZn7kC3pJ4+8CQyg+KTQBaIR4z/n2UI9V2UdUJOCvc7WnvIwH+WGb443WXnBC01Rvv3s0WPJ2BW0sK3Uii2ZJh4YjrOaz2jhUGf14LuSTCU9C/UqX0Jt8yZ97qvTqxmxT6fK6OlyGH+dfuEiXej+K5e0DsPJvhAaJivluCOB/cTHaRI8Id0tvps3Z/KmVl3YcS9tdgP9z+7cF9iTt+n15qbtcdullKYdHzmm04owK17JVgZNPRxMbsJ0YvDgzaRtTYtj6+dAzd2tfZ6l91bQ9ZF9hA7Bj1t8EJjhZyvxY2khHA3CRuVoqK5sZu9vwi2XgW36/d9zaVDMDroJiZuvMaA3gDoycsTDvvGvqQg1YntNnh625bqz8cROL6+BIq6pqWoxsoWH72/q8WNvvdFLIvfxqrOdZnFHRN3QN1EHplvTtc8Ho/Dq9mgTnaKM+ct6PoBr21ohjpRAvPk6w7Vm782rZQJrtRx7CfctSoZEr40DNerr4Jlct+J0IEJgWd4VTfXVvjfWQRUBbw5PBm/ha2Tjgtci2N7yukd6lW78KlhUQ1AaCkpuqz/9M6zlYQGikzL7/djiSDRJVzHE+M=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(10070799003)(7416014)(376014)(56012099003)(22082099003)(18002099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Qjd3VjdJUzBoTFB0SjhGeXhIUmJVSml4NCtraHBwdGNYV0M3WG0wOGR4R2xF?=
- =?utf-8?B?MkViZGE5dVhYdVRWL2tJemU1NzZQZjFZSUFPUzN6T2g5SEoxWUJJYnlWN2dY?=
- =?utf-8?B?S0dhb0hjTjh5a29BL3l4Y3Q2b0dGemFYbldmVTBQWVBXd1ZvT2RjbG44ZG5v?=
- =?utf-8?B?UkJ3blRycEQ5Z3Nwc2tCazM5NHM0M1ZOTDFmN0R4UmVhL3A0ay81clVPdEox?=
- =?utf-8?B?RE1wQXFBZ0FuZmI0RFpNd3lTVVNST1ZPU2tPQXZqZVNFMitaN3R1UkRSWm14?=
- =?utf-8?B?cU1kVzNDUksxQklRZUdTb1JMUE1KTUZvL0dyaExGVW5wY0pnZXVhNGhJTlY1?=
- =?utf-8?B?SExHYnY0WE0yVEowLzNrSitZOU5qUU1sNFVlaHNabFB1cVE5SEtaK2ZVdkVF?=
- =?utf-8?B?WUJadEJwL0hPVDlOelNqT2tFNE5Qa1FJZkZQb096M0JhRmRaSktZWjFTZnpJ?=
- =?utf-8?B?dUNEcitZQkNJZmMxWGFNWGdKUWpSQTRWNW1ycC85Tkg1RkM4cUpTSDNMWWll?=
- =?utf-8?B?TzNtUWFISENybEpjNUVvNEEwQnpSKzZCL3VUbXNsMmJ5WkEzRVgybFFVbUNh?=
- =?utf-8?B?cVRDT3JaQU9STjZLTGNMVlJMQ3gyWEJpWnlVVU01M3pEbHBvQVdGUnRHc25S?=
- =?utf-8?B?N0dLUXF5SUprK2g4RjZVNURnd2pKT3BQMHBFWHo4bTV5dXBzdk5SdmZ5c2ZQ?=
- =?utf-8?B?Z1MwYml4d3VFcWkrL25vdGd5aEJIZkVmelJNM0tlczg3czZ2NGNEdlo0YWdW?=
- =?utf-8?B?WVZub0J6TDV3VmxESDVWRkZuMHpXNS8ydkc3OWNZZGlGK2E4TjkySFhKU3h2?=
- =?utf-8?B?MkN5WFFkcU5FNjN6R2hkL1BUVU9oa28wRmpFN1hpZjBlb2JLd3lVdmZCZ2Zu?=
- =?utf-8?B?ZFJPakFGalBTWjltWGtHREhhS0YrNEFsTlcweWJFODdqcXl5dXlRRzc3c0cy?=
- =?utf-8?B?dmJLaHlJZzJTQmVCSHRodE9mWVlFOWQ5eU1OOHBWdFM2ZEdoMFNXQnZiZmlE?=
- =?utf-8?B?N2JCN1JKTWhoUmphV2tJbFZiaDBzaUNHbHgyZGppdHdSdTlmSDVYRGhJbHdW?=
- =?utf-8?B?aWRlUlZZbmtrNFB5N2NyVlNNOW5MMWZGUDIxajRBVHNzY29XeGVUTWJjRENS?=
- =?utf-8?B?OW9QLzc4NThySGc1TTFmNG1waUV3c1h3cVI3Q1U4RUlXanJoMHVsTWVIaFFB?=
- =?utf-8?B?NmpwV0NkSlMvMlBrMktMTlFPeGI2Q0I2R1EwQ2p0eU00OWZOdFBmSzlFNmRn?=
- =?utf-8?B?NUpvSkc5am9YUi9kNnVSRldzRldsanpTb2FuRDh3TlM5OHVoRGJOSjBwdWJI?=
- =?utf-8?B?QjBhZk9OQTNiVTVkZjJJWW0zVUhYbitLTi9LbTUyanpsMnZEdnVkNmlLQUtY?=
- =?utf-8?B?bHJvUmVwTVM2RHh2NmZzYnBxNFNsNWM1WWlXWUFvWWZuODM5eGJza29KbmFS?=
- =?utf-8?B?TldvLzBVQlFPeXBCeGFwL3NXMm84d0o1OTZIU3U5d3Z3S2srZWRqZkNaU2FH?=
- =?utf-8?B?angrK0NUTUxCWGcvZlFJbmdrazFmbGhFWG1waDZOTi94Z1VRV2c5cU1Bc2pU?=
- =?utf-8?B?NDlQTm5ZczMzUUpxT3BCUlFrdkVzV0JXaEtmR1JTcDM3SDdUNWx2blVKZnRL?=
- =?utf-8?B?SXZxWDVMc2w1S2s1bzJxTnB1UjUwL1k1UFhLd0JPOTE5bXZveStoRWQvbFJM?=
- =?utf-8?B?eTRBalJHQkx1S1liNzZra09Pd1FOQkVCbHlxdkd4N3RZZzErNnljS3lZYk5Y?=
- =?utf-8?B?dTRsc3d5b3ZCcXdJNHVYdFpkS003VUY1eldwcFhIUmsxYkNXaWNpRm9HaEVI?=
- =?utf-8?B?UlVaQTN0WG43cXRic3IyRjlieUlNSSsrRnZSWm9SUWpCS0FXamNvWEhQUmdW?=
- =?utf-8?B?dEsyYkZkT1RKSzE4MDUrLythUnJpSWU0RUFrSTF4MjQwdkt5ci9lbjZQNEgy?=
- =?utf-8?B?UkM0R0JZQ1ppbHNQVW5tRkVDWndsa2xGeXZHS3c5Yk54ai9RTUNRazVZaHg2?=
- =?utf-8?B?OXp3ZTN5dFR2WGk5NWg3Mmg2VjMrSVF3UFFyd3k4eDdhU29hNVF0Q2RnOXk4?=
- =?utf-8?B?dTFiR0ZmQnJkZzRnQ252ZjA3V0VwdWg3c3l3TjVPd0JGY3FCSzZCQ0p0ZGhD?=
- =?utf-8?B?aWRJTmt4Y01abUovaTU2WUtYUDZ6M1o4MlBnV21WZU80QlpSNDFERFFadkVO?=
- =?utf-8?B?WlJ4S0VjNkN5QWxUSHhyRVEzbEZPcTQ5VzJkVnV6THY2RHNteE11YjRHNTAr?=
- =?utf-8?B?SXFtYWhRUUVzZGg2ZFh6ek15aFZLSzk3NS9EZkoyZGZRRmJNZ2VjTGtVTTd2?=
- =?utf-8?B?Nyt6RU5LYkJoREVuN3hvNTN3Z3pMWDlDOE42ZG52WjJYRkNmNVJUdz09?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: a403a136-a0ab-4411-1c28-08de9187fa24
-X-MS-Exchange-CrossTenant-AuthSource: LOVP265MB8871.GBRP265.PROD.OUTLOOK.COM
+X-OriginatorOrg: renesas.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2026 13:50:33.7339
+X-MS-Exchange-CrossTenant-AuthSource: TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: e53686af-e0f0-4863-6778-08de9187fa17
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Apr 2026 13:50:33.5602
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4lys3wC0wRiT08h7J/HhggPTBCPA/6j5xitxdtoNyW5doFIQ8AW6NrklewKMekg0KHPiunkBvube/Dc/lNzXzg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO3P265MB2169
-X-Spamd-Result: default: False [1.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yod3Y5netbUIMt/maFeiU8WnNUCHuY4Xzt3WnaaAHlZgYSHYsaLT3xFI1lVAhuLfoMXD9TxjU/xXwmmzP7vzDpbXcrcj9SzJGFzB0SzSpYs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYYP301MB1126
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[garyguo.net,none];
-	R_DKIM_ALLOW(-0.20)[garyguo.net:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[renesas.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[renesas.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,trained-monkey.org,xen0n.name,alpha.franken.de,HansenPartnership.com,gmx.de,linux.ibm.com,ellerman.id.au,gmail.com,garyguo.net,protonmail.com,umich.edu,suse.de,mit.edu,oracle.com,linuxfoundation.org,linux-m68k.org,gondor.apana.org.au,baidu.com,linux.dev,mucse.com,iscas.ac.cn,lists.linux.dev,lists.ozlabs.org];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275058-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275057-lists,netdev=lfdr.de];
+	FREEMAIL_TO(0.00)[bp.renesas.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[garyguo.net:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
 	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[renesas.com:+];
+	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[gary@garyguo.net,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[ovidiu.panait.rb@renesas.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[58];
-	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-0.998];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: DB25E394BAE
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[microchip.com:url,renesas.com:dkim,renesas.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,TY7P301MB1984.JPNP301.PROD.OUTLOOK.COM:mid]
+X-Rspamd-Queue-Id: 5C9D9394B70
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu Apr 2, 2026 at 7:30 PM BST, Jakub Kicinski wrote:
-> The entire git history for this driver looks like tree-wide
-> and automated cleanups. There's even more coming now with
-> AI, so let's try to delete it instead.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: jes@trained-monkey.org
-> CC: chenhuacai@kernel.org
-> CC: kernel@xen0n.name
-> CC: tsbogend@alpha.franken.de
-> CC: James.Bottomley@HansenPartnership.com
-> CC: deller@gmx.de
-> CC: maddy@linux.ibm.com
-> CC: mpe@ellerman.id.au
-> CC: npiggin@gmail.com
-> CC: chleroy@kernel.org
-> CC: hca@linux.ibm.com
-> CC: gor@linux.ibm.com
-> CC: agordeev@linux.ibm.com
-> CC: borntraeger@linux.ibm.com
-> CC: svens@linux.ibm.com
-> CC: bhelgaas@google.com
-> CC: dakr@kernel.org
-> CC: kwilczynski@kernel.org
-> CC: ojeda@kernel.org
-> CC: boqun@kernel.org
-> CC: gary@garyguo.net
-> CC: bjorn3_gh@protonmail.com
-> CC: lossin@kernel.org
-> CC: a.hindborg@kernel.org
-> CC: aliceryhl@google.com
-> CC: tmgross@umich.edu
-> CC: ebiggers@google.com
-> CC: ardb@kernel.org
-> CC: tiwai@suse.de
-> CC: tytso@mit.edu
-> CC: enelsonmoore@gmail.com
-> CC: martin.petersen@oracle.com
-> CC: jirislaby@kernel.org
-> CC: gregkh@linuxfoundation.org
-> CC: geert@linux-m68k.org
-> CC: herbert@gondor.apana.org.au
-> CC: vineethr@linux.ibm.com
-> CC: lirongqing@baidu.com
-> CC: kshk@linux.ibm.com
-> CC: vadim.fedorenko@linux.dev
-> CC: dong100@mucse.com
-> CC: wangruikang@iscas.ac.cn
-> CC: hkallweit1@gmail.com
-> CC: kees@kernel.org
-> CC: loongarch@lists.linux.dev
-> CC: linux-mips@vger.kernel.org
-> CC: linux-parisc@vger.kernel.org
-> CC: linuxppc-dev@lists.ozlabs.org
-> CC: linux-s390@vger.kernel.org
-> CC: linux-pci@vger.kernel.org
-> CC: rust-for-linux@vger.kernel.org
-> ---
->  MAINTAINERS                                 |    6 -
->  drivers/net/ethernet/Kconfig                |    1 -
->  drivers/net/ethernet/alteon/Kconfig         |   47 -
->  drivers/net/ethernet/Makefile               |    1 -
->  drivers/net/ethernet/alteon/Makefile        |    6 -
->  drivers/net/ethernet/alteon/acenic.h        |  791 -----
->  include/linux/pci_ids.h                     |    2 -
->  drivers/net/ethernet/alteon/acenic.c        | 3178 -------------------
->  arch/loongarch/configs/loongson32_defconfig |    1 -
->  arch/loongarch/configs/loongson64_defconfig |    1 -
->  arch/mips/configs/cavium_octeon_defconfig   |    1 -
->  arch/mips/configs/loongson2k_defconfig      |    1 -
->  arch/mips/configs/loongson3_defconfig       |    1 -
->  arch/mips/configs/malta_qemu_32r6_defconfig |    1 -
->  arch/mips/configs/maltaaprp_defconfig       |    1 -
->  arch/mips/configs/maltasmvp_defconfig       |    1 -
->  arch/mips/configs/maltasmvp_eva_defconfig   |    1 -
->  arch/mips/configs/maltaup_defconfig         |    1 -
->  arch/mips/configs/mtx1_defconfig            |    1 -
->  arch/parisc/configs/generic-32bit_defconfig |    1 -
->  arch/parisc/configs/generic-64bit_defconfig |    1 -
->  arch/powerpc/configs/44x/akebono_defconfig  |    1 -
->  arch/powerpc/configs/g5_defconfig           |    2 -
->  arch/powerpc/configs/powernv_defconfig      |    2 -
->  arch/powerpc/configs/ppc64_defconfig        |    2 -
->  arch/powerpc/configs/ppc64e_defconfig       |    2 -
->  arch/powerpc/configs/ppc6xx_defconfig       |    1 -
->  arch/powerpc/configs/skiroot_defconfig      |    2 -
->  arch/s390/configs/debug_defconfig           |    1 -
->  arch/s390/configs/defconfig                 |    1 -
->  rust/kernel/pci/id.rs                       |    1 -
->  31 files changed, 4060 deletions(-)
->  delete mode 100644 drivers/net/ethernet/alteon/Kconfig
->  delete mode 100644 drivers/net/ethernet/alteon/Makefile
->  delete mode 100644 drivers/net/ethernet/alteon/acenic.h
->  delete mode 100644 drivers/net/ethernet/alteon/acenic.c
->
-> [...]
->
-> diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
-> index 406abf629be2..8608361fac95 100644
-> --- a/include/linux/pci_ids.h
-> +++ b/include/linux/pci_ids.h
-> @@ -1809,8 +1809,6 @@
->  /* formerly Platform Tech */
->  #define PCI_DEVICE_ID_ESS_ESS0100	0x0100
-> =20
-> -#define PCI_VENDOR_ID_ALTEON		0x12ae
-> -
->  #define PCI_SUBVENDOR_ID_CONNECT_TECH			0x12c4
->  #define PCI_SUBDEVICE_ID_CONNECT_TECH_BH8_232		0x0001
->  #define PCI_SUBDEVICE_ID_CONNECT_TECH_BH4_232		0x0002
->
-> [...]
->
-> diff --git a/rust/kernel/pci/id.rs b/rust/kernel/pci/id.rs
-> index 50005d176561..dc2035a4c175 100644
-> --- a/rust/kernel/pci/id.rs
-> +++ b/rust/kernel/pci/id.rs
-> @@ -428,7 +428,6 @@ fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Res=
-ult {
->      TRANSMETA                =3D bindings::PCI_VENDOR_ID_TRANSMETA,     =
-           // 0x1279
->      ROCKWELL                 =3D bindings::PCI_VENDOR_ID_ROCKWELL,      =
-           // 0x127A
->      ITE                      =3D bindings::PCI_VENDOR_ID_ITE,           =
-           // 0x1283
-> -    ALTEON                   =3D bindings::PCI_VENDOR_ID_ALTEON,        =
-           // 0x12ae
->      NVIDIA_SGS               =3D bindings::PCI_VENDOR_ID_NVIDIA_SGS,    =
-           // 0x12d2
->      PERICOM                  =3D bindings::PCI_VENDOR_ID_PERICOM,       =
-           // 0x12D8
->      AUREAL                   =3D bindings::PCI_VENDOR_ID_AUREAL,        =
-           // 0x12eb
 
-Does the PCI ID needs to be removed? There was a similar change that I reca=
-lled
-and the discussion eventually leads to ID not being removed.
-https://lore.kernel.org/all/20260123033233.16906-1-enelsonmoore@gmail.com/
+> >
+> > Hi,
+> >
+> > >
+> > > Hi Ovidiu Panait,
+> > >
+> > > Thanks for the patch.
+> > >
+> > > > -----Original Message-----
+> > > > From: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
+> > > > Sent: 03 April 2026 12:18
+> > > > Subject: [PATCH net] net: phy: micrel: Fix MMD register access
+> > > > during
+> > > SPD in ksz9131_resume()
+> > > >
+> > > > During system suspend, phy_suspend() puts the PHY into Software
+> > > > Power-
+> > > Down
+> > > > (SPD) by setting the BMCR_PDOWN bit in MII_BMCR. According to the
+> > > KSZ9131 datasheet, MMD register
+> > > > access is restricted during SPD:
+> > > >
+> > > >   - Only access to the standard registers (0 through 31) is
+> supported.
+> > > >   - Access to MMD address spaces other than MMD address space 1 is
+> > > >     possible if the spd_clock_gate_override bit is set.
+> > > >   - Access to MMD address space 1 is not possible.
+> > > >
+> > > > However, ksz9131_resume() calls ksz9131_config_rgmii_delay() before
+> > > > kszphy_resume() clears BMCR_PDOWN. This means MMD registers are
+> > > > accessed
+> > > while the PHY is still in SPD,
+> > > > contrary to the datasheet.
+> > >
+> > > SPD mode: This mode is used to power down the device when it is not i=
+n
+> > > use after power-up.
+> > >           Previous register settings are maintained during and
+> > > following the removal of SPD.
+> > >
+> > > Suspend to Idle case, it is in SPD mode and the MMD register values
+> > > are retained.
+> > >
+> >
+> > On resume from s2idle, ksz9131_resume() calls
+> ksz9131_config_rgmii_delay() which does MMD accesses,
+> > while the PHY is in SPD. According to the datasheet, it shouldn't
+> happen. See commit e398822c4751
+> > ("net: phy: micrel: populate .soft_reset for KSZ9131") which fixes the
+> same issue.
+>=20
+> On my board, while s2idle in SPD mode, it does not hang. The datasheet
+> does not explain
+> the behaviour when it is SPD mode. But it states that it retains all
+> previous register values
+> when it is out of SPD mode.
+>=20
 
-That said, if the decision is to remove the IDs, then the Rust change is ok=
-ay to
-me
+According to the KSZ9131 datasheet ([1]):
 
-Acked-by: Gary Guo <gary@garyguo.net> # Rust
+4.17.3 SOFTWARE POWER-DOWN MODE (SPD)
+...
+The following remain operational during SPD:
+MII Management Interface
+- Only access to the standard registers (0 through 31) is supported.
+- Access to MMD address spaces other than MMD address space 1 is
+  possible if the spd_clock_gate_override bit is set.
+- Access to MMD address space 1 is not possible.
 
-Best,
-Gary
+
+The spd_clock_gate_override bit is not used in the KSZ9131 driver.
+
+While the datasheet does not specify exactly what happens if registers
+from an unsupported address space are accessed while the PHY is in SPD,
+I think it is correct for the driver to not do it in the first place.
+
+[1] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductD=
+ocuments/DataSheets/00002841D.pdf
+
+Thanks,
+Ovidiu
+
+
+> >
+> > > But in Suspend to RAM, PHY loses power and the reset value of Power
+> > > Down bit 0 (ie normal mode), there is no restriction for accessing MM=
+D
+> > > registers in this mode.
+> > >
+> >
+> > If the PHY loses power, it loses all the configuration that was done by
+> ksz9131_config_init(). Right
+> > now, only the RGMII delays are restored, which is a subset of the
+> configurations done by
+> > ksz9131_config_init().
+>=20
+> I agree, Only RZ/G3E reported this issue and with configuring only delays=
+,
+> it worked.
+>=20
+> Calling ksz9131_config_init() restores more MMD registers or call
+> phy_init() like this patch.
+>=20
+> Cheers,
+> Biju
 
