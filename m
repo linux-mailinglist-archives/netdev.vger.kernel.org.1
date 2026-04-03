@@ -1,101 +1,109 @@
-Return-Path: <netdev+bounces-275157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275158-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iJDKCMT8z2nt2AYAu9opvQ
-	(envelope-from <netdev+bounces-275157-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:45:40 +0200
+	id YNmUDkf+z2kr2QYAu9opvQ
+	(envelope-from <netdev+bounces-275158-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:52:07 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77FB03971ED
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:45:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 332153972AF
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:52:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 29768304CEA0
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 17:42:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3BC46308853F
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 17:50:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A85323D34B9;
-	Fri,  3 Apr 2026 17:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326F03D34A9;
+	Fri,  3 Apr 2026 17:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Mh84Q3qV"
+	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="Cx21TSn/";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="PgQ4FC4D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f227.google.com (mail-qt1-f227.google.com [209.85.160.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393E72FD665
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 17:42:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA723A9D85
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 17:50:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775238166; cv=none; b=oqA3kYdiO7ngvM54IpwPcDnhfMWpJtokQfOhNSK6K85IFiQUipyYoQpHkdEa90n0/OebJk+eovo386CnAzcSl81JbChDLdnw5RFLtigCSCxROQXveipsTb0mH0L5IHK9eiHyqdbdTmcRp8x71EBp9ZKt+4lxvCSfz0VbtJcNqdk=
+	t=1775238612; cv=none; b=g732HSW9cV/z+LVTCtduw3/8u1Yrtkr8sqmGiVwhWzYglAijBr+18yPAllb7oNWq4eoF2jniujyIEv6czKUHjuLPAMplkjXN96js2TLdjpTQnaEglZOTaixwUYI5Y3pdwef7q69pNLn0JCPQXpFKuPOpwBXLYZBBq+an42ynuqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775238166; c=relaxed/simple;
-	bh=tAGSpXhdVDSX8wYYXotCgauFP4oRTrKJ6O66vUCaq0g=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=FWZqplQ4pHHrct8M1YUs54H0kmu6a+/llKXtKKgzsYldCxMR5GS4q+Ey4DEOq/KP8hojLNPCJY3ou2PcWCxZbNAyBy8MglwX8YZH58wEDfIC1rRhd1+Y921AmH533TsA7iDSACK4IJQY9OajwPz0Y0K9/BTe79f1KM2ups7RigE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Mh84Q3qV; arc=none smtp.client-ip=209.85.160.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f227.google.com with SMTP id d75a77b69052e-5094e1d17d3so22476151cf.3
-        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 10:42:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775238164; x=1775842964;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SvahecaH4ymg3e/cRaPdM/4xoBXYGz6dVojdP7GAtmY=;
-        b=hP5/JaaPVXiJUUGXrXjq86FHKslpMR1jlVjQtuSbJi26Rt7r/M0Uqf3bcNuwWgyP3/
-         k0WDMWcDwusZEPr/FGpgRHSgqavFeiRZ2R1id8lEYZMJNIM4hlmykW1fDsfo8LLC/hF9
-         iYT/6hHrX+CTZ4Zjg2rOlK198dgcAuV/amDc41xEmHwV6eH1yh+BOgOm1cQeiW6sQ7v7
-         C3EwhXiusH1Tmcph8n9I3ksIVEpt71YQlunL0OlO8pX0dPW0vNvb/PIo/QLhZt2M0ESC
-         yWVNsGpA+p7RFIXavdSPd9wcXGaJAMw/Cfp/MfJqczFBeCNDwG4yV5MsIP9JqS9FehWJ
-         owQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVOEStpSYX+PZrDvV5ZjYtP3K89HIuNF7FjRnkwXBZrZSlZoa0xzp+88Gld/iCLkk5zSh5BPxk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxO0nZdWZGtsdpdJIvZSeprUf32+inLTWxVVoK9Q+SbctK+T1hX
-	7N9vWYec6r89fY4uWqOTBy6qY4QyE7qBa648+xZdRoesVkYa9Ij0SGt6UuVCdYBramOtAKpS03e
-	IJWPeig4Q8f51baot2Sr7ZvsRFZa0Zj0f/CN57Gb6e78RN7NHZSZogJ8LArNN8V6655bFbknH5l
-	JfTwWPjvU89LptDEFzSIv17zmqRMvaIxfo/kx0A6ymW5IWghH6PXLlv7WNHjdp2lg8FNi8D1C/P
-	QUPquk3gLE=
-X-Gm-Gg: ATEYQzy4K20Krb7pZTvsSLxhvGrs/miKAYhYxPtVxVD68mrWmU7pSrZxCE6rLej5Uiu
-	I8abG4RPbyTejzKEbYTWwiiIFdkpPzfogzeDoiisdYOrlenYwgAZGGGdvRWAKwoWMtpG92mrHTw
-	p09rBlu8gb3CQq4ISLPNI8xJ6iShXyjLXCtBZUbZTTKxNMLlMOD8rxUaaDkmKq6grBXgwbAH9Mk
-	JUhP9eJk/vLbpY9Gk7vidSLwh2ZUdtitl6RJ+0LHZLZR30BpkgzGRwl6LLaN8A2LmsEeXKrnsca
-	IFgDEbX49RxjvI1ZcFCmUz0a7lKtVbzLwxGpA/PhP78uj39HVVCTdX2kr3nJ+QVmk4J+jUpdaD4
-	wmSX+ke2BtrmSfuVOjSfjs7oDi5M+Fp68DZKDa4izRtVTctBluBvkuVXZ311LblxyW7K2BoSWre
-	27JOewcOmQO5kULd0wKFncCEDJzzp5gTx6hiqo2QwccXCF87rTnq2PpaG+
-X-Received: by 2002:ac8:7e91:0:b0:4ff:c08a:52c4 with SMTP id d75a77b69052e-50d62772eb2mr59928001cf.18.1775238163958;
-        Fri, 03 Apr 2026 10:42:43 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-24.dlp.protect.broadcom.com. [144.49.247.24])
-        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-50d712c0eccsm443721cf.21.2026.04.03.10.42.43
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 03 Apr 2026 10:42:43 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dl1-f69.google.com with SMTP id a92af1059eb24-127133794b6so3166825c88.1
-        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 10:42:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1775238162; x=1775842962; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SvahecaH4ymg3e/cRaPdM/4xoBXYGz6dVojdP7GAtmY=;
-        b=Mh84Q3qVVrGxGiFZ62hu3GdzXTPhhpgeamzbxS+OX/9ry1Qz2DxGhCoc5zH1wcKt42
-         /1/sessotTZ0YuIOXVL2hbSYE/GQb7GAcU1e5hls+m0LJpEC7KDSBdOfZgXuON+amPdf
-         ldKsSHB9vplgt2FRb43GZ5YgvPPZdY5PlkqxM=
-X-Forwarded-Encrypted: i=1; AJvYcCVYGio86LVBv5iiaSQC7rNCeveSFsEn8FSBdxKfBCfqRZjOCm6+8nkL41UUxkRdw2X/+cZ0Qp4=@vger.kernel.org
-X-Received: by 2002:a05:7022:929:b0:119:e56c:18be with SMTP id a92af1059eb24-12bfb7986f7mr1657144c88.38.1775238161764;
-        Fri, 03 Apr 2026 10:42:41 -0700 (PDT)
-X-Received: by 2002:a05:7022:929:b0:119:e56c:18be with SMTP id a92af1059eb24-12bfb7986f7mr1657126c88.38.1775238161050;
-        Fri, 03 Apr 2026 10:42:41 -0700 (PDT)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12bedd4e4e3sm4660164c88.1.2026.04.03.10.42.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2026 10:42:40 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
-To: mkubecek@suse.cz,
-	kuba@kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] ethtool: Add 2 new link_ext_state names
-Date: Fri,  3 Apr 2026 10:42:00 -0700
-Message-ID: <20260403174200.1180275-1-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.45.4
+	s=arc-20240116; t=1775238612; c=relaxed/simple;
+	bh=AsnCHbWUF7HKHjz4azgtfqv+O8MqtxyOyazCBNIvOyQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JjfFj9JmLYENaWw83+g2GigAzJ/ejpjIoqRZGVGOa6d2gmnD/4XWxKwUED2t1zYounB2hOPMXy109Z0+G67bL+4CP8aJ4yVlPvRHrOoeqNpliQNd/Y3Nv+NfFlwFNLA4ioHTOPi87sG0Hk0YxyGN0CtpsZgvfn9U7qH4zlgIlX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=Cx21TSn/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PgQ4FC4D; arc=none smtp.client-ip=202.12.124.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 39AA77A01E1;
+	Fri,  3 Apr 2026 13:50:08 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Fri, 03 Apr 2026 13:50:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1775238608; x=1775325008; bh=ozRnCihEa8oWt/rTa2glc
+	YJ93V/2Yec+2w/1wOET/Sg=; b=Cx21TSn/kLFgdQw9AuyFDUwYe56P13tzOtIEa
+	GT1ROybl+7rzz5GPwzoyKd0B/ZM0nltdaHaqERGEUdJXLeObkFtnJKdefThAoYL1
+	SNi6fNGVETWPryZuTaocg5F8ut3rq1CDJsazXLmIFpSGBYQMjL/IyBY+TSdhsyDP
+	+VMfxEhzXG2dT1dYlZ/KDMEnwZMutsyMmE24/MaRzZvWErCHpj9n4jiCmIP1RHOv
+	GWuwVQ226QesfB8bq7no7k3LroA77kz0Ds4dKWIALJmbxjSnBEsx/IADW3LEUTmU
+	uyN0x2cabmFSDbpx0Fyy3QkIwzgrAR9Xu1OB0lO0ZzGQMjRAA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1775238608; x=1775325008; bh=ozRnCihEa8oWt/rTa2glcYJ93V/2Yec+2w/
+	1wOET/Sg=; b=PgQ4FC4D3Gqt2aI4c959hTjLtn2Ah8nUtO52dWrIuKmSQcfqMmk
+	8YjvN8kQbQYEu8gVO+g+AIqtQdXIv/rfjrJMNHPTpfNncMCmxZTg4HPJCqE0SDBX
+	o3JQL1WqupJq8DcxxfZtV5YtJgbxt5mkI5P9yxEkL68F2FjyDUrsujy3mmCF0sha
+	QflQ75hCxPCJJKlNO5zf8GFxDQ+WJlXNht49PMhbSCLu/vPHONE9Mvhd3vLoj3qJ
+	vAahUxL5mGhI+yOkEzzj7UvkMqnOipEniOzicZzvBVAYR+whl7wqgHwDBG2MhwPD
+	MQMF3i5yxb8eO+1sgKjDkHIuyUslP0RU0nw==
+X-ME-Sender: <xms:z_3Pafc9Tb06E1OZn8EHSHmtI9ACzrsRsXmjydwX2QilQLBiLH_k9A>
+    <xme:z_3PaaIB0F7JecatV14Li4OHN3PqTUDsJ4MiB0mINupc9nj5pAkAhx8V1N7qw3szN
+    ZRFm-OEd9vfbod3ULQU1uXSA-9D4svXvAiAeFIeu5eqC4glJhmzB4Cf>
+X-ME-Received: <xmr:z_3Pacxt4L6A4E9EojNdKTDBvywNXO838EGaTq615E5nlUxePHoFjrXitZs>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdelheekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
+    ephffvvefufffkofgggfestdekredtredttdenucfhrhhomheptehlihgtvgcuofhikhhi
+    thihrghnshhkrgcuoegrlhhitggvrdhkvghrnhgvlhesfhgrshhtmhgrihhlrdhimheqne
+    cuggftrfgrthhtvghrnhepheduiedvieefffduueelgeehuefhleekuefffeeiheeuhfet
+    jedtvefffefgfeegnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhitggvrdhkvghrnhgv
+    lhesfhgrshhtmhgrihhlrdhimhdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtph
+    houhhtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphht
+    thhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrse
+    hkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
+    pdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhgthh
+    grphhmrghnsehkrghtrghlihigrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgv
+    rhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlihgtvgesihhsohhvrghlvghnth
+    drtghomhdprhgtphhtthhopehshiiisghothdotghifegvuggvrgeitdgrgeegvddvhegu
+    vggtsehshiiikhgrlhhlvghrrdgrphhpshhpohhtmhgrihhlrdgtohhm
+X-ME-Proxy: <xmx:z_3PaQu-5RnAKlZskY38VCx9A-HM3jkPtCvRsq7nGa8RCKB0egVExw>
+    <xmx:z_3PafDIuvSx6LlIJqbX59H0SUZYSaRyoiltcgclnd4jhj2tfaGh9Q>
+    <xmx:z_3PaSEVG9miGN_NsKn2_ERDDAw4xuKSsSUNg_29Jw2Jya7ywAjmkQ>
+    <xmx:z_3PafDdlVH5oXjn64x2wd8DL8PzD0e-J7pvlK55i7tqb5-H9gxCiQ>
+    <xmx:0P3PaVqLGkFlH-rzkQO0b1Amp7DiFhlqAqEdaBDdUwZ-7kd0nwOl2Ryb>
+Feedback-ID: i559e4809:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 3 Apr 2026 13:50:04 -0400 (EDT)
+From: Alice Mikityanska <alice.kernel@fastmail.im>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	James Chapman <jchapman@katalix.com>,
+	netdev@vger.kernel.org,
+	Alice Mikityanska <alice@isovalent.com>,
+	syzbot+ci3edea60a44225dec@syzkaller.appspotmail.com
+Subject: [PATCH net-next] l2tp: Drop large packets with UDP encap
+Date: Fri,  3 Apr 2026 20:49:49 +0300
+Message-ID: <20260403174949.843941-1-alice.kernel@fastmail.im>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,66 +111,133 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm2,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275157-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[michael.chan@broadcom.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275158-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TO_DN_NONE(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 77FB03971ED
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev,ci3edea60a44225dec];
+	FREEMAIL_FROM(0.00)[fastmail.im];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,messagingengine.com:dkim,fastmail.im:dkim,fastmail.im:mid]
+X-Rspamd-Queue-Id: 332153972AF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add the corresponding names for 2 recently added ethtool_link_ext_state
-enums from kernel commit bc87b14594e3:
+From: Alice Mikityanska <alice@isovalent.com>
 
-ETHTOOL_LINK_EXT_STATE_OTP_SPEED_VIOLATION
-ETHTOOL_LINK_EXT_STATE_BMC_REQUEST_DOWN
+syzbot reported a WARN on my patch series [1]. The actual issue is an
+overflow of 16-bit UDP length field, and it exists in the upstream code.
+My series added a debug WARN with an overflow check that exposed the
+issue, that's why syzbot tripped on my patches, rather than on upstream
+code.
 
-for OTP (one-time-programmable) speed restrictions and
-BMC (Baseboard management controller) forcing the link down.
+syzbot's repro:
 
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+# {"procs":1,"slowdown":1,"sandbox":"","sandbox_arg":0,"close_fds":false,"callcomments":true}
+r0 = socket$pppl2tp(0x18, 0x1, 0x1)
+r1 = socket$inet6_udp(0xa, 0x2, 0x0)
+connect$inet6(r1, &(0x7f00000000c0)={0xa, 0x0, 0x0, @loopback, 0xfffffffc}, 0x1c)
+connect$pppl2tp(r0, &(0x7f0000000240)=@pppol2tpin6={0x18, 0x1, {0x0, r1, 0x4, 0x0, 0x0, 0x0, {0xa, 0x4e22, 0xffff, @ipv4={'\x00', '\xff\xff', @empty}}}}, 0x32)
+writev(r0, &(0x7f0000000080)=[{&(0x7f0000000000)="ee", 0x34000}], 0x1)
+
+It basically sends an oversized (0x34000 bytes) PPPoL2TP packet with UDP
+encapsulation, and l2tp_xmit_core doesn't check for overflows when it
+assigns the UDP length field. The value gets trimmed to 16 bites.
+
+Add an overflow check that drops oversized packets and avoids sending
+packets with trimmed UDP length to the wire.
+
+syzbot's stack trace (with my patch applied):
+
+len >= 65536u
+WARNING: ./include/linux/udp.h:38 at udp_set_len_short include/linux/udp.h:38 [inline], CPU#1: syz.0.17/5957
+WARNING: ./include/linux/udp.h:38 at l2tp_xmit_core net/l2tp/l2tp_core.c:1293 [inline], CPU#1: syz.0.17/5957
+WARNING: ./include/linux/udp.h:38 at l2tp_xmit_skb+0x1204/0x18d0 net/l2tp/l2tp_core.c:1327, CPU#1: syz.0.17/5957
+Modules linked in:
+CPU: 1 UID: 0 PID: 5957 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full)
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:udp_set_len_short include/linux/udp.h:38 [inline]
+RIP: 0010:l2tp_xmit_core net/l2tp/l2tp_core.c:1293 [inline]
+RIP: 0010:l2tp_xmit_skb+0x1204/0x18d0 net/l2tp/l2tp_core.c:1327
+Code: 0f 0b 90 e9 21 f9 ff ff e8 e9 05 ec f6 90 0f 0b 90 e9 8d f9 ff ff e8 db 05 ec f6 90 0f 0b 90 e9 cc f9 ff ff e8 cd 05 ec f6 90 <0f> 0b 90 e9 de fa ff ff 44 89 f1 80 e1 07 80 c1 03 38 c1 0f 8c 4f
+RSP: 0018:ffffc90003d67878 EFLAGS: 00010293
+RAX: ffffffff8ad985e3 RBX: ffff8881a6400090 RCX: ffff8881697f0000
+RDX: 0000000000000000 RSI: 0000000000034010 RDI: 000000000000ffff
+RBP: dffffc0000000000 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffff520007acf00 R12: ffff8881baf20900
+R13: 0000000000034010 R14: ffff8881a640008e R15: ffff8881760f7000
+FS:  000055557e81f500(0000) GS:ffff8882a9467000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000033000 CR3: 00000001612f4000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ pppol2tp_sendmsg+0x40a/0x5f0 net/l2tp/l2tp_ppp.c:302
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ sock_write_iter+0x503/0x550 net/socket.c:1195
+ do_iter_readv_writev+0x619/0x8c0 fs/read_write.c:-1
+ vfs_writev+0x33c/0x990 fs/read_write.c:1059
+ do_writev+0x154/0x2e0 fs/read_write.c:1105
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f636479c629
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffffd4241c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
+RAX: ffffffffffffffda RBX: 00007f6364a15fa0 RCX: 00007f636479c629
+RDX: 0000000000000001 RSI: 0000200000000080 RDI: 0000000000000003
+RBP: 00007f6364832b39 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f6364a15fac R14: 00007f6364a15fa0 R15: 00007f6364a15fa0
+ </TASK>
+
+[1]: https://lore.kernel.org/all/20260226201600.222044-1-alice.kernel@fastmail.im/
+
+Reported-by: syzbot+ci3edea60a44225dec@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/69a1dfba.050a0220.3a55be.0026.GAE@google.com/
+Signed-off-by: Alice Mikityanska <alice@isovalent.com>
 ---
- netlink/settings.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/l2tp/l2tp_core.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/netlink/settings.c b/netlink/settings.c
-index 05d215e..b5e44f2 100644
---- a/netlink/settings.c
-+++ b/netlink/settings.c
-@@ -671,6 +671,8 @@ static const char *const names_link_ext_state[] = {
- 	[ETHTOOL_LINK_EXT_STATE_POWER_BUDGET_EXCEEDED]	= "Power budget exceeded",
- 	[ETHTOOL_LINK_EXT_STATE_OVERHEAT]		= "Overheat",
- 	[ETHTOOL_LINK_EXT_STATE_MODULE]			= "Module",
-+	[ETHTOOL_LINK_EXT_STATE_OTP_SPEED_VIOLATION]	= "OTP speed violation",
-+	[ETHTOOL_LINK_EXT_STATE_BMC_REQUEST_DOWN]	= "BMC request down",
- };
+diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+index c89ae52764b8..157fc23ce4e1 100644
+--- a/net/l2tp/l2tp_core.c
++++ b/net/l2tp/l2tp_core.c
+@@ -1290,6 +1290,11 @@ static int l2tp_xmit_core(struct l2tp_session *session, struct sk_buff *skb, uns
+ 		uh->source = inet->inet_sport;
+ 		uh->dest = inet->inet_dport;
+ 		udp_len = uhlen + session->hdr_len + data_len;
++		if (udp_len > U16_MAX) {
++			kfree_skb(skb);
++			ret = NET_XMIT_DROP;
++			goto out_unlock;
++		}
+ 		uh->len = htons(udp_len);
  
- static const char *const names_autoneg_link_ext_substate[] = {
+ 		/* Calculate UDP checksum if configured to do so */
 -- 
-2.51.0
+2.53.0
 
 
