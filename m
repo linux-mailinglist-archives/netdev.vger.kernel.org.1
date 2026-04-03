@@ -1,66 +1,72 @@
-Return-Path: <netdev+bounces-274957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274958-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wJSTIYaDz2mwwwYAu9opvQ
-	(envelope-from <netdev+bounces-274957-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 11:08:22 +0200
+	id AMynHQaEz2n4wwYAu9opvQ
+	(envelope-from <netdev+bounces-274958-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 11:10:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC44C392969
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 11:08:15 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D6B8392A02
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 11:10:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5BD2C301DEC2
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 09:07:58 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 652303048631
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 09:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 912953845C6;
-	Fri,  3 Apr 2026 09:07:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C05238A285;
+	Fri,  3 Apr 2026 09:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="JnJtS1st"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="pPogtjpf"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB4D3859CE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBD6386458;
 	Fri,  3 Apr 2026 09:07:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775207276; cv=none; b=Ca1amWDVZKIG2TUTiTi15qiCeiuTmuQ1NEj6BZ6K/2wQPVHI472JCN52DjT8FFpGyYUP4c6cB8UoS8iXEw5/hI0WB7QGoJbSTpymbQ5AUgImfoZDiB4qQDHccMrwiABBTgF+yszCOr0DER/jvrTflEiYdgM+5QiBIhnVAD+qJX8=
+	t=1775207278; cv=none; b=Fjo7ffQTPx06XU3vsu1ojhTb2CSXQskEXB95Fb1mRhCUW7liouDUTNww8ziEQu1pgk93wG1q+hW+IrKyqVC8l0bX0lzAop99tDEGBz2NhJxxIAbVfMoPVwPeAfODJAsAhu8cprq2NlC7Q0ZKEItQlu0M+c8g7VNz5TUXw5eJeoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775207276; c=relaxed/simple;
-	bh=Jil8SCpCHIG8fcwJ6NpAU99pU3A40fanjCMqhBKrx2w=;
+	s=arc-20240116; t=1775207278; c=relaxed/simple;
+	bh=Ou3V0Yq9IiL+x5/jL9G2V0wQDpGIAZCQtkYrgVs3H8g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EbJ++hTP9+PiTwVirhNi1d9jmpiiLmarHI5kA2gmUK1Wjut6tiGHuCC7ppTbOS7ixhlH7+XZjDqgj+NkzljldfVm/8920ZZ7gkFQ+4rMNaRbnK3NHqf4ECBC5qyqQyYrlTflKj/WCioss00lZ2kW44WtXLVy/dhdm152/ZlsuGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=JnJtS1st; arc=none smtp.client-ip=194.13.80.246
+	 MIME-Version; b=PkB6JBKG5ape+KmtjeA3AvFmwH2MvFZGNvxP5e8EbCgCP5XP04IPlgFDARWb0iC0kzCNAMnKjW5J5xfStdfvD4VnOqxtiYEnDXpKSLlyYGFfUjGaRK8adkmYv8umRWN8sWRmlJWTwxe71ONpBjlzzg9dHbn9FTshMUPO/r0XEQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=pPogtjpf; arc=none smtp.client-ip=194.13.80.246
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D3601A11AE;
-	Fri,  3 Apr 2026 11:07:36 +0200 (CEST)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8C3DFA5896;
+	Fri,  3 Apr 2026 11:07:39 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1775207257; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1775207262; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=1XfxGKOARUvreYaAqzFmJPO+BFlwSnB7GItiL5w4+g8=;
-	b=JnJtS1stn6y37PdmtadanzFNUC669SDnO/qbNZBvqMrIfGFAGZZ6zKjBg8EGfzZYmIsTn7
-	IRb1W0s7H/Q+Gm24nkxyHpJAcH5a6fAETEPB4zglGe3o1ukDtJiiQhWFwrc/ROIN+ck7Fn
-	taACAxBp+Hjhs2QB/OxtGYQqyG6MsG4KnfzxLRQIiRSwn7OrvBSyL9mwniFV3rO1gq5F/E
-	TwE1NG6aaBLgXssJX+EE+Y9MPlzaWzy37Wlru81Ux07BpmIbz0EhWUB6WXq/VSUe2XzAkq
-	QZZ620vCsVPBHK9QoYIacTDv+clDlE3oJvX+zn9RiNqKtkTbQ5ENxJtHqgI6hA==
+	bh=VUnhP9CIeSJarBTzcsknHlQTmW1S3OZHd1O3zU2CgGY=;
+	b=pPogtjpftS4JJpyBp++vjU9BtfSe5s75m/w8PVxDcKWG23R9oxlrsPm6V5jRDORMA+7o2Q
+	Z3frljFIbrOTtBHUyhc8GvzDJpGpi27aFDZEpjwEwpAgmWtj/p+YBjP8znWYPqGa8uEpuR
+	gYge6pWBMcKC3LIqPIruwQrOcsKNaE8+c3PVz1v3MF5Ot4zQFu6Glncq8mhy/Re4OiVmMP
+	JEzanRtJdXrNAEqTG0mM9LwxsikFFbt74ov3ifZfwMfnN7zCQerwB3zLyZi2zrMG4uLyR7
+	dAC3F3Vo0kS8Z6uKAwleaxo18gAbFgDlSP4Do/b0hDQ9QIM6cpA/TV9drC+nmw==
 From: Nicolai Buchwitz <nb@tipi-net.de>
 To: netdev@vger.kernel.org
 Cc: Russell King <linux@armlinux.org.uk>,
 	Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <florian.fainelli@broadcom.com>,
 	Nicolai Buchwitz <nb@tipi-net.de>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Michael Klein <michael@fossekall.de>,
+	Daniel Braunwarth <daniel.braunwarth@kuka.com>,
+	Markus Stockhausen <markus.stockhausen@gmx.de>,
+	Issam Hamdi <ih@simonwunderlich.de>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH net-next 2/3] net: phy: broadcom: implement .disable_autonomous_eee for BCM54xx
-Date: Fri,  3 Apr 2026 11:06:52 +0200
-Message-ID: <20260403090656.733985-3-nb@tipi-net.de>
+Subject: [RFC PATCH net-next 3/3] net: phy: realtek: convert RTL8211F to .disable_autonomous_eee
+Date: Fri,  3 Apr 2026 11:06:53 +0200
+Message-ID: <20260403090656.733985-4-nb@tipi-net.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260403090656.733985-1-nb@tipi-net.de>
 References: <20260403090656.733985-1-nb@tipi-net.de>
@@ -72,93 +78,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-274958-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-274957-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[18];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,broadcom.com,tipi-net.de,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	DMARC_DNSFAIL(0.00)[tipi-net.de : query timed out];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,broadcom.com,tipi-net.de,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,makrotopia.org,nxp.com,fossekall.de,kuka.com,gmx.de,simonwunderlich.de,vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: CC44C392969
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,tipi-net.de:dkim,tipi-net.de:email,tipi-net.de:mid]
+X-Rspamd-Queue-Id: 9D6B8392A02
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Disable AutogrEEEn mode on BCM54210E when the MAC indicates EEE support
-via phy_support_eee(). In AutogrEEEn mode the PHY manages LPI
-autonomously without forwarding LPI signaling to the MAC over the RGMII
-interface, which prevents the MAC from controlling TX LPI entry/exit.
+The RTL8211F previously unconditionally disabled PHY-mode EEE in
+config_init. Convert this to use the new .disable_autonomous_eee
+callback so it is only disabled when the MAC indicates EEE support
+via phy_support_eee().
 
-Clearing the AutogrEEEn enable bit in MII_BUF_CNTL_0 switches the PHY
-to Native EEE mode where the MAC controls TX LPI and the PHY forwards
-received LPI on the RGMII interface.
+This preserves PHY-autonomous EEE for MACs that do not support EEE,
+while still disabling it when the MAC manages LPI.
 
 Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
 ---
- drivers/net/phy/broadcom.c | 7 +++++++
- include/linux/brcmphy.h    | 3 +++
- 2 files changed, 10 insertions(+)
+ drivers/net/phy/realtek/realtek_main.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
-index cb306f9e80cc..bf0c6a04481e 100644
---- a/drivers/net/phy/broadcom.c
-+++ b/drivers/net/phy/broadcom.c
-@@ -1452,6 +1452,12 @@ static int bcm54811_read_status(struct phy_device *phydev)
- 	return genphy_read_status(phydev);
+diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+index 023e47ad605b..b7c96b020baf 100644
+--- a/drivers/net/phy/realtek/realtek_main.c
++++ b/drivers/net/phy/realtek/realtek_main.c
+@@ -700,9 +700,8 @@ static int rtl8211f_config_aldps(struct phy_device *phydev)
+ 	return phy_modify(phydev, RTL8211F_PHYCR1, mask, mask);
  }
  
-+static int bcm54xx_disable_autonomous_eee(struct phy_device *phydev)
-+{
-+	return bcm_phy_modify_exp(phydev, BCM54XX_TOP_MISC_MII_BUF_CNTL0,
-+				  BCM54XX_MII_BUF_CNTL0_AUTOGREEEN_EN, 0);
-+}
-+
- static struct phy_driver broadcom_drivers[] = {
+-static int rtl8211f_config_phy_eee(struct phy_device *phydev)
++static int rtl8211f_disable_autonomous_eee(struct phy_device *phydev)
  {
- 	PHY_ID_MATCH_MODEL(PHY_ID_BCM5411),
-@@ -1495,6 +1501,7 @@ static struct phy_driver broadcom_drivers[] = {
- 	.get_wol	= bcm54xx_phy_get_wol,
- 	.set_wol	= bcm54xx_phy_set_wol,
- 	.led_brightness_set	= bcm_phy_led_brightness_set,
-+	.disable_autonomous_eee	= bcm54xx_disable_autonomous_eee,
- }, {
- 	PHY_ID_MATCH_MODEL(PHY_ID_BCM5461),
- 	.name		= "Broadcom BCM5461",
-diff --git a/include/linux/brcmphy.h b/include/linux/brcmphy.h
-index 115a964f3006..174687c4c80a 100644
---- a/include/linux/brcmphy.h
-+++ b/include/linux/brcmphy.h
-@@ -266,6 +266,9 @@
- #define BCM54XX_TOP_MISC_IDDQ_SD		(1 << 2)
- #define BCM54XX_TOP_MISC_IDDQ_SR		(1 << 3)
+-	/* Disable PHY-mode EEE so LPI is passed to the MAC */
+ 	return phy_modify(phydev, RTL8211F_PHYCR2,
+ 			  RTL8211F_PHYCR2_PHY_EEE_ENABLE, 0);
+ }
+@@ -730,7 +729,7 @@ static int rtl8211f_config_init(struct phy_device *phydev)
+ 		return ret;
+ 	}
  
-+#define BCM54XX_TOP_MISC_MII_BUF_CNTL0		(MII_BCM54XX_EXP_SEL_TOP + 0x00)
-+#define  BCM54XX_MII_BUF_CNTL0_AUTOGREEEN_EN	BIT(0)
-+
- #define BCM54XX_TOP_MISC_LED_CTL		(MII_BCM54XX_EXP_SEL_TOP + 0x0C)
- #define  BCM54XX_LED4_SEL_INTR			BIT(1)
+-	return rtl8211f_config_phy_eee(phydev);
++	return 0;
+ }
  
+ static int rtl821x_suspend(struct phy_device *phydev)
+@@ -2324,6 +2323,7 @@ static struct phy_driver realtek_drvs[] = {
+ 		.led_hw_is_supported = rtl8211x_led_hw_is_supported,
+ 		.led_hw_control_get = rtl8211f_led_hw_control_get,
+ 		.led_hw_control_set = rtl8211f_led_hw_control_set,
++		.disable_autonomous_eee = rtl8211f_disable_autonomous_eee,
+ 	}, {
+ 		PHY_ID_MATCH_EXACT(RTL_8211FVD_PHYID),
+ 		.name		= "RTL8211F-VD Gigabit Ethernet",
+@@ -2340,6 +2340,7 @@ static struct phy_driver realtek_drvs[] = {
+ 		.led_hw_is_supported = rtl8211x_led_hw_is_supported,
+ 		.led_hw_control_get = rtl8211f_led_hw_control_get,
+ 		.led_hw_control_set = rtl8211f_led_hw_control_set,
++		.disable_autonomous_eee = rtl8211f_disable_autonomous_eee,
+ 	}, {
+ 		.name		= "Generic FE-GE Realtek PHY",
+ 		.match_phy_device = rtlgen_match_phy_device,
 -- 
 2.51.0
 
