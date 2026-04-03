@@ -1,74 +1,73 @@
-Return-Path: <netdev+bounces-274894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274895-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kN2AEftXz2llvQYAu9opvQ
-	(envelope-from <netdev+bounces-274894-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 08:02:35 +0200
+	id uH6PIJRXz2llvQYAu9opvQ
+	(envelope-from <netdev+bounces-274895-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 08:00:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B58063914DC
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 08:02:34 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAAA03914CD
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 08:00:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E585E301750F
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 05:59:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C314300E3B8
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 06:00:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04BBB364947;
-	Fri,  3 Apr 2026 05:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4AE35F600;
+	Fri,  3 Apr 2026 05:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jxYWS/jf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VwbB2M8Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72FF2D7DEA
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 05:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840092DD5F6
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 05:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775195958; cv=none; b=koPl77uQ4l/yY/OGb+snUqEtPY4V/IKvdudku7cEj6StnOG92V2q+sawYSFRucUJXUM/DimZ8MRYCZ/2vlXA1vQqmE4xTEZ8r8vInfJMOBhRJ4YN+sTmfZ3kLELfbJLZmETLlwr1RX8zQcFeDareCiKRqREk4FzVy/hcxxD7Iyw=
+	t=1775195998; cv=none; b=LSpVT3prRRM0XViJJU4O/yL+GYE2/p1DKGtwlhFssWxMU6tGQPBfy3GmKDEBgVzg2J61rWhXsLOoJfXEL6r/IoEeVOqCc2NNOSXVD7uXGzLpVdCm4ETLu6gNcb5AyzzSUmf8QVBj3UyYiSk7EbNzitCFcz6vV5oUb6Qvi/K4YQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775195958; c=relaxed/simple;
-	bh=DRP+DtgotH+uHkIjI5tTy7Oo1rAFm5KnpRPZroqjVLs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tZi+9lV4jbbscfpKeFdvi4J7OMoynVGh/nDx8s55RP7zWieuQVY7u2gJUtKkr+bq3GUPfn/crCy4dNTbPB3Vxurfbt0FjKLwhItidApkJP2FvJ2x7qScllMpLRXKTUak/CQGe4nvjk4l0Mr1o+6XkdZv+iy/8bGWKBbkUXq3WBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jxYWS/jf; arc=none smtp.client-ip=192.198.163.9
+	s=arc-20240116; t=1775195998; c=relaxed/simple;
+	bh=hkh+Nmw/K44d7gAG5USnMmol1zayw7cvyPtDXFrWDIM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fieM6XD6R+KQXIqGCSCi1r+CF7wBZMjgxBGC54i6XPKq65BwldFRmO2gL4nPVmj2swxEyppVFMGX17+NP7uiIjmg4HTWLLelpGWv8o8qQ4Vu8NzCB5mPIPpWYwqgTTLsI7H1uewCJBIlz6WL3dc/AvrFKm4zAgHgN3oNh7MIzUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VwbB2M8Y; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775195951; x=1806731951;
+  t=1775195991; x=1806731991;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=DRP+DtgotH+uHkIjI5tTy7Oo1rAFm5KnpRPZroqjVLs=;
-  b=jxYWS/jfkh7e8hxMOnbRD8B5Ecsso/eOrSaapzYcHPk6BzsT+Oq9ezWE
-   3jRaVOiHXqoFWRSmSP2mx8s9wmRIgduAvdvhKtJx4dVmBHB6EJt8arcnd
-   L7XJGss7WV1D1vopgsFb0Tvw+CTUQpoSk/3IXgQ1tt2sgPBNJled6hYz0
-   ffgCJp5HASFiSqvv+VHapR44XeLt7wE4VJcShoVWNv7yt6Fk9rA8FF/Gx
-   KCXi0S2FKFdcwNSzCiWowDkVIKLwVwJJRINm62NhWdHo4qcToZUqZWTBB
-   vVupIkLfeUfRqdAvg/CnAh5X6oP8xsuXFKvn8LmcJn5IuUMiN8B2ge4F7
-   A==;
-X-CSE-ConnectionGUID: TFwaGGaATfWM55ZqDm0VMw==
-X-CSE-MsgGUID: LZT0PpNQQlK21+fukLuvSg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11747"; a="86964801"
+  bh=hkh+Nmw/K44d7gAG5USnMmol1zayw7cvyPtDXFrWDIM=;
+  b=VwbB2M8Yifq908KyH+Udp7D0DWj341nCv/OqBbFmn/A6IpZgvilpq19d
+   RQHdS42ixvBCTsyqPWErkZK/R64bZDfE5OHtVZHLaEV287ZjrWrGoOysp
+   uTjfxUGIalycBuu9zToU08Li3hmuvvHe8APSDwl+/JPSFHRaamRsRoFf8
+   sFDHF2AS0C8g4XvfTSzsdMC4hngKhZz6jwtHFD5JFOGNbMXb5dPT7f7ec
+   RXSAncfMFpplp4KCjst9GPVHByrHZaTSwptYZi7n471vKccvBKFlsZqs1
+   0taRVUpCYqKf/fhQPdi8e+xTVazgjQ9RjCW33HA5zj7SBudMc6/9ytRoH
+   w==;
+X-CSE-ConnectionGUID: 0gxRQQhFS+qVjq3PeXMsmA==
+X-CSE-MsgGUID: Vba0DEstSRKp/5AVxyDltQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11747"; a="87649922"
 X-IronPort-AV: E=Sophos;i="6.23,157,1770624000"; 
-   d="scan'208";a="86964801"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2026 22:59:06 -0700
-X-CSE-ConnectionGUID: 59TdPBPNQkGF9nI7N6QLsA==
-X-CSE-MsgGUID: y+8mW7HARyW9Tog33RWInw==
+   d="scan'208";a="87649922"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2026 22:59:50 -0700
+X-CSE-ConnectionGUID: BSKNbz52SEWx0SKtddhLcg==
+X-CSE-MsgGUID: vaTLvJYRTYu3CScoQu0u8Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,157,1770624000"; 
-   d="scan'208";a="250252556"
+   d="scan'208";a="227426251"
 Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by fmviesa002.fm.intel.com with ESMTP; 02 Apr 2026 22:59:05 -0700
+  by orviesa007.jf.intel.com with ESMTP; 02 Apr 2026 22:59:49 -0700
 From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	anthony.l.nguyen@intel.com,
 	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org,
-	Anton Loktion <aloktion@cisco.com>
+Cc: netdev@vger.kernel.org
 Subject: [PATCH iwl-net] ice: fix netdev allocation with max queues instead of default
-Date: Fri,  3 Apr 2026 07:59:04 +0200
-Message-ID: <20260403055904.3800150-1-aleksandr.loktionov@intel.com>
+Date: Fri,  3 Apr 2026 07:59:48 +0200
+Message-ID: <20260403055948.3800555-1-aleksandr.loktionov@intel.com>
 X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -80,34 +79,32 @@ Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274894-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274895-lists,netdev=lfdr.de];
 	DKIM_TRACE(0.00)[intel.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
+	RCVD_COUNT_FIVE(0.00)[5];
 	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[aleksandr.loktionov@intel.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,cisco.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B58063914DC
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CAAA03914CD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-
-From: Anton Loktion <aloktion@cisco.com>
 
 Commit ee13aa1a2c5a ("ice: use netif_get_num_default_rss_queues()")
 changed the default queue count from num_online_cpus() to
