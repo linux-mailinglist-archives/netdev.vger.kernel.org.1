@@ -1,109 +1,91 @@
-Return-Path: <netdev+bounces-275158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275159-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YNmUDkf+z2kr2QYAu9opvQ
-	(envelope-from <netdev+bounces-275158-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:52:07 +0200
+	id QMd8Opj+z2kr2QYAu9opvQ
+	(envelope-from <netdev+bounces-275159-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:53:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 332153972AF
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:52:05 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B7E83972D4
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:53:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3BC46308853F
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 17:50:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AAA69302AC05
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 17:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326F03D34A9;
-	Fri,  3 Apr 2026 17:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1539E3A9DB6;
+	Fri,  3 Apr 2026 17:50:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b="Cx21TSn/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="PgQ4FC4D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hBMY5uUZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA723A9D85
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 17:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51DDC299AAB
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 17:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775238612; cv=none; b=g732HSW9cV/z+LVTCtduw3/8u1Yrtkr8sqmGiVwhWzYglAijBr+18yPAllb7oNWq4eoF2jniujyIEv6czKUHjuLPAMplkjXN96js2TLdjpTQnaEglZOTaixwUYI5Y3pdwef7q69pNLn0JCPQXpFKuPOpwBXLYZBBq+an42ynuqQ=
+	t=1775238656; cv=none; b=MhzRamLn/1FuIIXfjVAam/W1ZG99gKeGAKiAiAuugA6w0nY2sWqYsvBOHP0ApAE/BAarGE/w11pxkEF893OmqsnQVqKCUcYromFHgIumU0H29FuCr7ksGeCOYTV3vZ49QTOY0IP8W5FPVDccxqZbLBG71YAZ4OhxBehylRfzCXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775238612; c=relaxed/simple;
-	bh=AsnCHbWUF7HKHjz4azgtfqv+O8MqtxyOyazCBNIvOyQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JjfFj9JmLYENaWw83+g2GigAzJ/ejpjIoqRZGVGOa6d2gmnD/4XWxKwUED2t1zYounB2hOPMXy109Z0+G67bL+4CP8aJ4yVlPvRHrOoeqNpliQNd/Y3Nv+NfFlwFNLA4ioHTOPi87sG0Hk0YxyGN0CtpsZgvfn9U7qH4zlgIlX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im; spf=pass smtp.mailfrom=fastmail.im; dkim=pass (2048-bit key) header.d=fastmail.im header.i=@fastmail.im header.b=Cx21TSn/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PgQ4FC4D; arc=none smtp.client-ip=202.12.124.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.im
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.im
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 39AA77A01E1;
-	Fri,  3 Apr 2026 13:50:08 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Fri, 03 Apr 2026 13:50:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.im; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm2; t=1775238608; x=1775325008; bh=ozRnCihEa8oWt/rTa2glc
-	YJ93V/2Yec+2w/1wOET/Sg=; b=Cx21TSn/kLFgdQw9AuyFDUwYe56P13tzOtIEa
-	GT1ROybl+7rzz5GPwzoyKd0B/ZM0nltdaHaqERGEUdJXLeObkFtnJKdefThAoYL1
-	SNi6fNGVETWPryZuTaocg5F8ut3rq1CDJsazXLmIFpSGBYQMjL/IyBY+TSdhsyDP
-	+VMfxEhzXG2dT1dYlZ/KDMEnwZMutsyMmE24/MaRzZvWErCHpj9n4jiCmIP1RHOv
-	GWuwVQ226QesfB8bq7no7k3LroA77kz0Ds4dKWIALJmbxjSnBEsx/IADW3LEUTmU
-	uyN0x2cabmFSDbpx0Fyy3QkIwzgrAR9Xu1OB0lO0ZzGQMjRAA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1775238608; x=1775325008; bh=ozRnCihEa8oWt/rTa2glcYJ93V/2Yec+2w/
-	1wOET/Sg=; b=PgQ4FC4D3Gqt2aI4c959hTjLtn2Ah8nUtO52dWrIuKmSQcfqMmk
-	8YjvN8kQbQYEu8gVO+g+AIqtQdXIv/rfjrJMNHPTpfNncMCmxZTg4HPJCqE0SDBX
-	o3JQL1WqupJq8DcxxfZtV5YtJgbxt5mkI5P9yxEkL68F2FjyDUrsujy3mmCF0sha
-	QflQ75hCxPCJJKlNO5zf8GFxDQ+WJlXNht49PMhbSCLu/vPHONE9Mvhd3vLoj3qJ
-	vAahUxL5mGhI+yOkEzzj7UvkMqnOipEniOzicZzvBVAYR+whl7wqgHwDBG2MhwPD
-	MQMF3i5yxb8eO+1sgKjDkHIuyUslP0RU0nw==
-X-ME-Sender: <xms:z_3Pafc9Tb06E1OZn8EHSHmtI9ACzrsRsXmjydwX2QilQLBiLH_k9A>
-    <xme:z_3PaaIB0F7JecatV14Li4OHN3PqTUDsJ4MiB0mINupc9nj5pAkAhx8V1N7qw3szN
-    ZRFm-OEd9vfbod3ULQU1uXSA-9D4svXvAiAeFIeu5eqC4glJhmzB4Cf>
-X-ME-Received: <xmr:z_3Pacxt4L6A4E9EojNdKTDBvywNXO838EGaTq615E5nlUxePHoFjrXitZs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdelheekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    ephffvvefufffkofgggfestdekredtredttdenucfhrhhomheptehlihgtvgcuofhikhhi
-    thihrghnshhkrgcuoegrlhhitggvrdhkvghrnhgvlhesfhgrshhtmhgrihhlrdhimheqne
-    cuggftrfgrthhtvghrnhepheduiedvieefffduueelgeehuefhleekuefffeeiheeuhfet
-    jedtvefffefgfeegnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhitggvrdhkvghrnhgv
-    lhesfhgrshhtmhgrihhlrdhimhdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtph
-    houhhtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphht
-    thhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrse
-    hkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-    pdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhgthh
-    grphhmrghnsehkrghtrghlihigrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgv
-    rhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlihgtvgesihhsohhvrghlvghnth
-    drtghomhdprhgtphhtthhopehshiiisghothdotghifegvuggvrgeitdgrgeegvddvhegu
-    vggtsehshiiikhgrlhhlvghrrdgrphhpshhpohhtmhgrihhlrdgtohhm
-X-ME-Proxy: <xmx:z_3PaQu-5RnAKlZskY38VCx9A-HM3jkPtCvRsq7nGa8RCKB0egVExw>
-    <xmx:z_3PafDIuvSx6LlIJqbX59H0SUZYSaRyoiltcgclnd4jhj2tfaGh9Q>
-    <xmx:z_3PaSEVG9miGN_NsKn2_ERDDAw4xuKSsSUNg_29Jw2Jya7ywAjmkQ>
-    <xmx:z_3PafDdlVH5oXjn64x2wd8DL8PzD0e-J7pvlK55i7tqb5-H9gxCiQ>
-    <xmx:0P3PaVqLGkFlH-rzkQO0b1Amp7DiFhlqAqEdaBDdUwZ-7kd0nwOl2Ryb>
-Feedback-ID: i559e4809:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 3 Apr 2026 13:50:04 -0400 (EDT)
-From: Alice Mikityanska <alice.kernel@fastmail.im>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	James Chapman <jchapman@katalix.com>,
-	netdev@vger.kernel.org,
-	Alice Mikityanska <alice@isovalent.com>,
-	syzbot+ci3edea60a44225dec@syzkaller.appspotmail.com
-Subject: [PATCH net-next] l2tp: Drop large packets with UDP encap
-Date: Fri,  3 Apr 2026 20:49:49 +0300
-Message-ID: <20260403174949.843941-1-alice.kernel@fastmail.im>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1775238656; c=relaxed/simple;
+	bh=V5XAtYoLjsrkjc+NdJyXkVY3dSJ6uiJw4jzwBXKtMWw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DuObayEMxhfqWmZdUw+nHH3CL1EKCXi+r2M6wwklT/BTWH4y7uucMnTElN598SssuSgu3nX9bn82g9fDqQ0wMOo0Crvb/jSUQ1jzzvfNp9xalP583vvZqA80NfiCMw1D2Kz63tR9F0LhKWDxWHQnHIuuLAFNBX30lkjjSBqY05s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hBMY5uUZ; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7986e0553bdso20801677b3.2
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 10:50:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775238653; x=1775843453; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8dl282UetUJKs0VqGe0awWZoW2QjXQSCj7EsovShSJ0=;
+        b=hBMY5uUZ+pyRq/k19mZ+op5luUoOyEzKuRPDTQghim4xftTgxdXjFT7pJYE/UmIKgh
+         tCxCcOWnzoaGKSn0RnGlMuVQ/uMi65KOQPYoWKKZC14o+BAc03Rzh7vMCjO10WyKdNsX
+         OB2wzOkbGS5fRaLrf2ZSzvnTpl4RgBLYwWHiuJtxVvi1nb6N1G+OIhhyRhFCrQR7IpLF
+         GZqTaIZTvA9ktV/kly2BNSEjVvcxdMtK8WDIwXQjBWXDnWIAgsAlEQHTPwVkW+Nv6rsp
+         Wu/w0+xA2IhNoy9uv01InKwWo02BWFBh2XE5wBeCdFkINwwn12W9hi8win5UU+BsNPbr
+         PqQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775238653; x=1775843453;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8dl282UetUJKs0VqGe0awWZoW2QjXQSCj7EsovShSJ0=;
+        b=TEtd8CIlOJqxJQm0vbyLJXluwGL38/t/1qSKVylFhN7YWF0eTzB4EWS1+TZzUaSy8L
+         aRcj5xf4WvQSCqqNquFTJx4GZ9rZg6gUMyGY/onZ8zlqPNckqSlYs8C/eEbeCtHpvcXQ
+         +mGx/zeZOv6fcTaFQjA7/aLdoYdTHAHnhJe77CkZ4k7EcPyxoyX4OVLXiThvO5Lj1jFJ
+         0LkyrctZACCtuoz5OFOTdnUf9NY6/P3pf/WZ7CVFYaQSIhWdcU9rXaWYOTTkaEaNv1vg
+         u7nuE2z/jg7T/jxYj/VrE6jR7E6SpH6kjlb2391EUELkSdXMMlCWKiTxnvyKzvw6N+Yh
+         puRQ==
+X-Gm-Message-State: AOJu0Yw17Dt3MhTbz1itqTj3O2pdRzjzkAa3CyMfxFP2YUAPxkH0bMxB
+	sZ1tHu9axzNhkpEw5db/0vI85KpntFQAjXNqfonqD5Iw95bh14r863YhJ6QQOw==
+X-Gm-Gg: AeBDievD+Opvg+CZ2ZfFk98vcUNqoIgIGS/Xrh5BJAh+Ssiyg1XfGkmI/mqHYG0xt0x
+	XcoBJuoBa1zt017s7+jGqpj+Fah07dNLNe2TwO6YyKBG6hOX7o4K2AlQlHNos4Ar834bbB97QNu
+	jBhv6PdTg+0FQb4elZBkibjE2fslxjrBwNgnAJ10LzoAdj48PiWxd4OwyfL9lQezDV4ftKWybua
+	gbIO7AlfYMHCQDbRnnO69fj/oLkcd+sF96UK1EzEmd6uzJrQJmQXmTV+zoNEI6hozK3Jew3DJ6g
+	gvvKywYHYX0Z+eeJlgWaILF9ejn/rip/nlSAj0XalKS2NXlzLtmuM50HzjZPhHoEOHQK4BadNo2
+	ZyqRbkCXbaFm1HvmtRtSv2742be7woXNt5CUJ86fQrT4yKzWTTRbz7W6E6YJuQ1xACQMzuu3pBX
+	5bDu7RC6dWpnR9fkvZLz8Oo8VnXpgnQY0e29ZF7s5PWhoVaUEuqCq9VTLPDsQo4ZZgL+cF50xbf
+	OKcD0e/FdIqj4vfBemu5OA9xfQ=
+X-Received: by 2002:a05:690c:25c1:b0:7a1:523e:93f6 with SMTP id 00721157ae682-7a4d5d5d817mr39205577b3.46.1775238653253;
+        Fri, 03 Apr 2026 10:50:53 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (172.165.85.34.bc.googleusercontent.com. [34.85.165.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7a36e8343d3sm23826967b3.16.2026.04.03.10.50.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Apr 2026 10:50:52 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next] selftests/net: convert so_txtime to drv-net
+Date: Fri,  3 Apr 2026 13:50:12 -0400
+Message-ID: <20260403175047.152646-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -111,133 +93,427 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[fastmail.im,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[fastmail.im:s=fm2,messagingengine.com:s=fm2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275158-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alice.kernel@fastmail.im,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[fastmail.im:+,messagingengine.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev,ci3edea60a44225dec];
-	FREEMAIL_FROM(0.00)[fastmail.im];
+	TAGGED_FROM(0.00)[bounces-275159-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,messagingengine.com:dkim,fastmail.im:dkim,fastmail.im:mid]
-X-Rspamd-Queue-Id: 332153972AF
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,so_txtime.py:url]
+X-Rspamd-Queue-Id: 4B7E83972D4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Alice Mikityanska <alice@isovalent.com>
+From: Willem de Bruijn <willemb@google.com>
 
-syzbot reported a WARN on my patch series [1]. The actual issue is an
-overflow of 16-bit UDP length field, and it exists in the upstream code.
-My series added a debug WARN with an overflow check that exposed the
-issue, that's why syzbot tripped on my patches, rather than on upstream
-code.
+In preparation for extending to pacing hardware offload, convert the
+so_txtime.sh test to a drv-net test that can be run against netdevsim
+and real hardware.
 
-syzbot's repro:
+Also move so_txtime.c to lib so that it is easily accessible for the
+new drv-net test, similar to gro.c in commit 8888bf4fb980 ("selftests:
+net: move gro to lib for HW vs SW reuse").
 
-# {"procs":1,"slowdown":1,"sandbox":"","sandbox_arg":0,"close_fds":false,"callcomments":true}
-r0 = socket$pppl2tp(0x18, 0x1, 0x1)
-r1 = socket$inet6_udp(0xa, 0x2, 0x0)
-connect$inet6(r1, &(0x7f00000000c0)={0xa, 0x0, 0x0, @loopback, 0xfffffffc}, 0x1c)
-connect$pppl2tp(r0, &(0x7f0000000240)=@pppol2tpin6={0x18, 0x1, {0x0, r1, 0x4, 0x0, 0x0, 0x0, {0xa, 0x4e22, 0xffff, @ipv4={'\x00', '\xff\xff', @empty}}}}, 0x32)
-writev(r0, &(0x7f0000000080)=[{&(0x7f0000000000)="ee", 0x34000}], 0x1)
+Also update so_txtime.c to not exit on first failure, but run to
+completion and report exit code there. This helps with debugging
+unexpected results, especially when processing multiple packets,
+as in the "reverse_order" testcase.
 
-It basically sends an oversized (0x34000 bytes) PPPoL2TP packet with UDP
-encapsulation, and l2tp_xmit_core doesn't check for overflows when it
-assigns the UDP length field. The value gets trimmed to 16 bites.
-
-Add an overflow check that drops oversized packets and avoids sending
-packets with trimmed UDP length to the wire.
-
-syzbot's stack trace (with my patch applied):
-
-len >= 65536u
-WARNING: ./include/linux/udp.h:38 at udp_set_len_short include/linux/udp.h:38 [inline], CPU#1: syz.0.17/5957
-WARNING: ./include/linux/udp.h:38 at l2tp_xmit_core net/l2tp/l2tp_core.c:1293 [inline], CPU#1: syz.0.17/5957
-WARNING: ./include/linux/udp.h:38 at l2tp_xmit_skb+0x1204/0x18d0 net/l2tp/l2tp_core.c:1327, CPU#1: syz.0.17/5957
-Modules linked in:
-CPU: 1 UID: 0 PID: 5957 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full)
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:udp_set_len_short include/linux/udp.h:38 [inline]
-RIP: 0010:l2tp_xmit_core net/l2tp/l2tp_core.c:1293 [inline]
-RIP: 0010:l2tp_xmit_skb+0x1204/0x18d0 net/l2tp/l2tp_core.c:1327
-Code: 0f 0b 90 e9 21 f9 ff ff e8 e9 05 ec f6 90 0f 0b 90 e9 8d f9 ff ff e8 db 05 ec f6 90 0f 0b 90 e9 cc f9 ff ff e8 cd 05 ec f6 90 <0f> 0b 90 e9 de fa ff ff 44 89 f1 80 e1 07 80 c1 03 38 c1 0f 8c 4f
-RSP: 0018:ffffc90003d67878 EFLAGS: 00010293
-RAX: ffffffff8ad985e3 RBX: ffff8881a6400090 RCX: ffff8881697f0000
-RDX: 0000000000000000 RSI: 0000000000034010 RDI: 000000000000ffff
-RBP: dffffc0000000000 R08: 0000000000000003 R09: 0000000000000004
-R10: dffffc0000000000 R11: fffff520007acf00 R12: ffff8881baf20900
-R13: 0000000000034010 R14: ffff8881a640008e R15: ffff8881760f7000
-FS:  000055557e81f500(0000) GS:ffff8882a9467000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000033000 CR3: 00000001612f4000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- pppol2tp_sendmsg+0x40a/0x5f0 net/l2tp/l2tp_ppp.c:302
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- sock_write_iter+0x503/0x550 net/socket.c:1195
- do_iter_readv_writev+0x619/0x8c0 fs/read_write.c:-1
- vfs_writev+0x33c/0x990 fs/read_write.c:1059
- do_writev+0x154/0x2e0 fs/read_write.c:1105
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x14d/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f636479c629
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffffd4241c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
-RAX: ffffffffffffffda RBX: 00007f6364a15fa0 RCX: 00007f636479c629
-RDX: 0000000000000001 RSI: 0000200000000080 RDI: 0000000000000003
-RBP: 00007f6364832b39 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f6364a15fac R14: 00007f6364a15fa0 R15: 00007f6364a15fa0
- </TASK>
-
-[1]: https://lore.kernel.org/all/20260226201600.222044-1-alice.kernel@fastmail.im/
-
-Reported-by: syzbot+ci3edea60a44225dec@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/69a1dfba.050a0220.3a55be.0026.GAE@google.com/
-Signed-off-by: Alice Mikityanska <alice@isovalent.com>
+Signed-off-by: Willem de Bruijn <willemb@google.com>
 ---
- net/l2tp/l2tp_core.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ tools/testing/selftests/drivers/net/Makefile  |   1 +
+ tools/testing/selftests/drivers/net/config    |   2 +
+ .../selftests/drivers/net/so_txtime.py        |  87 ++++++++++++++
+ tools/testing/selftests/net/.gitignore        |   1 -
+ tools/testing/selftests/net/Makefile          |   2 -
+ tools/testing/selftests/net/lib/.gitignore    |   1 +
+ tools/testing/selftests/net/lib/Makefile      |   1 +
+ .../selftests/net/{ => lib}/so_txtime.c       |  25 +++-
+ tools/testing/selftests/net/so_txtime.sh      | 110 ------------------
+ 9 files changed, 111 insertions(+), 119 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/so_txtime.py
+ rename tools/testing/selftests/net/{ => lib}/so_txtime.c (97%)
+ delete mode 100755 tools/testing/selftests/net/so_txtime.sh
 
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index c89ae52764b8..157fc23ce4e1 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -1290,6 +1290,11 @@ static int l2tp_xmit_core(struct l2tp_session *session, struct sk_buff *skb, uns
- 		uh->source = inet->inet_sport;
- 		uh->dest = inet->inet_dport;
- 		udp_len = uhlen + session->hdr_len + data_len;
-+		if (udp_len > U16_MAX) {
-+			kfree_skb(skb);
-+			ret = NET_XMIT_DROP;
-+			goto out_unlock;
-+		}
- 		uh->len = htons(udp_len);
+diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+index 7c7fa75b80c2..bfa72e07ca89 100644
+--- a/tools/testing/selftests/drivers/net/Makefile
++++ b/tools/testing/selftests/drivers/net/Makefile
+@@ -20,6 +20,7 @@ TEST_PROGS := \
+ 	queues.py \
+ 	ring_reconfig.py \
+ 	shaper.py \
++	so_txtime.py \
+ 	stats.py \
+ 	xdp.py \
+ # end of TEST_PROGS
+diff --git a/tools/testing/selftests/drivers/net/config b/tools/testing/selftests/drivers/net/config
+index 77ccf83d87e0..a3301d4da540 100644
+--- a/tools/testing/selftests/drivers/net/config
++++ b/tools/testing/selftests/drivers/net/config
+@@ -3,6 +3,8 @@ CONFIG_DEBUG_INFO_BTF=y
+ CONFIG_DEBUG_INFO_BTF_MODULES=n
+ CONFIG_INET_PSP=y
+ CONFIG_IPV6=y
++CONFIG_NET_SCH_ETF=m
++CONFIG_NET_SCH_FQ=m
+ CONFIG_NETCONSOLE=m
+ CONFIG_NETCONSOLE_DYNAMIC=y
+ CONFIG_NETCONSOLE_EXTENDED_LOG=y
+diff --git a/tools/testing/selftests/drivers/net/so_txtime.py b/tools/testing/selftests/drivers/net/so_txtime.py
+new file mode 100755
+index 000000000000..565cecf307dd
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/so_txtime.py
+@@ -0,0 +1,87 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
++
++"""Regression tests for the SO_TXTIME interface.
++
++Test delivery time in FQ and ETF qdiscs.
++"""
++
++import time
++
++from lib.py import ksft_exit, ksft_run
++from lib.py import KsftNamedVariant, KsftSkipEx, ksft_variants
++from lib.py import NetDrvEpEnv, bkg, cmd
++
++
++def test_so_txtime(cfg, clockid, ipver, args_tx, args_rx, expect_fail):
++  bin_path = cfg.net_lib_dir / "so_txtime"
++
++  tstart = time.time_ns() + 100_000_000
++
++  cmd_addr = f"-S {cfg.addr_v[ipver]} -D {cfg.remote_addr_v[ipver]}"
++  cmd_base = f"{bin_path} -{ipver} -c {clockid} -t {tstart} {cmd_addr}"
++  cmd_rx = f"{cmd_base} {args_rx} -r"
++  cmd_tx = f"{cmd_base} {args_tx}"
++
++  try:
++    with bkg(cmd_rx, host=cfg.remote, exit_wait=True):
++      cmd(cmd_tx)
++  except:
++    if not expect_fail:
++      raise
++
++
++def _test_variants_mono():
++  for ipver in ["4", "6"]:
++    for testcase in [
++        ["no_delay", "a,-1", "a,-1"],
++        ["zero_delay", "a,0", "a,0"],
++        ["one_pkt", "a,10", "a,10"],
++        ["in_order", "a,10,b,20", "a,10,b,20"],
++        ["reverse_order", "a,20,b,10", "b,20,a,20"],
++    ]:
++      name = f"_v{ipver}_{testcase[0]}"
++      yield KsftNamedVariant(name, ipver, testcase[1], testcase[2])
++
++
++@ksft_variants(_test_variants_mono())
++def test_so_txtime_mono(cfg, ipver, args_tx, args_rx):
++  cmd(f"tc qdisc replace dev {cfg.ifname} root fq")
++  test_so_txtime(cfg, "mono", ipver, args_tx, args_rx, False)
++
++
++def _test_variants_etf():
++  for ipver in ["4", "6"]:
++    for testcase in [
++        ["no_delay", "a,-1", "a,-1", True],
++        ["zero_delay", "a,0", "a,0", True],
++        ["one_pkt", "a,10", "a,10", False],
++        ["in_order", "a,10,b,20", "a,10,b,20", False],
++        ["reverse_order", "a,20,b,10", "b,10,a,20", False],
++    ]:
++      name = f"_v{ipver}_{testcase[0]}"
++      yield KsftNamedVariant(name, ipver, testcase[1], testcase[2], testcase[3])
++
++
++@ksft_variants(_test_variants_etf())
++def test_so_txtime_etf(cfg, ipver, args_tx, args_rx, expect_fail):
++  try:
++    # ETF does not support change, so remove and re-add it instead.
++    cmd(f"tc qdisc replace dev {cfg.ifname} root pfifo_fast")
++    etf_args = "clockid CLOCK_TAI delta 400000"
++    cmd(f"tc qdisc replace dev {cfg.ifname} root etf {etf_args}")
++  except Exception as e:
++    raise KsftSkipEx("tc does not support qdisc etf. skipping") from e
++
++  test_so_txtime(cfg, "tai", ipver, args_tx, args_rx, expect_fail)
++
++
++def main() -> None:
++  with NetDrvEpEnv(__file__) as cfg:
++    ksft_run([test_so_txtime_mono], args=(cfg,))
++    ksft_run([test_so_txtime_etf], args=(cfg,))
++  ksft_exit()
++
++
++if __name__ == "__main__":
++  main()
+diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
+index 97ad4d551d44..02ad4c99a2b4 100644
+--- a/tools/testing/selftests/net/.gitignore
++++ b/tools/testing/selftests/net/.gitignore
+@@ -40,7 +40,6 @@ skf_net_off
+ socket
+ so_incoming_cpu
+ so_netns_cookie
+-so_txtime
+ so_rcv_listener
+ stress_reuseport_listen
+ tap
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 6bced3ed798b..b7f51e8f190f 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -81,7 +81,6 @@ TEST_PROGS := \
+ 	rxtimestamp.sh \
+ 	sctp_vrf.sh \
+ 	skf_net_off.sh \
+-	so_txtime.sh \
+ 	srv6_end_dt46_l3vpn_test.sh \
+ 	srv6_end_dt4_l3vpn_test.sh \
+ 	srv6_end_dt6_l3vpn_test.sh \
+@@ -154,7 +153,6 @@ TEST_GEN_FILES := \
+ 	skf_net_off \
+ 	so_netns_cookie \
+ 	so_rcv_listener \
+-	so_txtime \
+ 	socket \
+ 	stress_reuseport_listen \
+ 	tcp_fastopen_backup_key \
+diff --git a/tools/testing/selftests/net/lib/.gitignore b/tools/testing/selftests/net/lib/.gitignore
+index 6cd2b762af5d..c57d22e72c75 100644
+--- a/tools/testing/selftests/net/lib/.gitignore
++++ b/tools/testing/selftests/net/lib/.gitignore
+@@ -1,4 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ csum
+ gro
++so_txtime
+ xdp_helper
+diff --git a/tools/testing/selftests/net/lib/Makefile b/tools/testing/selftests/net/lib/Makefile
+index ff83603397d0..8c50b6631524 100644
+--- a/tools/testing/selftests/net/lib/Makefile
++++ b/tools/testing/selftests/net/lib/Makefile
+@@ -15,6 +15,7 @@ TEST_GEN_FILES := \
+ 	$(patsubst %.c,%.o,$(wildcard *.bpf.c)) \
+ 	csum \
+ 	gro \
++	so_txtime \
+ 	xdp_helper \
+ # end of TEST_GEN_FILES
  
- 		/* Calculate UDP checksum if configured to do so */
+diff --git a/tools/testing/selftests/net/so_txtime.c b/tools/testing/selftests/net/lib/so_txtime.c
+similarity index 97%
+rename from tools/testing/selftests/net/so_txtime.c
+rename to tools/testing/selftests/net/lib/so_txtime.c
+index b76df1efc2ef..6583e1a83758 100644
+--- a/tools/testing/selftests/net/so_txtime.c
++++ b/tools/testing/selftests/net/lib/so_txtime.c
+@@ -33,6 +33,8 @@
+ #include <unistd.h>
+ #include <poll.h>
+ 
++#include "kselftest.h"
++
+ static int	cfg_clockid	= CLOCK_TAI;
+ static uint16_t	cfg_port	= 8000;
+ static int	cfg_variance_us	= 4000;
+@@ -43,6 +45,8 @@ static bool	cfg_rx;
+ static uint64_t glob_tstart;
+ static uint64_t tdeliver_max;
+ 
++static int errors;
++
+ /* encode one timed transmission (of a 1B payload) */
+ struct timed_send {
+ 	char	data;
+@@ -131,13 +135,15 @@ static void do_recv_one(int fdr, struct timed_send *ts)
+ 	fprintf(stderr, "payload:%c delay:%lld expected:%lld (us)\n",
+ 			rbuf[0], (long long)tstop, (long long)texpect);
+ 
+-	if (rbuf[0] != ts->data)
+-		error(1, 0, "payload mismatch. expected %c", ts->data);
++	if (rbuf[0] != ts->data) {
++		fprintf(stderr, "payload mismatch. expected %c", ts->data);
++		errors++;
++	}
+ 
+ 	if (llabs(tstop - texpect) > cfg_variance_us) {
+ 		fprintf(stderr, "exceeds variance (%d us)\n", cfg_variance_us);
+ 		if (!getenv("KSFT_MACHINE_SLOW"))
+-			exit(1);
++			errors++;
+ 	}
+ }
+ 
+@@ -255,8 +261,10 @@ static void start_time_wait(void)
+ 		return;
+ 
+ 	now = gettime_ns(CLOCK_REALTIME);
+-	if (cfg_start_time_ns < now)
+-		return;
++	if (cfg_start_time_ns < now) {
++		fprintf(stderr, "FAIL: start time already passed\n");
++		errors++;
++	}
+ 
+ 	err = usleep((cfg_start_time_ns - now) / 1000);
+ 	if (err)
+@@ -513,5 +521,10 @@ int main(int argc, char **argv)
+ 	else
+ 		do_test_tx((void *)&cfg_src_addr, cfg_alen);
+ 
+-	return 0;
++	if (errors) {
++		fprintf(stderr, "FAIL: %d errors\n", errors);
++		return KSFT_FAIL;
++	}
++
++	return KSFT_PASS;
+ }
+diff --git a/tools/testing/selftests/net/so_txtime.sh b/tools/testing/selftests/net/so_txtime.sh
+deleted file mode 100755
+index 5e861ad32a42..000000000000
+--- a/tools/testing/selftests/net/so_txtime.sh
++++ /dev/null
+@@ -1,110 +0,0 @@
+-#!/bin/bash
+-# SPDX-License-Identifier: GPL-2.0
+-#
+-# Regression tests for the SO_TXTIME interface
+-
+-set -e
+-
+-readonly ksft_skip=4
+-readonly DEV="veth0"
+-readonly BIN="./so_txtime"
+-
+-readonly RAND="$(mktemp -u XXXXXX)"
+-readonly NSPREFIX="ns-${RAND}"
+-readonly NS1="${NSPREFIX}1"
+-readonly NS2="${NSPREFIX}2"
+-
+-readonly SADDR4='192.168.1.1'
+-readonly DADDR4='192.168.1.2'
+-readonly SADDR6='fd::1'
+-readonly DADDR6='fd::2'
+-
+-cleanup() {
+-	ip netns del "${NS2}"
+-	ip netns del "${NS1}"
+-}
+-
+-trap cleanup EXIT
+-
+-# Create virtual ethernet pair between network namespaces
+-ip netns add "${NS1}"
+-ip netns add "${NS2}"
+-
+-ip link add "${DEV}" netns "${NS1}" type veth \
+-  peer name "${DEV}" netns "${NS2}"
+-
+-# Bring the devices up
+-ip -netns "${NS1}" link set "${DEV}" up
+-ip -netns "${NS2}" link set "${DEV}" up
+-
+-# Set fixed MAC addresses on the devices
+-ip -netns "${NS1}" link set dev "${DEV}" address 02:02:02:02:02:02
+-ip -netns "${NS2}" link set dev "${DEV}" address 06:06:06:06:06:06
+-
+-# Add fixed IP addresses to the devices
+-ip -netns "${NS1}" addr add 192.168.1.1/24 dev "${DEV}"
+-ip -netns "${NS2}" addr add 192.168.1.2/24 dev "${DEV}"
+-ip -netns "${NS1}" addr add       fd::1/64 dev "${DEV}" nodad
+-ip -netns "${NS2}" addr add       fd::2/64 dev "${DEV}" nodad
+-
+-run_test() {
+-	local readonly IP="$1"
+-	local readonly CLOCK="$2"
+-	local readonly TXARGS="$3"
+-	local readonly RXARGS="$4"
+-
+-	if [[ "${IP}" == "4" ]]; then
+-		local readonly SADDR="${SADDR4}"
+-		local readonly DADDR="${DADDR4}"
+-	elif [[ "${IP}" == "6" ]]; then
+-		local readonly SADDR="${SADDR6}"
+-		local readonly DADDR="${DADDR6}"
+-	else
+-		echo "Invalid IP version ${IP}"
+-		exit 1
+-	fi
+-
+-	local readonly START="$(date +%s%N --date="+ 0.1 seconds")"
+-
+-	ip netns exec "${NS2}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" -S "${SADDR}" -D "${DADDR}" "${RXARGS}" -r &
+-	ip netns exec "${NS1}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" -S "${SADDR}" -D "${DADDR}" "${TXARGS}"
+-	wait "$!"
+-}
+-
+-do_test() {
+-	run_test $@
+-	[ $? -ne 0 ] && ret=1
+-}
+-
+-do_fail_test() {
+-	run_test $@
+-	[ $? -eq 0 ] && ret=1
+-}
+-
+-ip netns exec "${NS1}" tc qdisc add dev "${DEV}" root fq
+-set +e
+-ret=0
+-do_test 4 mono a,-1 a,-1
+-do_test 6 mono a,0 a,0
+-do_test 6 mono a,10 a,10
+-do_test 4 mono a,10,b,20 a,10,b,20
+-do_test 6 mono a,20,b,10 b,20,a,20
+-
+-if ip netns exec "${NS1}" tc qdisc replace dev "${DEV}" root etf clockid CLOCK_TAI delta 400000; then
+-	do_fail_test 4 tai a,-1 a,-1
+-	do_fail_test 6 tai a,0 a,0
+-	do_test 6 tai a,10 a,10
+-	do_test 4 tai a,10,b,20 a,10,b,20
+-	do_test 6 tai a,20,b,10 b,10,a,20
+-else
+-	echo "tc ($(tc -V)) does not support qdisc etf. skipping"
+-	[ $ret -eq 0 ] && ret=$ksft_skip
+-fi
+-
+-if [ $ret -eq 0 ]; then
+-	echo OK. All tests passed
+-elif [[ $ret -ne $ksft_skip && -n "$KSFT_MACHINE_SLOW" ]]; then
+-	echo "Ignoring errors due to slow environment" 1>&2
+-	ret=0
+-fi
+-exit $ret
 -- 
-2.53.0
+2.53.0.1213.gd9a14994de-goog
 
 
