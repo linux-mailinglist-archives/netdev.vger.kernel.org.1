@@ -1,77 +1,74 @@
-Return-Path: <netdev+bounces-275155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275156-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uMXaFbL1z2lT2AYAu9opvQ
-	(envelope-from <netdev+bounces-275155-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:15:30 +0200
+	id 2KXsHKv4z2lT2AYAu9opvQ
+	(envelope-from <netdev+bounces-275156-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:28:11 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8193396E6D
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:15:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB7E1396FEC
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 19:28:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D9BDD3012BE7
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 17:12:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C0D5D3024CB8
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 17:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B963D3302;
-	Fri,  3 Apr 2026 17:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684823CBE67;
+	Fri,  3 Apr 2026 17:26:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Z7yYun9k"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f+pEtDRk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817633D0917;
-	Fri,  3 Apr 2026 17:12:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5EA2248A5;
+	Fri,  3 Apr 2026 17:26:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775236352; cv=none; b=O05HecDAgiTAqUOiETYqIgedaJJhGK6pdID4dh+cYm/3Gl9IFfdzVXmZ/UDt366tcoAtY4Uw9eqbu0l12iwS32cyxkIHZnqQYm8AGdWKx3bONracFghqqw6JKUYXHn73bdpmQnzrw5EH3l0btI9s0jaRzzDxN/nxU3/gc8tUwIA=
+	t=1775237211; cv=none; b=uQS5JYSZ9ecAeixR8HWmug9E0zNIdGu3YqXrTzBlNSH4hAMa3QEH5aFw+d0i2VQwxHVl1X9en1qTkQ0mOV0282+l+RfY+w9+6+3dsyJPIJBRI+ewNlPFtr9RgC+ERG+7jnQrD/k/Bu704i64KhafhnzDSCXNCvEW6+B+/Smm8Uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775236352; c=relaxed/simple;
-	bh=fVrIBw5Vas4Nlxh8fzTuiZw8BZ8DqhTsvxhfy1ry3WM=;
+	s=arc-20240116; t=1775237211; c=relaxed/simple;
+	bh=M6p3JmmzQexUHfSoR1LIGJcF55doBeHtQAVLzRfQu3I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EXaFWnR93P4GfFFN7PAXOlVEUlhUHxue7XDmu5s9udnVQcRNFLY/b+6TTID1WhbMgwrpLe3Rat0CHevIzojFK48nRmA3DcW/KG+aH+ON6VeYmd3hx6RxXTw80pF+xdC+0XfmsI+YLNh4tP3LJr5CEuJ0dxrshOgob133X+bH10M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Z7yYun9k; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 9E94F40E00DE;
-	Fri,  3 Apr 2026 17:12:27 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id OGwgTnufKYB0; Fri,  3 Apr 2026 17:12:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1775236343; bh=fF/bH0YV6SXfwCkNBOegEFdryWWQdJAU3GXAygSoFQo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z7yYun9kWI5p0Rzi7lwhMbJNjyZ/TZFO+3hY3DAiu0qBTfdUnfnpDJSPPpwPg6nKL
-	 vZAvKHuh7Eh9ozTwr15ZoqWlKAHtqH8n5W2SrSuJCzRkJ1GzSdboAelLXNkleX/CHP
-	 TooYm7X8R7M/Qgn6WlUgN4kBeXsY8fCsoqEGgQm+RT3Ew8DtYVChHj49WCqDTLLlf4
-	 kFaL1ND+7/S/bY31oHg24/WTylBSGyUsEJyXcLnPZUzeltH2ZH+PYTdEQPrZeQI9/w
-	 6aVrO6f5u4RAs8vbqj4Wa5HygKIaDZwz3IjFHDUjUzVTc9PefBJdPjt9MOACbc5E/8
-	 Ce+Yj+8/2gOkoUbtZNlJCPmvqvqKs5pNttKX7KdTX28O0wwxDUnW3ybS2e46ne+3H1
-	 MO+oOrjdU4Hr0Btgn+uOea2qt3aGUBehTS0hDX45VDCoC8kbS/U6c0UznIhrXFhU6t
-	 wa6XhWGoG1jKTp+BNTyDBwWfaB86GbncobZDq3kCVtgbvLn/k6kW69CabknkaM4bi+
-	 Tuto3kTKRL9NFAg3PPhGnbK5yZtF0dXYhpl4Am6ku6eK94Myr6I8bGX6umNPboPbn3
-	 pGSV8cmCb87dKQKoY22Ao3r3aUq8caqFRuGVP+nfZRLHIPYrhi8CSb7eYsDlLoeIPG
-	 TSxjtRvBN1vzIevSkedDBMcc=
-Received: from zn.tnic (p5de8e020.dip0.t-ipconnect.de [93.232.224.32])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 4D0F240E0163;
-	Fri,  3 Apr 2026 17:11:46 +0000 (UTC)
-Date: Fri, 3 Apr 2026 19:11:45 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=o4LV5dUQ4OTSInssWc7zSt/OLYf9C9kxJToJe+uBorYHs9BV6POEjgdS6dgkt8dJj65rekHKlJc9y/z3B2yWboQH6+XqqpjILD4JN5U8hlWKRd1aUAv5gqlqqL9auXLkMCcYOGC45++tMqfmoBs7oJIGC/MzQwPT5emkQIDoCKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f+pEtDRk; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775237210; x=1806773210;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=M6p3JmmzQexUHfSoR1LIGJcF55doBeHtQAVLzRfQu3I=;
+  b=f+pEtDRkR/TJ/eJmCypB3iLE+2pnWMC8CkJ8RtyFaOr1NSz8iXNoB92c
+   kMaPgjWeiCq06QIQJdrP8n/XgKLXE9yCbWKUnFMjATPDzypCI9xEtXrKj
+   rIAzSrnFn8dm6oMNtAQM5KHOIipBAd2/cyASCWJSSrC+OHcLVO2KjRFVI
+   rv3ViW754DeDWfTTA2XtHl+a1VJLCRpA/qAFcoQDJNEndysY3NyWkONbE
+   KIqmwZlYi4rF7LAEkUBQ3gFY2y2mCQ5EdiNZNdpcHPShYFicev1nKREfb
+   5jlkBeGMKZS2Bz+rgOVQOcm1Crb7QkCvzpqS0QypyNf4+Tlh3BbPsFYM3
+   w==;
+X-CSE-ConnectionGUID: F9RSWatfTRi45C3ENY46uA==
+X-CSE-MsgGUID: WDZN+ZL2QG+S+DRiVQgSpA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11748"; a="76192441"
+X-IronPort-AV: E=Sophos;i="6.23,158,1770624000"; 
+   d="scan'208";a="76192441"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2026 10:26:49 -0700
+X-CSE-ConnectionGUID: 8aLnb5V0QhqxJSY99LLsvw==
+X-CSE-MsgGUID: kWetgwjETliORgt530tEaQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,158,1770624000"; 
+   d="scan'208";a="257775807"
+Received: from guptapa-desk.jf.intel.com (HELO desk) ([10.165.239.46])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2026 10:26:49 -0700
+Date: Fri, 3 Apr 2026 10:26:43 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>, Borislav Petkov <bp@alien8.de>
 Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
 	Nikolay Borisov <nik.borisov@suse.com>,
 	"H. Peter Anvin" <hpa@zytor.com>,
 	Josh Poimboeuf <jpoimboe@kernel.org>,
 	David Kaplan <david.kaplan@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	Peter Zijlstra <peterz@infradead.org>,
 	Alexei Starovoitov <ast@kernel.org>,
@@ -93,64 +90,157 @@ Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>,
 	kvm@vger.kernel.org, Asit Mallick <asit.k.mallick@intel.com>,
 	Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org,
 	netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v9 01/10] x86/bhi: x86/vmscape: Move LFENCE out of
- clear_bhb_loop()
-Message-ID: <20260403171145.GFac_00XdoXprYJSM3@fat_crate.local>
+Subject: Re: [PATCH v9 07/10] x86/vmscape: Use static_call() for predictor
+ flush
+Message-ID: <20260403172643.fs2voyiy2kk6yzcx@desk>
 References: <20260402-vmscape-bhb-v9-0-94d16bc29774@linux.intel.com>
- <20260402-vmscape-bhb-v9-1-94d16bc29774@linux.intel.com>
- <20260403151630.GWac_ZzhQZj5LUDlRf@fat_crate.local>
- <20260403164552.chdvvmdfaufcgxzo@desk>
+ <20260402-vmscape-bhb-v9-7-94d16bc29774@linux.intel.com>
+ <ac_UJx99kDJY8j3t@google.com>
+ <20260403164432.ltnr5oupddscwaqu@desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260403164552.chdvvmdfaufcgxzo@desk>
-X-Spamd-Result: default: False [-0.66 / 15.00];
+In-Reply-To: <20260403164432.ltnr5oupddscwaqu@desk>
+X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[alien8.de,none];
-	R_DKIM_ALLOW(-0.20)[alien8.de:s=alien8];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275155-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,vger.kernel.org,intel.com];
+	TAGGED_FROM(0.00)[bounces-275156-lists,netdev=lfdr.de];
 	RCPT_COUNT_TWELVE(0.00)[37];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,google.com,lwn.net,vger.kernel.org,intel.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[bp@alien8.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[alien8.de:+];
+	FROM_NEQ_ENVFROM(0.00)[pawan.kumar.gupta@linux.intel.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[intel.com:+];
 	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[fat_crate.local:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,alien8.de:dkim]
-X-Rspamd-Queue-Id: C8193396E6D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: CB7E1396FEC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 03, 2026 at 09:45:52AM -0700, Pawan Gupta wrote:
-> Thanks.
+On Fri, Apr 03, 2026 at 09:44:32AM -0700, Pawan Gupta wrote:
+> On Fri, Apr 03, 2026 at 07:52:23AM -0700, Sean Christopherson wrote:
+> > On Thu, Apr 02, 2026, Pawan Gupta wrote:
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -11463,7 +11463,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+> > >  	 * set for the CPU that actually ran the guest, and not the CPU that it
+> > >  	 * may migrate to.
+> > >  	 */
+> > > -	if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
+> > > +	if (vmscape_mitigation_enabled())
+> > 
+> > This is pretty lame.  It turns a statically patched MOV
+> 
+> Yes it is, this was done ...
+> 
+> >   11548		if (cpu_feature_enabled(X86_FEATURE_IBPB_EXIT_TO_USER))
+> >   11549			this_cpu_write(x86_ibpb_exit_to_user, true);
+> >      0x000000000003c57a <+858>:	movb   $0x1,%gs:0x0(%rip)        # 0x3c582 <vcpu_enter_guest+866>
+> > 
+> > into a function call and two sets of conditional branches.  And with mitigations
+> > enabled, that function call may trigger the wonderful unret insanity
+> > 
+> >   11548		if (vmscape_mitigation_enabled())
+> >      0x000000000003c575 <+853>:	call   0x3c57a <vcpu_enter_guest+858>
+> >      0x000000000003c57a <+858>:	test   %al,%al
+> >      0x000000000003c57c <+860>:	je     0x3c586 <vcpu_enter_guest+870>
+> > 
+> >   11549			this_cpu_write(x86_predictor_flush_exit_to_user, true);
+> >      0x000000000003c57e <+862>:	movb   $0x1,%gs:0x0(%rip)        # 0x3c586 <vcpu_enter_guest+870>
+> > 
+> > 
+> >   3166	{
+> >      0xffffffff81285320 <+0>:	endbr64
+> >      0xffffffff81285324 <+4>:	call   0xffffffff812aa5a0 <__fentry__>
+> > 
+> >   3167		return !!static_call_query(vmscape_predictor_flush);
+> >      0xffffffff81285329 <+9>:	mov    0x13a4f30(%rip),%rax        # 0xffffffff8262a260 <__SCK__vmscape_predictor_flush>
+> >      0xffffffff81285330 <+16>:	test   %rax,%rax
+> >      0xffffffff81285333 <+19>:	setne  %al
+> > 
+> >   3168	}
+> >      0xffffffff81285336 <+22>:	jmp    0xffffffff81db1e30 <__x86_return_thunk>
+> > 
+> > While this isn't KVM's super hot inner run loop, it's still very much a hot path.
+> > Even more annoying, KVM will eat the function call on kernels with CPU_MITIGATIONS=n.
+> > 
+> > I'd like to at least do something like the below to make the common case of
+> > multiple guest entry/exits more or less free, and to avoid the CALL+(UN)RET
+> > overhead, but trying to include linux/static_call.h in processor.h (or any other
+> > core x86 header) creates a cyclical dependency :-/
+> > 
+> > diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
+> > index 20ab4dd588c6..0dc0680a80f8 100644
+> > --- a/arch/x86/include/asm/processor.h
+> > +++ b/arch/x86/include/asm/processor.h
+> > @@ -36,6 +36,7 @@ struct vm86;
+> >  #include <linux/err.h>
+> >  #include <linux/irqflags.h>
+> >  #include <linux/mem_encrypt.h>
+> > +#include <linux/static_call.h>
+> >  
+> >  /*
+> >   * We handle most unaligned accesses in hardware.  On the other hand
+> > @@ -753,7 +754,11 @@ enum mds_mitigations {
+> >  };
+> >  
+> >  extern bool gds_ucode_mitigated(void);
+> > -extern bool vmscape_mitigation_enabled(void);
+> > +
+> > +static inline bool vmscape_mitigation_enabled(void)
+> > +{
+> > +       return !!static_call_query(vmscape_predictor_flush);
+> > +}
+> >  
+> >  /*
+> >   * Make previous memory operations globally visible before
+> > diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+> > index 366ebe1e1fb9..02bf626f0773 100644
+> > --- a/arch/x86/kernel/cpu/bugs.c
+> > +++ b/arch/x86/kernel/cpu/bugs.c
+> > @@ -148,6 +148,7 @@ DEFINE_STATIC_KEY_FALSE(switch_mm_cond_l1d_flush);
+> >   * sequence. This defaults to no mitigation.
+> >   */
+> >  DEFINE_STATIC_CALL_NULL(vmscape_predictor_flush, write_ibpb);
+> > +EXPORT_STATIC_CALL_GPL(vmscape_predictor_flush);
+> 
+> ... to avoid exporting the static key, so that modules (other than KVM)
+> cannot do static_call_update(vmscape_predictor_flush).
+> 
+> Peter suggested changes that allowed adding EXPORT_STATIC_CALL_FOR_KVM():
+> 
+>   https://lore.kernel.org/all/20260319214409.GL3738786@noisy.programming.kicks-ass.net/
 
-You don't have to say "thanks" to every review - we're one big family.
+Sorry, this is the correct link for EXPORT_STATIC_CALL_FOR_KVM():
 
-:-)
+  https://lore.kernel.org/all/20260320062206.bdrnmnvho6lhmejw@desk/
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> EXPORT_STATIC_CALL_FOR_KVM() seems to be a cleaner approach to me.
+> 
+> Boris, I know you didn't like exporting the static_key. But, as Sean said
+> this is a hot path, and avoiding the unnecessary call would benefit all
+> CPUs (affected or unaffected). Moreover, EXPORT_STATIC_CALL_FOR_KVM()
+> somewhat addresses your concern of exporting the static_key to the world.
+> Would you be okay with it?
 
