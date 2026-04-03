@@ -1,213 +1,177 @@
-Return-Path: <netdev+bounces-275077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275078-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SOOFOsTMz2m50gYAu9opvQ
-	(envelope-from <netdev+bounces-275077-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 16:20:52 +0200
+	id sMIiLjnNz2m50gYAu9opvQ
+	(envelope-from <netdev+bounces-275078-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 16:22:49 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D6B039523A
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 16:20:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11FA5395293
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 16:22:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 018053115832
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 14:13:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1412830C9C71
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 14:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC4138945C;
-	Fri,  3 Apr 2026 14:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97226382F1C;
+	Fri,  3 Apr 2026 14:14:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g/4m5vOd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qYk2VQQY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67942E173B
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 14:13:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775225617; cv=none; b=gv8jwTPcIPhBzT4F38UGVJyvSpGpmaYjdTotSzwFp5D+2EeMSi7IElfxGpkt0mUFGdHwFhw8Vq1Jz6xnxUbIZ7bnbi0ZwJj2z4b+aQqW2+Q3JzwfpjhVJ9ZuUDM3V5LUbBvAcflITyZOJnZ9zruZ0PwOqD0CDQpsRw3KRALaVeY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775225617; c=relaxed/simple;
-	bh=cj5J5orZc6Bk097XCTbKpDv3F0DAnlPVBEk2/Ccl1QU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kM0hIRDssjsAgG7mvPlTgPwQnXcoGmP8lwXtQ+vgJfMy82MfPswZbquRD0Sdx37U1JT+/57C9JCrRWn9bN+x1/woYRuPHbguqUFgStX71SKw4ltY5K/r1r7Pd5KhwLpTS7uWdSKjLa77A6hrlWK6gibCIpWgHsTy+6fiIAdprio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g/4m5vOd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775225614;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=SeR01A5h0Zpg5VTECLLk9aoPfybIHXPzkZHfplkbzn8=;
-	b=g/4m5vOd2F+VYIb496X3sSPZmLa20PZMNXml7XqcJ6OcTzgusyb97eqEW56n75xFCgTHtM
-	UYnRyoaGnwIiS+aqdAmH3pQq7MdgkSmJwPTukqjHKlEADKxKiZi8J3oNIrOdFm40q8fazi
-	Fu/JwkoRZWd+YihU9wZQGaHp7bGuP3w=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-607-azpjkXEqNWKO1SXd_80n3g-1; Fri,
- 03 Apr 2026 10:13:31 -0400
-X-MC-Unique: azpjkXEqNWKO1SXd_80n3g-1
-X-Mimecast-MFC-AGG-ID: azpjkXEqNWKO1SXd_80n3g_1775225608
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 369221956058;
-	Fri,  3 Apr 2026 14:13:28 +0000 (UTC)
-Received: from dcaratti.users.ipa.redhat.com (unknown [10.44.48.80])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7A9553000223;
-	Fri,  3 Apr 2026 14:13:24 +0000 (UTC)
-From: Davide Caratti <dcaratti@redhat.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Xiang Mei <xmei5@asu.edu>,
-	netdev@vger.kernel.org
-Cc: Victor Nogueira <victor@mojatatu.com>
-Subject: [PATCH net] net/sched: cls_fw: fix NULL dereference of "old" filters before change()
-Date: Fri,  3 Apr 2026 16:13:11 +0200
-Message-ID: <a93f97c0ad17ffd67f8a1719ff26b21d18e1020f.1775225292.git.dcaratti@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DF73793B1
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 14:14:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775225682; cv=pass; b=JCcxopY/97Ia6k4Fno7IHUsIbek+ZaA78EbMC7YnZiGiNroFnU05KX44lR+lY0fQ1MPgDM+wvIL33Gr0y32ZkEJ7K1YDX8/90g/Mxo5mrIIrtstoGFfZv9B3gJt/oPW2aID9mIM2dn6cTmpJEExeZeujuLaMjegxXfaJFsX9aNM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775225682; c=relaxed/simple;
+	bh=HEacSVc9WrOj9fxcQ0JXEuYZe9qAhULgVPS4OSDH1eg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bQnR+6wzPtq32g4NDBQb0hdqat4jp9PCCQ+F+z0zeXgl21JLlTomG8dq6giOvTRAIAO+hDO85DEZR31e327ZwmezdNDxE4H7rjQsL3D5LLWTM4u2yd56XkbYn1fxY52YPK8luX7Mv52uTS16wfaSeMJRz/PJ04CV1VyCfN/Kq6o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qYk2VQQY; arc=pass smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-5091ed02c54so350111cf.1
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 07:14:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775225680; cv=none;
+        d=google.com; s=arc-20240605;
+        b=dBY+tkPdleP0jFkAwmdj3nqlxBjxjpJoQXdqXne3Xx/Kre5mu5XViYvOX9STka2leo
+         6iKvu5QHekeQXy7kkWYxGftfcAv+20+BTj6KQZDJVU5hSX1J/maszztD6Fk9IbdllCGo
+         OLlNmFYT2PPDBO40TNwtzOqcYeytXM6zwFCZi/7muVrL3nzIGMB+yjAyND9FrXCX5n/T
+         vTpGnZG1XwSzHerK5TI0wqGqwaxq/Oo5XcPgQCVi7/HLWqwEqr70d1FDl9CeQ88UOb0D
+         YQ4jWtFPVP5o6UNuJiYxA8bpbePsQec+v6M+wqxxm891VP4H3jk4awF2EyOGYxxTvsVL
+         grAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=zVbn7vKK9p+rq/cW/UuzyJsNfCtCCLh7vBkZv525ri4=;
+        fh=x8Hq+cbrWE8g7vYg+5MzVWGVeo+M8OeYtneaJFy4PGo=;
+        b=UGgFbSIrjFrd1t4IMlv5/C2lmX1NqG0vaTJTBX6YcrWXX/j2GuUKH6G/ebfLcUJwpK
+         BJ4TFSb7sIkvYvVpJd36yHjk2HdkwveHT4wOQCzoOCwH7oPz2ifNyVdgGd4UbWXL9d2z
+         c9oyUub3N2tbrfOWwZ5RePvvGn3E0wdfNkqywMzOqyB18oCBh78kknWhBSymb9omRqbs
+         t8S3asp+oUBUTs7G//wbLnQq+JutVox2TPdT9YVgDjlJEQl0PMeNqDGslQzeQWCczY7c
+         6AlLUE0ivW2CvkDvM1trrUZvfaeje18sSsxKmykeVj3nR4EiyqTLCtLcr6aGMxUOSd0t
+         ozxg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775225680; x=1775830480; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zVbn7vKK9p+rq/cW/UuzyJsNfCtCCLh7vBkZv525ri4=;
+        b=qYk2VQQYRURZak98VdVPmqTuh/gnSjJejxCMjIbTumWWW4rl9sABtIQ4eg7cTHalfy
+         ZAPiHxsvyYyqMvV6gEvBjBym1EhOGDjOM/d7MZUqAto1c39GA9r3sa8BMEnnd8wMbtdA
+         W1n8v0FHMjIW/HimtAV27o6YKEnVipXw6/mwWw4uIqF2IjdO8Puwr3fzCo1Cq+Km9gz1
+         pKDeTxgKFThg1xyz9qaUaxxgAq/GwXzHZeVGAkMORyvm78cejRT80c4Vp+5yRPVaE0Fl
+         144R+Q4xzyATJPKvdOY5aJATAiYAdtaaMlzrCb26kTzhw5cHZwXNsc5tBxCuq0WLIs6t
+         oewA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775225680; x=1775830480;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=zVbn7vKK9p+rq/cW/UuzyJsNfCtCCLh7vBkZv525ri4=;
+        b=MkRgaHY9awuc7bG1HqsDIz39rCL2rrymCfcS35aaEyY8pQfkMyPZ8XhZJA/fICg5hU
+         AmadeUQwqYoo61uS8x/82TNslLj9Bp/6d3yZicGdJaubC2vwRuEsFway4I0NCM959Npj
+         ErHp0fiXkPyPY+TvRrqqf7zkC727RMViNxOIKj2m9F+DL8kAb59DOWqtGJ1po9zHULDh
+         HSYPHoDupLQUazM21yDC6w2pj5AUMJksNpTIX48GDwvZRby1aOgRErYJk9QSJQMpwtQC
+         R/lRoGzSO+xsGbBnunp5D/cT+nytNWp2rPhX5HYjJgOzLsk8aVNiUBAH+z0zv9xo6qU8
+         GuSg==
+X-Forwarded-Encrypted: i=1; AJvYcCX8zdd4fw++Y4B9cu18Gu6I1kBh5C3cIfsLS88m1U0EiQOZw3/HwIWCKokFSc05jepu2TkCZCQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2hha5GRxYhqyPoaZlM2B8bRqaPy+kygkdJATCt04i+2sCLLX5
+	iqlqePzuDVlKSV2CZC4wJ127bByi/CcWt+lUO3dolTg2b1xQhCo5w19TU/zSzY0KlCPFxjAja/r
+	2YcpCuVfPAhnKJJtVWcgBXNMQVrwIcS9av6xeREPS
+X-Gm-Gg: ATEYQzzFgdsipnpLNJbtQ3FE3tqjjISS801kwjvsg4CopqhYKUryN/cUGskMMCR578K
+	+gsfFXFSjLyQniqKK0E4AVBM8/BCbs4/sTXapv/SQJ6h4UE8Wv5kGUqjnXEERqEyEwgzFjpqUfO
+	mk16DMBmyXhb0GVQARyfeQup1mUqSfyUJv4O01kbCaN150k7sPuYX0jgaNzRYo1FPvej2w9mHJt
+	IjN+7C+PnPHCmUBoPIqdfKRSZJmdFe3F32Y5/P7J3Vdo6mgTs5CB7X+VZtQYLuG+2U1sb3Qx0fj
+	Fp7ybVDz3u/LPxw95TEIvIBz7aGm+ZcKlnqqs5E=
+X-Received: by 2002:a05:622a:5a16:b0:509:174d:3224 with SMTP id
+ d75a77b69052e-50d66420317mr9892601cf.11.1775225679632; Fri, 03 Apr 2026
+ 07:14:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+References: <20260403102309.338648-1-edumazet@google.com>
+In-Reply-To: <20260403102309.338648-1-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Fri, 3 Apr 2026 09:14:21 -0500
+X-Gm-Features: AQROBzDGXDLtFvv6DkrkAfg3z_nd-BJS4YajNFL19JYHW8WJfeYgtCaJia1dqss
+Message-ID: <CADVnQyngfZKuufzQd+oReHL=YyEiiefypww5gPzQ2HWkyW+puw@mail.gmail.com>
+Subject: Re: [PATCH iproute2-next] ss: add support for TCP delack timers
+To: Eric Dumazet <edumazet@google.com>
+Cc: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275077-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dcaratti@redhat.com,netdev@vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	FREEMAIL_CC(0.00)[kernel.org,networkplumber.org,davemloft.net,redhat.com,google.com,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-275078-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[ncardwell@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url,bootlin.com:url]
-X-Rspamd-Queue-Id: 5D6B039523A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 11FA5395293
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Like pointed out by Sachiko [1], TC filters are added to a shared block
-before their ->change() function is called. This is a problem for cls_fw:
-an invalid filter created with the "old" method can still classify some
-packets before it is destroyed by the validation logic added by Xiang.
+On Fri, Apr 3, 2026 at 5:23=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> Kernel commit c698f5cc940d ("inet_diag: report delayed ack timer informat=
+ion")
+> added a new enum for idiag_timer values and support for delayed ack timer=
+s.
+>
+> Change tcp_timer_print() to use the new enum and display "delack"
+> instead of "unknown":
+>
+> tt -to
+> ...
+>    ESTAB 10     0   [2002:a05:6830:1f86::]:12875 [2002:a05:6830:1f85::]:5=
+0438
+>
+>         timer:(delack,003ms,0) ino:152178 sk:3004 cgroup:unreachable:189 =
+<->
+>
+>         skmem:(r1344,rb12780520,t0,tb262144,f2752,w0,o250,bl0,d0) ts usec=
+_ts
+>         ...
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
 
-Therefore, insisting with repeated runs of the following script:
+Reviewed-by: Neal Cardwell <ncardwell@google.com>
 
- # ip link add dev crash0 type dummy
- # ip link set dev crash0 up
- # mausezahn  crash0 -c 100000 -P 10 \
- > -A 4.3.2.1 -B 1.2.3.4 -t udp "dp=1234" -q &
- # sleep 1
- #  tc qdisc add dev crash0 egress_block 1 clsact
- # tc filter add block 1 protocol ip prio 1 matchall \
- > action skbedit mark 65536 continue
- #  tc filter add block 1 protocol ip prio 2 fw
- # ip link del dev crash0
+Thanks, Eric!
 
-can still make fw_classify() hit the WARN_ON() in [2]:
-
- WARNING: ./include/net/pkt_cls.h:88 at fw_classify+0x244/0x250 [cls_fw], CPU#18: mausezahn/1399
- Modules linked in: cls_fw(E) act_skbedit(E)
- CPU: 18 UID: 0 PID: 1399 Comm: mausezahn Tainted: G            E       7.0.0-rc6-virtme #17 PREEMPT(full)
- Tainted: [E]=UNSIGNED_MODULE
- Hardware name: Red Hat KVM, BIOS 1.16.3-2.el9 04/01/2014
- RIP: 0010:fw_classify+0x244/0x250 [cls_fw]
- Code: 5c 49 c7 45 00 00 00 00 00 41 5d 41 5e 41 5f 5d c3 cc cc cc cc 5b b8 ff ff ff ff 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc 90 <0f> 0b 90 eb a0 0f 1f 80 00 00 00 00 90 90 90 90 90 90 90 90 90 90
- RSP: 0018:ffffd1b7026bf8a8 EFLAGS: 00010202
- RAX: ffff8c5ac9c60800 RBX: ffff8c5ac99322c0 RCX: 0000000000000004
- RDX: 0000000000000001 RSI: ffff8c5b74d7a000 RDI: ffff8c5ac8284f40
- RBP: ffffd1b7026bf8d0 R08: 0000000000000000 R09: ffffd1b7026bf9b0
- R10: 00000000ffffffff R11: 0000000000000000 R12: 0000000000010000
- R13: ffffd1b7026bf930 R14: ffff8c5ac8284f40 R15: 0000000000000000
- FS:  00007fca40c37740(0000) GS:ffff8c5b74d7a000(0000) knlGS:0000000000000000
- CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- CR2: 00007fca40e822a0 CR3: 0000000005ca0001 CR4: 0000000000172ef0
- Call Trace:
-  <TASK>
-  tcf_classify+0x17d/0x5c0
-  tc_run+0x9d/0x150
-  __dev_queue_xmit+0x2ab/0x14d0
-  ip_finish_output2+0x340/0x8f0
-  ip_output+0xa4/0x250
-  raw_sendmsg+0x147d/0x14b0
-  __sys_sendto+0x1cc/0x1f0
-  __x64_sys_sendto+0x24/0x30
-  do_syscall_64+0x126/0xf80
-  entry_SYSCALL_64_after_hwframe+0x77/0x7f
- RIP: 0033:0x7fca40e822ba
- Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 7e c3 0f 1f 44 00 00 41 54 48 83 ec 30 44 89
- RSP: 002b:00007ffc248a42c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
- RAX: ffffffffffffffda RBX: 000055ef233289d0 RCX: 00007fca40e822ba
- RDX: 000000000000001e RSI: 000055ef23328c30 RDI: 0000000000000003
- RBP: 000055ef233289d0 R08: 00007ffc248a42d0 R09: 0000000000000010
- R10: 0000000000000000 R11: 0000000000000246 R12: 000000000000001e
- R13: 00000000000186a0 R14: 0000000000000000 R15: 00007fca41043000
-  </TASK>
- irq event stamp: 1045778
- hardirqs last  enabled at (1045784): [<ffffffff864ec042>] __up_console_sem+0x52/0x60
- hardirqs last disabled at (1045789): [<ffffffff864ec027>] __up_console_sem+0x37/0x60
- softirqs last  enabled at (1045426): [<ffffffff874d48c7>] __alloc_skb+0x207/0x260
- softirqs last disabled at (1045434): [<ffffffff874fe8f8>] __dev_queue_xmit+0x78/0x14d0
-
-Then, because of the value in the packet's mark, dereference on 'q->handle'
-with NULL 'q' occurs:
-
- BUG: kernel NULL  pointer dereference, address: 0000000000000038
- [...]
- RIP: 0010:fw_classify+0x1fe/0x250 [cls_fw]
- [...]
-
-Add a NULL check on 'q' to prevent the kernel from crashing. The WARN_ON()
-is preserved to allow users fixing their configuration.
-
-[1] https://sashiko.dev/#/patchset/20260331050217.504278-1-xmei5%40asu.edu
-[2] https://elixir.bootlin.com/linux/v7.0-rc6/source/include/net/pkt_cls.h#L86
-
-Fixes: faeea8bbf6e9 ("net/sched: cls_fw: fix NULL pointer dereference on shared blocks")
-Signed-off-by: Davide Caratti <dcaratti@redhat.com>
----
- net/sched/cls_fw.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
-index 23884ef8b80c..10f46999ad2a 100644
---- a/net/sched/cls_fw.c
-+++ b/net/sched/cls_fw.c
-@@ -78,7 +78,7 @@ TC_INDIRECT_SCOPE int fw_classify(struct sk_buff *skb,
- 
- 		/* Old method: classify the packet using its skb mark. */
- 		if (id && (TC_H_MAJ(id) == 0 ||
--			   !(TC_H_MAJ(id ^ q->handle)))) {
-+			   (q && !(TC_H_MAJ(id ^ q->handle))))) {
- 			res->classid = id;
- 			res->class = 0;
- 			return 0;
--- 
-2.52.0
-
+neal
 
