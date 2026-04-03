@@ -1,151 +1,167 @@
-Return-Path: <netdev+bounces-275102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275105-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iCIkBAnbz2mb1AYAu9opvQ
-	(envelope-from <netdev+bounces-275102-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:21:45 +0200
+	id UPSfNLvaz2mb1AYAu9opvQ
+	(envelope-from <netdev+bounces-275105-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:20:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CDC6395BBA
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:21:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23D73395B8C
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 17:20:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0D8CA3009576
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 15:17:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 444AA303DAFD
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 15:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 583723C73F3;
-	Fri,  3 Apr 2026 15:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5010392802;
+	Fri,  3 Apr 2026 15:19:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mle45kw2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S/fTovq8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2FCF3C6A43;
-	Fri,  3 Apr 2026 15:17:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775229423; cv=none; b=POs27y26DxWQvX7NnRYvCswEiSSbB3v5jeyq51ujrPntbaKKSaYbeJEeuEsWOW4ghjQhwELqu1Vv18gkgIwgL1MNbpp98PrOq8rZ75Gazq4u4GKGsu5wRr1GBu2rynaLoLfXX03EWeQsFdC2OSxaWmcnyVKd+rp1C1wdsi/fHNU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775229423; c=relaxed/simple;
-	bh=1QQFvoKpB2XfX6yKZk+AT0LvHS6NlKPqN9M6hnJ43Fw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LA4qCMqkPurCdiyU6jYAdo+jiuoDcukzOoRZuumjN9LnRbPoAbuIY1dmldWLUsn9KEKHpe0SUSr4CBTZMe7YeezJtD2sx1O+DS1f7LXLbNnec7X98C5Xm+CwN06FB1XjjlD7Ck3fDxb2XYyObli1r1bS9cJ3i9t6v3BNvBkc8WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mle45kw2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC2B5C4CEF7;
-	Fri,  3 Apr 2026 15:17:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775229423;
-	bh=1QQFvoKpB2XfX6yKZk+AT0LvHS6NlKPqN9M6hnJ43Fw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mle45kw2ZXDtkpPYYWnrA5tWz+iaxFnJTA8l99IFfQxYhs4OACwmfnxPrrGTHeo0q
-	 GPKleLrXkmSbi3NHtH5laYXPKS1xTqzy+WhtLr21b36imt7mTiYG2Vjd6BrPHpiQ7u
-	 8CPTjg+/LIKDhZ279mvghiILU+CFWmMAykyhGnwYiRK1iHp/7n0jx7G3AMqpTO4Sy/
-	 MvyTRuSm1O6CrLtwEPsLjWTYXe3b8aZXwaZ6G+fGlLzEOoltnFoBgn/TNlbX/AFnyA
-	 yEJNYmDAww6n6Wcphl3qWVoLsxkcxhWz/TuEr3c+IimHUF61FWYo0QN8RH5RA7irkY
-	 s2VvE2MP2Pm5w==
-Date: Fri, 3 Apr 2026 16:16:58 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thierry Reding <thierry.reding@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-tegra@vger.kernel.org
-Subject: Re: [PATCH V4 1/3] net: stmmac: Fix PTP ref clock for Tegra234
-Message-ID: <20260403151658.GJ113102@horms.kernel.org>
-References: <20260401102941.17466-1-jonathanh@nvidia.com>
- <20260401102941.17466-2-jonathanh@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676143612EF
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 15:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.161.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775229553; cv=pass; b=JmyvDkO00zbj/+C1JVCGd7wSkFYpUDUdrC/lMfRPl4w/z4H3yxSXW2kEz85I8th2pkVabLdRrAwEOwSDJDqm0XE22hjfJaWjWzDUlBFZ6rwil5BpfZyLd+d2YUsa4dWl23dhNmUTUu3WEgeTxH0g8GK3xHE1DwXiK7KUIYnOsew=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775229553; c=relaxed/simple;
+	bh=B9ChwxIqjVPjxIdXdydUQ28VrQVd0/3Zr/7xPOZkTm0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eDn4liOksuyvejGVA21+7zJZyWhoXHsnsdD6YDSvaoPAY2UUvPaEsfuK9OPvW2UJdM+qsY+q+mjvQIJZssXUi/ZPB8mhRwq/4fHcFozcxoJKHaRFu4cLzXTRY2deGfsIpNwLM7QHjoMS4SocJqO0cJoFTjF0aUSZY4yGjUoAdGE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S/fTovq8; arc=pass smtp.client-ip=209.85.161.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-6830f4f34c9so148596eaf.3
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 08:19:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775229551; cv=none;
+        d=google.com; s=arc-20240605;
+        b=DbyhalfxdfxQjxNcin3BRE3lheVPEZFqfgQFOzCaJsdItO6LAEZPH0EQl+2dI1YUkj
+         RAnVaB7m+7ENfoAONnHfY8RACY2H1F0TB1furrtLBIbOlbDM0yQpaH9b/Ck7K41qEg2S
+         Q7QKEOLCVHKK9IOw8H/LFIOLXaarQmzbC0EWO4XW+/HjHbThMNP2Vbp1t8dxOYra0r0z
+         LDAJkJch0qaCCa5Do68bhGzT3x0bQfNjA3Js/RMG/uw8k0yWWfTsMFt8gH3DwZcbVnPo
+         3NsMGJnT/XekmPi3OzmkVqvm9BsZIIkSt1DdrmsfhIdepy1pHRnQm5RLccOWASzigS+c
+         OlCA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Yj0csSExbiRXKyxIzdW4Y1VT9MMdIju9zbDZii7ejEg=;
+        fh=1ffhz1LCn+XjckKwJV4d58j3PNJFvGXtZYChy/J7jCo=;
+        b=k0d+wOJrgJ7PwBfELV5d3v7NEXAc06bGrCTqpUfVhRu9EyvUe6xwBaYHqa1Y/Ee3PT
+         87JK6vIXKa6mfAEBKV2IM8/HDY7MdT8u6ElGmHc89n6AKHCixuDBBFNP6zzZxdz8vMvI
+         puUfLIHz3Wc9TnUPFj1FtaqL9L+qbThdMWTm7eUef8YTh7EEL1xLcFVFBi0fvdscUd3K
+         EqGO+UqbSecl3K6oE5m0xmK8oQOnt+m5rqQ2geyEk4copChVfpOe8E4b6xgDHapBlk5J
+         5hwvJKg3Vn4HEaQA+iJmXaOOLXKeJLxN/N4Z1Wus7dGNeflAR2Z6GdE5jl7pJjp/AFSq
+         gMTg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775229551; x=1775834351; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yj0csSExbiRXKyxIzdW4Y1VT9MMdIju9zbDZii7ejEg=;
+        b=S/fTovq85BpNtXU19bsRHxf5dJWNxncuXbmkqE9ouurDtGI46+98rIsmInqyl+yvdo
+         O1STrRb0iaduJKx/eDpv1uOUlYJ2oMYuBIHE16ZkoRzSyfCxDNhxoOAzicXBamKG4oIe
+         EIVAwzWcKc9ClOfz3QkrycNmOUuZANh53XE9lhk3hgPBJwJdPfuLw/+YNDBEqtGqHJu6
+         MnLSp21z8aIKk79yzSYLj/mQn779J8P06vUKGsLHUxFRqdsBTx6ndHiJNasSruQkW6YF
+         oqfGk4PdfM8/TTFhO1dzJEDlPUOZD520t0gtdU5D8c86VM0R5dmHwYEON+WI2YNuws7v
+         7rEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775229551; x=1775834351;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Yj0csSExbiRXKyxIzdW4Y1VT9MMdIju9zbDZii7ejEg=;
+        b=IGFLYvm26m+eVaM5Q46IlBcZFcwcL8ITIRq20d6FnesRukJdBvDIwZ9iipfbxy3aq+
+         97/R0C6tXsQuhLwVp9Zsa0xlei4RrZLoVjBgr9SWmWgQ0Jsib3k8pHPIisc579uwVlyk
+         BFrNJEfE8ZUP8BbxsU0ya88rJb1oI4/yxzLb8AtcKCQsm/JaKRUHpn8PWp5lCGQPAGiq
+         n83NB6Xs5SyBCdLSvI7hlVNlrEVm4ONlPTBvLdwVKEmCo0GJxwgpDVfw7m64RqOwaOUg
+         Ct3XMuK3P9q99S23Mc0s4pZXvSQcu043/DI2TRa0iB8dxB6QvOWsx0ZceBH6seIXzJpf
+         SF9w==
+X-Gm-Message-State: AOJu0YxcmJwKkSVw778xgfjSnjvKYQW4lZ5A8W8EpIxUiDtIL/ngZS7E
+	FU0tCApXEJjRILPmx/i1+085CoFTTHn7NY44jy1UPqDMoJjalWuwJmNBb3cUFS7NQ3B/4znLaZN
+	483ggNv9mVAvElnGvcZpG+CTiFh2+Vmo=
+X-Gm-Gg: ATEYQzzc6zFnv7h4uxz/dyEbxMADk3AxzDL3/D85adwDhJLi1de7dshfeALKACrS1QB
+	mtDkYNfxjshc47P4aHiC7ZyqEiUFxDw6aGKIK9YGzX/260zZbVfcymrWP5hiR4jRYPfi0UH2IxG
+	/cC4J3BJkPhCG7JgOOvahJW2F72r3nS94Evxm1EOUVxZ8wwbSWV1sXrfc1E0SQQYgievINa+1YH
+	5tJ0HDQQtwxXpLcCZU8WNhl9paGMWyAVCLrN/8YNHmKpVfofAczotWMcvHySU3dUk7KTh3SksfS
+	UwgF4ATrKotHUNw/z9jfch7VVXE6zfLS7HppxL/dGwW5ExbLed+Q
+X-Received: by 2002:a05:6820:81e:b0:682:b064:ecf3 with SMTP id
+ 006d021491bc7-682b064ef39mr887157eaf.3.1775229550943; Fri, 03 Apr 2026
+ 08:19:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260401102941.17466-2-jonathanh@nvidia.com>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+References: <20260402223437.109097-1-mmyangfl@gmail.com> <20260402223437.109097-4-mmyangfl@gmail.com>
+ <654b51cd-fc06-4dd2-9a6e-421d7333f905@lunn.ch> <CAAXyoMP=o7P0-o6HOKi8dho8iLLV4LJT=YHae5Gj13xJ2ph4og@mail.gmail.com>
+ <308c4474-3da3-41bf-af29-3a400232e029@lunn.ch>
+In-Reply-To: <308c4474-3da3-41bf-af29-3a400232e029@lunn.ch>
+From: David Yang <mmyangfl@gmail.com>
+Date: Fri, 3 Apr 2026 23:18:34 +0800
+X-Gm-Features: AQROBzCLKbnn8kS3OOOL_Rx_k7SSRVBrWqQYiEeYoD1N5JQWo7VPP_aHfJR6fNY
+Message-ID: <CAAXyoMOJ=RDzV2pGGN0yW2Q5hpM9L212J=QMsUw3MsiFcvXFxw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/4] net: dsa: yt921x: Add port police support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-275105-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,davemloft.net,google.com,kernel.org,redhat.com];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275102-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[mmyangfl@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 6CDC6395BBA
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:email]
+X-Rspamd-Queue-Id: 23D73395B8C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 01, 2026 at 11:29:39AM +0100, Jon Hunter wrote:
-> Since commit 030ce919e114 ("net: stmmac: make sure that ptp_rate is not
-> 0 before configuring timestamping") was added the following error is
-> observed on Tegra234:
-> 
->  ERR KERN tegra-mgbe 6800000.ethernet eth0: Invalid PTP clock rate
->  WARNING KERN tegra-mgbe 6800000.ethernet eth0: PTP init failed
-> 
-> It turns out that the Tegra234 device-tree binding defines the PTP ref
-> clock name as 'ptp-ref' and not 'ptp_ref' and the above commit now
-> exposes this and that the PTP clock is not configured correctly.
-> 
-> In order to update device-tree to use the correct 'ptp_ref' name, update
-> the Tegra MGBE driver to use 'ptp_ref' by default and fallback to using
-> 'ptp-ref' if this clock name is present.
-> 
-> Fixes: d8ca113724e7 ("net: stmmac: tegra: Add MGBE support")
-> Signed-off-by: Jon Hunter <jonathanh@nvidia.com>
+On Fri, Apr 3, 2026 at 10:19=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > Does it unnecessarily depend on __int128? Otherwise it's good.
+>
+> Ah, it seems to be a 64 bit architecture only thing.
+>
+> Shame, because it would make this code easier to understand.
+>
+> For these u96 values, the masks i looked at would fit into a u64.  Are
+> there any fields which cross from bits < 64 to > 64? Could you
+> represent it as a u64+u32?
+>
+>           Andrew
 
-The nit below notwithstanding this looks good to me.
+EBS crosses word #0 and #1 and CBS crosses word #1 and #2, and I
+didn't find any boundary patterns among other u96 registers.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-> ---
->  .../net/ethernet/stmicro/stmmac/dwmac-tegra.c | 20 +++++++++++++++++--
->  1 file changed, 18 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-> index b4b39e6a169e..3af2f001fada 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-
-...
-
-> @@ -216,6 +216,7 @@ static int tegra_mgbe_probe(struct platform_device *pdev)
->  	struct plat_stmmacenet_data *plat;
->  	struct stmmac_resources res;
->  	struct tegra_mgbe *mgbe;
-> +	bool use_legacy_ptp = false;
->  	int irq, err, i;
->  	u32 value;
->  
-
-nit: As this is Networking code, please retain reverse xmas tree order --
-     longest line to shortest -- for local variable declarations.
-
-...
+But maybe I could drop those multi-word register helpers and use
+manual updates, since I have to use unaligned modifications anyway.
 
