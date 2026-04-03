@@ -1,152 +1,345 @@
-Return-Path: <netdev+bounces-275014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275017-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UKWTEnG1z2l1zgYAu9opvQ
-	(envelope-from <netdev+bounces-275014-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:41:21 +0200
+	id OLU4DCO1z2l1zgYAu9opvQ
+	(envelope-from <netdev+bounces-275017-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:40:03 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE3443941F4
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:41:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BE3A3941C3
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:40:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DE0B63037937
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 12:36:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C2464305CDD9
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 12:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6221F131A;
-	Fri,  3 Apr 2026 12:36:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADECB3932DB;
+	Fri,  3 Apr 2026 12:38:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RqkxR+ni"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RIlLuehq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4881EE7B7
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 12:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83ADC1F7569
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 12:38:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775219774; cv=none; b=fue8ZQRJRiOiboi07Qpphsa8IXtfnQEX274AjOEh9mdZPsA1IxUPfVKUHfnjyBDUqipm65oA/QOBp8/GkA1YusSlIwhV51kUw0VXLDhdAj3Z60NUjwSE4Lji+8GtCW4tJ1N+2AKB3olcpYlstGBVFvNbJ4n7JrXVBydGlLq0iWw=
+	t=1775219903; cv=none; b=XvQ6lghYCROfFX1rhC1qYUVP5WI5+gYgkWNT2iUtYAGiEk63oDxdl/PoQ87lR4EDmllS6D+XUOHb+sfRFqMQwW+D+nk0x3QWGcSzHC4r0CH7oXSfCATCTdIGQGSOTwEtF1RMi2RcM+tiDU/oJS9oFTuJUMSbY1lW1ar97/PS/4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775219774; c=relaxed/simple;
-	bh=X3XVpXyP4g3ARDUOTgtbvLWtHKjdFa8Ji90GBFFPHS8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gxh2Dvak6cIp10xpFJOALdD7CzsKeSMxQF1gza7Dot4LMLP3X2DlcPWHYBpJ1EktgZPWJ7608gJpv/iryX/VfvjaWaEV9pSAnaog7z/+BFJCgX903xOVNshDKtCNTyESi5vyDuFUVdCF9LTxmSsoukq3losAcfqifFDUvnGdJHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RqkxR+ni; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A906C4CEF7;
-	Fri,  3 Apr 2026 12:36:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775219774;
-	bh=X3XVpXyP4g3ARDUOTgtbvLWtHKjdFa8Ji90GBFFPHS8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RqkxR+niEw/K2ZktPoTMpDJxHXjTOS1E4NhnA3p429igntuDxFv3gArIp7hY/PALd
-	 gtRouYYIt4y742sZPhm2YLrGCoOEeW54NPkpjMZgiCnBadEBsp5utM6BU9825rjkvn
-	 7kmytAB7cE8AQ8jaAI/jPDE6y/kFjit98R0cLR7NPNf0yOdMKruoyPZMzBAJorarRG
-	 x8yPCfxuw0vZyam/Jcjlzyp3RzpGc5ZQXqTj5gPEDD/3AWeYS2dwhhn1+zMudoNXAa
-	 f11JkindJBGikiaxsmdnAOunc2tU/mHK2XvPP9N2N75ikUj7Ux3k+P5+c2y/f4tUZZ
-	 DumM2behqkUyQ==
-Date: Fri, 3 Apr 2026 13:36:10 +0100
-From: Simon Horman <horms@kernel.org>
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org, Paul Greenwalt <paul.greenwalt@intel.com>
-Subject: Re: [PATCH net] ice: fix ice_init_link() error return preventing
- probe
-Message-ID: <20260403123610.GA91152@horms.kernel.org>
-References: <20260327072332.130320-1-aleksandr.loktionov@intel.com>
- <20260327072332.130320-6-aleksandr.loktionov@intel.com>
+	s=arc-20240116; t=1775219903; c=relaxed/simple;
+	bh=ds34hCK/4//QihEfiYIFRbpzQKMG2S19lP2H+z/sfSI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V4tCPEjM9xtw6+JXRNp+UXKRob85xXgi2tXF1nQcIdae8jU/BqYI1pPaJ8pKRBc2ZOUfQg9OJ46bqXrIyvXdNHo3kK36a6JUDO0fGfBVKanP6/B3/jhEAYfIuBIpYzEXBqVlhg8zA8Otid4n+bqYKjNsSBXGqg0906u0WafG9YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=RIlLuehq; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 902761A3127;
+	Fri,  3 Apr 2026 12:38:12 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 620BA603C1;
+	Fri,  3 Apr 2026 12:38:12 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0028A104500C4;
+	Fri,  3 Apr 2026 14:38:02 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1775219891; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=VdV+CaWsNSOdWbL3pvTitMcVaeTGVTjmI9tMoEkoOLY=;
+	b=RIlLuehqQitHRLaXy3kLvlOIEkZWXeksBkUdO34PKEO35G9tsBBWLq+PVd5RaM3VvnJ1ng
+	gRvnesWtldHok2K6/3YdoBvSguXOJ2UnaJWF2OmePpPrnOYJ75wEgpNU8UFgSz4Q9uaup7
+	rWajrDtc497RjWkD+szv3JG/jkoTfmU6MALsVWwIqPFqyrarzlb18SJbRZ24fnGD97DQtf
+	0fx0an/MfTe0q6/05iYgIl2FdWKeNyrS1O5FqvBxVn1Gbpm58QTRsoVhwkA0VXjWGP0lwO
+	GPUry5sa10PfeSugkrI9yEkVE88gtdAKudpAGsOfhUmdtnZiqHnkFNG3fR8vqw==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: [PATCH net-next v9 00/10] net: phy_port: SFP modules representation and phy_port listing
+Date: Fri,  3 Apr 2026 14:37:44 +0200
+Message-ID: <20260403123755.175742-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260327072332.130320-6-aleksandr.loktionov@intel.com>
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[bootlin.com,vger.kernel.org,csgroup.eu,gmail.com,nxp.com,kernel.org,pengutronix.de,chromium.org,makrotopia.org,liebherr.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-275017-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275014-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[maxime.chevallier@bootlin.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[bootlin.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_FIVE(0.00)[5];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[horms.kernel.org:mid,intel.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AE3443941F4
+	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bootlin.com:dkim,bootlin.com:mid]
+X-Rspamd-Queue-Id: 9BE3A3941C3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 27, 2026 at 08:23:29AM +0100, Aleksandr Loktionov wrote:
-> From: Paul Greenwalt <paul.greenwalt@intel.com>
-> 
-> ice_init_link() can return an error status from ice_update_link_info()
-> or ice_init_phy_user_cfg(), causing probe to fail.
-> 
-> An incorrect NVM update procedure can result in link/PHY errors, and
-> the recommended resolution is to update the NVM using the correct
-> procedure. If the driver fails probe due to link errors, the user
-> cannot update the NVM to recover. The link/PHY errors logged are
-> non-fatal: they are already annotated as 'not a fatal error if this
-> fails'.
-> 
-> Since none of the errors inside ice_init_link() should prevent probe
-> from completing, convert it to void and remove the error check in the
-> caller. All failures are already logged; callers have no meaningful
-> recovery path for link init errors.
-> 
-> Fixes: 5b246e533d01 ("ice: split probe into smaller functions")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Hello everyone,
 
-The nit below notwithstanding, this looks good to me.
+Here's V9 for the phy_port netlink interface (get-only for now).
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+V9 addresses sashiko's issues (not all of them, as some don't make
+sense), and updates the missings parts in the doc.
 
-> ---
-> 
->  drivers/net/ethernet/intel/ice/ice_main.c | 12 +++---------
->  1 file changed, 3 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+This work extends on the recent addition of phy_port representation to enable
+listing the front-facing ports of an interface. For now, we don't control
+these ports, we merely list their presence and their capabilities.
 
-...
+As the most common use-case of multi-port interfaces is combo-ports that
+provide both RJ45 and SFP connectors on a single MAC, there's a lot of
+SFP stuff in this series.
 
-> @@ -5043,9 +5039,7 @@ static int ice_init(struct ice_pf *pf)
->  
->  	ice_init_wakeup(pf);
->  
-> -	err = ice_init_link(pf);
-> -	if (err)
-> -		goto err_init_link;
+This series is in 2 main parts. The first one aims at representing the
+SFP cages and modules using phy_port, as combo-ports with RJ45 + SFP are
+by far the most common cases for multi-connector setups.
 
-I think now would be a good time to rename the err_init_link label,
-after what it does, rather than where it is (no longer) jumped from.
-And perhaps others in this function too
+The second part is the netlink interface to list those ports, now that
+most use-cases are covered.
 
-> +	ice_init_link(pf);
->  
->  	err = ice_send_version(pf);
->  	if (err)
-> -- 
-> 2.52.0
-> 
+Let's see what we can do with some examples of the new ethtool API :
+
+- Get MII interfaces supported by an empty SFP cage :
+
+# ethtool --show-ports eth3
+
+Port for eth3:
+	Port id: 1
+	Vacant: yes
+	Supported MII interfaces : sgmii, 1000base-x, 2500base-x
+	Port type: sfp
+
+- Get Combo-ports supported modes, on each port :
+
+# ethtool --show-ports eth1
+
+Port for eth1:
+	Port id: 1
+	Vacant: no
+	Supported link modes:  10baseT/Half 10baseT/Full
+	                       100baseT/Half 100baseT/Full
+	                       1000baseT/Full
+	                       10000baseT/Full
+	                       2500baseT/Full
+	                       5000baseT/Full
+
+	Port type: mdi
+
+Port for eth1:
+	Port id: 2
+	Vacant: yes
+	Supported MII interfaces : 10gbase-r
+	Port type: sfp
+
+- Get Achievable linkmodes on a SFP module (combo port with a DAC in the
+SFP cage)
+
+# ethtool --show-ports eth1
+
+Port for eth1:
+	Port id: 1
+	Vacant: no
+	Supported link modes:  10baseT/Half 10baseT/Full
+	                       100baseT/Half 100baseT/Full
+	                       1000baseT/Full
+	                       10000baseT/Full
+	                       2500baseT/Full
+	                       5000baseT/Full
+	Port type: mdi
+
+Port for eth1:
+	Port id: 2
+	Vacant: no
+	Supported MII interfaces : 10gbase-r
+	Port type: sfp
+
+Port for eth1:
+	Port id: 3
+	Vacant: no
+	Supported link modes:  10000baseCR/Full
+	Port type: mdi
+
+Note that here, we have 3 ports :
+ - The Copper port
+ - The SFP Cage itself, marked as 'occupied'
+ - The SFP module
+
+This series builds on top of phy_port and phy_link_topology to allow
+tracking the ports of an interface. We maintain a list of supported
+linkmodes/interfaces on each port, which allows for fine-grained
+reporting of each port's capability.
+
+What this series doesn't do :
+ - We don't support selecting which port is active. This is the next step.
+ - We only support PHY-driven combo ports. The end-goal of this whole
+   journey that started with phy_link_topology is to get support for MII
+   muxes, such as the one we have on the Turris Omnia. This will eventually
+   be upstreamed as well.
+
+If you want to play around with it, here's [1] the patched ethtool that I've
+been using to produce the outputs above.
+
+Thanks !
+
+Maxime
+
+[1] : https://github.com/minimaxwell/ethtool/tree/mc/ethtool_port
+
+Changelog :
+
+Changes in V9:
+
+ - Added missing netlink doc updates for u8->u32 conversion
+ - Removed dead code with a condition that can never be true in
+   phylink's mod_port code
+ - Fixed the error path in phy_sfp_connect_phy
+
+Changes in v8:
+V8: https://lore.kernel.org/r/20260325081937.571115-1-maxime.chevallier@bootlin.com
+ - Set the new phydev.has_sfp_mod_phy field when we're sure that no
+   errors occured
+ - Fix formatting of the copyright info in ethnl port
+ - Use a policy to validate the range of port_id
+ - Use GENL_REQ_ATTR_CHECK
+ - alpha-sort headers
+ - use u32 in netlink messages
+ - return better error codes
+ - don't check the skb len, the core does that
+
+Changes in V7:
+V7: https://lore.kernel.org/all/20260309152747.702373-1-maxime.chevallier@bootlin.com/
+ - Changed the port cleanup path to use list_for_each_entry_continue_reverse
+ - Adjusted the cleanup path in phylink for the port vacant state
+ - Pass the right cmd for the netlink dump message
+
+Changes in V6:
+V6: https://lore.kernel.org/r/20260304145444.442334-1-maxime.chevallier@bootlin.com
+ - Added some comments in th mod_port cleanup
+ - changed some kmalloc to kmalloc_obj
+ - Removed some phy_link_topo_del_port that wasn't needed
+
+Changes in V5:
+V5: https://lore.kernel.org/r/20260205092317.755906-1-maxime.chevallier@bootlin.com
+ - Fixed a check on a potentially un-initialized pointer, reported by
+   Simon
+ - Fixed a documentation formatting issue
+ - Remove a stray pr_info
+ - Rebased on net-next
+
+Changes in V4:
+V4 : https://lore.kernel.org/netdev/20260203172839.548524-1-maxime.chevallier@bootlin.com/
+ - Add a cleanup patch for the of port parsing
+ - Added a match to sync the port's linkmodes with the PHY's for OF
+   ports
+ - Added RTNL assert in the port_get topo helper
+ - nullify the bus port for phylink support
+ - Fix some typos
+
+Changes in V3:
+V3: https://lore.kernel.org/netdev/20260201151249.642015-1-maxime.chevallier@bootlin.com/
+ - Remove the sfp bus ops for nophy, and use .module_start() as
+   suggested by Russell
+ - Added missing cleanup for the topology, as per AI review
+ - Fixed a few typos as per Romain's review
+ - Changed "occupied" to "vacant" as per Romain's review
+ - Added missing checks for null ports, per AI review
+
+Changes in V2:
+V2: https://lore.kernel.org/netdev/20260128204526.170927-1-maxime.chevallier@bootlin.com/
+ - Fix the cleanup path of phy_link_topo_add_phy, as per AI review
+ - Fix the cleanup path of phy_sfp_probe, as per AI review
+ - Fix the call-site of the disconnect_nophy sfp bus ops, per AI review
+ - Fix the netdev-less case uin phylink, per AI review
+ - Fix the prototype of phy_link_topo_get_port for the stubs
+ - Dropped patch 11. It ended-up breaking 'allnoconfig', so instead we
+   built a phy_interface_names array in net/ethtool/netlink.c
+ - Fix an ethool-netlink spec discrepancy with the type of an attribute
+ - Fix the size computation in the netlink port API
+ - Fix the cleanup path in the netlink port API
+
+V1: https://lore.kernel.org/netdev/20260127134202.8208-1-maxime.chevallier@bootlin.com/
+
+
+
+Maxime Chevallier (10):
+  net: phy: phy_link_topology: Add a helper for opportunistic alloc
+  net: phy: phy_link_topology: Track ports in phy_link_topology
+  net: phylink: Register a phy_port for MAC-driven SFP busses
+  net: phy: Create SFP phy_port before registering upstream
+  net: phy: Represent PHY-less SFP modules with phy_port
+  net: phylink: Represent PHY-less SFP modules with phy_port
+  net: phy: phy_port: Store information about a MII port's vacant state
+  net: phy: phy_link_topology: Add a helper to retrieve ports
+  netlink: specs: Add ethernet port listing with ethtool
+  net: ethtool: Introduce ethtool command to list ports
+
+ Documentation/netlink/specs/ethtool.yaml      |  50 +++
+ Documentation/networking/ethtool-netlink.rst  |  35 ++
+ MAINTAINERS                                   |   1 +
+ drivers/net/phy/phy-caps.h                    |   2 +
+ drivers/net/phy/phy_caps.c                    |  26 ++
+ drivers/net/phy/phy_device.c                  | 161 +++++++-
+ drivers/net/phy/phy_link_topology.c           |  82 +++-
+ drivers/net/phy/phylink.c                     | 137 ++++++-
+ include/linux/phy.h                           |   6 +
+ include/linux/phy_link_topology.h             |  39 ++
+ include/linux/phy_port.h                      |   6 +
+ .../uapi/linux/ethtool_netlink_generated.h    |  19 +
+ net/core/dev.c                                |   1 +
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/netlink.c                         |  25 ++
+ net/ethtool/netlink.h                         |   8 +
+ net/ethtool/port.c                            | 368 ++++++++++++++++++
+ 17 files changed, 936 insertions(+), 32 deletions(-)
+ create mode 100644 net/ethtool/port.c
+
+-- 
+2.49.0
+
 
