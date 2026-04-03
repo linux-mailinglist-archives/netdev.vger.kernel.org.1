@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-275032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275033-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sIs0MOC4z2kd0AYAu9opvQ
-	(envelope-from <netdev+bounces-275032-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:56:00 +0200
+	id YY01BMC4z2kd0AYAu9opvQ
+	(envelope-from <netdev+bounces-275033-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:55:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11EF0394401
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:56:00 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 689DA3943EA
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:55:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 32CB830B13F9
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 12:49:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6EE303046DB4
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 12:55:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6106D3AE1B1;
-	Fri,  3 Apr 2026 12:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 666D536C592;
+	Fri,  3 Apr 2026 12:55:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aOStDcoy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KupXL9c1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2658F2ED15D
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 12:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F63D3A9018
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 12:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775220586; cv=none; b=ULMfUf7AgC9mhslWBrD+Cut0AWeC1C4CN1vxdmH/IyfVfW65TUiH732VBRgg9zNN2y4XR0ndvlpRZnecgPkRxLNjPbSAEz+/nTWExhrEYEuJ7/1w2Hx1dV22U4FPRq/azro/JcHKDKmXNljwsiXFrZTpp4jazCqKtlXHQaoX644=
+	t=1775220924; cv=none; b=JfGeSTu97f0OEJhNK9X5DuCPuzoimOJ58Ihl/zN/10bq9AUX8U/KzdNWu6hhAiGIK1zIla/8vP9cmkOC4UZthoF+oowtrER2gnG8fidzEElXxbQlCVfvYpQBHLF2GR/IMnpLESJ3dXhsFVEGaFtV9H3J3/h+XTLope4LgyyDcr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775220586; c=relaxed/simple;
-	bh=oe1k06X8LzeLYzPSqTUn6zZwnoXsWv9v1PI95wY03zA=;
+	s=arc-20240116; t=1775220924; c=relaxed/simple;
+	bh=hRHbs1nZiBxTW53Dr0PK/q49gOnA+srDX4sDHcKT/U0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h5uVyVZPKbIh64UwIxI4j3NkFnliQqgWtIuNfr1xeN/AiVX8OAVJW8Xs71QdhDS7HwngpuKd0vD3GdgyyjFLp+wGNT3/ShLNyDdJwEP8DypWiMrOb0vbcRJhme1lo3KdxuwazA2Cuor4bZeCCjZn7NHM1U6fNopoYylpaHu0aGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aOStDcoy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 916F8C4CEF7;
-	Fri,  3 Apr 2026 12:49:44 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=O/CJKtIm3VUH053v2xo6qMpWSulZgbIsCM4w7Cu0vmIFhBteOIpevj2JcvHwNsxntUfANJxcguT9uU3pYW/HzmfrAHfT3qOoJX80imVlNPegXySX284RxTs3sytzBWloRiklO+NlSM+mTCuUjFVIInjdcFY/o039CVrfnR8l/gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KupXL9c1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF89AC4CEF7;
+	Fri,  3 Apr 2026 12:55:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775220585;
-	bh=oe1k06X8LzeLYzPSqTUn6zZwnoXsWv9v1PI95wY03zA=;
+	s=k20201202; t=1775220923;
+	bh=hRHbs1nZiBxTW53Dr0PK/q49gOnA+srDX4sDHcKT/U0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aOStDcoy773/nHKR3XdJisKUw/d/nD0GWcc79stsMFn2tJPJtCZRU17MdueYx1ayw
-	 F8bDzk9WbIS/Orv7/UcqFHwOFP9wZrKwCqAw4oIfWLy9sPF/YTODumbtdROmZzYX4o
-	 AtBPpX7yKh3IBwkCgbFumNBv6Z6ZVtPvRvAAsqGEla9w6Qt9CmsvLrpYrW7K/i0X5g
-	 XcmvSDgdRHmm4yK71zm3Gbo5WaaHJeObSwBW3abHpyS4VyMMO6EhBmPCsUNEyk96lo
-	 mBufMPs+HJglxHSlq1+nacLKedbPONkqztxZMgxEUW31xvqeFgUpyHGvLdB2JKM8Mz
-	 4Kphl5Oe/xS2w==
-Date: Fri, 3 Apr 2026 13:49:42 +0100
+	b=KupXL9c1SOTFLELhbeEvZqVLN9rUlFO3MhzaB6z2L09ny7U2mHCyQHaKmI3iSeIup
+	 pEJ84bkq93g8ZA0fS249HT5PeBcFO3yixizyo7mcR4uN0ek/QI8BROkzGaqeoC+qoK
+	 012NavwbizjkM/9cZrZm1ekueAfoHaCKyJgdkfErXW6Cd1UOBTP0j6Zr5s34ViQxa1
+	 5y2nC+Hkk0cO3qQnB/QrS5Hr6XvODNu8ZaST2GTW/M7vJKT5lMBRERc5ZIP5nwbMZ4
+	 eDzIZ5lXROUgDzWiXcByC+MeXTdM9SH++Gr6OtIfxDGmo6O/sVD6DU06M82jkwRTmK
+	 /rCSRYn8TTe/w==
+Date: Fri, 3 Apr 2026 13:55:20 +0100
 From: Simon Horman <horms@kernel.org>
 To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-next] ixgbe: increase SWFW semaphore timeout for X550
- FW updates
-Message-ID: <20260403124942.GA103228@horms.kernel.org>
-References: <20260327073046.134085-1-aleksandr.loktionov@intel.com>
+	netdev@vger.kernel.org,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+Subject: Re: [PATCH net] ice: use READ_ONCE() to access cached PHC time
+Message-ID: <20260403125520.GA105440@horms.kernel.org>
+References: <20260327072332.130320-1-aleksandr.loktionov@intel.com>
+ <20260327072332.130320-9-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,79 +62,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260327073046.134085-1-aleksandr.loktionov@intel.com>
+In-Reply-To: <20260327072332.130320-9-aleksandr.loktionov@intel.com>
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275032-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275033-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,horms.kernel.org:mid]
-X-Rspamd-Queue-Id: 11EF0394401
+	RCPT_COUNT_FIVE(0.00)[5];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:email,horms.kernel.org:mid]
+X-Rspamd-Queue-Id: 689DA3943EA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 27, 2026 at 08:30:35AM +0100, Aleksandr Loktionov wrote:
-> From: Soumen Karmakar <soumen.karmakar@intel.com>
+On Fri, Mar 27, 2026 at 08:23:32AM +0100, Aleksandr Loktionov wrote:
+> From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 > 
-> According to FW documentation, the most time-consuming part of continuous
-> FW activity is Shadow RAM (SR) dump which takes up to 3.2 seconds.  For
-> X550 devices, the module-update FW command can take over 4.5 s.  Increase
-> the max Software/Firmware (SW/FW) semaphore wait time from the default
-> 200 ms to 5 s for X550 to avoid spurious semaphore timeout failures
-
-Should 200ms be 1s (200 x 5us) ?
-
-> during FW update operations.
+> ptp.cached_phc_time is a 64-bit value updated by a periodic work item
+> on one CPU and read locklessly on another.  On 32-bit or non-atomic
+> architectures this can result in a torn read.  Use READ_ONCE() to
+> enforce a single atomic load.
 > 
-> Signed-off-by: Soumen Karmakar <soumen.karmakar@intel.com>
+> Fixes: 77a781155a65 ("ice: enable receive hardware timestamping")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 > Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> ---
->  drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c
-> index e67e2fe..85047ef 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c
-> @@ -577,6 +577,9 @@ int ixgbe_acquire_swfw_sync_X540(struct ixgbe_hw *hw, u32 mask)
->  
->  	swmask |= swi2c_mask;
->  	fwmask |= swi2c_mask << 2;
-> +	if (hw->mac.type == ixgbe_mac_X550)
-> +		timeout = 1000;
 
-I think it would be nice to centralise the initialisation of timeout,
-to either it's default or device-specific value, here.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-And to provide a comment indicating what the values mean in terms
-of maximum delay in s or ms.
-
-> +
->  	for (i = 0; i < timeout; i++) {
->  		/* SW NVM semaphore bit is used for access to all
->  		 * SW_FW_SYNC bits (not just NVM)
-> -- 
-> 2.52.0
-> 
 
