@@ -1,231 +1,175 @@
-Return-Path: <netdev+bounces-274939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274940-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GAOoCrN7z2mvwgYAu9opvQ
-	(envelope-from <netdev+bounces-274939-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 10:34:59 +0200
+	id CKIOMzZ8z2mvwgYAu9opvQ
+	(envelope-from <netdev+bounces-274940-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 10:37:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4DD039220B
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 10:34:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 385813922BE
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 10:37:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7A326306A903
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 08:28:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7845930BB140
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 08:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED2C37188D;
-	Fri,  3 Apr 2026 08:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C36AF37B3FD;
+	Fri,  3 Apr 2026 08:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UnaVtn+1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BJx9s9Ij"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFDC332EBD
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 08:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9492E1F06;
+	Fri,  3 Apr 2026 08:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775204892; cv=none; b=Jna4j7GSX3c9bMys1/Dk9/NTriHtGNAm1Uf4ftD4ii+wBKnxyictwRaRcWEmBAg2ElEmQZF/rYsY+bf+dTAQoCzveAjRjIL45F5et8jJ9iU+Ox+ZyCB+cNX1+0D8jPIpJCKO6oJBHfmf6ATsLcApZVw9bYhIdQLCPQfYobmkcNU=
+	t=1775205014; cv=none; b=kFuN93iFC6Rhw+Ta2buLKeHx/ciqIpprFwijB0iOUufBqF88c97luroPUydAhJf+WrMPbin7Up9HwpnETygUQt95EriSKCM94Jw5OFYuuwtCvJkbwt+MDqYXENY/Q2Q6kpR6yLjfDk3dnfBAEWky4Xly7q8TMI5l4gTCgfIE7kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775204892; c=relaxed/simple;
-	bh=P6tV/NSJ8+hcqtrJ1A4O5Qb4o4cfCFtJU4ZhtKEtKlw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=luUKWIcU4AA24QXiC1X7k+kPmw59QzaGxiBtNnOLltHO7M5lYWLG2PJ/MeKmuj9LV4KfyeXPrYkW1i3oWjX0qWzN3s8MO6vhhLM8eBX/2vZnDryAxazDv93Sq9lQHyEZfiT9KoEvxRfFcoWcoZC/5GqahB2A0fspAzHcJKZ14LA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UnaVtn+1; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-48374014a77so20893785e9.3
-        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 01:28:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775204889; x=1775809689; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BbH7f0R2O6m5QabRfcMy7zKu4Ni2chMwcIYJDUdBZQs=;
-        b=UnaVtn+137YiMT9e8E+q4C7cn7LiL/AbYE5ApJMFzZg9Rrx6GXW+wyfJw8yENzmIYW
-         pMO5G6BrDOhTpc9Z9MhdqL1yn+6HVZ4D+OEQid+RUdUwU+lUuQbplyWLfEPSWn2ggzK8
-         auSOfYmgBJV/QD2xrL8HFqLZbtSaSrIWstxCz9tCX3KHofCoGFKZq1k7s8CT/wa1cNNs
-         6NMQp1J4B5H2/1dQKM/K+fEXX9SEzFaBaCPFlh+vlxtTAt9NB3VR9VZrjgsZ1rTqSCxN
-         3NJXq8JrcRP02z78Ohh1LDvAtqDz4UBDD24kuFPIQ9pmSc8IQOAS8LI2VUb2I9baxorf
-         YpqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775204889; x=1775809689;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BbH7f0R2O6m5QabRfcMy7zKu4Ni2chMwcIYJDUdBZQs=;
-        b=KmG1qnCsp/SQlDeuwueQYhqlNMQkYCrlYN8XG4nikfk2VK/q96LnSDj7tHQOhO6UFp
-         isyueOKUsINO09la8+paokluFRmRV+0C33ChSXLGwPT6YLLgTomXouLEzPbm+b0pXG4b
-         WdfMvxe8lMP4LQGE71giTfacUZowtA7IwSvceIIH5yeZiSasBdRhPOrspYxw/AXuLcbF
-         sqXvahY/+SdZSOCnsyO0gXF6bFK0dTHpwSFf99qav0K1PJLOYJp18QKP/tQbkbrLDH9V
-         3bkcXX6Fk18pGJ84besj0VhJykwKiQBuEI45ZYNniQDWRwoxeEH/SjsiaojMce4t7IZI
-         +ezA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFWvPN/VTB0FpjSURLq8Ga+JqrqK8MmiZ6wbvQXuY3MM997ZjsaeJn7cB+YU3iBBylhAHCcb4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWHLajMB9c6/fZRaCkiKczcwgIT3RlvUFy/4PTrVOJoOdc8GUb
-	To45bPOhidVLj62g83Ws5X5I4axNybdiNdf04WuISkIN8KbxGzr/skw3zNL9vASWZo0=
-X-Gm-Gg: ATEYQzyK4X97p3JwK3uoN+sZcfxolDqTNmHoEb5ECBM+PhbbUtJZvloDpHiPMya5qnO
-	/XqEAMBFeU7oiXb9lOZR0PeS0M7cZIn0d81uBEKTfs5cpcAhhzfHLwLwsFD6V2KyRHHD6sFXTRQ
-	KimaZc8GkuJs1remo1u2d52NbBlIJ1hZzqi9hxr2BSdSvmYDN4XBWSc8Fk7C20lSWEX2dox0c04
-	G9vdPsdTLHzgsyohgBsA4CgiVBwvvc2/072VIQ4YhSlFvdwtwfyomowhBXAa+FO/rq/7INg6OdH
-	M9sKL4JUA8FQDbOsC+XBMXVWvImTtvCEwa87VpwNxzwT8idsRJ0ZX3pNYbgvvH3swEAKau5wnfb
-	3mewTbXyLFCTxoRPPtn/e+h/+6ie5WBtmq/E8MERox620b3a5m+1TFMZbBT9RjL6Edyb5ZQNTt6
-	6QnXn92G6+u1dGU3QZ9R+Zk2L0Cdrl6CF2qeuwOgwhNrVnRkE6v8tAJ7sD5uYEL96ZjstmmrU0D
-	XHy/KZrjA==
-X-Received: by 2002:a05:600c:4688:b0:485:2c61:9457 with SMTP id 5b1f17b1804b1-4889970ea7bmr33974195e9.10.1775204889311;
-        Fri, 03 Apr 2026 01:28:09 -0700 (PDT)
-Received: from [10.1.4.108] (cust-east-par-46-193-119-166.cust.wifirst.net. [46.193.119.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-488982e3244sm14946025e9.12.2026.04.03.01.28.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Apr 2026 01:28:09 -0700 (PDT)
-Message-ID: <72c9a165-74bb-42a5-b5fe-67bfa2c8ce2e@gmail.com>
-Date: Fri, 3 Apr 2026 10:28:08 +0200
+	s=arc-20240116; t=1775205014; c=relaxed/simple;
+	bh=Cd1EZ76xkf/x2fz9/IYK6lBMjtKYjfEikACFflOtBW0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ofIJwxykgjjocwz9CclgkIMnHt+Y0rqaHknIvRt3BD+M54s3KLMCw3HnHQb13TVvG6kbZmuP5NslntULeFeKOUxlcmN8/+KbzeHrWTXXt2zkUZEcKWD7a7G1m1DXL6PPGvhBmdV1VEtkYnoIxHAIHK2e1xqfcqM4+3KDNL2qztQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BJx9s9Ij; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E91EEC4CEF7;
+	Fri,  3 Apr 2026 08:30:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775205014;
+	bh=Cd1EZ76xkf/x2fz9/IYK6lBMjtKYjfEikACFflOtBW0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BJx9s9Ijnd3WYIlzq+9eC5jyjv5XIWfpQzQ5SvH7iVQcsBHm6h3SN2ad1110jvuWd
+	 bMnVTfBPmFp7gUltNJ2jUKy5HVCDcwMaqWPq8u05RCXMBx3rB0BePm65f0lM+i8FTW
+	 jrginlok22FrxLXRsBNqv3l2I4Wtmdzr2fJFxtqaBCNz61Zq81BLWhx6ApV8HC9PRD
+	 9hL/udhzm/BoqyKQlXBQg8t2syDTeWxK+5ZOpeYMgH9CWxI5UD15xSIXxgsQal2pFJ
+	 F8syoL7Ugpx/zV0Snia938z1XZWEeVrbtX0WJIDHIlaD7jGjQL97cmZlprkXWSQsHT
+	 WTFku4cedjzRA==
+Date: Fri, 3 Apr 2026 09:30:09 +0100
+From: Simon Horman <horms@kernel.org>
+To: Manivannan Sadhasivam <mani@kernel.org>
+Cc: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	andersson@kernel.org, yimingqian591@gmail.com,
+	chris.lew@oss.qualcomm.com, stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] net: qrtr: ns: Limit the maximum server registration
+ per node
+Message-ID: <20260403083009.GA11973@horms.kernel.org>
+References: <20260325104415.104972-1-manivannan.sadhasivam@oss.qualcomm.com>
+ <20260325104415.104972-2-manivannan.sadhasivam@oss.qualcomm.com>
+ <20260327095832.GC111839@horms.kernel.org>
+ <as3zucfwr4z2x5pxww6ognmqcujkwnhppulm7jquex6fy6sqn5@qa33h5mxxdz7>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] dt-bindings: dsa: microchip: add KSZ low-loss cable
- errata properties
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Marek Vasut <marex@denx.de>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Fidelio Lawson <fidelio.lawson@exotec.com>
-References: <20260326-ksz87xx_errata_low_loss_connections-v1-0-79a698f43626@exotec.com>
- <20260326-ksz87xx_errata_low_loss_connections-v1-1-79a698f43626@exotec.com>
- <521cf729-50d2-44c1-8c96-c1fba2127b9d@lunn.ch>
-Content-Language: en-US
-From: Fidelio LAWSON <lawson.fidelio@gmail.com>
-In-Reply-To: <521cf729-50d2-44c1-8c96-c1fba2127b9d@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <as3zucfwr4z2x5pxww6ognmqcujkwnhppulm7jquex6fy6sqn5@qa33h5mxxdz7>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[microchip.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,denx.de,bootlin.com,vger.kernel.org,exotec.com];
-	TAGGED_FROM(0.00)[bounces-274939-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274940-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[oss.qualcomm.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lawsonfidelio@gmail.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	MID_RHS_MATCH_FROM(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: C4DD039220B
+X-Rspamd-Queue-Id: 385813922BE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 3/26/26 13:14, Andrew Lunn wrote:
-> On Thu, Mar 26, 2026 at 10:10:21AM +0100, Fidelio Lawson wrote:
->> Microchip KSZ87xx switches are affected by the "Module 3: Equalizer fix
->> for short cables" erratum described in DS80000687C.
->> The embedded PHY receivers are tuned for long, high-loss cables,
->> which may cause signal distortion when operated with short or low-loss
->> cabling such as CAT5e or CAT6. In these cases,
->> the PHY may fail to establish a link due to internal over-amplification.
->>
->> Two workarounds are provided by Microchip, each configuring a different
->> indirect register value to adjust the PHY equalizer settings.
->>
->> This patch introduces two new device tree properties to enable and
->> select the appropriate workaround:
->>
->>    - microchip,low-loss-errata-enable: boolean enabling the feature
->>    - microchip,low-loss-errata: selects workaround 1 or 2 (default: 1)
->>
->> These properties allow board designers to opt into the errata fix
->> according to the targeted cable characteristics of their platform.
+On Fri, Mar 27, 2026 at 03:40:01PM +0530, Manivannan Sadhasivam wrote:
+> On Fri, Mar 27, 2026 at 09:58:32AM +0000, Simon Horman wrote:
+> > On Wed, Mar 25, 2026 at 04:14:14PM +0530, Manivannan Sadhasivam wrote:
+> > > Current code does no bound checking on the number of servers added per
+> > > node. A malicious client can flood NEW_SERVER messages and exhaust memory.
+> > > 
+> > > Fix this issue by limiting the maximum number of server registrations to
+> > > 256 per node. If the NEW_SERVER message is received for an old port, then
+> > > don't restrict it as it will get replaced.
+> > > 
+> > > Note that the limit of 256 is chosen based on the current platform
+> > > requirements. If requirement changes in the future, this limit can be
+> > > increased.
+> > > 
+> > > Cc: stable@vger.kernel.org
+> > > Fixes: 0c2204a4ad71 ("net: qrtr: Migrate nameservice to kernel from userspace")
+> > > Reported-by: Yiming Qian <yimingqian591@gmail.com>
+> > > Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> > 
+> > Reviewed-by: Simon Horman <horms@kernel.org>
+> > 
+> > > ---
+> > >  net/qrtr/ns.c | 24 ++++++++++++++++++++----
+> > >  1 file changed, 20 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/net/qrtr/ns.c b/net/qrtr/ns.c
+> > > index 3203b2220860..fb4e8a2d370d 100644
+> > > --- a/net/qrtr/ns.c
+> > > +++ b/net/qrtr/ns.c
+> > > @@ -67,8 +67,14 @@ struct qrtr_server {
+> > >  struct qrtr_node {
+> > >  	unsigned int id;
+> > >  	struct xarray servers;
+> > > +	u32 server_count;
+> > >  };
+> > >  
+> > > +/* Max server limit is chosen based on the current platform requirements. If the
+> > > + * requirement changes in the future, this value can be increased.
+> > > + */
+> > > +#define QRTR_NS_MAX_SERVERS 256
+> > > +
+> > >  static struct qrtr_node *node_get(unsigned int node_id)
+> > >  {
+> > >  	struct qrtr_node *node;
+> > > @@ -229,6 +235,17 @@ static struct qrtr_server *server_add(unsigned int service,
+> > >  	if (!service || !port)
+> > >  		return NULL;
+> > >  
+> > > +	node = node_get(node_id);
+> > > +	if (!node)
+> > > +		return NULL;
+> > 
+> > This is not new behaviour added by patch, but If I understand things
+> > correctly, node_get will allocate a new node if one doesn't already exist
+> > for the node_id.
+> > 
 > 
-> Does the errata give any indication how the two different workarounds
-> differ? How would a user decided which to use?
+> Yes!
 > 
-> I also question if this should be a DT property. The length of the
-> cables is not a property of the board.
+> > I am wondering if any bounds are placed on the number of nodes that can be
+> > created. And, if not, is this a point of concern from a memory exhaustion
+> > perspective?
+> > 
 > 
-> A PHY tunable would better reflect the same board can be used with
-> different cables, with different lengths/quality.
-> 
-> 	  Andrew
+> That's true. I plan to send a followup for that. This series just limits the
+> scope in addressing the reported issue.
 
-Hi Andrew,
-Thanks for the review.
-Regarding the difference between the two workarounds:
-Microchip’s errata does provide some insight into how they behave and 
-when each should be used.
-Workaround 1 modifies the PHY equalizer settings by adjusting an 
-indirect register (0x3c).
-According to Microchip’s support article:
+Thanks, sounds good to me.
 
-“The above register change makes the equalizer’s compensation range 
-wider, and therefore cables with various characteristics can be 
-tolerated. Adjust equalizer EQ training algorithm to cover a few type of 
-short cables issue. Also is appropriate for board‑to‑board connection 
-and port‑to‑port connection with the capacitor AC coupling mode.”
+For this patch, feel free to add:
 
-Microchip also explains that although the default value in register 0x3c 
-handles standard short Ethernet cables (CAT‑5/CAT‑5e), a more optimized 
-value (0x15) provides better tolerance for corner cases, especially very 
-short or board‑to‑board links:
-
-“Based on tests, a more optimized equalizer adjustment value 0x15 is 
-better for all corner cases of the short cable and short distance 
-connection for port‑to‑port or board‑to‑board cases.”
-
-So Workaround 1 primarily widens and optimizes the DSP equalizer EQ 
-compensation range, and is expected to solve most short/low‑loss cable 
-issues.
-Workaround 2 is intended for the cases where Workaround 1 is not sufficient.
-This one adjusts the receiver low‑pass filter bandwidth, effectively 
-reducing the high‑frequency component of the received signal:
-
-“Based on the root cause above, adjust the receiver low pass filter to 
-reduce the high frequency component to keep the receive signal within a 
-reasonable range when using CAT‑5E and CAT‑6 cable.”
-
-So Workaround 2 is a more aggressive filtering approach, applied only 
-when the EQ adjustment alone does not stabilize the link on CAT‑5e/CAT‑6 
-short cable scenarios.
-
-
-Regarding the question of whether this should be exposed through a PHY 
-tunable:
-I understand your concern. The erratum is indeed linked to cable 
-characteristics, not the board itself.
-Since this patch modifies registers that belong to the DSA switch 
-itself, and not the PHY driver, I’m not entirely sure it would be 
-architecturally correct to expose these adjustments as PHY tunables. The 
-workarounds target internal receiver/equalizer settings inside the 
-KSZ87xx switch block, accessed via the switch’s indirect register 
-mechanism, not via a standard phy_device.
-Given that, I’m unsure whether mapping these switch‑level registers into 
-the PHY tunables framework would be appropriate or even feasible.
-What do you think?
-
-Best regards,
-Fidelio
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
