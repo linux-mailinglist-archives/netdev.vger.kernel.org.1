@@ -1,191 +1,161 @@
-Return-Path: <netdev+bounces-274998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274999-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OLjtDR+mz2mZyQYAu9opvQ
-	(envelope-from <netdev+bounces-274998-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:35:59 +0200
+	id 0JynImqmz2mZyQYAu9opvQ
+	(envelope-from <netdev+bounces-274999-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:37:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAA67393BCB
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:35:58 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E79F9393BF7
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 13:37:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 72230306D68F
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 11:31:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A2F203027B63
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 11:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18A3F3BADA2;
-	Fri,  3 Apr 2026 11:31:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3CB37DEBB;
+	Fri,  3 Apr 2026 11:34:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="Drw526LX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bB0aTvmA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9883B7B80;
-	Fri,  3 Apr 2026 11:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775215913; cv=none; b=skyn8OQuCtTo54Mwk1LgFlhrQkcevjdOVRVDh/y8CZmkKvhXRWXuYSl3rE5gmPMg87lMcx25t5tctZ8DKN1+QGIsyozTOCdAvAZqwc7ziLJB4Y/6rMqqSdqBG1JgwNWrpike+7gy+OllRMxL4BB2o9TMicNpGd8nq7d1ym5fjws=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775215913; c=relaxed/simple;
-	bh=hw9vVJ/9ofYm7xcOtSUi3kDUj/K6JiJZWSWNvpjo6SM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ea6VnP8mlTIJMkKQkog+q16BH4GhfhSTozs8cQZ32/E1XqKPPbGXPDYPpz30t23xETK84uK5kK/EfPAXFULifN4D1kW3JNZMQWcZsZlmYsdwPcdg0Eh5K9ggFAEvyQ5j5qZ2VGckfx/BfcCrG6mT1ukunVw6UP+4tpd5Q4AJH2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=Drw526LX; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id DB77F60263;
-	Fri,  3 Apr 2026 13:31:44 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1775215905;
-	bh=f2Ze/DFrB8iHp4LQ1YCD1tHzYUC4hCcRW+FKgOT532A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Drw526LXxLn+vnzboYmZuPfsGy1xJngDeu13z5ivmayIuIrbI7JMFAcbTFlMoYEx2
-	 4xs0Hvr5Kn96xk5KxUJplOaoCajHeUHZ/DzyQI4Cs0YFn6LYeo4GWl55tCWydWpK/e
-	 SqWBU27Q9XbX+bJ/GChReF9Y9dYKP+lpODk49ww8sAqoItV4891YmfsJ3KnUkreHD9
-	 gtDOG1C0xCFpMIvGUBMusQpq+LxVDf2YGew1hmqhYpYOGxtna/SGRJAVyMh+UPicyD
-	 b5uXsLJI/FcjJrhuFYJULAtm1WKpkgdd3MYgZhGzOCO126BmA6crIMgjIKPtqpxBxG
-	 n39c3NHZmGqDw==
-Date: Fri, 3 Apr 2026 13:31:41 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org, fw@strlen.de,
-	phil@nwl.cc, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	yasuyuki.kozakai@toshiba.co.jp, kaber@trash.net,
-	yifanwucs@gmail.com, tomapufckgml@gmail.com, yuantan098@gmail.com,
-	bird@lzu.edu.cn, z1652074432@gmail.com
-Subject: Re: [PATCH v3] netfilter: xt_multiport: validate range encoding in
- checkentry
-Message-ID: <ac-lHcg6NTg9sWGY@lemonverbena>
-References: <cover.1774624314.git.n05ec@lzu.edu.cn>
- <d5c0d106e724c732436b985dd694272bcb813bb1.1775153311.git.n05ec@lzu.edu.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43B72DCF55
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 11:34:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775216092; cv=pass; b=Z8Aq/mh7X4gGvaQpBVVkwxvWHXeN+oX1/JzEA2Pl/yy4stMIQwCyDEGXSg7OyNH/gY3Y6nnPJvzLkCoC8AzXtuZgLCSZqy4hurx5y/cnT8EceXjtXpaUxsz4Ab/Z8fnY3gMYKhTlIwo1SmrbqWGgQyjlta9vKM/AP27mvDtpqCo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775216092; c=relaxed/simple;
+	bh=EK6As8t0598qij8p1oz0nFzE5poyh4dStAQ4im0YA2E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=H1aZcI+CSE7PKsDWKEfjKBI5yGshi+hN6Mkl9fYFlGmDdAclKHA/IvwJObWAssrsAC001IqPcsbQqfX8/OkF8drMvHDTgdJTQEB5pLa1ZzteLRJMs0R+bpE+Oy3onB/wc54zf356LaZ+wLN6oUv+5ssTTBUwa52+5ShiJnZc7xk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bB0aTvmA; arc=pass smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-50bbc41677dso26474971cf.0
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 04:34:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775216090; cv=none;
+        d=google.com; s=arc-20240605;
+        b=DNkgQjhKR9EMTp16MgRCUFTWX4DKOCaK4eoxeXnPu6dSaz27EW0Mrps69JcfOL20mb
+         y1AayGKJVC89j230nT+rPTa3j4PLFbVBCoh70yhTY4F8wlKJR4kdl0zJHbkoBYF87X8/
+         ppR8k+MPR7HKzRPI/HM00UfdfhkdQMrNabtDXKjCll7cRDPocme67ghUK/RpDqnMsHG/
+         OG/OhNW8Wgag49WveK49+c6HREOkM6Wg5a8QYAnoGzE4LfMyHlT6YUjpktHFN+bc3F+R
+         7Ej5FswnxUpFDdYdcNYMmWyXOSUFFs7YwGYYt+lE1RSoUA7pI65TOYAW/fvw3lQe8CXB
+         jSTw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=EK6As8t0598qij8p1oz0nFzE5poyh4dStAQ4im0YA2E=;
+        fh=mUZ5A6FLWuoZDUPrteNiR3cIgzYiqNjeRn8lHfM8Zlk=;
+        b=APKvzg7DgQkRALw7+vJe80ncMyoO0mdCRxPwZJoozOxsTKGvNTqzVofH/E4fUgsMB+
+         ZOb3rlxzWdRtNqYFtqZF+jFdIbDc2JmDjAfMgv2NejOPQrSa0ZZpjwCaLuY6Jpu2Oprk
+         sRJoS07D2qoGAs1Ly8uz+ObUEywzx5xiOr0KVS1GmZt5Iq26+Vo/ZUq7zTL4+jnhpNsb
+         QBbqIWTx4poRpic+Ht/lpKvc7MAtz3DlYs7CbhIBqjTSYCihyASaIPpqsyGAakGACpi0
+         I3Oxut8kPfcXeBj9BkizzdB1RhD5SeN+3eMz7wwZTiE5BPGlP0RKELxxfuRsZUUIOuVJ
+         2R6g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775216090; x=1775820890; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EK6As8t0598qij8p1oz0nFzE5poyh4dStAQ4im0YA2E=;
+        b=bB0aTvmAT4cADm4a290iyBUM7kxIk8rtUCK/fzcXPkFfoKxws3dmnW5fwBFflL71bR
+         5PMS4D6y36l2+mxMM9F5CYNxLcCJDs3G8+XLptZP+ipY3e0NqYTpWkFwbn1adzkQF/kV
+         GCOrjA6ni39v3nTSoEjB+ttGMTK/OCbo88o+lFYAkdlAKV2Czn2nruE3pVrLqgwRKMjD
+         ZnENU+5JebSk3Cl6luIyJJJEKlfUjh/WxYiigtg9sfLMq7MhvPq1JpXoEQw6d+qyJr/4
+         yDylhGFPPAIekfOadhfTfuarRRfefdZDGnqpA4SXIE5WtzF+iHo9FBzxbshqw6R50wa3
+         ANMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775216090; x=1775820890;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=EK6As8t0598qij8p1oz0nFzE5poyh4dStAQ4im0YA2E=;
+        b=sbOeBZyQhEuluXRXvWBh2+SmUityg8PVeBWkDJT18SY14bfXmSrtc/5wzkdSjcNwIO
+         QOx5m2tRknC+8+NJQsx7vxMnLqa8odHFEoZ5PqOokBtYVNdZynhC4Ze4OC6K6ssTK4dQ
+         C0/xiy+Z88iLtCPNaih3cLZryDeG2MqHiHoRPNc+fuUAsqt1oF3ATSrptDFWLjgI3cjH
+         6t4fBGYUf+lUd9NxDmypuOohe1q3NkdfT/RArk+17bEaqUS/O9cLpqhngG3v86sBia8/
+         JUDVVxWthhsWSKQFNcbSV7vvMv13AeOv8SS2ZU0lUzzxUdvpvVb2ppnS10fqBLfl6zBa
+         k1ug==
+X-Forwarded-Encrypted: i=1; AJvYcCWyiHrxpZXPi6tB7ljNRGWycgooVZonr8YCiVrSfgZCRap4y17IkXaUSDZ/MMBs/njHWt5Jb1A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyU1I8/MDlNfjKSQ86lSI803E3K4MGEe9ocU6osHJp2GgwqGUgn
+	zIuh8OdUmN1r1GXNbuVenq7AHXmwKmhUgb/JaBhREcb2TuKKvmM7gtfGaIZffic0N3gBiyxmZXv
+	bFp8lIhQu8qagOPjNjPXHpBoT2nj/VCCAJgQxw3ZY
+X-Gm-Gg: ATEYQzx27qOCqvoKDiYWVOdJfzno03Ccq0sFgIg1aJlUI8oYOZM+t7a5bYCjnx+toKd
+	/EfAMZAT//Wl7er0L76bN33wPC6tInb1XXgGla9SjKO5Xg63mvJGcbhrIqxjSB7hBJmOjDT2Sc8
+	rasbrYSOkfMrRvXVJU+p4P27hmxtn4n6nAqn2u+ZC7ERxQGGAXQcVYyCrh41P1jZGSuljum8bFD
+	FWq/1FUKNqsx+DTU7XQxJMAVtbwLEpzzpk0dM3ILvp2xZNhTXLba70C/fpzChXzem2H3NwD3+jM
+	Z+aI+4A=
+X-Received: by 2002:ac8:5a06:0:b0:50b:6a6c:ed06 with SMTP id
+ d75a77b69052e-50d62ae8905mr41318841cf.49.1775216089248; Fri, 03 Apr 2026
+ 04:34:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d5c0d106e724c732436b985dd694272bcb813bb1.1775153311.git.n05ec@lzu.edu.cn>
-X-Spamd-Result: default: False [-1.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+References: <20260403103654.15304-1-devnexen@gmail.com>
+In-Reply-To: <20260403103654.15304-1-devnexen@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 3 Apr 2026 04:34:38 -0700
+X-Gm-Features: AQROBzBS8nl5Dqcq_zQ_7_8Ft6Y7BZqD31_enXiO1jqYKo7-qFul7ptNmY_8_Bg
+Message-ID: <CANn89iL-4-JBQLsumT_XGv6DYXUWtgKHYKVztec1pj3w8ksuDQ@mail.gmail.com>
+Subject: Re: [PATCH] net: use get_random_u32() for net_namespace hash_mix initialization
+To: David Carlier <devnexen@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Christian Brauner <brauner@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, Jan Kara <jack@suse.cz>, 
+	Jeff Layton <jlayton@kernel.org>, Qiliang Yuan <realwujing@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[netfilter.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-274999-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_TO(0.00)[gmail.com];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,suse.cz,gmail.com,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-274998-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[netfilter.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[vger.kernel.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,toshiba.co.jp,trash.net,gmail.com,lzu.edu.cn];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,netfilter.org:dkim,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: CAA67393BCB
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E79F9393BF7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 03, 2026 at 02:21:17AM +0800, Ren Wei wrote:
-> ports_match_v1() treats any non-zero pflags entry as the start of a
-> port range and unconditionally consumes the next ports[] element as
-> the range end.
-> 
-> The checkentry path currently validates protocol, flags and count, but
-> it does not validate the range encoding itself. As a result, malformed
-> rules can mark the last slot as a range start or place two range starts
-> back to back, leaving ports_match_v1() to step past the last valid
-> ports[] element while interpreting the rule.
-> 
-> Reject malformed multiport v1 rules in checkentry by validating that
-> each range start has a following element and that the following element
-> is not itself marked as another range start.
-> 
-> Fixes: a89ecb6a2ef7 ("[NETFILTER]: x_tables: unify IPv4/IPv6 multiport match")
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-> Suggested-by: Xin Liu <bird@lzu.edu.cn>
-> Tested-by: Yuhang Zheng <z1652074432@gmail.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+On Fri, Apr 3, 2026 at 3:36=E2=80=AFAM David Carlier <devnexen@gmail.com> w=
+rote:
+>
+> Use get_random_u32() instead of get_random_bytes() to initialize
+> net->hash_mix. This is the preferred API for obtaining a single
+> random u32 value, as it returns the value directly rather than
+> writing through a pointer, and requires no size parameter.
+>
+> Signed-off-by: David Carlier <devnexen@gmail.com>
 > ---
-> Changes in v2:
-> - drop the selftest patch
-> - send the fix publicly to netfilter-devel
-> 
-> Changes in v3:
-> - drop datatype cleanup from the fix
-> - keep the original check() interface unchanged
-> - validate malformed range encoding in checkentry
-> 
->  net/netfilter/xt_multiport.c | 30 ++++++++++++++++++++++++++----
->  1 file changed, 26 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/netfilter/xt_multiport.c b/net/netfilter/xt_multiport.c
-> index 44a00f5acde8..07a0f2a3fc75 100644
-> --- a/net/netfilter/xt_multiport.c
-> +++ b/net/netfilter/xt_multiport.c
-> @@ -105,6 +105,24 @@ multiport_mt(const struct sk_buff *skb, struct xt_action_param *par)
->  	return ports_match_v1(multiinfo, ntohs(pptr[0]), ntohs(pptr[1]));
->  }
->  
-> +static inline bool
-> +multiport_valid_ranges(const struct xt_multiport_v1 *multiinfo)
-> +{
-> +	unsigned int i;
-> +
-> +	for (i = 0; i < multiinfo->count; i++) {
-> +		if (!multiinfo->pflags[i])
-> +			continue;
-> +
-> +		if (i + 1 >= multiinfo->count || multiinfo->pflags[i + 1])
-> +			return false;
-> +
-> +		i++;
-> +	}
-> +
-> +	return true;
-> +}
 
-I'd suggest:
+I feel a tree-wide patch could be attempted ?
 
-static inline bool
-multiport_valid_ranges(const struct xt_multiport_v1 *multiinfo)
-{
-        unsigned int i;
- 
-        for (i = 0; i < multiinfo->count; i++) {
-                if (!multiinfo->pflags[i])
-                        continue;
-
-                if (++i >= multiinfo->count)
-                        return false;
-         
-                if (multiinfo->pflags[i])
-                        return false;
-         
-                if (multiinfo->ports[i - 1] > multiinfo->ports[i])
-                        return false;
-        }
- 
-        return true;
-}
-
-Then, this validate non-sense ports array too.
+Thanks.
 
