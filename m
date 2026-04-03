@@ -1,179 +1,138 @@
-Return-Path: <netdev+bounces-274846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274847-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id YB/7Ak0jz2nLtAYAu9opvQ
-	(envelope-from <netdev+bounces-274846-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 04:17:49 +0200
+	id GL5KERkkz2notAYAu9opvQ
+	(envelope-from <netdev+bounces-274847-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 04:21:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CDFF39058B
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 04:17:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77C773905AC
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 04:21:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CB1C3302444A
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 02:17:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2BA523018D58
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 02:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4602848BE;
-	Fri,  3 Apr 2026 02:17:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8425531B823;
+	Fri,  3 Apr 2026 02:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="KdnhNcUF"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84A41B4224
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 02:17:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.46.229.174
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064D526CE2C
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 02:21:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775182665; cv=none; b=Ei61vyZifTHB3Y3slIKNjYQL5WekulhuEsn1DqhBih5P5EopC82bykivcJamrbqKAQiqfdfV7L7cAVGS03mwsN2FGnFC2SH3LNNadCjYXIzyoYdS3wzMR9tXS1I+/uLYrX5MMrE/Qwi94Qx2Un/SDwau3nXUENcbKZjhLa0ofOU=
+	t=1775182870; cv=none; b=IDJOB1WCEbNk1LzWcNi1Us2QywvhS74d4Sgha69+2FpnTCaIIBiq69ttsI0HBZQbrDUi0bDrsNJQRvB/OYo3VrNVRqjWOdNKsKCSwvA+HWK86uN1a73N3aJm5bly6eujH2BTHCaD/EyaGJSbK5dKyAU+88VVeOiFcDK3pmXLWIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775182665; c=relaxed/simple;
-	bh=YxJSynwZ5Sbaq1EQpSaAj8M2UPe+TIV0y7eBSGoYeH8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GEvMX2SQvQwELQWSLaE/WN9YWMkRDDfnYIk+dvtFHZexV4DIyaBjtQMej8gTEcPHYsU1DJhIrF/6yEK6K8eO/vCKq5QqaZSXMKKqh1lqqwrkJmjSexgH3lum6GOBD04brgpxryMDYOZtk5nMeXEp0I/Rn13lE6DuA7tcGg7H1lM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=207.46.229.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from a800-server-1.tail7779b.ts.net (unknown [172.30.111.252])
-	by app1 (Coremail) with SMTP id ygmowADHOPkwI89pqjeiAA--.675S2;
-	Fri, 03 Apr 2026 10:17:20 +0800 (CST)
-From: Yang Yang <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org
-Cc: dhowells@redhat.com,
-	marc.dionne@auristor.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	yuantan098@gmail.com,
-	bird@lzu.edu.cn,
-	jiewang2024@lzu.edu.cn,
-	n05ec@lzu.edu.cn
-Subject: [PATCH 1/1] rxrpc: only handle RESPONSE during service challenge
-Date: Fri,  3 Apr 2026 02:17:20 +0000
-Message-ID: <20260403021720.532400-1-n05ec@lzu.edu.cn>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260403021351.530453-1-n05ec@lzu.edu.cn>
-References: <20260403021351.530453-1-n05ec@lzu.edu.cn>
+	s=arc-20240116; t=1775182870; c=relaxed/simple;
+	bh=WVWHd/BE2wz3v+/T3LaJ93g68oKipqJsYOlmCaJ5o0g=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ZD/7rPA+0Z/NmjEgYLxKhjBe9dbzFMtDILUqdTt0lM3QT/qB/P9incmkEjQhGJBtrdUDTceiplustWc82Iz9z69lUvm1o9JEc3jeRjlvv4+ZRStryHYnovib53RwLMAszMUcSsIPoCCgM3uoyPWlywGXg4VkXS2HoGP6s0WlUts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=KdnhNcUF; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1775182867;
+	bh=4RlNFXYXdJ5Hd2M1EG9lWk0AN9D4vaZG59GAWw8trn8=;
+	h=From:Date:Subject:To:Cc;
+	b=KdnhNcUFpBLfAV2RBNk+6gqSnwdQ/FV8PbY1h71VBTIIqLZHP7gh+7+bf3Flq8Acg
+	 bGZKIL6v43xmVhuUawmBQVE2M1FWw6j3YAfgVBpSsGsfT4/Pv4U2yyBninqi8ZFwvr
+	 4tGPEBpfgwTxSClxNDWA5dG4+5lebsXihyKzGK26YatiiheGRG93uSh9RGudqOKBUp
+	 2dg5WKH+FtJKif+EqcV/U0ZSNdECWn0Or7+5RxiP0xw/p69iqL4ACZ/pdCoIHx6P4t
+	 VSSYfLzbtXppJzQj9w7TsJZ0oImr2zB7fI2+Rh7PGHxIxq+pCOV87k+vccOOSrYnxl
+	 SQ1Ky1FckVp6w==
+Received: by codeconstruct.com.au (Postfix, from userid 10000)
+	id 0CDE565FEE; Fri,  3 Apr 2026 10:21:07 +0800 (AWST)
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+Date: Fri, 03 Apr 2026 10:21:04 +0800
+Subject: [PATCH net-next] net: mctp: tests: use actual address when
+ creating dev with addr
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowADHOPkwI89pqjeiAA--.675S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uw15JFyDur43uw4kGw1Utrb_yoW5JrW8p3
-	y5CFWfKF95XanxXrs3Jr1v9r1qka1kGry7JryDuw18A3ZYqwnxAFn5tFZIvF13WFy8Ga1U
-	Zw4jyrs3AF45ZrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPv1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
-	z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzx
-	vE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	XVWUAwAv7VCY1x0262k0Y48FwI0_Jr0_Gr1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4
-	IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxG
-	xcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28Icx
-	kI7VAKI48JMxAIw28IcVCjz48v1sIEY20_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2Iq
-	xVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r
-	1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY
-	6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67
-	AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuY
-	vjfUYYL9UUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQMGCWnOkPwEpAABsn
-X-Spamd-Result: default: False [0.04 / 15.00];
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260403-dev-mctp-fix-test-addr-v1-1-b7fa789cdd9b@codeconstruct.com.au>
+X-B4-Tracking: v=1; b=H4sIAA8kz2kC/yWM0QqCQBBFf0XmuYHNJKxfiR5s5loTtMnuKIL47
+ 272eLj3nIUykiHTtVooYbJs31jgeKhIXl18gk0LUx3qc2jCiRUTf8QH7m1mR3buVBM3QHuRvg1
+ QoSIPCeWwh28U4RwxO93/Sx4fb4j/urSuG9djaHWEAAAA
+X-Change-ID: 20260403-dev-mctp-fix-test-addr-4ee89cf80edc
+To: Matt Johnston <matt@codeconstruct.com.au>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org
+X-Mailer: b4 0.15.1
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[codeconstruct.com.au,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[codeconstruct.com.au:s=2022a];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-274847-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	TO_DN_NONE(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-274846-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[codeconstruct.com.au:+];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[redhat.com,auristor.com,davemloft.net,google.com,kernel.org,gmail.com,lzu.edu.cn];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[jk@codeconstruct.com.au,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 0CDFF39058B
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 77C773905AC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Wang Jie <jiewang2024@lzu.edu.cn>
+Sashiko reports:
 
-Only process RESPONSE packets while the service connection is still in
-RXRPC_CONN_SERVICE_CHALLENGING. Check that state under state_lock before
-running response verification and security initialization, then use a local
-secured flag to decide whether to queue the secured-connection work after
-the state transition. This keeps duplicate or late RESPONSE packets from
-re-running the setup path and removes the unlocked post-transition state
-test.
+> This isn't a bug in the core networking code, but the addr parameter
+> appears to be ignored here.
 
-Fixes: 17926a79320a ("net: AF_RXRPC: Provide secure RxRPC sockets for use by userspace and kernel both")
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Suggested-by: Xin Liu <bird@lzu.edu.cn>
-Signed-off-by: Jie Wang <jiewang2024@lzu.edu.cn>
-Signed-off-by: Yang Yang <n05ec@lzu.edu.cn>
+In mctp_test_create_dev_with_addr(), we are ignoring the addr argument
+and just using `8`. Use the passed address instead.
+
+All invocations use 8 anyway, so no effective change at present.
+
+Fixes: 22cb45afd221 ("net: mctp: perform source address lookups when we populate our dst")
+Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 ---
- net/rxrpc/conn_event.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ net/mctp/test/utils.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
-index 98ad9b51ca2c..74823f70b57a 100644
---- a/net/rxrpc/conn_event.c
-+++ b/net/rxrpc/conn_event.c
-@@ -247,6 +247,7 @@ static int rxrpc_process_event(struct rxrpc_connection *conn,
- 			       struct sk_buff *skb)
- {
- 	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
-+	bool secured = false;
- 	int ret;
+diff --git a/net/mctp/test/utils.c b/net/mctp/test/utils.c
+index 2f79f8c1a2b4..c3987d5ade7a 100644
+--- a/net/mctp/test/utils.c
++++ b/net/mctp/test/utils.c
+@@ -95,7 +95,7 @@ struct mctp_test_dev *mctp_test_create_dev_with_addr(mctp_eid_t addr)
+ 	}
  
- 	if (conn->state == RXRPC_CONN_ABORTED)
-@@ -262,6 +263,13 @@ static int rxrpc_process_event(struct rxrpc_connection *conn,
- 		return ret;
+ 	dev->mdev->num_addrs = 1;
+-	dev->mdev->addrs[0] = 8;
++	dev->mdev->addrs[0] = addr;
  
- 	case RXRPC_PACKET_TYPE_RESPONSE:
-+		spin_lock_irq(&conn->state_lock);
-+		if (conn->state != RXRPC_CONN_SERVICE_CHALLENGING) {
-+			spin_unlock_irq(&conn->state_lock);
-+			return 0;
-+		}
-+		spin_unlock_irq(&conn->state_lock);
-+
- 		ret = conn->security->verify_response(conn, skb);
- 		if (ret < 0)
- 			return ret;
-@@ -272,11 +280,13 @@ static int rxrpc_process_event(struct rxrpc_connection *conn,
- 			return ret;
- 
- 		spin_lock_irq(&conn->state_lock);
--		if (conn->state == RXRPC_CONN_SERVICE_CHALLENGING)
-+		if (conn->state == RXRPC_CONN_SERVICE_CHALLENGING) {
- 			conn->state = RXRPC_CONN_SERVICE;
-+			secured = true;
-+		}
- 		spin_unlock_irq(&conn->state_lock);
- 
--		if (conn->state == RXRPC_CONN_SERVICE) {
-+		if (secured) {
- 			/* Offload call state flipping to the I/O thread.  As
- 			 * we've already received the packet, put it on the
- 			 * front of the queue.
--- 
-2.43.0
+ 	return dev;
+ }
+
+---
+base-commit: 8b0e64d6c9e7feec5ba5643b4fa8b7fd54464778
+change-id: 20260403-dev-mctp-fix-test-addr-4ee89cf80edc
+
+Best regards,
+--  
+Jeremy Kerr <jk@codeconstruct.com.au>
 
 
