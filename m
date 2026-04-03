@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-275190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275191-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uBEQErca0Gl33QYAu9opvQ
-	(envelope-from <netdev+bounces-275190-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 21:53:27 +0200
+	id 4DkBA7Ma0Gl33QYAu9opvQ
+	(envelope-from <netdev+bounces-275191-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 21:53:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6FD4397EFC
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 21:53:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82575397EE4
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 21:53:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 882D93087956
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 19:49:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EB02B301D329
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 19:50:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03AC63D75DA;
-	Fri,  3 Apr 2026 19:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66793D47CD;
+	Fri,  3 Apr 2026 19:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UixXY0E2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TO6MuT2D"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51AB63D8104;
-	Fri,  3 Apr 2026 19:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD9C3D6CB3;
+	Fri,  3 Apr 2026 19:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775245796; cv=none; b=d9txXl8NwotlY13cXlXJ8E1OvucmT/e7dOLF0wZB/h5fbXfz0Y431niCqhz7CBNtgAKu2NtZERApj6v8npMZFaByn1XsIs1TrKl2Nxgk4qZqHoPcwZAPFsMRcyuFkJ17gpnHDkfJyMlhD7cogRBUSXzzNl7WBBvDNH48EPGySpQ=
+	t=1775245800; cv=none; b=miZByHfSI+vcGzBbJvBBO0eKfDHOZb/WFUmOmo4CgxQ1wsfLLnKeLNs8ihsF/toThBKvHTOuB2j8dSn9VmbgsxLC2J/eCgVVbzzg6bBtlesyd55pRTVOVaMZPUsv0vczHIPm27mE6qKGr8LKZJB9kbEZu+RGfQi+2dINSz45j8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775245796; c=relaxed/simple;
-	bh=karQgKyTJPH3+C2cJlyeOYlDApnFfq/3MAeWG5hq5TE=;
+	s=arc-20240116; t=1775245800; c=relaxed/simple;
+	bh=WNgrh53dXK0aDHnzZhDAO6vOCVJFKDOlTm5Llb0hNwk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sInEDNp3Gd6yaLO3pzrDpbBUMKh50Aqz8UU8K89KGCQBN41njgAsKJubkQCrHnMsLFe+AXy+/jUP3JK3CzImurtJaX6/IikDWgNK72O/8njIKcCkB1LzVLT28Z0tc9TjAcXSB6APeGnXqff9AS+WwPG4ckKrDiPYslhEJnNguhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UixXY0E2; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=Ziam0KSouEqqT+czT9A4jTSU/7L/3n8yZHZwQFQ0KfBwj0MYV052agAw7pJwLKbCS5/WYD0WUpU/9HppXG5GPDzs/qXHrf7cW+GPm45BOmwoYU0k+qFVjL+PpclwVW4dCueuh0yHXsOA+1CNkVr8iA18eOZ1SAdUuNIGJs8Tr1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TO6MuT2D; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775245792; x=1806781792;
+  t=1775245796; x=1806781796;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=karQgKyTJPH3+C2cJlyeOYlDApnFfq/3MAeWG5hq5TE=;
-  b=UixXY0E2w1liMYErPu8+XYHiv7GpE4AjNw2KI3ALvv/jH+MCuhkyhsSf
-   LFL4oJY8RLJTMSXkORWUQ8yH0H7hlU3fJkvdemGTkWLjmatjI+c0o7N0E
-   tbtr/oFTyBnbsSiQwWzvc9pRg7xcD1aihduTpetQQIh6oZxS8WdUQhX1z
-   lZWRrIv2bG+UfTdHRbzlOFedYLM3UmsLgJhITl//lrTLCsPuImYpKvYJO
-   MuflzmeUpjlShKpg5jpfS4N3slZefiB2jOgG46rBj2yca9YcArIYBccL3
-   gM1BpA6VUGqFkXsv2GTx+HEn1Sf8mG3sjtgrM9Osqy+wqKtWshDz19nrq
+  bh=WNgrh53dXK0aDHnzZhDAO6vOCVJFKDOlTm5Llb0hNwk=;
+  b=TO6MuT2DH59bM1giuJT9pvq5AZx+EvxQ0flDIx1dvWfD23KKkVvry/LJ
+   bjGXRIsm0kMqhVenumrklq0V2OPoB7s6wfE4HBh6jcGo64+LM/MirFwMY
+   SDLCo20ZvqIPjCGbQ0R7ad9AewPnSrcdetJIXyC31WbKRvbYgrHB49j2O
+   XQAGWI8qANhupNVCQp1mNnQP8OUfUrkoGzUC5BuTAcZjnnVeT+bT9dWfS
+   sARphO4YZIU3rr997iHcqDwT8M4OVOSJf/T9rkURdH0o46KBw5VACoEJG
+   taMiQGz9Sujhy/b6CJMZprTu4MDsQl79mtyRLwQJmQq1uXNE9pMZI+4I5
    A==;
-X-CSE-ConnectionGUID: paKnJPNtQFqkRIxRLpn5QA==
-X-CSE-MsgGUID: HBgOyAatQ+i6BmTkyglttQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11748"; a="76428821"
+X-CSE-ConnectionGUID: 5sZfXfBQRnifb/QgZ6XYuQ==
+X-CSE-MsgGUID: rB/dn2MDRZy0KPjg2loZbw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11748"; a="76428827"
 X-IronPort-AV: E=Sophos;i="6.23,158,1770624000"; 
-   d="scan'208";a="76428821"
+   d="scan'208";a="76428827"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2026 12:49:46 -0700
-X-CSE-ConnectionGUID: T94vgxOjT+ybrwoBhY+aFg==
-X-CSE-MsgGUID: eRWF6/pATmKSVn3TDLW6BQ==
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2026 12:49:47 -0700
+X-CSE-ConnectionGUID: RWUmGipnQM20c+XNxc7Ndg==
+X-CSE-MsgGUID: 6fr294W6TjGXIx8MQ6562w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,158,1770624000"; 
-   d="scan'208";a="265266137"
+   d="scan'208";a="265266141"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa001.jf.intel.com with ESMTP; 03 Apr 2026 12:49:45 -0700
+  by orviesa001.jf.intel.com with ESMTP; 03 Apr 2026 12:49:46 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -86,11 +86,11 @@ Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
 	corbet@lwn.net,
 	richardcochran@gmail.com,
 	linux-doc@vger.kernel.org,
-	Samuel Salin <Samuel.salin@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH net-next v2 09/14] idpf: make mbx_task queueing and cancelling more consistent
-Date: Fri,  3 Apr 2026 12:49:31 -0700
-Message-ID: <20260403194938.3577011-10-anthony.l.nguyen@intel.com>
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Samuel Salin <Samuel.salin@intel.com>
+Subject: [PATCH net-next v2 10/14] idpf: print a debug message and bail in case of non-event ctlq message
+Date: Fri,  3 Apr 2026 12:49:32 -0700
+Message-ID: <20260403194938.3577011-11-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260403194938.3577011-1-anthony.l.nguyen@intel.com>
 References: <20260403194938.3577011-1-anthony.l.nguyen@intel.com>
@@ -107,7 +107,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
@@ -115,7 +115,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[intel.com,linux.intel.com,resnulli.us,kernel.org,lwn.net,gmail.com,vger.kernel.org];
 	RCPT_COUNT_TWELVE(0.00)[26];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-275190-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275191-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
@@ -127,115 +127,52 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: B6FD4397EFC
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 82575397EE4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Larysa Zaremba <larysa.zaremba@intel.com>
 
-As a consequence of refactoring idpf code to use libeth APIs,
-idpf_vc_xn_shutdown was merged with and replaced by idpf_deinit_dflt_mbx.
-This does not affect the Tx path, as it checked for a presence of an xn
-manager anyway. Rx processing is handled by the mbx_task that is not always
-cancelled before calling the new consolidated mailbox deinit function.
-Moreover, in the reset path idpf_intr_rel() reschedules it after the deinit
-is done. This leads to mbx_task referencing the freed mailbox and causing
-KASAN warnings.
+Unlike previous internal idpf ctlq implementation, idpf calls the default
+message handler for all received messages that do not have a matching xn
+transaction, not only for VIRTCHNL2_OP_EVENT. This leads to many error
+messages printing garbage, because the parsing expected a valid event
+message, but got e.g. a delayed response for a timed-out transaction.
 
-To remedy this, in the init path, do the first queueing of mbx_task in
-idpf_init_dflt_mbx(), in deinit and reset, always cancel the task in
-idpf_deinit_dflt_mbx() and in every flow first call idpf_mb_intr_rel_irq().
+The information about timed-out transactions and otherwise unhandleable
+messages can still be valuable for developers, so print the information
+with dynamic debug and exit the function, so the following functions can
+parse valid events in peace.
 
-Reviewed-by: Emil Tantilov <emil.s.tantilov@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
 Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
 Tested-by: Samuel Salin <Samuel.salin@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf.h          | 1 +
- drivers/net/ethernet/intel/idpf/idpf_lib.c      | 9 ++++-----
- drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 6 +++++-
- 3 files changed, 10 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index 679539a1b947..1d0e32e47e87 100644
---- a/drivers/net/ethernet/intel/idpf/idpf.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -984,6 +984,7 @@ void idpf_vc_event_task(struct work_struct *work);
- void idpf_dev_ops_init(struct idpf_adapter *adapter);
- void idpf_vf_dev_ops_init(struct idpf_adapter *adapter);
- int idpf_intr_req(struct idpf_adapter *adapter);
-+void idpf_mb_intr_rel_irq(struct idpf_adapter *adapter);
- void idpf_intr_rel(struct idpf_adapter *adapter);
- u16 idpf_get_max_tx_hdr_size(struct idpf_adapter *adapter);
- int idpf_initiate_soft_reset(struct idpf_vport *vport,
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 0d131bf0993e..7988836fbae0 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -68,9 +68,11 @@ static void idpf_deinit_vector_stack(struct idpf_adapter *adapter)
-  * This will also disable interrupt mode and queue up mailbox task. Mailbox
-  * task will reschedule itself if not in interrupt mode.
-  */
--static void idpf_mb_intr_rel_irq(struct idpf_adapter *adapter)
-+void idpf_mb_intr_rel_irq(struct idpf_adapter *adapter)
- {
--	clear_bit(IDPF_MB_INTR_MODE, adapter->flags);
-+	if (!test_and_clear_bit(IDPF_MB_INTR_MODE, adapter->flags))
-+		return;
-+
- 	kfree(free_irq(adapter->msix_entries[0].vector, adapter));
- 	queue_delayed_work(adapter->mbx_wq, &adapter->mbx_task, 0);
- }
-@@ -1938,14 +1940,11 @@ static void idpf_init_hard_reset(struct idpf_adapter *adapter)
- 		goto unlock_mutex;
- 	}
- 
--	queue_delayed_work(adapter->mbx_wq, &adapter->mbx_task, 0);
--
- 	/* Initialize the state machine, also allocate memory and request
- 	 * resources
- 	 */
- 	err = idpf_vc_core_init(adapter);
- 	if (err) {
--		cancel_delayed_work_sync(&adapter->mbx_task);
- 		idpf_deinit_dflt_mbx(adapter);
- 		goto unlock_mutex;
- 	}
 diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index 47eb8b521755..412159bb6259 100644
+index 412159bb6259..129c8f6b0faa 100644
 --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
 +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -2974,6 +2974,8 @@ int idpf_init_dflt_mbx(struct idpf_adapter *adapter)
- 	adapter->xnm = params.xnm;
- 	adapter->state = __IDPF_VER_CHECK;
+@@ -84,6 +84,13 @@ void idpf_recv_event_msg(struct libie_ctlq_ctx *ctx,
+ 	u32 event;
  
-+	queue_delayed_work(adapter->mbx_wq, &adapter->mbx_task, 0);
+ 	adapter = container_of(ctx, struct idpf_adapter, ctlq_ctx);
++	if (ctlq_msg->chnl_opcode != VIRTCHNL2_OP_EVENT) {
++		dev_dbg(&adapter->pdev->dev,
++			"Unhandled message with opcode %u from CP\n",
++			ctlq_msg->chnl_opcode);
++		goto free_rx_buf;
++	}
 +
- 	return 0;
- }
- 
-@@ -2983,6 +2985,9 @@ int idpf_init_dflt_mbx(struct idpf_adapter *adapter)
-  */
- void idpf_deinit_dflt_mbx(struct idpf_adapter *adapter)
- {
-+	idpf_mb_intr_rel_irq(adapter);
-+	cancel_delayed_work_sync(&adapter->mbx_task);
-+
- 	if (adapter->arq && adapter->asq) {
- 		idpf_mb_clean(adapter, adapter->asq, true);
- 		libie_ctlq_xn_deinit(adapter->xnm, &adapter->ctlq_ctx);
-@@ -3237,7 +3242,6 @@ void idpf_vc_core_deinit(struct idpf_adapter *adapter)
- 		idpf_deinit_dflt_mbx(adapter);
- 
- 	cancel_delayed_work_sync(&adapter->serv_task);
--	cancel_delayed_work_sync(&adapter->mbx_task);
- 
- 	idpf_vport_params_buf_rel(adapter);
- 
+ 	if (payload_size < sizeof(*v2e)) {
+ 		dev_err_ratelimited(&adapter->pdev->dev, "Failed to receive valid payload for event msg (op %d len %d)\n",
+ 				    ctlq_msg->chnl_opcode,
 -- 
 2.47.1
 
