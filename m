@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-274832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274833-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aGZYGnEVz2k2swYAu9opvQ
-	(envelope-from <netdev+bounces-274832-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 03:18:41 +0200
+	id UO2pNosWz2lZswYAu9opvQ
+	(envelope-from <netdev+bounces-274833-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 03:23:23 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E484C38FF1A
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 03:18:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 714D338FFEE
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 03:23:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 03E11304AD3B
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 01:17:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B902730CA6C1
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 01:17:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616A1283CBF;
-	Fri,  3 Apr 2026 01:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CC6229E116;
+	Fri,  3 Apr 2026 01:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OhBBdA+E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lFimNamV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2212820A9;
-	Fri,  3 Apr 2026 01:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6567828FFE7;
+	Fri,  3 Apr 2026 01:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775179063; cv=none; b=c2gvxYMfGd4G1ojVxwYinj9ASWZyJaah9B+ncHlz2uaAnaF9qx0ESbmxlBqA3EqQq1SQ6oF/k6/69GO8naZfgXIeiKQQaLwxdAZYLtV8AzAUG2ibojhhAcRJyJU957N6p7vha2bbunqmPwcEPj+nITfhC4ydqLkrPKJQffOOZ1w=
+	t=1775179065; cv=none; b=PwZtELkGCNpJ6MDPdCNPV/ylvM/KRx1fnqt4B3sYQ7IsoocXnEYd53uL3tJwZ0xvkYRKYxG048EYqvyIgdemGT5MvISpNmwuWc4NOhYg5iV5R8LadcSvnbsJnrpTjNvGvLH1bcEuhZDcXGUVbm59DM5l8DKXjP4MB/d02Sm2UzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775179063; c=relaxed/simple;
-	bh=EFAVMQZdeYp3p63+e+4293CsTLGyJdiSV230CSFVXgY=;
+	s=arc-20240116; t=1775179065; c=relaxed/simple;
+	bh=ZWTKc9p3eG4j6Nv/uMVUET78oJCOwONglyv3+fN8tCM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G7cQ5HvUiOPsNa0u2C3Kx8CXtR51o+wb38XUyeP/MV/gx+FBmHFQCZKqPSDH5BXbm7yJciMSUDvOsUKNE4l2nMiwVLf972ExPhbUj42Gp+b0g0p+XzLPCnzUtOuxwDrOpr1RPFigYl+qAEfm0pOAFf4vr2G6smYmjfUDOQHeHJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OhBBdA+E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC292C2BCB2;
-	Fri,  3 Apr 2026 01:17:41 +0000 (UTC)
+	 MIME-Version; b=JcRlTMd8lnASbCRwLr0z6uAyOjQO+8Pb9BxkIUDMVDKx9vtmk5VBf0rh/pZ/FsVRSgW3SZShuWuZE4rq5ulSu3fpb9GDAWkE2UxkIphYlVVgvDRiHDuBrI9l0u7z68ywvxJvCqh49B6g12Osg/bjAD6ZlPiWJ4iAHAUarR54xqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lFimNamV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AECCC116C6;
+	Fri,  3 Apr 2026 01:17:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775179062;
-	bh=EFAVMQZdeYp3p63+e+4293CsTLGyJdiSV230CSFVXgY=;
+	s=k20201202; t=1775179065;
+	bh=ZWTKc9p3eG4j6Nv/uMVUET78oJCOwONglyv3+fN8tCM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OhBBdA+EJaT7h1MeQGXuyT3xlz3LIwg2zub97gRs8+YKaNLTv9i3rQJ6KpghcbHBC
-	 bSg9iIQ2UYl/BkWpegwYnRNu9yg/bqXeQHBU1j1XL/LBJtrQL2OinJ9KooKqP5APzT
-	 mSMO9yiM8d5S4EEnHiHcmnxiw6ufdRrtxI8MpsplXg/m1C6DGWFSf5Eq2P8XcE8eAv
-	 +6Prlu8zJJKuZnwhBJTP51sZZLpvHpSlP8iSlCifsp2LEt5tzZOUEA1I6B+UUZlx4D
-	 8ua3RGw2eDYd/hEgp8w8qRloHWD29H+5oB+SzhbqzuSC1mWSJBHDFc9f9KXHm13Qe0
-	 iGvMa0Nb+Zbhg==
+	b=lFimNamVMzqxmN0xN9klnqc6kbFPNAItX3nfPjExbgcJMsZCOs4yH6lbuykfM+lwn
+	 q0w8ig+DYX1TSuT7HxIsUS5qYZaN3wbuYqJs0dAfWcu647ZAVHWL488Q3vqzOWcRjq
+	 hAdC2QhMd1qXd97OtQZlXY86KxecxUyIFHDuB4N1J/Lo3MVTtkQEtO2NOgZH6AMha0
+	 hdah7NG5ewcpBKpyO50DdBr0gH1n7KhfkyLn1tAvy/HUWj01GgAYCUt70P/acfxnQ/
+	 uv5DXZkcQfCxhq+zdblLVD8KLP1hCzIQRdWwJXEB8AxFJn4CMPQ8dNhwM146Exyn0v
+	 8lCP0+KFM4XSQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: wei.fang@nxp.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -69,12 +69,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	linuxppc-dev@lists.ozlabs.org,
 	linux-arm-kernel@lists.infradead.org,
 	imx@lists.linux.dev
-Subject: Re: [PATCH v4 net-next 11/14] net: dsa: netc: add phylink MAC operations
-Date: Thu,  2 Apr 2026 18:17:40 -0700
-Message-ID: <20260403011740.1795694-1-kuba@kernel.org>
+Subject: Re: [PATCH v4 net-next 12/14] net: dsa: netc: add more basic functions support
+Date: Thu,  2 Apr 2026 18:17:43 -0700
+Message-ID: <20260403011743.1795726-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260331113025.1566878-12-wei.fang@nxp.com>
-References: <20260331113025.1566878-12-wei.fang@nxp.com>
+In-Reply-To: <20260331113025.1566878-13-wei.fang@nxp.com>
+References: <20260331113025.1566878-13-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,14 +89,14 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FREEMAIL_CC(0.00)[kernel.org,nxp.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com,armlinux.org.uk,vger.kernel.org,lists.ozlabs.org,lists.infradead.org,lists.linux.dev];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[24];
-	TAGGED_FROM(0.00)[bounces-274832-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274833-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -109,150 +109,160 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E484C38FF1A
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 714D338FFEE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-net: dsa: netc: add phylink MAC operations
+net: dsa: netc: add more basic functions support
 
-Different versions of NETC switches have different numbers of ports and
-MAC capabilities, so add .phylink_get_caps() to struct netc_switch_info.
-In addition, related interfaces of struct phylink_mac_ops are added.
+This patch expands the NETC switch driver with several foundational
+features, including FDB and MDB management, STP state handling, MTU
+configuration, port setup/teardown, and host flooding support.
+
+At this stage, the driver operates only in standalone port mode. Each
+port uses VLAN 0 as its PVID, meaning ingress frames are internally
+assigned VID 0 regardless of whether they arrive tagged or untagged.
+Note that this does not inject a VLAN 0 header into the frame, the VID
+is used purely for subsequent VLAN processing within the switch.
 
 > diff --git a/drivers/net/dsa/netc/netc_main.c b/drivers/net/dsa/netc/netc_main.c
-> index 5828fd3e342e..f11f5d0f6a6d 100644
 > --- a/drivers/net/dsa/netc/netc_main.c
 > +++ b/drivers/net/dsa/netc/netc_main.c
-[ ... ]
-> +static void netc_port_set_mac_mode(struct netc_port *np,
-> +				   unsigned int mode,
-> +				   phy_interface_t phy_mode)
-> +{
-> +	u32 mask = PM_IF_MODE_IFMODE | PM_IF_MODE_REVMII;
-> +	u32 val = 0;
-> +
-> +	switch (phy_mode) {
-> +	case PHY_INTERFACE_MODE_RGMII:
-[ ... ]
-> +	case PHY_INTERFACE_MODE_SGMII:
-> +	case PHY_INTERFACE_MODE_2500BASEX:
-> +		val |= IFMODE_SGMII;
-> +		break;
-> +	default:
-> +		break;
-> +	}
-> +
-> +	netc_mac_port_rmw(np, NETC_PM_IF_MODE(0), mask, val);
-> +}
-
-In imx94_switch_phylink_get_caps(), PHY_INTERFACE_MODE_1000BASEX is
-advertised as supported for ports 0 and 1. Does it need to be handled
-in this switch statement? As written, it appears it will fall through
-to the default case and clear the IFMODE bits, leaving the MAC in an
-undefined mode.
 
 [ ... ]
-> +static void netc_port_mac_rx_enable(struct netc_port *np)
+
+> +static int netc_add_standalone_vlan_entry(struct netc_switch *priv)
 > +{
-> +	netc_port_rmw(np, NETC_POR, PCR_RXDIS, 0);
-> +	netc_mac_port_rmw(np, NETC_PM_CMD_CFG(0), PM_CMD_CFG_RX_EN,
-> +			  PM_CMD_CFG_RX_EN);
+> +	u32 bitmap_stg = VFT_STG_ID(0) | netc_available_port_bitmap(priv);
+
+Does putting all standalone ports into a single shared VLAN 0 break the DSA
+isolation requirements?
+
+If a user manually adds a static FDB entry to a standalone port, it is
+programmed into VLAN 0. Because all standalone ports reside in this VLAN, a
+frame arriving on one standalone port with a matching destination MAC might
+be hardware-switched directly to another standalone port, bypassing the CPU.
+
+[ ... ]
+
+> +static int netc_port_set_fdb_entry(struct netc_port *np,
+> +				   const unsigned char *addr, u16 vid)
+> +{
+
+[ ... ]
+
+> +	/* If the entry already exists, but not on this port, we need to
+> +	 * update the port bitmap. In general, it should only be valid
+> +	 * for multicast or broadcast address.
+> +	 */
+> +	port_bitmap ^= BIT(port);
+> +	entry->cfge.port_bitmap = cpu_to_le32(port_bitmap);
+
+Can this XOR operation cause multi-port floods during unicast MAC migrations?
+
+When a unicast MAC address moves to a new port, the bridging layer issues an
+ADD for the new port. The XOR operation leaves the old port bit set alongside
+the new port bit. Does the driver need to differentiate between unicast and
+multicast addresses and explicitly overwrite the bitmap for unicast entries?
+
+[ ... ]
+
+> +static int netc_port_del_fdb_entry(struct netc_port *np,
+> +				   const unsigned char *addr, u16 vid)
+> +{
+> +	struct netc_switch *priv = np->switch_priv;
+> +	struct ntmp_user *ntmp = &priv->ntmp;
+> +	struct netc_fdb_entry *entry;
+> +	int port = np->dp->index;
+> +	u32 port_bitmap;
+> +	int err = 0;
+> +
+> +	mutex_lock(&priv->fdbt_lock);
+> +
+> +	entry = netc_lookup_fdb_entry(priv, addr, vid);
+> +	if (unlikely(!entry))
+> +		goto unlock_fdbt;
+
+Will this prevent dynamically learned FDB entries from being deleted?
+
+Since the CPU port is configured with MLO_HW, the switch hardware dynamically
+learns MAC addresses, but they are not added to the software priv->fdb_list.
+If a user attempts to delete a dynamic entry, the software lookup will fail
+here and return 0 (success), leaving the stale dynamically learned entry
+active in hardware.
+
+[ ... ]
+
+> +static int netc_port_change_mtu(struct dsa_switch *ds,
+> +				int port, int mtu)
+> +{
+> +	u32 max_frame_size = mtu + VLAN_ETH_HLEN + ETH_FCS_LEN;
+> +	struct netc_port *np = NETC_PORT(ds, port);
+> +
+> +	if (dsa_is_cpu_port(ds, port))
+> +		max_frame_size += NETC_TAG_MAX_LEN;
+
+Does this double-count the DSA tag overhead for the CPU port?
+
+The DSA core computes the CPU port's MTU by adding the tagger overhead before
+calling the switch's .port_change_mtu() function. If the maximum MTU of 9582
+bytes is requested, the CPU port receives an MTU of 9596. Adding
+NETC_TAG_MAX_LEN again here results in 9628 bytes, which exceeds the
+hardware limit of 9600 (NETC_MAX_FRAME_LEN) and might lead to truncation.
+
+[ ... ]
+
+> +static int netc_port_fdb_add(struct dsa_switch *ds, int port,
+> +			     const unsigned char *addr, u16 vid,
+> +			     struct dsa_db db)
+> +{
+> +	struct netc_port *np = NETC_PORT(ds, port);
+> +
+> +	/* Currently, we only support standalone port mode, so all VLANs
+> +	 * should be converted to NETC_STANDALONE_PVID.
+> +	 */
+> +	return netc_port_set_fdb_entry(np, addr, NETC_STANDALONE_PVID);
 > +}
 
-Pseudo ports (like the CPU port) bypass PMAC register accesses during
-graceful stop via is_netc_pseudo_port(). Should there be a similar check
-here, and in netc_port_set_mac_mode(), to prevent accessing physical MAC
-registers on pseudo ports?
+Is it safe to silently override user-requested VLAN IDs to VLAN 0?
 
-Additionally, when np->caps.pmac is true, netc_port_mac_rx_graceful_stop()
-disables the preemption MAC via NETC_PM_CMD_CFG(1). Should this function
-re-enable it when bringing the link back up?
+If a user explicitly attempts to configure a MAC address for a specific VLAN,
+the hardware is programmed for VLAN 0 and returns success. Should this
+instead check if the requested vid is not 0 and not NETC_STANDALONE_PVID,
+and return -EOPNOTSUPP to inform the networking stack?
 
-> +static void netc_port_wait_rx_empty(struct netc_port *np, int mac)
+[ ... ]
+
+> +static void netc_port_set_host_flood(struct dsa_switch *ds, int port,
+> +				     bool uc, bool mc)
 > +{
-> +	u32 val;
+> +	struct netc_port *np = NETC_PORT(ds, port);
 > +
-> +	if (read_poll_timeout(netc_port_rd, val, val & PM_IEVENT_RX_EMPTY,
-> +			      100, 10000, false, np, NETC_PM_IEVENT(mac)))
-> +		dev_warn(np->switch_priv->dev,
-> +			 "MAC %d of swp%d RX is not empty\n", mac,
-> +			 np->dp->index);
+> +	if (np->uc == uc && np->mc == mc)
+> +		return;
+> +
+> +	/* IPFT does not support in-place updates to the KEYE element,
+> +	 * so we need to delete the old IPFT entry and then add a new
+> +	 * one.
+> +	 */
+> +	if (np->host_flood)
+> +		netc_port_remove_host_flood(np);
+> +
+> +	if (netc_port_add_host_flood_rule(np, uc, mc))
+> +		dev_err(ds->dev, "Failed to add host flood rule on port %d\n",
+> +			port);
 > +}
 
-Is NETC_PM_IEVENT a sticky write-1-to-clear register? If the RX FIFO had
-previously emptied during normal operation, could this bit already be set,
-causing read_poll_timeout() to return immediately without waiting?
+Could this permanently lose the host flood configuration if the new rule
+addition fails?
 
-> +static void netc_port_mac_rx_graceful_stop(struct netc_port *np)
-> +{
-> +	u32 val;
-> +
-> +	if (is_netc_pseudo_port(np))
-> +		goto check_rx_busy;
-> +
-> +	if (np->caps.pmac) {
-> +		netc_port_rmw(np, NETC_PM_CMD_CFG(1), PM_CMD_CFG_RX_EN, 0);
-> +		netc_port_wait_rx_empty(np, 1);
-> +	}
-> +
-> +	netc_port_rmw(np, NETC_PM_CMD_CFG(0), PM_CMD_CFG_RX_EN, 0);
-> +	netc_port_wait_rx_empty(np, 0);
-> +
-> +check_rx_busy:
-> +	if (read_poll_timeout(netc_port_rd, val, !(val & PSR_RX_BUSY),
-> +			      100, 10000, false, np, NETC_PSR))
-> +		dev_warn(np->switch_priv->dev, "swp%d RX is busy\n",
-> +			 np->dp->index);
-> +
-> +	netc_port_rmw(np, NETC_POR, PCR_RXDIS, PCR_RXDIS);
-> +}
-
-For pseudo ports, the code jumps directly to check_rx_busy and polls for
-PSR_RX_BUSY to clear. Since PCR_RXDIS is only set after the polling
-completes, will the RX pipeline continue accepting traffic and cause this
-poll to always timeout on an active link?
-
-> +static void netc_mac_link_up(struct phylink_config *config,
-> +			     struct phy_device *phy, unsigned int mode,
-> +			     phy_interface_t interface, int speed,
-> +			     int duplex, bool tx_pause, bool rx_pause)
-> +{
-> +	struct dsa_port *dp = dsa_phylink_to_port(config);
-> +	struct netc_port *np;
-> +
-> +	np = NETC_PORT(dp->ds, dp->index);
-> +	netc_port_set_speed(np, speed);
-> +
-> +	if (phy_interface_mode_is_rgmii(interface))
-> +		netc_port_set_rgmii_mac(np, speed, duplex);
-> +
-> +	if (interface == PHY_INTERFACE_MODE_RMII ||
-> +	    interface == PHY_INTERFACE_MODE_REVMII ||
-> +	    interface == PHY_INTERFACE_MODE_MII)
-> +		netc_port_set_rmii_mii_mac(np, speed, duplex);
-> +
-> +	netc_port_mac_rx_enable(np);
-> +}
-
-The callback imx94_switch_phylink_get_caps() advertises MAC_ASYM_PAUSE and
-MAC_SYM_PAUSE capabilities. Is it expected that tx_pause and rx_pause are
-ignored here? If flow control is implemented in a subsequent patch, should
-the advertisement be deferred until then?
-
-> +static void netc_mac_link_down(struct phylink_config *config,
-> +			       unsigned int mode,
-> +			       phy_interface_t interface)
-> +{
-> +	struct dsa_port *dp = dsa_phylink_to_port(config);
-> +
-> +	netc_port_mac_rx_graceful_stop(NETC_PORT(dp->ds, dp->index));
-> +}
-
-This correctly stops the RX pipeline, but should the TX path
-(PM_CMD_CFG_TX_EN or PCR_TXDIS) also be disabled when the link goes down?
+If the call to netc_port_add_host_flood_rule() fails (for example, due to
+-ENOMEM), the function logs an error and returns, leaving the port entirely
+without a host flood rule. Should the driver revert to the previous
+configuration on failure to avoid blackholing traffic meant for the CPU?
 
