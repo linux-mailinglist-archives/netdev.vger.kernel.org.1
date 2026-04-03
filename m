@@ -1,116 +1,118 @@
-Return-Path: <netdev+bounces-275222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275223-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UIZ8LzMr0GkH4QYAu9opvQ
-	(envelope-from <netdev+bounces-275222-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 23:03:47 +0200
+	id GAxWDUor0GkH4QYAu9opvQ
+	(envelope-from <netdev+bounces-275223-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 23:04:10 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 263B0398549
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 23:03:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B2C398551
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 23:04:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 18F4030528A0
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 21:00:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6DC36302C6CC
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 21:02:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 976613D5656;
-	Fri,  3 Apr 2026 21:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9148A3D6477;
+	Fri,  3 Apr 2026 21:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qP7DrXQG"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="Ra07SwbT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744B3359A6D
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 21:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60F53D5656;
+	Fri,  3 Apr 2026 21:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775250046; cv=none; b=FCWVMYXkl9/9TjxSRsXBu5pKCF5bz4oXF5IiP07hhUXfgjk1vWq4+iJTTFOfBUU40jFwdUCZPDdYdFOW+ovcVzJpb3Ex9nKQor/WKuH1ZyIF4ewyxHPRRY8CIVTrmRrBrSVVuz9zljvU4WwTM6SgDyGmIWeQc0jucRzDNnp73D4=
+	t=1775250122; cv=none; b=EL+z8SaStZauvA6u/vp2Ryrxkw1ff4u4TT9e9bsslSp1ob0lP29G+3vlsC5Cx4lnKCqfxGLqD/LHuevo8ECWyiWdXQ7C9IuL+wU3dHCYYyJKWzNZVoPjwNkMsamwxD8LNuPghpTiruz4uOz4AxV+WsxAlP3bs04GLNUJ1Pc1wmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775250046; c=relaxed/simple;
-	bh=XPKE9366I21wKdn9VkP0f4AJzYuYGZTwQKTuEYgVFS4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cEtejDZ9iLjv8ALN0Fxo47azBwBRznIHueMAvQoJ+zomggmf1qh/XQUxzgtc5NQqSbw7X5A5UwIG6psufj07BbHMRt15aZ8E7cH79lUc9n5JvH2hseRqlbzAB6JHfHpI+Yn6mepPQVTw90K3HTottGbRGP5CdYOkf5soPE5t9TQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qP7DrXQG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE488C19424;
-	Fri,  3 Apr 2026 21:00:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775250046;
-	bh=XPKE9366I21wKdn9VkP0f4AJzYuYGZTwQKTuEYgVFS4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qP7DrXQGUSfM7XFWiFiGpv/+yO8RI/Gb3pVbO8T3pyu7ztGv4Ac4BWB8VRhSdN7L/
-	 og8zOB8MEDhIo3g0wVUSkEyytD1JETH/qPTBWYLqFiKp5ChrGinUVcoeH2JBIGuRjE
-	 CQs446PsE9PGKb+KigJE8HmY4WVTVMNp3fKXcC3i3y2sHXSk5Cjg9n1TlLn219o98Q
-	 nDy5mZkYPv2fn05X/MBs9PGHP/HjTwayYgXZWidMVeUv+q6TiwrIygDykmtRlF6fPY
-	 1+vR95cScpL8e7qLmG8l8WYng8qzqEK6DqC2e7+Ig9zY8d33GVdI0P0DStSvkAOfMI
-	 ZqyuJOvxurGJw==
-Date: Fri, 3 Apr 2026 14:00:40 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH net v3 0/7] net/sched: Fix packet loops in mirred and
- netem
-Message-ID: <20260403140040.7aeb565c@kernel.org>
-In-Reply-To: <20260403120354.6e926c05@phoenix.local>
-References: <20260326181701.308275-1-stephen@networkplumber.org>
-	<20260402131618.21624737@phoenix.local>
-	<20260402174906.0ee218f2@kernel.org>
-	<20260403120354.6e926c05@phoenix.local>
+	s=arc-20240116; t=1775250122; c=relaxed/simple;
+	bh=OiLcugNzhOcn3+ZqTqNHyFc+1w+Of5vLCmgFDm/2EwQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rpTug87Wa+viwaWm6eYNSMcVxeulCfOU7dx9fcjIwWDMS+s82xRGKhi0LSeYJ9lmfJapkei6kg3ixivUh0WfJVtzfr2JJxHw85C5NhXW6TPPi/gM7eujeDM1owuhkRlIl9egT4iqZrTtTmleoy1Rm+60Hv+i9wwsN+CghUyooB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=Ra07SwbT; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 5489E60251;
+	Fri,  3 Apr 2026 23:01:58 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1775250118;
+	bh=Bik4T78PiVQ6FVf5qYxp+z3Qx6Y8fK8iKEYDKmRuU0M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ra07SwbTcDgF/6SfYn5ARiLngAbIomIrg2hBExbZ4dCq4Uzicc6O/8/uNSC7Iggt1
+	 n/Bhk9YW76SH8Y/u7OgT4cef50decbZTX9TPO8Ip9VcpUW6kD5/06c68CIjpyHiQjx
+	 0Rzn4YRuCIAyxI6QV21u4ESbR5KXvQEIYMe8nNN0LmkPlIEYwcPK+BWaea0NycR0WE
+	 Ggn3COvQnDjF0M884nJwJwp9zhBGadJEpGeDyAC+P5M7+x+W6/tWwHHvcSFd9UIliO
+	 uKpJNByxgjBQHUDZINiLt+vCCSQfe/kZYccGXqKztkpoZjXhriGNEdLs6uEh7FtwUC
+	 5r/bXzaV0pQwQ==
+Date: Fri, 3 Apr 2026 23:01:55 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Marino Dzalto <marino.dzalto@gmail.com>
+Cc: fw@strlen.de, netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] netfilter: xt_HL: add pr_fmt, default case and NULL
+ checks
+Message-ID: <adAqw08ImMk32r5h@lemonverbena>
+References: <20260403193929.89449-1-marino.dzalto@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260403193929.89449-1-marino.dzalto@gmail.com>
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MID_RHS_NOT_FQDN(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_DKIM_ALLOW(-0.20)[netfilter.org:s=2025];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275222-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
+	DMARC_NA(0.00)[netfilter.org];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[netfilter.org:+];
+	RCPT_COUNT_FIVE(0.00)[6];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pablo@netfilter.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275223-lists,netdev=lfdr.de];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 263B0398549
+X-Rspamd-Queue-Id: 24B2C398551
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, 3 Apr 2026 12:03:54 -0700 Stephen Hemminger wrote:
-> On Thu, 2 Apr 2026 17:49:06 -0700
-> Jakub Kicinski <kuba@kernel.org> wrote:
-> 
-> > On Thu, 2 Apr 2026 13:16:18 -0700 Stephen Hemminger wrote:  
-> > > Why is this marked Changes Requested.    
-> > 
-> > Is this a question.  
-> Yes a process question what is the blocker? What needs to change?
-> More review?
+On Fri, Apr 03, 2026 at 09:39:29PM +0200, Marino Dzalto wrote:
+> diff --git a/net/netfilter/xt_hl.c b/net/netfilter/xt_hl.c
+> index c1a70f8f0..9434d5ca8 100644
+> --- a/net/netfilter/xt_hl.c
+> +++ b/net/netfilter/xt_hl.c
+[...]
+>  static bool hl_mt6(const struct sk_buff *skb, struct xt_action_param *par)
+>  {
+>  	const struct ip6t_hl_info *info = par->matchinfo;
+> -	const struct ipv6hdr *ip6h = ipv6_hdr(skb);
+> +	const struct ipv6hdr *ip6h;
+> +
+> +	if (!skb)
+> +		return false;
 
-I think what happened was it was posted at the same time as another
-series for netem and made TDC fail. Then Jamal said something which 
-TBH I didn't completely follow so I left it as Changes Requested :S
-Imperfection of the maintainer, I'd say :S
+No skb !?
 
-Please repost if the series is good (presumably once the other
-series you have pending for net goes in?)
+This codebase is frozen, I don't see any benefit in this update.
 
