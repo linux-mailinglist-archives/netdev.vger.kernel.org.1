@@ -1,171 +1,200 @@
-Return-Path: <netdev+bounces-275214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275215-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MDl/K+gn0Gko4AYAu9opvQ
-	(envelope-from <netdev+bounces-275214-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 22:49:44 +0200
+	id iE5pGiYn0Gko4AYAu9opvQ
+	(envelope-from <netdev+bounces-275215-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 22:46:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 090E839844C
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 22:49:44 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 056413983F4
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 22:46:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 999143053645
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 20:46:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3BC1D30066A9
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 20:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127353BD237;
-	Fri,  3 Apr 2026 20:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="epoQLn+s";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="dW1tQzW0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F23D3B3885;
+	Fri,  3 Apr 2026 20:46:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-y-209.mailbox.org (mout-y-209.mailbox.org [91.198.250.237])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f78.google.com (mail-oa1-f78.google.com [209.85.160.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD9E23D7FB;
-	Fri,  3 Apr 2026 20:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.237
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E41023D7FB
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 20:46:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775249173; cv=none; b=NOSt5359zcWfKaEoruGqCG/6IRslBS4blzvrkqHHd9+48aZdxJNKVpxytoZELyM+XNQAWh145rN6OZkoBIafiy3JfVGsp6JeZzqbjJm2EWLbxLgk3zVUmIjpgtXH3mKeo6A+hcVaoiocldu0N4/Tq7VOHqn9/n0yQ0vGbbyANns=
+	t=1775249186; cv=none; b=GoXATxJvbvoSCTU1Vpc4M+9KC78XCcr5lUk6o8Pfn4lBu8eLjJb6/Sjx7d5IFZWhODI/TmHDa2vJQttIRSSvIlcsK6Y301ouJMqRMv0y6DC0ySs7USCP8l5oJjRlikAzHgb4/gvIAtXrAZYgBYlA2qIPJbZjg5SBvOT9sMHYB+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775249173; c=relaxed/simple;
-	bh=suheY/UrH8prsaVcQ3uhpQYUXmPEpsKJn7ro7xcYLN8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VXTQlOJX86uiYjuJT9umLGwVSKud7TRHdquZOF4uzo3bF0f5CD/VAGm0RToR2OQb8iYMwXa4BPC4xlap7I+w7dkmLB+faee7zDQqq1hfouKekRkQvOSNrgusgPaGlK3SpUxtSiXGhiFtHVr0m1Rn9B7ZLWGvAo3JJjxwHSZYUw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=epoQLn+s; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=dW1tQzW0; arc=none smtp.client-ip=91.198.250.237
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-y-209.mailbox.org (Postfix) with ESMTPS id 4fnW2y3clczB12x;
-	Fri,  3 Apr 2026 22:46:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1775249162;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=K4qIv147Xt8rsVwGLVGnAClnwr+dtQhi4QaadIQ4afc=;
-	b=epoQLn+sS3rsaQoxZNQFKGBI6OopP+13vcsbEWcRl4oGApB05jrIjlL2G3kroxb8F7zrrv
-	JYRtzPDxSe8bmmW3OLy1W9dlPVnf0S63y6RKP9O1x4LmBemGg7lIDr9YVZAGztaLW7os8q
-	OXUXCu+VyEU6Oa1yBlguBPNcDv4sG2QJdsaqxpSuEUzAQqD08Xdb057Pxngje+ragtluu8
-	sDhl+qYMuGCwV37JBPTB8TMNPv4JrtD4NpwsQY/wqpYbIWPsLb8LT7nF64jHMHBYONUaUz
-	E8qA6IC+zaGTg2vpKrlkfZOmdWr7h1EogTLbpe/2KMQ0SfYBener358aufq7rQ==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=dW1tQzW0;
-	spf=pass (outgoing_mbo_mout: domain of mashiro.chen@mailbox.org designates 2001:67c:2050:b231:465::1 as permitted sender) smtp.mailfrom=mashiro.chen@mailbox.org
-From: Mashiro Chen <mashiro.chen@mailbox.org>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1775249160;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=K4qIv147Xt8rsVwGLVGnAClnwr+dtQhi4QaadIQ4afc=;
-	b=dW1tQzW07GAK2JC1ibLKwi1A1G6hvGHgnwHx2WnHMgV2yd9AeHlzLIODqP4QRaNlOX2w9B
-	/qfoXsYgjDul7HvafMEN73/hdwJCfdxYJIwgRnrwc2Xz5bgAN+JiUxDtjeI14GW8iwUl7X
-	wHh3TWL45zRnaU7O2ddn3MsQ4rlQNYNO4wQaeMIW2KDJ5GwxIPMacSTzAgMhyVbvmHCRF2
-	aP4SPgIqWtA2pmWfYUry8wiakkpZ5B4tVt2SPrIwuY/ORFl/z+XSpgW0+9TdOal4aOgZgV
-	HcymW7Fc7SbVvm4nYrJZOePxPAz2R4bqtMJxN2fK7uL71GhtRDNoUXAzO+xHVg==
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	linux-hams@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Mashiro Chen <mashiro.chen@mailbox.org>,
-	syzbot+abd2b69348e2d9b107a1@syzkaller.appspotmail.com
-Subject: [PATCH net] net: rose: stop timers before freeing neighbour in rose_neigh_put
-Date: Sat,  4 Apr 2026 04:44:59 +0800
-Message-ID: <20260403204459.124812-1-mashiro.chen@mailbox.org>
+	s=arc-20240116; t=1775249186; c=relaxed/simple;
+	bh=ya8mIEi/lOzbAAv9vNueo7lkjuUjA9tBA2hrrpB0r9c=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=nn1bxmPprF9ZQaiGQKlsRwEruVTMmt3vXP1sbzLci8dCBcsVFuW+n2F3KgparZdGI/9nXGIXKANDwGEMQSiQKbu/M17q2Jrt2XqQIkdaSvDYGBcbMe714WQAWyrnU1l/sZY4u8gqIPHZmzGBgWjI43HK9hHXTaNoa1LIJoe6Y/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f78.google.com with SMTP id 586e51a60fabf-41c471678c4so3186973fac.2
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 13:46:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775249184; x=1775853984;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DwihP8VSD5VEOSh/pvXoSKE8nmgjfZs35QdENxNc5QI=;
+        b=HaRb1jK7e0rDcth9fPMpYou7bL3IQgOMoFDYcoylkixjj/7zCH+fGI9QTXNaFttmIR
+         An15gJkU7iNp3BwN3gyhovoz2LpBgTQfDFyOPg20GxgqL3OCllhyFlr0s3QsRlbaIgAi
+         NlmcfgypGWJpj6SMBe3prWGaKSXQGdoVb/Mj3TifVzJqL5JjyUsmjEcDPOrUOcTML6On
+         Z5QYo8ZoB1HXOmxeyXdHFeWngD3DXWxxfLCzWBUQJ72tlrZE4jl213l6VlxKuEVPEzkK
+         aHkSukOycKvp5ANhItroeFFxmAJwqpkyM9iCPQD6EQO7jH/wQvlUl1CBEvtxkTlHknQv
+         ueKA==
+X-Forwarded-Encrypted: i=1; AJvYcCV1CHskLF6e40hYugN/r0MtPEQVPSZ49H9GPrEhQXY1CX4UH4uU6DRTuR1WcWR43QOrJcGKtxw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyG25Jb+BlU4MVXT62sGdd9+HM6YrulijdRaJkg5AxsekM4Wk9i
+	+UNRl7SKfbBJEc+eVtTFhInH8TD9Q3TvfbzDvMjJkQcySMMM00lLRPjWswhXxjf/ce5hs3agp8t
+	j7XQQrv0+2HVRO5XdVw5n0CouuS3+4v0L7V/JnliVKyXbkATGrienw/8uS6c=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-MBO-RS-META: sbwep65h3pxq3iomk4695c9my5itzwek
-X-MBO-RS-ID: 8e464e809dfb223fc14
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Received: by 2002:a05:6820:818a:b0:67d:e140:344a with SMTP id
+ 006d021491bc7-68220c3f586mr2682669eaf.40.1775249183975; Fri, 03 Apr 2026
+ 13:46:23 -0700 (PDT)
+Date: Fri, 03 Apr 2026 13:46:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69d0271f.050a0220.182279.0019.GAE@google.com>
+Subject: [syzbot] [netfilter?] KCSAN: data-race in hash_ipportnet6_add / hash_ipportnet6_head
+From: syzbot <syzbot+421c5f3ff8e9493084d9@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+	pablo@netfilter.org, phil@nwl.cc, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [-0.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	URI_HIDDEN_PATH(1.00)[https://syzkaller.appspot.com/x/.config?x=3a78dd265deac3a9];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[appspotmail.com : SPF not aligned (relaxed), No valid DKIM,none];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275214-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mashiro.chen@mailbox.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,abd2b69348e2d9b107a1];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,appspotmail.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mailbox.org:dkim,mailbox.org:email,mailbox.org:mid]
-X-Rspamd-Queue-Id: 090E839844C
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-275215-lists,netdev=lfdr.de,421c5f3ff8e9493084d9];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	SUBJECT_HAS_QUESTION(0.00)[];
+	REDIRECTOR_URL(0.00)[goo.gl];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[syzbot@syzkaller.appspotmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	TO_DN_NONE(0.00)[];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.991];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,syzkaller.appspot.com:url,storage.googleapis.com:url]
+X-Rspamd-Queue-Id: 056413983F4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-rose_neigh_put() frees the rose_neigh object when the reference count
-reaches zero, but does not stop the t0timer and ftimer beforehand.
-If a timer has been scheduled and fires after the object is freed,
-the callback will access already-freed memory, leading to a
-use-after-free.
+Hello,
 
-For example, this can happen when rose_timer_expiry() in ROSE_STATE_2
-calls rose_neigh_put() dropping the last reference while the
-neighbour's t0timer is still pending:
+syzbot found the following issue on:
 
-  rose_timer_expiry() (ROSE_STATE_2)
-    rose_neigh_put(rose->neighbour)   --> refcount drops to 0, kfree
-  ...
-  rose_t0timer_expiry()               --> UAF: accesses freed neigh
+HEAD commit:    2d1373e4246d Merge tag 'for-7.0-rc4-tag' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12df3d52580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3a78dd265deac3a9
+dashboard link: https://syzkaller.appspot.com/bug?extid=421c5f3ff8e9493084d9
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
 
-Fix this by calling timer_delete_sync() for both t0timer and ftimer
-in rose_neigh_put() before freeing the object. This ensures any
-pending or running timer callback completes before the memory is
-released.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-This is safe because rose_neigh_put() is never called from the
-neigh's own timer callbacks (t0timer_expiry / ftimer_expiry), so
-timer_delete_sync() cannot deadlock.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/b2aee7aa6da1/disk-2d1373e4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/6cbfa1602880/vmlinux-2d1373e4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/52fe8db03e03/bzImage-2d1373e4.xz
 
-Reported-by: syzbot+abd2b69348e2d9b107a1@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=abd2b69348e2d9b107a1
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Mashiro Chen <mashiro.chen@mailbox.org>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+421c5f3ff8e9493084d9@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KCSAN: data-race in hash_ipportnet6_add / hash_ipportnet6_head
+
+read-write to 0xffff888181583b19 of 1 bytes by task 29523 on cpu 1:
+ hash_ipportnet6_add+0xa12/0x1900 net/netfilter/ipset/ip_set_hash_gen.h:965
+ hash_ipportnet6_uadt+0x7c1/0x900 net/netfilter/ipset/ip_set_hash_ipportnet.c:504
+ call_ad+0x231/0x640 net/netfilter/ipset/ip_set_core.c:1751
+ ip_set_ad+0x5c0/0x690 net/netfilter/ipset/ip_set_core.c:1841
+ ip_set_uadd+0x41/0x50 net/netfilter/ipset/ip_set_core.c:1864
+ nfnetlink_rcv_msg+0x509/0x5d0 net/netfilter/nfnetlink.c:302
+ netlink_rcv_skb+0x123/0x220 net/netlink/af_netlink.c:2550
+ nfnetlink_rcv+0x167/0x1720 net/netfilter/nfnetlink.c:669
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x5c0/0x690 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x5c8/0x6f0 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x563/0x5b0 net/socket.c:2592
+ ___sys_sendmsg+0x195/0x1e0 net/socket.c:2646
+ __sys_sendmsg net/socket.c:2678 [inline]
+ __do_sys_sendmsg net/socket.c:2683 [inline]
+ __se_sys_sendmsg net/socket.c:2681 [inline]
+ __x64_sys_sendmsg+0xd4/0x160 net/socket.c:2681
+ x64_sys_call+0x194c/0x3020 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x12c/0x370 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+read to 0xffff888181583b19 of 1 bytes by task 29539 on cpu 0:
+ hash_ipportnet6_ext_size net/netfilter/ipset/ip_set_hash_gen.h:823 [inline]
+ hash_ipportnet6_head+0x28f/0x790 net/netfilter/ipset/ip_set_hash_gen.h:1275
+ ip_set_dump_do+0xa34/0xb00 net/netfilter/ipset/ip_set_core.c:1651
+ netlink_dump+0x455/0x8a0 net/netlink/af_netlink.c:2325
+ netlink_recvmsg+0x420/0x550 net/netlink/af_netlink.c:1976
+ sock_recvmsg_nosec net/socket.c:1078 [inline]
+ sock_recvmsg+0xf5/0x120 net/socket.c:1100
+ ____sys_recvmsg+0xf5/0x280 net/socket.c:2812
+ ___sys_recvmsg+0x11f/0x3b0 net/socket.c:2854
+ do_recvmmsg+0x1ef/0x560 net/socket.c:2949
+ __sys_recvmmsg net/socket.c:3023 [inline]
+ __do_sys_recvmmsg net/socket.c:3046 [inline]
+ __se_sys_recvmmsg net/socket.c:3039 [inline]
+ __x64_sys_recvmmsg+0xe5/0x170 net/socket.c:3039
+ x64_sys_call+0x80f/0x3020 arch/x86/include/generated/asm/syscalls_64.h:300
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x12c/0x370 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+value changed: 0x05 -> 0x06
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 0 UID: 0 PID: 29539 Comm: syz.4.6655 Tainted: G        W           syzkaller #0 PREEMPT(full) 
+Tainted: [W]=WARN
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2026
+==================================================================
+
+
 ---
- include/net/rose.h | 2 ++
- 1 file changed, 2 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/include/net/rose.h b/include/net/rose.h
-index 2b5491bbf39ab..c69024e865456 100644
---- a/include/net/rose.h
-+++ b/include/net/rose.h
-@@ -160,6 +160,8 @@ static inline void rose_neigh_hold(struct rose_neigh *rose_neigh)
- static inline void rose_neigh_put(struct rose_neigh *rose_neigh)
- {
- 	if (refcount_dec_and_test(&rose_neigh->use)) {
-+		timer_delete_sync(&rose_neigh->t0timer);
-+		timer_delete_sync(&rose_neigh->ftimer);
- 		if (rose_neigh->ax25)
- 			ax25_cb_put(rose_neigh->ax25);
- 		kfree(rose_neigh->digipeat);
--- 
-2.53.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
