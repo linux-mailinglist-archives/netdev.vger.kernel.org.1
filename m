@@ -1,148 +1,164 @@
-Return-Path: <netdev+bounces-275197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275198-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6BlfNVAc0GnN3QYAu9opvQ
-	(envelope-from <netdev+bounces-275197-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 22:00:16 +0200
+	id aMQfE+ob0GnN3QYAu9opvQ
+	(envelope-from <netdev+bounces-275198-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 21:58:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C8B4397FFF
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 22:00:16 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EAED397FC9
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 21:58:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0102A301F338
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 19:57:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D5F6C30087D9
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 19:58:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D5683D5251;
-	Fri,  3 Apr 2026 19:56:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8913A3AA514;
+	Fri,  3 Apr 2026 19:58:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q72QCnJt"
+	dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b="XnEozkJc";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bWtlUcHc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E462624E4C3;
-	Fri,  3 Apr 2026 19:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5FB28505E
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 19:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775246219; cv=none; b=YBIl9CO5oDAYKr5bqdmNKX6u14FYJlhRrBIxzscrA5QVPncWKsnj7/WNOfJWvuTd4AcabNiMEpeFu3KQ8sBkPCzwqeih8hPiPvJ9aT99J+mCXxJYyrF7iCj8s5R0VNXDGhkOrYvLprn3HHJNjL+4GwiIvHkFjAYgYUbvUz/2xrA=
+	t=1775246310; cv=none; b=Uo4Hn23ywxwt11HYpyk/w1YmiqHjjOobyiU91ZhYmcyAOBmVUnb5OPjCLmRn/KBzm+KAMsGPZoPDjDfQTAPDOw9zJcOARoXbvlWRS58WBTBSGZCVzOiv9BzsoXFtbuByGINtITdaeo50u2orFJXhnF0/97H8zexHA8LGh+nLF2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775246219; c=relaxed/simple;
-	bh=i/moDq0DGqe89rhWcnbMfpd1fOs4JQ4tDR5Rad9XOKs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=ZzUC2LX+ZwfggTlMD8nrimIaYk/jktw1PeeP2CpAbjiJjaH3EOSt0X4+A+wOLjVzo3jWtX+Blqi6vmRqn4x0fIgXt5TtbeEzIDJndXyhinGGkG2wQyVFL54zqbT2/yMNdt4Be+sH/tSYB18LWAEDXj7n8GsSHb7rQ/bg6Lp12j8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q72QCnJt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44607C19424;
-	Fri,  3 Apr 2026 19:56:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775246218;
-	bh=i/moDq0DGqe89rhWcnbMfpd1fOs4JQ4tDR5Rad9XOKs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=Q72QCnJtolrdfAl0t++TuTiC3koOuaEji+ymU3jHbtTupWzOWgx5WN5Lvu1MtXSSb
-	 Ie8MNVEuYsSN36so1VJfqCVexa6J7Sf38JcGC+sMePAhc3zkXf+1dPjtVakGk1eYAX
-	 I6DGKKg36VNsfeXCTDL6J4S5ACrui9iGS9YGQg1cAqYk/BQakA99RoDpQ/QHCPWwVZ
-	 lZdM3dNrIL1xr09McGG/bJM/cIa5AQl8vN4JyNMEfmX01ilaZ4zNyNCu6rI8EIi48c
-	 lSRZ3MZ1LMbY9yT25BafikuhDlIvA1DbyYoY7pAyQW6549UTysLsVRe3bEUW/ImAWU
-	 MgAQL3FzVSy0Q==
-Date: Fri, 3 Apr 2026 14:56:57 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Gary Guo <gary@garyguo.net>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, jes@trained-monkey.org,
-	chenhuacai@kernel.org, kernel@xen0n.name, tsbogend@alpha.franken.de,
-	James.Bottomley@hansenpartnership.com, deller@gmx.de,
-	maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
-	chleroy@kernel.org, hca@linux.ibm.com, gor@linux.ibm.com,
-	agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-	svens@linux.ibm.com, bhelgaas@google.com, dakr@kernel.org,
-	kwilczynski@kernel.org, ojeda@kernel.org, boqun@kernel.org,
-	bjorn3_gh@protonmail.com, lossin@kernel.org, a.hindborg@kernel.org,
-	aliceryhl@google.com, tmgross@umich.edu, ebiggers@google.com,
-	ardb@kernel.org, tiwai@suse.de, tytso@mit.edu,
-	enelsonmoore@gmail.com, martin.petersen@oracle.com,
-	jirislaby@kernel.org, gregkh@linuxfoundation.org,
-	geert@linux-m68k.org, herbert@gondor.apana.org.au,
-	vineethr@linux.ibm.com, lirongqing@baidu.com, kshk@linux.ibm.com,
-	vadim.fedorenko@linux.dev, dong100@mucse.com,
-	wangruikang@iscas.ac.cn, hkallweit1@gmail.com, kees@kernel.org,
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org, linux-pci@vger.kernel.org,
-	rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH net-next] eth: remove the driver for acenic / tigon1&2
-Message-ID: <20260403195657.GA351015@bhelgaas>
+	s=arc-20240116; t=1775246310; c=relaxed/simple;
+	bh=x62Eavkmz0SkoF8wT21ADnynD5Y4uXt9DhSnEgPAvNE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZlrLMFwMCxGoDhecoElL42o7Blquyk+gfi0z6DdijKbT+Vbb3YtSJO4COBKBmuepRY4jRfcD90bU1M4MeRKlxbjYuldoP7ov6md0HM4hCRfZFdldkhyre+n363Ko7srn57B95Nkj/fw+zbn27rdKW96OXOxiX/D3R/MSJFQOURY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com; spf=pass smtp.mailfrom=fastmail.com; dkim=pass (2048-bit key) header.d=fastmail.com header.i=@fastmail.com header.b=XnEozkJc; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=bWtlUcHc; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.com
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 37F3F7A0129;
+	Fri,  3 Apr 2026 15:58:27 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Fri, 03 Apr 2026 15:58:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1775246307; x=1775332707; bh=y8w9sOgxlXszWUu5wSKj+
+	Z9HCoYTPQ2KsCb/qnXdpEY=; b=XnEozkJcIVWsLNyJxH/q58hhyLVCDlxa3+VE6
+	4zclXN3qq3hSA+f0NVVpvtsEWSHBKZJStKKcfacKp5okroobsWdymXKRShtfbxb/
+	LWMTtgXkhjbhjrduyeD4JpsXCpgI8WSLoAIyYUR5oU99PvNE8RqvBIzyYQMJ19m0
+	PWNmQSywCjyiiqu/8o4qzwtFewZyS3JODbSknA2CQ6izCM6YB8SOFPTD12ZpqLjx
+	o2vtlzVbZXws9B/ufBBjMF1eb5UvQ5Z4ls/T/7zb8JN2trZIPOP1eRzAzZYwdgz6
+	fJlXKNNjil6WlSeGNzZ+EHWwzK4mW+dGMfqhgXfdQ+8z2UYgQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1775246307; x=1775332707; bh=y8w9sOgxlXszWUu5wSKj+Z9HCoYTPQ2KsCb
+	/qnXdpEY=; b=bWtlUcHcRvlTsZmRpF3wKG/YdCG8Foca3R5d5W2wRvxDyyqIt8a
+	Y+Cqv6qWDYAwH7gUIDqdKwyuyH5Nmf3B3tPyGPWIArDXkemZdX1fF3U+AL3PmCVL
+	FvtLG9dNnJut8V0oI6BqMMxLsrZicCy0psD5TItQTvBHvKlw3X74h4Et5mYrc+X4
+	G6MaSdb7PyODJHqbsi8mrXj28PieUOM2nywKHu5ZyCtPom7VAYQw4yuHH6dmbvmI
+	l5MZqw6VFXtnIq3vhWNFhu5Y/maHMbbE2imhX+reiz+AitqRt1RBuc8GwkFiFTqq
+	k6CcEBTqlfh+hwO0T6fSiOgNeIGz97Av7hg==
+X-ME-Sender: <xms:4hvQaVPDbWv67JpnNdqbJOsHbr6u238za3gFxuUgzyUfJ-LGPkBUOg>
+    <xme:4hvQafazjhc7rxVwT3G5vhoRSxd3cCEY23qtAlVu403vXV8ygZJoOH0QE76ruYGEG
+    BnGWQtxkdh2ANnRA_2_tpxTEyHiUat350zoMCcgS4jopTVgmysP4Ozw>
+X-ME-Received: <xmr:4hvQaRqst6zk01NuWa4HXnjeqD4pHAUCasjkRlxB_G8uttYLh7mhV-JKoX6cTUgLeN-rY55mu_0yJTWtCjipj7Ih9UtfWKk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdelkeegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtne
+    cuhfhrohhmpefluhgrnhhluhcujfgvrhhrvghrohcuoehjuhgrnhhluhesfhgrshhtmhgr
+    ihhlrdgtohhmqeenucggtffrrghtthgvrhhnpeeggeffieevgeejffefieekieehledvie
+    dtveetudeitdejteetkedtgeeuieevheenucevlhhushhtvghrufhiiigvpedtnecurfgr
+    rhgrmhepmhgrihhlfhhrohhmpehjuhgrnhhluhesfhgrshhtmhgrihhlrdgtohhmpdhnsg
+    gprhgtphhtthhopeefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehkuhgsrges
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvg
+    hlrdhorhhgpdhrtghpthhtohepjhhurghnlhhusehfrghsthhmrghilhdrtghomh
+X-ME-Proxy: <xmx:4hvQabYmlqsnlZDZpnsJt36U2O3U-tmf-_n0uj9n63avfb8a0Nxllg>
+    <xmx:4hvQaRR73-ME-TUVfQp2l6UVStk9UDlr63HQDJWPubM4oy0IeyUYAA>
+    <xmx:4hvQaa7gvKft2jsm1Vs6EOI-zqMdtuoy4CoEp85vA5ACSc2fOcJ-bQ>
+    <xmx:4hvQaewHg48X-zHvVg6yxu8HfYcXm1OunXEbzasLYRl6FpiekLgpPg>
+    <xmx:4xvQaapbIxSJt5iUt_YZ5HTxn45w1ZQ5KmnECSLcAK1VjnFIpRvJ43b9>
+Feedback-ID: i80b64ba7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 3 Apr 2026 15:58:26 -0400 (EDT)
+From: Juanlu Herrero <juanlu@fastmail.com>
+To: kuba@kernel.org
+Cc: netdev@vger.kernel.org,
+	Juanlu Herrero <juanlu@fastmail.com>
+Subject: [PATCH] selftests: net: fix checkpatch warnings in iou-zcrx.c
+Date: Fri,  3 Apr 2026 14:57:53 -0500
+Message-ID: <20260403195754.10619-1-juanlu@fastmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260403123329.42bed564@kernel.org>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[fastmail.com,none];
+	R_DKIM_ALLOW(-0.20)[fastmail.com:s=fm2,messagingengine.com:s=fm2];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275197-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[garyguo.net,davemloft.net,vger.kernel.org,google.com,redhat.com,lunn.ch,kernel.org,trained-monkey.org,xen0n.name,alpha.franken.de,hansenpartnership.com,gmx.de,linux.ibm.com,ellerman.id.au,gmail.com,protonmail.com,umich.edu,suse.de,mit.edu,oracle.com,linuxfoundation.org,linux-m68k.org,gondor.apana.org.au,baidu.com,linux.dev,mucse.com,iscas.ac.cn,lists.linux.dev,lists.ozlabs.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[58];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[helgaas@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2C8B4397FFF
+	FREEMAIL_CC(0.00)[vger.kernel.org,fastmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275198-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	RCPT_COUNT_THREE(0.00)[3];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[juanlu@fastmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[fastmail.com:+,messagingengine.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_FROM(0.00)[fastmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,messagingengine.com:dkim]
+X-Rspamd-Queue-Id: 9EAED397FC9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 03, 2026 at 12:33:29PM -0700, Jakub Kicinski wrote:
-> On Fri, 3 Apr 2026 10:40:10 -0500 Bjorn Helgaas wrote:
-> > > > -#define PCI_VENDOR_ID_ALTEON		0x12ae
-> > > > -
-> > > >  #define PCI_SUBVENDOR_ID_CONNECT_TECH			0x12c4
-> > > >  #define PCI_SUBDEVICE_ID_CONNECT_TECH_BH8_232		0x0001
-> > > >  #define PCI_SUBDEVICE_ID_CONNECT_TECH_BH4_232		0x0002  
-> > 
-> > > Does the PCI ID needs to be removed? There was a similar change that
-> > > I recalled and the discussion eventually leads to ID not being
-> > > removed.
-> > > https://lore.kernel.org/all/20260123033233.16906-1-enelsonmoore@gmail.com/  
-> > 
-> > I don't think there is value in removing the PCI_VENDOR_ID_ALTEON
-> > definition.
-> 
-> Do you want me to respin the patch? "there is no value" is probably fair
-> but also there's no value in keeping it so LMK if you want a respin..
+---
+ tools/testing/selftests/drivers/net/hw/iou-zcrx.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-I think there is a little value in keeping it.  Removing
-PCI_VENDOR_ID_ALTEON:
+diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.c b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
+index 240d13dbc54e..df44b0eb46cc 100644
+--- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
++++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
+@@ -266,7 +266,7 @@ static void process_accept(struct io_uring *ring, struct io_uring_cqe *cqe)
+ 
+ static void process_recvzc(struct io_uring *ring, struct io_uring_cqe *cqe)
+ {
+-	unsigned rq_mask = rq_ring.ring_entries - 1;
++	unsigned int rq_mask = rq_ring.ring_entries - 1;
+ 	struct io_uring_zcrx_cqe *rcqe;
+ 	struct io_uring_zcrx_rqe *rqe;
+ 	struct io_uring_sqe *sqe;
+@@ -406,8 +406,7 @@ static void run_client(void)
+ 
+ static void usage(const char *filepath)
+ {
+-	error(1, 0, "Usage: %s (-4|-6) (-s|-c) -h<server_ip> -p<port> "
+-		    "-l<payload_size> -i<ifname> -q<rxq_id>", filepath);
++	error(1, 0, "Usage: %s (-4|-6) (-s|-c) -h<server_ip> -p<port> -l<payload_size> -i<ifname> -q<rxq_id>", filepath);
+ }
+ 
+ static void parse_opts(int argc, char **argv)
+-- 
+2.31.1
 
-  - makes future backports slightly harder, e.g., we remove
-    PCI_VENDOR_ID_ALTEON, then add a new definition like Vendor ID
-    0x12af, then backport the new definition, and the backport doesn't
-    apply cleanly because the context doesn't match.
-
-  - means we wouldn't notice a future addition of another name for
-    Vendor ID 0x12ae, either by mistake or via acquisition of Alteon.
-    We want to know about either one so we can avoid collisions with
-    Device IDs used by Alteon.
 
