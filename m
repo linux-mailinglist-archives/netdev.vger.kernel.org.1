@@ -1,105 +1,104 @@
-Return-Path: <netdev+bounces-275072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275073-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aJ4aBz7Lz2lH0QYAu9opvQ
-	(envelope-from <netdev+bounces-275072-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 16:14:22 +0200
+	id EBE3L0vLz2m50gYAu9opvQ
+	(envelope-from <netdev+bounces-275073-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 16:14:35 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 822543950C2
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 16:14:21 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E9FB3950D0
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 16:14:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 100A2309384B
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 14:11:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BBDFC3055E42
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 14:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4DF53C6A2D;
-	Fri,  3 Apr 2026 14:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB67B3C73CC;
+	Fri,  3 Apr 2026 14:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="La/h4ETJ";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="HpElIWKz"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="mgD0X0p+";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Oz9IO85Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579D03C554C
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 14:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026AE3C65F2
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 14:11:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775225487; cv=none; b=nWPwUCMCg1VXF+W9IQZXXF4cf9NhEJTqGaZ04+wrh9v6JXGzJEj/UHs6kuaHCSYk63VdqsMnMt+g753Qz8/k6h1oz/Dc3OHlAWXC04Nlt//FGvLdKrb3yRu4Fuz+gQpVXlHP1UH9dkReIyTNYh5SsrjzLZkseH+RBNh4PA5bGBE=
+	t=1775225489; cv=none; b=SjSaqs1aBkmHCW2/pIzGUqbmj4bO+zFqftFjVzlg9tlUToGQO19RfB/EZqQ/lBzy2etFpGgsi/zth4hfnR3B3H7CY3qMiSYzZm4Cx7KaOVEVo/B1vQQN8/lKdS4n8W6zEWb8FuK3hUQUufeVEyreRYuGh1QLCYasTW0ti4ftSyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775225487; c=relaxed/simple;
-	bh=LMhCinJ76fg5OoAev6q2bRZG/FqUvfvLkdG7qBbfT1A=;
+	s=arc-20240116; t=1775225489; c=relaxed/simple;
+	bh=vGgcAuslyoJWyNGK44xG02vagKnjoQAZqSHv+gjTJcs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Fkd3paN0Uq9Aj/Xs30bwpDJUNlA7bYywsvgOzyiwYQDN7KRQuuHrHMS1eC5Jkga8x/6QnZr2Ll0xRehbXV3EtnxIpAKeDAga6ikT8r+y6eylKUHeh1HlYd0aXIPZjk6Sy/15c3kFXt9os+Osvb5TbmAB+fBf6KPX2rPxa8Hitx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=La/h4ETJ; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=HpElIWKz; arc=none smtp.client-ip=205.220.180.131
+	 In-Reply-To:To:Cc; b=bwcXImJ6SmNe3tqm6yLjr/99+T4IH6vpYSxl07Qzp6IGbbo0rRRwrTlziXxHtILTPqSJaa9BzDhKablwFvEEQct0Ubnqu0ynKbz2ir5OAGF4orR8X76dX7+gm2Ytkx9JyAdUMbFgbfA5KeRlvChjWVE7DsQ0SqklNhJhIOq8fkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=mgD0X0p+; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Oz9IO85Z; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6337cpr42707131
-	for <netdev@vger.kernel.org>; Fri, 3 Apr 2026 14:11:24 GMT
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 633BAKMg981800
+	for <netdev@vger.kernel.org>; Fri, 3 Apr 2026 14:11:26 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	FKvG8YmivZ7s6G82R4mIgEk3yQGCPIAQZUIiegjm3x8=; b=La/h4ETJxN02VYYS
-	MZ1WaUYXmqAXpdXo3QTCUDGp4k6zkowjQJACvnWQEY6aORmKJzjZH6VIa8FRKEso
-	GtCeLxvgPgMNC/K1+q0SEBPas2d6qLV7bO44QGHJB+ol5JlbyMiC1hdiOvt1E15O
-	OXZFYLngw3zHo2id3buxG4E3mL9IS3BWNOaTSD2oLazqfLP8NZn8x0F3d1BywT2H
-	uB7Pq3K6pKBApMn+KCx1u2hTRf9HFkEHFVjjDAFR8HnncYvV7e5lctEHO/GU8n16
-	DWqdyVyw8gY2Rcgmgn8y84+aaPd61viiQFYIiMOE1w1endYHJ0YB2Msh/rweO1IM
-	sU3TKw==
+	w7V9GD9oO93FrsRNDlEG2IE2JOPbAv1X0jFKI17MXAE=; b=mgD0X0p+lnkgcMEt
+	nolq6DJf7vDGFqsHdp15iEvOFsUZFgEwQq4/oLqbCFT4bYXNwblBEVUc9SUZD777
+	gA6O5lyPlv7OobVLvM4+EnK+NFEIy2kUyD6Ct8B4lECtGlRovjUx6raq0kqFSMgn
+	Xa/tSoW+epBtk36/k7dXq2/SzjFatCo2ObtRNXj8WeXSinImVAPqm0EwcKKQ51PW
+	XZSefASxqwWwuflHlkg7G53Li/Kf4DP1oQWiy4gZ6q/PC05kskUqnRmsockJi/rN
+	xemrn/ag6SbcSpY5EqC7g1dh5eKHJxelqiMDss9MMRp7d6GMxkjxSn1FfC1mGaGV
+	ewJpyA==
 Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com [209.85.217.71])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d9yfjjp7a-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d9tupusrh-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 14:11:24 +0000 (GMT)
-Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-60270015488so2922016137.2
-        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 07:11:24 -0700 (PDT)
+	for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 14:11:25 +0000 (GMT)
+Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-60599e65115so445260137.1
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 07:11:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1775225484; x=1775830284; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1775225485; x=1775830285; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FKvG8YmivZ7s6G82R4mIgEk3yQGCPIAQZUIiegjm3x8=;
-        b=HpElIWKz5L+V8349eczuuQp6ooLlGASameowVfYYGX+ZSHxReL/JXlEVGiAX6zZBNB
-         F1mRjT/r7YAyZpgxVMa1RUTiAh88EGyRtghvXKaAUoBHT0RSAvFbY0LWC2VL29zbBotV
-         +7xLjGnYVeSwvFuFdbt7JxgmOdbnRQz00TrF8zq1PaxTeaAAy8iieEDw9S19jfqHrldd
-         bzkyhhpdvGKZQeSX9jVvho3uCYZ6uDEA5Vk9NZ4XMBCn9V3W72yl3bDmwJ0eOrXecDwI
-         d91ojaw+8foL4Q414s44CBPSbJMEPdLg2hW+mCPHatbLrmLUFhWDUbOWBkRzYByvxwvP
-         daHQ==
+        bh=w7V9GD9oO93FrsRNDlEG2IE2JOPbAv1X0jFKI17MXAE=;
+        b=Oz9IO85Z8/m6/0NjdPAMIrY1NsORKUUF8JjujGIuFw+RHRbcOUunCqgTBoEocUo+Jh
+         Xx8mPWxOsJSVVsUgK9IG0Thwumt5JxZCAOqBGJY9xkpBWcNIDHlKOfWz2FFYQsSwtXtn
+         p7X876qEqtvTqjEPD6rUZbD3h285FD7ImiVmvbSaQpCwEn3Ias9L11Ksu80m+CsJuS8c
+         /fj9ynDFwjhh49hR2mcdBiZcTaPeT1dq9tJ18m/Xv2g9XRFdYP5uqlKr5eyf/F3CbqSg
+         M+wo1kGhi3NE/2wX0ejVknBndiz7SUi3wfSu4m4RURF75M6ch7YKEun9BastWTMHGKBL
+         i07g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775225484; x=1775830284;
+        d=1e100.net; s=20251104; t=1775225485; x=1775830285;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=FKvG8YmivZ7s6G82R4mIgEk3yQGCPIAQZUIiegjm3x8=;
-        b=TDIDenO8oAwTfy8FnMTDF3MWcpIyofChRoSs2rcx5MvAFRwJQey00R1USVi1z84onZ
-         AuBbQ220GbWTb7FiS9/NKHBb5pkZgOXnd9elAAQ6GQMPKGWsgEVqGhqEJB3CJ+NN3mde
-         slVl58OV6jkqBN8SdGiYbcNvA5H0hslUQ8t4iKsDFG/Wtfu+/WVLRFK/PtnQjlyYFfgb
-         6WH1zrhv5l0AXGrkokxRqfegkK2aezKVro0GHZ1LwdbXmYqrY84Z2n8WsBKVfcIDgIgF
-         JitECtrR6ZGTGZazteSvEZdumASjnd4BQS0jB+1h0gnJgxGgr13BPtqEv4TXvCyy8dC2
-         kjxA==
-X-Forwarded-Encrypted: i=1; AJvYcCWAZeTnEAqIvtuCa02NXkWQtAOuvG0ffGQFShSOHErf9ruJgaeVq5YLUCSqKlQh+GEzrGoq2R0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAcu+5kaKRCmsHeb5LQAgHEwEJa88pFiLsSHuCva18xAPY7N2E
-	ZDCCYYFtDZ/tT0Pj13vo4BalJTWHBa8s0CNKlhqRhjsTFJw/sInA0oi8P8CDrAJKJVWUkgfZNKo
-	L2pRaVUc3GAnLlkx7pNl3ljFzjwuvqMsQNMSzFhgRqQmHcgO1zuy6np6sVk4=
-X-Gm-Gg: AeBDieswWxKiGaMyrWG+WSO+fCzR+iW9ymPmcgmyGJ3QXgHvWdMRK45Ur18jYjU3N8k
-	1S8Du5LeLDWSpWxpilN4LN+Qlo8yFwk1zZeskmhuX7TmSNP9XPfsofEns1q1ppy1qyMEOjP1S9M
-	b3jAL/EFVfBAUjmOxog/2+KC3vz6W7m+Vv78jE/MJFfn84utaav1y9bLed5ENQvbZQEbrzr6yOR
-	I41OMUsA2TamTabE4AUSpcB97UET3u6IR0tykSp5QxePaqVFwoZir38SVK9/CGKrd+n+/U3p4aE
-	9g4NgtAbSLwN6lpXfh1n7lB93Ow/8laTz+A+WSrn01mkJw4k+HbE0sWay88HjUi0D+oVja9KNKB
-	6/jT2jOnzwmcr47BwgjbFTT071q0eWZIz4XWWomawA4OMpSYCvZU=
-X-Received: by 2002:a05:6102:943:b0:5ff:ed38:1889 with SMTP id ada2fe7eead31-605a4e176f9mr1349098137.10.1775225483458;
-        Fri, 03 Apr 2026 07:11:23 -0700 (PDT)
-X-Received: by 2002:a05:6102:943:b0:5ff:ed38:1889 with SMTP id ada2fe7eead31-605a4e176f9mr1349078137.10.1775225482968;
-        Fri, 03 Apr 2026 07:11:22 -0700 (PDT)
+        bh=w7V9GD9oO93FrsRNDlEG2IE2JOPbAv1X0jFKI17MXAE=;
+        b=R2J4bmSSgk5o1QJ2EnjvnsodZ99Ic/B219ohzCgChUr0pUjcXgW6QdH4kBmUcnWkbM
+         6u8qWaksdnmGQ3OJj5YVM1v28S0zXdCl4MHrjhPX0oWCeDFgd2tlhHa2vuZ3rlZ6cXkh
+         c5BWz20sctrcSaQ0lnNa3pZ2g6Z4zokF/jE3V9cAt8nP1YHy2V6nlIsSeR5nc2FwGaY8
+         GcQPRoFDg3H4VWWrUhwf/HxRGG1WsLkE+Dn5ernoeJpuzIm4No6KeNHE6fTJaQpMI62U
+         rUuwv9hNeIzyaakFsX811/7Q7dG259CoNC6+o7Xbz27ZKG7Zt00BAar/9pe4TexPgOYQ
+         hIrA==
+X-Forwarded-Encrypted: i=1; AJvYcCWlk406F5CyxQun0htZ0ZLAFO2o+ReLwcvL6sC+/y7GCGbxVFTnrCE9jIJmzwPnj6H9jqHomYk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxg/aOa60BuJ46dAWRygRC4t4uTsIlWrI05A+ToPEuClrLwaBff
+	n5FrViyQHIliYE1CINqM87FCRIsXHBIWmvC1cg2m8PjFZ0lU1MkZfG+VnUHFFPzX0U6+GWDIJ/i
+	KY+32UjHNF6XfEdCrYWZfvqpwrPdVYSuiu3Umo5tQf4shJybVrUIgQSFwauo=
+X-Gm-Gg: AeBDietUweWrPZZoi9lfPph9prBMLg9K6rbEexBls4wn0vjH8tv0kLWnl6h0LoBKShh
+	Bg5MytFGskrN6CjDACl3uvBoy9sZ6pFsSaDpJfp/I+2hojutA2iXs7bBaKQE/g6BlnVQ9VVZ4Nh
+	GteYVPdi0vDeJ2dABYTC/LLcaRNc2K2nMVNGr0QWru8962shcdW9cENKxvjHRFOsXnf0umH2I7U
+	UIWekg3C3f2KXdpzp7+O4ZiV6/PPcz5pS/BzwLCzPI+IvrVRCpoJHU427tmzNN+d7j1mqowqgUA
+	GXi6i+L39VWZY40D1vQKHmWXHVAUtq0jAtHjqm2FqH30XCVRVqID+ymhGY5Ei69QPIKOReWR1WN
+	DfzSc98MZDyD1+1BSNnf5t8zgy72fuSN4X/al41m6/TnLrgXTwiI=
+X-Received: by 2002:a67:e717:0:b0:604:ee6f:18d with SMTP id ada2fe7eead31-605a5136c50mr1017619137.35.1775225485189;
+        Fri, 03 Apr 2026 07:11:25 -0700 (PDT)
+X-Received: by 2002:a67:e717:0:b0:604:ee6f:18d with SMTP id ada2fe7eead31-605a5136c50mr1017605137.35.1775225484753;
+        Fri, 03 Apr 2026 07:11:24 -0700 (PDT)
 Received: from brgl-qcom.local ([2a01:cb1d:dc:7e00:129d:59e8:f7c9:47ca])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48899d1b19esm30127315e9.6.2026.04.03.07.11.20
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48899d1b19esm30127315e9.6.2026.04.03.07.11.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2026 07:11:21 -0700 (PDT)
+        Fri, 03 Apr 2026 07:11:23 -0700 (PDT)
 From: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Date: Fri, 03 Apr 2026 16:10:51 +0200
-Subject: [PATCH 3/7] dt-bindings: clock: qcom: Add Nord Global Clock
- Controller
+Date: Fri, 03 Apr 2026 16:10:52 +0200
+Subject: [PATCH 4/7] clk: qcom: Add TCSR clock driver for Nord SoC
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -108,7 +107,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260403-nord-clks-v1-3-018af14979fd@oss.qualcomm.com>
+Message-Id: <20260403-nord-clks-v1-4-018af14979fd@oss.qualcomm.com>
 References: <20260403-nord-clks-v1-0-018af14979fd@oss.qualcomm.com>
 In-Reply-To: <20260403-nord-clks-v1-0-018af14979fd@oss.qualcomm.com>
 To: Bjorn Andersson <andersson@kernel.org>,
@@ -126,45 +125,44 @@ Cc: linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
         netdev@vger.kernel.org,
         Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=24556;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=11446;
  i=bartosz.golaszewski@oss.qualcomm.com; h=from:subject:message-id;
- bh=q0JzRMLaHw0AWBgo+dd9NT2AJZ+MW7NNNrrkUZJZukI=;
- b=owEBbQKS/ZANAwAKAQWdLsv/NoTDAcsmYgBpz8p8sq5n+KMZ0/tGvlytBM7mYrlqsD+LQLvGP
- e3cb21SJwaJAjMEAAEKAB0WIQSR5RMt5bVGHXuiZfwFnS7L/zaEwwUCac/KfAAKCRAFnS7L/zaE
- w3P3EACn7ABU/7dmRUNGWDyZISGPCsv+8IvNx1S1wGCPtQ3ic2YWQajE+L4u4m9YFhRVOmslD5o
- NeRuWr1z1LRsaNQPhRhE/oDDf7ocOKcND1e8VXCGejnDm0w6MJQiSMTXDHlovVYIiwP4hzs4OU4
- qZMnPnLwl73nRQ6ZsXq4UOjvw2tD2vZaaxfJcvUmPIzffr3y67MKT5OJ7zYYMHyAIcLZWCCr6V5
- 1uwW0IZfnfjFj6Hhxq1tfUZQbJTV6voSNAgEwYT1nBQmgIRVZEEowMr+i0ld1CXT6uP/P2CQdYq
- EbVkVy9KgeMrupIcVur9R9qVb+DmWsE+bKjQOKGxIGuDVXGEJCRTPN80clFW2SY6QWGERrT7fw1
- 8ZOEE6FVpMDuGoCfM+SapZyhu1g4baByuoViivBj9fSENhynAl9S28QVxJ898wsVUx26zSB2nnx
- /wuOQKl4itbY4DlqstdYkkCprnq5uBLSw1L5wA5bYS1Cc8z9tqelTtyYlXsGDqkrO7QQi5BWlz/
- 4TSwqobFMzeNPQ07dTjLTHrFVllBj7xNtPLM9LjzlGO/26jp66/3y/fNGSP0imbBbfQ9/JGxeJw
- SwVudCnCzrVbPzlE5qw2V9Qh7pPFO79Y23g8sWCQS50lVuXkpsQh+aacKdQE9PvWBtgDJOvrAMU
- PpvSbnnOPjJLQ0Q==
+ bh=WngLlsIJYc2VIn1dcAieQln8rLCNCDVE6moeVof9C0I=;
+ b=owEBbQKS/ZANAwAKAQWdLsv/NoTDAcsmYgBpz8p+Dir+221cIHEjFe9bHg3dZpfJH9yxCPp4f
+ XNSNEtapoSJAjMEAAEKAB0WIQSR5RMt5bVGHXuiZfwFnS7L/zaEwwUCac/KfgAKCRAFnS7L/zaE
+ wy5TD/0anfd0cK5Z4x1lKWKDsYak747gBS/wSlnp6AfKfyEeNMCP6W6l+TF7qjWGJ4a6TUTZsnT
+ 7KRdN/yx4Rs1NS6hrPcH32PL/7BQxX9+adPgF/4Yu1LU5Kg9+M+yV9KiOPHKtvz2ZivTdoybomM
+ 1dal0zNBmRNPT7f/bxJvmtWf6vePYzkgWvhQ9tHhycmYTMDgK1gG70ShOD+MsQHZ6WqemTrAcFV
+ yamcwnzva2nmEB4TFbVaQFX0MGlHcgqFdyhLhoPaT/O9gsV9Y46F2nxfXjCjVKV7bc0UEUqVL4L
+ fbKVmsiqx4SGlOKXZ2iwbGqabDp6CCO5hGZle6SM+XpNSFNe0Az12A/cfJ60BAVtcLbdygllwE3
+ 8OP+7mI7j9uH3fqj+WyEWlwPcIqgXYGfBtPz2Xk4i/Qv9FF/1Z0FsMBgmHs9zluGSX7ItWWYvKz
+ MSq+B/q5EzQQ/cqTojLokOg3QcdDQBljZQHixHY7URpZSFgJ09LO2fbTmb2ESHAFAPlt7edRrZv
+ qc0cD1tdrHNunTtxgye1OJQyxEsUGC1hT6zx03GUwQF07Fs6+MjnnL/4TnH4zt4YaKzT58a/3dc
+ /tuHWM36XZqEOGQR2hAmuZ/kMW5IROGu7URxCpGqnpCHs7piZxTuxe1cFguxS2Lzs5DMSAIN3M4
+ KEnVa/TGtwpqC3g==
 X-Developer-Key: i=bartosz.golaszewski@oss.qualcomm.com; a=openpgp;
  fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
-X-Proofpoint-GUID: 89W-AROiQrJOcSIy-NyGYp_rnu-nicyQ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDAzMDEyNiBTYWx0ZWRfX3XhRVX0rKvh6
- 5SVAf19BIjSrlE6AGxUOqn2rrSE8WY7mwAeazsjPwmb747kWy+aBhpWtEcOghV9xVo88S4s7Jnl
- EihzMPPWL2FqO5BpwjFNqSkoMiCbjsMhsQp30z47GxUzstx4i/YxioJ1meClYqKnyk7E1MK6Jdb
- Fb8Jm0g5wgn2V1Ei6rsCWJ9hIrAL0mB1vPXP6cZQWwGomNR37GCvM2e6QI26n4IZLB9dwCb2h/z
- M1VGX+sr9DZ+jcQussozoJlg0IydORFU3wKvP7a5Fr3ymQP0i1ZkrY+EBjJiWp028MctG8I5ee8
- Mye3bRTfHTaQ4kXV6XKRFwQkZB5qgH2b+sbbNwfbGDZS+9aHqI8cXqAa5U+53ypUFxQAqD/KmY2
- pVU7W3yWtTYLAZ4Q9PHmtfUASCcfbkP1TkJEwU1Bh4OCa1+tA24ldu3Kl4i9wk+9nbagGOnQ9gt
- XD0ybm0lRNFVtgYTZow==
-X-Authority-Analysis: v=2.4 cv=OrpCCi/t c=1 sm=1 tr=0 ts=69cfca8c cx=c_pps
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDAzMDEyNiBTYWx0ZWRfX/H6TXWnvSfUl
+ Xgg0fjKvHIMVD7zn8KI4yYMjGDDw/e85U2Izr0TvomtiFJRT3i73aikT3tUEWpNkvilnBYo3P8J
+ MhW6tg6gLXxa2WoRQF9kBrqh2etxHwlslvySwwevMgV7BvF/wnZjJoeUKjSDbe2603kt98DoH+Z
+ O/WAJWaFYPOWhgJvqUi+xx3m/DwT72kimoT1X3MtMCLm3NkO08+yktR78CMz+ze20MEgmJN6hdF
+ MJhkicpnqLcwxpZKjTKjs0N7Hux391kTSlJwgLr/W8q2KaxKoro32lMx/qRfEA29Sa679fc9dcu
+ 2H/b9slxQbQSJaR8TxEHuvNiTAnNDw/LKuubzXSEhfChCMlby0JVLZk1ErSq2JAxOrI4jt9+UOR
+ M69nJu2eFa1KhMxeFZfZ2FKDs+MVJa0SjwBGVTGpfB4dp+OQZ7brQFNhEBKVq7XMrCkMObAnM+L
+ xyzHaH2JHOVGIceZw7g==
+X-Proofpoint-ORIG-GUID: 7g6aavFb2BSpeyh7qgeuIfD30556GNTG
+X-Proofpoint-GUID: 7g6aavFb2BSpeyh7qgeuIfD30556GNTG
+X-Authority-Analysis: v=2.4 cv=DZ0aa/tW c=1 sm=1 tr=0 ts=69cfca8d cx=c_pps
  a=P2rfLEam3zuxRRdjJWA2cw==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
  a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22 a=gEfo2CItAAAA:8
- a=EUspDBNiAAAA:8 a=DpCVWlyd2gz3rNZ2myMA:9 a=QEXdDO2ut3YA:10
- a=ODZdjJIeia2B_SHc_B0f:22 a=sptkURWiP4Gy88Gu7hUp:22
-X-Proofpoint-ORIG-GUID: 89W-AROiQrJOcSIy-NyGYp_rnu-nicyQ
+ a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22 a=EUspDBNiAAAA:8
+ a=BTsOh_UvGg-GVyuq9HEA:9 a=QEXdDO2ut3YA:10 a=ODZdjJIeia2B_SHc_B0f:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-04-03_04,2026-04-03_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 malwarescore=0 adultscore=0 suspectscore=0 phishscore=0
- lowpriorityscore=0 spamscore=0 bulkscore=0 clxscore=1015 priorityscore=1501
+ impostorscore=0 phishscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
+ adultscore=0 malwarescore=0 clxscore=1015 spamscore=0 lowpriorityscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2604030126
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -172,18 +170,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
 	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275072-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275073-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[kernel.org,baylibre.com,oss.qualcomm.com,quicinc.com,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[17];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
@@ -194,682 +192,401 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 822543950C2
+X-Rspamd-Queue-Id: 5E9FB3950D0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Taniya Das <taniya.das@oss.qualcomm.com>
 
-Add device tree bindings for the global clock controller on Qualcomm
-Nord platform. The global clock controller on Nord SoC is divided into
-multiple clock controllers (GCC,SE_GCC,NE_GCC and NW_GCC). Add each of
-the bindings to define the clock controllers.
+Add a clock driver for the TCSR clock controller found on Nord SoC,
+which provides refclks for PCIE, USB, SGMII, UFS subsystems.
 
 Signed-off-by: Taniya Das <taniya.das@oss.qualcomm.com>
+[Shawn:
+- Use compatible qcom,nord-tcsrcc
+- Drop include of <linux/of.h> as the driver doesn't use any OF APIs]
+Co-developed-by: Shawn Guo <shengchao.guo@oss.qualcomm.com>
+Signed-off-by: Shawn Guo <shengchao.guo@oss.qualcomm.com>
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 ---
- .../devicetree/bindings/clock/qcom,nord-gcc.yaml   |  58 ++++++++
- .../devicetree/bindings/clock/qcom,nord-negcc.yaml |  60 +++++++++
- .../devicetree/bindings/clock/qcom,nord-nwgcc.yaml |  55 ++++++++
- include/dt-bindings/clock/qcom,nord-gcc.h          | 147 +++++++++++++++++++++
- include/dt-bindings/clock/qcom,nord-negcc.h        | 124 +++++++++++++++++
- include/dt-bindings/clock/qcom,nord-nwgcc.h        |  69 ++++++++++
- include/dt-bindings/clock/qcom,nord-segcc.h        |  98 ++++++++++++++
- 7 files changed, 611 insertions(+)
+ drivers/clk/qcom/Kconfig       |   7 +
+ drivers/clk/qcom/Makefile      |   1 +
+ drivers/clk/qcom/tcsrcc-nord.c | 337 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 345 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/clock/qcom,nord-gcc.yaml b/Documentation/devicetree/bindings/clock/qcom,nord-gcc.yaml
+diff --git a/drivers/clk/qcom/Kconfig b/drivers/clk/qcom/Kconfig
+index 8f55f10261ec2dd4add61101c5619cc4516f7d66..10c74db7e072f560f4bc26f81b4378034d1f9bf6 100644
+--- a/drivers/clk/qcom/Kconfig
++++ b/drivers/clk/qcom/Kconfig
+@@ -674,6 +674,13 @@ config QCS_GCC_404
+ 	  Say Y if you want to use multimedia devices or peripheral
+ 	  devices such as UART, SPI, I2C, USB, SD/eMMC, PCIe etc.
+ 
++config CLK_NORD_TCSRCC
++	tristate "Nord TCSR Clock Controller"
++	depends on ARM64 || COMPILE_TEST
++	help
++	  Support for the TCSR clock controller on Nord devices.
++	  Say Y if you want to use peripheral devices such as PCIe, USB, UFS etc.
++
+ config SA_CAMCC_8775P
+ 	tristate "SA8775P Camera Clock Controller"
+ 	depends on ARM64 || COMPILE_TEST
+diff --git a/drivers/clk/qcom/Makefile b/drivers/clk/qcom/Makefile
+index 103d6c4b860ccbc6b4ad552e9e6af43298a4474d..1a7ff1986b834f48dbaa2fd8c2559f0046ea7579 100644
+--- a/drivers/clk/qcom/Makefile
++++ b/drivers/clk/qcom/Makefile
+@@ -35,6 +35,7 @@ obj-$(CONFIG_CLK_KAANAPALI_GCC) += gcc-kaanapali.o
+ obj-$(CONFIG_CLK_KAANAPALI_GPUCC) += gpucc-kaanapali.o gxclkctl-kaanapali.o
+ obj-$(CONFIG_CLK_KAANAPALI_TCSRCC) += tcsrcc-kaanapali.o
+ obj-$(CONFIG_CLK_KAANAPALI_VIDEOCC) += videocc-kaanapali.o
++obj-$(CONFIG_CLK_NORD_TCSRCC) += tcsrcc-nord.o
+ obj-$(CONFIG_CLK_X1E80100_CAMCC) += camcc-x1e80100.o
+ obj-$(CONFIG_CLK_X1E80100_DISPCC) += dispcc-x1e80100.o
+ obj-$(CONFIG_CLK_X1E80100_GCC) += gcc-x1e80100.o
+diff --git a/drivers/clk/qcom/tcsrcc-nord.c b/drivers/clk/qcom/tcsrcc-nord.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..e35136722a931ef76f80d36ad2bc07fe618490d5
+index 0000000000000000000000000000000000000000..ed0f4909158f6e7e073e111549a8740f6a7fc94c
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/clock/qcom,nord-gcc.yaml
-@@ -0,0 +1,58 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/clock/qcom,nord-gcc.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Qualcomm Global Clock & Reset Controller on Nord SoC
-+
-+maintainers:
-+  - Taniya Das <taniya.das@oss.qualcomm.com>
-+
-+description: |
-+  Qualcomm global clock control module provides the clocks, resets and power
-+  domains on Nord SoC.
-+
-+  See also: include/dt-bindings/clock/qcom,nord-gcc.h
-+
-+properties:
-+  compatible:
-+    const: qcom,nord-gcc
-+
-+  clocks:
-+    items:
-+      - description: Board XO source
-+      - description: Sleep clock source
-+      - description: PCIE A Pipe clock source
-+      - description: PCIE B Pipe clock source
-+      - description: PCIE C Pipe clock source
-+      - description: PCIE D Pipe clock source
-+
-+required:
-+  - compatible
-+  - clocks
-+  - '#power-domain-cells'
-+
-+allOf:
-+  - $ref: qcom,gcc.yaml#
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/clock/qcom,rpmh.h>
-+    clock-controller@100000 {
-+      compatible = "qcom,nord-gcc";
-+      reg = <0x00100000 0x1f4200>;
-+      clocks = <&rpmhcc RPMH_CXO_CLK>,
-+               <&sleep_clk>,
-+               <&pcie_a_pipe_clk>,
-+               <&pcie_b_pipe_clk>,
-+               <&pcie_c_pipe_clk>,
-+               <&pcie_d_pipe_clk>;
-+      #clock-cells = <1>;
-+      #reset-cells = <1>;
-+      #power-domain-cells = <1>;
-+    };
-+
-+...
-diff --git a/Documentation/devicetree/bindings/clock/qcom,nord-negcc.yaml b/Documentation/devicetree/bindings/clock/qcom,nord-negcc.yaml
-new file mode 100644
-index 0000000000000000000000000000000000000000..749389f65ee14999b3a195256e34f486e9aace1d
---- /dev/null
-+++ b/Documentation/devicetree/bindings/clock/qcom,nord-negcc.yaml
-@@ -0,0 +1,60 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/clock/qcom,nord-negcc.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Qualcomm Global North East Clock & Reset Controller on Nord SoC
-+
-+maintainers:
-+  - Taniya Das <taniya.das@oss.qualcomm.com>
-+
-+description: |
-+  Qualcomm global clock control (NE) module provides the clocks, resets
-+  and power domains on Nord SoC.
-+
-+  See also: include/dt-bindings/clock/qcom,nord-negcc.h
-+
-+properties:
-+  compatible:
-+    const: qcom,nord-negcc
-+
-+  clocks:
-+    items:
-+      - description: Board XO source
-+      - description: Sleep clock source
-+      - description: UFS Phy Rx symbol 0 clock source
-+      - description: UFS Phy Rx symbol 1 clock source
-+      - description: UFS Phy Tx symbol 0 clock source
-+      - description: USB3 Phy sec wrapper pipe clock source
-+      - description: USB3 Phy wrapper pipe clock source
-+
-+required:
-+  - compatible
-+  - clocks
-+  - '#power-domain-cells'
-+
-+allOf:
-+  - $ref: qcom,gcc.yaml#
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/clock/qcom,rpmh.h>
-+    clock-controller@8900000 {
-+      compatible = "qcom,nord-negcc";
-+      reg = <0x08900000 0xf4200>;
-+      clocks = <&rpmhcc RPMH_CXO_CLK>,
-+               <&sleep_clk>,
-+               <&ufs_phy_rx_symbol_0_clk>,
-+               <&ufs_phy_rx_symbol_1_clk>,
-+               <&ufs_phy_tx_symbol_0_clk>,
-+               <&usb3_phy_sec_pipe_clk>,
-+               <&usb3_phy_pipe_clk>;
-+      #clock-cells = <1>;
-+      #reset-cells = <1>;
-+      #power-domain-cells = <1>;
-+    };
-+
-+...
-diff --git a/Documentation/devicetree/bindings/clock/qcom,nord-nwgcc.yaml b/Documentation/devicetree/bindings/clock/qcom,nord-nwgcc.yaml
-new file mode 100644
-index 0000000000000000000000000000000000000000..ce33f966bdfdf0b0ccebc40944e3d961c79c6fe0
---- /dev/null
-+++ b/Documentation/devicetree/bindings/clock/qcom,nord-nwgcc.yaml
-@@ -0,0 +1,55 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/clock/qcom,nord-nwgcc.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Qualcomm Global North West and South East  Clock & Reset Controller
-+       on Nord SoC
-+
-+maintainers:
-+  - Taniya Das <taniya.das@oss.qualcomm.com>
-+
-+description: |
-+  Qualcomm global clock control (NW, SE) module provides the clocks, resets
-+  and power domains on Nord SoC.
-+
-+  See also:
-+    include/dt-bindings/clock/qcom,nord-nwgcc.h
-+    include/dt-bindings/clock/qcom,nord-segcc.h
-+
-+properties:
-+  compatible:
-+    enum:
-+      - qcom,nord-nwgcc
-+      - qcom,nord-segcc
-+
-+  clocks:
-+    items:
-+      - description: Board XO source
-+      - description: Sleep clock source
-+
-+required:
-+  - compatible
-+  - clocks
-+  - '#power-domain-cells'
-+
-+allOf:
-+  - $ref: qcom,gcc.yaml#
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/clock/qcom,rpmh.h>
-+    clock-controller@8b00000 {
-+      compatible = "qcom,nord-nwgcc";
-+      reg = <0x08b00000 0xf4200>;
-+      clocks = <&rpmhcc RPMH_CXO_CLK>,
-+               <&sleep_clk>;
-+      #clock-cells = <1>;
-+      #reset-cells = <1>;
-+      #power-domain-cells = <1>;
-+    };
-+
-+...
-diff --git a/include/dt-bindings/clock/qcom,nord-gcc.h b/include/dt-bindings/clock/qcom,nord-gcc.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..8fbde162c8598d75b42136350fb23b33c29c339f
---- /dev/null
-+++ b/include/dt-bindings/clock/qcom,nord-gcc.h
-@@ -0,0 +1,147 @@
-+/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
++++ b/drivers/clk/qcom/tcsrcc-nord.c
+@@ -0,0 +1,337 @@
++// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
 + */
 +
-+#ifndef _DT_BINDINGS_CLK_QCOM_GCC_NORD_H
-+#define _DT_BINDINGS_CLK_QCOM_GCC_NORD_H
++#include <linux/clk-provider.h>
++#include <linux/mod_devicetable.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++#include <linux/regmap.h>
 +
-+/* GCC clocks */
-+#define GCC_BOOT_ROM_AHB_CLK					0
-+#define GCC_GP1_CLK						1
-+#define GCC_GP1_CLK_SRC						2
-+#define GCC_GP2_CLK						3
-+#define GCC_GP2_CLK_SRC						4
-+#define GCC_GPLL0						5
-+#define GCC_GPLL0_OUT_EVEN					6
-+#define GCC_MMU_0_TCU_VOTE_CLK					7
-+#define GCC_PCIE_A_AUX_CLK					8
-+#define GCC_PCIE_A_AUX_CLK_SRC					9
-+#define GCC_PCIE_A_CFG_AHB_CLK					10
-+#define GCC_PCIE_A_DTI_QTC_CLK					11
-+#define GCC_PCIE_A_MSTR_AXI_CLK					12
-+#define GCC_PCIE_A_PHY_AUX_CLK					13
-+#define GCC_PCIE_A_PHY_AUX_CLK_SRC				14
-+#define GCC_PCIE_A_PHY_RCHNG_CLK				15
-+#define GCC_PCIE_A_PHY_RCHNG_CLK_SRC				16
-+#define GCC_PCIE_A_PIPE_CLK					17
-+#define GCC_PCIE_A_PIPE_CLK_SRC					18
-+#define GCC_PCIE_A_SLV_AXI_CLK					19
-+#define GCC_PCIE_A_SLV_Q2A_AXI_CLK				20
-+#define GCC_PCIE_B_AUX_CLK					21
-+#define GCC_PCIE_B_AUX_CLK_SRC					22
-+#define GCC_PCIE_B_CFG_AHB_CLK					23
-+#define GCC_PCIE_B_DTI_QTC_CLK					24
-+#define GCC_PCIE_B_MSTR_AXI_CLK					25
-+#define GCC_PCIE_B_PHY_AUX_CLK					26
-+#define GCC_PCIE_B_PHY_AUX_CLK_SRC				27
-+#define GCC_PCIE_B_PHY_RCHNG_CLK				28
-+#define GCC_PCIE_B_PHY_RCHNG_CLK_SRC				29
-+#define GCC_PCIE_B_PIPE_CLK					30
-+#define GCC_PCIE_B_PIPE_CLK_SRC					31
-+#define GCC_PCIE_B_SLV_AXI_CLK					32
-+#define GCC_PCIE_B_SLV_Q2A_AXI_CLK				33
-+#define GCC_PCIE_C_AUX_CLK					34
-+#define GCC_PCIE_C_AUX_CLK_SRC					35
-+#define GCC_PCIE_C_CFG_AHB_CLK					36
-+#define GCC_PCIE_C_DTI_QTC_CLK					37
-+#define GCC_PCIE_C_MSTR_AXI_CLK					38
-+#define GCC_PCIE_C_PHY_AUX_CLK					39
-+#define GCC_PCIE_C_PHY_AUX_CLK_SRC				40
-+#define GCC_PCIE_C_PHY_RCHNG_CLK				41
-+#define GCC_PCIE_C_PHY_RCHNG_CLK_SRC				42
-+#define GCC_PCIE_C_PIPE_CLK					43
-+#define GCC_PCIE_C_PIPE_CLK_SRC					44
-+#define GCC_PCIE_C_SLV_AXI_CLK					45
-+#define GCC_PCIE_C_SLV_Q2A_AXI_CLK				46
-+#define GCC_PCIE_D_AUX_CLK					47
-+#define GCC_PCIE_D_AUX_CLK_SRC					48
-+#define GCC_PCIE_D_CFG_AHB_CLK					49
-+#define GCC_PCIE_D_DTI_QTC_CLK					50
-+#define GCC_PCIE_D_MSTR_AXI_CLK					51
-+#define GCC_PCIE_D_PHY_AUX_CLK					52
-+#define GCC_PCIE_D_PHY_AUX_CLK_SRC				53
-+#define GCC_PCIE_D_PHY_RCHNG_CLK				54
-+#define GCC_PCIE_D_PHY_RCHNG_CLK_SRC				55
-+#define GCC_PCIE_D_PIPE_CLK					56
-+#define GCC_PCIE_D_PIPE_CLK_SRC					57
-+#define GCC_PCIE_D_SLV_AXI_CLK					58
-+#define GCC_PCIE_D_SLV_Q2A_AXI_CLK				59
-+#define GCC_PCIE_LINK_AHB_CLK					60
-+#define GCC_PCIE_LINK_XO_CLK					61
-+#define GCC_PCIE_NOC_ASYNC_BRIDGE_CLK				62
-+#define GCC_PCIE_NOC_CNOC_SF_QX_CLK				63
-+#define GCC_PCIE_NOC_M_CFG_CLK					64
-+#define GCC_PCIE_NOC_M_PDB_CLK					65
-+#define GCC_PCIE_NOC_MSTR_AXI_CLK				66
-+#define GCC_PCIE_NOC_PWRCTL_CLK					67
-+#define GCC_PCIE_NOC_QOSGEN_EXTREF_CLK				68
-+#define GCC_PCIE_NOC_REFGEN_CLK					69
-+#define GCC_PCIE_NOC_REFGEN_CLK_SRC				70
-+#define GCC_PCIE_NOC_S_CFG_CLK					71
-+#define GCC_PCIE_NOC_S_PDB_CLK					72
-+#define GCC_PCIE_NOC_SAFETY_CLK					73
-+#define GCC_PCIE_NOC_SAFETY_CLK_SRC				74
-+#define GCC_PCIE_NOC_SLAVE_AXI_CLK				75
-+#define GCC_PCIE_NOC_TSCTR_CLK					76
-+#define GCC_PCIE_NOC_XO_CLK					77
-+#define GCC_PDM2_CLK						78
-+#define GCC_PDM2_CLK_SRC					79
-+#define GCC_PDM_AHB_CLK						80
-+#define GCC_PDM_XO4_CLK						81
-+#define GCC_QUPV3_WRAP3_CORE_2X_CLK				82
-+#define GCC_QUPV3_WRAP3_CORE_CLK				83
-+#define GCC_QUPV3_WRAP3_M_CLK					84
-+#define GCC_QUPV3_WRAP3_QSPI_REF_CLK				85
-+#define GCC_QUPV3_WRAP3_QSPI_REF_CLK_SRC			86
-+#define GCC_QUPV3_WRAP3_S0_CLK					87
-+#define GCC_QUPV3_WRAP3_S0_CLK_SRC				88
-+#define GCC_QUPV3_WRAP3_S_AHB_CLK				89
-+#define GCC_SMMU_PCIE_QTC_VOTE_CLK				90
++#include <dt-bindings/clock/qcom,nord-tcsrcc.h>
 +
-+/* GCC power domains */
-+#define GCC_PCIE_A_GDSC						0
-+#define GCC_PCIE_A_PHY_GDSC					1
-+#define GCC_PCIE_B_GDSC						2
-+#define GCC_PCIE_B_PHY_GDSC					3
-+#define GCC_PCIE_C_GDSC						4
-+#define GCC_PCIE_C_PHY_GDSC					5
-+#define GCC_PCIE_D_GDSC						6
-+#define GCC_PCIE_D_PHY_GDSC					7
-+#define GCC_PCIE_NOC_GDSC					8
++#include "clk-alpha-pll.h"
++#include "clk-branch.h"
++#include "clk-pll.h"
++#include "clk-rcg.h"
++#include "clk-regmap.h"
++#include "clk-regmap-divider.h"
++#include "clk-regmap-mux.h"
++#include "common.h"
++#include "reset.h"
 +
-+/* GCC resets */
-+#define GCC_PCIE_A_BCR						0
-+#define GCC_PCIE_A_LINK_DOWN_BCR				1
-+#define GCC_PCIE_A_NOCSR_COM_PHY_BCR				2
-+#define GCC_PCIE_A_PHY_BCR					3
-+#define GCC_PCIE_A_PHY_CFG_AHB_BCR				4
-+#define GCC_PCIE_A_PHY_COM_BCR					5
-+#define GCC_PCIE_A_PHY_NOCSR_COM_PHY_BCR			6
-+#define GCC_PCIE_B_BCR						7
-+#define GCC_PCIE_B_LINK_DOWN_BCR				8
-+#define GCC_PCIE_B_NOCSR_COM_PHY_BCR				9
-+#define GCC_PCIE_B_PHY_BCR					10
-+#define GCC_PCIE_B_PHY_CFG_AHB_BCR				11
-+#define GCC_PCIE_B_PHY_COM_BCR					12
-+#define GCC_PCIE_B_PHY_NOCSR_COM_PHY_BCR			13
-+#define GCC_PCIE_C_BCR						14
-+#define GCC_PCIE_C_LINK_DOWN_BCR				15
-+#define GCC_PCIE_C_NOCSR_COM_PHY_BCR				16
-+#define GCC_PCIE_C_PHY_BCR					17
-+#define GCC_PCIE_C_PHY_CFG_AHB_BCR				18
-+#define GCC_PCIE_C_PHY_COM_BCR					19
-+#define GCC_PCIE_C_PHY_NOCSR_COM_PHY_BCR			20
-+#define GCC_PCIE_D_BCR						21
-+#define GCC_PCIE_D_LINK_DOWN_BCR				22
-+#define GCC_PCIE_D_NOCSR_COM_PHY_BCR				23
-+#define GCC_PCIE_D_PHY_BCR					24
-+#define GCC_PCIE_D_PHY_CFG_AHB_BCR				25
-+#define GCC_PCIE_D_PHY_COM_BCR					26
-+#define GCC_PCIE_D_PHY_NOCSR_COM_PHY_BCR			27
-+#define GCC_PCIE_NOC_BCR					28
-+#define GCC_PDM_BCR						29
-+#define GCC_QUPV3_WRAPPER_3_BCR					30
-+#define GCC_TCSR_PCIE_BCR					31
++enum {
++	DT_BI_TCXO_PAD,
++};
 +
-+#endif
-diff --git a/include/dt-bindings/clock/qcom,nord-negcc.h b/include/dt-bindings/clock/qcom,nord-negcc.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..95f333d8e1aa7cf1e386b6926380b2c853f7cf43
---- /dev/null
-+++ b/include/dt-bindings/clock/qcom,nord-negcc.h
-@@ -0,0 +1,124 @@
-+/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
-+/*
-+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-+ */
++static struct clk_branch tcsr_dp_rx_0_clkref_en = {
++	.halt_reg = 0xa008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0xa008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_dp_rx_0_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+#ifndef _DT_BINDINGS_CLK_QCOM_NE_GCC_NORD_H
-+#define _DT_BINDINGS_CLK_QCOM_NE_GCC_NORD_H
++static struct clk_branch tcsr_dp_rx_1_clkref_en = {
++	.halt_reg = 0xb008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0xb008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_dp_rx_1_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+/* NE_GCC clocks */
-+#define NE_GCC_AGGRE_NOC_UFS_PHY_AXI_CLK			0
-+#define NE_GCC_AGGRE_NOC_USB2_AXI_CLK				1
-+#define NE_GCC_AGGRE_NOC_USB3_PRIM_AXI_CLK			2
-+#define NE_GCC_AGGRE_NOC_USB3_SEC_AXI_CLK			3
-+#define NE_GCC_AHB2PHY_CLK					4
-+#define NE_GCC_CNOC_USB2_AXI_CLK				5
-+#define NE_GCC_CNOC_USB3_PRIM_AXI_CLK				6
-+#define NE_GCC_CNOC_USB3_SEC_AXI_CLK				7
-+#define NE_GCC_FRQ_MEASURE_REF_CLK				8
-+#define NE_GCC_GP1_CLK						9
-+#define NE_GCC_GP1_CLK_SRC					10
-+#define NE_GCC_GP2_CLK						11
-+#define NE_GCC_GP2_CLK_SRC					12
-+#define NE_GCC_GPLL0						13
-+#define NE_GCC_GPLL0_OUT_EVEN					14
-+#define NE_GCC_GPLL2						15
-+#define NE_GCC_GPU_2_CFG_CLK					16
-+#define NE_GCC_GPU_2_GPLL0_CLK_SRC				17
-+#define NE_GCC_GPU_2_GPLL0_DIV_CLK_SRC				18
-+#define NE_GCC_GPU_2_HSCNOC_GFX_CLK				19
-+#define NE_GCC_GPU_2_SMMU_VOTE_CLK				20
-+#define NE_GCC_QUPV3_WRAP2_CORE_2X_CLK				21
-+#define NE_GCC_QUPV3_WRAP2_CORE_CLK				22
-+#define NE_GCC_QUPV3_WRAP2_M_AHB_CLK				23
-+#define NE_GCC_QUPV3_WRAP2_S0_CLK				24
-+#define NE_GCC_QUPV3_WRAP2_S0_CLK_SRC				25
-+#define NE_GCC_QUPV3_WRAP2_S1_CLK				26
-+#define NE_GCC_QUPV3_WRAP2_S1_CLK_SRC				27
-+#define NE_GCC_QUPV3_WRAP2_S2_CLK				28
-+#define NE_GCC_QUPV3_WRAP2_S2_CLK_SRC				29
-+#define NE_GCC_QUPV3_WRAP2_S3_CLK				30
-+#define NE_GCC_QUPV3_WRAP2_S3_CLK_SRC				31
-+#define NE_GCC_QUPV3_WRAP2_S4_CLK				32
-+#define NE_GCC_QUPV3_WRAP2_S4_CLK_SRC				33
-+#define NE_GCC_QUPV3_WRAP2_S5_CLK				34
-+#define NE_GCC_QUPV3_WRAP2_S5_CLK_SRC				35
-+#define NE_GCC_QUPV3_WRAP2_S6_CLK				36
-+#define NE_GCC_QUPV3_WRAP2_S6_CLK_SRC				37
-+#define NE_GCC_QUPV3_WRAP2_S_AHB_CLK				38
-+#define NE_GCC_SDCC4_APPS_CLK					39
-+#define NE_GCC_SDCC4_APPS_CLK_SRC				40
-+#define NE_GCC_SDCC4_AXI_CLK					41
-+#define NE_GCC_UFS_PHY_AHB_CLK					42
-+#define NE_GCC_UFS_PHY_AXI_CLK					43
-+#define NE_GCC_UFS_PHY_AXI_CLK_SRC				44
-+#define NE_GCC_UFS_PHY_ICE_CORE_CLK				45
-+#define NE_GCC_UFS_PHY_ICE_CORE_CLK_SRC				46
-+#define NE_GCC_UFS_PHY_PHY_AUX_CLK				47
-+#define NE_GCC_UFS_PHY_PHY_AUX_CLK_SRC				48
-+#define NE_GCC_UFS_PHY_RX_SYMBOL_0_CLK				49
-+#define NE_GCC_UFS_PHY_RX_SYMBOL_0_CLK_SRC			50
-+#define NE_GCC_UFS_PHY_RX_SYMBOL_1_CLK				51
-+#define NE_GCC_UFS_PHY_RX_SYMBOL_1_CLK_SRC			52
-+#define NE_GCC_UFS_PHY_TX_SYMBOL_0_CLK				53
-+#define NE_GCC_UFS_PHY_TX_SYMBOL_0_CLK_SRC			54
-+#define NE_GCC_UFS_PHY_UNIPRO_CORE_CLK				55
-+#define NE_GCC_UFS_PHY_UNIPRO_CORE_CLK_SRC			56
-+#define NE_GCC_USB20_MASTER_CLK					57
-+#define NE_GCC_USB20_MASTER_CLK_SRC				58
-+#define NE_GCC_USB20_MOCK_UTMI_CLK				59
-+#define NE_GCC_USB20_MOCK_UTMI_CLK_SRC				60
-+#define NE_GCC_USB20_MOCK_UTMI_POSTDIV_CLK_SRC			61
-+#define NE_GCC_USB20_SLEEP_CLK					62
-+#define NE_GCC_USB31_PRIM_ATB_CLK				63
-+#define NE_GCC_USB31_PRIM_EUD_AHB_CLK				64
-+#define NE_GCC_USB31_PRIM_MASTER_CLK				65
-+#define NE_GCC_USB31_PRIM_MASTER_CLK_SRC			66
-+#define NE_GCC_USB31_PRIM_MOCK_UTMI_CLK				67
-+#define NE_GCC_USB31_PRIM_MOCK_UTMI_CLK_SRC			68
-+#define NE_GCC_USB31_PRIM_MOCK_UTMI_POSTDIV_CLK_SRC		69
-+#define NE_GCC_USB31_PRIM_SLEEP_CLK				70
-+#define NE_GCC_USB31_SEC_ATB_CLK				71
-+#define NE_GCC_USB31_SEC_EUD_AHB_CLK				72
-+#define NE_GCC_USB31_SEC_MASTER_CLK				73
-+#define NE_GCC_USB31_SEC_MASTER_CLK_SRC				74
-+#define NE_GCC_USB31_SEC_MOCK_UTMI_CLK				75
-+#define NE_GCC_USB31_SEC_MOCK_UTMI_CLK_SRC			76
-+#define NE_GCC_USB31_SEC_MOCK_UTMI_POSTDIV_CLK_SRC		77
-+#define NE_GCC_USB31_SEC_SLEEP_CLK				78
-+#define NE_GCC_USB3_PRIM_PHY_AUX_CLK				79
-+#define NE_GCC_USB3_PRIM_PHY_AUX_CLK_SRC			80
-+#define NE_GCC_USB3_PRIM_PHY_COM_AUX_CLK			81
-+#define NE_GCC_USB3_PRIM_PHY_PIPE_CLK				82
-+#define NE_GCC_USB3_PRIM_PHY_PIPE_CLK_SRC			83
-+#define NE_GCC_USB3_SEC_PHY_AUX_CLK				84
-+#define NE_GCC_USB3_SEC_PHY_AUX_CLK_SRC				85
-+#define NE_GCC_USB3_SEC_PHY_COM_AUX_CLK				86
-+#define NE_GCC_USB3_SEC_PHY_PIPE_CLK				87
-+#define NE_GCC_USB3_SEC_PHY_PIPE_CLK_SRC			88
++static struct clk_branch tcsr_dp_tx_0_clkref_en = {
++	.halt_reg = 0xc008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0xc008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_dp_tx_0_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+/* NE_GCC power domains */
-+#define NE_GCC_UFS_MEM_PHY_GDSC					0
-+#define NE_GCC_UFS_PHY_GDSC					1
-+#define NE_GCC_USB20_PRIM_GDSC					2
-+#define NE_GCC_USB31_PRIM_GDSC					3
-+#define NE_GCC_USB31_SEC_GDSC					4
-+#define NE_GCC_USB3_PHY_GDSC					5
-+#define NE_GCC_USB3_SEC_PHY_GDSC				6
++static struct clk_branch tcsr_dp_tx_1_clkref_en = {
++	.halt_reg = 0xd008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0xd008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_dp_tx_1_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+/* NE_GCC resets */
-+#define NE_GCC_GPU_2_BCR					0
-+#define NE_GCC_QUPV3_WRAPPER_2_BCR				1
-+#define NE_GCC_SDCC4_BCR					2
-+#define NE_GCC_UFS_PHY_BCR					3
-+#define NE_GCC_USB20_PRIM_BCR					4
-+#define NE_GCC_USB31_PRIM_BCR					5
-+#define NE_GCC_USB31_SEC_BCR					6
-+#define NE_GCC_USB3_DP_PHY_PRIM_BCR				7
-+#define NE_GCC_USB3_DP_PHY_SEC_BCR				8
-+#define NE_GCC_USB3_PHY_PRIM_BCR				9
-+#define NE_GCC_USB3_PHY_SEC_BCR					10
-+#define NE_GCC_USB3PHY_PHY_PRIM_BCR				11
-+#define NE_GCC_USB3PHY_PHY_SEC_BCR				12
++static struct clk_branch tcsr_dp_tx_2_clkref_en = {
++	.halt_reg = 0xe008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0xe008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_dp_tx_2_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+#endif
-diff --git a/include/dt-bindings/clock/qcom,nord-nwgcc.h b/include/dt-bindings/clock/qcom,nord-nwgcc.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..b6253dd2aa85a3152f99447a60a6f8a3e85d8f3c
---- /dev/null
-+++ b/include/dt-bindings/clock/qcom,nord-nwgcc.h
-@@ -0,0 +1,69 @@
-+/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
-+/*
-+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-+ */
++static struct clk_branch tcsr_dp_tx_3_clkref_en = {
++	.halt_reg = 0xf008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0xf008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_dp_tx_3_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+#ifndef _DT_BINDINGS_CLK_QCOM_NW_GCC_NORD_H
-+#define _DT_BINDINGS_CLK_QCOM_NW_GCC_NORD_H
++static struct clk_branch tcsr_pcie_clkref_en = {
++	.halt_reg = 0x8,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0x8,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_pcie_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+/* NW_GCC clocks */
-+#define NW_GCC_ACMU_MUX_CLK					0
-+#define NW_GCC_CAMERA_AHB_CLK					1
-+#define NW_GCC_CAMERA_HF_AXI_CLK				2
-+#define NW_GCC_CAMERA_SF_AXI_CLK				3
-+#define NW_GCC_CAMERA_TRIG_CLK					4
-+#define NW_GCC_CAMERA_XO_CLK					5
-+#define NW_GCC_DISP_0_AHB_CLK					6
-+#define NW_GCC_DISP_0_HF_AXI_CLK				7
-+#define NW_GCC_DISP_0_TRIG_CLK					8
-+#define NW_GCC_DISP_1_AHB_CLK					9
-+#define NW_GCC_DISP_1_HF_AXI_CLK				10
-+#define NW_GCC_DISP_1_TRIG_CLK					11
-+#define NW_GCC_DPRX0_AXI_HF_CLK					12
-+#define NW_GCC_DPRX0_CFG_AHB_CLK				13
-+#define NW_GCC_DPRX1_AXI_HF_CLK					14
-+#define NW_GCC_DPRX1_CFG_AHB_CLK				15
-+#define NW_GCC_EVA_AHB_CLK					16
-+#define NW_GCC_EVA_AXI0_CLK					17
-+#define NW_GCC_EVA_AXI0C_CLK					18
-+#define NW_GCC_EVA_TRIG_CLK					19
-+#define NW_GCC_EVA_XO_CLK					20
-+#define NW_GCC_FRQ_MEASURE_REF_CLK				21
-+#define NW_GCC_GP1_CLK						22
-+#define NW_GCC_GP1_CLK_SRC					23
-+#define NW_GCC_GP2_CLK						24
-+#define NW_GCC_GP2_CLK_SRC					25
-+#define NW_GCC_GPLL0						26
-+#define NW_GCC_GPLL0_OUT_EVEN					27
-+#define NW_GCC_GPU_2_CFG_AHB_CLK				28
-+#define NW_GCC_GPU_2_GPLL0_CLK_SRC				29
-+#define NW_GCC_GPU_2_GPLL0_DIV_CLK_SRC				30
-+#define NW_GCC_GPU_2_HSCNOC_GFX_CLK				31
-+#define NW_GCC_GPU_CFG_AHB_CLK					32
-+#define NW_GCC_GPU_GPLL0_CLK_SRC				33
-+#define NW_GCC_GPU_GPLL0_DIV_CLK_SRC				34
-+#define NW_GCC_GPU_HSCNOC_GFX_CLK				35
-+#define NW_GCC_GPU_SMMU_VOTE_CLK				36
-+#define NW_GCC_HSCNOC_GPU_2_AXI_CLK				37
-+#define NW_GCC_HSCNOC_GPU_AXI_CLK				38
-+#define NW_GCC_MMU_1_TCU_VOTE_CLK				39
-+#define NW_GCC_VIDEO_AHB_CLK					40
-+#define NW_GCC_VIDEO_AXI0_CLK					41
-+#define NW_GCC_VIDEO_AXI0C_CLK					42
-+#define NW_GCC_VIDEO_AXI1_CLK					43
-+#define NW_GCC_VIDEO_XO_CLK					44
++static struct clk_branch tcsr_ufs_clkref_en = {
++	.halt_reg = 0x3008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0x3008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_ufs_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+/* NW_GCC power domains */
++static struct clk_branch tcsr_usb2_0_clkref_en = {
++	.halt_reg = 0x4008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0x4008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_usb2_0_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+/* NW_GCC resets */
-+#define NW_GCC_CAMERA_BCR					0
-+#define NW_GCC_DISPLAY_0_BCR					1
-+#define NW_GCC_DISPLAY_1_BCR					2
-+#define NW_GCC_DPRX0_BCR					3
-+#define NW_GCC_DPRX1_BCR					4
-+#define NW_GCC_EVA_BCR						5
-+#define NW_GCC_GPU_2_BCR					6
-+#define NW_GCC_GPU_BCR						7
-+#define NW_GCC_VIDEO_BCR					8
++static struct clk_branch tcsr_usb2_1_clkref_en = {
++	.halt_reg = 0x5008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0x5008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_usb2_1_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+#endif
-diff --git a/include/dt-bindings/clock/qcom,nord-segcc.h b/include/dt-bindings/clock/qcom,nord-segcc.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..f0f7422af692d05417d126c1011a22faf3bdc611
---- /dev/null
-+++ b/include/dt-bindings/clock/qcom,nord-segcc.h
-@@ -0,0 +1,98 @@
-+/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
-+/*
-+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
-+ */
++static struct clk_branch tcsr_usb2_2_clkref_en = {
++	.halt_reg = 0x6008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0x6008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_usb2_2_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+#ifndef _DT_BINDINGS_CLK_QCOM_SE_GCC_NORD_H
-+#define _DT_BINDINGS_CLK_QCOM_SE_GCC_NORD_H
++static struct clk_branch tcsr_usb3_0_clkref_en = {
++	.halt_reg = 0x8008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0x8008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_usb3_0_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+/* SE_GCC clocks */
-+#define SE_GCC_EEE_EMAC0_CLK					0
-+#define SE_GCC_EEE_EMAC0_CLK_SRC				1
-+#define SE_GCC_EEE_EMAC1_CLK					2
-+#define SE_GCC_EEE_EMAC1_CLK_SRC				3
-+#define SE_GCC_EMAC0_AXI_CLK					4
-+#define SE_GCC_EMAC0_CC_SGMIIPHY_RX_CLK				5
-+#define SE_GCC_EMAC0_CC_SGMIIPHY_TX_CLK				6
-+#define SE_GCC_EMAC0_PHY_AUX_CLK				7
-+#define SE_GCC_EMAC0_PHY_AUX_CLK_SRC				8
-+#define SE_GCC_EMAC0_PTP_CLK					9
-+#define SE_GCC_EMAC0_PTP_CLK_SRC				10
-+#define SE_GCC_EMAC0_RGMII_CLK					11
-+#define SE_GCC_EMAC0_RGMII_CLK_SRC				12
-+#define SE_GCC_EMAC0_RPCS_RX_CLK				13
-+#define SE_GCC_EMAC0_RPCS_TX_CLK				14
-+#define SE_GCC_EMAC0_XGXS_RX_CLK				15
-+#define SE_GCC_EMAC0_XGXS_TX_CLK				16
-+#define SE_GCC_EMAC1_AXI_CLK					17
-+#define SE_GCC_EMAC1_CC_SGMIIPHY_RX_CLK				18
-+#define SE_GCC_EMAC1_CC_SGMIIPHY_TX_CLK				19
-+#define SE_GCC_EMAC1_PHY_AUX_CLK				20
-+#define SE_GCC_EMAC1_PHY_AUX_CLK_SRC				21
-+#define SE_GCC_EMAC1_PTP_CLK					22
-+#define SE_GCC_EMAC1_PTP_CLK_SRC				23
-+#define SE_GCC_EMAC1_RGMII_CLK					24
-+#define SE_GCC_EMAC1_RGMII_CLK_SRC				25
-+#define SE_GCC_EMAC1_RPCS_RX_CLK				26
-+#define SE_GCC_EMAC1_RPCS_TX_CLK				27
-+#define SE_GCC_EMAC1_XGXS_RX_CLK				28
-+#define SE_GCC_EMAC1_XGXS_TX_CLK				29
-+#define SE_GCC_FRQ_MEASURE_REF_CLK				30
-+#define SE_GCC_GP1_CLK						31
-+#define SE_GCC_GP1_CLK_SRC					32
-+#define SE_GCC_GP2_CLK						33
-+#define SE_GCC_GP2_CLK_SRC					34
-+#define SE_GCC_GPLL0						35
-+#define SE_GCC_GPLL0_OUT_EVEN					36
-+#define SE_GCC_GPLL2						37
-+#define SE_GCC_GPLL4						38
-+#define SE_GCC_GPLL5						39
-+#define SE_GCC_MMU_2_TCU_VOTE_CLK				40
-+#define SE_GCC_QUPV3_WRAP0_CORE_2X_CLK				41
-+#define SE_GCC_QUPV3_WRAP0_CORE_CLK				42
-+#define SE_GCC_QUPV3_WRAP0_M_AHB_CLK				43
-+#define SE_GCC_QUPV3_WRAP0_S0_CLK				44
-+#define SE_GCC_QUPV3_WRAP0_S0_CLK_SRC				45
-+#define SE_GCC_QUPV3_WRAP0_S1_CLK				46
-+#define SE_GCC_QUPV3_WRAP0_S1_CLK_SRC				47
-+#define SE_GCC_QUPV3_WRAP0_S2_CLK				48
-+#define SE_GCC_QUPV3_WRAP0_S2_CLK_SRC				49
-+#define SE_GCC_QUPV3_WRAP0_S3_CLK				50
-+#define SE_GCC_QUPV3_WRAP0_S3_CLK_SRC				51
-+#define SE_GCC_QUPV3_WRAP0_S4_CLK				52
-+#define SE_GCC_QUPV3_WRAP0_S4_CLK_SRC				53
-+#define SE_GCC_QUPV3_WRAP0_S5_CLK				54
-+#define SE_GCC_QUPV3_WRAP0_S5_CLK_SRC				55
-+#define SE_GCC_QUPV3_WRAP0_S6_CLK				56
-+#define SE_GCC_QUPV3_WRAP0_S6_CLK_SRC				57
-+#define SE_GCC_QUPV3_WRAP0_S_AHB_CLK				58
-+#define SE_GCC_QUPV3_WRAP1_CORE_2X_CLK				59
-+#define SE_GCC_QUPV3_WRAP1_CORE_CLK				60
-+#define SE_GCC_QUPV3_WRAP1_M_AHB_CLK				61
-+#define SE_GCC_QUPV3_WRAP1_S0_CLK				62
-+#define SE_GCC_QUPV3_WRAP1_S0_CLK_SRC				63
-+#define SE_GCC_QUPV3_WRAP1_S1_CLK				64
-+#define SE_GCC_QUPV3_WRAP1_S1_CLK_SRC				65
-+#define SE_GCC_QUPV3_WRAP1_S2_CLK				66
-+#define SE_GCC_QUPV3_WRAP1_S2_CLK_SRC				67
-+#define SE_GCC_QUPV3_WRAP1_S3_CLK				68
-+#define SE_GCC_QUPV3_WRAP1_S3_CLK_SRC				69
-+#define SE_GCC_QUPV3_WRAP1_S4_CLK				70
-+#define SE_GCC_QUPV3_WRAP1_S4_CLK_SRC				71
-+#define SE_GCC_QUPV3_WRAP1_S5_CLK				72
-+#define SE_GCC_QUPV3_WRAP1_S5_CLK_SRC				73
-+#define SE_GCC_QUPV3_WRAP1_S6_CLK				74
-+#define SE_GCC_QUPV3_WRAP1_S6_CLK_SRC				75
-+#define SE_GCC_QUPV3_WRAP1_S_AHB_CLK				76
++static struct clk_branch tcsr_usb3_1_clkref_en = {
++	.halt_reg = 0x7008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0x7008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_usb3_1_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+/* SE_GCC power domains */
-+#define SE_GCC_EMAC0_GDSC					0
-+#define SE_GCC_EMAC1_GDSC					1
++static struct clk_branch tcsr_ux_sgmii_0_clkref_en = {
++	.halt_reg = 0x1008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0x1008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_ux_sgmii_0_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+/* SE_GCC resets */
-+#define SE_GCC_EMAC0_BCR					0
-+#define SE_GCC_EMAC1_BCR					1
-+#define SE_GCC_QUPV3_WRAPPER_0_BCR				2
-+#define SE_GCC_QUPV3_WRAPPER_1_BCR				3
++static struct clk_branch tcsr_ux_sgmii_1_clkref_en = {
++	.halt_reg = 0x2008,
++	.halt_check = BRANCH_HALT_DELAY,
++	.clkr = {
++		.enable_reg = 0x2008,
++		.enable_mask = BIT(0),
++		.hw.init = &(const struct clk_init_data) {
++			.name = "tcsr_ux_sgmii_1_clkref_en",
++			.parent_data = &(const struct clk_parent_data){
++				.index = DT_BI_TCXO_PAD,
++			},
++			.num_parents = 1,
++			.ops = &clk_branch2_ops,
++		},
++	},
++};
 +
-+#endif
++static struct clk_regmap *tcsr_cc_nord_clocks[] = {
++	[TCSR_DP_RX_0_CLKREF_EN] = &tcsr_dp_rx_0_clkref_en.clkr,
++	[TCSR_DP_RX_1_CLKREF_EN] = &tcsr_dp_rx_1_clkref_en.clkr,
++	[TCSR_DP_TX_0_CLKREF_EN] = &tcsr_dp_tx_0_clkref_en.clkr,
++	[TCSR_DP_TX_1_CLKREF_EN] = &tcsr_dp_tx_1_clkref_en.clkr,
++	[TCSR_DP_TX_2_CLKREF_EN] = &tcsr_dp_tx_2_clkref_en.clkr,
++	[TCSR_DP_TX_3_CLKREF_EN] = &tcsr_dp_tx_3_clkref_en.clkr,
++	[TCSR_PCIE_CLKREF_EN] = &tcsr_pcie_clkref_en.clkr,
++	[TCSR_UFS_CLKREF_EN] = &tcsr_ufs_clkref_en.clkr,
++	[TCSR_USB2_0_CLKREF_EN] = &tcsr_usb2_0_clkref_en.clkr,
++	[TCSR_USB2_1_CLKREF_EN] = &tcsr_usb2_1_clkref_en.clkr,
++	[TCSR_USB2_2_CLKREF_EN] = &tcsr_usb2_2_clkref_en.clkr,
++	[TCSR_USB3_0_CLKREF_EN] = &tcsr_usb3_0_clkref_en.clkr,
++	[TCSR_USB3_1_CLKREF_EN] = &tcsr_usb3_1_clkref_en.clkr,
++	[TCSR_UX_SGMII_0_CLKREF_EN] = &tcsr_ux_sgmii_0_clkref_en.clkr,
++	[TCSR_UX_SGMII_1_CLKREF_EN] = &tcsr_ux_sgmii_1_clkref_en.clkr,
++};
++
++static const struct regmap_config tcsr_cc_nord_regmap_config = {
++	.reg_bits = 32,
++	.reg_stride = 4,
++	.val_bits = 32,
++	.max_register = 0xf008,
++	.fast_io = true,
++};
++
++static const struct qcom_cc_desc tcsr_cc_nord_desc = {
++	.config = &tcsr_cc_nord_regmap_config,
++	.clks = tcsr_cc_nord_clocks,
++	.num_clks = ARRAY_SIZE(tcsr_cc_nord_clocks),
++};
++
++static const struct of_device_id tcsr_cc_nord_match_table[] = {
++	{ .compatible = "qcom,nord-tcsrcc" },
++	{ }
++};
++MODULE_DEVICE_TABLE(of, tcsr_cc_nord_match_table);
++
++static int tcsr_cc_nord_probe(struct platform_device *pdev)
++{
++	return qcom_cc_probe(pdev, &tcsr_cc_nord_desc);
++}
++
++static struct platform_driver tcsr_cc_nord_driver = {
++	.probe = tcsr_cc_nord_probe,
++	.driver = {
++		.name = "tcsrcc-nord",
++		.of_match_table = tcsr_cc_nord_match_table,
++	},
++};
++
++module_platform_driver(tcsr_cc_nord_driver);
++
++MODULE_DESCRIPTION("QTI TCSRCC NORD Driver");
++MODULE_LICENSE("GPL");
 
 -- 
 2.47.3
