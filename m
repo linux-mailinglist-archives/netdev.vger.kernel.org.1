@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-275168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275169-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CKGQDAEP0GlQ2wYAu9opvQ
-	(envelope-from <netdev+bounces-275168-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 21:03:29 +0200
+	id OIKLCkoP0GlQ2wYAu9opvQ
+	(envelope-from <netdev+bounces-275169-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 21:04:42 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BF2C39778E
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 21:03:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 926DC3977D2
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 21:04:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9E357304D147
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 19:02:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7F2FE3077EE3
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 19:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 887CB3D4102;
-	Fri,  3 Apr 2026 19:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B290F3D667E;
+	Fri,  3 Apr 2026 19:02:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="szKzb5ej"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kWdjJYP6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A45535DA61;
-	Fri,  3 Apr 2026 19:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3439E3D5656
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 19:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775242970; cv=none; b=OTK/vqVZDZoNtuRaDxHhB0hzW45Lp9mW7uaDx3zZyQOabOK0m/cUR4kq2Sbei/0CgY0OeNkIWuMcc9JQtzdP+rJB6hecAgsWRXrnAMpr6Y2+gbNoxssTdvujYYXEgrGZbRcuP+SYtYQViOmNbMof5HwH4XPtn6TUAtOJpa6M3MI=
+	t=1775242972; cv=none; b=XmdvxQA7G/miJYrgjVNYISLplqt+5gVjfCaMySu9sBTxQmnLUzLDQL2D8BqJ2Pf8JJlu2yyCVTFIth+md6K6liGeo3oEFXkI+6UXfkI1OnznmmRUR/GxMMev+7yRHrAjATQjCPIRa7hLKh2YqXFTRsJiNtQceUCIcfH9oayF5Yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775242970; c=relaxed/simple;
-	bh=82E1gNqQHbMmQCdl7prDr0d+QbB+S0A7xhvVfG/XcdM=;
+	s=arc-20240116; t=1775242972; c=relaxed/simple;
+	bh=2TMI09FpamYZahfXr+RTwRjwuJl1OVYR05Rg8UryZp8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=CgEChUIyAX5WDRbBaF43aTGuj1Z0biGyxVCAQQQiosFFunfnKT4SsDWYYaD4DAVpaL3V0RP2wtiEUOyCwLzt6c/LVnamMIx7LAxPNG9D7/8xcTf88JJjb3Zky+t66j+tFHrxOYNaYgy7dY4q3yKMDJV5VnEFhnt4LG0kfS99x2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=szKzb5ej; arc=none smtp.client-ip=185.171.202.116
+	 In-Reply-To:To:Cc; b=pxODs0JahM8lTsOJPW3UwzYKMFbFP34xRb7TkbvELfnWNLBvEeM4thn5qC8Z8QNDP3LkyUCn/G7sHDk/y+Pl19uuY0RR8uI5r9Y+6WPAvBilomQZzh0TzXOAdDjPxS1fKwQXmd9tTdSE9i/mv6HZ8adLnf5PR6NVMvxcL2nAGho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kWdjJYP6; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 87E5EC59F63;
-	Fri,  3 Apr 2026 19:03:19 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id C7EDF4E428DA;
+	Fri,  3 Apr 2026 19:02:49 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 7D11E603C1;
-	Fri,  3 Apr 2026 19:02:47 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3625C10450100;
-	Fri,  3 Apr 2026 21:02:43 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 9E56A603C1;
+	Fri,  3 Apr 2026 19:02:49 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A9F4C10450104;
+	Fri,  3 Apr 2026 21:02:46 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1775242966; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1775242968; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=2gFAv0dcUzXb0YHZi0Q5hVFzBQwFov8rssI1Wgkp5+g=;
-	b=szKzb5ejqSC8vuo21XdOCnskZXlaCPQhacWmUb0f/c4E8e/pBCAScYiD0wtvQXbl2VHXRp
-	/qdGQICv6I7Wgdmm1QKoIdA4gzDF32XegR/fUrtSf3RHr1Pi405Uh58mJGEl9nIsdwgvBk
-	Owo18Ta5CuItWl5z2R5UE9QJ3bNoDGinz3EaGQqvk+r5xEki6Ffm02/8xTtRaWc2GKCR++
-	/o8PMUnaRtrjnrbIlqbNjAT+0RMBR1Y3t4MxZGdBcvlBG+P3oEes04KRoIvHOqOtGiYgQ/
-	8oqsKz0WspqOhTmK5Qm0gkHQF8bNAozabOfSJGAQ+DS78tgL2Cue8LiNymgpaw==
+	bh=4Wv5yQvuj+rgucDv+ANDjV6mURH+Y6I5nT0NY+ugpFU=;
+	b=kWdjJYP6WePo47HuUMrKVu7jaB7aJj6o2/xliAwiE/AHbeZUC0k5aHOlloTu22oZ0BLhOb
+	XWVVV/zTuJotoNUYH+4bw7C+iB6B9iWjBJoxJSATWqxMC8UZa6ij9nukwouAattEP7nVyy
+	3ckAfhzzHo7RLfa5mXyphOw+2tEUzaydA9rnvxh63l8xZ262AsodvUwyhJnEYUiYpp0BZL
+	C7OkZpY0rSU5OAbSaeQajy+uepYZbl+0vZbYmT4/gPONFEhXL3uGzwW0aLJP3FAK6ouUtu
+	MuMgxMz7hQuupXrYB+0YiLxwIXUQFNdzG6IM4BvQEYWA2xkG5+wnfnrpzKFZkA==
 From: Thomas Richard <thomas.richard@bootlin.com>
-Date: Fri, 03 Apr 2026 21:02:23 +0200
-Subject: [PATCH 1/2] dt-bindings: net: Add schema for LAN75XX compatible
- USB Ethernet controllers
+Date: Fri, 03 Apr 2026 21:02:24 +0200
+Subject: [PATCH 2/2] ARM: dts: ti: var-som-om44: Add USB Ethernet
+ controller node
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260403-b4-var-som-om44-lan7500-v1-1-0dadde850143@bootlin.com>
+Message-Id: <20260403-b4-var-som-om44-lan7500-v1-2-0dadde850143@bootlin.com>
 References: <20260403-b4-var-som-om44-lan7500-v1-0-0dadde850143@bootlin.com>
 In-Reply-To: <20260403-b4-var-som-om44-lan7500-v1-0-0dadde850143@bootlin.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -87,7 +87,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275168-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275169-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -105,77 +105,43 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.1:email,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 9BF2C39778E
+	DBL_BLOCKED_OPENRESOLVER(0.00)[0.0.0.3:email,0.0.0.1:email,bootlin.com:dkim,bootlin.com:email,bootlin.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 926DC3977D2
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Create schema for LAN75XX compatible USB Ethernet controllers. The smsc75xx
-driver only supports LAN7500 and LAN7505 devices.
+Add USB tree description, including the Gigabit Ethernet controller
+(LAN7500). Adding the LAN7500 node will allow the bootloader to patch the
+devicetree and set the MAC address.
 
 Signed-off-by: Thomas Richard <thomas.richard@bootlin.com>
 ---
- .../devicetree/bindings/net/microchip,lan75xx.yaml | 52 ++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ arch/arm/boot/dts/ti/omap/omap4-var-som-om44.dtsi | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/microchip,lan75xx.yaml b/Documentation/devicetree/bindings/net/microchip,lan75xx.yaml
-new file mode 100644
-index 0000000000000000000000000000000000000000..b84022976044ffec2024cff9fc0aa5016723abed
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/microchip,lan75xx.yaml
-@@ -0,0 +1,52 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/microchip,lan75xx.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/arch/arm/boot/dts/ti/omap/omap4-var-som-om44.dtsi b/arch/arm/boot/dts/ti/omap/omap4-var-som-om44.dtsi
+index 37d56b3010cff0f6ea6208289da0aba7328067d5..9e04aa70f98227ac0054fea6cd4521ed1323ecbd 100644
+--- a/arch/arm/boot/dts/ti/omap/omap4-var-som-om44.dtsi
++++ b/arch/arm/boot/dts/ti/omap/omap4-var-som-om44.dtsi
+@@ -322,4 +322,18 @@ &usbhshost {
+ 
+ &usbhsehci {
+ 	phys = <&hsusb1_phy>;
++	#address-cells = <1>;
++	#size-cells = <0>;
 +
-+title: Microchip LAN7500/LAN7505 USB Ethernet Controllers
++	usbhub: hub@1 {
++		compatible = "usb424,2514";
++		reg = <1>;
++		#address-cells = <1>;
++		#size-cells = <0>;
 +
-+maintainers:
-+  - Thomas Richard <thomas.richard@bootlin.com>
-+
-+description:
-+  Device tree properties for LAN75XX compatible USB Ethernet controller.
-+
-+allOf:
-+  - $ref: ethernet-controller.yaml#
-+
-+properties:
-+  compatible:
-+    items:
-+      - enum:
-+          - usb424,7500
-+          - usb424,7505
-+
-+  reg:
-+    maxItems: 1
-+
-+  local-mac-address: true
-+  mac-address: true
-+  nvmem-cells: true
-+  nvmem-cell-names: true
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+
-+    usb {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        ethernet@1 {
-+            compatible = "usb424,7500";
-+            reg = <1>;
-+            local-mac-address = [00 00 00 00 00 00];
-+        };
-+    };
++		ethernet: ethernet@3 {
++			compatible = "usb424,7500";
++			reg = <3>;
++		};
++	};
+ };
 
 -- 
 2.53.0
