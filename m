@@ -1,223 +1,135 @@
-Return-Path: <netdev+bounces-275030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275031-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uICKBVC4z2nfzwYAu9opvQ
-	(envelope-from <netdev+bounces-275030-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:53:36 +0200
+	id 4N0bCMG4z2kd0AYAu9opvQ
+	(envelope-from <netdev+bounces-275031-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:55:29 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BB773943D2
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:53:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 590913943F1
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 14:55:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 524403030E83
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 12:47:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 601E43075D6D
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 12:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21313A9D85;
-	Fri,  3 Apr 2026 12:47:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 715DB3AE6EE;
+	Fri,  3 Apr 2026 12:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b="NcwpiD7u"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="j1jVQVS4"
 X-Original-To: netdev@vger.kernel.org
-Received: from TYVP286CU001.outbound.protection.outlook.com (mail-japaneastazon11011048.outbound.protection.outlook.com [52.101.125.48])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036493A7836;
-	Fri,  3 Apr 2026 12:47:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.125.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775220456; cv=fail; b=u0oNCXoNTnkimU6cWyo+GfY2MveqWP8szPUfrOMNBlgnwM8ciBqg9k6GrQF/AaWFqVgrzDYRyq0mbeZo+XEowbrE0Gm1T58pzYo+qaHrCyIY771XkO7KPkbnLcfn3rVnZFZ0TLuSGewULInyYGKo7KFzHl2k8QSt327m0Q+NKnA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775220456; c=relaxed/simple;
-	bh=bHhFt5m1n2U3v8dV2MgrOcarDCbvrvZuPBwR0CUp8ZM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KlDMjKqBhxadpQBmONK2AZcYKxsRRxnrI5Q+/mDysohbIDhvwjcoM4fnGYN9FMzWZkMZHM11mamSetQe89s59k7AlaogMzOwxQTbLI3IWwwDhX4aXolvwzHP8KwKhhg4UF2muZhbwF10Fc8iyKgy9spnGff5WJSPT/71WzwymD4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b=NcwpiD7u; arc=fail smtp.client-ip=52.101.125.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qQbaG+R910nltKrc0qsvga8FkcdrYpF5M7dJsIL3UBGd1lsXwikbNTP5cYHifPPC5hcLyJ9412HiUkUBm78i7jzJ8cbESZwvXcIH9D/iYhsJFEYJEWKDnwNwX4w0c+TO+dFOtYtIFIPFbchm4XI3fKCKhcYGV7XwaZekRmhywxyk/LnEgg++vdeJ761bNKb+GWS+l71sstB+3szIPWYbwJRzzmEET37QSqXq85TlSwJUrLChnYdRIOp1ENkQONSVM7jr43EiNX9DjbPlJRKzaZz8AR7GBRdHs1SZKU97d5KSrstIrOCWvZlCBC9bW4Z+BDB+7os/OMbP0erHRNKUeQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X3vXeyMZEip46V4dvD0M14Wyysxd5ygUJDy5wZ+quJA=;
- b=Yd6EVkyj9W0b2G07zqFOLQIEhY1fQIjiOFMMZqUfC4fRuXkJGP8EfQV9f+1zlNwvCM4we9BDi9ti5DBWw5b4JAaK7UkmwD9n2KMnVN6973xIUK9TAKFvr8FNMv9LU/ZWy5m/ChFKIyM8v2zLlSMOsE6cBx7FG77Qg4yyJwGZuVTSNe2oBPdki1mV3nzzr99sv8MQNR5x/QYkcFwck6oKgFSP2sK7/855tJ6Q47/P1gCNMpsaYpHHqpC6uqGG1/lNHwjg8cRnqgtacgU+uCglQy4jqx+tSK0r0qIvzBpVV09xx+lVjo+XGfGeJW7SlFQgiziEG3m9dZ4nF4BJMJ0FTg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bp.renesas.com; dmarc=pass action=none
- header.from=bp.renesas.com; dkim=pass header.d=bp.renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bp.renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X3vXeyMZEip46V4dvD0M14Wyysxd5ygUJDy5wZ+quJA=;
- b=NcwpiD7uedLx4qOnFgVdA2QvjNVVg2NPRG4kE1wh+6ZPT7RvfjDmUsWeE240i1Ftlu5SatqWtYcrc+QX4iZQQ0dJaJ7P2/kvM0MtLuSMvU+9fZ8C/baa7GpLb0V1GKKBM2qXhfDMvmRIS2VrMLZvHekKM4NoifGZdf8uLoFOavI=
-Received: from TYCPR01MB11332.jpnprd01.prod.outlook.com (2603:1096:400:3c0::7)
- by TY4PR01MB17886.jpnprd01.prod.outlook.com (2603:1096:405:34a::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.16; Fri, 3 Apr
- 2026 12:47:31 +0000
-Received: from TYCPR01MB11332.jpnprd01.prod.outlook.com
- ([fe80::2511:10cd:e497:4d97]) by TYCPR01MB11332.jpnprd01.prod.outlook.com
- ([fe80::2511:10cd:e497:4d97%5]) with mapi id 15.20.9769.020; Fri, 3 Apr 2026
- 12:47:30 +0000
-From: Biju Das <biju.das.jz@bp.renesas.com>
-To: Ovidiu Panait <ovidiu.panait.rb@renesas.com>, "andrew@lunn.ch"
-	<andrew@lunn.ch>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
-	Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-Subject: RE: [PATCH net] net: phy: micrel: Fix MMD register access during SPD
- in ksz9131_resume()
-Thread-Topic: [PATCH net] net: phy: micrel: Fix MMD register access during SPD
- in ksz9131_resume()
-Thread-Index: AQHcw1uOXzjJ5f4us0+uUd80lAj1i7XNRYKg
-Date: Fri, 3 Apr 2026 12:47:30 +0000
-Message-ID:
- <TYCPR01MB11332623A3F7FF4601FE8C35C865EA@TYCPR01MB11332.jpnprd01.prod.outlook.com>
-References: <20260403111738.37749-1-ovidiu.panait.rb@renesas.com>
-In-Reply-To: <20260403111738.37749-1-ovidiu.panait.rb@renesas.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=bp.renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TYCPR01MB11332:EE_|TY4PR01MB17886:EE_
-x-ms-office365-filtering-correlation-id: 4ed9cbe8-5c5a-468d-03ac-08de917f2b5b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|376014|7416014|366016|38070700021|22082099003|56012099003|18002099003;
-x-microsoft-antispam-message-info:
- CLWekKLTnwsNSS0wjEUbKAdEA7YkMTtJNntjbaRk2eBwWqAJLGxcerJhYeHStwJwoueoWmMF1+sgQYh40xlcC4ekh+8k54+acImXE6cqmpnGp5RtSKQacuBpqYJoYGhJ8DW9hJXnQt1iCpwqVWi4cW2doVRK/Ux3rc9JyLglc+BYox0plNT+rB4WIHRmC7JuwO324ZnQNoK9e2MphSM1y/OYq+zvGVwuI0Y7/0oNy81cqxU/tPhPImx/uCLc6v31qda3mPELK6gXWNIt1FFkXXzo0980Kr1fwtU0ptMxlHPyCHrrz79dZVyqcz6L/rmIyOT9lLqG0d20eZFMLSrZOB//TfvC2w/hfO5dozzwDRCbXSX3NiiwyHymj8RXZ4qs/vtKSn6/yihSjeCSon3LgKZ8IPGoXHdXPh1uweJ7ayDPkW6mZUPiPZX+UVD2ctNt/oPpxmBohBbKaIxmlpQTH4bfQtsAWEqiEif9eIKg9SNnHckmkgEqlQRXCMD/QhtCRQDjL76BqcYthuTLYBmuhnOrbdqdfttbkL5YjusxAfJPbbIGTqLS9Ih6M7vgZykZnDIKgKsoXwAK/nzHgqH71HX2c+EfQrbgZ4g7bDUj+oFp0hq2AMe8RstbgS1O7MxspaFKNAGDf6fp4n+zAlZ+A1LEF2Sra24d4ejAvTzaDku4lsLDfM2i+aha4fdgLw1tcWJUnRRCSAiwPZEN0nSUQUeb1ToimdTW9kaDS/7Q3l5eg3RhJ1fjK4+frmYh+WBPXFWQuRAqB4Sgn7X9QTVNZC8k/0uz9BSa2DAwbVFZHrA=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYCPR01MB11332.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(38070700021)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?ucOS8Sd3gjcIWB+QbsVAd8DXrj+cBUdRHZixNIhm2s8kETtFPdBU25BCJLG7?=
- =?us-ascii?Q?mpTQt1R+aoxvRhK0O02W+c3cuq1oDsYvLgmHB5kSNNjbv+saSl6rPAZo414p?=
- =?us-ascii?Q?4Kw4pTNBXF70r2CLzzZNKqvBZeoUKiL4emisvANQERa5dPSoId+HVDGsMHXF?=
- =?us-ascii?Q?Cop5JscoD7s9qX0tF9xl7u8ZlLwx+fibEeDSRj3hpWwT9FJbOp/KSxGUSBJE?=
- =?us-ascii?Q?KBx+LundI1m2JsGsKqAC9pC6x/xS05pjzr0SBTg2Faxs8mwJCEsQH7k2K969?=
- =?us-ascii?Q?uUUOx666dCVZDgALh7CLn0SmCs9NiUbOgg3Yn1KLxNwAeqo3eoNTaBhk5LtM?=
- =?us-ascii?Q?1BETKeDOehxrIXm4CTtEUEqYg236FomrXt55Xjv5lPWzF9VmrnWw/snJyFX1?=
- =?us-ascii?Q?D01umFmTlkd2P0I1rkT4wIaJs5yNdTWYSfa1OrQus/Ff67WeNFeG6N+YCl8f?=
- =?us-ascii?Q?hM0ZwDTyNsy+2O8/fEjlEM7RxdfxMD/0tP1Du5/y9PQmu45hIl/dDESaz7Ae?=
- =?us-ascii?Q?CAQgbBAGB+lMI+gs8bx77uhqOjvQ1Ydkh24OFSUf9PXYSlbRTGF0Wf0vXHl8?=
- =?us-ascii?Q?AuKyHFRAFCJMVGR2TgoxhLjTsOBRPfOpAWR/hq5HD7GD9i/Hzc05n7V8CPlr?=
- =?us-ascii?Q?TKLAoFaoUG1JTJqJ2lqNzjdWjctV0U/YmHO+O/p1xG4DtRVBUylxYhydRlix?=
- =?us-ascii?Q?3Qqhq9GTcc4HIhR8QENd9GTnpoiHZkoMbBFPbmbzMqeoFyjumQR8HVqb6oH/?=
- =?us-ascii?Q?Npg1FGk0RsTbyOgmiqgF5IFrNigqnJj82BfsrGY3jIxkGBzvIZai1cyCHoDj?=
- =?us-ascii?Q?WrK6+Wb4XeqBSOCdB9W3OdHCZeN73RBajFUjaAHuWqnWBvPtLHF55xMfZ8ba?=
- =?us-ascii?Q?71xAZ1Yi2gIVXiE6jAe7FE0zTZATrNuF9MuY+cdPLhNbo8McEbfMIKFZc4Nr?=
- =?us-ascii?Q?qAStp7KQYr0k0JNW7d2oceC+80xJnWpw2bbSYp7IxeT8PZkR39ueeF0kTNmG?=
- =?us-ascii?Q?PbM1lx3R+76ByYqV6Nceqss6hUXdU+S55Rx6jhZgYuXSAe1SZ5ltT/mGd9NZ?=
- =?us-ascii?Q?BSt26zTc2npooitVbfM1fJ7jdQd6y28fTABUtqpIvbBaVpGpKTLxjyYAKoej?=
- =?us-ascii?Q?5jbbiP3Fm94rZ/VQ+QAPmS3fG65Nca12g8biKQKh7NmCGKtffxNKFdSJXYGJ?=
- =?us-ascii?Q?V+bf4BwnLcp1zROT8JGAxZvHAFAAkYx7voyc8PAu1A3BodYyZzVf94/RouYr?=
- =?us-ascii?Q?znQyr7e1U95v4DJOBVlJJhOunyiQPubRkZqnDOPzvEAVLKpFjZ737qDo2y+Y?=
- =?us-ascii?Q?O79T2O7trvjuu4EUXQ+65spV2PG30MIttTaK1KHHvtUkdvVTcNxurzTiMdJJ?=
- =?us-ascii?Q?60HlghE8oIQrX7L9B+Td9uE00Qnkq0yYmJN6fbXEVX7ZtJ5X9FdbBO6dIWvs?=
- =?us-ascii?Q?NYBbyhFtduK1rObkOfL/aB82+FNn4qaTf0F7VjKqtIyLNB388//fORbIoUth?=
- =?us-ascii?Q?2PkO+BebS3eVjfEc6/fsB4vO1KEB/4LWIe1d39qUzrNga70BOlS9rxPVXcgi?=
- =?us-ascii?Q?VydHwinG0Qe4fENpk+Gwm/pG7ubMdUb8e7x5GBelu7pouRfRZ6TYUjm78vHd?=
- =?us-ascii?Q?D3l4FtYaT6i64bxGvUXVNOM/ZWiFcYe4BFB5J1YODaCdViHSHToXFb/V65bp?=
- =?us-ascii?Q?LVaREt8aZuvMQyAL87laOWdAdZLwwNxDJsxAfsmI8EE75Wcorw/Ry2j+SrcF?=
- =?us-ascii?Q?d8HYo3vD8tM967NDVntmA1fnNF46HdI=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861FF239E7F;
+	Fri,  3 Apr 2026 12:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775220555; cv=none; b=YU5RHyAgHOmJK0TtHB/mrII8y46GJr9GKRqAK8Lqk1h436Yzg+ZTmc8lU6hjGamyKcV9qlxrrnfh75mybFD/8Q4XsEpAkXxXdU7+LDRJlnZwzoRJ2nBVR9+kM2/fmjrLVyTxWFF9RG4WEFqKtwWYmn/oFX/UcalClvu0MI8whZc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775220555; c=relaxed/simple;
+	bh=+Gmps33FngXtRV+HbcVt1uHDIEW0qTrIRlrmLWpPgxU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uzlxQStfV5n+apwSRr7zw/iSCPyFWS21TsbtQBy/ZPtXKbsTy+FZ4X3SoyXSpvXIALKZzde0GeMlC+1VGNAv61mrtNpUqql3EoJT3G0rUBAW68zKnTFzfthhksazPdEVzQHwWBuxKeizGDn9m+AzvTToGaUswtmGfam4rbQej4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=j1jVQVS4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EDD0C4CEF7;
+	Fri,  3 Apr 2026 12:49:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1775220554;
+	bh=+Gmps33FngXtRV+HbcVt1uHDIEW0qTrIRlrmLWpPgxU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=j1jVQVS4CboefT/ydBqJV/WJLRbiSr2Vlw5cdSsqh1FRxxdaSK2DnseVCQHRn4D5c
+	 LGXeGgzVX2qO2UsbBeoejZOPYqhynBoXV/x79SoyjrXKicJNo0XRMek61VwTHH0LQj
+	 W5GLKTL4ZTM+tDLloJh4lLU0shva0G4RByG9T5QY=
+Date: Fri, 3 Apr 2026 14:49:11 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: "Korenblit, Miriam Rachel" <miriam.rachel.korenblit@intel.com>
+Cc: "He, Guocai (CN)" <Guocai.He.CN@windriver.com>,
+	Thorsten Leemhuis <regressions@leemhuis.info>,
+	"Berg, Johannes" <johannes.berg@intel.com>,
+	Friend <netdev@vger.kernel.org>,
+	Linux kernel regressions list <regressions@lists.linux.dev>
+Subject: Re: commit 0c4f1c02d27a880b cause a deadlock issue
+Message-ID: <2026040349-chowtime-freeload-5ca4@gregkh>
+References: <CO6PR11MB5586A4475A5EEC47FC10398BCD53A@CO6PR11MB5586.namprd11.prod.outlook.com>
+ <PH0PR11MB55934A1C9A8C35B1E751C247CD50A@PH0PR11MB5593.namprd11.prod.outlook.com>
+ <14d65103-8809-4a1b-b115-bf5f8d7110ea@leemhuis.info>
+ <CO6PR11MB5586DF3964BAB4E6131A86CDCD5EA@CO6PR11MB5586.namprd11.prod.outlook.com>
+ <2026040331-evasion-walk-f572@gregkh>
+ <DM3PPF63A6024A9C09C1B13E5DF46C0B72AA35EA@DM3PPF63A6024A9.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: bp.renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYCPR01MB11332.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ed9cbe8-5c5a-468d-03ac-08de917f2b5b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Apr 2026 12:47:30.6095
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Eo3cBA0cYDhDX4ttg1j3JJG5kXs53Er6AZANUJC0JDdzXYmWEqIeruk0/LrQJ1qnbxO85eHaQDV7+Nnr22+534JLVTxPNZ9aR7xaBnrCBfY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY4PR01MB17886
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[renesas.com,none];
-	R_DKIM_ALLOW(-0.20)[bp.renesas.com:s=selector1];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM3PPF63A6024A9C09C1B13E5DF46C0B72AA35EA@DM3PPF63A6024A9.namprd11.prod.outlook.com>
+X-Spamd-Result: default: False [2.34 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275030-lists,netdev=lfdr.de];
+	TO_DN_ALL(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-275031-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[renesas.com,lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[bp.renesas.com:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[biju.das.jz@bp.renesas.com,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,renesas.com:email,bp.renesas.com:dkim]
-X-Rspamd-Queue-Id: 6BB773943D2
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[windriver.com:email,linux.dev:email,leemhuis.info:email,linuxfoundation.org:dkim,linuxfoundation.org:email,intel.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 590913943F1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Ovidiu Panait,
+On Fri, Apr 03, 2026 at 12:44:48PM +0000, Korenblit, Miriam Rachel wrote:
+> 
+> 
+> > -----Original Message-----
+> > From: Greg KH <gregkh@linuxfoundation.org>
+> > Sent: Friday, April 3, 2026 2:27 PM
+> > To: He, Guocai (CN) <Guocai.He.CN@windriver.com>
+> > Cc: Thorsten Leemhuis <regressions@leemhuis.info>; Korenblit, Miriam Rachel
+> > <miriam.rachel.korenblit@intel.com>; Berg, Johannes
+> > <johannes.berg@intel.com>; Friend <netdev@vger.kernel.org>; Linux kernel
+> > regressions list <regressions@lists.linux.dev>
+> > Subject: Re: commit 0c4f1c02d27a880b cause a deadlock issue
+> > 
+> > On Fri, Apr 03, 2026 at 11:08:46AM +0000, He, Guocai (CN) wrote:
+> > > No, The mainline have no this issue.
+> > > The changes of 0c4f1c02d27a880b is not in mainline.
+> > 
+> > That does not make sense, that commit is really commit e1696c8bd005
+> > ("wifi: cfg80211: stop NAN and P2P in cfg80211_leave") which is in all of the
+> > following releases:
+> > 	5.10.252 5.15.202 6.1.165 6.6.128 6.12.75 6.18.14 6.19.4 7.0-rc1
+> > 
+> > confused,
+> 
+> The change is indeed in mainline, but the locking situation in mainline is totally different
+> (that mutex does not even exist there)
+> Therefore, the issue is not supposed to happen in mainline.
 
-Thanks for the patch.
+Ok, does that commit now need to be reverted from some of the stable
+branches?  If so, which ones?
 
-> -----Original Message-----
-> From: Ovidiu Panait <ovidiu.panait.rb@renesas.com>
-> Sent: 03 April 2026 12:18
-> Subject: [PATCH net] net: phy: micrel: Fix MMD register access during SPD=
- in ksz9131_resume()
->=20
-> During system suspend, phy_suspend() puts the PHY into Software Power-Dow=
-n
-> (SPD) by setting the BMCR_PDOWN bit in MII_BMCR. According to the KSZ9131=
- datasheet, MMD register
-> access is restricted during SPD:
->=20
->   - Only access to the standard registers (0 through 31) is supported.
->   - Access to MMD address spaces other than MMD address space 1 is
->     possible if the spd_clock_gate_override bit is set.
->   - Access to MMD address space 1 is not possible.
->=20
-> However, ksz9131_resume() calls ksz9131_config_rgmii_delay() before
-> kszphy_resume() clears BMCR_PDOWN. This means MMD registers are accessed =
-while the PHY is still in SPD,
-> contrary to the datasheet.
+thanks,
 
-SPD mode: This mode is used to power down the device when it is not in use =
-after power-up.
-          Previous register settings are maintained during and following th=
-e removal of SPD.
-
-Suspend to Idle case, it is in SPD mode and the MMD register values are ret=
-ained.
-
-But in Suspend to RAM, PHY loses power and the reset value of Power Down bi=
-t 0 (ie normal mode),=20
-there is no restriction for accessing MMD registers in this mode.
-
-Am I missing anything here??
-
-
-Cheers,
-Biju
+greg k-h
 
