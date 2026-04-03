@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-274908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-274909-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6LsKFW5pz2lPwAYAu9opvQ
-	(envelope-from <netdev+bounces-274908-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 09:17:02 +0200
+	id yFt3Lappz2lPwAYAu9opvQ
+	(envelope-from <netdev+bounces-274909-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 09:18:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AA23391A3E
-	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 09:17:01 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E074A391A7A
+	for <lists+netdev@lfdr.de>; Fri, 03 Apr 2026 09:18:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2A6F23065F3D
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 07:14:50 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 14CB13037BD1
+	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 07:14:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B396C365A11;
-	Fri,  3 Apr 2026 07:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895EE37EFF3;
+	Fri,  3 Apr 2026 07:14:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hW9gkIYJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j4g99Lkd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f202.google.com (mail-dy1-f202.google.com [74.125.82.202])
+Received: from mail-dl1-f73.google.com (mail-dl1-f73.google.com [74.125.82.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B623793C6
-	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 07:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3254437C911
+	for <netdev@vger.kernel.org>; Fri,  3 Apr 2026 07:14:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775200475; cv=none; b=g17uG0rhvaaON9PZle75u3QsoNFKQAvXl1tSDMR2Z3W/m4hcSwMI1jZu4s9DPUtioYKi70NsEjP7sKe6D6oJwUDSWX86x1BJdox4TP1IAsrKCjc8EoNPs9EDk1J7Sx7phMkRbjBCM3rhYrBOBDM3t25vywC+qEi+7DEN/W6x+y8=
+	t=1775200476; cv=none; b=SSmKNN3FPigwjGXdDCXUk1uXNAkyQJxXanif/j3//ARCv0klnVeBGNuot9GPmRrL4Sfojs6aswmOnLh4IzHKVGdUCUVUkfOh25AUUmOy7dVvFT8ziH2InvjmfxQVa3eZVpl92lZZbxIRrZOUXXfdJyqDnLRfiSMa+wPVWGO2uRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775200475; c=relaxed/simple;
-	bh=JjS6MuWrzLQ484r+Wytp35TgT78rt/ZzACL6KUmL0o0=;
+	s=arc-20240116; t=1775200476; c=relaxed/simple;
+	bh=/N3Ja4dG8+jpoPt6AyAOHBDaHZGDjq1at+rTrxPopSQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gLKzel0/I7i/tQZqUdLX90RSxbbI3mWwTX1GUWK7RGr9gwEcCItKMrz3VHjmlu+xz7S//9TY0ePlV4TvDRycJmMmo8gA47H5u38wCybua75tPioOex2XmrJSlASS5w6wEDDJFMrBnHoL8IeYe1Om28LgelHJkdxkkR80wG6+p10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hW9gkIYJ; arc=none smtp.client-ip=74.125.82.202
+	 To:Cc:Content-Type; b=iwDWFt3ABcRVhHu2v5MoGzEBy8mxtla/KMPB0SVk4oxxQJZPxvkiahEn0ejTrdlhHCSiIe8gkL9tx+onRcx0gn4G3HUkLTFrkZdz62I/FcS/BtuPZwwAzbHib43jMzuNnTGnXoTf1FUsR6xo+2PVc/LFXHA4mwCyMfn/VuvcbJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j4g99Lkd; arc=none smtp.client-ip=74.125.82.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--marcharvey.bounces.google.com
-Received: by mail-dy1-f202.google.com with SMTP id 5a478bee46e88-2c0ba59a830so2255590eec.0
-        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 00:14:33 -0700 (PDT)
+Received: by mail-dl1-f73.google.com with SMTP id a92af1059eb24-1270dcd11c1so2780709c88.0
+        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 00:14:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775200473; x=1775805273; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1775200474; x=1775805274; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sH3+awQ2VJG9FRCmCvGcnPpepbVJPLxWI2KeuMcmXiQ=;
-        b=hW9gkIYJtQ1qvaWk91pKISPu5N/MRg+yxakbe/DC1Q20i6sfRhqnZtqGuBJDubtg0k
-         QwEbI39QKGeQceEPGiouhSNFOi6ttMid79GpiVhN9g6e13sNx7+Wcgu/IilKJvmKIcpS
-         j51QBLPmdWy0Y6Un5u7sSKHLTctEQ5KuvcilrlzDLgqdRsXVNiE3GroOq6i4EP2HggP1
-         yl5IpYq3hbQo6nJVknO8AHBuh7xFSQE8l7iAOaesWlu0rYe3G63c4maOgyXJESJc43Xl
-         h4ZlVtAvFuMRjqD+ZLMQM8Ws0F/BZzbFdJiVTcze1kA+8P0iiavinX95F1EmpfiuozKh
-         l6Xg==
+        bh=/oRMa+U4zWiyNm2ajh9HytcVZ9+GoADzxNsQhgJNjBI=;
+        b=j4g99LkdW4vMmUjAsT3fHAIWFmbEtnRYFdscXqh1SneuBW3dlJN3GF2VHeyP3k6gW2
+         kEFt86KSwn6dFpzBHYOo9LYlrzqyn/SD0BMVUDKm+GI9w7aQZGyvYSp9Cwr/6Y97QczK
+         hiEOHEhQAw2TIKSWG1bUAkWpFmveueEzk3psoLDsFUlOzepPtT5TVRvbL5VYGJTl/A3o
+         K3GzxWEHR0s/wA3tZIbNJyiMYdsRm6hZHhH0XtB1sWk3nbbaCG9Sa6BTKCobZN4RImyv
+         bqbic2FgTWnujgIF6L4mG+sdIrkSi+b34lyCZPc8tLYo9fxt/dVaYUhk0wR+3GZeNesf
+         cZbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775200473; x=1775805273;
+        d=1e100.net; s=20251104; t=1775200474; x=1775805274;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sH3+awQ2VJG9FRCmCvGcnPpepbVJPLxWI2KeuMcmXiQ=;
-        b=dUJWh2eIyzuXvJ8Tw9itqDmCcBReraqfzI6JmvAvbzH9nwRR+1PSOQfNTX/4WzS//1
-         MoPgRGhxqx87fcKM3viCeh6gnmXPvEgWvra0+4vIC0K/zBucWmhoNqkYpzRQaA7NttTz
-         cTqSzGhO3thCqMlD06yTWatkDiJQnGEVZxg5i0Yvu8qbymrvcuaSiZlqbbc1mzce5y1Q
-         hT3/SHZxsXcb15nowTKcWvMuglIv4+kv8gZuA187bkoitzHd6UoVnVkkd+N9XZ6kQ5Uc
-         35pJYDvh7+AzlVaFGWf243hI+D1nwzGBkiaULA62+29kkRmFU87NZi6MdECf5kTfU3jB
-         gdvQ==
-X-Gm-Message-State: AOJu0Yw5KvSPuM4rMhlrWfzm+zs4GjTR0TgqBuJRfEzWiCYtYh8OpTZ2
-	xymvAc618nKdFfUpf0Wp18s7EJzJ8/8ceUv9/y5ppVflMwxwI6PofPyhFW9qFkxiAoR0Mge9ywl
-	05SvOZFSJSN5/7lr/92T7Mw==
-X-Received: from dyaf11-n1.prod.google.com ([2002:a05:693c:838b:10b0:2cb:735c:182c])
+        bh=/oRMa+U4zWiyNm2ajh9HytcVZ9+GoADzxNsQhgJNjBI=;
+        b=gfuNkY88ouEPzVPMT2mXNUAQUlNegSB6ra8fTaGU1wGmsayjvjlxVGmPyEAVgyTlom
+         JAiMHI+PSr1RIHsmZDKL3eCCkdmo2zF10q5+RHaZwnRvBcZ8Lfu3wC69yUAUIxrBLevd
+         1YokCft+dANEviFQseeHKMwPAZw5zKvWoq12XjAjr74NIPW5WcyQURgaekGr+/ENDHbD
+         3E0UFTNzCS9M2oLAzk/50lGsWcdWAHPyLRmH9d3qEdgL02SqzHOADcw0bIOyGzJHUkRV
+         1YPigrdcB63WEpmurHGfiR7EUVRMuYhPQzCGOaG6QjUGHg6TWaqkvDH7MRAuueXxBuGk
+         Uyxw==
+X-Gm-Message-State: AOJu0YyPr1boGGx5iPPhcRi36A62ic1H5sP3OK/Yj9g+mAx/eGcE8wKV
+	V/T4KcGFBwLbKKCnPBsZyr3P0FR0O+EGJS860Rex5yhLemNWM7/0MJKwDetWlqI3Ar4G0qoOzxf
+	qUHHP8IuYGS/Cn3cIxt74RQ==
+X-Received: from dlcio26.prod.google.com ([2002:a05:7023:c01a:b0:128:bbbe:13df])
  (user=marcharvey job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:693c:2b14:b0:2c5:d833:a4fe with SMTP id 5a478bee46e88-2cbfa5bf117mr923062eec.10.1775200472427;
- Fri, 03 Apr 2026 00:14:32 -0700 (PDT)
-Date: Fri, 03 Apr 2026 07:14:23 +0000
+ 2002:a05:7023:b0c:b0:119:e56b:98a4 with SMTP id a92af1059eb24-12bfb700b66mr954561c88.11.1775200474159;
+ Fri, 03 Apr 2026 00:14:34 -0700 (PDT)
+Date: Fri, 03 Apr 2026 07:14:24 +0000
 In-Reply-To: <20260403-teaming-driver-internal-v4-0-d3032f33ca25@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -75,13 +75,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260403-teaming-driver-internal-v4-0-d3032f33ca25@google.com>
 X-Developer-Key: i=marcharvey@google.com; a=ed25519; pk=OzOeciadbfF5Bug/4/hyEAwfrruSY4tn0Q0LocyYUL0=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1775200467; l=1461;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1775200467; l=2585;
  i=marcharvey@google.com; s=20260401; h=from:subject:message-id;
- bh=JjS6MuWrzLQ484r+Wytp35TgT78rt/ZzACL6KUmL0o0=; b=WaaKcCy6jw5XvMICkOKbYOhzmRWQdzj3dQmC//JznTNilpSYDLyMIPk7NU2fYSUCfczxIf585
- TUniz+tRtmCD+2aGkmk5rkyxA2PpoukSRZ62kUhqm0Eqbv4u7F5dDR4
+ bh=/N3Ja4dG8+jpoPt6AyAOHBDaHZGDjq1at+rTrxPopSQ=; b=HHr4OYKRZ3b9aY/0kw0j+0+dy3qCGxeh/d9NEuDX6U8rTwBUfqCDbTi1xEgr7R9xcYz7GuBwK
+ MGZ4WUfQsfGDXNPwfAC+u/mZi5GvXYzxuP09k+eEpbRt7vDg57RY7TM
 X-Mailer: b4 0.14.3
-Message-ID: <20260403-teaming-driver-internal-v4-2-d3032f33ca25@google.com>
-Subject: [PATCH net-next v4 02/10] net: team: Remove unused team_mode_op, port_enabled
+Message-ID: <20260403-teaming-driver-internal-v4-3-d3032f33ca25@google.com>
+Subject: [PATCH net-next v4 03/10] net: team: Rename port_disabled team mode
+ op to port_tx_disabled
 From: Marc Harvey <marcharvey@google.com>
 To: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -96,17 +97,17 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-274908-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-274909-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
@@ -116,11 +117,12 @@ X-Spamd-Result: default: False [-0.16 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCPT_COUNT_TWELVE(0.00)[12];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 0AA23391A3E
+X-Rspamd-Queue-Id: E074A391A7A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This team_mode_op wasn't used by any of the team modes, so remove it.
+This team mode op is only used by the load balance mode, and it only
+uses it in the tx path.
 
 Signed-off-by: Marc Harvey <marcharvey@google.com>
 ---
@@ -133,35 +135,61 @@ Changes in v3:
 Changes in v2:
 - None
 ---
- drivers/net/team/team_core.c | 2 --
- include/linux/if_team.h      | 1 -
- 2 files changed, 3 deletions(-)
+ drivers/net/team/team_core.c             | 4 ++--
+ drivers/net/team/team_mode_loadbalance.c | 4 ++--
+ include/linux/if_team.h                  | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index becd066279a6..e54bd21bd068 100644
+index e54bd21bd068..2ce31999c99f 100644
 --- a/drivers/net/team/team_core.c
 +++ b/drivers/net/team/team_core.c
-@@ -944,8 +944,6 @@ static void team_port_enable(struct team *team,
- 			   team_port_index_hash(team, port->index));
- 	team_adjust_ops(team);
- 	team_queue_override_port_add(team, port);
--	if (team->ops.port_enabled)
--		team->ops.port_enabled(team, port);
- 	team_notify_peers(team);
- 	team_mcast_rejoin(team);
- 	team_lower_state_changed(port);
+@@ -968,8 +968,8 @@ static void team_port_disable(struct team *team,
+ {
+ 	if (!team_port_enabled(port))
+ 		return;
+-	if (team->ops.port_disabled)
+-		team->ops.port_disabled(team, port);
++	if (team->ops.port_tx_disabled)
++		team->ops.port_tx_disabled(team, port);
+ 	hlist_del_rcu(&port->hlist);
+ 	__reconstruct_port_hlist(team, port->index);
+ 	WRITE_ONCE(port->index, -1);
+diff --git a/drivers/net/team/team_mode_loadbalance.c b/drivers/net/team/team_mode_loadbalance.c
+index 684954c2a8de..840f409d250b 100644
+--- a/drivers/net/team/team_mode_loadbalance.c
++++ b/drivers/net/team/team_mode_loadbalance.c
+@@ -655,7 +655,7 @@ static void lb_port_leave(struct team *team, struct team_port *port)
+ 	free_percpu(lb_port_priv->pcpu_stats);
+ }
+ 
+-static void lb_port_disabled(struct team *team, struct team_port *port)
++static void lb_port_tx_disabled(struct team *team, struct team_port *port)
+ {
+ 	lb_tx_hash_to_port_mapping_null_port(team, port);
+ }
+@@ -665,7 +665,7 @@ static const struct team_mode_ops lb_mode_ops = {
+ 	.exit			= lb_exit,
+ 	.port_enter		= lb_port_enter,
+ 	.port_leave		= lb_port_leave,
+-	.port_disabled		= lb_port_disabled,
++	.port_tx_disabled	= lb_port_tx_disabled,
+ 	.receive		= lb_receive,
+ 	.transmit		= lb_transmit,
+ };
 diff --git a/include/linux/if_team.h b/include/linux/if_team.h
-index 06f4d7400c1e..a761f5282bcf 100644
+index a761f5282bcf..740cb3100dfc 100644
 --- a/include/linux/if_team.h
 +++ b/include/linux/if_team.h
-@@ -121,7 +121,6 @@ struct team_mode_ops {
+@@ -121,7 +121,7 @@ struct team_mode_ops {
  	int (*port_enter)(struct team *team, struct team_port *port);
  	void (*port_leave)(struct team *team, struct team_port *port);
  	void (*port_change_dev_addr)(struct team *team, struct team_port *port);
--	void (*port_enabled)(struct team *team, struct team_port *port);
- 	void (*port_disabled)(struct team *team, struct team_port *port);
+-	void (*port_disabled)(struct team *team, struct team_port *port);
++	void (*port_tx_disabled)(struct team *team, struct team_port *port);
  };
  
+ extern int team_modeop_port_enter(struct team *team, struct team_port *port);
 
 -- 
 2.53.0.1185.g05d4b7b318-goog
