@@ -1,206 +1,148 @@
-Return-Path: <netdev+bounces-275361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275362-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qcdjIbr50GkdDAcAu9opvQ
-	(envelope-from <netdev+bounces-275361-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 13:44:58 +0200
+	id ePH1BHf70GlUDAcAu9opvQ
+	(envelope-from <netdev+bounces-275362-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 13:52:23 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEBA539AF61
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 13:44:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6555139AFC0
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 13:52:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 58265300AB35
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 11:44:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 204A43011749
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 11:52:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7B9329E47;
-	Sat,  4 Apr 2026 11:44:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RiUU3osu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD293321C2;
+	Sat,  4 Apr 2026 11:52:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87D3332631
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 11:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775303095; cv=pass; b=CT7mE+1vsiSXrJv/Vp1RB/XaP/htvPips2ybfR+bB70ghlHvRIY66qhUvA/FxRSsu/6MPJ5ENOZoGxZ9emLOLPZei5OfmVRjPEHXwpLYH5yq0EDh1Le4+LrNzv+HSWHRckqKOioR4nLLdvgtrrM1Nr8zxKbAoEXTlrWkEjqc/Ps=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775303095; c=relaxed/simple;
-	bh=VW1DIvTOrY598G6eAPXSPoQfWttzAN2Q8mb2Kw9czrM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SRuGSIb4ttP/BSrDXTKGDIBFBhCWwQFkgThmwGqNftETM5m1Rcbyvlk7AX28WAMz5eFhkJXiFOeWGR1dwCXBmh/CXV4P3mhpCdNJsYkjf6cxj/YwDf1o14tw5hYKMaI0Ptsx0N4XeQhctJCdLT4v05xo5Zup0eHyP+wRvzsb0+A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RiUU3osu; arc=pass smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-89cd8596724so32082326d6.0
-        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 04:44:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775303093; cv=none;
-        d=google.com; s=arc-20240605;
-        b=iGEazH8ePfwIUYPh1Td2L7Myz1eV7fg5xL3M6sxl87pcTPsXIQOT9yPnrEkhjx/4D8
-         GTwga9MgJj7pO7T+FHuQivoAhSj6rb4o3sQlI/ZjZ8LObt5jHeh047kD/+5v3FTILMRi
-         EIdxHZhBsA5exfI+FNKtb3csa+sopxXZ2PLc7Ilj24JRF3qqdMuF0s0PWp9Oo/YCdc0y
-         2Zc+ipRSG1+dE+8MN+plsSW89g/ffPm+us4PCEgcHrLb7CKS8XV8mi0DBXpDIRjMmmHw
-         NlhffIWwFuVsxP5/FqxN0vQmk8wa82Ez18zkJvXxHZPzx5Fhc226WAO7vC7yZb8yq/o8
-         EGAg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=fyMDP4OwVv4RKOfvwNTPXj32dglnNwC37byGuqS3llE=;
-        fh=AF5rQv8z7RHidkL4K0G4EHGF4qNy4hQjncMK++LjJ38=;
-        b=BWyemm2gQ7ke3a0CXLWm95M+rw1a6qh3S7qqdrstbMTSTCr9Obx3BQ+HC6m+ZcmP2w
-         Ha8UPXidNwbOaUa0p4LLnr/emtxhstQEwDND0KcaF7/k71mIixTFEXOWbvdNeoEczpkJ
-         ymF43L6FabUe8eIR/KiSCbQLTUzqpX4Y/iq4o2+0kiLHsLq402h7+NsPdxkDLNbDogFZ
-         h15QENQKEQDgSdY0HK5ctA+VxHY8ckTcnQNelcDbXlYSZpp2ee0NXNjRlyUMiC7RIZNa
-         s8QCoS/SLDaTbgYJHcrqNW1LgUV2Vn0eE/HHeGDTFVuZ+Y5axBobp6uBhctesWb1skhT
-         LV6Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775303093; x=1775907893; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fyMDP4OwVv4RKOfvwNTPXj32dglnNwC37byGuqS3llE=;
-        b=RiUU3osuu5Ci5DjwPfVrZo9agk4gzMTUWzeBzOv+KZGJn+iuOVxB0Ofq4B/tn6uPC7
-         JX97/99ebO0FoQazIdXndZoNMwnm9itnAFmwXwXSB9q0dM3gB7wR3K0WkSFEvEeJRC/u
-         b4+DZEu6CPGTCJzwz6fptSm7lYOk33ZXvmzUUnE96/Ha7z/rptdtXJp0cHu0z4K8STmL
-         U8e/9lxhZUTVUCytStYHiGFn2eOt0SASoupKr0v0n0lcq/R3WhFF8fyfih1a+Swllpht
-         /4uRtVY+S/Dabh4xLnhGZ/6COCafxNOq6BMUKyQBImyG094p6KyJhnVIpx2U4M0q4FKo
-         NVHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775303093; x=1775907893;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fyMDP4OwVv4RKOfvwNTPXj32dglnNwC37byGuqS3llE=;
-        b=ewZbTNFQaS9JU9fqZ7cyyWFOrGCvKO/OIt+P0jxo9Pd2BpR5dB7RtiXtFugRxw/drp
-         cnfArZR/kxcAoXJmSEIssII5Uc5szhiDdwhS0glL7Gsvb9VyFIeE66aRcavI6QWJ1iAn
-         tGC7OnE8m8KyvQwy7m/9SkOmQJkuxmcyqDM1TG1FdvAaC4M7RpXHch7DhOsCUZ+GkmDH
-         CZZpRjm339SmWhl1gqXqIux0PhFaR53glVpy16i7hR1J4KI5GMr5UJQwlCKO3g9MLWTb
-         4zZTNkip/3dAAU3RP6E602m7AWtfxWL/PzGlFAUsEWoCBVJNhCwP5lNbDPKi2V5yqlNY
-         n8Mw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+Vb0KbSF+kCpKiZCThHPb1BxZ2f9r0biIi2Gs1lsdcTdJ8T0AHcshqf7OOTLXRwmKtNDpzy8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOKNzgJIxq868GsByvhf3qtDZxuDOM57Y7qfctvzm5in4ciA8I
-	TSPAdIVbkPn6Rs8FItbbZbxmIiXT6MaEZY9EQzACsxokER8wWlu19u8Zjvjzg2nzlvB9c8fDxKm
-	9T/F6hJdpLFKE+6NjM+QzuJZ61BtqhcoeWGFOo+9RpXrnsZjDZZaetwcR
-X-Gm-Gg: AeBDieuagphsCd0CPrauul7JfSPAa9f+w1wfnsEcoZLJTWtSREjWyXW8m6nCadVFEvR
-	Zo3kErtdWsw5SDI0UQKyPlVykpA8h+E0GafdMinzAcMHEoiDHHNNj+3GZXVrUediqdaad/v+7f1
-	sTV8SnLEcsJ6wMSuoZ1hj1uvXVCqLfjL/S9rPfsolNH+QssIYmlYHmA17qP/kCXJhylC2hTfVX1
-	8HOylSpWfdT+PSHsU37wKs2ZPMKnoZNeX3uc0BkZvK0YFWUM7J7YiP6era1OUXEQ4CHtw38KQZW
-	s6pX
-X-Received: by 2002:a05:6214:4e16:b0:89f:48d0:4c9 with SMTP id
- 6a1803df08f44-8a704cb264dmr93610946d6.46.1775303092216; Sat, 04 Apr 2026
- 04:44:52 -0700 (PDT)
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B96042D5432
+	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 11:52:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.175.55.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775303539; cv=none; b=rb3QGXnMJ48fMw4QWT0OPeUAqKxl8a0jQVBIThqbEqeUR7xRZuAio14+pHJkIA9HSryQ6zjqqcg0qLYKpYkIYG5CmcqDTJl/wWgfRpUtkJKp5F9p2/Yn0tii0cmj5/sYcTOC9ot4GxCUhgCjbYe/8zqZSt7hQSwNqNcFlKuXyf8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775303539; c=relaxed/simple;
+	bh=HCK2E1Lz4FHwtzy64FBpm7QYgbBQ8bRmQTR0k+ZUD+k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jDJRQXXICp0NsGuNjcdEwk44WIfH8ofCAuoofJvjhhCVh5k6aLQkzp/AZHJmXmZD0Hcwx7M2kIoC1vG5aS1CwsWYgiG82eeLZhRvUJ5ZS7ZtoVy7RxQbDuAE+3BrWMAXyDOKa+XIW4o6NgViMkTOf93Nt+Mx4bMsqjkaYaedDnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.175.55.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from Draw.localdomain (unknown [172.23.146.222])
+	by app2 (Coremail) with SMTP id zQmowAAnvoRh+9BppMoxAA--.19647S2;
+	Sat, 04 Apr 2026 19:52:01 +0800 (CST)
+From: Ao Zhou <n05ec@lzu.edu.cn>
+To: netdev@vger.kernel.org
+Cc: David Ahern <dsahern@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Yifan Wu <yifanwucs@gmail.com>,
+	Juefei Pu <tomapufckgml@gmail.com>,
+	Yuan Tan <yuantan098@gmail.com>,
+	Xin Liu <bird@lzu.edu.cn>,
+	Ao Zhou <n05ec@lzu.edu.cn>,
+	Haoze Xie <royenheart@gmail.com>
+Subject: [PATCH net 1/1] net: l3mdev: Ignore non-L3 uppers in l3mdev_fib_table_rcu
+Date: Sat,  4 Apr 2026 19:52:03 +0800
+Message-ID: <b3b88cddc7e79d4b43756b26ae5db965678f3ba9.1775062214.git.royenheart@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1775062214.git.royenheart@gmail.com>
+References: <cover.1775062214.git.royenheart@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260402101732.1188059-1-edumazet@google.com> <20260403214418.2233266-2-kuba@kernel.org>
- <CANn89iKUKTYZ7NVNidtdssZXUAa95LmRpTYUQ29uGE99jLmLOw@mail.gmail.com>
- <20260403145010.4b4e5865@kernel.org> <2de5a3d1-cc8f-48c2-a590-09bef92e9adb@gmail.com>
-In-Reply-To: <2de5a3d1-cc8f-48c2-a590-09bef92e9adb@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 4 Apr 2026 04:44:41 -0700
-X-Gm-Features: AQROBzDkMNSp4NQ23eAf-HBNjt6rEaXZR3BrL7aisUDHAw9zsWhBmMHoqKqJIAA
-Message-ID: <CANn89i+QK6cWseXBAbwZaWcUGG6n+CbuWV-4b97x2LmDJoGjTQ@mail.gmail.com>
-Subject: Re: [PATCH net] ipv6: ioam: fix potential NULL dereferences in __ioam6_fill_trace_data()
-To: Justin Iurman <justin.iurman@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, pabeni@redhat.com, 
-	horms@kernel.org, dsahern@kernel.org, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, yimingqian591@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQmowAAnvoRh+9BppMoxAA--.19647S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7WFy7Kr4fAr4DXFyxKw43trb_yoW8Xryfp3
+	y3GF97KFWrJryjy348A34xuryDZr1DKFW7G3ykAr43W3ZrA3yUX345K342vFy7J3yjkr43
+	Xr12grZ5W3yrur7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
+	jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
+	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_
+	JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
+	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUFg4SDUUUU
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQIHCWnP4nwGewAAsI
+X-Spamd-Result: default: False [-0.96 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275361-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,redhat.com,vger.kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid]
-X-Rspamd-Queue-Id: CEBA539AF61
+	NEURAL_HAM(-0.00)[-0.992];
+	MIME_TRACE(0.00)[0:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_THREE(0.00)[4];
+	R_DKIM_NA(0.00)[];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,gmail.com,lzu.edu.cn];
+	TAGGED_FROM(0.00)[bounces-275362-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 6555139AFC0
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Apr 4, 2026 at 3:13=E2=80=AFAM Justin Iurman <justin.iurman@gmail.c=
-om> wrote:
->
-> On 4/3/26 23:50, Jakub Kicinski wrote:
-> > On Fri, 3 Apr 2026 14:47:32 -0700 Eric Dumazet wrote:
-> >>> If the ingress device has more RX queues than the egress device (dev)=
- has
-> >>> TX queues, skb_get_queue_mapping(skb) will exceed dev->num_tx_queues.
-> >>>
-> >>> Since skb_get_tx_queue() does not clamp the index, will it return an
-> >>> out-of-bounds pointer into the egress device's dev->_tx array, causin=
-g
-> >>> dereferencing queue->qdisc to read invalid memory?
-> >>
-> >> This seems a different bug ?
-> >>
-> >> I mean, do we need to fix all bug in a single patch ?
-> >
-> > no no, sorry, i'm just sending this out for Justin or you as a separate
-> > thing.
->
-> Thanks Jakub, I don't know how I missed that. It's not just about a
-> possible OOB: it's actually incorrect for IOAM to do that because we're
-> relying on a lucky assumption at best (i.e., if queue_mapping on RX =3D=
-=3D
-> queue_mapping on TX). This unfortunately rules out the possibility to
-> have an accurate per queue visibility (which I originally provided for
-> flexibility). I've had a local patch for a long time to aggregate the
-> queue depth (i.e., sum of all TX queues). It is more expensive(***), but
-> it would kill two birds with one stone and solve both problems
-> simultaneously.
->
-> Jakub, Eric, please let me know if the following plan works for both of y=
-ou:
-> - (net) fix the OOB reported by Jakub (and, while at it, add missing
-> locks around qdisc_qstats_qlen_backlog() -> also included in my local pat=
-ch)
-> - (net-next) after the merge window, add the new feature
->
-> After that, the per queue visibility would be considered
-> legacy/deprecated and not the default behavior. Documentation would be
-> updated accordingly to explain why per queue visibility cannot be trusted=
-.
->
->   (***) the advise to operators in such a case is (obviously) to reduce
-> the IOAM insertion (with the frequency parameter), especially at line rat=
-e.
+From: Haoze Xie <royenheart@gmail.com>
 
-Getting qdisc stats can be expensive for qdisc with per-cpu storage
-for counters like pfifo-fast.
+l3mdev_fib_table_rcu() assumes that any upper device observed for
+an IFF_L3MDEV_SLAVE device is an L3 master and dereferences
+master->l3mdev_ops unconditionally.
 
-If your plan is to sum MQ stats, this could have quadratic behavior :
-O(nr_cpus ^ 2)
+VRF slave setup sets IFF_L3MDEV_SLAVE before the upper link is fully
+switched, so readers can transiently observe a non-L3 upper such as a
+bridge and follow a NULL l3mdev_ops pointer. Require the current upper
+to still be an L3 master before consulting its FIB table.
 
-I suggest rate-limiting this very expensive operation, or OAM will
-become a nice DOS tool.
-(Ie not depend on operators being nice, enforce this on the hosts)
+Fixes: fee6d4c777a1 ("net: Add netif_is_l3_slave")
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Signed-off-by: Haoze Xie <royenheart@gmail.com>
+Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
+---
+ net/l3mdev/l3mdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/l3mdev/l3mdev.c b/net/l3mdev/l3mdev.c
+index 5432a5f2dfc8..b8a3030cb2c4 100644
+--- a/net/l3mdev/l3mdev.c
++++ b/net/l3mdev/l3mdev.c
+@@ -177,7 +177,7 @@ u32 l3mdev_fib_table_rcu(const struct net_device *dev)
+ 		const struct net_device *master;
+
+ 		master = netdev_master_upper_dev_get_rcu(_dev);
+-		if (master &&
++		if (master && netif_is_l3_master(master) &&
+ 		    master->l3mdev_ops->l3mdev_fib_table)
+ 			tb_id = master->l3mdev_ops->l3mdev_fib_table(master);
+ 	}
+--
+2.53.0
+
 
