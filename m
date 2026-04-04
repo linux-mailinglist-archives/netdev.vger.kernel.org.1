@@ -1,146 +1,205 @@
-Return-Path: <netdev+bounces-275417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275418-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kGYgDOCY0WmdLgcAu9opvQ
-	(envelope-from <netdev+bounces-275417-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 01:04:00 +0200
+	id UPyqK0yZ0WnILgcAu9opvQ
+	(envelope-from <netdev+bounces-275418-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 01:05:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8417D39CD22
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 01:03:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B17339CD31
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 01:05:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2691C300EA92
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 23:03:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CD2203006793
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 23:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3BC367F5A;
-	Sat,  4 Apr 2026 23:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E583D35CB6F;
+	Sat,  4 Apr 2026 23:05:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0ztXRYAL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JwFqL5MR"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF1F33CEA8;
-	Sat,  4 Apr 2026 23:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4553291C10
+	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 23:05:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775343799; cv=none; b=T+EVkp2+DL2zVvE5ZVTnIRCAQ8ryRX8l2ZG3fSkMSQnOHiBAJEbJZvxQqfJQNX3kxtup8mp5uWGX0vTyVJxSGgG9JabriUBuM8joux++kWaMlcHm1xYtPq36v9FuEkIZbg+5SVF/gZRxv4Xg2ot4JeF7CAaRTdu0GyfblQQ6wC0=
+	t=1775343940; cv=none; b=rrbekznob7Oqt+pg3CcE56Ap+uIi/xJ4t20GVD5ebOnJt05BrfzKs74S4u4Y82hFCS7mPylo6Lxen/h6Hf71sxXZ+PRomOR8TEZHBtXeZ0poRMzJ2o7U35VAPcPQGVuRQ5nNSYLuTJX9pvI27FgJ3YILiW82dMABxQjzupet628=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775343799; c=relaxed/simple;
-	bh=oPQr98i+WQIiqEuivy6k9noL1FzfXDmyrBCbyTQQjHM=;
+	s=arc-20240116; t=1775343940; c=relaxed/simple;
+	bh=OoE8Ic+95ti+1XKFSwr9PL5oGZ5/GrvMDw7LNSI0sCM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jEso+19egK2FjUxqhn1DTFTfD6AoMEM6X1D9Eg8V206Tr7MZ0pf1N+05IntUYbvLiW4aXx3FJ1W+8Tepq6X9TpOEz3SXAfz8SpiPfySX2JXvYFK4c4yhzuRSc+pUgkcDV9vRQlxY+3PBDp+umVqUz6mK49vWwA0bU/JinpI9bFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0ztXRYAL; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=KeGvgB06YzFJ6/v7FdOL64jsdd8t+dT4L0PYONqQZVk=; b=0z
-	tXRYALj2co6AjtmiPQD3TVKFPlGvxkdz1lakt+qiMBALb6lde2KnjYTxyh8DvJ6ZNZ0bPfNluW22U
-	A6QGjignCpvhUGKVmGosF+f2uj/FxUJPHtNLCpyqbXvxQqtbdiXdAqj+LIdll6qw66HMWNJwIdcbl
-	/uACTXZwNPwkGkI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w9A1E-00Eop9-7e; Sun, 05 Apr 2026 01:03:08 +0200
-Date: Sun, 5 Apr 2026 01:03:08 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oskar Ray-Frayssinet <rayfraytech@gmail.com>
-Cc: pavan.chebbi@broadcom.com, mchan@broadcom.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, lszubowi@redhat.com,
+	 Content-Type:Content-Disposition:In-Reply-To; b=WEuYDy2Zg+VCXAhGsEcAnBdl1coFRko+3Zw/AvJCJMpaFtWY0ykLdR7e6z3C6yrYPBOUbCWsUsHvdYYQ/MvD4jXsBUd5674M/GMHuINmKoxDexTM3VZ9/dqRcbxnZAltr3TeZjBatYAZOWzHXlUtDJHGkDSFHFdZwU7HjbHq3nY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JwFqL5MR; arc=none smtp.client-ip=209.85.217.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-604f1bfecf1so1999756137.3
+        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 16:05:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775343938; x=1775948738; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KnWvq+ekRwXyxh93OD6cFf9y027NFZpXtafpwpiBOP4=;
+        b=JwFqL5MR8ugJYJM3W5AehqLxIW9JpkRwPYCBldWRWGoqy2ePGcBLSVVc8LqCARzfL+
+         SfRYPnH2tLp/RB/KnDNOlw57aHWJ4ElJnQ+BezdO5XeBDCOp/LNp4sE/smAGTqYO9cT+
+         6tdJ7ZKVzHuEvk+3fEo5RATZ5WbUQ5cN0trEMgg5wS4lFt5Qngi+p3nCdouBXhuA6QkP
+         NV9W53pdm4TBa6bpU3y4OxMofUc4kXxpRJBPIoDiZOp41OMddeAHMqfwzFYMj7VB6v/G
+         rCkgCpYi3+yVBDmUlVexY57LjKIxaiPfl8Os9aj0FnodZmK/190N0tI1beejYsZAdbgh
+         JQQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775343938; x=1775948738;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KnWvq+ekRwXyxh93OD6cFf9y027NFZpXtafpwpiBOP4=;
+        b=Zaca55NnIUxLBcyV3bpq/zvzW2X3mbN8RXToHUswM+YTWk6zFaBIksP1wwL2cIyY0W
+         xDgNzHJkXT//jszjbOSrX5iu2bz6L8/HeG0bM9sd5asNgR3cLaMbdsG5QHipwqPyitxa
+         ltWedXy053YAZDjkvklQENtKNmY9ZesumYeWPECFu10gjZrZQ3Trb9wJMZe3tNPLBvFf
+         /eixp+hcw5USPWhrIOn+Vj/ILOX7KpgrtGx7d1L4aaGJohzMDVLSpoJopw4Q6eHDNZ00
+         sq4bJHhh2CPOVTAF8y/bi2Ek0Jxa/0Cohf8H3zaXgpD4kcgGuK9T8fz4lY0iFJdHWqK+
+         V3HQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWEpwU4H2AjF7ft+wdw61oH6m1IzXRZlA5QQR4q0Kt4I60h192S0Ag6+opCp7ITKq1ya0ZayCw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxY0DVpMorU4fLm3I7zQrAixz8cTAS/qHyhOFwliQZnDK5I7WzW
+	y+El0RRh5tUzSKePLlEpByQtO4udIqFxwgFRyxS25MFPVqQHOVMX1mkB
+X-Gm-Gg: AeBDietYYbKoqcmthGWbA9bgWqeQjo5O2LkNwEIh57EgAlIEaUY+PbWkLlDVC50w0Xm
+	rY0O2yUZpuZFRvHmn/UG3e0kYPRiAXGXOIN54VwMzGM5OR5sSu3W4PLbmgUkOF+pXzaUfDXGZR0
+	KVr6Tu/ToY+OmtJ7eVShShs8v5snq0NRmFPHe+QHcoJ1x4yqZqH2Gh5rF7zy8UfiRkk4ZDl/yHf
+	IF/Cb5K3WcIi4mlgIuUD2NvaZMnxs0Nf07qXaVXDLjmUJjOOSapkllqx+4Y8BjuQo9r/FNInnip
+	iT9N0yrbIDuapbcLap/mpK8QhArz9rC3CIvcuiIVbd6c9+H39AEZ27bIoJAVEUhLFdwDMoBs6/u
+	aEnKcr8wUEPFPuEP5Al6xdFkrOX1oaZ0ZIr9K9kgU5h1oh0D4tjWx9YGTNf3t+Uv3lffLV7fqOM
+	gqEj6JANiHsnn0TOiYp5PGirt+Yiw=
+X-Received: by 2002:a05:6102:6044:b0:605:38d2:26d4 with SMTP id ada2fe7eead31-605a50e32e4mr2632084137.25.1775343937583;
+        Sat, 04 Apr 2026 16:05:37 -0700 (PDT)
+Received: from google.com ([37.228.206.31])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-60583049c1esm12316939137.8.2026.04.04.16.05.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 Apr 2026 16:05:37 -0700 (PDT)
+Date: Sun, 5 Apr 2026 00:05:33 +0100
+From: Fabio Baltieri <fabio.baltieri@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] tg3: Add PowerEdge R740xd to AER quirk list
-Message-ID: <975ec123-e3df-41d5-bb15-f3af8af2c340@lunn.ch>
-References: <20260404225023.1254-1-rayfraytech@gmail.com>
+Subject: Re: [PATCH net-next v1] r8169: implement get_module functions for
+ rtl8127atf
+Message-ID: <adGZPQUMVoRcQqWu@google.com>
+References: <20260404201333.2849-1-fabio.baltieri@gmail.com>
+ <4f8310c2-07be-452a-84fa-0ec87d985651@gmail.com>
+ <368d3f30-b4af-4548-a4b9-f8e4e4f9a4cb@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260404225023.1254-1-rayfraytech@gmail.com>
+In-Reply-To: <368d3f30-b4af-4548-a4b9-f8e4e4f9a4cb@lunn.ch>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275417-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275418-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.995];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
-X-Rspamd-Queue-Id: 8417D39CD22
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fabiobaltieri@gmail.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5B17339CD31
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 05, 2026 at 12:50:23AM +0200, Oskar Ray-Frayssinet wrote:
-> The PowerEdge R740xd is a variant of the R740 that also triggers
-> a fatal PCIe AER event during system reboot. Add it to the DMI
-> list to apply the same workaround.
+On Sun, Apr 05, 2026 at 12:46:41AM +0200, Andrew Lunn wrote:
+> On Sat, Apr 04, 2026 at 11:55:25PM +0200, Heiner Kallweit wrote:
+> > On 04.04.2026 22:13, Fabio Baltieri wrote:
+> > > Implement get_module_info and get_module_eeprom for supported devices,
+> > > right now that's the rtl8127atf.
+> > > 
+> > > This enables using ethtool to retrieve the transceiver identification
+> > > and diagnostic data.
+> > > 
+> > > Signed-off-by: Fabio Baltieri <fabio.baltieri@gmail.com>
+> > > ---
+> > > 
+> > > Hi,
+> > > 
+> > > Realtek released a new out of tree driver for the rtl8127 and it
+> > > includes some code that exposes the I2C controller connected to the SFP
+> > > port.
+> > > 
+> > > This patch implements get_module_info and get_module_eeprom based on the
+> > > information found on that driver, it allows ethtool to fetch the SFP
+> > > module information, which is useful both to identify the module and to
+> > > track the health of fiber optic transceivers.
+> > > 
+> > > The logic for the SFF standard and i2c address selection is borrowed
+> > > directly from the aquantia/atlantic driver, I don't have a lot of stuff
+> > > to test it but I was able to trigger all code paths from a fiber optic
+> > > transceiver and an SFP cable I have available.
+> > > 
+> > 
+> > Hi Fabio, thanks for the patch. Being able to access the SFP I2C bus is an
+> > important step towards future phylink/SFP support.
+> > 
+> > @Russell/@Andrew
+> > I'm not really familiar with the phylink and sfp code. And I would like to have
+> > the functionality being implemented here reusable once we do further steps
+> > towards phylink support in r8169. So how shall the code be modeled, which
+> > components are needed?
+> > - Shall the SFP I2C bus be modeled as a struct i2c_adapter?
 > 
-> Fixes: e0efe83ed325 ("tg3: Disable tg3 PCIe AER on system reboot")
+> Yes, that would be best. Call i2c_add_adapter() to add it to the I2C
+> core. The SFP code in drivers/net/phy can then make use of it.
 > 
-> Signed-off-by: Oskar Ray-Frayssinet <rayfraytech@gmail.com>
-> ---
-> v2: Also add "R740XD vSAN Ready Node" DMI name as reported in
->     bugzilla #221279 by Thomas Berger
-> v1: Add "PowerEdge R740xd" DMI name
+> > - Shall we (partially?) implement a struct sfp, so that functions like
+> >   sfp_module_eeprom() can be used (implicitly)?
+> > 
+> > I assume this patch includes logic which duplicates what is available in
+> > phylink/sfp already. I'd a appreciate any hints you can provide.
+> 
+> No. phylink etc will end up populating netdev->sfp_bus, and then
+> get_module_eeprom_by_page() should then just make the module work in
+> ethtool.
+> 
+> The interesting bit if gluing it all together, without DT. But
+> txgbe_phy.c should be something you can copy from.
+> 
+> Does the out of tree driver give access to GPIOs connected to the SFP
+> cage pins? Ideally you want those as well, for loss of signal,
+> transmitter disable, knowing when a module has been inserted into the
+> cage, etc.
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+The current version does not seem to do that, maybe the Realtek folks
+can chime in about it.
 
-says: 
+I'll look into the dw driver, thanks for the pointer.
 
- * don’t repost your patches within one 24h period
-
-> @@ -18216,6 +18216,18 @@ static const struct dmi_system_id tg3_restart_aer_quirk_table[] = {
->  			DMI_MATCH(DMI_PRODUCT_NAME, "PowerEdge R740"),
->  		},
->  	},
-> +	{
-> +		.matches = {
-> +			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc."),
-> +			DMI_MATCH(DMI_PRODUCT_NAME, "PowerEdge R740xd"),
-> +		},
-> +	},
-> +	{
-> +		.matches = {
-> +			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc."),
-> +			DMI_MATCH(DMI_PRODUCT_NAME, "R740XD vSAN Ready Node"),
-> +		},
-> +	},
->  	{
->  		.matches = {
->  			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc."),
-
-When you look at tg3_restart_aer_quirk_table[] they are all Dell. Are
-there any Dell systems which actually work? Would it make sense to
-mark all Dell systems as broken and enable the quirk? Then there is no
-need to play whack-a-mole.
-
-     Andrew
+> And you will need a PCS driver.
+> 
+> But first step is probably to work with the existing Base-T devices
+> and convert the driver to phylink.
 
