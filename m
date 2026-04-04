@@ -1,62 +1,61 @@
-Return-Path: <netdev+bounces-275295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275296-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GAf1BBBV0GkA6gYAu9opvQ
-	(envelope-from <netdev+bounces-275295-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:02:24 +0200
+	id QAvROHxV0GkA6gYAu9opvQ
+	(envelope-from <netdev+bounces-275296-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:04:12 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D2A53992A4
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:02:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F1623992CA
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:04:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BA3B230209CB
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 00:01:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C8F0730115B5
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 00:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252241548C;
-	Sat,  4 Apr 2026 00:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA154883F;
+	Sat,  4 Apr 2026 00:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CcB0yCwV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YOWKtvK5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02134186A;
-	Sat,  4 Apr 2026 00:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57C74C92;
+	Sat,  4 Apr 2026 00:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775260888; cv=none; b=opUE06OohSGzYrSf6jDPDeEUUK/K4Z4lt72DM0y9jsH6wH5XyBQ6A60yb022auvuFdQqqsh1QQsgBOPbAf14j8g/UGaGNu2VfoJvVC61se0ADmhZODQ47EfhblTMkaa4DCidVu1s9HlaTD0TS97WmL0Fqper5hS2TiNu6JwmPRM=
+	t=1775261038; cv=none; b=fWJhR+Ij8sCxm+MB4Q7DXWpaNo9AkIrhiY1386Le+fsnr8H1DsIULQcA1Bf89EHG8ulSCKNmmG+xF/diYO5ho2fA8suLBfDoMA3Q5uTnI0lTLFD7c2UTs6CFOHc6bhgpbaAkxf87pQgQHAo4PerVu0mbh9wHH4G9wXpQIrPOzRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775260888; c=relaxed/simple;
-	bh=bNNcDrtNN79duLiVkQQ6cLnqJmh2d0HGN04f1nN0EgI=;
+	s=arc-20240116; t=1775261038; c=relaxed/simple;
+	bh=e8c7H+ZPoDWwwXYrkE7pEd5nu81cDoPtuLT9V6+iKl8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NaCgdq3tjInLdMnHoMX8uN7O7LCtf/6+lC6Zuf3XqBI8jVyAjGCSTiA7xNRGbSmmV2jLNt9mEfWtFHaJiJxQFFjDZY1wMEmAUGcIJGCH9WO+ghNX9amN0a7Kshhm77XczKeJpQCK5bZ+xEH/ON7kMvKkUpJMHz5cUKBmzO9nEtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CcB0yCwV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 252CBC4CEF7;
-	Sat,  4 Apr 2026 00:01:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=nBn8+IP8n0TZLOz8caHL1hbXtKqkCS+8/YDlwX5GldmePRSjhop3Ngk2Hnz6v2j2Y/39V1gKx6JNG8evHaecNeFV7w57DxinqGi344HcFpqzCGw4tY/JEbaOZj9zwwrweYT5tbhiyhmUTtO14iYx4A5OsE+BQaqaoFF6dDZv2ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YOWKtvK5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4E4FC4CEF7;
+	Sat,  4 Apr 2026 00:03:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775260887;
-	bh=bNNcDrtNN79duLiVkQQ6cLnqJmh2d0HGN04f1nN0EgI=;
+	s=k20201202; t=1775261038;
+	bh=e8c7H+ZPoDWwwXYrkE7pEd5nu81cDoPtuLT9V6+iKl8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CcB0yCwV1VFrHA31Qi3rnveP9qR7FZ3ayZA2lNBEVbbf06jhsXbMT499hYfrPs11L
-	 DV3eDBk/n4B0jZWqtYlEINCoakh5VcXORl307cHAaCWwrLqAyF4lP9ijDhJ6opc/fU
-	 /IaFy6ie/V5Xpi2Ef2+D7TQphbraRiOayvyu4emcLeJVm4z3xtg6S6y1vxv4xTf45U
-	 tBYHlFDdctydJbL4BerwLekoU3O7gJ7YlTFlEsylh/uS9xXCoiqo2KmZxCRPllEizE
-	 lQe4XTQXYiEDFZ03pgkwrxfzMZ0UEbnLBAM0Mo4BigmqXWfaE61AjxuwRanziM6Vs6
-	 ZoTnt6Wfh+0Dg==
-Date: Fri, 3 Apr 2026 17:01:26 -0700
+	b=YOWKtvK5OZrHHQuYf6H8v8YLAjx8R3WGOxIE9AkXN1bxrLesiW4HLLIrzdTTTycD7
+	 ZSeFa2y8BQetI7CJI2I9YTsCg0rpBj8CObuLf5Tk5wCSFy/5DWpU2G6kYWdg/0Ttxd
+	 ZpEtWxxWdhgpzdIhCAdh4kRulAGxXZzUVqhye1+ni/xdtmTephWKfW+OR4EdLrMqcM
+	 Oy30MuQe9zVDYgWO2VRG4aTuONXQXSd+tovC6l+lr+Md9i3UraZgsem1rTjbSYIH/e
+	 7ycVXls1PTxmi65TnMIhIpFyxlHUS6pEAJJmZmix2MBvwM7l+cOsdZlZbkj9cY/Ghv
+	 /cyjUdn1ovfzw==
+Date: Fri, 3 Apr 2026 17:03:57 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, magnus.karlsson@intel.com,
  stfomichev@gmail.com, pabeni@redhat.com, horms@kernel.org,
- larysa.zaremba@intel.com, aleksander.lobakin@intel.com, bjorn@kernel.org,
- Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH v6 net 1/8] xsk: tighten UMEM headroom validation to
- account for tailroom and min frame
-Message-ID: <20260403170126.276f9623@kernel.org>
-In-Reply-To: <20260402154958.562179-2-maciej.fijalkowski@intel.com>
+ larysa.zaremba@intel.com, aleksander.lobakin@intel.com, bjorn@kernel.org
+Subject: Re: [PATCH v6 net 4/8] xsk: validate MTU against usable frame size
+ on bind
+Message-ID: <20260403170357.14cb166a@kernel.org>
+In-Reply-To: <20260402154958.562179-5-maciej.fijalkowski@intel.com>
 References: <20260402154958.562179-1-maciej.fijalkowski@intel.com>
-	<20260402154958.562179-2-maciej.fijalkowski@intel.com>
+	<20260402154958.562179-5-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,8 +72,8 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,redhat.com,kernel.org,fomichev.me];
-	TAGGED_FROM(0.00)[bounces-275295-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,redhat.com,kernel.org];
+	TAGGED_FROM(0.00)[bounces-275296-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
@@ -90,26 +89,28 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 7D2A53992A4
+X-Rspamd-Queue-Id: 4F1623992CA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu,  2 Apr 2026 17:49:51 +0200 Maciej Fijalkowski wrote:
-> The current headroom validation in xdp_umem_reg() could leave us with
-> insufficient space dedicated to even receive minimum-sized ethernet
-> frame. Furthermore if multi-buffer would come to play then
-> skb_shared_info stored at the end of XSK frame would be corrupted.
+On Thu,  2 Apr 2026 17:49:54 +0200 Maciej Fijalkowski wrote:
+> AF_XDP bind currently accepts zero-copy pool configurations without
+> verifying that the device MTU fits into the usable frame space provided
+> by the UMEM chunk.
 > 
-> HW typically works with 128-aligned sizes so let us provide this value
-> as bare minimum.
-> 
-> Multi-buffer setting is known later in the configuration process so
-> besides accounting for 128 bytes, let us also take care of tailroom space
-> upfront.
+> This becomes a problem since we started to respect tailroom which is
+> subtracted from chunk_size (among with headroom). 2k chunk size might
+> not provide enough space for standard 1500 MTU, so let us catch such
+> settings at bind time. Furthermore, validate whether underlying HW will
+> be able to satisfy configured MTU wrt XSK's frame size multiplied by
+> supported Rx buffer chain length (that is exposed via
+> net_device::xdp_zc_max_segs).
 
-I guess it's a bit late to ask this, but am I the only one that has
-weird feelings about shinfo living in user-mapped memory?
+For multi-buf - I suppose it's fine, but wouldn't this be potentially
+a regression for setups which use single buf? Suddenly we expect the
+user to provide space for shinfo which was not part of the initial
+AF_XDP design?
 
