@@ -1,165 +1,208 @@
-Return-Path: <netdev+bounces-275316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275317-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QK/DGpFq0Gnf7QYAu9opvQ
-	(envelope-from <netdev+bounces-275316-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 03:34:09 +0200
+	id WFk1LZ9v0Gmo7gYAu9opvQ
+	(envelope-from <netdev+bounces-275317-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 03:55:43 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B05239979A
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 03:34:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C6DB3998A9
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 03:55:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 945BD303D2C5
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 01:34:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 961793019516
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 01:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B13277026;
-	Sat,  4 Apr 2026 01:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307302BDC23;
+	Sat,  4 Apr 2026 01:55:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KMMPhGss"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JLczD5cO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F2923EABA
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 01:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775266442; cv=pass; b=ovWSLQud8a3inYvognsPE2LMLIvAr5eO8rAlqeJgy1DTKDUxxOgl54P6kHvQjcAdi1C3XiHdJp+WLmxOR2Csch+GPmpxzMT8H3Q2i8oBk1+Sf6ZfWrN63IztiAvW3nB8LVhJ6A6me2g7Y/vX9q65o+PJPq54kUcxCo5cI0P5jNU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775266442; c=relaxed/simple;
-	bh=tACdfuNvuecVdLWS0HJWivNtfxvEwyjMHCX4AbXRuBo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cdLTb6RTaUm/jFKb0BarbsH7cm/2/EhlZc6p1jar4pROISrQVshrTW1IlJ0KxqCeeOEX+ksgOgXLnuJVMgthcGWp0o2FJExMtUGKxQSPeI1I1tWv0zUYNEg9WEtHIShsOWfK9SIwwia1ITst+iK0rF12mjcgFeSB5oNS7GrFEyY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KMMPhGss; arc=pass smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-66ba6d3dab3so15915a12.0
-        for <netdev@vger.kernel.org>; Fri, 03 Apr 2026 18:34:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775266440; cv=none;
-        d=google.com; s=arc-20240605;
-        b=XiUmuaPDVhR52hQhgHnQaM3SHXnkhjeTwPiztlBC58Du/VFfisNCGZc/CniV6/7GhT
-         a4vcxmJEXfl08YR7EqruEOrTo4Ur7+Jk6uMlsbeCWlXxhL8lJpF5Jpo7AEGsy6rzupJl
-         6/eSCpC247PIm8n0DpTb5cPgNLbqQaP27BKb2/pqeUnVVkwzHDRAwZ1DjznDpUQhTHOm
-         56LQPB3U/qCz6VHqjJle7Got7N0IMpVu2nysDBclq5VflkZmd4koXFdnFHDn53dTTY1e
-         CAkf4rbdrBtHQyQgP4PXUkMeYylCqSj+R0Xz+fvGQX1Ob5gzW975DXdLCgrXMtJ+nTC2
-         ZrTw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=tACdfuNvuecVdLWS0HJWivNtfxvEwyjMHCX4AbXRuBo=;
-        fh=hvImEU6WfPgLeFt1bONZx1Kwtd1ZmGGcW9BPggeomE4=;
-        b=atdwrSZZavcJ3hzpeYxk6+qdtCwjpbCdjrFk0J8Zsmw6aP6AaGmxZHA9+f6r386TM9
-         WgO2CdDHMv0oEzPRoYO3AIRUucOd2PNw5AaWsoB0L80gsyWCy97tvRpI8aarzn+f0B4X
-         Yc2paHWkSnk7rDZtsWSnO/aUe33CIVczReLK4J3cXsGvCBTXYfiU496uc8ynpj9uoTux
-         oOC4Vp7xAT3DmVExL5NUmVFVurk+k40bO0YSxpJy9M4SQo0qWUY8jsxtUu9HmoOs6cTO
-         2V4O5RJEx+Zvax2ITYxdFkWWxROP03LYe5yM0cK4vy82qfRQSQ7YUY71dCHCgI0NSLjb
-         9IFA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775266440; x=1775871240; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tACdfuNvuecVdLWS0HJWivNtfxvEwyjMHCX4AbXRuBo=;
-        b=KMMPhGss9evwWTfp0uVDdTvVCAW8QA2DVFc0U65NWgxCMwNinxzMqu9UTa7DHpNpiz
-         zd8WtzodUw4A8ppaS+1w+dcVgFxFswO6Vqftp2uobSgDGrlp3W/vT/aFPp/r2RmjE1pc
-         s8RE0bT79R5TXcfxZw6JNPbHk3fRfnT0hOwDbqwGTVJ0zJnEgGQYRl9T+vOWXNKnDrDr
-         +5YD9sxJsIO6KATqkk7XsE+7uWbmwDAZbZlfmL6le9Styyww2XraYuDaVdL93DvHxW9Q
-         HLgZhtP9VOVBHK8qlP/DT+yrQyLji9PA1UcXXss7K6c+flZuV4HZ4+VkZslIVN1T/wg1
-         hzGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775266440; x=1775871240;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tACdfuNvuecVdLWS0HJWivNtfxvEwyjMHCX4AbXRuBo=;
-        b=g8rLZSeqPGXkfa5+MBenWjWo/wB/xU/sq/NYVFhU/XCjJbU6Hn/MaaxiTRTZAAbvz0
-         UR1v4SO4BN2d0U0mm3RvjZKM30AgRL1Cw1X3+ymz7SezGyzdRidiuTCKnx4qVcd4Vp2r
-         ZCQ2shLoWvCG/h+M+Js/obLRatFVl8BB1o0fB5JQRDklifTx2Y+62JxHGUSQJGR3d847
-         /fUv+q9e7f3ehEqtxHBPZB03PJCHHzZwAvgJUHj11r9ROx00Waiz9ZpeBeJICAVtL38g
-         aTF7khu2P+3Ky6tuBiX5QBGq0Qa3Pgu2K5lMk8bNqGy7ZRsXabt1k5eogv7MfYcMnGbB
-         wpOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWyZuM/ACqETwUt2t6md4dTiYo8vlg/YWBqHs+HXSZb4MiXinhcbq3+Oy368N4B6NIR2M3YsRk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygomEJ3lF35QGSJrut6luFFOqM7RvdT0wkYL8YEX4ZSb+0T5wN
-	eGTnE+MKfYb6XwwFHOCtVYjyKLMRujjqkPuid8daKX5WKkTst4EaPEhP7OmnWY7Ou07IymVFxRW
-	mQLeMuP2KVAUeHRm6EkuIR9VAx+YY5D3xjDmr5or/
-X-Gm-Gg: AeBDieskoaLoiL2WUXAnEBxE4T5Pd3LTXjfQfVTCS3+aHsXsvDgWGe1YDCZjl8Tw5aG
-	Z0W7pXsKIpCs3Ev9CX1bqLG3xRk+ERRzW1DuTVsSeGPGAMshtw3Gi/92YG4BeztpzQypK/sUC/S
-	wgiPHUSE+F6x513M3q8T0VXp9p5YsvLKzm5JfXmjpxegT1DR/F9+d05H3nUDtswFw+/hCHWnpjb
-	QpGX3Prmg1TKL15tDPqneb0zsGSzX5hIP+CV2RUYiDUO4O15+kP6+1IF4V4ejvvioh1hbAhzHCX
-	bECnJRTCy2BWZDjNDo5eUpFXTBhY20p2A6Xbow0=
-X-Received: by 2002:a05:6402:5345:10b0:66b:eb28:2779 with SMTP id
- 4fb4d7f45d1cf-66e415a0e54mr43493a12.12.1775266439410; Fri, 03 Apr 2026
- 18:33:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941021DFD96
+	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 01:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775267741; cv=none; b=Yxpy8nkYw5FSj/ByAglVIMws6aDbusaVI5BzyPKlc0h8olVYX7vjGE+hQQncVFw15MV6vEP6qD+8LTkRGJgi0Ujs2TkqXMNMwxrtpX7i6hHhADub0+7zwzN0qfhrpKHkHKZZCTjxpdXT2Q8YtLSZ1NN12WKVKbpftM+kAptk6Z4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775267741; c=relaxed/simple;
+	bh=d0gRG5sUPk/qnF5oEb914IdRgbu7FRiGBIpb6tifVps=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kB1bMMxACKILVGKyifbaHkmaMZn9aRsMeR8jFQdB/EMd2X1HmI6isEBJ+bmKZC7ntfTFbkZ58kK+O5bjRJykhZ/l6M1mLQ0c+hPyQBxewL9Y/hMsd3/yNEyGYD++usyE3CVrFYSBpygGP59GCrj41N/yGNHn+14u8CJ/tASr/mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JLczD5cO; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <1f30ccde-5c6b-42a1-a53a-94f9346794be@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775267726;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dCJGBXnWQyfC1ns6yf/kUaOwu8NxCNbpAODPzSZVwwI=;
+	b=JLczD5cOt0njG6ngiMm5ybS30ZdVjsVM64b4EM+RkN26aAcwVICfRBNKKr/jpzWlOceUTm
+	Jdb1txgoJuLRWM6FIg2yO0cfLZrGzuQFsmzGvY9m5gMLwcKqbbYxzIi89+unczeXk0VuxH
+	NhEKqshBcu1nEtULsdOEiY6zwMbqI8g=
+Date: Sat, 4 Apr 2026 09:55:17 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260403-teaming-driver-internal-v4-0-d3032f33ca25@google.com> <20260403123039.77c80266@kernel.org>
-In-Reply-To: <20260403123039.77c80266@kernel.org>
-From: Marc Harvey <marcharvey@google.com>
-Date: Fri, 3 Apr 2026 18:33:48 -0700
-X-Gm-Features: AQROBzCcDmh9vMwsBnfFw6XOXuPHROjL8aDLdAW0gvpf0c5E0VDu0J3cAY2ph0Y
-Message-ID: <CANkEMgmh4_QtDum0brYNZOxJxzjeZpsxr8PMMKoKVBDawA6GXw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 00/10] Decouple receive and transmit
- enablement in team driver
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+Subject: Re: [PATCH net v1] net: mptcp: fix slab-use-after-free in
+ __inet_lookup_established
+To: mptcp@lists.linux.dev, netdev@vger.kernel.org
+Cc: Matthieu Baerts <matttbe@kernel.org>, Mat Martineau
+ <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+References: <20260403130734.93981-1-jiayuan.chen@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <20260403130734.93981-1-jiayuan.chen@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275316-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-275317-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[google.com:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[marcharvey@google.com,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
 	RCPT_COUNT_SEVEN(0.00)[11];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 0B05239979A
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
+X-Rspamd-Queue-Id: 0C6DB3998A9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 3, 2026 at 12:30=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
+
+On 4/3/26 9:07 PM, Jiayuan Chen wrote:
+> The ehash table lookups are lockless and rely on
+> SLAB_TYPESAFE_BY_RCU to guarantee socket memory stability
+> during RCU read-side critical sections. Both tcp_prot and
+> tcpv6_prot have their slab caches created with this flag
+> via proto_register().
 >
-> The test seems flaky, we hit this twice in the last 24h:
+> However, MPTCP's mptcp_subflow_init() copies tcpv6_prot into
+> tcpv6_prot_override during inet_init() (fs_initcall, level 5),
+> before inet6_init() (module_init/device_initcall, level 6) has
+> called proto_register(&tcpv6_prot). At that point,
+> tcpv6_prot.slab is still NULL, so tcpv6_prot_override.slab
+> remains NULL permanently.
+>
+> This causes MPTCP v6 subflow child sockets to be allocated via
+> kmalloc (falling into kmalloc-4k) instead of the TCPv6 slab
+> cache. The kmalloc-4k cache lacks SLAB_TYPESAFE_BY_RCU, so
+> when these sockets are freed without SOCK_RCU_FREE (which is
+> cleared for child sockets by design), the memory can be
+> immediately reused. Concurrent ehash lookups under
+> rcu_read_lock can then access freed memory, triggering a
+> slab-use-after-free in __inet_lookup_established.
+>
+> Fix this by splitting the IPv6-specific initialization out of
+> mptcp_subflow_init() into a new mptcp_subflow_v6_init(), which
+> is called from mptcpv6_init() after proto_register(&tcpv6_prot)
+> has completed. This ensures tcpv6_prot_override.slab correctly
+> inherits the SLAB_TYPESAFE_BY_RCU slab cache.
+>
+> Fixes: b19bc2945b40 ("mptcp: implement delegated actions")
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> ---
+>   net/mptcp/ctrl.c     |  6 +++++-
+>   net/mptcp/protocol.h |  1 +
+>   net/mptcp/subflow.c  | 15 +++++++++------
+>   3 files changed, 15 insertions(+), 7 deletions(-)
+>
+> diff --git a/net/mptcp/ctrl.c b/net/mptcp/ctrl.c
+> index d96130e49942..5887ddcdb875 100644
+> --- a/net/mptcp/ctrl.c
+> +++ b/net/mptcp/ctrl.c
+> @@ -583,7 +583,11 @@ int __init mptcpv6_init(void)
+>   	int err;
+>   
+>   	err = mptcp_proto_v6_init();
+> +	if (err)
+> +		return err;
+>   
+> -	return err;
+> +	mptcp_subflow_v6_init();
+> +
+> +	return 0;
+>   }
+>   #endif
+> diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
+> index 0bd1ee860316..ec15e503da8b 100644
+> --- a/net/mptcp/protocol.h
+> +++ b/net/mptcp/protocol.h
+> @@ -875,6 +875,7 @@ static inline void mptcp_subflow_tcp_fallback(struct sock *sk,
+>   void __init mptcp_proto_init(void);
+>   #if IS_ENABLED(CONFIG_MPTCP_IPV6)
+>   int __init mptcp_proto_v6_init(void);
+> +void __init mptcp_subflow_v6_init(void);
+>   #endif
+>   
+>   struct sock *mptcp_sk_clone_init(const struct sock *sk,
+> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+> index 6716970693e9..4ff5863aa9fd 100644
+> --- a/net/mptcp/subflow.c
+> +++ b/net/mptcp/subflow.c
+> @@ -2165,7 +2165,15 @@ void __init mptcp_subflow_init(void)
+>   	tcp_prot_override.psock_update_sk_prot = NULL;
+>   #endif
+>   
+> +	mptcp_diag_subflow_init(&subflow_ulp_ops);
+> +
+> +	if (tcp_register_ulp(&subflow_ulp_ops) != 0)
+> +		panic("MPTCP: failed to register subflows to ULP\n");
+> +}
+> +
+>   #if IS_ENABLED(CONFIG_MPTCP_IPV6)
+> +void __init mptcp_subflow_v6_init(void)
+> +{
+>   	/* In struct mptcp_subflow_request_sock, we assume the TCP request sock
+>   	 * structures for v4 and v6 have the same size. It should not changed in
+>   	 * the future but better to make sure to be warned if it is no longer
+> @@ -2204,10 +2212,5 @@ void __init mptcp_subflow_init(void)
+>   	/* Disable sockmap processing for subflows */
+>   	tcpv6_prot_override.psock_update_sk_prot = NULL;
+>   #endif
+> -#endif
+> -
+> -	mptcp_diag_subflow_init(&subflow_ulp_ops);
+> -
+> -	if (tcp_register_ulp(&subflow_ulp_ops) != 0)
+> -		panic("MPTCP: failed to register subflows to ULP\n");
+>   }
+> +#endif
 
-Hmm it waits for the active port to change before checking the packet
-counts, but that appears insufficient. I will make it wait for the
-newly inactive link to stop receiving traffic, using a generous
-polling timeout, which should fix this race condition.
 
-> What's even worse the retry of the test then fails like this:
 
-When starting up teamd, it seems to check for a pid file, which
-persists after using sigkill on the previous test run. So if we don't
-kill teamd gracefully, then this file must be deleted manually. It's
-strange that it didn't cause any problems on my end, but I can fix it
-in the next iteration.
+I think the AI review is not accurate here.
+https://sashiko.dev/#/patchset/20260403130734.93981-1-jiayuan.chen%40linux.dev
+
+Userspace programs only start running after all initcalls have 
+completed, so there is no race condition.
+
 
