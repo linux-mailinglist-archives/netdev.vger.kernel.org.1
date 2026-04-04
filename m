@@ -1,91 +1,90 @@
-Return-Path: <netdev+bounces-275366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275367-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +UoQMB8T0WkoEwcAu9opvQ
-	(envelope-from <netdev+bounces-275366-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 15:33:19 +0200
+	id OARmFy0V0Wm8EwcAu9opvQ
+	(envelope-from <netdev+bounces-275367-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 15:42:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FAF539B34B
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 15:33:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E33439B3A5
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 15:42:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6348F3005981
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 13:33:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EE22C300C59A
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 13:42:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE211E5B68;
-	Sat,  4 Apr 2026 13:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69F952EAB6F;
+	Sat,  4 Apr 2026 13:42:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HJaEYMxb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j/ucTpRl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6123E145355
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 13:33:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2532494D8
+	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 13:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775309595; cv=none; b=ljRwjzxN9/mhDBhle0uBlqoWmhvr4VEVk55tloulAKnkj4MZtHvV5c3qd2C2Nw9OQuBAINa4P03HxFsLhdkAPulx78CWda7h7uDVsFnQQO4l94b6m2j9l0Lyvbm0p3gSW+on84+hpZDiSmMB9c6njaKMasOAnG6mRtHEo6el3r0=
+	t=1775310121; cv=none; b=I50Lgxy7zvGK77j3Kn1Ud5W/p2nG9TeESUReFrBpJ7POEN3q9K6WwPrRIZve5wwHqjiJZ8mEtz1mFbH2azzkRrWZEAIkWdvFigk2NgSCu7ddoy/SZDudd40/BDhuHOJRH48kc7GSPq+bzpkbiOhzMNRuIS9N5O9yZtkU/0sLlfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775309595; c=relaxed/simple;
-	bh=/xn5L4USrPtgujNaz2tHUWealIM1HU2lwXzW22iViPQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FkAxBWbBIAwqBTlwfDoli0Z0t5e9QIF9+zsG8zIvb2d5CWtnf7TdZ0qyYSp5/BOXCAUTK+akV2PBnf1S7dlo6iiaaTsPN/G2eEKWo/9zqKs+W1m21aZonINZQ+DlYI6/mdXER1hmrW3BPpdFlJXg3hEoKRKQA4zlfDjIr0XnJKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HJaEYMxb; arc=none smtp.client-ip=209.85.216.51
+	s=arc-20240116; t=1775310121; c=relaxed/simple;
+	bh=JCJ3DYX3PDv0sF4vaPs/g40VMIbphBzFgOKIuzxZQh0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cDfKg5YA249HtLMr8BhzR0QSeHR+7D/ERHVWlACQ52q25VOpbyoA4OSCEVXDAUpv9buL4IUfmJOikMUU6ea7bjkXVcmhTDYPZEIeHnX9cUX//PHcwt2J9nuNoKVzy22Y7DXnuL6YdpCO0MJT48Ba0hUVyq/g15g9s9QwG6Ka5vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j/ucTpRl; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3538952a464so434157a91.2
-        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 06:33:14 -0700 (PDT)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b97f9587e6eso357883366b.3
+        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 06:41:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775309594; x=1775914394; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775310118; x=1775914918; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iNpL/8/dGzdqV00EBJ3niLmK24NofYvcyxqVS++1Uck=;
-        b=HJaEYMxbLVhHaEq2iVKwsqzYn1/XKXqE7anGlCh0Ud65VZne3JijXD3NZfDwOzp2ht
-         nW56YB7Do7HEkbTgTrHGln97ir4v8UDP4Jg10Qv+d6ahRwdBuSue82Le+q7vCcEJ+ZcB
-         rC3seeXz0mWdDQVnGnB8a118raM1vA/ddCON6BE+NLTVsU4+ECtJQP1QyXfoedMqlqO2
-         pY3VMFDtjIlG9qQ6KhTHHS4f43VVCC6NXj4QnlYZbJ8DccQc6aSK3/yfC1mepeqe1PiN
-         TKmI0m+ztyOgEFJ1th5rzohQQyhgV9+y5EoqYAHEImjqiWGFv8mz40sB2UNA0V9cl8DW
-         uQ0w==
+        bh=k1j6N8WMAfkzRObM5NgviDdEdPkVaIdiLqpbzrP+FDk=;
+        b=j/ucTpRlBj1hVP1Qvn0YaG8TEbSjbgdmSpc7kRURmK2UUIxU5mdrakq3FF4IApGaV7
+         Zkuu+9VAyw3IbsDr1gQX+vSD93/pIpsM66iBAuN03pzz1H+TN/RdvpuNTQ61z8RdakpD
+         6eHJUaKXir5lFWupXKBqgF/z27lUY0k9rQNLVJkx8+iYkbllB6oebH6DdwnIGhaOUlvV
+         dFTwl8lvGn0r84XGFfU9Tvi7/rBCp709FJr1SR589c5DxVqG8YhDe5smDO6Hujalha+/
+         5JqMGYeAuAWB2ldnA0rjZM+NtPiKW7qcmO9G4tG/+4EN34xyUhQJv42GGFyQB/sh9Wpb
+         Xlcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775309594; x=1775914394;
+        d=1e100.net; s=20251104; t=1775310118; x=1775914918;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iNpL/8/dGzdqV00EBJ3niLmK24NofYvcyxqVS++1Uck=;
-        b=bPLiVYCnUN3P7bWxaewpdrE9k6soEa3FSbwtLZAJUqvXAOY5veYM9ILxA1aPFha8FI
-         ayHek1Ih2DUgNj2czYXeYp8WS84vtC1sP/aOJoYqyqDQgV9at9jjuNQVN1ywGxbiQD8o
-         cX5RZ4iNiNrB7B7qPXlqBsU93gC+C9w2aaVXXZb9aWjXO/1SS4WIGgH6QgYKUZNHiifG
-         YUg4uZxoUyG59rRnHIZbtE/Eh/v7Nqm4r3lADeQwWo48DuoXb5kmaNQrphx33kIgHeWk
-         0gR4gzuWNlg2zE+3vGfchBObmt11YpVoXHxJB4nXg4Kj0WnCeK84hGaGaDizzfx1+F2r
-         bbxw==
-X-Forwarded-Encrypted: i=1; AJvYcCX+lEboHzcpF38/zr62wkWtaSM4xE2L9GX+y66vErBcXfaSuhdz9Ag/qT+eAtfaFmCbS+PXqKg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgM1op4Fel5dEAdh8BODLZu9eulGTyQd3S0elaR6yoXlxvT8/k
-	zUlKw3fGpX/GjIf/pGQySew+jwj4IJYJ43P9xygkcA8tvYWp4OfjJFhC
-X-Gm-Gg: AeBDievMdhf4s4IXLIXwBKiJVkLMueFEagWvbvYQgiFTOy42ZCgWRt6CeUt7sJ/lFiW
-	2hqwE4ObhgEIdKQPPQpUuyOeIUTnUIyvaAWDJocUVzfE7vpxl7sqxCPkmzwkTUR3bbAfpahATnh
-	vs/e9NBAdLVh8JWl/E8neaC2N/N+s1fG9VCHxGjfOvHwilht78GvxMQqJpHsBz1EuWD+sSOlD2i
-	QHEu6kKf4CaR3rAgMXANmeMxIpLeZCUH01tVgJreUNLkht1oiPps2aD/h1X3vP9elYSQSk5YD6/
-	DUI/dcXhwt4wrDtTQg5mtRZkJpms3BY6eD/whN3TkQ4dqzghKjxo6UHqKRL6cSehcuj0xHAbYMb
-	6YJufHd0f7BRC8n5ywb3Xm6uX/LbesnqNLYijBePphdpYIJWd2yprHfudaOVOi+jPHmny9Tc8M3
-	g7gt+L3yGGOTIvHyU2wT5AY/UlsX5cGjlz
-X-Received: by 2002:a17:902:da2d:b0:2b2:67ca:5ffa with SMTP id d9443c01a7336-2b2815d8057mr38831995ad.0.1775309593530;
-        Sat, 04 Apr 2026 06:33:13 -0700 (PDT)
-Received: from localhost.localdomain ([189.1.242.96])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2749a1e9csm94460445ad.55.2026.04.04.06.33.11
+        bh=k1j6N8WMAfkzRObM5NgviDdEdPkVaIdiLqpbzrP+FDk=;
+        b=VUiPOLxxJdTaRuXubOXFT3Wzd+BuYAeSs8ajW2TVuj0rE3HKxZHCOH1ZsQncibi8l0
+         ISYNnvyaqygYgyBJFFClpTNuerVMwXCOyStGB8JXsAi4J1M+7nsJL+XWx5/Pj6xq0eAQ
+         FKkMOcKIz68tUE8MDd+AEPhRfuJm0GGYQWNmVv3YODNX7wVkNhP9W45tYTn+bXKI35hM
+         5YBLc5buz1CLCuEyMsVZidbVaGHJZ4j5tGTfaaCn+4d0Wdz12HfjWRMIZTcHmhFJdKRq
+         JgsfdGh6iy4aR0UAr/+0Ey4vvuyhYjps9GSMnRUiaX2d88BDW0wZIl0sU0HniQyQfO6s
+         7foQ==
+X-Gm-Message-State: AOJu0YxwZjhMcBTAVHcPRPs4cilvFwsMjKYVsHPKAalPxFYzPahEnZZf
+	Sx7TNGglkrXrvRYbF8QJIj+srwrVDtLUrivz4KCSWVedxu7D5VZn2Y0/wCKPFg==
+X-Gm-Gg: AeBDiesd4TlgGpqrclXM5BgIepDujayEHAJgkA5WPqra8p0qcjJrscS0nhwqkNC+AdB
+	WF44t5Es49YH9BYQrfACmfLXLx9SctCl0lIeBDTWaHFOBD8nshBN8m0CuR+uXnWhmqAb4up4KWs
+	oUofiFMclrKLQKVksQZnRQo0FP45K85Ssq4OmVA+3/pD72R2OizQShwtE+zDr0JsErkwYRkJwu8
+	DYxmunDGka01Xgd2gCUk4bG/Jc7+mJCpq5R7sGdP3XISVgao3NxVDbeaQgnhfQLgssd/TNVUJlK
+	VtQ+Pve/BSCukRCzJ9uTbmH7sCyNpy10MJnmeZFkXXbx8QBtwlishRk4C2Ys+x884bqTm20XTtX
+	lHyrNi48A2yQVs8fO9+eFhRKMgFIyiFNZ7Huc3r1XPIN9UOryNcfitl5uh0xPnGBy+DEWFs2//e
+	meJfmajN8IwoKyO3Hsu2I9cvZZONf6vJPor9U+cjYtq7w=
+X-Received: by 2002:a17:907:c009:b0:b96:ef71:49f9 with SMTP id a640c23a62f3a-b9c6742fc89mr341121566b.9.1775310117830;
+        Sat, 04 Apr 2026 06:41:57 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:a03f:a75e:9a00:eb80:1fe:7625:6ba9])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9c3d028995sm294184166b.57.2026.04.04.06.41.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Apr 2026 06:33:13 -0700 (PDT)
-From: Yiqi Sun <sunyiqixm@gmail.com>
-To: jchapman@katalix.com
+        Sat, 04 Apr 2026 06:41:57 -0700 (PDT)
+From: Justin Iurman <justin.iurman@gmail.com>
+To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
+	dsahern@kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	horms@kernel.org,
-	netdev@vger.kernel.org,
-	Yiqi Sun <sunyiqixm@gmail.com>
-Subject: [PATCH net] l2tp: take a session reference in pppol2tp_ioctl()
-Date: Sat,  4 Apr 2026 21:32:45 +0800
-Message-Id: <20260404133245.2391409-1-sunyiqixm@gmail.com>
+	Justin Iurman <justin.iurman@gmail.com>
+Subject: [PATCH net] net: ioam6: fix OOB and missing lock
+Date: Sat,  4 Apr 2026 15:41:37 +0200
+Message-Id: <20260404134137.24553-1-justin.iurman@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -94,198 +93,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,gmail.com];
-	TAGGED_FROM(0.00)[bounces-275366-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275367-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,google.com,redhat.com,gmail.com];
 	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sunyiqixm@gmail.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4FAF539B34B
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9E33439B3A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-pppol2tp_ioctl() reads sock->sk->sk_user_data and dereferences the
-returned l2tp_session without taking a reference on it.
+When trace->type.bit6 is set:
 
-Since the ppp socket/session lifetime rework, session teardown runs
-asynchronously and can clear sk_user_data and drop the last session
-reference in parallel with ioctl(). This leaves ioctl() with a stale
-session pointer and can trigger a use-after-free.
+    if (trace->type.bit6) {
+        ...
+        queue = skb_get_tx_queue(dev, skb);
+        qdisc = rcu_dereference(queue->qdisc);
 
-Fix this by using pppol2tp_sock_to_session() in pppol2tp_ioctl() and
-dropping the session reference before returning. This matches the
-existing getsockopt/setsockopt paths.
+This code can lead to an out-of-bounds access of the dev->_tx[] array
+when is_input is true. In such a case, the packet is on the RX path and
+skb->queue_mapping contains the RX queue index of the ingress device. If
+the ingress device has more RX queues than the egress device (dev) has
+TX queues, skb_get_queue_mapping(skb) will exceed dev->num_tx_queues.
+Add a check to avoid this situation since skb_get_tx_queue() does not
+clamp the index. This issue has also revealed that per queue visibility
+cannot be accurate and will be replaced later as a new feature.
 
-Fixes: c5cbaef992d64 ("l2tp: refactor ppp socket/session relationship")
-Signed-off-by: Yiqi Sun <sunyiqixm@gmail.com>
+While at it, add missing lock around qdisc_qstats_qlen_backlog(). The
+function __ioam6_fill_trace_data() is called from both softirq and
+process contexts, hence the use of spin_lock_bh() here.
+
+Fixes: b63c5478e9cb ("ipv6: ioam: Support for Queue depth data field")
+Reported-by: Jakub Kicinski <kuba@kernel.org>
+Closes: https://lore.kernel.org/netdev/20260403214418.2233266-2-kuba@kernel.org/
+Signed-off-by: Justin Iurman <justin.iurman@gmail.com>
 ---
- net/l2tp/l2tp_ppp.c | 88 +++++++++++++++++++++++++++------------------
- 1 file changed, 54 insertions(+), 34 deletions(-)
+ net/ipv6/ioam6.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
-index ae4543d5597b..e6d7d3537180 100644
---- a/net/l2tp/l2tp_ppp.c
-+++ b/net/l2tp/l2tp_ppp.c
-@@ -1042,66 +1042,79 @@ static int pppol2tp_tunnel_copy_stats(struct pppol2tp_ioc_stats *stats,
- static int pppol2tp_ioctl(struct socket *sock, unsigned int cmd,
- 			  unsigned long arg)
- {
-+	struct sock *sk = sock->sk;
- 	struct pppol2tp_ioc_stats stats;
- 	struct l2tp_session *session;
-+	int err;
-+
-+	err = -ENOTCONN;
-+	if (!sk->sk_user_data)
-+		goto end;
-+
-+	err = -EBADF;
-+	session = pppol2tp_sock_to_session(sk);
-+	if (!session)
-+		goto end;
+diff --git a/net/ipv6/ioam6.c b/net/ipv6/ioam6.c
+index 05a0b7d7e2aa..e963a71858a7 100644
+--- a/net/ipv6/ioam6.c
++++ b/net/ipv6/ioam6.c
+@@ -803,12 +803,16 @@ static void __ioam6_fill_trace_data(struct sk_buff *skb,
+ 		struct Qdisc *qdisc;
+ 		__u32 qlen, backlog;
  
- 	switch (cmd) {
- 	case PPPIOCGMRU:
- 	case PPPIOCGFLAGS:
--		session = sock->sk->sk_user_data;
--		if (!session)
--			return -ENOTCONN;
--
- 		if (WARN_ON(session->magic != L2TP_SESSION_MAGIC))
--			return -EBADF;
-+			goto end_put_sess;
- 
- 		/* Not defined for tunnels */
--		if (!session->session_id && !session->peer_session_id)
--			return -ENOSYS;
-+		if (!session->session_id && !session->peer_session_id) {
-+			err = -ENOSYS;
-+			goto end_put_sess;
-+		}
- 
--		if (put_user(0, (int __user *)arg))
--			return -EFAULT;
-+		if (put_user(0, (int __user *)arg)) {
-+			err = -EFAULT;
-+			goto end_put_sess;
-+		}
-+		err = 0;
- 		break;
- 
- 	case PPPIOCSMRU:
- 	case PPPIOCSFLAGS:
--		session = sock->sk->sk_user_data;
--		if (!session)
--			return -ENOTCONN;
--
- 		if (WARN_ON(session->magic != L2TP_SESSION_MAGIC))
--			return -EBADF;
-+			goto end_put_sess;
- 
- 		/* Not defined for tunnels */
--		if (!session->session_id && !session->peer_session_id)
--			return -ENOSYS;
-+		if (!session->session_id && !session->peer_session_id) {
-+			err = -ENOSYS;
-+			goto end_put_sess;
-+		}
- 
--		if (!access_ok((int __user *)arg, sizeof(int)))
--			return -EFAULT;
-+		if (!access_ok((int __user *)arg, sizeof(int))) {
-+			err = -EFAULT;
-+			goto end_put_sess;
-+		}
-+		err = 0;
- 		break;
- 
- 	case PPPIOCGL2TPSTATS:
--		session = sock->sk->sk_user_data;
--		if (!session)
--			return -ENOTCONN;
--
- 		if (WARN_ON(session->magic != L2TP_SESSION_MAGIC))
--			return -EBADF;
-+			goto end_put_sess;
- 
- 		/* Session 0 represents the parent tunnel */
- 		if (!session->session_id && !session->peer_session_id) {
- 			u32 session_id;
--			int err;
-+			int rc;
- 
- 			if (copy_from_user(&stats, (void __user *)arg,
--					   sizeof(stats)))
--				return -EFAULT;
-+					   sizeof(stats))) {
-+				err = -EFAULT;
-+				goto end_put_sess;
-+			}
- 
- 			session_id = stats.session_id;
--			err = pppol2tp_tunnel_copy_stats(&stats,
--							 session->tunnel);
--			if (err < 0)
--				return err;
-+			rc = pppol2tp_tunnel_copy_stats(&stats,
-+							session->tunnel);
-+			if (rc < 0) {
-+				err = rc;
-+				goto end_put_sess;
-+			}
- 
- 			stats.session_id = session_id;
+-		if (dev->flags & IFF_LOOPBACK) {
++		if (dev->flags & IFF_LOOPBACK ||
++		    skb_get_queue_mapping(skb) >= dev->num_tx_queues) {
+ 			*(__be32 *)data = cpu_to_be32(IOAM6_U32_UNAVAILABLE);
  		} else {
-@@ -1111,15 +1124,22 @@ static int pppol2tp_ioctl(struct socket *sock, unsigned int cmd,
- 		stats.tunnel_id = session->tunnel->tunnel_id;
- 		stats.using_ipsec = l2tp_tunnel_uses_xfrm(session->tunnel);
+ 			queue = skb_get_tx_queue(dev, skb);
+ 			qdisc = rcu_dereference(queue->qdisc);
++
++			spin_lock_bh(qdisc_lock(qdisc));
+ 			qdisc_qstats_qlen_backlog(qdisc, &qlen, &backlog);
++			spin_unlock_bh(qdisc_lock(qdisc));
  
--		if (copy_to_user((void __user *)arg, &stats, sizeof(stats)))
--			return -EFAULT;
-+		if (copy_to_user((void __user *)arg, &stats, sizeof(stats))) {
-+			err = -EFAULT;
-+			goto end_put_sess;
-+		}
-+		err = 0;
- 		break;
- 
- 	default:
--		return -ENOIOCTLCMD;
-+		err = -ENOIOCTLCMD;
-+		break;
- 	}
- 
--	return 0;
-+end_put_sess:
-+	l2tp_session_put(session);
-+end:
-+	return err;
- }
- 
- /*****************************************************************************
+ 			*(__be32 *)data = cpu_to_be32(backlog);
+ 		}
 -- 
 2.34.1
 
