@@ -1,39 +1,40 @@
-Return-Path: <netdev+bounces-275314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275313-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kJZZFjFf0GmB7AYAu9opvQ
-	(envelope-from <netdev+bounces-275314-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:45:37 +0200
+	id dEfgORRf0GmB7AYAu9opvQ
+	(envelope-from <netdev+bounces-275313-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:45:08 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7EB139960A
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:45:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AE053995EB
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:45:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 16E84303EEAF
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 00:45:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 59F703008D54
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 00:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0CD25A359;
-	Sat,  4 Apr 2026 00:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9F926E173;
+	Sat,  4 Apr 2026 00:45:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3400D25A655;
-	Sat,  4 Apr 2026 00:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59BD122068D;
+	Sat,  4 Apr 2026 00:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775263506; cv=none; b=T+7NOpIP27v2ungDw0eAaVgInNlL1Il3G5RZqy9h1P/0qHYnRv4UHmY6EpYK5absWL12ko1rdc/5ZKRawz3tzeueJ9s0P6aG/owNRnYslB2cqYEMVZekqXfDt+qdM26qXnsYOvMq392cRJJ5VmIoaZCSqiYAI0+cTVaNxj6Chqg=
+	t=1775263505; cv=none; b=D0+6gk7cQ1/d+hcUGbBJhf+LCXfV8knVJ0bdl5Es+UbY346OLsRDcbMquOnWRnKZz8a5NryuxDSpEIXAFCsja0tk1h9AH7i9d7Rofzm6vtpV8HP0+LkXr/UyfwlHp6tsw8p33IHNdYRlyCYbYE5lPrxYe7mrei76seNi8Vtq4pI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775263506; c=relaxed/simple;
-	bh=yzbPoeeHHDwulpbumKyKCjqaSbxGUmPqE6/UL4HMRSQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nD77YOTkR5kiXh08foLbVBrQwxsuvPqE+6+2y0nuFhG2hfsbSOLDLlVesm9n4LhEuo7OeG4CoH6X9BzyjTB+XQXDh9w9r+XDqmS26ByzvOuHo0W46/Ecy22ayuRJjBya3FPLwGBMOSAorKnoPN9VGz5VU58MfgPf4zj2A/bdcNM=
+	s=arc-20240116; t=1775263505; c=relaxed/simple;
+	bh=qEtUMSOCmfAZwFqHdVAupL42nP36ZiGGCJfn/oHAdTE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=EvvAbiJ2TJCtIszYUBGRY2PVPpqQAraoVZYm7jm2B+Tnv6jy+ubzCh0brok+aJeEEVC7tO9jaacZLNE/E3T2zMqs+POjgoI7JQxFP5JkSVmuGHc3hpgboQY83moPxHgmVOg0HKwDenfHo8L78iOkgwVc+GGxlRjnBkzM51fLvSs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; arc=none smtp.client-ip=160.80.4.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
 Received: from localhost.localdomain ([160.80.103.126])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 6340iYLD026118;
-	Sat, 4 Apr 2026 02:44:39 +0200
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 6340iYLE026118;
+	Sat, 4 Apr 2026 02:44:40 +0200
 From: Andrea Mayer <andrea.mayer@uniroma2.it>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -41,11 +42,13 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
         david.lebrun@uclouvain.be, stefano.salsano@uniroma2.it,
         paolo.lungaroni@uniroma2.it, nicolas.dichtel@6wind.com,
         justin.iurman@gmail.com, linux-kernel@vger.kernel.org,
-        Andrea Mayer <andrea.mayer@uniroma2.it>
-Subject: [PATCH net v3 0/2] seg6: fix dst_cache sharing in seg6 lwtunnel
-Date: Sat,  4 Apr 2026 02:44:03 +0200
-Message-Id: <20260404004405.4057-1-andrea.mayer@uniroma2.it>
+        Andrea Mayer <andrea.mayer@uniroma2.it>, stable@vger.kernel.org
+Subject: [PATCH net v3 1/2] seg6: separate dst_cache for input and output paths in seg6 lwtunnel
+Date: Sat,  4 Apr 2026 02:44:04 +0200
+Message-Id: <20260404004405.4057-2-andrea.mayer@uniroma2.it>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20260404004405.4057-1-andrea.mayer@uniroma2.it>
+References: <20260404004405.4057-1-andrea.mayer@uniroma2.it>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,60 +63,142 @@ X-Spamd-Result: default: False [1.64 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	DMARC_POLICY_SOFTFAIL(0.10)[uniroma2.it : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275314-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275313-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	MIME_TRACE(0.00)[0:+];
 	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,uclouvain.be,uniroma2.it,6wind.com,gmail.com,vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[andrea.mayer@uniroma2.it,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.977];
+	NEURAL_HAM(-0.00)[-0.984];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,uniroma2.it:mid]
-X-Rspamd-Queue-Id: E7EB139960A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6AE053995EB
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The seg6 lwtunnel encap uses a single per-route dst_cache shared
+The seg6 lwtunnel uses a single dst_cache per encap route, shared
 between seg6_input_core() and seg6_output_core(). These two paths
 can perform the post-encap SID lookup in different routing contexts
 (e.g., ip rules matching on the ingress interface, or VRF table
 separation). Whichever path runs first populates the cache, and the
 other reuses it blindly, bypassing its own lookup.
 
-Patch 1 fixes this by splitting the cache into cache_input and
-cache_output. Patch 2 adds a selftest that validates the isolation.
+Fix this by splitting the cache into cache_input and cache_output,
+so each path maintains its own cached dst independently.
 
-Changes v2 -> v3:
- - Patch 2: add root privilege check (Justin)
- - Patch 2: extend prerequisite tool checks and use ping instead
-   of ping6 for consistency with other srv6 selftests
+Fixes: 6c8702c60b88 ("ipv6: sr: add support for SRH encapsulation and injection with lwtunnels")
+Cc: stable@vger.kernel.org
+Signed-off-by: Andrea Mayer <andrea.mayer@uniroma2.it>
+Reviewed-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Reviewed-by: Justin Iurman <justin.iurman@gmail.com>
+---
+ net/ipv6/seg6_iptunnel.c | 34 +++++++++++++++++++++++-----------
+ 1 file changed, 23 insertions(+), 11 deletions(-)
 
-Changes v1 -> v2:
- - Patch 2: fix SKIP message wording (Nicolas)
-
-Andrea Mayer (2):
-  seg6: separate dst_cache for input and output paths in seg6 lwtunnel
-  selftests: seg6: add test for dst_cache isolation in seg6 lwtunnel
-
- net/ipv6/seg6_iptunnel.c                      |  34 ++-
- tools/testing/selftests/net/Makefile          |   1 +
- .../selftests/net/srv6_iptunnel_cache.sh      | 197 ++++++++++++++++++
- 3 files changed, 221 insertions(+), 11 deletions(-)
- create mode 100755 tools/testing/selftests/net/srv6_iptunnel_cache.sh
-
+diff --git a/net/ipv6/seg6_iptunnel.c b/net/ipv6/seg6_iptunnel.c
+index 3e1b9991131a..d6a0f7df9080 100644
+--- a/net/ipv6/seg6_iptunnel.c
++++ b/net/ipv6/seg6_iptunnel.c
+@@ -48,7 +48,8 @@ static size_t seg6_lwt_headroom(struct seg6_iptunnel_encap *tuninfo)
+ }
+ 
+ struct seg6_lwt {
+-	struct dst_cache cache;
++	struct dst_cache cache_input;
++	struct dst_cache cache_output;
+ 	struct seg6_iptunnel_encap tuninfo[];
+ };
+ 
+@@ -488,7 +489,7 @@ static int seg6_input_core(struct net *net, struct sock *sk,
+ 	slwt = seg6_lwt_lwtunnel(lwtst);
+ 
+ 	local_bh_disable();
+-	dst = dst_cache_get(&slwt->cache);
++	dst = dst_cache_get(&slwt->cache_input);
+ 	local_bh_enable();
+ 
+ 	err = seg6_do_srh(skb, dst);
+@@ -504,7 +505,7 @@ static int seg6_input_core(struct net *net, struct sock *sk,
+ 		/* cache only if we don't create a dst reference loop */
+ 		if (!dst->error && lwtst != dst->lwtstate) {
+ 			local_bh_disable();
+-			dst_cache_set_ip6(&slwt->cache, dst,
++			dst_cache_set_ip6(&slwt->cache_input, dst,
+ 					  &ipv6_hdr(skb)->saddr);
+ 			local_bh_enable();
+ 		}
+@@ -564,7 +565,7 @@ static int seg6_output_core(struct net *net, struct sock *sk,
+ 	slwt = seg6_lwt_lwtunnel(orig_dst->lwtstate);
+ 
+ 	local_bh_disable();
+-	dst = dst_cache_get(&slwt->cache);
++	dst = dst_cache_get(&slwt->cache_output);
+ 	local_bh_enable();
+ 
+ 	err = seg6_do_srh(skb, dst);
+@@ -591,7 +592,7 @@ static int seg6_output_core(struct net *net, struct sock *sk,
+ 		/* cache only if we don't create a dst reference loop */
+ 		if (orig_dst->lwtstate != dst->lwtstate) {
+ 			local_bh_disable();
+-			dst_cache_set_ip6(&slwt->cache, dst, &fl6.saddr);
++			dst_cache_set_ip6(&slwt->cache_output, dst, &fl6.saddr);
+ 			local_bh_enable();
+ 		}
+ 
+@@ -701,11 +702,13 @@ static int seg6_build_state(struct net *net, struct nlattr *nla,
+ 
+ 	slwt = seg6_lwt_lwtunnel(newts);
+ 
+-	err = dst_cache_init(&slwt->cache, GFP_ATOMIC);
+-	if (err) {
+-		kfree(newts);
+-		return err;
+-	}
++	err = dst_cache_init(&slwt->cache_input, GFP_ATOMIC);
++	if (err)
++		goto err_free_newts;
++
++	err = dst_cache_init(&slwt->cache_output, GFP_ATOMIC);
++	if (err)
++		goto err_destroy_input;
+ 
+ 	memcpy(&slwt->tuninfo, tuninfo, tuninfo_len);
+ 
+@@ -720,11 +723,20 @@ static int seg6_build_state(struct net *net, struct nlattr *nla,
+ 	*ts = newts;
+ 
+ 	return 0;
++
++err_destroy_input:
++	dst_cache_destroy(&slwt->cache_input);
++err_free_newts:
++	kfree(newts);
++	return err;
+ }
+ 
+ static void seg6_destroy_state(struct lwtunnel_state *lwt)
+ {
+-	dst_cache_destroy(&seg6_lwt_lwtunnel(lwt)->cache);
++	struct seg6_lwt *slwt = seg6_lwt_lwtunnel(lwt);
++
++	dst_cache_destroy(&slwt->cache_input);
++	dst_cache_destroy(&slwt->cache_output);
+ }
+ 
+ static int seg6_fill_encap_info(struct sk_buff *skb,
 -- 
 2.43.0
 
