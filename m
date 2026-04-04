@@ -1,269 +1,146 @@
-Return-Path: <netdev+bounces-275358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275359-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4MnJMYr20GlyCwcAu9opvQ
-	(envelope-from <netdev+bounces-275358-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 13:31:22 +0200
+	id KLwLLmP30GmjCwcAu9opvQ
+	(envelope-from <netdev+bounces-275359-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 13:34:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8814E39AF06
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 13:31:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E77339AF27
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 13:34:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 42780300D6BC
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 11:31:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F1FC5300F9D1
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 11:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4E1F2236FD;
-	Sat,  4 Apr 2026 11:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82CA5314D34;
+	Sat,  4 Apr 2026 11:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JmZ68RU3"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja5ljk3lje4mi4ymjia.icoremail.net (zg8tmja5ljk3lje4mi4ymjia.icoremail.net [209.97.182.222])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 801902BD0B
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 11:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.182.222
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 591152BEC34;
+	Sat,  4 Apr 2026 11:34:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775302277; cv=none; b=EjPw6GXxg5W4S05j9jF2E9fbJGCJ/W4I9DB4XJMbA/2+L8HMKCLnTCiEgABVD21opbTZBUj8H+6OTg9RddS4DixRrwoq7CRQsRNvJFJIAghQDnan2qu80DIerobgbZcxjE3XG0T+VZ+2pi1kxnMML+DJpQpyscY7RF8t5KFOxMI=
+	t=1775302491; cv=none; b=OZDXHoHRJjTzR/THkVBO0x/NvYfAf8yIdkyOq0NhsZ1yCgppB5O+MVt5cKI7VNQciwQPA8VVeeWae1vNh8mKR/L5JquqCHyt+EZtV6ZtOvi/3Ym2cEFrujpdlN6BmVGZaupg7PtxDN0gs8BR4r8QzpzjguoYsACgr/8iKMBghtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775302277; c=relaxed/simple;
-	bh=IWnOiRGNhRT/prylB2A0OTWFcAtycTbn0M2ZRVgBMKc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XYI9Ucv6BhMNeUrKHZp95gsJjAsRql58/DuSnoGhig41gDaVq8Pg7BNnbhW708eqjhc2+m4wfEzAzA/bpXx9zUDqTLEmwqN6ls9U33kV2EJY0lUgYemTW0yXVjlLnibEk9LBpjLMnUGaUTGcVynhlIAC7HiC9oNA9yPP/1+5KlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=209.97.182.222
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from Draw.localdomain (unknown [172.23.146.222])
-	by app2 (Coremail) with SMTP id zQmowAB3EIdl9tBpV8gxAA--.26820S2;
-	Sat, 04 Apr 2026 19:30:45 +0800 (CST)
-From: Ao Zhou <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Felix Maurer <fmaurer@redhat.com>,
-	Murali Karicheri <m-karicheri2@ti.com>,
-	Shaurya Rane <ssrane_b23@ee.vjti.ac.in>,
-	Ingo Molnar <mingo@kernel.org>,
-	Kees Cook <kees@kernel.org>,
-	Yifan Wu <yifanwucs@gmail.com>,
-	Juefei Pu <tomapufckgml@gmail.com>,
-	Yuan Tan <yuantan098@gmail.com>,
-	Xin Liu <bird@lzu.edu.cn>,
-	Yuqi Xu <xuyuqiabc@gmail.com>,
-	Ao Zhou <n05ec@lzu.edu.cn>,
-	Haoze Xie <royenheart@gmail.com>
-Subject: [PATCH net v2 1/1] net: hsr: avoid learning unknown senders for local delivery
-Date: Sat,  4 Apr 2026 19:30:47 +0800
-Message-ID: <b053e938014c9bac22f7f687ecc2970f23a2b74a.1775281843.git.royenheart@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1775056603.git.royenheart@outlook.com>
-References: <cover.1775056603.git.royenheart@outlook.com>
+	s=arc-20240116; t=1775302491; c=relaxed/simple;
+	bh=Ow9QhO9wfoF7Vmg/G2JX4vIid+D5TO7M8+RE/T6ptQw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qjRPGpkfaDHPQDaGMuCjusXCm9bJHWJDYQ+Ln9OcPVkMnEAgnvb2kl3PIXf6/U1ThPBdZOi17e4cu/NmA7zz0UVwhf8nq/q5cq95Cui0VK1t5/p/6CGGim/V8V1FBo+WoIf4KNll7Ukbkj+c54StDVvcwxPoGGVOW+y3M63dEeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JmZ68RU3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4093FC19421;
+	Sat,  4 Apr 2026 11:34:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775302490;
+	bh=Ow9QhO9wfoF7Vmg/G2JX4vIid+D5TO7M8+RE/T6ptQw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JmZ68RU39l6GEIZun8e6WzYdbO86be3EcpU17/EAfhJZv347v/TM+QxiPaMbFpeHc
+	 K4bMxLwFJBq8bSrHeAVv63/rAX7/V7gFMMrtBnIlHT8gwOMNuAu5ju0PhDxH1JOkhq
+	 BE1T2BXRI+aqfuAxSUg53sxoPCgXYtlSSogEHojPe4us+ppePsvedzZsAqsQaZvOfW
+	 vDYeAQo33yt4zz+qbu0bfCvEuKd/pZkQlAEDiD+bgI1QtXRUBqIfESa50DAJcehylR
+	 mPuikA8MEO8zbOed65evwcniqk6g07jgYhNr1Gd2xm7T9zyZ/Uj9ST/tkOnjHCvMG6
+	 QuZsP5sMcUIqQ==
+Date: Sat, 4 Apr 2026 13:34:48 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Changhuang Liang <changhuang.liang@starfivetech.com>
+Cc: Michael Turquette <mturquette@baylibre.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alex@ghiti.fr>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Emil Renner Berthing <kernel@esmil.dk>, Kees Cook <kees@kernel.org>, 
+	"Gustavo A . R . Silva" <gustavoars@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
+	linux-clk@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-hardening@vger.kernel.org, netdev@vger.kernel.org, 
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>, Hal Feng <hal.feng@starfivetech.com>, 
+	Ley Foon Tan <leyfoon.tan@starfivetech.com>
+Subject: Re: [PATCH v1 17/22] dt-bindings: clock: Add StarFive JHB100
+ Peripheral-2 clock and reset generator
+Message-ID: <20260404-valiant-auburn-raven-c24be6@quoll>
+References: <20260402105523.447523-1-changhuang.liang@starfivetech.com>
+ <20260402105523.447523-18-changhuang.liang@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQmowAB3EIdl9tBpV8gxAA--.26820S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxtFy3tF4Dury5tw1DWFyUKFg_yoW7tw1Upa
-	s3Grn5ArZ7Jr1fCr40ya18Zr90yF1kGw429rW8A34IgrnrJFyYvFZxGF4qvFn5GrWkGFWY
-	kF4qqr18Gw1DWa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
-	jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_GFv_Wrylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
-	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjTRMXdjDUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQUHCWnP4nwGMwABsG
-X-Spamd-Result: default: False [-0.96 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260402105523.447523-18-changhuang.liang@starfivetech.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275359-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-275358-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,ti.com,ee.vjti.ac.in,gmail.com,lzu.edu.cn];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.991];
-	PRECEDENCE_BULK(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[baylibre.com,kernel.org,dabbelt.com,eecs.berkeley.edu,ghiti.fr,pengutronix.de,esmil.dk,gmail.com,vger.kernel.org,lists.infradead.org,starfivetech.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: 8814E39AF06
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4E77339AF27
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Haoze Xie <royenheart@gmail.com>
+On Thu, Apr 02, 2026 at 03:55:18AM -0700, Changhuang Liang wrote:
+> +  clocks:
+> +    items:
+> +      - description: Peripheral-2 600MHz
+> +      - description: Peripheral-2 400MHz
+> +      - description: Peripheral-2 125MHz
+> +      - description: Peripheral-2 GMAC2 RGMII RX
+> +      - description: Peripheral-2 GMAC2 RMII Reference
+> +      - description: Peripheral-2 GMAC3 SGMII TX
+> +      - description: Peripheral-2 GMAC3 SGMII RX
+> +      - description: Main Oscillator (25 MHz)
+> +
+> +  clock-names:
+> +    items:
+> +      - const: per2_600
 
-Traffic that is directly addressed to the local HSR/PRP master can be
-delivered locally without creating a persistent node entry. Learning one
-node per previously unseen source MAC lets forged sender floods grow
-node_db until the prune timer catches up.
+Does not have any meaningful name in datasheet / clock hierarchy?
 
-Determine whether a frame is locally exclusive before node lookup and
-skip learning for unknown senders in that case. When no node state
-exists, also skip duplicate discard checks that depend on it.
+> +      - const: per2_400
+> +      - const: per2_125
+> +      - const: per2_gmac2_rgmii_rx
+> +      - const: per2_gmac2_rmii_ref
+> +      - const: per2_gmac3_sgmii_tx
+> +      - const: per2_gmac3_sgmii_rx
 
-This keeps locally-destined traffic reachable while avoiding node table
-growth from source-MAC floods in both the PRP SAN path and the HSR/PRP
-tagged sender paths.
+per2 is redundant. Name these according to clock input names.
 
-Fixes: f421436a591d ("net/hsr: Add support for the High-availability Seamless Redundancy protocol (HSRv0)")
-Fixes: 451d8123f897 ("net: prp: add packet handling support")
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Suggested-by: Xin Liu <bird@lzu.edu.cn>
-Tested-by: Yuqi Xu <xuyuqiabc@gmail.com>
-Signed-off-by: Haoze Xie <royenheart@gmail.com>
-Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
----
-changes in v2:
-- generalize the fix beyond PRP SAN traffic and cover HSR/PRP tagged sender floods
-- decide whether learning is needed from local-exclusive delivery instead of protocol-specific SAN checks
-- use the normal NULL return semantics from hsr_get_node() instead of ERR_PTR-based error plumbing
-- skip duplicate-discard state checks when no node state exists
+Same for your patch for per3.
 
- net/hsr/hsr_forward.c  | 23 +++++++++++++----------
- net/hsr/hsr_framereg.c |  5 ++++-
- net/hsr/hsr_framereg.h |  2 +-
- 3 files changed, 18 insertions(+), 12 deletions(-)
+> +      - const: osc
+> +
+> +
 
-diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-index aefc9b6936ba..15bd17b4ee17 100644
---- a/net/hsr/hsr_forward.c
-+++ b/net/hsr/hsr_forward.c
-@@ -403,7 +403,8 @@ static void hsr_deliver_master(struct sk_buff *skb, struct net_device *dev,
- 	int res, recv_len;
- 
- 	was_multicast_frame = (skb->pkt_type == PACKET_MULTICAST);
--	hsr_addr_subst_source(node_src, skb);
-+	if (node_src)
-+		hsr_addr_subst_source(node_src, skb);
- 	skb_pull(skb, ETH_HLEN);
- 	recv_len = skb->len;
- 	res = netif_rx(skb);
-@@ -545,7 +546,7 @@ static void hsr_forward_do(struct hsr_frame_info *frame)
- 		/* Don't send frame over port where it has been sent before.
- 		 * Also for SAN, this shouldn't be done.
- 		 */
--		if (!frame->is_from_san &&
-+		if (frame->node_src && !frame->is_from_san &&
- 		    hsr->proto_ops->register_frame_out &&
- 		    hsr->proto_ops->register_frame_out(port, frame))
- 			continue;
-@@ -688,21 +689,25 @@ static int fill_frame_info(struct hsr_frame_info *frame,
- 		return -EINVAL;
- 
- 	memset(frame, 0, sizeof(*frame));
-+	frame->port_rcv = port;
- 	frame->is_supervision = is_supervision_frame(port->hsr, skb);
- 	if (frame->is_supervision && hsr->redbox)
- 		frame->is_proxy_supervision =
- 			is_proxy_supervision_frame(port->hsr, skb);
- 
-+	ethhdr = (struct ethhdr *)skb_mac_header(skb);
-+	check_local_dest(port->hsr, skb, frame);
-+
- 	n_db = &hsr->node_db;
- 	if (port->type == HSR_PT_INTERLINK)
- 		n_db = &hsr->proxy_node_db;
- 
- 	frame->node_src = hsr_get_node(port, n_db, skb,
--				       frame->is_supervision, port->type);
--	if (!frame->node_src)
--		return -1; /* Unknown node and !is_supervision, or no mem */
-+				       frame->is_supervision, port->type,
-+				       !frame->is_local_exclusive);
-+	if (!frame->node_src && !frame->is_local_exclusive)
-+		return -1;
- 
--	ethhdr = (struct ethhdr *)skb_mac_header(skb);
- 	frame->is_vlan = false;
- 	proto = ethhdr->h_proto;
- 
-@@ -720,13 +725,10 @@ static int fill_frame_info(struct hsr_frame_info *frame,
- 	}
- 
- 	frame->is_from_san = false;
--	frame->port_rcv = port;
- 	ret = hsr->proto_ops->fill_frame_info(proto, skb, frame);
- 	if (ret)
- 		return ret;
- 
--	check_local_dest(port->hsr, skb, frame);
--
- 	return 0;
- }
- 
-@@ -739,7 +741,8 @@ void hsr_forward_skb(struct sk_buff *skb, struct hsr_port *port)
- 	if (fill_frame_info(&frame, skb, port) < 0)
- 		goto out_drop;
- 
--	hsr_register_frame_in(frame.node_src, port, frame.sequence_nr);
-+	if (frame.node_src)
-+		hsr_register_frame_in(frame.node_src, port, frame.sequence_nr);
- 	hsr_forward_do(&frame);
- 	rcu_read_unlock();
- 	/* Gets called for ingress frames as well as egress from master port.
-diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
-index 50996f4de7f9..2bc6f8f154c2 100644
---- a/net/hsr/hsr_framereg.c
-+++ b/net/hsr/hsr_framereg.c
-@@ -221,7 +221,7 @@ void prp_update_san_info(struct hsr_node *node, bool is_sup)
-  */
- struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
- 			      struct sk_buff *skb, bool is_sup,
--			      enum hsr_port_type rx_port)
-+			      enum hsr_port_type rx_port, bool learn)
- {
- 	struct hsr_priv *hsr = port->hsr;
- 	struct hsr_node *node;
-@@ -270,6 +270,9 @@ struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
- 			san = true;
- 	}
- 
-+	if (!learn)
-+		return NULL;
-+
- 	return hsr_add_node(hsr, node_db, ethhdr->h_source, san, rx_port);
- }
- 
-diff --git a/net/hsr/hsr_framereg.h b/net/hsr/hsr_framereg.h
-index c65ecb925734..3d9c88e83090 100644
---- a/net/hsr/hsr_framereg.h
-+++ b/net/hsr/hsr_framereg.h
-@@ -33,7 +33,7 @@ void hsr_del_self_node(struct hsr_priv *hsr);
- void hsr_del_nodes(struct list_head *node_db);
- struct hsr_node *hsr_get_node(struct hsr_port *port, struct list_head *node_db,
- 			      struct sk_buff *skb, bool is_sup,
--			      enum hsr_port_type rx_port);
-+			      enum hsr_port_type rx_port, bool learn);
- void hsr_handle_sup_frame(struct hsr_frame_info *frame);
- bool hsr_addr_is_self(struct hsr_priv *hsr, unsigned char *addr);
- bool hsr_addr_is_redbox(struct hsr_priv *hsr, unsigned char *addr);
--- 
-2.53.0
+Just one blank line
+
+Best regards,
+Krzysztof
 
 
