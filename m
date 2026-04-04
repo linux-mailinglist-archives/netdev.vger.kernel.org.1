@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-275388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275389-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SKiMN+Eo0WkXGAcAu9opvQ
-	(envelope-from <netdev+bounces-275388-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 17:06:09 +0200
+	id KD1qOvgo0WkXGAcAu9opvQ
+	(envelope-from <netdev+bounces-275389-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 17:06:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4498739B7A0
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 17:06:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56B5539B7AF
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 17:06:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BCBC1300EF65
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 15:05:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB9C6301E21E
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 15:05:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB4D2C234A;
-	Sat,  4 Apr 2026 15:05:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603D5287268;
+	Sat,  4 Apr 2026 15:05:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MHyply/w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nGK1kybz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92BF2749ED
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 15:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A0128F948
+	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 15:05:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775315116; cv=none; b=LhxIsusmpPyqNYcnwMDVQy3PcpuQ59hnBMbwjDXOuo1biW5RWyq4DGuzcOgeFX+CXXiF+dSmB12WA0ffASKmb3dzjSShpGzwluNKIRgUh5Du1gD6aKLHBuLdID+lPss6b7vCAa5ObtjXnKkBJ1wZaQnQt2TmgsUbdD1ktJGMl3g=
+	t=1775315120; cv=none; b=VW0MFvwiMIMX1dnRv3E0yOPC1/dd/uZH2zJHTncMhCyobi7fhToaIZMIV4/NisxNtouRdIOUC9nnfWtCOfSR5bIJwwMpoCsToXu1bQRNRrU+HCB9mEVARd1PBtw1TSnN3vxorJC0/RPglcZQpa2MR9GawPMwgfcMbv7Kid/WUrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775315116; c=relaxed/simple;
-	bh=M36wO1iLBeappZvKcrU5VE7BwVOSjSBPOxXAKwOBYy0=;
+	s=arc-20240116; t=1775315120; c=relaxed/simple;
+	bh=FtKTq7Q2omV5L6dMEgKtQrlVoRSKqix2q+h2ljhis6s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iZhkP6bKKQdvCMe4z2nzyYHPo7MF1oHiiPK7I7lPQwpcVVXUm96CNtex28HhXYGboUKTA6mjzChfIYaN5K/h/Zg9CrrYGU8pUAAzHuN09RYa18tVJkUQCMUzVp+UGG4cXjxW2q/4he8kgL5nyYwvF3hsbADGJOnWueHPto0AaPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MHyply/w; arc=none smtp.client-ip=209.85.215.175
+	 MIME-Version; b=FyXM1EhhcYw9d8r3htwNHfByTbEUT5ERgQMt0Dd7hPkyjHjgCx3hoN+lNeTpcjFUc4WgGW8cs1CHEV7K3MUWo7hpX9itX3aUNRJcdHsdaqLdB2DVv5tOR8gGgNomlNK7kbOD68isrXjOc5aktoY5bhK46mFCiQhTF9msZhK9OsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nGK1kybz; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-c76e702e01aso63760a12.3
-        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 08:05:15 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-82ce0a9b3f7so1169004b3a.0
+        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 08:05:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775315115; x=1775919915; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775315118; x=1775919918; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+SqmaZWSq0c/sFy4TW4UeB/Dws2Pj4gNfU8a5P2DD2w=;
-        b=MHyply/wsr39x12rJle6UeJrlFibm7c1vyhFPHLAF8tZbYhntfaDcwF15mbB1e7Ebp
-         6EVQtXjW7hK/n4bTIlggfJOfXkgytb5FkF38HA+grjie37Zpnk9VRCMu65rJHs7ZAN2p
-         5PRcJUuus0phqiOep0DF/RbBcQBxb2HP6sCKRMlPq5e5WG0tHTNjqq4WRaaCQ6X80oQF
-         JyTOHYaQWbduHhqXqaKTQHJcmvqUot1OnpRbQM0vqWg+zEC9UmsXYU0heaLRBqoTgT82
-         A4dBy1pUui5DOwMQvrSpKgZ0FVWrUtnYjZKYb2Wj/rbA8D8anXSOXz+0qhrCNN38WMb8
-         VcRA==
+        bh=ien+mM5l9GTSiQaCM6QFkP9RFuVj/1ho/sT8zyGGYM4=;
+        b=nGK1kybzBfoofYK7NIBmQCwbuL7Z+MdRJTo1kzrx6edJPCarhFjgQ+Y4KSfRvvoWLX
+         r3CT0Xtfu57ac1ttOv6/iKk5z4f3b+VRrdZ4yZ7EjaaNrwrgA6Nvzsni4E11F/T9PSh3
+         RkoYekk43g3psoyvZftGMGNg3U68waGo2DAT0evDXl5cOhoJ82XgsSi0bbnPNl1ytWBD
+         40YJPDp+c8nwmg1PN74V8Ry+hxkUng9sAa7M8v9wkp6YRnOiw5klq9WmFlrdgAX1WXaa
+         4EMvmC5GY1GZv0puYTVGaWHedVLzZFmzpi3U8FYpdOqg68Rb/265HAPTtozcrjHEJB0B
+         LGbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775315115; x=1775919915;
+        d=1e100.net; s=20251104; t=1775315118; x=1775919918;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=+SqmaZWSq0c/sFy4TW4UeB/Dws2Pj4gNfU8a5P2DD2w=;
-        b=YInF0dMZB3trmIA3Jl/sEDJecH3z3LmhB3tmzBS86QUPVZcAau+qUZXLe5cUr19oJ8
-         D+s9p1YGI7tq1YrdXevM95zrqlGvAX+C5k4CiJ+m/ONpYzZmniQ91FwQmPAkWkeprfaD
-         o/nsp+SmkM+4wbQHExOekDdOfnjw1JjwxvkcCWBg78ORu8wuMzsm2wJt2DkBmGHHxheH
-         lZNOqmBHNUbyMmCzBLc3zrOt5f7p5fR6AlbQ5Ed+kszIhDp8+/XbjfythE4xkrVXvj6A
-         TniVlnsgu2Ve7gmneNIDk2mle+52Ml9uYdoxEmHEcOxVaD7j9SVQe9Dr5PTRHyhYty3F
-         IpfA==
-X-Gm-Message-State: AOJu0YwhtLOtCA+ZIOHdeXBAoc6jx99u+ephjPbCOVQg6skanG76thVj
-	Q6bcuI90v+W0pzpMirLlAJByJiL+P1qh2sGz2RD9GmbEZR1LD7UVGuyeEfUnoG9Xq50=
-X-Gm-Gg: AeBDieul+FIJiBVafBxitZcydpA7l+Hyc1wh94tFVyKPHWJIvgltCcrbc7ANU5brXbw
-	TFshLE7J4dO21mp05rYeP7ihkizyA4ylauUokKvs2HZjAWSN/EzGoenDxK/Clgoy6rFK8EJeaXd
-	1HK0whLMwKHpwoi9bV4kDR5LtFPFv35ha3ZDZhgNZ8k7cOWX5dCj4LapKUm2jYDF2K3+ETKRLug
-	J6lmdCqPnxTjiP1SSQQ5XrX9YLXp0i0p0GwBoBQ1ZV0Ri7NQWECpU7PkZp73x9upWg0FCgI6WS1
-	NCvzMp1YUqkoaAaSQcPFKnDY9pQVuqK/ay33f0QumRBNF285cXEVBV14bCvE6gzwMW9h/uIypUI
-	WrITJlCslu0rHJiaS17Yz865ejhBjdZvN2J5hAYU8aoU2Cz15z/ZsJ9rcZdPvbhQqD+4Wi9T6Yr
-	+V0oqLWtoDpTss+luid17NBoU+ybPPLuc2CD4019IurAXERwTeYLflD+x4LHg=
-X-Received: by 2002:a05:6a20:2448:b0:39f:2c96:e0cf with SMTP id adf61e73a8af0-39f2f0b2d05mr6892022637.18.1775315114591;
-        Sat, 04 Apr 2026 08:05:14 -0700 (PDT)
+        bh=ien+mM5l9GTSiQaCM6QFkP9RFuVj/1ho/sT8zyGGYM4=;
+        b=X+b2vTaei6iHaLC02dudOvARPD71KLuoIJerAdThkYTEvc2+1k7N/m6/j4DGv6LkDY
+         2k8WIk20CD/JXBZOT1FSBXWlXXRkKzGIDQ7KCmehfZM/TsgbbQ3+D+elxjGzB7Hnu/sF
+         kx7nJOTmwzvY32YAmq6N5sfuErahnEr+wtS7jrDneOtKjeHp0SaekR1vtIIEl9pM3Xua
+         Jmf46CvroFfR7O7l+1q8IRGnW/SEd5uX9mxUr4kqCPMGPW+17aYviT9RLzVWQUpGXBR9
+         rh9PoYK3HKJm75STMNjG3YUYI/xo9yUbi6rAnvmM3joIzCLyx15z6poeY96yPCMhjt5N
+         OnzA==
+X-Gm-Message-State: AOJu0Yy+W8qWu4jsJv+2C+y2lSxPq1CjWeHdWx/8HbYbtKXCg2a7m435
+	Hd8Cremdkww3/muyBwJBhu5THxuSnH+OZw+yfZS9OCqUHxlJfOqPZD+A
+X-Gm-Gg: AeBDietF1I8VvEtiE5bNkTAk+JFA53CbxCqDZgBedU0d5MC1tCIzNXhyZ8RuckCQFVQ
+	T0i4Z7IHEgzkEB6KeQH7zsj0cHquk4l7NYTP7tY/q7o9XYYC9y6/wS1Yke11MRXz+q+5OBVBGsQ
+	X+iZOlN/ftocCAqAL+mVkM3SSPvnrjDA7jYXAYoDNdz8T0UmNR5X7MzP0LEML+1c3qkvdHZdkdL
+	z4ukGIc5n0U4wQTht0T0lUQNek1XWS5L66QaDWozD0CzXKus/dAw5avagKo+7ilD5o3uHjZA3Jl
+	SuJuTjHO6VsgJDcSvurZ3J2SwLbHh9GrrwSPEgEIqeDS9Alh5Y2UcAb7X4hq+iAOqqKRRqZVdXF
+	AB9khEGuErdUCTK2cxZH3he2bmkOZE2gIsBLIQ2IuHVVO0NfO8KOha2Yh/Vs5OvuDsDKXGu5pJQ
+	bQUd7qz7wiU7DVkW0K1GVctfAf5bU1326/R1vyQBbbtajMyXwnqdDcjx0F7wk=
+X-Received: by 2002:a05:6a20:431a:b0:39b:ae5c:164d with SMTP id adf61e73a8af0-39f2eda9e97mr7034068637.4.1775315118410;
+        Sat, 04 Apr 2026 08:05:18 -0700 (PDT)
 Received: from KERNELXING-MC1.tencent.com ([121.25.96.171])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76c65935cbsm8051444a12.26.2026.04.04.08.05.10
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c76c65935cbsm8051444a12.26.2026.04.04.08.05.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Apr 2026 08:05:13 -0700 (PDT)
+        Sat, 04 Apr 2026 08:05:17 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -85,11 +85,10 @@ To: davem@davemloft.net,
 	martin.lau@kernel.org
 Cc: netdev@vger.kernel.org,
 	bpf@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>,
-	Yushan Zhou <katrinzhou@tencent.com>
-Subject: [PATCH net-next v2 3/4] bpf-timestamp: keep track of the skb when wait_for_space occurs
-Date: Sat,  4 Apr 2026 23:04:51 +0800
-Message-Id: <20260404150452.83904-4-kerneljasonxing@gmail.com>
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v2 4/4] bpf-timestamp: complete tracing the skb from each push in sendmsg
+Date: Sat,  4 Apr 2026 23:04:52 +0800
+Message-Id: <20260404150452.83904-5-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20260404150452.83904-1-kerneljasonxing@gmail.com>
 References: <20260404150452.83904-1-kerneljasonxing@gmail.com>
@@ -105,13 +104,13 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275388-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275389-lists,netdev=lfdr.de];
 	RCVD_COUNT_FIVE(0.00)[5];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
@@ -120,64 +119,58 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-1.000];
 	DKIM_TRACE(0.00)[gmail.com:+];
 	TAGGED_RCPT(0.00)[netdev];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[tencent.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4498739B7A0
+X-Rspamd-Queue-Id: 56B5539B7AF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Jason Xing <kernelxing@tencent.com>
 
-The patch is the 1/2 part of push-level granularity feature.
+The patch is the 2/2 part of push-level granularity feature.
 
-Tag the skb in tcp_sendmsg_locked() when wait_for_space occurs even
-though it might not carry the last byte of the sendmsg.
+Prior to the patch, BPF timestamping cannot cover this case.
+Here is how we reproduce in theory:
+1) in the first round, __tcp_push_pending_frames() or tcp_push() kicks
+   the stack to transfer the skb.
+2) in the second round, problems like skb_copy_to_page_nocache() that
+   returns with err code.
+3) it jumps into 'do_error" label and then 'out' label.
+4) at this point, there is no single skb staying in the write queue
+5) the end of sendmsg
 
-Prior to the patch, BPF timestamping cannot cover this case:
-The following steps reproduce this:
-1) skb A is the current last skb before entering wait_for_space process
-2) tcp_push() pushes A without any tag
-3) A is transmitted from TCP to driver without putting any skb carrying
-   timestamps in the error queue, like SCHED, DRV/HARDWARE.
-4) sk_stream_wait_memory() sleeps for a while and then returns with an
-   error code. Note that the socket lock is released.
-5) skb A finally gets acked and removed from the rtx queue.
-6) continue with the rest of tcp_sendmsg_locked(): it will jump to(goto)
-   'do_error' label and then 'out' label.
-7) at this moment, skb A turns out to be the last one in this send
-   syscall, and miss the following tcp_bpf_tx_timestamp() opportunity
-   before the final tcp_push()
-8) BPF script fails to see any timestamps this time
+Monitor these two push functions with the previous one to complete
+the conversion from send-level granularity to push-level granularity.
 
-Signed-off-by: Yushan Zhou <katrinzhou@tencent.com>
 Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
- net/ipv4/tcp.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ net/ipv4/tcp.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index c603b90057f6..7d030a11d004 100644
+index 7d030a11d004..43fa8329a5ad 100644
 --- a/net/ipv4/tcp.c
 +++ b/net/ipv4/tcp.c
-@@ -1400,9 +1400,11 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- wait_for_space:
- 		set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
- 		tcp_remove_empty_skb(sk);
--		if (copied)
-+		if (copied) {
-+			tcp_bpf_tx_timestamp(sk);
- 			tcp_push(sk, flags & ~MSG_MORE, mss_now,
- 				 TCP_NAGLE_PUSH, size_goal);
-+		}
+@@ -1392,9 +1392,12 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
  
- 		err = sk_stream_wait_memory(sk, &timeo);
- 		if (err != 0)
+ 		if (forced_push(tp)) {
+ 			tcp_mark_push(tp, skb);
++			tcp_bpf_tx_timestamp(sk);
+ 			__tcp_push_pending_frames(sk, mss_now, TCP_NAGLE_PUSH);
+-		} else if (skb == tcp_send_head(sk))
++		} else if (skb == tcp_send_head(sk)) {
++			tcp_bpf_tx_timestamp(sk);
+ 			tcp_push_one(sk, mss_now);
++		}
+ 		continue;
+ 
+ wait_for_space:
 -- 
 2.41.3
 
