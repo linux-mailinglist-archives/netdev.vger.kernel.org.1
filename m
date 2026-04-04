@@ -1,64 +1,61 @@
-Return-Path: <netdev+bounces-275322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275323-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cMpECDat0Gll+wYAu9opvQ
-	(envelope-from <netdev+bounces-275322-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 08:18:30 +0200
+	id lC1iCk2v0Gnm+wYAu9opvQ
+	(envelope-from <netdev+bounces-275323-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 08:27:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A76B439A1B5
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 08:18:29 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65DC139A1F7
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 08:27:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 0140D3007BA8
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 06:18:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D6C813018BDB
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 06:27:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF5133BBBD;
-	Sat,  4 Apr 2026 06:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2444B37702B;
+	Sat,  4 Apr 2026 06:27:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="oLQkKPDp"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="eS25IqI7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6632FE056
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 06:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00583376490;
+	Sat,  4 Apr 2026 06:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775283505; cv=none; b=lZ8ESS0JueRrCO6Mos+p4KJ2XXOH8bDrFNXEyi0k1wqGJraLjng6caAozURnA4IV28av7LmD9Fhw2GziXXl30sfmj0D1DHiSpIf+zE6PTFD7Fm7VGSdLEo6Een52kjObWWCdE6XuHHi6OR0sT2GOr8tndKg4izy8LfS/VXIJtMU=
+	t=1775284042; cv=none; b=SHklDf4hLms4vkxU8b1REJM+n67VYmJt8fx5X6VB1RNY9lCMt468osKTdU0sHhFWp1HVTeF0MI0FFVql6332xYBhEJcI2xaG9nnYanY0o5KMbRwlsFBHh0UivhPgJWm2aUfJndhDhR65+y14v0vBf363qaKdJb2TPqLWv7fHCgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775283505; c=relaxed/simple;
-	bh=oz1NsWKFN908kdETYVcdeNmEkUFKiu4Wtoc8BzmgJbY=;
+	s=arc-20240116; t=1775284042; c=relaxed/simple;
+	bh=bunaKKoOIroUL7wg9Yyer32hEEY8Vk14GWbxkhxtkKY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MXsfAgGFRqnSkM79p9pLoNlLQj8DsGotcZyGViENIX+ozCOprOnNV8slK8pt7oInTSU/3eS74Aasts24mGvZjnFnvvo1zi5PGGsT5eDldeXN4L8DWRO7tD3fN8Wp19L6yxlUmkoPNlpEXZmHoafmoF8/iXoqnuFnEOopntRn+Q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=oLQkKPDp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6808C19423;
-	Sat,  4 Apr 2026 06:18:24 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=J15CShSkvXqME1NuUy+2vNiqUW9aPBOHXUe5VdNNe+A0M2eVaohn8bJJIlh+HAA4XmJYgAqxCgEH8sbA0KdDmTRWu7kejUJdFn1xSHy9q9QugYC17UXHGjMWEeIwJRjs1FigtkDrOwxAsPjbUES8Aghj+vn8w3SdAhKfvQHvfD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=eS25IqI7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18FE2C19423;
+	Sat,  4 Apr 2026 06:27:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1775283505;
-	bh=oz1NsWKFN908kdETYVcdeNmEkUFKiu4Wtoc8BzmgJbY=;
+	s=korg; t=1775284041;
+	bh=bunaKKoOIroUL7wg9Yyer32hEEY8Vk14GWbxkhxtkKY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oLQkKPDpImSTuEvvF3B/UNJHkGEeKhdR2YrAh6WMBTUDBKWaUhH+PikH2edLBPwrf
-	 gmcwNQ1BpW7kKX/0VYU+JFURyZ98wlx3soigF22atosbfkK3xEz+9IMYxusBT/+/DZ
-	 zLuBa1cAv5Am7mR6CWjAFJvRfDynFHpln7+txxF0=
-Date: Sat, 4 Apr 2026 08:14:12 +0200
+	b=eS25IqI783pq1ol1St7L0uP2C2mQd6sEUhM291Qca3BVJS8aCOnBZPLI6TmgkY+TE
+	 Vg+t/AhhKerwKSpgT5AZgmrLCqnqBgH0HgLCe+s8gvtbMjZ59I2x+jgnzWam1TXJ8A
+	 QeoeBZ+adfVKZ7Ni3O2uP8WXB4AFFBDKfwLbSAr0=
+Date: Sat, 4 Apr 2026 08:27:18 +0200
 From: Greg KH <gregkh@linuxfoundation.org>
-To: Main Frame <framemain@outlook.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"security@kernel.org" <security@kernel.org>
-Subject: Re: OOB heap read in =?utf-8?Q?nci=5Fcore?=
- =?utf-8?Q?=5Finit=5Frsp=5Fpacket=5Fv1=28=29_via_chip-controlled_pointer_a?=
- =?utf-8?Q?rithmetic_=E2=80=94?= net/nfc/nci/rsp.c
-Message-ID: <2026040440-unnerve-dork-3a79@gregkh>
-References: <IA4PR10MB85192CB7160F3B87AE25DE55AA5EA@IA4PR10MB8519.namprd10.prod.outlook.com>
- <2026040335-gout-cytoplast-a1c0@gregkh>
- <IA4PR10MB8519F683F0FE5B64122A5216AA5EA@IA4PR10MB8519.namprd10.prod.outlook.com>
- <20260403163545.6e7c0f53@kernel.org>
- <SJ5PPF8C7834C85946892B0A1418D1F7FB2AA5FA@SJ5PPF8C7834C85.namprd10.prod.outlook.com>
+To: Birger Koblitz <mail@birger-koblitz.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chih Kai Hsu <hsu.chih.kai@realtek.com>
+Subject: Re: [PATCH net-next v6 0/2] r8152: Add support for the RTL8157 5Gbit
+ USB Ethernet chip
+Message-ID: <2026040421-kite-ethanol-2e28@gregkh>
+References: <20260402-rtl8157_next-v6-0-a9b77c0931ef@birger-koblitz.de>
+ <20260403160608.04f2408b@kernel.org>
+ <741bde66-45b7-49e4-88be-7fb1ca8a92df@birger-koblitz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,55 +64,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SJ5PPF8C7834C85946892B0A1418D1F7FB2AA5FA@SJ5PPF8C7834C85.namprd10.prod.outlook.com>
-X-Spamd-Result: default: False [2.34 / 15.00];
+In-Reply-To: <741bde66-45b7-49e4-88be-7fb1ca8a92df@birger-koblitz.de>
+X-Spamd-Result: default: False [3.84 / 15.00];
 	MID_END_EQ_FROM_USER_PART(4.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
 	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
 	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-275323-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275322-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	FREEMAIL_TO(0.00)[outlook.com];
 	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[linuxfoundation.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
+	NEURAL_HAM(-0.00)[-0.998];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[]
-X-Rspamd-Queue-Id: A76B439A1B5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 65DC139A1F7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Apr 04, 2026 at 12:24:29AM +0000, Main Frame wrote:
-> 
->  nfc: nci: fix OOB heap read in nci_core_init_rsp_packet_v1()
-> 
+On Sat, Apr 04, 2026 at 05:54:43AM +0200, Birger Koblitz wrote:
+> On 04/04/2026 01:06, Jakub Kicinski wrote:
+> > On Thu, 02 Apr 2026 10:28:12 +0200 Birger Koblitz wrote:
+> > > Add support for the RTL8157, which is a 5GBit USB-Ethernet adapter
+> > > chip in the RTL815x family of chips.
+> > 
+> > no longer applies, please rebase & repost
+> It looks like you are letting me play out the story of the hare and the
+> hedgehog. If there is no interest in this patch series or you would like
+> it to look different, please let me know instead of playing games.
 
-<snip>
+"Does not apply" is not a game, you just need to rebase and resubmit as
+others are also doing work on the same driver at the same time, so there
+can be some conflicts that it is up to the submitter to resolve.
 
-For some reason your email client sent this in html format, and it was
-corrupted and indented and couldn't be applied.
-
-Can you take a look at Documentation/process/email-clients.rst for how
-to fix up your email client to not do this and resend it in the correct
-format so that it can be applied?
-
-Also, one note, the "v2" stuff goes below the --- line as documented.
+This is normal kernel development, has always been this way.
 
 thanks,
 
