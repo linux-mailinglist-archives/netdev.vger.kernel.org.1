@@ -1,60 +1,62 @@
-Return-Path: <netdev+bounces-275294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275295-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0HQ9GblT0Gmx6QYAu9opvQ
-	(envelope-from <netdev+bounces-275294-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 01:56:41 +0200
+	id GAf1BBBV0GkA6gYAu9opvQ
+	(envelope-from <netdev+bounces-275295-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:02:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFB6B39925C
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 01:56:40 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D2A53992A4
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:02:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 686633028361
-	for <lists+netdev@lfdr.de>; Fri,  3 Apr 2026 23:56:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BA3B230209CB
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 00:01:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6308A314A82;
-	Fri,  3 Apr 2026 23:56:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252241548C;
+	Sat,  4 Apr 2026 00:01:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="msMw8Xsx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CcB0yCwV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A641A262D;
-	Fri,  3 Apr 2026 23:56:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02134186A;
+	Sat,  4 Apr 2026 00:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775260598; cv=none; b=H6MkiSIzQ/O5YPTZ8a9IjlfsHBshjCjysOizoPr3QI7un8GapYFXcFthfJz4Vn2HRwlb5vtiKIzvcizatQe5gDSgMGEwCZkVgaW0HsKIiJrFHnIYE2fMnBjGnju43tBQ919Oi4eGcJ6knG31QdjMvNWGsMw5KnraYGF+ctsvQ9c=
+	t=1775260888; cv=none; b=opUE06OohSGzYrSf6jDPDeEUUK/K4Z4lt72DM0y9jsH6wH5XyBQ6A60yb022auvuFdQqqsh1QQsgBOPbAf14j8g/UGaGNu2VfoJvVC61se0ADmhZODQ47EfhblTMkaa4DCidVu1s9HlaTD0TS97WmL0Fqper5hS2TiNu6JwmPRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775260598; c=relaxed/simple;
-	bh=UTBAkQ9neJE5ofzAe8EoJOdScc3B7H+1wVjcdejfLXE=;
+	s=arc-20240116; t=1775260888; c=relaxed/simple;
+	bh=bNNcDrtNN79duLiVkQQ6cLnqJmh2d0HGN04f1nN0EgI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nnHlTmw9ffp8u30PndwqN7n6gvVpvUIYYh270gEQpXVSl/nr22IRlyULaD499zPoUSwA+rY6s1X4gx6NbeM2zpC9j5kwvq7VxRBRttHQPeIq+ZHIXQU/lCTjzcqgGWSH7XajD7xAe4XoXsvVmSY+KZ81qpDTDD66VHu/2n1iSy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=msMw8Xsx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 756A1C4CEF7;
-	Fri,  3 Apr 2026 23:56:37 +0000 (UTC)
+	 MIME-Version:Content-Type; b=NaCgdq3tjInLdMnHoMX8uN7O7LCtf/6+lC6Zuf3XqBI8jVyAjGCSTiA7xNRGbSmmV2jLNt9mEfWtFHaJiJxQFFjDZY1wMEmAUGcIJGCH9WO+ghNX9amN0a7Kshhm77XczKeJpQCK5bZ+xEH/ON7kMvKkUpJMHz5cUKBmzO9nEtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CcB0yCwV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 252CBC4CEF7;
+	Sat,  4 Apr 2026 00:01:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775260597;
-	bh=UTBAkQ9neJE5ofzAe8EoJOdScc3B7H+1wVjcdejfLXE=;
+	s=k20201202; t=1775260887;
+	bh=bNNcDrtNN79duLiVkQQ6cLnqJmh2d0HGN04f1nN0EgI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=msMw8XsxjRYu5Qo/LG2w1oxhFGH3qTNP+e6ZeC1dImikJ77b4ZXGx3XA9QhlqGJJ+
-	 oit5I7F1Stpw2pTfs7XERpfiHyPfnX101tIhxe+WQMJU75tF4Oo4euZGlz4bS/Nu2P
-	 wDaZyuHnmi01s5cYi/fd5Z9e1ydGm8UEEItUV1JEHSRzy2Wpa86h9uq3su8UFFhuBq
-	 WyNz82GJf9XISqj2SlvCHfW9Qw6IBVr6XNoxUo9+kphoTQmklrWRLvo3oWL4lL2uH/
-	 0rPWE3+VjvZqL86WHUWkAUsM7TkYkwk9Es17NkNORQbmddQztVgSDSPlniDDv+aY0D
-	 bw+VdVawPdmRQ==
-Date: Fri, 3 Apr 2026 16:56:36 -0700
+	b=CcB0yCwV1VFrHA31Qi3rnveP9qR7FZ3ayZA2lNBEVbbf06jhsXbMT499hYfrPs11L
+	 DV3eDBk/n4B0jZWqtYlEINCoakh5VcXORl307cHAaCWwrLqAyF4lP9ijDhJ6opc/fU
+	 /IaFy6ie/V5Xpi2Ef2+D7TQphbraRiOayvyu4emcLeJVm4z3xtg6S6y1vxv4xTf45U
+	 tBYHlFDdctydJbL4BerwLekoU3O7gJ7YlTFlEsylh/uS9xXCoiqo2KmZxCRPllEizE
+	 lQe4XTQXYiEDFZ03pgkwrxfzMZ0UEbnLBAM0Mo4BigmqXWfaE61AjxuwRanziM6Vs6
+	 ZoTnt6Wfh+0Dg==
+Date: Fri, 3 Apr 2026 17:01:26 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, magnus.karlsson@intel.com,
  stfomichev@gmail.com, pabeni@redhat.com, horms@kernel.org,
- larysa.zaremba@intel.com, aleksander.lobakin@intel.com, bjorn@kernel.org
-Subject: Re: [PATCH v6 net 3/8] xsk: fix XDP_UMEM_SG_FLAG issues
-Message-ID: <20260403165636.1f4ee958@kernel.org>
-In-Reply-To: <20260402154958.562179-4-maciej.fijalkowski@intel.com>
+ larysa.zaremba@intel.com, aleksander.lobakin@intel.com, bjorn@kernel.org,
+ Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH v6 net 1/8] xsk: tighten UMEM headroom validation to
+ account for tailroom and min frame
+Message-ID: <20260403170126.276f9623@kernel.org>
+In-Reply-To: <20260402154958.562179-2-maciej.fijalkowski@intel.com>
 References: <20260402154958.562179-1-maciej.fijalkowski@intel.com>
-	<20260402154958.562179-4-maciej.fijalkowski@intel.com>
+	<20260402154958.562179-2-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,12 +69,12 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,redhat.com,kernel.org];
-	TAGGED_FROM(0.00)[bounces-275294-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,gmail.com,redhat.com,kernel.org,fomichev.me];
+	TAGGED_FROM(0.00)[bounces-275295-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
@@ -80,7 +82,7 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
@@ -88,57 +90,26 @@ X-Spamd-Result: default: False [-2.16 / 15.00];
 	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: AFB6B39925C
+X-Rspamd-Queue-Id: 7D2A53992A4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu,  2 Apr 2026 17:49:53 +0200 Maciej Fijalkowski wrote:
-> Currently xp_assign_dev_shared() is missing XDP_USE_SG being propagated
-> to flags so set it in order to preserve mtu check that is supposed to be
-> done only when no multi-buffer setup is in picture.
+On Thu,  2 Apr 2026 17:49:51 +0200 Maciej Fijalkowski wrote:
+> The current headroom validation in xdp_umem_reg() could leave us with
+> insufficient space dedicated to even receive minimum-sized ethernet
+> frame. Furthermore if multi-buffer would come to play then
+> skb_shared_info stored at the end of XSK frame would be corrupted.
 > 
-> Also, this flag has the same value as XDP_UMEM_TX_SW_CSUM so we could
-> get unexpected SG setups for software Tx checksums. Since csum flag is
-> UAPI, modify value of XDP_UMEM_SG_FLAG.
+> HW typically works with 128-aligned sizes so let us provide this value
+> as bare minimum.
+> 
+> Multi-buffer setting is known later in the configuration process so
+> besides accounting for 128 bytes, let us also take care of tailroom space
+> upfront.
 
-should we maybe add:
-
-BUILD_BUG_ON(XDP_UMEM_SG_FLAG & XDP_UMEM_FLAGS_VALID)
-
-somewhere or use a hack like this ?
-
-#define XDP_UMEM_SG_FLAG	(XDP_UMEM_FLAGS_VALID + 1)
-
-> diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-> index 23e8861e8b25..ebac60a3d8a1 100644
-> --- a/include/net/xdp_sock.h
-> +++ b/include/net/xdp_sock.h
-> @@ -14,7 +14,7 @@
->  #include <linux/mm.h>
->  #include <net/sock.h>
->  
-> -#define XDP_UMEM_SG_FLAG (1 << 1)
-> +#define XDP_UMEM_SG_FLAG BIT(3)
->  
->  struct net_device;
->  struct xsk_queue;
-> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-> index 37b7a68b89b3..729602a3cec0 100644
-> --- a/net/xdp/xsk_buff_pool.c
-> +++ b/net/xdp/xsk_buff_pool.c
-> @@ -247,6 +247,10 @@ int xp_assign_dev_shared(struct xsk_buff_pool *pool, struct xdp_sock *umem_xs,
->  	struct xdp_umem *umem = umem_xs->umem;
->  
->  	flags = umem->zc ? XDP_ZEROCOPY : XDP_COPY;
-> +
-> +	if (umem->flags & XDP_UMEM_SG_FLAG)
-> +		flags |= XDP_USE_SG;
-> +
->  	if (umem_xs->pool->uses_need_wakeup)
->  		flags |= XDP_USE_NEED_WAKEUP;
->  
-
+I guess it's a bit late to ask this, but am I the only one that has
+weird feelings about shinfo living in user-mapped memory?
 
