@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-275297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275298-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CMZzNhBW0GkA6gYAu9opvQ
-	(envelope-from <netdev+bounces-275297-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:06:40 +0200
+	id SOw0KCFW0GkA6gYAu9opvQ
+	(envelope-from <netdev+bounces-275298-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:06:57 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63D5B399327
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:06:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AEA839932F
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 02:06:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B968305E9BB
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 00:06:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 003EB306777E
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 00:06:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802E11DA23;
-	Sat,  4 Apr 2026 00:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFCD8883F;
+	Sat,  4 Apr 2026 00:06:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="isL26sF9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z2u176yn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D38520ED
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 00:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADEB8256D
+	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 00:06:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775261164; cv=none; b=J5cTb3MfccZkvOgF3gxT423iBak7L5v4rj/ojQaeKyS8BDM5V7TRCVB14x2De9KOY+vMNhp7UKwZ4r4rgcCv8pE+n/MfbzSrsIQgL99nbw4KGmYjdRCemSfsNiFi+zJKpzcWI1G6CK/1XtljeqhdHB4RqwZiJbA9e00uS6jPBtE=
+	t=1775261166; cv=none; b=BITvprNRwQfAptZUcl3OTR6KgfGXTZSKyh5viKxzLLt+6U0NVBQ0aEukdNg1tO0LYG9GhdLprP79VK4IlUdNTRnEUjW8C1Hm6wc0aSK41KiXD0g7fGuec7oPtQhdsIyUG/iQPLib1zXuCsefas4OOiY5nj0g/qKL8QdeqRY3cj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775261164; c=relaxed/simple;
-	bh=ckrsAK1DKZFms8X7f4mWEjqzrmnC7nSSDHp/8YcQ1OM=;
+	s=arc-20240116; t=1775261166; c=relaxed/simple;
+	bh=bxelPIZ8UlPj42apf8jGh6TgMpyzpGJkj+dQBBRV3tA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g91ekzCea0SWVm0VvjafcxEBSFVGg0+tpa5gxUueY93KdIagRDljj++3ud7EJt9FNW6/0z2C3CXPlOpRJIsuWWb6/X0TuooO7GF8PYZ1yfSfWxjsizrlL2C8xRhnHqvJhwwOVYQjjKEI8XiS6BvXX1r9ARntMcp17AbR0Z6YvrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=isL26sF9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF776C2BCAF;
-	Sat,  4 Apr 2026 00:06:03 +0000 (UTC)
+	 MIME-Version; b=ZscReXw/rxtB2jTEcS4QJCEx8kolm3RDljIZWQA1Qv0eZfEfanDnQrzkys3wLskFdKHjnEX2StDQP8TPihaXpx1aLS28/awB70HJziHPRKTk6PbLrbbVyA5JFcrY3Ohj265vH1YP7Oo2FVS9tFdXgz8rAg5nzWN1urOBIPaJ/6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z2u176yn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9106C19424;
+	Sat,  4 Apr 2026 00:06:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775261164;
-	bh=ckrsAK1DKZFms8X7f4mWEjqzrmnC7nSSDHp/8YcQ1OM=;
+	s=k20201202; t=1775261166;
+	bh=bxelPIZ8UlPj42apf8jGh6TgMpyzpGJkj+dQBBRV3tA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=isL26sF91N4g5LFg+JB4l8ynnK+FKZlw++4YLp7sPZ2SV53eWJZqXn342POpshzsQ
-	 sbdt9WH76Ei8nfTmWrIRWfo94/IZJkF1DcE3CWVhhuImvvC/NIQ5Eze4iI9ugFaJq0
-	 sw5vWm+kLkO6Ni+57hIMb2ohEeWuzvxRHJP1sJmIqNnuGXfTxljR44tzSgTjUIzGMq
-	 tv1MfKnWJpIK8LJMMTVvLdUxV1IGrPxWO1PA5A6aCTtl7rw/AeKlZsoUYVxsOJowT/
-	 lxvpbrME2bLYSgjfIk+VPbjihm/mwSEuxx9wOsLjjm9VHUf9u6r2r7G5HF0hvuEokf
-	 6mrUImyZY/KXw==
+	b=Z2u176ynbwUyTv1kmnxXJ4XVbQmF+QQTyd+Q+UgllK9tEUZ2ZFvQdSetncMLcxwHe
+	 UwxDCW5jFYmu3O3jXmd6WCj/+Ulj/CeA4ScnaXOzLrg+WVPO6g2I8RMAriqUsCADOD
+	 6z6+rRk7g2rBO4V5ktSA/+CoaUzf5vJuib19x2TsNGeOzj3f4mejF3U57sirAED4wr
+	 fNnvQMjdmNKz59OePCXf/LSUs4j8D1M19Cxrpon8UeJIUpb6G2gfni44CKIWHEM++Y
+	 qhmTug5mJ8xE8xfThslF6fEi4OlVli2NQfQzYAzx34ofDwwZ+9vGlDPk7JYhl3kSOd
+	 IBB62yn2zS9FQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: sdf@fomichev.me
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -53,12 +53,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	pabeni@redhat.com,
 	jiri@resnulli.us,
 	jv@jvosburgh.net
-Subject: Re: [PATCH net-next v5 01/14] net: add address list snapshot and reconciliation infrastructure
-Date: Fri,  3 Apr 2026 17:06:02 -0700
-Message-ID: <20260404000602.2413848-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v5 02/14] net: introduce ndo_set_rx_mode_async and netdev_rx_mode_work
+Date: Fri,  3 Apr 2026 17:06:04 -0700
+Message-ID: <20260404000604.2413879-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260402225535.4124525-2-sdf@fomichev.me>
-References: <20260402225535.4124525-2-sdf@fomichev.me>
+In-Reply-To: <20260402225535.4124525-3-sdf@fomichev.me>
+References: <20260402225535.4124525-3-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,7 +77,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275297-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275298-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -93,123 +93,108 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 63D5B399327
+X-Rspamd-Queue-Id: 1AEA839932F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-    net: add address list snapshot and reconciliation infrastructure
+Subject: net: introduce ndo_set_rx_mode_async and netdev_rx_mode_work
 
-This commit introduces address list snapshot and reconciliation routines
-to support the async rx_mode path. It provides functions to snapshot the
-lists, and to reconcile the hardware sync state back to the original lists
-after driver processing.
+This commit introduces an async variant of ndo_set_rx_mode that runs from a
+workqueue, allowing drivers to sleep during RX mode changes. It also adds
+netif_rx_mode_sync() to opportunistically flush pending updates before
+returning to userspace.
 
-> diff --git a/net/core/dev_addr_lists.c b/net/core/dev_addr_lists.c
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+[ ... ]
+> @@ -12217,6 +12178,9 @@ void free_netdev(struct net_device *dev)
+>  
+>  	kfree(rcu_dereference_protected(dev->ingress_queue, 1));
+>  
+> +	if (netif_rx_mode_clean(dev))
+> +		dev_put(dev);
+> +
+>  	/* Flush device addresses */
+>  	dev_addr_flush(dev);
+
+Is this cleanup reachable during normal shutdown?
+
+When a device is queued to rx_mode_list, netif_rx_mode_queue() elevates its
+reference count via dev_hold(). During unregistration, netdev_wait_allrefs()
+blocks the system until all references are dropped.
+
+Because of this wait, the system shouldn't be able to reach free_netdev()
+until the worker thread has already dequeued the device and called
+dev_put(). It seems the device is guaranteed to not be on the list by the
+time this code executes.
+
 > --- a/net/core/dev_addr_lists.c
 > +++ b/net/core/dev_addr_lists.c
 [ ... ]
-> @@ -501,6 +503,114 @@ void __hw_addr_init(struct netdev_hw_addr_list *list)
-[ ... ]
-> +void __hw_addr_list_reconcile(struct netdev_hw_addr_list *real_list,
-> +			      struct netdev_hw_addr_list *work,
-> +			      struct netdev_hw_addr_list *ref, int addr_len)
+> +static void netdev_rx_mode_work(struct work_struct *work)
 > +{
-[ ... ]
-> +		real_ha = __hw_addr_lookup(real_list, ref_ha->addr, addr_len,
-> +					   ref_ha->type);
-> +		if (!real_ha) {
-> +			/* The real entry was concurrently removed. If the
-> +			 * driver synced this addr to hardware (delta > 0),
-> +			 * re-insert it as a stale entry so the next work
-> +			 * run unsyncs it from hardware.
-> +			 */
-> +			if (delta > 0) {
-> +				real_ha = __hw_addr_create(ref_ha->addr,
-> +							   addr_len,
-> +							   ref_ha->type, false,
-> +							   false);
-
-Does this code silently leak a hardware MAC filter if the GFP_ATOMIC allocation
-fails? If the software loses track of this address, it appears future sync runs
-will never unsync it from the hardware.
-
-Could this failure be avoided by unlinking ref_ha from the ref list (which is
-about to be unconditionally freed via __hw_addr_flush) and moving it directly
-into real_list?
-
-> +				if (real_ha) {
-> +					real_ha->sync_cnt = 1;
-> +					real_ha->refcount = 1;
-
-Does this code break compatibility with reference-counted sync APIs?
-
-While __hw_addr_sync_dev() increments by 1, drivers processing snapshots with
-__hw_addr_ref_sync_dev() might increment sync_cnt by the total number of
-references. If such an entry is concurrently removed, recreation with a
-hardcoded value of 1 could instruct the next async run to unsync only 1
-reference, permanently leaking the remaining hardware references.
-
-Should these be dynamically initialized to real_ha->sync_cnt = delta and
-real_ha->refcount = delta?
-
-> +					list_add_tail_rcu(&real_ha->list,
-> +							  &real_list->list);
-> +					__hw_addr_insert(real_list, real_ha,
-> +							 addr_len);
-> +					real_list->count++;
-> +				}
-> +			}
-> +			continue;
+> +	struct net_device *dev;
+> +
+> +	rtnl_lock();
+> +
+> +	while (true) {
+> +		spin_lock_bh(&rx_mode_lock);
+> +		if (list_empty(&rx_mode_list)) {
+> +			spin_unlock_bh(&rx_mode_lock);
+> +			break;
 > +		}
-[ ... ]
-> diff --git a/net/core/dev_addr_lists_test.c b/net/core/dev_addr_lists_test.c
-> --- a/net/core/dev_addr_lists_test.c
-> +++ b/net/core/dev_addr_lists_test.c
-[ ... ]
-> @@ -225,6 +245,339 @@ static void dev_addr_test_add_excl(struct kunit *test)
-[ ... ]
-> +static void dev_addr_test_snapshot_sync(struct kunit *test)
-> +{
-[ ... ]
-> +	netif_addr_lock_bh(netdev);
-> +	__hw_addr_init(&snap);
-> +	__hw_addr_init(&ref);
-> +	KUNIT_ASSERT_EQ(test, 0,
-> +			__hw_addr_list_snapshot(&snap, &netdev->uc, ETH_ALEN));
-> +	KUNIT_ASSERT_EQ(test, 0,
-> +			__hw_addr_list_snapshot(&ref, &netdev->uc, ETH_ALEN));
-> +	netif_addr_unlock_bh(netdev);
-
-Will this cause a system deadlock if the assertion fails?
-
-If KUNIT_ASSERT_EQ triggers (e.g. from an out-of-memory condition in
-__hw_addr_list_snapshot), it immediately aborts the test case thread and skips
-the rest of the function, leaving the netif_addr_lock_bh spinlock permanently
-held and bottom-halves disabled.
-
-Could this be replaced with KUNIT_EXPECT_EQ and explicit goto error handling
-to ensure netif_addr_unlock_bh is always reached?
-
-[ ... ]
-> +static void dev_addr_test_snapshot_benchmark(struct kunit *test)
-> +{
-[ ... ]
-> +	for (iter = 0; iter < 1000; iter++) {
-> +		netif_addr_lock_bh(netdev);
-> +		__hw_addr_init(&snap);
+> +		dev = list_first_entry(&rx_mode_list, struct net_device,
+> +				       rx_mode_node);
+> +		list_del_init(&dev->rx_mode_node);
+> +		spin_unlock_bh(&rx_mode_lock);
 > +
-> +		start = ktime_get();
-> +		KUNIT_ASSERT_EQ(test, 0,
-> +				__hw_addr_list_snapshot(&snap, &netdev->uc,
-> +							ETH_ALEN));
-> +		duration += ktime_to_ns(ktime_sub(ktime_get(), start));
-> +
-> +		netif_addr_unlock_bh(netdev);
+> +		netdev_lock_ops(dev);
 
-Will this also cause a deadlock if the assertion fails while the lock is held?
--- 
-pw-bot: cr
+Can this while loop starve the system of the rtnl lock?
+
+Since userspace can trigger RX mode updates via ioctls like SIOCADDMULTI
+while holding only netdev_lock_ops() and not the rtnl lock, a continuous
+stream of these operations could repeatedly add devices to rx_mode_list.
+
+Because the loop releases rx_mode_lock while processing but retains the rtnl
+lock, could it run indefinitely if the list is continually replenished?
+
+Additionally, does the order of list_del_init() and netdev_lock_ops() create
+a race condition with netif_rx_mode_sync()?
+
+If the worker thread dequeues the device and drops the spinlock, it might
+then block waiting for netdev_lock_ops(). Meanwhile, an ioctl thread
+holding netdev_lock_ops() might call netif_rx_mode_sync().
+
+The ioctl thread would call netif_rx_mode_clean(), which checks
+list_empty(). Since the worker already removed the device from the list,
+clean returns false. This causes netif_rx_mode_sync() to act as a no-op,
+allowing the ioctl to return to userspace before the hardware update
+actually completes.
+
+> --- a/net/core/dev_api.c
+> +++ b/net/core/dev_api.c
+[ ... ]
+> @@ -311,6 +313,7 @@ int dev_set_allmulti(struct net_device *dev, int inc)
+>  
+>  	netdev_lock_ops(dev);
+>  	ret = netif_set_allmulti(dev, inc, true);
+> +	netif_rx_mode_sync(dev);
+>  	netdev_unlock_ops(dev);
+>  
+>  	return ret;
+
+Does this correctly handle cascaded updates for stacked devices?
+
+When operating on a stacked device like a VLAN, the RX mode update cascades
+to the underlying physical device, queuing the physical device to the
+rx_mode_list via __dev_set_rx_mode().
+
+Since netif_rx_mode_sync() is only called on the stacked device here, and
+the stacked device itself is not on the rx_mode_list, will the physical
+device's update be left on the workqueue? This seems to bypass the
+synchronous update guarantee.
 
