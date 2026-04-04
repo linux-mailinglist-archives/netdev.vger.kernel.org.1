@@ -1,430 +1,207 @@
-Return-Path: <netdev+bounces-275403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275404-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gJbLNvVw0Wm+JgcAu9opvQ
-	(envelope-from <netdev+bounces-275403-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 22:13:41 +0200
+	id iBokIHx80WkjKQcAu9opvQ
+	(envelope-from <netdev+bounces-275404-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 23:02:52 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E5D639C621
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 22:13:41 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8C5D39C774
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 23:02:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 324F43003D2B
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 20:13:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2A216301875D
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 21:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFE6133BBBA;
-	Sat,  4 Apr 2026 20:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBAF533E345;
+	Sat,  4 Apr 2026 21:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V8eAGki5"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Cb6lh1Wb";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="EBIgZvN6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4488E3019D6
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 20:13:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3C525A2C6
+	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 21:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775333618; cv=none; b=F5N+VkJLpIqys6jZi5EH8DdGwDZkKKnn5ykiYWE5COorpBoVEWl8mdsGyDTgyqkTnKUmoCR3mctORLTpeClbU5b3dR4lRfLwPTDDjOzVzLiMxCoE+aamIlYOhGlJEoFzdv86xu13z1CatWECTLCteBSJy5cBXrLjUKUFjj8FCHs=
+	t=1775336539; cv=none; b=G8fRLYdrUzWfBvbtA2oPfi1ogAVQ+UQALfFgjKei+uIjefp0TTY+velenHaJDyw7tVZ8rXcud8H/7hnncTNP6gmcK9maafv/U9KpZCtekXv19Li8W3/joahL/3AMaTS1B7LNm2EOr/CxPsjYPZbR6mgAIxlwCM/gnc6oVh6nWek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775333618; c=relaxed/simple;
-	bh=6IVkTjQ2D8zBMbDV+vErJ9JRCgC6abbJric/W+zRtIo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DNryCAXMdbyQWw7oor3+aBR8NtkT09BcmlqGYeCetsE12yMZF5QqKArspnoEw1H7wJPDvxEqIAp0a22IklRFstTwMxchhQFXHkUBQVd99JNnZBHL5M/jFgVh2nM63/9FDT0iTojGJfuEZa73/C5rfHHrxJlvFdB8LV3TLFv+TaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V8eAGki5; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4887fd35e60so18270725e9.2
-        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 13:13:37 -0700 (PDT)
+	s=arc-20240116; t=1775336539; c=relaxed/simple;
+	bh=M+11Bqne1ZEbBP552q16E4pebXsWAs4LLI08kLq/vLo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VZAfL9xHHb4rfLbHqq+Yqt9VBL/scaVXvi8mlQZUbLgk28TeRdogYylImUtqiNfEB7HisaKUIKu8aGOsU2wk3cg0oiIWYTru6In8uxR3g6S2AaEBxkBwxTHcPS82jxipN8Qy5F7iQSPGUiinpi9EUfZidTC7Gvn7f9nEs5jKW6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Cb6lh1Wb; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=EBIgZvN6; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6344emPZ2974021
+	for <netdev@vger.kernel.org>; Sat, 4 Apr 2026 21:02:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=fPHbHTmrz5b69W2HbX81pMl0
+	Mb3P+N1Jkbf+3Ti3CC4=; b=Cb6lh1WbqZF67viqKoBgkYUQW/wTrwHq3kSFBBW1
+	fLrfpE5IJIPXqYdcrnR2/Z/Mb2+iGyq1zUtmwVWr4LMegpAfW/FgB5tEOZlPlPWq
+	9roAlVL3QAFwv9ZSWgRCoakovk0mDIhY+yf/HLZBpy1C3JhQ4igu6ONHtueBo5de
+	SBYNL8lvfg1/SmNiiBrGPRQx4PUsJ3kfEBwcikMArm1KG3P52ZKBzqnkbO4BCKzt
+	AO/k9Zyt4iw/Y3cj/qKbA5Yi5KzP6UqQo4e9Z1t8xRKxubcffTt6C0ZW9XScq6IR
+	w7kJVOO7BDaUodxyEXMcZnUK0kfVVl0pDvUsyi8ncAY3Ew==
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dauth9d7t-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 21:02:16 +0000 (GMT)
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-5093b92f327so82521581cf.1
+        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 14:02:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775333615; x=1775938415; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SEYuEqxQ+TO3/jPNzXLnvJ7/Z/KsUW75My4aiFyt8Vc=;
-        b=V8eAGki55jpJHVr0mIIPYqUGYm6zhlDT4r+2m8yoLovhhUGkQT+WfTGrexZ64WKHzB
-         L70mpYrv/MUMepaTij90G8rArRS86VMO0w4eZ/Q92tDPrIV+S62MdLCJlHK/7IN0Tes+
-         u900xyMYBZQInX+Jq+c0T7+8BHNbWXT9ZJbJrsd8Kj0CmAnfwriq0S9gmNH/6CEKJEvZ
-         FqJZP++IE9rWxn+3nCr09mtOE0FTa4w1w046y7drnrg87wzAP+UDADOpkheWovPxKy3c
-         FInmtCHr0LBK5rJCX6elBd1q/fc0jiHLLayZ8j9FL5O34yg1XU8ErqeJteUr4RJkGEwe
-         hTnw==
+        d=oss.qualcomm.com; s=google; t=1775336536; x=1775941336; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fPHbHTmrz5b69W2HbX81pMl0Mb3P+N1Jkbf+3Ti3CC4=;
+        b=EBIgZvN6k3Ewz20qlNCkNiRkMc26RzSYvB0FTzlrK75f8o4rEOP29oxwMWh4+GEw+t
+         Sw1/X8BYQP79AKL0dX/hQej6pKS4YiJ3LsmXG0gg4bjZa1xvWP8Plh3+KS1O4pKRed9F
+         eu4AQLSmZ1/UgOivGmWhL43i6Henz3EGIv5zF0m+1pcvhW53MvJU6WF+1sG4wpdEAst/
+         c4s9GwMhPit/+3yx26zovUiyAuasAfV3/Dt/Fvrta2dgghBVXlpTW1s0x0lLnV2XCaIo
+         XTjZTIAwO7Jyb3yPW+o16W1TDQWFb5uluT/VjZtpbqHX1+KzuuZBiX+DZYSNatenEOMK
+         7eGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775333615; x=1775938415;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SEYuEqxQ+TO3/jPNzXLnvJ7/Z/KsUW75My4aiFyt8Vc=;
-        b=V7HrIN9G1rx48qyIQt0O4jdiow4hNWC32ZAj6yNboU6DiEyht5qzE+YVGhC95N5ekl
-         bMbPp7LrmKCX0uWIauwW6SRN16Ein5+/NoJGr+941XhdwDFNbEqKVZKdyucnnU/QxpHK
-         977GqBLzo8Nbd52a2/xe11uPf7yHHnpOO109xlzWnOLtyLkMxcI8UpxsKTwX8MW71bOc
-         cdCLZHqCJE6h3jTGMhci7tObvIAYYjJlLvrkL9ZKnb2OTOWNCFKs48qLrpCtPG0DkWze
-         9hSlA2HZedv8q41UdHKrsCNTgeZYTzJ9mlZj75ME0/d3gTQ9bpPT9l1g/oNnQkgBgDgu
-         eEtg==
-X-Gm-Message-State: AOJu0YxXzreiczgxC4Vb6o+Ww5DDMWpSs0RRJlV8hwx2hUpnq9ucSB1m
-	CfSUYxe2BGXK8a42GWT9u1y599Xk8mBztofTvTNmEp/DywQgCezHyN6X
-X-Gm-Gg: AeBDievy55wrNkPHfLxjC0wpRDB6Sl4SalMnjRZWIw0+48Sit2Njt2OBnhUVv3gUc1m
-	5Ozui8PflsEO/QJ5PLMxYlpJt2Uw8DD94swS+7q/LdvZi4jMm15ujsXqZQYDukEihOpABRcuiRX
-	jrQPjgejc5Vitg2C9UJg+DO4/8wn/q7c4FMLI0I2IGxLpa9hLbVRC4c5xv6sZQsP2O/0uX+Kj13
-	T9AmgQ9AWIZDifyNCmfsSGyMDx0FWb1WYJ5lYwPmbU2KBZKx2o5671378KrGV1UisYdRz3zROXH
-	aiOE+bkGgoQkEYi113IK9HpeFjlLNXRCD7QLcujVaT4QbtYh8TlqUg58W999bkIOCYE1g65aQRk
-	wSOZ6sIZF7CbBiyK4qofDZXR6aHKzNPp9cnu8OPDqDOA7+UXhXkvUCCbdy222FNdFIEAW5EK8CZ
-	Ujta38wDQvFS09PZkz2Qlki3KqfaCcgH5OByM=
-X-Received: by 2002:a05:600c:1d1c:b0:488:79a3:f04c with SMTP id 5b1f17b1804b1-488997d1387mr109585605e9.27.1775333615312;
-        Sat, 04 Apr 2026 13:13:35 -0700 (PDT)
-Received: from rpi5.lan ([37.228.206.31])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e4d58e5sm28179680f8f.23.2026.04.04.13.13.34
+        d=1e100.net; s=20251104; t=1775336536; x=1775941336;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fPHbHTmrz5b69W2HbX81pMl0Mb3P+N1Jkbf+3Ti3CC4=;
+        b=SiulPN6D7DglYV62EqesT0fd6cUHOMXlY43e/3t21qZO6FaJWDkIQz7Fw5CfMuKk2G
+         SIu1Hgiih6fFeYI8EPqytKfw0VvUEUH27Ai5ERkGd/WlvSj6wcp9EOPeibgTql1xOQi+
+         c8HgyQ8/p49qfv0C6ezCoZDxgkaQMcxWk2lzi6GFP1684XailKcGYD4CUNfdcxRoDcOT
+         AhXfUfEwCTyZttnpHU/msi6x34E3rZd4poLGth45J0RiLgV6lyl0esx0ijzlUzxqg/lm
+         mUgLdA45IkRAPLosmizEFfrWAdA/9lOFmUQNT7gbF07Mo/It3Dc7x3c5MA1rRfaSUKnJ
+         0O4g==
+X-Forwarded-Encrypted: i=1; AJvYcCVrA4Vui1vaj3RCSF224EIQMGnPqL6W0DEomo4htNKs8vQg0VdhoXEjXbPpfQUUWWzNM970jOg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx56akg8ve1jwxKvaHmpdnVTHCXxbdFx67Nt+oqb/OIvxd8XZDs
+	n/TlbSLNlOGTOmoeI84W+j5wayUgCf3wpDrG3k2ANE6oJiZCP2vFKNLEUk0v7ONXeHtl5WHvSgc
+	065VmoEohhkFeisyHpgdlsxrjeFGSlrbVuz6QZ+3dV+pjRFjegsiEAlMByVI=
+X-Gm-Gg: AeBDiesmKawKadqhcqxAt5/3n74s3OH2vBkaGeiOXhKiKAUSElAzgfhLmLWPXIO5LAi
+	DLhB/Ni44hrXXElJPC11GniJdc8ZGQhI95TdqafribuUUoPpAM2+09tVmOi5zgbHcKZ/uwhjrRg
+	eXTiOzdJvryiOWtfP8uOx3cMyOJcCpqMeEjnJA7m5NKv4GeShsjmsEHOW7x/Yx3sFRtRi4JfHiE
+	mplTkh7ur9BosxYkui7ZB/u3XvH5Cm67GY8Y8WKUMWHRKc8BGP+z7Vrqw+dttsKNGwxoN+jWdrk
+	UfKewImODO2VdUusZwNu1MUQewi8pdgLI9K7L0fa80x4M0AlEEF42RBmbK7QJ1SdTyJr3u5fQ0A
+	FSyGu0i3Yq7XdTOCLqZhKfxV4nGnd7LjZoJTsslhtrUHN638i89N+uRQj3/veDR9aPjBDYqLUzb
+	+zBObUCZSQh4HfvPaGqenHkNp8Ix1H2BWV6IM=
+X-Received: by 2002:a05:622a:4246:b0:509:44c3:5ffa with SMTP id d75a77b69052e-50d62b0a6d9mr116276411cf.52.1775336535677;
+        Sat, 04 Apr 2026 14:02:15 -0700 (PDT)
+X-Received: by 2002:a05:622a:4246:b0:509:44c3:5ffa with SMTP id d75a77b69052e-50d62b0a6d9mr116275831cf.52.1775336535152;
+        Sat, 04 Apr 2026 14:02:15 -0700 (PDT)
+Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a2c6c95149sm2319838e87.5.2026.04.04.14.02.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Apr 2026 13:13:34 -0700 (PDT)
-From: Fabio Baltieri <fabio.baltieri@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>,
-	nic_swsd@realtek.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fabio Baltieri <fabio.baltieri@gmail.com>
-Subject: [PATCH net-next v1] r8169: implement get_module functions for rtl8127atf
-Date: Sat,  4 Apr 2026 21:13:32 +0100
-Message-ID: <20260404201333.2849-1-fabio.baltieri@gmail.com>
-X-Mailer: git-send-email 2.47.3
+        Sat, 04 Apr 2026 14:02:12 -0700 (PDT)
+Date: Sun, 5 Apr 2026 00:02:09 +0300
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+To: david@ixit.cz
+Cc: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Alexander Martinz <amartinz@shift.eco>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Casey Connolly <casey.connolly@linaro.org>,
+        Alexander Martinz <amartinz@shiftphones.com>,
+        Petr Hodina <petr.hodina@protonmail.com>,
+        biemster <l.j.beemster@gmail.com>, netdev@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, oe-linux-nfc@lists.linux.dev,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        phone-devel@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH v3 3/5] arm64: dts: qcom: sdm845-shift-axolotl: Correct
+ touchscreen sleep state
+Message-ID: <ehzmqowdrvzafwahiakegphhvdoewq7eag3obpozxr6xf336rr@skgsull5vtd6>
+References: <20260403-oneplus-nfc-v3-0-fbdce57d63c1@ixit.cz>
+ <20260403-oneplus-nfc-v3-3-fbdce57d63c1@ixit.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260403-oneplus-nfc-v3-3-fbdce57d63c1@ixit.cz>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA0MDIwMCBTYWx0ZWRfXxHrzgN/bsSDs
+ 1pdvck5xI1V3S+utMl6oMwBUqxqeOCvGdrvsJDHB6xXgi/Za3XK+vYTeqcRN3YPb7MZYYJ6MqQu
+ JdzynsGRcSQkILQhVPCsMWXTUAaiMjAnTlDlvkMxVMBYjjhHEGYmSLsyKrKddDtOp8157cdreS6
+ 018wGRZ/zhU1Bvc3YBE0V83uW3+J1/PDJTQ4t+0C5ydV9GhKzlfZhQp3m5R83K29MV/CNm1VbtV
+ Xc+aNgQQdbjHOz+dsPcen7XkblLq4zGx43o0idtJl8dzxO65RPDWb0tnDbjbI9OGp6qUr/tpXZT
+ 4qwjMKIhSQTDkOahf1w8JezHnocG4qkRbYi9VHCTtZQ6TdlRHnJyKXUfCIbtx9AMjpjM7q/xojQ
+ QC7paAbRdNosAEDiC7BBLBZCYhbZhuQGPAgSKBau3qhu4ha58PdT5R0a/EqjN15XL/yVKdM1SyN
+ iIhMPdoe9f26yNBU6vA==
+X-Proofpoint-GUID: XcrPYlmYXviFx7hnRPQTw2xNaBk2v5PH
+X-Authority-Analysis: v=2.4 cv=MIptWcZl c=1 sm=1 tr=0 ts=69d17c58 cx=c_pps
+ a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22 a=EUspDBNiAAAA:8
+ a=_gdz5gggCwxQTVruBwIA:9 a=CjuIK1q_8ugA:10 a=a_PwQJl-kcHnX1M80qC6:22
+X-Proofpoint-ORIG-GUID: XcrPYlmYXviFx7hnRPQTw2xNaBk2v5PH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-04_03,2026-04-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 malwarescore=0 suspectscore=0 lowpriorityscore=0
+ priorityscore=1501 adultscore=0 impostorscore=0 phishscore=0 bulkscore=0
+ spamscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
+ definitions=main-2604040200
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275403-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FREEMAIL_TO(0.00)[gmail.com,realtek.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275404-lists,netdev=lfdr.de];
+	RCPT_COUNT_TWELVE(0.00)[23];
 	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[fabiobaltieri@gmail.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,shift.eco,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,shiftphones.com,protonmail.com,gmail.com,vger.kernel.org,lists.linux.dev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ixit.cz:email,oss.qualcomm.com:dkim,qualcomm.com:dkim,qualcomm.com:email];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dmitry.baryshkov@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 3E5D639C621
+	TAGGED_RCPT(0.00)[netdev,dt];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: D8C5D39C774
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Implement get_module_info and get_module_eeprom for supported devices,
-right now that's the rtl8127atf.
+On Fri, Apr 03, 2026 at 03:58:48PM +0200, David Heidelberg via B4 Relay wrote:
+> From: David Heidelberg <david@ixit.cz>
+> 
+> There is no suspend state in the mainline kernel, use the sleep state
+> intended for this purpose.
+> 
+> Fixes: 45882459159d ("arm64: dts: qcom: sdm845: add device tree for SHIFT6mq")
+> Signed-off-by: David Heidelberg <david@ixit.cz>
+> ---
+>  arch/arm64/boot/dts/qcom/sdm845-shift-axolotl.dts | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
 
-This enables using ethtool to retrieve the transceiver identification
-and diagnostic data.
-
-Signed-off-by: Fabio Baltieri <fabio.baltieri@gmail.com>
----
-
-Hi,
-
-Realtek released a new out of tree driver for the rtl8127 and it
-includes some code that exposes the I2C controller connected to the SFP
-port.
-
-This patch implements get_module_info and get_module_eeprom based on the
-information found on that driver, it allows ethtool to fetch the SFP
-module information, which is useful both to identify the module and to
-track the health of fiber optic transceivers.
-
-The logic for the SFF standard and i2c address selection is borrowed
-directly from the aquantia/atlantic driver, I don't have a lot of stuff
-to test it but I was able to trigger all code paths from a fiber optic
-transceiver and an SFP cable I have available.
-
-Demo:
-
-# Fiber transceiver
-$ sudo ethtool -m eth1
-        Identifier                                : 0x03 (SFP)
-        Extended identifier                       : 0x04 (GBIC/SFP defined by 2-wire interface ID)
-        Connector                                 : 0x07 (LC)
-        Transceiver codes                         : 0x10 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-        Transceiver type                          : 10G Ethernet: 10G Base-SR
-        Encoding                                  : 0x06 (64B/66B)
-        BR Nominal                                : 10300MBd
-        Rate identifier                           : 0x00 (unspecified)
-        Length (SMF)                              : 0km
-        Length (OM2)                              : 80m
-        Length (OM1)                              : 30m
-        Length (Copper or Active cable)           : 0m
-        Length (OM3)                              : 300m
-        Laser wavelength                          : 850nm
-        Vendor name                               : QSFPTEK
-        Vendor OUI                                : 00:0a:0d
-        Vendor PN                                 : QT-SFP+-SR
-        Vendor rev                                : 
-        Option values                             : 0x00 0x1a
-        Option                                    : TX_DISABLE implemented
-        BR margin max                             : 10%
-        BR margin min                             : 88%
-        Vendor SN                                 : QT8250805131
-        Date code                                 : 250806
-        Optical diagnostics support               : Yes
-        Laser bias current                        : 5.880 mA
-        Laser output power                        : 0.5431 mW / -2.65 dBm
-        Receiver signal average optical power     : 0.6912 mW / -1.60 dBm
-        Module temperature                        : 20.70 degrees C / 69.25 degrees F
-        Module voltage                            : 3.3000 V
-...
-
-# DAC
-$ sudo ethtool -m eth1
-        Identifier                                : 0x03 (SFP)
-        Extended identifier                       : 0x04 (GBIC/SFP defined by 2-wire interface ID)
-        Connector                                 : 0x21 (Copper pigtail)
-        Transceiver codes                         : 0x00 0x00 0x00 0x00 0x00 0x04 0x00 0x00 0x00
-        Transceiver type                          : Passive Cable
-        Encoding                                  : 0x00 (unspecified)
-        BR Nominal                                : 10300MBd
-        Rate identifier                           : 0x00 (unspecified)
-        Length (SMF)                              : 0km
-        Length (OM2)                              : 0m
-        Length (OM1)                              : 0m
-        Length (Copper or Active cable)           : 1m
-        Length (OM3)                              : 0m
-        Passive Cu cmplnce.                       : 0x01 (SFF-8431 appendix E [SFF-8472 rev10.4 only])
-        Vendor name                               : OEM
-        Vendor OUI                                : 00:40:20
-        Vendor PN                                 : SFP-H10GB-CU1M
-        Vendor rev                                : R
-        Option values                             : 0x00 0x00
-        BR margin max                             : 0%
-        BR margin min                             : 0%
-        Vendor SN                                 : CSC240415030053
-        Date code                                 : 240508
-...
-
-# No module
-$ sudo ethtool -m eth1
-netlink error: Input/output error
-
-Cheers,
-Fabio
+Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
 
 
- drivers/net/ethernet/realtek/r8169_main.c | 177 ++++++++++++++++++++++
- 1 file changed, 177 insertions(+)
-
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 58788d196c57..45ec0b5c1c21 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -2411,6 +2411,181 @@ static int rtl8169_set_link_ksettings(struct net_device *ndev,
- 	return 0;
- }
- 
-+#define R8127_SDS_I2C_CON		0xe200
-+#define R8127_SDS_I2C_TAR		0xe204
-+#define R8127_SDS_I2C_DATA_CMD		0xe210
-+#define R8127_SDS_I2C_FS_SCL_HCNT	0xe21c
-+#define R8127_SDS_I2C_FS_SCL_LCNT	0xe220
-+#define R8127_SDS_I2C_INTR_STAT		0xe22c
-+#define R8127_SDS_I2C_EN		0xe26c
-+#define R8127_SDS_I2C_STATUS		0xe270
-+
-+#define R8127_SDS_I2C_STATUS_ACTIVITY BIT(0)
-+#define R8127_SDS_I2C_RX_FIFO_NOT_EMPTY BIT(3)
-+#define R8127_SDS_I2C_STAT_TX_ABRT BIT(6)
-+
-+#define R8127_SDS_I2C_CMD_READ BIT(8)
-+#define R8127_SDS_I2C_CMD_STOP BIT(9)
-+#define R8127_SDS_I2C_CMD_RESTART BIT(10)
-+
-+#define SFF_8472_ID_ADDR 0x50
-+#define SFF_8472_DIAGNOSTICS_ADDR 0x51
-+
-+#define SFF_8472_COMP_ADDR      0x5e
-+#define SFF_8472_DOM_TYPE_ADDR  0x5c
-+
-+#define SFF_8472_ADDRESS_CHANGE_REQ_MASK 0x4
-+
-+static void r8127_sfp_sds_i2c_init(struct rtl8169_private *tp, u8 addr)
-+{
-+	r8168_mac_ocp_write(tp, R8127_SDS_I2C_EN, 0);
-+	r8168_mac_ocp_write(tp, R8127_SDS_I2C_CON, 0x65);
-+	r8168_mac_ocp_write(tp, R8127_SDS_I2C_TAR, addr);
-+	r8168_mac_ocp_write(tp, R8127_SDS_I2C_FS_SCL_HCNT, 0x23a);
-+	r8168_mac_ocp_write(tp, R8127_SDS_I2C_FS_SCL_LCNT, 0x23a);
-+	r8168_mac_ocp_write(tp, R8127_SDS_I2C_EN, 1);
-+}
-+
-+static void r8127_sfp_sds_i2c_disable(struct rtl8169_private *tp)
-+{
-+	r8168_mac_ocp_write(tp, R8127_SDS_I2C_EN, 0);
-+}
-+
-+DECLARE_RTL_COND(r8127_sfp_sds_i2c_idle_cond)
-+{
-+	u16 val;
-+
-+	val = r8168_mac_ocp_read(tp, R8127_SDS_I2C_STATUS);
-+
-+	return val & R8127_SDS_I2C_STATUS_ACTIVITY;
-+}
-+
-+DECLARE_RTL_COND(r8127_sfp_sds_i2c_rx_fifo_cond)
-+{
-+	u16 val;
-+
-+	val = r8168_mac_ocp_read(tp, R8127_SDS_I2C_STATUS);
-+
-+	return val & R8127_SDS_I2C_RX_FIFO_NOT_EMPTY;
-+}
-+
-+static int r8127_sfp_sds_i2c_read(struct rtl8169_private *tp,
-+				  u8 addr, u8 off, u8 *buf, u16 len)
-+{
-+	u16 intr_stat;
-+	int ret = 0;
-+
-+	r8127_sfp_sds_i2c_init(tp, addr);
-+
-+	r8168_mac_ocp_write(tp, R8127_SDS_I2C_DATA_CMD, off);
-+
-+	if (!rtl_loop_wait_low(tp, &r8127_sfp_sds_i2c_idle_cond, 10, 100)) {
-+		ret = -EIO;
-+		goto out;
-+	}
-+
-+	intr_stat = r8168_mac_ocp_read(tp, R8127_SDS_I2C_INTR_STAT);
-+	if (intr_stat & R8127_SDS_I2C_STAT_TX_ABRT) {
-+		/* NACK */
-+		ret = -EIO;
-+		goto out;
-+	}
-+
-+	for (int i = 0; i < len; i++) {
-+		u16 data = R8127_SDS_I2C_CMD_READ;
-+
-+		if (i == len - 1)
-+			data |= R8127_SDS_I2C_CMD_STOP;
-+		if (i == 0)
-+			data |= R8127_SDS_I2C_CMD_RESTART;
-+
-+		r8168_mac_ocp_write(tp, R8127_SDS_I2C_DATA_CMD, data);
-+
-+		if (!rtl_loop_wait_high(tp, &r8127_sfp_sds_i2c_rx_fifo_cond,
-+					10, 1000)) {
-+			ret = -ETIMEDOUT;
-+			goto out;
-+		}
-+
-+		buf[i] = r8168_mac_ocp_read(tp, R8127_SDS_I2C_DATA_CMD);
-+	}
-+
-+out:
-+	r8127_sfp_sds_i2c_disable(tp);
-+
-+	return ret;
-+}
-+
-+static int rtl8169_get_module_info(struct net_device *ndev,
-+				   struct ethtool_modinfo *modinfo)
-+{
-+	struct rtl8169_private *tp = netdev_priv(ndev);
-+	u8 compliance_val, dom_type;
-+	int ret;
-+
-+	if (!tp->sfp_mode)
-+		return -EOPNOTSUPP;
-+
-+	ret = r8127_sfp_sds_i2c_read(tp, SFF_8472_ID_ADDR,
-+				     SFF_8472_COMP_ADDR, &compliance_val, 1);
-+	if (ret)
-+		return ret;
-+
-+	ret = r8127_sfp_sds_i2c_read(tp, SFF_8472_ID_ADDR,
-+				     SFF_8472_DOM_TYPE_ADDR, &dom_type, 1);
-+	if (ret)
-+		return ret;
-+
-+	if (dom_type & SFF_8472_ADDRESS_CHANGE_REQ_MASK || compliance_val == 0x00) {
-+		modinfo->type = ETH_MODULE_SFF_8079;
-+		modinfo->eeprom_len = ETH_MODULE_SFF_8079_LEN;
-+	} else {
-+		modinfo->type = ETH_MODULE_SFF_8472;
-+		modinfo->eeprom_len = ETH_MODULE_SFF_8472_LEN;
-+	}
-+
-+	return 0;
-+}
-+
-+static int rtl8169_get_module_eeprom(struct net_device *ndev,
-+				     struct ethtool_eeprom *ee, unsigned char *data)
-+{
-+	struct rtl8169_private *tp = netdev_priv(ndev);
-+	unsigned int first, last, len;
-+	int ret;
-+
-+	if (!tp->sfp_mode)
-+		return -EOPNOTSUPP;
-+
-+	first = ee->offset;
-+	last = ee->offset + ee->len;
-+
-+	if (first < ETH_MODULE_SFF_8079_LEN) {
-+		len = min(last, ETH_MODULE_SFF_8079_LEN);
-+		len -= first;
-+
-+		ret = r8127_sfp_sds_i2c_read(tp, SFF_8472_ID_ADDR,
-+					     first, data, len);
-+		if (ret)
-+			return ret;
-+
-+		first += len;
-+		data += len;
-+	}
-+	if (first < ETH_MODULE_SFF_8472_LEN && last > ETH_MODULE_SFF_8079_LEN) {
-+		len = min(last, ETH_MODULE_SFF_8472_LEN);
-+		len -= first;
-+		first -= ETH_MODULE_SFF_8079_LEN;
-+
-+		ret = r8127_sfp_sds_i2c_read(tp, SFF_8472_DIAGNOSTICS_ADDR,
-+					     first, data, len);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
- static const struct ethtool_ops rtl8169_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
- 				     ETHTOOL_COALESCE_MAX_FRAMES,
-@@ -2437,6 +2612,8 @@ static const struct ethtool_ops rtl8169_ethtool_ops = {
- 	.set_pauseparam		= rtl8169_set_pauseparam,
- 	.get_eth_mac_stats	= rtl8169_get_eth_mac_stats,
- 	.get_eth_ctrl_stats	= rtl8169_get_eth_ctrl_stats,
-+	.get_module_info	= rtl8169_get_module_info,
-+	.get_module_eeprom	= rtl8169_get_module_eeprom,
- };
- 
- static const struct rtl_chip_info *rtl8169_get_chip_version(u32 xid, bool gmii)
 -- 
-2.47.3
-
+With best wishes
+Dmitry
 
