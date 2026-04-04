@@ -1,222 +1,181 @@
-Return-Path: <netdev+bounces-275331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275332-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CIC8ENzL0GkkAQcAu9opvQ
-	(envelope-from <netdev+bounces-275331-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 10:29:16 +0200
+	id 0LkFFmbS0GlBAwcAu9opvQ
+	(envelope-from <netdev+bounces-275332-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 10:57:10 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EBA139A69F
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 10:29:15 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id AADB239A7AC
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 10:57:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4192630180AF
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 08:29:14 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D0C133006453
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 08:57:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F76B3502A3;
-	Sat,  4 Apr 2026 08:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4BA3A5459;
+	Sat,  4 Apr 2026 08:57:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="AeV+RRd8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c0aJmhKE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C44139A071
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 08:29:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084702E6CA8;
+	Sat,  4 Apr 2026 08:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775291353; cv=none; b=q+861TCypILMlktGNIvNIIoMzK+ipFvHFl9pXT6ZH/tqXo6moAy+dkyCERjBkundmJZ0QArj/H3gkuFKa9mE07fX401Md1lBVpc0HdqJ8ow1kTmFCvRx49ELyezX5mbyljdSpHAAU/NfC7wXsOvZdvOsi2bLQN2KrcBGq14oDLA=
+	t=1775293024; cv=none; b=VU7KXfij8M3LHR71g3tghhTVe+pbGbYA34eXch7fvGqHIwsR3FFE/5RbHd1hkIKnHHBFiFJKTot9gaiOiB1C3mUWb0aNCmvu4/qSguaMWv4+5VbOlFmUPKwUfw87NU3CSEX2NltKYJUJpIK8AsIdpOSlBe0ErcEGpFb+rXcbfUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775291353; c=relaxed/simple;
-	bh=ZbsX+Q5T2gwoIrjPK4sgxPqkkf/llmC5UqpbNPFVpmM=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=f17bEw8aNL3dOK2qexlfnqlfvlEvjz4ZbI2GmMcO6Sd9VB6picv203OZQog6EyLQ9gQEHRvnS85DX3VoTXSPQMEQtxuE7hfpqVD828LkpfxMmC9ffHVCwn8DxhKjVmdn5j+dMPrCJn9+CpP3z2TalKKageuvVPMn/jhAlmFRJyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=AeV+RRd8; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1775291340; h=Message-ID:Subject:Date:From:To;
-	bh=2q+prOzJsFXyRKa4d2Gk0G7yi9o+Nj7QVGZC9FAOjUI=;
-	b=AeV+RRd8YRRKiOcP/zR2KgmjyXldD78yMnIxdOILXbTMksVzHEwREaE6XneGsDTOCc+KbGHVWgbwZMJXjhyypsfzrY0pMa5F207VILhT/L2AXkoINJXha+gv5VWVYvDMji8t9/lySn+c8G8u1kHLXbkcUCBemoCKNKPiPCzdg+k=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R551e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037009110;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0X0MpQxc_1775291338;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0X0MpQxc_1775291338 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sat, 04 Apr 2026 16:28:59 +0800
-Message-ID: <1775291205.5205972-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v36 1/8] eea: introduce PCI framework
-Date: Sat, 4 Apr 2026 16:26:45 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Wen Gu <guwen@linux.alibaba.com>,
- Philo Lu <lulie@linux.alibaba.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Dong Yibo <dong100@mucse.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Dust Li <dust.li@linux.alibaba.com>,
- netdev@vger.kernel.org
-References: <20260329132222.130912-1-xuanzhuo@linux.alibaba.com>
- <20260329132222.130912-2-xuanzhuo@linux.alibaba.com>
- <e769aaaa-17bb-4356-9848-dc5001885e24@redhat.com>
-In-Reply-To: <e769aaaa-17bb-4356-9848-dc5001885e24@redhat.com>
+	s=arc-20240116; t=1775293024; c=relaxed/simple;
+	bh=zrOG8L1Di6K8R3FaT/IvaAB6s1o1yqHxlWXzZh7Jowc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bXC6fvCZuFtpKQVRac9P7tPeR2hrHDXBRgB2mw9iMOPL8SOPeezoNhhas0xghDVDwTo9xD+tSkY4ym9kL6QvTachP87fsvRG+CSSYknJrmQPctgZiGrghyKM04FqZcASaOT5EQHAEDQEgRbmewHeTkZWVoIpDXWvzEmYbT3zzWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c0aJmhKE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59594C19421;
+	Sat,  4 Apr 2026 08:57:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775293023;
+	bh=zrOG8L1Di6K8R3FaT/IvaAB6s1o1yqHxlWXzZh7Jowc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=c0aJmhKENLyWzGLOgzrtraR700NOAwAPig1FF/5UNW0fIpo8oZdc2uNfon+TsQmKD
+	 ueTBZfWdy2iGj4CgFCCeb67vgOYdJ/kJXSVZlHyXTnLBIybHFEalG8AZayLgqqdF+Q
+	 +UqqrVEf55GDG8iFQyyeM1tYm2SYJH81cnhaLpMEZqhPT2N45FClNSUk5cDr10kGbC
+	 ye0kb5Kz9rqPjiuKBCUMBqQAm6U/vJXJrNbMT5n3YmvQOi+EUBhC3v3B0BbxwQVwhI
+	 5gb1JQgMzPectrItlR0HGqMJe5WtBGKq+mUbKb17EbweUM4Vb/oBS2FOcr/HUX0Ord
+	 87EuD2a170sWQ==
+Date: Sat, 4 Apr 2026 09:56:58 +0100
+From: Simon Horman <horms@kernel.org>
+To: Mashiro Chen <mashiro.chen@mailbox.org>
+Cc: ajk@comnets.uni-bremen.de, netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-hams@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+ecdb8c9878a81eb21e54@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] net: hamradio: 6pack: fix uninit-value in
+ sixpack_receive_buf
+Message-ID: <20260404085658.GR113102@horms.kernel.org>
+References: <20260402164525.134244-1-mashiro.chen@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-X-Spamd-Result: default: False [-6.16 / 15.00];
-	WHITELIST_DMARC(-7.00)[alibaba.com:D:+];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260402164525.134244-1-mashiro.chen@mailbox.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.alibaba.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.alibaba.com:s=default];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,linux.alibaba.com,linux.dev,mucse.com,gmail.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275331-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xuanzhuo@linux.alibaba.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275332-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.alibaba.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8EBA139A69F
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,ecdb8c9878a81eb21e54];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[appspotmail.com:email,mailbox.org:email,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: AADB239A7AC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, 2 Apr 2026 10:02:53 +0200, Paolo Abeni <pabeni@redhat.com> wrote:
-> On 3/29/26 3:22 PM, Xuan Zhuo wrote:
-> > +struct eea_pci_cfg {
-> > +	__le32 reserve0;
-> > +	__le32 reserve1;
-> > +	__le32 drv_f_idx;
-> > +	__le32 drv_f;
-> > +
-> > +#define EEA_S_OK           BIT(2)
-> > +#define EEA_S_FEATURE_DONE BIT(3)
-> > +#define EEA_S_FAILED       BIT(7)
-> > +	u8   device_status;
-> > +	u8   reserved[7];
-> > +
-> > +	__le32 rx_num_max;
-> > +	__le32 tx_num_max;
-> > +	__le32 db_blk_size;
-> > +
-> > +	/* admin queue cfg */
-> > +	__le16 aq_size;
-> > +	__le16 aq_msix_vector;
-> > +	__le32 aq_db_off;
-> > +
-> > +	__le32 aq_sq_addr;
-> > +	__le32 aq_sq_addr_hi;
-> > +	__le32 aq_cq_addr;
-> > +	__le32 aq_cq_addr_hi;
-> > +
-> > +	__le64 hw_ts;
->
-> Sashiko has still a lot to say about this series. Here:
->
+On Fri, Apr 03, 2026 at 12:45:25AM +0800, Mashiro Chen wrote:
+> sixpack_receive_buf() does not properly skip bytes with TTY error flags.
+> The while loop iterates through the flags buffer but never advances the
+> data pointer (cp), and passes the original count including error bytes
+> to sixpack_decode(). This causes sixpack_decode() to process bytes that
+> should have been skipped due to TTY errors.
+> 
+> Fix this by processing bytes one at a time, advancing cp on each
+> iteration, and only passing non-error bytes to sixpack_decode().
+> This matches the pattern used by slip_receive_buf() and
+> mkiss_receive_buf() for the same purpose.
+> 
+> Reported-by: syzbot+ecdb8c9878a81eb21e54@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=ecdb8c9878a81eb21e54
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Mashiro Chen <mashiro.chen@mailbox.org>
 > ---
-> Is there an implicit compiler padding issue here?
-> The field aq_cq_addr_hi is a 32-bit integer ending at offset 59. The
-> immediately following field, hw_ts, is an 8-byte integer. To align hw_ts
-> to an 8-byte boundary, the compiler will implicitly insert 4 bytes of
-> padding, placing hw_ts at offset 64 instead of 60.
-> Depending on whether the hardware designer intended the register to be
-> at offset 60 or 64, the driver might read from the wrong address, or
-> rely on implicit padding that could change across architectures.
-> ---
->
-> I assume the (virtual) H/W does the align thing correctly, so no real
-> issue here. Still replying to this patch explaining why the raised
-> concern is not valid would help a lot progresses on this series.
+>  drivers/net/hamradio/6pack.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/hamradio/6pack.c b/drivers/net/hamradio/6pack.c
+> index 885992951e8a6..c8b2dc5c1becc 100644
+> --- a/drivers/net/hamradio/6pack.c
+> +++ b/drivers/net/hamradio/6pack.c
 
+...
 
-Yes, we had indeed overlooked this part before. I think it's still better to
-keep it 64-bit aligned. AI did help us, and additionally, it caught another
-issue: if an RX packet is dropped, we need to re-dma-sync the buffer
-for the device when reusing it. In this AI review, I believe only these two
-findings are valid. Even though the second one rarely causes problems in
-practice, I'll submit another patch set to address both. AI does catch real
-issues, but the Sashiko review results seem to generate too many false
-positives. Reviewing them takes up too much of our time, and the return on
-effort is too low. I've gone through every single item flagged by Sashiko, and
-only these two are actual issues; the rest don't exist. Unfortunately, I can't
-reply to them inline like I would in an email thread.
+> @@ -401,16 +400,16 @@ static void sixpack_receive_buf(struct tty_struct *tty, const u8 *cp,
+>  		return;
+>  
+>  	/* Read the characters out of the buffer */
+> -	count1 = count;
+> -	while (count) {
+> -		count--;
+> +	while (count--) {
+>  		if (fp && *fp++) {
+>  			if (!test_and_set_bit(SIXPF_ERROR, &sp->flags))
+>  				sp->dev->stats.rx_errors++;
+> +			cp++;
+>  			continue;
+>  		}
+> +		sixpack_decode(sp, cp, 1);
+> +		cp++;
+>  	}
+> -	sixpack_decode(sp, cp, count1);
+>  
+>  	tty_unthrottle(tty);
+>  }
 
->
-> [ ... ]
-> > +int eea_device_reset(struct eea_device *edev)
-> > +{
-> > +	struct eea_pci_device *ep_dev = edev->ep_dev;
-> > +	u8 val;
-> > +
-> > +	eea_pci_io_set_status(edev, 0);
-> > +
-> > +	return read_poll_timeout(cfg_read8, val, !val, 20, EEA_RESET_TIMEOUT_US,
-> > +				 false, ep_dev->reg, device_status);
-> > +}
->
-> Sashiko says:
-> ---
-> Can this cause a 60-second thread stall during a surprise removal?
-> When a PCIe device is surprise-removed, MMIO reads typically return all
-> ones (0xFF). If the device is removed, !0xFF evaluates to false, causing
-> the loop to never exit early and hanging the executing thread for the
-> entire 60-second timeout.
-> ---
->
-> A similar concern was raised on the previous iteration. I see you
-> decreased the timeout from 1000s to 60s, but 60s is still a considerably
-> longsystem hangup. Anything above a few seconds should be considered
-> carefully.
+Hi,
 
+I am wondering if this could be expressed more succinctly by
+placing the cp++ in a common branch of execution.
 
-I will add check for 0xFF.
+Something like this (completely untested!)
 
+@@ -401,16 +400,15 @@ static void sixpack_receive_buf(struct tty_struct *tty, const u8 *cp,
+ 		return;
+ 
+ 	/* Read the characters out of the buffer */
+-	count1 = count;
+-	while (count) {
+-		count--;
++	while (count--) {
+ 		if (fp && *fp++) {
+ 			if (!test_and_set_bit(SIXPF_ERROR, &sp->flags))
+ 				sp->dev->stats.rx_errors++;
+-			continue;
++		} else {
++			sixpack_decode(sp, cp, 1);
+ 		}
++		cp++;
+ 	}
+-	sixpack_decode(sp, cp, count1);
+ 
+ 	tty_unthrottle(tty);
+ }
 
-Thanks
-
-
->
-> > +
-> > +int eea_pci_set_aq_up(struct eea_device *edev)
-> > +{
-> > +	struct eea_pci_device *ep_dev = edev->ep_dev;
-> > +	u8 status = eea_pci_io_get_status(edev);
-> > +	int err;
-> > +	u8 val;
-> > +
-> > +	WARN_ON(status & EEA_S_OK);
->
-> Sashiko says:
->
-> ---
-> Does a surprise removal trigger a spurious kernel warning here?
-> A surprise removal forces status to 0xFF, making 0xFF & BIT(2) true and
-> triggering an unintended kernel stack dump for an asynchronous hardware
-> event.
-> ---
->
-> This looks valid to me.
->
-> /P
->
+Also, while I don't think it is appropriate to be included in a fix.
+As a follow-up sixpack_decode() could be simplified by removing the count
+parameter, which is now always passed the value 1.
 
