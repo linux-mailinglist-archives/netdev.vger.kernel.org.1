@@ -1,298 +1,176 @@
-Return-Path: <netdev+bounces-275397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275398-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UCQXC3JG0WnxHAcAu9opvQ
-	(envelope-from <netdev+bounces-275397-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 19:12:18 +0200
+	id CMPiLq5J0WlwHQcAu9opvQ
+	(envelope-from <netdev+bounces-275398-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 19:26:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84A1E39BE7D
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 19:12:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22FD339BF3F
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 19:26:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A3DB4300C82F
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 17:12:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B5756300B45C
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 17:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59C833164D6;
-	Sat,  4 Apr 2026 17:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD49028CF6F;
+	Sat,  4 Apr 2026 17:25:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GcgJMoZ0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Foj2L3PY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3259733438F
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 17:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775322733; cv=none; b=qd00E24j+TRRTYN80j3NAFQ/LnF3VlOEcWpklsAiE5iGf7IylZLEB1jOPdUPr8t4p1Ek4gsP1pY5iAbCDkvSV1WEWZEfekmHqVCA+ATclWvthgc3gnqRs7NXI2bwFyJnoMpZurnXhfT2yEbPRGn+M4YpRHbTDrdQVvEunaDvxPg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775322733; c=relaxed/simple;
-	bh=6HWbdXTvY5ARCKQw/mJejk6jJkYYvhLGzuFZu/CMKrk=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85184299A87
+	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 17:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775323556; cv=pass; b=EGd3EQgKA5gV4VjVJnyoQYggnHgzvVPBUmcxmMYsPPOWbreBCCfwzIK/QuAHuH1GxaQnQpvg040M3PjEVxASsMfXQlOz1SIFkl1d9oX33tSfDYEn1rDYQmaEH0VRnVBFxUGPnQPEsXiCPsSOPamY8uisgZY8SIu0kqUqsG+5Qwo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775323556; c=relaxed/simple;
+	bh=iidgvtRYuaAhqrnd+5Px2QKaie9WCq8NPbXMgIRsVnU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F7A4fJ8oEKf0IzH5VEkWikK9jZJ+ZqGLKHVQ5WwAQPkyRZxGAZmTiT0e2Rqc4xBvE7TAvBcUBPt7Igi8LiP3pK08HihINIbVJHkifK6+OAhnIqINxp91qyyCIuvcb+ZPb1s2aMKtMGCWdEa0oQ1aRa68o35W4BL0PJv0vuoRa0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GcgJMoZ0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05DC8C2BCB5
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 17:12:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775322733;
-	bh=6HWbdXTvY5ARCKQw/mJejk6jJkYYvhLGzuFZu/CMKrk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=GcgJMoZ0JuCk1oE2p1uOznAEPZR6CrHmU63ZoUxVtxnX8mJab0r4uPFFxlAmTqcZA
-	 myj15f5ytltHO0slbfE7HO6gmrYbw3URX3zm5Ch5rWSlVdR401ec5dfg7RfsH5oBN4
-	 PnqK3oN/0RY4LZWR+knx2bZtXfIc8cep3MmTai8iVDgIiE9nPWWVN8CVFPKdI3F70S
-	 gC8kQiqGR2CuAUPcJ/9Yaydp3RzrBUC+10/bPsY353+aL5ufFQEdpAgg8xvos3Up3I
-	 owNuHEnPhFIkScgSgy7tm8cpYaSl2vK6VDp57FI0G+Yzb2m579C7WS8lt58GdxocpN
-	 fGfJdiBZK7yLg==
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-40efc77933fso1774259fac.3
-        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 10:12:12 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVnKjgLDc5eAsfwcftUA+yfmV18989oGJkqsPvTOnYZ6Hs7lbiH89Qgljo2xW2ELUiqkkUu2Rc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5p8DQfH8ISZNZXakLnsNgxKXFVQ3vOH5n8q4go/W/n3gmzAo1
-	FxThbPf3TG+OUzIgD6sxCFdj2ZcWxo6sZwpdJp9n50+4G2UfXl4LlKwC4OjJW2PuW5SYfNYe/XY
-	w2FtNJ8RgK4wUGYGxiD+bNvj4rmTEOGs=
-X-Received: by 2002:a05:6871:581e:b0:422:cd76:929d with SMTP id
- 586e51a60fabf-4230fd2d9e4mr3996409fac.18.1775322730928; Sat, 04 Apr 2026
- 10:12:10 -0700 (PDT)
+	 To:Cc:Content-Type; b=EZUccowhOL3Zl8DRBEFASWU7Y/Pv/j/4Tbq0i9Ta3DL9ajSQQouxf1jBTOpiqtWA5ZH4L9ut3ErCxamYOl7uOh1f3HGlFjS5ORYrb/PVg2CPip4eIvn7EV3SSqWI0M9MjYm4ECfKNrdoeDEBB2a8mbj7Wsqg43hQmLZFOvio3UU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Foj2L3PY; arc=pass smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-66ea74f472cso508414a12.1
+        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 10:25:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775323554; cv=none;
+        d=google.com; s=arc-20240605;
+        b=lrr5lW4NYA+Lt6KXscNpTzrP7WgOxeePzIYS+HwScb/qw9Bj8U0KWN/R5PKWZhEfZI
+         KKmJKhnGT8bym1E+vJJnLuqLPfAIB1VsWfRy3YmqfNqhZNc2FF5bGLUAz/ZcMe8O9JAY
+         stZzFQX4R4cAhIVGuS9HlE+8WoqApt1TBLjpj9Ie2kEz18UUxc9KXOrj2h1LcEJ4LGp+
+         WsbC9D6t2pc9dBKlDqqh2EfwmBVYoNIPWg4WSGnZB/nK5nEoFS4K38rQjvTGtxdUBDmO
+         9Bl6b+qVUBO98aBhVxusf9Kk9DN+HFRNidiQ8KZ1/pA8vhEfK8aWh36CA61MR8mifFCR
+         1xIA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=iidgvtRYuaAhqrnd+5Px2QKaie9WCq8NPbXMgIRsVnU=;
+        fh=A/9K6+8mtkge4UfDGah/fZVkBMmCtphYr4IoeOJGBhg=;
+        b=Rwsg7zbi746YUx08fesrOsGDYtTUFq1QKvjunaNHF1+d65lhrZudlu3g1SYleIpmmq
+         OnPwaDBD54n+qePvGRk5hFwvTOroQskGbQ5xLNKKsHBSDRO+bQGxmAPFkW77mUU3K+7M
+         vHFhljUuIIlcvdH0HTJl9OpnX73ROagGxBOH4Zc8wcVJrtwwIDKA8XQg2GsOU6Hkg5b/
+         Ze9LZoxw+QobcMlhSP4Jydha2CXvbbpY9sg/XRV81q8OSNH7rkJJvdhx8i/BeqkVKzwK
+         +dAlUjApAxG6dhKT2/njx7se6mF3gY9yZpNyrI+tWg3r83zlUG00KiKALN3fCQUiJb9+
+         IX9g==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775323554; x=1775928354; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iidgvtRYuaAhqrnd+5Px2QKaie9WCq8NPbXMgIRsVnU=;
+        b=Foj2L3PY/2C5011OYzRTRh+FtzyiYjsJW4ZTU0VGU+uhDG0Z0IaNv8CCV6Mr6Ra6Jp
+         hnsPFwzH9rhviGQ4/znbhQCN4YLmWk4FaWHU48bCBFyH3NjBqd9c3FLFBX7d1kqnA9hq
+         165DkUOCUm5PsRAvobBUqBUibwtY1+Oe4BKgwNvlPnjL27WiwkIUHjqWGqgDSrguktHr
+         ZCDb9kavuAG76FUklKoCVDB3mxwrmJ4a3oktDSXY3PV1h7w9K8bNLl9jqGsZkXegR86O
+         PaR8p+pEho9EcGcoq7BB8KAkdA7vujIzmjwjO0FWjgjOkZV1PRN6002emu5EDVT2eTP3
+         5qzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775323554; x=1775928354;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=iidgvtRYuaAhqrnd+5Px2QKaie9WCq8NPbXMgIRsVnU=;
+        b=sgQQnSY4GSewCAi0HkzneljQxYwieSZ87CzUurbRO7Ab7a39EyfGC+Go6YY9TnW0o9
+         7uR2zjC2yCNT4RqR3XiULJHRKket0NrWrJGJv4qT5IFl+P/dm1nhFkfFQgNfDQ04gf6P
+         +I6JgQxNsSNc3w8uzW+p9n4rDOZco8S0wqldoXM4SM635wFYydz8cZBKdZNlodiqpSie
+         JXemMngaFMqmlAR4BbtDUaw3JXryIWcbWCmw+EGXwbc13KkvBgCqkJEfB5GA0/NAM1Qe
+         R2TZNRUUGTT5bCc3bYzA7u3Ju3f8ufI9k/aErVed0ewXP45Sv3ei5KHSWfbz7iOxwzWL
+         l/fQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVAYaOBHtGCxXWVRuBt/PArVBtLDA5U7ttcO8hsNwBamhJcziko4/JKVU9PSWE/lIqi2+Ki4lQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykAI12JBfVyh07rqf8X4IPs72XtRk8Zmb2mQI5TPfmx7nmshpT
+	E2saBVBAelpvou0uEgRWpKBy2xg/VEnGmzb1Exww0h2lRL+h0Rycmb33VBytVVf8FzEiR/yDhtI
+	1dM64e8ZqZoCFdhhO1Hiu8aDOz6aPhPg=
+X-Gm-Gg: AeBDieu33m+EOZ0EnOzbAJAA97hb7dK/NfXshLBR2FuiFThYHo/sotyrGO3pH29TaWI
+	NUSMhQpqEZEHmttlLIXhKAWKn3ev2Zhg5vb3nGxCdJyQvzXuUlk3sC5iTADV6IMimFNlISwLIBJ
+	nbXbrNmf+LCritCH0M5hgI5UGSs77JBhovFuBsWq1XCQAqs7SlMHE42Q7gv8zwN2G1OtOmmnsYV
+	VtCHxYa4MjgA7Yw9XNm4yFkmmFCEqWgK3kyk6ij2gmPKu/+O2j+tkG4Bwmn0zk+r0o1/fCvUWF+
+	XhSfPIg=
+X-Received: by 2002:a17:907:ca19:b0:b98:4b8:1046 with SMTP id
+ a640c23a62f3a-b9c67922d67mr245594366b.31.1775323553422; Sat, 04 Apr 2026
+ 10:25:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260404000644.522677-1-dianders@chromium.org>
-In-Reply-To: <20260404000644.522677-1-dianders@chromium.org>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Sat, 4 Apr 2026 19:11:59 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0hRKyPesMGKGoDZEMDCX-GVw6Z-dxMLhNhwy6Kjz=7MCQ@mail.gmail.com>
-X-Gm-Features: AQROBzCS1sK1yep87rT-2xolltVfQ4j4qlt-9lHai0wQJnu4V3tzUHOX8_7jVCo
-Message-ID: <CAJZ5v0hRKyPesMGKGoDZEMDCX-GVw6Z-dxMLhNhwy6Kjz=7MCQ@mail.gmail.com>
-Subject: Re: [PATCH v4 0/9] driver core: Fix some race conditions
-To: Douglas Anderson <dianders@chromium.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J . Wysocki" <rafael@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, Alan Stern <stern@rowland.harvard.edu>, 
-	Saravana Kannan <saravanak@kernel.org>, Christoph Hellwig <hch@lst.de>, Eric Dumazet <edumazet@google.com>, 
-	Johan Hovold <johan@kernel.org>, Leon Romanovsky <leon@kernel.org>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, 
-	Robin Murphy <robin.murphy@arm.com>, Andrew Morton <akpm@linux-foundation.org>, Frank.Li@kernel.org, 
-	Jason Gunthorpe <jgg@ziepe.ca>, alex@ghiti.fr, alexander.stein@ew.tq-group.com, 
-	andre.przywara@arm.com, andrew@codeconstruct.com.au, andrew@lunn.ch, 
-	andriy.shevchenko@linux.intel.com, aou@eecs.berkeley.edu, ardb@kernel.org, 
-	bhelgaas@google.com, brgl@kernel.org, broonie@kernel.org, 
-	catalin.marinas@arm.com, chleroy@kernel.org, davem@davemloft.net, 
-	david@kernel.org, devicetree@vger.kernel.org, dmaengine@vger.kernel.org, 
-	driver-core@lists.linux.dev, gbatra@linux.ibm.com, 
-	gregory.clement@bootlin.com, hkallweit1@gmail.com, iommu@lists.linux.dev, 
-	jirislaby@kernel.org, joel@jms.id.au, joro@8bytes.org, kees@kernel.org, 
-	kevin.brodsky@arm.com, kuba@kernel.org, lenb@kernel.org, lgirdwood@gmail.com, 
-	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-aspeed@lists.ozlabs.org, linux-cxl@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org, linux-mm@kvack.org, 
-	linux-pci@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-serial@vger.kernel.org, linux-snps-arc@lists.infradead.org, 
-	linux-usb@vger.kernel.org, linux@armlinux.org.uk, 
-	linuxppc-dev@lists.ozlabs.org, m.szyprowski@samsung.com, maddy@linux.ibm.com, 
-	mani@kernel.org, maz@kernel.org, miko.lenczewski@arm.com, mpe@ellerman.id.au, 
-	netdev@vger.kernel.org, npiggin@gmail.com, osalvador@suse.de, 
-	oupton@kernel.org, pabeni@redhat.com, palmer@dabbelt.com, 
-	peter.ujfalusi@gmail.com, peterz@infradead.org, pjw@kernel.org, 
-	robh@kernel.org, sebastian.hesselbarth@gmail.com, tglx@kernel.org, 
-	tsbogend@alpha.franken.de, vgupta@kernel.org, vkoul@kernel.org, 
-	will@kernel.org, willy@infradead.org, yangyicong@hisilicon.com, 
-	yeoreum.yun@arm.com
+References: <f23ed1b3-6321-4e6d-9cda-ec5d34304f3b@blackwall.org>
+ <20260330191611.16929-1-royujjal@gmail.com> <20260331141647.GB1637150@shredder>
+In-Reply-To: <20260331141647.GB1637150@shredder>
+From: Ujjal Roy <royujjal@gmail.com>
+Date: Sat, 4 Apr 2026 22:55:38 +0530
+X-Gm-Features: AQROBzBVeQxzaE8wUvFhFsGym5EPOw52jRhY5t-OqeOyQKNixaLBWAKYKMiyQyE
+Message-ID: <CAE2MWk=CSaijB_x0BzMtVGjuibqbzuCov8y+3Hm2UodrJJpF3A@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/5] net: bridge: mcast: add multicast
+ exponential field encoding
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	Andy Roulin <aroulin@nvidia.com>, Yong Wang <yongwang@nvidia.com>, 
+	Petr Machata <petrm@nvidia.com>, Ujjal Roy <ujjal@alumnux.com>, bridge@lists.linux.dev, 
+	Kernel <netdev@vger.kernel.org>, Kernel <linux-kernel@vger.kernel.org>, 
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linuxfoundation.org,kernel.org,rowland.harvard.edu,lst.de,google.com,intel.com,ozlabs.ru,arm.com,linux-foundation.org,ziepe.ca,ghiti.fr,ew.tq-group.com,codeconstruct.com.au,lunn.ch,linux.intel.com,eecs.berkeley.edu,davemloft.net,vger.kernel.org,lists.linux.dev,linux.ibm.com,bootlin.com,gmail.com,jms.id.au,8bytes.org,lists.infradead.org,lists.ozlabs.org,kvack.org,armlinux.org.uk,samsung.com,ellerman.id.au,suse.de,redhat.com,dabbelt.com,infradead.org,alpha.franken.de,hisilicon.com];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-275397-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[rafael@kernel.org,netdev@vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-275398-lists,netdev=lfdr.de];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[85];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 84A1E39BE7D
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[royujjal@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,nvidia.com:email]
+X-Rspamd-Queue-Id: 22FD339BF3F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sat, Apr 4, 2026 at 2:07=E2=80=AFAM Douglas Anderson <dianders@chromium.=
-org> wrote:
+On Tue, Mar 31, 2026, 7:47=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wrot=
+e:
 >
-> The main goal of this series is to fix the observed bug talked about
-> in the first patch ("driver core: Don't let a device probe until it's
-> ready"). That patch fixes a problem that has been observed in the real
-> world and could land even if the rest of the patches are found
-> unacceptable or need to be spun.
+> On Mon, Mar 30, 2026 at 07:16:06PM +0000, Ujjal Roy wrote:
+> > Description:
+> > This series addresses a mismatch in how multicast query
+> > intervals and response codes are handled across IPv4 (IGMPv3)
+> > and IPv6 (MLDv2). While decoding logic currently exists,
+> > the corresponding encoding logic is missing during query
+> > packet generation. This leads to incorrect intervals being
+> > transmitted when values exceed their linear thresholds.
 >
-> That said, during patch review Danilo correctly pointed out that many
-> of the bitfield accesses in "struct device" are unsafe. I added a
-> bunch of patches in the series to address each one.
+> Thanks for the patches. I will take a look, but please read:
 >
-> Danilo said he's most worried about "can_match", so I put that one
-> first. After that, I tried to transition bitfields to flags in reverse
-> order to when the bitfield was added.
+> https://docs.kernel.org/process/maintainer-netdev.html
 >
-> Even if transitioning from bitfields to flags isn't truly needed for
-> correctness, it seems silly (and wasteful of space in struct device)
-> to have some in bitfields and some as flags. Thus I didn't spend time
-> for each bitfield showing that it's truly needed for correctness.
+> In particular:
 >
-> Transition was done semi manually. Presumably someone skilled at
-> coccinelle could do a better job, but I just used sed in a heavy-
-> handed manner and then reviewed/fixed the results, undoing anything my
-> script got wrong. My terrible/ugly script was:
->
-> var=3Dcan_match
-> caps=3D"${var^^}"
-> for f in $(git grep -l "[>\.]${var}[^1-9_a-zA-Z\[]"); do
->   echo $f
->   sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)->${var} =3D tru=
-e/set_bit(DEV_FLAG_${caps}, \&\\1->flags)/" "$f"
->   sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)\.${var} =3D tru=
-e/dev_set_${caps}(\&\\1)/" "$f"
->   sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)->${var} =3D fal=
-se/clear_bit(DEV_FLAG_${caps}, \&\\1->flags)/" "$f"
->   sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)\.${var} =3D fal=
-se/dev_clear_${caps}(\&\\1)/" "$f"
->   sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)->${var} =3D \([=
-^;]*\)/assign_bit(DEV_FLAG_${caps}, \&\\1->flags, \\2)/" "$f"
->   sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)\.${var} =3D \([=
-^;]*\)/dev_assign_${caps}(\&\\1, \\2)/" "$f"
->   sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)->${var}\([^1-9_=
-a-zA-Z\[]\)/test_bit(DEV_FLAG_${caps}, \&\\1->flags)\\2/" "$f"
->   sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)\.${var}\([^1-9_=
-a-zA-Z\[]\)/dev_${caps}(\&\\1)\\2/" "$f"
-> done
->
-> From v3 to v4, I transitioned to accessor functions with another ugly
-> sed script. I had git format the old patches, then transformed them
-> with:
->
-> for f in *.patch; do
->   echo $f
->   sed -i~ -e "s/test_and_set_bit(DEV_FLAG_\([^,]*\), \&\(.*\)->flags)/dev=
-_test_and_set_\\L\\1(\\2)/" "$f"
->   sed -i~ -e "s/test_and_set_bit(DEV_FLAG_\([^,]*\), \(.*\)\.flags)/dev_t=
-est_and_set_\\L\\1(\\2)/" "$f"
->   sed -i~ -e "s/test_bit(DEV_FLAG_\([^,]*\), \&\(.*\)->flags)/dev_\\L\\1(=
-\\2)/" "$f"
->   sed -i~ -e "s/test_bit(DEV_FLAG_\([^,]*\), \(.*\)\.flags)/dev_\\L\\1(\\=
-2)/" "$f"
->   sed -i~ -e "s/set_bit(DEV_FLAG_\([^,]*\), \&\(.*\)->flags)/dev_set_\\L\=
-\1(\\2)/" "$f"
->   sed -i~ -e "s/set_bit(DEV_FLAG_\([^,]*\), \(.*\)\.flags)/dev_set_\\L\\1=
-(\\2)/" "$f"
->   sed -i~ -e "s/clear_bit(DEV_FLAG_\([^,]*\), \&\(.*\)->flags)/dev_clear_=
-\\L\\1(\\2)/" "$f"
->   sed -i~ -e "s/clear_bit(DEV_FLAG_\([^,]*\), \(.*\)\.flags)/dev_clear_\\=
-L\\1(\\2)/" "$f"
->   sed -i~ -e "s/assign_bit(DEV_FLAG_\([^,]*\), \&\(.*\)->flags, \(.*\))/d=
-ev_assign_\\L\\1(\\2, \\3)/" "$f"
->   sed -i~ -e "s/assign_bit(DEV_FLAG_\([^,]*\), \(.*\)\.flags, \(.*\))/dev=
-_assign_\\L\\1(\\2, \\3)/" "$f"
-> done
->
-> ...and then did a few manual touchups for spacing.
->
-> NOTE: one potentially "controversial" choice I made in some patches
-> was to always reserve a flag ID even if a flag is only used under
-> certain CONFIG_ settings. This is a change from how things were
-> before. Keeping the numbering consistent and allowing easy
-> compile-testing of both CONFIG settings seemed worth it, especially
-> since it won't take up any extra space until we've added a lot more
-> flags.
->
-> I only marked the first patch as a "Fix" since it is the only one
-> fixing observed problems. Other patches could be considered fixes too
-> if folks want.
->
-> I tested the first patch in the series backported to kernel 6.6 on the
-> Pixel phone that was experiencing the race. I added extra printouts to
-> make sure that the problem was hitting / addressed. The rest of the
-> patches are tested with allmodconfig with arm32, arm64, ppc, and
-> x86. I boot tested on an arm64 Chromebook running mainline.
->
-> Changes in v4:
-> - Use accessor functions for flags
->
-> Changes in v3:
-> - Use a new "flags" bitfield
-> - Add missing \n in probe error message
->
-> Changes in v2:
-> - Instead of adjusting the ordering, use "ready_to_probe" flag
->
-> Douglas Anderson (9):
->   driver core: Don't let a device probe until it's ready
->   driver core: Replace dev->can_match with dev_can_match()
->   driver core: Replace dev->dma_iommu with dev_dma_iommu()
->   driver core: Replace dev->dma_skip_sync with dev_dma_skip_sync()
->   driver core: Replace dev->dma_ops_bypass with dev_dma_ops_bypass()
->   driver core: Replace dev->state_synced with dev_state_synced()
->   driver core: Replace dev->dma_coherent with dev_dma_coherent()
->   driver core: Replace dev->of_node_reused with dev_of_node_reused()
->   driver core: Replace dev->offline + ->offline_disabled with accessors
->
->  arch/arc/mm/dma.c                             |   4 +-
->  arch/arm/mach-highbank/highbank.c             |   2 +-
->  arch/arm/mach-mvebu/coherency.c               |   2 +-
->  arch/arm/mm/dma-mapping-nommu.c               |   4 +-
->  arch/arm/mm/dma-mapping.c                     |  28 ++--
->  arch/arm64/kernel/cpufeature.c                |   2 +-
->  arch/arm64/mm/dma-mapping.c                   |   2 +-
->  arch/mips/mm/dma-noncoherent.c                |   2 +-
->  arch/powerpc/kernel/dma-iommu.c               |   8 +-
->  .../platforms/pseries/hotplug-memory.c        |   4 +-
->  arch/riscv/mm/dma-noncoherent.c               |   2 +-
->  drivers/acpi/scan.c                           |   2 +-
->  drivers/base/core.c                           |  53 +++++---
->  drivers/base/cpu.c                            |   4 +-
->  drivers/base/dd.c                             |  28 ++--
->  drivers/base/memory.c                         |   2 +-
->  drivers/base/pinctrl.c                        |   2 +-
->  drivers/base/platform.c                       |   2 +-
->  drivers/dma/ti/k3-udma-glue.c                 |   6 +-
->  drivers/dma/ti/k3-udma.c                      |   6 +-
->  drivers/iommu/dma-iommu.c                     |   9 +-
->  drivers/iommu/iommu.c                         |   5 +-
->  drivers/net/pcs/pcs-xpcs-plat.c               |   2 +-
->  drivers/of/device.c                           |   6 +-
->  drivers/pci/of.c                              |   2 +-
->  drivers/pci/pwrctrl/core.c                    |   2 +-
->  drivers/regulator/bq257xx-regulator.c         |   2 +-
->  drivers/regulator/rk808-regulator.c           |   2 +-
->  drivers/tty/serial/serial_base_bus.c          |   2 +-
->  drivers/usb/gadget/udc/aspeed-vhub/dev.c      |   2 +-
->  include/linux/device.h                        | 120 ++++++++++++------
->  include/linux/dma-map-ops.h                   |   6 +-
->  include/linux/dma-mapping.h                   |   2 +-
->  include/linux/iommu-dma.h                     |   3 +-
->  kernel/cpu.c                                  |   4 +-
->  kernel/dma/mapping.c                          |  12 +-
->  mm/hmm.c                                      |   2 +-
->  37 files changed, 206 insertions(+), 142 deletions(-)
->
-> --
+> "The new version of patches should be posted as a separate thread, not
+> as a reply to the previous posting."
 
-For the whole set
-
-Reviewed-by: Rafael J. Wysocki (Intel) <rafael@kernel.org>
+I have updated the cover letter title and sent the new version as a
+separate thread. The same can be found here in this link:
+https://lore.kernel.org/all/20260403150050.1235-1-royujjal@gmail.com/
 
