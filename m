@@ -1,272 +1,220 @@
-Return-Path: <netdev+bounces-275356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275357-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +OkFJxny0GlzCgcAu9opvQ
-	(envelope-from <netdev+bounces-275356-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 13:12:25 +0200
+	id uFFrCOzy0GmiCgcAu9opvQ
+	(envelope-from <netdev+bounces-275357-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 13:15:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EE5B39AEA1
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 13:12:24 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B454D39AECA
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 13:15:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EB7CD3013ED0
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 11:12:22 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E64253004913
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 11:15:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26C430BF66;
-	Sat,  4 Apr 2026 11:12:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85292609EE;
+	Sat,  4 Apr 2026 11:15:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="e5wkKuKP";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="DxFUgG5y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GwtaKlBJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544472C158D
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 11:12:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32DE13A244;
+	Sat,  4 Apr 2026 11:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775301141; cv=none; b=Ctg1AhzTJ2no/8ppkCAtlD3GAzr07Pcj4lOYJVs6Uiq1JEOWiUaPg/WNcTytLcwJ8UW+Kbb9PZFlqvfe9iJ/vX+sdiHlnTS3ypkRn2azCQfo+0Rs/vXHY2JiCzBbPZnIpefXIXTPLW9c2TH4fyRgCOZs4Jhl/B082COxiKrJYJ4=
+	t=1775301353; cv=none; b=sCmcL+6F/wyJhjTWKcdtoXord+ZqSiWrkcCReigAG1KZxDu1UjSaWrWjz3CWzeCqNeYLClPaQbRMN4VMoEKPtBp8scUzWVwjFuVUukgrpJ/Q7P8AOdXCuW05Z9kNXZ+piCneeKU/d8gg6Q+iCsQbRF4V1mRYrz7WX9C72hP2CDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775301141; c=relaxed/simple;
-	bh=mXekBaB1qM5gOTF1FRrBKh6IOgESVsx4OdgPuLzjj1I=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=HwQ4k22ydKsFZMalN28/VVPPeTPxN5mkO5wjywgIHqIJ3JMptmii4cypxWNNdELyyYjbfX3uSBGIVCraDMNvJz+/4/8CBzmEbnAdMrTfZlZfK5ezSbGKrLrxFTlGAf5XAbg5o972NRc7dZgLJU2Bc+nIHDt4LfOQoY2oGprFU6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=e5wkKuKP; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=DxFUgG5y; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6342qqAx2199939
-	for <netdev@vger.kernel.org>; Sat, 4 Apr 2026 11:12:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	CO1GETQlg9DOXLPvkbjZAxLrjFhhCUrHOA72WOIr95A=; b=e5wkKuKPP7I7sjqA
-	EwWQgW9L+3406lL9+S7a96BhJO2zZk4eqG7zlBU4uUIFh2v42oQv/G7DBw+xrjbJ
-	4v8N0MKXCS+rECsirT2CYG8c5qhDVQRfTqeDuYtnw5GQ5APmmu6Yei5ymIHPdyUr
-	S+hkBd7HASWk4ifOdYOS9AHNcl6sVBLnlrcnY2vydX2y/4ENAx7bRxjngjPVKdjp
-	KuiY4IDduEqBjilSgFYBZWGAjx96GLaReSBzzzuIjNfpRyas0QVXMqHb8R9rpXoI
-	/WPzRpkIcfjkO9pL4eTY5DPjeScPG2CjQXUEBK30GDgTa8pT5BY5h9y/jlNpZlSK
-	U6WO2g==
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dat7u8r6k-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 11:12:19 +0000 (GMT)
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2b23eb4f94fso13852405ad.1
-        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 04:12:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1775301138; x=1775905938; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CO1GETQlg9DOXLPvkbjZAxLrjFhhCUrHOA72WOIr95A=;
-        b=DxFUgG5yML0/N8rciR17NquKejEO+jAVgKfGuKI51ilcNjw433AKS98ydy1GUzk9Sx
-         h2VJRCEQ9HLsOJoPJGFAm/XMErxwEjevxS/NxgSaOhZkKpwR8qgr08RTi5PvLO/JxKt6
-         p3o2Ft3UgRNF/CkrGDRqwyBzRWldFRlDFnLVTZrEjnFbbEY1jLMybm0xATDG/eo0VTIh
-         RdLjxD45DdAc7z1dqlN+eOzDTlAw5pkuP45LNCa96KHJhlJW7WisZWmyyl6gUI2QLsyC
-         scwB2G9gUcQ1jfTS2PYvERsa/wFQF6yzNKKwYNa4RgQofsV+Sf7Wr3n88P/TkatMHFxt
-         bxNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775301138; x=1775905938;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CO1GETQlg9DOXLPvkbjZAxLrjFhhCUrHOA72WOIr95A=;
-        b=f35aHqbuXYL2WtxybvRLfwUC1ut1O5308Ok0uKHekMZlqUpBOdppeJelD+xyFQr5ic
-         oyeQVZTyZP3Xl9XWjYTDvhekETix9hI6wLO4WbGdlxMfSZI92Fphyyjc+5rtVJ0xi+k8
-         KAIEg+H8l2V11YMbeVC178MdPs2g+AM7X8wYN0c4QELGZDYyIvKV0F6EMJbOn1zo/8+z
-         Mcynnv38Iyg47dAyLHmhDEUW8RGgqDSaen0Jh03y+F1J3cfAJr0MtpG2WpZ4eV2tWil9
-         agrh/Z/gEDCESlTsDbJPVm31d11ghLIicli7XbPRFTFLcXN7JdLKUV0/UWDasUXPideL
-         FIqA==
-X-Forwarded-Encrypted: i=1; AJvYcCWnPC8xw3wJU+1jzxlZGsAIccQ6I5J4QQK0wTnIUsTIW/7defoC/h0PR5iSk79gBJSIQt7oCm4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxK9+MRNjrRa9k11/RUFZZvw0fudG19SUwLUWge3tG9vzOxz3Oa
-	8/pJ+nz33HWd4H/idwQzcu4RoOgRhh2We+aEYUvnRhm8cuhy2jtUh+iRyxLNMZ+/DpmLsJ8+H9S
-	3qPYq4QT55wUjO0x2DjvczZlxl80qKdW0AIvEWOXTV0+gMk9yqQweS//ykCCfPU8YAEY=
-X-Gm-Gg: AeBDietlA/Xv3cvp07QsWPRoydG3XtCVWIoXf+OfE41E4hZd4YWH0JfaFaBQb5xBJo2
-	5bFuSVM5cyjy5gKLB9YQXy5EtF6AW+BeJwZkSCPRnFJ8zuC8blyUYEt2sWvxEbCRI5BqWqB0bBA
-	GWLQ5APyZ/MyAVScDFEPO+x6ocZ2vK3BDpDJzCkKgY57tcgSeEKDzlDMKOrmc8kmZg2kJErcPad
-	pQecUfQntQ89ahqcuuR6UK78AH/QShLuS9cAmW4NPYnK1B5lI3/wQO54S2MK0KHqakC6F5vkmK7
-	f93rfhvW65oc7x4uFKLAZwG2ka4krlhQPrOT6hc2a+PMUMRR29X/+NFvVQtGQt8W3GNln+J7UQz
-	XH6wJ//eJg1zZtN4pb37wDeY8iCXJZfrXTIqhMaRBsRH1T5ixEg==
-X-Received: by 2002:a17:90b:3952:b0:35b:a94d:7ad2 with SMTP id 98e67ed59e1d1-35de69d7ef8mr3317086a91.5.1775301137583;
-        Sat, 04 Apr 2026 04:12:17 -0700 (PDT)
-X-Received: by 2002:a17:90b:3952:b0:35b:a94d:7ad2 with SMTP id 98e67ed59e1d1-35de69d7ef8mr3317074a91.5.1775301137108;
-        Sat, 04 Apr 2026 04:12:17 -0700 (PDT)
-Received: from [10.218.41.33] ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35dbe93661fsm13739329a91.11.2026.04.04.04.12.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 04 Apr 2026 04:12:16 -0700 (PDT)
-Message-ID: <04c0949e-269c-4faa-8a7f-cef902d54fc1@oss.qualcomm.com>
-Date: Sat, 4 Apr 2026 16:42:11 +0530
+	s=arc-20240116; t=1775301353; c=relaxed/simple;
+	bh=dfhS9tV3KlRfmBCVpT5htf8yf6i8XgWSpM3gUYk0qWk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LlNrkEDnAHtJamrmd8GIuTErwbvm/P/bHoZW3ML6cbWxs4NlB17UcJsq37E6aTlzP0SLg1OCiHVQAPjg8C/bPwVI1AFdub4NKPiDiH3QuTPrsSS+yxIxe+av1o2JVgSnINDeQY/yNCosjcBS6Vr9NOD88NMAXlfmNQlO2ExlHns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GwtaKlBJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBFCCC19421;
+	Sat,  4 Apr 2026 11:15:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775301353;
+	bh=dfhS9tV3KlRfmBCVpT5htf8yf6i8XgWSpM3gUYk0qWk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=GwtaKlBJIXQLC2Q1qlJfoy66lVd3RzR/HmkcPFa8cZwECSrdGio9g1mEFcR+Cs0hT
+	 qD4dW7pYiXAQSkCLItdKycoIJerG4l3kEnvvR+LXDO7B+yynqa4ONeSkDI3IgBkKi8
+	 J3jQ8CmXAD5F7n8jZ78DPLgk8hPcZp9kIEqzNna3NrIVN1KZJFE19Uiq/eMyrokoIh
+	 lx/yVj7zlsFoGhy9FXnRqdpHn7NWcaV5vJ0hVC+xMFSNHMuWm7u5OMlQmVwDryvETh
+	 cT3BwHM20PQTdsbrKdM/wHe0/HPcE+zwpN5ykqDQOTPLIyRfE69+7RJ1ZXYeyb11Xj
+	 tOa3aUZWwQJUA==
+Message-ID: <9791b7d2-734b-4148-ad7b-89a374420a9c@kernel.org>
+Date: Sat, 4 Apr 2026 13:15:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] dt-bindings: arm: qcom: Add monaco-evk-ac support
-From: Umang Chheda <umang.chheda@oss.qualcomm.com>
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        umang.chheda@oss.qualcomm.com
-References: <20260401-monaco-evk-ac-sku-v2-0-27b5f702cfba@oss.qualcomm.com>
- <20260401-monaco-evk-ac-sku-v2-1-27b5f702cfba@oss.qualcomm.com>
- <7baeajhlqv6ujiqzmknjw3h6qr4mdw6qdywhaczm3c42pzjiue@nsgcbd4jsba5>
- <0f2612b8-5c44-4934-a625-27a66eeb7bdd@oss.qualcomm.com>
- <zyarcaimg67uivssnm4uxqiwc2jadolf5kx6moycwlbzhg4gmv@xa75wcpotzpr>
- <4d32e86f-353c-4951-89ca-46aa49d60f76@oss.qualcomm.com>
-Content-Language: en-US
-In-Reply-To: <4d32e86f-353c-4951-89ca-46aa49d60f76@oss.qualcomm.com>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net v1] net: mptcp: fix slab-use-after-free in
+ __inet_lookup_established
+Content-Language: fr
+To: Jiayuan Chen <jiayuan.chen@linux.dev>, mptcp@lists.linux.dev,
+ netdev@vger.kernel.org
+Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+References: <20260403130734.93981-1-jiayuan.chen@linux.dev>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20260403130734.93981-1-jiayuan.chen@linux.dev>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA0MDEwMiBTYWx0ZWRfX15YsJVNfCXry
- wViGKUww1hvX4qApcCBP2M6ET18L5j+qRmH+FatA8Bgv1Ev3COsX/Kr/2Y4TahBwRqOv5E/vCvT
- 7402XwO6+qC/JHAolUHVW+s8H7pLxspaPvBRz9adopThqSMzZOxI16RBKoSs79m7DZ14uaMiOmE
- StOy9zWSMSbAzCiHPASTMbXb2k9wxNpVGZiJPOpTCjkaAUAWvgHpQbMqQWRk7Qn+MBTysKA2oHe
- Kg5NzR7fR1P2OUgalZjO/RJZQzLcHhD5mJTLzda70zDhE83AYmvBJ3GUj6jI1e5ltM+3WGY6pae
- MrXN46jDSjKvnT7Y7V3JkmcSKQLtnAe5BM4kSWvmwOy26G5yeeOEjzEFH2K07CNva3PaZKEqC2+
- iGy+5MvwhkkmvzQj57tUPtYvXn8uTnRnsX9FDN+PeReIHi6fYYFfHWS4SpTgAlBL4TVkoHObuMt
- jN54fDmw+puDciNoi7A==
-X-Proofpoint-GUID: Ng7v-fhogvHxic3QromgddCTZKEBDyix
-X-Authority-Analysis: v=2.4 cv=RJ2+3oi+ c=1 sm=1 tr=0 ts=69d0f213 cx=c_pps
- a=IZJwPbhc+fLeJZngyXXI0A==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
- a=EUspDBNiAAAA:8 a=v7fjIr1oppM-PfoO_ygA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=uG9DUKGECoFWVXl0Dc02:22
-X-Proofpoint-ORIG-GUID: Ng7v-fhogvHxic3QromgddCTZKEBDyix
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-03_07,2026-04-03_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 suspectscore=0 lowpriorityscore=0 malwarescore=0
- impostorscore=0 adultscore=0 clxscore=1015 spamscore=0 phishscore=0
- bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
- definitions=main-2604040102
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
-	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275356-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org,oss.qualcomm.com];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275357-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
+	HAS_ORG_HEADER(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[umang.chheda@oss.qualcomm.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 0EE5B39AEA1
+	FORGED_SENDER_MAILLIST(0.00)[]
+X-Rspamd-Queue-Id: B454D39AECA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi Jiayuan,
 
+On 03/04/2026 15:07, Jiayuan Chen wrote:
+> The ehash table lookups are lockless and rely on
+> SLAB_TYPESAFE_BY_RCU to guarantee socket memory stability
+> during RCU read-side critical sections. Both tcp_prot and
+> tcpv6_prot have their slab caches created with this flag
+> via proto_register().
+> 
+> However, MPTCP's mptcp_subflow_init() copies tcpv6_prot into
+> tcpv6_prot_override during inet_init() (fs_initcall, level 5),
+> before inet6_init() (module_init/device_initcall, level 6) has
+> called proto_register(&tcpv6_prot). At that point,
+> tcpv6_prot.slab is still NULL, so tcpv6_prot_override.slab
+> remains NULL permanently.
+> 
+> This causes MPTCP v6 subflow child sockets to be allocated via
+> kmalloc (falling into kmalloc-4k) instead of the TCPv6 slab
+> cache. The kmalloc-4k cache lacks SLAB_TYPESAFE_BY_RCU, so
+> when these sockets are freed without SOCK_RCU_FREE (which is
+> cleared for child sockets by design), the memory can be
+> immediately reused. Concurrent ehash lookups under
+> rcu_read_lock can then access freed memory, triggering a
+> slab-use-after-free in __inet_lookup_established.
 
-On 4/4/2026 4:15 PM, Umang Chheda wrote:
-> 
-> 
-> On 4/4/2026 1:58 AM, Dmitry Baryshkov wrote:
->> On Fri, Apr 03, 2026 at 04:14:28PM +0530, Umang Chheda wrote:
->>> Hello Dmitry,
->>>
->>> On 4/1/2026 5:06 PM, Dmitry Baryshkov wrote:
->>>> On Wed, Apr 01, 2026 at 12:14:42AM +0530, Umang Chheda wrote:
->>>>> Introduce bindings for the monaco-evk-ac IoT board, which is
->>>>> based on the monaco-ac (QCS8300-AC) SoC variant.
->>>>
->>>> If it is a different SoC SKU, should it be reflected in the SoC compat
->>>> strings?
->>>
->>> Monaco‑AC does not introduce any S/W differences compared to Monaco SoC
->>> -- All IP blocks and bindings remain identical from S/W PoV, Hence
->>> haven't included the SoC SKU in the SoC compat strings.
->>>
->>> Hope this is okay ? Your view on this ?
->>
->> You are descibing -AC as the main difference between the kits, but then
->> you say that -AC doesn't bring new software interfaces. What is the
->> difference then between monako-evk and the -ac variant?
->>
-> 
-> The major difference between monaco-evk and monaco-ac-evk boards is that
-> of power grid. monaco-evk requires 4 PMICs (2x PM8650AU + Maxim MAX20018
-> + TI TPS6594) to support higher power requirements of monaco-AA variant
-> of SoC which supports upto 40 TOPS of NPU - whereas this board
-> "monaco-ac-evk" supports 20 TOPS of NPU and has lesser power
-> requirements hence 2 PMICs suffice the power requirements (2x PM8650AU).
-> 
-> 
->> Also, from the naming point of view, it is monako-ac-evk, not the other
->> way.
-> 
-> Ack, will change this to "monaco-ac-evk" in the next version.
-> 
-> Also, should I change DT name "monaco-ac-evk.dts" instead of current
-> "monaco-evk-ac-sku" ?
+Good catch! Thank you for this patch.
 
-Corrected Typo -  I meant change DT name to "monaco-ac-evk.dts" and drop
-"sku" from the DT name as well ?
+> Fix this by splitting the IPv6-specific initialization out of
+> mptcp_subflow_init() into a new mptcp_subflow_v6_init(), which
+> is called from mptcpv6_init() after proto_register(&tcpv6_prot)
+> has completed. This ensures tcpv6_prot_override.slab correctly
+> inherits the SLAB_TYPESAFE_BY_RCU slab cache.
 
-> 
->>
->>>
->>>>
->>>>>
->>>>> Signed-off-by: Umang Chheda <umang.chheda@oss.qualcomm.com>
->>>>> ---
->>>>>  Documentation/devicetree/bindings/arm/qcom.yaml | 1 +
->>>>>  1 file changed, 1 insertion(+)
->>>>>
->>>>> diff --git a/Documentation/devicetree/bindings/arm/qcom.yaml b/Documentation/devicetree/bindings/arm/qcom.yaml
->>>>> index ca880c105f3b..c76365a89687 100644
->>>>> --- a/Documentation/devicetree/bindings/arm/qcom.yaml
->>>>> +++ b/Documentation/devicetree/bindings/arm/qcom.yaml
->>>>> @@ -918,6 +918,7 @@ properties:
->>>>>            - enum:
->>>>>                - arduino,monza
->>>>>                - qcom,monaco-evk
->>>>> +              - qcom,monaco-evk-ac
->>>>>                - qcom,qcs8300-ride
->>>>>            - const: qcom,qcs8300
->>>>>  
->>>>>
->>>>> -- 
->>>>> 2.34.1
->>>>>
->>>>
->>>
->>> Thanks,
->>> Umang
->>
-> 
-> Thanks,
-> Umang
+The split makes sense anyway: better to regroup all v6-related init steps.
 
-Thanks,
-Umang
+> Fixes: b19bc2945b40 ("mptcp: implement delegated actions")
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> ---
+>  net/mptcp/ctrl.c     |  6 +++++-
+>  net/mptcp/protocol.h |  1 +
+>  net/mptcp/subflow.c  | 15 +++++++++------
+>  3 files changed, 15 insertions(+), 7 deletions(-)
 > 
-> 
+> diff --git a/net/mptcp/ctrl.c b/net/mptcp/ctrl.c
+> index d96130e49942..5887ddcdb875 100644
+> --- a/net/mptcp/ctrl.c
+> +++ b/net/mptcp/ctrl.c
+> @@ -583,7 +583,11 @@ int __init mptcpv6_init(void)
+>  	int err;
+>  
+>  	err = mptcp_proto_v6_init();
+> +	if (err)
+> +		return err;
+>  
+> -	return err;
+> +	mptcp_subflow_v6_init();
+
+I think it would be better to move this to mptcp_proto_v6_init, similar
+to what is done with mptcp_subflow_init, from mptcp_proto_init.
+
+From there, you can even call it before registering the protocol, at the
+beginning, so before inet6_register_protosw, which seems more logical
+and similar to what is done in v4. WDYT?
+
+If you send a v2, can you please remove the 'net:' prefix please?
+'mptcp:' is enough:
+
+  [PATCH net v2] mptcp: fix (...)
+
+Also, can you add a "Cc: stable" tag please?
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
