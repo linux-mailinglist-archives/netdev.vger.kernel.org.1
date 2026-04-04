@@ -1,209 +1,194 @@
-Return-Path: <netdev+bounces-275399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275400-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id hSUHHxhL0WmuHQcAu9opvQ
-	(envelope-from <netdev+bounces-275399-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 19:32:08 +0200
+	id 8HqoHvVR0WmhHgcAu9opvQ
+	(envelope-from <netdev+bounces-275400-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 20:01:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE6E839BF69
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 19:32:07 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E828B39C00D
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 20:01:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B84B2300BCA5
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 17:32:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A2293300A53F
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 18:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1978322FF22;
-	Sat,  4 Apr 2026 17:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89CC029AAEA;
+	Sat,  4 Apr 2026 18:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZZLniMs"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="EsdqI0AK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outbound.qs.icloud.com (qs-2007l-snip4-11.eps.apple.com [57.103.84.251])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECCD35893
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 17:32:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABE0264617
+	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 18:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.84.251
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775323925; cv=none; b=tHiY+jaSL4sEp2P+avs+tbHi6kLK90wRjZJbCIz5A0qXgYdsCN9MB2yRRYcTlF1nNWVrLk1veOq7eZSMB3RJ9FgUlACeoFh5/Zzvckaj3078/zVM/+ypPT/k4aQhtnO2C1fY02ktuf5z7/bv/LLbgtvt4nbIP4lU9qIBEC6qjXE=
+	t=1775325681; cv=none; b=NV4TwifW4RTbLDY3FBX1dhpjIsbRGQcujVzp7n4cI5mnHREyb0/dBhtM8ssF3k8wZF7ONPm03MO1Ql7NMvCnK4tnMmA+Q7dcU9VsycBlUrfGbNdt+iBjWBUzOP1tOfjrxbnGYWUZCY1ecIn1RCaNnJfLo+iwXr4S+muDZUMcG08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775323925; c=relaxed/simple;
-	bh=G5NO6/qbq4lLvoX8lplYG7qbuKvsCV+RTGtvHMwQuks=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AW2t426zZ5NyansCetUz8wxHsUeb0RqCoWfZEJrNrrgxUnPoc8Uyn7kEIOe6mPsoifoVrtPDIcB6jmXbFLrzL7ameQCZnkOMZ2+eegbERB9azAcm/A25jgLapg2JHwopykmfu8Y2VQDkKO9j9Sf0a3cTuXiHnvLrm8xwpn70Kuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XZZLniMs; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b9841aecf72so362496766b.2
-        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 10:32:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775323922; x=1775928722; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Mdajg83cdhJb92fM4V8OwfYFMBlzwcGMuQcWmzCCTqk=;
-        b=XZZLniMs8f2rTkQIS2Ef1kGVJ+CJmsH90TpDDhBXiPWu5n9uXuu1U2e9IKme7suXck
-         KZkW5l5eisGAaZN6/Kvcu6s2sVXYyxmXrgDKQqPITpwqpjwlbgdeH2xpLeIQzlBEVfdB
-         6bRF7LRAEN/slXUffn/83NxunY9diw7tNvPXcZVcR6owr5NwO7GI90GqwxB1p7EKh/wX
-         KijwsK0exJ+X0s2HVLdEATVCy1QTSrWoEL0oDg/Tb8AaORigC4WMjO6u6pYVswN7qFqf
-         NBtm1wBFlnoVgX5oc+iyuSaPpl6wt2Z4R203zaameK8RFLXamIgNbwfQCWAn2CHwVNlW
-         v2eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775323922; x=1775928722;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Mdajg83cdhJb92fM4V8OwfYFMBlzwcGMuQcWmzCCTqk=;
-        b=GjIZ+XYTuwSVS+bkVxbsKiG9ojjZ35/Gmwsmm1/iBE//fGEhzLOeuYzZQot464lRBG
-         lIvI/LSuHm4d4imvvcGjltv+XADRGx3KvBUm4Fy4MtHbES2kGlK2ciweVVx7MDMGW8v5
-         OlYzY8CLF1lGlOPV05EOBAtn1SoCXe8eTeXY/i5MlWR6PAlfT1iM7vRYfIBgsC4Mb+4v
-         iM8FmtbeqU/8t57b+aIc49IG0vR9hQNjoaaQUYeCBIVjPZUOGPNYO32UBjfz6ysDRvLM
-         q8iV7foslVaaaPpa0S0a4017bbHY3mMjHx49hwDJRXk3E6s9hivte1sjbaOhRDKDeKrK
-         J25w==
-X-Forwarded-Encrypted: i=1; AJvYcCWcJRNVOxSR8ZUwCZbAE183NjMemYUs5FoSjvDOiXKKjeIM+qpqhcw/ocKF2hex20MY4ZtOgqA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzB73pswWhJySLFGWTmzHcxhyAwgkFH501281f+bl05WwBmFsx
-	nXdrixuSAoUflA92UPAOJa1frYWJoQwnb8fuHa43TvzqDfWdVRGB35XE
-X-Gm-Gg: AeBDieujsTT3B9y46nVTxGETuLA3P6HeSh3WB7mssx7FhQ+x2ev06FfGoykOdrNDqb8
-	tLXBsu4whm/CGnFkXjqhWalNohiEdSFcmuKFyVPRX+04GGdhPB500VLOqb9XMJNP5XZ7D7mSKb0
-	0UNRHNv6ki/4ktZwWCzRNtHrWQqm7ElGLwO7gCg5s8REAOcm8Gj45iCA/ITofXgwslabbDXcgy1
-	0VMLc6URpali2noTRIh8qB2W1rVtTrtgmH804cysSk32XydzZuqhrLge+eZwf6RNHi8m+LyR78o
-	X4ERa9GEne0iVcTbifBTIl0ApR1hOViYcxxtT7bP9gk+quHGDwvHM5eGBnHCo+Emq8sfjVwoR1N
-	BkP8W6bq7guPHy/0lpO95Iwl14KhajFVvOanlIw8nbismRJembss0bUanQmngW3ljfFkVPx3JxX
-	ORPvOgHNqCE0qoUZcDIqJbAZcRDLUHYFYLeZR2oj3T1iGgZJAY624R8EqlHo0/N2I6QevZdvkzB
-	Es=
-X-Received: by 2002:a17:907:c003:b0:b9b:3a1b:e2ec with SMTP id a640c23a62f3a-b9c6766e7a6mr358073066b.14.1775323921613;
-        Sat, 04 Apr 2026 10:32:01 -0700 (PDT)
-Received: from ?IPV6:2a02:a03f:a75e:9a00:eb80:1fe:7625:6ba9? ([2a02:a03f:a75e:9a00:eb80:1fe:7625:6ba9])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9c3cff1298sm318079866b.54.2026.04.04.10.32.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 04 Apr 2026 10:32:01 -0700 (PDT)
-Message-ID: <5307ffc0-d72c-497d-9a38-dc77dcae5f52@gmail.com>
-Date: Sat, 4 Apr 2026 19:32:00 +0200
+	s=arc-20240116; t=1775325681; c=relaxed/simple;
+	bh=lD9gaMjBGvXHlWHM00X3qUwyDwEUamhQxaHCLKcB7jI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kXu4yoAwUmUdBRP19UxBrkSI6jRMn2aqc6INy8SPLDdDDlOV3aytt5jVL75DsrDiuRy1iNIyRLxtvIABo6tyvjmmeUmkaeZ7IBnY2hje6JajPA29iWKrJ2rlOeHD+BK5mIO7iQ60+dBya+PYTWKIR0LnGPD/h8pKMn0UutBXoEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=EsdqI0AK; arc=none smtp.client-ip=57.103.84.251
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+Received: from outbound.qs.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-2d-60-percent-4 (Postfix) with ESMTPS id A7BBE180013F;
+	Sat, 04 Apr 2026 18:01:16 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1775325679; x=1777917679; bh=0I1Is+uRm41TlYXJPEwsLEXw5wFOFW+Wto5j/ARTTDc=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=EsdqI0AKTlq3QkkFufLTaCtaVGBqy7aeKE/Mzr1rCpaaU1O0V3OGK5O5XUmsbf7ZNYMkUqLA/+ax4TjVoiMmC/QP4xGWcc2VEboL1eWJtfiYPv1bOxRXX+279Kj8xjjLz0orJXh0qgEKZZIU2ScOqT9tNUmwJkKt0mJHCvDUjm8HSfrzk0qYrD5LTCgVCxIwnEG0Z+HnVibJf7/OE0m5k51k2XEhhaBf2hGASzBYeYT4IM9usC4CvWi5+IOIx/iCxYfvj3YQxLxXNRz2rsME2HtHreNDlzAv8HzQPNLzput8waxjaevTyNs6bmGmgW+J2uAyoSQEvJaib5boLUEnwA==
+Received: from mainframe.tailfb0f7b.ts.net (unknown [17.57.155.37])
+	by p00-icloudmta-asmtp-us-east-2d-60-percent-4 (Postfix) with ESMTPSA id AD16918000A0;
+	Sat, 04 Apr 2026 18:01:14 +0000 (UTC)
+From: =?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
+To: netdev@vger.kernel.org
+Cc: gregkh@linuxfoundation.org,
+	linux-nfc@lists.01.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	=?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <framemain@outlook.com>
+Subject: [PATCH] nfc: nci: fix OOB heap read in nci_core_init_rsp_packet_v2()
+Date: Sat,  4 Apr 2026 20:00:49 +0200
+Message-ID: <20260404180049.1304711-1-snowwlake@icloud.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipv6: ioam: fix potential NULL dereferences in
- __ioam6_fill_trace_data()
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, pabeni@redhat.com,
- horms@kernel.org, dsahern@kernel.org, netdev@vger.kernel.org,
- eric.dumazet@gmail.com, yimingqian591@gmail.com
-References: <20260402101732.1188059-1-edumazet@google.com>
- <20260403214418.2233266-2-kuba@kernel.org>
- <CANn89iKUKTYZ7NVNidtdssZXUAa95LmRpTYUQ29uGE99jLmLOw@mail.gmail.com>
- <20260403145010.4b4e5865@kernel.org>
- <2de5a3d1-cc8f-48c2-a590-09bef92e9adb@gmail.com>
- <CANn89i+QK6cWseXBAbwZaWcUGG6n+CbuWV-4b97x2LmDJoGjTQ@mail.gmail.com>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@gmail.com>
-In-Reply-To: <CANn89i+QK6cWseXBAbwZaWcUGG6n+CbuWV-4b97x2LmDJoGjTQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA0MDE3MSBTYWx0ZWRfX7r28LsTMXjGj
+ /edCZyPtAJ3tNJEC/ho2ILsDZNCOVtWhmSijBVm7tUfJM3HvmM5/CzfBOH4ahcic5zzgL4aNNi/
+ Je548hQTOgPq5b9a9hzvEHosqJWZKXOlbjHrdOfRs07xGcPaxqtpj/tcW8W5zratTQum7gADz4/
+ /FB7m4hdjkgk+/sYthz9froUpI57KH3A2CUAo4JQFZjALQuOdnDNwlm6SssYv3rwFEtmpB6JNNN
+ VEQZpUS6uDOTC8xgSr5aFI8DphHUkyW19B0GePNJ67pImCIbOOO7Qjbii18LtGOZO/TGMCZjs8T
+ xJEbVTcrc2u6waNtox4X/Y4SZb1FKOSrfguCHsGcz2PpWus5Flt/Hxf4faL5MU=
+X-Proofpoint-ORIG-GUID: DpHCJmCuE6oO2rbsMIMQjPQ3mx_jpFfi
+X-Authority-Info-Out: v=2.4 cv=FP0WBuos c=1 sm=1 tr=0 ts=69d151ed
+ cx=c_apl:c_pps:t_out a=bsP7O+dXZ5uKcj+dsLqiMw==:117
+ a=bsP7O+dXZ5uKcj+dsLqiMw==:17 a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10
+ a=M51BFTxLslgA:10 a=x7bEGLp0ZPQA:10 a=LbuW6tbUWPcA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=UqCG9HQmAAAA:8 a=Dy0kGaICG5QvVYTBcgQA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=JKcXVnpmuwdQ7RL0mgk_:22
+ a=d4VnCkapGRcR46WWPyFy:22
+X-Proofpoint-GUID: DpHCJmCuE6oO2rbsMIMQjPQ3mx_jpFfi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-04_02,2026-04-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ lowpriorityscore=0 suspectscore=0 phishscore=0 mlxscore=0 bulkscore=0
+ clxscore=1011 mlxlogscore=999 adultscore=0 spamscore=0 malwarescore=0
+ classifier=spam authscore=0 adjust=0 reason=mlx scancount=1
+ engine=8.22.0-2601150000 definitions=main-2604040171
+X-Spamd-Result: default: False [-0.33 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MIXED_CHARSET(0.83)[subject];
+	DMARC_POLICY_ALLOW(-0.50)[icloud.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[icloud.com:s=1a1hai];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,redhat.com,vger.kernel.org,gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275400-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[linuxfoundation.org,lists.01.org,davemloft.net,kernel.org,outlook.com];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275399-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_FROM(0.00)[icloud.com];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[justiniurman@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[snowwlake@icloud.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[icloud.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: BE6E839BF69
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[outlook.com:email,icloud.com:dkim,icloud.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: E828B39C00D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/4/26 13:44, Eric Dumazet wrote:
-> On Sat, Apr 4, 2026 at 3:13 AM Justin Iurman <justin.iurman@gmail.com> wrote:
->>
->> On 4/3/26 23:50, Jakub Kicinski wrote:
->>> On Fri, 3 Apr 2026 14:47:32 -0700 Eric Dumazet wrote:
->>>>> If the ingress device has more RX queues than the egress device (dev) has
->>>>> TX queues, skb_get_queue_mapping(skb) will exceed dev->num_tx_queues.
->>>>>
->>>>> Since skb_get_tx_queue() does not clamp the index, will it return an
->>>>> out-of-bounds pointer into the egress device's dev->_tx array, causing
->>>>> dereferencing queue->qdisc to read invalid memory?
->>>>
->>>> This seems a different bug ?
->>>>
->>>> I mean, do we need to fix all bug in a single patch ?
->>>
->>> no no, sorry, i'm just sending this out for Justin or you as a separate
->>> thing.
->>
->> Thanks Jakub, I don't know how I missed that. It's not just about a
->> possible OOB: it's actually incorrect for IOAM to do that because we're
->> relying on a lucky assumption at best (i.e., if queue_mapping on RX ==
->> queue_mapping on TX). This unfortunately rules out the possibility to
->> have an accurate per queue visibility (which I originally provided for
->> flexibility). I've had a local patch for a long time to aggregate the
->> queue depth (i.e., sum of all TX queues). It is more expensive(***), but
->> it would kill two birds with one stone and solve both problems
->> simultaneously.
->>
->> Jakub, Eric, please let me know if the following plan works for both of you:
->> - (net) fix the OOB reported by Jakub (and, while at it, add missing
->> locks around qdisc_qstats_qlen_backlog() -> also included in my local patch)
->> - (net-next) after the merge window, add the new feature
->>
->> After that, the per queue visibility would be considered
->> legacy/deprecated and not the default behavior. Documentation would be
->> updated accordingly to explain why per queue visibility cannot be trusted.
->>
->>    (***) the advise to operators in such a case is (obviously) to reduce
->> the IOAM insertion (with the frequency parameter), especially at line rate.
-> 
-> Getting qdisc stats can be expensive for qdisc with per-cpu storage
-> for counters like pfifo-fast.
-> 
-> If your plan is to sum MQ stats, this could have quadratic behavior :
-> O(nr_cpus ^ 2)
-> 
-> I suggest rate-limiting this very expensive operation, or OAM will
-> become a nice DOS tool.
-> (Ie not depend on operators being nice, enforce this on the hosts)
+From: Lekë Hapçiu <framemain@outlook.com>
 
-Makes sense, I agree. But then rate-limiting would be redundant with the 
-frequency of IOAM insertion, which acts as a rate-limit on its own 
-already. IOAM is not (never ever) enabled by default, it must be enabled 
-on ingress interface(s) explicitly, and configured accordingly. So it 
-rules out the need to enforce anything on "hosts", as it is assumed you 
-know what you're doing when you enable something (***). Also, IOAM only 
-runs inside a limited domain (i.e., private/administrative domain 
-operated by the same person/entity). Traffic must be filtered on the 
-ingress of the domain (i.e., no IOAM injection from the outside), on the 
-egress of the domain (i.e., prevent potential data leaking due to, e.g., 
-misconfiguration), and the frequency of IOAM insertion actually is the 
-rate-limit inside the domain (to each their own configuration, depending 
-on performance). This is why I believe that documenting the whole thing 
-would be enough in this case, since we already have rate-limiting thanks 
-to the frequency of IOAM insertion.
+nci_core_init_rsp_packet_v2() walks the chip-supplied
+supported_rf_interfaces[] flexible array using a plain pointer
+with no bounds check.  Each iteration advances supported_rf_interface
+by (1 + 1 + rf_extension_cnt) bytes, where rf_extension_cnt comes
+directly from the chip.  A hostile NCI v2 chip can set
+rf_extension_cnt=255 per entry and num_supported_rf_interfaces=4,
+driving the pointer up to ~1028 bytes past the end of the skb into
+adjacent kernel heap.
 
-(***) well, we may add another security barrier, just in case someone 
-enables IOAM by mistake, by disabling the queue depth by default.
+Add two guards per loop iteration:
+ - check that at least 2 bytes remain before reading the interface
+   byte and extension count byte;
+ - check that sufficient bytes remain for the declared extension
+   block before advancing over it.
+
+Also add an upfront sizeof(*rsp) check so that accessing the fixed
+header fields (nfcc_features, max_logical_connections, ...) is safe
+before the loop is reached.
+
+Fixes: bcd684aace34 ("net/nfc/nci: Support NCI 2.x initial sequence")
+Signed-off-by: Lekë Hapçiu <framemain@outlook.com>
+---
+ net/nfc/nci/rsp.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/net/nfc/nci/rsp.c b/net/nfc/nci/rsp.c
+index 4aaf362b9..ecd360b59 100644
+--- a/net/nfc/nci/rsp.c
++++ b/net/nfc/nci/rsp.c
+@@ -96,10 +96,17 @@ static u8 nci_core_init_rsp_packet_v2(struct nci_dev *ndev,
+ 				      const struct sk_buff *skb)
+ {
+ 	const struct nci_core_init_rsp_nci_ver2 *rsp = (void *)skb->data;
+-	const u8 *supported_rf_interface = rsp->supported_rf_interfaces;
++	const u8 *supported_rf_interface;
++	const u8 *end = skb->data + skb->len;
+ 	u8 rf_interface_idx = 0;
+ 	u8 rf_extension_cnt = 0;
+ 
++	if (skb->len < sizeof(*rsp)) {
++		pr_err("CORE_INIT_RSP v2 too short: len=%u need=%zu\n",
++		       skb->len, sizeof(*rsp));
++		return NCI_STATUS_SYNTAX_ERROR;
++	}
++
+ 	pr_debug("status %x\n", rsp->status);
+ 
+ 	if (rsp->status != NCI_STATUS_OK)
+@@ -112,11 +119,22 @@ static u8 nci_core_init_rsp_packet_v2(struct nci_dev *ndev,
+ 		min((int)ndev->num_supported_rf_interfaces,
+ 		    NCI_MAX_SUPPORTED_RF_INTERFACES);
+ 
++	supported_rf_interface = rsp->supported_rf_interfaces;
+ 	while (rf_interface_idx < ndev->num_supported_rf_interfaces) {
++		if (supported_rf_interface + 2 > end) {
++			pr_err("CORE_INIT_RSP v2 truncated at rf_interface %d\n",
++			       rf_interface_idx);
++			return NCI_STATUS_SYNTAX_ERROR;
++		}
+ 		ndev->supported_rf_interfaces[rf_interface_idx++] = *supported_rf_interface++;
+ 
+ 		/* skip rf extension parameters */
+ 		rf_extension_cnt = *supported_rf_interface++;
++		if (supported_rf_interface + rf_extension_cnt > end) {
++			pr_err("CORE_INIT_RSP v2 rf_extension overflow at idx %d\n",
++			       rf_interface_idx - 1);
++			return NCI_STATUS_SYNTAX_ERROR;
++		}
+ 		supported_rf_interface += rf_extension_cnt;
+ 	}
+ 
+-- 
+2.51.0
+
 
