@@ -1,166 +1,119 @@
-Return-Path: <netdev+bounces-275353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275354-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aCWVI1no0GmeBwcAu9opvQ
-	(envelope-from <netdev+bounces-275353-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 12:30:49 +0200
+	id 6MTtI5Xp0Gk/CAcAu9opvQ
+	(envelope-from <netdev+bounces-275354-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 12:36:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8198339AC55
-	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 12:30:48 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E3639ACA4
+	for <lists+netdev@lfdr.de>; Sat, 04 Apr 2026 12:36:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4AB22300692B
-	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 10:30:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 414013005ABB
+	for <lists+netdev@lfdr.de>; Sat,  4 Apr 2026 10:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8890351C07;
-	Sat,  4 Apr 2026 10:30:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE44D35BDA4;
+	Sat,  4 Apr 2026 10:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="d5n+ojsf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WUTF44zQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.pv.icloud.com (p-west1-cluster6-host10-snip4-10.eps.apple.com [57.103.67.103])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1986273D77
-	for <netdev@vger.kernel.org>; Sat,  4 Apr 2026 10:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.67.103
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A23258EDE;
+	Sat,  4 Apr 2026 10:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775298642; cv=none; b=eV6A/GHc79dqIn/ft/QbdBREIzE4ZhY9UKGiO31HSujCIBPyzuhkDN1ud06HQKGrCQlaZ2OyuI67AfIkMM1SV3X+GQUxZfF7zqG1xPRtIHsW9/hfj6PrhOk2+gTZ0xI28JDwvQOrzsDn+0DbGH1qRK1/HUVYpyEIF0QZIa2Bu2w=
+	t=1775298962; cv=none; b=X894aulinmaUC1OoBRW4qlounthF3To70u8fflu2QrwI3Ryin1D3Q4uoEvJq+czLGhY8o/1OSVmveS0kqJHTT/DPAgj35RCIkemQXit2v9YShag5GFJdoZQRmF0HG5st8kn9PlE+k7V+erBiLZ6Jj/iRgtFMVFGZZJb+UJUhlMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775298642; c=relaxed/simple;
-	bh=uO0vylfqXi1EcSngQFnnTZqRcMUmiVc/BGETzLSZszM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AOnFa7mLe1nQ8qvCZxuB89Sjgeo+g/AESyw9j3p94sqKbVEkbYzKMR4V9grNOyxRhiuEKO9XQo2eJ40KE/40B+CsyBfxbU+OKB5Y15Y74NZnCd31b0xULNGNsPI/MuL8dRQnz/mbTGA1zg8QNVfuRW07ZVDfpks80Ao4tre3izc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=d5n+ojsf; arc=none smtp.client-ip=57.103.67.103
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-Received: from outbound.pv.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-1a-100-percent-0 (Postfix) with ESMTPS id 3D1AF180010D;
-	Sat, 04 Apr 2026 10:30:40 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1775298641; x=1777890641; bh=v8iSOSYKVyZ18y3wyP+oDU98Bany5SdsDLe5QovYIRk=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=d5n+ojsfZoVmBz4EH5R+nzMw7dWHKXC8GHoLOpnLU2N6FW1x489/7jwhKFlbmrSBxwImK4Jq9l1OjK802ykXsnz8k7U+c4jOZ+o9ffWo/WoKGgB/BYAS66kr5JMgfIqAi81FuZDvKeMZUPQbfYgcintDkGveYmCqxprZ7iN/FZavs3kAWj1/m8Jyk5LSj7A1YtlN9aJJ9+3Y+hvEcDa75sEuBxd+POE0llH64Gusvys/Dd06+olEBuZuM8mDBdCcG1/V8rhmFNV/Yo9rOFnMLqpGTP4ZEP+p0YV5TaKN6EnjRYD9vUkvml6FXQLEvJoPChmXuHLZN9MAohTnC7vrFg==
-Received: from mainframe.tailfb0f7b.ts.net (unknown [17.56.9.36])
-	by p00-icloudmta-asmtp-us-west-1a-100-percent-0 (Postfix) with ESMTPSA id 11AB51800135;
-	Sat, 04 Apr 2026 10:30:37 +0000 (UTC)
-From: =?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	security@kernel.org,
-	=?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <framemain@outlook.com>
-Subject: [PATCH] nfc: nci: fix OOB heap read in nci_core_init_rsp_packet_v1()
-Date: Sat,  4 Apr 2026 12:30:16 +0200
-Message-ID: <20260404103016.1292588-1-snowwlake@icloud.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1775298962; c=relaxed/simple;
+	bh=iQs4+wAEvGqLMsZvqvNU/VsvXhN2YZ9haUXqSaeLJfc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D6a2SZfENnusDvWbWBa0uQDGXgdVdAwNhmNNWitbDgYcDYGSLXJnw6j9Nlv7wHJEKM4a5YkroJ949OGFRrhubPtbjL5N/AIpKwWpNH1fspLlCqkAn2Br7fuJ296r1ZSZ8389gsmqyi/lSZFlrevHQvdXrvBgBGqdwfOEHZK6ZYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WUTF44zQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1073C19423;
+	Sat,  4 Apr 2026 10:36:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775298962;
+	bh=iQs4+wAEvGqLMsZvqvNU/VsvXhN2YZ9haUXqSaeLJfc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WUTF44zQTtUxDYGjVRCde6o86DFQ2BS+VKHSftiPzqD7VdxfUa3G+TllLOEezTks0
+	 VZanB40NS82qXuD1MOah1RClWDATGRSrqHz27UlSOfGDnbyGCCXXrOq5mtxM5HNzmx
+	 SSK5JXiDjqO7D8sE/cMZsNfRVGNc3FgWcHd0eVVcQUWN4hxy/jbi+Nhtb3eOd9UUjM
+	 FNE0jUdLzR2apf1jjykxv6OL0Zfy3W3qbJAf2Ifwy9sKDsP3pOg49IrwJNdFv6DzV3
+	 1fEVb5uTOyU8vfwIRjLRDJA+HiwfDkBf/ZILt52Ne7Wts8/91jnj9Cqf+hnD28w3r8
+	 DonJnyb9akbLA==
+Date: Sat, 4 Apr 2026 12:35:59 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: David Heidelberg <david@ixit.cz>
+Cc: Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Alexander Martinz <amartinz@shift.eco>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Casey Connolly <casey.connolly@linaro.org>, Alexander Martinz <amartinz@shiftphones.com>, 
+	Petr Hodina <petr.hodina@protonmail.com>, biemster <l.j.beemster@gmail.com>, netdev@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, oe-linux-nfc@lists.linux.dev, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, phone-devel@vger.kernel.org
+Subject: Re: [PATCH v3 1/5] dt-bindings: nfc: nxp,nci: Document PN557
+ compatible
+Message-ID: <20260404-antique-skylark-of-vigor-9dce8e@quoll>
+References: <20260403-oneplus-nfc-v3-0-fbdce57d63c1@ixit.cz>
+ <20260403-oneplus-nfc-v3-1-fbdce57d63c1@ixit.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA0MDA5NSBTYWx0ZWRfX/iG2KMukVWwO
- EReN4Y0irlMQXbg2QDsgroVx4d0/p9g4b7OkPyGwb1AfAEUWSJ8YVneZojWf5pqE8b5mKzotkeo
- a5YCNvdCyqbV0kySXwpvhqw2f0R/HDLAu2Wcq/S0ZTg7rzuTfhcN9UZMLNl/8DstZIkPkKRVfOk
- yZJukkxOV4gIRMpoEFnc1gncJNfuemdtri2Pa/cI1c8QfUcM5lyVc+IfcwGwEqljwlZ7K8u/QUb
- QpwuP273EfIhBTax7WMuNmtqw0MaAuV2Lpc8dMaL8gj+I5qizrf1IQeZHJoZKlWGfms/QXsVa/r
- 34DCT80nPiDML4rGtV3m+Ai/bSI4G7E7w8JzgHF9L737El1bsK1wa24TGuFV7M=
-X-Proofpoint-ORIG-GUID: cstqrVqpjEX5UzBhWbSt5DfvNfmVOB1q
-X-Proofpoint-GUID: cstqrVqpjEX5UzBhWbSt5DfvNfmVOB1q
-X-Authority-Info-Out: v=2.4 cv=J+mnLQnS c=1 sm=1 tr=0 ts=69d0e850
- cx=c_apl:c_pps:t_out a=azHRBMxVc17uSn+fyuI/eg==:117
- a=azHRBMxVc17uSn+fyuI/eg==:17 a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10
- a=M51BFTxLslgA:10 a=x7bEGLp0ZPQA:10 a=LbuW6tbUWPcA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=UqCG9HQmAAAA:8 a=0lfIgeIhH33YQOLGX-0A:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=JKcXVnpmuwdQ7RL0mgk_:22
- a=d4VnCkapGRcR46WWPyFy:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-03_07,2026-04-03_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- phishscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0 adultscore=0
- mlxscore=0 suspectscore=0 mlxlogscore=999 clxscore=1011 classifier=spam
- authscore=0 adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2604040095
-X-Spamd-Result: default: False [-0.33 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260403-oneplus-nfc-v3-1-fbdce57d63c1@ixit.cz>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MIXED_CHARSET(0.83)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[icloud.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[icloud.com:s=1a1hai];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[icloud.com:+];
-	TAGGED_FROM(0.00)[bounces-275353-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,outlook.com];
+	TAGGED_FROM(0.00)[bounces-275354-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,shift.eco,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,shiftphones.com,protonmail.com,gmail.com,vger.kernel.org,lists.linux.dev];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[snowwlake@icloud.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[7];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[krzk@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[icloud.com]
-X-Rspamd-Queue-Id: 8198339AC55
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 34E3639ACA4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Lekë Hapçiu <framemain@outlook.com>
+On Fri, Apr 03, 2026 at 03:58:46PM +0200, David Heidelberg wrote:
+> The PN557 uses the same hardware as the PN553 but ships with
+> firmware compliant with NCI 2.0.
+> 
+> Document PN557 as a compatible device.
+> 
+> Signed-off-by: David Heidelberg <david@ixit.cz>
 
-nci_core_init_rsp_packet_v1() uses the raw chip-supplied
-num_supported_rf_interfaces byte to compute the rsp_2 pointer, but
-the preceding min() already stores the capped value in
-ndev->num_supported_rf_interfaces.  When a hostile chip returns
-num_supported_rf_interfaces > 4 the memcpy is safe (capped) but rsp_2
-lands past the end of the skb, and the fields copied out of it corrupt
-nci_dev with data from adjacent kernel heap.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
-Use the already-capped ndev->num_supported_rf_interfaces for both the
-length check and the pointer, making the relationship between the two
-explicit.
-
-Fixes: e8c0dacd9836 ("NFC: Update names and structs to NCI spec 1.0 d18")
-Signed-off-by: Lekë Hapçiu <framemain@outlook.com>
----
-v2: drop intermediate offset variable, check skb->len directly against
-    ndev->num_supported_rf_interfaces + sizeof(*rsp_2) (Jakub Kicinski)
-
- net/nfc/nci/rsp.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/net/nfc/nci/rsp.c b/net/nfc/nci/rsp.c
-index 9eeb86282..4aaf362b9 100644
---- a/net/nfc/nci/rsp.c
-+++ b/net/nfc/nci/rsp.c
-@@ -66,7 +66,16 @@ static u8 nci_core_init_rsp_packet_v1(struct nci_dev *ndev,
- 	       rsp_1->supported_rf_interfaces,
- 	       ndev->num_supported_rf_interfaces);
- 
--	rsp_2 = (void *) (skb->data + 6 + rsp_1->num_supported_rf_interfaces);
-+	if (skb->len < sizeof(*rsp_1) + ndev->num_supported_rf_interfaces +
-+		       sizeof(*rsp_2)) {
-+		pr_err("CORE_INIT_RSP too short: len=%u need=%zu\n",
-+		       skb->len,
-+		       sizeof(*rsp_1) + ndev->num_supported_rf_interfaces +
-+		       sizeof(*rsp_2));
-+		return NCI_STATUS_SYNTAX_ERROR;
-+	}
-+	rsp_2 = (void *)(skb->data + sizeof(*rsp_1) +
-+			 ndev->num_supported_rf_interfaces);
- 
- 	ndev->max_logical_connections = rsp_2->max_logical_connections;
- 	ndev->max_routing_table_size =
--- 
-2.51.0
+Best regards,
+Krzysztof
 
 
