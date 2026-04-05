@@ -1,64 +1,61 @@
-Return-Path: <netdev+bounces-275433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275434-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8PlPERfi0Wm8PwcAu9opvQ
-	(envelope-from <netdev+bounces-275433-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 06:16:23 +0200
+	id lQP4FA7r0WmJRAcAu9opvQ
+	(envelope-from <netdev+bounces-275434-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 06:54:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1A2D39D48D
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 06:16:22 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E15239D52E
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 06:54:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E212A300C243
-	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 04:16:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 330763009CDE
+	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 04:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530842C026F;
-	Sun,  5 Apr 2026 04:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kmKYrEIX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55772773E4;
+	Sun,  5 Apr 2026 04:54:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9BD2BE053;
-	Sun,  5 Apr 2026 04:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from zg8tmja5ljk3lje4mi4ymjia.icoremail.net (zg8tmja5ljk3lje4mi4ymjia.icoremail.net [209.97.182.222])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32495242D9D
+	for <netdev@vger.kernel.org>; Sun,  5 Apr 2026 04:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.182.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775362576; cv=none; b=c0j9ka9EWpRWgfrOlviUyrerIbqt6mpFjJYwJ4W6XrczBne4N6fhYzGZiqyiBkFqWFpu5nyR4ewZ0PjvhqbQrGBCbt6hnn41SNeoOGdU4yk2z63gfavzRD7Fs62CYq/owUBj+5IBI2HUeIXy5fG67qH6Hce4olT+fIDwd/clua8=
+	t=1775364874; cv=none; b=oic7bmAPlfedwAhgKU9TwqY4GygHxMnf/aOnSDZsP9CKNa7mIbHyCP0xhdCtejVdoc1/npaPFh9Al9gNl+TpkpD+w1AGilRklS0Iw/JUexJPwcdvfrbfIlQvfsIzupkIRRgJTv4YXaNCQzQYjtM4QQ55GXh0ZX8bkykf2kPV3U0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775362576; c=relaxed/simple;
-	bh=oyM08foCllT4x58AQLid8iWZzat2U6iR9B1qaSByEY4=;
+	s=arc-20240116; t=1775364874; c=relaxed/simple;
+	bh=g/OUZVckuNw+zMl3FmSRhQQ6uyd0BUmrtl0ypkALBek=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ta2FQEoOP0PJbApO+fFmYOZJ2a+9CzBm5ZQTKhgCeEzWqTzokfsS3iQ39RqYTYvbWOL6vNn8dwqn1xRMBZ/bKQgOroTSR4QlwxtAEAYDip2tTn0EdP2RVxVzqENXXzy4ErEnsgPZFJCLq64DEE68Axfp6rbMidQWQ5WURC0VPHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kmKYrEIX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67BB4C116C6;
-	Sun,  5 Apr 2026 04:16:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775362576;
-	bh=oyM08foCllT4x58AQLid8iWZzat2U6iR9B1qaSByEY4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kmKYrEIXypp4VCUD2NYtWiKUoA1Ub1CsppbmaMX6f/15oS8LOEcHnKHtcdsT/EtJL
-	 uJBkF26JLoowF6L/r0n+qb3aw64CSNEjA7QuDyAdR9emj1q2fdfJDH6qBB5H+8jFwn
-	 Jzllx0jyXiuaeKy+tjzFtWcTG0xmSXpoHkFSO0rUBLRtM8OWNsKDBDGYfGDSQTuCxg
-	 ybxcy7E/Cc1J0pSMC+GYlhqxsswgt7mn5TYDZfjbIHhlHqKXYS7kN1wP1US4kCO9ao
-	 cp1HsouRGASHL4czj0Cfig0anmH2buRy4gYj6CwDWgjm4p6sgGXboYsXIWbaDuKGTq
-	 1Brs+2RDMMCAA==
-From: Allison Henderson <achender@kernel.org>
+	 MIME-Version; b=BGk+SkJRB0zErY1BysEFRgO8MPZElhytwF/QYGEJIbhohCF8OE8q/mtS1mVDMCsf3OIeS5RfIymlIxPnkG/K6eZEaX/VvqRmh6xa3ol5BeN6hlYqc3ikaD3tMDVsINYk0BsQyksZ+ialN4mo8hEMmVUKkHCXwUFmFsOLxkkQ1ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=209.97.182.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app2 (Coremail) with SMTP id zQmowAAnv4X36tFpmx0yAA--.26392S3;
+	Sun, 05 Apr 2026 12:54:17 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
 To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
+Cc: jmaloy@redhat.com,
+	davem@davemloft.net,
 	edumazet@google.com,
-	rds-devel@oss.oracle.com,
 	kuba@kernel.org,
+	pabeni@redhat.com,
 	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	achender@kernel.org
-Subject: [PATCH net v1 2/2] net/rds: Restrict use of RDS/IB to the initial network namespace
-Date: Sat,  4 Apr 2026 21:16:13 -0700
-Message-ID: <20260405041613.309958-3-achender@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260405041613.309958-1-achender@kernel.org>
-References: <20260405041613.309958-1-achender@kernel.org>
+	ying.xue@windriver.com,
+	tuong.t.lien@dektech.com.au,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	enjou1224z@gmail.com,
+	caoruide123@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net 1/1] tipc: validate Gap ACK blocks in STATE message
+Date: Sun,  5 Apr 2026 12:54:14 +0800
+Message-ID: <8b07adfdbda1c0fbcf10a114f3272b848d4ea3a0.1775269941.git.caoruide123@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1775269941.git.caoruide123@gmail.com>
+References: <cover.1775269941.git.caoruide123@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,115 +63,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-CM-TRANSID:zQmowAAnv4X36tFpmx0yAA--.26392S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxZryxXFy3AF1DtFWruF1DAwb_yoW5Gw47pa
+	y3KFW5KrWqgFWS9Fn2kF1xtr43GFs7JF13tas5Cw43Wan8ta15CF17WFW7XFn0yr4jkay5
+	Zrn0gr1jkrW5ZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
+	jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26F4UJVW0owAS0I0E0xvYzx
+	vE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	JVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
+	AKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x02
+	62kKe7AKxVWUtVW8ZwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaV
+	Av8VW8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQMICWnRM-0DAwAAs1
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	TAGGED_FROM(0.00)[bounces-275433-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[achender@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275434-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,windriver.com,dektech.com.au,gmail.com,lzu.edu.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-0.991];
 	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[syzkaller.appspot.com:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,oracle.com:email,appspotmail.com:email]
-X-Rspamd-Queue-Id: A1A2D39D48D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 1E15239D52E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Greg Jumper <greg.jumper@oracle.com>
+From: Ruide Cao <caoruide123@gmail.com>
 
-Prevent using RDS/IB in network namespaces other than the initial one.
-The existing RDS/IB code will not work properly in non-initial network
-namespaces, and there are currently no plans to support such use.
+tipc_get_gap_ack_blks() reads len, ugack_cnt and bgack_cnt directly from
+msg_data(hdr) before verifying that a STATE message actually contains the
+fixed Gap ACK block header in its logical data area.
 
-Fixes: d5a8ac28a7ff ("RDS-TCP: Make RDS-TCP work correctly when it is set up in a netns other than init_net")
-Reported-by: syzbot+da8e060735ae02c8f3d1@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=da8e060735ae02c8f3d1
-Signed-off-by: Greg Jumper <greg.jumper@oracle.com>
-Signed-off-by: Allison Henderson <achender@kernel.org>
+A peer that negotiates TIPC_GAP_ACK_BLOCK can send a short STATE message
+with a declared TIPC payload shorter than struct tipc_gap_ack_blks and
+still append a few physical bytes after the header. The helper then trusts
+those bytes as Gap ACK metadata, and the forged bgack_cnt/len values can
+drive the broadcast receive path into kmemdup() beyond the skb boundary.
+
+Fix this by rejecting Gap ACK parsing unless the logical STATE payload is
+large enough to cover the fixed header, and by rejecting declared Gap ACK
+lengths that are smaller than the fixed header or larger than the logical
+payload. Return 0 for invalid lengths so callers do not treat malformed Gap
+ACK data as monitor payload offset, while preserving the declared size for
+valid but unused Gap ACK records. This keeps malformed Gap ACK data ignored
+without misaligning monitor payload parsing in unicast STATE messages.
+
+Fixes: d7626b5acff9 ("tipc: introduce Gap ACK blocks for broadcast link")
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Ren Wei <enjou1224z@gmail.com>
+Signed-off-by: Ruide Cao <caoruide123@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
- net/rds/af_rds.c | 10 ++++++++--
- net/rds/ib.c     |  7 ++++++-
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ net/tipc/link.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
-index b396c673dfaf..896d4cfda5c3 100644
---- a/net/rds/af_rds.c
-+++ b/net/rds/af_rds.c
-@@ -357,7 +357,8 @@ static int rds_cong_monitor(struct rds_sock *rs, sockptr_t optval, int optlen)
- 	return ret;
- }
- 
--static int rds_set_transport(struct rds_sock *rs, sockptr_t optval, int optlen)
-+static int rds_set_transport(struct net *net, struct rds_sock *rs,
-+			     sockptr_t optval, int optlen)
+diff --git a/net/tipc/link.c b/net/tipc/link.c
+index 49dfc098d89b..a364822c1cd8 100644
+--- a/net/tipc/link.c
++++ b/net/tipc/link.c
+@@ -1415,12 +1415,20 @@ u16 tipc_get_gap_ack_blks(struct tipc_gap_ack_blks **ga, struct tipc_link *l,
+ 			  struct tipc_msg *hdr, bool uc)
  {
- 	int t_type;
+ 	struct tipc_gap_ack_blks *p;
+-	u16 sz = 0;
++	u16 sz = 0, dlen = msg_data_sz(hdr);
  
-@@ -373,6 +374,10 @@ static int rds_set_transport(struct rds_sock *rs, sockptr_t optval, int optlen)
- 	if (t_type < 0 || t_type >= RDS_TRANS_COUNT)
- 		return -EINVAL;
- 
-+	/* Only RDS/TCP supports non-initial network namespaces */
-+	if (t_type != RDS_TRANS_TCP && !net_eq(net, &init_net))
-+		return -EPROTOTYPE;
+ 	/* Does peer support the Gap ACK blocks feature? */
+ 	if (l->peer_caps & TIPC_GAP_ACK_BLOCK) {
++		if (dlen < sizeof(*p))
++			goto ignore;
 +
- 	rs->rs_transport = rds_trans_get(t_type);
- 
- 	return rs->rs_transport ? 0 : -ENOPROTOOPT;
-@@ -433,6 +438,7 @@ static int rds_setsockopt(struct socket *sock, int level, int optname,
- 			  sockptr_t optval, unsigned int optlen)
- {
- 	struct rds_sock *rs = rds_sk_to_rs(sock->sk);
-+	struct net *net = sock_net(sock->sk);
- 	int ret;
- 
- 	if (level != SOL_RDS) {
-@@ -461,7 +467,7 @@ static int rds_setsockopt(struct socket *sock, int level, int optname,
- 		break;
- 	case SO_RDS_TRANSPORT:
- 		lock_sock(sock->sk);
--		ret = rds_set_transport(rs, optval, optlen);
-+		ret = rds_set_transport(net, rs, optval, optlen);
- 		release_sock(sock->sk);
- 		break;
- 	case SO_TIMESTAMP_OLD:
-diff --git a/net/rds/ib.c b/net/rds/ib.c
-index 73e01984ee9a..1bdbe8eaf3fc 100644
---- a/net/rds/ib.c
-+++ b/net/rds/ib.c
-@@ -490,8 +490,13 @@ static int rds_ib_laddr_check_cm(struct net *net, const struct in6_addr *addr,
- static int rds_ib_laddr_check(struct net *net, const struct in6_addr *addr,
- 			      __u32 scope_id)
- {
--	struct rds_ib_device *rds_ibdev = rds_ib_get_device(addr->s6_addr32[3]);
-+	struct rds_ib_device *rds_ibdev;
+ 		p = (struct tipc_gap_ack_blks *)msg_data(hdr);
+ 		sz = ntohs(p->len);
++		if (sz < sizeof(*p) || sz > dlen) {
++			sz = 0;
++			goto ignore;
++		}
 +
-+	/* RDS/IB is only supported in the initial network namespace */
-+	if (!net_eq(net, &init_net))
-+		return -EPROTOTYPE;
- 
-+	rds_ibdev = rds_ib_get_device(addr->s6_addr32[3]);
- 	if (rds_ibdev) {
- 		rds_ib_dev_put(rds_ibdev);
+ 		/* Sanity check */
+ 		if (sz == struct_size(p, gacks, size_add(p->ugack_cnt, p->bgack_cnt))) {
+ 			/* Good, check if the desired type exists */
+@@ -1434,6 +1442,8 @@ u16 tipc_get_gap_ack_blks(struct tipc_gap_ack_blks **ga, struct tipc_link *l,
+ 			}
+ 		}
+ 	}
++
++ignore:
+ 	/* Other cases: ignore! */
+ 	p = NULL;
  
 -- 
-2.43.0
+2.34.1
 
 
