@@ -1,60 +1,91 @@
-Return-Path: <netdev+bounces-275421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275422-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mxAfEt+30WkxMwcAu9opvQ
-	(envelope-from <netdev+bounces-275421-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 03:16:15 +0200
+	id Hj25E6i+0WkHNAcAu9opvQ
+	(envelope-from <netdev+bounces-275422-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 03:45:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92DE439D010
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 03:16:14 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8C2F39D0AC
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 03:45:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BE59A300D33A
-	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 01:16:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D44B03004DCF
+	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 01:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F40F2745E;
-	Sun,  5 Apr 2026 01:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C666311C11;
+	Sun,  5 Apr 2026 01:45:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="efXHlYEj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="omFeEn+/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03948F49;
-	Sun,  5 Apr 2026 01:16:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C699282F18
+	for <netdev@vger.kernel.org>; Sun,  5 Apr 2026 01:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775351771; cv=none; b=MlT2LWmfL9F2ST2UTiIOObP6q0Ev2hc9JscsGTSJeeOGJlOHk63nxuEkmki1Kja38mXVqdtceacXtlobFCCQLqdDzgdmoCiO6h6fXEM2XDwxC3eVFYZm26RtiW7DEcDkO2ET48uavaOKQ8zNsz7aivDhi9olgBLxAxbpNV4SDJg=
+	t=1775353508; cv=none; b=BQga4khOi31sIcjMEMHzs6c/gTgq09CFdjfPl8JbWBc686A7G1qzxALYGRa92PCUTaJMdq2F7vWNEe4xLftkn+CFnfY5GeH3NOXaOiF1NE0T4o5V3uwjxjx+IkA2210iglXsOwhNMY8LZP0e/3R+pRj5S78WIiw7J+Xag/GaPVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775351771; c=relaxed/simple;
-	bh=wUgAW77gLesDjJ7akGuuOi0lJVwMR3VmDH0R9wN+Zqc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SodeKMBIuMKFIj3uZrrXWop61ZixRAcWVYW66Ikpsn9wGmos0Nuc5A/PYmY//LmiXItMFWWoNi5NkOhuMREfV7mGjfS4Xv9YJTq0PwLAzswRCtT5FkcXeTio1o/p2yL5G++w16ahtXqkCnuSDHJ1+zUfPF8cY+kWD14Sd1h2ZZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=efXHlYEj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44F63C19421;
-	Sun,  5 Apr 2026 01:16:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775351770;
-	bh=wUgAW77gLesDjJ7akGuuOi0lJVwMR3VmDH0R9wN+Zqc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=efXHlYEja0pThEY2fOHOyN/swby0n6ciyBLloFawRc51FOtUFPvmsiFI7hTO/TeIa
-	 IG8a34tByjKDnkVGYkI7T0N1KQ1QIPw9zERC5DYReQvNvKktwG+FYVr4scTWUfZxuw
-	 vDKp3U492MeGimClOFRSeQYZRrz5I54VerJbdlgWVxUHQNP7HvTP0ms9Sh1X9bUN/l
-	 sajcqgjmE8c8t2oc9ICQimbOx0AkrTYc/5lVZHIBlTNjbDdsxvi1speai5C/SXuPQg
-	 w9+XDGMk7MFmffsoI5fcT9uK4ISuw0gtH3RiYtRYoFWs5qhNShY2H4mNMye3hvkSdp
-	 j5mYlEf1r+LdA==
-From: Eric Biggers <ebiggers@kernel.org>
-To: netdev@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH ipsec-next] xfrm: Drop support for HMAC-RIPEMD-160
-Date: Sat,  4 Apr 2026 18:15:13 -0700
-Message-ID: <20260405011513.64909-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1775353508; c=relaxed/simple;
+	bh=OQSFmT9ofCYNiHH02bo8zz7A6l4ReSl4DnzEs7+mehs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cd74B6C2ibNfq7VYwEUOl2qBAJJVrETP79alTJHcTPNigTam8oZ6zvRbmuJOi/7jlvnr7TksIQD59OgjUNjAlvhJbZAwrkXjeVREYkBzRe8tbokeAZtmqugBCbf3z7PeQMv+W2yzYyE0pPqdUzZHu5jjcr5lqjKHIUU4MPiKTU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=omFeEn+/; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-79ea87af213so57901287b3.0
+        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 18:45:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775353505; x=1775958305; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZkLE+abpxmYTMWgX5YNLGGNLLd7RINT4kEa95W5sGx8=;
+        b=omFeEn+/std8tkTzPknHeZcWi4DbHM508Sm+EjCxPf+ROK21xFR2JhfujolDszWEFI
+         myapD0lu6WoVz7q3HaQ64Dn3BHzTG1zPljwJR+fiWfTflPnrpHuVW/iGeBBTM/HD7Ox9
+         eLGLdkfQ2icb/qjQ7uuSwSfN4ezdGU9MUV2CvYe28t3MkKfCpIfD/SFdO9rxo8EQ9FzF
+         mn6AIwyp4X8MBJOAX5tRmGMCqK7icd0jP3ppUXTxNam/9wrKIRjbwCfyp/mGs+0n7xMg
+         OTveeOymgnclLrxTImGxRLKjf7QUHV5ael77cXvr2lzD9huR948R+A48JNKsgdB1m9PF
+         7dtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775353505; x=1775958305;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZkLE+abpxmYTMWgX5YNLGGNLLd7RINT4kEa95W5sGx8=;
+        b=R4qTZodquj/h38EDq14rhs2Dk0E7pA6Fy2XWB+hgSLgVcPTabrLINMrgrY/33L1BJJ
+         mZcN3EmjFfJ4O9mvpO29KxirR36loN6+iFnGVIogfK+taZRoqg63hgKQ6eUAAfJtytFG
+         UNviIBCsRw5TzTjJ0t1aCOXlFv4aMJOeTeHm/P/8NwYUCfV0ENSewQSAGIsKXZY65OVD
+         l0sXTGaYuTsFL1J+H2DfirbjDFRnDTlr2j2slvgxjUgnv/Z9zxqsy//C28LXoiHkW64k
+         cIG/11e9WyfCQr5wwtY8foOw6NV+JZhZOQYfbfi22HRCCTICG6h2BeCs678KLdfd9Bea
+         IPgg==
+X-Gm-Message-State: AOJu0YxanBLlKAcERC5pmUIiXcPEibWhU6eiG0jtI8sK99mwEQOCKXR5
+	E6O6PruV/8VRxb5d0KmE6/bKNC22wWTvCuzJfxWDwkvZOMk8MBfF/i7sgc17Pg==
+X-Gm-Gg: AeBDies4jV0ZtX9zs209TZbxGdJqicumxSafoF6t+/LJcIi/14SjoMF89TvzzVT+Y8A
+	V/Q4NnP7EY+Sa2ye1wibRjYJHR8+OJMbBiOclK9qifFtWMeRt+Yp1YLZk9TWRQsc1EHDBdzeAbh
+	IMTFePT+5kj0RtSGRwnXQipYTC/wb28z2qyNzJtYFki7NXLR7lfDpPohf47v8M1CkKCU2ACdIsT
+	EiadLqdXaEp936tOJfa/8zdPfL2awJoFO1kl3fxHQJamZvSRR8PfsBZFcinxjgZi/FyjEsN7IkP
+	29WHE/PFcih+5kFdNX2iMyIQkNVuhsJb2QMWnm66+OXj7sPz0QH4QeGXwoLUOcQ73dJE9NFD1jT
+	wUipI3EpSd10deLbNxsaWa6MmOOgpUG94qJ/iESegXxVc6AA0ZCfUL8MEBthafiQ70+H0L8lfJ/
+	KuTxP+cetiM1sDn3QXdCF5I64kbmnDLSrttymy0x0OTq7EQHkBLNNE5iW16jx9Xs1kQn8zAE/V4
+	GmjGaUQWk2xH5GQZBQxwODi6Qk=
+X-Received: by 2002:a05:690c:dd3:b0:79c:142b:29a8 with SMTP id 00721157ae682-7a3bcaeb9f6mr94641067b3.15.1775353505073;
+        Sat, 04 Apr 2026 18:45:05 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (172.165.85.34.bc.googleusercontent.com. [34.85.165.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7a370df19f3sm38226497b3.39.2026.04.04.18.45.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 Apr 2026 18:45:04 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next v2] selftests/net: convert so_txtime to drv-net
+Date: Sat,  4 Apr 2026 21:44:22 -0400
+Message-ID: <20260405014458.1038165-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,165 +93,432 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275421-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275422-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 92DE439D010
+	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,lib.py:url,so_txtime.sh:url]
+X-Rspamd-Queue-Id: D8C2F39D0AC
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Drop support for HMAC-RIPEMD-160 from IPsec to reduce the UAPI surface
-and simplify future maintenance.  It's almost certainly unused.
+From: Willem de Bruijn <willemb@google.com>
 
-RIPEMD-160 received some attention in the early 2000s when SHA-* weren't
-quite as well established.  But it never received much adoption outside
-of certain niches such as Bitcoin.
+In preparation for extending to pacing hardware offload, convert the
+so_txtime.sh test to a drv-net test that can be run against netdevsim
+and real hardware.
 
-It's actually unclear that Linux + IPsec + HMAC-RIPEMD-160 has *ever*
-been used, even historically.  When support for it was added in 2003, it
-was done so in a "cleanup" commit without any justification [1].  It
-didn't actually work until someone happened to fix it 5 years later [2].
-That person didn't use or test it either [3].  Finally, also note that
-"hmac(rmd160)" is by far the slowest of the algorithms in aalg_list[].
+Also update so_txtime.c to not exit on first failure, but run to
+completion and report exit code there. This helps with debugging
+unexpected results, especially when processing multiple packets,
+as in the "reverse_order" testcase.
 
-Of course, today IPsec is usually used with an AEAD, such as AES-GCM.
-But even for IPsec users still using a dedicated auth algorithm, they
-almost certainly aren't using, and shouldn't use, HMAC-RIPEMD-160.
+Signed-off-by: Willem de Bruijn <willemb@google.com>
 
-Thus, let's just drop support for it.  Note: no kconfig update is
-needed, since CRYPTO_RMD160 wasn't actually being selected anyway.
+----
 
-References:
-  [1] linux-history commit d462985fc1941a47
-      ("[IPSEC]: Clean up key manager algorithm handling.")
-  [2] linux commit a13366c632132bb9
-      ("xfrm: xfrm_algo: correct usage of RIPEMD-160")
-  [3] https://lore.kernel.org/all/1212340578-15574-1-git-send-email-rueegsegger@swiss-it.ch
+v1 -> v2
+- move so_txtime.c for net/lib to drivers/net (Jakub)
+- fix drivers/net/config order (Jakub)
+- detect passing when failure is expected (Jakub, Sashiko)
+- pass pylint --disable=R (Jakub)
+- only call ksft_run once (Jakub)
+- do not sleep if waiting time is negative (Sashiko)
+- add \n when converting error() to fprintf() (Sashiko)
+- 4 space indentation, instead of 2 space
+- increase sync delay from 100 to 200ms, to fix rare vng flakes
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+v1: https://lore.kernel.org/netdev/20260403175047.152646-1-willemdebruijn.kernel@gmail.com/
 ---
- net/xfrm/xfrm_algo.c                | 20 --------------------
- tools/testing/selftests/net/ipsec.c |  8 ++------
- 2 files changed, 2 insertions(+), 26 deletions(-)
+ .../testing/selftests/drivers/net/.gitignore  |   1 +
+ tools/testing/selftests/drivers/net/Makefile  |   5 +-
+ tools/testing/selftests/drivers/net/config    |   2 +
+ .../selftests/{ => drivers}/net/so_txtime.c   |  24 +++-
+ .../selftests/drivers/net/so_txtime.py        |  88 ++++++++++++++
+ tools/testing/selftests/net/.gitignore        |   1 -
+ tools/testing/selftests/net/Makefile          |   2 -
+ tools/testing/selftests/net/so_txtime.sh      | 110 ------------------
+ 8 files changed, 114 insertions(+), 119 deletions(-)
+ rename tools/testing/selftests/{ => drivers}/net/so_txtime.c (96%)
+ create mode 100755 tools/testing/selftests/drivers/net/so_txtime.py
+ delete mode 100755 tools/testing/selftests/net/so_txtime.sh
 
-diff --git a/net/xfrm/xfrm_algo.c b/net/xfrm/xfrm_algo.c
-index 749011e031c0a..70434495f23f5 100644
---- a/net/xfrm/xfrm_algo.c
-+++ b/net/xfrm/xfrm_algo.c
-@@ -288,30 +288,10 @@ static struct xfrm_algo_desc aalg_list[] = {
- 		.sadb_alg_ivlen = 0,
- 		.sadb_alg_minbits = 512,
- 		.sadb_alg_maxbits = 512
+diff --git a/tools/testing/selftests/drivers/net/.gitignore b/tools/testing/selftests/drivers/net/.gitignore
+index 585ecb4d5dc4..e5314ce4bb2d 100644
+--- a/tools/testing/selftests/drivers/net/.gitignore
++++ b/tools/testing/selftests/drivers/net/.gitignore
+@@ -1,3 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ napi_id_helper
+ psp_responder
++so_txtime
+diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+index 7c7fa75b80c2..85d6a7e26627 100644
+--- a/tools/testing/selftests/drivers/net/Makefile
++++ b/tools/testing/selftests/drivers/net/Makefile
+@@ -20,12 +20,15 @@ TEST_PROGS := \
+ 	queues.py \
+ 	ring_reconfig.py \
+ 	shaper.py \
++	so_txtime.py \
+ 	stats.py \
+ 	xdp.py \
+ # end of TEST_PROGS
+ 
+ # YNL files, must be before "include ..lib.mk"
+-YNL_GEN_FILES := psp_responder
++YNL_GEN_FILES := \
++	psp_responder \
++	so_txtime
+ TEST_GEN_FILES += $(YNL_GEN_FILES)
+ 
+ include ../../lib.mk
+diff --git a/tools/testing/selftests/drivers/net/config b/tools/testing/selftests/drivers/net/config
+index 77ccf83d87e0..2d39f263e03b 100644
+--- a/tools/testing/selftests/drivers/net/config
++++ b/tools/testing/selftests/drivers/net/config
+@@ -7,4 +7,6 @@ CONFIG_NETCONSOLE=m
+ CONFIG_NETCONSOLE_DYNAMIC=y
+ CONFIG_NETCONSOLE_EXTENDED_LOG=y
+ CONFIG_NETDEVSIM=m
++CONFIG_NET_SCH_ETF=m
++CONFIG_NET_SCH_FQ=m
+ CONFIG_XDP_SOCKETS=y
+diff --git a/tools/testing/selftests/net/so_txtime.c b/tools/testing/selftests/drivers/net/so_txtime.c
+similarity index 96%
+rename from tools/testing/selftests/net/so_txtime.c
+rename to tools/testing/selftests/drivers/net/so_txtime.c
+index b76df1efc2ef..7d144001ecf2 100644
+--- a/tools/testing/selftests/net/so_txtime.c
++++ b/tools/testing/selftests/drivers/net/so_txtime.c
+@@ -33,6 +33,8 @@
+ #include <unistd.h>
+ #include <poll.h>
+ 
++#include "kselftest.h"
++
+ static int	cfg_clockid	= CLOCK_TAI;
+ static uint16_t	cfg_port	= 8000;
+ static int	cfg_variance_us	= 4000;
+@@ -43,6 +45,8 @@ static bool	cfg_rx;
+ static uint64_t glob_tstart;
+ static uint64_t tdeliver_max;
+ 
++static int errors;
++
+ /* encode one timed transmission (of a 1B payload) */
+ struct timed_send {
+ 	char	data;
+@@ -131,13 +135,15 @@ static void do_recv_one(int fdr, struct timed_send *ts)
+ 	fprintf(stderr, "payload:%c delay:%lld expected:%lld (us)\n",
+ 			rbuf[0], (long long)tstop, (long long)texpect);
+ 
+-	if (rbuf[0] != ts->data)
+-		error(1, 0, "payload mismatch. expected %c", ts->data);
++	if (rbuf[0] != ts->data) {
++		fprintf(stderr, "payload mismatch. expected %c\n", ts->data);
++		errors++;
++	}
+ 
+ 	if (llabs(tstop - texpect) > cfg_variance_us) {
+ 		fprintf(stderr, "exceeds variance (%d us)\n", cfg_variance_us);
+ 		if (!getenv("KSFT_MACHINE_SLOW"))
+-			exit(1);
++			errors++;
  	}
- },
--{
--	.name = "hmac(rmd160)",
--	.compat = "rmd160",
--
--	.uinfo = {
--		.auth = {
--			.icv_truncbits = 96,
--			.icv_fullbits = 160,
--		}
--	},
--
--	.pfkey_supported = 1,
--
--	.desc = {
--		.sadb_alg_id = SADB_X_AALG_RIPEMD160HMAC,
--		.sadb_alg_ivlen = 0,
--		.sadb_alg_minbits = 160,
--		.sadb_alg_maxbits = 160
--	}
--},
- {
- 	.name = "xcbc(aes)",
- 
- 	.uinfo = {
- 		.auth = {
-diff --git a/tools/testing/selftests/net/ipsec.c b/tools/testing/selftests/net/ipsec.c
-index f4afef51b9307..89c32c354c008 100644
---- a/tools/testing/selftests/net/ipsec.c
-+++ b/tools/testing/selftests/net/ipsec.c
-@@ -60,12 +60,10 @@
- #define grchild_ip(nr)	(4*nr + 2)
- 
- #define VETH_FMT	"ktst-%d"
- #define VETH_LEN	12
- 
--#define XFRM_ALGO_NR_KEYS 29
--
- static int nsfd_parent	= -1;
- static int nsfd_childa	= -1;
- static int nsfd_childb	= -1;
- static long page_size;
- 
-@@ -94,11 +92,10 @@ struct xfrm_key_entry xfrm_key_entries[] = {
- 	{"cmac(aes)", 128},
- 	{"xcbc(aes)", 128},
- 	{"cbc(cast5)", 128},
- 	{"cbc(serpent)", 128},
- 	{"hmac(sha1)", 160},
--	{"hmac(rmd160)", 160},
- 	{"cbc(des3_ede)", 192},
- 	{"hmac(sha256)", 256},
- 	{"cbc(aes)", 256},
- 	{"cbc(camellia)", 256},
- 	{"cbc(twofish)", 256},
-@@ -811,11 +808,11 @@ static int do_ping(int cmd_fd, char *buf, size_t buf_len, struct in_addr from,
- static int xfrm_fill_key(char *name, char *buf,
- 		size_t buf_len, unsigned int *key_len)
- {
- 	int i;
- 
--	for (i = 0; i < XFRM_ALGO_NR_KEYS; i++) {
-+	for (i = 0; i < ARRAY_SIZE(xfrm_key_entries); i++) {
- 		if (strncmp(name, xfrm_key_entries[i].algo_name, ALGO_LEN) == 0)
- 			*key_len = xfrm_key_entries[i].key_len;
- 	}
- 
- 	if (*key_len > buf_len) {
-@@ -2059,12 +2056,11 @@ static int write_desc(int proto, int test_desc_fd,
  }
  
- int proto_list[] = { IPPROTO_AH, IPPROTO_COMP, IPPROTO_ESP };
- char *ah_list[] = {
- 	"digest_null", "hmac(md5)", "hmac(sha1)", "hmac(sha256)",
--	"hmac(sha384)", "hmac(sha512)", "hmac(rmd160)",
--	"xcbc(aes)", "cmac(aes)"
-+	"hmac(sha384)", "hmac(sha512)", "xcbc(aes)", "cmac(aes)"
- };
- char *comp_list[] = {
- 	"deflate",
- #if 0
- 	/* No compression backend realization */
-
-base-commit: be14d13625c9b070c33c423026b598ed65695225
+@@ -255,8 +261,11 @@ static void start_time_wait(void)
+ 		return;
+ 
+ 	now = gettime_ns(CLOCK_REALTIME);
+-	if (cfg_start_time_ns < now)
++	if (cfg_start_time_ns < now) {
++		fprintf(stderr, "FAIL: start time already passed\n");
++		errors++;
+ 		return;
++	}
+ 
+ 	err = usleep((cfg_start_time_ns - now) / 1000);
+ 	if (err)
+@@ -513,5 +522,10 @@ int main(int argc, char **argv)
+ 	else
+ 		do_test_tx((void *)&cfg_src_addr, cfg_alen);
+ 
+-	return 0;
++	if (errors) {
++		fprintf(stderr, "FAIL: %d errors\n", errors);
++		return KSFT_FAIL;
++	}
++
++	return KSFT_PASS;
+ }
+diff --git a/tools/testing/selftests/drivers/net/so_txtime.py b/tools/testing/selftests/drivers/net/so_txtime.py
+new file mode 100755
+index 000000000000..31b95a7b5b8b
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/so_txtime.py
+@@ -0,0 +1,88 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
++
++"""Regression tests for the SO_TXTIME interface.
++
++Test delivery time in FQ and ETF qdiscs.
++"""
++
++import time
++
++from lib.py import ksft_exit, ksft_run, ksft_variants
++from lib.py import KsftNamedVariant, KsftSkipEx
++from lib.py import NetDrvEpEnv, bkg, cmd
++
++
++def test_so_txtime(cfg, clockid, ipver, args_tx, args_rx, expect_fail):
++    """Main function. Run so_txtime as sender and receiver."""
++    bin_path = cfg.test_dir / "so_txtime"
++
++    tstart = time.time_ns() + 200_000_000
++
++    cmd_addr = f"-S {cfg.addr_v[ipver]} -D {cfg.remote_addr_v[ipver]}"
++    cmd_base = f"{bin_path} -{ipver} -c {clockid} -t {tstart} {cmd_addr}"
++    cmd_rx = f"{cmd_base} {args_rx} -r"
++    cmd_tx = f"{cmd_base} {args_tx}"
++
++    with bkg(cmd_rx, host=cfg.remote, fail=(not expect_fail), exit_wait=True):
++        cmd(cmd_tx)
++
++
++def _test_variants_mono():
++    for ipver in ["4", "6"]:
++        for testcase in [
++            ["no_delay", "a,-1", "a,-1"],
++            ["zero_delay", "a,0", "a,0"],
++            ["one_pkt", "a,10", "a,10"],
++            ["in_order", "a,10,b,20", "a,10,b,20"],
++            ["reverse_order", "a,20,b,10", "b,20,a,20"],
++        ]:
++            name = f"_v{ipver}_{testcase[0]}"
++            yield KsftNamedVariant(name, ipver, testcase[1], testcase[2])
++
++
++@ksft_variants(_test_variants_mono())
++def test_so_txtime_mono(cfg, ipver, args_tx, args_rx):
++    """Run all variants of monotonic (fq) tests."""
++    cmd(f"tc qdisc replace dev {cfg.ifname} root fq")
++    test_so_txtime(cfg, "mono", ipver, args_tx, args_rx, False)
++
++
++def _test_variants_etf():
++    for ipver in ["4", "6"]:
++        for testcase in [
++            ["no_delay", "a,-1", "a,-1", True],
++            ["zero_delay", "a,0", "a,0", True],
++            ["one_pkt", "a,10", "a,10", False],
++            ["in_order", "a,10,b,20", "a,10,b,20", False],
++            ["reverse_order", "a,20,b,10", "b,10,a,20", False],
++        ]:
++            name = f"_v{ipver}_{testcase[0]}"
++            yield KsftNamedVariant(
++                name, ipver, testcase[1], testcase[2], testcase[3]
++            )
++
++
++@ksft_variants(_test_variants_etf())
++def test_so_txtime_etf(cfg, ipver, args_tx, args_rx, expect_fail):
++    """Run all variants of etf tests."""
++    try:
++        # ETF does not support change, so remove and re-add it instead.
++        cmd_prefix = f"tc qdisc replace dev {cfg.ifname} root"
++        cmd(f"{cmd_prefix} pfifo_fast")
++        cmd(f"{cmd_prefix} etf clockid CLOCK_TAI delta 400000")
++    except Exception as e:
++        raise KsftSkipEx("tc does not support qdisc etf. skipping") from e
++
++    test_so_txtime(cfg, "tai", ipver, args_tx, args_rx, expect_fail)
++
++
++def main() -> None:
++    """Boilerplate ksft main."""
++    with NetDrvEpEnv(__file__) as cfg:
++        ksft_run([test_so_txtime_mono, test_so_txtime_etf], args=(cfg,))
++    ksft_exit()
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
+index 97ad4d551d44..02ad4c99a2b4 100644
+--- a/tools/testing/selftests/net/.gitignore
++++ b/tools/testing/selftests/net/.gitignore
+@@ -40,7 +40,6 @@ skf_net_off
+ socket
+ so_incoming_cpu
+ so_netns_cookie
+-so_txtime
+ so_rcv_listener
+ stress_reuseport_listen
+ tap
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 6bced3ed798b..b7f51e8f190f 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -81,7 +81,6 @@ TEST_PROGS := \
+ 	rxtimestamp.sh \
+ 	sctp_vrf.sh \
+ 	skf_net_off.sh \
+-	so_txtime.sh \
+ 	srv6_end_dt46_l3vpn_test.sh \
+ 	srv6_end_dt4_l3vpn_test.sh \
+ 	srv6_end_dt6_l3vpn_test.sh \
+@@ -154,7 +153,6 @@ TEST_GEN_FILES := \
+ 	skf_net_off \
+ 	so_netns_cookie \
+ 	so_rcv_listener \
+-	so_txtime \
+ 	socket \
+ 	stress_reuseport_listen \
+ 	tcp_fastopen_backup_key \
+diff --git a/tools/testing/selftests/net/so_txtime.sh b/tools/testing/selftests/net/so_txtime.sh
+deleted file mode 100755
+index 5e861ad32a42..000000000000
+--- a/tools/testing/selftests/net/so_txtime.sh
++++ /dev/null
+@@ -1,110 +0,0 @@
+-#!/bin/bash
+-# SPDX-License-Identifier: GPL-2.0
+-#
+-# Regression tests for the SO_TXTIME interface
+-
+-set -e
+-
+-readonly ksft_skip=4
+-readonly DEV="veth0"
+-readonly BIN="./so_txtime"
+-
+-readonly RAND="$(mktemp -u XXXXXX)"
+-readonly NSPREFIX="ns-${RAND}"
+-readonly NS1="${NSPREFIX}1"
+-readonly NS2="${NSPREFIX}2"
+-
+-readonly SADDR4='192.168.1.1'
+-readonly DADDR4='192.168.1.2'
+-readonly SADDR6='fd::1'
+-readonly DADDR6='fd::2'
+-
+-cleanup() {
+-	ip netns del "${NS2}"
+-	ip netns del "${NS1}"
+-}
+-
+-trap cleanup EXIT
+-
+-# Create virtual ethernet pair between network namespaces
+-ip netns add "${NS1}"
+-ip netns add "${NS2}"
+-
+-ip link add "${DEV}" netns "${NS1}" type veth \
+-  peer name "${DEV}" netns "${NS2}"
+-
+-# Bring the devices up
+-ip -netns "${NS1}" link set "${DEV}" up
+-ip -netns "${NS2}" link set "${DEV}" up
+-
+-# Set fixed MAC addresses on the devices
+-ip -netns "${NS1}" link set dev "${DEV}" address 02:02:02:02:02:02
+-ip -netns "${NS2}" link set dev "${DEV}" address 06:06:06:06:06:06
+-
+-# Add fixed IP addresses to the devices
+-ip -netns "${NS1}" addr add 192.168.1.1/24 dev "${DEV}"
+-ip -netns "${NS2}" addr add 192.168.1.2/24 dev "${DEV}"
+-ip -netns "${NS1}" addr add       fd::1/64 dev "${DEV}" nodad
+-ip -netns "${NS2}" addr add       fd::2/64 dev "${DEV}" nodad
+-
+-run_test() {
+-	local readonly IP="$1"
+-	local readonly CLOCK="$2"
+-	local readonly TXARGS="$3"
+-	local readonly RXARGS="$4"
+-
+-	if [[ "${IP}" == "4" ]]; then
+-		local readonly SADDR="${SADDR4}"
+-		local readonly DADDR="${DADDR4}"
+-	elif [[ "${IP}" == "6" ]]; then
+-		local readonly SADDR="${SADDR6}"
+-		local readonly DADDR="${DADDR6}"
+-	else
+-		echo "Invalid IP version ${IP}"
+-		exit 1
+-	fi
+-
+-	local readonly START="$(date +%s%N --date="+ 0.1 seconds")"
+-
+-	ip netns exec "${NS2}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" -S "${SADDR}" -D "${DADDR}" "${RXARGS}" -r &
+-	ip netns exec "${NS1}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" -S "${SADDR}" -D "${DADDR}" "${TXARGS}"
+-	wait "$!"
+-}
+-
+-do_test() {
+-	run_test $@
+-	[ $? -ne 0 ] && ret=1
+-}
+-
+-do_fail_test() {
+-	run_test $@
+-	[ $? -eq 0 ] && ret=1
+-}
+-
+-ip netns exec "${NS1}" tc qdisc add dev "${DEV}" root fq
+-set +e
+-ret=0
+-do_test 4 mono a,-1 a,-1
+-do_test 6 mono a,0 a,0
+-do_test 6 mono a,10 a,10
+-do_test 4 mono a,10,b,20 a,10,b,20
+-do_test 6 mono a,20,b,10 b,20,a,20
+-
+-if ip netns exec "${NS1}" tc qdisc replace dev "${DEV}" root etf clockid CLOCK_TAI delta 400000; then
+-	do_fail_test 4 tai a,-1 a,-1
+-	do_fail_test 6 tai a,0 a,0
+-	do_test 6 tai a,10 a,10
+-	do_test 4 tai a,10,b,20 a,10,b,20
+-	do_test 6 tai a,20,b,10 b,10,a,20
+-else
+-	echo "tc ($(tc -V)) does not support qdisc etf. skipping"
+-	[ $ret -eq 0 ] && ret=$ksft_skip
+-fi
+-
+-if [ $ret -eq 0 ]; then
+-	echo OK. All tests passed
+-elif [[ $ret -ne $ksft_skip && -n "$KSFT_MACHINE_SLOW" ]]; then
+-	echo "Ignoring errors due to slow environment" 1>&2
+-	ret=0
+-fi
+-exit $ret
 -- 
-2.53.0
+2.53.0.1213.gd9a14994de-goog
 
 
