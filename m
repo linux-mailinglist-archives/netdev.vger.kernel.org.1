@@ -1,197 +1,155 @@
-Return-Path: <netdev+bounces-275420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275423-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KBCVADyn0WnDMAcAu9opvQ
-	(envelope-from <netdev+bounces-275420-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 02:05:16 +0200
+	id E+MRK7XF0WkJNQcAu9opvQ
+	(envelope-from <netdev+bounces-275423-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 04:15:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C89439CE7F
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 02:05:15 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59CC739D146
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 04:15:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C9ABB3003D2F
-	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 00:05:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1B5B0300E279
+	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 02:15:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95DF125A0;
-	Sun,  5 Apr 2026 00:05:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="s28tVyTJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47CDE32E68D;
+	Sun,  5 Apr 2026 02:15:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7098FDF59
-	for <netdev@vger.kernel.org>; Sun,  5 Apr 2026 00:05:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775347511; cv=pass; b=eAT8Xw8Rywb+z/IqSUT2Y3bgyqtbUDUFAss4IEhFlTSYMqQ+0PmpMApjvDcdse3+oBG6kdt2/Qw9iVpK1PftrEup4hafB9+uOd5nPKapcQvcU2473XgIfUZzOTEXAW3d6x+WC21dbmuV+1pKFIokx4Ck13OiWwtHgGPSwzeD6xU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775347511; c=relaxed/simple;
-	bh=R23rsYH+zgP21jS79cqvnw2fqeQu7QiruRCG+NqhnIM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nDF8ln34qY3DYHVMiWMlAzAxVTZ705XMJNbszMTnuuGjmz8N33fgOB/O1nTr9gE0LIh6+uno8mPt4zgVpevziqV73a1xG1YHxSb5JIe9NRhSly1fl6snRWi9WyJbBifJ598BKwlgZ5vavXIlnsnK5R3sDQ1lvewnR7zO639iZSU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=s28tVyTJ; arc=pass smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2b2503753efso24020525ad.0
-        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 17:05:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775347510; cv=none;
-        d=google.com; s=arc-20240605;
-        b=WLmYdfSc83+UWejFHAnt3cWKrgOu7eM06o7s9imRJ1vx/og1XzzYGOPCL+bVC6BJu9
-         p+cWBv2GmJPLZpmmMTHDh2Wo8TBTSMPWjgS4vD0YzNInmE/2o5jzqnBeYVXY3vFp6LAK
-         DWNQQaO/aJhQottqfXqCj6JBy8RCO4bXzwy0dKlRAUWC750tCv2bAomw0xoN1M8cPoQS
-         WItqSBfIXKrnecppypDuAKauLSthSuXx/SvS3AsDDN37vKRD4woBaAtgxleglWC0CItl
-         cVeX4SHSJxr1DqbxnDDqrNxccUkYVr0bu7bSpRk3pJgfF+3OPKU+oPEeF0nCtWcm2Rod
-         ynCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=uBdFnIwU/qogTBcIt+veH+3ao5W7MrcqdsJxPS4CqGw=;
-        fh=mc4xYpygOlnhFXWByWqe9LiqP9VDCa/v5Ox9bxhcwLM=;
-        b=EO3CpjKBk6eQCje21VP69XPSypUh5LknjX6nWLBqNkCUddZTEncvYdKvi7zQOguKMo
-         V2K1CIn5PjRXa0KyGZwrLnuHvJs7Vc6IDegbxEjYygWi+FGSkrxI7ZXfl6nuvPY5lRW2
-         eO2q++C64DkKPbXScUem6mKQq4m7+sLqYXEvhWOPZPGJ9rplAm/c1vKW5B3mjaDcEZRz
-         C160HzEXuPZBHWuRXf/VYft+TP67kTObQsiE3jJuLtWozqfMDjQVAAw22lEC6vs67Mlx
-         TfchxT/iGQ+Weg/ACyXMcYbaCtYHo5Ah8iBrnRcaZIMMmO/PVe5N+f3SrmJjSkTyLH6t
-         ItpA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1775347510; x=1775952310; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uBdFnIwU/qogTBcIt+veH+3ao5W7MrcqdsJxPS4CqGw=;
-        b=s28tVyTJce9e88IeGAQneU2Oe9txmbZjY6CK7BXjVzh3yAWdrmxzwxzEidLo+/bjNB
-         rA9fQ3sD1Ojmz9YzpbvzRc0+JUMATKINogyCLgCDI8CXtluvX/mrVDVbJubA72iTYy3j
-         JqUKuwfZeGZsnRvpLD/VpLMPr7jaFRo8gTQSq7FSmg3S0WDwtefpAQ/q55PHBkA4SnlT
-         6S0ACU8mzusAJAKDGU1UcKPvp4W5HqCI9OToiScCynLbpItYRjabOVj+IdI5d4gJ1Liz
-         GRvJUjvlh8DuJ12Hdyotlo3//TwJd7YCxYEYAIN4pa9fLETdiOha8I9t8NBi1581xgaA
-         z4aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775347510; x=1775952310;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=uBdFnIwU/qogTBcIt+veH+3ao5W7MrcqdsJxPS4CqGw=;
-        b=OW6MXNZbqGH4Rt6tKb5mSAC1XbnrUnVZFYiQ4Olm3JZjzFbR3yfK/bOE6c42uIRmGb
-         2Vn8GRYmurOFUgw3xPEHmxinWzQbNB7PSOB/X0ImIX1yJ+HOriMwsI5gXupjVn8gdIKs
-         DrDkSnO/WrXwwIeaEOGIyOcBu8rjrm3jwIoFJDv6ozb1aCkTTrrXU9fquWDQbYLBKxMD
-         B/G2k6hI+9ydLFB0MsXYVAYysjHkxzkNVTLI7zAGM3IilgRmsq/bEbeTMLdgsR5wYVhH
-         jBDK0yl80sRnh8u4zU4oC5Mlj+Pp7ZtpTetkCVRrIfiZri9yU0eA7wgWGayPAE6TBsxi
-         0bbQ==
-X-Gm-Message-State: AOJu0Yyg/xDxQXH+E+HlF0pwHovtH5dmERbW+OzkqeJqJXLCvzXJ12Vw
-	X2qT34p0A3phQctYSVASTmKqf0qBc+jL0FkjuvSVXXm0+rLRtl76hcijIvHwl+Q7A2XPQl6a5Xk
-	jItj20ylDp8rgbBMKn9n6+AOReht0rxuUu6ux3y/3
-X-Gm-Gg: AeBDievCCFI8AFsS+7Tw9xpR2LaAcXp0ebor5r0WUlrjmY2BkonmQcbmqx7pbcur7LP
-	cK89uhyoKnTtZDpHwOb17Eu+rywCB04Cq72Yqqb3ET62glbP0sRzbgKtfb+9kZUoUxceOYBbWeb
-	GK3cJTjCU0UFpo1OnunQc8MEYiV/K5aiq30413uqfAVhZZdkB5Ee4QvPtfWZW0dwX2nJZk8ChsJ
-	7RoVuambE9fJhzKMpXJRDgzt5+H2qwuNgLMs1JOAZnR2GH3E6Y/yBhd37JF3D0X8O3x9/XnanAE
-	Wmz+qari
-X-Received: by 2002:a17:902:f54d:b0:2b2:4e1a:aff9 with SMTP id
- d9443c01a7336-2b281997e1fmr78997865ad.44.1775347509777; Sat, 04 Apr 2026
- 17:05:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEB82E1746;
+	Sun,  5 Apr 2026 02:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775355310; cv=none; b=WUSOlsG9eT+31wW1CDus1INuqF/dG0YIWS7vAVaC51g7eeg5tqjYlxXqfdkEIHIEVDEz9Jedxwc1jyAWYqNvGJWV07ke5lHstKQ+H6hkzs/RTJwtMwdtLs+cyZJcmLy+kcU2JrxQe5H2q2CeY6rtNlqklMMbD6dsV7Y+5r3xCe4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775355310; c=relaxed/simple;
+	bh=7OOma5hn6cWCzif1BFZM+8WKH508jp5M99D4hlA8H7Q=;
+	h=From:Date:Message-ID:To:Cc:In-Reply-To:References:Subject; b=VKTtrqvY8v1jYcHJW9BL91iQetpuU0yOs7oKIzI74+x378zIv4dvrZzbXw8UYwqzQuFpkwYgR34MAT3xCr1aoOZUqTq/u7mYsuWLZ20yQBHeu+r/nt/AxZz7z82zrDqaHqzmWYN67c/+RsROo8eKoNhqfJA8tlQGfq+vOrV2QiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from 0003-pn533-v2.eml (unknown [111.196.245.197])
+	by APP-01 (Coremail) with SMTP id qwCowADHbGihxdFpRgU5DA--.1680S2;
+	Sun, 05 Apr 2026 10:14:57 +0800 (CST)
+From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Date: Sun, 5 Apr 2026 08:40:00 +0800
+Message-ID: <20260405094003.3-pn533-v2-pengpeng@iscas.ac.cn>
+To: netdev@vger.kernel.org
+Cc: Lars Poeschel <poeschel@lemonage.de>, Duoming Zhou <duoming@zju.edu.cn>, Rikard Falkeborn <rikard.falkeborn@gmail.com>, linux-kernel@vger.kernel.org, pengpeng@iscas.ac.cn, stable@vger.kernel.org
+In-Reply-To: <20260402042148.65251-1-pengpeng@iscas.ac.cn>
+References: <20260402042148.65251-1-pengpeng@iscas.ac.cn>
+Subject: [PATCH net v2] nfc: pn533: allocate rx skb before consuming bytes
+X-CM-TRANSID:qwCowADHbGihxdFpRgU5DA--.1680S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZryUuFWruFyxKFy5Jw43ZFb_yoW8CrWrpF
+	ZxGFy5tryUJr47GwsrCw1rWa45CayvyrWrGrWqk347Z3sxJFW3GFW3Ka42vrZ5JFWkXF4a
+	vFWDXF4UCFyrua7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkm14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_JF0_
+	Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOgAwDUUUU
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260326031957.3299500-1-xmei5@asu.edu> <20260327112056.GC567789@horms.kernel.org>
-In-Reply-To: <20260327112056.GC567789@horms.kernel.org>
-From: Xiang Mei <xmei5@asu.edu>
-Date: Sat, 4 Apr 2026 17:04:59 -0700
-X-Gm-Features: AQROBzDVrru311INQMcAH2NeVIDVm62F2BspdoCZ1Sm8hSx6TOuC6jLJ0FBtOPA
-Message-ID: <CAPpSM+TV89o-aj7SVsAWPcVVSSte5SENe8f4tGe+Y23CHza+iA@mail.gmail.com>
-Subject: Re: [PATCH net] bridge: cfm: do not reschedule TX work when interval
- is zero
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, bridge@lists.linux.dev, razor@blackwall.org, 
-	idosch@nvidia.com, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, bestswngs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[asu.edu,none];
-	R_DKIM_ALLOW(-0.20)[asu.edu:s=google];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.linux.dev,blackwall.org,nvidia.com,davemloft.net,google.com,redhat.com,gmail.com];
-	TAGGED_FROM(0.00)[bounces-275420-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lemonage.de,zju.edu.cn,gmail.com,vger.kernel.org,iscas.ac.cn];
+	TAGGED_FROM(0.00)[bounces-275423-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[asu.edu:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xmei5@asu.edu,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.947];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[asu.edu:dkim,asu.edu:email,mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8C89439CE7F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,iscas.ac.cn:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 59CC739D146
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Mar 27, 2026 at 4:21=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
-te:
->
-> On Wed, Mar 25, 2026 at 08:19:57PM -0700, Xiang Mei wrote:
-> > ccm_tx_work_expired() uses interval_to_us() to convert the configured
-> > exp_interval enum into a microsecond delay, then passes it to
-> > queue_delayed_work() to schedule the next iteration. The ccm_tx_dwork
-> > callback re-arms the same delayed_work struct at the end of each
-> > invocation, forming a repeating timer.
-> >
-> > interval_to_us() returns 0 for BR_CFM_CCM_INTERVAL_NONE and any
-> > out-of-range enum value. When this 0 is passed to queue_delayed_work()
-> > as the delay, the work item fires immediately and re-arms itself with
-> > zero delay again, creating an infinite tight loop. Each iteration
-> > allocates an skb via ccm_frame_build() and queues it for transmission.
-> > The skbs pile up faster than the network stack can free them because th=
-e
-> > worker never yields the CPU, rapidly exhausting all kernel memory until
-> > OOM deadlock panic.
-> >
-> > Since CC config and CCM TX are independent netlink commands that can be
-> > issued in any order, there is no single configuration entry point where
-> > rejecting interval=3D0 would cover all cases.
-> >
-> > Fix this by checking the interval at the start of ccm_tx_work_expired()
-> > and stopping transmission immediately if it is zero. Set period to 0 so
-> > that br_cfm_cc_ccm_tx() correctly sees transmission as stopped and can
-> > restart it later if a valid interval is configured. This also avoids
-> > transmitting a CCM frame with an invalid interval value.
->
-> Hi,
->
-> I think that the principle should be that code that doesn't need
-> to be in the datapath shouldn't be in the datapath.
->
-> So, with that in mind, I think it would be better to set a lower bound on
-> exp_interval when the mep is:
->
-> a) Created. It looks like that happens in br_cfm_mep_create
-> b) Configured. It looks like that can be done by setting a policy on the
->    minimum value of IFLA_BRIDGE_CFM_CC_CONFIG_EXP_INTERVAL
->
-Thanks for the suggestion. You are right, it's better to move the
-check out of the datapath. V2 has been sent, which blocks the invalid
-interval in creation/configuration.
-> >
-> > Fixes: a806ad8ee2aa ("bridge: cfm: Kernel space implementation of CFM. =
-CCM frame TX added.")
-> > Reported-by: Weiming Shi <bestswngs@gmail.com>
-> > Signed-off-by: Xiang Mei <xmei5@asu.edu>
->
-> ...
+pn532_receive_buf() reports the number of accepted bytes to the serdev
+core. The current code consumes bytes into recv_skb and may already hand
+a complete frame to pn533_recv_frame() before allocating a fresh receive
+buffer.
+
+If that alloc_skb() fails, the callback returns 0 even though it has
+already consumed bytes, and it leaves recv_skb as NULL for the next
+receive callback. That breaks the receive_buf() accounting contract and
+can also lead to a NULL dereference on the next skb_put_u8().
+
+Allocate the receive skb lazily before consuming the next byte instead.
+If allocation fails, return the number of bytes already accepted.
+
+Fixes: c656aa4c27b1 ("nfc: pn533: add UART phy driver")
+Cc: stable@vger.kernel.org
+Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
+---
+Changes since v1:
+- rebase on `net/main`
+- keep the same fix shape on top of the current tailroom handling
+
+ drivers/nfc/pn533/uart.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/nfc/pn533/uart.c b/drivers/nfc/pn533/uart.c
+index 1b82b7b2..e0d67cd2 100644
+--- a/drivers/nfc/pn533/uart.c
++++ b/drivers/nfc/pn533/uart.c
+@@ -211,6 +211,13 @@ static size_t pn532_receive_buf(struct serdev_device *serdev,
+ 
+ 	timer_delete(&dev->cmd_timeout);
+ 	for (i = 0; i < count; i++) {
++		if (!dev->recv_skb) {
++			dev->recv_skb = alloc_skb(PN532_UART_SKB_BUFF_LEN,
++						  GFP_KERNEL);
++			if (!dev->recv_skb)
++				return i;
++		}
++
+ 		if (unlikely(!skb_tailroom(dev->recv_skb)))
+ 			skb_trim(dev->recv_skb, 0);
+ 
+@@ -219,9 +226,7 @@ static size_t pn532_receive_buf(struct serdev_device *serdev,
+ 			continue;
+ 
+ 		pn533_recv_frame(dev->priv, dev->recv_skb, 0);
+-		dev->recv_skb = alloc_skb(PN532_UART_SKB_BUFF_LEN, GFP_KERNEL);
+-		if (!dev->recv_skb)
+-			return 0;
++		dev->recv_skb = NULL;
+ 	}
+ 
+ 	return i;
+-- 
+2.50.1
+
 
