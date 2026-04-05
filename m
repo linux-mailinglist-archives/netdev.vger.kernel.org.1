@@ -1,277 +1,293 @@
-Return-Path: <netdev+bounces-275425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275426-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mtRQAjbR0WmWOAcAu9opvQ
-	(envelope-from <netdev+bounces-275425-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 05:04:22 +0200
+	id 6HCTFqjT0Wn9OQcAu9opvQ
+	(envelope-from <netdev+bounces-275426-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 05:14:48 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5711139D2C8
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 05:04:21 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B36A539D325
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 05:14:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EA823300998A
-	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 03:04:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5B04E300AC12
+	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 03:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F396332EA2;
-	Sun,  5 Apr 2026 03:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BECC9345CCE;
+	Sun,  5 Apr 2026 03:14:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vr+1Iwjo"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="X2t2U6ur"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A86B270EDF
-	for <netdev@vger.kernel.org>; Sun,  5 Apr 2026 03:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DDA21F1304;
+	Sun,  5 Apr 2026 03:14:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775358259; cv=none; b=FGS91euWrBBKNtlhz9Yw0tjYhOxKWr2FwGfV/OttPp0g1WdoG+MC17HTFWK35pA+ZXZRX32beVlhf8IhKSpqUpEcdr6kkvnTr7dsvUGtUGrk+PwKbrqCBxzFvazSry097hQruzSUVfXgzm5CgxZF9vScdflvLxSOGeUIqfg1aq4=
+	t=1775358882; cv=none; b=EpLynJTrg5oTf9gcmcIo4qUiGsDgLbLh9Ief5SM2hoDaWWv8LO6xt54+kRuz796ite8bXVHnb3VvIhZHPS+4hh4Y4tXZkmp/jbX96oO6K5+hZmmKWnbUCJg2eHYzPMZ36uh6JLSHtzuJTyYtUf1+oQ7bozCNLmwFWAq1khhZeCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775358259; c=relaxed/simple;
-	bh=yEEngp7KMalharel9krZjkWbN0/Aha54Mek6b7Gatgs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=p1qSUJd2g+YZC4nKnYn4OUusuduxZFZoJhF+2wnQothxBCCTlz0DYHj6neb0xOaWwi9DOOtTP2oV/WySxJNLOhA3dVYJ3DF5Cc7pejwVTPzUcEDcrbBS6cNdLl/Ld23xnkxZr4TIfyQzRdPC8Lc2oMzkBEjMC/G8jbeo0Uycc6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vr+1Iwjo; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-79a46ebe2beso27861117b3.2
-        for <netdev@vger.kernel.org>; Sat, 04 Apr 2026 20:04:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775358256; x=1775963056; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pUZgKANrOkAQxf/MKhOniIP53GJxYrHO6dhJcPyazRk=;
-        b=Vr+1IwjoN6QHsxtJjlUtZXUfbZDDAxb52rttzn2VGzvGLkcyCc9ynrvaUUhYXIM+NX
-         oHnfiAYsR2uBCnVqSy1w/RPzbM/qvYIW0b5355qkVYxfmAYed3WyoSfx/iN1xp+4VEw4
-         H/aNvLME0Dn0qIV6XtuufieUQfq6nfN071FW/YdpXVkjMR5ckarRCQTrzA5MVjXhh3I0
-         xIO4HISjF8lWlsKq9MskU1/w0R9N1kH2GM4PJ/56PnWrke10zM0ALBwh4NmhF1wRhaI3
-         5YxMr3QIvdpp8Rj2iTqTbyQJg3rkqfLGfQTKzFPlQiFa5TcZgf+PH6N5+659HAbF+B+5
-         wfyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775358256; x=1775963056;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pUZgKANrOkAQxf/MKhOniIP53GJxYrHO6dhJcPyazRk=;
-        b=kTN7dn2ugmu37ONadAXuCHA9N5bieethWfQjFhgo9iQlCr9eKeTW9ns2zoP+U/5iz2
-         IlFGqXQ031+L9RgoTQKpQwTNPQUu6hXbXwFpn70TV22oTdcSuXa833VnFnuH+susuSbk
-         qGLDHcOmCRTKbVYo2UP3dD4pLJffvCPV3KQ/5hdtUkyFqXoEkfYQGkmOt8GUbNVAwjNz
-         O9d5DuoatJv1sgf6DqdNy9LmzAXatp5aS392ifzhvtQlM+7SIrkXJ5vZ8rH2T5gepepx
-         Xh3qoGtfytW8zNr89+G52wc2bgc9EIJa2itgUV4jlUefzUynjqg5AFewLN0MCrqI6Bys
-         yLxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVCPEBgnsun+JCm1GSHII2+Q0D87tKmGvqmKyVuhm+aGZD1TxVBUNkSq5Sg+llIyVJ5Eo8KzxI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKLgfyrZL1606NWLkvN/5ntjR1gX2VcVKuSOZQDU4mYJo7ToW7
-	7Nyp9vMUEUkZ5yt1IFrQFjCZKJxBneNhIaU9j7GIlEJ1xiCbHCzryPPE
-X-Gm-Gg: AeBDietCAsmiDHcfw5tTqZvNxpcMTEvV6wAmXPQzwzmFPdcPSfJOBeCQAolTGzlLl+2
-	28up8eFG0//SgeEjVTx+SlTF9Luq5awWO3AONxivPMYPyQ5US8ONQsXG1BVBAZe80vQUdAn/8lg
-	5ZQC7yBPvf80Lz3Nn1LfOSvYA46yh9I5lAfdlmRUvPSEfgRNS1VQXCGsa3FIg6BVdtb31WjFMKi
-	/yoVJ5r5b5Sr1giGvpsUINNm3ep1YlNjYhcpFl58JQCYtOP2gL9bOMkeCtgTuCloDE4KxHdCEBn
-	vWLychKwbwoDzhf2Tf72kQirZ8237KHijlfY6rOO+4PsGc/PixI4bP1wyN7347x5XPYdHgJ2CfB
-	0iJB+9v6HYw1eyXj408UdfK6KqnYxE4WzxcrYAVQQnGov931MqQuGm72eJT+5QjMyeR4x6zOMgU
-	VIayq/J0gBtGV76DpZ6djxwdyQVID2mGl5zEBdL6szdFdsZWAi+PfPCBhPIH6i5ao+lL6VSLpv8
-	kZ9
-X-Received: by 2002:a05:690c:c183:b0:79a:c40d:b73b with SMTP id 00721157ae682-7a4d604f231mr71869457b3.46.1775358256085;
-        Sat, 04 Apr 2026 20:04:16 -0700 (PDT)
-Received: from gmail.com (172.165.85.34.bc.googleusercontent.com. [34.85.165.172])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7a370901513sm38076957b3.29.2026.04.04.20.04.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Apr 2026 20:04:15 -0700 (PDT)
-Date: Sat, 04 Apr 2026 23:04:15 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Joe Damato <joe@dama.to>, 
- netdev@vger.kernel.org, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>
-Cc: andrew+netdev@lunn.ch, 
- linux-kernel@vger.kernel.org, 
- willemb@google.com, 
- Joe Damato <joe@dama.to>, 
- linux-kselftest@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.400d24decd7d@gmail.com>
-In-Reply-To: <20260403233240.178948-4-joe@dama.to>
-References: <20260403233240.178948-1-joe@dama.to>
- <20260403233240.178948-4-joe@dama.to>
-Subject: Re: [net-next v2 3/3] selftests/net: Test PACKET_AUXDATA
+	s=arc-20240116; t=1775358882; c=relaxed/simple;
+	bh=P7Zi725YLqzVdA8rZ6y665+moo1oSEn103nvnKydJuo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lnQpcgKmZfPBxAOL+BTMqCOwro2Dryxo6jAxJrHZeln0+3/vw45vL3qpXP3YQxrofs5BAavgxNd9Zg7O5/ttHkWdzKvV7dXTEPZhKxxUsSpjmNzTnIfSnyklk9g/QGNW6zahxbR1/Mz13wpctdNe5t1mk+vGOjhIGbjuyfHMyS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=X2t2U6ur; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 1203C20B6F01; Sat,  4 Apr 2026 20:14:35 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1203C20B6F01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1775358875;
+	bh=0bIrpRaHD+mAUYoibbvyttAD2W1I8KUuNlGO0fbluV4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=X2t2U6ur0kfYXDqeiiCh8PISRbLCDk9zLmiYCXxvqrA8WWupJNh/EeDUlNkySlhB8
+	 4bmnyI0RN6Z4sc/2Snw9acNABIe59y/p9j6ef/iTghQQXyI0TFg7qtuIJh1uRLkm2k
+	 pEnRSxQFeuLehYlIi3KzBz6oJCudJKil0lsRaJoI=
+Date: Sat, 4 Apr 2026 20:14:35 -0700
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, leon@kernel.org,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	stephen@networkplumber.org, jacob.e.keller@intel.com,
+	leitao@debian.org, kees@kernel.org, dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next,v4] net: mana: Force full-page RX buffers via
+ ethtool private flag
+Message-ID: <adHTm2SvjDrezEdv@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <acrkwuIFyBXhwICF@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20260330154755.6a8c73a6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260330154755.6a8c73a6@kernel.org>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
+	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275426-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275425-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[willemdebruijnkernel@gmail.com,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linux.microsoft.com:+];
+	NEURAL_HAM(-0.00)[-0.996];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 5711139D2C8
+X-Rspamd-Queue-Id: B36A539D325
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Joe Damato wrote:
-> Extend the packet socket selftest, adding a recvmsg path, to test
-> PACKET_AUXDATA. Check basic attributes of tpacket_auxdata.
+On Mon, Mar 30, 2026 at 03:47:55PM -0700, Jakub Kicinski wrote:
+> On Mon, 30 Mar 2026 14:01:54 -0700 Dipayaan Roy wrote:
+> > On some ARM64 platforms with 4K PAGE_SIZE, page_pool fragment
+> > allocation in the RX refill path can cause 15-20% throughput
+> > regression under high connection counts (>16 TCP streams).
 > 
-> Signed-off-by: Joe Damato <joe@dama.to>
-> ---
->  tools/testing/selftests/net/psock_snd.c  | 67 ++++++++++++++++++++++--
->  tools/testing/selftests/net/psock_snd.sh |  5 ++
->  2 files changed, 67 insertions(+), 5 deletions(-)
+> Did you investigate what makes such a difference exactly?
+> As I said I suspect there are some improvements we could
+> make in the page pool fragmentation logic that could yield
+> similar wins without bothering the user.
+>
+I collected the perf numbers, shared the analysis below.
+> > Add an ethtool private flag "full-page-rx" that allows the user to
+> > force one RX buffer per page, bypassing the page_pool fragment path.
+> > This restores line-rate(180+ Gbps) performance on affected platforms.
+> > 
+> > Usage:
+> >   ethtool --set-priv-flags eth0 full-page-rx on
+> > 
+> > There is no behavioral change by default. The flag must be explicitly
+> > enabled by the user or udev rule.
+> > 
+> > The existing single-buffer-per-page logic for XDP and jumbo frames is
+> > consolidated into a new helper mana_use_single_rxbuf_per_page().
 > 
-> v2:
->   - Add is_psock bool argument to do_rx.
->   - Factor out aux data check into its own function for readability.
+> ethtool -g rx-buf-len could also fit the bill but I guess this is more
+> of a hack / workaround than legit config so no strong preference.
 > 
-> diff --git a/tools/testing/selftests/net/psock_snd.c b/tools/testing/selftests/net/psock_snd.c
-> index 81096df5cffc..5464317c1764 100644
-> --- a/tools/testing/selftests/net/psock_snd.c
-> +++ b/tools/testing/selftests/net/psock_snd.c
-> @@ -40,6 +40,7 @@ static bool	cfg_use_qdisc_bypass;
->  static bool	cfg_use_vlan;
->  static bool	cfg_use_vnet;
->  static bool	cfg_drop;
-> +static bool	cfg_aux_data;
->  
->  static char	*cfg_ifname = "lo";
->  static int	cfg_mtu	= 1500;
-> @@ -279,11 +280,54 @@ static int setup_rx(void)
->  	return fd;
->  }
->  
-> -static void do_rx(int fd, int expected_len, char *expected)
-> +static void check_aux_data(struct cmsghdr *cmsg, int expected_len)
->  {
-> +	struct tpacket_auxdata *adata;
-> +
-> +	if (!cmsg)
-> +		error(1, 0, "auxdata null");
-> +
-> +	if (cmsg->cmsg_level != SOL_PACKET)
-> +		error(1, 0, "cmsg_level != SOL_PACKET");
-> +
-> +	if (cmsg->cmsg_type != PACKET_AUXDATA)
-> +		error(1, 0, "cmsg_type != PACKET_AUXDATA");
-> +
-> +	adata = (struct tpacket_auxdata *)CMSG_DATA(cmsg);
+ok, want to stay with private flag.
+> > -static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
+> > +static void mana_get_strings_stats(struct mana_port_context *apc, u8 **data)
+> >  {
+> > -	struct mana_port_context *apc = netdev_priv(ndev);
+> >  	unsigned int num_queues = apc->num_queues;
+> >  	int i, j;
+> >  
+> > -	if (stringset != ETH_SS_STATS)
+> > -		return;
+> >  	for (i = 0; i < ARRAY_SIZE(mana_eth_stats); i++)
+> > -		ethtool_puts(&data, mana_eth_stats[i].name);
+> > +		ethtool_puts(data, mana_eth_stats[i].name);
+> >  
+> >  	for (i = 0; i < ARRAY_SIZE(mana_hc_stats); i++)
+> > -		ethtool_puts(&data, mana_hc_stats[i].name);
+> > +		ethtool_puts(data, mana_hc_stats[i].name);
+> >  
+> >  	for (i = 0; i < ARRAY_SIZE(mana_phy_stats); i++)
+> > -		ethtool_puts(&data, mana_phy_stats[i].name);
+> > +		ethtool_puts(data, mana_phy_stats[i].name);
+> >  
+> >  	for (i = 0; i < num_queues; i++) {
+> > -		ethtool_sprintf(&data, "rx_%d_packets", i);
+> > -		ethtool_sprintf(&data, "rx_%d_bytes", i);
+> > -		ethtool_sprintf(&data, "rx_%d_xdp_drop", i);
+> > -		ethtool_sprintf(&data, "rx_%d_xdp_tx", i);
+> > -		ethtool_sprintf(&data, "rx_%d_xdp_redirect", i);
+> > -		ethtool_sprintf(&data, "rx_%d_pkt_len0_err", i);
+> > +		ethtool_sprintf(data, "rx_%d_packets", i);
+> 
+> Please factor out the noisy, no-op prep work into a separate patch for
+> ease of review
+Ack, will split it out in 2 separate patches in v5.
+> -- 
+> pw-bot: cr
 
-Sashiko had another interesting observation that this access may be
-unaligned, as cmsg_buf[1024] has 1-byte alignment.
+Hi Jakub,
 
-That is not new in this patch. Indeed most tests in this dir just
-deference msg_control as struct cmsghdr * and CMSG_DATA as whatever
-domain specific type.
+I did some perf analysis on the ARM64 platform for which we want to
+have this work around of full page rx buffers:
 
-The man page also warns about this and suggests using memcpy to
-access CMSG_DATA. Not sure why it does not warn about the other
-cmsg_.. fields.
+test: ntttcp with 48 tcp connections
+perf: perf record -ag --call-graph dwarf -C 0-33 -- sleep 32
 
-Indeed I can trigger this, e.g., with ipv6_flowlabel.c with
+Page pool overhead summary: 
+(framgment based rx buff vs full page rx buff on the same ARM64
+platform)
 
--       char control[CMSG_SPACE(sizeof(flowlabel))] = {0};
-+       char control[1 + CMSG_SPACE(sizeof(flowlabel))] = {0};
+  Function                        Fragment   Full-page   Delta
+  ─----------------------------   ─-------   ---------   -----
+  napi_pp_put_page                  3.93%      0.85%    +3.08%
+  page_pool_alloc_frag_netmem       1.93%         —     +1.93%
+  Total page_pool overhead          5.86%      0.85%    +5.01%
 
--               cm = (void *)control;
-+               cm = (void *)control + 1;
+In fragment mode, napi_pp_put_page performs an atomic decrement of
+the shared page refcount on every packet free. This single operation
+accounts for ~3% more CPU than in full-page mode, where the page is
+sole-owned and the atomic is skipped entirely. Additionally,
+page_pool_alloc_frag_netmem adds ~2% overhead on the allocation
+path for fragments.
 
-and compiling with -fsanitize=alignment. That triggers warnings for
-all fields, starting from cmsg_len on line 78.
+Further annotation of the hot page pool functions in fragment mode
+shows:
 
-In practice this does not cause issues, because the compiler appears
-to align char[] to 16B, even though __alignof__(control) shows 1. This
-seems true for x86_64, but I am not aware that it is true across all
-archs, especially those that cannot handle unaligned access.
+napi_pp_put_page:
 
-I think the x86_64 source is the AMD64 ABI Draft, e.g., v 0.99.6
+    0.09 :   ffff80008117c240:       b       ffff80008117c268
+<napi_pp_put_page+0x68>
+         : 64               ATOMIC64_FETCH_OP(        , al, op, asm_op,
+"memory")
+         :
+         : 66               ATOMIC64_FETCH_OPS(andnot, ldclr)
+         : 67               ATOMIC64_FETCH_OPS(or, ldset)
+         : 68               ATOMIC64_FETCH_OPS(xor, ldeor)
+         : 69               ATOMIC64_FETCH_OPS(add, ldadd)
+    0.00 :   ffff80008117c244:       mov     x3, #0xffffffffffffffff
+// #-1
+    0.08 :   ffff80008117c248:       add     x0, x2, #0x28
+    0.06 :   ffff80008117c24c:       ldaddal x3, x3, [x0]
+         : 73               }
+         :
+         : 75               ATOMIC64_OP_ADD_SUB_RETURN(_relaxed)
+         : 76               ATOMIC64_OP_ADD_SUB_RETURN(_acquire)
+         : 77               ATOMIC64_OP_ADD_SUB_RETURN(_release)
+         : 78               ATOMIC64_OP_ADD_SUB_RETURN(        )
+   88.09 :   ffff80008117c250:       sub     x3, x3, #0x1
+         :
+         : 81               return 0;
+         : 82               }
 
-   An array uses the same alignment as its elements, except that
-   a local or global array variable of length at least 16 bytes
-   or a C99 variable-length array variable always has alignment
-   of at least 16 bytes(4)
+88% of this function's cycles stall on the sub that depends on
+ldaddal.
 
-   (4) The alignment requirement allows the use of SSE instructions
-   when operating on the array. [..]
 
-Makes sense as sizeof struct cmsghdr == 16.
+page_pool_alloc_frag_netmem:
 
-cmsg_len has length 8 (size_t). We'll be hardpressed to find a
-CMSG_DATA example with a larger alignment requirement. Indeed I did
-not in this directory. So satisfying 8-byte alignment for msg_control
-will suffice for all tests in this directory.
+         : 151              ATOMIC64_FETCH_OPS(add, ldadd)
+    0.00 :   ffff8000811fd40c:       add     x1, x21, #0x28
+    0.14 :   ffff8000811fd410:       ldaddal x0, x1, [x1]
+         : 154              }
+         :
+         : 156              ATOMIC64_OP_ADD_SUB_RETURN(_relaxed)
+         : 157              ATOMIC64_OP_ADD_SUB_RETURN(_acquire)
+         : 158              ATOMIC64_OP_ADD_SUB_RETURN(_release)
+         : 159              ATOMIC64_OP_ADD_SUB_RETURN(        )
+   75.09 :   ffff8000811fd414:       add     x0, x0, x1
+         : 161              WARN_ON(ret < 0);
+    0.16 :   ffff8000811fd418:       cmp     x0, #0x0
+    0.00 :   ffff8000811fd41c:       b.lt    ffff8000811fd394
+<page_pool_alloc_frag_netmem+0xb4>  // b.tstop
 
-Unless we're certain that 8B alignment for stack aligned char[] is
-guaranteed across platforms, one safe approach it to add explicit
-alignment:
 
--       char control[CMSG_SPACE(sizeof(flowlabel))] = {0};
-+       char control[CMSG_SPACE(sizeof(flowlabel))] __attribute__((aligned(8))) = {0};
+75% of this function's cycles stall on the same pattern.
 
-I can update the (other) tests. Unless someone knows that this is
-indeed not needed in practice on any platform.
 
-> +
-> +	if (adata->tp_net != ETH_HLEN)
-> +		error(1, 0, "cmsg tp_net != ETH_HLEN");
-> +
-> +	if (adata->tp_len != expected_len)
-> +		error(1, 0, "cmsg tp_len != %u", expected_len);
-> +
-> +	if (adata->tp_snaplen != expected_len)
-> +		error(1, 0, "cmsg tp_snaplen != %u", expected_len);
-> +}
-> +
-> +static void do_rx(int fd, int expected_len, char *expected, bool is_psock)
-> +{
-> +	bool aux = is_psock && cfg_aux_data;
-> +	char cmsg_buf[1024] = {};
-> +	struct msghdr msg = {};
-> +	struct iovec iov[1];
->  	int ret;
->  
-> -	ret = recv(fd, rbuf, sizeof(rbuf), 0);
-> +	if (aux) {
-> +		iov[0].iov_base = rbuf;
-> +		iov[0].iov_len = sizeof(rbuf);
-> +
-> +		msg.msg_iov = iov;
-> +		msg.msg_iovlen = 1;
-> +
-> +		msg.msg_control = cmsg_buf;
-> +		msg.msg_controllen = sizeof(cmsg_buf);
-> +
-> +		ret = recvmsg(fd, &msg, 0);
-> +	} else {
-> +		ret = recv(fd, rbuf, sizeof(rbuf), 0);
-> +	}
-> +
+Full comparison (top functions, >0.5%):
+
+Fragment mode:                          Full-page mode:
+-------------                           --------------
+ 15.88%  __wake_up_sync_key             13.66%  __wake_up_sync_key
+  9.66%  default_idle_call              10.41%  default_idle_call
+  8.38%  handle_softirqs                 8.89%  handle_softirqs
+  3.93%  napi_pp_put_page       ←        0.85%  napi_pp_put_page
+  3.18%  tcp_gro_receive                 3.43%  tcp_gro_receive
+  1.93%  page_pool_alloc_frag   ←           —
+     —                                   1.14%
+page_pool_recycle_in_cache
+     —                                   1.06%
+page_pool_put_unrefed_netmem
+  0.93%  napi_build_skb                  1.24%  napi_build_skb
+  0.56%  __build_skb_around              1.46%  __build_skb_around
+
+In full page rx buffers mode  'napi_pp_put_page' took just 0.85% on
+the same ARM64 platform.
+
+Comparing with another platform(x86):
+
+To confirm this behaviour is specific to this ARM64 platform, I
+collected the same data on a x86 Vm (Intel, 192 vCPUs, same MANA NIC 200Gbps)
+Here both full page rx buff mode and fragment modes rx buffs achieves identical
+~182 Gbps on x86.
+
+x86 fragment mode:                      x86 full-page mode:
+─-----------------                      ─------------------
+ 61.69%  pv_native_safe_halt            50.91%  pv_native_safe_halt
+  4.17%  _raw_spin_unlock_irqrestore     6.19%
+_raw_spin_unlock_irqrestore
+  3.95%  handle_softirqs                 4.02%  handle_softirqs
+  2.51%  _copy_to_iter                   2.53%  _copy_to_iter
+  0.60%  napi_pp_put_page                  —    napi_pp_put_page (<0.5%)
+
+On x86, napi_pp_put_page is only 0.60% in fragment mode (vs 3.93%
+on the ARM64 platform data shared earlier).
+
+Note: I did not had a different arm64 platform available to run and compare
+it with.
+
+From the above data, seems to be an issue specific to this ARM64
+platform.
+
+
+Regards
 
