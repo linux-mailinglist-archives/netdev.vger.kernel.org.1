@@ -1,186 +1,141 @@
-Return-Path: <netdev+bounces-275459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275460-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id Qd9rBa5A0mkxUwcAu9opvQ
-	(envelope-from <netdev+bounces-275459-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 12:59:58 +0200
+	id cOBuMXZP0mlOWAcAu9opvQ
+	(envelope-from <netdev+bounces-275460-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 14:03:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D99539E169
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 12:59:57 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 733F439E399
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 14:03:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 440173007F69
-	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 10:59:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3B3EA300A394
+	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 12:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F8F833F5B3;
-	Sun,  5 Apr 2026 10:59:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A9F1346E4E;
+	Sun,  5 Apr 2026 12:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="A3kAlNBb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qQwwCeNj"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.qs.icloud.com (qs-2004c-snip4-4.eps.apple.com [57.103.84.27])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634BD26ED45
-	for <netdev@vger.kernel.org>; Sun,  5 Apr 2026 10:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.84.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB3123D7FF;
+	Sun,  5 Apr 2026 12:02:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775386794; cv=none; b=i7pYxXOIVPijFCScp65JZ4p5+xWSdQgwOBdRYWmQRacTvJISFp5Mh+aEzBPbHWQCxet3vhCqIyPtrVZEe3KjOT9Vr7F3vOMLCDNlKobe8Jxb2Tsitgk79b9/jWlRnxDeGYU/ZiNEsWYGUkJMxPy8CAGp29nvNSMoLJHLtn2vuGs=
+	t=1775390570; cv=none; b=Tiv4Eql/vzwchH3UTdgjl1SiHbDap3dYlXhYMNI/tFwCJCY/vb82+1mMxpBdtXZh96IXK7CI8i1zC1mhK7lPxfvXzFWn5OQDFtK4Jj96el+FY2dTqSfb5HsuUjQpCbZwZL9X1pXOMsGgRi3CyF8rOidKG75qN3tNGqjWPM+Qg9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775386794; c=relaxed/simple;
-	bh=SNdpv4JRA5I36bK4d/GA8qtPnuUS1SMcMYwTnvzMszs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ac7x8+mGoJjanLDWveO1sABcXAmaOv2mZiqUBtWIad0kGq/DK96nx7ZbOpFtHNe9NJ7WeLUJ3EzzIg2paPknAldwiOcecnLS50FfIxL4tHjgKhATWVfTOw3XnnlMOoyJh8GZYmQW2cDz/7xmFvwGMDLrE/FM10YlET3utVW4+Zg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=A3kAlNBb; arc=none smtp.client-ip=57.103.84.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-Received: from outbound.qs.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-2d-100-percent-10 (Postfix) with ESMTPS id 3BCD518000B4;
-	Sun, 05 Apr 2026 10:59:50 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1775386792; x=1777978792; bh=mmYSizGCcd+w6h0JNWD+gW/hsM7aqETjUFhWj+G2v9w=; h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:x-icloud-hme; b=A3kAlNBbj5D+GFPzHHGMpXymiZN+WbEwrx2ddJnowDCsxKlwJvgTH6KOushpM4pVlZ8HQTZN7jf4sMgOFscZ3X5DL4bO5dQNctcluwa2vJ/0pzsOhkblKNIbC/0gumE3sUmsKtPNlQSa7FJvupfTLdEObMdMYKqU9t74z4/R5mG4tGME/eVeWUYUjKDdjRQweTNzG2N8T+idLYRYhWLMXRue7dcI8Cd67iL16RFsPQV4LJQraDPpZBtIqS4GlM1bHP2ppY57+DPLXVkijfzCXEwZqsme9V4x95D5mHp5QKsh64m++Ba0HVbgCF5fPfX0U4777Rzt7GFs1DsQazTWcQ==
-Received: from mainframe.tailfb0f7b.ts.net (unknown [17.57.155.37])
-	by p00-icloudmta-asmtp-us-east-2d-100-percent-10 (Postfix) with ESMTPSA id 127821800101;
-	Sun, 05 Apr 2026 10:59:47 +0000 (UTC)
-From: =?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <snowwlake@icloud.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Lek=C3=AB=20Hap=C3=A7iu?= <framemain@outlook.com>
-Subject: [PATCH] nfc: llcp: fix u8 offset truncation in LLCP TLV parsers
-Date: Sun,  5 Apr 2026 12:59:38 +0200
-Message-ID: <20260405105938.1334488-1-snowwlake@icloud.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1775390570; c=relaxed/simple;
+	bh=VwXIPBbp0EIzPNtpB2Kh8OUpJCymQVJw7CRWHLQnyH0=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=RqDOFt27ZNxrFENXuruO+Ekqfojuw3AoOrjtsYPmZIHOmk9qOLWGNFrMpIG3Vz6aL1uKf2naHhamaRhJoWZ0RLHscqargu0pP7lI9wWRnaY4f9EEfzApV6CUlMILuf6AuBUOk5Gyz/a690ghjPilDRrArpP1zg9nYqi6JLK+xOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qQwwCeNj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17E64C19424;
+	Sun,  5 Apr 2026 12:02:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775390569;
+	bh=VwXIPBbp0EIzPNtpB2Kh8OUpJCymQVJw7CRWHLQnyH0=;
+	h=Date:Subject:Cc:To:From:References:In-Reply-To:From;
+	b=qQwwCeNj+saJT57yAG47jboL8X78w4/j6WpBJ1RZ4sp8PWbMz7XsL9EDbWtj55Eiv
+	 28aGEHxX84zqCSRKzt5WxDYhK2mKne18FSkXEYY++OZ6+IBYaBKFZkA86MS9bLh9Oc
+	 BYyORiDakrz6RnLk4LVZHvUx8P1LQpa7pCp8fHnA1nA9F6ZvrAlepEALLMXhhTHNG5
+	 7JaVWay0RJB3NcEhdmqtS8VF3DnUGPXm4QkCgawXIaUT/QfRxlFCiXeEIfDZt6r6xg
+	 I3uj6fM0ROLbqxk5+qZJNhPISl9Q1iNQvp6vF94UFTOtVMPHy01bKsqbxAmGzThrrM
+	 mtqWeRGNpMg3w==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authority-Info-Out: v=2.4 cv=B4u0EetM c=1 sm=1 tr=0 ts=69d240a6
- cx=c_apl:c_pps:t_out a=bsP7O+dXZ5uKcj+dsLqiMw==:117
- a=bsP7O+dXZ5uKcj+dsLqiMw==:17 a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10
- a=M51BFTxLslgA:10 a=x7bEGLp0ZPQA:10 a=LbuW6tbUWPcA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=UqCG9HQmAAAA:8 a=VwQbUJbxAAAA:8
- a=PHAGy2fEgbgclJbIeasA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=JKcXVnpmuwdQ7RL0mgk_:22 a=0rGzeHJzHG8Rmdz0oRec:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA1MDExMiBTYWx0ZWRfX4MstjNE/34Ti
- x0250eUQHe6FBGwGSZ56cdv2t/3NZlS0qCfZ89l/9m8o8tjkZhZZ8hjAvk4bEDpnw4NXuOhLHiE
- RlWO32XcZLSrKb/4PXxsHs7iprNfp8BEbs+c1MLXRAlw1Q9qW9bQ+a26B9gY4ToV+pr341B4Jt7
- AFxQM2de63lD0NaA24i9fd6TKpt8txR0EDYGWfu4vsfJ2KJgcYIH9WC03GrJfdoY4jhjfEpGLBE
- 4K4++W7D3znJR4qqtP3m/LIIT17AUjGXkkOYKVdTvv9Xp/sXud8Yn7lLrMV9Yfz75oe9otckSFa
- n1PGnyvm8gd7D0qlPYMyshvqw/IRS+bSGaK7Ucj05RsPKWwW1hlxcTaGzdDxvw=
-X-Proofpoint-ORIG-GUID: jZAnaIJfMRWJ3GmR1iCkeLrhfLLw1jic
-X-Proofpoint-GUID: jZAnaIJfMRWJ3GmR1iCkeLrhfLLw1jic
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-05_04,2026-04-03_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- mlxscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 adultscore=0
- mlxlogscore=999 suspectscore=0 clxscore=1011 phishscore=0 classifier=spam
- authscore=0 adjust=0 reason=mlx scancount=1 engine=8.22.0-2601150000
- definitions=main-2604050112
-X-Spamd-Result: default: False [-0.45 / 15.00];
+Date: Sun, 05 Apr 2026 14:02:33 +0200
+Message-Id: <DHL7FCNQ20PA.2K03T8MNSO9TT@kernel.org>
+Subject: Re: [PATCH v4 0/9] driver core: Fix some race conditions
+Cc: "Douglas Anderson" <dianders@chromium.org>, "Rafael J . Wysocki"
+ <rafael@kernel.org>, "Alan Stern" <stern@rowland.harvard.edu>, "Saravana
+ Kannan" <saravanak@kernel.org>, "Christoph Hellwig" <hch@lst.de>, "Eric
+ Dumazet" <edumazet@google.com>, "Johan Hovold" <johan@kernel.org>, "Leon
+ Romanovsky" <leon@kernel.org>, "Alexander Lobakin"
+ <aleksander.lobakin@intel.com>, "Alexey Kardashevskiy" <aik@ozlabs.ru>,
+ "Robin Murphy" <robin.murphy@arm.com>, "Andrew Morton"
+ <akpm@linux-foundation.org>, <Frank.Li@kernel.org>, "Jason Gunthorpe"
+ <jgg@ziepe.ca>, <alex@ghiti.fr>, <alexander.stein@ew.tq-group.com>,
+ <andre.przywara@arm.com>, <andrew@codeconstruct.com.au>, <andrew@lunn.ch>,
+ <andriy.shevchenko@linux.intel.com>, <aou@eecs.berkeley.edu>,
+ <ardb@kernel.org>, <bhelgaas@google.com>, <brgl@kernel.org>,
+ <broonie@kernel.org>, <catalin.marinas@arm.com>, <chleroy@kernel.org>,
+ <davem@davemloft.net>, <david@kernel.org>, <devicetree@vger.kernel.org>,
+ <dmaengine@vger.kernel.org>, <driver-core@lists.linux.dev>,
+ <gbatra@linux.ibm.com>, <gregory.clement@bootlin.com>,
+ <hkallweit1@gmail.com>, <iommu@lists.linux.dev>, <jirislaby@kernel.org>,
+ <joel@jms.id.au>, <joro@8bytes.org>, <kees@kernel.org>,
+ <kevin.brodsky@arm.com>, <kuba@kernel.org>, <lenb@kernel.org>,
+ <lgirdwood@gmail.com>, <linux-acpi@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-aspeed@lists.ozlabs.org>,
+ <linux-cxl@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-mips@vger.kernel.org>, <linux-mm@kvack.org>,
+ <linux-pci@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+ <linux-serial@vger.kernel.org>, <linux-snps-arc@lists.infradead.org>,
+ <linux-usb@vger.kernel.org>, <linux@armlinux.org.uk>,
+ <linuxppc-dev@lists.ozlabs.org>, <m.szyprowski@samsung.com>,
+ <maddy@linux.ibm.com>, <mani@kernel.org>, <maz@kernel.org>,
+ <miko.lenczewski@arm.com>, <mpe@ellerman.id.au>, <netdev@vger.kernel.org>,
+ <npiggin@gmail.com>, <osalvador@suse.de>, <oupton@kernel.org>,
+ <pabeni@redhat.com>, <palmer@dabbelt.com>, <peter.ujfalusi@gmail.com>,
+ <peterz@infradead.org>, <pjw@kernel.org>, <robh@kernel.org>,
+ <sebastian.hesselbarth@gmail.com>, <tglx@kernel.org>,
+ <tsbogend@alpha.franken.de>, <vgupta@kernel.org>, <vkoul@kernel.org>,
+ <will@kernel.org>, <willy@infradead.org>, <yangyicong@hisilicon.com>,
+ <yeoreum.yun@arm.com>
+To: "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>
+From: "Danilo Krummrich" <dakr@kernel.org>
+References: <20260404000644.522677-1-dianders@chromium.org>
+ <2026040539-sponge-publisher-2b42@gregkh>
+In-Reply-To: <2026040539-sponge-publisher-2b42@gregkh>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MIXED_CHARSET(0.71)[subject];
-	DMARC_POLICY_ALLOW(-0.50)[icloud.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[icloud.com:s=1a1hai];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	MV_CASE(0.50)[];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,outlook.com];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275459-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[icloud.com:+];
+	FREEMAIL_CC(0.00)[chromium.org,kernel.org,rowland.harvard.edu,lst.de,google.com,intel.com,ozlabs.ru,arm.com,linux-foundation.org,ziepe.ca,ghiti.fr,ew.tq-group.com,codeconstruct.com.au,lunn.ch,linux.intel.com,eecs.berkeley.edu,davemloft.net,vger.kernel.org,lists.linux.dev,linux.ibm.com,bootlin.com,gmail.com,jms.id.au,8bytes.org,lists.infradead.org,lists.ozlabs.org,kvack.org,armlinux.org.uk,samsung.com,ellerman.id.au,suse.de,redhat.com,dabbelt.com,infradead.org,alpha.franken.de,hisilicon.com];
+	TAGGED_FROM(0.00)[bounces-275460-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[84];
 	PRECEDENCE_BULK(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[snowwlake@icloud.com,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[dakr@kernel.org,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_FROM(0.00)[icloud.com];
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,icloud.com:dkim,icloud.com:mid,outlook.com:email]
-X-Rspamd-Queue-Id: 5D99539E169
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 733F439E399
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Lekë Hapçiu <framemain@outlook.com>
+On Sun Apr 5, 2026 at 7:27 AM CEST, Greg Kroah-Hartman wrote:
+> Anyway, this looks great, unless there are any objections, other than
+> the "needs to be undefined", which a follow-on patch can handle, I'll
+> queue them up next week for 7.1-rc1.
 
-nfc_llcp_parse_gb_tlv() and nfc_llcp_parse_connection_tlv() declare
-'offset' as u8, but compare it against a u16 tlv_array_len:
+Sounds good, for the series:
 
-    u8 type, length, offset = 0;
-    while (offset < tlv_array_len) {   /* tlv_array_len is u16 */
-        ...
-        offset += length + 2;          /* wraps at 256 */
-        tlv    += length + 2;
-    }
-
-When tlv_array_len > 255 -- possible in nfc_llcp_parse_connection_tlv()
-when the peer has negotiated MIUX = 0x7FF (MIU = 2175 bytes), so that
-a CONNECT PDU can carry a TLV array of up to 2173 bytes -- the u8
-offset wraps back below tlv_array_len after every 128 zero-length TLV
-entries and the loop never terminates.  The 'tlv' pointer meanwhile
-advances without bound into adjacent kernel heap, causing:
-
-  * an OOB read of kernel heap content past the skb end;
-  * a kernel page fault / oops once 'tlv' leaves mapped memory.
-
-This is reachable from any NFC P2P peer device within ~4 cm without
-requiring compromised NFCC firmware.
-
-Fix: promote 'offset' from u8 to u16 in both parsers, matching the
-type of their tlv_array_len parameter.
-
-nfc_llcp_parse_gb_tlv() takes GB bytes from the ATR_RES (max 44 bytes),
-so the wrap cannot occur in practice there.  Change it anyway for
-correctness and to prevent copy-paste reintroduction.
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Lekë Hapçiu <framemain@outlook.com>
----
- net/nfc/llcp_commands.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/net/nfc/llcp_commands.c b/net/nfc/llcp_commands.c
-index 291f26fac..6937dcb3b 100644
---- a/net/nfc/llcp_commands.c
-+++ b/net/nfc/llcp_commands.c
-@@ -193,7 +193,8 @@ int nfc_llcp_parse_gb_tlv(struct nfc_llcp_local *local,
- 			  const u8 *tlv_array, u16 tlv_array_len)
- {
- 	const u8 *tlv = tlv_array;
--	u8 type, length, offset = 0;
-+	u8 type, length;
-+	u16 offset = 0;
- 
- 	pr_debug("TLV array length %d\n", tlv_array_len);
- 
-@@ -243,7 +244,8 @@ int nfc_llcp_parse_connection_tlv(struct nfc_llcp_sock *sock,
- 				  const u8 *tlv_array, u16 tlv_array_len)
- {
- 	const u8 *tlv = tlv_array;
--	u8 type, length, offset = 0;
-+	u8 type, length;
-+	u16 offset = 0;
- 
- 	pr_debug("TLV array length %d\n", tlv_array_len);
- 
--- 
-2.51.0
-
+Reviewed-by: Danilo Krummrich <dakr@kernel.org>
 
