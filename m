@@ -1,168 +1,182 @@
-Return-Path: <netdev+bounces-275479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275480-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id M2ZyLG+20mn+ZwcAu9opvQ
-	(envelope-from <netdev+bounces-275479-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 21:22:23 +0200
+	id UPdsMsy40mlcaAcAu9opvQ
+	(envelope-from <netdev+bounces-275480-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 21:32:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A736E39F5D5
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 21:22:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00C4239F720
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 21:32:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 405EB3001FA6
-	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 19:22:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 33D9E300FB59
+	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 19:32:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D3B62F1FE4;
-	Sun,  5 Apr 2026 19:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062292F83A0;
+	Sun,  5 Apr 2026 19:32:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="oJnZ90iu"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="XOSZke6F";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="BX9fi0F5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx5.sberdevices.ru (mx5.sberdevices.ru [95.181.183.35])
+Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD05B2F069D;
-	Sun,  5 Apr 2026 19:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.181.183.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD5C3016FC;
+	Sun,  5 Apr 2026 19:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775416937; cv=none; b=Zs/qX2d2nPy/9P5JElvS2wKd3bFcnWR0RvMxjYJV46W6qOAJnjuCSBhwnboqJA5eGdqOnxjmXVjevCSnQnriXC1dOmxuqrdfm/9NGooAymhwCUpMbbr1/otZnTwR+v4DkAmhccvFXuTG2rWkCY9WUWsz8m03uRbHnarfwYHMGMU=
+	t=1775417532; cv=none; b=EGMA4JVQMXJ6Uzmam2/Mn4ocOq2D7a5g2MF23Y/rOY8NqEFTqKSC/7I0Xcctb9Ml1vFt7E/6yGD5dQiJ0ZbDXvdIjlQnQjArL1jjxhzVnZXBisw48JIaAspSH/MjrLPwD8ZHVkBf/iQn+zltLDFyWAYhWTjuBKpRjLuqcUws4v4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775416937; c=relaxed/simple;
-	bh=4FEK7G9FUJ2+gkgHqqFO4PYkr4bpAFXC7gWGdsYRC00=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=hL+qrbaww4EWutY3nuetA3Nbm6f94A6XzG4pDAsfDv0fHG541zHqbCpFfO8lT+zPFNyJfvvt/CCz7pAQ885SVFDzsFubkWyxKZUIVHK4LBFrOkq4YcTjxTaxPOQLNqz/PGxgyNa1V0uJarZN12IuIelWXqGD4XLjJwkPZ6Tb0UQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=oJnZ90iu; arc=none smtp.client-ip=95.181.183.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
-Received: from p-antispam-ksmg-gc-msk01.sberdevices.ru (localhost [127.0.0.1])
-	by mx5.sberdevices.ru (Postfix) with ESMTP id 1904A24000B;
-	Sun,  5 Apr 2026 22:22:10 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx5.sberdevices.ru 1904A24000B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=post; t=1775416930;
-	bh=6Sq7O88E3GPsooLdbHDQsH6D2/KBDMjazQjjB7hgd+M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=oJnZ90iu6tByApjRTo5oYcdLV99i4TCUbO75XEHSeeZ5NlradpeVikvUdOBw1JyqO
-	 xIAgbjEUBBuWZoTIpABOq76RYp/XDPUFp1j50fRiGHM/gLhWeS+/aQDObW6v7l8wpd
-	 nogXGgAUqymks0PZL60oFtijQD1xChFHoO842751U8Vy2ClgN9o4kleDq4UzkagRtl
-	 /vVHL7Vti3YmgxOg+JYAW5f7aDj7HSvw+7d3Axs5/5UkB5l2VRzMQn6UjxHFHdltJ6
-	 rt2BpuMiIBCjvcb1jF1r9kLJtgR6yPHGzL0MqqlW6sMz2Tp64CKs4h8asmQVtuPN7h
-	 guxhh/i/Pj9Wg==
-Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "sberdevices.ru", Issuer "R12" (not verified))
-	by mx5.sberdevices.ru (Postfix) with ESMTPS;
-	Sun,  5 Apr 2026 22:22:09 +0300 (MSK)
-Message-ID: <ac71a69c-e45d-4767-b5c0-806708fff388@salutedevices.com>
-Date: Sun, 5 Apr 2026 22:22:08 +0300
+	s=arc-20240116; t=1775417532; c=relaxed/simple;
+	bh=Mzj+bKNHKDekgtt9IVrHrL0LyZGVZTkE5+yiZv/rEgQ=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=cGVE1xnBiyZCQ59sqhNKen3VVBvyCeOdEtCi684Z4FxxeXbUTqcsRjjzORLCCGOBGd4GHZjHRe09liK0CTuth4ABdKZUryxndvX06q9bTEEBT3ft3lqGvAatHZ3n1RhJXtbopvnk0552hyOdFDGulAXnJc8bDoF35+F72UKEI7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=XOSZke6F; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=BX9fi0F5; arc=none smtp.client-ip=103.168.172.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id D4BA51400029;
+	Sun,  5 Apr 2026 15:32:09 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-04.internal (MEProxy); Sun, 05 Apr 2026 15:32:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1775417529;
+	 x=1775503929; bh=25xkYrco7rjEEztGHHRTWHWIOdtGy3UjIQU8Zg73vQk=; b=
+	XOSZke6FnjUWZXoTZxuI5RkSj7HfPikElwmlK5pN/j2Mvuc/5xXRAj5AWyO6qIFJ
+	b9nCON7zoBPJKhRvybbwbvXjfYSXbq6IDfignFfss/WSGyce3/M4OhtP6rfPQ3Ys
+	VocTA8d7WC1u6FVgtU21Gc3jJuVRiZCEqFYPXqD+9y4axBydEP7pGNtaiEAZYngl
+	pY7jVsxWlYb0SkMu8JNzegkreTZ54LxujPk+a7xIStLrljaSBMQ4+E3qimUNfGvr
+	lsjZCHqvS3Wv6CXzF5w8G8IQu0c3oTX2EOUKDQiSpOhzmL514kXxKD6enSzD6FOy
+	vyeX6R1/KEJymReptMffgw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1775417529; x=
+	1775503929; bh=25xkYrco7rjEEztGHHRTWHWIOdtGy3UjIQU8Zg73vQk=; b=B
+	X9fi0F5ZbgSRquFupWUHWL8r40d6D/mstla7tA8PzTpc9N6FdxO9CUBtvuGu6bbT
+	0ncFa3E89DU5fIX4X8IdTSCX85U9HQV+8hYYmNNllLDVvkbZqASc8y7YIxtoXKhm
+	iMF8XvRqaX/dP0T/RT9FC4/BSz/SvpQdDuJ9YloQqrFtqNkhok9Xl4qjIrRqbscC
+	pYGzTJPlzzE8NFjIlqQdfy0ShcPioJJ7cb1QsSCDsdCtqirKw8MelFvmhyre9XGn
+	tumPcWKkL4yF8+tRqy7y3jSoxvI9Ybgy2OEvyrSZvT8qM4r10aPClU/w9N2YsLIF
+	Z4lpMMf5KpZ6z+mGOhhsw==
+X-ME-Sender: <xms:ubjSaeo8ZR0lb4xpcEPJNt0ILYEeGbh7RtHamiuVXcY52ebcnifKoQ>
+    <xme:ubjSaXf_G2jic0Rt0pnf35PebjEWsbQ37MbdxIBwtwlmojDjIcnvSQnac5oaf-mgF
+    WcIa7qZ60SFVCgnJ7Z3HPmilCtyiDt2d_RRXg7uSsS6l19m7lM60gU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdduheeifecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhhnugcu
+    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
+    hnpefhtdfhvddtfeehudekteeggffghfejgeegteefgffgvedugeduveelvdekhfdvieen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
+    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopedvtddpmhhouggvpehsmhhtphhouhht
+    pdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhope
+    grlhgvgigrnhguvghrrdhsvhgvrhgulhhinhesghhmrghilhdrtghomhdprhgtphhtthho
+    pegurghnihgvlhdriigrhhhkrgesghhmrghilhdrtghomhdprhgtphhtthhopehhrghokh
+    gvgihinhesghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhg
+    lhgvrdgtohhmpdhrtghpthhtoheprghrnhgusehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhn
+    vghlrdhorhhgpdhrtghpthhtoheprhhoghgvrhhqsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:ubjSacDPJ-qnuKHZIJYExUUuXJMHJvVOlM50CPTjxBKt7WWujCs9ew>
+    <xmx:ubjSacPbrYUbjP8SBpXyDCkRn8jI4uL2hlNR12oq-5d4h4Ellha5XQ>
+    <xmx:ubjSaRWuriMRJhJr4S38nhNz52jtijGz0QL5vmdMh31kMu-4_LJkuA>
+    <xmx:ubjSafS1jk7DFIY4DJ-i8cGB_xPcaGTt1KJ8U4t0sG57SU_FT4ZWuw>
+    <xmx:ubjSabyeCxHRSiOROUd7SXjWTzv7E7ChS3eXNKVuxGpRVKEEwSDCin7B>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 1C26B700069; Sun,  5 Apr 2026 15:32:09 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] vsock/virtio: fix MSG_PEEK ignoring skb offset
- when calculating bytes to copy
-Content-Language: ru
-To: Luigi Leonardi <leonardi@redhat.com>, Stefan Hajnoczi
-	<stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
-	<xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
-	<eperezma@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20260402-fix_peek-v1-0-ad274fcef77b@redhat.com>
- <20260402-fix_peek-v1-1-ad274fcef77b@redhat.com>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20260402-fix_peek-v1-1-ad274fcef77b@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-ThreadId: AxeJrQzD9Ui3
+Date: Sun, 05 Apr 2026 21:31:28 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Simon Horman" <horms@kernel.org>
+Cc: "Ilias Apalodimas" <ilias.apalodimas@linaro.org>,
+ "Arnd Bergmann" <arnd@kernel.org>, Netdev <netdev@vger.kernel.org>,
+ "Andrew Lunn" <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>,
+ "Grygorii Strashko" <grygorii.strashko@ti.com>,
+ "Murali Karicheri" <m-karicheri2@ti.com>,
+ "Siddharth Vadapalli" <s-vadapalli@ti.com>,
+ "Roger Quadros" <rogerq@kernel.org>,
+ "Vladimir Oltean" <vladimir.oltean@nxp.com>,
+ "Alexander Sverdlin" <alexander.sverdlin@gmail.com>,
+ "Ioana Ciornei" <ioana.ciornei@nxp.com>,
+ Linux-OMAP <linux-omap@vger.kernel.org>, "Kevin Hao" <haokexin@gmail.com>,
+ "Daniel Zahka" <daniel.zahka@gmail.com>, linux-kernel@vger.kernel.org
+Message-Id: <64384fd1-edb3-4c7a-9ba8-56385a303d35@app.fastmail.com>
+In-Reply-To: <20260404091100.GT113102@horms.kernel.org>
+References: <20260402184726.3746487-1-arnd@kernel.org>
+ <CAC_iWj+vjZ0WnKUuqeFfaPeSoj5ovxZiEmUD5R8hPsRfkqMihQ@mail.gmail.com>
+ <4498f664-15ca-4859-a050-a593f124105f@app.fastmail.com>
+ <20260404091100.GT113102@horms.kernel.org>
+Subject: Re: [PATCH 1/3] [v4, net-next] net: ethernet: ti-cpsw:: rename soft_reset()
+ function
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: p-exch-cas-a-m2.sberdevices.ru (172.24.201.210) To
- p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Info: LuaCore: 96 0.3.96 f0df504111d78c4fb91ce829559989c2d1ddd192, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 201980 [Apr 05 2026]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.22
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2026/04/05 16:38:00 #28374316
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-KATA-Status: Not Scanned
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 5
-X-Spamd-Result: default: False [-2.16 / 15.00];
+X-Spamd-Result: default: False [-0.65 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[salutedevices.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[salutedevices.com:s=post];
+	DMARC_POLICY_ALLOW(-0.50)[arndb.de,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[arndb.de:s=fm1,messagingengine.com:s=fm2];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	TAGGED_FROM(0.00)[bounces-275479-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	XM_UA_NO_VERSION(0.01)[];
+	TAGGED_FROM(0.00)[bounces-275480-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[salutedevices.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[linaro.org,kernel.org,vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,ti.com,nxp.com,gmail.com];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[avkrasnov@salutedevices.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_NEQ_ENVFROM(0.00)[arnd@arndb.de,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[arndb.de:+,messagingengine.com:+];
+	RCVD_COUNT_FIVE(0.00)[6];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[salutedevices.com:dkim,salutedevices.com:email,salutedevices.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A736E39F5D5
+	NEURAL_HAM(-0.00)[-0.996];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,arndb.de:dkim,messagingengine.com:dkim,app.fastmail.com:mid]
+X-Rspamd-Queue-Id: 00C4239F720
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Sat, Apr 4, 2026, at 11:11, Simon Horman wrote:
+> On Thu, Apr 02, 2026 at 09:16:29PM +0200, Arnd Bergmann wrote:
+>> On Thu, Apr 2, 2026, at 21:13, Ilias Apalodimas wrote:
+>> 
+>> Before the c5013ac1dd0e1 commit, this was a 'static inline' function,
+>> which is allowed to clash with other identifiers. Making it a global
+>> symbol during the move was a problem.
+>
+>
+> If we are going to treat this as a fix then probably it should be separated
+> from the rest of the patchset and routed via net. With the rump patchset
+> re-submitted to net-next once dependencies are in place.
 
+I'll drop patch 1 then and send the other two when I get the next
+regression with duplicate objects in a couple of releases. I'm
+travelling at the moment and won't have time to rebase and test
+before the merge window.
 
-02.04.2026 11:18, Luigi Leonardi wrote:
-> `virtio_transport_stream_do_peek()` does not account for the skb offset
-> when computing the number of bytes to copy.
-> 
-> This means that, after a partial recv() that advances the offset, a peek
-> requesting more bytes than are available in the sk_buff causes
-> `skb_copy_datagram_iter()` to go past the valid payload, resulting in a -EFAULT.
-> 
-> The dequeue path already handles this correctly.
-> Apply the same logic to the peek path.
-> 
-> Fixes: 0df7cd3c13e4 ("vsock/virtio/vhost: read data from non-linear skb")
-> Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
-> ---
->  net/vmw_vsock/virtio_transport_common.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> index 8a9fb23c6e853dfea0a24d3787f7d6eb351dd6c6..4b65bfe5d875111f115e0fc4c6727adb66f34830 100644
-> --- a/net/vmw_vsock/virtio_transport_common.c
-> +++ b/net/vmw_vsock/virtio_transport_common.c
-> @@ -547,9 +547,8 @@ virtio_transport_stream_do_peek(struct vsock_sock *vsk,
->  	skb_queue_walk(&vvs->rx_queue, skb) {
->  		size_t bytes;
->  
-> -		bytes = len - total;
-> -		if (bytes > skb->len)
-> -			bytes = skb->len;
-> +		bytes = min_t(size_t, len - total,
-> +			      skb->len - VIRTIO_VSOCK_SKB_CB(skb)->offset);
->  
->  		spin_unlock_bh(&vvs->rx_lock);
->  
-> 
+It's no longer urgent since both cpsw and dpaa2 have been broken for
+years now since I first reported the regression.
 
-Acked-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+     Arnd
 
