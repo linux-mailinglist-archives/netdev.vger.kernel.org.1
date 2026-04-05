@@ -1,155 +1,226 @@
-Return-Path: <netdev+bounces-275423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275421-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id E+MRK7XF0WkJNQcAu9opvQ
-	(envelope-from <netdev+bounces-275423-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 04:15:17 +0200
+	id mxAfEt+30WkxMwcAu9opvQ
+	(envelope-from <netdev+bounces-275421-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 03:16:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59CC739D146
-	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 04:15:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92DE439D010
+	for <lists+netdev@lfdr.de>; Sun, 05 Apr 2026 03:16:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1B5B0300E279
-	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 02:15:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE59A300D33A
+	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 01:16:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47CDE32E68D;
-	Sun,  5 Apr 2026 02:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F40F2745E;
+	Sun,  5 Apr 2026 01:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="efXHlYEj"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEB82E1746;
-	Sun,  5 Apr 2026 02:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03948F49;
+	Sun,  5 Apr 2026 01:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775355310; cv=none; b=WUSOlsG9eT+31wW1CDus1INuqF/dG0YIWS7vAVaC51g7eeg5tqjYlxXqfdkEIHIEVDEz9Jedxwc1jyAWYqNvGJWV07ke5lHstKQ+H6hkzs/RTJwtMwdtLs+cyZJcmLy+kcU2JrxQe5H2q2CeY6rtNlqklMMbD6dsV7Y+5r3xCe4=
+	t=1775351771; cv=none; b=MlT2LWmfL9F2ST2UTiIOObP6q0Ev2hc9JscsGTSJeeOGJlOHk63nxuEkmki1Kja38mXVqdtceacXtlobFCCQLqdDzgdmoCiO6h6fXEM2XDwxC3eVFYZm26RtiW7DEcDkO2ET48uavaOKQ8zNsz7aivDhi9olgBLxAxbpNV4SDJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775355310; c=relaxed/simple;
-	bh=7OOma5hn6cWCzif1BFZM+8WKH508jp5M99D4hlA8H7Q=;
-	h=From:Date:Message-ID:To:Cc:In-Reply-To:References:Subject; b=VKTtrqvY8v1jYcHJW9BL91iQetpuU0yOs7oKIzI74+x378zIv4dvrZzbXw8UYwqzQuFpkwYgR34MAT3xCr1aoOZUqTq/u7mYsuWLZ20yQBHeu+r/nt/AxZz7z82zrDqaHqzmWYN67c/+RsROo8eKoNhqfJA8tlQGfq+vOrV2QiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from 0003-pn533-v2.eml (unknown [111.196.245.197])
-	by APP-01 (Coremail) with SMTP id qwCowADHbGihxdFpRgU5DA--.1680S2;
-	Sun, 05 Apr 2026 10:14:57 +0800 (CST)
-From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Date: Sun, 5 Apr 2026 08:40:00 +0800
-Message-ID: <20260405094003.3-pn533-v2-pengpeng@iscas.ac.cn>
-To: netdev@vger.kernel.org
-Cc: Lars Poeschel <poeschel@lemonage.de>, Duoming Zhou <duoming@zju.edu.cn>, Rikard Falkeborn <rikard.falkeborn@gmail.com>, linux-kernel@vger.kernel.org, pengpeng@iscas.ac.cn, stable@vger.kernel.org
-In-Reply-To: <20260402042148.65251-1-pengpeng@iscas.ac.cn>
-References: <20260402042148.65251-1-pengpeng@iscas.ac.cn>
-Subject: [PATCH net v2] nfc: pn533: allocate rx skb before consuming bytes
-X-CM-TRANSID:qwCowADHbGihxdFpRgU5DA--.1680S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZryUuFWruFyxKFy5Jw43ZFb_yoW8CrWrpF
-	ZxGFy5tryUJr47GwsrCw1rWa45CayvyrWrGrWqk347Z3sxJFW3GFW3Ka42vrZ5JFWkXF4a
-	vFWDXF4UCFyrua7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkm14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
-	0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_JF0_
-	Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
-	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI
-	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-	4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
-	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOgAwDUUUU
-X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
+	s=arc-20240116; t=1775351771; c=relaxed/simple;
+	bh=wUgAW77gLesDjJ7akGuuOi0lJVwMR3VmDH0R9wN+Zqc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SodeKMBIuMKFIj3uZrrXWop61ZixRAcWVYW66Ikpsn9wGmos0Nuc5A/PYmY//LmiXItMFWWoNi5NkOhuMREfV7mGjfS4Xv9YJTq0PwLAzswRCtT5FkcXeTio1o/p2yL5G++w16ahtXqkCnuSDHJ1+zUfPF8cY+kWD14Sd1h2ZZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=efXHlYEj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44F63C19421;
+	Sun,  5 Apr 2026 01:16:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775351770;
+	bh=wUgAW77gLesDjJ7akGuuOi0lJVwMR3VmDH0R9wN+Zqc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=efXHlYEja0pThEY2fOHOyN/swby0n6ciyBLloFawRc51FOtUFPvmsiFI7hTO/TeIa
+	 IG8a34tByjKDnkVGYkI7T0N1KQ1QIPw9zERC5DYReQvNvKktwG+FYVr4scTWUfZxuw
+	 vDKp3U492MeGimClOFRSeQYZRrz5I54VerJbdlgWVxUHQNP7HvTP0ms9Sh1X9bUN/l
+	 sajcqgjmE8c8t2oc9ICQimbOx0AkrTYc/5lVZHIBlTNjbDdsxvi1speai5C/SXuPQg
+	 w9+XDGMk7MFmffsoI5fcT9uK4ISuw0gtH3RiYtRYoFWs5qhNShY2H4mNMye3hvkSdp
+	 j5mYlEf1r+LdA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: netdev@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH ipsec-next] xfrm: Drop support for HMAC-RIPEMD-160
+Date: Sat,  4 Apr 2026 18:15:13 -0700
+Message-ID: <20260405011513.64909-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-X-Spamd-Result: default: False [1.54 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lemonage.de,zju.edu.cn,gmail.com,vger.kernel.org,iscas.ac.cn];
-	TAGGED_FROM(0.00)[bounces-275423-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-275421-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.947];
+	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[ebiggers@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[iscas.ac.cn:email,iscas.ac.cn:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 59CC739D146
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 92DE439D010
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-pn532_receive_buf() reports the number of accepted bytes to the serdev
-core. The current code consumes bytes into recv_skb and may already hand
-a complete frame to pn533_recv_frame() before allocating a fresh receive
-buffer.
+Drop support for HMAC-RIPEMD-160 from IPsec to reduce the UAPI surface
+and simplify future maintenance.  It's almost certainly unused.
 
-If that alloc_skb() fails, the callback returns 0 even though it has
-already consumed bytes, and it leaves recv_skb as NULL for the next
-receive callback. That breaks the receive_buf() accounting contract and
-can also lead to a NULL dereference on the next skb_put_u8().
+RIPEMD-160 received some attention in the early 2000s when SHA-* weren't
+quite as well established.  But it never received much adoption outside
+of certain niches such as Bitcoin.
 
-Allocate the receive skb lazily before consuming the next byte instead.
-If allocation fails, return the number of bytes already accepted.
+It's actually unclear that Linux + IPsec + HMAC-RIPEMD-160 has *ever*
+been used, even historically.  When support for it was added in 2003, it
+was done so in a "cleanup" commit without any justification [1].  It
+didn't actually work until someone happened to fix it 5 years later [2].
+That person didn't use or test it either [3].  Finally, also note that
+"hmac(rmd160)" is by far the slowest of the algorithms in aalg_list[].
 
-Fixes: c656aa4c27b1 ("nfc: pn533: add UART phy driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Of course, today IPsec is usually used with an AEAD, such as AES-GCM.
+But even for IPsec users still using a dedicated auth algorithm, they
+almost certainly aren't using, and shouldn't use, HMAC-RIPEMD-160.
+
+Thus, let's just drop support for it.  Note: no kconfig update is
+needed, since CRYPTO_RMD160 wasn't actually being selected anyway.
+
+References:
+  [1] linux-history commit d462985fc1941a47
+      ("[IPSEC]: Clean up key manager algorithm handling.")
+  [2] linux commit a13366c632132bb9
+      ("xfrm: xfrm_algo: correct usage of RIPEMD-160")
+  [3] https://lore.kernel.org/all/1212340578-15574-1-git-send-email-rueegsegger@swiss-it.ch
+
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
-Changes since v1:
-- rebase on `net/main`
-- keep the same fix shape on top of the current tailroom handling
+ net/xfrm/xfrm_algo.c                | 20 --------------------
+ tools/testing/selftests/net/ipsec.c |  8 ++------
+ 2 files changed, 2 insertions(+), 26 deletions(-)
 
- drivers/nfc/pn533/uart.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/nfc/pn533/uart.c b/drivers/nfc/pn533/uart.c
-index 1b82b7b2..e0d67cd2 100644
---- a/drivers/nfc/pn533/uart.c
-+++ b/drivers/nfc/pn533/uart.c
-@@ -211,6 +211,13 @@ static size_t pn532_receive_buf(struct serdev_device *serdev,
+diff --git a/net/xfrm/xfrm_algo.c b/net/xfrm/xfrm_algo.c
+index 749011e031c0a..70434495f23f5 100644
+--- a/net/xfrm/xfrm_algo.c
++++ b/net/xfrm/xfrm_algo.c
+@@ -288,30 +288,10 @@ static struct xfrm_algo_desc aalg_list[] = {
+ 		.sadb_alg_ivlen = 0,
+ 		.sadb_alg_minbits = 512,
+ 		.sadb_alg_maxbits = 512
+ 	}
+ },
+-{
+-	.name = "hmac(rmd160)",
+-	.compat = "rmd160",
+-
+-	.uinfo = {
+-		.auth = {
+-			.icv_truncbits = 96,
+-			.icv_fullbits = 160,
+-		}
+-	},
+-
+-	.pfkey_supported = 1,
+-
+-	.desc = {
+-		.sadb_alg_id = SADB_X_AALG_RIPEMD160HMAC,
+-		.sadb_alg_ivlen = 0,
+-		.sadb_alg_minbits = 160,
+-		.sadb_alg_maxbits = 160
+-	}
+-},
+ {
+ 	.name = "xcbc(aes)",
  
- 	timer_delete(&dev->cmd_timeout);
- 	for (i = 0; i < count; i++) {
-+		if (!dev->recv_skb) {
-+			dev->recv_skb = alloc_skb(PN532_UART_SKB_BUFF_LEN,
-+						  GFP_KERNEL);
-+			if (!dev->recv_skb)
-+				return i;
-+		}
-+
- 		if (unlikely(!skb_tailroom(dev->recv_skb)))
- 			skb_trim(dev->recv_skb, 0);
+ 	.uinfo = {
+ 		.auth = {
+diff --git a/tools/testing/selftests/net/ipsec.c b/tools/testing/selftests/net/ipsec.c
+index f4afef51b9307..89c32c354c008 100644
+--- a/tools/testing/selftests/net/ipsec.c
++++ b/tools/testing/selftests/net/ipsec.c
+@@ -60,12 +60,10 @@
+ #define grchild_ip(nr)	(4*nr + 2)
  
-@@ -219,9 +226,7 @@ static size_t pn532_receive_buf(struct serdev_device *serdev,
- 			continue;
+ #define VETH_FMT	"ktst-%d"
+ #define VETH_LEN	12
  
- 		pn533_recv_frame(dev->priv, dev->recv_skb, 0);
--		dev->recv_skb = alloc_skb(PN532_UART_SKB_BUFF_LEN, GFP_KERNEL);
--		if (!dev->recv_skb)
--			return 0;
-+		dev->recv_skb = NULL;
+-#define XFRM_ALGO_NR_KEYS 29
+-
+ static int nsfd_parent	= -1;
+ static int nsfd_childa	= -1;
+ static int nsfd_childb	= -1;
+ static long page_size;
+ 
+@@ -94,11 +92,10 @@ struct xfrm_key_entry xfrm_key_entries[] = {
+ 	{"cmac(aes)", 128},
+ 	{"xcbc(aes)", 128},
+ 	{"cbc(cast5)", 128},
+ 	{"cbc(serpent)", 128},
+ 	{"hmac(sha1)", 160},
+-	{"hmac(rmd160)", 160},
+ 	{"cbc(des3_ede)", 192},
+ 	{"hmac(sha256)", 256},
+ 	{"cbc(aes)", 256},
+ 	{"cbc(camellia)", 256},
+ 	{"cbc(twofish)", 256},
+@@ -811,11 +808,11 @@ static int do_ping(int cmd_fd, char *buf, size_t buf_len, struct in_addr from,
+ static int xfrm_fill_key(char *name, char *buf,
+ 		size_t buf_len, unsigned int *key_len)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < XFRM_ALGO_NR_KEYS; i++) {
++	for (i = 0; i < ARRAY_SIZE(xfrm_key_entries); i++) {
+ 		if (strncmp(name, xfrm_key_entries[i].algo_name, ALGO_LEN) == 0)
+ 			*key_len = xfrm_key_entries[i].key_len;
  	}
  
- 	return i;
+ 	if (*key_len > buf_len) {
+@@ -2059,12 +2056,11 @@ static int write_desc(int proto, int test_desc_fd,
+ }
+ 
+ int proto_list[] = { IPPROTO_AH, IPPROTO_COMP, IPPROTO_ESP };
+ char *ah_list[] = {
+ 	"digest_null", "hmac(md5)", "hmac(sha1)", "hmac(sha256)",
+-	"hmac(sha384)", "hmac(sha512)", "hmac(rmd160)",
+-	"xcbc(aes)", "cmac(aes)"
++	"hmac(sha384)", "hmac(sha512)", "xcbc(aes)", "cmac(aes)"
+ };
+ char *comp_list[] = {
+ 	"deflate",
+ #if 0
+ 	/* No compression backend realization */
+
+base-commit: be14d13625c9b070c33c423026b598ed65695225
 -- 
-2.50.1
+2.53.0
 
 
