@@ -1,178 +1,211 @@
-Return-Path: <netdev+bounces-275492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275493-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id lYiXJyfg0mnPbwcAu9opvQ
-	(envelope-from <netdev+bounces-275492-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 00:20:23 +0200
+	id kNwdJVPn0mmOcAcAu9opvQ
+	(envelope-from <netdev+bounces-275493-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 00:50:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB4B039FF78
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 00:20:22 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14FF03A00D7
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 00:50:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 72DCB3006B34
-	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 22:20:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E285530068C0
+	for <lists+netdev@lfdr.de>; Sun,  5 Apr 2026 22:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFDD83612C7;
-	Sun,  5 Apr 2026 22:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0E13845A9;
+	Sun,  5 Apr 2026 22:50:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GvE6F74a"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="QtVcM9bI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4881726ED37
-	for <netdev@vger.kernel.org>; Sun,  5 Apr 2026 22:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D4D3148A8
+	for <netdev@vger.kernel.org>; Sun,  5 Apr 2026 22:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775427619; cv=none; b=qJXs1yb4z41wKCkefigmTGXT++EcrqGDCL7/21zmL5xMjS4C6xSMI/jKlL1ZYCh45K6HgwFs+OePrAfwDWs33SJraUHgGctyqT1ZAxP45h03mvev6ONuQPTjQiq34Od23pPn+i8B0ZxOPMHliuKGWMG9F3zsW5lGBL2GqQNDilk=
+	t=1775429456; cv=none; b=BlBHoVsxm/b6yPCCp9/SzeKuwUimXFZQDw911XPienQv0wa8ujSKNzOpjoWmvYZa6P3TJjZkladR6g9WiYHilj5lubq/gk+yDdd7oJVg/e3RJMDi6sbcIVvIPcOrZSyZ6dl0tkrcY3he70+/8OcE4repivu+1F0L/UXYoemJVFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775427619; c=relaxed/simple;
-	bh=6r99neyde3b0isfHa5GQwCkPtLceRO7kB6KTmuQSUL4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W5+NV1qDbz05oM/PpjjAZBVtkc5fmUF1BY1sB7KVTC9X5CymHP/EgfTWJs0YPVT0LnvvN260lhxLUDARW4WXDu0cIaVGMVD27/hAKbyA0hBTwJQ68R9kzsxUIi+88sauUnL7fBKY63KGLqZJBUx/TsWVLbfGcDcHenlCF3G29+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GvE6F74a; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-488a88aeec9so13809165e9.2
-        for <netdev@vger.kernel.org>; Sun, 05 Apr 2026 15:20:18 -0700 (PDT)
+	s=arc-20240116; t=1775429456; c=relaxed/simple;
+	bh=zzMy5NtaL7AD5tUyCQ9LrBMAHeKvVDbZmilsbp1EV5w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BQE+FMjm+HXIkzYKgEgZkYy2+uC1KLF/ZZsE7chhb0yUlkJ/ocVcc/imqxYmz5c+n707Ech5v3ghvQ4Qc05VMb/am4DmOOAinG6+ZU1/USVvdbEF8FTGuGweBXuiDd1b1ksTAORxorjukRcFCHyVtmXTxU1ImkeEdO+1wfomU2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=QtVcM9bI; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b9c3e2cf3c0so544461366b.1
+        for <netdev@vger.kernel.org>; Sun, 05 Apr 2026 15:50:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775427617; x=1776032417; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UYtvotg7WC0VoukV+5DSJczX5Hfpm/Wf8rZ92IGGmqM=;
-        b=GvE6F74aXbCJmrkEbq0ZwuAj8jigxOq4W305hjGyqAuwzgTVoOOK0G28jRrqzVwbRS
-         20UnR0jTgPwOv0rajBVFT1W13MHmsukSk4NnFFuLr6bpuRCPDu/jtOZTfG1yRcNFCESr
-         R08VGZ9LuegZlZqEsjgjtDBzMXOVye8cn0q1z9VTgSVVXhCydpxixdxGiQl4PsxEEnvH
-         oNB4k67fyjUId7H/Jf2bJxVx6ADWmNkYYpcEPmCIFzEtRfKSorv4bgPoPqscq2KQJOdd
-         h5hbkDjpLyYkhhiMARsECfBD8gqBGNFSYpVKI6SHumFpOhiUSgaa6+UZgh+kHbqJ0lXE
-         1a4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775427617; x=1776032417;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=chromium.org; s=google; t=1775429453; x=1776034253; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UYtvotg7WC0VoukV+5DSJczX5Hfpm/Wf8rZ92IGGmqM=;
-        b=cTUh27NYISQEokdZejgosPIiGNosnFIZXonsbvAK8znTOdZzZF38COAF7CX2HMz6CJ
-         Lu9ebxGKREpD8moMM56ixQ1LTnCChpNhzPTCMRcPihM7DP3CpzSNdkdAYwF85x2XPWnp
-         zNAEuS/oQ1j+CzOvIkQ+11Tyz4UxVlIVeTAp9wb0BjbCo+6Prp9C3Jzw4cU4EyfZPEAy
-         NhmSubXgYpZbGPFecq3Inlc6R0pMXIoG02QtVBXIpjmcXQkEsfjY8VeLleOj0czC+kiG
-         suSPXK3+JHw1+5/FDcPZI1G7b3St7tnQuXlO0u9ZJdAvr+aF1f+4jA8r4akIj5j4TOdq
-         7Xtg==
-X-Forwarded-Encrypted: i=1; AJvYcCWTytZvUmZJeStLhhd61WeepGqd7MrTmAb2UhX6qAbC9GtaGDAJpO9ZIPTKU6ofZAfkuiqRxdg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygjfUDqFz+j2qIMv2ScMdnnI6TpJANRkF0rcYfe0VZT7duZZsm
-	njbQdPdV4od9Lmh3SiXKQ4LKpcjSubE7tu78bYS/HnKXZ5Ar37txdjOj
-X-Gm-Gg: AeBDietwUED95PqPMge1ZDzn6ut7Pq8FRZKfctYQgtiO5+TzeW/vqQzwD5PImDF6+40
-	OLPuKnzHkDxElVC+JSMclS+jC/+Lv4iLm93Adae+PblVxMNiY1ExC2p4MFeLNwUU/db1+Xe35Xy
-	/NT+E+xLouqIx30aTTukFdMFNzvPxBuPR2hTvPurKfVP79BnK4TVrNmaH/vP+afCntTH79ae9YN
-	GIx8pRrYHTPPAqM9Pqjrdwh1uxXaLKtFmDvi2qIo9TeHQqIKPBHqduiZ0ax4BToWbre9xhBZcPq
-	2b53Nl94cUMZJIyianBPw33JA0AmjUyw7BpfezGuxmGmimfFJkvbggtFaSnyPy5DwgtlVEbGqXd
-	06YHm6RqmXIROYwCs8pHCckkSXXu4si0g5XhCt4A8LinznXtPOyov3YJCFOgpmLxBlvNVSzN0W/
-	hdc2j5tUlxbGP53CBPvnYMPQD9
-X-Received: by 2002:a05:600c:4ec7:b0:485:35a4:939f with SMTP id 5b1f17b1804b1-488997ebfbamr136868985e9.28.1775427616390;
-        Sun, 05 Apr 2026 15:20:16 -0700 (PDT)
-Received: from rpi5.lan ([37.228.206.31])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887e829c43sm413182325e9.5.2026.04.05.15.20.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Apr 2026 15:20:15 -0700 (PDT)
-From: Fabio Baltieri <fabio.baltieri@gmail.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Fabio Baltieri <fabio.baltieri@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: txgbe: leave space for null terminators on property_entry
-Date: Sun,  5 Apr 2026 23:20:13 +0100
-Message-ID: <20260405222013.5347-1-fabio.baltieri@gmail.com>
-X-Mailer: git-send-email 2.47.3
+        bh=jzjlDiAhhtCwD9FkXK7yFaosCzkOtMCSogVYlSJljQY=;
+        b=QtVcM9bIh+y1qFeFYrA7qlIfAXmqyMvVA2g8x4gxWnsj/335qfuyv0jsJvK1MCXzK9
+         OJiu3THsRZfsF3jUYDCUJlipGLTMfFrNWenXtZ/iJtYfIz+Kp5Q3bjKyftAHMyI8JJzw
+         ukb6wbkBiXM5ioPh/M06jO+8T/CVzHEzNQ6s4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775429453; x=1776034253;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=jzjlDiAhhtCwD9FkXK7yFaosCzkOtMCSogVYlSJljQY=;
+        b=ZEXUwBmHebg1Vpc1DXxpgnngYpDp/xOK45kD7V2ON26rek0NjiaKjXczlcwSDpwQSm
+         E8WIVYpMtKqTi4puqGFHKS2KxASEJkn9MidKYIkypXIL+7L81WK5XeI8Vpk97gqMfPW2
+         J/KjiCCU+5TE7+UI5rlUaB0m7Tvy5v12FHSwipX1virUPFgtQa5G3xWuvuoTEn7Pg+Bz
+         0tjwhyDHbIuR9/sXpVmlTPp+yb3LY446R7qakScLchArQui+Unl7VvuFPkDOhg0iQTrN
+         zjsGZ6edvQC00deI1T92dhRGNkyt0b3pHpDP1dVRwF9v+S2PKMV2hjWaVa210mqwaD1Z
+         mCEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGBvkC+VmFvYFFTLweIIcMszhGd3GTIFZywJ5Wtzbzg9grNYo1JSsPnXjgRmLuG8cQ/Ezit+o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYqm6Md8J2optl7Ff6aTG6M5/MZOuJRK2bZle+YkQnM5NYprNC
+	dub7Gmp6ZfRyzMb4QA72QywA/9c3rPODar66iw+qALg8BNMvRMVHehedb0FfmXyKdgECd+GwKWN
+	c5HKIsT78
+X-Gm-Gg: AeBDiesIRSUTFmPBynZ5dDD9x21hDvXTRPpykB+oYIqBqKOaU1crArRxDINyOvw8A6N
+	S//CD7c0024Fh9b9g0vyV1AuB7wgMXr2cRJw4PT9sEEVj4SMY+yG0IQma1taXIbpS741Ia40a+C
+	pLs47Qn+lkg8jmHFs+6WVqYK1g8+6NlHaOZGjY3+FbxZy9eRLVCixIu2T8On66zzSXeqoogT0Vq
+	bESrz5dt5NCLuyG1pzAD3ZC6zQhdPsnX3lyOY+pfWgHyV2Uzs7kvtWNjkT3FsCgbMGqkoBryIbN
+	zJs7PEU9WJmTPBEMTweaXLOlSlTQlPrH1XbYpy9ArBlopKu8MZy1Rl2Xob1+yGvAbG7KeGdviTd
+	PUPzR9IlPczDRA4TDOOjbLk7ZSbmh0b2DpgH9T9BH7F7xpq0DQrwyJ2Ivh6x5Ygxe63uuQ0J0N1
+	P/ioMyxVuf3a4xZb1abj9xyUQoIYpE5R1lYU+jBkrJYHRHQw6pcougxteuj+O7gw==
+X-Received: by 2002:a17:907:d40f:b0:b98:2b83:909d with SMTP id a640c23a62f3a-b9c679f592dmr540325766b.37.1775429452683;
+        Sun, 05 Apr 2026 15:50:52 -0700 (PDT)
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com. [209.85.208.53])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9c3c9721absm429451166b.6.2026.04.05.15.50.52
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 05 Apr 2026 15:50:52 -0700 (PDT)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-66bb6eb28acso6183326a12.0
+        for <netdev@vger.kernel.org>; Sun, 05 Apr 2026 15:50:52 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXazha1EBxyS967kNoxcDPHkYPbWdI311DgL4roXjavYspWXsIjSVIvx7i6rw1s9DZHoXO49Z4=@vger.kernel.org
+X-Received: by 2002:a5d:5889:0:b0:43b:47ee:4586 with SMTP id
+ ffacd0b85a97d-43d292d34e1mr14051064f8f.29.1775429026066; Sun, 05 Apr 2026
+ 15:43:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.16 / 15.00];
+References: <20260404000644.522677-1-dianders@chromium.org> <2026040539-sponge-publisher-2b42@gregkh>
+In-Reply-To: <2026040539-sponge-publisher-2b42@gregkh>
+From: Doug Anderson <dianders@chromium.org>
+Date: Sun, 5 Apr 2026 15:43:34 -0700
+X-Gmail-Original-Message-ID: <CAD=FV=X6DRHV6k7G=p5Mno22na75G-69F-EzMkisSxMoxuvJcQ@mail.gmail.com>
+X-Gm-Features: AQROBzBHjVedWun0AWH98b5RajBbraAAaRvLQSenEhaNEY8p1Czch8mAczvPiQQ
+Message-ID: <CAD=FV=X6DRHV6k7G=p5Mno22na75G-69F-EzMkisSxMoxuvJcQ@mail.gmail.com>
+Subject: Re: [PATCH v4 0/9] driver core: Fix some race conditions
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: "Rafael J . Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+	Alan Stern <stern@rowland.harvard.edu>, Saravana Kannan <saravanak@kernel.org>, 
+	Christoph Hellwig <hch@lst.de>, Eric Dumazet <edumazet@google.com>, Johan Hovold <johan@kernel.org>, 
+	Leon Romanovsky <leon@kernel.org>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	Alexey Kardashevskiy <aik@ozlabs.ru>, Robin Murphy <robin.murphy@arm.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Frank.Li@kernel.org, 
+	Jason Gunthorpe <jgg@ziepe.ca>, alex@ghiti.fr, alexander.stein@ew.tq-group.com, 
+	andre.przywara@arm.com, andrew@codeconstruct.com.au, andrew@lunn.ch, 
+	andriy.shevchenko@linux.intel.com, aou@eecs.berkeley.edu, ardb@kernel.org, 
+	bhelgaas@google.com, brgl@kernel.org, broonie@kernel.org, 
+	catalin.marinas@arm.com, chleroy@kernel.org, davem@davemloft.net, 
+	david@kernel.org, devicetree@vger.kernel.org, dmaengine@vger.kernel.org, 
+	driver-core@lists.linux.dev, gbatra@linux.ibm.com, 
+	gregory.clement@bootlin.com, hkallweit1@gmail.com, iommu@lists.linux.dev, 
+	jirislaby@kernel.org, joel@jms.id.au, joro@8bytes.org, kees@kernel.org, 
+	kevin.brodsky@arm.com, kuba@kernel.org, lenb@kernel.org, lgirdwood@gmail.com, 
+	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-aspeed@lists.ozlabs.org, linux-cxl@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org, linux-mm@kvack.org, 
+	linux-pci@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-serial@vger.kernel.org, linux-snps-arc@lists.infradead.org, 
+	linux-usb@vger.kernel.org, linux@armlinux.org.uk, 
+	linuxppc-dev@lists.ozlabs.org, m.szyprowski@samsung.com, maddy@linux.ibm.com, 
+	mani@kernel.org, maz@kernel.org, miko.lenczewski@arm.com, mpe@ellerman.id.au, 
+	netdev@vger.kernel.org, npiggin@gmail.com, osalvador@suse.de, 
+	oupton@kernel.org, pabeni@redhat.com, palmer@dabbelt.com, 
+	peter.ujfalusi@gmail.com, peterz@infradead.org, pjw@kernel.org, 
+	robh@kernel.org, sebastian.hesselbarth@gmail.com, tglx@kernel.org, 
+	tsbogend@alpha.franken.de, vgupta@kernel.org, vkoul@kernel.org, 
+	will@kernel.org, willy@infradead.org, yangyicong@hisilicon.com, 
+	yeoreum.yun@arm.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[chromium.org,none];
+	R_DKIM_ALLOW(-0.20)[chromium.org:s=google];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,rowland.harvard.edu,lst.de,google.com,intel.com,ozlabs.ru,arm.com,linux-foundation.org,ziepe.ca,ghiti.fr,ew.tq-group.com,codeconstruct.com.au,lunn.ch,linux.intel.com,eecs.berkeley.edu,davemloft.net,vger.kernel.org,lists.linux.dev,linux.ibm.com,bootlin.com,gmail.com,jms.id.au,8bytes.org,lists.infradead.org,lists.ozlabs.org,kvack.org,armlinux.org.uk,samsung.com,ellerman.id.au,suse.de,redhat.com,dabbelt.com,infradead.org,alpha.franken.de,hisilicon.com];
 	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275492-lists,netdev=lfdr.de];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[chromium.org:+];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fabiobaltieri@gmail.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275493-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	FROM_NEQ_ENVFROM(0.00)[dianders@chromium.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[84];
 	TAGGED_RCPT(0.00)[netdev];
-	FREEMAIL_FROM(0.00)[gmail.com];
+	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EB4B039FF78
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,linuxfoundation.org:email,chromium.org:dkim]
+X-Rspamd-Queue-Id: 14FF03A00D7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Lists of struct property_entry are supposed to be terminated with an
-empty property, this driver currently seems to be allocating exactly the
-amount of entry used.
+Hi,
 
-Change the struct definition to leave an extra element for all
-property_entry.
+On Sat, Apr 4, 2026 at 10:28=E2=80=AFPM Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
+>
+> On Fri, Apr 03, 2026 at 05:04:54PM -0700, Douglas Anderson wrote:
+> > NOTE: one potentially "controversial" choice I made in some patches
+> > was to always reserve a flag ID even if a flag is only used under
+> > certain CONFIG_ settings. This is a change from how things were
+> > before. Keeping the numbering consistent and allowing easy
+> > compile-testing of both CONFIG settings seemed worth it, especially
+> > since it won't take up any extra space until we've added a lot more
+> > flags.
+>
+> Nah, this is fine, I don't see any problems with this as the original
+> code kind of was doing the same thing with the "hole" in the structure
+> if those options were not enabled.
+>
+> > I only marked the first patch as a "Fix" since it is the only one
+> > fixing observed problems. Other patches could be considered fixes too
+> > if folks want.
+> >
+> > I tested the first patch in the series backported to kernel 6.6 on the
+> > Pixel phone that was experiencing the race. I added extra printouts to
+> > make sure that the problem was hitting / addressed. The rest of the
+> > patches are tested with allmodconfig with arm32, arm64, ppc, and
+> > x86. I boot tested on an arm64 Chromebook running mainline.
+>
+> I'm guessing your tests passed?  :)
 
-Signed-off-by: Fabio Baltieri <fabio.baltieri@gmail.com>
----
+Yup, all the tests that I've run have passed. I also threw in an
+"allnoconfig" compile test just for good measure.
 
-Hi, bumped into this while studying the code, looks like the struct has
-been allocated without space for terminators, guess the top ones just
-end up using the bottom props as well but I'm surprised this does not
-crash at some point. Build test only, don't have any hardware for this,
-let me know if I'm missing something here.
 
-Cheers,
-Fabio
+> Anyway, this looks great, unless there are any objections, other than
+> the "needs to be undefined", which a follow-on patch can handle, I'll
+> queue them up next week for 7.1-rc1.
 
- drivers/net/ethernet/wangxun/txgbe/txgbe_type.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Thanks. As per the other thread, I'm happy if you or Danilo want to
+apply it, and I'm happy if you want to make minor fixups when
+applying.
 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-index 82433e9cb0e3..6b05f32b4a01 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-@@ -424,10 +424,10 @@ struct txgbe_nodes {
- 	char i2c_name[32];
- 	char sfp_name[32];
- 	char phylink_name[32];
--	struct property_entry gpio_props[1];
--	struct property_entry i2c_props[3];
--	struct property_entry sfp_props[8];
--	struct property_entry phylink_props[2];
-+	struct property_entry gpio_props[2];
-+	struct property_entry i2c_props[4];
-+	struct property_entry sfp_props[9];
-+	struct property_entry phylink_props[3];
- 	struct software_node_ref_args i2c_ref[1];
- 	struct software_node_ref_args gpio0_ref[1];
- 	struct software_node_ref_args gpio1_ref[1];
--- 
-2.47.3
+When I see the patches applied, I'll send a followup patch to address
+the "needs to be undefined" comment, unless Danilo makes that change
+himself when applying.
 
+-Doug
 
