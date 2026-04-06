@@ -1,171 +1,176 @@
-Return-Path: <netdev+bounces-275601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275602-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ADyzH2q602lDlAcAu9opvQ
-	(envelope-from <netdev+bounces-275601-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:51:38 +0200
+	id IDfcFwW702m5lAcAu9opvQ
+	(envelope-from <netdev+bounces-275602-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:54:13 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE41B3A3B4A
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:51:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC14C3A3B8A
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:54:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B0B783017FA3
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 13:50:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E11D23003539
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 13:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189C7224B15;
-	Mon,  6 Apr 2026 13:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="OxGEO5ni"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59ADC29E11D;
+	Mon,  6 Apr 2026 13:54:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4AC3175A9E
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 13:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB36306B37
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 13:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.175.55.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775483452; cv=none; b=VSoqTcRdxw+i59GSHZUhTnpexnPhcgfPN94d+QNqSE3Bfw+ycogq37Q7ThjlPY8E9Q+YcYKr9pKPrRElWjeZ0lhKTGfzzJSQiy+dT6iGSoKBYkLw7uDVvqmT8uznYFsRRCnmFYPltUKFZkZ8BBhyRwqvr0gz/Ye7l2AgLQ1BRnw=
+	t=1775483649; cv=none; b=hUh+MdCvOQFSbrXmAC+cmARU2KvUtQlspFnFXP6SFTVm3GrhWlVrB0NE4qxHGqp7OxtSVj8c1v++ugXVtB/QglnbVqJHS/YrcswQZ1nCR+H2gxMFnghxGRw6i6VWAh64rBPGwPU/uin66AysBOxa7l/hOqs6LLvuqMitpXfqh6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775483452; c=relaxed/simple;
-	bh=TuqfqOrCiWPshspPG/BpZpHeaCg3nPNb0BD+QrR5kWk=;
+	s=arc-20240116; t=1775483649; c=relaxed/simple;
+	bh=gDbwPL4lWb538GdsokNOA9J91hRTKlJnwhJ2F0/4G/Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QWGkOCednebQO6xXKwyjw8tWV7dsbO9s277ERJoQRy6Z/QAGitknpEg0uMM/bdWSnMFlJWR0oWZSb7gi5474+Hil0xzYqd/nZdoUB4O9cFt02gMzSpwWE6G4XbbklgrOE35Z85M5K2y3CplUU3R5wrEIQ9W3xA1aL1LQ/qUKMZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=OxGEO5ni; arc=none smtp.client-ip=213.160.73.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-Received: by dvalin.narfation.org (Postfix) id E18A320EDE;
-	Mon, 06 Apr 2026 13:50:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1775483441;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iRR+ID16DnxnNiho6gkKFAiloy6TB7CgO30hWezRnb4=;
-	b=OxGEO5niePgkHVCRAJkUYE1s3aLeyd6sDJCpSYwEP6xEN0J+6q1kOOe1R4odwdTaQweuW1
-	KTTrThG0GAYffUV4Drr7PlnAuPDgdfehpWPv7hCGs5uZ7pe5Yoq8/KsZ2v5Du/7jq/tr+v
-	wqLWjZTH9VDOMzrUADyS96pJnIsBbL4=
-From: Sven Eckelmann <sven@narfation.org>
-To: b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
- Ao Zhou <n05ec@lzu.edu.cn>
-Cc: Marek Lindner <marek.lindner@mailbox.org>,
- Simon Wunderlich <sw@simonwunderlich.de>,
- Antonio Quartulli <antonio@mandelbit.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Yifan Wu <yifanwucs@gmail.com>, Juefei Pu <tomapufckgml@gmail.com>,
- Yuan Tan <yuantan098@gmail.com>, Xin Liu <bird@lzu.edu.cn>,
- Ao Zhou <n05ec@lzu.edu.cn>, Haoze Xie <royenheart@gmail.com>
-Subject:
- Re: [PATCH net 1/1] batman-adv: hold claim backbone gateways by reference
-Date: Mon, 06 Apr 2026 15:50:37 +0200
-Message-ID: <6721686.DvuYhMxLoT@sven-desktop>
-In-Reply-To:
- <4a58d2daef70ac17bb9be1f244a182439d5c4d63.1775301426.git.royenheart@gmail.com>
-References:
- <cover.1775301426.git.royenheart@gmail.com>
- <4a58d2daef70ac17bb9be1f244a182439d5c4d63.1775301426.git.royenheart@gmail.com>
+	 MIME-Version; b=UjYhkjMw+2OH1ya8JryY70gCY95zpvH7eNBMNYYnaTloWP1lUneAuf21fU75n765RPze4xQInICR3C/9J/Q136+j6Taarrd0FnhACfWb+1C5560/JMUy8+YIAMaB5IG9EYjETivUIo2W/0yak+jHlkpY0sdiJNfxTCKNcWD/5b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.175.55.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowADHOPnqutNpAc+rAA--.3279S3;
+	Mon, 06 Apr 2026 21:53:48 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: netdev@vger.kernel.org
+Cc: kuniyu@google.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	xemul@parallels.com,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	enjou1224z@gmail.com,
+	wangjiexun2025@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net 1/1] af_unix: read UNIX_DIAG_VFS data under unix_state_lock
+Date: Mon,  6 Apr 2026 21:53:44 +0800
+Message-ID: <e597de49d761fdc6961f49d638ce26bd3f74e988.1775207252.git.wangjiexun2025@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1775207252.git.wangjiexun2025@gmail.com>
+References: <cover.1775207252.git.wangjiexun2025@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart6995330.lOV4Wx5bFT";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
-X-Spamd-Result: default: False [-3.76 / 15.00];
-	SIGNED_PGP(-2.00)[];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowADHOPnqutNpAc+rAA--.3279S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7CFy5Cr45GFyxCrWDGryfWFg_yoW8uryUpF
+	W3KFWUKryDAry29r1fKryI9w1Fva9rWF98G3yqkwn5J3ZrJrWIqas0gr9Fvrn5JFWFkw4x
+	JF1Y9F1rGr48ArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
+	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
+	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
+	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
+	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQIJCWnShX0IRQAAsN
+X-Spamd-Result: default: False [-0.96 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[narfation.org,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[narfation.org:s=20121];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275601-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_CC(0.00)[mailbox.org,simonwunderlich.de,mandelbit.com,davemloft.net,google.com,kernel.org,redhat.com,lunn.ch,gmail.com,lzu.edu.cn];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sven@narfation.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[narfation.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_FROM(0.00)[bounces-275602-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,parallels.com,gmail.com,lzu.edu.cn];
+	RCVD_COUNT_THREE(0.00)[4];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	NEURAL_HAM(-0.00)[-0.993];
+	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:email,open-mesh.org:url]
-X-Rspamd-Queue-Id: EE41B3A3B4A
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:email]
+X-Rspamd-Queue-Id: CC14C3A3B8A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
---nextPart6995330.lOV4Wx5bFT
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-Date: Mon, 06 Apr 2026 15:50:37 +0200
-Message-ID: <6721686.DvuYhMxLoT@sven-desktop>
-MIME-Version: 1.0
+From: Jiexun Wang <wangjiexun2025@gmail.com>
 
-On Monday, 6 April 2026 15:17:28 CEST Ao Zhou wrote:
-> From: Haoze Xie <royenheart@gmail.com>
-> 
-> batadv_bla_add_claim() can replace claim->backbone_gw and drop the old
-> gateway's last reference while readers still follow the pointer.
-> 
-> The netlink claim dump path dereferences claim->backbone_gw->orig and
-> takes claim->backbone_gw->crc_lock without pinning the underlying
-> backbone gateway. batadv_bla_check_claim() still has the same naked
-> pointer access pattern.
-> 
-> Reuse batadv_bla_claim_get_backbone_gw() in both readers so they operate
-> on a stable gateway reference until the read-side work is complete.
-> This keeps the dump and claim-check paths aligned with the lifetime
-> rules introduced for the other BLA claim readers.
-> 
-> Fixes: 23721387c409 ("batman-adv: add basic bridge loop avoidance code")
-> Fixes: 04f3f5bf1883 ("batman-adv: add B.A.T.M.A.N. Dump BLA claims via netlink")
-> Reported-by: Yifan Wu <yifanwucs@gmail.com>
-> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-> Suggested-by: Xin Liu <bird@lzu.edu.cn>
-> Signed-off-by: Haoze Xie <royenheart@gmail.com>
-> Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
-> ---
->  net/batman-adv/bridge_loop_avoidance.c | 27 +++++++++++++++++---------
->  1 file changed, 18 insertions(+), 9 deletions(-)
+Exact UNIX diag lookups hold a reference to the socket, but not to
+u->path. Meanwhile, unix_release_sock() clears u->path under
+unix_state_lock() and drops the path reference after unlocking.
 
-Applied, thanks!
+Read the inode and device numbers for UNIX_DIAG_VFS while holding
+unix_state_lock(), then emit the netlink attribute after dropping the
+lock.
 
-[1/1] batman-adv: hold claim backbone gateways by reference
-      https://git.open-mesh.org/linux-merge.git/commit/?h=batadv/net&id=82d8701b2c930d0e96b0dbc9115a218d791cb0d2
+This keeps the VFS data stable while the reply is being built.
 
-Best regards,
+Fixes: 5f7b0569460b ("unix_diag: Unix inode info NLA")
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Ren Wei <enjou1224z@gmail.com>
+Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
-Sven
---nextPart6995330.lOV4Wx5bFT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
+ net/unix/diag.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCadO6LQAKCRBND3cr0xT1
-y26iAQCjQv+PeIhpfRpwFpDi1Zektlh+3ZpKeTsIhBbRNXUa2QD/fvkRpCmUVrPR
-ILSBN6mBEL93oFdBwIh3VqNG9kzmPQ4=
-=GnOB
------END PGP SIGNATURE-----
-
---nextPart6995330.lOV4Wx5bFT--
-
-
+diff --git a/net/unix/diag.c b/net/unix/diag.c
+index ca3473026151..76b2c48137dd 100644
+--- a/net/unix/diag.c
++++ b/net/unix/diag.c
+@@ -28,18 +28,23 @@ static int sk_diag_dump_name(struct sock *sk, struct sk_buff *nlskb)
+ 
+ static int sk_diag_dump_vfs(struct sock *sk, struct sk_buff *nlskb)
+ {
+-	struct dentry *dentry = unix_sk(sk)->path.dentry;
++	struct dentry *dentry;
++	struct unix_diag_vfs uv;
++	bool have_vfs = false;
+ 
++	unix_state_lock(sk);
++	dentry = unix_sk(sk)->path.dentry;
+ 	if (dentry) {
+-		struct unix_diag_vfs uv = {
+-			.udiag_vfs_ino = d_backing_inode(dentry)->i_ino,
+-			.udiag_vfs_dev = dentry->d_sb->s_dev,
+-		};
+-
+-		return nla_put(nlskb, UNIX_DIAG_VFS, sizeof(uv), &uv);
++		uv.udiag_vfs_ino = d_backing_inode(dentry)->i_ino;
++		uv.udiag_vfs_dev = dentry->d_sb->s_dev;
++		have_vfs = true;
+ 	}
++	unix_state_unlock(sk);
+ 
+-	return 0;
++	if (!have_vfs)
++		return 0;
++
++	return nla_put(nlskb, UNIX_DIAG_VFS, sizeof(uv), &uv);
+ }
+ 
+ static int sk_diag_dump_peer(struct sock *sk, struct sk_buff *nlskb)
+-- 
+2.34.1
 
 
