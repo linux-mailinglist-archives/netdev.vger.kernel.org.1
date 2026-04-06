@@ -1,55 +1,86 @@
-Return-Path: <netdev+bounces-275549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275550-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AH4ZIrR302nPiQcAu9opvQ
-	(envelope-from <netdev+bounces-275549-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 11:07:00 +0200
+	id QBOWEYN802koigcAu9opvQ
+	(envelope-from <netdev+bounces-275550-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 11:27:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8B453A2704
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 11:06:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D52F83A2A6D
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 11:27:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C4F503006B1B
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 09:06:40 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 68ECC30022AE
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 09:27:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE9730C608;
-	Mon,  6 Apr 2026 09:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED5B3254B0;
+	Mon,  6 Apr 2026 09:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="FSd4GMUt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DnD2X0MH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D03E2D4816
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 09:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5383246EF
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 09:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775466399; cv=none; b=pok8EQHy2HnnHythN5Q5XuH0CojnXW8V5Cbz5SqEMdx5LzHPtb6eHOZNbwTfdNxvPayoCf61cXYdchR6BNe6nD+k9RxUNYSvgCC74nwcPvkv1BU1DmtTP/QmjpTzd4Hrab+qw2WLXmJfy9JrRl1Sp1MOHKNnsTcdxhsTS4wMF0U=
+	t=1775467633; cv=none; b=DZ0QHS4kLGAjJFVMgIaRNsyR+6vtzfPxqLJrnvJZCEVEkJ3NzNLsJnhDHiyvSFFTd3A1yrz2LVIYibEmAPkvKP4izn7HL8ox9YNDYwcm+Ab3bD0dbXnOeZxTv7rDZDkvgyNU9MmxG1iNnbx4vH2en7mDO9oTRFVYhktBhkSqazE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775466399; c=relaxed/simple;
-	bh=VfE417mO2SukjVNPjjFP0ubgR2q8aBP+cD83aqjp8CU=;
+	s=arc-20240116; t=1775467633; c=relaxed/simple;
+	bh=lEvuDfMbAo9PRGVT3OUpXJy6KBnBXNk7eE9OcVQDjJU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qW0/eGU67TUhEk32Hs8QsUSQoS3GyEF7UYx9kcFFRiSSkORQQWVd3HhXt1Q1vlxxEhp2fCqwzjhxov6K1NSfT54JYswmI05RYWyw6GkHExakprc8Rukg7wWFqs5koplc47tWD/6DZwoDi1laBQwinT0EIXgJKrVPC7lizTNM5Sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=FSd4GMUt; arc=none smtp.client-ip=212.77.101.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
-Received: (wp-smtpd smtp.wp.pl 16673 invoked from network); 6 Apr 2026 11:06:33 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1775466393; bh=d8U0tbA0U+a1sTKaYaAgDmYVd2FSU5vu1PgfxjFtGp0=;
-          h=Subject:To:Cc:From;
-          b=FSd4GMUtj+o2O79k2XhKpBnvVdMzveF7BRjpSGiQtDt0c1X6YuedC/gkdhl7aZPcK
-           kLNWbXT5WwC+DmkGhYRPGTJ+7sgOgQu/2CYGjMhdk9Y/82FLYtgHEh4GVQdD/840ZO
-           Fgs9ZBMgRbIcx6vw1iuFzjg+kY1PSIGIpGebkYseGq9OSQbdLMUYTZJtfJt3yPObwt
-           IFRKXCI5PnQsfVjDA1lp7PYVErhf7I7P+8kYImXDPq/eOBwL8O6Zc1ufYqodcJO7fB
-           cGL9NCNtkZW++5m+yeGVSloGQXXZkEDGb9KauqBh+LP7jf5Aadqacyg+KeYL88H2+d
-           YMJgpzHI5AnDw==
-Received: from 83.5.32.228.ipv4.supernova.orange.pl (HELO [192.168.2.103]) (olek2@wp.pl@[83.5.32.228])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
-          for <marek.vasut@mailbox.org>; 6 Apr 2026 11:06:33 +0200
-Message-ID: <afe58c43-ccce-4ace-80d2-a3ed09e166c9@wp.pl>
-Date: Mon, 6 Apr 2026 11:06:34 +0200
+	 In-Reply-To:Content-Type; b=IZ7vdNTpZ2LbLX5gp2baO2P/PdKCY+1AMvjYb0cnPJaP5vucsu90aHKJpw/eN3VAWQL6az+qkAyrmIVelWlSHIeScij12w13QveBmum540To7OwpLmNaEpypc0p1Uyv2oSlpuL7OnJgdkezXcWYQjhtQzOyXNinCdbe3jqWAB4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DnD2X0MH; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-43d43e09de5so150636f8f.1
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 02:27:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775467630; x=1776072430; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=lEvuDfMbAo9PRGVT3OUpXJy6KBnBXNk7eE9OcVQDjJU=;
+        b=DnD2X0MHUkX/y3Ao3pi31NQpVTS6Dx8LpCe7Gv8mY55udgCExjtvLpfe36gPDX4iWL
+         XTHMksXC3B4JP4WrG4mhH3J/C4ge+uWkdMiKKs41N+CRo51yQ8A8f0ZR86kdDVrv1nd7
+         8+EOQDul7orkO5ip3uowt1pKFkcoYYMmN91LucoPrQZe9UIGwzoz//LpXloI02vzWsA/
+         Y3dccs/1BmymrRQHWkTkavtmDIu/EZOCiVHJnSesZ97EYQK76ZAqpOW+t8K0mlTt0JhJ
+         JERniFs4N2AGf/c5juVyA8DuJ+dTJFLpFKwQslfwnv7mz+LgfHQ0HcSlXti93w4kVWFM
+         GnvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775467630; x=1776072430;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lEvuDfMbAo9PRGVT3OUpXJy6KBnBXNk7eE9OcVQDjJU=;
+        b=Rx/0E1xEwgCodP6Nh7PT6YL9v3+/ZeJOTxH+nOrS8F2QXPVxr9LCtbcq+s5F5ZXVfi
+         cBMzoWUwg88xghknv37+B7wBuNgGBRmzeGOqHKciUecBYxpbZ4PTS+VTAzyyikcTkT9y
+         pBq9RpMN6g459FL11iQXPTZWH1QOK2vBCxDSq3DgR0qLmwlBWVsWzW35ykPhBxrveDfA
+         eMY6jusz5ZIPbsxysGlQajhKm1eIPc7IJ46k0T2hFNCWCziUSOrxgP/Zr24sTSyRG3/R
+         00+OUlGujgvSXv4j732qoTk6X2RdWnygd36HzKPh3yxmw+/gbZfz5uw8mqevqbIwQVLU
+         aB6A==
+X-Forwarded-Encrypted: i=1; AJvYcCUD0FGlgYS6pvk1MQPhJOn1SASBXkUsTaE9wCMIRkZ8Mi6GEsjOwrOI8QOMzehcQp71SYD8OHo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+NrbrYZXDJqMKUQP3dY3X9HXxRhhkquWgV7OvxAevqdwdv+Pd
+	wDJFFBU6RwIWHzgQoAGx3bOZJSPX2e3mAzXrl1sLh4hrZm2TYXCBGEMf
+X-Gm-Gg: AeBDies0ylsbQ6F3E5eJLHQ+u2rniNoOGRRiQBFUW0hnX9MgtD2rvBbwIoG2NmfYtOx
+	auHGIFCSQoWZt0R3FTzxGgxT/HexYapQ795JyEyql+wAUcjuwtur329j1G1Sr0Md2XsO53pfoG4
+	9vcKM5UBHyniNRPdar1foZIUYXskx2RDNKatpGO4dpfOvyB+CZv1OOi//AXEoNW60bIfa76eUjF
+	5ys2qguGGt26KUKvlrL01GTsRSEp6SquFcSwVRSN6FmjNxYjvLtDWFoyeGrlrORSUJGSn/VyF87
+	4VaX4gRneVc4evqV5a+SZxEDiakSCqLwqBpiwuVuJRaWZHbmOq00KSpZQXJzNjTXk+009HzjXK2
+	4Vtfn5ibEDk+rM+4R3TzPuZ9fTIAJYYRca3YjwkuKv0QeHjLUWKeFwrn3o5qsp6vWIWi5SE+qLB
+	HvixwdRajUVOQD+vJA6Huw/KlgI3uWfLI98Kzsftngh9J2lqMgYYRVlxZpBr5UyF1XnZ/3JQ19p
+	Q==
+X-Received: by 2002:a05:6000:310a:b0:43b:4212:2ee8 with SMTP id ffacd0b85a97d-43d292cbcd8mr17078806f8f.24.1775467629447;
+        Mon, 06 Apr 2026 02:27:09 -0700 (PDT)
+Received: from ?IPV6:2001:8a0:e95c:5e00:7c8d:20ac:6645:7b95? ([2001:8a0:e95c:5e00:7c8d:20ac:6645:7b95])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e4f843dsm37655217f8f.37.2026.04.06.02.27.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Apr 2026 02:27:09 -0700 (PDT)
+Sender: Julian Braha <julian.braha@gmail.com>
+Message-ID: <f914fb50-ffca-49dd-901d-0b0176e5ee93@gmail.com>
+Date: Mon, 6 Apr 2026 10:27:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,112 +88,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,PATCH v5 3/3] net: phy: realtek: Add property to enable
- SSC
-To: Marek Vasut <marek.vasut@mailbox.org>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
- Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Ivan Galkin <ivan.galkin@axis.com>,
- Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Michael Klein <michael@fossekall.de>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, devicetree@vger.kernel.org
-References: <20260326210704.58912-1-marek.vasut@mailbox.org>
- <20260326210704.58912-3-marek.vasut@mailbox.org>
- <a03960a2-f313-4c12-98f2-d032ce4a45ad@wp.pl>
- <22564dd5-c2b5-46ec-b083-6239a3ff5a2f@mailbox.org>
-Content-Language: pl
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-In-Reply-To: <22564dd5-c2b5-46ec-b083-6239a3ff5a2f@mailbox.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-WP-MailID: 3454027ddb15dd59209e195785fd7180
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000000 [YSPc]                               
+Subject: Re: [PATCH v2] stmmac: cleanup dead dependencies on STMMAC_PLATFORM
+ and STMMAC_ETH in Kconfig
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: davem@davemloft.net, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, mcoquelin.stm32@gmail.com,
+ linux@armlinux.org.uk, kuba@kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+References: <20260402145858.240231-1-julianbraha@gmail.com>
+ <CAMuHMdUfzVSQpadJYpEqPJ_UOBAgswnGzD_bp_U3U6jt2dy0dg@mail.gmail.com>
+Content-Language: en-US
+From: Julian Braha <julianbraha@gmail.com>
+In-Reply-To: <CAMuHMdUfzVSQpadJYpEqPJ_UOBAgswnGzD_bp_U3U6jt2dy0dg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[wp.pl,none];
-	R_DKIM_ALLOW(-0.20)[wp.pl:s=20241105];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275549-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,st.com,foss.st.com,gmail.com,armlinux.org.uk,kernel.org,vger.kernel.org,lists.infradead.org];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[4];
-	FREEMAIL_FROM(0.00)[wp.pl];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[wp.pl:+];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[olek2@wp.pl,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,gmail.com,axis.com,fossekall.de,redhat.com,armlinux.org.uk,nxp.com,vger.kernel.org];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275550-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D8B453A2704
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[julianbraha@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: D52F83A2A6D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Marek,
+Hi Geert,
 
-On 05/04/2026 23:59, Marek Vasut wrote:
-> On 4/5/26 10:23 PM, Aleksander Jan Bajkowski wrote:
->
-> Hi,
->
->>> +static int rtl8211f_config_clkout_ssc(struct phy_device *phydev)
->>> +{
->>> +    struct rtl821x_priv *priv = phydev->priv;
->>> +    struct device *dev = &phydev->mdio.dev;
->>> +    int ret;
->>> +
->>> +    /* The value is preserved if the device tree property is absent */
->>> +    if (!priv->enable_clkout_ssc)
->>> +        return 0;
->>> +
->>> +    /* RTL8211FVD has PHYCR2 register, but configuration of CLKOUT SSC
->>> +     * is not currently supported by this driver due to different bit
->>> +     * layout.
->>> +     */
->>> +    if (phydev->drv->phy_id == RTL_8211FVD_PHYID)
->>> +        return 0;
->>> +
->>> +    /* Unnamed registers from EMI improvement parameters 
->>> application note 1.2 */
->>> +    ret = phy_write_paged(phydev, 0xd09, 0x10, 0xcf00);
->>> +    if (ret < 0) {
->>> +        dev_err(dev, "CLKOUT SSC initialization failed: %pe\n", 
->>> ERR_PTR(ret));
->>> +        return ret;
->>> +    }
->>> +
->>> +    ret = phy_write(phydev, RTL8211F_SSC_CLKOUT, 0x38c3);
->>
->> Only registers 0x10–0x17 require paged operations. The remaining 
->> registers
->> are mapped directly into the PHY address space. This is mentioned in 
->> commit
->> 650e55f224a575cdb18c984b95036109519502d1. Paged and direct access return
->> the same results. With this in mind, I believe that 
->> RTL8211F_SSC_CLKOUT is
->> an alias for RTL8211F_PHYCR2 and is described on page 45 of the 
->> datasheet[1].
->>
->> 1. RTL8211F(I)-CG/RTL8211FD(I)-CG Datasheet
-> This is a good point indeed, I think I can simply set PHYCR2 bits 
-> 7,12,13 to enable the CLKOUT SSC ?
-Sounds correct.
+With the patch applied, I've attempted to configure the kernel
+with STMMAC_PLATFORM=y while STMMAC_ETH=m but menuconfig gives this
+error message:
+"This feature depends on another which has been configured as a module.
+As a result, this feature will be built as a module."
 
+So it looks to me like this patch hasn't actually changed any kconfig
+behavior, but let me know if I'm missing something.
 
-Regards,
-Aleksander
+Best regards,
+Julian Braha
 
