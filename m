@@ -1,115 +1,168 @@
-Return-Path: <netdev+bounces-275596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275549-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sOzPEPi202mIkwcAu9opvQ
-	(envelope-from <netdev+bounces-275596-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:36:56 +0200
+	id AH4ZIrR302nPiQcAu9opvQ
+	(envelope-from <netdev+bounces-275549-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 11:07:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A22AD3A398D
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:36:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8B453A2704
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 11:06:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3956830182A2
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 13:36:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4F503006B1B
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 09:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91862DFA4A;
-	Mon,  6 Apr 2026 13:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE9730C608;
+	Mon,  6 Apr 2026 09:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="FSd4GMUt"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F60258EFF;
-	Mon,  6 Apr 2026 13:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D03E2D4816
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 09:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775482605; cv=none; b=KmyM/06lEQD49GtMDV4Yl0UfXF79vVcKmVv1n8hWM3lWQKt2DPR9Br+zI/KRqOle//b4ItNANe7jooaDd3nz8jLIXSDb8W2QzKp8YK3akG/632R+7Yf6yqZHq0dB82czgFvld8E+Cc4R3XZYYZZmhrRf3RiChFHDvpjiAzg30dY=
+	t=1775466399; cv=none; b=pok8EQHy2HnnHythN5Q5XuH0CojnXW8V5Cbz5SqEMdx5LzHPtb6eHOZNbwTfdNxvPayoCf61cXYdchR6BNe6nD+k9RxUNYSvgCC74nwcPvkv1BU1DmtTP/QmjpTzd4Hrab+qw2WLXmJfy9JrRl1Sp1MOHKNnsTcdxhsTS4wMF0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775482605; c=relaxed/simple;
-	bh=SLjsyADKhvtcnlCVDagTlXHmofYOmuF5Nu9OaF/8tzs=;
-	h=From:Date:Message-ID:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ply1QsazXZiRZ0CEAdxMAyXwPrixcVJdOdTDa/ykAt6KaT/WW0y8al1s+d0BDiMQImiGLn229AV2hWJ8/AqqP/6mUvPYJcTdNQaxLo2VoQYvAYuF+uYukoUKat60BNSmVcu5UDMmdewnLOVyyTpi1Xbir4CeuE1RiAjjUrW9AUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from reply.eml (unknown [111.196.245.197])
-	by APP-05 (Coremail) with SMTP id zQCowAAntwrfttNpmJu0DA--.35068S2;
-	Mon, 06 Apr 2026 21:36:31 +0800 (CST)
-From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Date: Mon, 6 Apr 2026 17:00:00 +0800
-Message-ID: <20260406170000.1-rxrpc-proc-confirm-reply-pengpeng@iscas.ac.cn>
-To: David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pengpeng@iscas.ac.cn
-Subject: Re: [PATCH] rxrpc/proc: size address buffers for %pISpc output
-In-Reply-To: <20260404190004.4-rxrpc-proc-pengpeng@iscas.ac.cn>
-References: <20260404190004.4-rxrpc-proc-pengpeng@iscas.ac.cn>
+	s=arc-20240116; t=1775466399; c=relaxed/simple;
+	bh=VfE417mO2SukjVNPjjFP0ubgR2q8aBP+cD83aqjp8CU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qW0/eGU67TUhEk32Hs8QsUSQoS3GyEF7UYx9kcFFRiSSkORQQWVd3HhXt1Q1vlxxEhp2fCqwzjhxov6K1NSfT54JYswmI05RYWyw6GkHExakprc8Rukg7wWFqs5koplc47tWD/6DZwoDi1laBQwinT0EIXgJKrVPC7lizTNM5Sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=FSd4GMUt; arc=none smtp.client-ip=212.77.101.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+Received: (wp-smtpd smtp.wp.pl 16673 invoked from network); 6 Apr 2026 11:06:33 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
+          t=1775466393; bh=d8U0tbA0U+a1sTKaYaAgDmYVd2FSU5vu1PgfxjFtGp0=;
+          h=Subject:To:Cc:From;
+          b=FSd4GMUtj+o2O79k2XhKpBnvVdMzveF7BRjpSGiQtDt0c1X6YuedC/gkdhl7aZPcK
+           kLNWbXT5WwC+DmkGhYRPGTJ+7sgOgQu/2CYGjMhdk9Y/82FLYtgHEh4GVQdD/840ZO
+           Fgs9ZBMgRbIcx6vw1iuFzjg+kY1PSIGIpGebkYseGq9OSQbdLMUYTZJtfJt3yPObwt
+           IFRKXCI5PnQsfVjDA1lp7PYVErhf7I7P+8kYImXDPq/eOBwL8O6Zc1ufYqodcJO7fB
+           cGL9NCNtkZW++5m+yeGVSloGQXXZkEDGb9KauqBh+LP7jf5Aadqacyg+KeYL88H2+d
+           YMJgpzHI5AnDw==
+Received: from 83.5.32.228.ipv4.supernova.orange.pl (HELO [192.168.2.103]) (olek2@wp.pl@[83.5.32.228])
+          (envelope-sender <olek2@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
+          for <marek.vasut@mailbox.org>; 6 Apr 2026 11:06:33 +0200
+Message-ID: <afe58c43-ccce-4ace-80d2-a3ed09e166c9@wp.pl>
+Date: Mon, 6 Apr 2026 11:06:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,PATCH v5 3/3] net: phy: realtek: Add property to enable
+ SSC
+To: Marek Vasut <marek.vasut@mailbox.org>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+ Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Ivan Galkin <ivan.galkin@axis.com>,
+ Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Michael Klein <michael@fossekall.de>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, devicetree@vger.kernel.org
+References: <20260326210704.58912-1-marek.vasut@mailbox.org>
+ <20260326210704.58912-3-marek.vasut@mailbox.org>
+ <a03960a2-f313-4c12-98f2-d032ce4a45ad@wp.pl>
+ <22564dd5-c2b5-46ec-b083-6239a3ff5a2f@mailbox.org>
+Content-Language: pl
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
+In-Reply-To: <22564dd5-c2b5-46ec-b083-6239a3ff5a2f@mailbox.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAAntwrfttNpmJu0DA--.35068S2
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYZ7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVCjjxC26r1F6r
-	13M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_
-	Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxV
-	W0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAa
-	Y2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4
-	A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACjI8F5VA0
-	II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4c
-	8EcI0Ec7CjxVAaw2AFwI0_Jw0_GFyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
-	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MI
-	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
-	14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-	W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5
-	UUUUU
-X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
-X-Spamd-Result: default: False [-0.46 / 15.00];
+X-WP-MailID: 3454027ddb15dd59209e195785fd7180
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 0000000 [YSPc]                               
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[wp.pl,none];
+	R_DKIM_ALLOW(-0.20)[wp.pl:s=20241105];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275596-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-275549-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FREEMAIL_FROM(0.00)[wp.pl];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[wp.pl:+];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.897];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	R_DKIM_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[olek2@wp.pl,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[davemloft.net,lunn.ch,kernel.org,google.com,gmail.com,axis.com,fossekall.de,redhat.com,armlinux.org.uk,nxp.com,vger.kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A22AD3A398D
+X-Rspamd-Queue-Id: D8B453A2704
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+Hi Marek,
 
-Thanks for confirming that.
+On 05/04/2026 23:59, Marek Vasut wrote:
+> On 4/5/26 10:23 PM, Aleksander Jan Bajkowski wrote:
+>
+> Hi,
+>
+>>> +static int rtl8211f_config_clkout_ssc(struct phy_device *phydev)
+>>> +{
+>>> +    struct rtl821x_priv *priv = phydev->priv;
+>>> +    struct device *dev = &phydev->mdio.dev;
+>>> +    int ret;
+>>> +
+>>> +    /* The value is preserved if the device tree property is absent */
+>>> +    if (!priv->enable_clkout_ssc)
+>>> +        return 0;
+>>> +
+>>> +    /* RTL8211FVD has PHYCR2 register, but configuration of CLKOUT SSC
+>>> +     * is not currently supported by this driver due to different bit
+>>> +     * layout.
+>>> +     */
+>>> +    if (phydev->drv->phy_id == RTL_8211FVD_PHYID)
+>>> +        return 0;
+>>> +
+>>> +    /* Unnamed registers from EMI improvement parameters 
+>>> application note 1.2 */
+>>> +    ret = phy_write_paged(phydev, 0xd09, 0x10, 0xcf00);
+>>> +    if (ret < 0) {
+>>> +        dev_err(dev, "CLKOUT SSC initialization failed: %pe\n", 
+>>> ERR_PTR(ret));
+>>> +        return ret;
+>>> +    }
+>>> +
+>>> +    ret = phy_write(phydev, RTL8211F_SSC_CLKOUT, 0x38c3);
+>>
+>> Only registers 0x10–0x17 require paged operations. The remaining 
+>> registers
+>> are mapped directly into the PHY address space. This is mentioned in 
+>> commit
+>> 650e55f224a575cdb18c984b95036109519502d1. Paged and direct access return
+>> the same results. With this in mind, I believe that 
+>> RTL8211F_SSC_CLKOUT is
+>> an alias for RTL8211F_PHYCR2 and is described on page 45 of the 
+>> datasheet[1].
+>>
+>> 1. RTL8211F(I)-CG/RTL8211FD(I)-CG Datasheet
+> This is a good point indeed, I think I can simply set PHYCR2 bits 
+> 7,12,13 to enable the CLKOUT SSC ?
+Sounds correct.
 
-That is very helpful. It matches the current-tree ISATAP case in
-lib/vsprintf.c and confirms that the formatter ends up writing 51 bytes
-including the trailing NUL into the existing 50-byte stack buffer.
 
-I'll resend the patch with the changelog corrected to frame the proof
-around the ISATAP case explicitly.
-
-Thanks,
-Pengpeng
-
-
+Regards,
+Aleksander
 
