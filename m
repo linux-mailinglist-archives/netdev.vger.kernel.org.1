@@ -1,167 +1,115 @@
-Return-Path: <netdev+bounces-275597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275598-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MFluJqm302l+kwcAu9opvQ
-	(envelope-from <netdev+bounces-275597-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:39:53 +0200
+	id 8B0fLVm402mqkwcAu9opvQ
+	(envelope-from <netdev+bounces-275598-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:42:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FE2A3A39F2
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:39:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 260653A3A54
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:42:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 20AA430134A0
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 13:39:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE1B6301650D
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 13:41:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D21C2E888A;
-	Mon,  6 Apr 2026 13:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEBBC2EC54A;
+	Mon,  6 Apr 2026 13:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q6Z733oI"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NFftRxmS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380632D9ED1;
-	Mon,  6 Apr 2026 13:39:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1732EAB61;
+	Mon,  6 Apr 2026 13:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775482746; cv=none; b=LxMFhS5LDraVrxHsMNlma/8Wiy4sVzEETt2v2Tg9W4nRHBnvoe/43UmXWCFCXj9/1s9TQc+9aZBfsBLVqXEFdMaI2yPIK0Lfcb6l85cJ3eNTZfNjFknGYDKhjwuzb8KhKpsE8LB2TYkglMd2uG7c5P2XRIeMZHNrJTIKegk9zzc=
+	t=1775482913; cv=none; b=Tmbf/3RJsIsNMGjY3gG9p0/KKaRt3PAj5DMYcbrSBQSLwU3sg240XWNQKlWiGo5CiiP74yJROwAfzCU7sPbmomAn3B5Ky0VIWIxQSNnO4FFuTt2WPZqEjWeKKYc8XpenTdLpCWGig5cGVNEFQvnic9FSYQCXRpN/+frwzlZy0kI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775482746; c=relaxed/simple;
-	bh=APQPUocm4GOFYU4BpDaucIHnYV/RnH6hj1Z27G2TWGM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=CV1HAPDCZAANwi0BOcDru+YWo78VfMGV69q2c6rbvipQD4xCCDhFnufmd/dkSr4/RDgQx2Dk0LMxvLHBGsqKd96+x+kmS8luji3f45kZ4FX7djjh9nX9x3nXOOlBewYZrvpLW3ChtA63bawMf98am+qkx4XF6E+juHjCEhx5Uss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q6Z733oI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14056C4CEF7;
-	Mon,  6 Apr 2026 13:39:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775482745;
-	bh=APQPUocm4GOFYU4BpDaucIHnYV/RnH6hj1Z27G2TWGM=;
-	h=Date:From:To:Cc:Subject:From;
-	b=Q6Z733oIthKhu+okUuFyVuoVBwsg+nNyHlHlWEO6O599x1tdnLHioen/4GcrI+7M7
-	 1h0hUyQivsBs5IKfZSnDHU7tXqFISxs1m7fvgzaM5JsbTY++9B1fVTCGIdQIGh9V8d
-	 FFZ5OdoDxw2fWmQX1BO+BUWXDnFiyWgX49bNC4avNd1ImrfjvrRQJ/Gd0PyfkAa+TA
-	 gw88i1e1LIyy53G7wVzhZJJQ1JzllDsBWEnAvL0BenptxDqHNUHebkFdLFL5kWFwPe
-	 yAFtY6CwJzk/4OHm+KbNprTAIeEQRjXj86I7g65B+JokhFC5CrNWY1VhruWxKg6ALg
-	 psiHBuF52mBmQ==
-Date: Mon, 6 Apr 2026 14:39:01 +0100
-From: Mark Brown <broonie@kernel.org>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Networking <netdev@vger.kernel.org>
-Cc: Fernando Fernandez Mancera <fmancera@suse.de>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Yiqi Sun <sunyiqixm@gmail.com>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <adO3dccqnr6j-BL9@sirena.org.uk>
+	s=arc-20240116; t=1775482913; c=relaxed/simple;
+	bh=ZkWh6ni8clb78ksTKZC/zmZzMqZGtQd3d5gS8a9Nu7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H8XJjnylwCG20rxOOdnypejCfbKWAaihtGWRwWBM7F+sPYxjAgVp+6UGb2mJbk7BB2LL3Xy2GkgBM81Ef6jl794gaz7oFgOo7BmzrVzl1P+GAEExQWA52iZN7M6mX4lAodbN2/iLThWp747aSt6ivgKJHJ+Sk65uQ+ioa9qqg2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NFftRxmS; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ULEfWSjnqZuwvt7ftQT2cZMGqxDo3cs9w58PjSSKSms=; b=NFftRxmSEWDdcDcVYXH3jB2Cgi
+	5WYkKX1EkS5m/0XvRfje5kJmtQWASWn2jUr9tIlrMUgUz24X6XiqMnvy/prPdy6XWmb9Kpj/bjo4+
+	kuBQ7+Gk1PePsp1Crjns7FYrgA/Og1aUAhTm6ZPuHmsEgGTmFlseWyzKquOQz3hEMmww=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w9kCu-00EzZN-63; Mon, 06 Apr 2026 15:41:36 +0200
+Date: Mon, 6 Apr 2026 15:41:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Johan Alvarado <contact@c127.dev>
+Cc: me@ziyao.cc, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, ggo@tuxedocomputers.com, andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: stmmac: dwmac-motorcomm: fix eFUSE MAC address
+ read failure
+Message-ID: <a276bd90-4883-42e9-b470-5ec0fc762d08@lunn.ch>
+References: <24cfefff-1233-4745-8c47-812b502d5d19@tuxedocomputers.com>
+ <fc5992a4-9532-49c3-8ec1-c2f8c5b84ca1@smtp-relay.sendinblue.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ft3vr1zCtKzX0w0Y"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Spamd-Result: default: False [-4.26 / 15.00];
-	SIGNED_PGP(-2.00)[];
+In-Reply-To: <fc5992a4-9532-49c3-8ec1-c2f8c5b84ca1@smtp-relay.sendinblue.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
 	MAILLIST(-0.15)[generic];
+	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275597-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[suse.de,vger.kernel.org,gmail.com];
+	TAGGED_FROM(0.00)[bounces-275598-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_ALL(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[broonie@kernel.org,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1FE2A3A39F2
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:email,lunn.ch:mid]
+X-Rspamd-Queue-Id: 260653A3A54
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+>  	motorcomm_reset(priv);
+>  
+> +	/*
+> +	 * After system reset, the eFuse controller needs time to load
+> +	 * its internal data. Without this delay, eFuse reads return
+> +	 * all zeros, causing MAC address detection to fail.
+> +	 */
+> +	usleep_range(2000, 5000);
+> +
 
---ft3vr1zCtKzX0w0Y
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This seems reasonable. My only comment is maybe this should be inside
+motorcomm_reset(). But i don't have a strong opinion.
 
-Hi all,
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Today's linux-next merge of the net-next tree got a conflict in:
-
-  net/ipv4/icmp.c
-
-between commit:
-
-  fde29fd934932 ("ipv4: icmp: fix null-ptr-deref in icmp_build_probe()")
-
-=66rom the net tree and commit:
-
-  d98adfbdd5c01 ("ipv4: drop ipv6_stub usage and use direct function calls")
-
-=66rom the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
-diff --cc net/ipv4/icmp.c
-index 4e2a6c70dcd84,2f4fac22d1aba..0000000000000
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@@ -1345,14 -1342,7 +1342,15 @@@ bool icmp_build_probe(struct sk_buff *s
-  		case ICMP_AFI_IP6:
-  			if (iio->ident.addr.ctype3_hdr.addrlen !=3D sizeof(struct in6_addr))
-  				goto send_mal_query;
-- 			dev =3D ipv6_stub->ipv6_dev_find(net, &iio->ident.addr.ip_addr.ipv6_ad=
-dr, dev);
-+ 			dev =3D ipv6_dev_find(net, &iio->ident.addr.ip_addr.ipv6_addr, dev);
-++
- +			/*
- +			 * If IPv6 identifier lookup is unavailable, silently
- +			 * discard the request instead of misreporting NO_IF.
- +			 */
- +			if (IS_ERR(dev))
- +				return false;
- +
-  			dev_hold(dev);
-  			break;
-  #endif
-
---ft3vr1zCtKzX0w0Y
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnTt3QACgkQJNaLcl1U
-h9A+5gf+NZWtn776BVXSDfhPQlejdbBeDV/j+yAQJoo0HMACAD3MYjCTid1I9BY/
-TNiqypn+U3AyrnlEx22gmtheSmPl/EscwmIRc09sG7auO5UDdtTp9lqTokJEuyej
-QhJUVA9/m/iZXXpATz0CdMIuWU1NB3kudgeeE5opwGySZU4CnG/qVXUmTnLOQ11W
-6L5oVnSeCfe/R5uh4W+oswcoQqWal5ELPSGYyY3bHTTT8TXiMjwTiTKCVaorqi/3
-Yu0sULjt80PVh9i+mphf0xqSdnbbME6CSTJyiJKg1ragTDCdL4m6aJpE4N371AWC
-FxOZJBlcpJ0uVkWfDAj6vq6WHIvSqQ==
-=0bbW
------END PGP SIGNATURE-----
-
---ft3vr1zCtKzX0w0Y--
+    Andrew
 
