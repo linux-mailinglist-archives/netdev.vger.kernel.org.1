@@ -1,134 +1,146 @@
-Return-Path: <netdev+bounces-275712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275713-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WLVVM6gG1GnUpwcAu9opvQ
-	(envelope-from <netdev+bounces-275712-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 21:16:56 +0200
+	id UJsjHogI1GnoqAcAu9opvQ
+	(envelope-from <netdev+bounces-275713-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 21:24:56 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30CA33A691D
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 21:16:55 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 305FA3A6980
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 21:24:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 76E99301BCF9
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 19:16:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A86D5301FA4E
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 19:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD51F2C1595;
-	Mon,  6 Apr 2026 19:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 946D23563DD;
+	Mon,  6 Apr 2026 19:24:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="i1zGF7/s"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LqJqN9AB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53482D7BF;
-	Mon,  6 Apr 2026 19:16:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3791D2D7BF;
+	Mon,  6 Apr 2026 19:24:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775502963; cv=none; b=Bx94I13AmfawRjh4VqkpSUcIzhuBqryny7iHFhUflhJcMmcc6IAnJc4ieO8uMMifMwvFKwKHE9MgWvcPrbpxHYP4BqQu78CF09A95iTcXSpNNNc4MCqyTtcYFZJP6LEA46YkxGy7hImf0G+kXUpfNRfmA1wbI8gA4UZ5ecJJecQ=
+	t=1775503492; cv=none; b=DmsKmxND5sFqTsy/iOLenZ7l3ZcW/K9bTxsjytJhKyAXhc5LhtI3paZyQ33J0iLLzsOIOnO28Fu9ZLJzcWCkbD/E6J705WPez+7pbIPgkcJ9POLBtZVmpC91wvTUgF8yrw/P7X9WluRWmlNIsXUXeKNynXwRV/UtzruuUXluwzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775502963; c=relaxed/simple;
-	bh=QFs5zbLdbLvzwCzJF46KTmdJhGKCTNp3PQe/c6FVWuk=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=YdAoAV69LtnQVP9UQp/FM59wrUUGmN6Yo6Q0T78HX1yBfpRcH1XZLCai2NzSEjlsFLkA9/e9cG84lAzhskULgT3l/T0xpuoNfPXn59/4NoSocd15cGDEXDSxVyRGUSXng3Dvr1sHNCIR7EpMop1ohfDDijTr3uHHNOrb55Okq4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=i1zGF7/s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69EC6C4CEF7;
-	Mon,  6 Apr 2026 19:16:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1775502963;
-	bh=QFs5zbLdbLvzwCzJF46KTmdJhGKCTNp3PQe/c6FVWuk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i1zGF7/sXDGh16efrnNHdWmhZTD0x2pFwIZOavKSuFz2N2xtPiz89vS+Sy1zhba7b
-	 FEnT9pU71iW1MyZNNXcGc+cGkz+XnfIw0RzpAiskj7GY1Gg75WAsOQ82daAXmiW+Cc
-	 aCbidToP7gn37uvs/LYVIM08JTBfpfHPMoaPEVSs=
-Date: Mon, 6 Apr 2026 12:16:01 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: "JP Kobryn (Meta)" <jp.kobryn@linux.dev>
-Cc: linux-mm@kvack.org, willy@infradead.org, hannes@cmpxchg.org,
- david@kernel.org, ljs@kernel.org, Liam.Howlett@oracle.com,
- vbabka@kernel.org, rppt@kernel.org, surenb@google.com, mhocko@suse.com,
- kasong@tencent.com, qi.zheng@linux.dev, shakeel.butt@linux.dev,
- baohua@kernel.org, axelrasmussen@google.com, yuanchu@google.com,
- weixugc@google.com, riel@surriel.com, kuba@kernel.org, edumazet@google.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
-Subject: Re: [PATCH v3] mm/vmpressure: skip socket pressure for costly order
- reclaim
-Message-Id: <20260406121601.0f4f3a6886098371e40d6711@linux-foundation.org>
-In-Reply-To: <6a41259c-bf69-49d5-9cba-80a5feb8ee8a@linux.dev>
-References: <20260406174425.61692-1-jp.kobryn@linux.dev>
-	<20260406105417.28fda9587146a011af2fb876@linux-foundation.org>
-	<6a41259c-bf69-49d5-9cba-80a5feb8ee8a@linux.dev>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1775503492; c=relaxed/simple;
+	bh=1q3XSuMMe4UjQJ22fk+I95JvVHih9U9MjRBxdLf+CBo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FRi+DVpW6/DmLnMiGWvqbRkB3kNMafDM7qVs1nlcSvBl29CKNkUlVe6aoy6g8QaE5u7criHQmnq0e7zugrN9OuQdiLEh1IHVl/l6Ox58sBhsUYdu7166Pk4rK0WOc9Os2doxwBToo53HkLx3dkx46wh/jYkxc6nIC98SDt08hz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LqJqN9AB; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Mhj1XqF2PSEq6c56fbv+9hQm1UGXxqAmyN6y3VzBQ/g=; b=LqJqN9ABVtlMi65kxrJNkI2Y2X
+	hr3Muk2wJOnYRpxyc8mMICKEhZpdUI1cht6rG89KfcrYWQIqw0K/17K+VuTQmxvkK3olAmLjZuq/3
+	oFYTRE28eZMTN342g+ef/pvsLYDQXz4BR2YMAAoaADuZ3AROuouABMfpolrUenVjmJIY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w9pYr-00F1va-UR; Mon, 06 Apr 2026 21:24:37 +0200
+Date: Mon, 6 Apr 2026 21:24:37 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 0/3] net: phy: add support for disabling
+ autonomous EEE
+Message-ID: <48550230-833f-4354-ada7-563b116a4966@lunn.ch>
+References: <20260406-devel-autonomous-eee-v1-0-b335e7143711@tipi-net.de>
+ <a1cf8f6a-b338-4dd7-aced-7e19e4d0fdb7@lunn.ch>
+ <9272c5dd653039b3def8caaea3e631c5@tipi-net.de>
+ <5298959c-12de-4992-a896-3d1371cba111@lunn.ch>
+ <cdef227e-9dfe-4860-aca3-5ce1f60cb838@broadcom.com>
+ <adPo-o9DtxIZGDvg@shell.armlinux.org.uk>
+ <faf651039d98fb9c1ffb40dbd98bb16b@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.16 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <faf651039d98fb9c1ffb40dbd98bb16b@tipi-net.de>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=korg];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275712-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[linux-foundation.org];
-	RCPT_COUNT_TWELVE(0.00)[24];
-	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linux-foundation.org:+];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,broadcom.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275713-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[akpm@linux-foundation.org,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email]
-X-Rspamd-Queue-Id: 30CA33A691D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: 305FA3A6980
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 6 Apr 2026 12:07:57 -0700 "JP Kobryn (Meta)" <jp.kobryn@linux.dev> wrote:
+On Mon, Apr 06, 2026 at 08:29:38PM +0200, Nicolai Buchwitz wrote:
+> On 6.4.2026 19:10, Russell King (Oracle) wrote:
+> > On Mon, Apr 06, 2026 at 09:43:55AM -0700, Florian Fainelli wrote:
+> > > That is almost a guarantee given, there will be a broken MAC
+> > 
+> > Well, it already exists. modern i.MX platforms use stmmac, and some
+> > bright spark wired lpi_intr_o together with the main stmmac interrupt
+> > which causes interrupt storms when the receive path exits LPI. This
+> > makes stmmac LPI unusable on this platform.
+> > 
+> > So, if i.MX is paired with a PHY that can do its own EEE, then we
+> > have this exact scenaro.
+> 
+> For DT-based platforms (like the broken i.MX), this could be addressed
+> similar to what we already have with eee-broken-* properties. For
+> platforms without DT it's getting more complicated and I can't see a
+> way without ethtool.
 
-> Let me know if this data helps, and if you'd like this added to the
-> changelog.
-> 
-> On one affected host with impacted net throughput, the memory state at
-> the time showed ~15GB available, zero cgroup pressure, and the following
-> buddyinfo state:
-> 
-> Order FreePages
-> 0:    133,970
-> 1:    29,230
-> 2:    17,351
-> 3:    18,984
-> 7+:   0
-> 
-> Using bpf, it was found that 94% of vmpressure calls on this host were
-> from order-7 kswapd reclaim.
-> 
-> TCP minimum recv window is rcv_ssthresh:19712.
-> 
-> Before patch:
-> 723 out of 3,843 (19%) TCP connections stuck at minimum recv window
-> 
-> After live-patching and ~30min elapsed:
-> 0 out of 3,470 TCP connections stuck at minimum recv window
+i.MX is not actually an issue. The MAC EEE is so broken we don't
+consider using it. Since it never calls phy_support_eee() PHY EEE will
+be used.
 
-Well I'm impressed ;)
+It gets more interesting when we actually have PHY EEE support. And a
+board using it. And then somebody adds support for MAC EEE which is
+partially broken, but better than nothing. It calls phy_support_eee(),
+so disabling PHY EEE, which can cause a board using PHY EEE to
+regress, because the poor MAC EEE is worse than the PHY EEE which just
+got disabled.
 
-Yes please, it's a useful thing to include.  When people look at a
-contribution, question #1 is "why should I spend time on this".  A
-clear (and tasty) description of userspace benefit is the ideal way of
-answering that.
+With PTP we talked about adding some sort of quality value, so we can
+rank the implementations and pick the best. But that never got
+implemented.
+
+It is these sorts of corner case regressions which are hard to deal
+with.
+
+	Andrew
 
