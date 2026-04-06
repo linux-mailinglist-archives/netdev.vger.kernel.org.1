@@ -1,186 +1,148 @@
-Return-Path: <netdev+bounces-275584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275586-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UK9sNG6n02klkAcAu9opvQ
-	(envelope-from <netdev+bounces-275584-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 14:30:38 +0200
+	id 4PU1A8Gs02nHkAcAu9opvQ
+	(envelope-from <netdev+bounces-275586-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 14:53:21 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 683C13A349A
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 14:30:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 614BC3A3648
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 14:53:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BC5CF3011756
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 12:30:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A812E301573D
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 12:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C3F3368B4;
-	Mon,  6 Apr 2026 12:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E2034C9A6;
+	Mon,  6 Apr 2026 12:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b="exUuEimw"
+	dkim=pass (1024-bit key) header.d=ziyao.cc header.i=me@ziyao.cc header.b="RstiPvQQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from www2881.sakura.ne.jp (www2881.sakura.ne.jp [49.212.198.91])
+Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6412DEA86
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 12:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.198.91
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775478622; cv=none; b=AXFTMUUjHZ46Bepcgxgck1O9zinr97q8SB0El0KCvHCwnlvmDrgFINYIvMJh5+Gp7Fek63oHDans1MKpZSqyABHfjtHRrMOvE3qYw/K79L5ne7/oRT9YGIlmPzSLuSlYhISBmPTP6IqN+tXCtw6g7uLFeAydWkzxJoe3uXvF3cM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775478622; c=relaxed/simple;
-	bh=emRCJyacTnSloKRUbPyqntMfWZ5pD3jQ3P79nsNsgmA=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E9A347FEC;
+	Mon,  6 Apr 2026 12:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775479390; cv=pass; b=q7kHyimPGiZG8PWhu1h3XsjXV5df03NIFKV9+36MToXXEGxLViGzf4WRbbiAh29VnzNL2XUrfy6JkyJluV9+RSARcEGcks7KbPMYBvroJagsLgdCXPedNQk4GA5EVR2nTSvBfXdTeTnX/PW1MMSYToLKHZmDEJB1OFrAhgBLD6s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775479390; c=relaxed/simple;
+	bh=o71LCjpQ+FkwymRkz7CSKQkm0BjuwkBoc4linYLJZio=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XKZ4IGbp6C8cdfa6EH9N3wEu0IVi9AhOlLefGdfRhA7CpPXoMQ5/KSFfHRGmu5+Fj5rU/CyKT3usFK2DP8D8i3jcuwpNtr/Qey8eE9pzNFc6JkhBE2F6gTlAWqKxUwhqDvxShofixiv56GMK/M8onCzA0dQao2/78bPXkbtEOiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp; spf=pass smtp.mailfrom=enjuk.jp; dkim=pass (2048-bit key) header.d=enjuk.jp header.i=@enjuk.jp header.b=exUuEimw; arc=none smtp.client-ip=49.212.198.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enjuk.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enjuk.jp
-Received: from x1 (13.3.31.150.dy.iij4u.or.jp [150.31.3.13])
-	(authenticated bits=0)
-	by www2881.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 636CTo3j080947
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Mon, 6 Apr 2026 21:29:52 +0900 (JST)
-	(envelope-from kohei@enjuk.jp)
-DKIM-Signature: a=rsa-sha256; bh=3OLGYuWueXpAxw4Xwkb7rNrd6HvEWShajiH3l89z4JE=;
-        c=relaxed/relaxed; d=enjuk.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20251215; t=1775478592; v=1;
-        b=exUuEimwu+3LRSzYhW/E37U5h2mO6GNiVvGmtd5dpgX/MBhWFIRJCLhZbiiqOJDa
-         0qTY6LkjTmVPE4ycnrw8xHlErDa4Lvy/wPiI9NPbZmm7QLuh53Ji8h9boEEkZZrY
-         +8bgVkBfITYXHXECH6t6DfGXldKysJhXceZOAdcFCR5B3sNyXYkf2vTTYTwZZXKg
-         yhR6XtxA81mCXQqIQ1iN0W6C9XTvQhqs14dxL4cnl8XI13cHGjwWN0Jk954uLN7L
-         TjoH7yRrykcjXmbrOW1BOFKavYCawN7taZrMrAR7Siup5IhIzBBQWWOwHAPTl3e8
-         CvTnHpqFoo5nVy8PO9RyUA==
-Date: Mon, 6 Apr 2026 21:29:50 +0900
-From: Kohei Enju <kohei@enjuk.jp>
-To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, stable@vger.kernel.org
-Subject: Re: [PATCH net 3/3] iavf: drop netdev lock while waiting for MAC
- change completion
-Message-ID: <adOjGCms-5PBuNte@x1>
-References: <20260406112057.906685-1-jtornosm@redhat.com>
- <20260406112057.906685-4-jtornosm@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cjUNipBAJ3O6kaxR0eTfpbeO4KoKDMS6tRxGQIvac9ACa14gNlcs8zTiGer4s63WoBvls/cZpKaSRoU6VXYVU8oKeHp/8SOO4qwZTK9aiuiEeR7zbm7DchKimMEoR9FXSQK19777zeNt8iC2kLjE/AGVjYefWoUhNt8oUVZIHbQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc; spf=pass smtp.mailfrom=ziyao.cc; dkim=pass (1024-bit key) header.d=ziyao.cc header.i=me@ziyao.cc header.b=RstiPvQQ; arc=pass smtp.client-ip=136.143.188.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziyao.cc
+ARC-Seal: i=1; a=rsa-sha256; t=1775479368; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=BScQ+Ks9FQvuKooZfppwojKnp/hyE2TBl1ntNnw1428WJJSWV5fzBDQdnLL6101SgI0U/4fJ5/3JJQkyzU+CtGKZGhdalnwoNVy3cbeV1Tr+iAJE5yDKZqum4a3acaGhX7Kd70wpIl2NDK31nC28J3HlOQPpBnzaXhfPgbjxiYc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1775479368; h=Content-Type:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=CmSnrLq2CguI8aCWb+g+eytRw4ve96+ufTl27dYwvqU=; 
+	b=UQl6L4flIbPNcj8SCyW0eJmATunbGQ0hr48WI6Jyo5BlzALbK4D6rHG3Q4AT24aB+OHCF2CvqHUfmgBnboiOet3P4ZJEqPfjhxPBLsEt10k6fgchxHhXe/Fd5yxAiBppc65Fmb19f71yXU9tkhfnxnE7RqnhWPFO3/Hvng32q8U=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=ziyao.cc;
+	spf=pass  smtp.mailfrom=me@ziyao.cc;
+	dmarc=pass header.from=<me@ziyao.cc>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1775479368;
+	s=zmail; d=ziyao.cc; i=me@ziyao.cc;
+	h=Date:Date:From:From:To:To:Cc:Cc:Subject:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To:Message-Id:Reply-To;
+	bh=CmSnrLq2CguI8aCWb+g+eytRw4ve96+ufTl27dYwvqU=;
+	b=RstiPvQQjdgRVoqWQwubs3esp7nlL3RLDifdLBW9TT0x+49ZHGIiX9rBGWA3T+JV
+	oR04Na8NFTthCeSjOE0ZYkh6NtIE681B1yQGfmN5cDYvkfJEgDQRMb0iMRCRgGHXnyv
+	ibnrzOJV3mkTgcXJ2q5o5Zoi0WEoVTxDJb9JjHs4=
+Received: by mx.zohomail.com with SMTPS id 1775479365106594.5157446270235;
+	Mon, 6 Apr 2026 05:42:45 -0700 (PDT)
+Date: Mon, 6 Apr 2026 12:42:29 +0000
+From: Yao Zi <me@ziyao.cc>
+To: "Johan Alvarado" <contact@c127.dev>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>
+Cc: <ggo@tuxedocomputers.com>, <andrew+netdev@lunn.ch>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: stmmac: dwmac-motorcomm: fix eFUSE MAC address
+ read failure
+Message-ID: <adOqNTRBOF2BQi_r@pie>
+References: <24cfefff-1233-4745-8c47-812b502d5d19@tuxedocomputers.com>
+ <4aaa214c-4286-4c24-ab5c-b17a3a1a8f1e@smtp-relay.sendinblue.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260406112057.906685-4-jtornosm@redhat.com>
-X-Spamd-Result: default: False [-1.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+In-Reply-To: <4aaa214c-4286-4c24-ab5c-b17a3a1a8f1e@smtp-relay.sendinblue.com>
+X-ZohoMailClient: External
+X-Spamd-Result: default: False [9.34 / 15.00];
+	URIBL_BLACK(7.50)[ziyao.cc:dkim,ziyao.cc:email];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_RHS_NOT_FQDN(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[enjuk.jp,none];
-	R_DKIM_ALLOW(-0.20)[enjuk.jp:s=rs20251215];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
+	BAD_REP_POLICIES(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275584-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275586-lists,netdev=lfdr.de];
+	R_DKIM_ALLOW(0.00)[ziyao.cc:s=zmail];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	GREYLIST(0.00)[pass,body];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[enjuk.jp:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kohei@enjuk.jp,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_POLICY_ALLOW(0.00)[ziyao.cc,quarantine];
+	DKIM_TRACE(0.00)[ziyao.cc:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TAGGED_RCPT(0.00)[netdev];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[me@ziyao.cc,netdev@vger.kernel.org];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 683C13A349A
-X-Rspamd-Action: no action
+	R_SPF_ALLOW(0.00)[+ip6:2600:3c0a:e001:db::/64:c];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ARC_ALLOW(0.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	NEURAL_SPAM(0.00)[0.991];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ziyao.cc:dkim,ziyao.cc:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,c127.dev:email,tuxedocomputers.com:email]
+X-Rspamd-Queue-Id: 614BC3A3648
+X-Rspamd-Action: add header
 X-Rspamd-Server: lfdr
+X-Spam: Yes
 
-On 04/06 13:20, Jose Ignacio Tornos Martinez wrote:
-> After commit ad7c7b2172c3 ("net: hold netdev instance lock during sysfs
-> operations"), iavf_set_mac() is called with the netdev instance lock
-> already held.
+On Mon, Apr 06, 2026 at 07:44:25AM +0000, Johan Alvarado wrote:
 > 
-> The function queues a MAC address change request and then waits for
-> completion while holding this lock. However, the watchdog task that
-> processes admin queue commands (including MAC changes) also needs to
-> acquire the netdev lock to run.
+> This patch fixes an issue where reading the MAC address from the eFUSE
+> fails due to a race condition.
 > 
-> This creates a lock contention scenario:
-> 1. iavf_set_mac() holds netdev lock and waits for MAC change
-> 2. Watchdog needs netdev lock to process the MAC change request
-> 3. Watchdog blocks waiting for lock
-> 4. MAC change times out after 2.5 seconds
-> 5. iavf_set_mac() returns -EAGAIN
+> The root cause was identified by comparing the driver's behavior with a
+> custom U-Boot port. In U-Boot, the MAC address was read successfully
+> every time because the driver was loaded later in the boot process, giving
+> the hardware ample time to initialize. In Linux, reading the eFUSE
+> immediately returns all zeros, resulting in a fallback to a random MAC address.
 > 
-> This particularly affects VFs during initialization when enslaved to a
-> bond. The first VF typically succeeds as it's already fully initialized,
-> but subsequent VFs fail as they're still progressing through their state
-> machine and need the watchdog to advance.
-> 
-> Fix by temporarily dropping the netdev lock before waiting for MAC change
-> completion, allowing the watchdog to run and process the request, then
-> re-acquiring the lock before returning.
-> 
-> This is safe because:
-> - The MAC change request is already queued before we drop the lock
-> - iavf_is_mac_set_handled() just checks filter state, doesn't modify it
-> - We re-acquire the lock before checking results and returning
-> 
-> Fixes: ad7c7b2172c3 ("net: hold netdev instance lock during sysfs operations")
-> cc: stable@vger.kernel.org
-> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-> ---
->  drivers/net/ethernet/intel/iavf/iavf_main.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> index dad001abc908..6281858e6f3c 100644
-> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> @@ -1068,10 +1068,14 @@ static int iavf_set_mac(struct net_device *netdev, void *p)
->  	if (ret)
->  		return ret;
->  
-> +	netdev_unlock(netdev);
-> +
->  	ret = wait_event_interruptible_timeout(adapter->vc_waitqueue,
->  					       iavf_is_mac_set_handled(netdev, addr->sa_data),
->  					       msecs_to_jiffies(2500));
->  
-> +	netdev_lock(netdev);
-> +
+> Hardware cold-boot testing revealed that the eFUSE controller requires a
+> short settling time to load its internal data. Adding a 2000-5000us
+> delay after the reset ensures the hardware is fully ready, allowing the
+> native MAC address to be read consistently.
 
-Hi Jose, thank you for the fix and detailed explanation.
+Sounds like a reasonable explanation. The vendor driver reads MAC
+address from eFuse before issuing a system reset, which explains why
+this doesn't reproduce on it. However, I'd prefer your approach which
+ensures a clean hardware state before any operations are performed.
 
-I don't have a great solution for this issue, but dropping the netdev
-lock taken by the networking core in the driver callback might not look
-acceptable.
+I'm currently on travel thus couldn't verify it against real hardware,
+but here's mine tag,
 
-FYI, Petr reported the same type of locking issue in
-ndo_change_mtu(), and the v1 approach was really similar to this one.
-https://lore.kernel.org/intel-wired-lan/20260202155813.3f8fbc27@kernel.org/
+Reviewed-by: Yao Zi <me@ziyao.cc>
 
-IIUC, the issue was eventually fixed by completing the reset
-synchronously in the same context as ndo_change_mtu(), instead of
-dropping the netdev lock and waiting for reset_task.
-https://lore.kernel.org/intel-wired-lan/20260211191855.1532226-1-poros@redhat.com/
+Much thanks for investigating into it.
 
-If that applies here as well, maybe iavf_set_mac() needs a similar
-approach, e.g. progressing the relevant virtchnl request/completion
-synchronously with the netdev lock held, rather than dropping the lock
-here?
+Best regards,
+Yao Zi
 
->  	/* If ret < 0 then it means wait was interrupted.
->  	 * If ret == 0 then it means we got a timeout.
->  	 * else it means we got response for set MAC from PF,
-> -- 
-> 2.53.0
-> 
+> Fixes: 02ff155ea281 ("net: stmmac: Add glue driver for Motorcomm YT6801 ethernet controller")
+> Reported-by: Georg Gottleuber <ggo@tuxedocomputers.com>
+> Closes: https://lore.kernel.org/all/24cfefff-1233-4745-8c47-812b502d5d19@tuxedocomputers.com/
+> Signed-off-by: Johan Alvarado <contact@c127.dev>
 
