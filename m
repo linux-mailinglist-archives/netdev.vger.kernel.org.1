@@ -1,152 +1,179 @@
-Return-Path: <netdev+bounces-275550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275551-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id QBOWEYN802koigcAu9opvQ
-	(envelope-from <netdev+bounces-275550-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 11:27:31 +0200
+	id GETpOjR902lIigcAu9opvQ
+	(envelope-from <netdev+bounces-275551-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 11:30:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D52F83A2A6D
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 11:27:30 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DED63A2A7E
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 11:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 68ECC30022AE
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 09:27:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 90D743009159
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 09:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED5B3254B0;
-	Mon,  6 Apr 2026 09:27:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DnD2X0MH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D6B15A86D;
+	Mon,  6 Apr 2026 09:30:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5383246EF
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 09:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3D822F01
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 09:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775467633; cv=none; b=DZ0QHS4kLGAjJFVMgIaRNsyR+6vtzfPxqLJrnvJZCEVEkJ3NzNLsJnhDHiyvSFFTd3A1yrz2LVIYibEmAPkvKP4izn7HL8ox9YNDYwcm+Ab3bD0dbXnOeZxTv7rDZDkvgyNU9MmxG1iNnbx4vH2en7mDO9oTRFVYhktBhkSqazE=
+	t=1775467824; cv=none; b=XCmj1REZ3rn3sSO6hj30jXZ0BBGd2EpTdkfk/YJfwQyVNgFOE67MXGLMEmRozxw6l6ECPeEZkDhC42GtF7wLhq4BeWptNyG7/CwGL/7jC4+/sC1kJ+JSd+ZjvhLg+QzGnYIGiVSgOtaRAJ64uHQaWn0Y6ipK3lAEwpqPJra5Q5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775467633; c=relaxed/simple;
-	bh=lEvuDfMbAo9PRGVT3OUpXJy6KBnBXNk7eE9OcVQDjJU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IZ7vdNTpZ2LbLX5gp2baO2P/PdKCY+1AMvjYb0cnPJaP5vucsu90aHKJpw/eN3VAWQL6az+qkAyrmIVelWlSHIeScij12w13QveBmum540To7OwpLmNaEpypc0p1Uyv2oSlpuL7OnJgdkezXcWYQjhtQzOyXNinCdbe3jqWAB4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DnD2X0MH; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-43d43e09de5so150636f8f.1
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 02:27:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775467630; x=1776072430; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=lEvuDfMbAo9PRGVT3OUpXJy6KBnBXNk7eE9OcVQDjJU=;
-        b=DnD2X0MHUkX/y3Ao3pi31NQpVTS6Dx8LpCe7Gv8mY55udgCExjtvLpfe36gPDX4iWL
-         XTHMksXC3B4JP4WrG4mhH3J/C4ge+uWkdMiKKs41N+CRo51yQ8A8f0ZR86kdDVrv1nd7
-         8+EOQDul7orkO5ip3uowt1pKFkcoYYMmN91LucoPrQZe9UIGwzoz//LpXloI02vzWsA/
-         Y3dccs/1BmymrRQHWkTkavtmDIu/EZOCiVHJnSesZ97EYQK76ZAqpOW+t8K0mlTt0JhJ
-         JERniFs4N2AGf/c5juVyA8DuJ+dTJFLpFKwQslfwnv7mz+LgfHQ0HcSlXti93w4kVWFM
-         GnvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775467630; x=1776072430;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :sender:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lEvuDfMbAo9PRGVT3OUpXJy6KBnBXNk7eE9OcVQDjJU=;
-        b=Rx/0E1xEwgCodP6Nh7PT6YL9v3+/ZeJOTxH+nOrS8F2QXPVxr9LCtbcq+s5F5ZXVfi
-         cBMzoWUwg88xghknv37+B7wBuNgGBRmzeGOqHKciUecBYxpbZ4PTS+VTAzyyikcTkT9y
-         pBq9RpMN6g459FL11iQXPTZWH1QOK2vBCxDSq3DgR0qLmwlBWVsWzW35ykPhBxrveDfA
-         eMY6jusz5ZIPbsxysGlQajhKm1eIPc7IJ46k0T2hFNCWCziUSOrxgP/Zr24sTSyRG3/R
-         00+OUlGujgvSXv4j732qoTk6X2RdWnygd36HzKPh3yxmw+/gbZfz5uw8mqevqbIwQVLU
-         aB6A==
-X-Forwarded-Encrypted: i=1; AJvYcCUD0FGlgYS6pvk1MQPhJOn1SASBXkUsTaE9wCMIRkZ8Mi6GEsjOwrOI8QOMzehcQp71SYD8OHo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+NrbrYZXDJqMKUQP3dY3X9HXxRhhkquWgV7OvxAevqdwdv+Pd
-	wDJFFBU6RwIWHzgQoAGx3bOZJSPX2e3mAzXrl1sLh4hrZm2TYXCBGEMf
-X-Gm-Gg: AeBDies0ylsbQ6F3E5eJLHQ+u2rniNoOGRRiQBFUW0hnX9MgtD2rvBbwIoG2NmfYtOx
-	auHGIFCSQoWZt0R3FTzxGgxT/HexYapQ795JyEyql+wAUcjuwtur329j1G1Sr0Md2XsO53pfoG4
-	9vcKM5UBHyniNRPdar1foZIUYXskx2RDNKatpGO4dpfOvyB+CZv1OOi//AXEoNW60bIfa76eUjF
-	5ys2qguGGt26KUKvlrL01GTsRSEp6SquFcSwVRSN6FmjNxYjvLtDWFoyeGrlrORSUJGSn/VyF87
-	4VaX4gRneVc4evqV5a+SZxEDiakSCqLwqBpiwuVuJRaWZHbmOq00KSpZQXJzNjTXk+009HzjXK2
-	4Vtfn5ibEDk+rM+4R3TzPuZ9fTIAJYYRca3YjwkuKv0QeHjLUWKeFwrn3o5qsp6vWIWi5SE+qLB
-	HvixwdRajUVOQD+vJA6Huw/KlgI3uWfLI98Kzsftngh9J2lqMgYYRVlxZpBr5UyF1XnZ/3JQ19p
-	Q==
-X-Received: by 2002:a05:6000:310a:b0:43b:4212:2ee8 with SMTP id ffacd0b85a97d-43d292cbcd8mr17078806f8f.24.1775467629447;
-        Mon, 06 Apr 2026 02:27:09 -0700 (PDT)
-Received: from ?IPV6:2001:8a0:e95c:5e00:7c8d:20ac:6645:7b95? ([2001:8a0:e95c:5e00:7c8d:20ac:6645:7b95])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e4f843dsm37655217f8f.37.2026.04.06.02.27.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Apr 2026 02:27:09 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <f914fb50-ffca-49dd-901d-0b0176e5ee93@gmail.com>
-Date: Mon, 6 Apr 2026 10:27:07 +0100
+	s=arc-20240116; t=1775467824; c=relaxed/simple;
+	bh=zoPKV2wENFibje5FRAO0JqMwLxTI7htgZwYdHm97UCo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vin/nqX2/hXu+DHlNDwjf/0keDKYI11dZYlaDJRltSVc9lpw4Vaj0AMT6f7A9yfJzwrWK2NhoU/PefG2EwwLcI/u35f5H+vv1wzj5ARvUC4nEqHlg4wCVXtbZ4i4a1ArgX17+exHbF2z7mLPcAOOCRZzdVOTBKTE9yFC2vnxUHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w9gHW-0008Oo-6b; Mon, 06 Apr 2026 11:30:06 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w9gHV-003zYB-1X;
+	Mon, 06 Apr 2026 11:30:05 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w9gHV-0000000AzK3-1Tn5;
+	Mon, 06 Apr 2026 11:30:05 +0200
+Date: Mon, 6 Apr 2026 11:30:05 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Carlo Szelinsky <github@szelinsky.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/3] net: mdio: treat PSE EPROBE_DEFER as
+ non-fatal during PHY registration
+Message-ID: <adN9Ha5FgJ8sp6gj@pengutronix.de>
+References: <6185f9d8-dabe-4190-b020-711e3a046e64@lunn.ch>
+ <20260405185730.3937952-1-github@szelinsky.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] stmmac: cleanup dead dependencies on STMMAC_PLATFORM
- and STMMAC_ETH in Kconfig
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: davem@davemloft.net, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, mcoquelin.stm32@gmail.com,
- linux@armlinux.org.uk, kuba@kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-References: <20260402145858.240231-1-julianbraha@gmail.com>
- <CAMuHMdUfzVSQpadJYpEqPJ_UOBAgswnGzD_bp_U3U6jt2dy0dg@mail.gmail.com>
-Content-Language: en-US
-From: Julian Braha <julianbraha@gmail.com>
-In-Reply-To: <CAMuHMdUfzVSQpadJYpEqPJ_UOBAgswnGzD_bp_U3U6jt2dy0dg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260405185730.3937952-1-github@szelinsky.de>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[davemloft.net,st.com,foss.st.com,gmail.com,armlinux.org.uk,kernel.org,vger.kernel.org,lists.infradead.org];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275550-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-275551-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[pengutronix.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,bootlin.com,gmail.com,armlinux.org.uk,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[julianbraha@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
+	NEURAL_SPAM(0.00)[0.604];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,kernel];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D52F83A2A6D
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pengutronix.de:mid,pengutronix.de:url]
+X-Rspamd-Queue-Id: 3DED63A2A7E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Geert,
+On Sun, Apr 05, 2026 at 08:57:30PM +0200, Carlo Szelinsky wrote:
+> Hi Andrew,
+> 
+> So I went and looked at whether we can just let EPROBE_DEFER do its
+> thing here, like you suggested.
+> 
+> From what I can tell, the issue is where it happens.
+> fwnode_mdiobus_register_phy() gets called during the MDIO bus scan in
+> __of_mdiobus_parse_phys(), and if any PHY returns -EPROBE_DEFER there,
+> the whole scan bails out - none of the PHYs on that bus get registered.
+> So you'd lose all networking on that bus just because one PHY's PSE
+> controller isn't ready yet.
+> 
+> I also dug into the timing question you raised. Correct me if I'm
+> wrong, but from what I see the deferred probe timeout is 10s and
+> regulator_late_cleanup fires at 30s, so the ordering would actually
+> work out - the consumer would get to claim the regulator before
+> cleanup kills it. It's more the bus level collateral damage that
+> seemed like the real problem to me.
+> 
+> That's basically why I ended up treating EPROBE_DEFER as non-fatal
+> for PSE during PHY registration and doing lazy resolution instead.
+> The admin_state_synced flag then covers the window between PSE
+> controller probe and whenever the lazy resolution actually happens.
+> 
+> But I might be looking at this the wrong way - would you rather we
+> defer the whole bus and accept that trade-off? Or does the lazy
+> approach seem reasonable for this case? Happy to hear if you have
+> a different idea entirely.
 
-With the patch applied, I've attempted to configure the kernel
-with STMMAC_PLATFORM=y while STMMAC_ETH=m but menuconfig gives this
-error message:
-"This feature depends on another which has been configured as a module.
-As a result, this feature will be built as a module."
+The core question, do we need PSE for PHY functionality? And what it
+will cost to decouple it?
 
-So it looks to me like this patch hasn't actually changed any kconfig
-behavior, but let me know if I'm missing something.
+We can make a step back and re-evaluate - what functionality and what
+order is actually required to find potentially better implementation.
 
-Best regards,
-Julian Braha
+We have a lot of current flowing over wires, budget and port
+prioritization issues, things which may damage HW if done not correctly.
+With other word, if we do not have properly operational environment
+providing system specific policies, it is better to run safe
+configuration - all ports/regulators are off.
+
+This means:
+- PSE controller driver should be registered as early as possible,
+  without caring about existence of PHYs, ports or network interfaces.
+  And configure ports in to default safe operation - off. Accept we
+  have some controller/firmware which would care about safety.
+- as soon as we have all needed components, we can start provide
+  controllable interfaces to serve external consumers.
+
+If we decouple PSE and PHY registration (and we probably will need to do
+it some day), we would need to have own implementation of deferred
+probing in the PSE core.  Event driven or by polling - which sounds not
+like very good idea. Pick your poison...
+
+Probably there is no quick and easy fix for now.
+
+Best Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
