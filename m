@@ -1,238 +1,198 @@
-Return-Path: <netdev+bounces-275611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275612-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MMCbLVrE02mqlgcAu9opvQ
-	(envelope-from <netdev+bounces-275611-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:34:02 +0200
+	id WKxrOkjD02mqlgcAu9opvQ
+	(envelope-from <netdev+bounces-275612-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:29:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C6F53A421C
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:34:01 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F46B3A40EA
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 90C5830CDD44
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 14:25:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E5BBF300FEE1
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 14:28:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B374381B0A;
-	Mon,  6 Apr 2026 14:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10293815D2;
+	Mon,  6 Apr 2026 14:28:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XeoTYTd5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XdGYgMut"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AE63806BE
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 14:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9723803FA
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 14:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.50
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775485425; cv=pass; b=EKOtATtKMM9potuWyHG74nwapcDymvuv2zFg4baIDRZV3M3TUK0U1+MkOCLFNCxQvwWojYshE4LiPm/nmaTVfYPmIV0cbUrWkjP/n5oqOsBlEDg77PiwcPlFIOECGrXZtiY4Lav+Pf/GpzONYZO4g8/swAKbX3xNHRXHfnsEZIA=
+	t=1775485738; cv=pass; b=CQj+maRgmaIlGxhUyf8K+UAXpp/tatLtwhFY+N00ZRnLUjBhNtq9oOhafv3CWaj1YroekfczoH48/mcipTdiGtP4EsxLDK6WJaE/dSgUGEEqQErBDd5/LckkjXtRskRsVroB0WKTck3Nb94xW6El3sKre5aPiZIJpen/MC60kn8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775485425; c=relaxed/simple;
-	bh=0oshv46xLuQzPLIPdH9A0EvaVpAKTWV20KUKhaXBiSk=;
+	s=arc-20240116; t=1775485738; c=relaxed/simple;
+	bh=RN4e1YhDSg992awiDit4aQ/vN6UYLHpPa8oGR6pnBZY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TEm7Crs8KWtPY9dA00angU+TsGzFBB+9llrTOve4WvFV9Lqsxg0UXTJHHpgP2Cm44kGIQYsM/MARKmHZgLR+G05erADeWI1sAGthPyRlmCAFDHW4oYxlfYg2A1M7/vwHFbxCOEQEKjz7tWr9PMJ2r0o21WjVCOHTTT+WZ2q8+OI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XeoTYTd5; arc=pass smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-66b0dc690bcso21593a12.1
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 07:23:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775485422; cv=none;
+	 To:Cc:Content-Type; b=JR2KuvoaDp2QdfqbMn/c6ajdEh/wHGdZj3fbOrNFqpjwVl0l81owMsveBW/yb6dmxYWQaaKmHx6ZqiNwBR+HmHQTV8rEZxtzKIASQkX6hiUfvLG3OREbObmpTp48fdCLO5cLH4zGNOUnKCklruO7DktxpU3HC4HGXnIUYXNBONI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XdGYgMut; arc=pass smtp.client-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7d7e9b97a73so2973322a34.0
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 07:28:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775485736; cv=none;
         d=google.com; s=arc-20240605;
-        b=ew9zcP53hxlLPVIwruf0u8d1QDSPbkFZY/xu0fRYlJL9M8VX7tlZwA+YfY12GnezzM
-         wCoiS+F6xxTscBY5ZihsdyfbHXaUBBiP4RC3e7gdU2Ad8o8DGJgD94i/au0KAShP2W5p
-         FGsbob+N06E8Oa3Sw29xOXQnvdHOV9xiUIzYrJYVSYmM1IcDG/zMqK0/Gu5VMjucaToS
-         W+okQpWyAp5biB3dynUD1lQlQfUDjwvgNSa2i9jlb+A3z/6hu6NaP2OCgPOc9P3Jonpg
-         IFaRa2y6do8yeNV7W50vXBa4Wl9KCCnuMomjnqhF2igjTv0CTu/48d2f5pOyK6SbAknC
-         CLRw==
+        b=Qz5hWptMDPugC/Goq5CvN2ZguifcHCPhr2Dkx9D8poJhqDAzKGmzwrlHRREQom/Gep
+         r2KdGyOChKXEeksjNNvLMF3AUM6OjUK9ZXPvHAxn1rXXFdnHvNUOVuBoWMsbngEiDfPC
+         JQjLMBVGzAXwtuTw9pGPjunf2lNGmdtF0bCbXZww9CIZT6jzYjItQ7XOscm64kvibjcv
+         lnFdelZ1XLEmKH1ZU6j/BVhWeK1r4yCCPhSyhTgEx2PJyj24R2+oMDihbI6WJS0Ozs2H
+         RWsKdrWFvg44Cyto8YPf2m7lXZtd8OO2fv4OA1xT1vvgD24JqblmRNJEL5LiCjoIgu70
+         hjTw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=4foAE2z+Q/MQv2J0mPBdcU98fqKB0vyTweCETb8dfag=;
-        fh=jje992HB1mwLu0u8Ly2JCfMSJQFsn3kg8g1N8eSszSo=;
-        b=MR6TwpOXRJnyxXflfi2HJAULoeMi94ZqBmze/HFgN0L9jwFdDgAJu60hU6kA+znxKi
-         V/+CaQSJtXd8of8dOayQhOw8LQR/1MXIYlHemvQ71dmURXJUfuWAqBCZ4cURgPrlJO3e
-         qIoeOBLo59e2XwWgkjbJdz0/a5Ea6FNONYaMOBg8kH2pb8h05HPQtutYtu0/HbrSSgDQ
-         Z7mG8PGWvf4aJu5j42jf75mVlEDcq9mGCv5aQB0RZpOpammQzWAWDsHkTridjWHVlJJq
-         vEpyo7k6WKjOeMPWZxfxazagB/Zu+xuY1Uxa2mwT0JcGJk3Gq2PB1Ho4GH4RHYe56nLO
-         SONQ==;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=pQmZeSWTgD6teuG9Cb0qg4wDQezIASQrTbGvcOITLWg=;
+        fh=8ifBJYBV/anOwxQ79H5tHVtvLHL0yGZFbBOE06rHE3E=;
+        b=chPCAvHd8/RyDzt98l4YgFoTtNOe3W+nxVrCFfSMnEgShpB57grX2u3venDUE0IegC
+         67k4Hmeyc04IiwA4W17iLL0wQcsrh5YxsSmEZDCcUPBGzxzke0RCfg2JBVXyZc+xWc0W
+         OXwS8ck+yHQbS6KKcBhLr1LSatkoy948UyH8zM/l0pnCrGlPcSwo5B3nvwqdN4tGsNy2
+         lVrqULEx7qQ4aPZGWWgi9bqnRGU66J5L/2Sg1g9SA8oZ59Df+YGUFeUVYwxVRB+6KqNk
+         tgc6wzdIzOyvZSHRmV24/f4kAq+XM5xGv5/6IVbLgF5p3fY02xPYlgmOXqc4HhJbwakj
+         WptQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775485422; x=1776090222; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4foAE2z+Q/MQv2J0mPBdcU98fqKB0vyTweCETb8dfag=;
-        b=XeoTYTd5wSE48JW8kaM0qv3ycrSE9eyeuCIskQwqlA84Ij2A9Xf6y3+NEG1J8FRvIQ
-         t6bHLyFisYQzufw6dVUDCO8+C3SQMB2M3WjdVqRea1tMTT1qZ12ijqURJCW5YdMxgO/U
-         0iX1FKr+yUwYvrYESOPuxPlwn8N0qKaPS2HrSIaYdfALRFDkTWB6DFUsYj2vLBsIzzdt
-         uxeS2dppQQhcpnblsFY4Z4BNYMbYJ5yQSZk4VljRhDO6MTvR1NaxLYhYgKToGQoccHBJ
-         uk0Miz7PmU3O0o3kStbFvFjYl8NPwzt9LvF2y0FdSXBEcd20f/V0vddkkgTmfWnI5ZQF
-         agZA==
+        d=gmail.com; s=20251104; t=1775485736; x=1776090536; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pQmZeSWTgD6teuG9Cb0qg4wDQezIASQrTbGvcOITLWg=;
+        b=XdGYgMutbu3g/mpl/gEpiXrNbPBDV+odsxZL3o8drZUGowzubMADFDSWIXewhj8sHn
+         TzV7wY9DGFtzPMZBWkSShrjaDJ/PVYjJRAgXbf/EfCPXJE9BWekaR0/4xoS752TmjwHh
+         i3gIgkN3ebcqUw53Cnptdd0imdbSFVFGjZiSNPxZQinfJFxklQEYB9zAAcZwTHh5/L2k
+         gzATHJysj74KzKE6lXqI5o9ljoAZaRTfhYkfR+fhohpow5uoUp5OpATFZdp5HVzFFtql
+         vr9ECIupiSBNvXPvvOcp3MVtHNMgmRv3cYGFhBItr3vzSj1n5CB6kp7fi8hgmPEHW1Kp
+         uTVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775485422; x=1776090222;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4foAE2z+Q/MQv2J0mPBdcU98fqKB0vyTweCETb8dfag=;
-        b=V5EEB0owdobKMTGIAgHO9Dz3jcff8NopIXvO+XgwMeVEKJGw+0sLDnWVT2vesbRekt
-         H26f4eyu1LsQ2+CxIGabtG7omNNqk8Oye+ZLpJ1mgUHa36gNyWepNz/L/4YGFB3OtFfW
-         7Bc0StbCh4S2eUP8vQjVzlL1eLg9LLPMKaIPqYs7c0Nd/iFtvjh4iecixmR5GIbvOKyL
-         c1gx1qWrQm2MKTWIGiWoYwo6Q6afbB0nsbELv0nVJRjuesGxpy8/sAhStAp66j//ycmS
-         GhSmxEKXbi690WNSjEjDYlbNv2/TU2rz+wbUQoqsPzyiF533iMmukjFLY7s87VhnVBiz
-         f9ZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUu/622w0I8ycKKNMCHFrl4VqCcyR95degqAMmnX4+lpBxilHLXtTMIsF05Bp+Tt5m8hMsgr9E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywt+KwfulKIPrtRetaU5B8NZvL+Km/46wzgYGv6SJkpdv6QBJkO
-	HdYGnlrFuWrL4oRDMAdtmyWd1oLiHNGDcEkVcJOX/H49+crPbUSvE5kK+wThNHr4uVCCC+h31N3
-	XVye+iH+ACj7o5M/zSC7U7bKFdg+2RVJsbNteTcI2
-X-Gm-Gg: AeBDietpAX0cyeF27ibHocXQdTDK2AiQ9fHJ6JwW/CgBgzcmxgU78iYMmbYNTKQ1tRo
-	FOsXzSvlLZVdepRtCjmwNX32F/FbZf4m/qGeBUzhTb1mxR9eMyYLfx3xeUQkA+bnQlCs//+5F2r
-	xe2C2FklrCjcC9036fcUViSlpMSY4iYqYf26V3irETo2J9aF1QfvOwjw/dzlRQs4UXBFJ06vAmM
-	FONJDBizcC/XenVnNrv9aNDWmYV6fn5slCTFX+5wpMYmDMdYySYdTlg3p1IuO91vOGo8DGosWP2
-	a3U4PlrLBqrCRtxA9Q==
-X-Received: by 2002:aa7:c383:0:b0:66a:7b3d:f43a with SMTP id
- 4fb4d7f45d1cf-66e43cdc3d3mr75635a12.1.1775485421479; Mon, 06 Apr 2026
- 07:23:41 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1775485736; x=1776090536;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pQmZeSWTgD6teuG9Cb0qg4wDQezIASQrTbGvcOITLWg=;
+        b=eikqDtgiBQU0L2r6jNAYcFhe17TZlJsQHqKBhNu0JMUHSlpkyTliAA25RDD4/wFwiH
+         x33g+ZDf0nUfxl2wWS+pNQ2qbNUJ2niSzqM3ajnExdb8n2kOXrsIp+9w9hOrumTMYocB
+         gYcIk/L209b7wQ6fHnLd3ER0cu4/jRy3d2WHqYB71KhlnPV1b8IpqSwQL5BNp06sbqJ8
+         2JVOacejEtdbzgRji1Y56/jzffXQSM7rHpwQ/u9EzxVqxm7IaQ6CETYGGTtjayskJFma
+         ev1PMWkviCV/lZOOAGAD7ikQwLJ8TqgjCFBUWqUSgZ7JBbIcA5wLESHeCVKuRkH7IGlU
+         y4Rw==
+X-Forwarded-Encrypted: i=1; AJvYcCXCIn1n43I4xyjt5kRoyCvcCQ8X5/rIWf44/YZBrzNbCiTqN3KrAgFfYpvNgD2ezbRARKEuleM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3YX/3hq4EKeaFGU4kvKHMkjPT92P2HLPhI5uYAU+tyk+xG5sV
+	HFIt1d9KIc/HgLO/l/ASIcAZ2HYpm0YIMto6rFg5MCek6I19turIOLa21zwTYQJ/cGXCK097/VV
+	wCVon2NWh3RH8sRgyyY/+XaNHjElT6yA=
+X-Gm-Gg: AeBDiev20e+MtM5dv9acGEilJyEdEPGGk89u2SqsMZlVFt8NlW6ci7scui2wKXxJyGU
+	P7Ah0wzumG6002nUg1l2wvHEZ+YQp9bEM+5Ffw5WfoUAjF1btxGM4dfuZMkeCWWOFAAcEXpNBbP
+	Yrh3vf8I+q4HwNh7WO4/o5HGthaZZCt4+q8ub3KYyPIv38eHJw2qQWoaV72lq2YALspA8hF1lBQ
+	8X1jvtsuWee3W7H9xFbS/MExVkeIrfOh/V5rGjqdO/jDizRsc5bscyG3XCtdKOx/HZGFy6jeVtQ
+	52lIyD+qXBxUWJ5+0XJIVaa77kWq+/JScAu2yA==
+X-Received: by 2002:a05:6820:8318:b0:683:6dbf:c6d4 with SMTP id
+ 006d021491bc7-6836dbfcb7bmr3030718eaf.22.1775485736189; Mon, 06 Apr 2026
+ 07:28:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260403185236.sjgetnkha3o3a4d3@desk> <CALMp9eSPkMpKQELTnsaj6=gXD+EyE0n2_p93n4maDc93bPFe+w@mail.gmail.com>
- <20260403213445.xzb4rxbfbg5un7li@desk> <CALMp9eSXfJvR=PHtttbqm3q3nH436T1eH4YdpVqxQeP-cxEPsA@mail.gmail.com>
- <20260403231608.zopnhnypdclzqlx7@desk> <CALMp9eT2vJBdLPY2uBYrPgVrhS_aYmfGfdXe6MZXG_gyryLHVA@mail.gmail.com>
- <20260403233329.fb2ppifgwm3um6ny@desk> <CALMp9eTpsenqsWjzmpXLEubn9uNjgZgzgrMwtZ72HDuV_2xgfg@mail.gmail.com>
- <20260404002149.wtayv6a64vzuppgp@desk> <CALMp9eSqgL5q-MY1xpjqR5oRn5_cb=mfEhNFWusNneS=Mx8UMg@mail.gmail.com>
- <20260404034954.t7iapenzvhdpagxp@desk>
-In-Reply-To: <20260404034954.t7iapenzvhdpagxp@desk>
-From: Jim Mattson <jmattson@google.com>
-Date: Mon, 6 Apr 2026 07:23:25 -0700
-X-Gm-Features: AQROBzBKIPcP_H1GwuJoXUrRRJVPGk443GCqm_WEh0Cd97H-YqzPVn5MR8nDNUU
-Message-ID: <CALMp9eR70eE2U63gzNzTiic0PqJVGv3CBBuVUOVbi3nqbWKZkQ@mail.gmail.com>
-Subject: Re: [PATCH v9 02/10] x86/bhi: Make clear_bhb_loop() effective on
- newer CPUs
-To: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-Cc: x86@kernel.org, Jon Kohler <jon@nutanix.com>, Nikolay Borisov <nik.borisov@suse.com>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Josh Poimboeuf <jpoimboe@kernel.org>, David Kaplan <david.kaplan@amd.com>, 
-	Sean Christopherson <seanjc@google.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, KP Singh <kpsingh@kernel.org>, Jiri Olsa <jolsa@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, David Laight <david.laight.linux@gmail.com>, 
-	Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	David Ahern <dsahern@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Asit Mallick <asit.k.mallick@intel.com>, Tao Zhang <tao1.zhang@intel.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org, chao.gao@intel.com
+References: <20260405154816.4774-1-devnexen@gmail.com> <268a9951-c1a6-4b24-8578-0a8bf4b957a3@kernel.org>
+In-Reply-To: <268a9951-c1a6-4b24-8578-0a8bf4b957a3@kernel.org>
+From: David CARLIER <devnexen@gmail.com>
+Date: Mon, 6 Apr 2026 15:28:42 +0100
+X-Gm-Features: AQROBzCw7pv9Q_nhcb2cp7aOThL8Ubn1v1x8P2vXHbgAOxV1wipCcpu51-53q2E
+Message-ID: <CA+XhMqxNzaXZRd0co=_gaJsN4zS9L_4OVqhC174EPxA-pzEUgA@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next] net: use get_random_u{16,32,64}() where appropriate
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, 
+	Ilya Dryomov <idryomov@gmail.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+	Aaron Conole <aconole@redhat.com>, Ilya Maximets <i.maximets@ovn.org>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
+	Jon Maloy <jmaloy@redhat.com>, netdev@vger.kernel.org, ceph-devel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, mptcp@lists.linux.dev, dev@openvswitch.org, 
+	linux-sctp@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275611-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275612-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[39];
-	FREEMAIL_CC(0.00)[kernel.org,nutanix.com,suse.com,zytor.com,amd.com,google.com,alien8.de,linux.intel.com,infradead.org,iogearbox.net,davemloft.net,gmail.com,redhat.com,linux.dev,fomichev.me,lwn.net,vger.kernel.org,intel.com];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,gmail.com,sipsolutions.net,ovn.org,vger.kernel.org,lists.linux.dev,openvswitch.org,lists.sourceforge.net];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jmattson@google.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[google.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[devnexen@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,intel.com:email]
-X-Rspamd-Queue-Id: 3C6F53A421C
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 4F46B3A40EA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 3, 2026 at 8:50=E2=80=AFPM Pawan Gupta
-<pawan.kumar.gupta@linux.intel.com> wrote:
+Hi Mathieu yes this is indeed a valid point, will address is for next
+time. Cheers
+
+On Mon, 6 Apr 2026 at 15:13, Matthieu Baerts <matttbe@kernel.org> wrote:
 >
-> On Fri, Apr 03, 2026 at 07:21:02PM -0700, Jim Mattson wrote:
-> > On Fri, Apr 3, 2026 at 5:22=E2=80=AFPM Pawan Gupta
-> > <pawan.kumar.gupta@linux.intel.com> wrote:
-> > >
-> > > On Fri, Apr 03, 2026 at 04:39:54PM -0700, Jim Mattson wrote:
-> > > > > Since cloud providers have greater control over userspace, the de=
-cision to
-> > > > > use BHI_DIS_S or not can be left to them. KVM would simply follow=
- what it
-> > > > > is asked to do by the userspace.
-> > > >
-> > > > I feel like we've gone over this before, but if userspace tells KVM
-> > > > not to enable BHI_DIS_S, how do we inform Windows that it needs to =
-do
-> > > > the longer clearing sequence, despite the fact that the virtual CPU=
- is
-> > > > masquerading as Ice Lake?
-> > >
-> > > IMO, if an OS is allergic to a hardware mitigation, and is also aware=
- that
-> > > it is virtualized, it should default to a sw mitigation that works ev=
-erywhere.
-> >
-> > Agreed. So, without any information to the contrary, VMs should assume
-> > the long BHB clearing sequence is required.
-> >
-> > Returning to my earlier comment, the test should be:
-> >
-> > +       if (cpu_feature_enabled(X86_FEATURE_BHI_CTRL) ||
-> > cpu_feature_enabled(X86_FEATURE_HYPERVISOR)) {
-> > +               bhb_seq_outer_loop =3D 12;
-> > +               bhb_seq_inner_loop =3D 7;
-> > +       }
+> Hi David,
 >
-> To be clear, my comment was for an OS that doesn't want BHI_DIS_S
-> under-the-hood with virtual-SPEC_CTRL. Linux doesn't have that problem,
-> hardware mitigation on Linux is perfectly okay.
-
-Today, BHI_DIS_S under-the-hood isn't offered. If the hypervisor
-doesn't offer the paravirtual mitigation MSRs, the guest must assume
-that the hypervisor will not set BHI_DIS_S on its behalf.
-
-> Without virtual-SPEC_CTRL, the problem set is limited to guests that
-> migrate accross Alder Lake generation CPUs. As you mentioned the change i=
-n
-> MAXPHYADDR makes it unlikely.
-
-I have been unable to make a compelling argument for not crossing this
-boundary. The only applications I can point to that are broken by the
-missing reserved bits are (nested) hypervisors using shadow-paging.
-Since both nVMX and nSVM support TDP, the niche cache isn't a concern.
-There are compelling business reasons to support seamless migration
-from pre-Alder Lake to post-Alder Lake. If you know of any other
-applications that will fail with a mis-emulated smaller MAXPHYADDR,
-please let me know.
-
-> With virtual-SPEC_CTRL support, guests that fall into the subset that
-> migrate inspite of MAXPHYADDR change would also be mitigated. Then, on to=
-p
-> of hardware mitigation, deploying the long sequence in the guest would
-> incur a significant performance penalty for no good reason.
-
-Yes, but the guest needs a way to determine whether the hypervisor
-will do what's necessary to make the short sequence effective. And, in
-particular, no KVM hypervisor today is prepared to do that.
-
-When running under a hypervisor, without BHI_CTRL and without any
-evidence to the contrary, the guest must assume that the longer
-sequence is necessary. At the very least, we need a CPUID or MSR bit
-that says, "the short BHB clearing sequence is adequate for this
-vCPU."
+> On 05/04/2026 17:48, David Carlier wrote:
+> > Use the typed random integer helpers instead of
+> > get_random_bytes() when filling a single integer variable.
+> > The helpers return the value directly, require no pointer
+> > or size argument, and better express intent.
+>
+> Regarding the modifications in net/mptcp, it looks good to me:
+>
+> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org> # net/mptcp
+>
+> > Skipped sites writing into __be16 fields (netdevsim) where
+> > a direct assignment would trigger sparse endianness warnings.
+>
+> Note that the AI reviews are mentioning that auth->client_challenge from
+> net/ceph/auth_x.c is declared as __le64, and it might then also cause
+> sparse warnings:
+>
+>   https://sashiko.dev/#/patchset/20260405154816.4774-1-devnexen%40gmail.com
+>
+>
+> It looks like they are right:
+>
+>   $ make C=1 net/ceph/auth_x.o
+>   net/ceph/auth_x.c:574:40: warning: incorrect type in assignment (different base types)
+>   net/ceph/auth_x.c:574:40:    expected restricted __le64 [usertype] client_challenge
+>   net/ceph/auth_x.c:574:40:    got unsigned long long
+>
+>
+> Note that the Netdev CI currently doesn't check sparse warnings:
+>
+>   https://github.com/linux-netdev/nipa/issues/76
+>
+> Cheers,
+> Matt
+> --
+> Sponsored by the NGI0 Core fund.
+>
 
