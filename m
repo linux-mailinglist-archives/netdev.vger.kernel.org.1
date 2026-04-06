@@ -1,343 +1,163 @@
-Return-Path: <netdev+bounces-275721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275723-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MLgaIOIR1GmEqgcAu9opvQ
-	(envelope-from <netdev+bounces-275721-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 22:04:50 +0200
+	id KIzZDd0T1GksqwcAu9opvQ
+	(envelope-from <netdev+bounces-275723-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 22:13:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23FEC3A6DC3
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 22:04:49 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1E363A6E66
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 22:13:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 55E503006B61
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 20:04:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BAE103041781
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 20:12:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E6039A7F9;
-	Mon,  6 Apr 2026 20:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB0239C00E;
+	Mon,  6 Apr 2026 20:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=doyensec.com header.i=@doyensec.com header.b="Rm5zPFW1"
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="AVtQyzF1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6FB039A060
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 20:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4DF839B483
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 20:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775505885; cv=none; b=HD16XuQz7o9v64WYIfVDUNJROi+p3sRN5GaBb3r3ecdlzsZRfs19RkbmEm4PaBBDfU/KEdvnGm6p3dPNFhWzN8J11EbUajgZtCXUKRYFZw5mwmsQwNx8aDDSQoacXUlv8AfwTGRxCRC5TWrV4xHwTqTks8iXavm8JAWYckQpsmk=
+	t=1775506359; cv=none; b=BsMitJeukE2CV1Jsy3stcIwtj+K+hpFgeVG2C7hgm5QsBDAP+0fVMzTp1Dz9MaGbtYKniF1zmLWOlLvH77M+h10kEcjfCxN44XXlrgT9vC9UIZ7cvPTyqhVcBGGkXfiDHgIsxi1kb5RCYzx2dLLLVw0wxe+dhs+VU3b8JGBOh0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775505885; c=relaxed/simple;
-	bh=BVBjRU8R+cBS4ShnNkWw2geTEpx0uy5I1ASSk5q7N0Q=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=ZHB5LdCau86B/faCNR0k9pTPFxJA3gISaZhx1yAkCa7myyuHuT2kbjgx6xzxFqEJoRAQY4QEmVXPrVTGIdsVf1QdcOX6ENLlHW2Cm4eUTkEl4MsV9Z4PsgkwxpGWeZINM+rQ/MduXh8UfP30htPhZVFdH7GiuEXaZy4VQNHGArc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=doyensec.com; spf=pass smtp.mailfrom=doyensec.com; dkim=pass (2048-bit key) header.d=doyensec.com header.i=@doyensec.com header.b=Rm5zPFW1; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=doyensec.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=doyensec.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b9358bc9c50so608594466b.1
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 13:04:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=doyensec.com; s=google; t=1775505879; x=1776110679; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B9PRdhuyqvsBKCnvXw6TdIqodY8RtCaLeWXlPrboPE4=;
-        b=Rm5zPFW1N3wjm+LIHnpf1YFOgtdJ79iHQko0Oi7x4raXhqsj42qzC+I9ddYTVYxOGe
-         sIgUlBYBFuwQkKTtCELYXU/T4byWoVqCibYRQEUeXQrjsPMAlyrrUQaC9G0GFt6rtG3Q
-         5cxGBrFwRE8xo7DeZ/8Kp+tqxpu6i7h+xQokVzsDKdhsBI0oyXMQUxwdfJ0WniPnFDgX
-         ZByArLtn4ofTCx8OMQ0bzvNRq5+p10lB74JQx5+r3plM59hBFy/9hZBjMqMYMfWRGbm/
-         4I34FYuyxBFftPHZFiBad8O7kCNicO3djN4vteKg97wAlc4jgLpVvQjaZpqGETxlln1M
-         3u/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775505879; x=1776110679;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B9PRdhuyqvsBKCnvXw6TdIqodY8RtCaLeWXlPrboPE4=;
-        b=WkFLKIgOCH+oyCeeKYcXjmnEiR9T+zMEUNPAgrvR2SDq2g+yq7GPS6GJdP/nv3EfHL
-         5Ydjw2uL87Y/cSILFvirGTBE8FJ3l4ucDkIpXG3nL+3F+SBR3i+RAlLDm6J/FpC6z0Ic
-         8Pqy4lClLFLOrwT41Q15Wtf7rO5OMXGUjUnhZYJiZBj/tdNHQc8RBg7OFtI7LmxYdCr3
-         QNKk2ljOKqeCQf+UeZ/gok6+X51qAHop0pG4cfutyF79l5dd8n2GHvWWGHUCazbPyPhA
-         YE1eLKINLa6focKnRAFFrPaJEXExFDaVb9fhOAhI/A3ELb5HFxiMTleTqhk1pDy+TnL/
-         ranA==
-X-Forwarded-Encrypted: i=1; AJvYcCUcaZluYih980gDALzDTbYZfhteF6RnTBFHf8i17K9/57Ont8YIPtgt/O1dncT3OhOXXc/z6lw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLGBn6bgUzcjLR9InLtfEnf2Ria5tiEosE1Qx57v7sh+m3Izkc
-	PguilBfd4jBl8NLvb4ijvhTUlxs9XwyMTTq7Yb9W4dtD9uOvqU2F5Kyz3tNkocKh3MY=
-X-Gm-Gg: AeBDievmbK5WPDbg1TC57wop+cwCQaR0B6bLZ22J/OwtHReuvWZalX518lePSALpjtM
-	1l2Ez/K5dOsWDeAi5P18hNy+O8LznjKyPiTM1pz1lVCn4+7W5M/YYMC+La6WTj2ItbgcaKRDV3U
-	e1bavXIH84wxJStQsyV1zmx51kZe9qMETkQAM/WDTw9rY04ewHsFOyBqqUZWli25u8CLSRth6xL
-	5tL8a4xxp+AjrlsDmy0bDvtyT+9Pc6Yqg1WRnSD4eEaxQ4MK+X7hpAc7tkHDK285hME3BmIEirE
-	OToZFTIUzmqiUSIXOVnouzAXoS+fq5NWzFtm3M4vWf2f2lhvbBsSj2Bhfs47JjtvXCxVYJJkMQ6
-	amJGxqzbTr2rr/0oSmAQ/xo1H82mMMxMsYLzWHUKyeeehMjEXinxxNHLZ4G6xWu8C73ziOSKapN
-	v7b9R//JnZEM03A5JBoxWXQXPRb6NLXR/stXOnyaOsXiBYeCFeDnBuibSsoh5dA3aQ25BqTZBRb
-	d0R
-X-Received: by 2002:a17:907:bac1:b0:b97:1d24:bfd1 with SMTP id a640c23a62f3a-b9c672fd90fmr578171566b.13.1775505879255;
-        Mon, 06 Apr 2026 13:04:39 -0700 (PDT)
-Received: from smtpclient.apple (83.10.27.44.ipv4.supernova.orange.pl. [83.10.27.44])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9c3c9721absm497776766b.6.2026.04.06.13.04.38
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 06 Apr 2026 13:04:38 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
+	s=arc-20240116; t=1775506359; c=relaxed/simple;
+	bh=ZnMbW+fpziZ0PZEKOCb/J5C/wBCYI4iMWttnZ2VNn6Y=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Wzbfo2xWDz7fubVASqQwpP1Gyw6fuKMHuIzYRuC5SZ85gaXtqb5ZDieRHN/IH/or7z9a7KSnrZzXMdFq4OzAyvXd5NX7aApIlR7R+zMoG9z13OLJZHQGkVXgBIcf61SWgIwosqhU6rMO57Ttyv6wCnGza9ATsUYCSOcmCvSLvVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=AVtQyzF1; arc=none smtp.client-ip=212.77.101.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+Received: (wp-smtpd smtp.wp.pl 12536 invoked from network); 6 Apr 2026 22:12:24 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
+          t=1775506344; bh=BXbXy27fWuQinBpsk4sHIC8WyW47CIYRu1WCEgKQhb8=;
+          h=From:To:Subject;
+          b=AVtQyzF13Usmjo3UnXNQMacG1ZfPjgTYppsYQnP3d4zWCMO05IsaHhtE10r0hShKx
+           EV5hjMp91aXBBfngH0wKFmvQGtECgV/A1Ygo7jHsZGKflbB4TpGnjBp5f8ijwXkoyI
+           U9NtqEMgmbqzpK6tLHqaP5Ph3yXyvQ7OR+TLUj0TaS3cDKybCSTi+vGbiVIG+Cr2yt
+           sqy/UwLARzqyUHExsocsV68qS9AJDjb/6vM6ICnBOFIrMIn68HS+Jn+TDeGR4QQvJE
+           Q/fso1UcjWQVMsd112m5UpjyPowx6bNmX5qWV+eQ0oHC8J55QYAw5QUxGT9dx0vKTF
+           GOTKTkaYuAYSg==
+Received: from 83.5.158.210.ipv4.supernova.orange.pl (HELO abajkowski.lan) (olek2@wp.pl@[83.5.158.210])
+          (envelope-sender <olek2@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
+          for <andrew@lunn.ch>; 6 Apr 2026 22:12:24 +0200
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	daniel@makrotopia.org,
+	vladimir.oltean@nxp.com,
+	michael@fossekall.de,
+	olek2@wp.pl,
+	markus.stockhausen@gmx.de,
+	ih@simonwunderlich.de,
+	rmk+kernel@armlinux.org.uk,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: phy: realtek: get rid of magic numbers in rtl8201_config_intr()
+Date: Mon,  6 Apr 2026 22:12:12 +0200
+Message-ID: <20260406201222.1043396-1-olek2@wp.pl>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.4\))
-Subject: [PATCH v2 net] vsock: fix buffer size clamping order
-From: Norbert Szetei <norbert@doyensec.com>
-In-Reply-To: <102981F1-2CAE-481F-8FAE-4F3085E25E89@doyensec.com>
-Date: Mon, 6 Apr 2026 22:04:26 +0200
-Cc: davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- pabeni@redhat.com,
- horms@kernel.org,
- virtualization@lists.linux.dev,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- John Villamil <john@doyensec.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <69317E49-40AA-4985-8A4E-447C58665A68@doyensec.com>
-References: <523A8D3C-F4D9-43DD-A3A6-01C9EC335656@doyensec.com>
- <acuKUpZQq6z1DY_n@sgarzare-redhat>
- <102981F1-2CAE-481F-8FAE-4F3085E25E89@doyensec.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-X-Mailer: Apple Mail (2.3826.700.81.1.4)
-X-Spamd-Result: default: False [-1.66 / 15.00];
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-WP-MailID: edd355c385dd0e7defdfdf90cf7b64d6
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 0000000 [MRMN]                               
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[doyensec.com,none];
-	R_DKIM_ALLOW(-0.20)[doyensec.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[wp.pl,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[wp.pl:s=20241105];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[doyensec.com:+];
-	TAGGED_FROM(0.00)[bounces-275721-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_TO(0.00)[lunn.ch,gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,makrotopia.org,nxp.com,fossekall.de,wp.pl,gmx.de,simonwunderlich.de,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275723-lists,netdev=lfdr.de];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[wp.pl];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[norbert@doyensec.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 23FEC3A6DC3
+	FROM_NEQ_ENVFROM(0.00)[olek2@wp.pl,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[wp.pl:+];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,kernel];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[wp.pl:dkim,wp.pl:email,wp.pl:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A1E363A6E66
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+Replace the magic numbers with defines. Register names were obtained from
+publicly available documentation[1]. This should make it clear what's going
+on in the code.
 
-v2: fix indentation/whitespace issues in the previous patch.
-
--- >8 --
-=46rom f5d160167c862c7f2ad6e6a1d4181d01997b683a Mon Sep 17 00:00:00 2001
-From: Norbert Szetei <norbert@doyensec.com>
-Date: Mon, 6 Apr 2026 19:52:52 +0200
-Subject: [PATCH] vsock: fix buffer size clamping order
-
-In vsock_update_buffer_size(), the buffer size was being clamped to the
-maximum first, and then to the minimum. If a user sets a minimum buffer
-size larger than the maximum, the minimum check overrides the maximum
-check, inverting the constraint.
-
-This breaks the intended socket memory boundaries by allowing the
-vsk->buffer_size to grow beyond the configured vsk->buffer_max_size.
-
-Fix this by checking the minimum first, and then the maximum. This
-ensures the buffer size never exceeds the buffer_max_size.
-
-Signed-off-by: Norbert Szetei <norbert@doyensec.com>
+1. RTL8201F/RTL8201FL/RTL8201FN Rev. 1.4 Datasheet
+Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
 ---
- net/vmw_vsock/af_vsock.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/phy/realtek/realtek_main.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index d912ed2f012a..08f4dfb9782c 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -1951,12 +1951,12 @@ static void vsock_update_buffer_size(struct =
-vsock_sock *vsk,
- 				     const struct vsock_transport =
-*transport,
- 				     u64 val)
- {
--	if (val > vsk->buffer_max_size)
--		val =3D vsk->buffer_max_size;
--
- 	if (val < vsk->buffer_min_size)
- 		val =3D vsk->buffer_min_size;
-=20
-+	if (val > vsk->buffer_max_size)
-+		val =3D vsk->buffer_max_size;
-+
- 	if (val !=3D vsk->buffer_size &&
- 	    transport && transport->notify_buffer_size)
- 		transport->notify_buffer_size(vsk, &val);
---=20
-2.53.0
-
-
-> On Apr 6, 2026, at 20:41, Norbert Szetei <norbert@doyensec.com> wrote:
->=20
-> Hi Stefano,
->=20
-> I like option 1 the most, as it is the most straightforward way to fix
-> the issue. I am including the patch below. This fixes the clamping
-> mismatch, but as you pointed out, it won't solve the root problem
-> regarding the issue to arbitrarily set a maximum buffer value.
->=20
-> Since VSOCK uses a unified buffer size rather than separating read and
-> write buffers like the core stack, introducing a vsock-specific sysctl
-> (e.g., net.vmw_vsock.buffer_max_size) seems the cleanest approach to =
-me.
-> I was also considering net.core.wmem_max/rmem_max, but mapping to =
-those
-> feels less natural.
->=20
-> If you agree with the vsock-specific sysctl, or have a different
-> suggestion, let me know and I will send a follow-up patch for that.
-> Thanks.
->=20
-> Best, Norbert
->=20
-> -- >8 --
-> =46rom f5d160167c862c7f2ad6e6a1d4181d01997b683a Mon Sep 17 00:00:00 =
-2001
-> From: Norbert Szetei <norbert@doyensec.com>
-> Date: Mon, 6 Apr 2026 19:52:52 +0200
-> Subject: [PATCH] vsock: fix buffer size clamping order
->=20
-> In vsock_update_buffer_size(), the buffer size was being clamped to =
-the
-> maximum first, and then to the minimum. If a user sets a minimum =
-buffer
-> size larger than the maximum, the minimum check overrides the maximum
-> check, inverting the constraint.
->=20
-> This breaks the intended socket memory boundaries by allowing the
-> vsk->buffer_size to grow beyond the configured vsk->buffer_max_size.
->=20
-> Fix this by checking the minimum first, and then the maximum. This
-> ensures the buffer size never exceeds the buffer_max_size.
->=20
-> Signed-off-by: Norbert Szetei <norbert@doyensec.com>
-> ---
-> net/vmw_vsock/af_vsock.c | 6 +++---
-> 1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> index d912ed2f012a..08f4dfb9782c 100644
-> --- a/net/vmw_vsock/af_vsock.c
-> +++ b/net/vmw_vsock/af_vsock.c
-> @@ -1951,12 +1951,12 @@ static void vsock_update_buffer_size(struct =
-vsock_sock *vsk,
->     const struct vsock_transport *transport,
->     u64 val)
-> {
-> - if (val > vsk->buffer_max_size)
-> - val =3D vsk->buffer_max_size;
-> -
->  if (val < vsk->buffer_min_size)
->  val =3D vsk->buffer_min_size;
-> + if (val > vsk->buffer_max_size)
-> + val =3D vsk->buffer_max_size;
-> +
->  if (val !=3D vsk->buffer_size &&
->    transport && transport->notify_buffer_size)
->  transport->notify_buffer_size(vsk, &val);
-> --=20
-> 2.53.0
->=20
->> On Mar 31, 2026, at 14:37, Stefano Garzarella <sgarzare@redhat.com> =
-wrote:
->>=20
->> On Tue, Mar 24, 2026 at 06:28:12PM +0100, Norbert Szetei wrote:
->>> Hello,
->>>=20
->>> we have discovered a bug in AF_VSOCK where an unprivileged user can =
-bypass socket
->>> memory constraints. This leads to refcount_t saturation and OOM. =
-While
->>> refcount_t prevents a true UAF by saturating, the resulting state =
-triggers
->>> kernel warnings and kernel panic, depending on the setup.
->>>=20
->>> In vsock_connectible_setsockopt(), the SO_VM_SOCKETS_BUFFER_MIN_SIZE =
-and
->>> SO_VM_SOCKETS_BUFFER_MAX_SIZE options are used to update the =
-buffer's minimum
->>> and maximum values independently.
->>>=20
->>> The vsock_update_buffer_size() function clamps the buffer size to =
-the maximum
->>> first, then the minimum:
->>>=20
->>> // =
-https://github.com/torvalds/linux/blob/c369299895a591d96745d6492d4888259b0=
-04a9e/net/vmw_vsock/af_vsock.c#L1950
->>> if (val > vsk->buffer_max_size)
->>> val =3D vsk->buffer_max_size;
->>>=20
->>> if (val < vsk->buffer_min_size)
->>> val =3D vsk->buffer_min_size;
->>>=20
->>> vsk->buffer_size =3D val;
->>>=20
->>> By setting buffer_min_size to a large value, the second clamp =
-overrides the
->>> first, forcing vsk->buffer_size to exceed the intended maximum. The =
-transport
->>> layer then uses this value, allowing unbounded SKB allocation that =
-saturates the
->>> 32-bit sk_wmem_alloc refcount.
->>>=20
->>> The fix should ensure that SO_VM_SOCKETS_BUFFER_MIN_SIZE cannot be =
-used to set a
->>> value higher than the current buffer_max_size. Conversely,
->>> SO_VM_SOCKETS_BUFFER_MAX_SIZE should not be allowed to be set lower =
-than the
->>> current buffer_min_size.
->>=20
->> Okay, but that wouldn't change much. As long as the user sets the =
-maximum to match the minimum you set in the POC, it behaves exactly the =
-same way, right?
->>=20
->> Maybe we should add a sysctl to set a global upper bound, but this is =
-another problem, I agree that we should improve the kernel behavior =
-around min/max.  I see 3 options:
->>=20
->> 1. Just invert the checks, fist check for min, then for max.
->>=20
->> 2. Simply adjust the min and max values so that they make sense. For =
-example, if the minimum value being set is greater than the maximum, the =
-kernel could adjust the maximum to the same value. However, this would =
-not change the behavior of your POC.
->>=20
->> 3. Force the minimum to be less than or equal to the maximum. This, =
-however, would require a certain order when setting the minimum and =
-maximum, especially relative to the default. For example, if you =
-increase the minimum beyond the default maximum, you must adjust the =
-maximum first; conversely, if you want to set the maximum below the =
-default minimum, you must adjust the minimum first.
->>=20
->> I'm more into 1 or 2. 3 IMO is too much.
->>=20
->> Do you want to send a patch?
->>=20
->> Thanks,
->> Stefano
->=20
->=20
+diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+index 75565fbdbf6d..e78f3b9e89db 100644
+--- a/drivers/net/phy/realtek/realtek_main.c
++++ b/drivers/net/phy/realtek/realtek_main.c
+@@ -22,7 +22,14 @@
+ #include "../phylib.h"
+ #include "realtek.h"
+ 
++#define RTL8201F_IER_PAGE			0x07
+ #define RTL8201F_IER				0x13
++#define RTL8201F_IER_LINK			BIT(13)
++#define RTL8201F_IER_DUPLEX			BIT(12)
++#define RTL8201F_IER_ANERR			BIT(11)
++#define RTL8201F_IER_MASK			(RTL8201F_IER_ANERR | \
++						 RTL8201F_IER_DUPLEX | \
++						 RTL8201F_IER_LINK)
+ 
+ #define RTL8201F_ISR				0x1e
+ #define RTL8201F_ISR_ANERR			BIT(15)
+@@ -346,11 +353,13 @@ static int rtl8201_config_intr(struct phy_device *phydev)
+ 		if (err)
+ 			return err;
+ 
+-		val = BIT(13) | BIT(12) | BIT(11);
+-		err = phy_write_paged(phydev, 0x7, RTL8201F_IER, val);
++		val = RTL8201F_IER_MASK;
++		err = phy_write_paged(phydev, RTL8201F_IER_PAGE,
++				      RTL8201F_IER, val);
+ 	} else {
+ 		val = 0;
+-		err = phy_write_paged(phydev, 0x7, RTL8201F_IER, val);
++		err = phy_write_paged(phydev, RTL8201F_IER_PAGE,
++				      RTL8201F_IER, val);
+ 		if (err)
+ 			return err;
+ 
+-- 
+2.51.0
 
 
