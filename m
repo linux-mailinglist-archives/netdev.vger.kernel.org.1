@@ -1,161 +1,157 @@
-Return-Path: <netdev+bounces-275575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275576-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KPF8Mkyc02mrjgcAu9opvQ
-	(envelope-from <netdev+bounces-275575-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:43:08 +0200
+	id 2KZmGpOc02mrjgcAu9opvQ
+	(envelope-from <netdev+bounces-275576-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:44:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BC583A31FB
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:43:08 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C255A3A3214
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:44:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5521A3013B48
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 11:43:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 30713300EAAD
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 11:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F417332614;
-	Mon,  6 Apr 2026 11:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B593195FC;
+	Mon,  6 Apr 2026 11:44:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uEwkjpkg"
+	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="ZDUb8o7V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0186C153BE9;
-	Mon,  6 Apr 2026 11:42:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D392DB788
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 11:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775475780; cv=none; b=h8Te5bBtV4QVR23KndBXyQc0os1Eu9f+uID/pnk61A/plrunhAn5/OmUSvPKVSrpajOThIz9pxPo/QINEdS1XLutZC2eMDeHgiIWENvZ6eb6Zt7MN76SIyxk+snwTP6VVSJ7Q2kw/1NL8nrriNEUW4pCZsJ6Ux3ta0JVgqA/rSA=
+	t=1775475856; cv=none; b=Tg1RJByhJSNnjb6jyR6nVmDxArnRfNKgDh1Tp9dMFbwJMRLPgmysKk2da2Y6Zr3M2EbQpx1/RvQY24A3OOlVZL8V1aTJneX738nMpg5egXGxJtWx1WEqrU3pBpKTaiX6ptaE8xMKxryexZVmvnbCZxdg8BEiXNSYezOrqdhPA5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775475780; c=relaxed/simple;
-	bh=FGRHUXyR+0IYeCGEAzCaangJ4UIXGFGgJFbwE4z892Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pnQsDCXTavBN/Tm/+F1kKE3/t+DkL3UIbDbmTic164eCWznorYRbpGG9m+b3XOHlku2Fgi19+clKxZUrVjXvq3KW139xV+VhGOC7wCEiv4yVUH784xxVwecqzo6R6/q35T6aBnyXIROTjQXIY7RJYnXcNjblX5LVrskjKspJzR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uEwkjpkg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 716F7C4CEF7;
-	Mon,  6 Apr 2026 11:42:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775475779;
-	bh=FGRHUXyR+0IYeCGEAzCaangJ4UIXGFGgJFbwE4z892Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uEwkjpkgZJJUgzLAMipZqb7S3m6PFvmEe1MRqsi12pNbrWPbTPr+/ozV0WB4e3kwc
-	 wUFFUuEvlco8X0oM3WIbq9yPqBJEUoDRTdYVLYUFB2rLHKjh8gNzdqJKD/ZZA+/iG9
-	 1xttCsrneXaxcIrBL9n1jqQndgGGSU6R9UiOuHMqxrC6g8cjPDhBpYAasm+A5RKcHR
-	 nV9r4Cclk4K062pas6X6TeGAxUgQ9hdOz1Jzos5uBp1OPKQb3IZujuUKw/GO3+cLck
-	 va/Idz0NKezYCEsD/GzpcK2QssI9WrYqRPMFymOo9jE/73sGxbCzQuYHAdNKM1hmip
-	 dP8d3gB/fbK0A==
-Date: Mon, 6 Apr 2026 17:12:42 +0530
-From: Sumit Garg <sumit.garg@kernel.org>
-To: Jorge Ramirez <jorge.ramirez@oss.qualcomm.com>,
-	vikash.garodia@oss.qualcomm.com
-Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
-	linux-media@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
-	linux-remoteproc@vger.kernel.org, andersson@kernel.org,
-	konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
-	akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
-	jesszhan0024@gmail.com, marijn.suijten@somainline.org,
-	airlied@gmail.com, simona@ffwll.ch,
-	dikshita.agarwal@oss.qualcomm.com, bod@kernel.org,
-	mchehab@kernel.org, elder@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, jjohnson@kernel.org, mathieu.poirier@linaro.org,
-	trilokkumar.soni@oss.qualcomm.com, mukesh.ojha@oss.qualcomm.com,
-	pavan.kondeti@oss.qualcomm.com, tonyh@qti.qualcomm.com,
-	vignesh.viswanathan@oss.qualcomm.com,
-	srinivas.kandagatla@oss.qualcomm.com,
-	amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
-	op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
-	skare@qti.qualcomm.com, harshal.dev@oss.qualcomm.com,
+	s=arc-20240116; t=1775475856; c=relaxed/simple;
+	bh=WhpS/KP8N+h++LNKoLk4eu5ll51D156G/Un8Kyiwxkk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e2coJAc/4Da+BhZu5uDEi7PFlPUdFl+vLVWoMEFMIjmMhLWUgjsvwacMyyNqWFRQjnBY+AR7bI/9JKbq9iDhE6MY/oXNBgQPyRU80QfIm/zgo44nsFM9H7sesnzDdDiCvdhpuSjsqtXZ3sNhpblUCFn7X6PiZ4jV/W3qiBZ/jmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=ZDUb8o7V; arc=none smtp.client-ip=185.67.36.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout01.posteo.de (Postfix) with ESMTPS id 01173240029
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 13:44:05 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.net; s=2017;
+	t=1775475846; bh=LZtkpNfc7eXlrOjhYAu2H3N8qUxWCwLGFLDfIsl33OA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:From;
+	b=ZDUb8o7VDCq3kVPBPZJ/odFr9LcPjwKYrRYdPmfDawDboWktu2VV+X3iIeBeE1xO5
+	 9SXHqGCZ8wL98crCjQVCFWUoZYDZsWaD1x+6DfIp56+/4/KC/W7K3Pv9/zAR7Qu6Ej
+	 F8OpF2tW6hwiPaj5PBn+f+SnHgrXO346FQ3y4fiRhekkxdr35rVBVLKUek+ZZSCefl
+	 bt/DTYNySVkD/Cyh6Upk/hvGDGFHDrydJolBp28m0M/cJEQJtIZv1cc8kglzZiVN9V
+	 TnU4xtqWOs0LtDL40C/yyt5sxFgK7lt1USBsEwZeg7M611u/W+1BRuwckTDas35AVv
+	 cLzJ1kbZkRhog==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4fq6tC26qYz6tw1;
+	Mon,  6 Apr 2026 13:44:03 +0200 (CEST)
+From: John Pavlick <jspavlick@posteo.net>
+To: linux@armlinux.org.uk
+Cc: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>
-Subject: Re: [PATCH v3 11/15] media: qcom: Switch to generic PAS TZ APIs
-Message-ID: <adOcMsk8a_Clb4WZ@sumit-xelite>
-References: <20260327131043.627120-1-sumit.garg@kernel.org>
- <20260327131043.627120-12-sumit.garg@kernel.org>
- <ac-KQ7e8-syph1Zl@trex>
+	John Pavlick <jspavlick@posteo.net>
+Subject: [PATCH] net: sfp: add quirks for GPON ONT SFP sticks
+Date: Mon, 06 Apr 2026 11:44:05 +0000
+Message-ID: <20260406114352.69168-1-jspavlick@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ac-KQ7e8-syph1Zl@trex>
-X-Spamd-Result: default: False [-0.16 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[posteo.net,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[posteo.net:s=2017];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275575-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
-	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-275576-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,posteo.net];
+	RCVD_TLS_LAST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jspavlick@posteo.net,netdev@vger.kernel.org];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[posteo.net:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[50];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sumit.garg@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[qualcomm.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8BC583A31FB
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,posteo.net:dkim,posteo.net:email,posteo.net:mid]
+X-Rspamd-Queue-Id: C255A3A3214
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Jorge,
+Several GPON ONT SFP sticks based on Realtek RTL960x report
+1000BASE-LX at 1300MBd in their EEPROM but can operate at 2500base-X.
+On hosts with serdes fixed at 2.5Gbase-X (e.g. Banana Pi R3 / MT7986),
+the kernel rejects them with 'no common interface modes'.
 
-On Fri, Apr 03, 2026 at 11:37:07AM +0200, Jorge Ramirez wrote:
-> On 27/03/26 18:40:39, Sumit Garg wrote:
-> > From: Sumit Garg <sumit.garg@oss.qualcomm.com>
-> > 
-> > Switch qcom media client drivers over to generic PAS TZ APIs. Generic PAS
-> > TZ service allows to support multiple TZ implementation backends like QTEE
-> > based SCM PAS service, OP-TEE based PAS service and any further future TZ
-> > backend service.
-> 
-> OP-TEE based PAS service relies on the linux driver to configure the
-> iommu (just as it is done on the no_tz case). This generic patch does
-> not cover that requirement.
+Add quirks for:
+- Hisense-Leox LXT-010S-H
+- Hisense ZNID-GPON-2311NA
+- HSGQ HSGQ-XPON-Stick
 
-That's exactly the reason why the kodiak EL2 dtso disables venus by
-default in patch #1 due to missing IOMMU configuration.
+Each quirk advertises 2500base-X and ignores TX_FAULT during the
+module's ~40s Linux boot time.
 
-> 
-> Because of that, it is probably better if the commit message doesnt
-> mention OP-TEE and instead maybe indicate that PAS wll support TEEs that
-> implement the same restrictions that QTEE (ie, iommu configuration).
+Tested on Banana Pi R3 (MT7986) with OpenWrt 25.12.1, confirmed
+2.5Gbps link and full throughput with flow offloading.
 
-The scope for this patch is to just adopt the generic PAS layer without
-affecting the client functionality.
+Signed-off-by: John Pavlick <jspavlick@posteo.net>
+---
+ drivers/net/phy/sfp.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-> 
-> I can send an RFC for OP-TEE support based on the integration work being
-> carried out here [1]
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index f1070eb0a0bb..bd970f753beb 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -543,6 +543,22 @@ static const struct sfp_quirk sfp_quirks[] = {
+ 	SFP_QUIRK("HUAWEI", "MA5671A", sfp_quirk_2500basex,
+ 		  sfp_fixup_ignore_tx_fault_and_los),
+ 
++	// Hisense LXT-010S-H is a GPON ONT SFP (sold as LEOX LXT-010S-H) that
++	// can operate at 2500base-X, but reports 1000BASE-LX / 1300MBd in its
++	// EEPROM
++	SFP_QUIRK("Hisense-Leox", "LXT-010S-H", sfp_quirk_2500basex,
++		  sfp_fixup_ignore_tx_fault),
++
++	// Hisense ZNID-GPON-2311NA can operate at 2500base-X, but reports
++	// 1000BASE-LX / 1300MBd in its EEPROM
++	SFP_QUIRK("Hisense", "ZNID-GPON-2311NA", sfp_quirk_2500basex,
++		  sfp_fixup_ignore_tx_fault),
++
++	// HSGQ HSGQ-XPON-Stick can operate at 2500base-X, but reports
++	// 1000BASE-LX / 1300MBd in its EEPROM
++	SFP_QUIRK("HSGQ", "HSGQ-XPON-Stick", sfp_quirk_2500basex,
++		  sfp_fixup_ignore_tx_fault),
++
+ 	// Lantech 8330-262D-E and 8330-265D can operate at 2500base-X, but
+ 	// incorrectly report 2500MBd NRZ in their EEPROM.
+ 	// Some 8330-265D modules have inverted LOS, while all of them report
+-- 
+2.53.0
 
-@Vikash may know better details about support for IOMMU configuration
-for venus since it's a generic functionality missing when Linux runs in
-EL2 whether it's with QTEE or OP-TEE.
-
-However, feel free to propose your work to initiate discussions again.
-
-> 
-> [1] https://github.com/OP-TEE/optee_os/pull/7721#discussion_r3016923507
-
--Sumit
 
