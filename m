@@ -1,96 +1,95 @@
-Return-Path: <netdev+bounces-275665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275666-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AOeIFznt02nInwcAu9opvQ
-	(envelope-from <netdev+bounces-275665-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:28:25 +0200
+	id yMMlHPPs02nInwcAu9opvQ
+	(envelope-from <netdev+bounces-275666-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:27:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDB463A5B06
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:28:24 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D3203A5AE9
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:27:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 08EE13021E9B
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 17:26:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3C720301A7D1
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 17:27:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E138390222;
-	Mon,  6 Apr 2026 17:26:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8571C39023B;
+	Mon,  6 Apr 2026 17:27:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="ZZUOYELl"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="Kie+xGdk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A11F38F251
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 17:26:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB7B38F63B
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 17:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775496414; cv=none; b=mSdjYGzZ2M+PsZAG3j2iEq66vCIKiz+unHlIcVQ4MMrCQWO3lzu514Nqc7zfUcOCuCVckpUyNOAiTuTS8FRTuY0oE9O9PX+/hbr9188S4UHsbhlzTaqfdH6RrAV8Gfqn3i3edESpNpyPCCXxwbB6BxQHLjGTj+5eoZMwlJi3sYA=
+	t=1775496420; cv=none; b=gnEmQElDzvmNvKa4gNN4cHMLACl40dHSId7IEDXOE/VkdJRQlZRAtt+6qE0cAhWpXusLxtCKQKTesSjbmQc1NrL10bn6RBvwqCigGSC6CJ9W9r0t+pY36OWdLfDwJNmvUystmCp+kt0OuKjB3dabH/i3f36WejcFiW3NsafM57E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775496414; c=relaxed/simple;
-	bh=fL0OfMMtDWSxHR0JJrLSv+7El8c9nsPcZEBdX0sgkzc=;
+	s=arc-20240116; t=1775496420; c=relaxed/simple;
+	bh=GLSG8FtIwLjde69qoOu6kXSyzXUvQM1EG/q+3zv/Neo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sbiHsDKeeIEz3eg4e5DP5nYCvrDqS3ZCIYEJB1JxrIvyIuwcWyFnmfANZDFF5YluPc6xxfurFj5MBu9Lx4IvrePVlY6NeIlxPYfOKDaGI6RJ9L0khVMIqoGL+sEtv8gRGU0yghEddZ0B+51xOF5sjkUFKxj3Mo1AtgrYVghVwa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=ZZUOYELl; arc=none smtp.client-ip=209.85.216.52
+	 MIME-Version:Content-Type; b=YPylzd3T9XsfhxUe0u/rcSpWTQTSMTvsgWdlNh9gO1B0KirHFvo0XHHXud9LzmLkflCHzo8W15AU8RqbXU4BOY3RpR7QrGuc7x3xzxovI3ydj8MdwF3EsafbcGdy/g0j/x9JN76evgBVLjHrTZ3Ixz/c/QtPlLn/tsraMplTFug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=Kie+xGdk; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-358ed696623so1758112a91.0
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:26:53 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2ad21f437eeso20999805ad.0
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:26:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1775496413; x=1776101213; darn=vger.kernel.org;
+        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1775496418; x=1776101218; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UsjmygR14oJm2Bm37kTyDucyaRPKWbtE7XhkLO/lfZI=;
-        b=ZZUOYELlZimddvrB8UvvH7IqvmSa6bvmlxXmPoPf2Cs8HrnmKw9CF9LCKCg9SXGwhQ
-         K206Sotpv7FgW4rkYwqkix6oozOxw7DXBaDCHE1WuDJQ5sbOYMeIbNIoNTKp70BJSxkT
-         XAg8Co3nklhSFugXEd9eVqbOAjiAq0lnG1TBxZI/dvF1CjMn5JkYmDoHJTxyS0sfNvDv
-         PS2TYKnCTN2u/7YHD2EjvCtQC0CHRk3cCrflcgsrffGaOZaZhf8kcKw0B2MI0NIPA9ib
-         N8fB9GXkrAXsA50xBdo+A9BhRyPkwwbxn3AfcI8iOPb8JvvLcPDYIZLNPYLITAIXkKna
-         18yA==
+        bh=IAt6MuY3k4AQYrmKu/CCCfGz0vUfJv+Dtwx2Q0voWRA=;
+        b=Kie+xGdkJGy2oezjhcS/ayWvRpPbnBfvWlifNXddui1kwVssGptcyvECF5zroyK7GY
+         hGBe5ZjRcLBK5xQ3QkV9gXkywS0TQWTFYVMNdwKtOpqw+UwPeiVdrNuxRlzMs48Iuvrr
+         KCz76XmTHbaKZsUti7xmLFSCh4mowzDRt5NjpkyCTDC4l1jgbB9yFYOvUfxEybO+Yktw
+         6h2hJjHbcujDnqeFQ+BvHTKi0hTXdKB3n2TRs8yOCuXeneqLsipj561sKJ18Yep+3hRa
+         NhygfIk1tqZt22GrLnAvl7EJsijsvk3EO9qPgK3l+JyNkh/+aerw1miwYzvUiqPEH0YO
+         gzMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775496413; x=1776101213;
+        d=1e100.net; s=20251104; t=1775496418; x=1776101218;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=UsjmygR14oJm2Bm37kTyDucyaRPKWbtE7XhkLO/lfZI=;
-        b=Gm8cK+nMxiT8IYVDkS+4Ksl3m9Iel0YP67t9MDt/j6Tnkya5NSKd1KRy4nCs5HexR9
-         /aOzqqhGZTH2BH+61A/4Nsxb3RNjNGE0wjoH9rGBj2nemsTBuZRsaPPXHSCqDs6GzV8P
-         zt9EOjy+koIXDP0dz+izAOQGB0KHvWbnLqCmuoPdeWalbq179xyNsnDK9RPXQXXxX7F7
-         UYResTGdv3bgZn/bGzOzMnVPw/+nRxo1VojTwOfqLaZcnUqDZEOvXjzZGX5lhUMh5F2c
-         7w1FWGEPAbQoCg6Attk3G9OhI0kO6Eb9mlkqq49Rw+ITGRQeGb7q7lgM8e9h4zGiUiM8
-         nUKA==
-X-Gm-Message-State: AOJu0Yys3rt19KVNqLzU0LEN0aALpAGLI06zoU85zv06ppG8REVMAowA
-	Qq5jdkPzuP0UIt4sEBML7FiC9CZDI3ExP6iAnMV01nanBmKZZM2X0SxdKucHSPZtjU/0SXrfbgN
-	q2S9g
-X-Gm-Gg: AeBDieutnFeUoPyM072qICaNStLY7PpnTgnWZHfzki4XvsfWL73UjlNblGsYnzQrTpG
-	MlLbjyqHiqi0NbJO/Sg3MmSommD/FU9czx20oPyt4rIT3D70qvx/ZDV4CBgpJkXwS3HTQfCdfzB
-	eDjvQopxtNIwLpSc4Pu8VnJPjVy+f+bJXGT3J7TaSUAXcrE2i0LvwlPYTbZmFE8Iwl91qt5Tfp/
-	VVcqheUtxMaypZyblvYmuqZc2H/rhEARNrmyFP17hY0ywnigEFljkDVdfWhqnoTSA3uezPaSYOS
-	aplicsjruLnHG1O4Jv5IvIBUpOO+Ki0KL7XBVTa+x6u7Hfb2+ivP8HNbaUJAbufSO4tNenio/am
-	Rdp/HFm5wF4Rrwekv0ouBq8RklKDGZulI78hUx8JoFlfTW4k9Bt5M9KmYTjThg2MYYASDCMvqCY
-	rP7EIjpOiiI7wOALUmolJqnxb5lWoPnBbr
-X-Received: by 2002:a17:903:90b:b0:2b2:6df1:111c with SMTP id d9443c01a7336-2b2816c33a4mr141974355ad.19.1775496412698;
-        Mon, 06 Apr 2026 10:26:52 -0700 (PDT)
+        bh=IAt6MuY3k4AQYrmKu/CCCfGz0vUfJv+Dtwx2Q0voWRA=;
+        b=WlHO/vY4rV5JsgVxuvIBBid9A3XlRWEqEQW0DvOJhgD+lYIdNKkD2pHUcuWOCQ+nCB
+         mPOcoHgw//BNQY3MJ0BWgSj4EKpvygjoAfgE3rJ3WRlIjWLUgsbra+SLCSvdjldmyk3p
+         uLNeSSqGG3hn7tWoDyt5nfisUW9WEaU7Ea/LcbZm5Ld2vIT0H85Li+oojsqYkW0N+SHG
+         IYya8m26xOHPxHmYfSv0iDOJrGEen7sDZSdRd+6YRWXm8SdRaQUD5whFuL9HFYaCTDjy
+         uAFIE4m4Vsv2DVURp/H5ZaTPXhOeLJzTEA9B4HVDENu4OiVgkeLNvewHha0XrcqxYsAQ
+         Kz/Q==
+X-Gm-Message-State: AOJu0Yy/mb7iArhAmRVLUPmUFbBI+iSs7GKVGM71QcQz8X6cbVeUHLic
+	EJJCy1fIZ9GnkG7SLiuza6JplDtReS347GbDeLo57XwZhE4fTFmU3aO5zj+jLG65hfoRJXPAkqH
+	2LX2y
+X-Gm-Gg: AeBDietvLyHxYlvmH7heXJHjq9SBXxWb8WHEnVQhyQomWrwQ3lSHmy1Sb9cyWNoCy0A
+	WVMXLBEO0JOr0/xIDqwjR0MI8GCT3qQeKrR5/zUVDdYgN9+8c2+D9rwsfR6EMxX88D+Yt4xZE4E
+	ordlob34gBkfXEbVQVO6krJNe1Em4qR1wdIm8dun3iKE12GyOO0K4LnH2PZirkgivuvRLrz+O6K
+	RJ8X+jXt5xTjP1DEARZbkUp8Li8YTzhRiT2VZRx7JlgR1h9AEjlptmSmylxl0A220ob1mjhYgYO
+	worE/vlppk9+x8gb7KC9Bc/W+ccAgKkKAc5iNMoc7W5dRDiGBRmp48F7U+p7jQI85m/0H6moIU/
+	SwF+iEMapU3dRddUB08gEZJQTPe9wXDX4FcAk+WmaXBACmGuJ3/u5k7ras1FwyL2XXpNrBr2Ywl
+	d8qtLP4tlBgfYVrM5QraLFmPRglcpLiurr
+X-Received: by 2002:a17:903:4b03:b0:2ae:5a38:96bb with SMTP id d9443c01a7336-2b277d633f8mr157734695ad.2.1775496418528;
+        Mon, 06 Apr 2026 10:26:58 -0700 (PDT)
 Received: from phoenix.lan ([104.202.41.210])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b27477a13dsm146437945ad.26.2026.04.06.10.26.47
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b27477a13dsm146437945ad.26.2026.04.06.10.26.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2026 10:26:52 -0700 (PDT)
+        Mon, 06 Apr 2026 10:26:58 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	Simon Horman <horms@kernel.org>,
 	Jamal Hadi Salim <jhs@mojatatu.com>,
 	Jiri Pirko <jiri@resnulli.us>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?q?Fran=C3=A7ois=20Michel?= <francois.michel@uclouvain.be>,
+	Simon Horman <horms@kernel.org>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net v4 3/8] net/sched: netem: only reseed PRNG when seed is explicitly provided
-Date: Mon,  6 Apr 2026 10:25:11 -0700
-Message-ID: <20260406172627.210894-4-stephen@networkplumber.org>
+Subject: [PATCH net v4 4/8] net/sched: netem: refactor dequeue into helper functions
+Date: Mon,  6 Apr 2026 10:25:12 -0700
+Message-ID: <20260406172627.210894-5-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260406172627.210894-1-stephen@networkplumber.org>
 References: <20260406172627.210894-1-stephen@networkplumber.org>
@@ -100,82 +99,282 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-Spamd-Result: default: False [-0.56 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275665-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275666-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: BDB463A5B06
+	MIME_TRACE(0.00)[0:+];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[]
+X-Rspamd-Queue-Id: 0D3203A5AE9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-netem_change() unconditionally reseeds the PRNG on every tc change
-command. If TCA_NETEM_PRNG_SEED is not specified, a new random seed
-is generated, destroying reproducibility for users who set a
-deterministic seed on a previous change.
+Extract the tfifo removal, slot accounting, and child/direct dequeue
+paths from the monolithic netem_dequeue() into separate helpers:
 
-Move the initial random seed generation to netem_init() and only
-reseed in netem_change() when TCA_NETEM_PRNG_SEED is explicitly
-provided by the user.
+  netem_pull_tfifo()    - remove head packet from tfifo
+  netem_slot_account()  - update slot pacing counters
+  netem_dequeue_child() - enqueue to child, then dequeue from child
+  netem_dequeue_direct()- dequeue from tfifo when no child
 
-Fixes: 4072d97ddc44 ("netem: add prng attribute to netem_sched_data")
+This replaces the goto-based control flow with straightforward function
+calls, making the code easier to follow and modify.
+
+No functional change intended.
+
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- net/sched/sch_netem.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ net/sched/sch_netem.c | 190 +++++++++++++++++++++++++++---------------
+ 1 file changed, 123 insertions(+), 67 deletions(-)
 
 diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index d400a730eadd..556f9747f0e7 100644
+index 556f9747f0e7..e264f7aefb97 100644
 --- a/net/sched/sch_netem.c
 +++ b/net/sched/sch_netem.c
-@@ -1112,11 +1112,10 @@ static int netem_change(struct Qdisc *sch, struct nlattr *opt,
- 	/* capping jitter to the range acceptable by tabledist() */
- 	q->jitter = min_t(s64, abs(q->jitter), INT_MAX);
+@@ -689,99 +689,155 @@ static struct sk_buff *netem_peek(struct netem_sched_data *q)
+ 	return q->t_head;
+ }
  
--	if (tb[TCA_NETEM_PRNG_SEED])
-+	if (tb[TCA_NETEM_PRNG_SEED]) {
- 		q->prng.seed = nla_get_u64(tb[TCA_NETEM_PRNG_SEED]);
--	else
--		q->prng.seed = get_random_u64();
--	prandom_seed_state(&q->prng.prng_state, q->prng.seed);
-+		prandom_seed_state(&q->prng.prng_state, q->prng.seed);
-+	}
- 
- unlock:
- 	sch_tree_unlock(sch);
-@@ -1139,6 +1138,9 @@ static int netem_init(struct Qdisc *sch, struct nlattr *opt,
- 		return -EINVAL;
- 
- 	q->loss_model = CLG_RANDOM;
-+	q->prng.seed = get_random_u64();
-+	prandom_seed_state(&q->prng.prng_state, q->prng.seed);
+-static void netem_erase_head(struct netem_sched_data *q, struct sk_buff *skb)
++/*
++ * Pop the head packet from the tfifo and prepare it for delivery.
++ * skb->dev shares the rbnode area and must be restored after removal.
++ */
++static struct sk_buff *netem_pull_tfifo(struct netem_sched_data *q,
++					struct Qdisc *sch)
+ {
+-	if (skb == q->t_head) {
++	struct sk_buff *skb;
 +
- 	ret = netem_change(sch, opt, extack);
- 	if (ret)
- 		pr_info("netem: change failed\n");
++	if (q->t_head) {
++		skb = q->t_head;
+ 		q->t_head = skb->next;
+ 		if (!q->t_head)
+ 			q->t_tail = NULL;
+ 	} else {
+-		rb_erase(&skb->rbnode, &q->t_root);
++		struct rb_node *p = rb_first(&q->t_root);
++
++		if (!p)
++			return NULL;
++		skb = rb_to_skb(p);
++		rb_erase(p, &q->t_root);
+ 	}
++
++	q->t_len--;
++	skb->next = NULL;
++	skb->prev = NULL;
++	skb->dev = qdisc_dev(sch);
++
++	return skb;
+ }
+ 
+-static struct sk_buff *netem_dequeue(struct Qdisc *sch)
++/* Update slot pacing counters after releasing a packet */
++static void netem_slot_account(struct netem_sched_data *q,
++			       const struct sk_buff *skb, u64 now)
++{
++	if (!q->slot.slot_next)
++		return;
++
++	q->slot.packets_left--;
++	q->slot.bytes_left -= qdisc_pkt_len(skb);
++	if (q->slot.packets_left <= 0 || q->slot.bytes_left <= 0)
++		get_slot_next(q, now);
++}
++
++/*
++ * Transfer time-ready packets from the tfifo into the child qdisc,
++ * then dequeue from the child.
++ */
++static struct sk_buff *netem_dequeue_child(struct Qdisc *sch)
+ {
+ 	struct netem_sched_data *q = qdisc_priv(sch);
++	u64 now = ktime_get_ns();
+ 	struct sk_buff *skb;
+ 
+-tfifo_dequeue:
+-	skb = __qdisc_dequeue_head(&sch->q);
+-	if (skb) {
+-deliver:
+-		qdisc_qstats_backlog_dec(sch, skb);
+-		qdisc_bstats_update(sch, skb);
+-		return skb;
+-	}
+ 	skb = netem_peek(q);
+ 	if (skb) {
+-		u64 time_to_send;
+-		u64 now = ktime_get_ns();
++		u64 time_to_send = netem_skb_cb(skb)->time_to_send;
+ 
+-		/* if more time remaining? */
+-		time_to_send = netem_skb_cb(skb)->time_to_send;
+ 		if (q->slot.slot_next && q->slot.slot_next < time_to_send)
+ 			get_slot_next(q, now);
+ 
+ 		if (time_to_send <= now && q->slot.slot_next <= now) {
+-			netem_erase_head(q, skb);
+-			q->t_len--;
+-			skb->next = NULL;
+-			skb->prev = NULL;
+-			/* skb->dev shares skb->rbnode area,
+-			 * we need to restore its value.
+-			 */
+-			skb->dev = qdisc_dev(sch);
+-
+-			if (q->slot.slot_next) {
+-				q->slot.packets_left--;
+-				q->slot.bytes_left -= qdisc_pkt_len(skb);
+-				if (q->slot.packets_left <= 0 ||
+-				    q->slot.bytes_left <= 0)
+-					get_slot_next(q, now);
+-			}
+-
+-			if (q->qdisc) {
+-				unsigned int pkt_len = qdisc_pkt_len(skb);
+-				struct sk_buff *to_free = NULL;
+-				int err;
+-
+-				err = qdisc_enqueue(skb, q->qdisc, &to_free);
+-				kfree_skb_list(to_free);
+-				if (err != NET_XMIT_SUCCESS) {
+-					if (net_xmit_drop_count(err))
+-						qdisc_qstats_drop(sch);
+-					sch->qstats.backlog -= pkt_len;
+-					sch->q.qlen--;
+-					qdisc_tree_reduce_backlog(sch, 1, pkt_len);
+-				}
+-				goto tfifo_dequeue;
+-			}
+-			sch->q.qlen--;
+-			goto deliver;
+-		}
+-
+-		if (q->qdisc) {
+-			skb = q->qdisc->ops->dequeue(q->qdisc);
+-			if (skb) {
++			struct sk_buff *to_free = NULL;
++			unsigned int pkt_len;
++			int err;
++
++			skb = netem_pull_tfifo(q, sch);
++			netem_slot_account(q, skb, now);
++
++			pkt_len = qdisc_pkt_len(skb);
++			err = qdisc_enqueue(skb, q->qdisc, &to_free);
++			kfree_skb_list(to_free);
++			if (err != NET_XMIT_SUCCESS) {
++				if (net_xmit_drop_count(err))
++					qdisc_qstats_drop(sch);
++				sch->qstats.backlog -= pkt_len;
+ 				sch->q.qlen--;
+-				goto deliver;
++				qdisc_tree_reduce_backlog(sch, 1, pkt_len);
+ 			}
+ 		}
+-
+-		qdisc_watchdog_schedule_ns(&q->watchdog,
+-					   max(time_to_send,
+-					       q->slot.slot_next));
+ 	}
+ 
+-	if (q->qdisc) {
+-		skb = q->qdisc->ops->dequeue(q->qdisc);
+-		if (skb) {
+-			sch->q.qlen--;
+-			goto deliver;
+-		}
++	skb = q->qdisc->ops->dequeue(q->qdisc);
++	if (skb)
++		sch->q.qlen--;
++
++	return skb;
++}
++
++/* Dequeue directly from the tfifo when no child qdisc is configured. */
++static struct sk_buff *netem_dequeue_direct(struct Qdisc *sch)
++{
++	struct netem_sched_data *q = qdisc_priv(sch);
++	struct sk_buff *skb;
++	u64 time_to_send;
++	u64 now;
++
++	skb = netem_peek(q);
++	if (!skb)
++		return NULL;
++
++	now = ktime_get_ns();
++	time_to_send = netem_skb_cb(skb)->time_to_send;
++
++	if (q->slot.slot_next && q->slot.slot_next < time_to_send)
++		get_slot_next(q, now);
++
++	if (time_to_send > now || q->slot.slot_next > now)
++		return NULL;
++
++	skb = netem_pull_tfifo(q, sch);
++	netem_slot_account(q, skb, now);
++	sch->q.qlen--;
++
++	return skb;
++}
++
++static struct sk_buff *netem_dequeue(struct Qdisc *sch)
++{
++	struct netem_sched_data *q = qdisc_priv(sch);
++	struct sk_buff *skb;
++
++	/* First check the reorder queue */
++	skb = __qdisc_dequeue_head(&sch->q);
++	if (skb)
++		goto deliver;
++
++	if (q->qdisc)
++		skb = netem_dequeue_child(sch);
++	else
++		skb = netem_dequeue_direct(sch);
++
++	if (skb)
++		goto deliver;
++
++	/* Nothing ready — schedule watchdog for next packet */
++	skb = netem_peek(q);
++	if (skb) {
++		u64 time_to_send = netem_skb_cb(skb)->time_to_send;
++
++		qdisc_watchdog_schedule_ns(&q->watchdog,
++					   max(time_to_send, q->slot.slot_next));
+ 	}
+ 	return NULL;
++
++deliver:
++	qdisc_qstats_backlog_dec(sch, skb);
++	qdisc_bstats_update(sch, skb);
++	return skb;
+ }
+ 
+ static void netem_reset(struct Qdisc *sch)
 -- 
 2.53.0
 
