@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-275763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275764-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ACZ8Ddsz1GnMsAcAu9opvQ
-	(envelope-from <netdev+bounces-275763-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 00:29:47 +0200
+	id 4PxlIdMz1GnMsAcAu9opvQ
+	(envelope-from <netdev+bounces-275764-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 00:29:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B01423A7DD8
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 00:29:46 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 367F43A7DD1
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 00:29:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 71F9E301910E
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 22:29:31 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 256DE301D0A8
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 22:29:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1EA239E199;
-	Mon,  6 Apr 2026 22:29:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030D339F16E;
+	Mon,  6 Apr 2026 22:29:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sDDE2B6G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RPGFD3UX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f196.google.com (mail-oi1-f196.google.com [209.85.167.196])
+Received: from mail-oi1-f195.google.com (mail-oi1-f195.google.com [209.85.167.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840D7331215
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 22:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E5E39E16B
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 22:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775514564; cv=none; b=MLe1D0eTi2ztpFUcP99ONwnG6n+5Dc4RmDQHoBehG5MYCopkERLu1J6wi+vMY4HBZXgZkzxHeGQ+MQ/agDZmO9Kk+kMASR0dRttITciXykxrpss1gvwsa7LjIprCHtZaIKExUS74lTrnVcqvJWG+M9n/OP+zrcVdgyaR5q1HTyc=
+	t=1775514565; cv=none; b=t9P2YE/28VOzJRD7KOHqSogPIQSEw/yy70Z4ueyqt7Klg3hbCCmn8IsyDOP1olptgSTrsM7U+OPjbLEYDVzOZG5P855ONXIT1BHfBrqHeTOSofxo6PcdK3xSZtfpYRe36Moth+o5jfY5IkNR4mS3c4BU4jqoc6h9m88vt95OlX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775514564; c=relaxed/simple;
-	bh=MzJD9UmEG4sMm67pvX/Vx2nBGsU/3YHgDlsehVqu5j4=;
-	h=From:Date:Message-ID:To:Cc:In-Reply-To:Subject:Content-Type; b=Wr4DpJF2DcbPb4HrP/o0V1VOplzH5gctGUglK4CUhK6Gt2HHYjbNEZA8VeOqIXaOcRB3rG8YRU86UPEDxFDID+mB+gmwJcnN4WElAeMyw7pN8BaX3n3750/HqBzuOew6VGhTGt3wKQebERjhM15RDGVXtvdu1jLDqM5XxvTaO8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sDDE2B6G; arc=none smtp.client-ip=209.85.167.196
+	s=arc-20240116; t=1775514565; c=relaxed/simple;
+	bh=Ac1l6PCYlaOpQPtsc4BOfIozfTrQgEPIItTYL5JqsRM=;
+	h=From:Date:Message-ID:To:Cc:In-Reply-To:Subject:Content-Type; b=L240MxiFWDVe1baCHr/a10q3so4P+9XJ1KpGBrwoQTxup4bkMuoUPHC+/hZSmxGLxyT8oWxBFilSk9+Ct+CmB4t2AB9TbVPunPw5LK5eZYY0vGmyTzkjzWFlbQIR6AhdBDiA5po3xetOgjtuPVr74e/lAERTJPkHGIWGtC0tkS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RPGFD3UX; arc=none smtp.client-ip=209.85.167.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f196.google.com with SMTP id 5614622812f47-46fb6d65c28so916898b6e.0
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 15:29:23 -0700 (PDT)
+Received: by mail-oi1-f195.google.com with SMTP id 5614622812f47-4710c186d8aso473853b6e.3
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 15:29:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775514562; x=1776119362; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775514563; x=1776119363; darn=vger.kernel.org;
         h=subject:in-reply-to:cc:to:message-id:date:from:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=DkvqhizTxEB9VE/2Oox3stQjf2DifB+wrjIxsdhk4G8=;
-        b=sDDE2B6Gc4+HdjPLyeI2pbn9ToCqpLXUQvcgDZsyi5oMnMm1W4lWirM+web03Nb2J0
-         Gj6JEkE64Std1zSCh0jFi4mt+T4bxWPthhdDCLPg53fHLqnhwFc9S2oNSr7O5KQxaqZX
-         iFKZEMzDe/aUvK3FeSNLscnsuIKuz7LWbJMiiN1dLVjL2N8j1+RviLRElYpV+ItyxyJR
-         swF0kM4j8W8IWo3OCLJn4wi5FgWtXUY06pcV9YiBO+mkK61ynbzQWitioXeRmEX8VigD
-         VZD5T5+3BWk5RuriaO1uprLwPKwQCUqO39XkpaQPfMmE+TR3c0i/BBiqjIf+iXLWOdTK
-         MKGg==
+        bh=nmQZqTXyDK0XMBr0sE1cCiBEnu+y/thLc3GWNyri0ck=;
+        b=RPGFD3UXZWGUcbIvBQDdOndkrVptv1qJ4GH90qj3+YD+7pvHBLjzpzhGX2jWf49327
+         gohRvcVO6TtN8MCIdhAnmhMAoZ88uH+a4IgSkksMPnTB9cCdTcbkha0dUb0r48iDfV7D
+         k4RIGejumHtLKiUjbcni2aUfaNhP1mj6ZOwJwUK/+ln/7vLDyD/X6QaD/iHTxCaf+xPC
+         77n5eLcjUj2w1dLRIRO6oiHymaHnZuXRAGnkFRcSoDJNLWRolZnCIKDfJigY+Hg27Z54
+         DoI6MQJ+oNAzAqsox4+9UKTfheunIV/bnrA2S6n3yTdvjIGpjcAPKg7Zj9QTRw62RxUQ
+         ey4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775514562; x=1776119362;
+        d=1e100.net; s=20251104; t=1775514563; x=1776119363;
         h=subject:in-reply-to:cc:to:message-id:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DkvqhizTxEB9VE/2Oox3stQjf2DifB+wrjIxsdhk4G8=;
-        b=d7dg1eq69KvoU6WuuhAchZj9mQ1pNgqNASueJ6aiUhaqjx76omaOps3sfa+/9Jm4AE
-         xOvQw4c6jvT4w755kGH0AY8OD1Sctw7l3u0CLxsX0ghTHpzClQFsbhhkTd4kMJyHV04r
-         hxhiv0qCfLHvmL5o62uy4fk5ygmqvdjwHn3ApEY1s9b8/6gwvKsKSO5V0JtCSTrGEFzZ
-         27F4Cwlc/a49KAXl6wQlNvnL+b+V8eQ4tXAAFu70bAgRNUfFewC5sGoQwroX1gDbd5aF
-         2FA/QDkXA1lplpJVdZWT5k7/8KzMcnjQWkwp49SDNMihwUuPnZhGr4cUCZVns3RfwbiJ
-         6Q2A==
-X-Forwarded-Encrypted: i=1; AJvYcCUkMt/VenmhDPMyft0gKQBtJQ1m6whnS0ezB/ViyhUHN+B90BA3ANFw06MM5NO5Nr0ENFllKPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTKB/2d4S8mZ+bJyR0VNBOPUnJSaokEv75j6QlUK09RBuIVs/P
-	2whNhaJEcBTgVAQeI/u2Hn4II1k42Ec2Ocq1Ds+nsGG9t4t0HK/SL5SE
-X-Gm-Gg: AeBDievWLIq1oxXGP4biqETlVx8hEm7Ppo/8wG2VY64sio2e2GYMWvSsSAeoFwZRlfZ
-	OxvCvP5AQgCDaJUaM4zarCecNk0MHzWTtLZGpdJSAagKQEtkauEpw6bAqWm/c/msPmCywtrsnQs
-	m8wQWFsRjwJy8jIjmH9BocMOmr+MKHp/1aKV/p1QpJCwUCaZJ6UuVMGf4sJhQzPsB8xNpdJ+Gc+
-	0qzPXUgR77QNNbY0fPsu+h6zDFpdsr5ufCOkj0c01CPRZI2q0xx64p90D7DDEDWZHp4xbNbN1fm
-	ETba/omoFzeiOas3s+8dHxetp6pXMGP15QjmBXJAGNdNIp87wBb1ccADkMdNXI/nWNDqVQVmKMJ
-	p0LMI0XLB8sX3QJXvEJ3jhctTn4jpbufR8vVGLaX5D4dEpQl2mDu5NHr2H8AZ00nCBGCEq7gHdA
-	g3c+FxO3OdKwf8BKiriA==
-X-Received: by 2002:a05:6820:2007:b0:67e:3919:4aba with SMTP id 006d021491bc7-68221533624mr7808142eaf.51.1775514562416;
-        Mon, 06 Apr 2026 15:29:22 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:73::])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4235e32d9dfsm3936967fac.16.2026.04.06.15.29.21
+        bh=nmQZqTXyDK0XMBr0sE1cCiBEnu+y/thLc3GWNyri0ck=;
+        b=rcaKuSbTFnRj2I06//jtHxcE2bayDBNokZ8MZYm47G4wk8Ohbh5h2hWyybG2fmvOFE
+         HjBG8SYt4oclgnTUOGA5NcoW749/nemhHvNdK3PNbcmbK3IhprJqs0X1zQ4WVNBCKB8G
+         fBm2rPtE3qsib9WSBwsAPAu63M5+gsZViR97AvmqH5OcC7nPYE5axvq5zSV141RFzzbr
+         5a493Rmq5tTCOF0Def539a11yNkmZ3G+wLkp+JI0gdJmWs1p0CxMi0+uGRykzvjik/Jw
+         nfOkqE8Zc2nyjszizzNPRD7AGAUzVxD3FGUUPX0vQjLQhh6iBnV8dZMbXjNfsC39OqQl
+         ckRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUCG4mT+Qh47ldaY9mAUwdcC5foWAFWek1wyXHYihP+kcaUBTCbgYVsXlF7zCEoxc0EWfiqKrA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvIE/8Hk/vzOp+C2psTqAeIV26bqhNP0KNDZmV7B+jtrdRhyd/
+	Eg5yqigQfCAWmhiNqelQETDV9OTBFXvOhCxbpM+AAk9UyyvAcN6q/Luv24kLOs6MD0o=
+X-Gm-Gg: AeBDievjfHG5ZHTdpjzdjSnupl4jtSMXxYEjL35htvHZx2gFH23Q7Vb27cFSiVDdn20
+	ifVmRFNC5X+7seMHV4Y+cmA9/1BJKeuGHCGE+tQjrUFCJpHKq6DSFFViLv349hAC48Y1KKzh+Jg
+	l2yRVz75hwMyEonTFBUMkMVvyl1HAgSY81XXrjb1gyrb6TGr/+qiord8XjpDIIfAzfVImlC7DLH
+	5/dtw1hih0J+YR2zcRcK6zrLdF4M1WtkdLJsDhXZonftOpvJL1ICBbOjOCzedHuH5j/4HguJBXf
+	qkmMBB60Sw+hAX7y7R+X9R0Xwt4gK5k1VHmfMXBD70717Q+xeATEMdA56ioyFexgBD9KAEv/uIp
+	apoOTF5KXsbBFseQ5KBs/weouV9Lu56BTQwjVfWDuiQzy2BhlYB2EfS3ne1e3tAZgjo6CaWuTh0
+	MXZMOE0wW3OI/HPNaDkA==
+X-Received: by 2002:a05:6808:1511:b0:467:3f4:9073 with SMTP id 5614622812f47-46ef59f3b78mr7509562b6e.16.1775514563325;
+        Mon, 06 Apr 2026 15:29:23 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:72::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-422eb25a55asm12873299fac.10.2026.04.06.15.29.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2026 15:29:22 -0700 (PDT)
+        Mon, 06 Apr 2026 15:29:23 -0700 (PDT)
 From: sdf.kernel@gmail.com
-Date: Mon, 06 Apr 2026 15:29:21 -0700
-Message-ID: <008bdbac81f0bab31aa80dd3cdb47acd.sdf.kernel@gmail.com>
+Date: Mon, 06 Apr 2026 15:29:22 -0700
+Message-ID: <cb163dc696c885556acea5f6fe2879ac.sdf.kernel@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
  davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, jiri@resnulli.us,
  jv@jvosburgh.net
-In-Reply-To: <20260404000611.2414085-1-kuba@kernel.org>
-Subject: Re: [PATCH net-next v5 07/14] bnxt: convert to ndo_set_rx_mode_async
- (c1776bbe53ec)
+In-Reply-To: <20260404000604.2413879-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v5 02/14] net: introduce ndo_set_rx_mode_async
+ and netdev_rx_mode_work (61d75e67dcd2)
 Content-Type: text/plain
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -95,11 +95,11 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275763-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275764-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -107,7 +107,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
 	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -119,85 +119,125 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org]
-X-Rspamd-Queue-Id: B01423A7DD8
+X-Rspamd-Queue-Id: 367F43A7DD1
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 > This is an AI-generated review of your patch. The human sending this
 > email has considered the AI review valid, or at least plausible.
 > ---
-> bnxt: convert to ndo_set_rx_mode_async
+> Subject: net: introduce ndo_set_rx_mode_async and netdev_rx_mode_work
 > 
-> This commit converts the bnxt driver to use ndo_set_rx_mode_async, updating
-> the rx mode callbacks to take explicit list parameters and iterate over them.
+> This commit introduces an async variant of ndo_set_rx_mode that runs from a
+> workqueue, allowing drivers to sleep during RX mode changes. It also adds
+> netif_rx_mode_sync() to opportunistically flush pending updates before
+> returning to userspace.
 > 
-> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > index fe8b886ff82ea..569c7de7c5e44 100644
-> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> 
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
 > [ ... ]
-> 
-> > @@ -13523,17 +13524,17 @@ void bnxt_get_ring_drv_stats(struct bnxt *bp,
-> >  		bnxt_get_one_ring_drv_stats(bp, stats, &bp->bnapi[i]->cp_ring);
-> >  }
+> > @@ -12217,6 +12178,9 @@ void free_netdev(struct net_device *dev)
 > >  
-> > -static bool bnxt_mc_list_updated(struct bnxt *bp, u32 *rx_mask)
-> > +static bool bnxt_mc_list_updated(struct bnxt *bp, u32 *rx_mask,
-> > +				 const struct netdev_hw_addr_list *mc)
-> >  {
-> >  	struct bnxt_vnic_info *vnic = &bp->vnic_info[BNXT_VNIC_DEFAULT];
-> > -	struct net_device *dev = bp->dev;
-> >  	struct netdev_hw_addr *ha;
-> >  	u8 *haddr;
-> >  	int mc_count = 0;
-> >  	bool update = false;
-> >  	int off = 0;
+> >  	kfree(rcu_dereference_protected(dev->ingress_queue, 1));
 > >  
-> > -	netdev_for_each_mc_addr(ha, dev) {
-> > +	netdev_hw_addr_list_for_each(ha, mc) {
-> 
-> When iterating over the list, bnxt_mc_list_updated() performs a memcpy()
-> into vnic->mc_list.
-> 
-> If this executes asynchronously while bnxt_cfg_rx_mode() is mapping
-> vnic->mc_list for DMA to the firmware via bnxt_hwrm_cfa_l2_set_rx_mask(),
-> could the NIC hardware read torn or corrupted multicast MAC addresses?
-> 
-> Even if a later patch addresses the explicit list TOCTOU issue, is a
-> driver-level spinlock needed here to serialize vnic state access between
-> the two concurrent workqueues?
+> > +	if (netif_rx_mode_clean(dev))
+> > +		dev_put(dev);
+> > +
+> >  	/* Flush device addresses */
+> >  	dev_addr_flush(dev);
+>
+> Is this cleanup reachable during normal shutdown?
+>
+> When a device is queued to rx_mode_list, netif_rx_mode_queue() elevates its
+> reference count via dev_hold(). During unregistration, netdev_wait_allrefs()
+> blocks the system until all references are dropped.
+>
+> Because of this wait, the system shouldn't be able to reach free_netdev()
+> until the worker thread has already dequeued the device and called
+> dev_put(). It seems the device is guaranteed to not be on the list by the
+> time this code executes.
 
-This is not something new I think? The same split was already happening
-prior to conversion: bnxt_set_rx_mode updates mc_list and queues
-BNXT_RX_MASK_SP_EVENT while bnxt_sp_task does bnxt_cfg_rx_mode.
-
-After the conversion, both paths should be under ops lock, so we should
-be in a better place.
+I guess, yeah, we can drop this. netdev_wait_allrefs waits for all refs
+to go away, so this is not needed.
 
 > 
+> > --- a/net/core/dev_addr_lists.c
+> > +++ b/net/core/dev_addr_lists.c
 > [ ... ]
+> > +static void netdev_rx_mode_work(struct work_struct *work)
+> > +{
+> > +	struct net_device *dev;
+> > +
+> > +	rtnl_lock();
+> > +
+> > +	while (true) {
+> > +		spin_lock_bh(&rx_mode_lock);
+> > +		if (list_empty(&rx_mode_list)) {
+> > +			spin_unlock_bh(&rx_mode_lock);
+> > +			break;
+> > +		}
+> > +		dev = list_first_entry(&rx_mode_list, struct net_device,
+> > +				       rx_mode_node);
+> > +		list_del_init(&dev->rx_mode_node);
+> > +		spin_unlock_bh(&rx_mode_lock);
+> > +
+> > +		netdev_lock_ops(dev);
 > 
-> > @@ -15881,7 +15884,7 @@ static const struct net_device_ops bnxt_netdev_ops = {
-> >  	.ndo_start_xmit		= bnxt_start_xmit,
-> >  	.ndo_stop		= bnxt_close,
-> >  	.ndo_get_stats64	= bnxt_get_stats64,
-> > -	.ndo_set_rx_mode	= bnxt_set_rx_mode,
-> > +	.ndo_set_rx_mode_async	= bnxt_set_rx_mode,
-> 
-> Since this callback now runs asynchronously without the netif_addr_lock_bh()
-> that the core networking stack previously held, does this introduce data races
-> on the driver state?
-> 
-> With bnxt_set_rx_mode() executing locklessly in the netdev_rx_mode_work
-> workqueue, and bnxt_cfg_rx_mode() concurrently modifying vnic->uc_list,
-> vnic->uc_filter_count, and vnic->rx_mask in the driver's bnxt_sp_task
-> workqueue, can they race when accessing the vnic state?
-> 
-> For example, could lockless assignments to vnic->rx_mask in bnxt_set_rx_mode()
-> temporarily drop hardware fallback states (like the PROMISCUOUS bit) set by
-> bnxt_cfg_rx_mode()?
+> Can this while loop starve the system of the rtnl lock?
+>
+> Since userspace can trigger RX mode updates via ioctls like SIOCADDMULTI
+> while holding only netdev_lock_ops() and not the rtnl lock, a continuous
+> stream of these operations could repeatedly add devices to rx_mode_list.
+>
+> Because the loop releases rx_mode_lock while processing but retains the rtnl
+> lock, could it run indefinitely if the list is continually replenished?
 
-Hmm, this is completely bogus? I don't see "lockless assignments". After
-async conversion all these paths run fully under ops lock.
+Idk, this seems overly paranoid, the same work would happen under rtnl
+on the main thread if we don't do a async callback.
+
+> Additionally, does the order of list_del_init() and netdev_lock_ops() create
+> a race condition with netif_rx_mode_sync()?
+>
+> If the worker thread dequeues the device and drops the spinlock, it might
+> then block waiting for netdev_lock_ops(). Meanwhile, an ioctl thread
+> holding netdev_lock_ops() might call netif_rx_mode_sync().
+>
+> The ioctl thread would call netif_rx_mode_clean(), which checks
+> list_empty(). Since the worker already removed the device from the list,
+> clean returns false. This causes netif_rx_mode_sync() to act as a no-op,
+> allowing the ioctl to return to userspace before the hardware update
+> actually completes.
+
+The worst thing that can happen is we re-queue empty work. I don't see
+how we can return to userspace without having a sync update.
+
+> 
+> > --- a/net/core/dev_api.c
+> > +++ b/net/core/dev_api.c
+> [ ... ]
+> > @@ -311,6 +313,7 @@ int dev_set_allmulti(struct net_device *dev, int inc)
+> >  
+> >  	netdev_lock_ops(dev);
+> >  	ret = netif_set_allmulti(dev, inc, true);
+> > +	netif_rx_mode_sync(dev);
+> >  	netdev_unlock_ops(dev);
+> >  
+> >  	return ret;
+> 
+> Does this correctly handle cascaded updates for stacked devices?
+>
+> When operating on a stacked device like a VLAN, the RX mode update cascades
+> to the underlying physical device, queuing the physical device to the
+> rx_mode_list via __dev_set_rx_mode().
+>
+> Since netif_rx_mode_sync() is only called on the stacked device here, and
+> the stacked device itself is not on the rx_mode_list, will the physical
+> device's update be left on the workqueue? This seems to bypass the
+> synchronous update guarantee.
+
+Yes, this assessment is correct in general. Not sure we want some new
+netif_rx_mode_deep_sync or (probably better?) add some netif_rx_mode_sync
+calls where appropriate. For now, leaving netif_rx_mode_sync in a few
+places and planning to add more netif_rx_mode_sync if/when issues with
+deep hierarchy syncing arise.
 
