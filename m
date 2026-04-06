@@ -1,152 +1,221 @@
-Return-Path: <netdev+bounces-275726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275727-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AAZEMyYY1GksqwcAu9opvQ
-	(envelope-from <netdev+bounces-275726-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 22:31:34 +0200
+	id AE30LIIa1GnHrAcAu9opvQ
+	(envelope-from <netdev+bounces-275727-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 22:41:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 312E63A73A8
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 22:31:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EAE03A742D
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 22:41:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8CA3300F10D
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 20:28:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 96944301BC34
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 20:41:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72DDE30EF95;
-	Mon,  6 Apr 2026 20:28:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BD7B3081D7;
+	Mon,  6 Apr 2026 20:41:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="becA8Wyr"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="DhY941wb"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011008.outbound.protection.outlook.com [52.101.65.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6B62F9985;
-	Mon,  6 Apr 2026 20:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775507326; cv=none; b=SJXcdFF+JQ0o+YLdcbqr0gO6jvy05AvqhAUw0sT3+CPVXgmfkxugy6ndKS9lE93fE+Q4Yuhwok1qD6gHM+yTiNMRUjVpkpw00lqDRAoiGT2uMa3AMCHhnByqmQMS302HhgL25HjuqzokQCQ5ZfkWkyU1szG6sRugN1M9XQ+Dlr0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775507326; c=relaxed/simple;
-	bh=1qWiuIRqe9AwC/241z7aSGJ9QiVuvILUv6zjUxFv4JQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CmTQ6yTAyeDkQUA+m17NDNOD+tbFpQB34MDlgHmXIzACoddtlHcIoRlfwzLhd5RqDSUyq9KUzXPmVh/57wxAo0sY7NcaPG8UCVQmMs9FUPhRY/MQMs9JgzDnsw+rXoZ8BhAskH4YQ3okAsBxxRiwo6OGKHa/WbgFTeMg7EqevSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=becA8Wyr; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=y33qY31aVGgomLecXEmItVy3lGhm7wL+Aw51Mknl+8g=; b=becA8Wyrj+YD+0bEQWcCIvcBuG
-	MUtFupMvdhtV1Y+RIpuwKI2AmCiZdFvMsnKmAk/q29aDbve+FRXk8LFRMAXPq7/XLo9/fYt6SMfL4
-	4cWTFMjeaMvEDQKbn7kcokS6IHsFY5T4F+WDuA92kCG0yYAP6CA36nufpAfj5/Q95cjGkC5fubIEM
-	e90AnQ6Xb59U9G3lz5ILWMTNjWwrs+Z4aWRDGFzgUXp/TtwG48zH2W7EGLV61OBsmiUjFOHWAIHa2
-	pM02yB7Vm/K1RguysAnSjNtwTYUQP+Kej+Uq7IMGwMjG2y4+9d7vuvaHfQNqf0YESDPPT4rmC3l5N
-	jhHJt7wA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50788)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1w9qYk-000000008VL-3tyh;
-	Mon, 06 Apr 2026 21:28:34 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1w9qYh-000000001bI-3HHI;
-	Mon, 06 Apr 2026 21:28:31 +0100
-Date: Mon, 6 Apr 2026 21:28:31 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Nicolai Buchwitz <nb@tipi-net.de>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5C02512C8;
+	Mon,  6 Apr 2026 20:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775508095; cv=fail; b=ufLNQsIoDSrV0/lYkbX42FaUxhEZk0PZh6gMgmBxgGqbcV4cO1XyJlwRAKeh1OOHc3RUSoo6m8U3T2wQIkWgQmrTL3T/t211d7gXAAgE7grJXE2iR7WZ1ceC1y37TFyMDIuBKuCUho/eGShZ6Q4Ek8KHohq+i7zoL/DpGlGDVmA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775508095; c=relaxed/simple;
+	bh=c2t7neGM+DbFaFHS4l5Gu4Uj7tAJ8W917alrefKiEzk=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=EBmYJaBsTa96Qgyu37xyQcIcW09c5aVu31ljSuWB8nPBmOS9NlgBBjl4l1FT/UrQeWRaVjFV6Xdi7LXD6rtTDOP2ZADKnBFecF7m+x9x5k8hLMZ2X+AeYEmmASgJXZbsqeb3j4QWWHfUa45RAM2g55zPhSFs6p90eqgiiAqdvsg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=DhY941wb; arc=fail smtp.client-ip=52.101.65.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Wk8Lj8enw8cSz8QYpJbJmlqZdEQk3nDmiYyk10xKw0WwIrVleV+JRt2D6OXuAVZA08JgUr7CDXBwm3iKB4jJor8WjeBL/GYOeoYaCEc8cyQ4NBurSDah4HOfUn6RdsRpzS5o/3Xee2QnDhQ09Ot5XqHgawEPnluVT5op2iQycFiRsRcSR8iwDevhwgQgiIgRAtAHX0n9PKBeHLMBbQZ9xrGAyTJOpGrDrlxMlnHUTLf4unn6YUco5yFB09aEYCf5pAZVuGtke66kUg8fdgLZqpcFyGk9hdXfbvAD8YcAVBUurUrF2GmYaJkM9/toSCT3/YZp/DC4GTamlwzHYw+2ZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=F7QeIdxbmF0/oxi6vpl060uVZ7A3mqZRFTYeBdqeGEQ=;
+ b=xyh67mE0xDPjA7tYuti4AKw4Z0tcZikfcNu0XP2Yzu34mYNNOCpEtkmPvhA4FBQ2wOrzrNWkJTvkygp8mfUd6z6QZk+fP5cCI2ceWILCiS5wE599x2tvAVqeW+e3Lsw/w7igKT0t9+5dMTYbgpzGC8COptP58JmiiN6MYacXqZeK9li0ejfWJ5SHhONEudZg8B9L8J3nqxvrMcVa9krDKSRhMPnh7X7x8X3V9wRe5mF3fMIh+l9kyiQ2BkNwg4SPaUwXlgspyPhX/BBIKEqLqqnsmqIUXlYEGDVuuzgO+OsYlOrEKi0Nm923WyBHlPPSWKclazXG5tjEt2hKxnDkIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=F7QeIdxbmF0/oxi6vpl060uVZ7A3mqZRFTYeBdqeGEQ=;
+ b=DhY941wb+2tJ57aatQb0xASxJh2WwBvA+mEO3+VnV23t7Gp44sd0TLRwAr+IS6ukGU/+57DdtA8SrYV2UY4rB+qbTmFXbfM65Erg+8UbAz4vfH5CJ3w5Q6TRjh0RNikfwR8ForgvidRs49CLzlixAqwNGOA9WaU+GC6WKBI2EGq5sI0XjE3KGxXdAihB6lPL4TrDlhlT6vkexkku3Hjs6BIZSY2/m/MCEnluuAoRliD1Y8IR26/pvgj/ErfqItvFhtxz/skArvcm8RRg6Y4ZM+hrkrz38Af1pidw6UfXNtyHKWZbcxGpvJN++R3s5oqFvLxwsbOp33MFz3wyjZx8Cg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
+ by DB9PR04MB8347.eurprd04.prod.outlook.com (2603:10a6:10:245::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.21; Mon, 6 Apr
+ 2026 20:41:31 +0000
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4]) by AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::f010:fca8:7ef:62f4%4]) with mapi id 15.20.9769.017; Mon, 6 Apr 2026
+ 20:41:31 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: Zefir Kurtisi <zefir.kurtisi@westermo.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Wei Fang <wei.fang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] net: phy: add support for disabling
- autonomous EEE
-Message-ID: <adQXbyzRsLgXRdIL@shell.armlinux.org.uk>
-References: <20260406-devel-autonomous-eee-v1-0-b335e7143711@tipi-net.de>
- <a1cf8f6a-b338-4dd7-aced-7e19e4d0fdb7@lunn.ch>
- <9272c5dd653039b3def8caaea3e631c5@tipi-net.de>
- <5298959c-12de-4992-a896-3d1371cba111@lunn.ch>
- <cdef227e-9dfe-4860-aca3-5ce1f60cb838@broadcom.com>
- <adPo-o9DtxIZGDvg@shell.armlinux.org.uk>
- <faf651039d98fb9c1ffb40dbd98bb16b@tipi-net.de>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Simon Horman <horms@kernel.org>,
+	bpf@vger.kernel.org,
+	imx@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 net 0/6] Fix short frame transmission in enetc
+Date: Mon,  6 Apr 2026 23:41:16 +0300
+Message-ID: <20260406204122.167237-1-vladimir.oltean@nxp.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: VI1PR0102CA0075.eurprd01.prod.exchangelabs.com
+ (2603:10a6:803:15::16) To AM9PR04MB8585.eurprd04.prod.outlook.com
+ (2603:10a6:20b:438::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <faf651039d98fb9c1ffb40dbd98bb16b@tipi-net.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [-0.36 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|DB9PR04MB8347:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3da7a02c-baa5-46af-66cd-08de941ce206
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|19092799006|10070799003|366016|7416014|376014|1800799024|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	BTN01wXNtNnK/sGkvlC1GRsicADKO/ogrt+qCaeofiPiCm3CEaATWa8v5K6kS9xsnDwXyrD8vVU+AvxccbddmDiP5+lLkeOtdtB/b+OANnkVywhIklK68p/tCe1+WfVnO0MuO/lvp/4eT2ASs2zTKKLC8u+qAEJdtARTpz1gqLF5z7YqXhOf7cFNj/d69oVfA4hr7svzMT//sOxq1WPBml/Yy0DVFt0cKhEx76psSfmizU7WxQGANMCwrflUlDrwyF332i6q2FZH3S3K4PoeDvPFINyllztGyKMtNw/GBQtdiM9l5Cl6PlsCJy1gqrlAjf4v/39hRQnQgS14E4NEE1xu7sV+S12uilcWhCFolW9Kl/vI4rlcGlfCIz73iMG7aokoUwDc5zZ9gzqovoiLm7cRkNDNkIyefBfLPal7wwSlr1hzdw5PXGLYWZ6hLcSCtJEjWo/oQp9qAkFuP/TTMXZL9jxNLxYEPnnVB5uUBmQMDLYWDX8ORHEDkD4HlIbL1Qqh6Mk23yKStiyRV3Z4dLI5gwcojeA67V8ry469rySb6rIXHyenuPVrN4XIausY+lLKrrn6rBsCwBYDl7HPSG6OkCHmmu05TpglfVCLyx2vugNAVCsgh30BAtIPrtHfDkEUkVvdU4CKUl1biEg6SDAOlGhRpeYxoHerpp7Ad1tHbF+FqzCueCMg1epR5k9nCip/HknZADEIRMXj43m6G+d7C7Yp3CsZyZhoxdNLRnGEt0yfBo8ac0ESX2rbN5zA
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(10070799003)(366016)(7416014)(376014)(1800799024)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?9Ngu+mxzqnLduMDRuZ5Fc5Bmb2DmGcg0anERXZf9/1sthGKMHEXIsoDaV53n?=
+ =?us-ascii?Q?joUlSD573AGMfdwFAJ0bdXiB4KpcyaWC94avpL8ZgYw24zFQcIbLwXa+TPHa?=
+ =?us-ascii?Q?9Ug047V93cYe2XETfH1+r04O6ZfeCKgbX9nn2EgMZTUQ8FeFLIw/V8sLjLjA?=
+ =?us-ascii?Q?HSbEE68fHgguEkFBK36oCJQbKkkrpisON2BuhNJSPO7ve5zJnl5l2TicWj+B?=
+ =?us-ascii?Q?2/h6H49W4tWaqqhhbQDwmo3jkhbZmeAlxSqXGVtj3E0JgXfbDAlY3HR47Y4w?=
+ =?us-ascii?Q?nOrW0B0AWt/x/hhxv5Grbyr+PjBXU6AO3d9PFzIvTrgDW1d6euGILoN+erlo?=
+ =?us-ascii?Q?C8OEDcxFSHeU8TLYzaSBMAUjo5avcp4yxWliOAdCF+UYB/K6u2kg6gWFr3lf?=
+ =?us-ascii?Q?rCfwB4bu0Kxeg8x+ppVxkztxx3oV3QZtdAsc1HWGO7XEh4LVsPjFS9te50hB?=
+ =?us-ascii?Q?GhE/B1Ho3Y5pX2Ws2F2fCEcuzWKn+JEJVAgdvPze7VRkJsTeZuuApJ1+4eA/?=
+ =?us-ascii?Q?tpJ/BX1rCB5MIVTW0hNZSFoeDejugl9tkh2zch1V3G0VdVKNbt2aYpMh75fz?=
+ =?us-ascii?Q?uryOXMQjXZIkY00SrFREj4/eVmHXxdvKF7rajwQx2T2ccDzULziqa0t1EMYl?=
+ =?us-ascii?Q?RNul4xXCh1ml3WSNUZshxrau9EE2EvtuUgkTrkp+DhvrKKbDTV917K25P6Kg?=
+ =?us-ascii?Q?g2g/lJ05uJgWzji5k4wfRIqcy2x66JYMIakoYpQ8nzlBSEIwhuuaZA86Z1Fl?=
+ =?us-ascii?Q?J4flJPpjD6f7Z834IoBYFXIAVwhmDHu9BdSVuagHaIqiqa8l3m6ymc1TWim8?=
+ =?us-ascii?Q?o17qm8QNLaLKOFDIA+kuLT87ch7oggQLYHd4BzZjTFHqmxwXjZ2ZdpBaubX1?=
+ =?us-ascii?Q?Z7H5T2duubB54i/F7b5UikXU/n4fhwuIClTnV/Agu7iyWEhwcptHhkn6hjZG?=
+ =?us-ascii?Q?93Bi20iA472kB5ehRZzA8FtO7UDGFPF6sRyPb7VTtZj0rqih0ZdFK6T5IH3l?=
+ =?us-ascii?Q?/J228qibfScVG5w4yUVln4TDD8LThNO4Qc4Oa8I/s2m40SmPdYkdnjVTtR1z?=
+ =?us-ascii?Q?M1ORjkeQpAvuUeHmOEpVaDtZ/uJKs3qyJ9HAm5os3FnXlAVQIHuok5+MeMap?=
+ =?us-ascii?Q?4BzkziuDBmax7e7+fgS/G7pDs5qJ6gXL4F1Xe/pc66mwxnA1E9Ty5/aEaB4l?=
+ =?us-ascii?Q?JHyfowpT343X6/lw5Bwew8FU6jbhrte0ivIo5LN3w1E6hKZEUxgSo5m/Yfsv?=
+ =?us-ascii?Q?9kZaieT5GHzBzyIoUbdLKmRB4Xpq4PhsUD3C002IZXG8/r4d64qxsL7qgyqc?=
+ =?us-ascii?Q?nID2C+FmXSFyB7gxRWr4U6XHN499i8YE7CjYK6DQox9YoNVKehIYuHJEGSOi?=
+ =?us-ascii?Q?NW3nDfCxrEhZgHgT/SeaL941AE8KqLw6qRbDFI6I/oOkm2XsMxH6B3EfyFrM?=
+ =?us-ascii?Q?woIDijMgpIj/fBKqCiAWu2ZlOddMXT7yGTEL5SBDWcA3/mr2eBO+ILfKHIm4?=
+ =?us-ascii?Q?qZsGO7ChdcrWzOtLFwBx3/ojHmOsjlb40sU9QECOBe2lotoU9rHzavSHJJ3P?=
+ =?us-ascii?Q?oudDMwYs9KbBLWEopEgDrE4bLPvVHvUkpFREjtvuWYSFs7ghiEhXcItLDh9d?=
+ =?us-ascii?Q?2+n8W2eBcN45QJJDaHmaRtvivaUCwFBEIAaKSMqrYeNieKwgfPrRNxQF80AW?=
+ =?us-ascii?Q?npaDKGwTmJHY8/kc3HJTJi7jFCSUwuMPNFMEuIWxByHkxJhcN9nj9UpJ8ZqN?=
+ =?us-ascii?Q?opigCb2gvhPGCTRmwUvTlFylBvv74/7n0URe2EzrQpwAuc69rLYE170pmTHE?=
+X-MS-Exchange-AntiSpam-MessageData-1: aq1AmsquZv5QIQ==
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3da7a02c-baa5-46af-66cd-08de941ce206
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2026 20:41:31.0596
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0AzvU1SH+Q6dAc9m1RS27pAh2eflwBmYDlMeEbY68HWnzzu28K3MIy/wxrMlSCSy0jjohhvIW6NzD7iyzpVlVg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB8347
+X-Spamd-Result: default: False [2.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[nxp.com,none];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[nxp.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[broadcom.com,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275726-lists,netdev=lfdr.de];
+	FREEMAIL_CC(0.00)[westermo.com,nxp.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,lists.linux.dev];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-275727-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[nxp.com:+];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[vladimir.oltean@nxp.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
 	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.851];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,shell.armlinux.org.uk:mid]
-X-Rspamd-Queue-Id: 312E63A73A8
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0EAE03A742D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 06, 2026 at 08:29:38PM +0200, Nicolai Buchwitz wrote:
-> On 6.4.2026 19:10, Russell King (Oracle) wrote:
-> > On Mon, Apr 06, 2026 at 09:43:55AM -0700, Florian Fainelli wrote:
-> > > That is almost a guarantee given, there will be a broken MAC
-> > 
-> > Well, it already exists. modern i.MX platforms use stmmac, and some
-> > bright spark wired lpi_intr_o together with the main stmmac interrupt
-> > which causes interrupt storms when the receive path exits LPI. This
-> > makes stmmac LPI unusable on this platform.
-> > 
-> > So, if i.MX is paired with a PHY that can do its own EEE, then we
-> > have this exact scenaro.
-> 
-> For DT-based platforms (like the broken i.MX), this could be addressed
-> similar to what we already have with eee-broken-* properties. For
-> platforms without DT it's getting more complicated and I can't see a
-> way without ethtool.
+This is a belated follow-up to Zefir Kurtisi's report:
+https://lore.kernel.org/netdev/20260220132930.2521155-1-zefir.kurtisi@gmail.com/
 
-No. It's not that EEE itself is broken, it's that the integration of
-the stmmac IP into the SoC is broken. We already have a solution to
-disable LPI at stmmac (the STMMAC_FLAG_EEE_DISABLE flag).
+which is that the ENETC misbehaves when transmitting packets smaller
+than 16 octets sans FCS: it sends them but does not update the completed
+index in the transmit BD ring. I did find a sentence in the reference
+manual explicitly stating these short frames are not supported.
 
-That tells stmmac that the MAC doesn't support LPI signalling for an
-speed and any interface mode, and will result in phy_disable_eee()
-being called, which clears the EEE advertisement, disables LPI, EEE
-enables, and fills phydev->eee_disabled_modes.
+The original series (patches 5, 6) were focused on handling the invalid
+frame geometries. However, review pointed out further issues in annex
+code. Patches 1-4 handle those.
+
+The main patch is 2/3, which Zefir already tested (in a simpler form)
+and confirmed working in the thread from February. The code path should
+be identical for his issue, so I've preserved the tag despite the
+additions.
+
+v1 at:
+https://lore.kernel.org/netdev/20260401172246.1075883-1-vladimir.oltean@nxp.com/
+
+Vladimir Oltean (6):
+  net: enetc: increment error counter in enetc_xdp_xmit() on DMA mapping
+    errors
+  net: enetc: linearize PTP event packets with one-step TX timestamping
+  net: enetc: ensure enetc_xdp_xmit() calls enetc_update_tx_ring_tail()
+  net: enetc: fix bogus TX ring consumer index after reinitialization
+  net: enetc: pad short frames in software
+  net: enetc: pad short XDP frames coming from devmap
+
+ drivers/net/ethernet/freescale/enetc/enetc.c | 38 +++++++++++++++++---
+ drivers/net/ethernet/freescale/enetc/enetc.h |  2 ++
+ include/net/xdp.h                            | 23 ++++++++++++
+ 3 files changed, 59 insertions(+), 4 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
