@@ -1,137 +1,141 @@
-Return-Path: <netdev+bounces-275527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275503-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4D3nIpE802mugAcAu9opvQ
-	(envelope-from <netdev+bounces-275527-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 06:54:41 +0200
+	id ouOUEVEG02k3dQcAu9opvQ
+	(envelope-from <netdev+bounces-275503-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 03:03:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 351613A180D
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 06:54:41 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D15A43A0F61
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 03:03:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DF602300575A
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 04:54:39 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F228730022D2
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 01:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D6FE302742;
-	Mon,  6 Apr 2026 04:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eH6SWGcH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D669A8287E;
+	Mon,  6 Apr 2026 01:03:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA601427A
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 04:54:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060773597B;
+	Mon,  6 Apr 2026 01:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775451279; cv=none; b=QUA+KIHDOnGGFzTUkjJ9HqM+CmIXU+m2tCshQ/4+uTLY3ToqmdJD+RfWMsXFHKHSyytf8cvjwmRWfXAmpPQ50cf8MgTnb9MOk/2S2zxawwjJKFlxgfIhr8E3Xdhnh9FUx+KK7vaiBzpe2Hh9oHmJyY/0Ps0gtwZN+NLHXcxnbto=
+	t=1775437389; cv=none; b=Yg5HGYaqcAfiF1g1Dnc44bkhKO/BbA8Vj6sjzxOqy+Lnek5GBUeAIFbcZi0o7L8koFMB5GMwerWGICiNsO+5uUA+gY52flQEeK1KFjVE5GRNewaU1CJE2OJGxgGFHaPf2y3KrSi/dJTjt/XP20pL4iU8RV7eE/TzKxs/p5PALT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775451279; c=relaxed/simple;
-	bh=i/M/U1Rs0FJn+opFy02cwva2q+VoShzETD0zYZFGZcs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gv75a2Dd14MWh4JA5WM0SSzUsC6Yn5jYwv4Kp0GGWZJX5AlZsidLdQuijKRyD9QS0v/HhjyMtkLsZn8U8osxMMISOpQ0+weLYI1/lEBNAtyk33ht43pgRK7u76t/BftCycaATr3SD798Ta5eA1AfyE/QeDpeHJxTYEZJbc8X6V4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eH6SWGcH; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <739cdd1f-1838-457d-9b71-f47c3eadb0fb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775451266;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tNbb8FX4JBbRHJzrlKceD/p+eg1E4vsexHkNHXJOTVg=;
-	b=eH6SWGcHg/XM9mk09g5me7tLM3qVV1qLzSSCdcCvmV3nCl4LqFDVfcMLm4clqMs6K7WZNk
-	d/qcdLWiTG+Hr41tmwrrx8Ta2SLTtwU4vpGQ3wRe7Wb8dNmiH7nkXeuhL2Q2r5KhIRNVil
-	7vKND561a5c5lVMyHwL7UGkhePEg/fM=
-Date: Mon, 6 Apr 2026 12:54:04 +0800
+	s=arc-20240116; t=1775437389; c=relaxed/simple;
+	bh=NaaYS8PXtHT9h4Sss4Nor9sR4h3q2661xa2Olb4QXWY=;
+	h=From:Date:Message-ID:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ww+8z447RwdSKj6JlPOkc7CL3CPDuX7jIKB14eMfUQ+ph35egQHE2UGDOyd3h1OIr2t8c7TlN48/Ig31YnA3xZNFL41l/PgPIcx3AebQxAz0mQLMVq5PpKMp9qDdsLtgQkj9jYGzQYAI3XwSlEvucLgVylV1DnxIXj7DQG53EI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from reply.eml (unknown [111.196.245.197])
+	by APP-03 (Coremail) with SMTP id rQCowABng9o3BtNp3JgPDQ--.27523S2;
+	Mon, 06 Apr 2026 09:02:47 +0800 (CST)
+From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Date: Mon, 6 Apr 2026 14:10:00 +0800
+Message-ID: <20260406141000.1-rxrpc-proc-reply-pengpeng@iscas.ac.cn>
+To: David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pengpeng@iscas.ac.cn
+Subject: Re: [PATCH] rxrpc/proc: size address buffers for %pISpc output
+In-Reply-To: <20260404190004.4-rxrpc-proc-pengpeng@iscas.ac.cn>
+References: <20260404190004.4-rxrpc-proc-pengpeng@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf v2 1/2] bpf: Fix same-register dst/src OOB read and
- pointer leak in sock_ops
-To: bot+bpf-ci@kernel.org, bpf@vger.kernel.org
-Cc: 2022090917019@std.uestc.edu.cn, dddddd@hust.edu.cn,
- M202472210@hust.edu.cn, dzm91@hust.edu.cn, emil@etsalapatis.com,
- ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, memxor@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, jolsa@kernel.org, john.fastabend@gmail.com,
- sdf@fomichev.me, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, martin.lau@kernel.org, clm@meta.com,
- ihor.solodrai@linux.dev
-References: <20260406031330.187630-1-jiayuan.chen@linux.dev>
- <913274772cd62d8d93e6cfb2c251c2388b73f24f90d05be3c9994207ac7048bf@mail.kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-In-Reply-To: <913274772cd62d8d93e6cfb2c251c2388b73f24f90d05be3c9994207ac7048bf@mail.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowABng9o3BtNp3JgPDQ--.27523S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uw1ruFW3Gr4xKr1fCr17ZFb_yoW8JFy7pF
+	WIkFyUJw1kZrn7JrnxZw4fW34UJ3s5Aa1UGry5Jry29F15Wr93tryft3WrCF1DXrn3G3W2
+	9rZIqrZ7JFnrt37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBI14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2jI8I6cxK62vIxIIY0VWUWVWUZwA2ocxC64kIII
+	0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xv
+	wVC0I7IYx2IY6xkF7I0E14v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4
+	x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8C
+	rVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxV
+	WUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI2
+	0VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28Icx
+	kI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2Iq
+	xVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42
+	IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY
+	6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
+	CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sR_iSd3UUUUU==
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
+X-Spamd-Result: default: False [3.54 / 15.00];
+	DATE_IN_FUTURE(4.00)[5];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[std.uestc.edu.cn,hust.edu.cn,etsalapatis.com,kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,davemloft.net,google.com,redhat.com,vger.kernel.org,meta.com];
-	TAGGED_FROM(0.00)[bounces-275527-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
+	TAGGED_FROM(0.00)[bounces-275503-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	TO_DN_NONE(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: 351613A180D
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.864];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,iscas.ac.cn:mid]
+X-Rspamd-Queue-Id: D15A43A0F61
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+Hi,
 
-On 4/6/26 11:47 AM, bot+bpf-ci@kernel.org wrote:
-> This Fixes: tag covers the SOCK_OPS_GET_SK() portion of the fix,
-> since 84f44df664e9 introduced that macro. However, the identical
-> bug in SOCK_OPS_GET_FIELD() was introduced by an earlier commit:
->
->    fd09af010788 ("bpf: sock_ops ctx access may stomp registers in corner case")
->
-> That commit added the dst_reg == src_reg handling to
-> SOCK_OPS_GET_FIELD() with the same missing zeroing in the
-> !fullsock path. Should this also carry:
->
->    Fixes: fd09af010788 ("bpf: sock_ops ctx access may stomp registers in corner case")
->
-> Without it, kernels that have fd09af010788 but not 84f44df664e9
-> would not receive the SOCK_OPS_GET_FIELD() fix via stable backport.
->
->
-> ---
-> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-> See:https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
->
-> CI run summary:https://github.com/kernel-patches/bpf/actions/runs/24017481706
-Well, it's true. However, fd09af010788 and 84f44df664e9 are from the
-same patchset (same author, same minute), so any stable branch carrying
-one will have both. That's why I only included a single Fixes tag.
+Yes. My original changelog example was too loose, and your quick test is
+right for a fully expanded plain IPv6 form such as
 
-But if you prefer carrying both explicitly, I'm happy to add it in next 
-version.
+  [ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff]:65535
+
+That form is only 47 visible characters, so it fits in the current
+char[50] buffers.
+
+The reason I still think the bug is real is the current %pISpc
+implementation in lib/vsprintf.c.
+
+For AF_INET6, %pISpc goes through ip6_addr_string_sa(), and the compressed
+path uses ip6_compressed_string(). That helper switches to a dotted-quad
+tail not only for v4mapped addresses, but also for ISATAP addresses:
+
+  useIPv4 = ipv6_addr_v4mapped(&in6) || ipv6_addr_is_isatap(&in6);
+
+So a current-tree case such as
+
+  [ffff:ffff:ffff:ffff:0:5efe:255.255.255.255]:65535
+
+is possible. That string is 50 visible characters, i.e. 51 bytes
+including the trailing NUL, which does not fit in the existing char[50]
+buffers used by the rxrpc procfs helpers.
+
+So I agree the example in my changelog should be corrected, but I do not
+think the underlying bug goes away. The claim should be framed around the
+ISATAP case rather than the plain IPv6 or mapped-v4 examples I used
+originally.
+
+If that makes sense, I can resend with the changelog corrected to cite the
+actual maximum case explicitly.
+
+Thanks,
+Pengpeng
+
+
 
