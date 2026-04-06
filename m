@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-275669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275670-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wONaENTt02nInwcAu9opvQ
-	(envelope-from <netdev+bounces-275669-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:31:00 +0200
+	id 6JzJOPjt02nInwcAu9opvQ
+	(envelope-from <netdev+bounces-275670-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:31:36 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C0543A5B51
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:30:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A0DB3A5B66
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:31:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6106301DBB1
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 17:27:19 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id ABDFA302F3A7
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 17:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11719390980;
-	Mon,  6 Apr 2026 17:27:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E9338F933;
+	Mon,  6 Apr 2026 17:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="FiXoI6nn"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="iX7JgO5s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBDF1390222
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 17:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F9338F22D
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 17:27:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775496439; cv=none; b=mBbLAr2rYRZNxAzxO8E2yTwvcilS6T7hVNH9uGjge/abYQwRDeSLDn3DkrZ7dJBMaCDVZdgg+/6AZ0Vlts8YvRWvrutIaoMyBXx3siLIiOy7duYPBKGoBXPVxgA9e3FmdrFdipf/M7VQVonGy5nh4ErpBqpkzXQbfzGxqBi7RWo=
+	t=1775496445; cv=none; b=drC3kun01CuM5rEQn27LIhl/e/cQuSnSWMYn6i27qT0DZQgmljOyFtfye/W72YgeRhlVwqvx50sFvdoWVFnLacbtQNwmAYoNkUrDn52Dd8pYoATKCsMNeMJxPSS3QGfMpeDZ2Is6GeZwHPxFYzrfzUrsP2Ht/wuJ6JM81MCjFHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775496439; c=relaxed/simple;
-	bh=UMQJelaESrnRDZL8PO4QRgAZzcPl/5e48Jg6H+CQ59w=;
+	s=arc-20240116; t=1775496445; c=relaxed/simple;
+	bh=TdSbYldN8BgHeccaQnv5dUiqChuSPpB3xVgb7tE+F8A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TnV2w3DSKTTXwolz+x4jzrN5XiVN/8tT1u77CW5GceEnkCDorhKTmVRTTbuBAt2zGobMvaVsNGAR1YHOSUC+q2V0IwqK6azh7nQRLvcwQ5hrOeCAMf/Ebci2/zK2Fx/T0NE1CacROkW2BBuZGRPMSSHoi4JS6K1AaUXPdi1jLSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=FiXoI6nn; arc=none smtp.client-ip=209.85.215.175
+	 MIME-Version; b=tSkrOwDk+HQQJy02V/zqvJT7nUzxyqm8O/f0eoDJDgGO/fbJWBzc5K7qM+t8LSS3J0MEeaSSrkbMJniCCIJEPLClIQ0rfoMBb6f1XIzQXwR0LYUfed79xezuTGbK/KgOuB4yXlzOuZvUK19bMesPT3UGkeIVul5CO0KTzXWimyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=iX7JgO5s; arc=none smtp.client-ip=209.85.215.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-c70e27e2b74so1199452a12.0
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:27:17 -0700 (PDT)
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-c76af79f029so1635455a12.3
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:27:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1775496437; x=1776101237; darn=vger.kernel.org;
+        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1775496444; x=1776101244; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WWolUof2Pu6ZTaPL7Za7frQru9ToMhBGz4ztPq2c1y4=;
-        b=FiXoI6nnzDtf0BoLzjLHIZi/NHG4ip2pIO6e1dGAnMj5//kIpITsBgtMavg5Jwaj89
-         aBfvPd473HCLC63hwHHq4jlCRO0YXxr9ZpJ6UOfZXN66wPqbepK4zHG8WSUXKfKJtJCk
-         fEwsA6RXpNyj1zdAW/wgmYEy4WmjFebcOY2vx6NcvXNXyOAKQMZ5F6ynTFGrWZubJyTv
-         QwUHYW3dEIvociSiy0T9jxJJgMwBEG9N6++DJqJ4DNHkm8WNbHaGjHtdcSvV0zhDXP8H
-         aV3lBXfeDhMvOK/YwFblDl5dUx6SLN5dg8uEx5zWsNV8d3njrRmpNxjjUsudvOsAGosv
-         Yg0A==
+        bh=2WtkE8OyzNx92SNs8SVA1PmzsnKoNFoQZNHcbvKbHJU=;
+        b=iX7JgO5s+SNNkOUPjazigN2V+4wq6xMA1ei4CFWHaFkcIfHnUllIep9DcHZ0NIkh90
+         C4FTwOiYqgWsvgF7vU3XCNUk9be6ju/8AuoZIbo/ElrIDS0+fFbfBHx0y86aVEKFAL5S
+         2Ox0NKdK45ugKagig7BAOqV5zc7fEUEIFPdIvStEYXid76vtVrGGO3lsBZcAdoL8NXFe
+         CnL9siU855O8fDXfaQ8TRfk4yAxCBQfVaAVXqaYyceJDp00Ti1VZjf0gzah5/CMbjgAd
+         EfEBuffOXRLY4i7DD3mADPcH2+zt/8dzDbw4EDpSsacfKz40qVUuu+nA4QB2t3wLJ2J4
+         Aqkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775496437; x=1776101237;
+        d=1e100.net; s=20251104; t=1775496444; x=1776101244;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=WWolUof2Pu6ZTaPL7Za7frQru9ToMhBGz4ztPq2c1y4=;
-        b=CLI+aypqhf2mocx4b6cduzx18VR3D5JU3wnp47yC6n4NQvO/HfNXHYVJT+BtaUUhhM
-         QKH5GjbhwXRtOkCW+LZrK8vddqADFZ5EQwm0HNgpmyySXGXbzUDJdr65WafZmZ1d7w8t
-         Z2uNvjGBiQldfVJKHwCJlPaEf8a64LShBGtXMCrrd8Mhzqiqskx88/xqu9UWkIYl7+Vt
-         UWljgkzRpGS6kXa8e47S9x8RAWu4E/vcpqLH2embx8h9oz1rP0uVtMFumn228xBJJvE7
-         qlAMk2RZgCbHR6BzP0zWyefVKjroQadBjfkygOQWv6bCpGE6zwJjCHGNlloXybgTrl7S
-         5xBg==
-X-Gm-Message-State: AOJu0Yx8lrXUdqIK/STxeBbmzlj1Itxmlh5wBucPiRlzmM0zEQCJ8ALk
-	mbsAgkHLNeDuV/jnh/2I1LbQ/BSEJ+LRIRtAg36peCbnF8SeJOKYTaXLo+iHsxsIJBXKM3lsYRX
-	41R4M
-X-Gm-Gg: AeBDiesTOp8SgQRZ+6mOE5fmG8QMnYLopqZtSZ+jjmlfsTsEuWArbkhM8tdSePbB3lc
-	HULWubxRCTfTzuRGDSEZmVrx44Pf8OsJxELWdXkYNZ/MIYYXkwNvd5nMQlUuVItgaEyWKvjcw1d
-	eSFFqaSRjPT2ppao8Y2yFCNP5E/XDCzFAyWPAD+dURoLQoscmns+h/0y7AKth/uN9RnIG+zJGHv
-	U9064YbcDcu06RD0l1wTa/dALuvwpTxCSAz9MOApK5xOkaCkl2HXSF2XrZ2tDKHhBUEK49vGGe3
-	7MsO+ufSqISQu8jcI+dE7IBoR1rByFGS/PZAZMDysm5hfGMmNYcE/hfwfr4BSF7IrNglVnvziUt
-	ZNxttBZcS9OABIxetntDBy/fpe+PQwH5Pg49Hh9Y9kbUTziLkg0OasHBr1NYdvS+vP4JHG83w/B
-	2K9Vw71Qyawf1x0XRwbcSc1uik45WT0GRQRdEwSZ2XSwA=
-X-Received: by 2002:a17:902:e790:b0:2ae:606b:bd98 with SMTP id d9443c01a7336-2b28176a77cmr145265855ad.26.1775496437219;
-        Mon, 06 Apr 2026 10:27:17 -0700 (PDT)
+        bh=2WtkE8OyzNx92SNs8SVA1PmzsnKoNFoQZNHcbvKbHJU=;
+        b=E142QyBkNoj0E3om4CB2y6i5cFkcGzrSf9UiDaQX0B7JexgSy+ufpIFfE8m6SP4InY
+         ReXdoszpQMyavKShw+dwfVzhejEZhC8ODFJTnbzjB/LBWDXfcLAwNXLcIYKevZ4hN8w/
+         jn0R0rsmeYCD9dIo8k3nIZLqk8q6BT2lTLND5/EtBI1XInxRF2ELmVfwxHqcRLPd2rrZ
+         PQUNA3Lu9hOT5wDOL89SkTNsfxnNVMotqzvu40xdJi+8gUD2Lu6hXtwTibwvSti38d0t
+         ghNF4gpLWn2LVk3H6jLNTep0CNZ+oqDKnXOIwh1bflx6n2OpQ8KgyEK95mja7EtWQI2I
+         UIFg==
+X-Gm-Message-State: AOJu0YxGelLAL2+UlUQjPBGusD2lQRqRQaJQXF2LgXJY2RYCr5MWdBHj
+	I6/UISgMB49OkYy4Mroe54za/+P9DxJYGQteG1cIXfpQf0t5o1Yv5CMYrzV9tn0J8wAqu4Ulgqr
+	otKLt
+X-Gm-Gg: AeBDieu9eov9OBVAA3gyGRPQgzHciMfBRSRxJIWbO8eZ6C650A4cggwnF+BOSA6rxE4
+	537R1rA1tTmt07xoaIWRpIS1t8BHReNWWeTE1IFlN7NWXcX4Cjbq5qERexMdYLVDi3ZZc8kNfpD
+	UZzW/555WDiqI2vpxyHv69MmpOJ8MV2xQZMaE+BEFS9gukdVYD6zwg2vfAizBoVYw1HwLvf49Kn
+	ROlnaBjL+zvs6iyvC5QdSka1p0hRjt8QXnnova+EUF4AP4vGaS8lWIBHGaYGlB0UIuIAGOMDAGX
+	PHP3/ix2SEpx3VW/WOzQRQ0085plAc4g1RZmtvv0Jh27SkE9BLtPjRCGqEOR283UtldGMLX5Egd
+	KKMrJyNbkibSHDxviePrqhTurtjc8h37B/3iyBhaaOVuIz/JkYS8xLOGsrLPQoqah6fJxvgN40I
+	4iMPjyVrZsK2XbgsIHzBLI6sc1TF//oMsL
+X-Received: by 2002:a17:903:22d1:b0:2ae:a45b:42f7 with SMTP id d9443c01a7336-2b2817b3e21mr140053395ad.36.1775496443798;
+        Mon, 06 Apr 2026 10:27:23 -0700 (PDT)
 Received: from phoenix.lan ([104.202.41.210])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b27477a13dsm146437945ad.26.2026.04.06.10.27.11
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b27477a13dsm146437945ad.26.2026.04.06.10.27.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2026 10:27:16 -0700 (PDT)
+        Mon, 06 Apr 2026 10:27:23 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>,
@@ -86,12 +86,12 @@ Cc: Stephen Hemminger <stephen@networkplumber.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Neal Cardwell <ncardwell@google.com>,
 	Yousuk Seung <ysseung@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net v4 7/8] net/sched: netem: check for invalid slot range
-Date: Mon,  6 Apr 2026 10:25:15 -0700
-Message-ID: <20260406172627.210894-8-stephen@networkplumber.org>
+Subject: [PATCH net v4 8/8] net/sched: netem: fix slot delay calculation overflow
+Date: Mon,  6 Apr 2026 10:25:16 -0700
+Message-ID: <20260406172627.210894-9-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260406172627.210894-1-stephen@networkplumber.org>
 References: <20260406172627.210894-1-stephen@networkplumber.org>
@@ -102,21 +102,21 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.34 / 15.00];
-	DMARC_POLICY_QUARANTINE(1.50)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine];
-	MID_CONTAINS_FROM(1.00)[];
+X-Spamd-Result: default: False [-0.06 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
+	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
 	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-275669-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275670-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[];
@@ -128,57 +128,46 @@ X-Spamd-Result: default: False [1.34 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 9C0543A5B51
+X-Rspamd-Queue-Id: 4A0DB3A5B66
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Reject slot configuration where min_delay exceeds max_delay.
-The delay range computation in get_slot_next() underflows in
-this case, producing bogus results.
+get_slot_next() computes a random delay between min_delay and
+max_delay using:
+
+  get_random_u32() * (max_delay - min_delay) >> 32
+
+This overflows signed 64-bit arithmetic when the delay range exceeds
+approximately 2.1 seconds (2^31 nanoseconds), producing a negative
+result that effectively disables slot-based pacing. This is a
+realistic configuration for WAN emulation (e.g., slot 1s 5s).
+
+Use mul_u64_u32_shr() which handles the widening multiply without
+overflow.
 
 Fixes: 0a9fe5c375b5 ("netem: slotting with non-uniform distribution")
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- net/sched/sch_netem.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ net/sched/sch_netem.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index e405bf862163..c82f76af41aa 100644
+index c82f76af41aa..d47e1b0d7942 100644
 --- a/net/sched/sch_netem.c
 +++ b/net/sched/sch_netem.c
-@@ -883,6 +883,18 @@ static int get_dist_table(struct disttable **tbl, const struct nlattr *attr)
- 	return 0;
- }
+@@ -660,9 +660,8 @@ static void get_slot_next(struct netem_sched_data *q, u64 now)
  
-+static int validate_slot(const struct nlattr *attr,
-+			 struct netlink_ext_ack *extack)
-+{
-+	const struct tc_netem_slot *c = nla_data(attr);
-+
-+	if (c->min_delay > c->max_delay) {
-+		NL_SET_ERR_MSG(extack, "slot min delay greater than max delay");
-+		return -EINVAL;
-+	}
-+	return 0;
-+}
-+
- static void get_slot(struct netem_sched_data *q, const struct nlattr *attr)
- {
- 	const struct tc_netem_slot *c = nla_data(attr);
-@@ -1096,6 +1108,12 @@ static int netem_change(struct Qdisc *sch, struct nlattr *opt,
- 			goto table_free;
- 	}
- 
-+	if (tb[TCA_NETEM_SLOT]) {
-+		ret = validate_slot(tb[TCA_NETEM_SLOT], extack);
-+		if (ret)
-+			goto table_free;
-+	}
-+
- 	sch_tree_lock(sch);
- 	/* backup q->clg and q->loss_model */
- 	old_clg = q->clg;
+ 	if (!q->slot_dist)
+ 		next_delay = q->slot_config.min_delay +
+-				(get_random_u32() *
+-				 (q->slot_config.max_delay -
+-				  q->slot_config.min_delay) >> 32);
++			mul_u64_u32_shr(q->slot_config.max_delay - q->slot_config.min_delay,
++					get_random_u32(), 32);
+ 	else
+ 		next_delay = tabledist(q->slot_config.dist_delay,
+ 				       (s32)(q->slot_config.dist_jitter),
 -- 
 2.53.0
 
