@@ -1,145 +1,199 @@
-Return-Path: <netdev+bounces-275618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275619-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GCGvCKjG02mqlgcAu9opvQ
-	(envelope-from <netdev+bounces-275618-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:43:52 +0200
+	id +J2VH9zG02mqlgcAu9opvQ
+	(envelope-from <netdev+bounces-275619-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:44:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8EFA3A453F
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:43:51 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1614F3A4560
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:44:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2BC1530071D0
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 14:43:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4878A300826A
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 14:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361563845B3;
-	Mon,  6 Apr 2026 14:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6539F3845B3;
+	Mon,  6 Apr 2026 14:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b="bHWv+7hz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W23Ii5gw"
 X-Original-To: netdev@vger.kernel.org
-Received: from szelinsky.de (szelinsky.de [85.214.127.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844703806DA;
-	Mon,  6 Apr 2026 14:43:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.127.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4170C334681;
+	Mon,  6 Apr 2026 14:44:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775486628; cv=none; b=gbRnLt0lyPuy36U1GZKF1QIYfJ9IxcYvQnZn4GkC/UwwNcnlioAWj2+mUvQRSYisQ22boztmaDP1BgHOFuKwzs8tE2/zAoYXMC//fC3QUchvqMe5yEYclmNb+fxaezT2447fRSbkM3kTC3vFUvS29X+wH4CwmDUGDKT7TeTWNu8=
+	t=1775486680; cv=none; b=fH3Z98p+PU9AiXbzkWbK0Wl1HDJ5tgn+eSzoWqPd1o4wzwe7yb8r2faFdTsxCQICkdbTuQSMNZ9CWcsOfYJXvPd43wvrbo+5R0MLJvLyoKU84SMBiNEHH5EqYxzd2EIPO82Q4Na+FdfLU6WN9lCTxhtLcP+LnRalP6ykmUNmFrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775486628; c=relaxed/simple;
-	bh=rmjYbnkw94A9U79dmJ5TDUh19hIbyDLscu8kGB8Ab28=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BuAP8HY+tn2YL0cLKAg3tPeyWOSzrc6/hMVmdk4u3WvDmmZQLg4BmU75568+mLz4Fck+q1BXWkP8i1qY/Rary90gxulB4thzfhr6dOla3nITQ7+e6lsWQ8YQmBKXp7Ul5/9mfF2+5n2qtvjgo1heEwu5WRG+eKb2wARrKAnvyc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de; spf=pass smtp.mailfrom=szelinsky.de; dkim=temperror (0-bit key) header.d=szelinsky.de header.i=@szelinsky.de header.b=bHWv+7hz; arc=none smtp.client-ip=85.214.127.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szelinsky.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szelinsky.de
-Received: from localhost (localhost [127.0.0.1])
-	by szelinsky.de (Postfix) with ESMTP id CBD6CE831AD;
-	Mon,  6 Apr 2026 16:43:43 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=szelinsky.de;
-	s=mail; t=1775486623;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rmjYbnkw94A9U79dmJ5TDUh19hIbyDLscu8kGB8Ab28=;
-	b=bHWv+7hzNB6yWgwO9GiuBJ6SAn1axBbnwiVgebVeao7SB/+2OEw/oKoldA4is0ICdB/Xt4
-	Ki9JMMpmniX6QYEdH5puig6BAJY0vsLnaxL9gNcrIZkb4i1lhbdKYamMzKwl0He1mqwPuH
-	ZJYVyiFlV9bX4XxeNQP3ipPPo5YVEGd6U1vYOioFLlzp37XDhor+eVL33Zx2Zj6RAr+Wxb
-	ObZn5ua3JosgX1XWhnIYP9K31qxFdd+gueb/xzhDvr+rI0cpumE3J5WQd7OOxwTe7B/08K
-	7QAPaV4eDJ7vqCOC7kCZ4vJlNOxKS310A6/H+qx+r6akIRkNuBVyeqYlViBgAw==
-X-Virus-Scanned: Debian amavisd-new at szelinsky.de
-Received: from szelinsky.de ([127.0.0.1])
-	by localhost (szelinsky.de [127.0.0.1]) (amavisd-new, port 10025)
-	with ESMTP id yWJJs7mzYGDh; Mon,  6 Apr 2026 16:43:43 +0200 (CEST)
-Received: from p14sgen5.intern.hubertus-soelden.com (unknown [83.218.176.39])
-	by szelinsky.de (Postfix) with ESMTPSA;
-	Mon,  6 Apr 2026 16:43:43 +0200 (CEST)
-From: Carlo Szelinsky <github@szelinsky.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Carlo Szelinsky <github@szelinsky.de>
-Subject: Re: [PATCH net-next v2 3/3] net: mdio: treat PSE EPROBE_DEFER as non-fatal during PHY registration
-Date: Mon,  6 Apr 2026 16:43:24 +0200
-Message-ID: <20260406144324.4007913-1-github@szelinsky.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <3597433c-ce26-43c6-9a5f-e942a3db5340@lunn.ch>
-References: <3597433c-ce26-43c6-9a5f-e942a3db5340@lunn.ch>
+	s=arc-20240116; t=1775486680; c=relaxed/simple;
+	bh=cUc/USTOXTckbKII2P/K3rxyrbVtnkvsLV7A5OMbn7E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Vxe3xOLUPLLa7Q+gjcSur52kgxHYqKbF+9nsam+dCO0/Upck4PEIu2gf0SUXH1saQrKQ1IBQE1YPsKRX7FtbzeBb5G8wYxSslWnkOOGSkLtpfOMsZHIsGRp/BLuIcpCb4jAEY19pY8EJNE7EvPTnyNlqFsNH2xxDWo1We2/IqAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W23Ii5gw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCC3FC4CEF7;
+	Mon,  6 Apr 2026 14:44:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775486679;
+	bh=cUc/USTOXTckbKII2P/K3rxyrbVtnkvsLV7A5OMbn7E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=W23Ii5gwcwcRvfER1ccWlIiqmxwU9wzIZXlCqrHkFRhFZwQOHXRfXUJj/K++9KvgY
+	 btTRTrODvylC9A4M4pmP2JGRWp+d2EUMGFODnwX/ytO0Ojou8PARizHNVKOQRGvFhT
+	 Wrl2QfUVrMIQ8MRsUeULqDdHJu1HZUzRrchoc0oz5vLBS6gqQk0Nvc5LlvLJdvhNwz
+	 RarrnYtUp4Aa7zkY/ostKNc+KgtAKh8luaqos140WwK92lBpfmznQi8ZBCJ89VdES6
+	 PoyrNgEt9iXWJeY899NO5JQfuui+yf2TowRb+ucJlaX5dWzaxANZHckKbPIRf2juZN
+	 sMxVsOMnw73Lg==
+Date: Mon, 6 Apr 2026 07:44:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Marc Harvey <marcharvey@google.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v5 00/10] Decouple receive and transmit
+ enablement in team driver
+Message-ID: <20260406074437.3ebb904a@kernel.org>
+In-Reply-To: <20260406-teaming-driver-internal-v5-0-e8a3f348a1c5@google.com>
+References: <20260406-teaming-driver-internal-v5-0-e8a3f348a1c5@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[szelinsky.de,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[szelinsky.de:s=mail];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[bootlin.com,lunn.ch,gmail.com,armlinux.org.uk,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org,szelinsky.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-275618-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[github@szelinsky.de,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275619-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[szelinsky.de:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,szelinsky.de:dkim,szelinsky.de:mid]
-X-Rspamd-Queue-Id: B8EFA3A453F
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,teamd_activebackup.sh:url,transmit_failover.sh:url]
+X-Rspamd-Queue-Id: 1614F3A4560
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Andrew, Oleksij,
+On Mon, 06 Apr 2026 03:03:36 +0000 Marc Harvey wrote:
+> Allow independent control over receive and transmit enablement states
+> for aggregated ports in the team driver.
+> 
+> The motivation is that IEE 802.3ad LACP "independent control" can't
+> be implemented for the team driver currently. This was added to the
+> bonding driver in commit 240fd405528b ("bonding: Add independent
+> control state machine").
+> 
+> This series also has a few patches that add tests to show that the old
+> coupled enablement still works and that the new decoupled enablement
+> works as intended (4, 5, and 10).
+> 
+> There are three patches with small fixes as well, with the goal of
+> making the final decoupling patch clearer (1, 2, and 3).
 
-Thanks for pushing me in the right direction here.
+activebackup:
 
-So if I understand correctly, I should move the PSE control lookup
-from fwnode_mdiobus_register_phy() into phy_probe(). That way the PHY
-just defers like any other device if the PSE controller isn't there
-yet, and the bus scan keeps going for the other PHYs.
+TAP version 13
+1..1
+# overriding timeout to 2400
+# selftests: drivers/net/team: teamd_activebackup.sh
+# Setting up two-link aggregation for runner activebackup
+# Teamd version is: teamd 1.32
+# Conf files are /tmp/tmp.ydjNK9Um7H and /tmp/tmp.xZuc3cWbN0
+# This program is not intended to be run as root.
+# This program is not intended to be run as root.
+# Created team devices
+# Teamd PIDs are 21457 and 21461
+# exec of "ip link set eth0 up" failed: No such file or directory
+# exec of "ip link set eth0 up" failed: No such file or directory
+# exec of "ip link set eth1 up" failed: No such file or directory
+# exec of "ip link set eth1 up" failed: No such file or directory
+# PING fd00::2 (fd00::2) 56 data bytes
+# 64 bytes from fd00::2: icmp_seq=1 ttl=64 time=0.753 ms
+# 
+# --- fd00::2 ping statistics ---
+# 1 packets transmitted, 1 received, 0% packet loss, time 0ms
+# rtt min/avg/max/mdev = 0.753/0.753/0.753/0.000 msPacket count for test_team2 was 0
+# Waiting for eth0 in ns2-lZ0gqd to stop receiving
+# Packet count for eth0 was 0Packet count for eth0 was 0
+# Packet count for eth1 was 0
+# Waiting for eth1 in ns2-lZ0gqd to stop receiving
+# Packet count for eth1 was 0Packet count for eth0 was 0
+# Packet count for eth1 was 0
+# TEST: teamd active backup runner test                               [FAIL]
+# Traffic did not reach team interface in NS2.
+# Tearing down two-link aggregation
+# Failed to kill daemon: Timer expired
+# Failed to kill daemon: Timer expired
+# Sending sigkill to teamd for test_team1
+# rm: cannot remove '/var/run/teamd/test_team1.pid': No such file or directory
+# rm: cannot remove '/var/run/teamd/test_team1.sock': No such file or directory
+# Sending sigkill to teamd for test_team2
+# rm: cannot remove '/var/run/teamd/test_team2.pid': No such file or directory
+# rm: cannot remove '/var/run/teamd/test_team2.sock': No such file or directory
+not ok 1 selftests: drivers/net/team: teamd_activebackup.sh # exit=1
 
-I checked and bus_probe_device() is void, so device_add() won't fail
-even if probe defers. And once the PSE module loads, the deferred
-probe retry should kick in and claim the regulator before the 30s
-cleanup runs. If the module never loads, the regulator cleanup is
-actually the right thing to do safety-wise. So no need for the
-admin_state_synced workaround or the lazy resolution stuff -
-deferred probe just handles it.
 
-Unlike lazy resolution, this also doesn't break notifications, so
-PSE is acquired during probe, not on first ethtool access.
+transmit_failover:
 
-Does that sound like what you had in mind?
-
-Cheers,
-Carlo
+TAP version 13
+1..1
+# overriding timeout to 2400
+# selftests: drivers/net/team: transmit_failover.sh
+# Error: ipv6: address not found.
+# Setting team in ns2-yxjiUo to mode roundrobin
+# Error: ipv6: address not found.
+# Setting team in ns1-Jht6kA to mode broadcast
+# Packet count for eth0 was 0
+# Packet count for eth1 was 0
+# Packet count for eth0 was 0
+# Packet count for eth1 was 0
+# Packet count for eth0 was 0
+# Packet count for eth1 was 0
+# TEST: Failover of 'broadcast' test                                  [FAIL]
+# eth0 not transmitting when both links enabled
+# Setting team in ns1-Jht6kA to mode roundrobin
+# Packet count for eth0 was 0
+# Packet count for eth1 was 0
+# Packet count for eth0 was 0
+# Packet count for eth1 was 0
+# Packet count for eth0 was 0
+# Packet count for eth1 was 0
+# TEST: Failover of 'roundrobin' test                                 [FAIL]
+# eth0 not transmitting when both links enabled
+# Setting team in ns1-Jht6kA to mode random
+# Packet count for eth0 was 0
+# Packet count for eth1 was 0
+# Packet count for eth0 was 0
+# Packet count for eth1 was 0
+# Packet count for eth0 was 0
+# Packet count for eth1 was 0
+# TEST: Failover of 'random' test                                     [FAIL]
+# eth0 not transmitting when both links enabled
+not ok 1 selftests: drivers/net/team: transmit_failover.sh # exit=1
+-- 
+pw-bot: cr
 
