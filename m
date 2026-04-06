@@ -1,154 +1,165 @@
-Return-Path: <netdev+bounces-275703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275704-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 6JKhOHX902kSpAcAu9opvQ
-	(envelope-from <netdev+bounces-275703-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:37:41 +0200
+	id s4wODwz+02lbpAcAu9opvQ
+	(envelope-from <netdev+bounces-275704-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:40:12 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED8923A64A5
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:37:40 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9682A3A64B8
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:40:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id D3894300BE21
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 18:37:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C268D3010242
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 18:40:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 675EA3939AB;
-	Mon,  6 Apr 2026 18:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1937B38C437;
+	Mon,  6 Apr 2026 18:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="LJbR9dh4"
+	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="Y99bQVC1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A34738E5F6;
-	Mon,  6 Apr 2026 18:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD507175A9E
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 18:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775500653; cv=none; b=DE1AaXlDxojc0/61yPB4NNpz0/MZ6aBfgCSZJmNCCFh/R0zTFH234TOA2a0zfHoJhtkQIjHHsCbfms7LgCOS3Bhc22qeQ+RJOvsD23T3LMj2LLLVpLsBYJ/ekIeIcd5SW+A4wvFd5nCbQbPrxttdDVtTih6OLtS+9LdqfmUwrS4=
+	t=1775500809; cv=none; b=a2e5+/moxWgIvy1N17CQPLR/Ja0o0N2j1jplGRHp36Fw4Q4LX34/7n+io475ymSKZTPhKaw28auozE56vS4w2lO8p9rUOERNtx9zyNLIAa90LqjUAiNmc9fYanJfxsFAeSIe8soN6F/GxpvCKnah8wNXlhkFnWYAeKfS0vBvnVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775500653; c=relaxed/simple;
-	bh=j/OcC1PBra97L2e12u5xT99c37IGn8k7+8n/kXD/Ng4=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=P0+of/ddnYkoxVsKW29KzpO/yG1MnFyqDAgzpnNkY2Np7+liMldFffZ2tJIjEbmbmvTXQa2981voPMOb5C0/IYj52d2ajURQ2b2pgsGq66AJXveemjp/UC1NcDJaZSEm6+bbJpjvksGrz+2NO3PymnlPta5ZCOxJmcbkwDw4aeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=LJbR9dh4; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C9251A5888;
-	Mon,  6 Apr 2026 20:37:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1775500648; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=kff7k9sb1vSdk8ThNR1w5zwCc9/cSFpnvvMQ/mvFjKk=;
-	b=LJbR9dh48Z28a7oODi05q5LCn0xvjV5bB1c6ERpYX9n35JsfdDJfSJk/4TELdcnu4VEycF
-	uEWo0GmcIFxAkKGksNk+GX88jGceHzi22qrRnIZUeZRr4jKlRjv+b2maiyRvebbhDqHt2F
-	F5Dn5pszA1Vy1qttnNgMlxZIFxGyzTx1FUv4isAfogspYLALaxO5/mIGty4SJPPjOtgYuk
-	Zi//dWqmAGTWwJ936oLzf/ne6+fMbCH2xOfJNNstClp5uAzjTGfOxVtmEbHsRdoV6YjI7e
-	12e4evHsIEK3ugFY8dBNB2PW5SEL1oNTQnoCKa/DYNembxt6pGu2/DGTqmeZ7Q==
+	s=arc-20240116; t=1775500809; c=relaxed/simple;
+	bh=aiuAcaV4yFLMn4T00LhgcC6CWWrzG8beixwMz8mRQNw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WvHp+FyE/H/Zxb/jWvtJ4I2PwMinuVlX0OtfLhITg0ePBksz9HVI6gAsK1a5oyijySyUm98UIrZxP3paxPchfNMn1crZpawPCmbkwFfntDRqLmjLhsCXFH3Wc0kZP7MJGxi5q6BZoe90GbZGUxqzD1sJjc/SLFFygu4koEEqxkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=Y99bQVC1; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-827270d50d4so3735831b3a.3
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 11:40:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775500803; x=1776105603; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yrfB4KDD6LfKQBg0YyaAbizVlqsEn4FOH33HJy36dpM=;
+        b=Y99bQVC1b1uezk/QloHoNNwb0uu3PpNro++LwKWAwTMfUZSMRc4XqFRgYlGk2EvkPB
+         tIAjwlycEX4tURbmI7wp3MLQyME62aYDHQSIw4fTozajymqwe7Nr6aKLof5Bcd/fl6Sw
+         KLKxu1WZQX9dxdbjCQXqr7fokDX+tVUVZP/5jH2A8g01E/uGVyPMKNWu3ccTr+CE6tq/
+         UU13OO37iE8EWTHJ3ay4qApQlcfzfiOxDx1XtRBp6atuiTOBn/NrCBy5XYuinDU80Wis
+         aWjURqpnj1/NFmlL/eUM9DUu0mb2SnqIQxOdiAuBImqmGjegdVa+nC+xMAapfS7C1Qiq
+         C3xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775500803; x=1776105603;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yrfB4KDD6LfKQBg0YyaAbizVlqsEn4FOH33HJy36dpM=;
+        b=N2C9J6ibiwjanZyVCK5gSGFoWPkRfgcg6pgabrOtOYawKxI4jyI3JEHZsT0WpYKCZi
+         m8xXinRpyOxfikQktIIFYsbflL59fduC+PJLtqWgotFXcoxq9ssGVuNKlHLnoptB/cfo
+         o+u0yvUGdolL7CVJyxbuEut39aftMLXNOLl6hrywHS0IxMX2RAH0aCPCN5mIfc+1Qcmb
+         hT9St6eu3MdjJLTI4UYrqZGKp8uFHTwYgwlM1owrMahAAK2qgk1hqCQo860AJw8lMANi
+         rY1G7IQfOz2ZMUTf6WGiHvWHoVfLoiHfl6YXNv98S13w80Wtj1ElAg7ij8iczYe3cJf8
+         gUJg==
+X-Forwarded-Encrypted: i=1; AJvYcCVylOWpQuVTt7IRnIMWAvng340Uz6pNHyRWJldgCoC1S1dZ5PEH3YHrkngAQHnj6RChIya1loA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzioroWUoIjrPyaWcb6ePXneZDrQObUgu51koIKCPuAyYwpqeaW
+	AUOEMLiKcsJn8vDdwMdYLmkHdUSCo+w77kn/jmksaCXY/tDnrKb5ye537qR7ccMTKJ4=
+X-Gm-Gg: AeBDievx+LgURhuXrIaX7h2kr1/rnJ9OlU1J6W0NI4TWjcF/eiaJZB/xJaOK5a203VS
+	eyf4hIZ/bVBXM8AIZd6UGoH5XSfDbWOMpyuIWPCsofalzJxzMuWONxk/l3umnFXkDYxgXzTKB58
+	kQb5x/eqKFHv7JN6fw7sy8bhi5Pl0uELqzEA8o1pFP+horgAv75zzhUMt2/Widz8CIyYttE+j2P
+	GuIxZ4DPvLN2A9ayBHN4OndGkG+ddHlVwmB/J2zQUjQAovwW0Ddklm9BpMs1ZtLpxqK9pXQmlut
+	10+wBn5t5Y7XVbUIv0SFEcKdhBP9zFjRyEJSlG1TNoIr2krHBmWIl4pnpcsdWPlhSESWH1x+DC1
+	TtYuMe7KSfF8r1Lk64sTBropXrZokN9TF433f9FPsmfNnz0fLpUfidqavDv2YAVDMvaLAI7PD49
+	rf9dIKvJfkn4jXoHM=
+X-Received: by 2002:a05:6a00:3306:b0:82c:2555:b9b2 with SMTP id d2e1a72fcca58-82d0da4fe1amr12187358b3a.10.1775500803251;
+        Mon, 06 Apr 2026 11:40:03 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:70::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82d11f76c09sm10655900b3a.55.2026.04.06.11.40.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Apr 2026 11:40:02 -0700 (PDT)
+Date: Mon, 6 Apr 2026 11:40:01 -0700
+From: Joe Damato <joe@dama.to>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next 2/2] net: pull headers in
+ qdisc_pkt_len_segs_init()
+Message-ID: <adP+AeuYK0eq0q0V@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com
+References: <20260403221540.3297753-1-edumazet@google.com>
+ <20260403221540.3297753-3-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 06 Apr 2026 20:37:27 +0200
-From: Nicolai Buchwitz <nb@tipi-net.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
- skhan@linuxfoundation.org, workflows@vger.kernel.org,
- linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next] docs: netdev: improve wording of reviewer
- guidance
-In-Reply-To: <20260406175334.3153451-1-kuba@kernel.org>
-References: <20260406175334.3153451-1-kuba@kernel.org>
-Message-ID: <04de66f8f3d92720fcae6280b70f57f9@tipi-net.de>
-X-Sender: nb@tipi-net.de
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260403221540.3297753-3-edumazet@google.com>
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275703-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275704-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
-	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[dama.to];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,lunn.ch,vger.kernel.org,gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:email,lwn.net:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: ED8923A64A5
+	DBL_BLOCKED_OPENRESOLVER(0.00)[dama.to:email,dama-to.20251104.gappssmtp.com:dkim,devvm20253.cco0.facebook.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 9682A3A64B8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 6.4.2026 19:53, Jakub Kicinski wrote:
-> Reword the reviewer guidance based on behavior we see on the list.
-> Steer folks:
->  - towards sending tags
->  - away from process issues.
+On Fri, Apr 03, 2026 at 10:15:40PM +0000, Eric Dumazet wrote:
+> Most ndo_start_xmit() methods expects headers of gso packets
+> to be already in skb->head.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> net/core/tso.c users are particularly at risk, because tso_build_hdr()
+> does a memcpy(hdr, skb->data, hdr_len);
+> 
+> qdisc_pkt_len_segs_init() already does a dissection of gso packets.
+> 
+> Use pskb_may_pull() instead of skb_header_pointer() to make
+> sure drivers do not have to reimplement this.
+> 
+> Some malicious packets could be fed, detect them so that we can
+> drop them sooner with a new SKB_DROP_REASON_SKB_BAD_GSO drop_reason.
+> 
+> Fixes: e876f208af18 ("net: Add a software TSO helper API")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 > ---
-> CC: corbet@lwn.net
-> CC: skhan@linuxfoundation.org
-> CC: workflows@vger.kernel.org
-> CC: linux-doc@vger.kernel.org
-> ---
->  Documentation/process/maintainer-netdev.rst | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/process/maintainer-netdev.rst 
-> b/Documentation/process/maintainer-netdev.rst
-> index 3aa13bc2405d..bda93b459a05 100644
-> --- a/Documentation/process/maintainer-netdev.rst
-> +++ b/Documentation/process/maintainer-netdev.rst
-> @@ -551,10 +551,12 @@ helpful tips please see 
-> :ref:`development_advancedtopics_reviews`.
-> 
->  It's safe to assume that netdev maintainers know the community and the 
-> level
->  of expertise of the reviewers. The reviewers should not be concerned 
-> about
-> -their comments impeding or derailing the patch flow.
-> +their comments impeding or derailing the patch flow. A Reviewed-by tag
-> +is understood to mean "I have reviewed this code to the best of my 
-> ability"
-> +rather than "I can attest this code is correct".
+>  include/net/dropreason-core.h |  3 +++
+>  net/core/dev.c                | 51 +++++++++++++++++++++--------------
+>  2 files changed, 34 insertions(+), 20 deletions(-)
 > 
 
-I had the same hesitation when starting to review on netdev, unsure if 
-my R-b
-carried any value. Therefore I appreciate the addition.
-
-> -Less experienced reviewers are highly encouraged to do more in-depth
-> -review of submissions and not focus exclusively on trivial or 
-> subjective
-> +Reviewers are highly encouraged to do more in-depth review of 
-> submissions
-> +and not focus exclusively on process issues, trivial or subjective
->  matters like code formatting, tags etc.
-> 
->  Testimonials / feedback
-
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+Reviewed-by: Joe Damato <joe@dama.to>
 
