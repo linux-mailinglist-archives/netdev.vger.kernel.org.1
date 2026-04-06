@@ -1,179 +1,204 @@
-Return-Path: <netdev+bounces-275658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275659-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iBz/M5bp02n/ngcAu9opvQ
-	(envelope-from <netdev+bounces-275658-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:12:54 +0200
+	id uJX+OlDr02nInwcAu9opvQ
+	(envelope-from <netdev+bounces-275659-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:20:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 336A03A59A3
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:12:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73F653A5A12
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:20:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EFD78300E27A
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 17:12:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 406E3302DB70
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 17:19:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB9438F930;
-	Mon,  6 Apr 2026 17:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D739F390990;
+	Mon,  6 Apr 2026 17:19:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b="ZnXFG4Fp"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="TfymV7/O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pj1-f99.google.com (mail-pj1-f99.google.com [209.85.216.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1128F38F243
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 17:12:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB5838F243
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 17:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775495570; cv=none; b=JNjo5oElGeL3i5jugMaFekENtcONVgQqm761C4RjLsf8FUnipOqeXedoXaMh6c2epIJWUqdZyYKT37hQJ/ow0SADTtzQJ4ty2ULmCe8S84ARjMM9N4NKpFY9mUI6mxBi+r1OH7PKj6bt/pNGakO9Slix+5OPZI2WshXifJC2NIM=
+	t=1775495970; cv=none; b=TIY/rlA7PE+N/pwZHBkQzS6R0kX9gcIJuaC8ezCdury0tBZM3ypw9nekLYK9owyb89d/VWAXxB427G6mq+xhpLpqE5783x0yrY0rMNyvSWVJP4sQqJK5YLR6OhWn5T/S69tiL4RQVNgBb68VFH8aucma39eVNkzd/hwsP7bhPG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775495570; c=relaxed/simple;
-	bh=d42IIw+weYRwQ5HRi/h21uuLi5FFAQnCGKhreEp4H7w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GqwgXxFHsKrtI0Db1Eett4XDQikCgEqa2QBhyGlVhzG8/FvjtWzAEPN+kspZp3/Ym9x0B5Jwfri9SAjDAQ8HFwnKn7z4kgq3z6nn48ruwd+RCyLz4eFM9RlxQCKK4ljuqurrr9pvkkfwmXjKrawRKy1wz4wsm/zOdCPwnopqY/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20251104.gappssmtp.com header.i=@networkplumber-org.20251104.gappssmtp.com header.b=ZnXFG4Fp; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8296dabef74so3981059b3a.1
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:12:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20251104.gappssmtp.com; s=20251104; t=1775495567; x=1776100367; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TSRY3MffZOgkoF8pneWM3oCokuMI5pTYVXcqEQr21cI=;
-        b=ZnXFG4Fpz7uaNkM8Tph9oHHFcn2beygIBDweG31W+n2EMbSHIHVmpOhFdm59vQNp22
-         koFJh9gFNRd01Vv32At8T1s4IDT8L55v/lZI6OXEQ7wXBExuF/YoAl7NkOazUjFnHMVk
-         bMdcPB3gz6JGD1Dg5UE6PCVzwZBK2FdGP+nigC/BB1k7MtqW5lLl1MvmeLfd2Av/SFgu
-         vWH0MKXXdXuQzABQ3rMiD3r4emFVpHxvVvVxhCDL/A5mK5KC5NfAj37zbBvixqEMFtDi
-         8ql9zI3uT144f4mtIVY4MlOr2UZTLC6+qKRjTlWAtVpuGwEqKfr3z4TLEPtkJI/V7YAK
-         BuaA==
+	s=arc-20240116; t=1775495970; c=relaxed/simple;
+	bh=Ss6WTHFJk7o5y0YnMAozv3+vHvaa9XtDF+7OYIRVVEk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=frheucArJFQUK7vzVs168mrhCX6MIjgMlQLcYi5O/jXnsumegNXRl5DXOq7vkIZtbnBqb9wBwAl7yy+yJnpkZ01FKY+8A8RYk+6QlL4M1Cfu8wp1HIZ5PNk0LAhEVKsc8LkeySXYsfjNca2xLrgy0Ulyg/WdOfFvsaSNdr3zMDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=TfymV7/O; arc=none smtp.client-ip=209.85.216.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f99.google.com with SMTP id 98e67ed59e1d1-35c1d101355so1644799a91.1
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:19:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775495567; x=1776100367;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=TSRY3MffZOgkoF8pneWM3oCokuMI5pTYVXcqEQr21cI=;
-        b=MneKtWMa+HqkzLUGKj/5/YrXYUEHOWG6qvg3m5NOzgLkgmjPVk3RJKQr9AU3kLEPFp
-         eFMMnz8tVEVgkzBaXkirTeELjXgQcKAYD2PSAFoajcfY9d3uXdZxWXjBfDzKMyKreJT/
-         zDE9eMmrDXz/6fNgC7gBxw2KP0p+su+kZ/KZE+1CR8TRltZvwmRWmgPOL1QoC0jEgzk6
-         vSMEi+M8TU6e7SAlxGacGut/niWcz4lkZsn6JvQowWWmADSWIo4iAY8+n4eaOZZCdXNv
-         rFL+pqyCBy18W/aXDxsgKOKthXLAqxsng6SRUQ1hN5r0UNTwpNljPdCFllv6sak2xZcd
-         YMcA==
-X-Forwarded-Encrypted: i=1; AJvYcCUnH/GKEaYEfFGIoQx19gjhPgWbsPZdqc/KdnyBz366TkOZMLZktBwdxm3tHFUAmIL1/tYlC2w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7jIhqC13uXg9prFzPdjr/Twq8+wqmbFRb2rV+Soq+S/ZFlshr
-	R8VFsP5nWYhxWgKlTckTVCdxi7Q0feGafPqld7IJX36F/HP0N13fhY3lKdeb2GD7sqg=
-X-Gm-Gg: AeBDietqgoODWxXObYtRzwFKqy8X8i42emRn+8RcbvploTDbYx/5f7oR10+H6TENLoB
-	WQIH+E79XVj83KiILWFh0zu3ATrKlcbE9QpNcFPczder/TEGnHxkOAgSoQZk4+NTbhC4IwOHN8w
-	R41x9KWGRvloYrt30U45wzHHxtzDXb7rV6eqX2Yuw9vU9c+dmzNBaxlSa+qDntKU5j8eyoU4fbk
-	lSOLWp+VcM+0G5Yde1LbPvlPS/37GIkQp4WCt8VwGJ11T45MoJ6zgbpw6+NbQXI7Hi52jvnb6BB
-	HY9Ycx8uVZQ/Cl2LNEUlHDby0wQgYLatmu6yqxYT2D98w4XsjLSBuQULgSodTS0Ro4z6YKKthHS
-	PHbQYGZ/9wP8e/gvap0dJKtZ4iOKi6ErwWHF9gmc2DAZDzNA4N+2GJMBUieMmsFXVDgYcn2KF9G
-	TNUYyyquwJAVwRtrru1GMoFi83w8lj4kmma/4=
-X-Received: by 2002:a05:6a00:18a3:b0:81f:31c3:2e34 with SMTP id d2e1a72fcca58-82d0da90bc1mr13231550b3a.25.1775495567223;
-        Mon, 06 Apr 2026 10:12:47 -0700 (PDT)
-Received: from phoenix.local ([104.202.41.210])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9b261b6sm17721564b3a.3.2026.04.06.10.12.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2026 10:12:46 -0700 (PDT)
-Date: Mon, 6 Apr 2026 10:12:38 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, Jamal Hadi
- Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v3 4/7] net/sched: netem: restructure dequeue to
- avoid re-entrancy with child qdisc
-Message-ID: <20260406101238.2d106bfd@phoenix.local>
-In-Reply-To: <20260406084133.47bcfc8f@kernel.org>
-References: <20260402202037.176299-1-stephen@networkplumber.org>
-	<20260402202037.176299-5-stephen@networkplumber.org>
-	<20260404094946.GU113102@horms.kernel.org>
-	<20260406084133.47bcfc8f@kernel.org>
+        d=1e100.net; s=20251104; t=1775495968; x=1776100768;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:dkim-signature:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=FRkVSzhsy3jVbqKy4UiNeOSWCmccE1QBrUWtrVbAuS8=;
+        b=bHLt+Z09A8d9MyL/jh0nqsfgC+ZYGmhWH8nlhkjVOUPN7wls8RRk+C8beQs4kiiA2Y
+         XoK7LUxYxGLSZnVrqWxWcpd6UW6HAmV81D1WlwgzxEVO6NXfp8N3rzMFPCKdOFsmDXPc
+         RBPt7/ATbxg2Zkl8H+bzCXJ1a/oA6QT51bUv9AWKbQHxvhmfrMYK0apEEufR6+twhDcJ
+         vW1GGjw4AWcsCLIIe5aT/cfOJtNjW+m/t76ZBbH7ORyKGYP9arw/xBGtRCYORIARCMF+
+         s72N891NzVZi347OIgedF5GietuCj58lzCg4IfxoaE1dfjH1w4VNJ5i+U3P6dt/OrRDW
+         D2GA==
+X-Forwarded-Encrypted: i=1; AJvYcCVp/HLOxcJ8DHCt84Yc/rwJFborWoGZke+gOoGJj7RHbVUGbXgkJg7itrZDBjd4xZPLoJPIDy8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyegB4ABoeHsgbOryGAx4dIkhz6SCx6Zcb2OECvaU8TVbI3Qr+y
+	6giVcGrFiwruE9G1UMa30AS2YnL/UtFpdDyCkHwqkKjWZRNhU216wV/zCvIEGGmO/8KkdFwUox5
+	CoMU/7kEA/wo8fUJrzub48f3xghmMinQLiYiAzlXXXUOq2BQD6RgGpXyVF++xf6Z82UhPBI2o2R
+	hSyQomi4uHfjdStU917KM359g2iZR6Xs/Xpdgv0x/BANA//qt9gDzVh496PNJZifQbEsIgTckpQ
+	FbAvYYUN7xYlLle
+X-Gm-Gg: AeBDiev/d0q++f7WYu91f680y0LczFeOn58Cp945psqkcXaI/jNPgAmWIldpUDohqXX
+	q8PgQKOA3dmFupPwrf0K16qw6fUeS0bOW1fRQWn4yOWheFTESZQqLJQpd4sS+GO5DUWsrFcjjSX
+	e0h/+Itf+sr/Jqf7YV8ABuDpD4eQC+Ekia7Evf/vLNruyzaAR60GISgjVo1/gIMmyHCbzL/rwNZ
+	2lkk600nsEO5gJGGKAQXzXlS2WFnUAnoMFGCVNn2M71P21fgcnjmNIm3tLtaPjDrhMqj/DXTG4V
+	bhEhOIGGc7cyS6WWQZy3vNSF8hAlleCi2SU3QafX7sxbZgWMxYAiO+dxQeQsfkmuhlaaybHA0S5
+	cs7FK8/HAkhBFa8Xom1ernsPWdM95qgNrHNI2lHGP+HEiREl5RRFMJ3/ft/SQ5CSYXjc/plBcv2
+	wFv+nhgXuqYnm4QfUfnZnqS4wKhHj9QhRUDZhDA8Hed9XItIlJu8kvCSJPHdqqiw==
+X-Received: by 2002:a17:90b:2b4e:b0:35d:a78c:1194 with SMTP id 98e67ed59e1d1-35de680d5a0mr12696377a91.9.1775495967811;
+        Mon, 06 Apr 2026 10:19:27 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-15.dlp.protect.broadcom.com. [144.49.247.15])
+        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-35dbe60d33esm1504757a91.1.2026.04.06.10.19.27
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 06 Apr 2026 10:19:27 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-2c68a134df8so3927587eec.1
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:19:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1775495966; x=1776100766; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=FRkVSzhsy3jVbqKy4UiNeOSWCmccE1QBrUWtrVbAuS8=;
+        b=TfymV7/O7c5eFmfvkZNxWGl0ZGIArH3eeaKvulbhnrW+UCXAM0umeF7y7htvp7NVXu
+         XtAPhNjWe7uaQXg8pf/HN31wG5A/CQDukHGpS1lZALutKx7ETiUwSK2+tyo7vVpvNBzY
+         iqzmkmwd80uxFTpC8yPz06v72V1r97kVDA2Dw=
+X-Forwarded-Encrypted: i=1; AJvYcCVtc5KXTGLla1xoKV6/Kt42X4kvm/qtTd1o++Z0wxIX3VowATkVtbRVFRQOnWVj65sMBhP2MLA=@vger.kernel.org
+X-Received: by 2002:a05:7022:6881:b0:11b:b622:cad9 with SMTP id a92af1059eb24-12bfb73e381mr5511738c88.21.1775495965626;
+        Mon, 06 Apr 2026 10:19:25 -0700 (PDT)
+X-Received: by 2002:a05:7022:6881:b0:11b:b622:cad9 with SMTP id a92af1059eb24-12bfb73e381mr5511704c88.21.1775495965035;
+        Mon, 06 Apr 2026 10:19:25 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12bede7f542sm12020430c88.14.2026.04.06.10.19.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Apr 2026 10:19:24 -0700 (PDT)
+Message-ID: <967f597e-589d-41b5-9b03-b91ecd2d3ab0@broadcom.com>
+Date: Mon, 6 Apr 2026 10:19:22 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 7/7] net: bcmgenet: reject MTU changes
+ incompatible with XDP
+To: Nicolai Buchwitz <nb@tipi-net.de>, netdev@vger.kernel.org
+Cc: Justin Chen <justin.chen@broadcom.com>, Simon Horman <horms@kernel.org>,
+ Mohsin Bashir <mohsin.bashr@gmail.com>, Doug Berger <opendmb@gmail.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20260406083536.839517-1-nb@tipi-net.de>
+ <20260406083536.839517-8-nb@tipi-net.de>
+Content-Language: en-US, fr-FR
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20260406083536.839517-8-nb@tipi-net.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.56 / 15.00];
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[networkplumber-org.20251104.gappssmtp.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
-	DMARC_POLICY_SOFTFAIL(0.10)[networkplumber.org : SPF not aligned (relaxed), DKIM not aligned (relaxed),quarantine,sampled_out];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[networkplumber-org.20251104.gappssmtp.com:+];
-	FROM_HAS_DN(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275658-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[broadcom.com,kernel.org,gmail.com,lunn.ch,google.com,redhat.com,davemloft.net,iogearbox.net,fomichev.me,vger.kernel.org];
 	MIME_TRACE(0.00)[0:+];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[stephen@networkplumber.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	RCPT_COUNT_SEVEN(0.00)[9];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275659-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[florian.fainelli@broadcom.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[broadcom.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 336A03A59A3
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 73F653A5A12
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 6 Apr 2026 08:41:33 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
-
-> On Sat, 4 Apr 2026 10:49:46 +0100 Simon Horman wrote:
-> > On Thu, Apr 02, 2026 at 01:19:32PM -0700, Stephen Hemminger wrote:  
-> > > netem_dequeue() enqueues packets into its child qdisc while being
-> > > called from the parent's dequeue path. This causes two problems:
-> > > 
-> > > - HFSC tracks class active/inactive state on qlen transitions.
-> > >   A child enqueue during dequeue causes double-insertion into
-> > >   the eltree (CVE-2025-37890, CVE-2025-38001).
-> > > 
-> > > - Non-work-conserving children like TBF may refuse to dequeue
-> > >   packets just enqueued, causing netem to return NULL despite
-> > >   having backlog. Parents like DRR then incorrectly deactivate
-> > >   the class.
-> > > 
-> > > Split the dequeue into helpers:
-> > > 
-> > >   netem_pull_tfifo()    - remove head packet from tfifo
-> > >   netem_slot_account()  - update slot pacing counters
-> > >   netem_dequeue_child() - batch-transfer ready packets to the
-> > >                           child, then dequeue from the child
-> > >   netem_dequeue_direct()- dequeue from tfifo when no child
-> > > 
-> > > When a child qdisc is present, all time-ready packets are moved
-> > > into the child before calling its dequeue. This separates the
-> > > enqueue and dequeue phases so the parent sees consistent qlen
-> > > transitions.
-> > > 
-> > > Fixes: 50612537e9ab ("netem: fix classful handling")
-> > > Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
-> > > ---
-> > >  net/sched/sch_netem.c | 201 +++++++++++++++++++++++++++---------------
-> > >  1 file changed, 128 insertions(+), 73 deletions(-)    
-> > 
-> > Hi Stephen,
-> > 
-> > As a fix this is a large and complex patch.
-> > Could it be split up somehow to aid review?  
+On 4/6/26 01:35, Nicolai Buchwitz wrote:
+> Add a minimal ndo_change_mtu that rejects MTU values too large for
+> single-page XDP buffers when an XDP program is attached. Without this,
+> users could change the MTU at runtime and break the XDP buffer layout.
 > 
-> +1, FWIW it's perfectly fine to have refactoring patch in a net series
-> (without a Fixes tag) if it makes the fix a lot easier to review.
+> When no XDP program is attached, any MTU change is accepted, matching
+> the existing behavior without ndo_change_mtu.
+> 
+> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
 
-I split it into refactoring followed by fix for next version
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
-The fix alone just gets really confusing to look at;
-I got more confused the pre-existing spaghetti code here..
 
