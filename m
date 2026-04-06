@@ -1,372 +1,237 @@
-Return-Path: <netdev+bounces-275523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275521-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mDt/EUkl02lxfAcAu9opvQ
-	(envelope-from <netdev+bounces-275523-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 05:15:21 +0200
+	id 4pl9CtUk02lxfAcAu9opvQ
+	(envelope-from <netdev+bounces-275521-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 05:13:25 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2F003A149B
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 05:15:20 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B9493A1453
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 05:13:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 98FC6301A929
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 03:14:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F19930053E7
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 03:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5FB33C194;
-	Mon,  6 Apr 2026 03:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43572322B72;
+	Mon,  6 Apr 2026 03:13:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qPa4Bynx"
+	dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b="CNdGFAji"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com [209.85.215.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AC52EAB61
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 03:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3AC235972
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 03:13:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775445269; cv=none; b=gsRHSClBbyMJXR5Q0/7g8emFgkndTG9OjD/VcaFPozlAzl4EVFuvMu3gHT0ZtZMpHgDwrdzKLTTlGNYbDeQu/jTEFKlRxgOWx2X8FP8lOFeUn86a8fb5kGBgnDC0EHJxu11ZYf3yFaMe1YaFQXdsWJhqUXAGgBVXPdl95bbFo5g=
+	t=1775445199; cv=none; b=VZT9KGSNFd2CfO3hlvLPY++5h6QxgppUCL164yiLXUuXxR60cZQQBs9p3ZG0rbzs7J39aeZto6MMZH5ziOhTapkoBS03R4/9iY5rbmw0pFBdyL1JAgL+UJfi87+Oxi3KrfH5y2cWY/LRGmaf7i5E+LKkkCmwTJjOjHLw2lbH0Tg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775445269; c=relaxed/simple;
-	bh=IaQBJhZq22U/AqidD8mlM6KHpzkK9UrNrCDYgLDGXmQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YWe/rMNOgf31JAixMGFSEZ0drPKAEqMbBCvKY/swmIs9kV2WQEgnYFgK6X+WORd7MPx+5wyozvNyhq4jS/4wtRF7sq2BQIAMfqQlbqky118+PpXUnomPOFu2eSJl5GBVCUi9jn1830CD1QA3mFl9XfjH9wnfflGRpyo3q9/E6U0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qPa4Bynx; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775445263;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ikZtbZMewTqC6nCN77M39tHB8LncJ0K7vUTKUc1uO90=;
-	b=qPa4BynxA8X7czn/0YBEbkKCUidwebDq2ve+wDhpbhFP7HcBDNw6aEdDPRFhwXSPvGkxxm
-	sMHDfeNXRnTvVpygKye0W37eQUN8EtAzBx79XUoV67hi/O6GxzYRd+0+Zyyn4Zt8lKlH2O
-	gZwpxCI0apb9YLgN28R3d0XPOmhIzOA=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: bpf@vger.kernel.org
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf v2 2/2] selftests/bpf: Add tests for sock_ops ctx access with same src/dst register
-Date: Mon,  6 Apr 2026 11:12:51 +0800
-Message-ID: <20260406031330.187630-2-jiayuan.chen@linux.dev>
-In-Reply-To: <20260406031330.187630-1-jiayuan.chen@linux.dev>
-References: <20260406031330.187630-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1775445199; c=relaxed/simple;
+	bh=yQGImmrjwLYeGHdVX82wTBnt/uEq+A862pqBtuQLX+E=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=B9vnnoZRrgBqBw4Rj2oSq1is2utrUq30n6xXiO3jhEIoeKAPmpTO75Abz/8zM60gvOfEI7ZUyMEB5UkIgg71cQncSZrkW9tuhz1MQEVzKO6qQ45Vpdo7b9IeZMI2UK5kvgr/KkFwrtHs5Elxh89GhCcqcZ4z9Z/8CM4buLf73aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=CNdGFAji; arc=none smtp.client-ip=209.85.215.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etsalapatis.com
+Received: by mail-pg1-f194.google.com with SMTP id 41be03b00d2f7-c742d4df00cso1700171a12.1
+        for <netdev@vger.kernel.org>; Sun, 05 Apr 2026 20:13:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1775445197; x=1776049997; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WikSyXf56QgGRlPo6LAXPYCmBwFl+zDorUSabvFaPsQ=;
+        b=CNdGFAjiwyrUvwB+aqH/zLS0WZQHfTuwaJZHQWqX3cMG1WQWWIlTZ6Z8Xue/HuUO/y
+         d/J09JaQjUpm3usDcTCS0Q4GQU5GzxU7fBbo8yxAMow7ykx2UgDlStCzaxNR9ZtgCdoW
+         mtVxqePweiSZ734IYp7b8VvCDMhfqTKgOxpzvEI6tkZFunc11xU1GX3LSakZeU9Qv+og
+         DelJRxldSSyq05LS1LgcOWRaRRndsZXcs6pHXCROck1OM/ahJvqkrJg8BGxF24dLn4jY
+         NOgm6Vh8DJSCE+zP6W2cDmSmtr/r31YWgNsAD2uqNujzqg2iG9Y4qamHiMQC57eBdeJj
+         Z5Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775445197; x=1776049997;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WikSyXf56QgGRlPo6LAXPYCmBwFl+zDorUSabvFaPsQ=;
+        b=J+9ur5LNBLbP83xXMcHxMYXH5V0vcUF2nlzw8HWLBUXSuLWQz6vwG4iRuYwLXvz73b
+         yP7uinoAF2U1m4BMIczRSuoEpmjNCVO0N39p17dmd8WlVaxKGbJhdUuKK7OIq7/zjpZi
+         zRmFLkXrhpIEXoQ+116d6YfphxKi5dOvp7PhJkWC6X2fl4Bu8gtWRzi71u07xTOseDM0
+         U8kcrE9jsLdnO5RVY4VgZKAtpDV4tbcAO3p1iG/SxAmpZs32Wb8cLMLg1aDt9JuKIpg6
+         QQevpFFjnSOIRFgMoac6dG32qh/YdUcxrFEH7qsOGT730x8bFbv3I90UeiKAsNz0vYlA
+         S9uw==
+X-Forwarded-Encrypted: i=1; AJvYcCV8D+XFDAuv0f1ByotR7zbXAkt1V3V4xKMbyQoQX2XxqtIOCMi4kq4vrU+bMy8zNq6FHAaymZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxIFl8P837lTMQC5g9MHpevn0Q8SLenxI0E6iVzla5Dv4/pV8F
+	1B43S2LMIt0yVMXmpT70Upuw/KG6zwnOhTgpYJ9jcDiBsyX9OQAqmDFv5GIS1lZflcc=
+X-Gm-Gg: AeBDietK/dK6b5VoW0uPl4DcO4HN8ISZ/lK2yQSm0BnjfTlHDvHhPoakTiam3fpsyCT
+	nrUWCYRatmhnjOPcd3Ap4MF1c/4sCITgjVo7CEMyEg6VQN/zu/edTkwFFX8LxI4yE7j5Zjx8PU5
+	IrsMuWekdYFr/Jukkvr4I8j84jfh0WSPU626BpoG/x1FIeVwShzXHvCOuS/bvm/nAM7FD44S3Sd
+	DrXEFFyOkPzFpat76e8QyeDp+6HEv0Dg4fgYS3Fjxn+8p8rhwwEG/JdP67SEsTSS3xMz4Md35Uh
+	/8SQ1fpRNSOy4IKO18i84oLXq0GuteSM+cnsakYUdwCgS/rJho1xd+08aY1YS95N7QczqHzgiHz
+	l4/psetXzCnjDe4pq2FR5kQp0If4yBBBlMtAlVHOuwFvk6Bejvb/R85bSCPWKz98kof8PE3p2bo
+	Acs6zIqBA=
+X-Received: by 2002:a17:903:946:b0:2b2:5293:f415 with SMTP id d9443c01a7336-2b277d8ba21mr124434045ad.7.1775445196985;
+        Sun, 05 Apr 2026 20:13:16 -0700 (PDT)
+Received: from localhost ([2604:3d08:487d:cd00::5517])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2749cbd85sm119417275ad.74.2026.04.05.20.13.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 05 Apr 2026 20:13:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.84 / 15.00];
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sun, 05 Apr 2026 23:13:15 -0400
+Message-Id: <DHLQSMYH2MV0.3ROVQ0ALRBIW6@etsalapatis.com>
+Cc: "Quan Sun" <2022090917019@std.uestc.edu.cn>, "Yinhao Hu"
+ <dddddd@hust.edu.cn>, "Kaiyan Mei" <M202472210@hust.edu.cn>, "Dongliang Mu"
+ <dzm91@hust.edu.cn>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Daniel
+ Borkmann" <daniel@iogearbox.net>, "John Fastabend"
+ <john.fastabend@gmail.com>, "Stanislav Fomichev" <sdf@fomichev.me>, "Alexei
+ Starovoitov" <ast@kernel.org>, "Andrii Nakryiko" <andrii@kernel.org>,
+ "Eduard Zingerman" <eddyz87@gmail.com>, "Kumar Kartikeya Dwivedi"
+ <memxor@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong Song"
+ <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
+ Horman" <horms@kernel.org>, "Shuah Khan" <shuah@kernel.org>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH bpf v1 1/2] bpf: Fix SOCK_OPS_GET_SK same-register OOB
+ read in sock_ops
+From: "Emil Tsalapatis" <emil@etsalapatis.com>
+To: "Jiayuan Chen" <jiayuan.chen@linux.dev>, "Emil Tsalapatis"
+ <emil@etsalapatis.com>, <bpf@vger.kernel.org>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260404141010.247536-1-jiayuan.chen@linux.dev>
+ <DHLMGWNKBI4K.3LM87NOU4XB3O@etsalapatis.com>
+ <DHLMKFBINRKW.BS0BEK9AMU86@etsalapatis.com>
+ <346597fc-1703-45d7-bcef-55f5d4a7579c@linux.dev>
+In-Reply-To: <346597fc-1703-45d7-bcef-55f5d4a7579c@linux.dev>
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	TAGGED_FROM(0.00)[bounces-275523-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275521-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DMARC_NA(0.00)[etsalapatis.com];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[27];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[std.uestc.edu.cn,hust.edu.cn,linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E2F003A149B
+	NEURAL_HAM(-0.00)[-1.000];
+	TO_DN_SOME(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hust.edu.cn:email,uestc.edu.cn:email,linux.dev:email]
+X-Rspamd-Queue-Id: 5B9493A1453
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add selftests to verify SOCK_OPS_GET_SK() and SOCK_OPS_GET_FIELD()
-correctly return NULL/zero when dst_reg == src_reg and is_fullsock == 0.
+On Sun Apr 5, 2026 at 10:58 PM EDT, Jiayuan Chen wrote:
+>
+> On 4/6/26 7:54 AM, Emil Tsalapatis wrote:
+>> On Sun Apr 5, 2026 at 7:49 PM EDT, Emil Tsalapatis wrote:
+>>> On Sat Apr 4, 2026 at 10:09 AM EDT, Jiayuan Chen wrote:
+>>>> When a BPF sock_ops program reads ctx->sk with dst_reg =3D=3D src_reg
+>>>> (e.g., r1 =3D *(u64 *)(r1 + offsetof(sk))), the SOCK_OPS_GET_SK() macr=
+o
+>>>> fails to zero the destination register in the is_fullsock =3D=3D 0 pat=
+h.
+>>>>
+>>>> The macro saves/restores a temporary register and checks is_fullsock.
+>>>> When is_fullsock =3D=3D 0 (e.g., TCP_NEW_SYN_RECV state with a request=
+_sock),
+>>>> it should set dst_reg =3D 0 (NULL) so the verifier's PTR_TO_SOCKET_OR_=
+NULL
+>>>> type is correct at runtime. Instead, dst_reg retains the original ctx
+>>>> pointer, which passes subsequent NULL checks and can be used as a bogu=
+s
+>>>> socket pointer, leading to stack-out-of-bounds access in helpers like
+>>>> bpf_skc_to_tcp6_sock().
+>>>>
+>>>> Fix by:
+>>>>   - Changing JMP_A(1) to JMP_A(2) in the fullsock path to skip the
+>>>>     added instruction.
+>>>>   - Adding BPF_MOV64_IMM(si->dst_reg, 0) after the temp register
+>>>>     restore in the !fullsock path, placed after the restore because
+>>>>     dst_reg =3D=3D src_reg means we need src_reg intact to read ctx->t=
+emp.
+>>>>
+>>>> Fixes: 84f44df664e9 ("bpf: sock_ops sk access may stomp registers when=
+ dst_reg =3D src_reg")
+>>>> Reported-by: Quan Sun <2022090917019@std.uestc.edu.cn>
+>>>> Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
+>>>> Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
+>>>> Reported-by: Dongliang Mu <dzm91@hust.edu.cn>
+>>>> Closes: https://lore.kernel.org/bpf/6fe1243e-149b-4d3b-99c7-fcc9e2f757=
+87@std.uestc.edu.cn/T/#u
+>>>> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+>>> This patch only seems to fix the problem when dst_reg =3D=3D src_reg.
+>>> Why is this not an issue when is_fullsock =3D=3D 0, but dst_reg !=3D sr=
+c_reg?
+>>> In that case the dst_reg is unmodified by the whole macro but is still
+>>> marked as PTR_TO_SOCKET_OR_NULL. Isn't that a problem? Can you add
+>>> a test case for is_fullsock =3D=3D 0 but dst_reg !=3D src_reg in patch =
+2?
+>> Sorry for the double post, but also check sashiko.dev:
+>> SOSK_OPTS_GET_FIELD seems to have the same issue as the
+>> SOCK_OPTS_GET_SK. Can you add the same fix to it?
+>>
+>
+> Thanks for the review!
+>
+> The AI reviewer's observation about SOCK_OPS_GET_FIELD() is correct =E2=
+=80=94
+> it has the same bug when dst_reg =3D=3D src_reg and is_locked_tcp_sock =
+=3D=3D 0.
+> I've folded that fix into patch 1 in v2.
+>
+> Regarding dst_reg !=3D src_reg: this case is actually safe. When
+> dst_reg !=3D src_reg, fullsock_reg is dst_reg itself, and the generated
+> sequence is:
+>
+> LDX_MEM=C2=A0 =C2=A0dst_reg =3D is_fullsock
+> JEQ=C2=A0 =C2=A0 =C2=A0 =C2=A0dst_reg =3D=3D 0, +jmp
+> LDX_MEM=C2=A0 =C2=A0dst_reg =3D sk
+>
 
-Three subtests are included:
- - get_sk: ctx->sk with same src/dst register (SOCK_OPS_GET_SK)
- - get_field: ctx->snd_cwnd with same src/dst register (SOCK_OPS_GET_FIELD)
- - get_sk_diff_reg: ctx->sk with different src/dst register (baseline)
+Yes, I missed the dst is the is_fullsock_reg assignment. v1 looks
+correct then.
 
-Each BPF program uses inline asm (__naked) to force specific register
-allocation, reads is_fullsock first, then loads the field using the same
-(or different) register. The test triggers TCP_NEW_SYN_RECV via a TCP
-handshake and checks that the result is NULL/zero when is_fullsock == 0.
+> The JEQ only branches when dst_reg =3D=3D 0, so dst_reg is naturally
+> zeroed on that path =E2=80=94 no extra MOV_IMM needed. The same-register =
+bug
+> exists precisely because dst_reg =3D=3D src_reg forces the macro to borro=
+w
+> a temporary register for the is_fullsock check, leaving dst_reg (the
+> ctx pointer) untouched.
+>
+> I will add a get_sk_diff_reg subtest in v2.
+>
+> The other suggestions (moving the detailed comment to the BPF program
+> file, avoiding vague "the fix" wording) are good points =E2=80=94 address=
+ed
+> in v2 as well.
 
-Test:
-	./test_progs -a sock_ops_get_sk -v
-	test_sock_ops_get_sk:PASS:join_cgroup 0 nsec
-	test_sock_ops_get_sk:PASS:skel_open_load 0 nsec
-	run_sock_ops_test:PASS:prog_attach 0 nsec
-	run_sock_ops_test:PASS:start_server 0 nsec
-	run_sock_ops_test:PASS:connect_to_fd 0 nsec
-	test_sock_ops_get_sk:PASS:null_seen 0 nsec
-	test_sock_ops_get_sk:PASS:bug_not_detected 0 nsec
-	#419/1   sock_ops_get_sk/get_sk:OK
-	run_sock_ops_test:PASS:prog_attach 0 nsec
-	run_sock_ops_test:PASS:start_server 0 nsec
-	run_sock_ops_test:PASS:connect_to_fd 0 nsec
-	test_sock_ops_get_sk:PASS:field_null_seen 0 nsec
-	test_sock_ops_get_sk:PASS:field_bug_not_detected 0 nsec
-	#419/2   sock_ops_get_sk/get_field:OK
-	run_sock_ops_test:PASS:prog_attach 0 nsec
-	run_sock_ops_test:PASS:start_server 0 nsec
-	run_sock_ops_test:PASS:connect_to_fd 0 nsec
-	test_sock_ops_get_sk:PASS:diff_reg_null_seen 0 nsec
-	test_sock_ops_get_sk:PASS:diff_reg_bug_not_detected 0 nsec
-	#419/3   sock_ops_get_sk/get_sk_diff_reg:OK
-	#419     sock_ops_get_sk:OK
-	Summary: 1/3 PASSED, 0 SKIPPED, 0 FAILED
+With the changes, feel free to add to both patches:
 
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- .../bpf/prog_tests/sock_ops_get_sk.c          |  77 ++++++++++++
- .../selftests/bpf/progs/sock_ops_get_sk.c     | 117 ++++++++++++++++++
- 2 files changed, 194 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sock_ops_get_sk.c
- create mode 100644 tools/testing/selftests/bpf/progs/sock_ops_get_sk.c
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/sock_ops_get_sk.c b/tools/testing/selftests/bpf/prog_tests/sock_ops_get_sk.c
-new file mode 100644
-index 0000000000000..e086f7abb197e
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/sock_ops_get_sk.c
-@@ -0,0 +1,77 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <test_progs.h>
-+#include "cgroup_helpers.h"
-+#include "network_helpers.h"
-+#include "sock_ops_get_sk.skel.h"
-+
-+/* See progs/sock_ops_get_sk.c for the bug description. */
-+static void run_sock_ops_test(struct sock_ops_get_sk *skel, int cgroup_fd,
-+			      int prog_fd)
-+{
-+	int server_fd, client_fd, err;
-+
-+	err = bpf_prog_attach(prog_fd, cgroup_fd, BPF_CGROUP_SOCK_OPS, 0);
-+	if (!ASSERT_OK(err, "prog_attach"))
-+		return;
-+
-+	server_fd = start_server(AF_INET, SOCK_STREAM, NULL, 0, 0);
-+	if (!ASSERT_GE(server_fd, 0, "start_server"))
-+		goto detach;
-+
-+	/* Trigger TCP handshake which causes TCP_NEW_SYN_RECV state where
-+	 * is_fullsock == 0 and is_locked_tcp_sock == 0.
-+	 */
-+	client_fd = connect_to_fd(server_fd, 0);
-+	if (!ASSERT_GE(client_fd, 0, "connect_to_fd"))
-+		goto close_server;
-+
-+	close(client_fd);
-+
-+close_server:
-+	close(server_fd);
-+detach:
-+	bpf_prog_detach(cgroup_fd, BPF_CGROUP_SOCK_OPS);
-+}
-+
-+void test_sock_ops_get_sk(void)
-+{
-+	struct sock_ops_get_sk *skel;
-+	int cgroup_fd;
-+
-+	cgroup_fd = test__join_cgroup("/sock_ops_get_sk");
-+	if (!ASSERT_GE(cgroup_fd, 0, "join_cgroup"))
-+		return;
-+
-+	skel = sock_ops_get_sk__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "skel_open_load"))
-+		goto close_cgroup;
-+
-+	/* Test SOCK_OPS_GET_SK with same src/dst register */
-+	if (test__start_subtest("get_sk")) {
-+		run_sock_ops_test(skel, cgroup_fd,
-+				  bpf_program__fd(skel->progs.sock_ops_get_sk_same_reg));
-+		ASSERT_EQ(skel->bss->null_seen, 1, "null_seen");
-+		ASSERT_EQ(skel->bss->bug_detected, 0, "bug_not_detected");
-+	}
-+
-+	/* Test SOCK_OPS_GET_FIELD with same src/dst register */
-+	if (test__start_subtest("get_field")) {
-+		run_sock_ops_test(skel, cgroup_fd,
-+				  bpf_program__fd(skel->progs.sock_ops_get_field_same_reg));
-+		ASSERT_EQ(skel->bss->field_null_seen, 1, "field_null_seen");
-+		ASSERT_EQ(skel->bss->field_bug_detected, 0, "field_bug_not_detected");
-+	}
-+
-+	/* Test SOCK_OPS_GET_SK with different src/dst register */
-+	if (test__start_subtest("get_sk_diff_reg")) {
-+		run_sock_ops_test(skel, cgroup_fd,
-+				  bpf_program__fd(skel->progs.sock_ops_get_sk_diff_reg));
-+		ASSERT_EQ(skel->bss->diff_reg_null_seen, 1, "diff_reg_null_seen");
-+		ASSERT_EQ(skel->bss->diff_reg_bug_detected, 0, "diff_reg_bug_not_detected");
-+	}
-+
-+	sock_ops_get_sk__destroy(skel);
-+close_cgroup:
-+	close(cgroup_fd);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/sock_ops_get_sk.c b/tools/testing/selftests/bpf/progs/sock_ops_get_sk.c
-new file mode 100644
-index 0000000000000..3a0689f8ce7ca
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/sock_ops_get_sk.c
-@@ -0,0 +1,117 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+#include "bpf_misc.h"
-+
-+/*
-+ * Test the SOCK_OPS_GET_SK() and SOCK_OPS_GET_FIELD() macros in
-+ * sock_ops_convert_ctx_access() when dst_reg == src_reg.
-+ *
-+ * When dst_reg == src_reg, the macros borrow a temporary register to load
-+ * is_fullsock / is_locked_tcp_sock, because dst_reg holds the ctx pointer
-+ * and cannot be clobbered before ctx->sk / ctx->field is read. If
-+ * is_fullsock == 0 (e.g., TCP_NEW_SYN_RECV with a request_sock), the macro
-+ * must still zero dst_reg so the verifier's PTR_TO_SOCKET_OR_NULL /
-+ * SCALAR_VALUE type is correct at runtime. A missing clear leaves a stale
-+ * ctx pointer in dst_reg that passes NULL checks (GET_SK) or leaks a kernel
-+ * address as a scalar (GET_FIELD).
-+ *
-+ * When dst_reg != src_reg, dst_reg itself is used to load is_fullsock, so
-+ * the JEQ (dst_reg == 0) naturally leaves it zeroed on the !fullsock path.
-+ */
-+
-+int bug_detected;
-+int null_seen;
-+
-+SEC("sockops")
-+__naked void sock_ops_get_sk_same_reg(void)
-+{
-+	asm volatile (
-+		"r7 = *(u32 *)(r1 + %[is_fullsock_off]);"
-+		"r1 = *(u64 *)(r1 + %[sk_off]);"
-+		"if r7 != 0 goto 2f;"
-+		"if r1 == 0 goto 1f;"
-+		"r1 = %[bug_detected] ll;"
-+		"r2 = 1;"
-+		"*(u32 *)(r1 + 0) = r2;"
-+		"goto 2f;"
-+	"1:"
-+		"r1 = %[null_seen] ll;"
-+		"r2 = 1;"
-+		"*(u32 *)(r1 + 0) = r2;"
-+	"2:"
-+		"r0 = 1;"
-+		"exit;"
-+		:
-+		: __imm_const(is_fullsock_off, offsetof(struct bpf_sock_ops, is_fullsock)),
-+		  __imm_const(sk_off, offsetof(struct bpf_sock_ops, sk)),
-+		  __imm_addr(bug_detected),
-+		  __imm_addr(null_seen)
-+		: __clobber_all);
-+}
-+
-+/* SOCK_OPS_GET_FIELD: same-register, is_locked_tcp_sock == 0 path. */
-+int field_bug_detected;
-+int field_null_seen;
-+
-+SEC("sockops")
-+__naked void sock_ops_get_field_same_reg(void)
-+{
-+	asm volatile (
-+		"r7 = *(u32 *)(r1 + %[is_fullsock_off]);"
-+		"r1 = *(u32 *)(r1 + %[snd_cwnd_off]);"
-+		"if r7 != 0 goto 2f;"
-+		"if r1 == 0 goto 1f;"
-+		"r1 = %[field_bug_detected] ll;"
-+		"r2 = 1;"
-+		"*(u32 *)(r1 + 0) = r2;"
-+		"goto 2f;"
-+	"1:"
-+		"r1 = %[field_null_seen] ll;"
-+		"r2 = 1;"
-+		"*(u32 *)(r1 + 0) = r2;"
-+	"2:"
-+		"r0 = 1;"
-+		"exit;"
-+		:
-+		: __imm_const(is_fullsock_off, offsetof(struct bpf_sock_ops, is_fullsock)),
-+		  __imm_const(snd_cwnd_off, offsetof(struct bpf_sock_ops, snd_cwnd)),
-+		  __imm_addr(field_bug_detected),
-+		  __imm_addr(field_null_seen)
-+		: __clobber_all);
-+}
-+
-+/* SOCK_OPS_GET_SK: different-register, is_fullsock == 0 path. */
-+int diff_reg_bug_detected;
-+int diff_reg_null_seen;
-+
-+SEC("sockops")
-+__naked void sock_ops_get_sk_diff_reg(void)
-+{
-+	asm volatile (
-+		"r7 = r1;"
-+		"r6 = *(u32 *)(r7 + %[is_fullsock_off]);"
-+		"r2 = *(u64 *)(r7 + %[sk_off]);"
-+		"if r6 != 0 goto 2f;"
-+		"if r2 == 0 goto 1f;"
-+		"r1 = %[diff_reg_bug_detected] ll;"
-+		"r3 = 1;"
-+		"*(u32 *)(r1 + 0) = r3;"
-+		"goto 2f;"
-+	"1:"
-+		"r1 = %[diff_reg_null_seen] ll;"
-+		"r3 = 1;"
-+		"*(u32 *)(r1 + 0) = r3;"
-+	"2:"
-+		"r0 = 1;"
-+		"exit;"
-+		:
-+		: __imm_const(is_fullsock_off, offsetof(struct bpf_sock_ops, is_fullsock)),
-+		  __imm_const(sk_off, offsetof(struct bpf_sock_ops, sk)),
-+		  __imm_addr(diff_reg_bug_detected),
-+		  __imm_addr(diff_reg_null_seen)
-+		: __clobber_all);
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.43.0
-
+Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
 
