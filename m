@@ -1,163 +1,150 @@
-Return-Path: <netdev+bounces-275570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275571-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yFyHEumU02lWjQcAu9opvQ
-	(envelope-from <netdev+bounces-275570-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:11:37 +0200
+	id PFRxES+X02n3jQcAu9opvQ
+	(envelope-from <netdev+bounces-275571-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:21:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93B913A3104
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:11:36 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C56F93A3135
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:21:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1F13A300D94D
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 11:11:35 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 270883006827
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 11:21:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A67330B0E;
-	Mon,  6 Apr 2026 11:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD843264C2;
+	Mon,  6 Apr 2026 11:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="izZalmHg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TNRICWkm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561B832694F
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 11:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451FA3195FC
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 11:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775473894; cv=none; b=C3YZTPOWv4FBy+aNPxMk6QbJOeYDf+/rlR+HPHABlWXBZnYQwluddY9xL/jgTWkc6WglkaMr4IKRAcYpyw5zhyeVB6tvm4VZkBxD9UyxP653G0PEx2/ZYD80cR6bObW4u0inKkaJ2S2KuYy8zD5aNE1RdpxdAYsmlF6D6o8CsJA=
+	t=1775474475; cv=none; b=L46J8IrB0UgRTNqrBHAcxT7a9cXUuvuCH/3cSrv1HK6B/sUuPcTMskLbLViCDAcZMgl/BdOKebpgSqQlqgS4LYxe5ZRwD4zETSnj7xFcn+xaOuiTpglY1hQ79v/bannR4hz8QTz4U6Bx0aC7/IDPmsr5IL/N3Xrw7QVVltif9Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775473894; c=relaxed/simple;
-	bh=iC+2ohcreA1PvKvOdfrHeMqJv86PUTt82H1u2Ppok9U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TWbQZSyXNBG3d8McrhLGohczKNxS0GVIASRoFoOmnRJx/qZ8OcGi8Ag2gazu92Lhg45hHuLHzqjheyBPAR8ode1oZOx8zVvSWO6DwhvvvSDuu2Z8k+hrOyUhkV3rQ+3F42+b25aHsO3QjAHo5qWgwv0yrpe+anMK25e5wvw1vcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=izZalmHg; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8cbc593a67aso395717385a.2
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 04:11:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775473892; x=1776078692; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XNibLyDGLaj9kHfh+LazW3EKcAg7PW95+I2MB77p0e0=;
-        b=izZalmHgpeuXHW42IaNxM3LHgMZhFB5YeAoH0s8d3vkkJiYLAQmcOoercjnp6yEbfC
-         aGryvWqP3Owt+8uZGFfClXzOHm6/+XiUQm5aJo19q5BQTcwe52Jst5lC+Mz3CMYip6x7
-         A+ERs7Y8m2S1VRoDn9Z4v67UgVqRmIXRldVRdp89gjK1ALsNTwIIpx/YoqmanKlhPpAy
-         Ygu5Ag8/NEfh0l20PmmSXUOE5MdAsHhReIyOGNDa8g36MJNRRKt96XIGAlH/1ZFCJpLi
-         5IAhZzC5WipIr72WFRgrikyE3WSv8hZn2TgmEdfkzQDkrEaCWH7FcZR/WEPYMjmYMVEM
-         UrXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775473892; x=1776078692;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XNibLyDGLaj9kHfh+LazW3EKcAg7PW95+I2MB77p0e0=;
-        b=Aw5W/qXqzs+lGvHUe2TDhjYjRfLWRDQoEcrNaimJsmSx2Owq7KG2ia+vrqNz9+CZFM
-         XlLac5pQKezruksTLcHItJJFtTuDhjZs8oeKESB3lFrU1ckrD9XYGTriLd+5+JQTqG1b
-         fYju/zBQ+vr6XDfU7t0B2zS/Yyc8pyoz5wF3tMOIcCl18IgrLM8ppDiuvytBvW8aUS4j
-         toDSnBsPNk2CUvnfAHWZQKMx4VARuKEm/pFgpKfCsVIFmLIWidoekierMEgEhz4GWTpP
-         sMtJLG+MUT7LLCijS19hSzyaqdJduHYAmDpfnPNxcnjqsa0gwUY+BmwtJuRa9A+6sz6O
-         0uDw==
-X-Forwarded-Encrypted: i=1; AJvYcCWTg7io021ixcLym2A01KjH25GNFhHprCKKRY6WlffyuWyV4n3QU4DNmtYS/25YpwvPUvIbVqc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDw23Rg6FPbeYDXcxvqahUtaUkfDl9WM7ILJD2jr8FuFEeeJEO
-	/lb9WrV8ZCsD1HXuE6nG+4ZES3pa0kn4ZAdsJBjq6qP/5S4mhznzdx7O
-X-Gm-Gg: AeBDiev4/AkWlw5Z8sc06z5mfnFinb+RIUkKx6j7MlxL6Rb6lREwfBs+RxYVAhg2iqk
-	NaPUuOOV5n4JoMq7gIsJ6oTRqw2mnKP6z1Fu8Q6eWaPd4W1UPW2xmatOI0sxN6N1IvlxZwhsAno
-	vcAiAzZCks/MCfY6xsp8CQLGw6qIuUv3LdoAQPz0CZ3pOetCHuKaogMKhPQO6FXoTWQaldNzL4L
-	lT+6ph3qixaofOucoyS46TtweQ9u3vpmoGGej6+or+ngtrCI/Xvi6iW5FRJeYig4zwb2yLmSXrn
-	GtjVaPxi1IY8H2TOPuUdr5SyzmPdB5AEKme2x0Jcd9AKoE01eUribmRnYf1poNc5X56r92XpDyT
-	7h+ZEXeaRY+pD3GS4y3VfC0+IlxsIK/b4epqjPsQslkbPXDxtyJQQW5pqOintCqQdpMU03zarA0
-	Tq8VlmEfHOv0emlffim4/pxRqnIiUVswB9ehSpCVBSbOWMHkLT+CsdVFSBsIB8ANf7NQSgfXznl
-	w2bx7QHH6gnp0vfjrMaD6wtra+RhN0K5chyiw==
-X-Received: by 2002:a05:620a:2844:b0:8cd:b71d:b1ca with SMTP id af79cd13be357-8d41ec0ac41mr1696517485a.63.1775473892091;
-        Mon, 06 Apr 2026 04:11:32 -0700 (PDT)
-Received: from ?IPV6:2600:4040:93b4:e600:a22c:878f:7c1a:1976? ([2600:4040:93b4:e600:a22c:878f:7c1a:1976])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8d2a8740491sm1028685885a.38.2026.04.06.04.11.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Apr 2026 04:11:31 -0700 (PDT)
-Message-ID: <0b4de4de-45d8-4d4f-a15f-87c527b87253@gmail.com>
-Date: Mon, 6 Apr 2026 07:11:28 -0400
+	s=arc-20240116; t=1775474475; c=relaxed/simple;
+	bh=oP+J4GfGCQ85I/W1iPCu8993CzzEnQjRrTSmBNvLZzI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HcWS1XIoMrXlH7MmnALPS47mIquM2Dk2RUvOlGOVkBsMQ9aOOaRP4zbUZNTIY9urQhak5A6DyM+ubeNQWLQ6W24KW60lXTbCOVSosnvh6ySIc02qa7yBKARnSpgbh1VNcs7bphWSr++P90TgzGafz8Xa/pHNa3CRrOw+wUuCwHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TNRICWkm; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1775474473;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=OHB5rvbHOIfZdqV/Ia+WSfXX4qz29mspQuLK0d1ndu0=;
+	b=TNRICWkmXcFIeIPonjewcJorINyrn8fEhFbsLqfDbZea+nPzwNqWqBTW9mNJKEzgqOZWkG
+	xzAtp2ka6knAUQsphZlqILhIihcZ437abRXs00NgDDfzjk4f43gNeuh59zw5tZVIMvDdra
+	VnasfsxOAG2VUjDFKf5pVzHqk/gBpS0=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-645-SUbSvAxUOHO4dA-ObDbbDA-1; Mon,
+ 06 Apr 2026 07:21:08 -0400
+X-MC-Unique: SUbSvAxUOHO4dA-ObDbbDA-1
+X-Mimecast-MFC-AGG-ID: SUbSvAxUOHO4dA-ObDbbDA_1775474467
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B449819560A7;
+	Mon,  6 Apr 2026 11:21:06 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.44.48.51])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D7510300019F;
+	Mon,  6 Apr 2026 11:21:02 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: netdev@vger.kernel.org
+Cc: intel-wired-lan@lists.osuosl.org,
+	jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Subject: [PATCH net 0/3] Fix i40e/iavf VF bonding after netdev lock changes
+Date: Mon,  6 Apr 2026 13:20:54 +0200
+Message-ID: <20260406112057.906685-1-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 net-next 1/5] psp: add admin/non-admin version of
- psp_device_get_locked
-To: Wei Wang <weibunny.kernel@gmail.com>, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- David Wei <dw@davidwei.uk>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Simon Horman <horms@kernel.org>
-Cc: Wei Wang <weibunny@fb.com>
-References: <20260405055853.3285534-1-weibunny.kernel@gmail.com>
- <20260405055853.3285534-2-weibunny.kernel@gmail.com>
-Content-Language: en-US
-From: Daniel Zahka <daniel.zahka@gmail.com>
-In-Reply-To: <20260405055853.3285534-2-weibunny.kernel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275570-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org,kernel.org,davidwei.uk,lunn.ch,davemloft.net,google.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-275571-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jtornosm@redhat.com,netdev@vger.kernel.org];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fb.com:email]
-X-Rspamd-Queue-Id: 93B913A3104
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: C56F93A3135
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+This series fixes VF bonding failures introduced by commit ad7c7b2172c3
+("net: hold netdev instance lock during sysfs operations").
 
-On 4/5/26 1:58 AM, Wei Wang wrote:
-> From: Wei Wang <weibunny@fb.com>
->
-> Introduce 2 versions of psp_device_get_locked:
-> 1. psp_device_get_locked_admin(): This version is used for operations
->     that would change the status of the psd, and are currently used for
->     dev-set nad key-rotation.
+The core issue is lock contention: iavf_set_mac() is now called with the
+netdev lock held and waits for MAC change completion while holding it.
+However, the watchdog task that processes the request also needs this lock,
+creating a deadlock scenario where the watchdog cannot run, causing
+timeouts.
 
+Additionally, setting VF trust triggers an unnecessary ~10 second VF reset
+that delays bonding setup, even though filter synchronization happens
+naturally during normal VF operation.
 
-typo: "and"
+This series:
+1. Adds safety guard to avoid waiting with locks during reset
+2. Eliminates unnecessary VF reset when setting trust (major performance
+   win)
+3. Fixes the lock contention by dropping the lock while waiting
 
+Testing shows VF bonding now works reliably in ~5 seconds vs 15+ seconds
+before, without timeouts or errors.
 
-> 2. psp_device_get_locked(): This is the non-admin version, which are
->     used for broader user issued operations including: dev-get, rx-assoc,
->     tx-assoc, get-stats.
->
-> Following commit will be implementing both of the checks.
->
-> Signed-off-by: Wei Wang <weibunny@fb.com>
+Tested on Intel 700-series dual-port NIC (i40e) with iavf driver.
 
+Thanks to Jan Tluka <jtluka@redhat.com> for reporting the issue.
 
-Reviewed-by: Daniel Zahka <daniel.zahka@gmail.com>
+Jose Ignacio Tornos Martinez (3):
+  iavf: return EBUSY if reset in progress during MAC change
+  i40e: skip unnecessary VF reset when setting trust
+  iavf: drop netdev lock while waiting for MAC change completion
+
+ drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 12 +++++++-----
+ drivers/net/ethernet/intel/iavf/iavf_main.c        | 14 ++++++++++++++
+ 2 files changed, 21 insertions(+), 5 deletions(-)
+
+--
+2.43.0
 
 
