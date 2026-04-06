@@ -1,154 +1,154 @@
-Return-Path: <netdev+bounces-275701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275703-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8DXfNl/902kSpAcAu9opvQ
-	(envelope-from <netdev+bounces-275701-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:37:19 +0200
+	id 6JKhOHX902kSpAcAu9opvQ
+	(envelope-from <netdev+bounces-275703-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:37:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43ABA3A6488
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:37:19 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED8923A64A5
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:37:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C204A300B9DE
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 18:37:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D3894300BE21
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 18:37:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA3238B7D1;
-	Mon,  6 Apr 2026 18:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 675EA3939AB;
+	Mon,  6 Apr 2026 18:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="c+wwKQ9t"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="LJbR9dh4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F7B32695F
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 18:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A34738E5F6;
+	Mon,  6 Apr 2026 18:37:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775500637; cv=none; b=sGN8xiVWywmt392hKH1AUOeUqS/9RVsl/txnsOVoeYkyBNFmgYXjbVm1EFJTgkpB5UBciAGj2pfFMdUiduuliIbL9shSLWJ5AJfxomiZ/YEdOA5SGbQP4Y1nWPJ87lSOm33y9O8RTD+2vxJEKkp6W9k+bvvPNGsCjeszOsVpC2I=
+	t=1775500653; cv=none; b=DE1AaXlDxojc0/61yPB4NNpz0/MZ6aBfgCSZJmNCCFh/R0zTFH234TOA2a0zfHoJhtkQIjHHsCbfms7LgCOS3Bhc22qeQ+RJOvsD23T3LMj2LLLVpLsBYJ/ekIeIcd5SW+A4wvFd5nCbQbPrxttdDVtTih6OLtS+9LdqfmUwrS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775500637; c=relaxed/simple;
-	bh=CP12LEi5xWikBKv139k1WmbpUqAApCKC/R78cqzPPLY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UVIvNe6yxxSsXH6KHgbMw+RmfyCUyeTdLU1pSEXZmcfmeSbABNlcwFpI3gHpvnzoJmNt94vyqQp1W8rAYoA7RqTKA1q4ae4JHTr+fy8S80M4Oo2u7oZSlOTeQt2ACKYa9VU3+ucPyybBfJaePTqCS8iLGJRCEum9eBFVK9Ap1q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=c+wwKQ9t; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-354bc7c2c46so2518681a91.0
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 11:37:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775500635; x=1776105435; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KzoMkeGQjHqq5m5NUQcYMb2CsDvxm3DrHbtl/8KcFh8=;
-        b=c+wwKQ9tI3hqYicFLui9G/kJDHKCN91dlAa2DRP8CORBmpDqyeCQu6PiVzBSRP6Wys
-         RY2KnO4lS05cubdBuIU1kEsA/8rsO2Ft74mddjcMF/mwb1zOQ8Wg9vw+bl+vb7SbfXEd
-         RiiclPV9y/klQIyhav6e9P4TqJMMhwltLGtc+XBa1kYBvCqTxa1rMBj01awUw+Gb/bd0
-         BYyyrqFK9pkjNitJJiRw8W7orV4qveL2Ao+3f0tB5EkRI0P6BKf048k19NFky9mgpMTq
-         9d2+St15L4hx31TbUQqBOkXdAcjnk5uEF1xVUk+CpMsX8KUb5EFADGj3XyyuatNZFikz
-         ohZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775500635; x=1776105435;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KzoMkeGQjHqq5m5NUQcYMb2CsDvxm3DrHbtl/8KcFh8=;
-        b=L+VxuiyzajiAahbZSEsvVjhJ2TwVZIvPwo7i4q+QW5RWOsi/aHeOkyHPoqssLRChGK
-         0m5kRo40YbEQ1/UtGlo/DBidNvEqQh1EmmdDbYUzyuirJ7Cg06NlAAEsY5/+dFsx28yK
-         /whlrgJeCalM31VHMx7JetMHgBR9W8pQBV/pILJkltxI5NOxsAJ0pQo+/AI8cIaGc+EG
-         2fXlHONXHiXPUz+witBC+4c1a9ZcNowom8mwioM7uQlQ9EIA18hytCax3mjuDvXTn+c1
-         9OHueymv1WIB9BS9QEOdK+ZvmBFA0yDb4oL7YrtZ8AnaX4osX4rbPogo80x7rHVIaum/
-         AF2w==
-X-Forwarded-Encrypted: i=1; AJvYcCUZK/sV0oeFWau+o4hk0c92iNY4wLiMtIFPh6ABu/rUX8nQpTdG2cq7cRRhs65ad4ycAtvg3H8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxn1JR0zkv3gIsSWdZUiIaJm2GYHAJT7qAn5vDZObTv/Nja68CF
-	VPbQv8c85LPAacJ43LC+On/jVsOMUfU5gDcL69u7e1Y0dLDya2uIxtLZgabGAX7ihPc=
-X-Gm-Gg: AeBDietxw3+NTFvpZEVXtQic4rhC4D66MxvpHe+Edkf458ruYYksFFrywZU7mqVGNjD
-	y5L1XlJ9z3C/CJXQBOcfhl4DHf087Es12GNEHDkyxGhiLAgtgTFnLoCj78JMy+VkBKS6JoaJ41v
-	jZGClpXXILEk0DiiN4p2WdDJEz6Hd+ZXwcGowKlLRmBpU8thU5l9UtVbzoBn+ziobJg383B7xVg
-	G8bB6p88n0JcGGidSM/S+dzoL0b1woZkq33hhvWxJNcfScSD0BTL+vBXEL8sQwrXTpyIatU1eP4
-	Gnjm0LU6v7JL71x4m2R4XTlAODvoifeGBujAbKWTXrRjITLjOpBc116IjvX2lKH2c1L6uCO5hdK
-	Xi8ME6AHwPnx3D0cn/4XNIho+wSKd1bumd4Kl+4EVeXFOQBE+7jGZa+gMXovQOHNYBrPKOH0EJL
-	vR0c8i4kMyrPOSIOQ=
-X-Received: by 2002:a17:902:e748:b0:2b0:571f:6f09 with SMTP id d9443c01a7336-2b2818934camr150347155ad.44.1775500635409;
-        Mon, 06 Apr 2026 11:37:15 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:46::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b27479d0fbsm191461085ad.35.2026.04.06.11.37.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2026 11:37:15 -0700 (PDT)
-Date: Mon, 6 Apr 2026 11:37:14 -0700
-From: Joe Damato <joe@dama.to>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 1/2] net: qdisc_pkt_len_segs_init() cleanup
-Message-ID: <adP9Wn4D3a8Srhub@devvm20253.cco0.facebook.com>
-Mail-Followup-To: Joe Damato <joe@dama.to>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-References: <20260403221540.3297753-1-edumazet@google.com>
- <20260403221540.3297753-2-edumazet@google.com>
+	s=arc-20240116; t=1775500653; c=relaxed/simple;
+	bh=j/OcC1PBra97L2e12u5xT99c37IGn8k7+8n/kXD/Ng4=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=P0+of/ddnYkoxVsKW29KzpO/yG1MnFyqDAgzpnNkY2Np7+liMldFffZ2tJIjEbmbmvTXQa2981voPMOb5C0/IYj52d2ajURQ2b2pgsGq66AJXveemjp/UC1NcDJaZSEm6+bbJpjvksGrz+2NO3PymnlPta5ZCOxJmcbkwDw4aeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=LJbR9dh4; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C9251A5888;
+	Mon,  6 Apr 2026 20:37:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1775500648; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=kff7k9sb1vSdk8ThNR1w5zwCc9/cSFpnvvMQ/mvFjKk=;
+	b=LJbR9dh48Z28a7oODi05q5LCn0xvjV5bB1c6ERpYX9n35JsfdDJfSJk/4TELdcnu4VEycF
+	uEWo0GmcIFxAkKGksNk+GX88jGceHzi22qrRnIZUeZRr4jKlRjv+b2maiyRvebbhDqHt2F
+	F5Dn5pszA1Vy1qttnNgMlxZIFxGyzTx1FUv4isAfogspYLALaxO5/mIGty4SJPPjOtgYuk
+	Zi//dWqmAGTWwJ936oLzf/ne6+fMbCH2xOfJNNstClp5uAzjTGfOxVtmEbHsRdoV6YjI7e
+	12e4evHsIEK3ugFY8dBNB2PW5SEL1oNTQnoCKa/DYNembxt6pGu2/DGTqmeZ7Q==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260403221540.3297753-2-edumazet@google.com>
+Date: Mon, 06 Apr 2026 20:37:27 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, corbet@lwn.net,
+ skhan@linuxfoundation.org, workflows@vger.kernel.org,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next] docs: netdev: improve wording of reviewer
+ guidance
+In-Reply-To: <20260406175334.3153451-1-kuba@kernel.org>
+References: <20260406175334.3153451-1-kuba@kernel.org>
+Message-ID: <04de66f8f3d92720fcae6280b70f57f9@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-0.16 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275701-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275703-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DMARC_NA(0.00)[dama.to];
-	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,lunn.ch,vger.kernel.org,gmail.com];
+	DMARC_NA(0.00)[tipi-net.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dama-to.20251104.gappssmtp.com:dkim,devvm20253.cco0.facebook.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,dama.to:email]
-X-Rspamd-Queue-Id: 43ABA3A6488
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:email,lwn.net:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: ED8923A64A5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 03, 2026 at 10:15:39PM +0000, Eric Dumazet wrote:
-> Reduce indentation level by returning early if the transport header
-> was not set.
+On 6.4.2026 19:53, Jakub Kicinski wrote:
+> Reword the reviewer guidance based on behavior we see on the list.
+> Steer folks:
+>  - towards sending tags
+>  - away from process issues.
 > 
-> Add an unlikely() clause as this is not the common case.
-> 
-> No functional change.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->  net/core/dev.c | 62 +++++++++++++++++++++++++-------------------------
->  1 file changed, 31 insertions(+), 31 deletions(-)
+> CC: corbet@lwn.net
+> CC: skhan@linuxfoundation.org
+> CC: workflows@vger.kernel.org
+> CC: linux-doc@vger.kernel.org
+> ---
+>  Documentation/process/maintainer-netdev.rst | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/process/maintainer-netdev.rst 
+> b/Documentation/process/maintainer-netdev.rst
+> index 3aa13bc2405d..bda93b459a05 100644
+> --- a/Documentation/process/maintainer-netdev.rst
+> +++ b/Documentation/process/maintainer-netdev.rst
+> @@ -551,10 +551,12 @@ helpful tips please see 
+> :ref:`development_advancedtopics_reviews`.
+> 
+>  It's safe to assume that netdev maintainers know the community and the 
+> level
+>  of expertise of the reviewers. The reviewers should not be concerned 
+> about
+> -their comments impeding or derailing the patch flow.
+> +their comments impeding or derailing the patch flow. A Reviewed-by tag
+> +is understood to mean "I have reviewed this code to the best of my 
+> ability"
+> +rather than "I can attest this code is correct".
+> 
 
-Reviewed-by: Joe Damato <joe@dama.to>
+I had the same hesitation when starting to review on netdev, unsure if 
+my R-b
+carried any value. Therefore I appreciate the addition.
+
+> -Less experienced reviewers are highly encouraged to do more in-depth
+> -review of submissions and not focus exclusively on trivial or 
+> subjective
+> +Reviewers are highly encouraged to do more in-depth review of 
+> submissions
+> +and not focus exclusively on process issues, trivial or subjective
+>  matters like code formatting, tags etc.
+> 
+>  Testimonials / feedback
+
+Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
 
