@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-275753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275754-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cEj5JW0m1Gn5rgcAu9opvQ
-	(envelope-from <netdev+bounces-275753-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:32:29 +0200
+	id MMoEOBom1Gn5rgcAu9opvQ
+	(envelope-from <netdev+bounces-275754-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:31:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF3A33A7915
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:32:28 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F15B3A78C3
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:31:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2C0E43078480
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 21:30:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BF5BC301F283
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 21:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C632E390980;
-	Mon,  6 Apr 2026 21:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8114339185D;
+	Mon,  6 Apr 2026 21:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fTyDs6np"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TpOQ7KpS"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA4A38D014
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 21:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD3F390215
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 21:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775511047; cv=none; b=dvKlY/tvCBs6msuW5bvfNd6JT/FILgK2xjhE4HJwPswI0XTDPdTJObUVME/MMoanib5Ukx/NZVGv1ihwL0moY+ptoFsuPDWmEvXUJaLrvRwp8EyPoX0qOqdLuHJzeeyLRXhADpvCHJL4jTyq70mZ3mHCe5DS6BibipgDUQLrLCE=
+	t=1775511048; cv=none; b=bQkZZcyZz3V4fbZESKmLt7vhSO3W1Lvwcs3QRUmor0Q83A7YLuKpTSYZN7mvmjqbqcZrpToYOiNbGKLDbVq9vIVPxpjVB89TTkwGphVq8bxDEwvxpWmvlvKHOfMp5cdBCvdjY3ctJqp1TP/AiNRaM/akQTeSP4CLwY3x6y8hYMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775511047; c=relaxed/simple;
-	bh=KSAMTGcxXgMTXhBl+w5KtIKGeqHJklT1ZXBOKmUXQ2U=;
+	s=arc-20240116; t=1775511048; c=relaxed/simple;
+	bh=BBwjgRdaqANREThw2MhZ2ChLB2tk9qMkoLA5ZQTZyf0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XDY8yRKUno8AdFizbXoBos0waFGuJ7SDy6AuUv5iKdWngoEC01gDk5mPunytSF/FZWq/pTQwckk8RwKvGB6x+oO8u9KzvyO/XUaZ11HuWyPXIBraBOfiKMJ9Ks7ATsM4HwKpTyDd5oxCWtSCkRypE362qotQ9yWG6RJ4tGoad/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fTyDs6np; arc=none smtp.client-ip=192.198.163.13
+	 MIME-Version; b=oqlyb+hfshx+J7A2RTecWmVkc7t0QX8Qj49cIt4BlZxuQygqzOoDTQwQEeDz5ni26bS4vZs32Orrc/6xkQGTC4+W2xSpvUMnCf/sA2AW1s6B56/Yyp6kkrGPs2vUNMAQVqe/slCm7E9hYVS5TBk/rZecgw3miqbShJSLoWxIfv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TpOQ7KpS; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775511046; x=1807047046;
+  t=1775511047; x=1807047047;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=KSAMTGcxXgMTXhBl+w5KtIKGeqHJklT1ZXBOKmUXQ2U=;
-  b=fTyDs6np3NLa3jk2gAKLo8CHfSankDdMvUPQqT2+/ali4CQ20FpAbv6q
-   H06J6a4N3jBViRGoCOe7oycfNVEL7VoZ46eK799u/zATKy+6+eocqdk7F
-   vWQokGscUdNhb8eLtkhNUt+is52YFVTYdjoQsc6VUih7MrzmqCi43HA+I
-   LAglqKWUGG0OQg9jYNFki/gKY1s/EhMV4P89lkibbRaf62y28yxn0yBsF
-   +t/FICRJciVzzNrvOI/dfK0fBpcMDgvoyT3i2y4TJimglkpTnLR/AGUg3
-   yN8N2JAwOIeUg4R+1sR7sR2JIkDKgeLJ627zfMfbFBqC8TYaayLGE0+1z
-   A==;
-X-CSE-ConnectionGUID: lJyPW/WlRGuOnBeWg5baLQ==
-X-CSE-MsgGUID: wmqmwbrYTp+E8nfF/ByTjg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11751"; a="79057422"
+  bh=BBwjgRdaqANREThw2MhZ2ChLB2tk9qMkoLA5ZQTZyf0=;
+  b=TpOQ7KpSL0nplwQ6zoXZjhIZbs4KtOIczZ3nrWZhcZm7PmCEvhEJ+MtP
+   Bg48+XtYkzXLs7pmiQk8cnrfDKeqLE5oezQzJv5XOayvN5gAO9pPPaT63
+   cjoww39/L36JzBl31n4koX10QdpRqxfgHeSbQ/tIW72ZVjjElFherW9Tp
+   uQqJey0HL2Srl2yWCtqn9MRSwF0tMopVb6112MoOso8up9finf+B4hH2k
+   gQc6DhG8eEU/LqsBTG4UeNlr8I/6Rf84X2Y3SRLiCQKfKkmGbxHmblB2j
+   AkXjBIReaeqPdWJBa5dKQPdmPgHfiuNw94SggyNmp8bFX98PGVZK9RBd+
+   Q==;
+X-CSE-ConnectionGUID: u4xDLCb1Q6+dEmsfwvEepw==
+X-CSE-MsgGUID: vU5XjGAQTVSVpM3ST9rOYw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11751"; a="79057429"
 X-IronPort-AV: E=Sophos;i="6.23,164,1770624000"; 
-   d="scan'208";a="79057422"
+   d="scan'208";a="79057429"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
   by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2026 14:30:42 -0700
-X-CSE-ConnectionGUID: UJJMOK1PSviLXsE+s7rYDQ==
-X-CSE-MsgGUID: MjAPSGtDTsuZMUphA3dnzA==
+X-CSE-ConnectionGUID: e1Wc+tVgTb+ixZ5vVbDVqQ==
+X-CSE-MsgGUID: xe5PDSMUS2K/74gNIUe7Kg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,164,1770624000"; 
-   d="scan'208";a="228248114"
+   d="scan'208";a="228248117"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa007.jf.intel.com with ESMTP; 06 Apr 2026 14:30:41 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -68,14 +68,13 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+Cc: Michal Schmidt <mschmidt@redhat.com>,
 	anthony.l.nguyen@intel.com,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net 6/9] ixgbe: stop re-reading flash on every get_drvinfo for e610
-Date: Mon,  6 Apr 2026 14:30:33 -0700
-Message-ID: <20260406213038.444732-7-anthony.l.nguyen@intel.com>
+	Xiaoqiang Xiong <xxiong@redhat.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH net 7/9] ixgbevf: add missing negotiate_features op to Hyper-V ops table
+Date: Mon,  6 Apr 2026 14:30:34 -0700
+Message-ID: <20260406213038.444732-8-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260406213038.444732-1-anthony.l.nguyen@intel.com>
 References: <20260406213038.444732-1-anthony.l.nguyen@intel.com>
@@ -93,158 +92,97 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275753-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275754-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: EF3A33A7915
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 6F15B3A78C3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+From: Michal Schmidt <mschmidt@redhat.com>
 
-ixgbe_get_drvinfo() calls ixgbe_refresh_fw_version() on every ethtool
-query for e610 adapters.  That ends up in ixgbe_discover_flash_size(),
-which bisects the full 16 MB NVM space issuing one ACI command per
-step (~20 ms each, ~24 steps total = ~500 ms).
+Commit a7075f501bd3 ("ixgbevf: fix mailbox API compatibility by
+negotiating supported features") added the .negotiate_features callback
+to ixgbe_mac_operations and populated it in ixgbevf_mac_ops, but forgot
+to add it to ixgbevf_hv_mac_ops. This leaves the function pointer NULL
+on Hyper-V VMs.
 
-Profiling on an idle E610-XAT2 system with telegraf scraping ethtool
-stats every 10 seconds:
+During probe, ixgbevf_negotiate_api() calls ixgbevf_set_features(),
+which unconditionally dereferences hw->mac.ops.negotiate_features().
+On Hyper-V this results in a NULL pointer dereference:
 
-  kretprobe:ixgbe_get_drvinfo took 527603 us
-  kretprobe:ixgbe_get_drvinfo took 523978 us
-  kretprobe:ixgbe_get_drvinfo took 552975 us
-  kretprobe:ice_get_drvinfo   took       3 us
-  kretprobe:igb_get_drvinfo   took       2 us
-  kretprobe:i40e_get_drvinfo  took       5 us
+  BUG: kernel NULL pointer dereference, address: 0000000000000000
+  [...]
+  Hardware name: Microsoft Corporation Virtual Machine/Virtual Machine [...]
+  Workqueue: events work_for_cpu_fn
+  RIP: 0010:0x0
+  [...]
+  Call Trace:
+   ixgbevf_negotiate_api+0x66/0x160 [ixgbevf]
+   ixgbevf_sw_init+0xe4/0x1f0 [ixgbevf]
+   ixgbevf_probe+0x20f/0x4a0 [ixgbevf]
+   local_pci_probe+0x50/0xa0
+   work_for_cpu_fn+0x1a/0x30
+   [...]
 
-The half-second stall happens under the RTNL lock, causing visible
-latency on ip-link and friends.
+Add ixgbevf_hv_negotiate_features_vf() that returns -EOPNOTSUPP and
+wire it into ixgbevf_hv_mac_ops. The caller already handles -EOPNOTSUPP
+gracefully.
 
-The FW version can only change after an EMPR reset.  All flash data is
-already populated at probe time and the cached adapter->eeprom_id is
-what get_drvinfo should be returning.  The only place that needs to
-trigger a re-read is ixgbe_devlink_reload_empr_finish(), right after
-the EMPR completes and new firmware is running.  Additionally, refresh
-the FW version in ixgbe_reinit_locked() so that any PF that undergoes a
-reinit after an EMPR (e.g. triggered by another PF's devlink reload)
-also picks up the new version in adapter->eeprom_id.
-
-ixgbe_devlink_info_get() keeps its refresh call for explicit
-"devlink dev info" queries, which is fine given those are user-initiated.
-
-Fixes: c9e563cae19e ("ixgbe: add support for devlink reload")
-Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+Fixes: a7075f501bd3 ("ixgbevf: fix mailbox API compatibility by negotiating supported features")
+Reported-by: Xiaoqiang Xiong <xxiong@redhat.com>
+Closes: https://issues.redhat.com/browse/RHEL-155455
+Assisted-by: Claude:claude-4.6-opus-high Cursor
+Tested-by: Xiaoqiang Xiong <xxiong@redhat.com>
+Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ixgbe/devlink/devlink.c |  2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe.h           |  2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c   | 13 +++++++------
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c      | 10 ++++++++++
- 4 files changed, 19 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/intel/ixgbevf/vf.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c b/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c
-index b0404f37271a..cf8908b82f8a 100644
---- a/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c
-@@ -474,7 +474,7 @@ static int ixgbe_devlink_reload_empr_finish(struct devlink *devlink,
- 	adapter->flags2 &= ~(IXGBE_FLAG2_API_MISMATCH |
- 			     IXGBE_FLAG2_FW_ROLLBACK);
- 
--	return 0;
-+	return ixgbe_refresh_fw_version(adapter);
+diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.c b/drivers/net/ethernet/intel/ixgbevf/vf.c
+index b67b580f7f1c..f6df86d124b9 100644
+--- a/drivers/net/ethernet/intel/ixgbevf/vf.c
++++ b/drivers/net/ethernet/intel/ixgbevf/vf.c
+@@ -709,6 +709,12 @@ static int ixgbevf_negotiate_features_vf(struct ixgbe_hw *hw, u32 *pf_features)
+ 	return err;
  }
  
- static const struct devlink_ops ixgbe_devlink_ops = {
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-index dce4936708eb..047f04045585 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -973,7 +973,7 @@ int ixgbe_init_interrupt_scheme(struct ixgbe_adapter *adapter);
- bool ixgbe_wol_supported(struct ixgbe_adapter *adapter, u16 device_id,
- 			 u16 subdevice_id);
- void ixgbe_set_fw_version_e610(struct ixgbe_adapter *adapter);
--void ixgbe_refresh_fw_version(struct ixgbe_adapter *adapter);
-+int ixgbe_refresh_fw_version(struct ixgbe_adapter *adapter);
- #ifdef CONFIG_PCI_IOV
- void ixgbe_full_sync_mac_table(struct ixgbe_adapter *adapter);
- #endif
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index 56aabaa5caec..ba049b3a9609 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -1155,12 +1155,17 @@ static int ixgbe_set_eeprom(struct net_device *netdev,
- 	return ret_val;
- }
- 
--void ixgbe_refresh_fw_version(struct ixgbe_adapter *adapter)
-+int ixgbe_refresh_fw_version(struct ixgbe_adapter *adapter)
- {
- 	struct ixgbe_hw *hw = &adapter->hw;
-+	int err;
++static int ixgbevf_hv_negotiate_features_vf(struct ixgbe_hw *hw,
++					    u32 *pf_features)
++{
++	return -EOPNOTSUPP;
++}
 +
-+	err = ixgbe_get_flash_data(hw);
-+	if (err)
-+		return err;
- 
--	ixgbe_get_flash_data(hw);
- 	ixgbe_set_fw_version_e610(adapter);
-+	return 0;
- }
- 
- static void ixgbe_get_drvinfo(struct net_device *netdev,
-@@ -1168,10 +1173,6 @@ static void ixgbe_get_drvinfo(struct net_device *netdev,
- {
- 	struct ixgbe_adapter *adapter = ixgbe_from_netdev(netdev);
- 
--	/* need to refresh info for e610 in case fw reloads in runtime */
--	if (adapter->hw.mac.type == ixgbe_mac_e610)
--		ixgbe_refresh_fw_version(adapter);
--
- 	strscpy(drvinfo->driver, ixgbe_driver_name, sizeof(drvinfo->driver));
- 
- 	strscpy(drvinfo->fw_version, adapter->eeprom_id,
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index e4101c59074d..59801187a839 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -6289,6 +6289,16 @@ void ixgbe_reinit_locked(struct ixgbe_adapter *adapter)
- 	if (adapter->flags & IXGBE_FLAG_SRIOV_ENABLED)
- 		msleep(2000);
- 	ixgbe_up(adapter);
-+
-+	/* E610 has no FW event to notify all PFs of an EMPR reset, so
-+	 * refresh the FW version here to pick up any new FW version after
-+	 * a hardware reset (e.g. EMPR triggered by another PF's devlink
-+	 * reload).  ixgbe_refresh_fw_version() updates both hw->flash and
-+	 * adapter->eeprom_id so ethtool -i reports the correct string.
-+	 */
-+	if (adapter->hw.mac.type == ixgbe_mac_e610)
-+		(void)ixgbe_refresh_fw_version(adapter);
-+
- 	clear_bit(__IXGBE_RESETTING, &adapter->state);
- }
- 
+ /**
+  *  ixgbevf_set_vfta_vf - Set/Unset VLAN filter table address
+  *  @hw: pointer to the HW structure
+@@ -1142,6 +1148,7 @@ static const struct ixgbe_mac_operations ixgbevf_hv_mac_ops = {
+ 	.setup_link		= ixgbevf_setup_mac_link_vf,
+ 	.check_link		= ixgbevf_hv_check_mac_link_vf,
+ 	.negotiate_api_version	= ixgbevf_hv_negotiate_api_version_vf,
++	.negotiate_features	= ixgbevf_hv_negotiate_features_vf,
+ 	.set_rar		= ixgbevf_hv_set_rar_vf,
+ 	.update_mc_addr_list	= ixgbevf_hv_update_mc_addr_list_vf,
+ 	.update_xcast_mode	= ixgbevf_hv_update_xcast_mode,
 -- 
 2.47.1
 
