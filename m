@@ -1,199 +1,125 @@
-Return-Path: <netdev+bounces-275524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275525-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uNSYKl4l02lxfAcAu9opvQ
-	(envelope-from <netdev+bounces-275524-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 05:15:42 +0200
+	id 0OqBO+cs02nFfQcAu9opvQ
+	(envelope-from <netdev+bounces-275525-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 05:47:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F3423A14AA
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 05:15:42 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 996FC3A1595
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 05:47:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A08973001464
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 03:15:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 162693007ACF
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 03:47:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC04434AAEB;
-	Mon,  6 Apr 2026 03:15:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7982304BDF;
+	Mon,  6 Apr 2026 03:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qMppkvCP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mdKeFnTP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90582344DA9
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 03:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20B540DFCB;
+	Mon,  6 Apr 2026 03:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775445340; cv=none; b=klY2MArq7IIbg0obuJhnZZAooKlhV8NcuqpSoueMRBOCgcSK1aaZ1Q91E2DHrtnYj8JzX5MeoG6GJ2yIntvDsOwAfTysj9M6jLACLfRB0aMvnXZNYovDzx7MuOU8wgObUoDGTitrL3kugcaBs3N8xWbqnpM/gPwvIGKDHdaD5rw=
+	t=1775447264; cv=none; b=akIuHTWoP06Fo5eZyZ9o1QSlZhri9ky/vMTBR9M7pSRg/1m4HXBFsP0L0mdSCfQ0JoZZFAMfJIa8Wpou96mRkkmuGeh/ZkYp039Q3r4iv5lLeS5Gb2zBSFyQhyfwQlVwoiM4AMWIxFEYG2LLSvydLtw/tBbJr11r5iz2+CcY4B8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775445340; c=relaxed/simple;
-	bh=VnKcRhtnXmg3esTxutvPiewGjUarJqAT10kc4eGYok4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k3hpBOuzPrtm0r7XSrrdFpSr+HrgBXQOCOcTgg9uUAwKDbpk+Fwk1s5dsU8wEXMAHNF0FySD58T637V1elJzJG7FbVJuXYHMExF8GH5fjMuN+Y8/dcImfFvYL3hKM+LoU5hJ9o1GI7yIk0VEBBUBqMfK2+f0qEh+rfbO/gB0D+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qMppkvCP; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775445324;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=pCU31PuVLxnkqkH0Q/gfVj7NOZB8sp1JJeyWvm+opn0=;
-	b=qMppkvCPiJYh+m7P00Vul4Jo2KsY7FUMAzJ7JHiQ0AAMkRusLuXvkSBInX0nzNiYSiQzSi
-	5b+yway8muyT9Hoxbv+KK5va66DvhgtG8FHI00LQa7y1qzFsZpRn2Eb+FmaX8rQRzaDKxI
-	l/HKg/HyeNDl9AP70zAEPbpR2S9VYWo=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: mptcp@lists.linux.dev
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	stable@vger.kernel.org,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] mptcp: fix slab-use-after-free in __inet_lookup_established
-Date: Mon,  6 Apr 2026 11:15:10 +0800
-Message-ID: <20260406031512.189159-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1775447264; c=relaxed/simple;
+	bh=9BXHBOTCWdya0L5PFYubQfX2LAdXHzUD5zA97PeNOrc=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=CLVDhJW+lhhmQM2T+ZCWWdqo115cSJd8IClPyG455aopVGVAcYJOPUVkyJLtMlWhcq8wKirstxPo8CCEqc3CaAViZnQsRxItDobVw9v8bWUa1IF6PawxvZuaO5AvNgoXJWbHt5sBt9Pu4q6Fc35KS2UVrbV1RqnqNEXVi1R9Y2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mdKeFnTP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3420C4CEF7;
+	Mon,  6 Apr 2026 03:47:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775447264;
+	bh=9BXHBOTCWdya0L5PFYubQfX2LAdXHzUD5zA97PeNOrc=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=mdKeFnTPqwDg8oZynH5Bsp/A8+T9rR8oExgKFXyorugo+FPs7P0jaq290hogvEkwh
+	 ssidxYtaOiFQCOK06/6ktGPuRTGi2kBw/kMkento77iZg6yuMNWsJQFvIRUBiCJWYi
+	 6MEBv2ImZjCq5sJKhopgGZLqunDjCbejC9le5kWCR5g7eMcV53XuO+xyGaODwr503E
+	 FvCXEnhPpaMk0rvaKjyWo59Hg0aZ9VRoiotkXxoQMaV6AZqZA6l/xdP6pC7gL9BcAZ
+	 o3j8/grlvbL+cOekq7JSLQ6ap2PAcFsuwNWqbzO6L7/RQn+DMY7TPc74YZ0t+804fW
+	 ELJV25H30flzg==
+Content-Type: multipart/mixed; boundary="===============2924377954232874562=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+Message-Id: <913274772cd62d8d93e6cfb2c251c2388b73f24f90d05be3c9994207ac7048bf@mail.kernel.org>
+In-Reply-To: <20260406031330.187630-1-jiayuan.chen@linux.dev>
+References: <20260406031330.187630-1-jiayuan.chen@linux.dev>
+Subject: Re: [PATCH bpf v2 1/2] bpf: Fix same-register dst/src OOB read and pointer leak in sock_ops
+From: bot+bpf-ci@kernel.org
+To: jiayuan.chen@linux.dev,bpf@vger.kernel.org
+Cc: jiayuan.chen@linux.dev,2022090917019@std.uestc.edu.cn,dddddd@hust.edu.cn,M202472210@hust.edu.cn,dzm91@hust.edu.cn,emil@etsalapatis.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,memxor@gmail.com,song@kernel.org,yonghong.song@linux.dev,jolsa@kernel.org,john.fastabend@gmail.com,sdf@fomichev.me,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,horms@kernel.org,shuah@kernel.org,linux-kernel@vger.kernel.org,netdev@vger.kernel.org,linux-kselftest@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Mon,  6 Apr 2026 03:47:43 +0000 (UTC)
+X-Spamd-Result: default: False [0.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	CTYPE_MIXED_BOGUS(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275524-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[linux.dev,std.uestc.edu.cn,hust.edu.cn,etsalapatis.com,kernel.org,iogearbox.net,gmail.com,fomichev.me,davemloft.net,google.com,redhat.com,vger.kernel.org,meta.com];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RCVD_COUNT_THREE(0.00)[3];
-	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	TAGGED_FROM(0.00)[bounces-275525-lists,netdev=lfdr.de,bpf-ci];
+	MIME_TRACE(0.00)[0:+,1:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[36];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
-X-Rspamd-Queue-Id: 3F3423A14AA
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 996FC3A1595
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The ehash table lookups are lockless and rely on
-SLAB_TYPESAFE_BY_RCU to guarantee socket memory stability
-during RCU read-side critical sections. Both tcp_prot and
-tcpv6_prot have their slab caches created with this flag
-via proto_register().
+--===============2924377954232874562==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-However, MPTCP's mptcp_subflow_init() copies tcpv6_prot into
-tcpv6_prot_override during inet_init() (fs_initcall, level 5),
-before inet6_init() (module_init/device_initcall, level 6) has
-called proto_register(&tcpv6_prot). At that point,
-tcpv6_prot.slab is still NULL, so tcpv6_prot_override.slab
-remains NULL permanently.
+> Fixes: 84f44df664e9 ("bpf: sock_ops sk access may stomp registers when dst_reg = src_reg")
 
-This causes MPTCP v6 subflow child sockets to be allocated via
-kmalloc (falling into kmalloc-4k) instead of the TCPv6 slab
-cache. The kmalloc-4k cache lacks SLAB_TYPESAFE_BY_RCU, so
-when these sockets are freed without SOCK_RCU_FREE (which is
-cleared for child sockets by design), the memory can be
-immediately reused. Concurrent ehash lookups under
-rcu_read_lock can then access freed memory, triggering a
-slab-use-after-free in __inet_lookup_established.
+This Fixes: tag covers the SOCK_OPS_GET_SK() portion of the fix,
+since 84f44df664e9 introduced that macro. However, the identical
+bug in SOCK_OPS_GET_FIELD() was introduced by an earlier commit:
 
-Fix this by splitting the IPv6-specific initialization out of
-mptcp_subflow_init() into a new mptcp_subflow_v6_init(), called
-from mptcp_proto_v6_init() before protocol registration. This
-ensures tcpv6_prot_override.slab correctly inherits the
-SLAB_TYPESAFE_BY_RCU slab cache.
+  fd09af010788 ("bpf: sock_ops ctx access may stomp registers in corner case")
 
-Fixes: b19bc2945b40 ("mptcp: implement delegated actions")
-Cc: stable@vger.kernel.org
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+That commit added the dst_reg == src_reg handling to
+SOCK_OPS_GET_FIELD() with the same missing zeroing in the
+!fullsock path. Should this also carry:
+
+  Fixes: fd09af010788 ("bpf: sock_ops ctx access may stomp registers in corner case")
+
+Without it, kernels that have fd09af010788 but not 84f44df664e9
+would not receive the SOCK_OPS_GET_FIELD() fix via stable backport.
+
+
 ---
- net/mptcp/protocol.c |  2 ++
- net/mptcp/protocol.h |  1 +
- net/mptcp/subflow.c  | 15 +++++++++------
- 3 files changed, 12 insertions(+), 6 deletions(-)
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 65c3bb8016f4..614c3f583ca0 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -4660,6 +4660,8 @@ int __init mptcp_proto_v6_init(void)
- {
- 	int err;
- 
-+	mptcp_subflow_v6_init();
-+
- 	mptcp_v6_prot = mptcp_prot;
- 	strscpy(mptcp_v6_prot.name, "MPTCPv6", sizeof(mptcp_v6_prot.name));
- 	mptcp_v6_prot.slab = NULL;
-diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
-index 0bd1ee860316..ec15e503da8b 100644
---- a/net/mptcp/protocol.h
-+++ b/net/mptcp/protocol.h
-@@ -875,6 +875,7 @@ static inline void mptcp_subflow_tcp_fallback(struct sock *sk,
- void __init mptcp_proto_init(void);
- #if IS_ENABLED(CONFIG_MPTCP_IPV6)
- int __init mptcp_proto_v6_init(void);
-+void __init mptcp_subflow_v6_init(void);
- #endif
- 
- struct sock *mptcp_sk_clone_init(const struct sock *sk,
-diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-index 6716970693e9..4ff5863aa9fd 100644
---- a/net/mptcp/subflow.c
-+++ b/net/mptcp/subflow.c
-@@ -2165,7 +2165,15 @@ void __init mptcp_subflow_init(void)
- 	tcp_prot_override.psock_update_sk_prot = NULL;
- #endif
- 
-+	mptcp_diag_subflow_init(&subflow_ulp_ops);
-+
-+	if (tcp_register_ulp(&subflow_ulp_ops) != 0)
-+		panic("MPTCP: failed to register subflows to ULP\n");
-+}
-+
- #if IS_ENABLED(CONFIG_MPTCP_IPV6)
-+void __init mptcp_subflow_v6_init(void)
-+{
- 	/* In struct mptcp_subflow_request_sock, we assume the TCP request sock
- 	 * structures for v4 and v6 have the same size. It should not changed in
- 	 * the future but better to make sure to be warned if it is no longer
-@@ -2204,10 +2212,5 @@ void __init mptcp_subflow_init(void)
- 	/* Disable sockmap processing for subflows */
- 	tcpv6_prot_override.psock_update_sk_prot = NULL;
- #endif
--#endif
--
--	mptcp_diag_subflow_init(&subflow_ulp_ops);
--
--	if (tcp_register_ulp(&subflow_ulp_ops) != 0)
--		panic("MPTCP: failed to register subflows to ULP\n");
- }
-+#endif
--- 
-2.43.0
-
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/24017481706
+--===============2924377954232874562==--
 
