@@ -1,176 +1,132 @@
-Return-Path: <netdev+bounces-275602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275603-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IDfcFwW702m5lAcAu9opvQ
-	(envelope-from <netdev+bounces-275602-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:54:13 +0200
+	id eChBMti702mslAcAu9opvQ
+	(envelope-from <netdev+bounces-275603-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:57:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC14C3A3B8A
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:54:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E52A3A3BEF
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:57:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E11D23003539
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 13:54:09 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E932F3022604
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 13:57:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59ADC29E11D;
-	Mon,  6 Apr 2026 13:54:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647C8370D4E;
+	Mon,  6 Apr 2026 13:57:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SMgI942G"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB36306B37
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 13:54:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.175.55.52
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D4E372667;
+	Mon,  6 Apr 2026 13:57:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775483649; cv=none; b=hUh+MdCvOQFSbrXmAC+cmARU2KvUtQlspFnFXP6SFTVm3GrhWlVrB0NE4qxHGqp7OxtSVj8c1v++ugXVtB/QglnbVqJHS/YrcswQZ1nCR+H2gxMFnghxGRw6i6VWAh64rBPGwPU/uin66AysBOxa7l/hOqs6LLvuqMitpXfqh6A=
+	t=1775483822; cv=none; b=k9kvZxEEUV2BN2j+cHzCZd5QEX54fg32cC2FE66LFcuJ8FRIIY+KwlyZbRY4FqPtuxgsmdcIBwhnLBsMIhIhDlmjUT4vizkOZhDx7jSRJotAcG0AH6EjKKzsWovY1YiDqPi67+BJyZGct65O4qQiSaYLDb8GJ5En7BQ/3ejVBhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775483649; c=relaxed/simple;
-	bh=gDbwPL4lWb538GdsokNOA9J91hRTKlJnwhJ2F0/4G/Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UjYhkjMw+2OH1ya8JryY70gCY95zpvH7eNBMNYYnaTloWP1lUneAuf21fU75n765RPze4xQInICR3C/9J/Q136+j6Taarrd0FnhACfWb+1C5560/JMUy8+YIAMaB5IG9EYjETivUIo2W/0yak+jHlkpY0sdiJNfxTCKNcWD/5b4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.175.55.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowADHOPnqutNpAc+rAA--.3279S3;
-	Mon, 06 Apr 2026 21:53:48 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org
-Cc: kuniyu@google.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	xemul@parallels.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	yuantan098@gmail.com,
-	bird@lzu.edu.cn,
-	enjou1224z@gmail.com,
-	wangjiexun2025@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH net 1/1] af_unix: read UNIX_DIAG_VFS data under unix_state_lock
-Date: Mon,  6 Apr 2026 21:53:44 +0800
-Message-ID: <e597de49d761fdc6961f49d638ce26bd3f74e988.1775207252.git.wangjiexun2025@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1775207252.git.wangjiexun2025@gmail.com>
-References: <cover.1775207252.git.wangjiexun2025@gmail.com>
+	s=arc-20240116; t=1775483822; c=relaxed/simple;
+	bh=xjHwG5Y+1E1d2HwBhZsmGySfm5K7EBG11H8zaiaM9cs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IDaa5acfAbfs6b87zsSqyaY9304jEcDRjEZhWSn0NTUuhYTfLcGV/esr7lgZZzbTjrjuYB5rdn1W9cKQiWVO0HIw4PCtTAChOjgEJqaEZenH/Oi0trH7H51/jdtvJ7Nlf7jCN8//zQGnFFXkTF911Kd2d+7PkaUddJBoFj+xYb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SMgI942G; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=P6+ExAEXw9GKGXkRDQY+ltkonNVErp1cHtCmBK5GetU=; b=SMgI942GxUKcjBVCjiy7h8WiWZ
+	DnYPldEHZ0kb0VLRTe1Xg1IXhCsxpRnHtRzvXh5Wdx99ITNIQcUivXAAkj8bSpvRmRvvFcmEI5Isz
+	RF+DQOE9C0ijARr6bqxGhwDBGiFwb/ksIYaZQ8DxkxWW463uOLlJZEMe0pY3v1YU2XiI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1w9kRd-00Ezh8-PC; Mon, 06 Apr 2026 15:56:49 +0200
+Date: Mon, 6 Apr 2026 15:56:49 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 0/3] net: phy: add support for disabling
+ autonomous EEE
+Message-ID: <5298959c-12de-4992-a896-3d1371cba111@lunn.ch>
+References: <20260406-devel-autonomous-eee-v1-0-b335e7143711@tipi-net.de>
+ <a1cf8f6a-b338-4dd7-aced-7e19e4d0fdb7@lunn.ch>
+ <9272c5dd653039b3def8caaea3e631c5@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowADHOPnqutNpAc+rAA--.3279S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7CFy5Cr45GFyxCrWDGryfWFg_yoW8uryUpF
-	W3KFWUKryDAry29r1fKryI9w1Fva9rWF98G3yqkwn5J3ZrJrWIqas0gr9Fvrn5JFWFkw4x
-	JF1Y9F1rGr48ArJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
-	Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_Jw0_GFylc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY2
-	0_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQIJCWnShX0IRQAAsN
-X-Spamd-Result: default: False [-0.96 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9272c5dd653039b3def8caaea3e631c5@tipi-net.de>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
+	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275602-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,parallels.com,gmail.com,lzu.edu.cn];
-	RCVD_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275603-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.993];
-	TO_DN_NONE(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[lunn.ch:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: CC14C3A3B8A
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
+X-Rspamd-Queue-Id: 2E52A3A3BEF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Jiexun Wang <wangjiexun2025@gmail.com>
+> "Autonomous EEE" works for me (obviously). It kinda describes what
+> happens (the PHY acts autonomously) without being tied to a specific
+> vendor's marketing name.
+> 
+> That said, I feel Russell's argument that it doesn't type well. But
+> even after some walks in the woods I wasn't able to come up with a
+> better name yet.
 
-Exact UNIX diag lookups hold a reference to the socket, but not to
-u->path. Meanwhile, unix_release_sock() clears u->path under
-unix_state_lock() and drops the path reference after unlocking.
+Yes, naming is hard.
 
-Read the inode and device numbers for UNIX_DIAG_VFS while holding
-unix_state_lock(), then emit the netlink attribute after dropping the
-lock.
+> I don't think there's a meaningful use case for letting users choose
+> between the two. Or is there?
 
-This keeps the VFS data stable while the reply is being built.
+This has come up before, in other context. PTP is one example, where
+both the MAC and the PHY can implement it. Ideally, you want it to
+happen at the PHY, it gives higher accuracy. But there are systems
+where the PHY implementation is somewhat broken, and the MAC PTP gives
+better results. So defaulting to PHY PTP is not always the best
+option.
 
-Fixes: 5f7b0569460b ("unix_diag: Unix inode info NLA")
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Suggested-by: Xin Liu <bird@lzu.edu.cn>
-Tested-by: Ren Wei <enjou1224z@gmail.com>
-Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- net/unix/diag.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+I would expect IEEE 802.3 EEE, with both the MAC and PHY cooperating
+is better than just PHY level EEE, the system as a whole has a better
+picture of what is going on, so using 802.3 EEE should be the
+preference/default. But are we going to run into oddball systems where
+autonomous EEE is actually better than using a somewhat broke MAC?
 
-diff --git a/net/unix/diag.c b/net/unix/diag.c
-index ca3473026151..76b2c48137dd 100644
---- a/net/unix/diag.c
-+++ b/net/unix/diag.c
-@@ -28,18 +28,23 @@ static int sk_diag_dump_name(struct sock *sk, struct sk_buff *nlskb)
- 
- static int sk_diag_dump_vfs(struct sock *sk, struct sk_buff *nlskb)
- {
--	struct dentry *dentry = unix_sk(sk)->path.dentry;
-+	struct dentry *dentry;
-+	struct unix_diag_vfs uv;
-+	bool have_vfs = false;
- 
-+	unix_state_lock(sk);
-+	dentry = unix_sk(sk)->path.dentry;
- 	if (dentry) {
--		struct unix_diag_vfs uv = {
--			.udiag_vfs_ino = d_backing_inode(dentry)->i_ino,
--			.udiag_vfs_dev = dentry->d_sb->s_dev,
--		};
--
--		return nla_put(nlskb, UNIX_DIAG_VFS, sizeof(uv), &uv);
-+		uv.udiag_vfs_ino = d_backing_inode(dentry)->i_ino;
-+		uv.udiag_vfs_dev = dentry->d_sb->s_dev;
-+		have_vfs = true;
- 	}
-+	unix_state_unlock(sk);
- 
--	return 0;
-+	if (!have_vfs)
-+		return 0;
-+
-+	return nla_put(nlskb, UNIX_DIAG_VFS, sizeof(uv), &uv);
- }
- 
- static int sk_diag_dump_peer(struct sock *sk, struct sk_buff *nlskb)
--- 
-2.34.1
-
+	Andrew
 
