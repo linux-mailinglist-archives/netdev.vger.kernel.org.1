@@ -1,139 +1,342 @@
-Return-Path: <netdev+bounces-275773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275777-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MFYHGFo91Gl4sQcAu9opvQ
-	(envelope-from <netdev+bounces-275773-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 01:10:18 +0200
+	id 0PCYN+tA1GmRsQcAu9opvQ
+	(envelope-from <netdev+bounces-275777-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 01:25:31 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07FCF3A8108
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 01:10:17 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54F493A81B9
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 01:25:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B85A530480E4
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 23:10:05 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 838DA301FA92
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 23:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95E73A0B01;
-	Mon,  6 Apr 2026 23:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 427FF3A16A8;
+	Mon,  6 Apr 2026 23:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nRATh4BG"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="C7XkuzFi"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A7331E82A
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 23:10:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5562931A072
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 23:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775517004; cv=none; b=ar6CyxmXUkjR5EUcycLxDl70lDz2Hg6kIoDFHKPhPAYr7vp20bBlcg4ucBI3r7q8pnQnkUrK73JVSTuGAin6mgGQ8R6G/js5+xriNQfeD9hiTLHtSEaXAdmq7YpoT1ZaIEycBCKWxNSD1vMkPCrz1BfE+BeZFuJ5LKn9y1M5Abw=
+	t=1775517926; cv=none; b=WAW9Hza4Beo9coOz+Rzhm+CoeA+55cMiwF5iFEG7G+PQe17ljwFr5OcfUSfze1DodH7ZIhZg52L6z8gSkPGaTj8Xn9kUJV/stt70vMPADy7dBRInMZcJecjw5beDEWM6Ukb45mO/Mabkx5VQr1PFa24s5YggR4AKiU/etHQnWvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775517004; c=relaxed/simple;
-	bh=aav1lhR8vSFtAoSET/qKuyidyqCyOvG8gkWmbtg64So=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KTk3IHYBJS4Dk6350dYypyruDY5PYk1jNZ8GPz+LEdOnNYGhNbSKhF8tgD5zQ7J5E3RBxbAuzu1GTyhR/STxe7t2qPky7bQOcs12GeunUQkcs9kMDcHGTYR1wz3UbJSsMd7KYByE+hKZyUffQmwUZ5st6dA4K4uscSw8A1CbiQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nRATh4BG; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 6 Apr 2026 16:09:23 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775517000;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z/bPOhIIvmuTeeJGSnL/TObh+9FGDRoQVYzMHqtnl5g=;
-	b=nRATh4BGOrpkfckLmZMVXj8l7mNOBfAeRwqzL5E4XfOeZJoH6qksRu0gPRtrsGijderNLO
-	TxJHabaIP2gbyqfZL+lD5MKbILj7F/J+p/XxmtLEl97EpXLmPSt6jI32AaeWCQ1ERpb1K4
-	uqUEQpEiVCIhPLAJqQmSeZfPsok555c=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bot+bpf-ci@kernel.org, bpf@vger.kernel.org, 
-	2022090917019@std.uestc.edu.cn, dddddd@hust.edu.cn, M202472210@hust.edu.cn, dzm91@hust.edu.cn, 
-	emil@etsalapatis.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, memxor@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	jolsa@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	shuah@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, martin.lau@kernel.org, clm@meta.com, ihor.solodrai@linux.dev
-Subject: Re: [PATCH bpf v2 1/2] bpf: Fix same-register dst/src OOB read and
- pointer leak in sock_ops
-Message-ID: <20264623643.FrCc.martin.lau@linux.dev>
-References: <20260406031330.187630-1-jiayuan.chen@linux.dev>
- <913274772cd62d8d93e6cfb2c251c2388b73f24f90d05be3c9994207ac7048bf@mail.kernel.org>
- <739cdd1f-1838-457d-9b71-f47c3eadb0fb@linux.dev>
+	s=arc-20240116; t=1775517926; c=relaxed/simple;
+	bh=a3r3KrEuJLHBWtXp3+zPQs9X4rkDOMQXRKluXAK5krI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FS3t6AgsDlJVHgb7oKagaYrpr+zg5/UDideLnu3uO7y8oRlwfXO84qq9VaLImawzSLLbyZ5kkmYoZYn0Rbcbz43pgxKNrL0KSNkZXj+/nZRZx961jKTZhg1jadIl2Mb+HkSgNdjGkTOYmbANgEB3BZJ1TEsDbYa849GVETUAI7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=C7XkuzFi; arc=none smtp.client-ip=74.125.82.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-2ce102afb0aso2630025eec.1
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 16:25:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1775517923; x=1776122723; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=e+LsTmUaKDUP6TtbtpmsofePBR8TWMvjJHv9+/xi4nY=;
+        b=C7XkuzFi8BgckAdjqH1TaaQYw3Cz/FCHv1Ztl4wqO9HGHtrp5tPLxmMJ2RBUDuwyb6
+         1nId1gnR0WyWEW9NAzON05hgbpeKXxc3LDDohEOOEHxXogtppLAXUM3IX8gPs03e5Hf6
+         gnQNX8eMEFVqOJ9LCFo4Mao5L28IExThf90gk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775517923; x=1776122723;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e+LsTmUaKDUP6TtbtpmsofePBR8TWMvjJHv9+/xi4nY=;
+        b=VUVr8sSDjHEoyDUnf9LMWccU8Bz0FG+SzBDF/jDI2dN2tuv/Hb4bmsUWr9WtdE/qmd
+         eJYoew2yIBZ5oD0ikNHuA9p7S04FwJuHNJ244MHGTY/szuMeX7ZyfnV1QYKXw+Ybgg/n
+         75HJmhqO0Us1uPb7T4/79E3LX0F1re2820tqNDfZuXUWBK3f6iqoYjN6zTd3dI2vZZ8J
+         rB0SJU5bgQl8swpYquzSvoMwdXV6mKKU4jel2EOhCDgtX5yM0kqQf1HWtzOyTC2+Ll9o
+         G7JLqMbMWCRloKo2kRNlWBj8EATOo1nwv9sgS5ovX953TdMzEpUnb4ulNZk+f9QopxHz
+         e+OQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXPUZuH/IyHt3Whf5teP9a12BLi7XPX/7Sw1+sJ62TF1VXRG62+D4LEMe0P7BFKSlffRQlmypA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVjQOExPuiGhUmBtEeLhpmmrL9YC7WANZOQJOPAOfdcgGfUy3t
+	h1ku/I3FWrEsawyvVLgLtJ9bjffaKtGtCmb52ztzwGPohStNCVGETfJ0kzOujjuqJA==
+X-Gm-Gg: AeBDietziHrnupMHH44TVOSHeT3rqxsZwwXckW9jfa1CalIz2ufDChJ7xJInZUNzsrs
+	Ec5yTISGWnTb9+AB14rrGMletblp7cG/b+P7VzcOVEPTF+Fu+IMYQZ3FwXKaoegBaUZH9xhnMtE
+	S3D/YoiW6k7KcVNasLYNCFlkT1177bJYyD8tUV8/pVV6gpldbyDKWPjCq3im0/6OsYXNagcHGxL
+	OO5Jiwl5ThDh0bZsSg4OVAKNSO7QGiZCI2wXlr8U2tHhXpjdH55sfjaAokxvD17MyaYyQS+xyPz
+	+gGz98FVdAcpRoryxdMW+FB4o95SPaBO3fEziOF2CkiNdpXmXtDhn8xj56oyy+8FBPHKEcB5Ewf
+	4XbvLhtXZ0yZ/3uEhRR2M5ITodmKhQI6337X+n0dCI4Omy+nutTxjbRP++5xbrHirjK150/rSKj
+	NuvMLsJowBcQbTbvayg/F4A6hwVfqcMoGnKdmgDBCNrOWw/ucg8u/D37lWbli+oPCNkhFDFnyYh
+	WLbxswdXQsuJFYO19VN
+X-Received: by 2002:a05:7300:818c:b0:2c7:3a7:c7b1 with SMTP id 5a478bee46e88-2cbf9503916mr7679632eec.1.1775517923360;
+        Mon, 06 Apr 2026 16:25:23 -0700 (PDT)
+Received: from dianders.sjc.corp.google.com ([2a00:79e0:2e7c:8:c071:3b78:5a5:824a])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ca760b0518sm14730975eec.0.2026.04.06.16.25.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Apr 2026 16:25:22 -0700 (PDT)
+From: Douglas Anderson <dianders@chromium.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Alan Stern <stern@rowland.harvard.edu>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>,
+	Johan Hovold <johan@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Robin Murphy <robin.murphy@arm.com>,
+	maz@kernel.org,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Saravana Kannan <saravanak@kernel.org>,
+	Douglas Anderson <dianders@chromium.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Frank.Li@kernel.org,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	alex@ghiti.fr,
+	alexander.stein@ew.tq-group.com,
+	andre.przywara@arm.com,
+	andrew@codeconstruct.com.au,
+	andrew@lunn.ch,
+	andriy.shevchenko@linux.intel.com,
+	aou@eecs.berkeley.edu,
+	ardb@kernel.org,
+	astewart@tektelic.com,
+	bhelgaas@google.com,
+	brgl@kernel.org,
+	broonie@kernel.org,
+	catalin.marinas@arm.com,
+	chleroy@kernel.org,
+	davem@davemloft.net,
+	david@kernel.org,
+	devicetree@vger.kernel.org,
+	dmaengine@vger.kernel.org,
+	driver-core@lists.linux.dev,
+	gbatra@linux.ibm.com,
+	gregory.clement@bootlin.com,
+	hkallweit1@gmail.com,
+	iommu@lists.linux.dev,
+	jirislaby@kernel.org,
+	joel@jms.id.au,
+	joro@8bytes.org,
+	kees@kernel.org,
+	kevin.brodsky@arm.com,
+	kuba@kernel.org,
+	lenb@kernel.org,
+	lgirdwood@gmail.com,
+	linux-acpi@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-aspeed@lists.ozlabs.org,
+	linux-cxl@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-pci@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	linux-serial@vger.kernel.org,
+	linux-snps-arc@lists.infradead.org,
+	linux-usb@vger.kernel.org,
+	linux@armlinux.org.uk,
+	linuxppc-dev@lists.ozlabs.org,
+	m.szyprowski@samsung.com,
+	maddy@linux.ibm.com,
+	mani@kernel.org,
+	miko.lenczewski@arm.com,
+	mpe@ellerman.id.au,
+	netdev@vger.kernel.org,
+	npiggin@gmail.com,
+	osalvador@suse.de,
+	oupton@kernel.org,
+	pabeni@redhat.com,
+	palmer@dabbelt.com,
+	peter.ujfalusi@gmail.com,
+	peterz@infradead.org,
+	pjw@kernel.org,
+	robh@kernel.org,
+	sebastian.hesselbarth@gmail.com,
+	tglx@kernel.org,
+	tsbogend@alpha.franken.de,
+	vgupta@kernel.org,
+	vkoul@kernel.org,
+	will@kernel.org,
+	willy@infradead.org,
+	yangyicong@hisilicon.com,
+	yeoreum.yun@arm.com
+Subject: [PATCH v5 0/9] driver core: Fix some race conditions
+Date: Mon,  6 Apr 2026 16:22:53 -0700
+Message-ID: <20260406232444.3117516-1-dianders@chromium.org>
+X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <739cdd1f-1838-457d-9b71-f47c3eadb0fb@linux.dev>
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.34 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[chromium.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[chromium.org:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275773-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[30];
+	TAGGED_FROM(0.00)[bounces-275777-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,std.uestc.edu.cn,hust.edu.cn,etsalapatis.com,iogearbox.net,gmail.com,linux.dev,fomichev.me,davemloft.net,google.com,redhat.com,meta.com];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[ozlabs.ru,kernel.org,google.com,lst.de,arm.com,intel.com,chromium.org,linux-foundation.org,ziepe.ca,ghiti.fr,ew.tq-group.com,codeconstruct.com.au,lunn.ch,linux.intel.com,eecs.berkeley.edu,tektelic.com,davemloft.net,vger.kernel.org,lists.linux.dev,linux.ibm.com,bootlin.com,gmail.com,jms.id.au,8bytes.org,lists.infradead.org,lists.ozlabs.org,kvack.org,armlinux.org.uk,samsung.com,ellerman.id.au,suse.de,redhat.com,dabbelt.com,infradead.org,alpha.franken.de,hisilicon.com];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[chromium.org:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev,bpf-ci];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid]
-X-Rspamd-Queue-Id: 07FCF3A8108
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dianders@chromium.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_GT_50(0.00)[86];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-0.995];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 54F493A81B9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 06, 2026 at 12:54:04PM +0800, Jiayuan Chen wrote:
-> 
-> On 4/6/26 11:47 AM, bot+bpf-ci@kernel.org wrote:
-> > This Fixes: tag covers the SOCK_OPS_GET_SK() portion of the fix,
-> > since 84f44df664e9 introduced that macro. However, the identical
-> > bug in SOCK_OPS_GET_FIELD() was introduced by an earlier commit:
-> > 
-> >    fd09af010788 ("bpf: sock_ops ctx access may stomp registers in corner case")
-> > 
-> > That commit added the dst_reg == src_reg handling to
-> > SOCK_OPS_GET_FIELD() with the same missing zeroing in the
-> > !fullsock path. Should this also carry:
-> > 
-> >    Fixes: fd09af010788 ("bpf: sock_ops ctx access may stomp registers in corner case")
-> > 
-> > Without it, kernels that have fd09af010788 but not 84f44df664e9
-> > would not receive the SOCK_OPS_GET_FIELD() fix via stable backport.
-> > 
-> > 
-> > ---
-> > AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-> > See:https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-> > 
-> > CI run summary:https://github.com/kernel-patches/bpf/actions/runs/24017481706
-> Well, it's true. However, fd09af010788 and 84f44df664e9 are from the
-> same patchset (same author, same minute), so any stable branch carrying
-> one will have both. That's why I only included a single Fixes tag.
-> 
-> But if you prefer carrying both explicitly, I'm happy to add it in next
-> version.
+The main goal of this series is to fix the observed bug talked about
+in the first patch ("driver core: Don't let a device probe until it's
+ready"). That patch fixes a problem that has been observed in the real
+world and could land even if the rest of the patches are found
+unacceptable or need to be spun.
 
-Please list both in the Fixes tags so that it is clear both bugs will
-be fixed. Thanks.
+That said, during patch review Danilo correctly pointed out that many
+of the bitfield accesses in "struct device" are unsafe. I added a
+bunch of patches in the series to address each one.
+
+Danilo said he's most worried about "can_match", so I put that one
+first. After that, I tried to transition bitfields to flags in reverse
+order to when the bitfield was added.
+
+Even if transitioning from bitfields to flags isn't truly needed for
+correctness, it seems silly (and wasteful of space in struct device)
+to have some in bitfields and some as flags. Thus I didn't spend time
+for each bitfield showing that it's truly needed for correctness.
+
+Transition was done semi manually. Presumably someone skilled at
+coccinelle could do a better job, but I just used sed in a heavy-
+handed manner and then reviewed/fixed the results, undoing anything my
+script got wrong. My terrible/ugly script was:
+
+var=can_match
+caps="${var^^}"
+for f in $(git grep -l "[>\.]${var}[^1-9_a-zA-Z\[]"); do
+  echo $f
+  sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)->${var} = true/set_bit(DEV_FLAG_${caps}, \&\\1->flags)/" "$f"
+  sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)\.${var} = true/dev_set_${caps}(\&\\1)/" "$f"
+  sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)->${var} = false/clear_bit(DEV_FLAG_${caps}, \&\\1->flags)/" "$f"
+  sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)\.${var} = false/dev_clear_${caps}(\&\\1)/" "$f"
+  sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)->${var} = \([^;]*\)/assign_bit(DEV_FLAG_${caps}, \&\\1->flags, \\2)/" "$f"
+  sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)\.${var} = \([^;]*\)/dev_assign_${caps}(\&\\1, \\2)/" "$f"
+  sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)->${var}\([^1-9_a-zA-Z\[]\)/test_bit(DEV_FLAG_${caps}, \&\\1->flags)\\2/" "$f"
+  sed -i~ -e "s/\([a-zA-Z_0-9\.>()-][a-zA-Z_0-9\.>()-]*\)\.${var}\([^1-9_a-zA-Z\[]\)/dev_${caps}(\&\\1)\\2/" "$f"
+done
+
+From v3 to v4, I transitioned to accessor functions with another ugly
+sed script. I had git format the old patches, then transformed them
+with:
+
+for f in *.patch; do
+  echo $f
+  sed -i~ -e "s/test_and_set_bit(DEV_FLAG_\([^,]*\), \&\(.*\)->flags)/dev_test_and_set_\\L\\1(\\2)/" "$f"
+  sed -i~ -e "s/test_and_set_bit(DEV_FLAG_\([^,]*\), \(.*\)\.flags)/dev_test_and_set_\\L\\1(\\2)/" "$f"
+  sed -i~ -e "s/test_bit(DEV_FLAG_\([^,]*\), \&\(.*\)->flags)/dev_\\L\\1(\\2)/" "$f"
+  sed -i~ -e "s/test_bit(DEV_FLAG_\([^,]*\), \(.*\)\.flags)/dev_\\L\\1(\\2)/" "$f"
+  sed -i~ -e "s/set_bit(DEV_FLAG_\([^,]*\), \&\(.*\)->flags)/dev_set_\\L\\1(\\2)/" "$f"
+  sed -i~ -e "s/set_bit(DEV_FLAG_\([^,]*\), \(.*\)\.flags)/dev_set_\\L\\1(\\2)/" "$f"
+  sed -i~ -e "s/clear_bit(DEV_FLAG_\([^,]*\), \&\(.*\)->flags)/dev_clear_\\L\\1(\\2)/" "$f"
+  sed -i~ -e "s/clear_bit(DEV_FLAG_\([^,]*\), \(.*\)\.flags)/dev_clear_\\L\\1(\\2)/" "$f"
+  sed -i~ -e "s/assign_bit(DEV_FLAG_\([^,]*\), \&\(.*\)->flags, \(.*\))/dev_assign_\\L\\1(\\2, \\3)/" "$f"
+  sed -i~ -e "s/assign_bit(DEV_FLAG_\([^,]*\), \(.*\)\.flags, \(.*\))/dev_assign_\\L\\1(\\2, \\3)/" "$f"
+done
+
+...and then did a few manual touchups for spacing.
+
+I only marked the first patch as a "Fix" since it is the only one
+fixing observed problems. Other patches could be considered fixes too
+if folks want.
+
+I tested the first patch in the series backported to kernel 6.6 on the
+Pixel phone that was experiencing the race. I added extra printouts to
+make sure that the problem was hitting / addressed. The rest of the
+patches are tested with allmodconfig with arm32, arm64, ppc, and
+x86. I boot tested on an arm64 Chromebook running mainline.
+
+Changes in v5:
+- ready_to_prove => ready_to_probe typo
+- device_lock() while calling dev_set_ready_to_probe()
+- Add comment before "can_match = true" from Danilo.
+- undef __create_dev_flag_accessors
+
+Changes in v4:
+- Use accessor functions for flags
+
+Changes in v3:
+- Use a new "flags" bitfield
+- Add missing \n in probe error message
+
+Changes in v2:
+- Instead of adjusting the ordering, use "ready_to_probe" flag
+
+Douglas Anderson (9):
+  driver core: Don't let a device probe until it's ready
+  driver core: Replace dev->can_match with dev_can_match()
+  driver core: Replace dev->dma_iommu with dev_dma_iommu()
+  driver core: Replace dev->dma_skip_sync with dev_dma_skip_sync()
+  driver core: Replace dev->dma_ops_bypass with dev_dma_ops_bypass()
+  driver core: Replace dev->state_synced with dev_state_synced()
+  driver core: Replace dev->dma_coherent with dev_dma_coherent()
+  driver core: Replace dev->of_node_reused with dev_of_node_reused()
+  driver core: Replace dev->offline + ->offline_disabled with accessors
+
+ arch/arc/mm/dma.c                             |   4 +-
+ arch/arm/mach-highbank/highbank.c             |   2 +-
+ arch/arm/mach-mvebu/coherency.c               |   2 +-
+ arch/arm/mm/dma-mapping-nommu.c               |   4 +-
+ arch/arm/mm/dma-mapping.c                     |  28 ++--
+ arch/arm64/kernel/cpufeature.c                |   2 +-
+ arch/arm64/mm/dma-mapping.c                   |   2 +-
+ arch/mips/mm/dma-noncoherent.c                |   2 +-
+ arch/powerpc/kernel/dma-iommu.c               |   8 +-
+ .../platforms/pseries/hotplug-memory.c        |   4 +-
+ arch/riscv/mm/dma-noncoherent.c               |   2 +-
+ drivers/acpi/scan.c                           |   2 +-
+ drivers/base/core.c                           |  55 +++++---
+ drivers/base/cpu.c                            |   4 +-
+ drivers/base/dd.c                             |  36 ++++--
+ drivers/base/memory.c                         |   2 +-
+ drivers/base/pinctrl.c                        |   2 +-
+ drivers/base/platform.c                       |   2 +-
+ drivers/dma/ti/k3-udma-glue.c                 |   6 +-
+ drivers/dma/ti/k3-udma.c                      |   6 +-
+ drivers/iommu/dma-iommu.c                     |   9 +-
+ drivers/iommu/iommu.c                         |   5 +-
+ drivers/net/pcs/pcs-xpcs-plat.c               |   2 +-
+ drivers/of/device.c                           |   6 +-
+ drivers/pci/of.c                              |   2 +-
+ drivers/pci/pwrctrl/core.c                    |   2 +-
+ drivers/regulator/bq257xx-regulator.c         |   2 +-
+ drivers/regulator/rk808-regulator.c           |   2 +-
+ drivers/tty/serial/serial_base_bus.c          |   2 +-
+ drivers/usb/gadget/udc/aspeed-vhub/dev.c      |   2 +-
+ include/linux/device.h                        | 122 ++++++++++++------
+ include/linux/dma-map-ops.h                   |   6 +-
+ include/linux/dma-mapping.h                   |   2 +-
+ include/linux/iommu-dma.h                     |   3 +-
+ kernel/cpu.c                                  |   4 +-
+ kernel/dma/mapping.c                          |  12 +-
+ mm/hmm.c                                      |   2 +-
+ 37 files changed, 218 insertions(+), 142 deletions(-)
+
+-- 
+2.53.0.1213.gd9a14994de-goog
+
 
