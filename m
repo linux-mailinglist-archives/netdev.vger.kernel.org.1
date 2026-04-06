@@ -1,102 +1,87 @@
-Return-Path: <netdev+bounces-275533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275534-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WNhwMVlg02lMhwcAu9opvQ
-	(envelope-from <netdev+bounces-275533-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 09:27:21 +0200
+	id qbafFA1j02mkhwcAu9opvQ
+	(envelope-from <netdev+bounces-275534-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 09:38:53 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 289D33A1FFF
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 09:27:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 931CB3A207A
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 09:38:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 391F3300FEC0
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 07:27:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A466300D321
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 07:38:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9C2361DBC;
-	Mon,  6 Apr 2026 07:27:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B673630B6;
+	Mon,  6 Apr 2026 07:38:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="fhl4ULzz"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="11pogHO7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010009.outbound.protection.outlook.com [40.93.198.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB43355F42
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 07:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775460436; cv=none; b=LzQQAuw7PfAvCoaaSkAi5H2m1lvAPnOnWKh9yx+TcUVWC84d8Ui1LMKhgGEgkV7DV+P0mrAng2YO3Hv6IF4IQbl4EsF4Fa5WNwCLg4hOJiNQkqXrbp6ARALcPY6g5+zY2UilnJoW3FD0IlohbBS5z3zxc4TkyA8+aCdfhvV7Ywc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775460436; c=relaxed/simple;
-	bh=5xf2bbceAjrL9Kn0yXbZUdc9u2qLSvuJAqr0yCPb/MY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a1fKCacCkZfvlD9HqDnULdi3Um2T5y9FWy1ibyLjqHvw3jD49vhPLJQLqlAqKESn2V5s89iPvKF+RC0vwQQjB4bPDIqjRFZzDnwTbuTDkIE85+9hoPLq1Luz5cZko/MeCaQyWbbAyPijRjvtRAK1gSqNhNPluUY9DNnxku9zkWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com; spf=pass smtp.mailfrom=shopee.com; dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b=fhl4ULzz; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shopee.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shopee.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3567e2b4159so2269283a91.0
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 00:27:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shopee.com; s=shopee.com; t=1775460434; x=1776065234; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/+l8xdJ81rnHVCDBCC4cOrkEDKbX4zpmL1qqNzt32Zg=;
-        b=fhl4ULzzM3JxbZouxPkKN/7rTjYPN3YEpC3ZB6OYTyX4Eb7eWdz0InUBJR2eUpHwBT
-         GM9n+s2IF8A8NQVlD4smGaMYzKRMZyryUeJCwH9cr5CXCNOTL/oJn/c2MLV5NJ8MsnH1
-         iGWWSCazM5+HYYH5YwgAqQt4dCjkwGCzGeYbQMoF7dlr5z2fJvhglH6j6TV1NdLvJBFo
-         lDoav5ssTuxyaOwadCG4QEu0zGH3Oqc/GNH96JjwPpBDcfKQKIAgOlVFn+FDSV0NbiPN
-         HL4dLsekBNrbAKSdbSxN9NCMwQQgP6JUAzECK7g6yZZfhpa0F9avoVHZrnmph4zfBLF3
-         BKdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775460434; x=1776065234;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/+l8xdJ81rnHVCDBCC4cOrkEDKbX4zpmL1qqNzt32Zg=;
-        b=N1N4gXcDC4g9gdJhwf7ElI9K0Bf6IHxX5ZJLTDFBOt93BGzV0I8rLRDnO3dUJxau8f
-         ZuVWuB3Qe6nlMU8z+YB0ZETC2IaI4aLHs3YSVhrfgLPRuySyJni6VEpDdz0gSUytMUfd
-         VDgtl5RvJZX+VwcSk+Yo4roadezsRIMH6gfHgrHOzaLzuhNF8MGs1pgtZyNlDmAPey34
-         jaTT494IKaupTMIlayDbFiLiSOPfiD6AepzPta09MIBAfPoO9pLV+B6OR1h2+hqtTeBd
-         0Rs9o14T0zPObRK/Yr4KO03z/DaSqCtgMNPcX33SC8aVeTqeMwChQWafPC0XNWwdml3D
-         SeKg==
-X-Gm-Message-State: AOJu0YzaMCh7eiMKGNRbR5fdpWqi8U74CCpGk2Jch8tgItiC3ynhhwh3
-	DWO8evXinTR5Bnfy5OD/OjiqW/zn8sBmm3Kwfs4ibDpztWZdG2QcQ1apckwChrvJRyrmAkh5PxK
-	OCly/iGxh9dfwhX3Di30uv8p/ExV4fl2CcJMIhhZENv5PZKqhbxNwrYfTm9qKLpOLUaIatdSl/R
-	u5OMA3bQMdUl7t/LnAyOfu/LG7VsqfFT7zL+YL+iEYcEtZew==
-X-Gm-Gg: AeBDieuIgWzILxuP8eZrreYQeo5LbFKi89J/nDcdfBbDIF2LZCg63cqF/s2dKZgBbJ+
-	e9JZLoe+gZwIxoRxxnDUGmZgODUAaf6K4bAi6iHYRS7fe84WUx0SO9ctm3Idtotn3Ei0T6usPlq
-	Mw+o3od2bmDvN5zOiqGrvz7VeyzAbVkktZG3EsrQCURISOotVRbnDyTwlaeTQaH8PdIAmJqEp8N
-	ySXMeXBTPKkaZGQIx/scfmnOEqUPvWEtxU6Mw6Wp4JjdrDkbSBF0T28cRMNU8Pgb5wK/Hg8z20T
-	FSaY2vSRhK0L3cO+3sYLwBYEE55/IsoYCAWqpZZuIOfZmr5rsbxVaYmJv2CIE5vgKXEM6UFejUJ
-	isyq30CmAz0cyY3qPWUeij1FWqcjcDAhfR1iumRRG74/0D2S8slAOXGrHMxs0j5xYwX0NkOFxla
-	dFtzLAp0ydkUQ6m7oEH2hbPkEu83SOGqyIbfEkptb6g2DcsPalgA==
-X-Received: by 2002:a17:90b:384e:b0:35c:d01:d3dc with SMTP id 98e67ed59e1d1-35de68ec479mr10327576a91.18.1775460433873;
-        Mon, 06 Apr 2026 00:27:13 -0700 (PDT)
-Received: from bms-ytl-d1-app-10-251-178-27 ([147.136.157.0])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35dd367bf24sm12920937a91.9.2026.04.06.00.27.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2026 00:27:13 -0700 (PDT)
-From: Leon Hwang <leon.huangfu@shopee.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Leon Hwang <leon.huangfu@shopee.com>,
-	Leon Hwang <leon.hwang@linux.dev>
-Subject: [PATCH net-next v2] selftests/drivers/net: Add an xdp test to xdp.py
-Date: Mon,  6 Apr 2026 15:26:54 +0800
-Message-ID: <20260406072655.368173-1-leon.huangfu@shopee.com>
-X-Mailer: git-send-email 2.53.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40C7318BA4;
+	Mon,  6 Apr 2026 07:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775461130; cv=fail; b=kbVicwBSX/bxlpj/xx/kg9VKyrM7AwJtHjQWYlpLVOd7BzDqYhapRgS8dxyx8G2XdUv2kg9+IH/uiP+06HJrUkBmgkULz1qQ6I0OabNUIDehzXMh5PtmWr+nNwjKOF7K+UKN8FLceuhZtJ2L1y/wCeMOjhgEncuNRRukCOciwtk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775461130; c=relaxed/simple;
+	bh=9P8f4XPudKdDx1L9kEcWaI4J7ihtU/rBDeEwGrqXj+g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SMYoXAfQS2Vl9rKDj1JVeJKmL/k1AgbTvT1Tuw6WsRqsL9x9r1r/z+vJU3MaYi8PHH2nCNAdBU1sa/FrkFKSVWTt/ky4Ae9bmDdE7Iv2KTk8Rbsbw111cnV/ZCGxgTcYwX3rtd0cQGY8LlSyTkI/IngoxrgfsXB768vMs6TSyzM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=11pogHO7; arc=fail smtp.client-ip=40.93.198.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OpQuYFZszGjQ4uW6Ltt6gdWpYdLBqTqZuPZ7FnNSrgMAVbAu2asMCwGf2EQ2i90LGmVZbuSHijsvrlYta614KXqSfDBYJDypldrmEGDa6T2HEL2rEKs/4hotNSR7Df3VCje1rODSmwepm6/wUAfVY9XZKZ/4TqOrp+R/s5hBB75BYkWbA9iqAAmi3HzfktL+weXsP0/HViiHrZxIToRRjZLxZdxZwa3tHM07sBkBm8bSajgdy2yl6LaNrUcwy122QbZEALPsP98FQRGt+Lgcx3x/bmaONxKqVvle5t7l/YDy/r/10gqa/Fhn89hrzwxCfr649OPzZEv+5gqQxJZUww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uoV5A9J6nV10akgLn6Ya602h2679UKvku/bkXzK4UZQ=;
+ b=c9x3T4fq+r5RZMAOnAT8s/MhHQhXuGCYMg75r34/OQ6ZQIRJwU+CURHLQcrNk4UMGjbZFQ4ITBA8R+o4jomyQbPYW+xQaLduXiRtfKVJrW7Ysf0gM2l0x79pjmTNL/E1pO1KT0pGUT5381O9AGAcdpq3T4YkR+FX9fr0OCEJxkzG3SZPPs8XMt7Esot5cI7Kd9vLwP0f2zmRQP3YMgQDPZJu2oQTgPLBcZaeMZXI4hVjJJP8wWOWhOK0aX997oKMJYW+gAUOMCxhLIdiAErJxt1WeFfWn165kihJWjF5wPgS6EfqQfOqiYXKqRP7Wq99ceR+EEvLDIRyNXhEqmGZXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uoV5A9J6nV10akgLn6Ya602h2679UKvku/bkXzK4UZQ=;
+ b=11pogHO7zyQkAl7DLTWuBLqh725UMZy+a7J7//E0+LbwYsb9DE6sSi7TdORTDm+hrKB2FvrO4xb1ikrg5uoZrHDgyWUroTjpsgdH/zZvfhxgFvfEpDW8IAoIHhwyOISIf5mT9O03TrNiAfmQOpk2NW9VBGG26QsDkH8KmELuhrs=
+Received: from DS2PEPF0000455B.namprd21.prod.outlook.com
+ (2603:10b6:f:fc00::518) by BL1PR12MB5852.namprd12.prod.outlook.com
+ (2603:10b6:208:397::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.8; Mon, 6 Apr
+ 2026 07:38:45 +0000
+Received: from CH3PEPF00000018.namprd21.prod.outlook.com
+ (2603:10b6:61f:fc00::37b) by DS2PEPF0000455B.outlook.office365.com
+ (2603:10b6:f:fc00::518) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9791.23 via Frontend Transport; Mon,
+ 6 Apr 2026 07:38:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ CH3PEPF00000018.mail.protection.outlook.com (10.167.244.123) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9818.0 via Frontend Transport; Mon, 6 Apr 2026 07:38:45 +0000
+Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 6 Apr
+ 2026 02:38:42 -0500
+From: Raju Rangoju <Raju.Rangoju@amd.com>
+To: <linux-kernel@vger.kernel.org>
+CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+	<davem@davemloft.net>, <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>,
+	Raju Rangoju <Raju.Rangoju@amd.com>, Prashanth Kumar K R
+	<PrashanthKumar.K.R@amd.com>
+Subject: [PATCH] MAINTAINERS: Add Prashanth as additional maintainer for amd-xgbe driver
+Date: Mon, 6 Apr 2026 13:08:16 +0530
+Message-ID: <20260406073816.3218387-1-Raju.Rangoju@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,145 +89,88 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PEPF00000018:EE_|BL1PR12MB5852:EE_
+X-MS-Office365-Filtering-Correlation-Id: bed6399a-bd19-493d-7f8f-08de93af888e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700016|376014|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	52guhNNOBuGGtOt9mJ5aQ8w2YGVEhnDKYQ68QqN/0j0MH319xJMRvYPso/3w+xbzR6OK2lnmuV6iSCAUOdDD4+Zpfy4/1CmZ00fvaVrBF+Sc3KBnlkFFjcp+gA3OCi64KQ/nIWhqGDvm6UyWWPUWGMFc+J2SSAqOmLi7YhAQP5UOYge2Z0/mpeEj8anOnwEXZotmps4Mycn9N9RzHfXSe0VJmPkPR4oJ+WFilNuYE/FGtupJAM3j96u5PgMzT7FSj6A6g6ckfy3EU1OQ6NR7U31CnqxnX3JonFFQx2O3z1CGziDoRTS5zTtbJelJyaYGQPtTGEOcQMP8EGPN3DmN1EennsZJ6nv2lQljII9js+SNySElooFKE6EbnmRbyM6rTRLU0MadjH2kUTplqNA+C0XjfIKrTorWI8oh/yPiADZ9AZF2SFyk6IFG9vgfcoBkeIAKC585SqTameWOM/YSiLyBq26puVtn36wm/5vanSWkjGL5wuWybBhf2V7CA1r9L5E4W5Q+IyMiTttVvevmcDlebU8adSsF2oPyK5a82fQNDCt9TS7NR6jY4veODQXGsE7jlSYM2mycS6GsziHFIn5N+0xf/nky4a0VENi/2A9fsFObFCkIf3fmQudyGj1wTe+rVAQ3Kwp6EpsLUjtuaTTIMD1VgGyWyWd/aIkI6n7/2mP2Ajlu5BokGyQ3CD5POMBu8jCWec+rF/YQVUTzQL/zTQi4jS6yo25EATTNNBXcgGh8zH8OlExGFj/bP17oeqYgFH8bRlVaKJ6yNg9vlg==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700016)(376014)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	98rLOUH00NUY6dCXbddweaK1WMxLdnhHoi6Lt5/vkkCN4wum7Qj9Cm3HBT4/FiqJSj0TKRQk1/ctBK/IQxq5XCrbvgI87O0aUb7K9ZhQP9m0YDPg31gMzbqoExBZYgs/aLyNzNCb7jJlMnBJhArpuI7RiGJhusXXjTz6BWT1cFJNXH5QidMoJQy2kc2yKz6wi3wnLKSK5McnDlDWvVyHgMfO1E75zbbAl26V4h9rVpg6ufrDvZFnQk2Gf+q7bfRHLXhOGDsOIbbVv2GGsRWc+Tx7ueNfhvLOsoB57fhZt63GkEbK9QGlBOo06HAzEu3TLvqYjrwcg7bqh9mBg4NRkUs2SWSiGGydGIX7V43XiLCUfGaO883uj52il9a7b6mW12vUaOaZ4sgNkrGagvMsTN2TStkZBPPAbfHNpI5ycUSk18NpqGD0qnAXcvbG5PpV
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2026 07:38:45.2249
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: bed6399a-bd19-493d-7f8f-08de93af888e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH3PEPF00000018.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5852
+X-Spamd-Result: default: False [2.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_REJECT(1.00)[cv is fail on i=2];
 	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[shopee.com,reject];
+	DMARC_POLICY_ALLOW(-0.50)[amd.com,quarantine];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[shopee.com:s=shopee.com];
+	R_DKIM_ALLOW(-0.20)[amd.com:s=selector1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,gmail.com,fomichev.me,vger.kernel.org,shopee.com,linux.dev];
-	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-275533-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275534-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[amd.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leon.huangfu@shopee.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[shopee.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,xdp.py:url]
-X-Rspamd-Queue-Id: 289D33A1FFF
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[Raju.Rangoju@amd.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 931CB3A207A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-In "bpf: Disallow freplace on XDP with mismatched xdp_has_frags values" [1],
-this XDP test is suggested to add to xdp.py.
+Add Prashanth as an additional maintainer for the amd-xgbe Ethernet
+driver to help with ongoing development and maintenance.
 
-1. Verify the failure of updating frag-capable prog with non-frag-capable
-   prog, when the frag-capable prog attaches to mtu=9k driver.
-
-The test has been verified against Mellanox CX6 and Intel 82599ES NICs.
-
-With dropping other tests, here is the test log.
-
- # ethtool -i eth0
- driver: mlx5_core
- version: 6.19.0-061900-generic
-
- # NETIF=eth0 python3 xdp.py
- TAP version 13
- 1..1
- ok 1 xdp.test_xdp_native_update_mb_to_sb
- # Totals: pass:1 fail:0 xfail:0 xpass:0 skip:0 error:0
-
- # ethtool -i eth0
- driver: ixgbe
- version: 6.19.0-061900-generic
-
- # NETIF=eth0 python3 xdp.py
- TAP version 13
- 1..1
- # CMD: ip  link set dev eth0 xdpdrv obj /path/to/tools/testing/selftests/net/lib/xdp_dummy.bpf.o sec xdp.frags
- #   EXIT: 2
- #   STDERR: RTNETLINK answers: Invalid argument
- ok 1 xdp.test_xdp_native_update_mb_to_sb # SKIP device does not support multi-buffer XDP
- # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:1 error:0
-
-Links:
-[1] https://lore.kernel.org/bpf/20260326124205.1a3bb825@kernel.org/
-
-Cc: Leon Hwang <leon.hwang@linux.dev>
-Signed-off-by: Leon Hwang <leon.huangfu@shopee.com>
+Cc: Prashanth Kumar K R <PrashanthKumar.K.R@amd.com>
+Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
 ---
-v1 -> v2:
-- Update the category in subject from selftests/net to selftests/drivers/net.
-- Drop _exec_cmd helper.
-- Recover the original MTU using cfg.dev['mtu'] (per Kuba).
-- Drop the unnecessary shell=True arg (per Kuba).
-- Print error using ksft_pr (per Kuba).
-- Drop the sb_to_mb case (per Kuba).
-- Skip test when device supports sb XDP with mtu 9000 (per Kuba,Gemini/sashiko).
-v1: https://lore.kernel.org/netdev/20260401052746.314667-1-leon.huangfu@shopee.com/
----
- tools/testing/selftests/drivers/net/xdp.py | 28 +++++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/testing/selftests/drivers/net/xdp.py b/tools/testing/selftests/drivers/net/xdp.py
-index d86446569f89..864ca4097b87 100755
---- a/tools/testing/selftests/drivers/net/xdp.py
-+++ b/tools/testing/selftests/drivers/net/xdp.py
-@@ -13,7 +13,7 @@ from enum import Enum
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 4601903a8f9b..dc935838e516 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1291,6 +1291,7 @@ F:	include/uapi/drm/amdxdna_accel.h
  
- from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_ge, ksft_ne, ksft_pr
- from lib.py import KsftNamedVariant, ksft_variants
--from lib.py import KsftFailEx, NetDrvEpEnv
-+from lib.py import KsftFailEx, KsftSkipEx, NetDrvEpEnv
- from lib.py import EthtoolFamily, NetdevFamily, NlError
- from lib.py import bkg, cmd, rand_port, wait_port_listen
- from lib.py import ip, defer
-@@ -693,6 +693,31 @@ def test_xdp_native_qstats(cfg, act):
-             ksft_ge(after['tx-packets'], before['tx-packets'])
- 
- 
-+def test_xdp_native_update_mb_to_sb(cfg):
-+    obj = cfg.net_lib_dir / "xdp_dummy.bpf.o"
-+    mtu = 9000
-+
-+    ip(f"link set dev {cfg.ifname} mtu {mtu}")
-+    defer(ip, f"link set dev {cfg.ifname} mtu {cfg.dev['mtu']} xdpdrv off")
-+
-+    attach = cmd(f"ip link set dev {cfg.ifname} xdpdrv obj {obj} sec xdp", fail=False)
-+    if attach.ret == 0:
-+        raise KsftSkipEx(f"device supports single-buffer XDP with mtu {mtu}")
-+
-+    attach = cmd(f"ip link set dev {cfg.ifname} xdpdrv obj {obj} sec xdp.frags", fail=False)
-+    if attach.ret != 0:
-+        ksft_pr(attach)
-+        raise KsftSkipEx("device does not support multi-buffer XDP")
-+
-+    # Verify updating mb -> mb program works.
-+    cmd(f"ip -force link set dev {cfg.ifname} xdpdrv obj {obj} sec xdp.frags")
-+
-+    # Verify updating mb -> sb program does not work.
-+    update = cmd(f"ip -force link set dev {cfg.ifname} xdpdrv obj {obj} sec xdp", fail=False)
-+    if update.ret == 0:
-+        raise KsftFailEx("device unexpectedly updates non-multi-buffer XDP")
-+
-+
- def main():
-     """
-     Main function to execute the XDP tests.
-@@ -718,6 +743,7 @@ def main():
-                 test_xdp_native_adjst_head_grow_data,
-                 test_xdp_native_adjst_head_shrnk_data,
-                 test_xdp_native_qstats,
-+                test_xdp_native_update_mb_to_sb,
-             ],
-             args=(cfg,))
-     ksft_exit()
+ AMD XGBE DRIVER
+ M:	Raju Rangoju <Raju.Rangoju@amd.com>
++M:	Prashanth Kumar K R <PrashanthKumar.K.R@amd.com>
+ L:	netdev@vger.kernel.org
+ S:	Maintained
+ F:	arch/arm64/boot/dts/amd/amd-seattle-xgbe*.dtsi
 -- 
-2.53.0
+2.34.1
 
 
