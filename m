@@ -1,91 +1,93 @@
-Return-Path: <netdev+bounces-275677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275678-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OHQ5Hzn002nToQcAu9opvQ
-	(envelope-from <netdev+bounces-275677-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:58:17 +0200
+	id CH4PH0f002nToQcAu9opvQ
+	(envelope-from <netdev+bounces-275678-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:58:31 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F036E3A5F31
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:58:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 102E33A5F3F
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:58:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1B056300D6A7
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 17:58:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 498B33020D4C
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 17:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BBF63939A7;
-	Mon,  6 Apr 2026 17:58:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04424393DD1;
+	Mon,  6 Apr 2026 17:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Vt2orQUJ"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bHBy0f4h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f226.google.com (mail-qt1-f226.google.com [209.85.160.226])
+Received: from mail-oa1-f99.google.com (mail-oa1-f99.google.com [209.85.160.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB633909A4
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 17:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1903939D6
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 17:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775498285; cv=none; b=qG/9WxkDljsF63F87Un1TlMUqGZqF4IN3vEVvaIHlJUFeBKvGZWl4Ag0V2coKq2J2MGHUkfo2bNMOz2FXa7VehEvwpDPU2gZczo9ixET8nkM5L6Wvpz6diJzeeVKNI/ILFovF5A54NXXNxTqsznMooFwCPtmFkZTecQBInI3R1Q=
+	t=1775498286; cv=none; b=q91nEtJn4ZVI/3ImQ7LqepmW2m6PaoHJmXiEQs+HmjxDTwVLMQVaFPDfcnPAk9hRKOmjK62k1/3mr/V+TuEW8B0vEMqLBleO2U/nAmT7AhX7vAEXrKGjr0JCNMlIrYi/veZlOVNQQzIn1ceS1RZdhxSwiQpIpSmKityNDhGYDsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775498285; c=relaxed/simple;
-	bh=1NlIS9xcxbFxK3vP/VmB0WSnGsgTNlhEU1DqSondv8A=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o7R1PBsc4ICErO030DVJURWu5VJmbfwbqaEMZQek4nJTdWq8gnl5PYVbRuwDFq1fN8+bzpASzDB+CFOHUpHnNyZHpLwQO4HFdAWlyjlJh62MCEch33d2jTpEmnT7rXdzAgqjZ5/lKNblihw0hlV3xZVaNHygMJm9QJvxG8j5PQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Vt2orQUJ; arc=none smtp.client-ip=209.85.160.226
+	s=arc-20240116; t=1775498286; c=relaxed/simple;
+	bh=KoWiGxdA7eMlluw82ADCz/hEWx8BY9mKixVoCNP8Wm4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=fIhaa6jmcqRHOlLC9lPRpQYuWhQIAMuEtdQiM/Vt0u9cftyHsSb+CPPqsB3I8bv0ujbjRR1EOcOe88SWGbRBvE5qOpqtap0raD49BTZLnXsZnI0O89gOaAVXNOwPFMafUh71vGJbeSKKjIbaswTif5B8+hU03oG5PN3R5UEUi0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=bHBy0f4h; arc=none smtp.client-ip=209.85.160.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f226.google.com with SMTP id d75a77b69052e-50b2b2aa276so41394821cf.3
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:58:03 -0700 (PDT)
+Received: by mail-oa1-f99.google.com with SMTP id 586e51a60fabf-41576c5c01cso2481784fac.3
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:58:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775498283; x=1776103083;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SzTj5O42wXMyYqLPUybTBY9GP0xdyTb+BoKz6aKizPE=;
-        b=bqs6R7vTel9yY3Uh3W3EvNVO+tVOb6h4IcCA2hII1agaXLcgqMwjvKVOOiQLc0kiun
-         ZLmTfnPkKPMh3x7T6QthO6Owd1DOu64BMUieL/W/w3NuEw6ppRmAYy2w6lPWZMfPiE/Q
-         i0owhN4C6rdRWOmNAREkEYQs4iJHcvl0s+G5PfcW8ILLn4pPFxGO6b/zpWG9BfCALfKU
-         Z8M0oShK3Vb8q94/993cHnWwmiUgVmCa0Kj5JQVbefUAqChlY/3T/e6QWDzQG9TSIZx6
-         qY+d2ZqPNihdlhj0CD2rLDwlgwSX+KrFPHApxidUXEU3byofcU41g/vb9GJ9vFkfis34
-         qRKQ==
-X-Gm-Message-State: AOJu0YxjJ9qOKFjmyWDMOOHqW5qqmdFb18w9lmufUhn+L/C0fpCGCagv
-	YS3kJj0fhKku/HURywXsbDRU6sFTyOa6s83F1Oi8wyOi9CbpP2RppkzGIm1WdEQsprBKcS+ytR0
-	3/HW9YOv5ufBb2Na4lBOE03PuBA6bh7qn+BxWx84ZO1EkvUJilQFvcI5HW3YbkIfclk+L6/2W02
-	86YZOBY1QNqMhbXHyUqzGlU58sk2PuVzhtkgFkkKvRx4DmyWE418d09tAGNB2/ao5hnLsHjRU22
-	LnwDvFWEQ==
-X-Gm-Gg: AeBDieupjeFCdibM804r7ZDbhuuHf8IaYtd3LvqOGwM5HhHAO7CwORGFX35ldjkVxQQ
-	CVtIfgjjsdxlq/GH8bEqaDmAtYp/osxbVJmzsHIdPups1lLhsNHyfjI4WwyNNI+uPc49Nl+HdT+
-	jldtsmK1Ibt/UtrBAwLdYhYEZXYLG2dEBsXrun7hrU8omePRrKeOiywefLKrSnLFkoZdLJqtcqh
-	pIm84NTRuuRMbSz0vydUVJMrjeBD3BWX8d10xYwkyymTAoe47rlsxFCIq23B7Xaw5p45TH4BpSz
-	kuUmTCTi+ZMwzSOGNtu73O54Z3jE2pX+R1xvqir9Xjd75uUfwQCHXZYbfHXM5mvk8/zfJVUP13W
-	ZOArDzdDYEP0EBwItVS0OxLhr3Z8UsMspU3wtk9XI2RUOI/EO7wJCM3mg6nix/fkOsFyQR+f38S
-	TcIn6movIwrtbp8QGFFrY4pFPSf5J60xT60YIRmCRNfHmnJQgGXyhr7hI=
-X-Received: by 2002:a05:622a:4e09:b0:509:3d06:96a with SMTP id d75a77b69052e-50d62b12664mr201371861cf.53.1775498282725;
-        Mon, 06 Apr 2026 10:58:02 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1775498284; x=1776103084;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=r6Rw3k1N40qCZwRrtuE29C+8M83AncDyy6tmfraYWWE=;
+        b=mVoqDu1Way+PiavQ+YiB4ZBluOdDz29ePC0r1pfoox41uV2Eua8RRUaszR0sfvykVW
+         c3OYAxyoxgAY7IYrlAAUS9Smzl/ouEBScqqTi49zJeDgSAH5wY57Q3m6iv58R8KKnDCn
+         Ojm7DHO5u9Yb0C0yI4+xl/gVOHgSoWFrXz3aBB3P0AdRtmM0vxzvZfVnhkOs6YMn1eR2
+         wAtnlxUOyScKL9jn0gnAY7eRfzNj8g1MYABmaI1RKkc8eDK5tHWR/BekQ2DgOYIibHnd
+         oMQVUQw1IR5lquh08NQPWx/U7bcT0efuhcaFUyoZyRl9CUklu1VP/dGMBSjiirkMZHId
+         yPdg==
+X-Gm-Message-State: AOJu0YwrphWJ8G6uxNGTO+iPyKA2b40CatkltJNXRf8VdwwDL5pO4m8M
+	g60JETBeZV2owEpda8E4GRmAlqtazEk/JapXZtqL4uFI0juSS0C79fhavhIsaFH90TfWIJh4Ia3
+	yD5z8AZoMopsScNcGmKvuB3xGc1eS3f+QuLzrR06X90wlTEjtANgjfveUtJKtpsaT04HE3iIMB6
+	An/dPvf346aQB9dFQasV7utFnUFkA6pqfT+JJKoYK3bnUfRlI4Yg+kb7YpC/P7uj1g2toR3uaWS
+	dEfUSK/AA==
+X-Gm-Gg: AeBDievAMUrmApq9ox91SLuxv4UwalhLZBd+4KfK3GbkCLmw3qzUitesWThtIhy0v8v
+	i9VWrAGi67+IpJogsKqalApjY8X9gmuF2jxX+scms13xw/XHW0WJYEltTn+Qw1rqhZXAkrRfLNO
+	TUJVsQoF4OFmNiObMPV6dsMF6KidsgSBIhhzlpHqG5lH7b4D4F/171TUeqKpeCU0Hsajnp7KFu/
+	x81bNYf8OgtRMZdXGx16RWslDZdnxUGlMKfDUvvw7XypkzxWNF1uou0m4z5EZYPclLQnSS9VMhk
+	pUd5V5GwSKav5xc0w2BoXlwtdLfeuMY3qZd/6c+SORrpTrUrzLG+k5JWhj9wqe8Bd0IQJUIgFoG
+	uNYOvMh9KWPT2Fp1wqrSWDctS7UvhTGb6g/sdWo+0Fa/WIjXbM4uVbcDjSlbUoOoRXfbQ0Jvln6
+	yNFbZJl1ew16QCaeQGOLbapqAmLhqtA9qBL2gKmzZXB4t+18E4+ZGhq2s=
+X-Received: by 2002:a05:6871:7408:b0:417:d068:6029 with SMTP id 586e51a60fabf-4231009ba52mr8027273fac.36.1775498284311;
+        Mon, 06 Apr 2026 10:58:04 -0700 (PDT)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-24.dlp.protect.broadcom.com. [144.49.247.24])
-        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-50d4f6ad262sm9257251cf.9.2026.04.06.10.58.01
+        by smtp-relay.gmail.com with ESMTPS id 586e51a60fabf-4230fbbebc6sm1168303fac.0.2026.04.06.10.58.04
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 06 Apr 2026 10:58:02 -0700 (PDT)
+        Mon, 06 Apr 2026 10:58:04 -0700 (PDT)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-89f670976acso117038896d6.0
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:58:01 -0700 (PDT)
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-89ce375c788so115098326d6.2
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:58:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1775498281; x=1776103081; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SzTj5O42wXMyYqLPUybTBY9GP0xdyTb+BoKz6aKizPE=;
-        b=Vt2orQUJ+3fMR3tTiurAmnGmHp9CJGuPvjioUgKGR4nWGQoc5RJE3PKhZmzwhiLj48
-         3SK1TeDGYPKEnB96bpG8LgtWfv7k1azlZQ9gJdpkY+CotFe4oB8Tn5CvxpK2d3btAUO6
-         90zBK6Qg7ivAPcSSd2qYoBM/AeaXP+DMoLw1s=
-X-Received: by 2002:a05:6214:224b:b0:89a:107a:5ad with SMTP id 6a1803df08f44-8a704cb262cmr224865736d6.45.1775498281150;
-        Mon, 06 Apr 2026 10:58:01 -0700 (PDT)
-X-Received: by 2002:a05:6214:224b:b0:89a:107a:5ad with SMTP id 6a1803df08f44-8a704cb262cmr224865246d6.45.1775498280564;
-        Mon, 06 Apr 2026 10:58:00 -0700 (PDT)
+        d=broadcom.com; s=google; t=1775498283; x=1776103083; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r6Rw3k1N40qCZwRrtuE29C+8M83AncDyy6tmfraYWWE=;
+        b=bHBy0f4hsNZm32gZYP5lDryhhZEbH0ZP0cxzFx3uMZpIpHv9ydYCaMM8Mp/WDwSD/F
+         AFIVFxbRJV4cxH3qAXSNRYnGeNhIMjsV7ZUGajZilRO+joQDbTkvzHn7Iwh7ijzKYwjU
+         e4YEMnsyf0YXiFMDbfadtM6SXQtA8G+sfkrsw=
+X-Received: by 2002:a05:6214:5c82:b0:8a0:f8b7:391d with SMTP id 6a1803df08f44-8a7042f27cdmr189118136d6.31.1775498283041;
+        Mon, 06 Apr 2026 10:58:03 -0700 (PDT)
+X-Received: by 2002:a05:6214:5c82:b0:8a0:f8b7:391d with SMTP id 6a1803df08f44-8a7042f27cdmr189117466d6.31.1775498282461;
+        Mon, 06 Apr 2026 10:58:02 -0700 (PDT)
 Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8a596915986sm141462266d6.24.2026.04.06.10.57.58
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8a596915986sm141462266d6.24.2026.04.06.10.58.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2026 10:58:00 -0700 (PDT)
+        Mon, 06 Apr 2026 10:58:02 -0700 (PDT)
 From: Justin Chen <justin.chen@broadcom.com>
 To: netdev@vger.kernel.org
 Cc: pabeni@redhat.com,
@@ -98,10 +100,12 @@ Cc: pabeni@redhat.com,
 	opendmb@gmail.com,
 	nb@tipi-net.de,
 	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net v3 0/3] net: bcmgenet: fix queue lock up
-Date: Mon,  6 Apr 2026 10:57:53 -0700
-Message-Id: <20260406175756.134567-1-justin.chen@broadcom.com>
+Subject: [PATCH net v3 1/3] net: bcmgenet: fix off-by-one in bcmgenet_put_txcb
+Date: Mon,  6 Apr 2026 10:57:54 -0700
+Message-Id: <20260406175756.134567-2-justin.chen@broadcom.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20260406175756.134567-1-justin.chen@broadcom.com>
+References: <20260406175756.134567-1-justin.chen@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -125,7 +129,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FROM_HAS_DN(0.00)[];
 	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,lunn.ch,broadcom.com,gmail.com,tipi-net.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275677-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275678-lists,netdev=lfdr.de];
 	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
@@ -133,47 +137,51 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:mid];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,tipi-net.de:email];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: F036E3A5F31
+X-Rspamd-Queue-Id: 102E33A5F3F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-We have been seeing reports of logs like this.
-# [   39.713199] bcmgenet 1001300000.ethernet eth0: NETDEV WATCHDOG: CPU: 0: transmit queue 2 timed out 7991 ms
-[   41.761198] bcmgenet 1001300000.ethernet eth0: NETDEV WATCHDOG: CPU: 0: transmit queue 2 timed out 10039 ms
-[   43.745198] bcmgenet 1001300000.ethernet eth0: NETDEV WATCHDOG: CPU: 0: transmit queue 2 timed out 12023 ms
-[   45.729198] bcmgenet 1001300000.ethernet eth0: NETDEV WATCHDOG: CPU: 0: transmit queue 2 timed out 14007 ms
+The write_ptr points to the next open tx_cb. We want to return the
+tx_cb that gets rewinded, so we must rewind the pointer first then
+return the tx_cb that it points to. That way the txcb can be correctly
+cleaned up.
 
-We have two issues. The persistent queue timeouts and the eventual lock up of the entire transmit.
+Fixes: 876dbadd53a7 ("net: bcmgenet: Fix unmapping of fragments in bcmgenet_xmit()")
+Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
+---
+ drivers/net/ethernet/broadcom/genet/bcmgenet.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-We address the lock up issue first. The queue timeouts are due to a fundamental design issue
-not a bug perse. Timeouts still persist, but we should no longer lock up.
-
-v3
-- Dropped this patch. Not relevant yet.
-  net: bcmgenet: relax the xmit ring full case
-
-v2
-- These patches stayed the same.
-  net: bcmgenet: fix off-by-one in bcmgenet_put_txcb
-  net: bcmgenet: fix leaking free_bds
-- New patches that fix a few other slightly related issues.
-  net: bcmgenet: fix off-by-one in bcmgenet_put_txcb
-  net: bcmgenet: relax the xmit ring full case
-
-Justin Chen (3):
-  net: bcmgenet: fix off-by-one in bcmgenet_put_txcb
-  net: bcmgenet: fix leaking free_bds
-  net: bcmgenet: fix racing timeout handler
-
- .../net/ethernet/broadcom/genet/bcmgenet.c    | 30 +++++++++----------
- 1 file changed, 14 insertions(+), 16 deletions(-)
-
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+index 482a31e7b72b..0f6e4baba25b 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+@@ -1819,15 +1819,15 @@ static struct enet_cb *bcmgenet_put_txcb(struct bcmgenet_priv *priv,
+ {
+ 	struct enet_cb *tx_cb_ptr;
+ 
+-	tx_cb_ptr = ring->cbs;
+-	tx_cb_ptr += ring->write_ptr - ring->cb_ptr;
+-
+ 	/* Rewinding local write pointer */
+ 	if (ring->write_ptr == ring->cb_ptr)
+ 		ring->write_ptr = ring->end_ptr;
+ 	else
+ 		ring->write_ptr--;
+ 
++	tx_cb_ptr = ring->cbs;
++	tx_cb_ptr += ring->write_ptr - ring->cb_ptr;
++
+ 	return tx_cb_ptr;
+ }
+ 
 -- 
 2.34.1
 
