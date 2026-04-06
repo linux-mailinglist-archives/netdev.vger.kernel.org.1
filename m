@@ -1,278 +1,221 @@
-Return-Path: <netdev+bounces-275538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275539-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qIPED9Zu02nAiAcAu9opvQ
-	(envelope-from <netdev+bounces-275538-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 10:29:10 +0200
+	id +JsBFTlx02n2iAcAu9opvQ
+	(envelope-from <netdev+bounces-275539-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 10:39:21 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 675CB3A2359
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 10:29:09 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BFC53A24D6
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 10:39:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E85453006B77
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 08:29:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C1A263007F43
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 08:36:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6920731196F;
-	Mon,  6 Apr 2026 08:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF8B315D58;
+	Mon,  6 Apr 2026 08:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b="mZPKewV7"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="cEHCjmo9"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010067.outbound.protection.outlook.com [52.101.69.67])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807432F7AAB
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 08:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775464147; cv=fail; b=XAJMSC/yX8NOI7uFaeHJMDyxojBbjXdtGEQ5ftXaEtculr5ZRenYT/3Rui0qq3H9cjT1GTdQhdgB5SZ+ukYBzlycF9UJiBiaDa3E0r2VjlvTdzKoH6YHmEAfymJAzQ2fe85KJoddrfNvhG5/xecp5AqsiJTkuO57hmLb2z0LCxk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775464147; c=relaxed/simple;
-	bh=a/sE51lkFvCkgxtdFlqyQoxsfmo/agd7cnmJwBW9QtI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=nQNqwirc0gNz9IPb4/PvsdwtL1zsc+TNIx586JBuRPyoXgRS+RUsbux39ZqbxUoEJXRBM3zMrLAZtQpD/8s9se1F88nZt3/6BygkGyNG+K8HMdh2RSK4firI1dA2vOKnULXEesKvtOfmoinCbqemAkaZ6a27jaEyTlMXKLF3yas=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=mZPKewV7; arc=fail smtp.client-ip=52.101.69.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TXuWiJDFa9O9UbVq2ZRtLU9lgMol4cyuEQqKdb1bBQ3W+LMaFAWp1eqJqovBI7BCPk6o2ou9GBdEsjfi/5Z4xbl3eKVO19lwsioG3kRtUJPSGvjVkWWKBNtCodrfM1CxoLlGZlQGWtlbuc2UJvcfjm0SJelWWmcfJ/i9zIIA9n8EcTRvMw8X0iINMHCrjZM96I1th56FBsHV6vy78aC2H8GWYGhx63uuB83EZL23eF1ams0xxotoDEQdZcv42PKPEYRGrCeVjTgIiFpxUxu0zQr5ScJfVu/KIO8w4ZlUuzbkMFvwIKBRdzbbnfWHcJXBWUc4Uk1mvopxSvMmBDKxqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SU2QzCVNUY6HsNLLVdTb+wfQaNeeRq/sGaAtOMb6kIY=;
- b=eX7QPgk1qfcRevGzbX7hVO38Ids3ufeXQOxkZPfAVyBI2nEhcw4Z0eDxcBAZNWr3yKtGmzPXulI8Gw0ypPdIuX6aI9jgHNt4pmJ/6+GTFAiNjBbzah2++B5G3vwekJRHy3G7lZGoxu08IKnhqFomrS9anEyJI2XtpxcMifts1fNWoOc31iAHH54SyZMnRuVn0dZRdVWNsHAysvSBq3cuvNc7/TBA9if55Smf3IxcXGYIzp7yVMx1P8QRtJavkTWT68KXZt2Z2az8Lb94Ko/gZrYnYybD4bGeXemG4+LiyWF3LqdJC+s7Jk1OB7XMSFVIXjMmgxjEWAag1NDxman9Vw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
- dkim=pass header.d=est.tech; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SU2QzCVNUY6HsNLLVdTb+wfQaNeeRq/sGaAtOMb6kIY=;
- b=mZPKewV7k717XNnE3U1wBvzwDat0UFNg0qNhWbkJZRh5o8l3VaT7VMwJJMQN6DIWtFCHhQ+/+cQqTScL+LQXoWf6b8z5evAcZ+tdQTQU0i7HysnifpPGDVd9SvNM8XW+OOG9qZr5wj5vozucRXdR7ahVWqwrE2bl7lAW5qwto1M3QZwdspaA45h7P3ts2Wy1ym864FGXd3fZMOZdIterO0+V2u3wG1DVPYJYNzP1zMKa/hDbnZMe2tv8v1tPB6qJfGQHqEuV+pTHCAA9UKiRogzMGQ1HLvdGHKySQCe9HTXp8/3kS49qqbj2xiRR85Hwy33kr6Uc6kfLF7QlxDZF8A==
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:63::5) by
- DU2PPF4772558B0.EURP189.PROD.OUTLOOK.COM (2603:10a6:18:3::a8b) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9745.28; Mon, 6 Apr 2026 08:29:02 +0000
-Received: from GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7]) by GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
- ([fe80::bfff:5391:8a49:21b7%5]) with mapi id 15.20.9769.016; Mon, 6 Apr 2026
- 08:29:01 +0000
-From: Tung Quang Nguyen <tung.quang.nguyen@est.tech>
-To: Ren Wei <n05ec@lzu.edu.cn>
-CC: "jmaloy@redhat.com" <jmaloy@redhat.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>, "ying.xue@windriver.com"
-	<ying.xue@windriver.com>, "yifanwucs@gmail.com" <yifanwucs@gmail.com>,
-	"tomapufckgml@gmail.com" <tomapufckgml@gmail.com>, "yuantan098@gmail.com"
-	<yuantan098@gmail.com>, "bird@lzu.edu.cn" <bird@lzu.edu.cn>,
-	"enjou1224z@gmail.com" <enjou1224z@gmail.com>, "caoruide123@gmail.com"
-	<caoruide123@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH net 1/1] tipc: validate Gap ACK blocks in STATE message
-Thread-Topic: [PATCH net 1/1] tipc: validate Gap ACK blocks in STATE message
-Thread-Index: AQHcxLhPAyZoQw2hfkKoy+b+OgxZg7XRrHHw
-Date: Mon, 6 Apr 2026 08:29:01 +0000
-Message-ID:
- <GV1P189MB1988F57CA7DF4087D19D9901C65DA@GV1P189MB1988.EURP189.PROD.OUTLOOK.COM>
-References: <cover.1775269941.git.caoruide123@gmail.com>
- <8b07adfdbda1c0fbcf10a114f3272b848d4ea3a0.1775269941.git.caoruide123@gmail.com>
-In-Reply-To:
- <8b07adfdbda1c0fbcf10a114f3272b848d4ea3a0.1775269941.git.caoruide123@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=est.tech;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: GV1P189MB1988:EE_|DU2PPF4772558B0:EE_
-x-ms-office365-filtering-correlation-id: 47d18efc-499d-4033-b960-08de93b68e52
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700021|18002099003|22082099003|56012099003;
-x-microsoft-antispam-message-info:
- VMOpDdKZ3RHM3aF4dha2yb0GTAuPNHNa4GlJcNT9+5XYClDPqkL4AXo+OE26ezP4l/5sYB3kar5pgRzkk9tjYL2C7/EuzGORmEmGNVckRS3HyCz0ARX25JMC+8rBLp7nheZyhkSwPah4hFwDR5DLvM2luAq0WSd5ATrgCg2V+Vx3IYY5SACFVvrJR82VSi035/BDBTyzd8CnaSRBPMIJ1t1LnDbLq9YVUFP/unXdRmbpdBxT2t+Kb+bznmP9SDs50a22ehXYgLGJ0SaNBSTOpNWkK5+uVV1iHY/iziGXWpruCzQ92lHBV5GZ4sChqDzwGba/NJ85pKm74QtGpuxSkd5QEFbNUI7hy2kytPwrp1rEt3FiZX1vJi5SnIadZfAx4/UADKJrgJG2TbiBHQ8OSHrLyUUnyyCFZa8kt0n8qZECXl198+svKP+BVMd8hEyVGXec4n56l6D9sFPzwJj/QphTX1rr0OuKidpEU3fHWB/qUH2WOEwZClQXlSJvqeMJ3ILWDcmMY8Vr89hz+1CuXDtM3zrl38jCnqIRTPuXBWTaPYMVrDuyj6QYXcVuTcU210dQq9t4Mdszsdn0Bv/rs4F5IAamNjCGqsrEspiZTwr+02WMLZNUsb51mhQSb2pz8J/jmPJ+/C7HiAYxftcrXCXIilaz2zaIrSBpGZNKdv/oXC5R83eZRS0zcyahzdRrEmitu/JmLka2qWIVk6UNU4Tw4mPPsV6ZaWGEl9i26A2pI6w8Jm1upFy8gEEgSnmn0m6S+zN3SkuPGbFVcHVF8qOCvc9xUY/FCG8tIJ3qkzs=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1P189MB1988.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700021)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?WKP16zQlTcZXgZpdP1Bujtm3uShoSxqMeMRzzQC9lUChNZyOn6KtPH+PD35c?=
- =?us-ascii?Q?xRbCSTHWQXQvzk3EgSR0XG4S9MKx5v07HKLqcQu3dRySlhxYLqqXst5zXLqk?=
- =?us-ascii?Q?1niI0uE00uTKsL3f+NRI3rwwM1jxf7RRvwX33eumQNoWMW7jHOcj853kj83J?=
- =?us-ascii?Q?lpwPJPlpFbQpG1+OD86AtJHeRrJuMPcDpOxGyEyMlSKWjQ8THBMk2UGMH72N?=
- =?us-ascii?Q?ZQ3OeldDEf1JmmZJQ43PCGQkNZlKeRn6ZACnOix5Q7UcXUIYghUd7aUhypR1?=
- =?us-ascii?Q?P0N2NKyE3l8+N1n21hX6Q+Zj+uPhzoHttMwNP8u0zcN0x2XIp7tmrRyEdpgU?=
- =?us-ascii?Q?TsbO5CUbxWVfgtigXwrmJu/DyDe7qpDmpY+UHG+T5OJXcGHgwry3rs7r4ian?=
- =?us-ascii?Q?sna4wLsazBOfz5W7yD7ccKE+DqB7mjL2sxNbPOR5lJZl51enf3x5V6tHBrjb?=
- =?us-ascii?Q?a5BGamwsx2T/Z/OqHOaMTwbG/utjV07uDNK3WtNsf0lEqmpYqvNKoWex+CcG?=
- =?us-ascii?Q?rJSPIUs4mJa0nzUOFkHakhTAR//4fwg3GnK1cEtNk651VSj8gGJYEhA9mV91?=
- =?us-ascii?Q?PGpgdbWvofdl6aCHlHOuvWBWo4JuHf1DFPPOr7vueJVcvZBJ56+pecV36j7q?=
- =?us-ascii?Q?w2lBtz9drpUTSlxO0V9IC/jG1xdrLkVUWQw8ESmi8ctz8pfpA0jIRugWCc1d?=
- =?us-ascii?Q?hiE6OZUhUabdLDNOCDA0QD/2AEmGncJvX2Yk6Qn7G4+/tqw8QzAFuaFgw8Qv?=
- =?us-ascii?Q?gCV0YNjzeTllUW71kybay/xpTFlHZgaAdbiy6eg1j3qbi0i9So+hIldjNrd6?=
- =?us-ascii?Q?KvFahshPmbnIycQdetxXDXLHMQDkn04Wj0CLDyj9OfG5ap1XsQC/LVX6Hovl?=
- =?us-ascii?Q?aMes/TIhuVNYVO8RYgjsdzMU9Jn1DDyQimM8iqPsZOvXkngX+ftS1taTFIIi?=
- =?us-ascii?Q?bGyASO8b2MuZ2jbVQTma22z4vf7y4xzX96qbbyaFOf/BlrIhY0R7dhmPE7p5?=
- =?us-ascii?Q?4vVZGDg9sXE2rH/U9OT2K55llFeAfHLEbg31EPLqLQwKBRlhlYUCOYTdRhKD?=
- =?us-ascii?Q?dXsFSu50Yz5cGyJBMgrnsEe7o7LJKc4IIhSyGoSvw+ZDc4DM38rJGZ/BarLh?=
- =?us-ascii?Q?kO+BqpKSXoHwwDjuyH1szP81+uoQILi4SwE2GkuAzs14RPDddGu94yyz8/di?=
- =?us-ascii?Q?YQ452uBbcopPLTDN/gotH9s0PkFI21e9knfaQR3ZyMeKvbksjy621hzsf41W?=
- =?us-ascii?Q?ogB7YPJLhOoaJbSI9u/9ZYY2vCKUnRsYwtIHfZz/CucvGr8NxCtBmqrFWpFR?=
- =?us-ascii?Q?Nb6PjRYmJjvFE36Qr8Lu+lMMVmzbitnLh9Ah9uZR/Uw+/1MSJPhTUfLaT7y9?=
- =?us-ascii?Q?E0TsFrwq9ROjbhcDuvqOwDvAvoI7LDNb0tCrRO1hzaJbK3KgRLNk6LIqEPHY?=
- =?us-ascii?Q?ubnFpqWLrSh3lGhCQPZrW1OCx7BmDtky7S01Hh7AtfEWs2NcRe3eyHFkBDAu?=
- =?us-ascii?Q?IYOfP2/WvFKkJoPYjm1xnKkVHlWazJrNUwT6xwD4p/GF3/jTuByIL+uty2CZ?=
- =?us-ascii?Q?hF6iYnUEcKFNTnWiTPfttvcw4tbNiNhzMHuNDvZdTc4Wn7CywfMDCGHEussc?=
- =?us-ascii?Q?ZW5UwJGJ6H2HhizWY57lG4pcSHxSDDoNVe+OT6TVFSPasbh3FdQPu4smfJU/?=
- =?us-ascii?Q?Az3wVQnOkfQJTy1vlqsL/viDVFSKqkLVGFSmzjC1CGVdN5mRxMfAZZNco6FP?=
- =?us-ascii?Q?skkU+QpM2w=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F072BDF59;
+	Mon,  6 Apr 2026 08:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775464598; cv=none; b=iNYNiFtxuyLbBKrcqUOm6rHEjd6UZJHpxPj5reDGdGyiQzziAooXmxO5XpNxtO4ZCSEoq8KUdJ/5fohwluhvyDMh9nq2SINdB/WPoJaXXO1bYtsDJ+CsNI4TWep691aHgsubMWxjeAku/bFv0fxiNdc6EaYrMM9k4pkoQ0Qn5dE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775464598; c=relaxed/simple;
+	bh=OeLB3u3hU0cSTmDTYfAGoOEaiP5YiR8JOo7wSL7r33A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QhDbpqvblA0kHpNbdX5ZbTJnNXVTE01ssTXEkUN3SxHXHx1kfdzYFSrj3L/GlPbSbWGZfPVjr/9Sk8UIUtaKZaT5drObdF6dqGr3EwEzJtzIISX7yZfhRWIPXBRbXpoQMCoJsVmh+6oCgqAhNL3ixOW179lWZdS8nSijTWlvFxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=cEHCjmo9; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8A750A26FD;
+	Mon,  6 Apr 2026 10:36:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1775464589; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=gywS/cJqCcJZuCFcZd+ncFv6nmplC2clIcSgdxsA4ng=;
+	b=cEHCjmo9QwIg/+7Ng8YrnskaPO6izfQ1Q2M2QkOyTB9R7TQlfDdPWPnim8QselPbsKXZgy
+	cChnrlS4DhcBjRSjzD0CnulcwDJnY1L+s8tsB5RtUdLK9eo464E1Bo1AnBGffkVAfPrCgu
+	IRSqVqq/Y/PKTs7t+IR3RqprtfgTtvXSaDYuxS2ub+EYq801AL4cPmKdU+wezJGaQ88rjc
+	FL/jrR5fP5AuWRUrT4/MMRqd0Cqz4JVAnpwj05yX8lgdcxSAPCoN76fe3jGOesyvByuR2l
+	IPTW4MXYPqo17m5NtphgBf065tUWTCxBvqlrDybNd1NAkftiy0dojEyzFWSemg==
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: netdev@vger.kernel.org
+Cc: Justin Chen <justin.chen@broadcom.com>,
+	Simon Horman <horms@kernel.org>,
+	Mohsin Bashir <mohsin.bashr@gmail.com>,
+	Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nicolai Buchwitz <nb@tipi-net.de>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next v6 0/7] net: bcmgenet: add XDP support
+Date: Mon,  6 Apr 2026 10:35:24 +0200
+Message-ID: <20260406083536.839517-1-nb@tipi-net.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: GV1P189MB1988.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 47d18efc-499d-4033-b960-08de93b68e52
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Apr 2026 08:29:01.3690
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3mvynCbKRetmdWL/nak9jnsm7pa+OqD2zK42YdzJ7kZRISA3pBHJrBKpvzm0+o7VlJO1fSsKgbxIZBB2Zoz5vhASQvmALODclf7OpqLDI/Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PPF4772558B0
-X-Spamd-Result: default: False [0.34 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	R_DKIM_ALLOW(-0.20)[est.tech:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [1.34 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-275539-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275538-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[est.tech];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[redhat.com,davemloft.net,google.com,kernel.org,windriver.com,gmail.com,lzu.edu.cn,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[19];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	DKIM_TRACE(0.00)[est.tech:+];
-	MISSING_XM_UA(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[tipi-net.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:+];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tung.quang.nguyen@est.tech,netdev@vger.kernel.org];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	FREEMAIL_CC(0.00)[broadcom.com,kernel.org,gmail.com,lunn.ch,google.com,redhat.com,tipi-net.de,iogearbox.net,davemloft.net,fomichev.me,vger.kernel.org];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,est.tech:dkim,lzu.edu.cn:email,GV1P189MB1988.EURP189.PROD.OUTLOOK.COM:mid]
-X-Rspamd-Queue-Id: 675CB3A2359
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tipi-net.de:dkim,tipi-net.de:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7BFC53A24D6
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
->Subject: [PATCH net 1/1] tipc: validate Gap ACK blocks in STATE message
->
->From: Ruide Cao <caoruide123@gmail.com>
->
->tipc_get_gap_ack_blks() reads len, ugack_cnt and bgack_cnt directly from
->msg_data(hdr) before verifying that a STATE message actually contains the
->fixed Gap ACK block header in its logical data area.
->
->A peer that negotiates TIPC_GAP_ACK_BLOCK can send a short STATE message
->with a declared TIPC payload shorter than struct tipc_gap_ack_blks and sti=
-ll
->append a few physical bytes after the header. The helper then trusts those
->bytes as Gap ACK metadata, and the forged bgack_cnt/len values can drive t=
-he
->broadcast receive path into kmemdup() beyond the skb boundary.
->
->Fix this by rejecting Gap ACK parsing unless the logical STATE payload is =
-large
->enough to cover the fixed header, and by rejecting declared Gap ACK length=
-s
->that are smaller than the fixed header or larger than the logical payload.
->Return 0 for invalid lengths so callers do not treat malformed Gap ACK dat=
-a as
->monitor payload offset, while preserving the declared size for valid but u=
-nused
->Gap ACK records. This keeps malformed Gap ACK data ignored without
->misaligning monitor payload parsing in unicast STATE messages.
->
->Fixes: d7626b5acff9 ("tipc: introduce Gap ACK blocks for broadcast link")
->Reported-by: Yifan Wu <yifanwucs@gmail.com>
->Reported-by: Juefei Pu <tomapufckgml@gmail.com>
->Co-developed-by: Yuan Tan <yuantan098@gmail.com>
->Signed-off-by: Yuan Tan <yuantan098@gmail.com>
->Suggested-by: Xin Liu <bird@lzu.edu.cn>
->Tested-by: Ren Wei <enjou1224z@gmail.com>
->Signed-off-by: Ruide Cao <caoruide123@gmail.com>
->Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
->---
-> net/tipc/link.c | 12 +++++++++++-
-> 1 file changed, 11 insertions(+), 1 deletion(-)
->
->diff --git a/net/tipc/link.c b/net/tipc/link.c index 49dfc098d89b..a364822=
-c1cd8
->100644
->--- a/net/tipc/link.c
->+++ b/net/tipc/link.c
->@@ -1415,12 +1415,20 @@ u16 tipc_get_gap_ack_blks(struct
->tipc_gap_ack_blks **ga, struct tipc_link *l,
-> 			  struct tipc_msg *hdr, bool uc)
-> {
-> 	struct tipc_gap_ack_blks *p;
->-	u16 sz =3D 0;
->+	u16 sz =3D 0, dlen =3D msg_data_sz(hdr);
->
-> 	/* Does peer support the Gap ACK blocks feature? */
-> 	if (l->peer_caps & TIPC_GAP_ACK_BLOCK) {
->+		if (dlen < sizeof(*p))
-Your patch is wrong. sizeof(*p) is equivalent to sizeof(NULL) which is 4 by=
-tes. I guess you did not really test this code to see if it is ever hit.
->+			goto ignore;
->+
-> 		p =3D (struct tipc_gap_ack_blks *)msg_data(hdr);
-> 		sz =3D ntohs(p->len);
->+		if (sz < sizeof(*p) || sz > dlen) {
-sizeof(*p) cannot be used because tipc_gap_ack_blks contains flexible array=
-. struct_size() must be used in stead.
-The above 2 comparisons are redundant because they are already done in belo=
-w "Sanity check" and in tipc_link_proto_rcv():
-tipc_link_proto_rcv()
-{
-...
-/* Validate Gap ACK blocks, drop if invalid */
-glen =3D tipc_get_gap_ack_blks(&ga, l, hdr, true);
-      if (glen > dlen)
-           break;
-...
-}
->+			sz =3D 0;
->+			goto ignore;
->+		}
->+
-> 		/* Sanity check */
-> 		if (sz =3D=3D struct_size(p, gacks, size_add(p->ugack_cnt, p-
->>bgack_cnt))) {
-> 			/* Good, check if the desired type exists */ @@ -
->1434,6 +1442,8 @@ u16 tipc_get_gap_ack_blks(struct tipc_gap_ack_blks **ga,
->struct tipc_link *l,
-> 			}
-> 		}
-> 	}
->+
->+ignore:
-> 	/* Other cases: ignore! */
-> 	p =3D NULL;
->
->--
->2.34.1
->
+Add XDP support to the bcmgenet driver, covering XDP_PASS, XDP_DROP,
+XDP_TX, XDP_REDIRECT, and ndo_xdp_xmit.
+
+The first patch converts the RX path from the existing kmalloc-based
+allocation to page_pool, which is a prerequisite for XDP. The remaining
+patches incrementally add XDP functionality and per-action statistics.
+
+Tested on Raspberry Pi CM4 (BCM2711, bcmgenet, 1Gbps link):
+- XDP_PASS: 943 Mbit/s TX, 935 Mbit/s RX (no regression vs baseline)
+- XDP_PASS latency: 0.164ms avg, 0% packet loss
+- XDP_DROP: all inbound traffic blocked as expected
+- XDP_TX: TX counter increments (packet reflection working)
+- Link flap with XDP attached: no errors
+- Program swap under iperf3 load: no errors
+- Upstream XDP selftests (xdp.py): pass_sb, drop_sb, tx_sb passing
+- XDP-based EtherCAT master (~37 kHz cycle rate, all packet processing
+  in BPF/XDP), stable over multiple days
+
+Previous versions:
+  v5: https://lore.kernel.org/netdev/20260328230513.415790-1-nb@tipi-net.de/
+  v4: https://lore.kernel.org/netdev/20260323120539.136029-1-nb@tipi-net.de/
+  v3: https://lore.kernel.org/netdev/20260319115402.353509-1-nb@tipi-net.de/
+  v2: https://lore.kernel.org/netdev/20260315214914.1555777-1-nb@tipi-net.de/
+  v1: https://lore.kernel.org/netdev/20260313092101.1344954-1-nb@tipi-net.de/
+
+Changes since v5:
+  - Refactored desc_rx: always prepare xdp_buff and use
+    bcmgenet_xdp_build_skb for both XDP and non-XDP paths, treating
+    no-prog as XDP_PASS. (Jakub Kicinski)
+  - Removed synchronize_net() before bpf_prog_put(), RCU handles
+    the grace period. (Jakub Kicinski)
+  - Save status->rx_csum before running XDP program to prevent
+    bpf_xdp_adjust_head from corrupting the RSB checksum.
+    (Jakub Kicinski)
+  - Tightened TSB headroom check to include sizeof(struct xdp_frame).
+    (Jakub Kicinski)
+  - Fixed reclaim gating: check for pending frames on the XDP TX ring
+    instead of priv->xdp_prog, so in-flight frames are still reclaimed
+    after XDP program detach. (Jakub Kicinski)
+  - Removed dead len -= ETH_FCS_LEN in patch 1. (Mohsin Bashir)
+  - Added patch 7: minimal ndo_change_mtu that rejects MTU values
+    incompatible with XDP when a program is attached. (Mohsin Bashir,
+    Florian Fainelli)
+
+Changes since v4:
+  - Fixed unused variable warning: moved tx_ring declaration from
+    patch 4 to patch 5 where it is first used. (Jakub Kicinski)
+
+Changes since v3:
+  - Fixed xdp_prepare_buff() called with meta_valid=false, causing
+    bcmgenet_xdp_build_skb() to compute metasize=UINT_MAX and corrupt
+    skb meta_len. Now passes true. (Simon Horman)
+  - Removed bcmgenet_dump_tx_queue() for ring 16 in bcmgenet_timeout().
+    Ring 16 has no netdev TX queue, so netdev_get_tx_queue(dev, 16)
+    accessed beyond the allocated _tx array. (Simon Horman)
+  - Fixed checkpatch alignment warnings in patches 4 and 5.
+
+Changes since v2:
+  - Fixed page leak on partial bcmgenet_alloc_rx_buffers() failure:
+    free already-allocated rx_cbs before destroying page pool.
+    (Simon Horman)
+  - Fixed GENET_Q16_TX_BD_CNT defined as 64 instead of 32.
+    (Simon Horman)
+  - Moved XDP TX ring to a separate struct member (xdp_tx_ring)
+    instead of expanding tx_rings[] to DESC_INDEX+1. (Justin Chen)
+  - Added synchronize_net() before bpf_prog_put() in XDP prog swap.
+  - Removed goto drop_page inside switch; inlined page_pool_put
+    calls in each failure path. (Justin Chen)
+  - Removed unnecessary curly braces around case XDP_TX. (Justin Chen)
+  - Moved int err hoisting from patch 2 to patch 1. (Justin Chen)
+  - Kept return type on same line as function name, per driver
+    convention. (Justin Chen)
+  - XDP TX packets/bytes now counted in TX reclaim for standard
+    network statistics.
+
+Changes since v1:
+  - Fixed tx_rings[DESC_INDEX] out-of-bounds access. Expanded array
+    to DESC_INDEX+1 and initialized ring 16 with dedicated BDs.
+  - Use ring 16 (hardware default descriptor ring) for XDP TX,
+    isolating from normal SKB TX queues.
+  - Piggyback ring 16 TX completion on RX NAPI poll (INTRL2_1 bit
+    collision with RX ring 0).
+  - Fixed ring 16 TX reclaim: skip INTRL2_1 clear, skip BQL
+    completion, use non-destructive reclaim in RX poll path.
+  - Prepend zeroed TSB before XDP TX frame data (TBUF_64B_EN requires
+    64-byte struct status_64 prefix on all TX buffers).
+  - Tested with upstream XDP selftests (xdp.py): pass_sb, drop_sb,
+    tx_sb all passing. The multi-buffer tests (pass_mb, drop_mb,
+    tx_mb) fail because bcmgenet does not support jumbo frames /
+    MTU changes; I plan to add ndo_change_mtu support in a follow-up
+    series.
+
+Nicolai Buchwitz (7):
+  net: bcmgenet: convert RX path to page_pool
+  net: bcmgenet: register xdp_rxq_info for each RX ring
+  net: bcmgenet: add basic XDP support (PASS/DROP)
+  net: bcmgenet: add XDP_TX support
+  net: bcmgenet: add XDP_REDIRECT and ndo_xdp_xmit support
+  net: bcmgenet: add XDP statistics counters
+  net: bcmgenet: reject MTU changes incompatible with XDP
+
+ drivers/net/ethernet/broadcom/Kconfig         |   1 +
+ .../net/ethernet/broadcom/genet/bcmgenet.c    | 643 +++++++++++++++---
+ .../net/ethernet/broadcom/genet/bcmgenet.h    |  19 +
+ 3 files changed, 565 insertions(+), 98 deletions(-)
+
+--
+2.51.0
 
 
