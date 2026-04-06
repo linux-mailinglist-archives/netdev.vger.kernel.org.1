@@ -1,182 +1,137 @@
-Return-Path: <netdev+bounces-275526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275527-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8fEnFRoz02nZfgcAu9opvQ
-	(envelope-from <netdev+bounces-275526-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 06:14:18 +0200
+	id 4D3nIpE802mugAcAu9opvQ
+	(envelope-from <netdev+bounces-275527-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 06:54:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A588F3A1637
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 06:14:17 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 351613A180D
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 06:54:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D78AD30068DE
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 04:14:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DF602300575A
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 04:54:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E5B3093B5;
-	Mon,  6 Apr 2026 04:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D6FE302742;
+	Mon,  6 Apr 2026 04:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b="Jh8nbbuI"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eH6SWGcH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B563064A9
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 04:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA601427A
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 04:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775448852; cv=none; b=o9ebgs+2oHzCl/ENbPmrrAK+qTzPB3G+9BL8JvGs1jWegIHHzAhN+y1M75fsn92y/IY/t9VOb1YoQlNCCvq0Z/sudx/0lIllHZn6NvUwrpeAvfJ85ZJw6COOvbcS83mc+oht9DuBd8ClBKtf2MWc2kO0R3Zp3+uW1R3mcqBpVak=
+	t=1775451279; cv=none; b=QUA+KIHDOnGGFzTUkjJ9HqM+CmIXU+m2tCshQ/4+uTLY3ToqmdJD+RfWMsXFHKHSyytf8cvjwmRWfXAmpPQ50cf8MgTnb9MOk/2S2zxawwjJKFlxgfIhr8E3Xdhnh9FUx+KK7vaiBzpe2Hh9oHmJyY/0Ps0gtwZN+NLHXcxnbto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775448852; c=relaxed/simple;
-	bh=UWukafqK49bkulS5Sg+KJO4z122g7pojjTf5iY+7Cng=;
+	s=arc-20240116; t=1775451279; c=relaxed/simple;
+	bh=i/M/U1Rs0FJn+opFy02cwva2q+VoShzETD0zYZFGZcs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nIkm8ANlQntKlL//HI3NLKSzxW0UmAZqPuyBH758xC4BLr0Dc0LnmS8w80QJYhSKMpHS/GJrZbUxz3dfB956tgRjMJgvgBZNH5+cRwe33VqNYAPZeV/s5TzYnNy3Td530UIadYiLAJlXaEjxuv9ujA2RJaFkmta5BGsKhpm7DEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com; spf=pass smtp.mailfrom=allelesecurity.com; dkim=pass (1024-bit key) header.d=allelesecurity.com header.i=@allelesecurity.com header.b=Jh8nbbuI; arc=none smtp.client-ip=74.125.82.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=allelesecurity.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=allelesecurity.com
-Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2c156c4a9efso4163836eec.1
-        for <netdev@vger.kernel.org>; Sun, 05 Apr 2026 21:14:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=allelesecurity.com; s=google; t=1775448850; x=1776053650; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6FFmfbqUJtg3hdvp5z3Iq8gFNeJQDVPJXxta1wcIAEU=;
-        b=Jh8nbbuImDW6zj1BkR3H1gVy68FfYh+ps7Ek32WfFHob+Lvv/ZJlOT+fZQsVd28M68
-         sFl+62VAY5+45cz/KxfN+6eGDjTgfC5uAX8LeAD/se8T2nqO552jQ8FANi5jdB6aRU0B
-         Y852mkvyB/ksdBzbJDQ5ZznSAPzpa4iDT+KFA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775448850; x=1776053650;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6FFmfbqUJtg3hdvp5z3Iq8gFNeJQDVPJXxta1wcIAEU=;
-        b=SRZki535nk3BCs4vJx2kaxDLwop5jqS7mzSBVn49HC84wyi4BiOD39chyDdxvM/GMA
-         XdlQispQu5AMxrmtX2sxt/dTpz3vr2s+yJZ1A7O87w6fvfN165HVXD/cgRnS9EhN45Gx
-         8pLh8PqSEyxWDn9YK91A6jCVBd8vqg0lYvJuoS+ddkQD9MhZPacDf+dCd8NexQD6Q3xs
-         T3o6tIdzswbN+PstHEOz8e6XpnowLaS+q8np8eNWk7z5Z58W5mG4ctaDDtN55ec4slDe
-         I1m5gFVWWu3dsUggGSd+LvzMyS5NOSuOcKoVRqR3CLFPfWzghl8DoiqjtH9R3mSCOV1C
-         rqeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUD4kwIA3kz5pGs9MqtQ9XOtY89eZ7zzdHuth1OgugeAxT3ZHuoGQpCE8+QemF/1U8RdWctzv8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxxb0PygiLzaf0+qlpQCWCD9pnE1FPmiBax2VHYPxuEloag9rDO
-	vRqMpw63XxeespCIIiyVd5KhHxFMvWLqzaiiW1cfZrqKeRjKX0e6Fg8UoS8DogZlC/k=
-X-Gm-Gg: AeBDies1O9BubYDBVP60dAi1cV9kGSlJOgXSQW4gslE9VKJS1yNKlSsn7KYTloq5kbv
-	pd7irykyKJPesGYjxJ/MIaOzxeVLCVWhSbYtItzDFULP+eA/zcVZ8gmC4O4F4VcqeUqR2Sro7xu
-	f8tNyK6Fzc5iC6GhLtx8qYdE1HeQwVABir8BAG8Di8sdZaa2NqI1NvsWAcqwuPpvjtpQKEe8tTb
-	gFi5H/086QFB/2YFaBN1btoylJDLthC18UAQ1uXKM7YrEerz62+iyQ9S/9LmOVGI6z3y4nsRMQG
-	tmQK0dkUEe3aBzHIQ5cuyH4ZyevEyHOxmM8MaNu57lC+Nf8e1xh0onSr6fYRTtyHtRyWvdrU3ZI
-	TuvOoBw08foKmN0AeWSOTxfaLaRh1ne0rpL5uAXtxQzj86JrmEtDONNEqLzdfeIhNOHkt+nqo9H
-	v+10Kkdh1TvlO1VzZZERA6rqTOSoHIYx4m3oDH
-X-Received: by 2002:a05:7300:dc8e:b0:2c1:3f85:756 with SMTP id 5a478bee46e88-2cbf9fe3608mr5005632eec.11.1775448850222;
-        Sun, 05 Apr 2026 21:14:10 -0700 (PDT)
-Received: from [192.168.1.2] ([179.105.152.82])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2cee97ff4e8sm3395736eec.25.2026.04.05.21.14.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Apr 2026 21:14:09 -0700 (PDT)
-Message-ID: <a14b354c-3d53-4f06-8d50-98b510a235e1@allelesecurity.com>
-Date: Mon, 6 Apr 2026 01:12:56 -0300
+	 In-Reply-To:Content-Type; b=gv75a2Dd14MWh4JA5WM0SSzUsC6Yn5jYwv4Kp0GGWZJX5AlZsidLdQuijKRyD9QS0v/HhjyMtkLsZn8U8osxMMISOpQ0+weLYI1/lEBNAtyk33ht43pgRK7u76t/BftCycaATr3SD798Ta5eA1AfyE/QeDpeHJxTYEZJbc8X6V4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eH6SWGcH; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <739cdd1f-1838-457d-9b71-f47c3eadb0fb@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775451266;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tNbb8FX4JBbRHJzrlKceD/p+eg1E4vsexHkNHXJOTVg=;
+	b=eH6SWGcHg/XM9mk09g5me7tLM3qVV1qLzSSCdcCvmV3nCl4LqFDVfcMLm4clqMs6K7WZNk
+	d/qcdLWiTG+Hr41tmwrrx8Ta2SLTtwU4vpGQ3wRe7Wb8dNmiH7nkXeuhL2Q2r5KhIRNVil
+	7vKND561a5c5lVMyHwL7UGkhePEg/fM=
+Date: Mon, 6 Apr 2026 12:54:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] rxrpc/proc: size address buffers for %pISpc output
-To: Pengpeng Hou <pengpeng@iscas.ac.cn>, David Howells <dhowells@redhat.com>,
- Marc Dionne <marc.dionne@auristor.com>, anderson@allelesecurity.com
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- linux-afs@lists.infradead.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260404190004.4-rxrpc-proc-pengpeng@iscas.ac.cn>
- <20260406141000.1-rxrpc-proc-reply-pengpeng@iscas.ac.cn>
-Content-Language: en-US
-From: Anderson Nascimento <anderson@allelesecurity.com>
-In-Reply-To: <20260406141000.1-rxrpc-proc-reply-pengpeng@iscas.ac.cn>
+Subject: Re: [PATCH bpf v2 1/2] bpf: Fix same-register dst/src OOB read and
+ pointer leak in sock_ops
+To: bot+bpf-ci@kernel.org, bpf@vger.kernel.org
+Cc: 2022090917019@std.uestc.edu.cn, dddddd@hust.edu.cn,
+ M202472210@hust.edu.cn, dzm91@hust.edu.cn, emil@etsalapatis.com,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@linux.dev, eddyz87@gmail.com, memxor@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, jolsa@kernel.org, john.fastabend@gmail.com,
+ sdf@fomichev.me, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, martin.lau@kernel.org, clm@meta.com,
+ ihor.solodrai@linux.dev
+References: <20260406031330.187630-1-jiayuan.chen@linux.dev>
+ <913274772cd62d8d93e6cfb2c251c2388b73f24f90d05be3c9994207ac7048bf@mail.kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+In-Reply-To: <913274772cd62d8d93e6cfb2c251c2388b73f24f90d05be3c9994207ac7048bf@mail.kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[allelesecurity.com,reject];
-	R_DKIM_ALLOW(-0.20)[allelesecurity.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[allelesecurity.com:+];
+	FREEMAIL_CC(0.00)[std.uestc.edu.cn,hust.edu.cn,etsalapatis.com,kernel.org,iogearbox.net,linux.dev,gmail.com,fomichev.me,davemloft.net,google.com,redhat.com,vger.kernel.org,meta.com];
+	TAGGED_FROM(0.00)[bounces-275527-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275526-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[30];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[anderson@allelesecurity.com,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A588F3A1637
+	TAGGED_RCPT(0.00)[netdev,bpf-ci];
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:mid]
+X-Rspamd-Queue-Id: 351613A180D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 
-On 4/6/26 3:10 AM, Pengpeng Hou wrote:
-> Hi,
+On 4/6/26 11:47 AM, bot+bpf-ci@kernel.org wrote:
+> This Fixes: tag covers the SOCK_OPS_GET_SK() portion of the fix,
+> since 84f44df664e9 introduced that macro. However, the identical
+> bug in SOCK_OPS_GET_FIELD() was introduced by an earlier commit:
 >
-> Yes. My original changelog example was too loose, and your quick test is
-> right for a fully expanded plain IPv6 form such as
+>    fd09af010788 ("bpf: sock_ops ctx access may stomp registers in corner case")
 >
->    [ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff]:65535
+> That commit added the dst_reg == src_reg handling to
+> SOCK_OPS_GET_FIELD() with the same missing zeroing in the
+> !fullsock path. Should this also carry:
 >
-> That form is only 47 visible characters, so it fits in the current
-> char[50] buffers.
+>    Fixes: fd09af010788 ("bpf: sock_ops ctx access may stomp registers in corner case")
 >
-> The reason I still think the bug is real is the current %pISpc
-> implementation in lib/vsprintf.c.
+> Without it, kernels that have fd09af010788 but not 84f44df664e9
+> would not receive the SOCK_OPS_GET_FIELD() fix via stable backport.
 >
-> For AF_INET6, %pISpc goes through ip6_addr_string_sa(), and the compressed
-> path uses ip6_compressed_string(). That helper switches to a dotted-quad
-> tail not only for v4mapped addresses, but also for ISATAP addresses:
 >
->    useIPv4 = ipv6_addr_v4mapped(&in6) || ipv6_addr_is_isatap(&in6);
+> ---
+> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+> See:https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 >
-> So a current-tree case such as
->
->    [ffff:ffff:ffff:ffff:0:5efe:255.255.255.255]:65535
->
-> is possible. That string is 50 visible characters, i.e. 51 bytes
-> including the trailing NUL, which does not fit in the existing char[50]
-> buffers used by the rxrpc procfs helpers.
->
-> So I agree the example in my changelog should be corrected, but I do not
-> think the underlying bug goes away. The claim should be framed around the
-> ISATAP case rather than the plain IPv6 or mapped-v4 examples I used
-> originally.
->
-> If that makes sense, I can resend with the changelog corrected to cite the
-> actual maximum case explicitly.
->
-> Thanks,
-> Pengpeng
+> CI run summary:https://github.com/kernel-patches/bpf/actions/runs/24017481706
+Well, it's true. However, fd09af010788 and 84f44df664e9 are from the
+same patchset (same author, same minute), so any stable branch carrying
+one will have both. That's why I only included a single Fixes tag.
 
-Thanks! I confirm the ISATAP case really triggers the issue. It ends up 
-writing 51 bytes, including the NULL byte.
-
-$ cat /proc/net/rxrpc/locals
-Proto Local                                           Use Act RxQ
-UDP   [ffff:ffff:ffff:ffff:0:5efe:255.255.255.255]:65   1   1   0
-$
-
-Regards,
-
-Anderson Nascimento
-
+But if you prefer carrying both explicitly, I'm happy to add it in next 
+version.
 
