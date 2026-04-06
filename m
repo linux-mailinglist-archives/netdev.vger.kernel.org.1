@@ -1,237 +1,199 @@
-Return-Path: <netdev+bounces-275521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275524-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4pl9CtUk02lxfAcAu9opvQ
-	(envelope-from <netdev+bounces-275521-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 05:13:25 +0200
+	id uNSYKl4l02lxfAcAu9opvQ
+	(envelope-from <netdev+bounces-275524-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 05:15:42 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B9493A1453
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 05:13:24 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F3423A14AA
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 05:15:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F19930053E7
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 03:13:20 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A08973001464
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 03:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43572322B72;
-	Mon,  6 Apr 2026 03:13:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC04434AAEB;
+	Mon,  6 Apr 2026 03:15:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b="CNdGFAji"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qMppkvCP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f194.google.com (mail-pg1-f194.google.com [209.85.215.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3AC235972
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 03:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90582344DA9
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 03:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775445199; cv=none; b=VZT9KGSNFd2CfO3hlvLPY++5h6QxgppUCL164yiLXUuXxR60cZQQBs9p3ZG0rbzs7J39aeZto6MMZH5ziOhTapkoBS03R4/9iY5rbmw0pFBdyL1JAgL+UJfi87+Oxi3KrfH5y2cWY/LRGmaf7i5E+LKkkCmwTJjOjHLw2lbH0Tg=
+	t=1775445340; cv=none; b=klY2MArq7IIbg0obuJhnZZAooKlhV8NcuqpSoueMRBOCgcSK1aaZ1Q91E2DHrtnYj8JzX5MeoG6GJ2yIntvDsOwAfTysj9M6jLACLfRB0aMvnXZNYovDzx7MuOU8wgObUoDGTitrL3kugcaBs3N8xWbqnpM/gPwvIGKDHdaD5rw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775445199; c=relaxed/simple;
-	bh=yQGImmrjwLYeGHdVX82wTBnt/uEq+A862pqBtuQLX+E=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=B9vnnoZRrgBqBw4Rj2oSq1is2utrUq30n6xXiO3jhEIoeKAPmpTO75Abz/8zM60gvOfEI7ZUyMEB5UkIgg71cQncSZrkW9tuhz1MQEVzKO6qQ45Vpdo7b9IeZMI2UK5kvgr/KkFwrtHs5Elxh89GhCcqcZ4z9Z/8CM4buLf73aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com; spf=pass smtp.mailfrom=etsalapatis.com; dkim=pass (2048-bit key) header.d=etsalapatis-com.20251104.gappssmtp.com header.i=@etsalapatis-com.20251104.gappssmtp.com header.b=CNdGFAji; arc=none smtp.client-ip=209.85.215.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=etsalapatis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=etsalapatis.com
-Received: by mail-pg1-f194.google.com with SMTP id 41be03b00d2f7-c742d4df00cso1700171a12.1
-        for <netdev@vger.kernel.org>; Sun, 05 Apr 2026 20:13:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=etsalapatis-com.20251104.gappssmtp.com; s=20251104; t=1775445197; x=1776049997; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WikSyXf56QgGRlPo6LAXPYCmBwFl+zDorUSabvFaPsQ=;
-        b=CNdGFAjiwyrUvwB+aqH/zLS0WZQHfTuwaJZHQWqX3cMG1WQWWIlTZ6Z8Xue/HuUO/y
-         d/J09JaQjUpm3usDcTCS0Q4GQU5GzxU7fBbo8yxAMow7ykx2UgDlStCzaxNR9ZtgCdoW
-         mtVxqePweiSZ734IYp7b8VvCDMhfqTKgOxpzvEI6tkZFunc11xU1GX3LSakZeU9Qv+og
-         DelJRxldSSyq05LS1LgcOWRaRRndsZXcs6pHXCROck1OM/ahJvqkrJg8BGxF24dLn4jY
-         NOgm6Vh8DJSCE+zP6W2cDmSmtr/r31YWgNsAD2uqNujzqg2iG9Y4qamHiMQC57eBdeJj
-         Z5Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775445197; x=1776049997;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WikSyXf56QgGRlPo6LAXPYCmBwFl+zDorUSabvFaPsQ=;
-        b=J+9ur5LNBLbP83xXMcHxMYXH5V0vcUF2nlzw8HWLBUXSuLWQz6vwG4iRuYwLXvz73b
-         yP7uinoAF2U1m4BMIczRSuoEpmjNCVO0N39p17dmd8WlVaxKGbJhdUuKK7OIq7/zjpZi
-         zRmFLkXrhpIEXoQ+116d6YfphxKi5dOvp7PhJkWC6X2fl4Bu8gtWRzi71u07xTOseDM0
-         U8kcrE9jsLdnO5RVY4VgZKAtpDV4tbcAO3p1iG/SxAmpZs32Wb8cLMLg1aDt9JuKIpg6
-         QQevpFFjnSOIRFgMoac6dG32qh/YdUcxrFEH7qsOGT730x8bFbv3I90UeiKAsNz0vYlA
-         S9uw==
-X-Forwarded-Encrypted: i=1; AJvYcCV8D+XFDAuv0f1ByotR7zbXAkt1V3V4xKMbyQoQX2XxqtIOCMi4kq4vrU+bMy8zNq6FHAaymZY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxIFl8P837lTMQC5g9MHpevn0Q8SLenxI0E6iVzla5Dv4/pV8F
-	1B43S2LMIt0yVMXmpT70Upuw/KG6zwnOhTgpYJ9jcDiBsyX9OQAqmDFv5GIS1lZflcc=
-X-Gm-Gg: AeBDietK/dK6b5VoW0uPl4DcO4HN8ISZ/lK2yQSm0BnjfTlHDvHhPoakTiam3fpsyCT
-	nrUWCYRatmhnjOPcd3Ap4MF1c/4sCITgjVo7CEMyEg6VQN/zu/edTkwFFX8LxI4yE7j5Zjx8PU5
-	IrsMuWekdYFr/Jukkvr4I8j84jfh0WSPU626BpoG/x1FIeVwShzXHvCOuS/bvm/nAM7FD44S3Sd
-	DrXEFFyOkPzFpat76e8QyeDp+6HEv0Dg4fgYS3Fjxn+8p8rhwwEG/JdP67SEsTSS3xMz4Md35Uh
-	/8SQ1fpRNSOy4IKO18i84oLXq0GuteSM+cnsakYUdwCgS/rJho1xd+08aY1YS95N7QczqHzgiHz
-	l4/psetXzCnjDe4pq2FR5kQp0If4yBBBlMtAlVHOuwFvk6Bejvb/R85bSCPWKz98kof8PE3p2bo
-	Acs6zIqBA=
-X-Received: by 2002:a17:903:946:b0:2b2:5293:f415 with SMTP id d9443c01a7336-2b277d8ba21mr124434045ad.7.1775445196985;
-        Sun, 05 Apr 2026 20:13:16 -0700 (PDT)
-Received: from localhost ([2604:3d08:487d:cd00::5517])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2749cbd85sm119417275ad.74.2026.04.05.20.13.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Apr 2026 20:13:16 -0700 (PDT)
+	s=arc-20240116; t=1775445340; c=relaxed/simple;
+	bh=VnKcRhtnXmg3esTxutvPiewGjUarJqAT10kc4eGYok4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k3hpBOuzPrtm0r7XSrrdFpSr+HrgBXQOCOcTgg9uUAwKDbpk+Fwk1s5dsU8wEXMAHNF0FySD58T637V1elJzJG7FbVJuXYHMExF8GH5fjMuN+Y8/dcImfFvYL3hKM+LoU5hJ9o1GI7yIk0VEBBUBqMfK2+f0qEh+rfbO/gB0D+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qMppkvCP; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775445324;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pCU31PuVLxnkqkH0Q/gfVj7NOZB8sp1JJeyWvm+opn0=;
+	b=qMppkvCPiJYh+m7P00Vul4Jo2KsY7FUMAzJ7JHiQ0AAMkRusLuXvkSBInX0nzNiYSiQzSi
+	5b+yway8muyT9Hoxbv+KK5va66DvhgtG8FHI00LQa7y1qzFsZpRn2Eb+FmaX8rQRzaDKxI
+	l/HKg/HyeNDl9AP70zAEPbpR2S9VYWo=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: mptcp@lists.linux.dev
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	stable@vger.kernel.org,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] mptcp: fix slab-use-after-free in __inet_lookup_established
+Date: Mon,  6 Apr 2026 11:15:10 +0800
+Message-ID: <20260406031512.189159-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sun, 05 Apr 2026 23:13:15 -0400
-Message-Id: <DHLQSMYH2MV0.3ROVQ0ALRBIW6@etsalapatis.com>
-Cc: "Quan Sun" <2022090917019@std.uestc.edu.cn>, "Yinhao Hu"
- <dddddd@hust.edu.cn>, "Kaiyan Mei" <M202472210@hust.edu.cn>, "Dongliang Mu"
- <dzm91@hust.edu.cn>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Daniel
- Borkmann" <daniel@iogearbox.net>, "John Fastabend"
- <john.fastabend@gmail.com>, "Stanislav Fomichev" <sdf@fomichev.me>, "Alexei
- Starovoitov" <ast@kernel.org>, "Andrii Nakryiko" <andrii@kernel.org>,
- "Eduard Zingerman" <eddyz87@gmail.com>, "Kumar Kartikeya Dwivedi"
- <memxor@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong Song"
- <yonghong.song@linux.dev>, "Jiri Olsa" <jolsa@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, "Shuah Khan" <shuah@kernel.org>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH bpf v1 1/2] bpf: Fix SOCK_OPS_GET_SK same-register OOB
- read in sock_ops
-From: "Emil Tsalapatis" <emil@etsalapatis.com>
-To: "Jiayuan Chen" <jiayuan.chen@linux.dev>, "Emil Tsalapatis"
- <emil@etsalapatis.com>, <bpf@vger.kernel.org>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260404141010.247536-1-jiayuan.chen@linux.dev>
- <DHLMGWNKBI4K.3LM87NOU4XB3O@etsalapatis.com>
- <DHLMKFBINRKW.BS0BEK9AMU86@etsalapatis.com>
- <346597fc-1703-45d7-bcef-55f5d4a7579c@linux.dev>
-In-Reply-To: <346597fc-1703-45d7-bcef-55f5d4a7579c@linux.dev>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[etsalapatis-com.20251104.gappssmtp.com:s=20251104];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275521-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[etsalapatis.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
+	TAGGED_FROM(0.00)[bounces-275524-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[std.uestc.edu.cn,hust.edu.cn,linux.dev,iogearbox.net,gmail.com,fomichev.me,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	RCVD_COUNT_THREE(0.00)[3];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[emil@etsalapatis.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[etsalapatis-com.20251104.gappssmtp.com:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
 	NEURAL_HAM(-0.00)[-1.000];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,hust.edu.cn:email,uestc.edu.cn:email,linux.dev:email]
-X-Rspamd-Queue-Id: 5B9493A1453
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
+X-Rspamd-Queue-Id: 3F3423A14AA
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun Apr 5, 2026 at 10:58 PM EDT, Jiayuan Chen wrote:
->
-> On 4/6/26 7:54 AM, Emil Tsalapatis wrote:
->> On Sun Apr 5, 2026 at 7:49 PM EDT, Emil Tsalapatis wrote:
->>> On Sat Apr 4, 2026 at 10:09 AM EDT, Jiayuan Chen wrote:
->>>> When a BPF sock_ops program reads ctx->sk with dst_reg =3D=3D src_reg
->>>> (e.g., r1 =3D *(u64 *)(r1 + offsetof(sk))), the SOCK_OPS_GET_SK() macr=
-o
->>>> fails to zero the destination register in the is_fullsock =3D=3D 0 pat=
-h.
->>>>
->>>> The macro saves/restores a temporary register and checks is_fullsock.
->>>> When is_fullsock =3D=3D 0 (e.g., TCP_NEW_SYN_RECV state with a request=
-_sock),
->>>> it should set dst_reg =3D 0 (NULL) so the verifier's PTR_TO_SOCKET_OR_=
-NULL
->>>> type is correct at runtime. Instead, dst_reg retains the original ctx
->>>> pointer, which passes subsequent NULL checks and can be used as a bogu=
-s
->>>> socket pointer, leading to stack-out-of-bounds access in helpers like
->>>> bpf_skc_to_tcp6_sock().
->>>>
->>>> Fix by:
->>>>   - Changing JMP_A(1) to JMP_A(2) in the fullsock path to skip the
->>>>     added instruction.
->>>>   - Adding BPF_MOV64_IMM(si->dst_reg, 0) after the temp register
->>>>     restore in the !fullsock path, placed after the restore because
->>>>     dst_reg =3D=3D src_reg means we need src_reg intact to read ctx->t=
-emp.
->>>>
->>>> Fixes: 84f44df664e9 ("bpf: sock_ops sk access may stomp registers when=
- dst_reg =3D src_reg")
->>>> Reported-by: Quan Sun <2022090917019@std.uestc.edu.cn>
->>>> Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
->>>> Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
->>>> Reported-by: Dongliang Mu <dzm91@hust.edu.cn>
->>>> Closes: https://lore.kernel.org/bpf/6fe1243e-149b-4d3b-99c7-fcc9e2f757=
-87@std.uestc.edu.cn/T/#u
->>>> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
->>> This patch only seems to fix the problem when dst_reg =3D=3D src_reg.
->>> Why is this not an issue when is_fullsock =3D=3D 0, but dst_reg !=3D sr=
-c_reg?
->>> In that case the dst_reg is unmodified by the whole macro but is still
->>> marked as PTR_TO_SOCKET_OR_NULL. Isn't that a problem? Can you add
->>> a test case for is_fullsock =3D=3D 0 but dst_reg !=3D src_reg in patch =
-2?
->> Sorry for the double post, but also check sashiko.dev:
->> SOSK_OPTS_GET_FIELD seems to have the same issue as the
->> SOCK_OPTS_GET_SK. Can you add the same fix to it?
->>
->
-> Thanks for the review!
->
-> The AI reviewer's observation about SOCK_OPS_GET_FIELD() is correct =E2=
-=80=94
-> it has the same bug when dst_reg =3D=3D src_reg and is_locked_tcp_sock =
-=3D=3D 0.
-> I've folded that fix into patch 1 in v2.
->
-> Regarding dst_reg !=3D src_reg: this case is actually safe. When
-> dst_reg !=3D src_reg, fullsock_reg is dst_reg itself, and the generated
-> sequence is:
->
-> LDX_MEM=C2=A0 =C2=A0dst_reg =3D is_fullsock
-> JEQ=C2=A0 =C2=A0 =C2=A0 =C2=A0dst_reg =3D=3D 0, +jmp
-> LDX_MEM=C2=A0 =C2=A0dst_reg =3D sk
->
+The ehash table lookups are lockless and rely on
+SLAB_TYPESAFE_BY_RCU to guarantee socket memory stability
+during RCU read-side critical sections. Both tcp_prot and
+tcpv6_prot have their slab caches created with this flag
+via proto_register().
 
-Yes, I missed the dst is the is_fullsock_reg assignment. v1 looks
-correct then.
+However, MPTCP's mptcp_subflow_init() copies tcpv6_prot into
+tcpv6_prot_override during inet_init() (fs_initcall, level 5),
+before inet6_init() (module_init/device_initcall, level 6) has
+called proto_register(&tcpv6_prot). At that point,
+tcpv6_prot.slab is still NULL, so tcpv6_prot_override.slab
+remains NULL permanently.
 
-> The JEQ only branches when dst_reg =3D=3D 0, so dst_reg is naturally
-> zeroed on that path =E2=80=94 no extra MOV_IMM needed. The same-register =
-bug
-> exists precisely because dst_reg =3D=3D src_reg forces the macro to borro=
-w
-> a temporary register for the is_fullsock check, leaving dst_reg (the
-> ctx pointer) untouched.
->
-> I will add a get_sk_diff_reg subtest in v2.
->
-> The other suggestions (moving the detailed comment to the BPF program
-> file, avoiding vague "the fix" wording) are good points =E2=80=94 address=
-ed
-> in v2 as well.
+This causes MPTCP v6 subflow child sockets to be allocated via
+kmalloc (falling into kmalloc-4k) instead of the TCPv6 slab
+cache. The kmalloc-4k cache lacks SLAB_TYPESAFE_BY_RCU, so
+when these sockets are freed without SOCK_RCU_FREE (which is
+cleared for child sockets by design), the memory can be
+immediately reused. Concurrent ehash lookups under
+rcu_read_lock can then access freed memory, triggering a
+slab-use-after-free in __inet_lookup_established.
 
-With the changes, feel free to add to both patches:
+Fix this by splitting the IPv6-specific initialization out of
+mptcp_subflow_init() into a new mptcp_subflow_v6_init(), called
+from mptcp_proto_v6_init() before protocol registration. This
+ensures tcpv6_prot_override.slab correctly inherits the
+SLAB_TYPESAFE_BY_RCU slab cache.
 
-Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
+Fixes: b19bc2945b40 ("mptcp: implement delegated actions")
+Cc: stable@vger.kernel.org
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+---
+ net/mptcp/protocol.c |  2 ++
+ net/mptcp/protocol.h |  1 +
+ net/mptcp/subflow.c  | 15 +++++++++------
+ 3 files changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index 65c3bb8016f4..614c3f583ca0 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -4660,6 +4660,8 @@ int __init mptcp_proto_v6_init(void)
+ {
+ 	int err;
+ 
++	mptcp_subflow_v6_init();
++
+ 	mptcp_v6_prot = mptcp_prot;
+ 	strscpy(mptcp_v6_prot.name, "MPTCPv6", sizeof(mptcp_v6_prot.name));
+ 	mptcp_v6_prot.slab = NULL;
+diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
+index 0bd1ee860316..ec15e503da8b 100644
+--- a/net/mptcp/protocol.h
++++ b/net/mptcp/protocol.h
+@@ -875,6 +875,7 @@ static inline void mptcp_subflow_tcp_fallback(struct sock *sk,
+ void __init mptcp_proto_init(void);
+ #if IS_ENABLED(CONFIG_MPTCP_IPV6)
+ int __init mptcp_proto_v6_init(void);
++void __init mptcp_subflow_v6_init(void);
+ #endif
+ 
+ struct sock *mptcp_sk_clone_init(const struct sock *sk,
+diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+index 6716970693e9..4ff5863aa9fd 100644
+--- a/net/mptcp/subflow.c
++++ b/net/mptcp/subflow.c
+@@ -2165,7 +2165,15 @@ void __init mptcp_subflow_init(void)
+ 	tcp_prot_override.psock_update_sk_prot = NULL;
+ #endif
+ 
++	mptcp_diag_subflow_init(&subflow_ulp_ops);
++
++	if (tcp_register_ulp(&subflow_ulp_ops) != 0)
++		panic("MPTCP: failed to register subflows to ULP\n");
++}
++
+ #if IS_ENABLED(CONFIG_MPTCP_IPV6)
++void __init mptcp_subflow_v6_init(void)
++{
+ 	/* In struct mptcp_subflow_request_sock, we assume the TCP request sock
+ 	 * structures for v4 and v6 have the same size. It should not changed in
+ 	 * the future but better to make sure to be warned if it is no longer
+@@ -2204,10 +2212,5 @@ void __init mptcp_subflow_init(void)
+ 	/* Disable sockmap processing for subflows */
+ 	tcpv6_prot_override.psock_update_sk_prot = NULL;
+ #endif
+-#endif
+-
+-	mptcp_diag_subflow_init(&subflow_ulp_ops);
+-
+-	if (tcp_register_ulp(&subflow_ulp_ops) != 0)
+-		panic("MPTCP: failed to register subflows to ULP\n");
+ }
++#endif
+-- 
+2.43.0
+
 
