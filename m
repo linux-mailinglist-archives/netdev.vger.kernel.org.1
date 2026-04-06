@@ -1,152 +1,188 @@
-Return-Path: <netdev+bounces-275719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275720-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sFneHDMP1GkbqgcAu9opvQ
-	(envelope-from <netdev+bounces-275719-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 21:53:23 +0200
+	id j/b0EnAQ1GmCqgcAu9opvQ
+	(envelope-from <netdev+bounces-275720-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 21:58:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 073D63A6CB9
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 21:53:22 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A69753A6D21
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 21:58:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EB6623012CEA
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 19:53:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id AF6713006B61
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 19:58:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A58D9396B7A;
-	Mon,  6 Apr 2026 19:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ck9qypBU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7C4398910;
+	Mon,  6 Apr 2026 19:58:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E441D45E8
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 19:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E16D397E6C
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 19:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775505199; cv=none; b=gW3GhY8IACeXid2wSI9lLO1Z1wL3YQqHK5mFfDKkRqeQRT/78WimwpMRPSNxLnUwtYKOmkW67LmuO3UgS+NNf8MRyOPcF8FC4Yx3aXaKHJHii3b3JDf8adkoLdZ33CPqC344bGvMVMJI0Yfw1ikeNg3zwhhvI6/vRLK1p5cvFOM=
+	t=1775505514; cv=none; b=s25XFEqx812oCHidZsa7kOUJV54GicLgNjQwYjOmjSWVHbGBDUPtMI60GKDWxDEof2CeFc3UlIB8njFvSUMvaWaulLUY2R9Vuw7pC8/6R42CtNIUrb7omSdnoOJLzyBLOWF2fSEWy4EyWWiYo+gMtlSC0na+o0AF7+nYsyKFDw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775505199; c=relaxed/simple;
-	bh=eouATSlX8G6NY+XWDHTk7j04brbeOYKRBaUKpumKmWA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s/0/NozVhha8VKgxjtj9n20I+A+agZvcdKGbEbL7AB3sXGMVSqU8AYaIl//ruwUTqcguJ7YGs2MXKX5KiMw4NaNJ8+zcSmFGHQFxIcit0/Rw2kP8UP0mm+39flv33Mh5XmP6k0TUZA09sEiDJ/sn+ZrYgXFQtJcqUYnaftybaGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ck9qypBU; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 6 Apr 2026 12:53:02 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775505196;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IXovqCnmzrS4eafaIE4xviHOkrXx/YXiMKIkCRxRFy8=;
-	b=Ck9qypBUUeubWrUPGT1KdtemkqhN1WZ44o57VDvfufj1WmgJt5zaTSzQ4Kk+PjofRyNJbA
-	ASmdOuiwsBzwk8RZdlw06SUEgTqdiJABpgU5YViHUI7e7LVXa8DZ2N0cul4YdYsqcsJaW9
-	xlscoPDKRvKpgOXipVgtqvNnJ8bfM+g=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Jiri Olsa <jolsa@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf v6 1/2] bpf: tcp: Reject non-TCP skb in
- bpf_sk_assign_tcp_reqsk()
-Message-ID: <20264619471.he8Q.martin.lau@linux.dev>
-References: <20260403015851.148209-1-jiayuan.chen@linux.dev>
- <20260403015851.148209-2-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1775505514; c=relaxed/simple;
+	bh=I78/UicW+3hCmr69SW5qwZkWf3Gw6hcPflvcdDFYlrE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X2ODc7ten0Hnfqgj2PAavbrhGqiam/yRJNShA+NC4JgoltoFD59z8DV1ytALiU8hCIm7oKGebfmt41naxARa7Vb5R87FVZSdGFJrP5PwOd4Z/lOnzOqE+UFtGvkThKjm00hHm+l5jC/MEo17Cq3QZxtk7SR704GmsqfFLqjlYHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 7C0DA4E082;
+	Mon,  6 Apr 2026 19:58:30 +0000 (UTC)
+Authentication-Results: smtp-out1.suse.de;
+	none
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C62B34A0B0;
+	Mon,  6 Apr 2026 19:58:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id pbLvLGUQ1GmcMwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Mon, 06 Apr 2026 19:58:29 +0000
+Message-ID: <345722f0-21b1-4970-8c45-ef85edf9d45b@suse.de>
+Date: Mon, 6 Apr 2026 21:58:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260403015851.148209-2-jiayuan.chen@linux.dev>
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] docs: netdev: document AI-assisted review
+ tooling
+To: Nicolai Buchwitz <nb@tipi-net.de>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>
+Cc: netdev@vger.kernel.org, workflows@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260406-nb-docs-ai-review-v1-1-b58943762ca9@tipi-net.de>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20260406-nb-docs-ai-review-v1-1-b58943762ca9@tipi-net.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spam-Flag: NO
+X-Spam-Score: -4.00
+X-Spam-Level: 
+X-Spamd-Result: default: False [-1.36 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[suse.de : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275719-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[22];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,google.com,kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,davemloft.net,redhat.com];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	TAGGED_FROM(0.00)[bounces-275720-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	NEURAL_HAM(-0.00)[-0.949];
+	MID_RHS_MATCH_FROM(0.00)[];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url]
-X-Rspamd-Queue-Id: 073D63A6CB9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,sashiko.dev:url,linux.dev:url,tipi-net.de:email]
+X-Rspamd-Queue-Id: A69753A6D21
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 03, 2026 at 09:58:27AM +0800, Jiayuan Chen wrote:
-> bpf_sk_assign_tcp_reqsk() only validates skb->protocol (L3) but does not
-> check the L4 protocol in the IP header. A BPF program can call this kfunc
-> on a UDP skb with a valid TCP listener socket, which will succeed and
-> attach a TCP reqsk to the UDP skb.
+On 4/6/26 9:40 PM, Nicolai Buchwitz wrote:
+> Add a section about Sashiko, the Linux Foundation's open-source
+> AI review system for kernel patches. Contributors can check review
+> feedback on the Sashiko website and address findings proactively,
+> reducing the need for maintainers to relay the same questions.
 > 
-> When the UDP skb enters the UDP receive path, skb_steal_sock() returns
-> the TCP listener from the reqsk. The UDP code then passes this TCP socket
-> to udp_unicast_rcv_skb() -> __udp_enqueue_schedule_skb(), which casts
-> it to udp_sock and accesses UDP-specific fields at invalid offsets,
-> causing a null pointer dereference and kernel panic:
+> Also point to the local review tooling at netdev-ai.bots.linux.dev
+> for contributors who want to run AI reviews before submitting.
 > 
->   BUG: KASAN: null-ptr-deref in __udp_enqueue_schedule_skb+0x19d/0x1df0
->   Read of size 4 at addr 0000000000000008 by task test_progs/537
+> Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+> ---
+> Sashiko [1] reviews are already being used on the list (e.g. [2])
+> but there's no mention of them in the netdev docs. Add a section
+> so contributors know they can check and respond to AI review
+> feedback directly.
 > 
->   CPU: 1 UID: 0 PID: 537 Comm: test_progs Not tainted 7.0.0-rc4+ #46 PREEMPT
->   Call Trace:
->    <IRQ>
->    dump_stack_lvl (lib/dump_stack.c:123)
->    print_report (mm/kasan/report.c:487)
->    kasan_report (mm/kasan/report.c:597)
->    __kasan_check_read (mm/kasan/shadow.c:32)
->    __udp_enqueue_schedule_skb (net/ipv4/udp.c:1719)
->    udp_queue_rcv_one_skb (net/ipv4/udp.c:2370 net/ipv4/udp.c:2500)
->    udp_queue_rcv_skb (net/ipv4/udp.c:2532)
->    udp_unicast_rcv_skb (net/ipv4/udp.c:2684)
->    __udp4_lib_rcv (net/ipv4/udp.c:2742)
->    udp_rcv (net/ipv4/udp.c:2937)
->    ip_protocol_deliver_rcu (net/ipv4/ip_input.c:209)
->    ip_local_deliver_finish (./include/linux/rcupdate.h:879 net/ipv4/ip_input.c:242)
->    ip_local_deliver (net/ipv4/ip_input.c:265)
->    __netif_receive_skb_one_core (net/core/dev.c:6164 (discriminator 4))
->    __netif_receive_skb (net/core/dev.c:6280)
+> Based on Jakub's reviewer guidance patch [3].
 > 
-> Fix this by checking the IP header's protocol field in
-> bpf_sk_assign_tcp_reqsk() and rejecting non-TCP skbs with -EINVAL.
+> [1] https://sashiko.dev/
+> [2] https://lore.kernel.org/all/20260324024235.929875-1-kuba@kernel.org/
+> [3] https://lore.kernel.org/all/20260406175334.3153451-1-kuba@kernel.org/
+> ---
+>   Documentation/process/maintainer-netdev.rst | 13 +++++++++++++
+>   1 file changed, 13 insertions(+)
 > 
-> Note that for IPv6, the nexthdr check does not walk extension headers.
-> This is uncommon for TCP SYN packets in practice, and keeping it simple
-> was agreed upon by Kuniyuki Iwashima.
+> diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
+> index bda93b459a0533fa1adfd11b756a4f47d1dbaa22..27296afb05d3828a350b4ed5c16907672db9785d 100644
+> --- a/Documentation/process/maintainer-netdev.rst
+> +++ b/Documentation/process/maintainer-netdev.rst
+> @@ -559,6 +559,19 @@ Reviewers are highly encouraged to do more in-depth review of submissions
+>   and not focus exclusively on process issues, trivial or subjective
+>   matters like code formatting, tags etc.
+>   
+> +AI-assisted review
+> +~~~~~~~~~~~~~~~~~~
+> +
+> +Patches posted to netdev are automatically reviewed by the Sashiko
+> +AI review system (https://sashiko.dev/). Results are posted publicly
+> +on the website. 
 
-sashiko has flagged a similar issue with larger scope.
-Please take a look. Thanks.
+Hi Nicolai,
 
-https://sashiko.dev/#/patchset/20260403015851.148209-1-jiayuan.chen%40linux.dev
+maybe I am missing something but [2] isn't from sashiko.dev but from 
+netdev AI CI instead. See: 
+https://netdev-ai.bots.linux.dev/ai-review.html?id=0b114a22-9aab-4265-8bfc-ea1b5bca5514
+
+The documentation mentioned for running the AI locally is correctly 
+related to netdev AI bot.
+
+I think it would be useful to document that AI reviews are happening but 
+mixing AI bots might confuse people.
+
+> Check for findings on your submissions and address
+> +valid ones before a maintainer has to relay the same questions.
+> +
+
+I wonder what would be the consequences for this. If less experienced 
+submitters are expected to address issues pointed out by AI bots they 
+might work on something that isn't valid. AFAIU, the AI output is only 
+forwarded to the submitter after a maintainer reviewed it and believes 
+it makes sense.
+
+Thanks,
+Fernando.
+
+> +You can also run AI reviews locally before submitting. Instructions
+> +and tooling are available at:
+> +
+> +  https://netdev-ai.bots.linux.dev/ai-local.html
+> +
+>   Testimonials / feedback
+>   -----------------------
+>   
 
