@@ -1,218 +1,163 @@
-Return-Path: <netdev+bounces-275580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275581-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gCz8FU2g02lajwcAu9opvQ
-	(envelope-from <netdev+bounces-275580-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 14:00:13 +0200
+	id 0K+COV+k02m1jwcAu9opvQ
+	(envelope-from <netdev+bounces-275581-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 14:17:35 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE7963A32CB
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 14:00:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 825E73A33CD
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 14:17:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6063F30125DD
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 12:00:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BCE2E3015473
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 12:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4A530C63A;
-	Mon,  6 Apr 2026 12:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088BC3358AF;
+	Mon,  6 Apr 2026 12:17:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wj83SUlP"
+	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="nuLIkick"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D673264F7
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 12:00:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775476810; cv=pass; b=T6rgE0h/xbmthRbmovzk6tV3uATg8CXXm1bp5X+4ZV/Vz3DiXAv/H1bsBo1i/iMDsdNcyAFPreisMQ5U1xiOyTJhuNTaTGEf/HL2Z0FgbwWckcjzzHpYsz0Uxrkqs5BNTolDnpnw+KKKpKFN+7qS//Xwl9Zn8D6rY2C5ORd39Bw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775476810; c=relaxed/simple;
-	bh=fcEIZMZ8hJHb+M5FGnQOEit1qBuFU3wayQRg42scuo4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rBc8exSTF7O45Sj6HH2K4E4jiGabjmIqJbUfcfULirKxhP1008UiclE3pnnTz3ExYmQk5te4KlBAYOIUvDOTCsaU9kvs1k9OiDLBrgfDjpZ0kZWfQfMfQl4AwtXfy0tFpyDvoseojixtkp+u/AKs04JIzei9wfisSvhFP9W/a7M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wj83SUlP; arc=pass smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5a2967e5de4so5168700e87.3
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 05:00:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775476807; cv=none;
-        d=google.com; s=arc-20240605;
-        b=L+dbv+tJOj0Gsu6oToPRs0xAYzMxAy3S9FMm99lI/rt1FewgBoWg+jrYTDAtl64HFR
-         rlF+G/9PTYkskQa99B4mgV1UdF1U7pLuMeqB7SwIc6k6TUyGUUm48QNLd/YXtUQZdydQ
-         ou/IUSe54swAcBZVOP5iFk+/LmifuSoyCCHzxg1blFFqE9lu0oaeUeaf7+zBu6HnyP42
-         6eRFQYJ/Ec/81VEq4CmDC99PfzB2Wi0ZhBJYlVnndp94dEB6VtY6HPcmNlP8byCvd1aa
-         sT56zU86HZUGAWqmci08IpmlgP1NLdYBn5B+MDPlVT0r7lUVb7/5aO/1gEvXu0ZxzjfE
-         pLCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=xUzQMuJkHWjZKwmfTvvznTEuXmb9XPZ3i0McRs/Z5mM=;
-        fh=dnvcqhzGmKeATDu5BfnLdkPBPPYmy0h2403UDnqti+g=;
-        b=Uggj63T6l0UI8PQo5D/Dr1T8dtQe+GMVuQFBctBwKivHIQUNg/XbN418heMsnXpOc+
-         RIEkp9NvoIHG4x/H9wLOFypmsy2accCKNR8PjtxjEfsMk6dzHLfCFCPVzLZeuZgxsGfm
-         U/E0DZz1exY/4K3bw2v1A5C9sESPxhDcpaScTSNQGVXw1SGwu0Wmp5bSn/VxF4XkoqsV
-         W0I8JuhCs2TDCXihoJCaP0yIlB7kxNpjauX4Wosjq0hSsqmrytkpWyqY44mRjq6S6Fn1
-         UehtpPuDvrsseeoRoxNtdtIKLZFFtwoyic2lwYP5SBUXTUCV3IlEEGa5PuUIkZQUN8eF
-         l47Q==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775476807; x=1776081607; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xUzQMuJkHWjZKwmfTvvznTEuXmb9XPZ3i0McRs/Z5mM=;
-        b=Wj83SUlPex1uBTfA1nOtyIo5Yw/mz51AV3+XO61r1exCSO2Z3GjqrYXvDJpyJBrRPZ
-         3sY505RBGWK8bWGQUKAnyVK40Z3irKenrRTJuW5dhFbPam/UjTMN0lVRc2Wd39AcpJ+u
-         R69G+3rUhui/SXYmP95ZCbJgrwPc/QvlfMM4xTSWLmVonE5xICAC67NvFbnuoGqgS04N
-         vGFHxgrkJc1pxaRgoYbJqwBjIcyb7EGjPV0vVRI4xNNNcjFeSryOgiK7x5ByPVl9chfx
-         XVtA7FxU3UF7rLSLXQ6o3+zQMiQdIS74Tz3lQ2xX0Am3z1xwcV0wGO2P88asYhvreOec
-         ickw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775476807; x=1776081607;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xUzQMuJkHWjZKwmfTvvznTEuXmb9XPZ3i0McRs/Z5mM=;
-        b=Z8dAoLOCktMZGW3knuHKtz8nPcmYhp7Oiv3utgLH8CpgfWBsmfMuCCs7FRQhOSRYLN
-         gz7AlCcxlaNBRPmMshJxVsJW37DH2CgGwQUkbnFG9FRBsvttFdzvIl+me6MZcR5bpwgZ
-         N+1AGPHA5G0K8s8gX0ZSQLMlGTABxqCBdqF95A2+jyCa2/TUxtadAlhnVOQ8JAYHLplQ
-         BeVgwRCY57rraL/CSuVVHh03G7m+b98qRfIG45MuEC8q8zVW7We69mpL3lPfa9vFw7J6
-         tMGqDqElZmnPLbOnHPqgyfha7qqeWuVqcj+6uX34izINiUEm9zYEU89s7kSaoFWZvymb
-         Bkog==
-X-Forwarded-Encrypted: i=1; AJvYcCX4ao+eOz39M72Zp+bEVMPtmAvjrGwXkguz8CsUN3xnSOuyasFwuXix0ASjGkDgZgLRiN9P1nE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJdbxDlAY4SNyr5A33OmEoDBzXs5nN8BdZwrbh+qy887AwgBjR
-	L6ZfDeBUcBm3U6S6mozaikqqgFr3gJYqbzUnxzR2UdLjdkzAby7aK5vDq4RhBvWW9q4coY2NS0F
-	hh92r+tc1LRYyeg5RfiVvpci9SaciTiY=
-X-Gm-Gg: AeBDiet6ZMVvUG+V+j+0rRLLBQTO9YIN4rMDscl9YZ+4EdVXUOQyU5q3ERWML6oUAfX
-	aCF4MJgS6eDOEYpGwbFTuQL1azLSBxLkMin6OF6kx0EVwHoJQvY5QBgX/Pnf8bwz3CjMWv6yOkR
-	R1KDTv7L7Uva3qyR4XV3Ja/z5CDJmMtxSGC+g4uUWDTOE6cfj8K97/qMs6T+siJZt4TtCHxcfu3
-	KbYUxxHT099TbKgBLR9hc6n9i+pDcW2NSezpPJJ+CO2epPgNqVYl6IwfrwM+5uO+xBeF+OnVrmg
-	Z9QYyuc=
-X-Received: by 2002:a05:6512:3d92:b0:5a2:bb45:7f21 with SMTP id
- 2adb3069b0e04-5a33757c21fmr4613352e87.28.1775476806506; Mon, 06 Apr 2026
- 05:00:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6792D97A6
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 12:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775477845; cv=none; b=XjScxOysRVGg6C1S6FYz1oT6Ba/8qSmB6PDhiJ71YotX/aeFKulzmytQWBj+Q5k3LlBaBndd/X/7IeDIpFMzPyhJENZ2dNi76tPhHbZxox7gS2BlGEyXN+JkYxnjcWXmPY04G7yivax/S7QqA2WDNQoAyinxPgeU0jEJvo1jveE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775477845; c=relaxed/simple;
+	bh=/WzMW28IjWmZnRlmWMvuoIBeIKjUEIvXVICyjwf8m3c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PJ+zSmUMuOXhqDI/NrD0wR/iY2/35kCI5xWKLiDHJgx0L7WorAArUjMK3eqvqCkhkhQ2dGypE7zFznDBdol1aiIxJn3cl+okMR8AF3wNOOss05KQGpWfCiWMcThuiOrv+Ev73U9bkBFEsBHH+xlqCTLDdk669UBf0aPvbSRNs7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=nuLIkick; arc=none smtp.client-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id E00AC240101
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 14:17:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.net; s=2017;
+	t=1775477841; bh=FvLAg6B4pdIV6SmF5cLammCmoQlQ2eq/da3X4qGi024=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:From;
+	b=nuLIkickNqI5bDMLS663F/5GLe8kHlmNx1qFqz4OBpUsC80IiyJYP+ACKiVb9KtgA
+	 ecmwRZ6q1Vri7KjvGuEBHXrABIsAIxNg+2qW38F2EZFV4CK1kgUk8i3EpcAJ56XwcO
+	 jhcmrC5NKkKZw4dHNvA114qiRiMsIVHVINxVqLbFjoYWFLmC2ix40WW1IjgLKLfQ6A
+	 hsFG7MoBR8pdMN3ZFG/FssoBMd88o46q4UwIGzDbLx50r53QdAdlm92rDuDmTjFtEX
+	 IL8f0IwJIL7eqUct4gtX1r9A/JshS5bJBFhu9cqfUTRNlO3fHE8kTZRMRF1sf4f31Q
+	 HSlQn+v1jSJGg==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4fq7cb3m9Zz6tvs;
+	Mon,  6 Apr 2026 14:17:19 +0200 (CEST)
+From: John Pavlick <jspavlick@posteo.net>
+To: linux@armlinux.org.uk
+Cc: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	John Pavlick <jspavlick@posteo.net>,
+	Marcin Nita <marcin.nita@leolabs.pl>
+Subject: [PATCH v2] net: sfp: add quirks for GPON ONT SFP sticks
+Date: Mon, 06 Apr 2026 12:17:21 +0000
+Message-ID: <20260406121716.69854-1-jspavlick@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260404150452.83904-1-kerneljasonxing@gmail.com>
- <20260404150452.83904-4-kerneljasonxing@gmail.com> <willemdebruijn.kernel.2ff565d2f9e7f@gmail.com>
-In-Reply-To: <willemdebruijn.kernel.2ff565d2f9e7f@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 6 Apr 2026 19:59:28 +0800
-X-Gm-Features: AQROBzB3sC5UT6ZJcIRcqKr0kaJV4c5b4kQZPMFgIGiWrxzPe3N-tzGEy0vqdu4
-Message-ID: <CAL+tcoB94=ptFB-acU3nAK_MqW74DV0MQUVvvV3nbQ7Zc6zSZw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/4] bpf-timestamp: keep track of the skb when
- wait_for_space occurs
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, willemb@google.com, 
-	martin.lau@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>, Yushan Zhou <katrinzhou@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_CONTAINS_FROM(1.00)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[posteo.net,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[posteo.net:s=2017];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,posteo.net,leolabs.pl];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275580-lists,netdev=lfdr.de];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	DKIM_TRACE(0.00)[posteo.net:+];
+	TAGGED_FROM(0.00)[bounces-275581-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	NEURAL_HAM(-0.00)[-0.999];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jspavlick@posteo.net,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: AE7963A32CB
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 825E73A33CD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 6, 2026 at 10:28=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > The patch is the 1/2 part of push-level granularity feature.
-> >
-> > Tag the skb in tcp_sendmsg_locked() when wait_for_space occurs even
-> > though it might not carry the last byte of the sendmsg.
-> >
-> > Prior to the patch, BPF timestamping cannot cover this case:
-> > The following steps reproduce this:
-> > 1) skb A is the current last skb before entering wait_for_space process
-> > 2) tcp_push() pushes A without any tag
-> > 3) A is transmitted from TCP to driver without putting any skb carrying
-> >    timestamps in the error queue, like SCHED, DRV/HARDWARE.
-> > 4) sk_stream_wait_memory() sleeps for a while and then returns with an
-> >    error code. Note that the socket lock is released.
-> > 5) skb A finally gets acked and removed from the rtx queue.
-> > 6) continue with the rest of tcp_sendmsg_locked(): it will jump to(goto=
-)
-> >    'do_error' label and then 'out' label.
-> > 7) at this moment, skb A turns out to be the last one in this send
-> >    syscall, and miss the following tcp_bpf_tx_timestamp() opportunity
-> >    before the final tcp_push()
-> > 8) BPF script fails to see any timestamps this time
-> >
-> > Signed-off-by: Yushan Zhou <katrinzhou@tencent.com>
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  net/ipv4/tcp.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index c603b90057f6..7d030a11d004 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -1400,9 +1400,11 @@ int tcp_sendmsg_locked(struct sock *sk, struct m=
-sghdr *msg, size_t size)
-> >  wait_for_space:
-> >               set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
-> >               tcp_remove_empty_skb(sk);
-> > -             if (copied)
-> > +             if (copied) {
-> > +                     tcp_bpf_tx_timestamp(sk);
-> >                       tcp_push(sk, flags & ~MSG_MORE, mss_now,
-> >                                TCP_NAGLE_PUSH, size_goal);
->
-> Now the number of skbs that will be tracked will be unpredictable,
-> varying based on memory pressure.
+Several GPON ONT SFP sticks based on Realtek RTL960x report
+1000BASE-LX at 1300MBd in their EEPROM but can operate at 2500base-X.
+On hosts with serdes fixed at 2.5Gbase-X (e.g. Banana Pi R3 / MT7986),
+the kernel rejects them with 'no common interface modes'.
 
-Right, I put some effort into writing a selftests to check how many
-push functions get called at one time and failed to do so.
+Add quirks for:
+- Hisense-Leox LXT-010S-H
+- Hisense ZNID-GPON-2311NA
+- HSGQ HSGQ-XPON-Stick
 
->
-> That sounds hard to use to me. Especially if these extra pushes
-> cannot be identified as such.
->
-> Perhaps if all skbs from the same sendmsg call can be identified,
-> that would help explain pattern in data resulting from these
-> uncommon extra data points.
+Each quirk advertises 2500base-X and ignores TX_FAULT during the
+module's ~40s Linux boot time.
 
-You meant move tcp_bpf_tx_timestamp before tcp_skb_entail()? That is
-close to packet basis without considering fragmentation of skb :)
+Tested on Banana Pi R3 (MT7986) with OpenWrt 25.12.1, confirmed
+2.5Gbps link and full throughput with flow offloading.
 
-Thanks,
-Jason
+Suggested-by: Marcin Nita <marcin.nita@leolabs.pl>
+Signed-off-by: John Pavlick <jspavlick@posteo.net>
+---
+Changes in v2:
+  - Add Suggested-by tag for Marcin Nita <marcin.nita@leolabs.pl>, who
+    suggested investigating sfp.c quirks as a solution rather than
+    attempting to edit the EEPROM data directly on the module.
+
+ drivers/net/phy/sfp.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index f1070eb0a0bb..bd970f753beb 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -543,6 +543,22 @@ static const struct sfp_quirk sfp_quirks[] = {
+ 	SFP_QUIRK("HUAWEI", "MA5671A", sfp_quirk_2500basex,
+ 		  sfp_fixup_ignore_tx_fault_and_los),
+ 
++	// Hisense LXT-010S-H is a GPON ONT SFP (sold as LEOX LXT-010S-H) that
++	// can operate at 2500base-X, but reports 1000BASE-LX / 1300MBd in its
++	// EEPROM
++	SFP_QUIRK("Hisense-Leox", "LXT-010S-H", sfp_quirk_2500basex,
++		  sfp_fixup_ignore_tx_fault),
++
++	// Hisense ZNID-GPON-2311NA can operate at 2500base-X, but reports
++	// 1000BASE-LX / 1300MBd in its EEPROM
++	SFP_QUIRK("Hisense", "ZNID-GPON-2311NA", sfp_quirk_2500basex,
++		  sfp_fixup_ignore_tx_fault),
++
++	// HSGQ HSGQ-XPON-Stick can operate at 2500base-X, but reports
++	// 1000BASE-LX / 1300MBd in its EEPROM
++	SFP_QUIRK("HSGQ", "HSGQ-XPON-Stick", sfp_quirk_2500basex,
++		  sfp_fixup_ignore_tx_fault),
++
+ 	// Lantech 8330-262D-E and 8330-265D can operate at 2500base-X, but
+ 	// incorrectly report 2500MBd NRZ in their EEPROM.
+ 	// Some 8330-265D modules have inverted LOS, while all of them report
+-- 
+2.53.0
+
 
