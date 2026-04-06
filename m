@@ -1,157 +1,166 @@
-Return-Path: <netdev+bounces-275576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275577-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2KZmGpOc02mrjgcAu9opvQ
-	(envelope-from <netdev+bounces-275576-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:44:19 +0200
+	id ON08Jsyd02nGjgcAu9opvQ
+	(envelope-from <netdev+bounces-275577-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:49:32 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C255A3A3214
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:44:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0971F3A3245
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:49:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 30713300EAAD
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 11:44:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 485E930131E7
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 11:49:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B593195FC;
-	Mon,  6 Apr 2026 11:44:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34617332ED0;
+	Mon,  6 Apr 2026 11:49:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="ZDUb8o7V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fcOglI5j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D392DB788
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 11:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775475856; cv=none; b=Tg1RJByhJSNnjb6jyR6nVmDxArnRfNKgDh1Tp9dMFbwJMRLPgmysKk2da2Y6Zr3M2EbQpx1/RvQY24A3OOlVZL8V1aTJneX738nMpg5egXGxJtWx1WEqrU3pBpKTaiX6ptaE8xMKxryexZVmvnbCZxdg8BEiXNSYezOrqdhPA5k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775475856; c=relaxed/simple;
-	bh=WhpS/KP8N+h++LNKoLk4eu5ll51D156G/Un8Kyiwxkk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e2coJAc/4Da+BhZu5uDEi7PFlPUdFl+vLVWoMEFMIjmMhLWUgjsvwacMyyNqWFRQjnBY+AR7bI/9JKbq9iDhE6MY/oXNBgQPyRU80QfIm/zgo44nsFM9H7sesnzDdDiCvdhpuSjsqtXZ3sNhpblUCFn7X6PiZ4jV/W3qiBZ/jmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=ZDUb8o7V; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id 01173240029
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 13:44:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=posteo.net; s=2017;
-	t=1775475846; bh=LZtkpNfc7eXlrOjhYAu2H3N8qUxWCwLGFLDfIsl33OA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:From;
-	b=ZDUb8o7VDCq3kVPBPZJ/odFr9LcPjwKYrRYdPmfDawDboWktu2VV+X3iIeBeE1xO5
-	 9SXHqGCZ8wL98crCjQVCFWUoZYDZsWaD1x+6DfIp56+/4/KC/W7K3Pv9/zAR7Qu6Ej
-	 F8OpF2tW6hwiPaj5PBn+f+SnHgrXO346FQ3y4fiRhekkxdr35rVBVLKUek+ZZSCefl
-	 bt/DTYNySVkD/Cyh6Upk/hvGDGFHDrydJolBp28m0M/cJEQJtIZv1cc8kglzZiVN9V
-	 TnU4xtqWOs0LtDL40C/yyt5sxFgK7lt1USBsEwZeg7M611u/W+1BRuwckTDas35AVv
-	 cLzJ1kbZkRhog==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4fq6tC26qYz6tw1;
-	Mon,  6 Apr 2026 13:44:03 +0200 (CEST)
-From: John Pavlick <jspavlick@posteo.net>
-To: linux@armlinux.org.uk
-Cc: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	John Pavlick <jspavlick@posteo.net>
-Subject: [PATCH] net: sfp: add quirks for GPON ONT SFP sticks
-Date: Mon, 06 Apr 2026 11:44:05 +0000
-Message-ID: <20260406114352.69168-1-jspavlick@posteo.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4EA033291F
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 11:49:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775476168; cv=pass; b=IdTYn0RCD/k/BRIdYfJXfhZLkDcgOIog03gTpRbrxb2zREUVzAvOUMaMs6h1Gao884dDVw7yFCYE7eiuwNfMoNN7zw7WfqvVNl4WuWM+FalYUZGIogIZvrgmEALwHqUl9vRwnZbJvZICeUY0FtinpRaMzVxPpDUE7fLJVz3pErk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775476168; c=relaxed/simple;
+	bh=hiCrAkfJhWTW9PZ93bl3KXczpdHUgPTttVV+nD7Ho8U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=noxQ5iWCQbSMaN3oSTmMdXl4ru69nCA0Rd2YcMOpE5Uf8DpFbuGIA8JLX98kuaobqFf9qYRH4bcxDbg18fU+35uqPSQp3/eIAhcEsQlcyTb+4XPu9owuWRBq5T5KYLjLYWZeYBiJrFlEsc/HS6YEzrd6c/0XXBmZNWtJs48oKdI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fcOglI5j; arc=pass smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5a0ff30b240so4647443e87.0
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 04:49:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775476165; cv=none;
+        d=google.com; s=arc-20240605;
+        b=kIIApCb7tw698vH9yMcoQALDktaC/vG4U9rX02uM6Ff0TX7bl7LqfhKh3z59LbhZbq
+         Ihr8vhJcZMOZuhhuS8CuwA3H9z8qixGlDj4u6jwOTeoM8VMGrdutneChEMAEmTdchKC8
+         /lwLtRDdA1IyShwIuKRlscapJy/aeU3XQAsEBewLr2evIIs1WRa3+J7sUlEgrOMah4EM
+         U1gdmBM/NrnhrN6ArZxiNZeBtLl0OBLvCnVkbxp/zhAZ/42zKI3qEoFgnRNWzrsie6R2
+         E4Y0U8sw7exsiBYGJGpSxICXfgYoTtcqW4PSz4Ms0akd/ddXvafft5ZLzqnoMb56nCim
+         c7tw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=hiCrAkfJhWTW9PZ93bl3KXczpdHUgPTttVV+nD7Ho8U=;
+        fh=4Z3TWazabsSXUxsTaYNutLd7+RmcaoLGM4DOvXvBHrQ=;
+        b=Uu+vt/Vj8fgMVR9FHnfAQdxxOZvXtdsSpKy3vaOtXpYBZHQ2mRfFNw9owZXDhIu8+n
+         YU1L4PnDC/j2hKqfkuR3Oqm5fZnbnwfY1TPkOIR4jspLb9+cs3nav41DiRLhm+qGukJN
+         RvuQLL3hZknMbXCNj24hwWYrT4HabMbTe3sGXU3cKcW6E47sOF2+JxMzP4xueBbMdLmy
+         A7ywNtvVRFcQip13RCNOUn05tNX4afFWF8waZ/UkYdSsvuYtKP0U79jwqKh0sSSYR/Bx
+         m4nxbTh2M3O3IpWRF4ARcwA+FsF2FSYNA90SLDXPOjELnZ5/X19HBCeuthfJmpSRFusI
+         h/aQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775476165; x=1776080965; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hiCrAkfJhWTW9PZ93bl3KXczpdHUgPTttVV+nD7Ho8U=;
+        b=fcOglI5jsehh0OLUav3l6WtazkrOY07ZdrKYZhaSfYnDDce09kMYQOECHjgzyCUOqz
+         F5giq+P/FamImBrc8JJtm7s0Kd5zIAlQ8X2qks6FXtx+npP/dfz+wjhQZL//mnntiX63
+         WQfmalsWt5uHT7DL6yAlDvTILL/f1n9zINg/SJ+tPcRRqp90nCDCPkWFGWFSfuG7DlLS
+         Wz8FoYEMkmvxcMQvMW/2GXBkFDGFDBS3IojoZWF9Yl6QuBSfB9c5ZH6BCSA0k3YT4ek4
+         P3XH+e3IDk7svYTBG25Kjk+i76D9fUNT1Ko5Lz1xoqUOi2egnNiZ7i+cO9/yrb014uGp
+         XXtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775476165; x=1776080965;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=hiCrAkfJhWTW9PZ93bl3KXczpdHUgPTttVV+nD7Ho8U=;
+        b=ZfsnC0GCDny3ikHpb5CWi+a1pw1GtBK98dDoA7hIX6stV+kQiW6ENz+r2GeWzD2gK5
+         sbgjJGvKfFlcW9ZCnmZ6Wt7MhjBXiTP6BELu5PPgMpA2zzuY/byzNs6OCll5vdOoX3PX
+         xSI6DFaNSbDhoh16ph6TDpukGZk9AzjYOS5KK6A3O30WVCkBVVfcRtKO9/NA+HTTuYor
+         7JkByd+CPD03WZ3ivrFZVO+4C5kIjOk/zswpZmMT+z9MxK+MNpCNTeqWHfWd2SvwjgY2
+         mPNUUql9VOZZFp1H1DlPvQK/qMIAoezpPDSUy+SsmAGU6tdh/jomqH9/VhrPG7JT0GZK
+         ICyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQgg0j1cfNYbf3ihCxHs9yeJg/KtfculHoOHMsTVCy2deUFQz3m0z6ttsUBEGRKT6/Vtjyekw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUIg21mvTK6xUmr/HafmBEpqvl7vm/hzF18gFflxKrb74FYenB
+	m7OBK+paxvs6RlvIl+2J/QoUYHFPxRL6cNTNmaoOQFGnkit8GndlEH6yhZgtCTt793uAccyJwwT
+	iU5I3bMosCtX1UHtWa6XnSZUkzx/2SyY=
+X-Gm-Gg: AeBDiet4pMzerErtI1blURs41wxT66yQt0el1nEcDtvUkiwI3bXSHgsLnjFOSkUX5ZM
+	ddHx3GfEVygtRajTKseUw2dtZ4wMZ5Jqa/xpMuvrhl5/kGl8WWgBP7u2XoGQMCBd1rQdPlZdXv3
+	fP946Q+xMJvJtLMU5WuBOEisEKcNisIkxnXIKIFjoWVTyQUvfVuHIPyIGSOklTw3JvBCntxG1eK
+	vfcgZt2uePsxQLAhCuFDCthux4cQwDYRMLGbd63N+pO4ls8ASauzUBQR9IJ6l5bhiWmN7F3qg4w
+	B2qUk/w=
+X-Received: by 2002:a05:6512:3044:b0:59e:57d2:75f0 with SMTP id
+ 2adb3069b0e04-5a33758ad0fmr4630910e87.32.1775476164770; Mon, 06 Apr 2026
+ 04:49:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260404150452.83904-1-kerneljasonxing@gmail.com>
+ <20260404150452.83904-3-kerneljasonxing@gmail.com> <willemdebruijn.kernel.c2ef8ef43869@gmail.com>
+In-Reply-To: <willemdebruijn.kernel.c2ef8ef43869@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 6 Apr 2026 19:48:45 +0800
+X-Gm-Features: AQROBzBLd1qJZJR7_3XJ4RB9kCGoLhjqb3qGP5BJWelUsV1v58MJj_BN8Rtdwv4
+Message-ID: <CAL+tcoAdsBBVa36ocMqiuUT4goratVdnNNcHfKcwcwm2h7cujQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/4] tcp: advance the tsflags check to save cycles
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, willemb@google.com, 
+	martin.lau@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Yushan Zhou <katrinzhou@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[posteo.net,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[posteo.net:s=2017];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275576-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,posteo.net];
+	TAGGED_FROM(0.00)[bounces-275577-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jspavlick@posteo.net,netdev@vger.kernel.org];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[posteo.net:+];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,posteo.net:dkim,posteo.net:email,posteo.net:mid]
-X-Rspamd-Queue-Id: C255A3A3214
+	NEURAL_HAM(-0.00)[-0.999];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,mail.gmail.com:mid,tencent.com:email]
+X-Rspamd-Queue-Id: 0971F3A3245
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Several GPON ONT SFP sticks based on Realtek RTL960x report
-1000BASE-LX at 1300MBd in their EEPROM but can operate at 2500base-X.
-On hosts with serdes fixed at 2.5Gbase-X (e.g. Banana Pi R3 / MT7986),
-the kernel rejects them with 'no common interface modes'.
+On Mon, Apr 6, 2026 at 10:23=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Check the tsflags first to see if the socket timestamping is enabled.
+> > If so, then try to fetch the last skb from either write queue or
+> > retransmission queue.
+>
+> This message does not explain why this change is made.
 
-Add quirks for:
-- Hisense-Leox LXT-010S-H
-- Hisense ZNID-GPON-2311NA
-- HSGQ HSGQ-XPON-Stick
+Oh, right, I should've added more direct benefits.
 
-Each quirk advertises 2500base-X and ignores TX_FAULT during the
-module's ~40s Linux boot time.
-
-Tested on Banana Pi R3 (MT7986) with OpenWrt 25.12.1, confirmed
-2.5Gbps link and full throughput with flow offloading.
-
-Signed-off-by: John Pavlick <jspavlick@posteo.net>
----
- drivers/net/phy/sfp.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index f1070eb0a0bb..bd970f753beb 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -543,6 +543,22 @@ static const struct sfp_quirk sfp_quirks[] = {
- 	SFP_QUIRK("HUAWEI", "MA5671A", sfp_quirk_2500basex,
- 		  sfp_fixup_ignore_tx_fault_and_los),
- 
-+	// Hisense LXT-010S-H is a GPON ONT SFP (sold as LEOX LXT-010S-H) that
-+	// can operate at 2500base-X, but reports 1000BASE-LX / 1300MBd in its
-+	// EEPROM
-+	SFP_QUIRK("Hisense-Leox", "LXT-010S-H", sfp_quirk_2500basex,
-+		  sfp_fixup_ignore_tx_fault),
-+
-+	// Hisense ZNID-GPON-2311NA can operate at 2500base-X, but reports
-+	// 1000BASE-LX / 1300MBd in its EEPROM
-+	SFP_QUIRK("Hisense", "ZNID-GPON-2311NA", sfp_quirk_2500basex,
-+		  sfp_fixup_ignore_tx_fault),
-+
-+	// HSGQ HSGQ-XPON-Stick can operate at 2500base-X, but reports
-+	// 1000BASE-LX / 1300MBd in its EEPROM
-+	SFP_QUIRK("HSGQ", "HSGQ-XPON-Stick", sfp_quirk_2500basex,
-+		  sfp_fixup_ignore_tx_fault),
-+
- 	// Lantech 8330-262D-E and 8330-265D can operate at 2500base-X, but
- 	// incorrectly report 2500MBd NRZ in their EEPROM.
- 	// Some 8330-265D modules have inverted LOS, while all of them report
--- 
-2.53.0
-
+Thanks,
+Jason
 
