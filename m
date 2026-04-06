@@ -1,156 +1,158 @@
-Return-Path: <netdev+bounces-275593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275594-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id WFbDCxy102nLkgcAu9opvQ
-	(envelope-from <netdev+bounces-275593-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:29:00 +0200
+	id IOhjB0+202nLkgcAu9opvQ
+	(envelope-from <netdev+bounces-275594-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:34:07 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CD543A3899
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:28:59 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEA7C3A3950
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:33:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D2417301372D
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 13:28:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3A99F300616C
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 13:33:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30B0333725;
-	Mon,  6 Apr 2026 13:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80EB21CC4F;
+	Mon,  6 Apr 2026 13:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="vhLkpoeT"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB83B30C63A
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 13:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D65F1F192E;
+	Mon,  6 Apr 2026 13:33:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775482116; cv=none; b=jU88R/kuNTLixolkltQTQDSEJKdqB1IZ93JiUUS6OczzdY0WsJEGfM8w4JTYtWq+I5WSNjClMNgAlhbKYJQI/ArFMMJvOWSRYutpuHru/OZS5dvsR77MJeeo2fWKcq2dlD4JVu5LvFDEmkjsnPl+l5MCCXwgW/lZ0iJsVE/rmA4=
+	t=1775482433; cv=none; b=JPwU8VP0XLBfaRpCznn9rtl/WXEqGPaxfnvhRJTcbJBddNMP3+I4CxopRdj6l90wIF7Oewa4gL+7pXvnkHnFplAmI8r36pOsnXGTlA71jQpHDJSEVJ/7Yze5Q/TGegUV0Uv4+Qh2+rgHGJWU/lSoXzfUH71qGuS0NFtWVH8ySa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775482116; c=relaxed/simple;
-	bh=YFl+3yr7JynCxJYawGnSTFCIJT3YeqX7qPlqbJs1yVc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WIWjVm2hyJcNGujW5XPMXDPTLB7yOHrobTfIuKz1Mn687yjLZ2Y3lusn+ipn8XfE6sFDItM13h/+HJAxbODNxUyXoG4WkUrZbc75Gb6Bmm7NltY/aVL0jDnuV47CXE/dV1AiZKI9cSMdtqHbVgOD6PGmRUlti4nAdO0DrgjzBYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.161.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from Draw.localdomain (unknown [27.227.216.52])
-	by app1 (Coremail) with SMTP id ygmowACXB_jwtNNpxr6rAA--.3337S2;
-	Mon, 06 Apr 2026 21:28:16 +0800 (CST)
-From: Ao Zhou <n05ec@lzu.edu.cn>
-To: netdev@vger.kernel.org,
-	David Ahern <dsahern@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Ido Schimmel <idosch@mellanox.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Yifan Wu <yifanwucs@gmail.com>,
-	Juefei Pu <tomapufckgml@gmail.com>,
-	Yuan Tan <yuantan098@gmail.com>,
-	Xin Liu <bird@lzu.edu.cn>,
-	Ao Zhou <n05ec@lzu.edu.cn>,
-	Haoze Xie <royenheart@gmail.com>
-Subject: [PATCH net v2 1/1] net: l3mdev: Ignore non-L3 uppers in l3mdev_fib_table_rcu
-Date: Mon,  6 Apr 2026 21:28:16 +0800
-Message-ID: <429dd4a81d4ca5624ab9f6d7b53c5fe08552c734.1775443332.git.royenheart@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1775062214.git.royenheart@gmail.com>
-References: <cover.1775062214.git.royenheart@gmail.com>
+	s=arc-20240116; t=1775482433; c=relaxed/simple;
+	bh=rby7I+8Zk1SNZO7WH40Wj1O8cmV/OD8smQdiIDeejsw=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=RLv9wRd/8UK8RDIEifDMkXFJR7X9w4a+uVv2Uq8vYOk4J0D64FYfnFs0YJscWrZdlNxDuePveNcuFnsvE2og7iZMonaMTV/KKxKi3zSdxgGgHqvFeNFuYS+3TtkrTz2UIPnFt+Mc7Kaf6nzpMaxhimUZPa+N1EenfjtTKYbCDj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=vhLkpoeT; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 16353A5888;
+	Mon,  6 Apr 2026 15:33:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1775482424; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=yEwxY8e/7wqrX1mbmXoSy1MbXgqbAyCZJyVMeKm7HOQ=;
+	b=vhLkpoeTEriohvJIdBFXLtzWp9zgDaYiSvXMvuBGaRxmw+JG1D1qTBn4PjsYcA5jazGWNP
+	3F1/AYi2K1mj7SdgIOenpL8rObxF0J4Fc3LCDuTVq4xXBNqObaJ4bRUsagooItUdE9+vgt
+	XpTxF5gu/odEkUPvhdz+qVnWQglKCT3T+8M9uKGd7Vsp5FfZm1JYWlRrxwCWeggZAJCdQw
+	OyTYPNd3uRdRkbPlETt6Lda13ZmdAxbLvSJ7Yirpao7Rgkh0vxAd7ea+6YX9fv0dZ5Pv52
+	HuiThUvXwyUPq/REhZDqseaTczoxw65geTMdaesVhxfRqGj8a45wyx4uxbYxVQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowACXB_jwtNNpxr6rAA--.3337S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7WFy7ZFWxCryfZw17XrW3trb_yoW8Ww4rp3
-	y3GF97KFW8XryUA348J34xuryDZr4DK347G3yvyr47W3WDA347X345ta4avFy7JayFkF43
-	JF12ga9Yg3s5urJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB21xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_
-	JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
-	w2AFwI0_Jw0_GFylc2xSY4AK67AK6ry8MxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1s
-	IEY20_GrWl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
-	6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0x
-	vE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE
-	42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
-	kF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUe38nUUUUU
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQMJCWnShX0IAgAAsL
-X-Spamd-Result: default: False [-0.96 / 15.00];
+Date: Mon, 06 Apr 2026 15:33:40 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 0/3] net: phy: add support for disabling
+ autonomous EEE
+In-Reply-To: <a1cf8f6a-b338-4dd7-aced-7e19e4d0fdb7@lunn.ch>
+References: <20260406-devel-autonomous-eee-v1-0-b335e7143711@tipi-net.de>
+ <a1cf8f6a-b338-4dd7-aced-7e19e4d0fdb7@lunn.ch>
+Message-ID: <9272c5dd653039b3def8caaea3e631c5@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[lzu.edu.cn];
-	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-275593-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,mellanox.com,resnulli.us,gmail.com,lzu.edu.cn];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	FROM_HAS_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-0.992];
-	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,armlinux.org.uk,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	R_DKIM_NA(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:?];
+	TAGGED_FROM(0.00)[bounces-275594-lists,netdev=lfdr.de];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.646];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
+	DMARC_DNSFAIL(0.00)[tipi-net.de : query timed out];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MID_RHS_MATCH_FROM(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,lzu.edu.cn:email]
-X-Rspamd-Queue-Id: 9CD543A3899
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_DKIM_TEMPFAIL(0.00)[tipi-net.de:s=dkim];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: BEA7C3A3950
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Haoze Xie <royenheart@gmail.com>
+On 6.4.2026 15:17, Andrew Lunn wrote:
+> On Mon, Apr 06, 2026 at 09:13:06AM +0200, Nicolai Buchwitz wrote:
+>> Some PHYs implement autonomous EEE where the PHY manages EEE
+>> independently
+> 
+> I suppose we should discuss naming. As far as i know, IEEE 802.3 does
+> not include this feature, so it does not provide a guide to how we
+> should name it.
+> 
+> In the past we have used SmartEEE, but that is Atheros's vendor
+> name. Broadcom seem to call it AutoGrEEEn.
+> 
+> Autonomous EEE seems like a reasonable name, and appears to be vendor
+> agnostic. Are we happy with this?
 
-l3mdev_fib_table_rcu() assumes that any upper device observed for
-an IFF_L3MDEV_SLAVE device is an L3 master and dereferences
-master->l3mdev_ops unconditionally.
+"Autonomous EEE" works for me (obviously). It kinda describes what
+happens (the PHY acts autonomously) without being tied to a specific
+vendor's marketing name.
 
-VRF slave setup sets IFF_L3MDEV_SLAVE before the upper link is fully
-switched, so readers can transiently observe a non-L3 upper such as a
-bridge and follow a NULL l3mdev_ops pointer. Require the current upper
-to still be an L3 master before consulting its FIB table.
+That said, I feel Russell's argument that it doesn't type well. But
+even after some walks in the woods I wasn't able to come up with a
+better name yet.
 
-Fixes: fdeea7be88b1 ("net: vrf: Set slave's private flag before linking")
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Co-developed-by: Yuan Tan <yuantan098@gmail.com>
-Signed-off-by: Yuan Tan <yuantan098@gmail.com>
-Suggested-by: Xin Liu <bird@lzu.edu.cn>
-Reviewed-by: David Ahern <dsahern@kernel.org>
-Signed-off-by: Haoze Xie <royenheart@gmail.com>
-Signed-off-by: Ao Zhou <n05ec@lzu.edu.cn>
----
-changes in v2:
-- point Fixes to the VRF slave ordering change identified by David Ahern
-- add David Ahern's Reviewed-by trailer
+> 
+> What i guess is unclear is what part of the network stack is acting
+> autonomously. In the context of a PHY driver op,
+> .disable_autonomous_eee is clear. But when we go further to actually
+> making use of it, do we need to report to user space if we are using
+> IEEE 802.3 EEE or "autonomous EEE". But i guess it is no worse than
+> SmartEEE or AutoGrEEEn which also make no indication where EEE is
+> happening.
 
- net/l3mdev/l3mdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I think for now it's fine to not expose this. From the user's 
+perspective,
+EEE is either on or off. Whether the PHY or MAC manages LPI is an
+implementation detail. ethtool --set-eee should just do the right thing:
 
-diff --git a/net/l3mdev/l3mdev.c b/net/l3mdev/l3mdev.c
-index 5432a5f2dfc8..b8a3030cb2c4 100644
---- a/net/l3mdev/l3mdev.c
-+++ b/net/l3mdev/l3mdev.c
-@@ -177,7 +177,7 @@ u32 l3mdev_fib_table_rcu(const struct net_device *dev)
- 		const struct net_device *master;
- 
- 		master = netdev_master_upper_dev_get_rcu(_dev);
--		if (master &&
-+		if (master && netif_is_l3_master(master) &&
- 		    master->l3mdev_ops->l3mdev_fib_table)
- 			tb_id = master->l3mdev_ops->l3mdev_fib_table(master);
- 	}
--- 
-2.53.0
+- MAC supports LPI: use MAC-managed EEE
+- MAC doesn't, but PHY has autonomous EEE: use that instead
+- Neither: EOPNOTSUPP
 
+I don't think there's a meaningful use case for letting users choose
+between the two. Or is there?
+
+> 
+> Thoughts?
+> 
+> 	Andrew
+
+Nicolai
 
