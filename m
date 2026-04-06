@@ -1,117 +1,163 @@
-Return-Path: <netdev+bounces-275696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275697-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SFM6DIH402k4ogcAu9opvQ
-	(envelope-from <netdev+bounces-275696-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:16:33 +0200
+	id eLYGKvf502k8owcAu9opvQ
+	(envelope-from <netdev+bounces-275697-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:22:47 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E08F3A61A0
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:16:32 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1ECC3A6254
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:22:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5279D3017027
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 18:14:18 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C4246300C7D7
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 18:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914A438F923;
-	Mon,  6 Apr 2026 18:14:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB753939D9;
+	Mon,  6 Apr 2026 18:22:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cUaeIvOI"
+	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="n5DKFsXb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F18F38E5DA
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 18:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13BA639099E
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 18:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775499257; cv=none; b=Ykwbu82g3FzOcFP4hGrMEA6csjzBmfX7UjkSvJCUvxTw9g6tLumE5FTyNI+toD6WrNX9ejx3sxfo8rsfVdaueG2A/dY6IghAZWA3aTFgWmLqDVpYSQm4c0ekH659BtI/lPdX2LFXCm3ACAwjVJzOkIRPkRCJXtzlxkUE9da0Bvw=
+	t=1775499752; cv=none; b=SRmjcHtTupW2MigcXerSwj8IX9DE5xKajjxzBl8xfT2KdQvhQ3Gjm9M8KDekh2cYq5Rx4Xg8bi5k/GXDnj1WsW1NaJX7u1rLych7t1X53epKo5I2OretYeL/3FwlIKIl9trREYODxR6zxFZtTCFV+01pt05aLbcH17gtuXLDOPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775499257; c=relaxed/simple;
-	bh=qUdOjEAMvmH7efMDC7D2HhPL8uzmdroQVyLsnXvG5Wg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BpeYP9+RvtvmasknvgVz4b699G6Bq/NJzD8eTPX0lWQB0Hk4b02Ej8hSW5uE/3mvtw5XObwaHxa9K4Y8+IZTrFqFfqUiIduJ2scbeTnS7HHtm08D41x0KlAnMc8I+6KKM5vFfBaJlMcjBFQLXWMuggUZlpKLRmPWlzorh2bcjzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cUaeIvOI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D5B0C4CEF7;
-	Mon,  6 Apr 2026 18:14:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775499257;
-	bh=qUdOjEAMvmH7efMDC7D2HhPL8uzmdroQVyLsnXvG5Wg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cUaeIvOIJLaA5vnSQNHwTX0g8gt5UPDp+v0C43t+z4dA6LA5Rkc653SaaF3u7VSwr
-	 ZMIVn+cwFnfBmtqBO6TKgi4Hl9YbWPsJswHmfFaIDFmw5QazcDisxbQxJGHI58CiSL
-	 3o4ISsRq7WGvsR0whTuAi79XI3xUFFZFudjzczHNac8r2Q0ZrlWyDZTFznYNlR5nvG
-	 +6TimnMd770JhbkULYHofa5xQzqZD3svYAF8UZ+CNY+USfLtOqm1uRnrUQrwHWvAGb
-	 EyPu7ax68A3WRYC+3zuPdqgw/LnrsUFBlPKlMel5oQNVcgAlHqrW/0UkyLnzdmjLwi
-	 87IqbeebjYDAQ==
-Message-ID: <b6cc7bc1-f18b-43d2-a21a-c964466fa882@kernel.org>
-Date: Mon, 6 Apr 2026 12:14:15 -0600
+	s=arc-20240116; t=1775499752; c=relaxed/simple;
+	bh=B8brx8enrGAKNK/GTZCZ9+CebemN9//C1P1BW+RdNSI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SSkWtbwRUbdjYCf3oFpd8Vvm5x465kx6zEhgLl8fFcc7cBslHOmj8gR6e0D77K3TAZyQbXVZL0Nl3SFHJCDAsPgybwLJD+8rCI3PkU5yap4IsFsCUwnprmpLKu9EYZwEzrctFozUY5vf6M4NT5WOzG2A/CTwt171uY/caJcOsiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=n5DKFsXb; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2b0ba3bfe16so41328815ad.1
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 11:22:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775499750; x=1776104550; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X/gVcY2SMYwC6mQAd+Ffvz0fZeo9R6pSPs95jEm28w4=;
+        b=n5DKFsXbjFTtorAc9GnodVWTrpbH6Gv0tUGfS36C30VmT9hjkU6XUfxGxIAM0PB6FB
+         lNqnnmYy2wPL4PNW9JWYEoZD6QjE3ae+cVZbJcxWzbvgdJSVvU5jNi4uqMG1Xx8UItOn
+         FNfI19UzPFyn1fbwIYx9yqvnXxGpiOIVnhYDB6XlSBfCPAlWfSFSlJ1zk0KGRXt8zSh8
+         dJEKCys7+wgtu93YZWEQbyQA5RA92Vw0nMEQADz/6f0Y0jcyRue34K+3Etsp5KscShFJ
+         U38kPjfvBJjCuIvI9GAop1rt9+D17mj2Wj/1N3Bkk02sullm6qdojMxqiwP41WSHFNs7
+         Halw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775499750; x=1776104550;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=X/gVcY2SMYwC6mQAd+Ffvz0fZeo9R6pSPs95jEm28w4=;
+        b=roOd69oEd1f1azKu0DZ2Ln09ewKn7765/rZL2WX81/BGB/s7wjpSVhSFbeffmBqGrB
+         djIE9H+/UHXT9N4Qh8Pas49YU9cqh19Sde/jGpBJ7hxmXCme3DXIHJHCLfMxWVY/92F8
+         Lxyyspgmw2huyOvsMzmMOJzAi5mc4R1fU/r1T28Wro6MOE09hDhyOCtpT48zcEHpJY0r
+         PMt9vXoyXpQn+FY4kwR0xQMRJaAT/wd9C7fqhCDQXMM2zBInxvl12pXU920vC6gkUc/u
+         yEcnztvFT2YX9I0fYN1mYq7pD5bHzv1d/nbW+pI3pZYnUOakU6vLJ+VBcNhBKBuchzQt
+         QFBg==
+X-Forwarded-Encrypted: i=1; AJvYcCV63TQMK4QsR00Qr2B7sOKyNpMx/MeXNtN2GSbKpa9+Fv/dTmQFyh304l0t6fr2NC3/t86NWqI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/SIiWPwykX5xOZaHvsSYYovRqBQdNFmRzj3t8r4L9U/LjHBzY
+	u30BseX75el88ixmjtTwdVTBw88+tVnmpxKeP0Pzc2wVmXy5RWWluEF+TvJrtR8f+Ps=
+X-Gm-Gg: AeBDievqOUjndsif4QZASamExzd8BS9eXBu0vfXlhUekpmXIKyj0XZ+r7lEX0yTwxFG
+	7zP1I6MO8plbyqqp18HnK29/HXYlkoVlyKPr0zS1sgihnp2CV8kpD93QIFcPJN3L7zDah9lGw3X
+	RnV4Xbepit8khRAtQ60XVCpMK/TjpCiKAkkzQNtSqQ3L2dSJNgtEGcU8SvzFjns+bXCeiZoJvqB
+	wAFIyBkG0fkI0P/m4fEA2WggPlZaFX6OjuWFnDj/c6ilMfz1pIhR6Ws26fdgs8J+UUIg68GK+zH
+	PCg0ZbqECuOt3TzMMRWLqHlSJVbXjoICrWmdeg+3mkC9+6Tv4dX2J6BymzdBbb2r+5dgB4UaL5D
+	pz7QQVFGkVCRroOz4AgVvzhVjQqwGp4lHpkCsZCz4/oTCST1Lc6Rb5TQAvUxPbhIRQPxIw3TSHf
+	1YQwiZ1ruPM+xT+2I=
+X-Received: by 2002:a17:902:ce0b:b0:2b0:c060:aab8 with SMTP id d9443c01a7336-2b277d9b788mr149553495ad.9.1775499750169;
+        Mon, 06 Apr 2026 11:22:30 -0700 (PDT)
+Received: from localhost ([2a03:2880:2ff:47::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b27475bc2asm151273645ad.19.2026.04.06.11.22.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Apr 2026 11:22:29 -0700 (PDT)
+Date: Mon, 6 Apr 2026 11:22:29 -0700
+From: Joe Damato <joe@dama.to>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next] net: dropreason: add
+ SKB_DROP_REASON_{BROAD,MULTI}CAST_BACKLOG
+Message-ID: <adP55WGtpzoEGXek@devvm20253.cco0.facebook.com>
+Mail-Followup-To: Joe Damato <joe@dama.to>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com
+References: <20260403022443.3480770-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/1] net: l3mdev: Ignore non-L3 uppers in
- l3mdev_fib_table_rcu
-Content-Language: en-US
-To: Ido Schimmel <idosch@nvidia.com>, Ao Zhou <n05ec@lzu.edu.cn>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Ido Schimmel <idosch@mellanox.com>, Jiri Pirko <jiri@resnulli.us>,
- Yifan Wu <yifanwucs@gmail.com>, Juefei Pu <tomapufckgml@gmail.com>,
- Yuan Tan <yuantan098@gmail.com>, Xin Liu <bird@lzu.edu.cn>,
- Haoze Xie <royenheart@gmail.com>
-References: <cover.1775062214.git.royenheart@gmail.com>
- <429dd4a81d4ca5624ab9f6d7b53c5fe08552c734.1775443332.git.royenheart@gmail.com>
- <20260406154808.GA714138@shredder>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20260406154808.GA714138@shredder>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260403022443.3480770-1-edumazet@google.com>
+X-Spamd-Result: default: False [-0.16 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275696-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,mellanox.com,resnulli.us,gmail.com,lzu.edu.cn];
-	RCPT_COUNT_TWELVE(0.00)[15];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-275697-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	DMARC_NA(0.00)[dama.to];
+	FREEMAIL_CC(0.00)[davemloft.net,kernel.org,redhat.com,google.com,lunn.ch,vger.kernel.org,gmail.com];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dsahern@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 8E08F3A61A0
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,dama-to.20251104.gappssmtp.com:dkim]
+X-Rspamd-Queue-Id: A1ECC3A6254
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/6/26 9:48 AM, Ido Schimmel wrote:
+On Fri, Apr 03, 2026 at 02:24:43AM +0000, Eric Dumazet wrote:
+> ipvlan and macvlan use queues to process broadcast or multicast packets
+> from a work queue.
 > 
-> Don't we have the same problem in l3mdev_l3_rcv() and l3mdev_l3_out()?
-> If so, please check if I missed more places and include them in v3.
+> Under attack these queues can drop packets.
 > 
-> And I think that the part that I was missing earlier is that we don't
-> have RCU synchronization in the unslaving path, so an RCU reader can
-> either see the original master, NULL or a new master (e.g., bridge
-> instead of the original VRF master).
+> Add BROADCAST_BACKLOG drop_reason for macvlan broadcast queue.
+> 
+> Add MULTICAST_BACKLOG drop_reason for ipvlan multicast queue.
+> 
+> Also change ipvlan_rcv_frame() to use SKB_DROP_REASON_DEV_READY
+> when the device is not UP.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  drivers/net/ipvlan/ipvlan_core.c |  4 ++--
+>  drivers/net/macvlan.c            |  2 +-
+>  include/net/dropreason-core.h    | 12 ++++++++++++
+>  3 files changed, 15 insertions(+), 3 deletions(-)
 
-synchronize_rcu after the unlink (control path) seems like a better,
-more robust option than adding more checks to the datapath.
+Reviewed-by: Joe Damato <joe@dama.to>
 
