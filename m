@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-275748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275750-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EDnZBQom1Gn5rgcAu9opvQ
-	(envelope-from <netdev+bounces-275748-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:30:50 +0200
+	id CICXK0Am1Gn5rgcAu9opvQ
+	(envelope-from <netdev+bounces-275750-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:31:44 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDA213A78B4
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:30:48 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F17D83A78EF
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:31:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 54D313013C46
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 21:30:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9B9AA3060AC4
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 21:30:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB608358D0E;
-	Mon,  6 Apr 2026 21:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361B5391839;
+	Mon,  6 Apr 2026 21:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MPtw7w1p"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JyRngsN3"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FEBF304BDF;
-	Mon,  6 Apr 2026 21:30:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33433876BD;
+	Mon,  6 Apr 2026 21:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775511044; cv=none; b=i7vnfpFTSq7cASiFpKo/h2G7GZ/4B3U1XQacMgtcrnNT+g9rETYH/CFQ9kHsismVp3rmz1/1sDEdRFrkp8rwvI8TBRyrMxhwvdrX/8OHkFdcv58enZ0MEoOEaP0b0FThXulBde4aWSFgTGJE+7L407381Q9JFDamWeaED5H0Evo=
+	t=1775511046; cv=none; b=EjNvcK09meSvCifAWZNuM1gVW03Ky5K/Mo3jVT2Dfdq72FzWr9vJOUNcdLijAPGl+LO3NGIhVluRMxVStcEw3p3aAr7t89syvyO5osNC6svwo3HjvHEGv91Uvhpd03ZmygTYWAbydQAyR5i4z+8mYJDbupoTellXWxMCSP32aGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775511044; c=relaxed/simple;
-	bh=EBBX5AvIPQbD/OevBQffUNUxIiVWvmO32BVoUF8K2vA=;
+	s=arc-20240116; t=1775511046; c=relaxed/simple;
+	bh=MB2fVYyMYCmQvw4kqR1JgkxKBAlJ/OcpfBqFXmVy+rg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qlGpjtD504bu3G6m6aqiUXFustHG7S7wKdQ/CsXk1UQryNT4Gldb6CirgToq9a9h5HPkqng996SAs+fpdNuyBHsoWf0sD0CqcJhYUyTiF3oUGm8h8U5yukgpzRkEV+V+Vrp0hmoQMZfMb7dYbK11F9dVL1IQWUd111NrMj2KcIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MPtw7w1p; arc=none smtp.client-ip=192.198.163.13
+	 MIME-Version; b=pFxCiue6m6n7dz700XbyHf6wL1TWvBv/1ysGFEsjuMILlts9S/khNWbmhjcAtiThCLFJTTgFFWRA9ASzhKnI5a1FmHMpsBhEnonFt1a4jouHq90jDS3S0mYg4lMa0ND34xg5oUxVjPaxzMjs9xYXIxXyMhUcnvSaBIgPpYXXQ6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JyRngsN3; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775511043; x=1807047043;
+  t=1775511045; x=1807047045;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=EBBX5AvIPQbD/OevBQffUNUxIiVWvmO32BVoUF8K2vA=;
-  b=MPtw7w1pIeFiyee+hx9uN2Oau+u/VeUzygSxbCJlkh8UZRfl95Rmwyz8
-   T6IjLEfYFv3UJo1e748v2FdqkDdElxYayiBrXaeFk9XRbDSuqprRaxv+D
-   MdhOOqCHdFGV72UfjcJLlUatNKnUEDiZ3SbelnO2S230r3sE033c4h4pw
-   rxHwTTLAA9MKu+wNO+6B6tuZwH+vPxKdbWCPiMT30yGPkkGK9sJdQHkCC
-   Wm+bk1C6gqoRi6ySUR130nYt5lvYMTHnDyljZXuuj2ypiThbJDZdGOn1N
-   z4kVqrV9TVH6PA7mKcQIIhXwAztApWcSDNGsNHea/fyjjn1qLW8H8DWwy
+  bh=MB2fVYyMYCmQvw4kqR1JgkxKBAlJ/OcpfBqFXmVy+rg=;
+  b=JyRngsN3gyeHxwAZapwjuD5wf6eFFThciwb47YXHYG+X0N56S1SNL6KG
+   DHXDp4CJBvmeeQD/EechjSjNSV4XpTkmpkvIeohCF8n4Ku59eRM9C5RxM
+   JYYQthkV7KZmEk3u+RY2pB2w1gXTEJBZi3AOEnHjigzcdEj5biCs5cX8x
+   ojZ9iGf/yxRxFh64+Yu7e6yYGUAohb7K/AE5UpOAZW6y++VVmVOTu9N5Q
+   /XnDWkA7gV6FeIxSEi4gUOx/sXEf+/XaHQBc8Bo5kOgoiQjAQ5TQ/fKE7
+   rWPFTGKtEIE0rRpQm3yuIG7gm5gMzsyn/wx8UJJTWSnSRq/4j26qnf9qh
    g==;
-X-CSE-ConnectionGUID: Ua0k16H5SrKR0TSeiis3yg==
-X-CSE-MsgGUID: 877EuXMnSUK05GXVXH3Mpg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11751"; a="79057388"
+X-CSE-ConnectionGUID: 2VPnhyNdRv+Ki/z7fHrcSA==
+X-CSE-MsgGUID: DiRvoketS4Ka1VCk2V8RJw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11751"; a="79057398"
 X-IronPort-AV: E=Sophos;i="6.23,164,1770624000"; 
-   d="scan'208";a="79057388"
+   d="scan'208";a="79057398"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2026 14:30:41 -0700
-X-CSE-ConnectionGUID: 4Jo9KR5mRWqdTESjopBtWQ==
-X-CSE-MsgGUID: wlc/CXaaTCeXh1hCfsQNxQ==
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2026 14:30:42 -0700
+X-CSE-ConnectionGUID: k0y2AoyvRASaLeCsM3/+jA==
+X-CSE-MsgGUID: mBhsy9hhQ6ei28myPHHX8Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,164,1770624000"; 
-   d="scan'208";a="228248101"
+   d="scan'208";a="228248104"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa007.jf.intel.com with ESMTP; 06 Apr 2026 14:30:40 -0700
+  by orviesa007.jf.intel.com with ESMTP; 06 Apr 2026 14:30:41 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -75,12 +75,12 @@ Cc: Emil Tantilov <emil.s.tantilov@intel.com>,
 	rostedt@goodmis.org,
 	linux-rt-devel@lists.linux.dev,
 	stable@vger.kernel.org,
-	Ray Zhang <sgzhang@google.com>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Li Li <boolli@google.com>,
 	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH net 2/9] idpf: improve locking around idpf_vc_xn_push_free()
-Date: Mon,  6 Apr 2026 14:30:29 -0700
-Message-ID: <20260406213038.444732-3-anthony.l.nguyen@intel.com>
+Subject: [PATCH net 3/9] idpf: set the payload size before calling the async handler
+Date: Mon,  6 Apr 2026 14:30:30 -0700
+Message-ID: <20260406213038.444732-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260406213038.444732-1-anthony.l.nguyen@intel.com>
 References: <20260406213038.444732-1-anthony.l.nguyen@intel.com>
@@ -98,7 +98,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
@@ -106,8 +106,8 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	RCVD_TLS_LAST(0.00)[];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-275748-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TAGGED_FROM(0.00)[bounces-275750-lists,netdev=lfdr.de];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
@@ -117,43 +117,44 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-0.999];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid,linutronix.de:email]
-X-Rspamd-Queue-Id: EDA213A78B4
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linutronix.de:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,intel.com:dkim,intel.com:email,intel.com:mid]
+X-Rspamd-Queue-Id: F17D83A78EF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 From: Emil Tantilov <emil.s.tantilov@intel.com>
 
-Protect the set_bit() operation for the free_xn bitmask in
-idpf_vc_xn_push_free(), to make the locking consistent with rest of the
-code and avoid potential races in that logic.
+Set the payload size before forwarding the reply to the async handler.
+Without this, xn->reply_sz will be 0 and idpf_mac_filter_async_handler()
+will never get past the size check.
 
 Fixes: 34c21fa894a1 ("idpf: implement virtchnl transaction manager")
 Cc: stable@vger.kernel.org
-Reported-by: Ray Zhang <sgzhang@google.com>
 Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Li Li <boolli@google.com>
 Acked-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 Tested-by: Samuel Salin <Samuel.salin@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index 582e0c8e9dc0..fbd5a15b015c 100644
+index fbd5a15b015c..be66f9b2e101 100644
 --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
 +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -402,7 +402,9 @@ static void idpf_vc_xn_push_free(struct idpf_vc_xn_manager *vcxn_mngr,
- 				 struct idpf_vc_xn *xn)
- {
- 	idpf_vc_xn_release_bufs(xn);
-+	spin_lock_bh(&vcxn_mngr->xn_bm_lock);
- 	set_bit(xn->idx, vcxn_mngr->free_xn_bm);
-+	spin_unlock_bh(&vcxn_mngr->xn_bm_lock);
- }
- 
- /**
+@@ -615,6 +615,10 @@ idpf_vc_xn_forward_reply(struct idpf_adapter *adapter,
+ 		err = -ENXIO;
+ 		goto out_unlock;
+ 	case IDPF_VC_XN_ASYNC:
++		/* Set reply_sz from the actual payload so that async_handler
++		 * can evaluate the response.
++		 */
++		xn->reply_sz = ctlq_msg->data_len;
+ 		err = idpf_vc_xn_forward_async(adapter, xn, ctlq_msg);
+ 		idpf_vc_xn_unlock(xn);
+ 		return err;
 -- 
 2.47.1
 
