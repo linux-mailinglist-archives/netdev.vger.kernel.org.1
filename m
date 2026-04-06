@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-275766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275767-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uKclNPsz1GnMsAcAu9opvQ
-	(envelope-from <netdev+bounces-275766-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 00:30:19 +0200
+	id SFIHGN4z1GnMsAcAu9opvQ
+	(envelope-from <netdev+bounces-275767-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 00:29:50 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 645523A7DF6
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 00:30:19 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06AF43A7DDF
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 00:29:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B49D730451EB
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 22:29:38 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9101F301AAA9
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 22:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8434239FCC1;
-	Mon,  6 Apr 2026 22:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B08839FCD6;
+	Mon,  6 Apr 2026 22:29:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c8jAkx5W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YQMcyb6c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f66.google.com (mail-oo1-f66.google.com [209.85.161.66])
+Received: from mail-ot1-f65.google.com (mail-ot1-f65.google.com [209.85.210.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2164039F179
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 22:29:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D292539FCA0
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 22:29:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775514567; cv=none; b=k4tL55/qnWCqPj72Gl+MYZwk1ZUGF/O8Ja+mskJB8aZigVepfHms35L/a8QuKJ4uM2+jKpoBccRV//ZsbSu2rg4xMt1UffR90fqI9vf5TRuThMSUi40Dr89NMQfCXW5dvHjRk8A5j36o3SPAIrC6WJ5RatvnwiDm/uia1ayxxPQ=
+	t=1775514568; cv=none; b=SHVpPEZ6mtVS07uUftPUdyPPliZ/VNqqQm6sHrTTQMRFgB5z6nHdOfo7yXykW+PRq0L0JcVuoYOKzDc5ZbEuSZfCfdNRKbEOoOh9mmt2Ata3KcOYEPdwA0bf3/Mpp2pCpK5vAsRomrphyQUmjUblG8sxw4jDpffZveWPjSOcW5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775514567; c=relaxed/simple;
-	bh=LVxqEMqhWdq76kcJM1NeOGxHfgbldjWfrr7AdKo9egA=;
-	h=From:Date:Message-ID:To:Cc:In-Reply-To:Subject:Content-Type; b=mCqZKqOAesXEgIid6MbsyRfUSYGd3V1r22rjni8eWIixb1SYwS6o07VQszM1AaoW4SlkbHGqT8fwR7APrY8PiEARIJhUFmXojQtNQtReJp1ObPWt8kWlHqhfivlaII1h/Dh0wJwKd1W9dYf+eKII2qi8ORBKZFWMrqz6OqohpmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c8jAkx5W; arc=none smtp.client-ip=209.85.161.66
+	s=arc-20240116; t=1775514568; c=relaxed/simple;
+	bh=kXDSGF0F8rVBu416WMwBhmMjZ7ZQL2luYHiIxwtRGpI=;
+	h=From:Date:Message-ID:To:Cc:In-Reply-To:Subject:Content-Type; b=QuifIBhlbr4fG9yC9mjL/XaS2pDa6YtaspjH9kIsHwi85CEJEVjp51gRkyV68YRkr5f7YP+HYzaclLRltG8c00CWPcq+XUPtW/KINdkMCyUFFDjRhiGZaO6DVKjntRIjAMK15ZmMvbLMU/bdynIuqKYlUPiLLKxm0GzoN30oIwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YQMcyb6c; arc=none smtp.client-ip=209.85.210.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f66.google.com with SMTP id 006d021491bc7-67c22b05346so2501615eaf.2
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 15:29:25 -0700 (PDT)
+Received: by mail-ot1-f65.google.com with SMTP id 46e09a7af769-7dbcd61429cso1011660a34.2
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 15:29:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775514565; x=1776119365; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775514566; x=1776119366; darn=vger.kernel.org;
         h=subject:in-reply-to:cc:to:message-id:date:from:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=cXKQI7WgyKqGZBWGRa2uXVzTyFEOr8G0e8YRMrKRXCc=;
-        b=c8jAkx5W/A+Ng0YIK0+zdiW60hcFhIAxYEX6J5DY9lwMTYX7KmkS+70V9Mb+oXjxj3
-         BwYoqQOiHeQNv5xo0aJkivSnjez8GPn85yD1rKlV8lHT6FTLEU9j9FovmzzDJZiLbHjn
-         cRowQ+oPDaZp+Ha1bJJBYVf2tI29kOC8txDXkXvUBDg/FkEf0X9dQ61g9F2PH7r3xfT5
-         SyHT6bqANnLwOZ+MrLly0c0niitrlBO/gzt1NTZeBijD18xcoBwG99KhHC8J9kyKd1HV
-         9+XZMMKfh093l3cnYZwZm7swevyRV0ybvqIKyiKcEIfkZziUSji+9VmrD+ZjQupYbIyw
-         3NYQ==
+        bh=PYNnHdXi3xjmheUln4I6VmG6L0pt85J9Fa0AQugeFMg=;
+        b=YQMcyb6c2LO5IHmvx4T/Ql/UpJf+n3oremoDTUozW30/7vqTfD3dF5raMEhlq4wTLz
+         lWSU8894fayDpIninwYQohj+/6nB+l7uAjMgxcM5v2hemQZE44rXtmpMsZeBhel7e8Id
+         /3LjmSiLGchtuEE0Tj4DqaAgmpTsRgHB5piGvz2Wh1uAn2O25lWs2/2Dndye6ZmNU4RX
+         4AVAL12pUGziBmh3fr0+qw8xn8lyVeNEkmeIk23c2DiptrRht7K1teJuWCewxmKRIyH+
+         cZ7hpQTVW6tlB3Z57UiWajYAMFKicSDMblrJ6QJys+7BnlpsghWJA6bH/0txGDEbZdBZ
+         1sgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775514565; x=1776119365;
+        d=1e100.net; s=20251104; t=1775514566; x=1776119366;
         h=subject:in-reply-to:cc:to:message-id:date:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cXKQI7WgyKqGZBWGRa2uXVzTyFEOr8G0e8YRMrKRXCc=;
-        b=K+A7zoeIux3Yji/hOSSx2upRhFqlioHS516w25u7MzxkirGHafmiz5xzBUsLg/+Dqd
-         t4q9IjgjGz/SwLSvlnmcd0PK2NXZpmS8gepyhs4kh7dgXzkCFXr9oyVEN1K3OsvV/OAZ
-         G6d51Eg/mpW2xzMcDp50ZmN5YWBUtkjdWyQMf93RM8L2jKb1KKqUN0qjqgZbFrnnoRIU
-         p99ugEXIq32pTC2SH1iCk7z116e2RXoIXzyVOqgD8FiReaul29+SIoLYob9dZvXJxc/0
-         M2F29duOWQlBomzqAdvu4UoYWqSVI8dJq7xExOdwZ5KPUgOzlzSSPgH5F9DfmcbkSpLa
-         uiFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVcHDWdXrr1VvU4iBSi0L8mMCwUgY/tUc6ldDMkUtPWxGMAXsT6dnSrCElXk32Ud7BxItwFX3I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPeHCnjNS8CUBprjrG7ynjN2HCW5lz6DoZ61Fa1W/eoVXMa1Fx
-	ljx9L8WctMs7X2e/C1XJ3H31KHVOaqBanYzeEKrfaOaV3yOlFOqRAGTH
-X-Gm-Gg: AeBDievssLVzM0Q0dWHryQvPM6/qPW7QQztOeeo24mF7uVBjPvCGpJU7hGOh3+VCA7G
-	uoghUUoxybAShEnSWGjCv+ZBAON1T4/Dav9t34p3OP0dS6WE11hQjUOL9Kp5EtviwuZjeyqo0jK
-	iUUokEti+ypAoCApAYSdeCqIaCP4hc55ZhKvdJq+Bi5dCBQ7JJDSw39Ig6AkIIUtc3rLixWEAjp
-	g46C5q07//po5U0dUs9xYE+6uiaGe4yuxKJmwVh5Zyi4/0qncZO1v/yKtHwyieFJppYUdSrMKia
-	Dd7tGDuOXdMH5eRMERM1b+j0tc7TN5EMMVeEpTZWovhI2SGBlxipGy02xIXJr8ix2qHB53XYaio
-	ho9AxjRwQp0P/T97VP61niimtzCTaRu0s6Sy2wsHnX5v2T9y/c/I/S2MeMkP7BWMOuPRQ/JFb6L
-	UV0IZPhflN3IDnQbT45Q==
-X-Received: by 2002:a05:6820:1c83:b0:67e:1b8b:862c with SMTP id 006d021491bc7-6821a14057cmr7653072eaf.0.1775514564994;
-        Mon, 06 Apr 2026 15:29:24 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:72::])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6823d419d09sm6837710eaf.15.2026.04.06.15.29.24
+        bh=PYNnHdXi3xjmheUln4I6VmG6L0pt85J9Fa0AQugeFMg=;
+        b=VMtFDiviggrprHxZELc/0wZtNR6ovtt+gJu2s8R+brQrXgcOfoNJmkuG65ZKBabsWv
+         vtqhXKnH9ueGarNNDM+5YV5GCzWnF+QY3sI6zLZcS5zbM+lrOX0HGSpb9EnozdTBJLxm
+         a6CG9LbBXl3H+juzbNMRuzpM4NiGqWTWcdd6neVrlhPb/Rcd7UzBBdHhd0nw4KEdBsEq
+         WioqP0MSIgl0DpbG9Ir3Ct/ZXADhm4G6MpJ3VvhzMMx/xh6lwfHUUsWnMDc/Xp/z45Uj
+         Punl7EYYt+Rjp4bNhfpBzUCNRMjZge0IjAK7bgZwPUwM0wLE5gsyDBbsbr1NAfJo1A4y
+         cdBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUY7MvBfQT3QktuVTCK1/NaNle7mOL3iScrgLBeC4kZOdFVwHBxA8y+2+EQTeB4vXhbkw6aRhE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAGoTTkIl3XjnZTf2ZQlAHaivFVpc+1epIqbonBU/StPyisfWj
+	Y6fOAf1mL3BDfIOYu+3Sbp1LGY5lpgSSg3LBPWOiTftCx07hQFBFlY4s
+X-Gm-Gg: AeBDietMObcf5IqV5GffdA2WvJMzowGMiIv275FcNj8tSUi+2zq+BEdHnPAWc31aWyi
+	INq8AJHA/UEdW+X+Usy1j6oPC0CIv4gkgqIXssUBKdQuwY9wJV5YwB7Hca5cE0v7eemXbS3qv/X
+	vMucZZs9cL2pr6l7WBMaP59xIEEOm9YIfhzzkRjsWbGAoS3X2YrY5tcbjkxMiw/EnbN3hmjro4p
+	1N1NGxO5axvnEYULSfeHFCN8NnvGXxSt5Nfl0q9uoiBrAHAK+VqiqtqMng4OJ/X4wU48NyGMN3x
+	Gs4Ob8C4mRJqlFGFfA3hoUxsVpyRvkpw+5e6oiN/4mpgtBFmPsDCSjuxwc1zzuwDpG0ZftIHPno
+	qXdWVPB5Xf5hEF1iOHdClLB78JVUuK79wFyWn2dfxpMPpWOeaB2eEFLyGwdgBjXGWiJf1vg213g
+	25L9Ghh9csbWJtS89r
+X-Received: by 2002:a05:6830:71a2:b0:7d7:d097:96dc with SMTP id 46e09a7af769-7dbb6f1c62amr9285732a34.5.1775514565808;
+        Mon, 06 Apr 2026 15:29:25 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:3::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dba72fcb47sm11172893a34.15.2026.04.06.15.29.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2026 15:29:24 -0700 (PDT)
+        Mon, 06 Apr 2026 15:29:25 -0700 (PDT)
 From: sdf.kernel@gmail.com
-Date: Mon, 06 Apr 2026 15:29:24 -0700
-Message-ID: <1762d78b034628249764138bee950a87.sdf.kernel@gmail.com>
+Date: Mon, 06 Apr 2026 15:29:25 -0700
+Message-ID: <0ce79f77f534e1635d53d673d0e909f9.sdf.kernel@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
  davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, jiri@resnulli.us,
  jv@jvosburgh.net
-In-Reply-To: <20260404000606.2413916-1-kuba@kernel.org>
-Subject: Re: [PATCH net-next v5 03/14] net: move promiscuity handling into
- netdev_rx_mode_work (ddeab417d841)
+In-Reply-To: <20260404000608.2414015-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v5 05/14] fbnic: convert to ndo_set_rx_mode_async
+ (1d5e76c60ed0)
 Content-Type: text/plain
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -95,11 +95,11 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
 	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275766-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275767-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -107,7 +107,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
 	FROM_NO_DN(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	RCVD_COUNT_FIVE(0.00)[5];
@@ -119,90 +119,110 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	FREEMAIL_FROM(0.00)[gmail.com];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[sdfkernel@gmail.com,netdev@vger.kernel.org]
-X-Rspamd-Queue-Id: 645523A7DF6
+X-Rspamd-Queue-Id: 06AF43A7DDF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 > This is an AI-generated review of your patch. The human sending this
 > email has considered the AI review valid, or at least plausible.
 > ---
-> net: move promiscuity handling into netdev_rx_mode_work
+> fbnic: convert to ndo_set_rx_mode_async
 > 
-> This commit moves unicast promiscuity tracking into netdev_rx_mode_work so
-> it runs under netdev_ops_lock instead of the addr_lock spinlock. It also
-> changes ASSERT_RTNL() to netdev_ops_assert_locked() in several functions
-> called from the work queue.
+> Convert fbnic from ndo_set_rx_mode to ndo_set_rx_mode_async, updating
+> the driver to take explicit uc/mc lists and using __hw_addr_sync_dev()
+> on the snapshots instead of __dev_uc_sync() on the netdev directly.
 > 
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index 0efac0c730077..08dac9c759996 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -9586,7 +9586,7 @@ int __dev_set_promiscuity(struct net_device *dev, int inc, bool notify)
-> >  	kuid_t uid;
-> >  	kgid_t gid;
-> >  
-> > -	ASSERT_RTNL();
-> > +	netdev_ops_assert_locked(dev);
-> 
-> Can this cause a lockdep assertion failure for unconverted ops-locked devices
-> using the legacy RX mode path?
-
-Correct and addressed later in the series in "net: warn ops-locked drivers
-still using ndo_set_rx_mode". Don't think there is a better way to split
-the patches...
-
-> Replacing ASSERT_RTNL() with netdev_ops_assert_locked(dev) asserts that
-> dev->lock is held for devices where netdev_need_ops_lock(dev) is true.
-> 
+> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> > index b4b396ca9bce3..c406a3b56b37f 100644
+> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
 > [ ... ]
-> 
-> > diff --git a/net/core/dev_addr_lists.c b/net/core/dev_addr_lists.c
-> > index a05db3ac43ea9..61589537b2d3d 100644
-> > --- a/net/core/dev_addr_lists.c
-> > +++ b/net/core/dev_addr_lists.c
-> [ ... ]
-> > @@ -1295,20 +1337,16 @@ void __dev_set_rx_mode(struct net_device *dev)
-> >  	if (!netif_device_present(dev))
-> >  		return;
-> >  
-> > -	if (ops->ndo_set_rx_mode_async) {
-> > +	if (ops->ndo_set_rx_mode_async || ops->ndo_change_rx_flags) {
-> >  		netif_rx_mode_queue(dev);
-> >  		return;
+> > @@ -213,10 +215,10 @@ void __fbnic_set_rx_mode(struct fbnic_dev *fbd)
 > >  	}
 > >  
-> > -	if (!(dev->priv_flags & IFF_UNICAST_FLT)) {
-> > -		if (!netdev_uc_empty(dev) && !dev->uc_promisc) {
-> > -			__dev_set_promiscuity(dev, 1, false);
-> > -			dev->uc_promisc = true;
-> > -		} else if (netdev_uc_empty(dev) && dev->uc_promisc) {
-> > -			__dev_set_promiscuity(dev, -1, false);
-> > -			dev->uc_promisc = false;
-> > -		}
-> > -	}
-> > +	/* Legacy path for non-ops-locked HW devices. */
-> > +
-> > +	promisc_inc = netif_uc_promisc_update(dev);
-> > +	if (promisc_inc)
-> > +		__dev_set_promiscuity(dev, promisc_inc, false);
+> >  	/* Synchronize unicast and multicast address lists */
+> > -	err = __dev_uc_sync(netdev, fbnic_uc_sync, fbnic_uc_unsync);
+> > +	err = __hw_addr_sync_dev(uc, netdev, fbnic_uc_sync, fbnic_uc_unsync);
+> >  	if (err == -ENOSPC)
+> >  		uc_promisc = true;
+> > -	err = __dev_mc_sync(netdev, fbnic_mc_sync, fbnic_mc_unsync);
+> > +	err = __hw_addr_sync_dev(mc, netdev, fbnic_mc_sync, fbnic_mc_unsync);
 > 
-> If an ops-locked device has not yet been converted to implement the new
-> ndo_set_rx_mode_async or ndo_change_rx_flags callbacks, this legacy path
-> will be executed.
+> Since __fbnic_set_rx_mode() performs read-modify-write operations on the
+> internal fbd->mac_addr array and updates the device TCAM, is there a need
+> for internal synchronization?
+>
+> It appears that concurrent out-of-band callers like fbnic_bmc_rpc_check()
+> (from an unlocked workqueue), RTNL paths like fbnic_set_mac(), and the async
+> RX mode workqueue can race on the internal fbd->mac_addr array and interleave
+> writes to the hardware, potentially breaking the RX filtering rules.
 
-Same here, addressed later in the series in "net: warn ops-locked drivers
-still using ndo_set_rx_mode".
+This is bogus, both paths are rntl/ops protested.
 
 > 
-> When a secondary unicast address is added to such a device (e.g., by
-> bringing up a macvlan interface over it) and the device lacks
-> IFF_UNICAST_FLT, netif_uc_promisc_update() returns 1. This triggers a
-> synchronous inline call to __dev_set_promiscuity(dev, 1, false).
+> >  	if (err == -ENOSPC)
+> >  		mc_promisc = true;
+> [ ... ]
+> > @@ -257,7 +262,8 @@ static int fbnic_set_mac(struct net_device *netdev, void *p)
+> >  
+> >  	eth_hw_addr_set(netdev, addr->sa_data);
+> >  
+> > -	fbnic_set_rx_mode(netdev);
+> > +	if (netif_running(netdev))
+> > +		__fbnic_set_rx_mode(fbn->fbd, &netdev->uc, &netdev->mc);
 > 
-> Since __dev_set_rx_mode() is invoked from address list helpers like
-> dev_uc_add() which only hold rtnl_lock() and netif_addr_lock_bh(dev),
-> dev->lock is not held, which would trigger the new assertion in
-> __dev_set_promiscuity().
+> Is it safe to pass the live &netdev->uc and &netdev->mc address lists to
+> __hw_addr_sync_dev() without holding netif_addr_lock_bh() or rtnl_lock()?
+>
+> This bypasses the core network stack's lock, which could lead to list
+> corruption and use-after-free if the network stack concurrently modifies
+> the address lists (e.g., via dev_mc_add()).
+>
+> Additionally, doesn't manually mutating sync_cnt on the live lists bypass
+> the core's snapshot reconciliation state machine?
 
-Same.
+This is the same as before, nothing new added here (and, again, under
+rtnl/ops lock).
+
+> 
+> >  
+> >  	return 0;
+> >  }
+> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+> > index e3aebbe3656d5..6b139cf542567 100644
+> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+> [ ... ]
+> > @@ -180,7 +180,7 @@ static int fbnic_fw_config_after_crash(struct fbnic_dev *fbd)
+> >  	}
+> >  
+> >  	fbnic_rpc_reset_valid_entries(fbd);
+> > -	__fbnic_set_rx_mode(fbd);
+> > +	__fbnic_set_rx_mode(fbd, &fbd->netdev->uc, &fbd->netdev->mc);
+> 
+> Similarly here, fbnic_fw_config_after_crash() appears to be executed from the
+> unlocked fbnic_service_task workqueue. Could this cause lockless data races on
+> the live network stack lists?
+
+Nothing is lockless here, everything is under rtnl at least.
+
+> 
+> >  
+> >  	return 0;
+> >  }
+> > diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+> > index 42a186db43ea9..fe95b6f696463 100644
+> > --- a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+> > +++ b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+> [ ... ]
+> > @@ -244,7 +244,7 @@ void fbnic_bmc_rpc_check(struct fbnic_dev *fbd)
+> >  
+> >  	if (fbd->fw_cap.need_bmc_tcam_reinit) {
+> >  		fbnic_bmc_rpc_init(fbd);
+> > -		__fbnic_set_rx_mode(fbd);
+> > +		__fbnic_set_rx_mode(fbd, &fbd->netdev->uc, &fbd->netdev->mc);
+> 
+> And here as well, passing live address lists without synchronization.
+
+Same here, nothing technically changed and this runs under rtnl.
 
