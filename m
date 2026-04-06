@@ -1,208 +1,129 @@
-Return-Path: <netdev+bounces-275680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275681-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id KOwVKzv002nToQcAu9opvQ
-	(envelope-from <netdev+bounces-275680-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:58:19 +0200
+	id yEADDbv002nToQcAu9opvQ
+	(envelope-from <netdev+bounces-275681-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:00:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EDFF3A5F38
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:58:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 810023A5F7D
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 20:00:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E4E5B301A420
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 17:58:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DA57A302F0D2
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 17:59:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9812393DCA;
-	Mon,  6 Apr 2026 17:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5DB38D6BD;
+	Mon,  6 Apr 2026 17:59:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RU3Qkpzi"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Zhdt7+3M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-dl1-f100.google.com (mail-dl1-f100.google.com [74.125.82.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389A6393DD8
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 17:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20AF238C2D6
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 17:59:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775498291; cv=none; b=nxygbpXazAfUXDhss6/AUVGQwcc3WXuAciZxfW8Xql3z1r16g0Oacs01aKhbBnViT/ZYCQoo6auul2TxR5XG1NCur6IUCoPGzHshwit6/vdTuj+4mB9SjVE3eA6Jh0VQvbV1HtJuj4TXgIv7QHofbcoOMOhE2cekavWGrErKk/A=
+	t=1775498347; cv=none; b=guaWmhPq2kX9emrS3jteh1hpTB9e6rV/Zl/BGpo3NH7uJyprcymjVIdgQSdk89k9XjfU5WlsF+MuIV4dSuTSEwv4napv+rLzqtzNSt1i7jX8t97p9c6wVx690hPAZsyd8pti5GoOF/rYDsb3b+CXCDU4ipv7Gf3gfRRFuUmEWlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775498291; c=relaxed/simple;
-	bh=/VIdnwA1rFPmMjFbFNDc0b6zbIJIlIRpPot0XhXLrzQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pOLL0QbGmJTfoOiicPoBXtQp+EiHcg8qeE1ho8xUDX1gy0NIkBKHdVcwfBPh/aue0blG04i4V2WtybNkqdUSzWX7CR9Wmm6FHKhbvRzMvaIQoHWKtIJKIujPNzX/KHc/0t/F8KTWGb1FGezYnaSBcj7s+0IxFR7c45OBj2/pPDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RU3Qkpzi; arc=none smtp.client-ip=74.125.82.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-dl1-f100.google.com with SMTP id a92af1059eb24-128b9b7e3edso1556814c88.0
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:58:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775498289; x=1776103089;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZGzURbeb7kfWQrJI6B8LRZmFPEfffxSDLiDprZPr0hE=;
-        b=ln0z0Tc1bHIXEDQ+Zg8ACeiIx1A9BU+nv+EaRi8IFq2l3OmDL9ZIzFJF0Fw4NHlNHa
-         YuQUT0k8spL/Eg4BTGzPeDlnVlNHnd6iaMpfcWL9XcQGe3QOEPhV4MMTVW+PDuI5NNnb
-         7HRjSVWLXFsPF8FKq3Li2cVjF2/2AgnawD35Bb2VA/QO07X3+d1+CpMuCxOR51FjxH7q
-         Gh6oRgSL60mNg/wo8+hNgmnsE2SOBqvtPyVrNZ4IqkzZnu2drGMB7RbNUruu9l1iVPMh
-         vZKygmavgicAbgJrB+jav3/ChUXWUF0n8xr2hHG6/ieYb8gJkNhd/IYVYzI7o+3pVT9t
-         B7hQ==
-X-Gm-Message-State: AOJu0YywJxP0wUrhRKKO5WUCwCqomo1PiXpuaH4nJtFz8qaoVYSuGqpt
-	Uc9ue0ddUbztnslLhFiwDDnGock4H8xFAJmvx/CJyuC2EVxiGwPK1MztjCMyhsUO6A6qLV3L89p
-	NNH968uGkr45ydE/p6e7DB0bEsWdeDOF6WtpVw8+xGo3EeWZk7yZFtcxCLJ3I7o5Tv0KBhwqH+F
-	SgsetlbjcesxDMjg5IW0fsYZ9u8siu737OIV2O12RyzbOsJxL8wIctGEl05sjXG2GUyTp7vFBmu
-	j5zsuhR0Q==
-X-Gm-Gg: AeBDieuHczZ2F6h+7eGnWzAN0e3BLw85J5mWgoMez+pM58un/UVtQLOSVA9tSnrbq0+
-	WpRcgK0YkZiTzV3IQXslXXCdUh4Ge+eWh8YWhfT1BWGHUGegVlhxVs2/EvO0hl4lMAtWxWMgsr7
-	zZ/VCNf0e+HHySUaFtxy9o+yhjMGkbqx1uGzlGjuXzUH04+gq9nr6YdLjKrmFjuqZqlQ6EYAiHC
-	74MHluNVFWg1e2oxo58R6h3MEIvqzdRfnbUdXDRC3ZRXkBvpXyge4BZ9Jwcj7aRTbsdRMTv9fAl
-	SxjthX1JuxCPSGAaa6Z8GBZQcBm98c7YPdkc3YrFv0Mdj+zFj3BAITuEQqeQ4xeqIaBew37ik7g
-	XE/HkliYCUSeeJj4tZDw3uYjvCsHYy2ysjNDpzSYj90P0OigT4ldAlywiWhyw4X+kOv/S4flA3A
-	lkuji2njPJuWssp8Agkbd6VoBZCZYGMM61BdS8TRM/fn21ksLykvMUL+c=
-X-Received: by 2002:a05:7022:6881:b0:128:dedf:f56d with SMTP id a92af1059eb24-12bfb74419bmr6394912c88.24.1775498289240;
-        Mon, 06 Apr 2026 10:58:09 -0700 (PDT)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-15.dlp.protect.broadcom.com. [144.49.247.15])
-        by smtp-relay.gmail.com with ESMTPS id a92af1059eb24-12c119518e0sm144893c88.1.2026.04.06.10.58.08
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 06 Apr 2026 10:58:09 -0700 (PDT)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-89f670976acso117044516d6.0
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:58:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1775498287; x=1776103087; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZGzURbeb7kfWQrJI6B8LRZmFPEfffxSDLiDprZPr0hE=;
-        b=RU3QkpzirjOWdv5SrA3MGa0mLuw2y83M0zZMKny9FcDYdbFS167O1AI4Acl4YiXOFX
-         CkmmbeAXAOwpzjosH0AkaFLsR30cz5kPS3tQEWQqsJ5T5WP0WZyj2O5W0ukeRdv3xFUm
-         RfrmcHb5BXr2AwU/vL+Zv6X27hTiHrjSNVPLE=
-X-Received: by 2002:a05:6214:f0c:b0:89c:c668:9d3a with SMTP id 6a1803df08f44-8a7022bb7c9mr234917166d6.12.1775498287007;
-        Mon, 06 Apr 2026 10:58:07 -0700 (PDT)
-X-Received: by 2002:a05:6214:f0c:b0:89c:c668:9d3a with SMTP id 6a1803df08f44-8a7022bb7c9mr234916536d6.12.1775498286182;
-        Mon, 06 Apr 2026 10:58:06 -0700 (PDT)
-Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8a596915986sm141462266d6.24.2026.04.06.10.58.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2026 10:58:05 -0700 (PDT)
-From: Justin Chen <justin.chen@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	bcm-kernel-feedback-list@broadcom.com,
-	florian.fainelli@broadcom.com,
-	opendmb@gmail.com,
-	nb@tipi-net.de,
-	Justin Chen <justin.chen@broadcom.com>
-Subject: [PATCH net v3 3/3] net: bcmgenet: fix racing timeout handler
-Date: Mon,  6 Apr 2026 10:57:56 -0700
-Message-Id: <20260406175756.134567-4-justin.chen@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260406175756.134567-1-justin.chen@broadcom.com>
-References: <20260406175756.134567-1-justin.chen@broadcom.com>
+	s=arc-20240116; t=1775498347; c=relaxed/simple;
+	bh=X5rjy7mqR00+5ilijbVHYlvpgIS2fHz1wGldFo+23AU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Bxw/sh4k69PpFXbR1lqQz23HPiqDRfpmt7Drv+LkLdHaF3UtmIMV1mYKbYqNn8LV0RoFxcomcBPYiUjzOkeMp4eeVTxVqxZIKIXErGGf4gG5IKt3OIAsZKlh5wcCGy1P+jdcrLclSA0/my6XWPMkArzMUK4agvaykXUJZr6T9Z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Zhdt7+3M; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775498334;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=TdEHKp6Sjx6DlhyLwNbUs3hFS5RwtmRESEqCX0Oeqdg=;
+	b=Zhdt7+3Mu1mGVN3N5YDIlAC0rWHNnOTMKVOQytXsqWTCGOvtrOZouN5DW3qapDlin21KOi
+	RroZ342LAx7kjwSN11uU7eNSEYJizs8ssD2P7FcC/qbe2v/mW0neircZLg7TtvMfsDcirF
+	ZVcoLlBN8eh8UJYVckPl3kua6KVWA2Q=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Tim Bird <tim.bird@sony.com>,
+	Thorsten Blum <thorsten.blum@linux.dev>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 1/2] keys, dns: drop unused upayload->data NUL terminator
+Date: Mon,  6 Apr 2026 19:58:09 +0200
+Message-ID: <20260406175810.1018681-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1084; i=thorsten.blum@linux.dev; h=from:subject; bh=X5rjy7mqR00+5ilijbVHYlvpgIS2fHz1wGldFo+23AU=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJmXvxjdc/e9elnizT/3U3eurL9yZl/S852hC6O+dKm8+ 5XNyOd+q6OUhUGMi0FWTJHlwawfM3xLayo3mUTshJnDygQyhIGLUwAmwsTFyNBwTCeqXrR1tdTz 2lLWv9+uZhqmnZX9sHlC5E1V7bdJHaoM/0t+XhQM6E2fFHLV3jtSbeejr5Ys5mzuT1Kcb3y+/kz jLgcA
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,lunn.ch,broadcom.com,gmail.com,tipi-net.de];
+	TAGGED_FROM(0.00)[bounces-275681-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275680-lists,netdev=lfdr.de];
-	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[broadcom.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	NEURAL_HAM(-0.00)[-1.000];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:dkim,broadcom.com:email,broadcom.com:mid,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,tipi-net.de:email];
-	TAGGED_RCPT(0.00)[netdev];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[7]
-X-Rspamd-Queue-Id: 2EDFF3A5F38
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[thorsten.blum@linux.dev,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 810023A5F7D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The bcmgenet_timeout handler tries to take down all tx queues when
-a single queue times out. This is over zealous and causes many race
-conditions with queues that are still chugging along. Instead lets
-only restart the timed out queue.
+In dns_resolver_preparse(), do not NUL-terminate ->data and allocate one
+byte less. The NUL terminator is never used and only ->datalen bytes are
+accessed.
 
-Fixes: 13ea657806cf ("net: bcmgenet: improve TX timeout")
-Signed-off-by: Justin Chen <justin.chen@broadcom.com>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Reviewed-by: Nicolai Buchwitz <nb@tipi-net.de>
-Tested-by: Nicolai Buchwitz <nb@tipi-net.de>
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- .../net/ethernet/broadcom/genet/bcmgenet.c    | 22 ++++++++-----------
- 1 file changed, 9 insertions(+), 13 deletions(-)
+ net/dns_resolver/dns_key.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index e89126a0c20e..54f71b1e85fc 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -3477,27 +3477,23 @@ static void bcmgenet_dump_tx_queue(struct bcmgenet_tx_ring *ring)
- static void bcmgenet_timeout(struct net_device *dev, unsigned int txqueue)
- {
- 	struct bcmgenet_priv *priv = netdev_priv(dev);
--	u32 int1_enable = 0;
--	unsigned int q;
-+	struct bcmgenet_tx_ring *ring = &priv->tx_rings[txqueue];
-+	struct netdev_queue *txq = netdev_get_tx_queue(dev, txqueue);
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index c3c8c3240ef9..451247864a63 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -203,7 +203,7 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
+ 	kdebug("store result");
+ 	prep->quotalen = result_len;
  
- 	netif_dbg(priv, tx_err, dev, "bcmgenet_timeout\n");
+-	upayload = kmalloc_flex(*upayload, data, result_len + 1);
++	upayload = kmalloc_flex(*upayload, data, result_len);
+ 	if (!upayload) {
+ 		kleave(" = -ENOMEM");
+ 		return -ENOMEM;
+@@ -211,7 +211,6 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
  
--	for (q = 0; q <= priv->hw_params->tx_queues; q++)
--		bcmgenet_dump_tx_queue(&priv->tx_rings[q]);
--
--	bcmgenet_tx_reclaim_all(dev);
-+	bcmgenet_dump_tx_queue(ring);
+ 	upayload->datalen = result_len;
+ 	memcpy(upayload->data, data, result_len);
+-	upayload->data[result_len] = '\0';
  
--	for (q = 0; q <= priv->hw_params->tx_queues; q++)
--		int1_enable |= (1 << q);
-+	bcmgenet_tx_reclaim(dev, ring, true);
- 
--	/* Re-enable TX interrupts if disabled */
--	bcmgenet_intrl2_1_writel(priv, int1_enable, INTRL2_CPU_MASK_CLEAR);
-+	/* Re-enable the TX interrupt for this ring */
-+	bcmgenet_intrl2_1_writel(priv, 1 << txqueue, INTRL2_CPU_MASK_CLEAR);
- 
--	netif_trans_update(dev);
-+	txq_trans_cond_update(txq);
- 
--	BCMGENET_STATS64_INC((&priv->tx_rings[txqueue].stats64), errors);
-+	BCMGENET_STATS64_INC((&ring->stats64), errors);
- 
--	netif_tx_wake_all_queues(dev);
-+	netif_tx_wake_queue(txq);
- }
- 
- #define MAX_MDF_FILTER	17
--- 
-2.34.1
-
+ 	prep->payload.data[dns_key_data] = upayload;
+ 	kleave(" = 0");
 
