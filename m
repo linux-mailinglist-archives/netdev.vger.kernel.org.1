@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-275754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275756-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MMoEOBom1Gn5rgcAu9opvQ
-	(envelope-from <netdev+bounces-275754-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:31:06 +0200
+	id OAETLJ4m1Gn5rgcAu9opvQ
+	(envelope-from <netdev+bounces-275756-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:33:18 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F15B3A78C3
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:31:06 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45E823A7924
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:33:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id BF5BC301F283
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 21:30:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 35622308B5A3
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 21:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8114339185D;
-	Mon,  6 Apr 2026 21:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35BB63976AB;
+	Mon,  6 Apr 2026 21:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TpOQ7KpS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OT/ZHl+c"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD3F390215
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 21:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD6238C2BE;
+	Mon,  6 Apr 2026 21:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775511048; cv=none; b=bQkZZcyZz3V4fbZESKmLt7vhSO3W1Lvwcs3QRUmor0Q83A7YLuKpTSYZN7mvmjqbqcZrpToYOiNbGKLDbVq9vIVPxpjVB89TTkwGphVq8bxDEwvxpWmvlvKHOfMp5cdBCvdjY3ctJqp1TP/AiNRaM/akQTeSP4CLwY3x6y8hYMA=
+	t=1775511049; cv=none; b=IdS/e2vbaRKJU/XR0cLP40kJVXNrXZ3A8hzAKM+GPAXKSUKmhV8j+xEU2Oe0qF1m0YYbUotpEzUq38pg0LWX9Sn9V/p7PZ3VDwQ6oXAdFfnZKF8CnkmGwBCCDNc/0niOdTzn4w/DbuvLc/r7xqJrCwc2E2y0/5asfy/AgIBX1DI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775511048; c=relaxed/simple;
-	bh=BBwjgRdaqANREThw2MhZ2ChLB2tk9qMkoLA5ZQTZyf0=;
+	s=arc-20240116; t=1775511049; c=relaxed/simple;
+	bh=oiYwxhECjz3AIHcUgobFSs0e+AuAlRnHRi4XWl6bYz0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oqlyb+hfshx+J7A2RTecWmVkc7t0QX8Qj49cIt4BlZxuQygqzOoDTQwQEeDz5ni26bS4vZs32Orrc/6xkQGTC4+W2xSpvUMnCf/sA2AW1s6B56/Yyp6kkrGPs2vUNMAQVqe/slCm7E9hYVS5TBk/rZecgw3miqbShJSLoWxIfv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TpOQ7KpS; arc=none smtp.client-ip=192.198.163.13
+	 MIME-Version; b=DFb8tf8Zs2totGaIRmgxMUg1l1g6LaApz1PeHk2EhVgEFTDNkP1Nvnjwf0xuNzDq0XpkhEyQDFM4Xrshqe8AGXXdyiMevJNcb6uzpZLSgYwJ0Kw4SG6RBaDdyqtg+xGmYUVwlM+kr8/lOogCSvav57r9n/wqQCrVfIijArtYX+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OT/ZHl+c; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775511047; x=1807047047;
+  t=1775511048; x=1807047048;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=BBwjgRdaqANREThw2MhZ2ChLB2tk9qMkoLA5ZQTZyf0=;
-  b=TpOQ7KpSL0nplwQ6zoXZjhIZbs4KtOIczZ3nrWZhcZm7PmCEvhEJ+MtP
-   Bg48+XtYkzXLs7pmiQk8cnrfDKeqLE5oezQzJv5XOayvN5gAO9pPPaT63
-   cjoww39/L36JzBl31n4koX10QdpRqxfgHeSbQ/tIW72ZVjjElFherW9Tp
-   uQqJey0HL2Srl2yWCtqn9MRSwF0tMopVb6112MoOso8up9finf+B4hH2k
-   gQc6DhG8eEU/LqsBTG4UeNlr8I/6Rf84X2Y3SRLiCQKfKkmGbxHmblB2j
-   AkXjBIReaeqPdWJBa5dKQPdmPgHfiuNw94SggyNmp8bFX98PGVZK9RBd+
-   Q==;
-X-CSE-ConnectionGUID: u4xDLCb1Q6+dEmsfwvEepw==
-X-CSE-MsgGUID: vU5XjGAQTVSVpM3ST9rOYw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11751"; a="79057429"
+  bh=oiYwxhECjz3AIHcUgobFSs0e+AuAlRnHRi4XWl6bYz0=;
+  b=OT/ZHl+cw4Mt6zwwhysYL6tZ/LAMYzePe5mqLDR9gOPwkxql4cqGe64+
+   YoKbWHwMeymxvM0JrMvDFrRzU08E6N5zAfuew+kjwuC8igCZo8s1ELZEo
+   1S6S5vp9O00u3Lb0KkRByzaZSAC0HLkuAcFBcLN/JgioryBhSU6B9a79M
+   4+Q/1QX1seZcKy8L8huOw0VuWBouz4lCBYnmtH0Lm0ziZMcb5ityjrPLx
+   Atp6+c+blSHFdl+TwpEFX0juRY4yV/zUf1yMBY3yzL0CkNN8xKyTmo+Gu
+   8KpshgrpyOxnGaONZ7UScTeFYyJc/Xdc0M6IbgXrS9xvWWJAt72mw2dS+
+   w==;
+X-CSE-ConnectionGUID: ZAAe3ZkmTmqccdtYBM092g==
+X-CSE-MsgGUID: kS7Czz1aSCCSRtu4QYyaCA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11751"; a="79057433"
 X-IronPort-AV: E=Sophos;i="6.23,164,1770624000"; 
-   d="scan'208";a="79057429"
+   d="scan'208";a="79057433"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
   by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2026 14:30:42 -0700
-X-CSE-ConnectionGUID: e1Wc+tVgTb+ixZ5vVbDVqQ==
-X-CSE-MsgGUID: xe5PDSMUS2K/74gNIUe7Kg==
+X-CSE-ConnectionGUID: 59RiAQ1ZS2CkLg09NEkGzQ==
+X-CSE-MsgGUID: 7psJ9mzjQDyLh8OjTffVeg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,164,1770624000"; 
-   d="scan'208";a="228248117"
+   d="scan'208";a="228248123"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa007.jf.intel.com with ESMTP; 06 Apr 2026 14:30:41 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -68,13 +68,24 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Michal Schmidt <mschmidt@redhat.com>,
+Cc: Alex Dvoretsky <advoretsky@gmail.com>,
 	anthony.l.nguyen@intel.com,
-	Xiaoqiang Xiong <xxiong@redhat.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH net 7/9] ixgbevf: add missing negotiate_features op to Hyper-V ops table
-Date: Mon,  6 Apr 2026 14:30:34 -0700
-Message-ID: <20260406213038.444732-8-anthony.l.nguyen@intel.com>
+	kurt@linutronix.de,
+	sriram.yagnaraman@ericsson.com,
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@fomichev.me,
+	bpf@vger.kernel.org,
+	stable@vger.kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Patryk Holda <patryk.holda@intel.com>
+Subject: [PATCH net 8/9] igb: remove napi_synchronize() in igb_down()
+Date: Mon,  6 Apr 2026 14:30:35 -0700
+Message-ID: <20260406213038.444732-9-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20260406213038.444732-1-anthony.l.nguyen@intel.com>
 References: <20260406213038.444732-1-anthony.l.nguyen@intel.com>
@@ -87,102 +98,91 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	MID_CONTAINS_FROM(1.00)[];
 	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[gmail.com,intel.com,linutronix.de,ericsson.com,kernel.org,iogearbox.net,fomichev.me,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[21];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-275756-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[anthony.l.nguyen@intel.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275754-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
 	DKIM_TRACE(0.00)[intel.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_COUNT_FIVE(0.00)[5];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6F15B3A78C3
+	NEURAL_HAM(-0.00)[-0.997];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,intel.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 45E823A7924
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Michal Schmidt <mschmidt@redhat.com>
+From: Alex Dvoretsky <advoretsky@gmail.com>
 
-Commit a7075f501bd3 ("ixgbevf: fix mailbox API compatibility by
-negotiating supported features") added the .negotiate_features callback
-to ixgbe_mac_operations and populated it in ixgbevf_mac_ops, but forgot
-to add it to ixgbevf_hv_mac_ops. This leaves the function pointer NULL
-on Hyper-V VMs.
+When an AF_XDP zero-copy application terminates abruptly (e.g., kill -9),
+the XSK buffer pool is destroyed but NAPI polling continues.
+igb_clean_rx_irq_zc() repeatedly returns the full budget, preventing
+napi_complete_done() from clearing NAPI_STATE_SCHED.
 
-During probe, ixgbevf_negotiate_api() calls ixgbevf_set_features(),
-which unconditionally dereferences hw->mac.ops.negotiate_features().
-On Hyper-V this results in a NULL pointer dereference:
+igb_down() calls napi_synchronize() before napi_disable() for each queue
+vector. napi_synchronize() spins waiting for NAPI_STATE_SCHED to clear,
+which never happens. igb_down() blocks indefinitely, the TX watchdog
+fires, and the TX queue remains permanently stalled.
 
-  BUG: kernel NULL pointer dereference, address: 0000000000000000
-  [...]
-  Hardware name: Microsoft Corporation Virtual Machine/Virtual Machine [...]
-  Workqueue: events work_for_cpu_fn
-  RIP: 0010:0x0
-  [...]
-  Call Trace:
-   ixgbevf_negotiate_api+0x66/0x160 [ixgbevf]
-   ixgbevf_sw_init+0xe4/0x1f0 [ixgbevf]
-   ixgbevf_probe+0x20f/0x4a0 [ixgbevf]
-   local_pci_probe+0x50/0xa0
-   work_for_cpu_fn+0x1a/0x30
-   [...]
+napi_disable() already handles this correctly: it sets NAPI_STATE_DISABLE.
+After a full-budget poll, __napi_poll() checks napi_disable_pending(). If
+set, it forces completion and clears NAPI_STATE_SCHED, breaking the loop
+that napi_synchronize() cannot.
 
-Add ixgbevf_hv_negotiate_features_vf() that returns -EOPNOTSUPP and
-wire it into ixgbevf_hv_mac_ops. The caller already handles -EOPNOTSUPP
-gracefully.
+napi_synchronize() was added in commit 41f149a285da ("igb: Fix possible
+panic caused by Rx traffic arrival while interface is down").
+napi_disable() provides stronger guarantees: it prevents further
+scheduling and waits for any active poll to exit.
+Other Intel drivers (ixgbe, ice, i40e) use napi_disable() without a
+preceding napi_synchronize() in their down paths.
 
-Fixes: a7075f501bd3 ("ixgbevf: fix mailbox API compatibility by negotiating supported features")
-Reported-by: Xiaoqiang Xiong <xxiong@redhat.com>
-Closes: https://issues.redhat.com/browse/RHEL-155455
-Assisted-by: Claude:claude-4.6-opus-high Cursor
-Tested-by: Xiaoqiang Xiong <xxiong@redhat.com>
-Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+Remove redundant napi_synchronize() call and reorder napi_disable()
+before igb_set_queue_napi() so the queue-to-NAPI mapping is only
+cleared after polling has fully stopped.
+
+Fixes: 2c6196013f84 ("igb: Add AF_XDP zero-copy Rx support")
+Cc: stable@vger.kernel.org
+Suggested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Alex Dvoretsky <advoretsky@gmail.com>
+Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Tested-by: Patryk Holda <patryk.holda@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ixgbevf/vf.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/net/ethernet/intel/igb/igb_main.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.c b/drivers/net/ethernet/intel/ixgbevf/vf.c
-index b67b580f7f1c..f6df86d124b9 100644
---- a/drivers/net/ethernet/intel/ixgbevf/vf.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/vf.c
-@@ -709,6 +709,12 @@ static int ixgbevf_negotiate_features_vf(struct ixgbe_hw *hw, u32 *pf_features)
- 	return err;
- }
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index ee99fd8fd513..ce91dda00ec0 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -2203,9 +2203,8 @@ void igb_down(struct igb_adapter *adapter)
  
-+static int ixgbevf_hv_negotiate_features_vf(struct ixgbe_hw *hw,
-+					    u32 *pf_features)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- /**
-  *  ixgbevf_set_vfta_vf - Set/Unset VLAN filter table address
-  *  @hw: pointer to the HW structure
-@@ -1142,6 +1148,7 @@ static const struct ixgbe_mac_operations ixgbevf_hv_mac_ops = {
- 	.setup_link		= ixgbevf_setup_mac_link_vf,
- 	.check_link		= ixgbevf_hv_check_mac_link_vf,
- 	.negotiate_api_version	= ixgbevf_hv_negotiate_api_version_vf,
-+	.negotiate_features	= ixgbevf_hv_negotiate_features_vf,
- 	.set_rar		= ixgbevf_hv_set_rar_vf,
- 	.update_mc_addr_list	= ixgbevf_hv_update_mc_addr_list_vf,
- 	.update_xcast_mode	= ixgbevf_hv_update_xcast_mode,
+ 	for (i = 0; i < adapter->num_q_vectors; i++) {
+ 		if (adapter->q_vector[i]) {
+-			napi_synchronize(&adapter->q_vector[i]->napi);
+-			igb_set_queue_napi(adapter, i, NULL);
+ 			napi_disable(&adapter->q_vector[i]->napi);
++			igb_set_queue_napi(adapter, i, NULL);
+ 		}
+ 	}
+ 
 -- 
 2.47.1
 
