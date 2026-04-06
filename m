@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-275558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275559-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qJY5N1SM02nFiwcAu9opvQ
-	(envelope-from <netdev+bounces-275558-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 12:35:00 +0200
+	id EGumGquM02nFiwcAu9opvQ
+	(envelope-from <netdev+bounces-275559-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 12:36:27 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 824D73A2D57
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 12:35:00 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B31B53A2DAD
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 12:36:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id CF25930074A4
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 10:34:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A685C302AC35
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 10:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CC032AAC6;
-	Mon,  6 Apr 2026 10:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBDF32AADE;
+	Mon,  6 Apr 2026 10:35:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i7vYzAXW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RZ9w36XF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FAF43290DB;
-	Mon,  6 Apr 2026 10:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED42B329E6C;
+	Mon,  6 Apr 2026 10:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775471699; cv=none; b=qtlRlI9FZ2mgOmepAF0R8JVHynKhqUAdAbyayHigibXIur4bPu7UJ48WRBvJTCZBjv/IumLZMsBTL96wzRhWkbarr2FIzphUfZTjt0as5apSzKGqIfIYy3iUdpy86toMU0na+oCb4TCcK8q0DE4VNlsms1aEPLuA2xik7mgMDYY=
+	t=1775471702; cv=none; b=nNklrDnkhTR/sr+Xun5FxWRGT1G8+XSLtoM2kQZh40ugs6ng41MOLL/K7S2yxCrx7BG1MqTCT82uznisYxZ66mLGvYeF83SF9gecpyjwkuTSXCOda+Qev+Po1esVsSIbT078WURdeX6TxGZuLpzKc+9UCNc88BQsEWnsWjqi+no=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775471699; c=relaxed/simple;
-	bh=fg8IocJA5vXQMLynYvLHDQ9WFhBhFX6UWbPpMcsa0pE=;
+	s=arc-20240116; t=1775471702; c=relaxed/simple;
+	bh=7tdbmMyyemQhDrB5zxY6X1u58OSzm7oOpI/1zW/UIl8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TXqAUoyPzb7kjXQw+5v9aZ/I9Ug1S9s2LE9rUfrKmdp0cWE9jrNi+2yLI/kedqO9zbQXSQzwycVKzNu6qQOzW2j8c4wFKlXp4csZTz4Wc+y6GHnGR6r1N93wGHKgKTYVFpKVwxGJ4JxU7qULof0pNH3lFGrLFey5PzdZF2kIvSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i7vYzAXW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D416CC4CEF7;
-	Mon,  6 Apr 2026 10:34:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=nUWisdANoqnZyYuIeZUix1Io/axEUDp6s1AXcr94muDlQLuPNF1KrbFVmtGNB8LQm2UHprgCXzUWxI9br76EC7cusgNvYn+ijAKRXAectqG9txSv1AEBBsRSLJ7HElWNIixQb7cdGSgvmmj2sTgK2OWoNCvH3dcny6DLJvRJT0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RZ9w36XF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43811C19425;
+	Mon,  6 Apr 2026 10:35:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775471699;
-	bh=fg8IocJA5vXQMLynYvLHDQ9WFhBhFX6UWbPpMcsa0pE=;
+	s=k20201202; t=1775471701;
+	bh=7tdbmMyyemQhDrB5zxY6X1u58OSzm7oOpI/1zW/UIl8=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=i7vYzAXW6yGMCQJkkoB0JLvb7WMYK68uYXNhFhTLRmkQLcBl6PMFnLD7jlPSGHJbQ
-	 10qpgkLb/M+4e1IJtuICLCloE9ibYi9kQFgII7WYsN5bSXVF5vB7bb7ie3lxfTlTHZ
-	 T8UoQn21ZG+rbhjJWbQK3uphSGXgqEgqR/ErR/t33J0974yiRf9CSqq5IAN27x0F4F
-	 lRORnnCfGofiEmVtzOVbDkECARziZNz6pTRuDfRSBcHJ9HjW56xCzrJJnS3Wg1kC9B
-	 TyXWp2jQR7VjJkh0YwLEDTiIy9yaxtSwR2re9yGcRz4maFALI7v3urvCI3zkruBF9B
-	 vNpptEl60LSSg==
+	b=RZ9w36XFsnBxFpyRlKbwZTIGCJ0rea4bDHb3dQOQ7Vobb69BdlrhYnyRmK/tG3JhE
+	 dNk6ZXDYYtt3qSTXrM2u4Jaa1Ye7G224z7M3mO3fdXlVRo6aXtUZTaHqIOcJCqxFHm
+	 wYo9kmxcGpPJ6P2ON93V7D0YBTrvGihdRN7FILLG2o1g7dHHg8cbsToJNzt43Vjx5K
+	 AJF38R0ZXLIA5racKzA6Kz7461qa6iCj4mpfeZhqsy4fCf7LO2yRvYdjxOG3rMZvAc
+	 fpRAZ8DiWPNmqIBVlb2Lr7mCrGf4pyVV7QaHLOsUGOREXW5fBPNsD27Dq0WTnBwmZc
+	 Re67jVnuFiY9g==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 06 Apr 2026 12:34:08 +0200
-Subject: [PATCH net-next v3 03/12] net: airoha: Rely on net_device pointer
- in airoha_dev_setup_tc_block signature
+Date: Mon, 06 Apr 2026 12:34:09 +0200
+Subject: [PATCH net-next v3 04/12] net: airoha: Rely on net_device pointer
+ in HTB callbacks
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260406-airoha-eth-multi-serdes-v3-3-ab6ea49d59ff@kernel.org>
+Message-Id: <20260406-airoha-eth-multi-serdes-v3-4-ab6ea49d59ff@kernel.org>
 References: <20260406-airoha-eth-multi-serdes-v3-0-ab6ea49d59ff@kernel.org>
 In-Reply-To: <20260406-airoha-eth-multi-serdes-v3-0-ab6ea49d59ff@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -75,11 +75,11 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275558-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275559-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -96,70 +96,176 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev,dt];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[airoha.com:email]
-X-Rspamd-Queue-Id: 824D73A2D57
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[airoha.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B31B53A2DAD
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Remove airoha_gdm_port dependency in airoha_dev_setup_tc_block routine
-signature and rely on net_device pointer instead. Please note this patch
-does not introduce any logical change and it is a preliminary patch to
-support multiple net_devices connected to the GDM3 or GDM4 ports via an
+Remove airoha_gdm_port dependency in HTB tc callback signatures and rely
+on net_device pointer instead. Please note this patch does not introduce
+any logical change and it is a preliminary patch in order to support
+multiple net_devices connected to the same GDM3 or GDM4 port via an
 external hw arbiter.
 
 Tested-by: Xuegang Lu <xuegang.lu@airoha.com>
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_eth.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/airoha/airoha_eth.c | 51 ++++++++++++++++++--------------
+ 1 file changed, 28 insertions(+), 23 deletions(-)
 
 diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 4b5581596043..e2fc57cb5020 100644
+index e2fc57cb5020..8dc50d60f136 100644
 --- a/drivers/net/ethernet/airoha/airoha_eth.c
 +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2692,7 +2692,7 @@ static int airoha_dev_setup_tc_block_cb(enum tc_setup_type type,
+@@ -2497,10 +2497,11 @@ static int airoha_qdma_set_trtcm_token_bucket(struct airoha_qdma *qdma,
+ 					   mode, val);
+ }
+ 
+-static int airoha_qdma_set_tx_rate_limit(struct airoha_gdm_port *port,
++static int airoha_qdma_set_tx_rate_limit(struct net_device *netdev,
+ 					 int channel, u32 rate,
+ 					 u32 bucket_size)
+ {
++	struct airoha_gdm_port *port = netdev_priv(netdev);
+ 	int i, err;
+ 
+ 	for (i = 0; i <= TRTCM_PEAK_MODE; i++) {
+@@ -2520,21 +2521,21 @@ static int airoha_qdma_set_tx_rate_limit(struct airoha_gdm_port *port,
+ 	return 0;
+ }
+ 
+-static int airoha_tc_htb_alloc_leaf_queue(struct airoha_gdm_port *port,
++static int airoha_tc_htb_alloc_leaf_queue(struct net_device *netdev,
+ 					  struct tc_htb_qopt_offload *opt)
+ {
+ 	u32 channel = TC_H_MIN(opt->classid) % AIROHA_NUM_QOS_CHANNELS;
+ 	u32 rate = div_u64(opt->rate, 1000) << 3; /* kbps */
+-	struct net_device *dev = port->dev;
+-	int num_tx_queues = dev->real_num_tx_queues;
+-	int err;
++	int err, num_tx_queues = netdev->real_num_tx_queues;
++	struct airoha_gdm_port *port = netdev_priv(netdev);
+ 
+ 	if (opt->parent_classid != TC_HTB_CLASSID_ROOT) {
+ 		NL_SET_ERR_MSG_MOD(opt->extack, "invalid parent classid");
+ 		return -EINVAL;
+ 	}
+ 
+-	err = airoha_qdma_set_tx_rate_limit(port, channel, rate, opt->quantum);
++	err = airoha_qdma_set_tx_rate_limit(netdev, channel, rate,
++					    opt->quantum);
+ 	if (err) {
+ 		NL_SET_ERR_MSG_MOD(opt->extack,
+ 				   "failed configuring htb offload");
+@@ -2544,9 +2545,10 @@ static int airoha_tc_htb_alloc_leaf_queue(struct airoha_gdm_port *port,
+ 	if (opt->command == TC_HTB_NODE_MODIFY)
+ 		return 0;
+ 
+-	err = netif_set_real_num_tx_queues(dev, num_tx_queues + 1);
++	err = netif_set_real_num_tx_queues(netdev, num_tx_queues + 1);
+ 	if (err) {
+-		airoha_qdma_set_tx_rate_limit(port, channel, 0, opt->quantum);
++		airoha_qdma_set_tx_rate_limit(netdev, channel, 0,
++					      opt->quantum);
+ 		NL_SET_ERR_MSG_MOD(opt->extack,
+ 				   "failed setting real_num_tx_queues");
+ 		return err;
+@@ -2733,44 +2735,47 @@ static int airoha_dev_setup_tc_block(struct net_device *dev,
  	}
  }
  
--static int airoha_dev_setup_tc_block(struct airoha_gdm_port *port,
-+static int airoha_dev_setup_tc_block(struct net_device *dev,
- 				     struct flow_block_offload *f)
+-static void airoha_tc_remove_htb_queue(struct airoha_gdm_port *port, int queue)
++static void airoha_tc_remove_htb_queue(struct net_device *netdev, int queue)
  {
- 	flow_setup_cb_t *cb = airoha_dev_setup_tc_block_cb;
-@@ -2705,12 +2705,12 @@ static int airoha_dev_setup_tc_block(struct airoha_gdm_port *port,
- 	f->driver_block_list = &block_cb_list;
- 	switch (f->command) {
- 	case FLOW_BLOCK_BIND:
--		block_cb = flow_block_cb_lookup(f->block, cb, port->dev);
-+		block_cb = flow_block_cb_lookup(f->block, cb, dev);
- 		if (block_cb) {
- 			flow_block_cb_incref(block_cb);
- 			return 0;
- 		}
--		block_cb = flow_block_cb_alloc(cb, port->dev, port->dev, NULL);
-+		block_cb = flow_block_cb_alloc(cb, dev, dev, NULL);
- 		if (IS_ERR(block_cb))
- 			return PTR_ERR(block_cb);
+-	struct net_device *dev = port->dev;
++	struct airoha_gdm_port *port = netdev_priv(netdev);
  
-@@ -2719,7 +2719,7 @@ static int airoha_dev_setup_tc_block(struct airoha_gdm_port *port,
- 		list_add_tail(&block_cb->driver_list, &block_cb_list);
- 		return 0;
- 	case FLOW_BLOCK_UNBIND:
--		block_cb = flow_block_cb_lookup(f->block, cb, port->dev);
-+		block_cb = flow_block_cb_lookup(f->block, cb, dev);
- 		if (!block_cb)
- 			return -ENOENT;
+-	netif_set_real_num_tx_queues(dev, dev->real_num_tx_queues - 1);
+-	airoha_qdma_set_tx_rate_limit(port, queue + 1, 0, 0);
++	netif_set_real_num_tx_queues(netdev, netdev->real_num_tx_queues - 1);
++	airoha_qdma_set_tx_rate_limit(netdev, queue + 1, 0, 0);
+ 	clear_bit(queue, port->qos_sq_bmap);
+ }
  
-@@ -2818,7 +2818,7 @@ static int airoha_dev_tc_setup(struct net_device *dev, enum tc_setup_type type,
- 		return airoha_tc_setup_qdisc_htb(port, type_data);
- 	case TC_SETUP_BLOCK:
- 	case TC_SETUP_FT:
--		return airoha_dev_setup_tc_block(port, type_data);
-+		return airoha_dev_setup_tc_block(dev, type_data);
+-static int airoha_tc_htb_delete_leaf_queue(struct airoha_gdm_port *port,
++static int airoha_tc_htb_delete_leaf_queue(struct net_device *netdev,
+ 					   struct tc_htb_qopt_offload *opt)
+ {
+ 	u32 channel = TC_H_MIN(opt->classid) % AIROHA_NUM_QOS_CHANNELS;
++	struct airoha_gdm_port *port = netdev_priv(netdev);
+ 
+ 	if (!test_bit(channel, port->qos_sq_bmap)) {
+ 		NL_SET_ERR_MSG_MOD(opt->extack, "invalid queue id");
+ 		return -EINVAL;
+ 	}
+ 
+-	airoha_tc_remove_htb_queue(port, channel);
++	airoha_tc_remove_htb_queue(netdev, channel);
+ 
+ 	return 0;
+ }
+ 
+-static int airoha_tc_htb_destroy(struct airoha_gdm_port *port)
++static int airoha_tc_htb_destroy(struct net_device *netdev)
+ {
++	struct airoha_gdm_port *port = netdev_priv(netdev);
+ 	int q;
+ 
+ 	for_each_set_bit(q, port->qos_sq_bmap, AIROHA_NUM_QOS_CHANNELS)
+-		airoha_tc_remove_htb_queue(port, q);
++		airoha_tc_remove_htb_queue(netdev, q);
+ 
+ 	return 0;
+ }
+ 
+-static int airoha_tc_get_htb_get_leaf_queue(struct airoha_gdm_port *port,
++static int airoha_tc_get_htb_get_leaf_queue(struct net_device *netdev,
+ 					    struct tc_htb_qopt_offload *opt)
+ {
+ 	u32 channel = TC_H_MIN(opt->classid) % AIROHA_NUM_QOS_CHANNELS;
++	struct airoha_gdm_port *port = netdev_priv(netdev);
+ 
+ 	if (!test_bit(channel, port->qos_sq_bmap)) {
+ 		NL_SET_ERR_MSG_MOD(opt->extack, "invalid queue id");
+@@ -2782,23 +2787,23 @@ static int airoha_tc_get_htb_get_leaf_queue(struct airoha_gdm_port *port,
+ 	return 0;
+ }
+ 
+-static int airoha_tc_setup_qdisc_htb(struct airoha_gdm_port *port,
++static int airoha_tc_setup_qdisc_htb(struct net_device *dev,
+ 				     struct tc_htb_qopt_offload *opt)
+ {
+ 	switch (opt->command) {
+ 	case TC_HTB_CREATE:
+ 		break;
+ 	case TC_HTB_DESTROY:
+-		return airoha_tc_htb_destroy(port);
++		return airoha_tc_htb_destroy(dev);
+ 	case TC_HTB_NODE_MODIFY:
+ 	case TC_HTB_LEAF_ALLOC_QUEUE:
+-		return airoha_tc_htb_alloc_leaf_queue(port, opt);
++		return airoha_tc_htb_alloc_leaf_queue(dev, opt);
+ 	case TC_HTB_LEAF_DEL:
+ 	case TC_HTB_LEAF_DEL_LAST:
+ 	case TC_HTB_LEAF_DEL_LAST_FORCE:
+-		return airoha_tc_htb_delete_leaf_queue(port, opt);
++		return airoha_tc_htb_delete_leaf_queue(dev, opt);
+ 	case TC_HTB_LEAF_QUERY_QUEUE:
+-		return airoha_tc_get_htb_get_leaf_queue(port, opt);
++		return airoha_tc_get_htb_get_leaf_queue(dev, opt);
  	default:
  		return -EOPNOTSUPP;
  	}
+@@ -2815,7 +2820,7 @@ static int airoha_dev_tc_setup(struct net_device *dev, enum tc_setup_type type,
+ 	case TC_SETUP_QDISC_ETS:
+ 		return airoha_tc_setup_qdisc_ets(port, type_data);
+ 	case TC_SETUP_QDISC_HTB:
+-		return airoha_tc_setup_qdisc_htb(port, type_data);
++		return airoha_tc_setup_qdisc_htb(dev, type_data);
+ 	case TC_SETUP_BLOCK:
+ 	case TC_SETUP_FT:
+ 		return airoha_dev_setup_tc_block(dev, type_data);
 
 -- 
 2.53.0
