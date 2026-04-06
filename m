@@ -1,317 +1,191 @@
-Return-Path: <netdev+bounces-275776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275779-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8NAiKyNA1GmRsQcAu9opvQ
-	(envelope-from <netdev+bounces-275776-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 01:22:11 +0200
+	id KPudA1xE1GnPsQcAu9opvQ
+	(envelope-from <netdev+bounces-275779-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 01:40:12 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CF2D3A8192
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 01:22:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4990E3A832A
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 01:40:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A2A643049979
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 23:21:49 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1F422303D703
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 23:40:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE9B3A0B1D;
-	Mon,  6 Apr 2026 23:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A08632ED3A;
+	Mon,  6 Apr 2026 23:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lJ3zRlMG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GrjAOLZY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E8639D6CF
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 23:21:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3293191BB
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 23:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775517709; cv=none; b=k1wocofcPIVpumy3cT5CMh73PyM04UsHMABJxEW8dcKCEnRDl/1D7/ORJw35e0dk8AfCS9YDqXK8A0ptuI2vx39+gXvTn/CUXr2SJOHXYr12jxjj+D9tZbEFK+JRbjERMOj4KGVdUs1YUipQJRcJSSY1mTD/MwGA6KaVlh/lDfk=
+	t=1775518807; cv=none; b=FE8zN8u+XQ6oZTRcRZjtOVlJS71WgyVxhSrkDmS4cd+w/l22AHBGG4BNLRNJhqrDV6Z5CkiWYgd1Mb0OCUQUNfoM360ANbFW1NqNwF+QHCi3tBAh3y5bPtPZRkBYOVyJ4EPNECTeB19Bsor8JUQ6dqXPKtpAgLOJwy+xSw82amA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775517709; c=relaxed/simple;
-	bh=LoyL83Q4kP/YIk5ssgNwI9pOEK+CHoIbH+8bUYCFx5w=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=p2XaJU/C5tkjbWHjHlRL/saueXswoeqSHdWSvVmV6adwnoU75+q672n0jk+sgLsfr+cw/+pfxzuEaSI2YpJLQKdSflPhI8oeqt1KEGsebIWcP9DiAiL76izMYuUQSkKBkiCCIY+bWDrjpKN5H9d7rNdZpL6V7USbIIjnsIeVic4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lJ3zRlMG; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775517708; x=1807053708;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=LoyL83Q4kP/YIk5ssgNwI9pOEK+CHoIbH+8bUYCFx5w=;
-  b=lJ3zRlMGvFN0//w2aB1UrOgiw9dzSH1/6DLHtyQpWn9k+9nmzrJ6Rtr1
-   R++OgBkiHsO/c541Td1vatOmOXagz/4t83RBB4s3LkpH2sWFrHBv/4YE2
-   4iYQAclrFn6c0gJsy0dUlfIpax8unU3zDqof7M/jd+v1N1PVfe8Fw1Kbd
-   G6RTrslTF9oeB9esJeO1a85+dDZGr8/En8jZfCYOntTmOxFtlYyEOGMCx
-   WhJ/95w7nGTFzBt2/ukKdsB3XhBFIRT3gbwF6nrnTIgk/DgrIoXewXo1A
-   01COGMmtjvZct04kYGgcujYQmeVMAAnsKFwlLBd40U1fNxxB4Pyxmdg+q
-   A==;
-X-CSE-ConnectionGUID: Ccdq39hbQH2yNL96Lfa7WQ==
-X-CSE-MsgGUID: rA38uz4kRNiNP2iUNsry5Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11751"; a="76368985"
-X-IronPort-AV: E=Sophos;i="6.23,164,1770624000"; 
-   d="scan'208";a="76368985"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2026 16:21:45 -0700
-X-CSE-ConnectionGUID: ie146FGOS0qcepsWoRMBfA==
-X-CSE-MsgGUID: 6mnlO9qORUmQRZmMAe4jag==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,164,1770624000"; 
-   d="scan'208";a="232050500"
-Received: from dcskidmo-m40.jf.intel.com ([10.166.241.14])
-  by orviesa003.jf.intel.com with ESMTP; 06 Apr 2026 16:21:45 -0700
-From: Joshua Hay <joshua.a.hay@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org
-Subject: [Intel-wired-lan][PATCH iwl-net 2/2] idpf: fix skb datapath queue based scheduling crashes and timeouts
-Date: Mon,  6 Apr 2026 16:32:36 -0700
-Message-Id: <20260406233236.3585504-3-joshua.a.hay@intel.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20260406233236.3585504-1-joshua.a.hay@intel.com>
-References: <20260406233236.3585504-1-joshua.a.hay@intel.com>
+	s=arc-20240116; t=1775518807; c=relaxed/simple;
+	bh=mGt75SnvaPRypeP+PnFAZmsCVL+F9lljS2GpxdG288Q=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mHAXCWGNL14Q5YoE6U1XXqCYdPhONnYFHPE3zKGpbRBsSGzQOAPmM1aC0a+WwzAvIDA99EyuH7FqPw/fA/C4uc4KbqPk3Cp+qmQ56mKs0bc1ATK+tvNsqo28YbWGNnL6D+fJqpc5MRAC6CJhT9sAfOkqLRekm89ajQjHSeYKnWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GrjAOLZY; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2b250d3699aso108969145ad.2
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 16:40:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775518805; x=1776123605; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1hcYTP3VT53MAcPTyOSTzBSmynY4NyEpZMracFsGLhc=;
+        b=GrjAOLZYndynJXhTGlJABZKrYIkOn9+Qw0/8fp8RbFoH5bUqSGn0oti4z52ncMzQzZ
+         ZnCu7+oW/gsreW2eOqwhWmNTGpxuHf/FrwwPB98dq3/dNUhBd2hiCZBunbapAt9QRx6/
+         RZDPZH+DD7Rfc2pjgF+vnClKM0QnOhiY80EF6y6ncV7RonzQFdAV89Rr1Ysc2j+B/Otj
+         g/5nDult53Pl3BIX4pBXn0kMaOf3gbF3Uhmiti/84Dd3nTyD4PsRMkFdHYnKTvDaHw+/
+         mp3J6YYHeVIQnSPHsBhDyjHdIWcrQ+BoGAZLH/YPCsoGX2ZYCay6FesNJVJ0oePkdZWk
+         VDMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775518805; x=1776123605;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1hcYTP3VT53MAcPTyOSTzBSmynY4NyEpZMracFsGLhc=;
+        b=oHX5v7rLSwyycaBXozA8+NduUIofi5a3qfIvk/YhM3W135VpLMxrnWgu3advKRZUiY
+         v4rndkvpGIdJsBV5z7DU2rtD5KFaSvVK/Be6MaGZDkrks2200u6l6kxgYCq5XaL3RLv0
+         323s/zSu1qyk5mLa4p8ijSoaYtSmCn5eJNkzEnnohIupGM3jSkPccFbmWP6nbbzXQCIw
+         u0h85RsO3Y88OXagTGZumXW9UTiU7KSRbPmBrD1DfK4nvMKj6KZP/eYSTmRDmZOLamfE
+         NsYXybVTQMkHz2vlt1U9sTBnrGPVT2HT2L5FiQtQGFPcV0JWHCVDslgUwHtJG3heyg1d
+         P9CA==
+X-Gm-Message-State: AOJu0YxFT+v7WXcxM4fb+2DaExh0yjkqXswbJeIHe5INS4q+Wf1YXXSa
+	yq6t1ThffWjFmnfs3nIFpBp734Yl8TEVNlAn7OE540RTBZYmeDzlL8DakBguOj4dV2f6gM8tbfc
+	Ah6ivoAj0w6oeOTuYRAITVh72AgGajFcftDcWOMAFQHHrnmvviMS2TmJnwsq0wK769ntCQ0YfvR
+	/HmQ3F/3Tx7auEbZul/5wzcRNrRFOIRJHalsWG5Ts0jVniDruq68RKwsCP9cZUkOY=
+X-Received: from plbms7.prod.google.com ([2002:a17:903:ac7:b0:2b2:6f73:54e0])
+ (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:903:3c47:b0:2b0:67a7:5c4b with SMTP id d9443c01a7336-2b281802d24mr160270145ad.28.1775518805097;
+ Mon, 06 Apr 2026 16:40:05 -0700 (PDT)
+Date: Mon,  6 Apr 2026 23:39:59 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
+Message-ID: <20260406234002.3610542-1-hramamurthy@google.com>
+Subject: [PATCH net-next v4 0/3] gve: add support for PTP gettimex64
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+To: netdev@vger.kernel.org
+Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	richardcochran@gmail.com, willemb@google.com, nktgrg@google.com, 
+	jfraker@google.com, ziweixiao@google.com, maolson@google.com, 
+	thostet@google.com, jordanrhee@google.com, jefrogers@google.com, 
+	alok.a.tiwari@oracle.com, yyd@google.com, jacob.e.keller@intel.com, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	MV_CASE(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[google.com,lunn.ch,davemloft.net,kernel.org,redhat.com,gmail.com,oracle.com,intel.com,vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275779-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275776-lists,netdev=lfdr.de];
-	TO_DN_NONE(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joshua.a.hay@intel.com,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-1.000];
-	DKIM_TRACE(0.00)[intel.com:+];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_COUNT_THREE(0.00)[4];
+	FROM_HAS_DN(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[hramamurthy@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
+	TO_DN_NONE(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	NEURAL_HAM(-0.00)[-1.000];
 	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 4CF2D3A8192
+	RCPT_COUNT_TWELVE(0.00)[21]
+X-Rspamd-Queue-Id: 4990E3A832A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The splitq Tx resource checks were assuming that the queues were using
-flow based scheduling and checking the refillqs for free buffers.
-However, the Tx refillqs are not allocated when using queue based
-scheduling resulting in a NULL ptr dereference. Adjust the Tx resource
-checks to only check available descriptor resources when using queue
-based scheduling. Because queue based scheduling does not have any
-notion of descriptor only completions, there cannot be any packets in
-flight, meaning there is no need to check for pending completions.
+From: Jordan Rhee <jordanrhee@google.com>
 
-The driver also only supported 8 byte completion descriptors in the skb
-datapath previously. However, currently the FW only supports 4 byte
-completion descriptors when using queue based scheduling. This meant we
-were skipping over completions, resulting in Tx timeouts.  Add support
-to process both 4 and 8 byte completion descriptors, depending on the
-scheduling mode. Cache the next_to_clean completion descriptor in the
-completion queue struct, and fetch this descriptor before the start of
-each cleaning loop. Access the next descriptor in the loop by
-calculating the index based on raw byte count.
+This patch series adds support to obtain near-simultaneous NIC and
+system timestamps with gettimex64. This enables daemons like
+chrony and phc2sys to synchronize the system clock to the NIC clock.
 
-Fixes: 0c3f135e840d ("idpf: stop Tx if there are insufficient buffer resources")
-Fixes: 1c325aac10a8 ("idpf: configure resources for TX queues")
-Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+GVE does not have direct register access to the NIC hardware clock, so
+it must issue an AdminQ command to read the NIC clock. Due to relatively
+high latency of AQ commands (~100us), it is necessary for the hypervisor
+to sample the system time sandwich inside the AQ command.
+
+The first two patches pave the way for the PTP implementation by
+quieting excessive logging and refactoring an existing routine for
+thread safety.
+
+When tested inside a GCE C3 VM, this enabled chrony to synchronize the
+NIC clock and system clock with sub-microsecond precision.
+
+chronyc tracking
+Reference ID    : 50484330 (PHC0)
+Stratum         : 1
+Ref time (UTC)  : Sat Feb 14 01:53:42 2026
+System time     : 0.000000001 seconds fast of NTP time
+Last offset     : -0.000000000 seconds
+RMS offset      : 0.000000001 seconds
+Frequency       : 0.686 ppm fast
+Residual freq   : -0.000 ppm
+Skew            : 0.001 ppm
+Root delay      : 0.000000001 seconds
+Root dispersion : 0.000000812 seconds
+Update interval : 0.5 seconds
+Leap status     : Normal
+
 ---
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 49 +++++++++++++--------
- drivers/net/ethernet/intel/idpf/idpf_txrx.h |  6 ++-
- 2 files changed, 36 insertions(+), 19 deletions(-)
+Changelog:
+V4:
+- call out change to dev_err_ratelimited() in patch 1 commit message (Jacob Keller)
+- Ensure only one log is emitted when command returns GVE_ADMINQ_COMMAND_UNSET (Jacob Keller)
+- Link to v3: https://lore.kernel.org/netdev/20260403194427.1830609-1-hramamurthy@google.com/
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index f6b3b15364ff..4fc0bb14c5b1 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -270,11 +270,9 @@ static int idpf_tx_desc_alloc(const struct idpf_vport *vport,
- static int idpf_compl_desc_alloc(const struct idpf_vport *vport,
- 				 struct idpf_compl_queue *complq)
- {
--	u32 desc_size;
--
--	desc_size = idpf_queue_has(FLOW_SCH_EN, complq) ?
--		    sizeof(*complq->comp) : sizeof(*complq->comp_4b);
--	complq->size = array_size(complq->desc_count, desc_size);
-+	complq->desc_sz = idpf_queue_has(FLOW_SCH_EN, complq) ?
-+			  sizeof(*complq->comp) : sizeof(*complq->comp_4b);
-+	complq->size = array_size(complq->desc_count, complq->desc_sz);
- 
- 	complq->desc_ring = dma_alloc_coherent(complq->netdev->dev.parent,
- 					       complq->size, &complq->dma,
-@@ -284,6 +282,7 @@ static int idpf_compl_desc_alloc(const struct idpf_vport *vport,
- 
- 	complq->next_to_use = 0;
- 	complq->next_to_clean = 0;
-+	complq->ntc_desc = complq->comp;
- 	idpf_queue_set(GEN_CHK, complq);
- 
- 	idpf_xsk_setup_queue(vport, complq,
-@@ -2193,7 +2192,7 @@ static void idpf_tx_handle_rs_completion(struct idpf_tx_queue *txq,
- static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
- 				 int *cleaned)
- {
--	struct idpf_splitq_tx_compl_desc *tx_desc;
-+	struct idpf_splitq_tx_compl_desc *tx_desc = complq->ntc_desc;
- 	s16 ntc = complq->next_to_clean;
- 	struct idpf_netdev_priv *np;
- 	unsigned int complq_budget;
-@@ -2201,7 +2200,6 @@ static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
- 	int i;
- 
- 	complq_budget = complq->clean_budget;
--	tx_desc = &complq->comp[ntc];
- 	ntc -= complq->desc_count;
- 
- 	do {
-@@ -2257,11 +2255,12 @@ static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
- 		u64_stats_update_end(&tx_q->stats_sync);
- 
- fetch_next_desc:
--		tx_desc++;
-+		tx_desc = (struct idpf_splitq_tx_compl_desc *)
-+				((u8 *)tx_desc + complq->desc_sz);
- 		ntc++;
- 		if (unlikely(!ntc)) {
- 			ntc -= complq->desc_count;
--			tx_desc = &complq->comp[0];
-+			tx_desc = complq->comp;
- 			idpf_queue_change(GEN_CHK, complq);
- 		}
- 
-@@ -2271,6 +2270,8 @@ static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
- 		complq_budget--;
- 	} while (likely(complq_budget));
- 
-+	complq->ntc_desc = tx_desc;
-+
- 	/* Store the state of the complq to be used later in deciding if a
- 	 * TXQ can be started again
- 	 */
-@@ -2437,21 +2438,32 @@ static int idpf_txq_has_room(struct idpf_tx_queue *tx_q, u32 descs_needed,
-  * @tx_q: the queue to be checked
-  * @descs_needed: number of descriptors required for this packet
-  * @bufs_needed: number of buffers needed for this packet
-+ * @flow: true if queue uses flow based scheduling, false if queue based scheduling
-  *
-  * Return: 0 if stop is not needed
-  */
- static int idpf_tx_maybe_stop_splitq(struct idpf_tx_queue *tx_q,
--				     u32 descs_needed,
--				     u32 bufs_needed)
-+				     u32 descs_needed, u32 bufs_needed,
-+				     bool flow)
- {
--	/* Since we have multiple resources to check for splitq, our
-+	/* Since we have multiple resources to check for flow based splitq, our
- 	 * start,stop_thrs becomes a boolean check instead of a count
- 	 * threshold.
- 	 */
--	if (netif_subqueue_maybe_stop(tx_q->netdev, tx_q->idx,
--				      idpf_txq_has_room(tx_q, descs_needed,
--							bufs_needed),
--				      1, 1))
-+	if (flow && netif_subqueue_maybe_stop(tx_q->netdev, tx_q->idx,
-+					      idpf_txq_has_room(tx_q,
-+								descs_needed,
-+								bufs_needed),
-+					      1, 1))
-+		return 0;
-+
-+	/* For queue based splitq, there is no need to check the number of
-+	 * pending completions since we cannot reuse descriptors until we get
-+	 * completions, so we only need to check for descriptor resources.
-+	 */
-+	if (!flow && netif_subqueue_maybe_stop(tx_q->netdev, tx_q->idx,
-+					       IDPF_DESC_UNUSED(tx_q),
-+					       descs_needed, descs_needed))
- 		return 0;
- 
- 	u64_stats_update_begin(&tx_q->stats_sync);
-@@ -3021,6 +3033,7 @@ static bool idpf_tx_splitq_need_re(struct idpf_tx_queue *tx_q)
- static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
- 					struct idpf_tx_queue *tx_q)
- {
-+	bool flow = idpf_queue_has(FLOW_SCH_EN, tx_q);
- 	struct idpf_tx_splitq_params tx_params = {
- 		.prev_ntu = tx_q->next_to_use,
- 	};
-@@ -3040,7 +3053,7 @@ static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
- 
- 	/* Check for splitq specific TX resources */
- 	count += (IDPF_TX_DESCS_PER_CACHE_LINE + tso);
--	if (idpf_tx_maybe_stop_splitq(tx_q, count, buf_count)) {
-+	if (idpf_tx_maybe_stop_splitq(tx_q, count, buf_count, flow)) {
- 		idpf_tx_buf_hw_update(tx_q, tx_q->next_to_use, false);
- 
- 		return NETDEV_TX_BUSY;
-@@ -3072,7 +3085,7 @@ static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
- 		idpf_tx_set_tstamp_desc(ctx_desc, idx);
- 	}
- 
--	if (idpf_queue_has(FLOW_SCH_EN, tx_q)) {
-+	if (flow) {
- 		struct idpf_sw_queue *refillq = tx_q->refillq;
- 
- 		/* Save refillq state in case of a packet rollback.  Otherwise,
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 4be5b3b6d3ed..b6836e38f449 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -807,11 +807,13 @@ libeth_cacheline_set_assert(struct idpf_buf_queue, 64, 24, 32);
-  * @txq_grp: See struct idpf_txq_group
-  * @flags: See enum idpf_queue_flags_t
-  * @desc_count: Number of descriptors
-+ * @desc_sz: Descriptor size in bytes
-  * @clean_budget: queue cleaning budget
-  * @netdev: &net_device corresponding to this queue
-  * @next_to_use: Next descriptor to use. Relevant in both split & single txq
-  *		 and bufq.
-  * @next_to_clean: Next descriptor to clean
-+ * @ntc_desc: Pointer to next_to_clean descriptor for next NAPI poll
-  * @num_completions: Only relevant for TX completion queue. It tracks the
-  *		     number of completions received to compare against the
-  *		     number of completions pending, as accumulated by the
-@@ -833,6 +835,7 @@ struct idpf_compl_queue {
- 
- 	DECLARE_BITMAP(flags, __IDPF_Q_FLAGS_NBITS);
- 	u32 desc_count;
-+	u32 desc_sz;
- 
- 	u32 clean_budget;
- 	struct net_device *netdev;
-@@ -841,6 +844,7 @@ struct idpf_compl_queue {
- 	__cacheline_group_begin_aligned(read_write);
- 	u32 next_to_use;
- 	u32 next_to_clean;
-+	struct idpf_splitq_tx_compl_desc *ntc_desc;
- 
- 	aligned_u64 num_completions;
- 	__cacheline_group_end_aligned(read_write);
-@@ -853,7 +857,7 @@ struct idpf_compl_queue {
- 	struct idpf_q_vector *q_vector;
- 	__cacheline_group_end_aligned(cold);
- };
--libeth_cacheline_set_assert(struct idpf_compl_queue, 40, 16, 24);
-+libeth_cacheline_set_assert(struct idpf_compl_queue, 48, 24, 24);
- 
- /**
-  * struct idpf_sw_queue
+V3:
+- Take system time snapshot inside the mutex
+- Return -EOPNOTSUPP if cross-timestamp is requested on an arch other
+  than x86 or arm64
+- Fix initialization to only register PTP clock once all data is
+  initialized
+- Link to v2: https://lore.kernel.org/netdev/20260326224527.1044097-1-hramamurthy@google.com/
+
+V2:
+- Fixed compilation warning on ARM by casting to u64
+- Link to v1: https://lore.kernel.org/netdev/20260323234829.3185051-1-hramamurthy@google.com/
+---
+
+Ankit Garg (1):
+  gve: make nic clock reads thread safe
+
+Jordan Rhee (2):
+  gve: skip error logging for retryable AdminQ commands
+  gve: implement PTP gettimex64
+
+ drivers/net/ethernet/google/gve/gve.h         |  12 +-
+ drivers/net/ethernet/google/gve/gve_adminq.c  |  27 +-
+ drivers/net/ethernet/google/gve/gve_adminq.h  |   4 +-
+ drivers/net/ethernet/google/gve/gve_ethtool.c |   3 +-
+ drivers/net/ethernet/google/gve/gve_ptp.c     | 317 +++++++++++++-----
+ 5 files changed, 268 insertions(+), 95 deletions(-)
+
+
+base-commit: 5446b8691eb8278f10deca92048fad84ffd1e4d5
 -- 
-2.39.2
+2.53.0.1213.gd9a14994de-goog
 
 
