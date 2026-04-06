@@ -1,167 +1,120 @@
-Return-Path: <netdev+bounces-275624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275625-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id aBB3M8LJ02m7mAcAu9opvQ
-	(envelope-from <netdev+bounces-275624-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:57:06 +0200
+	id yP5DBCTL02nomAcAu9opvQ
+	(envelope-from <netdev+bounces-275625-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 17:03:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B083A4726
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:57:06 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B48D3A47DF
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 17:02:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A4B75300753B
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 14:57:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4F6203001844
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 15:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7307382F32;
-	Mon,  6 Apr 2026 14:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE323859CD;
+	Mon,  6 Apr 2026 15:02:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C8H2sCes"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xii0MaFj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A2770809
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 14:57:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC00C2DF717;
+	Mon,  6 Apr 2026 15:02:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775487423; cv=none; b=kdIWlRGStGd1hogPpMb/xC6r8ApXqKZ2dybLSYA5wTXHHrU4AZOZkQ+jJzoUZ4iDaeX8aynJSyS5W0DvmDI9pvEdAVnX2gXPk5UAPyN9ZKou5AiWFTx7TxiO/ThxMltCtX/Gajwv557PzTiHuR1ZHNy15AF0UGeECHb7TibjKG8=
+	t=1775487775; cv=none; b=mJuArrntPDj8o2QtSXVMxZQ7JYXEpZt2CYbykz6yzW8rkZUI9e0t9Opj5PA5qnCNj51nlW01CiVSp1f+rjxQXl1JMbELlX7t5d1qOBcGfQdR1IzNI/y/NAtxD65lv/wEHG1jLfGyItygGKujJ/9VMnyLqa/ujOO4preRzsSXnJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775487423; c=relaxed/simple;
-	bh=Lq+x/Mfe4ysFSKnbrZR3svVFTSgb59cVz8m2AINXKpM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rQOrhp8a70Ikx7E/agVPEFY01i9oH4CkXYK+q2GI6HyLkg+c39EBkIxCJ4HCFqO4VpWVzz00SLtRECA0v0HZy+gfE8lDTcCAFbxT6WNn/kuv4PmFmLEasLthxWUJTY8kH/Nx3YwDGAwTHO/gfia8ew3O7l/bl/SCr4puObGW+Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C8H2sCes; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775487421;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=0UsJTdLotzHUfNK/rfhKfTZZocm2SY/j7tRKh0ACf/A=;
-	b=C8H2sCesgB+ViqIFWFM48/WD4bfV7aD56EoWYkD9m7r+8eys+GgUr3wX7ch8gKWWt6rcu9
-	Z/7DV9TWNveheQpmeKHsw2KpfkqyV5xc/d+yxTyRa/fRE9rvqfl7tyKFdtA7YWLbcMqETp
-	JcwwPNCtgCH6nm88Ld9f3DMpQVFCiUk=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-136-Ud8GiP5gOFOsWtcJA2JLkw-1; Mon,
- 06 Apr 2026 10:56:57 -0400
-X-MC-Unique: Ud8GiP5gOFOsWtcJA2JLkw-1
-X-Mimecast-MFC-AGG-ID: Ud8GiP5gOFOsWtcJA2JLkw_1775487415
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C169A1800283;
-	Mon,  6 Apr 2026 14:56:54 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.44.48.51])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C419019540C4;
-	Mon,  6 Apr 2026 14:56:48 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1775487775; c=relaxed/simple;
+	bh=/zWTTEwu/4ZvHrECK/ZptCOk4mvqjq4tGCDOOrZFik4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e/Ion+OGkY33iVkJwYIzP6phmHVWpvhN78YyUftBZklbBJVPSKPIF8xJA+Pf6laZNjsignHfplOlptHbPImVJtgzZOT9pCrg5PZbwqTXveUeEovJ4MD7+phfUoSUW8pHIBkCpAhO8thvMvXEwi48VjJ6DE2FKQuAt5KZWExaojU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xii0MaFj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C76DFC4CEF7;
+	Mon,  6 Apr 2026 15:02:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775487774;
+	bh=/zWTTEwu/4ZvHrECK/ZptCOk4mvqjq4tGCDOOrZFik4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Xii0MaFjExvsIQcUvAeczdhUiDvrdopDAvaRxpwdpJZni2L1gqeh/hgnwstwshDRq
+	 jxT+YEcaWwqAf15XkxeVfCUWMS7tuIiC7qonC73r1Nmr6mWduiZPur8hJm14TEb++w
+	 b6iBvxj84KbE3mgkdVdGyvokgk7rVno5kNkaC5fsCDBFQqsUhk3Jv0HkhXsJchPZw3
+	 aQ8iMdh9ZQ9bwJHbRapwIS+Jdg6eNs41pEwlDePE2qYZbcZCJRGmkGwnJR9AwAR9Gm
+	 SvbdckSWuL57eqWQaMeKY4/6lmsWd4+4RQfrTsb26UU/T8BlT/UyKEZ7D4oHic0eHl
+	 R1ORlDu1Jbs6A==
+Date: Mon, 6 Apr 2026 16:02:49 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Dave Ertman <david.m.ertman@intel.com>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] ice: fix VF queue configuration with low MTU values
-Date: Mon,  6 Apr 2026 16:56:41 +0200
-Message-ID: <20260406145641.1020623-1-jtornosm@redhat.com>
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
+	Michael Guralnik <michaelgur@nvidia.com>, stable@vger.kernel.org,
+	Patrisious Haddad <phaddad@nvidia.com>
+Subject: Re: [PATCH net-next] net/mlx5: Update the list of the PCI supported
+ devices
+Message-ID: <20260406150249.GA410024@kernel.org>
+References: <20260403091756.139583-1-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-X-Spamd-Result: default: False [0.84 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260403091756.139583-1-tariqt@nvidia.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-275625-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[104.64.211.4:from];
 	RCPT_COUNT_TWELVE(0.00)[16];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275624-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	DKIM_TRACE(0.00)[kernel.org:+];
 	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[jtornosm@redhat.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 70B083A4726
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[10.30.226.201:received,100.90.174.1:received];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0B48D3A47DF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The ice driver's VF queue configuration validation rejects
-databuffer_size values below 1024 bytes, which prevents VFs from
-using MTU values below 871 bytes.
+On Fri, Apr 03, 2026 at 12:17:56PM +0300, Tariq Toukan wrote:
+> From: Michael Guralnik <michaelgur@nvidia.com>
+> 
+> Add the upcoming ConnectX-10 NVLink-C2C device ID to the table of
+> supported PCI device IDs.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Michael Guralnik <michaelgur@nvidia.com>
+> Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-The iavf driver calculates databuffer_size based on the MTU using:
-  databuffer_size = ALIGN(MTU + LIBETH_RX_LL_LEN, 128)
-
-where LIBETH_RX_LL_LEN = 26 (ETH_HLEN + 2*VLAN_HLEN + ETH_FCS_LEN).
-
-For MTU values below 871:
-  MTU 870: 870 + 26 = 896, aligned to 128 = 896 (< 1024, rejected)
-  MTU 871: 871 + 26 = 897, aligned to 128 = 1024 (>= 1024, accepted)
-
-The 1024-byte minimum seems unnecessarily restrictive, because the hardware
-supports databuffer_size as low as 128 bytes (the alignment boundary),
-which should allow MTU values down to the standard minimum of 68 bytes.
-
-I haven't found the reason why the limit was configured in the commit
-9c7dd7566d18 ("ice: add validation in OP_CONFIG_VSI_QUEUES VF message"), so
-with no more information and since it is working, change the minimum
-databuffer_size validation from 1024 to 128 bytes to allow standard low
-MTU values while still preventing invalid configurations.
-
-Fixes: 9c7dd7566d18 ("ice: add validation in OP_CONFIG_VSI_QUEUES VF message")
-cc: stable@vger.kernel.org
-Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
----
- drivers/net/ethernet/intel/ice/virt/queues.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/virt/queues.c b/drivers/net/ethernet/intel/ice/virt/queues.c
-index f73d5a3e83d4..31be2f76181c 100644
---- a/drivers/net/ethernet/intel/ice/virt/queues.c
-+++ b/drivers/net/ethernet/intel/ice/virt/queues.c
-@@ -840,7 +840,7 @@ int ice_vc_cfg_qs_msg(struct ice_vf *vf, u8 *msg)
- 
- 			if (qpi->rxq.databuffer_size != 0 &&
- 			    (qpi->rxq.databuffer_size > ((16 * 1024) - 128) ||
--			     qpi->rxq.databuffer_size < 1024))
-+			     qpi->rxq.databuffer_size < 128))
- 				goto error_param;
- 
- 			ring->rx_buf_len = qpi->rxq.databuffer_size;
--- 
-2.53.0
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
