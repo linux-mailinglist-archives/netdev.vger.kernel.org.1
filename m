@@ -1,68 +1,53 @@
-Return-Path: <netdev+bounces-275585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275587-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gNB0NUaq02lukAcAu9opvQ
-	(envelope-from <netdev+bounces-275585-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 14:42:46 +0200
+	id euQDJaCr02mckAcAu9opvQ
+	(envelope-from <netdev+bounces-275587-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 14:48:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A8AC3A35E2
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 14:42:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D0943A3617
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 14:48:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4DDB13011F06
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 12:42:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1A51B300FECE
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 12:48:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E935734BA42;
-	Mon,  6 Apr 2026 12:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GYDQhlhR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7850136E498;
+	Mon,  6 Apr 2026 12:48:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E0434B19A;
-	Mon,  6 Apr 2026 12:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87FE36E487;
+	Mon,  6 Apr 2026 12:48:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775479360; cv=none; b=HENTrZs8wBS5MDAF1v47G/dD9FduMHAZMLlqGCN1REcS/Gvc5CIFIRdVLxkIgJMfK6PRTGAVDlgPpPh1CRS+BwS1CcnWiiteaqOWJgPs3oH5SIiJcxxREwA200BCapHqxUB6TWRbuD1TjqSDiHHxEqaWy6z+q35m1C8sxzZqMDc=
+	t=1775479707; cv=none; b=SQb+CaXLEBVRMqJEz5YEl+tV4BOA+vEIh2eE7dBp5jgMenlVSUOxcXN6vmcUyhKpmVS+KpSLK2rkK5QaMRL9d5E5xPiulnarARHas3Q1YLfyS2akuoaX07eDsffDV7k3IdbNYPvqltygT0ToYJpUfxd6M/ENMrjAJ3m8sn4om0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775479360; c=relaxed/simple;
-	bh=Sv0A+sHdJ2RG8qbrDbw8lVNY4v8YEFz1J6FoU7pUpSk=;
+	s=arc-20240116; t=1775479707; c=relaxed/simple;
+	bh=thdk4scEbCEfjDTiEe0RV/ajU0uS958gF5HffrDyMpk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I/GYFnPpa0VO3V0QzxcyzlLf0drxOygfKZ9+l+FWLo3+ACc/JG8FJKZFS9jUswI3j9YVpap6pParZ7lGOZIkdFdUFv6+vdDGyGWuHPDxW0UbGzEkY8t6lyxHYeZYhBr5ca4YZ2IO1QK+BRVEln0dD9RdRc7k7YOjIQmv5iovDPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GYDQhlhR; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Pl89xt0XO0MVD2bqFFaXnKndIOOiqwaplxwOyuzmR+0=; b=GYDQhlhRXMtHU6pEEWhAabOk7O
-	tQRg/t6VCr9oMOICTIFK0m6RC3M0inSbqgDVZ66rOCkxj5n4s30nPnl2W1MYjN6OHH34E2RUPAu2v
-	sMmqKPIm9BVPQTXNIxJt2msZlgytIy1sMl2JdgS51xsqgGWn/xaR3JymsP9ZJ6Zz2ZSE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1w9jHh-00EzCe-Qq; Mon, 06 Apr 2026 14:42:29 +0200
-Date: Mon, 6 Apr 2026 14:42:29 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Carlo Szelinsky <github@szelinsky.de>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=FVAvanmuLoaKVZ/7MazIPEbU49K6JOfBTv86hLKjRRBZnUQ4wmkYuq2FkZX0wFmhIUNXKF+vnxojVCFtrKvn8pYv6CWnFQ+ZznFonlPQWCankxTV53oIWliC4jwJFpjAQqlCDsYFwVPb/1YuzXD2D9qftlA7KSQoWVFcn/rlkMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1w9jNG-000000005zN-34Rs;
+	Mon, 06 Apr 2026 12:48:14 +0000
+Date: Mon, 6 Apr 2026 13:48:11 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: John Pavlick <jspavlick@posteo.net>
+Cc: linux@armlinux.org.uk, andrew@lunn.ch, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/3] net: mdio: treat PSE EPROBE_DEFER as
- non-fatal during PHY registration
-Message-ID: <3597433c-ce26-43c6-9a5f-e942a3db5340@lunn.ch>
-References: <6185f9d8-dabe-4190-b020-711e3a046e64@lunn.ch>
- <20260405185730.3937952-1-github@szelinsky.de>
+Subject: Re: [PATCH] net: sfp: add quirks for GPON ONT SFP sticks
+Message-ID: <adOri4VEQl8ezm24@makrotopia.org>
+References: <20260406114352.69168-1-jspavlick@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,88 +56,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260405185730.3937952-1-github@szelinsky.de>
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <20260406114352.69168-1-jspavlick@posteo.net>
+X-Spamd-Result: default: False [-1.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[lunn.ch,none];
-	R_DKIM_ALLOW(-0.20)[lunn.ch:s=20171124];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275585-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[bootlin.com,pengutronix.de,lunn.ch,gmail.com,armlinux.org.uk,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[armlinux.org.uk,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[andrew@lunn.ch,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[lunn.ch:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_FROM(0.00)[bounces-275587-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[makrotopia.org];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lunn.ch:dkim,lunn.ch:mid]
-X-Rspamd-Queue-Id: 5A8AC3A35E2
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.792];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	R_DKIM_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2D0943A3617
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, Apr 05, 2026 at 08:57:30PM +0200, Carlo Szelinsky wrote:
-> Hi Andrew,
-> 
-> So I went and looked at whether we can just let EPROBE_DEFER do its
-> thing here, like you suggested.
-> 
-> >From what I can tell, the issue is where it happens.
-> fwnode_mdiobus_register_phy() gets called during the MDIO bus scan in
-> __of_mdiobus_parse_phys(), and if any PHY returns -EPROBE_DEFER there,
-> the whole scan bails out - none of the PHYs on that bus get registered.
-> So you'd lose all networking on that bus just because one PHY's PSE
-> controller isn't ready yet.
+On Mon, Apr 06, 2026 at 11:44:05AM +0000, John Pavlick wrote:
+> Several GPON ONT SFP sticks based on Realtek RTL960x report
+> 1000BASE-LX at 1300MBd in their EEPROM but can operate at 2500base-X.
+> On hosts with serdes fixed at 2.5Gbase-X (e.g. Banana Pi R3 / MT7986),
+> the kernel rejects them with 'no common interface modes'.
 
-Something does not sounds correct here. The MDIO bus, and the devices
-on the bus should have different life cycles.
+While the quirks themselves may be correct, the statement above is wrong.
+The BananaPi R3 (and all MediaTek router SoCs) *do* support also
+1000Base-X and SGMII, the SerDes is *not* "fixed at 2.5GBase-X". This
+can easily be verified by plugging a random 1Gbps SFP module into the
+board (eg. ubiquitous copper modules based on Marvell 88E1111 PHY).
 
-If the MDIO bus itself is missing resources it needs, it can return
-EPROBE_DEFFER. A typical example of this would be the MDIO bus reset,
-which applies to all devices on the bus. If that GPIO is missing, the
-probe of the MDIO bus will unwind.
-
-I would expect PHYs on the bus to be just devices in the device
-model. They can return EPROBE_DEFER, and the driver core will probe
-them again later. This could be a per PHY reset signal, reset
-controller, etc, or the PSE. If such a resource is missing, just the
-PHY should fail probing, not the whole MDIO bus.
-
-> I also dug into the timing question you raised. Correct me if I'm
-> wrong, but from what I see the deferred probe timeout is 10s and
-> regulator_late_cleanup fires at 30s, so the ordering would actually
-> work out - the consumer would get to claim the regulator before
-> cleanup kills it. It's more the bus level collateral damage that
-> seemed like the real problem to me.
-
-Your patch 0/X says:
-
-> When a PSE controller driver is built as a module, it may not be
-> probed yet when PHYs are registered on the MDIO bus. This causes
-> of_pse_control_get() to return -EPROBE_DEFER, destroying the PHY
-> device.  Later, regulator_late_cleanup disables the unclaimed PSE
-> regulators, permanently killing PoE.
-
-How are we getting to time t=30 without the PSE probing?
-
-If the PSE controller is a module, and missing from the file system,
-so cannot be loaded, then turning off the regulators actually seems
-like a good safety policy. But if the module is there, but never gets
-loaded, it sounds like we have a different sort of problem, some
-cyclic dependency we need to break?
-
-	Andrew
+Also you have to make sure to not break support for those modules on
+boards which do not support 2500Base-X and need the module to operate
+at 1000Base-X (eg. older MikroTik QCA9xxx-based MIPS boards).
 
