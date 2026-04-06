@@ -1,132 +1,180 @@
-Return-Path: <netdev+bounces-275676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275677-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OA3tMVLz02lxoQcAu9opvQ
-	(envelope-from <netdev+bounces-275676-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:54:26 +0200
+	id OHQ5Hzn002nToQcAu9opvQ
+	(envelope-from <netdev+bounces-275677-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:58:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0CCB3A5EF2
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:54:25 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F036E3A5F31
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 19:58:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A85663008610
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 17:54:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1B056300D6A7
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 17:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081AA3932F9;
-	Mon,  6 Apr 2026 17:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BBF63939A7;
+	Mon,  6 Apr 2026 17:58:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="K61I7HDy"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Vt2orQUJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f226.google.com (mail-qt1-f226.google.com [209.85.160.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0303909B2;
-	Mon,  6 Apr 2026 17:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB633909A4
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 17:58:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775498058; cv=none; b=Q7T9iO0yIuoc1x28acu5LCTP3ZlnJZfCeI+q7x2yyyZAYZqKMIzNRbTXKCRH3FruM2FzMGYwnnhfnDj17uvb8LMI4O2vvjGGn008YQmTaJfVSZNzwxZtPZxSYkv/uqj8vOb4XyebwaFrE9JmpRe6VbKUHYAqGIL2gdBojbFn8WI=
+	t=1775498285; cv=none; b=qG/9WxkDljsF63F87Un1TlMUqGZqF4IN3vEVvaIHlJUFeBKvGZWl4Ag0V2coKq2J2MGHUkfo2bNMOz2FXa7VehEvwpDPU2gZczo9ixET8nkM5L6Wvpz6diJzeeVKNI/ILFovF5A54NXXNxTqsznMooFwCPtmFkZTecQBInI3R1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775498058; c=relaxed/simple;
-	bh=bJaqfa/gqe5hwOumVtDeoBhAL1x7A6nlQ0A9z2WKb6U=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=FUlicY5WX8DLSOZRsnVplUe/X0UuM5WijUGCvUr8jeO6IHfoaBX6CsT65TspydtsK1TQfIfMpO60gPWwb3MsdPue96y40XPPLwRi6Ke9zqiLXqjWWj6yJDfewTg/+UbbUEBUp7IKa5r0yo/YwV0EG6oP3Cw8qfrR3FWTnMDWYr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=K61I7HDy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBBD5C4CEF7;
-	Mon,  6 Apr 2026 17:54:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1775498058;
-	bh=bJaqfa/gqe5hwOumVtDeoBhAL1x7A6nlQ0A9z2WKb6U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K61I7HDy5O7GcGISve4miyGDAiyRNr8PSrYE1uJUq3cKg+RzdTcLuQ4n2sXaWeSK/
-	 l9q5xzvMPUduw5G32AGCokoXyk3bIGihJtBI0dQE4wU9xq0C9I6ENYIdgz8fwXMZ8u
-	 MlxXw8nUNNAWHKWp0u/3U0pEcm//25OMWBNdTEeY=
-Date: Mon, 6 Apr 2026 10:54:17 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: "JP Kobryn (Meta)" <jp.kobryn@linux.dev>
-Cc: linux-mm@kvack.org, willy@infradead.org, hannes@cmpxchg.org,
- david@kernel.org, ljs@kernel.org, Liam.Howlett@oracle.com,
- vbabka@kernel.org, rppt@kernel.org, surenb@google.com, mhocko@suse.com,
- kasong@tencent.com, qi.zheng@linux.dev, shakeel.butt@linux.dev,
- baohua@kernel.org, axelrasmussen@google.com, yuanchu@google.com,
- weixugc@google.com, riel@surriel.com, kuba@kernel.org, edumazet@google.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
-Subject: Re: [PATCH v3] mm/vmpressure: skip socket pressure for costly order
- reclaim
-Message-Id: <20260406105417.28fda9587146a011af2fb876@linux-foundation.org>
-In-Reply-To: <20260406174425.61692-1-jp.kobryn@linux.dev>
-References: <20260406174425.61692-1-jp.kobryn@linux.dev>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1775498285; c=relaxed/simple;
+	bh=1NlIS9xcxbFxK3vP/VmB0WSnGsgTNlhEU1DqSondv8A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o7R1PBsc4ICErO030DVJURWu5VJmbfwbqaEMZQek4nJTdWq8gnl5PYVbRuwDFq1fN8+bzpASzDB+CFOHUpHnNyZHpLwQO4HFdAWlyjlJh62MCEch33d2jTpEmnT7rXdzAgqjZ5/lKNblihw0hlV3xZVaNHygMJm9QJvxG8j5PQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Vt2orQUJ; arc=none smtp.client-ip=209.85.160.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qt1-f226.google.com with SMTP id d75a77b69052e-50b2b2aa276so41394821cf.3
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:58:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775498283; x=1776103083;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SzTj5O42wXMyYqLPUybTBY9GP0xdyTb+BoKz6aKizPE=;
+        b=bqs6R7vTel9yY3Uh3W3EvNVO+tVOb6h4IcCA2hII1agaXLcgqMwjvKVOOiQLc0kiun
+         ZLmTfnPkKPMh3x7T6QthO6Owd1DOu64BMUieL/W/w3NuEw6ppRmAYy2w6lPWZMfPiE/Q
+         i0owhN4C6rdRWOmNAREkEYQs4iJHcvl0s+G5PfcW8ILLn4pPFxGO6b/zpWG9BfCALfKU
+         Z8M0oShK3Vb8q94/993cHnWwmiUgVmCa0Kj5JQVbefUAqChlY/3T/e6QWDzQG9TSIZx6
+         qY+d2ZqPNihdlhj0CD2rLDwlgwSX+KrFPHApxidUXEU3byofcU41g/vb9GJ9vFkfis34
+         qRKQ==
+X-Gm-Message-State: AOJu0YxjJ9qOKFjmyWDMOOHqW5qqmdFb18w9lmufUhn+L/C0fpCGCagv
+	YS3kJj0fhKku/HURywXsbDRU6sFTyOa6s83F1Oi8wyOi9CbpP2RppkzGIm1WdEQsprBKcS+ytR0
+	3/HW9YOv5ufBb2Na4lBOE03PuBA6bh7qn+BxWx84ZO1EkvUJilQFvcI5HW3YbkIfclk+L6/2W02
+	86YZOBY1QNqMhbXHyUqzGlU58sk2PuVzhtkgFkkKvRx4DmyWE418d09tAGNB2/ao5hnLsHjRU22
+	LnwDvFWEQ==
+X-Gm-Gg: AeBDieupjeFCdibM804r7ZDbhuuHf8IaYtd3LvqOGwM5HhHAO7CwORGFX35ldjkVxQQ
+	CVtIfgjjsdxlq/GH8bEqaDmAtYp/osxbVJmzsHIdPups1lLhsNHyfjI4WwyNNI+uPc49Nl+HdT+
+	jldtsmK1Ibt/UtrBAwLdYhYEZXYLG2dEBsXrun7hrU8omePRrKeOiywefLKrSnLFkoZdLJqtcqh
+	pIm84NTRuuRMbSz0vydUVJMrjeBD3BWX8d10xYwkyymTAoe47rlsxFCIq23B7Xaw5p45TH4BpSz
+	kuUmTCTi+ZMwzSOGNtu73O54Z3jE2pX+R1xvqir9Xjd75uUfwQCHXZYbfHXM5mvk8/zfJVUP13W
+	ZOArDzdDYEP0EBwItVS0OxLhr3Z8UsMspU3wtk9XI2RUOI/EO7wJCM3mg6nix/fkOsFyQR+f38S
+	TcIn6movIwrtbp8QGFFrY4pFPSf5J60xT60YIRmCRNfHmnJQgGXyhr7hI=
+X-Received: by 2002:a05:622a:4e09:b0:509:3d06:96a with SMTP id d75a77b69052e-50d62b12664mr201371861cf.53.1775498282725;
+        Mon, 06 Apr 2026 10:58:02 -0700 (PDT)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-24.dlp.protect.broadcom.com. [144.49.247.24])
+        by smtp-relay.gmail.com with ESMTPS id d75a77b69052e-50d4f6ad262sm9257251cf.9.2026.04.06.10.58.01
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 06 Apr 2026 10:58:02 -0700 (PDT)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-89f670976acso117038896d6.0
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 10:58:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1775498281; x=1776103081; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SzTj5O42wXMyYqLPUybTBY9GP0xdyTb+BoKz6aKizPE=;
+        b=Vt2orQUJ+3fMR3tTiurAmnGmHp9CJGuPvjioUgKGR4nWGQoc5RJE3PKhZmzwhiLj48
+         3SK1TeDGYPKEnB96bpG8LgtWfv7k1azlZQ9gJdpkY+CotFe4oB8Tn5CvxpK2d3btAUO6
+         90zBK6Qg7ivAPcSSd2qYoBM/AeaXP+DMoLw1s=
+X-Received: by 2002:a05:6214:224b:b0:89a:107a:5ad with SMTP id 6a1803df08f44-8a704cb262cmr224865736d6.45.1775498281150;
+        Mon, 06 Apr 2026 10:58:01 -0700 (PDT)
+X-Received: by 2002:a05:6214:224b:b0:89a:107a:5ad with SMTP id 6a1803df08f44-8a704cb262cmr224865246d6.45.1775498280564;
+        Mon, 06 Apr 2026 10:58:00 -0700 (PDT)
+Received: from stbsdo-bld-1.sdg.broadcom.net ([192.19.161.248])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8a596915986sm141462266d6.24.2026.04.06.10.57.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Apr 2026 10:58:00 -0700 (PDT)
+From: Justin Chen <justin.chen@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	andrew+netdev@lunn.ch,
+	bcm-kernel-feedback-list@broadcom.com,
+	florian.fainelli@broadcom.com,
+	opendmb@gmail.com,
+	nb@tipi-net.de,
+	Justin Chen <justin.chen@broadcom.com>
+Subject: [PATCH net v3 0/3] net: bcmgenet: fix queue lock up
+Date: Mon,  6 Apr 2026 10:57:53 -0700
+Message-Id: <20260406175756.134567-1-justin.chen@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-1.16 / 15.00];
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MV_CASE(0.50)[];
-	R_DKIM_ALLOW(-0.20)[linux-foundation.org:s=korg];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64];
+	DMARC_POLICY_ALLOW(-0.50)[broadcom.com,reject];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[broadcom.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275676-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[linux-foundation.org];
-	RCPT_COUNT_TWELVE(0.00)[24];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[linux-foundation.org:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_CC(0.00)[redhat.com,kernel.org,google.com,davemloft.net,lunn.ch,broadcom.com,gmail.com,tipi-net.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275677-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[justin.chen@broadcom.com,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[akpm@linux-foundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[broadcom.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:dkim,broadcom.com:mid];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,linux-foundation.org:dkim,linux-foundation.org:mid]
-X-Rspamd-Queue-Id: C0CCB3A5EF2
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: F036E3A5F31
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon,  6 Apr 2026 10:44:25 -0700 "JP Kobryn (Meta)" <jp.kobryn@linux.dev> wrote:
+We have been seeing reports of logs like this.
+# [   39.713199] bcmgenet 1001300000.ethernet eth0: NETDEV WATCHDOG: CPU: 0: transmit queue 2 timed out 7991 ms
+[   41.761198] bcmgenet 1001300000.ethernet eth0: NETDEV WATCHDOG: CPU: 0: transmit queue 2 timed out 10039 ms
+[   43.745198] bcmgenet 1001300000.ethernet eth0: NETDEV WATCHDOG: CPU: 0: transmit queue 2 timed out 12023 ms
+[   45.729198] bcmgenet 1001300000.ethernet eth0: NETDEV WATCHDOG: CPU: 0: transmit queue 2 timed out 14007 ms
 
-> When reclaim is triggered by high order allocations on a fragmented system,
-> vmpressure() can report poor reclaim efficiency even though the system has
-> plenty of free memory. This is because many pages are scanned, but few are
-> found to actually reclaim - the pages are actively in use and don't need to
-> be freed. The resulting scan:reclaim ratio causes vmpressure() to assert
-> socket pressure, throttling TCP throughput unnecessarily.
-> 
-> Costly order allocations (above PAGE_ALLOC_COSTLY_ORDER) rely heavily on
-> compaction to succeed, so poor reclaim efficiency at these orders does not
-> necessarily indicate memory pressure. The kernel already treats this order
-> as the boundary where reclaim is no longer expected to succeed and
-> compaction may take over.
-> 
-> Make vmpressure() order-aware through an additional parameter sourced from
-> scan_control at existing call sites. Socket pressure is now only asserted
-> when order <= PAGE_ALLOC_COSTLY_ORDER.
-> 
-> Memcg reclaim is unaffected since try_to_free_mem_cgroup_pages() always
-> uses order 0, which passes the filter unconditionally. Similarly,
-> vmpressure_prio() now passes order 0 internally when calling vmpressure(),
-> ensuring critical pressure from low reclaim priority is not suppressed by
-> the order filter.
+We have two issues. The persistent queue timeouts and the eventual lock up of the entire transmit.
 
-Thanks.  I'd prefer to park this until after next -rc1.  I could be
-argued with, but....
+We address the lock up issue first. The queue timeouts are due to a fundamental design issue
+not a bug perse. Timeouts still persist, but we should no longer lock up.
 
-What I'm not understanding from the above is how beneficial this patch
-is.  Some description of observed before-and-after behavior, preferably
-with impressive measurements?
+v3
+- Dropped this patch. Not relevant yet.
+  net: bcmgenet: relax the xmit ring full case
 
+v2
+- These patches stayed the same.
+  net: bcmgenet: fix off-by-one in bcmgenet_put_txcb
+  net: bcmgenet: fix leaking free_bds
+- New patches that fix a few other slightly related issues.
+  net: bcmgenet: fix off-by-one in bcmgenet_put_txcb
+  net: bcmgenet: relax the xmit ring full case
+
+Justin Chen (3):
+  net: bcmgenet: fix off-by-one in bcmgenet_put_txcb
+  net: bcmgenet: fix leaking free_bds
+  net: bcmgenet: fix racing timeout handler
+
+ .../net/ethernet/broadcom/genet/bcmgenet.c    | 30 +++++++++----------
+ 1 file changed, 14 insertions(+), 16 deletions(-)
+
+-- 
+2.34.1
 
 
