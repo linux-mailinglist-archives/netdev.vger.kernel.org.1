@@ -1,107 +1,66 @@
-Return-Path: <netdev+bounces-275738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275739-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uP5FDbAe1GmJrQcAu9opvQ
-	(envelope-from <netdev+bounces-275738-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 22:59:28 +0200
+	id 2DD8J4Mg1GkxrgcAu9opvQ
+	(envelope-from <netdev+bounces-275739-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:07:15 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id B83EE3A763A
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 22:59:27 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AE373A7692
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 23:07:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7F8B43014B91
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 20:59:21 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D63AB302A7D9
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 21:07:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB9D8342146;
-	Mon,  6 Apr 2026 20:59:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF9330EF7D;
+	Mon,  6 Apr 2026 21:07:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="o57RMeOs";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dCtOOgJy"
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="PHwJHf9e"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6989B1E531
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 20:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629102D7BF;
+	Mon,  6 Apr 2026 21:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775509158; cv=none; b=fH9PfkzPuDfrEpWWKXcqRvdrqoZ+MpT/5IP4unORFYkzKHFf4E+n4paxI2Ev4wWkVG/ORw1x77wunzFvIs1qAJEkTjblDhWIYVgPx53KFQU4vukkDH+phMhwaOJMrnCsxpBfeJD3LRCJkRFk58dEPuHruxHQ0TL7s2wypDaRAlk=
+	t=1775509630; cv=none; b=Ul6R+mpBHIYWBbF+1WnQp/3O/eUy+tBEPEXT/HU9BzfShowF6Vz3s5kyvRBDExjvQ0bUh4CFo6gldDfBfjY7rbRuS5OG2Xh5ObehHB16QeNpgjJfRp5dPae7X3HPVTsps9Bsu+TDqirfT/4wgZv/d4VGnyZGar61CS4OevV4DLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775509158; c=relaxed/simple;
-	bh=magp0IE22P75Lgn1+dhhXcundRnYJLEqy3cGcTt9mAI=;
+	s=arc-20240116; t=1775509630; c=relaxed/simple;
+	bh=1LOfMHXAr/3VoSQrFTWUhUhKZV2VaoER/vYpoa0XP0I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sYTum9ZuDHCJ6i83Au3ipZBtFFwNFRL67rE8AlxjTDqiKmexgoN3vLviMY0gB6LTVbCYfYbhZ8qekt5VcHA9fTtqgk/v8vL3yW0c5P7TB/j/O0NrI2vFubvgQ3OdtrsMDvETbwtyA2CwVf1fvhut0+2Z/wuF+IEhRz6mpxHwrVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=o57RMeOs; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dCtOOgJy; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 9AE7B1400265;
-	Mon,  6 Apr 2026 16:59:15 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Mon, 06 Apr 2026 16:59:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1775509155; x=
-	1775595555; bh=utKnC8uziAIDCTK5Eh+hCDCjtBl/gA6MDG1mYjtAUnE=; b=o
-	57RMeOsnTOOyT4IW73/rH932rTXAJYAKDarX8U33faxn2fX+fNmh8YOg8fjXySxh
-	w+N3HU1y8Lbsl3PCXyWN/ZVapWYZ0Dp7DEmD6i80SbZYfKxB1xN9jSk3KPFazEiP
-	/GzQkZ7rYfebQvSer6fJqV1KpwmMoUaiq1RBaIj/SZY4m2yEIb1PTiFLoTc4ACnd
-	0y72L2xlSBYdNnPrTqQ/nrsV+Xhe/AhX+dEwuHi3xxRJx7F73zVbrqn/iT4iRI//
-	/dXX8BeFsUi18vfk8G5/51A27vJa9FXVFJCVGaN+DVu8EQCQBVKgFJpNP8pgp1iN
-	s7oSog0CR5q47xiQ2xCjw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1775509155; x=1775595555; bh=utKnC8uziAIDCTK5Eh+hCDCjtBl/gA6MDG1
-	mYjtAUnE=; b=dCtOOgJyOzaofiuY2yGDWxrJVJDH5uXb+yHCefmHqd96DfDgf8e
-	5B+kL679NQkY5Rs6poa5VMP82Wc/dlgi7AnTN30ke3t29V6H7O05EjHJgZUyqsNG
-	o8SlVgKzrfFJ+SuqbUUrRzAwEC64rSd4STCVzlUNhzkKZmxAOEMYjDvveM+lC4VV
-	1OYVkjbGukXZO26PirL9yHDFUyuGiQ+5J2kgDVami6OzBP44WzkpKdMdttD+hmvr
-	Y35xLNh1ro7MoIG/HfgeYb7cW6HQjZhyJV/zW/CdnyOhhS1qxPBZijoKTyAcAflZ
-	NoTlJfRoFcfGzn3QSrHLhKLOwwsy5sHmSRQ==
-X-ME-Sender: <xms:ox7UaTwmIU27iIqzfFlnEwaZohMZJo5WRaj2wYt-W6CnHHxDR2tZ8g>
-    <xme:ox7UaXGa-KMSB1x57vKOsNhnJSoVURGNnreWdcfdQT5G-GHQhNbOWw8JlGJXzewS-
-    ENBLesL1oiB4XJ36jiZYNlRJCaj7h22JbazJBgWFSITPargQYd2xMs>
-X-ME-Received: <xmr:ox7UaYuBGFIxyoD2eppztvR9oiAJxB3FkmU7n88LCncPpwtYgOmnY6Av554W>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddukeejiecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
-    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
-    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
-    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepuddvpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopehrjhgvthhhfigrnhhisehpuhhrvghsthhorh
-    grghgvrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtohepshgrvggvughmsehnvhhiughirgdrtghomhdprhgtphhtthhope
-    htrghrihhqthesnhhvihguihgrrdgtohhmpdhrtghpthhtohepmhgslhhotghhsehnvhhi
-    ughirgdrtghomhdprhgtphhtthhopegsohhrihhsphesnhhvihguihgrrdgtohhmpdhrtg
-    hpthhtohepjhhohhhnrdhfrghsthgrsggvnhgusehgmhgrihhlrdgtohhmpdhrtghpthht
-    ohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvg
-    hmlhhofhhtrdhnvght
-X-ME-Proxy: <xmx:ox7UaXBHpCEtcgdH5aJO-9EtGi4LiUL66rOTtSdR4d7f6-QWM0pCRw>
-    <xmx:ox7UaTCh6yyWawZF43xpaA5z0rmfAWj9-8SO-kW4E5zi1u7kb2CYCQ>
-    <xmx:ox7UaRqTYzZ8f_MVS3Zwya4YIWTahmS9KkbWztIVcwFLjXVTnIWdNQ>
-    <xmx:ox7UaeELIJA4riF8AqfsIJqwQQ5f5E9tDAl44iHLn2o-kBY6nztGzw>
-    <xmx:ox7UaVmSSLzpmJyz-sce5F3ovXD6o2rcGzUdtFcW8YeIfJN05DtjJby8>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 6 Apr 2026 16:59:14 -0400 (EDT)
-Date: Mon, 6 Apr 2026 22:59:12 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Rishikesh Jethwani <rjethwani@purestorage.com>
-Cc: netdev@vger.kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
-	mbloch@nvidia.com, borisp@nvidia.com, john.fastabend@gmail.com,
-	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, leon@kernel.org
-Subject: Re: [PATCH v12 5/6] tls: add hardware offload key update support
-Message-ID: <adQeoGH8qmhhCSal@krikkit>
-References: <20260402235511.664801-1-rjethwani@purestorage.com>
- <20260402235511.664801-6-rjethwani@purestorage.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eywbwrYwBbbuWkNgU8LPF+8nDzypXflUPznfo4RS/vECs+89fPbFEfxu/4fy/VKV+GCsfRKTPBinkUqN5btkBE0PYnPinMitHV8iYM2z1nMRq+Mmt6MNRJ9VSjIkno3dOZP5//ovtqGiw18nW5BgBz5dpaZoGERLvLCIQlQ8luI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=PHwJHf9e; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from killaraus.ideasonboard.com (2001-14ba-703d-e500--2a1.rev.dnainternet.fi [IPv6:2001:14ba:703d:e500::2a1])
+	by perceval.ideasonboard.com (Postfix) with UTF8SMTPSA id DF513143F;
+	Mon,  6 Apr 2026 23:05:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1775509533;
+	bh=1LOfMHXAr/3VoSQrFTWUhUhKZV2VaoER/vYpoa0XP0I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PHwJHf9eaBqF0JQPh+ng+LOsd6OrJW9PeBsdhY3K7cVhiU2sfzphJxwtKXzmdosyK
+	 phr84tEWXSqYHDuxsNazBpARTpABGzraGcBDW55sRVfZWlNJXDyU8ENxYQuPmm7UNx
+	 IvpGfLzo6EjfB6B2jUBX5wjo9I7QEb3/lTEa0FvE=
+Date: Tue, 7 Apr 2026 00:06:57 +0300
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: Fernando Fernandez Mancera <fmancera@suse.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org,
+	workflows@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, mbloch@nvidia.com
+Subject: Re: [PATCH net-next] docs: netdev: document AI-assisted review
+ tooling
+Message-ID: <20260406210657.GD1268443@killaraus.ideasonboard.com>
+References: <20260406-nb-docs-ai-review-v1-1-b58943762ca9@tipi-net.de>
+ <345722f0-21b1-4970-8c45-ef85edf9d45b@suse.de>
+ <56c5bdfe2e37738e47b3b4d22e21697c@tipi-net.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,69 +69,119 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260402235511.664801-6-rjethwani@purestorage.com>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <56c5bdfe2e37738e47b3b4d22e21697c@tipi-net.de>
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+	DMARC_POLICY_ALLOW(-0.50)[ideasonboard.com,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_DKIM_ALLOW(-0.20)[ideasonboard.com:s=mail];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275738-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275739-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FREEMAIL_CC(0.00)[vger.kernel.org,nvidia.com,gmail.com,kernel.org,davemloft.net,redhat.com,google.com];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	DKIM_TRACE(0.00)[ideasonboard.com:+];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	NEURAL_HAM(-0.00)[-0.998];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,messagingengine.com:dkim]
-X-Rspamd-Queue-Id: B83EE3A763A
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[laurent.pinchart@ideasonboard.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url,killaraus.ideasonboard.com:mid]
+X-Rspamd-Queue-Id: 1AE373A7692
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-04-02, 17:55:10 -0600, Rishikesh Jethwani wrote:
-> During a TLS 1.3 KeyUpdate the NIC key cannot be replaced immediately
-> if previously encrypted HW records are awaiting ACK. start_rekey sets
-> up a temporary SW context with the new key and redirects sendmsg through
-> tls_sw_sendmsg_locked. When no records are pending, complete_rekey runs
-> inline during setsockopt. Otherwise, clean_acked sets REKEY_READY once
-> all old-key records are ACKed, and the next sendmsg calls complete_rekey.
-> complete_rekey flushes remaining SW records, reinstalls HW offload at
-> the current write_seq, and frees the temporary context.
+On Mon, Apr 06, 2026 at 10:24:14PM +0200, Nicolai Buchwitz wrote:
+> On 6.4.2026 21:58, Fernando Fernandez Mancera wrote:
+> > [...]
 > 
-> If another KeyUpdate arrives while a rekey is already pending,
-> start_rekey just re-keys the existing SW AEAD in place.
+> > 
+> > Hi Nicolai,
+> > maybe I am missing something but [2] isn't from sashiko.dev but from 
+> > netdev AI CI instead. See: 
+> > https://netdev-ai.bots.linux.dev/ai-review.html?id=0b114a22-9aab-4265-8bfc-ea1b5bca5514
 > 
-> If complete_rekey fails (tls_dev_add or crypto_aead_setkey),
-> we stay in SW mode (REKEY_FAILED) until a subsequent rekey
-> succeeds, while maintaining TLS_HW configuration.
+> You're right, I mixed up the two systems - the example I linked was
+> from the netdev AI bot, not Sashiko. My mistake on the link.
 > 
-> Tested on Mellanox ConnectX-6 Dx (Crypto Enabled) with multiple
-> TLS 1.3 key update cycles.
+> I stumbled over Sashiko when I noticed the name appearing more often
+> in other reviews and then found Jonathan's LWN article about it [1].
+> 
+> Both tools are actively reviewing patches on the list today. I think
+> it makes sense to document both rather than just one:
+> 
+> The netdev AI bot at netdev-ai.bots.linux.dev
+> Sashiko at sashiko.dev, which posts reviews publicly on its website
+> Both use the same review prompts by Chris Mason [2], so there is
+> common ground - though results will vary between them due to the
+> different AI models (Claude Opus for netdev-ai, Gemini for Sashiko)
+> on top of the usual AI uncertainty.
+> 
+> I think it would be useful to document that AI reviews are happening
+> but mixing AI bots might confuse people.
+> 
+> Agreed, I'll rework the patch to distinguish the two systems once
+> the discussion has been settled.
+> 
+> > The documentation mentioned for running the AI locally is correctly 
+> > related to netdev AI bot.
+> > 
+> > I think it would be useful to document that AI reviews are happening 
+> > but mixing AI bots might confuse people.
+> > 
+> >> Check for findings on your submissions and address
+> >> +valid ones before a maintainer has to relay the same questions.
+> >> +
+> > 
+> > I wonder what would be the consequences for this. If less experienced 
+> > submitters are expected to address issues pointed out by AI bots they 
+> > might work on something that isn't valid. AFAIU, the AI output is only 
+> > forwarded to the submitter after a maintainer reviewed it and believes 
+> > it makes sense.
+> 
+> Fair point. The wording should make clear that the local tooling is
+> an optional aid, not an obligation. I'll soften the language around
+> addressing findings.
+> 
+> Would appreciate input on how much detail is appropriate here -
+> should the doc just acknowledge that AI review exists and point to
+> the tooling, or go into more detail about the workflow?
 
-Something here doesn't seem to work. I have a very simple
-client/server pair where one side just loops doing large send()s and
-does a rekey (send keyupdate + change key) every N iterations (I've
-set N large enough that it goes about 5 seconds between rekeys), and
-the other receives all the data and changes its RX key when it sees a
-keyupdate. If both sides are doing SW, it works. If I configure either
-side to use offload, decrypt fails after the rekey unless I add a
-small sleep() just after changing keys on the TX side.
+In general, if a workflow is expected by a subsystem, it should be
+documented. I don't see much to be gained from not telling submitters
+what they're expecting to do.
+
+More precisely in this case, as a submitter, I would take it pretty
+badly if I was told to act on the output of a tool that is prone to
+hallucinations without a maintainer first triaging the comments.
+
+> [1] https://lwn.net/Articles/1063292/
+> [2] https://github.com/masoncl/review-prompts/blob/main/kernel/subsystem/networking.md
+> 
+> >> +You can also run AI reviews locally before submitting. Instructions
+> >> +and tooling are available at:
+> >> +
+> >> +  https://netdev-ai.bots.linux.dev/ai-local.html
+> >> +
+> >>   Testimonials / feedback
+> >>   -----------------------
+> >> 
+> 
+> Thanks for your input
+> 
+> Nicolai
 
 -- 
-Sabrina
+Regards,
+
+Laurent Pinchart
 
