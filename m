@@ -1,296 +1,300 @@
-Return-Path: <netdev+bounces-275578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275579-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id iEj/FtGd02nGjgcAu9opvQ
-	(envelope-from <netdev+bounces-275578-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:49:37 +0200
+	id MGwmLvqf02lVjwcAu9opvQ
+	(envelope-from <netdev+bounces-275579-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:58:50 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC0AD3A324D
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:49:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31D3A3A32A3
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 13:58:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 620F4300F188
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 11:49:34 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0AFF23012C9B
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 11:58:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06E59332EDE;
-	Mon,  6 Apr 2026 11:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA6833468C;
+	Mon,  6 Apr 2026 11:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="r1D49UlB";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="BxwvLeEe"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="d6LSHNcf";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="RwV/FzmR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-y-209.mailbox.org (mout-y-209.mailbox.org [91.198.250.237])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F801332ED0;
-	Mon,  6 Apr 2026 11:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.237
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08E41A5BAE
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 11:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775476172; cv=none; b=d6aDvW8zY7rdXKh6H4Jkmi/W0U3ppIQ003RwdOJEtif4UoKr2gh0y5KeQIybWbRD4d5FLjZbMf5a3ES4QvdKpBUfBoRLG0dpWEQUw1OYlRyh7766WwPJ++LjBjTrG32DePM35B6T6F2jUtYnXIZNopSm93amFAY4fWS0iZAA2DY=
+	t=1775476726; cv=none; b=KderXjkfmh+f8jDVzTfsCFlrBUU9wDq8vknIrMnCLQRY5KGS+txrv2wVhOhW6Pn6Ox7qqo0mcDHrOu4MuhRQQQzz/CU52gLpd/DAtnWkBbNMgz2ec1qrgF1ahJCTYExEiwnJwD34ok7e7mOub7oj6HIPkhnMGuIlt4RTWymhvFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775476172; c=relaxed/simple;
-	bh=ElTI4ch/q1PK6KaWKqQdkphlnnXPnWeo5BIRo5tQ/z8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZrFsDyAhgpAfdctDTGjoR5R2HXKzSTfcNi7z3g5oNv2e6Qm46IAcKmVtQrn6+lXHSlI48LjvNJp1bqhGgZL5hx3Rqi/+WEXkb4By+Dayy+Ijm9y4zFQwLxklw9RAFEfFDQtG7Upj/aTJp4IZ4bIuOnKFvh38yX1CsLgJm2Pg8OM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=r1D49UlB; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=BxwvLeEe; arc=none smtp.client-ip=91.198.250.237
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-y-209.mailbox.org (Postfix) with ESMTPS id 4fq70L5GxFzB1J0;
-	Mon,  6 Apr 2026 13:49:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1775476162;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lviZr5OB/1BdIsAZAshFDCsCNodIEVkbyY4ofYDvk3o=;
-	b=r1D49UlBIEciX23eXKofB5bDknk2ewFx354ZgKZUN+zVHx80Ub6BH9VYG53Vif9JsftWKQ
-	nWLFZB/QYUrc5uOVPnV3wXCW+zuaR/hjXlTWODEicGpHHgbzGQYdIh2bBN0gycHUVs6hbc
-	Cn6ErOKdUUj3OiyydasXBmVL6w0ZAmyMsSMoJCDNlcdXhlcbLgrx5lUjvnSAmskt1esMZW
-	aGesd34LFJ/YLL7ypIYfg8D1hIza5sLNPBqJMjZ6TzhNjc7LFtKvEMShPg5AgAukGNWULJ
-	MgGkT7h4oExdN0sEbN6f55uT/gqmiv7mJGa/YQRCIz8xo/jO0QO0IxOMjLqAtg==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=BxwvLeEe;
-	spf=pass (outgoing_mbo_mout: domain of mashiro.chen@mailbox.org designates 2001:67c:2050:b231:465::1 as permitted sender) smtp.mailfrom=mashiro.chen@mailbox.org
-From: Mashiro Chen <mashiro.chen@mailbox.org>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1775476161;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lviZr5OB/1BdIsAZAshFDCsCNodIEVkbyY4ofYDvk3o=;
-	b=BxwvLeEe7uGCEmPqca+EYa6Qg890jmTQ4BMs93pMguhwRT8UbWbjFg1nodHE8fcVuUV+OI
-	cEXKJfYdrG5jXNtT3GEcywY1usTFA+mPERDOBVOkVgjZAnoysQHZ4i4SCxr7K1IykxALXc
-	kxzXqrekSsV6oQPqNwyqkUxs3k0I20zWCZIKalkFqSj2xjUq1Aw53vPlHpZBoIR2bA2y1c
-	MLHxxEXqOHsrFFmaK+UVisdHDKU2uFkZYu4XEHFMVTiWinAGM1wXvB7BnKtjZSEnQjDuPx
-	6qJ5AeebFafo3T+IIxvp+4nac3uW5nZW8JZWqkj5Dp5WDcrEgH+1Afha70/ZDQ==
-To: netdev@vger.kernel.org
-Cc: linux-hams@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+6eb7834837cf6a8db75b@syzkaller.appspotmail.com,
-	Mashiro Chen <mashiro.chen@mailbox.org>
-Subject: [PATCH net v2] net: netrom: fix lock order inversion in nr_add_node, nr_del_node and nr_dec_obs
-Date: Mon,  6 Apr 2026 19:49:04 +0800
-Message-ID: <20260406114904.89088-1-mashiro.chen@mailbox.org>
-In-Reply-To: <20260406110643.82577-1-mashiro.chen@mailbox.org>
-References: <20260406110643.82577-1-mashiro.chen@mailbox.org>
+	s=arc-20240116; t=1775476726; c=relaxed/simple;
+	bh=sdulTfIZGIJEqWel6l2jvDouPMlgJ9AyuDVKH+29ZOo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XsNxs5h22hoVNL9rs/94kktTnmOwb8poUCRGJMyQmOo3l/JIFnJixUPMwO2QIAywpBJhQ8jCdpng6C0G0fGlYBPMGAndTwdpzk1rqBW3gYvl0Pn2lZ27p4eMwO0+gOxSiLBqFgx2IANrY5vQkRAcPZom3PlSo8YpdzZYGU/gAPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=d6LSHNcf; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=RwV/FzmR; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6366YCCR704419
+	for <netdev@vger.kernel.org>; Mon, 6 Apr 2026 11:58:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	FN5ZDjiy2FKrMXgecdzRkxCIor0XyXBcB50swAm+tV8=; b=d6LSHNcf5MechMlj
+	hbUY4xanFyVAIBTK1y1NipuQ21zvyafftD5BWhVkJ8qJfrwcAX5gII7hW7R5c1Fi
+	Fi+pGiX+mtD3olTjIyVGrf3sBXohRPBm21iYEksTmPrMes6lshgiI9SSSkpZcAXH
+	60XKjTwEsDam8LU/zOhEQ5/VkPlWuLpUJZrQ3B1b1d6LrhawplxFIf4PbKx4QGo5
+	U5Bfvi4Zw4dwF5UTzHfqWlHUHB2QqkjFSpNm6YRbsrMLbJPIdwnwS91+5P+z6DHw
+	obvCqCrY7AqFzvWWgvC7o4VIrUnMD+O3j17aL9YpnCERr29jk0NCU/vp+QcFqVCq
+	ShWwlw==
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com [209.85.210.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4daudd4yds-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 11:58:44 +0000 (GMT)
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-82a80fb4566so996147b3a.3
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 04:58:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1775476723; x=1776081523; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FN5ZDjiy2FKrMXgecdzRkxCIor0XyXBcB50swAm+tV8=;
+        b=RwV/FzmRWrvy0YxleJd5ibNYlQQRZ1/4Sbf5XfQazogMKk5iVIbYqe/44T2sK7LO1t
+         u/4ZxzS924V5/qh4xmzU5KmzEEsdV5CHFLbhpbjA35Ch3pHWARobOtF4/CHpIiWklNzb
+         3oIWsvo//xDuRVK+nkFsObhd2bZVSGYsq7S+gn52rkxt+viTWuBo+lHpJiYh3Eg65B1I
+         Ygjc155RnorlCdMobPeHTurWKITFaV50ixmTHhbcIrNBKb7EJFg1/tDs8c4YlSn9ja7J
+         O9cqvXudlDFlGpyuzWMhuE7sxuCUnOjXKcCPtuqhsiDe4a8K6TCXGvvYdq7Ue7q2Bvot
+         L4Ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775476723; x=1776081523;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FN5ZDjiy2FKrMXgecdzRkxCIor0XyXBcB50swAm+tV8=;
+        b=jXK4jrEymcemCkx0sdOVBWujaj39NXCE72HPUu4rw9Qn7NOKLQ7ubmhoSO5wnF6UKl
+         OUMncgmOMS+wT6aahM7d6PBJ8ZtuChBFeJmKASqfLCy2rd6EDMhd8IiXQ2EeYqiCQKg6
+         tNWaLLVieKsrxSu5HwOWZpltBILi8/5dp8lKkDUaXkosFnCt4MeQou3icewTCugYObL7
+         sPj0vg0HJJaZIyjZsOv1hIkPGCJjpVu066yAhRcR7RsX/7yv2jAcW8EYkxKTjcPizO20
+         5VLnaKdRVYOQwc/OBFDhwN63b9XpqblphWiraVd88Fh+GU4VxdM0J4oY2hBHJKmTKi6A
+         xE2g==
+X-Forwarded-Encrypted: i=1; AJvYcCX5qDdXos/EOmrPKearHXbEKMZb4AlLKmAVPj1NhAcgC4UjmHO3cnC/FoHWknOXzFVlucKei+I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3rFznRAyS1kmnKfPLjViwSSBbbLfM6nlMP9Qyv+sjZ0GlF8pn
+	xbNVhteXOwP7wtbS5faiBPpBDKDYrQVLnEFV36WfV8FeGxomR23kYtN0PFnEKADEJXayT1bKvbD
+	xO+xk2cZfiVzyr6ife8Pmda2kfo8QM/4txKk4V1HmUU3kkPECpqhIyKxOl19LZEBCiHw=
+X-Gm-Gg: AeBDietjSCNZugJUYtGUYbp5G6jiZH4WiJrCIPTL5ja9lnfVRMrXMdkK3X/K4HhGjOT
+	87n1SnaOBjDBvC7pYjIzBi8BSrz40pZS15SW7xm6pFLtq0j50j4Og1tnGqlPXvVfo9azUwzNWTK
+	7LEmSi+DRqDcqxGdN1CPt2UqeO6vZyqABftW5H/u+wUWF3tHwV11GAkhwUM+O5cMJRJBdg25fwx
+	AusYZePB2WHPbDxveihJDXh7dfR1Io8Q5ZfYx3ymvH1+3J6Qhwwxgm1U1mCvilmHyzU0pWSuadd
+	h3szBDhc8F/RA8gWABW9Ak6BmlVTzmRk0EKUS+WHC9n7opk18jau+0OtOSnh815qhhMjoWFkwPz
+	zNDipkrg+CfKaNWTA6ALT5W5GrgVQzYRLqQC3MhVHs6TXC9d05g==
+X-Received: by 2002:a05:6a00:6ca8:b0:824:3b85:ef89 with SMTP id d2e1a72fcca58-82d0dbb0736mr7001331b3a.5.1775476722515;
+        Mon, 06 Apr 2026 04:58:42 -0700 (PDT)
+X-Received: by 2002:a05:6a00:6ca8:b0:824:3b85:ef89 with SMTP id d2e1a72fcca58-82d0dbb0736mr7001311b3a.5.1775476722026;
+        Mon, 06 Apr 2026 04:58:42 -0700 (PDT)
+Received: from [10.218.41.33] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9c4387esm14889588b3a.31.2026.04.06.04.58.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Apr 2026 04:58:41 -0700 (PDT)
+Message-ID: <8f79000d-ccbb-403c-871c-7a36423c9eee@oss.qualcomm.com>
+Date: Mon, 6 Apr 2026 17:28:35 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] dt-bindings: arm: qcom: Add monaco-evk-ac support
+To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Cc: Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20260401-monaco-evk-ac-sku-v2-0-27b5f702cfba@oss.qualcomm.com>
+ <20260401-monaco-evk-ac-sku-v2-1-27b5f702cfba@oss.qualcomm.com>
+ <7baeajhlqv6ujiqzmknjw3h6qr4mdw6qdywhaczm3c42pzjiue@nsgcbd4jsba5>
+ <0f2612b8-5c44-4934-a625-27a66eeb7bdd@oss.qualcomm.com>
+ <zyarcaimg67uivssnm4uxqiwc2jadolf5kx6moycwlbzhg4gmv@xa75wcpotzpr>
+ <4d32e86f-353c-4951-89ca-46aa49d60f76@oss.qualcomm.com>
+ <7r6373fo56alzqa4e2zzdnsgwfhgdkmbhxe4cvdo4p7fg3zren@eyiml4uedfbn>
+Content-Language: en-US
+From: Umang Chheda <umang.chheda@oss.qualcomm.com>
+In-Reply-To: <7r6373fo56alzqa4e2zzdnsgwfhgdkmbhxe4cvdo4p7fg3zren@eyiml4uedfbn>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-MBO-RS-META: 3i94t3xm3f8pj6gst8r1ke5dzqqc3rkm
-X-MBO-RS-ID: 8d1fc563d922d8c983b
-X-Spamd-Result: default: False [0.84 / 15.00];
+X-Proofpoint-ORIG-GUID: yB_AASem8ufwNmEQL7ox9BvpfcglWFGa
+X-Authority-Analysis: v=2.4 cv=JZ2xbEKV c=1 sm=1 tr=0 ts=69d39ff4 cx=c_pps
+ a=m5Vt/hrsBiPMCU0y4gIsQw==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22
+ a=EUspDBNiAAAA:8 a=XEdbQUFsqSG1udmAHCAA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=IoOABgeZipijB_acs4fv:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA2MDExOCBTYWx0ZWRfX8IxPiJjUzMCq
+ tQ2TamGzBTeyAPCM88o+v+WzDKaNS4KL7LD9Ib9dBk2GJwQ2dIGACkys+DD76RVe9yCzK0n4VWP
+ 9GCnOncaaqz6Dn/6PlmuFd2xPLZTrVXXZMqSilaHGWPrNPJS6PAW18Mtio3ZvgNsXgIOeadtj8P
+ g4h6K7lBfnuOse55fk/j7x6cIi3Y+uHgqpojO3rzMkyqNSDsyDwu3IsPx7saY/yoTlVnK2TzzD9
+ lkj3ZGgYQjkJ4gLZ89jOAow4LVwqCIsZ8ffE2gPs0qRdQQ/I1+tnz2CMYLI44nygCReeCBEaYkI
+ z52Rfog+nmz3+MiKZG6bqv8CS8+6pCZ7WHbHLQHDFdoOrqnXxz1FkTo6nE7CvxCeagH9lXLudVQ
+ VSGPpGiYdc8/GAiPlBSlwR+OWq3n7AkSa8H/udJ3/eddP3ZaJqea3WobX5yAOLMDirhapbT8cP/
+ PJh+b+Bavddt6VXPCgQ==
+X-Proofpoint-GUID: yB_AASem8ufwNmEQL7ox9BvpfcglWFGa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-06_02,2026-04-03_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 clxscore=1015 malwarescore=0 suspectscore=0 adultscore=0
+ priorityscore=1501 lowpriorityscore=0 spamscore=0 bulkscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2604060118
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	TAGGED_FROM(0.00)[bounces-275579-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275578-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mashiro.chen@mailbox.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,6eb7834837cf6a8db75b];
-	RCPT_COUNT_SEVEN(0.00)[10];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[umang.chheda@oss.qualcomm.com,netdev@vger.kernel.org];
 	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mailbox.org:dkim,mailbox.org:email,mailbox.org:mid,appspotmail.com:email,syzkaller.appspot.com:url]
-X-Rspamd-Queue-Id: CC0AD3A324D
+	MID_RHS_MATCH_FROM(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 31D3A3A32A3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-nr_del_node() and nr_dec_obs() acquire nr_node_list_lock first, then
-call nr_remove_neigh() which internally acquires nr_neigh_list_lock.
-nr_add_node() acquires node_lock first, then calls nr_remove_neigh()
-which acquires nr_neigh_list_lock.
 
-Both are the reverse of the lock order used in nr_rt_device_down() and
-nr_rt_free(), which acquire nr_neigh_list_lock before nr_node_list_lock
-and node_lock.
 
-The resulting lock order inversions can cause an ABBA deadlock when
-concurrently executing:
-  - SIOCDELRT or SIOCNRDECOBS ioctl (requires CAP_NET_ADMIN)
-  - bringing down a NET/ROM-attached network device
+On 4/5/2026 1:09 AM, Dmitry Baryshkov wrote:
+> On Sat, Apr 04, 2026 at 04:15:54PM +0530, Umang Chheda wrote:
+>>
+>>
+>> On 4/4/2026 1:58 AM, Dmitry Baryshkov wrote:
+>>> On Fri, Apr 03, 2026 at 04:14:28PM +0530, Umang Chheda wrote:
+>>>> Hello Dmitry,
+>>>>
+>>>> On 4/1/2026 5:06 PM, Dmitry Baryshkov wrote:
+>>>>> On Wed, Apr 01, 2026 at 12:14:42AM +0530, Umang Chheda wrote:
+>>>>>> Introduce bindings for the monaco-evk-ac IoT board, which is
+>>>>>> based on the monaco-ac (QCS8300-AC) SoC variant.
+>>>>>
+>>>>> If it is a different SoC SKU, should it be reflected in the SoC compat
+>>>>> strings?
+>>>>
+>>>> Monaco‑AC does not introduce any S/W differences compared to Monaco SoC
+>>>> -- All IP blocks and bindings remain identical from S/W PoV, Hence
+>>>> haven't included the SoC SKU in the SoC compat strings.
+>>>>
+>>>> Hope this is okay ? Your view on this ?
+>>>
+>>> You are descibing -AC as the main difference between the kits, but then
+>>> you say that -AC doesn't bring new software interfaces. What is the
+>>> difference then between monako-evk and the -ac variant?
+>>>
+>>
+>> The major difference between monaco-evk and monaco-ac-evk boards is that
+>> of power grid. monaco-evk requires 4 PMICs (2x PM8650AU + Maxim MAX20018
+>> + TI TPS6594) to support higher power requirements of monaco-AA variant
+>> of SoC which supports upto 40 TOPS of NPU - whereas this board
+>> "monaco-ac-evk" supports 20 TOPS of NPU and has lesser power
+>> requirements hence 2 PMICs suffice the power requirements (2x PM8650AU).
+> 
+> Is that the only difference? Is the PCB the same? Should we have a
+> single common file for those two variants?
 
-Fix by acquiring nr_neigh_list_lock before nr_node_list_lock and
-node_lock in all three functions, following the canonical lock order,
-and replacing the internal-locking nr_remove_neigh() with
-nr_remove_neigh_locked() which assumes the caller already holds
-nr_neigh_list_lock.
+Yes, the major differences b/w 2 boards are:
+1. Monaco-AA version of SoC in monaco-evk v/s Monaco-AC version of SoC
+in monaco-ac-evk board.
+2. 4 PMICs (2x PM8650AU + Maxim MAX20018 + TI TPS6594) in monaco-evk
+board v/s 2 PMICs (2x PM8650AU) in monaco-ac-evk board.
 
-Fixes: e03e7f20ebf7 ("netrom: fix possible dead-lock in nr_rt_ioctl()")
-Reported-by: syzbot+6eb7834837cf6a8db75b@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=6eb7834837cf6a8db75b
-Signed-off-by: Mashiro Chen <mashiro.chen@mailbox.org>
----
-Changes in v2:
-  - Move __nr_remove_neigh() and nr_remove_neigh_locked() macro definition
-    before nr_add_node() to fix implicit function declaration build error
+PCB is different for both of the boards.
 
- net/netrom/nr_route.c | 45 ++++++++++++++++++++++++-------------------
- 1 file changed, 25 insertions(+), 20 deletions(-)
+Can I restructure as below to avoid code duplication ?
 
-diff --git a/net/netrom/nr_route.c b/net/netrom/nr_route.c
-index 9cc29ae85b06f..c3cceee5a2284 100644
---- a/net/netrom/nr_route.c
-+++ b/net/netrom/nr_route.c
-@@ -75,7 +75,21 @@ static struct nr_neigh *nr_neigh_get_dev(ax25_address *callsign,
- 	return found;
- }
- 
--static void nr_remove_neigh(struct nr_neigh *);
-+static inline void __nr_remove_neigh(struct nr_neigh *nr_neigh)
-+{
-+	hlist_del_init(&nr_neigh->neigh_node);
-+	nr_neigh_put(nr_neigh);
-+}
-+
-+#define nr_remove_neigh_locked(__neigh) \
-+	__nr_remove_neigh(__neigh)
-+
-+static void nr_remove_neigh(struct nr_neigh *nr_neigh)
-+{
-+	spin_lock_bh(&nr_neigh_list_lock);
-+	__nr_remove_neigh(nr_neigh);
-+	spin_unlock_bh(&nr_neigh_list_lock);
-+}
- 
- /*      re-sort the routes in quality order.    */
- static void re_sort_routes(struct nr_node *nr_node, int x, int y)
-@@ -211,6 +225,7 @@ static int __must_check nr_add_node(ax25_address *nr, const char *mnemonic,
- 		nr_neigh_put(nr_neigh);
- 		return 0;
- 	}
-+	spin_lock_bh(&nr_neigh_list_lock);
- 	nr_node_lock(nr_node);
- 
- 	if (quality != 0)
-@@ -246,7 +261,7 @@ static int __must_check nr_add_node(ax25_address *nr, const char *mnemonic,
- 				nr_neigh_put(nr_node->routes[2].neighbour);
- 
- 				if (nr_node->routes[2].neighbour->count == 0 && !nr_node->routes[2].neighbour->locked)
--					nr_remove_neigh(nr_node->routes[2].neighbour);
-+					nr_remove_neigh_locked(nr_node->routes[2].neighbour);
- 
- 				nr_node->routes[2].quality   = quality;
- 				nr_node->routes[2].obs_count = obs_count;
-@@ -281,6 +296,7 @@ static int __must_check nr_add_node(ax25_address *nr, const char *mnemonic,
- 
- 	nr_neigh_put(nr_neigh);
- 	nr_node_unlock(nr_node);
-+	spin_unlock_bh(&nr_neigh_list_lock);
- 	nr_node_put(nr_node);
- 	return 0;
- }
-@@ -293,22 +309,6 @@ static void nr_remove_node_locked(struct nr_node *nr_node)
- 	nr_node_put(nr_node);
- }
- 
--static inline void __nr_remove_neigh(struct nr_neigh *nr_neigh)
--{
--	hlist_del_init(&nr_neigh->neigh_node);
--	nr_neigh_put(nr_neigh);
--}
--
--#define nr_remove_neigh_locked(__neigh) \
--	__nr_remove_neigh(__neigh)
--
--static void nr_remove_neigh(struct nr_neigh *nr_neigh)
--{
--	spin_lock_bh(&nr_neigh_list_lock);
--	__nr_remove_neigh(nr_neigh);
--	spin_unlock_bh(&nr_neigh_list_lock);
--}
--
- /*
-  *	"Delete" a node. Strictly speaking remove a route to a node. The node
-  *	is only deleted if no routes are left to it.
-@@ -331,6 +331,7 @@ static int nr_del_node(ax25_address *callsign, ax25_address *neighbour, struct n
- 		return -EINVAL;
- 	}
- 
-+	spin_lock_bh(&nr_neigh_list_lock);
- 	spin_lock_bh(&nr_node_list_lock);
- 	nr_node_lock(nr_node);
- 	for (i = 0; i < nr_node->count; i++) {
-@@ -339,7 +340,7 @@ static int nr_del_node(ax25_address *callsign, ax25_address *neighbour, struct n
- 			nr_neigh_put(nr_neigh);
- 
- 			if (nr_neigh->count == 0 && !nr_neigh->locked)
--				nr_remove_neigh(nr_neigh);
-+				nr_remove_neigh_locked(nr_neigh);
- 			nr_neigh_put(nr_neigh);
- 
- 			nr_node->count--;
-@@ -361,6 +362,7 @@ static int nr_del_node(ax25_address *callsign, ax25_address *neighbour, struct n
- 			}
- 			nr_node_unlock(nr_node);
- 			spin_unlock_bh(&nr_node_list_lock);
-+			spin_unlock_bh(&nr_neigh_list_lock);
- 
- 			return 0;
- 		}
-@@ -368,6 +370,7 @@ static int nr_del_node(ax25_address *callsign, ax25_address *neighbour, struct n
- 	nr_neigh_put(nr_neigh);
- 	nr_node_unlock(nr_node);
- 	spin_unlock_bh(&nr_node_list_lock);
-+	spin_unlock_bh(&nr_neigh_list_lock);
- 	nr_node_put(nr_node);
- 
- 	return -EINVAL;
-@@ -454,6 +457,7 @@ static int nr_dec_obs(void)
- 	struct hlist_node *nodet;
- 	int i;
- 
-+	spin_lock_bh(&nr_neigh_list_lock);
- 	spin_lock_bh(&nr_node_list_lock);
- 	nr_node_for_each_safe(s, nodet, &nr_node_list) {
- 		nr_node_lock(s);
-@@ -469,7 +473,7 @@ static int nr_dec_obs(void)
- 				nr_neigh_put(nr_neigh);
- 
- 				if (nr_neigh->count == 0 && !nr_neigh->locked)
--					nr_remove_neigh(nr_neigh);
-+					nr_remove_neigh_locked(nr_neigh);
- 
- 				s->count--;
- 
-@@ -497,6 +501,7 @@ static int nr_dec_obs(void)
- 		nr_node_unlock(s);
- 	}
- 	spin_unlock_bh(&nr_node_list_lock);
-+	spin_unlock_bh(&nr_neigh_list_lock);
- 
- 	return 0;
- }
--- 
-2.53.0
+"monaco-evk-common.dtsi" --> This will add/enable all the common
+peripherals of monaco-evk and monaco-ac-evk.
+
+monaco-evk.dts --> Include "monaco-evk-common.dtsi" and enable
+monaco-evk specific changes.
+
+monaco-ac-evk.dts --> Include "monaco-evk-common.dtsi" and enable
+monaco-ac specific changes
+
+Does the above file re-structuring looks good ?
+
+> 
+>>
+>>
+>>> Also, from the naming point of view, it is monako-ac-evk, not the other
+>>> way.
+>>
+>> Ack, will change this to "monaco-ac-evk" in the next version.
+>>
+>> Also, should I change DT name "monaco-ac-sku.dts" instead of current
+>> "monaco-evk-ac-sku" ?
+> 
+> monako-ac-evk.dtsi.
+> 
+>>
+>>>
+>>>>
+>>>>>
+>>>>>>
+>>>>>> Signed-off-by: Umang Chheda <umang.chheda@oss.qualcomm.com>
+>>>>>> ---
+>>>>>>  Documentation/devicetree/bindings/arm/qcom.yaml | 1 +
+>>>>>>  1 file changed, 1 insertion(+)
+>>>>>>
+>>>>>> diff --git a/Documentation/devicetree/bindings/arm/qcom.yaml b/Documentation/devicetree/bindings/arm/qcom.yaml
+>>>>>> index ca880c105f3b..c76365a89687 100644
+>>>>>> --- a/Documentation/devicetree/bindings/arm/qcom.yaml
+>>>>>> +++ b/Documentation/devicetree/bindings/arm/qcom.yaml
+>>>>>> @@ -918,6 +918,7 @@ properties:
+>>>>>>            - enum:
+>>>>>>                - arduino,monza
+>>>>>>                - qcom,monaco-evk
+>>>>>> +              - qcom,monaco-evk-ac
+>>>>>>                - qcom,qcs8300-ride
+>>>>>>            - const: qcom,qcs8300
+>>>>>>  
+>>>>>>
+>>>>>> -- 
+>>>>>> 2.34.1
+>>>>>>
+>>>>>
+>>>>
+>>>> Thanks,
+>>>> Umang
+>>>
+>>
+>> Thanks,
+>> Umang
+>>
+>>
+> 
+
+Thanks,
+Umang
 
 
