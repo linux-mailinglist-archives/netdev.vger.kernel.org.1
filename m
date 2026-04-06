@@ -1,159 +1,292 @@
-Return-Path: <netdev+bounces-275715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275716-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id fI3LJDgM1Gm5qQcAu9opvQ
-	(envelope-from <netdev+bounces-275715-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 21:40:40 +0200
+	id 4BtNDIwO1GkbqgcAu9opvQ
+	(envelope-from <netdev+bounces-275716-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 21:50:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD0183A6B24
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 21:40:36 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 882723A6C2E
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 21:50:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4BC3F3021E9E
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 19:40:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 152953022F92
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 19:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63674396560;
-	Mon,  6 Apr 2026 19:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3192738E5E6;
+	Mon,  6 Apr 2026 19:50:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="POIf5Y0v"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="G8mputUh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69AFB2C1595;
-	Mon,  6 Apr 2026 19:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72293175A8B
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 19:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775504429; cv=none; b=paQQhmXotPdS6kK5xfLWJgY6X5ElOgctSZaQSvOfcE2i3qtEcDVFZme4tZ+1RV5au2cU6WLz1Z+8+m8ud+wgE1Vm4k1R/oYnbnCpCnMAOB7+RgV3ZcI0PoT0RaPjXZ627rh9UpyKTcN1547fmfAnphh7veA1699sWuJWvn2pHGU=
+	t=1775505033; cv=none; b=ut82MuF3VZL7I9tYQ/tbynBTqN9YVeNln1TAbuT6CnRfAmNCkG4A080vA3nvRcBIgbA++iRJNHxDeM7Y9gJrnKK9EXqfHNSpZCg+MiLpgeCma+v5ygpTlaW0sBGrwapyppcs3UlnMABYnzy5RInL6gTxaL1UqcyZnZJ5rAHXvVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775504429; c=relaxed/simple;
-	bh=o6SVX02Cy49xwJaMaA0hSMfOCJpY7mCYLWuYVTyLwpI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=mw1KZIo/yrGnOJjbrPD0quDtbEw4U4S2U1G4qtpKm+G6N0s/JAMixOWOrbNlNg3FbWa+c6whvkqtAE4qFIb5HNmASmIoBBxMITVBaUvT7anyV951G5dcwS3tUhsJv9T3npU54tXGTHWgPoQnTAQloIoNg8nNpvRiW5RHW3t+MP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=POIf5Y0v; arc=none smtp.client-ip=194.13.80.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8D056A589E;
-	Mon,  6 Apr 2026 21:40:21 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
-	t=1775504424; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding; bh=vZusVusnCFkImcX+sjCySol13wfuarQezH6fJsCm24w=;
-	b=POIf5Y0v4k5qQbORPFTqDr3jo0Pdahsu+7wqouakIIX3ZW8VxmBkGXRUegDz7xK+sAuEE1
-	DyfrrkQ8A9d4sdyKGcC7XqqUuJmhaFCeM9X5NfRvASOePhfKa9v8hv6uuiO4XU0ONxQ8Gf
-	wkCeHxNMk5jPtE/7RiCODRHer0BFY/fNVee7ptxI85SYJKD+i+ui6uN8TkMNKZlPpvaA2w
-	gcmz0XJRIJ0wr8CNlil2Zvz63gCOcIZXQR0fte6VoP+uBdUmro69HN4FNt/W3UVdTQ3VN/
-	kBLsqeOln97N7Ln5bFqerB1E3D4ipcjZ1GMN2nj4NZ0cAjHNLWVsnPbDImsFDA==
-From: Nicolai Buchwitz <nb@tipi-net.de>
-Date: Mon, 06 Apr 2026 21:40:00 +0200
-Subject: [PATCH net-next] docs: netdev: document AI-assisted review tooling
+	s=arc-20240116; t=1775505033; c=relaxed/simple;
+	bh=IYzmr2aJkzTSXu/bMIPfkggemYS0Zq7/TlUoiSr9I0E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l3qzwdrvUjSEeLbNeF6q9wGgx9WPo8ROSiDjHKrp0HCq4+h+mH6F4SYveLarJ2yzxvHHPF1rm5xrPxp9mugXzBsCfbEd6HiVLTq6P6LpxCNIKvO33b1kKClqv1+uNqAYH38tyJrlQjGZ6JWu90s/JWr/vi26yWMPINTQySHDOTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=G8mputUh; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775505028;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=wMDWBaqqGgQCGE92Rrt36vAM/h6N+zhFrP9Xojab0ng=;
+	b=G8mputUhX/4ysML4eTqXDXWE2xQtxaez6DRCvP3EvQWF0kYmsCPjkFldTGEaL7J9r65O9d
+	Cxh6tzeHQ3PtUrlb10N73Kw0S1p2m8lyB8OdMyYYrB1RN9Rx8O4mwx+knKJhuYLPh7Wsgs
+	ZhR0+YPYoooIYZKgaJhzrNKOMFCwjcI=
+From: "JP Kobryn (Meta)" <jp.kobryn@linux.dev>
+To: linux-mm@kvack.org,
+	willy@infradead.org,
+	hannes@cmpxchg.org,
+	akpm@linux-foundation.org,
+	david@kernel.org,
+	ljs@kernel.org,
+	Liam.Howlett@oracle.com,
+	vbabka@kernel.org,
+	rppt@kernel.org,
+	surenb@google.com,
+	mhocko@suse.com,
+	kasong@tencent.com,
+	qi.zheng@linux.dev,
+	shakeel.butt@linux.dev,
+	baohua@kernel.org,
+	axelrasmussen@google.com,
+	yuanchu@google.com,
+	weixugc@google.com,
+	riel@surriel.com,
+	kuba@kernel.org,
+	edumazet@google.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-team@meta.com
+Subject: [PATCH v4] mm/vmpressure: skip socket pressure for costly order reclaim
+Date: Mon,  6 Apr 2026 12:50:14 -0700
+Message-ID: <20260406195014.112521-1-jp.kobryn@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260406-nb-docs-ai-review-v1-1-b58943762ca9@tipi-net.de>
-X-B4-Tracking: v=1; b=H4sIAA8M1GkC/x2MwQ5AMBAFf0X2bJNqEPEr4kC9spclrSAR/64cJ
- 5mZmyKCIFKb3RRwSJRVExR5Rm4ZdAbLlJissbUpTc068rS6yIPw5+Nk24yl97ZwvgKlbgvwcv3
- PjhQ7K66d+ud5AWo64+NtAAAA
-X-Change-ID: 20260406-nb-docs-ai-review-28b4ff21cf5e
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, workflows@vger.kernel.org, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Nicolai Buchwitz <nb@tipi-net.de>
-X-Mailer: b4 0.14.2
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-1.66 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[tipi-net.de:s=dkim];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[tipi-net.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-275715-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275716-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[tipi-net.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jp.kobryn@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_NONE(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,sashiko.dev:url]
-X-Rspamd-Queue-Id: AD0183A6B24
+	NEURAL_HAM(-0.00)[-1.000];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
+X-Rspamd-Queue-Id: 882723A6C2E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a section about Sashiko, the Linux Foundation's open-source
-AI review system for kernel patches. Contributors can check review
-feedback on the Sashiko website and address findings proactively,
-reducing the need for maintainers to relay the same questions.
+When reclaim is triggered by high order allocations on a fragmented system,
+vmpressure() can report poor reclaim efficiency even though the system has
+plenty of free memory. This is because many pages are scanned, but few are
+found to actually reclaim - the pages are actively in use and don't need to
+be freed. The resulting scan:reclaim ratio causes vmpressure() to assert
+socket pressure, throttling TCP throughput unnecessarily.
 
-Also point to the local review tooling at netdev-ai.bots.linux.dev
-for contributors who want to run AI reviews before submitting.
+Costly order allocations (above PAGE_ALLOC_COSTLY_ORDER) rely heavily on
+compaction to succeed, so poor reclaim efficiency at these orders does not
+necessarily indicate memory pressure. The kernel already treats this order
+as the boundary where reclaim is no longer expected to succeed and
+compaction may take over.
 
-Signed-off-by: Nicolai Buchwitz <nb@tipi-net.de>
+Make vmpressure() order-aware through an additional parameter sourced from
+scan_control at existing call sites. Socket pressure is now only asserted
+when order <= PAGE_ALLOC_COSTLY_ORDER.
+
+Memcg reclaim is unaffected since try_to_free_mem_cgroup_pages() always
+uses order 0, which passes the filter unconditionally. Similarly,
+vmpressure_prio() now passes order 0 internally when calling vmpressure(),
+ensuring critical pressure from low reclaim priority is not suppressed by
+the order filter.
+
+The patch was motivated by a case of impacted net throughput in production.
+On one affected host, the memory state at the time showed ~15GB available,
+zero cgroup pressure, and the following buddyinfo state:
+
+Order FreePages
+0:    133,970
+1:    29,230
+2:    17,351
+3:    18,984
+7+:   0
+
+Using bpf, it was found that 94% of vmpressure calls on this host were from
+order-7 kswapd reclaim.
+
+TCP minimum recv window is rcv_ssthresh:19712.
+
+Before patch:
+723 out of 3,843 (19%) TCP connections stuck at minimum recv window
+
+After live-patching and ~30min elapsed:
+0 out of 3,470 TCP connections stuck at minimum recv window
+
+Signed-off-by: JP Kobryn (Meta) <jp.kobryn@linux.dev>
+Reviewed-by: Rik van Riel <riel@surriel.com>
+Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+Acked-by: Shakeel Butt <shakeel.butt@linux.dev>
+Acked-by: Jakub Kicinski <kuba@kernel.org>
 ---
-Sashiko [1] reviews are already being used on the list (e.g. [2])
-but there's no mention of them in the netdev docs. Add a section
-so contributors know they can check and respond to AI review
-feedback directly.
+v4
+ - update changelog to include prod data
 
-Based on Jakub's reviewer guidance patch [3].
+v3: https://lore.kernel.org/linux-mm/20260406174425.61692-1-jp.kobryn@linux.dev/
+ - update changelog to justify patch beyond just networking
+ - update changelog to expand scope of vmpressure beyond kswapd
 
-[1] https://sashiko.dev/
-[2] https://lore.kernel.org/all/20260324024235.929875-1-kuba@kernel.org/
-[3] https://lore.kernel.org/all/20260406175334.3153451-1-kuba@kernel.org/
----
- Documentation/process/maintainer-netdev.rst | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+v2: https://lore.kernel.org/linux-mm/20260402232511.17246-1-jp.kobryn@linux.dev/
+ - dropped extern specifier from vmpressure decl
+ - added comment to explain rationale of adjusted conditional
 
-diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-index bda93b459a0533fa1adfd11b756a4f47d1dbaa22..27296afb05d3828a350b4ed5c16907672db9785d 100644
---- a/Documentation/process/maintainer-netdev.rst
-+++ b/Documentation/process/maintainer-netdev.rst
-@@ -559,6 +559,19 @@ Reviewers are highly encouraged to do more in-depth review of submissions
- and not focus exclusively on process issues, trivial or subjective
- matters like code formatting, tags etc.
+v1: https://lore.kernel.org/all/20260401203752.643259-1-jp.kobryn@linux.dev/
+
+ include/linux/vmpressure.h |  9 +++++----
+ mm/vmpressure.c            | 15 ++++++++++++---
+ mm/vmscan.c                |  8 ++++----
+ 3 files changed, 21 insertions(+), 11 deletions(-)
+
+diff --git a/include/linux/vmpressure.h b/include/linux/vmpressure.h
+index 6a2f51ebbfd35..faecd55224017 100644
+--- a/include/linux/vmpressure.h
++++ b/include/linux/vmpressure.h
+@@ -30,8 +30,8 @@ struct vmpressure {
+ struct mem_cgroup;
  
-+AI-assisted review
-+~~~~~~~~~~~~~~~~~~
-+
-+Patches posted to netdev are automatically reviewed by the Sashiko
-+AI review system (https://sashiko.dev/). Results are posted publicly
-+on the website. Check for findings on your submissions and address
-+valid ones before a maintainer has to relay the same questions.
-+
-+You can also run AI reviews locally before submitting. Instructions
-+and tooling are available at:
-+
-+  https://netdev-ai.bots.linux.dev/ai-local.html
-+
- Testimonials / feedback
- -----------------------
+ #ifdef CONFIG_MEMCG
+-extern void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
+-		       unsigned long scanned, unsigned long reclaimed);
++void vmpressure(gfp_t gfp, int order, struct mem_cgroup *memcg, bool tree,
++		unsigned long scanned, unsigned long reclaimed);
+ extern void vmpressure_prio(gfp_t gfp, struct mem_cgroup *memcg, int prio);
  
-
----
-base-commit: d00749db443cf420a882c020ce0e6bb5c43009de
-change-id: 20260406-nb-docs-ai-review-28b4ff21cf5e
-
-Best regards,
+ extern void vmpressure_init(struct vmpressure *vmpr);
+@@ -44,8 +44,9 @@ extern int vmpressure_register_event(struct mem_cgroup *memcg,
+ extern void vmpressure_unregister_event(struct mem_cgroup *memcg,
+ 					struct eventfd_ctx *eventfd);
+ #else
+-static inline void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
+-			      unsigned long scanned, unsigned long reclaimed) {}
++static inline void vmpressure(gfp_t gfp, int order, struct mem_cgroup *memcg,
++			      bool tree, unsigned long scanned,
++			      unsigned long reclaimed) {}
+ static inline void vmpressure_prio(gfp_t gfp, struct mem_cgroup *memcg,
+ 				   int prio) {}
+ #endif /* CONFIG_MEMCG */
+diff --git a/mm/vmpressure.c b/mm/vmpressure.c
+index 3fbb86996c4d2..f053554e58264 100644
+--- a/mm/vmpressure.c
++++ b/mm/vmpressure.c
+@@ -218,6 +218,7 @@ static void vmpressure_work_fn(struct work_struct *work)
+ /**
+  * vmpressure() - Account memory pressure through scanned/reclaimed ratio
+  * @gfp:	reclaimer's gfp mask
++ * @order:	allocation order being reclaimed for
+  * @memcg:	cgroup memory controller handle
+  * @tree:	legacy subtree mode
+  * @scanned:	number of pages scanned
+@@ -236,7 +237,7 @@ static void vmpressure_work_fn(struct work_struct *work)
+  *
+  * This function does not return any value.
+  */
+-void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
++void vmpressure(gfp_t gfp, int order, struct mem_cgroup *memcg, bool tree,
+ 		unsigned long scanned, unsigned long reclaimed)
+ {
+ 	struct vmpressure *vmpr;
+@@ -307,7 +308,15 @@ void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
+ 
+ 		level = vmpressure_calc_level(scanned, reclaimed);
+ 
+-		if (level > VMPRESSURE_LOW) {
++		/*
++		 * Once we go above COSTLY_ORDER, reclaim relies heavily on
++		 * compaction to make progress. Reclaim efficiency was never a
++		 * great proxy for pressure to begin with, but it's outright
++		 * misleading with these high orders. Don't throttle sockets
++		 * because somebody is attempting something crazy like an order-7
++		 * and predictably struggling.
++		 */
++		if (level > VMPRESSURE_LOW && order <= PAGE_ALLOC_COSTLY_ORDER) {
+ 			/*
+ 			 * Let the socket buffer allocator know that
+ 			 * we are having trouble reclaiming LRU pages.
+@@ -348,7 +357,7 @@ void vmpressure_prio(gfp_t gfp, struct mem_cgroup *memcg, int prio)
+ 	 * to the vmpressure() basically means that we signal 'critical'
+ 	 * level.
+ 	 */
+-	vmpressure(gfp, memcg, true, vmpressure_win, 0);
++	vmpressure(gfp, 0, memcg, true, vmpressure_win, 0);
+ }
+ 
+ #define MAX_VMPRESSURE_ARGS_LEN	(strlen("critical") + strlen("hierarchy") + 2)
+diff --git a/mm/vmscan.c b/mm/vmscan.c
+index 5a8c8fcccbfc9..1342323a0b41f 100644
+--- a/mm/vmscan.c
++++ b/mm/vmscan.c
+@@ -5071,8 +5071,8 @@ static int shrink_one(struct lruvec *lruvec, struct scan_control *sc)
+ 	shrink_slab(sc->gfp_mask, pgdat->node_id, memcg, sc->priority);
+ 
+ 	if (!sc->proactive)
+-		vmpressure(sc->gfp_mask, memcg, false, sc->nr_scanned - scanned,
+-			   sc->nr_reclaimed - reclaimed);
++		vmpressure(sc->gfp_mask, sc->order, memcg, false,
++			   sc->nr_scanned - scanned, sc->nr_reclaimed - reclaimed);
+ 
+ 	flush_reclaim_state(sc);
+ 
+@@ -6175,7 +6175,7 @@ static void shrink_node_memcgs(pg_data_t *pgdat, struct scan_control *sc)
+ 
+ 		/* Record the group's reclaim efficiency */
+ 		if (!sc->proactive)
+-			vmpressure(sc->gfp_mask, memcg, false,
++			vmpressure(sc->gfp_mask, sc->order, memcg, false,
+ 				   sc->nr_scanned - scanned,
+ 				   sc->nr_reclaimed - reclaimed);
+ 
+@@ -6220,7 +6220,7 @@ static void shrink_node(pg_data_t *pgdat, struct scan_control *sc)
+ 
+ 	/* Record the subtree's reclaim efficiency */
+ 	if (!sc->proactive)
+-		vmpressure(sc->gfp_mask, sc->target_mem_cgroup, true,
++		vmpressure(sc->gfp_mask, sc->order, sc->target_mem_cgroup, true,
+ 			   sc->nr_scanned - nr_scanned, nr_node_reclaimed);
+ 
+ 	if (nr_node_reclaimed)
 -- 
-Nicolai Buchwitz <nb@tipi-net.de>
+2.52.0
 
 
