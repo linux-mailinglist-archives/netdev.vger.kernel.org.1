@@ -1,202 +1,186 @@
-Return-Path: <netdev+bounces-275607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275608-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id OJx1BnG/02n6lQcAu9opvQ
-	(envelope-from <netdev+bounces-275607-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:13:05 +0200
+	id aEK+Cnq/02n6lQcAu9opvQ
+	(envelope-from <netdev+bounces-275608-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:13:14 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80E073A3CF0
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:13:04 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E6113A3D06
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 16:13:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5BF15300DF50
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 14:12:39 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id BE8103006B6A
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 14:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A8C37DEAF;
-	Mon,  6 Apr 2026 14:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T6c9cOgp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8084371D0D;
+	Mon,  6 Apr 2026 14:13:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B4C296BD2
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 14:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C43637E2F7
+	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 14:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775484758; cv=none; b=rsGzhCGUgRrpaUWuz5FP7M5jyP0RQXU12r9gbUfeJOVcRMIhxaKQdIW1rVuut3rjrva2hXVhrNno9bLlSjxp2Sezdmws9Vm1VFHgU7P9xmnyR0fb0kdG+HdJtv8az7bQ8/mBIy3pOQJpEO3eirR2GGgC+w1ovbm6AlQ+f9EBbvk=
+	t=1775484791; cv=none; b=npbk1KmfjFFHJDl7Lvm86G7Hos6lUJC7usOLMroJ3WRK7MmTckI1Feeb0DK6esajRq0QHl8IZhbs7aBGQ/Dbr9nPHfN2qYzbpGG1qXMxfQ2h9t6zaYTACX69t1XJcbPLqLwz3VZnPlMElZjFzkB8hR7pK+NNYczSPOQ2mehbCno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775484758; c=relaxed/simple;
-	bh=UK2SVH8TXBaIYXis85mAu9ZcKBy/IYwma3iGJlQ34PU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=faXo4EztWx64oW4KUEW7zvGy5zT1Evqzogl7W2acq3AyuYnVi8G43cZhPnmwAdteFLycDWO4LSM8HYsGVAjhDqJdTAD4+TAbglNWeC4r8eD3HlbF0vxybewsVIS022RLTyLN6wwgSzErgDlPh8+/s8sJIJgcafs7GmW/R/aTgkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T6c9cOgp; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8d00cf835b7so503861485a.1
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 07:12:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775484756; x=1776089556; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pMOsnvmEr0i8ZUnWpq78US8xsmNYVDcykG72w05H6j4=;
-        b=T6c9cOgpbV2eN3u35Ux55zm3CqMlunNhL+u+SoqaXMzEEnCtGorLY8CGg2LoqoGy5y
-         DuHEEMB4NX2Xk0VxJT6dIDPKobAHCkinqrP7A+PJ+L7FdTuAQr+stTvUPS2lyQVdYaQj
-         c2SK4G9Tp4pylAfOv3UfLRwp8pfcJvCP2ytzKzd+JIkqfzGKzn1H6J/P56zdsoF0akEN
-         qv6hEaAptLe99U+QemWj8ayphtfgfrwm8eB1vgGpqWlY2XnojDlCm/RnT3dLZl/TcE1n
-         VAo75AQvPKNQ2vR6YY9J42m+5YiIYor/Dv2d4stmjKSernMjLsAjnoQgFqr3N35WV3/7
-         KHZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775484756; x=1776089556;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pMOsnvmEr0i8ZUnWpq78US8xsmNYVDcykG72w05H6j4=;
-        b=eeR7PllIRIM8czGuOtA1gbsS8DFvqRjQLjDVQe/M5d4vZagLWkNfLFwNWhV67QJDmt
-         JLxysAEAl2NNMYRtJHgx/3LZjxvgBOg9Vl0zINnFx2GD3z3S426rs4RY29FWNzcvu52Z
-         Ld93iO6mulp+XXAEdhB2Gix4eN5My+woUo02BZERRg79aYJAodKrcsoYRSvqnpNCHreS
-         yznagcSvJLFLROOcWWzz+08dlHHDZgGUzg8Tt6mWTGkD8VYrGzrKoT/wBlhdh0JA4cBs
-         BSdO+BY0b0JVxsmS9JYRWYMVyh+Mwra3xFLLvgnaPnhQ1JNwGNcN+1/LDIEaP9NqR65o
-         rmbw==
-X-Forwarded-Encrypted: i=1; AJvYcCUs58NPkGk4IhivkpAEnKdl3xj/n8aJMBvC9544jhRyGglw//bRvLOC+sb3Mvcrvr8H1OOZBXI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVJYyfZbYA0YqBOdjfRtyz1Xwv5DptEQ6fEsHnPCDYcu2HBu/R
-	ZhnjG7roUSkLo96EO092CubZ5QUQPPxzYAXLhyb4AsU3lGbrCVYtz1aH
-X-Gm-Gg: AeBDiesMwajpTi3xKhRjSqfrEvN5RIaJbtpTmBs+Ob9W1M2xy7ZFMxW+YDpObSGCtyT
-	IzWZTJgjXAnjrTteZgN7Kszh+H6QfQWe2eYckTINf1PoX28+tw8MlV2y3DH8CH4X0eRmQBUGBe0
-	vHAWtYu5J3irEhaWT+Hppy5XnGnHPbspOoK2VWSwKCpAVkf2fNMypfLHeTrUImFQjKqg+fUxiOm
-	U46G8KfZU1NvIju2IqgGBWMxRlUMNyhf3tkWBFSWZR3jd9M0rBv/NqQveRogijzCObYuBOYdB+F
-	BAG25kmn4ACizHg7wOelj38HSnhb6s0ao4TPWRCpIg9NMSPpeWRAdcesdkJi3YApz2afGb+ic3N
-	JprFavX/txCaNStxk+WFssnB9SG5kuW91SA3nqPHg+y/ASNrkcSInHQpEPLZ36LZlpmf61JqNnb
-	gEGkszqG7lgV6k0hQaDjR6TQI/I96fH8m3tnuIgYV8U5FajNr8Vl6E6Ok7NDOC16ke2aB3YOX2/
-	pSkXA+AMyT+fB+hYEjDUDnbHAzhb1J+Nwit+A==
-X-Received: by 2002:a05:620a:28ce:b0:8c7:ad9:d0a2 with SMTP id af79cd13be357-8d41c3b5997mr1797056085a.22.1775484755986;
-        Mon, 06 Apr 2026 07:12:35 -0700 (PDT)
-Received: from ?IPV6:2600:4040:93b4:e600:a22c:878f:7c1a:1976? ([2600:4040:93b4:e600:a22c:878f:7c1a:1976])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8d2a1307586sm1059779585a.0.2026.04.06.07.12.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Apr 2026 07:12:34 -0700 (PDT)
-Message-ID: <c502c837-6f01-4854-bd6b-e81aba940dc8@gmail.com>
-Date: Mon, 6 Apr 2026 10:12:32 -0400
+	s=arc-20240116; t=1775484791; c=relaxed/simple;
+	bh=1JsMDjMGSWHym8yj04RdSWUfoHm/5ptMjRJYrRDKQ60=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EiCP8SEy1gP/HpyMbEhXhg2QI9mIaIhmd+cXcHPD4IjunfwKmiC0c3Tr0N/a31kjnllFqqh7LVDjwAz9gxTerwRuUz7gRVoEThvK02EvEFvzSz6G0uieCdMaRQQxFCDD3vn1ppDe5JO623din3cLO3yRNPmpgH9cVXEhVBV5/c8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w9khC-0004yD-Fe; Mon, 06 Apr 2026 16:12:54 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w9khB-0041iE-1Z;
+	Mon, 06 Apr 2026 16:12:53 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1w9khB-0000000B4gG-1Ul0;
+	Mon, 06 Apr 2026 16:12:53 +0200
+Date: Mon, 6 Apr 2026 16:12:53 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Carlo Szelinsky <github@szelinsky.de>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/3] net: mdio: treat PSE EPROBE_DEFER as
+ non-fatal during PHY registration
+Message-ID: <adO_Za-X1cMjCEEa@pengutronix.de>
+References: <6185f9d8-dabe-4190-b020-711e3a046e64@lunn.ch>
+ <20260405185730.3937952-1-github@szelinsky.de>
+ <adN9Ha5FgJ8sp6gj@pengutronix.de>
+ <1df8b470-2449-418d-a4a8-9cd929ced463@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 net-next 3/5] psp: add a new netdev event for dev
- unregister
-To: Wei Wang <weibunny.kernel@gmail.com>, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- David Wei <dw@davidwei.uk>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Simon Horman <horms@kernel.org>
-Cc: Wei Wang <weibunny@fb.com>
-References: <20260405055853.3285534-1-weibunny.kernel@gmail.com>
- <20260405055853.3285534-4-weibunny.kernel@gmail.com>
-Content-Language: en-US
-From: Daniel Zahka <daniel.zahka@gmail.com>
-In-Reply-To: <20260405055853.3285534-4-weibunny.kernel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1df8b470-2449-418d-a4a8-9cd929ced463@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275607-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275608-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org,kernel.org,davidwei.uk,lunn.ch,davemloft.net,google.com];
+	DMARC_NA(0.00)[pengutronix.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TO_DN_SOME(0.00)[];
+	FREEMAIL_CC(0.00)[szelinsky.de,bootlin.com,lunn.ch,gmail.com,armlinux.org.uk,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
+	RCPT_COUNT_TWELVE(0.00)[13];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	RCVD_COUNT_FIVE(0.00)[5];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[danielzahka@gmail.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
+	NEURAL_SPAM(0.00)[0.624];
+	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,fb.com:email]
-X-Rspamd-Queue-Id: 80E073A3CF0
+	MID_RHS_MATCH_FROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,pengutronix.de:mid,pengutronix.de:url]
+X-Rspamd-Queue-Id: 5E6113A3D06
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+On Mon, Apr 06, 2026 at 02:22:16PM +0200, Andrew Lunn wrote:
+> > The core question, do we need PSE for PHY functionality?
+> 
+> I don't think the PHY should require PSE in order to send/receive
+> frames. If the PSE is not supplying power, the link peer is probably
+> off, but that is not so different from the cable being unplugged.
+> 
+> > We can make a step back and re-evaluate - what functionality and what
+> > order is actually required to find potentially better implementation.
+> > 
+> > We have a lot of current flowing over wires, budget and port
+> > prioritization issues, things which may damage HW if done not correctly.
+> > With other word, if we do not have properly operational environment
+> > providing system specific policies, it is better to run safe
+> > configuration - all ports/regulators are off.
+> > 
+> > This means:
+> > - PSE controller driver should be registered as early as possible,
+> >   without caring about existence of PHYs, ports or network interfaces.
+> >   And configure ports in to default safe operation - off. Accept we
+> >   have some controller/firmware which would care about safety.
+> 
+> Don't most PSE have I2C or SPI interfaces? So they have a different
+> life cycle to PHYs, ports or netdevs. Only PSEs which are embedded
+> within a PHY, on an MDIO bus, will have a closely linked life
+> cycle. But do such devices exist?
 
-On 4/5/26 1:58 AM, Wei Wang wrote:
-> From: Wei Wang <weibunny@fb.com>
->
-> Add a new netdev event for dev unregister and handle the removal of this
-> dev from psp->assoc_dev_list, upon the first dev-assoc operation.
->
-> Signed-off-by: Wei Wang <weibunny@fb.com>
-> ---
-...
-> +static bool psp_notifier_registered;
-> +
-> +/**
-> + * psp_attach_netdev_notifier() - register netdev notifier on first use
-> + *
-> + * Register the netdevice notifier when the first device association
-> + * is created. In many installations no associations will be created and
-> + * the notifier won't be needed.
-> + *
-> + * Must be called without psd->lock held, due to lock ordering:
-> + * rtnl_lock -> psd->lock (the notifier callback runs under rtnl_lock
-> + * and takes psd->lock).
-> + */
-> +int psp_attach_netdev_notifier(void)
-> +{
-> +	int err = 0;
-> +
-> +	if (READ_ONCE(psp_notifier_registered))
-> +		return 0;
-> +
-> +	mutex_lock(&psp_devs_lock);
-> +	if (!psp_notifier_registered) {
-> +		err = register_netdevice_notifier(&psp_netdev_notifier);
-> +		if (!err)
-> +			WRITE_ONCE(psp_notifier_registered, true);
-> +	}
-> +	mutex_unlock(&psp_devs_lock);
-> +
-> +	return err;
-> +}
-> +
+i'm not aware of any.
 
+> As soon as the PSE probes with all the resources it needs, and can
+> impose a safe default setting. And that can be independent of PHY and
+> netdev. I _think_ we only need the netdev for configuration, since
+> ethtool addresses netdev's.  There would only be issues with user
+> space listening to udev creation events, it knows the PSE exists, but
+> it has no way to access it until the netdev is created.
 
-This looks like an abuse of the psp_devs_lock to provide mutual 
-exclusion on psp_notifier_registered, which has the undesirable property 
-of establishing a lock dependency from psp_devs_lock -> rtnl_lock. 
-Perhaps a dedicated mutex would be cleaner.
+Ack. netdev is for configuration as virtual representation of PSE PI. And it
+is easier to assign corresponding interface for the LLDP.
+We do not really care about the PHY; it just happens to represent the
+port at the farthest end described in the Device Tree.
 
->   
-> +/**
-> + * Non-admin version of psp_device_get_locked() + psp_attach_netdev_notifier()
-> + * only used for dev-assoc.
-> + */
-> +int psp_device_get_locked_dev_assoc(const struct genl_split_ops *ops,
-> +				    struct sk_buff *skb, struct genl_info *info)
+> > - as soon as we have all needed components, we can start provide
+> >   controllable interfaces to serve external consumers.
+> 
+> Yep.
+> 
+> > If we decouple PSE and PHY registration (and we probably will need to do
+> > it some day), we would need to have own implementation of deferred
+> > probing in the PSE core.  Event driven or by polling - which sounds not
+> > like very good idea. Pick your poison...
+> 
+> I don't see why. Maybe i'm missing something. We have two cases:
+> 
+> 1) PSE probes first. When the PHY looks up the PSE, it exists, and it
+> is passed a handle to the PSE.
+> 
+> 2) PHY probes first. The PSE core returns EPROBE_DEFFER, and the PHY
+> will try again later.
+> 
+> I don't think there is any chicken/egg problems.
 
+Ack, i guess it is optimization problem.
 
-kdoc open, but not a kdoc comment.
-
-Minor comments, otherwise:
-
-Reviewed-by: Daniel Zahka <daniel.zahka@gmail.com>
-
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
