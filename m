@@ -1,151 +1,115 @@
-Return-Path: <netdev+bounces-275548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275596-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 0GxqJc1202nPiQcAu9opvQ
-	(envelope-from <netdev+bounces-275548-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 11:03:09 +0200
+	id sOzPEPi202mIkwcAu9opvQ
+	(envelope-from <netdev+bounces-275596-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:36:56 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E364C3A2680
-	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 11:03:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A22AD3A398D
+	for <lists+netdev@lfdr.de>; Mon, 06 Apr 2026 15:36:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 166AF300FEE8
-	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 09:03:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3956830182A2
+	for <lists+netdev@lfdr.de>; Mon,  6 Apr 2026 13:36:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0270024503B;
-	Mon,  6 Apr 2026 09:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91862DFA4A;
+	Mon,  6 Apr 2026 13:36:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C601A0BE0
-	for <netdev@vger.kernel.org>; Mon,  6 Apr 2026 09:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F60258EFF;
+	Mon,  6 Apr 2026 13:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775466183; cv=none; b=QW2pJuJfPiqPQCCip5kJWF2ZkKq3saN0NBU850aY4h63LDkvHOfXsSJK8U2hY/LMRNHpAAoowc5giaQmvrBVI2duNjk329GUQ8NptiuMng7gMbQCmW0cwjBYqaphyceZLng4oh9Xaxx+9tHEZB2NcdaSiLENyTYErR7w8B58zXk=
+	t=1775482605; cv=none; b=KmyM/06lEQD49GtMDV4Yl0UfXF79vVcKmVv1n8hWM3lWQKt2DPR9Br+zI/KRqOle//b4ItNANe7jooaDd3nz8jLIXSDb8W2QzKp8YK3akG/632R+7Yf6yqZHq0dB82czgFvld8E+Cc4R3XZYYZZmhrRf3RiChFHDvpjiAzg30dY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775466183; c=relaxed/simple;
-	bh=JManHJFhk2e6nq/kPT+MB+sA+3+bWZrMdrr3hCEWNso=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TKwklAyRh2WQq44w8YyDYrEwZHra+p+ftj8jrGEydMK1AtIzWkdau/hjM40Yk2u7hZl7ZYdAE49/6sY7+O/aFQ4UfA1WGpZSCWzKz3yj2GOiWPvBKTMQP4VoyQET88sh+2jci699BKQkGk6vhC9rFiBd9jpJ+qq2V9dWBnCWR+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w9fXV-00053S-4t; Mon, 06 Apr 2026 10:42:33 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w9fXT-003zEV-29;
-	Mon, 06 Apr 2026 10:42:31 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.98.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1w9fXT-0000000Aysq-2JFh;
-	Mon, 06 Apr 2026 10:42:31 +0200
-Date: Mon, 6 Apr 2026 10:42:31 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Carlo Szelinsky <github@szelinsky.de>, Andrew Lunn <andrew@lunn.ch>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/3] net: mdio: treat PSE EPROBE_DEFER as
- non-fatal during PHY registration
-Message-ID: <adNx9z-AYxwpL2yH@pengutronix.de>
-References: <61561526-1e8c-4d0c-a0ff-56da25ee6531@lunn.ch>
- <20260403133111.3304497-1-github@szelinsky.de>
- <20260403153849.2ed7d342@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1775482605; c=relaxed/simple;
+	bh=SLjsyADKhvtcnlCVDagTlXHmofYOmuF5Nu9OaF/8tzs=;
+	h=From:Date:Message-ID:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ply1QsazXZiRZ0CEAdxMAyXwPrixcVJdOdTDa/ykAt6KaT/WW0y8al1s+d0BDiMQImiGLn229AV2hWJ8/AqqP/6mUvPYJcTdNQaxLo2VoQYvAYuF+uYukoUKat60BNSmVcu5UDMmdewnLOVyyTpi1Xbir4CeuE1RiAjjUrW9AUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from reply.eml (unknown [111.196.245.197])
+	by APP-05 (Coremail) with SMTP id zQCowAAntwrfttNpmJu0DA--.35068S2;
+	Mon, 06 Apr 2026 21:36:31 +0800 (CST)
+From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Date: Mon, 6 Apr 2026 17:00:00 +0800
+Message-ID: <20260406170000.1-rxrpc-proc-confirm-reply-pengpeng@iscas.ac.cn>
+To: David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-afs@lists.infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pengpeng@iscas.ac.cn
+Subject: Re: [PATCH] rxrpc/proc: size address buffers for %pISpc output
+In-Reply-To: <20260404190004.4-rxrpc-proc-pengpeng@iscas.ac.cn>
+References: <20260404190004.4-rxrpc-proc-pengpeng@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260403153849.2ed7d342@kmaincent-XPS-13-7390>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spamd-Result: default: False [0.04 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowAAntwrfttNpmJu0DA--.35068S2
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYZ7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+	6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l87I20VAvwVCjjxC26r1F6r
+	13M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_
+	Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxV
+	W0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAa
+	Y2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4
+	A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACjI8F5VA0
+	II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4c
+	8EcI0Ec7CjxVAaw2AFwI0_Jw0_GFyl4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
+	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MI
+	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
+	14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
+	W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5
+	UUUUU
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_CONTAINS_FROM(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275548-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275596-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DMARC_NA(0.00)[pengutronix.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[szelinsky.de,lunn.ch,gmail.com,armlinux.org.uk,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DMARC_NA(0.00)[iscas.ac.cn];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[o.rempel@pengutronix.de,netdev@vger.kernel.org];
-	NEURAL_SPAM(0.00)[0.726];
+	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.897];
+	RCPT_COUNT_SEVEN(0.00)[10];
 	R_DKIM_NA(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,szelinsky.de:email]
-X-Rspamd-Queue-Id: E364C3A2680
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A22AD3A398D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 Hi,
 
-On Fri, Apr 03, 2026 at 03:38:49PM +0200, Kory Maincent wrote:
-> On Fri,  3 Apr 2026 15:31:11 +0200
-> Carlo Szelinsky <github@szelinsky.de> wrote:
-> 
-> > Hi Andrew,
-> > 
-> > Thx for helping me! 
-> > I thought of keeping the eager path so we still catch broken DT bindings
-> > early at boot instead of silently failing later on first ethtool access.
-> > But you're right, dropping it would simplify things quite a bit. Do you
-> > think that trade-off is worth it? I will follow your lead. 
-> 
-> On my side I thinks that's a good idea, and I don't see any issue with that for
-> now. Oleksij you introduced it here in the first place, is it ok for you?
+Thanks for confirming that.
 
-If I see it correctly - this patch kills all notifications originated
-from the PSE core to the users space, until some one calls get/set path
-from user space. Means, kernel update may break UAPI behavior of
-existing devices.
+That is very helpful. It matches the current-tree ISATAP case in
+lib/vsprintf.c and confirms that the formatter ends up writing 51 bytes
+including the trailing NUL into the existing 50-byte stack buffer.
 
-On other hand, I agree that PSE is not a strickt requirement for PHY
-functionality in most cases. At the early stage, as initial PSE support
-was introduced, PHYs was kind of representation of the port and related
-ethernet interface (needed for LLDP). Are there better methods to solve
-it now?
+I'll resend the patch with the changelog corrected to frame the proof
+around the ISATAP case explicitly.
 
-Best Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Thanks,
+Pengpeng
+
+
 
