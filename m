@@ -1,123 +1,120 @@
-Return-Path: <netdev+bounces-275811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275812-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8A+fHwhf1Gm6tQcAu9opvQ
-	(envelope-from <netdev+bounces-275811-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 03:34:00 +0200
+	id 0PhtN1tf1Gm6tQcAu9opvQ
+	(envelope-from <netdev+bounces-275812-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 03:35:23 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B0C83A8B91
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 03:34:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 456FB3A8BC5
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 03:35:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AE86230137BA
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 01:33:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A6562302BEAE
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 01:34:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D47321C173;
-	Tue,  7 Apr 2026 01:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9ACB221540;
+	Tue,  7 Apr 2026 01:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DrivtFnP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dcWLxV+c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65C51E832A
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 01:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D113670830
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 01:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.177
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775525635; cv=pass; b=nf1x4PStKWJHwDykAiA4DGkdHNpgQGooUiFRjIushuBRficg2QVrQy1o3vwDSTpYnK45iw7o5cwfvbarPqxHe0klia2jmi5bT/Ox+F+mQ81jYcnlOZQbaF3K08Gd2M4t8vxw8riwU845AUrwWoPW2LWdBCFCjTh/+1YBbi3yscI=
+	t=1775525696; cv=pass; b=QVBNNNpv3Pf0KkU+pNqgd01Fg8i5OCyuXDAraLcGJ9wqJ/THUg4QoHa2rwh6OeHyrZdMHR4ZDQzpE9EwLD+SaSauEhnKzWCyHYzupnL8F7nsezuX+i6Xb40DD6yM5tI/P0792Oj5nBdRz/3+QE1TK8e/XFoKkhjg71f+C8Bp/CI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775525635; c=relaxed/simple;
-	bh=H0LoEFDakMTPfi/BP2bcz4FMwGYT8QVcG3BuR0hJpVA=;
+	s=arc-20240116; t=1775525696; c=relaxed/simple;
+	bh=CdjNKl6RvdEAH7DQmoeHpr7AGXr1Jb08XVC3ztHNxVc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SyhtLqZtsrqVUwS3IXSCONJDBf6wSJgyidFxmIC6e+szyNIaUQm2jQE+76LsQ6w9O1yh7rzOtenGt6v1LO86mCq3ERBuWtYM2s5QIlxOcYTna3d2Xy/S0PmOagrdmFlFLUxdgL0ihn9re+1fELVtREA5/UAZQrVizowRHcHkyXI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DrivtFnP; arc=pass smtp.client-ip=209.85.219.53
+	 To:Cc:Content-Type; b=m5PsfHigXpf3WVvQA69LLJshEd9omDJUXmX8AzOwJc1O8Tbb0dqgcCWV4nh1cEaeK8fPRkFuq2SWehYVTkDAl1OPIvy6YfgsU4WwdlSjSzlZEf1ktSCn88jV8Emo3x1QyxpFg2Xf8mPnyzzGczqWsvyL2cC2wNjB/VGyjbwiFbc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dcWLxV+c; arc=pass smtp.client-ip=209.85.128.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-89cc71f4311so62221106d6.3
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 18:33:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775525633; cv=none;
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-79a535e7c00so45323327b3.3
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 18:34:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775525694; cv=none;
         d=google.com; s=arc-20240605;
-        b=OBXMtdPs9DU0MiGaAglZbSJNMkfasSo0uuL80BV143SyzqiDLk8N0DL9T15ZPXHh9L
-         vm55ppfLhXvslecojGqb86MRWhWb/VPdB1ecd4YHOhdaTZsvsBpULHalhCM4g2OLFL9X
-         MsgpZS/piRIesTCjmcdxmrqYhi4v0hR6Q69G5JTJTZB7T5EjHhwXp9ZetKgER3uA3KUF
-         CXMq0Nb7jyJecvezKzdMDHOeUBWxKxCRXs32Wr8I3qwriahDOrRJzUt8AetK6Fzcutdv
-         7v2nlSSY3TbwxVvyt+rPbkrzbFJFY0KeuEteqO5pulQmW6GclHvASAAq6+FcUqduInbY
-         ZOsQ==
+        b=MtfE0dVFE6n+ZVTdmShekETBAf6/s8FHIokOqf3zXrIduEoW7iRVVWl13keVTasVbV
+         G2E/ZCxjyLUt73Bg5o5ovx+Z6AuCT0/HeX98fubrPU8z1F+asUNKS3B53GE2UdQN6hH4
+         Rftkq9sMiY6GPsKaRmgsIsUTwB5htR6R/MX/46mgVz8VxDr6/zyN1nyRgAKJFHXEB57B
+         ode/emaNu+93BzZoj3pZGzcFXfJJYqwavNsMjht0k+fZzWmkw49Brk3iRpfbRco7S0Zs
+         H/WU9H8OhmfpNrlLi+zf2+OtLdE8SOywodZqeoXAbS4zjt94fdZ0vGmOtWF5udtxFe7g
+         xQ5Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=H0LoEFDakMTPfi/BP2bcz4FMwGYT8QVcG3BuR0hJpVA=;
-        fh=JETGcnr7sJOGloZzoZUVan+uS9xzbEMm+bocSC2XAI4=;
-        b=j8WWJhlyYZv+7qE6LYkqn2AUfteriim/xPWFJ3krDAqIEPbvOh9SUMtBeGDBR8ooBa
-         vT607D7nn9QDeGwheOTNAbFvPLv5bh25PK3PL9bLWDgc4yVJMO+cWZwpY1E95Sjeq6Ed
-         Gqy9phS1bd844Zdc9KGNeiKFAnz1lMF77Juseu0JswtPryxAlkvHoauaPhmj/I9v/eXu
-         Zf6uoZD/ZTtW7V2x1WgZRisaPIo6r5jo7U5q1WhhUazcmXcZHgkI3sGBucT8MoMbF2aB
-         IsX8V6RnJYcy6p/8Co44LiqZGewveH+4hzFB7N7efhvqoyxMD2RPBUqlVSXhGGU8EcYe
-         lS0w==;
+        bh=gOQ/7d8DzPMY6Lf5FjM6QVlbxIIMJf+rrNRaxjRBQZo=;
+        fh=IraZ6NjzbtjSyhbYh7U288a+aJg+kHGJzP7meyuQgQM=;
+        b=WwmmEs2NM8oDL2Zwo56teF1AnD8/cPcwx2lj6Bb/9+fCbv43bd/ymyZK34ABteCRnu
+         4JBn6z3hQUIisvkaC9OxKzG4bTcBblnZ/k/KB32Jyeg2oJmyQBPB717kDxvqtYCiI07K
+         FEUa2/rcJbQ2P9ew2283byiBYHhec5roCS2+RcF7x/MORHZ1cgSv3KC/N8YMlWHcMqYi
+         WHO7L8JvDdAUjqfET3AGLS8+S8XtYLF3vcJeo16vLE5GtmaDSBC5mVgWf1QSh46udmYT
+         VvkGDkMmDD34Yyzw7HY3wxbPdbrFm7n+Ua9U3rYvJNb02Wb4jeN5hti1jSDm1KVTsIPO
+         x2RA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775525633; x=1776130433; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1775525694; x=1776130494; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=H0LoEFDakMTPfi/BP2bcz4FMwGYT8QVcG3BuR0hJpVA=;
-        b=DrivtFnPofV28Y8uVHc6FGfKTp1x+purr/50UFYwENXewNmec1Z4OYqybhhaf/QVUR
-         X5g8gqWVR1s1AYcRi8tPqoKps9gO+vKhthgUkVYEemH7wA9icjwWUw5nJj9EwRvucGP3
-         8DJHJcBGHlYp8vGH6kqj7/oJVWGU0IeH6L5IJxIsCc77UddIvpMVYlsUMVNo72VZjLHH
-         G9TxVO61pkUVYMZx2Q26gyJI5hjMb1/n/8y64XGNTRccZDmGvoc41f/nAZrj6iHlOvt3
-         3Tk0gw8WAKcUy+zsmEyqZPxc7kwczAe+IxlS3UcloyDoa6BnoD3Okla4ApbIzzYK78r8
-         ZiOQ==
+        bh=gOQ/7d8DzPMY6Lf5FjM6QVlbxIIMJf+rrNRaxjRBQZo=;
+        b=dcWLxV+c7sNj1Mt26ZSPDjOh4nvp5U4/4gsLwSnif7FwaixOHnG20msivSBboeTKwI
+         sxPtLOwtpFiPHWaAr/MUYqm3pf5MvCNvb2nuTGi7V3uGs7k/BvePNR1MCJOuhP/JD9J2
+         W0qqn6ZyKdu25WLmmEF+tL5qrYnNf0fpgeMK9hnqo/RaJMiPzjCeh6fNxfNaDtU6Wr7/
+         aw+oV6RBXPeHe3OL9uXev9n448WFQMjyRTTgd9c7JBCHLMLxbJVsvnCf4RH2PXYWsiDv
+         8mug6B89myCUQoZJHWXQDGaQUhdll8eRNSWZkZf2oF8eDbT8FppW7JcqNF50Vv1mCzes
+         HKmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775525633; x=1776130433;
+        d=1e100.net; s=20251104; t=1775525694; x=1776130494;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=H0LoEFDakMTPfi/BP2bcz4FMwGYT8QVcG3BuR0hJpVA=;
-        b=R7v+t/7/diDU2//h/LCYiocjFCotJ5D9uUo+WxumgGJ0v8AmhUW5gmT6wMVk2vX6Dt
-         AuwKEaRKBj+hiALf5ssulHJEH+3vokZ8admw6O02XmAXdwIqT2p5q5bySJrp3eXQa6hg
-         T9N8u1f+kn9ifMwjgJqV91Yb7Hhl02BC/hYSJpPqWE9zbxXbUb5B42Tb+0cfiUyz+0nL
-         IjfExvbUKPiBqtp7n+AVAItgi7uCNJWv4dMUr08Ou6hTJZPQ7qFTdBoSBuNDszo6+Tuo
-         eaz8HKoSZu/kYsh1rDnCSjQ6J8LhYV3ic4yZXrSNoBFapCWIWksJ+w2jYv3DlgJeR3Os
-         G7Ig==
-X-Forwarded-Encrypted: i=1; AJvYcCVIlu7yniGE6hzjHUsqslPDdclrbpSSLa1OX+zQfTmWgNEYGi31KkajflDpt2fG9ictfEE6B8Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0gZ1W/VgV6h+ED7G5Skyl1TBUtd4XDD2rhmqeo2WXHGfLPxnX
-	UwOELFsQbbvW2hqmWz4LHw5D6JbOWQ0GBhOGR+89n3MXrzT/BLmi+Bvw52ezgbaKA/4/ygFLeeq
-	UeVyNmGH28iQfLHQM6Xqdko37n4IUUZU=
-X-Gm-Gg: AeBDieuxQDCEcJFDmc0U4jjJ0C2fqgWVcbMF0Ev36fX+vWAqWCKgprqhwphnKueOr7l
-	PP/6wPFbQp8PMl8cHHdYwNWbXjHrOjVYx9/7avEzpmDE+MkjoXhKc7erlghf43NAgKj5cEczS5P
-	/22k7KNEMCWnmO6Dn8m9ik5Pz+5QMpzQpW4mVRMoOS9JJ0PBolM/vo2ceDXWG2UA/bwitlXHWZj
-	9n2cvFoRdgSeVse9Kl+XrlD5Jrg082wfZJEi0Mln7Mj7g0DmjPP/a4YjnGmw4i+XRejlrtSUO73
-	5/b14Ziv0HR95gakvETO
-X-Received: by 2002:a05:6214:212b:b0:89c:5110:751a with SMTP id
- 6a1803df08f44-8a704ac00f3mr250748606d6.44.1775525633467; Mon, 06 Apr 2026
- 18:33:53 -0700 (PDT)
+        bh=gOQ/7d8DzPMY6Lf5FjM6QVlbxIIMJf+rrNRaxjRBQZo=;
+        b=eOfDX/LeqjIs+2BIBm+vsBKlof4VuURnfP2lBYssEsP3NOhLMJBrktPNfZoeKQTQ4H
+         9iPZ148hO222hOMK+ayd4liIjSXfi3Y2tNWLUD+s893YYPIcPpnz1HyjpHxBO1gLZdEs
+         NC0wz8rUc2mR0rn38dI3Lo2WR+PgWiNDtxGdf2+qbe0e8Tpw5c8kjsyMOiSjQaxyvwpN
+         ZxoR98iU+3+3hoOQTDj3m0eJpznRjmt+kjJEzu8tm2xPEremi1ekc6ueAZgCQiXSXA9i
+         MDEF+1pM3LMXHlzT9MtsaA50Cmcfmj35i0gpuWWWQ/tdEPpvGdNjqdxxgjljVKNxAk2P
+         b/cQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvnP0D+1+BP+Zi8oDIzEUcui41GxE8v3fD4eNs9jLJX6djOtTvM3hsT3ojjvVBScBdBRoKFYw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyt8v+85hsKQgFK/38Ub6r+2GJRglNBtGx+osHrHxs8lD+JGzmC
+	N6KZXt8sOxfAwfCU227aOQctkFPtNhdu6SLHfqJRKBhV4kDuToRn6PPbHYV74BvyT1Vdl8kUe6A
+	XHaWoFsTAr123nW0nmCF3X73UkaMz6Hc=
+X-Gm-Gg: AeBDietXMqrQnn/a0HMynNiyhSPM5TQV8jL0pz0czZ83Aamoz30qKjvyM20tSCN3mQI
+	YpyAuT7CXRNOIdOrxGyqS8G9KhzoLakNBJETV23hU8znJmVkJNRMu1TtXG+0J7LZF0qBURsdYXu
+	QuEJk83BZMrVhoMi+T9yi+71eDB+1PiQNm1o7Pe4zGKXEO+21K7Bhl5uf40lvp2c+1ntT0s0Y75
+	qW+PeiOV/zfOBkz7p4HsFW5SYGC/+c+ogwrCmpzp2kZg4kOxJPkWXQs/SmjhCh6HHcxx4HpXEu1
+	9bFLBQD+/CIjKwZL+ZTG3vRIzT8bYQ7+tZCWV+mJdrM2gWqEtTg=
+X-Received: by 2002:a05:690c:4806:b0:79a:7ff5:93c4 with SMTP id
+ 00721157ae682-7a4d6b311bbmr150352887b3.18.1775525693949; Mon, 06 Apr 2026
+ 18:34:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260405154816.4774-1-devnexen@gmail.com>
-In-Reply-To: <20260405154816.4774-1-devnexen@gmail.com>
-From: Julian Calaby <julian.calaby@gmail.com>
-Date: Tue, 7 Apr 2026 11:33:40 +1000
-X-Gm-Features: AQROBzCkX2gE2vUcwz9Vh41Dy86vV6V6vedD5cjTTBBq9Q2y1TRb7sq-3zFQtYQ
-Message-ID: <CAGRGNgUpknQi6PzBWQXeAP0Vh7XjntD_-O4QyjU5tAn8_71=eQ@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next] net: use get_random_u{16,32,64}() where appropriate
-To: David Carlier <devnexen@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, 
-	Ilya Dryomov <idryomov@gmail.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, Aaron Conole <aconole@redhat.com>, 
-	Ilya Maximets <i.maximets@ovn.org>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Xin Long <lucien.xin@gmail.com>, Jon Maloy <jmaloy@redhat.com>, netdev@vger.kernel.org, 
-	ceph-devel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	mptcp@lists.linux.dev, dev@openvswitch.org, linux-sctp@vger.kernel.org, 
-	tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org
+References: <20260402160147.215499-1-sun.jian.kdev@gmail.com> <202646183934.lJx5.martin.lau@linux.dev>
+In-Reply-To: <202646183934.lJx5.martin.lau@linux.dev>
+From: sun jian <sun.jian.kdev@gmail.com>
+Date: Tue, 7 Apr 2026 09:34:44 +0800
+X-Gm-Features: AQROBzDEHcZwUn6RnkKIGl5W4d3QSCPFqo_CJP6vIqbrvoH3IIXffE6vzY6oLWQ
+Message-ID: <CABFUUZF_CWQZrRk=L9cNxO=8Z4iSgGfXi3J=hpzeyTKDbfE2-w@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3] bpf: reject short IPv4/IPv6 inputs in bpf_prog_test_run_skb
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, 
+	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, shuah@kernel.org, 
+	syzbot+619b9ef527f510a57cfc@syzkaller.appspotmail.com, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-0.66 / 15.00];
@@ -129,59 +126,103 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275811-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	TAGGED_FROM(0.00)[bounces-275812-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	FREEMAIL_FROM(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[25];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[gmail.com:+];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	FREEMAIL_CC(0.00)[kernel.org,iogearbox.net,gmail.com,linux.dev,fomichev.me,google.com,davemloft.net,redhat.com,syzkaller.appspotmail.com,vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	NEURAL_HAM(-0.00)[-0.989];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[juliancalaby@gmail.com,netdev@vger.kernel.org];
-	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,gmail.com,sipsolutions.net,ovn.org,vger.kernel.org,lists.linux.dev,openvswitch.org,lists.sourceforge.net];
+	FROM_NEQ_ENVFROM(0.00)[sunjiankdev@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	MID_RHS_MATCH_FROMTLD(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,619b9ef527f510a57cfc];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 2B0C83A8B91
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email]
+X-Rspamd-Queue-Id: 456FB3A8BC5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi David,
-
-On Mon, Apr 6, 2026 at 1:50=E2=80=AFAM David Carlier <devnexen@gmail.com> w=
-rote:
+On Tue, Apr 7, 2026 at 2:58=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.d=
+ev> wrote:
 >
-> Use the typed random integer helpers instead of
-> get_random_bytes() when filling a single integer variable.
-> The helpers return the value directly, require no pointer
-> or size argument, and better express intent.
+> On Fri, Apr 03, 2026 at 12:01:47AM +0800, Sun Jian wrote:
+> > diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+> > index 178c4738e63b..300e2bfc5a62 100644
+> > --- a/net/bpf/test_run.c
+> > +++ b/net/bpf/test_run.c
+> > @@ -1120,19 +1120,23 @@ int bpf_prog_test_run_skb(struct bpf_prog *prog=
+, const union bpf_attr *kattr,
+> >
+> >       switch (skb->protocol) {
+> >       case htons(ETH_P_IP):
+> > -             sk->sk_family =3D AF_INET;
+> > -             if (sizeof(struct iphdr) <=3D skb_headlen(skb)) {
+> > -                     sk->sk_rcv_saddr =3D ip_hdr(skb)->saddr;
+> > -                     sk->sk_daddr =3D ip_hdr(skb)->daddr;
+> > +             if (skb_headlen(skb) < sizeof(struct iphdr)) {
+> > +                     ret =3D -EINVAL;
+> > +                     goto out;
+> >               }
+> > +             sk->sk_family =3D AF_INET;
+> > +             sk->sk_rcv_saddr =3D ip_hdr(skb)->saddr;
+> > +             sk->sk_daddr =3D ip_hdr(skb)->daddr;
+> >               break;
+> >  #if IS_ENABLED(CONFIG_IPV6)
+> >       case htons(ETH_P_IPV6):
+> > -             sk->sk_family =3D AF_INET6;
+> > -             if (sizeof(struct ipv6hdr) <=3D skb_headlen(skb)) {
+> > -                     sk->sk_v6_rcv_saddr =3D ipv6_hdr(skb)->saddr;
+> > -                     sk->sk_v6_daddr =3D ipv6_hdr(skb)->daddr;
+> > +             if (skb_headlen(skb) < sizeof(struct ipv6hdr)) {
+> > +                     ret =3D -EINVAL;
+> > +                     goto out;
+> >               }
+> > +             sk->sk_family =3D AF_INET6;
+> > +             sk->sk_v6_rcv_saddr =3D ipv6_hdr(skb)->saddr;
+> > +             sk->sk_v6_daddr =3D ipv6_hdr(skb)->daddr;
+> >               break;
+> >  #endif
+> >       default:
+> > diff --git a/tools/testing/selftests/bpf/prog_tests/empty_skb.c b/tools=
+/testing/selftests/bpf/prog_tests/empty_skb.c
+> > index 438583e1f2d1..d53567e9cd77 100644
+> > --- a/tools/testing/selftests/bpf/prog_tests/empty_skb.c
+> > +++ b/tools/testing/selftests/bpf/prog_tests/empty_skb.c
+> > @@ -12,6 +12,8 @@ void test_empty_skb(void)
+> >       struct bpf_program *prog;
+> >       char eth_hlen_pp[15];
+> >       char eth_hlen[14];
+> > +     char ipv4_eth_hlen[14];
+> > +     char ipv6_eth_hlen[14];
 >
-> Skipped sites writing into __be16 fields (netdevsim) where
-> a direct assignment would trigger sparse endianness warnings.
+> The eth_hlen_pp and eth_hlen needs to memset zero now.
+>
+> Instead of adding two more ethhdrs, just reuse the current eth_hlen and
+> define it as 'struct ethhdr eth_hlen;' instead of a char array.
+> Add 'h_proto' to the anonymous 'struct { } tests[]'.  Initialize
+> the eth_hlen.h_proto based on the tests[i].h_proto.
+>
+> Also, this test does not actually reproduce the reading uninit memeory.
+> It needs a bpf prog to actually trigger it by calling bpf_skb_adjust_room=
+()
+> based on the report in the "Closes" link. The test should be able
+> to trigger it without the change in test_run.c
+>
+> The ai-review has flagged again that it is missing a "Fixes" tag. This
+> probably started since the bpf_skb_adjust_room helper was introduced.
+>
+> The selftests should also be in a separate patch 2 following the patch 1
+> changes in test_run.c.
+>
+> pw-bot: cr
 
-I don't believe that endian swapping significantly affects the
-randomness of the data returned, so either:
-
-1. Do something to silence sparse (casts?)
-2. Live with the endian swap overhead if they're not in the hot path.
-
-Other than that,
-
-Reviewed-by: Julian Calaby <julian.calaby@gmail.com>
-
-Thanks,
-
---=20
-Julian Calaby
-
-Email: julian.calaby@gmail.com
-Profile: http://www.google.com/profiles/julian.calaby/
+Ack. I'll split this into two patches and rework the selftest accordingly.
 
