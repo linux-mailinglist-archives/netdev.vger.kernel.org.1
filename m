@@ -1,259 +1,179 @@
-Return-Path: <netdev+bounces-275878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275879-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +MsPO+Sw1GnvwQcAu9opvQ
-	(envelope-from <netdev+bounces-275878-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 09:23:16 +0200
+	id wLlDFWix1GnvwQcAu9opvQ
+	(envelope-from <netdev+bounces-275879-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 09:25:28 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D99603AABB7
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 09:23:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D1F93AABDE
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 09:25:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B33DB30028D4
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 07:23:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C2B73008D2E
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 07:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADAE8392819;
-	Tue,  7 Apr 2026 07:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B958392819;
+	Tue,  7 Apr 2026 07:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Vmn9Ozo5"
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-146.mail.aliyun.com (out28-146.mail.aliyun.com [115.124.28.146])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2401C3BF7;
-	Tue,  7 Apr 2026 07:23:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B28175A83;
+	Tue,  7 Apr 2026 07:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775546591; cv=none; b=fox8wMtfk1F+3UfEDBYGQLLS9lmcP4rKsxZgCrKduKXGgoYozL7O9loGgrkQsbUCvx5zziZWXcTrQUyo/VFjAaRXpM7GnS/+NNwJjYF6qQoZnCdCLsPhtJavU3vH27KFR8dHQbjKPrTSiQDxEOCo14tpAA8V71Ht3+nvfnv62cA=
+	t=1775546725; cv=none; b=gmlN3yzBwvz34GUhCeXEpQBP78CdRiRoQ/nz2e30lEMBsyeLCN7OqcWUnbTTOMTaK4I2gkOsF92vWyR1jYRuwpS03s6FdpgHAiusBo2Zb3EC2MhKHX0AGhvtxphT0J7AbZc1Mqsm9Qvcice/pPzOA/Z74M5vP6iOv+kFnRwQz3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775546591; c=relaxed/simple;
-	bh=IUhjbKfU2p9E/Ibta/kOFlhOmBt8xagLIXN7lbOXS7Y=;
-	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:References:
-	 In-Reply-To:Content-Type; b=KbC1zEq+56SC1Y0NigU3aBdMoSUV5GZnKUoNUdapBPrY9qetI4YwmExqdTiUf6JmBmyxkDEh2ba6Csl54PksuIpSk1YHrpLBlegqj3hu9ctUjRqPGSvT/FHCQ7PCylMvhqYKVyKJ9wgOBXHwyRyxzxCcIDsVlmCo9pX/z1Uwqkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com; spf=pass smtp.mailfrom=nebula-matrix.com; arc=none smtp.client-ip=115.124.28.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nebula-matrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebula-matrix.com
-X-Alimail-AntiSpam:AC=CONTINUE;BC=0.06663878|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_regular_dialog|0.0154995-0.00274282-0.981758;FP=15163742083825009140|0|0|0|0|-1|-1|-1;HT=maildocker-contentspam011083013073;MF=illusion.wang@nebula-matrix.com;NM=1;PH=DW;RN=20;RT=20;SR=0;TI=W4_0.2.3_21449A8C_1775546405550_o7001c237p;
-Received: from WS-web (Illusion.Wang@nebula-matrix.com[W4_0.2.3_21449A8C_1775546405550_o7001c237p] cluster:ay29) at Tue, 07 Apr 2026 15:22:52 +0800
-Date: Tue, 07 Apr 2026 15:22:52 +0800
-From: "Illusion Wang" <Illusion.Wang@nebula-matrix.com>
-To: "Mohsin Bashir" <mohsin.bashr@gmail.com>,
-  "Dimon" <dimon.zhao@nebula-matrix.com>,
-  "Alvin" <alvin.wang@nebula-matrix.com>,
-  "Sam" <sam.chen@nebula-matrix.com>,
-  "netdev" <netdev@vger.kernel.org>
-Cc: "andrew+netdev" <andrew+netdev@lunn.ch>,
-  "corbet" <corbet@lwn.net>,
-  "kuba" <kuba@kernel.org>,
-  "linux-doc" <linux-doc@vger.kernel.org>,
-  "lorenzo" <lorenzo@kernel.org>,
-  "pabeni" <pabeni@redhat.com>,
-  "horms" <horms@kernel.org>,
-  "vadim.fedorenko" <vadim.fedorenko@linux.dev>,
-  "lukas.bulwahn" <lukas.bulwahn@redhat.com>,
-  "edumazet" <edumazet@google.com>,
-  "enelsonmoore" <enelsonmoore@gmail.com>,
-  "skhan" <skhan@linuxfoundation.org>,
-  "hkallweit1" <hkallweit1@gmail.com>,
-  "jani.nikula" <jani.nikula@intel.com>,
-  "open list" <linux-kernel@vger.kernel.org>
-Reply-To: "Illusion Wang" <Illusion.Wang@nebula-matrix.com>
-Message-ID: <10ad9d63-12cf-4d28-ab2e-e49e33c8e5d0.Illusion.Wang@nebula-matrix.com>
-Subject: =?UTF-8?B?5Zue5aSN77yaW1BBVENIIHYxMCBuZXQtbmV4dCAwNC8xMV0gbmV0L25lYnVsYS1tYXRyaXg6?=
-  =?UTF-8?B?IGNoYW5uZWwgbXNnIHZhbHVlIGFuZCBtc2cgc3RydWN0?=
-X-Mailer: [Alimail-Mailagent][W4_0.2.3][null][Chrome]
+	s=arc-20240116; t=1775546725; c=relaxed/simple;
+	bh=3opjvFYBgL1qeuyF5RExKJkNtN6TTTnSXpwSLVcsDV8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VnX9ohghpQfOFMOAAcLScqb52IfTzHz1Ggqv+1oXdF8lZktf++bjPw7DUEcv8A8Daq28M77kAW6n3kt9WYLcliYsSeL9Upc6u6zqQBeqx1oc6nD/9w09wz+f8dEmi9KzbXlUx4CtIGIS0QPamK8BaJluFZJxsNooJ94F/XwLlcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Vmn9Ozo5; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Xfd4Ai8X1jiYT9iJrd3H7okMbF4OcPxA5a49UaGG3Bw=; b=Vmn9Ozo5QiEKRbYD/7LSGVZBeD
+	SEgRx4FA/5P7govPIx4DVNioi2ragtO1PZ4zk2yS4RthLlcFsuOtAyDzr/nXA+7JQBZKyfyt9Mxuh
+	AeyGAyJVF9sKFpPiPTkqn8oNBU4itqHyK55vu/Utlm3JdnjcepTre+4P/DWZTOzSQC82s1jiZrTtt
+	xeItoEZYjRqlBCad0STVVtMkoIV3KOyoX74RVbuWf/uqPIgFpwv3/vqCUHWhe4u/XLRfffY5VsI8c
+	kVO1BAgZyWBfS4tPO/s3rd2gjuuRJWH0jltg+g3LP/zM5U2dt2xEf5sNob+TKDN/JOppHYtp3qOYO
+	sLLNgKNQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51304)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1wA0o4-000000000YZ-2Nm1;
+	Tue, 07 Apr 2026 08:25:04 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1wA0nr-0000000024m-08Up;
+	Tue, 07 Apr 2026 08:24:51 +0100
+Date: Tue, 7 Apr 2026 08:24:50 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	bcm-kernel-feedback-list@broadcom.com, richardcochran@gmail.com,
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+	john.fastabend@gmail.com, rohan.g.thomas@altera.com,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org,
+	andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
+	me@ziyao.cc, siyanteng@cqsoftware.com.cn,
+	prabhakar.mahadev-lad.rj@bp.renesas.com,
+	weishangjuan@eswincomputing.com, wens@kernel.org,
+	vladimir.oltean@nxp.com, lizhi2@eswincomputing.com,
+	boon.khai.ng@altera.com, maxime.chevallier@bootlin.com,
+	chenchuangyu@xiaomi.com, yangtiezhu@loongson.cn,
+	ovidiu.panait.rb@renesas.com, chenhuacai@kernel.org,
+	florian.fainelli@broadcom.com, quic_abchauha@quicinc.com
+Subject: Re: [PATCH net-next v9 0/4] net: stmmac: Add PCI driver support for
+ BCM8958x
+Message-ID: <adSxQpAE0nY0ulfU@shell.armlinux.org.uk>
+References: <20260402213629.1996133-1-jitendra.vegiraju@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-x-aliyun-im-through: {"version":"v1.0"}
-References: <20260401022318.28550-1-illusion.wang@nebula-matrix.com> <20260401022318.28550-5-illusion.wang@nebula-matrix.com>,<0b0eb2e1-7aec-4913-8062-b3eff786a1ae@gmail.com>
-x-aliyun-mail-creator: W4_0.2.3_null_EuMTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEzMy4wLjY5NDMuMTQyIFNhZmFyaS81MzcuMzYgZGluZ3RhbGstd2luLzEuMC4wIG53KDAuMTQuNykgRGluZ1RhbGsoOC4yLjE1LVJlbGVhc2UuMjYwMjI1MDAxKSBNb2pvLzEuMC4wIE5hdGl2ZSBBcHBUeXBlKHJlbGVhc2UpIENoYW5uZWwvMjAxMjAwIEFyY2hpdGVjdHVyZS94ODZfNjQgd2ViRHQvUEM=uL
-In-Reply-To: <0b0eb2e1-7aec-4913-8062-b3eff786a1ae@gmail.com>
-x-aliyun-mailtrack: {"foreign-track":"0"}
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260402213629.1996133-1-jitendra.vegiraju@broadcom.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Spamd-Result: default: False [1.14 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_BASE64_TEXT(0.10)[];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	DMARC_NA(0.00)[nebula-matrix.com];
-	TO_DN_ALL(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[20];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275878-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_TO(0.00)[gmail.com,nebula-matrix.com,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[4];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns];
-	HAS_REPLYTO(0.00)[Illusion.Wang@nebula-matrix.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[Illusion.Wang@nebula-matrix.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275879-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,lwn.net,kernel.org,vger.kernel.org,redhat.com,linux.dev,google.com,gmail.com,linuxfoundation.org,intel.com];
-	NEURAL_HAM(-0.00)[-0.939];
-	TAGGED_RCPT(0.00)[netdev];
-	R_DKIM_NA(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,foss.st.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,broadcom.com,iogearbox.net,altera.com,st-md-mailman.stormreply.com,lists.infradead.org,lunn.ch,fomichev.me,ziyao.cc,cqsoftware.com.cn,bp.renesas.com,eswincomputing.com,nxp.com,bootlin.com,xiaomi.com,loongson.cn,renesas.com,quicinc.com];
+	RCPT_COUNT_TWELVE(0.00)[37];
+	RCVD_TLS_LAST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[armlinux.org.uk:-];
+	MISSING_XM_UA(0.00)[];
+	NEURAL_SPAM(0.00)[0.462];
+	RCVD_COUNT_FIVE(0.00)[5];
+	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	REPLYTO_EQ_FROM(0.00)[]
-X-Rspamd-Queue-Id: D99603AABB7
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url]
+X-Rspamd-Queue-Id: 9D1F93AABDE
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Cj4gwqAgc3RydWN0IG5ibF9jaGFubmVsX21ndDsKPiDCoCBzdHJ1Y3QgbmJsX2FkYXB0ZXI7Cj4+
-ICtlbnVtIG5ibF9jaGFuX21zZ190eXBlIHsKPj4gKyBOQkxfQ0hBTl9NU0dfQUNLLAo+PiArIE5C
-TF9DSEFOX01TR19BRERfTUFDVkxBTiwKPj4gKyBOQkxfQ0hBTl9NU0dfREVMX01BQ1ZMQU4sCj4+
-ICsgTkJMX0NIQU5fTVNHX0FERF9NVUxUSV9SVUxFLAo+PiArIE5CTF9DSEFOX01TR19ERUxfTVVM
-VElfUlVMRSwKPj4gKyBOQkxfQ0hBTl9NU0dfU0VUVVBfTVVMVElfR1JPVVAsCj4+ICsgTkJMX0NI
-QU5fTVNHX1JFTU9WRV9NVUxUSV9HUk9VUCwKPj4gKyBOQkxfQ0hBTl9NU0dfUkVHSVNURVJfTkVU
-LAo+PiArIE5CTF9DSEFOX01TR19VTlJFR0lTVEVSX05FVCwKPj4gKyBOQkxfQ0hBTl9NU0dfQUxM
-T0NfVFhSWF9RVUVVRVMsCj4+ICsgTkJMX0NIQU5fTVNHX0ZSRUVfVFhSWF9RVUVVRVMsCj4+ICsg
-TkJMX0NIQU5fTVNHX1NFVFVQX1FVRVVFLAo+PiArIE5CTF9DSEFOX01TR19SRU1PVkVfQUxMX1FV
-RVVFUywKPj4gKyBOQkxfQ0hBTl9NU0dfQ0ZHX0RTQ0gsCj4+ICsgTkJMX0NIQU5fTVNHX1NFVFVQ
-X0NRUywKPj4gKyBOQkxfQ0hBTl9NU0dfUkVNT1ZFX0NRUywKPj4gKyBOQkxfQ0hBTl9NU0dfQ0ZH
-X1FESVNDX01RUFJJTywKPj4gKyBOQkxfQ0hBTl9NU0dfQ09ORklHVVJFX01TSVhfTUFQLAo+PiAr
-IE5CTF9DSEFOX01TR19ERVNUUk9ZX01TSVhfTUFQLAo+PiArIE5CTF9DSEFOX01TR19NQUlMQk9Y
-X0VOQUJMRV9JUlEsCj4+ICsgTkJMX0NIQU5fTVNHX0dFVF9HTE9CQUxfVkVDVE9SLAo+PiArIE5C
-TF9DSEFOX01TR19HRVRfVlNJX0lELAo+PiArIE5CTF9DSEFOX01TR19TRVRfUFJPU0lTQ19NT0RF
-LAo+PiArIE5CTF9DSEFOX01TR19HRVRfRklSTVdBUkVfVkVSU0lPTiwKPj4gKyBOQkxfQ0hBTl9N
-U0dfR0VUX1FVRVVFX0VSUl9TVEFUUywKPj4gKyBOQkxfQ0hBTl9NU0dfR0VUX0NPQUxFU0NFLAo+
-PiArIE5CTF9DSEFOX01TR19TRVRfQ09BTEVTQ0UsCj4+ICsgTkJMX0NIQU5fTVNHX1NFVF9TUE9P
-Rl9DSEVDS19BRERSLAo+PiArIE5CTF9DSEFOX01TR19TRVRfVkZfU1BPT0ZfQ0hFQ0ssCj4+ICsg
-TkJMX0NIQU5fTVNHX0dFVF9SWEZIX0lORElSX1NJWkUsCj4+ICsgTkJMX0NIQU5fTVNHX0dFVF9S
-WEZIX0lORElSLAo+PiArIE5CTF9DSEFOX01TR19HRVRfUlhGSF9SU1NfS0VZLAo+PiArIE5CTF9D
-SEFOX01TR19HRVRfUlhGSF9SU1NfQUxHX1NFTCwKPj4gKyBOQkxfQ0hBTl9NU0dfR0VUX0hXX0NB
-UFMsCj4+ICsgTkJMX0NIQU5fTVNHX0dFVF9IV19TVEFURSwKPj4gKyBOQkxfQ0hBTl9NU0dfUkVH
-SVNURVJfUkRNQSwKPj4gKyBOQkxfQ0hBTl9NU0dfVU5SRUdJU1RFUl9SRE1BLAo+PiArIE5CTF9D
-SEFOX01TR19HRVRfUkVBTF9IV19BRERSLAo+PiArIE5CTF9DSEFOX01TR19HRVRfUkVBTF9CREYs
-Cj4+ICsgTkJMX0NIQU5fTVNHX0dSQ19QUk9DRVNTLAo+PiArIE5CTF9DSEFOX01TR19TRVRfU0ZQ
-X1NUQVRFLAo+PiArIE5CTF9DSEFOX01TR19TRVRfRVRIX0xPT1BCQUNLLAo+PiArIE5CTF9DSEFO
-X01TR19DSEVDS19BQ1RJVkVfVkYsCj4+ICsgTkJMX0NIQU5fTVNHX0dFVF9QUk9EVUNUX0ZMRVhf
-Q0FQLAo+PiArIE5CTF9DSEFOX01TR19BTExPQ19LVExTX1RYX0lOREVYLAo+PiArIE5CTF9DSEFO
-X01TR19GUkVFX0tUTFNfVFhfSU5ERVgsCj4+ICsgTkJMX0NIQU5fTVNHX0NGR19LVExTX1RYX0tF
-WU1BVCwKPj4gKyBOQkxfQ0hBTl9NU0dfQUxMT0NfS1RMU19SWF9JTkRFWCwKPj4gKyBOQkxfQ0hB
-Tl9NU0dfRlJFRV9LVExTX1JYX0lOREVYLAo+PiArIE5CTF9DSEFOX01TR19DRkdfS1RMU19SWF9L
-RVlNQVQsCj4+ICsgTkJMX0NIQU5fTVNHX0NGR19LVExTX1JYX1JFQ09SRCwKPj4gKyBOQkxfQ0hB
-Tl9NU0dfQUREX0tUTFNfUlhfRkxPVywKPj4gKyBOQkxfQ0hBTl9NU0dfREVMX0tUTFNfUlhfRkxP
-VywKPj4gKyBOQkxfQ0hBTl9NU0dfQUxMT0NfSVBTRUNfVFhfSU5ERVgsCj4+ICsgTkJMX0NIQU5f
-TVNHX0ZSRUVfSVBTRUNfVFhfSU5ERVgsCj4+ICsgTkJMX0NIQU5fTVNHX0FMTE9DX0lQU0VDX1JY
-X0lOREVYLAo+PiArIE5CTF9DSEFOX01TR19GUkVFX0lQU0VDX1JYX0lOREVYLAo+PiArIE5CTF9D
-SEFOX01TR19DRkdfSVBTRUNfVFhfU0FELAo+PiArIE5CTF9DSEFOX01TR19DRkdfSVBTRUNfUlhf
-U0FELAo+PiArIE5CTF9DSEFOX01TR19BRERfSVBTRUNfVFhfRkxPVywKPj4gKyBOQkxfQ0hBTl9N
-U0dfREVMX0lQU0VDX1RYX0ZMT1csCj4+ICsgTkJMX0NIQU5fTVNHX0FERF9JUFNFQ19SWF9GTE9X
-LAo+PiArIE5CTF9DSEFOX01TR19ERUxfSVBTRUNfUlhfRkxPVywKPj4gKyBOQkxfQ0hBTl9NU0df
-Tk9USUZZX0lQU0VDX0hBUkRfRVhQSVJFLAo+PiArIE5CTF9DSEFOX01TR19HRVRfTUJYX0lSUV9O
-VU0sCj4+ICsgTkJMX0NIQU5fTVNHX0NMRUFSX0ZMT1csCj4+ICsgTkJMX0NIQU5fTVNHX0NMRUFS
-X1FVRVVFLAo+PiArIE5CTF9DSEFOX01TR19HRVRfRVRIX0lELAo+PiArIE5CTF9DSEFOX01TR19T
-RVRfT0ZGTE9BRF9TVEFUVVMsCj4+ICsgTkJMX0NIQU5fTVNHX0lOSVRfT0ZMRCwKPj4gKyBOQkxf
-Q0hBTl9NU0dfSU5JVF9DTURRLAo+PiArIE5CTF9DSEFOX01TR19ERVNUUk9ZX0NNRFEsCj4+ICsg
-TkJMX0NIQU5fTVNHX1JFU0VUX0NNRFEsCj4+ICsgTkJMX0NIQU5fTVNHX0lOSVRfRkxPVywKPj4g
-KyBOQkxfQ0hBTl9NU0dfREVJTklUX0ZMT1csCj4+ICsgTkJMX0NIQU5fTVNHX09GRkxPQURfRkxP
-V19SVUxFLAo+PiArIE5CTF9DSEFOX01TR19HRVRfQUNMX1NXSVRDSCwKPj4gKyBOQkxfQ0hBTl9N
-U0dfR0VUX1ZTSV9HTE9CQUxfUVVFVUVfSUQsCj4+ICsgTkJMX0NIQU5fTVNHX0lOSVRfUkVQLAo+
-PiArIE5CTF9DSEFOX01TR19HRVRfTElORV9SQVRFX0lORk8sCj4+ICsgTkJMX0NIQU5fTVNHX1JF
-R0lTVEVSX05FVF9SRVAsCj4+ICsgTkJMX0NIQU5fTVNHX1VOUkVHSVNURVJfTkVUX1JFUCwKPj4g
-KyBOQkxfQ0hBTl9NU0dfUkVHSVNURVJfRVRIX1JFUCwKPj4gKyBOQkxfQ0hBTl9NU0dfVU5SRUdJ
-U1RFUl9FVEhfUkVQLAo+PiArIE5CTF9DSEFOX01TR19SRUdJU1RFUl9VUENBTExfUE9SVCwKPj4g
-KyBOQkxfQ0hBTl9NU0dfVU5SRUdJU1RFUl9VUENBTExfUE9SVCwKPj4gKyBOQkxfQ0hBTl9NU0df
-R0VUX1BPUlRfU1RBVEUsCj4+ICsgTkJMX0NIQU5fTVNHX1NFVF9QT1JUX0FEVkVSVElTSU5HLAo+
-PiArIE5CTF9DSEFOX01TR19HRVRfTU9EVUxFX0lORk8sCj4+ICsgTkJMX0NIQU5fTVNHX0dFVF9N
-T0RVTEVfRUVQUk9NLAo+PiArIE5CTF9DSEFOX01TR19HRVRfTElOS19TVEFURSwKPj4gKyBOQkxf
-Q0hBTl9NU0dfTk9USUZZX0xJTktfU1RBVEUsCj4+ICsgTkJMX0NIQU5fTVNHX0dFVF9RVUVVRV9D
-WFQsCj4+ICsgTkJMX0NIQU5fTVNHX0NGR19MT0csCj4+ICsgTkJMX0NIQU5fTVNHX0lOSVRfVkRQ
-QVEsCj4+ICsgTkJMX0NIQU5fTVNHX0RFU1RST1lfVkRQQVEsCj4+ICsgTkJMX0NIQU5fTVNHX0dF
-VF9VUENBTExfUE9SVCwKPj4gKyBOQkxfQ0hBTl9NU0dfTk9USUZZX0VUSF9SRVBfTElOS19TVEFU
-RSwKPj4gKyBOQkxfQ0hBTl9NU0dfU0VUX0VUSF9NQUNfQUREUiwKPj4gKyBOQkxfQ0hBTl9NU0df
-R0VUX0ZVTkNUSU9OX0lELAo+PiArIE5CTF9DSEFOX01TR19HRVRfQ0hJUF9URU1QRVJBVFVSRSwK
-Pj4gKyBOQkxfQ0hBTl9NU0dfRElTQUJMRV9IV19GTE9XLAo+PiArIE5CTF9DSEFOX01TR19FTkFC
-TEVfSFdfRkxPVywKPj4gKyBOQkxfQ0hBTl9NU0dfU0VUX1VQQ0FMTF9SVUxFLAo+PiArIE5CTF9D
-SEFOX01TR19VTlNFVF9VUENBTExfUlVMRSwKPj4gKyBOQkxfQ0hBTl9NU0dfR0VUX1JFR19EVU1Q
-LAo+PiArIE5CTF9DSEFOX01TR19HRVRfUkVHX0RVTVBfTEVOLAo+PiArIE5CTF9DSEFOX01TR19D
-RkdfTEFHX0hBU0hfQUxHT1JJVEhNLAo+PiArIE5CTF9DSEFOX01TR19DRkdfTEFHX01FTUJFUl9G
-V0QsCj4+ICsgTkJMX0NIQU5fTVNHX0NGR19MQUdfTUVNQkVSX0xJU1QsCj4+ICsgTkJMX0NIQU5f
-TVNHX0NGR19MQUdfTUVNQkVSX1VQX0FUVFIsCj4+ICsgTkJMX0NIQU5fTVNHX0FERF9MQUdfRkxP
-VywKPj4gKyBOQkxfQ0hBTl9NU0dfREVMX0xBR19GTE9XLAo+PiArIE5CTF9DSEFOX01TR19TV0lU
-Q0hERVZfSU5JVF9DTURRLAo+PiArIE5CTF9DSEFOX01TR19TV0lUQ0hERVZfREVJTklUX0NNRFEs
-Cj4+ICsgTkJMX0NIQU5fTVNHX1NFVF9UQ19GTE9XX0lORk8sCj4+ICsgTkJMX0NIQU5fTVNHX1VO
-U0VUX1RDX0ZMT1dfSU5GTywKPj4gKyBOQkxfQ0hBTl9NU0dfSU5JVF9BQ0wsCj4+ICsgTkJMX0NI
-QU5fTVNHX1VOSU5JVF9BQ0wsCj4+ICsgTkJMX0NIQU5fTVNHX0NGR19MQUdfTUNDLAo+PiArIE5C
-TF9DSEFOX01TR19SRUdJU1RFUl9WU0kyUSwKPj4gKyBOQkxfQ0hBTl9NU0dfU0VUVVBfUTJWU0ks
-Cj4+ICsgTkJMX0NIQU5fTVNHX1JFTU9WRV9RMlZTSSwKPj4gKyBOQkxfQ0hBTl9NU0dfU0VUVVBf
-UlNTLAo+PiArIE5CTF9DSEFOX01TR19SRU1PVkVfUlNTLAo+PiArIE5CTF9DSEFOX01TR19HRVRf
-UkVQX1FVRVVFX0lORk8sCj4+ICsgTkJMX0NIQU5fTVNHX0NUUkxfUE9SVF9MRUQsCj4+ICsgTkJM
-X0NIQU5fTVNHX05XQVlfUkVTRVQsCj4+ICsgTkJMX0NIQU5fTVNHX1NFVF9JTlRMX1NVUFBSRVNT
-X0xFVkVMLAo+PiArIE5CTF9DSEFOX01TR19HRVRfRVRIX1NUQVRTLAo+PiArIE5CTF9DSEFOX01T
-R19HRVRfTU9EVUxFX1RFTVBFUkFUVVJFLAo+PiArIE5CTF9DSEFOX01TR19HRVRfQk9BUkRfSU5G
-TywKPj4gKyBOQkxfQ0hBTl9NU0dfR0VUX1A0X1VTRUQsCj4+ICsgTkJMX0NIQU5fTVNHX0dFVF9W
-Rl9CQVNFX1ZTSV9JRCwKPj4gKyBOQkxfQ0hBTl9NU0dfQUREX0xMRFBfRkxPVywKPj4gKyBOQkxf
-Q0hBTl9NU0dfREVMX0xMRFBfRkxPVywKPj4gKyBOQkxfQ0hBTl9NU0dfQ0ZHX0VUSF9CT05EX0lO
-Rk8sCj4+ICsgTkJMX0NIQU5fTVNHX0NGR19EVVBQS1RfTUNDLAo+PiArIE5CTF9DSEFOX01TR19B
-RERfTkRfVVBDQUxMX0ZMT1csCj4+ICsgTkJMX0NIQU5fTVNHX0RFTF9ORF9VUENBTExfRkxPVywK
-Pj4gKyBOQkxfQ0hBTl9NU0dfR0VUX0JPQVJEX0lELAo+PiArIE5CTF9DSEFOX01TR19TRVRfU0hB
-UElOR19EUE9SVF9WTEQsCj4+ICsgTkJMX0NIQU5fTVNHX1NFVF9EUE9SVF9GQ19USF9WTEQsCj4+
-ICsgTkJMX0NIQU5fTVNHX1JFR0lTVEVSX1JETUFfQk9ORCwKPj4gKyBOQkxfQ0hBTl9NU0dfVU5S
-RUdJU1RFUl9SRE1BX0JPTkQsCj4+ICsgTkJMX0NIQU5fTVNHX1JFU1RPUkVfTkVUREVWX1FVRVVF
-LAo+PiArIE5CTF9DSEFOX01TR19SRVNUQVJUX05FVERFVl9RVUVVRSwKPj4gKyBOQkxfQ0hBTl9N
-U0dfUkVTVE9SRV9IV19RVUVVRSwKPj4gKyBOQkxfQ0hBTl9NU0dfS0VFUF9BTElWRSwKPj4gKyBO
-QkxfQ0hBTl9NU0dfR0VUX0JBU0VfTUFDX0FERFIsCj4+ICsgTkJMX0NIQU5fTVNHX0NGR19CT05E
-X1NIQVBJTkcsCj4+ICsgTkJMX0NIQU5fTVNHX0NGR19CR0lEX0JBQ0tfUFJFU1NVUkUsCj4+ICsg
-TkJMX0NIQU5fTVNHX0FMTE9DX0tUX0JMT0NLLAo+PiArIE5CTF9DSEFOX01TR19GUkVFX0tUX0JM
-T0NLLAo+PiArIE5CTF9DSEFOX01TR19HRVRfVVNFUl9RVUVVRV9JTkZPLAo+PiArIE5CTF9DSEFO
-X01TR19HRVRfRVRIX0JPTkRfSU5GTywKPj4gKyBOQkxfQ0hBTl9NU0dfQ0xFQVJfQUNDRUxfRkxP
-VywKPj4gKyBOQkxfQ0hBTl9NU0dfU0VUX0JSSURHRV9NT0RFLAo+PiArIE5CTF9DSEFOX01TR19H
-RVRfVkZfRlVOQ1RJT05fSUQsCj4+ICsgTkJMX0NIQU5fTVNHX05PVElGWV9MSU5LX0ZPUkNFRCwK
-Pj4gKyBOQkxfQ0hBTl9NU0dfU0VUX1BNRF9ERUJVRywKPj4gKyBOQkxfQ0hBTl9NU0dfUkVHSVNU
-RVJfRlVOQ19NQUMsCj4+ICsgTkJMX0NIQU5fTVNHX1NFVF9UWF9SQVRFLAo+PiArIE5CTF9DSEFO
-X01TR19SRUdJU1RFUl9GVU5DX0xJTktfRk9SQ0VELAo+PiArIE5CTF9DSEFOX01TR19HRVRfTElO
-S19GT1JDRUQsCj4+ICsgTkJMX0NIQU5fTVNHX1JFR0lTVEVSX0ZVTkNfVkxBTiwKPj4gKyBOQkxf
-Q0hBTl9NU0dfR0VUX0ZEX0ZMT1csCj4+ICsgTkJMX0NIQU5fTVNHX0dFVF9GRF9GTE9XX0NOVCwK
-Pj4gKyBOQkxfQ0hBTl9NU0dfR0VUX0ZEX0ZMT1dfQUxMLAo+PiArIE5CTF9DSEFOX01TR19HRVRf
-RkRfRkxPV19NQVgsCj4+ICsgTkJMX0NIQU5fTVNHX1JFUExBQ0VfRkRfRkxPVywKPj4gKyBOQkxf
-Q0hBTl9NU0dfUkVNT1ZFX0ZEX0ZMT1csCj4+ICsgTkJMX0NIQU5fTVNHX0NGR19GRF9GTE9XX1NU
-QVRFLAo+PiArIE5CTF9DSEFOX01TR19SRUdJU1RFUl9GVU5DX1JBVEUsCj4+ICsgTkJMX0NIQU5f
-TVNHX05PVElGWV9WTEFOLAo+PiArIE5CTF9DSEFOX01TR19HRVRfWERQX1FVRVVFX0lORk8sCj4+
-ICsgTkJMX0NIQU5fTVNHX1NUT1BfQUJOT1JNQUxfU1dfUVVFVUUsCj4+ICsgTkJMX0NIQU5fTVNH
-X1NUT1BfQUJOT1JNQUxfSFdfUVVFVUUsCj4+ICsgTkJMX0NIQU5fTVNHX05PVElGWV9SRVNFVF9F
-VkVOVCwKPj4gKyBOQkxfQ0hBTl9NU0dfQUNLX1JFU0VUX0VWRU5ULAo+PiArIE5CTF9DSEFOX01T
-R19HRVRfVkZfVlNJX0lELAo+PiArIE5CTF9DSEFOX01TR19DT05GSUdVUkVfUU9TLAo+PiArIE5C
-TF9DSEFOX01TR19HRVRfUEZDX0JVRkZFUl9TSVpFLAo+PiArIE5CTF9DSEFOX01TR19TRVRfUEZD
-X0JVRkZFUl9TSVpFLAo+PiArIE5CTF9DSEFOX01TR19HRVRfVkZfU1RBVFMsCj4+ICsgTkJMX0NI
-QU5fTVNHX1JFR0lTVEVSX0ZVTkNfVFJVU1QsCj4+ICsgTkJMX0NIQU5fTVNHX05PVElGWV9UUlVT
-VCwKPj4gKyBOQkxfQ0hBTl9NU0dfQ0hFQ0tfVkZfSVNfQUNUSVZFLAo+PiArIE5CTF9DSEFOX01T
-R19HRVRfRVRIX0FCTk9STUFMX1NUQVRTLAo+PiArIE5CTF9DSEFOX01TR19HRVRfRVRIX0NUUkxf
-U1RBVFMsCj4+ICsgTkJMX0NIQU5fTVNHX0dFVF9QQVVTRV9TVEFUUywKPj4gKyBOQkxfQ0hBTl9N
-U0dfR0VUX0VUSF9NQUNfU1RBVFMsCj4+ICsgTkJMX0NIQU5fTVNHX0dFVF9GRUNfU1RBVFMsCj4+
-ICsgTkJMX0NIQU5fTVNHX0NGR19NVUxUSV9NQ0FTVF9SVUxFLAo+PiArIE5CTF9DSEFOX01TR19H
-RVRfTElOS19ET1dOX0NPVU5ULAo+PiArIE5CTF9DSEFOX01TR19HRVRfTElOS19TVEFUVVNfT1BD
-T0RFLAo+PiArIE5CTF9DSEFOX01TR19HRVRfUk1PTl9TVEFUUywKPj4gKyBOQkxfQ0hBTl9NU0df
-UkVHSVNURVJfUEZfTkFNRSwKPj4gKyBOQkxfQ0hBTl9NU0dfR0VUX1BGX05BTUUsCj4+ICsgTkJM
-X0NIQU5fTVNHX0NPTkZJR1VSRV9SRE1BX0JXLAo+PiArIE5CTF9DSEFOX01TR19TRVRfUkFURV9M
-SU1JVCwKPj4gKyBOQkxfQ0hBTl9NU0dfU0VUX1RDX1dHVCwKPj4gKyBOQkxfQ0hBTl9NU0dfUkVN
-T1ZFX1FVRVVFLAo+PiArIE5CTF9DSEFOX01TR19HRVRfTUlSUk9SX1RBQkxFX0lELAo+PiArIE5C
-TF9DSEFOX01TR19DT05GSUdVUkVfTUlSUk9SLAo+PiArIE5CTF9DSEFOX01TR19DT05GSUdVUkVf
-TUlSUk9SX1RBQkxFLAo+PiArIE5CTF9DSEFOX01TR19DTEVBUl9NSVJST1JfQ0ZHLAo+PiArIE5C
-TF9DSEFOX01TR19NSVJST1JfT1VUUFVUUE9SVF9OT1RJRlksCj4+ICsgTkJMX0NIQU5fTVNHX0NI
-RUNLX0ZMT1dUQUJMRV9TUEVDLAo+PiArIE5CTF9DSEFOX01TR19DSEVDS19WRl9JU19WRFBBLAo+
-PiArIE5CTF9DSEFOX01TR19HRVRfVkRQQV9WRl9TVEFUUywKPj4gKyBOQkxfQ0hBTl9NU0dfU0VU
-X1JYX1JBVEUsCj4+ICsgTkJMX0NIQU5fTVNHX0dFVF9VVk5fUEtUX0RST1BfU1RBVFMsCj4+ICsg
-TkJMX0NIQU5fTVNHX0dFVF9VU1RPUkVfUEtUX0RST1BfU1RBVFMsCj4+ICsgTkJMX0NIQU5fTVNH
-X0dFVF9VU1RPUkVfVE9UQUxfUEtUX0RST1BfU1RBVFMsCj4+ICsgTkJMX0NIQU5fTVNHX1NFVF9X
-T0wsCj4+ICsgTkJMX0NIQU5fTVNHX0lOSVRfVkZfTVNJWF9NQVAsCj4+ICsgTkJMX0NIQU5fTVNH
-X0dFVF9TVF9OQU1FLAo+PiArIE5CTF9DSEFOX01TR19NVFVfU0VUID0gNTAxLAo+PiArIE5CTF9D
-SEFOX01TR19TRVRfUlhGSF9JTkRJUiA9IDUwNiwKPj4gKyBOQkxfQ0hBTl9NU0dfU0VUX1JYRkhf
-UlNTX0FMR19TRUwgPSA1MDgsCj4+ICsgLyogbWFpbGJveCBtc2cgZW5kICovCj4+ICsgTkJMX0NI
-QU5fTVNHX01BSUxCT1hfTUFYLAo+PiArfTsKPj4gKwoKPlRoaXMgaXMgYSBiaWcgZW51bS4gSXMg
-dGhlcmUgYSBwb3NzaWJpbGl0eSB0byBncm91cCB0aGVtIGJ5IGZ1bmN0aW9uYWxpdHk/CgpUaGFu
-ayB5b3UgZm9yIHlvdXIgZmVlZGJhY2suCkFzIG1lbnRpb25lZCBpbiB0aGUgY29tbWl0IG1lc3Nh
-Z2UsIGZvciBjb21wYXRpYmlsaXR5LAp0aGUgbXNnIElEIHZhbHVlcyBhcmUgZml4ZWQgYW5kIGNh
-bm5vdCBiZSByZW9yZGVyZWQgb3IgcmVudW1iZXJlZC4KVGhpcyBjb25zdHJhaW50ZW5zdXJlcyBi
-YWNrd2FyZCBjb21wYXRpYmlsaXR5IHdpdGggZXhpc3RpbmcKaW1wbGVtZW50YXRpb25zIHRoYXQg
-cmVseSBvbiB0aGVzZSBudW1lcmljIHZhbHVlcy4KLS0taWxsdXNpb24ud2FuZwo=
+On Thu, Apr 02, 2026 at 02:36:25PM -0700, Jitendra Vegiraju wrote:
+> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+> 
+> This patchset adds basic PCI ethernet device driver support for Broadcom
+> BCM8958x Automotive Ethernet switch SoC devices.
+> 
+> This SoC device has PCIe ethernet MAC attached to an integrated ethernet
+> switch using XGMII interface. The PCIe ethernet controller is presented to
+> the Linux host as PCI network device.
+> Management of integrated ethernet switch on this SoC is not handled via
+> the PCIe interface.
+> 
+> The following block diagram gives an overview of the application.
+>              +=================================+
+>              |       Host CPU/Linux            |
+>              +=================================+
+>                         || PCIe
+>                         ||
+>         +==========================================+
+>         |           +--------------+               |
+>         |           | PCIE Endpoint|               |
+>         |           | Ethernet     |               |
+>         |           | Controller   |               |
+>         |           |   DMA        |               |
+>         |           +--------------+               |
+>         |           |   MAC        |   BCM8958X    |
+>         |           +--------------+   SoC         |
+>         |               || XGMII                   |
+>         |               ||                         |
+>         |           +--------------+               |
+>         |           | Ethernet     |               |
+>         |           | switch       |               |
+>         |           +--------------+               |
+>         |             || || || ||                  |
+>         +==========================================+
+>                       || || || || More external interfaces
+> 
+> The MAC block on BCM8958x is based on Synopsis XGMAC 4.00a core. This
+> MAC IP introduces new DMA architecture called Hyper-DMA for virtualization
+> scalability.
+> 
+> Driver functionality specific to new MAC (DW25GMAC) is implemented in
+> new file dw25gmac.c.
+
+Sorry for suggesting this rather late, but I recently came across
+another stmmac driver in the kernel - drivers/net/ethernet/synopsys.
+This is for XLGMAC, but I wonder whether it may be a better bet for
+this core. Have you looked at it?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
