@@ -1,187 +1,181 @@
-Return-Path: <netdev+bounces-275890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275891-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MP80MpK51GnQwgcAu9opvQ
-	(envelope-from <netdev+bounces-275890-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 10:00:18 +0200
+	id EAJEDue51GlEwwcAu9opvQ
+	(envelope-from <netdev+bounces-275891-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 10:01:43 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50D383AB0B9
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 10:00:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC42D3AB0E8
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 10:01:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2159530053D2
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 07:59:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 13A84300C5B0
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 08:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3236C3A382C;
-	Tue,  7 Apr 2026 07:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vo2FAFtA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 979D13947BE;
+	Tue,  7 Apr 2026 08:00:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EEE43A381A
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 07:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [4.193.249.245])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC653A3E64
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 08:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=4.193.249.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775548792; cv=none; b=nKYqpuUb1qlV6sEeeBz5o7dQAB8xbzTh2Zac3mW9Y5H3VTJbCVf5e49pps2q1RIYE4d5LEQr5u6w3mNUCNCQm04MyLj9f6caUbHYcIMcV4wdJ2ZH+Q4fPTt8rNysYk48ErUMmp2QEYDjLn7qVP5cT6p1m3Qi3rsN3TXy/opGh30=
+	t=1775548844; cv=none; b=m+t4G4mTsUuUNqApPPFtxlivjdKX1nAqRFG0siUkrWWAH192ExkdC7Dy+sEDIuQZEmFFF3kvfD6JBCDkJqkE1ispUhDhwRalFhoESTn+o24dSMKDIONRqUODn5Vu/s2Ny8qsJ9yVzW/AIxgjNy4wYM7ZJkvF/+AgQtkNfDVt+zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775548792; c=relaxed/simple;
-	bh=frAmkuTgP2dSjHd8B0fZF03UIuplXCuIlN7oKbjWcXU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fITiVTe10H3jbrsr8xPS4lWeEyJ6sjaL6mhL+p3e76siingjUTqffQeUbGmFfjcQrDskhL8oPUFbXi671CzvLycoso6Sri0ndctxEye02QBwy3i95UA7X0Rsz4+g5xh2ig0bsj2tLD4byYBQQkM4YWDjzvY1TrBG453GwEq+znM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vo2FAFtA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF212C2BCB5
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 07:59:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775548791;
-	bh=frAmkuTgP2dSjHd8B0fZF03UIuplXCuIlN7oKbjWcXU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Vo2FAFtA+faS4VTXSaZNI84ImD5/V+X1OKXueozJR6jU5q/ZyR420UWS6o/c/lcjJ
-	 719bPyVdSdwojmtDy99Yhqlts5JhQaOdN+4pMlnoxb3ZtAgtmq9PPQOvyV+amQE4PD
-	 xWANGAZZEHxtEiuQGJ4iw8q3uinMo8eLjMKjVxv8Rn8rLSyti5WiQDIgp/NBkycklD
-	 +aoHaID4ZNF4yqHWXQBcGGWeGeARwJRUCMXEWciriFe0j4z2YsiQmamtI7tBfoTDQb
-	 IDCNwIuIbYUCcAjdGFGgr9o/JC2vFFDmYEajpsNlb2uuzpc9y5OTB/d4sb8zgFNoRT
-	 Kl1xu1ICDMFiQ==
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-79f855b2575so45743377b3.2
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 00:59:51 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXTBgNXCVG7hp4nW6kZhl62IRdsgDoQvITAJ/gpYFwnb0S4ZThi7LomtMhHNk6YQQk2HjSE0IQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnUhEpHa9/NSYwFbz5mOCnNobh4Ga4ZU09a7ALP1ItcSxO3HtA
-	qi1GAthXjEPH0ym4BTOhnTIKBtG5tb9V9gIjqOwKqTSDcG/XvRk6Mka8+rESWXmHk61Ruc7pvhU
-	AnlZCzhIL5k3LJkRRBEsX/lstw8g003s=
-X-Received: by 2002:a05:690c:c36e:b0:79a:dae4:5848 with SMTP id
- 00721157ae682-7a4d3ec9a5bmr127068957b3.20.1775548791255; Tue, 07 Apr 2026
- 00:59:51 -0700 (PDT)
+	s=arc-20240116; t=1775548844; c=relaxed/simple;
+	bh=S9mR6Lo7v7/UCAjrZOUa8wskBN0EKrg1vvVzLgTstQY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sqLtbGfr+5KODtik03UloQdc9ozqp5P4dUpd77dgQ+ewXBd//zfYRXUvprPEDUiwLTHufXjwlnb99SBwfnz8Zy5GBLAMJftzU6mQ7cFj7unyCwuUTYIbwBJCJhXFT6pNYLDezqRDvQ/logknUqsQC4z0LGGiAzcN4jjX9AM2N3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=4.193.249.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowADnXf6PudRpvOGuAA--.3802S2;
+	Tue, 07 Apr 2026 16:00:15 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: netdev@vger.kernel.org
+Cc: kuniyu@google.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	xemul@parallels.com,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	enjou1224z@gmail.com,
+	wangjiexun2025@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH net v2 1/1] af_unix: read UNIX_DIAG_VFS data under unix_state_lock
+Date: Tue,  7 Apr 2026 16:00:14 +0800
+Message-ID: <20260407080015.1744197-1-n05ec@lzu.edu.cn>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1775207252.git.wangjiexun2025@gmail.com>
+References: <cover.1775207252.git.wangjiexun2025@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com> <20260331-realtek_forward-v1-6-44fb63033b7e@gmail.com>
-In-Reply-To: <20260331-realtek_forward-v1-6-44fb63033b7e@gmail.com>
-From: Linus Walleij <linusw@kernel.org>
-Date: Tue, 7 Apr 2026 09:59:40 +0200
-X-Gmail-Original-Message-ID: <CAD++jLmRT+3EJ-f_FNuZwOGU4fBB6pGHhq2OuxBS7O-cEnWt=g@mail.gmail.com>
-X-Gm-Features: AQROBzDoc5pVoMcVhuloeT4ma0flCVt38NSkmePLngpEVqq-QR9Ofazt0QEg36U
-Message-ID: <CAD++jLmRT+3EJ-f_FNuZwOGU4fBB6pGHhq2OuxBS7O-cEnWt=g@mail.gmail.com>
-Subject: Re: [net-next PATCH 06/10] net: dsa: realtek: rtl8365mb: add VLAN support
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowADnXf6PudRpvOGuAA--.3802S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7CFy5Cr45GFyxCrWDGryfWFg_yoW8uFW3pF
+	y3KFWUKryDAry7ur1ftryI93WFva9rWF98G3yvkwn5J3WDJrWIva4DKr9Ivrn5JFWFkw4x
+	JF1Y9F1rGr4DArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_JFC_Wr1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
+	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
+	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
+	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
+	n4kS14v26r1q6r43MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
+	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQMJCWnT1v0A0gAEsF
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275890-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275891-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[lzu.edu.cn];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,bang-olufsen.dk,rasmusvillemoes.dk,armlinux.org.uk,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
+	FREEMAIL_CC(0.00)[google.com,davemloft.net,kernel.org,redhat.com,parallels.com,gmail.com,lzu.edu.cn];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	RSPAMD_EMAILBL_FAIL(0.00)[n05ec.lzu.edu.cn:query timed out,tomapufckgml.gmail.com:query timed out];
+	FROM_NEQ_ENVFROM(0.00)[n05ec@lzu.edu.cn,netdev@vger.kernel.org];
+	NEURAL_HAM(-0.00)[-0.840];
+	TO_DN_NONE(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[linusw@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bang-olufsen.dk:email]
-X-Rspamd-Queue-Id: 50D383AB0B9
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,lzu.edu.cn:email,lzu.edu.cn:mid]
+X-Rspamd-Queue-Id: DC42D3AB0E8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Luiz, Alvin,
+From: Jiexun Wang <wangjiexun2025@gmail.com>
 
-thanks for your patch!
+Exact UNIX diag lookups hold a reference to the socket, but not to
+u->path. Meanwhile, unix_release_sock() clears u->path under
+unix_state_lock() and drops the path reference after unlocking.
 
-On Wed, Apr 1, 2026 at 1:00=E2=80=AFAM Luiz Angelo Daros de Luca
-<luizluca@gmail.com> wrote:
+Read the inode and device numbers for UNIX_DIAG_VFS while holding
+unix_state_lock(), then emit the netlink attribute after dropping the
+lock.
 
-> From: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
->
-> Realtek RTL8365MB switches (a.k.a. RTL8367C family) use two different
-> structures for VLANs:
->
-> - VLAN4K: A full table with 4096 entries defining port membership and
->   tagging.
-> - VLANMC: A smaller table with 32 entries used primarily for PVID
->   assignment.
->
-> In this hardware, a port's PVID must point to an index in the VLANMC
-> table rather than a VID directly. Since the VLANMC table is limited to
-> 32 entries, the driver implements a dynamic allocation scheme to
-> maximize resource usage:
->
-> - VLAN4K is treated by the driver as the source of truth for membership.
-> - A VLANMC entry is only allocated when a port is configured to use a
->   specific VID as its PVID.
-> - VLANMC entries are deleted when no longer needed as a PVID by any port.
->
-> Although VLANMC has a members field, the switch only checks membership
-> in the VLAN4K table. However, when a corresponding VLAN entry also exists
-> in VLANMC, this driver keeps both membership configurations in sync.
->
-> VLANMC index 0, although a valid entry, is reserved in this driver as a
-> neutral PVID value for ports not using a specific PVID.
->
-> In the subsequent RTL8367D switch family, VLANMC table was
-> removed and PVID assignment was delegated to a dedicated set of
-> registers.
->
-> All ports start isolated, forwarding exclusively to CPU ports, and
-> with VLAN transparent, ignoring VLAN membership. Once a member in a
-> bridge, the port isolation is expanded to include the bridge members.
-> When that bridge enables VLAN filtering, the VLAN transparent feature is
-> disabled, letting the switch filter based on VLAN setup.
->
-> Co-developed-by: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
-> Signed-off-by: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+This keeps the VFS data stable while the reply is being built.
 
-This patch ignores the existing abstractions for generic RTL8366 VLAN
-handling in rtl8366-core.c and realtek.h, which is actually compiled
-and bundled into the same object with the RTL8365MB driver.
-It provides rtl8366_vlan_add(), rtl8366_vlan_del(), rtl8366_enable_vlan(),
-rtl8366_enable_vlan4k(), rtl8366_set_pvid(), rtl8366_set_vlan().
+Fixes: 5f7b0569460b ("unix_diag: Unix inode info NLA")
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Ren Wei <enjou1224z@gmail.com>
+Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+---
+Changes in v2:
+- reorder local variables in reverse xmas tree order
 
-The RTL8366RB notably has the same 32 PVID thing and the
-same 4K VLAN table.
+ net/unix/diag.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-I understand that it is always easier to develop and test something
-for "just this one chip", but I predictably have to be the one to ask
-if this can be done in the shared code.
+diff --git a/net/unix/diag.c b/net/unix/diag.c
+index ca3473026151..c9c1e51c4419 100644
+--- a/net/unix/diag.c
++++ b/net/unix/diag.c
+@@ -28,18 +28,23 @@ static int sk_diag_dump_name(struct sock *sk, struct sk_buff *nlskb)
+ 
+ static int sk_diag_dump_vfs(struct sock *sk, struct sk_buff *nlskb)
+ {
+-	struct dentry *dentry = unix_sk(sk)->path.dentry;
++	struct unix_diag_vfs uv;
++	struct dentry *dentry;
++	bool have_vfs = false;
+ 
++	unix_state_lock(sk);
++	dentry = unix_sk(sk)->path.dentry;
+ 	if (dentry) {
+-		struct unix_diag_vfs uv = {
+-			.udiag_vfs_ino = d_backing_inode(dentry)->i_ino,
+-			.udiag_vfs_dev = dentry->d_sb->s_dev,
+-		};
+-
+-		return nla_put(nlskb, UNIX_DIAG_VFS, sizeof(uv), &uv);
++		uv.udiag_vfs_ino = d_backing_inode(dentry)->i_ino;
++		uv.udiag_vfs_dev = dentry->d_sb->s_dev;
++		have_vfs = true;
+ 	}
++	unix_state_unlock(sk);
+ 
+-	return 0;
++	if (!have_vfs)
++		return 0;
++
++	return nla_put(nlskb, UNIX_DIAG_VFS, sizeof(uv), &uv);
+ }
+ 
+ static int sk_diag_dump_peer(struct sock *sk, struct sk_buff *nlskb)
+-- 
+2.34.1
 
-You need to either:
-
-- Take a second sweep and refactor to share the existing VLAN
-  handling with RTL8366RB (preferred).
-
-- Explain why RTL8365MB is so very different that it cannot share
-  code with RTL8366RB, then proceed to move all code from
-  rtl8366-core.c into the RTL8366RB driver, change prefix of functions
-  and generally make it local so it doesn't bloat the
-  RTL8365MB code before adding this.
-
-Yours,
-Linus Walleij
 
