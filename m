@@ -1,265 +1,172 @@
-Return-Path: <netdev+bounces-275926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275925-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4PvUEk7R1GlJxwcAu9opvQ
-	(envelope-from <netdev+bounces-275926-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:41:34 +0200
+	id 6GFNNkrR1GljxwcAu9opvQ
+	(envelope-from <netdev+bounces-275925-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:41:30 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 335483AC366
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:41:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 73CA63AC35E
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:41:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 65FBB300492B
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 09:41:32 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id D468230071C1
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 09:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C8A3A6EE9;
-	Tue,  7 Apr 2026 09:41:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D6493A6B96;
+	Tue,  7 Apr 2026 09:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tlxrsy9P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nZp7rTEz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676F73A5E7D
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 09:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775554891; cv=none; b=ih7P4RC35zVcGHBlJSAssjYrbd+qy07Qf5tl8XGEnIh/lA6zlGVVzQh2z3y1K1TgwE6ivEWNOFKS7bMtUIPENMWMjX9mt6TtcyO26ix38DGb5ddm+KnMKqIjnrXfT2QicFhNhh1bqWXHgKOHjM1HousROtyNlPoQ7a+smB4LnYQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775554891; c=relaxed/simple;
-	bh=KgpkJhlN1z1QlMZqVAxt43YkPZ+vTw1jPiMOtNbAUsA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=WdVE6LMGxptNkMgEEnFNKqwzoKIKpJOUueAcTJN3UOJe6Ga/1fxH6BgiR7jFrRIYvAj6nCkH6ZI0oxx1n8nqBoEjYQvpfofzV7MZeKLIjdEJWhEW7v1iYU0yXyfTNcjMthDtXTdvNuozVVPcte8HRAzPn04/eNrvDMJ/Y1oVo8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tlxrsy9P; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775554876;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=5joibMANCykBiLgKj2c6T79xsF0pUdONomREytFFN/E=;
-	b=tlxrsy9PvC8ry2AFC2uiBSAP+k5vcwW+UxYKkBy6y2cobEAVGlO3Tgnojx0JglNk8ioIKP
-	H3tj64pbA+nwEkosOdHh0+c1QPtiXtnPmHNpIHUyrJFf5+0T85KugehlJ8TSzbsDPofQQL
-	rrSqNWfrzCDa+2FGnn6OXlF7DJMY7x8=
-From: Qingfang Deng <qingfang.deng@linux.dev>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Qingfang Deng <qingfang.deng@linux.dev>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Kees Cook <kees@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] ppp: consolidate refcount decrements
-Date: Tue,  7 Apr 2026 17:40:56 +0800
-Message-ID: <20260407094058.257246-1-qingfang.deng@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51803A5E8C
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 09:41:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775554889; cv=pass; b=ZM47cV+Xr2z+GOBBYaMTJHQr09J+nZWfoHkCoOPZAA+I9Wz+32WHJTe77INDRtt10Ga/yCaYb9GPZG4kTe+Qti0b/R6zUXu8sY+6+tqEa1cx41GdbTYKZm9DD1OTH4bP+skAoQkcaJKK+8ZtgniNubn7YSrQzlu5DBVMYBxGd2Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775554889; c=relaxed/simple;
+	bh=9XKMsadydwDQqCY9F+DkrtsGh8JxW60RIBSvou5/6bE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IxS6/YtWT7by/X6wCmiO3JuWiH/uZy6TzbzOGDELZ81OTdU06qgDuKKEeTy1/seqyHyA9usmkr3TSr5kUD+uvFn19m0b1W68oPUAwwIo4cPyByD7UTVegfEfQMhhdW8Dlwk4hFBu7goDP72owUSb9XZz1vlF7BCdVdtQp4Yq28c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nZp7rTEz; arc=pass smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-89fc4147f2eso62712246d6.3
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 02:41:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775554883; cv=none;
+        d=google.com; s=arc-20240605;
+        b=F31yaqNo8sRETP23BmcU53cmHt01SrC6C9BBg8BCWvjKMTAK7hwSBja0vmRtKuRKP1
+         L/89qLVHO+wlqfObHs3sx4qW0M6ZRQ2u+ArxkAaKVUaBIqlWF5JZN+jfzFuUlJ2wUQbM
+         D4fatsjp565cYSZnnlAUlwsp832bcOJ3gYVnGuuljgUGcMLhxVy/VCRnkKo03/UEOm8w
+         leqxPiav2R7z2NY/OSHCoDtQQy23fFpralOjR9CQQOJkfQDizlyCU39QGHvSQzfC4pQV
+         JoKBh8Cm/vr64MwVGY+kA7+d0KAGG9riMYr+SlA0ZkzaUKw0wd4ARFiPvHO/yxy/XNj6
+         1vdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=9XKMsadydwDQqCY9F+DkrtsGh8JxW60RIBSvou5/6bE=;
+        fh=NUu01oYJ/8KdePd4eImPO/tX73eiFcB3BBlOUTYYgK0=;
+        b=dwB3/49ngylPOURFNA5mhKFYZ0S7SewgIWo8ncSpxe6uaCYowmTB04budSKbOaHsnW
+         eEsxc7WQasLzUqpO4uCN1vxHRGtk7EgusPdXd8FXg1ruilk+icTxFBRVepwLtcw+hLWh
+         RrOJ7UEeWXPRAkl1vy6f3MWfgtts4cikAEdj1C97VepGtrPL+WQFQj+Ah3cLQTKqDqKz
+         YLVWyMR4YZCYFVmJeRTqkioKnrrPeXknL+WVBCO6b+FJI+2herGjl9U5NjYYZe5OkEvY
+         syfi0vpTs9AewpFYsy3dRaXvA/fuKiE+LhZSXs8Bz+/JEDy3aXznfX+jc+kWVRXvqfXW
+         GSEw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775554883; x=1776159683; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9XKMsadydwDQqCY9F+DkrtsGh8JxW60RIBSvou5/6bE=;
+        b=nZp7rTEzIgwApXkyB4DOq1hdYaHOXy2CgZTki3CI/gAiVpeDlBXGkivctNvJ7KUkJJ
+         nvNVtLHrvwpZua9JrMUOLgOv3DR+J+8YKe5VE9JUVJBwGQKkNRt9UhNgbql8buaYu9Sa
+         dLk2Vec0G09UmG2fZqQ5oQAKWe9ZApIbtb14ZnX1sY1HMNTqk0LPVioNMdkzCOblWRIp
+         +q6v8V7cpgqSa8l5ocB3tqBdxD9ByLfknmy0dE4hqETsQJDiHrkV+Mvli53vU5KrpQ0E
+         taWTiWAQ01rHlPeiREiJ85MwR0+XnUihGjNZS8qel/Vya+3NJ6pmk5Eq8sr273f1xZEG
+         9gsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775554883; x=1776159683;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9XKMsadydwDQqCY9F+DkrtsGh8JxW60RIBSvou5/6bE=;
+        b=KMPW3gFiMUF4idQdnP3c1ZtPy8KeOqnzeGZVIFEAx6a2NOH48SjSnyIU5lKSXcyEz0
+         IKO4gpTIk8fixIYFSRdT86MXS2jtimRp6zuZ5TBaGwjyvyByiwzKYEc7y/aNbpXMkL3o
+         ovfGtu8a3O5ygO4fxVP4dqi7JFsosNOVHAPWsxLeHXPsrThmOnbBJZlW0xvHTwWJEC+1
+         /ds5E+SU9vCT5elHF9W+PtyGKNZ7h4K2I0QNAcoc4eunaoWv0QnZEWH4TdElEnYejU5Y
+         gukGW4XW69MzkMim4pe/gvfrjVHsLo7HcOF+IhqirGBjOby0Ws6T76jw//OxNqlZECNI
+         Q8zw==
+X-Gm-Message-State: AOJu0Yz5iSoIz4YJZyiwSa7zVDCmbRLi+MJOhmto6sZLAan056+SAwHm
+	MPU7HvL9931qaVVk3ed1Jvmlydud08sUw2dWG9sP30lgW5M6SgDCVECWi5Qpgs0jtPEz9tFUexp
+	Hzwlx3Ya3THvfHksV1szhWs0KKJT8qlsdNLHd7Tqx
+X-Gm-Gg: AeBDietlEvr/PiRGQziIhui1pDsjiJPxJhDYiNu8etedki4uVLJx5B6RMcQIEiZYEoP
+	bxeuotjl2EDBOc58XEUWVvGQK4nQFJULAZflop6P7ey1zP6XMIzzeTJlTbQcqBh7V16mEa5VOUh
+	FwUo0yiFAHX8607EEpT7wRFw6CIxvCpgg3frEKbYAcZF40TVMCR2iulFbekCnDPwmsdVDN76gni
+	ID3deNlo0t+KsvE/z/Rbd/qQhV/khEy10ysmCexRsq83yGTlhEV/wU+YCLCoMs7PHJzjM1HHup3
+	pMNH
+X-Received: by 2002:ad4:5e8f:0:b0:89c:4985:83e3 with SMTP id
+ 6a1803df08f44-8a704fa67a2mr262987336d6.49.1775554883096; Tue, 07 Apr 2026
+ 02:41:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.84 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+References: <20260407084219.95718-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20260407084219.95718-1-jiayuan.chen@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 7 Apr 2026 02:41:11 -0700
+X-Gm-Features: AQROBzDxjTgngBp4Xw_lPhwbg1f-uM-3EApa_YW3WL5jzC4EuSzAvXYNieQbksQ
+Message-ID: <CANn89iLEPOh8p-KythbL1FOPW4SU4U8qhSb7A_CVvjoVUZtn=g@mail.gmail.com>
+Subject: Re: [PATCH net] net: initialize sk_rx_queue_mapping in sk_clone()
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-2.16 / 15.00];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	TAGGED_FROM(0.00)[bounces-275926-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-275925-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	NEURAL_HAM(-0.00)[-0.999];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[google.com:+];
 	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 335483AC366
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[edumazet@google.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	TAGGED_RCPT(0.00)[netdev];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,linux.dev:email]
+X-Rspamd-Queue-Id: 73CA63AC35E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-ppp_destroy_{channel,interface} are always called after
-refcount_dec_and_test().
+On Tue, Apr 7, 2026 at 1:43=E2=80=AFAM Jiayuan Chen <jiayuan.chen@linux.dev=
+> wrote:
+>
+> sk_clone() initializes sk_tx_queue_mapping via sk_tx_queue_clear()
+> but does not initialize sk_rx_queue_mapping. Since this field is in
+> the sk_dontcopy region, it is neither copied from the parent socket
+> by sock_copy() nor zeroed by sk_prot_alloc() (called without
+> __GFP_ZERO from sk_clone).
+>
+> Commit 03cfda4fa6ea ("tcp: fix another uninit-value
+> (sk_rx_queue_mapping)") attempted to fix this by introducing
+> sk_mark_napi_id_set() with force_set=3Dtrue in tcp_child_process().
+> However, sk_mark_napi_id_set() -> sk_rx_queue_set() only writes
+> when skb_rx_queue_recorded(skb) is true. If the 3-way handshake
+> ACK arrives through a device that does not record rx_queue (e.g.
+> loopback or veth), sk_rx_queue_mapping remains uninitialized.
+>
+> When a subsequent data packet arrives with a recorded rx_queue,
+> sk_mark_napi_id() -> sk_rx_queue_update() reads the uninitialized
+> field for comparison (force_set=3Dfalse path), triggering KMSAN.
+>
+> This was reproduced by establishing a TCP connection over loopback
+> (which does not call skb_record_rx_queue), then attaching a BPF TC
+> program on lo ingress to set skb->queue_mapping on data packets:
 
-To reduce boilerplate code, consolidate the decrements by moving them
-into the two functions. To reflect this change in semantics, rename the
-functions to ppp_release_*.
+Ok, it's a somewhat convoluted way, and no real harm but KMSAN :)
 
-Signed-off-by: Qingfang Deng <qingfang.deng@linux.dev>
----
- drivers/net/ppp/ppp_generic.c | 61 ++++++++++++++++-------------------
- 1 file changed, 28 insertions(+), 33 deletions(-)
-
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index cb29a6968c63..b097d1b38ac9 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -286,12 +286,12 @@ static struct compressor *find_compressor(int type);
- static void ppp_get_stats(struct ppp *ppp, struct ppp_stats *st);
- static int ppp_create_interface(struct net *net, struct file *file, int *unit);
- static void init_ppp_file(struct ppp_file *pf, int kind);
--static void ppp_destroy_interface(struct ppp *ppp);
-+static void ppp_release_interface(struct ppp *ppp);
- static struct ppp *ppp_find_unit(struct ppp_net *pn, int unit);
- static struct channel *ppp_find_channel(struct ppp_net *pn, int unit);
- static int ppp_connect_channel(struct channel *pch, int unit);
- static int ppp_disconnect_channel(struct channel *pch);
--static void ppp_destroy_channel(struct channel *pch);
-+static void ppp_release_channel(struct channel *pch);
- static int unit_get(struct idr *p, void *ptr, int min);
- static int unit_set(struct idr *p, void *ptr, int n);
- static void unit_put(struct idr *p, int n);
-@@ -407,22 +407,18 @@ static int ppp_release(struct inode *unused, struct file *file)
- 
- 	if (pf) {
- 		file->private_data = NULL;
--		if (pf->kind == INTERFACE) {
-+		switch (pf->kind) {
-+		case INTERFACE:
- 			ppp = PF_TO_PPP(pf);
- 			rtnl_lock();
- 			if (file == ppp->owner)
- 				unregister_netdevice(ppp->dev);
- 			rtnl_unlock();
--		}
--		if (refcount_dec_and_test(&pf->refcnt)) {
--			switch (pf->kind) {
--			case INTERFACE:
--				ppp_destroy_interface(PF_TO_PPP(pf));
--				break;
--			case CHANNEL:
--				ppp_destroy_channel(PF_TO_CHANNEL(pf));
--				break;
--			}
-+			ppp_release_interface(ppp);
-+			break;
-+		case CHANNEL:
-+			ppp_release_channel(PF_TO_CHANNEL(pf));
-+			break;
- 		}
- 	}
- 	return 0;
-@@ -675,8 +671,7 @@ static int ppp_bridge_channels(struct channel *pch, struct channel *pchb)
- 	synchronize_rcu();
- 
- 	if (pchb)
--		if (refcount_dec_and_test(&pchb->file.refcnt))
--			ppp_destroy_channel(pchb);
-+		ppp_release_channel(pchb);
- 
- 	return -EALREADY;
- }
-@@ -708,11 +703,9 @@ static int ppp_unbridge_channels(struct channel *pch)
- 	synchronize_rcu();
- 
- 	if (pchbb == pch)
--		if (refcount_dec_and_test(&pch->file.refcnt))
--			ppp_destroy_channel(pch);
-+		ppp_release_channel(pch);
- 
--	if (refcount_dec_and_test(&pchb->file.refcnt))
--		ppp_destroy_channel(pchb);
-+	ppp_release_channel(pchb);
- 
- 	return 0;
- }
-@@ -786,8 +779,7 @@ static long ppp_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
- 				break;
- 			err = ppp_bridge_channels(pch, pchb);
- 			/* Drop earlier refcount now bridge establishment is complete */
--			if (refcount_dec_and_test(&pchb->file.refcnt))
--				ppp_destroy_channel(pchb);
-+			ppp_release_channel(pchb);
- 			break;
- 
- 		case PPPIOCUNBRIDGECHAN:
-@@ -1584,8 +1576,7 @@ static void ppp_dev_priv_destructor(struct net_device *dev)
- 	struct ppp *ppp;
- 
- 	ppp = netdev_priv(dev);
--	if (refcount_dec_and_test(&ppp->file.refcnt))
--		ppp_destroy_interface(ppp);
-+	ppp_release_interface(ppp);
- }
- 
- static int ppp_fill_forward_path(struct net_device_path_ctx *ctx,
-@@ -3022,8 +3013,7 @@ ppp_unregister_channel(struct ppp_channel *chan)
- 	pch->file.dead = 1;
- 	wake_up_interruptible(&pch->file.rwait);
- 
--	if (refcount_dec_and_test(&pch->file.refcnt))
--		ppp_destroy_channel(pch);
-+	ppp_release_channel(pch);
- }
- 
- /*
-@@ -3404,12 +3394,14 @@ init_ppp_file(struct ppp_file *pf, int kind)
- }
- 
- /*
-- * Free the memory used by a ppp unit.  This is only called once
-- * there are no channels connected to the unit and no file structs
-- * that reference the unit.
-+ * Drop a reference to a ppp unit and free its memory if the refcount reaches
-+ * zero.
-  */
--static void ppp_destroy_interface(struct ppp *ppp)
-+static void ppp_release_interface(struct ppp *ppp)
- {
-+	if (!refcount_dec_and_test(&ppp->file.refcnt))
-+		return;
-+
- 	atomic_dec(&ppp_unit_count);
- 
- 	if (!ppp->file.dead || ppp->n_channels) {
-@@ -3561,18 +3553,21 @@ ppp_disconnect_channel(struct channel *pch)
- 			wake_up_interruptible(&ppp->file.rwait);
- 		ppp_unlock(ppp);
- 		synchronize_net();
--		if (refcount_dec_and_test(&ppp->file.refcnt))
--			ppp_destroy_interface(ppp);
-+		ppp_release_interface(ppp);
- 		err = 0;
- 	}
- 	return err;
- }
- 
- /*
-- * Free up the resources used by a ppp channel.
-+ * Drop a reference to a ppp channel and free its memory if the refcount reaches
-+ * zero.
-  */
--static void ppp_destroy_channel(struct channel *pch)
-+static void ppp_release_channel(struct channel *pch)
- {
-+	if (!refcount_dec_and_test(&pch->file.refcnt))
-+		return;
-+
- 	put_net_track(pch->chan_net, &pch->ns_tracker);
- 	pch->chan_net = NULL;
- 
--- 
-2.43.0
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
