@@ -1,298 +1,246 @@
-Return-Path: <netdev+bounces-276196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276197-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id INgKOU+A1Wn36wcAu9opvQ
-	(envelope-from <netdev+bounces-276196-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 00:08:15 +0200
+	id qGKnNNGB1Wlr7AcAu9opvQ
+	(envelope-from <netdev+bounces-276197-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 00:14:41 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A70C3B53A4
-	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 00:08:15 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 737313B544D
+	for <lists+netdev@lfdr.de>; Wed, 08 Apr 2026 00:14:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 59D2830AC25B
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 22:04:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 34BD93025724
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 22:14:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD27388376;
-	Tue,  7 Apr 2026 22:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E35E537F724;
+	Tue,  7 Apr 2026 22:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b="A8F05xPr"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="OweH0Y2k";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Towwi8qC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAEB53876B5
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 22:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8294837DE91
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 22:14:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775599425; cv=none; b=PajW/U39kKGerjw4tq5hsS3tt6hTrIrH7a0p9RyI/y8/GfmJ3O9iwgc1/EGXgbkFoMhc3sKB6ofyoXXNvuROt5kew65noXwm/mppnw3DaremaJ9Wa4l/HnYUSUGP6YnLiB/BuXmboiADobetFFcTrLsDdolRUE4frwWJneE+xxw=
+	t=1775600075; cv=none; b=k1X8DUO+d8ofRc9JOgYBh0HMfW2gjVAVVys/reQ6UR7paAkQnTdyx4Fr6x7SCQmNsBt8rJFM/0ded7hjcIn7dT+nRyLTbgD0QAMx4pGNllV7q3Jm1GJBTfpWoD+7DeBq8+7dRXm+dqSKSyMpo6NorY0PcpA3+j38djL24/A/bzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775599425; c=relaxed/simple;
-	bh=o/NtSsecFTNFsiPqiNCLzmEF05SSxO9/5XaAXM7arIk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I3ojiLWrM3pWwZaIXFmOcv0sVl6AXJVLrlFMvfl5URknIaQql4YZPQUaMM0bzaMGqDGmfGHwUAP2dLs1FxubXgALDH802D9E4sDFXvvHLISyK2IvOPva3tqYr1NF3UJgRUdGVlkYbY+NQdiiALTt4a9WObGNOBo2U2x+hv7CSXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to; spf=none smtp.mailfrom=dama.to; dkim=pass (2048-bit key) header.d=dama-to.20251104.gappssmtp.com header.i=@dama-to.20251104.gappssmtp.com header.b=A8F05xPr; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dama.to
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=dama.to
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-35691a231a7so3052233a91.3
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 15:03:43 -0700 (PDT)
+	s=arc-20240116; t=1775600075; c=relaxed/simple;
+	bh=O70zG8/vQ7/2/njiFcnoP01VaZrKBSDy6k7ous7SiZg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n/GOZsoNExt4f5rwsaTY4sx0R4Tst+TN/XRpXUtyGs59zmI7aDDBt2jGWk1Iar843sWcqRosCIwkvlPTJ2G0uhGGQN+lAUf/mFxsrka74TC8qZy/mJzpXj+Ibu6qRUJSKgyt3rDhGFAB5vuHjVmh0BlsMnmj0+3A5uLO0aGhYhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=OweH0Y2k; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Towwi8qC; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 637M4MjX2860429
+	for <netdev@vger.kernel.org>; Tue, 7 Apr 2026 22:14:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	VjGZu1nMIYxEH+BkM12qs+iRxdD0JnnyuDFHzOWT/rM=; b=OweH0Y2kARoYn1W1
+	qq3nLdCQrnMusgkFKVH97SH/YIOnMEsAfAZK2KoiG9Gxh/8/n7cU1UsGD3/JY+O+
+	TnCC6+QeX8Z0IUKHaUmjTIypZ2H0UfYbyJVOT7JUEat6dMR7LzZBxjoLQJyQmwOz
+	hXC6WmTAPgKiCEnt8sayLvxEaf1aQEZ3KVbNm3zDkVgkpsYAgEMpiGSFzicXC+GT
+	zLbUcVWQXj925Bce1NoFoyGvgQBlVpoEnadvPpUlxJC/tmR4UarU4h86gc0j8iqn
+	9zGvFPUfebfRPl8K/kWd8XSw9wadeBrURZDqQNVSPOk9jaO1/Rspujy1bXSio4MO
+	UaKy3Q==
+Received: from mail-dy1-f200.google.com (mail-dy1-f200.google.com [74.125.82.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ddad8r0rf-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 22:14:33 +0000 (GMT)
+Received: by mail-dy1-f200.google.com with SMTP id 5a478bee46e88-2ba9a744f7dso7903256eec.0
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 15:14:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dama-to.20251104.gappssmtp.com; s=20251104; t=1775599423; x=1776204223; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kmD0I3pcx04Mtpj/oo4F+jl+//3G3jRQHwrxWNrdT1Y=;
-        b=A8F05xPr23ZAyBRW50hOtfIKI5FaNNvrIL2+XslcNalgNgrdz3GFTSF3zo0Hd7d9ZU
-         lHmtk/eYMJIKI52ZVn5Y4282qTNAIuMBr0FDeHgK2Ebg60R9vt4U8qK4f0NIRskcD4bK
-         milGHICq9G8hdnR7N+tZovni7XLJkl3YU6RmbKMbcL5mD4OFr1P3LsChDGnM2P6ua/e0
-         y6rgI2JPGS1je+uLccTK9OiKljSX6O7cLEJuKjwKHbI67foidwCQWnbS0y5KoVh38IWf
-         sVaPiiyPGJzwtFnq8WQYMMwYOoht+LPpNLE1pQ/goG/lStKHPqVQVnozasuEVZuigLD6
-         cuxg==
+        d=oss.qualcomm.com; s=google; t=1775600066; x=1776204866; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VjGZu1nMIYxEH+BkM12qs+iRxdD0JnnyuDFHzOWT/rM=;
+        b=Towwi8qCgZfYUflNkOb/McOoIKWL4FXtnHS+61NfoX++L3aMY7rz/hE198FCH4bEr7
+         lTERDD6vyUau5niV1ACETaGLJLCGKM8CtQ0iiSxhmTxj+2HO2sINAgOq0BoMpBk9P1YU
+         W9md2wZDgOfa20KbSwBg+UV8n0wd523R2GHFLceuS34njkbSagCzY+oSqRTutlOBHC6Z
+         e6Q135NmJUVeVXysLPa9h+mTLE1K4lGnxU8vGE6WgQf84h93PCfXW7qpQB3FDz88YPWz
+         6xhTGOk4ctF9wQjZs54SKwXMl75pDrM3hj5xPU33fZycNyzpm+gsA1bz8/8rTSIX/0Ll
+         hLGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775599423; x=1776204223;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kmD0I3pcx04Mtpj/oo4F+jl+//3G3jRQHwrxWNrdT1Y=;
-        b=bLbAn5R5TiM5OsFPH0PO6iN1+DII0CTJopEGBfbmNjt9Oo9q0Ms2K/bsx/+YLCX869
-         CNP7rxS6t+AP1lGzztxmviH0mIjFtSboKDcjiaMxsleVvGH18Q0mZ3wOA2IX8RY8mpMl
-         K9z46BKQKRPFAHxPFtHMXi3jYOmcPz4vkVfmQhR7mIKs4X945nRGroBOa/9UhZ9Wb8ff
-         KfVyitQIoGkXwWvRaj2FfMFxxiRyhy+ujBiJVU863r8JRjE/+PQy/+5tZsXY043y8ues
-         uFfmxzPBGpJSf/ydvr2c8oHfjU1Hbjs8bUhKPY5hF6RTXM7Tb9p8/aWS01oBWEk+8I6V
-         nEMw==
-X-Gm-Message-State: AOJu0Yz8OeQ6c0uAfq/j6x3tkDkarJ9vEjR5+IT7B5lVV8tSW7d+JcpY
-	dFV6oaVOCZ2fJuhg7Fm1OxorYcYDaQX/dRzVI0SV9sOTH3o643WmMeM7+C9dTe0X8adld9JsrPw
-	loNgFlAA=
-X-Gm-Gg: AeBDies/KxSc74p2/YmxTeOm7TiBkCO307JAkrHfd+9rZx406WAdNxV7So910O1Srgv
-	yJm2Dad8IUoeGXxIBl7S0fxpnWc+msaRq/+ZIp/Yj9P1L3mQqQwG8Igcirb6C8Z/atj6kSKxSsE
-	6sAh/44AJfwJe9fs66K4HmFOiD6Z1ijH6R0jTVGo1sjA6TTo7733tga4tMKALsJOMVwQth4IcqZ
-	Xw1U9FkoGxoSimaUNxoCMBfT1F16CKtz/6qDl7mEpYXZz3jeExZMCPrhB0Pxy/hUcMYS6FTqGIH
-	C7xmI+L19+pI1orwM8gfbgLzBkuhTibr1H4qZwhG1aO5mlJ0IbaJekYMYFWJD1mlyhw9oiSq8hK
-	QoN4d90s5Cn9ro5i55zUnpRlAuqNeWQlteoSFNdyX3FsTiIcpsTW7B/5E8yxqlZSWDL9d5VYKbc
-	/xVgT3
-X-Received: by 2002:a17:90b:2251:b0:35d:b00a:3c54 with SMTP id 98e67ed59e1d1-35de69acf35mr18090837a91.22.1775599422777;
-        Tue, 07 Apr 2026 15:03:42 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:40::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35dd35f7229sm19645039a91.7.2026.04.07.15.03.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Apr 2026 15:03:42 -0700 (PDT)
-From: Joe Damato <joe@dama.to>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: horms@kernel.org,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	linux-kernel@vger.kernel.org,
-	leon@kernel.org,
-	Joe Damato <joe@dama.to>,
-	linux-kselftest@vger.kernel.org
-Subject: [net-next v9 10/10] selftests: drv-net: Add USO test
-Date: Tue,  7 Apr 2026 15:03:06 -0700
-Message-ID: <20260407220313.3990909-11-joe@dama.to>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20260407220313.3990909-1-joe@dama.to>
-References: <20260407220313.3990909-1-joe@dama.to>
+        d=1e100.net; s=20251104; t=1775600066; x=1776204866;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VjGZu1nMIYxEH+BkM12qs+iRxdD0JnnyuDFHzOWT/rM=;
+        b=gUN1t8hqph9wDnte3WhenlzaR9CFYvXVs0tsRBkgvsAASKrpIz1B6I0qhlnkDSCw9W
+         6LTLjXy5ZSIlp+yRCc6f1znt7RCLlrUsKyZUEL7hI/tv1VpG2kAJLmnuGPBno2VBX6zT
+         xsifHB0TlIGKlhhTsnOAdX2yW06qEebaoeCtbF+Bdqteh/9dpk9rcqp0xOhm4nyop1vT
+         uO+dFewNkMxuxHmEWtAQGbRP8vaJwSYxgnttLpepdRhjoev8/1qK+7duoaqUcdOvSHGr
+         mVQ1yibF3+nldK64NwygkmZqvVxow3F8xfHJB3oR6+fnCsQ1mG+QLUg4wzXdFb83cjpI
+         s9Wg==
+X-Forwarded-Encrypted: i=1; AJvYcCWz39V84KQTuWgHfR6Be2RyFhRq5mvF5GCyrEwMGCXbtcKSS8zf8s1U/+2Euvhr5BfIoYK9i5Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YylXoZP5D4coLC0265cC61th8NTHv6N+60ZLsVwB8TPNcDJeTVf
+	7rfxxx/ZQxPlYHYA6x6ilOQJkjUFTWMjiih9IUizCYV6hzadqOMEysdhppOVx7RjXT46SO1X5NC
+	sfWkirkVcsRuKnq5cCOpCNdKtBhJHCu7k0fKGdWm5H4doLxnJAnvGuJ2DSKI=
+X-Gm-Gg: AeBDiesiHabV7VZb8ym0IGLpX0NL51ccP56L9fSykKGzx1XhsUrk724b3LF30wvZiii
+	KgTIrrhCgdPbejnRMvyiJk+4KpMYTc9PW4wQvn54SEiTnB98FG29urkhtLsFExY2MaU1E9x4+Ww
+	N9uBxTqLs9WFbKiyxdkD9pgT0YiUQIXVuNE712U1C2xpRpMOggG2gvTPd1sFW2cjJwfVcc1Teck
+	SPOOwcaU8MQcUFAH3hClmN3AFcicOyEohV3Hzp4GmqZg7eepfwzScvLetZSZPfrDBrDkkmhpi2x
+	urX821fGLEXrK7YHcXGxkWBbTEWxNO/c3zmtRevtwzbIVOi8dJykVzT0IZSiX9fiKLS1+nav9Js
+	8RyHWlqq+BNNpaJ6itAujO0ynsJyRvH6gGyL8QzokrxubPas0jKbwOwRndwnAi27iZwPaNKh+k+
+	T5Zi09
+X-Received: by 2002:a05:7300:880a:b0:2ce:f3d7:20c with SMTP id 5a478bee46e88-2cef3d70bd3mr4324857eec.29.1775600065600;
+        Tue, 07 Apr 2026 15:14:25 -0700 (PDT)
+X-Received: by 2002:a05:7300:880a:b0:2ce:f3d7:20c with SMTP id 5a478bee46e88-2cef3d70bd3mr4324829eec.29.1775600065017;
+        Tue, 07 Apr 2026 15:14:25 -0700 (PDT)
+Received: from [10.134.65.116] (i-global254.qualcomm.com. [199.106.103.254])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2cf2be19f85sm12178552eec.30.2026.04.07.15.14.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Apr 2026 15:14:24 -0700 (PDT)
+Message-ID: <439f9bbf-1ba1-465f-b5af-01ba0ebb86d4@oss.qualcomm.com>
+Date: Tue, 7 Apr 2026 15:14:22 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [1.34 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 11/15] media: qcom: Switch to generic PAS TZ APIs
+To: Sumit Garg <sumit.garg@kernel.org>,
+        Jorge Ramirez <jorge.ramirez@oss.qualcomm.com>,
+        vikash.garodia@oss.qualcomm.com
+Cc: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, freedreno@lists.freedesktop.org,
+        linux-media@vger.kernel.org, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, ath12k@lists.infradead.org,
+        linux-remoteproc@vger.kernel.org, andersson@kernel.org,
+        konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+        conor+dt@kernel.org, robin.clark@oss.qualcomm.com, sean@poorly.run,
+        akhilpo@oss.qualcomm.com, lumag@kernel.org, abhinav.kumar@linux.dev,
+        jesszhan0024@gmail.com, marijn.suijten@somainline.org,
+        airlied@gmail.com, simona@ffwll.ch, dikshita.agarwal@oss.qualcomm.com,
+        bod@kernel.org, mchehab@kernel.org, elder@kernel.org,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, jjohnson@kernel.org,
+        mathieu.poirier@linaro.org, mukesh.ojha@oss.qualcomm.com,
+        pavan.kondeti@oss.qualcomm.com, tonyh@qti.qualcomm.com,
+        vignesh.viswanathan@oss.qualcomm.com,
+        srinivas.kandagatla@oss.qualcomm.com,
+        amirreza.zarrabi@oss.qualcomm.com, jens.wiklander@linaro.org,
+        op-tee@lists.trustedfirmware.org, apurupa@qti.qualcomm.com,
+        skare@qti.qualcomm.com, harshal.dev@oss.qualcomm.com,
+        linux-kernel@vger.kernel.org, Sumit Garg <sumit.garg@oss.qualcomm.com>
+References: <20260327131043.627120-1-sumit.garg@kernel.org>
+ <20260327131043.627120-12-sumit.garg@kernel.org> <ac-KQ7e8-syph1Zl@trex>
+ <adOcMsk8a_Clb4WZ@sumit-xelite>
+Content-Language: en-US
+From: Trilok Soni <trilokkumar.soni@oss.qualcomm.com>
+In-Reply-To: <adOcMsk8a_Clb4WZ@sumit-xelite>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: Z_yxAaiIiBE8T73lnFIfyz6JEwibWJO7
+X-Proofpoint-GUID: Z_yxAaiIiBE8T73lnFIfyz6JEwibWJO7
+X-Authority-Analysis: v=2.4 cv=EoDiaycA c=1 sm=1 tr=0 ts=69d581c9 cx=c_pps
+ a=PfFC4Oe2JQzmKTvty2cRDw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22
+ a=NEAV23lmAAAA:8 a=EUspDBNiAAAA:8 a=nRfXl0x10UYwF-qtBXkA:9 a=QEXdDO2ut3YA:10
+ a=6Ab_bkdmUrQuMsNx7PHu:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA3MDIwMyBTYWx0ZWRfXxSQ6i03A5bEY
+ G0WYfSWdjlClxLf2v8yd7UMBzZmPg+O+JWB9yuAWr/45QmmZdQu6npLEKyE+daSSFaNn9G+TP8K
+ DZO4aCueF429280Hbj9u10jVNXy0kO1Mwkmy4XzRSzJBZvN2Skm9VH7gmuTI90hbN5vUNCKb/NO
+ JHzbZL2+QJK5h/vddFy9qxt33/j7nOx/T/M6Okiecar4zF3rdplkHVBIvv17OLNazRJd0WxYYnt
+ WU3wxNBSYTmCoET90n7wyGmsjuQyi4kCNp6P7J/YHIb/5XIqxHyeAdweSgodyYnsMQWuBeMECKh
+ tLovsSz9ueZirOHqDsByiZY0KTwFdylx+1c63voxPxi91uX87htfO3cf3BFAEz/nBbeHi5I91aX
+ JU4IMFZMrZbPI+ccdb4zt1e0ECFAyWrPqbTA3Ap8e1ZlbEnVMfs0Ll6Jhc7SWa3qxQ14EWgv275
+ TZotf7avHkYsHp9C0+w==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-07_05,2026-04-07_05,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 priorityscore=1501 spamscore=0 clxscore=1015 bulkscore=0
+ malwarescore=0 impostorscore=0 suspectscore=0 phishscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604010000 definitions=main-2604070203
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[dama-to.20251104.gappssmtp.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	DMARC_POLICY_ALLOW(-0.50)[qualcomm.com,reject];
+	R_DKIM_ALLOW(-0.20)[qualcomm.com:s=qcppdkim1,oss.qualcomm.com:s=google];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-276196-lists,netdev=lfdr.de];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[dama.to];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.infradead.org,kernel.org,oss.qualcomm.com,poorly.run,linux.dev,gmail.com,somainline.org,ffwll.ch,lunn.ch,davemloft.net,google.com,redhat.com,linaro.org,qti.qualcomm.com,lists.trustedfirmware.org];
+	DKIM_TRACE(0.00)[qualcomm.com:+,oss.qualcomm.com:+];
+	TAGGED_FROM(0.00)[bounces-276197-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[joe@dama.to,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[dama-to.20251104.gappssmtp.com:+];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.999];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,oss.qualcomm.com:dkim,oss.qualcomm.com:mid];
 	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[trilokkumar.soni@oss.qualcomm.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCPT_COUNT_GT_50(0.00)[50];
+	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[dama-to.20251104.gappssmtp.com:dkim,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,uso.py:url,dama.to:email,dama.to:mid,lib.py:url]
-X-Rspamd-Queue-Id: 6A70C3B53A4
+	TAGGED_RCPT(0.00)[netdev,dt];
+	RCVD_COUNT_SEVEN(0.00)[7]
+X-Rspamd-Queue-Id: 737313B544D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add a simple test for USO. Tests both ipv4 and ipv6 with several full
-segments and a partial segment.
+On 4/6/2026 4:42 AM, Sumit Garg wrote:
+> Hi Jorge,
+> 
+> On Fri, Apr 03, 2026 at 11:37:07AM +0200, Jorge Ramirez wrote:
+>> On 27/03/26 18:40:39, Sumit Garg wrote:
+>>> From: Sumit Garg <sumit.garg@oss.qualcomm.com>
+>>>
+>>> Switch qcom media client drivers over to generic PAS TZ APIs. Generic PAS
+>>> TZ service allows to support multiple TZ implementation backends like QTEE
+>>> based SCM PAS service, OP-TEE based PAS service and any further future TZ
+>>> backend service.
+>>
+>> OP-TEE based PAS service relies on the linux driver to configure the
+>> iommu (just as it is done on the no_tz case). This generic patch does
+>> not cover that requirement.
+> 
+> That's exactly the reason why the kodiak EL2 dtso disables venus by
+> default in patch #1 due to missing IOMMU configuration.
+> 
+>>
+>> Because of that, it is probably better if the commit message doesnt
+>> mention OP-TEE and instead maybe indicate that PAS wll support TEEs that
+>> implement the same restrictions that QTEE (ie, iommu configuration).
+> 
+> The scope for this patch is to just adopt the generic PAS layer without
+> affecting the client functionality.
+> 
+>>
+>> I can send an RFC for OP-TEE support based on the integration work being
+>> carried out here [1]
+> 
+> @Vikash may know better details about support for IOMMU configuration
+> for venus since it's a generic functionality missing when Linux runs in
+> EL2 whether it's with QTEE or OP-TEE.
+> 
+> However, feel free to propose your work to initiate discussions again.
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Joe Damato <joe@dama.to>
----
- v9:
-   - Use UDP-LISTEN instead of UDP-RECV in socat receiver (suggested by AI).
-   - Fixed stale docstring.
-   - Removed unused return value.
+Vikas and team depends on some of the IOMMU patches to get accepted 
+before they enable the EL2 venus support. Please reach out to him
+and Prakash Gupta at Qualcomm. 
 
- v7:
-   - Dropped Pavan's Reviewed-by as there were changes.
-   - Update to use ksft_variants with a generator and a parameterized test_uso
-     function.
-   - Save original USO state and restore it at the end of the test.
-   - Replace sleep with cfg.wait_hw_stats_settle
-   - Use a socat receiver and check tx stats locally instead of rx on the
-     remote.
-
- v5:
-   - Added Pavan's Reviewed-by. No functional changes.
-
- v4:
-   - Fix python linter issues (unused imports, docstring, etc).
-
- rfcv2:
-   - new in rfcv2
-
- tools/testing/selftests/drivers/net/Makefile |   1 +
- tools/testing/selftests/drivers/net/uso.py   | 103 +++++++++++++++++++
- 2 files changed, 104 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/uso.py
-
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index 7c7fa75b80c2..335c2ce4b9ab 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -21,6 +21,7 @@ TEST_PROGS := \
- 	ring_reconfig.py \
- 	shaper.py \
- 	stats.py \
-+	uso.py \
- 	xdp.py \
- # end of TEST_PROGS
- 
-diff --git a/tools/testing/selftests/drivers/net/uso.py b/tools/testing/selftests/drivers/net/uso.py
-new file mode 100755
-index 000000000000..6d61e56cab3c
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/uso.py
-@@ -0,0 +1,103 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+"""Test USO
-+
-+Sends large UDP datagrams with UDP_SEGMENT and verifies that the peer
-+receives the expected total payload and that the NIC transmitted at least
-+the expected number of segments.
-+"""
-+import random
-+import socket
-+import string
-+
-+from lib.py import ksft_run, ksft_exit, KsftSkipEx
-+from lib.py import ksft_eq, ksft_ge, ksft_variants, KsftNamedVariant
-+from lib.py import NetDrvEpEnv
-+from lib.py import bkg, defer, ethtool, ip, rand_port, wait_port_listen
-+
-+# python doesn't expose this constant, so we need to hardcode it to enable UDP
-+# segmentation for large payloads
-+UDP_SEGMENT = 103
-+
-+
-+def _send_uso(cfg, ipver, mss, total_payload, port):
-+    if ipver == "4":
-+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-+        dst = (cfg.remote_addr_v["4"], port)
-+    else:
-+        sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
-+        dst = (cfg.remote_addr_v["6"], port)
-+
-+    sock.setsockopt(socket.IPPROTO_UDP, UDP_SEGMENT, mss)
-+    payload = ''.join(random.choice(string.ascii_lowercase)
-+                      for _ in range(total_payload))
-+    sock.sendto(payload.encode(), dst)
-+    sock.close()
-+
-+
-+def _get_tx_packets(cfg):
-+    stats = ip(f"-s link show dev {cfg.ifname}", json=True)[0]
-+    return stats['stats64']['tx']['packets']
-+
-+
-+def _test_uso(cfg, ipver, mss, total_payload):
-+    cfg.require_ipver(ipver)
-+    cfg.require_cmd("socat", remote=True)
-+
-+    features = ethtool(f"-k {cfg.ifname}", json=True)
-+    uso_was_on = features[0]["tx-udp-segmentation"]["active"]
-+
-+    try:
-+        ethtool(f"-K {cfg.ifname} tx-udp-segmentation on")
-+    except Exception as exc:
-+        raise KsftSkipEx(
-+            "Device does not support tx-udp-segmentation") from exc
-+    if not uso_was_on:
-+        defer(ethtool, f"-K {cfg.ifname} tx-udp-segmentation off")
-+
-+    expected_segs = (total_payload + mss - 1) // mss
-+
-+    port = rand_port(stype=socket.SOCK_DGRAM)
-+    rx_cmd = f"socat -{ipver} -T 2 -u UDP-LISTEN:{port},reuseport STDOUT"
-+
-+    tx_before = _get_tx_packets(cfg)
-+
-+    with bkg(rx_cmd, host=cfg.remote, exit_wait=True) as rx:
-+        wait_port_listen(port, proto="udp", host=cfg.remote)
-+        _send_uso(cfg, ipver, mss, total_payload, port)
-+
-+    ksft_eq(len(rx.stdout), total_payload,
-+            comment=f"Received {len(rx.stdout)}B, expected {total_payload}B")
-+
-+    cfg.wait_hw_stats_settle()
-+
-+    tx_after = _get_tx_packets(cfg)
-+    tx_delta = tx_after - tx_before
-+
-+    ksft_ge(tx_delta, expected_segs,
-+            comment=f"Expected >= {expected_segs} tx packets, got {tx_delta}")
-+
-+
-+def _uso_variants():
-+    for ipver in ["4", "6"]:
-+        yield KsftNamedVariant(f"v{ipver}_partial", ipver, 1400, 1400 * 10 + 500)
-+        yield KsftNamedVariant(f"v{ipver}_exact", ipver, 1400, 1400 * 5)
-+
-+
-+@ksft_variants(_uso_variants())
-+def test_uso(cfg, ipver, mss, total_payload):
-+    """Send a USO datagram and verify the peer receives the expected segments."""
-+    _test_uso(cfg, ipver, mss, total_payload)
-+
-+
-+def main() -> None:
-+    """Run USO tests."""
-+    with NetDrvEpEnv(__file__) as cfg:
-+        ksft_run([test_uso],
-+                 args=(cfg, ))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.52.0
+> 
+>>
+>> [1] https://github.com/OP-TEE/optee_os/pull/7721#discussion_r3016923507
+> 
+> -Sumit
 
 
