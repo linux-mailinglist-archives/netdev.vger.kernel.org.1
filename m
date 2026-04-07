@@ -1,353 +1,313 @@
-Return-Path: <netdev+bounces-276153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276154-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id mIlOF+Jk1Wm05gcAu9opvQ
-	(envelope-from <netdev+bounces-276153-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 22:11:14 +0200
+	id oEo5Il9l1Wm05gcAu9opvQ
+	(envelope-from <netdev+bounces-276154-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 22:13:19 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05CD43B4624
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 22:11:13 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 028093B4677
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 22:13:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 43700307D4F0
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 20:05:22 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D5A69305D71A
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 20:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32B7388E79;
-	Tue,  7 Apr 2026 20:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8280435CB60;
+	Tue,  7 Apr 2026 20:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="JAOPmnft"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XievHkLn"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970EF37AA6D;
-	Tue,  7 Apr 2026 20:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775592175; cv=none; b=IJhctyRLGsFQm6wspPlOvDIxwoSAsj3VgKy1kSY/fgnVNeEnsGOkvJJRxgslBim/Bg+uu7HbBSJgGMKfLqSCAq/LGCvgMUG1yKYbKZZuSVzA84pybitk6d43c504ROGQ8Y/fRyEJCtOmpvoCTsJ9Q+qjgorVQC5hSsgd0pZPl44=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775592175; c=relaxed/simple;
-	bh=5H8uv55CdIEjsgjwTREHfEmz2xCo418XDDD+GfJSn5U=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KLpQ+UJiA1J2eeKeNcV8PyVvbhqrYk/xvIJuqbGvtlC0gxVgzq8RSse9UOZ9BV+3c8epEojkpabdl7Jx5+vfqnCbeUxEBah9OX7wmbnlp3MREZga2hVXuVXzDYnUb953BSqexpWy9NBr8j7Cmp8ERnz/etUaV/w6I5KKcgTpZcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=JAOPmnft; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
-	by linux.microsoft.com (Postfix) with ESMTPSA id EBE7020B712B;
-	Tue,  7 Apr 2026 13:02:52 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com EBE7020B712B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1775592173;
-	bh=u74eADCno/AFCuSqkMUCWBI9VPUeluydwikYKABjQ0o=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=JAOPmnftYB4cDoh6bKZiS28PLKXxzTRtRiWSRDXFvyGL+jqNznHJVBO7zMEvg5NOj
-	 /+n3Fl3VNP65Ab9oyxuhz0GbezfiD+MkUFA/9Lc+2p16aXqcn/SMpkLP0S1109+voE
-	 oJZ2BvPw94pIL7xHvPbTmNzrbyJseydowOSsraB8=
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	leon@kernel.org,
-	longli@microsoft.com,
-	kotaranov@microsoft.com,
-	horms@kernel.org,
-	shradhagupta@linux.microsoft.com,
-	ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	stephen@networkplumber.org,
-	jacob.e.keller@intel.com,
-	leitao@debian.org,
-	kees@kernel.org,
-	john.fastabend@gmail.com,
-	hawk@kernel.org,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	sdf@fomichev.me,
-	dipayanroy@microsoft.com
-Subject: [PATCH net-next v6 2/2] net: mana: force full-page RX buffers via ethtool private flag
-Date: Tue,  7 Apr 2026 12:59:19 -0700
-Message-ID: <20260407200216.272659-3-dipayanroy@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
-In-Reply-To: <20260407200216.272659-1-dipayanroy@linux.microsoft.com>
-References: <20260407200216.272659-1-dipayanroy@linux.microsoft.com>
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4180D338592
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 20:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775592432; cv=pass; b=cDvzoEPX7zU0QFz0CjZywlgvzO+g5POTejfV6Xw+TQJ+zqYTj/gvdc34xpzEyrlnok7Z+ofbYqNGQItTXVHzLdR0LparDbUPy+JMjsBjxDUQxRNLhzu0Bua2fGJK9E1pCpqj3ImjTNk/iA0aLeADt46u8JJ5BebX8aprIKrEpeQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775592432; c=relaxed/simple;
+	bh=e8wrO5vikecJwWYmKqPCipX+VB+wtmE5VFXv9Q/3tHc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dIvmPGxY/iiuMEsKLRn0Dn54YWSjNA6hIsrWqWlCGvS6kp/RgYAAFbCywhljFtAAMWfucruMZiKr6c7gKFbI+6DNxniz3GbeMI/NYFjjAxLxTAAfdN7t8SSzaLKOm1NPf5/CJiNEN1PicEbst6d6o3r0R/um2ROWh6uvfpntn3s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XievHkLn; arc=pass smtp.client-ip=74.125.224.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-6501418152cso5233937d50.0
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 13:07:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775592429; cv=none;
+        d=google.com; s=arc-20240605;
+        b=TQvrZ3SPJSIfeZSciNONBIqJijUUg8SlWN52blpR0eOZy2V3NT4b0abOUKIOBwkDmD
+         kZeZV0mu0O17gtTkWEJZ8SZiEY3962/eSAAsKOuhjfEaZtB1WnsnAmN9+v8KRLeTx/RD
+         2a9vVhjfVUwuYJt7zGNDeoD0JT8WmNLBR4yTc7L4WYmnzJc1cuXSI96RSZE3Q9Rb8Aat
+         N32BUrZEptPA2LxYZdsbZV9e834J+PZ/ZEvCvRWG+xWosJOxZ+GLfdTfDsXtYYSOtTVT
+         +f6uAlE6ilpDa2pR+ZoLUdQtTWWChYgH4aZO+c79G8vj9iaADuDDEb9Bf7BsODFMqHEa
+         2Pmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=lXMhraVxYqwinzEqyzscZSZwxhZ/frtE/tR4HTzvZR4=;
+        fh=EP9iF1bhKD2WCTPFJA9RBaooJuDlCwVCMjlRb5nuam4=;
+        b=GvXLHKBIky/A8P/NOiJK+6ZVoivuskoBxQmuipfYdikgBHqTVAyG/b7oROcDAwWu6e
+         Wp5lLrcWOePzkm2hy2AHIbu7qtgHgn0u7bJFNmVtnoEXnyPqkd8hWLapcxQvo9WA9Eyb
+         NkHfaEoyWU28pFFoxFttB5O1fDZacqqsPMAz/PQ4HdEZj+fvG0++kXtpFC2C7hyQNLh6
+         0rUUYQCkR99O/m+loLpxZ32St/ZnunjpmC6w4fe2vR5SYJV1GPrJmksKzzIv1yfyb5Tb
+         mfg87AxcIVG4PQpsRAjEJYBpjoqCvFsECQk5emTh4zDaV4nVuYzOPiv0PHZPr2UChOfG
+         yY1Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775592429; x=1776197229; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lXMhraVxYqwinzEqyzscZSZwxhZ/frtE/tR4HTzvZR4=;
+        b=XievHkLnOheSp2jIgR8kESbGKj6CngEzh/Mb8Dey29za/HJrCDQg2qhnais2SlgGsT
+         UaCbedRWKPdMdRnyezUm8lA1rrg21G4VJiEti7B8MctxOPpz8yNajlEjI1pHVNli3bxP
+         hXbRlHkQ7JCAO0Dk8eWfpypyvXOwwQd1S7Tz3pePpWaqHdNoUW8YLhHKnG0vIM489e0z
+         CNB1+xA3NgU6P8lU005PRZVgFz6btE0HEqghbxjWeR+W2OJnI6yZybLOrmpHfMlKjFEl
+         2OFtwh+xgt326yFwjeQ88zWM7q1zfYtnMookj0Xvxx75hoR6QoUv/zjuT/tZkn8LqJmo
+         7+Uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775592429; x=1776197229;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lXMhraVxYqwinzEqyzscZSZwxhZ/frtE/tR4HTzvZR4=;
+        b=LczshpXep89Ucw3L4sIMJMu4YE7guVHsmxmUXmTKwWlg7WGtRMJLIQ+AJrtZrJpAwZ
+         dTKx5/EZ1YTvW3InPW6tQ+y8MYtC82wJGsEa8ZMqC/9A+ONhcf1Zm3cOVSqcV9Kwka1Z
+         GzCBjsuhGYUs/xad2wCh+b9bkxiLyp9JpzPf9Fl5ze88Wu/aKFuqaQZhoine0O3+pbct
+         IHZET/bm8QycBwSKwVvtBWf1Sc4KYNJJpfWpW1fAD1tFrmTla+sibnBilQU/ZbnM/tLg
+         ylIXgsC98vBoP/98xUe1nA3a2soaqGHJFU2PS0uTLunMhaOa46DJ7RqycvX18+MxvT9v
+         kqPg==
+X-Forwarded-Encrypted: i=1; AJvYcCV74PrbBNCWC3Sjsxyp2y3x3pT4DBXLKwdtRUV6kr68r5PrTq7+s8WImyrBOYwwbdlVebQ8mZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlLLPvqy+Qf5x53rttE24ELRa1RjoMfPWN8bLP5yI2AVrPIczS
+	R0tqkiN4qsGUayWlfUMOZcQyZrUzKIMxz2DPa+pbY5fmXI6/eckOGQT+0+TEFqVJ9W65LU5adpp
+	4YeRcw/FvHhgMbQ1xj5YQ0ryCYRk1Z5k=
+X-Gm-Gg: AeBDiet5qcfkK8X1OlmslMtqBqgtD+UfuzVtpYkivZsLDR7eWXwz8PkzRx01mBNVJZJ
+	xjaxi1zozDngBTihFC08J6FQdaKjHP3yivk5orDMRvzEXAEqieTizVD9f9pPm5qsflI0TOPgHu1
+	9ivgmdD+Yvlbe9xzvbJG+cXTEEILSiEn8PKNQdmp+xKCk2X7BYFyBo6qKwwgyRYzih9RPlr+kcH
+	9soRELBvZvGXdEHTeQYasF/tVtMS6lZezTTHnoxclcOw7SIUHGtGw9tOjZ1JpYZax5iyG5vREBj
+	sAny7MXJjQeOMBBpXnGQhsBlTsQBigOLxljhCDB5wCL3JDETcg8H4IEBx4J97Nw8XI31rw==
+X-Received: by 2002:a05:690e:1447:b0:64a:e781:891f with SMTP id
+ 956f58d0204a3-6504878d8b5mr18273755d50.28.1775592429222; Tue, 07 Apr 2026
+ 13:07:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [0.84 / 15.00];
+References: <aZ1FrL8qvvKuktBF@kspp> <d04e11af-5c1b-44a2-aebc-a0ee4fb79802@embeddedor.com>
+In-Reply-To: <d04e11af-5c1b-44a2-aebc-a0ee4fb79802@embeddedor.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 7 Apr 2026 16:06:57 -0400
+X-Gm-Features: AQROBzBVPVG9lewQAg4xWgXaY_QVQNvPxJT95QjFDd687G3MpHiw6Ni_WDKPrq4
+Message-ID: <CABBYNZKJ9Xqwo0CF8wwax68etv8DywG8BmN=V1CWoWcfiq2mog@mail.gmail.com>
+Subject: Re: [PATCH][next] Bluetooth: hci.h: Avoid a couple
+ -Wflex-array-member-not-at-end warnings
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[linux.microsoft.com,none];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[linux.microsoft.com:s=default];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276154-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_TO(0.00)[microsoft.com,kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,linux.microsoft.com,vger.kernel.org,networkplumber.org,intel.com,debian.org,gmail.com,iogearbox.net,fomichev.me];
-	TAGGED_FROM(0.00)[bounces-276153-lists,netdev=lfdr.de];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FREEMAIL_CC(0.00)[kernel.org,holtmann.org,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.989];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[dipayanroy@linux.microsoft.com,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.microsoft.com:+];
-	TO_DN_NONE(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[luizdentz@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_TWELVE(0.00)[32];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,linux.microsoft.com:dkim,linux.microsoft.com:mid]
-X-Rspamd-Queue-Id: 05CD43B4624
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,embeddedor.com:email,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 028093B4677
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On some ARM64 platforms with 4K PAGE_SIZE, page_pool fragment
-allocation in the RX refill path can cause 15-20% throughput
-regression under high connection counts (>16 TCP streams).
+Hi Gustavo,
 
-Add an ethtool private flag "full-page-rx" that allows the user to
-force one RX buffer per page, bypassing the page_pool fragment path.
-This restores line-rate (180+ Gbps) performance on affected platforms.
+On Tue, Apr 7, 2026 at 3:58=E2=80=AFPM Gustavo A. R. Silva
+<gustavo@embeddedor.com> wrote:
+>
+> Hi all,
+>
+> Friendly ping: who can take this, please?
 
-Usage:
-  ethtool --set-priv-flags eth0 full-page-rx on
+Just resend as this is no longer available via patchwork.
 
-There is no behavioral change by default. The flag must be explicitly
-enabled by the user or udev rule.
+> Thanks
+> -Gustavo
+>
+> On 2/24/26 00:31, Gustavo A. R. Silva wrote:
+> > -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+> > getting ready to enable it, globally.
+> >
+> > struct hci_std_codecs and struct hci_std_codecs_v2 are flexible
+> > structures, this is structures that contain a flexible-array member
+> > (__u8 codec[]; and struct hci_std_codec_v2 codec[];, correspondingly.)
+> >
+> > Since struct hci_rp_read_local_supported_codecs and struct
+> > hci_rp_read_local_supported_codecs_v2 are defined by hardware, we
+> > create the new struct hci_std_codecs_hdr and struct hci_std_codecs_v2_h=
+dr
+> > types, and use them to replace the object types causing trouble in
+> > struct hci_rp_read_local_supported_codecs and struct
+> > hci_rp_read_local_supported_codecs_v2, namely struct hci_std_codecs
+> > std_codecs; and struct hci_std_codecs_v2_hdr std_codecs;.
+> >
+> > Also, once -fms-extensions is enabled, we can use transparent struct
+> > members in both struct hci_std_codecs and struct hci_std_codecs_v2_hdr.
+> >
+> > Notice that the newly created types does not contain the flex-array
+> > member `codec`, which is the object causing the -Wfamnae warnings.
+> >
+> > After these changes, the size of struct hci_rp_read_local_supported_cod=
+ecs
+> > and struct hci_rp_read_local_supported_codecs_v2, along with their
+> > member's offsets remain the same, hence the memory layouts don't
+> > change:
+> >
+> > Before changes:
+> > struct hci_rp_read_local_supported_codecs {
+> >          __u8                       status;               /*     0     =
+1 */
+> >          struct hci_std_codecs      std_codecs;           /*     1     =
+1 */
+> >          struct hci_vnd_codecs      vnd_codecs;           /*     2     =
+1 */
+> >
+> >          /* size: 3, cachelines: 1, members: 3 */
+> >          /* last cacheline: 3 bytes */
+> > } __attribute__((__packed__));
+> >
+> > struct hci_rp_read_local_supported_codecs_v2 {
+> >          __u8                       status;               /*     0     =
+1 */
+> >          struct hci_std_codecs_v2   std_codecs;           /*     1     =
+1 */
+> >          struct hci_vnd_codecs_v2   vendor_codecs;        /*     2     =
+1 */
+> >
+> >          /* size: 3, cachelines: 1, members: 3 */
+> >          /* last cacheline: 3 bytes */
+> > } __attribute__((__packed__));
+> >
+> > After changes:
+> > struct hci_rp_read_local_supported_codecs {
+> >       __u8                       status;               /*     0     1 *=
+/
+> >       struct hci_std_codecs_hdr  std_codecs;           /*     1     1 *=
+/
+> >       struct hci_vnd_codecs      vnd_codecs;           /*     2     1 *=
+/
+> >
+> >       /* size: 3, cachelines: 1, members: 3 */
+> >       /* last cacheline: 3 bytes */
+> > } __attribute__((__packed__));
+> >
+> > struct hci_rp_read_local_supported_codecs_v2 {
+> >       __u8                       status;               /*     0     1 *=
+/
+> >       struct hci_std_codecs_v2_hdr std_codecs;         /*     1     1 *=
+/
+> >       struct hci_vnd_codecs_v2   vendor_codecs;        /*     2     1 *=
+/
+> >
+> >       /* size: 3, cachelines: 1, members: 3 */
+> >       /* last cacheline: 3 bytes */
+> > } __attribute__((__packed__));
+> >
+> > With these changes fix the following warnings:
+> >
+> > include/net/bluetooth/hci.h:1490:31: warning: structure containing a fl=
+exible array member is not at the end of another structure [-Wflex-array-me=
+mber-not-at-end]
+> > include/net/bluetooth/hci.h:1525:34: warning: structure containing a fl=
+exible array member is not at the end of another structure [-Wflex-array-me=
+mber-not-at-end]
+> >
+> > Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> > ---
+> >   include/net/bluetooth/hci.h | 16 ++++++++++++----
+> >   1 file changed, 12 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index 89ad9470fa71..572b1c620c5d 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -1468,8 +1468,12 @@ struct hci_rp_read_data_block_size {
+> >   } __packed;
+> >
+> >   #define HCI_OP_READ_LOCAL_CODECS    0x100b
+> > -struct hci_std_codecs {
+> > +struct hci_std_codecs_hdr {
+> >       __u8    num;
+> > +} __packed;
+> > +
+> > +struct hci_std_codecs {
+> > +     struct hci_std_codecs_hdr;
+> >       __u8    codec[];
+> >   } __packed;
+> >
+> > @@ -1487,7 +1491,7 @@ struct hci_vnd_codecs {
+> >
+> >   struct hci_rp_read_local_supported_codecs {
+> >       __u8    status;
+> > -     struct hci_std_codecs std_codecs;
+> > +     struct hci_std_codecs_hdr std_codecs;
+> >       struct hci_vnd_codecs vnd_codecs;
+> >   } __packed;
+> >
+> > @@ -1504,8 +1508,12 @@ struct hci_std_codec_v2 {
+> >       __u8    transport;
+> >   } __packed;
+> >
+> > -struct hci_std_codecs_v2 {
+> > +struct hci_std_codecs_v2_hdr {
+> >       __u8    num;
+> > +} __packed;
+> > +
+> > +struct hci_std_codecs_v2 {
+> > +     struct hci_std_codecs_v2_hdr;
+> >       struct hci_std_codec_v2 codec[];
+> >   } __packed;
+> >
+> > @@ -1522,7 +1530,7 @@ struct hci_vnd_codecs_v2 {
+> >
+> >   struct hci_rp_read_local_supported_codecs_v2 {
+> >       __u8    status;
+> > -     struct hci_std_codecs_v2 std_codecs;
+> > +     struct hci_std_codecs_v2_hdr std_codecs;
+> >       struct hci_vnd_codecs_v2 vendor_codecs;
+> >   } __packed;
+> >
+>
 
-The existing single-buffer-per-page logic for XDP and jumbo frames is
-consolidated into a new helper mana_use_single_rxbuf_per_page() which
-is now the single decision point for both the automatic and
-user-controlled paths.
 
-Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 22 ++++-
- .../ethernet/microsoft/mana/mana_ethtool.c    | 89 +++++++++++++++++++
- include/net/mana/mana.h                       |  8 ++
- 3 files changed, 117 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 49c65cc1697c..59a1626c2be1 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -744,6 +744,25 @@ static void *mana_get_rxbuf_pre(struct mana_rxq *rxq, dma_addr_t *da)
- 	return va;
- }
- 
-+static bool
-+mana_use_single_rxbuf_per_page(struct mana_port_context *apc, u32 mtu)
-+{
-+	/* On some platforms with 4K PAGE_SIZE, page_pool fragment allocation
-+	 * in the RX refill path (~2kB buffer) can cause significant throughput
-+	 * regression under high connection counts. Allow user to force one RX
-+	 * buffer per page via ethtool private flag to bypass the fragment
-+	 * path.
-+	 */
-+	if (apc->priv_flags & BIT(MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF))
-+		return true;
-+
-+	/* For xdp and jumbo frames make sure only one packet fits per page. */
-+	if (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2 || mana_xdp_get(apc))
-+		return true;
-+
-+	return false;
-+}
-+
- /* Get RX buffer's data size, alloc size, XDP headroom based on MTU */
- static void mana_get_rxbuf_cfg(struct mana_port_context *apc,
- 			       int mtu, u32 *datasize, u32 *alloc_size,
-@@ -754,8 +773,7 @@ static void mana_get_rxbuf_cfg(struct mana_port_context *apc,
- 	/* Calculate datasize first (consistent across all cases) */
- 	*datasize = mtu + ETH_HLEN;
- 
--	/* For xdp and jumbo frames make sure only one packet fits per page */
--	if (mtu + MANA_RXBUF_PAD > PAGE_SIZE / 2 || mana_xdp_get(apc)) {
-+	if (mana_use_single_rxbuf_per_page(apc, mtu)) {
- 		if (mana_xdp_get(apc)) {
- 			*headroom = XDP_PACKET_HEADROOM;
- 			*alloc_size = PAGE_SIZE;
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-index a28ca461c135..0547c903f613 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-@@ -133,6 +133,10 @@ static const struct mana_stats_desc mana_phy_stats[] = {
- 	{ "hc_tc7_tx_pause_phy", offsetof(struct mana_ethtool_phy_stats, tx_pause_tc7_phy) },
- };
- 
-+static const char mana_priv_flags[MANA_PRIV_FLAG_MAX][ETH_GSTRING_LEN] = {
-+	[MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF] = "full-page-rx"
-+};
-+
- static int mana_get_sset_count(struct net_device *ndev, int stringset)
- {
- 	struct mana_port_context *apc = netdev_priv(ndev);
-@@ -144,6 +148,10 @@ static int mana_get_sset_count(struct net_device *ndev, int stringset)
- 		       ARRAY_SIZE(mana_phy_stats) +
- 		       ARRAY_SIZE(mana_hc_stats)  +
- 		       num_queues * (MANA_STATS_RX_COUNT + MANA_STATS_TX_COUNT);
-+
-+	case ETH_SS_PRIV_FLAGS:
-+		return MANA_PRIV_FLAG_MAX;
-+
- 	default:
- 		return -EINVAL;
- 	}
-@@ -192,6 +200,14 @@ static void mana_get_strings_stats(struct mana_port_context *apc, u8 **data)
- 	}
- }
- 
-+static void mana_get_strings_priv_flags(u8 **data)
-+{
-+	int i;
-+
-+	for (i = 0; i < MANA_PRIV_FLAG_MAX; i++)
-+		ethtool_puts(data, mana_priv_flags[i]);
-+}
-+
- static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
- {
- 	struct mana_port_context *apc = netdev_priv(ndev);
-@@ -200,6 +216,9 @@ static void mana_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
- 	case ETH_SS_STATS:
- 		mana_get_strings_stats(apc, &data);
- 		break;
-+	case ETH_SS_PRIV_FLAGS:
-+		mana_get_strings_priv_flags(&data);
-+		break;
- 	default:
- 		break;
- 	}
-@@ -590,6 +609,74 @@ static int mana_get_link_ksettings(struct net_device *ndev,
- 	return 0;
- }
- 
-+static u32 mana_get_priv_flags(struct net_device *ndev)
-+{
-+	struct mana_port_context *apc = netdev_priv(ndev);
-+
-+	return apc->priv_flags;
-+}
-+
-+static int mana_set_priv_flags(struct net_device *ndev, u32 priv_flags)
-+{
-+	struct mana_port_context *apc = netdev_priv(ndev);
-+	u32 changed = apc->priv_flags ^ priv_flags;
-+	u32 old_priv_flags = apc->priv_flags;
-+	bool schedule_port_reset = false;
-+	int err = 0;
-+
-+	if (!changed)
-+		return 0;
-+
-+	/* Reject unknown bits */
-+	if (priv_flags & ~GENMASK(MANA_PRIV_FLAG_MAX - 1, 0))
-+		return -EINVAL;
-+
-+	if (changed & BIT(MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF)) {
-+		apc->priv_flags = priv_flags;
-+
-+		if (!apc->port_is_up) {
-+			/* Port is down, flag updated to apply on next up
-+			 * so just return.
-+			 */
-+			return 0;
-+		}
-+
-+		/* Pre-allocate buffers to prevent failure in mana_attach
-+		 * later
-+		 */
-+		err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
-+		if (err) {
-+			netdev_err(ndev,
-+				   "Insufficient memory for new allocations\n");
-+			apc->priv_flags = old_priv_flags;
-+			return err;
-+		}
-+
-+		err = mana_detach(ndev, false);
-+		if (err) {
-+			netdev_err(ndev, "mana_detach failed: %d\n", err);
-+			apc->priv_flags = old_priv_flags;
-+			goto out;
-+		}
-+
-+		err = mana_attach(ndev);
-+		if (err) {
-+			netdev_err(ndev, "mana_attach failed: %d\n", err);
-+			apc->priv_flags = old_priv_flags;
-+			schedule_port_reset = true;
-+		}
-+	}
-+
-+out:
-+	mana_pre_dealloc_rxbufs(apc);
-+
-+	if (err && schedule_port_reset)
-+		queue_work(apc->ac->per_port_queue_reset_wq,
-+			   &apc->queue_reset_work);
-+
-+	return err;
-+}
-+
- const struct ethtool_ops mana_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_RX_CQE_FRAMES,
- 	.get_ethtool_stats	= mana_get_ethtool_stats,
-@@ -608,4 +695,6 @@ const struct ethtool_ops mana_ethtool_ops = {
- 	.set_ringparam          = mana_set_ringparam,
- 	.get_link_ksettings	= mana_get_link_ksettings,
- 	.get_link		= ethtool_op_get_link,
-+	.get_priv_flags		= mana_get_priv_flags,
-+	.set_priv_flags		= mana_set_priv_flags,
- };
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 3336688fed5e..fd87e3d6c1f4 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -30,6 +30,12 @@ enum TRI_STATE {
- 	TRI_STATE_TRUE = 1
- };
- 
-+/* MANA ethtool private flag bit positions */
-+enum mana_priv_flag_bits {
-+	MANA_PRIV_FLAG_USE_FULL_PAGE_RXBUF = 0,
-+	MANA_PRIV_FLAG_MAX,
-+};
-+
- /* Number of entries for hardware indirection table must be in power of 2 */
- #define MANA_INDIRECT_TABLE_MAX_SIZE 512
- #define MANA_INDIRECT_TABLE_DEF_SIZE 64
-@@ -531,6 +537,8 @@ struct mana_port_context {
- 	u32 rxbpre_headroom;
- 	u32 rxbpre_frag_count;
- 
-+	u32 priv_flags;
-+
- 	struct bpf_prog *bpf_prog;
- 
- 	/* Create num_queues EQs, SQs, SQ-CQs, RQs and RQ-CQs, respectively. */
--- 
-2.43.0
-
+--=20
+Luiz Augusto von Dentz
 
