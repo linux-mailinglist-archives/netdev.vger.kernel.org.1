@@ -1,195 +1,214 @@
-Return-Path: <netdev+bounces-275874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275876-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qJLKGN+o1GmkwAcAu9opvQ
-	(envelope-from <netdev+bounces-275874-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 08:49:03 +0200
+	id 0H9FBgmq1GmkwAcAu9opvQ
+	(envelope-from <netdev+bounces-275876-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 08:54:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E044E3AA76C
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 08:49:02 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AF983AA82F
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 08:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 89BBD300D143
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 06:48:40 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D9CF2300623A
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 06:53:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6F538AC96;
-	Tue,  7 Apr 2026 06:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5A138C418;
+	Tue,  7 Apr 2026 06:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W7RyjkJP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f7bY7P9i"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63C337E2FF
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 06:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3629B38C2C3;
+	Tue,  7 Apr 2026 06:53:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775544518; cv=none; b=c6FsP8YKaz8qCUKqqT2IeS27xQhg0JL5ier8oHD0xuwrVO8hjjLpNrgPfPygAz3li8jNvcOhAsW8ROFTflYJubvEBukbunZD2K4erhbSwSf284x1Od3AIRqwgs4+llfTk6K0c28uhqHLq4yn2vF1kbpfFZb6FIpIAN1O3BCYhRg=
+	t=1775544822; cv=none; b=HkmNX4t3S4K3L6+7XbJl2MztYD7qnDEBHyNoe6yay4ofp7X4qv6g0t3buv9cdGHsWdBT21dyDW3WWzIXddbqclG6iSpuoiMrhcv0v+oYJoOvh8v7EGJCyfHkbM19dyYqk4JomaMIPUR+/h6ilz9jnQSCg+CoxaDNNeu73NhD0iE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775544518; c=relaxed/simple;
-	bh=sO9aQuhE+niwJIm1bqiOtD3Jjz6qnYB8L83GRriDkrA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=q80cxgNEpyfNinyuCQbTKzO+qi0RZxsDlc21sa++l7TE/Pz0FCXjkpWN2V0zGCeCUoSiFT2bdtOBDaLOfL6KBHT/9NMjZ1vP9/tGCaOPVXaBOXPAf+LCpd9CPVRPj84SaL6i7SXlEFHLJ690Kle36051MHQxBhqNF4fI2L9S/Ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W7RyjkJP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A990C116C6;
-	Tue,  7 Apr 2026 06:48:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775544518;
-	bh=sO9aQuhE+niwJIm1bqiOtD3Jjz6qnYB8L83GRriDkrA=;
-	h=From:Date:Subject:To:Cc:From;
-	b=W7RyjkJPbc9QY9ImPBHkmjo0uS84hXK7K/BSLw6m6mt+L9Y6FaXWxApbiloGeOI49
-	 MO+z5Z2rMK1/BgV1bIFHqNSaXzJTEtrPCqO2xkAJUXzYxiLwtDdg79S1CiJLQ3MJXR
-	 nRERo2iz9AwoFN0eBfPSC1I21LHmaklRVfmdP1FoYDSbJ6zyvfr2DjkCoIvNa3Du9l
-	 OpS8xCNQnTvj3bxcwjnKpKqZdS7aIuqxj0XE9F+GlfCPYJeOE+69VSHzgjg1eE5AMN
-	 XHn4GAOCbmEl687Akghnl9byCiBaJU5iA1OX/KUPavRUrtkLdC7+VPrEMQhlGMfpxb
-	 GAltvef+phLjw==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 07 Apr 2026 08:48:04 +0200
-Subject: [PATCH net v3] net: airoha: Add dma_rmb() and READ_ONCE() in
- airoha_qdma_rx_process()
+	s=arc-20240116; t=1775544822; c=relaxed/simple;
+	bh=0ylP3qPddIE6iKieDpcRNjjkdOUWN7+gbfiTZw5y9BE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BaJHCvu6C+6eLHZLsLG1ASz27iLrBt7Ztatf7C7ymmrxZNxiJ5P4Qd7KDfID+fI815KSVR/FazSBxzpp0n3ZKC4x5Es5fy6XbyxehkCysOE4PimLCkg/qvU+E5CVHjthCdthY3hepsoTTkTe+hGDxvmENr4CAm0PZ2PL3VsqUl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f7bY7P9i; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775544820; x=1807080820;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0ylP3qPddIE6iKieDpcRNjjkdOUWN7+gbfiTZw5y9BE=;
+  b=f7bY7P9ivZqA0znFudJ0GMv2TtXinCRUbxdu9CVJXwsoN/ZKd3vV3wLw
+   me6CpfASXGypZJ45nnKt8w6/53p8rVoTc25DogKj/UYmo5liI6gMf/YNX
+   DKlyAZoNATFl+sYIWLnxzG93sXLL8ZirMc92eR2VrhQXkFX7XsAEJupzQ
+   /1YYgQXZkNc5zPPd2xIGpilosd3rwH4qxZuUGmL0mYn6O0y45F/+vfLc/
+   Mq0WNrYA/BS/Xk/C/xuqSDaRSMKg6ibam2beYlrcBPqjEPhPwGM3H45dX
+   WhSIdgotFx6OXG43OyrAfDaRItvseYxb0oUfsCgz/OIN8PS4PDqbrPfPr
+   A==;
+X-CSE-ConnectionGUID: GCFJ7AUcTU2T5GvHj74EoA==
+X-CSE-MsgGUID: OEGfofX8QO+088NffQIHVA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11751"; a="64046699"
+X-IronPort-AV: E=Sophos;i="6.23,165,1770624000"; 
+   d="scan'208";a="64046699"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2026 23:53:21 -0700
+X-CSE-ConnectionGUID: iSNZMh5iTqqQpKQNzsq4cA==
+X-CSE-MsgGUID: Onw+95tRTxCMlGBz5WScxw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,165,1770624000"; 
+   d="scan'208";a="251373004"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by fmviesa001.fm.intel.com with ESMTP; 06 Apr 2026 23:53:16 -0700
+Received: by black.igk.intel.com (Postfix, from userid 1001)
+	id 49A9095; Tue, 07 Apr 2026 08:53:15 +0200 (CEST)
+Date: Tue, 7 Apr 2026 08:53:15 +0200
+From: Mika Westerberg <mika.westerberg@linux.intel.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
+	kuba@kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org, andriy.shevchenko@intel.com,
+	ilpo.jarvinen@linux.intel.com, dima.ruinskiy@intel.com,
+	mbloch@nvidia.com, leon@kernel.org, linux-pci@vger.kernel.org,
+	saeedm@nvidia.com, tariqt@nvidia.com, lukas@wunner.de,
+	bhelgaas@google.com, richardcochran@gmail.com,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Avigail Dahan <avigailx.dahan@intel.com>
+Subject: Re: [PATCH net-next 01/15] igc: Call netif_queue_set_napi() with
+ rtnl locked
+Message-ID: <20260407065315.GD3552@black.igk.intel.com>
+References: <20260331173728.GA146742@bhelgaas>
+ <9f169800-12f2-4f98-ab99-e4433b2b49a9@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260407-airoha_qdma_rx_process-fix-reordering-v3-1-91c36e9da31f@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/5XNSw6CMBCA4auQrq1pp1CIK+9hDOExQKO2OCUNh
- nB3m650p8t55Ps35pEMenbKNkYYjDfOxkEdMtZNjR2Rmz7ODARokQvgjSE3NfWzfzQ1rfVMrkP
- v+WBWTuioj5wdeQmgRAVF0eqCRWsmjB+pc2EWF3aNy8n4xdErtYNMpz8zQXLJCwVllZf5IDScb
- 0gW70dHY0oE+GTVryxEVlYSNYLqoWy/2H3f374jibI3AQAA
-X-Change-ID: 20260402-airoha_qdma_rx_process-fix-reordering-722308255b65
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Xuegang Lu <xuegang.lu@airoha.com>, Simon Horman <horms@kernel.org>, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- netdev@vger.kernel.org
-X-Mailer: b4 0.14.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <9f169800-12f2-4f98-ab99-e4433b2b49a9@redhat.com>
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275874-lists,netdev=lfdr.de];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,intel.com,davemloft.net,google.com,lunn.ch,vger.kernel.org,linux.intel.com,nvidia.com,wunner.de,gmail.com];
+	TAGGED_FROM(0.00)[bounces-275876-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	MIME_TRACE(0.00)[0:+];
+	DKIM_TRACE(0.00)[intel.com:+];
+	MISSING_XM_UA(0.00)[];
 	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
+	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lorenzo@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mika.westerberg@linux.intel.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: E044E3AA76C
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:dkim,intel.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,black.igk.intel.com:mid]
+X-Rspamd-Queue-Id: 1AF983AA82F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add missing dma_rmb() in airoha_qdma_rx_process routine to make sure the
-DMA read operations are completed when the NIC reports the processing on
-the current descriptor is done. Moreover, add missing READ_ONCE() in
-airoha_qdma_rx_process() for DMA descriptor control fields in order to
-avoid any compiler reordering.
+Hi,
 
-Fixes: 23020f0493270 ("net: airoha: Introduce ethernet support for EN7581 SoC")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
-Changes in v3:
-- Move page pointer initialization before checking error condition on
-  payload length in order avoid using page pointer uninitialized in the
-  airoha_qdma_rx_process() error path.
-- Link to v2: https://lore.kernel.org/r/20260403-airoha_qdma_rx_process-fix-reordering-v2-1-181e6e23d27b@kernel.org
+On Thu, Apr 02, 2026 at 12:29:06PM +0200, Paolo Abeni wrote:
+> On 3/31/26 7:37 PM, Bjorn Helgaas wrote:
+> > On Mon, Mar 30, 2026 at 04:02:30PM -0700, Tony Nguyen wrote:
+> >> From: Mika Westerberg <mika.westerberg@linux.intel.com>
+> >>
+> >> When runtime resuming igc we get:
+> >>
+> >>   [  516.161666] RTNL: assertion failed at ./include/net/netdev_lock.h (72)
+> >>
+> >> Happens because commit 310ae9eb2617 ("net: designate queue -> napi
+> >> linking as "ops protected"") added check for this. For this reason drop
+> >> the special case for runtime PM from __igc_resume(). This makes it take
+> >> rtnl lock unconditionally.
+> > 
+> > Taking the rtnl lock unconditionally certainly makes the code nicer,
+> > but the commit log only mentions the "avoid the warning" benefit, not
+> > the actual reason this is safe to do.
+> 
+> Sashiko says it's not safe:
+> 
+> ---
+> Can this regression cause a self-deadlock when a runtime resume is
+> triggered from paths that already hold the rtnl lock?
+> If the network interface is logically up but the link is disconnected,
+> igc_runtime_idle() allows the device to enter runtime suspend. When a
+> user queries the device using ethtool, the networking core acquires
+> rtnl_lock() and then calls pm_runtime_get_sync() to ensure the hardware
+> is awake.
+> This synchronously executes the driver's runtime resume callback, which
+> calls __igc_resume(). Because netif_running(netdev) is true, the
+> modified __igc_resume() unconditionally attempts to acquire rtnl_lock().
+> Since the executing thread already holds this non-recursive mutex, it
+> appears the system would self-deadlock, hanging the network stack.
+> ---
 
-Changes in v2:
-- Use msg1 in airoha_qdma_get_gdm_port() signature to avoid missing
-  READ_ONCE().
-- Link to v1: https://lore.kernel.org/r/20260402-airoha_qdma_rx_process-fix-reordering-v1-1-53278474f062@kernel.org
----
- drivers/net/ethernet/airoha/airoha_eth.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+It's a good analysis. I just tried this flow:
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 91cb63a32d99..9285a68f435f 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -584,7 +584,7 @@ static int airoha_qdma_fill_rx_queue(struct airoha_queue *q)
- static int airoha_qdma_get_gdm_port(struct airoha_eth *eth,
- 				    struct airoha_qdma_desc *desc)
- {
--	u32 port, sport, msg1 = le32_to_cpu(desc->msg1);
-+	u32 port, sport, msg1 = le32_to_cpu(READ_ONCE(desc->msg1));
- 
- 	sport = FIELD_GET(QDMA_ETH_RXMSG_SPORT_MASK, msg1);
- 	switch (sport) {
-@@ -612,21 +612,24 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 	while (done < budget) {
- 		struct airoha_queue_entry *e = &q->entry[q->tail];
- 		struct airoha_qdma_desc *desc = &q->desc[q->tail];
--		u32 hash, reason, msg1 = le32_to_cpu(desc->msg1);
--		struct page *page = virt_to_head_page(e->buf);
--		u32 desc_ctrl = le32_to_cpu(desc->ctrl);
-+		u32 hash, reason, msg1, desc_ctrl;
- 		struct airoha_gdm_port *port;
- 		int data_len, len, p;
-+		struct page *page;
- 
-+		desc_ctrl = le32_to_cpu(READ_ONCE(desc->ctrl));
- 		if (!(desc_ctrl & QDMA_DESC_DONE_MASK))
- 			break;
- 
-+		dma_rmb();
-+
- 		q->tail = (q->tail + 1) % q->ndesc;
- 		q->queued--;
- 
- 		dma_sync_single_for_cpu(eth->dev, e->dma_addr,
- 					SKB_WITH_OVERHEAD(q->buf_size), dir);
- 
-+		page = virt_to_head_page(e->buf);
- 		len = FIELD_GET(QDMA_DESC_LEN_MASK, desc_ctrl);
- 		data_len = q->skb ? q->buf_size
- 				  : SKB_WITH_OVERHEAD(q->buf_size);
-@@ -670,8 +673,8 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 			 * DMA descriptor. Report DSA tag to the DSA stack
- 			 * via skb dst info.
- 			 */
--			u32 sptag = FIELD_GET(QDMA_ETH_RXMSG_SPTAG,
--					      le32_to_cpu(desc->msg0));
-+			u32 msg0 = le32_to_cpu(READ_ONCE(desc->msg0));
-+			u32 sptag = FIELD_GET(QDMA_ETH_RXMSG_SPTAG, msg0);
- 
- 			if (sptag < ARRAY_SIZE(port->dsa_meta) &&
- 			    port->dsa_meta[sptag])
-@@ -679,6 +682,7 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 						  &port->dsa_meta[sptag]->dst);
- 		}
- 
-+		msg1 = le32_to_cpu(READ_ONCE(desc->msg1));
- 		hash = FIELD_GET(AIROHA_RXD4_FOE_ENTRY, msg1);
- 		if (hash != AIROHA_RXD4_FOE_ENTRY)
- 			skb_set_hash(q->skb, jhash_1word(hash, 0),
+1. Boot the system up, nothing connected to igc NIC.
+2. Plug in cable to igc.
+3. Configure the interface.
+4. Enable runtime PM for igc.
+5. Unplug the cable.
+6. Verify igc is runtime suspended.
+7. Run ethtool <interface>
 
----
-base-commit: a9d4f4f6e65e0bf9bbddedecc84d67249991979c
-change-id: 20260402-airoha_qdma_rx_process-fix-reordering-722308255b65
+This leads to deadlock as below.
 
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+igc maintainers, please drop this patch. I apologize I did not realize this
+flow when I did it.
 
+[ 1231.655924] INFO: task ethtool:3139 blocked for more than 122 seconds.
+[ 1231.662515]       Tainted: G     U              7.0.0-rc6+ #1748
+[ 1231.668551] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[ 1231.676410] task:ethtool         state:D stack:0     pid:3139  tgid:3139  ppid:292    task_flags:0x480000 flags:0x00080800
+[ 1231.687508] Call Trace:
+[ 1231.689997]  <TASK>
+[ 1231.692132]  __schedule+0x58a/0x1820
+[ 1231.695747]  ? sysvec_apic_timer_interrupt+0x4c/0xa0
+[ 1231.700742]  ? asm_sysvec_apic_timer_interrupt+0x1b/0x20
+[ 1231.706090]  schedule+0x64/0xe0
+[ 1231.709262]  schedule_preempt_disabled+0x15/0x30
+[ 1231.713907]  __mutex_lock+0x377/0xa60
+[ 1231.717606]  __mutex_lock_slowpath+0x13/0x20
+[ 1231.721905]  mutex_lock+0x2c/0x40
+[ 1231.725259]  rtnl_lock+0x15/0x20
+[ 1231.728541]  __igc_resume+0x19a/0x2b0 [igc]
+[ 1231.732798]  igc_runtime_resume+0xe/0x20 [igc]
+[ 1231.737288]  pci_pm_runtime_resume+0xce/0x100
+[ 1231.741678]  ? __pfx_pci_pm_runtime_resume+0x10/0x10
+[ 1231.746681]  __rpm_callback+0xab/0x310
+[ 1231.750458]  ? ktime_get_mono_fast_ns+0x3a/0x100
+[ 1231.755107]  ? __pfx_pci_pm_runtime_resume+0x10/0x10
+[ 1231.760096]  rpm_resume+0x4bb/0x670
+[ 1231.763618]  __pm_runtime_resume+0x5c/0x80
+[ 1231.767749]  dev_ethtool+0x19d/0xc90
+[ 1231.771352]  dev_ioctl+0x23c/0x550
+[ 1231.774791]  sock_do_ioctl+0x11f/0x1b0
+[ 1231.778569]  sock_ioctl+0x27f/0x390
+[ 1231.782091]  ? handle_mm_fault+0x11a5/0x1250
+[ 1231.786388]  __se_sys_ioctl+0x75/0xd0
+[ 1231.790077]  __x64_sys_ioctl+0x1d/0x30
+[ 1231.793851]  x64_sys_call+0x14ed/0x2d30
+[ 1231.797719]  do_syscall_64+0xfb/0x680
+[ 1231.801404]  ? arch_exit_to_user_mode_prepare+0xd/0xb0
+[ 1231.806559]  ? irqentry_exit+0x3b/0x510
+[ 1231.810413]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
