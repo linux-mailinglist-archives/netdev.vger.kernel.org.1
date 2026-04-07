@@ -1,105 +1,220 @@
-Return-Path: <netdev+bounces-275784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275790-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cM3+HbRR1GnLtAcAu9opvQ
-	(envelope-from <netdev+bounces-275784-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 02:37:08 +0200
+	id wAIpFEVS1GnLtAcAu9opvQ
+	(envelope-from <netdev+bounces-275790-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 02:39:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03ADD3A8715
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 02:37:07 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF4013A876A
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 02:39:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 08A6A301BA66
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 00:37:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 68C49308356B
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 00:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067DE14B08A;
-	Tue,  7 Apr 2026 00:37:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B71221FC6;
+	Tue,  7 Apr 2026 00:37:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SVp70/+t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qcQRUstJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56542B9A4;
-	Tue,  7 Apr 2026 00:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834471C2324;
+	Tue,  7 Apr 2026 00:37:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775522223; cv=none; b=nJpU9OGeoiHqy7741+9zHxEfZliiV/o7Fkenm+iUEJpZHrW0GX7lOQTjZnAW1mRMZRsRDWQRk/TtNHdaZTDcRvz809SiS/Bh8oSYGaF7CtE6EzkvzMpPZy+cDO1LxQP004s8yRxOQKdvQymEuJma7OSeq9wk7Kq0+VU44M9qSjY=
+	t=1775522227; cv=none; b=L0o0I6aVx8elqQvY46uvhKZNvmrI8IpOhucvVeZEIeHEZBzOvn9SOEd3tRrcafOBfEtEZkmPqn25+7cL9gA0Y2ur7N45fWwy0EiodSmoMoKudSSc8IiCQS1llbf2P48s1uA8gXun8i/2eXztilZeG2C8mmVHOZnRPMWHx95AyBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775522223; c=relaxed/simple;
-	bh=XlHyAzaJklqxmNalMDD6OKRU12ck+jCq8qKnCst96gI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KOp13/D7oCLbVRspT3Zm2iGikcUYSMi5tur+hsZ/nIUWn5fWodrge7oD8+nHWiEdjZrBdKtkXO8bSqsqz8gvnqwvAZ5Z9BrHtzbuFotNCu/UoHt2JVLe/Zc4AYmJpc9z1yvx2sXisteysgxBsUMhAJzOuWVzQ3QTOoAB8kFPMOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SVp70/+t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14F58C4CEF7;
-	Tue,  7 Apr 2026 00:37:03 +0000 (UTC)
+	s=arc-20240116; t=1775522227; c=relaxed/simple;
+	bh=CHD2sGmHFADoajsajVO5DHFLgnLfs7K8NFH7Cqwp6P0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=RIxPIBkzpfpuFhJfe/k86qAdSsP7YPRTp0aGdC24wy0jRvhLlXGi8S9ZzFw57J7o4HQDJHXvX5F3zO0zRXcJKrxvNpN6YJmI5CTuuYqg9GWLzIzgvMFg0CcaUqa11MCnD5bwfBQOFVcJfvbAlJJ+BnRt5RCKWTguP9QNwNIMnKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qcQRUstJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D091C2BCB6;
+	Tue,  7 Apr 2026 00:37:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775522223;
-	bh=XlHyAzaJklqxmNalMDD6OKRU12ck+jCq8qKnCst96gI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SVp70/+tlQHEJnueuLtQClkQR1/+dtsCJj9DulgO1WpCNXWprnF+zoscNNJk7ZVux
-	 a7lIqu3QkET4z0bHxNT78dqjeGhEVNuyUpnV3xNo2ps6CS7/dba2r1Pm9YDWFmyta6
-	 O6biJMb8Z+jNYrQrdlKM0BDxBHCwoDxeR0s+9OqWjcz/7XaamRjeW0lGHPyQy33DGI
-	 CulDptKAPmAhC8VBZ/xiex0X7VAP9YKXcVw0rxC8T4MlkRDg93+A+MSU+Mey2SC7kL
-	 wtiSDz64hFL76ad4FoNrt1SUuqu69i30mO3OHlp+p99NYRMNRmQb9TWL2xYCH6Xj4j
-	 pcCPc/b+x61iA==
-Date: Mon, 6 Apr 2026 17:37:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Norbert Szetei <norbert@doyensec.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, John Villamil <john@doyensec.com>
-Subject: Re: [PATCH v2 net] vsock: fix buffer size clamping order
-Message-ID: <20260406173702.56239557@kernel.org>
-In-Reply-To: <69317E49-40AA-4985-8A4E-447C58665A68@doyensec.com>
-References: <523A8D3C-F4D9-43DD-A3A6-01C9EC335656@doyensec.com>
-	<acuKUpZQq6z1DY_n@sgarzare-redhat>
-	<102981F1-2CAE-481F-8FAE-4F3085E25E89@doyensec.com>
-	<69317E49-40AA-4985-8A4E-447C58665A68@doyensec.com>
+	s=k20201202; t=1775522227;
+	bh=CHD2sGmHFADoajsajVO5DHFLgnLfs7K8NFH7Cqwp6P0=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=qcQRUstJE5YdZoejDNp+7rn6x/ze6ftVNY9ZOqweQHegm3sM+b4hseGfQblZpesbt
+	 nACehzVx35IKsaAh/esbQdvaRDnp4zP4I7BzoBkKqWdS3WGGTcc9YHbXJKz9BufsYC
+	 jwUvietQIUtyK7syzqdpBSni5LzYBbVuhCKWhA1e+Fr904Bano91I7MYBYY6/+GlUD
+	 ais8vQuuRiHzxfQzMOEw2ZqyI20On/+LlmtuufM5WusG4c4l/kg7u2JG4L/Te8efvG
+	 U8f7V/tsuzPfYf0T+rjjtingq75RwgesxxK4Lv5YKGm0YRBKXg8pvvU53HaZu7+sIF
+	 BvBn3RTiHtvXA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 539B0FB5178;
+	Tue,  7 Apr 2026 00:37:07 +0000 (UTC)
+From: Satish Kharat via B4 Relay <devnull+satishkh.cisco.com@kernel.org>
+Date: Mon, 06 Apr 2026 17:37:03 -0700
+Subject: [PATCH 05/10] enic: define MBOX message types and header
+ structures
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Message-Id: <20260406-enic-sriov-v2-admin-channel-v2-v1-5-82cc47636a78@cisco.com>
+References: <20260406-enic-sriov-v2-admin-channel-v2-v1-0-82cc47636a78@cisco.com>
+In-Reply-To: <20260406-enic-sriov-v2-admin-channel-v2-v1-0-82cc47636a78@cisco.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ 20260401-enic-sriov-v2-prep-v4-0-d5834b2ef1b9@cisco.com, 
+ Satish Kharat <satishkh@cisco.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1775522225; l=2895;
+ i=satishkh@cisco.com; h=from:subject:message-id;
+ bh=QgPYsFppAoUswndbEnI+khJeTR1Tn6EJVQstlZ2VNn8=;
+ b=z/2/f+Nvt+Qn1oQEZWZO3RC83AE3LkVK33tT1oY42MT9B/sluF5nMKKUVilAdpK7d5PY042QC
+ DMrRLjcGcyMCDo+CFqO6nGXV0X5wYIUYIv5FCJphqmB4di/Go0cV2bG
+X-Developer-Key: i=satishkh@cisco.com; a=ed25519;
+ pk=4BxbLoCGvHeIMH/PbpiNVx8/2IcTjFvqcr0AD8K6WLY=
+X-Endpoint-Received: by B4 Relay for satishkh@cisco.com/default with
+ auth_id=639
+X-Original-From: Satish Kharat <satishkh@cisco.com>
+Reply-To: satishkh@cisco.com
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-275790-lists,netdev=lfdr.de,satishkh.cisco.com];
+	FROM_HAS_DN(0.00)[];
+	REPLYTO_DOM_NEQ_FROM_DOM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	TAGGED_FROM(0.00)[bounces-275784-lists,netdev=lfdr.de];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
+	HAS_REPLYTO(0.00)[satishkh@cisco.com];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[devnull@kernel.org,netdev@vger.kernel.org];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[10];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 03ADD3A8715
+	RCPT_COUNT_SEVEN(0.00)[9];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,cisco.com:email,cisco.com:replyto,cisco.com:mid]
+X-Rspamd-Queue-Id: BF4013A876A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 6 Apr 2026 22:04:26 +0200 Norbert Szetei wrote:
-> v2: fix indentation/whitespace issues in the previous patch.
+From: Satish Kharat <satishkh@cisco.com>
 
-This is not a correct way to submit a patch, but please wait until
-Stefano responds with any further postings.
+Define the mailbox protocol used for PF-VF communication over the
+admin channel. The protocol uses request/reply pairs where even
+message types are requests and odd are replies.
+
+Initial message types cover the core SR-IOV handshake:
+  - VF_CAPABILITY: version negotiation
+  - VF_REGISTER/UNREGISTER: VF lifecycle management
+  - PF_LINK_STATE_NOTIF: PF-initiated link state changes
+
+Each message carries a common header (src/dst vnic ID, type,
+length, sequence number) followed by a type-specific payload.
+
+Signed-off-by: Satish Kharat <satishkh@cisco.com>
+---
+ drivers/net/ethernet/cisco/enic/enic_mbox.h | 75 +++++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
+
+diff --git a/drivers/net/ethernet/cisco/enic/enic_mbox.h b/drivers/net/ethernet/cisco/enic/enic_mbox.h
+new file mode 100644
+index 000000000000..84cb6bbc1ead
+--- /dev/null
++++ b/drivers/net/ethernet/cisco/enic/enic_mbox.h
+@@ -0,0 +1,75 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright 2025 Cisco Systems, Inc.  All rights reserved. */
++
++#ifndef _ENIC_MBOX_H_
++#define _ENIC_MBOX_H_
++
++/*
++ * Mailbox protocol for PF-VF communication over the admin channel.
++ *
++ * Even numbers are requests, odd numbers are replies/acks.
++ * The prefix indicates the initiator: VF_ = VF-initiated, PF_ = PF-initiated.
++ */
++enum enic_mbox_msg_type {
++	ENIC_MBOX_VF_CAPABILITY_REQUEST		= 0,
++	ENIC_MBOX_VF_CAPABILITY_REPLY		= 1,
++	ENIC_MBOX_VF_REGISTER_REQUEST		= 2,
++	ENIC_MBOX_VF_REGISTER_REPLY		= 3,
++	ENIC_MBOX_VF_UNREGISTER_REQUEST		= 4,
++	ENIC_MBOX_VF_UNREGISTER_REPLY		= 5,
++	ENIC_MBOX_PF_LINK_STATE_NOTIF		= 6,
++	ENIC_MBOX_PF_LINK_STATE_ACK		= 7,
++	ENIC_MBOX_MAX
++};
++
++struct enic_mbox_hdr {
++	__le16 src_vnic_id;
++	__le16 dst_vnic_id;
++	u8 msg_type;
++	u8 flags;
++	__le16 msg_len;
++	__le64 msg_num;
++};
++
++struct enic_mbox_generic_reply {
++	__le16 ret_major;
++	__le16 ret_minor;
++};
++
++#define ENIC_MBOX_ERR_GENERIC		BIT(0)
++#define ENIC_MBOX_ERR_VF_NOT_REGISTERED	BIT(1)
++#define ENIC_MBOX_ERR_MSG_NOT_SUPPORTED	BIT(2)
++
++/* ENIC_MBOX_VF_CAPABILITY_REQUEST / _REPLY */
++#define ENIC_MBOX_CAP_VERSION_0		0
++#define ENIC_MBOX_CAP_VERSION_1		1
++
++struct enic_mbox_vf_capability_msg {
++	__le32 version;
++	__le32 reserved[32];
++};
++
++struct enic_mbox_vf_capability_reply_msg {
++	struct enic_mbox_generic_reply reply;
++	__le32 version;
++	__le32 reserved[32];
++};
++
++/* ENIC_MBOX_VF_REGISTER / _UNREGISTER */
++struct enic_mbox_vf_register_reply_msg {
++	struct enic_mbox_generic_reply reply;
++};
++
++/* ENIC_MBOX_PF_LINK_STATE_NOTIF / _ACK */
++#define ENIC_MBOX_LINK_STATE_DISABLE	0
++#define ENIC_MBOX_LINK_STATE_ENABLE	1
++
++struct enic_mbox_pf_link_state_notif_msg {
++	__le32 link_state;
++};
++
++struct enic_mbox_pf_link_state_ack_msg {
++	struct enic_mbox_generic_reply ack;
++};
++
++#endif /* _ENIC_MBOX_H_ */
+
+-- 
+2.43.0
+
+
 
