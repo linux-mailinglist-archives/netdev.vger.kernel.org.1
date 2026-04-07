@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-275829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275830-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yL0BN7Fn1GkMtwcAu9opvQ
-	(envelope-from <netdev+bounces-275829-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:10:57 +0200
+	id iHV9IOBn1GnptgcAu9opvQ
+	(envelope-from <netdev+bounces-275830-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:11:44 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E4DD3A8E60
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:10:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C742F3A8E8D
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:11:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 00B7D304A5AD
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:10:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E994C3060AFE
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:10:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03938283FF5;
-	Tue,  7 Apr 2026 02:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDBE12882CD;
+	Tue,  7 Apr 2026 02:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YheRBWI9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H0kvEK4W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B582264C7;
-	Tue,  7 Apr 2026 02:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA717283C9D;
+	Tue,  7 Apr 2026 02:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775527804; cv=none; b=TrD1suuLLkBVcbErCmKFp28QSI40KTv44xoicRjVJ7nTVNsBEAeQ2IT6QnmXHP2Ay21S0qpu3rSHxfNa54V39MPgMmkMv2q7njteliQduHq5TledH2L2u1mBfYASdcmeoH1loolIbmjKOKPUvixxBSD+eEw5y7gch1J+rHE8lno=
+	t=1775527807; cv=none; b=akAed4MCUz8t3MbHOb2PmqZT/ZWx5j7aSD7kfQVlhGcRE5L6jZ7Nk22RK3VGbkShfxanVD7ltMt3jlQb3TTs7Jn2u8sUQKHdUxEcOIbKGKjZ5M8rCeZ4WfT/LcyW5N8PjaOCwRgXfB99cQmgCP8q+gxvUWRvAZEVY2SO0JMbgek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775527804; c=relaxed/simple;
-	bh=ZIIp/+ZUoCnQFU4UxASiRQxcQE6IhtOQ6CK/qGpyTpk=;
+	s=arc-20240116; t=1775527807; c=relaxed/simple;
+	bh=/bV+bTTfPhODyuYodpZsbu0E+ohIbVKUHn1OOkkT/gM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qFkNkEZNOVyuX1qOlAsv8ABd4Z09AkVY2Cnt9orMlv8mv/MB2UiRufv/97aHwEPLdInOH5Kpf4TkytVipbeOsgo7RZU8ly5chflWX4h4KITZ8z+gAfzT4+qt6WJT5h0l883fES9k+iIG3VYVOCt9Y2qEkdUIz5TYlVJW3vfHea8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YheRBWI9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDFAFC2BCB2;
-	Tue,  7 Apr 2026 02:10:02 +0000 (UTC)
+	 MIME-Version; b=dk/sW7J534viyjUqZuey3mfb7yRM/qIjxSO47z4PaV2+ai8SyZj5lTt+uTYf9jl03fvXORDq/DUs37m38wDZT57/5mPF4p9dOfEPdc5vNN26nUB3Bw0LEkeaodJOHU5hYbZiGh52WaaCL7Nrw2/mO/sRjAzCD+ICUfMcpOKE5I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H0kvEK4W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCD7EC2BCAF;
+	Tue,  7 Apr 2026 02:10:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775527804;
-	bh=ZIIp/+ZUoCnQFU4UxASiRQxcQE6IhtOQ6CK/qGpyTpk=;
+	s=k20201202; t=1775527807;
+	bh=/bV+bTTfPhODyuYodpZsbu0E+ohIbVKUHn1OOkkT/gM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YheRBWI9F1HtwM5G2yFcl/FwnK3egO39Fh7LQR9y1FIfLXGbOI8XXGmqxsOnBUXW9
-	 YL8KsmM170BEIkKX0kBJX057CRwyWOO2CLV30RDNLLcbmsLc0+6XObTTmwtJXCWCn7
-	 wGBEBWJEWCIpoOSwbFABvEe3w/u6CjzpfUAQi/SizmkqlqNO3c5t6RCEqF7UW4Ukx7
-	 9Sh/53wIf/nsDJPF8f9Xo6f+L4cI6QD4727REsxx16GfTCKmPj/Svcskl37NTaAnuh
-	 jDtSzPfNSvHofGxD4YIskqMnAHHVSsoR5cbgmL8sh7bVMxVHMbY+eiXv9NrPkHfTQO
-	 Wt9CKCQgD7mzQ==
+	b=H0kvEK4WdPguBs68FdUXumtOEYMcAARWdKr5U9iHRFFYdhHvbwdHcBhp+l/h6qAuC
+	 n/M06MPGTRWbTxt+BiTqZDCiPXOc7l7Gj2QkcFZACW4PuO/SzRqjpHzzjjXeTIS1or
+	 Rl8un6WwuDy8hcdeKI9J5bJ8R5vcgKBW7dLgW62MAasDUgxMn3Gamf0OKuHA+/deXe
+	 Nyn1dYZgYlrfYEhU3d0X7o/FQ4b9d41mEPJ8ABZKfFHVqOi7Hs7+GcFTLjxy0kBG+t
+	 088imVURnvi+0tCIo5SBq3diHslVrb7nqhmsFwmjGfbGQ0h9moqybpKh/HS8two8F8
+	 4af+y58m0ms7w==
 From: Jakub Kicinski <kuba@kernel.org>
 To: jitendra.vegiraju@broadcom.com
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -83,12 +83,12 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	chenhuacai@kernel.org,
 	florian.fainelli@broadcom.com,
 	quic_abchauha@quicinc.com
-Subject: Re: [PATCH net-next v9 3/4] net: stmmac: Add PCI glue driver for BCM8958x
-Date: Mon,  6 Apr 2026 19:10:01 -0700
-Message-ID: <20260407021001.3674617-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next v9 4/4] net: stmmac: Add BCM8958x driver to build system
+Date: Mon,  6 Apr 2026 19:10:04 -0700
+Message-ID: <20260407021004.3674655-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260402213629.1996133-4-jitendra.vegiraju@broadcom.com>
-References: <20260402213629.1996133-4-jitendra.vegiraju@broadcom.com>
+In-Reply-To: <20260402213629.1996133-5-jitendra.vegiraju@broadcom.com>
+References: <20260402213629.1996133-5-jitendra.vegiraju@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,7 +110,7 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	FREEMAIL_CC(0.00)[kernel.org,vger.kernel.org,foss.st.com,davemloft.net,google.com,redhat.com,gmail.com,broadcom.com,iogearbox.net,armlinux.org.uk,altera.com,st-md-mailman.stormreply.com,lists.infradead.org,lunn.ch,fomichev.me,ziyao.cc,cqsoftware.com.cn,bp.renesas.com,eswincomputing.com,nxp.com,bootlin.com,xiaomi.com,loongson.cn,renesas.com,quicinc.com];
 	RCVD_COUNT_THREE(0.00)[4];
 	RCPT_COUNT_TWELVE(0.00)[38];
-	TAGGED_FROM(0.00)[bounces-275829-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275830-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
@@ -125,111 +125,51 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	TAGGED_RCPT(0.00)[netdev,kernel];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 5E4DD3A8E60
+X-Rspamd-Queue-Id: C742F3A8E8D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
 This is an AI-generated review of your patch. The human sending this
 email has considered the AI review valid, or at least plausible.
 ---
-Date:   Thu Apr 2 21:36:28 2026 +0000
+net: stmmac: Add BCM8958x driver to build system
 
-    net: stmmac: Add PCI glue driver for BCM8958x
+This commit adds the PCI driver for the Broadcom BCM8958x to the Linux build
+system. It enables the configuration option and updates the MAINTAINERS file.
 
-    Add pci ethernet driver support for Broadcom BCM8958x soc devices used
-    in automotive applications. This device features a pcie ethernet mac
-    directly attached to an integrated ethernet switch using an xgmii interface.
+While reviewing this patch, I noticed a potential regression introduced in the
+previous patch of the series (net: stmmac: Add PCI glue driver for BCM8958x)
+that is enabled here.
 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-brcm.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-brcm.c
-> new file mode 100644
-> index 0000000000000..e8c6b4b618acb
-> --- /dev/null
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-brcm.c
-[ ... ]
-> +static const struct software_node *brcm_swnodes[] = {
-> +	&parent_swnode,
-> +	&fixed_link_swnode,
-> +	NULL
-> +};
+The driver defines a global static array of software nodes (brcm_swnodes)
+and registers it in brcm_drv_init() using software_node_register_node_group().
 
-Will this statically allocated global software node array cause issues if
-multiple devices are present?
+Since PCI drivers must support multiple device instances concurrently, what
+happens if there are multiple BCM8958x PCI devices present?
 
-If a second device is probed, software_node_register_node_group might fail
-with an error. Additionally, if one device is unbound, unregistering the
-group could destroy the global nodes, causing a use-after-free for any other
-active instances.
+If the second instance's probe attempts to register the exact same software
+node pointers, software_node_register() will return -EEXIST. The failure
+path in software_node_register_node_group() then unconditionally unregisters
+all nodes in the group.
 
-Could these software nodes be dynamically allocated per-device?
-
-[ ... ]
-> +static int brcm_drv_init(struct device *dev, void *bsp_priv)
-> +{
-> +	struct brcm_priv_data *brcm_priv = (struct brcm_priv_data *)bsp_priv;
-> +	struct pci_dev *pdev = to_pci_dev(dev);
-> +	int vector;
-> +	int ret;
-> +
-> +	/* This device is directly attached to the switch chip internal to the
-> +	 * SoC using XGMII interface. Since no MDIO is present, register
-> +	 * fixed-link software_node to create phylink.
-> +	 */
-> +	ret = software_node_register_node_group(brcm_swnodes);
-> +	if (ret)
-> +		return dev_err_probe(&pdev->dev, ret,
-> +				     "failed to register software_node\n");
-> +	device_set_node(dev, software_node_fwnode(&parent_swnode));
-
-Does device_set_node overwrite the device's primary firmware node here?
-
-Using device_set_node can destroy existing acpi or device tree companion
-nodes. Would it be safer to use device_add_software_node instead to attach
-the node without overwriting the primary firmware node?
-
-> +
-> +	pci_write_config_dword(pdev, XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_LOW,
-> +			       XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_LO_VALUE);
-> +	pci_write_config_dword(pdev, XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_HIGH,
-> +			       XGMAC_PCIE_CFG_MSIX_ADDR_MATCH_HI_VALUE);
-> +
-> +	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_LO_OFFSET,
-> +		     XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_LO_VALUE);
-> +	misc_iowrite(brcm_priv, XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_HI_OFFSET,
-> +		     XGMAC_PCIE_MISC_MSIX_ADDR_MATCH_HI_VALUE);
+Could this unregister the software nodes that the first probed device
+successfully registered and is actively using, leaving the first device with
+dangling fwnode pointers and leading to a use-after-free? Would it be safer
+to dynamically allocate the software nodes per device instance?
 
 [ ... ]
 
-> +static void brcm_drv_exit_cleanup(struct device *dev, void *bsp_priv)
-> +{
-> +	struct pci_dev *pdev = to_pci_dev(dev);
-> +
-> +	device_set_node(&pdev->dev, NULL);
-> +	software_node_unregister_node_group(brcm_swnodes);
-> +}
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
+> index dc55aec915a27..a1e39f65cd42e 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/Makefile
+> +++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
+> @@ -51,4 +51,5 @@ obj-$(CONFIG_STMMAC_PCI)	+= stmmac-pci.o
+>  obj-$(CONFIG_DWMAC_INTEL)	+= dwmac-intel.o
+>  obj-$(CONFIG_DWMAC_LOONGSON)	+= dwmac-loongson.o
+>  obj-$(CONFIG_DWMAC_MOTORCOMM)	+= dwmac-motorcomm.o
+> +obj-$(CONFIG_DWMAC_BRCM)       += dwmac-brcm.o
 
-If device_set_node is called with NULL, will it leave the device permanently
-mangled without its original firmware node upon unbind?
-
-[ ... ]
-> +static int brcm_pci_resume(struct device *dev, void *bsp_priv)
-> +{
-> +	/* Enable Switch Link */
-> +	misc_iowrite(bsp_priv, XGMAC_PCIE_MISC_MII_CTRL_OFFSET,
-> +		     XGMAC_PCIE_MISC_MII_CTRL_PAUSE_RX |
-> +		     XGMAC_PCIE_MISC_MII_CTRL_PAUSE_TX |
-> +		     XGMAC_PCIE_MISC_MII_CTRL_LINK_UP);
-> +
-> +	return stmmac_pci_plat_resume(dev, bsp_priv);
-> +}
-
-Will the hardware state configured in brcm_drv_init be fully restored after
-a suspend and resume cycle?
-
-When a pci device resumes from suspend, its internal state is typically reset
-to defaults. Since the pci core's pci_save_state does not save arbitrary mmio
-registers or custom extended configuration registers, it appears the msi-x
-routing and address match configurations programmed during probe might be
-lost.
-
-Could this cause the msi-x interrupts to stop working after resume?
+This isn't a bug, but it looks like spaces are used here for alignment instead
+of a tab. The surrounding entries all use a tab character before the
+assignment operator.
 
