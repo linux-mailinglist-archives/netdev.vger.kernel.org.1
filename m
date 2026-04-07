@@ -1,197 +1,220 @@
-Return-Path: <netdev+bounces-275860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275861-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id CLtCO0N91GniuQcAu9opvQ
-	(envelope-from <netdev+bounces-275860-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 05:42:59 +0200
+	id bgVsDWSF1GkwuwcAu9opvQ
+	(envelope-from <netdev+bounces-275861-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 06:17:40 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BAB93A97AE
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 05:42:59 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 949123A9AE4
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 06:17:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A1CDA300B602
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 03:42:57 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2C5E63012CA9
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 04:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D7E37418F;
-	Tue,  7 Apr 2026 03:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F7615B971;
+	Tue,  7 Apr 2026 04:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VUuSvAL6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h7NUvK3m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f44.google.com (mail-dl1-f44.google.com [74.125.82.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA664334681
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 03:42:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775533376; cv=none; b=iKsXi7KNOyPMWisLoxl0Hvb3b9dthswsgrf1IEq5diqmj5pIhUQ4TE7600Jv/RtaUThWvbbbTL45e+445Ng8G6Kd+Np1Pveaoa3zfxzse4WmcqiMhA3ZviBqsTTQRvpS8P49BRiezTZl68uS8lbTzResdGQwj6SI3K99qTDCSpw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775533376; c=relaxed/simple;
-	bh=PY5ILjxCJ5TPuG6N0E7dhyIq1ZD+5631r/TnZxOEGqs=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F18D4C97
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 04:17:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775535455; cv=pass; b=XbVpUV4JBNBggVBVDRa9woQ3pwhbGTJKHnC+JtPq33tTH4a6pFsa/yWpfkj68872YcBthW9Rm9rK2aoi5z17CoL+m7rd26a/i627hvnAHHfn6cSpvrgIqpzEvW5KvFJKCzFmEnN24YdkGYGfP6oo2lKV9pkP66VREZAVh/0TdFQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775535455; c=relaxed/simple;
+	bh=Sw7ty+29veqGp5LQJRH7glKwePKiIhW+LcAyP2s9O+Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XCsUSIMDMvHORBLjxSsGXHXQNjZNIT4K1mvd8uhnxre4FmqfhlUulJ7Nlm1Ojj00u0y9rI/YEuyQbeyGf55WwQ1mey86sIfMRhp0B8Iy3mYEFuYy5MnvOF2EECM3lnpCgPErzPU0GAbU7ihlOFlpFIbt3EWx5Zj1IOnSYcmXTlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VUuSvAL6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64C6BC116C6
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 03:42:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775533376;
-	bh=PY5ILjxCJ5TPuG6N0E7dhyIq1ZD+5631r/TnZxOEGqs=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=VUuSvAL6MmfiGvHoOHm1xPJTU1DpfVTVCk887C9HA01fbUJW6Tn4Fv5E1Z0skVC+y
-	 tw9NfzwKG518J0Cy3ragAO9/m1rCZPVNl6niPRDV6KGeu7Riv7qn4vWPieLAko20YA
-	 oBTlrTZAzHKo0FyLxQqUY5YWyG7wC3rSK+g1Xrm6CkY2hZC03LD8YOYDDgHTJLPo21
-	 /keuIjDMez7M5VOmT8AuEWU8quzzgnYmoNW1tOTAWyZQkTSP7itfIz8azH/EHnY1P4
-	 cLOJ+2Ts7dwqkaf60zoiaL4BK3sJz8QfoUMx212SquwTnyJqCMFDNvntBeGdooqfkQ
-	 8WzkHTXYJFM3Q==
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-899a9f445cbso59346066d6.0
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 20:42:56 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUCqHb0uLQRTARglCgGyuLe25hLCcICV0QY+ioS8XFRy04T1+gm8p0ShFboTMIRc4Cg5FDSAJA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyu4C91Id/mxueXdnkastBWTH5axwsYW4v30jnXA+kjGeejI7Yy
-	hqT5We7hbCrnipoYfwPApTcWTGGjZbaMPTOaAn+BkD/WzNdtmQUL6K9BjB3BYdN+tEzQylxu2RM
-	Nby3Z3N2QBnWiFQ/9xZdWlsprIRe1gDM=
-X-Received: by 2002:a05:6214:20aa:b0:8a9:9cdc:9ab9 with SMTP id
- 6a1803df08f44-8a99cdc9b7fmr142559486d6.24.1775533375703; Mon, 06 Apr 2026
- 20:42:55 -0700 (PDT)
+	 To:Cc:Content-Type; b=gcOdg4Dz/GAkYBIfVdMlWyx3jC2G0tN93swYt8BxhZ21gyNqzwKSioZJsPPG1td6a5b9BdkK1TAvJZkh0z7CV0u2seRviCHfTYhyoR8JeZ0pRpI63xuyKteolE9osFipb7cklT7wVSkgv1h6w2P2/g2XkCJVty3nnh8eA8ijA2E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h7NUvK3m; arc=pass smtp.client-ip=74.125.82.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-dl1-f44.google.com with SMTP id a92af1059eb24-12c19d23b19so40214c88.0
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 21:17:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775535453; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OdKh+39BlKw0bRQyq4cnB9j6e0KQxvf4h1+3LnAW/+5czlxdwCsoeGZiso9OyW0xlS
+         k48aC+D5Mbr8ysTyQoIfQFENw7GrTD7coADrNMJhxOk0dmb1zI6pjzfOWeoQFhJpFGwY
+         WsJ+EQNHmw4RROV0UKVtVoQd+kEYa3JNu8lW8b8Ig6tSJmIrXG9JmsRRCkMsiTFf1Pta
+         9WgqPaumjXHB/9qevgDK+P/+fxU48d4EmsHHU2kiirJqTZOwcrvqPGOo4EI20bRTVGV2
+         k6XTYWjhfYwtAi7NOxiSjfLdizsoBMtcMTPtTc4JzX5VuzyQB7sf8mR9a7xTuilZYK2K
+         qFOA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=AyYS6PCArwoFK69Ul2Lan69GZWWz4KZxx8evAz2lAUY=;
+        fh=7HfJqo4yIBpdTKM/B8vkXiFgqqNi5t65ByLUo5vMqiI=;
+        b=GNsZPoeNd0D1E2WByVbWIfwg+Bcflmpain+kdRDr+9ias4wYOj4itlodFk5Ho2bWU4
+         6rhqiypTDyO3ZIvu4JCB8bZDD8Z/ThP0ooGx1yttzvv530W1lGwQTa/C3JoQu5RJauqM
+         jnKDEuCHgD+OGSnvqq4ndgXMSjMOv15LNbWJaknjhaSreuqJoPCe2hyIlETQ56OpmX7s
+         wm10ZxNLbXISo+rK1/y0870oVxKQBJ3AqaAa4i7ubPIB6ulZ0c0UaPX41UGLNYkR9Jh5
+         eWZldP1TuZlaZTP8M4IgodDGqkJLzgna9yS/y8gw6KQ8SvCQunFlCzcxOwDHZQkiVrq/
+         yfFQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1775535453; x=1776140253; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AyYS6PCArwoFK69Ul2Lan69GZWWz4KZxx8evAz2lAUY=;
+        b=h7NUvK3mG3g86hm6udSjw73qAZqrP2DFC/H4/qj3Lzn3QoeeoQbUZiipOOUiU9iJ54
+         pVb0QEl8B7sX+tQ69lZFs2D+U3iUpmvZz5v7pjZLzb6g3PoI9fDUzVk3r0qkBB+JXQzf
+         VC9oPfZpixf2SSet2b7jWdzmFqZc27I1XSZJ5sHF/xJS2s03do1Nt8DkrBE1PhFOxEV0
+         5411julxX4tA7LkAVxDDFs3qUaubJ//ooHE81tqjzrBOCV0PbYVvNFv3PB5wLS+pV0O9
+         ZHod9bza962jC75nBjA35154T1IZ2elH8oBx89Tu+cDXwzM03YjmmPdZvPWHxSJhPBSe
+         Yl9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775535453; x=1776140253;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=AyYS6PCArwoFK69Ul2Lan69GZWWz4KZxx8evAz2lAUY=;
+        b=LhO9oG0XXYGeSTq5IAHlFt+qEarv4m5rhPwttkMzJ8gmx/IRg8X2uftrzgL0Rztxk0
+         2KZalY/sIthsmQZy1Z2qDQ1YNyyDq/x57LaGg00gOCzLnCHRtecwyh76w+SU5vLgZX5S
+         KaDYLwyXAVETSM1TUPbdjXEpN+DypyeiBGJnX+vHPUOTKnpBTJKIXofAMCgVQydHleXL
+         MKxaW7YBuU+uWnD6tsh8OP2fXPHjsUED6iUNyzi9F/QFN7MYE5dEtBTjCqHh/dkHTe72
+         e9rBaJbq+mZm9znOEAZ1YRjohsGkcKL46CMbm7rZLhDIY0HM9aENlWAozN2FXv/7J63a
+         rwiQ==
+X-Gm-Message-State: AOJu0Yx/DCINasiRo3fT/TdtPfLJpEUgv7Swc6OSlazyK6JUnjhbhTwf
+	DJhSSy5sQN+3OgttV3oAHyW5L7CtNUHPQWY3PhXo5B8SV24zMwfJJ7OdB7ZKiRYEHRGTiv2p64L
+	Zf3uIn4/nDAiQgSoYcF4NhyeGavr+/Thjv0S3jBUe
+X-Gm-Gg: AeBDieulfVdrGT30epvoo4DNyP7/E5msHwvAXAjAqM1NAFXAtU6Vni6w6tr+fFOEVgN
+	GKc5e/fxMEYLwwmI79EJ5jArsO5F4bnDgbPq/iiteS8fF/JIkBLzeFhegw8SSKtMILYWtSso/pz
+	eTDpIU0lbdCejkGbVij272QYwq6QitINA8V06tyS2QiiexaIouUH+OH+xcDkDYzHT2Ww3jm49is
+	TfO3FdvGogg7oRPW1MxGVNh/u0EoKsvd+Q5SDf8N6R4JSKTShpCcdbl8cIDvGAPRpPVsDXkD7nk
+	HCP+9RRH100QsfUJDirDcrPp9Q0GpFzY/OqrDTl/MFFIoGUVlIOziLEE22ckjnpOzHZj5AxBQ0T
+	DHkAd5FU=
+X-Received: by 2002:a05:7022:e02:b0:12b:f881:d8d0 with SMTP id
+ a92af1059eb24-12bfb7459f4mr7362897c88.18.1775535452787; Mon, 06 Apr 2026
+ 21:17:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260406195014.112521-1-jp.kobryn@linux.dev>
-In-Reply-To: <20260406195014.112521-1-jp.kobryn@linux.dev>
-From: Barry Song <baohua@kernel.org>
-Date: Tue, 7 Apr 2026 11:42:43 +0800
-X-Gmail-Original-Message-ID: <CAGsJ_4xqmXGon8d9bwD_6QnRvpa+4uXDw4vGrv_C1BZC59DOQQ@mail.gmail.com>
-X-Gm-Features: AQROBzCUXfyDhGLk2aQzGMeYjrCKkTpaMIsiEwO5P_TRgb51gwzU8_3avOm2lko
-Message-ID: <CAGsJ_4xqmXGon8d9bwD_6QnRvpa+4uXDw4vGrv_C1BZC59DOQQ@mail.gmail.com>
-Subject: Re: [PATCH v4] mm/vmpressure: skip socket pressure for costly order reclaim
-To: "JP Kobryn (Meta)" <jp.kobryn@linux.dev>
-Cc: linux-mm@kvack.org, willy@infradead.org, hannes@cmpxchg.org, 
-	akpm@linux-foundation.org, david@kernel.org, ljs@kernel.org, 
-	Liam.Howlett@oracle.com, vbabka@kernel.org, rppt@kernel.org, 
-	surenb@google.com, mhocko@suse.com, kasong@tencent.com, qi.zheng@linux.dev, 
-	shakeel.butt@linux.dev, axelrasmussen@google.com, yuanchu@google.com, 
-	weixugc@google.com, riel@surriel.com, kuba@kernel.org, edumazet@google.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com, 
-	wanglian@kylinos.cn, chentao@kylinos.cn
+References: <cover.1775207252.git.wangjiexun2025@gmail.com> <e597de49d761fdc6961f49d638ce26bd3f74e988.1775207252.git.wangjiexun2025@gmail.com>
+In-Reply-To: <e597de49d761fdc6961f49d638ce26bd3f74e988.1775207252.git.wangjiexun2025@gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 6 Apr 2026 21:17:21 -0700
+X-Gm-Features: AQROBzBAHphE4lXXMiSCwDLdeWnZAvHZv1I7HbyYfBZBXMGqnInJjFrg0rjys5w
+Message-ID: <CAAVpQUDe6cg4fNVHjy+EdtCUj+oEbi_2ohz5PVkNZmcTfS2kDA@mail.gmail.com>
+Subject: Re: [PATCH net 1/1] af_unix: read UNIX_DIAG_VFS data under unix_state_lock
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, xemul@parallels.com, 
+	yifanwucs@gmail.com, tomapufckgml@gmail.com, yuantan098@gmail.com, 
+	bird@lzu.edu.cn, enjou1224z@gmail.com, wangjiexun2025@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spamd-Result: default: False [-2.16 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
+	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275860-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275861-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[26];
+	FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,parallels.com,gmail.com,lzu.edu.cn];
+	RCPT_COUNT_TWELVE(0.00)[14];
 	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[baohua@kernel.org,netdev@vger.kernel.org];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[5];
-	TAGGED_RCPT(0.00)[netdev];
+	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[google.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:email,mail.gmail.com:mid]
-X-Rspamd-Queue-Id: 4BAB93A97AE
+	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mail.gmail.com:mid,lzu.edu.cn:email]
+X-Rspamd-Queue-Id: 949123A9AE4
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Tue, Apr 7, 2026 at 3:50=E2=80=AFAM JP Kobryn (Meta) <jp.kobryn@linux.de=
-v> wrote:
+On Mon, Apr 6, 2026 at 6:53=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrote:
 >
-> When reclaim is triggered by high order allocations on a fragmented syste=
-m,
-> vmpressure() can report poor reclaim efficiency even though the system ha=
-s
-> plenty of free memory. This is because many pages are scanned, but few ar=
-e
-> found to actually reclaim - the pages are actively in use and don't need =
-to
-> be freed. The resulting scan:reclaim ratio causes vmpressure() to assert
-> socket pressure, throttling TCP throughput unnecessarily.
+> From: Jiexun Wang <wangjiexun2025@gmail.com>
 >
-> Costly order allocations (above PAGE_ALLOC_COSTLY_ORDER) rely heavily on
-> compaction to succeed, so poor reclaim efficiency at these orders does no=
-t
-> necessarily indicate memory pressure. The kernel already treats this orde=
-r
-> as the boundary where reclaim is no longer expected to succeed and
-> compaction may take over.
+> Exact UNIX diag lookups hold a reference to the socket, but not to
+> u->path. Meanwhile, unix_release_sock() clears u->path under
+> unix_state_lock() and drops the path reference after unlocking.
 >
-> Make vmpressure() order-aware through an additional parameter sourced fro=
-m
-> scan_control at existing call sites. Socket pressure is now only asserted
-> when order <=3D PAGE_ALLOC_COSTLY_ORDER.
+> Read the inode and device numbers for UNIX_DIAG_VFS while holding
+> unix_state_lock(), then emit the netlink attribute after dropping the
+> lock.
 >
-> Memcg reclaim is unaffected since try_to_free_mem_cgroup_pages() always
-> uses order 0, which passes the filter unconditionally. Similarly,
-> vmpressure_prio() now passes order 0 internally when calling vmpressure()=
+> This keeps the VFS data stable while the reply is being built.
+>
+> Fixes: 5f7b0569460b ("unix_diag: Unix inode info NLA")
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+> Suggested-by: Xin Liu <bird@lzu.edu.cn>
+> Tested-by: Ren Wei <enjou1224z@gmail.com>
+> Signed-off-by: Jiexun Wang <wangjiexun2025@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> ---
+>  net/unix/diag.c | 21 +++++++++++++--------
+>  1 file changed, 13 insertions(+), 8 deletions(-)
+>
+> diff --git a/net/unix/diag.c b/net/unix/diag.c
+> index ca3473026151..76b2c48137dd 100644
+> --- a/net/unix/diag.c
+> +++ b/net/unix/diag.c
+> @@ -28,18 +28,23 @@ static int sk_diag_dump_name(struct sock *sk, struct =
+sk_buff *nlskb)
+>
+>  static int sk_diag_dump_vfs(struct sock *sk, struct sk_buff *nlskb)
+>  {
+> -       struct dentry *dentry =3D unix_sk(sk)->path.dentry;
+> +       struct dentry *dentry;
+> +       struct unix_diag_vfs uv;
+> +       bool have_vfs =3D false;
+
+nit: Please keep the reverse xmas order.
+https://www.kernel.org/doc/html/v6.6/process/maintainer-netdev.html#local-v=
+ariable-ordering-reverse-xmas-tree-rcs
+
+
+>
+> +       unix_state_lock(sk);
+> +       dentry =3D unix_sk(sk)->path.dentry;
+>         if (dentry) {
+> -               struct unix_diag_vfs uv =3D {
+> -                       .udiag_vfs_ino =3D d_backing_inode(dentry)->i_ino=
 ,
-> ensuring critical pressure from low reclaim priority is not suppressed by
-> the order filter.
+> -                       .udiag_vfs_dev =3D dentry->d_sb->s_dev,
+> -               };
+> -
+> -               return nla_put(nlskb, UNIX_DIAG_VFS, sizeof(uv), &uv);
+> +               uv.udiag_vfs_ino =3D d_backing_inode(dentry)->i_ino;
+> +               uv.udiag_vfs_dev =3D dentry->d_sb->s_dev;
+> +               have_vfs =3D true;
+>         }
+> +       unix_state_unlock(sk);
 >
-> The patch was motivated by a case of impacted net throughput in productio=
-n.
-> On one affected host, the memory state at the time showed ~15GB available=
-,
-> zero cgroup pressure, and the following buddyinfo state:
+> -       return 0;
+> +       if (!have_vfs)
+> +               return 0;
+> +
+> +       return nla_put(nlskb, UNIX_DIAG_VFS, sizeof(uv), &uv);
+>  }
 >
-> Order FreePages
-> 0:    133,970
-> 1:    29,230
-> 2:    17,351
-> 3:    18,984
-> 7+:   0
+>  static int sk_diag_dump_peer(struct sock *sk, struct sk_buff *nlskb)
+> --
+> 2.34.1
 >
-> Using bpf, it was found that 94% of vmpressure calls on this host were fr=
-om
-> order-7 kswapd reclaim.
->
-> TCP minimum recv window is rcv_ssthresh:19712.
->
-> Before patch:
-> 723 out of 3,843 (19%) TCP connections stuck at minimum recv window
->
-> After live-patching and ~30min elapsed:
-> 0 out of 3,470 TCP connections stuck at minimum recv window
->
-> Signed-off-by: JP Kobryn (Meta) <jp.kobryn@linux.dev>
-> Reviewed-by: Rik van Riel <riel@surriel.com>
-> Acked-by: Johannes Weiner <hannes@cmpxchg.org>
-> Acked-by: Shakeel Butt <shakeel.butt@linux.dev>
-> Acked-by: Jakub Kicinski <kuba@kernel.org>
-
-This patch looks sensible to me
-
-Reviewed-by: Barry Song <baohua@kernel.org>
-
-This is a one-sided costly order and should be treated as costly for
-reclamation. On the other hand, nominally non-costly orders (e.g.,
-order-3) can also become costly. I previously raised this issue here:
-
-https://lore.kernel.org/linux-mm/20251013101636.69220-1-21cnbao@gmail.com/
-
-Burst network traffic can make phones heat up.
-
-More recently, with help from Wang Lian and Kunwu Chan (Cc'ed),
-we developed a simple model that reliably reproduces this
-behavior, where we observe significant CPU utilization by
-kswapd due to 3-order burst allocation from the network.
-
-I may revisit this discussion soon.
-
-Best Regards
-Barry
 
