@@ -1,176 +1,168 @@
-Return-Path: <netdev+bounces-275901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275902-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +Ob2M6bB1GmWwwcAu9opvQ
-	(envelope-from <netdev+bounces-275901-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 10:34:46 +0200
+	id WARfF9bB1GmWwwcAu9opvQ
+	(envelope-from <netdev+bounces-275902-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 10:35:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29B643AB679
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 10:34:45 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id F23F03AB6A8
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 10:35:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 56F6830058C5
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 08:34:45 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5BC4530067AA
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 08:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047FC39A81A;
-	Tue,  7 Apr 2026 08:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAD5339A07F;
+	Tue,  7 Apr 2026 08:35:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="xkGzOt2f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sOIM9gM4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820D739A81B
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 08:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C37399377
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 08:35:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775550880; cv=none; b=DUNGJECI9RDKHvetRJViTPMOd0aWlUt8EpxHrS685G6wA17LN5uZN7zc9NEwIw47KRjFE5AqWtQTnoOZMhrOv7ZstaaKKBDecahVPHXD69V7tfORTBVelsArG9AegPVKr2/xiPcH9GGzle/zGO4B4l/uTh1b3R114L1LOZlV4Do=
+	t=1775550930; cv=none; b=gzaqdihqwPO/0OpT6hfCRza1hc1x0AsQUZ6nulrNjswRDocliJAsfv8gf0emyAxAiIPCwn6xkaLswZwKJw1wkLb4he6zoOObrfAqcjZRLaHiewVj9Lmd9QkSycvkt+kRoR2V108dCMpCVtNt7W/5aYsf5OwueXbYxThO89raRXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775550880; c=relaxed/simple;
-	bh=ll5Xf8OgLSwzLu5gj1f8oU0LLlZwJOhEZFC7iIA9WeM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JsZ3m+srExtm/TIl/K+OKaBqRvFBLeLRH7bo2arqgVp7jb9ur3WK19Q5TkmCkbd418RU+FoR3o+p2/NhXB3iwyTYYELgTQ/2LFyEblLZpdKv2yambigbrNIhIoEw26OJ8OsmywLDG8LeD8UU4tQPOPt0EsFsxp8vGWvoYuAKnsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=xkGzOt2f; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id DB4C21A31AC;
-	Tue,  7 Apr 2026 08:34:26 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id AA828603C7;
-	Tue,  7 Apr 2026 08:34:26 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 901F310450169;
-	Tue,  7 Apr 2026 10:34:19 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1775550865; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=MeVAzDBoyGqpo2KSnPfszamlpaudEQsSPJY6g/H6Ddc=;
-	b=xkGzOt2fHZy8K/uSb8zZSe7krpsMuTwa9sV0dleOZNXCZ0Rcr1V7kjqWPldKOwQVt8psTM
-	2hwNspJcP04jPOiA9hsbPXa19xKzO9a1DIRyJhEX6oNnIwPiYbDNv66rWw1CXzVi4aSsv7
-	RZJurmrlgJNgpZPP7uggfsMrRrrvjUoo2EK2LNoCcC7LoiVn8cVo/GTbjuDj7dgGJk9/C/
-	rJtt6dqYnnlxuANE4gZbL6y3vbWEwGICizQSymY3chIhzLn0DuMYt89JYpjNcS6Z6fTXNo
-	pT+lmzsH2H86Ege+Vey2IbLFm+6y9o4jUJSycrPmaiOdEn5M2wFBOqDV6GEeCQ==
-Message-ID: <c2026868-35ff-4b5e-a0e2-bf6b3f6b75ce@bootlin.com>
-Date: Tue, 7 Apr 2026 10:34:18 +0200
+	s=arc-20240116; t=1775550930; c=relaxed/simple;
+	bh=dKTujzU/RT4gZ0YeCuNIiO3l8HTosq2qqb8WSt2cwZY=;
+	h=From:To:Cc:Subject:Message-ID:Date:Content-Type:MIME-Version; b=ZmTjJSIQaCC0JGMm69Lubc0eubZQzfpmSJHcSFzB+Fj0ReKg46E7tWbeSSQkQoUccJz89S3hWcl6QGx9KdvPBQY4VI6m2TEQpcQipIIsCSPYWBWWkAAecVzsA6zUaQswfqrrWFQBIJTqBljzurJZfOEeb4NMrI9UnZapR+M8Qbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sOIM9gM4; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-c6e2355739dso2066354a12.2
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 01:35:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775550919; x=1776155719; darn=vger.kernel.org;
+        h=mime-version:content-transfer-encoding:date:message-id:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LkzOHxn7RTxz0GA1rTzNHX8XFNh7eSE/QKKRVQuNXEQ=;
+        b=sOIM9gM4MNcwg4V3eeUPr6Z9rcLL2WuLqnJvoHTJxZPuCN2r8wlbl0dTigkD+Fl2qo
+         Rv4U5OHgkEMr3znCP4O8bu/d1wQdCvnqXxQJDYvXc6luTmvAboFjKV+rt1V9e36tcHM7
+         tHqyCcAFaQFG/xPvEY3PpjObDm+CykSVSBO3GIbBAicyQ8y+olKBkA7o0F5QbUxmMRdH
+         Q7P07CSEAIwnF1Hj6HuhoVW9UHcfKIssHZg3J3Ftg+cqoej/GG1jdeoAmdE9EOY0WBTC
+         Ar/sN5DGmBBT3DViFutrM3eDUZYLCuG//UI/Wg/LK/gS4f7sn8CKy/4fOLvpx1iMCLTB
+         at5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775550919; x=1776155719;
+        h=mime-version:content-transfer-encoding:date:message-id:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LkzOHxn7RTxz0GA1rTzNHX8XFNh7eSE/QKKRVQuNXEQ=;
+        b=Lp6L6dpvrwPiwLRI1Nnr0BaJt8Zju+59YxNXcyLxk40Cus6+dfge0iUkLW2Q41O0/W
+         tc6YlK9Y/RpocqWWKcqExqotTtTKS/YOsFQrTJzuxUPziOCyY8btzckhJuGJJvD/Bdlh
+         FfPqzld77wUWiVrHFsT52BQksSwzH69PYCkxI9W9GqlENm/rLJrDvBlN5iA1nsZcHpV3
+         JtqTURTQq79yA1NW80iH+Wo0NKhZukfLY3nNuJkvEBamxMz2D2RJFgcNh5r7dMLBz07J
+         Buj/miomA83UWyWW0+x3xCWh2kTEzaPqI0gzPjjw2lpCMtC83krJq/CWyr4l1sSjO3Ap
+         Pj2A==
+X-Forwarded-Encrypted: i=1; AJvYcCXucBbOWjfaCAAN99dO4puXnfuyIwP9Jr7ZNAJrTOMpfK11i3yZk4I9vwYhManyIitER1dZ894=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybOpKvA/SfMPa1X4bj9ZexEFdWx3J/hFemvBeWP7b+Wmt8PrwM
+	Ezg8ESbFwhfY5U49WH/ev/uygfZC1lzMfBejeoIn3UaITndmdpaETMXv
+X-Gm-Gg: AeBDietr7jwW8RtCETaz4eEC1zi7DTPyRv9dMY9lVyXEwkVzpjGYwlhDClnSNV0kumY
+	uv1w7trj2CD2MTFSbRZUud/oOY+gXfPXLslVOyhnpwCOhVltdilFVxlwb90tiF0S382YBLakwGQ
+	Hm4aurs8ZImqpFCpWasJaoc1XASu/iPXaFhnCFEVGR8utQCrlg/+0poGSJseD8Ya7P3awPYOT//
+	AODamf6Us20+F3pHl6hqKpJ+AaG4l5K+u2cBHWFMEQbAMHh1nskH3W9/sGK8vTovC9RrmveNPrq
+	NCPqGT0dlqTuglvuLnL7tllmU57XVOYgof1I/PcmPhDNp0EmkbPtO+IZrCdNrbvuYSmF37FIywy
+	AZhUaIbS8NEy0o9zbUWxlajFPN0OxUSal8r3Of1YuZnFtgWN+zSXu0+SaZQUfd5a6m7c6RszFsp
+	cdbCth9xWta4/SPOszJ5crbyZL7TIewvSPc/Rxt5HtZleXKL0+D7Vrzy7tVc2wiqbNclyNlRYgN
+	n3ME+9R7jQOROzVL2pNxw==
+X-Received: by 2002:a05:6a20:4322:b0:39e:f994:f698 with SMTP id adf61e73a8af0-39f2f0cc6e0mr14883194637.48.1775550919424;
+        Tue, 07 Apr 2026 01:35:19 -0700 (PDT)
+Received: from Shuvs-MacBook-Air.local ([103.10.28.236])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82cf9c6ad8asm16842931b3a.40.2026.04.07.01.35.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Apr 2026 01:35:19 -0700 (PDT)
+From: Shuvam Pandey <shuvampandey1@gmail.com>
+To: David S. Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+ syzbot+5ec223ccb83b24ef982f@syzkaller.appspotmail.com
+Subject: [PATCH net] atm: mpoa: fix mpc->dev refcount across mpoad restart
+Message-ID: <177555091252.59118.13093904987038690781@gmail.com>
+Date: Tue, 07 Apr 2026 14:20:12 +0545
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: net: Add schema for LAN75XX compatible
- USB Ethernet controllers
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Aaro Koskinen <aaro.koskinen@iki.fi>,
- Andreas Kemnade <andreas@kemnade.info>, Kevin Hilman <khilman@baylibre.com>,
- Roger Quadros <rogerq@kernel.org>, Tony Lindgren <tony@atomide.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-omap@vger.kernel.org
-References: <20260403-b4-var-som-om44-lan7500-v1-0-0dadde850143@bootlin.com>
- <20260403-b4-var-som-om44-lan7500-v1-1-0dadde850143@bootlin.com>
- <20260405-smoky-spectacular-koel-dbfcda@quoll>
-Content-Language: en-US
-From: Thomas Richard <thomas.richard@bootlin.com>
-In-Reply-To: <20260405-smoky-spectacular-koel-dbfcda@quoll>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
 X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275901-lists,netdev=lfdr.de];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
 	RCVD_TLS_LAST(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275902-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[19];
-	RCVD_COUNT_FIVE(0.00)[6];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[thomas.richard@bootlin.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev,dt];
+	FROM_NEQ_ENVFROM(0.00)[shuvampandey1@gmail.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	NEURAL_HAM(-0.00)[-0.998];
+	RCPT_COUNT_SEVEN(0.00)[8];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 29B643AB679
+	TAGGED_RCPT(0.00)[netdev,5ec223ccb83b24ef982f];
+	FREEMAIL_FROM(0.00)[gmail.com]
+X-Rspamd-Queue-Id: F23F03AB6A8
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello Krzysztof,
+atm: mpoa: fix mpc->dev refcount across mpoad restart
 
-On 4/5/26 10:06 AM, Krzysztof Kozlowski wrote:
-> On Fri, Apr 03, 2026 at 09:02:23PM +0200, Thomas Richard wrote:
->> Create schema for LAN75XX compatible USB Ethernet controllers. The smsc75xx
->> driver only supports LAN7500 and LAN7505 devices.
->>
->> Signed-off-by: Thomas Richard <thomas.richard@bootlin.com>
->> ---
->>  .../devicetree/bindings/net/microchip,lan75xx.yaml | 52 ++++++++++++++++++++++
->>  1 file changed, 52 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/net/microchip,lan75xx.yaml b/Documentation/devicetree/bindings/net/microchip,lan75xx.yaml
->> new file mode 100644
->> index 0000000000000000000000000000000000000000..b84022976044ffec2024cff9fc0aa5016723abed
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/net/microchip,lan75xx.yaml
-> 
-> Rather microchip,lan7500.yaml. Wildcards don't really scale when you
-> have 75yy coming which does not fit into this binding.
-> 
-> 
->> @@ -0,0 +1,52 @@
->> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/net/microchip,lan75xx.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: Microchip LAN7500/LAN7505 USB Ethernet Controllers
->> +
->> +maintainers:
->> +  - Thomas Richard <thomas.richard@bootlin.com>
->> +
->> +description:
->> +  Device tree properties for LAN75XX compatible USB Ethernet controller.
->> +
->> +allOf:
->> +  - $ref: ethernet-controller.yaml#
->> +
->> +properties:
->> +  compatible:
->> +    items:
-> 
-> Drop items, that's enum directly.
-> 
->> +      - enum:
->> +          - usb424,7500
->> +          - usb424,7505
-> 
-> But you should notice that this is exactly the same as 95xx, so why it
-> cannot go there? Because of the wildcard 95xx naming? That's not a
-> reason.
+mpoad_close() drops the reference held in mpc->dev with dev_put(), but
+the mpoa_client stays alive and keeps the same device pointer.
 
-Yes I noticed. I did not put them in 95xx because it is not the same
-driver. Isn't that a valid reason?
+A later mpoad attach reuses the existing mpoa_client without
+reacquiring that reference, so the next close can hit the netdevice
+refcount warning. Keep the LEC device reference with the mpoa_client
+until the device unregisters or the client is torn down.
 
-Best Regards,
-Thomas
+Reported-by: syzbot+5ec223ccb83b24ef982f@syzkaller.appspotmail.com
+Link: https://groups.google.com/g/syzkaller-bugs/c/qhZ5MJfLBOE/m/UnotmgRdAQAJ
+Signed-off-by: Shuvam Pandey <shuvampandey1@gmail.com>
+---
+ net/atm/mpc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/net/atm/mpc.c b/net/atm/mpc.c
+index ce8e9780373b..1e9b9c633e8b 100644
+--- a/net/atm/mpc.c
++++ b/net/atm/mpc.c
+@@ -886,7 +886,6 @@ static void mpoad_close(struct atm_vcc *vcc)
+ 		struct lec_priv *priv = netdev_priv(mpc->dev);
+ 		priv->lane2_ops->associate_indicator = NULL;
+ 		stop_mpc(mpc);
+-		dev_put(mpc->dev);
+ 	}
+ 
+ 	mpc->in_ops->destroy_cache(mpc);
+@@ -1508,6 +1507,8 @@ static void __exit atm_mpoa_cleanup(void)
+ 			priv = netdev_priv(mpc->dev);
+ 			if (priv->lane2_ops != NULL)
+ 				priv->lane2_ops->associate_indicator = NULL;
++			dev_put(mpc->dev);
++			mpc->dev = NULL;
+ 		}
+ 		ddprintk("about to clear caches\n");
+ 		mpc->in_ops->destroy_cache(mpc);
+
+-- 
+2.50.0
 
