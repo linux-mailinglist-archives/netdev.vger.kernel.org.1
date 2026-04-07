@@ -1,150 +1,133 @@
-Return-Path: <netdev+bounces-275834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275824-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eIwyD59o1GnptgcAu9opvQ
-	(envelope-from <netdev+bounces-275834-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:14:55 +0200
+	id kNycHVRm1GnptgcAu9opvQ
+	(envelope-from <netdev+bounces-275824-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:05:08 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 922C23A8F0A
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:14:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C29FA3A8D9A
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:05:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BF57130DE5E1
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:10:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D04523017C2B
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 964DB27CCF0;
-	Tue,  7 Apr 2026 02:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1FA11DE8BE;
+	Tue,  7 Apr 2026 02:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V5bqUeVK"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE5022F77B;
-	Tue,  7 Apr 2026 02:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6A7EED8;
+	Tue,  7 Apr 2026 02:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775527838; cv=none; b=jlQK8GrYIBBCshgPrgznOcNr6WrFd9DzHyBB9aQAdph2I6BpGY71ARnM5d6jVqhtCwa7OCB45wONb8jBrZlTgA74k2qSpSFChz9Em22ofygQKDsOpca2z9bbDqhr5L7UyTDGIdldh+MFkeg1er/WaLjJs8Zcd8//318Ege4XCxY=
+	t=1775527502; cv=none; b=fYo86cN88LtP6uDgHGdergqvyMn5tsPJBcThRQwwQ27+qQADtbO6jQFBH310BC6qoRiKSk0pHig7hN2Bfbqgj9zvZ/UlEgW1wvfcbQ4jKUSsMbnaqmB2AJr2xv3RnwunscSya+ksajN78DVmp5DSIhwS9MrwrlXwhDYGVd1/7V8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775527838; c=relaxed/simple;
-	bh=2gk/j8ec/luBQmUu0MPxwUnwBOnlSZLezzRCV4elKDM=;
-	h=From:Date:Message-ID:To:Cc:In-Reply-To:References:Subject; b=l+n/BCzrvCGGNrTRxCCQhTK48l9Z1HgB8tGhd1kNEJ0hhJ5JuTL+bO4PF9kJNFrTldo/n9wAiTC3OVBFBNFAAp4u7zviNPzv9pbClOOGusaMuLZ+/M1yNX/HglApqr2MmXawuzBH1rnZorZnCJgjisa3ffVCSi1+dgaK1SqOwzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from 0004-nfc-sensf-v2.eml (unknown [111.196.245.197])
-	by APP-01 (Coremail) with SMTP id qwCowADHM2+SZ9RpzrR2DA--.49618S2;
-	Tue, 07 Apr 2026 10:10:26 +0800 (CST)
-From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Date: Tue, 7 Apr 2026 09:57:36 +0800
-Message-ID: <20260407120004.4-nfc-sensf-v2-pengpeng@iscas.ac.cn>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kees Cook <kees@kernel.org>, linux-kernel@vger.kernel.org, pengpeng@iscas.ac.cn
-In-Reply-To: <20260322031922.57949-1-pengpeng@iscas.ac.cn>
-References: <20260322031922.57949-1-pengpeng@iscas.ac.cn>
-Subject: [PATCH net v2] NFC: digital: bound SENSF response copy into
- nfc_target
-X-CM-TRANSID:qwCowADHM2+SZ9RpzrR2DA--.49618S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw1kJFy3WFW5uryrXryrJFb_yoW8ZF18pF
-	yfC3W5A3y3XFW7tFWkAF40krsYvF1vkFZrurWxA34IywsxJFW7JF48Gr1aqF1UJFWxGw1x
-	WF4DAFyUGa1UXrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26r
-	xl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-	6xIIjxv20xvE14v26r126r1DMcIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r1q
-	6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	W8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbtxhJUUUU
-	U==
-X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
+	s=arc-20240116; t=1775527502; c=relaxed/simple;
+	bh=QAbPk6VWnQg1ID0bqbSVaZJqWzuhr7oU3u8vHAFVY3c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A4TuzMB5xbBjkYUt9lpPbt9LNHuHXd1gWymTHprQg4FaNLMRRa6VOgeMMv+uNYZb1OkYJXQ2DAcOC+O0z889cIRelKNdYJAAlry/SCett5wbsqa8P59H2A3VmCe/wZnby1ufih2VOqZq6g10Tx+yGt7GocmIgUwpMl9ob+uFxDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V5bqUeVK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A9A5C4CEF7;
+	Tue,  7 Apr 2026 02:05:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775527502;
+	bh=QAbPk6VWnQg1ID0bqbSVaZJqWzuhr7oU3u8vHAFVY3c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=V5bqUeVK7FEQTESf6if9UYiMQOfsqbgiDnPbwEKGzpMZztP8UvkT0gfb0tloi4KcB
+	 7nC1HYLzApKHl+RGixxl+vnK0N1fhxt+sF4aVRh6/ViApMBp5hs3KopqPRn+epXKoL
+	 zIAEONunhGo8J2YGpkZos6Ea1be0bTqcXNLpL7QdYssWc/C/FnGs0DZR2E+GPyF090
+	 cvv60+P/p2RHJHRe9hiLJwrkDzNAgfbN66bPhUDtOH+ojF2fQFwggEunHxCpJ5cwpS
+	 Sa6nEtUXsAYXym3O7zFCJH2aOTm2zxDrSpQ124xkuPcOfDJd1lw7XTATws4j5eYmtv
+	 aZkjZVOMMeKYw==
+Date: Mon, 6 Apr 2026 19:05:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Arnd Bergmann" <arnd@arndb.de>
+Cc: "Simon Horman" <horms@kernel.org>, "Ilias Apalodimas"
+ <ilias.apalodimas@linaro.org>, "Arnd Bergmann" <arnd@kernel.org>, Netdev
+ <netdev@vger.kernel.org>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S .
+ Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Grygorii Strashko" <grygorii.strashko@ti.com>,
+ "Murali Karicheri" <m-karicheri2@ti.com>, "Siddharth Vadapalli"
+ <s-vadapalli@ti.com>, "Roger Quadros" <rogerq@kernel.org>, "Vladimir
+ Oltean" <vladimir.oltean@nxp.com>, "Alexander Sverdlin"
+ <alexander.sverdlin@gmail.com>, "Ioana Ciornei" <ioana.ciornei@nxp.com>,
+ Linux-OMAP <linux-omap@vger.kernel.org>, "Kevin Hao" <haokexin@gmail.com>,
+ "Daniel Zahka" <daniel.zahka@gmail.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] [v4, net-next] net: ethernet: ti-cpsw:: rename
+ soft_reset() function
+Message-ID: <20260406190500.21c4ec2d@kernel.org>
+In-Reply-To: <64384fd1-edb3-4c7a-9ba8-56385a303d35@app.fastmail.com>
+References: <20260402184726.3746487-1-arnd@kernel.org>
+	<CAC_iWj+vjZ0WnKUuqeFfaPeSoj5ovxZiEmUD5R8hPsRfkqMihQ@mail.gmail.com>
+	<4498f664-15ca-4859-a050-a593f124105f@app.fastmail.com>
+	<20260404091100.GT113102@horms.kernel.org>
+	<64384fd1-edb3-4c7a-9ba8-56385a303d35@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-X-Spamd-Result: default: False [0.04 / 15.00];
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-275824-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275834-lists,netdev=lfdr.de];
-	DMARC_NA(0.00)[iscas.ac.cn];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,linaro.org,vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,ti.com,nxp.com,gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[20];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
-	R_DKIM_NA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.958];
+	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	TO_DN_SOME(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.998];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,iscas.ac.cn:email,iscas.ac.cn:mid]
-X-Rspamd-Queue-Id: 922C23A8F0A
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C29FA3A8D9A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-digital_in_recv_sensf_res() copies the received SENSF response into
-struct nfc_target without bounding the copy to target.sensf_res. A full
-on-wire digital_sensf_res is 19 bytes long, while nfc_target stores 18
-bytes, so oversized or full-length frames can overwrite adjacent stack
-fields before digital_target_found() sees the target.
+On Sun, 05 Apr 2026 21:31:28 +0200 Arnd Bergmann wrote:
+> On Sat, Apr 4, 2026, at 11:11, Simon Horman wrote:
+> > On Thu, Apr 02, 2026 at 09:16:29PM +0200, Arnd Bergmann wrote:  
+> >> On Thu, Apr 2, 2026, at 21:13, Ilias Apalodimas wrote:
+> >> 
+> >> Before the c5013ac1dd0e1 commit, this was a 'static inline' function,
+> >> which is allowed to clash with other identifiers. Making it a global
+> >> symbol during the move was a problem.  
+> >
+> > If we are going to treat this as a fix then probably it should be separated
+> > from the rest of the patchset and routed via net. With the rump patchset
+> > re-submitted to net-next once dependencies are in place.  
+> 
+> I'll drop patch 1 then and send the other two when I get the next
+> regression with duplicate objects in a couple of releases. I'm
+> travelling at the moment and won't have time to rebase and test
+> before the merge window.
+> 
+> It's no longer urgent since both cpsw and dpaa2 have been broken for
+> years now since I first reported the regression.
 
-Reject payloads larger than struct digital_sensf_res and clamp the copy
-into target.sensf_res so valid 19-byte responses keep working while the
-fixed destination buffer stays bounded.
-
-Fixes: 8c0695e4998dd268ff2a05951961247b7e015651 ("NFC Digital: Add NFC-F technology support")
-Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
----
-Changes since v1:
-- target the net tree and use the NFC: digital: prefix
-- add the missing Fixes tag
-- preserve valid 19-byte SENSF responses by clamping the copy into
-  struct nfc_target
-- reject only payloads larger than struct digital_sensf_res
-
-net/nfc/digital_technology.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/net/nfc/digital_technology.c b/net/nfc/digital_technology.c
-index 63f1b721c71d..abf544d917f3 100644
---- a/net/nfc/digital_technology.c
-+++ b/net/nfc/digital_technology.c
-@@ -767,13 +767,18 @@ static void digital_in_recv_sensf_res(struct nfc_digital_dev *ddev, void *arg,
- 	}
- 
- 	skb_pull(resp, 1);
-+	if (resp->len > sizeof(struct digital_sensf_res)) {
-+		rc = -EIO;
-+		goto exit;
-+	}
- 
- 	memset(&target, 0, sizeof(struct nfc_target));
- 
- 	sensf_res = (struct digital_sensf_res *)resp->data;
- 
--	memcpy(target.sensf_res, sensf_res, resp->len);
--	target.sensf_res_len = resp->len;
-+	target.sensf_res_len = min_t(unsigned int, resp->len,
-+				     sizeof(target.sensf_res));
-+	memcpy(target.sensf_res, sensf_res, target.sensf_res_len);
- 
- 	memcpy(target.nfcid2, sensf_res->nfcid2, NFC_NFCID2_MAXSIZE);
- 	target.nfcid2_len = NFC_NFCID2_MAXSIZE;
--- 
-2.50.1 (Apple Git-155)
-
+Seems borderline, let me take it via net-next without the Fixes tag.
 
