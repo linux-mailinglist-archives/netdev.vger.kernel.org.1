@@ -1,208 +1,224 @@
-Return-Path: <netdev+bounces-276008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276009-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id eN7POJkR1Wm30AcAu9opvQ
-	(envelope-from <netdev+bounces-276008-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 16:15:53 +0200
+	id 0CYfNacT1Wm30AcAu9opvQ
+	(envelope-from <netdev+bounces-276009-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 16:24:39 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 571EF3AFDC4
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 16:15:53 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81C543AFF7A
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 16:24:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 158FE30D3EE4
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 14:09:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E5D7630BF027
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 14:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E5A3B388D;
-	Tue,  7 Apr 2026 14:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TWW+DFii"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE703B7B61;
+	Tue,  7 Apr 2026 14:15:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B8539A05E;
-	Tue,  7 Apr 2026 14:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9880F3B19D1;
+	Tue,  7 Apr 2026 14:15:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775570998; cv=none; b=hR1lfD/zcPMX5oeFayhU54O56GR3jtK8QD0IdNGuvp+LgFM3L7Zd8IFuURTkHT6IUBVlVCII0uU+olAoN5kpSkaWz0R11HUebcSke308RoD2G4rUinN8yTJIy9Cn3nvQ0nmRIqDFqc1PAlgcoiUO0WChP6K2W/pJ6ZFcsGnVLOw=
+	t=1775571349; cv=none; b=i/AjnHTZ3Cl7hZzANaTy5rb5vtZl1rBZjDU/UFkIXiAlhrS15FCanUqricOgi305tncg44igZPTujj1z4nbiEEpb8jWABH0sGc7jx22E5CvSXpEMQcBmUQbL31wx6yuAk/e1sron5Y1SKKI/inAOTWAYnmT6EJfx5JhYtFzxQtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775570998; c=relaxed/simple;
-	bh=xMtCdr7WJHpOJDQDwTSSF/AZKyKCLw08CI+TTdGi1r0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FYQYBWfeRWZOT75OHuWxyX4PsT0TBHy9/z28uZBIxCmETU/XVmErKdXuWrMxCP3jhwhc4ZbJDnC+wkl1ERlYfb6tZACzDkhTGNYrmNGH++y6zeKY60cB6OXdNbXCKTI1DPclOKGOmeTN6lGD9hAcDSwAWTF+4f39Pr4X8AjS9M4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TWW+DFii; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=MN6qzqxRs/zqrPwuVs2/6X79CviG+I8DWPs5lk/Ay2c=; b=TWW+DFiilpedgYEvtVyq7aTK32
-	O3BaEiUrFW1cKLzlvwnM8nb50GigIkogLZuJXkkCF0KkWw6k4YhEkMzSNRfhgRZ8AMZ8Shwam0edR
-	pWSEcMgEplZ7851y63OAhIgW3Unkzw0Ou8ZIWTzXZ59MnxmqFXbMt9h+suaD1LRDNLq2/DhwZRRDR
-	rWbqm+UTVyVUYtXuyK4cZmHgdSWSXe3Vu3WujAKjftI7mK2VTOHxaYr+Kp75Q9tkNYh1E/mkBi3AD
-	Zze+0VwODVD2NvONOkTLv91I3qahyeX7LH9AMPR1vxf5X/ODgy06Xn65DxLY6IqJ89NqCla1w3Hme
-	ERjpF/Nw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50812)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1wA77h-0000000010S-2pf6;
-	Tue, 07 Apr 2026 15:09:45 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1wA77U-000000002KF-1WoV;
-	Tue, 07 Apr 2026 15:09:32 +0100
-Date: Tue, 7 Apr 2026 15:09:32 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	bcm-kernel-feedback-list@broadcom.com, richardcochran@gmail.com,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, rohan.g.thomas@altera.com,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org,
-	andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
-	me@ziyao.cc, siyanteng@cqsoftware.com.cn,
-	prabhakar.mahadev-lad.rj@bp.renesas.com,
-	weishangjuan@eswincomputing.com, wens@kernel.org,
-	vladimir.oltean@nxp.com, lizhi2@eswincomputing.com,
-	boon.khai.ng@altera.com, maxime.chevallier@bootlin.com,
-	chenchuangyu@xiaomi.com, yangtiezhu@loongson.cn,
-	ovidiu.panait.rb@renesas.com, chenhuacai@kernel.org,
-	florian.fainelli@broadcom.com, quic_abchauha@quicinc.com
-Subject: Re: [PATCH net-next v9 1/4] net: stmmac: Add DW25GMAC support in
- stmmac core driver
-Message-ID: <adUQHHBD0d3p1OSI@shell.armlinux.org.uk>
-References: <20260402213629.1996133-1-jitendra.vegiraju@broadcom.com>
- <20260402213629.1996133-2-jitendra.vegiraju@broadcom.com>
+	s=arc-20240116; t=1775571349; c=relaxed/simple;
+	bh=6qZjZyJ9GLCN60E6LWzWhxaj/3spMGIYtEashTkIS8E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k33TJJFnxs5SQsueO7rJa9QmmzzG9DGOsddo+rzXaIynOzH7nU5RNnBKhU7rRiBfaK6ubvrv5Q3soW1WjYa9p0pMmJXVZUEWytOwuAXZjeasLbEAP1VAwexQyXJ6Ixueg05CZopFRjdf4EsTKAQFJ72NAdGHlPwpmaAmIxjZV98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 1AC7A60660; Tue, 07 Apr 2026 16:15:45 +0200 (CEST)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net-next 00/13] netfilter: updates for net-next
+Date: Tue,  7 Apr 2026 16:15:27 +0200
+Message-ID: <20260407141540.11549-1-fw@strlen.de>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260402213629.1996133-2-jitendra.vegiraju@broadcom.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.04 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276008-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,foss.st.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,broadcom.com,iogearbox.net,altera.com,st-md-mailman.stormreply.com,lists.infradead.org,lunn.ch,fomichev.me,ziyao.cc,cqsoftware.com.cn,bp.renesas.com,eswincomputing.com,nxp.com,bootlin.com,xiaomi.com,loongson.cn,renesas.com,quicinc.com];
-	RCPT_COUNT_TWELVE(0.00)[37];
+	TAGGED_FROM(0.00)[bounces-276009-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	DMARC_NA(0.00)[strlen.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_SPAM(0.00)[0.245];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[fw@strlen.de,netdev@vger.kernel.org];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.916];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[shell.armlinux.org.uk:mid,mii.data:url,armlinux.org.uk:url,broadcom.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 571EF3AFDC4
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,strlen.de:mid]
+X-Rspamd-Queue-Id: 81C543AFF7A
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Not withstanding my comment about the other Synopsys xlgmac driver that
-we have in the kernel...
+Hi,
 
-On Thu, Apr 02, 2026 at 02:36:26PM -0700, Jitendra Vegiraju wrote:
-> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-> 
-> The DW25GMAC introduced a new DMA architecture called Hyper-DMA (HDMA) for
-> virtualization scalability. This is realized by decoupling physical DMA
-> channels(PDMA) from potentially large number of virtual DMA channels(VDMA).
-> The VDMAs provide software abstraction to driver that map to PDMAs for
-> frame transmission and reception.
-> Since 25GMAC is a derivative of XGMAC, majority of IP is common to both.
-> 
-> To add support for the HDMA in 25GMAC, a new instance of dma_ops,
-> dw25gmac400_dma_ops is introduced.
-> To support the current needs, a simple one-to-one mapping of dw25gmac's
-> logical VDMA (channel) to TC to PDMAs is used. Most of the other dma
-> operation functions in existing dwxgamc2_dma.c file are reused whereever
+The following patchset contains Netfilter fixes for *net-next*:
 
-Typo: dwxgmac2_dma.c
+1) Fix ancient sparse warnings in nf conntrack nat modules, from
+   Sun Jian.
+2) Fix typo in enum description, from Jelle van der Waa.
+3) remove redundant refetch of netns pointer in nf_conntrack_sip.
+4) add a deprecation warning for dccp match.
+   We can extend the deadline later if needed, but plan atm is to
+   remove the feature.
+5) remove nf_conntrack_h323 debug code that can read out-of-bounds
+   with malformed messages. This code was commented out, but better
+   remove this.
+6+7) add more netlink policy validations in netfilter.
+   This could theoretically cause issues when a client sends e.g.
+   unsupported feature flags that were previously ignored, so we
+   may have to relax some changes. For now, try to be stricter and
+   reject upfront.
+8+9) minor code cleanup in nft_set_pipapo (an nftables set backend).
+10) Add nftables matching support fro double-tagged vlan and pppoe
+    frames, from Pablo Neira Ayuso.
+11) Fix up indentation of debug messages in nf_conntrack_h323 conntrack
+    helper, from David Laight.
+12) Add a helper to iterate to next flow action and bail out if the
+    maximum number of actions is reached, also from Pablo.
+13) Impose more retrictions on expectations attached via ctnetlink
+    control plane by restricting this based on the helper attached to
+    the master conntrack, also from Pablo Neira Ayuso.
 
-> applicable.
-> Added setup function for DW25GMAC's stmmac_hwif_entry in stmmac core.
+Please, pull these changes from:
+The following changes since commit 97a8355b6a715c79c090b906894e12dc3934b3fe:
 
-In a previous review, I questioned the use of DWMAC_CORE_25GMAC and
-asked about its version numberspace. I believe you indicated that the
-version numberspace is the same as the existing XGMAC core.
+  Merge branch 'net-mlx5e-xdp-add-support-for-multi-packet-per-page' (2026-04-07 13:34:08 +0200)
 
-I'm going to question the value of adding DWMAC_CORE_25GMAC.
+are available in the Git repository at:
 
-1. What is the value of splitting DWMAC_CORE_25GMAC from
-   DWMAC_CORE_XGMAC given that it's in the same versioning numberspace
-   as XGMAC, and most tests (via dwmac_is_xgmac()) test for XGMAC or
-   25GMAC?
+  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-26-04-07
 
-2. Have you reviewed all the places that explicitly test for
-   DWMAC_CORE_XGMAC, looking at their "false" paths (for non-XGMAC
-   cores) to determine whether they are suitable? For example:
+for you to fetch changes up to ead9479042e7349e3deab204add7b7ccebe20429:
 
-        if (priv->plat->core_type == DWMAC_CORE_XGMAC)
-                ndev->max_mtu = XGMAC_JUMBO_LEN;
-        else if (priv->plat->enh_desc || priv->synopsys_id >= DWMAC_CORE_4_00)
-                ndev->max_mtu = JUMBO_LEN;
-        else
-                ndev->max_mtu = SKB_MAX_HEAD(NET_SKB_PAD + NET_IP_ALIGN);
+  netfilter: ctnetlink: restrict expectfn to helper (2026-04-07 15:48:16 +0200)
 
-   XGMAC can handle a max MTU of 16368, but with your code using
-   DWMAC_CORE_25GMAC, we fall back to the next test, which tests the
-   IP version against 0x40, and uses a max MTU of 9000. Given that
-   DWMAC_CORE_4_00 is a different "version number space" this seems
-   wrong.
+----------------------------------------------------------------
+netfilter pull request nf-next-26-04-07
 
-3. Looking at the MDIO code, this looks very wrong if you're
-   introducing DWMAC_CORE_25GMAC. Have you tested MDIO accesses?
+----------------------------------------------------------------
+David Laight (1):
+  netfilter: nf_conntrack_h323: Correct indentation when H323_TRACE
+    defined
 
-   dwxgmac2_setup() is called for DWMAC_CORE_XGMAC core-type. In
-   stmmac_mdio_register(), DWMAC_CORE_XGMAC uses different functions
-   for MDIO bus access for C22 and C45 from other cores - it uses the
-   stmmac_xgmac2_mdio_* functions.
+Florian Westphal (7):
+  netfilter: nf_conntrack_sip: remove net variable shadowing
+  netfilter: add deprecation warning for dccp support
+  netfilter: nf_conntrack_h323: remove unreliable debug code in
+    decode_octstr
+  netfilter: add more netlink-based policy range checks
+  netfilter: nf_tables: add netlink policy based cap on registers
+  netfilter: nft_set_pipapo: increment data in one step
+  netfilter: nft_set_pipapo_avx2: remove redundant loop in lookup_slow
 
-   These use stmmac_xgmac2_c45_format() and stmmac_xgmac2_c22_format()
-   to format the register values which do not depend on mii.*_mask, but
-   do use mii.address and mii.data for the register offsets. Thus, is
-   there any point to setting mii.addr_mask and mii.reg_mask ?
+Jelle van der Waa (1):
+  netfilter: nf_tables: Fix typo in enum description
 
-   For non-DWMAC_CORE_XGMAC cores, we fall back to the stmmac_mdio_*()
-   functions, which for non-DWMAC_CORE_GMAC4 will only support Clause
-   22 access, not Clause 45 - which would be very strange for a 25G
-   core.
+Pablo Neira Ayuso (3):
+  netfilter: nft_meta: add double-tagged vlan and pppoe support
+  netfilter: nf_tables_offload: add nft_flow_action_entry_next() and use
+    it
+  netfilter: ctnetlink: restrict expectfn to helper
 
-4. What about the feature printing in
-   stmmac_main.c::stmmac_dma_cap_show() ?
+Sun Jian (1):
+  netfilter: use function typedefs for __rcu NAT helper hook pointers
 
-5. What about similar tests in stmmac_est.c and stmmac_ethtool.c ?
-
-
-
+ include/linux/netfilter/nf_conntrack_amanda.h | 15 +++--
+ include/linux/netfilter/nf_conntrack_ftp.h    | 17 +++---
+ include/linux/netfilter/nf_conntrack_irc.h    | 15 +++--
+ include/linux/netfilter/nf_conntrack_snmp.h   | 11 ++--
+ include/linux/netfilter/nf_conntrack_tftp.h   |  9 ++-
+ include/net/netfilter/nf_conntrack_helper.h   |  3 +-
+ include/net/netfilter/nf_tables.h             |  4 ++
+ include/net/netfilter/nf_tables_ipv4.h        | 17 ++++--
+ include/net/netfilter/nf_tables_ipv6.h        | 16 +++--
+ include/net/netfilter/nf_tables_offload.h     | 10 ++++
+ include/uapi/linux/netfilter/nf_tables.h      |  6 +-
+ net/ipv4/netfilter/nf_nat_h323.c              |  2 +
+ net/netfilter/ipset/ip_set_core.c             |  2 +-
+ net/netfilter/nf_conntrack_amanda.c           | 10 +---
+ net/netfilter/nf_conntrack_ftp.c              | 10 +---
+ net/netfilter/nf_conntrack_h323_asn1.c        | 45 ++++++--------
+ net/netfilter/nf_conntrack_helper.c           |  5 +-
+ net/netfilter/nf_conntrack_irc.c              | 10 +---
+ net/netfilter/nf_conntrack_netlink.c          |  2 +-
+ net/netfilter/nf_conntrack_sip.c              |  3 +-
+ net/netfilter/nf_conntrack_snmp.c             |  7 +--
+ net/netfilter/nf_conntrack_tftp.c             |  7 +--
+ net/netfilter/nf_dup_netdev.c                 |  5 +-
+ net/netfilter/nf_nat_sip.c                    |  1 +
+ net/netfilter/nf_tables_api.c                 | 20 +++++--
+ net/netfilter/nf_tables_core.c                |  2 +-
+ net/netfilter/nfnetlink_acct.c                |  2 +-
+ net/netfilter/nfnetlink_cthelper.c            |  2 +-
+ net/netfilter/nfnetlink_hook.c                |  2 +-
+ net/netfilter/nfnetlink_log.c                 |  4 +-
+ net/netfilter/nfnetlink_osf.c                 |  2 +-
+ net/netfilter/nfnetlink_queue.c               |  2 +-
+ net/netfilter/nft_bitwise.c                   |  6 +-
+ net/netfilter/nft_byteorder.c                 |  4 +-
+ net/netfilter/nft_cmp.c                       |  2 +-
+ net/netfilter/nft_compat.c                    |  2 +-
+ net/netfilter/nft_connlimit.c                 |  2 +-
+ net/netfilter/nft_ct.c                        |  6 +-
+ net/netfilter/nft_dynset.c                    |  3 +-
+ net/netfilter/nft_exthdr.c                    |  9 ++-
+ net/netfilter/nft_fib.c                       |  2 +-
+ net/netfilter/nft_hash.c                      |  4 +-
+ net/netfilter/nft_immediate.c                 |  6 +-
+ net/netfilter/nft_inner.c                     |  2 +-
+ net/netfilter/nft_limit.c                     |  2 +-
+ net/netfilter/nft_log.c                       |  2 +-
+ net/netfilter/nft_lookup.c                    |  4 +-
+ net/netfilter/nft_meta.c                      | 58 ++++++++++++++++++-
+ net/netfilter/nft_numgen.c                    |  2 +-
+ net/netfilter/nft_objref.c                    |  2 +-
+ net/netfilter/nft_osf.c                       |  4 +-
+ net/netfilter/nft_payload.c                   |  8 +--
+ net/netfilter/nft_queue.c                     |  2 +-
+ net/netfilter/nft_quota.c                     |  2 +-
+ net/netfilter/nft_range.c                     |  2 +-
+ net/netfilter/nft_rt.c                        |  2 +-
+ net/netfilter/nft_set_pipapo.c                |  4 +-
+ net/netfilter/nft_set_pipapo.h                |  3 -
+ net/netfilter/nft_set_pipapo_avx2.c           | 32 +++-------
+ net/netfilter/nft_socket.c                    |  2 +-
+ net/netfilter/nft_synproxy.c                  |  4 +-
+ net/netfilter/nft_tunnel.c                    |  6 +-
+ net/netfilter/nft_xfrm.c                      |  6 +-
+ net/netfilter/xt_dccp.c                       |  3 +
+ 64 files changed, 271 insertions(+), 195 deletions(-)
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.52.0
 
