@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-275835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275836-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id ML71JRJq1GlQtwcAu9opvQ
-	(envelope-from <netdev+bounces-275835-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:21:06 +0200
+	id EEy/Lydq1GletwcAu9opvQ
+	(envelope-from <netdev+bounces-275836-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:21:27 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 443A03A8F8B
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:21:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F98D3A8F9C
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:21:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 738E9303DD07
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:20:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E31A430474D9
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B5D34E74B;
-	Tue,  7 Apr 2026 02:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1917334F46D;
+	Tue,  7 Apr 2026 02:20:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cq6tYqz+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WChUrc0V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F1934D4EA;
-	Tue,  7 Apr 2026 02:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98F635893;
+	Tue,  7 Apr 2026 02:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775528445; cv=none; b=WvxmqBdTAJvJt2+6gpzAwKuvz1UuBF2I33A/FQITfBVwTaQB2PrX+H4WJhrix9+ScW7qDa53mbi5Jo5dglpUJYeRfQn6ASGBBnCIsP6sZjkT4c261Fg0koLnvVzT6vNVCxpHLtr/1k/kq7BXoKbvZ9sLelB0KBgcXq38v1GYxMw=
+	t=1775528446; cv=none; b=oSa5hSxl4JvUoH+MD2gUANiGhoQBLGQLVF+pF1iDEKYHMZvIbS2BgG3nE3r10kvQnl1ZdbFErWa04EPeL4l6Q+mJbfNEFoI2VdEm+OSJHkAJzjuit7ke7aoss3xwMm+qiICOKJ6wKqClemS1D0pbk4iUeb9TZ2c60Do+TM2BX90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775528445; c=relaxed/simple;
-	bh=alNwXDLkA8tDaP+3/itxFIwRAifX5uOLvOtmvlBVT6w=;
+	s=arc-20240116; t=1775528446; c=relaxed/simple;
+	bh=05wv7UBxC6F1xpRjeHp3mezC2Pa262FFuui5eUoKY4A=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YBiH1FmKjclttYRNLj/apG0CyTeqjbTj1PmbXWEVYBC0lZWO2W2hyvh40gQBfqc9V2JQQZNveKdnXf9POmKzXUx4GSnuBKPjJiiYo4B6ZvBlD+Chz6UMzTuoQgBAPcmc7PO4gWVHgyw2qJMATz89UHlXwtjY6kCatWbMa1x2p8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cq6tYqz+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77314C4CEF7;
-	Tue,  7 Apr 2026 02:20:44 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=dUfwHTOLy700yfDH+ApXZnNLYfSXe+9gz0kUDaJcYNoIw13a4t6HvTr9fTMIaMKJCjqB7pQd1/hlFq3cHNR/Gyk11k9KNvDIMf59CblsPnvlU1SoPgtyL8AilBku+BK6CornUB5sCXkErHFJx/Ljye9nmY2n89yEqv4F7Z9adcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WChUrc0V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB32DC2BCB1;
+	Tue,  7 Apr 2026 02:20:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775528444;
-	bh=alNwXDLkA8tDaP+3/itxFIwRAifX5uOLvOtmvlBVT6w=;
+	s=k20201202; t=1775528445;
+	bh=05wv7UBxC6F1xpRjeHp3mezC2Pa262FFuui5eUoKY4A=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Cq6tYqz+4BWZkTNLy0FdmHvBUqZi3+1Tu1fFU27exvjLopxNJ7lgX/3S2F/TSi7HU
-	 LWhzw730wHBmm9Pqp/T4HYFMtcT45blfiQN2LycLQsLuSx4Vn+HQ2xyCz1ynEU/OyX
-	 gMjvXKX7K8apJW4iVhFBQgWZCRjAEiETwcVb/URAZwlOviAFwnv4OIRuxo3QbVI2dI
-	 3ZJ0S+h/nGyYHVLLSv4dkOYt2sM12OztYK9v9e9aQpNz3KeSxnenmCtPzmqiWTYqVe
-	 O4reme+p4rpzJ3LdXu4LQJitRS4EU/J8mFdj7K4Vz1sbdEM33l9xp+lCsBQdD9v7T9
-	 VMCcxATt3QH5g==
+	b=WChUrc0V/q1omU30QqKfIe3vj13c0Iv4eVgcD/PRHo1pdD+zhPGNQ4BunXIYAFwEH
+	 7KIvUap7g/MMAQMCG+vS7AWbMO0QCCOgFzZrz13sL6GbAvR1gb+3wmA5MksoI2oSn9
+	 PfVumZL9bZsNkJ4rT4BSRAGFyyzzorTfQSrynPNXCtSo0Z7n73HcNfwyW9C0rySExX
+	 K8CmK+VKzpjDVmyWh9ZHtxQZjHuUHPKJxdV3nrJa7CvJSycOo9Bk7cwNgWMhdQeCqY
+	 a6aeUVsCUW959PfaLio5H/VEpqSAzn8BMQebkOhDoWEmlmENfXTbwNzHuKpAtv68h4
+	 KmYujJya5LJow==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02C473809A28;
-	Tue,  7 Apr 2026 02:20:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FED03809A28;
+	Tue,  7 Apr 2026 02:20:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -55,48 +55,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] mptcp: support MSG_EOR and small cleanups
+Subject: Re: [PATCH 1/3] [v4,
+ net-next] net: ethernet: ti-cpsw:: rename soft_reset() function
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <177552842280.3346653.6456875572655445146.git-patchwork-notify@kernel.org>
-Date: Tue, 07 Apr 2026 02:20:22 +0000
-References: 
- <20260403-net-next-mptcp-msg_eor-misc-v1-0-b0b33bea3fed@kernel.org>
-In-Reply-To: 
- <20260403-net-next-mptcp-msg_eor-misc-v1-0-b0b33bea3fed@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: martineau@kernel.org, geliang@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org, mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
- yangang@kylinos.cn, ncardwell@google.com, kuniyu@google.com,
- dsahern@kernel.org, shuah@kernel.org, linux-kselftest@vger.kernel.org
-X-Spamd-Result: default: False [-2.16 / 15.00];
+ <177552842404.3346653.1362966815028978410.git-patchwork-notify@kernel.org>
+Date: Tue, 07 Apr 2026 02:20:24 +0000
+References: <20260402184726.3746487-1-arnd@kernel.org>
+In-Reply-To: <20260402184726.3746487-1-arnd@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ grygorii.strashko@ti.com, ilias.apalodimas@linaro.org, m-karicheri2@ti.com,
+ s-vadapalli@ti.com, rogerq@kernel.org, vladimir.oltean@nxp.com,
+ alexander.sverdlin@gmail.com, ioana.ciornei@nxp.com,
+ linux-omap@vger.kernel.org, arnd@arndb.de, haokexin@gmail.com,
+ daniel.zahka@gmail.com, linux-kernel@vger.kernel.org
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,ti.com,linaro.org,nxp.com,gmail.com,arndb.de];
 	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275835-lists,netdev=lfdr.de,netdevbpf];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_FROM(0.00)[bounces-275836-lists,netdev=lfdr.de,netdevbpf];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	RCPT_COUNT_TWELVE(0.00)[17];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	NEURAL_HAM(-0.00)[-0.999];
 	RCVD_COUNT_FIVE(0.00)[5];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NO_DN(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
+	MISSING_XM_UA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: 443A03A8F8B
+X-Rspamd-Queue-Id: 2F98D3A8F9C
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
@@ -105,28 +108,23 @@ Hello:
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 03 Apr 2026 13:29:26 +0200 you wrote:
-> This series contains various unrelated patches:
+On Thu,  2 Apr 2026 20:46:53 +0200 you wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> - Patches 1 & 2: support MSG_EOR instead of ignoring it.
-> 
-> - Patch 3: avoid duplicated code in TCP and MPTCP by using a new helper.
-> 
-> - Patch 4: remove duplicated condition.
+> While looking at the glob symbols shared between the cpsw drivers,
+> I noticed that soft_reset() is the only one that is missing a proper
+> namespace prefix, and will pollute the kernel namespace, so rename
+> it to be consistent with the other symbols.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/5] mptcp: reduce 'overhead' from u16 to u8
-    https://git.kernel.org/netdev/net-next/c/00d46be3c319
-  - [net-next,2/5] mptcp: preserve MSG_EOR semantics in sendmsg path
-    https://git.kernel.org/netdev/net-next/c/7fb2f5f96499
-  - [net-next,3/5] tcp: add recv_should_stop helper
-    https://git.kernel.org/netdev/net-next/c/eb477fdd6803
-  - [net-next,4/5] mptcp: pm: in-kernel: remove mptcp_pm_has_addr_attr_id
-    (no matching commit)
-  - [net-next,5/5] selftests: mptcp: join: recreate signal endp with same ID
-    https://git.kernel.org/netdev/net-next/c/c4a5cb2f00f9
+  - [1/3,v4,net-next] net: ethernet: ti-cpsw:: rename soft_reset() function
+    https://git.kernel.org/netdev/net-next/c/961f3c535608
+  - [2/3,v4,net-next] net: ethernet: ti-cpsw: fix linking built-in code to modules
+    https://git.kernel.org/netdev/net-next/c/df75bd552a87
+  - [3/3,v4,net-next] dpaa2: avoid linking objects into multiple modules
+    https://git.kernel.org/netdev/net-next/c/ede3136e5655
 
 You are awesome, thank you!
 -- 
