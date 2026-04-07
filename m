@@ -1,219 +1,157 @@
-Return-Path: <netdev+bounces-276103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276104-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EM7UGog71WlY3AcAu9opvQ
-	(envelope-from <netdev+bounces-276103-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 19:14:48 +0200
+	id ODD+Bww81WlY3AcAu9opvQ
+	(envelope-from <netdev+bounces-276104-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 19:17:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D92973B23EC
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 19:14:47 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AA683B2428
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 19:16:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 96C95302E7C5
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 17:14:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 69E7D3019916
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 17:16:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6E8389444;
-	Tue,  7 Apr 2026 17:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78002331205;
+	Tue,  7 Apr 2026 17:16:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="yWA2jgE0";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="xwASnASo";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="C0isRJE7";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NfGd7tfS"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="nwvdPUeD";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="onTavs78"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-y-209.mailbox.org (mout-y-209.mailbox.org [91.198.250.237])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5BA433CEA8
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 17:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCC8303A37;
+	Tue,  7 Apr 2026 17:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.237
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775582085; cv=none; b=I964r0N5IW44Kq/mLu08NqPf7+C12uGF8A0SPl65ZYSgsmxXv0ZJ9ZKZHInvqNhX4rEuf8Q9iToG+60jOBVuJKnsyTa+rFBspZ/YACUlsK3xMw8WHC424+4tIjNmWlcGmfdHqjf9UKfp5L7dTl2wa+h7czJyGqf2UjDoF0hEwc4=
+	t=1775582202; cv=none; b=RZSGZo0egXa3X8cWG+aMWRgexW/gI7rKSaO3Bi+MB/2myQP0/8bTzBihTjqpCPvsRAOoitKI1MwW7T6Nrg0QFP2qZz+xxPfG6CXSaOzDpeZ+aAOpx1dXDT2pHnIg81b+epjevBoed9G/MT/xEhN0SFZJpv4MpA0Ig9yhj/K7/lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775582085; c=relaxed/simple;
-	bh=PCb7jzDtZrltEUDUs+KdG2BSSzrGlb0wi1TNmgcM+U0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BWewg3d3XLIVOuUElXTQyPuhEwci42SozlU4l2TUBGGNPyw+1vyapAD7CV9NyMVtxZz11LMZSHmvOuaV45PSTG2OceUzVZ19S8GpnXTeItuN24P6DTdhUmXdiKaqsQVsuiTAIukSeHUqk0/R9HxQw5xhC+7SbU6CQA9OSFgFuD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=yWA2jgE0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=xwASnASo; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=C0isRJE7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NfGd7tfS; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	s=arc-20240116; t=1775582202; c=relaxed/simple;
+	bh=hM2XUXPoIDYLSjP+/KTrF5awXYnBkmdlM1IybsbYYjI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NC5KPRijPXz96OZv6ZhDalVRh8ayj33UIOWb5f/sKs2NZa73rOw1FtmDszwummwlbHHUWGWrIKlxB4GSdrtBEGVyZQ3IYS3+spTLbXjMNoMoPEmvlwYPeSlbzdLyQJbjeOPUfcCfFPIhFXtT+n77XqkBcgzG6g8qIW0613lHjKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=nwvdPUeD; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=onTavs78; arc=none smtp.client-ip=91.198.250.237
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id CC8F24E51B;
-	Tue,  7 Apr 2026 17:14:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1775582082; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SXOpCoMcgIKJsO4Rl6iRpkevFMz/CPZkJyzyynfYR1o=;
-	b=yWA2jgE0q9hTqhANoJigiz8jCMYeoL/hqQkEj7dx/blnNdj0bYnwR4BKrv0CFJtTf1Pn7s
-	OolEpSHSTYSlcd9yLA/Mo6gDLiefsbDZU2OvAoAP6K9xXxvO7LMdIgB8z86V5OtwFs3TV/
-	L18/vDzx9k8CJkNE8k93NOdhBnwNv1k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1775582082;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SXOpCoMcgIKJsO4Rl6iRpkevFMz/CPZkJyzyynfYR1o=;
-	b=xwASnASoZz1KloteDvd+0zyv85QdoR8w4F04wMxPgaetHnU2I4FkQfEh17xqOmAXFGCTT2
-	6BAUKzAkVlyhU+Dg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=C0isRJE7;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=NfGd7tfS
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1775582081; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SXOpCoMcgIKJsO4Rl6iRpkevFMz/CPZkJyzyynfYR1o=;
-	b=C0isRJE7pQwyhOeK13RlvVoJMVgtlfIqwFeG3UAUStOc2/6pssesss3PBq7rtX9TJEswUi
-	m6zIgTCKBAlwOABaznsHeCSQI9cGwQUK3AlWrkfOpbZv77moAWL4p8tW+bq1+VCYqEu1QU
-	QpM9JMJQdrC+mVhSzfnF7x/HotJZiGk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1775582081;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SXOpCoMcgIKJsO4Rl6iRpkevFMz/CPZkJyzyynfYR1o=;
-	b=NfGd7tfSk5tPMuNapgJIqrI+XDPF2wCX3g0RqXQKm11E+PukiUEisi9rv8gAGwbCDKGomC
-	fw2FXIbnwJc3LfBw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5D92C4A0B0;
-	Tue,  7 Apr 2026 17:14:41 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id thZgE4E71WnjNwAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Tue, 07 Apr 2026 17:14:41 +0000
-Message-ID: <80b74501-5c15-4b69-a825-b747ac509855@suse.de>
-Date: Tue, 7 Apr 2026 19:14:21 +0200
+	by mout-y-209.mailbox.org (Postfix) with ESMTPS id 4fqtCM5swyzB0xJ;
+	Tue,  7 Apr 2026 19:16:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1775582191;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2PA7xCx97TEAuzYmmiZwCMtjFGZYSyx4V6yHSoLVI/I=;
+	b=nwvdPUeDPGTRKVGgGJRef2iMUEeivlso60Bcvnd6z8ua2Nh+4J8dXFJTF0pty2HCMaL6UZ
+	5ENgJeTchcupsXhB6GOp2yekRraV+TmKk8ucmioUaQ6yEQKJ43LmOhkQ7R5pWLkIV1Pfru
+	6OLIU88xUAD1FqecQlSxjHDA4N2vSHxwXzEwLZ0iD36QsqT46DUuM0aB4CzIwPMHjVMD85
+	r/OFoooPluJfHHVS5wOP6VOLoKu3Lk4UEfLnJhTTLpAYnHjVjFe9OvPtUgUI/w8449YYDo
+	iGkhpYbx2SMsUGzY3e284njVYqkFI61JIwV4o/xQi/g8+e8lB0FdmYaeOMuLGg==
+From: Mashiro Chen <mashiro.chen@mailbox.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1775582189;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2PA7xCx97TEAuzYmmiZwCMtjFGZYSyx4V6yHSoLVI/I=;
+	b=onTavs788rmYy7PpZDimSU+6mSY0ocUMe3kAAYjIZaXVWi7BPswjBLz8LytPfrse/6ksoe
+	tJGBS8IJUATQaKYhJbsPaQS9iy89hX2HL+VnotAOg7zpnEeJFgfoel7AsqZDvJRGoj05eS
+	Qrf9hACxBkQXkCYjaKvkgtB9DqMEuYMVb4HbPOTrOyYXilo5JNTglaixpspcXAolOTrUvK
+	LwMuyVA78XXIV5oqA8Egx1Gl64upSXgJQwwgTnq3MXW54r19CGyK13yOhviflRzZmAOkLN
+	CwORyeAygafAptCvdtC9awVzl6jKv56O2Vj8CbDMVOnZ2JsV/5W6GLg5qSfOig==
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	gregkh@linuxfoundation.org,
+	ben@decadent.org.uk,
+	linux-hams@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Mashiro Chen <mashiro.chen@mailbox.org>
+Subject: [PATCH 0/3] net: fix three security bugs in NET/ROM and ROSE stacks
+Date: Wed,  8 Apr 2026 01:15:57 +0800
+Message-ID: <20260407171600.102988-1-mashiro.chen@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net_sched: fix skb memory leak in deferred qdisc
- drops
-To: netdev@vger.kernel.org
-Cc: horms@kernel.org, pabeni@redhat.com, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net,
- Damilola Bello <damilola@aterlo.com>
-References: <20260407170214.4157-2-fmancera@suse.de>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <20260407170214.4157-2-fmancera@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-MBO-RS-META: 75tnszh3syzh39qoy89warp8zo197oq5
+X-MBO-RS-ID: b14e8d03dc0354285bf
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[suse.de,none];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276103-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276104-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[4];
+	MISSING_XM_UA(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[fmancera@suse.de,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mashiro.chen@mailbox.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[mailbox.org:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,suse.de:mid,aterlo.com:email,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D92973B23EC
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mailbox.org:dkim,mailbox.org:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 7AA683B2428
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
+This series fixes three bugs in the Linux kernel AX.25 protocol stack,
+submitted on top of Greg Kroah-Hartman's frame-size validation series
+(https://lore.kernel.org/r/2026040730-untagged-groin-bbb7@gregkh).
 
+Patch 1 fixes an integer overflow in nr_queue_rx_frame(): nr_sock.fraglen
+is declared as unsigned short and accumulates received fragment lengths
+without overflow protection.  When total received data exceeds 65535 bytes,
+fraglen wraps to a small value, causing alloc_skb() to allocate a tiny
+buffer followed by a full-length copy -- a heap out-of-bounds write.
 
-On 4/7/26 7:02 PM, Fernando Fernandez Mancera wrote:
-> When the network stack cleans up the deferred list via qdisc_run_end(),
-> it operates on the root qdisc. If the root qdisc do not implement the
-> TCQ_F_DEQUEUE_DROPS flag the packets queue to free are never freed and
-> gets stranded on the child's local to_free list.
-> 
-> Fix this by making qdisc_dequeue_drop() aware of the root qdisc. It
-> fetches the root qdisc and check for the TCQ_F_DEQUEUE_DROPS flag. If
-> the flag is present, the packet is appended directly to the root's
-> to_free list. Otherwise, drop it directly as it was done before the
-> optimization was implemented.
-> 
-> Fixes: a6efc273ab82 ("net_sched: use qdisc_dequeue_drop() in cake, codel, fq_codel")
-> Reported-by: Damilola Bello <damilola@aterlo.com>
-> Closes: https://lore.kernel.org/netdev/CAPgFtOLaedBMU0f_BxV2bXftTJSmJr018Q5uozOo5vVo6b9tjw@mail.gmail.com/
-> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
-> ---
->   include/net/sch_generic.h | 12 +++++++++---
->   1 file changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-> index c3d657359a3d..61ba54e909f2 100644
-> --- a/include/net/sch_generic.h
-> +++ b/include/net/sch_generic.h
-> @@ -1170,12 +1170,18 @@ static inline void tcf_kfree_skb_list(struct sk_buff *skb)
->   static inline void qdisc_dequeue_drop(struct Qdisc *q, struct sk_buff *skb,
->   				      enum skb_drop_reason reason)
->   {
-> +	struct Qdisc *root = qdisc_root_sleeping(q);
-> +
->   	DEBUG_NET_WARN_ON_ONCE(!(q->flags & TCQ_F_DEQUEUE_DROPS));
->   	DEBUG_NET_WARN_ON_ONCE(q->flags & TCQ_F_NOLOCK);
->   
-> -	tcf_set_drop_reason(skb, reason);
-> -	skb->next = q->to_free;
-> -	q->to_free = skb;
-> +	if (root->flags & TCQ_F_DEQUEUE_DROPS) {
-> +		tcf_set_drop_reason(skb, reason);
-> +		skb->next = q->to_free;
-> +		q->to_free = skb;
-> +	} else {
-> +		kfree_skb_reason(skb, reason);
-> +	}
->   }
->   
+Patch 2 fixes nr_find_socket() dispatching incoming NR_INFO frames by
+matching only the circuit index/id bytes without validating the source
+callsign against the socket's dest_addr.  Any node can inject frames into
+an existing STATE_3 connection by guessing the circuit ID (the value space
+is only 65025 non-zero pairs and IDs are assigned sequentially).  Combined
+with the fraglen overflow in patch 1, this gives an unauthenticated
+attacker a complete heap corruption primitive.
 
-*sigh* this is missing the following diff - tested it but forgot to 
-amend it. Anyway, Eric let me know what do you think, if you like this 
-solution I can send the v2 appending the skb to the root's to_free list 
-properly.
+Patch 3 fixes an out-of-bounds read in rose_parse_ccitt(): the function
+validates 10 <= l <= 20 but never checks that the remaining buffer is at
+least l+2 bytes before calling memcpy().  rose_parse_national() already
+performs the equivalent check; this patch adds the same guard.
 
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index 61ba54e909f2..0e4166319c02 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -1177,8 +1177,8 @@ static inline void qdisc_dequeue_drop(struct Qdisc 
-*q, struct sk_buff *skb,
+Mashiro Chen (3):
+  net: netrom: fix integer overflow in nr_queue_rx_frame()
+  net: netrom: validate source address in nr_find_socket()
+  net: rose: fix out-of-bounds read in rose_parse_ccitt()
 
-         if (root->flags & TCQ_F_DEQUEUE_DROPS) {
-                 tcf_set_drop_reason(skb, reason);
--               skb->next = q->to_free;
--               q->to_free = skb;
-+               skb->next = root->to_free;
-+               root->to_free = skb;
-         } else {
-                 kfree_skb_reason(skb, reason);
-         }
+ net/netrom/af_netrom.c | 11 +++++++----
+ net/netrom/nr_in.c     | 10 ++++++++++
+ net/rose/rose_subr.c   |  3 +++
+ 3 files changed, 20 insertions(+), 4 deletions(-)
+
+-- 
+2.53.0
 
 
