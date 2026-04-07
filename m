@@ -1,119 +1,279 @@
-Return-Path: <netdev+bounces-275825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275859-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id qKrdKalm1GnptgcAu9opvQ
-	(envelope-from <netdev+bounces-275825-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:06:33 +0200
+	id oFZoBTV71GmxuQcAu9opvQ
+	(envelope-from <netdev+bounces-275859-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 05:34:13 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FC093A8DD9
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:06:33 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60C903A96E7
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 05:34:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id ACB0A300DF66
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:06:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9AA7730166D7
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 03:34:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A67026FA6F;
-	Tue,  7 Apr 2026 02:06:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79644374169;
+	Tue,  7 Apr 2026 03:34:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a/9MC9sH"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BCC1DE8BE;
-	Tue,  7 Apr 2026 02:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775527587; cv=none; b=dvFdiB0lmLK4p+mGfN2iPNMfwC/Q9N+gXm9bUoL88cAwmRxjooRaRN2vWUNoUTPxgN4QjA5nC8hkx+U9X6w6MkrQfSRqOPgpreYaCqJE+dEwm8luMZ2WZHOHTtWyjNdWAsZEYXilw6m0cFKOQiSsBlza4Ulzq53tyxR5JBpP63Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775527587; c=relaxed/simple;
-	bh=+f2UOPImH35g4Dc44A84oU2dmZHo2HxTfwAD8Wjygko=;
-	h=From:Date:Message-ID:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b6Mnecg3JR3w9xpA1AqJKWRC/5ahlVxyv6RV97usj6e9yGKpj/6SuZ5Jx+mcCGTMUBmMwPNxPKIet3/DRvgVxhesG8Xp2Wx/Spqg8+cqUfbAXm262vCQcG2g9EOIacFGVoPj5FgPbckWQ28oEauqeRX+RUrmOxUdVUeQWRrDyg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from 0004-nfc-sensf-reply.eml (unknown [111.196.245.197])
-	by APP-01 (Coremail) with SMTP id qwCowACnT2uRZtRpHZx2DA--.46852S2;
-	Tue, 07 Apr 2026 10:06:09 +0800 (CST)
-From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Date: Tue, 7 Apr 2026 11:30:03 +0800
-Message-ID: <20260407113003.4-nfc-sensf-reply-pengpeng@iscas.ac.cn>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kees Cook <kees@kernel.org>, linux-kernel@vger.kernel.org, pengpeng@iscas.ac.cn
-Subject: Re: [PATCH] net/nfc: bound SENSF response copy length
-In-Reply-To: <20260322031922.57949-1-pengpeng@iscas.ac.cn>
-References: <20260322031922.57949-1-pengpeng@iscas.ac.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDD91E505
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 03:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775532846; cv=pass; b=G1xIeuxG8pPUoBXTDsGGANzcP2Wd1vrFXLzDczjQP5loP5vi3eMwHwQQXVU/u7Y5MSBhFGTOn02rGMpZ2IdwG7dtZy5VLTGpmzke34n5YKdm6eA200FY72L+M/NlinjuwpkEbjCAnBf+AuJ2KFvEds5FNzz6NSMrvmAbHu4XVsc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775532846; c=relaxed/simple;
+	bh=Yjx0P1FayQ+aswRUqrzahcSgnCpPUXKWDEzX7RCxt+I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tK/2b/dTTPQOoeMId7gBT7eCw1QXxpTkaC64EvvpyJsuBNIQTq+ROkBpAEPdYArILiP7DkRle2fxb8DLyjiGFQSF3y8Qdu6LBE2GZWZk3wv7bg5m6DRUR2J9q97Z/3aVd9t7bjrBLuXuu6qzci1dV5svJoqYl/OyU3WvGZdrAbE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a/9MC9sH; arc=pass smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-59e4a04f059so4294344e87.2
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 20:34:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775532842; cv=none;
+        d=google.com; s=arc-20240605;
+        b=aLqqNFWs7Vs3hgV0NOVTiQgPoiyAwaX3DLVsD/YxQO5oX6SzOmBkM6tcsJklJPs3yl
+         QD87RQ4KCqX+qgsvx6TjpymC4gCkdhYLZl+bDIE9mz6FFr/zaufnsp7qpo6b1nitLQsW
+         a0Uy8dp3A5IaAa7VEYVe9S4yWBHXkU+7jHK3E3xR/PBsLne8elgsRQaceuydgMB8g4vi
+         HLzgKqfBBRtXph5/zt5/UotPW/gjmybc+kRrABIHblNJ2nzn/FdeUnbrYI9+w5bYxMDV
+         5eeYBYQ9oCEPgW51mFoLAOO3yQeWFaI2QGA11Cy/B2Yex8LNkZpU4JeVtJB1/Hm33P3j
+         V3lA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=A3PNoohLi4ojxQ+BzINYqs8H5aArYT9tOIdlY75O8KU=;
+        fh=Mcm0MKXyVUegOTHJqZZ1bQ/WWKOysWTBRbs750w2xpU=;
+        b=AEg6CJuU+yIxF5FTphCxXe05xAIGKbf5O9z+ZuiFg5DSlRE+6ysqjuJ4NSoEc/JPTz
+         3I20x2rr3dyL1ENfGw6wydLF6vDbjmeHVjMcycMhXgOZ4t2ZCGxLm1T0Kjrm5DYI3BK2
+         s2WfOjPGkLYtKT/oNBJdRhuDqMHvXh7a5EeAuoNInlPGqxo0mA4bxyrSSXqd745tzhz8
+         vZUvcDyMokNNZ1FzV13JfGfSXriebnCPgQMXZvzEESax5AlqA+knWa7x5fiXUy2jFlXB
+         jiZPF11MKiO2CQr1s5rK1B05919Chf8NBslyhXkzV+ZHNSrNwM429sYhM8n70tHMZnaT
+         UtNg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775532842; x=1776137642; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A3PNoohLi4ojxQ+BzINYqs8H5aArYT9tOIdlY75O8KU=;
+        b=a/9MC9sHiadUav7bheLILFiODYAk4t/HMampf1dIg7ahKQLyrJceJGSgu85nPNi060
+         46TjAQ0YBKTh8IzMKV9v/bHg8y0WlMUFdFbCFmUtiJ8n9Mt0IngWteypHPrLYbqV0CVs
+         xVQspp+VkjNEsIYzEPHUR2d8GjIAf8Mz1mK6XJIN5uKdnkIGgUfx7XEKlVcJXx/yMcXQ
+         5Qiai6ZF3RK8K9iLj/cTh2KuJrKYeceBWulCLTClOe16phQ8+l3zHST7bJPg4y7+AcFG
+         nKAIZOpffgT1YRq+TwpBtThembUlIq+MQotvkiRoOBLvr1K+Ttk3IAk09vb/l9rJAxw/
+         fEoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775532842; x=1776137642;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=A3PNoohLi4ojxQ+BzINYqs8H5aArYT9tOIdlY75O8KU=;
+        b=VKapg33Cyjp65jNrdgWDYEWpTub/pCNPJ2PEsrswoUHITL4zVltV1dAgpwIgtp0nnw
+         pTQFn496GvTvGnAZqlH2G510ysdaxuW6U5NLxef+Rq+E44vkxtLkUGMqj9ibM3vSncd3
+         ulOD32zeBKIEaL0MvDq6Y87qFBVkjM0wLaK9oObx+vS3hU16SRE88Pwc9bOCMR0dFWYd
+         9Sl2qxYt6uSPHFe0sIv66alwgWAUQDy6f4ICDmcxo6sytq++gKIyKbqgGgItjlMaiNvd
+         PKAnxC1LuaDtywMqjh1dHVNh6+OrN7WJ3OiTACJsnuKhqY4qFnjZPKczBNSxFj8njW4N
+         H9DQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVjosuJ4/9cVvsdindHjZ52DtndK2jQlshXTovvh9suxdM8ilu9cMHP8qYrgAO+geU1NumXv2g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+r9gLzWUflmChiYlFlvzes2sLPGZVL4pfSmV/gUuZzQYDiyjG
+	w9ypAx2vraQWWSB2X+i45JPxHipXK3bcB2V3I6fWRfj7z/4F8MT65hg+o3E6nfwApRC3mtTfnYF
+	/QRLHHVjyDb/WkD+jygUVXAjfr7IZwDwl3vkAcc8=
+X-Gm-Gg: AeBDiesN8Blsl2x1TCQm9kFn29qBy21iUxoIHRuxaOpBQJHXp+FR2EqshCQRQh03Pbe
+	ir3z+0krCF/sYcW42vxCbuRoBkGvgggyqk6zBM6YH3PlHY8i75vguPNIzJQ2yaAyW6orzlcZ4q5
+	uXx8tVmY49EnWYbdPtCxaA1WyS9QuLz+767XKSJTcP+DySFpmzz5wzGIMs5EZ6o8iyI5UYYUxBJ
+	2LRlBsKggnzdG7FJrtIaf5R1mOMhejtR5MX/uN2GaGL9MLWXzQ3hR6PhC2V6We8OwMr/qV34kZd
+	sbXPcItD
+X-Received: by 2002:a05:6512:118c:b0:5a2:c742:7a76 with SMTP id
+ 2adb3069b0e04-5a33759394dmr5793209e87.44.1775532841398; Mon, 06 Apr 2026
+ 20:34:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowACnT2uRZtRpHZx2DA--.46852S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7JrW5JFy8JFW7Xw4kKFy5twb_yoWxZwc_Za
-	yvywnrK3WDuFs8Aa1xCan5KrZ7ArsruF97GFW0qrn7WryjyF15C3Z3t3savr1kX34jqrZ8
-	Cr1kG3Z5CryqgjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbckFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWUtVW8
-	ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r
-	1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij
-	64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr
-	0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF
-	0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUpwZcUUUUU=
-X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
-X-Spamd-Result: default: False [-0.46 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
+References: <20260404150452.83904-1-kerneljasonxing@gmail.com>
+ <20260404150452.83904-4-kerneljasonxing@gmail.com> <willemdebruijn.kernel.2ff565d2f9e7f@gmail.com>
+ <CAL+tcoB94=ptFB-acU3nAK_MqW74DV0MQUVvvV3nbQ7Zc6zSZw@mail.gmail.com> <willemdebruijn.kernel.27ec47b22b23c@gmail.com>
+In-Reply-To: <willemdebruijn.kernel.27ec47b22b23c@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 7 Apr 2026 11:33:23 +0800
+X-Gm-Features: AQROBzCVep2rMbj10HatyLnc1BEUgEJA7ncanO8dNr1X3UBx1xselIpn5iOhKeo
+Message-ID: <CAL+tcoAvVBN7juJEBt5-FYQ4eGTe7dYrFbR3CMOwguw=_X=btA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/4] bpf-timestamp: keep track of the skb when
+ wait_for_space occurs
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, willemb@google.com, 
+	martin.lau@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>, Yushan Zhou <katrinzhou@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275825-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275859-lists,netdev=lfdr.de];
 	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DMARC_NA(0.00)[iscas.ac.cn];
+	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[12];
 	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-0.973];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	R_DKIM_NA(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[kerneljasonxing@gmail.com,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 4FC093A8DD9
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,tencent.com:email,mail.gmail.com:mid]
+X-Rspamd-Queue-Id: 60C903A96E7
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Simon,
+On Mon, Apr 6, 2026 at 10:37=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > On Mon, Apr 6, 2026 at 10:28=E2=80=AFAM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Jason Xing wrote:
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > The patch is the 1/2 part of push-level granularity feature.
+> > > >
+> > > > Tag the skb in tcp_sendmsg_locked() when wait_for_space occurs even
+> > > > though it might not carry the last byte of the sendmsg.
+> > > >
+> > > > Prior to the patch, BPF timestamping cannot cover this case:
+> > > > The following steps reproduce this:
+> > > > 1) skb A is the current last skb before entering wait_for_space pro=
+cess
+> > > > 2) tcp_push() pushes A without any tag
+> > > > 3) A is transmitted from TCP to driver without putting any skb carr=
+ying
+> > > >    timestamps in the error queue, like SCHED, DRV/HARDWARE.
+> > > > 4) sk_stream_wait_memory() sleeps for a while and then returns with=
+ an
+> > > >    error code. Note that the socket lock is released.
+> > > > 5) skb A finally gets acked and removed from the rtx queue.
+> > > > 6) continue with the rest of tcp_sendmsg_locked(): it will jump to(=
+goto)
+> > > >    'do_error' label and then 'out' label.
+> > > > 7) at this moment, skb A turns out to be the last one in this send
+> > > >    syscall, and miss the following tcp_bpf_tx_timestamp() opportuni=
+ty
+> > > >    before the final tcp_push()
+> > > > 8) BPF script fails to see any timestamps this time
+> > > >
+> > > > Signed-off-by: Yushan Zhou <katrinzhou@tencent.com>
+> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > ---
+> > > >  net/ipv4/tcp.c | 4 +++-
+> > > >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > > > index c603b90057f6..7d030a11d004 100644
+> > > > --- a/net/ipv4/tcp.c
+> > > > +++ b/net/ipv4/tcp.c
+> > > > @@ -1400,9 +1400,11 @@ int tcp_sendmsg_locked(struct sock *sk, stru=
+ct msghdr *msg, size_t size)
+> > > >  wait_for_space:
+> > > >               set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
+> > > >               tcp_remove_empty_skb(sk);
+> > > > -             if (copied)
+> > > > +             if (copied) {
+> > > > +                     tcp_bpf_tx_timestamp(sk);
+> > > >                       tcp_push(sk, flags & ~MSG_MORE, mss_now,
+> > > >                                TCP_NAGLE_PUSH, size_goal);
+> > >
+> > > Now the number of skbs that will be tracked will be unpredictable,
+> > > varying based on memory pressure.
+> >
+> > Right, I put some effort into writing a selftests to check how many
+> > push functions get called at one time and failed to do so.
+> >
+> > >
+> > > That sounds hard to use to me. Especially if these extra pushes
+> > > cannot be identified as such.
+> > >
+> > > Perhaps if all skbs from the same sendmsg call can be identified,
+> > > that would help explain pattern in data resulting from these
+> > > uncommon extra data points.
+> >
+> > You meant move tcp_bpf_tx_timestamp before tcp_skb_entail()? That is
+> > close to packet basis without considering fragmentation of skb :)
+>
+> No, I meant somehow in the notification having a way to identify all
+> the skbs belonging to the same sendmsg call, to allow filtering on
+> that. But I also don't immediately see how to do that (without adding
+> yet another counter say).
 
-Thanks, you're right about the net targeting, the NFC: digital:
-prefix, and the missing Fixes tag.
+If we don't build the relationship between skb and sendmsg (just like
+the SENDMSG sock option), we will have no clue on how to calculate. If
+we only take care of the skb from the view of the syscall layer, it's
+fine by moving tcp_bpf_tx_timestamp() before tcp_skb_entail(). But in
+terms of per skb even generated beneath TCP due to gso/tso, there is
+only one way to correlate: adding an additional member in the skb
+structure to store its sendmsg time. This discussion is only suitable
+for use cases like net_timestamping.
 
-You are also right that a valid full SENSF_RES can be 19 bytes long.
-So instead of rejecting resp->len > NFC_SENSF_RES_MAXSIZE, v2 only
-rejects payloads larger than struct digital_sensf_res, then clamps the
-copy into the 18-byte sensf_res buffer inside struct nfc_target.
+Well, my key point is that, I have to admit, the above (including
+existing bpf script net_timestamping) is a less effective way which
+definitely harms the performance because of the extremely frequent
+look-up process. It's not suitable for 7x24 observability in
+production. What we've done internally is make the kernel layer as
+lightweight/easy as possible and let the timestamping feature throw
+each record into a ring buffer that the application can read, sort and
+calculate. This arch survives the performance. But that's simply what
+the design of the kernel module is, given the fast deployment in
+production. I suppose in the future we could build a userspace tool
+like blktrace to monitor efficiently instead of the selftest sample.
+Honestly I don't like look-up action.
 
-That keeps valid 19-byte responses working while still fixing the stack
-overwrite in the target copy path. The lower-bound check remains on the
-pre-skb_pull() frame length, and v2 only adds the post-pull upper bound
-before treating the payload as struct digital_sensf_res.
+Since we're modifying the kernel, how about adding a new member to
+record sendmsg time which bpf script is able to read. The whole
+scenario looks like this:
+1) in tcp_sendmsg_locked(), record the sendmsg time for each skb
+2) in either tso_fragment() or tcp_gso_tstamp(), each new skb will get
+a copy of its original skb
+3) in each stage, bpf script reads the skb's sendmsg time and the
+current time, and then effortlessly do the math.
+
+At this point, what I had in mind is we have two options:
+1) only handle the skb from the view of the send syscall layer, which
+is, for sure, very simple but not thorough.
+2) stick to a pure authentic packet basis, then adding a new member
+seems inevitable. so the question would be where to add? The space of
+the skb structure is very precious :(
+
+>
+> Right now, push-based seems rather arbitrary to me, informed more by
+> technical limitations than a clear design. Perhaps per-packet makes
+> more sense, esp. since BPF calls are cheap (compared to the other
+> errqueue mechanism).
+
+Agreed.
 
 Thanks,
-Pengpeng
-
-
+Jason
 
