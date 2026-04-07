@@ -1,235 +1,278 @@
-Return-Path: <netdev+bounces-276149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276150-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id IEpBGG5f1Wlq5QcAu9opvQ
-	(envelope-from <netdev+bounces-276149-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 21:47:58 +0200
+	id KDK9KUZi1Wk85gcAu9opvQ
+	(envelope-from <netdev+bounces-276150-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 22:00:06 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61CFD3B3F91
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 21:47:57 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFA043B4276
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 22:00:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 04CA4305CD6E
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 19:44:25 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C5AD63003805
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 19:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17AD37997A;
-	Tue,  7 Apr 2026 19:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15C533F38B;
+	Tue,  7 Apr 2026 19:58:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="jibf8U0V"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="ovYykCZu"
 X-Original-To: netdev@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012045.outbound.protection.outlook.com [52.101.48.45])
+Received: from omta040.useast.a.cloudfilter.net (omta040.useast.a.cloudfilter.net [44.202.169.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD97352C4F;
-	Tue,  7 Apr 2026 19:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775591038; cv=fail; b=tqUdauI3zojxkd7TvdzwQTKpGjy7+i5KOY8uE/qq2u0ra8c+MUQgeQ2KTTM67/2PuYi1vGZTjdS0AZTCNe1GD/tnYAoVvKd6m0uvy3NvP9XNLb1XJCKO/dUYHi5qvhVlJs6QTeCvWipC65YGw7qQ0B2uIgX5Sf/Hg1aWscoJQFs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775591038; c=relaxed/simple;
-	bh=bNxPaFyKTr+8PzSZjErURSRhx42C1826Yt2rbTSXgps=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OwrJFFay/2hYX04vRlC0lgFCT4ldRCouofgdFuWvDUOpkQVZL1VP06os7g6cNx5HXKjW1TRRqi7ew2dLLeilzqXzmryQMccL5Qj7INBMhJp70YRz9HpUqUmTH4H475IDUX4rAiHPbOtPy3ksQgTM6w7AUuxKPCxB6MNNQAx2qD4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=jibf8U0V; arc=fail smtp.client-ip=52.101.48.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jAwM+nUW9igYwAtpoil5e+Y8wyNUXlzDwU+2emAgFUyGKlTGh+WmD4u9ewzrZKbbCvDR/6eJMGhiyezROzsjKqnSBIDWe9ZPeigQYw2A6YzGXcOPC3J7Fi0CHE4gWM9Hwzr9nHgrlNV99bt9nO9x9qkEaheh3myzcMid9vFi9Mp6s+MO2Hj2/vGM4a2knmj8MaiAfQLvlP+I/gbjTjLwDzgVaTbRg2+gFW930xEbeo1Rteh8F6E3ZkJ2RInzoVwj9/Yt0WVTmhPWwz/G3CuGzsZxRL6Mm7286mzvZ4JQYu3GYz0S9Rl+DW1c+ySgoJ4T8SZrGw4OeYvV3AG+cGvbFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ftahLqQoNhhEzHXVvf+M97Mjovjuqjqr+GfvnqTKqeI=;
- b=mq4ZRsd1DgGfbSRvfBYGY1IC3MT0E4DT4veS35DrTW/oJgk8UYdoqtXL1z4PkuhvxifSZWCT9Jxm3KRdLWm2L8W7gLQ04CQ4jGFpkTye8LkNqhmrfhmP8IGJMYdg73cwUXvk7WLuWXryiTT/w9+MJEmIc/TmQL6fFG9MPMIdo6egd6TpbOIQ4WbTox/tD9hxVVnfRgUdWlmvA2mTG/25NyCtbiCY0JiMfLbzkKctjHqiJMwimY06B9XzgpoMDj4wSjR7BHBn0eOqMyzBKP6M1xmJeweFD8qkz4kOPLHFmauw/nRy6xUOIR5fO3PwSXiNIXRF/+b0JlWfayRGnGmDmw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ftahLqQoNhhEzHXVvf+M97Mjovjuqjqr+GfvnqTKqeI=;
- b=jibf8U0V8adr91NsaKqdmCuEBc4LkEX213JtRB94PSl35N7J9ImMqxT687jIe12Eo+7KMyR06moB44Erc4RR5b0W2dve9YJGHb7KIhQKmU97KoljyOSKwqvaRlhdlOZNv1iKHUpTqWaudzQjAUsvch4JeHrm9aG5ygA2ieT1uksU2LfrcGKxlMcc2ZSibFJMX/CLy1LTnsfBFttLdrCE4jcLGJhHL8fHFof654pKYCemk2lq4ljfIYyYaBJY+vn7cyhPU6jZ7CNnE+2kH/0Pj/4E0GOzNrvkZJKtMFYp/Y7t0SSS9A+HLBz4+MQrcBCcI9UGnRfNFCIEhQECkOV7PA==
-Received: from MN2PR03CA0013.namprd03.prod.outlook.com (2603:10b6:208:23a::18)
- by DM4PR12MB7551.namprd12.prod.outlook.com (2603:10b6:8:10d::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.20; Tue, 7 Apr
- 2026 19:43:48 +0000
-Received: from BN3PEPF0000B06F.namprd21.prod.outlook.com
- (2603:10b6:208:23a:cafe::89) by MN2PR03CA0013.outlook.office365.com
- (2603:10b6:208:23a::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9769.33 via Frontend Transport; Tue,
- 7 Apr 2026 19:43:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN3PEPF0000B06F.mail.protection.outlook.com (10.167.243.74) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9818.0 via Frontend Transport; Tue, 7 Apr 2026 19:43:48 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 7 Apr
- 2026 12:43:33 -0700
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 7 Apr
- 2026 12:43:32 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Tue, 7 Apr
- 2026 12:43:24 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan
-	<skhan@linuxfoundation.org>, Saeed Mahameed <saeedm@nvidia.com>, "Leon
- Romanovsky" <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch
-	<mbloch@nvidia.com>, Shuah Khan <shuah@kernel.org>, "Matthieu Baerts (NGI0)"
-	<matttbe@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, Carolina Jubran
-	<cjubran@nvidia.com>, Or Har-Toov <ohartoov@nvidia.com>, Moshe Shemesh
-	<moshe@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, Daniel Zahka
-	<daniel.zahka@gmail.com>, Shahar Shitrit <shshitrit@nvidia.com>, Cosmin Ratiu
-	<cratiu@nvidia.com>, Jacob Keller <jacob.e.keller@intel.com>, Parav Pandit
-	<parav@nvidia.com>, Adithya Jayachandran <ajayachandra@nvidia.com>, "Shay
- Drori" <shayd@nvidia.com>, Kees Cook <kees@kernel.org>, Daniel Jurgens
-	<danielj@nvidia.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-kselftest@vger.kernel.org>, Gal Pressman
-	<gal@nvidia.com>
-Subject: [PATCH net-next V5 12/12] devlink: Document resource scope filtering
-Date: Tue, 7 Apr 2026 22:41:07 +0300
-Message-ID: <20260407194107.148063-13-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20260407194107.148063-1-tariqt@nvidia.com>
-References: <20260407194107.148063-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A4C126C17
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 19:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.39
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775591930; cv=none; b=BYtPrzVVVjBkYX5ZvEfTy1KPjEj7T2gQhVBewJQ5SwX+ZgUVV7LIgDZEGm+nHTkbhrfiC26s5rAGOB+6tR9MfQ2hgX1ByNweZcHXXjO7P/KvKOIEfkc+SZd3RHd0X9rLcpMRu7nAAXmunKH8djqeo2caWH0JpxInG3Qs/gvmJGA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775591930; c=relaxed/simple;
+	bh=Z6velnEz/B2uUTLmaqxbse9s2ja6/VD05qH9aqa+eGM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EIbnMuzL2F6bgNEUZQnepBCgMsfMGia2YE0Ay5xIQYvvQ6v7M8pjkcsr9Hk7T7eRFoORrIsCvtMpzBCO88ic5Z/Tvnj3xC5jmvXgWbcmmoylypox6F57NfB5o4AhNL+Ei1W08Tqwgdkt5nADH4PWoVX4vwuk61h1JUoxNvqSOso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=ovYykCZu; arc=none smtp.client-ip=44.202.169.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-6007b.ext.cloudfilter.net ([10.0.30.166])
+	by cmsmtp with ESMTPS
+	id A62Hw7gR14RkpACZNwMwVo; Tue, 07 Apr 2026 19:58:41 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id ACZMwMjGK36heACZNwMgAO; Tue, 07 Apr 2026 19:58:41 +0000
+X-Authority-Analysis: v=2.4 cv=PN8P+eqC c=1 sm=1 tr=0 ts=69d561f1
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=chC0KcwHAXg1M6QkddG+Hg==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=7T7KSl7uo7wA:10 a=VwQbUJbxAAAA:8
+ a=e9iTn1YT0ADnaAsSjdMA:9 a=QEXdDO2ut3YA:10 a=2aFnImwKRvkU0tJ3nQRT:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Ftx1xvaens4tD60bx30l+0J5ZoIN5FuIm41gSlSbF7M=; b=ovYykCZudC5eWXWUoETHRq3Jh+
+	9h56ItZnoxviFExq4NOVyR276Jy4LzgQ8yDpWw0QMvZKS2k31LYVaP0SwudkrsM0olfV7q3y8VXv3
+	AT2zbKvPvCU34hE9GVynQ6Nzo1bUYnlGPC9cz+ZS9ULbR61xxg/kU2va4eok8lprH+ctJ8vEIOE+j
+	bmz37MuAqP0j3WBFPlPHXTIVA4aio1+SgPfVFfAGfN8CSB3sbul6eK3kJggYOS9DeCIbaNUbErmMj
+	rCsn8lMZBwWyCrfZl8lVrrpgyjhtyByKRvYCk7s01EABm74swPB6QWZBwFkdHSwYh54xgZLxOGAZ6
+	bQWz3S3w==;
+Received: from [177.238.18.219] (port=37324 helo=[192.168.0.36])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.99.1)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1wACZL-00000003Nk6-0Fqb;
+	Tue, 07 Apr 2026 14:58:39 -0500
+Message-ID: <d04e11af-5c1b-44a2-aebc-a0ee4fb79802@embeddedor.com>
+Date: Tue, 7 Apr 2026 13:57:00 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B06F:EE_|DM4PR12MB7551:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1bc6ac0d-ad72-46ce-15cc-08de94ddfceb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700016|7416014|18002099003|22082099003|56012099003;
-X-Microsoft-Antispam-Message-Info:
-	LcJabH3riS4mD2EJ+WyOu63jtmUo8uuiHgtlfbLHTHVI1lR5UaY/+mKI9+W9tqhf1XttRpBCZbchb4YgIumvYp7khqEozgA9WkchadUOwNVQ9Gxhdo5HvwvwwEhiGGid5Z3waSp4zQ4geSvuj+kfYg4HtgsBfxg0QFjkpJmQpJPfhbffqMlGmbFsOKhyMXKFi+PWHCAg6XbkVLGMU6/B4Lm0WJpYMDLgGk5rOk7yaYY3dOwoMmJPBKv/fmPsRTyL9NGa3F28CKFAlwxNqxvwTazW+gHBlGWhDgvfJM7HV0JWSE7ApVPmJnUyPAnQNodWplmDxFQzQ0TBVhPZQ3K+tC+IX9qsA2++suznRpbOo0Ywbwjw47I4zAMZ5f9mT8AFkCtWl06z7UbPye9Mv4IbqMLirCbZht7o3f1QenNqCM7WBo81CLKoL4Fy+9hVdZVhTg87FRVD7ajb6VOP3x0hGqgmXZkLiJTefocOP75usbK4bwq3fCyOkbGOhagvwrvJEcCdOac6qhRZwMkg9+WDB58dVsNks01rRgVZzrhJO1GcpZedao2224V4mYPW3xxxJCwdaXhks1sPCMUDnvA+OU9pCNf5ZbEj2pk+FdhEHLpYDTSrvQdwggKQXFHAUVq6A6Gdv0qIdfEStF8kmUsjHdTNvOXoxuLmKbR6oa2zMxQhYL1l1EwMEIVfoj3hPxjDfLo4X+zzCIhGmwVhFbhRW1loUd2+g8rnazmHOvupouqduj0NLLpPvjqb2HEza6Ejn9Knpy4X+MY0eFPcsRjlNA==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700016)(7416014)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	z15saFO0VGeiWHBaSbgX/XUI0IvrRA0wiIWNhGxHJET57L5xUmdVQuLs3VgBjVU6raK9c9W2wtohzzGP34dmd5hLrAvICSuB7pQeyqB2913StJT8fuHjgIR7iWc1Avbpa6f+WPOd6PIZWTadyW/iYVGffNmnkhJwBHCUXyGUE6ny9xvUiYt5NIoOQdLMl9jSOfELJyi6kHgYjr8eMItqrwT1DrQp3Ec73HOsZ8hJvRNUG8fqQeheZtoT/Uckf4qO+e+eqtWBEnK8g2Blf40cHugzTQySSfn/U5/jc9XcmLZZ1E9uNYdGIffKgDRjCpMZxO4igkj0jRryYrL3XjpS+BUtdIq5tibEx1nXZEjIPYHQeWiMWQXBDgN+lep7grGTUWDIiOmRZ48zA7wBx4D5YUzURyXCxlEs85NG0CJnrJIge5jgsYrYr6UZcdYVEMuw
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2026 19:43:48.3283
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1bc6ac0d-ad72-46ce-15cc-08de94ddfceb
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B06F.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7551
-X-Spamd-Result: default: False [2.84 / 15.00];
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH][next] Bluetooth: hci.h: Avoid a couple
+ -Wflex-array-member-not-at-end warnings
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <aZ1FrL8qvvKuktBF@kspp>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <aZ1FrL8qvvKuktBF@kspp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 177.238.18.219
+X-Source-L: No
+X-Exim-ID: 1wACZL-00000003Nk6-0Fqb
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.0.36]) [177.238.18.219]:37324
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 3
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfLNYe7hf7MtB1h2Z9rADpohw7k1P2FEC9gR3FzcPuTaIq8mEVMRqPHxFZsrFYts+pcZgu/nLzil4WAnqyo26cC0jz78R0LWE2yXG8/3xnXzc4iljEIx0
+ YME9/lILVGKQlstZeftMnbJSh+FLAkB9P2A3Y+vOypz4MTwjCqtl6tFQ/c8y3CbOIyqZJsowMO34QdYcw6P83oLvIvryw+gW0Is=
+X-Spamd-Result: default: False [1.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
-	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
+	R_DKIM_REJECT(1.00)[embeddedor.com:s=default];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,resnulli.us,lwn.net,linuxfoundation.org,nvidia.com,oracle.com,intel.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[36];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-276149-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[Nvidia.com:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[tariqt@nvidia.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-276150-lists,netdev=lfdr.de];
 	FROM_HAS_DN(0.00)[];
+	DMARC_NA(0.00)[embeddedor.com];
+	FREEMAIL_TO(0.00)[kernel.org,holtmann.org,gmail.com,davemloft.net,google.com,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	HAS_X_SOURCE(0.00)[];
+	HAS_X_ANTIABUSE(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,nvidia.com:mid,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,Nvidia.com:dkim];
+	RCVD_COUNT_FIVE(0.00)[6];
+	FROM_NEQ_ENVFROM(0.00)[gustavo@embeddedor.com,netdev@vger.kernel.org];
+	PRECEDENCE_BULK(0.00)[];
+	DKIM_TRACE(0.00)[embeddedor.com:-];
+	NEURAL_HAM(-0.00)[-0.500];
 	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.997];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	RCVD_COUNT_SEVEN(0.00)[9]
-X-Rspamd-Queue-Id: 61CFD3B3F91
+	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,embeddedor.com:mid]
+X-Rspamd-Queue-Id: CFA043B4276
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Or Har-Toov <ohartoov@nvidia.com>
+Hi all,
 
-Document the scope parameter for devlink resource show, which allows
-filtering the dump to device-level or port-level resources only.
+Friendly ping: who can take this, please?
 
-Signed-off-by: Or Har-Toov <ohartoov@nvidia.com>
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- .../networking/devlink/devlink-resource.rst   | 35 +++++++++++++++++++
- 1 file changed, 35 insertions(+)
+Thanks
+-Gustavo
 
-diff --git a/Documentation/networking/devlink/devlink-resource.rst b/Documentation/networking/devlink/devlink-resource.rst
-index 9839c1661315..47eec8f875b4 100644
---- a/Documentation/networking/devlink/devlink-resource.rst
-+++ b/Documentation/networking/devlink/devlink-resource.rst
-@@ -109,3 +109,38 @@ To show resources for a specific port:
-     $ devlink resource show pci/0000:03:00.0/196608
-     pci/0000:03:00.0/196608:
-       name max_SFs size 128 unit entry dpipe_tables none
-+
-+Resource Scope Filtering
-+========================
-+
-+When dumping resources for all devices, ``devlink resource show`` accepts
-+an optional ``scope`` parameter to restrict the response to device-level
-+resources, port-level resources, or both (the default).
-+
-+To dump only device-level resources across all devices:
-+
-+.. code:: shell
-+
-+    $ devlink resource show scope dev
-+    pci/0000:03:00.0:
-+      name max_local_SFs size 128 unit entry dpipe_tables none
-+      name max_external_SFs size 128 unit entry dpipe_tables none
-+    pci/0000:03:00.1:
-+      name max_local_SFs size 128 unit entry dpipe_tables none
-+      name max_external_SFs size 128 unit entry dpipe_tables none
-+
-+To dump only port-level resources across all devices:
-+
-+.. code:: shell
-+
-+    $ devlink resource show scope port
-+    pci/0000:03:00.0/196608:
-+      name max_SFs size 128 unit entry dpipe_tables none
-+    pci/0000:03:00.0/196609:
-+      name max_SFs size 128 unit entry dpipe_tables none
-+    pci/0000:03:00.1/196708:
-+      name max_SFs size 128 unit entry dpipe_tables none
-+    pci/0000:03:00.1/196709:
-+      name max_SFs size 128 unit entry dpipe_tables none
-+
-+Note that port-level resources are read-only.
--- 
-2.44.0
+On 2/24/26 00:31, Gustavo A. R. Silva wrote:
+> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+> getting ready to enable it, globally.
+> 
+> struct hci_std_codecs and struct hci_std_codecs_v2 are flexible
+> structures, this is structures that contain a flexible-array member
+> (__u8 codec[]; and struct hci_std_codec_v2 codec[];, correspondingly.)
+> 
+> Since struct hci_rp_read_local_supported_codecs and struct
+> hci_rp_read_local_supported_codecs_v2 are defined by hardware, we
+> create the new struct hci_std_codecs_hdr and struct hci_std_codecs_v2_hdr
+> types, and use them to replace the object types causing trouble in
+> struct hci_rp_read_local_supported_codecs and struct
+> hci_rp_read_local_supported_codecs_v2, namely struct hci_std_codecs
+> std_codecs; and struct hci_std_codecs_v2_hdr std_codecs;.
+> 
+> Also, once -fms-extensions is enabled, we can use transparent struct
+> members in both struct hci_std_codecs and struct hci_std_codecs_v2_hdr.
+> 
+> Notice that the newly created types does not contain the flex-array
+> member `codec`, which is the object causing the -Wfamnae warnings.
+> 
+> After these changes, the size of struct hci_rp_read_local_supported_codecs
+> and struct hci_rp_read_local_supported_codecs_v2, along with their
+> member's offsets remain the same, hence the memory layouts don't
+> change:
+> 
+> Before changes:
+> struct hci_rp_read_local_supported_codecs {
+>          __u8                       status;               /*     0     1 */
+>          struct hci_std_codecs      std_codecs;           /*     1     1 */
+>          struct hci_vnd_codecs      vnd_codecs;           /*     2     1 */
+> 
+>          /* size: 3, cachelines: 1, members: 3 */
+>          /* last cacheline: 3 bytes */
+> } __attribute__((__packed__));
+> 
+> struct hci_rp_read_local_supported_codecs_v2 {
+>          __u8                       status;               /*     0     1 */
+>          struct hci_std_codecs_v2   std_codecs;           /*     1     1 */
+>          struct hci_vnd_codecs_v2   vendor_codecs;        /*     2     1 */
+> 
+>          /* size: 3, cachelines: 1, members: 3 */
+>          /* last cacheline: 3 bytes */
+> } __attribute__((__packed__));
+> 
+> After changes:
+> struct hci_rp_read_local_supported_codecs {
+> 	__u8                       status;               /*     0     1 */
+> 	struct hci_std_codecs_hdr  std_codecs;           /*     1     1 */
+> 	struct hci_vnd_codecs      vnd_codecs;           /*     2     1 */
+> 
+> 	/* size: 3, cachelines: 1, members: 3 */
+> 	/* last cacheline: 3 bytes */
+> } __attribute__((__packed__));
+> 
+> struct hci_rp_read_local_supported_codecs_v2 {
+> 	__u8                       status;               /*     0     1 */
+> 	struct hci_std_codecs_v2_hdr std_codecs;         /*     1     1 */
+> 	struct hci_vnd_codecs_v2   vendor_codecs;        /*     2     1 */
+> 
+> 	/* size: 3, cachelines: 1, members: 3 */
+> 	/* last cacheline: 3 bytes */
+> } __attribute__((__packed__));
+> 
+> With these changes fix the following warnings:
+> 
+> include/net/bluetooth/hci.h:1490:31: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> include/net/bluetooth/hci.h:1525:34: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> 
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> ---
+>   include/net/bluetooth/hci.h | 16 ++++++++++++----
+>   1 file changed, 12 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 89ad9470fa71..572b1c620c5d 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -1468,8 +1468,12 @@ struct hci_rp_read_data_block_size {
+>   } __packed;
+>   
+>   #define HCI_OP_READ_LOCAL_CODECS	0x100b
+> -struct hci_std_codecs {
+> +struct hci_std_codecs_hdr {
+>   	__u8	num;
+> +} __packed;
+> +
+> +struct hci_std_codecs {
+> +	struct hci_std_codecs_hdr;
+>   	__u8	codec[];
+>   } __packed;
+>   
+> @@ -1487,7 +1491,7 @@ struct hci_vnd_codecs {
+>   
+>   struct hci_rp_read_local_supported_codecs {
+>   	__u8	status;
+> -	struct hci_std_codecs std_codecs;
+> +	struct hci_std_codecs_hdr std_codecs;
+>   	struct hci_vnd_codecs vnd_codecs;
+>   } __packed;
+>   
+> @@ -1504,8 +1508,12 @@ struct hci_std_codec_v2 {
+>   	__u8	transport;
+>   } __packed;
+>   
+> -struct hci_std_codecs_v2 {
+> +struct hci_std_codecs_v2_hdr {
+>   	__u8	num;
+> +} __packed;
+> +
+> +struct hci_std_codecs_v2 {
+> +	struct hci_std_codecs_v2_hdr;
+>   	struct hci_std_codec_v2 codec[];
+>   } __packed;
+>   
+> @@ -1522,7 +1530,7 @@ struct hci_vnd_codecs_v2 {
+>   
+>   struct hci_rp_read_local_supported_codecs_v2 {
+>   	__u8	status;
+> -	struct hci_std_codecs_v2 std_codecs;
+> +	struct hci_std_codecs_v2_hdr std_codecs;
+>   	struct hci_vnd_codecs_v2 vendor_codecs;
+>   } __packed;
+>   
 
 
