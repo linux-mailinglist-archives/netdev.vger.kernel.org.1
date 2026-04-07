@@ -1,73 +1,72 @@
-Return-Path: <netdev+bounces-275921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275922-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id SJeqL5DN1GmtxgcAu9opvQ
-	(envelope-from <netdev+bounces-275921-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:25:36 +0200
+	id 6NGzFMjN1GmtxgcAu9opvQ
+	(envelope-from <netdev+bounces-275922-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:26:32 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1919D3ABE62
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:25:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD763ABF11
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:26:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DA73D301A390
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 09:20:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 271943007CAD
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 09:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D3C39C011;
-	Tue,  7 Apr 2026 09:20:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5093739BFFD;
+	Tue,  7 Apr 2026 09:22:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="herPfiMe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p2RBhsgU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED8F39B971
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 09:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8BE39B49C
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 09:22:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775553637; cv=none; b=AJOqSlSLeGUG/lewGkuF/KWfNYiCEqwUTLAJaTpr8I/vAwtlUn92L+DSsGqQG0LSi/KQCxpHDKSZ5R5ZscRdPAU4VQ7tSojPbSSCV/EXQHvBYMEh4FIBbMO8CcvZ4ZhnjzmDTJO17/zzNPOIV4+ks8vQx+Bnx/FUUKsF22h1awo=
+	t=1775553778; cv=none; b=NMgaQ8wTxMqDfdeN9KvQ3lkESR5oMT/JJdZ0kcmLrV7zoag2+bqGwwknF23wZDt7tJSELHAdVUHZAopIxw+1aHyMsK+EsRx/cBy3aXTdXPjzGCeAKNLBR1g/DI3Q8x/n/h11zcHHC7+mlMA/hPPq8NDwJm0ggaz2lxSLUjtaO08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775553637; c=relaxed/simple;
-	bh=t14bFX05TFXLTsJh9mRddXXLj8M3JZsFETNQEiPN3pg=;
+	s=arc-20240116; t=1775553778; c=relaxed/simple;
+	bh=hRO2sH+AZYMuioqBbIdAHoSERuZOO3FkQS3wvzTDRS8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OwVka/T1C4cKnoUd9TPp2WvOnCUued7ZzwBSvjDm+Rx4rWTw0y/U9qpDXHD9gXTJWOQzEUFvo9opS4hWSt882rxnJZP9tzjVm6FWww+PKPBziT7GnWpHZP7nZliHyuoqKDrgb9yYwUqQ3v59AdP4Q704nDeexzk+cCiShbAnz2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=herPfiMe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C47BAC2BCB7
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 09:20:36 +0000 (UTC)
+	 To:Cc:Content-Type; b=peAnVApD8S0xNf1fnYIRXi7pUY7SUuyilQpKWYZil8LsziV4wUXxIHny3q5QHt+Um1RiyuXtjPPAyATRwJ1EPlIoCNq/YoApuOQ98NWLzSadSpFcYDBhhrLbZ+4fJ/TtMI5aSjJwCtjq5aTEyRlB5NgI6S9v9dEoQtGPYcAzduQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p2RBhsgU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2B20C2BCB4
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 09:22:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775553636;
-	bh=t14bFX05TFXLTsJh9mRddXXLj8M3JZsFETNQEiPN3pg=;
+	s=k20201202; t=1775553778;
+	bh=hRO2sH+AZYMuioqBbIdAHoSERuZOO3FkQS3wvzTDRS8=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=herPfiMejmU6aql+whYpwvyX9HoxpsLxOd0vtWKl+XNzC+jedIc1gpJ9QLldf7CaQ
-	 YFABhOmarj/ER91PviosGiSIE4OM59dbzFYH4hcsEjec0mfE8jECvmTFe709YWhn61
-	 z7p1EOqNIAHvycgJqurlZCQGj1PgpzKWqC9+2zUlEVbuOq4IF/Q2TDVRuljH8NCSwc
-	 RDru3g0Jv19nu8CLbhwpgHG1k9BsCIYuoQPQWEBHVYzrBK4Pd8rNSQagnO921ATdLK
-	 0hYhIS5Q/mCVg/xvdTmSkhhsaovz8FuB+mKg4nL7uN2CLu+zi46qr5LG9KBFITlvaF
-	 3hKnJ5iRNgHvg==
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-6501e465a8eso5293424d50.1
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 02:20:36 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCV+aby9955xcLFvRl4wnhHHBsxsJg9HWHfEFZONhIvhDHQC6QzxkwZhfjDh2AvGtrlJYcPBXaA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrNfwaP5jsBkJ9IKu6YXVBXKU/lWRd34YLaw2YnRPLCjAcIB+X
-	8WSIgGw1nQqMxOWqoTDElXHSfExSIT03soGA8VuBNdxt4+VGdn8tEHs5Fb94BcIdZVBJBlQmpIX
-	grWa9xHb1XEGhB0bnjePwMxT4QbyheRs=
-X-Received: by 2002:a05:690e:130e:b0:650:1cbb:50a8 with SMTP id
- 956f58d0204a3-6503d84d2e8mr15299210d50.26.1775553636060; Tue, 07 Apr 2026
- 02:20:36 -0700 (PDT)
+	b=p2RBhsgUOeuzvBlq+zLOb1DQ/zXfapti97Fhb2E/eDOggFqCr71M3f7T1GhJZh2Mu
+	 mxnwYXPhJcXXY19WcXShLaVdwhtPa8M2dfSFVfIE2hP4SogWTRXaZP4ilWdRSOyZFx
+	 kviqHDInpQ2UZY2c4+Ikml5SQS7ogjjZY8NlHMDZT8GERxO6z+KU0qAQgDrETzFhJI
+	 lc1cw+Tt5pd9eSv+fsKHxFldHF69m1H+3o59rqMSAZVHlDdaTy7UEjAsPHnV6S6soR
+	 3GMzt5dkuqL36MBTwGysPWnmDCMZKRU/y5xBL4JrGZcLj2CwpsOthQvfz9BldLFM8C
+	 F+RS1xFsturUA==
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-79a7109f568so52122617b3.1
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 02:22:57 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXM46EIh3IfIF+RZISzRCN//ioXeeyvO5FB46MKVvwg5DNvkhFXKHwRY5Bc4dfgZVj2Teg6tqg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRcgfkIJBsJ5HIM3hRkXNKzksl1/38pR/dTGIs3OXFBTZavJAs
+	Ui530DddjwexRf53QCGYRdiDjRVirE4a4pC0mioBJQh5q8QKgnkcqR12lFBijRvVtU42T5fDpZa
+	rzKlaNG6lXXG+gXalQU/sq7pOB+F7TQQ=
+X-Received: by 2002:a05:690c:385:b0:79a:bde3:7085 with SMTP id
+ 00721157ae682-7a4d39c8c04mr166065927b3.14.1775553777353; Tue, 07 Apr 2026
+ 02:22:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com> <20260331-realtek_forward-v1-9-44fb63033b7e@gmail.com>
-In-Reply-To: <20260331-realtek_forward-v1-9-44fb63033b7e@gmail.com>
+References: <20260331-realtek_forward-v1-0-44fb63033b7e@gmail.com> <20260331-realtek_forward-v1-10-44fb63033b7e@gmail.com>
+In-Reply-To: <20260331-realtek_forward-v1-10-44fb63033b7e@gmail.com>
 From: Linus Walleij <linusw@kernel.org>
-Date: Tue, 7 Apr 2026 11:20:25 +0200
-X-Gmail-Original-Message-ID: <CAD++jL=v6qe+dVF-wk3cPg3aw8Qp7pS6BVtAqmWURJ=JvMvDHA@mail.gmail.com>
-X-Gm-Features: AQROBzDB96Ncl7gIJ47tpiERBvt7RrBsgAZwAY3BNEtIyqQE3Rc5aEFEjAct-FY
-Message-ID: <CAD++jL=v6qe+dVF-wk3cPg3aw8Qp7pS6BVtAqmWURJ=JvMvDHA@mail.gmail.com>
-Subject: Re: [net-next PATCH 09/10] net: dsa: realtek: rtl8365mb: add bridge
- port flags
+Date: Tue, 7 Apr 2026 11:22:46 +0200
+X-Gmail-Original-Message-ID: <CAD++jLmX31KfhGXA6SMAPXb14dHSC1t4JQZ=PQvjh-3hUcnzJA@mail.gmail.com>
+X-Gm-Features: AQROBzCxgk2wWtBb_ytqICh5rGz9Rc8aTvJ6IXb1NfEGqfOE0SSPKJA9UtMVF5E
+Message-ID: <CAD++jLmX31KfhGXA6SMAPXb14dHSC1t4JQZ=PQvjh-3hUcnzJA@mail.gmail.com>
+Subject: Re: [net-next PATCH 10/10] net: dsa: tag_rtl8_4: set KEEP flag
 To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -87,7 +86,7 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275921-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275922-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FREEMAIL_TO(0.00)[gmail.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -107,108 +106,30 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	TO_DN_SOME(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,bang-olufsen.dk:email]
-X-Rspamd-Queue-Id: 1919D3ABE62
+X-Rspamd-Queue-Id: 9AD763ABF11
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
-
-Hi Luiz, Alvin,
 
 On Wed, Apr 1, 2026 at 1:01=E2=80=AFAM Luiz Angelo Daros de Luca
 <luizluca@gmail.com> wrote:
 
-> From: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
->
-> Add bridge port flags for:
-> - BR_LEARNING
-> - BR_FLOOD
-> - BR_MCAST_FLOOD
-> - BR_BCAST_FLOOD
+> KEEP=3D1 is needed because we should respect the format of the packet as
+> the kernel sends it to us. Unless tx forward offloading is used, the
+> kernel is giving us the packet exactly as it should leave the specified
+> port on the wire. Until now this was not needed because the ports were
+> always functioning in a standalone mode in a VLAN-unaware way, so the
+> switch would not tag or untag frames anyway. But arguably it should have
+> been KEEP=3D1 all along.
 >
 > Co-developed-by: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
 > Signed-off-by: Alvin =C5=A0ipraga <alsi@bang-olufsen.dk>
 > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 
-I have been working on a patch for RTL8366RB for this as well:
-https://git.kernel.org/pub/scm/linux/kernel/git/linusw/linux-integrator.git=
-/patch/?id=3D0d58a9d74f363b969c06a8ac8446e6eef5511795
+Reviewed-by: Linus Walleij <linusw@kernel.org>
 
-> +static int rtl8365mb_port_set_ucast_flood(struct realtek_priv *priv, int=
- port,
-> +                                         bool enable)
-> +static int rtl8365mb_port_set_mcast_flood(struct realtek_priv *priv, int=
- port,
-> +                                         bool enable)
-> +static int rtl8365mb_port_set_bcast_flood(struct realtek_priv *priv, int=
- port,
-> +                                         bool enable)
-
-Those are small and just writing registers so I guess they can be kept loca=
-l,
-but I think they should be accessed indirectly through
-struct realtek_ops .rtl8366_port_set_ucast_flood() etc.
-
-I can just make a simple patch adding the same three callbacks for
-RTL8366RB and then it's done for both chips.
-
-> +static int rtl8365mb_port_pre_bridge_flags(struct dsa_switch *ds, int po=
-rt,
-> +                                          struct switchdev_brport_flags =
-flags,
-> +                                          struct netlink_ext_ack *extack=
-)
-> +static int rtl8365mb_port_bridge_flags(struct dsa_switch *ds, int port,
-> +                                      struct switchdev_brport_flags flag=
-s,
-> +                                      struct netlink_ext_ack *exack)
-
-Move this one to rtl8366-core.c under the name rtl8366_port_[pre_]bridge_fl=
-ags()
-and use the abstract accessors to do the register writes.
-
-> @@ -1691,6 +1797,8 @@ static int rtl8365mb_port_bridge_join(struct dsa_sw=
-itch *ds, int port,
->         int ret;
->         int i;
->
-> +       dev_dbg(priv->dev, "bridge %d join port %d\n", port, bridge.num);
-> +
->         /* Add this port to the isolation group of every other port
->          * offloading this bridge.
->          */
-> @@ -1730,6 +1838,8 @@ static void rtl8365mb_port_bridge_leave(struct dsa_=
-switch *ds, int port,
->         u32 mask =3D 0;
->         int i;
->
-> +       dev_dbg(priv->dev, "bridge %d leave port %d\n", port, bridge.num)=
-;
-> +
->         /* Remove this port from the isolation group of every other
->          * port offloading this bridge.
->          */
-
-These debug prints seem unrelated to this patch?
-
-> @@ -2547,6 +2657,19 @@ static int rtl8365mb_setup(struct dsa_switch *ds)
->                 if (ret)
->                         goto out_teardown_irq;
->
-> +               /* Enable all types of flooding */
-> +               ret =3D rtl8365mb_port_set_ucast_flood(priv, i, true);
-> +               if (ret)
-> +                       goto out_teardown_irq;
-> +
-> +               ret =3D rtl8365mb_port_set_mcast_flood(priv, i, true);
-> +               if (ret)
-> +                       goto out_teardown_irq;
-> +
-> +               ret =3D rtl8365mb_port_set_bcast_flood(priv, i, true);
-> +               if (ret)
-> +                       goto out_teardown_irq;
-
-Create rtl8366_setup_flood_control() in realtek-core.c and add these
-three calls as a helper using the rtl8366_* generic calls there. It will be
-done the same on all chips.
+I think you could just send this and patch 1 separately so they get
+merged first as they are completely self-contained and uncontroversial
+and touch the same code.
 
 Yours,
 Linus Walleij
