@@ -1,192 +1,285 @@
-Return-Path: <netdev+bounces-276025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276031-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id yA63IaAV1Wm30AcAu9opvQ
-	(envelope-from <netdev+bounces-276025-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 16:33:04 +0200
+	id 4MWbHSoc1Wli0wcAu9opvQ
+	(envelope-from <netdev+bounces-276031-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 17:00:58 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C5373B0193
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 16:33:04 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 233B73B088B
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 17:00:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 577AB3042EAE
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 14:32:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 02D8430C5564
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 14:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 883C9274B28;
-	Tue,  7 Apr 2026 14:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E810A29AAEA;
+	Tue,  7 Apr 2026 14:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RY9p1rGe";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="QdMsowRO"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="mGSdguxW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC26F27A92D
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 14:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17D833ADAB;
+	Tue,  7 Apr 2026 14:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775572326; cv=none; b=diHGZWFVOtJs72c+R05onTzc3s5MU1dbQHl39v+2HZjA8loLll2wOJBZGMhQ90pYoduxMj5aKlbvJiyKHKnQez2yhBqXRSsALqUwvbfZGOLUrUh4FDOdBdD4JNzb+bKnpH5V5+gZMvif43j6ox+7XZAtGqTxi2UKUa5s5I64cYQ=
+	t=1775573721; cv=none; b=n6WDmWr77jAfyrQII0zh/MiKnwOuhQFM0Jr57ZdPAmpJiwSgm8EZQgzOXFt5XuCehHHxI/l36F9FED8ASg1Y6sEI5/RbwZob/T1HnkIAQe8SscQ4RFjuBGWrs3VciDBfnrxiNPyL3o/A5NaWQ1Zh6BmKZ3tO8WJyyfLR0OZ+VZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775572326; c=relaxed/simple;
-	bh=L/JCFvTPVv0HlOE0c8AmntduyQpe67fTxZL7BZ7I2Dw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=gyQNKsMUlVtdpgLrbbmgca3YzgotGqXebF8RDxjvGlG4PvYrNpmADggFJ7wrl5Nt+2YVADd3OnJOj4oZosqAczMZ2rjlificoKHFzCOD1DusvINnFfDXrXhQXcVHL0Fpwy1WhUIgHoIgxks+ijS++qwNAwztMZQaMONARq6+u/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RY9p1rGe; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=QdMsowRO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775572324;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=wN4PMrlLhWPP7lFFAEz7bnVJ7qzQh0MFMJBBTUMTFgM=;
-	b=RY9p1rGeo6R4Nng20Bgj5IEwILBDcUlz2h27QNmJbIYv94QVH1qfs7qXvVKzbB1KbyKJ9V
-	eL+RSJiL95Zqmoz8bfNn+c1HtRmhtxdap8o6JIlPFIwGjgbXVSvdxERpnbZwxH4eDP2lCN
-	rmVtsx4gEUqBp64dzb024fh0pecF7pw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-595-Jx7nW7eMP7SlXVpMdyRtZw-1; Tue, 07 Apr 2026 10:32:02 -0400
-X-MC-Unique: Jx7nW7eMP7SlXVpMdyRtZw-1
-X-Mimecast-MFC-AGG-ID: Jx7nW7eMP7SlXVpMdyRtZw_1775572321
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4839fc4cef6so61720015e9.0
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 07:32:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1775572321; x=1776177121; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wN4PMrlLhWPP7lFFAEz7bnVJ7qzQh0MFMJBBTUMTFgM=;
-        b=QdMsowROYNoAk8Ar2eYrxwaau5weuVKtu7xQbxYxyhozlWgVxysgQi8NCegyd4NSl2
-         3RQUt6TDUEf7me7f9qdiAVwF1UptmYG5fvxUwODi5xdF4P/kf1VLScKzpvRDrKCK/S6g
-         2ZgFC1vqugfEdc5tLpQGwBY/1sokQkXxCXCpRGJzMi7xmq8Ag6rjmhCkzqwGT/1luFzd
-         E+VveuDqF1g8iF9bLrB0qIoVlcij7SS5QvX3wGKEljv/YjZXzX8TMLFqu7YCO07U+DhG
-         eTddPSeoicFgqRBSl67kwSqIGc/UifdAj1xXHMA+NIvDFPy8oETCgq15dR2MgM2omeyh
-         LpSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775572321; x=1776177121;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wN4PMrlLhWPP7lFFAEz7bnVJ7qzQh0MFMJBBTUMTFgM=;
-        b=TXYNxJ3iAeNaNnvdL5coqbBM+zWidh4z8xVoJObX2sH1OF1FrRZD9U2bzsQBDbBglM
-         tibhUwDRiOFizkFaSsYtbqsa4bDVQljivBnogvapW+XCfl9+uNSat6e4wLUDZBjg0+kj
-         Ck6d6w+va9LAhLnyMyLFGeMSY9f0KPOeWWMO1tseHTA+YVR7uYWLYmNOxi7rmiZiG21P
-         dp5FQOjqTzWinIIZmE8db7QCVI0H2OrnqYPA/rbheiaUn2AkIyN05AKAwYIsqwpTAvtN
-         ZCHlyWpu42QWzpgl7Gk9i28LB/TyPlMvNsKr3H0iPiUhk+8amgHbC8IXhFVXKffi6bbG
-         mlEg==
-X-Forwarded-Encrypted: i=1; AJvYcCVggzlVe3Yj2rgvhL+7QhkCvSUUGXsK7TlkMbTRk7K/o8vAlkGmEBlRrzNu0qIEETD7OnP1Q7o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOo2PDGoti+a3CgriHTvUiPLvIYQG1yI9nRdKzm3kCqr8jDiJb
-	baWQ4Djk98+WSSVt4azU+2xHS3h2M2GDeeKQgionBe0j9BI0bPEb4rRsVq1Mf0q4IW9PXE/hnQJ
-	yL5uDTFtoQPAUerdLgMuNTgrmGc175rLAICzlFGvpnzvW9tvG2Pkbp5a7qA==
-X-Gm-Gg: AeBDietQxxShn7j4rEuArKu/jIO1cRqNF1ZPzvJ2rfQnGo68pnHPuTyxogEDQslTj4e
-	eixKCODRYmd2/pu7lJEO4SinjTKHZzw2lNaCFjvhX8sX3ZVUow04ZRVJyfv6MjqfQ0f7GSMJHW2
-	Qec2dKcDK1VYKetc5BOB0GQubGQENbo6Os+rr11Db6HbeHJbEHwqif/pbq1smFxkUULyBi1N3eY
-	dVB7ZRrqkLv0bSG/7ZCcje23LSmE+TgJRNEgGj/oC4KoLY7pVnjXj+j7TvXO86lVHk9mm/7725f
-	aubDKU90YXzgIYQSvTLhsHBWgwV75pPuJnPfGpq1Et03yMGhxi9Yz5bdGnm63p+f0hAEQ7ksqF6
-	Bl49PAuuxozyYZe0hYvaWTMJex6zxXq8WY1w/tVvDa1xvHiIa3ehX7m/YLTCi
-X-Received: by 2002:a05:600c:45cf:b0:477:9890:9ab8 with SMTP id 5b1f17b1804b1-4889945f8c3mr203346735e9.3.1775572321427;
-        Tue, 07 Apr 2026 07:32:01 -0700 (PDT)
-X-Received: by 2002:a05:600c:45cf:b0:477:9890:9ab8 with SMTP id 5b1f17b1804b1-4889945f8c3mr203346525e9.3.1775572320964;
-        Tue, 07 Apr 2026 07:32:00 -0700 (PDT)
-Received: from lleonard-thinkpadx1carbongen13.rmtit.csb ([176.206.19.176])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48897fdd2cesm146677635e9.4.2026.04.07.07.31.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Apr 2026 07:32:00 -0700 (PDT)
-From: Luigi Leonardi <leonardi@redhat.com>
-Date: Tue, 07 Apr 2026 16:31:56 +0200
-Subject: [PATCH net-next] vsock/virtio: remove unnecessary call to
- `virtio_transport_get_ops`
+	s=arc-20240116; t=1775573721; c=relaxed/simple;
+	bh=Vr7+Y9O6Lq0UctbS41Ypfr586Zm9YHBHCjGTcLSBDdA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=itGoXDC5r7klGlpDDiGnttCZ3q+jaWvMDvasOCkv4I7mhPFQdlgH39dUxOxJqkpxu3N8+u3pYpM4ofQvMtwdomQ+569jz6SkkkXVHABdoWJMQckSJG+aG9BI2N2AXbsMJSY/GHhF8mxdB/BQGqkC88Qnhqng6wm4kFh8W7bH8M0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=mGSdguxW; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=KWVlvf/fLA4JQzZbInCx2uw0d9Dz/WHGRPxlljy4Ttw=; b=mGSdguxWBFjgZo63d/t65P6+z9
+	pdRGYfVK8+7ziH7WzurTclyg6OtYVeUp87NfHUeBRHrLvNioM0CJKvzRLvm0BDnSFHvfKanCIjdg6
+	b5bAPDNFWNI/x3yUJqNkhvKJGj4JBdK4k0z4YzJA/KR4YWOrkJJN8za09IQv1casJmfPVsVuEJAiE
+	lndPPPtc+3kWt8Gp05pufZOZEELRbOBmALl3nTVnj+IYgZOCwhRoCBe7vhg0L9QJcf3pY4nfxpDo+
+	4pVXvxpp+1LMRmb/LlPyGKbufSU/A1nPRI5HrrUKBvVRVcglCZrvyrULSL1+VAVblQLHqpeYHg4S/
+	26dBM3RvFU/95VIQrRMMTQ8zK0THs1SqDXR9P2enZqZntZZ+nu8HbtJf4z/tuVDUAUYsmXZYBLlZf
+	+crEDXMaKSvBX0JDiI/7H7LGLNldBP+8qrzwdjv9sIN6l05JNfXnptzR9PUE99RdCJgGLrExnfSyY
+	b1qKNhG09rtB8L/5pbmSMZCW;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wA7hp-00000007WOO-39uS;
+	Tue, 07 Apr 2026 14:47:05 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: metze@samba.org,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>,
+	Long Li <longli@microsoft.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Henrique Carvalho <henrique.carvalho@suse.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	netdev@vger.kernel.org,
+	Xin Long <lucien.xin@gmail.com>,
+	quic@lists.linux.dev,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mark Brown <broonie@kernel.org>,
+	linux-next@vger.kernel.org
+Subject: [PATCH 0/8] smb: add kernel internal IPPROTO_SMBDIRECT
+Date: Tue,  7 Apr 2026 16:46:26 +0200
+Message-ID: <cover.1775571957.git.metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260407-remove_parameter-v1-1-e9729360a2be@redhat.com>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3MSwqAMAxF0a1IxhbiB0W3IiJFXzUDq6RFBHHvF
- odncO9DASoI1GcPKS4JcviEIs9o3qxfYWRJppLLhmtujWI/LkynVbsjQo1rCluh5tl1TCk7FU7
- ufzmQRzQed6TxfT/F+e0xbAAAAA==
-X-Change-ID: 20260407-remove_parameter-f61a3e40cf90
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
- Stefan Hajnoczi <stefanha@redhat.com>, 
- Stefano Garzarella <sgarzare@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Luigi Leonardi <leonardi@redhat.com>
-X-Mailer: b4 0.14.3
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[samba.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[samba.org:s=42];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	TAGGED_FROM(0.00)[bounces-276025-lists,netdev=lfdr.de];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276031-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RSPAMD_URIBL_FAIL(0.00)[samba.org:query timed out];
+	RCPT_COUNT_TWELVE(0.00)[23];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[samba.org,gmail.com,talpey.com,microsoft.com,kernel.org,redhat.com,suse.com,davemloft.net,google.com,vger.kernel.org,lists.linux.dev];
+	DKIM_TRACE(0.00)[samba.org:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[metze@samba.org,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[leonardi@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1C5373B0193
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[samba.org:dkim,samba.org:mid,samba.org:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 233B73B088B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-`virtio_transport_send_pkt_info` gets all the transport information
-from the parameter `t_ops`. There is no need to call
-`virtio_transport_get_ops()`.
+Hi,
 
-Remove it.
+as the work to unify the smbdirect code
+between cifs.ko and ksmbd.ko into an smbdirect.ko
+is in linux-next for a while this is the next
+step to also share the code with userspace
+e.g. Samba as client and server.
 
-Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
-Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
----
-I marked this as net-next material, but honsetly I'm not sure if I
-should have targeted net. It's not a bug after all, it's just a cleanup.
----
- net/vmw_vsock/virtio_transport_common.c | 2 --
- 1 file changed, 2 deletions(-)
+The SMBDIRECT protocol, defined in [MS-SMBD] by Microsoft.
+It is used as wrapper around RDMA in order to provide a transport for SMB3,
+but Microsoft also uses it as transport for other protocols.
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 8a9fb23c6e85..a152a9e208d0 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -60,8 +60,6 @@ static bool virtio_transport_can_zcopy(const struct virtio_transport *t_ops,
- 		return false;
- 
- 	/* Check that transport can send data in zerocopy mode. */
--	t_ops = virtio_transport_get_ops(info->vsk);
--
- 	if (t_ops->can_msgzerocopy) {
- 		int pages_to_send = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
- 
+SMBDIRECT works over Infiniband, RoCE and iWarp.  RoCEv2 is based on IP/UDP
+and iWarp is based on IP/TCP, so these use IP addresses natively.
+Infiniband and RoCEv1 require IPOIB in order to be used for SMBDIRECT.
 
----
-base-commit: bfe62a454542cfad3379f6ef5680b125f41e20f4
-change-id: 20260407-remove_parameter-f61a3e40cf90
+So instead of adding a PF_SMBDIRECT, which would only use AF_INET[6],
+we use IPPROTO_SMBDIRECT instead, this uses a number not
+allocated from IANA, as it would not appear in an IP header.
 
-Best regards,
+This is similar to IPPROTO_SMC, IPPROTO_MPTCP and IPPROTO_QUIC,
+which are linux specific values for the socket() syscall.
+
+  socket(AF_INET, SOCK_STREAM, IPPROTO_SMBDIRECT);
+  socket(AF_INET6, SOCK_STREAM, IPPROTO_SMBDIRECT);
+
+This will allow the existing smbdirect code used by
+cifs.ko and ksmbd.ko to be moved behind the socket layer [1],
+so that there's less special handling. Only sock_sendmsg()
+sock_recvmsg() are used, so that the main stream handling
+is done all the same for tcp, smbdirect and later also quic.
+
+The special RDMA read/write handling will be via direct
+function calls as they are currently done for the in kernel
+consumers.
+
+As a start __sock_create(kern=0)/sk->sk_kern_sock == 0 will
+still cause a -EPROTONOSUPPORT. So only in kernel consumers
+will be supported for now.
+
+For now the core smbdirect code still supports both
+modes, direct calls in indirect via the socket layer.
+The core code uses if (sc->sk.sk_family) as indication
+for the new socket mode. Once cifs.ko and ksmbd.ko
+are converted we can remove the old mode slowly,
+but I'll deferr that to a future patchset.
+
+There's still a way to go in order to make this
+as generic as tcp and quic e.g. adding MSG_SPLICE_PAGES support or
+splice_read/read_sock/read_skb.
+
+But it's a good start, which will make changes much easier.
+
+This patchset is based on top of the smbdirect.ko patches
+in ksmbd-for-next and it's also based on netdev-next
+because it needs this commit from there:
+8341c989ac77d712c7d6e2bce29e8a4bcb2eeae4
+"net: remove addr_len argument of recvmsg() handlers"
+
+Patches 1-4 are some preparation fixes for the
+existing smbdirect.ko patchset. We may
+squash them into the existing patches before
+sending them to Linus. But for now I kept
+them separately. I also don't cc the network and rdma
+people on these...
+
+Patch 5 defines IPPROTO_SMBDIRECT and SOL_SMBDIRECT
+constants (and also reserve the number 288 for SOL_QUIC
+as applications are already using that and we don't
+want to conflict)
+
+Patch 6 adds basic IPPROTO_SMBDIRECT layering
+on top of the existing smbdirect code.
+This is just enough in order to let cifs.ko
+and ksmbd.ko use it in the following commits,
+so userspace still sees -EPROTONOSUPPORT.
+
+Patch 7 converts cifs.ko to use IPPROTO_SMBDIRECT
+as much as currently possible.
+Using sock_sendmsg is not yet possible, because of the
+tcp_sock_set_cork usage, but that will change in future.
+
+Patch 8 converts ksmbd.ko to use IPPROTO_SMBDIRECT.
+
+Because of the need for netdev-next commit
+8341c989ac77d712c7d6e2bce29e8a4bcb2eeae4
+"net: remove addr_len argument of recvmsg() handlers"
+it's a bit tricky to prepare something that would not
+cause problems in linux-next.
+
+We could merge in netdev-next completely,
+but I saw commit 00f03539e3d97af925abf42992d8c46167d54243
+in next-20260406, indicates some resolved conflicts
+with (at least) the rdma tree, which comes
+just before netdev-next, while ksmbd-for-next is merged
+before all of them. So merging netdev-next into
+ksmbd-for-next changes the order of netdev-next vs. rdma.
+
+Or we add a new branch smbdirect-for-next that's
+merged into linux-next after netdev-next.
+
+Or a bit hacky but likely easier, ksmbd-for-next
+just cherry-picks 8341c989ac77d712c7d6e2bce29e8a4bcb2eeae4
+"net: remove addr_len argument of recvmsg() handlers"
+and that cherry picked commit is reverted as
+last commit in ksmbd-for-next, or only in linux-next
+right before netdev-next is merged.
+
+For now I have the patches in a branch with a
+cherry picked version of the needed commit only, see
+for-7.1/ipproto-smbdirect-20260407-v1 at commit:
+e1972e6f1fda9842c5724b7daf4a2aa7779901a5
+git fetch https://git.samba.org/metze/linux/wip.git for-7.1/ipproto-smbdirect-20260407-v1
+https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/for-7.1/ipproto-smbdirect-20260407-v1
+
+It would be great to get this somehow into linux-next soon :-)
+
+Stefan Metzmacher (8):
+  smb: smbdirect: change
+    smbdirect_socket_parameters.{initiator_depth,responder_resources} to
+    __u16
+  smb: smbdirect: fix copyright header of smbdirect.h
+  smb: smbdirect: fix the logic in smbdirect_socket_destroy_sync()
+    without an error
+  smb: smbdirect: let smbdirect_connection_deregister_mr_io unlock while
+    waiting
+  net: define IPPROTO_SMBDIRECT and SOL_SMBDIRECT constants
+  smb: smbdirect: add in kernel only support for IPPROTO_SMBDIRECT
+  smb: client: make use of IPPROTO_SMBDIRECT sockets
+  smb: server: make use of IPPROTO_SMBDIRECT sockets
+
+ fs/smb/client/cifs_debug.c                    |    2 +-
+ fs/smb/client/cifsfs.c                        |    2 +-
+ fs/smb/client/cifsglob.h                      |    7 +-
+ fs/smb/client/connect.c                       |  123 +-
+ fs/smb/client/file.c                          |    8 +-
+ fs/smb/client/sess.c                          |    4 +-
+ fs/smb/client/smb2ops.c                       |    8 +-
+ fs/smb/client/smb2pdu.c                       |   10 +-
+ fs/smb/client/smbdirect.c                     |  275 +--
+ fs/smb/client/smbdirect.h                     |   27 +-
+ fs/smb/client/transport.c                     |    2 +-
+ fs/smb/common/smbdirect/Makefile              |    1 +
+ fs/smb/common/smbdirect/smbdirect.h           |   69 +-
+ fs/smb/common/smbdirect/smbdirect_accept.c    |   14 +-
+ .../common/smbdirect/smbdirect_connection.c   |   58 +
+ fs/smb/common/smbdirect/smbdirect_devices.c   |    2 +-
+ fs/smb/common/smbdirect/smbdirect_internal.h  |   59 +-
+ fs/smb/common/smbdirect/smbdirect_listen.c    |   49 +-
+ fs/smb/common/smbdirect/smbdirect_main.c      |   45 +
+ fs/smb/common/smbdirect/smbdirect_mr.c        |   18 +
+ fs/smb/common/smbdirect/smbdirect_proto.c     | 1549 +++++++++++++++++
+ fs/smb/common/smbdirect/smbdirect_public.h    |    3 +
+ fs/smb/common/smbdirect/smbdirect_rw.c        |   29 +-
+ fs/smb/common/smbdirect/smbdirect_socket.c    |  180 +-
+ fs/smb/common/smbdirect/smbdirect_socket.h    |   26 +-
+ fs/smb/server/transport_rdma.c                |  119 +-
+ include/linux/socket.h                        |    2 +
+ include/uapi/linux/in.h                       |    2 +
+ 28 files changed, 2320 insertions(+), 373 deletions(-)
+ create mode 100644 fs/smb/common/smbdirect/smbdirect_proto.c
+
 -- 
-Luigi Leonardi <leonardi@redhat.com>
+2.43.0
 
 
