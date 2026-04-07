@@ -1,72 +1,74 @@
-Return-Path: <netdev+bounces-275824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275826-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id kNycHVRm1GnptgcAu9opvQ
-	(envelope-from <netdev+bounces-275824-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:05:08 +0200
+	id KOEaJ0Bn1GnptgcAu9opvQ
+	(envelope-from <netdev+bounces-275826-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:09:04 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C29FA3A8D9A
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:05:07 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id A35AB3A8E00
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:09:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D04523017C2B
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:05:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id ADFCC300602F
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:09:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1FA11DE8BE;
-	Tue,  7 Apr 2026 02:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 897E626FA6F;
+	Tue,  7 Apr 2026 02:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V5bqUeVK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SCwtf8bs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6A7EED8;
-	Tue,  7 Apr 2026 02:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D41EED8;
+	Tue,  7 Apr 2026 02:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775527502; cv=none; b=fYo86cN88LtP6uDgHGdergqvyMn5tsPJBcThRQwwQ27+qQADtbO6jQFBH310BC6qoRiKSk0pHig7hN2Bfbqgj9zvZ/UlEgW1wvfcbQ4jKUSsMbnaqmB2AJr2xv3RnwunscSya+ksajN78DVmp5DSIhwS9MrwrlXwhDYGVd1/7V8=
+	t=1775527737; cv=none; b=ouYvg5DC7ie4C4asegOWm6nFi+PlqpHrQEAOuSpLFA1BrtQluZm8tDTxXlG+UGPJQqF7EDcNzUNKHlmH5tqP9p1+ti2ewBoHzun1CiMnJFjqzS/xE+7ayV77D5cTA+zNOLK4rMtGwjOGE2+O30clAb8R/u0RDc4oRjknedf81hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775527502; c=relaxed/simple;
-	bh=QAbPk6VWnQg1ID0bqbSVaZJqWzuhr7oU3u8vHAFVY3c=;
+	s=arc-20240116; t=1775527737; c=relaxed/simple;
+	bh=He/fqeGcwQSmgNiVZyJYEsyIDIMjQPKTbSWJEV+kcCU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A4TuzMB5xbBjkYUt9lpPbt9LNHuHXd1gWymTHprQg4FaNLMRRa6VOgeMMv+uNYZb1OkYJXQ2DAcOC+O0z889cIRelKNdYJAAlry/SCett5wbsqa8P59H2A3VmCe/wZnby1ufih2VOqZq6g10Tx+yGt7GocmIgUwpMl9ob+uFxDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V5bqUeVK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A9A5C4CEF7;
-	Tue,  7 Apr 2026 02:05:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=T3lKmnncjBlf1V/krjrZEAnkPSenrw7cklK9IuWfIIVdxw4Cj12XicSlQik1b7dJ01exNSG0PZ7P2k0xR+v8kSizaukLI7G12xlz/+OJwJOVOqO5+PuOjyufjDl2clCNyc2zcxSKzgQs/xlMyMndzmMwzTunhUOXtJXj6z8+FeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SCwtf8bs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73830C4CEF7;
+	Tue,  7 Apr 2026 02:08:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775527502;
-	bh=QAbPk6VWnQg1ID0bqbSVaZJqWzuhr7oU3u8vHAFVY3c=;
+	s=k20201202; t=1775527737;
+	bh=He/fqeGcwQSmgNiVZyJYEsyIDIMjQPKTbSWJEV+kcCU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=V5bqUeVK7FEQTESf6if9UYiMQOfsqbgiDnPbwEKGzpMZztP8UvkT0gfb0tloi4KcB
-	 7nC1HYLzApKHl+RGixxl+vnK0N1fhxt+sF4aVRh6/ViApMBp5hs3KopqPRn+epXKoL
-	 zIAEONunhGo8J2YGpkZos6Ea1be0bTqcXNLpL7QdYssWc/C/FnGs0DZR2E+GPyF090
-	 cvv60+P/p2RHJHRe9hiLJwrkDzNAgfbN66bPhUDtOH+ojF2fQFwggEunHxCpJ5cwpS
-	 Sa6nEtUXsAYXym3O7zFCJH2aOTm2zxDrSpQ124xkuPcOfDJd1lw7XTATws4j5eYmtv
-	 aZkjZVOMMeKYw==
-Date: Mon, 6 Apr 2026 19:05:00 -0700
+	b=SCwtf8bsMl12ktsPj3oFIc41TE+oL3ZUtJTlC97i90HEZdaH8X31PgsavVyH3kh6k
+	 CCCqFJ/2XHGourzmLkiJRmAfLRskkbx//u9zDnspLyUJJWy70eweGSOZkVwIYbqLGf
+	 ygxoAxXlUTUgO93D+H9m/4LbLJkeShPK28qPppBGLoNDwCd2oK/GZDkb7X47QZaZHk
+	 8Aq/Ph9PlCkVvCXuCAvJb4hbQNA2U701K8T7huPQWgxAkBNufohNjw58v29o2tFMGt
+	 aeImjBNE+hCaCnqJ7xKFrunMecQIm/I3xxrR4QLVV0FPhPVsKGkNO+b+3jvojxvhFh
+	 SWhw+PJl2n2UA==
+Date: Mon, 6 Apr 2026 19:08:54 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Arnd Bergmann" <arnd@arndb.de>
-Cc: "Simon Horman" <horms@kernel.org>, "Ilias Apalodimas"
- <ilias.apalodimas@linaro.org>, "Arnd Bergmann" <arnd@kernel.org>, Netdev
- <netdev@vger.kernel.org>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S .
- Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Paolo
- Abeni" <pabeni@redhat.com>, "Grygorii Strashko" <grygorii.strashko@ti.com>,
- "Murali Karicheri" <m-karicheri2@ti.com>, "Siddharth Vadapalli"
- <s-vadapalli@ti.com>, "Roger Quadros" <rogerq@kernel.org>, "Vladimir
- Oltean" <vladimir.oltean@nxp.com>, "Alexander Sverdlin"
- <alexander.sverdlin@gmail.com>, "Ioana Ciornei" <ioana.ciornei@nxp.com>,
- Linux-OMAP <linux-omap@vger.kernel.org>, "Kevin Hao" <haokexin@gmail.com>,
- "Daniel Zahka" <daniel.zahka@gmail.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] [v4, net-next] net: ethernet: ti-cpsw:: rename
- soft_reset() function
-Message-ID: <20260406190500.21c4ec2d@kernel.org>
-In-Reply-To: <64384fd1-edb3-4c7a-9ba8-56385a303d35@app.fastmail.com>
-References: <20260402184726.3746487-1-arnd@kernel.org>
-	<CAC_iWj+vjZ0WnKUuqeFfaPeSoj5ovxZiEmUD5R8hPsRfkqMihQ@mail.gmail.com>
-	<4498f664-15ca-4859-a050-a593f124105f@app.fastmail.com>
-	<20260404091100.GT113102@horms.kernel.org>
-	<64384fd1-edb3-4c7a-9ba8-56385a303d35@app.fastmail.com>
+To: "Jitendra Vegiraju" <jitendra.vegiraju@broadcom.com>
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com,
+ richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, rmk+kernel@armlinux.org.uk,
+ rohan.g.thomas@altera.com, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org,
+ andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me, me@ziyao.cc,
+ siyanteng@cqsoftware.com.cn, prabhakar.mahadev-lad.rj@bp.renesas.com,
+ weishangjuan@eswincomputing.com, wens@kernel.org, vladimir.oltean@nxp.com,
+ lizhi2@eswincomputing.com, boon.khai.ng@altera.com,
+ maxime.chevallier@bootlin.com, chenchuangyu@xiaomi.com,
+ yangtiezhu@loongson.cn, ovidiu.panait.rb@renesas.com,
+ chenhuacai@kernel.org, florian.fainelli@broadcom.com,
+ quic_abchauha@quicinc.com
+Subject: Re: [PATCH net-next v9 4/4] net: stmmac: Add BCM8958x driver to
+ build system
+Message-ID: <20260406190854.13596789@kernel.org>
+In-Reply-To: <20260402213629.1996133-5-jitendra.vegiraju@broadcom.com>
+References: <20260402213629.1996133-1-jitendra.vegiraju@broadcom.com>
+	<20260402213629.1996133-5-jitendra.vegiraju@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,54 +82,46 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275824-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275826-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,linaro.org,vger.kernel.org,lunn.ch,davemloft.net,google.com,redhat.com,ti.com,nxp.com,gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[vger.kernel.org,foss.st.com,davemloft.net,google.com,redhat.com,gmail.com,broadcom.com,kernel.org,iogearbox.net,armlinux.org.uk,altera.com,st-md-mailman.stormreply.com,lists.infradead.org,lunn.ch,fomichev.me,ziyao.cc,cqsoftware.com.cn,bp.renesas.com,eswincomputing.com,nxp.com,bootlin.com,xiaomi.com,loongson.cn,renesas.com,quicinc.com];
+	RCPT_COUNT_TWELVE(0.00)[37];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
 	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
+	NEURAL_HAM(-0.00)[-0.999];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuba@kernel.org,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[kernel.org:+];
 	MID_RHS_MATCH_FROM(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
+	TAGGED_RCPT(0.00)[netdev,kernel];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C29FA3A8D9A
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[broadcom.com:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A35AB3A8E00
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Sun, 05 Apr 2026 21:31:28 +0200 Arnd Bergmann wrote:
-> On Sat, Apr 4, 2026, at 11:11, Simon Horman wrote:
-> > On Thu, Apr 02, 2026 at 09:16:29PM +0200, Arnd Bergmann wrote:  
-> >> On Thu, Apr 2, 2026, at 21:13, Ilias Apalodimas wrote:
-> >> 
-> >> Before the c5013ac1dd0e1 commit, this was a 'static inline' function,
-> >> which is allowed to clash with other identifiers. Making it a global
-> >> symbol during the move was a problem.  
-> >
-> > If we are going to treat this as a fix then probably it should be separated
-> > from the rest of the patchset and routed via net. With the rump patchset
-> > re-submitted to net-next once dependencies are in place.  
-> 
-> I'll drop patch 1 then and send the other two when I get the next
-> regression with duplicate objects in a couple of releases. I'm
-> travelling at the moment and won't have time to rebase and test
-> before the merge window.
-> 
-> It's no longer urgent since both cpsw and dpaa2 have been broken for
-> years now since I first reported the regression.
+On Thu,  2 Apr 2026 14:36:29 -0700 Jitendra Vegiraju wrote:
+> +BROADCOM BCM8958X ETHERNET DRIVER
+> +M:	Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+> +R:	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
 
-Seems borderline, let me take it via net-next without the Fixes tag.
+Should be:
+
+L:	<bcm-kernel-feedback-list@broadcom.com>
+
+It's not a parson.
+Before you ask - FWIW what other subsystems allow in MAINTAINERS
+is irrelevant.
+
+> +L:	netdev@vger.kernel.org
 
