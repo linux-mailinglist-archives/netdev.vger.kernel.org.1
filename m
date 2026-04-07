@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-275960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275963-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id sDfBBtbt1GkjywcAu9opvQ
-	(envelope-from <netdev+bounces-275960-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:43:18 +0200
+	id 2PpqF+nt1GkjywcAu9opvQ
+	(envelope-from <netdev+bounces-275963-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:43:37 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8BEF3ADDB3
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:43:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1601F3ADDE9
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:43:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 94E3E30143F4
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 11:43:16 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AC96530185A3
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 11:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 568FD3AEF43;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFF4B3B0ADD;
 	Tue,  7 Apr 2026 11:43:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="lqLvqhF3"
+	dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="TBX94DZT"
 X-Original-To: netdev@vger.kernel.org
 Received: from www537.your-server.de (www537.your-server.de [188.40.3.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7388022D7B5;
-	Tue,  7 Apr 2026 11:43:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B323AE6F7;
+	Tue,  7 Apr 2026 11:43:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.3.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775562193; cv=none; b=S5YET52PDXnWMFFOjUQo60Gxsd3Ev4keoMTlQw1G0KkVOB9m46lIikcKqfj0oIXn0GCLzx0dvylioMsn8Rbi28yUrC+BBvR0hXp8wozh/ZcSPUVk5J0xRtmZr8CWk29mWK/eFiLFHyyuuP7VLI3tCupvDRycz1VZUJMOgbFhwzw=
+	t=1775562193; cv=none; b=EMYDELSb2d8NRN+OHr4bWyaE6OSOEigZv15aCDVSLQrlMkaOWbOUIDKh33QF41VYOnWnGjRqnFEFAJ/vMGX04ZFCHZILRJxBc0Qdn1jQ0SqBlfGiwp2JT1CNHyQzrIQKkpmymLYSKjLxe9jxX0Pep4mXuM9gNrRk6wFIL74BDmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775562193; c=relaxed/simple;
-	bh=nHrM03wRuMc4wMBBtQ8fqkoqDTyblmWSd3XLIUHzVpg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sqL0VqY1lj7mC7OxGRIgoPHIogQ6t+AOWxvYIsxJsICxVlcgR3e2mICO9QtiwZlRn9TG/02Z/rF/hqF9i7JoHkBoN4TOaFv+/wSss+IWADJ9/qNrmzy9jvzvcWJg7dWkPaWLm4QX8BYRD6h2t/X56jUf3QnK84ZO8GE5RqeS9nc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=lqLvqhF3; arc=none smtp.client-ip=188.40.3.216
+	bh=SmxwvldxsVZZ0J82vA9fO2JiHhyxrO5dEylcDSwCcWg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WcsCzWygING92CqfAQhPqZ2wTzo2v5GSJuVXHQT1Z/x5CCnhvb6lQ2zDzzoyh6M4VicMgy2VvMEdabP6DLzZ3CefYBCd+WS5Z7qK5kId4wF4htPrZ2K0GGQFinu9bSdRLifDogkxZjYVOs5ZlApS31/8XwCByMiC7CN/5v4Z868=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=TBX94DZT; arc=none smtp.client-ip=188.40.3.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ew.tq-group.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=ew.tq-group.com; s=default2602; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=m8+dxvmtECNtO6/nlvcPTQOUYVBF4c5AJ3AT7nnB+dY=; b=lqLvqhF3ilaOrBHq8SKJmK6IJv
-	ypuf7HzVvhUCp4JK/C6quvv7u1N0L0XY1DKGnEA1k+Ndys6s+N3Wk7jq5JErjE4ECWaiCx9p/sZ2d
-	VYVwGQNJgfLe8a6FmhdGP9TAwUHztx/BWLd0bMB6/rzoRADtoKpdVJ3P7wiThH6Q2OkKPr05rOFMO
-	hFMEeMNFS6VfhK6GJgUr17EZtyp+LVe9VxQHJXq27a8J7d9DtDwy0VEawEQJ/7gBoijtc9C0+3EZX
-	E2/q+dw/V1jczghDcQiMUlstZKNp1eJYg/nK+HgT4ZYt1lVvqZt0wDNBpBIFmHw70zsJQHRmXtZOj
-	Nb8wtueA==;
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=q3lc7HIf7EMrxpUFQEZNt+F3YfJliSNzOpaipwXNlVo=; b=TBX94DZTZryfkNjOyil/zViwcG
+	Cw255Z2j5ZLA53O8ToJNFlUZH0a3/GOf0r240Ey4mqAjN5wTo4ylIQxnbxVOoHTIeLEwRzazRKWZF
+	4qGg5WFqW4u1BT1ki2Tg2vbIHj5wNGKa1vWXfAR1AVgKFYTuMkpLE8UDHFekpZCsnz17pGKNBkQHQ
+	0E9pAU72KRdypBcx1LYEa/2G6u94Q7exQmjPhAidQt/MLAvgjOoov7xZRQD8M7jMIkQmfWNDZDL2O
+	8RdfDMe5UeEA4RFM37ZbnDu4yzfHCjUaxh6AaaHOUOL5ifCnvzTfuhMzvntP237mI3VDBhLSLOyfA
+	0evTaSHA==;
 Received: from sslproxy08.your-server.de ([78.47.166.52])
 	by www537.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96.2)
 	(envelope-from <nora.schiffer@ew.tq-group.com>)
-	id 1wA4pn-000IJI-0U;
-	Tue, 07 Apr 2026 13:43:07 +0200
+	id 1wA4po-000IJS-0T;
+	Tue, 07 Apr 2026 13:43:08 +0200
 Received: from localhost ([127.0.0.1])
 	by sslproxy08.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <nora.schiffer@ew.tq-group.com>)
-	id 1wA4pl-000PKA-1n;
-	Tue, 07 Apr 2026 13:43:06 +0200
+	id 1wA4pm-000PKA-1k;
+	Tue, 07 Apr 2026 13:43:07 +0200
 From: Nora Schiffer <nora.schiffer@ew.tq-group.com>
 To: Nishanth Menon <nm@ti.com>,
 	Vignesh Raghavendra <vigneshr@ti.com>,
@@ -79,10 +80,12 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	linux-arm-kernel@lists.infradead.org,
 	linux@ew.tq-group.com,
 	Nora Schiffer <nora.schiffer@ew.tq-group.com>
-Subject: [PATCH v4 0/5] J722S SGMII support
-Date: Tue,  7 Apr 2026 13:42:32 +0200
-Message-ID: <cover.1775559102.git.nora.schiffer@ew.tq-group.com>
+Subject: [PATCH v4 1/5] dt-bindings: phy: ti: phy-j721e-wiz: Add ti,j722s-wiz-10g compatible
+Date: Tue,  7 Apr 2026 13:42:33 +0200
+Message-ID: <1ef8adf850f2fd41b6c4e3c89e4f4e6e0f469a0e.1775559102.git.nora.schiffer@ew.tq-group.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <cover.1775559102.git.nora.schiffer@ew.tq-group.com>
+References: <cover.1775559102.git.nora.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,7 +107,7 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	HAS_LIST_UNSUB(-0.01)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	TAGGED_FROM(0.00)[bounces-275960-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275963-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	RECEIVED_HELO_LOCALHOST(0.00)[];
 	FROM_HAS_DN(0.00)[];
@@ -119,56 +122,48 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	TAGGED_RCPT(0.00)[netdev,dt];
 	RCPT_COUNT_TWELVE(0.00)[22];
 	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: A8BEF3ADDB3
+X-Rspamd-Queue-Id: 1601F3ADDE9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-The J722S CPSW and SERDES are very similar to the variants found on the
-AM64, but they additionally support SGMII. Introduce new compatible
-strings for the J722S to add this support to the drivers.
+The J722S WIZ is mostly identical to the AM64's, but additionally supports
+SGMII. The AM64 compatible ti,am64-wiz-10g is used as a fallback.
 
-This is a prerequisite for the Single-Pair Ethernet interface of the
-TQ-Systems MBa67xx baseboard for the TQMa67xx SoM, which will be
-submitted separately.
+Signed-off-by: Nora Schiffer <nora.schiffer@ew.tq-group.com>
+---
+ .../bindings/phy/ti,phy-j721e-wiz.yaml        | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-For SGMII to actually work on the J722S, the am65-cpsw needs to be extended
-as well, which has been submitted for net-next:
-https://patchwork.kernel.org/project/netdevbpf/list/?series=1078111
-
-Fallback compatible strings allow for the patches to be applied in any
-order and to go through different trees without breaking existing
-functionality.
-
-v4:
-- remove redundant items: level from DT binding YAMLs
-
-v3:
-- Drop am65-cpsw changes from this series, they need to go through net-next
-- Fix missing PHY_GMII_SEL_RGMII_ID_MODE and PHY_GMII_SEL_FIXED_TX_DELAY in
-  gmii-sel driver for RGMII delay mode configuration
-
-v2:
-- Keep support for the AM64 compatible strings as a fallback, adjust commit
-  messages
-- Drop reference to AM64_CPSW_QUIRK_CUT_THRU flag, which only exists in the
-  TI vendor kernel
-
-Nora Schiffer (5):
-  dt-bindings: phy: ti: phy-j721e-wiz: Add ti,j722s-wiz-10g compatible
-  dt-bindings: phy: ti: phy-gmii-sel: Add ti,j722s-phy-gmii-sel
-    compatible
-  phy: ti: phy-j721e-wiz: add support for J722S SoC family
-  phy: ti: gmii-sel: add support for J722S SoC family
-  arm64: dts: ti: k3-j722s-main: use J722S compatibles for WIZ, gmii-sel
-    and CPSW3G
-
- .../bindings/phy/ti,phy-gmii-sel.yaml         | 23 +++++++++++-------
- .../bindings/phy/ti,phy-j721e-wiz.yaml        | 19 +++++++++------
- arch/arm64/boot/dts/ti/k3-j722s-main.dtsi     | 12 ++++++++--
- drivers/phy/ti/phy-gmii-sel.c                 | 13 ++++++++++
- drivers/phy/ti/phy-j721e-wiz.c                | 24 +++++++++++++++++++
- 5 files changed, 73 insertions(+), 18 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/phy/ti,phy-j721e-wiz.yaml b/Documentation/devicetree/bindings/phy/ti,phy-j721e-wiz.yaml
+index 3f16ff14484d2..0653252c18d8e 100644
+--- a/Documentation/devicetree/bindings/phy/ti,phy-j721e-wiz.yaml
++++ b/Documentation/devicetree/bindings/phy/ti,phy-j721e-wiz.yaml
+@@ -12,13 +12,18 @@ maintainers:
+ 
+ properties:
+   compatible:
+-    enum:
+-      - ti,j721e-wiz-16g
+-      - ti,j721e-wiz-10g
+-      - ti,j721s2-wiz-10g
+-      - ti,am64-wiz-10g
+-      - ti,j7200-wiz-10g
+-      - ti,j784s4-wiz-10g
++    oneOf:
++      - enum:
++          - ti,j721e-wiz-16g
++          - ti,j721e-wiz-10g
++          - ti,j721s2-wiz-10g
++          - ti,am64-wiz-10g
++          - ti,j7200-wiz-10g
++          - ti,j784s4-wiz-10g
++      - items:
++          - enum:
++              - ti,j722s-wiz-10g
++          - const: ti,am64-wiz-10g
+ 
+   power-domains:
+     maxItems: 1
 -- 
 TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
 Amtsgericht München, HRB 105018
