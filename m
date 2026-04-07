@@ -1,126 +1,132 @@
-Return-Path: <netdev+bounces-275839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275842-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MEi8Fsxr1GletwcAu9opvQ
-	(envelope-from <netdev+bounces-275839-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:28:28 +0200
+	id GI5wDIZs1GmatwcAu9opvQ
+	(envelope-from <netdev+bounces-275842-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:31:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A64533A9079
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:28:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A24663A914D
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:31:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 351463040183
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:27:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2B540301F9FC
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F3C3351C04;
-	Tue,  7 Apr 2026 02:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5EC0350D7F;
+	Tue,  7 Apr 2026 02:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b="mlw6llIe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oyB9y6I1"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.baidu.com (jpmx.baidu.com [119.63.196.201])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 3E0E7238178;
-	Tue,  7 Apr 2026 02:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.63.196.201
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B5E34F497;
+	Tue,  7 Apr 2026 02:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775528876; cv=none; b=ZSF5MS+LgkaHugRtlBOlPXaCJ8cvnNJQIDoua8lxh3zZRPhVkeO9m1bRWx4n24bnqtBK3ICd8LUB77oB9jI8gFoCAInsKnIGDZ9K4ZwzRg3AiDBmy/k/lrFdk+ijolDLIqXgej3JfJaObDiSwd/KjkZh5BDzwPJngwA+yqKUaig=
+	t=1775529027; cv=none; b=gwu2K/M5PsLgeIyN2lIccKlXHxCzxVE53gVpXLuDNS8GNi/n8RACgbgBG5Wf+FlfE21Mo6CdYotml2vpWAICqKWyEOXLFeJPOyT3f62QD3VSb7iWUHf7NxxiiHpubyvPsTj0UmnUaC9SEEFaHqQmY1VG71/SPhr5G/mh4Sj1doQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775528876; c=relaxed/simple;
-	bh=W/xxQQVyTbtVD25wXMT+RCdTuEaBRAJrbFb2CKhUJQM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WUhnPKCBNa144EoSVO8H+mLKIo7y9SN8iutDqoPqMgnKeJV0Mp3vBoN5gedYTykdfGq/KhOTkeZIMzamQqw73m88Y82AT2rwjwdTXNJmvkndV1dw2tGF3e613uD5OWcf5uXS1EOvVM2d3N8Z6YNYb7Mi3npQFNKotalYGQyj5Cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; dkim=pass (2048-bit key) header.d=baidu.com header.i=@baidu.com header.b=mlw6llIe; arc=none smtp.client-ip=119.63.196.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-X-MD-Sfrom: lirongqing@baidu.com
-X-MD-SrcIP: 172.31.50.47
-From: lirongqing <lirongqing@baidu.com>
-To: Jiri Pirko <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Mateusz
- Polchlopek <mateusz.polchlopek@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Li RongQing <lirongqing@baidu.com>
-Subject: [PATCH] devlink: Fix incorrect skb socket family dumping
-Date: Mon, 6 Apr 2026 22:27:30 -0400
-Message-ID: <20260407022730.2393-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1775529027; c=relaxed/simple;
+	bh=mZ3uY486A1qHU8NVBKPstw2sALiJlVUGNsNBRlP6Usk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qL7hMX8BjPvG+U3qt9UmPoe8uT6pwe7xdCYxYZeVUr0CU/YzAyZQxTRdfrFVgf80Vpa8HL3Naymky7SJjbm4TUGwMOikV0QkaJF+gUVO/LMcIMX2hhEcOemXYOWurbZ3xPqbEP0o26JxA51Tlf/iECvnw4pG9No4BzL3eJk08YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oyB9y6I1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 347F4C4CEF7;
+	Tue,  7 Apr 2026 02:30:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775529027;
+	bh=mZ3uY486A1qHU8NVBKPstw2sALiJlVUGNsNBRlP6Usk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=oyB9y6I1L4XASOJNLu4lqmAwO/TIwqvKhllNeV6NgLL1P5EmZT+VbzAv1gO1QaQym
+	 iLCQHndfK6Xs4OYHT7qGcrMcoUKNSVEaSKcomMvnrNSOa0bLtJcuJlfP83OPUOY5Ih
+	 qXq3XsHUha8l0c7tTsz9YiM1xpEuB/sA420U6Pap+ECXOEi9smCpBZWRR4IdA1pKJT
+	 EKRqE5FeiWMyXtnu8KMYDFu5TQ0rfSOoaXgRTXiTUTfvAfUvN+cUCesBS0rfonP7vY
+	 r6opEP99DtAafedUhW8R37QC/G3xk4y/OitadWRJN+YbdDGW+uBekbclA3G/AjwTUh
+	 Q+bPYuAp5IB5Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9E723809A28;
+	Tue,  7 Apr 2026 02:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: bjkjy-exc11.internal.baidu.com (172.31.51.11) To
- bjkjy-exc3.internal.baidu.com (172.31.50.47)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=baidu.com;
-	s=selector1; t=1775528861;
-	bh=rMxAsSE1T2ENZfR5RXIKLUTCSrJJ56L2NjvuWxizi08=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type;
-	b=mlw6llIekOJTsGnqPBdavbTKtLp8BZIzuRiiwho+ELKucp3wFQryBTiZxQmTfxH41
-	 z+qlnXLD3BrZZvBmeLoVnPaTx3JVNF+mEE82Rn8n6HuxfBjbyaQIF3JHchXXljwll9
-	 i6VtEas+EQQquMRwooJF512XlFBLBXpWc3jjhEZoXsf1jc+gsT+EbK73q9hWA78wTf
-	 BuK+ejC2EwyJemfiD4QvvezN2Rn3ntIwQ14bj6i7jb9yOFaSgG06k8MQ3q5raTCp9d
-	 kgke95emH1our0obrJWtRWXv7lXDY/ZFnmyenEZ9rELaR+kweW0G8DvGQJCXM3RVxD
-	 QzHq6Y2SiEycQ==
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net/mlx5: Update the list of the PCI supported
+ devices
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <177552900555.3349888.9239225042307354768.git-patchwork-notify@kernel.org>
+Date: Tue, 07 Apr 2026 02:30:05 +0000
+References: <20260403091756.139583-1-tariqt@nvidia.com>
+In-Reply-To: <20260403091756.139583-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
+ michaelgur@nvidia.com, stable@vger.kernel.org, phaddad@nvidia.com
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	MID_CONTAINS_FROM(1.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[baidu.com,quarantine];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[baidu.com:s=selector1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275839-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275842-lists,netdev=lfdr.de,netdevbpf];
+	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	RCPT_COUNT_TWELVE(0.00)[16];
 	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	FORGED_SENDER_MAILLIST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_NO_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lirongqing@baidu.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[baidu.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_COUNT_FIVE(0.00)[5];
+	PRECEDENCE_BULK(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: A64533A9079
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A24663A914D
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-From: Li RongQing <lirongqing@baidu.com>
+Hello:
 
-The devlink_fmsg_dump_skb function was incorrectly using the socket
-type (sk->sk_type) instead of the socket family (sk->sk_family)
-when filling the "family" field in the fast message dump.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-This patch fixes this to properly display the socket family.
+On Fri, 3 Apr 2026 12:17:56 +0300 you wrote:
+> From: Michael Guralnik <michaelgur@nvidia.com>
+> 
+> Add the upcoming ConnectX-10 NVLink-C2C device ID to the table of
+> supported PCI device IDs.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Michael Guralnik <michaelgur@nvidia.com>
+> Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> 
+> [...]
 
-Fixes: 3dbfde7f6bc7b8 ("devlink: add devlink_fmsg_dump_skb() function")
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
- net/devlink/health.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Here is the summary with links:
+  - [net-next] net/mlx5: Update the list of the PCI supported devices
+    https://git.kernel.org/netdev/net/c/a9d4f4f6e65e
 
-diff --git a/net/devlink/health.c b/net/devlink/health.c
-index 449c761..ea7a334 100644
---- a/net/devlink/health.c
-+++ b/net/devlink/health.c
-@@ -1327,7 +1327,7 @@ void devlink_fmsg_dump_skb(struct devlink_fmsg *fmsg, const struct sk_buff *skb)
- 	if (sk) {
- 		devlink_fmsg_pair_nest_start(fmsg, "sk");
- 		devlink_fmsg_obj_nest_start(fmsg);
--		devlink_fmsg_put(fmsg, "family", sk->sk_type);
-+		devlink_fmsg_put(fmsg, "family", sk->sk_family);
- 		devlink_fmsg_put(fmsg, "type", sk->sk_type);
- 		devlink_fmsg_put(fmsg, "proto", sk->sk_protocol);
- 		devlink_fmsg_obj_nest_end(fmsg);
+You are awesome, thank you!
 -- 
-2.9.4
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
