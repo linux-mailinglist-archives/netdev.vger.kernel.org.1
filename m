@@ -1,206 +1,213 @@
-Return-Path: <netdev+bounces-275924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275927-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 8FlQOGbR1GlJxwcAu9opvQ
-	(envelope-from <netdev+bounces-275924-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:41:58 +0200
+	id 0N6pC4nS1Gl/xwcAu9opvQ
+	(envelope-from <netdev+bounces-275927-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:46:49 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 283853AC36D
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:41:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E6A43AC455
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:46:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 401CE300A619
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 09:40:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A88B302ED4D
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 09:42:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDE4439B49C;
-	Tue,  7 Apr 2026 09:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lcxnp3wZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E52883A5E67;
+	Tue,  7 Apr 2026 09:42:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A3C397E9F;
-	Tue,  7 Apr 2026 09:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7F026ED45;
+	Tue,  7 Apr 2026 09:42:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.16.166
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775554839; cv=none; b=WSOiR6ORWn3uQNiakBa6c+OKQbBMU+NF62Nd0K9o/LMCoixd+gmalTjbU2A053TRlRKaDlh17u2yON2BcMYc4FzjADWTd5gQcsy5yCpxU6DRqqO6srVyjNPRBGvMeNCQU5f05NNhxli6ittibq2jtLfMWQKO4wFEEPKy9o585tk=
+	t=1775554954; cv=none; b=Y838dgW6A79XZvuAkpBSQFacc06HlenL0uRq7+QW3WHpKSq2WARPON+qTbFAjZsY3BBwVVMW6cbr2/beeVo/JOx/f7/Pyepvf/hHAj2ybaStju4seJkvgwKTzioG3x+QjrVv6vLMYJ+dNv3kXQrvGfmXClHUlv5jOe1ltCkeF9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775554839; c=relaxed/simple;
-	bh=4lyCBGNQl/3+m1BK3GENq+afc9cSJKlavGL0IGYAg0k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lmDiwc1q32lB7xLM8HD20UZG7lnnuV6G1pu6N7ZZ7ytpb9oTbYL20p8wi4Ehbhw3+BQWv/zb6AA2iZVRlm2LCJ3Cx5RzKPNQ4ER0OmDT5uSAHC3wv9jqQj6RNCvdfEHFa07VKCYkcpLkjp5d5Quw6mESGR08aMrSjffSvC8Ihog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lcxnp3wZ; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 228ED1A31B3;
-	Tue,  7 Apr 2026 09:40:36 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id EACA8603C7;
-	Tue,  7 Apr 2026 09:40:35 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 18AED1045017D;
-	Tue,  7 Apr 2026 11:40:31 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1775554835; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=7i4+STDc0ibhW0/mMo7y7QeOw6BMz3TT9b7HewYcv4E=;
-	b=lcxnp3wZXO0F6B8ALu88ruzpEAowiinyeFN8O/61TDxyAL8AaB9UhtV/2texsuYG8DVQQQ
-	wj0l/fzDMZxm7CeLar+phAveyndZUseU7XXt8BJY0qu7UdXt0vjC60MD9jNy/PIPiyJ/nY
-	zW/HcY6NkIIVhaQZLncvaF/wY8GGGBztxt3YQzGYZY+Awj4AAhR+KxerVaPGIMeKwY/h6h
-	g1Gd0sSFRP4s6RDe21GlKyAQU4de1FnxjCCwBQ29+cvIH1Y1mFuCg5KNyc3I/AFkirysnY
-	NrAKlhn4/mlZ7VwkCyQxoRdIFtCVoqW0b3Z8IbPW5I/VO8lIftMOeLkzo4c/gA==
-Date: Tue, 7 Apr 2026 11:40:30 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Carlo Szelinsky <github@szelinsky.de>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Jakub
- Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/3] net: mdio: treat PSE EPROBE_DEFER as
- non-fatal during PHY registration
-Message-ID: <20260407114030.4cd0d6a4@kmaincent-XPS-13-7390>
-In-Reply-To: <adO_Za-X1cMjCEEa@pengutronix.de>
-References: <6185f9d8-dabe-4190-b020-711e3a046e64@lunn.ch>
-	<20260405185730.3937952-1-github@szelinsky.de>
-	<adN9Ha5FgJ8sp6gj@pengutronix.de>
-	<1df8b470-2449-418d-a4a8-9cd929ced463@lunn.ch>
-	<adO_Za-X1cMjCEEa@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1775554954; c=relaxed/simple;
+	bh=Y7ZnMXEFIEemEET8vrnmFEFBonhOELzPkEsKH3dqgKY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ofe7hH15EHXyejr1qvIDhsL0LQTQasN0Rv8CW3CQgNfzNcow1ilrrwLEPd6NYns6xuBLSNBOcuVGlwTt4/lqIX8mLe/v5uhUxvhf8MzwSYdycOeo5o9NoKXS3oHi9hoPmTXKvBY2k6JsV4vuMRzWzPaZt3mu0Hslbjnee1odjGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.16.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: zesmtpgz3t1775554856t4604b7cb
+X-QQ-Originating-IP: OVA3AjnluGGBB4XcG7C//Qjq9AZrRV4YZ0LZvpCcQss=
+Received: from w-MS-7E16.trustnetic.com ( [115.220.225.134])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 07 Apr 2026 17:40:50 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 6970311505155291080
+EX-QQ-RecipientCnt: 11
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org
+Cc: Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] net: txgbe: fix RTNL assertion warning when remove module
+Date: Tue,  7 Apr 2026 17:40:41 +0800
+Message-ID: <8B47A5872884147D+20260407094041.4646-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
-X-Spamd-Result: default: False [-0.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: MWdgP8+gtiFRLnOhkuZH/p/+sYFPjRX8obKadQV50g51gITSe2lF+N37
+	0aJPeDAU7BpOO3uT9ktDmZqmPTx1r+8mZec9jdsqRCxXPnxbLVzOBu1wrCOzlUyTQx71CzO
+	3OJP+Ylnqi2YfS5fqBZ9+ZGYUKKD2Ql/F27ZQLr/ZeDzExuaYYOUwn9Iid9wkE7c8Jowp+J
+	eAYp10Q4OGLGY+N3/uTR87dks9kxiQU8jBrb4837xhzemLUfSdz8Atuim4Va5GQml9H00ea
+	Ybn2BqLIDsUjLfoGDPgADYzLhmSSjTd0VKMrYETFE6vX7ZIS3HqXu3FPi79RkHJJv7hzADe
+	Z9x8lxGWxafgsMVQlCGDffBf9HaRn2p1GQMLXIvTHpqstW26IB/Tr5AGpAEcHYZgTki5UPM
+	Z2Eb0wN2chIlGkGz5mC5axQf8Sq5VJhZ/HJPPmcb+g1WNElSRQ69DPNpoRE4vDtoshRgSw9
+	MhuAJ08s2v2ldTw3n4BzsAKUgQQXiv+3FyJAD1N4a5yGb7uSFlzF01YE6etg3iBxV/pVDB+
+	hyHyzle8JMFRVb9ud2Oj0hDAqNRXnTwfrKK/5m6c8AWzgCWMhWfudTuhgJmnXqjcur3N3gM
+	VocbOP/hnEBD80g4sWPQswFhg2AOFleaF2WI+alWCrJkwtYSthOXNZRgOAc+UeP5GRptOb3
+	zn5eCPo2m0RToogHCoFeN8GXrdT47w8zD6SmIcK/Our0+507UrlNBm3rsVEO6V77Z9z0srB
+	rpnl6TDkDjxNOQ77wRceyZMOKcv+EPN8Ayc7SrmuwRtLFodzF1wA/U4FCrFWVYrKCChHfeK
+	gxAATm6OhrczGXXyF10Vg/Z2Qev2YXqxXhEj9EPulFRS6/X5HEa9uLuCkY5zd5xjGui6hy/
+	hl3mOCYPxukqlW6SiMvfse09rOxOiItOl6sGOQMvDErTGjl1HuGvC1z3jjP/OMqi9vaH4qK
+	4sBT7ira1yCoKdsfui/Aac47IG57VUl91eVD+Rhy05m7YIWJ8qM/hlNejQeSZMQyD1hhpg/
+	BMLRXo6kTqEoRt6T6lk5Jtsmo5t62unU1tdYaV51gzzvv5iTQczh1tJMd6tM88JovUzeqyt
+	/d+UFh4MRKf
+X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
+X-QQ-RECHKSPAM: 0
+X-Spamd-Result: default: False [1.54 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[bootlin.com,reject];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
-	R_DKIM_ALLOW(-0.20)[bootlin.com:s=dkim];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275924-lists,netdev=lfdr.de];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[13];
 	RCVD_TLS_LAST(0.00)[];
-	RECEIVED_HELO_LOCALHOST(0.00)[];
-	HAS_ORG_HEADER(0.00)[];
-	FREEMAIL_CC(0.00)[lunn.ch,szelinsky.de,gmail.com,armlinux.org.uk,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[kory.maincent@bootlin.com,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275927-lists,netdev=lfdr.de];
+	DMARC_NA(0.00)[trustnetic.com];
+	RCVD_COUNT_THREE(0.00)[4];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2600:3c0a:e001:db::12fc:5321:from];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[bootlin.com:+];
-	RCVD_COUNT_FIVE(0.00)[6];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-0.972];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[bootlin.com:dkim,bootlin.com:url,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,pengutronix.de:email]
-X-Rspamd-Queue-Id: 283853AC36D
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.526];
+	PRECEDENCE_BULK(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TAGGED_RCPT(0.00)[netdev];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[100.90.174.1:received,54.206.16.166:received,115.220.225.134:received];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 5E6A43AC455
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, 6 Apr 2026 16:12:53 +0200
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+For the copper NIC with external PHY, the driver called
+phylink_connect_phy() during probe and phylink_disconnect_phy() during
+remove. It caused an RTNL assertion warning in phylink_disconnect_phy()
+upon module remove.
 
-> On Mon, Apr 06, 2026 at 02:22:16PM +0200, Andrew Lunn wrote:
-> > > The core question, do we need PSE for PHY functionality? =20
-> >=20
-> > I don't think the PHY should require PSE in order to send/receive
-> > frames. If the PSE is not supplying power, the link peer is probably
-> > off, but that is not so different from the cable being unplugged.
-> >  =20
-> > > We can make a step back and re-evaluate - what functionality and what
-> > > order is actually required to find potentially better implementation.
-> > >=20
-> > > We have a lot of current flowing over wires, budget and port
-> > > prioritization issues, things which may damage HW if done not correct=
-ly.
-> > > With other word, if we do not have properly operational environment
-> > > providing system specific policies, it is better to run safe
-> > > configuration - all ports/regulators are off.
-> > >=20
-> > > This means:
-> > > - PSE controller driver should be registered as early as possible,
-> > >   without caring about existence of PHYs, ports or network interfaces.
-> > >   And configure ports in to default safe operation - off. Accept we
-> > >   have some controller/firmware which would care about safety. =20
-> >=20
-> > Don't most PSE have I2C or SPI interfaces? So they have a different
-> > life cycle to PHYs, ports or netdevs. Only PSEs which are embedded
-> > within a PHY, on an MDIO bus, will have a closely linked life
-> > cycle. But do such devices exist? =20
->=20
-> i'm not aware of any.
+To fix this, add rtnl_lock() and rtnl_unlock() around the
+phylink_disconnect_phy() in remove function.
 
-Same here, but it's not impossible to have such device in the future.=20
+ ------------[ cut here ]------------
+ RTNL: assertion failed at drivers/net/phy/phylink.c (2351)
+ WARNING: drivers/net/phy/phylink.c:2351 at
+phylink_disconnect_phy+0xd8/0xf0 [phylink], CPU#0: rmmod/4464
+ Modules linked in: ...
+ CPU: 0 UID: 0 PID: 4464 Comm: rmmod Kdump: loaded Not tainted 7.0.0-rc4+
+ Hardware name: Micro-Star International Co., Ltd. MS-7E16/X670E GAMING
+PLUS WIFI (MS-7E16), BIOS 1.90 12/31/2024
+ RIP: 0010:phylink_disconnect_phy+0xe4/0xf0 [phylink]
+ Code: 5b 41 5c 41 5d 41 5e 41 5f 5d 31 c0 31 d2 31 f6 31 ff e9 3a 38 8f e7
+48 8d 3d 48 87 e2 ff ba 2f 09 00 00 48 c7 c6 c1 22 24 c0 <67> 48 0f b9 3a
+e9 34 ff ff ff 66 90 90 90 90 90 90 90 90 90 90 90
+ RSP: 0018:ffffce7288363ac0 EFLAGS: 00010246
+ RAX: 0000000000000000 RBX: ffff89654b2a1a00 RCX: 0000000000000000
+ RDX: 000000000000092f RSI: ffffffffc02422c1 RDI: ffffffffc0239020
+ RBP: ffffce7288363ae8 R08: 0000000000000000 R09: 0000000000000000
+ R10: 0000000000000000 R11: 0000000000000000 R12: ffff8964c4022000
+ R13: ffff89654fce3028 R14: ffff89654ebb4000 R15: ffffffffc0226348
+ FS:  0000795e80d93780(0000) GS:ffff896c52857000(0000)
+knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: 00005b528b592000 CR3: 0000000170d0f000 CR4: 0000000000f50ef0
+ PKRU: 55555554
+ Call Trace:
+  <TASK>
+  txgbe_remove_phy+0xbb/0xd0 [txgbe]
+  txgbe_remove+0x4c/0xb0 [txgbe]
+  pci_device_remove+0x41/0xb0
+  device_remove+0x43/0x80
+  device_release_driver_internal+0x206/0x270
+  driver_detach+0x4a/0xa0
+  bus_remove_driver+0x83/0x120
+  driver_unregister+0x2f/0x60
+  pci_unregister_driver+0x40/0x90
+  txgbe_driver_exit+0x10/0x850 [txgbe]
+  __do_sys_delete_module.isra.0+0x1c3/0x2f0
+  __x64_sys_delete_module+0x12/0x20
+  x64_sys_call+0x20c3/0x2390
+  do_syscall_64+0x11c/0x1500
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? do_syscall_64+0x15a/0x1500
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? do_fault+0x312/0x580
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? __handle_mm_fault+0x9d5/0x1040
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? count_memcg_events+0x101/0x1d0
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? handle_mm_fault+0x1e8/0x2f0
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? do_user_addr_fault+0x2f8/0x820
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? irqentry_exit+0xb2/0x600
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? exc_page_fault+0x92/0x1c0
+  entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-> > As soon as the PSE probes with all the resources it needs, and can
-> > impose a safe default setting. And that can be independent of PHY and
-> > netdev. I _think_ we only need the netdev for configuration, since
-> > ethtool addresses netdev's.  There would only be issues with user
-> > space listening to udev creation events, it knows the PSE exists, but
-> > it has no way to access it until the netdev is created. =20
->=20
-> Ack. netdev is for configuration as virtual representation of PSE PI. And=
- it
-> is easier to assign corresponding interface for the LLDP.
-> We do not really care about the PHY; it just happens to represent the
-> port at the farthest end described in the Device Tree.
->=20
-> > > - as soon as we have all needed components, we can start provide
-> > >   controllable interfaces to serve external consumers. =20
-> >=20
-> > Yep.
-> >  =20
-> > > If we decouple PSE and PHY registration (and we probably will need to=
- do
-> > > it some day), we would need to have own implementation of deferred
-> > > probing in the PSE core.  Event driven or by polling - which sounds n=
-ot
-> > > like very good idea. Pick your poison... =20
-> >=20
-> > I don't see why. Maybe i'm missing something. We have two cases:
-> >=20
-> > 1) PSE probes first. When the PHY looks up the PSE, it exists, and it
-> > is passed a handle to the PSE.
-> >=20
-> > 2) PHY probes first. The PSE core returns EPROBE_DEFFER, and the PHY
-> > will try again later.
-> >=20
-> > I don't think there is any chicken/egg problems. =20
->=20
-> Ack, i guess it is optimization problem.
+Fixes: 02b2a6f91b90 ("net: txgbe: support copper NIC with external PHY")
+Cc: stable@vger.kernel.org
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+---
+v2:
+- Add RTNL lock instead of moving phylink connect/disconnect functions.
 
-Yes, as I reply in another mail of the thread:
-We should be able to get the PSE control either at PSE register time or at =
-PHY
-(or PHY port) probe time.
+v1: https://lore.kernel.org/all/D56A7C3379B4DA62+20260331071107.5414-1-jiawenwu@trustnetic.com
+---
+ drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Maybe if the PHY can't find the PSE PI, we could save the phandle of the PS=
-E PI
-somewhere in the PHY structure. Then at PSE register time, look for each PH=
-Y to
-resolve every unresolved phandle.
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+index 8ea7aa07ae4e..dc9f24314658 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+@@ -657,7 +657,9 @@ void txgbe_remove_phy(struct txgbe *txgbe)
+ 		return;
+ 	case wx_mac_sp:
+ 		if (txgbe->wx->media_type == wx_media_copper) {
++			rtnl_lock();
+ 			phylink_disconnect_phy(txgbe->wx->phylink);
++			rtnl_unlock();
+ 			phylink_destroy(txgbe->wx->phylink);
+ 			return;
+ 		}
+-- 
+2.48.1
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
