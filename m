@@ -1,80 +1,67 @@
-Return-Path: <netdev+bounces-275846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275848-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AFKNAiRw1GkruAcAu9opvQ
-	(envelope-from <netdev+bounces-275846-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:47:00 +0200
+	id mBa4DJpy1GlquAcAu9opvQ
+	(envelope-from <netdev+bounces-275848-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:57:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 151043A93A7
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:46:58 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842263A9440
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:57:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B4F50300EC45
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:45:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id E7D9A3004DE8
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:57:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D434373C10;
-	Tue,  7 Apr 2026 02:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/X9XglN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE0A1372691;
+	Tue,  7 Apr 2026 02:57:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3E5372EE3
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 02:45:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1611474CC
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 02:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775529943; cv=none; b=XwBNTEuJfyImRMYvqSOfNKZe+WlLfbxrfxLzTIRhNHelSeIIq88jZ7wvdhZacHdsmOckJXfEJkUqTBzgzOaRVuNRXaCsonft+dY88vxppXF4tKS571AZN3fr/Ihbzrayw2HUEfMx4SkZgm1nbkD0IaTJnQLtpf7r1y18pVUTiT8=
+	t=1775530647; cv=none; b=KViuI7o5jSpUbntsaLDTWfFA3GaBSdyMbH//A7ggMQDFfYBQPHqKi/Whny/kXTlzP5e2XbJ9Djuzsnb2TWgKBzT22VcIQCWUswVc2J9sA1/eRmJTqUsolTYTgfTalPEdHICbTiNZUJYMJKEXYQaztNc3IcaPSWWLK8tqfYHa7tA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775529943; c=relaxed/simple;
-	bh=NA8XcEs7Rx23RPVBK4DgyYLEyZpuUgGoQ451Bpm7vcg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GzGqVBibgdCxk8a9M1Z8fO6KWPXe1r4aQtyyfHoy58kD/ygOeIBxR4/X2ANxAz2LB/dymker09whrzOgmIfTQVLGV08GBKgUeX7k6QMPLgg3MEb9U2VqVo3CSyro1QCCYNViZnu2WDWbNqUdhB4ll3rquprkh5FzY+qHZ4xqo70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c/X9XglN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775529941;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uBjjPwiqEnQlQJWcx1TjKWKQU5N6GjqGMfXPuwlgZhw=;
-	b=c/X9XglNimfMCT/hOihVoPP/FGXW1kzysA+V2Tvj6uU40QKsJjJOO9cVMzUduql5b1Yaye
-	4tLNe2pgEm5J60kvgykcJtFjT2opANYF0VsSLCk5N3Xo+SzaizYbwlOcSejc7JKfXvZE7M
-	bTcxIW/7KhWWPc3kQ8JQ99qIJTVU0qs=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-47-0e-91N8UPG2jQWWPUBiQkg-1; Mon,
- 06 Apr 2026 22:45:37 -0400
-X-MC-Unique: 0e-91N8UPG2jQWWPUBiQkg-1
-X-Mimecast-MFC-AGG-ID: 0e-91N8UPG2jQWWPUBiQkg_1775529936
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 83D97180035C;
-	Tue,  7 Apr 2026 02:45:36 +0000 (UTC)
-Received: from xudu-thinkpadx1carbongen9.nay.com (unknown [10.72.116.131])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B26B4300019F;
-	Tue,  7 Apr 2026 02:45:32 +0000 (UTC)
-From: Xu Du <xudu@redhat.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC net-next 4/4] selftests: drv-net: tso: expand double tunnel GSO test coverage
-Date: Tue,  7 Apr 2026 10:45:11 +0800
-Message-ID: <b68b86bdee10126f1552a22149bc7e631ac0701a.1775527362.git.xudu@redhat.com>
-In-Reply-To: <cover.1775527362.git.xudu@redhat.com>
-References: <cover.1775527362.git.xudu@redhat.com>
+	s=arc-20240116; t=1775530647; c=relaxed/simple;
+	bh=i/OgHkSU3jjEy7OV9IqUpuSSx/2kUc+pyImprSLflrM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hhMfsMUD+ry4NHdkljSMps3T4NgQR+oMPeEr8E0RozbSf92szkkIA26B5Y3GGGRm47j5rAw//GguBM62XfaP1IoZf1xqTk6TBkYwefY7rRzMIh/9eKBeddn9pPafFD370T0i6KDPDtb4HjRNhLOoDRH6F4Vhued7FQufyEFB8wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: zesmtpsz3t1775530591t3b09fb30
+X-QQ-Originating-IP: +FE+jYRq/pVZEGnvBpFpOd5AvrGuDAtJk0djjX4+0Q4=
+Received: from lap-jiawenwu.trustnetic.com ( [115.220.225.134])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 07 Apr 2026 10:56:27 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 13124595242704030276
+EX-QQ-RecipientCnt: 17
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Kees Cook <kees@kernel.org>,
+	Joe Damato <joe@dama.to>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Abdun Nihaal <abdun.nihaal@gmail.com>,
+	Breno Leitao <leitao@debian.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v7 0/9] Wangxun improvement
+Date: Tue,  7 Apr 2026 10:56:07 +0800
+Message-Id: <20260407025616.33652-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,92 +69,117 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: NpfbsqbTlzxU9vxAeQ8WSUn1MNUvhYb0hB1k0A5ZxWRNPBPeJCXIo0gW
+	3hoz9n2NjPbqWtzqgc17lnoo3MoApdOWtlmOqWT0lOcAbkdgu3OXlgbNh7X9DLBwB4mEX/X
+	GsDhl+S5fQ9u4mpWcJWhDrPw0X6fv8/Qt4CYfquVE/6dPXgcSlGkIT6TxFo/isYVuDgB83/
+	uMRTnfNGDntbODdYUU6DxOUasnoQkG3gmwvJo4Zh9AgLFkagY+OOT3ihs3dese0JJ2l7Ai5
+	OMQfJvV0g/gjP6RRoxKwYT6Vq8vVCtyCUL1uNw5DzR3xHBkgfdeWq7ZI3ln513Rv7X2vlcs
+	ELsJUYORvchcdWrpXe176fHprdPf1yR9vLj/SgbQqk49P0Rtr8clSaBP+LXKPqhyXq6CShm
+	vH/zVdlOPmNlrJrPeVAEBymv4PwUUKupI0+KAS3mwNYau4t3u1+/o1G4i3VJaBUyBJ0rs8f
+	oCyuLrmROVc1Z2TSguZnNfEODNS+9PfmYqOFWAz7Fx9aL2ayv8Aw+gqSw4CQSZISOow+hqL
+	lbh8tiyeCe91y/6UE4ETfwlwznlSkq8l9Rlg7kHFlb8GggcLtJqyhAIh8hnV74CajI4o4nZ
+	6TeWYyvyP8MP2MsP9aBFdiPPRz3mLfoku3Kkpxdy/gMF9UL7UAAMywOXsTJZh6IAANSA4Wm
+	AxjFWexhMlISczPHWuaYnMiyjrF4ljdCUQkb5SoisQFjD/japsYEX+HJgItCsA6FdYgKIZd
+	/a5PF4E5QGmnkCKLmxFJwg3XYEuEyqaxEIIaMKraU6jUbhIAhQBvsnTH9u7qAOhz+3runGM
+	hAcD32JI5dVTIz8/uQeL57PysS/m3gz69TSYSbUGtcgY3v/3gnfCO8yS2KSpNpzGta8kCZX
+	wmUcm5gVycHcJMxTpzNuMHcjdpz14xm3oKDOxmz56IkvsPhQnE+tU7BWaUmgWUsRyhtcqTN
+	thIEbrXv9LpqfjfB6Onu5phe7T5UwnLTfeT6qQtKw0UlHLqsmt5a1iMY6sLDdhULvPr2dX7
+	UPGFGyhgkLIJSIdgKcNVILvIvB1F+MV3GOUuPsf5lK5Mdk1BPwwTQauC2sLcY=
+X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
+X-QQ-RECHKSPAM: 0
+X-Spamd-Result: default: False [1.54 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[xudu@redhat.com,netdev@vger.kernel.org];
-	TAGGED_FROM(0.00)[bounces-275846-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
+	TAGGED_FROM(0.00)[bounces-275848-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	NEURAL_HAM(-0.00)[-1.000];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	RCVD_COUNT_FIVE(0.00)[6];
+	DMARC_NA(0.00)[trustnetic.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 151043A93A7
+	FREEMAIL_CC(0.00)[net-swift.com,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,linux.intel.com,intel.com,dama.to,gmail.com,debian.org,trustnetic.com];
+	NEURAL_SPAM(0.00)[0.366];
+	TO_DN_SOME(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[jiawenwu@trustnetic.com,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,trustnetic.com:mid]
+X-Rspamd-Queue-Id: 842263A9440
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Add Geneve test variants with GRO hint and TTL inherit options
-to exercise additional tunnel configuration paths.
+This patch series cleans up the code and enhances the implementation.
 
-Also add double VXLAN tunnel test cases to complement the existing
-double Geneve coverage.
+v7:
+- Drop the patches about Tx timeout, pci_error_handlers and ngbe reset.
+- Replace busy-wait reset flag with kernel mutex.
+- Reorder timer and work sync cancellations.
+- Add spin lock to protect wx_update_stats().
+- Enhance the reading of the registers which are not clear-on-read.
 
-Signed-off-by: Xu Du <xudu@redhat.com>
----
- tools/testing/selftests/drivers/net/hw/tso.py | 24 +++++++++++++++++++
- 1 file changed, 24 insertions(+)
+v6: https://lore.kernel.org/all/20260326021406.30444-1-jiawenwu@trustnetic.com
+- Remove changes to the reset process in patch 04/11.
+- Remove the inappropriate comments in patch 09/11, and detail the
+  commit message.
 
-diff --git a/tools/testing/selftests/drivers/net/hw/tso.py b/tools/testing/selftests/drivers/net/hw/tso.py
-index 6b4639ce6139..6930eb3fde29 100755
---- a/tools/testing/selftests/drivers/net/hw/tso.py
-+++ b/tools/testing/selftests/drivers/net/hw/tso.py
-@@ -373,6 +373,12 @@ def main() -> None:
-                 ("vxlan", "id 100 dstport 4789 udpcsum", "", ("4", "6")),
-                 (),
-             ),
-+            (
-+                "vxlan2", "4", "tx-udp_tnl-csum-segmentation",
-+                ("vxlan", "id 100 dstport 4789 udpcsum",
-+                 "tx-gso-partial tx-udp_tnl-segmentation tx-udp_tnl-csum-segmentation", (),),
-+                ("vxlan", "id 200 dstport 5789 udpcsum", "", ("4", "6")),
-+            ),
-             (
-                 "gre", "4", "tx-gre-segmentation",
-                 ("gre", "", "", ("4", "6")),
-@@ -390,6 +396,24 @@ def main() -> None:
-                 ("geneve", "id 200 dstport 6082 noudpcsum udp6zerocsumtx udp6zerocsumrx",
-                  "", ("4", "6"),),
-             ),
-+            (
-+                "geneve2_csum", "", "tx-udp_tnl-csum-segmentation",
-+                ("geneve", "id 100 dstport 6081 udpcsum",
-+                 "tx-gso-partial tx-udp_tnl-segmentation tx-udp_tnl-csum-segmentation", (),),
-+                ("geneve", "id 200 dstport 6082 noudpcsum", "", ("4", "6")),
-+            ),
-+            (
-+                "geneve2_grohint", "", "tx-udp_tnl-csum-segmentation",
-+                ("geneve", "id 100 dstport 6081 udpcsum gro-hint",
-+                 "tx-gso-partial tx-udp_tnl-segmentation tx-udp_tnl-csum-segmentation", (),),
-+                ("geneve", "id 200 dstport 6082 udpcsum", "", ("4", "6")),
-+            ),
-+            (
-+                "geneve2_inherit", "4", "tx-udp_tnl-csum-segmentation",
-+                ("geneve", "id 100 dstport 6081 udpcsum gro-hint",
-+                 "tx-gso-partial tx-udp_tnl-segmentation tx-udp_tnl-csum-segmentation", (),),
-+                ("geneve", "id 200 dstport 6082 udpcsum inner-proto-inherit", "", ("4", "6")),
-+            ),
-         )
- 
-         cases = []
+v5: https://lore.kernel.org/all/20260317073827.4300-1-jiawenwu@trustnetic.com
+- Add patch 10/11 to handle Tx hang check with pause frame.
+- Clear WX_STATE_DISABLED bit in wx_resume().
+
+v4: https://lore.kernel.org/all/20260306063211.20536-1-jiawenwu@trustnetic.com
+- Add an initial patch to remove netdev->ethtool->wol_enabled setting.
+
+v3: https://lore.kernel.org/all/20260303030331.24076-1-jiawenwu@trustnetic.com
+- Detail the commit log for improving ngbe reset flow.
+- Correct the process of stopping the work queue.
+
+v2: https://lore.kernel.org/all/20260227073450.23680-1-jiawenwu@trustnetic.com
+- Split NCSI changes from the WOL patch.
+- Properly return and handle error codes.
+- Fix the typos.
+- Remove the check for PCIe errors and subsequent error handling, because
+  aer_recover_queue() does not want to be called by the ethernet driver.
+  The discussion link:
+  https://lore.kernel.org/linux-acpi/001c01dc9740$c7722540$56566fc0$@trustnetic.com/T/
+
+v1: https://lore.kernel.org/all/20260203075759.5852-1-jiawenwu@trustnetic.com
+
+Jiawen Wu (9):
+  net: ngbe: remove netdev->ethtool->wol_enabled setting
+  net: ngbe: move the WOL functions to libwx
+  net: ngbe: remove redundant macros
+  net: wangxun: replace busy-wait reset flag with kernel mutex
+  net: wangxun: move ethtool_ops.set_channels into libwx
+  net: wangxun: reorder timer and work sync cancellations
+  net: wangxun: schedule hardware stats update in watchdog
+  net: libwx: wrap-around and reset qmprc counter
+  net: libwx: improve flow control setting
+
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 37 ++++++++++-
+ .../net/ethernet/wangxun/libwx/wx_ethtool.h   |  4 ++
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    | 66 +++++++++++++++++--
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  | 53 ++++++++++-----
+ .../net/ethernet/wangxun/libwx/wx_vf_common.c |  9 ++-
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  | 57 ++--------------
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c | 52 ++++++++++++---
+ drivers/net/ethernet/wangxun/ngbe/ngbe_type.h | 17 -----
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    | 21 ++----
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 16 ++---
+ 10 files changed, 200 insertions(+), 132 deletions(-)
+
 -- 
-2.53.0
+2.48.1
 
 
