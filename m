@@ -1,178 +1,168 @@
-Return-Path: <netdev+bounces-275995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275996-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id +OnjAoAI1WnMzgcAu9opvQ
-	(envelope-from <netdev+bounces-275995-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 15:37:04 +0200
+	id uD6DCAcL1WlQzwcAu9opvQ
+	(envelope-from <netdev+bounces-275996-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 15:47:51 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ECAF3AF426
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 15:37:03 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75A4F3AF6FF
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 15:47:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 74BB4307B4D9
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 13:29:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 255C530DF633
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 13:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 188453B774A;
-	Tue,  7 Apr 2026 13:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBC123B8958;
+	Tue,  7 Apr 2026 13:37:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JF85sbCv";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ti1iJj5e"
+	dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b="UKxbmTUD"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from oak.phenome.org (unknown [193.110.157.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BACF63B7753
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 13:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03413AD506;
+	Tue,  7 Apr 2026 13:37:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775568566; cv=none; b=hlEv3hT0LxTJZDAtJB2hB9TDU9F5b3VHuwWY6IpJxL5eP6DM+Fyn2vgXRfPr+VCA1V+ZvCBXzpnM0SBNBV/6h5VJpGtRJW1FX0FStcc2PwL6FDJQq0KcuQM1QunJV1S3+LevmS9R6QNDdvmPHJdCYvUJpFV8hIzCp1Q1ARYJkpI=
+	t=1775569042; cv=none; b=eXKYFNx99iegf2/SwHeunlo68tp2mDujlU7luvHGpvHCbY0/uFxEDOI7dYhg1B0hZJfFuv0m+Tm6GBf15Tvn0f9mrB4QYGsFFLvY8FXFvvUUcA8NB3MyyYKVwecl6JtJhSySrlKl5T05HUS8MHjacDv4T1l/49tC/tsbpZVZ2lM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775568566; c=relaxed/simple;
-	bh=7tA5C92PG8nI+vqli8+BWVx+xZUPGPyr52je8nhr8Pw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GLMOoSTiNpTL7jfQ4sQhBHeDohepHKDBYsvIr8LtDWd4fq8aT40PxXaxIhiI6XVNkdXB7DZYm37JwujMcj3a+c2HGuMdoafOoxyYUwUQHu6kO8HCBJCh0oJOF3Pqnn2gfHyrxqWl7dF3KlSq3+1ZA7mZ++3+ZeQ7cl6tY4g9Lsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JF85sbCv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ti1iJj5e; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775568563;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pelvdbp9V/M+qvKaYggT3terh3L8nysQjlcb510IJW4=;
-	b=JF85sbCvWzlF72cMqzCKzWh4QdNhTaCk4cCK5pjQR3CtGC+YWBDlVPpaWbiB4rSW4jk4VZ
-	U5TXq3OxPiqt7m6i8AtiF6c3xmmQC55geQB9/vvhhdP/f3AJ7vXycJ7cgDG9l+UawVkWkw
-	RaAKR5Cco62WoZqnoPY5vTlBcaq+v84=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-637-Y_V8AsAsNNCLyQh--i3StQ-1; Tue, 07 Apr 2026 09:29:22 -0400
-X-MC-Unique: Y_V8AsAsNNCLyQh--i3StQ-1
-X-Mimecast-MFC-AGG-ID: Y_V8AsAsNNCLyQh--i3StQ_1775568561
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43d167a0c1fso3547468f8f.3
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 06:29:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1775568560; x=1776173360; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pelvdbp9V/M+qvKaYggT3terh3L8nysQjlcb510IJW4=;
-        b=Ti1iJj5es1+jYEUCg1TRLcrNdAZKN31qQDXWr7tBk6msS2lsrCdjDNbQoPUiE4iGaa
-         A3ASckDMDJLNg/DggZPEQSy8yb6jaM0bd3zmB2ugq9Oj5YtEPCpSezoJM2yJM+UVR5fX
-         jTxkyyOpdD2uwTaq3GUsXhJy7fCO9nTIy4/4BPQa4IpDUi7Oaz9jNSt9Lllt5rNEz5fG
-         nqCCqbcTbeh9+qBhGCI+5mdzS9YUuW60irJlC12Xop5ZQ6o4sn3QuQEnkqfAp9eQ51A8
-         reaEmIWlDXNtl8mSqrnQRgPwlQ/KAwb4uZURgh15u7eVw8fFCodlJiBoTJKoj5Cea5ia
-         EG5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775568560; x=1776173360;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pelvdbp9V/M+qvKaYggT3terh3L8nysQjlcb510IJW4=;
-        b=eQ8DNjzI4nZ/RfPAVkusupVvC4LCP3Pg7SikMnD2mChAwnk6rrNPZhdjDLgpKO8IVB
-         PoaL+2MdCeb0Az2hd2HBv3gouxuo9kFOLG2Cad+udZzJYtvPv/ivO40sZvE2VkH15HQ1
-         zhenL0HEGmsW8vxLXMB/1ZC0tdeYftQBwHn2lHXfPC5mGklR7b60n/KlW/8xVh4l4EfG
-         EMHCWu+qLianAqYonFaJkO3It2INAI/XnJ6/KeO9fyTi+L4qq+1OsZU1qkkjIpcb3q/g
-         H8CtHv0cRY67MA4KhWKjOoPdTSRCZaxK2a1PM6ri8zg1lN4XNEE1s3yyAXqikFFQCZBJ
-         1N3A==
-X-Forwarded-Encrypted: i=1; AJvYcCXnspnIIEVILYFzN4jxNBcuPaJrM5wqGNoc7x7Oo24feuQJTM0S9RrL7S+3jYgP6eYK4wOuBeE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZVJSXVUAxBb69+CUpXUJkDpEq65u+la6giuBGqoY6UIRny/hL
-	O7s/yHII3lqMCP7m30UUZbE0T5PBo+NtVMwjrz+febI/pkXmxF97e3anGmCs+XzbWfpLQ8dyJ/q
-	ZHTPEgHXd4ND5Ol/sGwN+G2z4uPtqVi7FvUrbWssyVDNZJJZkLzk0kBTIuA==
-X-Gm-Gg: AeBDieuVR7sPo83IXQtusX+0xxKGgUbTzcGoXvVCsosX6mJVdSAXAhdRWYB/y+PdGUo
-	aIfSPgXevshDXE8sCv6lY8nUSaObVa51GZatMKLYjISj+zNVig7N46B6Eq/Hadh2yc6HwzhsrDJ
-	dnQajhodEST+lr1TTILiEGyfst8x5/sOWXkyEsLQKJhHX6PGh0EYUwKXdsz7AhYDGhqunQO49WZ
-	CRAsLvP+1I/TraWWwThiHMSCBUEKRZDljxnFFNO0yhiM3oePHIzUA76sAnSqS62i458LugvzclS
-	dsYBsjFaqCvHcCldZ3o1rDN2VQy2NXJb5nGLC4b/WLNmYQ0g61na3GPrhy+LuFi3eDllUfd1ION
-	nOgdFSvaPLyhb0itqgTzR8n3dMA0VZtEudx/X9/FmmcMasLJ3mBbN6StLaQ==
-X-Received: by 2002:a05:6000:1249:b0:43d:3113:6eed with SMTP id ffacd0b85a97d-43d31136f34mr15036381f8f.4.1775568560459;
-        Tue, 07 Apr 2026 06:29:20 -0700 (PDT)
-X-Received: by 2002:a05:6000:1249:b0:43d:3113:6eed with SMTP id ffacd0b85a97d-43d31136f34mr15036310f8f.4.1775568559904;
-        Tue, 07 Apr 2026 06:29:19 -0700 (PDT)
-Received: from [192.168.88.32] ([212.105.153.231])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43d1e4d289asm49269433f8f.19.2026.04.07.06.29.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Apr 2026 06:29:19 -0700 (PDT)
-Message-ID: <756852a4-b589-4eeb-81bf-963fa2e71821@redhat.com>
-Date: Tue, 7 Apr 2026 15:29:17 +0200
+	s=arc-20240116; t=1775569042; c=relaxed/simple;
+	bh=I8Yh8w5RqR2TlarL0EXjxRT50/mPd1NH/1bFddxO9JE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C2kNSXvcaHxlPquWMbzdMZg+KuFzk8U3XW/JoGk39/fPXv2MSPfleBx6kAFspzOlQR3I0Nbcr5zVOTM78gF8AGCNDqorjmreHG4e7xQ6ynLpWQyriNBdJk837dqGN7i800IcbqGJCBJ1vOFoIemrDJ5NurK2pABi8o450bLJNvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org; spf=pass smtp.mailfrom=phenome.org; dkim=pass (2048-bit key) header.d=phenome.org header.i=@phenome.org header.b=UKxbmTUD; arc=none smtp.client-ip=193.110.157.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=phenome.org
+Authentication-Results: oak.phenome.org (amavisd); dkim=pass (2048-bit key)
+ reason="pass (just generated, assumed good)" header.d=phenome.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=phenome.org; h=
+	in-reply-to:content-disposition:content-type:content-type
+	:mime-version:references:message-id:subject:subject:from:from
+	:date:date:received; s=oak1; t=1775568606; x=1776432607; bh=I8Yh
+	8w5RqR2TlarL0EXjxRT50/mPd1NH/1bFddxO9JE=; b=UKxbmTUD+fmcX5k+eTUD
+	ThP7rBvbdkC3CCwEa2YCki2xsX9xRnkOsx1UKeM5H+umHGLAXiom3erEUc9jM7mG
+	eFQzqm2vELwrkSe4E2wHOGGRDvz9kVZhiJOUhNrBsVl86WVR1i3k+/PtGbcuGpyQ
+	28LYiUbPKRNvm2YcYV8dfdFMnjrmyTtlyRhLIBmuqUISaYsnJW8e+FyfpbG8DFyc
+	9FEA5k/5MZ8wFlrqtR4rbEwBYhuxLdMBDmFiZqtTNFukMISLzv+M5mMfLzoIMaqT
+	HrMsNe+afPwJGNartsca2d/zpUpCTNb+sc1ibYZGNKyDd7BBEckNm4/HG42FpVbS
+	BQ==
+X-Virus-Scanned: amavisd at oak.phenome.org
+Received: by oak.phenome.org (Postfix);
+	Tue, 07 Apr 2026 15:29:59 +0200 (CEST)
+Date: Tue, 7 Apr 2026 15:29:37 +0200
+From: Antony Antony <antony@phenome.org>
+To: Antony Antony <antony@phenome.org>
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+	Antony Antony <antony.antony@secunet.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Chiachang Wang <chiachangwang@google.com>, devel@linux-ipsec.org,
+	Simon Horman <horms@kernel.org>, Paul Moore <paul@paul-moore.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>, linux-kernel@vger.kernel.org,
+	selinux@vger.kernel.org, Nathan Harold <nharold@google.com>,
+	Yan Yan <evitayan@google.com>
+Subject: Re: [devel-ipsec] Re: [PATCH ipsec-next v5 8/8] xfrm: add
+ XFRM_MSG_MIGRATE_STATE for single SA migration
+Message-ID: <adUGwQbs3L6esfZv@Antony2201.local>
+References: <cover.1769509130.git.antony.antony@secunet.com>
+ <b7b1bee9456ac4ada8941c93c2cc17f07d0b1912.1769509131.git.antony.antony@secunet.com>
+ <CADHa2dAxVFQULCKnsjSmSPrK+VTJyyT-5P5BAYGdhO5wKDKqig@mail.gmail.com>
+ <aaF_SAQj4WT8jRaO@krikkit>
+ <CADHa2dCF=Cq2SMYgjHcs71VedwYaDmUXPWnNbv=46+11Mz0otA@mail.gmail.com>
+ <aa2K8pXXipCH8cke@Antony2201.local>
+ <aa_750R5Jm5qPbNs@krikkit>
+ <abBMMZWNp_zN23xL@Antony2201.local>
+ <CADHa2dCdFKE4Wg-uSmYLmh1-JEf=rZOA2WUmRbTy0S0rp+rz+A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: hsr: emit notification for PRP slave2
- changed hw addr on port deletion
-To: Fernando Fernandez Mancera <fmancera@suse.de>, netdev@vger.kernel.org
-Cc: acsjakub@amazon.de, liuhangbin@gmail.com, kees@kernel.org,
- horms@kernel.org, kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- fmaurer@redhat.com, Luka Gejak <luka.gejak@linux.dev>
-References: <20260403123928.4249-2-fmancera@suse.de>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260403123928.4249-2-fmancera@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADHa2dCdFKE4Wg-uSmYLmh1-JEf=rZOA2WUmRbTy0S0rp+rz+A@mail.gmail.com>
+X-Spamd-Result: default: False [-0.66 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
+	DMARC_POLICY_ALLOW(-0.50)[phenome.org,none];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[phenome.org:s=oak1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
-	FREEMAIL_CC(0.00)[amazon.de,gmail.com,kernel.org,google.com,davemloft.net,redhat.com,linux.dev];
 	RCVD_TLS_LAST(0.00)[];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275995-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275996-lists,netdev=lfdr.de];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	FREEMAIL_CC(0.00)[queasysnail.net,secunet.com,gondor.apana.org.au,vger.kernel.org,davemloft.net,google.com,kernel.org,redhat.com,linux-ipsec.org,paul-moore.com,gmail.com];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[antony@phenome.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[phenome.org:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 6ECAF3AF426
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 75A4F3AF6FF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/3/26 2:39 PM, Fernando Fernandez Mancera wrote:
-> On PRP protocol, when deleting the port the MAC address change
-> notification was missing. In addition to that, make sure to only perform
-> the MAC address change on slave2 deletion and PRP protocol as the
-> operation isn't necessary for HSR nor slave1.
+On Fri, Mar 13, 2026 at 05:32:15PM -0700, Yan Yan via Devel wrote:
+> > yes I can add that. I would add XFRMA_SET_MARK/XFRMA_SET_MARK_MASK together.
+> > If you set only the SET_MARK mask will be 0xffffffff.
 > 
-> Note that the eth_hw_addr_set() is correct on PRP context as the slaves
-> are either in promiscuous mode or forward offload enabled.
+> > I am actually using xfrm_smark_init() which will accept both.
 > 
-> Fixes: b65999e7238e ("net: hsr: sync hw addr of slave2 according to slave1 hw addr on PRP")
-> Reported-by: Luka Gejak <luka.gejak@linux.dev>
-> Closes: https://lore.kernel.org/netdev/DHFCZEM93FTT.1RWFBIE32K7OT@linux.dev/
-> Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
-> ---
-> Note: routed through net-next tree as the next net tree as rc6 batch is
-> already out and I do not think this is worth to be included in a last
-> call batch. Anyway, if maintainer thinks it is, feel free to apply it to
-> net tree.
+> Great! Thanks for supporting that.
+> 
+> > Option 1: add XFRM_OFFLOAD_CLEAR to xfrm_user_offload flags in uapi xfrm.h:
+> >
+> > #define XFRM_OFFLOAD_CLEAR  (1 << 7)
+> > When set in XFRMA_OFFLOAD_DEV, it means remove offload rather than configure it.
+> >
+> > Option 2: add a __u32 flags field to xfrm_user_migrate_state in uapi xfrm.h.
+> > There is a __u16 reserved currently used for alignment, but 16 bits feels
+> > too small if we want to cover clearing other attributes in the future.
+> > A __u32 at the end of the struct avoids that constraint.
+> >
+> > I am leaning toward option 2. Any preference?
+> 
+> I'm also in favor of option 2 for better extensibility.
+> 
+> >     - XFRMA_REPLAY_ESN_VAL / XFRMA_REPLAY_VAL : may be later replay type
+> >       should not change.
+> 
+> I agree we should keep the replay type immutable. Changing ESN flag on
+> the fly would make it hard to keep both sides synced, and I'm not
+> aware of any use case for this.
 
-The general guidance is to avoid fixes tag for net-next patches that do
-not fix net-next specific code. In this case I assume you want the patch
-landing into stable right?
+While testing XFRM_MSG_MIGRATE_STATE we ran into an issue with x->sel
+migration in transport mode. In transport mode the selector is typically
+a single-host entry matching the SA's saddr and daddr, so after
+migration it only needs to be updated with the new addresses.
 
-I think a net target would be better, please LMK.
+For this common case I added XFRM_MIGRATE_STATE_UPDATE_SEL to
+xfrm_user_migrate_state.flags. When set, the kernel validates that the
+existing selector is a single-host match for the SA addresses and
+derives the new selector from new_daddr/new_saddr with the appropriate
+mask for the new family.
 
-/P
+I think this is the main use case. However, for corner cases out there,
+the selector is not a simple single-host entry,
+struct xfrm_user_migrate_state now carries a new_sel field. When
+XFRM_MIGRATE_STATE_UPDATE_SEL is not set, new_sel is used as-is for
+the migrated SA.
 
+-antony
 
