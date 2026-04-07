@@ -1,215 +1,180 @@
-Return-Path: <netdev+bounces-275904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275905-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gKtbFFHD1GmWwwcAu9opvQ
-	(envelope-from <netdev+bounces-275904-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 10:41:53 +0200
+	id R5rqB6zD1GmmxAcAu9opvQ
+	(envelope-from <netdev+bounces-275905-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 10:43:24 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7A533AB771
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 10:41:52 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C2923AB789
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 10:43:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AEB553013B52
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 08:41:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC78930048C4
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 08:43:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E373939DD;
-	Tue,  7 Apr 2026 08:41:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A393939DD;
+	Tue,  7 Apr 2026 08:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RlGkZPT3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nEruKG7v"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE2B2E54B6;
-	Tue,  7 Apr 2026 08:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C152E54B6
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 08:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775551310; cv=none; b=ee19sgs5+dNkQrFGZK8OjhzEY/Y2QovkyRrEbgIPR06Bd87yI5ReApUqJPTl1l2ShOtt2NIrnAqWbdxNbcDHmVXCLVSYeuLvi58guCdHc5NByjD54UuBJVJ5xwpa2FYw3c56BdnNHSEVd8nmVdEp5VKaXvRLrZjCfposLfE8ME0=
+	t=1775551401; cv=none; b=SDNJguFmwZ3Uge6wIJ/IHM7SbYtSX67cQnXGUzT9fYPkspJioH91ZgWlH3sVbDqG2iuQ3ASm89UB5axSuBaXigkpGzfwUo0Egymx2YY9hkL3PCZWExjLsbetbkY/xcT8Fa/MJsa0hF3zDPUbbt4s4qjXAlX51Oa3ZIXdmPYe4EE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775551310; c=relaxed/simple;
-	bh=OkmnU4nlM29hsuno8u3eVrPXqnKmdcFgOmY3skpbYp0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=RKOGbeDCKVz20ILMYHBjVVTCKFibd+gpSq4D84MbkFJasy51dyAMjGAH0Q++/B14RU2C4/1LxkquleUrLA6TENTq6liU97lwBwsNn/5+kWSDlAu0AikfCD0OGsFnhfSoK6qbkdZsyJ0QuQnYAb+1+f7MOWQ/2I8AaRqHx4yskI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RlGkZPT3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E883C116C6;
-	Tue,  7 Apr 2026 08:41:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775551310;
-	bh=OkmnU4nlM29hsuno8u3eVrPXqnKmdcFgOmY3skpbYp0=;
-	h=From:Date:Subject:To:Cc:From;
-	b=RlGkZPT3MOvOTwIDArNY9EsdDfm4DUvjh+g3w2k1ABoYFsVrGfq7nVCHps1c427jO
-	 zcvZwstUzO1Xq13CPSG/nqBjhlkDVOcq6mahd3UQXU1ziv+3FbFhZre7mSTi/uj6Bh
-	 FvccoVO1gJf9altTaxrkx6wBuiyK2haLYvCuqUD7dU+D1UX6bBmPHi8W5njQmcpATm
-	 WkAyinWXkF/hwh3+CJqk6kuF0Ux7Oprnt5yNyxfFjchcMf8dVALUW3SYV8TIIrG7H3
-	 s3Yij1JuHKkzSG4S3xJSXHnGhT462CI91wHqi7DhtWMB3VB5qfnVPd/lB4x/rKkDaR
-	 lBU6denhPZmLg==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Tue, 07 Apr 2026 10:41:41 +0200
-Subject: [PATCH net v2] Revert "mptcp: add needs_id for netlink appending
- addr"
+	s=arc-20240116; t=1775551401; c=relaxed/simple;
+	bh=ur0/Cy5HeDdbCGQ6Nkwa4Fr/T4FfeEjaIVd1seb4g5Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FW/TLLYDZQ/ayKWIyeEqa9lRr3s6AESN8Z7vp767SISwTfc8I/8EhWo6cbUhekW3NgPlNgyTglth+VWofNuFBiFuVyv03kRNHe20dEegL3QLFYQGnT8iSqxDMsTQcLe1IqX5DbQooqw2blTqc3lUmNRxkIFLHgkfqfQX8fcTU9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nEruKG7v; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1775551397;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=YG8WTR8zxy5E+D0qbi2BRlO966r8JsfuPWhpPgXocW8=;
+	b=nEruKG7vrHQWioNn8ylJSKf+LzTsIY9Q1Dl/fbK76yeWQxLig0qWyPrO+Sn4huwsqnJyn0
+	N1oXS7O6vOn/D33HOJWy6By7hrdlmfD7WB++oOW0fL+kr6x7bdpxhLDslwX9jIp0oYk9QN
+	RZwz9epqeJoJ7idEzM5p8VPCeZtGWrE=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Soheil Hassas Yeganeh <soheil@google.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: initialize sk_rx_queue_mapping in sk_clone()
+Date: Tue,  7 Apr 2026 16:42:18 +0800
+Message-ID: <20260407084219.95718-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260407-net-mptcp-revert-pm-needs-id-v2-1-7a25cbc324f8@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yWM0QrCMBAEf6XcswdpkIr+ivhg0o2e0BhyqQil/
- +7VPs6wOwspqkDp0i1U8RGVdzbwh47i854fYBmNyTs/uKMbOKPxVFosbHPUxmUyh1FtyKmPIZy
- c79MZZIlSkeT7z1/JnnTbpc7hhdi2MK3rD0DTB7iFAAAA
-X-Change-ID: 20260406-net-mptcp-revert-pm-needs-id-f1cbb7021f9e
-To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.15.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3890; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=OkmnU4nlM29hsuno8u3eVrPXqnKmdcFgOmY3skpbYp0=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDKvHPZ2eaH2Z06zMZ/qMRf2BRtYU1n+cD0ISnTTMz+lW
- cYQXarXUcrCIMbFICumyCLdFpk/83kVb4mXnwXMHFYmkCEMXJwCMBGLMIbfbPHlbkVzPER3MzxZ
- Lia2PDHy99XlUWoW4l67M1pzrmRWM/xmd76mwfw6d3f3p5XT5Vn4HAKFHrvKOPRtfXJ2ww8D7QW
- cAA==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
-X-Spamd-Result: default: False [-2.16 / 15.00];
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275904-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
 	MIME_TRACE(0.00)[0:+];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
+	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275905-lists,netdev=lfdr.de];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MISSING_XM_UA(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[matttbe@kernel.org,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Queue-Id: B7A533AB771
+	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,linux.dev:dkim,linux.dev:email,linux.dev:mid]
+X-Rspamd-Queue-Id: 6C2923AB789
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This commit was originally adding the ability to add MPTCP endpoints
-with ID 0 by accident. The in-kernel PM, handling MPTCP endpoints at the
-net namespace level, is not supposed to handle endpoints with such ID,
-because this ID 0 is reserved to the initial subflow, as mentioned in
-the MPTCPv1 protocol [1], a per-connection setting.
+sk_clone() initializes sk_tx_queue_mapping via sk_tx_queue_clear()
+but does not initialize sk_rx_queue_mapping. Since this field is in
+the sk_dontcopy region, it is neither copied from the parent socket
+by sock_copy() nor zeroed by sk_prot_alloc() (called without
+__GFP_ZERO from sk_clone).
 
-Note that 'ip mptcp endpoint add id 0' stops early with an error, but
-other tools might still request the in-kernel PM to create MPTCP
-endpoints with this restricted ID 0.
+Commit 03cfda4fa6ea ("tcp: fix another uninit-value
+(sk_rx_queue_mapping)") attempted to fix this by introducing
+sk_mark_napi_id_set() with force_set=true in tcp_child_process().
+However, sk_mark_napi_id_set() -> sk_rx_queue_set() only writes
+when skb_rx_queue_recorded(skb) is true. If the 3-way handshake
+ACK arrives through a device that does not record rx_queue (e.g.
+loopback or veth), sk_rx_queue_mapping remains uninitialized.
 
-In other words, it was wrong to call the mptcp_pm_has_addr_attr_id
-helper to check whether the address ID attribute is set: if it was set
-to 0, a new MPTCP endpoint would be created with ID 0, which is not
-expected, and might cause various issues later.
+When a subsequent data packet arrives with a recorded rx_queue,
+sk_mark_napi_id() -> sk_rx_queue_update() reads the uninitialized
+field for comparison (force_set=false path), triggering KMSAN.
 
-Fixes: 584f38942626 ("mptcp: add needs_id for netlink appending addr")
-Cc: stable@vger.kernel.org
-Link: https://datatracker.ietf.org/doc/html/rfc8684#section-3.2-9 [1]
-Reviewed-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+This was reproduced by establishing a TCP connection over loopback
+(which does not call skb_record_rx_queue), then attaching a BPF TC
+program on lo ingress to set skb->queue_mapping on data packets:
+
+BUG: KMSAN: uninit-value in tcp_v4_do_rcv (net/ipv4/tcp_ipv4.c:1875)
+ tcp_v4_do_rcv (net/ipv4/tcp_ipv4.c:1875)
+ tcp_v4_rcv (net/ipv4/tcp_ipv4.c:2287)
+ ip_protocol_deliver_rcu (net/ipv4/ip_input.c:207)
+ ip_local_deliver_finish (net/ipv4/ip_input.c:242)
+ ip_local_deliver (net/ipv4/ip_input.c:262)
+ ip_rcv (net/ipv4/ip_input.c:573)
+ __netif_receive_skb (net/core/dev.c:6294)
+ process_backlog (net/core/dev.c:6646)
+ __napi_poll (net/core/dev.c:7710)
+ net_rx_action (net/core/dev.c:7929)
+ handle_softirqs (kernel/softirq.c:623)
+ do_softirq (kernel/softirq.c:523)
+ __local_bh_enable_ip (kernel/softirq.c:?)
+ __dev_queue_xmit (net/core/dev.c:?)
+ ip_finish_output2 (net/ipv4/ip_output.c:237)
+ ip_output (net/ipv4/ip_output.c:438)
+ __ip_queue_xmit (net/ipv4/ip_output.c:534)
+ __tcp_transmit_skb (net/ipv4/tcp_output.c:1693)
+ tcp_write_xmit (net/ipv4/tcp_output.c:3064)
+ tcp_sendmsg_locked (net/ipv4/tcp.c:?)
+ tcp_sendmsg (net/ipv4/tcp.c:1465)
+ inet_sendmsg (net/ipv4/af_inet.c:865)
+ sock_write_iter (net/socket.c:1195)
+ vfs_write (fs/read_write.c:688)
+ ...
+Uninit was created at:
+ kmem_cache_alloc_noprof (mm/slub.c:4873)
+ sk_prot_alloc (net/core/sock.c:2239)
+ sk_alloc (net/core/sock.c:2301)
+ inet_create (net/ipv4/af_inet.c:334)
+ __sock_create (net/socket.c:1605)
+ __sys_socket (net/socket.c:1747)
+
+Fix this at the root by adding sk_rx_queue_clear() alongside
+sk_tx_queue_clear() in sk_clone().
+
+Fixes: 342159ee394d ("net: avoid dirtying sk->sk_rx_queue_mapping")
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
-v2:
- - The v1 has been sent to net-next with a different commit message:
-   https://lore.kernel.org/20260403-net-next-mptcp-msg_eor-misc-v1-4-b0b33bea3fed@kernel.org
----
- net/mptcp/pm_kernel.c | 24 +++++-------------------
- 1 file changed, 5 insertions(+), 19 deletions(-)
+ net/core/sock.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/mptcp/pm_kernel.c b/net/mptcp/pm_kernel.c
-index 82e59f9c6dd9..0ebf43be9939 100644
---- a/net/mptcp/pm_kernel.c
-+++ b/net/mptcp/pm_kernel.c
-@@ -720,7 +720,7 @@ static void __mptcp_pm_release_addr_entry(struct mptcp_pm_addr_entry *entry)
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 5976100a9d55..a12c5eca88f2 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -2583,6 +2583,7 @@ struct sock *sk_clone(const struct sock *sk, const gfp_t priority,
  
- static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
- 					     struct mptcp_pm_addr_entry *entry,
--					     bool needs_id, bool replace)
-+					     bool replace)
- {
- 	struct mptcp_pm_addr_entry *cur, *del_entry = NULL;
- 	int ret = -EINVAL;
-@@ -779,7 +779,7 @@ static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
- 		}
- 	}
+ 	sk_set_socket(newsk, NULL);
+ 	sk_tx_queue_clear(newsk);
++	sk_rx_queue_clear(newsk);
+ 	RCU_INIT_POINTER(newsk->sk_wq, NULL);
  
--	if (!entry->addr.id && needs_id) {
-+	if (!entry->addr.id) {
- find_next:
- 		entry->addr.id = find_next_zero_bit(pernet->id_bitmap,
- 						    MPTCP_PM_MAX_ADDR_ID + 1,
-@@ -790,7 +790,7 @@ static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
- 		}
- 	}
- 
--	if (!entry->addr.id && needs_id)
-+	if (!entry->addr.id)
- 		goto out;
- 
- 	__set_bit(entry->addr.id, pernet->id_bitmap);
-@@ -923,7 +923,7 @@ int mptcp_pm_nl_get_local_id(struct mptcp_sock *msk,
- 		return -ENOMEM;
- 
- 	entry->addr.port = 0;
--	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry, true, false);
-+	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry, false);
- 	if (ret < 0)
- 		kfree(entry);
- 
-@@ -977,18 +977,6 @@ static int mptcp_nl_add_subflow_or_signal_addr(struct net *net,
- 	return 0;
- }
- 
--static bool mptcp_pm_has_addr_attr_id(const struct nlattr *attr,
--				      struct genl_info *info)
--{
--	struct nlattr *tb[MPTCP_PM_ADDR_ATTR_MAX + 1];
--
--	if (!nla_parse_nested_deprecated(tb, MPTCP_PM_ADDR_ATTR_MAX, attr,
--					 mptcp_pm_address_nl_policy, info->extack) &&
--	    tb[MPTCP_PM_ADDR_ATTR_ID])
--		return true;
--	return false;
--}
--
- /* Add an MPTCP endpoint */
- int mptcp_pm_nl_add_addr_doit(struct sk_buff *skb, struct genl_info *info)
- {
-@@ -1037,9 +1025,7 @@ int mptcp_pm_nl_add_addr_doit(struct sk_buff *skb, struct genl_info *info)
- 			goto out_free;
- 		}
- 	}
--	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry,
--						!mptcp_pm_has_addr_attr_id(attr, info),
--						true);
-+	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry, true);
- 	if (ret < 0) {
- 		GENL_SET_ERR_MSG_FMT(info, "too many addresses or duplicate one: %d", ret);
- 		goto out_free;
-
----
-base-commit: a9d4f4f6e65e0bf9bbddedecc84d67249991979c
-change-id: 20260406-net-mptcp-revert-pm-needs-id-f1cbb7021f9e
-
-Best regards,
---  
-Matthieu Baerts (NGI0) <matttbe@kernel.org>
+ 	if (newsk->sk_prot->sockets_allocated)
+-- 
+2.43.0
 
 
