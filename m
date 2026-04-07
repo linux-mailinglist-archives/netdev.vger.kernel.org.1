@@ -1,106 +1,51 @@
-Return-Path: <netdev+bounces-275957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275968-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id gDPHL9Lq1GkjywcAu9opvQ
-	(envelope-from <netdev+bounces-275957-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:30:26 +0200
+	id GOvUGPHu1GkZzAcAu9opvQ
+	(envelope-from <netdev+bounces-275968-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:48:01 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32EF93ADB53
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:30:26 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F7CD3ADEAF
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:48:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id E1B2D300C0F9
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 11:30:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 329C53026584
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 11:47:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A543AD50D;
-	Tue,  7 Apr 2026 11:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Ox8/IkIN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ahokdZI2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B463ACF1C;
+	Tue,  7 Apr 2026 11:47:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
+Received: from mail.servers.dxld.at (mail.servers.dxld.at [168.119.78.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0883AE198;
-	Tue,  7 Apr 2026 11:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7043B372B3B;
+	Tue,  7 Apr 2026 11:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.78.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775561415; cv=none; b=TkbImTulXmPHg2NAylZq7+OLchW4NSDszy4LIyAZndGSUNMdsfJ+Pa17L5lmmbsyXbDZeIBtHKhFeI6gRv/8Bjm7iTjkXBbb4zeHqvcBee1UoksxiatqemOMKak7gxKo202S4gq96rC9micOkVHQ8/eLwy1N19zbO6Y6GLQ+lGk=
+	t=1775562478; cv=none; b=GLWAywJ6aKBVBZxyUNJBsJnkdmGfAZdnehoNCY3pV81GLBXRuKs2IeNMDw6kw5Msdcat/4X9gvhmFNTih0evrHsm4QqUhyZ/35GQ1sXkbFk76rMEgKw/pnCIgsWKlbeNdfMZ1NytYjhIOWKPmAOcEuu02wh0PWSh38yXt+Bn0+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775561415; c=relaxed/simple;
-	bh=zmKtGXvPPmowdh2mtbprU/pHgivD6gdZlQXXU41pyVM=;
+	s=arc-20240116; t=1775562478; c=relaxed/simple;
+	bh=JYzF85C0V7dRRpq9u6kadu53IyVu+6XVVnHFbfBnr9s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RMQVJ8Z8dEZhnPD1B4sVHTyVDg05dhcpivdTs5/iAfH23w/JZ+9Da80sQRYrVjeX3diuqzlS90YLPaaWc780Rp/ksy3QezzGOApKCvIS5e7WAmcb7QdwfcAH8ePCyl2f9SCclPq9aUZ6o2vWgf0U1C+r1HIjS6/csUvGdm1PocE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Ox8/IkIN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ahokdZI2; arc=none smtp.client-ip=103.168.172.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
-	by mailfout.phl.internal (Postfix) with ESMTP id 1DC57EC046B;
-	Tue,  7 Apr 2026 07:30:11 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-09.internal (MEProxy); Tue, 07 Apr 2026 07:30:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1775561411; x=
-	1775647811; bh=gFXawp+CjNeAOKeG8AkV4oa72KSKeiCRRlIhnESJsY0=; b=O
-	x8/IkINDomUK2DdnDZv92Tqe2fyR/rCFVna1Q+pd/gld0p0ocPRPSeTyB7Abtaa+
-	+bZy6aVd14++osb9OYg6DwAJ1BjYXaKfFGmth6oijf6fIe8vgCNGPCW1CcitqPj8
-	xd3WoLtj3unpMEFJ7v7Sb8tKiP+0HUOefr88+6zIPikE8HLGt70bXBIuz+l0jFm7
-	u/re0vUqamR4hN4rHnpMNQ00KRCz5Z5RwXk3f/u+5jHedWzDbYm+RNF2ozHUcKMW
-	7q+as5YP32gniEjkpEeI9GwKVEZQAFntw9bodgApidhT70O44YxNwakDLfoC+Tza
-	v3RK13TkikHj4qmZVidsA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1775561411; x=1775647811; bh=gFXawp+CjNeAOKeG8AkV4oa72KSKeiCRRlI
-	hnESJsY0=; b=ahokdZI2Twg3hSVUcTqIL37CfkP/XEzvyAjSPJEj8u3zr4USwqR
-	enqP94rddA1T/bwy4hAzojq/M+2BJM11tP2Q6MXrRGdEm7VsF0tsRbFrcxKPresd
-	CQvc8W2moY3tmoZxZIg/tbZD/vcwf29QFCc21RP3x482WDD3bUZQXcNZe76EOtD0
-	WHiLpzGXt9XjUyLiyRWhmusTSFAgx9GpaXRmCUW7C6N2/XYALYzA6GW09Wyulcvh
-	8BG/0HT512muWwRxNf+POIsjXasqnRJEMHpMqAD85/13ns8bjNMoVqgmKloztHOO
-	KdfIYZPh9Bz26djbF7UgmdM6DUotFSBgTgQ==
-X-ME-Sender: <xms:wurUaZn7dNQSk1_hbtq-SFY57811q7oeiBa5A4TDnVSgxQnsGXv6Ig>
-    <xme:wurUaZxLczwv7v5tKM_aqYAOU5v9blze_hlMsN6_h4uXOq_4Ln8CMWshn9xBFe5Nj
-    _v_SC1odU6Ghhrlg99JB56Eqc_KNJ7hw6H1FIvKysH2wpXbojZcsvM>
-X-ME-Received: <xmr:wurUaT6JVdBzoDBc1qv8NTwgJsxBOgu4MiZp8LNLZ6w1yWlHwGwMOxGyfzAb>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddvtdehvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
-    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
-    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
-    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepledpmhhouggv
-    pehsmhhtphhouhhtpdhrtghpthhtoheprhgrmhguhhgrnhesshhtrghrlhgrsghsrdhsgh
-    dprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphht
-    thhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvh
-    gvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgt
-    ohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhope
-    hjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhopehinhhf
-    ohesshhtrghrlhgrsghsrdhsghdprhgtphhtthhopehsthgrsghlvgesvhhgvghrrdhkvg
-    hrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:wurUaZXZguiCPhMPyfzR8Msu3om59RqM2TdPzzxbtKJ7aQSHVLG5fQ>
-    <xmx:wurUabJ-lSOPRtSCwcBZ53g5pAYhXFeePv6xtYfQN2duKEFvjESXOQ>
-    <xmx:wurUabvEXhbZftfpE0IRDTsigQK2Jdu6_uKvq8BrBzaQ5aQrgBbiSA>
-    <xmx:wurUaYL-I6VIcBcnmEyd510PcNpLSnty0OQpAmfV83XrRKRj1I0gpA>
-    <xmx:w-rUaXdw7I-wBLgB6prGxjjYuvQ2CyZQ1i07yBpNJ57AL7-4Or-2Mzct>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 7 Apr 2026 07:30:09 -0400 (EDT)
-Date: Tue, 7 Apr 2026 13:30:08 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Muhammad Alifa Ramdhan <ramdhan@starlabs.sg>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, john.fastabend@gmail.com,
-	info@starlabs.sg, stable@vger.kernel.org
-Subject: Re: [PATCH] net/tls: fix use-after-free in -EBUSY error path of
- tls_do_encryption
-Message-ID: <adTqwMD_GBUjZnkw@krikkit>
-References: <20260403013617.2838875-1-ramdhan@starlabs.sg>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fAXdtX9ct6pU7u/5eCmb4LzeLif1wH5rDPpcHed8IPNbMYK1VHoGnQLQqqPKYAQx3PFhfc5ESeVRmN12I1Ws6RE9mAy0wbdYeboktb+tHK6Ir8E7FZfMv6Pvd6d1qr77rNBDkgqHQv2wSTV0T2ttamjHIJn40iyfqMube6c3OdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=darkboxed.org; spf=pass smtp.mailfrom=darkboxed.org; arc=none smtp.client-ip=168.119.78.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=darkboxed.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=darkboxed.org
+Received: mail.servers.dxld.at;
+	Tue, 07 Apr 2026 13:30:53 +0200
+Date: Tue, 7 Apr 2026 13:30:44 +0200
+From: Daniel =?utf-8?Q?Gr=C3=B6ber?= <dxld@darkboxed.org>
+To: Xavier Hsinyuan <xavierhsinyuan@outlook.com>
+Cc: ralf@mandelbit.com, antonio@mandelbit.com, corbet@lwn.net, 
+	davem@davemloft.net, edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, skhan@linuxfoundation.org
+Subject: Re: [RFC net-next 15/15] Documentation: networking: add ipxlat
+ translator guide
+Message-ID: <fldksy7obiaonlcxrjcbnfkfmaup27t3fq3ktubd7sx35fsswx@hjmchh6sr7rw>
+References: <20260319151230.655687-16-ralf@mandelbit.com>
+ <TYRPR01MB12666EEA0B8007166ED446088CA5DA@TYRPR01MB12666.jpnprd01.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,75 +54,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260403013617.2838875-1-ramdhan@starlabs.sg>
-X-Spamd-Result: default: False [0.34 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+In-Reply-To: <TYRPR01MB12666EEA0B8007166ED446088CA5DA@TYRPR01MB12666.jpnprd01.prod.outlook.com>
+X-Spamd-Result: default: False [-0.86 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[queasysnail.net:s=fm3,messagingengine.com:s=fm2];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
+	DMARC_POLICY_SOFTFAIL(0.10)[darkboxed.org : SPF not aligned (relaxed), No valid DKIM,none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275957-lists,netdev=lfdr.de];
-	RCVD_TLS_LAST(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	DMARC_NA(0.00)[queasysnail.net];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,davemloft.net,google.com,redhat.com,gmail.com,starlabs.sg];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_TO(0.00)[outlook.com];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[queasysnail.net:+,messagingengine.com:+];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[13];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-275968-lists,netdev=lfdr.de];
 	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[sd@queasysnail.net,netdev@vger.kernel.org];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	NEURAL_HAM(-0.00)[-0.998];
-	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[9];
 	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns,messagingengine.com:dkim,queasysnail.net:dkim,queasysnail.net:email]
-X-Rspamd-Queue-Id: 32EF93ADB53
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[dxld@darkboxed.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-0.994];
+	TAGGED_RCPT(0.00)[netdev];
+	R_DKIM_NA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,ietf.org:url]
+X-Rspamd-Queue-Id: 8F7CD3ADEAF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-2026-04-03, 09:36:17 +0800, Muhammad Alifa Ramdhan wrote:
-> The -EBUSY handling in tls_do_encryption(), introduced by commit
-> 859054147318 ("net: tls: handle backlogging of crypto requests"), has
-> a use-after-free due to double cleanup of encrypt_pending and the
-> scatterlist entry.
-> 
-> When crypto_aead_encrypt() returns -EBUSY, the request is enqueued to
-> the cryptd backlog and the async callback tls_encrypt_done() will be
-> invoked upon completion. That callback unconditionally restores the
-> scatterlist entry (sge->offset, sge->length) and decrements
-> ctx->encrypt_pending. However, if tls_encrypt_async_wait() returns an
-> error, the synchronous error path in tls_do_encryption() performs the
-> same cleanup again, double-decrementing encrypt_pending and
-> double-restoring the scatterlist.
-> 
-> The double-decrement corrupts the encrypt_pending sentinel (initialized
-> to 1), making tls_encrypt_async_wait() permanently skip the wait for
-> pending async callbacks. A subsequent sendmsg can then free the
-> tls_rec via bpf_exec_tx_verdict() while a cryptd callback is still
-> pending, resulting in a use-after-free when the callback fires on the
-> freed record.
-> 
-> Fix this by skipping the synchronous cleanup when the -EBUSY async
-> wait returns an error, since the callback has already handled
-> encrypt_pending and sge restoration.
-> 
-> Fixes: 859054147318 ("net: tls: handle backlogging of crypto requests")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Muhammad Alifa Ramdhan <ramdhan@starlabs.sg>
-> ---
->  net/tls/tls_sw.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+On Mon, Apr 06, 2026 at 10:50:44PM +0800, Xavier Hsinyuan wrote:
+> >+    $ ./tools/net/ynl/pyynl/cli.py --family ipxlat --json '{"ifindex": $IID, \
+> >+        "config": {"xlat-prefix6": "'$HEX_ADDR'", "prefix-len": 96} }'
+> Should this be like:
+> $ python3 /extends/pyynl/cli.py --spec ipxlat.yaml --do dev-set --json \
+> '{"ifindex": "'$IID'", "config": {"xlat-prefix6": \
+> {"prefix":"'$ADDR_HEX'", "prefix-len": 96}}}'
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Indeed, the JSON is just wrong and --do dev-set is missing. However
+`--family ipxlat` works for me and looking at the code is basically the
+same as specifying --spec.
 
--- 
-Sabrina
+Could you try this:
+
+    $ JSON='{"ifindex": '"$IID"', "config": {"xlat-prefix6": { "prefix": "'$ADDR_HEX'", "prefix-len": 96}}}'
+    $ ./tools/net/ynl/pyynl/cli.py --family ipxlat --do dev-set --json "$JSON"
+
+> >+Address Translation
+> >+-------------------
+> >+
+> >+The ipxlat address translation algorithm is stateless, per RFC-ADDR_, all
+> >+possible IPv4 addressess are mapped one-to-one into the translation prefix,
+> >+optionally including a non-standard "suffix". See `RFC-ADDR Section 2.2
+> >+<https://datatracker.ietf.org/doc/html/rfc6052#section-2.2>`_.
+> >+
+> >+.. _RFC-ADDR: https://datatracker.ietf.org/doc/html/rfc6052
+> >+
+> >+IPv6 addressess outside this prefix are rejected with ICMPv6 errors with
+> >+the notable exception of ICMPv6 errors originating from untranslatable
+> >+source addressess. These are translated to be sourced from the IPv4 Dummy
+> >+Address ``192.0.0.8`` (per I-D-dummy_) instead to maintain IPv4 traceroute
+> >+visibility.
+>
+> Would it help to add a few example? For instance,
+>  - Interface ipxlat0 with prefix6=64:ff9b::/96.
+>  - A IPv6 packet with src=64:ff9b::192.0.2.1 dst=64:ff9b::198.51.100.1,
+>    was send to ipxlat0.
+>  - Then a IPv4 packet with src=192.0.2.1 dst=198.51.100.1 was received from
+>    ipxlat0.
+
+I worry once we start with that we're really just re-stating what's already
+extensively documented in the RFCs.
+
+How about a reference to RFC 7915 Appendix A? This has a full bidirectional
+end-to-end example of how translation operates:
+https://datatracker.ietf.org/doc/html/rfc7915#appendix-A
+
+Admittedly using a /96 prefix (which the appendix doesn't) would make it
+easier to grok whats going on. Not sure that's reason enough to get into
+more detailed examples here.
+
+WDYT?
+
+Thanks,
+--Daniel
 
