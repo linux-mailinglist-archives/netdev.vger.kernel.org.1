@@ -1,219 +1,189 @@
-Return-Path: <netdev+bounces-275911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275912-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id FP7IJ2PI1Gk0xgcAu9opvQ
-	(envelope-from <netdev+bounces-275911-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:03:31 +0200
+	id oEjPEILI1GlbxQcAu9opvQ
+	(envelope-from <netdev+bounces-275912-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:04:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FB0C3ABB4B
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:03:31 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B70A3ABB7F
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 11:04:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id F0094300765F
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 09:03:29 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DC1D2300531C
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 09:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66D5830FC1D;
-	Tue,  7 Apr 2026 09:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b="xnIxApop"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E053290D1;
+	Tue,  7 Apr 2026 09:03:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012046.outbound.protection.outlook.com [52.101.66.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0F026F46F;
-	Tue,  7 Apr 2026 09:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775552607; cv=fail; b=eCh/Mx04fq7FyR/dxvPCSBmSJAeb4zXcmlQYSWAk0LhgEdy9i7SayuRFs8eW0E8Y1vzlfbJ4WdRkgYFCysOYJYfsnwh1TbwQ1bfnFe22apiU1aB01NoEU69RfA42z835R9ps6ESPzQhMOdtkcbnyAGP+loGO/MTmDLYY7C7OysI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775552607; c=relaxed/simple;
-	bh=ACk91BH1Fb4RH9p8lKOGDWWN9sucPmYCnRhfJ5Q0FFU=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Z+tUSbmntgJuR14Jb47cevSCjz5uoBoxbL4M99/dD2T7n8rnBbSusfi0xbGGctyXZz7OdCoAoe5jmsTnSMPaf394oaok2vywKR5qaTZAc5TppjONCUBepFzHr8d/1ve3i5MSPiUDajfVd0TNwQZrh/dR83EcOobFPy4QmeNlbeY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b=xnIxApop; arc=fail smtp.client-ip=52.101.66.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=siemens.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=otSbbJoH8NQ9lDmfGbqKezJTMdvKK/2XU3M9WE11Gysz6tb043rVJezjwuiJswoX9QI/EQo+ukjk0cBCVwBJ5nH6nJ5pEqKvvM+2Q9vJgDO2Z+rZo/Pkr6nhgE8jpfHJpxMbojy9vxtReRnMCRFDZdwJyO3A6OqqyA6e5DhfpN3REIVDORY2n2FcZvJTrXOUYuHDXO8rIA6JQWGFDwTslnnI/eGBFgYwkU6tQkMoiMX8ZuQv55h9/v595K4UAOun1WbTi5Gy3jtFp2b5MaEyj4bHvputH2vdPqZp3rmv8UxBc5KUXHRi+YcCFmE5KzQ5OEBECDSro0KR+N35/KB9Sw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ACk91BH1Fb4RH9p8lKOGDWWN9sucPmYCnRhfJ5Q0FFU=;
- b=n+nAysWRXzm7MnivBiFKTbUGYiKLUEBD54xOsOgdmIAcLmoS94inIW9frzzRxr78f8BtR8yWQ3esG5htx8nr64akdX2tMbQIHk9db9EIvPNsQYvVz15qLOf7ChDHDfuttHCP48ZyqipzDrntqj/q+zEfklRYhJWFwMotGH0FZd4W6+kKPgbMq4aLc5bD1Wc1ITrHsNi6Cm4FNqq4c5j680gqQBzaoidST5kQTdq9zwUpU+s3rHDGjzvjji/WLBqupLyxZsxYd9fpXehfQQW2FGp2uiHHKBzRdhYbCjwR9ZhRSc6EimrYk55IPih+n6pIrBNvQwCNpq7Hnwc/YDLlDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=siemens.com; dmarc=pass action=none header.from=siemens.com;
- dkim=pass header.d=siemens.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=siemens.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ACk91BH1Fb4RH9p8lKOGDWWN9sucPmYCnRhfJ5Q0FFU=;
- b=xnIxApop9DliCIsho9kYQBqQL1YKwYjzvf6roPAbxkixGWGp36O9ZYi4xjzUVz6GWv4cu6O0C/4r9hmCc+v/NCxmjfG5hjxZ0V8JJ1+Y16UYXb7q3uJ1d+z2WzGqSymfjDlbxbwVMFirF2MO2vubj7xfjrWzRVd4UjJ6dS1U9Y3RJFIzPUQS0akOK03wxwrQyIAepw6dyQZUvzzGxv1UAY73Z5h/2TekrBQx+zyYplEdTmj8V68f/e8nJO8kKFc0LTAZmZoWpXTctaHPpI88waGIqgqncvLNGiCnlHmMQEer0yPKt1tD43bQLl42zqw/QFYzei6m8gpbRR5bNeSflQ==
-Received: from AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:5b6::22)
- by DU0PR10MB5801.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:3a7::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.17; Tue, 7 Apr
- 2026 09:03:22 +0000
-Received: from AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::9126:d21d:31c4:1b9f]) by AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::9126:d21d:31c4:1b9f%6]) with mapi id 15.20.9769.016; Tue, 7 Apr 2026
- 09:03:21 +0000
-From: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>
-To: "daniel@makrotopia.org" <daniel@makrotopia.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] selftests: net: bridge_vlan_mcast: wait for h1 before
- querier check
-Thread-Topic: [PATCH net] selftests: net: bridge_vlan_mcast: wait for h1
- before querier check
-Thread-Index: AQHcxUNPjHfKyMJX+0Wq//pXkxyulbXTUDsA
-Date: Tue, 7 Apr 2026 09:03:21 +0000
-Message-ID: <f5bdb5485406fe2db0fb39bc89a5c67da1f81a10.camel@siemens.com>
-References:
- <c830f130860fd2efae08bfb9e5b25fd028e58ce5.1775424423.git.daniel@makrotopia.org>
-In-Reply-To:
- <c830f130860fd2efae08bfb9e5b25fd028e58ce5.1775424423.git.daniel@makrotopia.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.54.3 (3.54.3-2.fc41) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=siemens.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AS8PR10MB6867:EE_|DU0PR10MB5801:EE_
-x-ms-office365-filtering-correlation-id: 2612652c-8635-434f-7211-08de94848485
-x-ms-exchange-atpmessageproperties: SA
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|366016|1800799024|55112099003|38070700021|22082099003|56012099003|18002099003;
-x-microsoft-antispam-message-info:
- nvb8H2uniRxlhh97/SDBdsXos2heOfocYHSX6fjciTC+I6aw6SBBsDq38XIUWMQvCX2qDja1OJlwtCI6dso9T82glw/Rr38xxKciGNEVdHBAScwYvgW5lHm+JRqbMoQmLIozI9XFCiShOgDJRj8pJaniOJTlORQzWUytNmstkFS2Ruk5yuCshr4VXb0S1Nru5cyoQhaWEqdSNmwL/RyjycTv2xigQeiNL9YTm7HXurD4vWzsJyYfownvYVcoki2gVmHjt32G7kZjEPxqpvdlINJsSp94ehx5MHnNTNVPB0gzOnLnMOM5BUokuWEram9CPktNPcnNp7fqEP4I+CflnHO30feEo9pSUPxZMzSn2aJ6H1JklFTNXrgkdzbNMlGJn8cumHzgHFKl6zabjFnPZMT+Rh52fLfCcHmbeEsVwvnM5P072TA7PXWoqN3eqn90ac+DfZlVHsuXxKHboFslKvQolByvuyLf0GpO8urPrcJ7tDeRe14aZRsJkBzpsWd1adaWfUmvJjEu9xsyAbfxFKHc7R3xKxcmdZiWcINfnONiv5fRv7IT+g+DthMhJ9xe6pxFcCIRVVd20c8CTVQz0WHUroi7Q+DBU3GitD9rKCQ5TXiAxXnPKaa0lEZotbYdJY/T1VlsjAAxk05vSVW+TUdBm6z6K+gX7LlHk8iVC5BRUN0nQCLUMdwWwostmSzz0q/Y+PisEirhFIyllX83EohB4r69cJA9rNrY4Y/hxpM=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(55112099003)(38070700021)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?QkRkK0FuZ1cyZ2RQanM1MzhkZVNkTXkvSUw4enBScm5MUnVZVUpybXVEQ0I4?=
- =?utf-8?B?VUJ3dVBxWm1qU0o5bml0TEVpTWNqOWF3cFJ1NGY4RDZzaU11M1NESWNrcEVD?=
- =?utf-8?B?cUVZTms5ZTVqSjBtQmhsQzIyQk81N2ovalN3b0tieXdCMUxPSmpjdmp2TlBM?=
- =?utf-8?B?bzl5UDh0RE43QlZKVk1VT09UWlpTbnhUbHJZanJYaHc4clZwVjVjM1lTZkdm?=
- =?utf-8?B?b25rbnpSSlJkWTAxZVdOSlRwbFMyRUlrNE00ZFpDRU80TlBsd1h6REN6NVh6?=
- =?utf-8?B?YStldXBKZksvWnNZMU1paWlXMzI0cDYwbEpydFBqeDQ2U1dXZXh2S2ZOdXlL?=
- =?utf-8?B?OGpqb2NpWFZ2Y0R2bWdOOTh3VXlHaW1BTDZNSUNLYWFFeGl5MUR1RXpra3ZB?=
- =?utf-8?B?ZDBQczVrWkUwRmFhNWlxc0dTK0FXU0xQcUZyOS9EV2lKOXE4ckR3MGV1L2kx?=
- =?utf-8?B?OElwZUxqRE5QRWMwbzVhTm9lT1JsQjlST0MxdThXc2RYU0RlZTlMNnF5cmRU?=
- =?utf-8?B?NVlPNzRiSklNVWE2bGlKd0p2bnJCaFRqcWRucHJ5NDVnTnMrNXRBQ2hsQVlZ?=
- =?utf-8?B?YzNtN1BHWUROZXdBTmhBZEd3ZjN6VWE5TFcwMHB4WjdTVm40QWttQ1JaMlVl?=
- =?utf-8?B?ZEh1Y0FpNmtjbTBkNkkwZjR0SHBVZnMyenZjeUNCcmdsR2J6NUxaaTIxb0Rq?=
- =?utf-8?B?SXUyZ2pORi9iUVpRa0ZvRWorOHE5bzMvUk9WeXlyS3c0VXhKOGE4Rmw0R1VO?=
- =?utf-8?B?UkNFeC8rVmZ5ZEdZanh6ZytoNzVrZjNFckZCRnZ0VHZNSXNxaHk5SG5xK2s2?=
- =?utf-8?B?dnpkalV2TVlRVU9oeEtnK1ZRckJDRE43MkNVUU9FN3dtNDU4aWpQakxoM3FV?=
- =?utf-8?B?L0V1MFppakY4UEJVWlZZaXVSSk52aDRrZTdxZXFOVVR4VEh3VzdvaGNQNTkx?=
- =?utf-8?B?ZlBkYVRFZ3dlbmlFdTJwbXZoR2hVSUtNS3FGU0pzMi90YlNQb3NicEtab3cx?=
- =?utf-8?B?M1VXaWRTNzgydVE0dk83b0FkKzhjS3RZTGVwZEV0dnVlLzJ2MllpeThjVzZn?=
- =?utf-8?B?NkI2ZGdTRmpDL1RsYWpQWjlVaElCa2xNZU9xN0RFTjlTcmpUSS9oZzV1SW1m?=
- =?utf-8?B?UVd3UjJaY21DSWpVU2tnL1YyckpXUEhuMm8xWlFyQ3lZRVpvemlCd0JLZnJK?=
- =?utf-8?B?YjZTdGRuVDZUZHMvUHpFNWExNlJMS1BIQTllNFk3RWlzcUVjVGpicHVIZGtC?=
- =?utf-8?B?eldHcmhvN1NwNGh4U3FuTm03bCtvVUdUWHczeE1qOFFnaUJHdHBRZzlaeVdR?=
- =?utf-8?B?bk13QnJiZkRicmtURnFyaGZKblhvNnFYSWhuL051S2tOME1BU0wxd1JuMllm?=
- =?utf-8?B?cmVnbUVrc0hwRWV2NjRNWW9hTmg0bzFKbExCcjl0ZENLelBPRFZvWmt5STRE?=
- =?utf-8?B?ZGgrS1FyTnFsaUJxMjVqL1l1dTFwbU1ESHdKc0xqVEQrYlNyeTVzcUVObTBB?=
- =?utf-8?B?a0ZlcUQ2OUU5WnhEcVkyUlBkZ0ZabzE4Nm9tc1FsNnpvc1BNVTNMWUZ2TTF4?=
- =?utf-8?B?U2pjN1RHVi96eDBTems4Q0Z1SWRYTUFrUFdLNGEzY2pMVEh3WWFpZ3MvQXpO?=
- =?utf-8?B?ejV0WTNWSlZYSG8vUEFQOFY5VDFQNldqRnlTOWY3bmduLzV1L1Q5Mmt1TDht?=
- =?utf-8?B?VE9YbXFqRk5KbEx5WlhMb0tCbklBb0VlYzVHS1AvV3NFVlc3RTFsNDdoenBo?=
- =?utf-8?B?Mkh1R0JCSlFQMndHRlQxdGpvT3RFdVI2Vk9wcC82dkRTRTMyZHU2MW90NU1n?=
- =?utf-8?B?b21vY242QUhQVFdSZXRxRE9rTWYwcUpJa2x2T3ZDcDUyWjRmT05XbGU5M2Vk?=
- =?utf-8?B?ZENVdmhNb3N6dlBiOGhVdTlHcGQ4TW9TQzl6Y3VHM3BmYnVzNjB0TDlyZGhP?=
- =?utf-8?B?VUlvaUpqa0NIcWlmK0VtQ01wZW9jSHhwRWFhTzBETnI1djRJNVpnQmJvSlJ2?=
- =?utf-8?B?ek9BUW9pRGV3Qy9uejVFWDNwVU9lUEk5L21xaGU4eEUySjBmUWdnSHFjV1VT?=
- =?utf-8?B?aHptb2FKWThTRUtWaXRnR0t0QTFrbDNlaHVycTl4ajdGcVEwVkdDQWZlUzFB?=
- =?utf-8?B?VkZOeHJ1WlQ5WUJnY2twU2lhWG1RZ3ZvTUpNWmYwNmhOeWkzRjBTZVFTOTFN?=
- =?utf-8?B?UFR1N2JuWkpZdU1YUVpVN1V5Y2hjemJMUjhQTGw3ZG5BOUFYQjFKTlhUOEZL?=
- =?utf-8?B?M0NieVQzYUVEQzh3VzVYMjY3eWRiTmRvb1NxaUkwNEZwYUxmbUdmSkVJUjAr?=
- =?utf-8?B?UTlvb3dEaFg4QlBmbkI2YkNMQnR6aCtpWFBCSWkzQTkvdkpZRy9XTGtFOFpr?=
- =?utf-8?Q?BXxppYIGt9LvjSr8=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A195989CD8D47B42A2B004B6BC0A8275@EURPRD10.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16281399002
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 09:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775552635; cv=none; b=NsKmTK4vCN8xZHbCG7iQ3flY84ab6JhUad9wg3grNOY5hF1/WZm5JUf0PY6Yt3ccXRL+dwFhSRXtDUEFJ3UsEKs1Cb1Rzf2oXGdkprcnabkmOVaUv837vy6yWnC3v+0/gm3pI97jmC9VkZU2S54k5lLwdTAFOO0N+jA6g4cKnAk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775552635; c=relaxed/simple;
+	bh=vR/OD3mUKC8xpJtZllM5WnO0SI3rvXcz9b+Z3xpwwk0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s+jjdyLYruzUwQh2cd6OkIkYFbXMry3rI8wk+CNF5eW0HGXU0VQjo8FeU8b/ofh70eiFc2FubU7P0RPsuqOxfpmG/Fl9pXYsWSARYIXaK55xD/G3Tu/xZbZYagIEpPcqjB3hr2YrIfJA4+h1zHOwmO3Ft8JsbsHG0N2BT7ZsUi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-56dfd007d31so2139094e0c.3
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 02:03:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775552631; x=1776157431;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=y0vl46NKGRyiCl8U/M/6ud6IWg1EyGptt9/bHQKZ9ec=;
+        b=Lu/Bqnc+x0eauoHO2Bvi2I1Y2xIIpVI+HCrK7gCDkc2KWIM+Rd5YYpTgaijBIzXrkx
+         fDnOLt3loMS9HR01HhmdZrVD7RMakv8MM2YJ0V/EiY864Cpf5aWRA4NKlnos29sYXyjQ
+         6qejHr8GASIXH9lW3zLwX8xwAg+F2FA+x4JZ57JcSHAzbARUcMrUwndCsBYzpKSvT8IR
+         mWTsLSf/5ib87eRRsBvhGkGRP9qznj0qK0Ao5NLY9nao0eOzona7FO7Qym7uKa+T2vhp
+         Tzd6xQIkSGdyCbDR4nGtoTJ0TE8ZpjkQa3Ld++e/y+IKwcibZ7/GhfxPSfIDfctXvrYB
+         86hA==
+X-Forwarded-Encrypted: i=1; AJvYcCXnCGCHfLGOQ8VOt1nmvxpjT2xwUi1w9Jt6bG8Eg8JSYqGFU60HWczKP+TLAvn09v6i5wce1B0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRchTRuA65CEJlBoQ7NiFL9g+qfsEheg/xb/cn+xbCbKzGcxxr
+	LwQgV1nGn/kkwKc4/w6BX/EfL3ip1jRfTkSqsVVpzeHfKgKYSex/9r08sWeYe5s9
+X-Gm-Gg: AeBDieu65kKYmEfUnXjE0aoK/56YyqZ75IsQX4dQL3LI6IS8NT2Q+UTBLU4GRBRxP55
+	SwsQhhf14UFDhkpbCksmZHMYxsbmp1ZQNRSuOVj6Z743Z5DJ468+XrJkDBMm4rdoq2KKU6CQg+0
+	lvcyVDpfkJ27bVdma+wuk9vaMIhE6lzQGHxr4yAilohOmdsJ9hlrv2bXmDizwhVqtHTF3hIhMPW
+	gErl4nSkbVnD33CSB6cFVv40Qb/LHYgRQnj5Y1mkZuW90rUctsnBnVo1Clf9joJOgAoJxiuEJpt
+	7kHGvK3Y3/+JkU8ZBptzxJQJJwjaH7AJuLgEG3XvBF2kZKP031DHqUB3lOmYQNPQuRgbIpjSAd/
+	Jpv/ZnZF63c8lr5ftg3cDd0NOBF097RKIBWLUgyVH925mW0zLy53TA3mYwlRVZHG2r7Llgmmxj7
+	0p+F2mPvp2hspBVrMR/A1NyqFaosZBc4SR5j2LbWgkwgjH+LxItA2DedGkMNMCr8rE
+X-Received: by 2002:a67:e7cb:0:b0:5fe:12c9:6e5a with SMTP id ada2fe7eead31-605a4e668aemr6834423137.12.1775552630842;
+        Tue, 07 Apr 2026 02:03:50 -0700 (PDT)
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com. [209.85.221.171])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-60583098fa7sm18769024137.10.2026.04.07.02.03.50
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Apr 2026 02:03:50 -0700 (PDT)
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-56739adfa1aso3735987e0c.0
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 02:03:50 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVQ+HhssEUdwxZdL2N8eF+wwKTZ7e98Enga8myG2C9ymByTBBADwcJCEIcy6KbFW48+hO3DInc=@vger.kernel.org
+X-Received: by 2002:a05:6122:83d3:b0:56d:451b:e4dd with SMTP id
+ 71dfb90a1353d-56dab9c582amr5571250e0c.12.1775552630186; Tue, 07 Apr 2026
+ 02:03:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: siemens.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2612652c-8635-434f-7211-08de94848485
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Apr 2026 09:03:21.2385
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 38ae3bcd-9579-4fd4-adda-b42e1495d55a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iIUPvd5F/IJJIcmNiw/MCN4/BFVtxp7gZE2b0W/rhVeijq5NlX8v1YLVCcI1f4NJo7mp/iOW20It2TTHBB07/Q+vD57PoarWF2k2flQTVzM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR10MB5801
-X-Spamd-Result: default: False [-0.06 / 15.00];
-	ARC_REJECT(1.00)[cv is fail on i=2];
-	DMARC_POLICY_ALLOW(-0.50)[siemens.com,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[siemens.com:s=selector2];
+References: <20260401183608.1852225-1-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20260401183608.1852225-1-niklas.soderlund+renesas@ragnatech.se>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 7 Apr 2026 11:03:38 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdWnjV=HGE1o08zLhUfTgOSene5fYx1J5GG10mB+Toq8qg@mail.gmail.com>
+X-Gm-Features: AQROBzCmpfqi0EhIW62xO0TmPSVfhgL94wc_gDMbxOuCcTOVB0k3yzyfQ0rPbgc
+Message-ID: <CAMuHMdWnjV=HGE1o08zLhUfTgOSene5fYx1J5GG10mB+Toq8qg@mail.gmail.com>
+Subject: Re: [net-next] net: ethernet: ravb: Suspend and resume the
+ transmission flow
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>, 
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [0.04 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	MIME_BASE64_TEXT(0.10)[];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_ALL(0.00)[];
-	DKIM_TRACE(0.00)[siemens.com:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275911-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DMARC_NA(0.00)[linux-m68k.org];
+	TAGGED_FROM(0.00)[bounces-275912-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_FIVE(0.00)[5];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev,renesas];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[alexander.sverdlin@siemens.com,netdev@vger.kernel.org];
-	RCPT_COUNT_THREE(0.00)[4];
-	NEURAL_HAM(-0.00)[-1.000];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[makrotopia.org:email,siemens.com:dkim,siemens.com:mid,siemens.com:email,siemens.com:url,tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 0FB0C3ABB4B
+	FROM_NEQ_ENVFROM(0.00)[geert@linux-m68k.org,netdev@vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	R_DKIM_NA(0.00)[];
+	NEURAL_HAM(-0.00)[-0.335];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[ragnatech.se:email,renesas.com:email,mail.gmail.com:mid,linux-m68k.org:email,sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 3B70A3ABB7F
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-SGkgRGFuaWVsLA0KDQpPbiBTdW4sIDIwMjYtMDQtMDUgYXQgMjI6MjkgKzAxMDAsIERhbmllbCBH
-b2xsZSB3cm90ZToNCj4gVGhlIHF1ZXJpZXItaW50ZXJ2YWwgdGVzdCBhZGRzIGgxIChjdXJyZW50
-bHkgYSBzbGF2ZSBvZiB0aGUgVlJGIGNyZWF0ZWQNCj4gYnkgc2ltcGxlX2lmX2luaXQpIHRvIGEg
-dGVtcG9yYXJ5IGJyaWRnZSBicjEgYWN0aW5nIGFzIGFuIG91dHNpZGUgSUdNUA0KPiBxdWVyaWVy
-LiBUaGUga2VybmVsIFZSRiBkcml2ZXIgKGRyaXZlcnMvbmV0L3ZyZi5jKSBjYWxscyBjeWNsZV9u
-ZXRkZXYoKQ0KPiBvbiBldmVyeSBzbGF2ZSBhZGQgYW5kIHJlbW92ZSwgdG9nZ2xpbmcgdGhlIGlu
-dGVyZmFjZSBhZG1pbi1kb3duIHRoZW4gdXAuDQo+IFBoeWxpbmsgdGFrZXMgdGhlIFBIWSBkb3du
-IGR1cmluZyB0aGUgYWRtaW4tZG93biBoYWxmIG9mIHRoYXQgY3ljbGUuDQo+IFNpbmNlIGgxIGFu
-ZCBzd3AxIGFyZSBjYWJsZS1jb25uZWN0ZWQsIHN3cDEgYWxzbyBsb3NlcyBpdHMgbGluayBtYXkg
-bmVlZA0KPiBzZXZlcmFsIHNlY29uZHMgdG8gcmUtbmVnb3RpYXRlLg0KPiANCj4gVXNlIHNldHVw
-X3dhaXRfZGV2ICRoMSAwIHdoaWNoIHdhaXRzIGZvciBoMSB0byByZXR1cm4gdG8gVVAgc3RhdGUs
-IHNvIHRoZQ0KPiB0ZXN0IGNhbiByZWx5IG9uIHRoZSBsaW5rIGJlaW5nIGJhY2sgdXAgYXQgdGhp
-cyBwb2ludC4NCj4gDQo+IEZpeGVzOiA0ZDg2MTBlZThiZDc3ICgic2VsZnRlc3RzOiBuZXQ6IGJy
-aWRnZTogYWRkIHZsYW4gbWNhc3RfcXVlcmllcl9pbnRlcnZhbCB0ZXN0cyIpDQo+IFNpZ25lZC1v
-ZmYtYnk6IERhbmllbCBHb2xsZSA8ZGFuaWVsQG1ha3JvdG9waWEub3JnPg0KDQpSZXZpZXdlZC1i
-eTogQWxleGFuZGVyIFN2ZXJkbGluIDxhbGV4YW5kZXIuc3ZlcmRsaW5Ac2llbWVucy5jb20+DQoN
-Cj4gLS0tDQo+IMKgdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvbmV0L2ZvcndhcmRpbmcvYnJpZGdl
-X3ZsYW5fbWNhc3Quc2ggfCAxICsNCj4gwqAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKykN
-Cj4gDQo+IGRpZmYgLS1naXQgYS90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9uZXQvZm9yd2FyZGlu
-Zy9icmlkZ2Vfdmxhbl9tY2FzdC5zaCBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL25ldC9mb3J3
-YXJkaW5nL2JyaWRnZV92bGFuX21jYXN0LnNoDQo+IGluZGV4IDcyZGZiZWFmNTZiOTIuLmU4MDMx
-ZjY4MjAwYWQgMTAwNzU1DQo+IC0tLSBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL25ldC9mb3J3
-YXJkaW5nL2JyaWRnZV92bGFuX21jYXN0LnNoDQo+ICsrKyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRl
-c3RzL25ldC9mb3J3YXJkaW5nL2JyaWRnZV92bGFuX21jYXN0LnNoDQo+IEBAIC00MTQsNiArNDE0
-LDcgQEAgdmxtY19xdWVyaWVyX2ludHZsX3Rlc3QoKQ0KPiDCoAlicmlkZ2UgdmxhbiBhZGQgdmlk
-IDEwIGRldiBicjEgc2VsZiBwdmlkIHVudGFnZ2VkDQo+IMKgCWlwIGxpbmsgc2V0IGRldiAkaDEg
-bWFzdGVyIGJyMQ0KPiDCoAlpcCBsaW5rIHNldCBkZXYgYnIxIHVwDQo+ICsJc2V0dXBfd2FpdF9k
-ZXYgJGgxIDANCj4gwqAJYnJpZGdlIHZsYW4gYWRkIHZpZCAxMCBkZXYgJGgxIG1hc3Rlcg0KPiDC
-oAlicmlkZ2UgdmxhbiBnbG9iYWwgc2V0IHZpZCAxMCBkZXYgYnIxIG1jYXN0X3Nub29waW5nIDEg
-bWNhc3RfcXVlcmllciAxDQo+IMKgCXNsZWVwIDINCg0KLS0gDQpBbGV4YW5kZXIgU3ZlcmRsaW4N
-ClNpZW1lbnMgQUcNCnd3dy5zaWVtZW5zLmNvbQ0K
+Hi Niklas, Shimoda-san,
+
+On Wed, 1 Apr 2026 at 20:39, Niklas S=C3=B6derlund
+<niklas.soderlund+renesas@ragnatech.se> wrote:
+>
+> From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+>
+> The current driver does not follow the latest datasheet and does not
+> suspend the flow when stopping DMA and resume it when starting. Update
+> the driver to do so.
+>
+> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> [Niklas: Rebase from BSP and reword commit message]
+> Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatech.=
+se>
+
+Thanks for your patch, which is now commit 353d8e7989b6babe ("net:
+ethernet: ravb: Suspend and resume the transmission flow") in
+linux-next/master net-next.
+
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -694,6 +694,9 @@ static int ravb_dmac_init(struct net_device *ndev)
+>         const struct ravb_hw_info *info =3D priv->info;
+>         int error;
+>
+> +       /* Clear transmission suspension */
+> +       ravb_modify(ndev, CCC, CCC_DTSR, 0);
+> +
+>         /* Set CONFIG mode */
+>         error =3D ravb_set_opmode(ndev, CCC_OPC_CONFIG);
+>         if (error)
+> @@ -1103,6 +1106,12 @@ static int ravb_stop_dma(struct net_device *ndev)
+>         if (error)
+>                 return error;
+>
+> +       /* Request for transmission suspension */
+> +       ravb_modify(ndev, CCC, CCC_DTSR, CCC_DTSR);
+> +       error =3D ravb_wait(ndev, CSR, CSR_DTS, CSR_DTS);
+> +       if (error)
+> +               netdev_err(ndev, "failed to stop AXI BUS\n");
+
+This error message is printed during resume from s2idle or s2ram on
+e.g. Salvator-XS and Gray Hawk Single.  Ethernet (nfsroot) still works
+fine, though.
+
+> +
+>         /* Stop AVB-DMAC process */
+>         return ravb_set_opmode(ndev, CCC_OPC_CONFIG);
+>  }
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
