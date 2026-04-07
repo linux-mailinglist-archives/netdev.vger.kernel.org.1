@@ -1,53 +1,76 @@
-Return-Path: <netdev+bounces-275842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275843-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GI5wDIZs1GmatwcAu9opvQ
-	(envelope-from <netdev+bounces-275842-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:31:34 +0200
+	id qJtsHcpv1GkruAcAu9opvQ
+	(envelope-from <netdev+bounces-275843-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:45:30 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A24663A914D
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:31:33 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 770D73A9356
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:45:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2B540301F9FC
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:30:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 433B43004DAF
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5EC0350D7F;
-	Tue,  7 Apr 2026 02:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2FF81A317D;
+	Tue,  7 Apr 2026 02:45:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oyB9y6I1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YaQOYSSt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B5E34F497;
-	Tue,  7 Apr 2026 02:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855D7372B37
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 02:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775529027; cv=none; b=gwu2K/M5PsLgeIyN2lIccKlXHxCzxVE53gVpXLuDNS8GNi/n8RACgbgBG5Wf+FlfE21Mo6CdYotml2vpWAICqKWyEOXLFeJPOyT3f62QD3VSb7iWUHf7NxxiiHpubyvPsTj0UmnUaC9SEEFaHqQmY1VG71/SPhr5G/mh4Sj1doQ=
+	t=1775529923; cv=none; b=okAxevMThQndcCFH3y57SG/y4sPFFKGCInBV1Ol6t3jClrXcaatqQLc1jnIM0nGGMHiXAlEdyyntmq/DQOJfA+8PIrQbm7RZNWN/+qWRnZ8cqFEIfwYK+msh2Tas65Y/NYmHucu8v2GWg7D7m2BUGC0Bu/szQ1Q90LK6Rydghqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775529027; c=relaxed/simple;
-	bh=mZ3uY486A1qHU8NVBKPstw2sALiJlVUGNsNBRlP6Usk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qL7hMX8BjPvG+U3qt9UmPoe8uT6pwe7xdCYxYZeVUr0CU/YzAyZQxTRdfrFVgf80Vpa8HL3Naymky7SJjbm4TUGwMOikV0QkaJF+gUVO/LMcIMX2hhEcOemXYOWurbZ3xPqbEP0o26JxA51Tlf/iECvnw4pG9No4BzL3eJk08YU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oyB9y6I1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 347F4C4CEF7;
-	Tue,  7 Apr 2026 02:30:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775529027;
-	bh=mZ3uY486A1qHU8NVBKPstw2sALiJlVUGNsNBRlP6Usk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oyB9y6I1L4XASOJNLu4lqmAwO/TIwqvKhllNeV6NgLL1P5EmZT+VbzAv1gO1QaQym
-	 iLCQHndfK6Xs4OYHT7qGcrMcoUKNSVEaSKcomMvnrNSOa0bLtJcuJlfP83OPUOY5Ih
-	 qXq3XsHUha8l0c7tTsz9YiM1xpEuB/sA420U6Pap+ECXOEi9smCpBZWRR4IdA1pKJT
-	 EKRqE5FeiWMyXtnu8KMYDFu5TQ0rfSOoaXgRTXiTUTfvAfUvN+cUCesBS0rfonP7vY
-	 r6opEP99DtAafedUhW8R37QC/G3xk4y/OitadWRJN+YbdDGW+uBekbclA3G/AjwTUh
-	 Q+bPYuAp5IB5Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9E723809A28;
-	Tue,  7 Apr 2026 02:30:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1775529923; c=relaxed/simple;
+	bh=yQUOKSy6VfcfXDDIRY90Etg+nb+Y+n6W8ukWh0hXxsY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sc1l84wr1Y4J59Iwgrsp8uA70ICr2aX3MIs/yLPDCWNcaXKAnA2XUD0esLrgRlRQjvmPIhyslvDNBQE6JcxWWdsZp/LzwHKfAg8vdwvAc84iB8brDq6g2hn4XyprKW2/ljDp1iTbZE2H2MuuikhzXTKrQIYPX5IFNYdue/cA9Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YaQOYSSt; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1775529921;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FDDFUAQFNb512S/LxyDIQRQ2l8wUPzRCjDTUtKlW1rE=;
+	b=YaQOYSSt4TGJLns0vabDwzdGckU3mh3r5LgWXfirxte3Bgt6MR9ublciPmG6kby18fsXTh
+	Xy85/rDdXN0pOqhhqvzPKt8k/qBgj6PWb4qUK+7sYAsj0NJGMZglhyqK7C9ITtw4N3jAFk
+	gVd29cPt5yVV20Gs15aWyLtLta9st2I=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-500-yI-jBFHzNAyTZgkTk-uDZQ-1; Mon,
+ 06 Apr 2026 22:45:20 -0400
+X-MC-Unique: yI-jBFHzNAyTZgkTk-uDZQ-1
+X-Mimecast-MFC-AGG-ID: yI-jBFHzNAyTZgkTk-uDZQ_1775529918
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 99E801800359;
+	Tue,  7 Apr 2026 02:45:18 +0000 (UTC)
+Received: from xudu-thinkpadx1carbongen9.nay.com (unknown [10.72.116.131])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 95B6B300019F;
+	Tue,  7 Apr 2026 02:45:14 +0000 (UTC)
+From: Xu Du <xudu@redhat.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	shuah@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC net-next 0/4] selftests: drv-net: tso: add double tunneling GSO tests
+Date: Tue,  7 Apr 2026 10:45:07 +0800
+Message-ID: <cover.1775527362.git.xudu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,78 +78,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net/mlx5: Update the list of the PCI supported
- devices
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177552900555.3349888.9239225042307354768.git-patchwork-notify@kernel.org>
-Date: Tue, 07 Apr 2026 02:30:05 +0000
-References: <20260403091756.139583-1-tariqt@nvidia.com>
-In-Reply-To: <20260403091756.139583-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
- michaelgur@nvidia.com, stable@vger.kernel.org, phaddad@nvidia.com
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
-	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275842-lists,netdev=lfdr.de,netdevbpf];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	FROM_NO_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	RCVD_COUNT_FIVE(0.00)[5];
+	TAGGED_FROM(0.00)[bounces-275843-lists,netdev=lfdr.de];
+	FROM_NEQ_ENVFROM(0.00)[xudu@redhat.com,netdev@vger.kernel.org];
+	TO_DN_NONE(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	MISSING_XM_UA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_COUNT_FIVE(0.00)[6];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	NEURAL_HAM(-0.00)[-1.000];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[nvidia.com:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: A24663A914D
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[]
+X-Rspamd-Queue-Id: 770D73A9356
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+This series extends the TSO selftest (tso.py) to cover double-encapsulated
+tunnel scenarios, ensuring that hardware offload and the kernel GSO path 
+correctly handle packets with two layers of tunnel headers.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Xu Du (4):
+  selftests: drv-net: tso: retry connect on EHOSTUNREACH
+  selftests: drv-net: tso: add helpers for double tunneling GSO
+  selftests: drv-net: tso: add Geneve double tunneling GSO test
+  selftests: drv-net: tso: expand double tunnel GSO test coverage
 
-On Fri, 3 Apr 2026 12:17:56 +0300 you wrote:
-> From: Michael Guralnik <michaelgur@nvidia.com>
-> 
-> Add the upcoming ConnectX-10 NVLink-C2C device ID to the table of
-> supported PCI device IDs.
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Michael Guralnik <michaelgur@nvidia.com>
-> Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> 
-> [...]
+ .../drivers/net/hw/lib/py/__init__.py         |   4 +-
+ tools/testing/selftests/drivers/net/hw/tso.py | 267 +++++++++++++++---
+ .../selftests/drivers/net/lib/py/__init__.py  |   4 +-
+ .../testing/selftests/net/lib/py/__init__.py  |   4 +-
+ tools/testing/selftests/net/lib/py/utils.py   |  19 +-
+ 5 files changed, 248 insertions(+), 50 deletions(-)
 
-Here is the summary with links:
-  - [net-next] net/mlx5: Update the list of the PCI supported devices
-    https://git.kernel.org/netdev/net/c/a9d4f4f6e65e
 
-You are awesome, thank you!
+base-commit: 2f60df9e61aa48bf40c36254bf2e839f09cffd98
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.53.0
 
 
