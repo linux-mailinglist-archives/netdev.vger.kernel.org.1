@@ -1,82 +1,57 @@
-Return-Path: <netdev+bounces-275939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275940-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id MNZcKSzf1GnzyAcAu9opvQ
-	(envelope-from <netdev+bounces-275939-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 12:40:44 +0200
+	id kEkKDQTh1GmZyQcAu9opvQ
+	(envelope-from <netdev+bounces-275940-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 12:48:36 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DAB53AD096
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 12:40:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84EED3AD31B
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 12:48:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 84DD5303DA2A
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 10:39:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B554E30CD602
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 10:43:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 323DA3A9DA6;
-	Tue,  7 Apr 2026 10:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6339A3ACF1C;
+	Tue,  7 Apr 2026 10:42:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WcVTfgJg"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="R2HWbiOe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BDF33AA195;
-	Tue,  7 Apr 2026 10:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0A83ACF05;
+	Tue,  7 Apr 2026 10:42:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775558370; cv=none; b=C2C7IDTbgsETpHNboVUXySOnWXaUK9GRCR0oQAGAoeoVWyA1WRdYr0qor6b7gPzLsitkEn0TCPG/Wz6ypWO5Q9V1wutDoXV0+aHmPHSnzyq+xDM/80MuZkh1d3rMZ1OAkxKWRoErcLJGHwmDohrIX7rlpcbm9cmVHPeecwomF5g=
+	t=1775558568; cv=none; b=rUO3VBfb09+Yio9g0FjC2i5359XYIONexgHet0kVs7R5x7juPguCx2SAHnlu6jHKgiSDZIDbEr4uovgegmNV9PkL8BvYTEQ6XFGSq6Fz6+R3kv6FmYfk/S95r+31afsUGp68ednceM1SFobG6yaSS4Whxm5AVlOvq43eQ2BLwuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775558370; c=relaxed/simple;
-	bh=r10VBvcXoM3Z4eQBWU/o9X8JVvhzleGLD98YRMI0yKw=;
+	s=arc-20240116; t=1775558568; c=relaxed/simple;
+	bh=Gbh+L9DmoMziiKxCfay/VTWnCT4itwq3mN59Ml42hA0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sk8p8i1oxJsZF21vIK5S+v4+wl4NiCS0TTaqbgQZ422P5ddmodj6Kf933lW9MZGKR6Cwa48XL5QE2SsCsEBQKrbrcEWzzqO9P0KKvtr0n+JTWHC3kDX+jqxQM/Ae3j0ZoJpYRLYqtlSLQ6niWvFFUvZONrhxO87HRA7D5IMpuls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WcVTfgJg; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775558369; x=1807094369;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=r10VBvcXoM3Z4eQBWU/o9X8JVvhzleGLD98YRMI0yKw=;
-  b=WcVTfgJg+RcR72E2pusmjbes60OKX0pINm3j8zwgIPL4Kbu7WiPE3bid
-   qw7pI0uwTTezah7KRNvpZ9FcUrpwq7BUff/t+Tx1hOG4ZnLPDEOy4gN4w
-   YScfpykcy5qJm5ZM95vVfGBTtFjK/l/czmm56IStj3eHhsrSXvtDjpq8a
-   uOH9OkcwuvaxcdNNTzI0B6EAivhm9hX1trvMZIs2hKn9ZM1Fubk9Bwec/
-   4hxfb33WC3h1Es6RkzEojTLuaFT24Y+rS3Y4offAiKRqVuDuqWP8riP+O
-   XyAiZ6EL6sECP6q/JeLIn8omyZq/L/xB405qpyQvQ5VseG0AIdSpV9VKD
-   A==;
-X-CSE-ConnectionGUID: gA11lOzHS+6SQamat3vQJw==
-X-CSE-MsgGUID: p5G8FkT2R5eM1cN3F+sEJw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11751"; a="94098390"
-X-IronPort-AV: E=Sophos;i="6.23,165,1770624000"; 
-   d="scan'208";a="94098390"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2026 03:39:28 -0700
-X-CSE-ConnectionGUID: 8qZIApI1QCSNvqiYkzcIAw==
-X-CSE-MsgGUID: nWMeLn2zQW6R8ABdGEZsNw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,165,1770624000"; 
-   d="scan'208";a="228405589"
-Received: from lkp-server01.sh.intel.com (HELO d00eb8a6782a) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 07 Apr 2026 03:39:23 -0700
-Received: from kbuild by d00eb8a6782a with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wA3q3-000000000Tp-494i;
-	Tue, 07 Apr 2026 10:39:19 +0000
-Date: Tue, 7 Apr 2026 18:38:32 +0800
-From: kernel test robot <lkp@intel.com>
-To: Yingnan Zhang <342144303@qq.com>, horms@verge.net.au, ja@ssi.bg
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	pablo@netfilter.org, fw@strlen.de, phil@nwl.cc, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org, Yingnan Zhang <342144303@qq.com>
-Subject: Re: [PATCH net v2] ipvs: fix MTU check for GSO packets in tunnel mode
-Message-ID: <202604071825.Sh4Y1fMi-lkp@intel.com>
-References: <tencent_CA2C1C219C99D315086BE55E8654AF7E6009@qq.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=quSK9pOtUM8QQonSvbmp1uJ8/3xvf3h2MmMPwabuzhK7jbH1LFHfQlgKJGRdKS5E9Kh9bE67+y0/5NDcy8cJZnM7AHLS3/UTjY5GYjCE6Q1m+z1IyC3g8gnv1qNGkt3EQ4Oq/VI6toTwjRhRNDG8bHk6MQQz7v3/+Wi2jlDvBy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=R2HWbiOe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F26EC19421;
+	Tue,  7 Apr 2026 10:42:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1775558567;
+	bh=Gbh+L9DmoMziiKxCfay/VTWnCT4itwq3mN59Ml42hA0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R2HWbiOepVdv0NY+QeHWExrYKaMCU3S5Ha8Chl3ac1BQQ9WjLf62BWEOb2biapL0P
+	 8x0RBvQ1EvkK8kU38d5js0FTCaz2dOf0OnOmOTMM/f+VTvHmJwW5L0Ok6pLrUxNJlT
+	 VbBdeuTFIGK+tNhdM0QaBMAdUWQ0FhOEdS/B5gIk=
+Date: Tue, 7 Apr 2026 12:42:44 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Kai Zen <kai.aizen.dev@gmail.com>
+Cc: netdev@vger.kernel.org, edwin.peer@broadcom.com,
+	Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	stable@vger.kernel.org, security@kernel.org
+Subject: Re: [PATCH net] net: rtnetlink: zero ifla_vf_broadcast to avoid
+ stack infoleak in rtnl_fill_vfinfo
+Message-ID: <2026040759-whiny-tinker-c321@gregkh>
+References: <CALynFi7k1Z7Vgr4p2=KH2-uWVntBRE5R+8uP=cds9_ihGqzOdQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,98 +60,161 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <tencent_CA2C1C219C99D315086BE55E8654AF7E6009@qq.com>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+In-Reply-To: <CALynFi7k1Z7Vgr4p2=KH2-uWVntBRE5R+8uP=cds9_ihGqzOdQ@mail.gmail.com>
+X-Spamd-Result: default: False [3.84 / 15.00];
+	MID_END_EQ_FROM_USER_PART(4.00)[];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[intel.com,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
-	R_DKIM_ALLOW(-0.20)[intel.com:s=Intel];
+	DMARC_POLICY_ALLOW(-0.50)[linuxfoundation.org,none];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	R_DKIM_ALLOW(-0.20)[linuxfoundation.org:s=korg];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275939-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[lists.linux.dev,netfilter.org,strlen.de,nwl.cc,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org,qq.com];
 	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_TO(0.00)[qq.com,verge.net.au,ssi.bg];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-275940-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_TO(0.00)[gmail.com];
+	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lkp@intel.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[intel.com:+];
-	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,01.org:url,intel.com:dkim,intel.com:email,intel.com:mid]
-X-Rspamd-Queue-Id: 5DAB53AD096
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[gregkh@linuxfoundation.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[linuxfoundation.org:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	TO_DN_SOME(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linuxfoundation.org:dkim,linuxfoundation.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 84EED3AD31B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi Yingnan,
+On Tue, Apr 07, 2026 at 01:21:57PM +0300, Kai Zen wrote:
+> rtnl_fill_vfinfo() declares struct ifla_vf_broadcast on the stack
+> without initialisation:
+> 
+>     struct ifla_vf_broadcast vf_broadcast;
+> 
+> The struct contains a single fixed 32-byte field:
+> 
+>     /* include/uapi/linux/if_link.h */
+>     struct ifla_vf_broadcast {
+>             __u8 broadcast[32];
+>     };
+> 
+> The function then copies dev->broadcast into it using dev->addr_len
+> as the length:
+> 
+>     memcpy(vf_broadcast.broadcast, dev->broadcast, dev->addr_len);
+> 
+> On Ethernet devices (the overwhelming majority of SR-IOV NICs)
+> dev->addr_len is 6, so only the first 6 bytes of broadcast[] are
+> written. The remaining 26 bytes retain whatever was previously on
+> the kernel stack. The full struct is then handed to userspace via:
+> 
+>     nla_put(skb, IFLA_VF_BROADCAST,
+>             sizeof(vf_broadcast), &vf_broadcast)
+> 
+> leaking up to 26 bytes of uninitialised kernel stack per VF per
+> RTM_GETLINK request, repeatable.
+> 
+> The other vf_* structs in the same function are explicitly zeroed
+> for exactly this reason - see the memset() calls for ivi,
+> vf_vlan_info, node_guid and port_guid a few lines above.
+> vf_broadcast was simply missed when it was added.
+> 
+> The pattern used elsewhere in this file for the regular IFLA_BROADCAST
+> attribute also avoids the issue by sending only dev->addr_len bytes
+> rather than a fixed-size struct, but for IFLA_VF_BROADCAST the wire
+> format is the fixed 32-byte struct, so the right fix is to zero the
+> struct before the partial memcpy.
+> 
+> Reachability and impact
+> -----------------------
+> 
+> The leak is reachable by any unprivileged local process. AF_NETLINK
+> with NETLINK_ROUTE requires no capabilities. The only environmental
+> requirement is that the host has at least one SR-IOV-capable
+> interface present (a parent device with VFs), which is the common
+> case for cloud, datacenter and HPC hosts.
+> 
+> Trigger: send RTM_GETLINK with an IFLA_EXT_MASK attribute whose
+> value has the RTEXT_FILTER_VF bit set. The kernel will then walk
+> each VF and emit IFLA_VFINFO_LIST, including IFLA_VF_BROADCAST,
+> which carries the 26 bytes of uninitialised stack per VF.
+> 
+> Stack residue at this call site can include return addresses
+> (useful as a KASLR / function-pointer disclosure primitive) and
+> transient sensitive data left over by whatever ran on the same
+> kernel stack just prior. KASAN with stack instrumentation, or
+> KMSAN, will flag the nla_put() when reproduced.
+> 
+> Reproducer (unprivileged):
+> 
+>     import socket, struct
+>     IFLA_EXT_MASK   = 29
+>     RTEXT_FILTER_VF = 1
+>     s = socket.socket(socket.AF_NETLINK, socket.SOCK_RAW,
+>                       socket.NETLINK_ROUTE)
+>     s.bind((0, 0))
+>     hdr  = struct.pack('=IHHII', 0, 18, 0x301, 0, 0)
+>     ifi  = struct.pack('=BxHiII', 0, 0, 0, 0, 0)
+>     attr = (struct.pack('=HH', 8, IFLA_EXT_MASK) +
+>             struct.pack('=I', RTEXT_FILTER_VF))
+>     msg  = hdr + ifi + attr
+>     msg  = struct.pack('=I', len(msg)) + msg[4:]
+>     s.send(msg)
+>     data = s.recv(65536)
+>     # Parse IFLA_VF_BROADCAST from the response. Bytes 7..32 of the
+>     # broadcast[] field are uninitialised kernel stack on Ethernet.
+> 
+> Fix
+> ---
+> 
+> Zero the on-stack struct before the partial memcpy, matching the
+> existing pattern used for the other vf_* structs in the same
+> function.
+> 
+> Reported-by: Kai Aizen <kai.aizen.dev@gmail.com>
+> Signed-off-by: Kai Aizen <kai.aizen.dev@gmail.com>
+> ---
+> 
+> Note for reviewers: this is v1. I have not yet identified the
+> exact introducing commit for the Fixes: tag and would appreciate
+> a pointer, or I will resend as v2 once I have run git blame on a
+> local checkout. The bug is present at least as far back as the
+> introduction of struct ifla_vf_broadcast in net-next.
+> 
+>  net/core/rtnetlink.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> --- a/net/core/rtnetlink.c
+> +++ b/net/core/rtnetlink.c
+> @@ -1572,6 +1572,7 @@ static noinline_for_stack int
+> rtnl_fill_vfinfo(struct sk_buff *skb,
+>                 port_guid.vf = ivi.vf;
+> 
+>         memcpy(vf_mac.mac, ivi.mac, sizeof(ivi.mac));
+> +       memset(&vf_broadcast, 0, sizeof(vf_broadcast));
+>         memcpy(vf_broadcast.broadcast, dev->broadcast, dev->addr_len);
+>         vf_vlan.vlan = ivi.vlan;
+>         vf_vlan.qos = ivi.qos;
 
-kernel test robot noticed the following build errors:
+Nice catch, but your patch is corrupted and can't be applied as the tabs
+were converted to spaces and the commit is line-wrapped :(
 
-[auto build test ERROR on net/main]
+With that fixed, feel free to resubmit and add:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yingnan-Zhang/ipvs-fix-MTU-check-for-GSO-packets-in-tunnel-mode/20260407-141549
-base:   net/main
-patch link:    https://lore.kernel.org/r/tencent_CA2C1C219C99D315086BE55E8654AF7E6009%40qq.com
-patch subject: [PATCH net v2] ipvs: fix MTU check for GSO packets in tunnel mode
-config: x86_64-rhel-9.4-rust (https://download.01.org/0day-ci/archive/20260407/202604071825.Sh4Y1fMi-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-rustc: rustc 1.88.0 (6b00bc388 2025-06-23)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260407/202604071825.Sh4Y1fMi-lkp@intel.com/reproduce)
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202604071825.Sh4Y1fMi-lkp@intel.com/
+thanks,
 
-All error/warnings (new ones prefixed by >>):
-
->> net/netfilter/ipvs/ip_vs_xmit.c:115:2: warning: non-void function does not return a value in all control paths [-Wreturn-type]
-     115 |         } else if (skb->len > mtu &&
-         |         ^
->> net/netfilter/ipvs/ip_vs_xmit.c:115:4: error: expected identifier or '('
-     115 |         } else if (skb->len > mtu &&
-         |           ^
-   net/netfilter/ipvs/ip_vs_xmit.c:119:2: error: expected identifier or '('
-     119 |         return false;
-         |         ^
->> net/netfilter/ipvs/ip_vs_xmit.c:120:1: error: extraneous closing brace ('}')
-     120 | }
-         | ^
-   1 warning and 3 errors generated.
-
-
-vim +115 net/netfilter/ipvs/ip_vs_xmit.c
-
-   104	
-   105	static inline bool
-   106	__mtu_check_toobig_v6(const struct sk_buff *skb, u32 mtu)
-   107	{
-   108		if (IP6CB(skb)->frag_max_size) {
-   109			/* frag_max_size tell us that, this packet have been
-   110			 * defragmented by netfilter IPv6 conntrack module.
-   111			 */
-   112			if (IP6CB(skb)->frag_max_size > mtu)
-   113				return true; /* largest fragment violate MTU */
-   114		}
- > 115		} else if (skb->len > mtu &&
-   116			   !(skb_is_gso(skb) && skb_gso_validate_network_len(skb, mtu))) {
-   117			return true; /* Packet size violate MTU size */
-   118		}
-   119		return false;
- > 120	}
-   121	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+greg k-h
 
