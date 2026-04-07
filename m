@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-276164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276165-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UGSCKBJ11WlC6gcAu9opvQ
-	(envelope-from <netdev+bounces-276164-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 23:20:18 +0200
+	id kOB2HQF21WlC6gcAu9opvQ
+	(envelope-from <netdev+bounces-276165-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 23:24:17 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26F833B4F57
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 23:20:18 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DCBF3B5011
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 23:24:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DDA31301B4FF
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 21:20:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DED9630C4A31
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 21:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA70D37C91E;
-	Tue,  7 Apr 2026 21:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3515037C90C;
+	Tue,  7 Apr 2026 21:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fl7IU4Om"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZZbtFDxM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6693E37BE9E
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 21:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D592C228CB8
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 21:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775596807; cv=none; b=LYE+XmTKHUBhZC5m+QzmdoO0zwcS4Rk2BDIGOGGccmobYFYaZXIedxoPgTjx+BU2qlNgUGK8LtvG05cDBXJE7HuIIX0T9ojHcJyOEjo09eChNbFIaVX8Q4swxNlUyFyXtiLsNyBB082JC9vIEqQT+3jwNFQWMtNF9dosOK5xQS4=
+	t=1775596809; cv=none; b=bmsvkrq5KLyoTFQ7YtOB1I1ohWTuypuftm4La0UJziqG2OzXgov6mrQn24NbVSH/rKjLStzBxsDPaGeG+OkKZ0DxJN69cl8Lu3hHnbGWmk+AiZc8OMrJG8ae9nOS41CbXmJoXwihRhyQPSwnSjPyjUL2xvrTPRB9NpcwdsoV/5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775596807; c=relaxed/simple;
-	bh=xVT/XZnSRrIDVpvbY3KXoxLurmbeZotULvEpGJ02geI=;
+	s=arc-20240116; t=1775596809; c=relaxed/simple;
+	bh=QPAVgILUjRRGDOG7GMlNiQNmgHUj6lSeoi656rZCTbA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=k2Y383fUcxmDCbIRj7bndF41v3Hfs31PlJaFklAC7hD7VlK9XnrcONXE33tJPf3YTh1w/WPHId0EXellI3+qGF67r1ei3L5YZoLZK/PYaemdAgSsecnDHpjQ7+Ysx+BUx+YWO0CeEyW0sYN6QmVq/MYnGzvrtvkFTKHwwF6BRso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fl7IU4Om; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=O5r4rEQpb7XG+jis5KapXOKSSE+/h7XDAdfgRDo6Spz9wcqBsOlxGjcTipGXjafygPXBi3afwAwAAp2cyQ+jBP21IBB3EMr62+/7kPfGIpB76Ie83vZvxKu1paGsWDXcgKEuDFlflmB2V4h84Yg1+uAPh/amAODLyslUv8RpVDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZZbtFDxM; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2b242cbb97aso44133645ad.1
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 14:20:06 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-82c7ec40f92so7245213b3a.0
+        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 14:20:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1775596806; x=1776201606; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1775596807; x=1776201607; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T+l6+TXy4b6dxMhG7gjvJQhnzsnvatK2g7FUHSpTF1s=;
-        b=Fl7IU4OmRqGoOwxYlhmkZEvb3kVgrQV2AF+F9tttFLtSokNuAo3RGgwkyr/fR4yhus
-         PJN/XFYdz6IC16Wv58d8q+jbw79/r73ifK+lmQg9ttLaGt84X7Ba9fR7iRAjtAhsb5Vy
-         xvfiIkds3cuw504JdbzNRAZQnhI6SfEspc3VslpnRLINR0F+NVz4NyVrL37VpMSlBx/+
-         HgM8FV/Vc33RTgu5ZgiNA7KP8wUt57jHrOfTUl/eqTzS1sQ9qJOAY1KvtpqQw65nxFzU
-         Nz+jukNRa26NNmkzQSdzzlZN28vf7FQUV+hb+TUT1gsL46F01Ox0qAx0Hu97QEb8duO9
-         lcyw==
+        bh=GcVKv0sQ44FyUo4I68FZifCBpScEWMQjoICDyHB7V4E=;
+        b=ZZbtFDxMElOAVLtgkfvUqSBQNqotbTcaku229UXriMU/yp0x+Kko6t0/z2XYtEqMBc
+         uHdlyQm8jgLf+WuhwBtYXeJvwLtBe+gU92/DRe992baC+ue1NMQJVroT9WvPPUCc2h1z
+         J9ZpzKJ9Zt3BWKSlc86LtO0Nz2k9yM7ATLtyXC+VOMRvGAsaqwc2l+CbU5jPjtWTiSAE
+         biACQSZE11n9vghXqr4uSqJpFNaV6YvEAodqH36OGGrvekabOfxiaLgybku0DTR+CVz6
+         z7ZEN8dT8NpC6JOX4iyxeQdaRvaHj0csoxf+hiJk31RMGnsSj/zCcqNekIpu8Urd0zEp
+         TK5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775596806; x=1776201606;
+        d=1e100.net; s=20251104; t=1775596807; x=1776201607;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T+l6+TXy4b6dxMhG7gjvJQhnzsnvatK2g7FUHSpTF1s=;
-        b=jgU93sXWvCp41lGB1ZjjRVCjt+RAZXgVuORpr0HCqveELXYRZaCUzOXCrHeYKhz5Av
-         fQoj9oMw1Qrv28UCGcDoHWUZiTqg5+KjQum4FTBs4My+sFhfzwsOZWjbK5pfNwqiENRf
-         39bPMGSnNgeVRJ4gM/Ues19N7X4H79U3qbyqm9cYz08PcJKpiNZE3+7TIagXsOcEhIBh
-         VINb5cgXdJn8CPJVenY5chAOErb0D2XPDnibdjkOi/1lD48V1+G9okObxLLZu2lcjTp3
-         GE8etacq9svRIrf1JA+fMGU6dhbr869K/BXAE5zDUd2/GUgCW7gLTFZ5O2MchPQW7MVq
-         qpWw==
-X-Forwarded-Encrypted: i=1; AJvYcCXSjmN1oD4i4Y8P3D4FT7w+0gFZuk/TWxUpSJz64FliSd58zUno9518kBdq/xao4cgCACjjZ/8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxjuk9SdnqYDQ9ohHAyQ4uBBpsJtMTjJEhBnH+h4DksVvFkD6Z2
-	jP1tnZedXT7rTp9x9cmOZqRzl2Gg4aQIEymgliQN5B02NQjU8YooO7umbbPRsLbIroTg8cO/jrS
-	OpJzZXA==
-X-Received: from pfbdh21.prod.google.com ([2002:a05:6a00:4795:b0:829:f706:70e4])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:94c7:b0:39b:f0a1:1495
- with SMTP id adf61e73a8af0-39f2f286fd8mr18258275637.52.1775596805396; Tue, 07
- Apr 2026 14:20:05 -0700 (PDT)
-Date: Tue,  7 Apr 2026 21:19:34 +0000
+        bh=GcVKv0sQ44FyUo4I68FZifCBpScEWMQjoICDyHB7V4E=;
+        b=bNunGmq+csjI/y4H4jkd13H5MfQNkJ0NX1tBKT0pWlEOkTDCis8bMP2lfpK9Ri0sAp
+         yLhhSQjNspzI4EZRwDMPGS9s9Dj8nYuIJ6XNu9AGTIhbo6k1L8gSP0mOpjOQrYphT5Fi
+         A50QqBpU2MNsv4XyXmBZbY4gDrYTNFkY0LlDnUlK4RsUzjGk+3W6K2A+Odvef2FChtmT
+         NwmvxL32RXeBnITIHvb+AbiO3e8STGd1CELwz/Y+NxIeUSBL9pBYP1yxoyKtPPhYcwxz
+         SPdJH/fai6eo2mmgvxIk0njebKiufdgK45dqTWq1DzWbrY+5Kqge/dC/9+0dmrp+IeaV
+         jblw==
+X-Forwarded-Encrypted: i=1; AJvYcCWnDtTR/Ri8KxeuM/gcNwsOlN3zZUyo12950HaF7EvTCGxhVGYypVcTOIWZsD/GkCiMNsdKuZQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSpb4H8q8gz5HH9Cmo/wlw+B9otg5iQg96LvvXe0uyYTHjmACa
+	zfQvGHL91AnuxSB1+lDLCyE1vgKJdLHBzJR8EItx4OZlCJcS+ZQnAPzcONAbZ6IIvZHH5i+QUva
+	xbKKKKA==
+X-Received: from pfbjs10.prod.google.com ([2002:a05:6a00:918a:b0:829:7493:545c])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:f88:b0:82a:955:50d3
+ with SMTP id d2e1a72fcca58-82d0dbab605mr17482544b3a.45.1775596807003; Tue, 07
+ Apr 2026 14:20:07 -0700 (PDT)
+Date: Tue,  7 Apr 2026 21:19:35 +0000
 In-Reply-To: <20260407212001.2368593-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260407212001.2368593-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.53.0.1213.gd9a14994de-goog
-Message-ID: <20260407212001.2368593-2-kuniyu@google.com>
-Subject: [PATCH v3 net-next 01/15] selftest: net: Extend ipmr.c for IP6MR.
+Message-ID: <20260407212001.2368593-3-kuniyu@google.com>
+Subject: [PATCH v3 net-next 02/15] ipmr: Convert mr_table.cache_resolve_queue_len
+ to u32.
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -90,18 +91,18 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	MV_CASE(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[google.com,reject];
 	R_DKIM_ALLOW(-0.20)[google.com:s=20251104];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276164-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276165-lists,netdev=lfdr.de];
 	FREEMAIL_CC(0.00)[kernel.org,google.com,gmail.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
 	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[kuniyu@google.com,netdev@vger.kernel.org];
@@ -110,385 +111,140 @@ X-Spamd-Result: default: False [-0.66 / 15.00];
 	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 26F833B4F57
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 0DCBF3B5011
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-This commit extends most test cases in ipmr.c for IPV6MR.
+mr_table.cache_resolve_queue_len is always updated under
+spin_lock_bh(&mfc_unres_lock).
 
-Note that IP6MR does not provide rtnetlink interface for MFC,
-so such tests will be skipped.
+Let's convert it to u32.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- tools/testing/selftests/net/forwarding/ipmr.c | 163 ++++++++++++------
- 1 file changed, 110 insertions(+), 53 deletions(-)
+ include/linux/mroute_base.h |  2 +-
+ net/ipv4/ipmr.c             | 18 ++++++++++--------
+ net/ipv6/ip6mr.c            | 11 +++++++----
+ 3 files changed, 18 insertions(+), 13 deletions(-)
 
-diff --git a/tools/testing/selftests/net/forwarding/ipmr.c b/tools/testing/selftests/net/forwarding/ipmr.c
-index df870aad9ead..cfd00173bcd6 100644
---- a/tools/testing/selftests/net/forwarding/ipmr.c
-+++ b/tools/testing/selftests/net/forwarding/ipmr.c
-@@ -2,7 +2,9 @@
- /* Copyright 2026 Google LLC */
+diff --git a/include/linux/mroute_base.h b/include/linux/mroute_base.h
+index cf3374580f74..3341acca002f 100644
+--- a/include/linux/mroute_base.h
++++ b/include/linux/mroute_base.h
+@@ -254,7 +254,7 @@ struct mr_table {
+ 	struct rhltable		mfc_hash;
+ 	struct list_head	mfc_cache_list;
+ 	int			maxvif;
+-	atomic_t		cache_resolve_queue_len;
++	u32			cache_resolve_queue_len;
+ 	bool			mroute_do_assert;
+ 	bool			mroute_do_pim;
+ 	bool			mroute_do_wrvifwhole;
+diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+index 8a08d09b4c30..2566b4a1f80b 100644
+--- a/net/ipv4/ipmr.c
++++ b/net/ipv4/ipmr.c
+@@ -756,7 +756,8 @@ static void ipmr_destroy_unres(struct mr_table *mrt, struct mfc_cache *c)
+ 	struct sk_buff *skb;
+ 	struct nlmsgerr *e;
  
- #include <linux/if.h>
-+#include <linux/in6.h>
- #include <linux/mroute.h>
-+#include <linux/mroute6.h>
- #include <linux/netlink.h>
- #include <linux/rtnetlink.h>
- #include <linux/socket.h>
-@@ -17,6 +19,14 @@ FIXTURE(ipmr)
- 	int netlink_sk;
- 	int raw_sk;
- 	int veth_ifindex;
-+	union {
-+		struct vifctl vif;
-+		struct mif6ctl vif6;
-+	};
-+	union {
-+		struct mfcctl mfc;
-+		struct mf6cctl mfc6;
-+	};
- };
+-	atomic_dec(&mrt->cache_resolve_queue_len);
++	WRITE_ONCE(mrt->cache_resolve_queue_len,
++		   mrt->cache_resolve_queue_len - 1);
  
- FIXTURE_VARIANT(ipmr)
-@@ -25,6 +35,11 @@ FIXTURE_VARIANT(ipmr)
- 	int protocol;
- 	int level;
- 	int opts[MRT_MAX - MRT_BASE + 1];
-+	int vif_size;
-+	char vif_check_cmd_pimreg[64];
-+	char vif_check_cmd_veth[64];
-+	int mfc_size;
-+	char mfc_check_cmd[1024];
- };
+ 	while ((skb = skb_dequeue(&c->_c.mfc_un.unres.unresolved))) {
+ 		if (ip_hdr(skb)->version == 0) {
+@@ -1178,11 +1179,12 @@ static int ipmr_cache_unresolved(struct mr_table *mrt, vifi_t vifi,
+ 			return err;
+ 		}
  
- FIXTURE_VARIANT_ADD(ipmr, ipv4)
-@@ -47,6 +62,39 @@ FIXTURE_VARIANT_ADD(ipmr, ipv4)
- 		MRT_DEL_MFC_PROXY,
- 		MRT_FLUSH,
- 	},
-+	.vif_size = sizeof(struct vifctl),
-+	.vif_check_cmd_pimreg = "cat /proc/net/ip_mr_vif | grep -q pimreg",
-+	.vif_check_cmd_veth = "cat /proc/net/ip_mr_vif | grep -q veth",
-+	.mfc_size = sizeof(struct mfcctl),
-+	.mfc_check_cmd = "cat /proc/net/ip_mr_cache | grep -q '00000000 00000000'",
-+};
-+
-+FIXTURE_VARIANT_ADD(ipmr, ipv6)
-+{
-+	.family = AF_INET6,
-+	.protocol = IPPROTO_ICMPV6,
-+	.level = IPPROTO_IPV6,
-+	.opts = {
-+		MRT6_INIT,
-+		MRT6_DONE,
-+		MRT6_ADD_MIF,
-+		MRT6_DEL_MIF,
-+		MRT6_ADD_MFC,
-+		MRT6_DEL_MFC,
-+		MRT6_VERSION,
-+		MRT6_ASSERT,
-+		MRT6_PIM,
-+		MRT6_TABLE,
-+		MRT6_ADD_MFC_PROXY,
-+		MRT6_DEL_MFC_PROXY,
-+		MRT_FLUSH,
-+	},
-+	.vif_size = sizeof(struct mif6ctl),
-+	.vif_check_cmd_pimreg = "cat /proc/net/ip6_mr_vif | grep -q pim6reg",
-+	.vif_check_cmd_veth = "cat /proc/net/ip6_mr_vif | grep -q veth",
-+	.mfc_size = sizeof(struct mf6cctl),
-+	.mfc_check_cmd = "cat /proc/net/ip6_mr_cache | "
-+		"grep -q '0000:0000:0000:0000:0000:0000:0000:0000 0000:0000:0000:0000:0000:0000:0000:0000'",
- };
+-		atomic_inc(&mrt->cache_resolve_queue_len);
++		WRITE_ONCE(mrt->cache_resolve_queue_len,
++			   mrt->cache_resolve_queue_len + 1);
+ 		list_add(&c->_c.list, &mrt->mfc_unres_queue);
+ 		mroute_netlink_event(mrt, c, RTM_NEWROUTE);
  
- struct mfc_attr {
-@@ -144,6 +192,18 @@ FIXTURE_SETUP(ipmr)
- 	ASSERT_EQ(0, err);
+-		if (atomic_read(&mrt->cache_resolve_queue_len) == 1)
++		if (mrt->cache_resolve_queue_len == 1)
+ 			mod_timer(&mrt->ipmr_expire_timer,
+ 				  c->_c.mfc_un.unres.expires);
+ 	}
+@@ -1287,7 +1289,8 @@ static int ipmr_mfc_add(struct net *net, struct mr_table *mrt,
+ 		if (uc->mfc_origin == c->mfc_origin &&
+ 		    uc->mfc_mcastgrp == c->mfc_mcastgrp) {
+ 			list_del(&_uc->list);
+-			atomic_dec(&mrt->cache_resolve_queue_len);
++			WRITE_ONCE(mrt->cache_resolve_queue_len,
++				   mrt->cache_resolve_queue_len - 1);
+ 			found = true;
+ 			break;
+ 		}
+@@ -1346,7 +1349,7 @@ static void mroute_clean_tables(struct mr_table *mrt, int flags,
+ 	}
  
- 	self->veth_ifindex = ifr.ifr_ifindex;
-+
-+	if (variant->family == AF_INET) {
-+		self->vif = (struct vifctl){
-+			.vifc_flags = VIFF_USE_IFINDEX,
-+			.vifc_lcl_ifindex = self->veth_ifindex,
-+		};
-+	} else {
-+		self->vif6 = (struct mif6ctl){
-+			.mif6c_flags = 0,
-+			.mif6c_pifi = self->veth_ifindex,
-+		};
-+	}
- }
+ 	if (flags & MRT_FLUSH_MFC) {
+-		if (atomic_read(&mrt->cache_resolve_queue_len) != 0) {
++		if (READ_ONCE(mrt->cache_resolve_queue_len)) {
+ 			spin_lock_bh(&mfc_unres_lock);
+ 			list_for_each_entry_safe(c, tmp, &mrt->mfc_unres_queue, list) {
+ 				list_del(&c->list);
+@@ -2954,10 +2957,9 @@ static int ipmr_rtm_route(struct sk_buff *skb, struct nlmsghdr *nlh,
  
- FIXTURE_TEARDOWN(ipmr)
-@@ -169,41 +229,39 @@ TEST_F(ipmr, mrt_init)
- 
- TEST_F(ipmr, mrt_add_vif_register)
+ static bool ipmr_fill_table(struct mr_table *mrt, struct sk_buff *skb)
  {
--	struct vifctl vif = {
--		.vifc_vifi = 0,
--		.vifc_flags = VIFF_REGISTER,
--	};
- 	int err;
+-	u32 queue_len = atomic_read(&mrt->cache_resolve_queue_len);
+-
+ 	if (nla_put_u32(skb, IPMRA_TABLE_ID, mrt->id) ||
+-	    nla_put_u32(skb, IPMRA_TABLE_CACHE_RES_QUEUE_LEN, queue_len) ||
++	    nla_put_u32(skb, IPMRA_TABLE_CACHE_RES_QUEUE_LEN,
++			READ_ONCE(mrt->cache_resolve_queue_len)) ||
+ 	    nla_put_s32(skb, IPMRA_TABLE_MROUTE_REG_VIF_NUM,
+ 			READ_ONCE(mrt->mroute_reg_vif_num)) ||
+ 	    nla_put_u8(skb, IPMRA_TABLE_MROUTE_DO_ASSERT,
+diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
+index 85010ff21c98..5755244e226c 100644
+--- a/net/ipv6/ip6mr.c
++++ b/net/ipv6/ip6mr.c
+@@ -792,7 +792,8 @@ static void ip6mr_destroy_unres(struct mr_table *mrt, struct mfc6_cache *c)
+ 	struct net *net = read_pnet(&mrt->net);
+ 	struct sk_buff *skb;
  
-+	memset(&self->vif, 0, variant->vif_size);
-+
-+	if (variant->family == AF_INET)
-+		self->vif.vifc_flags = VIFF_REGISTER;
-+	else
-+		self->vif6.mif6c_flags = MIFF_REGISTER;
-+
- 	err = setsockopt(self->raw_sk,
- 			 variant->level, variant->opts[MRT_ADD_VIF - MRT_BASE],
--			 &vif,  sizeof(vif));
-+			 &self->vif,  variant->vif_size);
- 	ASSERT_EQ(0, err);
+-	atomic_dec(&mrt->cache_resolve_queue_len);
++	WRITE_ONCE(mrt->cache_resolve_queue_len,
++		   mrt->cache_resolve_queue_len - 1);
  
--	err = system("cat /proc/net/ip_mr_vif | grep -q pimreg");
-+	err = system(variant->vif_check_cmd_pimreg);
- 	ASSERT_EQ(0, err);
+ 	while ((skb = skb_dequeue(&c->_c.mfc_un.unres.unresolved)) != NULL) {
+ 		if (ipv6_hdr(skb)->version == 0) {
+@@ -1205,7 +1206,8 @@ static int ip6mr_cache_unresolved(struct mr_table *mrt, mifi_t mifi,
+ 			return err;
+ 		}
  
- 	err = setsockopt(self->raw_sk,
- 			 variant->level, variant->opts[MRT_DEL_VIF - MRT_BASE],
--			 &vif,  sizeof(vif));
-+			 &self->vif,  variant->vif_size);
- 	ASSERT_EQ(0, err);
- }
+-		atomic_inc(&mrt->cache_resolve_queue_len);
++		WRITE_ONCE(mrt->cache_resolve_queue_len,
++			   mrt->cache_resolve_queue_len + 1);
+ 		list_add(&c->_c.list, &mrt->mfc_unres_queue);
+ 		mr6_netlink_event(mrt, c, RTM_NEWROUTE);
  
- TEST_F(ipmr, mrt_del_vif_unreg)
- {
--	struct vifctl vif = {
--		.vifc_vifi = 0,
--		.vifc_flags = VIFF_USE_IFINDEX,
--		.vifc_lcl_ifindex = self->veth_ifindex,
--	};
- 	int err;
+@@ -1510,7 +1512,8 @@ static int ip6mr_mfc_add(struct net *net, struct mr_table *mrt,
+ 		if (ipv6_addr_equal(&uc->mf6c_origin, &c->mf6c_origin) &&
+ 		    ipv6_addr_equal(&uc->mf6c_mcastgrp, &c->mf6c_mcastgrp)) {
+ 			list_del(&_uc->list);
+-			atomic_dec(&mrt->cache_resolve_queue_len);
++			WRITE_ONCE(mrt->cache_resolve_queue_len,
++				   mrt->cache_resolve_queue_len - 1);
+ 			found = true;
+ 			break;
+ 		}
+@@ -1568,7 +1571,7 @@ static void mroute_clean_tables(struct mr_table *mrt, int flags)
+ 	}
  
- 	err = setsockopt(self->raw_sk,
- 			 variant->level, variant->opts[MRT_ADD_VIF - MRT_BASE],
--			 &vif,  sizeof(vif));
-+			 &self->vif,  variant->vif_size);
- 	ASSERT_EQ(0, err);
- 
--	err = system("cat /proc/net/ip_mr_vif | grep -q veth0");
-+	err = system(variant->vif_check_cmd_veth);
- 	ASSERT_EQ(0, err);
- 
- 	/* VIF is removed along with its device. */
-@@ -213,23 +271,18 @@ TEST_F(ipmr, mrt_del_vif_unreg)
- 	/* mrt->vif_table[veth_ifindex]->dev is NULL. */
- 	err = setsockopt(self->raw_sk,
- 			 variant->level, variant->opts[MRT_DEL_VIF - MRT_BASE],
--			 &vif,  sizeof(vif));
-+			 &self->vif,  variant->vif_size);
- 	ASSERT_EQ(-1, err);
- 	ASSERT_EQ(EADDRNOTAVAIL, errno);
- }
- 
- TEST_F(ipmr, mrt_del_vif_netns_dismantle)
- {
--	struct vifctl vif = {
--		.vifc_vifi = 0,
--		.vifc_flags = VIFF_USE_IFINDEX,
--		.vifc_lcl_ifindex = self->veth_ifindex,
--	};
- 	int err;
- 
- 	err = setsockopt(self->raw_sk,
- 			 variant->level, variant->opts[MRT_ADD_VIF - MRT_BASE],
--			 &vif,  sizeof(vif));
-+			 &self->vif,  variant->vif_size);
- 	ASSERT_EQ(0, err);
- 
- 	/* Let cleanup_net() remove veth0 and VIF. */
-@@ -237,49 +290,49 @@ TEST_F(ipmr, mrt_del_vif_netns_dismantle)
- 
- TEST_F(ipmr, mrt_add_mfc)
- {
--	struct mfcctl mfc = {};
- 	int err;
- 
- 	/* MRT_ADD_MFC / MRT_ADD_MFC_PROXY does not need vif to exist (unlike netlink). */
- 	err = setsockopt(self->raw_sk,
- 			 variant->level, variant->opts[MRT_ADD_MFC - MRT_BASE],
--			 &mfc,  sizeof(mfc));
-+			 &self->mfc, variant->mfc_size);
- 	ASSERT_EQ(0, err);
- 
- 	/* (0.0.0.0 -> 0.0.0.0) */
--	err = system("cat /proc/net/ip_mr_cache | grep -q '00000000 00000000' ");
-+	err = system(variant->mfc_check_cmd);
- 	ASSERT_EQ(0, err);
- 
- 	err = setsockopt(self->raw_sk,
- 			 variant->level, variant->opts[MRT_DEL_MFC - MRT_BASE],
--			 &mfc,  sizeof(mfc));
-+			 &self->mfc, variant->mfc_size);
- }
- 
- TEST_F(ipmr, mrt_add_mfc_proxy)
- {
--	struct mfcctl mfc = {};
- 	int err;
- 
- 	err = setsockopt(self->raw_sk,
- 			 variant->level, variant->opts[MRT_ADD_MFC_PROXY - MRT_BASE],
--			 &mfc,  sizeof(mfc));
-+			 &self->mfc, variant->mfc_size);
- 	ASSERT_EQ(0, err);
- 
--	err = system("cat /proc/net/ip_mr_cache | grep -q '00000000 00000000' ");
-+	err = system(variant->mfc_check_cmd);
- 	ASSERT_EQ(0, err);
- 
- 	err = setsockopt(self->raw_sk,
- 			 variant->level, variant->opts[MRT_DEL_MFC_PROXY - MRT_BASE],
--			 &mfc,  sizeof(mfc));
-+			 &self->mfc, variant->mfc_size);
- }
- 
-+#define SKIP_IPV6()						\
-+	do {							\
-+		if (variant->family == AF_INET6)		\
-+			SKIP(return,				\
-+			     "no netlink MFC interface");	\
-+	} while (0)
-+
- TEST_F(ipmr, mrt_add_mfc_netlink)
- {
--	struct vifctl vif = {
--		.vifc_vifi = 0,
--		.vifc_flags = VIFF_USE_IFINDEX,
--		.vifc_lcl_ifindex = self->veth_ifindex,
--	};
- 	struct mfc_attr mfc_attr = {
- 		.table = RT_TABLE_DEFAULT,
- 		.origin = 0,
-@@ -289,15 +342,17 @@ TEST_F(ipmr, mrt_add_mfc_netlink)
- 	};
- 	int err;
- 
-+	SKIP_IPV6();
-+
- 	err = setsockopt(self->raw_sk,
- 			 variant->level, variant->opts[MRT_ADD_VIF - MRT_BASE],
--			 &vif,  sizeof(vif));
-+			 &self->vif, variant->vif_size);
- 	ASSERT_EQ(0, err);
- 
- 	err = nl_sendmsg_mfc(_metadata, self, RTM_NEWROUTE, &mfc_attr);
- 	ASSERT_EQ(0, err);
- 
--	err = system("cat /proc/net/ip_mr_cache | grep -q '00000000 00000000' ");
-+	err = system(variant->mfc_check_cmd);
- 	ASSERT_EQ(0, err);
- 
- 	err = nl_sendmsg_mfc(_metadata, self, RTM_DELROUTE, &mfc_attr);
-@@ -306,11 +361,6 @@ TEST_F(ipmr, mrt_add_mfc_netlink)
- 
- TEST_F(ipmr, mrt_add_mfc_netlink_proxy)
- {
--	struct vifctl vif = {
--		.vifc_vifi = 0,
--		.vifc_flags = VIFF_USE_IFINDEX,
--		.vifc_lcl_ifindex = self->veth_ifindex,
--	};
- 	struct mfc_attr mfc_attr = {
- 		.table = RT_TABLE_DEFAULT,
- 		.origin = 0,
-@@ -320,15 +370,17 @@ TEST_F(ipmr, mrt_add_mfc_netlink_proxy)
- 	};
- 	int err;
- 
-+	SKIP_IPV6();
-+
- 	err = setsockopt(self->raw_sk,
- 			 variant->level, variant->opts[MRT_ADD_VIF - MRT_BASE],
--			 &vif,  sizeof(vif));
-+			 &self->vif, variant->vif_size);
- 	ASSERT_EQ(0, err);
- 
- 	err = nl_sendmsg_mfc(_metadata, self, RTM_NEWROUTE, &mfc_attr);
- 	ASSERT_EQ(0, err);
- 
--	err = system("cat /proc/net/ip_mr_cache | grep -q '00000000 00000000' ");
-+	err = system(variant->mfc_check_cmd);
- 	ASSERT_EQ(0, err);
- 
- 	err = nl_sendmsg_mfc(_metadata, self, RTM_DELROUTE, &mfc_attr);
-@@ -345,6 +397,8 @@ TEST_F(ipmr, mrt_add_mfc_netlink_no_vif)
- 	};
- 	int err;
- 
-+	SKIP_IPV6();
-+
- 	/* netlink always requires RTA_IIF of an existing vif. */
- 	mfc_attr.ifindex = 0;
- 	err = nl_sendmsg_mfc(_metadata, self, RTM_NEWROUTE, &mfc_attr);
-@@ -378,6 +432,8 @@ TEST_F(ipmr, mrt_del_mfc_netlink_netns_dismantle)
- 	};
- 	int i, err;
- 
-+	SKIP_IPV6();
-+
- 	for (i = 0; i < 2; i++) {
- 		/* Create 2 VIFs just to avoid -ENFILE later. */
- 		err = setsockopt(self->raw_sk,
-@@ -390,7 +446,7 @@ TEST_F(ipmr, mrt_del_mfc_netlink_netns_dismantle)
- 	err = nl_sendmsg_mfc(_metadata, self, RTM_NEWROUTE, &mfc_attr);
- 	ASSERT_EQ(0, err);
- 
--	err = system("cat /proc/net/ip_mr_cache | grep -q '00000000 00000000' ");
-+	err = system(variant->mfc_check_cmd);
- 	ASSERT_EQ(0, err);
- 
- 	/* Remove mrt->vif_table[0]. */
-@@ -398,7 +454,7 @@ TEST_F(ipmr, mrt_del_mfc_netlink_netns_dismantle)
- 	ASSERT_EQ(0, err);
- 
- 	/* MFC entry is NOT removed even if the tied VIF is removed... */
--	err = system("cat /proc/net/ip_mr_cache | grep -q '00000000 00000000' ");
-+	err = system(variant->mfc_check_cmd);
- 	ASSERT_EQ(0, err);
- 
- 	/* ... and netlink is not capable of removing such an entry
-@@ -412,11 +468,6 @@ TEST_F(ipmr, mrt_del_mfc_netlink_netns_dismantle)
- 
- TEST_F(ipmr, mrt_table_flush)
- {
--	struct vifctl vif = {
--		.vifc_vifi = 0,
--		.vifc_flags = VIFF_USE_IFINDEX,
--		.vifc_lcl_ifindex = self->veth_ifindex,
--	};
- 	struct mfc_attr mfc_attr = {
- 		.origin = 0,
- 		.group = 0,
-@@ -436,11 +487,17 @@ TEST_F(ipmr, mrt_table_flush)
- 
- 	err = setsockopt(self->raw_sk,
- 			 variant->level, variant->opts[MRT_ADD_VIF - MRT_BASE],
--			 &vif,  sizeof(vif));
-+			 &self->vif,  variant->vif_size);
- 	ASSERT_EQ(0, err);
- 
--	mfc_attr.table = table_id;
--	err = nl_sendmsg_mfc(_metadata, self, RTM_NEWROUTE, &mfc_attr);
-+	if (variant->family == AF_INET) {
-+		mfc_attr.table = table_id;
-+		err = nl_sendmsg_mfc(_metadata, self, RTM_NEWROUTE, &mfc_attr);
-+	} else {
-+		err = setsockopt(self->raw_sk,
-+				 variant->level, variant->opts[MRT_ADD_MFC - MRT_BASE],
-+				 &self->mfc, variant->mfc_size);
-+	}
- 	ASSERT_EQ(0, err);
- 
- 	/* Flush mrt->vif_table[] and all caches. */
+ 	if (flags & MRT6_FLUSH_MFC) {
+-		if (atomic_read(&mrt->cache_resolve_queue_len) != 0) {
++		if (READ_ONCE(mrt->cache_resolve_queue_len)) {
+ 			spin_lock_bh(&mfc_unres_lock);
+ 			list_for_each_entry_safe(c, tmp, &mrt->mfc_unres_queue, list) {
+ 				list_del(&c->list);
 -- 
 2.53.0.1213.gd9a14994de-goog
 
