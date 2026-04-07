@@ -1,133 +1,119 @@
-Return-Path: <netdev+bounces-275858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275825-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 2O6iDt131GkxuQcAu9opvQ
-	(envelope-from <netdev+bounces-275858-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 05:19:57 +0200
+	id qKrdKalm1GnptgcAu9opvQ
+	(envelope-from <netdev+bounces-275825-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:06:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 850693A95FB
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 05:19:56 +0200 (CEST)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FC093A8DD9
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:06:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 27F26300CC32
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 03:19:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id ACB0A300DF66
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:06:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC2934DB74;
-	Tue,  7 Apr 2026 03:19:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U6yLraf8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A67026FA6F;
+	Tue,  7 Apr 2026 02:06:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 637F022F77B
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 03:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BCC1DE8BE;
+	Tue,  7 Apr 2026 02:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775531994; cv=none; b=MchXCmoNW0Cvz4it0HQHzuSC6LNRfugiMzR86/Q68aG0iQ7H32xcZielGWKRZoZhNOwEecQCs0Z+suvJaqIdo4MtRUv+195gUnx+oITl+ZiyGUZyojhogRKM8R5/aAWGIuXb/pv6o5LTQmk0/StEOW3Ftsv9htXJu6d98xYZILQ=
+	t=1775527587; cv=none; b=dvFdiB0lmLK4p+mGfN2iPNMfwC/Q9N+gXm9bUoL88cAwmRxjooRaRN2vWUNoUTPxgN4QjA5nC8hkx+U9X6w6MkrQfSRqOPgpreYaCqJE+dEwm8luMZ2WZHOHTtWyjNdWAsZEYXilw6m0cFKOQiSsBlza4Ulzq53tyxR5JBpP63Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775531994; c=relaxed/simple;
-	bh=Qoc9FcsWY0971Mtxw9re92jKrcBSoFbO9WY3rC0dWAM=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=n/dmocY4dVTMe0HCB8jZNyY3TbFo4EdiA+T2WUW4AgR7c+KXBvuyhKMJo9WGX5l/5UrPB2DEeVI/FRZQG7Iykxa+JeRtInVIztpD2FNKCay/0tJJ1mu/TY5MaLBqKeTfB90VeEUzR54TYy7dQ+v9kWOPEfvXDNfB3vYt+Lq/BMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U6yLraf8; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1775527587; c=relaxed/simple;
+	bh=+f2UOPImH35g4Dc44A84oU2dmZHo2HxTfwAD8Wjygko=;
+	h=From:Date:Message-ID:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b6Mnecg3JR3w9xpA1AqJKWRC/5ahlVxyv6RV97usj6e9yGKpj/6SuZ5Jx+mcCGTMUBmMwPNxPKIet3/DRvgVxhesG8Xp2Wx/Spqg8+cqUfbAXm262vCQcG2g9EOIacFGVoPj5FgPbckWQ28oEauqeRX+RUrmOxUdVUeQWRrDyg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from 0004-nfc-sensf-reply.eml (unknown [111.196.245.197])
+	by APP-01 (Coremail) with SMTP id qwCowACnT2uRZtRpHZx2DA--.46852S2;
+	Tue, 07 Apr 2026 10:06:09 +0800 (CST)
+From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+Date: Tue, 7 Apr 2026 11:30:03 +0800
+Message-ID: <20260407113003.4-nfc-sensf-reply-pengpeng@iscas.ac.cn>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kees Cook <kees@kernel.org>, linux-kernel@vger.kernel.org, pengpeng@iscas.ac.cn
+Subject: Re: [PATCH] net/nfc: bound SENSF response copy length
+In-Reply-To: <20260322031922.57949-1-pengpeng@iscas.ac.cn>
+References: <20260322031922.57949-1-pengpeng@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775531990;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q3AInkdi6HcxeRmbGw4wszTC0bpMLALoEye9TJbgSw4=;
-	b=U6yLraf8ZRVDW9ugsvvSN+oW6/LAKe+N2WbcSslZPfUGjTdAmROE0d/BvsJpNoBgUYDC+R
-	SKDeXyqLvaPE7bhHN463+P2ql1fb3ec8VfG1CCKZMkK73ZCiakwAXyL88MIp5kLnWyzUXG
-	z7+Gyza4Vh11bKoA6Ski6dJcF0wbFxY=
-Date: Tue, 07 Apr 2026 03:19:45 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: qingfang.deng@linux.dev
-Message-ID: <e3ada3f0bb0c389d592657b37c462944e633a0d6@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net-next] pppoe: drop PFC frames
-To: "Simon Horman" <horms@kernel.org>
-Cc: linux-ppp@vger.kernel.org, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, "Paul Mackerras"
- <paulus@ozlabs.org>, "Jaco Kroon" <jaco@uls.co.za>, "James Carlson"
- <carlsonj@workingcode.com>, "Wojciech Drewek"
- <wojciech.drewek@intel.com>, "Guillaume Nault" <gnault@redhat.com>
-In-Reply-To: <20260406144828.GH395680@kernel.org>
-References: <20260403083926.68320-1-qingfang.deng@linux.dev>
- <20260406144828.GH395680@kernel.org>
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowACnT2uRZtRpHZx2DA--.46852S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7JrW5JFy8JFW7Xw4kKFy5twb_yoWxZwc_Za
+	yvywnrK3WDuFs8Aa1xCan5KrZ7ArsruF97GFW0qrn7WryjyF15C3Z3t3savr1kX34jqrZ8
+	Cr1kG3Z5CryqgjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbckFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+	Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWUtVW8
+	ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r
+	1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij
+	64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr
+	0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF
+	0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUpwZcUUUUU=
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10];
+	MID_CONTAINS_FROM(1.00)[];
+	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	TAGGED_FROM(0.00)[bounces-275825-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275858-lists,netdev=lfdr.de];
-	RCVD_COUNT_THREE(0.00)[3];
+	RCVD_COUNT_THREE(0.00)[4];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[iscas.ac.cn];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	FROM_NEQ_ENVFROM(0.00)[qingfang.deng@linux.dev,netdev@vger.kernel.org];
 	MISSING_XM_UA(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
-	TAGGED_RCPT(0.00)[netdev];
-	FROM_NO_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	FROM_HAS_DN(0.00)[];
 	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 850693A95FB
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pengpeng@iscas.ac.cn,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
+	NEURAL_HAM(-0.00)[-0.973];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	R_DKIM_NA(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 4FC093A8DD9
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+Hi Simon,
+
+Thanks, you're right about the net targeting, the NFC: digital:
+prefix, and the missing Fixes tag.
+
+You are also right that a valid full SENSF_RES can be 19 bytes long.
+So instead of rejecting resp->len > NFC_SENSF_RES_MAXSIZE, v2 only
+rejects payloads larger than struct digital_sensf_res, then clamps the
+copy into the 18-byte sensf_res buffer inside struct nfc_target.
+
+That keeps valid 19-byte responses working while still fixing the stack
+overwrite in the target copy path. The lower-bound check remains on the
+pre-skb_pull() frame length, and v2 only adds the post-pull upper bound
+before treating the payload as struct digital_sensf_res.
+
+Thanks,
+Pengpeng
 
 
-April 6, 2026 at 10:48 PM, Simon Horman wrote:
->=20
->=20Hi,
->=20
->=20I think it would be best to add/use a #define rather than
-> open coding the magic value 0x01. And perhaps expanding
-> the comment to note that skb->data[0] is the first byte
-> of the PPP protocol would be nice too.
-
-The field does not have a canonical name. As per RFC1661, the LSB of the=
-=20
-first=20octet is used to test if the protocol field is compressed, and th=
-e=20
-same=20code snippet is used in ppp_generic.c.
-
-I could instead add a helper function:
-
-static inline bool ppp_skb_is_compressed_proto(const struct sk_buff *skb)
-{
-	return skb->data[0] & 0x01;
-}
-
-What do you think?
-
-Regards,
-Qingfang
 
