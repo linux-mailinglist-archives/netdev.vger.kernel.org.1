@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-275999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276000-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4BSvKUAK1WnMzgcAu9opvQ
-	(envelope-from <netdev+bounces-275999-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 15:44:32 +0200
+	id AEbDI7YM1WlQzwcAu9opvQ
+	(envelope-from <netdev+bounces-276000-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 15:55:02 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7FEA3AF61D
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 15:44:31 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB0303AF8B3
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 15:55:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DA829300C372
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 13:44:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DD15E3095BF7
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 13:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBDAF3B388D;
-	Tue,  7 Apr 2026 13:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 204AF3B388D;
+	Tue,  7 Apr 2026 13:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pvcu2GxP"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AsRsNjcc"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010040.outbound.protection.outlook.com [52.101.61.40])
+Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010044.outbound.protection.outlook.com [52.101.201.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57FFE38F631;
-	Tue,  7 Apr 2026 13:44:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72B938F631;
+	Tue,  7 Apr 2026 13:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775569467; cv=fail; b=nBBvIfNqKZZpJZso4WpikSngxxfa8prw4O2ocbMBfFrkkbCPRbynh71VRq5bqhjPnAU3gRu3DiSCEstC16xIFnBcc68fCNyP6v8DEd8/b/SyNNutC0650ANsKRvmJac25GdwPiQeyFVC8VZbKiyTjE4HC1sccbLdmNlqShL1Tnw=
+	t=1775569484; cv=fail; b=oLnBlMifOF2HY4jKjos21EoGOBqE9ZroMjdq47lgIm7EONJMwaNuC+GxKV1ThjCuW5CuOLXLcLq6aym830c9BG9wSSErF3FyJ6bSRl8FqKybtxleJFh2XJzj7NlKdEoX4Wqyv9IoKOE33dM38zIMsXHA9yEqjLQ7DhI14ya11R0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775569467; c=relaxed/simple;
-	bh=6FEGT8Yv7dN2BxupKh16zPrAF51KoqNsta81aJed99U=;
+	s=arc-20240116; t=1775569484; c=relaxed/simple;
+	bh=ZS1H+Mh48dZLzXBlbyDnILLCw4HoLGtUqf8IdxqTlUY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=hGQ9CA8JzQELoNvBcEkHgWbbnbx8L5Cfb2XbqLCSNbt9X08IUrCg28UJovS95WSOOi8ukqt60IMZE4Jzk3QT60+g4xjNb6tw1c/4PjlhwcaJ2W5vp8LwgWVrQ/qa8Fu5WZbATHa8Z/BE2NXOgzczSVJwYyx2eHBCXhi7c1mlUEI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pvcu2GxP; arc=fail smtp.client-ip=52.101.61.40
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Ugjrsig9bNxZEq/cuk1mAP2L+3ZfqGk/kNHG6jUXgq7zfR7zWKsrBvDYJj++aPeNv4HO97JLyg5Y9dnRY2UVcd1DFx2NR+O8czAbsaHJpi3yd86ElHe4alM4Q2HIJmIGnXLsPe3FFt99GJt5pxlJFTGvC7IG29aOh+TRKixgmcs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AsRsNjcc; arc=fail smtp.client-ip=52.101.201.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tvkVSa/udf9+88hOEvS4+F0EJaHvU7GFyYpHdNC+9FuDvgXyQ8V3pMQcDWRzAiYnUs7ZeHGiTv1nRlKNRL6f5rexQHMOpFzStR2pZCLiVPhY3lPslM10+sbYCS7uzKf1mcTwg375giiBGAoPLLfpQtOB1feTtyaUrapsVQGaQST1jBfWo3qdmzpVP9U6kVfRhtBmbClbAVCC1dZ71fYl4CjxAUDCuzyo0YjcJxXcycJhwFZN4Oqw+o1jsJeIduKgZp+hTtabHHOW6t+zfpYEOUcrzJUa5Z1Lk5XqhztuM69SX10jXBdtv5aHfl2d1P7B9X1yWFBlrVOs3w/LgtOfFA==
+ b=nlgx9L6aHIIyZqLfHEsI6+roQltD8MKeJFyGzKg4MsuTg88p19R+tDABMUN8sRSJApw58tJJBkpAAg1DmF1lMhNRNQPURM0eRJv5UIQ3sskOlx6pftGhZYYnlOHNWHWsfvmERhr9t2SmVYYrtaYYArYBBvvHHc7UfoVV0sIeGiv5iZBi/ltJI3D3mwLxSQzX9hYWLbw7ku4oT8JxntfU2R9C5hV+b3JCynEE6W9YiTqzMG8hLOTsxIbj/DMgarWv31GtSDPI2gkSEV+I9xW7c1+Lr/Shs15Fo1H14U9WQDUMlyVdFVZPIBbkwyGVoxvdYxV97g1RWD+JpuGW1TxyJA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5fzHsRKD/tR2zXRIlzt+4DJ5PvQAEWVVTzJwCQWX/6A=;
- b=kBQEG1ZvYT1Q1uNssy6G0UYGLhWEMyi5DLJ3g0KrCXr9kyYHNu+X84UmasC6Eppmtc4rtHoEZBd5wqX4EhCizdexcznT4sSaRTKqK3zqgoWRClZqDI6Qb5doBX6QWGanjLIrfmqC8MoggaONk+vF2r/BPJ60nhypgN3mKOSHmQpagXNrMF2fdCCwfD2iZRlfUAo17FKCqGtoCcflVD4YKPz2rH7L+YxgVYnkToorbDYUxfNvT1yVVIKb2MqXm2m6BiMkHawkzZ1d0f3s8gmanG0yQ3esuuV9aotAxA/4sBx96tDuL6/nvZBH95D2yyvrYe8yCE21TJpqkLfJ55TDHA==
+ bh=O26GDhH3XruuwdfHiddiEvi07mcpi9KpOLvGfUVWVEA=;
+ b=SsBshV827E6ZxLFR/EiJEAa6rZNpeAQw7HPr82zD35A0s71uIMN+UPYV+K5RGBAUbSqz0605ugrhU74PHx1ZFYROix1YOMRlgtSGYyr94DLNlixr8317WWGJGMFYt4TmBSeNTpUkAy7tc8dcEsufUfW6a1CSxzeMObzvAraEZAo4AIAOJOd5EFTjX1xP6F8vRTRfX0/dyb4uI4WcKzXE/T44k4WUMRz0x4SLYZDPnDBbNAKJg8brlyr1xGBUeOYSXfiYKSc+pK77Hbh4ZXTTdk30xztxZmRDRORJrrZlzJmGcDVUftHD/lNymypIS3EYZ8HBUUOfiTBhPahTfkNbmg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5fzHsRKD/tR2zXRIlzt+4DJ5PvQAEWVVTzJwCQWX/6A=;
- b=pvcu2GxPKERqTZozPFZHJyIj5JFdKYPdAbV/krlMmlHlq3w6Jnhq33VCfZZm5/HCbPfbTGwQbRwS36jDXbk3bjq74ebuuhBAUzbOMjm4YfvWrwObl2elH/16UrvNWS6Xt4wIqkNsjlPpWQfH3CjlKd0dgSFigSkVOrACbG20d1hQrsYLJ/ohp0cIV8K7uZ4cqxLQIP9jme90MKIiJP5OcCIxs6KhSzZEnFngKqhQGbPBepUg8FgoA20A+CQXXgYGshQqzxIBL4jm/WGb0zMvw/5mzKoJF9EBfS/W2sYj5HMrpS1Lc3bPhOyVaUuZcHH4sOebmGPfKr/SyqzarYxnLA==
+ bh=O26GDhH3XruuwdfHiddiEvi07mcpi9KpOLvGfUVWVEA=;
+ b=AsRsNjccAMjj47hyklxveQqO5kmHw+sM9Nig/WaMKcoFP7gtXkA2QiFODY4q3INqO5EuGXVwXRz7IR65BROXw+nniuPE94fpHyJLv0j7rZYdv9ti9fATF31vI+mnp7WUaLbiCR7kxi0sBxaRgMTmwGCtwIpPXddDNvl3GyqpXNVgwKoiMgt6ESur+DrLLmuX3FeNFEjeiOwsFCcsPAlBlq6EYsvu7/W4yJrPWQoVOVGJbFobDxVRW0nmh9XFoMIdk3pwhz9t2hB8/Eovtl04dBJk16BzyDT+i6dVDulTBbWcrh5XqnOuQlSXLirUjJ72a1ozz2mOFIhS6ZcoO9KAoQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
  by LV5PR12MB9825.namprd12.prod.outlook.com (2603:10b6:408:2ff::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.19; Tue, 7 Apr
- 2026 13:44:22 +0000
+ 2026 13:44:40 +0000
 Received: from SA3PR12MB7901.namprd12.prod.outlook.com
  ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
  ([fe80::6f7f:5844:f0f7:acc2%6]) with mapi id 15.20.9769.016; Tue, 7 Apr 2026
- 13:44:22 +0000
-Date: Tue, 7 Apr 2026 16:44:11 +0300
+ 13:44:40 +0000
+Date: Tue, 7 Apr 2026 16:44:29 +0300
 From: Ido Schimmel <idosch@nvidia.com>
 To: Ujjal Roy <royujjal@gmail.com>
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -73,17 +73,16 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Petr Machata <petrm@nvidia.com>, Ujjal Roy <ujjal@alumnux.com>,
 	bridge@lists.linux.dev, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/5] ipv4: igmp: get rid of IGMPV3_{QQIC,MRC}
- and simplify calculation
-Message-ID: <20260407134411.GA849209@shredder>
+Subject: Re: [PATCH net-next v3 2/5] ipv6: mld: rename mldv2_mrc() and add
+ mldv2_qqi()
+Message-ID: <20260407134429.GB849209@shredder>
 References: <20260403150050.1235-1-royujjal@gmail.com>
- <20260403150050.1235-2-royujjal@gmail.com>
+ <20260403150050.1235-3-royujjal@gmail.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260403150050.1235-2-royujjal@gmail.com>
-X-ClientProxiedBy: TL2P290CA0011.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::14) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+In-Reply-To: <20260403150050.1235-3-royujjal@gmail.com>
+X-ClientProxiedBy: TL2P290CA0006.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:2::6)
+ To SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,69 +91,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|LV5PR12MB9825:EE_
-X-MS-Office365-Filtering-Correlation-Id: 91db5b94-c7a8-4afc-6253-08de94abc676
+X-MS-Office365-Filtering-Correlation-Id: e31a0334-88e2-4a44-9f9f-08de94abd10a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|1800799024|376014|7416014|366016|22082099003|56012099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	gfT7qogVTcflgSwSmsqvT9X552tFGBzMdAwmhiKCUzG2oZ5I4i35UilDYzBDLZOSyRzJ/5V1nTHqLIskZHd8ovopoz2OzX7K/njbDUinct25QIQoZg0Ru36kc5r9CzpCQu0neCzXxplrQRWWF+keSXZlxL+Ir1EfFlyB4IgRkj/r2Qz4XSS9OhyX1Pe3XPOYUk0HTxvFdqhBN2b0lXLOpY4Pi5aLC9e238bBcdn2sMan9pR9MS+u+4XTTtXop8CMYP+SnMhyPB3p7gFjKu5NYA8nlCTJ0ebi4INT5kqfmUmWHJ7dZKMreOnqgSe1wUS9qlCor7NSsQzd1PbX68pyyHV6OQkLVHcsFPQ2gixfhWN0bkD50KuMaVAOEpWj9bmruMeTwXaUSxvRFkWyfu1Hv503kyj8FNuQ3c7WbC9BfYAGTyE9kywgWybDd8o4PMr1RG+D0m+uaGdYLl24BUNmfQ3VqnUjhsonwcBGmoZfM3+fhXJJpZr2Txvfl59J8CrJNW7L2lIcct2V4Qdq3MKhJs4Ai4Vl3y5i2nKhQ5EHNz1b4fOQssxtJALsVOEH9wSlPbrcmB98ZSroV6OcETb9etJGgYLTFNlIeET9AX3ZBLMjysPERzavGS/WkkN/XxDqKGARxxGGGjR5ZttYiv1vCBO/LBlWDhjuuWKmASCjkIZ3SfrfeWgqtIBmRGS2LgCAG821zwXbGuul+2HQC4wkTH3PxzRPEAwePkp8iC38CD8=
+	RLoKCcnhB2w0o1ehcjWpFCkZ27EXyxmvh5C48Q0K1Db0v/BXV4d/+eY5Xb15KOiOj75/UqIwXN7t/ZmGnT4Wr7KSLVbBHKSSm5fzCJbSssG9MJmRFLZJyJZXQ/3HkU9kpI6s/5aTZaTiQ8zv2ura1qWZ3QCnA9rNP9+NfMYUwWzGbeUxobTuBz1Zx8WWZlwMZdtu7SKImtdMM6GwZQtKQ9qr+8V9wNkHmGdBLaOcLKNVMN3fgBo98GxNePTbyY1GIywIqrJml4lBr4/JCE1WRjiVl9/htwXUM7vvhp21GUFkpsrjcaiWkagRHjM+0Ind99oPHeHK409Uyx+rx4a+63VSE57azeHLlLVLbp2irbF7UWv2c7GO3jHo4h5Ohv1WYJCOLxj/HCNla9UTdrGvte/5KGSG05TqjH1UWNYOxspo6uG4u42+YNqOq0Rd9bL0XWbpzq0AhJL4MIefwu6lqT2LrTww/Zklo2qlM2MZI2/y/QmP3AG6uR9kwB2UFg3+A2dg6F8N3WE5YvyxSERdevFAs2ME7ETdX/A43NViAzFRNNF2Zfn+r8xrO8nEbrqxKcHdnXoLvEbblyD8yMsD0QZUzpgkxKQrH5DZil9R1NiufTvR/5o2ASPcJFAu+fd21URtVMg0S8o6AWdLSuXST7jWjZDhD8C2p6MDWnBmRhQSDY+gj8n2cjBD7d5+KPcpy6hEZ9yyNu7FTay2J9w/v7YZlSKv7xbmxDNi7EdMJY8=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?GYvUIJJcfIq6ATtRqKW0x/6XuUT9IjIVBvJnoROUb/Bcdzpy3VFioHP0X0BK?=
- =?us-ascii?Q?EpWDnOuzcm5g+hDmWC+uiXdjGNqZB+aPay/5nTQAVBY6nl/Vd62YG2nmIzix?=
- =?us-ascii?Q?TK7E6NZju2V5nKSmow52avgMTk6cuSeclUDfTn1FfOowJX3v3UPz8k0mcGox?=
- =?us-ascii?Q?1Ep8517+uS4UgKSk0de8votaT4ezHaLa5ftk9NyCVZk8E/NKVE26IEPc57Ep?=
- =?us-ascii?Q?ItAPT85ssQSKSdA05D+9oDPfy9k4ssyyXj8M+tZ5e9/EjYRGng22CACf9iRX?=
- =?us-ascii?Q?6KpO8USTmjwyhzwL8X9KVbGYV5bwCLlaY/tGRJMLiqgvFqdm+LLLHRJR8pln?=
- =?us-ascii?Q?FpkmO5u/8eXP0qcXdVr4guMPLLBb2ZmqjTGsn79m7Sw+Xkrv5oDDzvzigOKa?=
- =?us-ascii?Q?aC7lBd4ktcvuh2x2DtlzgtvEqYhlgs/rhff/p2HMBd6YMODBUyQrm7o/Mwvp?=
- =?us-ascii?Q?S2KSjeLi4W04bzvN8/xyjz/GzBayRYgnmYtmIIkmSBWdriKVEihJa6bpVgMN?=
- =?us-ascii?Q?XaARDixAFQMf94vKtuyr8ZyNlXmDWyfV66DcUfVu/89mt2iNFHEY8asLMORg?=
- =?us-ascii?Q?LVHlfhU4RWRCBuP22GX48ajw4lYpAxQkD1YeJ9mWBu023su7GFndyRMPfZL5?=
- =?us-ascii?Q?YBarAamn4J4sW7/D02CJ2qKY2PSEFH+sZgBG2A+/yD4O9r7wGHR/lOCrSbpl?=
- =?us-ascii?Q?sZKZ0mmHPNGhcdJ/AMDHzJB9HVL5h0g63cuj3yn/r2xrSSOhJv1v5o2Z0tLz?=
- =?us-ascii?Q?/oFln8i6B9nOc0fydawvXpMqys1PvqtzqCUr05hSQ8NeSwnIu2zo5YOijb4U?=
- =?us-ascii?Q?wf79kOX/v2w8oAAFcxJ+0/NLF9m0eoEuWuK5nReXWqIbSv0MHT31jkyR4DwZ?=
- =?us-ascii?Q?6vOwctz30swKwnSCBq0EVhrDqxCijkQ4skgLOiwHqZYfMFmY3DTkKDvlIV4g?=
- =?us-ascii?Q?47KdkTuJCSqhIs8Ywopg8CNjjciiLGtX965tkjZiU1LmjHl5rKUPDVb6RJtI?=
- =?us-ascii?Q?A0XeSVs4poacQ8dI4AFmIVsAAuCLVDqSkVonvdSfjqaVshJ3xvdZUXoPMNP2?=
- =?us-ascii?Q?sBRgdek6wVWJMwK2USYY7Ni8QSeqRwtZaIsHA1v5CBk/cN/hg+ZE9fH0dgsE?=
- =?us-ascii?Q?+/oWTLxiC+JYgJ9jJR94M98TDKQWMunx6e7ArYESRL0Qx0SYllLRBkbmofFg?=
- =?us-ascii?Q?R5O3h5FA3oid/rmIFgbtXMDQh/hLsR1odIe6BiCKLY9jg6wJ7vtBqQYBEi+W?=
- =?us-ascii?Q?R8GSJ11SZSWWTr9ltNI9hI2mOHbXi9b1oveV7IIMqgXY9v6D8U6WKOCHn5Pi?=
- =?us-ascii?Q?pSrvqCvbhhOAfwVciKzmfF5DscEfDAFI3oV1vabepzPgCNsL25Lb1YaBx6cP?=
- =?us-ascii?Q?vKMsTKyYKLKBk3eS7FhaR+lyciB5EwXKnCfPXtAk7cBPXhkQD5QkdFy4qW1Y?=
- =?us-ascii?Q?aF3Z68h+1t4eQkgIwdDRY+5YIKjQ7KJgrR93hCkZVhDFKDzdyXOesiOhvf5L?=
- =?us-ascii?Q?6Hszm4anEivG0E5G9AoE4lkjpG3kohylhPPy/Fe7o0Z2yFqy73hLJvYdv+vK?=
- =?us-ascii?Q?CMEg0X+sy7RdIBe+bqF0snRscs343OOTtaizv1F9sofQMesMxHrSaVybsG8V?=
- =?us-ascii?Q?UglXWqe6SQvFgsAh12KnQyiGhvTZtomxAos/GE95ZEiWV0f1Zeb3uDT+qum4?=
- =?us-ascii?Q?hjNDcMN8NJXAkGaNuQaNcBkL8jQvAbnqtAdoIwB6tXTHN8+L8s18O3ymoSot?=
- =?us-ascii?Q?jw76j7gAoQ=3D=3D?=
+	=?us-ascii?Q?AMrKhZX+9tk72+2AqnXWw+ut/mdPGsepK7MkANH6u9lD6s3OZBP/bQFitZ4H?=
+ =?us-ascii?Q?I++/3capvIvjCbRdUlk1p/Bj5zmEB35Rew2b46ZpBFMQHi7f7NRKeXe558R0?=
+ =?us-ascii?Q?HJ06PqvC+hB1DH4xg3qLuktos+wIaaisHskqv4yWC2Usu3FvdDKAEPzkfQrT?=
+ =?us-ascii?Q?qqdE+Bqzemn7O0y9jlor64OBW+okdPfHXawHiZ2YI0G66DmHT2MZ4GtPGnL2?=
+ =?us-ascii?Q?+Nu7KT8lfMBQqYaW+jtdITVr7AW8aF4Lmq9fmtrZQVRahbHv2YCn9p4eSibo?=
+ =?us-ascii?Q?FJQlz9FFjdbJl2Ej675s0nJTGkfizeCNxPrMynKN1kcJRgj/10ENX/7RZ3GU?=
+ =?us-ascii?Q?wUNEsbkFMs0jY48uAaoRPaWWWvHNWc1cXEpDV9g3M1+83L6Ws/nbOEjz9BmC?=
+ =?us-ascii?Q?1oda64cfELuE7IQZ8NRm5RHa+WWA68QiHUyVhh0y5OU4benKwREFRxrk2Mjt?=
+ =?us-ascii?Q?CsrSkrfmcGBKKNySlSriuF7SHVutER7Ujy4UR8a+CZ8P+Si4IAQa+DWEk0q6?=
+ =?us-ascii?Q?LKuMl2xtZIDRuqoos4zf33MxnabjzbqPqt1dh2NRXxknL9ZgrpPTJ4pOmirt?=
+ =?us-ascii?Q?cMKOAAsw2gk9g+A6wRo4zwyuf+UGbR2nJ2bIEN7wvMzI82djV0L9mBn9Am8w?=
+ =?us-ascii?Q?BesK/3GMyvpMrgHfoc+EggjCzge0ssu/RJGLSjp5Fz6J6LG6g5KXZVXdN6sb?=
+ =?us-ascii?Q?GkMQig5n4eOt7EpZ0GJsoZXB60EuJoLlgbI6JnR3aBsHUia1YjCHLMulpfUu?=
+ =?us-ascii?Q?ghbmpTDG0Gq5HhcDGTgGjGbxDawJAmBXEu9THYC7fHrdDGwWNVou36Dt93Bp?=
+ =?us-ascii?Q?C5e92kB/LY8M9V6IXtnnfsuOCxUcSrd22RMr+HIO/RFAeem89NGRGV/5F2OW?=
+ =?us-ascii?Q?HlGPALAVGfnZ4qFyF1JnPl/vho+YO8Dd1eLR6Y5ghPnOzq2D/GDf7IL9pLMj?=
+ =?us-ascii?Q?X5Ae7tsfkEDvOcpWA9rg68h/nZzsnospf5Ih4S8SE2UB1XsHPUrpdTL2uC/i?=
+ =?us-ascii?Q?S5QzfBRdM8XIwrpBFmOefZkGRsEJmAC6wG5kMCJ15NmqvnhV7rgQod5RVykI?=
+ =?us-ascii?Q?3R/ckOppzeBoXRMXe+VDcS8xAc4Mm9i3f0UEC/hL2Fa3LKKts66D/Lp5oRa7?=
+ =?us-ascii?Q?hvXJWj5W2OMyIAdunOxSdPMhfaYmAtn8s0MMOpO+YY1xOFsZy9w6SWdvwKSZ?=
+ =?us-ascii?Q?hgiPn7XtoJmUooePwQFWq1RTqbKDH6Oqx4X+mW0Yy3/92O6hbo9F/Q87gRIG?=
+ =?us-ascii?Q?koBSGw9gd9Hb8STUy/VNxX/GynFDLxf0ASs+KU0Q7zjMNh7ec4UNbctbjZbI?=
+ =?us-ascii?Q?io+RcJD+yrK0RGIrJV+pwB1BZ9ZmsccMLcqrOc+I8Yk+TbvjuQtN0ZQnELXO?=
+ =?us-ascii?Q?FXgOiglbnw4KVDKEkVa5RnyCwzHMZ1wbNXmPuElhT9i8iDxHRBSZKptfAP6W?=
+ =?us-ascii?Q?NUmx6tCFjsTMiYdpBRHc8iN6RohtySOWJBolZes7XLAVTBNzR7EVuD6y6uRN?=
+ =?us-ascii?Q?4IgCV9pjDTYTFINzQBzABleenjPtGQJMuz8G3hQZeMJmjdAKPC/55ZZCBkP6?=
+ =?us-ascii?Q?tIXwWYjRQYGxNkmMJYzDPdWzhWqLe0sgxbOjeV/zZyjbbat2uSFVzb4MUZ/d?=
+ =?us-ascii?Q?Tvp9++nizPks2Cy2NUCTsCqqpO8NMnOQC6Ew11w+gJHfB69ZDeVGyaF0/KDY?=
+ =?us-ascii?Q?Fh4qUkh+Gwblulq4y82VH/o5wvUK70Q72Jtb9Drtyev+oo+4WKn9IKGx2pyW?=
+ =?us-ascii?Q?ZRJPwxParA=3D=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 91db5b94-c7a8-4afc-6253-08de94abc676
+X-MS-Exchange-CrossTenant-Network-Message-Id: e31a0334-88e2-4a44-9f9f-08de94abd10a
 X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2026 13:44:22.6160
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2026 13:44:40.1847
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NcTXEYWxIVv+W3MbCLGjlgYMkhGrW4lLZmmapmlWuLw0mIs9hzzpjME4M/zfSMIzJhJYqF1E7eDzp+iZWIAyJA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: XGpAs6jJClShYOd0XPzl2Z+YCVsD6rDL8c1atTN9CUW4zLAIo2EV/kVy2R/q/0NuMqJMeLv+/OtM+YydpUN9Hg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV5PR12MB9825
 X-Spamd-Result: default: False [0.34 / 15.00];
 	ARC_REJECT(1.00)[cv is fail on i=2];
 	DMARC_POLICY_ALLOW(-0.50)[nvidia.com,reject];
 	MID_RHS_NOT_FQDN(0.50)[];
 	R_DKIM_ALLOW(-0.20)[Nvidia.com:s=selector2];
-	R_SPF_ALLOW(-0.20)[+ip4:104.64.211.4:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275999-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-276000-lists,netdev=lfdr.de];
 	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
@@ -167,184 +166,29 @@ X-Spamd-Result: default: False [0.34 / 15.00];
 	FROM_NEQ_ENVFROM(0.00)[idosch@nvidia.com,netdev@vger.kernel.org];
 	DKIM_TRACE(0.00)[Nvidia.com:+];
 	NEURAL_HAM(-0.00)[-1.000];
-	ASN(0.00)[asn:63949, ipnet:104.64.192.0/19, country:SG];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns,Nvidia.com:dkim]
-X-Rspamd-Queue-Id: C7FEA3AF61D
+	DBL_BLOCKED_OPENRESOLVER(0.00)[Nvidia.com:dkim,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: DB0303AF8B3
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Fri, Apr 03, 2026 at 03:00:46PM +0000, Ujjal Roy wrote:
-> Get rid of the IGMPV3_MRC macro and use the igmpv3_mrt() API to
-> calculate the Max Resp Time from the Maximum Response Code.
+On Fri, Apr 03, 2026 at 03:00:47PM +0000, Ujjal Roy wrote:
+> Rename mldv2_mrc() to mldv2_mrd() as it is used to calculate
+> the Maximum Response Delay from the Maximum Response Code.
 > 
-> Similarly, for IGMPV3_QQIC, use the igmpv3_qqi() API to calculate
-> the Querier's Query Interval from the QQIC field.
+> Introduce a new API mldv2_qqi() to define the existing
+> calculation logic of QQI from QQIC. This also organizes
+> the existing mld_update_qi() API.
 > 
 > Signed-off-by: Ujjal Roy <royujjal@gmail.com>
-
-Looks fine, but see a few nits below
-
 > ---
->  include/linux/igmp.h      | 84 +++++++++++++++++++++++++++++++++++----
+>  include/net/mld.h         | 70 +++++++++++++++++++++++++++++++++------
 >  net/bridge/br_multicast.c |  2 +-
->  net/ipv4/igmp.c           |  6 +--
->  3 files changed, 80 insertions(+), 12 deletions(-)
-> 
-> diff --git a/include/linux/igmp.h b/include/linux/igmp.h
-> index 073b30a9b850..0624410e75c6 100644
-> --- a/include/linux/igmp.h
-> +++ b/include/linux/igmp.h
-> @@ -92,15 +92,83 @@ struct ip_mc_list {
->  	struct rcu_head		rcu;
->  };
->  
-> +/* RFC3376, relevant sections:
-> + *  - 4.1.1. Maximum Response Code
-> + *  - 4.1.7. QQIC (Querier's Query Interval Code)
-> + *
-> + * For both MRC and QQIC, values >= 128 use the same floating-point
-> + * encoding as follows:
-> + *
-> + *  0 1 2 3 4 5 6 7
-> + * +-+-+-+-+-+-+-+-+
-> + * |1| exp | mant  |
-> + * +-+-+-+-+-+-+-+-+
-> + */
-> +#define IGMPV3_FP_EXP(value)		(((value) >> 4) & 0x07)
-> +#define IGMPV3_FP_MAN(value)		((value) & 0x0f)
-> +
-> +/* IGMPV3 floating-point exponential field threshold */
-> +#define IGMPV3_EXP_MIN_THRESHOLD	128
-> +
->  /* V3 exponential field decoding */
-> -#define IGMPV3_MASK(value, nb) ((nb)>=32 ? (value) : ((1<<(nb))-1) & (value))
-> -#define IGMPV3_EXP(thresh, nbmant, nbexp, value) \
-> -	((value) < (thresh) ? (value) : \
-> -        ((IGMPV3_MASK(value, nbmant) | (1<<(nbmant))) << \
-> -         (IGMPV3_MASK((value) >> (nbmant), nbexp) + (nbexp))))
-> -
-> -#define IGMPV3_QQIC(value) IGMPV3_EXP(0x80, 4, 3, value)
-> -#define IGMPV3_MRC(value) IGMPV3_EXP(0x80, 4, 3, value)
-> +
-> +/* IGMPv3 QQIC/MRC 8-bit exponential field decode.
-> + *
-> + * RFC3376, 4.1.1 & 4.1.7. defines the decoding formula:
-> + *      0 1 2 3 4 5 6 7
-> + *     +-+-+-+-+-+-+-+-+
-> + *     |1| exp | mant  |
-> + *     +-+-+-+-+-+-+-+-+
-> + * Max Resp Time = (mant | 0x10) << (exp + 3)
-> + * QQI = (mant | 0x10) << (exp + 3)
-> + */
-> +static inline unsigned long igmpv3_exp_field_decode(const u8 code)
-> +{
-> +	/* RFC3376, relevant sections:
-> +	 *  - 4.1.1. Maximum Response Code
-> +	 *  - 4.1.7. QQIC (Querier's Query Interval Code)
-> +	 */
+>  net/ipv6/mcast.c          | 19 ++---------
+>  3 files changed, 64 insertions(+), 27 deletions(-)
 
-I find it weird to have a comment at the beginning of the function when
-there's already a comment above the function. Let's remove this comment
-since this information is already present in the MRC/QQIC functions
-below.
-
-> +	if (code < IGMPV3_EXP_MIN_THRESHOLD) {
-> +		return code;
-> +	} else {
-> +		unsigned long mc_man, mc_exp;
-> +
-> +		mc_exp = IGMPV3_FP_EXP(code);
-> +		mc_man = IGMPV3_FP_MAN(code);
-> +
-> +		return (mc_man | 0x10) << (mc_exp + 3);
-> +	}
-> +}
-> +
-> +/* Calculate Max Resp Time from Maximum Response Code
-> + *
-> + * After decode, MRC represents the Maximum Response Time (MRT) in units
-> + * of 0.1 seconds (100 ms).
-> + */
-> +static inline unsigned long igmpv3_mrt(const struct igmpv3_query *ih3)
-> +{
-> +	/* RFC3376, relevant sections:
-> +	 *  - 4.1.1. Maximum Response Code
-> +	 *  - 8.3. Query Response Interval
-> +	 */
-
-Please move this to the comment above the function
-
-> +	return igmpv3_exp_field_decode(ih3->code);
-> +}
-> +
-> +/* Calculate Querier's Query Interval from Querier's Query Interval Code
-> + *
-> + * After decode, QQIC represents the Querier's Query Interval in units
-> + * of seconds.
-> + */
-> +static inline unsigned long igmpv3_qqi(const struct igmpv3_query *ih3)
-> +{
-> +	/* RFC3376, relevant sections:
-> +	 *  - 4.1.7. QQIC (Querier's Query Interval Code)
-> +	 *  - 8.2. Query Interval
-> +	 *  - 8.12. Older Version Querier Present Timeout
-> +	 *    (the [Query Interval] in the last Query received)
-> +	 */
-
-Likewise
-
-> +	return igmpv3_exp_field_decode(ih3->qqic);
-> +}
->  
->  static inline int ip_mc_may_pull(struct sk_buff *skb, unsigned int len)
->  {
-> diff --git a/net/bridge/br_multicast.c b/net/bridge/br_multicast.c
-> index 881d866d687a..9fec76e887bc 100644
-> --- a/net/bridge/br_multicast.c
-> +++ b/net/bridge/br_multicast.c
-> @@ -3518,7 +3518,7 @@ static void br_ip4_multicast_query(struct net_bridge_mcast *brmctx,
->  			goto out;
->  
->  		max_delay = ih3->code ?
-> -			    IGMPV3_MRC(ih3->code) * (HZ / IGMP_TIMER_SCALE) : 1;
-> +			    igmpv3_mrt(ih3) * (HZ / IGMP_TIMER_SCALE) : 1;
->  	} else {
->  		goto out;
->  	}
-> diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
-> index a674fb44ec25..d7eff36d98c3 100644
-> --- a/net/ipv4/igmp.c
-> +++ b/net/ipv4/igmp.c
-> @@ -991,7 +991,7 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
->  		 * different encoding. We use the v3 encoding as more likely
->  		 * to be intended in a v3 query.
->  		 */
-> -		max_delay = IGMPV3_MRC(ih3->code)*(HZ/IGMP_TIMER_SCALE);
-> +		max_delay = igmpv3_mrt(ih3) * (HZ / IGMP_TIMER_SCALE);
->  		if (!max_delay)
->  			max_delay = 1;	/* can't mod w/ 0 */
->  	} else { /* v3 */
-> @@ -1006,7 +1006,7 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
->  			ih3 = igmpv3_query_hdr(skb);
->  		}
->  
-> -		max_delay = IGMPV3_MRC(ih3->code)*(HZ/IGMP_TIMER_SCALE);
-> +		max_delay = igmpv3_mrt(ih3) * (HZ / IGMP_TIMER_SCALE);
->  		if (!max_delay)
->  			max_delay = 1;	/* can't mod w/ 0 */
->  		WRITE_ONCE(in_dev->mr_maxdelay, max_delay);
-> @@ -1016,7 +1016,7 @@ static bool igmp_heard_query(struct in_device *in_dev, struct sk_buff *skb,
->  		 * configured value.
->  		 */
->  		in_dev->mr_qrv = ih3->qrv ?: READ_ONCE(net->ipv4.sysctl_igmp_qrv);
-> -		in_dev->mr_qi = IGMPV3_QQIC(ih3->qqic)*HZ ?: IGMP_QUERY_INTERVAL;
-> +		in_dev->mr_qi = igmpv3_qqi(ih3) * HZ ? : IGMP_QUERY_INTERVAL;
->  
->  		/* RFC3376, 8.3. Query Response Interval:
->  		 * The number of seconds represented by the [Query Response
-> -- 
-> 2.43.0
-> 
+Again, code looks fine, but same comments from the previous patch apply
+here
 
