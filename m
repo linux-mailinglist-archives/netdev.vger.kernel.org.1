@@ -1,132 +1,136 @@
-Return-Path: <netdev+bounces-276114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276113-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id UNRTCmE/1Wk73gcAu9opvQ
-	(envelope-from <netdev+bounces-276114-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 19:31:13 +0200
+	id kMdlJI8/1Wk73gcAu9opvQ
+	(envelope-from <netdev+bounces-276113-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 19:31:59 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5B4B3B25D7
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 19:31:12 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FE443B25EF
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 19:31:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6CD923032DE7
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 17:30:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0681930557CE
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 17:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8D11F4CB3;
-	Tue,  7 Apr 2026 17:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="RBp5aW1w"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6693433ADB5;
+	Tue,  7 Apr 2026 17:30:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-y-209.mailbox.org (mout-y-209.mailbox.org [91.198.250.237])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882601F3B87;
-	Tue,  7 Apr 2026 17:30:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.198.250.237
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C08C30FF20;
+	Tue,  7 Apr 2026 17:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775583051; cv=none; b=m1+/WOYPbcHp1roR4LTQhtxT8f7pZ4AjUlh7Yi1huQFgNjPsrEPb7QsBEEGCUKxDFJuSh6thFeOLvREshWbMswIkhLl/T6w2E+aPqIBpU+HmFagxrcqYgy/vge8QNrCbolHOBdk4agNcOc+Cw1PtZDkGaL3x0AJU3Z5HGET8cHI=
+	t=1775583043; cv=none; b=dAtI+JAsK768O9It4J16dM4GxpjkZw+K17GnipPbBDTPcdKLU2PfM6cyAvL1uNMrsLlRuDscB356QlGtn8Mf26q8xoY9sauBx38DHwDkNPNbw5Qeje6HRctOalJR2s5ddQEw3lEy4/JMhreN5Upo8A5RdxEPNa96jz60CUKTfl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775583051; c=relaxed/simple;
-	bh=1NCS9gYTZrgbYxx9Fl3+Y5Fmo9ikKC3KhdLHIGn2jVQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MmDX2xiw3pa0YmPcuJMxfky7W3R1so+wSDxVSvJq4TQsvJDkf4M9FwRqZFb1fREXFYuhOnUQJXPaYlkknx9V0UFtpoUVWvXqUNpySEALNBlof7d3cGip97fIIZWWFLY4o7aRDcWmmjaTKH5TIjVhRIVxKq1oEnbYbP5MhAttTMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=RBp5aW1w; arc=none smtp.client-ip=91.198.250.237
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-y-209.mailbox.org (Postfix) with ESMTPS id 4fqtWn6QWZzB14f;
-	Tue,  7 Apr 2026 19:30:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1775583046;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fJ7zM5V7ZzJ0suotcdnEmX2tSdOwa9vrNHy5SWQdhjc=;
-	b=RBp5aW1wHytr1Sq6QjueW2EIHrWjuQ5kE2VwYua1H03KM3S6Dvm2z/rjdhE/PE4lqKxeo+
-	BldZfmDuIwCMfvYy6y4Z8b+QKkp4Swyim5WoxcBxr3pJiU/UkYYhuynbphrFtUK4yhcgYg
-	Yx87bpj8z/vmCK1ds/8wpzduuuAS1l0mgGps68mkGCDQj6jfxtzm/RK5jDVjIhYWSQsRoU
-	/8NLg7YkD/S2MGOPreOZGoFuY4jXbfVuAH28MvZAY8RFIW6XXL2a6dMZF7fqMd3mEthm1q
-	Ub10DTRIkJ7lXGdNqwjcfppyDAwr0nKemVMU7vbu2C3OOlXmjLoJg6PC/Exhrg==
-From: Mashiro Chen <mashiro.chen@mailbox.org>
-To: horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-hams@vger.kernel.org
-Subject: Re: [PATCH] net: hamradio: 6pack: fix uninit-value in sixpack_receive_buf
-Date: Wed,  8 Apr 2026 01:30:34 +0800
-Message-ID: <20260407173034.107268-1-mashiro.chen@mailbox.org>
-In-Reply-To: <20260407165007.GB469338@kernel.org>
-References: <20260407165007.GB469338@kernel.org>
+	s=arc-20240116; t=1775583043; c=relaxed/simple;
+	bh=Bx71B91bExZVi8hwTVvN/Q1tQ4CJ9ow2kReJr6TCmRs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y6ES4kjNVKyOrAJ9us7mizTlPH0yXeVpC1Xyv8KV4RotVXxtK0DPkuexoUHes+Z9wmpPVU+3SGXHcZ+x2riQHsqUOBOEbA7I2GhXfA9g8Z1CXVuaKxTDJtieEMgDSy2fzB58jPuWhjHHMX2zBOkFVPxCUaofJcLzMuGHTfg8RaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1wAAG6-000000000ob-29PF;
+	Tue, 07 Apr 2026 17:30:38 +0000
+Date: Tue, 7 Apr 2026 18:30:35 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Liang Xu <lxu@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	Jose Maria Verdu Munoz <jverdu@maxlinear.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [PATCH net-next 2/3] net: dsa: mxl862xx: don't skip early bridge
+ port configuration
+Message-ID: <15962aac29ebe0a6eb77565451acff880c41ef33.1775581804.git.daniel@makrotopia.org>
+References: <cover.1775581804.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-MBO-RS-META: 6c81e7fba9t8u9d8zwe568b4q54mh9i7
-X-MBO-RS-ID: 710b1589b8f0d540d6f
-X-Spamd-Result: default: False [-0.66 / 15.00];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1775581804.git.daniel@makrotopia.org>
+X-Spamd-Result: default: False [-0.46 / 15.00];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	DMARC_POLICY_ALLOW(-0.50)[mailbox.org,reject];
-	R_SPF_ALLOW(-0.20)[+ip4:172.105.105.114:c];
-	R_DKIM_ALLOW(-0.20)[mailbox.org:s=mail20150812];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	FORGED_SENDER_MAILLIST(0.00)[];
+	DMARC_NA(0.00)[makrotopia.org];
+	TAGGED_FROM(0.00)[bounces-276113-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276114-lists,netdev=lfdr.de];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[mailbox.org:+];
-	ASN(0.00)[asn:63949, ipnet:172.105.96.0/20, country:SG];
-	MISSING_XM_UA(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[mashiro.chen@mailbox.org,netdev@vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	TO_DN_NONE(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
-	NEURAL_HAM(-0.00)[-1.000];
+	FREEMAIL_TO(0.00)[makrotopia.org,lunn.ch,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,armlinux.org.uk,vger.kernel.org];
+	FREEMAIL_CC(0.00)[gmx.de,monroe.io,adtran.com,maxlinear.com,phrozen.org];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	RCVD_COUNT_THREE(0.00)[4];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mailbox.org:dkim,mailbox.org:mid]
-X-Rspamd-Queue-Id: B5B4B3B25D7
+	FORGED_SENDER_MAILLIST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	NEURAL_HAM(-0.00)[-0.981];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[daniel@makrotopia.org,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	R_DKIM_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,makrotopia.org:email,makrotopia.org:mid]
+X-Rspamd-Queue-Id: 8FE443B25EF
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Wed, Apr 08, 2026, Simon Horman wrote:
-> Sorry for not noticing this earlier, but AI generated review flags
-> that while this change looks correct, it's not clear how it relates
-> to the sysbot report: IOW, how is it that bytes with TTY error flags
-> may be uninitialized?
+mxl862xx_bridge_port_set() is currently guarded by the
+mxl8622_port->setup_done flag, as the early call to
+mxl862xx_bridge_port_set() from mxl862xx_port_stp_state_set() would
+otherwise cause a NULL-pointer dereference on unused ports which don't
+have dp->cpu_dp despite not being a CPU port.
 
-Thanks for the question, and for the earlier review.
+Using the setup_done flag (which is never set for unused ports),
+however, also prevents mxl862xx_bridge_port_set() from configuring
+user ports' single-port bridges early, which was unintended.
 
-The TTY receive_buf() contract is that for positions where fp[i] != 0
-(error flag set), the caller must discard cp[i] -- the TTY driver does
-not guarantee a meaningful value there.  In syzbot's fuzzing harness
-(pty/ldisc injection), the fuzzer allocates a tty_buffer, sets error
-flags on certain byte positions, but leaves the corresponding entries in
-the char buffer uninitialized.  KMSAN then detects that sixpack_decode()
-reads those uninitialized bytes.
+Fix this by returning early from mxl862xx_bridge_port_set() in case
+dsa_port_is_unused().
 
-slip_receive_buf() and mkiss_receive_buf() already handle this correctly
-by advancing their char pointer past error-flagged bytes before calling
-their decode functions.  sixpack_receive_buf() had the same structure
-but cp was never advanced, so the full original buffer -- including the
-uninit error-flagged positions -- was forwarded to sixpack_decode().
+Fixes: 340bdf984613c ("net: dsa: mxl862xx: implement bridge offloading")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ drivers/net/dsa/mxl862xx/mxl862xx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I have also dropped the Suggested-by tag per your note, and submitted
-a v2 with the commit message expanded to explain the uninit-value
-connection more clearly.
-
-Thanks,
-Mashiro Chen
+diff --git a/drivers/net/dsa/mxl862xx/mxl862xx.c b/drivers/net/dsa/mxl862xx/mxl862xx.c
+index 9a9714c4859b1..f65525aff5e52 100644
+--- a/drivers/net/dsa/mxl862xx/mxl862xx.c
++++ b/drivers/net/dsa/mxl862xx/mxl862xx.c
+@@ -278,7 +278,7 @@ static int mxl862xx_set_bridge_port(struct dsa_switch *ds, int port)
+ 	bool enable;
+ 	int i, idx;
+ 
+-	if (!p->setup_done)
++	if (dsa_port_is_unused(dp))
+ 		return 0;
+ 
+ 	if (dsa_port_is_cpu(dp)) {
+-- 
+2.53.0
 
