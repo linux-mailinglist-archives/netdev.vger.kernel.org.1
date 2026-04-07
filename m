@@ -1,220 +1,187 @@
-Return-Path: <netdev+bounces-275810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275811-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id EPlqJ0Bd1GlrtQcAu9opvQ
-	(envelope-from <netdev+bounces-275810-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 03:26:24 +0200
+	id 8A+fHwhf1Gm6tQcAu9opvQ
+	(envelope-from <netdev+bounces-275811-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 03:34:00 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30B783A8AF7
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 03:26:23 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B0C83A8B91
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 03:34:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 3F1E83001007
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 01:26:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AE86230137BA
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 01:33:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D29175A99;
-	Tue,  7 Apr 2026 01:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D47321C173;
+	Tue,  7 Apr 2026 01:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nJZSA9oC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DrivtFnP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DE14C6C
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 01:26:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775525182; cv=none; b=FaoElQIfRS3HhD6ObkDLQ2uxQ/erc0SKGrrj0rfKgeBkse8Zk5sF2UxxZ/ba7e49Xk2/Ji3AADS+wNxbOQk+6sySjBmMvl5Ix7XhS69HcBmqDpsVrglpra2RERdo2G5XZz5rwr0mpjtU45yedK9MPPiizb9I/ltVm+fXDEuli5M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775525182; c=relaxed/simple;
-	bh=dVILt1iLbW9F7TOlyKfK5PT3r7yL8XE5R4xlV05lU2k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cIgb8f2CuJQFYSkRRUiw0Y1yRyUa3KgJJd9h3vIV3Y/0zaNE39n5VZAJbeg1esq9um+mJdk+zla1NNTj8sjoQHhwFAJCTe/sKAUE3BFim8ynwj4LQxQsZRkD5jAXnXnC2jbWJCGTTIPUQ9qt0cgRlKyo1QGdP7V9rICir7xHKn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nJZSA9oC; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 6 Apr 2026 18:25:52 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775525177;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=euWRknGGJoLsZnDSjgyoR/3x+tUQI1fMgnlSdPtl2Ss=;
-	b=nJZSA9oCoqyBwc4kpihQiPaqanTRL6HaqfMrlXAGWgpkozZ43AB8upcT6Yt0IULldqZlgu
-	zySMdC4zpYVQV4VQuM9AMLIxjLSjUvAiGXSHc0TIjUvZgpqu5HTel2eOzghc7gWgT8AV6N
-	hMl+vQEtwoqSEnRrFslDBwUhQMJTlb8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: Werner Kasselman <werner@verivus.ai>
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lawrence Brakmo <brakmo@fb.com>, 
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH] bpf: add is_locked_tcp_sock guard for sock_ops rtt_min
- access
-Message-ID: <2026471147.8A6S.martin.lau@linux.dev>
-References: <20260406224953.2787289-1-werner@verivus.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65C51E832A
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 01:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775525635; cv=pass; b=nf1x4PStKWJHwDykAiA4DGkdHNpgQGooUiFRjIushuBRficg2QVrQy1o3vwDSTpYnK45iw7o5cwfvbarPqxHe0klia2jmi5bT/Ox+F+mQ81jYcnlOZQbaF3K08Gd2M4t8vxw8riwU845AUrwWoPW2LWdBCFCjTh/+1YBbi3yscI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775525635; c=relaxed/simple;
+	bh=H0LoEFDakMTPfi/BP2bcz4FMwGYT8QVcG3BuR0hJpVA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SyhtLqZtsrqVUwS3IXSCONJDBf6wSJgyidFxmIC6e+szyNIaUQm2jQE+76LsQ6w9O1yh7rzOtenGt6v1LO86mCq3ERBuWtYM2s5QIlxOcYTna3d2Xy/S0PmOagrdmFlFLUxdgL0ihn9re+1fELVtREA5/UAZQrVizowRHcHkyXI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DrivtFnP; arc=pass smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-89cc71f4311so62221106d6.3
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 18:33:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1775525633; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OBXMtdPs9DU0MiGaAglZbSJNMkfasSo0uuL80BV143SyzqiDLk8N0DL9T15ZPXHh9L
+         vm55ppfLhXvslecojGqb86MRWhWb/VPdB1ecd4YHOhdaTZsvsBpULHalhCM4g2OLFL9X
+         MsgpZS/piRIesTCjmcdxmrqYhi4v0hR6Q69G5JTJTZB7T5EjHhwXp9ZetKgER3uA3KUF
+         CXMq0Nb7jyJecvezKzdMDHOeUBWxKxCRXs32Wr8I3qwriahDOrRJzUt8AetK6Fzcutdv
+         7v2nlSSY3TbwxVvyt+rPbkrzbFJFY0KeuEteqO5pulQmW6GclHvASAAq6+FcUqduInbY
+         ZOsQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=H0LoEFDakMTPfi/BP2bcz4FMwGYT8QVcG3BuR0hJpVA=;
+        fh=JETGcnr7sJOGloZzoZUVan+uS9xzbEMm+bocSC2XAI4=;
+        b=j8WWJhlyYZv+7qE6LYkqn2AUfteriim/xPWFJ3krDAqIEPbvOh9SUMtBeGDBR8ooBa
+         vT607D7nn9QDeGwheOTNAbFvPLv5bh25PK3PL9bLWDgc4yVJMO+cWZwpY1E95Sjeq6Ed
+         Gqy9phS1bd844Zdc9KGNeiKFAnz1lMF77Juseu0JswtPryxAlkvHoauaPhmj/I9v/eXu
+         Zf6uoZD/ZTtW7V2x1WgZRisaPIo6r5jo7U5q1WhhUazcmXcZHgkI3sGBucT8MoMbF2aB
+         IsX8V6RnJYcy6p/8Co44LiqZGewveH+4hzFB7N7efhvqoyxMD2RPBUqlVSXhGGU8EcYe
+         lS0w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1775525633; x=1776130433; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H0LoEFDakMTPfi/BP2bcz4FMwGYT8QVcG3BuR0hJpVA=;
+        b=DrivtFnPofV28Y8uVHc6FGfKTp1x+purr/50UFYwENXewNmec1Z4OYqybhhaf/QVUR
+         X5g8gqWVR1s1AYcRi8tPqoKps9gO+vKhthgUkVYEemH7wA9icjwWUw5nJj9EwRvucGP3
+         8DJHJcBGHlYp8vGH6kqj7/oJVWGU0IeH6L5IJxIsCc77UddIvpMVYlsUMVNo72VZjLHH
+         G9TxVO61pkUVYMZx2Q26gyJI5hjMb1/n/8y64XGNTRccZDmGvoc41f/nAZrj6iHlOvt3
+         3Tk0gw8WAKcUy+zsmEyqZPxc7kwczAe+IxlS3UcloyDoa6BnoD3Okla4ApbIzzYK78r8
+         ZiOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1775525633; x=1776130433;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=H0LoEFDakMTPfi/BP2bcz4FMwGYT8QVcG3BuR0hJpVA=;
+        b=R7v+t/7/diDU2//h/LCYiocjFCotJ5D9uUo+WxumgGJ0v8AmhUW5gmT6wMVk2vX6Dt
+         AuwKEaRKBj+hiALf5ssulHJEH+3vokZ8admw6O02XmAXdwIqT2p5q5bySJrp3eXQa6hg
+         T9N8u1f+kn9ifMwjgJqV91Yb7Hhl02BC/hYSJpPqWE9zbxXbUb5B42Tb+0cfiUyz+0nL
+         IjfExvbUKPiBqtp7n+AVAItgi7uCNJWv4dMUr08Ou6hTJZPQ7qFTdBoSBuNDszo6+Tuo
+         eaz8HKoSZu/kYsh1rDnCSjQ6J8LhYV3ic4yZXrSNoBFapCWIWksJ+w2jYv3DlgJeR3Os
+         G7Ig==
+X-Forwarded-Encrypted: i=1; AJvYcCVIlu7yniGE6hzjHUsqslPDdclrbpSSLa1OX+zQfTmWgNEYGi31KkajflDpt2fG9ictfEE6B8Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0gZ1W/VgV6h+ED7G5Skyl1TBUtd4XDD2rhmqeo2WXHGfLPxnX
+	UwOELFsQbbvW2hqmWz4LHw5D6JbOWQ0GBhOGR+89n3MXrzT/BLmi+Bvw52ezgbaKA/4/ygFLeeq
+	UeVyNmGH28iQfLHQM6Xqdko37n4IUUZU=
+X-Gm-Gg: AeBDieuxQDCEcJFDmc0U4jjJ0C2fqgWVcbMF0Ev36fX+vWAqWCKgprqhwphnKueOr7l
+	PP/6wPFbQp8PMl8cHHdYwNWbXjHrOjVYx9/7avEzpmDE+MkjoXhKc7erlghf43NAgKj5cEczS5P
+	/22k7KNEMCWnmO6Dn8m9ik5Pz+5QMpzQpW4mVRMoOS9JJ0PBolM/vo2ceDXWG2UA/bwitlXHWZj
+	9n2cvFoRdgSeVse9Kl+XrlD5Jrg082wfZJEi0Mln7Mj7g0DmjPP/a4YjnGmw4i+XRejlrtSUO73
+	5/b14Ziv0HR95gakvETO
+X-Received: by 2002:a05:6214:212b:b0:89c:5110:751a with SMTP id
+ 6a1803df08f44-8a704ac00f3mr250748606d6.44.1775525633467; Mon, 06 Apr 2026
+ 18:33:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260406224953.2787289-1-werner@verivus.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spamd-Result: default: False [0.34 / 15.00];
+References: <20260405154816.4774-1-devnexen@gmail.com>
+In-Reply-To: <20260405154816.4774-1-devnexen@gmail.com>
+From: Julian Calaby <julian.calaby@gmail.com>
+Date: Tue, 7 Apr 2026 11:33:40 +1000
+X-Gm-Features: AQROBzCkX2gE2vUcwz9Vh41Dy86vV6V6vedD5cjTTBBq9Q2y1TRb7sq-3zFQtYQ
+Message-ID: <CAGRGNgUpknQi6PzBWQXeAP0Vh7XjntD_-O4QyjU5tAn8_71=eQ@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next] net: use get_random_u{16,32,64}() where appropriate
+To: David Carlier <devnexen@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, 
+	Ilya Dryomov <idryomov@gmail.com>, Johannes Berg <johannes@sipsolutions.net>, 
+	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, Aaron Conole <aconole@redhat.com>, 
+	Ilya Maximets <i.maximets@ovn.org>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Xin Long <lucien.xin@gmail.com>, Jon Maloy <jmaloy@redhat.com>, netdev@vger.kernel.org, 
+	ceph-devel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	mptcp@lists.linux.dev, dev@openvswitch.org, linux-sctp@vger.kernel.org, 
+	tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spamd-Result: default: False [-0.66 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c09:e001:a7::/64:c];
-	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
+	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=2];
+	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
+	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	FREEMAIL_CC(0.00)[linux.dev,kernel.org,iogearbox.net,gmail.com,davemloft.net,google.com,redhat.com,fb.com,vger.kernel.org];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	TAGGED_FROM(0.00)[bounces-275810-lists,netdev=lfdr.de];
+	TAGGED_FROM(0.00)[bounces-275811-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	RCVD_TLS_LAST(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[gmail.com];
 	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[martin.lau@linux.dev,netdev@vger.kernel.org];
+	FREEMAIL_FROM(0.00)[gmail.com];
+	RCPT_COUNT_TWELVE(0.00)[25];
 	FROM_HAS_DN(0.00)[];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	DKIM_TRACE(0.00)[gmail.com:+];
+	TO_DN_SOME(0.00)[];
 	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c09::/32, country:SG];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[juliancalaby@gmail.com,netdev@vger.kernel.org];
+	FREEMAIL_CC(0.00)[kernel.org,davemloft.net,google.com,redhat.com,lunn.ch,gmail.com,sipsolutions.net,ovn.org,vger.kernel.org,lists.linux.dev,openvswitch.org,lists.sourceforge.net];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
 	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:mid,sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 30B783A8AF7
+	DBL_BLOCKED_OPENRESOLVER(0.00)[mail.gmail.com:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: 2B0C83A8B91
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Mon, Apr 06, 2026 at 10:49:56PM +0000, Werner Kasselman wrote:
-> sock_ops_convert_ctx_access() generates BPF instructions to inline
-> context field accesses for BPF_PROG_TYPE_SOCK_OPS programs. For
-> tcp_sock-specific fields like snd_cwnd, srtt_us, etc., it uses the
-> SOCK_OPS_GET_TCP_SOCK_FIELD() macro which checks is_locked_tcp_sock
-> and returns 0 when the socket is not a locked full TCP socket.
-> 
-> However, the rtt_min field bypasses this guard entirely: it emits a raw
-> two-instruction load sequence (load sk pointer, then load from
-> tcp_sock->rtt_min offset) without checking is_locked_tcp_sock first.
-> 
-> This is a problem because bpf_skops_hdr_opt_len() and
-> bpf_skops_write_hdr_opt() in tcp_output.c set sock_ops.sk to a
-> tcp_request_sock (cast from request_sock) during SYN-ACK processing,
-> with is_fullsock=0 and is_locked_tcp_sock=0. If a SOCK_OPS program
-> with BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG reads ctx->rtt_min in this
-> callback, the generated code treats the tcp_request_sock pointer as a
-> tcp_sock and reads at offsetof(struct tcp_sock, rtt_min) -- which is
-> well past the end of the tcp_request_sock allocation, causing an
-> out-of-bounds slab read.
+Hi David,
 
-This is not limited to hdr related CB flags.
+On Mon, Apr 6, 2026 at 1:50=E2=80=AFAM David Carlier <devnexen@gmail.com> w=
+rote:
+>
+> Use the typed random integer helpers instead of
+> get_random_bytes() when filling a single integer variable.
+> The helpers return the value directly, require no pointer
+> or size argument, and better express intent.
+>
+> Skipped sites writing into __be16 fields (netdevsim) where
+> a direct assignment would trigger sparse endianness warnings.
 
-It also happens to earlier CB flags that have a request_sock, such as
-BPF_SOCK_OPS_RWND_INIT.
+I don't believe that endian swapping significantly affects the
+randomness of the data returned, so either:
 
-> 
-> The rtt_min field was introduced in the same commit as the other
-> tcp_sock fields but was given hand-rolled access code because it reads
-> a sub-field (rtt_min.s[0].v, a minmax_sample) rather than a direct
-> struct member, making it incompatible with the SOCK_OPS_GET_FIELD()
-> macro. This hand-rolled code omitted the is_fullsock guard that the
-> macro provides. The guard was later renamed to is_locked_tcp_sock in
-> commit fd93eaffb3f9 ("bpf: Prevent unsafe access to the sock fields in the BPF timestamping callback").
-> 
-> Add the is_locked_tcp_sock guard to the rtt_min case, replicating the
-> exact instruction pattern used by SOCK_OPS_GET_FIELD() including
-> proper handling of the dst_reg==src_reg case with temp register
-> save/restore. Use offsetof(struct minmax_sample, v) for the sub-field
-> offset to match the style in bpf_tcp_sock_convert_ctx_access().
-> 
-> Found via AST-based call-graph analysis using sqry.
-> 
-> Fixes: 44f0e43037d3 ("bpf: Add support for reading sk_state and more")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Werner Kasselman <werner@verivus.com>
-> ---
->  net/core/filter.c | 47 ++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 44 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 78b548158fb0..58f0735b18d9 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -10830,13 +10830,54 @@ static u32 sock_ops_convert_ctx_access(enum bpf_access_type type,
->  		BUILD_BUG_ON(sizeof(struct minmax) <
->  			     sizeof(struct minmax_sample));
->  
-> +		/* Unlike other tcp_sock fields that use
-> +		 * SOCK_OPS_GET_TCP_SOCK_FIELD(), rtt_min requires a
-> +		 * custom access pattern because it reads a sub-field
-> +		 * (rtt_min.s[0].v) rather than a direct struct member.
-> +		 * We must still guard the access with is_locked_tcp_sock
-> +		 * to prevent an OOB read when sk points to a
-> +		 * tcp_request_sock (e.g., during SYN-ACK processing via
-> +		 * bpf_skops_hdr_opt_len/bpf_skops_write_hdr_opt).
-> +		 */
-> +		off = offsetof(struct tcp_sock, rtt_min) +
-> +		      offsetof(struct minmax_sample, v);
-> +	{
-> +		int fullsock_reg = si->dst_reg, reg = BPF_REG_9, jmp = 2;
-> +
-> +		if (si->dst_reg == reg || si->src_reg == reg)
-> +			reg--;
-> +		if (si->dst_reg == reg || si->src_reg == reg)
-> +			reg--;
-> +		if (si->dst_reg == si->src_reg) {
-> +			*insn++ = BPF_STX_MEM(BPF_DW, si->src_reg, reg,
-> +					  offsetof(struct bpf_sock_ops_kern,
-> +					  temp));
-> +			fullsock_reg = reg;
-> +			jmp += 2;
-> +		}
-> +		*insn++ = BPF_LDX_MEM(BPF_FIELD_SIZEOF(
-> +						struct bpf_sock_ops_kern,
-> +						is_locked_tcp_sock),
-> +				      fullsock_reg, si->src_reg,
-> +				      offsetof(struct bpf_sock_ops_kern,
-> +					       is_locked_tcp_sock));
-> +		*insn++ = BPF_JMP_IMM(BPF_JEQ, fullsock_reg, 0, jmp);
-> +		if (si->dst_reg == si->src_reg)
-> +			*insn++ = BPF_LDX_MEM(BPF_DW, reg, si->src_reg,
-> +				      offsetof(struct bpf_sock_ops_kern,
-> +				      temp));
->  		*insn++ = BPF_LDX_MEM(BPF_FIELD_SIZEOF(
->  						struct bpf_sock_ops_kern, sk),
->  				      si->dst_reg, si->src_reg,
->  				      offsetof(struct bpf_sock_ops_kern, sk));
-> -		*insn++ = BPF_LDX_MEM(BPF_W, si->dst_reg, si->dst_reg,
-> -				      offsetof(struct tcp_sock, rtt_min) +
-> -				      sizeof_field(struct minmax_sample, t));
-> +		*insn++ = BPF_LDX_MEM(BPF_W, si->dst_reg, si->dst_reg, off);
-> +		if (si->dst_reg == si->src_reg) {
-> +			*insn++ = BPF_JMP_A(1);
-> +			*insn++ = BPF_LDX_MEM(BPF_DW, reg, si->src_reg,
-> +				      offsetof(struct bpf_sock_ops_kern,
-> +				      temp));
+1. Do something to silence sparse (casts?)
+2. Live with the endian swap overhead if they're not in the hot path.
 
-There is an existing bug in this copy-and-paste codes [1] and now is
-repeated here, so please find a way to refactor it to be reusable instead of
-duplicating it.
+Other than that,
 
-This also needs a test. It should be a subtest of [1],
-so [1] need to land first.
+Reviewed-by: Julian Calaby <julian.calaby@gmail.com>
 
-[1]: https://lore.kernel.org/bpf/20260406031330.187630-1-jiayuan.chen@linux.dev/
+Thanks,
+
+--=20
+Julian Calaby
+
+Email: julian.calaby@gmail.com
+Profile: http://www.google.com/profiles/julian.calaby/
 
