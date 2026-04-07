@@ -1,229 +1,147 @@
-Return-Path: <netdev+bounces-276159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276160-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 4ItuNHxw1WmN6QcAu9opvQ
-	(envelope-from <netdev+bounces-276159-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 23:00:44 +0200
+	id AOD3HXlx1WmN6QcAu9opvQ
+	(envelope-from <netdev+bounces-276160-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 23:04:57 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E8883B4CD8
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 23:00:44 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E558E3B4D4B
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 23:04:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0367B3039F42
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 20:58:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 692673025932
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 21:04:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253FF3793C8;
-	Tue,  7 Apr 2026 20:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16F637A4BA;
+	Tue,  7 Apr 2026 21:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mleia.com header.i=@mleia.com header.b="hHuYgiE5";
-	dkim=pass (2048-bit key) header.d=mleia.com header.i=@mleia.com header.b="hHuYgiE5"
+	dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b="ISEoigmC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.mleia.com (mleia.com [178.79.152.223])
+Received: from mail.tipi-net.de (mail.tipi-net.de [194.13.80.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF41286D4D;
-	Tue,  7 Apr 2026 20:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.79.152.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56767253F05;
+	Tue,  7 Apr 2026 21:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.13.80.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775595529; cv=none; b=a5rLJglmScQ2XIK9cayyUufsXI6mxT0HvSPxy/0xmZrF7h7hLjV6OWVatsyTrtGd+GpvkNxd/PcOxC10JRl6B7nhZQrYLijqCDMka2jGisWh6P0IHCJX/lq09TwLDvpuuSh36KXbAnIbZGH9CC0ZsC2h3/BuAkXVQEvb8nuqXMw=
+	t=1775595888; cv=none; b=hipWJeDXcADT6UkreILHKCzLr4YQLbV5Yaavx2jcLRxaEuxRoZYGW8Qyh4BHXHFa+FMQIVu1E1lJ7uUewH+x9FbP5Vbhai1mgiYyuCMU5I+QlWfq9RPDaNH1Um7TVP4zconkHOQ98n6y5p+a6omMUZUWlNBhHLGU08+48HYAnT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775595529; c=relaxed/simple;
-	bh=UwJUOGjr3wF6gP3UKq3tPA0H8IjhbtQZEg5uOq1j9W0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m2Xy2NUfMshCJgG+ASGQ/NEFCo8CD4nrBtCpvLup7EwKlU1c3aHaXcxE5uHNNynGOOD1KlTM/1uumPBNvVPH4DUTXcNqmRwG9Bmeo27av4GXbuCRIRxk8C7YS5Se30ouIEkMGUqkm8KH9cs4Rmvs8OTKnaUFSzBzKO4BMrJ83bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mleia.com; spf=none smtp.mailfrom=mleia.com; dkim=pass (2048-bit key) header.d=mleia.com header.i=@mleia.com header.b=hHuYgiE5; dkim=pass (2048-bit key) header.d=mleia.com header.i=@mleia.com header.b=hHuYgiE5; arc=none smtp.client-ip=178.79.152.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mleia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mleia.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mleia.com; s=mail;
-	t=1775595525; bh=UwJUOGjr3wF6gP3UKq3tPA0H8IjhbtQZEg5uOq1j9W0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hHuYgiE5ISRXBkqFp3zAZepkjMVBT9j/eUuxTMlzZSQrCNGb1y0CpY8S3XyvUa4ev
-	 yBgICoY72dnoGvmZm1/K6Jv5pqm5nywZhhVfJ9EG5UXViC+lIZZHSEIRiwzG0lBw5S
-	 gvLZ+ecPEZ0PmyZ0gIgcCVfvm6nK+/TuIHpWFIlJnr8YsPdf3y9fm1kF9mab3sAyp3
-	 w5vGPWK9hjlGWcer8TXMZyUBAmbbDU+FmIYMbpsiehRK88F7RytCBC/oZfEE3ko/Zr
-	 i69k4J8cYkfP/q9sbXT31L9sQCKLPCticWr4fr3a6HP3QjCDQirfW2LWFdLP1G9Yku
-	 oo5ls0QWvE2sQ==
-Received: from mail.mleia.com (localhost [127.0.0.1])
-	by mail.mleia.com (Postfix) with ESMTP id 9DD913829B6;
-	Tue,  7 Apr 2026 20:58:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=mleia.com; s=mail;
-	t=1775595525; bh=UwJUOGjr3wF6gP3UKq3tPA0H8IjhbtQZEg5uOq1j9W0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hHuYgiE5ISRXBkqFp3zAZepkjMVBT9j/eUuxTMlzZSQrCNGb1y0CpY8S3XyvUa4ev
-	 yBgICoY72dnoGvmZm1/K6Jv5pqm5nywZhhVfJ9EG5UXViC+lIZZHSEIRiwzG0lBw5S
-	 gvLZ+ecPEZ0PmyZ0gIgcCVfvm6nK+/TuIHpWFIlJnr8YsPdf3y9fm1kF9mab3sAyp3
-	 w5vGPWK9hjlGWcer8TXMZyUBAmbbDU+FmIYMbpsiehRK88F7RytCBC/oZfEE3ko/Zr
-	 i69k4J8cYkfP/q9sbXT31L9sQCKLPCticWr4fr3a6HP3QjCDQirfW2LWFdLP1G9Yku
-	 oo5ls0QWvE2sQ==
-Message-ID: <60dea9e5-9890-49ab-b806-713c388d6e08@mleia.com>
-Date: Tue, 7 Apr 2026 23:58:44 +0300
+	s=arc-20240116; t=1775595888; c=relaxed/simple;
+	bh=jqvu83wfWERS+A4du18eODKc8zsl2by81Rtu32YYlg4=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=hfPMOL2uwrPxUDBRBT4nuUAWNG2hkWEI61Y6bZ2OFzPYarA2afrAWJvwzMlvxIJX1W1TAnXCCWq4olvsH8SK645dJuBNkH2ikbPgxQIj54/4muxCqGfJ4MYyL25tALbX0ONTklHOYnhnLP/FS8gHWSnvmCxaeHJKor7A0nXNO7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de; spf=pass smtp.mailfrom=tipi-net.de; dkim=pass (2048-bit key) header.d=tipi-net.de header.i=@tipi-net.de header.b=ISEoigmC; arc=none smtp.client-ip=194.13.80.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tipi-net.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tipi-net.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 41356A5884;
+	Tue,  7 Apr 2026 23:04:30 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tipi-net.de; s=dkim;
+	t=1775595874; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=9BugpWoyyC0JTlJJqIH/b68u9qMIscoqZi+/vmLrBBQ=;
+	b=ISEoigmC7NVF6PKbXaR5JpDcFsvvZkshxXPfcT5tsbSomgIw+adXHu22jRx9+0N3YlTq12
+	Kjw0FJVVDwLeQeMAZiAopo48jC10J3DP6DCszP2nHKK9ZIucxOV167gPP8hfi6nH242/in
+	z9/lL2s/YEwQddBNNeJmNLVbHu7S6bRJ2Qo9KUJ+/Zfcqf4j3Cu0cVVuUqXbPqztWS21JJ
+	ZO/Juk8ELZRo9LiR+Te2F08dcFDFhGDseuqFeUGtfPpgV2OCQN/6un+kQrtR7pOuBPc023
+	317LdcMxOMUYyCJqcwRMuE3rFgsAs2qQKW18iAbjpAVT3Z9rZnSlzIoOI7AqyA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: lpc_eth: Fix a possible memory leak in
- lpc_mii_probe()
-To: Ma Ke <make24@iscas.ac.cn>
-Cc: alexandre.belloni@bootlin.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, piotr.wojtaszczyk@timesys.com,
- stable@vger.kernel.org
-References: <b44db9e6-f820-439d-a7ed-c1e2514579a8@mleia.com>
- <20260401131813.139167-1-make24@iscas.ac.cn>
-From: Vladimir Zapolskiy <vz@mleia.com>
-In-Reply-To: <20260401131813.139167-1-make24@iscas.ac.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Date: Tue, 07 Apr 2026 23:04:30 +0200
+From: Nicolai Buchwitz <nb@tipi-net.de>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Justin Chen
+ <justin.chen@broadcom.com>, Vikas Gupta <vikas.gupta@broadcom.com>, Bhargava
+ Marreddy <bhargava.marreddy@broadcom.com>, Rajashekar Hudumula
+ <rajashekar.hudumula@broadcom.com>, Arnd Bergmann <arnd@arndb.de>, Eric
+ Biggers <ebiggers@google.com>, =?UTF-8?Q?Markus_Bl=C3=B6chl?=
+ <markus@blochl.de>, Heiner Kallweit <hkallweit1@gmail.com>, Fernando
+ Fernandez Mancera <fmancera@suse.de>, linux-kernel@vger.kernel.org,
+ bcm-kernel-feedback-list@broadcom.com
+Subject: Re: [PATCH net-next] net: bcmasp: Switch to page pool for RX path
+In-Reply-To: <20260407162658.4056141-1-florian.fainelli@broadcom.com>
+References: <20260407162658.4056141-1-florian.fainelli@broadcom.com>
+Message-ID: <028ee7c4c1073056ba11c98a7faf1f13@tipi-net.de>
+X-Sender: nb@tipi-net.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-CRM114-Version: 20100106-BlameMichelson ( TRE 0.8.0 (BSD) ) MR-49551924 
-X-CRM114-CacheID: sfid-20260407_205845_664179_DEA539B3 
-X-CRM114-Status: GOOD (  23.93  )
-X-Spamd-Result: default: False [-0.16 / 15.00];
+X-Last-TLS-Session-Version: TLSv1.3
+X-Spamd-Result: default: False [0.04 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_DKIM_ALLOW(-0.20)[mleia.com:s=mail];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	RECEIVED_HELO_LOCALHOST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-276160-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
-	RCVD_COUNT_THREE(0.00)[4];
-	DMARC_NA(0.00)[mleia.com];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-276159-lists,netdev=lfdr.de];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
 	FROM_HAS_DN(0.00)[];
-	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	RCVD_COUNT_THREE(0.00)[4];
+	DMARC_NA(0.00)[tipi-net.de];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lunn.ch,davemloft.net,google.com,kernel.org,redhat.com,broadcom.com,arndb.de,blochl.de,gmail.com,suse.de];
+	MIME_TRACE(0.00)[0:+];
+	FORGED_SENDER_MAILLIST(0.00)[];
+	DKIM_TRACE(0.00)[tipi-net.de:?];
+	NEURAL_SPAM(0.00)[0.890];
 	TO_DN_SOME(0.00)[];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[vz@mleia.com,netdev@vger.kernel.org];
-	DKIM_TRACE(0.00)[mleia.com:+];
-	NEURAL_HAM(-0.00)[-0.999];
-	TAGGED_RCPT(0.00)[netdev];
 	MID_RHS_MATCH_FROM(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,mleia.com:dkim,mleia.com:mid,iscas.ac.cn:email]
-X-Rspamd-Queue-Id: 4E8883B4CD8
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[nb@tipi-net.de,netdev@vger.kernel.org];
+	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TAGGED_RCPT(0.00)[netdev];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_DKIM_TEMPFAIL(0.00)[tipi-net.de:s=dkim];
+	MISSING_XM_UA(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,broadcom.com:email]
+X-Rspamd-Queue-Id: E558E3B4D4B
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello Ma Ke.
-
-On 4/1/26 16:18, Ma Ke wrote:
-> On 3/30/26 13:04, Vladimir Zapolskiy wrote:
->> On 3/30/26 11:16, Ma Ke wrote:
->>> lpc_mii_probe() calls of_phy_find_device() to obtain a phy_device
->>> pointer. of_phy_find_device() increments the refcount of the device.
->>> The current implementation does not decrement the refcount after using
->>> the pointer, which leads to a memory leak.
->>
->> this is correct, there is an actual detected bug.
->>
->>>
->>> Add phy_device_free() to balance the refcount.
->>
->> But this does not sound right, you shoud use of_node_put(pldat->phy_node).
->>
->>>
->>> Found by code review.
->>>
->>> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
->>> Cc: stable@vger.kernel.org
->>> Fixes: 3503bf024b3e ("net: lpc_eth: parse phy nodes from device tree")
->>> ---
->>>    drivers/net/ethernet/nxp/lpc_eth.c | 11 ++++++-----
->>>    1 file changed, 6 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/drivers/net/ethernet/nxp/lpc_eth.c b/drivers/net/ethernet/nxp/lpc_eth.c
->>> index 8b9a3e3bba30..8ce7c9bb6dd6 100644
->>> --- a/drivers/net/ethernet/nxp/lpc_eth.c
->>> +++ b/drivers/net/ethernet/nxp/lpc_eth.c
->>> @@ -751,7 +751,7 @@ static void lpc_handle_link_change(struct net_device *ndev)
->>>    static int lpc_mii_probe(struct net_device *ndev)
->>>    {
->>>    	struct netdata_local *pldat = netdev_priv(ndev);
->>> -	struct phy_device *phydev;
->>> +	struct phy_device *phydev, *phydev_tmp;
->>>    
->>>    	/* Attach to the PHY */
->>>    	if (lpc_phy_interface_mode(&pldat->pdev->dev) == PHY_INTERFACE_MODE_MII)
->>> @@ -760,17 +760,18 @@ static int lpc_mii_probe(struct net_device *ndev)
->>>    		netdev_info(ndev, "using RMII interface\n");
->>>    
->>>    	if (pldat->phy_node)
->>> -		phydev =  of_phy_find_device(pldat->phy_node);
->>> +		phydev_tmp =  of_phy_find_device(pldat->phy_node);
->>>    	else
->>> -		phydev = phy_find_first(pldat->mii_bus);
->>> -	if (!phydev) {
->>> +		phydev_tmp = phy_find_first(pldat->mii_bus);
->>> +	if (!phydev_tmp) {
->>
->> I didn't get it, why the new phydev_tmp is needed above, please
->> restore the original code above.
->>
->>>    		netdev_err(ndev, "no PHY found\n");
->>>    		return -ENODEV;
->>>    	}
->>>    
->>> -	phydev = phy_connect(ndev, phydev_name(phydev),
->>> +	phydev = phy_connect(ndev, phydev_name(phydev_tmp),
->>>    			     &lpc_handle_link_change,
->>>    			     lpc_phy_interface_mode(&pldat->pdev->dev));
->>> +	phy_device_free(phydev_tmp);
->>
->> This is plainly wrong and has to be dropped or changed to
->>
->> 	if (pldat->phy_node)
->> 		of_node_put(pldat->phy_node);
->>
->>>    	if (IS_ERR(phydev)) {
->>>    		netdev_err(ndev, "Could not attach to PHY\n");
->>>    		return PTR_ERR(phydev);
->>
->> Is it AI generated fix or what?.. The change looks bad, it introduces
->> more severe issues than it fixes.
->>
->> If you think you cannot create a proper change, let me know.
->>
-> Thank you very much for your detailed review and guidance.
+On 7.4.2026 18:26, Florian Fainelli wrote:
+> This shows an improvement of 1.9% in reducing the CPU cycles and data
+> cache misses.
 > 
-> Now I think your point probably is: you are saying that the real leak
-> is not from of_phy_find_device(), but from the device node
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> ---
 
-I was pretty indelicate in my comment, let's split the change into parts.
+> [...]
 
-1) I still do not understand, why phydev_tmp is introduced, please explain
-or remove this part of the change;
-
-2) phydev = of_phy_find_device() requires phy_device_free(phydev), but
-I do not see why phy_find_first() requires it, while it was added in your
-change.
-
-Let's start from resolving these two points.
-
-> pldat->phy_node which was obtained earlier (probably by
-> of_parse_phandle()) and never freed by of_node_put(). And you suggest
-> to add of_node_put(pldat->phy_node) instead of my wrong
-> phy_device_free().
 > 
-> However, I am still a little confused. In lpc_mii_probe(),
-> of_phy_find_device() is called. From my understanding, this function
-> increases the reference count of the device. To balance it, I thought
-> phy_device_free() (which calls put_device()) should be used.
-> 
-> Could you please kindly advise the correct patch? I will follow your
-> guidance and submit a proper fix.
-> 
-> I apologize again for my previous wrong patch. Thank you very much for
-> your help.
+> -static int bcmasp_alloc_buffers(struct bcmasp_intf *intf)
+> +static struct page_pool *
+> +bcmasp_rx_page_pool_create(struct bcmasp_intf *intf)
+> +{
+> +	struct page_pool_params pp_params = {
+> +		.order		= 0,
+> +		/* Pages are CPU-side copy targets; no DMA mapping needed. */
+> +		.flags		= 0,
+> +		.pool_size	= NUM_4K_BUFFERS,
+> +		.nid		= NUMA_NO_NODE,
+> +		.dev		= &intf->parent->pdev->dev,
+> +		.dma_dir	= DMA_FROM_DEVICE,
 
--- 
-Best wishes,
-Vladimir
+Nit: .dma_dir has AFAIK no effect without PP_FLAG_DMA_MAP, so
+it's a bit misleading next to the "no DMA mapping needed" comment.
+
+> +		.offset		= 0,
+> +		.max_len	= PAGE_SIZE,
+> +	};
+
+Other Broadcom page pool drivers set .napi and .netdev. Adding those
+here would enable direct recycling and expose pool stats in ethtool -S.
+
+> [...]
+
+Thanks
+Nicolai
 
