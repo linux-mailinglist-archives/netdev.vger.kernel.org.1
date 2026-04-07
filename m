@@ -1,179 +1,367 @@
-Return-Path: <netdev+bounces-275879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275880-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id wLlDFWix1GnvwQcAu9opvQ
-	(envelope-from <netdev+bounces-275879-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 09:25:28 +0200
+	id 6OpZCgWy1GkkwgcAu9opvQ
+	(envelope-from <netdev+bounces-275880-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 09:28:05 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D1F93AABDE
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 09:25:27 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2B953AAC54
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 09:28:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0C2B73008D2E
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 07:25:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 95B5A300D46D
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 07:27:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B958392819;
-	Tue,  7 Apr 2026 07:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B286F3947BC;
+	Tue,  7 Apr 2026 07:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Vmn9Ozo5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m30OgZ4+"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B28175A83;
-	Tue,  7 Apr 2026 07:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F3F3921E7;
+	Tue,  7 Apr 2026 07:27:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775546725; cv=none; b=gmlN3yzBwvz34GUhCeXEpQBP78CdRiRoQ/nz2e30lEMBsyeLCN7OqcWUnbTTOMTaK4I2gkOsF92vWyR1jYRuwpS03s6FdpgHAiusBo2Zb3EC2MhKHX0AGhvtxphT0J7AbZc1Mqsm9Qvcice/pPzOA/Z74M5vP6iOv+kFnRwQz3U=
+	t=1775546856; cv=none; b=Bq9R/r1NbPeTRsCZkqP5/1SxJRc/nh/8ogjxNd9yT2IpYUroSxScmhjJHnXpjJ6+lOS4nwR/9iiOK2MUW2y30oLoibE/Sjz6CDCS7YHaJbIMiQ8eMz1vddDwQ/6T05FlbdauCphItfGhxyiTZFxqlihslsbJjbq8amf8eD4aGo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775546725; c=relaxed/simple;
-	bh=3opjvFYBgL1qeuyF5RExKJkNtN6TTTnSXpwSLVcsDV8=;
+	s=arc-20240116; t=1775546856; c=relaxed/simple;
+	bh=Ke+4cfFIuUyaAYRB85WlhtaSzn9Vsqf7eLubNm2wrC8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VnX9ohghpQfOFMOAAcLScqb52IfTzHz1Ggqv+1oXdF8lZktf++bjPw7DUEcv8A8Daq28M77kAW6n3kt9WYLcliYsSeL9Upc6u6zqQBeqx1oc6nD/9w09wz+f8dEmi9KzbXlUx4CtIGIS0QPamK8BaJluFZJxsNooJ94F/XwLlcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Vmn9Ozo5; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Xfd4Ai8X1jiYT9iJrd3H7okMbF4OcPxA5a49UaGG3Bw=; b=Vmn9Ozo5QiEKRbYD/7LSGVZBeD
-	SEgRx4FA/5P7govPIx4DVNioi2ragtO1PZ4zk2yS4RthLlcFsuOtAyDzr/nXA+7JQBZKyfyt9Mxuh
-	AeyGAyJVF9sKFpPiPTkqn8oNBU4itqHyK55vu/Utlm3JdnjcepTre+4P/DWZTOzSQC82s1jiZrTtt
-	xeItoEZYjRqlBCad0STVVtMkoIV3KOyoX74RVbuWf/uqPIgFpwv3/vqCUHWhe4u/XLRfffY5VsI8c
-	kVO1BAgZyWBfS4tPO/s3rd2gjuuRJWH0jltg+g3LP/zM5U2dt2xEf5sNob+TKDN/JOppHYtp3qOYO
-	sLLNgKNQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51304)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1wA0o4-000000000YZ-2Nm1;
-	Tue, 07 Apr 2026 08:25:04 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1wA0nr-0000000024m-08Up;
-	Tue, 07 Apr 2026 08:24:51 +0100
-Date: Tue, 7 Apr 2026 08:24:50 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	bcm-kernel-feedback-list@broadcom.com, richardcochran@gmail.com,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com, rohan.g.thomas@altera.com,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org,
-	andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
-	me@ziyao.cc, siyanteng@cqsoftware.com.cn,
-	prabhakar.mahadev-lad.rj@bp.renesas.com,
-	weishangjuan@eswincomputing.com, wens@kernel.org,
-	vladimir.oltean@nxp.com, lizhi2@eswincomputing.com,
-	boon.khai.ng@altera.com, maxime.chevallier@bootlin.com,
-	chenchuangyu@xiaomi.com, yangtiezhu@loongson.cn,
-	ovidiu.panait.rb@renesas.com, chenhuacai@kernel.org,
-	florian.fainelli@broadcom.com, quic_abchauha@quicinc.com
-Subject: Re: [PATCH net-next v9 0/4] net: stmmac: Add PCI driver support for
- BCM8958x
-Message-ID: <adSxQpAE0nY0ulfU@shell.armlinux.org.uk>
-References: <20260402213629.1996133-1-jitendra.vegiraju@broadcom.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=d0SEjTTTNPneD2ijgza6uz4htZdSOu0bhQ/KnibN6FToo/c5XgbMgvHWcXSqX5jEBmczFoPbmPpAT94Bdr5WG6adW80a0wsm2jjQ78PvPYggnD0jwtCGh/2DcHI/bdQfPCKGGWxJc31UvY+LUk1qkpeNhpaDlxjdGH86c7rd8oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m30OgZ4+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F639C116C6;
+	Tue,  7 Apr 2026 07:27:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775546856;
+	bh=Ke+4cfFIuUyaAYRB85WlhtaSzn9Vsqf7eLubNm2wrC8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=m30OgZ4+3p1ReP/oAexgtmU1wpHtdCwMpqLsPQ1M0sfld/z/FFzZXpYDh4e3fybYj
+	 /pxqvDO1Tk2YWl7SwXOzZpmgZPuybaqhOnBhM2OusK35qXxa6nPe47jMcbyPObRx9A
+	 LIBBR24hxE+0GEJyrHG5Mor7C5RciZv0K1Y119quGDDpBWRKWuWFCrZtXtkdQBW4P/
+	 0NSGF1V4uZmeRTPBIIxtlEIQSD1QF0mJS+7VB4QuEvtYAR4nRExM1YEGb6Y1NIFanM
+	 5dyrIFv4Z+WGfhdSU+6/pMy8q4brJ4lkLN1g/LKq88orVqzymK08dPIflO6p1CiWaw
+	 stDhRXnwwdSEw==
+Date: Tue, 7 Apr 2026 12:57:19 +0530
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Douglas Anderson <dianders@chromium.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J . Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+	Alan Stern <stern@rowland.harvard.edu>, Alexey Kardashevskiy <aik@ozlabs.ru>, 
+	Johan Hovold <johan@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+	Robin Murphy <robin.murphy@arm.com>, maz@kernel.org, Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	Saravana Kannan <saravanak@kernel.org>, Mark Brown <broonie@kernel.org>, alexander.stein@ew.tq-group.com, 
+	andrew@codeconstruct.com.au, andrew@lunn.ch, andriy.shevchenko@linux.intel.com, 
+	astewart@tektelic.com, bhelgaas@google.com, brgl@kernel.org, davem@davemloft.net, 
+	devicetree@vger.kernel.org, driver-core@lists.linux.dev, hkallweit1@gmail.com, 
+	jirislaby@kernel.org, joel@jms.id.au, kees@kernel.org, kuba@kernel.org, 
+	lgirdwood@gmail.com, linux-arm-kernel@lists.infradead.org, 
+	linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, linux@armlinux.org.uk, 
+	netdev@vger.kernel.org, pabeni@redhat.com, robh@kernel.org
+Subject: Re: [PATCH v5 8/9] driver core: Replace dev->of_node_reused with
+ dev_of_node_reused()
+Message-ID: <xoo5ymm44t66hr5ti2apl3u7mmenbic66gi7siiiwxtdgn6bhh@hvfzixit53pf>
+References: <20260406232444.3117516-1-dianders@chromium.org>
+ <20260406162231.v5.8.I806b8636cd3724f6cd1f5e199318ab8694472d90@changeid>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260402213629.1996133-1-jitendra.vegiraju@broadcom.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spamd-Result: default: False [1.14 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	R_DKIM_REJECT(1.00)[armlinux.org.uk:s=pandora-2019];
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260406162231.v5.8.I806b8636cd3724f6cd1f5e199318ab8694472d90@changeid>
+X-Spamd-Result: default: False [-1.66 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
+	MID_RHS_NOT_FQDN(0.50)[];
+	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
-	DMARC_POLICY_SOFTFAIL(0.10)[armlinux.org.uk : SPF not aligned (relaxed),none];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275879-lists,netdev=lfdr.de];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,foss.st.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com,broadcom.com,iogearbox.net,altera.com,st-md-mailman.stormreply.com,lists.infradead.org,lunn.ch,fomichev.me,ziyao.cc,cqsoftware.com.cn,bp.renesas.com,eswincomputing.com,nxp.com,bootlin.com,xiaomi.com,loongson.cn,renesas.com,quicinc.com];
-	RCPT_COUNT_TWELVE(0.00)[37];
 	RCVD_TLS_LAST(0.00)[];
-	MIME_TRACE(0.00)[0:+];
+	TAGGED_FROM(0.00)[bounces-275880-lists,netdev=lfdr.de];
+	RCVD_COUNT_THREE(0.00)[4];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[armlinux.org.uk:-];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_SPAM(0.00)[0.462];
-	RCVD_COUNT_FIVE(0.00)[5];
-	FROM_NEQ_ENVFROM(0.00)[linux@armlinux.org.uk,netdev@vger.kernel.org];
-	PRECEDENCE_BULK(0.00)[];
+	FREEMAIL_CC(0.00)[linuxfoundation.org,kernel.org,rowland.harvard.edu,ozlabs.ru,google.com,lst.de,arm.com,intel.com,ew.tq-group.com,codeconstruct.com.au,lunn.ch,linux.intel.com,tektelic.com,davemloft.net,vger.kernel.org,lists.linux.dev,gmail.com,jms.id.au,lists.infradead.org,lists.ozlabs.org,armlinux.org.uk,redhat.com];
+	RCPT_COUNT_TWELVE(0.00)[41];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[netdev];
 	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns,armlinux.org.uk:url]
-X-Rspamd-Queue-Id: 9D1F93AABDE
+	NEURAL_HAM(-0.00)[-1.000];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[mani@kernel.org,netdev@vger.kernel.org];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	TAGGED_RCPT(0.00)[netdev];
+	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[chromium.org:email,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: C2B953AAC54
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On Thu, Apr 02, 2026 at 02:36:25PM -0700, Jitendra Vegiraju wrote:
-> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+On Mon, Apr 06, 2026 at 04:23:01PM -0700, Douglas Anderson wrote:
+> In C, bitfields are not necessarily safe to modify from multiple
+> threads without locking. Switch "of_node_reused" over to the "flags"
+> field so modifications are safe.
 > 
-> This patchset adds basic PCI ethernet device driver support for Broadcom
-> BCM8958x Automotive Ethernet switch SoC devices.
-> 
-> This SoC device has PCIe ethernet MAC attached to an integrated ethernet
-> switch using XGMII interface. The PCIe ethernet controller is presented to
-> the Linux host as PCI network device.
-> Management of integrated ethernet switch on this SoC is not handled via
-> the PCIe interface.
-> 
-> The following block diagram gives an overview of the application.
->              +=================================+
->              |       Host CPU/Linux            |
->              +=================================+
->                         || PCIe
->                         ||
->         +==========================================+
->         |           +--------------+               |
->         |           | PCIE Endpoint|               |
->         |           | Ethernet     |               |
->         |           | Controller   |               |
->         |           |   DMA        |               |
->         |           +--------------+               |
->         |           |   MAC        |   BCM8958X    |
->         |           +--------------+   SoC         |
->         |               || XGMII                   |
->         |               ||                         |
->         |           +--------------+               |
->         |           | Ethernet     |               |
->         |           | switch       |               |
->         |           +--------------+               |
->         |             || || || ||                  |
->         +==========================================+
->                       || || || || More external interfaces
-> 
-> The MAC block on BCM8958x is based on Synopsis XGMAC 4.00a core. This
-> MAC IP introduces new DMA architecture called Hyper-DMA for virtualization
-> scalability.
-> 
-> Driver functionality specific to new MAC (DW25GMAC) is implemented in
-> new file dw25gmac.c.
+> Cc: Johan Hovold <johan@kernel.org>
+> Acked-by: Mark Brown <broonie@kernel.org>
+> Reviewed-by: Rafael J. Wysocki (Intel) <rafael@kernel.org>
+> Reviewed-by: Danilo Krummrich <dakr@kernel.org>
+> Signed-off-by: Douglas Anderson <dianders@chromium.org>
 
-Sorry for suggesting this rather late, but I recently came across
-another stmmac driver in the kernel - drivers/net/ethernet/synopsys.
-This is for XLGMAC, but I wonder whether it may be a better bet for
-this core. Have you looked at it?
+Acked-by: Manivannan Sadhasivam <mani@kernel.org> # PCI_PWRCTRL
+
+- Mani
+
+> ---
+> Not fixing any known bugs; problem is theoretical and found by code
+> inspection. Change is done somewhat manually and only lightly tested
+> (mostly compile-time tested).
+> 
+> (no changes since v4)
+> 
+> Changes in v4:
+> - Use accessor functions for flags
+> 
+> Changes in v3:
+> - New
+> 
+>  drivers/base/core.c                      | 2 +-
+>  drivers/base/pinctrl.c                   | 2 +-
+>  drivers/base/platform.c                  | 2 +-
+>  drivers/net/pcs/pcs-xpcs-plat.c          | 2 +-
+>  drivers/of/device.c                      | 6 +++---
+>  drivers/pci/of.c                         | 2 +-
+>  drivers/pci/pwrctrl/core.c               | 2 +-
+>  drivers/regulator/bq257xx-regulator.c    | 2 +-
+>  drivers/regulator/rk808-regulator.c      | 2 +-
+>  drivers/tty/serial/serial_base_bus.c     | 2 +-
+>  drivers/usb/gadget/udc/aspeed-vhub/dev.c | 2 +-
+>  include/linux/device.h                   | 7 ++++---
+>  12 files changed, 17 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/base/core.c b/drivers/base/core.c
+> index 8a83d7c93361..30825bf83234 100644
+> --- a/drivers/base/core.c
+> +++ b/drivers/base/core.c
+> @@ -5283,7 +5283,7 @@ void device_set_of_node_from_dev(struct device *dev, const struct device *dev2)
+>  {
+>  	of_node_put(dev->of_node);
+>  	dev->of_node = of_node_get(dev2->of_node);
+> -	dev->of_node_reused = true;
+> +	dev_set_of_node_reused(dev);
+>  }
+>  EXPORT_SYMBOL_GPL(device_set_of_node_from_dev);
+>  
+> diff --git a/drivers/base/pinctrl.c b/drivers/base/pinctrl.c
+> index 6e250272c843..0bbc83231234 100644
+> --- a/drivers/base/pinctrl.c
+> +++ b/drivers/base/pinctrl.c
+> @@ -24,7 +24,7 @@ int pinctrl_bind_pins(struct device *dev)
+>  {
+>  	int ret;
+>  
+> -	if (dev->of_node_reused)
+> +	if (dev_of_node_reused(dev))
+>  		return 0;
+>  
+>  	dev->pins = devm_kzalloc(dev, sizeof(*(dev->pins)), GFP_KERNEL);
+> diff --git a/drivers/base/platform.c b/drivers/base/platform.c
+> index d44591d52e36..199e6fb25770 100644
+> --- a/drivers/base/platform.c
+> +++ b/drivers/base/platform.c
+> @@ -856,7 +856,7 @@ struct platform_device *platform_device_register_full(
+>  	pdev->dev.parent = pdevinfo->parent;
+>  	pdev->dev.fwnode = pdevinfo->fwnode;
+>  	pdev->dev.of_node = of_node_get(to_of_node(pdev->dev.fwnode));
+> -	pdev->dev.of_node_reused = pdevinfo->of_node_reused;
+> +	dev_assign_of_node_reused(&pdev->dev, pdevinfo->of_node_reused);
+>  
+>  	if (pdevinfo->dma_mask) {
+>  		pdev->platform_dma_mask = pdevinfo->dma_mask;
+> diff --git a/drivers/net/pcs/pcs-xpcs-plat.c b/drivers/net/pcs/pcs-xpcs-plat.c
+> index b8c48f9effbf..f4b1b8246ce9 100644
+> --- a/drivers/net/pcs/pcs-xpcs-plat.c
+> +++ b/drivers/net/pcs/pcs-xpcs-plat.c
+> @@ -349,7 +349,7 @@ static int xpcs_plat_init_dev(struct dw_xpcs_plat *pxpcs)
+>  	 * up later. Make sure DD-core is aware of the OF-node being re-used.
+>  	 */
+>  	device_set_node(&mdiodev->dev, fwnode_handle_get(dev_fwnode(dev)));
+> -	mdiodev->dev.of_node_reused = true;
+> +	dev_set_of_node_reused(&mdiodev->dev);
+>  
+>  	/* Pass the data further so the DW XPCS driver core could use it */
+>  	mdiodev->dev.platform_data = (void *)device_get_match_data(dev);
+> diff --git a/drivers/of/device.c b/drivers/of/device.c
+> index f7e75e527667..be4e1584e0af 100644
+> --- a/drivers/of/device.c
+> +++ b/drivers/of/device.c
+> @@ -26,7 +26,7 @@
+>  const struct of_device_id *of_match_device(const struct of_device_id *matches,
+>  					   const struct device *dev)
+>  {
+> -	if (!matches || !dev->of_node || dev->of_node_reused)
+> +	if (!matches || !dev->of_node || dev_of_node_reused(dev))
+>  		return NULL;
+>  	return of_match_node(matches, dev->of_node);
+>  }
+> @@ -192,7 +192,7 @@ ssize_t of_device_modalias(struct device *dev, char *str, ssize_t len)
+>  {
+>  	ssize_t sl;
+>  
+> -	if (!dev || !dev->of_node || dev->of_node_reused)
+> +	if (!dev || !dev->of_node || dev_of_node_reused(dev))
+>  		return -ENODEV;
+>  
+>  	sl = of_modalias(dev->of_node, str, len - 2);
+> @@ -254,7 +254,7 @@ int of_device_uevent_modalias(const struct device *dev, struct kobj_uevent_env *
+>  {
+>  	int sl;
+>  
+> -	if ((!dev) || (!dev->of_node) || dev->of_node_reused)
+> +	if ((!dev) || (!dev->of_node) || dev_of_node_reused(dev))
+>  		return -ENODEV;
+>  
+>  	/* Devicetree modalias is tricky, we add it in 2 steps */
+> diff --git a/drivers/pci/of.c b/drivers/pci/of.c
+> index 9f8eb5df279e..1f9b669abdb0 100644
+> --- a/drivers/pci/of.c
+> +++ b/drivers/pci/of.c
+> @@ -38,7 +38,7 @@ int pci_set_of_node(struct pci_dev *dev)
+>  	struct device *pdev __free(put_device) =
+>  		bus_find_device_by_of_node(&platform_bus_type, node);
+>  	if (pdev)
+> -		dev->bus->dev.of_node_reused = true;
+> +		dev_set_of_node_reused(&dev->bus->dev);
+>  
+>  	device_set_node(&dev->dev, of_fwnode_handle(no_free_ptr(node)));
+>  	return 0;
+> diff --git a/drivers/pci/pwrctrl/core.c b/drivers/pci/pwrctrl/core.c
+> index 7754baed67f2..72963a92362a 100644
+> --- a/drivers/pci/pwrctrl/core.c
+> +++ b/drivers/pci/pwrctrl/core.c
+> @@ -39,7 +39,7 @@ static int pci_pwrctrl_notify(struct notifier_block *nb, unsigned long action,
+>  		 * If we got here then the PCI device is the second after the
+>  		 * power control platform device. Mark its OF node as reused.
+>  		 */
+> -		dev->of_node_reused = true;
+> +		dev_set_of_node_reused(dev);
+>  		break;
+>  	}
+>  
+> diff --git a/drivers/regulator/bq257xx-regulator.c b/drivers/regulator/bq257xx-regulator.c
+> index dab8f1ab4450..40e0f1a7ae81 100644
+> --- a/drivers/regulator/bq257xx-regulator.c
+> +++ b/drivers/regulator/bq257xx-regulator.c
+> @@ -143,7 +143,7 @@ static int bq257xx_regulator_probe(struct platform_device *pdev)
+>  	struct regulator_config cfg = {};
+>  
+>  	pdev->dev.of_node = pdev->dev.parent->of_node;
+> -	pdev->dev.of_node_reused = true;
+> +	dev_set_of_node_reused(&pdev->dev);
+>  
+>  	pdata = devm_kzalloc(&pdev->dev, sizeof(struct bq257xx_reg_data), GFP_KERNEL);
+>  	if (!pdata)
+> diff --git a/drivers/regulator/rk808-regulator.c b/drivers/regulator/rk808-regulator.c
+> index e66408f23bb6..8297d31cde9f 100644
+> --- a/drivers/regulator/rk808-regulator.c
+> +++ b/drivers/regulator/rk808-regulator.c
+> @@ -2115,7 +2115,7 @@ static int rk808_regulator_probe(struct platform_device *pdev)
+>  	int ret, i, nregulators;
+>  
+>  	pdev->dev.of_node = pdev->dev.parent->of_node;
+> -	pdev->dev.of_node_reused = true;
+> +	dev_set_of_node_reused(&pdev->dev);
+>  
+>  	regmap = dev_get_regmap(pdev->dev.parent, NULL);
+>  	if (!regmap)
+> diff --git a/drivers/tty/serial/serial_base_bus.c b/drivers/tty/serial/serial_base_bus.c
+> index a12935f6b992..5f23284a8778 100644
+> --- a/drivers/tty/serial/serial_base_bus.c
+> +++ b/drivers/tty/serial/serial_base_bus.c
+> @@ -74,7 +74,7 @@ static int serial_base_device_init(struct uart_port *port,
+>  	dev->parent = parent_dev;
+>  	dev->bus = &serial_base_bus_type;
+>  	dev->release = release;
+> -	dev->of_node_reused = true;
+> +	dev_set_of_node_reused(dev);
+>  
+>  	device_set_node(dev, fwnode_handle_get(dev_fwnode(parent_dev)));
+>  
+> diff --git a/drivers/usb/gadget/udc/aspeed-vhub/dev.c b/drivers/usb/gadget/udc/aspeed-vhub/dev.c
+> index 2ecd049dacc2..8b9449d16324 100644
+> --- a/drivers/usb/gadget/udc/aspeed-vhub/dev.c
+> +++ b/drivers/usb/gadget/udc/aspeed-vhub/dev.c
+> @@ -593,7 +593,7 @@ int ast_vhub_init_dev(struct ast_vhub *vhub, unsigned int idx)
+>  		d->gadget.max_speed = USB_SPEED_HIGH;
+>  	d->gadget.speed = USB_SPEED_UNKNOWN;
+>  	d->gadget.dev.of_node = vhub->pdev->dev.of_node;
+> -	d->gadget.dev.of_node_reused = true;
+> +	dev_set_of_node_reused(&d->gadget.dev);
+>  
+>  	rc = usb_add_gadget_udc(d->port_dev, &d->gadget);
+>  	if (rc != 0)
+> diff --git a/include/linux/device.h b/include/linux/device.h
+> index 5b0fb6ad4c72..a79865a212e9 100644
+> --- a/include/linux/device.h
+> +++ b/include/linux/device.h
+> @@ -483,6 +483,8 @@ struct device_physical_location {
+>   *		driver/bus sync_state() callback.
+>   * @DEV_FLAG_DMA_COHERENT: This particular device is dma coherent, even if the
+>   *		architecture supports non-coherent devices.
+> + * @DEV_FLAG_OF_NODE_REUSED: Set if the device-tree node is shared with an
+> + *		ancestor device.
+>   */
+>  enum struct_device_flags {
+>  	DEV_FLAG_READY_TO_PROBE = 0,
+> @@ -492,6 +494,7 @@ enum struct_device_flags {
+>  	DEV_FLAG_DMA_OPS_BYPASS = 4,
+>  	DEV_FLAG_STATE_SYNCED = 5,
+>  	DEV_FLAG_DMA_COHERENT = 6,
+> +	DEV_FLAG_OF_NODE_REUSED = 7,
+>  
+>  	DEV_FLAG_COUNT
+>  };
+> @@ -573,8 +576,6 @@ enum struct_device_flags {
+>   *
+>   * @offline_disabled: If set, the device is permanently online.
+>   * @offline:	Set after successful invocation of bus type's .offline().
+> - * @of_node_reused: Set if the device-tree node is shared with an ancestor
+> - *              device.
+>   * @flags:	DEV_FLAG_XXX flags. Use atomic bitfield operations to modify.
+>   *
+>   * At the lowest level, every device in a Linux system is represented by an
+> @@ -681,7 +682,6 @@ struct device {
+>  
+>  	bool			offline_disabled:1;
+>  	bool			offline:1;
+> -	bool			of_node_reused:1;
+>  
+>  	DECLARE_BITMAP(flags, DEV_FLAG_COUNT);
+>  };
+> @@ -715,6 +715,7 @@ __create_dev_flag_accessors(dma_skip_sync, DEV_FLAG_DMA_SKIP_SYNC);
+>  __create_dev_flag_accessors(dma_ops_bypass, DEV_FLAG_DMA_OPS_BYPASS);
+>  __create_dev_flag_accessors(state_synced, DEV_FLAG_STATE_SYNCED);
+>  __create_dev_flag_accessors(dma_coherent, DEV_FLAG_DMA_COHERENT);
+> +__create_dev_flag_accessors(of_node_reused, DEV_FLAG_OF_NODE_REUSED);
+>  
+>  #undef __create_dev_flag_accessors
+>  
+> -- 
+> 2.53.0.1213.gd9a14994de-goog
+> 
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+மணிவண்ணன் சதாசிவம்
 
