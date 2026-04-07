@@ -1,59 +1,55 @@
-Return-Path: <netdev+bounces-275840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275841-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id GK/kFwBs1GmbtwcAu9opvQ
-	(envelope-from <netdev+bounces-275840-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:29:20 +0200
+	id IJV/Fkps1GmatwcAu9opvQ
+	(envelope-from <netdev+bounces-275841-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:30:34 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BDBE3A90B1
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:29:19 +0200 (CEST)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8E7C3A9128
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 04:30:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 67E883051D1E
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:28:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 00D4A3021B0F
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 02:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40211350A1B;
-	Tue,  7 Apr 2026 02:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F804350A1B;
+	Tue,  7 Apr 2026 02:28:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lhLVsCC3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EQTGaOyq"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51E234F497
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 02:28:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFDD350D7D
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 02:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775528887; cv=none; b=tqs4wuPb2YXKbM+A1336pZPE9wysxQfi7gCBsU8ZhXUwNcJk9qYBq+mUQxcaN6awuOj/3AjA3byu/F2/N07ql+DYEyzmDDmUI8emtgDDGU4QOB8EMdug+AsXxMH0MLulr3AoicSqB8FJoVjdkXzrxf6IryE2zdLvbvsNKvSNLa0=
+	t=1775528908; cv=none; b=S6IxSJP02e0fszZDhJklFkTqiqXDnaEt8t92aMB9ydSx3hGUIGJ7YHb3VPtUx4JMG38JJc16Yo8F7nK5u0EpDmifxEFkpdEn/LJymiN6JMgYLS2CsrITC9HZgZEopse/frnyoCuUSbL9wOG25r5AK9LYcUxuQzn0pzY9Lng4L5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775528887; c=relaxed/simple;
-	bh=DtWCpX0Y7Wziob7R+T50C6L34Jslab04GZwvfTcdn2Y=;
+	s=arc-20240116; t=1775528908; c=relaxed/simple;
+	bh=4DLr8fmQA7w/BSu3doLzsfLae70vyzknOfPGkamv3p8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K4YU3juT5RZKhG0MIY4XZMCUau04kJiSQXDIriZzrq9hdKJ67Khhvw+0LtXLAX91TlQUi1U3ybOSxnNiKH4CdhTQk5qTMTXjNkR8tLFqGy+9Ujits51NCXS3TZPGpoifKek0Qg1V7RmBqXFOdHPagDFopZXdYz/J8du7hsWmJ3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lhLVsCC3; arc=none smtp.client-ip=91.218.175.185
+	 MIME-Version; b=WcoeIC3zlF+w+SliiUm1PU9GQtj5s6SVxoRr+jCEnfbeZpEqnSwwg4qJqnVDdHxZYiB2uv36FXFZ8shWg4tXOGgtj3iTBGCo2RxN8yzXrPUmOAFeqc5JWJlRGnXpp07zsQx14ofdJoiOeFiAdaj6u54Npz/KxJVNT/0DA1OsxPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EQTGaOyq; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775528883;
+	t=1775528903;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BLNnb3jXRMLQyY/e94DI3Ql+r/h7olt/Wmz1vv4kMSM=;
-	b=lhLVsCC38No1vHbljGAihvS2QSvu+rHvjpQntwmCrLCf18+DEbksgjf6C18piYJEMlBCX/
-	oB/9ShLEKVEqBBvhkVpkROicVw3UdvUkCK2hxiI5JWj2plCsHB+y+aJ6liWjbDZe7pf9El
-	pMJRcmTsNRQ+OJnOAiOpasOdTTk4vks=
+	bh=/UCL1UTPbeTkxlCFboHUyYHOG6gkIs2lk0DovDddN4g=;
+	b=EQTGaOyqBEf+7c42TUTyU/TlGKvJFkMSr2/PR6tYezKeaL4fN5BI4N82f2srRn1IVYCYz6
+	y+leKHq6BIiJUkeVNBmmvje0i23c4gXE0X8CjKroj6EsMfryxdol3hQHqDKapDXXMcXuEY
+	99rbNaopjQmikkq2+9p1Uq39EmAxz5s=
 From: Jiayuan Chen <jiayuan.chen@linux.dev>
 To: bpf@vger.kernel.org
 Cc: werner@verivus.ai,
 	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Quan Sun <2022090917019@std.uestc.edu.cn>,
-	Yinhao Hu <dddddd@hust.edu.cn>,
-	Kaiyan Mei <M202472210@hust.edu.cn>,
-	Dongliang Mu <dzm91@hust.edu.cn>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
+	Sun Jian <sun.jian.kdev@gmail.com>,
 	Martin KaFai Lau <martin.lau@linux.dev>,
 	Daniel Borkmann <daniel@iogearbox.net>,
 	John Fastabend <john.fastabend@gmail.com>,
@@ -71,13 +67,12 @@ Cc: werner@verivus.ai,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	Shuah Khan <shuah@kernel.org>,
-	Sun Jian <sun.jian.kdev@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf v3 1/2] bpf: Fix same-register dst/src OOB read and pointer leak in sock_ops
-Date: Tue,  7 Apr 2026 10:26:27 +0800
-Message-ID: <20260407022720.162151-2-jiayuan.chen@linux.dev>
+Subject: [PATCH bpf v3 2/2] selftests/bpf: Add tests for sock_ops ctx access with same src/dst register
+Date: Tue,  7 Apr 2026 10:26:28 +0800
+Message-ID: <20260407022720.162151-3-jiayuan.chen@linux.dev>
 In-Reply-To: <20260407022720.162151-1-jiayuan.chen@linux.dev>
 References: <20260407022720.162151-1-jiayuan.chen@linux.dev>
 Precedence: bulk
@@ -92,102 +87,262 @@ X-Spamd-Result: default: False [0.84 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
 	DMARC_POLICY_ALLOW(-0.50)[linux.dev,none];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[linux.dev:s=key1];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
+	FREEMAIL_CC(0.00)[verivus.ai,linux.dev,gmail.com,iogearbox.net,fomichev.me,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
 	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[24];
+	TAGGED_FROM(0.00)[bounces-275841-lists,netdev=lfdr.de];
 	RCVD_TLS_LAST(0.00)[];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275840-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[verivus.ai,linux.dev,std.uestc.edu.cn,hust.edu.cn,etsalapatis.com,iogearbox.net,gmail.com,fomichev.me,kernel.org,davemloft.net,google.com,redhat.com,vger.kernel.org];
-	DKIM_TRACE(0.00)[linux.dev:+];
+	MIME_TRACE(0.00)[0:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
+	TO_DN_SOME(0.00)[];
 	PRECEDENCE_BULK(0.00)[];
 	FROM_NEQ_ENVFROM(0.00)[jiayuan.chen@linux.dev,netdev@vger.kernel.org];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[linux.dev:+];
+	NEURAL_HAM(-0.00)[-0.998];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
 	TAGGED_RCPT(0.00)[netdev];
 	MISSING_XM_UA(0.00)[];
-	FROM_HAS_DN(0.00)[]
-X-Rspamd-Queue-Id: 8BDBE3A90B1
+	DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:dkim,linux.dev:email,linux.dev:mid,sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: B8E7C3A9128
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-When a BPF sock_ops program accesses ctx fields with dst_reg == src_reg,
-the SOCK_OPS_GET_SK() and SOCK_OPS_GET_FIELD() macros fail to zero the
-destination register in the !fullsock / !locked_tcp_sock path.
+Add selftests to verify SOCK_OPS_GET_SK() and SOCK_OPS_GET_FIELD() correctly
+return NULL/zero when dst_reg == src_reg and is_fullsock == 0.
 
-Both macros borrow a temporary register to check is_fullsock /
-is_locked_tcp_sock when dst_reg == src_reg, because dst_reg holds the
-ctx pointer. When the check is false (e.g., TCP_NEW_SYN_RECV state with
-a request_sock), dst_reg should be zeroed but is not, leaving the stale
-ctx pointer:
+Three subtests are included:
+ - get_sk: ctx->sk with same src/dst register (SOCK_OPS_GET_SK)
+ - get_field: ctx->snd_cwnd with same src/dst register (SOCK_OPS_GET_FIELD)
+ - get_sk_diff_reg: ctx->sk with different src/dst register (baseline)
 
- - SOCK_OPS_GET_SK: dst_reg retains the ctx pointer, passes NULL checks
-   as PTR_TO_SOCKET_OR_NULL, and can be used as a bogus socket pointer,
-   leading to stack-out-of-bounds access in helpers like
-   bpf_skc_to_tcp6_sock().
+Each BPF program uses inline asm (__naked) to force specific register
+allocation, reads is_fullsock first, then loads the field using the same
+(or different) register. The test triggers TCP_NEW_SYN_RECV via a TCP
+handshake and checks that the result is NULL/zero when is_fullsock == 0.
 
- - SOCK_OPS_GET_FIELD: dst_reg retains the ctx pointer which the
-   verifier believes is a SCALAR_VALUE, leaking a kernel pointer.
-
-Fix both macros by:
- - Changing JMP_A(1) to JMP_A(2) in the fullsock path to skip the
-   added instruction.
- - Adding BPF_MOV64_IMM(si->dst_reg, 0) after the temp register
-   restore in the !fullsock path, placed after the restore because
-   dst_reg == src_reg means we need src_reg intact to read ctx->temp.
-
-Fixes: fd09af010788 ("bpf: sock_ops ctx access may stomp registers in corner case")
-Fixes: 84f44df664e9 ("bpf: sock_ops sk access may stomp registers when dst_reg = src_reg")
-Reported-by: Quan Sun <2022090917019@std.uestc.edu.cn>
-Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
-Reported-by: Dongliang Mu <dzm91@hust.edu.cn>
-Reviewed-by: Emil Tsalapatis <emil@etsalapatis.com>
-Closes: https://lore.kernel.org/bpf/6fe1243e-149b-4d3b-99c7-fcc9e2f75787@std.uestc.edu.cn/T/#u
+Reviewed-by: Sun Jian <sun.jian.kdev@gmail.com>
 Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 ---
- net/core/filter.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ .../bpf/prog_tests/sock_ops_get_sk.c          |  76 ++++++++++++
+ .../selftests/bpf/progs/sock_ops_get_sk.c     | 117 ++++++++++++++++++
+ 2 files changed, 193 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sock_ops_get_sk.c
+ create mode 100644 tools/testing/selftests/bpf/progs/sock_ops_get_sk.c
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 78b548158fb05..53ce06ed4a88e 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -10581,10 +10581,11 @@ static u32 sock_ops_convert_ctx_access(enum bpf_access_type type,
- 				      si->dst_reg, si->dst_reg,		      \
- 				      offsetof(OBJ, OBJ_FIELD));	      \
- 		if (si->dst_reg == si->src_reg)	{			      \
--			*insn++ = BPF_JMP_A(1);				      \
-+			*insn++ = BPF_JMP_A(2);				      \
- 			*insn++ = BPF_LDX_MEM(BPF_DW, reg, si->src_reg,	      \
- 				      offsetof(struct bpf_sock_ops_kern,      \
- 				      temp));				      \
-+			*insn++ = BPF_MOV64_IMM(si->dst_reg, 0);	      \
- 		}							      \
- 	} while (0)
- 
-@@ -10618,10 +10619,11 @@ static u32 sock_ops_convert_ctx_access(enum bpf_access_type type,
- 				      si->dst_reg, si->src_reg,		      \
- 				      offsetof(struct bpf_sock_ops_kern, sk));\
- 		if (si->dst_reg == si->src_reg)	{			      \
--			*insn++ = BPF_JMP_A(1);				      \
-+			*insn++ = BPF_JMP_A(2);				      \
- 			*insn++ = BPF_LDX_MEM(BPF_DW, reg, si->src_reg,	      \
- 				      offsetof(struct bpf_sock_ops_kern,      \
- 				      temp));				      \
-+			*insn++ = BPF_MOV64_IMM(si->dst_reg, 0);	      \
- 		}							      \
- 	} while (0)
- 
+diff --git a/tools/testing/selftests/bpf/prog_tests/sock_ops_get_sk.c b/tools/testing/selftests/bpf/prog_tests/sock_ops_get_sk.c
+new file mode 100644
+index 0000000000000..343d92c4df30d
+--- /dev/null
++++ b/tools/testing/selftests/bpf/prog_tests/sock_ops_get_sk.c
+@@ -0,0 +1,76 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <test_progs.h>
++#include "cgroup_helpers.h"
++#include "network_helpers.h"
++#include "sock_ops_get_sk.skel.h"
++
++/* See progs/sock_ops_get_sk.c for the bug description. */
++static void run_sock_ops_test(int cgroup_fd, int prog_fd)
++{
++	int server_fd, client_fd, err;
++
++	err = bpf_prog_attach(prog_fd, cgroup_fd, BPF_CGROUP_SOCK_OPS, 0);
++	if (!ASSERT_OK(err, "prog_attach"))
++		return;
++
++	server_fd = start_server(AF_INET, SOCK_STREAM, NULL, 0, 0);
++	if (!ASSERT_OK_FD(server_fd, "start_server"))
++		goto detach;
++
++	/* Trigger TCP handshake which causes TCP_NEW_SYN_RECV state where
++	 * is_fullsock == 0 and is_locked_tcp_sock == 0.
++	 */
++	client_fd = connect_to_fd(server_fd, 0);
++	if (!ASSERT_OK_FD(client_fd, "connect_to_fd"))
++		goto close_server;
++
++	close(client_fd);
++
++close_server:
++	close(server_fd);
++detach:
++	bpf_prog_detach(cgroup_fd, BPF_CGROUP_SOCK_OPS);
++}
++
++void test_ns_sock_ops_get_sk(void)
++{
++	struct sock_ops_get_sk *skel;
++	int cgroup_fd;
++
++	cgroup_fd = test__join_cgroup("/sock_ops_get_sk");
++	if (!ASSERT_OK_FD(cgroup_fd, "join_cgroup"))
++		return;
++
++	skel = sock_ops_get_sk__open_and_load();
++	if (!ASSERT_OK_PTR(skel, "skel_open_load"))
++		goto close_cgroup;
++
++	/* Test SOCK_OPS_GET_SK with same src/dst register */
++	if (test__start_subtest("get_sk")) {
++		run_sock_ops_test(cgroup_fd,
++				  bpf_program__fd(skel->progs.sock_ops_get_sk_same_reg));
++		ASSERT_EQ(skel->bss->null_seen, 1, "null_seen");
++		ASSERT_EQ(skel->bss->bug_detected, 0, "bug_not_detected");
++	}
++
++	/* Test SOCK_OPS_GET_FIELD with same src/dst register */
++	if (test__start_subtest("get_field")) {
++		run_sock_ops_test(cgroup_fd,
++				  bpf_program__fd(skel->progs.sock_ops_get_field_same_reg));
++		ASSERT_EQ(skel->bss->field_null_seen, 1, "field_null_seen");
++		ASSERT_EQ(skel->bss->field_bug_detected, 0, "field_bug_not_detected");
++	}
++
++	/* Test SOCK_OPS_GET_SK with different src/dst register */
++	if (test__start_subtest("get_sk_diff_reg")) {
++		run_sock_ops_test(cgroup_fd,
++				  bpf_program__fd(skel->progs.sock_ops_get_sk_diff_reg));
++		ASSERT_EQ(skel->bss->diff_reg_null_seen, 1, "diff_reg_null_seen");
++		ASSERT_EQ(skel->bss->diff_reg_bug_detected, 0, "diff_reg_bug_not_detected");
++	}
++
++	sock_ops_get_sk__destroy(skel);
++close_cgroup:
++	close(cgroup_fd);
++}
+diff --git a/tools/testing/selftests/bpf/progs/sock_ops_get_sk.c b/tools/testing/selftests/bpf/progs/sock_ops_get_sk.c
+new file mode 100644
+index 0000000000000..3a0689f8ce7ca
+--- /dev/null
++++ b/tools/testing/selftests/bpf/progs/sock_ops_get_sk.c
+@@ -0,0 +1,117 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include "vmlinux.h"
++#include <bpf/bpf_helpers.h>
++#include "bpf_misc.h"
++
++/*
++ * Test the SOCK_OPS_GET_SK() and SOCK_OPS_GET_FIELD() macros in
++ * sock_ops_convert_ctx_access() when dst_reg == src_reg.
++ *
++ * When dst_reg == src_reg, the macros borrow a temporary register to load
++ * is_fullsock / is_locked_tcp_sock, because dst_reg holds the ctx pointer
++ * and cannot be clobbered before ctx->sk / ctx->field is read. If
++ * is_fullsock == 0 (e.g., TCP_NEW_SYN_RECV with a request_sock), the macro
++ * must still zero dst_reg so the verifier's PTR_TO_SOCKET_OR_NULL /
++ * SCALAR_VALUE type is correct at runtime. A missing clear leaves a stale
++ * ctx pointer in dst_reg that passes NULL checks (GET_SK) or leaks a kernel
++ * address as a scalar (GET_FIELD).
++ *
++ * When dst_reg != src_reg, dst_reg itself is used to load is_fullsock, so
++ * the JEQ (dst_reg == 0) naturally leaves it zeroed on the !fullsock path.
++ */
++
++int bug_detected;
++int null_seen;
++
++SEC("sockops")
++__naked void sock_ops_get_sk_same_reg(void)
++{
++	asm volatile (
++		"r7 = *(u32 *)(r1 + %[is_fullsock_off]);"
++		"r1 = *(u64 *)(r1 + %[sk_off]);"
++		"if r7 != 0 goto 2f;"
++		"if r1 == 0 goto 1f;"
++		"r1 = %[bug_detected] ll;"
++		"r2 = 1;"
++		"*(u32 *)(r1 + 0) = r2;"
++		"goto 2f;"
++	"1:"
++		"r1 = %[null_seen] ll;"
++		"r2 = 1;"
++		"*(u32 *)(r1 + 0) = r2;"
++	"2:"
++		"r0 = 1;"
++		"exit;"
++		:
++		: __imm_const(is_fullsock_off, offsetof(struct bpf_sock_ops, is_fullsock)),
++		  __imm_const(sk_off, offsetof(struct bpf_sock_ops, sk)),
++		  __imm_addr(bug_detected),
++		  __imm_addr(null_seen)
++		: __clobber_all);
++}
++
++/* SOCK_OPS_GET_FIELD: same-register, is_locked_tcp_sock == 0 path. */
++int field_bug_detected;
++int field_null_seen;
++
++SEC("sockops")
++__naked void sock_ops_get_field_same_reg(void)
++{
++	asm volatile (
++		"r7 = *(u32 *)(r1 + %[is_fullsock_off]);"
++		"r1 = *(u32 *)(r1 + %[snd_cwnd_off]);"
++		"if r7 != 0 goto 2f;"
++		"if r1 == 0 goto 1f;"
++		"r1 = %[field_bug_detected] ll;"
++		"r2 = 1;"
++		"*(u32 *)(r1 + 0) = r2;"
++		"goto 2f;"
++	"1:"
++		"r1 = %[field_null_seen] ll;"
++		"r2 = 1;"
++		"*(u32 *)(r1 + 0) = r2;"
++	"2:"
++		"r0 = 1;"
++		"exit;"
++		:
++		: __imm_const(is_fullsock_off, offsetof(struct bpf_sock_ops, is_fullsock)),
++		  __imm_const(snd_cwnd_off, offsetof(struct bpf_sock_ops, snd_cwnd)),
++		  __imm_addr(field_bug_detected),
++		  __imm_addr(field_null_seen)
++		: __clobber_all);
++}
++
++/* SOCK_OPS_GET_SK: different-register, is_fullsock == 0 path. */
++int diff_reg_bug_detected;
++int diff_reg_null_seen;
++
++SEC("sockops")
++__naked void sock_ops_get_sk_diff_reg(void)
++{
++	asm volatile (
++		"r7 = r1;"
++		"r6 = *(u32 *)(r7 + %[is_fullsock_off]);"
++		"r2 = *(u64 *)(r7 + %[sk_off]);"
++		"if r6 != 0 goto 2f;"
++		"if r2 == 0 goto 1f;"
++		"r1 = %[diff_reg_bug_detected] ll;"
++		"r3 = 1;"
++		"*(u32 *)(r1 + 0) = r3;"
++		"goto 2f;"
++	"1:"
++		"r1 = %[diff_reg_null_seen] ll;"
++		"r3 = 1;"
++		"*(u32 *)(r1 + 0) = r3;"
++	"2:"
++		"r0 = 1;"
++		"exit;"
++		:
++		: __imm_const(is_fullsock_off, offsetof(struct bpf_sock_ops, is_fullsock)),
++		  __imm_const(sk_off, offsetof(struct bpf_sock_ops, sk)),
++		  __imm_addr(diff_reg_bug_detected),
++		  __imm_addr(diff_reg_null_seen)
++		: __clobber_all);
++}
++
++char _license[] SEC("license") = "GPL";
 -- 
 2.43.0
 
