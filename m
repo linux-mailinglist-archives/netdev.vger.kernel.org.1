@@ -1,143 +1,161 @@
-Return-Path: <netdev+bounces-275969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275970-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id AD7cJrPv1GkjywcAu9opvQ
-	(envelope-from <netdev+bounces-275969-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:51:15 +0200
+	id wJteO07w1GkjywcAu9opvQ
+	(envelope-from <netdev+bounces-275970-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:53:50 +0200
 X-Original-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FE863ADF36
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:51:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ECA53ADF97
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:53:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AF3CB30674D0
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 11:50:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BF0AF3047438
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 11:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD33D39FCDB;
-	Tue,  7 Apr 2026 11:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE943A63F6;
+	Tue,  7 Apr 2026 11:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="II8a75QD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EenWegPn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A95F9303A37;
-	Tue,  7 Apr 2026 11:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F46394786;
+	Tue,  7 Apr 2026 11:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775562637; cv=none; b=e4+A6nlYCt0pSPBu96aN7Dc/rDsFXSxYd6kYWUB++Mp2rEuKEx32k/DD7tqv1MbVv/N7zwB0Tly47KDKvD+b1OCFRPTH4G8tgh1kE1+hx7wHbeeeI7V2BrhpOpiyRxNkzSHcpTbUbeala7dXp2G60vUq0toyRwkW1n0P27fUjKI=
+	t=1775562742; cv=none; b=SWyNEbEccBjNdtccB26RK7g5/XVureBeL6Wk7H4QoUvqCLjCwx4M304V7garSiq+93ek+N1y4jfMOQJgUCH8AFGfdv5Fl2TAtNfPcPwvEubLjgSWp16NIsJOJixMEqi9q3iB0j5mHVpR4gjx66VNAY5EtbQCQXPLKXBPIIbNZy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775562637; c=relaxed/simple;
-	bh=k/oljhVZdj6guNzWvZmUYNC1Bp3zfCAM5LkEGMzctnQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uUNrNjkrIJX6Mb6E1YZ6vBATG00DeG2haiaSAX2b+gGjUgVJvanbI4esIec7LAMHtwclZ6GupTvi0N9iHrPORUY6NIR5YgmrOH0pSpMnRN77klc4XEC8ZeVI2pdWUQuO6oARYYFjE/bdeDNK515WEi0AaQGKbhiKqYYKFWeI7DM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=II8a75QD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BF75C116C6;
-	Tue,  7 Apr 2026 11:50:37 +0000 (UTC)
+	s=arc-20240116; t=1775562742; c=relaxed/simple;
+	bh=uiNZibcrpanS2tAKwNcCtp5oMpTDwmPdO98fIwbT4rw=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=qGbOma6wDYiRLrM4S8AXf5PDuSH3l9hvJ3PSAB73YCpfpi57gY8x0gId/gS+u9hBbm4Dr3p1nHZkxtnBBg36UBgIknJiDfkI87vh2yVR1WLYRiWSreODV1ibYN5O2fa8IY+FkJDa8wAlRLS7tj3HFOyoEhuBz99eiENTqKyggyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EenWegPn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4111DC116C6;
+	Tue,  7 Apr 2026 11:52:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775562637;
-	bh=k/oljhVZdj6guNzWvZmUYNC1Bp3zfCAM5LkEGMzctnQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=II8a75QDuvH0GdnAfa+B3/SHXri77Xso4v8jkDJ3/9eLb5TyN/a/HHmlCnpBVut45
-	 6dX0LkhUIvni4teY6MB5TPZrnBD8xlkXVcayCkleFUIdxAIiz58sdf2D502C3mXemq
-	 S0u8nc50WuhBqK3tL/bC3KP2Nv2Br2gYHAeeYg4wTrRtPQUaOtc77O0hlKxyy5m4aM
-	 rm+vylG1n5AKNutGoBxS1ed5H5M6J6q0LmOJMM2pG32Mc4BC93+XPJZyTMPzKc30vK
-	 SJtW+K2dTXAgL60QiQ1i/n6nv7vdffi3RC9fTdBfIp3uLVAHNRJmkTzMOrqoAbpTaq
-	 +NVB2o9OYNT1Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7CF0C3809A2A;
-	Tue,  7 Apr 2026 11:50:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1775562742;
+	bh=uiNZibcrpanS2tAKwNcCtp5oMpTDwmPdO98fIwbT4rw=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=EenWegPnPLymwI3Zd+2paaOXSnNisTgOga3YK1xwKYGERgzQ+h+xiOD3Omkbfs82g
+	 OP/cbIv/uPvynoW+jLvcwmMZXjQ/egLKOrMVX2s/gLLBtuOiy0bBBucxyxuiq/9hTo
+	 rr/rCQWl7ue5dqd8A8AoreQ/YIFAh7JojKM1N+ktM83LAAVllJ+cOgU3I7DTW8xzC6
+	 jq0pSrk2n1W0hnrgUEiixzTr/y/5OVd2Qe8F2Gc6f+R28r3a7ngedmPgPYL2XRAV+F
+	 UP0UE3j5c9blDYtzV/M6VmBHXaMNwqBKDtwN///wJFvSPzbu8+exctfSU7MZ28rOTY
+	 dWEA1ArJlwa/Q==
+Content-Type: multipart/mixed; boundary="===============5828004932034665690=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V2 0/5] net/mlx5e: XDP,
- Add support for multi-packet per page
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177556261506.3533890.2896935129697278952.git-patchwork-notify@kernel.org>
-Date: Tue, 07 Apr 2026 11:50:15 +0000
-References: <20260403090927.139042-1-tariqt@nvidia.com>
-In-Reply-To: <20260403090927.139042-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- leon@kernel.org, mbloch@nvidia.com, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me,
- dtatulea@nvidia.com, cratiu@nvidia.com, horms@kernel.org,
- jacob.e.keller@intel.com, lkayal@nvidia.com,
- michal.swiatkowski@linux.intel.com, cjubran@nvidia.com, nathan@kernel.org,
- daniel.zahka@gmail.com, rrameshbabu@nvidia.com, raeds@nvidia.com,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, gal@nvidia.com
-X-Spamd-Result: default: False [-0.66 / 15.00];
+Message-Id: <4ab24b8c12f6594ff4bf5df1d05d1b8ada3c913e55000f86e15ec7e7ee980b54@mail.kernel.org>
+In-Reply-To: <20260407105005.1639815-6-nhudson@akamai.com>
+References: <20260407105005.1639815-6-nhudson@akamai.com>
+Subject: Re: [PATCH bpf-next v3 5/6] bpf: clear decap tunnel GSO state in skb_adjust_room
+From: bot+bpf-ci@kernel.org
+To: nhudson@akamai.com,bpf@vger.kernel.org,netdev@vger.kernel.org,willemb@google.com,martin.lau@linux.dev
+Cc: nhudson@akamai.com,mtottenh@akamai.com,aglasgal@akamai.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,eddyz87@gmail.com,memxor@gmail.com,davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,linux-kernel@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Tue,  7 Apr 2026 11:52:22 +0000 (UTC)
+X-Spamd-Result: default: False [0.34 / 15.00];
 	SUSPICIOUS_RECIPS(1.50)[];
+	CTYPE_MIXED_BOGUS(1.00)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
 	R_SPF_ALLOW(-0.20)[+ip4:172.234.253.10:c];
 	MAILLIST(-0.15)[generic];
-	MIME_GOOD(-0.10)[text/plain];
+	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-275969-lists,netdev=lfdr.de,netdevbpf];
-	FREEMAIL_CC(0.00)[google.com,kernel.org,redhat.com,lunn.ch,davemloft.net,nvidia.com,iogearbox.net,gmail.com,fomichev.me,intel.com,linux.intel.com,vger.kernel.org];
-	FROM_NEQ_ENVFROM(0.00)[patchwork-bot@kernel.org,netdev@vger.kernel.org];
-	FORGED_SENDER_MAILLIST(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[akamai.com,kernel.org,iogearbox.net,gmail.com,davemloft.net,google.com,redhat.com,vger.kernel.org,linux.dev,meta.com];
 	DKIM_TRACE(0.00)[kernel.org:+];
-	FROM_NO_DN(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCVD_COUNT_FIVE(0.00)[5];
-	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[bot@kernel.org,netdev@vger.kernel.org];
+	TAGGED_FROM(0.00)[bounces-275970-lists,netdev=lfdr.de,bpf-ci];
+	RCVD_COUNT_THREE(0.00)[4];
+	RCVD_TLS_LAST(0.00)[];
+	FORGED_SENDER_MAILLIST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
+	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
+	MIME_TRACE(0.00)[0:+,1:+];
+	NEURAL_HAM(-0.00)[-0.999];
+	TO_DN_NONE(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NO_DN(0.00)[];
+	MID_RHS_MATCH_FROMTLD(0.00)[];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	TO_DN_SOME(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.234.224.0/19, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: 1FE863ADF36
+	MISSING_XM_UA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[26]
+X-Rspamd-Queue-Id: 8ECA53ADF97
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hello:
+--===============5828004932034665690==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 7f8d43420afb..04059d07d368 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -3667,6 +3667,46 @@ static int bpf_skb_net_shrink(struct sk_buff *skb, u32 off, u32 len_diff,
+>  		if (!(flags & BPF_F_ADJ_ROOM_FIXED_GSO))
+>  			skb_increase_gso_size(shinfo, len_diff);
+>
+> +		/* Selective GSO flag clearing based on decap type.
+> +		 * Only clear the flags for the tunnel layer being removed.
+> +		 */
+> +		if ((flags & BPF_F_ADJ_ROOM_DECAP_L4_UDP) &&
+> +		    (shinfo->gso_type & (SKB_GSO_UDP_TUNNEL |
+> +					 SKB_GSO_UDP_TUNNEL_CSUM |
+> +					 SKB_GSO_TUNNEL_REMCSUM)))
+> +			shinfo->gso_type &= ~(SKB_GSO_UDP_TUNNEL |
+> +					      SKB_GSO_UDP_TUNNEL_CSUM |
+> +					      SKB_GSO_TUNNEL_REMCSUM);
 
-On Fri, 3 Apr 2026 12:09:22 +0300 you wrote:
-> Hi,
-> 
-> This series removes the limitation of having one packet per page in XDP
-> mode. This has the following implications:
-> 
-> - XDP in Striding RQ mode can now be used on 64K page systems.
-> 
-> [...]
+[ ... ]
 
-Here is the summary with links:
-  - [net-next,V2,1/5] net/mlx5e: XSK, Increase size for chunk_size param
-    https://git.kernel.org/netdev/net-next/c/1047e14b44ed
-  - [net-next,V2,2/5] net/mlx5e: XDP, Improve dma address calculation of linear part for XDP_TX
-    https://git.kernel.org/netdev/net-next/c/833e72645aac
-  - [net-next,V2,3/5] net/mlx5e: XDP, Remove stride size limitation
-    https://git.kernel.org/netdev/net-next/c/2dfaa0238774
-  - [net-next,V2,4/5] net/mlx5e: XDP, Use a single linear page per rq
-    https://git.kernel.org/netdev/net-next/c/ebd4ad29cc82
-  - [net-next,V2,5/5] net/mlx5e: XDP, Use page fragments for linear data in multibuf-mode
-    https://git.kernel.org/netdev/net-next/c/25b8c9b6d731
+> +
+> +		/* Clear encapsulation flag only when no tunnel GSO flags remain */
+> +		if (flags & (BPF_F_ADJ_ROOM_DECAP_L4_MASK |
+> +			     BPF_F_ADJ_ROOM_DECAP_IPXIP_MASK)) {
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+[ ... ]
+
+> +
+> +			if (flags & BPF_F_ADJ_ROOM_DECAP_L4_UDP) {
+> +				skb->encap_hdr_csum = !!(shinfo->gso_type & SKB_GSO_UDP_TUNNEL_CSUM);
+> +				skb->remcsum_offload = !!(shinfo->gso_type & SKB_GSO_TUNNEL_REMCSUM);
+
+The L4_UDP clearing block above unconditionally clears
+SKB_GSO_UDP_TUNNEL_CSUM and SKB_GSO_TUNNEL_REMCSUM from
+shinfo->gso_type. By the time these two assignments execute,
+both flags are always zero, so these expressions always
+evaluate to 0.
+
+The kernel's own __skb_udp_tunnel_segment() in udp_offload.c
+uses the same !!() pattern:
+
+    need_csum = !!(skb_shinfo(skb)->gso_type & SKB_GSO_UDP_TUNNEL_CSUM);
+    skb->encap_hdr_csum = need_csum;
+    remcsum = !!(skb_shinfo(skb)->gso_type & SKB_GSO_TUNNEL_REMCSUM);
+    skb->remcsum_offload = remcsum;
+
+but there the flags are still live. Here they have already been
+cleared, so the conditional form is misleading. Would it be
+clearer to just assign 0 directly?
+
+> +			}
+> +		}
 
 
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/24079111128
+--===============5828004932034665690==--
 
