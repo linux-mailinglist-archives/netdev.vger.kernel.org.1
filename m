@@ -1,272 +1,191 @@
-Return-Path: <netdev+bounces-275946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275956-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id cKY+Cpri1Gn0yQcAu9opvQ
-	(envelope-from <netdev+bounces-275946-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 12:55:22 +0200
+	id YEQgIsjq1GkjywcAu9opvQ
+	(envelope-from <netdev+bounces-275956-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:30:16 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3B813AD534
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 12:55:21 +0200 (CEST)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 995313ADB36
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 13:30:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3696C30F75D6
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 10:49:06 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 982EF300682E
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 11:30:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A36BA3A7859;
-	Tue,  7 Apr 2026 10:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E286D3AD52D;
+	Tue,  7 Apr 2026 11:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jpb4PSu1";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="WIHk8h5z"
+	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="BwHQtUyg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [67.231.149.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2722C39D6F9
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 10:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFDE3AD522;
+	Tue,  7 Apr 2026 11:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.149.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775558937; cv=none; b=AWpPygLxpA4rQq9Zwaun5+FE4+cXcFAvfOuofWaF7dXxbcTXBuxpVkE4TPnIQ4fyWnsqOPWJFiZiJwzYMreY+eOBKuA381SXZhW15mGByXkblOw/Pu2xBa7VZQs6ku0WdO80v2EQBQPq4cApZ+MxK1Mvqc7l6djJCZt6ouGNP90=
+	t=1775561409; cv=none; b=apE0wk7A5DU19sxiNsqfMKIx+fLnX3pDu0aKXa0SgIzpBuZDeljkQAgx5gKS6vN/qVHIcSEwNOtD+JR6FJIuvsY8GkcE/Y304kmFV8LMfUtfncZgk5m2de0KJ6/ntMGD7ZKyvLcs9ibVkeLdwwxBGcOMUZWjxLSgTAmVKjQFvRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775558937; c=relaxed/simple;
-	bh=Ytn6pR4N3uMVNtXoQo8Gr27tjtQpaIHKh+ULAxWMXXo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NXhgOTE7QgKcNHACCrHqXgEpi1dtk5Akrz5yQpgzL2ym6M3GrEYqee2mAyu1IGhL2WITUStrCLgep76SYOqb3TJtXXpzZ8mIPSN+BzraRJO09Omf93Yj3d36Ob5HBfs6uhHfeowOiuNZ5AgAsNi/XpDpjDsdKZKvZy5kyT1tOSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jpb4PSu1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WIHk8h5z; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775558934;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fwuWWKD1gpIC79YNQto4eiR0rGIBiL3Ai2I/8/jRRlE=;
-	b=Jpb4PSu1WPp/82wKHS1A5pLSXCUK2cVZjNd0VKqy/Szrd3Kq9ZQ7MruLu8E1Vg0OhagsWN
-	a+0W6402TOADyWes7lTZdlq16TdHimkWlRpIDYOPFZEPTxUDbk41vkco+wL8bIWp2tpu+2
-	Dp5hYubL1e8wYqRMftQKXz7zZURZyFU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-649-yOsK0nTKNdirX3nPZIDQTQ-1; Tue, 07 Apr 2026 06:48:53 -0400
-X-MC-Unique: yOsK0nTKNdirX3nPZIDQTQ-1
-X-Mimecast-MFC-AGG-ID: yOsK0nTKNdirX3nPZIDQTQ_1775558932
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43b96365ea8so6224539f8f.2
-        for <netdev@vger.kernel.org>; Tue, 07 Apr 2026 03:48:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1775558932; x=1776163732; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fwuWWKD1gpIC79YNQto4eiR0rGIBiL3Ai2I/8/jRRlE=;
-        b=WIHk8h5zpmAfvLzEZvB7xge8JA75yeaXjpxNn5ILvi5TUdctjYSHDbW1KLPZuFZeS6
-         fOn7VN4rNJwZFIlt7kO9MGpirIMXv9+zEnZXY5YvU6og5ln86KaPU9PhVVkiEUBhKrGa
-         tvNyLxfr9+TbyOlbmVW+P/cFxSend14gY8IiH2EOelDxK468xHwgBqI0XF6L8hCFO2tI
-         yrMR+rxdism5cEwm9Xft+Px4qhFMSCIx+W3Y+PBuWbCIx4wxmTvrToDECwGQJAg34P/o
-         O21RSip3ded6sDeBfuJ6OF7egyZRYY3cuksSk7I//K5uffRAxocLlnW0yDeUDDxyar91
-         u7yA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775558932; x=1776163732;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fwuWWKD1gpIC79YNQto4eiR0rGIBiL3Ai2I/8/jRRlE=;
-        b=qzDqMDsGpCKiRlQQ9DAMpe5DmffAXnSqToD54HU0xJ4NnH/ilxIkTe6sol7RlVZPS6
-         4CadHnBD3GdHLDv9UmjygP3S1LGrSqNuODPQ/ry5N7tbIXjX3ML66WD6bGqFPWdwG27h
-         zNn3rBTbZhjKVb/Bxb9AvuQ//7r4fdt7vX7a8EyhKmPurqdBxdh/Ka0QMyDqSmUPfogU
-         wYzZem8Z3uM3vj7EqtUUTtz1nkP9ahlwkzVjvCh1jCzS2yBv2h9Lna4+3GNfI1YV0ITv
-         3PM5T47SVy4qdc+S1lhn+6yaoTZrqFx3ZpE8GdKY7GO197HkHu9fbRAGB6dbQSCMjyQ7
-         p2nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWIdC11BuSEbPD+gKbKT6UYPcO1zVj2UXce61dzLm2j6+3z7jsSxsfMFHSZutEU4KIqjIlGffA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyRTzJlbQFfs+VxWr2tEGLWlAQnnehf0uugcTX2OTZw7NsLWyj
-	970S5V04xvAxMiO1b8ET3iZiXmLqgIIeo9951ag74WddkFkKtMXt3Wpq9KD5TcGZG+U8mNWGQyR
-	zhv5YTrwUNH1tMw1xD1s+yg0FQ5d5BKrTP0tEVQs+neTaSyhnziq97s7souktg1ADIA==
-X-Gm-Gg: AeBDieuJMjmuBYbFBAz3y8NHS/T0j/NmgNN9uHAFpnpo9ner/bkJYMUWw9521NJ+raj
-	U5RhrHLpIdJi2hDGM2JGqmLH2recUiEf6sStlFkqzzP9ebvv2oRQFPRP0nXIEfk92vdrxT+qHuk
-	XyxDEi7aCXvTwG8Rc9bYeFwPA/I4ooDGutxPN8wWkvGqjSqhFa7AK4EgCBNHFsVfrwVA08iG+yW
-	jXuGm3wh9sI8PS0Thfbq+CcE4nDtgd6oizqIiFhGYjD/4iIYeakltzSepnzLP+HMlmb+hSfD+LI
-	YJm1lBxXlq175Ae5ifW2HzP4C9r6mVCYcB8xiW5i5oJ+oObVIa2ocltg260wmYycpM2IRZJ1QBk
-	LSqCM2hU/naODBZxupQ6awryyP3egAdyg59VQLtCqMzfaIKaC0Fqfd1FH3w==
-X-Received: by 2002:a05:600c:4743:b0:487:219e:42d with SMTP id 5b1f17b1804b1-4889970642emr229188235e9.11.1775558931654;
-        Tue, 07 Apr 2026 03:48:51 -0700 (PDT)
-X-Received: by 2002:a05:600c:4743:b0:487:219e:42d with SMTP id 5b1f17b1804b1-4889970642emr229187935e9.11.1775558931166;
-        Tue, 07 Apr 2026 03:48:51 -0700 (PDT)
-Received: from [192.168.88.32] ([212.105.153.231])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48895e19c10sm348616065e9.8.2026.04.07.03.48.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 Apr 2026 03:48:50 -0700 (PDT)
-Message-ID: <ea5ba55d-c212-402a-a977-93c442610d17@redhat.com>
-Date: Tue, 7 Apr 2026 12:48:43 +0200
+	s=arc-20240116; t=1775561409; c=relaxed/simple;
+	bh=KCKl5ztQqRvVLggW+dB1QE+I26Jh98Ml3MM3A41Du8I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FSXJoPLeYOClH+Bdg98DzCisSq3EWYB7uwpMZhWmuF0E1fQQ5PsBc3XLeiC3VCatPW2Cd0welJQdNnQSvNw6z0WCoh4tPrY5Xm9Oc6/BXyO1n33cGr0XK2T1VN9MhoND6RoaPFA+s/8W9KzrojVkCu+ZwXBx/ulTe5KbwWYJHx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=BwHQtUyg; arc=none smtp.client-ip=67.231.149.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
+Received: from pps.filterd (m0409409.ppops.net [127.0.0.1])
+	by m0409409.ppops.net-00190b01. (8.18.1.11/8.18.1.11) with ESMTP id 6372FHPp536041;
+	Tue, 7 Apr 2026 11:50:13 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=jan2016.eng; bh=Fm4QDEKMfHoElFxUNOQWeJg+0bZbYcXhJ
+	UHvTev2Kjk=; b=BwHQtUygfm0Fv/n1vOERuJYH5Dkb8gTmvTbQs27I5+5MO3rEW
+	Bjh8ZESvJKYtQI87LN0TRK1Oe9/MS6Y0ttFggQF+p0FjqUhHAoI9mCo6vvZSmCDF
+	YQgdAF866BYPr6glCB4z974hyTpmRI8ysqWq78Y81Vn6xdepZwq5mU21tmN0RKvy
+	uf0sMAEIpNNNzyI52MdGeUTtDWd/9DEUu0nbXxZ8G3MMbDWQrUwKzSbqnXTsle+u
+	5M6eMi7E0rN1+Eq7fEaNqdx54Vobjnqi/INI5FGHayt2CW5VBnoXy2RnnNc6tNGy
+	uP1Pst8bXw1hYZGFXx8iXmm0uGNXll4oSDRRA==
+Received: from prod-mail-ppoint5 (prod-mail-ppoint5.akamai.com [184.51.33.60])
+	by m0409409.ppops.net-00190b01. (PPS) with ESMTPS id 4dbbymrgce-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 Apr 2026 11:50:12 +0100 (BST)
+Received: from pps.filterd (prod-mail-ppoint5.akamai.com [127.0.0.1])
+	by prod-mail-ppoint5.akamai.com (8.18.1.7/8.18.1.7) with ESMTP id 637AoB7B001156;
+	Tue, 7 Apr 2026 03:50:11 -0700
+Received: from prod-mail-relay01.akamai.com ([172.27.118.31])
+	by prod-mail-ppoint5.akamai.com (PPS) with ESMTP id 4dcmehtbbs-1;
+	Tue, 07 Apr 2026 03:50:11 -0700 (PDT)
+Received: from muc-lhvdhd.munich.corp.akamai.com (muc-lhvdhd.munich.corp.akamai.com [172.29.0.147])
+	by prod-mail-relay01.akamai.com (Postfix) with ESMTP id 9EE7780;
+	Tue,  7 Apr 2026 10:50:08 +0000 (UTC)
+From: Nick Hudson <nhudson@akamai.com>
+To: bpf@vger.kernel.org, netdev@vger.kernel.org,
+        Willem de Bruijn <willemb@google.com>,
+        Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Nick Hudson <nhudson@akamai.com>, Max Tottenham <mtottenh@akamai.com>,
+        Anna Glasgall <aglasgal@akamai.com>
+Subject: [PATCH bpf-next v3 0/6] bpf: decap flags and GSO state updates
+Date: Tue,  7 Apr 2026 11:49:59 +0100
+Message-Id: <20260407105005.1639815-1-nhudson@akamai.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net] amd-xgbe: synchronize KR training with device
- operations
-To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch, Thomas.Lendacky@amd.com,
- maxime.chevallier@bootlin.com
-References: <20260403072157.1042806-1-Raju.Rangoju@amd.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20260403072157.1042806-1-Raju.Rangoju@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-07_02,2026-04-07_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ mlxscore=0 mlxlogscore=999 malwarescore=0 lowpriorityscore=0 phishscore=0
+ suspectscore=0 spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2604010000 definitions=main-2604070101
+X-Authority-Analysis: v=2.4 cv=K+sS2SWI c=1 sm=1 tr=0 ts=69d4e164 cx=c_pps
+ a=NpDlK6FjLPvvy7XAFEyJFw==:117 a=NpDlK6FjLPvvy7XAFEyJFw==:17
+ a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Ifg-1AOnLHOf1gn6spyb:22
+ a=TTBIr9FR-UdC54aaq7Eb:22 a=X7Ea-ya5AAAA:8 a=1oy85zK9C34BhurvvrYA:9
+X-Proofpoint-ORIG-GUID: ijNFZiXVfNJ-jGjMPJPGl-nydoVvelqL
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA3MDA5OSBTYWx0ZWRfXy9nnJCfjpXMF
+ CbRl83AwyEWMopRMw1A8RUNLl1Y6lSd1Odnl0VYLfG3DnLpq5G1r7kxA+4ejgUctVbbidyUA5wr
+ jHMyHw4bxFsDRBPB9JoiiX1DaKDsXRTQbhJc/2NW0qhf0ChcnqgxTDYk43Yy9T5E4xLOoHUCaAi
+ 9cAGPhQKN/zGmh0VP9H7z70WTgGjIWua0M/u5svuI44lMsjLAsTIC6wvFXOaHL8AMg/WSx6tKOx
+ YMoGampnqgEUU5g2Trbo3FDiY1wEYRaDwqZhTOsbxSqOn50yWz/UOHoSVyyxESePUMY0/vsTsqM
+ BX8gQbGG9gCNaiAE5RKdtR9vwIhl4FHmw6xRvO/3Wa1Y5CjFO11JvvEnRJoHO3xauqqmGFLOqIq
+ 7Sh66UzeJXh41FSS0qQmNeFUtILruQj8F3mrkLovJ+ObEbZwmigKXVoDSwA7EH8TNIqHJUmzBoj
+ cxGf5dLEQOrzyi0+8qw==
+X-Proofpoint-GUID: ijNFZiXVfNJ-jGjMPJPGl-nydoVvelqL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-07_02,2026-04-07_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0 phishscore=0 adultscore=0 suspectscore=0
+ impostorscore=0 clxscore=1015 lowpriorityscore=0 spamscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604010000 definitions=main-2604070099
 X-Spamd-Result: default: False [-0.66 / 15.00];
-	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
-	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c0a:e001:db::/64:c];
+	MID_CONTAINS_FROM(1.00)[];
+	DMARC_POLICY_ALLOW(-0.50)[akamai.com,quarantine];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[akamai.com:s=jan2016.eng];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	DKIM_TRACE(0.00)[redhat.com:+];
 	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275956-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	TAGGED_FROM(0.00)[bounces-275946-lists,netdev=lfdr.de];
+	RCVD_TLS_LAST(0.00)[];
 	MIME_TRACE(0.00)[0:+];
+	FROM_NEQ_ENVFROM(0.00)[nhudson@akamai.com,netdev@vger.kernel.org];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_FIVE(0.00)[6];
 	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
-	ASN(0.00)[asn:63949, ipnet:2600:3c0a::/32, country:SG];
-	NEURAL_HAM(-0.00)[-0.999];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	NEURAL_HAM(-0.00)[-1.000];
+	DKIM_TRACE(0.00)[akamai.com:+];
 	TAGGED_RCPT(0.00)[netdev];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sea.lore.kernel.org:helo,sea.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: B3B813AD534
+	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_SEVEN(0.00)[8]
+X-Rspamd-Queue-Id: 995313ADB36
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-On 4/3/26 9:21 AM, Raju Rangoju wrote:
-> +static bool xgbe_kr_training_in_progress(struct xgbe_prv_data *pdata)
-> +{
-> +	struct xgbe_phy_data *phy_data = pdata->phy_data;
-> +	unsigned long kr_start, kr_end;
-> +
-> +	/* Only wait for KR training in specific conditions:
-> +	 *  - Inphi re-driver is present, OR
-> +	 *  - Currently in KR mode with autoneg enabled
-> +	 */
-> +	if (!xgbe_phy_port_is_inphi(pdata) &&
-> +	    !(phy_data->cur_mode == XGBE_MODE_KR &&
-> +	      pdata->phy.autoneg == AUTONEG_ENABLE))
-> +		return false;
-> +
-> +	/* If training hasn't completed, ensure it actually started */
-> +	kr_start = READ_ONCE(pdata->kr_start_time);
-> +	if (!kr_start)
-> +		return false;
+This series extends bpf_skb_adjust_room() with decapsulation-specific
+flags and tunnel GSO state updates for decap use cases.
 
-AFAICS kr_start_time is set to the current jiffies value at
-initialization time and 0 is a valid - even if unlikely - jiffies value.
-The above test is false-positive prone.
+Motivation
+----------
 
-> +
-> +	/* Training is complete - no need to wait */
-> +	if (READ_ONCE(pdata->an_result) == XGBE_AN_COMPLETE)
-> +		return false;
-> +
-> +	kr_end = kr_start +
-> +		msecs_to_jiffies(XGBE_AN_MS_TIMEOUT + XGBE_KRTR_TIME);
-> +
-> +	/* If we're already past the training window, it's not "in progress" */
-> +	if (time_after(jiffies, kr_end))
-> +		return false;
+When BPF decapsulates tunneled packets, skb GSO state needs to be updated
+to match the removed tunnel layer. This includes clearing the corresponding
+tunnel GSO type bits and resetting encapsulation state once no tunnel GSO
+flags remain.
 
-Sashiko notes wrap-around (32 bits systems) will lead to wrong return value.
+Series Overview
+---------------
 
-> +
-> +	return true;
-> +}
-> +
-> +static void xgbe_wait_for_kr_training_inprogress(struct xgbe_prv_data *pdata)
-> +{
-> +	unsigned long kr_end;
-> +
-> +	if (!xgbe_kr_training_in_progress(pdata))
-> +		return;
-> +
-> +	/* Don't block the auto-negotiation state machine work item */
-> +	if (current_work() == &pdata->an_work)
-> +		return;
-> +
-> +	kr_end = READ_ONCE(pdata->kr_start_time) +
-> +		msecs_to_jiffies(XGBE_AN_MS_TIMEOUT + XGBE_KRTR_TIME);
-> +
-> +	/* Poll until training completes or the training window expires */
-> +	while (time_before(jiffies, kr_end)) {
-> +		if (READ_ONCE(pdata->an_result) == XGBE_AN_COMPLETE)
-> +			break;
-> +
-> +		usleep_range(10000, 11000);
-> +	}
-> +}
-> +
->  static void xgbe_phy_perform_ratechange(struct xgbe_prv_data *pdata,
-> -					enum xgbe_mb_cmd cmd, enum xgbe_mb_subcmd sub_cmd)
-> +					enum xgbe_mb_cmd cmd,
-> +					enum xgbe_mb_subcmd sub_cmd)
->  {
->  	unsigned int s0 = 0;
->  	unsigned int wait;
-> @@ -2104,6 +2171,13 @@ static void xgbe_phy_perform_ratechange(struct xgbe_prv_data *pdata,
->  	/* Disable PLL re-initialization during FW command processing */
->  	xgbe_phy_pll_ctrl(pdata, false);
->  
-> +	/* Serialize firmware mailbox access.
-> +	 * Protects entire command sequence including busy check, PLL control,
-> +	 * and command execution. Uses explicit lock/unlock for compatibility
-> +	 * with goto-based cleanup (per cleanup.h guidelines).
-> +	 */
-> +	mutex_lock(&pdata->mailbox_lock);
+- Name the adjust_room flag enum for CO-RE lookups.
+- Refactor adjust_room helper masks for maintainable validation logic.
+- Add new DECAP flags to UAPI.
+- Add guard rails for incompatible/invalid decap flag combinations.
+- Implement decap GSO flag clearing.
+- Add selftests to validate decap GSO state transitions.
 
-The comment is confusing, due the the `xgbe_phy_pll_ctrl()` invocation
-just before acquiring the lock.
+Changes v2 -> v3:
+- Add a new selftests patch to validate decap GSO state behavior.
+- Reorder the series so helper-mask refactoring precedes UAPI DECAP flag additions.
+- Refresh patch 2 and patch 3 split to keep refactoring behavior-neutral.
+- Patch 5: add decap tunnel GSO-state checks in
+  "bpf: clear decap tunnel GSO state in skb_adjust_room" (per Gemini/sashiko).
 
-> +
->  	/* Log if a previous command did not complete */
->  	if (XP_IOREAD_BITS(pdata, XP_DRIVER_INT_RO, STATUS)) {
->  		netif_dbg(pdata, link, pdata->netdev,
-> @@ -2115,7 +2189,7 @@ static void xgbe_phy_perform_ratechange(struct xgbe_prv_data *pdata,
->  	XP_SET_BITS(s0, XP_DRIVER_SCRATCH_0, COMMAND, cmd);
->  	XP_SET_BITS(s0, XP_DRIVER_SCRATCH_0, SUB_COMMAND, sub_cmd);
->  
-> -	/* Issue the command */
-> +	/* Issue the firmware command */
->  	XP_IOWRITE(pdata, XP_DRIVER_SCRATCH_0, s0);
->  	XP_IOWRITE(pdata, XP_DRIVER_SCRATCH_1, 0);
->  	XP_IOWRITE_BITS(pdata, XP_DRIVER_INT_REQ, REQUEST, 1);
-> @@ -2123,11 +2197,13 @@ static void xgbe_phy_perform_ratechange(struct xgbe_prv_data *pdata,
->  	/* Wait for command to complete */
->  	wait = XGBE_RATECHANGE_COUNT;
->  	while (wait--) {
-> -		if (!XP_IOREAD_BITS(pdata, XP_DRIVER_INT_RO, STATUS))
-> +		if (!XP_IOREAD_BITS(pdata, XP_DRIVER_INT_RO, STATUS)) {
-> +			mutex_unlock(&pdata->mailbox_lock);
->  			goto do_rx_adaptation;
-> -
-> +		}
->  		usleep_range(1000, 2000);
->  	}
-> +	mutex_unlock(&pdata->mailbox_lock);
->  
->  	netif_dbg(pdata, link, pdata->netdev,
->  		  "firmware mailbox command did not complete\n");
+Changes v1 -> v2:
+- Patch 3: decap flag acceptance intentionally remains L3-only while adding helper masks.
+- Patch 4: decap with L4/IPXIP support enabled with guard rails.
 
-A `xgbe_phy_rx_reset()` invocation will happen here, outside the lock.
-Can that race? will that corrupt the nic status?
+Co-developed-by: Max Tottenham <mtottenh@akamai.com>
+Signed-off-by: Max Tottenham <mtottenh@akamai.com>
+Co-developed-by: Anna Glasgall <aglasgal@akamai.com>
+Signed-off-by: Anna Glasgall <aglasgal@akamai.com>
+Signed-off-by: Nick Hudson <nhudson@akamai.com>
 
-/P
+Nick Hudson (6):
+  bpf: name the enum for BPF_FUNC_skb_adjust_room flags
+  bpf: refactor masks for ADJ_ROOM flags and encap validation
+  bpf: add BPF_F_ADJ_ROOM_DECAP_* flags for tunnel decapsulation
+  bpf: allow new DECAP flags and add guard rails
+  bpf: clear decap tunnel GSO state in skb_adjust_room
+  selftests/bpf: tc_tunnel validate decap GSO state
+
+ include/uapi/linux/bpf.h                      |  36 +++++-
+ net/core/filter.c                             | 120 +++++++++++++++---
+ tools/include/uapi/linux/bpf.h                |  36 +++++-
+ .../selftests/bpf/progs/test_tc_tunnel.c      |  58 +++++++++
+ 4 files changed, 227 insertions(+), 23 deletions(-)
+
+-- 
+2.34.1
 
 
