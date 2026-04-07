@@ -1,226 +1,191 @@
-Return-Path: <netdev+bounces-275869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-275870-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id 7fmXDvad1GnDvwcAu9opvQ
-	(envelope-from <netdev+bounces-275869-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 08:02:30 +0200
+	id gFlvDCWf1GnsvwcAu9opvQ
+	(envelope-from <netdev+bounces-275870-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 08:07:33 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C135C3AA242
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 08:02:29 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A15E43AA26E
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 08:07:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 18CA6300681F
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 06:02:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 90B06301484E
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 06:07:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F0A37C0E1;
-	Tue,  7 Apr 2026 06:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0BE337E2E0;
+	Tue,  7 Apr 2026 06:07:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aSYr6cPA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BhZ91mcG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="dmfWWNU1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACDE8229B18
-	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 06:02:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F03B37D120
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 06:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775541747; cv=none; b=JHIvf0j59l6TF3qgAEOO3cJKBBi+7oaifV/1pDTz3sXn2wQx5A+XgtzIRUrFQmIjlAQINiU9CO4V3ksxWbPQu0d3bFsKAXLTHH0XBNcSfUs0z2ErNkZbu3p3GhAnWpn0GgEli89gad5Gj//EvFHvUMop7+ztki0V7hS/sOUrK1E=
+	t=1775542050; cv=none; b=cTFHaU9b6B5ZCKNOW1nJg7Ifp7MRqHymtbV4wAZIq0KgthZG3EDoW+HIUJfe+9iHKklxNX8SLlFC35hXG9vsYa+sCf4nTESmFB9T70qnjH9DOxafAjJxl/YlJmncKPIVrouicdM0hCKLFUvxlxEMsh45jTxkLSzO7PdgPGY3QYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775541747; c=relaxed/simple;
-	bh=0H9VniHkzeScDYxm/6T7jaHVl7KRkm/Ov7jjRgrBk6Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MIi1UCEuOIfRejV3us3DdVeqEAyoL03jRH13+a32X9i5hT7vtVYWQ8Xe1pWQQMZMLlffIx4g8vKMpJKROWb6prVRFJDUt0a9JYtQPhUPHzeJIiHHVyJJaU3vkKTjJpdlskI/esqbsFgeyBvygnZ+OmlB44uMP2GUk9yYHXEhkdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aSYr6cPA; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2b24fede2acso25585875ad.3
-        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 23:02:26 -0700 (PDT)
+	s=arc-20240116; t=1775542050; c=relaxed/simple;
+	bh=zSPXquHJPZc4vaZrZRXpX7a83xz02/Rc79YIwB+l/e4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uAlOaieL/zttgi3hdFc8feC43qs0Btrvw/t4Jc6/FvuG7d2VbRUWQ6XQCp5Qd4Nh7Ad7KqUmdcspcX8/VHb6THUAshks8BOBq7WL+7t3DFO60iuQBF3A5YeeSW9FciCt9iCT/zPSWcKN9igxL49yKZxjC00d0Z4gDKO2zQunWb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BhZ91mcG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=dmfWWNU1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1775542048;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=goNgr9AbJ08dlfiC1cIzWTDFI/Qs/LnpiiJx3p3Hftk=;
+	b=BhZ91mcG8gX596jy3pdwC1D60Vo0bODdvw9e4R/MxlWCbfXeoua+I6OljZJ6qRs62lquDD
+	vTQAkpNFbX/DMX6dv4P8R1A4CfFNXmkm3Go6FP3LTTzzlHnP7zN2TIhnz5kpffQ4uxvbsP
+	nth+z+8EikFwqRGiuj+/AP3Tyfed44c=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-671-4W25jw1HOGaKFJNJqvPSBA-1; Tue, 07 Apr 2026 02:07:22 -0400
+X-MC-Unique: 4W25jw1HOGaKFJNJqvPSBA-1
+X-Mimecast-MFC-AGG-ID: 4W25jw1HOGaKFJNJqvPSBA_1775542041
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-488af976487so11054135e9.1
+        for <netdev@vger.kernel.org>; Mon, 06 Apr 2026 23:07:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775541746; x=1776146546; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=W+UZVknFvzZ+CFZRKBwEomqUEvo570iJuDBzJawHtDk=;
-        b=aSYr6cPAGxt3Xk7EuXlKysqU+50BosfIlUki+v2Tc6Dy69Vt4fbcu5g5c6yVihUJ3t
-         DkTesnWuWRCGo6N88hNEHSWWB6mzLnrhwbfLkSxL5Fdzn/l1lDUObjz3br7yX8Dnwjyt
-         gOv8yrWj5sFA0mvKE2XFc6JqanDjZgV0ZGJqLBcd/H/GVOfYE0sSgcPup36Sdt1pWRaa
-         ASLsKJOep6FXQ60U9TGbZ58SlIFrlg98y1s9K9xSavQDRvCt2m4Fr4ycN1i5UW0kyqo8
-         DJrOjYjXksVBZbmBTv5Qz+Ts9X1qIqsjXK62dre58mSpUIA+s/HJZxBrtfKuKT0FiS1L
-         HpQw==
+        d=redhat.com; s=google; t=1775542041; x=1776146841; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=goNgr9AbJ08dlfiC1cIzWTDFI/Qs/LnpiiJx3p3Hftk=;
+        b=dmfWWNU1heq7V7tC4TwouPMxIw3wRFPkptnsJ1GNWh40Mle4dyYJztDD8CEkcLuI/H
+         SgzKllWP0CVvviiNEIgnxdWyueK1TLo5QvZ2NqAk9l05k4zYtv/p57EoU/S4VgjS2pHJ
+         CwTkR2+fjlPo3F4VtwA6ic1MuGhBVXUyz6cwgSSTBQSx2M9CfGEPa1qGU/CPjOhCZzFJ
+         A2DcEVDtkf6/HzkQC28B8f7LtJ1eIXrOCrRs7uWM5ZU16CXZ1p/1tQI3czerDVIqDMYs
+         jJZEBazJoz9LG7OrfhSu6GXXx5NaPY4V8uPkgcFDjQZWoiU6fiUsxq+GGOczZBN1ijzP
+         DkWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775541746; x=1776146546;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W+UZVknFvzZ+CFZRKBwEomqUEvo570iJuDBzJawHtDk=;
-        b=qaA8IyUtrQ3HN5MizJtXoVzpbOKS2xjBbuP3U81F1Hi63ZtiX7y/q2T0TJeFCEYoPF
-         InlDgG/rPCwuBX6FIQ+Q1mEn3n/npeTziWU4GgRPPnRy3ESYOJvAesS4eOrp7f8CXToM
-         RZHIs2eYO09wW9HcXZYQbzNG+lGF9hOXFb41BGznWZwmlpvV43Eu0VpKGwExWVVlISJq
-         MOAmcn8E2tVvT4HiuGn201RNKh7M7qsNXNpihFl+xN6AKxCMX5qasiXuvByHJbgFnWBK
-         WGjGRvxnQjXiHbBd3o1JXLDjBBpm3lVeCAJVhYYnv7J8WEU4wEn7wFN9ciLb6cZgLuK4
-         Vu0g==
-X-Gm-Message-State: AOJu0Yy4xXIVGCR7g4YOTeXu0xpY8Orr0blWlgshn0iJ8IBcMvwURUS/
-	POLKfH2XN1LVXYOCzHuAIxM5MgoyTHsxI+6f1RtwXAes9KCR1/CNGz/jSs7QeZK4I8A=
-X-Gm-Gg: AeBDieuEw6iLvFfLjDUjWYWFf+U4AqnJ5VYt7l8EJZ1mR3gsVPjR11hU6l+bVhYZHBQ
-	Y71shHRG8ueykKjUt5EyC6cBmuo7Is/eYB17ctVj8hFvGiXlTDpc7zs0krfcxAEZoYRIIBsBG51
-	SkRzZ+9A++dXIloN3bSqDM+GdP3em5pa1nal3LUj8Uk0OIKhaOPRemDOgVHcYDUWwo/vZnlgJfn
-	Uq2lcrADq+f6guSThBhC6J/um3isC1eStnP20tYa6zT/irf7mYf9+5LiHNm5QcyoIdwxzDH1qBl
-	5Pox8k5h0If0hXw9ukG/lkIS5LNA0hRfSbd6rtnCMfkSdpbzYAE5lmaau77hHBzvIqN3YanRdQQ
-	A7nPkBJYkhvoNxW2cC2MxUE2tSPfcVU52UvZSUa5JFXf2HkdJfHgocILOMwFCZeQ02I/IE238Al
-	EJ40neregTox8J8E5YK/cSkaNrzsFTP2gJNhI=
-X-Received: by 2002:a17:903:22c6:b0:2b2:680c:2193 with SMTP id d9443c01a7336-2b2818b3ae8mr164243585ad.31.1775541745820;
-        Mon, 06 Apr 2026 23:02:25 -0700 (PDT)
-Received: from C6-AF-E1-B8-1C-91 ([106.216.138.173])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b27478cb4fsm174986745ad.29.2026.04.06.23.02.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Apr 2026 23:02:25 -0700 (PDT)
-From: Adith-Joshua <adithalex29@gmail.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	kuba@kernel.org,
-	hawk@kernel.org,
-	john.fastabend@gmail.com
-Subject: [RFC bpf] Ingress RX queue provenance across cpumap redirect
-Date: Tue,  7 Apr 2026 11:32:03 +0530
-Message-ID: <20260407060203.3391-1-adithalex29@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        d=1e100.net; s=20251104; t=1775542041; x=1776146841;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=goNgr9AbJ08dlfiC1cIzWTDFI/Qs/LnpiiJx3p3Hftk=;
+        b=QaRtft8JkqgaH6/DdQsTgMJZZHc12nD7O8Jz4ykctM2a4ntEsWrXPik/V4Y7s4dR0e
+         UuctaqGwNSnQGi9iY5CBvAVnWCZqcJgj7G92uZcTrGtrKgx+rRcPs31fBm64yARWHqDx
+         roX3gy3LlnV2supiLEvOrvUOi7uGCrVYTPf61pQK98rSli943uA87apBRsxosP7ESg+t
+         RS1PZIT5pWl1UKepk1cNAhEja83/HHOZHMCRvhpct/jS2QuogSNQ5VRapT0DEzLhFW4c
+         i/mGn9n5v5XBggu+SrF+gvL7GiuJi8QCserbcHA5BvA09vaD0Pu/894DULAo+GsKS2qT
+         rLZA==
+X-Forwarded-Encrypted: i=1; AJvYcCUjKA6yB8bjMAx9psxWvoqo5jNM0M07rqHvQzU17vgFy1AzaiRR8GJYYfoKoV+ITP0K85ha+y4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrlCaWzKpq1/c3hwtm3/RWXE5GKZOXGKVeF08yESV1As/s5m16
+	q2hv+r9w2NPvAh3CbK1mjgB1Xt9FLkXpBA81nS9xXYIbqd18u7ROeppvCzLxe7+iwahBo3Zyq96
+	6m53aFZnSJyFX9O5RpSXDOKgDboINFv+6XHTpjzgF9bAwXNuBhLr75LfQSQ==
+X-Gm-Gg: AeBDieu7L5bTXPIMke8PuW08/WdKQIYVp1F9Ketgd1bhiU0o8yesnQ073OBQw6oW2zN
+	g69RD11/mfZf+1Nqj9VjPVMOIuBPNernPhiLjcgpj6ObSGxoxZz97nu9URjHr4yJiDe2zlM1MHX
+	Mn8ou+j+2OnASbth80dKJACWHu1xH9cT4ID938PdDJsCwGT+CySIyNWusR/DPPz2QyE4RX3KSAr
+	vp0c0snZwDA3k7kOTNrV3rqm/XTAi7g/cmjAwBU3wcyhrfab49axN/CNyiOavdD7TLxYZNy8k9I
+	UNblojFzwGwAdJQNDFIxj1/9hvJhnKxpYXCAix2C9Q3VvcY5CG0GPut1aRETHQVPC9xcyMM2MdG
+	4lNgYEZYGTOkI9VlyC7zTE0Iph6/6B53HB0fejbWdLW13NwLgiBqom7sreQ==
+X-Received: by 2002:a05:600c:348d:b0:488:be21:54b9 with SMTP id 5b1f17b1804b1-488be2155c0mr15464305e9.8.1775542040628;
+        Mon, 06 Apr 2026 23:07:20 -0700 (PDT)
+X-Received: by 2002:a05:600c:348d:b0:488:be21:54b9 with SMTP id 5b1f17b1804b1-488be2155c0mr15463755e9.8.1775542040128;
+        Mon, 06 Apr 2026 23:07:20 -0700 (PDT)
+Received: from [192.168.88.32] ([212.105.153.231])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48899d3a4e9sm221519485e9.6.2026.04.06.23.07.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Apr 2026 23:07:19 -0700 (PDT)
+Message-ID: <7145f530-3adc-409f-bfc4-583e42be50ee@redhat.com>
+Date: Tue, 7 Apr 2026 08:07:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,v17,08/14] net: homa: create homa_rpc.h and homa_rpc.c
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: horms@kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
+ edumazet@google.com
+References: <20260316223228.2611-9-ouster@cs.stanford.edu>
+ <20260318072131.268946-1-pabeni@redhat.com>
+ <CAGXJAmy7=A+Jc+iJ6jwddWs6x0z4pOudRs31Q41m9HMZ4yTWnw@mail.gmail.com>
+ <6fb603dd-7bc2-4b60-bf93-7247d05f3250@redhat.com>
+ <CAGXJAmx6YsBYQCagvHs1DPTd-b-yHYVTN67-JCApQdG+x6-cjg@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CAGXJAmx6YsBYQCagvHs1DPTd-b-yHYVTN67-JCApQdG+x6-cjg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-0.66 / 15.00];
+X-Spamd-Result: default: False [-2.16 / 15.00];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_CONTAINS_FROM(1.00)[];
-	DMARC_POLICY_ALLOW(-0.50)[gmail.com,none];
-	R_MISSING_CHARSET(0.50)[];
-	R_SPF_ALLOW(-0.20)[+ip4:172.232.135.74:c];
-	R_DKIM_ALLOW(-0.20)[gmail.com:s=20251104];
+	DMARC_POLICY_ALLOW(-0.50)[redhat.com,quarantine];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
+	R_DKIM_ALLOW(-0.20)[redhat.com:s=mimecast20190719,redhat.com:s=google];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
 	MIME_TRACE(0.00)[0:+];
-	DKIM_TRACE(0.00)[gmail.com:+];
-	TAGGED_FROM(0.00)[bounces-275869-lists,netdev=lfdr.de];
+	TO_DN_SOME(0.00)[];
+	TAGGED_FROM(0.00)[bounces-275870-lists,netdev=lfdr.de];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,iogearbox.net,gmail.com];
 	RCVD_TLS_LAST(0.00)[];
+	DKIM_TRACE(0.00)[redhat.com:+];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_FROM(0.00)[gmail.com];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[adithalex29@gmail.com,netdev@vger.kernel.org];
 	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:63949, ipnet:172.232.128.0/19, country:SG];
-	RCVD_COUNT_FIVE(0.00)[5];
-	NEURAL_HAM(-0.00)[-0.999];
-	TO_DN_NONE(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_FIVE(0.00)[6];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[pabeni@redhat.com,netdev@vger.kernel.org];
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	NEURAL_HAM(-0.00)[-1.000];
 	TAGGED_RCPT(0.00)[netdev];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sto.lore.kernel.org:helo,sto.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: C135C3AA242
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns]
+X-Rspamd-Queue-Id: A15E43AA26E
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-Hi,
+On 4/4/26 1:04 AM, John Ousterhout wrote:
+> On Tue, Mar 24, 2026 at 1:55 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>>
+>>>> [ ... ]
+>>>> Paolo also suggested using deferred SKB freeing (skb_attempt_defer_free) to
+>>>> reduce the cost. While you mentioned that GRO is implemented in the full
+>>>> Homa but was left out of the initial patch series, would it be beneficial to
+>>>> include at least some of these optimizations in this initial submission?
+>>>>
+>>>> Reference: https://lore.kernel.org/netdev/9209dfbb-ca3a-4fb7-a2fb-0567394f8cda@redhat.com/
+>>>
+>>> When I asked ChatGPT about homa_attempt_defer_free it said that it
+>>> only works if the skb has no dst, no destructor, and no skb_nfct. I'm
+>>> a bit unsure how to proceed. Is homa_attempt_defer_free only intended
+>>> for incoming packets? If so, then presumably there is no dst? But what
+>>> about the other fields? Do I need to do something to clean them up
+>>> before calling homa_attempt_defer_free?
+>> skb_attempt_defer_free() usage is intended for the RX path only.
+>>
+>> Incoming packets get state (dst, extensions, ct...) attached in the rx
+>> path before reaching the socket. You should free/release the state, if
+>> possible, before inserting the skb into the receive queue, so that you
+>> could defer free them after read.
+> 
+> I have modified Homa to use skb_attempt_defer_free, and this made a
+> significant difference in the throughput of the critical path copying
+> data from skbs to user space. Thanks for the suggestion.
+> 
+> However, skb_attempt_defer_free is not currently exported, so the
+> patch series will now include an EXPORT_SYMBOL line for that in
+> skbuff.c; hopefully that will be OK...
 
-While working with XDP programs using cpumap redirection, I observed that
-ctx->rx_queue_index becomes 0 after xdp_buff -> xdp_frame conversion and
-execution on the remote CPU.
+Yes, it is as long as such export is bundled with the module user - i.e.
+this series.
 
-This is expected since xdp_frame does not carry xdp_rxq_info and cpumap
-re-invokes XDP in a new execution context.
+Cheers,
 
----
+Paolo
 
-## Motivation
-
-Some XDP deployments use cpumap as part of a multi-stage packet processing
-pipeline, where XDP is effectively used as a distributed processing model
-across CPUs rather than a single RX invocation.
-
-In such setups, ingress RX queue identity (rx_queue_index) is sometimes
-used beyond the initial hook not only for debugging, but for maintaining
-consistent observability and pipeline semantics across stages. This includes:
-
-  - maintaining consistent per-RX-queue accounting across cpumap and later
-    XDP stages
-  - preserving RSS-based classification identity for traffic analysis and
-    validation of NIC steering behavior across a distributed pipeline
-  - enabling end-to-end telemetry correlation from hardware queue origin
-    through CPU-side processing
-  - supporting reproducibility of packet processing paths in asynchronous
-    cpumap-driven execution where scheduling and CPU assignment may vary
-
-In these cases, rx_queue_index acts as a stable ingress classification anchor.
-Losing this information at the cpumap boundary breaks the assumption that
-XDP programs operate on a logically continuous packet context across stages.
-
----
-
-## Design observation
-
-Current behavior appears intentional:
-
-  - xdp_frame does not carry xdp_rxq_info
-  - cpumap executes XDP in a new RX context
-  - RX metadata is not considered part of redirected packet state
-
-This suggests that RX provenance is currently scoped strictly to the NIC RX
-invocation context, and is not carried across execution boundaries such as
-cpumap or devmap.
-
----
-
-## Question
-
-Is RX queue provenance expected to be part of the XDP execution model across
-redirect boundaries, or is it explicitly considered out of scope once a packet
-is passed through cpumap/devmap?
-
----
-
-## Alternative direction (for clarification only)
-
-One possible model could be to treat ingress RX metadata as optional,
-non-authoritative context and expose it via a helper-based mechanism
-(e.g. ingress queue accessor), rather than embedding it in xdp_frame or
-xdp_rxq_info.
-
-However, I am not assuming this is aligned with existing design principles,
-and would appreciate clarification on whether such a model is desirable at all.
-
-To be explicit, I am not proposing that rx_queue_index itself be preserved
-in xdp_frame or across cpumap, nor any change to existing struct layouts.
-
-The question is whether ingress RX queue identity is intended to be
-representable beyond the initial NIC RX invocation, particularly in
-redirect-based XDP pipelines.
-
-This question is motivated by cases where cpumap is used as part of a
-multi-stage XDP processing pipeline, where loss of ingress queue identity
-removes a stable classification signal that can otherwise be useful for:
-
-  - correlating packets across distributed XDP execution stages
-  - validating RSS / hardware steering behavior in software datapaths
-  - maintaining consistent per-queue observability across cpumap boundaries
-  - reconstructing ingress-to-processing paths in asynchronous CPU offload
-
-The intent is to understand whether these requirements are intentionally
-out of scope in the current XDP execution model, or whether a helper-based
-or metadata-based abstraction is expected for such use cases.
-
----
-
-## Follow-up
-
-If this aligns with intended design, I would be happy to explore a concrete
-proposal or implementation.
-
-Thanks,
-Adith
 
