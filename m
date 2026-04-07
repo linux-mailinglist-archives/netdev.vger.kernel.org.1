@@ -1,358 +1,173 @@
-Return-Path: <netdev+bounces-276062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-276070-lists+netdev=lfdr.de@vger.kernel.org>
 Delivered-To: lists+netdev@lfdr.de
 Received: from mail.lfdr.de
 	by lfdr with LMTP
-	id uPomNbMp1Wli1wcAu9opvQ
-	(envelope-from <netdev+bounces-276062-lists+netdev=lfdr.de@vger.kernel.org>)
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 17:58:43 +0200
+	id SLsJNKot1Wli1wcAu9opvQ
+	(envelope-from <netdev+bounces-276070-lists+netdev=lfdr.de@vger.kernel.org>)
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 18:15:38 +0200
 X-Original-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7F7B3B16A6
-	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 17:58:42 +0200 (CEST)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A6EB3B19C5
+	for <lists+netdev@lfdr.de>; Tue, 07 Apr 2026 18:15:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id C7DE93006901
-	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 15:58:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4FB24307C750
+	for <lists+netdev@lfdr.de>; Tue,  7 Apr 2026 16:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336F73CD8CD;
-	Tue,  7 Apr 2026 15:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744393CFF5D;
+	Tue,  7 Apr 2026 16:06:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="twI1mTON"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GY4xCBGb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7F83CF03E;
-	Tue,  7 Apr 2026 15:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4909A3CF69F
+	for <netdev@vger.kernel.org>; Tue,  7 Apr 2026 16:05:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775577513; cv=none; b=kNR01rC6g+vuksSypFQY9Ng7n9ux0CG4iwQxNxRrki5paF17g7IFTBIhBL710KJ645asGUR4qzs62ifvvHXLKrLdBrPKbtf6n0a9by4UTOg0rIVjfqaETumFZD5DGdpXcf9gtJbeYMBdN63eZ4nfRwxJIoHI9r/psPSiTB3dWPc=
+	t=1775577959; cv=none; b=SRlU1KWq+Ig7iy/pB6hlhH+DNann8DrG1WIi64Img53JQE3XlM7LGfcn5yQoYUNKdhnLXk3NR8saBNI8CS0lTkPbzNHuR+lEoFnRWkYxM8fUr9CqRmOXSPCMSb2rYth4APwjtRn7ygCJk55CKSW8WAzdmDlvHQWCRZfU4jut4hE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775577513; c=relaxed/simple;
-	bh=uMKW524ItQm2huwJsii0rZz2rhbgsj5zBmrSHlUEbnU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Swd2pgkAmQN17EyoCGXoiWeTMAwv5pNPQqTBoJcufZ8Y7bt3jNxbZ5MOT9IgtfuftotaO/JQVNYqg76v+LpP1bcZoCKgB7oGwH4K6ZMLDdqG9DRDULMViTt8k5G0khmuMgv7hlMMhKpwVSWDDcFJ65v6TEDY3a5gwaaNiMq4UqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=twI1mTON; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE723C116C6;
-	Tue,  7 Apr 2026 15:58:29 +0000 (UTC)
+	s=arc-20240116; t=1775577959; c=relaxed/simple;
+	bh=WftREMo1u84xLMr+6YLVGdH39LN0KbhOC3B/w0TvlxQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pqWJzG+c+Q+U4Yg3pRuNOmYv4rKVPwFl6R9mElfcqy3F2Su8yLdfql0j4lw935fYsSb0UI1dTzRVtZ2Wh+iC4WqLMp6XVzGXdsBM4D/+IWKdjWGkrNdGhK820elQdA59tRB8X1IPJMMb1j4fm6Gy1P8NbCcEmgRgA2oma+jWIbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GY4xCBGb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67AC9C19424;
+	Tue,  7 Apr 2026 16:05:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775577512;
-	bh=uMKW524ItQm2huwJsii0rZz2rhbgsj5zBmrSHlUEbnU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=twI1mTONCtqzHlORVBPVF5XtsvsYU/GRjchbScBwnNWLlrUMP8sK8YIAsmfi91FVV
-	 a/i2ocO/jf0WOB6CWCxFsKmZSfrdcbb1GNLGjCbFHcAIp0pmgWK4A0CTRkENobuRG1
-	 fWNjcMW4VyPFKFcMqjmqqvCX5eZ9G270613UMuUI7Zdlcgsch/LOTifeZHjcuPGQRl
-	 2f0m49U7vLEjaexwkTieYcY2xeftuBh0fp0gkyRFgkfiMwv/xtcJhjOD834P70/wop
-	 PfXKC5OdhkkqlNWzoPLXEUNl0dsdgQ3SidDvBGE/GYT4SMBmRe9132QAITOikkzx1y
-	 pM+CbWVB/PfmA==
-Date: Tue, 7 Apr 2026 16:58:27 +0100
-From: Lee Jones <lee@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@google.com>, stable@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>,
-	Linus Torvalds <torvalds@linuxfoundation.org>,
-	netdev@vger.kernel.org, Igor Ushakov <sysroot314@gmail.com>
-Subject: Re: [PATCH v3 net] af_unix: Give up GC if MSG_PEEK intervened.
-Message-ID: <20260407155827.GA1993342@google.com>
-References: <20260311054043.1231316-1-kuniyu@google.com>
+	s=k20201202; t=1775577958;
+	bh=WftREMo1u84xLMr+6YLVGdH39LN0KbhOC3B/w0TvlxQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=GY4xCBGbTrz3MQyQjJvGIovIL3b8DFki2JMe0YyX/aJyHaXLmp0wD0EdRJHobRv17
+	 MmEszpcm8yOnzRPMq14WJ+Isl/3PuBJ82jp0VogQrutYGHKzW9xSFoGyyyTIKxnMCe
+	 l9MrQ84JCICzknpnhQq2B8FkEeoulfgjrQcoLVLIYarYsPgTqHQAArLmkj7NLcOrHO
+	 KhOak4aZVZXlQE/P+TFnjCLSmwqQq8F7Zalr0fLLQazio2UT7ORF7MQaGi2Lt2yS2d
+	 ICGV/WXhbYGTD/zWV4GbzDXrvE1xFV6l54h5re1wahmRkJLsKTkuFzpOd/Tod7J8X2
+	 zog+Yf7aerwEg==
+From: Simon Horman <horms@kernel.org>
+To: emil.s.tantilov@intel.com
+Cc: 'Simon Horman' <horms@kernel.org>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	richardcochran@gmail.com,
+	milena.olech@intel.com,
+	jacob.e.keller@intel.com,
+	konstantin.ilichev@intel.com
+Subject: Re: [PATCH iwl-net] idpf: fix read_dev_clk_lock spinlock init in idpf_ptp_init()
+Date: Tue,  7 Apr 2026 17:02:43 +0100
+Message-ID: <20260407160241.470945-3-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260403153538.11516-1-emil.s.tantilov@intel.com>
+References: <20260403153538.11516-1-emil.s.tantilov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260311054043.1231316-1-kuniyu@google.com>
-X-Spamd-Result: default: False [-1.16 / 15.00];
+X-Spamd-Result: default: False [0.84 / 15.00];
+	SUSPICIOUS_RECIPS(1.50)[];
 	ARC_ALLOW(-1.00)[subspace.kernel.org:s=arc-20240116:i=1];
-	MID_RHS_MATCH_TO(1.00)[];
+	MID_CONTAINS_FROM(1.00)[];
 	DMARC_POLICY_ALLOW(-0.50)[kernel.org,quarantine];
+	R_MISSING_CHARSET(0.50)[];
 	R_DKIM_ALLOW(-0.20)[kernel.org:s=k20201202];
-	R_SPF_ALLOW(-0.20)[+ip6:2600:3c15:e001:75::/64:c];
+	R_SPF_ALLOW(-0.20)[+ip6:2600:3c04:e001:36c::/64:c];
 	MAILLIST(-0.15)[generic];
 	MIME_GOOD(-0.10)[text/plain];
 	HAS_LIST_UNSUB(-0.01)[];
-	TAGGED_FROM(0.00)[bounces-276062-lists,netdev=lfdr.de];
-	FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,gmail.com,linuxfoundation.org,vger.kernel.org];
-	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,lists.osuosl.org,vger.kernel.org,intel.com,lunn.ch,davemloft.net,google.com,redhat.com,gmail.com];
 	RCVD_COUNT_THREE(0.00)[4];
-	RCVD_TLS_LAST(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[16];
+	TAGGED_FROM(0.00)[bounces-276070-lists,netdev=lfdr.de];
 	MIME_TRACE(0.00)[0:+];
 	FORGED_SENDER_MAILLIST(0.00)[];
-	DKIM_TRACE(0.00)[kernel.org:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	PRECEDENCE_BULK(0.00)[];
-	FROM_NEQ_ENVFROM(0.00)[lee@kernel.org,netdev@vger.kernel.org];
+	RCVD_TLS_LAST(0.00)[];
 	FORGED_RECIPIENTS_MAILLIST(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[11];
+	TO_DN_SOME(0.00)[];
+	PRECEDENCE_BULK(0.00)[];
+	FROM_NEQ_ENVFROM(0.00)[horms@kernel.org,netdev@vger.kernel.org];
+	FROM_HAS_DN(0.00)[];
+	DKIM_TRACE(0.00)[kernel.org:+];
+	NEURAL_HAM(-0.00)[-0.997];
 	RCVD_VIA_SMTP_AUTH(0.00)[];
 	TAGGED_RCPT(0.00)[netdev];
-	ASN(0.00)[asn:63949, ipnet:2600:3c15::/32, country:SG];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sin.lore.kernel.org:helo,sin.lore.kernel.org:rdns]
-X-Rspamd-Queue-Id: D7F7B3B16A6
+	ASN(0.00)[asn:63949, ipnet:2600:3c04::/32, country:SG];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[tor.lore.kernel.org:helo,tor.lore.kernel.org:rdns,sashiko.dev:url]
+X-Rspamd-Queue-Id: 7A6EB3B19C5
 X-Rspamd-Action: no action
 X-Rspamd-Server: lfdr
 
-INTENTIONAL TOP POST
+From: 'Simon Horman' <horms@kernel.org>
 
-I note that this was not sent to Stable, but it should be included please.
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 
-> Igor Ushakov reported that GC purged the receive queue of
-> an alive socket due to a race with MSG_PEEK with a nice repro.
-> 
-> This is the exact same issue previously fixed by commit
-> cbcf01128d0a ("af_unix: fix garbage collect vs MSG_PEEK").
-> 
-> After GC was replaced with the current algorithm, the cited
-> commit removed the locking dance in unix_peek_fds() and
-> reintroduced the same issue.
-> 
-> The problem is that MSG_PEEK bumps a file refcount without
-> interacting with GC.
-> 
-> Consider an SCC containing sk-A and sk-B, where sk-A is
-> close()d but can be recv()ed via sk-B.
-> 
-> The bad thing happens if sk-A is recv()ed with MSG_PEEK from
-> sk-B and sk-B is close()d while GC is checking unix_vertex_dead()
-> for sk-A and sk-B.
-> 
->   GC thread                    User thread
->   ---------                    -----------
->   unix_vertex_dead(sk-A)
->   -> true   <------.
->                     \
->                      `------   recv(sk-B, MSG_PEEK)
->               invalidate !!    -> sk-A's file refcount : 1 -> 2
-> 
->                                close(sk-B)
->                                -> sk-B's file refcount : 2 -> 1
->   unix_vertex_dead(sk-B)
->   -> true
-> 
-> Initially, sk-A's file refcount is 1 by the inflight fd in sk-B
-> recvq.  GC thinks sk-A is dead because the file refcount is the
-> same as the number of its inflight fds.
-> 
-> However, sk-A's file refcount is bumped silently by MSG_PEEK,
-> which invalidates the previous evaluation.
-> 
-> At this moment, sk-B's file refcount is 2; one by the open fd,
-> and one by the inflight fd in sk-A.  The subsequent close()
-> releases one refcount by the former.
-> 
-> Finally, GC incorrectly concludes that both sk-A and sk-B are dead.
-> 
-> One option is to restore the locking dance in unix_peek_fds(),
-> but we can resolve this more elegantly thanks to the new algorithm.
-> 
-> The point is that the issue does not occur without the subsequent
-> close() and we actually do not need to synchronise MSG_PEEK with
-> the dead SCC detection.
-> 
-> When the issue occurs, close() and GC touch the same file refcount.
-> If GC sees the refcount being decremented by close(), it can just
-> give up garbage-collecting the SCC.
-> 
-> Therefore, we only need to signal the race during MSG_PEEK with
-> a proper memory barrier to make it visible to the GC.
-> 
-> Let's use seqcount_t to notify GC when MSG_PEEK occurs and let
-> it defer the SCC to the next run.
-> 
-> This way no locking is needed on the MSG_PEEK side, and we can
-> avoid imposing a penalty on every MSG_PEEK unnecessarily.
-> 
-> Note that we can retry within unix_scc_dead() if MSG_PEEK is
-> detected, but we do not do so to avoid hung task splat from
-> abusive MSG_PEEK calls.
-> 
-> Fixes: 118f457da9ed ("af_unix: Remove lock dance in unix_peek_fds().")
-> Reported-by: Igor Ushakov <sysroot314@gmail.com>
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
-> v3: Check !fpl and add spinlock in unix_peek_fpl()
-> v2: https://lore.kernel.org/all/20260309185823.3502204-1-kuniyu@google.com/
->   * Use seqcount_t for proper memory barrier
-> v1: https://lore.kernel.org/netdev/20260308030406.1825938-1-kuniyu@google.com/
-> ---
->  net/unix/af_unix.c |  2 ++
->  net/unix/af_unix.h |  1 +
->  net/unix/garbage.c | 79 ++++++++++++++++++++++++++++++----------------
->  3 files changed, 54 insertions(+), 28 deletions(-)
-> 
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index 7eaa5b187fef..b23c33df8b46 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -1958,6 +1958,8 @@ static void unix_detach_fds(struct scm_cookie *scm, struct sk_buff *skb)
->  static void unix_peek_fds(struct scm_cookie *scm, struct sk_buff *skb)
->  {
->  	scm->fp = scm_fp_dup(UNIXCB(skb).fp);
-> +
-> +	unix_peek_fpl(scm->fp);
->  }
->  
->  static void unix_destruct_scm(struct sk_buff *skb)
-> diff --git a/net/unix/af_unix.h b/net/unix/af_unix.h
-> index c4f1b2da363d..8119dbeef3a3 100644
-> --- a/net/unix/af_unix.h
-> +++ b/net/unix/af_unix.h
-> @@ -29,6 +29,7 @@ void unix_del_edges(struct scm_fp_list *fpl);
->  void unix_update_edges(struct unix_sock *receiver);
->  int unix_prepare_fpl(struct scm_fp_list *fpl);
->  void unix_destroy_fpl(struct scm_fp_list *fpl);
-> +void unix_peek_fpl(struct scm_fp_list *fpl);
->  void unix_schedule_gc(struct user_struct *user);
->  
->  /* SOCK_DIAG */
-> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-> index 816e8fa2b062..a7967a345827 100644
-> --- a/net/unix/garbage.c
-> +++ b/net/unix/garbage.c
-> @@ -318,6 +318,25 @@ void unix_destroy_fpl(struct scm_fp_list *fpl)
->  	unix_free_vertices(fpl);
->  }
->  
-> +static bool gc_in_progress;
-> +static seqcount_t unix_peek_seq = SEQCNT_ZERO(unix_peek_seq);
-> +
-> +void unix_peek_fpl(struct scm_fp_list *fpl)
-> +{
-> +	static DEFINE_SPINLOCK(unix_peek_lock);
-> +
-> +	if (!fpl || !fpl->count_unix)
-> +		return;
-> +
-> +	if (!READ_ONCE(gc_in_progress))
-> +		return;
-> +
-> +	/* Invalidate the final refcnt check in unix_vertex_dead(). */
-> +	spin_lock(&unix_peek_lock);
-> +	raw_write_seqcount_barrier(&unix_peek_seq);
-> +	spin_unlock(&unix_peek_lock);
-> +}
-> +
->  static bool unix_vertex_dead(struct unix_vertex *vertex)
->  {
->  	struct unix_edge *edge;
-> @@ -351,6 +370,36 @@ static bool unix_vertex_dead(struct unix_vertex *vertex)
->  	return true;
->  }
->  
-> +static LIST_HEAD(unix_visited_vertices);
-> +static unsigned long unix_vertex_grouped_index = UNIX_VERTEX_INDEX_MARK2;
-> +
-> +static bool unix_scc_dead(struct list_head *scc, bool fast)
-> +{
-> +	struct unix_vertex *vertex;
-> +	bool scc_dead = true;
-> +	unsigned int seq;
-> +
-> +	seq = read_seqcount_begin(&unix_peek_seq);
-> +
-> +	list_for_each_entry_reverse(vertex, scc, scc_entry) {
-> +		/* Don't restart DFS from this vertex. */
-> +		list_move_tail(&vertex->entry, &unix_visited_vertices);
-> +
-> +		/* Mark vertex as off-stack for __unix_walk_scc(). */
-> +		if (!fast)
-> +			vertex->index = unix_vertex_grouped_index;
-> +
-> +		if (scc_dead)
-> +			scc_dead = unix_vertex_dead(vertex);
-> +	}
-> +
-> +	/* If MSG_PEEK intervened, defer this SCC to the next round. */
-> +	if (read_seqcount_retry(&unix_peek_seq, seq))
-> +		return false;
-> +
-> +	return scc_dead;
-> +}
-> +
->  static void unix_collect_skb(struct list_head *scc, struct sk_buff_head *hitlist)
->  {
->  	struct unix_vertex *vertex;
-> @@ -404,9 +453,6 @@ static bool unix_scc_cyclic(struct list_head *scc)
->  	return false;
->  }
->  
-> -static LIST_HEAD(unix_visited_vertices);
-> -static unsigned long unix_vertex_grouped_index = UNIX_VERTEX_INDEX_MARK2;
-> -
->  static unsigned long __unix_walk_scc(struct unix_vertex *vertex,
->  				     unsigned long *last_index,
->  				     struct sk_buff_head *hitlist)
-> @@ -474,9 +520,7 @@ static unsigned long __unix_walk_scc(struct unix_vertex *vertex,
+Simon says: I don't agree with the regression characterisation made by
+the AI review - I think this patch is good. But I do think the issues
+flagged by the AI review warrant investigation.
+
+---
+idpf: fix read_dev_clk_lock spinlock init in idpf_ptp_init()
+
+This commit moves the initialization of read_dev_clk_lock earlier in
+idpf_ptp_init() to ensure it is initialized before the PTP auxiliary
+worker is scheduled.
+
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_ptp.c b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+> index eec91c4f0a75a..4a51d2727547d 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_ptp.c
+> @@ -952,6 +952,8 @@ int idpf_ptp_init(struct idpf_adapter *adapter)
+>  		goto free_ptp;
 >  	}
 >  
->  	if (vertex->index == vertex->scc_index) {
-> -		struct unix_vertex *v;
->  		struct list_head scc;
-> -		bool scc_dead = true;
->  
->  		/* SCC finalised.
->  		 *
-> @@ -485,18 +529,7 @@ static unsigned long __unix_walk_scc(struct unix_vertex *vertex,
->  		 */
->  		__list_cut_position(&scc, &vertex_stack, &vertex->scc_entry);
->  
-> -		list_for_each_entry_reverse(v, &scc, scc_entry) {
-> -			/* Don't restart DFS from this vertex in unix_walk_scc(). */
-> -			list_move_tail(&v->entry, &unix_visited_vertices);
-> -
-> -			/* Mark vertex as off-stack. */
-> -			v->index = unix_vertex_grouped_index;
-> -
-> -			if (scc_dead)
-> -				scc_dead = unix_vertex_dead(v);
-> -		}
-> -
-> -		if (scc_dead) {
-> +		if (unix_scc_dead(&scc, false)) {
->  			unix_collect_skb(&scc, hitlist);
->  		} else {
->  			if (unix_vertex_max_scc_index < vertex->scc_index)
-> @@ -550,19 +583,11 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
->  	while (!list_empty(&unix_unvisited_vertices)) {
->  		struct unix_vertex *vertex;
->  		struct list_head scc;
-> -		bool scc_dead = true;
->  
->  		vertex = list_first_entry(&unix_unvisited_vertices, typeof(*vertex), entry);
->  		list_add(&scc, &vertex->scc_entry);
->  
-> -		list_for_each_entry_reverse(vertex, &scc, scc_entry) {
-> -			list_move_tail(&vertex->entry, &unix_visited_vertices);
-> -
-> -			if (scc_dead)
-> -				scc_dead = unix_vertex_dead(vertex);
-> -		}
-> -
-> -		if (scc_dead) {
-> +		if (unix_scc_dead(&scc, true)) {
->  			cyclic_sccs--;
->  			unix_collect_skb(&scc, hitlist);
->  		}
-> @@ -577,8 +602,6 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
->  		   cyclic_sccs ? UNIX_GRAPH_CYCLIC : UNIX_GRAPH_NOT_CYCLIC);
->  }
->  
-> -static bool gc_in_progress;
-> -
->  static void unix_gc(struct work_struct *work)
->  {
->  	struct sk_buff_head hitlist;
-> -- 
-> 2.53.0.473.g4a7958ca14-goog
-> 
+> +	spin_lock_init(&adapter->ptp->read_dev_clk_lock);
+> +
+>  	err = idpf_ptp_create_clock(adapter);
 
--- 
-Lee Jones [李琼斯]
+This patch moves the lock initialization to prevent the worker from accessing
+an uninitialized lock. However, idpf_ptp_create_clock() registers the PTP
+device, and shortly after, ptp_schedule_worker() is called. Both happen
+before the hardware clock baseline and initial time are set later in
+idpf_ptp_init().
+
+Could this introduce a regression where userspace opens the PTP device and
+interacts with an uninitialized clock, or has its settings overwritten by
+the driver's delayed idpf_ptp_settime64() call?
+
+Additionally, could the scheduled worker read the uninitialized zero-time
+and overwrite the software cache after the main thread sets the real time?
+
+Moving the device registration and worker scheduling to the very end of
+idpf_ptp_init() might resolve these races and naturally fix the lock
+initialization ordering.
+
+Also, since this code manages worker synchronization, is there a regression
+when updating cached_phc_time and cached_phc_jiffies?
+
+In idpf_ptp_update_cached_phctime(), these variables are updated
+sequentially using the WRITE_ONCE() macro.
+
+Because this function can be executed concurrently by the PTP worker
+thread and ioctls, thread interleaving could result in an inconsistent
+state where one variable is from one thread and the other from another.
+
+Readers like idpf_ptp_extend_ts() load these variables using plain C
+accesses without mutual exclusion or a seqlock.
+
+Could this cause valid timestamps to be extended using an incorrect or
+outdated baseline, silently corrupting network timestamps?
+
+[ ... ]
 
